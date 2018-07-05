@@ -11,24 +11,6 @@ module Reports
       PostFlag.where("posts.uploader_id = ? and posts.created_at >= ? and post_flags.creator_id <> ?", user_id, date_range, User.system.id).joins(:post).pluck("post_flags.creator_id").uniq
     end
 
-    def build_message(user_id, data)
-      user_name = User.id_to_name(user_id)
-
-      if data.empty?
-        return "There don't appear to be any users targeting #{user_name} for flags."
-      else
-        msg = "The following users may be targeting #{user_name} for flags. Over half of their flags are targeting the user, with 95\% confidence.\n\n"
-
-        data.each do |flagger_id, targets|
-          targets.each do |uploader_id, score|
-            if uploader_id == user_id && score > 50
-              msg += "* " + User.id_to_name(flagger_id)
-            end
-          end
-        end
-      end
-    end
-
     def attackers
       matches = []
 
