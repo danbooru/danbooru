@@ -42,7 +42,7 @@
 
               <span class="info">
                 <strong>Source</strong>
-                <%= link_to_if (upload.source =~ %r!\Ahttps?://!i), (upload.source.presence || content_tag(:em, "none")), upload.source %>
+                <%= link_to_if (upload.source =~ %r!\Ahttps?://!i), (upload.source.presence.try(:truncate, 50) || content_tag(:em, "none")), upload.source %>
                 <%= link_to "»", uploads_path(search: params[:search].merge(source_matches: upload.source)) %>
               </span>
               <br>
