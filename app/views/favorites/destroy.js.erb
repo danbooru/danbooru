@@ -10,4 +10,4 @@ $("#favcount-for-post-<%= @post.id %>").html(<%= @post.fav_count %>);
     $("#show-favlist-link, #hide-favlist-link, #favlist").hide();
   <% end %>
 <% end %>
-Danbooru.notice("You have unfavorited this post");
+$(window).trigger("danbooru:notice", "You have unfavorited this post");

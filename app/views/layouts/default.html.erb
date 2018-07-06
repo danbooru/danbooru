@@ -28,23 +28,12 @@
   <meta name="disable-post-tooltips" content="<%= CurrentUser.disable_post_tooltips? %>">
   <%= content_tag(:meta, nil, name: "disable-mobile-gestures", content: CurrentUser.disable_mobile_gestures?) %>
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
-  <% if Rails.env.production? %>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" integrity="sha256-rByPlHULObEjJ6XQxW/flG2r+22R5dKiAoef+aXWfik=" crossorigin="anonymous" />
-  <% else %>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" integrity="sha256-p6xU9YulB7E2Ic62/PX+h59ayb3PBJ0WFTEQxq0EjHw=" crossorigin="anonymous" />
-  <% end %>
-  <%= stylesheet_link_tag "application", :media => "screen" %>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <%= javascript_pack_tag "application" %>
+  <%= stylesheet_pack_tag "application" %>
   <% if CurrentUser.user.custom_style.present? %>
     <%= stylesheet_link_tag custom_style_users_path, :media => "screen" %>
   <% end %>
-  <% if Rails.env.production? %>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha256-KM512VNnjElC30ehFwehXjx1YCHPiQkOPmqnrWtpccM=" crossorigin="anonymous"></script>
-  <% else %>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
-  <% end %>
-  <%= javascript_include_tag "application" %>
   <%= raw Danbooru.config.custom_html_header_content %>
   <%= yield :html_header %>
   <% if Danbooru.config.twitter_site %>

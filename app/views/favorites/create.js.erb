@@ -1,5 +1,5 @@
 <% if @error_msg %>
-  Danbooru.error("<%= @error_msg %>");
+  $(window).trigger("danbooru:error", "<%= @error_msg %>");
 <% else %>
   $("#add-to-favorites").hide();
   $("#add-fav-button").hide();
@@ -13,5 +13,5 @@
       $("#show-favlist-link").show();
     }
   <% end %>
-  Danbooru.notice("You have favorited this post");
+  $(window).trigger("danbooru:notice", "You have favorited this post");
 <% end %>
