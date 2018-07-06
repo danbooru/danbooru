@@ -1,7 +1,7 @@
 <% if @error %>
-  Danbooru.notice("<%= j @error.to_s %>");
+  $(window).trigger("danbooru:notice", "<%= j @error.to_s %>");
 <% else %>
-  Danbooru.notice("Vote saved");
+  $(window).trigger("danbooru:notice", "Vote saved");
   $("#score-for-post-<%= @post.id %>").html(<%= @post.score %>);
 <% end %>
 
