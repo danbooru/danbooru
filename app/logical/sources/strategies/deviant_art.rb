@@ -110,6 +110,8 @@ module Sources
             "http://fav.me/d#{$1}"
           elsif url =~ %r{\Ahttps?://(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net/.+/[a-f0-9]+-d([a-z0-9]+)\.}i
             "http://fav.me/d#{$1}"
+          elsif url =~ %r{\Ahttps?://www\.deviantart\.com/([^/]+)/art/}
+            url
           elsif url =~ %r{deviantart\.com/art/}
             url
           else

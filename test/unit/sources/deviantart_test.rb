@@ -7,6 +7,17 @@ module Sources
       skip "DeviantArt API keys not set" unless Danbooru.config.deviantart_client_id.present?
     end
 
+    context "A path-based artist url" do
+      setup do
+        @site = Sources::Site.new("https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484")
+        @site.get
+      end
+
+      should "work" do
+        assert_equal(["http://origin-orig.deviantart.net/d533/f/2014/004/8/d/holiday_elincia_by_aeror404-d70rm0s.jpg"], @site.image_urls)
+      end
+    end
+
     context "The source for a private DeviantArt image URL" do
       setup do
         @site = Sources::Site.new("https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png")
