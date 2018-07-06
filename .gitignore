@@ -26,3 +26,8 @@ script/scratch.*
 test/fixtures/vcr_cassettes
 .gitconfig
 test/reports
+/public/packs-test
+/node_modules
+yarn-debug.log*
+.yarn-integrity
+public/packs
