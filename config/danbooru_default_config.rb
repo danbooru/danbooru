@@ -762,6 +762,10 @@ module Danbooru
 
     def recaptcha_secret_key
     end
+
+    def enable_image_cropping
+      true
+    end
     
     # Akismet API key. Used for Dmail spam detection. http://akismet.com/signup/
     def rakismet_key

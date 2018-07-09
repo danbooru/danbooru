@@ -21,7 +21,7 @@ class PostPresenter < Presenter
     end
 
     path = options[:path_prefix] || "/posts"
-    if CurrentUser.id == 1 && options[:show_cropped] && post.has_cropped? && !CurrentUser.user.disable_cropped_thumbnails?
+    if Danbooru.config.enable_image_cropping && CurrentUser.id == 1 && options[:show_cropped] && post.has_cropped? && !CurrentUser.user.disable_cropped_thumbnails?
       src = post.crop_file_url
       imgClass = "cropped"
     else
