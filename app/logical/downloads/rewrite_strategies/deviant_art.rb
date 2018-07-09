@@ -8,7 +8,7 @@ module Downloads
       end
 
       def rewrite(url, headers, data = {})
-        if url =~ %r{deviantart\.com/art/} || url =~ %r{deviantart\.net/.+/[a-z0-9_]+(_by_[a-z0-9_]+)?-d([a-z0-9]+)\.}i
+        if url =~ %r{deviantart\.com/art/} || url =~ %r{\Ahttps?://www\.deviantart\.com/([^/]+)/art/} || url =~ %r{deviantart\.net/.+/[a-z0-9_]+(_by_[a-z0-9_]+)?-d([a-z0-9]+)\.}i
           url, headers = rewrite_html_pages(url, headers)
           url, headers = rewrite_thumbnails(url, headers)
         end
@@ -18,7 +18,7 @@ module Downloads
 
     protected
       def rewrite_html_pages(url, headers)
-        if url =~ %r{^https?://.+?\.deviantart\.com/art/}
+        if url =~ %r{^https?://.+?\.deviantart\.com/art/} || url =~ %r{\Ahttps?://www\.deviantart\.com/([^/]+)/art/}
           return [source.image_url, headers]
         else
           return [url, headers]
