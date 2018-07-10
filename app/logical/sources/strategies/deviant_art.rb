@@ -112,8 +112,8 @@ module Sources
             "http://fav.me/d#{$1}"
           elsif url =~ %r{\Ahttps?://www\.deviantart\.com/([^/]+)/art/}
             url
-          elsif url =~ %r{deviantart\.com/art/}
-            url
+          elsif url !~ %r{\Ahttps?://(?:fc|th|pre|orig|img|www)\.} && url =~ %r{\Ahttps?://(.+?)\.deviantart\.com/?(.*)}
+            "https://www.deviantart.com/#{$1}/#{$2}"
           else
             nil
           end
