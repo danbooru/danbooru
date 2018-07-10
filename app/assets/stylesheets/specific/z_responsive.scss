@@ -146,6 +146,7 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    justify-content: space-between;
   }
 
   article.post-preview {
@@ -173,15 +174,27 @@
   }
 
   .user-disable-cropped-false {
-    article {
-      width: 150px;
-      height: 150px;
-      margin: 5px;
+    article.post-preview {
+      width: 32vw;
+      height: 32vw;
+      margin: 3px;
+
+      &:nth-child(3n+1) {
+        margin-left: 0;
+      }
+
+      &:nth-child(3n+3) {
+        margin-right: 0;
+      }
+
+      &:last-child {
+        margin-right: 0;
+      }
     }
 
     img {
-      width: 150px;
-      height: 150px;
+      width: 32vw;
+      height: 32vw;
     }
   }
 
