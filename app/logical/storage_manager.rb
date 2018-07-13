@@ -72,7 +72,8 @@ class StorageManager
     origin
   end
 
-  def file_path(md5, file_ext, type)
+  def file_path(post_or_md5, file_ext, type)
+    md5 = post_or_md5.is_a?(String) ? post_or_md5 : post_or_md5.md5
     subdir = subdir_for(md5)
     file = file_name(md5, file_ext, type)
 

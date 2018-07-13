@@ -5,10 +5,6 @@ syntax. Matches are executed in order of appearance so the first
 matching manager is returned. You should always add at least one
 manager with no constraints as a default case.
 
-This does not derive from StorageManager so only `open_file`,
-`delete_file`, `store_file`, `file_url`, and `file_path` are
-implemented.
-
 ### Example
 
   StorageManager::Match.new do |matcher|
@@ -35,7 +31,7 @@ implemented.
 
 =end
 
-class StorageManager::Match
+class StorageManager::Match < StorageManager
   def initialize
     @managers = []
 
