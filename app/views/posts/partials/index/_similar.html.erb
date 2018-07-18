@@ -1,0 +1,7 @@
+<div class="recent-posts">
+  <p>You might also like:</p>
+
+  <div>
+    <%= PostSets::Similar.new(post).presenter.post_previews_html(self) %>
+  </div>
+</div>

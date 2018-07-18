@@ -82,6 +82,10 @@
         </div>
       <% end %>
 
+      <% if RecommenderService.available?(@post) %>
+        <%= render "posts/partials/index/similar", post: @post %>
+      <% end %>
+
       <% if @post.presenter.has_nav_links?(self) %>
         <%= render "posts/partials/show/nav_links", :post => @post, :position => "bottom" %>
       <% end %>
