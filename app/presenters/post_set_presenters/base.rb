@@ -12,7 +12,7 @@ module PostSetPresenters
       end
 
       posts.each do |post|
-        html << PostPresenter.preview(post, options.merge(:show_cropped => true, :tags => @post_set.tag_string, :raw => @post_set.raw))
+        html << PostPresenter.preview(post, options.merge(:tags => @post_set.tag_string, :raw => @post_set.raw))
         html << "\n"
       end
 
