@@ -43,7 +43,7 @@ class PostPresenter < Presenter
     html << %{<picture>}
     html << %{<source media="(max-width: 660px)" srcset="#{cropped_src}">}
     html << %{<source media="(min-width: 660px)" srcset="#{post.preview_file_url}">}
-    html << %{<img itemprop="thumbnailUrl" src="#{post.preview_file_url}" title="#{h(tooltip)}" alt="#{h(post.tag_string)}">}
+    html << %{<img itemprop="thumbnailUrl" class="has-cropped-#{post.has_cropped?}" src="#{post.preview_file_url}" title="#{h(tooltip)}" alt="#{h(post.tag_string)}">}
     html << %{</picture>}
     html << %{</a>}
 
