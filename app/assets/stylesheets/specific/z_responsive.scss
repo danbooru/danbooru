@@ -181,7 +181,11 @@
 
     img {
       width: 100%;
-      height: 33.3vw
+      height: 33.3vw;
+
+      &.has-cropped-false {
+        object-fit: cover;
+      }
     }
   }
 
