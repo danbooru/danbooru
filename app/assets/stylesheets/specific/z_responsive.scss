@@ -161,6 +161,7 @@
     }
 
     img {
+      width: 33.3vw;
       border: none !important;
     }
 
@@ -180,11 +181,10 @@
     }
 
     img {
-      width: 100%;
+      width: 33.3vw;
       height: 33.3vw;
 
       &.has-cropped-false {
-        width: 33.3vw;
         object-fit: cover;
       }
     }
