@@ -156,7 +156,7 @@ class UploadService
       # in case this upload never finishes processing, we need to delete the
       # distributed files in the future
       Danbooru.config.other_server_hosts.each do |host|
-        UploadService::Utils.delay(priority: -1, queue: host, run_at: 30.minutes.from_now).delete_file(upload.md5, upload.file_ext, upload.id)
+        UploadService::Utils.delay(priority: -1, queue: host, run_at: 24.hours.from_now).delete_file(upload.md5, upload.file_ext, upload.id)
       end
     end
 
