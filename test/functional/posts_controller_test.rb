@@ -115,6 +115,22 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         get post_path(@post), params: {:id => @post.id}
         assert_response :success
       end
+
+      context "when the recommend service is enabled" do
+        setup do
+          @post2 = create(:post)
+          RecommenderService.stubs(:enabled?).returns(true)
+          RecommenderService.stubs(:available?).returns(true)
+          RecommenderService.stubs(:similar).returns([[@post.id, "1.0"], [@post2.id, "0.01"]])
+        end
+
+        should "render a section for similar posts" do
+          get_auth post_path(@post), @user
+          assert_response :success
+          assert_select ".similar-posts"
+          assert_select ".similar-posts #post_#{@post2.id}"
+        end
+      end
     end
 
     context "update action" do
