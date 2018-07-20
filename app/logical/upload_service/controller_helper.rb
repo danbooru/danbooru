@@ -15,7 +15,7 @@ class UploadService
         if post.nil?
           # this gets called from UploadsController#new so we need
           # to preprocess async
-          Preprocessor.new(source: url).delay(priority: -1, queue: "default").delayed_start(CurrentUser.id)
+          Preprocessor.new(source: url, referer_url: ref).delay(priority: -1, queue: "default").delayed_start(CurrentUser.id)
         end
 
         begin
