@@ -70,8 +70,11 @@ class StorageManager::Match < StorageManager
       end
 
       if match
-        yield manager if block_given?
-        return manager unless block_given?
+        if block_given?
+          return yield(manager)
+        else
+          return manager
+        end
       end
     end
   end
