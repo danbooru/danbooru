@@ -783,6 +783,12 @@ module Danbooru
 
     def cloudflare_key
     end
+
+    def recommender_server
+    end
+
+    def recommender_key
+    end
   end
 
   class EnvironmentConfiguration
