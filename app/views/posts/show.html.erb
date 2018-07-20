@@ -82,21 +82,29 @@
         </div>
       <% end %>
 
-      <% if RecommenderService.available?(@post) %>
-        <%= render "posts/partials/index/similar", post: @post %>
-      <% end %>
-
       <% if @post.presenter.has_nav_links?(self) %>
         <%= render "posts/partials/show/nav_links", :post => @post, :position => "bottom" %>
       <% end %>
 
       <menu id="post-sections">
+        <% if RecommenderService.available?(@post) %>
+          <li><a href="#similar">Similar</a></li>
+        <% end %>
+
         <li><a href="#comments">Comments</a></li>
+
         <% if CurrentUser.is_member? && @post.visible? %>
           <li><a href="#edit" id="post-edit-link">Edit</a></li>
         <% end %>
+
         <li><a href="#share">Share</a></li>
       </menu>
+
+      <% if RecommenderService.available?(@post) %>
+        <section id="similar">
+          <%= render "posts/partials/index/similar", post: @post %>
+        </section>
+      <% end %>
 
       <section id="comments">
         <% if !CurrentUser.user.is_builder? %>

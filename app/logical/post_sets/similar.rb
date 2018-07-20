@@ -8,7 +8,7 @@ module PostSets
     def posts
       @posts ||= begin
         response = RecommenderService.similar(@post)
-        post_ids = response.reject {|x| x[0] == @post.id}.slice(0, 5).map {|x| x[0]}
+        post_ids = response.reject {|x| x[0] == @post.id}.slice(0, 6).map {|x| x[0]}
         ::Post.find(post_ids)
       end
     end
