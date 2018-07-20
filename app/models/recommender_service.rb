@@ -6,9 +6,7 @@ module RecommenderService
   end
 
   def available?(post)
-    return true if Rails.env.development?
-    
-    enabled? && CurrentUser.id == 1 && post.created_at > 6.months.ago && post.score >= 10
+    enabled? && post.created_at > 6.months.ago && post.score >= 10
   end
 
   def similar(post)
