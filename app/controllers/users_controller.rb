@@ -96,6 +96,7 @@ class UsersController < ApplicationController
       disable_categorized_saved_searches disable_tagged_filenames
       enable_recent_searches disable_cropped_thumbnails disable_mobile_gestures
       enable_safe_mode disable_responsive_mode disable_post_tooltips
+      enable_recommended_posts
     ]
 
     permitted_params += [dmail_filter_attributes: %i[id words]]

@@ -438,7 +438,7 @@
         $("#comments").show();
         $("#edit").hide();
         $("#share").hide();
-        $("#similar").hide();
+        $("#recommended").hide();
       } else if (e.target.hash === "#edit") {
         $("#edit").show();
         $("#comments").hide();
@@ -446,18 +446,18 @@
         $("#post_tag_string").focus().selectEnd().height($("#post_tag_string")[0].scrollHeight);
         $("#related-tags-button").trigger("click");
         $("#find-artist-button").trigger("click");
-        $("#similar").hide();
-      } else if (e.target.hash === "#similar") {
+        $("#recommended").hide();
+      } else if (e.target.hash === "#recommended") {
         $("#comments").hide();
         $("#edit").hide();
         $("#share").hide();
-        $("#similar").show();
+        $("#recommended").show();
       } else {
         $("#edit").hide();
         $("#comments").hide();
         $("#share").show();
         addthis.init();
-        $("#similar").hide();
+        $("#recommended").hide();
       } 
 
       $("#post-sections li").removeClass("active");
@@ -465,11 +465,14 @@
       e.preventDefault();
     });
 
-    $("#post-sections li:first-child").addClass("active");
     $("#notes").hide();
     $("#edit").hide();
-    if ($("#similar").length) {
+    if ($("#recommended").data("available")) {
+      $("#post-sections li:first-child").addClass("active");
       $("#comments").hide();
+    } else {
+      $("#post-sections li:nth-child(2)").addClass("active");
+      $("#recommended").hide();
     }
   }
 

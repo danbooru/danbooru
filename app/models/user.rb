@@ -59,6 +59,7 @@ class User < ApplicationRecord
     enable_safe_mode
     disable_responsive_mode
     disable_post_tooltips
+    enable_recommended_posts
   )
 
   include Danbooru::HasBitFlags

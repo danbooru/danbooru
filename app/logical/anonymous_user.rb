@@ -281,6 +281,10 @@ class AnonymousUser
     false
   end
 
+  def enable_recommended_posts?
+    false
+  end
+
   User::Roles.reject {|r| r == :anonymous}.each do |name|
     define_method("is_#{name}?") do
       false

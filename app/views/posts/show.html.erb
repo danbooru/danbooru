@@ -87,8 +87,8 @@
       <% end %>
 
       <menu id="post-sections">
-        <% if RecommenderService.available?(@post) %>
-          <li><a href="#similar">Similar</a></li>
+        <% if RecommenderService.enabled? %>
+          <li><a href="#recommended">Recommended</a></li>
         <% end %>
 
         <li><a href="#comments">Comments</a></li>
@@ -100,11 +100,13 @@
         <li><a href="#share">Share</a></li>
       </menu>
 
-      <% if RecommenderService.available?(@post) %>
-        <section id="similar">
-          <%= render "posts/partials/index/similar", post: @post %>
-        </section>
-      <% end %>
+      <section id="recommended" data-available="<%= RecommenderService.available?(@post) %>">
+        <% if RecommenderService.available?(@post) %>
+          <%= render "posts/partials/index/recommended", post: @post %>
+        <% else %>
+          <p><em>Not enough data available</em></p>
+        <% end %>
+      </section>
 
       <section id="comments">
         <% if !CurrentUser.user.is_builder? %>

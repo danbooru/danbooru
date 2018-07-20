@@ -1,5 +1,5 @@
 module PostSets
-  class Similar < PostSets::Post
+  class Recommended < PostSets::Post
     def initialize(post)
       super("")
       @post = post

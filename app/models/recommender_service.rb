@@ -1,12 +1,14 @@
 module RecommenderService
   extend self
 
+  SCORE_THRESHOLD = 10
+
   def enabled?
     Danbooru.config.recommender_server.present?
   end
 
   def available?(post)
-    enabled? && post.created_at > 6.months.ago && post.score >= 10
+    enabled? && CurrentUser.enable_recommended_posts? && post.created_at > Date.civil(2018, 1, 1) #&& post.score >= SCORE_THRESHOLD
   end
 
   def similar(post)
