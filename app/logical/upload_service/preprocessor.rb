@@ -76,7 +76,7 @@ class UploadService
           file = params[:file]
         end
 
-        Utils.process_file(upload, file)
+        Utils.process_file(upload, file, original_post_id: original_post_id)
 
         upload.rating = params[:rating]
         upload.tag_string = params[:tag_string]

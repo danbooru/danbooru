@@ -1,6 +1,8 @@
 class UploadService
   module Utils
-    def self.file_header_to_file_ext(file)
+    extend self
+
+    def file_header_to_file_ext(file)
       case File.read(file.path, 16)
       when /^\xff\xd8/n
         "jpg"
@@ -21,7 +23,7 @@ class UploadService
       end
     end
 
-    def self.delete_file(md5, file_ext, upload_id = nil)
+    def delete_file(md5, file_ext, upload_id = nil)
       if Post.where(md5: md5).exists?
         if upload_id
           CurrentUser.as_system do
@@ -46,7 +48,7 @@ class UploadService
       Danbooru.config.backup_storage_manager.delete_file(nil, md5, file_ext, :preview)
     end
 
-    def self.calculate_ugoira_dimensions(source_path)
+    def calculate_ugoira_dimensions(source_path)
       folder = Zip::File.new(source_path)
       Tempfile.open("ugoira-dim-") do |tempfile|
         folder.first.extract(tempfile.path) { true }
@@ -55,7 +57,7 @@ class UploadService
       end
     end
 
-    def self.calculate_dimensions(upload, file)
+    def calculate_dimensions(upload, file)
       if upload.is_video?
         video = FFMPEG::Movie.new(file.path)
         yield(video.width, video.height)
@@ -70,9 +72,10 @@ class UploadService
       end
     end
 
-    def self.distribute_files(file, record, type)
+    def distribute_files(file, record, type, original_post_id: nil)
       # need to do this for hybrid storage manager
       post = Post.new
+      post.id = original_post_id if original_post_id.present?
       post.md5 = record.md5
       post.file_ext = record.file_ext
       [Danbooru.config.storage_manager, Danbooru.config.backup_storage_manager].each do |sm|
@@ -80,11 +83,11 @@ class UploadService
       end
     end
 
-    def self.is_downloadable?(source)
+    def is_downloadable?(source)
       source =~ /^https?:\/\//
     end
 
-    def self.generate_resizes(file, upload)
+    def generate_resizes(file, upload)
       if upload.is_video?
         video = FFMPEG::Movie.new(file.path)
         crop_file = generate_video_crop_for(video, Danbooru.config.small_image_width)
@@ -106,7 +109,7 @@ class UploadService
       [preview_file, crop_file, sample_file]
     end
 
-    def self.generate_video_crop_for(video, width)
+    def generate_video_crop_for(video, width)
       vp = Tempfile.new(["video-preview", ".jpg"], binmode: true)
       video.screenshot(vp.path, {:seek_time => 0, :resolution => "#{video.width}x#{video.height}"})
       crop = DanbooruImageResizer.crop(vp, width, width, 85)
@@ -114,7 +117,7 @@ class UploadService
       return crop
     end
 
-    def self.generate_video_preview_for(video, width, height)
+    def generate_video_preview_for(video, width, height)
       dimension_ratio = video.width.to_f / video.height
       if dimension_ratio > 1
         height = (width / dimension_ratio).to_i
@@ -127,7 +130,7 @@ class UploadService
       output_file
     end
 
-    def self.process_file(upload, file)
+    def process_file(upload, file, original_post_id: nil)
       upload.file = file
       upload.file_ext = Utils.file_header_to_file_ext(file)
       upload.file_size = file.size
@@ -143,10 +146,10 @@ class UploadService
       preview_file, crop_file, sample_file = Utils.generate_resizes(file, upload)
 
       begin
-        Utils.distribute_files(file, upload, :original)
-        Utils.distribute_files(sample_file, upload, :large) if sample_file.present?
-        Utils.distribute_files(preview_file, upload, :preview) if preview_file.present?
-        Utils.distribute_files(crop_file, upload, :crop) if crop_file.present?
+        Utils.distribute_files(file, upload, :original, original_post_id: original_post_id)
+        Utils.distribute_files(sample_file, upload, :large, original_post_id: original_post_id) if sample_file.present?
+        Utils.distribute_files(preview_file, upload, :preview, original_post_id: original_post_id) if preview_file.present?
+        Utils.distribute_files(crop_file, upload, :crop, original_post_id: original_post_id) if crop_file.present?
       ensure
         preview_file.try(:close!)
         crop_file.try(:close!)
@@ -163,7 +166,7 @@ class UploadService
     # these methods are only really used during upload processing even 
     # though logically they belong on upload. post can rely on the 
     # automatic tag that's added.
-    def self.is_animated_gif?(upload, file)
+    def is_animated_gif?(upload, file)
       return false if upload.file_ext != "gif"
 
       # Check whether the gif has multiple frames by trying to load the second frame.
@@ -177,16 +180,16 @@ class UploadService
       end
     end
 
-    def self.is_animated_png?(upload, file)
+    def is_animated_png?(upload, file)
       upload.file_ext == "png" && APNGInspector.new(file.path).inspect!.animated?
     end
 
-    def self.is_video_with_audio?(upload, file)
+    def is_video_with_audio?(upload, file)
       video = FFMPEG::Movie.new(file.path)
       upload.is_video? && video.audio_channels.present?
     end
 
-    def self.automatic_tags(upload, file)
+    def automatic_tags(upload, file)
       return "" unless Danbooru.config.enable_dimension_autotagging
 
       tags = []
@@ -196,7 +199,7 @@ class UploadService
       tags.join(" ")
     end
 
-    def self.download_from_source(source, referer_url: nil)
+    def download_from_source(source, referer_url: nil)
       download = Downloads::File.new(source, referer_url: referer_url)
       file = download.download!
       context = {
@@ -216,7 +219,7 @@ class UploadService
       return file
     end
 
-    def self.download_for_upload(source, upload)
+    def download_for_upload(source, upload)
       file = download_from_source(source, referer_url: upload.referer_url) do |context|
         upload.downloaded_source = context[:downloaded_source]
         upload.source = context[:source]

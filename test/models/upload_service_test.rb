@@ -12,7 +12,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       ],
       "content_type" => "image/jpeg"
     }
-  }.freeze
+  }
 
   context "::Utils" do
     subject { UploadService::Utils }
@@ -137,6 +137,13 @@ class UploadServiceTest < ActiveSupport::TestCase
       setup do
         @upload = FactoryBot.build(:jpg_upload)
         @file = @upload.file
+      end
+
+      context "with an original_post_id" do
+        should "run" do
+          subject.expects(:distribute_files).times(3)
+          subject.process_file(@upload, @file, original_post_id: 12345)
+        end
       end
 
       should "run" do
