@@ -82,3 +82,9 @@ The following features are delegated to the [Reportbooru service](https://github
 * Favorite searches
 * Upload trend graphs
 * Similar users (via favorites and post votes)
+
+### Cropped Thumbnails
+
+There's optional support for cropped thumbnails. This relies on installing
+libvips 8.6 or higher and setting Danbooru.config.enable_image_cropping to
+true.
