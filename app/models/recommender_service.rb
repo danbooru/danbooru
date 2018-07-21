@@ -8,7 +8,8 @@ module RecommenderService
   end
 
   def available?(post)
-    enabled? && CurrentUser.enable_recommended_posts? && post.created_at > Date.civil(2018, 1, 1) #&& post.score >= SCORE_THRESHOLD
+    return true if Rails.env.development?
+    enabled? && CurrentUser.enable_recommended_posts? && post.created_at > Date.civil(2018, 1, 1) && post.score >= SCORE_THRESHOLD
   end
 
   def similar(post)

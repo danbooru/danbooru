@@ -467,13 +467,8 @@
 
     $("#notes").hide();
     $("#edit").hide();
-    if ($("#recommended").data("available")) {
-      $("#post-sections li:first-child").addClass("active");
-      $("#comments").hide();
-    } else {
-      $("#post-sections li:nth-child(2)").addClass("active");
-      $("#recommended").hide();
-    }
+    $("#recommended").hide();
+    $("#post-sections li:first-child").addClass("active");
   }
 
   Danbooru.Post.resize_ugoira_controls = function() {

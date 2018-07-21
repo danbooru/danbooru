@@ -87,11 +87,11 @@
       <% end %>
 
       <menu id="post-sections">
+        <li><a href="#comments">Comments</a></li>
+
         <% if RecommenderService.enabled? %>
           <li><a href="#recommended">Recommended</a></li>
         <% end %>
-
-        <li><a href="#comments">Comments</a></li>
 
         <% if CurrentUser.is_member? && @post.visible? %>
           <li><a href="#edit" id="post-edit-link">Edit</a></li>
