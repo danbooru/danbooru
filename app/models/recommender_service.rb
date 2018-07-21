@@ -18,7 +18,7 @@ module RecommenderService
   end
 
   def recommend_for_user(user_id)
-    ids = Cache.get("rsu:#{user_id}", 1.day) do
+    ids = Cache.get("rsu:#{user_id}", 1.hour) do
       resp = HTTParty.get(
         "#{Danbooru.config.recommender_server}/recommend/#{user_id}", 
         Danbooru.config.httparty_options.merge(
