@@ -14,7 +14,7 @@ private
 
   def load_posts
     if params[:context] == "post"
-      @posts = RecommenderService.recommend(post_id: params[:post_id])
+      @posts = RecommenderService.recommend(post_id: params[:post_id].to_i)
 
     elsif params[:context] == "user"
       @posts = RecommenderService.recommend(user_id: CurrentUser.id)
