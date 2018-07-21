@@ -1,16 +1,10 @@
 module PostSets
   class Recommended < PostSets::Post
-    def initialize(post)
+    attr_reader :posts
+    
+    def initialize(posts)
       super("")
-      @post = post
-    end
-
-    def posts
-      @posts ||= begin
-        response = RecommenderService.similar(@post)
-        post_ids = response.reject {|x| x[0] == @post.id}.slice(0, 6).map {|x| x[0]}
-        ::Post.find(post_ids)
-      end
+      @posts = posts
     end
 
     def presenter

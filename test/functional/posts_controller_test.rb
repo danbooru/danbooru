@@ -120,15 +120,12 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         setup do
           @post2 = create(:post)
           RecommenderService.stubs(:enabled?).returns(true)
-          RecommenderService.stubs(:available?).returns(true)
-          RecommenderService.stubs(:similar).returns([[@post.id, "1.0"], [@post2.id, "0.01"]])
+          RecommenderService.stubs(:available_for_post?).returns(true)
         end
 
-        should "render a section for similar posts" do
+        should "not error out" do
           get_auth post_path(@post), @user
           assert_response :success
-          assert_select ".similar-posts"
-          assert_select ".similar-posts #post_#{@post2.id}"
         end
       end
     end

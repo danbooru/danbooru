@@ -65,6 +65,10 @@ group :production do
   gem 'capistrano-deploytags', '~> 1.0.0', require: false
 end
 
+group :development do
+  gem 'sinatra'
+end
+
 group :development, :test do
   gem 'awesome_print'
   gem 'pry-byebug'

@@ -251,6 +251,7 @@ Rails.application.routes.draw do
   post "reports/post_versions_create" => "reports#post_versions_create"
   get "reports/down_voting_post" => "reports#down_voting_post"
   post "reports/down_voting_post_create" => "reports#down_voting_post_create"
+  resource :recommended_posts, only: [:show]
   resources :saved_searches, :except => [:show] do
     collection do
       get :labels

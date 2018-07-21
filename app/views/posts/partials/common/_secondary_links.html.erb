@@ -3,6 +3,9 @@
     <li><%= link_to "Listing", posts_path %></li>
     <li id="secondary-links-posts-upload" class="nonessential"><%= link_to "Upload", new_upload_path %></li>
     <li id="secondary-links-posts-hot"><%= link_to "Hot", posts_path(:tags => "order:rank", :d => "1") %></li>
+    <% if RecommenderService.available_for_user? %>
+      <li><%= link_to "Recommended", recommended_posts_path(context: "user") %></li>
+    <% end %>
     <% unless CurrentUser.is_anonymous? %>
       <li id="secondary-links-posts-favorites"><%= link_to "Favorites", favorites_path %></li>
       <li id="secondary-links-posts-favorite-groups"><%= link_to "Fav groups", favorite_groups_path %></li>

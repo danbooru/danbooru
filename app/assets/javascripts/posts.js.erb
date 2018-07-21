@@ -452,6 +452,9 @@
         $("#edit").hide();
         $("#share").hide();
         $("#recommended").show();
+        $.get("/recommended_posts", {context: "post", post_id: Danbooru.meta("post-id")}, function(data) {
+          $("#recommended").html(data);
+        });
       } else {
         $("#edit").hide();
         $("#comments").hide();
