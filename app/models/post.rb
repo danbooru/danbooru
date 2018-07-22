@@ -18,7 +18,7 @@ class Post < ApplicationRecord
   before_validation :parse_pixiv_id
   before_validation :blank_out_nonexistent_parents
   before_validation :remove_parent_loops
-  validates_uniqueness_of :md5, :on => :create
+  validates_uniqueness_of :md5, :on => :create, message: ->(obj, data) { "duplicate: #{Post.find_by_md5(obj.md5).id}"}
   validates_inclusion_of :rating, in: %w(s q e), message: "rating must be s, q, or e"
   validate :tag_names_are_valid
   validate :added_tags_are_valid

@@ -10,7 +10,7 @@ module RecommenderService
   def available_for_post?(post)
     return true if Rails.env.development?
 
-    enabled? && CurrentUser.enable_recommended_posts? && post.created_at > Date.civil(2017, 1, 1) && post.fav_count >= SCORE_THRESHOLD
+    enabled? && post.created_at > Date.civil(2017, 1, 1) && post.fav_count >= SCORE_THRESHOLD
   end
 
   def available_for_user?

@@ -28,7 +28,12 @@ class UploadService
 
     if preprocessor.completed?
       @upload = preprocessor.finish!
-      create_post_from_upload(@upload)
+
+      begin
+        create_post_from_upload(@upload)
+      rescue Exception => x
+        @upload.update(status: "error: #{x.class} - #{x.message}", backtrace: x.backtrace.join("\n"))
+      end
       return @upload
     end
 
@@ -77,8 +82,6 @@ class UploadService
   def create_post_from_upload(upload)
     @post = convert_to_post(upload)
     @post.save!
-
-    upload.update(status: "error: " + @post.errors.full_messages.join(", "))
 
     if upload.context && upload.context["ugoira"]
       PixivUgoiraFrameData.create(

@@ -343,7 +343,7 @@ class UploadServiceTest < ActiveSupport::TestCase
           FactoryBot.create(:user)
         end
         CurrentUser.ip_addr = "127.0.0.1"
-        @jpeg = "https://upload.wikimedia.org/wikipedia/commons/c/c5/Moraine_Lake_17092005.jpg"
+        @jpeg = "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"
         @ugoira = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364"
         @video = "https://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_1mb.mp4"
       end
@@ -362,7 +362,8 @@ class UploadServiceTest < ActiveSupport::TestCase
         assert_operator(@upload.file_size, :>, 0)
         assert_not_nil(@upload.source)
         assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
-        assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :large)))
+        # this image is not large enough to generate a large file
+        #assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :large)))
         assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :preview)))
       end
 
@@ -825,7 +826,7 @@ class UploadServiceTest < ActiveSupport::TestCase
     subject { UploadService }
 
     setup do
-      @source = "https://upload.wikimedia.org/wikipedia/commons/c/c5/Moraine_Lake_17092005.jpg"
+      @source = "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"
       CurrentUser.user = travel_to(1.month.ago) do
         FactoryBot.create(:user)
       end
@@ -895,7 +896,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
     context "with a preprocessed predecessor" do
       setup do
-        @predecessor = FactoryBot.create(:source_upload, status: "preprocessed", source: @source, image_height: 0, image_width: 0, file_size: 1, md5: 'blank', file_ext: "jpg")
+        @predecessor = FactoryBot.create(:source_upload, status: "preprocessed", source: @source, image_height: 0, image_width: 0, file_size: 1, md5: 'd34e4cf0a437a5d65f8e82b7bcd02606', file_ext: "jpg")
         @tags = 'hello world'
       end
 
@@ -906,6 +907,20 @@ class UploadServiceTest < ActiveSupport::TestCase
         assert_equal(@predecessor, predecessor)
         assert_equal(@tags, predecessor.tag_string.strip)
       end
+
+      context "when the file has already been uploaded" do
+        setup do
+          @post = create(:post, md5: "d34e4cf0a437a5d65f8e82b7bcd02606")
+          @service = subject.new(source: @source)
+        end
+
+        should "point to the dup post in the upload" do
+          @upload = subject.new(source: @source, tag_string: @tags).start!
+          @predecessor.reload
+          assert_equal("error: ActiveRecord::RecordInvalid - Validation failed: Md5 duplicate: #{@post.id}", @predecessor.status)
+        end
+      end
+
     end
 
     context "with no predecessor" do
