@@ -15,9 +15,15 @@ class UploadService
       params[:md5_confirmation]
     end
 
+    def normalized_source
+      @normalized_source ||= begin
+        Downloads::File.new(params[:source]).rewrite_url
+      end
+    end
+
     def in_progress?
       if Utils.is_downloadable?(source)
-        Upload.where(status: "preprocessing", source: source).exists?
+        Upload.where(status: "preprocessing", source: normalized_source).exists?
       elsif md5.present?
         Upload.where(status: "preprocessing", md5: md5).exists?
       else
@@ -27,7 +33,7 @@ class UploadService
 
     def predecessor
       if Utils.is_downloadable?(source)
-        Upload.where(status: ["preprocessed", "preprocessing"], source: source).first
+        Upload.where(status: ["preprocessed", "preprocessing"], source: normalized_source).first
       elsif md5.present?
         Upload.where(status: ["preprocessed", "preprocessing"], md5: md5).first
       end
@@ -49,17 +55,17 @@ class UploadService
     def start!
       if Utils.is_downloadable?(source)
         CurrentUser.as_system do
-          if Post.tag_match("source:#{source}").where.not(id: original_post_id).exists?
-            raise ActiveRecord::RecordNotUnique.new("A post with source #{source} already exists")
+          if Post.tag_match("source:#{normalized_source}").where.not(id: original_post_id).exists?
+            raise ActiveRecord::RecordNotUnique.new("A post with source #{normalized_source} already exists")
           end
         end
 
-        if Upload.where(source: source, status: "completed").exists?
-          raise ActiveRecord::RecordNotUnique.new("A completed upload with source #{source} already exists")
+        if Upload.where(source: normalized_source, status: "completed").exists?
+          raise ActiveRecord::RecordNotUnique.new("A completed upload with source #{normalized_source} already exists")
         end
 
-        if Upload.where(source: source).where("status like ?", "error%").exists?
-          raise ActiveRecord::RecordNotUnique.new("An errored upload with source #{source} already exists")
+        if Upload.where(source: normalized_source).where("status like ?", "error%").exists?
+          raise ActiveRecord::RecordNotUnique.new("An errored upload with source #{normalized_source} already exists")
         end
       end
 

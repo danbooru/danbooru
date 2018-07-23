@@ -103,9 +103,9 @@ class StorageManager::Match < StorageManager
     end
   end
 
-  def file_path(post, type, **options)
+  def file_path(post, file_ext, type, **options)
     find(id: post.id, type: type) do |manager|
-      manager.file_path(post, type, **options)
+      manager.file_path(post, file_ext, type, **options)
     end
   end
 end

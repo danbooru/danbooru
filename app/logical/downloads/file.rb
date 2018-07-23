@@ -22,6 +22,11 @@ module Downloads
       @data[:get_thumbnail] = options[:get_thumbnail]
     end
 
+    def rewrite_url
+      url, _, _ = before_download(@source, @data)
+      return url
+    end
+
     def size
       url, headers, _ = before_download(@source, @data)
       options = { timeout: 3, headers: headers }.deep_merge(Danbooru.config.httparty_options)
