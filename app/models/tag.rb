@@ -59,6 +59,10 @@ class Tag < ApplicationRecord
       end
 
       def increment_post_counts(tag_names)
+        if Rails.env.production? && tag_names.include?("breasts")
+          ::NewRelic::Agent.record_custom_event("increment_post_counts", user_id: CurrentUser.id, pid: Process.pid, stacktrace: Kernel.caller.join("\n"), hash: Cache.hash(tag_names))
+        end
+
         Tag.where(:name => tag_names).update_all("post_count = post_count + 1")
       end
 

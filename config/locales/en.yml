@@ -5,6 +5,8 @@ en:
   hello: "Hello world"
   activerecord:
     attributes:
+      artist_url:
+        url: ""
       forum_post_vote:
         creator_id: "Your vote"
       post:

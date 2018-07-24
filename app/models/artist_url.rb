@@ -115,7 +115,7 @@ class ArtistUrl < ApplicationRecord
 
   def validate_url_format
     uri = Addressable::URI.parse(url)
-    errors[:url] << "must begin with http:// or https://" if !uri.scheme.in?(%w[http https])
+    errors[:url] << " #{uri} must begin with http:// or https://" if !uri.scheme.in?(%w[http https])
   rescue Addressable::URI::InvalidURIError => error
     errors[:url] << "is malformed: #{error}"
   end
