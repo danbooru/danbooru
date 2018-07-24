@@ -110,7 +110,7 @@ class Upload < ApplicationRecord
     end
 
     def is_duplicate?
-      status =~ /duplicate/
+      status =~ /duplicate: \d+/
     end
 
     def is_errored?
