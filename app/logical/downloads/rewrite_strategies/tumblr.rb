@@ -38,7 +38,7 @@ module Downloads
       # => http://data.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg
       def rewrite_samples(url, headers)
         if url =~ %r!\Ahttps?://#{DOMAIN}/(?<dir>#{MD5}/)?#{FILENAME}_#{SIZES}\.#{EXT}\z!i
-          sizes = ["raw", 1280, 540, 500, 400, 250]
+          sizes = ["raw", 1280, 640, 540, "500h", 500, 400, 250]
           candidates = sizes.map do |size|
             "http://data.tumblr.com/#{$~[:dir]}#{$~[:filename]}_#{size}.#{$~[:ext]}"
           end
