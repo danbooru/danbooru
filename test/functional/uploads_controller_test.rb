@@ -68,6 +68,20 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for a pixiv post" do
+        setup do
+          @source = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=14901720"
+        end
+
+        should "set the correct url" do
+          get_auth new_upload_path, @user, params: {url: @source}
+          assert_response :success
+          Delayed::Worker.new.work_off
+          upload = Upload.last
+          assert_equal(@source, upload.source)
+        end
+      end
+
       context "for a twitter post" do
         should "render" do
           skip "Twitter keys are not set" unless Danbooru.config.twitter_api_key

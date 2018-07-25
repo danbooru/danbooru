@@ -5,7 +5,7 @@ class UploadService
 
       if Utils.is_downloadable?(url) && file.nil?
         download = Downloads::File.new(url)
-        normalized_url, _, _ = download.before_download(url, {})
+        normalized_url = download.rewrite_url()
         post = if normalized_url.nil?
           Post.where("SourcePattern(lower(posts.source)) = ?", url).first
         else

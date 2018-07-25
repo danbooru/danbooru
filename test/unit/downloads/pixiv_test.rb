@@ -12,24 +12,6 @@ module Downloads
       super
     end
 
-    context "An ugoira site for pixiv" do
-      setup do
-        @download = Downloads::File.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
-        @tempfile = @download.download!
-        @tempfile.close!
-      end
-
-      should "capture the data" do
-        assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @download.source)
-        assert_equal(2, @download.data[:ugoira_frame_data].size)
-        if @download.data[:ugoira_frame_data][0]["file"]
-          assert_equal([{"file"=>"000000.jpg", "delay"=>125}, {"file"=>"000001.jpg", "delay"=>125}], @download.data[:ugoira_frame_data])
-        else
-          assert_equal([{"delay_msec"=>125}, {"delay_msec"=>125}], @download.data[:ugoira_frame_data])
-        end
-      end
-    end
-
     context "in all cases" do
       # Test an old illustration (one uploaded before 2014-09-16). New
       # /img-original/ and /img-master/ URLs currently don't work for images
@@ -192,6 +174,24 @@ module Downloads
 
           assert_not_rewritten(@file_url)
           assert_downloaded(@file_size, @file_url)
+        end
+      end
+    end
+
+    context "An ugoira site for pixiv" do
+      setup do
+        @download = Downloads::File.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+        @tempfile = @download.download!
+        @tempfile.close!
+      end
+
+      should "capture the data" do
+        assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @download.source)
+        assert_equal(2, @download.data[:ugoira_frame_data].size)
+        if @download.data[:ugoira_frame_data][0]["file"]
+          assert_equal([{"file"=>"000000.jpg", "delay"=>125}, {"file"=>"000001.jpg", "delay"=>125}], @download.data[:ugoira_frame_data])
+        else
+          assert_equal([{"delay_msec"=>125}, {"delay_msec"=>125}], @download.data[:ugoira_frame_data])
         end
       end
     end

@@ -222,7 +222,8 @@ class UploadService
     def download_for_upload(source, upload)
       file = download_from_source(source, referer_url: upload.referer_url) do |context|
         upload.downloaded_source = context[:downloaded_source]
-        upload.source = context[:source]
+        puts "source: #{source} -> #{context[:source]}"
+        #upload.source = context[:source]
 
         if context[:ugoira]
           upload.context = { ugoira: context[:ugoira] }
