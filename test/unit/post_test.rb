@@ -1603,6 +1603,16 @@ class PostTest < ActiveSupport::TestCase
   end
 
   context "Updating:" do
+    context "an existing post" do
+      setup { @post = FactoryBot.create(:post) }
+
+      should "call Tag.increment_post_counts with the correct params" do
+        @post.reload
+        Tag.expects(:increment_post_counts).once.with(["abc"])
+        @post.update(tag_string: "tag1 abc")
+      end
+    end
+
     context "A rating unlocked post" do
       setup { @post = FactoryBot.create(:post) }
       subject { @post }
@@ -1821,6 +1831,15 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(user2.id, post.uploader_id)
         assert_equal(user2.id, post.uploader_id)
         assert_equal(user2.name, post.uploader_name)
+      end
+
+      context "tag post counts" do
+        setup { @post = FactoryBot.build(:post) }
+
+        should "call Tag.increment_post_counts with the correct params" do
+          Tag.expects(:increment_post_counts).once.with(["tag1", "tag2"])
+          @post.save
+        end
       end
 
       should "increment the uploaders post_upload_count" do

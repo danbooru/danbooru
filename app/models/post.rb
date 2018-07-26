@@ -542,7 +542,7 @@ class Post < ApplicationRecord
     end
 
     def tag_array_was
-      @tag_array_was ||= Tag.scan_tags(tag_string_before_last_save || tag_string_was)
+      @tag_array_was ||= Tag.scan_tags(tag_string_in_database.presence || tag_string_before_last_save || "")
     end
 
     def tags
