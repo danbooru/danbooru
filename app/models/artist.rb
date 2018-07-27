@@ -50,6 +50,7 @@ class Artist < ApplicationRecord
         "donmai.us/users", # http://danbooru.donmai.us/users/507162/
         "derpibooru.org",
         "derpibooru.org/tags", # https://derpibooru.org/tags/artist-colon-checkerboardazn
+        "deviantart.com",
         "deviantart.net",
         "dlsite.com",
         "doujinshi.org",
