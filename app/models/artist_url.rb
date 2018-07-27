@@ -38,6 +38,7 @@ class ArtistUrl < ApplicationRecord
       rescue Sources::Site::NoStrategyError
       end
       url = url.gsub(/\/+\Z/, "")
+      url = url.gsub(%r!^https://!, "http://")
       url + "/"
     end
   end
