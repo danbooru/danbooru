@@ -18,15 +18,18 @@ class ArtistUrl < ApplicationRecord
     if url.nil?
       nil
     else
-      url = url.gsub(/^https:\/\//, "http://")
-      url = url.gsub(/^http:\/\/blog\d+\.fc2/, "http://blog.fc2")
-      url = url.gsub(/^http:\/\/blog-imgs-\d+\.fc2/, "http://blog.fc2")
-      url = url.gsub(/^http:\/\/blog-imgs-\d+-\w+\.fc2/, "http://blog.fc2")
-      url = url.sub(%r!(http://seiga.nicovideo.jp/user/illust/\d+)\?.+!, '\1/')
+      url = url.sub(%r!^https://!, "http://")
+      url = url.sub(%r!^http://blog\d+\.fc2!, "http://blog.fc2")
+      url = url.sub(%r!^http://blog-imgs-\d+\.fc2!, "http://blog.fc2")
+      url = url.sub(%r!^http://blog-imgs-\d+-\w+\.fc2!, "http://blog.fc2")
+      url = url.sub(%r!^(http://seiga.nicovideo.jp/user/illust/\d+)\?.+!, '\1/')
       url = url.sub(%r!^http://pictures.hentai-foundry.com//!, "http://pictures.hentai-foundry.com/")
+      if url !~ %r{\Ahttps?://(?:fc|th|pre|orig|img|www)\.}
+        url = url.sub(%r{\Ahttps?://(.+?)\.deviantart\.com(.*)}, 'http://www.deviantart.com/\1\2')
+      end
 
       # the strategy won't always work for twitter because it looks for a status
-      url = url.downcase if url =~ /https?:\/\/(?:mobile\.)?twitter\.com/
+      url = url.downcase if url =~ %r!^https?://(?:mobile\.)?twitter\.com!
 
       begin
         url = Sources::Site.new(url).normalize_for_artist_finder!
@@ -43,13 +46,13 @@ class ArtistUrl < ApplicationRecord
     if url.nil?
       nil
     else
-      url = url.gsub(/^https:\/\//, "http://")
-      url = url.gsub(/^http:\/\/blog\d+\.fc2/, "http://blog.fc2")
-      url = url.gsub(/^http:\/\/blog-imgs-\d+\.fc2/, "http://blog.fc2")
-      url = url.gsub(/^http:\/\/blog-imgs-\d+-\w+\.fc2/, "http://blog.fc2")
-      url = url.gsub(/^http:\/\/img\d+\.pixiv\.net/, "http://img.pixiv.net")
-      url = url.gsub(/^http:\/\/i\d+\.pixiv\.net\/img\d+/, "http://img.pixiv.net")
-      url = url.gsub(/\/+\Z/, "")
+      url = url.gsub(%r!^https://!, "http://")
+      url = url.gsub(%r!^http://blog\d+\.fc2!, "http://blog.fc2")
+      url = url.gsub(%r!^http://blog-imgs-\d+\.fc2!, "http://blog.fc2")
+      url = url.gsub(%r!^http://blog-imgs-\d+-\w+\.fc2!, "http://blog.fc2")
+      url = url.gsub(%r!^http://img\d+\.pixiv\.net!, "http://img.pixiv.net")
+      url = url.gsub(%r!^http://i\d+\.pixiv\.net/img\d+!, "http://img.pixiv.net")
+      url = url.gsub(%r!/+\Z!, "")
       url + "/"
     end
   end
@@ -59,12 +62,16 @@ class ArtistUrl < ApplicationRecord
       url = File.dirname(url)
     end
 
-    url = url.gsub(/^https:\/\//, "http://")
-    url = url.gsub(/^http:\/\/blog\d+\.fc2/, "http://blog*.fc2")
-    url = url.gsub(/^http:\/\/blog-imgs-\d+\.fc2/, "http://blog*.fc2")
-    url = url.gsub(/^http:\/\/blog-imgs-\d+-\w+\.fc2/, "http://blog*.fc2")
-    url = url.gsub(/^http:\/\/img\d+\.pixiv\.net/, "http://img*.pixiv.net")
-    url = url.gsub(/^http:\/\/i\d+\.pixiv\.net\/img\d+/, "http://*.pixiv.net/img*")
+    url = url.gsub(%r!^https://!, "http://")
+    url = url.gsub(%r!^http://blog\d+\.fc2!, "http://blog*.fc2")
+    url = url.gsub(%r!^http://blog-imgs-\d+\.fc2!, "http://blog*.fc2")
+    url = url.gsub(%r!^http://blog-imgs-\d+-\w+\.fc2!, "http://blog*.fc2")
+    url = url.gsub(%r!^http://img\d+\.pixiv\.net!, "http://img*.pixiv.net")
+    url = url.gsub(%r!^http://i\d+\.pixiv\.net/img\d+!, "http://*.pixiv.net/img*")
+    if url !~ %r{\Ahttps?://(?:fc|th|pre|orig|img|www)\.}
+      url = url.sub(%r{\Ahttps?://(.+?)\.deviantart\.com(.*)}, "http://www.deviantart.com/#\1\2")
+    end
+    url
   end
 
   def parse_prefix

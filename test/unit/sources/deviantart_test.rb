@@ -57,7 +57,7 @@ module Sources
       end
 
       should "get the profile" do
-        assert_equal("https://noizave.deviantart.com", @site.profile_url)
+        assert_equal("https://www.deviantart.com/noizave", @site.profile_url)
       end
 
       should "get the artist name" do

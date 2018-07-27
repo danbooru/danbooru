@@ -55,6 +55,11 @@ class ArtistUrlTest < ActiveSupport::TestCase
       assert_equal("http://blog.fc2.com/monet/", url.normalized_url)
     end
 
+    should "normalize deviant art artist urls" do
+      url = FactoryBot.create(:artist_url, :url => "https://caidychen.deviantart.com/")
+      assert_equal("http://www.deviantart.com/caidychen/", url.normalized_url)      
+    end
+
     should "normalize nico seiga artist urls" do
       url = FactoryBot.create(:artist_url, :url => "http://seiga.nicovideo.jp/user/illust/1826959")
       assert_equal("http://seiga.nicovideo.jp/user/illust/1826959/", url.normalized_url)

@@ -228,10 +228,10 @@ class ArtistTest < ActiveSupport::TestCase
       end
 
       should "find the correct artist for page URLs" do
-        assert_artist_found("artgerm", "http://artgerm.deviantart.com/art/Peachy-Princess-Ver-2-457220550")
+        assert_artist_found("artgerm", "http://www.deviantart.com/artgerm/art/Peachy-Princess-Ver-2-457220550")
 
-        assert_artist_found("trixia", "http://trixdraws.deviantart.com/art/My-Queen-426745289")
-        assert_artist_found("trixia", "http://trixdraws.deviantart.com/gallery/#/d722mrt")
+        assert_artist_found("trixia", "http://www.deviantart.com/trixdraws/art/My-Queen-426745289")
+        assert_artist_found("trixia", "http://www.deviantart.com/trixdraws/gallery/#/d722mrt")
       end
 
       should "find the correct artist for image URLs" do
@@ -242,11 +242,6 @@ class ArtistTest < ActiveSupport::TestCase
         assert_artist_found("trixia", "http://fc01.deviantart.net/fs71/i/2014/050/d/e/my_queen_by_trixdraws-d722mrt.jpg")
         assert_artist_found("trixia", "http://th01.deviantart.net/fs71/200H/i/2014/050/d/e/my_queen_by_trixdraws-d722mrt.jpg")
         assert_artist_found("trixia", "http://th09.deviantart.net/fs71/PRE/i/2014/050/d/e/my_queen_by_trixdraws-d722mrt.jpg")
-      end
-
-      should "return nothing for unknown deviantart artists" do
-        assert_artist_not_found("http://guweiz.deviantart.com/art/Battleship-551905391")
-        assert_artist_not_found("https://orig00.deviantart.net/7585/f/2015/219/a/5/battleship__by_guweiz-d94l8xb.png")
       end
     end
 

@@ -7,6 +7,20 @@ module Sources
         url =~ /^https?:\/\/(?:.+?\.)?deviantart\.(?:com|net)/
       end
 
+      def self.normalize(url)
+        if url =~ %r{\Ahttps?://(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net/.+/[a-z0-9_]*_by_[a-z0-9_]+-d([a-z0-9]+)\.}i
+          "http://fav.me/d#{$1}"
+        elsif url =~ %r{\Ahttps?://(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net/.+/[a-f0-9]+-d([a-z0-9]+)\.}i
+          "http://fav.me/d#{$1}"
+        elsif url =~ %r{\Ahttps?://www\.deviantart\.com/([^/]+)/art/}
+          url
+        elsif url !~ %r{\Ahttps?://(?:fc|th|pre|orig|img|www)\.} && url =~ %r{\Ahttps?://(.+?)\.deviantart\.com(.*)}
+          "http://www.deviantart.com/#{$1}#{$2}"
+        else
+          url
+        end
+      end
+
       def referer_url
         if @referer_url =~ /deviantart\.com\/art\// && @url =~ /https?:\/\/(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net\//
           @referer_url
@@ -63,7 +77,7 @@ module Sources
 
       def profile_url
         return "" if artist_name.blank?
-        "https://#{artist_name}.deviantart.com"
+        "https://www.deviantart.com/#{artist_name}"
       end
 
       def image_url
@@ -102,22 +116,22 @@ module Sources
         api_metadata[:description]
       end
 
+      def normalizable_for_artist_finder?
+        url !~ %r!^https?://www.deviantart.com/!
+      end
+
+      def normalized_for_artist_finder?
+        url =~ %r!^https?://www.deviantart.com/! 
+      end
+
+      def normalize_for_artist_finder!
+        profile_url
+      end
+
       protected
 
       def normalized_url
-        @normalized_url ||= begin
-          if url =~ %r{\Ahttps?://(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net/.+/[a-z0-9_]*_by_[a-z0-9_]+-d([a-z0-9]+)\.}i
-            "http://fav.me/d#{$1}"
-          elsif url =~ %r{\Ahttps?://(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net/.+/[a-f0-9]+-d([a-z0-9]+)\.}i
-            "http://fav.me/d#{$1}"
-          elsif url =~ %r{\Ahttps?://www\.deviantart\.com/([^/]+)/art/}
-            url
-          elsif url !~ %r{\Ahttps?://(?:fc|th|pre|orig|img|www)\.} && url =~ %r{\Ahttps?://(.+?)\.deviantart\.com/?(.*)}
-            "https://www.deviantart.com/#{$1}/#{$2}"
-          else
-            nil
-          end
-        end
+        @normalized_url ||= self.class.normalize(url)
       end
 
       def page
