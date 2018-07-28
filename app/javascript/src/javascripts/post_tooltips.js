@@ -1,19 +1,22 @@
-import Utility from './utility'
+import Utility from './utility';
+require('qtip2');
+require('qtip2/dist/jquery.qtip.css');
 
 let PostTooltip = {};
 
 PostTooltip.render_tooltip = function (event, qtip) {
-  var post_id = $(event.target).parents("[data-id]").data("id");
+  var post_id = $(this).parents("[data-id]").data("id");
 
-  $.get("/posts/" + post_id, { variant: "tooltip" }).then(function (html) {
-    qtip.set("content.text", html);
-    qtip.elements.tooltip.removeClass("post-tooltip-loading");
+  $.get("/posts/" + post_id, { variant: "tooltip" }).
+    then(function (html) {
+      qtip.set("content.text", html);
+      qtip.elements.tooltip.removeClass("post-tooltip-loading");
 
-    // Hide the tooltip if the user stopped hovering before the ajax request completed.
-    if (PostTooltip.lostFocus) {
-      qtip.hide();
-    }
-  });
+      // Hide the tooltip if the user stopped hovering before the ajax request completed.
+      if (PostTooltip.lostFocus) {
+        qtip.hide();
+      }
+    });
 };
 
 // Hide the tooltip the first time it is shown, while we wait on the ajax call to complete.
@@ -40,17 +43,6 @@ PostTooltip.QTIP_OPTIONS = {
       y: -2,
       method: "shift",
     },
-    /* Position tooltip beneath mouse.
-    my: "top left",
-    at: "bottom left",
-    target: "mouse",
-    viewport: true,
-    adjust: {
-      mouse: false,
-      y: 25,
-      method: "shift",
-    },
-    */
   },
   show: {
     solo: true,
@@ -75,7 +67,7 @@ PostTooltip.initialize = function () {
     if (PostTooltip.disabled()) {
       $(this).qtip("disable");
     } else {
-      $(this).qtip(PostTooltip.QTIP_OPTIONS, event);
+      $(this).qtip(PostTooltip.QTIP_OPTIONS);
     }
 
     PostTooltip.lostFocus = false;

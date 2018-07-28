@@ -38,9 +38,9 @@
 
 <% content_for(:html_header) do %>
   <script type="text/javascript">
-    Danbooru.Ugoira = {};
+    Ugoira = {};
 
-    Danbooru.Ugoira.create_player = function() {
+    Ugoira.create_player = function() {
       var meta_data = {
         mime_type: <%= raw @post.pixiv_ugoira_frame_data.content_type.to_json %>,
         frames: <%= raw @post.pixiv_ugoira_frame_data.data.to_json %>
@@ -57,24 +57,24 @@
       this.player = new ZipImagePlayer(options);
     }
 
-    Danbooru.Ugoira.player = null;
+    Ugoira.player = null;
 
     $(function() {
-      Danbooru.Ugoira.create_player();
-      $(Danbooru.Ugoira.player).on("loadProgress", function(ev, progress) {
+      Ugoira.create_player();
+      $(Ugoira.player).on("loadProgress", function(ev, progress) {
         $("#seek-slider").progressbar("value", Math.floor(progress * 100));
       });
 
       var player_manually_paused = false;
       $("#ugoira-play").click(function(e) {
-        Danbooru.Ugoira.player.play();
+        Ugoira.player.play();
         $(this).hide();
         $("#ugoira-pause").show();
         player_manually_paused = false;
         e.preventDefault();
       })
       $("#ugoira-pause").click(function(e) {
-        Danbooru.Ugoira.player.pause();
+        Ugoira.player.pause();
         $(this).hide();
         $("#ugoira-play").show();
         player_manually_paused = true;
@@ -87,23 +87,23 @@
 
       $("#seek-slider").slider({
         min: 0,
-        max: Danbooru.Ugoira.player._frameCount-1,
+        max: Ugoira.player._frameCount-1,
         start: function(event, ui) {
           // Need to pause while slider is being dragged or playback speed will bug out
-          Danbooru.Ugoira.player.pause();
+          Ugoira.player.pause();
         },
         slide: function(event, ui) {
-          Danbooru.Ugoira.player._frame = ui.value;
-          Danbooru.Ugoira.player._displayFrame();
+          Ugoira.player._frame = ui.value;
+          Ugoira.player._displayFrame();
         },
         stop: function(event, ui) {
           // Resume playback when dragging stops, but only if player was not paused by the user earlier
           if (!(player_manually_paused)) {
-            Danbooru.Ugoira.player.play();
+            Ugoira.player.play();
           }
         }
       });
-      $(Danbooru.Ugoira.player).on("frame", function(frame, frame_number) {
+      $(Ugoira.player).on("frame", function(frame, frame_number) {
         $("#seek-slider").slider("option", "value", frame_number);
       });
     });
