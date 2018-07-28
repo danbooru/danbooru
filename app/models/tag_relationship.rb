@@ -13,13 +13,15 @@ class TagRelationship < ApplicationRecord
   has_one :antecedent_tag, :class_name => "Tag", :foreign_key => "name", :primary_key => "antecedent_name"
   has_one :consequent_tag, :class_name => "Tag", :foreign_key => "name", :primary_key => "consequent_name"
 
+  scope :active, ->{where(status: "active")}
   scope :expired, ->{where("created_at < ?", EXPIRY.days.ago)}
   scope :old, ->{where("created_at >= ? and created_at < ?", EXPIRY.days.ago, EXPIRY_WARNING.days.ago)}
   scope :pending, ->{where(status: "pending")}
+  scope :retired, ->{where(status: "retired")}
 
   before_validation :initialize_creator, :on => :create
   before_validation :normalize_names
-  validates_format_of :status, :with => /\A(active|deleted|pending|processing|queued|error: .*)\Z/
+  validates_format_of :status, :with => /\A(active|deleted|pending|processing|queued|retired|error: .*)\Z/
   validates_presence_of :creator_id, :antecedent_name, :consequent_name
   validates :creator, presence: { message: "must exist" }, if: -> { creator_id.present? }
   validates :approver, presence: { message: "must exist" }, if: -> { approver_id.present? }
@@ -33,6 +35,10 @@ class TagRelationship < ApplicationRecord
   def normalize_names
     self.antecedent_name = antecedent_name.mb_chars.downcase.tr(" ", "_")
     self.consequent_name = consequent_name.mb_chars.downcase.tr(" ", "_")
+  end
+
+  def is_retired?
+    status == "retired"
   end
 
   def is_pending?
@@ -98,6 +104,8 @@ class TagRelationship < ApplicationRecord
 
       if params[:status].present?
         q = q.status_matches(params[:status])
+      else
+        q = q.active
       end
 
       if params[:category].present?
@@ -138,6 +146,10 @@ class TagRelationship < ApplicationRecord
 
     def reject_message(rejector)
       "The #{relationship} [[#{antecedent_name}]] -> [[#{consequent_name}]] #{forum_link} has been rejected by @#{rejector.name}."
+    end
+
+    def retirement_message
+      "The #{relationship} [[#{antecedent_name}]] -> [[#{consequent_name}]] #{forum_link} has been retired."
     end
 
     def conflict_message

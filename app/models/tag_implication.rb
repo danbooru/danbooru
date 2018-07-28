@@ -2,6 +2,7 @@ class TagImplication < TagRelationship
   before_save :update_descendant_names
   after_save :update_descendant_names_for_parents
   after_destroy :update_descendant_names_for_parents
+  after_save :update_descendant_names_for_parents, if: ->(rec) { rec.is_retired? }
   after_save :create_mod_action
   validates_uniqueness_of :antecedent_name, :scope => :consequent_name
   validate :absence_of_circular_relation
