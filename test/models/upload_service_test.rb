@@ -353,6 +353,14 @@ class UploadServiceTest < ActiveSupport::TestCase
         CurrentUser.ip_addr = nil
       end
 
+      should "record the correct source when a referer is given" do
+        @source = "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large"
+        @ref = "https://twitter.com/nounproject/status/540944400767922176"
+        @service = subject.new(source: @source, referer_url: @ref)
+        @upload = @service.start!
+        assert_equal(@ref, @upload.source)
+      end
+
       should "work for a jpeg" do
         @service = subject.new(source: @jpeg)
         @upload = @service.start!
