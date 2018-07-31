@@ -6,10 +6,11 @@ function importAll (r) {
 
 require('jquery-ujs');
 require('hammerjs');
-require('qtip2');
 
 // should start looking for nodejs replacements
 importAll(require.context('../vendor', true, /\.js$/));
+
+importAll(require.context('../src/styles/base', true, /\.scss$/));
 
 require("jquery-ui/ui/widgets/autocomplete");
 require("jquery-ui/ui/widgets/button");
@@ -25,5 +26,5 @@ require("jquery-ui/themes/base/resizable.css");
 require("jquery-ui/themes/base/theme.css");
 
 importAll(require.context('../src/javascripts', true, /\.js(\.erb)?$/));
-importAll(require.context('../src/styles', true, /\.scss$/));
-importAll(require.context('../src/styles', true, /\.scss.erb$/));
+importAll(require.context('../src/styles/common', true, /\.scss(?:\.erb)?$/));
+importAll(require.context('../src/styles/specific', true, /\.scss(?:\.erb)?$/));

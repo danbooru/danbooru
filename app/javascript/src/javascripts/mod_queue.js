@@ -1,3 +1,5 @@
+import Utility from './utility'
+
 let ModQueue = {};
 
 ModQueue.processed = 0;

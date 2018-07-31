@@ -1,9 +1,12 @@
 import Utility from './utility'
 
+require('qtip2');
+require('qtip2/dist/jquery.qtip.css');
+
 let PostTooltip = {};
 
 PostTooltip.render_tooltip = function (event, qtip) {
-  var post_id = $(event.target).parents("[data-id]").data("id");
+  var post_id = $(this).parents("[data-id]").data("id");
 
   $.get("/posts/" + post_id, { variant: "tooltip" }).then(function (html) {
     qtip.set("content.text", html);
