@@ -500,7 +500,6 @@ DEPENDENCIES
   simple_form
   simplecov
   sinatra
-  sprockets-rails
   statistics2
   streamio-ffmpeg
   stripe

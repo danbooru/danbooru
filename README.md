@@ -1,4 +1,4 @@
-### Installation
+## Installation
 
 It is recommended that you install Danbooru on a Debian-based system
 since most of the required packages are available on APT. Danbooru
@@ -17,7 +17,7 @@ Use your operating system's package management system whenever
 possible.  This will simplify the process of installing init scripts,
 which will not always happen when compiling from source.
 
-### Troubleshooting
+## Troubleshooting
 
 These instructions won't work for everyone. If your setup is not
 working, here are the steps I usually recommend to people:
@@ -37,6 +37,15 @@ debug your Nginx configuration file.
 
 4) Check all log files.
 
+## Services
+
+Danbooru employs numerous external services to delegate some 
+functionality.
+
+For development purposes, you can just run mocked version of these
+services. They're available in `scrtip/mock_services` and can be started
+automatically using Foreman and the provided Procfile.
+
 ### Amazon Web Services
 
 In order to enable the following features, you will need an AWS SQS 
@@ -55,12 +64,9 @@ The following features requires a Google API account:
 * Bulk revert
 * Post versions report
 
-### IQDB Integration
+### IQDB Service
 
-IQDB integration is now delegated to the [IQDBS service](https://github.com/r888888888/iqdbs). 
-
-You will need to install your own copy and enable the appropriate 
-configuration settings.
+IQDB integration is delegated to the [IQDBS service](https://github.com/r888888888/iqdbs). 
 
 ### Listbooru Service
 
@@ -86,5 +92,5 @@ The following features are delegated to the [Reportbooru service](https://github
 ### Cropped Thumbnails
 
 There's optional support for cropped thumbnails. This relies on installing
-libvips 8.6 or higher and setting Danbooru.config.enable_image_cropping to
-true.
+`libvips-8.6` or higher and setting `Danbooru.config.enable_image_cropping`
+to true.
