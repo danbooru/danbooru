@@ -1,0 +1,18 @@
+{
+  "dependencies": {
+    "@rails/webpacker": "^3.5.3",
+    "debug-loader": "^0.0.1",
+    "expose-loader": "^0.7.5",
+    "hammerjs": "^2.0.8",
+    "jquery": "^3.3.1",
+    "jquery-ui": "^1.12.1",
+    "jquery-ujs": "^1.2.2",
+    "qtip2": "^3.0.3",
+    "rails-erb-loader": "^5.4.2",
+    "script-loader": "^0.7.2",
+    "webpack-cli": "^3.0.8"
+  },
+  "devDependencies": {
+    "webpack-dev-server": "^2.11.1"
+  }
+}

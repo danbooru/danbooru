@@ -1,0 +1,38 @@
+@import "../base/000_vars.scss";
+
+a:link {
+  color: $link_color;
+  text-decoration: none;
+}
+
+a:visited {
+  color: $link_color;
+  text-decoration: none;
+}
+
+a:hover {
+  color: $link_hover_color;
+  text-decoration: none;
+}
+
+a:active {
+  color: $link_color;
+  text-decoration: none;
+}
+
+a.active {
+  font-weight: bold;
+}
+
+a.login {
+  font-weight: bold;
+  color: #e00;
+}
+
+a.forum-updated {
+  font-style: italic;
+}
+
+a.wiki-link {
+  margin-right: 0.3em;
+}

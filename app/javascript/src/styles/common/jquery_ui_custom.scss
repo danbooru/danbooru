@@ -1,0 +1,66 @@
+@import "../base/000_vars.scss";
+
+.ui-widget {
+  font-family: $base_font_family;
+
+  input, select, textarea, button {
+    font-family: $base_font_family;
+  }
+}
+
+div.ui-dialog {
+  height: auto! important;
+  overflow: visible;
+  font-size: 1em;
+  z-index: 999 !important;
+  box-shadow: 2px 2px 1px grey;
+
+  ul {
+    margin-left: 1em;
+    margin-bottom: 1em;
+  }
+}
+
+.ui-state-highlight {
+  border: 1px solid #FCEEC1;
+  background: #FDF5D9;
+  color: #363636;
+}
+
+.ui-state-error {
+  border: 1px solid #FBC7C6;
+  background: #FDDFDE;
+}
+
+.ui-button {
+  margin: 0;
+  padding: 0.25em 1em;
+  background-color: #f6f6f6;
+  border: 1px solid #c5c5c5;
+
+  &.sub {
+    font-size: 90%;
+  }
+
+  &.tiny {
+    font-size: 90%;
+    padding: 0.25em 0.5em;
+  }
+
+  &.gradient {
+    background: linear-gradient(#f6f6f6, #e5e5e5);
+  }
+}
+
+.ui-button:hover {
+  box-shadow: 1px 1px grey;
+  transform: translateY(-1px);
+
+  &.gradient {
+    background: linear-gradient(#fefefe, #f0f0f0);
+  }
+}
+
+.ui-front {
+  z-index: 1000;
+}

@@ -1,0 +1,27 @@
+@import "../base/000_vars.scss";
+
+div#c-explore-posts {
+  header {
+    text-align: center;
+
+    h1 {
+      font-size: 3em;
+    }
+
+    p.byline {
+      font-size: 1.2em;
+      font-style: italic;
+    }
+  }
+
+  div.posts {
+    padding: 1em;
+    margin-bottom: 2em;
+  }
+
+  div#a-intro {
+    width: 870px;
+    margin: 0 auto;
+    text-align: center;
+  }
+}

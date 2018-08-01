@@ -1,0 +1,9 @@
+@import "../base/000_vars.scss";
+
+div#c-post-versions {
+  div#a-index {
+    tr.hilite {
+      background: $highlight_color;
+    }
+  }
+}

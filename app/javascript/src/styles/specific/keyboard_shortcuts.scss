@@ -1,0 +1,21 @@
+@import "../base/000_vars.scss";
+
+div#c-static {
+  div#a-keyboard-shortcuts {
+    overflow: visible;
+
+    section {
+      min-width: 20%;
+      float: left;
+      margin-bottom: 1em;
+
+      h1 {
+        font-size: $h3_size;
+      }
+
+      li {
+        margin-bottom: 0.5em;
+      }
+    }
+  }
+}

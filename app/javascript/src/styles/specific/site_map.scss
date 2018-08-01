@@ -1,0 +1,25 @@
+@import "../base/000_vars.scss";
+
+div#c-static {
+  div#a-site-map {
+    width: 80em;
+
+    h1 {
+      display: none;
+    }
+
+    section {
+      width: 20em;
+      float: left;
+
+      h1 {
+        display: block;
+        font-size: $h3_size;
+      }
+
+      ul {
+        margin-bottom: 1.5em;
+      }
+    }
+  }
+}

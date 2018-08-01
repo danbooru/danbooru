@@ -1,0 +1,35 @@
+@import "../base/000_vars.scss";
+
+div.paginator {
+  display: block;
+  padding: 2em 0 1em 0;
+  text-align: center;
+  clear: both;
+
+  li {
+    a {
+      margin: 0 0.25em;
+      padding: 0.25em 0.75em;
+    }
+
+    &.more {
+      color: grey;
+    }
+
+    a.arrow:hover {
+      background: white;
+      color: $link_color;
+    }
+
+    a:hover {
+      background: $link_color;
+      color: white;
+    }
+
+    span {
+      margin: 0 0.25em;
+      padding: 0.25em 0.75em;
+      font-weight: bold;
+    }
+  }
+}

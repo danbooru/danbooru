@@ -1,0 +1,52 @@
+@import "../base/000_vars.scss";
+
+div#related-tags-container {
+  padding-right: 2em;
+
+  h1 {
+    font-size: $h3_size;
+  }
+}
+
+div.related-tags {
+  width: 100%;
+  margin-bottom: 1em;
+  padding: 1em;
+  background: #EEE;
+  overflow: auto;
+  border-radius: 4px;
+
+  div.tag-column {
+    max-width: 15em;
+    margin-right: 2em;
+    float: left;
+
+    ul {
+      margin: 0;
+
+      li {
+        em {
+          font-weight: bold;
+        }
+
+        svg {
+          margin-top: 2px;
+          cursor: pointer;
+        }
+
+        a {
+          min-width: 3em;
+        }
+
+        a.selected {
+          background-color: $link_color;
+          color: white;
+        }
+      }
+    }
+  }
+  
+  div.wide-column {
+    max-width: 45em;
+  }
+}

@@ -1,5 +1,5 @@
 <% if @error %>
-  Danbooru.error("<%= j @error.to_s %>");
+  $(window).trigger("danbooru:error", "<%= j @error.to_s %>");
 <% else %>
   $("#comment-vote-up-link-for-<%= @comment.id %>").show();
   $("#comment-vote-down-link-for-<%= @comment.id %>").show();

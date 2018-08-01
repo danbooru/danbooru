@@ -1,0 +1,283 @@
+@import "../base/000_vars.scss";
+
+#desktop-version-link {
+  display: none;
+}
+
+#searchbox-redirect-link {
+  display: none;
+}
+
+@media screen and (max-width: 660px) {
+  #desktop-version-link {
+    display: inline;
+  }
+
+  #searchbox-redirect-link {
+    display: inline;
+  }
+
+  #saved-searches-nav {
+    display: none;
+  }
+
+  div#page aside#sidebar {
+    padding: 5px;
+
+    input#tags {
+      width: 80%;
+    }
+
+    button[type=submit] {
+      font-size: 1.4em;
+      background-color: #EEE;
+      height: 42px;
+      padding: 2px 10px;
+    }
+  }
+
+  div#page {
+    padding: 0 0.25vw;
+    > div /* div#c-$controller */ {
+      > div /* div#a-$action */ {
+        display: flex;
+        flex-direction: column;
+
+        /* Move #sidebar below #content. */
+        > aside#sidebar {
+          font-size: 1.5em;
+          float: none;
+          width: auto;
+          order: 2;
+        }
+      }
+    }
+  }
+
+  #maintoggle {
+    display: block;
+    font-weight: bold;
+    position: absolute;
+    top: 3vw;
+    right: 4vw;
+    font-size: 2em;
+
+    &.toggler-active {
+      background-color: lighten($link_color, 25%);
+      color: #000;    
+    }
+  }
+
+  /* Make the quick search box in the navbar full width. */
+  header#top menu form input {
+    width: auto;
+  }
+
+  h1 {
+    display: none;
+  }
+
+  form {
+    input[type=text] {
+      vertical-align: top;
+      font-size: 24pt;
+      border: 1px solid #c5c5c5;
+    }
+
+    textarea {
+      vertical-align: top;
+      border: 1px solid #c5c5c5;
+    }
+
+    input[type=submit] {
+      font-size: 160%;
+    }
+
+    input[type=submit].tiny {
+      font-size: 120%;
+      vertical-align: top;
+    }
+  }
+
+  div#page section#content {
+    margin: 0;
+    padding: 0;
+  }
+
+  #comments h2 {
+    display: none;
+  }
+
+  div.paginator {
+    font-size: 24pt;
+    font-weight: bold;
+    text-align: center;
+    width: 100%;
+    padding: 0;
+    margin: 0;
+    margin-top: 1em;
+
+    li {
+      display: inline-block;
+      margin: 0 0.25em;
+
+      a, span {
+        margin: 0;
+        padding: 0;
+        border: none;
+      }
+
+      &.current-page {
+        text-align: center;
+      }
+
+      &.arrow:last-child {
+        text-align: right;
+      }
+
+      &.numbered-page, &.more {
+        display: none;
+      }
+    }
+  }
+
+  #posts #posts-container {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  article.post-preview {
+    float: none;
+    margin: 0; 
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+
+    a {
+      margin: 0 auto;
+    }
+
+    img {
+      width: 33.3vw;
+      border: none !important;
+    }
+
+    &[data-tags~=animated]:before, &[data-file-ext=swf]:before, &[data-file-ext=webm]:before, &[data-file-ext=mp4]:before, &[data-file-ext=zip]:before {
+      @include animated-icon;
+    }
+
+    &[data-has-sound=true]:before {
+      @include sound-icon;
+    }
+  }
+
+  .user-disable-cropped-false {
+    article.post-preview {
+      width: 33.3%;
+      height: 33.3vw;
+      overflow: hidden;
+    }
+
+    img {
+      width: 33.3vw;
+      height: 33.3vw;
+
+      &.has-cropped-false {
+        object-fit: cover;
+      }
+    }
+  }
+
+  img#image {
+    margin-top: 5px;
+  }
+
+  #image-container {
+    overflow: scroll;
+  }
+
+  div#options {
+    margin-top: 10px;
+    font-size: 24pt;
+    font-weight: bold;
+  }
+
+  div#tags {
+    margin-top: 30px;
+
+    li {
+      margin: 10px 0;
+    }
+
+    a.search-tag {
+      font-size: 24pt;
+      font-weight: bold;
+    }
+  }
+
+  div#page {
+    div.comments-for-post div.list-of-comments article.comment div.content {
+      clear: both;
+      margin: 0;
+    }
+  }
+
+  #nav {
+    font-size: 2em;
+    line-height: 2em;
+    display: none;
+  }
+  
+  header#top menu.main {
+    background-color: lighten($link_color, 25%);
+    padding: 5px 10px;
+  }
+  
+  h1 {
+    display: block;
+    font-size: 2em;
+    margin: 1em 0 0 0;
+  }
+  
+  h2 {
+    font-size: 0.825em;
+    margin: 1em 0 0 0;
+  }
+  
+  header {
+    text-align: center;
+    line-height: 2em;
+    h1 {
+      display: inline; //Needed for menu button
+    }
+  }
+  
+  div#page {
+    margin: 0;
+  }
+}
+
+@media screen and (max-width: 440px) {
+  input#expand-search {
+    display: none;
+  }
+
+  body {
+    width: 100%;
+  }
+
+  #post-sections {
+    font-size: 1em;
+  }
+  
+  div article.post-preview {
+    overflow: visible;
+  }
+}
+
+#tos-notice {
+  display: none;
+}

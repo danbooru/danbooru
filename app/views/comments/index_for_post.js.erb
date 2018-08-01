@@ -2,15 +2,4 @@ $("#hidden-comments-notice-for-<%= @post.id %>").hide();
 
 var current_comment_section = $("div.comments-for-post[data-post-id=<%= @post.id %>] div.list-of-comments");
 current_comment_section.html("<%= j(render(:partial => 'comments/partials/show/comment', :collection => @comments))%>");
-
-<% if params[:include_below_threshold] %>
-  $("#threshold-comments-notice-for-<%= @post.id %>").hide();
-  Danbooru.Comment.highlight_threshold_comments(<%= @post.id %>);
-<% else %>
-  Danbooru.Comment.hide_threshold_comments(<%= @post.id %>);
-<% end %>
-
-Danbooru.Comment.initialize_reply_links(current_comment_section);
-Danbooru.Comment.initialize_edit_links(current_comment_section);
-Danbooru.Comment.initialize_vote_links(current_comment_section);
-Danbooru.Dtext.initialize_expandables(current_comment_section);
+$(window).trigger("danbooru:index_for_post", <%= @post.id %>, current_comment_section, <%= ActiveModel::Type::Boolean.new.cast(params[:include_below_threshold]) %>);

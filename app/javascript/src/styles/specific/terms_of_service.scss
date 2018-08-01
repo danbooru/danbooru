@@ -1,0 +1,26 @@
+@import "../base/000_vars.scss";
+
+div#c-static div#a-terms-of-service {
+  width: 40em;
+
+  h1 {
+    font-size: $h2_size;
+  }
+
+  p {
+    margin-bottom: 1em;
+  }
+
+  ul {
+    margin-left: 1em;
+    margin-bottom: 1em;
+  }
+
+  li {
+    list-style-type: disc;
+  }
+
+  section {
+    margin-bottom: 2em;
+  }
+}

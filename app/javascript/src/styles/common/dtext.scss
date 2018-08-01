@@ -1,0 +1,95 @@
+@import "../base/000_vars.scss";
+
+div.prose {
+  line-height: 1.4em;
+
+  h1, h2, h3 {
+    line-height: 1em;
+  }
+
+  h1 {
+    font-size: $dtext_h1_size;
+    padding: $h1_padding;
+  }
+
+  h2 {
+    font-size: $dtext_h2_size;
+    padding: $h2_padding;
+  }
+
+  h3 {
+    font-size: $dtext_h3_size;
+    padding: $h3_padding;
+  }
+
+  h4 {
+    font-size: $dtext_h4_size;
+    padding: $h4_padding;
+  }
+
+  h5 {
+    font-size: $dtext_h5_size;
+    padding: $h4_padding;
+  }
+
+  h6 {
+    font-size: $dtext_h6_size;
+    padding: $h4_padding;
+  }
+
+  ul {
+    margin-left: 1em;
+    margin-bottom: 1em;
+
+    ul {
+      margin-bottom: 0;
+    }
+  }
+
+  li {
+    list-style-type: disc;
+  }
+  
+  pre {
+    font-family: monospace;
+    font-size: 1.2em;
+    margin: 0.5em 0;
+    padding: 0.5em 1em;
+    background: #EEE;
+    white-space: pre-wrap;
+  }
+
+  code {
+    font-family: monospace;
+    background: #EEE;
+  }
+
+  div.expandable {
+    margin-bottom: 1em;
+    border: 1px inset #666;
+  }
+
+  div.expandable-header {
+    padding: 0.4em;
+
+    span {
+      margin-right: 0.5em;
+      font-weight: bold;
+    }
+  }
+
+  div.expandable-content {
+    padding: 0.4em;
+    border-top: 1px solid #666;
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+div.dtext-preview {
+  ul {
+    margin-left: 1em;
+  }
+}

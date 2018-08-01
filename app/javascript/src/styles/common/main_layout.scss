@@ -1,0 +1,114 @@
+@import "../base/000_vars.scss";
+
+div#search {
+  margin-bottom: 1em;
+}
+
+div#search-box button {
+  -webkit-appearance: button;
+  border: 1px solid $link_color;
+  background-color: $link_color;
+  color: #FFF;
+  &:hover, &:focus {
+    border: 1px solid $link_hover_color;
+    background-color: $link_hover_color;
+  }
+}
+
+div#page {
+  overflow: visible;
+  margin: 0 20px;
+  padding: 0 10px;
+
+  div#upgrade-account-notice, div#sign-up-notice, div#tos-notice, div#ban-notice, div#dmail-notice, div#mod-notice {
+    margin: 1em 0;
+    padding: 1em;
+    text-align: center;
+    position: relative;
+
+    h1 {
+      font-size: $h2_size;
+      font-weight: bold;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
+  aside#sidebar {
+    width: 15em;
+    float: left;
+
+    h1 {
+      font-size: $h3_size;
+    }
+
+    ul {
+      list-style-type: none;
+    }
+
+    input[type=text] {
+      /* ensure expanded search box renders above post thumbnails. */
+      z-index: 1;
+      position: relative;
+    }
+
+    button[type=submit] {
+      padding: 2px 6px;
+      background: #EEE;
+      border-left: none;
+    }
+  }
+
+  aside#sidebar > section {
+    margin-bottom: 1em;
+  }
+
+  aside#sidebar > section#blacklist-box ul {
+    margin-left: 1em;
+
+    li {
+      list-style-type: disc;
+    }
+
+    a {
+      color: $link_color;
+      cursor: pointer;
+    }
+
+    span {
+      color: #AAA;
+    }
+  }
+
+  section#content {
+    overflow: visible;
+    margin-left: 15em;
+    padding-left: 1em;
+  }
+}
+
+footer#page-footer {
+  clear: both;
+  width: 100%;
+  margin-top: 1em;
+  text-align: center;
+  padding: 1em 0 1em;
+  border-top: 1px solid #EEE;
+}
+
+div.clearfix {
+  clear: both;
+}
+
+div#more-links {
+  z-index: 5000;
+  position: absolute;
+  background: white;
+  border: 1px solid #999;
+  width: 8em;
+  line-height: 1.3em;
+  padding: 0.2em 0.6em;
+  @include box-shadow(2px 2px 2px #ccc);
+}

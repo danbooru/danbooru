@@ -1,0 +1,136 @@
+@import "../base/000_vars.scss";
+
+body {
+  background-color: #FFF;
+  font-family: $base_font_family;
+  padding: 0;
+  margin: 0;
+  font-size: 87.5%;
+  line-height: 1.25em;
+}
+
+article, section {
+  display: block;
+}
+
+abbr[title=required] {
+  display: none;
+}
+
+blockquote {
+  margin: 0 0 1em 0;
+  padding: 1em 1em 0.2em;
+  border: 1px solid #666;
+  background: #EEE;
+}
+
+code {
+  font-family: monospace;
+  font-size: 1.2em;
+}
+
+dd {
+  margin-bottom: 1em;
+}
+
+dt {
+  font-weight: bold;
+}
+
+em {
+  font-style: italic;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: Tahoma, Verdana, Helvetica, sans-serif;
+  font-weight: bold;
+  line-height: 1.5em;
+}
+
+h1 {
+  font-size: $h1_size;
+}
+
+h2 {
+  font-size: $h2_size;
+}
+
+h3, h4, h5, h6 {
+  font-weight: bold;
+  font-size: $h3_size;
+}
+
+fieldset {
+  margin-bottom: 1em;
+}
+
+header {
+  margin: 0 0 1em 0;
+  padding: 0;
+  display: block;
+}
+
+img {
+  border: none;
+  vertical-align: middle;
+}
+
+img.wait {
+  margin-left: 5px;
+}
+
+legend {
+  font-size: $h2_size;
+  font-weight: bold;
+  margin-bottom: 0.5em;
+}
+
+menu {
+  margin: 0;
+  padding: 0;
+
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    margin: 0;
+    padding: 0 0.2em;
+    list-style-type: none;
+    display: inline;
+  }
+}
+
+p {
+  margin-bottom: 1em;
+}
+
+section {
+  display: block;
+}
+
+strong {
+  font-weight: bold;
+}
+
+table tfoot {
+  margin-top: 2em;
+}
+
+.hint {
+  color: #666;
+  font-style: italic;
+  max-width: 70%;
+}
+
+.tn {
+  font-size: 0.8em;
+  color: gray;
+}
+
+p.info {
+  color: #AAA;
+  font-style: italic;
+  font-size: 80%;
+}

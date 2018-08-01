@@ -1,7 +1,7 @@
 <% if @error %>
-  Danbooru.error("<%= j @error.to_s %>");
+  $(window).trigger("danbooru:error", "<%= j @error.to_s %>");
 <% elsif @comment_vote.errors.any? %>
-  Danbooru.error("<%= j @comment_vote.errors.full_messages.join('; ') %>");
+  $(window).trigger("danbooru:error", "<%= j @comment_vote.errors.full_messages.join('; ') %>");
 <% elsif @comment_vote.is_negative? %>
   $(".comment[data-comment-id=<%= @comment.id %>]").remove();
 <% end %>
