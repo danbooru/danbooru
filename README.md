@@ -89,6 +89,10 @@ The following features are delegated to the [Reportbooru service](https://github
 * Upload trend graphs
 * Similar users (via favorites and post votes)
 
+### Recommender Service
+
+Post recommendations require the [Recommender service](https://github.com/r888888888/recommender).
+
 ### Cropped Thumbnails
 
 There's optional support for cropped thumbnails. This relies on installing

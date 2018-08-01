@@ -2,6 +2,7 @@ class TagAlias < TagRelationship
   before_save :ensure_tags_exist
   after_save :clear_all_cache
   after_destroy :clear_all_cache
+  after_save :clear_all_cache, if: ->(rec) {rec.is_retired?}
   after_save :create_mod_action
   validates_uniqueness_of :antecedent_name
   validate :absence_of_transitive_relation

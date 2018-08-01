@@ -15,7 +15,9 @@
         <td><%= link_to_user(request.user) %></td>
         <td><% if request.approver %><%= link_to_user(request.approver) %><% end %></td>
         <td>
-          <% if request.forum_topic_id %>
+          <% if request.forum_post_id %>
+            <%= link_to(request.forum_topic_id, forum_topic_path(request.forum_topic_id, page: request.forum_post.forum_topic_page, :anchor => "forum_post_#{request.forum_post.id}")) %>
+          <% elsif request.forum_topic_id %>
             <%= link_to(request.forum_topic_id, forum_topic_path(request.forum_topic_id)) %>
           <% end %>
         </td>
