@@ -4,6 +4,10 @@
   .category-<%= category %> a, a.tag-type-<%= category %>, .ui-widget-content a.tag-type-<%= category %> {
     color: <%= cssmap["color"] %>;
 
+    &:link, &:visited {
+      color: <%= cssmap["color"] %>;
+    }
+
     &:hover {
       color: <%= cssmap["hover"] %>;
     }
@@ -15,6 +19,18 @@
 
   .ui-widget-content .ui-state-active a.tag-type-<%= category %> {
     color: <%= cssmap["hover"] %>;
+
+    &:link, &:visited {
+      color: <%= cssmap["color"] %>;
+    }
+
+    &:hover {
+      color: <%= cssmap["hover"] %>;
+    }
+
+    &.selected {
+      color: white;
+    }
   }
 <% end %>
 
