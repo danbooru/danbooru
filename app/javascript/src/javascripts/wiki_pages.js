@@ -23,3 +23,5 @@ WikiPage.initialize_shortcuts = function() {
 $(document).ready(function() {
   WikiPage.initialize_all();
 });
+
+export default WikiPage;

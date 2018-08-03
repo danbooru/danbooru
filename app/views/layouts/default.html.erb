@@ -72,17 +72,25 @@
   </script>
   <script defer src="https://use.fontawesome.com/releases/v5.0.10/js/all.js" integrity="sha384-slN8GvtUJGnv6ca26v8EzVaR9DC58QEwsIk9q1QXdCU8Yu8ck/tL/5szYlBbqmS+" crossorigin="anonymous"></script>
   <script>
-    if (typeof window.Danbooru !== "object") {
-      window.Danbooru = {};
+    window.Danbooru = window.Danbooru || {};
+    for (var property in window.Danbooru.application) {
+      window.Danbooru[property] = window.Danbooru.application[property];
     }
+
     window.Danbooru.notice = function(msg) {
-      console.warn("Danbooru.notice will be deprecated. Use $(window).trigger('danbooru:notice', msg) instead.")
-      $(window).trigger("danbooru:notice", msg);
-    }
+      console.warn("Danbooru.notice will be deprecated. Use Danbooru.Utility.notice(msg) instead.")
+      return Danbooru.Utility.notice(msg);
+    };
+
     window.Danbooru.error = function(msg) {
-      console.warn("Danbooru.error will be deprecated. Use $(window).trigger('danbooru:error', msg) instead.")
-      $(window).trigger("danbooru:error", msg);
-    }
+      console.warn("Danbooru.error will be deprecated. Use Danbooru.Utility.error(msg) instead.")
+      return Danbooru.Utility.error(msg);
+    };
+
+    window.Danbooru.meta = function(key) {
+      console.warn("Danbooru.meta will be deprecated. Use Danbooru.Utility.meta(key) instead.")
+      return Danbooru.Utility.meta(key);
+    };
   </script>
 
 </head>
