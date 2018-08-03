@@ -72,15 +72,16 @@
   </script>
   <script defer src="https://use.fontawesome.com/releases/v5.0.10/js/all.js" integrity="sha384-slN8GvtUJGnv6ca26v8EzVaR9DC58QEwsIk9q1QXdCU8Yu8ck/tL/5szYlBbqmS+" crossorigin="anonymous"></script>
   <script>
-    window.Danbooru = {
-      notice: function(msg) {
-        console.warn("Danbooru.notice will be deprecated. Use $(window).trigger('danbooru:notice', msg) instead.")
-        $(window).trigger("danbooru:notice", msg);
-      },
-      error: function(msg) {
-        console.warn("Danbooru.error will be deprecated. Use $(window).trigger('danbooru:error', msg) instead.")
-        $(window).trigger("danbooru:error", msg);
-      }
+    if (typeof window.Danbooru !== "object") {
+      window.Danbooru = {};
+    }
+    window.Danbooru.notice = function(msg) {
+      console.warn("Danbooru.notice will be deprecated. Use $(window).trigger('danbooru:notice', msg) instead.")
+      $(window).trigger("danbooru:notice", msg);
+    }
+    window.Danbooru.error = function(msg) {
+      console.warn("Danbooru.error will be deprecated. Use $(window).trigger('danbooru:error', msg) instead.")
+      $(window).trigger("danbooru:error", msg);
     }
   </script>
 

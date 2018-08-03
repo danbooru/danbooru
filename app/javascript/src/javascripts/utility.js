@@ -138,6 +138,18 @@ Utility.sorttable = function(table) {
   });
 };
 
+Utility.is_global_hook_defined = function(path) {
+  let objs = path.split(/\./g);
+  let obj = window;
+  objs.forEach(x => {
+    if (obj) {
+      obj = obj[x]
+    }
+  });
+
+  return typeof obj === 'function';
+}
+
 String.prototype.hash = function() {
   var hash = 5381, i = this.length;
 
