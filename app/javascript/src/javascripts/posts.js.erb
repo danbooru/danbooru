@@ -486,36 +486,6 @@ Post.initialize_post_sections = function() {
   $("#post-sections li:first-child").addClass("active");
 }
 
-Post.initialize_post_sections = function() {
-  $("#post-sections li a").click(function(e) {
-    if (e.target.hash === "#comments") {
-      $("#comments").show();
-      $("#edit").hide();
-      $("#share").hide();
-    } else if (e.target.hash === "#edit") {
-      $("#edit").show();
-      $("#comments").hide();
-      $("#share").hide();
-      $("#post_tag_string").focus().selectEnd().height($("#post_tag_string")[0].scrollHeight);
-      $("#related-tags-button").trigger("click");
-      $("#find-artist-button").trigger("click");
-    } else {
-      $("#edit").hide();
-      $("#comments").hide();
-      $("#share").show();
-      addthis.init();
-    }
-
-    $("#post-sections li").removeClass("active");
-    $(e.target).parent("li").addClass("active");
-    e.preventDefault();
-  });
-
-  $("#post-sections li:first-child").addClass("active");
-  $("#notes").hide();
-  $("#edit").hide();
-}
-
 Post.resize_ugoira_controls = function() {
   var $img = $("#image");
   var width = Math.max($img.width(), 350);
