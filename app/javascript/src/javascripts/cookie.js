@@ -1,3 +1,5 @@
+import Utility from "./utility";
+
 let Cookie = {};
 
 Cookie.put = function(name, value, days) {

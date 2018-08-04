@@ -1,3 +1,5 @@
+import Utility from "./utility";
+
 let Artist = {};
 
 Artist.initialize_all = function() {
