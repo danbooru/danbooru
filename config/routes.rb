@@ -245,7 +245,6 @@ Rails.application.routes.draw do
   resources :artist_commentary_versions, :only => [:index]
   resource :related_tag, :only => [:show, :update]
   get "reports/uploads" => "reports#uploads"
-  get "reports/similar_users" => "reports#similar_users"
   get "reports/upload_tags" => "reports#upload_tags"
   get "reports/post_versions" => "reports#post_versions"
   post "reports/post_versions_create" => "reports#post_versions_create"

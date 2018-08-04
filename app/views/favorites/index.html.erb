@@ -15,10 +15,6 @@
       <section id="related-box">
         <h1>Related</h1>
         <ul id="related-list">
-          <% if CurrentUser.is_gold? %>
-            <li><%= link_to "Similar users", reports_similar_users_path %></li>
-          <% end %>
-
           <li><%= link_to "Deleted posts", posts_path(:tags => "#{@favorite_set.tag_string} status:deleted"), :rel => "nofollow" %></li>
 
           <li><%= link_to "Random post", random_posts_path(:tags => @favorite_set.tag_string), :id => "random-post", :rel => "nofollow" %></li>

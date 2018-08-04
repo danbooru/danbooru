@@ -87,7 +87,6 @@ The following features are delegated to the [Reportbooru service](https://github
 * Popular searches report
 * Favorite searches
 * Upload trend graphs
-* Similar users (via favorites and post votes)
 
 ### Recommender Service
 

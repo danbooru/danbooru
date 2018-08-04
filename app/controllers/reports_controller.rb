@@ -1,15 +1,9 @@
 class ReportsController < ApplicationController
   before_action :member_only, :except => [:upload_tags]
-  before_action :gold_only, :only => [:similar_users]
   before_action :moderator_only, :only => [:post_versions, :post_versions_create, :down_voting_post_report, :down_voting_post_report_create]
 
   def uploads
     @report = Reports::Uploads.new(params[:min_date], params[:max_date], params[:queries])
-  end
-
-  def similar_users
-    @report = Reports::UserSimilarity.new(CurrentUser.id)
-    @presenter = UserSimilarityPresenter.new(@report)
   end
 
   def post_versions
