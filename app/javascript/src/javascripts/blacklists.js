@@ -62,7 +62,6 @@ Blacklist.update_sidebar = function() {
     var item = $("<li/>");
     var link = $("<a/>");
     var count = $("<span/>");
-    var hash = entry.tags.hash();
 
     link.text(entry.tags);
     link.click(Blacklist.toggle_entry);
