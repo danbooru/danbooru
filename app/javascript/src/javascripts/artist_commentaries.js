@@ -1,3 +1,5 @@
+import Utility from "./utility";
+
 let ArtistCommentary = {};
 
 ArtistCommentary.initialize_all = function() {
