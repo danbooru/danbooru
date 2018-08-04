@@ -138,13 +138,13 @@ Upload.fill_source_info = function(data) {
     });
 
     var link = $("<a>").attr("href", "/artists/new?" + new_artist_params).text("Create new artist");
-    $("#source-Artists").html(link);
+    $("#source-danbooru-artists").html(link);
   } else {
     var artistLinks = data.artists.map(function (artist) {
       return $('<a class="tag-type-1">').attr("href", "/artists/" + artist.id).text(artist.name);
     });
 
-    $("#source-Artists").html(artistLinks)
+    $("#source-danbooru-artists").html(artistLinks)
   }
 
   if (data.image_urls.length > 1) {
