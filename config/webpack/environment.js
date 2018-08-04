@@ -20,4 +20,6 @@ environment.config.externals = {
   jquery: "jQuery"
 }
 
+environment.config.output.library = ["Danbooru", "[name]"];
+
 module.exports = environment

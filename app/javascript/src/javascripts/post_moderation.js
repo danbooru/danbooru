@@ -27,3 +27,5 @@ PostModeration.hide_or_show_delete_and_undelete_links = function() {
 $(document).ready(function() {
   PostModeration.initialize_all();
 });
+
+export default PostModeration;
