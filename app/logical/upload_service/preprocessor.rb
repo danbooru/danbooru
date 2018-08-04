@@ -15,7 +15,13 @@ class UploadService
       params[:md5_confirmation]
     end
 
+    def referer
+      params[:referer_url]
+    end
+
     def normalized_source
+      # problem: for batch twitter, the source is saved as
+      # the twimg url, 
       @normalized_source ||= begin
         Downloads::File.new(params[:source]).rewrite_url
       end
@@ -23,7 +29,7 @@ class UploadService
 
     def in_progress?
       if Utils.is_downloadable?(source)
-        Upload.where(status: "preprocessing", source: normalized_source).exists?
+        Upload.where(status: "preprocessing", source: normalized_source).or(Upload.where(status: "preprocessing", alt_source: normalized_source)).exists?
       elsif md5.present?
         Upload.where(status: "preprocessing", md5: md5).exists?
       else
@@ -33,7 +39,7 @@ class UploadService
 
     def predecessor
       if Utils.is_downloadable?(source)
-        Upload.where(status: ["preprocessed", "preprocessing"], source: normalized_source).first
+        Upload.where(status: ["preprocessed", "preprocessing"]).where(source: normalized_source).or(Upload.where(status: ["preprocessed", "preprocessing"], alt_source: normalized_source)).first
       elsif md5.present?
         Upload.where(status: ["preprocessed", "preprocessing"], md5: md5).first
       end
@@ -76,7 +82,10 @@ class UploadService
       begin
         upload.update(status: "preprocessing")
 
-        if source.present?
+        if Utils.is_downloadable?(source)
+          # preserve the original source (for twitter, the twimg:orig
+          # source, while the status url is stored in upload.source)
+          upload.alt_source = normalized_source 
           file = Utils.download_for_upload(source, upload)
         elsif params[:file].present?
           file = params[:file]
@@ -101,7 +110,9 @@ class UploadService
       # regardless of who initialized the upload, credit should goto whoever submitted the form
       pred.initialize_attributes
 
-      pred.attributes = self.params
+      # we went through a lot of trouble normalizing the source,
+      # so don't overwrite it with whatever the user provided
+      pred.attributes = self.params.except(:source)
 
       # if a file was uploaded after the preprocessing occurred,
       # then process the file and overwrite whatever the preprocessor

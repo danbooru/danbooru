@@ -353,12 +353,38 @@ class UploadServiceTest < ActiveSupport::TestCase
         CurrentUser.ip_addr = nil
       end
 
-      should "record the correct source when a referer is given" do
-        @source = "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large"
-        @ref = "https://twitter.com/nounproject/status/540944400767922176"
-        @service = subject.new(source: @source, referer_url: @ref)
-        @upload = @service.start!
-        assert_equal(@ref, @upload.source)
+      context "for twitter" do
+        setup do
+          @source = "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large"
+          @norm_source = "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"
+          @ref = "https://twitter.com/nounproject/status/540944400767922176"
+        end
+
+        should "record the correct source when a referer is given" do
+          @service = subject.new(source: @source, referer_url: @ref)
+          @upload = @service.start!
+          assert_equal(@ref, @upload.source)
+        end
+
+        should "save the twimg url in alt_source" do
+          @service = subject.new(source: @source, referer_url: @ref)
+          @upload = @service.start!
+          assert_equal(@norm_source, @upload.alt_source)
+        end
+      end
+
+      context "for pixiv" do
+        setup do
+          @source = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65981735"
+          @ref = "http://www.pixiv.net/member.php?id=696859"
+          @direct = "https://i.pximg.net/img-original/img/2017/11/21/05/12/37/65981735_p0.jpg"
+        end
+
+        should "record the correct source" do
+          @service = subject.new(source: @source, referer_url: @ref)
+          @upload = @service.start!
+          assert_equal(@direct, @upload.source)
+        end        
       end
 
       should "work for a jpeg" do
@@ -411,6 +437,50 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
       end
 
+    end
+
+    context "#finish!" do
+      setup do
+        CurrentUser.user = travel_to(1.month.ago) do
+          FactoryBot.create(:user)
+        end
+        CurrentUser.ip_addr = "127.0.0.1"
+      end
+
+      context "for twitter" do
+        setup do
+          @source = "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large"
+          @norm_source = "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"
+          @ref = "https://twitter.com/nounproject/status/540944400767922176"
+        end
+
+        should "record the correct source when a referer is given" do
+          @service = subject.new(source: @source, referer_url: @ref)
+          @upload = @service.start!
+          @service = subject.new(source: @source)
+          @service.finish!
+          @upload.reload
+
+          assert_equal(@ref, @upload.source)
+        end        
+      end
+
+      context "for pixiv" do
+        setup do
+          @source = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65981735"
+          @ref = "http://www.pixiv.net/member.php?id=696859"
+          @direct = "https://i.pximg.net/img-original/img/2017/11/21/05/12/37/65981735_p0.jpg"
+        end
+
+        should "record the correct source" do
+          @service = subject.new(source: @source, referer_url: @ref)
+          @upload = @service.start!
+          @service = subject.new(source: @source)
+          @service.finish!
+          @upload.reload
+          assert_equal(@direct, @upload.source)
+        end        
+      end
     end
   end
 
