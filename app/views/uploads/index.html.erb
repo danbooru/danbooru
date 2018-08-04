@@ -47,6 +47,15 @@
               </span>
               <br>
 
+              <% if upload.alt_source.present? %>
+                <span class="info">
+                  <strong>Alternate Source</strong>
+                  <%= link_to_if (upload.alt_source =~ %r!\Ahttps?://!i), (upload.alt_source.presence.try(:truncate, 50) || content_tag(:em, "none")), upload.source %>
+                  <%= link_to "»", uploads_path(search: params[:search].merge(source_matches: upload.alt_source)) %>
+                </span>
+                <br>
+              <% end %>
+
               <span class="info">
                 <strong>Tags</strong>
                 <%= TagSetPresenter.new(upload.tag_string.split).inline_tag_list_html(self) %>

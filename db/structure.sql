@@ -433,8 +433,8 @@ CREATE TABLE public.advertisement_hits (
     id integer NOT NULL,
     advertisement_id integer NOT NULL,
     ip_addr inet NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -464,15 +464,15 @@ ALTER SEQUENCE public.advertisement_hits_id_seq OWNED BY public.advertisement_hi
 CREATE TABLE public.advertisements (
     id integer NOT NULL,
     referral_url text NOT NULL,
-    ad_type character varying NOT NULL,
-    status character varying NOT NULL,
+    ad_type character varying(255) NOT NULL,
+    status character varying(255) NOT NULL,
     hit_count integer DEFAULT 0 NOT NULL,
     width integer NOT NULL,
     height integer NOT NULL,
-    file_name character varying NOT NULL,
+    file_name character varying(255) NOT NULL,
     is_work_safe boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -502,8 +502,8 @@ ALTER SEQUENCE public.advertisements_id_seq OWNED BY public.advertisements.id;
 CREATE TABLE public.amazon_backups (
     id integer NOT NULL,
     last_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -564,7 +564,7 @@ ALTER SEQUENCE public.anti_voters_id_seq OWNED BY public.anti_voters.id;
 CREATE TABLE public.api_keys (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    key character varying NOT NULL,
+    key character varying(255) NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -612,8 +612,8 @@ CREATE TABLE public.artist_commentaries (
     original_description text DEFAULT ''::text NOT NULL,
     translated_title text DEFAULT ''::text NOT NULL,
     translated_description text DEFAULT ''::text NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -649,8 +649,8 @@ CREATE TABLE public.artist_commentary_versions (
     original_description text,
     translated_title text,
     translated_description text,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -682,8 +682,8 @@ CREATE TABLE public.artist_urls (
     artist_id integer NOT NULL,
     url text NOT NULL,
     normalized_url text NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     is_active boolean DEFAULT true NOT NULL
 );
 
@@ -714,16 +714,16 @@ ALTER SEQUENCE public.artist_urls_id_seq OWNED BY public.artist_urls.id;
 CREATE TABLE public.artist_versions (
     id integer NOT NULL,
     artist_id integer NOT NULL,
-    name character varying NOT NULL,
+    name character varying(255) NOT NULL,
     updater_id integer NOT NULL,
     updater_ip_addr inet NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
     other_names text,
-    group_name character varying,
+    group_name character varying(255),
     url_string text,
     is_banned boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -752,15 +752,15 @@ ALTER SEQUENCE public.artist_versions_id_seq OWNED BY public.artist_versions.id;
 
 CREATE TABLE public.artists (
     id integer NOT NULL,
-    name character varying NOT NULL,
+    name character varying(255) NOT NULL,
     creator_id integer NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
     other_names text,
     other_names_index tsvector,
-    group_name character varying,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    group_name character varying(255),
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -793,8 +793,8 @@ CREATE TABLE public.bans (
     reason text NOT NULL,
     banner_id integer NOT NULL,
     expires_at timestamp without time zone NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -826,7 +826,7 @@ CREATE TABLE public.bulk_update_requests (
     user_id integer NOT NULL,
     forum_topic_id integer,
     script text NOT NULL,
-    status character varying DEFAULT 'pending'::character varying NOT NULL,
+    status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     approver_id integer,
@@ -863,8 +863,8 @@ CREATE TABLE public.comment_votes (
     comment_id integer NOT NULL,
     user_id integer NOT NULL,
     score integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -899,8 +899,8 @@ CREATE TABLE public.comments (
     ip_addr inet NOT NULL,
     body_index tsvector NOT NULL,
     score integer DEFAULT 0 NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     updater_id integer,
     updater_ip_addr inet,
     do_not_bump_post boolean DEFAULT false NOT NULL,
@@ -941,10 +941,10 @@ CREATE TABLE public.delayed_jobs (
     run_at timestamp without time zone,
     locked_at timestamp without time zone,
     failed_at timestamp without time zone,
-    locked_by character varying,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    queue character varying
+    locked_by character varying(255),
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    queue character varying(255)
 );
 
 
@@ -1013,8 +1013,8 @@ CREATE TABLE public.dmails (
     message_index tsvector NOT NULL,
     is_read boolean DEFAULT false NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     creator_ip_addr inet NOT NULL,
     is_spam boolean DEFAULT false
 );
@@ -2149,8 +2149,8 @@ CREATE TABLE public.forum_posts (
     body text NOT NULL,
     text_index tsvector NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -2182,7 +2182,7 @@ CREATE TABLE public.forum_subscriptions (
     user_id integer,
     forum_topic_id integer,
     last_read_at timestamp without time zone,
-    delete_key character varying
+    delete_key character varying(255)
 );
 
 
@@ -2246,14 +2246,14 @@ CREATE TABLE public.forum_topics (
     id integer NOT NULL,
     creator_id integer NOT NULL,
     updater_id integer NOT NULL,
-    title character varying NOT NULL,
+    title character varying(255) NOT NULL,
     response_count integer DEFAULT 0 NOT NULL,
     is_sticky boolean DEFAULT false NOT NULL,
     is_locked boolean DEFAULT false NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
     text_index tsvector NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     category_id integer DEFAULT 0 NOT NULL,
     min_level integer DEFAULT 0 NOT NULL
 );
@@ -2287,8 +2287,8 @@ CREATE TABLE public.ip_bans (
     creator_id integer NOT NULL,
     ip_addr inet NOT NULL,
     reason text NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -2320,9 +2320,9 @@ CREATE TABLE public.janitor_trials (
     creator_id integer NOT NULL,
     user_id integer NOT NULL,
     original_level integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    status character varying DEFAULT 'active'::character varying NOT NULL
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    status character varying(255) DEFAULT 'active'::character varying NOT NULL
 );
 
 
@@ -2353,8 +2353,8 @@ CREATE TABLE public.mod_actions (
     id integer NOT NULL,
     creator_id integer NOT NULL,
     description text NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     category integer
 );
 
@@ -2387,8 +2387,8 @@ CREATE TABLE public.news_updates (
     message text NOT NULL,
     creator_id integer NOT NULL,
     updater_id integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -2427,8 +2427,8 @@ CREATE TABLE public.note_versions (
     height integer NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
     body text NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     version integer DEFAULT 0 NOT NULL
 );
 
@@ -2467,8 +2467,8 @@ CREATE TABLE public.notes (
     is_active boolean DEFAULT true NOT NULL,
     body text NOT NULL,
     body_index tsvector NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     version integer DEFAULT 0 NOT NULL
 );
 
@@ -2500,7 +2500,7 @@ CREATE TABLE public.pixiv_ugoira_frame_data (
     id integer NOT NULL,
     post_id integer,
     data text NOT NULL,
-    content_type character varying NOT NULL
+    content_type character varying(255) NOT NULL
 );
 
 
@@ -2529,16 +2529,16 @@ ALTER SEQUENCE public.pixiv_ugoira_frame_data_id_seq OWNED BY public.pixiv_ugoir
 
 CREATE TABLE public.pools (
     id integer NOT NULL,
-    name character varying,
+    name character varying(255),
     creator_id integer NOT NULL,
     description text,
     is_active boolean DEFAULT true NOT NULL,
     post_ids text DEFAULT ''::text NOT NULL,
     post_count integer DEFAULT 0 NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    category character varying DEFAULT 'series'::character varying NOT NULL
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    category character varying(255) DEFAULT 'series'::character varying NOT NULL
 );
 
 
@@ -2571,8 +2571,8 @@ CREATE TABLE public.post_appeals (
     creator_id integer NOT NULL,
     creator_ip_addr inet,
     reason text,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -2635,9 +2635,9 @@ CREATE TABLE public.post_disapprovals (
     id integer NOT NULL,
     user_id integer NOT NULL,
     post_id integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    reason character varying DEFAULT 'legacy'::character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    reason character varying(255) DEFAULT 'legacy'::character varying,
     message text
 );
 
@@ -2672,8 +2672,8 @@ CREATE TABLE public.post_flags (
     creator_ip_addr inet NOT NULL,
     reason text,
     is_resolved boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -2758,8 +2758,8 @@ CREATE TABLE public.post_votes (
     post_id integer NOT NULL,
     user_id integer NOT NULL,
     score integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -2788,13 +2788,13 @@ ALTER SEQUENCE public.post_votes_id_seq OWNED BY public.post_votes.id;
 
 CREATE TABLE public.posts (
     id integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     up_score integer DEFAULT 0 NOT NULL,
     down_score integer DEFAULT 0 NOT NULL,
     score integer DEFAULT 0 NOT NULL,
-    source character varying DEFAULT ''::character varying NOT NULL,
-    md5 character varying NOT NULL,
+    source character varying(255) DEFAULT ''::character varying NOT NULL,
+    md5 character varying(255) NOT NULL,
     rating character(1) DEFAULT 'q'::bpchar NOT NULL,
     is_note_locked boolean DEFAULT false NOT NULL,
     is_rating_locked boolean DEFAULT false NOT NULL,
@@ -2817,7 +2817,7 @@ CREATE TABLE public.posts (
     tag_count_artist integer DEFAULT 0 NOT NULL,
     tag_count_character integer DEFAULT 0 NOT NULL,
     tag_count_copyright integer DEFAULT 0 NOT NULL,
-    file_ext character varying NOT NULL,
+    file_ext character varying(255) NOT NULL,
     file_size integer NOT NULL,
     image_width integer NOT NULL,
     image_height integer NOT NULL,
@@ -2890,7 +2890,7 @@ ALTER SEQUENCE public.saved_searches_id_seq OWNED BY public.saved_searches.id;
 --
 
 CREATE TABLE public.schema_migrations (
-    version character varying NOT NULL
+    version character varying(255) NOT NULL
 );
 
 
@@ -2931,14 +2931,14 @@ ALTER SEQUENCE public.super_voters_id_seq OWNED BY public.super_voters.id;
 
 CREATE TABLE public.tag_aliases (
     id integer NOT NULL,
-    antecedent_name character varying NOT NULL,
-    consequent_name character varying NOT NULL,
+    antecedent_name character varying(255) NOT NULL,
+    consequent_name character varying(255) NOT NULL,
     creator_id integer NOT NULL,
     creator_ip_addr inet NOT NULL,
     forum_topic_id integer,
     status text DEFAULT 'pending'::text NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     post_count integer DEFAULT 0 NOT NULL,
     approver_id integer,
     forum_post_id integer
@@ -2970,15 +2970,15 @@ ALTER SEQUENCE public.tag_aliases_id_seq OWNED BY public.tag_aliases.id;
 
 CREATE TABLE public.tag_implications (
     id integer NOT NULL,
-    antecedent_name character varying NOT NULL,
-    consequent_name character varying NOT NULL,
+    antecedent_name character varying(255) NOT NULL,
+    consequent_name character varying(255) NOT NULL,
     descendant_names text NOT NULL,
     creator_id integer NOT NULL,
     creator_ip_addr inet NOT NULL,
     forum_topic_id integer,
     status text DEFAULT 'pending'::text NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     approver_id integer,
     forum_post_id integer
 );
@@ -3010,14 +3010,14 @@ ALTER SEQUENCE public.tag_implications_id_seq OWNED BY public.tag_implications.i
 CREATE TABLE public.tag_subscriptions (
     id integer NOT NULL,
     creator_id integer NOT NULL,
-    name character varying NOT NULL,
+    name character varying(255) NOT NULL,
     tag_query text NOT NULL,
     post_ids text NOT NULL,
     is_public boolean DEFAULT true NOT NULL,
     last_accessed_at timestamp without time zone,
     is_opted_in boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -3046,7 +3046,7 @@ ALTER SEQUENCE public.tag_subscriptions_id_seq OWNED BY public.tag_subscriptions
 
 CREATE TABLE public.tags (
     id integer NOT NULL,
-    name character varying NOT NULL,
+    name character varying(255) NOT NULL,
     post_count integer DEFAULT 0 NOT NULL,
     category integer DEFAULT 0 NOT NULL,
     related_tags text,
@@ -3094,8 +3094,8 @@ CREATE UNLOGGED TABLE public.token_buckets (
 CREATE TABLE public.uploads (
     id integer NOT NULL,
     source text,
-    file_path character varying,
-    content_type character varying,
+    file_path character varying(255),
+    content_type character varying(255),
     rating character(1) NOT NULL,
     uploader_id integer NOT NULL,
     uploader_ip_addr inet NOT NULL,
@@ -3103,11 +3103,21 @@ CREATE TABLE public.uploads (
     status text DEFAULT 'pending'::text NOT NULL,
     backtrace text,
     post_id integer,
-    md5_confirmation character varying,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    md5_confirmation character varying(255),
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     server text,
-    parent_id integer
+    parent_id integer,
+    md5 character varying,
+    file_ext character varying,
+    file_size integer,
+    image_width integer,
+    image_height integer,
+    artist_commentary_desc text,
+    artist_commentary_title text,
+    include_artist_commentary boolean,
+    context text,
+    alt_source text
 );
 
 
@@ -3138,10 +3148,10 @@ CREATE TABLE public.user_feedback (
     id integer NOT NULL,
     user_id integer NOT NULL,
     creator_id integer NOT NULL,
-    category character varying NOT NULL,
+    category character varying(255) NOT NULL,
     body text NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -3170,15 +3180,15 @@ ALTER SEQUENCE public.user_feedback_id_seq OWNED BY public.user_feedback.id;
 
 CREATE TABLE public.user_name_change_requests (
     id integer NOT NULL,
-    status character varying DEFAULT 'pending'::character varying NOT NULL,
+    status character varying(255) DEFAULT 'pending'::character varying NOT NULL,
     user_id integer NOT NULL,
     approver_id integer,
-    original_name character varying,
-    desired_name character varying,
+    original_name character varying(255),
+    desired_name character varying(255),
     change_reason text,
     rejection_reason text,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -3207,10 +3217,10 @@ ALTER SEQUENCE public.user_name_change_requests_id_seq OWNED BY public.user_name
 
 CREATE TABLE public.user_password_reset_nonces (
     id integer NOT NULL,
-    key character varying NOT NULL,
-    email character varying NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    key character varying(255) NOT NULL,
+    email character varying(255) NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -3239,12 +3249,12 @@ ALTER SEQUENCE public.user_password_reset_nonces_id_seq OWNED BY public.user_pas
 
 CREATE TABLE public.users (
     id integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    name character varying NOT NULL,
-    password_hash character varying NOT NULL,
-    email character varying,
-    email_verification_key character varying,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    name character varying(255) NOT NULL,
+    password_hash character varying(255) NOT NULL,
+    email character varying(255),
+    email_verification_key character varying(255),
     inviter_id integer,
     level integer DEFAULT 0 NOT NULL,
     base_upload_limit integer DEFAULT 10 NOT NULL,
@@ -3256,13 +3266,13 @@ CREATE TABLE public.users (
     note_update_count integer DEFAULT 0 NOT NULL,
     favorite_count integer DEFAULT 0 NOT NULL,
     comment_threshold integer DEFAULT '-1'::integer NOT NULL,
-    default_image_size character varying DEFAULT 'large'::character varying NOT NULL,
+    default_image_size character varying(255) DEFAULT 'large'::character varying NOT NULL,
     favorite_tags text,
     blacklisted_tags text DEFAULT 'spoilers
 guro
 scat
 furry -rating:s'::text,
-    time_zone character varying DEFAULT 'Eastern Time (US & Canada)'::character varying NOT NULL,
+    time_zone character varying(255) DEFAULT 'Eastern Time (US & Canada)'::character varying NOT NULL,
     bcrypt_password_hash text,
     per_page integer DEFAULT 20 NOT NULL,
     custom_style text,
@@ -3300,11 +3310,11 @@ CREATE TABLE public.wiki_page_versions (
     wiki_page_id integer NOT NULL,
     updater_id integer NOT NULL,
     updater_ip_addr inet NOT NULL,
-    title character varying NOT NULL,
+    title character varying(255) NOT NULL,
     body text NOT NULL,
     is_locked boolean NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     other_names text,
     is_deleted boolean DEFAULT false NOT NULL
 );
@@ -3336,12 +3346,12 @@ ALTER SEQUENCE public.wiki_page_versions_id_seq OWNED BY public.wiki_page_versio
 CREATE TABLE public.wiki_pages (
     id integer NOT NULL,
     creator_id integer NOT NULL,
-    title character varying NOT NULL,
+    title character varying(255) NOT NULL,
     body text NOT NULL,
     body_index tsvector NOT NULL,
     is_locked boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
     updater_id integer,
     other_names text,
     other_names_index tsvector,
@@ -4758,14 +4768,6 @@ ALTER TABLE ONLY public.posts
 
 ALTER TABLE ONLY public.saved_searches
     ADD CONSTRAINT saved_searches_pkey PRIMARY KEY (id);
-
-
---
--- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.schema_migrations
-    ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
 
 
 --
@@ -6993,13 +6995,6 @@ CREATE INDEX index_posts_on_pixiv_id ON public.posts USING btree (pixiv_id) WHER
 
 
 --
--- Name: index_posts_on_source; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_posts_on_source ON public.posts USING btree (lower((source)::text));
-
-
---
 -- Name: index_posts_on_source_pattern; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7018,13 +7013,6 @@ CREATE INDEX index_posts_on_tags_index ON public.posts USING gin (tag_index);
 --
 
 CREATE INDEX index_posts_on_uploader_id ON public.posts USING btree (uploader_id);
-
-
---
--- Name: index_posts_on_uploader_ip_addr; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_posts_on_uploader_ip_addr ON public.posts USING btree (uploader_ip_addr);
 
 
 --
@@ -7130,6 +7118,20 @@ CREATE INDEX index_tags_on_name_trgm ON public.tags USING gin (name public.gin_t
 --
 
 CREATE UNIQUE INDEX index_token_buckets_on_user_id ON public.token_buckets USING btree (user_id);
+
+
+--
+-- Name: index_uploads_on_alt_source; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_uploads_on_alt_source ON public.uploads USING btree (alt_source);
+
+
+--
+-- Name: index_uploads_on_source; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_uploads_on_source ON public.uploads USING btree (source);
 
 
 --
@@ -7263,6 +7265,13 @@ CREATE INDEX index_wiki_pages_on_title_pattern ON public.wiki_pages USING btree 
 --
 
 CREATE INDEX index_wiki_pages_on_updated_at ON public.wiki_pages USING btree (updated_at);
+
+
+--
+-- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING btree (version);
 
 
 --
@@ -7493,9 +7502,13 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20171230220225'),
 ('20180113211343'),
 ('20180116001101'),
+('20180310070233'),
 ('20180403231351'),
 ('20180413224239'),
 ('20180425194016'),
-('20180516222413');
+('20180516222413'),
+('20180517190048'),
+('20180518175154'),
+('20180804203201');
 
 
