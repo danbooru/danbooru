@@ -11,14 +11,14 @@ Favorite.initialize_all = function() {
 
 Favorite.hide_or_show_add_to_favorites_link = function() {
   var current_user_id = Utility.meta("current-user-id");
-  if (current_user_id == "") {
+  if (current_user_id === "") {
     $("#add-to-favorites").hide();
     $("#remove-from-favorites").hide();
     $("#add-fav-button").hide();
     $("#remove-fav-button").hide();
     return;
   }
-  if ($("#image-container").length && $("#image-container").data("is-favorited") == true) {
+  if ($("#image-container").length && $("#image-container").data("is-favorited") === true) {
     $("#add-to-favorites").hide();
     $("#add-fav-button").hide();
   } else {

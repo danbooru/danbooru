@@ -113,18 +113,18 @@ let Note = {
             return;
           }
 
+          var $this = $(this);
           var $note_box_inner = $(e.currentTarget);
+
           if (e.type === "mouseover") {
             Note.Body.show($note_box_inner.data("id"));
             if (Note.editing) {
-              var $this = $(this);
               $this.resizable("enable");
               $this.draggable("enable");
             }
           } else if (e.type === "mouseout") {
             Note.Body.hide($note_box_inner.data("id"));
             if (Note.editing) {
-              var $this = $(this);
               $this.resizable("disable");
               $this.draggable("disable");
             }
@@ -191,7 +191,7 @@ let Note = {
         return;
       }
       // Hide notes while rescaling, to prevent unnecessary reflowing
-      var was_visible = container.style.display != 'none';
+      var was_visible = container.style.display !== 'none';
       if (was_visible) {
         container.style.display = 'none';
       }
@@ -239,14 +239,6 @@ let Note = {
       var $image = $("#image");
       var doc_width = $image.offset().left + $image.width();
 
-      /*while ($note_body[0].clientHeight < $note_body[0].scrollHeight) {
-        $note_body.css({height: $note_body.height() + 5});
-      }
-
-      while ($note_body[0].clientWidth < $note_body[0].scrollWidth) {
-        $note_body.css({width: $note_body.width() + 5});
-      }*/
-
       if ($note_body.offset().left + $note_body.width() > doc_width) {
         $note_body.css({
           left: $note_body.position().left - 10 - ($note_body.offset().left + $note_body.width() - doc_width)
@@ -286,10 +278,13 @@ let Note = {
       var golden_ratio = 1.6180339887;
       var last = 0;
       var x = 0;
+      var lo = 0;
+      var hi = 0;
 
       if ((w / h) < golden_ratio) {
-        var lo = 140;
-        var hi = 400;
+        lo = 140;
+        hi = 400;
+
         do {
           last = w;
           x = (lo + hi) / 2;
@@ -304,8 +299,8 @@ let Note = {
           }
         } while ((lo < hi) && (w > last));
       } else if ($note_body[0].scrollWidth <= $note_body.width()) {
-        var lo = 20;
-        var hi = w;
+        lo = 20;
+        hi = w;
 
         do {
           x = (lo + hi) / 2;
@@ -466,14 +461,16 @@ let Note = {
     },
 
     success_handler: function(data, status, xhr) {
+      var $note_box = null;
+
       if (data.html_id) { // new note
         var $note_body = Note.Body.find(data.html_id);
-        var $note_box = Note.Box.find(data.html_id);
+        $note_box = Note.Box.find(data.html_id);
         $note_body.data("id", String(data.id)).attr("data-id", data.id);
         $note_box.data("id", String(data.id)).attr("data-id", data.id);
         $note_box.find(".note-box-inner-border").removeClass("unsaved");
       } else {
-        var $note_box = Note.Box.find(data.id);
+        $note_box = Note.Box.find(data.id);
         $note_box.find(".note-box-inner-border").removeClass("unsaved");
       }
     },
@@ -574,7 +571,7 @@ let Note = {
     start: function(e) {
       e.preventDefault();
 
-      if (Utility.meta("current-user-id") == "") {
+      if (Utility.meta("current-user-id") === "") {
         Utility.notice("You must be logged in to edit notes");
         return;
       }
@@ -654,7 +651,7 @@ let Note = {
         var offset = $image.offset();
         var limitX1 = $image.width() - Note.TranslationMode.Drag.dragStartX + offset.left - 1;
         var limitX2 = offset.left - Note.TranslationMode.Drag.dragStartX;
-        var limitY1 = $image.height()- Note.TranslationMode.Drag.dragStartY + offset.top - 1;
+        var limitY1 = $image.height() - Note.TranslationMode.Drag.dragStartY + offset.top - 1;
         var limitY2 = offset.top - Note.TranslationMode.Drag.dragStartY;
 
         if (Note.TranslationMode.Drag.dragDistanceX > limitX1) {
@@ -709,8 +706,8 @@ let Note = {
         $(window).off("mousemove");
 
         if (Note.TranslationMode.Drag.dragging) {
-          $('#note-preview').css({display:'none'});
-          Note.TranslationMode.create_note(e, Note.TranslationMode.Drag.x, Note.TranslationMode.Drag.y, Note.TranslationMode.Drag.w-1, Note.TranslationMode.Drag.h-1);
+          $('#note-preview').css({ display: 'none' });
+          Note.TranslationMode.create_note(e, Note.TranslationMode.Drag.x, Note.TranslationMode.Drag.y, Note.TranslationMode.Drag.w - 1, Note.TranslationMode.Drag.h - 1);
           Note.TranslationMode.Drag.dragging = false; /* border of the note is pixel-perfect on the preview border */
         } else { /* no dragging -> toggle display of notes */
           Note.Box.toggle_all();
@@ -796,7 +793,7 @@ let Note = {
   },
 
   initialize_all: function() {
-    if ($("#c-posts #a-show #image").length == 0 || $("video#image").length) {
+    if ($("#c-posts #a-show #image").length === 0 || $("video#image").length) {
       return;
     }
 
@@ -809,7 +806,7 @@ let Note = {
   },
 
   initialize_shortcuts: function() {
-    if ($("#note-locked-notice").length == 0) {
+    if ($("#note-locked-notice").length === 0) {
       $("#translate").click(Note.TranslationMode.toggle);
       Utility.keydown("n", "translation_mode", Note.TranslationMode.toggle);
     }

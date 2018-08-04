@@ -22,7 +22,7 @@ Utility.scroll_to = function(element) {
   }
 
   var top = null;
-  if (typeof(element) === "number") {
+  if (typeof element === "number") {
     top = element;
   } else {
     top = element.offset().top - 10;
@@ -76,8 +76,7 @@ Utility.intersect = function(a, b) {
   a = a.slice(0).sort();
   b = b.slice(0).sort();
   var result = [];
-  while (a.length > 0 && b.length > 0)
-  {
+  while (a.length > 0 && b.length > 0) {
     if (a[0] < b[0]) {
       a.shift();
     } else if (a[0] > b[0]) {
@@ -150,7 +149,7 @@ $.fn.selectRange = function(start, end) {
   });
 };
 
-$.fn.selectEnd = function(){
+$.fn.selectEnd = function() {
   if (this.length) {
     this.selectRange(this.val().length, this.val().length);
   }

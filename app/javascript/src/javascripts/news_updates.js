@@ -5,7 +5,7 @@ let NewsUpdate = {};
 NewsUpdate.initialize = function() {
   var key = $("#news-updates").data("id");
 
-  if (Cookie.get("news-ticker") == key) {
+  if (Cookie.get("news-ticker") === key) {
     $("#news-updates").hide();
   } else {
     $("#news-updates").show();

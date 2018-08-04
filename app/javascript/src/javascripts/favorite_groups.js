@@ -21,7 +21,7 @@ FavoriteGroup.initialize_add_to_favgroup_dialog = function() {
   });
 
   var open_favgroup_dialog = function(e) {
-    if (Utility.meta("current-user-id") == "") { // anonymous
+    if (Utility.meta("current-user-id") === "") { // anonymous
       return;
     }
 

@@ -1,3 +1,5 @@
+/* global addthis */
+
 import Utility from './utility'
 import Hammer from 'hammerjs'
 import RelatedTag from './related_tag.js.erb'
@@ -79,7 +81,7 @@ Post.initialize_gestures = function() {
   }
 }
 
-Post.initialize_edit_dialog = function(e) {
+Post.initialize_edit_dialog = function() {
   $("#open-edit-dialog").button().show().click(function(e) {
     $(window).scrollTop($("#image").offset().top);
     Post.open_edit_dialog();
@@ -104,11 +106,11 @@ Post.open_edit_dialog = function() {
   dialog.dialog({
     title: "Edit tags",
     width: $(window).width() * 0.6,
-      position: {
-        my: "right",
-        at: "right-20",
-        of: window
-      },
+    position: {
+      my: "right",
+      at: "right-20",
+      of: window
+    },
     drag: function(e, ui) {
       if (Utility.meta("enable-auto-complete") === "true") {
         $tag_string.data("uiAutocomplete").close();
@@ -128,15 +130,15 @@ Post.open_edit_dialog = function() {
     if (dialog_widget.css("position") === "absolute") {
       pos.left -= $(window).scrollLeft();
       pos.top -= $(window).scrollTop();
-      dialog_widget.offset(pos).css({position:"fixed"});
-      dialog.dialog("option", "resize", function() { dialog_widget.css({position:"fixed"}); });
+      dialog_widget.offset(pos).css({ position: "fixed" });
+      dialog.dialog("option", "resize", function() { dialog_widget.css({ position: "fixed" }); });
 
       pin_button.button("option", "icons", {primary: "ui-icon-pin-s"});
     } else {
       pos.left += $(window).scrollLeft();
       pos.top += $(window).scrollTop();
-      dialog_widget.offset(pos).css({position:"absolute"});
-      dialog.dialog("option", "resize", function() {});
+      dialog_widget.offset(pos).css({ position: "absolute" });
+      dialog.dialog("option", "resize", function() { /* do nothing */ });
 
       pin_button.button("option", "icons", {primary: "ui-icon-pin-w"});
     }
@@ -144,8 +146,7 @@ Post.open_edit_dialog = function() {
 
   dialog.parent().mouseout(function(e) {
     dialog.parent().css({"opacity": 0.6, "transition": "opacity .2s ease"});
-  })
-  .mouseover(function(e) {
+  }).mouseover(function(e) {
     dialog.parent().css({"opacity": 1});
   });
 
@@ -182,15 +183,17 @@ Post.swipe_prev = function(e) {
 }
 
 Post.nav_prev = function(e) {
+  var href = "";
+
   if ($("#search-seq-nav").length) {
-    var href = $("#search-seq-nav a[rel~=prev]").attr("href");
+    href = $("#search-seq-nav a[rel~=prev]").attr("href");
     if (href) {
       location.href = href;
     }
   } else if ($(".paginator a[rel~=prev]").length) {
     location.href = $("a[rel~=prev]").attr("href");
   } else {
-    var href = $("#pool-nav a.active[rel~=prev], #favgroup-nav a.active[rel~=prev]").attr("href");
+    href = $("#pool-nav a.active[rel~=prev], #favgroup-nav a.active[rel~=prev]").attr("href");
     if (href) {
       location.href = href;
     }
@@ -200,13 +203,15 @@ Post.nav_prev = function(e) {
 }
 
 Post.nav_next = function(e) {
+  var href = "";
+
   if ($("#search-seq-nav").length) {
-    var href = $("#search-seq-nav a[rel~=next]").attr("href");
+    href = $("#search-seq-nav a[rel~=next]").attr("href");
     location.href = href;
   } else if ($(".paginator a[rel~=next]").length) {
     location.href = $(".paginator a[rel~=next]").attr("href");
   } else {
-    var href = $("#pool-nav a.active[rel~=next], #favgroup-nav a.active[rel~=next]").attr("href");
+    href = $("#pool-nav a.active[rel~=next], #favgroup-nav a.active[rel~=next]").attr("href");
     if (href) {
       location.href = href;
     }
@@ -301,8 +306,7 @@ Post.toggle_relationship_preview = function(preview, preview_link) {
   if (preview.is(":visible")) {
     preview_link.html("&laquo; hide");
     Cookie.put("show-relationship-previews", "1");
-  }
-  else {
+  } else {
     preview_link.html("show &raquo;");
     Cookie.put("show-relationship-previews", "0");
   }
@@ -343,7 +347,7 @@ Post.expand_image = function(e) {
   $image.attr("src", $link.attr("href"));
   $image.css("opacity", "0.25");
   $image.width($image.data("original-width"));
-  $image.height($image.data("original-height"));        
+  $image.height($image.data("original-height"));
   $image.on("load", function() {
     $image.css("opacity", "1");
     $notice.hide();
@@ -384,14 +388,16 @@ Post.initialize_post_image_resize_links = function() {
 }
 
 Post.resize_image_to_window = function($img) {
+  var sidebar_width = 0;
+  var client_width = 0;
+
   if (($img.data("scale-factor") === 1) || ($img.data("scale-factor") === undefined)) {
     if ($(window).width() > 660) {
-      var sidebar_width = $("#sidebar").width() || 0;
-      var client_width = $(window).width() - sidebar_width - 75;
+      sidebar_width = $("#sidebar").width() || 0;
+      client_width = $(window).width() - sidebar_width - 75;
     } else {
-      var client_width = $(window).width() - 2;
+      client_width = $(window).width() - 2;
     }
-    var client_height = $(window).height();
 
     if ($img.width() > client_width) {
       var ratio = client_width / $img.data("original-width");
@@ -473,7 +479,7 @@ Post.initialize_post_sections = function() {
       $("#share").show();
       addthis.init();
       $("#recommended").hide();
-    } 
+    }
 
     $("#post-sections li").removeClass("active");
     $(e.target).parent("li").addClass("active");
@@ -525,7 +531,7 @@ Post.vote = function(score, id) {
   $(window).trigger("danbooru:notice", "Voting...");
 
   $.post("/posts/" + id + "/votes.js", {
-     score: score
+    score: score
   });
 }
 
@@ -583,12 +589,10 @@ Post.approve = function(post_id) {
 Post.favorite = function (e) {
   if ($("#add-to-favorites").is(":visible")) {
     $("#add-to-favorites")[0].click();
+  } else if (Utility.meta("current-user-id") === "") {
+    $(window).trigger("danbooru:notice", "You must be logged in to favorite posts");
   } else {
-    if (Utility.meta("current-user-id") == "") {
-      $(window).trigger("danbooru:notice", "You must be logged in to favorite posts");
-    } else {
-      $(window).trigger("danbooru:notice", "You have already favorited this post");
-    }
+    $(window).trigger("danbooru:notice", "You have already favorited this post");
   }
 };
 

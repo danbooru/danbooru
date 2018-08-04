@@ -1,6 +1,5 @@
 import Utility from './utility'
 import Post from './posts.js.erb'
-import Artist from './artists'
 import RelatedTag from './related_tag.js.erb'
 
 let Upload = {};
@@ -45,8 +44,8 @@ Upload.initialize_submit = function() {
       error_messages.push("Must specify a rating");
     }
     if (error_messages.length === 0) {
-      $("#submit-button").prop("disabled","true");
-      $("#submit-button").prop("value","Submitting...");
+      $("#submit-button").prop("disabled", "true");
+      $("#submit-button").prop("value", "Submitting...");
       $("#client-errors").hide();
     } else {
       $("#client-errors").html("<strong>Error</strong>: " + error_messages.join(", "));
@@ -112,7 +111,7 @@ Upload.fetch_source_data = function(url, referer_url) {
   return $.getJSON("/source.json", { url: url, ref: referer_url })
     .then(Upload.fill_source_info)
     .catch(function(data) {
-      $("#source-info span#loading-data").html("Error: " + data.responseJSON["message"])
+      $("#source-info span#loading-data").html("Error: " + data.responseJSON.message)
     });
 }
 

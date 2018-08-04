@@ -3,9 +3,12 @@ import SavedSearch from './saved_searches'
 
 let Autocomplete = {};
 
-Autocomplete.AUTOCOMPLETE_VERSION = 1;
-Autocomplete.PREFIXES = /^(-|~|<%= TagCategory.mapping.keys.map {|category| category + ':'}.join('|') %>)(.*)$/i;
-Autocomplete.METATAGS = /^(<%= Tag::METATAGS %>):(.*)$/i;
+Autocomplete.METATAGS = <%= Tag::METATAGS.to_json.html_safe %>;
+Autocomplete.TAG_CATEGORIES = <%= TagCategory.mapping.to_json.html_safe %>;
+
+Autocomplete.TAG_PREFIXES = "-|~|" + Object.keys(Autocomplete.TAG_CATEGORIES).map(category => category + ":").join("|");
+Autocomplete.TAG_PREFIXES_REGEX = new RegExp("^(" + Autocomplete.TAG_PREFIXES + ")(.*)$", "i");
+Autocomplete.METATAGS_REGEX = new RegExp("^(" + Autocomplete.METATAGS + "):(.*)$", "i");
 
 Autocomplete.initialize_all = function() {
   if (Utility.meta("enable-auto-complete") === "true") {
@@ -42,16 +45,15 @@ Autocomplete.initialize_mention_autocomplete = function($fields) {
     },
     source: function(req, resp) {
       var cursor = this.element.get(0).selectionStart;
-      var i;
       var name = null;
 
-      for (i=cursor; i>=1; --i) {
-        if (req.term[i-1] === " ") {
+      for (var i = cursor; i >= 1; --i) {
+        if (req.term[i - 1] === " ") {
           return;
         }
 
-        if (req.term[i-1] === "@") {
-          if (i == 1 || /[ \r\n]/.test(req.term[i-2])) {
+        if (req.term[i - 1] === "@") {
+          if (i === 1 || /[ \r\n]/.test(req.term[i - 2])) {
             name = req.term.substring(i, cursor);
             break;
           } else {
@@ -63,8 +65,6 @@ Autocomplete.initialize_mention_autocomplete = function($fields) {
       if (name) {
         Autocomplete.user_source(name, resp, "@");
       }
-
-      return;
     }
   });
 }
@@ -99,7 +99,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
         return;
       }
 
-      switch(metatag) {
+      switch (metatag) {
       case "md5":
       case "width":
       case "height":
@@ -117,7 +117,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
       case "pixiv_id":
       case "pixiv":
       <% TagCategory.short_name_list.each do |category| %>
-        case "<%= category %>tags":
+        case "<%= category %>tags": // eslint-disable-line
       <% end %>
         resp([]);
         return;
@@ -194,7 +194,7 @@ Autocomplete.initialize_artist_autocomplete = function($fields) {
               type: "tag",
               label: artist.name.replace(/_/g, " "),
               value: artist.name,
-              category: <%= Tag.categories.artist %>,
+              category: Autocomplete.TAG_CATEGORIES.artist,
             };
           }));
         }
@@ -250,9 +250,7 @@ Autocomplete.normal_source = function(term, resp) {
     return window.Danbooru.Autocomplete.normal_source(term, resp);
   }
 
-  var key = "ac-" + term.replace(/\./g,'\uFFFF');
-
-  $.ajax({
+  return $.ajax({
     url: "/tags/autocomplete.json",
     data: {
       "search[name_matches]": term,
@@ -288,12 +286,14 @@ Autocomplete.parse_query = function(text, caret) {
     return {};
   }
 
-  if (match = term.match(Autocomplete.PREFIXES)) {
+  match = term.match(Autocomplete.TAG_PREFIXES_REGEX);
+  if (match) {
     metatag = match[1].toLowerCase();
     term = match[2];
   }
-  
-  if (match = term.match(Autocomplete.METATAGS)) {
+
+  match = term.match(Autocomplete.METATAGS_REGEX);
+  if (match) {
     metatag = match[1].toLowerCase();
     term = match[2];
   }
@@ -307,8 +307,7 @@ Autocomplete.insert_completion = function(input, completion) {
   var before_caret_text = input.value.substring(0, input.selectionStart).trim();
   var after_caret_text = input.value.substring(input.selectionStart).trim();
 
-  var prefixes = "-|~|" + "<%= TagCategory.mapping.keys.map {|category| category + ':'}.join('|') %>";
-  var regexp = new RegExp("(" + prefixes + ")?\\S+$", "g");
+  var regexp = new RegExp("(" + Autocomplete.TAG_PREFIXES + ")?\\S+$", "g");
   before_caret_text = before_caret_text.replace(regexp, "$1") + completion + " ";
 
   input.value = before_caret_text + after_caret_text;
@@ -357,12 +356,12 @@ Autocomplete.render_item = function(list, item) {
   }
 
   if (item.post_count !== undefined) {
-    var count;
-    if (item.post_count >= 1000) {
-      count = Math.floor(item.post_count / 1000) + "k";
-    } else {
-      count = item.post_count;
+    var count = item.post_count;
+
+    if (count >= 1000) {
+      count = Math.floor(count / 1000) + "k";
     }
+
     var $post_count = $("<span/>").addClass("post-count").css("float", "right").text(count);
     $link.append($post_count);
   }
@@ -440,7 +439,7 @@ Autocomplete.user_source = function(term, resp, metatag) {
     return window.Danbooru.Autocomplete.user_source(term, resp, metatag);
   }
 
-  $.ajax({
+  return $.ajax({
     url: "/users.json",
     data: {
       "search[order]": "post_upload_count",
@@ -450,8 +449,8 @@ Autocomplete.user_source = function(term, resp, metatag) {
     },
     method: "get",
     success: function(data) {
-      var prefix;
-      var display_name;
+      var prefix = "";
+      var display_name = null;
 
       if (metatag === "@") {
         prefix = "@";
@@ -478,7 +477,7 @@ Autocomplete.pool_source = function(term, resp, metatag) {
     return window.Danbooru.Autocomplete.pool_source(term, resp, metatag);
   }
 
-  $.ajax({
+  return $.ajax({
     url: "/pools.json",
     data: {
       "search[order]": "post_count",
@@ -505,7 +504,7 @@ Autocomplete.favorite_group_source = function(term, resp, metatag) {
     return window.Danbooru.Autocomplete.favorite_group_source(term, resp, metatag);
   }
 
-  $.ajax({
+  return $.ajax({
     url: "/favorite_groups.json",
     data: {
       "search[name_matches]": term,
