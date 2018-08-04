@@ -20,8 +20,6 @@ class UploadService
     end
 
     def normalized_source
-      # problem: for batch twitter, the source is saved as
-      # the twimg url, 
       @normalized_source ||= begin
         Downloads::File.new(params[:source]).rewrite_url
       end
