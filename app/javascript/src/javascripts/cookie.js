@@ -56,12 +56,6 @@ Cookie.unescape = function(val) {
 }
 
 Cookie.initialize = function() {
-  var loc = location.href;
-
-  if (loc.match(/^http/)) {
-    loc = loc.replace(/^https?:\/\/[^\/]+/, "");
-  }
-
 	if (this.get("hide-upgrade-account") != "1") {
 	  $("#upgrade-account").show();
 	}
