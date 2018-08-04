@@ -56,7 +56,7 @@ Utility.error = function(msg) {
 
 Utility.keydown = function(keys, namespace, handler) {
   if (Utility.meta("enable-js-navigation") === "true") {
-    $(document).on("keydown" + ".Utility." + namespace, null, keys, handler);
+    $(document).on("keydown.danbooru." + namespace, null, keys, handler);
   }
 };
 
