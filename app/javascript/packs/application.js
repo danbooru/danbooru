@@ -1,6 +1,6 @@
 /* eslint no-console:0 */
 
-function importAll (r) {
+function importAll(r) {
   r.keys().forEach(r);
 }
 
@@ -28,3 +28,10 @@ require("jquery-ui/themes/base/theme.css");
 importAll(require.context('../src/javascripts', true, /\.js(\.erb)?$/));
 importAll(require.context('../src/styles/common', true, /\.scss(?:\.erb)?$/));
 importAll(require.context('../src/styles/specific', true, /\.scss(?:\.erb)?$/));
+
+// export { default as Autocomplete } from '../src/javascripts/autocomplete.js.erb';
+export { default as Blacklist } from '../src/javascripts/blacklists.js';
+export { default as Comment } from '../src/javascripts/comments.js';
+export { default as Dtext } from '../src/javascripts/dtext.js';
+export { default as Note } from '../src/javascripts/notes.js';
+export { default as PostModeMenu } from '../src/javascripts/post_mode_menu.js';

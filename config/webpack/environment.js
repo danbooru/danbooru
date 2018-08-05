@@ -16,6 +16,8 @@ environment.loaders.append('scss.erb', {
 
 environment.loaders.append('erb', erb);
 
+environment.config.output.library = ["Danbooru"];
+
 environment.config.externals = {
   jquery: "jQuery"
 }
