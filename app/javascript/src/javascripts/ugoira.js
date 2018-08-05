@@ -1,4 +1,6 @@
 import { ZipImagePlayer } from '../../vendor/pixiv-ugoira-player';
+require("jquery-ui/ui/widgets/progressbar");
+require("jquery-ui/ui/widgets/slider");
 
 let Ugoira = {};
 
