@@ -519,3 +519,7 @@ ZipImagePlayer.prototype = {
         return this._failed;
     }
 }
+
+// added
+
+export default ZipImagePlayer;

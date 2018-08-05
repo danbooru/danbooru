@@ -38,74 +38,12 @@
 
 <% content_for(:html_header) do %>
   <script type="text/javascript">
-    var Ugoira = {};
-
-    Ugoira.create_player = function() {
-      var meta_data = {
-        mime_type: <%= raw @post.pixiv_ugoira_frame_data.content_type.to_json %>,
-        frames: <%= raw @post.pixiv_ugoira_frame_data.data.to_json %>
-      };
-      var options = {
-        canvas: document.getElementById("image"),
-        source: "<%= @post.file_url %>",
-        metadata: meta_data,
-        chunkSize: 300000,
-        loop: true,
-        autoStart: true,
-        debug: false,
-      }
-      this.player = new ZipImagePlayer(options);
-    }
-
-    Ugoira.player = null;
-
     $(function() {
-      Ugoira.create_player();
-      $(Ugoira.player).on("loadProgress", function(ev, progress) {
-        $("#seek-slider").progressbar("value", Math.floor(progress * 100));
-      });
-
-      var player_manually_paused = false;
-      $("#ugoira-play").click(function(e) {
-        Ugoira.player.play();
-        $(this).hide();
-        $("#ugoira-pause").show();
-        player_manually_paused = false;
-        e.preventDefault();
-      })
-      $("#ugoira-pause").click(function(e) {
-        Ugoira.player.pause();
-        $(this).hide();
-        $("#ugoira-play").show();
-        player_manually_paused = true;
-        e.preventDefault();
-      });
-
-      $("#seek-slider").progressbar({
-        value: 0
-      });
-
-      $("#seek-slider").slider({
-        min: 0,
-        max: Ugoira.player._frameCount-1,
-        start: function(event, ui) {
-          // Need to pause while slider is being dragged or playback speed will bug out
-          Ugoira.player.pause();
-        },
-        slide: function(event, ui) {
-          Ugoira.player._frame = ui.value;
-          Ugoira.player._displayFrame();
-        },
-        stop: function(event, ui) {
-          // Resume playback when dragging stops, but only if player was not paused by the user earlier
-          if (!(player_manually_paused)) {
-            Ugoira.player.play();
-          }
-        }
-      });
-      $(Ugoira.player).on("frame", function(frame, frame_number) {
-        $("#seek-slider").slider("option", "value", frame_number);
-      });
+      Danbooru.Ugoira.create_player(
+        <%= raw @post.pixiv_ugoira_frame_data.content_type.to_json %>, 
+        <%= raw @post.pixiv_ugoira_frame_data.data.to_json %>,
+        "<%= @post.file_url %>"
+      );      
     });
   </script>
 <% end %>
