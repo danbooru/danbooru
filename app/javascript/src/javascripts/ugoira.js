@@ -30,7 +30,7 @@ Ugoira.create_player = (mime_type, frames, file_url) => {
 
   $("#ugoira-play").click(e => {
     Ugoira.player.play();
-    $(this).hide();
+    $("#ugoira-play").hide();
     $("#ugoira-pause").show();
     Ugoira.player_manually_paused = false;
     e.preventDefault();
@@ -38,7 +38,7 @@ Ugoira.create_player = (mime_type, frames, file_url) => {
 
   $("#ugoira-pause").click(e => {
     Ugoira.player.pause();
-    $(this).hide();
+    $("#ugoira-pause").hide();
     $("#ugoira-play").show();
     Ugoira.player_manually_paused = true;
     e.preventDefault();
