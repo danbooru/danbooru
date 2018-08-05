@@ -66,6 +66,7 @@ Ugoira.create_player = (mime_type, frames, file_url) => {
   });
 
   $(Ugoira.player).on("frame", (frame, frame_number) => {
+    console.log("frame", frame_number);
     $("#seek-slider").slider("option", "value", frame_number);
   });
 }
