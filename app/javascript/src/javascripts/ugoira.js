@@ -1,8 +1,8 @@
-import '../../vendor/pixiv-ugoira-player';
+const ZipImagePlayer = require('../../vendor/pixiv-ugoira-player');
 
 let Ugoira = {};
 
-Ugoira.create_player = function(mime_type, frames, file_url) {
+Ugoira.create_player = (mime_type, frames, file_url) => {
   var meta_data = {
     mime_type: mime_type,
     frames: frames
@@ -18,13 +18,13 @@ Ugoira.create_player = function(mime_type, frames, file_url) {
   }
   var player = new ZipImagePlayer(options);
 
-  $(player).on("loadProgress", function(ev, progress) {
+  $(player).on("loadProgress", (ev, progress) => {
     $("#seek-slider").progressbar("value", Math.floor(progress * 100));
   });
 
   var player_manually_paused = false;
 
-  $("#ugoira-play").click(function(e) {
+  $("#ugoira-play").click(e => {
     Ugoira.player.play();
     $(this).hide();
     $("#ugoira-pause").show();
@@ -32,7 +32,7 @@ Ugoira.create_player = function(mime_type, frames, file_url) {
     e.preventDefault();
   })
 
-  $("#ugoira-pause").click(function(e) {
+  $("#ugoira-pause").click(e => {
     Ugoira.player.pause();
     $(this).hide();
     $("#ugoira-play").show();
@@ -62,7 +62,7 @@ Ugoira.create_player = function(mime_type, frames, file_url) {
       }
     }
   });
-  
+
   $(player).on("frame", function(frame, frame_number) {
     $("#seek-slider").slider("option", "value", frame_number);
   });
