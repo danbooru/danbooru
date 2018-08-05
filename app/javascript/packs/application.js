@@ -35,3 +35,4 @@ export { default as Comment } from '../src/javascripts/comments.js';
 export { default as Dtext } from '../src/javascripts/dtext.js';
 export { default as Note } from '../src/javascripts/notes.js';
 export { default as PostModeMenu } from '../src/javascripts/post_mode_menu.js';
+export { default as Utility } from '../src/javascripts/utility.js';
