@@ -1,4 +1,4 @@
-const ZipImagePlayer = require('../../vendor/pixiv-ugoira-player');
+import { ZipImagePlayer } from '../../vendor/pixiv-ugoira-player';
 
 let Ugoira = {};
 

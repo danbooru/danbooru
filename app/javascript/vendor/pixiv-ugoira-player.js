@@ -522,4 +522,4 @@ ZipImagePlayer.prototype = {
 
 // added
 
-export default ZipImagePlayer;
+export { ZipImagePlayer };
