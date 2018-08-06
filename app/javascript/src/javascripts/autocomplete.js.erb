@@ -246,8 +246,6 @@ Autocomplete.initialize_wiki_autocomplete = function($fields) {
 };
 
 Autocomplete.normal_source = function(term, resp) {
-  var key = "ac-" + term.replace(/\./g,'\uFFFF');
-
   return $.ajax({
     url: "/tags/autocomplete.json",
     data: {
