@@ -19,6 +19,7 @@ end
 
 every 1.week, :at => "1:30 am" do
   runner "WeeklyMaintenance.new.run"
+  runner "TagRelationshipRetirementService.find_and_retire!"
 end
 
 every 1.month, :at => "2:00 am" do
