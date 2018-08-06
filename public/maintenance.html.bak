@@ -16,6 +16,6 @@
   </head>
   <body>
     <h1>The site is down for maintenance.</h1>
-    <p>Check <a href="https://twitter.com/danboorubot">Twitter</a> for updates.</p>
+    <p><a class="twitter-timeline" data-width="500" data-tweet-limit="3" data-dnt="true" href="https://twitter.com/danboorubot">Check Twitter for updates.</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
   </body>
 </html>
