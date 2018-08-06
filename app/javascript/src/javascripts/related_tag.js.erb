@@ -15,18 +15,14 @@ RelatedTag.initialize_all = function() {
 RelatedTag.initialize_buttons = function() {
   this.common_bind("#related-tags-button", "");
   <% TagCategory.related_button_list.each do |category| %>
-    RelatedTag.common_bind("#related-<%= category %>-button", "<%= category %>");
+    RelatedTag.common_bind("#related-<%= category %>-button", "<%= category %>"); // eslint-disable-line indent
   <% end %>
   $("#find-artist-button").click(RelatedTag.find_artist);
 }
 
 RelatedTag.tags_include = function(name) {
   var current = $("#upload_tag_string,#post_tag_string").val().toLowerCase().match(/\S+/g) || [];
-  if ($.inArray(name.toLowerCase(), current) > -1) {
-    return true;
-  } else {
-    return false;
-  }
+  return $.inArray(name.toLowerCase(), current) > -1;
 }
 
 RelatedTag.common_bind = function(button_name, category) {
@@ -89,7 +85,7 @@ RelatedTag.current_tag = function() {
   }
 
   b++;
-	return string.slice(a, b);
+  return string.slice(a, b);
 }
 
 RelatedTag.process_response = function(data) {
@@ -130,7 +126,7 @@ RelatedTag.build_all = function() {
   if (wiki_page_tags.length) {
     $dest.append(RelatedTag.build_html("wiki:" + query, wiki_page_tags, "wiki"));
   }
-  $.each(other_wikis, function(i,wiki) {
+  $.each(other_wikis, function(i, wiki) {
     $dest.append(RelatedTag.build_html("wiki:" + wiki.title, wiki.wiki_page_tags, "otherwiki" + i.toString()));
   });
   if (RelatedTag.recent_artists) {
@@ -156,7 +152,7 @@ RelatedTag.build_all = function() {
         tags.push([artist.name, 1]);
       });
     }
-   $dest.append(RelatedTag.build_html("artist", tags, "artist", true));
+    $dest.append(RelatedTag.build_html("artist", tags, "artist", true));
   }
 }
 
@@ -231,9 +227,10 @@ RelatedTag.build_html = function(query, related_tags, name, is_wide_column) {
       );
     } else {
       var text = tag[0];
+      var desc = "";
       if (text.match(/^ -http/)) {
         text = text.substring(1, 1000);
-        var desc = text.replace(/^-https?:\/\//, "");
+        desc = text.replace(/^-https?:\/\//, "");
         if (desc.length > 30) {
           desc = desc.substring(0, 30) + "...";
         }
@@ -244,7 +241,7 @@ RelatedTag.build_html = function(query, related_tags, name, is_wide_column) {
         );
       } else if (text.match(/^ http/)) {
         text = text.substring(1, 1000);
-        var desc = text.replace(/^https?:\/\//, "");
+        desc = text.replace(/^https?:\/\//, "");
         if (desc.length > 30) {
           desc = desc.substring(0, 30) + "...";
         }
@@ -284,7 +281,7 @@ RelatedTag.toggle_tag = function(e) {
     RelatedTag.process_artist(RelatedTag.recent_artist);
   }
 
-  //The timeout is needed on Chrome since it will clobber the field attribute otherwise
+  // The timeout is needed on Chrome since it will clobber the field attribute otherwise
   setTimeout(function () { $field.prop('selectionStart', $field.val().length);}, 100);
   e.preventDefault();
 }
@@ -295,7 +292,7 @@ RelatedTag.find_artist = function(e) {
   var referer_url = $("#upload_referer_url");
   $.get("/artists/finder.json", {"url": url.val(), "referer_url": referer_url.val()}, RelatedTag.process_artist);
   if (e) {
-    e.preventDefault();      
+    e.preventDefault();
   }
 }
 
@@ -328,12 +325,12 @@ RelatedTag.hide = function() {
 RelatedTag.disable_artist_url = function(e) {
   var url = e.currentTarget.href;
   $.each(RelatedTag.recent_artists[0].sorted_urls, function(k, v) {
-    if (v["normalized_url"] === url || v["url"] === url) {
+    if (v.normalized_url === url || v.url === url) {
       if (!confirm("This will mark the URL as inactive. Continue?")) {
         return;
       }
-      
-      $.ajax("/artist_urls/" + v["id"], {
+
+      $.ajax("/artist_urls/" + v.id, {
         method: "PUT",
         data: {
           artist_url: {

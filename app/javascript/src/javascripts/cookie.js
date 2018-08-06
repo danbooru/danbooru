@@ -31,11 +31,11 @@ Cookie.raw_get = function(name) {
   for (var i = 0; i < ca.length; ++i) {
     var c = ca[i];
 
-    while (c.charAt(0) == " ") {
+    while (c.charAt(0) === " ") {
       c = c.substring(1, c.length);
     }
 
-    if (c.indexOf(nameEq) == 0) {
+    if (c.indexOf(nameEq) === 0) {
       return c.substring(nameEq.length, c.length);
     }
   }
@@ -56,9 +56,9 @@ Cookie.unescape = function(val) {
 }
 
 Cookie.initialize = function() {
-	if (this.get("hide-upgrade-account") != "1") {
-	  $("#upgrade-account").show();
-	}
+  if (this.get("hide-upgrade-account") !== "1") {
+    $("#upgrade-account").show();
+  }
 }
 
 $(function() {

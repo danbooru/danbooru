@@ -45,6 +45,6 @@ $(function() {
   });
 });
 
-global.submitInvisibleRecaptchaForm = function () {
+window.submitInvisibleRecaptchaForm = function () {
   document.getElementById("signup-form").submit();
 }

@@ -1,4 +1,5 @@
 /* eslint no-console:0 */
+/* global require */
 
 function importAll(r) {
   r.keys().forEach(r);

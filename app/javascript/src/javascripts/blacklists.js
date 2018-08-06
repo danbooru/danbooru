@@ -112,7 +112,7 @@ Blacklist.apply = function() {
 
   $.each(this.posts(), function(i, post) {
     var post_count = 0;
-    $.each(Blacklist.entries, function(i, entry) {
+    $.each(Blacklist.entries, function(j, entry) {
       if (Blacklist.post_match(post, entry)) {
         entry.hits += 1;
         count += 1;
@@ -192,7 +192,7 @@ Blacklist.initialize_all = function() {
 }
 
 $(document).ready(function() {
-  if ($("#blacklist-box").length == 0) {
+  if ($("#blacklist-box").length === 0) {
     return;
   }
 

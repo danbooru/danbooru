@@ -52,7 +52,7 @@ Pool.initialize_simple_edit = function() {
     $.ajax({
       type: "put",
       url: e.target.action,
-      data: $("#sortable").sortable("serialize") + "&" +  $(e.target).serialize()
+      data: $("#sortable").sortable("serialize") + "&" + $(e.target).serialize()
     });
     e.preventDefault();
   });

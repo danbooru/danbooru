@@ -14,7 +14,7 @@ Shortcuts.initialize = function() {
 
   if ($("#image").length) { // post page or bookmarklet upload page
     Utility.keydown("shift+e", "edit_dialog", function(e) {
-      if (Utility.meta("current-user-id") == "") { // anonymous
+      if (Utility.meta("current-user-id") === "") { // anonymous
         return;
       }
 

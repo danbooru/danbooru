@@ -14,10 +14,10 @@ Artist.initialize_check_name = function() {
     if ($("#artist_name").val().length > 0) {
       $("#check-name-result").html("");
 
-      $.getJSON("/artists?search[name]=" + escape($("#artist_name").val()), function(data) {
-        if (data.length === 0) {
-          $.getJSON("/wiki_pages/" + escape($("#artist_name").val()), function(data) {
-            if (data !== null) {
+      $.getJSON("/artists?search[name]=" + escape($("#artist_name").val()), function(artists) {
+        if (artists.length === 0) {
+          $.getJSON("/wiki_pages/" + escape($("#artist_name").val()), function(wiki_pages) {
+            if (wiki_pages !== null) {
               $("#check-name-result").html("<a href='/wiki_pages/" + escape($("#artist_name").val()) + "'>A wiki page with this name already exists</a>. You must either move the wiki page or pick another artist name.")
             }
           });

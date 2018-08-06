@@ -39,7 +39,7 @@ Comment.quote = function(e) {
       var $link = $(e.target);
       var $div = $link.closest("div.comments-for-post").find(".new-comment");
       var $textarea = $div.find("textarea");
-      var msg = data["quoted_response"];
+      var msg = data.quoted_response;
       if ($textarea.val().length > 0) {
         msg = $textarea.val() + "\n\n" + msg;
       }

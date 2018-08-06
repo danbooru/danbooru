@@ -16,10 +16,8 @@ TagScript.test = function(tags, predicate) {
       if ($.inArray(x.substr(1, 100), tags)) {
         is_true = false;
       }
-    } else {
-      if (!$.inArray(x, tags)) {
-        is_true = false;
-      }
+    } else if (!$.inArray(x, tags)) {
+      is_true = false;
     }
   });
 

@@ -50,7 +50,7 @@ Ugoira.create_player = (mime_type, frames, file_url) => {
 
   $("#seek-slider").slider({
     min: 0,
-    max: Ugoira.player._frameCount-1,
+    max: Ugoira.player._frameCount - 1,
     start: (event, ui) => {
       // Need to pause while slider is being dragged or playback speed will bug out
       Ugoira.player.pause();

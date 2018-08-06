@@ -63,15 +63,16 @@ ArtistCommentary.initialize_edit_commentary_dialog = function() {
 }
 
 ArtistCommentary.fetch_commentary = function() {
+  var commentary = "";
   Utility.notice("Fetching artist commentary...");
 
   var type = $('#fetch-commentary select[name="commentary_source_type"]').val();
   if (type === "Source") {
     var source = $('#fetch-commentary input[name="commentary_source"]').val();
-    var commentary = ArtistCommentary.from_source(source);
+    commentary = ArtistCommentary.from_source(source);
   } else if (type === "Post") {
     var id = $('#fetch-commentary input[name="commentary_post_id"]').val();
-    var commentary = ArtistCommentary.from_post_id(id);
+    commentary = ArtistCommentary.from_post_id(id);
   }
 
   commentary.then(ArtistCommentary.fill_commentary).then(function (success) {
@@ -120,13 +121,13 @@ ArtistCommentary.merge_commentaries = function(description, commentary) {
   var normalized_source = $("#image-container").data().normalizedSource;
 
   if ((commentary.original_description && description) &&
-      (commentary.original_description != description)) {
+      (commentary.original_description !== description)) {
     return description
       + "\n\n[tn]\nSource: " + normalized_source + "\n[/tn]"
       + "\n\nh6. " + (commentary.original_title || "Untitled")
       + "\n\n" + commentary.original_description
       + "\n\n[tn]\nSource: " + commentary.source + "\n[/tn]";
-  } else if (commentary.source != post_source) {
+  } else if (commentary.source !== post_source) {
     return commentary.original_description + "\n\n[tn]\nSource: " + commentary.source + "\n[/tn]";
   } else {
     return commentary.original_description || description;

@@ -22,20 +22,19 @@ PostModeMenu.initialize_shortcuts = function() {
 }
 
 PostModeMenu.show_notice = function(i) {
-  Utility.notice("Switched to tag script #" + i + ". To switch tag scripts, use the number keys.");    
+  Utility.notice("Switched to tag script #" + i + ". To switch tag scripts, use the number keys.");
 }
 
 PostModeMenu.change_tag_script = function(e) {
   if ($("#mode-box select").val() === "tag-script") {
     var old_tag_script_id = Cookie.get("current_tag_script_id") || "1";
-    var old_tag_script = $("#tag-script-field").val();
-    
+
     var new_tag_script_id = String.fromCharCode(e.which);
     var new_tag_script = Cookie.get("tag-script-" + new_tag_script_id);
-  
+
     $("#tag-script-field").val(new_tag_script);
     Cookie.put("current_tag_script_id", new_tag_script_id);
-    if (old_tag_script_id != new_tag_script_id) {
+    if (old_tag_script_id !== new_tag_script_id) {
       PostModeMenu.show_notice(new_tag_script_id);
     }
 
@@ -145,7 +144,7 @@ PostModeMenu.open_edit = function(post_id) {
   $("#post_tag_string").val($post.data("tags") + " ").focus().selectEnd();
 
   /* Set height of tag edit box to fit content. */
-  $("#post_tag_string").height(80);  // min height: 80px.
+  $("#post_tag_string").height(80); // min height: 80px.
   var padding = $("#post_tag_string").innerHeight() - $("#post_tag_string").height();
   var height = $("#post_tag_string").prop("scrollHeight") - padding;
   $("#post_tag_string").height(height);
