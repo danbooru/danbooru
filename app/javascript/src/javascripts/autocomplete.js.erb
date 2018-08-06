@@ -246,10 +246,6 @@ Autocomplete.initialize_wiki_autocomplete = function($fields) {
 };
 
 Autocomplete.normal_source = function(term, resp) {
-  if (Utility.is_global_hook_defined("Danbooru.Autocomplete.normal_source")) {
-    return window.Danbooru.Autocomplete.normal_source(term, resp);
-  }
-
   var key = "ac-" + term.replace(/\./g,'\uFFFF');
 
   $.ajax({
@@ -436,10 +432,6 @@ Autocomplete.static_metatag_source = function(term, resp, metatag) {
 }
 
 Autocomplete.user_source = function(term, resp, metatag) {
-  if (Utility.is_global_hook_defined("Danbooru.Autocomplete.user_source")) {
-    return window.Danbooru.Autocomplete.user_source(term, resp, metatag);
-  }
-
   $.ajax({
     url: "/users.json",
     data: {
@@ -474,10 +466,6 @@ Autocomplete.user_source = function(term, resp, metatag) {
 }
 
 Autocomplete.pool_source = function(term, resp, metatag) {
-  if (Utility.is_global_hook_defined("Danbooru.Autocomplete.pool_source")) {
-    return window.Danbooru.Autocomplete.pool_source(term, resp, metatag);
-  }
-
   $.ajax({
     url: "/pools.json",
     data: {
@@ -501,10 +489,6 @@ Autocomplete.pool_source = function(term, resp, metatag) {
 }
 
 Autocomplete.favorite_group_source = function(term, resp, metatag) {
-  if (Utility.is_global_hook_defined("Danbooru.Autocomplete.favorite_group_source")) {
-    return window.Danbooru.Autocomplete.favorite_group_source(term, resp, metatag);
-  }
-
   $.ajax({
     url: "/favorite_groups.json",
     data: {
@@ -525,10 +509,6 @@ Autocomplete.favorite_group_source = function(term, resp, metatag) {
 }
 
 Autocomplete.saved_search_source = function(term, resp) {
-  if (Utility.is_global_hook_defined("Danbooru.Autocomplete.saved_search_source")) {
-    return window.Danbooru.Autocomplete.saved_search_source(term, resp);
-  }
-
   return SavedSearch.labels(term).then(function(labels) {
     resp(labels.map(function(label) {
       return {
@@ -542,3 +522,6 @@ Autocomplete.saved_search_source = function(term, resp) {
 $(document).ready(function() {
   Autocomplete.initialize_all();
 });
+
+export default Autocomplete;
+

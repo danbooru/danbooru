@@ -123,18 +123,6 @@ Utility.sorttable = function(table) {
   });
 };
 
-Utility.is_global_hook_defined = function(path) {
-  let objs = path.split(/\./g);
-  let obj = window;
-  objs.forEach(x => {
-    if (obj) {
-      obj = obj[x]
-    }
-  });
-
-  return typeof obj === 'function';
-}
-
 $.fn.selectRange = function(start, end) {
   return this.each(function() {
     if (this.setSelectionRange) {
