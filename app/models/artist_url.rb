@@ -22,7 +22,7 @@ class ArtistUrl < ApplicationRecord
       url = url.sub(%r!^http://blog\d+\.fc2!, "http://blog.fc2")
       url = url.sub(%r!^http://blog-imgs-\d+\.fc2!, "http://blog.fc2")
       url = url.sub(%r!^http://blog-imgs-\d+-\w+\.fc2!, "http://blog.fc2")
-      url = url.sub(%r!^(http://seiga.nicovideo.jp/user/illust/\d+)\?.+!, '\1/')
+      # url = url.sub(%r!^(http://seiga.nicovideo.jp/user/illust/\d+)\?.+!, '\1/')
       url = url.sub(%r!^http://pictures.hentai-foundry.com//!, "http://pictures.hentai-foundry.com/")
       if url !~ %r{\Ahttps?://(?:fc|th|pre|orig|img|www)\.}
         url = url.sub(%r{\Ahttps?://(.+?)\.deviantart\.com(.*)}, 'http://www.deviantart.com/\1\2')
@@ -30,13 +30,17 @@ class ArtistUrl < ApplicationRecord
 
       # the strategy won't always work for twitter because it looks for a status
       url = url.downcase if url =~ %r!^https?://(?:mobile\.)?twitter\.com!
-
+        
       begin
-        url = Sources::Site.new(url).normalize_for_artist_finder!
+        source = Sources::Strategies.find(url)
+  
+        if !source.normalized_for_artist_finder? && source.normalizable_for_artist_finder?
+          url = source.normalize_for_artist_finder
+        end
       rescue Net::OpenTimeout, PixivApiClient::Error
         raise if Rails.env.test?
-      rescue Sources::Site::NoStrategyError
       end
+      
       url = url.gsub(/\/+\Z/, "")
       url = url.gsub(%r!^https://!, "http://")
       url + "/"
@@ -102,10 +106,6 @@ class ArtistUrl < ApplicationRecord
   end
 
   def normalize
-    if !Sources::Site.new(normalized_url).normalized_for_artist_finder?
-      self.normalized_url = self.class.normalize(url)
-    end
-  rescue Sources::Site::NoStrategyError
     self.normalized_url = self.class.normalize(url)
   end
 

@@ -47,8 +47,7 @@ class Upload < ApplicationRecord
   end
 
 
-  attr_accessor :as_pending,
-    :referer_url, :downloaded_source, :replaced_post, :file
+  attr_accessor :as_pending, :replaced_post, :file
   belongs_to :uploader, :class_name => "User"
   belongs_to :post, optional: true
 
@@ -63,6 +62,7 @@ class Upload < ApplicationRecord
   validates :file_ext, format: { with: /jpg|gif|png|swf|webm|mp4|zip/ }, allow_nil: true
   validates_with Validator
   serialize :context, JSON
+  scope :preprocessed, -> { where(status: "preprocessed") }
 
   def initialize_attributes
     self.uploader_id = CurrentUser.id

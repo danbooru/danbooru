@@ -1,41 +1,108 @@
 # This is a collection of strategies for extracting information about a 
 # resource. At a minimum it tries to extract the artist name and a canonical 
 # URL to download the image from. But it can also be used to normalize a URL 
-# for use with the artist finder. It differs from Downloads::RewriteStrategies
-# in that the latter is more for normalizing and rewriting a URL until it is 
-# suitable for downloading, whereas Sources::Strategies is more for meta-data 
-# that can only be obtained by downloading and parsing the resource.
+# for use with the artist finder. 
+#
+# Design Principles
+#
+# In general you should minimize state. You can safely assume that <tt>url</tt>
+# and <tt>referer_url</tt> will not change over the lifetime of an instance,
+# so you can safely memoize methods and their results. A common pattern is
+# conditionally making an external API call and parsing its response. You should
+# make this call on demand and memoize the response.
 
 module Sources
   module Strategies
     class Base
       attr_reader :url, :referer_url
-      attr_reader :artist_name, :profile_url, :image_url, :tags
-      attr_reader :artist_commentary_title, :artist_commentary_desc
 
-      def self.url_match?(url)
+      extend Memoist
+
+      def self.match?(*urls)
         false
       end
 
+      # * <tt>url</tt> - Should point to a resource suitable for 
+      #   downloading. This may sometimes point to the binary file. 
+      #   It may also point to the artist's profile page, in cases
+      #   where this class is being used to normalize artist urls.
+      #   Implementations should be smart enough to detect this and 
+      #   behave accordingly.
+      # * <tt>referer_url</tt> - Sometimes the HTML page cannot be
+      #   determined from <tt>url</tt>. You should generally pass in a
+      #   <tt>referrer_url</tt> so the strategy can discover the HTML
+      #   page and other information.
       def initialize(url, referer_url = nil)
         @url = url
         @referer_url = referer_url
       end
 
-      # No remote calls are made until this method is called.
-      def get
+      def site_name
         raise NotImplementedError
       end
 
-      def get_size
-        @get_size ||= Downloads::File.new(@image_url).size
+      # Whatever <tt>url</tt> is, this method should return the direct links 
+      # to the canonical binary files. It should not be an HTML page. It should 
+      # be a list of JPEG, PNG, GIF, WEBM, MP4, ZIP, etc. It is what the 
+      # downloader will fetch and save to disk.
+      def image_urls
+        raise NotImplementedError
       end
+
+      def image_url
+        image_urls.first
+      end
+
+      # Whatever <tt>url</tt> is, this method should return a link to the HTML
+      # page containing the resource. It should not be a binary file. It will
+      # eventually be assigned as the source for the post, but it does not
+      # represent what the downloader will fetch.
+      def page_url
+        Rails.logger.warn "Valid page url for (#{url}, #{referer_url}) not found"
+
+        return nil
+      end
+
+      # This will be the url stored in posts. Typically this is the page
+      # url, but on some sites it may be preferable to store the image url.
+      def canonical_url
+        page_url
+      end
+
+      # A link to the artist's profile page on the site.
+      def profile_url
+        nil
+      end
+
+      def artist_name
+        raise NotImplementedError
+      end
+
+      def artist_commentary_title
+        nil
+      end
+
+      def artist_commentary_desc
+        nil
+      end
+
+      # Subclasses should merge in any required headers needed to access resources
+      # on the site.
+      def headers
+        return Danbooru.config.http_headers
+      end
+
+      # Returns the size of the image resource without actually downloading the file.
+      def size
+        Downloads::File.new(image_url).size
+      end
+      memoize :size
 
       # Subclasses should return true only if the URL is in its final normalized form.
       #
-      # Sources::Site.new("http://img.pixiv.net/img/evazion").normalized_for_artist_finder?
+      # Sources::Strategies.find("http://img.pixiv.net/img/evazion").normalized_for_artist_finder?
       # => true
-      # Sources::Site.new("http://i2.pixiv.net/img18/img/evazion/14901720_m.png").normalized_for_artist_finder?
+      # Sources::Strategies.find("http://i2.pixiv.net/img18/img/evazion/14901720_m.png").normalized_for_artist_finder?
       # => false
       def normalized_for_artist_finder?
         false
@@ -44,32 +111,33 @@ module Sources
       # Subclasses should return true only if the URL is a valid URL that could
       # be converted into normalized form.
       #
-      # Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054").normalizable_for_artist_finder?
+      # Sources::Strategies.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054").normalizable_for_artist_finder?
       # => true
-      # Sources::Site.new("http://dic.pixiv.net/a/THUNDERproject").normalizable_for_artist_finder?
+      # Sources::Strategies.find("http://dic.pixiv.net/a/THUNDERproject").normalizable_for_artist_finder?
       # => false
       def normalizable_for_artist_finder?
         false
       end
 
-      def normalize_for_artist_finder!
-        url
+      def normalize_for_artist_finder
+        profile_url || url
       end
 
-      def site_name
-        raise NotImplementedError
-      end
-
+      # A unique identifier for the artist. This is used for artist creation.
       def unique_id
         artist_name
       end
 
       def artists
-        Artist.find_artists(url, referer_url)
+        Artist.find_artists(profile_url)
       end
 
-      def image_urls
-        [image_url]
+      def file_url
+        image_url
+      end
+
+      def data
+        {}
       end
 
       def tags
@@ -97,11 +165,6 @@ module Sources
         translated_tags
       end
 
-      # Should be set to a url for sites that prevent hotlinking, or left nil for sites that don't.
-      def fake_referer
-        nil
-      end
-
       def dtext_artist_commentary_title
         self.class.to_dtext(artist_commentary_title)
       end
@@ -110,9 +173,40 @@ module Sources
         self.class.to_dtext(artist_commentary_desc)
       end
 
+      # A strategy may return extra data unrelated to the file
+      def data
+        return {}
+      end
+
+      def to_h
+        return {
+          :artist_name => artist_name,
+          :artists => artists.as_json(include: :sorted_urls),
+          :profile_url => profile_url,
+          :image_url => image_url,
+          :image_urls => image_urls,
+          :normalized_for_artist_finder_url => normalize_for_artist_finder,
+          :tags => tags,
+          :translated_tags => translated_tags,
+          :unique_id => unique_id,
+          :artist_commentary => {
+            :title => artist_commentary_title,
+            :description => artist_commentary_desc,
+            :dtext_title => dtext_artist_commentary_title,
+            :dtext_description => dtext_artist_commentary_desc,
+          }
+        }
+      end
+
+      def to_json
+        to_h.to_json
+      end
+
     protected
-      def agent
-        raise NotImplementedError
+
+      def http_exists?(url, headers)
+        res = HTTParty.head(url, Danbooru.config.httparty_options.deep_merge(headers: headers))
+        res.success?
       end
 
       # Convert commentary to dtext by stripping html tags. Sites can override
