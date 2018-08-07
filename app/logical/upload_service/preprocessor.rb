@@ -111,6 +111,7 @@ class UploadService
 
       # we went through a lot of trouble normalizing the source,
       # so don't overwrite it with whatever the user provided
+      pred.source = "" if pred.source.nil?
       pred.attributes = self.params.except(:source)
 
       # if a file was uploaded after the preprocessing occurred,

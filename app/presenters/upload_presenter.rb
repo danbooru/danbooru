@@ -9,6 +9,9 @@ class UploadPresenter < Presenter
       dup_post_id = $1
       template.link_to(@upload.status.gsub(/error: RuntimeError - /, ""), template.__send__(:post_path, dup_post_id))
 
+    when /\Aerror: /
+      @upload.status.gsub(/DETAIL:.+/m, "...")
+
     else
       @upload.status
     end
