@@ -4,11 +4,8 @@ module Sources
   class NicoSeigaTest < ActiveSupport::TestCase
     context "The source site for nico seiga" do
       setup do
-        @site_1 = Sources::Site.new("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663")
-        @site_1.get
-
-        @site_2 = Sources::Site.new("http://seiga.nicovideo.jp/seiga/im4937663")
-        @site_2.get
+        @site_1 = Sources::Strategies.find("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663")
+        @site_2 = Sources::Strategies.find("http://seiga.nicovideo.jp/seiga/im4937663")
       end
 
       should "get the profile" do
@@ -34,11 +31,11 @@ module Sources
       should "get the tags" do
         assert(@site_1.tags.size > 0)
         first_tag = @site_1.tags.first
-        assert_equal(["アニメ", "http://seiga.nicovideo.jp/tag/%E3%82%A2%E3%83%8B%E3%83%A1"], first_tag)
+        assert_equal(["アニメ", "https://seiga.nicovideo.jp/tag/%E3%82%A2%E3%83%8B%E3%83%A1"], first_tag)
 
         assert(@site_2.tags.size > 0)
         first_tag = @site_2.tags.first
-        assert_equal(["アニメ", "http://seiga.nicovideo.jp/tag/%E3%82%A2%E3%83%8B%E3%83%A1"], first_tag)
+        assert_equal(["アニメ", "https://seiga.nicovideo.jp/tag/%E3%82%A2%E3%83%8B%E3%83%A1"], first_tag)
       end
 
       should "convert a page into a json representation" do
@@ -51,8 +48,7 @@ module Sources
       end
 
       should "work for a https://lohas.nicoseiga.jp/thumb/${id}i url" do
-        site = Sources::Site.new("https://lohas.nicoseiga.jp/thumb/6844226i")
-        site.get
+        site = Sources::Strategies.find("https://lohas.nicoseiga.jp/thumb/6844226i")
 
         full_image_url = %r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/6844226!
         assert_match(full_image_url, site.image_url)

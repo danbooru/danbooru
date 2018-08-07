@@ -9,8 +9,7 @@ module Sources
 
     context "A path-based artist url" do
       setup do
-        @site = Sources::Site.new("https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484")
-        @site.get
+        @site = Sources::Strategies.find("https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484")
       end
 
       should "work" do
@@ -20,8 +19,7 @@ module Sources
 
     context "The source for a private DeviantArt image URL" do
       setup do
-        @site = Sources::Site.new("https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png")
-        @site.get
+        @site = Sources::Strategies.find("https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png")
       end
 
       should "work" do
@@ -31,25 +29,24 @@ module Sources
 
     context "The source for a download-disabled DeviantArt artwork page" do
       should "get the image url" do
-        @site = Sources::Site.new("https://noizave.deviantart.com/art/test-no-download-697415967")
+        @site = Sources::Strategies.find("https://noizave.deviantart.com/art/test-no-download-697415967")
         assert_equal(["https://img00.deviantart.net/56ee/i/2017/219/2/3/test__no_download_by_noizave-dbj81lr.jpg"], @site.image_urls)
       end
     end
 
     context "The source for a DeviantArt image url" do
       should "fetch the source data" do
-        @site = Sources::Site.new("https://pre00.deviantart.net/b5e6/th/pre/f/2016/265/3/5/legend_of_galactic_heroes_by_hideyoshi-daihpha.jpg")
+        @site = Sources::Strategies.find("https://pre00.deviantart.net/b5e6/th/pre/f/2016/265/3/5/legend_of_galactic_heroes_by_hideyoshi-daihpha.jpg")
 
         assert_equal("hideyoshi", @site.artist_name)
-        assert_equal("https://hideyoshi.deviantart.com", @site.profile_url)
-        assert_equal("https://orig00.deviantart.net/9e1f/f/2016/265/3/5/legend_of_galactic_heroes_by_hideyoshi-daihpha.jpg", @site.image_url)
+        assert_equal("https://www.deviantart.com/hideyoshi", @site.profile_url)
+        assert_equal("https://pre00.deviantart.net/b5e6/th/pre/f/2016/265/3/5/legend_of_galactic_heroes_by_hideyoshi-daihpha.jpg", @site.image_url)
       end
     end
 
     context "The source for an DeviantArt artwork page" do
       setup do
-        @site = Sources::Site.new("http://noizave.deviantart.com/art/test-post-please-ignore-685436408")
-        @site.get
+        @site = Sources::Strategies.find("http://noizave.deviantart.com/art/test-post-please-ignore-685436408")
       end
 
       should "get the image url" do
@@ -107,8 +104,7 @@ module Sources
 
     context "The source for a login-only DeviantArt artwork page" do
       setup do
-        @site = Sources::Site.new("http://noizave.deviantart.com/art/hidden-work-685458369")
-        @site.get
+        @site = Sources::Strategies.find("http://noizave.deviantart.com/art/hidden-work-685458369")
       end
 
       should "get the image url" do
@@ -118,8 +114,7 @@ module Sources
 
     context "A source with malformed links in the artist commentary" do
       should "fix the links" do
-        @site = Sources::Site.new("https://teemutaiga.deviantart.com/art/Kisu-620666655")
-        @site.get
+        @site = Sources::Strategies.find("https://teemutaiga.deviantart.com/art/Kisu-620666655")
 
         assert_match(%r!"Print available at Inprnt":\[http://www.inprnt.com/gallery/teemutaiga/kisu\]!, @site.dtext_artist_commentary_desc)
       end
