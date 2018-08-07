@@ -1655,7 +1655,9 @@ class Post < ApplicationRecord
   
   module PixivMethods
     def parse_pixiv_id
-      self.pixiv_id = Sources::Strategies::Pixiv.new(source).illust_id_from_url
+      if Sources::Strategies::Pixiv.match?(source)
+        self.pixiv_id = Sources::Strategies::Pixiv.new(source).illust_id
+      end
     end
   end
 
@@ -1763,10 +1765,8 @@ class Post < ApplicationRecord
       return if has_tag?("artist_request") || has_tag?("official_art")
       return if tags.any? { |t| t.category == Tag.categories.artist }
 
-      site = Sources::Site.new(source)
+      site = Sources::Strategies.find(source)
       self.warnings[:base] << "Artist tag is required. Create a new tag with [[artist:<artist_name>]]. Ask on the forum if you need naming help"
-    rescue Sources::Site::NoStrategyError => e
-      # unrecognized source; do nothing.
     end
 
     def has_copyright_tag

@@ -1,44 +1,122 @@
 module Sources
   module Strategies
     class DeviantArt < Base
-      extend Memoist
+      ATTRIBUTED_ASSET = %r{\Ahttps?://(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net/.+/[a-z0-9_]*_by_[a-z0-9_]+-d([a-z0-9]+)\.}i
+      ASSET = %r{\Ahttps?://(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net/.+/[a-f0-9]+-d([a-z0-9]+)\.}i
+      PATH_ART = %r{\Ahttps?://www\.deviantart\.com/([^/]+)/art/}
+      RESERVED_SUBDOMAINS = %r{\Ahttps?://(?:fc|th|pre|orig|img|www)\.}
+      SUBDOMAIN_ART = %r{\Ahttps?://(.+?)\.deviantart\.com(.*)}
 
-      def self.url_match?(url)
-        url =~ /^https?:\/\/(?:.+?\.)?deviantart\.(?:com|net)/
-      end
-
-      def self.normalize(url)
-        if url =~ %r{\Ahttps?://(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net/.+/[a-z0-9_]*_by_[a-z0-9_]+-d([a-z0-9]+)\.}i
-          "http://fav.me/d#{$1}"
-        elsif url =~ %r{\Ahttps?://(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net/.+/[a-f0-9]+-d([a-z0-9]+)\.}i
-          "http://fav.me/d#{$1}"
-        elsif url =~ %r{\Ahttps?://www\.deviantart\.com/([^/]+)/art/}
-          url
-        elsif url !~ %r{\Ahttps?://(?:fc|th|pre|orig|img|www)\.} && url =~ %r{\Ahttps?://(.+?)\.deviantart\.com(.*)}
-          "http://www.deviantart.com/#{$1}#{$2}"
-        else
-          url
-        end
-      end
-
-      def referer_url
-        if @referer_url =~ /deviantart\.com\/art\// && @url =~ /https?:\/\/(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net\//
-          @referer_url
-        else
-          @url
-        end
+      def self.match?(*urls)
+        urls.compact.any? { |x| x.match?(/^https?:\/\/(?:.+?\.)?deviantart\.(?:com|net)/) }
       end
 
       def site_name
         "Deviant Art"
       end
 
-      def unique_id
-        artist_name
+      def image_urls
+        # normalize thumbnails
+        if url =~ %r{^(https?://(?:fc|th)\d{2}\.deviantart\.net/.+?/)200H/}
+          match = $1
+          return [url.sub(match + "200H/", match)]
+        end
+
+        if url =~ %r{^(https?://(?:fc|th)\d{2}\.deviantart\.net/.+?/)PRE/}
+          match = $1
+          return [url.sub(match + "PRE/", match)]
+        end
+
+        # return direct links
+        if url =~ ATTRIBUTED_ASSET || url =~ ASSET
+          return [url]
+        end
+
+        # work is deleted, use image url as given by user.
+        if uuid.nil?
+          return [url]
+        end
+
+        # work is downloadable
+        if api_deviation[:is_downloadable] && api_deviation[:download_filesize] != api_deviation.dig(:content, :filesize)
+          src = api_download[:src]
+          src.gsub!(%r!\Ahttps?://s3\.amazonaws\.com/!i, "https://")
+          src.gsub!(/\?.*\z/, "") # strip s3 query params
+          src.gsub!(%r!\Ahttps://origin-orig\.deviantart\.net!, "http://origin-orig.deviantart.net") # https://origin-orig.devianart.net doesn't work
+
+          return [src]
+        end
+
+        # work isn't downloadable, or download size is same as regular size.
+        if api_deviation.present?
+          return [api_deviation.dig(:content, :src)]
+        end
+
+        raise "Couldn't find image url"
       end
 
-      def get
-        # no-op
+      def page_url
+        [url, referer_url].each do |x|
+          if x =~ ATTRIBUTED_ASSET
+            return "http://fav.me/d#{$1}"
+          end
+
+          if x =~ ASSET
+            return "http://fav.me/d#{$1}"
+          end
+
+          if x =~ PATH_ART
+            return x
+          end
+
+          if x !~ RESERVED_SUBDOMAINS && x =~ SUBDOMAIN_ART
+            return "http://www.deviantart.com/#{$1}#{$2}"
+          end
+        end
+
+        return super
+      end
+
+      def profile_url
+        if artist_name.blank?
+          return ""
+        end
+
+        return "https://www.deviantart.com/#{artist_name}"
+      end
+
+      def artist_name
+        api_metadata.dig(:author, :username).try(&:downcase)
+      end
+
+      def artist_commentary_title
+        api_metadata[:title]
+      end
+
+      def artist_commentary_desc
+        api_metadata[:description]
+      end
+
+      def normalized_for_artist_finder?
+        url =~ %r!^https?://www.deviantart.com/! 
+      end
+
+      def normalizable_for_artist_finder?
+        url !~ %r!^https?://www.deviantart.com/!
+      end
+
+      def normalize_for_artist_finder
+        profile_url
+      end
+
+      def tags
+        if api_metadata.blank?
+          return []
+        end
+
+        api_metadata[:tags].map do |tag|
+          [tag[:tag_name], "https://www.deviantart.com/tag/#{tag[:tag_name]}"]
+        end
       end
 
       def dtext_artist_commentary_desc
@@ -71,75 +149,24 @@ module Sources
         end.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
       end
 
-      def artist_name
-        api_metadata.dig(:author, :username).try(&:downcase)
-      end
-
-      def profile_url
-        return "" if artist_name.blank?
-        "https://www.deviantart.com/#{artist_name}"
-      end
-
-      def image_url
-        # work is deleted, use image url as given by user.
-        if uuid.nil?
-          url
-        # work is downloadable
-        elsif api_deviation[:is_downloadable] && api_deviation[:download_filesize] != api_deviation.dig(:content, :filesize)
-          src = api_download[:src]
-          src.gsub!(%r!\Ahttps?://s3\.amazonaws\.com/!i, "https://")
-          src.gsub!(/\?.*\z/, "") # strip s3 query params
-          src.gsub!(%r!\Ahttps://origin-orig\.deviantart\.net!, "http://origin-orig.deviantart.net") # https://origin-orig.devianart.net doesn't work
-
-          src
-        # work isn't downloadable, or download size is same as regular size.
-        elsif api_deviation.present?
-          api_deviation.dig(:content, :src)
-        else
-          raise "couldn't find image url"
-        end
-      end
-
-      def tags
-        return [] if api_metadata.blank?
-
-        api_metadata[:tags].map do |tag|
-          [tag[:tag_name], "https://www.deviantart.com/tag/#{tag[:tag_name]}"]
-        end
-      end
-
-      def artist_commentary_title
-        api_metadata[:title]
-      end
-
-      def artist_commentary_desc
-        api_metadata[:description]
-      end
-
-      def normalizable_for_artist_finder?
-        url !~ %r!^https?://www.deviantart.com/!
-      end
-
-      def normalized_for_artist_finder?
-        url =~ %r!^https?://www.deviantart.com/! 
-      end
-
-      def normalize_for_artist_finder!
-        profile_url
-      end
-
-      protected
-
-      def normalized_url
-        @normalized_url ||= self.class.normalize(url)
-      end
+    public
 
       def page
-        options = Danbooru.config.httparty_options.deep_merge(format: :plain, headers: { "Accept-Encoding" => "gzip" })
-        resp = HTTParty.get(normalized_url, **options)
-        body = Zlib.gunzip(resp.body)
+        options = Danbooru.config.httparty_options.deep_merge(
+          format: :plain, 
+          headers: { "Accept-Encoding" => "gzip" }
+        )
+        resp = HTTParty.get(page_url, **options)
+
+        if resp.success?
+          body = Zlib.gunzip(resp.body)
+        else
+          raise HTTParty::ResponseError.new(resp)
+        end
+
         Nokogiri::HTML(body)
       end
+      memoize :page
 
       # Scrape UUID from <meta property="da:appurl" content="DeviantArt://deviation/12F08C5D-A3A4-338C-2F1A-7E4E268C0E8B">
       # For private works the UUID will be nil.
@@ -151,29 +178,39 @@ module Sources
         uuid = appurl[%r!\ADeviantArt://deviation/(.*)\z!, 1]
         uuid
       end
+      memoize :uuid
 
       def api_client
-        api_client = DeviantArtApiClient.new(Danbooru.config.deviantart_client_id, Danbooru.config.deviantart_client_secret, Danbooru.config.httparty_options)
-        api_client.access_token = Cache.get("da-access-token", 55.minutes) { api_client.access_token.to_hash }
+        api_client = DeviantArtApiClient.new(
+          Danbooru.config.deviantart_client_id, 
+          Danbooru.config.deviantart_client_secret, 
+          Danbooru.config.httparty_options
+        )
+        api_client.access_token = Cache.get("da-access-token", 55.minutes) do
+          api_client.access_token.to_hash
+        end
         api_client
       end
+      memoize :api_client
 
       def api_deviation
         return {} if uuid.nil?
         api_client.deviation(uuid)
       end
+      memoize :api_deviation
 
       def api_metadata
         return {} if uuid.nil?
         api_client.metadata(uuid)[:metadata].first
       end
+      memoize :api_metadata
 
       def api_download
         return {} if uuid.nil?
         api_client.download(uuid)
       end
+      memoize :api_download
 
-      memoize :page, :uuid, :api_client, :api_deviation, :api_metadata, :api_download
     end
   end
 end
