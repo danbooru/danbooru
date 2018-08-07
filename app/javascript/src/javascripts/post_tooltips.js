@@ -43,17 +43,6 @@ PostTooltip.QTIP_OPTIONS = {
       y: -2,
       method: "shift",
     },
-    /* Position tooltip beneath mouse.
-    my: "top left",
-    at: "bottom left",
-    target: "mouse",
-    viewport: true,
-    adjust: {
-      mouse: false,
-      y: 25,
-      method: "shift",
-    },
-    */
   },
   show: {
     solo: true,
