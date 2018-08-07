@@ -200,35 +200,17 @@ class UploadService
       tags.join(" ")
     end
 
-    def download_from_source(source, referer_url: nil)
-      download = Downloads::File.new(source, referer_url: referer_url)
-      
-      file = download.download!
-      context = {
-        downloaded_source: download.downloaded_source,
-        source: download.source
-      }
+    def download_for_upload(upload)
+      download = Downloads::File.new(upload.source, upload.referer_url)
+      file, strategy = download.download!
 
-      if download.data[:is_ugoira]
-        context[:ugoira] = {
-          frame_data: download.data[:ugoira_frame_data],
-          content_type: download.data[:ugoira_content_type]
+      if download.data[:ugoira_frame_data]
+        upload.context = { 
+          "ugoira" => {
+            "frame_data" => download.data[:ugoira_frame_data],
+            "content_type" => "image/jpeg"
+          }
         }
-      end
-
-      yield(context)
-
-      return file
-    end
-
-    def download_for_upload(source, upload)
-      file = download_from_source(source, referer_url: upload.referer_url) do |context|
-        upload.downloaded_source = context[:downloaded_source]
-        upload.source = context[:source]
-
-        if context[:ugoira]
-          upload.context = { ugoira: context[:ugoira] }
-        end
       end
 
       return file

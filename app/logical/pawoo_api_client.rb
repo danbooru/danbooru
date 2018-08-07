@@ -1,14 +1,26 @@
 class PawooApiClient
   extend Memoist
 
+  PROFILE1 = %r!\Ahttps?://pawoo\.net/web/accounts/(\d+)!
+  PROFILE2 = %r!\Ahttps?://pawoo\.net/@([^/]+)!
+  STATUS1 = %r!\Ahttps?://pawoo\.net/web/statuses/(\d+)!
+  STATUS2 = %r!\Ahttps?://pawoo\.net/@.+?/([^/]+)!
+
   class MissingConfigurationError < Exception ; end
 
   class Account
     attr_reader :json
 
     def self.is_match?(url)
-      url =~ %r!https?://pawoo.net/web/accounts/(\d+)!
-      $1
+      if url =~ PROFILE1
+        return $1
+      end
+
+      if url =~ PROFILE2
+        return $1
+      end
+
+      false
     end
 
     def initialize(json)
@@ -44,8 +56,15 @@ class PawooApiClient
     attr_reader :json
 
     def self.is_match?(url)
-      url =~ %r!https?://pawoo.net/web/statuses/(\d+)! || url =~ %r!https?://pawoo.net/@.+?/(\d+)!
-      $1
+      if url =~ STATUS1
+        return $1
+      end
+
+      if url =~ STATUS2
+        return $1
+      end
+
+      false
     end
 
     def initialize(json)
@@ -82,11 +101,11 @@ class PawooApiClient
 
   def get(url)
     if id = Status.is_match?(url)
-      Status.new(JSON.parse(access_token.get("/api/v1/statuses/#{id}").body))
-    elsif id = Account.is_match?(url)
-      Account.new(JSON.parse(access_token.get("/api/v1/accounts/#{id}").body))
-    else
-      nil
+      return Status.new(JSON.parse(access_token.get("/api/v1/statuses/#{id}").body))
+    end
+
+    if id = Account.is_match?(url)
+      return Account.new(JSON.parse(access_token.get("/api/v1/accounts/#{id}").body))
     end
   end
 

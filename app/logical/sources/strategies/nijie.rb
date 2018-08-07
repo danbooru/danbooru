@@ -1,26 +1,90 @@
 module Sources
   module Strategies
     class Nijie < Base
-      attr_reader :image_urls
+      PICTURE = %r{pic\d+\.nijie.info/nijie_picture/}
+      PAGE = %r{\Ahttps?://nijie\.info/view\.php.+id=\d+}
+      DIFF = %r!\Ahttps?://pic\d+\.nijie\.info/__rs_l120x120/nijie_picture/diff/main/[0-9_]+\.\w+\z!i
 
-      def self.url_match?(url)
-        url =~ /^https?:\/\/(?:.+?\.)?nijie\.info/
-      end
-
-      def initialize(url, referer_url=nil)
-        super(normalize_url(url), normalize_url(referer_url))
-      end
-
-      def referer_url
-        if @referer_url =~ /nijie\.info\/view\.php.+id=\d+/ && @url =~ /pic\d+\.nijie.info\/nijie_picture\//
-          @referer_url
-        else
-          @url
-        end
+      def self.match?(*urls)
+        urls.compact.any? { |x| x.match?(/^https?:\/\/(?:.+?\.)?nijie\.info/) }
       end
 
       def site_name
         "Nijie"
+      end
+
+      def image_urls
+        if url =~ PICTURE
+          return [url]
+        end
+
+        # http://pic03.nijie.info/__rs_l120x120/nijie_picture/diff/main/218856_0_236014_20170620101329.png
+        # => http://pic03.nijie.info/nijie_picture/diff/main/218856_3_236014_20170620101331.png
+        if url =~ DIFF
+          return [normalize_thumbnails(url)]
+        end
+
+        page.search("div#gallery a > img").map do |img|
+          # //pic01.nijie.info/__rs_l120x120/nijie_picture/diff/main/218856_0_236014_20170620101329.png
+          # => https://pic01.nijie.info/__rs_l120x120/nijie_picture/diff/main/218856_0_236014_20170620101329.png
+          normalize_thumbnails("https:" + img.attr("src"))
+        end.uniq
+      end
+
+      def page_url
+        [url, referer_url].each do |x|
+          if x =~ PAGE
+            return x
+          end
+
+          if x =~ %r!https?://nijie\.info/view_popup\.php.+id=(\d+)!
+            return "https://nijie.info/view.php?id=#{$1}"
+          end
+        end
+
+        return super
+      end
+
+      def profile_url
+        links = page.search("a.name")
+
+        if links.any?
+          return "https://nijie.info/" + links[0]["href"]
+        end
+
+        return nil
+      end
+
+      def artist_name
+        links = page.search("a.name")
+
+        if links.any?
+          return links[0].text
+        end
+
+        return nil
+      end
+
+      def artist_commentary_title
+        page.search("h2.illust_title").text
+      end
+
+      def artist_commentary_desc
+        page.search('meta[property="og:description"]').attr("content").value
+      end
+
+      def tags
+        links = page.search("div#view-tag a").find_all do |node|
+          node["href"] =~ /search\.php/
+        end
+
+        if links.any?
+          return links.map do |node|
+            [node.inner_text, "https://nijie.info" + node.attr("href")]
+          end
+        end
+
+        return []
       end
 
       def unique_id
@@ -28,128 +92,67 @@ module Sources
         "nijie" + $1.to_s
       end
 
-      def image_url
-        image_urls.first
-      end
-
-      def get
-        page = agent.get(referer_url)
-
-        if page.search("div#header-login-container").any?
-          # Session cache is invalid, clear it and log in normally.
-          Cache.delete("nijie-session")
-          @agent = nil
-          page = agent.get(referer_url)
-        end
-
-        @artist_name, @profile_url = get_profile_from_page(page)
-        @image_urls = get_image_urls_from_page(page)
-        @tags = get_tags_from_page(page)
-        @artist_commentary_title, @artist_commentary_desc = get_commentary_from_page(page)
-      end
-
-    protected
+    public
 
       def self.to_dtext(text)
         text = text.gsub(/\r\n|\r/, "<br>")
         DText.from_html(text).strip
       end
 
-      def get_commentary_from_page(page)
-        title = page.search("h2.illust_title").text
-        desc = page.search('meta[property="og:description"]').attr("content").value
-
-        [title, desc]
+      def normalize_thumbnails(x)
+        x.gsub(%r!__rs_l120x120/!i, "")
       end
 
-      def get_profile_from_page(page)
-        links = page.search("a.name")
+      def page
+        doc = agent.get(page_url)
 
-        if links.any?
-          profile_url = "http://nijie.info/" + links[0]["href"]
-          artist_name = links[0].text
-        else
-          profile_url = nil
-          artist_name = nil
+        if doc.search("div#header-login-container").any?
+          # Session cache is invalid, clear it and log in normally.
+          Cache.delete("nijie-session")
+          doc = agent.get(page_url)
         end
 
-        return [artist_name, profile_url].compact
+        return doc
       end
-
-      def get_image_urls_from_page(page)
-        page.search("div#gallery a > img").map do |img|
-          # //pic01.nijie.info/__rs_l120x120/nijie_picture/diff/main/218856_0_236014_20170620101329.png
-          # => https://pic01.nijie.info/__rs_l120x120/nijie_picture/diff/main/218856_0_236014_20170620101329.png
-          url = "https:" + img.attr("src")
-          normalize_image_url(url)
-        end
-      end
-
-      def get_tags_from_page(page)
-        # puts page.root.to_xhtml
-
-        links = page.search("div#view-tag a").find_all do |node|
-          node["href"] =~ /search\.php/
-        end
-
-        if links.any?
-          links.map do |node|
-            [node.inner_text, "http://nijie.info" + node.attr("href")]
-          end
-        else
-          []
-        end
-      end
-
-      def normalize_url(url)
-        if url =~ %r!https?://nijie\.info/view_popup\.php.+id=(\d+)!
-          return "http://nijie.info/view.php?id=#{$1}"
-        else
-          return url
-        end
-      end
-
-      def normalize_image_url(image_url)
-        # http://pic03.nijie.info/__rs_l120x120/nijie_picture/diff/main/218856_0_236014_20170620101329.png
-        # => http://pic03.nijie.info/nijie_picture/diff/main/218856_3_236014_20170620101331.png
-        if image_url =~ %r!\Ahttps?://pic\d+\.nijie\.info/__rs_l120x120/nijie_picture/diff/main/[0-9_]+\.\w+\z!i
-          image_url = image_url.gsub(%r!__rs_l120x120/!i, "")
-        end
-
-        image_url = image_url.gsub(%r!\Ahttp:!i, "https:")
-        image_url
-      end
+      memoize :page
 
       def agent
-        @agent ||= begin
-          mech = Mechanize.new
+        mech = Mechanize.new
 
-          session = Cache.get("nijie-session")
-          if session
-            cookie = Mechanize::Cookie.new("NIJIEIJIEID", session)
-            cookie.domain = ".nijie.info"
-            cookie.path = "/"
-            mech.cookie_jar.add(cookie)
-          else
-            mech.get("http://nijie.info/login.php") do |page|
-              page.form_with(:action => "/login_int.php") do |form|
-                form['email'] = Danbooru.config.nijie_login
-                form['password'] = Danbooru.config.nijie_password
-              end.click_button
-            end
-            session = mech.cookie_jar.cookies.select{|c| c.name == "NIJIEIJIEID"}.first
-            Cache.put("nijie-session", session.value, 1.month) if session
-          end
-
-          # This cookie needs to be set to allow viewing of adult works while anonymous
-          cookie = Mechanize::Cookie.new("R18", "1")
+        session = Cache.get("nijie-session")
+        if session
+          cookie = Mechanize::Cookie.new("NIJIEIJIEID", session)
           cookie.domain = ".nijie.info"
           cookie.path = "/"
           mech.cookie_jar.add(cookie)
+        else
+          mech.get("https://nijie.info/login.php") do |page|
+            page.form_with(:action => "/login_int.php") do |form|
+              form['email'] = Danbooru.config.nijie_login
+              form['password'] = Danbooru.config.nijie_password
+            end.click_button
+          end
+          session = mech.cookie_jar.cookies.select{|c| c.name == "NIJIEIJIEID"}.first
+          Cache.put("nijie-session", session.value, 1.day) if session
+        end
 
-          mech
+        # This cookie needs to be set to allow viewing of adult works while anonymous
+        cookie = Mechanize::Cookie.new("R18", "1")
+        cookie.domain = ".nijie.info"
+        cookie.path = "/"
+        mech.cookie_jar.add(cookie)
+
+        mech
+
+      rescue Mechanize::ResponseCodeError => x
+        if x.response_code.to_i == 429
+          sleep(5)
+          retry
+        else
+          raise
         end
       end
+      memoize :agent
     end
   end
 end

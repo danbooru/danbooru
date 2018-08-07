@@ -17,6 +17,7 @@ class TagAliasCorrectionTest < ActiveSupport::TestCase
 
     context "with a bad cache and post counts" do
       setup do
+        Cache.delete("ta:#{Cache.hash('bbb')}")
         Cache.put("ta:#{Cache.hash('aaa')}", "zzz")
         Tag.where(:name => "aaa").update_all("post_count = -3")
         @correction = TagAliasCorrection.new(@tag_alias.id)
