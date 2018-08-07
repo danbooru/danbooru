@@ -12,7 +12,8 @@ module Downloads
       end
 
       should "set the html page as the source" do
-        assert_equal("https://orig00.deviantart.net/82ef/f/2016/271/7/1/aaaaaa_by_starbitt-daj8b46.gif", @download.source)
+        assert_equal("http://www.deviantart.com/starbitt/art/09271X-636962118", @download.source)
+        assert_equal("https://orig00.deviantart.net/82ef/f/2016/271/7/1/aaaaaa_by_starbitt-daj8b46.gif", @download.downloaded_source)
       end
 
       should "work" do

@@ -10,11 +10,9 @@ module Iqdb
       headers = {}
       datums = {}
 
-      Downloads::RewriteStrategies::Base.strategies.each do |strategy|
-        url, headers, datums = strategy.new(url).rewrite(url, headers, datums)
-      end
+      strategy = Sources::Strategies.find(url)
 
-      [url, headers["Referer"]]
+      [strategy.image_url, strategy.headers["Referer"]]
     end
 
     def self.find_similar(source)

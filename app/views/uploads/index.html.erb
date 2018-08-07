@@ -47,11 +47,10 @@
               </span>
               <br>
 
-              <% if upload.alt_source.present? %>
+              <% if upload.referer_url.present? %>
                 <span class="info">
-                  <strong>Alternate Source</strong>
-                  <%= link_to_if (upload.alt_source =~ %r!\Ahttps?://!i), (upload.alt_source.presence.try(:truncate, 50) || content_tag(:em, "none")), upload.source %>
-                  <%= link_to "»", uploads_path(search: params[:search].merge(source_matches: upload.alt_source)) %>
+                  <strong>Referer</strong>
+                  <%= URI.parse(upload.referer_url).host rescue nil %>
                 </span>
                 <br>
               <% end %>

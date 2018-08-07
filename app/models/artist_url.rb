@@ -32,10 +32,9 @@ class ArtistUrl < ApplicationRecord
       url = url.downcase if url =~ %r!^https?://(?:mobile\.)?twitter\.com!
 
       begin
-        url = Sources::Site.new(url).normalize_for_artist_finder!
+        url = Sources::Strategies.find(url).normalize_for_artist_finder
       rescue Net::OpenTimeout, PixivApiClient::Error
         raise if Rails.env.test?
-      rescue Sources::Site::NoStrategyError
       end
       url = url.gsub(/\/+\Z/, "")
       url = url.gsub(%r!^https://!, "http://")
@@ -102,10 +101,6 @@ class ArtistUrl < ApplicationRecord
   end
 
   def normalize
-    if !Sources::Site.new(normalized_url).normalized_for_artist_finder?
-      self.normalized_url = self.class.normalize(url)
-    end
-  rescue Sources::Site::NoStrategyError
     self.normalized_url = self.class.normalize(url)
   end
 

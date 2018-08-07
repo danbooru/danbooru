@@ -1,5 +1,7 @@
 class UploadService
   class Preprocessor
+    extend Memoist
+
     attr_reader :params, :original_post_id
 
     def initialize(params)
@@ -15,31 +17,40 @@ class UploadService
       params[:md5_confirmation]
     end
 
-    def referer
+    def referer_url
       params[:referer_url]
     end
 
-    def normalized_source
-      @normalized_source ||= begin
-        Downloads::File.new(params[:source]).rewrite_url
-      end
+    def strategy
+      Sources::Strategies.find(source, referer_url)
     end
+    memoize :strategy
+
+    # When searching posts we have to use the canonical source
+    def canonical_source
+      strategy.canonical_url
+    end
+    memoize :canonical_source
 
     def in_progress?
       if Utils.is_downloadable?(source)
-        Upload.where(status: "preprocessing", source: normalized_source).or(Upload.where(status: "preprocessing", alt_source: normalized_source)).exists?
-      elsif md5.present?
-        Upload.where(status: "preprocessing", md5: md5).exists?
-      else
-        false
+        return Upload.where(status: "preprocessing", source: source).exists?
       end
+
+      if md5.present?
+        return Upload.where(status: "preprocessing", md5: md5).exists?
+      end
+
+      false
     end
 
     def predecessor
       if Utils.is_downloadable?(source)
-        Upload.where(status: ["preprocessed", "preprocessing"]).where(source: normalized_source).or(Upload.where(status: ["preprocessed", "preprocessing"], alt_source: normalized_source)).first
-      elsif md5.present?
-        Upload.where(status: ["preprocessed", "preprocessing"], md5: md5).first
+        return Upload.where(status: ["preprocessed", "preprocessing"], source: source).first
+      end
+
+      if md5.present?
+        return Upload.where(status: ["preprocessed", "preprocessing"], md5: md5).first
       end
     end
 
@@ -59,34 +70,31 @@ class UploadService
     def start!
       if Utils.is_downloadable?(source)
         CurrentUser.as_system do
-          if Post.tag_match("source:#{normalized_source}").where.not(id: original_post_id).exists?
-            raise ActiveRecord::RecordNotUnique.new("A post with source #{normalized_source} already exists")
+          if Post.tag_match("source:#{canonical_source}").where.not(id: original_post_id).exists?
+            raise ActiveRecord::RecordNotUnique.new("A post with source #{canonical_source} already exists")
           end
         end
 
-        if Upload.where(source: normalized_source, status: "completed").exists?
-          raise ActiveRecord::RecordNotUnique.new("A completed upload with source #{normalized_source} already exists")
+        if Upload.where(source: source, status: "completed").exists?
+          raise ActiveRecord::RecordNotUnique.new("A completed upload with source #{source} already exists")
         end
 
-        if Upload.where(source: normalized_source).where("status like ?", "error%").exists?
-          raise ActiveRecord::RecordNotUnique.new("An errored upload with source #{normalized_source} already exists")
+        if Upload.where(source: source).where("status like ?", "error%").exists?
+          raise ActiveRecord::RecordNotUnique.new("An errored upload with source #{source} already exists")
         end
       end
 
       params[:rating] ||= "q"
       params[:tag_string] ||= "tagme"
-
       upload = Upload.create!(params)
+
       begin
         upload.update(status: "preprocessing")
 
-        if Utils.is_downloadable?(source)
-          # preserve the original source (for twitter, the twimg:orig
-          # source, while the status url is stored in upload.source)
-          upload.alt_source = normalized_source 
-          file = Utils.download_for_upload(source, upload)
-        elsif params[:file].present?
+        if params[:file].present?
           file = params[:file]
+        elsif Utils.is_downloadable?(source)
+          file = Utils.download_for_upload(upload)
         end
 
         Utils.process_file(upload, file, original_post_id: original_post_id)
@@ -109,10 +117,7 @@ class UploadService
       # goto whoever submitted the form
       pred.initialize_attributes
 
-      # we went through a lot of trouble normalizing the source,
-      # so don't overwrite it with whatever the user provided
-      pred.source = "" if pred.source.nil?
-      pred.attributes = self.params.except(:source)
+      pred.attributes = self.params
 
       # if a file was uploaded after the preprocessing occurred,
       # then process the file and overwrite whatever the preprocessor
