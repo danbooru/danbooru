@@ -28,7 +28,7 @@
     <% elsif @upload.is_duplicate? %>
       <p>This upload is a duplicate: <%= link_to "post ##{@upload.duplicate_post_id}", post_path(@upload.duplicate_post_id) %></p>
     <% else %>
-      <p>An error occurred: <%= @upload.status %></p>
+      <p>An error occurred: <%= @upload.presenter.status(self) %></p>
       <% if CurrentUser.user.is_builder? %>
         <ul>
           <% @upload.backtrace.to_s.split(/\n/).each do |line| %>

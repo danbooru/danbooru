@@ -67,7 +67,7 @@
               <br><%= time_ago_in_words_tagged  upload.created_at %>
             </td>
             <td class="col-normal">
-              <%= link_to upload.presenter.status(self), uploads_path(search: params[:search].merge(status: upload.status)) %>
+              <%= upload.presenter.status(self) %>
             </td>
           </tr>
         <% end %>
