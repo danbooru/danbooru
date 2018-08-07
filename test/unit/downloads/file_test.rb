@@ -41,7 +41,7 @@ module Downloads
       end
 
       should "store the file in the tempfile path" do
-        tempfile = @download.download!
+        tempfile, strategy = @download.download!
         assert_equal(@source, @download.source)
         assert_operator(tempfile.size, :>, 0, "should have data")
       end

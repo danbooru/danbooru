@@ -47,8 +47,7 @@ class Upload < ApplicationRecord
   end
 
 
-  attr_accessor :as_pending,
-    :referer_url, :downloaded_source, :replaced_post, :file
+  attr_accessor :as_pending, :replaced_post, :file
   belongs_to :uploader, :class_name => "User"
   belongs_to :post, optional: true
 

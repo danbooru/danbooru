@@ -1,6 +1,8 @@
 require 'resolv-replace'
 
 class PixivApiClient
+  extend Memoist
+  
   API_VERSION = "1"
   CLIENT_ID = "bYGKuGVw91e0NMfPGp44euvGt59s"
   CLIENT_SECRET = "HP3RmkgAmEGro0gn1x9ioawQE8WMfvLXDz3ZqxpK"
@@ -23,90 +25,11 @@ class PixivApiClient
   class Error < Exception ; end
   class BadIDError < Error ; end
 
-  class WorksResponse
+  class WorkResponse
     attr_reader :json, :pages, :name, :moniker, :user_id, :page_count, :tags
     attr_reader :artist_commentary_title, :artist_commentary_desc
 
     def initialize(json)
-      # Sample response: 
-      # {
-      #     "status": "success",
-      #     "response": [
-      #         {
-      #             "id": 49270482,
-      #             "title": "ツイログ",
-      #             "caption": null,
-      #             "tags": [
-      #                 "神崎蘭子",
-      #                 "双葉杏",
-      #                 "アイドルマスターシンデレラガールズ",
-      #                 "Star!!",
-      #                 "アイマス5000users入り"
-      #             ],
-      #             "tools": [
-      #                 "CLIP STUDIO PAINT"
-      #             ],
-      #             "image_urls": {
-      #                 "large": "http://i3.pixiv.net/img-original/img/2015/03/14/17/53/32/49270482_p0.jpg"
-      #             },
-      #             "width": 1200,
-      #             "height": 951,
-      #             "stats": {
-      #                 "scored_count": 8247,
-      #                 "score": 81697,
-      #                 "views_count": 191630,
-      #                 "favorited_count": {
-      #                     "public": 7804,
-      #                     "private": 745
-      #                 },
-      #                 "commented_count": 182
-      #             },
-      #             "publicity": 0,
-      #             "age_limit": "all-age",
-      #             "created_time": "2015-03-14 17:53:32",
-      #             "reuploaded_time": "2015-03-14 17:53:32",
-      #             "user": {
-      #                 "id": 341433,
-      #                 "account": "nardack",
-      #                 "name": "Nardack",
-      #                 "is_following": false,
-      #                 "is_follower": false,
-      #                 "is_friend": false,
-      #                 "is_premium": null,
-      #                 "profile_image_urls": {
-      #                     "px_50x50": "http://i1.pixiv.net/img19/profile/nardack/846482_s.jpg"
-      #                 },
-      #                 "stats": null,
-      #                 "profile": null
-      #             },
-      #             "is_manga": true,
-      #             "is_liked": false,
-      #             "favorite_id": 0,
-      #             "page_count": 2,
-      #             "book_style": "none",
-      #             "type": "illustration",
-      #             "metadata": {
-      #                 "pages": [
-      #                     {
-      #                         "image_urls": {
-      #                             "large": "http://i3.pixiv.net/img-original/img/2015/03/14/17/53/32/49270482_p0.jpg",
-      #                             "medium": "http://i3.pixiv.net/c/1200x1200/img-master/img/2015/03/14/17/53/32/49270482_p0_master1200.jpg"
-      #                         }
-      #                     },
-      #                     {
-      #                         "image_urls": {
-      #                             "large": "http://i3.pixiv.net/img-original/img/2015/03/14/17/53/32/49270482_p1.jpg",
-      #                             "medium": "http://i3.pixiv.net/c/1200x1200/img-master/img/2015/03/14/17/53/32/49270482_p1_master1200.jpg"
-      #                         }
-      #                     }
-      #                 ]
-      #             },
-      #             "content_type": null
-      #         }
-      #     ],
-      #     "count": 1
-      # }
-
       @json = json
       @name = json["user"]["name"]
       @user_id = json["user"]["id"]
@@ -131,7 +54,105 @@ class PixivApiClient
     end
   end
 
-  def works(illust_id)
+  class NovelResponse
+    extend Memoist
+
+    attr_reader :json
+
+    def initialize(json)
+      @json = json
+    end
+
+    def name
+      json["user"]["name"]
+    end
+
+    def user_id
+      json["user"]["id"]
+    end
+
+    def moniker
+      json["user"]["account"]
+    end
+
+    def page_count
+      json["page_count"].to_i
+    end
+
+    def artist_commentary_title
+      json["title"]
+    end
+
+    def artist_commentary_desc
+      json["caption"]
+    end
+
+    def tags
+      json["tags"]
+    end
+
+    def pages
+      # ex: 
+      # https://i.pximg.net/c/150x150_80/novel-cover-master/img/2017/07/27/23/14/17/8465454_80685d10e6df4d7d53ad347ddc18a36b_master1200.jpg (6096b)
+      # =>
+      # https://i.pximg.net/novel-cover-original/img/2017/07/27/23/14/17/8465454_80685d10e6df4d7d53ad347ddc18a36b.jpg (532129b)
+      [find_original(json["image_urls"]["small"])]
+    end
+    memoize :pages
+
+  public
+    PXIMG = %r!\Ahttps?://i\.pximg\.net/c/\d+x\d+_\d+/novel-cover-master/img/(?<timestamp>\d+/\d+/\d+/\d+/\d+/\d+)/(?<filename>\d+_[a-f0-9]+)_master\d+\.(?<ext>jpg|jpeg|png|gif)!i
+
+    def find_original(x)
+      if x =~ PXIMG
+        return "https://i.pximg.net/novel-cover-original/img/#{$~[:timestamp]}/#{$~[:filename]}.#{$~[:ext]}"
+      end
+
+      return x
+    end
+  end
+
+  class FanboxResponse
+    attr_reader :json
+
+    def initialize(json)
+      @json = json
+    end
+
+    def name
+      json["body"]["user"]["name"]
+    end
+    
+    def user_id
+      json["body"]["user"]["userId"]
+    end
+
+    def moniker
+      raise NotImplementedError
+    end
+
+    def page_count
+      json["body"]["body"]["images"].size
+    end
+
+    def artist_commentary_title
+      json["body"]["title"]
+    end
+
+    def artist_commentary_desc
+      json["body"]["body"]["text"]
+    end
+
+    def tags
+      []
+    end
+
+    def pages
+      json["body"]["body"]["images"].map {|x| x["originalUrl"]}
+    end
+  end
+
+  def work(illust_id)
     headers = Danbooru.config.http_headers.merge(
       "Referer" => "http://www.pixiv.net",
       "Content-Type" => "application/x-www-form-urlencoded",
@@ -148,10 +169,44 @@ class PixivApiClient
     json = JSON.parse(body)
 
     if resp.success?
-      WorksResponse.new(json["response"][0])
+      WorkResponse.new(json["response"][0])
     elsif json["status"] == "failure" && json.dig("errors", "system", "message") =~ /対象のイラストは見つかりませんでした。/
       raise BadIDError.new("Pixiv ##{illust_id} not found: work was deleted, made private, or ID is invalid.")
     else
+      raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
+    end
+  rescue JSON::ParserError
+    raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
+  end
+
+  def fanbox(fanbox_id)
+    url = "https://www.pixiv.net/ajax/fanbox/post?postId=#{fanbox_id.to_i}"
+    resp = agent.get(url)
+    json = JSON.parse(resp.body)
+    if resp.code == "200"
+      FanboxResponse.new(json)
+    elsif json["status"] == "failure"
+      raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
+    end
+  rescue JSON::ParserError
+    raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
+  end
+
+  def novel(novel_id)
+    headers = Danbooru.config.http_headers.merge(
+      "Referer" => "http://www.pixiv.net",
+      "Content-Type" => "application/x-www-form-urlencoded",
+      "Authorization" => "Bearer #{access_token}"
+    )
+
+    url = "https://public-api.secure.pixiv.net/v#{API_VERSION}/novels/#{novel_id.to_i}.json"
+    resp = HTTParty.get(url, Danbooru.config.httparty_options.deep_merge(headers: headers))
+    body = resp.body.force_encoding("utf-8")
+    json = JSON.parse(body)
+
+    if resp.success?
+      NovelResponse.new(json["response"][0])
+    elsif json["status"] == "failure" && json.dig("errors", "system", "message") =~ /対象のイラストは見つかりませんでした。/
       raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
     end
   rescue JSON::ParserError
@@ -186,4 +241,9 @@ class PixivApiClient
       access_token
     end
   end
+
+  def agent
+    PixivWebAgent.build
+  end
+  memoize :agent
 end

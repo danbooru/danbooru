@@ -7,9 +7,7 @@ module Sources
         CurrentUser.user = FactoryBot.create(:user)
         CurrentUser.ip_addr = "127.0.0.1"
 
-        @site = Sources::Site.new("http://nijie.info/view.php?id=213043")
-        @site.get
-        sleep(5)
+        @site = Sources::Strategies.find("https://nijie.info/view.php?id=213043")
       end
 
       should "get the image url" do
@@ -17,7 +15,7 @@ module Sources
       end
 
       should "get the profile" do
-        assert_equal("http://nijie.info/members.php?id=728995", @site.profile_url)
+        assert_equal("https://nijie.info/members.php?id=728995", @site.profile_url)
       end
 
       should "get the artist name" do
@@ -25,15 +23,14 @@ module Sources
       end
 
       should "get the tags" do
-        assert_equal([["眼鏡", "http://nijie.info/search.php?word=%E7%9C%BC%E9%8F%A1"], ["リトルウィッチアカデミア", "http://nijie.info/search.php?word=%E3%83%AA%E3%83%88%E3%83%AB%E3%82%A6%E3%82%A3%E3%83%83%E3%83%81%E3%82%A2%E3%82%AB%E3%83%87%E3%83%9F%E3%82%A2"], ["アーシュラ先生", "http://nijie.info/search.php?word=%E3%82%A2%E3%83%BC%E3%82%B7%E3%83%A5%E3%83%A9%E5%85%88%E7%94%9F"]], @site.tags)
+        assert_equal([["眼鏡", "https://nijie.info/search.php?word=%E7%9C%BC%E9%8F%A1"], ["リトルウィッチアカデミア", "https://nijie.info/search.php?word=%E3%83%AA%E3%83%88%E3%83%AB%E3%82%A6%E3%82%A3%E3%83%83%E3%83%81%E3%82%A2%E3%82%AB%E3%83%87%E3%83%9F%E3%82%A2"], ["アーシュラ先生", "https://nijie.info/search.php?word=%E3%82%A2%E3%83%BC%E3%82%B7%E3%83%A5%E3%83%A9%E5%85%88%E7%94%9F"]], @site.tags)
       end
 
       should "normalize （）characters in tags" do
         FactoryBot.create(:tag, :name => "kaga")
         FactoryBot.create(:wiki_page, :title => "kaga", :other_names => "加賀(艦これ)")
 
-        @site = Sources::Site.new("http://nijie.info/view.php?id=208316")
-        @site.get
+        @site = Sources::Strategies.find("https://nijie.info/view.php?id=208316")
 
         assert_includes(@site.tags.map(&:first), "加賀（艦これ）")
         assert_includes(@site.translated_tags.map(&:first), "kaga")
@@ -50,16 +47,15 @@ module Sources
 
     context "The source site for a nijie referer url" do
       setup do
-        @site = Sources::Site.new("http://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", referer_url: "https://nijie.info/view_popup.php?id=213043")
-        @site.get
+        @site = Sources::Strategies.find("http://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", "https://nijie.info/view_popup.php?id=213043")
       end
 
       should "get the image url" do
-        assert_equal("https://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
+        assert_equal("http://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
       end
 
       should "get the profile" do
-        assert_equal("http://nijie.info/members.php?id=728995", @site.profile_url)
+        assert_equal("https://nijie.info/members.php?id=728995", @site.profile_url)
       end
 
       should "get the artist name" do
@@ -69,8 +65,7 @@ module Sources
 
     context "The source site for a nijie popup" do
       setup do
-        @site = Sources::Site.new("https://nijie.info/view_popup.php?id=213043")
-        @site.get
+        @site = Sources::Strategies.find("https://nijie.info/view_popup.php?id=213043")
       end
 
       should "get the image url" do
@@ -78,7 +73,7 @@ module Sources
       end
 
       should "get the profile" do
-        assert_equal("http://nijie.info/members.php?id=728995", @site.profile_url)
+        assert_equal("https://nijie.info/members.php?id=728995", @site.profile_url)
       end
 
       should "get the artist name" do
@@ -88,8 +83,7 @@ module Sources
 
     context "The source site for a nijie gallery" do
       setup do
-        @site = Sources::Site.new("http://nijie.info/view.php?id=218856")
-        @site.get
+        @site = Sources::Strategies.find("https://nijie.info/view.php?id=218856")
       end
 
       should "get the image urls" do

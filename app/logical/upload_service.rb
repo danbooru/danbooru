@@ -49,7 +49,7 @@ class UploadService
       @upload.update(status: "processing")
 
       if @upload.file.nil? && Utils.is_downloadable?(source)
-        @upload.file = Utils.download_for_upload(source, @upload)
+        @upload.file = Utils.download_for_upload(@upload)
       end
 
       if @upload.file.present?
@@ -111,7 +111,9 @@ class UploadService
       p.image_width = upload.image_width
       p.image_height = upload.image_height
       p.rating = upload.rating
-      p.source = upload.source
+      if upload.source.present?
+        p.source = Sources::Strategies.find(upload.source, upload.referer_url).canonical_url
+      end
       p.file_size = upload.file_size
       p.uploader_id = upload.uploader_id
       p.uploader_ip_addr = upload.uploader_ip_addr
