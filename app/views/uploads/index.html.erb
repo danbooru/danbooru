@@ -67,7 +67,7 @@
               <br><%= time_ago_in_words_tagged  upload.created_at %>
             </td>
             <td class="col-normal">
-              <%= upload.presenter.status(self) %>
+              <%= render_status(upload) %>
             </td>
           </tr>
         <% end %>

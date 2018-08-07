@@ -117,6 +117,14 @@ class Upload < ApplicationRecord
       status =~ /error:/
     end
 
+    def sanitized_status
+      if is_errored?
+        status.sub(/DETAIL:.+/m, "...")
+      else
+        status
+      end
+    end
+
     def duplicate_post_id
       @duplicate_post_id ||= status[/duplicate: (\d+)/, 1]
     end
