@@ -17,31 +17,56 @@ class UploadServiceTest < ActiveSupport::TestCase
   context "::Utils" do
     subject { UploadService::Utils }
 
-    context "#download_from_source" do
-      setup do
-        @jpeg = "https://upload.wikimedia.org/wikipedia/commons/c/c5/Moraine_Lake_17092005.jpg"
-        @ugoira = "https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip"
-      end
-
-      should "work on a jpeg" do
-        file = subject.download_from_source(@jpeg) do |context|
-          assert_not_nil(context[:downloaded_source])
-          assert_not_nil(context[:source])
+    context "#download_for_upload" do
+      context "for a non-source site" do
+        setup do
+          @source = "https://upload.wikimedia.org/wikipedia/commons/c/c5/Moraine_Lake_17092005.jpg"          
+          @upload = Upload.new
+          @upload.source = @source
         end
 
-        assert_operator(File.size(file.path), :>, 0)
-        file.close
+        should "work on a jpeg" do
+          file = subject.download_for_upload(@upload)
+
+          assert_operator(File.size(file.path), :>, 0)
+
+          file.close
+        end
       end
 
-      should "work on an ugoira url" do
-        file = subject.download_from_source(@ugoira, referer_url: "https://www.pixiv.net") do |context|
-          assert_not_nil(context[:downloaded_source])
-          assert_not_nil(context[:source])
-          assert_not_nil(context[:ugoira])
+      context "for a pixiv" do
+        setup do
+          @source = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350"
+          @upload = Upload.new
+          @upload.source = @source
         end
 
-        assert_operator(File.size(file.path), :>, 0)
-        file.close
+        should "work on an ugoira url" do
+          file = subject.download_for_upload(@upload)
+
+          assert_operator(File.size(file.path), :>, 0)
+
+          file.close
+        end
+      end
+
+      context "for a pixiv ugoira" do
+        setup do
+          @source = "https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip"
+          @referer = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364"
+          @upload = Upload.new
+          @upload.source = @source
+          @upload.referer_url = @referer
+        end
+
+        should "work on an ugoira url" do
+          file = subject.download_for_upload(@upload)
+
+          assert_not_nil(@upload.context["ugoira"])
+          assert_operator(File.size(file.path), :>, 0)
+
+          file.close
+        end
       end
     end
 
@@ -343,9 +368,6 @@ class UploadServiceTest < ActiveSupport::TestCase
           FactoryBot.create(:user)
         end
         CurrentUser.ip_addr = "127.0.0.1"
-        @jpeg = "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"
-        @ugoira = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364"
-        @video = "https://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_1mb.mp4"
       end
 
       teardown do
@@ -356,82 +378,100 @@ class UploadServiceTest < ActiveSupport::TestCase
       context "for twitter" do
         setup do
           @source = "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large"
-          @norm_source = "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"
           @ref = "https://twitter.com/nounproject/status/540944400767922176"
         end
 
-        should "record the correct source when a referer is given" do
+        should "download the file" do
           @service = subject.new(source: @source, referer_url: @ref)
           @upload = @service.start!
-          assert_equal(@ref, @upload.source)
-        end
-
-        should "save the twimg url in alt_source" do
-          @service = subject.new(source: @source, referer_url: @ref)
-          @upload = @service.start!
-          assert_equal(@norm_source, @upload.alt_source)
+          assert_equal("preprocessed", @upload.status)
+          assert_equal(9800, @upload.file_size)
+          assert_equal("png", @upload.file_ext)
+          assert_equal("f5fe24f3a3a13885285f6627e04feec9", @upload.md5)
+          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "png", :original)))
+          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "png", :preview)))
         end
       end
 
       context "for pixiv" do
         setup do
-          @source = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65981735"
-          @ref = "http://www.pixiv.net/member.php?id=696859"
-          @direct = "https://i.pximg.net/img-original/img/2017/11/21/05/12/37/65981735_p0.jpg"
+          @source = "https://i.pximg.net/img-original/img/2014/10/29/09/27/19/46785915_p0.jpg"
+          @ref = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=46785915"
         end
 
-        should "record the correct source" do
+        should "download the file" do
           @service = subject.new(source: @source, referer_url: @ref)
           @upload = @service.start!
-          assert_equal(@direct, @upload.source)
-        end        
+          assert_equal("preprocessed", @upload.status)
+          assert_equal(294591, @upload.file_size)
+          assert_equal("jpg", @upload.file_ext)
+          assert_equal("3cb1ef624714c15dbb2d6e7b1d57faef", @upload.md5)
+          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :preview)))
+        end
       end
 
-      should "work for a jpeg" do
-        @service = subject.new(source: @jpeg)
-        @upload = @service.start!
-        assert_equal("preprocessed", @upload.status)
-        assert_not_nil(@upload.md5)
-        assert_equal("jpg", @upload.file_ext)
-        assert_operator(@upload.file_size, :>, 0)
-        assert_not_nil(@upload.source)
-        assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
-        # this image is not large enough to generate a large file
-        #assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :large)))
-        assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :preview)))
+      context "for pixiv ugoira" do
+        setup do
+          @source = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364"
+        end
+
+        should "download the file" do
+          @service = subject.new(source: @source)
+          @upload = @service.start!
+          assert_equal("preprocessed", @upload.status)
+          assert_equal(2804, @upload.file_size)
+          assert_equal("zip", @upload.file_ext)
+          assert_equal("cad1da177ef309bf40a117c17b8eecf5", @upload.md5)
+          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "zip", :original)))
+          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "zip", :large)))
+        end
       end
 
-      should "work for an ugoira" do
-        @service = subject.new(source: @ugoira)
-        @upload = @service.start!
-        assert_equal("preprocessed", @upload.status)
-        assert_not_nil(@upload.md5)
-        assert_equal("zip", @upload.file_ext)
-        assert_operator(@upload.file_size, :>, 0)
-        assert_not_nil(@upload.source)
-        assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "zip", :original)))
-        assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "zip", :large)))
+      context "for null" do
+        setup do
+          @source = "https://raikou1.donmai.us/93/f4/93f4dd66ef1eb11a89e56d31f9adc8d0.jpg"
+        end
+
+        should "download the file" do
+          @service = subject.new(source: @source)
+          @upload = @service.start!
+          assert_equal("preprocessed", @upload.status)
+          assert_equal(181309, @upload.file_size)
+          assert_equal("jpg", @upload.file_ext)
+          assert_equal("93f4dd66ef1eb11a89e56d31f9adc8d0", @upload.md5)
+          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :large)))
+          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :preview)))
+        end
       end
 
-      should "work for a video" do
-        @service = subject.new(source: @video)
-        @upload = @service.start!
-        assert_equal("preprocessed", @upload.status)
-        assert_not_nil(@upload.md5)
-        assert_equal("mp4", @upload.file_ext)
-        assert_operator(@upload.file_size, :>, 0)
-        assert_not_nil(@upload.source)
-        assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "mp4", :original)))
-        assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "mp4", :preview)))
+      context "for a video" do
+        setup do
+          @source = "https://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_1mb.mp4"
+        end
+
+        should "work for a video" do
+          @service = subject.new(source: @source)
+          @upload = @service.start!
+          assert_equal("preprocessed", @upload.status)
+          assert_not_nil(@upload.md5)
+          assert_equal("mp4", @upload.file_ext)
+          assert_operator(@upload.file_size, :>, 0)
+          assert_not_nil(@upload.source)
+          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "mp4", :original)))
+          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "mp4", :preview)))
+        end
       end
 
       context "on timeout errors" do
         setup do
+          @source = "https://raikou1.donmai.us/93/f4/93f4dd66ef1eb11a89e56d31f9adc8d0.jpg"
           HTTParty.stubs(:get).raises(Net::ReadTimeout)
         end
         
         should "leave the upload in an error state" do
-          @service = subject.new(source: @video)
+          @service = subject.new(source: @source)
           @upload = @service.start!
           assert_match(/error:/, @upload.status)
         end
@@ -445,41 +485,15 @@ class UploadServiceTest < ActiveSupport::TestCase
           FactoryBot.create(:user)
         end
         CurrentUser.ip_addr = "127.0.0.1"
+        @source = "https://twitter.com/nounproject/status/540944400767922176"
       end
 
-      context "for twitter" do
-        setup do
-          @source = "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large"
-          @norm_source = "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"
-          @ref = "https://twitter.com/nounproject/status/540944400767922176"
-        end
-
-        should "record the correct source when a referer is given" do
-          @service = subject.new(source: @source, referer_url: @ref)
-          @upload = @service.start!
-          @service = subject.new(source: @source)
-          @service.finish!
-          @upload.reload
-
-          assert_equal(@ref, @upload.source)
-        end        
-      end
-
-      context "for pixiv" do
-        setup do
-          @source = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65981735"
-          @ref = "http://www.pixiv.net/member.php?id=696859"
-          @direct = "https://i.pximg.net/img-original/img/2017/11/21/05/12/37/65981735_p0.jpg"
-        end
-
-        should "record the correct source" do
-          @service = subject.new(source: @source, referer_url: @ref)
-          @upload = @service.start!
-          @service = subject.new(source: @source)
-          @service.finish!
-          @upload.reload
-          assert_equal(@direct, @upload.source)
-        end        
+      should "overwrite the attributes" do
+        @service = subject.new(source: @source, rating: 'e')
+        @upload = @service.start!        
+        @service.finish!
+        @upload.reload
+        assert_equal('e', @upload.rating)
       end
     end
   end
@@ -637,7 +651,7 @@ class UploadServiceTest < ActiveSupport::TestCase
           image_url = "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"
           as_user { @post.replace!(replacement_url: replacement_url) }
 
-          assert_equal(image_url, @post.replacements.last.replacement_url)
+          assert_equal(replacement_url, @post.replacements.last.replacement_url)
         end
       end
 
@@ -1027,7 +1041,33 @@ class UploadServiceTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
-    context "for an ugoira" do
+    context "for a pixiv" do
+      setup do
+        @source = "https://i.pximg.net/img-original/img/2017/11/21/05/12/37/65981735_p0.jpg"
+        @ref = "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65981735"
+        @upload = FactoryBot.create(:jpg_upload, file_size: 1000, md5: "12345", file_ext: "jpg", image_width: 100, image_height: 100, source: @source, referer_url: @ref)
+      end
+
+      should "record the canonical source" do
+        post = subject.new({}).create_post_from_upload(@upload)
+        assert_equal(@source, post.source)
+      end
+    end
+
+    context "for a twitter" do
+      setup do
+        @source = "https://pbs.twimg.com/media/C1kt72yVEAEGpOv.jpg:large"
+        @ref = "https://twitter.com/aranobu/status/817736083567820800"
+        @upload = FactoryBot.create(:jpg_upload, file_size: 1000, md5: "12345", file_ext: "jpg", image_width: 100, image_height: 100, source: @source, referer_url: @ref)
+      end
+
+      should "record the canonical source" do
+        post = subject.new({}).create_post_from_upload(@upload)
+        assert_equal(@ref, post.source)
+      end 
+    end
+
+    context "for a pixiv ugoira" do
       setup do
         @upload = FactoryBot.create(:ugoira_upload, file_size: 1000, md5: "12345", file_ext: "jpg", image_width: 100, image_height: 100, context: UGOIRA_CONTEXT)
       end
