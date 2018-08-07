@@ -87,7 +87,7 @@ namespace :images do
     post = Post.find(post_id)
     post.source =~ /(\d{5,})/
     if illust_id = $1
-      response = PixivApiClient.new.works(illust_id)
+      response = PixivApiClient.new.work(illust_id)
       upload = Upload.new
       upload.source = response.pages.first
       upload.file_ext = post.file_ext

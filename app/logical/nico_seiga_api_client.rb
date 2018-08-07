@@ -34,6 +34,6 @@ class NicoSeigaApiClient
     @image_id = image["id"].to_i
     @user_id = image["user_id"].to_i
     @title = image["title"]
-    @desc = image["description"]
+    @desc = image["description"] || image["summary"]
   end
 end
