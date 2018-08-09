@@ -19,7 +19,7 @@ Comment.initialize_all = function() {
     Comment.highlight_threshold_comments(Utility.meta("post-id"));
   }
 
-  $(window).on("danbooru:index_for_post", (post_id, current_comment_section, include_below_threshold) => {
+  $(window).on("danbooru:index_for_post", (_event, post_id, current_comment_section, include_below_threshold) => {
     if (include_below_threshold) {
       $("#threshold-comments-notice-for-" + post_id).hide();
     } else {
