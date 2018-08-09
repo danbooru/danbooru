@@ -11,16 +11,8 @@ Comment.initialize_all = function() {
     this.initialize_expand_links();
   }
 
-  if ($("#c-posts").length && $("#a-show").length) {
-    Comment.highlight_threshold_comments(Utility.meta("post-id"));
-  }
-
-  $(window).on("danbooru:index_for_post", (_event, post_id, current_comment_section, include_below_threshold) => {
-    if (include_below_threshold) {
-      $("#threshold-comments-notice-for-" + post_id).hide();
-    } else {
-      Comment.highlight_threshold_comments(post_id);
-    }
+  $(window).on("danbooru:index_for_post", (_event, post_id, current_comment_section) => {
+    $("#threshold-comments-notice-for-" + post_id).hide();
     Dtext.initialize_expandables(current_comment_section);
   });
 }
@@ -65,17 +57,6 @@ Comment.show_new_comment_form = function(e) {
 Comment.show_edit_form = function(e) {
   $(this).closest(".comment").find(".edit_comment").show();
   e.preventDefault();
-}
-
-Comment.highlight_threshold_comments = function(post_id) {
-  var threshold = parseInt(Utility.meta("user-comment-threshold"));
-  var articles = $("article.comment[data-post-id=" + post_id + "]");
-  articles.each(function(i, v) {
-    var $comment = $(v);
-    if (parseInt($comment.data("score")) < threshold) {
-      $comment.addClass("below-threshold");
-    }
-  });
 }
 
 Comment.hide_threshold_comments = function(post_id) {
