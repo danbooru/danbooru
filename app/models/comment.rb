@@ -189,6 +189,10 @@ class Comment < ApplicationRecord
     true
   end
 
+  def below_threshold?(user = CurrentUser.user)
+    score < user.comment_threshold
+  end
+
   def editable_by?(user)
     creator_id == user.id || user.is_moderator?
   end

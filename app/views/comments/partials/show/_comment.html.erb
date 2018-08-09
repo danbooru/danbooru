@@ -1,6 +1,6 @@
 <% if CurrentUser.is_moderator? || (params[:search] && params[:search][:is_deleted] =~ /t/) || !comment.is_deleted? %>
   <a name="comment-<%= comment.id %>"></a>
-  <article class="comment" data-post-id="<%= comment.post_id %>" data-comment-id="<%= comment.id %>" data-score="<%= comment.score %>" data-creator="<%= comment.creator_name %>" data-is-sticky="<%= comment.is_sticky %>">
+  <article class="comment <%= "below-threshold" if comment.below_threshold? %>" data-post-id="<%= comment.post_id %>" data-comment-id="<%= comment.id %>" data-score="<%= comment.score %>" data-creator="<%= comment.creator_name %>" data-is-sticky="<%= comment.is_sticky %>">
     <div class="author">
       <h1>
         <%= link_to_user comment.creator %>
@@ -35,7 +35,7 @@
             <% end %>
             <li id="comment-vote-up-link-for-<%= comment.id %>"><%= link_to "Vote up", comment_votes_path(:comment_id => comment.id, :score => "up"), :method => :post, :remote => true %></li>
             <li id="comment-vote-down-link-for-<%= comment.id %>"><%= link_to "Vote down", comment_votes_path(:comment_id => comment.id, :score => "down"), :method => :post, :remote => true %></li>
-            <li id="comment-unvote-link-for-<%= comment.id %>" class="unvote-comment-link"><%= link_to "Unvote", comment_votes_path(:comment_id => comment.id), :method => :delete, :remote => true %></li>
+            <li style="display: none;" id="comment-unvote-link-for-<%= comment.id %>" class="unvote-comment-link"><%= link_to "Unvote", comment_votes_path(:comment_id => comment.id), :method => :delete, :remote => true %></li>
             <% if CurrentUser.is_moderator? %>
               <li>|</li>
               <li>
@@ -46,7 +46,7 @@
           <% end %>
         </menu>
         <% if comment.editable_by?(CurrentUser.user) %>
-          <%= render "comments/form", :post => comment.post, :comment => comment %>
+          <%= render "comments/form", comment: comment, hidden: true %>
         <% end %>
       <% end %>
     </div>
