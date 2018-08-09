@@ -1,6 +1,6 @@
 <%= error_messages_for :comment %>
 
-<%= simple_form_for(comment, :html => {:class => "edit_comment"}) do |f| %>
+<%= simple_form_for(comment, :html => {:style => ("display: none;" if local_assigns[:hidden]), :class => "edit_comment"}) do |f| %>
   <%= f.hidden_field :post_id %>
   <%= dtext_field "comment", "body", :classes => "autocomplete-mentions", :value => comment.body, :input_id => "comment_body_for_#{comment.id}", :preview_id => "dtext-preview-for-#{comment.id}" %>
   <%= f.button :submit, "Submit" %>

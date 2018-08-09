@@ -8,7 +8,6 @@ Comment.initialize_all = function() {
     this.initialize_response_link();
     this.initialize_reply_links();
     this.initialize_expand_links();
-    this.initialize_vote_links();
 
     if (!$("#a-edit").length) {
       this.initialize_edit_links();
@@ -27,7 +26,6 @@ Comment.initialize_all = function() {
     }
     Comment.initialize_reply_links(current_comment_section);
     Comment.initialize_edit_links(current_comment_section);
-    Comment.initialize_vote_links(current_comment_section);
     Dtext.initialize_expandables(current_comment_section);
   });
 }
@@ -74,13 +72,10 @@ Comment.initialize_response_link = function() {
     Utility.scroll_to($form);
     e.preventDefault();
   });
-
-  $("div.new-comment form").hide();
 }
 
 Comment.initialize_edit_links = function($parent) {
   $parent = $parent || $(document);
-  $parent.find(".edit_comment").hide();
   $parent.find(".edit_comment_link").click(function(e) {
     var link_id = $(this).attr("id");
     var comment_id = link_id.match(/^edit_comment_link_(\d+)$/)[1];
@@ -109,11 +104,6 @@ Comment.hide_threshold_comments = function(post_id) {
       $comment.hide();
     }
   });
-}
-
-Comment.initialize_vote_links = function($parent) {
-  $parent = $parent || $(document);
-  $parent.find(".unvote-comment-link").hide();
 }
 
 $(document).ready(function() {
