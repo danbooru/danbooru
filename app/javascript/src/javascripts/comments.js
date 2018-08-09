@@ -5,13 +5,10 @@ let Comment = {};
 
 Comment.initialize_all = function() {
   if ($("#c-posts").length || $("#c-comments").length) {
-    this.initialize_response_link();
-    this.initialize_reply_links();
+    $(document).on("click", ".reply-link", Comment.quote);
+    $(document).on("click", ".edit_comment_link", Comment.show_edit_form);
+    $(document).on("click", ".expand-comment-response", Comment.show_new_comment_form);
     this.initialize_expand_links();
-
-    if (!$("#a-edit").length) {
-      this.initialize_edit_links();
-    }
   }
 
   if ($("#c-posts").length && $("#a-show").length) {
@@ -24,8 +21,6 @@ Comment.initialize_all = function() {
     } else {
       Comment.highlight_threshold_comments(post_id);
     }
-    Comment.initialize_reply_links(current_comment_section);
-    Comment.initialize_edit_links(current_comment_section);
     Dtext.initialize_expandables(current_comment_section);
   });
 }
@@ -49,11 +44,6 @@ Comment.quote = function(e) {
   e.preventDefault();
 }
 
-Comment.initialize_reply_links = function($parent) {
-  $parent = $parent || $(document);
-  $parent.find(".reply-link").click(Comment.quote);
-}
-
 Comment.initialize_expand_links = function() {
   $(".comment-section form").hide();
   $(".comment-section input.expand-comment-response").click(function(e) {
@@ -64,24 +54,17 @@ Comment.initialize_expand_links = function() {
   });
 }
 
-Comment.initialize_response_link = function() {
-  $("a.expand-comment-response").click(function(e) {
-    $(e.target).hide();
-    var $form = $(e.target).closest("div.new-comment").find("form");
-    $form.show();
-    Utility.scroll_to($form);
-    e.preventDefault();
-  });
+Comment.show_new_comment_form = function(e) {
+  $(e.target).hide();
+  var $form = $(e.target).closest("div.new-comment").find("form");
+  $form.show();
+  Utility.scroll_to($form);
+  e.preventDefault();
 }
 
-Comment.initialize_edit_links = function($parent) {
-  $parent = $parent || $(document);
-  $parent.find(".edit_comment_link").click(function(e) {
-    var link_id = $(this).attr("id");
-    var comment_id = link_id.match(/^edit_comment_link_(\d+)$/)[1];
-    $("#edit_comment_" + comment_id).fadeToggle("fast");
-    e.preventDefault();
-  });
+Comment.show_edit_form = function(e) {
+  $(this).closest(".comment").find(".edit_comment").show();
+  e.preventDefault();
 }
 
 Comment.highlight_threshold_comments = function(post_id) {
