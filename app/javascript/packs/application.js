@@ -38,4 +38,5 @@ export { default as Note } from '../src/javascripts/notes.js';
 export { default as PostModeMenu } from '../src/javascripts/post_mode_menu.js';
 export { default as Utility } from '../src/javascripts/utility.js';
 export { default as Ugoira } from '../src/javascripts/ugoira.js';
+export { default as Shortcuts } from '../src/javascripts/shortcuts.js';
 export { default as TagScript } from '../src/javascripts/tag_script.js';
