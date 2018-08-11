@@ -14,7 +14,7 @@
 
     <li><%= link_to "Deleted", posts_path(:tags => "#{params[:tags]} status:deleted"), :rel => "nofollow" %></li>
 
-    <li><%= link_to "Random", random_posts_path(:tags => params[:tags]), :id => "random-post", :rel => "nofollow" %></li>
+    <li><%= link_to "Random", random_posts_path(:tags => params[:tags]), :id => "random-post", :rel => "nofollow", :"data-shortcut" => "r" %></li>
 
     <li><%= link_to "Count", posts_counts_path(:tags => params[:tags]) %></li>
   </ul>

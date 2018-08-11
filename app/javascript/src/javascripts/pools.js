@@ -1,12 +1,6 @@
-import Utility from './utility'
-
 let Pool = {};
 
 Pool.initialize_all = function() {
-  if ($("#c-pools").length) {
-    this.initialize_shortcuts();
-  }
-
   if ($("#c-posts").length && $("#a-show").length) {
     this.initialize_add_to_pool_link();
   }
@@ -29,18 +23,6 @@ Pool.initialize_add_to_pool_link = function() {
     $("#pool_name").val($(this).attr("data-value"));
   });
 }
-
-Pool.initialize_shortcuts = function() {
-  if ($("#c-pools #a-show").length) {
-    Utility.keydown("e", "edit", function(e) {
-      $("#pool-edit a")[0].click();
-    });
-
-    Utility.keydown("shift+d", "delete", function(e) {
-      $("#pool-delete a")[0].click();
-    });
-  }
-};
 
 Pool.initialize_simple_edit = function() {
   $("#sortable").sortable({

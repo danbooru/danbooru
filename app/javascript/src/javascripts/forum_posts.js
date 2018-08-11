@@ -1,24 +1,8 @@
-import Utility from './utility'
-
 let ForumPost = {};
 
 ForumPost.initialize_all = function() {
   if ($("#c-forum-topics #a-show,#c-forum-posts #a-show").length) {
     this.initialize_edit_links();
-
-    Utility.keydown("e", "edit", function(e) {
-      $(".edit_forum_topic_link")[0].click();
-    });
-
-    Utility.keydown("shift+d", "delete", function(e) {
-      $("#forum-topic-delete a")[0].click();
-    });
-  }
-
-  if ($("#c-forum-topics").length) {
-    Utility.keydown("shift+r", "mark_all_as_read", function(e) {
-      $("#forum-topic-mark-all-as-read a")[0].click();
-    });
   }
 }
 

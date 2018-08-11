@@ -1,4 +1,3 @@
-import Utility from './utility'
 import Post from './posts.js.erb'
 import RelatedTag from './related_tag.js.erb'
 
@@ -18,7 +17,6 @@ Upload.initialize_all = function() {
     }
     this.initialize_info_bookmarklet();
     this.initialize_similar();
-    this.initialize_shortcuts();
     this.initialize_submit();
     $("#related-tags-button").trigger("click");
 
@@ -54,13 +52,6 @@ Upload.initialize_submit = function() {
     }
   });
 }
-
-Upload.initialize_shortcuts = function() {
-  Utility.keydown("e", "edit", function(e) {
-    $("#upload_tag_string").focus();
-    e.preventDefault();
-  });
-};
 
 Upload.initialize_iqdb_source = function() {
   if (/^https?:\/\//.test($("#normalized_url").val())) {

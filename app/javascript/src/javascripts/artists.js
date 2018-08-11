@@ -1,11 +1,8 @@
-import Utility from "./utility";
-
 let Artist = {};
 
 Artist.initialize_all = function() {
   if ($("#c-artists").length) {
     Artist.initialize_check_name();
-    Artist.initialize_shortcuts();
   }
 }
 
@@ -28,18 +25,6 @@ Artist.initialize_check_name = function() {
     }
   });
 }
-
-Artist.initialize_shortcuts = function() {
-  if ($("#c-artists #a-show").length) {
-    Utility.keydown("e", "edit", function(e) {
-      $("#artist-edit a")[0].click();
-    });
-
-    Utility.keydown("shift+d", "delete", function(e) {
-      $("#artist-delete a")[0].click();
-    });
-  }
-};
 
 $(document).ready(function() {
   Artist.initialize_all();
