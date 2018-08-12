@@ -1,13 +1,1 @@
-$("#add-to-favorites").hide();
-$("#add-fav-button").hide();
-$("#remove-from-favorites").show();
-$("#remove-fav-button").show();
-$("#score-for-post-<%= @post.id %>").html(<%= @post.score %>);
-$("#favcount-for-post-<%= @post.id %>").html(<%= @post.fav_count %>);
-<% if CurrentUser.is_gold? %>
-  $("#favlist").html("<%= escape_javascript(post_favlist(@post)) %>");
-  if (!$("#favlist").is(":visible")) {
-    $("#show-favlist-link").show();
-  }
-<% end %>
-$(window).trigger("danbooru:notice", "You have favorited this post");
+_update.js.erb
