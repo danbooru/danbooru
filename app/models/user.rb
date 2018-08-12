@@ -605,7 +605,7 @@ class User < ApplicationRecord
 
     def favorite_limit
       if is_platinum?
-        nil
+        Float::INFINITY
       elsif is_gold?
         20_000
       else

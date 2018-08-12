@@ -1,4 +1,6 @@
 class Favorite < ApplicationRecord
+  class Error < Exception ; end
+
   belongs_to :post
   belongs_to :user
   scope :for_user, ->(user_id) {where("user_id % 100 = #{user_id.to_i % 100} and user_id = #{user_id.to_i}")}
@@ -7,7 +9,12 @@ class Favorite < ApplicationRecord
     Favorite.transaction do
       User.where(:id => user.id).select("id").lock("FOR UPDATE NOWAIT").first
 
-      return if Favorite.for_user(user.id).where(:user_id => user.id, :post_id => post.id).exists?
+      if user.favorite_count >= user.favorite_limit
+        raise Error, "You can only keep up to #{user.favorite_limit} favorites. Upgrade your account to save more."
+      elsif Favorite.for_user(user.id).where(:user_id => user.id, :post_id => post.id).exists?
+        raise Error, "You have already favorited this post"
+      end
+
       Favorite.create!(:user_id => user.id, :post_id => post.id)
       Post.where(:id => post.id).update_all("fav_count = fav_count + 1")
       post.append_user_to_fav_string(user.id)
