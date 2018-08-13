@@ -21,11 +21,9 @@
     <% if post.is_status_locked? %>
       <li><span id="status-locked-notice">Status locked</span></li>
     <% else %>
-      <% if !post.is_deleted? && !post.is_pending? %>
+      <% if !post.is_deleted? && !post.is_pending? && !post.is_flagged? %>
         <li><%= link_to "Flag", new_post_flag_path(:post_id => post.id), :id => "flag" %></li>
-      <% end %>
-
-      <% if post.is_flagged? || post.is_deleted? %>
+      <% elsif post.is_flagged? || post.is_deleted? %>
         <li><%= link_to "Appeal", new_post_appeal_path(:post_id => post.id), :id => "appeal" %></li>
       <% end %>
 
