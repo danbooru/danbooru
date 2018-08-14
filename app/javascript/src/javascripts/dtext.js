@@ -11,7 +11,6 @@ Dtext.initialize_links = function() {
 
 Dtext.initialize_expandables = function($parent) {
   $parent = $parent || $(document);
-  $parent.find(".expandable-content").hide();
   $parent.find(".expandable-button").click(function(e) {
     var button = $(this);
     button.parent().next().fadeToggle("fast");
