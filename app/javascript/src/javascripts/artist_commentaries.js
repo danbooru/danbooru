@@ -26,9 +26,6 @@ ArtistCommentary.initialize_commentary_display_tabs = function() {
     $(e.target).parent("li").addClass("active");
     e.preventDefault();
   });
-
-  $("#commentary-sections li:last-child").addClass("active");
-  $("#original-artist-commentary").hide();
 }
 
 ArtistCommentary.initialize_edit_commentary_dialog = function() {
