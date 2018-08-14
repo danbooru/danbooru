@@ -19,7 +19,7 @@
   </li>
   <li>Source: <%= post_source_tag(post) %></li>
   <li>Rating: <%= post.pretty_rating %></li>
-  <li>Score: <span id="score-for-post-<%= post.id %>"><%= post.score %></span> <% if CurrentUser.is_voter? %>(<span id="vote-links-for-post-<%= post.id %>">vote <%= link_to content_tag("i", nil, class: "far fa-thumbs-up"), post_votes_path(:post_id => post.id, :score => "up"), :remote => true, :method => :post %> <%= link_to content_tag("i", nil, class: "far fa-thumbs-down"), post_votes_path(:post_id => post.id, :score => "down"), :remote => true, :method => :post %></span><%= link_to "undo vote", post_votes_path(post), :remote => true, :method => :delete, :id => "unvote-link-for-post-#{post.id}", :class => "unvote-post-link" %>)<% end %></li>
+  <li>Score: <span id="score-for-post-<%= post.id %>"><%= post.score %></span> <% if CurrentUser.is_voter? %>(<span id="vote-links-for-post-<%= post.id %>">vote <%= link_to content_tag("i", nil, class: "far fa-thumbs-up"), post_votes_path(:post_id => post.id, :score => "up"), :remote => true, :method => :post %> <%= link_to content_tag("i", nil, class: "far fa-thumbs-down"), post_votes_path(:post_id => post.id, :score => "down"), :remote => true, :method => :post %></span><%= link_to "undo vote", post_votes_path(post), :remote => true, :method => :delete, :id => "unvote-link-for-post-#{post.id}", :class => "unvote-post-link", :style => "display: none;"  %>)<% end %></li>
   <li>Favorites: <span id="favcount-for-post-<%= post.id %>"><%= post.fav_count %></span>
   <% if CurrentUser.is_gold? %>
     <%= link_to "Show »", "#", id: "show-favlist-link", style: ("display: none;" if post.fav_count == 0) %>
