@@ -806,11 +806,7 @@ let Note = {
   },
 
   initialize_shortcuts: function() {
-    if ($("#note-locked-notice").length === 0) {
-      $("#translate").click(Note.TranslationMode.toggle);
-      Utility.keydown("n", "translation_mode", Note.TranslationMode.toggle);
-    }
-
+    $("#translate").click(Note.TranslationMode.toggle);
     $("#image").click(Note.Box.toggle_all);
   },
 

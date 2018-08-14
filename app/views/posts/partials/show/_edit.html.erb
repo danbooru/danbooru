@@ -80,7 +80,7 @@
     <div>
       <%= f.label :tag_string, "Tags" %>
       <%= f.text_area :tag_string, :size => "50x5", :value => post.presenter.categorized_tag_string + " ", :data => { :autocomplete => "tag-edit" } %>
-      <span id="open-edit-dialog" class="ui-icon ui-icon-arrow-1-ne" title="detach" style="display: none;"/>
+      <span id="open-edit-dialog" class="ui-icon ui-icon-arrow-1-ne" title="detach" style="display: none;" data-shortcut="shift+e"/>
     </div>
 
     <%= button_tag "Related tags", :id => "related-tags-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>

@@ -10,12 +10,12 @@
       <li><%= link_to "Posts (#{Post.fast_count(@artist.name)})", posts_path(:tags => @artist.name) %></li>
       <li><%= link_to "Show", artist_path(@artist) %></li>
       <% if CurrentUser.is_member? %>
-        <li id="artist-edit"><%= link_to "Edit", edit_artist_path(@artist) %></li>
+        <li id="artist-edit"><%= link_to "Edit", edit_artist_path(@artist), :"data-shortcut" => "e" %></li>
       <% end %>
       <li><%= link_to "History", artist_versions_path(:search => {:artist_id => @artist.id}) %></li>
       <% if @artist.deletable_by?(CurrentUser.user) %>
         <% if @artist.is_active? %>
-          <li id="artist-delete"><%= link_to "Delete", artist_path(@artist), method: :delete, data: {confirm: "Are you sure you want to delete this artist?"} %></li>
+          <li id="artist-delete"><%= link_to "Delete", artist_path(@artist), method: :delete, "data-shortcut": "shift+d", "data-confirm": "Are you sure you want to delete this artist?" %></li>
         <% else %>
           <li><%= link_to "Undelete", artist_path(@artist, format: "js"), method: :put, data: {confirm: "Are you sure you want to undelete this artist?", params: "artist[is_active]=true"}, remote: true %></li>
         <% end %>

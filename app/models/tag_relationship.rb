@@ -104,8 +104,6 @@ class TagRelationship < ApplicationRecord
 
       if params[:status].present?
         q = q.status_matches(params[:status])
-      else
-        q = q.active
       end
 
       if params[:category].present?

@@ -1,0 +1,16 @@
+$("#add-to-favorites, #add-fav-button, #remove-from-favorites, #remove-fav-button").toggle();
+$("#score-for-post-<%= @post.id %>").text(<%= @post.score %>);
+$("#favcount-for-post-<%= @post.id %>").text(<%= @post.fav_count %>);
+
+<% if CurrentUser.is_gold? %>
+  var fav_count = <%= @post.fav_count %>;
+  $("#favlist").html("<%= j post_favlist(@post) %>");
+
+  if (fav_count === 0) {
+    $("#show-favlist-link, #hide-favlist-link, #favlist").hide();
+  } else if (!$("#favlist").is(":visible")) {
+    $("#show-favlist-link").show();
+  }
+<% end %>
+
+Danbooru.Utility.notice("<%= j flash[:notice] %>");

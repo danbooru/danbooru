@@ -1,0 +1,2 @@
+var message = <%= raw @error_message.try(:to_json) || @exception.message.to_json %>;
+Danbooru.Utility.error(message);

@@ -111,8 +111,8 @@
         <div class="input">
           <div>
             <%= f.label :tag_string, "Tags" %>
-            <%= f.text_area :tag_string, :size => "60x5", :spellcheck => false, :data => { :autocomplete => "tag-edit" } %>
-            <span id="open-edit-dialog" class="ui-icon ui-icon-arrow-1-ne" title="detach" style="display: none;"/>
+            <%= f.text_area :tag_string, :size => "60x5", :spellcheck => false, :"data-autocomplete" => "tag-edit", :"data-shortcut" => "e" %>
+            <span id="open-edit-dialog" class="ui-icon ui-icon-arrow-1-ne" title="detach" style="display: none;" data-shortcut="shift+e"/>
           </div>
 
           <%= button_tag "Related tags", :id => "related-tags-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
