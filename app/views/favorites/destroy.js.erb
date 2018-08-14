@@ -1,13 +1,1 @@
-$("#add-to-favorites").show();
-$("#add-fav-button").show();
-$("#remove-from-favorites").hide();
-$("#remove-fav-button").hide();
-$("#score-for-post-<%= @post.id %>").html(<%= @post.score %>);
-$("#favcount-for-post-<%= @post.id %>").html(<%= @post.fav_count %>);
-<% if CurrentUser.is_gold? %>
-  $("#favlist").html("<%= escape_javascript(post_favlist(@post)) %>");
-  <% if @post.fav_count == 0 %>
-    $("#show-favlist-link, #hide-favlist-link, #favlist").hide();
-  <% end %>
-<% end %>
-$(window).trigger("danbooru:notice", "You have unfavorited this post");
+_update.js.erb
