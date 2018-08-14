@@ -532,6 +532,11 @@ Post.vote = function(score, id) {
   });
 }
 
+Post.tag = function(post_id, tags) {
+  const tag_string = (Array.isArray(tags) ? tags.join(" ") : String(tags));
+  Post.update(post_id, { "post[old_tag_string]": "", "post[tag_string]": tag_string });
+}
+
 Post.update = function(post_id, params) {
   Post.notice_update("inc");
 

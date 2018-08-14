@@ -2,7 +2,6 @@ import Utility from './utility'
 import Cookie from './cookie'
 import Post from './posts.js.erb'
 import Favorite from './favorites'
-import TagScript from './tag_script'
 
 let PostModeMenu = {};
 
@@ -175,7 +174,7 @@ PostModeMenu.click = function(e) {
   } else if (s === "tag-script") {
     var current_script_id = Cookie.get("current_tag_script_id");
     var tag_script = Cookie.get("tag-script-" + current_script_id);
-    TagScript.run(post_id, tag_script);
+    Post.tag(post_id, tag_script);
   } else {
     return;
   }

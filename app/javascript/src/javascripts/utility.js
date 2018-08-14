@@ -99,16 +99,6 @@ Utility.without = function(array, element) {
   return temp;
 }
 
-Utility.reject = function(array, f) {
-  var filtered = [];
-  $.each(array, function(i, x) {
-    if (!f(x)) {
-      filtered.push(x);
-    }
-  });
-  return filtered;
-}
-
 Utility.regexp_escape = function(string) {
   return string.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
 }
