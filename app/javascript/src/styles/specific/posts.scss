@@ -499,10 +499,12 @@ div#c-explore-posts {
   }
 }
 
-.inline-blacklist {
-  #blacklist-box {
-    margin-bottom: 1em;
-  }
+#blacklist-box {
+  display: none;
+}
+
+#blacklist-box.inline-blacklist {
+  margin-bottom: 1em;
 
   #blacklist-list {
     display: inline;
