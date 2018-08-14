@@ -6,7 +6,6 @@ Dtext.initialize_all = function() {
 }
 
 Dtext.initialize_links = function() {
-  $(".simple_form .dtext-preview").hide();
   $(".simple_form input[value=Preview]").click(Dtext.click_button);
 }
 
