@@ -89,7 +89,7 @@
       <% end %>
 
       <menu id="post-sections">
-        <li><a href="#comments">Comments</a></li>
+        <li class="active"><a href="#comments">Comments</a></li>
 
         <% if RecommenderService.available_for_post?(@post) %>
           <li><a href="#recommended">Recommended</a></li>
@@ -103,7 +103,7 @@
       </menu>
 
       <% if RecommenderService.available_for_post?(@post) %>
-        <section id="recommended">
+        <section id="recommended" style="display: none;">
           <p><em>Loading...</em></p>
         </section>
       <% end %>
