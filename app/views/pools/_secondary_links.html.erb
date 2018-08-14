@@ -10,13 +10,13 @@
       <li><%= link_to "Show", pool_path(@pool) %></li>
       <li><%= link_to "Posts", posts_path(:tags => "pool:#{@pool.id}") %></li>
       <% if CurrentUser.is_member? %>
-        <li id="pool-edit"><%= link_to "Edit", edit_pool_path(@pool) %></li>
+        <li id="pool-edit"><%= link_to "Edit", edit_pool_path(@pool), "data-shortcut": "e" %></li>
       <% end %>
       <% if @pool.deletable_by?(CurrentUser.user) %>
         <% if @pool.is_deleted? %>
           <li id="pool-delete"><%= link_to "Undelete", undelete_pool_path(@pool), :method => :post, :remote => true %></li>
         <% else %>
-          <li id="pool-delete"><%= link_to "Delete", pool_path(@pool), :method => :delete, :data => {:confirm => "Are you sure you want to delete this pool?"}, :remote => true %></li>
+          <li id="pool-delete"><%= link_to "Delete", pool_path(@pool), :method => :delete, :"data-shortcut" => "shift+d", :"data-confirm" => "Are you sure you want to delete this pool?", :remote => true %></li>
         <% end %>
       <% end %>
       <% if PoolArchive.enabled? %>

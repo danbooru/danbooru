@@ -76,7 +76,8 @@ module PostSetPresenters
           :date => prev_date_for_scale(scale),
           :scale => scale.downcase
         ),
-        :rel => (link_rel_for_scale?(template, scale.downcase) ? "prev" : nil)
+        :rel => (link_rel_for_scale?(template, scale.downcase) ? "prev" : nil),
+        :"data-shortcut" => (link_rel_for_scale?(template, scale.downcase) ? "a left" : nil)
       )
       html << template.link_to(
         scale,
@@ -92,7 +93,8 @@ module PostSetPresenters
           :date => next_date_for_scale(scale),
           :scale => scale.downcase
         ),
-        :rel => (link_rel_for_scale?(template, scale.downcase) ? "next" : nil)
+        :rel => (link_rel_for_scale?(template, scale.downcase) ? "next" : nil),
+        :"data-shortcut" => (link_rel_for_scale?(template, scale.downcase) ? "d right" : nil)
       )
       html << '</span>'
       html.join("\n").html_safe

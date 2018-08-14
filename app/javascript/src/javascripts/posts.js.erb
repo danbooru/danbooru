@@ -95,6 +95,17 @@ Post.initialize_edit_dialog = function() {
 }
 
 Post.open_edit_dialog = function() {
+  if ($("#edit-dialog").length === 1) {
+    return;
+  }
+
+  $("#edit").show();
+  $("#comments").hide();
+  $("#share").hide();
+  $("#post-sections li").removeClass("active");
+  $("#post-edit-link").parent("li").addClass("active");
+  $("#related-tags-container").show();
+
   var $tag_string = $("#post_tag_string,#upload_tag_string");
   $("div.input").has($tag_string).prevAll().hide();
   $("#open-edit-dialog").hide();
@@ -230,22 +241,8 @@ Post.swipe_next = function(e) {
 
 Post.initialize_shortcuts = function() {
   if ($("#a-show").length) {
-    Utility.keydown("e", "edit", function(e) {
-      $("#post-edit-link").trigger("click");
-      $("#post_tag_string").focus();
-      e.preventDefault();
-    });
-
-    if (Utility.meta("current-user-can-approve-posts") === "true") {
-      Utility.keydown("shift+o", "approve", function(e) {
-        $(".approve-link").click();
-      });
-    }
-
     Utility.keydown("a", "prev_page", Post.nav_prev);
     Utility.keydown("d", "next_page", Post.nav_next);
-    Utility.keydown("f", "favorite", Post.favorite);
-    Utility.keydown("shift+f", "unfavorite", Post.unfavorite);
   }
 }
 
@@ -585,22 +582,6 @@ Post.approve = function(post_id) {
     }
   });
 }
-
-Post.favorite = function (e) {
-  if ($("#add-to-favorites").is(":visible")) {
-    $("#add-to-favorites")[0].click();
-  } else if (Utility.meta("current-user-id") === "") {
-    $(window).trigger("danbooru:notice", "You must be logged in to favorite posts");
-  } else {
-    $(window).trigger("danbooru:notice", "You have already favorited this post");
-  }
-};
-
-Post.unfavorite = function (e) {
-  $.ajax("/favorites/" + Utility.meta("post-id") + ".js", {
-    type: "DELETE"
-  });
-};
 
 Post.initialize_saved_searches = function() {
   $("#new_saved_search #saved_search_label_string").autocomplete({

@@ -17,7 +17,7 @@
         <ul id="related-list">
           <li><%= link_to "Deleted posts", posts_path(:tags => "#{@favorite_set.tag_string} status:deleted"), :rel => "nofollow" %></li>
 
-          <li><%= link_to "Random post", random_posts_path(:tags => @favorite_set.tag_string), :id => "random-post", :rel => "nofollow" %></li>
+          <li><%= link_to "Random post", random_posts_path(:tags => @favorite_set.tag_string), :id => "random-post", :rel => "nofollow", :"data-shortcut" => "r" %></li>
         </ul>
       </section>
     </aside>

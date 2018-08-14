@@ -12,7 +12,7 @@
     <% if params[:random] %>
       <%= hidden_field_tag :random, params[:random] %>
     <% end %>
-    <%= text_field_tag("tags", tags, :id => tags_dom_id, :data => { :autocomplete => "tag-query" }) %><%= content_tag "button", content_tag("i", nil, class: "fas fa-search"), type: "submit" %>
+    <%= text_field_tag("tags", tags, :id => tags_dom_id, :"data-shortcut" => "q", :"data-autocomplete" => "tag-query") %><%= content_tag "button", content_tag("i", nil, class: "fas fa-search"), type: "submit" %>
     <%= hidden_field_tag "ms", "1" %>
   <% end %>
 </section>

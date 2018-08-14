@@ -94,7 +94,7 @@
         <% end %>
 
         <% if CurrentUser.is_member? && @post.visible? %>
-          <li><a href="#edit" id="post-edit-link">Edit</a></li>
+          <li><a href="#edit" id="post-edit-link" data-shortcut="e">Edit</a></li>
         <% end %>
 
         <li><a href="#share">Share</a></li>

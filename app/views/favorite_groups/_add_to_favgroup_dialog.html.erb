@@ -6,6 +6,7 @@
     <%= link_to favgroup.name,
       add_post_favorite_group_path(favgroup, :post_id => post.id, :format => :js),
       :id => "add-to-favgroup-#{i + 1}", :class => "add-to-favgroup",
-      :method => :put, :remote => true %>
+      :method => :put, :remote => true,
+      :"data-shortcut" => (i + 1) % 10, :"data-shortcut-when" => ":visible" %>
   </div>
 <% end %>
