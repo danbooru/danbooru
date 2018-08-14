@@ -7,8 +7,6 @@ ForumPost.initialize_all = function() {
 }
 
 ForumPost.initialize_edit_links = function() {
-  $(".edit_forum_post, .edit_forum_topic").hide();
-
   $(".edit_forum_post_link").click(function(e) {
     var link_id = $(this).attr("id");
     var forum_post_id = link_id.match(/^edit_forum_post_link_(\d+)$/)[1];
