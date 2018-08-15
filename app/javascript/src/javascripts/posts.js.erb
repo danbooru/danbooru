@@ -83,7 +83,6 @@ Post.initialize_gestures = function() {
 
 Post.initialize_edit_dialog = function() {
   $("#open-edit-dialog").button().show().click(function(e) {
-    $(window).scrollTop($("#image").offset().top);
     Post.open_edit_dialog();
     e.preventDefault();
   });
