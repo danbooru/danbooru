@@ -14,7 +14,7 @@ class StorageManager
   end
 
   def default_base_url
-    CurrentUser.root_url + "data"
+    "#{CurrentUser.root_url}/data"
   end
 
   # Store the given file at the given path. If a file already exists at that

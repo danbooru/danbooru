@@ -254,7 +254,7 @@ module Danbooru
       # base_url - where to serve files from (default: http://#{hostname}/data)
       # hierarchical: false - store files in a single directory
       # hierarchical: true - store files in a hierarchical directory structure, based on the MD5 hash
-      StorageManager::Local.new(base_url: CurrentUser.root_url + "data", base_dir: "#{Rails.root}/public/data", hierarchical: false)
+      StorageManager::Local.new(base_url: "#{CurrentUser.root_url}/data", base_dir: "#{Rails.root}/public/data", hierarchical: false)
 
       # Store files on one or more remote host(s). Configure SSH settings in
       # ~/.ssh_config or in the ssh_options param (ref: http://net-ssh.github.io/net-ssh/Net/SSH.html#method-c-start)
