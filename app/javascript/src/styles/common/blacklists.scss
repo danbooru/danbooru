@@ -3,13 +3,27 @@
 #blacklist-box {
   display: none;
 
-  a.blacklisted-active {
-    text-decoration: line-through;
+  #blacklist-list {
+    a {
+      display: inline-block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      vertical-align: bottom;
+    }
+
+    a.blacklisted-active {
+      text-decoration: line-through;
+    }
   }
 
   &.sidebar-blacklist ul li {
     list-style-type: disc;
     list-style-position: inside;
+
+    a {
+      max-width: 75%;
+    }
   }
 
   &.inline-blacklist {
@@ -21,6 +35,10 @@
       li {
         display: inline;
         margin-right: 1em;
+
+        a {
+          max-width: 25%;
+        }
       }
     }
   }

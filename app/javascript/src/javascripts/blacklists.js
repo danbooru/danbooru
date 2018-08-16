@@ -70,6 +70,7 @@ Blacklist.update_sidebar = function() {
 
     link.text(entry.tags);
     link.attr("href", `/posts?tags=${encodeURIComponent(entry.tags)}`);
+    link.attr("title", entry.tags);
     link.click(Blacklist.toggle_entry);
     count.html(entry.hits);
     count.addClass("count");
