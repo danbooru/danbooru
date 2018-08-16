@@ -10,6 +10,7 @@ Blacklist.parse_entry = function(string) {
     "tags": string,
     "require": [],
     "exclude": [],
+    "optional": [],
     "disabled": false,
     "hits": 0,
     "min_score": null
@@ -18,6 +19,8 @@ Blacklist.parse_entry = function(string) {
   $.each(matches, function(i, tag) {
     if (tag.charAt(0) === '-') {
       entry.exclude.push(tag.slice(1));
+    } else if (tag.charAt(0) === '~') {
+      entry.optional.push(tag.slice(1));
     } else if (tag.match(/^score:<.+/)) {
       var score = tag.match(/^score:<(.+)/)[1];
       entry.min_score = parseInt(score);
@@ -30,6 +33,7 @@ Blacklist.parse_entry = function(string) {
 
 Blacklist.parse_entries = function() {
   var entries = (Utility.meta("blacklisted-tags") || "nozomiisthebestlovelive").replace(/(rating:[qes])\w+/ig, "$1").toLowerCase().split(/,/);
+  entries = entries.filter(e => e.trim() !== "");
 
   $.each(entries, function(i, tags) {
     var entry = Blacklist.parse_entry(tags);
@@ -156,7 +160,10 @@ Blacklist.post_match = function(post, entry) {
   $.each(String($post.data("flags")).match(/\S+/g) || [], function(i, v) {
     tags.push("status:" + v);
   });
-  return (entry.require.length > 0 || entry.exclude.length > 0) && Utility.is_subset(tags, entry.require) && !Utility.intersect(tags, entry.exclude).length;
+
+  return Utility.is_subset(tags, entry.require)
+    && (!entry.optional.length || Utility.intersect(tags, entry.optional).length)
+    && !Utility.intersect(tags, entry.exclude).length;
 }
 
 Blacklist.post_hide = function(post) {
