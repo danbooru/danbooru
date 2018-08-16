@@ -51,14 +51,6 @@ article.post-preview {
   margin-top: 1em;
 }
 
-a.blacklisted-active {
-  text-decoration: line-through;
-}
-
-.post-preview.blacklisted-active, #image-container.blacklisted-active {
-  display: none;
-}
-
 #excerpt p.links {
   margin-top: 1em;
 }
@@ -494,33 +486,6 @@ div#c-explore-posts {
     margin: 0 5em;
 
     &:first-child {
-      margin-left: 0;
-    }
-  }
-}
-
-#blacklist-box {
-  display: none;
-}
-
-#blacklist-box.inline-blacklist {
-  margin-bottom: 1em;
-
-  #blacklist-list {
-    display: inline;
-  }
-
-  #blacklist-list li {
-    display: inline;
-    margin-right: 1em;
-
-    a {
-      color: $link_color;
-      cursor: pointer;
-    }
-
-    span.count {
-      color: #AAA;
       margin-left: 0;
     }
   }

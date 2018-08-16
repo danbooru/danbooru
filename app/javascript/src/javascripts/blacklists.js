@@ -55,6 +55,7 @@ Blacklist.toggle_entry = function(e) {
     }
   }
   Blacklist.apply();
+  e.preventDefault();
 }
 
 Blacklist.update_sidebar = function() {
@@ -68,6 +69,7 @@ Blacklist.update_sidebar = function() {
     var count = $("<span/>");
 
     link.text(entry.tags);
+    link.attr("href", `/posts?tags=${encodeURIComponent(entry.tags)}`);
     link.click(Blacklist.toggle_entry);
     count.html(entry.hits);
     count.addClass("count");
