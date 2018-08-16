@@ -26,7 +26,7 @@ class FavoritesController < ApplicationController
   def create
     @post = Post.find(params[:post_id])
     @post.add_favorite!(CurrentUser.user)
-    flash[:notice] = "You have favorited this post"
+    flash.now[:notice] = "You have favorited this post"
 
     respond_with(@post)
   end
@@ -40,7 +40,7 @@ class FavoritesController < ApplicationController
       Favorite.remove(post_id: params[:id], user: CurrentUser.user)
     end
 
-    flash[:notice] = "You have unfavorited this post"
+    flash.now[:notice] = "You have unfavorited this post"
     respond_with(@post)
   end
 end
