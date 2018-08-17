@@ -49,11 +49,7 @@
     $(function() {
       $("#new-response-link").click(function(e) {
         $("#topic-response").show();
-
-        $('html, body').animate({
-            scrollTop: $("#forum_post_body").offset().top - 100
-        }, 500);
-
+        document.body.scrollIntoView(false);
         e.preventDefault();
       })
     });

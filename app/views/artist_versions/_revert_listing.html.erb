@@ -19,7 +19,7 @@
     </thead>
     <tbody>
       <% @artist_versions.each do |artist_version| %>
-        <tr class="<%= cycle 'even', 'odd' %>">
+        <tr>
           <% if artist_version.visible? %>
             <td><%= link_to artist_version.name, artist_path(artist_version.artist_id) %></td>
             <td class="col-expand"><%= artist_version_other_names_diff(artist_version) %></td>

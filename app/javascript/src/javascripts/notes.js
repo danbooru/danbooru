@@ -145,7 +145,7 @@ let Note = {
       Note.Body.show(note_id);
       $(".note-box-highlighted").removeClass("note-box-highlighted");
       $note_box.addClass("note-box-highlighted");
-      Utility.scroll_to($note_box);
+      $note_box[0].scrollIntoView(false);
     },
 
     resize_inner_border: function($note_box) {

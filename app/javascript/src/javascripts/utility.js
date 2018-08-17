@@ -12,24 +12,6 @@ Utility.test_max_width = function(width) {
   return mq.matches;
 }
 
-Utility.scrolling = false;
-
-Utility.scroll_to = function(element) {
-  if (Utility.scrolling) {
-    return;
-  } else {
-    Utility.scrolling = true;
-  }
-
-  var top = null;
-  if (typeof element === "number") {
-    top = element;
-  } else {
-    top = element.offset().top - 10;
-  }
-  $('html, body').animate({scrollTop: top}, 300, "linear", function() {Utility.scrolling = false;});
-}
-
 Utility.notice_timeout_id = undefined;
 
 Utility.notice = function(msg, permanent) {
@@ -89,49 +71,15 @@ Utility.intersect = function(a, b) {
   return result;
 }
 
-Utility.without = function(array, element) {
-  var temp = [];
-  $.each(array, function(i, v) {
-    if (v !== element) {
-      temp.push(v);
-    }
-  });
-  return temp;
-}
-
 Utility.regexp_escape = function(string) {
   return string.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
 }
 
-Utility.sorttable = function(table) {
-  table.stupidtable();
-  table.bind("aftertablesort", function(event, data) {
-    $("#c-saved-searches table tbody tr").removeClass("even odd");
-    $("#c-saved-searches table tbody tr:even").addClass("even");
-    $("#c-saved-searches table tbody tr:odd").addClass("odd");
-  });
-};
-
-$.fn.selectRange = function(start, end) {
-  return this.each(function() {
-    if (this.setSelectionRange) {
-      this.focus();
-      this.setSelectionRange(start, end);
-    } else if (this.createTextRange) {
-      var range = this.createTextRange();
-      range.collapse(true);
-      range.moveEnd('character', end);
-      range.moveStart('character', start);
-      range.select();
-    }
-  });
-};
-
 $.fn.selectEnd = function() {
-  if (this.length) {
-    this.selectRange(this.val().length, this.val().length);
-  }
-  return this;
+  return this.each(function() {
+    this.focus();
+    this.setSelectionRange(this.value.length, this.value.length);
+  })
 }
 
 $(function() {
