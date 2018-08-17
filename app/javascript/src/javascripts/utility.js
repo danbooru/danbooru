@@ -71,16 +71,6 @@ Utility.intersect = function(a, b) {
   return result;
 }
 
-Utility.without = function(array, element) {
-  var temp = [];
-  $.each(array, function(i, v) {
-    if (v !== element) {
-      temp.push(v);
-    }
-  });
-  return temp;
-}
-
 Utility.regexp_escape = function(string) {
   return string.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
 }
