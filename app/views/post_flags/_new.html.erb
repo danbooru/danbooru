@@ -1,6 +1,6 @@
 <%= format_text(WikiPage.titled(Danbooru.config.flag_notice_wiki_page).first.try(&:body)) %>
 
-<!-- XXX dtext_field expects there to be a `post_flag` instance variable. -->
+<%# XXX dtext_field expects there to be a `post_flag` instance variable. %>
 <% @post_flag = post_flag %>
 <%= simple_form_for(@post_flag, format: :js, remote: true) do |f| %>
   <%= f.hidden_field :post_id %>

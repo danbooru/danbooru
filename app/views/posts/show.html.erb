@@ -187,7 +187,7 @@
     <meta name="report-server" content="<%= Danbooru.config.reportbooru_server %>">
   <% end %>
 
-  <!-- Twitter properties -->
+  <%# Twitter properties %>
   <% if @post.twitter_card_supported? %>
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="<%= Danbooru.config.twitter_site %>">
