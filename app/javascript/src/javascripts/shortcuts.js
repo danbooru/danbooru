@@ -43,16 +43,11 @@ Shortcuts.initialize_data_shortcuts = function() {
 };
 
 Shortcuts.nav_scroll_down = function() {
-  var scroll_top = $(window).scrollTop() + ($(window).height() * 0.15);
-  $(window).scrollTop(scroll_top);
+  window.scrollBy(0, $(window).height() * 0.15);
 }
 
 Shortcuts.nav_scroll_up = function() {
-  var scroll_top = $(window).scrollTop() - ($(window).height() * 0.15);
-  if (scroll_top < 0) {
-    scroll_top = 0;
-  }
-  $(window).scrollTop(scroll_top);
+  window.scrollBy(0, $(window).height() * -0.15);
 }
 
 $(document).ready(function() {
