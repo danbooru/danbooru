@@ -26,7 +26,7 @@
   <meta name="last-forum-read-at" content="<%= CurrentUser.user.last_forum_read_at %>">
   <meta name="disable-labeled-saved-searches" content="<%= CurrentUser.disable_categorized_saved_searches? %>">
   <meta name="disable-post-tooltips" content="<%= CurrentUser.disable_post_tooltips? %>">
-  <%= content_tag(:meta, nil, name: "disable-mobile-gestures", content: CurrentUser.disable_mobile_gestures?) %>
+  <%= tag.meta name: "disable-mobile-gestures", content: CurrentUser.disable_mobile_gestures? %>
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <%= javascript_pack_tag "application" %>

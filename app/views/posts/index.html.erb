@@ -66,10 +66,10 @@
 
 <%= content_for(:html_header) do %>
   <link href="<%= posts_path(:format => 'atom', :tags => params[:tags]) %>" rel="alternate" title="ATOM" type="application/atom+xml" />
-  <%= content_tag(:link, nil, rel: "prefetch", href: next_page_url, as: "html", crossorigin: "use-credentials") %>
-  <%= content_tag :link, nil, rel: "next", href: next_page_url %>
+  <%= tag.link rel: "prefetch", href: next_page_url, as: "html", crossorigin: "use-credentials" %>
+  <%= tag.link rel: "next", href: next_page_url %>
   <% if prev_page_url %>
-    <%= content_tag :link, nil, rel: "prev", href: prev_page_url %>
+    <%= tag.link rel: "prev", href: prev_page_url %>
   <% end %>
   <% if @post_set.has_wiki? %>
     <meta name="description" content="<%= strip_dtext(@post_set.wiki_page.presenter.excerpt) %>">
