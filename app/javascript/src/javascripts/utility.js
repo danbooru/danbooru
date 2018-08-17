@@ -85,26 +85,11 @@ Utility.regexp_escape = function(string) {
   return string.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
 }
 
-$.fn.selectRange = function(start, end) {
-  return this.each(function() {
-    if (this.setSelectionRange) {
-      this.focus();
-      this.setSelectionRange(start, end);
-    } else if (this.createTextRange) {
-      var range = this.createTextRange();
-      range.collapse(true);
-      range.moveEnd('character', end);
-      range.moveStart('character', start);
-      range.select();
-    }
-  });
-};
-
 $.fn.selectEnd = function() {
-  if (this.length) {
-    this.selectRange(this.val().length, this.val().length);
-  }
-  return this;
+  return this.each(function() {
+    this.focus();
+    this.setSelectionRange(this.value.length, this.value.length);
+  })
 }
 
 $(function() {
