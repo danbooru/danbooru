@@ -103,15 +103,6 @@ Utility.regexp_escape = function(string) {
   return string.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
 }
 
-Utility.sorttable = function(table) {
-  table.stupidtable();
-  table.bind("aftertablesort", function(event, data) {
-    $("#c-saved-searches table tbody tr").removeClass("even odd");
-    $("#c-saved-searches table tbody tr:even").addClass("even");
-    $("#c-saved-searches table tbody tr:odd").addClass("odd");
-  });
-};
-
 $.fn.selectRange = function(start, end) {
   return this.each(function() {
     if (this.setSelectionRange) {

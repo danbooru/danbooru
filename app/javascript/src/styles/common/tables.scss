@@ -35,7 +35,7 @@ table.striped {
     }
   }
 
-  tr.even {
+  tr:nth-child(even) {
     background-color: #FAFAFA;
   }
 }
