@@ -39,7 +39,7 @@ Comment.show_new_comment_form = function(e) {
   $(e.target).hide();
   var $form = $(e.target).closest("div.new-comment").find("form");
   $form.show();
-  Utility.scroll_to($form);
+  $form[0].scrollIntoView(false);
   e.preventDefault();
 }
 

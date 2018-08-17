@@ -12,24 +12,6 @@ Utility.test_max_width = function(width) {
   return mq.matches;
 }
 
-Utility.scrolling = false;
-
-Utility.scroll_to = function(element) {
-  if (Utility.scrolling) {
-    return;
-  } else {
-    Utility.scrolling = true;
-  }
-
-  var top = null;
-  if (typeof element === "number") {
-    top = element;
-  } else {
-    top = element.offset().top - 10;
-  }
-  $('html, body').animate({scrollTop: top}, 300, "linear", function() {Utility.scrolling = false;});
-}
-
 Utility.notice_timeout_id = undefined;
 
 Utility.notice = function(msg, permanent) {

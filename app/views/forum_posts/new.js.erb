@@ -4,7 +4,5 @@ if ($("#forum_post_body").val().length > 0) {
 }
 $("#forum_post_body").val(msg);
 $("#topic-response").show();
-$('html, body').animate({
-    scrollTop: $("#forum_post_body").offset().top - 100
-}, 500);
+document.body.scrollIntoView(false);
 $("#forum_post_body").selectEnd();
