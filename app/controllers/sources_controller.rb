@@ -3,7 +3,6 @@ class SourcesController < ApplicationController
 
   def show
     @source = Sources::Strategies.find(params[:url], params[:ref])
-    @source.get
 
     respond_with(@source.to_h) do |format|
       format.xml { render xml: @source.to_h.to_xml(root: "source") }
