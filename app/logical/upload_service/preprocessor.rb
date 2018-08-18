@@ -34,7 +34,7 @@ class UploadService
 
     def in_progress?
       if Utils.is_downloadable?(source)
-        return Upload.where(status: "preprocessing", source: source).exists?
+        return Upload.where(status: "preprocessing", source: [source, canonical_source]).exists?
       end
 
       if md5.present?
@@ -46,7 +46,7 @@ class UploadService
 
     def predecessor
       if Utils.is_downloadable?(source)
-        return Upload.where(status: ["preprocessed", "preprocessing"], source: source).first
+        return Upload.where(status: ["preprocessed", "preprocessing"], source: [source, canonical_source]).first
       end
 
       if md5.present?
@@ -75,11 +75,11 @@ class UploadService
           end
         end
 
-        if Upload.where(source: source, status: "completed").exists?
+        if Upload.where(source: [source, canonical_source], status: "completed").exists?
           raise ActiveRecord::RecordNotUnique.new("A completed upload with source #{source} already exists")
         end
 
-        if Upload.where(source: source).where("status like ?", "error%").exists?
+        if Upload.where(source: [source, canonical_source]).where("status like ?", "error%").exists?
           raise ActiveRecord::RecordNotUnique.new("An errored upload with source #{source} already exists")
         end
       end
