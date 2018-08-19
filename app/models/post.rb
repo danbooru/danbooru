@@ -403,7 +403,9 @@ class Post < ApplicationRecord
       when %r{\Ahttp://www\.karabako\.net/images(?:ub)?/karabako_(\d+)(?:_\d+)?\.}i
         "http://www.karabako.net/post/view/#{$1}"
 
-      when %r{\Ahttp://p\.twpl\.jp/show/orig/([a-z0-9]+)}i
+      # XXX http://twipple.jp is defunct
+      # http://p.twpl.jp/show/orig/myRVs
+      when %r{\Ahttp://p\.twpl\.jp/show/(?:large|orig)/([a-z0-9]+)}i
         "http://p.twipple.jp/#{$1}"
 
       when %r{\Ahttps?://pictures\.hentai-foundry\.com//?[^/]/([^/]+)/(\d+)}i
