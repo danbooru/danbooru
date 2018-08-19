@@ -521,6 +521,11 @@ class Post < ApplicationRecord
           source
         end
 
+      # http://art59.photozou.jp/pub/212/1986212/photo/118493247_org.v1534644005.jpg
+      # http://kura3.photozou.jp/pub/794/1481794/photo/161537258_org.v1364829097.jpg
+      when %r{\Ahttps?://\w+\.photozou\.jp/pub/\d+/(?<artist_id>\d+)/photo/(?<photo_id>\d+)_.*$}i
+        "https://photozou.jp/photo/show/#{$~[:artist_id]}/#{$~[:photo_id]}"
+
       else
         source
       end
