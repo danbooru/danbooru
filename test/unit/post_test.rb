@@ -1505,38 +1505,38 @@ class PostTest < ActiveSupport::TestCase
 
         should "normalize pixiv links" do
           @post.source = "http://i2.pixiv.net/img12/img/zenze/39749565.png"
-          assert_equal("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=39749565", @post.normalized_source)
+          assert_equal("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=39749565", @post.normalized_source)
 
           @post.source = "http://i1.pixiv.net/img53/img/themare/39735353_big_p1.jpg"
-          assert_equal("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=39735353", @post.normalized_source)
+          assert_equal("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=39735353", @post.normalized_source)
 
           @post.source = "http://i1.pixiv.net/c/150x150/img-master/img/2010/11/30/08/39/58/14901720_p0_master1200.jpg"
-          assert_equal("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=14901720", @post.normalized_source)
+          assert_equal("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=14901720", @post.normalized_source)
 
           @post.source = "http://i1.pixiv.net/img-original/img/2010/11/30/08/39/58/14901720_p0.png"
-          assert_equal("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=14901720", @post.normalized_source)
+          assert_equal("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=14901720", @post.normalized_source)
 
           @post.source = "http://i2.pixiv.net/img-zip-ugoira/img/2014/08/05/06/01/10/44524589_ugoira1920x1080.zip"
-          assert_equal("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=44524589", @post.normalized_source)
+          assert_equal("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=44524589", @post.normalized_source)
         end
 
         should "normalize nicoseiga links" do
           @post.source = "http://lohas.nicoseiga.jp/priv/3521156?e=1382558156&h=f2e089256abd1d453a455ec8f317a6c703e2cedf"
-          assert_equal("http://seiga.nicovideo.jp/seiga/im3521156", @post.normalized_source)
+          assert_equal("https://seiga.nicovideo.jp/seiga/im3521156", @post.normalized_source)
           @post.source = "http://lohas.nicoseiga.jp/priv/b80f86c0d8591b217e7513a9e175e94e00f3c7a1/1384936074/3583893"
-          assert_equal("http://seiga.nicovideo.jp/seiga/im3583893", @post.normalized_source)
+          assert_equal("https://seiga.nicovideo.jp/seiga/im3583893", @post.normalized_source)
         end
 
         should "normalize twitpic links" do
           @post.source = "http://d3j5vwomefv46c.cloudfront.net/photos/large/820960031.jpg?1384107199"
-          assert_equal("http://twitpic.com/dks0tb", @post.normalized_source)
+          assert_equal("https://twitpic.com/dks0tb", @post.normalized_source)
         end
 
         should "normalize deviantart links" do
           @post.source = "http://fc06.deviantart.net/fs71/f/2013/295/d/7/you_are_already_dead__by_mar11co-d6rgm0e.jpg"
-          assert_equal("http://mar11co.deviantart.com/art/You-Are-Already-Dead-408921710", @post.normalized_source)
+          assert_equal("https://mar11co.deviantart.com/art/You-Are-Already-Dead-408921710", @post.normalized_source)
           @post.source = "http://fc00.deviantart.net/fs71/f/2013/337/3/5/35081351f62b432f84eaeddeb4693caf-d6wlrqs.jpg"
-          assert_equal("http://deviantart.com/deviation/417560500", @post.normalized_source)
+          assert_equal("https://deviantart.com/deviation/417560500", @post.normalized_source)
         end
 
         should "normalize karabako links" do
@@ -1551,10 +1551,10 @@ class PostTest < ActiveSupport::TestCase
 
         should "normalize hentai foundry links" do
           @post.source = "http://pictures.hentai-foundry.com//a/AnimeFlux/219123.jpg"
-          assert_equal("http://www.hentai-foundry.com/pictures/user/AnimeFlux/219123", @post.normalized_source)
+          assert_equal("https://www.hentai-foundry.com/pictures/user/AnimeFlux/219123", @post.normalized_source)
 
           @post.source = "http://pictures.hentai-foundry.com/a/AnimeFlux/219123/Mobile-Suit-Equestria-rainbow-run.jpg"
-          assert_equal("http://www.hentai-foundry.com/pictures/user/AnimeFlux/219123", @post.normalized_source)
+          assert_equal("https://www.hentai-foundry.com/pictures/user/AnimeFlux/219123", @post.normalized_source)
         end
       end
 
