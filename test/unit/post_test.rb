@@ -68,7 +68,6 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "decrement the user's favorite count" do
-        @post.add_favorite!(@post.uploader)
         assert_difference(["@post.uploader.reload.favorite_count"], -1) do
           @post.expunge!
         end
@@ -1720,13 +1719,13 @@ class PostTest < ActiveSupport::TestCase
         assert_equal(0, @post.score)
       end
 
-      should "update the fav strings ont he post" do
+      should "update the fav strings on the post" do
         @post.add_favorite!(@user)
         @post.reload
         assert_equal("fav:#{@user.id}", @post.fav_string)
         assert(Favorite.exists?(:user_id => @user.id, :post_id => @post.id))
 
-        @post.add_favorite!(@user)
+        assert_raises(Favorite::Error) { @post.add_favorite!(@user) }
         @post.reload
         assert_equal("fav:#{@user.id}", @post.fav_string)
         assert(Favorite.exists?(:user_id => @user.id, :post_id => @post.id))

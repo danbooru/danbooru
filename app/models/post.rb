@@ -966,6 +966,13 @@ class Post < ApplicationRecord
       clean_fav_string! if clean_fav_string?
     end
 
+    def add_favorite(user)
+      add_favorite!(user)
+      true
+    rescue Favorite::Error
+      false
+    end
+
     def add_favorite!(user)
       Favorite.add(post: self, user: user)
       vote!("up", user) if user.is_voter?
@@ -1295,7 +1302,7 @@ class Post < ApplicationRecord
       transaction do
         favorites.each do |fav|
           remove_favorite!(fav.user)
-          parent.add_favorite!(fav.user)
+          parent.add_favorite(fav.user)
         end
       end
 
