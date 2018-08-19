@@ -362,21 +362,21 @@ class Post < ApplicationRecord
       case source
       when %r{\Ahttps?://img\d+\.pixiv\.net/img/[^\/]+/(\d+)}i, 
            %r{\Ahttps?://i\d\.pixiv\.net/img\d+/img/[^\/]+/(\d+)}i
-        "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
+        "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
 
       when %r{\Ahttps?://(?:i\d+\.pixiv\.net|i\.pximg\.net)/img-(?:master|original)/img/(?:\d+\/)+(\d+)_p}i,
            %r{\Ahttps?://(?:i\d+\.pixiv\.net|i\.pximg\.net)/c/\d+x\d+/img-master/img/(?:\d+\/)+(\d+)_p}i,
            %r{\Ahttps?://(?:i\d+\.pixiv\.net|i\.pximg\.net)/img-zip-ugoira/img/(?:\d+\/)+(\d+)_ugoira\d+x\d+\.zip}i
-        "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
+        "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
 
       when %r{\Ahttps?://lohas\.nicoseiga\.jp/priv/(\d+)\?e=\d+&h=[a-f0-9]+}i, 
            %r{\Ahttps?://lohas\.nicoseiga\.jp/priv/[a-f0-9]+/\d+/(\d+)}i
-        "http://seiga.nicovideo.jp/seiga/im#{$1}"
+        "https://seiga.nicovideo.jp/seiga/im#{$1}"
 
       when %r{\Ahttps?://(?:d3j5vwomefv46c|dn3pm25xmtlyu)\.cloudfront\.net/photos/large/(\d+)\.}i
         base_10_id = $1.to_i
         base_36_id = base_10_id.to_s(36)
-        "http://twitpic.com/#{base_36_id}"
+        "https://twitpic.com/#{base_36_id}"
 
       # http://orig12.deviantart.net/9b69/f/2017/023/7/c/illustration___tokyo_encount_oei__by_melisaongmiqin-dawi58s.png
       # http://pre15.deviantart.net/81de/th/pre/f/2015/063/5/f/inha_by_inhaestudios-d8kfzm5.jpg
@@ -390,7 +390,7 @@ class Post < ApplicationRecord
         artist = $~[:artist].dasherize
         title = $~[:title].titleize.strip.squeeze(" ").tr(" ", "-")
         id = $~[:id].to_i(36)
-        "http://#{artist}.deviantart.com/art/#{title}-#{id}"
+        "https://#{artist}.deviantart.com/art/#{title}-#{id}"
 
       # http://prnt00.deviantart.net/9b74/b/2016/101/4/468a9d89f52a835d4f6f1c8caca0dfb2-pnjfbh.jpg
       # http://fc00.deviantart.net/fs71/f/2013/234/d/8/d84e05f26f0695b1153e9dab3a962f16-d6j8jl9.jpg
@@ -398,7 +398,7 @@ class Post < ApplicationRecord
       # http://fc09.deviantart.net/fs22/o/2009/197/3/7/37ac79eaeef9fb32e6ae998e9a77d8dd.jpg
       when %r{\Ahttps?://(?:fc|th|pre|orig|img|prnt)\d{2}\.deviantart\.net/.+/[a-f0-9]{32}-d(?<id>[a-z0-9]+)\.}i
         id = $~[:id].to_i(36)
-        "http://deviantart.com/deviation/#{id}"
+        "https://deviantart.com/deviation/#{id}"
 
       when %r{\Ahttp://www\.karabako\.net/images(?:ub)?/karabako_(\d+)(?:_\d+)?\.}i
         "http://www.karabako.net/post/view/#{$1}"
@@ -407,7 +407,7 @@ class Post < ApplicationRecord
         "http://p.twipple.jp/#{$1}"
 
       when %r{\Ahttps?://pictures\.hentai-foundry\.com//?[^/]/([^/]+)/(\d+)}i
-        "http://www.hentai-foundry.com/pictures/user/#{$1}/#{$2}"
+        "https://www.hentai-foundry.com/pictures/user/#{$1}/#{$2}"
 
       when %r{\Ahttp://blog(?:(?:-imgs-)?\d*(?:-origin)?)?\.fc2\.com/(?:(?:[^/]/){3}|(?:[^/]/))([^/]+)/(?:file/)?([^\.]+\.[^\?]+)}i
         username = $1
@@ -426,16 +426,16 @@ class Post < ApplicationRecord
         "https://www.facebook.com/photo.php?fbid=#{$1}"
 
       when %r{\Ahttps?://c(?:s|han|[1-4])\.sankakucomplex\.com/data(?:/sample)?/(?:[a-f0-9]{2}/){2}(?:sample-|preview)?([a-f0-9]{32})}i
-        "http://chan.sankakucomplex.com/en/post/show?md5=#{$1}"
+        "https://chan.sankakucomplex.com/en/post/show?md5=#{$1}"
 
       when %r{\Ahttp://s(?:tatic|[1-4])\.zerochan\.net/.+(?:\.|\/)(\d+)\.(?:jpe?g?)\z}i
-        "http://www.zerochan.net/#{$1}#full"
+        "https://www.zerochan.net/#{$1}#full"
 
       when %r{\Ahttp://static[1-6]?\.minitokyo\.net/(?:downloads|view)/(?:\d{2}/){2}(\d+)}i
         "http://gallery.minitokyo.net/download/#{$1}"
 
       when %r{\Ahttp://(?:(?:s?img|cdn|www)\d?\.)?gelbooru\.com/{1,2}(?:images|samples)/\d+/(?:sample_)?(?:[a-f0-9]{32}|[a-f0-9]{40})\.}i
-        "http://gelbooru.com/index.php?page=post&s=list&md5=#{md5}"
+        "https://gelbooru.com/index.php?page=post&s=list&md5=#{md5}"
 
       when %r{\Ahttps?://(?:slot\d*\.)?im(?:g|ages)\d*\.wikia\.(?:nocookie\.net|com)/(?:_{2}cb\d{14}/)?([^/]+)(?:/[a-z]{2})?/images/(?:(?:thumb|archive)?/)?[a-f0-9]/[a-f0-9]{2}/(?:\d{14}(?:!|%21))?([^/]+)}i
         subdomain = $1
@@ -462,30 +462,31 @@ class Post < ApplicationRecord
         "http://doujinantena.com/page.php?id=#{$1}"
 
       when %r{\Ahttp://rule34-(?:data-\d{3}|images)\.paheal\.net/(?:_images/)?([a-f0-9]{32})}i
-        "http://rule34.paheal.net/post/list/md5:#{$1}/1"
+        "https://rule34.paheal.net/post/list/md5:#{$1}/1"
         
       when %r{\Ahttp://shimmie\.katawa-shoujo\.com/image/(\d+)}i
-        "http://shimmie.katawa-shoujo.com/post/view/#{$1}"
+        "https://shimmie.katawa-shoujo.com/post/view/#{$1}"
         
       when %r{\Ahttp://(?:(?:(?:img\d?|cdn)\.)?rule34\.xxx|img\.booru\.org/(?:rule34|r34))(?:/(?:img/rule34|r34))?/{1,2}images/\d+/(?:[a-f0-9]{32}|[a-f0-9]{40})\.}i
-        "http://rule34.xxx/index.php?page=post&s=list&md5=#{md5}"
+        "https://rule34.xxx/index.php?page=post&s=list&md5=#{md5}"
         
       when %r{\Ahttps?://(?:s3\.amazonaws\.com/imgly_production|img\.ly/system/uploads)/((?:\d{3}/){3}|\d+/)}i
         imgly_id = $1
         imgly_id = imgly_id.gsub(/[^0-9]/, '')
         base_62 = imgly_id.to_i.encode62
-        "http://img.ly/#{base_62}"
+        "https://img.ly/#{base_62}"
         
       when %r{(\Ahttp://.+)/diarypro/d(?:ata/upfile/|iary\.cgi\?mode=image&upfile=)(\d+)}i
         base_url = $1
         entry_no = $2
         "#{base_url}/diarypro/diary.cgi?no=#{entry_no}"
         
+      # XXX site is defunct
       when %r{\Ahttp://i(?:\d)?\.minus\.com/(?:i|j)([^\.]{12,})}i
         "http://minus.com/i/#{$1}"
         
       when %r{\Ahttps?://pic0[1-4]\.nijie\.info/nijie_picture/(?:diff/main/)?\d+_(\d+)_(?:\d+{10}|\d+_\d+{14})}i
-        "http://nijie.info/view.php?id=#{$1}"
+        "https://nijie.info/view.php?id=#{$1}"
 
       # http://ayase.yande.re/image/2d0d229fd8465a325ee7686fcc7f75d2/yande.re%20192481%20animal_ears%20bunny_ears%20garter_belt%20headphones%20mitha%20stockings%20thighhighs.jpg
       # https://yuno.yande.re/image/1764b95ae99e1562854791c232e3444b/yande.re%20281544%20cameltoe%20erect_nipples%20fundoshi%20horns%20loli%20miyama-zero%20sarashi%20sling_bikini%20swimsuits.jpg
