@@ -58,7 +58,7 @@ module Sources::Strategies
 
       desc = artist_commentary_desc
       desc = CGI::unescapeHTML(desc)
-      desc = desc.gsub(%r!https?://t\.co/[^[:space:]]+!i, url_replacements)
+      desc = desc.gsub(%r!https?://t\.co/[a-zA-Z0-9]+!i, url_replacements)
       desc = desc.gsub(%r!#([^[:space:]]+)!, '"#\\1":[https://twitter.com/hashtag/\\1]')
       desc = desc.gsub(%r!@([a-zA-Z0-9_]+)!, '"@\\1":[https://twitter.com/\\1]')
       desc.strip
