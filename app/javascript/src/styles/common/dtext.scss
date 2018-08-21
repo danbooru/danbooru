@@ -79,6 +79,7 @@ div.prose {
   }
 
   div.expandable-content {
+    display: none;
     padding: 0.4em;
     border-top: 1px solid #666;
 
@@ -89,6 +90,8 @@ div.prose {
 }
 
 div.dtext-preview {
+  display: none;
+
   ul {
     margin-left: 1em;
   }

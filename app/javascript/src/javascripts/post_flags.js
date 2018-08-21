@@ -1,17 +1,8 @@
-import Utility from './utility'
-
 let PostFlag = {};
 
 PostFlag.initialize_all = function() {
   if ($("#c-posts").length && $("#a-show").length) {
     this.initialize_flag();
-    this.hide_or_show_flag_link();
-  }
-}
-
-PostFlag.hide_or_show_flag_link = function() {
-  if (Utility.meta("post-is-deleted") === "true") {
-    $("#flag").hide();
   }
 }
 

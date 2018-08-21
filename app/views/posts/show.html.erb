@@ -48,10 +48,12 @@
         <%= @post.presenter.image_html(self) %>
       </section>
 
-      <div class="fav-buttons">
-        <%= button_to "Favorite", favorites_path(post_id: @post.id), remote: true, method: :post, form: {id: "add-fav-button"}, class: "ui-button ui-widget ui-corner-all gradient", data: {disable_with: "Favoriting..."} %>
-        <%= button_to "Unfavorite", favorite_path(@post), remote: true, method: :delete, form: {id: "remove-fav-button"}, class: "ui-button ui-widget ui-corner-all gradient", data: {disable_with: "Unfavoriting..."} %>
-      </div>
+      <% if CurrentUser.is_member? %>
+        <div class="fav-buttons">
+          <%= button_to "Favorite", favorites_path(post_id: @post.id), remote: true, method: :post, form: {id: "add-fav-button", style: ("display: none;" if @post.is_favorited?)}, class: "ui-button ui-widget ui-corner-all gradient", data: {disable_with: "Favoriting..."} %>
+          <%= button_to "Unfavorite", favorite_path(@post), remote: true, method: :delete, form: {id: "remove-fav-button", style: ("display: none;" if !@post.is_favorited?)}, class: "ui-button ui-widget ui-corner-all gradient", data: {disable_with: "Unfavoriting..."} %>
+        </div>
+      <% end %>
 
       <section id="mark-as-translated-section" style="display: none;">
         <%= form_tag(mark_as_translated_post_path(@post), :class => "simple_form", :method => :put) do |f| %>
@@ -87,7 +89,7 @@
       <% end %>
 
       <menu id="post-sections">
-        <li><a href="#comments">Comments</a></li>
+        <li class="active"><a href="#comments">Comments</a></li>
 
         <% if RecommenderService.available_for_post?(@post) %>
           <li><a href="#recommended">Recommended</a></li>
@@ -101,7 +103,7 @@
       </menu>
 
       <% if RecommenderService.available_for_post?(@post) %>
-        <section id="recommended">
+        <section id="recommended" style="display: none;">
           <p><em>Loading...</em></p>
         </section>
       <% end %>
@@ -166,15 +168,7 @@
 
 <% content_for(:html_header) do %>
   <meta name="description" content="<%= @post.presenter.humanized_tag_string %>">
-  <meta name="tags" content="<%= @post.tag_string %>">
-  <meta name="pools" content="<%= @post.pool_string %>">
   <meta name="post-id" content="<%= @post.id %>">
-  <% if CurrentUser.can_approve_posts? %>
-    <meta name="post-is-approvable" content="<%= @post.is_approvable? %>">
-  <% end %>
-  <meta name="post-is-deleted" content="<%= @post.is_deleted? %>">
-  <meta name="post-is-flagged" content="<%= @post.is_flagged? %>">
-  <meta name="config-large-width" content="<%= Danbooru.config.large_image_width %>">
   <meta name="post-has-embedded-notes" content="<%= @post.has_embedded_notes? %>">
   <meta name="always-resize-images" content="<%= CurrentUser.user.always_resize_images? %>">
   <meta property="og:title" content="<%= @post.presenter.humanized_essential_tag_string %> - <%= Danbooru.config.app_name %>">

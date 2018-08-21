@@ -273,8 +273,6 @@ Post.initialize_links = function() {
 
     e.preventDefault();
   });
-
-  $(".unvote-post-link").hide();
 }
 
 Post.initialize_post_relationship_previews = function() {
@@ -309,24 +307,8 @@ Post.toggle_relationship_preview = function(preview, preview_link) {
 }
 
 Post.initialize_favlist = function() {
-  $("#favlist").hide();
-  $("#hide-favlist-link").hide();
-  var fav_count = $("#show-favlist-link").prev().text();
-  if (fav_count === "0") {
-    $("#show-favlist-link").hide();
-  }
-
-  $("#show-favlist-link").click(function(e) {
-    $("#favlist").show();
-    $(this).hide();
-    $("#hide-favlist-link").show();
-    e.preventDefault();
-  });
-
-  $("#hide-favlist-link").click(function(e) {
-    $("#favlist").hide();
-    $(this).hide();
-    $("#show-favlist-link").show();
+  $("#show-favlist-link, #hide-favlist-link").click(function(e) {
+    $("#favlist, #show-favlist-link, #hide-favlist-link").toggle();
     e.preventDefault();
   });
 }
@@ -481,11 +463,6 @@ Post.initialize_post_sections = function() {
     $(e.target).parent("li").addClass("active");
     e.preventDefault();
   });
-
-  $("#notes").hide();
-  $("#edit").hide();
-  $("#recommended").hide();
-  $("#post-sections li:first-child").addClass("active");
 }
 
 Post.resize_ugoira_controls = function() {

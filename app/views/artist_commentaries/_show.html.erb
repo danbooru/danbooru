@@ -3,7 +3,7 @@
 <menu id="commentary-sections">
   <% if artist_commentary.original_present? && artist_commentary.translated_present? %>
     <li><a href="#original">Original</a></li> |
-    <li><a href="#translated">Translated</a></li>
+    <li class="active"><a href="#translated">Translated</a></li>
   <% elsif artist_commentary.original_present? %>
     <li><b>Original</b></li>
   <% elsif artist_commentary.translated_present? %>
@@ -12,12 +12,12 @@
 </menu>
 
 <% if artist_commentary.original_present? %>
-  <section id="original-artist-commentary">
+  <%= tag.section id: "original-artist-commentary", style: ("display: none" if artist_commentary.translated_present?) do %>
     <h3><%= artist_commentary.original_title %></h3>
     <div class="prose">
       <%= format_text(artist_commentary.original_description, :disable_mentions => true) %>
     </div>
-  </section>
+  <% end %>
 <% end %>
 
 <% if artist_commentary.translated_present? %>

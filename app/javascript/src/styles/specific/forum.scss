@@ -43,6 +43,10 @@ div.list-of-forum-posts {
       padding: 1em;
       margin-left: 14em;
 
+      .edit_forum_post, .edit_forum_topic {
+        display: none;
+      }
+
       menu {
         margin-top: 0.5em;
 

@@ -1,17 +1,8 @@
-import Utility from './utility'
-
 let PostAppeal = {};
 
 PostAppeal.initialize_all = function() {
   if ($("#c-posts").length && $("#a-show").length) {
     this.initialize_appeal();
-    this.hide_or_show_appeal_link();
-  }
-}
-
-PostAppeal.hide_or_show_appeal_link = function() {
-  if ((Utility.meta("post-is-flagged") === "false") && (Utility.meta("post-is-deleted") === "false")) {
-    $("#appeal").hide();
   }
 }
 
