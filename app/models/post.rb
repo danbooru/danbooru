@@ -532,6 +532,13 @@ class Post < ApplicationRecord
       when %r{\Ahttps?://\w+\.photozou\.jp/pub/\d+/(?<artist_id>\d+)/photo/(?<photo_id>\d+)_.*$}i
         "https://photozou.jp/photo/show/#{$~[:artist_id]}/#{$~[:photo_id]}"
 
+      # http://img.toranoana.jp/popup_img/04/0030/09/76/040030097695-2p.jpg
+      # http://img.toranoana.jp/popup_img18/04/0010/22/87/040010228714-1p.jpg
+      # http://img.toranoana.jp/popup_blimg/04/0030/08/30/040030083068-1p.jpg
+      # https://ecdnimg.toranoana.jp/ec/img/04/0030/65/34/040030653417-6p.jpg
+      when %r{\Ahttps?://(\w+\.)?toranoana\.jp/(?:popup_(?:bl)?img\d*|ec/img)/\d{2}/\d{4}/\d{2}/\d{2}/(?<work_id>\d+)}i
+        "https://ec.toranoana.jp/tora_r/ec/item/#{$~[:work_id]}/"
+
       else
         source
       end
