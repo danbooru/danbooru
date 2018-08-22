@@ -2223,19 +2223,30 @@ class PostTest < ActiveSupport::TestCase
       post = FactoryBot.create(:post, :source => url)
       assert_tag_match([post], "pixiv_id:789")
     end
-    
+
     should "return posts for a pixiv id search (type 3)" do
       url = "http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=19113635&page=0"
       post = FactoryBot.create(:post, :source => url)
       assert_tag_match([post], "pixiv_id:19113635")
     end
-    
+
     should "return posts for a pixiv id search (type 4)" do
       url = "http://i2.pixiv.net/img70/img/disappearedstump/34551381_p3.jpg?1364424318"
       post = FactoryBot.create(:post, :source => url)
       assert_tag_match([post], "pixiv_id:34551381")
     end
-    
+
+    should "return posts for a pixiv_id:any search" do
+      url = "http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p0.png"
+      post = FactoryBot.create(:post, source: url)
+      assert_tag_match([post], "pixiv_id:any")
+    end
+
+    should "return posts for a pixiv_id:none search" do
+      post = FactoryBot.create(:post)
+      assert_tag_match([post], "pixiv_id:none")
+    end
+
     # should "return posts for a pixiv novel id search" do
     #   url = "http://www.pixiv.net/novel/show.php?id=2156088"
     #   post = FactoryBot.create(:post, :source => url)

@@ -763,7 +763,11 @@ class Tag < ApplicationRecord
             q[:filetype_neg] = g2.downcase
 
           when "pixiv_id", "pixiv"
-            q[:pixiv_id] = parse_helper(g2)
+            if g2.downcase == "any" || g2.downcase == "none"
+              q[:pixiv_id] = g2.downcase
+            else
+              q[:pixiv_id] = parse_helper(g2)
+            end
 
           when "upvote"
             if CurrentUser.user.is_moderator?
