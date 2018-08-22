@@ -77,7 +77,7 @@ class PostQueryBuilder
         end
 
         post_ids = [0] if post_ids.empty?
-        relation = relation.where(["posts.id IN (?)", post_ids])
+        relation = relation.where("posts.id": post_ids)
       end
     end
 
@@ -124,7 +124,7 @@ class PostQueryBuilder
     relation = add_range_relation(q[:post_tag_count], "posts.tag_count", relation)
 
     if q[:md5]
-      relation = relation.where(["posts.md5 IN (?)", q[:md5]])
+      relation = relation.where("posts.md5": q[:md5])
     end
 
     if q[:status] == "pending"
@@ -201,15 +201,15 @@ class PostQueryBuilder
     end
 
     if q[:uploader_id_neg]
-      relation = relation.where("posts.uploader_id not in (?)", q[:uploader_id_neg])
+      relation = relation.where.not("posts.uploader_id": q[:uploader_id_neg])
     end
 
     if q[:uploader_id]
-      relation = relation.where("posts.uploader_id = ?", q[:uploader_id])
+      relation = relation.where("posts.uploader_id": q[:uploader_id])
     end
 
     if q[:approver_id_neg]
-      relation = relation.where("posts.approver_id not in (?)", q[:approver_id_neg])
+      relation = relation.where.not("posts.approver_id": q[:approver_id_neg])
     end
 
     if q[:approver_id]
@@ -218,7 +218,7 @@ class PostQueryBuilder
       elsif q[:approver_id] == "none"
         relation = relation.where("posts.approver_id is null")
       else
-        relation = relation.where("posts.approver_id = ?", q[:approver_id])
+        relation = relation.where("posts.approver_id": q[:approver_id])
       end
     end
 
@@ -227,7 +227,7 @@ class PostQueryBuilder
         if CurrentUser.can_view_flagger?(flagger_id)
           post_ids = PostFlag.unscoped.search({:creator_id => flagger_id, :category => "normal"}).reorder("").select {|flag| flag.not_uploaded_by?(CurrentUser.id)}.map {|flag| flag.post_id}.uniq
           if post_ids.any?
-            relation = relation.where("posts.id NOT IN (?)", post_ids)
+            relation = relation.where.not("posts.id": post_ids)
           end
         end
       end
@@ -241,14 +241,14 @@ class PostQueryBuilder
           relation = relation.where('NOT EXISTS (' + PostFlag.unscoped.search({:category => "normal"}).where('post_id = posts.id').reorder('').select('1').to_sql + ')')
         elsif CurrentUser.can_view_flagger?(flagger_id)
           post_ids = PostFlag.unscoped.search({:creator_id => flagger_id, :category => "normal"}).reorder("").select {|flag| flag.not_uploaded_by?(CurrentUser.id)}.map {|flag| flag.post_id}.uniq
-          relation = relation.where("posts.id IN (?)", post_ids)
+          relation = relation.where("posts.id": post_ids)
         end
       end
     end
 
     if q[:appealer_ids_neg]
       q[:appealer_ids_neg].each do |appealer_id|
-        relation = relation.where("posts.id NOT IN (?)", PostAppeal.unscoped.where(creator_id: appealer_id).select(:post_id).distinct)
+        relation = relation.where.not("posts.id":  PostAppeal.unscoped.where(creator_id: appealer_id).select(:post_id).distinct)
       end
     end
 
@@ -259,7 +259,7 @@ class PostQueryBuilder
         elsif appealer_id == "none"
           relation = relation.where('NOT EXISTS (' + PostAppeal.unscoped.where('post_id = posts.id').select('1').to_sql + ')')
         else
-          relation = relation.where("posts.id IN (?)", PostAppeal.unscoped.where(creator_id: appealer_id).select(:post_id).distinct)
+          relation = relation.where("posts.id": PostAppeal.unscoped.where(creator_id: appealer_id).select(:post_id).distinct)
         end
       end
     end
@@ -271,7 +271,7 @@ class PostQueryBuilder
         elsif commenter_id == "none"
           relation = relation.where("posts.last_commented_at is null")
         else
-          relation = relation.where("posts.id":  Comment.unscoped.where(creator_id: commenter_id).select(:post_id).distinct)
+          relation = relation.where("posts.id": Comment.unscoped.where(creator_id: commenter_id).select(:post_id).distinct)
         end
       end
     end
@@ -290,13 +290,13 @@ class PostQueryBuilder
 
     if q[:note_updater_ids]
       q[:note_updater_ids].each do |note_updater_id|
-        relation = relation.where("posts.id IN (?)", NoteVersion.unscoped.where("updater_id = ?", note_updater_id).select("post_id").distinct)
+        relation = relation.where("posts.id": NoteVersion.unscoped.where(updater_id: note_updater_id).select("post_id").distinct)
       end
     end
 
     if q[:artcomm_ids]
       q[:artcomm_ids].each do |artcomm_id|
-        relation = relation.where("posts.id IN (?)", ArtistCommentaryVersion.unscoped.where("updater_id = ?", artcomm_id).select("post_id").distinct)
+        relation = relation.where("posts.id": ArtistCommentaryVersion.unscoped.where(updater_id: artcomm_id).select("post_id").distinct)
       end
     end
 
@@ -380,7 +380,7 @@ class PostQueryBuilder
         favgroup_id = favgroup_rec.to_i
         favgroup = FavoriteGroup.where("favorite_groups.id = ?", favgroup_id).first
         if favgroup
-          relation = relation.where("posts.id NOT in (?)", favgroup.post_id_array)
+          relation = relation.where.not("posts.id": favgroup.post_id_array)
         end
       end
     end
@@ -390,7 +390,7 @@ class PostQueryBuilder
         favgroup_id = favgroup_rec.to_i
         favgroup = FavoriteGroup.where("favorite_groups.id = ?", favgroup_id).first
         if favgroup
-          relation = relation.where("posts.id in (?)", favgroup.post_id_array)
+          relation = relation.where("posts.id": favgroup.post_id_array)
         end
       end
     end
@@ -398,13 +398,13 @@ class PostQueryBuilder
     if q[:upvote].present?
       user_id = q[:upvote]
       post_ids = PostVote.where(:user_id => user_id).where("score > 0").limit(400).pluck(:post_id)
-      relation = relation.where("posts.id in (?)", post_ids)
+      relation = relation.where("posts.id": post_ids)
     end
 
     if q[:downvote].present?
       user_id = q[:downvote]
       post_ids = PostVote.where(:user_id => user_id).where("score < 0").limit(400).pluck(:post_id)
-      relation = relation.where("posts.id in (?)", post_ids)
+      relation = relation.where("posts.id": post_ids)
     end
 
     if q[:ordfav].present?
