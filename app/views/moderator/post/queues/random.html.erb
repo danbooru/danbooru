@@ -12,6 +12,8 @@
 
       </div>
 
+      <%= render "posts/partials/common/inline_blacklist" %>
+
       <% @posts.each do |post| %>
         <%= render "post", post: post %>
       <% end %>
