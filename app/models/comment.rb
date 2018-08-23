@@ -64,7 +64,7 @@ class Comment < ApplicationRecord
     end
 
     def for_creator(user_id)
-      user_id.present? ? where("creator_id = ?", user_id) : where("false")
+      user_id.present? ? where("creator_id = ?", user_id) : none
     end
 
     def for_creator_name(user_name)

@@ -14,7 +14,7 @@ module PostSets
         query
       end
     rescue ::Post::SearchError
-      ::Post.where("false")
+      ::Post.none
     end
 
     def presenter

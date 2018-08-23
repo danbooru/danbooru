@@ -76,7 +76,7 @@ class PostFlag < ApplicationRecord
           q = q.where.not(post_id: CurrentUser.user.posts)
           q = q.where("creator_id = ?", params[:creator_id].to_i)
         else
-          q = q.where("false")
+          q = q.none
         end
       end
 
@@ -86,7 +86,7 @@ class PostFlag < ApplicationRecord
           q = q.where.not(post_id: CurrentUser.user.posts)
           q = q.where("creator_id = ?", flagger_id)
         else
-          q = q.where("false")
+          q = q.none
         end
       end
 

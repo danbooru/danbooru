@@ -22,7 +22,7 @@ class PostArchive < ApplicationRecord
       if user_id
         where("updater_id = ?", user_id)
       else
-        where("false")
+        none
       end
     end
 
