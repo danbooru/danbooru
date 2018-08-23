@@ -16,10 +16,6 @@ class PostDisapproval < ApplicationRecord
     self.user_id ||= CurrentUser.user.id
   end
 
-  def initialize_attributes
-    self.user_id ||= CurrentUser.user.id
-  end
-
   def self.prune!
     PostDisapproval.where("post_id in (select _.post_id from post_disapprovals _ where _.created_at < ?)", DELETION_THRESHOLD.ago).delete_all
   end
