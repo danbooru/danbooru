@@ -1,4 +1,3 @@
-import Utility from './utility'
 import Dtext from './dtext'
 
 let Comment = {};
