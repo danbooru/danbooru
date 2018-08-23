@@ -2308,6 +2308,24 @@ class PostTest < ActiveSupport::TestCase
       end
     end
 
+    should "return posts for a disapproval:<type> metatag" do
+      CurrentUser.scoped(FactoryBot.create(:mod_user)) do
+        pending     = FactoryBot.create(:post, is_pending: true)
+        disapproved = FactoryBot.create(:post, is_pending: true)
+        disapproval = FactoryBot.create(:post_disapproval, post: disapproved, reason: "disinterest")
+
+        assert_tag_match([pending],     "disapproval:none")
+        assert_tag_match([disapproved], "disapproval:any")
+        assert_tag_match([disapproved], "disapproval:disinterest")
+        assert_tag_match([],            "disapproval:breaks_rules")
+
+        assert_tag_match([disapproved],          "-disapproval:none")
+        assert_tag_match([pending],              "-disapproval:any")
+        assert_tag_match([pending],              "-disapproval:disinterest")
+        assert_tag_match([disapproved, pending], "-disapproval:breaks_rules")
+      end
+    end
+
     should "return posts ordered by a particular attribute" do
       posts = (1..2).map do |n|
         tags = ["tagme", "gentag1 gentag2 artist:arttag char:chartag copy:copytag"]

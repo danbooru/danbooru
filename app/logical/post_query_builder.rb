@@ -222,6 +222,34 @@ class PostQueryBuilder
       end
     end
 
+    if q[:disapproval]
+      q[:disapproval].each do |disapproval|
+        disapprovals = CurrentUser.user.post_disapprovals.select(:post_id)
+
+        if disapproval.in?(%w[none false])
+          relation = relation.where.not("posts.id": disapprovals)
+        elsif disapproval.in?(%w[any all true])
+          relation = relation.where("posts.id": disapprovals)
+        else
+          relation = relation.where("posts.id": disapprovals.where(reason: disapproval))
+        end
+      end
+    end
+
+    if q[:disapproval_neg]
+      q[:disapproval_neg].each do |disapproval|
+        disapprovals = CurrentUser.user.post_disapprovals.select(:post_id)
+
+        if disapproval.in?(%w[none false])
+          relation = relation.where("posts.id": disapprovals)
+        elsif disapproval.in?(%w[any all true])
+          relation = relation.where.not("posts.id": disapprovals)
+        else
+          relation = relation.where.not("posts.id": disapprovals.where(reason: disapproval))
+        end
+      end
+    end
+
     if q[:flagger_ids_neg]
       q[:flagger_ids_neg].each do |flagger_id|
         if CurrentUser.can_view_flagger?(flagger_id)
