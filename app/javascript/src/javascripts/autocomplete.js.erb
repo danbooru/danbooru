@@ -399,7 +399,7 @@ Autocomplete.static_metatags = {
     "custom"
   ].concat(<%= TagCategory.short_name_list.map {|category| [category + "tags", category + "tags_asc"]}.flatten %>),
   status: [
-    "any", "deleted", "active", "pending", "flagged", "banned"
+    "any", "deleted", "active", "pending", "flagged", "banned", "modqueue", "unmoderated"
   ],
   rating: [
     "safe", "questionable", "explicit"

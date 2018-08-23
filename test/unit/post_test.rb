@@ -2130,6 +2130,7 @@ class PostTest < ActiveSupport::TestCase
       banned  = FactoryBot.create(:post, is_banned: true)
       all = [banned, deleted, flagged, pending]
 
+      assert_tag_match([flagged, pending], "status:modqueue")
       assert_tag_match([pending], "status:pending")
       assert_tag_match([flagged], "status:flagged")
       assert_tag_match([deleted], "status:deleted")
@@ -2138,11 +2139,23 @@ class PostTest < ActiveSupport::TestCase
       assert_tag_match(all, "status:any")
       assert_tag_match(all, "status:all")
 
+      assert_tag_match(all - [flagged, pending], "-status:modqueue")
       assert_tag_match(all - [pending], "-status:pending")
       assert_tag_match(all - [flagged], "-status:flagged")
       assert_tag_match(all - [deleted], "-status:deleted")
       assert_tag_match(all - [banned],  "-status:banned")
       assert_tag_match(all, "-status:active")
+    end
+
+    should "return posts for the status:unmoderated metatag" do
+      flagged = FactoryBot.create(:post, is_flagged: true)
+      pending = FactoryBot.create(:post, is_pending: true)
+      disapproved = FactoryBot.create(:post, is_pending: true)
+
+      FactoryBot.create(:post_flag, post: flagged)
+      FactoryBot.create(:post_disapproval, post: disapproved, reason: "disinterest")
+
+      assert_tag_match([pending, flagged], "status:unmoderated")
     end
 
     should "respect the 'Deleted post filter' option when using the status:banned metatag" do

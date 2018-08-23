@@ -1645,7 +1645,9 @@ class Post < ApplicationRecord
       where("uploader_id = ?", user_id)
     end
 
-    def available_for_moderation(hidden, user = CurrentUser.user)
+    def available_for_moderation(hidden = false, user = CurrentUser.user)
+      return none if user.is_anonymous?
+
       approved_posts = user.post_approvals.select(:post_id)
       disapproved_posts = user.post_disapprovals.select(:post_id)
 
