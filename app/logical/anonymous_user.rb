@@ -229,8 +229,12 @@ class AnonymousUser
     false
   end
 
+  def post_disapprovals
+    PostDisapproval.none
+  end
+
   def saved_searches
-    SavedSearch.where(false)
+    SavedSearch.none
   end
 
   def has_saved_searches?

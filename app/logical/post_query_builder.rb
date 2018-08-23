@@ -131,18 +131,24 @@ class PostQueryBuilder
       relation = relation.where("posts.is_pending = TRUE")
     elsif q[:status] == "flagged"
       relation = relation.where("posts.is_flagged = TRUE")
+    elsif q[:status] == "modqueue"
+      relation = relation.where("posts.is_pending = TRUE OR posts.is_flagged = TRUE")
     elsif q[:status] == "deleted"
       relation = relation.where("posts.is_deleted = TRUE")
     elsif q[:status] == "banned"
       relation = relation.where("posts.is_banned = TRUE")
     elsif q[:status] == "active"
       relation = relation.where("posts.is_pending = FALSE AND posts.is_deleted = FALSE AND posts.is_banned = FALSE AND posts.is_flagged = FALSE")
+    elsif q[:status] == "unmoderated"
+      relation = relation.merge(Post.pending_or_flagged.available_for_moderation)
     elsif q[:status] == "all" || q[:status] == "any"
       # do nothing
     elsif q[:status_neg] == "pending"
       relation = relation.where("posts.is_pending = FALSE")
     elsif q[:status_neg] == "flagged"
       relation = relation.where("posts.is_flagged = FALSE")
+    elsif q[:status_neg] == "modqueue"
+      relation = relation.where("posts.is_pending = FALSE AND posts.is_flagged = FALSE")
     elsif q[:status_neg] == "deleted"
       relation = relation.where("posts.is_deleted = FALSE")
     elsif q[:status_neg] == "banned"
@@ -219,6 +225,34 @@ class PostQueryBuilder
         relation = relation.where("posts.approver_id is null")
       else
         relation = relation.where("posts.approver_id": q[:approver_id])
+      end
+    end
+
+    if q[:disapproval]
+      q[:disapproval].each do |disapproval|
+        disapprovals = CurrentUser.user.post_disapprovals.select(:post_id)
+
+        if disapproval.in?(%w[none false])
+          relation = relation.where.not("posts.id": disapprovals)
+        elsif disapproval.in?(%w[any all true])
+          relation = relation.where("posts.id": disapprovals)
+        else
+          relation = relation.where("posts.id": disapprovals.where(reason: disapproval))
+        end
+      end
+    end
+
+    if q[:disapproval_neg]
+      q[:disapproval_neg].each do |disapproval|
+        disapprovals = CurrentUser.user.post_disapprovals.select(:post_id)
+
+        if disapproval.in?(%w[none false])
+          relation = relation.where("posts.id": disapprovals)
+        elsif disapproval.in?(%w[any all true])
+          relation = relation.where.not("posts.id": disapprovals)
+        else
+          relation = relation.where.not("posts.id": disapprovals.where(reason: disapproval))
+        end
       end
     end
 
