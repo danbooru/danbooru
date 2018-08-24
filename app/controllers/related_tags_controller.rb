@@ -19,4 +19,12 @@ class RelatedTagsController < ApplicationController
     @tag.save
     head :ok
   end
+
+  protected
+
+  def require_reportbooru_key
+    unless Danbooru.config.reportbooru_key.present? && params[:key] == Danbooru.config.reportbooru_key
+      raise User::PrivilegeError
+    end
+  end
 end
