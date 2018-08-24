@@ -1,4 +1,8 @@
 module PostsHelper
+  def post_search_counts_enabled?
+    Danbooru.config.enable_post_search_counts && Danbooru.config.reportbooru_server.present? && Danbooru.config.reportbooru_key.present?
+  end
+
   def discover_mode?
     params[:tags] =~ /order:rank/ || params[:action] =~ /searches|viewed/
   end
@@ -18,7 +22,7 @@ module PostsHelper
   end
 
   def missed_post_search_count_js
-    return nil unless Danbooru.config.enable_post_search_counts
+    return nil unless post_search_counts_enabled?
     
     if params[:ms] == "1" && @post_set.post_count == 0 && @post_set.is_single_tag?
       session_id = session.id
@@ -29,7 +33,7 @@ module PostsHelper
   end
 
   def post_search_count_js
-    return nil unless Danbooru.config.enable_post_search_counts
+    return nil unless post_search_counts_enabled?
     
     if action_name == "index" && params[:page].nil?
       tags = Tag.scan_query(params[:tags]).sort.join(" ")
@@ -47,7 +51,7 @@ module PostsHelper
   end
 
   def post_view_count_js
-    return nil unless Danbooru.config.enable_post_search_counts
+    return nil unless post_search_counts_enabled?
 
     msg = "#{params[:id]},#{session.id}"
     msg = ActiveSupport::MessageVerifier.new(Danbooru.config.reportbooru_key, serializer: JSON, digest: "SHA256").generate(msg)
@@ -55,7 +59,7 @@ module PostsHelper
   end
 
   def common_searches_html(user)
-    return nil unless Danbooru.config.enable_post_search_counts
+    return nil unless post_search_counts_enabled?
     return nil unless user.is_platinum?
     return nil unless user.enable_recent_searches?
 
