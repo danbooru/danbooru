@@ -1,8 +1,9 @@
 class TagImplication < TagRelationship
+  extend Memoist
+
   before_save :update_descendant_names
   after_save :update_descendant_names_for_parents
   after_destroy :update_descendant_names_for_parents
-  after_save :update_descendant_names_for_parents, if: ->(rec) { rec.is_retired? }
   after_save :create_mod_action
   validates_uniqueness_of :antecedent_name, :scope => :consequent_name
   validate :absence_of_circular_relation
@@ -17,6 +18,7 @@ class TagImplication < TagRelationship
 
   module DescendantMethods
     extend ActiveSupport::Concern
+    extend Memoist
 
     module ClassMethods
       # assumes names are normalized
@@ -32,17 +34,16 @@ class TagImplication < TagRelationship
     end
 
     def descendants
-      @descendants ||= begin
-        [].tap do |all|
-          children = [consequent_name]
+      [].tap do |all|
+        children = [consequent_name]
 
-          until children.empty?
-            all.concat(children)
-            children = TagImplication.active.where(antecedent_name: children).pluck(:consequent_name)
-          end
-        end.sort.uniq
-      end
+        until children.empty?
+          all.concat(children)
+          children = TagImplication.active.where(antecedent_name: children).pluck(:consequent_name)
+        end
+      end.sort.uniq
     end
+    memoize :descendants
 
     def descendant_names_array
       descendant_names.split(/ /)
@@ -53,7 +54,7 @@ class TagImplication < TagRelationship
     end
 
     def update_descendant_names!
-      clear_descendants_cache
+      flush_cache
       update_descendant_names
       update_attribute(:descendant_names, descendant_names)
     end
@@ -64,20 +65,15 @@ class TagImplication < TagRelationship
         parent.update_descendant_names_for_parents
       end
     end
-
-    def clear_descendants_cache
-      @descendants = nil
-    end
   end
 
   module ParentMethods
-    def parents
-      @parents ||= self.class.where(["consequent_name = ?", antecedent_name])
-    end
+    extend Memoist
 
-    def clear_parents_cache
-      @parents = nil
+    def parents
+      self.class.where("consequent_name = ?", antecedent_name)
     end
+    memoize :parents
   end
 
   module ValidationMethods
@@ -139,6 +135,8 @@ class TagImplication < TagRelationship
   end
 
   module ApprovalMethods
+    extend Memoist
+
     def process!(update_topic: true)
       unless valid?
         raise errors.full_messages.join("; ")
@@ -215,19 +213,18 @@ class TagImplication < TagRelationship
     end
 
     def forum_updater
-      @forum_updater ||= begin
-        post = if forum_topic
-          forum_post || forum_topic.posts.where("body like ?", TagImplicationRequest.command_string(antecedent_name, consequent_name) + "%").last
-        else
-          nil
-        end
-        ForumUpdater.new(
-          forum_topic, 
-          forum_post: post, 
-          expected_title: TagImplicationRequest.topic_title(antecedent_name, consequent_name)
-        )
+      post = if forum_topic
+        forum_post || forum_topic.posts.where("body like ?", TagImplicationRequest.command_string(antecedent_name, consequent_name) + "%").last
+      else
+        nil
       end
+      ForumUpdater.new(
+        forum_topic, 
+        forum_post: post, 
+        expected_title: TagImplicationRequest.topic_title(antecedent_name, consequent_name)
+      )
     end
+    memoize :forum_updater
   end
 
   include DescendantMethods
@@ -236,8 +233,7 @@ class TagImplication < TagRelationship
   include ApprovalMethods
 
   def reload(options = {})
+    flush_cache
     super
-    clear_parents_cache
-    clear_descendants_cache
   end
 end

@@ -100,11 +100,11 @@ class TagImplicationTest < ActiveSupport::TestCase
     end
 
     should "update its descendants on save" do
-      ti1 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
-      ti2 = FactoryBot.create(:tag_implication, :antecedent_name => "ccc", :consequent_name => "ddd")
+      ti1 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb", :status => "active")
+      ti2 = FactoryBot.create(:tag_implication, :antecedent_name => "ccc", :consequent_name => "ddd", :status => "active")
       ti1.reload
       ti2.reload
-      ti2.update_attributes(
+      ti2.update(
         :antecedent_name => "bbb"
       )
       ti1.reload
