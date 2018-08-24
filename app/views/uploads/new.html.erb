@@ -27,7 +27,7 @@
         <% if CurrentUser.can_upload_free? %>
           <div class="input">
             <label for="upload_as_pending">
-              <%= f.check_box :as_pending %>
+              <%= f.check_box :as_pending, :checked => params[:as_pending].present? %>
               Upload for approval
             </label>
           </div>
@@ -44,11 +44,7 @@
 
         <div class="input">
           <%= f.label :source %>
-          <% if params[:url].present? %>
-            <%= f.text_field :source, :size => 50, :value => params[:url] %>
-          <% else %>
-            <%= f.text_field :source, :size => 50 %>
-          <% end %>
+          <%= f.text_field :source, :size => 50, :value => params[:url] %>
           <%= button_tag "Similar", :id => "similar-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
           <%= button_tag "Artist", :id => "find-artist-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
           <span class="hint">You can enter a URL to have <%= Danbooru.config.app_name %> automatically download and process it</span>
@@ -58,20 +54,20 @@
           <%= f.label :rating %>
 
           <fieldset class="ratings">
-            <%= f.radio_button :rating, :e %>
+            <%= f.radio_button :rating, :e, :checked => (params[:rating] == "e") %>
             <%= f.label :rating_e, "Explicit", :title => "Hardcore porn, visible genitals" %>
 
-            <%= f.radio_button :rating, :q %>
+            <%= f.radio_button :rating, :q, :checked => (params[:rating] == "q") %>
             <%= f.label :rating_q, "Questionable", :title => "Nudity, anything erotic" %>
 
-            <%= f.radio_button :rating, :s %>
+            <%= f.radio_button :rating, :s, :checked => (params[:rating] == "s") %>
             <%= f.label :rating_s, "Safe", :title => "Everything else" %>
           </fieldset>
         </div>
 
         <div class="input">
           <%= f.label :parent_id, "Parent ID" %>
-          <%= f.text_field :parent_id %>
+          <%= f.text_field :parent_id, :value => params[:parent_id] %>
         </div>
 
         <div class="input">
@@ -81,17 +77,17 @@
           <div class="artist-commentary" style="display: none;">
             <div class="input">
               <%= f.label :artist_commentary_title, "Title" %>
-              <%= f.text_field :artist_commentary_title %>
+              <%= f.text_field :artist_commentary_title, :value => params[:artist_commentary_title] %>
             </div>
 
             <div class="input">
               <%= f.label :artist_commentary_desc, "Description" %>
-              <%= f.text_area :artist_commentary_desc, :size => "60x5" %>
+              <%= f.text_area :artist_commentary_desc, :size => "60x5", :value => params[:artist_commentary_desc] %>
             </div>
 
             <div class="input">
               <label for="upload_include_artist_commentary">
-                <%= f.check_box :include_artist_commentary %>
+                <%= f.check_box :include_artist_commentary, :checked => params[:include_artist_commentary].present? %>
                 Include Commentary
               </label>
             </div>
@@ -111,7 +107,7 @@
         <div class="input">
           <div>
             <%= f.label :tag_string, "Tags" %>
-            <%= f.text_area :tag_string, :size => "60x5", :spellcheck => false, :"data-autocomplete" => "tag-edit", :"data-shortcut" => "e" %>
+            <%= f.text_area :tag_string, :size => "60x5", :spellcheck => false, :"data-autocomplete" => "tag-edit", :"data-shortcut" => "e", :value => params[:tag_string] %>
             <span id="open-edit-dialog" class="ui-icon ui-icon-arrow-1-ne" title="detach" style="display: none;" data-shortcut="shift+e"/>
           </div>
 
