@@ -18,5 +18,6 @@ class DailyMaintenance
     TokenBucket.prune!
     TagChangeRequestPruner.warn_all
     TagChangeRequestPruner.reject_all
+    Ban.prune!
   end
 end

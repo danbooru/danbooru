@@ -61,6 +61,12 @@ class Ban < ApplicationRecord
     q
   end
 
+  def self.prune!
+    expired.includes(:user).find_each do |ban|
+      ban.user.unban! if ban.user.ban_expired?
+    end
+  end
+
   def initialize_banner_id
     self.banner_id = CurrentUser.id if self.banner_id.blank?
   end
