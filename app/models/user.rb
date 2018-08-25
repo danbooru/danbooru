@@ -110,7 +110,6 @@ class User < ApplicationRecord
   has_many :favorite_groups, -> {order(name: :asc)}, foreign_key: :creator_id
   has_many :favorites, ->(rec) {where("user_id % 100 = #{rec.id % 100} and user_id = #{rec.id}").order("id desc")}
   belongs_to :inviter, class_name: "User", optional: true
-  after_update :create_mod_action
   accepts_nested_attributes_for :dmail_filter
 
   module BanMethods
@@ -355,10 +354,6 @@ class User < ApplicationRecord
       level_string.downcase.to_sym
     end
 
-    def level_string_before_last_save
-      level_string(level_before_last_save)
-    end
-
     def level_string_was
       level_string(level_was)
     end
@@ -409,12 +404,6 @@ class User < ApplicationRecord
 
     def is_approver?
       can_approve_posts?
-    end
-
-    def create_mod_action
-      if saved_change_to_level?
-        ModAction.log(%{"#{name}":/users/#{id} level changed #{level_string_before_last_save} -> #{level_string}},:user_level)
-      end
     end
 
     def set_per_page

@@ -26,7 +26,7 @@ class UserPromotion
     
     user.inviter_id = promoter.id
 
-    create_user_feedback unless options[:skip_feedback]
+    create_user_feedback unless options[:is_upgrade]
     create_dmail unless options[:skip_dmail]
     create_mod_actions
 
@@ -43,8 +43,13 @@ private
     if old_can_upload_free != user.can_upload_free?
       ModAction.log("\"#{promoter.name}\":/users/#{promoter.id} changed unlimited upload privileges for \"#{user.name}\":/users/#{user.id} from #{old_can_upload_free} to [b]#{user.can_upload_free?}[/b]",:user_upload_privilege)
     end
+
+    if user.level_changed?
+      category = options[:is_upgrade] ? :user_account_upgrade : :user_level_change
+      ModAction.log(%{"#{user.name}":/users/#{user.id} level changed #{user.level_string_was} -> #{user.level_string}}, category)
+    end
   end
-  
+
   def validate
     # admins can do anything
     return if promoter.is_admin?
