@@ -1618,15 +1618,15 @@ class Post < ApplicationRecord
     end
 
     def pending
-      where("is_pending = ?", true)
+      where(is_pending: true)
     end
 
     def flagged
-      where("is_flagged = ?", true)
+      where(is_flagged: true)
     end
 
     def pending_or_flagged
-      where("(is_pending = ? or (is_flagged = ? and id in (select _.post_id from post_flags _ where _.created_at >= ?)))", true, true, 1.week.ago)
+      pending.or(flagged)
     end
 
     def undeleted
