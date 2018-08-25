@@ -38,27 +38,6 @@ class UserTest < ActiveSupport::TestCase
       end
     end
 
-    context "that has been invited by a mod" do
-      setup do
-        @mod = FactoryBot.create(:moderator_user)
-      end
-
-      should "work" do
-        @user.invite!(User::Levels::BUILDER, "1")
-        @user.reload
-        assert_equal(User::Levels::BUILDER, @user.level)
-        assert_equal(true, @user.can_upload_free)
-      end
-
-      should "create a mod action" do
-        assert_difference("ModAction.count") do
-          @user.invite!(User::Levels::BUILDER, "1")
-        end
-        assert_equal(%{"#{@user.name}":/users/#{@user.id} level changed Member -> Builder}, ModAction.last.description)
-        assert_equal("user_level", ModAction.last.category)
-      end
-    end
-
     should "not validate if the originating ip address is banned" do
       FactoryBot.create(:ip_ban, ip_addr: '127.0.0.1')
       user = FactoryBot.build(:user)

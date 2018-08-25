@@ -135,22 +135,6 @@ class User < ApplicationRecord
     end
   end
 
-  module InvitationMethods
-    def invite!(level, can_upload_free)
-      if can_upload_free
-        self.can_upload_free = true
-      else
-        self.can_upload_free = false
-      end
-
-      if level.to_i <= Levels::BUILDER
-        self.level = level
-        self.inviter_id = CurrentUser.id
-        save
-      end
-    end
-  end
-
   module NameMethods
     extend ActiveSupport::Concern
 
@@ -909,7 +893,6 @@ class User < ApplicationRecord
   include BlacklistMethods
   include ForumMethods
   include LimitMethods
-  include InvitationMethods
   include ApiMethods
   include CountMethods
   extend SearchMethods
