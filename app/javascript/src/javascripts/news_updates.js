@@ -14,10 +14,6 @@ NewsUpdate.initialize = function() {
       $("#news-updates").hide();
       Cookie.put("news-ticker", key);
 
-      // need to reset the more link
-      var $site_map_link = $("#site-map-link");
-      $("#more-links").hide().offset({top: $site_map_link.offset().top + $site_map_link.height() + 10, left: $site_map_link.offset().left});
-
       return false;
     });
   }
