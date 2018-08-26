@@ -14,7 +14,8 @@ module ApplicationHelper
       klass = nil
     end
 
-    content_tag("li", link_to(text, url, options), :class => klass)
+    id = "nav-" + text.downcase.gsub(/[^a-z ]/, "").parameterize
+    tag.li(link_to(text, url, options), class: klass, id: id)
   end
 
   def fast_link_to(text, link_params, options = {})
