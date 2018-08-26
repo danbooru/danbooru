@@ -150,7 +150,7 @@ module ApplicationHelper
       html << " [" + link_to("+", new_user_feedback_path(:user_feedback => {:category => "positive", :user_id => user.id})) + "]"
 
       unless user.is_gold?
-        html << " [" + link_to("invite", new_moderator_invitation_path(:invitation => {:name => user.name, :can_upload_free => "1"})) + "]"
+        html << " [" + link_to("promote", edit_admin_user_path(user)) + "]"
       end
     else
       html << " [" + link_to("&ndash;".html_safe, new_user_feedback_path(:user_feedback => {:category => "negative", :user_id => user.id})) + "]"
