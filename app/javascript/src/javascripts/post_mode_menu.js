@@ -117,7 +117,7 @@ PostModeMenu.change = function() {
     return;
   }
   var $body = $(document.body);
-  $body.removeClass();
+  $body.removeClass((i, classNames) => classNames.split(/ /).filter(name => /^mode-/.test(name)).join(" "));
   $body.addClass("mode-" + s);
   Cookie.put("mode", s, 1);
 

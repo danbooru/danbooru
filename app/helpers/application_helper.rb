@@ -192,12 +192,27 @@ module ApplicationHelper
     attributes = [:id, :name, :level, :level_string, :can_approve_posts?, :can_upload_free?]
     attributes += User::Roles.map { |role| :"is_#{role}?" }
 
+    controller_param = params[:controller].parameterize.dasherize
+    action_param = params[:action].parameterize.dasherize
+
+    {
+      lang: "en",
+      class: "c-#{controller_param} a-#{action_param}",
+      data: {
+        controller: controller_param,
+        action: action_param,
+        **data_attributes_for(user, "user", attributes)
+      }
+    }
+  end
+
+  def data_attributes_for(record, prefix, attributes)
     attributes.map do |attr|
       name = attr.to_s.dasherize.delete("?")
-      value = user.send(attr)
+      value = record.send(attr)
 
-      %{data-user-#{name}="#{h(value)}"}
-    end.join(" ").html_safe
+      [:"#{prefix}-#{name}", value]
+    end.to_h
   end
   
 protected
