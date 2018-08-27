@@ -54,7 +54,7 @@ if User.count == 0
       :password => "password1",
       :password_confirmation => "password1"
       )
-      newuser.promote_to!(User::Levels.const_get(level), {:skip_feedback => true, :skip_dmail => true})
+      newuser.promote_to!(User::Levels.const_get(level), {:is_upgrade => true, :skip_dmail => true})
     end
 
     newuser = User.create(
@@ -69,14 +69,14 @@ if User.count == 0
       :password => "password1",
       :password_confirmation => "password1"
       )
-    newuser.promote_to!(User::Levels::BUILDER, {:can_upload_free => true, :skip_feedback => true, :skip_dmail => true})
+    newuser.promote_to!(User::Levels::BUILDER, {:can_upload_free => true, :is_upgrade => true, :skip_dmail => true})
 
     newuser = User.create(
       :name => "approver",
       :password => "password1",
       :password_confirmation => "password1"
       )
-    newuser.promote_to!(User::Levels::BUILDER, {:can_approve_posts => true, :skip_feedback => true, :skip_dmail => true})
+    newuser.promote_to!(User::Levels::BUILDER, {:can_approve_posts => true, :is_upgrade => true, :skip_dmail => true})
 
   end
 
