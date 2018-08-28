@@ -229,9 +229,7 @@ class ArtistTest < ActiveSupport::TestCase
 
       should "find the correct artist for page URLs" do
         assert_artist_found("artgerm", "http://www.deviantart.com/artgerm/art/Peachy-Princess-Ver-2-457220550")
-
         assert_artist_found("trixia", "http://www.deviantart.com/trixdraws/art/My-Queen-426745289")
-        assert_artist_found("trixia", "http://www.deviantart.com/trixdraws/gallery/#/d722mrt")
       end
 
       should "find the correct artist for image URLs" do
@@ -279,11 +277,6 @@ class ArtistTest < ActiveSupport::TestCase
         assert_artist_found("bkub",  "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46239857")
         assert_artist_found("bkub",  "http://www.pixiv.net/member_illust.php?mode=big&illust_id=46239857")
         assert_artist_found("bkub",  "http://www.pixiv.net/i/46239857")
-      end
-
-      should "find nothing for malformed URLs" do
-        assert_artist_not_found("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=herpderp")
-        assert_artist_not_found("http://www.pixiv.net/wharrgarbl")
       end
 
       should "find nothing for bad IDs" do

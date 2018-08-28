@@ -3,16 +3,33 @@ module Downloads
     class Error < Exception ; end
 
     attr_reader :data, :options
-    attr_accessor :source, :original_source, :downloaded_source
+    attr_accessor :source, :referer
 
-    def initialize(source, options = {})
+    # Prevent Cloudflare from potentially mangling the image. See issue #3528.
+    def self.uncached_url(url, headers = {})
+      url = Addressable::URI.parse(url)
+
+      if is_cloudflare?(url, headers)
+        url.query_values = (url.query_values || {}).merge(danbooru_no_cache: SecureRandom.uuid)
+      end
+
+      url
+    end
+
+    def self.is_cloudflare?(url, headers = {})
+      Cache.get("is_cloudflare:#{url.origin}", 4.hours) do
+        res = HTTParty.head(url, { headers: headers }.deep_merge(Danbooru.config.httparty_options))
+        raise Error.new("HTTP error code: #{res.code} #{res.message}") unless res.success?
+
+        res.key?("CF-Ray")
+      end
+    end
+
+    def initialize(source, referer=nil, options = {})
       # source can potentially get rewritten in the course
       # of downloading a file, so check it again
       @source = source
-      @original_source = source
-
-      # the URL actually downloaded after rewriting the original source.
-      @downloaded_source = nil
+      @referer = referer
 
       # we sometimes need to capture data from the source page
       @data = {}
@@ -22,48 +39,31 @@ module Downloads
       @data[:get_thumbnail] = options[:get_thumbnail]
     end
 
-    def rewrite_url
-      url, _, _ = before_download(@source, @data)
-      return url
-    end
-
     def size
-      url, headers, _ = before_download(@source, @data)
-      options = { timeout: 3, headers: headers }.deep_merge(Danbooru.config.httparty_options)
-      res = HTTParty.head(url, options)
-      res.content_length
+      strategy = Sources::Strategies.find(source, referer)
+      options = { timeout: 3, headers: strategy.headers }.deep_merge(Danbooru.config.httparty_options)
+
+      res = HTTParty.head(strategy.file_url, options)
+
+      if res.success?
+        res.content_length
+      else
+        raise HTTParty::ResponseError.new(res)
+      end
     end
 
     def download!
-      url, headers, @data = before_download(@source, @data)
-
+      strategy = Sources::Strategies.find(source, referer)
       output_file = Tempfile.new(binmode: true)
-      http_get_streaming(uncached_url(url, headers), output_file, headers)
+      @data = strategy.data
 
-      @downloaded_source = url
-      @source = after_download(url)
+      http_get_streaming(
+        self.class.uncached_url(strategy.file_url, strategy.headers), 
+        output_file, 
+        strategy.headers
+      )
 
-      output_file
-    end
-
-    def before_download(url, datums)
-      original_url = url
-      headers = Danbooru.config.http_headers
-
-      RewriteStrategies::Base.strategies.each do |strategy|
-        url, headers, datums = strategy.new(url).rewrite(url, headers, datums)
-        url = original_url if url.nil?
-      end
-
-      return [url, headers, datums]
-    end
-
-    def after_download(src)
-      src = fix_twitter_sources(src)
-      if options[:referer_url].present?
-        src = set_source_to_referer(src, options[:referer_url])
-      end
-      src
+      [output_file, strategy]
     end
 
     def validate_local_hosts(url)
@@ -111,50 +111,5 @@ module Downloads
         end
       end # while
     end # def
-
-    def fix_twitter_sources(src)
-      if src =~ %r!^https?://(?:video|pbs)\.twimg\.com/! && original_source =~ %r!^https?://twitter\.com/!
-        original_source
-      elsif src =~ %r!^https?://img\.pawoo\.net/! && original_source =~ %r!^https?://pawoo\.net/!
-        original_source
-      else
-        src
-      end
-    end
-
-    def set_source_to_referer(src, referer)
-      if Sources::Strategies::Nijie.url_match?(src) ||
-         Sources::Strategies::Twitter.url_match?(src) || Sources::Strategies::Twitter.url_match?(referer) ||
-         Sources::Strategies::Pawoo.url_match?(src) ||
-         Sources::Strategies::Tumblr.url_match?(src) || Sources::Strategies::Tumblr.url_match?(referer) ||
-         Sources::Strategies::ArtStation.url_match?(src) || Sources::Strategies::ArtStation.url_match?(referer)
-        strategy = Sources::Site.new(src, :referer_url => referer)
-        strategy.referer_url
-      else
-        src
-      end
-    end
-
-    private
-
-    # Prevent Cloudflare from potentially mangling the image. See issue #3528.
-    def uncached_url(url, headers = {})
-      url = Addressable::URI.parse(url)
-
-      if is_cloudflare?(url, headers)
-        url.query_values = (url.query_values || {}).merge(danbooru_no_cache: SecureRandom.uuid)
-      end
-
-      url
-    end
-
-    def is_cloudflare?(url, headers = {})
-      Cache.get("is_cloudflare:#{url.origin}", 4.hours) do
-        res = HTTParty.head(url, { headers: headers }.deep_merge(Danbooru.config.httparty_options))
-        raise Error.new("HTTP error code: #{res.code} #{res.message}") unless res.success?
-
-        res.key?("CF-Ray")
-      end
-    end
   end
 end

@@ -4,8 +4,7 @@ module Sources
   class ArtStationTest < ActiveSupport::TestCase
     context "The source site for an art station artwork page" do
       setup do
-        @site = Sources::Site.new("https://www.artstation.com/artwork/04XA4")
-        @site.get
+        @site = Sources::Strategies.find("https://www.artstation.com/artwork/04XA4")
       end
 
       should "get the image url" do
@@ -32,8 +31,7 @@ module Sources
 
     context "The source site for an art station projects page" do
       setup do
-        @site = Sources::Site.new("https://dantewontdie.artstation.com/projects/YZK5q")
-        @site.get
+        @site = Sources::Strategies.find("https://dantewontdie.artstation.com/projects/YZK5q")
       end
 
       should "get the image url" do
@@ -61,8 +59,7 @@ module Sources
 
     context "The source site for a www.artstation.com/artwork/$slug page" do
       setup do
-        @site = Sources::Site.new("https://www.artstation.com/artwork/cody-from-sf")
-        @site.get
+        @site = Sources::Strategies.find("https://www.artstation.com/artwork/cody-from-sf")
       end
 
       should "get the image url" do
@@ -75,8 +72,7 @@ module Sources
       setup do
         @url = "https://cdna.artstation.com/p/assets/images/images/006/029/978/large/amama-l-z.jpg"
         @ref = "https://www.artstation.com/artwork/4BWW2"
-        @site = Sources::Site.new(@url, referer_url: @ref)
-        @site.get
+        @site = Sources::Strategies.find(@url, @ref)
       end
 
       should "fetch the source data" do
@@ -86,8 +82,7 @@ module Sources
 
     context "The source site for an ArtStation gallery" do
       setup do
-        @site = Sources::Site.new("https://www.artstation.com/artwork/BDxrA")
-        @site.get
+        @site = Sources::Strategies.find("https://www.artstation.com/artwork/BDxrA")
       end
 
       should "get only image urls, not video urls" do

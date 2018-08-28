@@ -5,7 +5,7 @@ class UploadsController < ApplicationController
 
   def new
     @upload_notice_wiki = WikiPage.titled(Danbooru.config.upload_notice_wiki_page).first
-    @upload, @post, @source, @normalized_url, @remote_size = UploadService::ControllerHelper.prepare(
+    @upload, @post, @source, @remote_size = UploadService::ControllerHelper.prepare(
       url: params[:url], ref: params[:ref]
     )
     respond_with(@upload)
@@ -43,7 +43,7 @@ class UploadsController < ApplicationController
   end
 
   def preprocess
-    @upload, @post, @source, @normalized_url, @remote_size = UploadService::ControllerHelper.prepare(
+    @upload, @post, @source, @remote_size = UploadService::ControllerHelper.prepare(
       url: params[:url], file: params[:file], ref: params[:ref]
     )
     render body: nil

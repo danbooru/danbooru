@@ -3,8 +3,8 @@ require 'test_helper'
 module Sources
   class PixivTest < ActiveSupport::TestCase
     def get_source(source)
-      @site = Sources::Site.new(source)
-      @site.get
+      @site = Sources::Strategies.find(source)
+      
       @site
     rescue Net::OpenTimeout
       skip "Remote connection to #{source} failed"
@@ -23,19 +23,22 @@ module Sources
     context "in all cases" do
       context "A touch page" do
         setup do
-          @site = Sources::Site.new("http://touch.pixiv.net/member_illust.php?mode=medium&illust_id=59687915")
-          @image_urls = @site.get
+          @site = Sources::Strategies.find("http://touch.pixiv.net/member_illust.php?mode=medium&illust_id=59687915")
+          @image_urls = @site.image_urls
         end
 
         should "get all the image urls" do
-          assert_equal("https://i.pximg.net/img-original/img/2016/10/29/17/13/23/59687915_p0.png", @image_urls)
+          expected_urls = [
+            "https://i.pximg.net/img-original/img/2016/10/29/17/13/23/59687915_p0.png",
+            "https://i.pximg.net/img-original/img/2016/10/29/17/13/23/59687915_p1.png"
+          ].sort
+          assert_equal(expected_urls, @image_urls.sort)
         end
       end
 
       context "A gallery page" do
         setup do
-          @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=49270482")
-          @site.get
+          @site = Sources::Strategies.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=49270482")
           @image_urls = @site.image_urls
         end
 
@@ -46,8 +49,7 @@ module Sources
 
       context "An ugoira source site for pixiv" do
         setup do
-          @site = Sources::Site.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
-          @site.get
+          @site = Sources::Strategies.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
         end
 
         should "get the file url" do
@@ -66,8 +68,7 @@ module Sources
 
       context "A https://i.pximg.net/img-zip/ugoira/* source" do
         should "get the metadata" do
-          @site = Sources::Site.new("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip")
-          @site.get
+          @site = Sources::Strategies.find("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip")
 
           assert_equal("uroobnad2", @site.artist_name)
         end
@@ -79,7 +80,7 @@ module Sources
         end
 
         should "get the profile" do
-          assert_equal("http://www.pixiv.net/member.php?id=696859", @site.profile_url)
+          assert_equal("https://www.pixiv.net/member.php?id=696859", @site.profile_url)
         end
 
         should "get the artist name" do
@@ -142,12 +143,17 @@ module Sources
         should "get the full size image url" do
           assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.image_url)
         end        
+
+        should "get the full size image url for the canonical url" do
+          assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.canonical_url)
+        end
       end
 
       context "fetching source data for a deleted work" do
         should "raise a bad id error" do
           assert_raise(::PixivApiClient::BadIDError) do
             get_source("https://i.pximg.net/img-original/img/2017/11/22/01/06/44/65991677_p0.png")
+            @site.image_urls
           end
         end
       end

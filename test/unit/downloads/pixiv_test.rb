@@ -4,6 +4,7 @@ module Downloads
   class PixivTest < ActiveSupport::TestCase
     def setup
       super
+      Downloads::File.stubs(:is_cloudflare?).returns(false)
       load_pixiv_tokens!
     end
 
@@ -13,29 +14,6 @@ module Downloads
     end
 
     context "in all cases" do
-      # Test an old illustration (one uploaded before 2014-09-16). New
-      # /img-original/ and /img-master/ URLs currently don't work for images
-      # uploaded before this date. Only old /imgXX/img/username/ URLs work.
-      context "downloading an old PNG illustration" do
-        setup do
-          @medium_page = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=14901720"
-          @big_page    = "http://www.pixiv.net/member_illust.php?mode=big&illust_id=14901720"
-
-          @new_small_thumbnail  = "http://i1.pixiv.net/c/150x150/img-master/img/2010/11/30/08/39/58/14901720_p0_master1200.jpg"
-          @new_medium_thumbnail = "http://i1.pixiv.net/c/600x600/img-master/img/2010/11/30/08/39/58/14901720_p0_master1200.jpg"
-          @new_full_size_image  = "http://i1.pixiv.net/img-original/img/2010/11/30/08/39/58/14901720_p0.png"
-
-          @file_size = 1261
-        end
-
-        should "work when using new URLs" do
-          # Don't know the actual file size of the thumbnails since they don't work.
-          assert_downloaded(1083, @new_small_thumbnail)
-          assert_downloaded(1083, @new_medium_thumbnail)
-          assert_downloaded(@file_size, @new_full_size_image)
-        end
-      end
-
       # Test a new illustration (one uploaded after 2014-09-30). New illustrations
       # must use /img-original/ for full size URLs. Old /imgXX/img/username/ style URLs
       # don't work for images uploaded after this date.
@@ -103,21 +81,6 @@ module Downloads
         end
       end
 
-      context "downloading a bad id image" do
-        setup do
-          @bad_id_full   = "https://i.pximg.net/img-original/img/2017/11/22/01/06/44/65991677_p0.png"
-          @bad_id_sample = "https://i.pximg.net/c/600x600/img-master/img/2017/11/22/01/06/44/65991677_p0_master1200.jpg"
-        end
-
-        should "not raise an error when rewriting the url" do
-          assert_nothing_raised { assert_not_rewritten(@bad_id_full) }
-        end
-
-        should_eventually "rewrite bad id samples to full size" do
-          assert_rewritten(@bad_id_full, @bad_id_sample)
-        end
-      end
-
       context "downloading a ugoira" do
         setup do
           @medium_page     = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364"
@@ -138,6 +101,8 @@ module Downloads
 
       context "downloading a profile image" do
         should "download new profile images" do
+          skip "profile images are no longer supported"
+
           @file_url = "https://i.pximg.net/user-profile/img/2014/12/18/10/31/23/8733472_7dc7310db6cc37163af145d04499e411_170.jpg"
           @file_size = 23_328
 
@@ -149,8 +114,10 @@ module Downloads
 
       context "downloading a background image" do
         should "download the image" do
-          @file_url = "http://i1.pixiv.net/background/img/2016/05/17/12/05/48/2074388_d4ac52034f7ca0af3e083d59fde7e97f.jpg"
-          @file_size = 386_678
+          skip "background images are no longer supported"
+
+          @file_url = "https://i.pximg.net/background/img/2015/10/25/08/45/27/198128_77ddf78cdb162e3d1c0d5134af185813.jpg"
+          @file_size = 0
 
           assert_not_rewritten(@file_url)
           assert_downloaded(@file_size, @file_url)
@@ -159,21 +126,23 @@ module Downloads
 
       context "downloading a novel image" do
         should "download new novel images" do
-          @file_url = "http://i1.pixiv.net/novel-cover-original/img/2016/11/03/20/10/58/7436075_f75af69f3eacd1656d3733c72aa959cf.jpg"
-          @file_size = 316_311
+          @file_url = "https://i.pximg.net/novel-cover-original/img/2017/07/27/23/14/17/8465454_80685d10e6df4d7d53ad347ddc18a36b.jpg"
+          @ref = 'https://www.pixiv.net/novel/show.php?id=8465454&mode=cover'
+          @file_size = 532_129
 
-          assert_not_rewritten(@file_url)
-          assert_downloaded(@file_size, @file_url)
+          assert_not_rewritten(@file_url, @ref)
+          assert_downloaded(@file_size, @file_url, @ref)
         end
       end
 
       context "downloading a pixiv fanbox image" do
         should "work" do
-          @file_url = "https://fanbox.pixiv.net/images/post/31757/w/1200/0CdXtgr4al3t43gQG4NZLnpQ.jpeg"
-          @file_size = 200_239
+          @source = "https://www.pixiv.net/fanbox/creator/12491073/post/82406"
+          @file_url = "https://fanbox.pixiv.net/images/post/82406/D833IKA7FIesJXL8xx39rrG0.jpeg"
+          @file_size = 873_387
 
-          assert_not_rewritten(@file_url)
-          assert_downloaded(@file_size, @file_url)
+          assert_not_rewritten(@file_url, @source)
+          assert_downloaded(@file_size, @file_url, @source)
         end
       end
     end
@@ -181,12 +150,11 @@ module Downloads
     context "An ugoira site for pixiv" do
       setup do
         @download = Downloads::File.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
-        @tempfile = @download.download!
+        @tempfile, strategy = @download.download!
         @tempfile.close!
       end
 
       should "capture the data" do
-        assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @download.source)
         assert_equal(2, @download.data[:ugoira_frame_data].size)
         if @download.data[:ugoira_frame_data][0]["file"]
           assert_equal([{"file"=>"000000.jpg", "delay"=>125}, {"file"=>"000001.jpg", "delay"=>125}], @download.data[:ugoira_frame_data])

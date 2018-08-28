@@ -1,122 +1,23 @@
-# encoding: UTF-8
-
 require 'csv'
 
 module Sources
   module Strategies
     class Pixiv < Base
-      attr_reader :zip_url, :ugoira_frame_data, :ugoira_content_type
+      MONIKER = %r!(?:[a-zA-Z0-9_-]+)!
+      PROFILE = %r!\Ahttps?://www\.pixiv\.net/member\.php\?id=[0-9]+\z!
+      EXT =     %r!(?:jpg|jpeg|png|gif)!i
 
-      MONIKER   = '(?:[a-zA-Z0-9_-]+)'
-      TIMESTAMP = '(?:[0-9]{4}/[0-9]{2}/[0-9]{2}/[0-9]{2}/[0-9]{2}/[0-9]{2})'
-      EXT = "(?:jpg|jpeg|png|gif)"
+      WEB =     %r!(?:\A(?:https?://)?www\.pixiv\.net)!
+      I12 =     %r!(?:\A(?:https?://)?i[0-9]+\.pixiv\.net)!
+      IMG =     %r!(?:\A(?:https?://)?img[0-9]*\.pixiv\.net)!
+      PXIMG =   %r!(?:\A(?:https?://)?i\.pximg\.net)!
+      TOUCH =   %r!(?:\A(?:https?://)?touch\.pixiv\.net)!
+      NOVEL_PAGE = %r!(?:\Ahttps?://www\.pixiv\.net/novel/show\.php\?id=(\d+))!
+      FANBOX_IMAGE = %r!(?:\Ahttps?://fanbox\.pixiv\.net/images/post/(\d+))!
+      FANBOX_PAGE = %r!(?:\Ahttps?://www\.pixiv\.net/fanbox/creator/\d+/post/(\d+))!
 
-      WEB =   '(?:\A(?:https?://)?www\.pixiv\.net)'
-      I12 =   '(?:\A(?:https?://)?i[0-9]+\.pixiv\.net)'
-      IMG =   '(?:\A(?:https?://)?img[0-9]*\.pixiv\.net)'
-      PXIMG = '(?:\A(?:https?://)?i\.pximg\.net)'
-      TOUCH = '(?:\A(?:https?://)?touch\.pixiv\.net)'
-
-      def self.url_match?(url)
-        url =~ /#{WEB}|#{IMG}|#{I12}|#{TOUCH}|#{PXIMG}/i
-      end
-
-      def referer_url
-        if @referer_url =~ /pixiv\.net\/member_illust.+mode=medium/ && @url =~ /#{IMG}|#{I12}/
-          @referer_url
-        else
-          @url
-        end
-      end
-
-      def site_name
-        "Pixiv"
-      end
-
-      def unique_id
-        @pixiv_moniker
-      end
-
-      def fake_referer
-        "http://www.pixiv.net"
-      end
-
-      def normalized_for_artist_finder?
-        url =~ %r!\Ahttp://www\.pixiv\.net/member\.php\?id=[0-9]+\z/!
-      end
-
-      def normalizable_for_artist_finder?
-        has_moniker? || sample_image? || full_image? || work_page?
-      end
-
-      def normalize_for_artist_finder!
-        @illust_id = illust_id_from_url!
-        @metadata = get_metadata_from_papi(@illust_id)
-
-        "http://www.pixiv.net/member.php?id=#{@metadata.user_id}/"
-      end
-
-      def translate_tag(tag)
-        normalized_tag = tag.gsub(/\d+users入り\z/i, "")
-
-        translated_tags = super(normalized_tag)
-        if translated_tags.empty? && normalized_tag.include?("/")
-          translated_tags = normalized_tag.split("/").flat_map { |tag| super(tag) }
-        end
-
-        translated_tags
-      end
-
-      def get
-        return unless illust_id_from_url
-        @illust_id = illust_id_from_url
-        @metadata = get_metadata_from_papi(@illust_id)
-
-        page = agent.get(URI.parse(normalized_url))
-        
-        if page.search("body.not-logged-in").any?
-          # Session cache is invalid, clear it and log in normally.
-          Cache.delete("pixiv-phpsessid")
-          @agent = nil
-          page = agent.get(URI.parse(normalized_url))
-        end
-        
-        @artist_name = @metadata.name
-        @profile_url = "http://www.pixiv.net/member.php?id=#{@metadata.user_id}"
-        @pixiv_moniker = @metadata.moniker
-        @zip_url, @ugoira_frame_data, @ugoira_content_type = get_zip_url_from_api
-        @tags = @metadata.tags.map do |tag|
-          [tag, "https://www.pixiv.net/search.php?s_mode=s_tag_full&#{{word: tag}.to_param}"]
-        end
-        @page_count = @metadata.page_count
-        @artist_commentary_title = @metadata.artist_commentary_title
-        @artist_commentary_desc = @metadata.artist_commentary_desc
-
-        is_manga = @page_count > 1
-
-        if !@zip_url
-          page = manga_page_from_url(@url).to_i
-          @image_url = image_urls[page]
-        end
-      end
-
-      def rewrite_thumbnails(thumbnail_url, is_manga=nil)
-        thumbnail_url = rewrite_new_medium_images(thumbnail_url)
-        thumbnail_url = rewrite_medium_ugoiras(thumbnail_url)
-        thumbnail_url = rewrite_old_small_and_medium_images(thumbnail_url, is_manga)
-        return thumbnail_url
-      end
-
-      def agent
-        @agent ||= PixivWebAgent.build
-      end
-
-      def file_url
-        image_url || zip_url
-      end
-
-      def image_urls
-        @metadata.pages
+      def self.match?(*urls)
+        urls.compact.any? { |x| x.match?(/#{WEB}|#{IMG}|#{I12}|#{TOUCH}|#{PXIMG}|#{FANBOX_IMAGE}/i) }
       end
 
       def self.to_dtext(text)
@@ -137,18 +38,147 @@ module Sources
         DText.from_html(text)
       end
 
-      def illust_id_from_url
-        if sample_image? || full_image? || work_page?
-          illust_id_from_url!
-        else
-          nil
+      def site_name
+        "Pixiv"
+      end
+
+      def image_urls
+        image_urls_sub.
+          map {|x| rewrite_cdn(x)}
+      rescue PixivApiClient::BadIDError
+        [url]
+      end
+
+      def page_url
+        if novel_id.present?
+          return "https://www.pixiv.net/novel/show.php?id=#{novel_id}&mode=cover"
         end
-      rescue Sources::Error
-        raise if Rails.env.test?
+
+        if fanbox_id.present?
+          return "https://www.pixiv.net/fanbox/creator/#{metadata.user_id}/post/#{fanbox_id}"
+        end
+
+        if illust_id.present?
+          return "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{illust_id}"
+        end
+
+        return url
+
+      rescue PixivApiClient::BadIDError
+        nil
+      end
+      
+      def canonical_url
+        return image_url
+      end
+
+      def profile_url
+        [url, referer_url].each do |x|
+          if x =~ PROFILE
+            return x
+          end
+        end
+
+        "https://www.pixiv.net/member.php?id=#{metadata.user_id}"
+      rescue PixivApiClient::BadIDError
         nil
       end
 
-      def illust_id_from_url!
+      def artist_name
+        metadata.name
+      rescue PixivApiClient::BadIDError
+        nil
+      end
+
+      def artist_commentary_title
+        metadata.artist_commentary_title
+      rescue PixivApiClient::BadIDError
+        nil
+      end
+
+      def artist_commentary_desc
+        metadata.artist_commentary_desc
+      rescue PixivApiClient::BadIDError
+        nil
+      end
+      
+      def headers
+        if fanbox_id.present?
+          # need the session to download fanbox images
+          return {
+            "Referer" => "https://www.pixiv.net/fanbox",
+            "Cookie" => HTTP::Cookie.cookie_value(agent.cookies)
+          }
+        end
+
+        return {
+          "Referer" => "https://www.pixiv.net"
+        }
+      end
+
+      def normalized_for_artist_finder?
+        url =~ PROFILE
+      end
+
+      def normalizable_for_artist_finder?
+        illust_id.present? || novel_id.present? || fanbox_id.present?
+      end
+
+      def unique_id
+        moniker
+      end
+
+      def tags
+        metadata.tags.map do |tag|
+          [tag, "https://www.pixiv.net/search.php?s_mode=s_tag_full&#{{word: tag}.to_param}"]
+        end
+      rescue PixivApiClient::BadIDError
+        []
+      end
+      memoize :tags
+
+      def translate_tag(tag)
+        normalized_tag = tag.gsub(/\d+users入り\z/i, "")
+        translated_tags = super(normalized_tag)
+
+        if translated_tags.empty? && normalized_tag.include?("/")
+          translated_tags = normalized_tag.split("/").flat_map { |tag| super(tag) }
+        end
+
+        translated_tags
+      end
+
+    public
+
+      def image_urls_sub
+        # there's too much normalization bullshit we have to deal with
+        # raw urls, so just fetch the canonical url from the api every
+        # time.
+
+        if manga_page.present?
+          return [metadata.pages[manga_page]]
+        end
+
+        if metadata.pages.is_a?(Hash)
+          return [ugoira_zip_url]
+        end
+
+        return metadata.pages
+      end
+
+      def rewrite_cdn(x)
+        if x =~ %r{\Ahttps?:\/\/(?:\w+\.)?pixiv\.net\.edgesuite\.net}
+          return x.sub(".edgesuite.net", "")
+        end
+
+        return x
+      end
+
+      # in order to prevent recursive loops, this method should not make any
+      # api calls and only try to extract the illust_id from the url. therefore,
+      # even though it makes sense to reference page_url here, it will only look
+      # at (url, referer_url).
+      def illust_id
         # http://img18.pixiv.net/img/evazion/14901720.png
         #
         # http://i2.pixiv.net/img18/img/evazion/14901720.png
@@ -165,228 +195,166 @@ module Sources
         #
         # http://i1.pixiv.net/img-zip-ugoira/img/2014/10/03/17/29/16/46323924_ugoira1920x1080.zip
         if url =~ %r!/(\d+)(?:_\w+)?\.(?:jpg|jpeg|png|gif|zip)!i
-          $1
-
-        # http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054
-        # http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054
-        # http://www.pixiv.net/member_illust.php?mode=manga&illust_id=18557054
-        # http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=18557054&page=1
-        elsif url =~ /illust_id=(\d+)/i
-          $1
-
-        # http://www.pixiv.net/i/18557054
-        elsif url =~ %r!pixiv\.net/i/(\d+)!i
-          $1
-
-        else
-          raise Sources::Error.new("Couldn't get illust ID from URL: #{url}")
-        end
-      end
-
-      # http://i1.pixiv.net/c/600x600/img-master/img/2014/10/02/13/51/23/46304396_p1_master1200.jpg
-      # => http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p1.png
-      #
-      # http://i.pximg.net/img-master/img/2014/05/15/23/53/59/43521009_p1_master1200.jpg
-      # => http://i.pximg.net/img-original/img/2014/05/15/23/53/59/43521009_p1.jpg
-      def rewrite_new_medium_images(thumbnail_url)
-        if thumbnail_url =~ %r!/c/\d+x\d+/img-master/img/#{TIMESTAMP}/\d+_p\d+_\w+\.jpg!i ||
-           thumbnail_url =~ %r!/img-master/img/#{TIMESTAMP}/\d+_p\d+_\w+\.jpg!i
-          page = manga_page_from_url(@url).to_i
-          thumbnail_url = @metadata.pages[page]
+          return $1
         end
 
-        thumbnail_url
-      end
-
-      # http://i3.pixiv.net/img-zip-ugoira/img/2014/12/03/04/58/24/47378698_ugoira600x600.zip
-      # => http://i3.pixiv.net/img-zip-ugoira/img/2014/12/03/04/58/24/47378698_ugoira1920x1080.zip
-      def rewrite_medium_ugoiras(thumbnail_url)
-        if thumbnail_url =~ %r!/img-zip-ugoira/img/.*/\d+_ugoira600x600.zip!i
-          thumbnail_url = thumbnail_url.sub("_ugoira600x600.zip", "_ugoira1920x1080.zip")
-        end
-
-        thumbnail_url
-      end
-
-      # If the thumbnail is for a manga gallery, it needs to be rewritten like this:
-      #
-      # http://i2.pixiv.net/img18/img/evazion/14901720_m.png
-      # => http://i2.pixiv.net/img18/img/evazion/14901720_big_p0.png
-      #
-      # Otherwise, it needs to be rewritten like this:
-      #
-      # http://i2.pixiv.net/img18/img/evazion/14901720_m.png
-      # => http://i2.pixiv.net/img18/img/evazion/14901720.png
-      #
-      def rewrite_old_small_and_medium_images(thumbnail_url, is_manga)
-        if thumbnail_url =~ %r!/img/#{MONIKER}/\d+_[ms]\.#{EXT}!i
-          if is_manga.nil?
-            page_count = @metadata.page_count
-            is_manga = page_count > 1
+        [url, referer_url].each do |x|
+          # http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054
+          # http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054
+          # http://www.pixiv.net/member_illust.php?mode=manga&illust_id=18557054
+          # http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=18557054&page=1
+          if x =~ /illust_id=(\d+)/i
+            return $1
           end
 
-          if is_manga
-            page = manga_page_from_url(@url)
-            return thumbnail_url.sub(/_[ms]\./, "_big_p#{page}.")
-          else
-            return thumbnail_url.sub(/_[ms]\./, ".")
+          # http://www.pixiv.net/i/18557054
+          if x =~ %r!pixiv\.net/i/(\d+)!i
+            return $1
           end
         end
 
-        return thumbnail_url
+        raise Sources::Error.new("Couldn't get illust ID from URL (#{url}, #{referer_url})")
+      end
+      memoize :illust_id
+
+      def novel_id
+        [url, referer_url].each do |x|
+          if x =~ NOVEL_PAGE
+            return $1
+          end
+        end
+
+        return nil
+      end
+      memoize :novel_id
+
+      def fanbox_id
+        [url, referer_url].each do |x|
+          if x =~ FANBOX_PAGE
+            return $1
+          end
+
+          if x =~ FANBOX_IMAGE
+            return $1
+          end
+        end
+
+        return nil
+      end
+      memoize :fanbox_id
+
+      def agent
+        PixivWebAgent.build
+      end
+      memoize :agent
+
+      def page
+        agent.get(URI.parse(page_url))
+        
+        if page.search("body.not-logged-in").any?
+          # Session cache is invalid, clear it and log in normally.
+          Cache.delete("pixiv-phpsessid")
+          @agent = nil
+          page = agent.get(URI.parse(page_url))
+        end
+
+        page
+      end
+      memoize :page
+
+      def metadata
+        if novel_id.present?
+          return PixivApiClient.new.novel(novel_id)
+        end
+
+        if fanbox_id.present?
+          return PixivApiClient.new.fanbox(fanbox_id)
+        end
+
+        return PixivApiClient.new.work(illust_id)
+      end
+      memoize :metadata
+
+      def moniker
+        # we can sometimes get the moniker from the url
+        if url =~ %r!#{IMG}/img/(#{MONIKER})!i
+          return $1
+        end
+
+        if url =~ %r!#{I12}/img[0-9]+/img/(#{MONIKER})!i
+          return $1
+        end
+
+        if url =~ %r!#{WEB}/stacc/(#{MONIKER})/?$!i
+          return $1
+        end
+
+        return metadata.moniker
+      end
+      memoize :moniker
+
+      def page_count
+        metadata.page_count
       end
 
-      def manga_page_from_url(url)
+      def data
+        return {
+          ugoira_frame_data: ugoira_frame_data
+        }
+      end
+
+      def ugoira_zip_url
+        if metadata.pages.is_a?(Hash) && metadata.pages["ugoira600x600"]
+          return metadata.pages["ugoira600x600"].sub("_ugoira600x600.zip", "_ugoira1920x1080.zip")
+        end
+      end
+      memoize :ugoira_zip_url
+
+      def ugoira_frame_data
+        return metadata.json.dig("metadata", "frames")
+      end
+      memoize :ugoira_frame_data
+
+      def ugoira_content_type
+        case metadata.json["image_urls"].to_s
+        when /\.jpg/
+          return "image/jpeg"
+
+        when /\.png/
+          return "image/png"
+
+        when /\.gif/
+          return "image/gif"
+        end
+
+        raise Sources::Error.new("content type not found for (#{url}, #{referer_url})")
+      end
+      memoize :ugoira_content_type
+
+      def is_manga?
+        page_count > 1
+      end
+
+      # Returns the current page number of the manga. This will not
+      # make any api calls and only looks at (url, referer_url).
+      def manga_page
         # http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_p0.jpg
         # http://i1.pixiv.net/c/600x600/img-master/img/2014/09/24/23/25/08/46168376_p0_master1200.jpg
         # http://i1.pixiv.net/img-original/img/2014/09/25/23/09/29/46183440_p0.jpg
         if url =~ %r!/\d+_p(\d+)(?:_\w+)?\.#{EXT}!i
-          $1
+          return $1.to_i
+        end
 
         # http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=46170939&page=0
-        elsif url =~ /page=(\d+)/i
-          $1
-
-        else
-          0
-        end
-      end
-
-      def get_moniker_from_url
-        case url
-        when %r!#{IMG}/img/(#{MONIKER})!i
-          $1
-        when %r!#{I12}/img[0-9]+/img/(#{MONIKER})!i
-          $1
-        when %r!#{WEB}/stacc/(#{MONIKER})/?$!i
-          $1
-        else
-          false
-        end
-      end
-
-      def has_moniker?
-        get_moniker_from_url != false
-      end
-
-      def get_image_url_from_page(page, is_manga)
-        if is_manga
-          elements = page.search("div.works_display a img").find_all do |node|
-            node["src"] !~ /source\.pixiv\.net/
+        [url, referer_url].each do |x|
+          if x =~ /page=(\d+)/i
+            return $1.to_i
           end
-        else
-          elements = page.search("div.works_display div img.big")
-          elements = page.search("div.works_display div img") if elements.empty?
         end
 
-        if elements.any?
-          element = elements.first
-          thumbnail_url = element.attr("src") || element.attr("data-src")
-          return rewrite_thumbnails(thumbnail_url, is_manga)
-        end
-
-        if page.body =~ /"original":"(https:.+?)"/
-          return $1.gsub(/\\\//, '/')
-        end
+        return nil
       end
-
-      def get_zip_url_from_api
-        if @metadata.pages.is_a?(Hash) && @metadata.pages["ugoira600x600"]
-          zip_url = @metadata.pages["ugoira600x600"].sub("_ugoira600x600.zip", "_ugoira1920x1080.zip")
-          frame_data = @metadata.json["metadata"]["frames"]
-          content_type = nil
-          
-          case @metadata.json["image_urls"].to_s
-          when /\.jpg/
-            content_type = "image/jpeg"
-
-          when /\.png/
-            content_type = "image/png"
-
-          when /\.gif/
-            content_type = "image/gif"
-          end
-
-          return [zip_url, frame_data, content_type]
-        end
-      end
-
-      def get_zip_url_from_page(page)
-        scripts = page.search("body script").find_all do |node|
-          node.text =~ /_ugoira600x600\.zip/
-        end
-
-        if scripts.any?
-          javascript = scripts.first.text
-
-          json = javascript.match(/;pixiv\.context\.ugokuIllustData\s+=\s+(\{.+?\});(?:$|pixiv\.context)/)[1]
-          data = JSON.parse(json)
-          zip_url = data["src"].sub("_ugoira600x600.zip", "_ugoira1920x1080.zip")
-          frame_data = data["frames"]
-          content_type = data["mime_type"]
-
-          return [zip_url, frame_data, content_type]
-        end
-      end
-
-      def normalized_url
-        "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{@illust_id}"
-      end
-
-      def get_metadata_from_papi(illust_id)
-        @metadata ||= PixivApiClient.new.works(illust_id)
-      end
-
-      def work_page?
-        return true if url =~ %r!(?:#{WEB}|#{TOUCH})/member_illust\.php! && url =~ %r!mode=(?:medium|big|manga|manga_big)! && url =~ %r!illust_id=\d+!
-        return true if url =~ %r!(?:#{WEB}|#{TOUCH})/i/\d+$!i
-        return false
-      end
-
-      def full_image?
-        # http://img18.pixiv.net/img/evazion/14901720.png?1234
-        return true if url =~ %r!#{IMG}/img/#{MONIKER}/\d+(?:_big_p\d+)?\.#{EXT}!i
-
-        # http://i2.pixiv.net/img18/img/evazion/14901720.png
-        # http://i1.pixiv.net/img07/img/pasirism/18557054_big_p1.png
-        return true if url =~ %r!#{I12}/img\d+/img/#{MONIKER}/\d+(?:_big_p\d+)?\.#{EXT}!i
-
-        # http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p0.png
-        return true if url =~ %r!#{I12}/img-original/img/#{TIMESTAMP}/\d+_p\d+\.#{EXT}$!i
-
-        # http://i.pximg.net/img-original/img/2017/03/22/17/40/51/62041488_p0.jpg
-        return true if url =~ %r!#{PXIMG}/img-original/img/#{TIMESTAMP}/\d+_\w+\.#{EXT}!i
-
-        # http://i1.pixiv.net/img-zip-ugoira/img/2014/10/03/17/29/16/46323924_ugoira1920x1080.zip
-        return true if url =~ %r!(#{I12}|#{PXIMG})/img-zip-ugoira/img/#{TIMESTAMP}/\d+_ugoira\d+x\d+\.zip$!i
-
-        return false
-      end
-
-      def sample_image?
-        # http://img18.pixiv.net/img/evazion/14901720_m.png
-        return true if url =~ %r!#{IMG}/img/#{MONIKER}/\d+_(?:[sm]|p\d+)\.#{EXT}!i
-
-        # http://i2.pixiv.net/img18/img/evazion/14901720_m.png
-        # http://i1.pixiv.net/img07/img/pasirism/18557054_p1.png
-        return true if url =~ %r!#{I12}/img\d+/img/#{MONIKER}/\d+_(?:[sm]|p\d+)\.#{EXT}!i
-
-        # http://i1.pixiv.net/c/600x600/img-master/img/2014/10/02/13/51/23/46304396_p0_master1200.jpg
-        # http://i2.pixiv.net/c/64x64/img-master/img/2014/10/09/12/59/50/46441917_square1200.jpg
-        return true if url =~ %r!#{I12}/c/\d+x\d+/img-master/img/#{TIMESTAMP}/\d+_\w+\.#{EXT}$!i
-
-        # http://i.pximg.net/img-master/img/2014/05/15/23/53/59/43521009_p1_master1200.jpg
-        return true if url =~ %r!#{PXIMG}/img-master/img/#{TIMESTAMP}/\d+_\w+\.#{EXT}!i
-
-        # http://i.pximg.net/c/600x600/img-master/img/2017/03/22/17/40/51/62041488_p0_master1200.jpg
-        return true if url =~ %r!#{PXIMG}/c/\d+x\d+/img-master/img/#{TIMESTAMP}/\d+_\w+\.#{EXT}!i
-
-        # http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_s.png
-        # http://i2.pixiv.net/img-inf/img/2010/11/30/08/54/06/14901765_64x64.jpg
-        return true if url =~ %r!#{I12}/img-inf/img/#{TIMESTAMP}/\d+_\w+\.#{EXT}!i
-
-        return false
-      end
+      memoize :manga_page
     end
   end
 end

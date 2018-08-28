@@ -1,51 +1,93 @@
 module Sources::Strategies
   class Twitter < Base
-    attr_reader :image_urls
+    PAGE = %r!\Ahttps?://(?:mobile\.)?twitter\.com!i
+    ASSET = %r!\A(https?://(?:video|pbs)\.twimg\.com/media/)}!i
 
-    def self.url_match?(url)
-      self.status_id_from_url(url).present?
+    def self.match?(*urls)
+      urls.compact.any? { |x| x =~ PAGE || x =~ ASSET}
     end
 
-    def referer_url
-      normalized_url
-    end
+    # https://twitter.com/i/web/status/943446161586733056
+    # https://twitter.com/motty08111213/status/943446161586733056
+    def self.status_id_from_url(url)
+      if url =~ %r{\Ahttps?://(?:mobile\.)?twitter\.com/(?:i/web|\w+)/status/(\d+)}i
+        return $1
+      end
 
-    def normalized_url
-      "https://twitter.com/#{artist_name}/status/#{status_id}"
-    end
-
-    def artist_name
-      api_response.attrs[:user][:screen_name]
+      return nil
     end
 
     def site_name
       "Twitter"
     end
 
-    def api_response
-      @api_response ||= TwitterService.new.client.status(status_id, tweet_mode: "extended")
-    end
-
-    def get
-      attrs = api_response.attrs
-      @profile_url = "https://twitter.com/" + attrs[:user][:screen_name]
-      @image_urls = TwitterService.new.image_urls(api_response)
-      @image_url = @image_urls.first
-      @artist_commentary_title = ""
-      @artist_commentary_desc = attrs[:full_text]
-      @tags = attrs[:entities][:hashtags].map do |text:, indices:|
-        [text, "https://twitter.com/hashtag/#{text}"]
+    def image_urls
+      if url =~ /(#{ASSET}[^:]+)/
+        return [$1 + ":orig" ]
       end
-    rescue ::Twitter::Error::Forbidden
+
+      [url, referer_url].each do |x|
+        if x =~ PAGE
+          return service.image_urls(api_response)
+        end
+      end
+    rescue Twitter::Error::NotFound
+      url
+    end
+    memoize :image_urls
+
+    def page_url
+      [url, referer_url].each do |x|
+        if self.class.status_id_from_url(x).present?
+          return x
+        end
+      end
+
+      return super
     end
 
-    def normalize_for_artist_finder!
-      url.downcase
+    def profile_url
+      if url =~ %r{\Ahttps?://(?:mobile\.)?twitter\.com/(\w+)}i
+        if $1 != "i"
+          return "https://twitter.com/#{$1}"
+        end
+      end
+
+      "https://twitter.com/" + api_response.attrs[:user][:screen_name]
+    rescue Twitter::Error::NotFound
+      nil
+    end
+
+    def artist_name
+      api_response.attrs[:user][:screen_name]
+    rescue Twitter::Error::NotFound
+      nil
+    end
+
+    def artist_commentary_title
+      ""
+    end
+
+    def artist_commentary_desc
+      api_response.attrs[:full_text]
+    rescue Twitter::Error::NotFound
+      nil
     end
 
     def normalizable_for_artist_finder?
-      true
+      url =~ PAGE
     end
+
+    def normalize_for_artist_finder
+      profile_url.downcase
+    end
+
+    def tags
+      api_response.attrs[:entities][:hashtags].map do |text:, indices:|
+        [text, "https://twitter.com/hashtag/#{text}"]
+      end
+    end
+    memoize :tags
 
     def dtext_artist_commentary_desc
       url_replacements = api_response.urls.map do |obj|
@@ -63,19 +105,23 @@ module Sources::Strategies
       desc = desc.gsub(%r!@([a-zA-Z0-9_]+)!, '"@\\1":[https://twitter.com/\\1]')
       desc.strip
     end
+    memoize :dtext_artist_commentary_desc
+
+  public
+
+    def service
+      TwitterService.new
+    end
+    memoize :service
+
+    def api_response
+      service.client.status(status_id, tweet_mode: "extended")
+    end
+    memoize :api_response
 
     def status_id
-      self.class.status_id_from_url(@url) || self.class.status_id_from_url(@referer_url)
+      [url, referer_url].map {|x| self.class.status_id_from_url(x)}.compact.first
     end
-
-    # https://twitter.com/i/web/status/943446161586733056
-    # https://twitter.com/motty08111213/status/943446161586733056
-    def self.status_id_from_url(url)
-      if url =~ %r{\Ahttps?://(?:mobile\.)?twitter\.com/(?:i/web|\w+)/status/(\d+)}i
-        $1
-      else
-        nil
-      end
-    end
+    memoize :status_id
   end
 end

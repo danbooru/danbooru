@@ -74,8 +74,8 @@ class UploadService
       
       if replacement.replacement_file.present?
         replacement.replacement_url = "file://#{replacement.replacement_file.original_filename}"
-      elsif upload.downloaded_source.present?
-        replacement.replacement_url = upload.downloaded_source
+      elsif upload.source.present?
+        replacement.replacement_url = Sources::Strategies.canonical(upload.source, upload.referer_url)
       end
 
       if md5_changed
@@ -93,7 +93,7 @@ class UploadService
       post.image_width = upload.image_width
       post.image_height = upload.image_height
       post.file_size = upload.file_size
-      post.source = upload.downloaded_source || upload.source
+      post.source = Sources::Strategies.canonical(upload.source, upload.referer_url)
       post.tag_string = upload.tag_string
 
       update_ugoira_frame_data(post, upload)
