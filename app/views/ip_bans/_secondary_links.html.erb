@@ -1,6 +1,6 @@
 <% content_for(:secondary_links) do %>
   <menu>
-    <li><%= link_to "Listing", ip_bans_path %></li>
-    <li><%= link_to "New", new_ip_ban_path %></li>
+    <%= subnav_link_to "Listing", ip_bans_path %>
+    <%= subnav_link_to "New", new_ip_ban_path %>
   </menu>
 <% end %>

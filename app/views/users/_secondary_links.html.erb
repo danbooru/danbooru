@@ -1,41 +1,41 @@
 <% content_for(:secondary_links) do %>
   <menu>
     <li><%= render "users/quick_search" %></li>
-    <li><%= link_to "Listing", users_path %></li>
-    <li><%= link_to "Search", search_users_path %></li>
+    <%= subnav_link_to "Listing", users_path %>
+    <%= subnav_link_to "Search", search_users_path %>
 
     <% if CurrentUser.user.is_anonymous? %>
-      <li><%= link_to "Sign up", new_user_path %></li>
+      <%= subnav_link_to "Sign up", new_user_path %>
     <% end %>
 
     <% if @user && !@user.new_record? && !CurrentUser.user.is_anonymous? %>
       <li>|</li>
       <% if @user.id == CurrentUser.user.id %>
-        <li><%= link_to "Settings", edit_user_path(CurrentUser.user) %></li>
-        <li><%= link_to "Profile", user_path(CurrentUser.user) %></li>
-        <li><%= link_to "Messages #{CurrentUser.user.dmail_count}", dmails_current_folder_path %></li>
+        <%= subnav_link_to "Settings", edit_user_path(CurrentUser.user) %>
+        <%= subnav_link_to "Profile", user_path(CurrentUser.user) %>
+        <%= subnav_link_to "Messages #{CurrentUser.user.dmail_count}", dmails_current_folder_path %>
 
         <% if !@user.is_platinum? %>
-          <li><%= link_to "Upgrade", new_user_upgrade_path %></li>
+          <%= subnav_link_to "Upgrade", new_user_upgrade_path %>
         <% end %>
       <% else %>
-        <li><%= link_to "Send message", new_dmail_path(:dmail => {:to_id => @user.id}) %></li>
+        <%= subnav_link_to "Send message", new_dmail_path(:dmail => {:to_id => @user.id}) %>
         <% if !@user.is_platinum? %>
-          <li><%= link_to "Gift upgrade", new_user_upgrade_path(:user_id => @user.id) %></li>
+          <%= subnav_link_to "Gift upgrade", new_user_upgrade_path(:user_id => @user.id) %>
         <% end %>
       <% end %>
 
       <% if CurrentUser.user.is_moderator? %>
-        <li><%= link_to "Promote", edit_admin_user_path(@user) %></li>
+        <%= subnav_link_to "Promote", edit_admin_user_path(@user) %>
         <% if @user.is_banned? %>
-          <li><%= link_to "Unban", ban_path(@user.recent_ban) %></li>
+          <%= subnav_link_to "Unban", ban_path(@user.recent_ban) %>
         <% else %>
-          <li><%= link_to "Ban", new_ban_path(:ban => {:user_id => @user.id}) %></li>
+          <%= subnav_link_to "Ban", new_ban_path(:ban => {:user_id => @user.id}) %>
         <% end %>
       <% end %>
 
       <li>|</li>
-      <li><%= link_to "Sign out", sign_out_session_path %></li>
+      <%= subnav_link_to "Sign out", sign_out_session_path %>
     <% end %>
   </menu>
 <% end %>

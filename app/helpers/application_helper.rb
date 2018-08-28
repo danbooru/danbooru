@@ -7,15 +7,24 @@ module ApplicationHelper
     raw(wordbreaked_string)
   end
 
-  def nav_link_to(text, url, options = nil)
+  def nav_link_to(text, url, **options)
     if nav_link_match(params[:controller], url)
       klass = "current"
     else
       klass = nil
     end
 
-    id = "nav-" + text.downcase.gsub(/[^a-z ]/, "").parameterize
-    tag.li(link_to(text, url, options), class: klass, id: id)
+    li_link_to(text, url, id_prefix: "nav-", class: klass, **options)
+  end
+
+  def subnav_link_to(text, url, **options)
+    li_link_to(text, url, id_prefix: "subnav-", **options)
+  end
+
+  def li_link_to(text, url, id_prefix: "", **options)
+    klass = options.delete(:class)
+    id = id_prefix + text.downcase.gsub(/[^a-z ]/, "").parameterize
+    tag.li(link_to(text, url, options), id: id, class: klass)
   end
 
   def fast_link_to(text, link_params, options = {})

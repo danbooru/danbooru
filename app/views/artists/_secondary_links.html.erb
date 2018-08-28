@@ -1,31 +1,31 @@
 <% content_for(:secondary_links) do %>
   <menu>
     <li><%= render "artists/quick_search" %></li>
-    <li><%= link_to "Listing", artists_path %></li>
-    <li><%= link_to "Banned", banned_artists_path %></li>
-    <li><%= link_to "New", new_artist_path %></li>
-    <li><%= link_to "Recent changes", artist_versions_path %></li>
+    <%= subnav_link_to "Listing", artists_path %>
+    <%= subnav_link_to "Banned", banned_artists_path %>
+    <%= subnav_link_to "New", new_artist_path %>
+    <%= subnav_link_to "Recent changes", artist_versions_path %>
     <% if @artist && !@artist.new_record? %>
       <li>|</li>
-      <li><%= link_to "Posts (#{Post.fast_count(@artist.name)})", posts_path(:tags => @artist.name) %></li>
-      <li><%= link_to "Show", artist_path(@artist) %></li>
+      <%= subnav_link_to "Posts (#{Post.fast_count(@artist.name)})", posts_path(:tags => @artist.name) %>
+      <%= subnav_link_to "Show", artist_path(@artist) %>
       <% if CurrentUser.is_member? %>
-        <li id="artist-edit"><%= link_to "Edit", edit_artist_path(@artist), :"data-shortcut" => "e" %></li>
+        <%= subnav_link_to "Edit", edit_artist_path(@artist), :"data-shortcut" => "e" %>
       <% end %>
-      <li><%= link_to "History", artist_versions_path(:search => {:artist_id => @artist.id}) %></li>
+      <%= subnav_link_to "History", artist_versions_path(:search => {:artist_id => @artist.id}) %>
       <% if @artist.deletable_by?(CurrentUser.user) %>
         <% if @artist.is_active? %>
-          <li id="artist-delete"><%= link_to "Delete", artist_path(@artist), method: :delete, "data-shortcut": "shift+d", "data-confirm": "Are you sure you want to delete this artist?" %></li>
+          <%= subnav_link_to "Delete", artist_path(@artist), method: :delete, "data-shortcut": "shift+d", "data-confirm": "Are you sure you want to delete this artist?" %>
         <% else %>
-          <li><%= link_to "Undelete", artist_path(@artist, format: "js"), method: :put, data: {confirm: "Are you sure you want to undelete this artist?", params: "artist[is_active]=true"}, remote: true %></li>
+          <%= subnav_link_to "Undelete", artist_path(@artist, format: "js"), method: :put, data: {confirm: "Are you sure you want to undelete this artist?", params: "artist[is_active]=true"}, remote: true %>
         <% end %>
       <% end %>
       <% if CurrentUser.is_admin? %>
         <% if @artist.is_banned? %>
-          <li><%= link_to "Unban", unban_artist_path(@artist), :method => :put, :data => {:confirm => "Are you sure you want to unban this artist?"} %></li>
+          <%= subnav_link_to "Unban", unban_artist_path(@artist), :method => :put, :data => {:confirm => "Are you sure you want to unban this artist?"} %>
 
         <% else %>
-          <li><%= link_to "Ban", ban_artist_path(@artist), :method => :put, :data => {:confirm => "Are you sure you want to ban this artist?"} %></li>
+          <%= subnav_link_to "Ban", ban_artist_path(@artist), :method => :put, :data => {:confirm => "Are you sure you want to ban this artist?"} %>
         <% end %>
       <% end %>
     <% end %>
