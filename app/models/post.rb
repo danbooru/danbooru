@@ -1793,8 +1793,8 @@ class Post < ApplicationRecord
       return if source !~ %r!\Ahttps?://!
       return if has_tag?("artist_request") || has_tag?("official_art")
       return if tags.any? { |t| t.category == Tag.categories.artist }
+      return if Sources::Strategies.find(source).is_a?(Sources::Strategies::Null)
 
-      site = Sources::Strategies.find(source)
       self.warnings[:base] << "Artist tag is required. Create a new tag with [[artist:<artist_name>]]. Ask on the forum if you need naming help"
     end
 
