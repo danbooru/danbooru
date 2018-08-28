@@ -1,8 +1,10 @@
-class ApproverPruner
+module ApproverPruner
+  extend self
+
   def inactive_approvers
     User.where("bit_prefs & ? > 0", User.flag_value_for("can_approve_posts")).select do |user|
       approval_count = Post.where("created_at >= ? and approver_id = ?", 3.months.ago, user.id).count
-      approval_count == 0
+      approval_count < 10
     end
   end
 
@@ -23,7 +25,7 @@ class ApproverPruner
         Dmail.create_automated(
           :to_id => user.id,
           :title => "Approver inactivity",
-          :body => "You haven't approved a post in the past three months. In order to make sure the list of active approvers is up-to-date, you have lost your approver privileges."
+          :body => "You've approved fewer than 10 posts in the past three months. In order to make sure the list of active approvers is up-to-date, you have lost your approval privileges. If you wish to dispute this, you can message an admin to have your permission reinstated."
         )
       end
     end
