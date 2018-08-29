@@ -143,6 +143,25 @@ module Sources
       end
     end
 
+    context "The source site for a direct image url (pbs.twimg.com/media/*.jpg) without a referer url" do
+      setup do
+        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
+        @site = Sources::Strategies.find("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large")
+      end
+
+      should "work" do
+        assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig", @site.image_url)
+        assert_equal(["https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"], @site.image_urls)
+        assert(@site.artist_name.blank?)
+        assert(@site.profile_url.blank?)
+        assert(@site.artists.empty?)
+        assert(@site.tags.empty?)
+        assert(@site.artist_commentary_desc.blank?)
+        assert(@site.dtext_artist_commentary_desc.blank?)
+        assert_nothing_raised { @site.to_h }
+      end
+    end
+
     context "The source site for a https://twitter.com/i/web/status/:id url" do
       setup do
         skip "Twitter key is not set" unless Danbooru.config.twitter_api_key

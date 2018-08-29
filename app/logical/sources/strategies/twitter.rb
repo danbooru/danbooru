@@ -24,6 +24,8 @@ module Sources::Strategies
     def image_urls
       if url =~ /(#{ASSET}[^:]+)/
         return [$1 + ":orig" ]
+      elsif api_response.blank?
+        return [url]
       end
 
       [url, referer_url].each do |x|
@@ -31,8 +33,6 @@ module Sources::Strategies
           return service.image_urls(api_response)
         end
       end
-    rescue Twitter::Error::NotFound
-      url
     end
     memoize :image_urls
 
@@ -47,21 +47,28 @@ module Sources::Strategies
     end
 
     def profile_url
+      return "" if api_response.blank?
+
       if url =~ %r{\Ahttps?://(?:mobile\.)?twitter\.com/(\w+)}i
         if $1 != "i"
           return "https://twitter.com/#{$1}"
         end
       end
 
-      "https://twitter.com/" + api_response.attrs[:user][:screen_name]
-    rescue Twitter::Error::NotFound
-      nil
+      "https://twitter.com/" + artist_name
+    end
+
+    def artists
+      if profile_url.present?
+        Artist.find_artists(profile_url)
+      else
+        []
+      end
     end
 
     def artist_name
+      return "" if api_response.blank?
       api_response.attrs[:user][:screen_name]
-    rescue Twitter::Error::NotFound
-      nil
     end
 
     def artist_commentary_title
@@ -69,9 +76,8 @@ module Sources::Strategies
     end
 
     def artist_commentary_desc
+      return "" if api_response.blank?
       api_response.attrs[:full_text]
-    rescue Twitter::Error::NotFound
-      nil
     end
 
     def normalizable_for_artist_finder?
@@ -79,10 +85,12 @@ module Sources::Strategies
     end
 
     def normalize_for_artist_finder
-      profile_url.downcase
+      profile_url.try(:downcase)
     end
 
     def tags
+      return [] if api_response.blank?
+
       api_response.attrs[:entities][:hashtags].map do |text:, indices:|
         [text, "https://twitter.com/hashtag/#{text}"]
       end
@@ -90,6 +98,8 @@ module Sources::Strategies
     memoize :tags
 
     def dtext_artist_commentary_desc
+      return "" if artist_commentary_desc.blank?
+
       url_replacements = api_response.urls.map do |obj|
         [obj.url.to_s, obj.expanded_url.to_s]
       end
@@ -116,6 +126,8 @@ module Sources::Strategies
 
     def api_response
       service.client.status(status_id, tweet_mode: "extended")
+    rescue ::Twitter::Error::NotFound
+      {}
     end
     memoize :api_response
 
