@@ -10,6 +10,7 @@ class TagsController < ApplicationController
 
   def index
     @tags = Tag.search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+
     respond_with(@tags) do |format|
       format.xml do
         render :xml => @tags.to_xml(:root => "tags")
@@ -18,7 +19,13 @@ class TagsController < ApplicationController
   end
 
   def autocomplete
-    @tags = Tag.names_matches_with_aliases(params[:search][:name_matches])
+    if CurrentUser.is_builder?
+      # limit rollout
+      @tags = TagAutocomplete.search(params[:search][:name_matches])
+    else
+      @tags = Tag.names_matches_with_aliases(params[:search][:name_matches])
+    end
+
     expires_in params[:expiry].to_i.days if params[:expiry]
 
     respond_with(@tags) do |format|
