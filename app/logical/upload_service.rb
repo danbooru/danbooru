@@ -112,7 +112,7 @@ class UploadService
       p.image_height = upload.image_height
       p.rating = upload.rating
       if upload.source.present?
-        p.source = Sources::Strategies.find(upload.source, upload.referer_url).canonical_url
+        p.source = Sources::Strategies.find(upload.source, upload.referer_url).canonical_url || upload.source
       end
       p.file_size = upload.file_size
       p.uploader_id = upload.uploader_id
