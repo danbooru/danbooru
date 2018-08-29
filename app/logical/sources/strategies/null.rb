@@ -13,6 +13,10 @@ module Sources
         url
       end
 
+      def artist_name
+        nil
+      end
+
       def normalized_for_artist_finder?
         true
       end
