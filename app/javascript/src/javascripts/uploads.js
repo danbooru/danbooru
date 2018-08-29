@@ -86,8 +86,8 @@ Upload.initialize_info_bookmarklet = function() {
 
 Upload.initialize_info_manual = function() {
   $("#fetch-data-manual").click(function(e) {
-    var source = $("#upload_source,#post_source,#url").val();
-    var referer = $("#upload_referer_url,#ref").val();
+    var source = $("#upload_source,#post_source").val();
+    var referer = $("#ref").val();
 
     if (/^https?:\/\//.test(source)) {
       $("#source-info span#loading-data").show();
