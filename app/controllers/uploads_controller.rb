@@ -44,7 +44,7 @@ class UploadsController < ApplicationController
 
   def preprocess
     @upload, @post, @source, @remote_size = UploadService::ControllerHelper.prepare(
-      url: params[:url], file: params[:file], ref: params[:ref]
+      url: upload_params[:source], file: upload_params[:file], ref: upload_params[:referer_url]
     )
     render body: nil
   end

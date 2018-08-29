@@ -18,9 +18,8 @@
       <div id="client-errors" class="error-messages ui-state-error ui-corner-all" style="display:none"></div>
 
       <%= form_for(@upload, :html => {:multipart => true, :class => "simple_form", :id => "form"}) do |f| %>
-        <%= hidden_field_tag :url, params[:url] %>
-        <%= hidden_field_tag :ref, params[:ref] %>
         <%= f.hidden_field :md5_confirmation %>
+        <%= f.hidden_field :referer_url, value: params[:ref] %>
 
         <% if CurrentUser.can_upload_free? %>
           <div class="input">
@@ -160,7 +159,7 @@
       }
 
       $("#filedropzone").dropzone({ 
-        paramName: "file", 
+        paramName: "upload[file]", 
         url: "/uploads/preprocess", 
         createImageThumbnails: false,
         addRemoveLinks: false,
