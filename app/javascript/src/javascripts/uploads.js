@@ -54,8 +54,8 @@ Upload.initialize_submit = function() {
 }
 
 Upload.initialize_iqdb_source = function() {
-  if (/^https?:\/\//.test($("#upload_source,#post_source").val())) {
-    $.get("/iqdb_queries", {"url": $("#upload_source,#post_source").val()}).done(function(html) {$("#iqdb-similar").html(html)});
+  if (/^https?:\/\//.test($("#upload_source").val())) {
+    $.get("/iqdb_queries", {"url": $("#upload_source").val()}).done(function(html) {$("#iqdb-similar").html(html)});
   }
 }
 
