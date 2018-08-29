@@ -42,5 +42,14 @@ header#top {
       background: $menu_color;
       font-weight: bold;
     }
+
+    li#nav-sign-in a {
+      font-weight: bold;
+      color: #e00;
+    }
+
+    li.forum-updated a {
+      font-style: italic;
+    }
   }
 }
