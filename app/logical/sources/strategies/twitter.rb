@@ -1,7 +1,7 @@
 module Sources::Strategies
   class Twitter < Base
     PAGE = %r!\Ahttps?://(?:mobile\.)?twitter\.com!i
-    ASSET = %r!\A(https?://(?:video|pbs)\.twimg\.com/media/)}!i
+    ASSET = %r!\A(https?://(?:video|pbs)\.twimg\.com/media/)!i
 
     def self.match?(*urls)
       urls.compact.any? { |x| x =~ PAGE || x =~ ASSET}
