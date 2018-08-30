@@ -4,7 +4,8 @@ class IqdbQueriesController < ApplicationController
 
   def show
     if params[:url]
-      @matches = IqdbProxy.query(params[:url])
+      strategy = Sources::Strategies.find(params[:url])
+      @matches = IqdbProxy.query(strategy.image_url)
     end
 
     if params[:post_id]
