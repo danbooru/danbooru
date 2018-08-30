@@ -147,10 +147,7 @@ Blacklist.post_match = function(post, entry) {
 
   var $post = $(post);
   var score = parseInt($post.attr("data-score"));
-
-  if (entry.min_score !== null && score < entry.min_score) {
-    return true;
-  }
+  var score_test = entry.min_score === null || score < entry.min_score;
 
   var tags = String($post.attr("data-tags")).match(/\S+/g) || [];
   tags = tags.concat(String($post.attr("data-pools")).match(/\S+/g) || []);
@@ -164,7 +161,7 @@ Blacklist.post_match = function(post, entry) {
     tags.push("status:" + v);
   });
 
-  return Utility.is_subset(tags, entry.require)
+  return (Utility.is_subset(tags, entry.require) && score_test)
     && (!entry.optional.length || Utility.intersect(tags, entry.optional).length)
     && !Utility.intersect(tags, entry.exclude).length;
 }
