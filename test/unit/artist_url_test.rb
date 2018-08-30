@@ -89,9 +89,9 @@ class ArtistUrlTest < ActiveSupport::TestCase
       end
 
       should "normalize" do
-        assert_equal("http://seiga.nicovideo.jp/user/illust/7017777", @urls[0].normalized_url)
-        assert_equal("http://seiga.nicovideo.jp/user/illust/7017777", @urls[1].normalized_url)
-        assert_equal("http://seiga.nicovideo.jp/user/illust/7017777", @urls[2].normalized_url)
+        assert_equal("http://seiga.nicovideo.jp/user/illust/7017777/", @urls[0].normalized_url)
+        assert_equal("http://seiga.nicovideo.jp/user/illust/7017777/", @urls[1].normalized_url)
+        assert_equal("http://seiga.nicovideo.jp/user/illust/7017777/", @urls[2].normalized_url)
       end
     end
 

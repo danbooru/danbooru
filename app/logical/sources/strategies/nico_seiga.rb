@@ -2,7 +2,8 @@ module Sources
   module Strategies
     class NicoSeiga < Base
       URL = %r!\Ahttps?://(?:\w+\.)?nico(?:seiga|video)\.jp!
-      DIRECT = %r!\Ahttps?://lohas\.nicoseiga\.jp/priv/[0-9a-f]+!
+      DIRECT1 = %r!\Ahttps?://lohas\.nicoseiga\.jp/priv/[0-9a-f]+!
+      DIRECT2 = %r!\Ahttps?://lohas\.nicoseiga\.jp/o/[0-9a-f]+/\d+/\d+!
       PAGE = %r!\Ahttps?://seiga\.nicovideo\.jp/seiga/im(\d+)!i
       PROFILE = %r!\Ahttps?://seiga\.nicovideo\.jp/user/illust/(\d+)!i
 
@@ -15,7 +16,7 @@ module Sources
       end
 
       def image_urls
-        if url =~ DIRECT
+        if url =~ DIRECT1
           return [url]
         end
 
@@ -100,7 +101,7 @@ module Sources
       end
 
       def normalizable_for_artist_finder?
-        url =~ PAGE || url =~ PROFILE
+        url =~ PAGE || url =~ PROFILE || url =~ DIRECT1 || url =~ DIRECT2
       end
 
       def normalize_for_artist_finder
