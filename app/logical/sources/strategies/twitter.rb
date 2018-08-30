@@ -47,15 +47,15 @@ module Sources::Strategies
     end
 
     def profile_url
-      return "" if api_response.blank?
-
       if url =~ %r{\Ahttps?://(?:mobile\.)?twitter\.com/(\w+)}i
         if $1 != "i"
           return "https://twitter.com/#{$1}"
         end
+      elsif artist_name.present?
+        "https://twitter.com/" + artist_name
+      else
+        ""
       end
-
-      "https://twitter.com/" + artist_name
     end
 
     def artists
