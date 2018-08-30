@@ -3,6 +3,13 @@ require 'test_helper'
 class TagAutocompleteTest < ActiveSupport::TestCase
   subject { TagAutocomplete }
 
+  context "#search" do
+    should "be case insensitive" do
+      create(:tag, name: "abcdef", post_count: 1)
+      assert_equal(["abcdef"], subject.search("A").map(&:name))
+    end
+  end
+
   context "#search_exact" do
     setup do
       @tags = [

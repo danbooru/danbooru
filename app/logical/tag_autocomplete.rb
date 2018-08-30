@@ -10,6 +10,8 @@ module TagAutocomplete
   end
 
   def search(query)
+    query = Tag.normalize_name(query)
+
     candidates = count_sort(
       query,
       search_prefix(query, 3) + 
