@@ -12,6 +12,7 @@ module Sources
       IMG =     %r!(?:\A(?:https?://)?img[0-9]*\.pixiv\.net)!
       PXIMG =   %r!(?:\A(?:https?://)?i\.pximg\.net)!
       TOUCH =   %r!(?:\A(?:https?://)?touch\.pixiv\.net)!
+      STACC_PAGE = %r!\A#{WEB}/stacc/#{MONIKER}/?\z!i
       NOVEL_PAGE = %r!(?:\Ahttps?://www\.pixiv\.net/novel/show\.php\?id=(\d+))!
       FANBOX_IMAGE = %r!(?:\Ahttps?://fanbox\.pixiv\.net/images/post/(\d+))!
       FANBOX_PAGE = %r!(?:\Ahttps?://www\.pixiv\.net/fanbox/creator/\d+/post/(\d+))!
@@ -117,7 +118,7 @@ module Sources
       end
 
       def normalized_for_artist_finder?
-        url =~ PROFILE
+        url =~ PROFILE || url =~ STACC_PAGE
       end
 
       def normalizable_for_artist_finder?
