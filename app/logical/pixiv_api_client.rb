@@ -128,7 +128,7 @@ class PixivApiClient
     end
 
     def moniker
-      raise NotImplementedError
+      ""
     end
 
     def page_count
