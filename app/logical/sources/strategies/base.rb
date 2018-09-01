@@ -71,11 +71,11 @@ module Sources
 
       # A link to the artist's profile page on the site.
       def profile_url
-        nil
+        ""
       end
 
       def artist_name
-        raise NotImplementedError
+        ""
       end
 
       def artist_commentary_title
@@ -129,7 +129,8 @@ module Sources
       end
 
       def artists
-        Artist.find_artists(profile_url)
+        url = profile_url.presence || image_url.presence
+        Artist.find_artists(url)
       end
 
       def file_url

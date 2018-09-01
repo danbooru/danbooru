@@ -13,8 +13,8 @@ module Sources
         url
       end
 
-      def artist_name
-        nil
+      def canonical_url
+        image_url
       end
 
       def normalized_for_artist_finder?
@@ -37,10 +37,6 @@ module Sources
 
       def unique_id
         url
-      end
-
-      def rewrite(url, headers, data)
-        return [url, headers, data]
       end
     end
   end
