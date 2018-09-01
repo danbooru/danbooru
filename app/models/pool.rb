@@ -58,9 +58,7 @@ class Pool < ApplicationRecord
         q = q.name_matches(params[:name_matches])
       end
 
-      if params[:description_matches].present?
-        q = q.where("lower(pools.description) like ? escape E'\\\\'", "%" + params[:description_matches].mb_chars.downcase.to_escaped_for_sql_like + "%")
-      end
+      q = q.attribute_matches(:description, params[:description_matches])
 
       if params[:creator_name].present?
         q = q.where("pools.creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].tr(" ", "_").mb_chars.downcase)

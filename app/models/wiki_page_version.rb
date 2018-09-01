@@ -20,6 +20,8 @@ class WikiPageVersion < ApplicationRecord
         q = q.where("wiki_page_id = ?", params[:wiki_page_id].to_i)
       end
 
+      q = q.attribute_matches(:title, params[:title])
+      q = q.attribute_matches(:body, params[:body])
       q = q.attribute_matches(:is_locked, params[:is_locked])
       q = q.attribute_matches(:is_deleted, params[:is_deleted])
 

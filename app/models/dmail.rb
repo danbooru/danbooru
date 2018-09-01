@@ -157,20 +157,6 @@ class Dmail < ApplicationRecord
       where("is_deleted = ?", true)
     end
 
-    def title_matches(query)
-      query = "*#{query}*" unless query =~ /\*/
-      where("lower(dmails.title) LIKE ?", query.mb_chars.downcase.to_escaped_for_sql_like)
-    end
-
-    def search_message(query)
-      if query =~ /\*/ && CurrentUser.user.is_builder?
-        escaped_query = query.to_escaped_for_sql_like
-        where("(title ILIKE ? ESCAPE E'\\\\' OR body ILIKE ? ESCAPE E'\\\\')", escaped_query, escaped_query)
-      else
-        where("message_index @@ plainto_tsquery(?)", query.to_escaped_for_tsquery_split)
-      end
-    end
-
     def read
       where(is_read: true)
     end
@@ -194,13 +180,8 @@ class Dmail < ApplicationRecord
     def search(params)
       q = super
 
-      if params[:title_matches].present?
-        q = q.title_matches(params[:title_matches])
-      end
-
-      if params[:message_matches].present?
-        q = q.search_message(params[:message_matches])
-      end
+      q = q.attribute_matches(:title, params[:title_matches])
+      q = q.attribute_matches(:body, params[:message_matches], index_column: :message_index)
 
       if params[:to_name].present?
         q = q.to_name_matches(params[:to_name])

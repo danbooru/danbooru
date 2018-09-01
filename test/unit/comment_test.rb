@@ -218,7 +218,7 @@ class CommentTest < ActiveSupport::TestCase
         c2 = FactoryBot.create(:comment, :body => "aaa ddd")
         c3 = FactoryBot.create(:comment, :body => "eee")
 
-        matches = Comment.body_matches("aaa")
+        matches = Comment.search(body_matches: "aaa")
         assert_equal(2, matches.count)
         assert_equal(c2.id, matches.all[0].id)
         assert_equal(c1.id, matches.all[1].id)

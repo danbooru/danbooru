@@ -24,14 +24,6 @@ class PostFlag < ApplicationRecord
   scope :in_cooldown, -> { by_users.where("created_at >= ?", COOLDOWN_PERIOD.ago) }
 
   module SearchMethods
-    def reason_matches(query)
-      if query =~ /\*/
-        where("post_flags.reason ILIKE ? ESCAPE E'\\\\'", query.to_escaped_for_sql_like)
-      else
-        where("to_tsvector('english', post_flags.reason) @@ plainto_tsquery(?)", query.to_escaped_for_tsquery)
-      end
-    end
-
     def duplicate
       where("to_tsvector('english', post_flags.reason) @@ to_tsquery('dup | duplicate | sample | smaller')")
     end
@@ -67,9 +59,7 @@ class PostFlag < ApplicationRecord
     def search(params)
       q = super
 
-      if params[:reason_matches].present?
-        q = q.reason_matches(params[:reason_matches])
-      end
+      q = q.attribute_matches(:reason, params[:reason_matches])
 
       if params[:creator_id].present?
         if CurrentUser.can_view_flagger?(params[:creator_id].to_i)

@@ -58,6 +58,9 @@ class BulkUpdateRequest < ApplicationRecord
         q = q.where(status: params[:status].split(","))
       end
 
+      q = q.attribute_matches(:title, params[:title_matches])
+      q = q.attribute_matches(:script, params[:script_matches])
+
       params[:order] ||= "status_desc"
       case params[:order]
       when "id_desc"
