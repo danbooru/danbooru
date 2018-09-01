@@ -14,6 +14,10 @@ module Sources
         assert_equal("https://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
       end
 
+      should "get the canonical url" do
+        assert_equal("https://nijie.info/view.php?id=213043", @site.canonical_url)
+      end
+
       should "get the profile" do
         assert_equal("https://nijie.info/members.php?id=728995", @site.profile_url)
       end
@@ -54,6 +58,10 @@ module Sources
         assert_equal("http://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
       end
 
+      should "get the canonical url" do
+        assert_equal("https://nijie.info/view.php?id=213043", @site.canonical_url)
+      end
+
       should "get the profile" do
         assert_equal("https://nijie.info/members.php?id=728995", @site.profile_url)
       end
@@ -70,6 +78,10 @@ module Sources
 
       should "get the image url" do
         assert_equal("https://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
+      end
+
+      should "get the canonical url" do
+        assert_equal("https://nijie.info/view.php?id=213043", @site.canonical_url)
       end
 
       should "get the profile" do
