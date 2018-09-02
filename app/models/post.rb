@@ -390,7 +390,7 @@ class Post < ApplicationRecord
         artist = $~[:artist].dasherize
         title = $~[:title].titleize.strip.squeeze(" ").tr(" ", "-")
         id = $~[:id].to_i(36)
-        "https://#{artist}.deviantart.com/art/#{title}-#{id}"
+        "https://www.deviantart.com/#{artist}/art/#{title}-#{id}"
 
       # http://prnt00.deviantart.net/9b74/b/2016/101/4/468a9d89f52a835d4f6f1c8caca0dfb2-pnjfbh.jpg
       # http://fc00.deviantart.net/fs71/f/2013/234/d/8/d84e05f26f0695b1153e9dab3a962f16-d6j8jl9.jpg
