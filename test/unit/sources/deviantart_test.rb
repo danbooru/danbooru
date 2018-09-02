@@ -44,6 +44,18 @@ module Sources
       end
     end
 
+    context "The source for a origin-orig.deviantart.net image url without a referer" do
+      should "work" do
+        @site = Sources::Strategies.find("http://origin-orig.deviantart.net/7b5b/f/2017/160/c/5/test_post_please_ignore_by_noizave-dbc3a48.png")
+
+        assert_equal("noizave", @site.artist_name)
+        assert_equal("https://www.deviantart.com/noizave", @site.profile_url)
+        assert_equal("http://origin-orig.deviantart.net/7b5b/f/2017/160/c/5/test_post_please_ignore_by_noizave-dbc3a48.png", @site.image_url)
+        assert_equal(%w[bar baz foo], @site.tags.map(&:first))
+        assert_nothing_raised { @site.to_h }
+      end
+    end
+
     context "The source for an DeviantArt artwork page" do
       setup do
         @site = Sources::Strategies.find("http://noizave.deviantart.com/art/test-post-please-ignore-685436408")

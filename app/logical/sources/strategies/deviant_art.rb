@@ -1,10 +1,11 @@
 module Sources
   module Strategies
     class DeviantArt < Base
-      ATTRIBUTED_ASSET = %r{\Ahttps?://(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net/.+/[a-z0-9_]*_by_[a-z0-9_]+-d([a-z0-9]+)\.}i
-      ASSET = %r{\Ahttps?://(?:fc|th|pre|orig|img)\d{2}\.deviantart\.net/.+/[a-f0-9]+-d([a-z0-9]+)\.}i
+      ASSET_SUBDOMAINS = %r{(?:fc|th|pre|img|orig|origin-orig)\d*}i
+      ATTRIBUTED_ASSET = %r{\Ahttps?://#{ASSET_SUBDOMAINS}\.deviantart\.net/.+/[a-z0-9_]*_by_[a-z0-9_]+-d([a-z0-9]+)\.}i
+      ASSET = %r{\Ahttps?://#{ASSET_SUBDOMAINS}\.deviantart\.net/.+/[a-f0-9]+-d([a-z0-9]+)\.}i
       PATH_ART = %r{\Ahttps?://www\.deviantart\.com/([^/]+)/art/}
-      RESERVED_SUBDOMAINS = %r{\Ahttps?://(?:fc|th|pre|orig|img|www)\.}
+      RESERVED_SUBDOMAINS = %r{\Ahttps?://(?:#{ASSET_SUBDOMAINS}|www)\.}
       SUBDOMAIN_ART = %r{\Ahttps?://(.+?)\.deviantart\.com(.*)}
       PROFILE = %r{\Ahttps?://www\.deviantart\.com/([^/]+)/?\z}
 
