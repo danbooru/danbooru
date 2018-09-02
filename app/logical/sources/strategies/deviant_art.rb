@@ -18,17 +18,6 @@ module Sources
       end
 
       def image_urls
-        # normalize thumbnails
-        if url =~ %r{^(https?://(?:fc|th)\d{2}\.deviantart\.net/.+?/)200H/}
-          match = $1
-          return [url.sub(match + "200H/", match)]
-        end
-
-        if url =~ %r{^(https?://(?:fc|th)\d{2}\.deviantart\.net/.+?/)PRE/}
-          match = $1
-          return [url.sub(match + "PRE/", match)]
-        end
-
         # return direct links
         if url =~ ATTRIBUTED_ASSET || url =~ ASSET
           return [url]

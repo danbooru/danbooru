@@ -56,6 +56,13 @@ module Sources
       end
     end
 
+    context "The source for a th00.deviantart.net/*/PRE/* thumbnail url" do
+      should "return the full size image url" do
+        @site = Sources::Strategies.find("http://th00.deviantart.net/fs71/PRE/f/2014/065/3/b/goruto_by_xyelkiltrox-d797tit.png")
+        assert_equal("http://origin-orig.deviantart.net/0f1e/f/2014/065/3/b/goruto_by_xyelkiltrox-d797tit.png", @site.image_url)
+      end
+    end
+
     context "The source for an DeviantArt artwork page" do
       setup do
         @site = Sources::Strategies.find("http://noizave.deviantart.com/art/test-post-please-ignore-685436408")
