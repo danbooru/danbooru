@@ -17,13 +17,10 @@ module Sources
       end
     end
 
-    context "The source for a private DeviantArt image URL" do
-      setup do
-        @site = Sources::Strategies.find("https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png")
-      end
-
+    context "The source for a deleted DeviantArt image URL" do
       should "work" do
-        assert_equal(["https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png"], @site.image_urls)
+        @site = Sources::Strategies.find("https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png")
+        assert_equal("https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png", @site.image_url)
       end
     end
 

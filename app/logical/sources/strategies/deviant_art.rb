@@ -147,17 +147,20 @@ module Sources
 
         if resp.success?
           body = Zlib.gunzip(resp.body)
+          Nokogiri::HTML(body)
+        # the work was deleted
+        elsif resp.code == 404
+          nil
         else
           raise HTTParty::ResponseError.new(resp)
         end
-
-        Nokogiri::HTML(body)
       end
       memoize :page
 
       # Scrape UUID from <meta property="da:appurl" content="DeviantArt://deviation/12F08C5D-A3A4-338C-2F1A-7E4E268C0E8B">
-      # For private works the UUID will be nil.
+      # For hidden or deleted works the UUID will be nil.
       def uuid
+        return nil if page.nil?
         meta = page.search('meta[property="da:appurl"]').first
         return nil if meta.nil?
 
