@@ -40,7 +40,7 @@ module Sources
 
         assert_equal("hideyoshi", @site.artist_name)
         assert_equal("https://www.deviantart.com/hideyoshi", @site.profile_url)
-        assert_equal("https://pre00.deviantart.net/b5e6/th/pre/f/2016/265/3/5/legend_of_galactic_heroes_by_hideyoshi-daihpha.jpg", @site.image_url)
+        assert_equal("http://origin-orig.deviantart.net/9e1f/f/2016/265/3/5/legend_of_galactic_heroes_by_hideyoshi-daihpha.jpg", @site.image_url)
       end
     end
 
@@ -53,6 +53,13 @@ module Sources
         assert_equal("http://origin-orig.deviantart.net/7b5b/f/2017/160/c/5/test_post_please_ignore_by_noizave-dbc3a48.png", @site.image_url)
         assert_equal(%w[bar baz foo], @site.tags.map(&:first))
         assert_nothing_raised { @site.to_h }
+      end
+    end
+
+    context "The source for a img00.deviantart.net sample image url" do
+      should "return the full size image url" do
+        @site = Sources::Strategies.find("https://img00.deviantart.net/a233/i/2017/160/5/1/test_post_please_ignore_by_noizave-dbc3a48.png")
+        assert_equal("http://origin-orig.deviantart.net/7b5b/f/2017/160/c/5/test_post_please_ignore_by_noizave-dbc3a48.png", @site.image_url)
       end
     end
 

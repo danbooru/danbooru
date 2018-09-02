@@ -18,32 +18,24 @@ module Sources
       end
 
       def image_urls
-        # return direct links
-        if url =~ ATTRIBUTED_ASSET || url =~ ASSET
-          return [url]
-        end
-
-        # work is deleted, use image url as given by user.
-        if uuid.nil?
-          return [url]
-        end
-
+        # work is private or deleted, use image url as given by user.
+        if api_deviation.blank?
+          [url]
         # work is downloadable
-        if api_deviation[:is_downloadable] && api_deviation[:download_filesize] != api_deviation.dig(:content, :filesize)
+        elsif api_deviation[:is_downloadable] && api_deviation[:download_filesize] != api_deviation.dig(:content, :filesize)
           src = api_download[:src]
           src.gsub!(%r!\Ahttps?://s3\.amazonaws\.com/!i, "https://")
           src.gsub!(/\?.*\z/, "") # strip s3 query params
           src.gsub!(%r!\Ahttps://origin-orig\.deviantart\.net!, "http://origin-orig.deviantart.net") # https://origin-orig.devianart.net doesn't work
-
-          return [src]
-        end
-
+          [src]
         # work isn't downloadable, or download size is same as regular size.
-        if api_deviation.present?
-          return [api_deviation.dig(:content, :src)]
+        elsif api_deviation.present?
+          src = api_deviation.dig(:content, :src)
+          src = src.gsub(%r!\Ahttps?://orig\d+\.deviantart\.net!i, "http://origin-orig.deviantart.net")
+          [src]
+        else
+          raise "Couldn't find image url" # this should never happen
         end
-
-        raise "Couldn't find image url"
       end
 
       def page_url
