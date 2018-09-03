@@ -86,19 +86,20 @@ module Sources
       end
 
       def profile_url
-        if url =~ PATH_PROFILE
-          return url
-        end
-
-        if artist_name.blank?
-          return nil
-        end
-
-        return "https://www.deviantart.com/#{artist_name}"
+        return "" if artist_name.blank?
+        "https://www.deviantart.com/#{artist_name.downcase}"
       end
 
+      # Prefer the name from the url because the api metadata won't be present when
+      # the input url doesn't contain a deviation id, or the deviation is private or deleted.
       def artist_name
-        api_metadata.dig(:author, :username).try(&:downcase)
+        if artist_name_from_url.present?
+          artist_name_from_url
+        elsif api_metadata.present?
+          api_metadata.dig(:author, :username)
+        else
+          ""
+        end
       end
 
       def artist_commentary_title
@@ -114,7 +115,7 @@ module Sources
       end
 
       def normalizable_for_artist_finder?
-        url =~ PATH_ART || url =~ SUBDOMAIN_ART
+        normalize_for_artist_finder.present?
       end
 
       def normalize_for_artist_finder
@@ -173,8 +174,22 @@ module Sources
         end
       end
 
+      def self.artist_name_from_url(url)
+        if url =~ ASSET || url =~ PATH_ART || url =~ PATH_PROFILE
+          $~[:artist]
+        elsif url !~ RESERVED_SUBDOMAINS && (url =~ SUBDOMAIN_ART || url =~ SUBDOMAIN_PROFILE)
+          $~[:artist]
+        else
+          nil
+        end
+      end
+
       def deviation_id
         self.class.deviation_id_from_url(url) || self.class.deviation_id_from_url(referer_url)
+      end
+
+      def artist_name_from_url
+        self.class.artist_name_from_url(url) || self.class.artist_name_from_url(referer_url)
       end
 
       def page
