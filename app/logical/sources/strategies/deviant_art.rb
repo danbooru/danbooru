@@ -1,13 +1,47 @@
+# Asset URLs:
+#
+# * http://orig12.deviantart.net/9b69/f/2017/023/7/c/illustration___tokyo_encount_oei__by_melisaongmiqin-dawi58s.png
+# * http://pre15.deviantart.net/81de/th/pre/f/2015/063/5/f/inha_by_inhaestudios-d8kfzm5.jpg
+# * http://th00.deviantart.net/fs71/PRE/f/2014/065/3/b/goruto_by_xyelkiltrox-d797tit.png
+#
+# * http://th04.deviantart.net/fs70/300W/f/2009/364/4/d/Alphes_Mimic___Rika_by_Juriesute.png
+# * http://fc02.deviantart.net/fs48/f/2009/186/2/c/Animation_by_epe_tohri.swf
+# * http://fc08.deviantart.net/files/f/2007/120/c/9/Cool_Like_Me_by_47ness.jpg
+#
+# * http://fc08.deviantart.net/images3/i/2004/088/8/f/Blackrose_for_MuzicFreq.jpg
+# * http://img04.deviantart.net/720b/i/2003/37/9/6/princess_peach.jpg
+#
+# * http://prnt00.deviantart.net/9b74/b/2016/101/4/468a9d89f52a835d4f6f1c8caca0dfb2-pnjfbh.jpg
+# * http://fc00.deviantart.net/fs71/f/2013/234/d/8/d84e05f26f0695b1153e9dab3a962f16-d6j8jl9.jpg
+# * http://th04.deviantart.net/fs71/PRE/f/2013/337/3/5/35081351f62b432f84eaeddeb4693caf-d6wlrqs.jpg
+#
+# * http://fc09.deviantart.net/fs22/o/2009/197/3/7/37ac79eaeef9fb32e6ae998e9a77d8dd.jpg
+# * http://pre06.deviantart.net/8497/th/pre/f/2009/173/c/c/cc9686111dcffffffb5fcfaf0cf069fb.jpg
+#
+# Page URLs:
+#
+# * https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408
+# * https://noizave.deviantart.com/art/test-post-please-ignore-685436408
+# * https://www.deviantart.com/deviation/685436408
+# * https://fav.me/dbc3a48
+
 module Sources
   module Strategies
     class DeviantArt < Base
       ASSET_SUBDOMAINS = %r{(?:fc|th|pre|img|orig|origin-orig)\d*}i
-      ATTRIBUTED_ASSET = %r{\Ahttps?://#{ASSET_SUBDOMAINS}\.deviantart\.net/.+/[a-z0-9_]*_by_[a-z0-9_]+-d([a-z0-9]+)\.}i
-      ASSET = %r{\Ahttps?://#{ASSET_SUBDOMAINS}\.deviantart\.net/.+/[a-f0-9]+-d([a-z0-9]+)\.}i
-      PATH_ART = %r{\Ahttps?://www\.deviantart\.com/([^/]+)/art/}
-      RESERVED_SUBDOMAINS = %r{\Ahttps?://(?:#{ASSET_SUBDOMAINS}|www)\.}
-      SUBDOMAIN_ART = %r{\Ahttps?://(.+?)\.deviantart\.com(.*)}
-      PROFILE = %r{\Ahttps?://www\.deviantart\.com/([^/]+)/?\z}
+      RESERVED_SUBDOMAINS = %r{\Ahttps?://(?:#{ASSET_SUBDOMAINS}|www)\.}i
+
+      TITLE = %r{(?<title>[a-z0-9_-]+?)}i
+      ARTIST = %r{(?<artist>[a-z0-9_-]+?)}i
+      DEVIATION_ID = %r{(?<deviation_id>[0-9]+)}i
+
+      ASSET = %r{\Ahttps?://#{ASSET_SUBDOMAINS}\.deviantart\.net/.+/#{TITLE}(?:_by_#{ARTIST}(?:-d(?<base36_deviation_id>\w+))?)?\.}i
+
+      PATH_ART = %r{\Ahttps?://www\.deviantart\.com/#{ARTIST}/art/#{TITLE}-#{DEVIATION_ID}\z}i
+      SUBDOMAIN_ART = %r{\Ahttps?://#{ARTIST}\.deviantart\.com/art/#{TITLE}-#{DEVIATION_ID}\z}i
+
+      PATH_PROFILE = %r{\Ahttps?://www\.deviantart\.com/#{ARTIST}/?\z}i
+      SUBDOMAIN_PROFILE = %r{\Ahttps?://#{ARTIST}\.deviantart\.com/?\z}i
 
       def self.match?(*urls)
         urls.compact.any? { |x| x.match?(/^https?:\/\/(?:.+?\.)?deviantart\.(?:com|net)/) }
@@ -17,8 +51,16 @@ module Sources
         "Deviant Art"
       end
 
+      def canonical_url
+        if self.class.deviation_id_from_url(image_url).present? || page_url.blank?
+          image_url
+        else
+          page_url
+        end
+      end
+
       def image_urls
-        # work is private or deleted, use image url as given by user.
+        # work is private, deleted, or the url didn't contain a deviation id; use image url as given by user.
         if api_deviation.blank?
           [url]
         # work is downloadable
@@ -39,29 +81,12 @@ module Sources
       end
 
       def page_url
-        [url, referer_url].each do |x|
-          if x =~ ATTRIBUTED_ASSET
-            return "http://fav.me/d#{$1}"
-          end
-
-          if x =~ ASSET
-            return "http://fav.me/d#{$1}"
-          end
-
-          if x =~ PATH_ART
-            return x
-          end
-
-          if x !~ RESERVED_SUBDOMAINS && x =~ SUBDOMAIN_ART
-            return "http://www.deviantart.com/#{$1}#{$2}"
-          end
-        end
-
-        return super
+        return "" if api_deviation.blank?
+        api_deviation[:url]
       end
 
       def profile_url
-        if url =~ PROFILE
+        if url =~ PATH_PROFILE
           return url
         end
 
@@ -85,7 +110,7 @@ module Sources
       end
 
       def normalized_for_artist_finder?
-        url =~ PROFILE
+        url =~ PATH_PROFILE
       end
 
       def normalizable_for_artist_finder?
@@ -138,12 +163,29 @@ module Sources
 
     public
 
+      def self.deviation_id_from_url(url)
+        if url =~ ASSET
+          $~[:base36_deviation_id].try(:to_i, 36)
+        elsif url =~ PATH_ART || (url !~ RESERVED_SUBDOMAINS && url =~ SUBDOMAIN_ART)
+          $~[:deviation_id].to_i
+        else
+          nil
+        end
+      end
+
+      def deviation_id
+        self.class.deviation_id_from_url(url) || self.class.deviation_id_from_url(referer_url)
+      end
+
       def page
+        return nil if deviation_id.blank?
+        deviation_url = "https://www.deviantart.com/deviation/#{deviation_id}"
+
         options = Danbooru.config.httparty_options.deep_merge(
           format: :plain, 
           headers: { "Accept-Encoding" => "gzip" }
         )
-        resp = HTTParty.get(page_url, **options)
+        resp = HTTParty.get(deviation_url, **options)
 
         if resp.success?
           body = Zlib.gunzip(resp.body)
