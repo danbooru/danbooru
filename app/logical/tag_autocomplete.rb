@@ -2,8 +2,9 @@ module TagAutocomplete
   extend self
 
   PREFIX_BOUNDARIES = "(_/:;-"
+  LIMIT = 10
 
-  class Result < Struct.new(:name, :post_count, :category, :antecedent_name)
+  class Result < Struct.new(:name, :post_count, :category, :antecedent_name, :weight)
     def to_xml(options = {})
       to_h.to_xml(options)
     end
@@ -14,27 +15,27 @@ module TagAutocomplete
 
     candidates = count_sort(
       query,
-      search_prefix(query, 3) + 
-      search_fuzzy(query, 5) +
       search_exact(query, 3) +
-      search_aliases(query, 3)
+      search_prefix(query, 3) + 
+      search_fuzzy(query, 3) +
+      search_aliases(query, 10)
     )
   end
 
   def count_sort(query, words)
-    words.uniq.sort_by do |x|
-      x.post_count
+    words.uniq.slice(0, LIMIT).sort_by do |x|
+      x.post_count * x.weight
     end.reverse
   end
 
-  def search_exact(query, n=3)
+  def search_exact(query, n=4)
     Tag
       .where("name like ? escape e'\\\\'", query.to_escaped_for_sql_like + "%")
       .where("post_count > 0")
       .order("post_count desc")
       .limit(n)
       .pluck(:name, :post_count, :category)
-      .map {|row| Result.new(*row)}
+      .map {|row| Result.new(*row, 1.0)}
   end
 
   def search_fuzzy(query, n=5)
@@ -53,7 +54,7 @@ module TagAutocomplete
       .order(Arel.sql("word_similarity(name, #{Tag.connection.quote(query)}) DESC"))
       .limit(n)
       .pluck(:name, :post_count, :category)
-      .map {|row| Result.new(*row)}
+      .map {|row| Result.new(*row, 0.1)}
   end
 
   def search_prefix(query, n=3)
@@ -84,10 +85,10 @@ module TagAutocomplete
       .order("post_count desc")
       .limit(n)
       .pluck(:name, :post_count, :category)
-      .map {|row| Result.new(*row)}
+      .map {|row| Result.new(*row, 0.8)}
   end
 
-  def search_aliases(query, n=20)
+  def search_aliases(query, n=10)
     wildcard_name = query + "*"
     TagAlias
       .select("tags.name, tags.post_count, tags.category, tag_aliases.antecedent_name")
@@ -99,7 +100,7 @@ module TagAutocomplete
       .order("tag_aliases.post_count desc")
       .limit(n)
       .pluck(:name, :post_count, :category, :antecedent_name)
-      .map {|row| Result.new(*row)}
+      .map {|row| Result.new(*row, 0.2)}
   end
 end
 
