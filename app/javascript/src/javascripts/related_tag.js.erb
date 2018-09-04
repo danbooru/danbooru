@@ -6,7 +6,6 @@ let RelatedTag = {};
 RelatedTag.initialize_all = function() {
   if ($("#c-posts #a-show").length || $("#c-uploads #a-new").length) {
     this.initialize_buttons();
-    $("#artist-tags-container").hide();
     $("#upload_tag_string,#post_tag_string").keyup(RelatedTag.update_selected);
     $("body").on("click", "#artist-related-tags-column a.del", RelatedTag.disable_artist_url)
   }
@@ -35,7 +34,6 @@ RelatedTag.common_bind = function(button_name, category) {
       "query": RelatedTag.current_tag(),
       "category": category
     }, RelatedTag.process_response);
-    $("#artist-tags-container").hide();
     e.preventDefault();
   });
 }
@@ -277,9 +275,6 @@ RelatedTag.toggle_tag = function(e) {
   $field.val($field.val().trim().replace(/ +/g, " ") + " ");
 
   RelatedTag.update_selected();
-  if (RelatedTag.recent_artist && $("#artist-tags-container").css("display") === "block") {
-    RelatedTag.process_artist(RelatedTag.recent_artist);
-  }
 
   // The timeout is needed on Chrome since it will clobber the field attribute otherwise
   setTimeout(function () { $field.prop('selectionStart', $field.val().length);}, 100);
