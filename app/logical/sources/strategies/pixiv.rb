@@ -45,8 +45,7 @@ module Sources
       end
 
       def image_urls
-        image_urls_sub.
-          map {|x| rewrite_cdn(x)}
+        image_urls_sub
       rescue PixivApiClient::BadIDError
         [url]
       end
@@ -170,14 +169,6 @@ module Sources
         end
 
         return metadata.pages
-      end
-
-      def rewrite_cdn(x)
-        if x =~ %r{\Ahttps?:\/\/(?:\w+\.)?pixiv\.net\.edgesuite\.net}
-          return x.sub(".edgesuite.net", "")
-        end
-
-        return x
       end
 
       # in order to prevent recursive loops, this method should not make any
