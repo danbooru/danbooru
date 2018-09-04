@@ -265,20 +265,6 @@ module Sources
       end
       memoize :agent
 
-      def page
-        agent.get(URI.parse(page_url))
-        
-        if page.search("body.not-logged-in").any?
-          # Session cache is invalid, clear it and log in normally.
-          Cache.delete("pixiv-phpsessid")
-          @agent = nil
-          page = agent.get(URI.parse(page_url))
-        end
-
-        page
-      end
-      memoize :page
-
       def metadata
         if novel_id.present?
           return PixivApiClient.new.novel(novel_id)
@@ -309,10 +295,6 @@ module Sources
         return metadata.moniker
       end
       memoize :moniker
-
-      def page_count
-        metadata.page_count
-      end
 
       def data
         return {
@@ -347,10 +329,6 @@ module Sources
         raise Sources::Error.new("content type not found for (#{url}, #{referer_url})")
       end
       memoize :ugoira_content_type
-
-      def is_manga?
-        page_count > 1
-      end
 
       # Returns the current page number of the manga. This will not
       # make any api calls and only looks at (url, referer_url).
