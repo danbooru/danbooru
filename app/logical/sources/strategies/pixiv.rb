@@ -14,11 +14,12 @@ module Sources
       TOUCH =   %r!(?:\A(?:https?://)?touch\.pixiv\.net)!
       STACC_PAGE = %r!\A#{WEB}/stacc/#{MONIKER}/?\z!i
       NOVEL_PAGE = %r!(?:\Ahttps?://www\.pixiv\.net/novel/show\.php\?id=(\d+))!
+      FANBOX_ACCOUNT = %r!(?:\Ahttps?://www\.pixiv\.net/fanbox/creator/\d+\z)!
       FANBOX_IMAGE = %r!(?:\Ahttps?://fanbox\.pixiv\.net/images/post/(\d+))!
       FANBOX_PAGE = %r!(?:\Ahttps?://www\.pixiv\.net/fanbox/creator/\d+/post/(\d+))!
 
       def self.match?(*urls)
-        urls.compact.any? { |x| x.match?(/#{WEB}|#{IMG}|#{I12}|#{TOUCH}|#{PXIMG}|#{FANBOX_IMAGE}/i) }
+        urls.compact.any? { |x| x.match?(/#{WEB}|#{IMG}|#{I12}|#{TOUCH}|#{PXIMG}|#{FANBOX_IMAGE}|#{FANBOX_ACCOUNT}/i) }
       end
 
       def self.to_dtext(text)
@@ -57,6 +58,10 @@ module Sources
 
         if fanbox_id.present?
           return "https://www.pixiv.net/fanbox/creator/#{metadata.user_id}/post/#{fanbox_id}"
+        end
+
+        if fanbox_account_id.present?
+          return "https://www.pixiv.net/fanbox/creator/#{fanbox_account_id}"
         end
 
         if illust_id.present?
@@ -243,6 +248,17 @@ module Sources
         return nil
       end
       memoize :fanbox_id
+
+      def fanbox_account_id
+        [url, referer_url].each do |x|
+          if x =~ FANBOX_ACCOUNT
+            return x
+          end
+        end
+
+        return nil
+      end
+      memoize :fanbox_account_id
 
       def agent
         PixivWebAgent.build
