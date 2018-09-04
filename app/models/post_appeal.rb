@@ -10,14 +10,6 @@ class PostAppeal < ApplicationRecord
   validates_uniqueness_of :creator_id, :scope => :post_id, :message => "have already appealed this post"
 
   module SearchMethods
-    def reason_matches(query)
-      if query =~ /\*/
-        where("post_appeals.reason ILIKE ? ESCAPE E'\\\\'", query.to_escaped_for_sql_like)
-      else
-        where("to_tsvector('english', post_appeals.reason) @@ plainto_tsquery(?)", query.to_escaped_for_tsquery)
-      end
-    end
-
     def post_tags_match(query)
       PostQueryBuilder.new(query).build(self.joins(:post))
     end
@@ -45,9 +37,7 @@ class PostAppeal < ApplicationRecord
     def search(params)
       q = super
 
-      if params[:reason_matches].present?
-        q = q.reason_matches(params[:reason_matches])
-      end
+      q = q.attribute_matches(:reason, params[:reason_matches])
 
       if params[:creator_id].present?
         q = q.where(creator_id: params[:creator_id].split(",").map(&:to_i))

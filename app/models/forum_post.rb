@@ -32,20 +32,8 @@ class ForumPost < ApplicationRecord
   )
 
   module SearchMethods
-    def body_matches(body)
-      if body =~ /\*/ && CurrentUser.user.is_builder?
-        where("forum_posts.body ILIKE ? ESCAPE E'\\\\'", body.to_escaped_for_sql_like)
-      else
-        where("forum_posts.text_index @@ plainto_tsquery(E?)", body.to_escaped_for_tsquery)
-      end
-    end
-
     def topic_title_matches(title)
-      if title =~ /\*/ && CurrentUser.user.is_builder?
-        joins(:topic).where("forum_topics.title ILIKE ? ESCAPE E'\\\\'", title.to_escaped_for_sql_like)
-      else
-        joins(:topic).where("forum_topics.text_index @@ plainto_tsquery(E?)", title.to_escaped_for_tsquery_split)
-      end
+      joins(:topic).merge(ForumTopic.search(title_matches: title))
     end
 
     def for_user(user_id)
@@ -80,9 +68,7 @@ class ForumPost < ApplicationRecord
         q = q.topic_title_matches(params[:topic_title_matches])
       end
 
-      if params[:body_matches].present?
-        q = q.body_matches(params[:body_matches])
-      end
+      q = q.attribute_matches(:body, params[:body_matches], index_column: :text_index)
 
       if params[:creator_name].present?
         q = q.creator_name(params[:creator_name].tr(" ", "_"))

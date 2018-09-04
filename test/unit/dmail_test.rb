@@ -103,10 +103,10 @@ class DmailTest < ActiveSupport::TestCase
       should "return results based on title contents" do
         dmail = FactoryBot.create(:dmail, :title => "xxx", :owner => @user)
 
-        matches = Dmail.search(title_matches: "x")
+        matches = Dmail.search(title_matches: "x*")
         assert_equal([dmail.id], matches.map(&:id))
 
-        matches = Dmail.search(title_matches: "X")
+        matches = Dmail.search(title_matches: "X*")
         assert_equal([dmail.id], matches.map(&:id))
 
         matches = Dmail.search(message_matches: "xxx")
@@ -118,9 +118,9 @@ class DmailTest < ActiveSupport::TestCase
 
       should "return results based on body contents" do
         dmail = FactoryBot.create(:dmail, :body => "xxx", :owner => @user)
-        matches = Dmail.search_message("xxx")
+        matches = Dmail.search(message_matches: "xxx")
         assert(matches.any?)
-        matches = Dmail.search_message("aaa")
+        matches = Dmail.search(message_matches: "aaa")
         assert(matches.empty?)
       end
     end

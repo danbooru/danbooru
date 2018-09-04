@@ -5,15 +5,17 @@ class ApplicationRecord < ActiveRecord::Base
 
   concerning :SearchMethods do
     class_methods do
-      def attribute_matches(attribute, value)
+      def attribute_matches(attribute, value, **options)
         return all if value.nil?
 
         column = column_for_attribute(attribute)
         case column.sql_type_metadata.type
         when :boolean
-          boolean_attribute_matches(attribute, value)
+          boolean_attribute_matches(attribute, value, **options)
         when :integer, :datetime
-          numeric_attribute_matches(attribute, value)
+          numeric_attribute_matches(attribute, value, **options)
+        when :string, :text
+          text_attribute_matches(attribute, value, **options)
         else
           raise ArgumentError, "unhandled attribute type"
         end
@@ -38,6 +40,19 @@ class ApplicationRecord < ActiveRecord::Base
         parsed_range = Tag.parse_helper(range, column.type)
 
         PostQueryBuilder.new(nil).add_range_relation(parsed_range, qualified_column, self)
+      end
+
+      def text_attribute_matches(attribute, value, index_column: nil, ts_config: "english")
+        column = column_for_attribute(attribute)
+        qualified_column = "#{table_name}.#{column.name}"
+
+        if value =~ /\*/
+          where("lower(#{qualified_column}) LIKE :value ESCAPE E'\\\\'", value: value.mb_chars.downcase.to_escaped_for_sql_like)
+        elsif index_column.present?
+          where("#{table_name}.#{index_column} @@ plainto_tsquery(:ts_config, :value)", ts_config: ts_config, value: value)
+        else
+          where("to_tsvector(:ts_config, #{qualified_column}) @@ plainto_tsquery(:ts_config, :value)", ts_config: ts_config, value: value)
+        end
       end
 
       def apply_default_order(params)

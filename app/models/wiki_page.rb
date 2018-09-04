@@ -33,14 +33,6 @@ class WikiPage < ApplicationRecord
       order("updated_at DESC").limit(25)
     end
 
-    def body_matches(query)
-      if query =~ /\*/ && CurrentUser.user.is_builder?
-        where("body ILIKE ? ESCAPE E'\\\\'", query.to_escaped_for_sql_like)
-      else
-        where("body_index @@ plainto_tsquery(?)", query.to_escaped_for_tsquery_split)
-      end
-    end
-
     def other_names_equal(name)
       query_sql = name.unicode_normalize(:nfkc).to_escaped_for_tsquery
       where("other_names_index @@ to_tsquery('danbooru', E?)", query_sql)
@@ -70,9 +62,7 @@ class WikiPage < ApplicationRecord
         q = q.where("creator_id = ?", params[:creator_id])
       end
 
-      if params[:body_matches].present?
-        q = q.body_matches(params[:body_matches])
-      end
+      q = q.attribute_matches(:body, params[:body_matches], index_column: :body_index, ts_config: "danbooru")
 
       if params[:other_names_match].present?
         q = q.other_names_match(params[:other_names_match])

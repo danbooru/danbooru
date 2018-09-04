@@ -7,6 +7,8 @@
 
       <%= search_field "creator_name", :label => "Creator" %>
 
+      <%= search_field "body_matches", :label => "Message" %>
+
       <div class="input">
         <label for="search_category">Category</label>
         <%= select "search", "category", %w(positive negative neutral), :include_blank => true %>

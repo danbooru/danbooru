@@ -27,6 +27,13 @@ class PostReplacement < ApplicationRecord
       def search(params = {})
         q = super
 
+        q = q.attribute_matches(:replacement_url, params[:replacement_url])
+        q = q.attribute_matches(:original_url, params[:original_url])
+        q = q.attribute_matches(:file_ext_was, params[:file_ext_was])
+        q = q.attribute_matches(:file_ext, params[:file_ext])
+        q = q.attribute_matches(:md5_was, params[:md5_was])
+        q = q.attribute_matches(:md5, params[:md5])
+
         if params[:creator_id].present?
           q = q.where(creator_id: params[:creator_id].split(",").map(&:to_i))
         end

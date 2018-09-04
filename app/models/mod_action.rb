@@ -56,6 +56,8 @@ class ModAction < ApplicationRecord
   def self.search(params)
     q = super
 
+    q = q.attribute_matches(:description, params[:description_matches])
+
     if params[:creator_id].present?
       q = q.where("creator_id = ?", params[:creator_id].to_i)
     end

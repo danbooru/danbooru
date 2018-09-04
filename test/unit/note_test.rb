@@ -196,13 +196,13 @@ class NoteTest < ActiveSupport::TestCase
 
       context "where the body contains the string 'aaa'" do
         should "return a hit" do
-          assert_equal(1, Note.body_matches("aaa").count)
+          assert_equal(1, Note.search(body_matches: "aaa").count)
         end
       end
 
       context "where the body contains the string 'bbb'" do
         should "return no hits" do
-          assert_equal(0, Note.body_matches("bbb").count)
+          assert_equal(0, Note.search(body_matches: "bbb").count)
         end
       end
     end

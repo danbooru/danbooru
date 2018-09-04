@@ -48,6 +48,8 @@ class UserFeedback < ApplicationRecord
     def search(params)
       q = super
 
+      q = q.attribute_matches(:body, params[:body_matches])
+
       if params[:user_id].present?
         q = q.for_user(params[:user_id].to_i)
       end

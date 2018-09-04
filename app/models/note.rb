@@ -20,14 +20,6 @@ class Note < ApplicationRecord
       where("is_active = TRUE")
     end
 
-    def body_matches(query)
-      if query =~ /\*/ && CurrentUser.user.is_builder?
-        where("body ILIKE ? ESCAPE E'\\\\'", query.to_escaped_for_sql_like)
-      else
-        where("body_index @@ plainto_tsquery(E?)", query.to_escaped_for_tsquery_split)
-      end
-    end
-
     def post_tags_match(query)
       PostQueryBuilder.new(query).build(self.joins(:post)).reorder("")
     end
@@ -43,10 +35,7 @@ class Note < ApplicationRecord
     def search(params)
       q = super
 
-      if params[:body_matches].present?
-        q = q.body_matches(params[:body_matches])
-      end
-
+      q = q.attribute_matches(:body, params[:body_matches], index_column: :body_index)
       q = q.attribute_matches(:is_active, params[:is_active])
 
       if params[:post_id].present?

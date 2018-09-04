@@ -18,6 +18,7 @@ class NoteVersion < ApplicationRecord
     end
 
     q = q.attribute_matches(:is_active, params[:is_active])
+    q = q.attribute_matches(:body, params[:body_matches])
 
     q.apply_default_order(params)
   end

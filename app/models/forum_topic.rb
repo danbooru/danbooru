@@ -51,14 +51,6 @@ class ForumTopic < ApplicationRecord
   end
 
   module SearchMethods
-    def title_matches(title)
-      if title =~ /\*/ && CurrentUser.user.is_builder?
-        where("title ILIKE ? ESCAPE E'\\\\'", title.to_escaped_for_sql_like)
-      else
-        where("text_index @@ plainto_tsquery(E?)", title.to_escaped_for_tsquery_split)
-      end
-    end
-
     def active
       where("is_deleted = false")
     end
@@ -83,9 +75,7 @@ class ForumTopic < ApplicationRecord
         q = q.where("min_level >= ?", MIN_LEVELS[:Moderator])
       end
 
-      if params[:title_matches].present?
-        q = q.title_matches(params[:title_matches])
-      end
+      q = q.attribute_matches(:title, params[:title_matches], index_column: :text_index)
 
       if params[:category_id].present?
         q = q.for_category_id(params[:category_id])
