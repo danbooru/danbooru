@@ -37,5 +37,10 @@ class PopularSearchService
       end
       response
     end.to_s.force_encoding("utf-8")
+
+  rescue => e
+    Rails.logger.error(e.to_s)
+    NewRelic::Agent.notice_error(e)
+    return []
   end
 end
