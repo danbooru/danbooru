@@ -66,7 +66,7 @@ module Sources
       # This will be the url stored in posts. Typically this is the page
       # url, but on some sites it may be preferable to store the image url.
       def canonical_url
-        page_url
+        page_url || image_url
       end
 
       # A link to the artist's profile page on the site.
