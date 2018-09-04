@@ -614,16 +614,6 @@ Post.initialize_saved_searches = function() {
 
     e.preventDefault();
   });
-
-  $("#search-dropdown #wiki-search").click(function(e) {
-    window.location.href = "/wiki_pages?search%5Btitle%5D=" + encodeURIComponent($("#tags").val());
-    e.preventDefault();
-  });
-
-  $("#search-dropdown #artist-search").click(function(e) {
-    window.location.href = "/artists?search%5Bname%5D=" + encodeURIComponent($("#tags").val());
-    e.preventDefault();
-  });
 }
 
 Post.initialize_replace_image_dialog = function() {
