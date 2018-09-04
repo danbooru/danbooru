@@ -35,7 +35,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
     context "preprocess action" do      
       should "prefer the file over the source when preprocessing" do
         file = Rack::Test::UploadedFile.new("#{Rails.root}/test/files/test.jpg", "image/jpeg")
-        post_auth preprocess_uploads_path, @user, params: {:url => "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", :file => file}
+        post_auth preprocess_uploads_path, @user, params: {:upload => {:source => "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", :file => file}}
         assert_response :success
         Delayed::Worker.new.work_off
         assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", Upload.last.md5)
