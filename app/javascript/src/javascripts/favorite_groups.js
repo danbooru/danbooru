@@ -17,17 +17,17 @@ FavoriteGroup.initialize_add_to_favgroup_dialog = function() {
     }
   });
 
-  var open_favgroup_dialog = function(e) {
-    if ($(".add-to-favgroup").length === 1) {
-      // If the user only has one favorite group we don't need to ask which group to add the post to.
-      $(".add-to-favgroup").click();
-    } else if ($(".add-to-favgroup").length > 1) {
-      $("#add-to-favgroup-dialog").dialog("open");
-    }
-    e.preventDefault();
-  }
+  $("#open-favgroup-dialog-link").on("click.danbooru", FavoriteGroup.open_favgroup_dialog);
+}
 
-  $("#open-favgroup-dialog-link").click(open_favgroup_dialog);
+FavoriteGroup.open_favgroup_dialog = function(e) {
+  if ($(".add-to-favgroup").length === 1) {
+    // If the user only has one favorite group we don't need to ask which group to add the post to.
+    $(".add-to-favgroup").click();
+  } else if ($(".add-to-favgroup").length > 1) {
+    $("#add-to-favgroup-dialog").dialog("open");
+  }
+  e.preventDefault();
 }
 
 $(function() {

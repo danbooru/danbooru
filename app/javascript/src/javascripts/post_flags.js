@@ -26,7 +26,7 @@ PostFlag.initialize_flag = function() {
     $('#flag-dialog').dialog('close');
   });
 
-  $("#flag").click(function(e) {
+  $("#flag").on("click.danbooru", function(e) {
     e.preventDefault();
     $("#flag-dialog").dialog("open");
   });

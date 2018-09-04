@@ -65,7 +65,7 @@ let Note = {
 
     bind_events: function($note_box) {
       $note_box.on(
-        "dragstart resizestart",
+        "dragstart.danbooru resizestart.danbooru",
         function(e) {
           var $note_box_inner = $(e.currentTarget);
           $note_box_inner.find(".note-box-inner-border").addClass("unsaved");
@@ -82,7 +82,7 @@ let Note = {
         }
       );
 
-      $note_box.resize(
+      $note_box.on("resize.danbooru",
         function(e) {
           var $note_box_inner = $(e.currentTarget);
           Note.Box.resize_inner_border($note_box_inner);
@@ -91,7 +91,7 @@ let Note = {
       );
 
       $note_box.on(
-        "dragstop resizestop",
+        "dragstop.danbooru resizestop.danbooru",
         function(e) {
           Note.dragging = false;
           if (Note.embed) {
@@ -107,7 +107,7 @@ let Note = {
       );
 
       $note_box.on(
-        "mouseover mouseout",
+        "mouseover.danbooru mouseout.danbooru",
         function(e) {
           if (Note.dragging) {
             return;
@@ -334,20 +334,20 @@ let Note = {
     },
 
     bind_events: function($note_body) {
-      $note_body.mouseover(function(e) {
+      $note_body.on("mouseover.danbooru", function(e) {
         var $note_body_inner = $(e.currentTarget);
         Note.Body.show($note_body_inner.data("id"));
         e.stopPropagation();
       });
 
-      $note_body.mouseout(function(e) {
+      $note_body.on("mouseout.danbooru", function(e) {
         var $note_body_inner = $(e.currentTarget);
         Note.Body.hide($note_body_inner.data("id"));
         e.stopPropagation();
       });
 
       if (Utility.meta("current-user-name") !== "Anonymous") {
-        $note_body.click(function(e) {
+        $note_body.on("click.danbooru", function(e) {
           if (e.target.tagName !== "A") {
             var $note_body_inner = $(e.currentTarget);
             Note.Edit.show($note_body_inner);
@@ -355,7 +355,7 @@ let Note = {
           e.stopPropagation();
         });
       } else {
-        $note_body.click(function(e) {
+        $note_body.on("click.danbooru", function(e) {
           if (e.target.tagName !== "A") {
             Utility.notice("You must be logged in to edit notes");
           }
@@ -419,7 +419,7 @@ let Note = {
       }
       $dialog.dialog("option", "title", 'Edit note #' + id + ' (<a href="/wiki_pages/help:notes">view help</a>)');
 
-      $dialog.on("dialogclose", function() {
+      $dialog.on("dialogclose.danbooru", function() {
         Note.editing = false;
         $(".note-box").resizable("enable");
         $(".note-box").draggable("enable");
@@ -585,12 +585,12 @@ let Note = {
       $(document.body).addClass("mode-translation");
       $("#original-file-link").click();
       $("#image").off("click", Note.Box.toggle_all);
-      $("#image").mousedown(Note.TranslationMode.Drag.start);
-      $(window).mouseup(Note.TranslationMode.Drag.stop);
+      $("#image").on("mousedown.danbooru.note", Note.TranslationMode.Drag.start);
+      $(document).on("mouseup.danbooru.note", Note.TranslationMode.Drag.stop);
       $("#mark-as-translated-section").show();
 
       Utility.notice('Translation mode is on. Drag on the image to create notes. <a href="#">Turn translation mode off</a> (shortcut is <span class="key">n</span>).');
-      $("#notice a:contains(Turn translation mode off)").click(Note.TranslationMode.stop);
+      $("#notice a:contains(Turn translation mode off)").on("click.danbooru", Note.TranslationMode.stop);
     },
 
     stop: function(e) {
@@ -598,9 +598,9 @@ let Note = {
 
       Note.TranslationMode.active = false;
       $("#image").css("cursor", "auto");
-      $("#image").click(Note.Box.toggle_all);
+      $("#image").on("click.danbooru", Note.Box.toggle_all);
       $("#image").off("mousedown", Note.TranslationMode.Drag.start);
-      $(window).off("mouseup", Note.TranslationMode.Drag.stop);
+      $(document).off("mouseup", Note.TranslationMode.Drag.stop);
       $(document.body).removeClass("mode-translation");
       $("#close-notice-link").click();
       $("#mark-as-translated-section").hide();
@@ -639,7 +639,7 @@ let Note = {
           return;
         }
         e.preventDefault(); /* don't drag the image */
-        $(window).mousemove(Note.TranslationMode.Drag.drag);
+        $(document).on("mousemove.danbooru", Note.TranslationMode.Drag.drag);
         Note.TranslationMode.Drag.dragStartX = e.pageX;
         Note.TranslationMode.Drag.dragStartY = e.pageY;
       },
@@ -703,7 +703,7 @@ let Note = {
         if (Note.TranslationMode.Drag.dragStartX === 0) {
           return; /* 'stop' is bound to window, don't create note if start wasn't triggered */
         }
-        $(window).off("mousemove");
+        $(document).off("mousemove", Note.TranslationMode.Drag.drag);
 
         if (Note.TranslationMode.Drag.dragging) {
           $('#note-preview').css({ display: 'none' });
@@ -802,12 +802,12 @@ let Note = {
 
     this.initialize_shortcuts();
     this.initialize_highlight();
-    $(window).on("hashchange", this.initialize_highlight);
+    $(document).on("hashchange.danbooru.note", this.initialize_highlight);
   },
 
   initialize_shortcuts: function() {
-    $("#translate").click(Note.TranslationMode.toggle);
-    $("#image").click(Note.Box.toggle_all);
+    $("#translate").on("click.danbooru", Note.TranslationMode.toggle);
+    $("#image").on("click.danbooru", Note.Box.toggle_all);
   },
 
   initialize_highlight: function() {

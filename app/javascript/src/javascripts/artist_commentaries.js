@@ -13,7 +13,7 @@ ArtistCommentary.initialize_all = function() {
 }
 
 ArtistCommentary.initialize_commentary_display_tabs = function() {
-  $("#commentary-sections li a").click(function(e) {
+  $("#commentary-sections li a").on("click.danbooru", function(e) {
     if (e.target.hash === "#original") {
       $("#original-artist-commentary").show();
       $("#translated-artist-commentary").hide();
@@ -47,7 +47,7 @@ ArtistCommentary.initialize_edit_commentary_dialog = function() {
     $('#add-commentary-dialog').dialog('close');
   });
 
-  $("#add-commentary").click(function(e) {
+  $("#add-commentary").on("click.danbooru", function(e) {
     e.preventDefault();
     $("#add-commentary-dialog").dialog("open");
   });
@@ -56,7 +56,7 @@ ArtistCommentary.initialize_edit_commentary_dialog = function() {
     $("#fetch-commentary input").toggle();
   });
 
-  $('#fetch-commentary button[type="submit"]').click(ArtistCommentary.fetch_commentary);
+  $('#fetch-commentary button[type="submit"]').on("click.danbooru", ArtistCommentary.fetch_commentary);
 }
 
 ArtistCommentary.fetch_commentary = function() {

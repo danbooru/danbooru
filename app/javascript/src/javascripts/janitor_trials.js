@@ -2,7 +2,7 @@ let JanitorTrials = {};
 
 JanitorTrials.initialize_all = function() {
   if ($("#c-janitor-trials").length) {
-    $("input[value=Test]").click(function(e) {
+    $("input[value=Test]").on("click.danbooru", function(e) {
       $.ajax({
         type: "get",
         url: "/janitor_trials/test.json",

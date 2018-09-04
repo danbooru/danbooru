@@ -63,7 +63,7 @@ PostTooltip.QTIP_OPTIONS = {
 };
 
 PostTooltip.initialize = function () {
-  $(document).on("mouseenter", PostTooltip.POST_SELECTOR, function (event) {
+  $(document).on("mouseenter.danbooru.postTooltip", PostTooltip.POST_SELECTOR, function (event) {
     if (PostTooltip.disabled()) {
       $(this).qtip("disable");
     } else {
@@ -73,20 +73,20 @@ PostTooltip.initialize = function () {
     PostTooltip.lostFocus = false;
   });
 
-  $(document).on("mouseleave", PostTooltip.POST_SELECTOR, function (event) {
+  $(document).on("mouseleave.danbooru.postTooltip", PostTooltip.POST_SELECTOR, function (event) {
     PostTooltip.lostFocus = true;
   });
 
-  $(document).on("click", ".post-tooltip-disable", PostTooltip.on_disable_tooltips);
+  $(document).on("click.danbooru.postTooltip", ".post-tooltip-disable", PostTooltip.on_disable_tooltips);
 
   // Hide tooltips when pressing keys or clicking thumbnails.
-  $(document).on("keydown", PostTooltip.hide);
-  $(document).on("click", PostTooltip.POST_SELECTOR, PostTooltip.hide);
+  $(document).on("keydown.danbooru.postTooltip", PostTooltip.hide);
+  $(document).on("click.danbooru.postTooltip", PostTooltip.POST_SELECTOR, PostTooltip.hide);
 
   // Disable tooltips on touch devices. https://developer.mozilla.org/en-US/docs/Web/API/Touch_events/Supporting_both_TouchEvent_and_MouseEvent
   PostTooltip.isTouching = false;
-  $(document).on("touchstart", function (event) { PostTooltip.isTouching = true; });
-  $(document).on("touchend",   function (event) { PostTooltip.isTouching = false; });
+  $(document).on("touchstart.danbooru.postTooltip", function (event) { PostTooltip.isTouching = true; });
+  $(document).on("touchend.danbooru.postTooltip",   function (event) { PostTooltip.isTouching = false; });
 };
 
 PostTooltip.hide = function (event) {

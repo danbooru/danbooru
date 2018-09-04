@@ -7,7 +7,7 @@ Artist.initialize_all = function() {
 }
 
 Artist.initialize_check_name = function() {
-  $("#artist_name").keyup(function(e) {
+  $("#artist_name").on("keyup.danbooru", function(e) {
     if ($("#artist_name").val().length > 0) {
       $("#check-name-result").html("");
 

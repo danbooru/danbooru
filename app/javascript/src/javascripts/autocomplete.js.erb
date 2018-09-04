@@ -343,7 +343,7 @@ Autocomplete.render_item = function(list, item) {
   var $link = $("<a/>");
   $link.text(item.label);
   $link.attr("href", "/posts?tags=" + encodeURIComponent(item.value));
-  $link.click(function(e) {
+  $link.on("click.danbooru", function(e) {
     e.preventDefault();
   });
 

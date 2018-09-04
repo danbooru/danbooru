@@ -82,12 +82,12 @@ Post.initialize_gestures = function() {
 }
 
 Post.initialize_edit_dialog = function() {
-  $("#open-edit-dialog").button().show().click(function(e) {
+  $("#open-edit-dialog").button().show().on("click.danbooru", function(e) {
     Post.open_edit_dialog();
     e.preventDefault();
   });
 
-  $("#toggle-related-tags-link").click(function(e) {
+  $("#toggle-related-tags-link").on("click.danbooru", function(e) {
     RelatedTag.toggle();
     e.preventDefault();
   });
@@ -133,7 +133,7 @@ Post.open_edit_dialog = function() {
   var pin_button = $("<button/>").button({icons: {primary: "ui-icon-pin-w"}, label: "pin", text: false});
   pin_button.css({width: "20px", height: "20px", position: "absolute", right: "28.4px"});
   dialog.parent().children(".ui-dialog-titlebar").append(pin_button);
-  pin_button.click(function(e) {
+  pin_button.on("click.danbooru", function(e) {
     var dialog_widget = $('.ui-dialog:has(#edit-dialog)');
     var pos = dialog_widget.offset();
 
@@ -176,7 +176,7 @@ Post.close_edit_dialog = function(e, ui) {
 }
 
 Post.initialize_similar = function() {
-  $("#similar-button").click(function(e) {
+  $("#similar-button").on("click.danbooru", function(e) {
     $.get("/iqdb_queries", {"url": $("#post_source").val()}).done(function(html) {$("#iqdb-similar").html(html).show()});
     e.preventDefault();
   });
@@ -246,7 +246,7 @@ Post.initialize_shortcuts = function() {
 }
 
 Post.initialize_links = function() {
-  $("#copy-notes").click(function(e) {
+  $("#copy-notes").on("click.danbooru", function(e) {
     var current_post_id = $("meta[name=post-id]").attr("content");
     var other_post_id = parseInt(prompt("Enter the ID of the post to copy all notes to:"), 10);
 
@@ -284,12 +284,12 @@ Post.initialize_post_relationship_previews = function() {
     this.toggle_relationship_preview($("#has-parent-relationship-preview"), $("#has-parent-relationship-preview-link"));
   }
 
-  $("#has-children-relationship-preview-link").click(function(e) {
+  $("#has-children-relationship-preview-link").on("click.danbooru", function(e) {
     Post.toggle_relationship_preview($("#has-children-relationship-preview"), $(this));
     e.preventDefault();
   });
 
-  $("#has-parent-relationship-preview-link").click(function(e) {
+  $("#has-parent-relationship-preview-link").on("click.danbooru", function(e) {
     Post.toggle_relationship_preview($("#has-parent-relationship-preview"), $(this));
     e.preventDefault();
   });
@@ -307,7 +307,7 @@ Post.toggle_relationship_preview = function(preview, preview_link) {
 }
 
 Post.initialize_favlist = function() {
-  $("#show-favlist-link, #hide-favlist-link").click(function(e) {
+  $("#show-favlist-link, #hide-favlist-link").on("click.danbooru", function(e) {
     $("#favlist, #show-favlist-link, #hide-favlist-link").toggle();
     e.preventDefault();
   });
@@ -326,7 +326,7 @@ Post.expand_image = function(e) {
   $image.css("opacity", "0.25");
   $image.width($image.data("original-width"));
   $image.height($image.data("original-height"));
-  $image.on("load", function() {
+  $image.on("load.danbooru", function() {
     $image.css("opacity", "1");
     $notice.hide();
   });
@@ -338,7 +338,7 @@ Post.expand_image = function(e) {
 }
 
 Post.initialize_post_image_resize_links = function() {
-  $("#image-resize-link").click(Post.expand_image);
+  $("#image-resize-link").on("click.danbooru", Post.expand_image);
 
   if ($("#image-resize-notice").length) {
     Utility.keydown("v", "resize", function(e) {
@@ -353,7 +353,7 @@ Post.initialize_post_image_resize_links = function() {
         $image.height($image.data("large-height"));
         $notice.children().eq(0).show();
         $notice.children().eq(1).hide(); // Loading message
-        $image.on("load", function() {
+        $image.on("load.danbooru", function() {
           $image.css("opacity", "1");
           $notice.show();
         });
@@ -395,7 +395,7 @@ Post.resize_image_to_window = function($img) {
 }
 
 Post.initialize_post_image_resize_to_window_link = function() {
-  $("#image-resize-to-window-link").click(function(e) {
+  $("#image-resize-to-window-link").on("click.danbooru", function(e) {
     Post.resize_image_to_window($("#image"));
     e.preventDefault();
   });
@@ -404,7 +404,7 @@ Post.initialize_post_image_resize_to_window_link = function() {
 Post.initialize_excerpt = function() {
   $("#excerpt").hide();
 
-  $("#show-posts-link").click(function(e) {
+  $("#show-posts-link").on("click.danbooru", function(e) {
     $("#show-posts-link").parent("li").addClass("active");
     $("#show-excerpt-link").parent("li").removeClass("active");
     $("#posts").show();
@@ -412,7 +412,7 @@ Post.initialize_excerpt = function() {
     e.preventDefault();
   });
 
-  $("#show-excerpt-link").click(function(e) {
+  $("#show-excerpt-link").on("click.danbooru", function(e) {
     if ($(this).parent("li").hasClass("active")) {
       return;
     }
@@ -429,7 +429,7 @@ Post.initialize_excerpt = function() {
 }
 
 Post.initialize_post_sections = function() {
-  $("#post-sections li a").click(function(e) {
+  $("#post-sections li a").on("click.danbooru", function(e) {
     if (e.target.hash === "#comments") {
       $("#comments").show();
       $("#edit").hide();
@@ -596,7 +596,7 @@ Post.initialize_saved_searches = function() {
     }
   });
 
-  $("#save-search").click(function(e) {
+  $("#save-search").on("click.danbooru", function(e) {
     $("#save-search-dialog #saved_search_query").val($("#tags").val());
 
     if (Utility.meta("disable-labeled-saved-searches") === "false") {
@@ -636,7 +636,7 @@ Post.initialize_replace_image_dialog = function() {
     $('#replace-image-dialog').dialog('close');
   });
 
-  $("#replace-image").click(function(e) {
+  $("#replace-image").on("click.danbooru", function(e) {
     e.preventDefault();
     $("#replace-image-dialog").dialog("open");
   });

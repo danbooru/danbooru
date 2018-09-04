@@ -4,9 +4,9 @@ let Comment = {};
 
 Comment.initialize_all = function() {
   if ($("#c-posts").length || $("#c-comments").length) {
-    $(document).on("click", ".reply-link", Comment.quote);
-    $(document).on("click", ".edit_comment_link", Comment.show_edit_form);
-    $(document).on("click", ".expand-comment-response", Comment.show_new_comment_form);
+    $(document).on("click.danbooru.comment", ".reply-link", Comment.quote);
+    $(document).on("click.danbooru.comment", ".edit_comment_link", Comment.show_edit_form);
+    $(document).on("click.danbooru.comment", ".expand-comment-response", Comment.show_new_comment_form);
   }
 
   $(window).on("danbooru:index_for_post", (_event, post_id, current_comment_section) => {

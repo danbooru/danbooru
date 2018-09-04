@@ -22,7 +22,7 @@ PostAppeal.initialize_appeal = function() {
     }
   });
 
-  $("#appeal").click(function(e) {
+  $("#appeal").on("click.danbooru", function(e) {
     e.preventDefault();
     $("#appeal-dialog").dialog("open");
   });

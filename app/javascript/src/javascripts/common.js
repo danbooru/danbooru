@@ -3,19 +3,19 @@ import Utility from './utility'
 
 $(function() {
   // Account notices
-  $("#hide-sign-up-notice").click(function(e) {
+  $("#hide-sign-up-notice").on("click.danbooru", function(e) {
     $("#sign-up-notice").hide();
     Cookie.put("hide_sign_up_notice", "1", 7);
     e.preventDefault();
   });
 
-  $("#hide-upgrade-account-notice").click(function(e) {
+  $("#hide-upgrade-account-notice").on("click.danbooru", function(e) {
     $("#upgrade-account-notice").hide();
     Cookie.put('hide_upgrade_account_notice', '1', 7);
     e.preventDefault();
   });
 
-  $("#hide-dmail-notice").click(function(e) {
+  $("#hide-dmail-notice").on("click.danbooru", function(e) {
     var $dmail_notice = $("#dmail-notice");
     $dmail_notice.hide();
     var dmail_id = $dmail_notice.data("id");
@@ -23,12 +23,12 @@ $(function() {
     e.preventDefault();
   });
 
-  $("#close-notice-link").click(function(e) {
+  $("#close-notice-link").on("click.danbooru", function(e) {
     $('#notice').fadeOut("fast");
     e.preventDefault();
   });
 
-  $("#desktop-version-link a").click(function(e) {
+  $("#desktop-version-link a").on("click.danbooru", function(e) {
     e.preventDefault();
     $.ajax("/users/" + Utility.meta("current-user-id") + ".json", {
       method: "PUT",

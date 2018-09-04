@@ -24,11 +24,11 @@ Ugoira.create_player = (mime_type, frames, file_url) => {
   Ugoira.player = new ZipImagePlayer(options);
   Ugoira.player_manually_paused = false;
 
-  $(Ugoira.player).on("loadProgress", (ev, progress) => {
+  $(Ugoira.player).on("loadProgress.danbooru", (ev, progress) => {
     $("#seek-slider").progressbar("value", Math.floor(progress * 100));
   });
 
-  $("#ugoira-play").click(e => {
+  $("#ugoira-play").on("click.danbooru", e => {
     Ugoira.player.play();
     $("#ugoira-play").hide();
     $("#ugoira-pause").show();
@@ -36,7 +36,7 @@ Ugoira.create_player = (mime_type, frames, file_url) => {
     e.preventDefault();
   })
 
-  $("#ugoira-pause").click(e => {
+  $("#ugoira-pause").on("click.danbooru", e => {
     Ugoira.player.pause();
     $("#ugoira-pause").hide();
     $("#ugoira-play").show();
@@ -67,7 +67,7 @@ Ugoira.create_player = (mime_type, frames, file_url) => {
     }
   });
 
-  $(Ugoira.player).on("frame", (frame, frame_number) => {
+  $(Ugoira.player).on("frame.danbooru", (frame, frame_number) => {
     $("#seek-slider").slider("option", "value", frame_number);
   });
 }

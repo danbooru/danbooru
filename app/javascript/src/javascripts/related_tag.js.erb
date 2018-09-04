@@ -6,8 +6,8 @@ let RelatedTag = {};
 RelatedTag.initialize_all = function() {
   if ($("#c-posts #a-show").length || $("#c-uploads #a-new").length) {
     this.initialize_buttons();
-    $("#upload_tag_string,#post_tag_string").keyup(RelatedTag.update_selected);
-    $("body").on("click", "#artist-related-tags-column a.del", RelatedTag.disable_artist_url)
+    $("#upload_tag_string,#post_tag_string").on("keyup.danbooru.relatedTags", RelatedTag.update_selected);
+    $("#related-tags-container").on("click.danbooru", "#artist-related-tags-column a.del", RelatedTag.disable_artist_url)
   }
 }
 
@@ -16,7 +16,7 @@ RelatedTag.initialize_buttons = function() {
   <% TagCategory.related_button_list.each do |category| %>
     RelatedTag.common_bind("#related-<%= category %>-button", "<%= category %>"); // eslint-disable-line indent
   <% end %>
-  $("#find-artist-button").click(RelatedTag.find_artist);
+  $("#find-artist-button").on("click.danbooru", RelatedTag.find_artist);
 }
 
 RelatedTag.tags_include = function(name) {
@@ -25,7 +25,7 @@ RelatedTag.tags_include = function(name) {
 }
 
 RelatedTag.common_bind = function(button_name, category) {
-  $(button_name).click(function(e) {
+  $(button_name).on("click.danbooru", function(e) {
     var $dest = $("#related-tags");
     $dest.empty();
     RelatedTag.build_recent_and_frequent($dest);
@@ -216,7 +216,7 @@ RelatedTag.build_html = function(query, related_tags, name, is_wide_column) {
       $link.text(tag[0].replace(/_/g, " "));
       $link.addClass("tag-type-" + tag[1]);
       $link.attr("href", "/posts?tags=" + encodeURIComponent(tag[0]));
-      $link.click(RelatedTag.toggle_tag);
+      $link.on("click.danbooru", RelatedTag.toggle_tag);
       if (RelatedTag.tags_include(tag[0])) {
         $link.addClass("selected");
       }

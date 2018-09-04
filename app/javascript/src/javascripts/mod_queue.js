@@ -31,7 +31,7 @@ ModQueue.initialize_hilights = function() {
 }
 
 ModQueue.initialize_detailed_rejection_links = function() {
-  $(".detailed-rejection-link").click(ModQueue.detailed_rejection_dialog)
+  $(".detailed-rejection-link").on("click.danbooru", ModQueue.detailed_rejection_dialog)
 }
 
 ModQueue.detailed_rejection_dialog = function() {

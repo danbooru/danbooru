@@ -6,12 +6,12 @@ Dtext.initialize_all = function() {
 }
 
 Dtext.initialize_links = function() {
-  $(".simple_form input[value=Preview]").click(Dtext.click_button);
+  $(".simple_form input[value=Preview]").on("click.danbooru", Dtext.click_button);
 }
 
 Dtext.initialize_expandables = function($parent) {
   $parent = $parent || $(document);
-  $parent.find(".expandable-button").click(function(e) {
+  $parent.find(".expandable-button").on("click.danbooru", function(e) {
     var button = $(this);
     button.parent().next().fadeToggle("fast");
     if (button.val() === "Show") {

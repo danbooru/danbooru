@@ -71,7 +71,7 @@ Blacklist.update_sidebar = function() {
     link.text(entry.tags);
     link.attr("href", `/posts?tags=${encodeURIComponent(entry.tags)}`);
     link.attr("title", entry.tags);
-    link.click(Blacklist.toggle_entry);
+    link.on("click.danbooru", Blacklist.toggle_entry);
     count.html(entry.hits);
     count.addClass("count");
     item.append(link);
@@ -93,7 +93,7 @@ Blacklist.initialize_disable_all_blacklists = function() {
     $("#disable-all-blacklists").show()
   }
 
-  $("#disable-all-blacklists").click(function(e) {
+  $("#disable-all-blacklists").on("click.danbooru", function(e) {
     $("#disable-all-blacklists").hide();
     $("#re-enable-all-blacklists").show();
     Cookie.put("dab", "1");
@@ -101,7 +101,7 @@ Blacklist.initialize_disable_all_blacklists = function() {
     e.preventDefault();
   });
 
-  $("#re-enable-all-blacklists").click(function(e) {
+  $("#re-enable-all-blacklists").on("click.danbooru", function(e) {
     $("#disable-all-blacklists").show();
     $("#re-enable-all-blacklists").hide();
     Cookie.put("dab", "0");

@@ -10,7 +10,7 @@ NewsUpdate.initialize = function() {
   } else {
     $("#news-updates").show();
 
-    $("#close-news-ticker-link").click(function(e) {
+    $("#close-news-ticker-link").on("click.danbooru", function(e) {
       $("#news-updates").hide();
       Cookie.put("news-ticker", key);
 

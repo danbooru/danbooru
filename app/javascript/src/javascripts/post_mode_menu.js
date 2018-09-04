@@ -49,24 +49,24 @@ PostModeMenu.initialize_selector = function() {
     $("#mode-box select").val(Cookie.get("mode"));
   }
 
-  $("#mode-box select").change(function(e) {
+  $("#mode-box select").on("change.danbooru", function(e) {
     PostModeMenu.change();
     $("#tag-script-field:visible").focus().select();
   });
 }
 
 PostModeMenu.initialize_preview_link = function() {
-  $(".post-preview a").click(PostModeMenu.click);
+  $(".post-preview a").on("click.danbooru", PostModeMenu.click);
 }
 
 PostModeMenu.initialize_edit_form = function() {
   $("#quick-edit-div").hide();
-  $("#quick-edit-form input[value=Cancel]").click(function(e) {
+  $("#quick-edit-form input[value=Cancel]").on("click.danbooru", function(e) {
     PostModeMenu.close_edit_form();
     e.preventDefault();
   });
 
-  $("#quick-edit-form").submit(function(e) {
+  $("#quick-edit-form").on("submit.danbooru", function(e) {
     $.ajax({
       type: "put",
       url: $("#quick-edit-form").attr("action"),
