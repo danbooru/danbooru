@@ -592,6 +592,32 @@ class UploadServiceTest < ActiveSupport::TestCase
       end
     end
 
+    context "for a twitter source replacement" do
+      setup do
+        @new_url = "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"
+
+        travel_to(1.month.ago) do
+          @user = FactoryBot.create(:user)
+        end
+
+        as_user do
+          @post = FactoryBot.create(:post, source: "http://blah", file_ext: "jpg", md5: "something", uploader_ip_addr: "127.0.0.2")
+          @post.stubs(:queue_delete_files)
+          @replacement = FactoryBot.create(:post_replacement, post: @post, replacement_url: @new_url)
+        end
+      end
+
+      subject { UploadService::Replacer.new(post: @post, replacement: @replacement) }
+
+      should "replace the post" do
+        as_user { subject.process! }
+
+        @post.reload
+
+        assert_equal(@new_url, @post.replacements.last.replacement_url)
+      end
+    end
+
     context "for a source replacement" do
       setup do
         @new_url = "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"
