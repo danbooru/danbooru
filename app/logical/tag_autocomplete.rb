@@ -38,15 +38,19 @@ module TagAutocomplete
   end
 
   def search_fuzzy(query, n=5)
+    if CurrentUser.id != 1
+      return []
+    end
+
     if query.size <= 3
       return []
     end
 
     Tag
-      .where("name % ?", query)
+      .where("name <% ?", query)
       .where("name like ? escape E'\\\\'", query[0].to_escaped_for_sql_like + '%')
       .where("post_count > 0")
-      .order(Arel.sql("similarity(name, #{Tag.connection.quote(query)}) * log(10, post_count + 1) DESC"))
+      .order(Arel.sql("word_similarity(name, #{Tag.connection.quote(query)}) * log(10, post_count + 1) DESC"))
       .limit(n)
       .pluck(:name, :post_count, :category)
       .map {|row| Result.new(*row)}
