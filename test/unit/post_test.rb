@@ -1513,7 +1513,7 @@ class PostTest < ActiveSupport::TestCase
 
         should "normalize deviantart links" do
           @post.source = "http://fc06.deviantart.net/fs71/f/2013/295/d/7/you_are_already_dead__by_mar11co-d6rgm0e.jpg"
-          assert_equal("https://mar11co.deviantart.com/art/You-Are-Already-Dead-408921710", @post.normalized_source)
+          assert_equal("https://www.deviantart.com/mar11co/art/You-Are-Already-Dead-408921710", @post.normalized_source)
           @post.source = "http://fc00.deviantart.net/fs71/f/2013/337/3/5/35081351f62b432f84eaeddeb4693caf-d6wlrqs.jpg"
           assert_equal("https://deviantart.com/deviation/417560500", @post.normalized_source)
         end

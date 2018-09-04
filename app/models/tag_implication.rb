@@ -12,7 +12,6 @@ class TagImplication < TagRelationship
   validate :consequent_is_not_aliased
   validate :antecedent_and_consequent_are_different
   validate :wiki_pages_present, :on => :create
-  scope :expired, ->{where("created_at < ?", 2.months.ago)}
   scope :old, ->{where("created_at between ? and ?", 2.months.ago, 1.month.ago)}
   scope :pending, ->{where(status: "pending")}
 

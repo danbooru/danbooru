@@ -18,7 +18,7 @@ module TagAutocomplete
       search_exact(query, 3) +
       search_prefix(query, 3) + 
       search_fuzzy(query, 3) +
-      search_aliases(query, 10)
+      search_aliases(query, 3)
     )
   end
 

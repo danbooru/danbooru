@@ -127,7 +127,7 @@ module Sources
       end
 
       def normalizable_for_artist_finder?
-        illust_id.present? || novel_id.present? || fanbox_id.present?
+        illust_id.present? || novel_id.present? || fanbox_id.present? || fanbox_account_id.present?
       end
 
       def unique_id
@@ -219,7 +219,7 @@ module Sources
           end
         end
 
-        raise Sources::Error.new("Couldn't get illust ID from URL (#{url}, #{referer_url})")
+        return nil
       end
       memoize :illust_id
 
