@@ -8,10 +8,10 @@ module ApplicationHelper
   end
 
   def nav_link_to(text, url, **options)
+    klass = options.delete(:class)
+
     if nav_link_match(params[:controller], url)
-      klass = "current"
-    else
-      klass = nil
+      klass = "#{klass} current"
     end
 
     li_link_to(text, url, id_prefix: "nav-", class: klass, **options)
