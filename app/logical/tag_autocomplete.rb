@@ -24,7 +24,7 @@ module TagAutocomplete
 
   def count_sort(query, words)
     words.uniq.slice(0, LIMIT).sort_by do |x|
-      x.post_count.to_i * x.weight
+      x.post_count * x.weight
     end.reverse
   end
 
@@ -35,7 +35,7 @@ module TagAutocomplete
       .order("post_count desc")
       .limit(n)
       .pluck(:name, :post_count, :category)
-      .map {|row| Result.new(*row, 1.0)}
+      .map {|row| Result.new(*row, nil, 1.0)}
   end
 
   def search_fuzzy(query, n=5)
@@ -54,7 +54,7 @@ module TagAutocomplete
       .order(Arel.sql("word_similarity(name, #{Tag.connection.quote(query)}) DESC"))
       .limit(n)
       .pluck(:name, :post_count, :category)
-      .map {|row| Result.new(*row, 0.1)}
+      .map {|row| Result.new(*row, nil, 0.1)}
   end
 
   def search_prefix(query, n=3)
@@ -85,7 +85,7 @@ module TagAutocomplete
       .order("post_count desc")
       .limit(n)
       .pluck(:name, :post_count, :category)
-      .map {|row| Result.new(*row, 0.8)}
+      .map {|row| Result.new(*row, nil, 0.8)}
   end
 
   def search_aliases(query, n=10)
