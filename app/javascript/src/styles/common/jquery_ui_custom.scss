@@ -25,6 +25,14 @@ div.ui-dialog {
   border: 1px solid #FCEEC1;
   background: #FDF5D9;
   color: #363636;
+
+  a, a:active, a:visited {
+    color: $link_color;
+  }
+
+  a:hover {
+    color: $link_hover_color;
+  }
 }
 
 .ui-state-error {
