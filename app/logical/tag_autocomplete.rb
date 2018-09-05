@@ -17,7 +17,7 @@ module TagAutocomplete
       query,
       search_exact(query, 3) +
       search_prefix(query, 3) + 
-      search_fuzzy(query, 3) +
+      search_correct(query, 2) +
       search_aliases(query, 3)
     )
   end
@@ -38,7 +38,7 @@ module TagAutocomplete
       .map {|row| Result.new(*row, nil, 1.0)}
   end
 
-  def search_fuzzy(query, n=5)
+  def search_correct(query, n=2)
     if CurrentUser.id != 1
       return []
     end
@@ -49,6 +49,7 @@ module TagAutocomplete
 
     Tag
       .where("name % ?", query)
+      .where("abs(length(name) - ?) <= 2", query.size)
       .where("name like ? escape E'\\\\'", query[0].to_escaped_for_sql_like + '%')
       .where("post_count > 0")
       .order(Arel.sql("similarity(name, #{Tag.connection.quote(query)}) DESC"))

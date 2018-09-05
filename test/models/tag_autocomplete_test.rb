@@ -29,7 +29,7 @@ class TagAutocompleteTest < ActiveSupport::TestCase
     end
   end
 
-  context "#search_fuzzy" do
+  context "#search_correct" do
     setup do
       CurrentUser.stubs(:id).returns(1)
 
@@ -60,7 +60,7 @@ class TagAutocompleteTest < ActiveSupport::TestCase
         @tags[1],
         @tags[2]
       ].map(&:name)
-      assert_equal(expected, subject.search_fuzzy("abcd", 3).map(&:name))
+      assert_equal(expected, subject.search_correct("abcd", 3).map(&:name))
     end
   end
 
