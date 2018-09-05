@@ -2,7 +2,7 @@ module TagAutocomplete
   extend self
 
   PREFIX_BOUNDARIES = "(_/:;-"
-  LIMIT = 12
+  LIMIT = 10
 
   class Result < Struct.new(:name, :post_count, :category, :antecedent_name, :weight)
     def to_xml(options = {})
@@ -18,7 +18,7 @@ module TagAutocomplete
       search_exact(query, 8) +
       search_prefix(query, 4) + 
       search_correct(query, 2) +
-      search_aliases(query, 6)
+      search_aliases(query, 3)
     )
   end
 
