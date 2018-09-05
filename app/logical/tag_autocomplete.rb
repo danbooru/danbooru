@@ -2,7 +2,7 @@ module TagAutocomplete
   extend self
 
   PREFIX_BOUNDARIES = "(_/:;-"
-  LIMIT = 10
+  LIMIT = 12
 
   class Result < Struct.new(:name, :post_count, :category, :antecedent_name, :weight)
     def to_xml(options = {})
@@ -15,17 +15,17 @@ module TagAutocomplete
 
     candidates = count_sort(
       query,
-      search_exact(query, 3) +
-      search_prefix(query, 3) + 
+      search_exact(query, 8) +
+      search_prefix(query, 4) + 
       search_correct(query, 2) +
-      search_aliases(query, 3)
+      search_aliases(query, 6)
     )
   end
 
   def count_sort(query, words)
-    words.uniq.slice(0, LIMIT).sort_by do |x|
+    words.uniq.sort_by do |x|
       x.post_count * x.weight
-    end.reverse
+    end.reverse.slice(0, LIMIT)
   end
 
   def search_exact(query, n=4)
@@ -49,7 +49,7 @@ module TagAutocomplete
 
     Tag
       .where("name % ?", query)
-      .where("abs(length(name) - ?) <= 2", query.size)
+      .where("abs(length(name) - ?) <= 3", query.size)
       .where("name like ? escape E'\\\\'", query[0].to_escaped_for_sql_like + '%')
       .where("post_count > 0")
       .order(Arel.sql("similarity(name, #{Tag.connection.quote(query)}) DESC"))
