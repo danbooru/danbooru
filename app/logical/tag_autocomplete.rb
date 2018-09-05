@@ -48,10 +48,10 @@ module TagAutocomplete
     end
 
     Tag
-      .where("name <% ?", query)
+      .where("name % ?", query)
       .where("name like ? escape E'\\\\'", query[0].to_escaped_for_sql_like + '%')
       .where("post_count > 0")
-      .order(Arel.sql("word_similarity(name, #{Tag.connection.quote(query)}) DESC"))
+      .order(Arel.sql("similarity(name, #{Tag.connection.quote(query)}) DESC"))
       .limit(n)
       .pluck(:name, :post_count, :category)
       .map {|row| Result.new(*row, nil, 0.1)}
