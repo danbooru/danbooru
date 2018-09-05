@@ -29,5 +29,18 @@ class DailyMaintenanceTest < ActiveSupport::TestCase
       assert(true, @pending.reload.is_deleted)
       assert(true, @flagged.reload.is_deleted)
     end
+
+    context "when pruning bans" do
+      should "clear the is_banned flag for users who are no longer banned" do
+        banner = FactoryBot.create(:admin_user)
+        user = FactoryBot.create(:user)
+
+        CurrentUser.as(banner) { FactoryBot.create(:ban, user: user, banner: banner, duration: 1) }
+
+        assert_equal(true, user.reload.is_banned)
+        travel_to(2.days.from_now) { DailyMaintenance.new.run }
+        assert_equal(false, user.reload.is_banned)
+      end
+    end
   end
 end
