@@ -31,12 +31,14 @@ class TagAutocompleteTest < ActiveSupport::TestCase
 
   context "#search_fuzzy" do
     setup do
+      CurrentUser.stubs(:id).returns(1)
+
       @tags = [
-        create(:tag, name: "abcdef", post_count: 1),
-        create(:tag, name: "abcdzz", post_count: 2),
+        create(:tag, name: "abcde", post_count: 1),
+        create(:tag, name: "abcdz", post_count: 2),
 
         # one char mismatch
-        create(:tag, name: "abcezz", post_count: 2),
+        create(:tag, name: "abcez", post_count: 2),
 
         # too long
         create(:tag, name: "abcdefghijk", post_count: 2),
@@ -45,18 +47,18 @@ class TagAutocompleteTest < ActiveSupport::TestCase
         create(:tag, name: "bbcdef", post_count: 2),
 
         # zero post count
-        create(:tag, name: "abcdyy", post_count: 0),
+        create(:tag, name: "abcdy", post_count: 0),
 
         # completely different
-        create(:tag, name: "bbbbbb")
+        create(:tag, name: "bbbbb")
       ]
     end
 
     should "find the tags" do
       expected = [
+        @tags[0],
         @tags[1],
-        @tags[2],
-        @tags[0]
+        @tags[2]
       ].map(&:name)
       assert_equal(expected, subject.search_fuzzy("abcd", 3).map(&:name))
     end

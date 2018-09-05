@@ -280,9 +280,7 @@ class ArtistTest < ActiveSupport::TestCase
       end
 
       should "find nothing for bad IDs" do
-        assert_raises(PixivApiClient::BadIDError) do
-          assert_artist_not_found("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=32049358")
-        end
+        assert_artist_not_found("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=32049358")
       end
     end
 
