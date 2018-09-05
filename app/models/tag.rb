@@ -814,6 +814,7 @@ class Tag < ApplicationRecord
         self.related_tags = RelatedTagCalculator.calculate_from_sample_to_array(name).join(" ")
       end
       self.related_tags_updated_at = Time.now
+      fix_post_count if rand(post_count) <= 1
       save
     rescue ActiveRecord::StatementInvalid
     end
