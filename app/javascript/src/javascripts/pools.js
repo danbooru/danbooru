@@ -1,3 +1,6 @@
+require("jquery-ui/ui/widgets/sortable");
+require("jquery-ui/themes/base/sortable.css");
+
 let Pool = {};
 
 Pool.initialize_all = function() {

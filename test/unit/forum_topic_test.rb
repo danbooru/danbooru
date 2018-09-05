@@ -132,8 +132,8 @@ class ForumTopicTest < ActiveSupport::TestCase
     end
 
     should "be searchable by title" do
-      assert_equal(1, ForumTopic.title_matches("xxx").count)
-      assert_equal(0, ForumTopic.title_matches("aaa").count)
+      assert_equal(1, ForumTopic.attribute_matches(:title, "xxx").count)
+      assert_equal(0, ForumTopic.attribute_matches(:title, "aaa").count)
     end
 
     should "be searchable by category id" do
