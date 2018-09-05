@@ -23,7 +23,7 @@ module TagAutocomplete
   end
 
   def count_sort(query, words)
-    words.uniq.sort_by do |x|
+    words.uniq(&:name).sort_by do |x|
       x.post_count * x.weight
     end.reverse.slice(0, LIMIT)
   end

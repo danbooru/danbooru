@@ -8,6 +8,11 @@ class TagAutocompleteTest < ActiveSupport::TestCase
       create(:tag, name: "abcdef", post_count: 1)
       assert_equal(["abcdef"], subject.search("A").map(&:name))
     end
+
+    should "not return duplicates" do
+      create(:tag, name: "red_eyes", post_count: 5001)
+      assert_equal(%w[red_eyes], subject.search("re").map(&:name))
+    end
   end
 
   context "#search_exact" do
