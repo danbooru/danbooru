@@ -84,9 +84,17 @@ class UserFeedback < ApplicationRecord
     self.user_id = User.name_to_id(name)
   end
 
+  def disclaimer
+    if category != "negative"
+      return nil
+    end
+
+    "The purpose of feedback is to help you become a valuable member of the site by highlighting adverse behaviors. The author, #{creator_name}, should have sent you a message in the recent past as a warning. The fact that you're receiving this feedback now implies you've ignored their advice.\n\nYou can protest this feedback by petitioning the mods and admins in the forum. If #{creator_name} fails to provide sufficient evidence, you can have the feedback removed. However, if you fail to defend yourself against the accusations, you will likely earn yourself another negative feedback.\n\nNegative feedback generally doesn't affect your usability of the site. But it does mean other users may trust you less and give you less benefit of the doubt.\n\n"
+  end
+
   def create_dmail
     unless disable_dmail_notification
-      body = %{@#{creator_name} created a "#{category} record":/user_feedbacks?search[user_id]=#{user_id} for your account:\n\n#{self.body}}
+      body = %{#{disclaimer}@#{creator_name} created a "#{category} record":/user_feedbacks?search[user_id]=#{user_id} for your account:\n\n#{self.body}}
       Dmail.create_automated(:to_id => user_id, :title => "Your user record has been updated", :body => body)
     end
   end
