@@ -205,6 +205,11 @@ class ArtistTest < ActiveSupport::TestCase
       assert_equal(["minko"], Artist.find_all_by_url("http://minko.com/x/test.jpg").map(&:name))
     end
 
+    should "be case-insensitive to domains when finding matches by url" do
+      a1 = FactoryBot.create(:artist, name: "bkub", url_string: "http://BKUB.example.com")
+      assert_artist_found(a1.name, "http://bkub.example.com")
+    end
+
     should "not find duplicates" do
       FactoryBot.create(:artist, :name => "warhol", :url_string => "http://warhol.com/x/a/image.jpg\nhttp://warhol.com/x/b/image.jpg")
       assert_equal(["warhol"], Artist.find_all_by_url("http://warhol.com/x/test.jpg").map(&:name))

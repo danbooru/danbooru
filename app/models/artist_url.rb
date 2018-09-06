@@ -19,6 +19,7 @@ class ArtistUrl < ApplicationRecord
       nil
     else
       url = url.sub(%r!^https://!, "http://")
+      url = url.sub(%r!^http://([^/]+)!i) { |domain| domain.downcase }
       url = url.sub(%r!^http://blog\d+\.fc2!, "http://blog.fc2")
       url = url.sub(%r!^http://blog-imgs-\d+\.fc2!, "http://blog.fc2")
       url = url.sub(%r!^http://blog-imgs-\d+-\w+\.fc2!, "http://blog.fc2")

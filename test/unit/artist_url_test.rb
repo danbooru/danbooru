@@ -35,6 +35,11 @@ class ArtistUrlTest < ActiveSupport::TestCase
       assert_equal("http://google.com/", url.normalized_url)
     end
 
+    should "normalise domains to lowercase" do
+      url = FactoryBot.create(:artist_url, url: "https://ArtistName.example.com")
+      assert_equal("http://artistname.example.com/", url.normalized_url)
+    end
+
     context "normalize twitter profile urls" do
       setup do
         @url = FactoryBot.create(:artist_url, :url => "https://twitter.com/BLAH")
