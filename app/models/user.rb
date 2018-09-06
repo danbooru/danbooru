@@ -462,6 +462,8 @@ class User < ApplicationRecord
   end
 
   module LimitMethods
+    extend Memoist
+
     def max_saved_searches
       if is_platinum?
         1_000
@@ -527,7 +529,7 @@ class User < ApplicationRecord
     end
 
     def upload_limit
-      @upload_limit ||= [max_upload_limit - used_upload_slots, 0].max
+      [max_upload_limit - used_upload_slots, 0].max
     end
 
     def used_upload_slots
@@ -535,6 +537,7 @@ class User < ApplicationRecord
       uploaded_comic_count = Post.for_user(id).tag_match("comic").where("created_at >= ?", 23.hours.ago).count / 3
       uploaded_count - uploaded_comic_count
     end
+    memoize :used_upload_slots
 
     def max_upload_limit
       [(base_upload_limit * upload_limit_multiplier).ceil, 10].max
@@ -547,6 +550,7 @@ class User < ApplicationRecord
     def adjusted_deletion_confidence
       [deletion_confidence(60), 15].min
     end
+    memoize :adjusted_deletion_confidence
 
     def base_upload_limit
       if created_at >= 1.month.ago
