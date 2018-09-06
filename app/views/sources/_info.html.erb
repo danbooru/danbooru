@@ -1,5 +1,3 @@
-<%# source %>
-
 <div id="source-info">
   <p><%= link_to "Fetch source data", source_path(:format => "json"), :id => "fetch-data-manual" %></p>
   <p><%= content_tag "span", "Loading source data...", :id => "loading-data", :style => "display: none;" %></p>
