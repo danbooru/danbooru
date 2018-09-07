@@ -23,11 +23,5 @@ class UploadService
 
       return [upload]
     end
-
-    def self.batch(url, ref = nil)
-      if url
-        return Sources::Strategies.find(url, ref)
-      end
-    end
   end
 end
