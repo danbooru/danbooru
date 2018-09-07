@@ -24,6 +24,12 @@
 # * https://noizave.deviantart.com/art/test-post-please-ignore-685436408
 # * https://www.deviantart.com/deviation/685436408
 # * https://fav.me/dbc3a48
+#
+# Profile URLs:
+#
+# * https://noizave.deviantart.com
+# * https://www.deviantart.com/noizave
+# * https://deviantart.com/noizave
 
 module Sources
   module Strategies
@@ -40,7 +46,7 @@ module Sources
       PATH_ART = %r{\Ahttps?://www\.deviantart\.com/#{ARTIST}/art/#{TITLE}-#{DEVIATION_ID}\z}i
       SUBDOMAIN_ART = %r{\Ahttps?://#{ARTIST}\.deviantart\.com/art/#{TITLE}-#{DEVIATION_ID}\z}i
 
-      PATH_PROFILE = %r{\Ahttps?://www\.deviantart\.com/#{ARTIST}/?\z}i
+      PATH_PROFILE = %r{\Ahttps?://(www\.)?deviantart\.com/#{ARTIST}/?\z}i
       SUBDOMAIN_PROFILE = %r{\Ahttps?://#{ARTIST}\.deviantart\.com/?\z}i
 
       def self.match?(*urls)
@@ -111,7 +117,7 @@ module Sources
       end
 
       def normalized_for_artist_finder?
-        url =~ PATH_PROFILE
+        url == normalize_for_artist_finder
       end
 
       def normalizable_for_artist_finder?

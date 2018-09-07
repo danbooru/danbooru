@@ -229,5 +229,14 @@ module Sources
         assert_match(%r!"Print available at Inprnt":\[http://www.inprnt.com/gallery/teemutaiga/kisu\]!, @site.dtext_artist_commentary_desc)
       end
     end
+
+    context "An artist entry with a profile url that is missing the 'www'" do
+      should "still find the artist" do
+        @site = Sources::Strategies.find("http://noizave.deviantart.com/art/test-post-please-ignore-685436408")
+        @artist = FactoryBot.create(:artist, name: "noizave", url_string: "https://deviantart.com/noizave")
+
+        assert_equal([@artist], @site.artists)
+      end
+    end
   end
 end
