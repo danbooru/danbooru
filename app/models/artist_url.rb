@@ -45,35 +45,6 @@ class ArtistUrl < ApplicationRecord
     end
   end
 
-  def self.legacy_normalize(url)
-    if url.nil?
-      nil
-    else
-      url = url.gsub(%r!^https://!, "http://")
-      url = url.gsub(%r!^http://blog\d+\.fc2!, "http://blog.fc2")
-      url = url.gsub(%r!^http://blog-imgs-\d+\.fc2!, "http://blog.fc2")
-      url = url.gsub(%r!^http://blog-imgs-\d+-\w+\.fc2!, "http://blog.fc2")
-      url = url.gsub(%r!^http://img\d+\.pixiv\.net!, "http://img.pixiv.net")
-      url = url.gsub(%r!^http://i\d+\.pixiv\.net/img\d+!, "http://img.pixiv.net")
-      url = url.gsub(%r!/+\Z!, "")
-      url + "/"
-    end
-  end
-
-  def self.normalize_for_search(url)
-    if url =~ /\.\w+\Z/ && url =~ /\w\/\w/
-      url = File.dirname(url)
-    end
-
-    url = url.gsub(%r!^https://!, "http://")
-    url = url.gsub(%r!^http://blog\d+\.fc2!, "http://blog*.fc2")
-    url = url.gsub(%r!^http://blog-imgs-\d+\.fc2!, "http://blog*.fc2")
-    url = url.gsub(%r!^http://blog-imgs-\d+-\w+\.fc2!, "http://blog*.fc2")
-    url = url.gsub(%r!^http://img\d+\.pixiv\.net!, "http://img*.pixiv.net")
-    url = url.gsub(%r!^http://i\d+\.pixiv\.net/img\d+!, "http://*.pixiv.net/img*")
-    url
-  end
-
   def parse_prefix
     case url
     when /^-/

@@ -60,10 +60,6 @@ class ArtistVersion < ApplicationRecord
     new_urls = url_array
     old_urls = version.present? ? version.url_array : []
 
-    latest_urls  = latest_urls.map {|url| ArtistUrl.legacy_normalize(url)}
-    new_urls = new_urls.map {|url| ArtistUrl.legacy_normalize(url)}
-    old_urls = old_urls.map {|url| ArtistUrl.legacy_normalize(url)}
-
     added_urls = new_urls - old_urls
     removed_urls = old_urls - new_urls
 

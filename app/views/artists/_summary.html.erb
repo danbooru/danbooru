@@ -33,9 +33,6 @@
             <% else %>
               <del><%= h(url.url) %></del>
             <% end %>
-            <% if CurrentUser.user.is_moderator? %>
-              [<%= link_to("mass edit", edit_moderator_tag_path(:antecedent => "-#{artist.name} source:#{ArtistUrl.normalize_for_search(url.url)}", :consequent => artist.name)) %>]
-            <% end %>
           </li>
         <% end %>
       </ul>
