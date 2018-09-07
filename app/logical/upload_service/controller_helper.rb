@@ -4,14 +4,8 @@ class UploadService
       upload = Upload.new
 
       if Utils.is_downloadable?(url) && file.nil?
-        strategy = Sources::Strategies.find(url, ref)
-        post = Post.where("SourcePattern(lower(posts.source)) IN (?)", [url, strategy.canonical_url]).first
-
-        if post.nil?
-          # this gets called from UploadsController#new so we need
-          # to preprocess async
-          Preprocessor.new(source: url, referer_url: ref).delay(priority: -1, queue: "default").delayed_start(CurrentUser.id)
-        end
+        # this gets called from UploadsController#new so we need to preprocess async
+        Preprocessor.new(source: url, referer_url: ref).delay(priority: -1, queue: "default").delayed_start(CurrentUser.id)
 
         begin
           download = Downloads::File.new(url, ref)
@@ -19,7 +13,7 @@ class UploadService
         rescue Exception
         end
 
-        return [upload, post, strategy, remote_size]
+        return [upload, remote_size]
       end
 
       if file
@@ -28,12 +22,6 @@ class UploadService
       end
 
       return [upload]
-    end
-
-    def self.batch(url, ref = nil)
-      if url
-        return Sources::Strategies.find(url, ref)
-      end
     end
   end
 end

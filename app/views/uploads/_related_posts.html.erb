@@ -1,0 +1,27 @@
+<%# source %>
+
+<% if source.present? && source.related_posts.present? %>
+  <div id="related-posts-by-source">
+    <h3>Related Posts</h3>
+
+    <p class="hint">
+      Found <%= link_to pluralize(source.related_posts.total_count, "other post"), posts_path(tags: source.related_posts_search_query) %> from the same source:
+    </p>
+
+    <div>
+      <% source.related_posts.each do |post| %>
+        <%= PostPresenter.preview(post, show_deleted: true, size: true) %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<% if Danbooru.config.iqdbs_server %>
+  <% if params[:url] %>
+    <div class="input" id="iqdb-similar">
+      <p><em>Loading similar...</em></p>
+    </div>
+  <% else %>
+    <div class="input" id="iqdb-similar" style="display: none;"></div>
+  <% end %>
+<% end %>

@@ -1,9 +1,11 @@
 <% if @matches.present? %>
-  <h3>Similar</h3>
+  <h3>Similar Posts</h3>
+  <p class="hint">Found <%= pluralize(@matches.length, "similar post") %>:</p>
+
   <% @matches.each do |match| %>
     <%= PostPresenter.preview(match["post"], :tags => "status:any", :similarity => match["score"], :size => true) %>
   <% end %>
 <% else %>
-  <h3>Similar</h3>
-  <p>No matches found</p>
+  <h3>Similar Posts</h3>
+  <p class="hint">No similar posts found.</p>
 <% end %>

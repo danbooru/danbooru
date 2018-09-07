@@ -12,8 +12,8 @@
       <% end %>
 
       <%= render "image" %>
-      <%= render "post", :post => @post %>
-      <%= render "sources/info", :source => @source %>
+      <%= render "related_posts", source: @source %>
+      <%= render "sources/info" %>
 
       <div id="client-errors" class="error-messages ui-state-error ui-corner-all" style="display:none"></div>
 
@@ -90,16 +90,6 @@
             </div>
           </div>
         </div>
-
-        <% if Danbooru.config.iqdbs_server %>
-          <% if params[:url] %>
-            <div class="input" id="iqdb-similar">
-              <p><em>Loading similar...</em></p>
-            </div>
-          <% else %>
-            <div class="input" id="iqdb-similar" style="display: none;"></div>
-          <% end %>
-        <% end %>
 
         <div class="input">
           <div>

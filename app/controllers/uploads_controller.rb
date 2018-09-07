@@ -4,8 +4,9 @@ class UploadsController < ApplicationController
   skip_before_action :verify_authenticity_token, only: [:preprocess]
 
   def new
+    @source = Sources::Strategies.find(params[:url], params[:ref]) if params[:url].present?
     @upload_notice_wiki = WikiPage.titled(Danbooru.config.upload_notice_wiki_page).first
-    @upload, @post, @source, @remote_size = UploadService::ControllerHelper.prepare(
+    @upload, @remote_size = UploadService::ControllerHelper.prepare(
       url: params[:url], ref: params[:ref]
     )
     respond_with(@upload)
@@ -13,7 +14,7 @@ class UploadsController < ApplicationController
 
   def batch
     @url = params.dig(:batch, :url) || params[:url]
-    @source = UploadService::ControllerHelper.batch(@url, params[:ref])
+    @source = Sources::Strategies.find(@url, params[:ref]) if @url.present?
     respond_with(@source)
   end
 
@@ -43,7 +44,7 @@ class UploadsController < ApplicationController
   end
 
   def preprocess
-    @upload, @post, @source, @remote_size = UploadService::ControllerHelper.prepare(
+    @upload, @remote_size = UploadService::ControllerHelper.prepare(
       url: upload_params[:source], file: upload_params[:file], ref: upload_params[:referer_url]
     )
     render body: nil

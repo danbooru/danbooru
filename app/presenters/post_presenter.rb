@@ -27,7 +27,7 @@ class PostPresenter < Presenter
       cropped_src = post.preview_file_url
     end
 
-    html =  %{<article itemscope itemtype="http://schema.org/ImageObject" id="post_#{post.id}" class="#{preview_class(post, options[:pool], options)}" #{data_attributes(post)}>}
+    html =  %{<article itemscope itemtype="http://schema.org/ImageObject" id="post_#{post.id}" class="#{preview_class(post, options)}" #{data_attributes(post)}>}
     if options[:tags].present? && !CurrentUser.is_anonymous?
       tag_param = "?tags=#{CGI::escape(options[:tags])}"
     elsif options[:pool_id] || options[:pool]
@@ -72,10 +72,10 @@ class PostPresenter < Presenter
     html.html_safe
   end
 
-  def self.preview_class(post, description = nil, options = {})
+  def self.preview_class(post, options = {})
     klass = "post-preview"
     # klass << " large-cropped" if post.has_cropped? && options[:show_cropped]
-    klass << " pooled" if description
+    klass << " captioned" if options.values_at(:pooled, :size, :similarity).any?(&:present?)
     klass << " post-status-pending" if post.is_pending?
     klass << " post-status-flagged" if post.is_flagged?
     klass << " post-status-deleted" if post.is_deleted?

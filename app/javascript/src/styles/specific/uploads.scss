@@ -9,8 +9,17 @@ div#c-uploads {
       margin-bottom: 2em;
     }
 
-    ul#links {
+    ul#upload-image-metadata, ul#links {
       margin-bottom: 1em;
+    }
+
+    div#related-posts-by-source, div#iqdb-similar {
+      display: inline-block;
+
+      .hint {
+        white-space: nowrap;
+        max-width: 100%;
+      }
     }
 
     label[for="upload_as_pending"] {
