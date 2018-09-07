@@ -182,7 +182,7 @@ module Sources
 
       def self.artist_name_from_url(url)
         if url =~ ASSET || url =~ PATH_ART || url =~ PATH_PROFILE
-          $~[:artist]
+          $~[:artist].try(:dasherize)
         elsif url !~ RESERVED_SUBDOMAINS && (url =~ SUBDOMAIN_ART || url =~ SUBDOMAIN_PROFILE)
           $~[:artist]
         else

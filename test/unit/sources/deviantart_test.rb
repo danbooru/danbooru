@@ -82,6 +82,16 @@ module Sources
       end
     end
 
+    context "A source for a *.deviantart.net/*/:title_by_:artist.jpg url artist name containing underscores" do
+      should "find the correct artist" do
+        @site = Sources::Strategies.find("https://orig00.deviantart.net/4274/f/2010/230/8/a/pkmn_king_and_queen_by_mikoto_chan.jpg")
+        @artist = FactoryBot.create(:artist, name: "mikoto-chan", url_string: "https://www.deviantart.com/mikoto-chan")
+
+        assert_equal("mikoto-chan", @site.artist_name)
+        assert_equal([@artist], @site.artists)
+      end
+    end
+
     context "The source for a *.deviantart.net/*/:title_by_:artist.jpg url" do
       setup do
         @url = "http://fc08.deviantart.net/files/f/2007/120/c/9/cool_like_me_by_47ness.jpg"
