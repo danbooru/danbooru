@@ -13,12 +13,14 @@ article.post-preview {
     @include inline-block;
   }
 
-  &.pooled {
-    height: 214px;
+  &.captioned {
+    height: auto;
+    vertical-align: text-top;
   }
 
   .desc {
    font-size: 80%;
+   margin-bottom: 0;
   }
 
   img {
@@ -31,19 +33,6 @@ article.post-preview {
 
   &[data-has-sound=true]:before {
     @include sound-icon;
-  }
-}
-
-#iqdb-similar {
-  overflow: hidden;
-
-  .post-preview {
-    height: auto;
-    margin-bottom: 0;
-  }
-
-  p {
-    margin-bottom: 0;
   }
 }
 
