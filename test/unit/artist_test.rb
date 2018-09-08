@@ -154,9 +154,7 @@ class ArtistTest < ActiveSupport::TestCase
     should "resolve ambiguous urls" do
       bobross = FactoryBot.create(:artist, :name => "bob_ross", :url_string => "http://artists.com/bobross/image.jpg")
       bob = FactoryBot.create(:artist, :name => "bob", :url_string => "http://artists.com/bob/image.jpg")
-      matches = Artist.find_all_by_url("http://artists.com/bob/test.jpg")
-      assert_equal(1, matches.size)
-      assert_equal("bob", matches.first.name)
+      assert_artist_found("bob", "http://artists.com/bob/test.jpg")
     end
 
     should "parse urls" do
@@ -190,7 +188,7 @@ class ArtistTest < ActiveSupport::TestCase
     should "ignore pixiv.net/ and pixiv.net/img/ url matches" do
       a1 = FactoryBot.create(:artist, :name => "yomosaka", :url_string => "http://i2.pixiv.net/img18/img/evazion/14901720.png")
       a2 = FactoryBot.create(:artist, :name => "niwatazumi_bf", :url_string => "http://i2.pixiv.net/img18/img/evazion/14901720_big_p0.png")
-      assert_equal([], Artist.find_all_by_url("http://i2.pixiv.net/img28/img/kyang692/35563903.jpg"))
+      assert_artist_not_found("http://i2.pixiv.net/img28/img/kyang692/35563903.jpg")
     end
 
     should "find matches by url" do
@@ -198,11 +196,11 @@ class ArtistTest < ActiveSupport::TestCase
       a2 = FactoryBot.create(:artist, :name => "subway", :url_string => "http://subway.com/x/test.jpg")
       a3 = FactoryBot.create(:artist, :name => "minko", :url_string => "https://minko.com/x/test.jpg")
 
-      assert_equal(["rembrandt"], Artist.find_all_by_url("http://rembrandt.com/x/test.jpg").map(&:name))
-      assert_equal(["rembrandt"], Artist.find_all_by_url("http://rembrandt.com/x/another.jpg").map(&:name))
-      assert_equal([], Artist.find_all_by_url("http://nonexistent.com/test.jpg").map(&:name))
-      assert_equal(["minko"], Artist.find_all_by_url("https://minko.com/x/test.jpg").map(&:name))
-      assert_equal(["minko"], Artist.find_all_by_url("http://minko.com/x/test.jpg").map(&:name))
+      assert_artist_found("rembrandt", "http://rembrandt.com/x/test.jpg")
+      assert_artist_found("rembrandt", "http://rembrandt.com/x/another.jpg")
+      assert_artist_not_found("http://nonexistent.com/test.jpg")
+      assert_artist_found("minko", "https://minko.com/x/test.jpg")
+      assert_artist_found("minko", "http://minko.com/x/test.jpg")
     end
 
     should "be case-insensitive to domains when finding matches by url" do
@@ -212,7 +210,7 @@ class ArtistTest < ActiveSupport::TestCase
 
     should "not find duplicates" do
       FactoryBot.create(:artist, :name => "warhol", :url_string => "http://warhol.com/x/a/image.jpg\nhttp://warhol.com/x/b/image.jpg")
-      assert_equal(["warhol"], Artist.find_all_by_url("http://warhol.com/x/test.jpg").map(&:name))
+      assert_artist_found("warhol", "http://warhol.com/x/test.jpg")
     end
 
     should "not include duplicate urls" do
@@ -222,7 +220,7 @@ class ArtistTest < ActiveSupport::TestCase
 
     should "hide deleted artists" do
       FactoryBot.create(:artist, :name => "warhol", :url_string => "http://warhol.com/a/image.jpg", :is_active => false)
-      assert_equal([], Artist.find_all_by_url("http://warhol.com/a/image.jpg").map(&:name))
+      assert_artist_not_found("http://warhol.com/a/image.jpg")
     end
 
     context "when finding deviantart artists" do
