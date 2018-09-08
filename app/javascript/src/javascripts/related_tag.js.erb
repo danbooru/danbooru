@@ -1,3 +1,4 @@
+import Upload from './uploads';
 import Utility from './utility';
 import Cookie from './cookie';
 
@@ -16,7 +17,6 @@ RelatedTag.initialize_buttons = function() {
   <% TagCategory.related_button_list.each do |category| %>
     RelatedTag.common_bind("#related-<%= category %>-button", "<%= category %>"); // eslint-disable-line indent
   <% end %>
-  $("#find-artist-button").on("click.danbooru", RelatedTag.find_artist);
 }
 
 RelatedTag.tags_include = function(name) {
@@ -281,21 +281,6 @@ RelatedTag.toggle_tag = function(e) {
   e.preventDefault();
 }
 
-RelatedTag.find_artist = function(e) {
-  $("#artist-tags").html("<em>Loading...</em>");
-  var url = $("#upload_source,#post_source");
-  var referer_url = $("#upload_referer_url");
-  $.get("/artists/finder.json", {"url": url.val(), "referer_url": referer_url.val()}, RelatedTag.process_artist);
-  if (e) {
-    e.preventDefault();
-  }
-}
-
-RelatedTag.process_artist = function(data) {
-  RelatedTag.recent_artists = data;
-  RelatedTag.build_all();
-}
-
 RelatedTag.toggle = function() {
   if ($("#related-tags").is(":visible")) {
     RelatedTag.hide();
@@ -332,7 +317,7 @@ RelatedTag.disable_artist_url = function(e) {
             is_active: false
           }
         }
-      }).done(RelatedTag.find_artist);
+      }).done(Upload.fetch_data_manual);
     }
   });
   return false;
