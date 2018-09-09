@@ -116,7 +116,7 @@ module Sources
       # Sources::Strategies.find("http://dic.pixiv.net/a/THUNDERproject").normalizable_for_artist_finder?
       # => false
       def normalizable_for_artist_finder?
-        false
+        normalize_for_artist_finder.present?
       end
 
       def normalize_for_artist_finder

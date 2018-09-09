@@ -151,5 +151,13 @@ class ArtistUrlTest < ActiveSupport::TestCase
       assert_equal("https://twitter.com/aoimanabu/status/892370963630743552", url.url)
       assert_equal("http://twitter.com/aoimanabu/", url.normalized_url)
     end
+
+    should "normalize nijie urls" do
+      url = FactoryBot.create(:artist_url, url: "https://pic03.nijie.info/nijie_picture/236014_20170620101426_0.png")
+      assert_equal("http://nijie.info/members.php?id=236014/", url.normalized_url)
+
+      url = FactoryBot.create(:artist_url, url: "https://nijie.info/members.php?id=236014")
+      assert_equal("http://nijie.info/members.php?id=236014/", url.normalized_url)
+    end
   end
 end
