@@ -6,6 +6,7 @@ class User < ApplicationRecord
   class PrivilegeError < Exception ; end
 
   module Levels
+    ANONYMOUS = 0
     BLOCKED = 10
     MEMBER = 20
     GOLD = 30
@@ -17,7 +18,6 @@ class User < ApplicationRecord
 
   # Used for `before_action :<role>_only`. Must have a corresponding `is_<role>?` method.
   Roles = Levels.constants.map(&:downcase) + [
-    :anonymous,
     :banned,
     :approver,
     :voter,
@@ -289,6 +289,12 @@ class User < ApplicationRecord
         User.find_by!(name: Danbooru.config.system_user)
       end
 
+      def anonymous
+        user = User.new(name: "Anonymous", created_at: Time.now)
+        user.freeze.readonly!
+        user
+      end
+
       def level_hash
         return {
           "Member" => Levels::MEMBER,
@@ -302,6 +308,9 @@ class User < ApplicationRecord
 
       def level_string(value)
         case value
+        when Levels::ANONYMOUS
+          "Anonymous"
+
         when Levels::BLOCKED
           "Banned"
 
@@ -363,11 +372,11 @@ class User < ApplicationRecord
     end
 
     def is_anonymous?
-      false
+      level == Levels::ANONYMOUS
     end
 
     def is_member?
-      true
+      level >= Levels::MEMBER
     end
 
     def is_blocked?
@@ -917,6 +926,7 @@ class User < ApplicationRecord
     self.new_post_navigation_layout = true
     self.enable_sequential_post_navigation = true
     self.enable_auto_complete = true
+    self.always_resize_images = true
   end
 
   def presenter
