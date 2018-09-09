@@ -17,10 +17,10 @@ module Downloads
     context "downloading a 'https://twitter.com/:user/status/:id/photo/:n' card url" do
       should "download the orig file" do
         skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
-        @source = "https://twitter.com/ry_o_ta_/status/1024316791688843269/photo/1"
-        @rewrite = "https://pbs.twimg.com/media/Djcar72VsAAZsGa.jpg:orig"
+        @source = "https://twitter.com/paxiti/status/1035511366629568512/photo/1"
+        @rewrite = "https://pbs.twimg.com/media/Dl7f3G4VsAEoZXz.jpg:orig"
         assert_rewritten(@rewrite, @source)
-        assert_downloaded(103812, @source)
+        assert_downloaded(131_525, @source)
       end
     end
 
