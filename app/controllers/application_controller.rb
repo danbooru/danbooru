@@ -184,11 +184,8 @@ class ApplicationController < ActionController::Base
 
   User::Roles.each do |role|
     define_method("#{role}_only") do
-      if !CurrentUser.user.is_banned_or_ip_banned? && CurrentUser.user.__send__("is_#{role}?")
-        true
-      else
-        access_denied()
-        false
+      if !CurrentUser.user.send("is_#{role}?") || CurrentUser.user.is_banned? || IpBan.is_banned?(CurrentUser.ip_addr)
+        access_denied
       end
     end
   end
