@@ -1,6 +1,6 @@
 <% if (CurrentUser.can_approve_posts? || post.created_at < 3.days.ago) && disapprovals.length > 0 %>
   <p>
-    It has been reviewed by <%= pluralize disapprovals.length, "moderator" %>. 
+    It has been reviewed by <%= pluralize disapprovals.length, "approver" %>. 
 
     <% if disapprovals.map(&:reason).grep("breaks_rules").count > 0 %>
       <%= disapprovals.map(&:reason).grep("breaks_rules").count %> believe it breaks the rules.
