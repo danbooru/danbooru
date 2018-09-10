@@ -5,6 +5,7 @@ module Sources
         Strategies::Pixiv, 
         Strategies::NicoSeiga, 
         Strategies::Twitter, 
+        Strategies::Stash, # must come before DeviantArt
         Strategies::DeviantArt, 
         Strategies::Tumblr, 
         Strategies::ArtStation, 
