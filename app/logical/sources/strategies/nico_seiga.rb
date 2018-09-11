@@ -123,7 +123,7 @@ module Sources
     public
 
       def api_client
-        NicoSeigaApiClient.new(illust_id)
+        NicoSeigaApiClient.new(illust_id: illust_id)
       end
       memoize :api_client
 

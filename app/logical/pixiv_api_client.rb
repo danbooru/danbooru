@@ -164,19 +164,19 @@ class PixivApiClient
     }
 
     url = "https://public-api.secure.pixiv.net/v#{API_VERSION}/works/#{illust_id.to_i}.json"
-    resp = HTTParty.get(url, Danbooru.config.httparty_options.deep_merge(query: params, headers: headers))
-    body = resp.body.force_encoding("utf-8")
+    body, code = HttpartyCache.get(url, headers: headers, params: params)
     json = JSON.parse(body)
 
-    if resp.success?
+    if code == 200
       WorkResponse.new(json["response"][0])
     elsif json["status"] == "failure" && json.dig("errors", "system", "message") =~ /対象のイラストは見つかりませんでした。/
       raise BadIDError.new("Pixiv ##{illust_id} not found: work was deleted, made private, or ID is invalid.")
     else
-      raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
+      raise Error.new("Pixiv API call failed (status=#{code} body=#{body})")
     end
+
   rescue JSON::ParserError
-    raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
+    raise Error.new("Pixiv API call failed (status=#{code} body=#{body})")
   end
 
   def fanbox(fanbox_id)

@@ -161,11 +161,9 @@ module Sources
       end
 
       context "fetching source data for a deleted work" do
-        should "raise a bad id error" do
-          assert_raise(::PixivApiClient::BadIDError) do
-            get_source("https://i.pximg.net/img-original/img/2017/11/22/01/06/44/65991677_p0.png")
-            @site.image_urls
-          end
+        should "return the same url" do
+          get_source("https://i.pximg.net/img-original/img/2017/11/22/01/06/44/65991677_p0.png")
+          assert_equal(["https://i.pximg.net/img-original/img/2017/11/22/01/06/44/65991677_p0.png"], @site.image_urls)
         end
       end
 

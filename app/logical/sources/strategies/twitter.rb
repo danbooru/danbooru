@@ -47,13 +47,17 @@ module Sources::Strategies
     end
 
     def profile_url
-      if url =~ %r{\Ahttps?://(?:mobile\.)?twitter\.com/(\w+)}i && $1 != "i"
-        "https://twitter.com/#{$1}"
-      elsif artist_name.present?
-        "https://twitter.com/" + artist_name
-      else
-        ""
+      if url =~ %r{\Ahttps?://(?:mobile\.)?twitter\.com/(\w+)}i
+        if $1 != "i"
+          return "https://twitter.com/#{$1}"
+        end
       end
+
+      if artist_name.present?
+        return "https://twitter.com/" + artist_name
+      end
+
+      ""
     end
 
     def artists
@@ -123,7 +127,7 @@ module Sources::Strategies
     memoize :service
 
     def api_response
-      service.client.status(status_id, tweet_mode: "extended")
+      service.status(status_id, tweet_mode: "extended")
     rescue ::Twitter::Error::NotFound
       {}
     end
