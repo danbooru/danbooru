@@ -539,6 +539,17 @@ class Post < ApplicationRecord
       when %r{\Ahttps?://(\w+\.)?toranoana\.jp/(?:popup_(?:bl)?img\d*|ec/img)/\d{2}/\d{4}/\d{2}/\d{2}/(?<work_id>\d+)}i
         "https://ec.toranoana.jp/tora_r/ec/item/#{$~[:work_id]}/"
 
+      # https://a.hitomi.la/galleries/907838/1.png
+      # https://0a.hitomi.la/galleries/1169701/23.png
+      # https://aa.hitomi.la/galleries/990722/003_01_002.jpg
+      # https://la.hitomi.la/galleries/1054851/001_main_image.jpg
+      when %r{\Ahttps?://\w+\.hitomi\.la/galleries/(?<gallery_id>\d+)/(?<image_id>\d+)\w*\.[a-z]+\z}i
+        "https://hitomi.la/reader/#{$~[:gallery_id]}.html##{$~[:image_id].to_i}"
+
+      # https://aa.hitomi.la/galleries/883451/t_rena1g.png
+      when %r{\Ahttps?://\w+\.hitomi\.la/galleries/(?<gallery_id>\d+)/\w*\.[a-z]+\z}i
+        "https://hitomi.la/galleries/#{$~[:gallery_id]}.html"
+
       else
         source
       end
