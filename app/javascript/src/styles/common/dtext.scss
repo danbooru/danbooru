@@ -87,6 +87,18 @@ div.prose {
       margin-bottom: 0;
     }
   }
+
+  // https://fontawesome.com/how-to-use/on-the-web/advanced/css-pseudo-elements
+  a.dtext-external-link::after {
+    display: none;
+    font: 900 1em "Font Awesome 5 Free";
+    content: "\f35d"; // https://fontawesome.com/icons/external-link-alt?style=solid
+  }
+
+  a.dtext-external-link svg {
+    width: 0.75em;
+    padding-left: 0.25em;
+  }
 }
 
 div.dtext-preview {
