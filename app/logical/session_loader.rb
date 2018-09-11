@@ -11,7 +11,7 @@ class SessionLoader
   end
 
   def load
-    CurrentUser.user = AnonymousUser.new
+    CurrentUser.user = User.anonymous
     CurrentUser.ip_addr = request.remote_ip
 
     if Rails.env.test? && Thread.current[:test_user_id]
