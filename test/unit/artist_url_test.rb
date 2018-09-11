@@ -154,10 +154,10 @@ class ArtistUrlTest < ActiveSupport::TestCase
 
     should "normalize nijie urls" do
       url = FactoryBot.create(:artist_url, url: "https://pic03.nijie.info/nijie_picture/236014_20170620101426_0.png")
-      assert_equal("http://nijie.info/members.php?id=236014/", url.normalized_url)
+      assert_equal("http://nijie.info/members.php?id=161703/", url.normalized_url)
 
-      url = FactoryBot.create(:artist_url, url: "https://nijie.info/members.php?id=236014")
-      assert_equal("http://nijie.info/members.php?id=236014/", url.normalized_url)
+      url = FactoryBot.create(:artist_url, url: "https://nijie.info/members.php?id=161703")
+      assert_equal("http://nijie.info/members.php?id=161703/", url.normalized_url)
     end
   end
 end

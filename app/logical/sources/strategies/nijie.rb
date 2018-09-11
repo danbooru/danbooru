@@ -41,6 +41,10 @@ module Sources
           if x =~ %r!https?://nijie\.info/view_popup\.php.+id=(\d+)!
             return "https://nijie.info/view.php?id=#{$1}"
           end
+
+          if x =~ %r!\Ahttps?://pic\d+\.nijie\.info/nijie_picture/(\d+)!
+            return "https://nijie.info/view.php?id=#{$1}"
+          end
         end
 
         return super
