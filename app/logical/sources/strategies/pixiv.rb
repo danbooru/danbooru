@@ -50,6 +50,12 @@ module Sources
         [url]
       end
 
+      def preview_urls
+        image_urls.map do |x|
+          x.sub(%r!pximg\.net/img-original/img!, "pximg.net/c/240x240/img-master/img")
+        end
+      end
+
       def page_url
         if novel_id.present?
           return "https://www.pixiv.net/novel/show.php?id=#{novel_id}&mode=cover"

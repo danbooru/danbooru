@@ -36,6 +36,12 @@ module Sources::Strategies
         .uniq
     end
 
+    def preview_urls
+      image_urls.map do |x|
+        x.sub(%r!_1280\.(jpg|png|gif|jpeg)\z!, '_250.\1')
+      end
+    end
+
     def page_url
       [url, referer_url].each do |x|
         if x =~ POST
