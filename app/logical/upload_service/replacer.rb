@@ -129,6 +129,8 @@ class UploadService
       replacement.save!
       post.save!
 
+      post.update_iqdb_async
+
       rescale_notes(post)
     end
 
