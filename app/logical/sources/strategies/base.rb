@@ -53,6 +53,16 @@ module Sources
         image_urls.first
       end
 
+      # A smaller representation of the image that's suitable for
+      # displaying previews.
+      def preview_urls
+        image_urls
+      end
+
+      def preview_url
+        preview_urls.first
+      end
+
       # Whatever <tt>url</tt> is, this method should return a link to the HTML
       # page containing the resource. It should not be a binary file. It will
       # eventually be assigned as the source for the post, but it does not

@@ -78,6 +78,10 @@ module Sources
         assert_equal("https://pbs.twimg.com/media/C1kt72yVEAEGpOv.jpg:orig", @site.image_url)
       end
 
+      should "get the preview url" do
+        assert_equal("https://pbs.twimg.com/media/C1kt72yVEAEGpOv.jpg:small", @site.preview_url)
+      end
+
       should "get the canonical url" do
         assert_equal("https://twitter.com/aranobu/status/817736083567820800", @site.canonical_url)
       end

@@ -36,6 +36,12 @@ module Sources::Strategies
     end
     memoize :image_urls
 
+    def preview_urls
+      image_urls.map do |x|
+        x.sub(%r!\.(jpg|jpeg|png|gif)(?::orig)?\z!i, '.\1:small')
+      end
+    end
+
     def page_url
       [url, referer_url].each do |x|
         if self.class.status_id_from_url(x).present?

@@ -9,7 +9,7 @@
 
     <% if @source.present? %>
       <section>
-        <% @source.image_urls.each.with_index do |url, i| %>
+        <% @source.image_urls.zip(@source.preview_urls).each.with_index do |(url, preview_url), i| %>
           <div class="upload-preview">
             <p class="caption-top">
               <%= link_to "Image ##{i}", new_upload_path(url: url, ref: @url), target: "_blank" %>
@@ -17,7 +17,7 @@
 
             <%= link_to new_upload_path(url: url, ref: @url), target: "_blank" do %>
               <% if ImageProxy.needs_proxy?(url) %>
-                <%= image_tag(image_proxy_uploads_path(url: url)) %>
+                <%= image_tag(image_proxy_uploads_path(url: preview_url)) %>
               <% elsif url.is_a?(String) %>
                 <%= image_tag url %>
               <% else %>
