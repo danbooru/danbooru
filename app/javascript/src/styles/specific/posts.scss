@@ -445,18 +445,20 @@ div#c-posts, div#c-uploads {
     padding: 1em;
     border: 1px solid #666;
 
-    p {
-      margin: 0;
+    &:not(.loading) #source-info-loading { display: none; }
+    &.loading #source-info-content { display: none; }
+    &.loading #fetch-data-manual { display: none; }
+
+    ul {
+      display: inline-block;
     }
 
-    > ul {
-      display: none;
+    dt, dd, li {
+      display: inline;
+    }
 
-      .source-tags {
-        a {
-          margin-right: 1em;
-        }
-      }
+    dt, #source-info-tags li {
+      margin-right: 1em;
     }
   }
 }

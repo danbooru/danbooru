@@ -1,5 +1,5 @@
 class SourcesController < ApplicationController
-  respond_to :json, :xml
+  respond_to :js, :json, :xml
 
   def show
     @source = Sources::Strategies.find(params[:url], params[:ref])
