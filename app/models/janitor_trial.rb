@@ -48,7 +48,7 @@ class JanitorTrial < ApplicationRecord
 
   def create_feedback
     user.feedback.create(
-      :category => "negative",
+      :category => "neutral",
       :body => "Lost approval privileges"
     )
   end
