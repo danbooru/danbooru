@@ -87,8 +87,13 @@ module Sources
       end
 
       def page_url
-        return "" if api_deviation.blank?
-        api_deviation[:url]
+        if api_deviation.present?
+          api_deviation[:url]
+        elsif api_url.present?
+          api_url
+        else
+          ""
+        end
       end
 
       def profile_url
