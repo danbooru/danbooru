@@ -18,6 +18,12 @@ class TwitterService
   end
   memoize :client
 
+  def status(id, options = {})
+    Cache.get("twitterapi:#{id}", 60) do
+      client.status(id, options)      
+    end
+  end
+
   def extract_urls_for_status(tweet)
     tweet.media.map do |obj|
       if obj.is_a?(Twitter::Media::Photo)

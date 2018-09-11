@@ -80,7 +80,7 @@ module Downloads
         @source = "http://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_250.jpg"
         @rewrite = "https://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg"
         assert_rewritten(@rewrite, @source, @ref)
-        assert_downloaded(101869, @source, @ref)
+        assert_downloaded(105963, @source, @ref)
         # assert_downloaded(296_399, @source)
       end
     end
