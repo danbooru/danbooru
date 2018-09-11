@@ -42,11 +42,15 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "work on an ugoira url" do
-          file = subject.download_for_upload(@upload)
+          begin
+            file = subject.download_for_upload(@upload)
 
-          assert_operator(File.size(file.path), :>, 0)
+            assert_operator(File.size(file.path), :>, 0)
 
-          file.close
+            file.close
+          rescue Net::OpenTimeout
+            skip "network problems"
+          end
         end
       end
 
@@ -418,7 +422,11 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         should "download the file" do
           @service = subject.new(source: @source)
-          @upload = @service.start!
+          begin
+            @upload = @service.start!
+          rescue Net::OpenTimeout
+            skip "network problems"
+          end
           assert_equal("preprocessed", @upload.status)
           assert_equal(2804, @upload.file_size)
           assert_equal("zip", @upload.file_ext)
@@ -435,7 +443,11 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         should "download the file" do
           @service = subject.new(source: @source)
-          @upload = @service.start!
+          begin
+            @upload = @service.start!
+          rescue Net::OpenTimeout
+            skip "network problems"
+          end
           assert_equal("preprocessed", @upload.status)
           assert_equal(181309, @upload.file_size)
           assert_equal("jpg", @upload.file_ext)
