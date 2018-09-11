@@ -193,5 +193,25 @@ module Sources
         assert_equal(tags, @site.tags)
       end
     end
+
+    context "A tweet containing non-normalized Unicode text" do
+      should "be normalized to nfkc" do
+        site = Sources::Strategies.find("https://twitter.com/aprilarcus/status/367557195186970624")
+        desc1 = "𝖸𝗈 𝐔𝐧𝐢𝐜𝐨𝐝𝐞 𝗅 𝗁𝖾𝗋𝖽 𝕌 𝗅𝗂𝗄𝖾 𝑡𝑦𝑝𝑒𝑓𝑎𝑐𝑒𝑠 𝗌𝗈 𝗐𝖾 𝗉𝗎𝗍 𝗌𝗈𝗆𝖾 𝚌𝚘𝚍𝚎𝚙𝚘𝚒𝚗𝚝𝚜 𝗂𝗇 𝗒𝗈𝗎𝗋 𝔖𝔲𝔭𝔭𝔩𝔢𝔪𝔢𝔫𝔱𝔞𝔯𝔶 𝔚𝔲𝔩𝔱𝔦𝔩𝔦𝔫𝔤𝔳𝔞𝔩 𝔓𝔩𝔞𝔫𝔢 𝗌𝗈 𝗒𝗈𝗎 𝖼𝖺𝗇 𝓮𝓷𝓬𝓸𝓭𝓮 𝕗𝕠𝕟𝕥𝕤 𝗂𝗇 𝗒𝗈𝗎𝗋 𝒇𝒐𝒏𝒕𝒔."
+        desc2 = "Yo Unicode l herd U like typefaces so we put some codepoints in your Supplementary Wultilingval Plane so you can encode fonts in your fonts."
+
+        assert_equal(desc1, site.artist_commentary_desc)
+        assert_equal(desc2, site.dtext_artist_commentary_desc)
+      end
+
+      should "normalize full-width hashtags" do
+        site = Sources::Strategies.find("https://twitter.com/corpsmanWelt/status/1037724260075069441")
+        desc1 = %{新しいおともだち\n＃けものフレンズ https://t.co/sEAuu16yAQ}
+        desc2 = %{新しいおともだち\n"#けものフレンズ":[https://twitter.com/hashtag/けものフレンズ]}
+
+        assert_equal(desc1, site.artist_commentary_desc)
+        assert_equal(desc2, site.dtext_artist_commentary_desc)
+      end
+    end
   end
 end

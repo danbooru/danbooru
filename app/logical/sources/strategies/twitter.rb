@@ -106,7 +106,7 @@ module Sources::Strategies
       end
       url_replacements = url_replacements.to_h
 
-      desc = artist_commentary_desc
+      desc = artist_commentary_desc.unicode_normalize(:nfkc)
       desc = CGI::unescapeHTML(desc)
       desc = desc.gsub(%r!https?://t\.co/[a-zA-Z0-9]+!i, url_replacements)
       desc = desc.gsub(%r!#([^[:space:]]+)!, '"#\\1":[https://twitter.com/hashtag/\\1]')
