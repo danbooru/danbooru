@@ -103,7 +103,7 @@ module Sources
         end
 
         should "get the preview size image url" do
-          assert_equal("https://i.pximg.net/c/240x240/img-master/img/2017/11/21/05/12/37/65981735_p0.jpg", @site.preview_url)          
+          assert_equal("https://i.pximg.net/c/240x240/img-master/img/2017/11/21/05/12/37/65981735_p0_master1200.jpg", @site.preview_url)
         end
 
         should "get the page count" do
