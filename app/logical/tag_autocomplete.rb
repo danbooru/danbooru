@@ -39,10 +39,6 @@ module TagAutocomplete
   end
 
   def search_correct(query, n=2)
-    if CurrentUser.id != 1
-      return []
-    end
-
     if query.size <= 3
       return []
     end
