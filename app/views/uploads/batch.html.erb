@@ -19,7 +19,7 @@
               <% if ImageProxy.needs_proxy?(url) %>
                 <%= image_tag(image_proxy_uploads_path(url: preview_url)) %>
               <% elsif url.is_a?(String) %>
-                <%= image_tag url %>
+                <%= image_tag preview_url %>
               <% else %>
                 Direct Link
               <% end %>
