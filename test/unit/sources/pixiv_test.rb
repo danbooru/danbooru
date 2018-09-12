@@ -56,6 +56,10 @@ module Sources
           assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @site.file_url)
         end
 
+        should "get the preview url" do
+          assert_equal("https://i.pximg.net/c/240x240/img-master/img/2017/04/04/08/57/38/62247364_master1200.jpg", @site.preview_url)
+        end
+
         should "capture the frame data" do
           assert_equal(2, @site.ugoira_frame_data.size)
           if @site.ugoira_frame_data[0]["file"]

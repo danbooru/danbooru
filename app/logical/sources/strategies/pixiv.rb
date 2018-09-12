@@ -5,6 +5,7 @@ module Sources
     class Pixiv < Base
       MONIKER = %r!(?:[a-zA-Z0-9_-]+)!
       PROFILE = %r!\Ahttps?://www\.pixiv\.net/member\.php\?id=[0-9]+\z!
+      DATE =    %r!(?<date>\d{4}/\d{2}/\d{2}/\d{2}/\d{2}/\d{2})!i
       EXT =     %r!(?:jpg|jpeg|png|gif)!i
 
       WEB =     %r!(?:\A(?:https?://)?www\.pixiv\.net)!
@@ -12,7 +13,8 @@ module Sources
       IMG =     %r!(?:\A(?:https?://)?img[0-9]*\.pixiv\.net)!
       PXIMG =   %r!(?:\A(?:https?://)?i\.pximg\.net)!
       TOUCH =   %r!(?:\A(?:https?://)?touch\.pixiv\.net)!
-      ORIG_IMAGE = %r!#{PXIMG}/img-original/img/(?<date>\d{4}/\d{2}/\d{2}/\d{2}/\d{2}/\d{2})/(?<illust_id>\d+)_p(?<page>\d+)\.#{EXT}\z!i
+      UGOIRA =  %r!#{PXIMG}/img-zip-ugoira/img/#{DATE}/(?<illust_id>\d+)_ugoira1920x1080\.zip\z!i
+      ORIG_IMAGE = %r!#{PXIMG}/img-original/img/#{DATE}/(?<illust_id>\d+)_p(?<page>\d+)\.#{EXT}\z!i
       STACC_PAGE = %r!\A#{WEB}/stacc/#{MONIKER}/?\z!i
       NOVEL_PAGE = %r!(?:\Ahttps?://www\.pixiv\.net/novel/show\.php\?id=(\d+))!
       FANBOX_ACCOUNT = %r!(?:\Ahttps?://www\.pixiv\.net/fanbox/creator/\d+\z)!
@@ -52,9 +54,14 @@ module Sources
       end
 
       def preview_urls
-        image_urls.map do |x|
-          x.sub(ORIG_IMAGE) do
+        image_urls.map do |url|
+          case url
+          when ORIG_IMAGE
             "https://i.pximg.net/c/240x240/img-master/img/#{$~[:date]}/#{$~[:illust_id]}_p#{$~[:page]}_master1200.jpg"
+          when UGOIRA
+            "https://i.pximg.net/c/240x240/img-master/img/#{$~[:date]}/#{$~[:illust_id]}_master1200.jpg"
+          else
+            url
           end
         end
       end
