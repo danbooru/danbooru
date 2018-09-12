@@ -7129,13 +7129,6 @@ CREATE INDEX index_tags_on_name_pattern ON public.tags USING btree (name text_pa
 
 
 --
--- Name: index_tags_on_name_prefix; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_tags_on_name_prefix ON public.tags USING gin (regexp_replace((name)::text, '([a-z0-9])[a-z0-9'']*($|[^a-z0-9'']+)'::text, ''::text, 'g'::text) public.gin_trgm_ops) WHERE (post_count > 0);
-
-
---
 -- Name: index_tags_on_name_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7531,7 +7524,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20180517190048'),
 ('20180518175154'),
 ('20180804203201'),
-('20180816230604'),
-('20180912185624');
+('20180816230604');
 
 
