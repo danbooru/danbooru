@@ -3,7 +3,7 @@ require 'test_helper'
 class ArtistsControllerTest < ActionDispatch::IntegrationTest
   def assert_artist_found(expected_artist, source_url = nil)
     if source_url
-      get_auth finder_artists_path(format: "json", url: source_url), @user
+      get_auth artists_path(format: "json", search: { url_matches: source_url }), @user
       if response.body =~ /Net::OpenTimeout/
         skip "Remote connection to #{source_url} failed"
         return
@@ -16,9 +16,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
   end
 
   def assert_artist_not_found(source_url)
-    tries = 0
-
-    get_auth finder_artists_path(format: "json", url: source_url), @user
+    get_auth artists_path(format: "json", search: { url_matches: source_url }), @user
     if response.body =~ /Net::OpenTimeout/
       skip "Remote connection to #{source_url} failed"
       return

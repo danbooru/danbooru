@@ -129,6 +129,8 @@ module Sources
         normalize_for_artist_finder.present?
       end
 
+      # The url to use for artist finding purposes. This will be stored in the
+      # artist entry. Normally this will be the profile url.
       def normalize_for_artist_finder
         profile_url || url
       end
@@ -139,8 +141,7 @@ module Sources
       end
 
       def artists
-        url = profile_url.presence || image_url.presence
-        Artist.find_artists(url)
+        Artist.url_matches(normalize_for_artist_finder)
       end
 
       def file_url

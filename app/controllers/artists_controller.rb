@@ -92,20 +92,6 @@ class ArtistsController < ApplicationController
     end
   end
 
-  def finder
-    @artists = Artist.find_artists(params[:url], params[:referer_url])
-
-    respond_with(@artists) do |format|
-      format.xml do
-        render :xml => @artists.to_xml(:include => [:sorted_urls], :root => "artists")
-      end
-      format.json do
-        render :json => @artists.to_json(:include => [:sorted_urls])
-        expires_in params[:expiry].to_i.days if params[:expiry]
-      end
-    end
-  end
-
 private
 
   def load_artist

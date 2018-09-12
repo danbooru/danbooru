@@ -148,7 +148,7 @@ class Artist < ApplicationRecord
         %r!\Ahttps?://(?:[a-zA-Z0-9_-]+\.)*#{domain}/\z!i
       end)
 
-      def find_all_by_url(url)
+      def url_matches(url)
         url = ArtistUrl.normalize(url)
         artists = []
 
@@ -163,7 +163,7 @@ class Artist < ApplicationRecord
           break if url =~ SITE_BLACKLIST_REGEXP
         end
 
-        artists.inject({}) {|h, x| h[x.name] = x; h}.values.slice(0, 20)
+        where(id: artists.uniq(&:name).take(20))
       end
     end
 
@@ -456,40 +456,6 @@ class Artist < ApplicationRecord
   end
 
   module SearchMethods
-    def find_artists(url, referer_url = nil)
-      artists = url_matches(url).order("id desc").limit(10)
-
-      if artists.empty? && referer_url.present? && referer_url != url
-        artists = url_matches(referer_url).order("id desc").limit(20)
-      end
-
-      artists
-    rescue PixivApiClient::Error => e
-      []
-    end
-
-    def url_matches(string)
-      matches = find_all_by_url(string).map(&:id)
-
-      if matches.any?
-        where("id in (?)", matches)
-      elsif matches = search_for_profile(string)
-        where("id in (?)", matches)
-      else
-        where("false")
-      end
-    end
-
-    def search_for_profile(url)
-      source = Sources::Strategies.find(url)
-      find_all_by_url(source.profile_url)
-    rescue Net::OpenTimeout, PixivApiClient::Error
-      raise if Rails.env.test?
-      nil
-    rescue Exception
-      nil
-    end
-
     def other_names_match(string)
       if string =~ /\*/ && CurrentUser.is_builder?
         where("artists.other_names ILIKE ? ESCAPE E'\\\\'", string.to_escaped_for_sql_like)

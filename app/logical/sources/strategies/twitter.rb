@@ -66,14 +66,6 @@ module Sources::Strategies
       ""
     end
 
-    def artists
-      if profile_url.present?
-        Artist.find_artists(profile_url)
-      else
-        []
-      end
-    end
-
     def artist_name
       return "" if api_response.blank?
       api_response.attrs[:user][:screen_name]
