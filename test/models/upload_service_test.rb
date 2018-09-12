@@ -1121,7 +1121,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
     context "for nijie" do
       should "record the canonical source" do
-        page_url = "https://nijie.info/view.php?id=213043"
+        page_url = "https://nijie.info/view.php?id=728995"
         image_url = "https://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg"
         upload = FactoryBot.create(:jpg_upload, file_size: 1000, md5: "12345", file_ext: "jpg", image_width: 100, image_height: 100, source: image_url, referer_url: page_url)
 

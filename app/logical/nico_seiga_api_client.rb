@@ -1,43 +1,52 @@
 class NicoSeigaApiClient
+  extend Memoist
   BASE_URL = "http://seiga.nicovideo.jp/api"
-  attr_reader :user_id, :moniker, :image_id, :title, :desc
+  attr_reader :illust_id
 
-  def initialize(illust_id)
-    get_illust(illust_id)
-    get_artist(user_id)
+  def initialize(illust_id:, user_id: nil)
+    @illust_id = illust_id
+    @user_id = user_id
   end
 
-  def get_illust(id)
-    uri = "#{BASE_URL}/illust/info?id=#{id}"
-    resp = HTTParty.get(uri, Danbooru.config.httparty_options)
-    if resp.success?
-      parse_illust_xml_response(resp.body)
+  def image_id
+    illust_xml["response"]["image"]["id"].to_i
+  end
+
+  def user_id
+    @user_id || illust_xml["response"]["image"]["user_id"].to_i
+  end
+
+  def title
+    illust_xml["response"]["image"]["title"]
+  end
+
+  def desc
+    illust_xml["response"]["image"]["description"] || illust_xml["response"]["image"]["summary"]
+  end
+
+  def moniker
+    artist_xml["response"]["user"]["nickname"]
+  end
+
+  def illust_xml
+    uri = "#{BASE_URL}/illust/info?id=#{illust_id}"
+    body, code = HttpartyCache.get(uri)
+    if code == 200
+      Hash.from_xml(body)
     else
-      raise HTTParty::ResponseError.new(resp)
+      raise "nico seiga api call failed (code=#{code}, body=#{body})"
     end
   end
+  memoize :illust_xml
 
-  def get_artist(id)
-    uri = "#{BASE_URL}/user/info?id=#{id}"
-    resp = HTTParty.get(uri, Danbooru.config.httparty_options)
-    if resp.success?
-      parse_artist_xml_response(resp.body)
+  def artist_xml
+    uri = "#{BASE_URL}/user/info?id=#{user_id}"
+    body, code = HttpartyCache.get(uri)
+    if code == 200
+      Hash.from_xml(body)
     else
-      raise HTTParty::ResponseError.new(resp)
+      raise "nico seiga api call failed (code=#{code}, body=#{body})"
     end
   end
-
-  def parse_artist_xml_response(text)
-    doc = Hash.from_xml(text)
-    @moniker = doc["response"]["user"]["nickname"]
-  end
-
-  def parse_illust_xml_response(text)
-    doc = Hash.from_xml(text)
-    image = doc["response"]["image"]
-    @image_id = image["id"].to_i
-    @user_id = image["user_id"].to_i
-    @title = image["title"]
-    @desc = image["description"] || image["summary"]
-  end
+  memoize :artist_xml
 end

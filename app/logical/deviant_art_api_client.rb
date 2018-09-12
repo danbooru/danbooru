@@ -47,18 +47,20 @@ class DeviantArtApiClient
   end
 
   def request(url, **params)
-    options = httparty_options.deep_merge(
+    options = {
       base_uri: BASE_URL,
-      query: { access_token: access_token.token, **params },
+      params: { access_token: access_token.token, **params },
       headers: { "Accept-Encoding" => "gzip" },
       format: :plain,
-    )
+    }
 
-    resp = HTTParty.get(url, **options)
-    json = JSON.parse(Zlib.gunzip(resp.body), symbolize_names: true)
+    body, code = HttpartyCache.get(url, **options)
 
-    raise Error, "HTTP error #{resp.code}: #{json}" unless resp.success?
-    json
+    if code == 200
+      return JSON.parse(Zlib.gunzip(body), symbolize_names: true)
+    end
+
+    raise "DeviantArtApiClient call failed (code=#{code}, url=#{url}, body=#{body})"
   end
 
   def oauth
