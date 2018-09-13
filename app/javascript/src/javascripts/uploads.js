@@ -17,7 +17,7 @@ Upload.initialize_all = function() {
     this.initialize_info_bookmarklet();
     this.initialize_similar();
     this.initialize_submit();
-    $("#related-tags-button").trigger("click");
+    $(() => $("#related-tags-button").click()); // delay so we don't click until button is bound (#3895).
 
     $("#toggle-artist-commentary").on("click.danbooru", function(e) {
       Upload.toggle_commentary();
