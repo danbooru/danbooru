@@ -74,9 +74,9 @@ module TagAutocomplete
       n += 2
     end
 
-    anchors = "^" + query.split("").map {|x| Regexp.escape(x)}.join(".*[#{PREFIX_BOUNDARIES}]")
+    regexp = "([a-z0-9])[a-z0-9']*($|[^a-z0-9']+)"
     Tag
-      .where("name ~ ?", anchors)
+      .where('regexp_replace(name, ?, ?, ?) like ?', regexp, '\1', 'g', query.to_escaped_for_sql_like + '%')
       .where("post_count > ?", min_post_count)
       .where("post_count > 0")
       .order("post_count desc")
