@@ -104,7 +104,7 @@ class UploadService
         upload.status = "preprocessed"
         upload.save!
       rescue Exception => x
-        upload.update(status: "error: #{x.class} - #{x.message}", backtrace: x.backtrace.join("\n"))
+        upload.update(file_ext: nil, status: "error: #{x.class} - #{x.message}", backtrace: x.backtrace.join("\n"))
       end
 
       return upload

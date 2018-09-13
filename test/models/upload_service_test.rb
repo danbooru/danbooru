@@ -489,6 +489,18 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
       end
 
+      context "for an invalid content type" do
+        setup do
+          @source = "http://www.example.com"
+          @service = subject.new(source: @source)
+        end
+
+        should "fail" do
+          upload = @service.start!
+          upload.reload
+          assert_match(/error:/, upload.status)
+        end
+      end
     end
 
     context "#finish!" do
