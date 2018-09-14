@@ -30,8 +30,8 @@ kbd.key {
   color: white;
 /*  width: 1em;*/
   text-align: center;
-  @include inline-block;
-  @include border-radius(3px);
+  display: inline-block;
+  border-radius: 3px;
 }
 
 span.inactive {

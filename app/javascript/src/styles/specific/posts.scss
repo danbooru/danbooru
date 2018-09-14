@@ -6,11 +6,11 @@ article.post-preview {
   margin: 0 10px 10px 0;
   overflow: hidden;
   text-align: center;
-  @include inline-block;
+  display: inline-block;
   position: relative;
 
   a {
-    @include inline-block;
+    display: inline-block;
   }
 
   &.captioned {

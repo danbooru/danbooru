@@ -69,7 +69,7 @@ div#c-pool-orders, div#c-favorite-group-orders {
         min-width: 150px;
         min-height: 150px;
         padding: 10px;
-        @include inline-block;
+        display: inline-block;
       }
 
       li.ui-state-default {

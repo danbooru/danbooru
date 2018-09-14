@@ -33,40 +33,6 @@ $note_highlight_color: $preview_pending_color;
 $error_color: hsl(0, 100%, 95%); // light red
 $success_color: hsl(120, 100%, 95%); // light green
 
-@mixin border-radius($val) {
-  -moz-border-radius: $val;
-  -webkit-border-radius: $val;
-  -ms-border-radius: $val;
-  -o-border-radius: $val;
-  border-radius: $val;
-}
-
-@mixin box-shadow($val) {
-  -moz-box-shadow: $val;
-  -webkit-box-shadow: $val;
-  -ms-box-shadow: $val;
-  -o-box-shadow: $val;
-  box-shadow: $val;
-}
-
-@mixin text-shadow($val) {
-  -moz-text-shadow: $val;
-  -webkit-text-shadow: $val;
-  -ms-text-shadow: $val;
-  -o-text-shadow: $val;
-  text-shadow: $val;
-}
-
-@mixin inline-block {
-  display: -moz-inline-box;
-  -moz-box-orient: vertical;
-  display: inline-block;
-  vertical-align: baseline;
-  zoom: 1;
-  *display: inline;
-  *vertical-align: auto;
-}
-
 @mixin animated-icon {
   content: "►";
   position: absolute;
