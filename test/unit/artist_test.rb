@@ -56,10 +56,12 @@ class ArtistTest < ActiveSupport::TestCase
       assert(@artist.urls[0].is_active?)
     end
 
-    should "should have a valid name" do
-      @artist = Artist.new(:name => "-blah")
-      @artist.save
-      assert_equal(["Name '-blah' cannot begin with a dash ('-')"], @artist.errors.full_messages)
+    context "with an invalid name" do
+      subject { FactoryBot.build(:artist) }
+
+      should_not allow_value("-blah").for(:name)
+      should_not allow_value("_").for(:name)
+      should_not allow_value("").for(:name)
     end
 
     context "with a matching tag alias" do

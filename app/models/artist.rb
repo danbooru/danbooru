@@ -8,9 +8,8 @@ class Artist < ApplicationRecord
   after_save :categorize_tag
   after_save :update_wiki
   after_save :save_urls
-  validates_uniqueness_of :name
   validates_associated :urls
-  validates :name, tag_name: true
+  validates :name, tag_name: true, uniqueness: true
   validate :validate_wiki, :on => :create
   after_validation :merge_validation_errors
   belongs_to_creator
