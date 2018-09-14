@@ -46,10 +46,6 @@ class TagSetPresenter < Presenter
     template.tag.span(html, class: classes)
   end
 
-  def split_inline_tag_list_html(template, **options)
-    inline_tag_list_html(template, classes: "split-inline-tag-list", **options)
-  end
-
   private
 
   def typed_tags(name)

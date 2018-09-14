@@ -1,7 +1,6 @@
 $menu_color: #F5F5FF;
 $link_color: hsl(213, 100%, 50%);
 $link_hover_color: lighten($link_color, 25%);
-$link_dark_color: darken($link_color, 25%);
 $highlight_color: lighten($link_color, 45%);
 $h1_size: 2em;
 $h2_size: 1.5em;
@@ -17,8 +16,6 @@ $h1_padding: 0.8em 0 0.25em 0;
 $h2_padding: 0.8em 0 0.25em 0;
 $h3_padding: 0.8em 0 0.25em 0;
 $h4_padding: 0.8em 0 0.25em 0;
-$baseline: 1em;
-$basefont: 100%;
 $base_font_family: Verdana, Helvetica, sans-serif;
 $preview_has_children_color: #0F0;
 $preview_has_parent_color: #CC0;

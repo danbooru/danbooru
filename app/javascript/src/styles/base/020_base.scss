@@ -3,14 +3,8 @@
 body {
   background-color: #FFF;
   font-family: $base_font_family;
-  padding: 0;
-  margin: 0;
   font-size: 87.5%;
   line-height: 1.25em;
-}
-
-article, section {
-  display: block;
 }
 
 abbr[title=required] {
@@ -37,13 +31,8 @@ dt {
   font-weight: bold;
 }
 
-em {
-  font-style: italic;
-}
-
 h1, h2, h3, h4, h5, h6 {
   font-family: Tahoma, Verdana, Helvetica, sans-serif;
-  font-weight: bold;
   line-height: 1.5em;
 }
 
@@ -56,7 +45,6 @@ h2 {
 }
 
 h3, h4, h5, h6 {
-  font-weight: bold;
   font-size: $h3_size;
 }
 
@@ -67,22 +55,11 @@ fieldset {
 header {
   margin: 0 0 1em 0;
   padding: 0;
-  display: block;
 }
 
 img {
   border: none;
   vertical-align: middle;
-}
-
-img.wait {
-  margin-left: 5px;
-}
-
-legend {
-  font-size: $h2_size;
-  font-weight: bold;
-  margin-bottom: 0.5em;
 }
 
 menu {
@@ -104,14 +81,6 @@ menu {
 
 p {
   margin-bottom: 1em;
-}
-
-section {
-  display: block;
-}
-
-strong {
-  font-weight: bold;
 }
 
 table tfoot {
