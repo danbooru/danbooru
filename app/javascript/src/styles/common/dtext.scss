@@ -88,16 +88,13 @@ div.prose {
     }
   }
 
-  // https://fontawesome.com/how-to-use/on-the-web/advanced/css-pseudo-elements
   a.dtext-external-link::after {
-    display: none;
-    font: 900 1em "Font Awesome 5 Free";
-    content: "\f35d"; // https://fontawesome.com/icons/external-link-alt?style=solid
-  }
+    // https://fontawesome.com/icons/external-link-alt?style=solid
+    @include fa-icon("Font Awesome 5 Free", 900, "\f35d");
 
-  a.dtext-external-link svg {
-    width: 0.75em;
-    padding-left: 0.25em;
+    font-size: 0.6em;
+    padding: 0 0.2em 0 0.3em;
+    vertical-align: 1px;
   }
 }
 

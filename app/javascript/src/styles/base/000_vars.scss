@@ -88,3 +88,16 @@ $success_color: hsl(120, 100%, 95%); // light green
   margin: 2px;
   text-align: center;
 }
+
+// https://fontawesome.com/how-to-use/on-the-web/advanced/css-pseudo-elements
+@mixin fa-icon($family, $weight, $content) {
+  display: inline-block;
+  font-style: normal;
+  font-variant: normal;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+
+  font-family: $family;
+  font-weight: $weight;
+  content: $content;
+}
