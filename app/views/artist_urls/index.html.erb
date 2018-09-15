@@ -1,0 +1,44 @@
+<div id="c-artist-urls">
+  <div id="a-index">
+    <%= simple_form_for(:search, url: artist_urls_path, method: :get, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+      <%= f.input :is_active, label: "Active?", collection: [["Yes", true], ["No", false]], include_blank: true, selected: params[:search][:is_active] %>
+      <%= f.input :order, collection: [["ID", "id"], ["Created", "created_at"], ["Updated", "updated_at"]], selected: params[:search][:order] %>
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <table class="striped" width="100%">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Artist Name</th>
+          <th>URL</th>
+          <th>Normalized URL</th>
+          <th>Active?</th>
+          <th>Created</th>
+          <th>Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @artist_urls.each do |artist_url| %>
+          <tr>
+            <%= tag.td artist_url.id %>
+            <%= tag.td link_to(artist_url.artist.name, artist_url.artist) %>
+            <%= tag.td external_link_to(artist_url.url.to_s) %>
+            <%= tag.td external_link_to(artist_url.normalized_url) %>
+            <%= tag.td artist_url.is_active.to_s %>
+            <%= tag.td artist_url.created_at %>
+            <%= tag.td artist_url.updated_at %>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <%= numbered_paginator(@artist_urls) %>
+  </div>
+</div>
+
+<%= render "artists/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Artist URLs - <%= Danbooru.config.app_name %>
+<% end %>

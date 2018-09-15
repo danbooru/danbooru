@@ -45,6 +45,24 @@ class ArtistUrl < ApplicationRecord
     end
   end
 
+  def self.search(params = {})
+    q = super
+
+    q = q.attribute_matches(:artist_id, params[:artist_id])
+    q = q.attribute_matches(:is_active, params[:is_active])
+
+    case params[:order]
+    when /\A(id|artist_id|url|normalized_url|is_active|created_at|updated_at)(?:_(asc|desc))?\z/i
+      dir = $2 || :desc
+      q = q.order($1 => dir).order(id: :desc)
+    else
+      q = q.apply_default_order(params)
+    end
+
+    q
+  end
+
+
   def parse_prefix
     case url
     when /^-/
