@@ -6,6 +6,9 @@ class ArtistUrl < ApplicationRecord
   validate :validate_url_format
   belongs_to :artist, :touch => true
 
+  scope :url_matches, ->(url) { url_attribute_matches(:url, url) }
+  scope :normalized_url_matches, ->(url) { url_attribute_matches(:normalized_url, url) }
+
   def self.strip_prefixes(url)
     url.sub(/^[-]+/, "")
   end
@@ -51,6 +54,10 @@ class ArtistUrl < ApplicationRecord
     q = q.attribute_matches(:artist_id, params[:artist_id])
     q = q.attribute_matches(:is_active, params[:is_active])
 
+    q = q.artist_matches(params[:artist])
+    q = q.url_matches(params[:url_matches])
+    q = q.normalized_url_matches(params[:normalized_url_matches])
+
     case params[:order]
     when /\A(id|artist_id|url|normalized_url|is_active|created_at|updated_at)(?:_(asc|desc))?\z/i
       dir = $2 || :desc
@@ -62,6 +69,22 @@ class ArtistUrl < ApplicationRecord
     q
   end
 
+  def self.artist_matches(params = {})
+    return all if params.blank?
+    where(artist_id: Artist.search(params).reorder(nil))
+  end
+
+  def self.url_attribute_matches(attr, url)
+    if url.blank?
+      all
+    elsif url =~ %r!\A/(.*)/\z!
+      where_regex(attr, $1)
+    elsif url.include?("*")
+      where_ilike(attr, url)
+    else
+      where(attr => normalize(url))
+    end
+  end
 
   def parse_prefix
     case url
