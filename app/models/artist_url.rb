@@ -53,6 +53,8 @@ class ArtistUrl < ApplicationRecord
 
     q = q.attribute_matches(:artist_id, params[:artist_id])
     q = q.attribute_matches(:is_active, params[:is_active])
+    q = q.search_text_attribute(:url, params)
+    q = q.search_text_attribute(:normalized_url, params)
 
     q = q.artist_matches(params[:artist])
     q = q.url_matches(params[:url_matches])

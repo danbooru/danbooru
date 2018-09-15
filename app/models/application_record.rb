@@ -9,14 +9,30 @@ class ApplicationRecord < ActiveRecord::Base
         "#{table_name}.#{column_for_attribute(attr).name}"
       end
 
+      def where_like(attr, value)
+        where("#{qualified_column_for(attr)} LIKE ? ESCAPE E'\\\\'", value.to_escaped_for_sql_like)
+      end
+
+      def where_not_like(attr, value)
+        where.not("#{qualified_column_for(attr)} LIKE ? ESCAPE E'\\\\'", value.to_escaped_for_sql_like)
+      end
+
       def where_ilike(attr, value)
         where("lower(#{qualified_column_for(attr)}) LIKE ? ESCAPE E'\\\\'", value.mb_chars.downcase.to_escaped_for_sql_like)
+      end
+
+      def where_not_ilike(attr, value)
+        where.not("lower(#{qualified_column_for(attr)}) LIKE ? ESCAPE E'\\\\'", value.mb_chars.downcase.to_escaped_for_sql_like)
       end
 
       # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-REGEXP
       # "(?e)" means force use of ERE syntax; see sections 9.7.3.1 and 9.7.3.4.
       def where_regex(attr, value)
         where("#{qualified_column_for(attr)} ~ ?", "(?e)" + value)
+      end
+
+      def where_not_regex(attr, value)
+        where.not("#{qualified_column_for(attr)} ~ ?", "(?e)" + value)
       end
 
       def attribute_matches(attribute, value, **options)
@@ -66,6 +82,30 @@ class ApplicationRecord < ActiveRecord::Base
           where("#{table_name}.#{index_column} @@ plainto_tsquery(:ts_config, :value)", ts_config: ts_config, value: value)
         else
           where("to_tsvector(:ts_config, #{qualified_column}) @@ plainto_tsquery(:ts_config, :value)", ts_config: ts_config, value: value)
+        end
+      end
+
+      def search_text_attribute(attr, params, **options)
+        if params[attr].present?
+          where(attr => params[attr])
+        elsif params[:"#{attr}_eq"].present?
+          where(attr => params[:"#{attr}_eq"])
+        elsif params[:"#{attr}_not_eq"].present?
+          where.not(attr => params[:"#{attr}_not_eq"])
+        elsif params[:"#{attr}_like"].present?
+          where_like(attr, params[:"#{attr}_like"])
+        elsif params[:"#{attr}_ilike"].present?
+          where_ilike(attr, params[:"#{attr}_ilike"])
+        elsif params[:"#{attr}_not_like"].present?
+          where_not_like(attr, params[:"#{attr}_not_like"])
+        elsif params[:"#{attr}_not_ilike"].present?
+          where_not_ilike(attr, params[:"#{attr}_not_ilike"])
+        elsif params[:"#{attr}_regex"].present?
+          where_regex(attr, params[:"#{attr}_regex"])
+        elsif params[:"#{attr}_not_regex"].present?
+          where_not_regex(attr, params[:"#{attr}_not_regex"])
+        else
+          all
         end
       end
 
