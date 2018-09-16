@@ -43,8 +43,14 @@ module Sources
         @referer_url = referer_url
       end
 
+      def urls
+        [url, referer_url].select(&:present?)
+      end
+
       def site_name
-        raise NotImplementedError
+        Addressable::URI.heuristic_parse(url).host
+      rescue Addressable::URI::InvalidURIError => e
+        nil
       end
 
       # Whatever <tt>url</tt> is, this method should return the direct links 

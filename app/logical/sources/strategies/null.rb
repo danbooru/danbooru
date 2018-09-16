@@ -29,12 +29,6 @@ module Sources
         url
       end
 
-      def site_name
-        URI.parse(url).hostname || "N/A"
-      rescue
-        "N/A"
-      end
-
       def unique_id
         url
       end
