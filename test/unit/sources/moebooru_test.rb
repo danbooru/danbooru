@@ -1,6 +1,6 @@
 require "test_helper"
 
-module Downloads
+module Sources
   class MoebooruTest < ActiveSupport::TestCase
     context "downloading a 'https://yande.re/jpeg/:hash/:file.jpg' jpeg sample url" do
       should "download the original file" do
