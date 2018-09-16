@@ -13,6 +13,10 @@ module Sources::Strategies
       urls.compact.any? { |x| x =~ PAGE || x =~ ASSET}
     end
 
+    def self.enabled?
+      TwitterService.new.enabled?
+    end
+
     # https://twitter.com/i/web/status/943446161586733056
     # https://twitter.com/motty08111213/status/943446161586733056
     def self.status_id_from_url(url)
@@ -135,6 +139,7 @@ module Sources::Strategies
     memoize :service
 
     def api_response
+      return {} if !service.enabled?
       service.status(status_id, tweet_mode: "extended")
     rescue ::Twitter::Error::NotFound
       {}

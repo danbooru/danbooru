@@ -22,6 +22,12 @@ module Sources
         false
       end
 
+      # Should return true if all prerequisites for using the strategy are met.
+      # Return false if the strategy requires api keys that have not been configured.
+      def self.enabled?
+        true
+      end
+
       # * <tt>url</tt> - Should point to a resource suitable for 
       #   downloading. This may sometimes point to the binary file. 
       #   It may also point to the artist's profile page, in cases

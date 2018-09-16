@@ -2,15 +2,17 @@ require 'test_helper'
 
 module Sources
   class TwitterTest < ActiveSupport::TestCase
+    setup do
+      skip "Twitter credentials are not configured" if !Sources::Strategies::Twitter.enabled?
+    end
+
     context "An extended tweet" do
       should "extract the correct image url" do
-        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Strategies.find("https://twitter.com/onsen_musume_jp/status/865534101918330881")
         assert_equal(["https://pbs.twimg.com/media/DAL-ntWV0AEbhes.jpg:orig"], @site.image_urls)
       end
 
       should "extract all the image urls" do
-        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Strategies.find("https://twitter.com/aoimanabu/status/892370963630743552")
 
         urls = %w[
@@ -25,7 +27,6 @@ module Sources
     
     context "A video" do
       setup do
-        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Strategies.find("https://twitter.com/CincinnatiZoo/status/859073537713328129")
       end
 
@@ -36,7 +37,6 @@ module Sources
 
     context "An animated gif" do
       setup do
-        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Strategies.find("https://twitter.com/DaniStrawberry1/status/859435334765088769")
       end
 
@@ -47,7 +47,6 @@ module Sources
 
     context "A twitter summary card" do
       setup do
-        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Strategies.find("https://twitter.com/NatGeo/status/932700115936178177")
       end
 
@@ -58,7 +57,6 @@ module Sources
 
     context "A twitter summary card from twitter" do
       setup do
-        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Strategies.find("https://twitter.com/masayasuf/status/870734961778630656/photo/1")
       end
 
@@ -70,7 +68,6 @@ module Sources
 
     context "A twitter summary card from twitter with a :large image" do
       setup do
-        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Strategies.find("https://twitter.com/aranobu/status/817736083567820800")
       end
 
@@ -89,7 +86,6 @@ module Sources
 
     context "The source site for a restricted twitter" do
       setup do
-        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Strategies.find("https://mobile.twitter.com/Strangestone/status/556440271961858051")
       end
 
@@ -100,7 +96,6 @@ module Sources
 
     context "The source site for twitter" do
       setup do
-        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Strategies.find("https://mobile.twitter.com/nounproject/status/540944400767922176")
       end
 
@@ -133,7 +128,6 @@ module Sources
 
     context "The source site for a direct image and a referer" do
       setup do
-        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Strategies.find("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large", "https://twitter.com/nounproject/status/540944400767922176")
       end
 
@@ -148,7 +142,6 @@ module Sources
 
     context "The source site for a direct image url (pbs.twimg.com/media/*.jpg) without a referer url" do
       setup do
-        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Strategies.find("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large")
       end
 
@@ -167,7 +160,6 @@ module Sources
 
     context "The source site for a https://twitter.com/i/web/status/:id url" do
       setup do
-        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Strategies.find("https://twitter.com/i/web/status/943446161586733056")
       end
 
@@ -189,7 +181,6 @@ module Sources
 
     context "A tweet" do
       setup do
-        skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Strategies.find("https://twitter.com/noizave/status/875768175136317440")
       end
 
