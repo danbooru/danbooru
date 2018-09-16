@@ -4945,13 +4945,6 @@ CREATE INDEX index_artist_urls_on_artist_id ON public.artist_urls USING btree (a
 
 
 --
--- Name: index_artist_urls_on_normalized_url; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_artist_urls_on_normalized_url ON public.artist_urls USING btree (normalized_url);
-
-
---
 -- Name: index_artist_urls_on_normalized_url_pattern; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4959,17 +4952,17 @@ CREATE INDEX index_artist_urls_on_normalized_url_pattern ON public.artist_urls U
 
 
 --
--- Name: index_artist_urls_on_url; Type: INDEX; Schema: public; Owner: -
+-- Name: index_artist_urls_on_normalized_url_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_artist_urls_on_url ON public.artist_urls USING btree (url);
+CREATE INDEX index_artist_urls_on_normalized_url_trgm ON public.artist_urls USING gin (normalized_url public.gin_trgm_ops);
 
 
 --
--- Name: index_artist_urls_on_url_pattern; Type: INDEX; Schema: public; Owner: -
+-- Name: index_artist_urls_on_url_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_artist_urls_on_url_pattern ON public.artist_urls USING btree (url text_pattern_ops);
+CREATE INDEX index_artist_urls_on_url_trgm ON public.artist_urls USING gin (url public.gin_trgm_ops);
 
 
 --
@@ -7532,6 +7525,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20180518175154'),
 ('20180804203201'),
 ('20180816230604'),
-('20180912185624');
+('20180912185624'),
+('20180913184128'),
+('20180916002448');
 
 
