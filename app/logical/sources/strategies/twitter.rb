@@ -61,13 +61,8 @@ module Sources::Strategies
     end
 
     def page_url
-      [url, referer_url].each do |x|
-        if self.class.status_id_from_url(x).present?
-          return x
-        end
-      end
-
-      return super
+      return "" if status_id.blank? || artist_name.blank?
+      "https://twitter.com/#{artist_name}/status/#{status_id}"
     end
 
     def profile_url

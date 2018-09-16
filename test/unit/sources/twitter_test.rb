@@ -89,8 +89,10 @@ module Sources
         @site = Sources::Strategies.find("https://mobile.twitter.com/Strangestone/status/556440271961858051")
       end
 
-      should "get the image url" do
+      should "get the urls" do
         assert_equal("https://pbs.twimg.com/media/B7jfc1JCcAEyeJh.png:orig", @site.image_url)
+        assert_equal("https://twitter.com/Strangestone/status/556440271961858051", @site.page_url)
+        assert_equal("https://twitter.com/Strangestone/status/556440271961858051", @site.canonical_url)
       end
     end
 
@@ -109,6 +111,10 @@ module Sources
 
       should "get the image url" do
         assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig", @site.image_url)
+      end
+
+      should "get the canonical url" do
+        assert_equal("https://twitter.com/nounproject/status/540944400767922176", @site.canonical_url)
       end
 
       should "get the tags" do
@@ -165,6 +171,10 @@ module Sources
 
       should "fetch the source data" do
         assert_equal("https://twitter.com/motty08111213", @site.profile_url)
+      end
+
+      should "get the canonical url" do
+        assert_equal("https://twitter.com/motty08111213/status/943446161586733056", @site.canonical_url)
       end
     end
 
