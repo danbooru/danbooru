@@ -132,7 +132,7 @@ module Sources
       # The url to use for artist finding purposes. This will be stored in the
       # artist entry. Normally this will be the profile url.
       def normalize_for_artist_finder
-        profile_url || url
+        profile_url.presence || url
       end
 
       # A unique identifier for the artist. This is used for artist creation.

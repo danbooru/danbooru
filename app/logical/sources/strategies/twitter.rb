@@ -2,6 +2,12 @@ module Sources::Strategies
   class Twitter < Base
     PAGE = %r!\Ahttps?://(?:mobile\.)?twitter\.com!i
     ASSET = %r!\A(https?://(?:video|pbs)\.twimg\.com/media/)!i
+    PROFILE = %r!\Ahttps?://(?:mobile\.)?twitter.com/(?<username>[a-z0-9_]+)!i
+
+    # Twitter provides a list but it's inaccurate; some names ('intent') aren't
+    # included and other names in the list aren't actually reserved.
+    # https://developer.twitter.com/en/docs/developer-utilities/configuration/api-reference/get-help-configuration
+    RESERVED_USERNAMES = %w[home i intent search]
 
     def self.match?(*urls)
       urls.compact.any? { |x| x =~ PAGE || x =~ ASSET}
@@ -15,6 +21,14 @@ module Sources::Strategies
       end
 
       return nil
+    end
+
+    def self.artist_name_from_url(url)
+      if url =~ PROFILE && !$~[:username].in?(RESERVED_USERNAMES)
+        $~[:username]
+      else
+        nil
+      end
     end
 
     def site_name
@@ -53,22 +67,18 @@ module Sources::Strategies
     end
 
     def profile_url
-      if url =~ %r{\Ahttps?://(?:mobile\.)?twitter\.com/(\w+)}i
-        if $1 != "i"
-          return "https://twitter.com/#{$1}"
-        end
-      end
-
-      if artist_name.present?
-        return "https://twitter.com/" + artist_name
-      end
-
-      ""
+      return "" if artist_name.blank?
+      "https://twitter.com/#{artist_name}"
     end
 
     def artist_name
-      return "" if api_response.blank?
-      api_response.attrs[:user][:screen_name]
+      if artist_name_from_url.present?
+        artist_name_from_url
+      elsif api_response.present?
+        api_response.attrs[:user][:screen_name]
+      else
+        ""
+      end
     end
 
     def artist_commentary_title
@@ -85,7 +95,7 @@ module Sources::Strategies
     end
 
     def normalize_for_artist_finder
-      profile_url.try(:downcase)
+      profile_url.try(:downcase).presence || url
     end
 
     def tags
@@ -135,5 +145,9 @@ module Sources::Strategies
       [url, referer_url].map {|x| self.class.status_id_from_url(x)}.compact.first
     end
     memoize :status_id
+
+    def artist_name_from_url
+      [url, referer_url].map {|x| self.class.artist_name_from_url(x)}.compact.first
+    end
   end
 end

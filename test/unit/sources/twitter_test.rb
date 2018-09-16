@@ -91,7 +91,6 @@ module Sources
       setup do
         skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         @site = Sources::Strategies.find("https://mobile.twitter.com/Strangestone/status/556440271961858051")
-        
       end
 
       should "get the image url" do
@@ -174,6 +173,17 @@ module Sources
 
       should "fetch the source data" do
         assert_equal("https://twitter.com/motty08111213", @site.profile_url)
+      end
+    end
+
+    context "A deleted tweet" do
+      should "still find the artist name" do
+        @site = Sources::Strategies.find("https://twitter.com/masayasuf/status/870734961778630656")
+        @artist = FactoryBot.create(:artist, name: "masayasuf", url_string: @site.url)
+
+        assert_equal("masayasuf", @site.artist_name)
+        assert_equal("https://twitter.com/masayasuf", @site.profile_url)
+        assert_equal([@artist], @site.artists)
       end
     end
 

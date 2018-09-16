@@ -152,6 +152,12 @@ class ArtistUrlTest < ActiveSupport::TestCase
       assert_equal("http://twitter.com/aoimanabu/", url.normalized_url)
     end
 
+    should "normalize https://twitter.com/intent/user?user_id=* urls" do
+      url = FactoryBot.create(:artist_url, :url => "https://twitter.com/intent/user?user_id=2784590030")
+      assert_equal("https://twitter.com/intent/user?user_id=2784590030", url.url)
+      assert_equal("http://twitter.com/intent/user?user_id=2784590030/", url.normalized_url)
+    end
+
     should "normalize nijie urls" do
       url = FactoryBot.create(:artist_url, url: "https://pic03.nijie.info/nijie_picture/236014_20170620101426_0.png")
       assert_equal("http://nijie.info/members.php?id=161703/", url.normalized_url)
