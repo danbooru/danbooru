@@ -46,7 +46,10 @@ typedef struct StateMachine {
 
 StateMachine* init_machine(const char * src, size_t len, bool f_strip, bool f_inline, bool f_mentions);
 void free_machine(StateMachine * sm);
+
 gboolean parse_helper(StateMachine* sm);
+GString* parse_basic_inline(const char* dtext, const ssize_t length, const bool f_strip);
+
 GQuark dtext_parse_error_quark();
 
 #endif
