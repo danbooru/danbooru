@@ -1,7 +1,40 @@
+# Original images:
+#
+# * https://yande.re/image/b4b1d11facd1700544554e4805d47bb6/.png
+# * https://files.yande.re/image/2a5d1d688f565cb08a69ecf4e35017ab/yande.re%20349790%20breast_hold%20kurashima_tomoyasu%20mahouka_koukou_no_rettousei%20naked%20nipples.jpg
+# * https://ayase.yande.re/image/2d0d229fd8465a325ee7686fcc7f75d2/yande.re%20192481%20animal_ears%20bunny_ears%20garter_belt%20headphones%20mitha%20stockings%20thighhighs.jpg
+# * https://yuno.yande.re/image/1764b95ae99e1562854791c232e3444b/yande.re%20281544%20cameltoe%20erect_nipples%20fundoshi%20horns%20loli%20miyama-zero%20sarashi%20sling_bikini%20swimsuits.jpg
+# * https://konachan.com/image/5d633771614e4bf5c17df19a0f0f333f/Konachan.com%20-%20270807%20black_hair%20bokuden%20clouds%20grass%20landscape%20long_hair%20original%20phone%20rope%20scenic%20seifuku%20skirt%20sky%20summer%20torii%20tree.jpg
+#
+# Jpeg sample images (full size is .png):
+#
+# * https://yande.re/jpeg/22577d2344fe694cf47f80563031b3cd.jpg
+# * https://yande.re/jpeg/0c9ec0ffcaa40470093cb44c3fd40056/yande.re%2064649%20animal_ears%20cameltoe%20fixme%20nekomimi%20nipples%20ryohka%20school_swimsuit%20see_through%20shiraishi_nagomi%20suzuya%20swimsuits%20tail%20thighhighs.jpg
+# * https://konachan.com/jpeg/e2e2994bae738ff52fff7f4f50b069d5/Konachan.com%20-%20270803%20banishment%20bicycle%20grass%20group%20male%20night%20original%20rooftop%20scenic%20signed%20stars%20tree.jpg
+#
+# Sample images (full size is .png or .jpg):
+#
+# * https://yande.re/sample/ceb6a12e87945413a95b90fada406f91/.jpg
+# * https://files.yande.re/sample/0d79447ce2c89138146f64ba93633568/yande.re%20290757%20sample%20seifuku%20thighhighs%20tsukudani_norio.jpg
+# * https://konachan.com/sample/e2e2994bae738ff52fff7f4f50b069d5/Konachan.com%20-%20270803%20sample.jpg
+#
+# Preview images:
+#
+# * https://assets.yande.re/data/preview/7e/cf/7ecfdead705d7b956b26b1d37b98d089.jpg
+# * https://konachan.com/data/preview/5d/63/5d633771614e4bf5c17df19a0f0f333f.jpg
+#
+# Post pages:
+#
+# * https://yande.re/post/show/3
+# * https://konachan.com/post/show/270803/banishment-bicycle-grass-group-male-night-original
+
 module Sources
   module Strategies
     class Moebooru < Base
       BASE_URL = %r!\Ahttps?://(?:[^.]+\.)?(?<domain>yande\.re|konachan\.com)!i
+      POST_URL = %r!#{BASE_URL}/post/show/(?<id>\d+)!i
+      URL_SLUG = %r!/(?:yande\.re%20|Konachan\.com%20-%20)(?<id>\d+).*!i
+      IMAGE_URL = %r!#{BASE_URL}/(?<type>image|jpeg|sample)/(?<md5>\h{32})#{URL_SLUG}?\.(?<ext>jpg|jpeg|png|gif)\z!i
 
       def self.match?(*urls)
         urls.compact.any? { |x| x.match?(BASE_URL) }
@@ -12,11 +45,14 @@ module Sources
       end
 
       def image_url
-        if url =~ %r{\A(?<base>#{BASE_URL})/jpeg/(?<md5>\h+(?:/.*)?)\.jpg\Z}
-          return $~[:base] + "/image/" + $~[:md5] + ".png"
+        # try to include the post_id so that it's saved for posterity in the canonical_url.
+        if post_md5.present? && file_ext.present? && post_id.present?
+          "https://#{file_host}/image/#{post_md5}/#{filename_prefix}#{post_id}.#{file_ext}"
+        elsif post_md5.present? && file_ext.present?
+          "https://#{file_host}/image/#{post_md5}.#{file_ext}"
+        else
+          url
         end
-
-        return url
       end
 
       def image_urls
@@ -24,7 +60,8 @@ module Sources
       end
 
       def page_url
-        return url
+        return nil if post_id.blank?
+        "https://#{site_name}/post/show/#{post_id}"
       end
 
       def canonical_url
@@ -32,11 +69,84 @@ module Sources
       end
 
       def profile_url
-        return url
+        nil
       end
 
       def artist_name
-        return ""
+        nil
+      end
+
+      # Moebooru returns an empty array when doing an md5:<hash> search for a
+      # deleted post. Because of this, api_response may be empty in some cases.
+      def api_response
+        if post_id_from_url.present?
+          params = { tags: "id:#{post_id_from_url}" }
+        elsif post_md5_from_url.present?
+          params = { tags: "md5:#{post_md5_from_url}" }
+        else
+          return {}
+        end
+
+        body, code = HttpartyCache.get("/post.json", base_uri: "https://#{site_name}", params: params)
+        post = JSON.parse(body, symbolize_names: true).first
+        post || {}
+      end
+      memoize :api_response
+
+      concerning :HelperMethods do
+        def file_host
+          case site_name
+          when "yande.re" then "files.yande.re"
+          when "konachan.com" then "konachan.com"
+          end
+        end
+
+        def filename_prefix
+          case site_name
+          when "yande.re" then "yande.re%20"
+          when "konachan.com" then "Konachan.com%20-%20"
+          end
+        end
+
+        def file_ext
+          if url[IMAGE_URL, :type] == "jpeg"
+            "png"
+
+          elsif url[IMAGE_URL, :type] == "image"
+            url[IMAGE_URL, :ext]
+
+          # file_ext is not present in konachan's api (only on yande.re)
+          elsif api_response[:file_ext].present?
+            api_response[:file_ext]
+
+          # file_url is not present in yande.re's api on deleted posts
+          elsif api_response[:file_url].present?
+            api_response[:file_url][/\.(jpg|jpeg|png|gif)\z/i, 1]
+
+          # the api_response wasn't available because it's a deleted post.
+          elsif post_md5.present?
+            %w[jpg png gif].find { |ext| http_exists?("https://#{site_name}/image/#{post_md5}.#{ext}", headers) }
+
+          else
+            nil
+          end
+        end
+
+        def post_id_from_url
+          urls.map { |url| url[POST_URL, :id] || url[IMAGE_URL, :id] }.compact.first
+        end
+
+        def post_md5_from_url
+          urls.map { |url| url[IMAGE_URL, :md5] }.compact.first
+        end
+
+        def post_id
+          post_id_from_url || api_response[:id]
+        end
+
+        def post_md5
+          post_md5_from_url || api_response[:md5]
+        end
       end
     end
   end
