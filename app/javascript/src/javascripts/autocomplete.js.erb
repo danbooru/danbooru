@@ -262,6 +262,8 @@ Autocomplete.normal_source = function(term, resp) {
           antecedent: tag.antecedent_name,
           value: tag.name,
           category: tag.category,
+          source: tag.source,
+          weight: tag.weight,
           post_count: tag.post_count
         };
       });
@@ -381,7 +383,14 @@ Autocomplete.render_item = function(list, item) {
   }
 
   var $menu_item = $("<div/>").append($link);
-  return $("<li/>").data("item.autocomplete", item).append($menu_item).appendTo(list);
+  var $list_item = $("<li/>").data("item.autocomplete", item).append($menu_item);
+
+  var data_attributes = ["type", "source", "antecedent", "value", "category", "post_count", "weight"];
+  data_attributes.forEach(attr => {
+    $list_item.attr(`data-autocomplete-${attr.replace(/_/g, "-")}`, item[attr]);
+  });
+
+  return $list_item.appendTo(list);
 };
 
 Autocomplete.static_metatags = {
