@@ -5,6 +5,7 @@
     <%= subnav_link_to "Banned", banned_artists_path %>
     <%= subnav_link_to "New", new_artist_path %>
     <%= subnav_link_to "Recent changes", artist_versions_path %>
+    <%= subnav_link_to "URLs", artist_urls_path %>
     <% if @artist && !@artist.new_record? %>
       <li>|</li>
       <%= subnav_link_to "Posts (#{Post.fast_count(@artist.name)})", posts_path(:tags => @artist.name) %>
