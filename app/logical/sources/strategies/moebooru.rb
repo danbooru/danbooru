@@ -27,6 +27,10 @@ module Sources
         return url
       end
 
+      def canonical_url
+        image_url
+      end
+
       def profile_url
         return url
       end

@@ -17,6 +17,7 @@ module Sources
           @site = Sources::Strategies.find("https://files.yande.re/sample/7ecfdead705d7b956b26b1d37b98d089/yande.re%20482880%20sample%20bayashiko%20journey_to_the_west%20sun_wukong.jpg")
 
           assert_equal("yande.re", @site.site_name)
+          assert_equal(@site.image_url, @site.canonical_url)
           assert_nothing_raised { @site.to_h }
         end
       end
