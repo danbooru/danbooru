@@ -4,9 +4,21 @@ module TagAutocomplete
   PREFIX_BOUNDARIES = "(_/:;-"
   LIMIT = 10
 
-  class Result < Struct.new(:name, :post_count, :category, :antecedent_name, :weight)
-    def to_xml(options = {})
-      to_h.to_xml(options)
+  class Result < Struct.new(:name, :post_count, :category, :antecedent_name, :source)
+    include ActiveModel::Serializers::JSON
+    include ActiveModel::Serializers::Xml
+
+    def attributes
+      (members + [:weight]).map { |x| [x.to_s, send(x)] }.to_h
+    end
+
+    def weight
+      case source
+      when :exact   then 1.0
+      when :prefix  then 0.8
+      when :alias   then 0.2
+      when :correct then 0.1
+      end
     end
   end
 
@@ -35,7 +47,7 @@ module TagAutocomplete
       .order("post_count desc")
       .limit(n)
       .pluck(:name, :post_count, :category)
-      .map {|row| Result.new(*row, nil, 1.0)}
+      .map {|row| Result.new(*row, nil, :exact)}
   end
 
   def search_correct(query, n=2)
@@ -51,7 +63,7 @@ module TagAutocomplete
       .order(Arel.sql("similarity(name, #{Tag.connection.quote(query)}) DESC"))
       .limit(n)
       .pluck(:name, :post_count, :category)
-      .map {|row| Result.new(*row, nil, 0.1)}
+      .map {|row| Result.new(*row, nil, :correct)}
   end
 
   def search_prefix(query, n=3)
@@ -82,7 +94,7 @@ module TagAutocomplete
       .order("post_count desc")
       .limit(n)
       .pluck(:name, :post_count, :category)
-      .map {|row| Result.new(*row, nil, 0.8)}
+      .map {|row| Result.new(*row, nil, :prefix)}
   end
 
   def search_aliases(query, n=10)
@@ -97,7 +109,7 @@ module TagAutocomplete
       .order("tag_aliases.post_count desc")
       .limit(n)
       .pluck(:name, :post_count, :category, :antecedent_name)
-      .map {|row| Result.new(*row, 0.2)}
+      .map {|row| Result.new(*row, :alias)}
   end
 end
 
