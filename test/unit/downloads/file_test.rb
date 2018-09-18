@@ -2,19 +2,6 @@ require 'test_helper'
 
 module Downloads
   class FileTest < ActiveSupport::TestCase
-    context "A twitter video download" do
-      setup do
-        skip "Twitter is not configured" unless Danbooru.config.twitter_api_key
-        @source = "https://twitter.com/CincinnatiZoo/status/859073537713328129"
-        @download = Downloads::File.new(@source)
-      end
-
-      should "preserve the twitter source" do
-        @download.download!
-        assert_equal("https://twitter.com/CincinnatiZoo/status/859073537713328129", @download.source)
-      end
-    end
-
     context "A post download" do
       setup do
         @source = "http://www.google.com/intl/en_ALL/images/logo.gif"

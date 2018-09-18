@@ -30,8 +30,9 @@ module Sources
         @site = Sources::Strategies.find("https://twitter.com/CincinnatiZoo/status/859073537713328129")
       end
 
-      should "get the image url" do
+      should "get the correct urls" do
         assert_equal("https://video.twimg.com/ext_tw_video/859073467769126913/pu/vid/1280x720/cPGgVROXHy3yrK6u.mp4", @site.image_url)
+        assert_equal("https://twitter.com/CincinnatiZoo/status/859073537713328129", @site.canonical_url)
       end
     end
 
