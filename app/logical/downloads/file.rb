@@ -54,17 +54,15 @@ module Downloads
       end
     end
 
-    def download!(tries: 3)
+    def download!(tries: 3, **options)
       strategy = Sources::Strategies.find(source, referer)
-      output_file = Tempfile.new(binmode: true)
       url = self.class.uncached_url(strategy.file_url, strategy.headers)
       @data = strategy.data
 
       Retriable.retriable(on: RETRIABLE_ERRORS, tries: tries, base_interval: 0) do
-        http_get_streaming(url, output_file, strategy.headers)
+        file = http_get_streaming(url, headers: strategy.headers, **options)
+        return [file, strategy]
       end
-
-      [output_file, strategy]
     end
 
     def validate_local_hosts(url)
@@ -74,7 +72,7 @@ module Downloads
       end
     end
 
-    def http_get_streaming(src, file, headers = {}, max_size: Danbooru.config.max_file_size)
+    def http_get_streaming(src, file: Tempfile.new(binmode: true), headers: {}, max_size: Danbooru.config.max_file_size)
       url = URI.parse(src)
 
       unless url.is_a?(URI::HTTP) || url.is_a?(URI::HTTPS)
