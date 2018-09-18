@@ -64,12 +64,16 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "work on an ugoira url" do
-          file = subject.download_for_upload(@upload)
+          begin
+            file = subject.download_for_upload(@upload)
 
-          assert_not_nil(@upload.context["ugoira"])
-          assert_operator(File.size(file.path), :>, 0)
+            assert_not_nil(@upload.context["ugoira"])
+            assert_operator(File.size(file.path), :>, 0)
 
-          file.close
+            file.close
+          rescue Net::OpenTimeout
+            skip "network failure"
+          end
         end
       end
     end
@@ -404,8 +408,12 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "download the file" do
-          @service = subject.new(source: @source, referer_url: @ref)
-          @upload = @service.start!
+          begin
+            @service = subject.new(source: @source, referer_url: @ref)
+            @upload = @service.start!
+          rescue Net::OpenTimeout
+            skip "network failure"
+          end
           assert_equal("preprocessed", @upload.status)
           assert_equal(294591, @upload.file_size)
           assert_equal("jpg", @upload.file_ext)
@@ -1099,8 +1107,12 @@ class UploadServiceTest < ActiveSupport::TestCase
       end
 
       should "record the canonical source" do
-        post = subject.new({}).create_post_from_upload(@upload)
-        assert_equal(@source, post.source)
+        begin
+          post = subject.new({}).create_post_from_upload(@upload)
+          assert_equal(@source, post.source)
+        rescue Net::OpenTimeout
+          skip "network failure"
+        end
       end
     end
 
