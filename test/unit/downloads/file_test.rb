@@ -10,14 +10,9 @@ module Downloads
       end
 
       context "that fails" do
-        setup do
-          HTTParty.stubs(:get).raises(Errno::ETIMEDOUT)
-        end
-
-        should "retry three times" do
-          assert_raises(Errno::ETIMEDOUT) do
-            @download.http_get_streaming(@source, @tempfile)
-          end
+        should "retry three times before giving up" do
+          HTTParty.expects(:get).times(3).raises(Errno::ETIMEDOUT)
+          assert_raises(Errno::ETIMEDOUT) { @download.download! }
         end
       end
 

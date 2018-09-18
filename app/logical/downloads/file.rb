@@ -2,6 +2,8 @@ module Downloads
   class File
     class Error < Exception ; end
 
+    RETRIABLE_ERRORS = [Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EIO, Errno::EHOSTUNREACH, Errno::ECONNREFUSED, Timeout::Error, IOError]
+
     attr_reader :data, :options
     attr_accessor :source, :referer
 
@@ -52,16 +54,15 @@ module Downloads
       end
     end
 
-    def download!
+    def download!(tries: 3)
       strategy = Sources::Strategies.find(source, referer)
       output_file = Tempfile.new(binmode: true)
+      url = self.class.uncached_url(strategy.file_url, strategy.headers)
       @data = strategy.data
 
-      http_get_streaming(
-        self.class.uncached_url(strategy.file_url, strategy.headers), 
-        output_file, 
-        strategy.headers
-      )
+      Retriable.retriable(on: RETRIABLE_ERRORS, tries: tries, base_interval: 0) do
+        http_get_streaming(url, output_file, strategy.headers)
+      end
 
       [output_file, strategy]
     end
@@ -74,42 +75,30 @@ module Downloads
     end
 
     def http_get_streaming(src, file, headers = {}, max_size: Danbooru.config.max_file_size)
-      tries = 0
       url = URI.parse(src)
 
-      while true
-        unless url.is_a?(URI::HTTP) || url.is_a?(URI::HTTPS)
-          raise Error.new("URL must be HTTP or HTTPS")
-        end
+      unless url.is_a?(URI::HTTP) || url.is_a?(URI::HTTPS)
+        raise Error.new("URL must be HTTP or HTTPS")
+      end
 
-        validate_local_hosts(url)
+      validate_local_hosts(url)
 
-        begin
-          size = 0
-          options = { stream_body: true, timeout: 10, headers: headers }
+      size = 0
+      options = { stream_body: true, timeout: 10, headers: headers }
 
-          res = HTTParty.get(url, options.deep_merge(Danbooru.config.httparty_options)) do |chunk|
-            size += chunk.size
-            raise Error.new("File is too large (max size: #{max_size})") if size > max_size && max_size > 0
+      res = HTTParty.get(url, options.deep_merge(Danbooru.config.httparty_options)) do |chunk|
+        size += chunk.size
+        raise Error.new("File is too large (max size: #{max_size})") if size > max_size && max_size > 0
 
-            file.write(chunk)
-          end
+        file.write(chunk)
+      end
 
-          if res.success?
-            file.rewind
-            return file
-          else
-            raise Error.new("HTTP error code: #{res.code} #{res.message}")
-          end
-        rescue Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EIO, Errno::EHOSTUNREACH, Errno::ECONNREFUSED, Timeout::Error, IOError => x
-          tries += 1
-          if tries < 3
-            retry
-          else
-            raise
-          end
-        end
-      end # while
+      if res.success?
+        file.rewind
+        return file
+      else
+        raise Error.new("HTTP error code: #{res.code} #{res.message}")
+      end
     end # def
   end
 end

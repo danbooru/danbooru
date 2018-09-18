@@ -489,6 +489,7 @@ DEPENDENCIES
   rakismet
   recaptcha
   responders
+  retriable
   ruby-imagespec!
   ruby-prof
   ruby-vips
