@@ -4,6 +4,8 @@ class WikiPageVersion < ApplicationRecord
   belongs_to :artist, optional: true
   delegate :visible?, :to => :wiki_page
 
+  extend Memoist
+
   module SearchMethods
     def for_user(user_id)
       where("updater_id = ?", user_id)
@@ -34,6 +36,11 @@ class WikiPageVersion < ApplicationRecord
   def pretty_title
     title.tr("_", " ")
   end
+
+  def previous
+    WikiPageVersion.where("wiki_page_id = ? and id < ?", wiki_page_id, id).order("id desc").first
+  end
+  memoize :previous
 
   def category_name
     Tag.category_for(title)
