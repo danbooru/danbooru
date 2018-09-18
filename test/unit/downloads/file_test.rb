@@ -8,6 +8,18 @@ module Downloads
         @download = Downloads::File.new(@source)
       end
 
+      context "for a banned IP" do
+        should "prevent downloads" do
+          Resolv.expects(:getaddress).returns("127.0.0.1")
+          assert_raise(ActiveModel::ValidationError) { Downloads::File.new("http://evil.com").download! }
+        end
+
+        should "prevent fetching the size" do
+          Resolv.expects(:getaddress).returns("127.0.0.1")
+          assert_raise(ActiveModel::ValidationError) { Downloads::File.new("http://evil.com").size }
+        end
+      end
+
       context "that fails" do
         should "retry three times before giving up" do
           HTTParty.expects(:get).times(3).raises(Errno::ETIMEDOUT)
@@ -34,7 +46,6 @@ module Downloads
 
       should "store the file in the tempfile path" do
         tempfile, strategy = @download.download!
-        assert_equal(@source, @download.source)
         assert_operator(tempfile.size, :>, 0, "should have data")
       end
     end

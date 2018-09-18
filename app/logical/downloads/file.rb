@@ -1,11 +1,15 @@
 module Downloads
   class File
+    include ActiveModel::Validations
     class Error < Exception ; end
 
     RETRIABLE_ERRORS = [Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EIO, Errno::EHOSTUNREACH, Errno::ECONNREFUSED, Timeout::Error, IOError]
 
     delegate :data, to: :strategy
-    attr_accessor :source, :referer
+    attr_reader :url, :referer
+
+    validate :validate_url
+    validate :validate_local_hosts
 
     # Prevent Cloudflare from potentially mangling the image. See issue #3528.
     def self.uncached_url(url, headers = {})
@@ -27,14 +31,13 @@ module Downloads
       end
     end
 
-    def initialize(source, referer=nil)
-      # source can potentially get rewritten in the course
-      # of downloading a file, so check it again
-      @source = source
+    def initialize(url, referer=nil)
+      @url = Addressable::URI.parse(url) rescue nil
       @referer = referer
     end
 
     def size
+      validate!
       options = { timeout: 3, headers: strategy.headers }.deep_merge(Danbooru.config.httparty_options)
 
       res = HTTParty.head(strategy.file_url, options)
@@ -47,6 +50,7 @@ module Downloads
     end
 
     def download!(tries: 3, **options)
+      validate!
       url = self.class.uncached_url(strategy.file_url, strategy.headers)
 
       Retriable.retriable(on: RETRIABLE_ERRORS, tries: tries, base_interval: 0) do
@@ -55,22 +59,20 @@ module Downloads
       end
     end
 
-    def validate_local_hosts(url)
+    def validate_local_hosts
       ip_addr = IPAddr.new(Resolv.getaddress(url.hostname))
       if Danbooru.config.banned_ip_for_download?(ip_addr)
-        raise Error.new("Banned server for download")
+        errors[:base] << "Downloads from #{ip_addr} are not allowed"
       end
     end
 
-    def http_get_streaming(src, file: Tempfile.new(binmode: true), headers: {}, max_size: Danbooru.config.max_file_size)
-      url = URI.parse(src)
+    def validate_url
+      errors[:base] << "URL must not be blank" if url.blank?
+      errors[:base] << "'#{url}' is not a valid url" if !url.host.present?
+      errors[:base] << "'#{url}' is not a valid url. Did you mean 'http://#{url}'?" if !url.scheme.in?(%w[http https])
+    end
 
-      unless url.is_a?(URI::HTTP) || url.is_a?(URI::HTTPS)
-        raise Error.new("URL must be HTTP or HTTPS")
-      end
-
-      validate_local_hosts(url)
-
+    def http_get_streaming(url, file: Tempfile.new(binmode: true), headers: {}, max_size: Danbooru.config.max_file_size)
       size = 0
       options = { stream_body: true, timeout: 10, headers: headers }
 
@@ -90,7 +92,7 @@ module Downloads
     end # def
 
     def strategy
-      @strategy ||= Sources::Strategies.find(source, referer)
+      @strategy ||= Sources::Strategies.find(url.to_s, referer)
     end
   end
 end
