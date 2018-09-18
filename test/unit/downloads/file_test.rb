@@ -11,12 +11,27 @@ module Downloads
       context "for a banned IP" do
         should "prevent downloads" do
           Resolv.expects(:getaddress).returns("127.0.0.1")
-          assert_raise(ActiveModel::ValidationError) { Downloads::File.new("http://evil.com").download! }
+          assert_raise(Downloads::File::Error) { Downloads::File.new("http://evil.com").download! }
         end
 
         should "prevent fetching the size" do
           Resolv.expects(:getaddress).returns("127.0.0.1")
-          assert_raise(ActiveModel::ValidationError) { Downloads::File.new("http://evil.com").size }
+          assert_raise(Downloads::File::Error) { Downloads::File.new("http://evil.com").size }
+        end
+
+        should "not follow redirects to banned IPs" do
+          url = "http://httpbin.org/redirect-to?url=http://127.0.0.1"
+          stub_request(:get, url).to_return(status: 301, headers: { "Location": "http://127.0.0.1" })
+
+          assert_raise(Downloads::File::Error) { Downloads::File.new(url).download! }
+        end
+
+        should "not follow redirects that resolve to a banned IP" do
+          url = "http://httpbin.org/redirect-to?url=http://127.0.0.1.nip.io"
+          stub_request(:get, url).to_return(status: 301, headers: { "Location": "http://127.0.0.1.xip.io" })
+          Resolv.expects(:getaddress).returns("127.0.0.1")
+
+          assert_raise(Downloads::File::Error) { Downloads::File.new(url).download! }
         end
       end
 

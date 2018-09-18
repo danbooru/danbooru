@@ -9,7 +9,6 @@ module Downloads
     attr_reader :url, :referer
 
     validate :validate_url
-    validate :validate_local_hosts
 
     # Prevent Cloudflare from potentially mangling the image. See issue #3528.
     def self.uncached_url(url, headers = {})
@@ -34,13 +33,11 @@ module Downloads
     def initialize(url, referer=nil)
       @url = Addressable::URI.parse(url) rescue nil
       @referer = referer
+      validate!
     end
 
     def size
-      validate!
-      options = { timeout: 3, headers: strategy.headers }.deep_merge(Danbooru.config.httparty_options)
-
-      res = HTTParty.head(strategy.file_url, options)
+      res = HTTParty.head(strategy.file_url, **httparty_options, timeout: 3)
 
       if res.success?
         res.content_length
@@ -50,19 +47,11 @@ module Downloads
     end
 
     def download!(tries: 3, **options)
-      validate!
       url = self.class.uncached_url(strategy.file_url, strategy.headers)
 
       Retriable.retriable(on: RETRIABLE_ERRORS, tries: tries, base_interval: 0) do
         file = http_get_streaming(url, headers: strategy.headers, **options)
         return [file, strategy]
-      end
-    end
-
-    def validate_local_hosts
-      ip_addr = IPAddr.new(Resolv.getaddress(url.hostname))
-      if Danbooru.config.banned_ip_for_download?(ip_addr)
-        errors[:base] << "Downloads from #{ip_addr} are not allowed"
       end
     end
 
@@ -74,9 +63,8 @@ module Downloads
 
     def http_get_streaming(url, file: Tempfile.new(binmode: true), headers: {}, max_size: Danbooru.config.max_file_size)
       size = 0
-      options = { stream_body: true, timeout: 10, headers: headers }
 
-      res = HTTParty.get(url, options.deep_merge(Danbooru.config.httparty_options)) do |chunk|
+      res = HTTParty.get(url, httparty_options) do |chunk|
         size += chunk.size
         raise Error.new("File is too large (max size: #{max_size})") if size > max_size && max_size > 0
 
@@ -93,6 +81,29 @@ module Downloads
 
     def strategy
       @strategy ||= Sources::Strategies.find(url.to_s, referer)
+    end
+
+    def httparty_options
+      {
+        timeout: 10,
+        stream_body: true,
+        headers: strategy.headers,
+        connection_adapter: ValidatingConnectionAdapter,
+      }.deep_merge(Danbooru.config.httparty_options)
+    end
+  end
+
+  # Hook into HTTParty to validate the IP before following redirects.
+  # https://www.rubydoc.info/github/jnunemaker/httparty/HTTParty/ConnectionAdapter
+  class ValidatingConnectionAdapter < HTTParty::ConnectionAdapter
+    def self.call(uri, options)
+      ip_addr = IPAddr.new(Resolv.getaddress(uri.hostname))
+
+      if Danbooru.config.banned_ip_for_download?(ip_addr)
+        raise Downloads::File::Error, "Downloads from #{ip_addr} are not allowed"
+      end
+
+      super(uri, options)
     end
   end
 end
