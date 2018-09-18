@@ -31,8 +31,8 @@
             <%= tag.td external_link_to(artist_url.url.to_s) %>
             <%= tag.td external_link_to(artist_url.normalized_url) %>
             <%= tag.td artist_url.is_active.to_s %>
-            <%= tag.td artist_url.created_at %>
-            <%= tag.td artist_url.updated_at %>
+            <%= tag.td compact_time(artist_url.created_at) %>
+            <%= tag.td compact_time(artist_url.updated_at) %>
           </tr>
         <% end %>
       </tbody>
