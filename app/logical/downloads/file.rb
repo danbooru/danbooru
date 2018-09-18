@@ -4,7 +4,7 @@ module Downloads
 
     RETRIABLE_ERRORS = [Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EIO, Errno::EHOSTUNREACH, Errno::ECONNREFUSED, Timeout::Error, IOError]
 
-    attr_reader :data, :options
+    delegate :data, to: :strategy
     attr_accessor :source, :referer
 
     # Prevent Cloudflare from potentially mangling the image. See issue #3528.
@@ -27,22 +27,14 @@ module Downloads
       end
     end
 
-    def initialize(source, referer=nil, options = {})
+    def initialize(source, referer=nil)
       # source can potentially get rewritten in the course
       # of downloading a file, so check it again
       @source = source
       @referer = referer
-
-      # we sometimes need to capture data from the source page
-      @data = {}
-
-      @options = options
-
-      @data[:get_thumbnail] = options[:get_thumbnail]
     end
 
     def size
-      strategy = Sources::Strategies.find(source, referer)
       options = { timeout: 3, headers: strategy.headers }.deep_merge(Danbooru.config.httparty_options)
 
       res = HTTParty.head(strategy.file_url, options)
@@ -55,9 +47,7 @@ module Downloads
     end
 
     def download!(tries: 3, **options)
-      strategy = Sources::Strategies.find(source, referer)
       url = self.class.uncached_url(strategy.file_url, strategy.headers)
-      @data = strategy.data
 
       Retriable.retriable(on: RETRIABLE_ERRORS, tries: tries, base_interval: 0) do
         file = http_get_streaming(url, headers: strategy.headers, **options)
@@ -98,5 +88,9 @@ module Downloads
         raise Error.new("HTTP error code: #{res.code} #{res.message}")
       end
     end # def
+
+    def strategy
+      @strategy ||= Sources::Strategies.find(source, referer)
+    end
   end
 end
