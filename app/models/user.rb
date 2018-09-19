@@ -447,10 +447,6 @@ class User < ApplicationRecord
   end
 
   module BlacklistMethods
-    def blacklisted_tag_array
-      Tag.scan_query(blacklisted_tags)
-    end
-
     def normalize_blacklisted_tags
       self.blacklisted_tags = blacklisted_tags.downcase if blacklisted_tags.present?
     end

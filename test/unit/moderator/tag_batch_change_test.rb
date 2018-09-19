@@ -35,6 +35,14 @@ module Moderator
         assert_equal("123 456 bbb", ss.reload.normalized_query)
       end
 
+      should "move blacklists" do
+        @user.update(blacklisted_tags: "123 456\n789\n")
+        tag_batch_change = TagBatchChange.new("456", "xxx", @user.id, "127.0.0.1")
+        tag_batch_change.perform
+        @user.reload
+        assert_equal("123 xxx\n789", @user.blacklisted_tags)
+      end
+
       should "move only saved searches that match the mass update exactly" do
         ss = FactoryBot.create(:saved_search, :user => @user, :query => "123 ... 456")
         tag_batch_change = TagBatchChange.new("1", "bbb", @user.id, "127.0.0.1")
