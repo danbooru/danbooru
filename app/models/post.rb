@@ -7,6 +7,7 @@ class Post < ApplicationRecord
   class RevertError < Exception ; end
   class SearchError < Exception ; end
   class DeletionError < Exception ; end
+  class TimeoutError < Exception ; end
 
   # Tags to copy when copying notes.
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation]
@@ -1202,6 +1203,10 @@ class Post < ApplicationRecord
 
       if count.nil?
         # give up
+        if options[:raise_on_timeout]
+          raise TimeoutError.new("timed out")
+        end
+
         count = Danbooru.config.blank_tag_search_fast_count
       else
         set_count_in_cache(tags, count)
