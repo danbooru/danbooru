@@ -376,7 +376,6 @@ Rails.application.routes.draw do
 
   get "/post/index.xml", :controller => "legacy", :action => "posts", :format => "xml"
   get "/post/index.json", :controller => "legacy", :action => "posts", :format => "json"
-  get "/post/create.xml", :controller => "legacy", :action => "create_post", :format => "xml"
   get "/post/piclens", :controller => "legacy", :action => "unavailable"
   get "/post/index" => redirect {|params, req| "/posts?tags=#{CGI::escape(req.params[:tags].to_s)}&page=#{req.params[:page]}"}
   get "/post" => redirect {|params, req| "/posts?tags=#{CGI::escape(req.params[:tags].to_s)}&page=#{req.params[:page]}"}

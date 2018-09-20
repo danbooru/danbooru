@@ -1,5 +1,4 @@
 class LegacyController < ApplicationController
-  before_action :member_only, :only => [:create_post]
   respond_to :json, :xml
 
   def posts
@@ -16,19 +15,6 @@ class LegacyController < ApplicationController
         render xml: xml.target!
       end
     end
-  end
-
-  def create_post
-    @upload = Upload.new
-    @upload.server = Socket.gethostname
-    @upload.file = params[:post][:file]
-    @upload.source = params[:post][:source]
-    @upload.tag_string = params[:post][:tags]
-    @upload.parent_id = params[:post][:parent_id]
-    @upload.rating = params[:post][:rating][0].downcase
-    @upload.md5_confirmation = params[:md5] if params[:md5].present?
-    @upload.save
-    @upload.process!
   end
 
   def users
