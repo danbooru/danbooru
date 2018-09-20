@@ -445,6 +445,13 @@ class Tag < ApplicationRecord
       tag.include?("*")
     end
 
+    def has_metatag?(tags, *metatags)
+      return nil if tags.blank?
+
+      tags = scan_query(tags.to_str) if tags.respond_to?(:to_str)
+      tags.grep(/\A#{Regexp.union(metatags.map(&:to_s))}:(.+)\z/i) { $1 }.first
+    end
+
     def parse_query(query, options = {})
       q = {}
 

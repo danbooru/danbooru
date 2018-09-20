@@ -10,9 +10,7 @@ class PostsController < ApplicationController
         format.html { redirect_to(@post) }
       end
     else
-      limit = params[:limit] || (params[:tags] =~ /(?:^|\s)limit:(\d+)(?:$|\s)/ && $1) || CurrentUser.user.per_page
-      @random = params[:random] || params[:tags] =~ /(?:^|\s)order:random(?:$|\s)/
-      @post_set = PostSets::Post.new(tag_query, params[:page], limit, raw: params[:raw], random: @random, format: params[:format], read_only: params[:ro])
+      @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], raw: params[:raw], random: params[:random], format: params[:format], read_only: params[:ro])
       @posts = @post_set.posts
       respond_with(@posts) do |format|
         format.atom

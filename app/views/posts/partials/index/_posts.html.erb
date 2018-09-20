@@ -19,7 +19,7 @@
     </div>
   <% end %>
 
-  <% unless @random.present? %>
+  <% unless post_set.is_random? %>
     <%= numbered_paginator(post_set.posts) %>
   <% end %>
 </div>

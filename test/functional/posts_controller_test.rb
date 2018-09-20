@@ -89,6 +89,16 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to(@post)
         end
       end
+
+      context "with a random search" do
+        should "render" do
+          get posts_path, params: { tags: "order:random" }
+          assert_response :success
+
+          get posts_path, params: { random: "1" }
+          assert_response :success
+        end
+      end
     end
 
     context "show_seq action" do

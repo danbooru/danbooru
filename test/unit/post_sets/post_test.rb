@@ -161,6 +161,19 @@ module PostSets
           end
         end
       end
+
+      context "#per_page method" do
+        should "take the limit from the params first, then the limit:<n> metatag, then the account settings" do
+          set = PostSets::Post.new("a limit:23 b", 1, 42)
+          assert_equal(42, set.per_page)
+
+          set = PostSets::Post.new("a limit:23 b", 1, nil)
+          assert_equal(23, set.per_page)
+
+          set = PostSets::Post.new("a", 1, nil)
+          assert_equal(CurrentUser.user.per_page, set.per_page)
+        end
+      end
     end
   end
 end
