@@ -34,6 +34,10 @@ module Downloads
       should "return the original file, not the polished file" do
         assert_downloaded(517_706, @asset) # polished size: 502_052
       end
+
+      should "return the original filesize, not the polished filesize" do
+        assert_equal(517_706, Downloads::File.new(@asset).size)
+      end
     end
 
     context "a download for a https://$artist.artstation.com/projects/$id page" do

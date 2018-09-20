@@ -9,12 +9,12 @@ module Downloads
       end
 
       context "for a banned IP" do
-        should "prevent downloads" do
+        should "not try to download the file" do
           Resolv.expects(:getaddress).returns("127.0.0.1")
           assert_raise(Downloads::File::Error) { Downloads::File.new("http://evil.com").download! }
         end
 
-        should "prevent fetching the size" do
+        should "not try to fetch the size" do
           Resolv.expects(:getaddress).returns("127.0.0.1")
           assert_raise(Downloads::File::Error) { Downloads::File.new("http://evil.com").size }
         end
@@ -32,6 +32,11 @@ module Downloads
           Resolv.expects(:getaddress).returns("127.0.0.1")
 
           assert_raise(Downloads::File::Error) { Downloads::File.new(url).download! }
+        end
+
+        should "not send a HEAD request when checking for cloudflare" do
+          Resolv.expects(:getaddress).with("www.google.com").returns("127.0.0.1")
+          assert_raise(Downloads::File::Error) { @download.is_cloudflare? }
         end
       end
 

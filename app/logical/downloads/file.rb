@@ -11,19 +11,19 @@ module Downloads
     validate :validate_url
 
     # Prevent Cloudflare from potentially mangling the image. See issue #3528.
-    def self.uncached_url(url, headers = {})
-      url = Addressable::URI.parse(url)
+    def uncached_url
+      url = file_url.dup
 
-      if is_cloudflare?(url, headers)
+      if is_cloudflare?
         url.query_values = (url.query_values || {}).merge(danbooru_no_cache: SecureRandom.uuid)
       end
 
       url
     end
 
-    def self.is_cloudflare?(url, headers = {})
-      Cache.get("is_cloudflare:#{url.origin}", 4.hours) do
-        res = HTTParty.head(url, { headers: headers }.deep_merge(Danbooru.config.httparty_options))
+    def is_cloudflare?
+      Cache.get("is_cloudflare:#{file_url.origin}", 4.hours) do
+        res = HTTParty.head(file_url, httparty_options)
         raise Error.new("HTTP error code: #{res.code} #{res.message}") unless res.success?
 
         res.key?("CF-Ray")
@@ -37,7 +37,7 @@ module Downloads
     end
 
     def size
-      res = HTTParty.head(strategy.file_url, **httparty_options, timeout: 3)
+      res = HTTParty.head(uncached_url, **httparty_options, timeout: 3)
 
       if res.success?
         res.content_length
@@ -47,10 +47,8 @@ module Downloads
     end
 
     def download!(tries: 3, **options)
-      url = self.class.uncached_url(strategy.file_url, strategy.headers)
-
       Retriable.retriable(on: RETRIABLE_ERRORS, tries: tries, base_interval: 0) do
-        file = http_get_streaming(url, headers: strategy.headers, **options)
+        file = http_get_streaming(uncached_url, headers: strategy.headers, **options)
         return [file, strategy]
       end
     end
@@ -78,6 +76,10 @@ module Downloads
         raise Error.new("HTTP error code: #{res.code} #{res.message}")
       end
     end # def
+
+    def file_url
+      @file_url ||= Addressable::URI.parse(strategy.image_url)
+    end
 
     def strategy
       @strategy ||= Sources::Strategies.find(url.to_s, referer)
