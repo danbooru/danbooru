@@ -24,7 +24,7 @@ module PostSetPresenters
         related_tags_for_single(post_set.tag_string)
       elsif post_set.unordered_tag_array.size == 1
         related_tags_for_single(post_set.unordered_tag_array.first)
-      elsif post_set.tag_string =~ /(?:^|\s)(?:#{Tag::SUBQUERY_METATAGS}):\S+/
+      elsif Tag.has_metatag?(post_set.tag_array, *Tag::SUBQUERY_METATAGS)
         calculate_related_tags_from_post_set
       elsif post_set.is_empty_tag?
         popular_tags

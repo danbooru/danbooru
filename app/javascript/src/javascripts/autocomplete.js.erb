@@ -8,7 +8,7 @@ Autocomplete.TAG_CATEGORIES = <%= TagCategory.mapping.to_json.html_safe %>;
 
 Autocomplete.TAG_PREFIXES = "-|~|" + Object.keys(Autocomplete.TAG_CATEGORIES).map(category => category + ":").join("|");
 Autocomplete.TAG_PREFIXES_REGEX = new RegExp("^(" + Autocomplete.TAG_PREFIXES + ")(.*)$", "i");
-Autocomplete.METATAGS_REGEX = new RegExp("^(" + Autocomplete.METATAGS + "):(.*)$", "i");
+Autocomplete.METATAGS_REGEX = new RegExp("^(" + Autocomplete.METATAGS.join("|") + "):(.*)$", "i");
 
 Autocomplete.initialize_all = function() {
   if (Utility.meta("enable-auto-complete") === "true") {

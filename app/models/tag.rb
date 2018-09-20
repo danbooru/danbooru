@@ -1,8 +1,16 @@
 class Tag < ApplicationRecord
   COSINE_SIMILARITY_RELATED_TAG_THRESHOLD = 300
-  METATAGS = "-user|user|-approver|approver|commenter|comm|noter|noteupdater|artcomm|-pool|pool|ordpool|-favgroup|favgroup|-fav|fav|ordfav|md5|-rating|rating|-locked|locked|width|height|mpixels|ratio|score|favcount|filesize|source|-source|id|-id|date|age|order|limit|-status|status|tagcount|parent|-parent|child|pixiv_id|pixiv|search|upvote|downvote|filetype|-filetype|flagger|-flagger|appealer|-appealer|disapproval|-disapproval|" +
-    TagCategory.short_name_list.map {|x| "#{x}tags"}.join("|")
-  SUBQUERY_METATAGS = "commenter|comm|noter|noteupdater|artcomm|flagger|-flagger|appealer|-appealer"
+  METATAGS = %w[
+    -user user -approver approver commenter comm noter noteupdater artcomm
+    -pool pool ordpool -favgroup favgroup -fav fav ordfav md5 -rating rating
+    -locked locked width height mpixels ratio score favcount filesize source
+    -source id -id date age order limit -status status tagcount parent -parent
+    child pixiv_id pixiv search upvote downvote filetype -filetype flagger
+    -flagger appealer -appealer disapproval -disapproval
+  ] + TagCategory.short_name_list.map {|x| "#{x}tags"}
+
+  SUBQUERY_METATAGS = %w[commenter comm noter noteupdater artcomm flagger -flagger appealer -appealer]
+
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :artist, :foreign_key => "name", :primary_key => "name"
   has_one :antecedent_alias, -> {active}, :class_name => "TagAlias", :foreign_key => "antecedent_name", :primary_key => "name"
@@ -430,7 +438,7 @@ class Tag < ApplicationRecord
     end
 
     def is_metatag?(tag)
-      !!(tag =~ /\A(#{METATAGS}):(.+)\Z/i)
+      tag.match?(/\A(#{Regexp.union(METATAGS)}):(.+)\z/i)
     end
 
     def is_negated_tag?(tag)
@@ -466,7 +474,7 @@ class Tag < ApplicationRecord
       scan_query(query).each do |token|
         q[:tag_count] += 1 unless Danbooru.config.is_unlimited_tag?(token)
 
-        if token =~ /\A(#{METATAGS}):(.+)\Z/i
+        if token =~ /\A(#{Regexp.union(METATAGS)}):(.+)\z/i
           g1 = $1.downcase
           g2 = $2
           case g1
