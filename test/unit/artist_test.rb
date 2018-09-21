@@ -399,30 +399,32 @@ class ArtistTest < ActiveSupport::TestCase
 
     should "search on its name should return results" do
       artist = FactoryBot.create(:artist, :name => "artist")
+
       assert_not_nil(Artist.search(:name => "artist").first)
-      assert_not_nil(Artist.search(:name_matches => "artist").first)
+      assert_not_nil(Artist.search(:name_like => "artist").first)
       assert_not_nil(Artist.search(:any_name_matches => "artist").first)
+      assert_not_nil(Artist.search(:any_name_matches => "/art/").first)
     end
 
     should "search on other names should return matches" do
       artist = FactoryBot.create(:artist, :name => "artist", :other_names_comma => "aaa, ccc ddd")
-      assert_nil(Artist.other_names_match("artist").first)
-      assert_not_nil(Artist.other_names_match("aaa").first)
-      assert_not_nil(Artist.other_names_match("ccc_ddd").first)
-      assert_not_nil(Artist.search(:name => "artist").first)
 
-      assert_not_nil(Artist.search(:other_names_match => "aaa").first)
+      assert_nil(Artist.search(other_names_like: "*artist*").first)
+      assert_not_nil(Artist.search(other_names_like: "*aaa*").first)
+      assert_not_nil(Artist.search(other_names_like: "*ccc_ddd*").first)
+      assert_not_nil(Artist.search(name: "artist").first)
       assert_not_nil(Artist.search(:any_name_matches => "aaa").first)
+      assert_not_nil(Artist.search(:any_name_matches => "/a/").first)
     end
 
     should "search on group name and return matches" do
       cat_or_fish = FactoryBot.create(:artist, :name => "cat_or_fish")
       yuu = FactoryBot.create(:artist, :name => "yuu", :group_name => "cat_or_fish")
-      cat_or_fish.reload
-      assert_equal("yuu", cat_or_fish.member_names)
 
-      assert_not_nil(Artist.search(:group_name_matches => "cat_or_fish").first)
+      assert_equal("yuu", cat_or_fish.member_names)
+      assert_not_nil(Artist.search(:group_name => "cat_or_fish").first)
       assert_not_nil(Artist.search(:any_name_matches => "cat_or_fish").first)
+      assert_not_nil(Artist.search(:any_name_matches => "/cat/").first)
     end
 
     should "search on has_tag and return matches" do

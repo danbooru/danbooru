@@ -455,24 +455,6 @@ class Artist < ApplicationRecord
   end
 
   module SearchMethods
-    def other_names_match(string)
-      if string =~ /\*/ && CurrentUser.is_builder?
-        where("artists.other_names ILIKE ? ESCAPE E'\\\\'", string.to_escaped_for_sql_like)
-      else
-        where("artists.other_names_index @@ to_tsquery('danbooru', E?)", Artist.normalize_name(string).to_escaped_for_tsquery)
-      end
-    end
-
-    def group_name_matches(name)
-      stripped_name = normalize_name(name).to_escaped_for_sql_like
-      where("artists.group_name LIKE ? ESCAPE E'\\\\'", stripped_name)
-    end
-
-    def name_matches(name)
-      stripped_name = normalize_name(name).to_escaped_for_sql_like
-      where("artists.name LIKE ? ESCAPE E'\\\\'", stripped_name)
-    end
-
     def named(name)
       where(name: normalize_name(name))
     end
@@ -487,21 +469,12 @@ class Artist < ApplicationRecord
       end
     end
 
-
     def search(params)
       q = super
 
-      if params[:name_matches].present?
-        q = q.name_matches(params[:name_matches])
-      end
-
-      if params[:other_names_match].present?
-        q = q.other_names_match(params[:other_names_match])
-      end
-
-      if params[:group_name_matches].present?
-        q = q.group_name_matches(params[:group_name_matches])
-      end
+      q = q.search_text_attribute(:name, params)
+      q = q.search_text_attribute(:other_names, params)
+      q = q.search_text_attribute(:group_name, params)
 
       if params[:any_name_matches].present?
         q = q.any_name_matches(params[:any_name_matches])
