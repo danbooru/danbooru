@@ -233,7 +233,7 @@ class Artist < ApplicationRecord
     end
 
     def other_names_array
-      other_names.try(:split, /\s/)
+      other_names.try(:split, /[[:space:]]+/)
     end
 
     def other_names_comma

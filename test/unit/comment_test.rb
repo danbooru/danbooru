@@ -298,5 +298,10 @@ class CommentTest < ActiveSupport::TestCase
         end
       end
     end
+
+    context "during validation" do
+      subject { FactoryBot.build(:comment) }
+      should_not allow_value(" ").for(:body)
+    end
   end
 end

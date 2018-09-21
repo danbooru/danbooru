@@ -8,13 +8,8 @@ class Dmail < ApplicationRecord
 
   include Rakismet::Model
 
-  with_options on: :create do
-    validates_presence_of :to_id
-    validates_presence_of :from_id
-    validates_format_of :title, :with => /\S/
-    validates_format_of :body, :with => /\S/
-    validate :validate_sender_is_not_banned
-  end
+  validates_presence_of :title, :body, on: :create
+  validate :validate_sender_is_not_banned, on: :create
 
   belongs_to :owner, :class_name => "User"
   belongs_to :to, :class_name => "User"
@@ -217,7 +212,7 @@ class Dmail < ApplicationRecord
   extend SearchMethods
 
   def validate_sender_is_not_banned
-    if from.is_banned?
+    if from.try(:is_banned?)
       errors[:base] << "Sender is banned and cannot send messages"
       return false
     else

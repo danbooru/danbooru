@@ -51,7 +51,7 @@ class PostVersion < ApplicationRecord
   end
 
   def tag_array
-    @tag_array ||= tags.scan(/\S+/)
+    @tag_array ||= tags.split
   end
 
   def reload

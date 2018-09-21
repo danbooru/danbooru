@@ -88,7 +88,7 @@ class PostArchive < ApplicationRecord
   include ArchiveServiceMethods
 
   def tag_array
-    tags.scan(/\S+/)
+    tags.split
   end
 
   def presenter

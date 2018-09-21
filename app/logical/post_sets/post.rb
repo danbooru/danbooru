@@ -22,7 +22,7 @@ module PostSets
     end
 
     def unordered_tag_array
-      tag_array.reject{|tag| tag =~ /\Aorder:\S+/}
+      tag_array.reject {|tag| tag =~ /\Aorder:/i }
     end
 
     def has_wiki?
@@ -55,7 +55,7 @@ module PostSets
     end
 
     def pool_name
-      tag_string.match(/^(?:ord)?pool:(\S+)$/i).try(:[], 1)
+      @pool_name ||= Tag.has_metatag?(tag_array, :ordpool, :pool)
     end
 
     def has_pool?
@@ -67,7 +67,7 @@ module PostSets
     end
 
     def favgroup_name
-      tag_string.match(/^favgroup:(\S+)$/i).try(:[], 1)
+      @favgroup_name ||= Tag.has_metatag?(tag_array, :favgroup)
     end
 
     def has_favgroup?

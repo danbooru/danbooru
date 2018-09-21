@@ -47,6 +47,6 @@ class WikiPageVersion < ApplicationRecord
   end
 
   def other_names_array
-    other_names.to_s.scan(/\S+/)
+    other_names.to_s.split(/[[:space:]]+/)
   end
 end

@@ -48,11 +48,11 @@ class ArtistVersion < ApplicationRecord
   extend SearchMethods
 
   def url_array
-    url_string.to_s.scan(/\S+/)
+    url_string.to_s.split(/[[:space:]]+/)
   end
 
   def other_names_array
-    other_names.to_s.scan(/\S+/)
+    other_names.to_s.split(/[[:space:]]+/)
   end
 
   def urls_diff(version)

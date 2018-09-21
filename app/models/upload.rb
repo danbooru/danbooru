@@ -239,8 +239,8 @@ class Upload < ApplicationRecord
   end
 
   def assign_rating_from_tags
-    if tag_string =~ /(?:\s|^)rating:([qse])/i
-      self.rating = $1.downcase
+    if rating = Tag.has_metatag?(tag_string, :rating)
+      self.rating = rating.downcase
     end
   end
 

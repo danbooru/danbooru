@@ -18,6 +18,6 @@ class DmailFilter < ApplicationRecord
   end
 
   def regexp
-    @regexp ||= Regexp.compile('\b(?:' + words.scan(/\S+/).map {|x| Regexp.escape(x)}.join("|") + ')\b')
+    @regexp ||= /\b#{Regexp.union(words.split(/[[:space:]]+/))}\b/
   end
 end

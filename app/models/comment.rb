@@ -3,7 +3,7 @@ class Comment < ApplicationRecord
 
   validate :validate_post_exists, :on => :create
   validate :validate_creator_is_not_limited, :on => :create
-  validates_format_of :body, :with => /\S/, :message => 'has no content'
+  validates_presence_of :body, :message => "has no content"
   belongs_to :post
   belongs_to_creator
   belongs_to_updater

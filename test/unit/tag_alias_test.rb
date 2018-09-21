@@ -74,7 +74,7 @@ class TagAliasTest < ActiveSupport::TestCase
       ss = FactoryBot.create(:saved_search, :query => "123 ... 456", :user => CurrentUser.user)
       ta = FactoryBot.create(:tag_alias, :antecedent_name => "...", :consequent_name => "bbb")
       ss.reload
-      assert_equal(%w(123 456 bbb), ss.query.scan(/\S+/).sort)
+      assert_equal(%w(123 456 bbb), ss.query.split.sort)
     end
 
     should "update any affected posts when saved" do

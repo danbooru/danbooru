@@ -1,7 +1,1 @@
-<% CurrentUser.user.custom_style.to_s.split(/\r\n|\r|\n/).each do |line| %>
-  <% if line =~ /^@import/ %>
-    <%= raw(line) %>
-  <% else %>
-    <%= raw(line.gsub(/(\S)\s*(?:!important)?\s*(;|})/, "\\1 !important\\2")) %>
-  <% end %>
-<% end %>
+<%= raw CurrentUser.user.presenter.custom_css %>

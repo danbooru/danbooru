@@ -33,13 +33,13 @@ module GoogleBigQuery
       constraints << "updater_id = #{user_id.to_i}"
 
       if added_tags
-        added_tags.scan(/\S+/).each do |tag|
+        added_tags.split.each do |tag|
           constraints << add_tag_condition(tag)
         end
       end
 
       if removed_tags
-        removed_tags.scan(/\S+/).each do |tag|
+        removed_tags.split.each do |tag|
           constraints << remove_tag_condition(tag)
         end
       end

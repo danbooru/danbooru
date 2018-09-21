@@ -179,7 +179,7 @@ class Tag < ApplicationRecord
           while counts.empty? && n < 1000
             tag_strings = Post.select_values_sql("select tag_string from posts where created_at >= ?", n.hours.ago)
             tag_strings.each do |tag_string|
-              tag_string.scan(/\S+/).each do |tag|
+              tag_string.split.each do |tag|
                 counts[tag] ||= 0
                 counts[tag] += 1
               end

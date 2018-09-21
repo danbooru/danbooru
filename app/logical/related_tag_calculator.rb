@@ -27,7 +27,7 @@ class RelatedTagCalculator
     CurrentUser.without_safe_mode do
       Post.with_timeout(5_000, [], {:tags => tag}) do
         Post.tag_match(tag).limit(400).reorder("posts.md5").pluck(:tag_string).each do |tag_string|
-          tag_string.scan(/\S+/).each do |tag|
+          tag_string.split.each do |tag|
             counts[tag] += 1
           end
         end

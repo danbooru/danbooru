@@ -180,4 +180,14 @@ class UserPresenter
   def previous_names(template)
     user.user_name_change_requests.map { |req| template.link_to req.original_name, req }.join(", ").html_safe
   end
+
+  def custom_css
+    user.custom_style.to_s.split(/\r\n|\r|\n/).map do |line|
+      if line =~ /\A@import/
+        line
+      else
+        line.gsub(/([^[:space:]])[[:space:]]*(?:!important)?[[:space:]]*(;|})/, "\\1 !important\\2")
+      end
+    end.join("\n")
+  end
 end

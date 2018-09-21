@@ -108,7 +108,7 @@ class FavoriteGroup < ApplicationRecord
   end
 
   def self.normalize_name(name)
-    name.gsub(/\s+/, "_")
+    name.gsub(/[[:space:]]+/, "_")
   end
 
   def normalize_name

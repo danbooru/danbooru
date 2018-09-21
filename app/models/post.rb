@@ -970,7 +970,7 @@ class Post < ApplicationRecord
     end
 
     def clean_fav_string!
-      array = fav_string.scan(/\S+/).uniq
+      array = fav_string.split.uniq
       self.fav_string = array.join(" ")
       self.fav_count = array.size
       update_column(:fav_string, fav_string)
@@ -1113,7 +1113,7 @@ class Post < ApplicationRecord
     end
 
     def set_pool_category_pseudo_tags
-      self.pool_string = (pool_string.scan(/\S+/) - ["pool:series", "pool:collection"]).join(" ")
+      self.pool_string = (pool_string.split - ["pool:series", "pool:collection"]).join(" ")
 
       pool_categories = pools.undeleted.pluck(:category)
       if pool_categories.include?("series")
@@ -1157,7 +1157,7 @@ class Post < ApplicationRecord
     def fast_count(tags = "", options = {})
       tags = tags.to_s
       tags += " rating:s" if CurrentUser.safe_mode?
-      tags += " -status:deleted" if CurrentUser.hide_deleted_posts? && tags !~ /(?:^|\s)(?:-)?status:.+/
+      tags += " -status:deleted" if CurrentUser.hide_deleted_posts? && !Tag.has_metatag?(tags, "status", "-status")
       tags = Tag.normalize_query(tags)
 
       # optimize some cases. these are just estimates but at these
