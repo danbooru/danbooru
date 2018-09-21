@@ -1,4 +1,6 @@
 class DmailFilter < ApplicationRecord
+  extend Memoist
+
   belongs_to :user
   validates_presence_of :user
   before_validation :initialize_user
@@ -18,6 +20,9 @@ class DmailFilter < ApplicationRecord
   end
 
   def regexp
-    @regexp ||= /\b#{Regexp.union(words.split(/[[:space:]]+/))}\b/
+    union = words.split(/[[:space:]]+/).map { |word| Regexp.escape(word) }.join("|")
+    /\b#{union}\b/i
   end
+
+  memoize :regexp
 end
