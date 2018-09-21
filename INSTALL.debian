@@ -35,12 +35,29 @@ export GITHUB_INSTALL_SCRIPTS=https://raw.githubusercontent.com/r888888888/danbo
 echo "* Installing packages..."
 LIBSSL_DEV_PKG=$( verlt `lsb_release -sr` 9.0 && echo libssl-dev || echo libssl1.0-dev )
 apt-get update
-apt-get -y install build-essential automake $LIBSSL_DEV_PKG libxml2-dev libxslt-dev ncurses-dev sudo libreadline-dev flex bison ragel memcached libmemcached-dev git curl libcurl4-openssl-dev libvips-dev libvips-tools sendmail-bin sendmail postgresql postgresql-contrib libpq-dev postgresql-server-dev-all nginx ssh coreutils ffmpeg mkvtoolnix libvips42 libvips-tools libvips-dev 
+apt-get -y install build-essential automake $LIBSSL_DEV_PKG libxml2-dev libxslt-dev ncurses-dev sudo libreadline-dev flex bison ragel memcached libmemcached-dev git curl libcurl4-openssl-dev sendmail-bin sendmail postgresql postgresql-contrib libpq-dev nginx ssh coreutils ffmpeg mkvtoolnix
+apt-get -y install postgresql-server-dev-all
+apt-get -y install libjpeg-turbo8-dev libexpat1-dev libgif-dev libpng-dev libexif-dev
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+curl -sSL https://deb.nodesource.com/setup_10.x | sudo -E bash -
+apt-get update
+apt-get -y install nodejs yarn
+apt-get remove cmdtest
 
 if [ $? -ne 0 ]; then
   echo "* Error installing packages; aborting"
   exit 1
 fi
+
+# compile and install libvips (the version in apt is too old)
+cd /tmp
+wget -q https://github.com/libvips/libvips/releases/download/v$VIPS_VERSION/vips-$VIPS_VERSION.tar.gz
+tar xzf vips-$VIPS_VERSION.tar.gz
+cd vips-$VIPS_VERSION
+./configure --prefix=/usr
+make install
+ldconfig
 
 # Create user account
 useradd -m danbooru
@@ -58,7 +75,7 @@ fi
 
 # Install rbenv
 echo "* Installing rbenv..."
-cd /
+cd /tmp
 sudo -u danbooru git clone git://github.com/sstephenson/rbenv.git ~danbooru/.rbenv
 sudo -u danbooru touch ~danbooru/.bash_profile
 echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~danbooru/.bash_profile
