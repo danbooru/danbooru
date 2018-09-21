@@ -477,41 +477,19 @@ class Artist < ApplicationRecord
       where(name: normalize_name(name))
     end
 
-    def any_name_matches(name)
-      stripped_name = normalize_name(name).to_escaped_for_sql_like
-      if name =~ /\*/ && CurrentUser.is_builder?
-        where("(artists.name LIKE ? ESCAPE E'\\\\' OR artists.other_names LIKE ? ESCAPE E'\\\\')", stripped_name, stripped_name)
+    def any_name_matches(query)
+      if query =~ %r!\A/(.*)/\z!
+        where_regex(:name, $1).or(where_regex(:other_names, $1)).or(where_regex(:group_name, $1))
       else
-        name_for_tsquery = normalize_name(name).to_escaped_for_tsquery
-        where("(artists.name LIKE ? ESCAPE E'\\\\' OR artists.other_names_index @@ to_tsquery('danbooru', E?))", stripped_name, name_for_tsquery)
+        normalized_name = normalize_name(query)
+        normalized_name = "*#{normalized_name}*" unless normalized_name.include?("*")
+        where_like(:name, normalized_name).or(where_like(:other_names, normalized_name)).or(where_like(:group_name, normalized_name))
       end
     end
 
+
     def search(params)
       q = super
-
-      case params[:name]
-      when /^http/
-        q = q.url_matches(params[:name])
-
-      when /name:(.+)/
-        q = q.name_matches($1)
-
-      when /other:(.+)/
-        q = q.other_names_match($1)
-
-      when /group:(.+)/
-        q = q.group_name_matches($1)
-
-      when /status:banned/
-        q = q.banned
-
-      when /status:active/
-        q = q.unbanned.active
-
-      when /./
-        q = q.any_name_matches(params[:name])
-      end
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
@@ -542,11 +520,6 @@ class Artist < ApplicationRecord
 
       if params[:creator_id].present?
         q = q.where("artists.creator_id = ?", params[:creator_id].to_i)
-      end
-
-      # XXX deprecated, remove at some point.
-      if params[:empty_only].to_s.truthy?
-        params[:has_tag] = "false"
       end
 
       if params[:has_tag].to_s.truthy?

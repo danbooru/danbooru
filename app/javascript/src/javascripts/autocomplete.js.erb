@@ -182,7 +182,7 @@ Autocomplete.initialize_artist_autocomplete = function($fields) {
       $.ajax({
         url: "/artists.json",
         data: {
-          "search[name]": req.term + "*",
+          "search[name_like]": req.term.trim().replace(/\s+/g, "_") + "*",
           "search[is_active]": true,
           "search[order]": "post_count",
           "limit": 10,
