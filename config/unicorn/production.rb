@@ -1,15 +1,15 @@
 # Set your full path to application.
-app_path = "/var/www/danbooru2/current"
+app_path = "/var/www/danbooru/current"
 
 # Set unicorn options
-worker_processes 22
+worker_processes 8
 
 timeout 180
 #listen "127.0.0.1:9000", :tcp_nopush => true
 listen "/tmp/.unicorn.sock", :backlog => 512
 
 # Spawn unicorn master worker for user apps (group: apps)
-user 'albert', 'albert'
+user 'danbooru', 'danbooru'
 
 # Fill path to your app
 working_directory app_path
