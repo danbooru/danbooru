@@ -674,7 +674,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "throw an error" do
-          assert_raises(ActiveRecord::RecordNotUnique) do
+          assert_raises(UploadService::Replacer::Error) do
             as_user { @post2.replace!(replacement_url: @new_url) }
           end
         end

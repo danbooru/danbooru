@@ -1,6 +1,7 @@
 class UploadService
   class Replacer
     extend Memoist
+    class Error < Exception; end
 
     attr_reader :post, :replacement
 
@@ -86,12 +87,13 @@ class UploadService
         tag_string: replacement.tags,
         source: replacement.replacement_url,
         file: replacement.replacement_file,
+        replaced_post: post,
         original_post_id: post.id
       )
       upload = preprocessor.start!
-      return if upload.is_errored?
+      raise Error, upload.status if upload.is_errored?
       upload = preprocessor.finish!(upload)
-      return if upload.is_errored?
+      raise Error, upload.status if upload.is_errored?
       md5_changed = upload.md5 != post.md5
       
       replacement.replacement_url = find_replacement_url(replacement, upload)
