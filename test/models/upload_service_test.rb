@@ -108,9 +108,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       context "for an ugoira" do
         setup do
           @file = File.open("test/files/valid_ugoira.zip", "rb")
-          @upload = mock()
-          @upload.stubs(:is_video?).returns(false)
-          @upload.stubs(:is_ugoira?).returns(true)
+          @upload = Upload.new(file_ext: "zip")
         end
 
         teardown do
@@ -129,8 +127,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       context "for a video" do
         setup do
           @file = File.open("test/files/test-300x300.mp4", "rb")
-          @upload = mock()
-          @upload.stubs(:is_video?).returns(true)
+          @upload = Upload.new(file_ext: "mp4")
         end
 
         teardown do
@@ -148,9 +145,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       context "for an image" do 
         setup do
           @file = File.open("test/files/test.jpg", "rb")
-          @upload = mock()
-          @upload.stubs(:is_video?).returns(false)
-          @upload.stubs(:is_ugoira?).returns(false)
+          @upload = Upload.new(file_ext: "jpg")
         end
 
         teardown do
@@ -498,15 +493,9 @@ class UploadServiceTest < ActiveSupport::TestCase
       end
 
       context "for an invalid content type" do
-        setup do
-          @source = "http://www.example.com"
-          @service = subject.new(source: @source)
-        end
-
         should "fail" do
-          upload = @service.start!
-          upload.reload
-          assert_match(/error:/, upload.status)
+          upload = subject.new(source: "http://www.example.com").start!
+          assert_match(/\Aerror:.*File ext is invalid/, upload.status)
         end
       end
     end

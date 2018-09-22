@@ -66,9 +66,15 @@ class UploadService
         w, h = calculate_ugoira_dimensions(file.path)
         yield(w, h)
 
-      else
+      elsif upload.is_image? || upload.is_flash?
         image_size = ImageSpec.new(file.path)
         yield(image_size.width, image_size.height)
+
+      elsif upload.file_ext == "bin"
+        yield(0, 0)
+
+      else
+        raise ArgumentError, "unhandled file type (#{upload.file_ext})" # should not happen
       end
     end
 
@@ -141,6 +147,7 @@ class UploadService
         upload.image_height = height
       end
 
+      upload.validate!(:file)
       upload.tag_string = "#{upload.tag_string} #{Utils.automatic_tags(upload, file)}"
 
       preview_file, crop_file, sample_file = Utils.generate_resizes(file, upload)
