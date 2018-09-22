@@ -153,7 +153,7 @@ module Sources
       end
 
       def artists
-        Artist.url_matches(normalize_for_artist_finder)
+        Artist.find_artists(normalize_for_artist_finder)
       end
 
       def file_url

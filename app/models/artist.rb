@@ -147,7 +147,7 @@ class Artist < ApplicationRecord
         %r!\Ahttps?://(?:[a-zA-Z0-9_-]+\.)*#{domain}/\z!i
       end)
 
-      def url_matches(url)
+      def find_artists(url)
         url = ArtistUrl.normalize(url)
         artists = []
 
@@ -466,6 +466,18 @@ class Artist < ApplicationRecord
         normalized_name = normalize_name(query)
         normalized_name = "*#{normalized_name}*" unless normalized_name.include?("*")
         where_like(:name, normalized_name).or(where_like(:other_names, normalized_name)).or(where_like(:group_name, normalized_name))
+      end
+    end
+
+    def url_matches(query)
+      if query =~ %r!\A/(.*)/\z!
+        where(id: ArtistUrl.where_regex(:url, $1).select(:artist_id))
+      elsif query.include?("*")
+        where(id: ArtistUrl.where_like(:url, query).select(:artist_id))
+      elsif query =~ %r!\Ahttps?://!i
+        find_artists(query)
+      else
+        where(id: ArtistUrl.where_like(:url, "*#{query}*").select(:artist_id))
       end
     end
 
