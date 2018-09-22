@@ -28,6 +28,11 @@ module Sources
         assert_match(/^http:\/\/lohas\.nicoseiga\.jp\/priv\//, @site_2.image_url)
       end
 
+      should "get the canonical url" do
+        assert_match(%r!\Ahttps?://lohas\.nicoseiga\.jp/priv/\h{40}/\d+/4937663!, @site_1.canonical_url)
+        assert_match(%r!\Ahttps?://lohas\.nicoseiga\.jp/priv/\h{40}/\d+/4937663!, @site_2.canonical_url)
+      end
+
       should "get the tags" do
         assert(@site_1.tags.size > 0)
         first_tag = @site_1.tags.first
@@ -52,6 +57,7 @@ module Sources
 
         full_image_url = %r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/6844226!
         assert_match(full_image_url, site.image_url)
+        assert_match(full_image_url, site.canonical_url)
       end
     end
   end

@@ -70,6 +70,10 @@ module Sources
         return super
       end
 
+      def canonical_url
+        image_url
+      end
+
       def profile_url
         if url =~ PROFILE
           return url
