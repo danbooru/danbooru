@@ -2,6 +2,37 @@ require 'test_helper'
 
 module Sources
   class NijieTest < ActiveSupport::TestCase
+    context "downloading a 'http://nijie.info/view.php?id=:id' url" do
+      should "download the original file" do
+        @source = "http://nijie.info/view.php?id=213043"
+        @rewrite = "https://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg"
+        assert_rewritten(@rewrite, @source)
+        assert_downloaded(132_555, @source)
+      end
+    end
+
+    context "downloading a 'https://pic*.nijie.info/nijie_picture/:id.jpg' url" do
+      should "download the original file" do
+        @source = "https://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg"
+        assert_not_rewritten(@source)
+        assert_downloaded(132_555, @source)
+      end
+    end
+
+    context "downloading a 'https://pic*.nijie.info/__rs_*/nijie_picture/:id.jpg' preview url" do
+      should "download the original file" do
+        assert_rewritten(
+          "https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png",
+          "https://pic01.nijie.info/__rs_l120x120/nijie_picture/diff/main/218856_0_236014_20170620101329.png"
+        )
+
+        assert_rewritten(
+          "https://pic03.nijie.info/nijie_picture/236014_20170620101426_0.png",
+          "https://pic03.nijie.info/__rs_cns350x350/nijie_picture/236014_20170620101426_0.png"
+        )
+      end
+    end
+
     context "The source site for a nijie page" do
       setup do
         CurrentUser.user = FactoryBot.create(:user)

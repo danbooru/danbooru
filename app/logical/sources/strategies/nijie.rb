@@ -125,7 +125,7 @@ module Sources
       end
 
       def normalize_thumbnails(x)
-        x.gsub(%r!__rs_l120x120/!i, "")
+        x.gsub(%r!__rs_\w+/!i, "")
       end
 
       def illust_id
