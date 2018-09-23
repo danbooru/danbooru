@@ -30,11 +30,7 @@
     <% else %>
       <p>An error occurred: <%= render_status(@upload) %></p>
       <% if CurrentUser.user.is_builder? %>
-        <ul>
-          <% @upload.backtrace.to_s.split(/\n/).each do |line| %>
-            <li><%= line %></li>
-          <% end %>
-        </ul>
+        <%= render "static/backtrace", backtrace: @upload.backtrace.to_s.split(/\n/) %>
       <% end %>
     <% end %>
 

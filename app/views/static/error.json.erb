@@ -4,6 +4,6 @@
   {
     "success": false,
     "message": <%= raw @exception.to_s.encode("utf-8", {:invalid => :replace, :undef => :replace, :replace => "?"}).to_json %>,
-    "backtrace": <%= raw @exception.backtrace.to_json %>
+    "backtrace": <%= raw Rails.backtrace_cleaner.clean(@exception.backtrace).to_json %>
   }
 <% end %>

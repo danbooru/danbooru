@@ -1,0 +1,7 @@
+<%# backtrace %>
+
+<ul class="backtrace">
+  <% Rails.backtrace_cleaner.clean(backtrace).each do |b| %>
+    <li class="backtrace-line"><%= b %></li>
+  <% end %>
+</ul>
