@@ -79,15 +79,8 @@ module Sources
       end
 
       def profile_url
-        return url if url =~ PROFILE
-
-        links = page.search("a.name")
-
-        if links.any?
-          return "https://nijie.info/" + links[0]["href"]
-        end
-
-        return nil
+        return nil if artist_id.blank?
+        "https://nijie.info/members.php?id=#{artist_id}"
       end
 
       def artist_name
@@ -113,8 +106,7 @@ module Sources
       end
 
       def unique_id
-        profile_url =~ /nijie\.info\/members.php\?id=(\d+)/
-        "nijie" + $1.to_s
+        "nijie" + artist_id.to_s
       end
 
     public
@@ -130,6 +122,18 @@ module Sources
 
       def illust_id
         urls.map { |url| url[PAGE_URL, :illust_id] || url[IMAGE_URL, :illust_id] }.compact.first
+      end
+
+      def artist_id_from_url
+        urls.map { |url| url[IMAGE_URL, :artist_id] || url[PROFILE_URL, :artist_id] }.compact.first
+      end
+
+      def artist_id_from_page
+        page&.search("a.name")&.first&.attr("href")&.match(/members\.php\?id=(\d+)/) { $1.to_i }
+      end
+
+      def artist_id
+        artist_id_from_url || artist_id_from_page
       end
 
       def page
