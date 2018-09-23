@@ -168,6 +168,12 @@ class ArtistUrlTest < ActiveSupport::TestCase
 
       url = FactoryBot.create(:artist_url, url: "https://nijie.info/members.php?id=161703")
       assert_equal("http://nijie.info/members.php?id=161703/", url.normalized_url)
+
+      url = FactoryBot.create(:artist_url, url: "https://www.nijie.info/members_illust.php?id=161703")
+      assert_equal("http://nijie.info/members.php?id=161703/", url.normalized_url)
+
+      url = FactoryBot.create(:artist_url, url: "https://nijie.info/invalid.php")
+      assert_equal("http://nijie.info/invalid.php/", url.normalized_url)
     end
 
     context "#search method" do

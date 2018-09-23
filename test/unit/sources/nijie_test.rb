@@ -131,6 +131,62 @@ module Sources
         assert_equal(image_url, site.image_url)
         assert_equal(image_url, site.canonical_url)
         assert_equal("https://nijie.info/members.php?id=236014", site.profile_url)
+        assert_nothing_raised { site.to_h }
+      end
+    end
+
+    context "An image url that contains the illust id" do
+      should "fetch all the data" do
+        site = Sources::Strategies.find("https://pic03.nijie.info/nijie_picture/diff/main/218856_4_236014_20170620101333.png")
+
+        assert_equal("https://nijie.info/view.php?id=218856", site.page_url)
+        assert_equal("https://nijie.info/view.php?id=218856", site.canonical_url)
+        assert_equal("https://nijie.info/members.php?id=236014", site.profile_url)
+        assert_equal("名無しのチンポップ", site.artist_name)
+        assert_equal(site.url, site.image_url)
+        assert_equal(6, site.image_urls.size)
+      end
+    end
+
+    context "An artist profile url" do
+      should "not fail" do
+        site = Sources::Strategies.find("https://nijie.info/members_illust.php?id=236014")
+        assert_equal("https://nijie.info/members.php?id=236014", site.profile_url)
+        assert_nothing_raised { site.to_h }
+      end
+    end
+
+    context "An url that is invalid" do
+      should "not fail" do
+        site = Sources::Strategies.find("http://nijie.info/index.php")
+        assert_nothing_raised { site.to_h }
+      end
+    end
+
+    context "A deleted work" do
+      context "for an image url" do
+        should "find the profile url" do
+          site = Sources::Strategies.find("http://pic01.nijie.info/nijie_picture/diff/main/196201_20150201033106_0.jpg")
+
+          assert_nothing_raised { site.to_h }
+          assert_equal("https://nijie.info/members.php?id=196201", site.profile_url)
+        end
+      end
+
+      context "for a page url" do
+        should "not fail" do
+          site = Sources::Strategies.find("http://www.nijie.info/view_popup.php?id=212355")
+
+          assert_equal("https://nijie.info/view.php?id=212355", site.page_url)
+          assert_nil(site.profile_url)
+          assert_nil(site.artist_name)
+          assert_nil(site.artist_commentary_desc)
+          assert_nil(site.artist_commentary_title)
+          assert_nil(site.image_url)
+          assert_empty(site.image_urls)
+          assert_empty(site.tags)
+          assert_nothing_raised { site.to_h }
+        end
       end
     end
   end
