@@ -121,5 +121,17 @@ module Sources
         assert_equal(desc, @site.dtext_artist_commentary_desc)
       end
     end
+
+    context "The source site for a nijie image url without referer" do
+      should "get the correct urls" do
+        image_url = "https://pic03.nijie.info/nijie_picture/236014_20170620101426_0.png"
+        site = Sources::Strategies.find(image_url)
+
+        assert_nil(site.page_url)
+        assert_equal(image_url, site.image_url)
+        assert_equal(image_url, site.canonical_url)
+        assert_equal("https://nijie.info/members.php?id=236014", site.profile_url)
+      end
+    end
   end
 end
