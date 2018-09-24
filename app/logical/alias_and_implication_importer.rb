@@ -24,7 +24,7 @@ class AliasAndImplicationImporter
   end
 
   def self.tokenize(text)
-    text.split(/\r\n|\r|\n/).map do |line|
+    text.split(/\r\n|\r|\n/).reject(&:blank?).map do |line|
       line = line.gsub(/[[:space:]]+/, " ").strip
 
       if line =~ /^(?:create alias|aliasing|alias) (\S+) -> (\S+)$/i

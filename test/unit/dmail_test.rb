@@ -206,7 +206,7 @@ class DmailTest < ActiveSupport::TestCase
       should "fail gracefully if recipient doesn't exist" do
         assert_nothing_raised do
           dmail = Dmail.create_automated(to_name: "this_name_does_not_exist", title: "test", body: "test")
-          assert_equal(["can't be blank"], dmail.errors[:to_id])
+          assert_equal(["must exist"], dmail.errors[:to])
         end
       end
     end
