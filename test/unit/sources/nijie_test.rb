@@ -43,10 +43,17 @@ module Sources
 
       should "get the image url" do
         assert_equal("https://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
+        assert_http_size(132_555, @site.image_url)
       end
 
       should "get the canonical url" do
         assert_equal("https://nijie.info/view.php?id=213043", @site.canonical_url)
+      end
+
+      should "get the preview url" do
+        assert_equal("https://pic03.nijie.info/__rs_l170x170/nijie_picture/728995_20170505014820_0.jpg", @site.preview_url)
+        assert_equal([@site.preview_url], @site.preview_urls)
+        assert_http_exists(@site.preview_url)
       end
 
       should "get the profile" do
@@ -86,7 +93,12 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("http://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
+        assert_equal("https://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
+      end
+
+      should "get the preview urls" do
+        assert_equal("https://pic03.nijie.info/__rs_l170x170/nijie_picture/728995_20170505014820_0.jpg", @site.preview_url)
+        assert_equal([@site.preview_url], @site.preview_urls)
       end
 
       should "get the canonical url" do
@@ -109,6 +121,11 @@ module Sources
 
       should "get the image url" do
         assert_equal("https://pic03.nijie.info/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
+      end
+
+      should "get the preview urls" do
+        assert_equal("https://pic03.nijie.info/__rs_l170x170/nijie_picture/728995_20170505014820_0.jpg", @site.preview_url)
+        assert_equal([@site.preview_url], @site.preview_urls)
       end
 
       should "get the canonical url" do
@@ -163,6 +180,9 @@ module Sources
         assert_equal(image_url, site.canonical_url)
         assert_equal("https://nijie.info/members.php?id=236014", site.profile_url)
         assert_nothing_raised { site.to_h }
+
+        assert_http_size(3619, site.image_url)
+        assert_http_exists(site.preview_url)
       end
     end
 
@@ -176,6 +196,7 @@ module Sources
         assert_equal("名無しのチンポップ", site.artist_name)
         assert_equal(site.url, site.image_url)
         assert_equal(6, site.image_urls.size)
+        assert_equal(6, site.preview_urls.size)
       end
     end
 
@@ -197,10 +218,13 @@ module Sources
     context "A deleted work" do
       context "for an image url" do
         should "find the profile url" do
-          site = Sources::Strategies.find("http://pic01.nijie.info/nijie_picture/diff/main/196201_20150201033106_0.jpg")
+          site = Sources::Strategies.find("https://pic01.nijie.info/nijie_picture/diff/main/196201_20150201033106_0.jpg")
 
           assert_nothing_raised { site.to_h }
           assert_equal("https://nijie.info/members.php?id=196201", site.profile_url)
+          assert_equal(site.url, site.image_url)
+          assert_equal([site.url], site.image_urls)
+          assert_equal(1, site.preview_urls.size)
         end
       end
 
@@ -214,7 +238,9 @@ module Sources
           assert_nil(site.artist_commentary_desc)
           assert_nil(site.artist_commentary_title)
           assert_nil(site.image_url)
+          assert_nil(site.preview_url)
           assert_empty(site.image_urls)
+          assert_empty(site.preview_urls)
           assert_empty(site.tags)
           assert_nothing_raised { site.to_h }
         end

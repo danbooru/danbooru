@@ -19,6 +19,21 @@ module DownloadTestHelper
     assert_rewritten(source, source, referer)
   end
 
+  def assert_http_exists(url, headers: {})
+    res = HTTParty.head(url, Danbooru.config.httparty_options.deep_merge(headers: headers))
+    assert_equal(true, res.success?)
+  end
+
+  def assert_http_status(code, url, headers: {})
+    res = HTTParty.head(url, Danbooru.config.httparty_options.deep_merge(headers: headers))
+    assert_equal(code, res.code)
+  end
+
+  def assert_http_size(size, url, headers: {})
+    res = HTTParty.head(url, Danbooru.config.httparty_options.deep_merge(headers: headers))
+    assert_equal(size, res.content_length)
+  end
+
   def check_ffmpeg
     File.which("ffmpeg") && File.which("mkvmerge")
   end

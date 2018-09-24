@@ -62,15 +62,26 @@ module Sources
       end
 
       def image_url
-        return normalize_thumbnails(url) if url =~ IMAGE_URL
+        return to_full_image_url(url) if url.match?(IMAGE_URL)
         image_urls.first
       end
 
       def image_urls
-        images = page&.search("div#gallery a > img") || []
-        images.map do |img|
-          normalize_thumbnails("https:" + img.attr("src"))
-        end.uniq
+        images = page&.search("div#gallery a > img").to_a.map do |img|
+          "https:#{img["src"]}"
+        end
+
+        images = [url] if url.match?(IMAGE_URL) && images.empty?
+        images.map(&method(:to_full_image_url)).uniq
+      end
+
+      def preview_url
+        return nil if image_url.blank?
+        to_preview_url(image_url)
+      end
+
+      def preview_urls
+        image_urls.map(&method(:to_preview_url))
       end
 
       def page_url
@@ -116,8 +127,12 @@ module Sources
         DText.from_html(text).strip
       end
 
-      def normalize_thumbnails(x)
-        x.gsub(%r!__rs_\w+/!i, "")
+      def to_full_image_url(x)
+        x.gsub(%r!__rs_\w+/!i, "").gsub(/\Ahttp:/, "https:")
+      end
+
+      def to_preview_url(url)
+        url.gsub(/nijie_picture/, "__rs_l170x170/nijie_picture").gsub(/\Ahttp:/, "https:")
       end
 
       def illust_id
