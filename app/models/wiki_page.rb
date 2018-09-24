@@ -21,10 +21,6 @@ class WikiPage < ApplicationRecord
       where("title = ?", title.mb_chars.downcase.tr(" ", "_"))
     end
 
-    def title_in(titles)
-      where("title in (?)", titles.map{|x| x.mb_chars.downcase.tr(" ", "_")} )
-    end
-
     def active
       where("is_deleted = false")
     end
@@ -111,10 +107,6 @@ class WikiPage < ApplicationRecord
 
   extend SearchMethods
   include ApiMethods
-
-  def self.find_title_and_id(title)
-    titled(title).select("title, id").first
-  end
 
   def validate_not_locked
     if is_locked? && !CurrentUser.is_builder?
