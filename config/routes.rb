@@ -428,8 +428,6 @@ Rails.application.routes.draw do
   post "/static/accept_terms_of_service" => "static#accept_terms_of_service", :as => "accept_terms_of_service"
   get "/static/mrtg" => "static#mrtg", :as => "mrtg"
   get "/static/contact" => "static#contact", :as => "contact"
-  get "/static/benchmark" => "static#benchmark"
-  get "/static/name_change" => "static#name_change", :as => "name_change"
   get "/meta_searches/tags" => "meta_searches#tags", :as => "meta_searches_tags"
 
   get "/intro" => redirect("/explore/posts/intro")
