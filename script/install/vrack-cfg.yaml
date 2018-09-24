@@ -1,0 +1,9 @@
+network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eno2: {}
+  vlans:
+    vlan.99:
+      id: 99
+      link: eno2
