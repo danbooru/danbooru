@@ -1,12 +1,12 @@
 namespace :delayed_job do
   desc "Start delayed_job process"
   task :start do
-    on roles(:app) do
+    on roles(:worker) do
       if test("[ -d #{current_path} ]")
         within current_path do
           with rails_env: fetch(:rails_env) do
             hostname = capture("hostname").strip
-            execute :bundle, "exec", "script/delayed_job", "--queues=default,#{hostname}", "-n 2", "start"
+            execute :bundle, "exec", "script/delayed_job", "--queues=default,#{hostname}", "-n 8", "start"
           end
         end
       end
@@ -15,7 +15,7 @@ namespace :delayed_job do
 
   desc "Stop delayed_job process"
   task :stop do
-    on roles(:app) do
+    on roles(:worker) do
       if test("[ -d #{current_path} ]")
         within current_path do
           with rails_env: fetch(:rails_env) do
@@ -28,7 +28,7 @@ namespace :delayed_job do
 
   desc "Restart delayed_job process"
   task :restart do
-    on roles(:app) do
+    on roles(:worker) do
       find_and_execute_task("delayed_job:stop")
       find_and_execute_task("delayed_job:start")
     end
@@ -36,7 +36,7 @@ namespace :delayed_job do
 
   desc "Kill delayed_job process"
   task :kill do
-    on roles(:app) do
+    on roles(:worker) do
       procs = capture("ps -A -o pid,command").split(/\r\n|\r|\n/).grep(/delayed_job/).map(&:to_i)
 
       if procs.any?
