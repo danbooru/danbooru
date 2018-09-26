@@ -106,13 +106,13 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "find artists by image URL" do
-        get artists_path(name: "http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_m.jpg", format: "json")
+        get artists_path(search: { url_matches: "http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_m.jpg" }, format: "json")
         assert_artist_found("masao")
       end
 
       should "find artists by page URL" do
         url = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939"
-        get artists_path(name: url, format: "json")
+        get artists_path(search: { url_matches: url }, format: "json")
         assert_artist_found("masao")
       end
     end

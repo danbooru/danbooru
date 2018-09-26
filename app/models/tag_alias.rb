@@ -203,12 +203,9 @@ class TagAlias < TagRelationship
     end
 
     if antecedent_tag.category == Tag.categories.artist
-      antecedent_artist = Artist.name_matches(antecedent_name).first
-      if antecedent_artist.present? && Artist.name_matches(consequent_name).blank?
+      if antecedent_tag.artist.present? && consequent_tag.artist.blank?
         CurrentUser.scoped(creator, creator_ip_addr) do
-          antecedent_artist.update_attributes(
-            :name => consequent_name
-          )
+          antecedent_tag.artist.update!(name: consequent_name)
         end
       end
     end
