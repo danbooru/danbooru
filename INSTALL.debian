@@ -49,6 +49,10 @@ apt-get -y install libjpeg-turbo8-dev libexpat1-dev libgif-dev libpng-dev libexi
 apt-get -y install vlan
 modprobe 8021q
 echo "8021q" >> /etc/modules
+vconfig add eno2 99
+ip addr add $VLAN_IP_ADDR/24 dev eno2.99
+ip link set up eno2.99
+
 curl -L -s $GITHUB_INSTALL_SCRIPTS/vrack-cfg.yaml -o /etc/netplan/01-netcfg.yaml
 netplan apply
 
