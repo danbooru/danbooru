@@ -135,17 +135,19 @@
     </section>
   </div>
 
-  <div id="add-to-pool-dialog" title="Add to pool" style="display: none;">
-    <%= render "pool_elements/new" %>
-  </div>
+  <% if CurrentUser.is_member? %>
+    <div id="add-to-pool-dialog" title="Add to pool" style="display: none;">
+      <%= render "pool_elements/new" %>
+    </div>
 
-  <div id="add-commentary-dialog" title="Add artist commentary" style="display: none;">
-    <%= render "artist_commentaries/form", :post => @post %>
-  </div>
+    <div id="add-commentary-dialog" title="Add artist commentary" style="display: none;">
+      <%= render "artist_commentaries/form", :post => @post %>
+    </div>
 
-  <div id="add-to-favgroup-dialog" title="Add to favorite group" style="display: none;">
-    <%= render "favorite_groups/add_to_favgroup_dialog", :post => @post %>
-  </div>
+    <div id="add-to-favgroup-dialog" title="Add to favorite group" style="display: none;">
+      <%= render "favorite_groups/add_to_favgroup_dialog", :post => @post %>
+    </div>
+  <% end %>
 </div>
 
 <%= post_view_count_js %>
