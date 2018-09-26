@@ -1,8 +1,12 @@
-<%= format_text(WikiPage.titled(Danbooru.config.replacement_notice_wiki_page).first.try(&:body)) %>
+<div class="replace-image-dialog-body">
+  <div class="prose">
+    <%= format_text(WikiPage.titled(Danbooru.config.replacement_notice_wiki_page).first.try(&:body)) %>
+  </div>
 
-<%= simple_form_for(post_replacement, url: post_replacements_path(post_id: post_replacement.post_id), method: :post) do |f| %>
-  <%= f.input :replacement_file, label: "File", as: :file %>
-  <%= f.input :replacement_url, label: "Replacement URL", hint: "The source URL to download the replacement from.", as: :string, input_html: { value: post_replacement.post.normalized_source } %>
-  <%= f.input :final_source, label: "Final Source", hint: "If present, the source field will be changed to this after replacement.", as: :string, input_html: { value: post_replacement.post.source } %>
-  <%= f.input :tags, label: "Tags", as: :text, input_html: { value: post_replacement.suggested_tags_for_removal, data: { autocomplete: "tag-edit" } } %>
-<% end %>
+  <%= simple_form_for(post_replacement, url: post_replacements_path(post_id: post_replacement.post_id), method: :post) do |f| %>
+    <%= f.input :replacement_file, label: "File", as: :file %>
+    <%= f.input :replacement_url, label: "Replacement URL", hint: "The source URL to download the replacement from.", as: :string, input_html: { value: post_replacement.post.normalized_source } %>
+    <%= f.input :final_source, label: "Final Source", hint: "If present, the source field will be changed to this after replacement.", as: :string, input_html: { value: post_replacement.post.source } %>
+    <%= f.input :tags, label: "Tags", as: :string, input_html: { value: post_replacement.suggested_tags_for_removal, data: { autocomplete: "tag-edit" } } %>
+  <% end %>
+</div>

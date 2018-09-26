@@ -31,7 +31,6 @@ Post.initialize_all = function() {
     this.initialize_post_image_resize_links();
     this.initialize_post_image_resize_to_window_link();
     this.initialize_similar();
-    this.initialize_replace_image_dialog();
     this.initialize_gestures();
 
     if ((Utility.meta("always-resize-images") === "true") || (Utility.meta("viewport") && (window.screen.width <= 660))) {
@@ -615,32 +614,6 @@ Post.initialize_saved_searches = function() {
     e.preventDefault();
   });
 }
-
-Post.initialize_replace_image_dialog = function() {
-  $("#replace-image-dialog").dialog({
-    autoOpen: false,
-    width: 700,
-    modal: true,
-    buttons: {
-      "Submit": function() {
-        $("#replace-image-dialog form").submit();
-        $(this).dialog("close");
-      },
-      "Cancel": function() {
-        $(this).dialog("close");
-      }
-    }
-  });
-
-  $('#replace-image-dialog form').submit(function() {
-    $('#replace-image-dialog').dialog('close');
-  });
-
-  $("#replace-image").on("click.danbooru", function(e) {
-    e.preventDefault();
-    $("#replace-image-dialog").dialog("open");
-  });
-};
 
 $(document).ready(function() {
   Post.initialize_all();

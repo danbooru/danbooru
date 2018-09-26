@@ -3,7 +3,7 @@ class PostAppealsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def new
-    @post_appeal = PostAppeal.new
+    @post_appeal = PostAppeal.new(post_appeal_params)
     respond_with(@post_appeal)
   end
 

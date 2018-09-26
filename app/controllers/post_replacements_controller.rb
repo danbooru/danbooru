@@ -1,9 +1,10 @@
 class PostReplacementsController < ApplicationController
-  respond_to :html, :xml, :json
+  respond_to :html, :xml, :json, :js
   before_action :moderator_only, except: [:index]
 
   def new
-    @post = Post.find(params[:post_id])
+    @post_replacement = Post.find(params[:post_id]).replacements.new
+    respond_with(@post_replacement)
   end
 
   def create

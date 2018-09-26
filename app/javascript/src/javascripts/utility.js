@@ -36,6 +36,31 @@ Utility.error = function(msg) {
   }
 }
 
+Utility.dialog = function(title, html) {
+  const $dialog = $(html).dialog({
+    title: title,
+    width: 700,
+    modal: true,
+    close: function() {
+      // Defer removing the dialog to avoid detaching the <form> tag before the
+      // form is submitted (which would prevent the submission from going through).
+      $(() => $dialog.dialog("destroy"));
+    },
+    buttons: {
+      "Submit": function() {
+        $dialog.find("form").submit();
+      },
+      "Cancel": function() {
+        $dialog.dialog("close");
+      }
+    }
+  });
+
+  $dialog.find("form").on("submit.danbooru", function() {
+    $dialog.dialog("close");
+  });
+}
+
 Utility.keydown = function(keys, namespace, handler) {
   if (Utility.meta("enable-js-navigation") === "true") {
     $(document).on("keydown.danbooru." + namespace, null, keys, handler);

@@ -22,9 +22,9 @@
       <li><span id="status-locked-notice">Status locked</span></li>
     <% else %>
       <% if !post.is_deleted? && !post.is_pending? && !post.is_flagged? %>
-        <li><%= link_to "Flag", new_post_flag_path(:post_id => post.id), :id => "flag" %></li>
+        <li><%= link_to "Flag", new_post_flag_path(post_flag: { post_id: post.id }), id: "flag", remote: true %></li>
       <% elsif post.is_flagged? || post.is_deleted? %>
-        <li><%= link_to "Appeal", new_post_appeal_path(:post_id => post.id), :id => "appeal" %></li>
+        <li><%= link_to "Appeal", new_post_appeal_path(post_appeal: { post_id: post.id }), id: "appeal", remote: true %></li>
       <% end %>
 
       <% if CurrentUser.can_approve_posts? %>
@@ -53,7 +53,7 @@
         <% end %>
 
         <% if CurrentUser.is_moderator? %>
-          <li><%= link_to "Replace Image", new_post_replacement_path(:post_id => post.id), :id => "replace-image" %></li>
+          <li><%= link_to "Replace Image", new_post_replacement_path(post_id: post.id), id: "replace-image", remote: true %></li>
           <li><%= link_to "Down vote report", reports_down_voting_post_path(post_id: post.id) %></li>
         <% end %>
       <% end %>
