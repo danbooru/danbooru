@@ -29,8 +29,9 @@ if [[ -z "$HOSTNAME" ]] ; then
 fi
 
 export RUBY_VERSION=2.5.1
-export GITHUB_INSTALL_SCRIPTS=https://raw.githubusercontent.com/r888888888/danbooru/production2/script/install
+export GITHUB_INSTALL_SCRIPTS=https://raw.githubusercontent.com/r888888888/danbooru/master/script/install
 export VIPS_VERSION=8.7.0
+export VLAN_IP_ADDR=172.168.0.1
 
 # Install packages
 echo "* Installing packages..."
