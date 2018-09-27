@@ -5,7 +5,7 @@
     <label>Copy from</label>
     <%= select_tag :commentary_source_type, options_for_select(%w[Source Post]) %>
     <%= text_field_tag :commentary_source, post.source %>
-    <%= text_field_tag :commentary_post_id, (post.parent.try(&:id) || post.children.first.try(&:id)), :style => "display: none;" %>
+    <%= text_field_tag :commentary_post_id, post.parent_id, :style => "display: none;" %>
     <%= button_tag "Fetch" %>
   </div>
 </form>

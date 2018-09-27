@@ -135,29 +135,19 @@
     </section>
   </div>
 
-  <div id="flag-dialog" class="prose" title="Flag post" style="display: none;">
-    <%= render "post_flags/new", post_flag: @post.flags.new %>
-  </div>
+  <% if CurrentUser.is_member? %>
+    <div id="add-to-pool-dialog" title="Add to pool" style="display: none;">
+      <%= render "pool_elements/new" %>
+    </div>
 
-  <div id="appeal-dialog" class="prose" title="Appeal post" style="display: none;">
-    <%= render "post_appeals/new", post_appeal: @post.appeals.new %>
-  </div>
+    <div id="add-commentary-dialog" title="Add artist commentary" style="display: none;">
+      <%= render "artist_commentaries/form", :post => @post %>
+    </div>
 
-  <div id="replace-image-dialog" class="prose" title="Replace image" style="display: none;">
-    <%= render "post_replacements/new", post_replacement: @post.replacements.new %>
-  </div>
-
-  <div id="add-to-pool-dialog" title="Add to pool" style="display: none;">
-    <%= render "pool_elements/new" %>
-  </div>
-
-  <div id="add-commentary-dialog" title="Add artist commentary" style="display: none;">
-    <%= render "artist_commentaries/form", :post => @post %>
-  </div>
-
-  <div id="add-to-favgroup-dialog" title="Add to favorite group" style="display: none;">
-    <%= render "favorite_groups/add_to_favgroup_dialog", :post => @post %>
-  </div>
+    <div id="add-to-favgroup-dialog" title="Add to favorite group" style="display: none;">
+      <%= render "favorite_groups/add_to_favgroup_dialog", :post => @post %>
+    </div>
+  <% end %>
 </div>
 
 <%= post_view_count_js %>

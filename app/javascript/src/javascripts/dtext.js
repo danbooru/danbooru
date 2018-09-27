@@ -6,12 +6,11 @@ Dtext.initialize_all = function() {
 }
 
 Dtext.initialize_links = function() {
-  $(".simple_form input[value=Preview]").on("click.danbooru", Dtext.click_button);
+  $(document).on("click.danbooru", ".dtext-preview-button", Dtext.click_button);
 }
 
-Dtext.initialize_expandables = function($parent) {
-  $parent = $parent || $(document);
-  $parent.find(".expandable-button").on("click.danbooru", function(e) {
+Dtext.initialize_expandables = function() {
+  $(document).on("click.danbooru", ".expandable-button", function(e) {
     var button = $(this);
     button.parent().next().fadeToggle("fast");
     if (button.val() === "Show") {
@@ -34,7 +33,6 @@ Dtext.call_preview = function(e, $button, $input, $preview) {
     },
     success: function(data) {
       $preview.html(data).fadeIn("fast");
-      Dtext.initialize_expandables($preview);
     }
   });
 }

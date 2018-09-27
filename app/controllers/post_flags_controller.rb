@@ -3,7 +3,7 @@ class PostFlagsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def new
-    @post_flag = PostFlag.new
+    @post_flag = PostFlag.new(post_flag_params)
     respond_with(@post_flag)
   end
 

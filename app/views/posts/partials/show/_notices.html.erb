@@ -42,6 +42,7 @@
 
     <% if CurrentUser.can_approve_posts? && !post.disapproved_by?(CurrentUser.user) %>
       <%= render "moderator/post/queues/quick_mod", post: post %>
+      <%= render "post_disapprovals/detailed_rejection_dialog" %>
     <% end %>
   </div>
 <% end %>
@@ -73,5 +74,3 @@
     <span style="display: none;">Loading...</span>
   </div>
 <% end %>
-
-<%= render "post_disapprovals/detailed_rejection_dialog" %>

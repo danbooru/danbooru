@@ -1,9 +1,13 @@
-<%= format_text(WikiPage.titled(Danbooru.config.flag_notice_wiki_page).first.try(&:body)) %>
+<div class="flag-dialog-body">
+  <div class="prose">
+    <%= format_text(WikiPage.titled(Danbooru.config.flag_notice_wiki_page).first.try(&:body)) %>
+  </div>
 
-<%# XXX dtext_field expects there to be a `post_flag` instance variable. %>
-<% @post_flag = post_flag %>
-<%= simple_form_for(@post_flag, format: :js, remote: true) do |f| %>
-  <%= f.hidden_field :post_id %>
-  <%= dtext_field "post_flag", "reason", preview_id: "dtext-preview-for-post-flag", type: "string" %>
-  <%= dtext_preview_button "post_flag", "reason", preview_id: "dtext-preview-for-post-flag" %>
-<% end %>
+  <%# XXX dtext_field expects there to be a `post_flag` instance variable. %>
+  <% @post_flag = post_flag %>
+  <%= simple_form_for(@post_flag, format: :js, remote: true) do |f| %>
+    <%= f.hidden_field :post_id %>
+    <%= dtext_field "post_flag", "reason", preview_id: "dtext-preview-for-post-flag", type: "string" %>
+    <%= dtext_preview_button "post_flag", "reason", preview_id: "dtext-preview-for-post-flag" %>
+  <% end %>
+</div>
