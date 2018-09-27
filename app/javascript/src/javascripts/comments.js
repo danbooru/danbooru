@@ -11,7 +11,6 @@ Comment.initialize_all = function() {
 
   $(window).on("danbooru:index_for_post", (_event, post_id, current_comment_section) => {
     $("#threshold-comments-notice-for-" + post_id).hide();
-    Dtext.initialize_expandables(current_comment_section);
   });
 }
 
