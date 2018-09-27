@@ -85,8 +85,8 @@ module Sources
       end
 
       def page_url
-	return nil if illust_id.blank?
-	"https://nijie.info/view.php?id=#{illust_id}"
+        return nil if illust_id.blank?
+        "https://nijie.info/view.php?id=#{illust_id}"
       end
 
       def profile_url
