@@ -138,6 +138,7 @@ class TagTest < ActiveSupport::TestCase
       assert_equal([:lte, 2], Tag.parse_query("id:..2")[:post_id])
       assert_equal([:gt, 2], Tag.parse_query("id:>2")[:post_id])
       assert_equal([:lt, 3], Tag.parse_query("id:<3")[:post_id])
+      assert_equal([:lt, 3], Tag.parse_query("ID:<3")[:post_id])
 
       Tag.expects(:normalize_tags_in_query).returns(nil)
       assert_equal(["acb"], Tag.parse_query("a*b")[:tags][:include])
@@ -160,6 +161,7 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(false, Tag.is_simple_tag?("~foo"))
       assert_equal(false, Tag.is_simple_tag?("foo*"))
       assert_equal(false, Tag.is_simple_tag?("fav:1234"))
+      assert_equal(false, Tag.is_simple_tag?("FAV:1234"))
       assert_equal(false, Tag.is_simple_tag?("pool:1234"))
       assert_equal(false, Tag.is_simple_tag?('source:"foo bar baz"'))
       assert_equal(false, Tag.is_simple_tag?("foo bar"))
@@ -241,6 +243,7 @@ class TagTest < ActiveSupport::TestCase
       should_not allow_value("foo\abar").for(:name).on(:create)
       should_not allow_value("café").for(:name).on(:create)
       should_not allow_value("東方").for(:name).on(:create)
+      should_not allow_value("FAV:blah").for(:name).on(:create)
 
       metatags = Tag::METATAGS + TagCategory.mapping.keys
       metatags.each do |metatag|

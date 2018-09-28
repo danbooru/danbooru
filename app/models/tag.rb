@@ -438,7 +438,7 @@ class Tag < ApplicationRecord
     end
 
     def is_metatag?(tag)
-      tag.match?(/\A(#{Regexp.union(METATAGS)}):(.+)\z/i)
+      has_metatag?(tag, *METATAGS)
     end
 
     def is_negated_tag?(tag)
@@ -457,7 +457,7 @@ class Tag < ApplicationRecord
       return nil if tags.blank?
 
       tags = scan_query(tags.to_str) if tags.respond_to?(:to_str)
-      tags.grep(/\A#{Regexp.union(metatags.map(&:to_s))}:(.+)\z/i) { $1 }.first
+      tags.grep(/\A(?:#{metatags.map(&:to_s).join("|")}):(.+)\z/i) { $1 }.first
     end
 
     def parse_query(query, options = {})
@@ -474,7 +474,7 @@ class Tag < ApplicationRecord
       scan_query(query).each do |token|
         q[:tag_count] += 1 unless Danbooru.config.is_unlimited_tag?(token)
 
-        if token =~ /\A(#{Regexp.union(METATAGS)}):(.+)\z/i
+        if token =~ /\A(#{METATAGS.join("|")}):(.+)\z/i
           g1 = $1.downcase
           g2 = $2
           case g1
