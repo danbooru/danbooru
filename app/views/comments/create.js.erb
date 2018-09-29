@@ -1,1 +1,0 @@
-$("div.comments-for-post[data-post-id=<%= @comment.post_id %>] div.list-of-comments").append("<%= escape_javascript(render('comments/partials/show/comment', :comment => @comment)) %>");

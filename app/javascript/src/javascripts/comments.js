@@ -1,5 +1,3 @@
-import Dtext from './dtext'
-
 let Comment = {};
 
 Comment.initialize_all = function() {
@@ -8,10 +6,6 @@ Comment.initialize_all = function() {
     $(document).on("click.danbooru.comment", ".edit_comment_link", Comment.show_edit_form);
     $(document).on("click.danbooru.comment", ".expand-comment-response", Comment.show_new_comment_form);
   }
-
-  $(window).on("danbooru:index_for_post", (_event, post_id, current_comment_section) => {
-    $("#threshold-comments-notice-for-" + post_id).hide();
-  });
 }
 
 Comment.quote = function(e) {
