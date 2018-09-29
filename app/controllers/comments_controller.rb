@@ -106,6 +106,6 @@ private
     permitted_params += %i[is_deleted] if context == :update
     permitted_params += %i[is_sticky] if CurrentUser.is_moderator?
 
-    params.require(:comment).permit(permitted_params)
+    params.fetch(:comment, {}).permit(permitted_params)
   end
 end

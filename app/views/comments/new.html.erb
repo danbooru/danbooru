@@ -1,0 +1,13 @@
+<div id="c-comments">
+  <div id="a-new">
+    <h1>New Comment</h1>
+
+    <%= render "comments/form", comment: @comment %>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  New Comment - <%= Danbooru.config.app_name %>
+<% end %>

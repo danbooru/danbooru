@@ -27,7 +27,7 @@
 
   <% if CurrentUser.is_member? %>
     <div class="new-comment">
-      <p><%= link_to "Post comment", new_comment_path, :class => "expand-comment-response" %></p>
+      <p><%= link_to "Post comment", new_comment_path(comment: { post_id: post.id }), :class => "expand-comment-response" %></p>
       <%= render "comments/form", comment: post.comments.new, hidden: true %>
     </div>
   <% end %>
