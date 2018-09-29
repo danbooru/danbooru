@@ -1,5 +1,6 @@
 class CommentsController < ApplicationController
   respond_to :html, :xml, :json
+  respond_to :js, only: [:new, :destroy, :undelete]
   before_action :member_only, :except => [:index, :search, :show]
   skip_before_action :api_check
 
@@ -17,7 +18,9 @@ class CommentsController < ApplicationController
   end
 
   def new
-    redirect_to comments_path
+    @comment = Comment.new(comment_params(:create))
+    @comment.body = Comment.find(params[:id]).quoted_response if params[:id]
+    respond_with(@comment)
   end
 
   def update
@@ -45,25 +48,21 @@ class CommentsController < ApplicationController
 
   def show
     @comment = Comment.find(params[:id])
-    respond_with(@comment, methods: [:quoted_response])
+    respond_with(@comment)
   end
 
   def destroy
     @comment = Comment.find(params[:id])
     check_privilege(@comment)
     @comment.delete!
-    respond_with(@comment) do |format|
-      format.js
-    end
+    respond_with(@comment)
   end
 
   def undelete
     @comment = Comment.find(params[:id])
     check_privilege(@comment)
     @comment.undelete!
-    respond_with(@comment) do |format|
-      format.js
-    end
+    respond_with(@comment)
   end
 
 private

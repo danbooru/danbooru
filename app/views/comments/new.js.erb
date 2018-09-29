@@ -1,0 +1,11 @@
+var $div = $('div.comments-for-post[data-post-id="<%= @comment.post_id %>"] div.new-comment');
+$div.find(".expand-comment-response").click();
+
+var $textarea = $div.find("textarea");
+var msg = "<%= j @comment.body %>";
+if ($textarea.val().length > 0) {
+  msg = $textarea.val() + "\n\n" + msg;
+}
+
+$textarea.val(msg);
+$textarea.selectEnd();
