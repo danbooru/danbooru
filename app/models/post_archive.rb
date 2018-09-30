@@ -5,7 +5,7 @@ class PostArchive < ApplicationRecord
   belongs_to_updater counter_cache: "post_update_count"
 
   def self.enabled?
-    Danbooru.config.aws_sqs_archives_url.present?
+    Rails.env.test? || Danbooru.config.aws_sqs_archives_url.present?
   end
 
   establish_connection (ENV["ARCHIVE_DATABASE_URL"] || "archive_#{Rails.env}".to_sym) if enabled?
