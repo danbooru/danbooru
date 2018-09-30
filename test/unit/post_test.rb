@@ -954,16 +954,26 @@ class PostTest < ActiveSupport::TestCase
         end
 
         context "for a child" do
-          setup do
-            @child = FactoryBot.create(:post)
-          end
+          should "add and remove children" do
+            @children = FactoryBot.create_list(:post, 3, parent_id: nil)
 
-          should "update the parent relationships for both posts" do
-            @post.update_attributes(:tag_string => "aaa child:#{@child.id}")
-            @post.reload
-            @child.reload
-            assert_equal(@post.id, @child.parent_id)
-            assert(@post.has_children?)
+            @post.update(tag_string: "aaa child:#{@children.first.id}..#{@children.last.id}")
+            assert_equal(true, @post.reload.has_children?)
+            assert_equal(@post.id, @children[0].reload.parent_id)
+            assert_equal(@post.id, @children[1].reload.parent_id)
+            assert_equal(@post.id, @children[2].reload.parent_id)
+
+            @post.update(tag_string: "aaa -child:#{@children.first.id}")
+            assert_equal(true, @post.reload.has_children?)
+            assert_nil(@children[0].reload.parent_id)
+            assert_equal(@post.id, @children[1].reload.parent_id)
+            assert_equal(@post.id, @children[2].reload.parent_id)
+
+            @post.update(tag_string: "aaa child:none")
+            assert_equal(false, @post.reload.has_children?)
+            assert_nil(@children[0].reload.parent_id)
+            assert_nil(@children[1].reload.parent_id)
+            assert_nil(@children[2].reload.parent_id)
           end
         end
 

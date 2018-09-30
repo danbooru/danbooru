@@ -791,7 +791,7 @@ class Post < ApplicationRecord
     def filter_metatags(tags)
       @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent|-?locked):/i}
       tags = apply_categorization_metatags(tags)
-      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|-fav|child|-favgroup|favgroup|upvote|downvote):/i}
+      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|-fav|child|-child|-favgroup|favgroup|upvote|downvote):/i}
       apply_pre_metatags
       return tags
     end
@@ -841,10 +841,20 @@ class Post < ApplicationRecord
         when /^(up|down)vote:(.+)$/i
           vote!($1)
 
+        when /^child:none$/i
+          children.each do |post|
+            post.update!(parent_id: nil)
+          end
+
+        when /^-child:(.+)$/i
+          children.numeric_attribute_matches(:id, $1).each do |post|
+            post.update!(parent_id: nil)
+          end
+
         when /^child:(.+)$/i
-          child = Post.find($1)
-          child.parent_id = id
-          child.save
+          Post.numeric_attribute_matches(:id, $1).where.not(id: id).limit(10).each do |post|
+            post.update!(parent_id: id)
+          end
 
         when /^-favgroup:(\d+)$/i
           favgroup = FavoriteGroup.where("id = ?", $1.to_i).for_creator(CurrentUser.user.id).first
