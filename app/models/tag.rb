@@ -56,10 +56,6 @@ class Tag < ApplicationRecord
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def counts_for(tag_names)
-        select_all_sql("SELECT name, post_count FROM tags WHERE name IN (?)", tag_names)
-      end
-
       def highest_post_count
         Cache.get("highest-post-count", 4.hours) do
           select("post_count").order("post_count DESC").first.post_count

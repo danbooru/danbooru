@@ -5,7 +5,8 @@
 =end
 
 class TagSetPresenter < Presenter
-  attr_reader :tag_names, :tags
+  extend Memoist
+  attr_reader :tag_names
 
   def initialize(tag_names)
     @tag_names = tag_names
@@ -13,9 +14,10 @@ class TagSetPresenter < Presenter
 
   def tag_list_html(current_query: "", show_extra_links: false, name_only: false)
     html = ""
-    if tag_names.present?
+
+    if ordered_tags.present?
       html << '<ul itemscope itemtype="http://schema.org/ImageObject">'
-      tag_names.each do |tag|
+      ordered_tags.each do |tag|
         html << build_list_item(tag, current_query: current_query, show_extra_links: show_extra_links, name_only: name_only)
       end
       html << "</ul>"
@@ -28,7 +30,8 @@ class TagSetPresenter < Presenter
     html = ""
 
     category_list.each do |category|
-      typetags = typed_tags(category)
+      typetags = ordered_tags.select { |tag| tag.category == Tag.categories.value_for(category) }
+
       if typetags.any?
         html << TagCategory.header_mapping[category] if headers
         html << %{<ul class="#{category}-tag-list">}
@@ -50,60 +53,54 @@ class TagSetPresenter < Presenter
 
   private
 
-  def typed_tags(name)
-    @typed_tags ||= {}
-    @typed_tags[name] ||= begin
-      tag_names.select do |tag|
-        categories[tag] == TagCategory.mapping[name]
-      end
+  def tags
+    Tag.where(name: tag_names).select(:name, :post_count, :category)
+  end
+  memoize :tags
+
+  def ordered_tags
+    names_to_tags = tags.map { |tag| [tag.name, tag] }.to_h
+
+    tag_names.map do |name|
+      names_to_tags[name] || Tag.new(name: name).freeze
     end
   end
-
-  def categories
-    @categories ||= Tag.categories_for(tag_names)
-  end
-
-  def counts
-    @counts ||= Tag.counts_for(tag_names).inject({}) do |hash, x|
-      hash[x["name"]] = x["post_count"]
-      hash
-    end
-  end
+  memoize :ordered_tags
 
   def build_list_item(tag, name_only: false, humanize_tags: true, show_extra_links: false, current_query: "")
-    html = %{<li class="category-#{categories[tag]}">}
+    name = tag.name
+    count = tag.post_count
+    category = tag.category
+
+    html = %{<li class="category-#{tag.category}">}
 
     unless name_only
-      if categories[tag] == Tag.categories.artist
-        html << %{<a class="wiki-link" href="/artists/show_or_new?name=#{u(tag)}">?</a> }
+      if category == Tag.categories.artist
+        html << %{<a class="wiki-link" href="/artists/show_or_new?name=#{u(name)}">?</a> }
       else
-        html << %{<a class="wiki-link" href="/wiki_pages/show_or_new?title=#{u(tag)}">?</a> }
+        html << %{<a class="wiki-link" href="/wiki_pages/show_or_new?title=#{u(name)}">?</a> }
       end
 
       if show_extra_links && current_query.present?
-        html << %{<a rel="nofollow" href="/posts?tags=#{u(current_query)}+#{u(tag)}" class="search-inc-tag">+</a> }
-        html << %{<a rel="nofollow" href="/posts?tags=#{u(current_query)}+-#{u(tag)}" class="search-exl-tag">&ndash;</a> }
+        html << %{<a rel="nofollow" href="/posts?tags=#{u(current_query)}+#{u(name)}" class="search-inc-tag">+</a> }
+        html << %{<a rel="nofollow" href="/posts?tags=#{u(current_query)}+-#{u(name)}" class="search-exl-tag">&ndash;</a> }
       end
     end
 
-    humanized_tag = humanize_tags ? tag.tr("_", " ") : tag
-    if categories[tag] == Tag.categories.artist
-      itemprop = 'itemprop="author"'
-    else
-      itemprop = nil
-    end
-    html << %{<a class="search-tag" #{itemprop} href="/posts?tags=#{u(tag)}">#{h(humanized_tag)}</a> }
+    humanized_tag = humanize_tags ? name.tr("_", " ") : name
+    itemprop = 'itemprop="author"' if category == Tag.categories.artist
+    html << %{<a class="search-tag" #{itemprop} href="/posts?tags=#{u(name)}">#{h(humanized_tag)}</a> }
 
-    unless name_only
-      if counts[tag].to_i >= 10_000
-        post_count = "#{counts[tag].to_i / 1_000}k"
-      elsif counts[tag].to_i >= 1_000
-        post_count = "%.1fk" % (counts[tag].to_f / 1_000)
+    unless name_only || tag.new_record?
+      if count >= 10_000
+        post_count = "#{count / 1_000}k"
+      elsif count >= 1_000
+        post_count = "%.1fk" % (count / 1_000.0)
       else
-        post_count = counts[tag].to_s
+        post_count = count
       end
 
-      is_underused_tag = counts[tag].to_i <= 1 && categories[tag] == Tag.categories.general
+      is_underused_tag = count <= 1 && category == Tag.categories.general
       klass = "post-count#{is_underused_tag ? " low-post-count" : ""}"
       title = "New general tag detected. Check the spelling or populate it now."
 
