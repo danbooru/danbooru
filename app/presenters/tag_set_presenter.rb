@@ -8,6 +8,9 @@ class TagSetPresenter < Presenter
   extend Memoist
   attr_reader :tag_names
 
+  # @param [Array<String>] a list of tags to present. Tags will be presented in
+  # the order given. The list should not contain duplicates. The list may
+  # contain tags that do not exist in the tags table, such as metatags.
   def initialize(tag_names)
     @tag_names = tag_names
   end
@@ -30,7 +33,7 @@ class TagSetPresenter < Presenter
     html = ""
 
     category_list.each do |category|
-      typetags = ordered_tags.select { |tag| tag.category == Tag.categories.value_for(category) }
+      typetags = tags_for_category(category)
 
       if typetags.any?
         html << TagCategory.header_mapping[category] if headers
@@ -51,12 +54,27 @@ class TagSetPresenter < Presenter
     %{<span class="inline-tag-list">#{html}</span>}.html_safe
   end
 
+  # the list of tags inside the tag box in the post edit form.
+  def split_tag_list_text(category_list: TagCategory.categorized_list)
+    category_list.map do |category|
+      tags_for_category(category).map(&:name).join(" ")
+    end.join(" \n")
+  end
+
   private
 
   def tags
     Tag.where(name: tag_names).select(:name, :post_count, :category)
   end
-  memoize :tags
+
+  def tags_by_category
+    ordered_tags.group_by(&:category)
+  end
+
+  def tags_for_category(category_name)
+    category = TagCategory.mapping[category_name.downcase]
+    tags_by_category[category] || []
+  end
 
   def ordered_tags
     names_to_tags = tags.map { |tag| [tag.name, tag] }.to_h
@@ -65,7 +83,6 @@ class TagSetPresenter < Presenter
       names_to_tags[name] || Tag.new(name: name).freeze
     end
   end
-  memoize :ordered_tags
 
   def build_list_item(tag, name_only: false, humanize_tags: true, show_extra_links: false, current_query: "")
     name = tag.name
@@ -110,4 +127,6 @@ class TagSetPresenter < Presenter
     html << "</li>"
     html
   end
+
+  memoize :tags, :tags_by_category, :ordered_tags
 end
