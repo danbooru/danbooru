@@ -57,7 +57,7 @@
 
               <span class="info">
                 <strong>Tags</strong>
-                <%= TagSetPresenter.new(upload.tag_string.split).inline_tag_list_html(self) %>
+                <%= upload.presenter.inline_tag_list_html %>
               </span>
             </td>
             <td>

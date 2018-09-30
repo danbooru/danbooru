@@ -5,16 +5,18 @@
 =end
 
 class TagSetPresenter < Presenter
-  def initialize(tags)
-    @tags = tags
+  attr_reader :tag_names, :tags
+
+  def initialize(tag_names)
+    @tag_names = tag_names
   end
 
-  def tag_list_html(template, options = {})
+  def tag_list_html(current_query: "", show_extra_links: false, name_only: false)
     html = ""
-    if @tags.present?
+    if tag_names.present?
       html << '<ul itemscope itemtype="http://schema.org/ImageObject">'
-      @tags.each do |tag|
-        html << build_list_item(tag, template, options)
+      tag_names.each do |tag|
+        html << build_list_item(tag, current_query: current_query, show_extra_links: show_extra_links, name_only: name_only)
       end
       html << "</ul>"
     end
@@ -22,7 +24,7 @@ class TagSetPresenter < Presenter
     html.html_safe
   end
 
-  def split_tag_list_html(template, category_list: TagCategory.split_header_list, headers: true, **options)
+  def split_tag_list_html(headers: true, category_list: TagCategory.split_header_list, current_query: "", show_extra_links: false, name_only: false, humanize_tags: true)
     html = ""
 
     category_list.each do |category|
@@ -31,7 +33,7 @@ class TagSetPresenter < Presenter
         html << TagCategory.header_mapping[category] if headers
         html << %{<ul class="#{category}-tag-list">}
         typetags.each do |tag|
-          html << build_list_item(tag, template, **options)
+          html << build_list_item(tag, current_query: current_query, show_extra_links: show_extra_links, name_only: name_only, humanize_tags: humanize_tags)
         end
         html << "</ul>"
       end
@@ -41,9 +43,9 @@ class TagSetPresenter < Presenter
   end
 
   # compact (horizontal) list, as seen in the /comments index.
-  def inline_tag_list_html(template, classes: "inline-tag-list", **options)
-    html = split_tag_list_html(template, category_list: TagCategory.categorized_list, headers: false, name_only: true, humanize_tags: true, **options)
-    template.tag.span(html, class: classes)
+  def inline_tag_list_html(humanize_tags: true)
+    html = split_tag_list_html(category_list: TagCategory.categorized_list, headers: false, show_extra_links: false, name_only: true, humanize_tags: humanize_tags)
+    %{<span class="inline-tag-list">#{html}</span>}.html_safe
   end
 
   private
@@ -51,27 +53,25 @@ class TagSetPresenter < Presenter
   def typed_tags(name)
     @typed_tags ||= {}
     @typed_tags[name] ||= begin
-      @tags.select do |tag|
+      tag_names.select do |tag|
         categories[tag] == TagCategory.mapping[name]
       end
     end
   end
 
   def categories
-    @categories ||= Tag.categories_for(@tags)
+    @categories ||= Tag.categories_for(tag_names)
   end
 
   def counts
-    @counts ||= Tag.counts_for(@tags).inject({}) do |hash, x|
+    @counts ||= Tag.counts_for(tag_names).inject({}) do |hash, x|
       hash[x["name"]] = x["post_count"]
       hash
     end
   end
 
-  def build_list_item(tag, template, name_only: false, humanize_tags: true, show_extra_links: CurrentUser.is_gold?)
-    html = ""
-    html << %{<li class="category-#{categories[tag]}">}
-    current_query = template.params[:tags] || ""
+  def build_list_item(tag, name_only: false, humanize_tags: true, show_extra_links: false, current_query: "")
+    html = %{<li class="category-#{categories[tag]}">}
 
     unless name_only
       if categories[tag] == Tag.categories.artist

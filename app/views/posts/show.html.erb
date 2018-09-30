@@ -6,7 +6,7 @@
       <%= render "posts/partials/index/blacklist" %>
 
       <section id="tag-list">
-        <%= @post.presenter.split_tag_list_html(self) %>
+        <%= @post.presenter.split_tag_list_html(current_query: params[:tags], show_extra_links: CurrentUser.user.is_gold?) %>
       </section>
 
       <section id="post-information">
