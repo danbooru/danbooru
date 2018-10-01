@@ -1070,6 +1070,18 @@ class UploadServiceTest < ActiveSupport::TestCase
           service.start!
         end
       end
+
+      should "assign the rating from tags" do
+        service = subject.new(source: @source, tag_string: "rating:safe blah")
+        upload = service.start!
+
+        assert_equal(true, upload.valid?)
+        assert_equal("s", upload.rating)
+        assert_equal("rating:safe blah ", upload.tag_string)
+
+        assert_equal("s", upload.post.rating)
+        assert_equal("blah", upload.post.tag_string)
+      end
     end
   end
 

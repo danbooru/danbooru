@@ -245,7 +245,7 @@ class Upload < ApplicationRecord
 
   def assign_rating_from_tags
     if rating = Tag.has_metatag?(tag_string, :rating)
-      self.rating = rating.downcase
+      self.rating = rating.downcase.first
     end
   end
 
