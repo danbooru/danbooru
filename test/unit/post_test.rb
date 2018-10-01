@@ -2557,7 +2557,7 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "set the expiration time" do
-          Cache.expects(:put).with(Post.count_cache_key("aaa score:42"), 1, 1)
+          Cache.expects(:put).with(Post.count_cache_key("aaa score:42"), 1, 180)
           Post.fast_count("aaa score:42")
         end
       end

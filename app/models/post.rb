@@ -1267,7 +1267,7 @@ class Post < ApplicationRecord
     end
 
     def set_count_in_cache(tags, count, expiry = nil)
-      expiry ||= [count.seconds, 20.hours].min
+      expiry ||= count.seconds.clamp(3.minutes, 20.hours).to_i
 
       Cache.put(count_cache_key(tags), count, expiry)
     end
