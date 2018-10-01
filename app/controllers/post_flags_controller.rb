@@ -30,6 +30,6 @@ class PostFlagsController < ApplicationController
   private
 
   def post_flag_params
-    params.require(:post_flag).permit(%i[post_id reason])
+    params.fetch(:post_flag, {}).permit(%i[post_id reason])
   end
 end

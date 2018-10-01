@@ -118,7 +118,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     context "new action" do
       should "redirect" do
         get_auth new_comment_path, @user
-        assert_redirected_to comments_path
+        assert_response :success
       end
     end
 
