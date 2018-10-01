@@ -8,7 +8,7 @@
     <%= subnav_link_to "Help", wiki_pages_path(:search => {:title => "help:tags"}) %>
     <% if @tag %>
       <li>|</li>
-      <%= subnav_link_to "Posts (#{Post.fast_count(@tag.name)})", posts_path(:tags => @tag.name) %>
+      <%= subnav_link_to "Posts (#{@tag.post_count})", posts_path(:tags => @tag.name) %>
       <%= subnav_link_to "Edit", edit_tag_path(@tag) %>
       <% if @tag.post_count < 1_000 %>
         <%= subnav_link_to "Fix", new_tag_correction_path(:tag_id => @tag.id) %>

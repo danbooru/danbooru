@@ -8,7 +8,7 @@
     <%= subnav_link_to "URLs", artist_urls_path %>
     <% if @artist && !@artist.new_record? %>
       <li>|</li>
-      <%= subnav_link_to "Posts (#{Post.fast_count(@artist.name)})", posts_path(:tags => @artist.name) %>
+      <%= subnav_link_to "Posts (#{@artist.tag.try(:post_count).to_i})", posts_path(:tags => @artist.name) %>
       <%= subnav_link_to "Show", artist_path(@artist) %>
       <% if CurrentUser.is_member? %>
         <%= subnav_link_to "Edit", edit_artist_path(@artist), :"data-shortcut" => "e" %>
