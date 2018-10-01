@@ -1164,7 +1164,7 @@ class Post < ApplicationRecord
   end
 
   module CountMethods
-    def fast_count(tags = "", options = {})
+    def fast_count(tags = "", timeout: 1_000, raise_on_timeout: false)
       tags = tags.to_s
       tags += " rating:s" if CurrentUser.safe_mode?
       tags += " -status:deleted" if CurrentUser.hide_deleted_posts? && !Tag.has_metatag?(tags, "status", "-status")
@@ -1194,7 +1194,7 @@ class Post < ApplicationRecord
       count = get_count_from_cache(tags)
 
       if count.nil?
-        count = fast_count_search(tags, options)
+        count = fast_count_search(tags, timeout: timeout, raise_on_timeout: raise_on_timeout)
       end
 
       count
@@ -1202,18 +1202,14 @@ class Post < ApplicationRecord
       0
     end
 
-    def fast_count_search(tags, options = {})
-      count = PostReadOnly.with_timeout(3_000, nil, {:tags => tags}) do
+    def fast_count_search(tags, timeout:, raise_on_timeout:)
+      count = PostReadOnly.with_timeout(timeout, nil, tags: tags) do
         PostReadOnly.tag_match(tags).count
       end
 
       if count.nil?
-        count = fast_count_search_batched(tags, options)
-      end
-
-      if count.nil?
         # give up
-        if options[:raise_on_timeout]
+        if raise_on_timeout
           raise TimeoutError.new("timed out")
         end
 
@@ -1223,26 +1219,6 @@ class Post < ApplicationRecord
       end
 
       count ? count.to_i : nil
-    rescue PG::ConnectionBad
-      return nil
-    end
-
-    def fast_count_search_batched(tags, options)
-      # this is slower but less likely to timeout
-      i = Post.maximum(:id)
-      sum = 0
-      while i > 0
-        count = PostReadOnly.with_timeout(1_000, nil, {:tags => tags}) do
-          sum += PostReadOnly.tag_match(tags).where("id <= ? and id > ?", i, i - 25_000).count
-          i -= 25_000
-        end
-
-        if count.nil?
-          return nil
-        end
-      end
-      sum
-
     rescue PG::ConnectionBad
       return nil
     end
