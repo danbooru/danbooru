@@ -2555,6 +2555,11 @@ class PostTest < ActiveSupport::TestCase
         should "return the true count, if not cached" do
           assert_equal(1, Post.fast_count("aaa score:42"))
         end
+
+        should "set the expiration time" do
+          Cache.expects(:put).with(Post.count_cache_key("aaa score:42"), 1, 1)
+          Post.fast_count("aaa score:42")
+        end
       end
 
       context "a blank search" do
