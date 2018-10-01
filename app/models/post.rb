@@ -1208,10 +1208,6 @@ class Post < ApplicationRecord
       end
 
       if count.nil?
-        count = fast_count_search_batched(tags, options)
-      end
-
-      if count.nil?
         # give up
         if options[:raise_on_timeout]
           raise TimeoutError.new("timed out")
@@ -1223,26 +1219,6 @@ class Post < ApplicationRecord
       end
 
       count ? count.to_i : nil
-    rescue PG::ConnectionBad
-      return nil
-    end
-
-    def fast_count_search_batched(tags, options)
-      # this is slower but less likely to timeout
-      i = Post.maximum(:id)
-      sum = 0
-      while i > 0
-        count = PostReadOnly.with_timeout(1_000, nil, {:tags => tags}) do
-          sum += PostReadOnly.tag_match(tags).where("id <= ? and id > ?", i, i - 25_000).count
-          i -= 25_000
-        end
-
-        if count.nil?
-          return nil
-        end
-      end
-      sum
-
     rescue PG::ConnectionBad
       return nil
     end
