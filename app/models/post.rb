@@ -36,7 +36,6 @@ class Post < ApplicationRecord
   after_save :create_version
   after_save :update_parent_on_save
   after_save :apply_post_metatags
-  after_save :expire_essential_tag_string_cache
   after_commit :delete_files, :on => :destroy
   after_commit :remove_iqdb_async, :on => :destroy
   after_commit :update_iqdb_async, :on => :create
@@ -933,36 +932,6 @@ class Post < ApplicationRecord
         tag_array.select do |tag|
           tag_categories[tag] == TagCategory.mapping[name]
         end
-      end
-    end
-
-    def expire_essential_tag_string_cache
-      Cache.delete("hets-#{id}")
-    end
-
-    def humanized_essential_tag_string
-      @humanized_essential_tag_string ||= Cache.get("hets-#{id}", 1.hour.to_i) do
-        string = []
-
-        TagCategory.humanized_list.each do |category|
-          typetags = typed_tags(category) - TagCategory.humanized_mapping[category]["exclusion"]
-          if TagCategory.humanized_mapping[category]["slice"] > 0
-            typetags = typetags.slice(0,TagCategory.humanized_mapping[category]["slice"]) + (typetags.length > TagCategory.humanized_mapping[category]["slice"] ? ["others"] : [])
-          end
-          if TagCategory.humanized_mapping[category]["regexmap"] != //
-            typetags = typetags.map do |tag|
-              tag.match(TagCategory.humanized_mapping[category]["regexmap"])[1]
-            end
-          end
-          if typetags.any?
-            if category != "copyright" || typed_tags("character").any?
-              string << TagCategory.humanized_mapping[category]["formatstr"] % typetags.to_sentence
-            else
-              string << typetags.to_sentence
-            end
-          end
-        end
-        string.empty? ? "##{id}" : string.join(" ").tr("_", " ")
       end
     end
 

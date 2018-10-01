@@ -144,7 +144,7 @@ class PostPresenter < Presenter
   end
 
   def humanized_essential_tag_string
-    @post.humanized_essential_tag_string
+    @humanized_essential_tag_string ||= tag_set_presenter.humanized_essential_tag_string(default: "##{@post.id}")
   end
 
   def filename_for_download

@@ -115,7 +115,7 @@ class StorageManager
   def seo_tags(post)
     return "" if !tagged_filenames
 
-    tags = post.humanized_essential_tag_string.gsub(/[^a-z0-9]+/, "_").gsub(/(?:^_+)|(?:_+$)/, "").gsub(/_{2,}/, "_")
+    tags = post.presenter.humanized_essential_tag_string.gsub(/[^a-z0-9]+/, "_").gsub(/(?:^_+)|(?:_+$)/, "").gsub(/_{2,}/, "_")
     "__#{tags}__"
   end
 end
