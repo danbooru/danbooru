@@ -67,12 +67,8 @@ module PostSetPresenters
       SavedSearch.labels_for(CurrentUser.user.id).map {|x| "search:#{x}"}
     end
 
-    def tag_list_html(template, options = {})
-      if post_set.is_saved_search?
-        options[:name_only] = true
-      end
-      
-      tag_set_presenter.tag_list_html(template, options)
+    def tag_list_html(**options)
+      tag_set_presenter.tag_list_html(name_only: post_set.is_saved_search?, **options)
     end
   end
 end
