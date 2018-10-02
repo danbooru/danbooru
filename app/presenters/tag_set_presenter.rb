@@ -58,7 +58,7 @@ class TagSetPresenter < Presenter
   def split_tag_list_text(category_list: TagCategory.categorized_list)
     category_list.map do |category|
       tags_for_category(category).map(&:name).join(" ")
-    end.join(" \n")
+    end.reject(&:blank?).join(" \n")
   end
 
   def humanized_essential_tag_string(category_list: TagCategory.humanized_list, default: "")
