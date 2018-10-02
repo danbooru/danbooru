@@ -497,14 +497,14 @@ class Post < ApplicationRecord
       # https://yuno.yande.re/image/1764b95ae99e1562854791c232e3444b/yande.re%20281544%20cameltoe%20erect_nipples%20fundoshi%20horns%20loli%20miyama-zero%20sarashi%20sling_bikini%20swimsuits.jpg
       # https://files.yande.re/image/2a5d1d688f565cb08a69ecf4e35017ab/yande.re%20349790%20breast_hold%20kurashima_tomoyasu%20mahouka_koukou_no_rettousei%20naked%20nipples.jpg
       # https://files.yande.re/sample/0d79447ce2c89138146f64ba93633568/yande.re%20290757%20sample%20seifuku%20thighhighs%20tsukudani_norio.jpg
-      when %r{\Ahttps?://(?:ayase\.|yuno\.|files\.)?yande\.re/(?:sample|image)/[a-z0-9]{32}/yande\.re%20(?<post_id>[0-9]+)%20}i
+      when %r{\Ahttps?://(?:[^.]+\.)?yande\.re/(?:image|jpeg|sample)/\h{32}/yande\.re%20(?<post_id>\d+)}i
         "https://yande.re/post/show/#{$~[:post_id]}"
 
       # https://yande.re/jpeg/0c9ec0ffcaa40470093cb44c3fd40056/yande.re%2064649%20animal_ears%20cameltoe%20fixme%20nekomimi%20nipples%20ryohka%20school_swimsuit%20see_through%20shiraishi_nagomi%20suzuya%20swimsuits%20tail%20thighhighs.jpg
       # https://yande.re/jpeg/22577d2344fe694cf47f80563031b3cd.jpg
       # https://yande.re/image/b4b1d11facd1700544554e4805d47bb6/.png
       # https://yande.re/sample/ceb6a12e87945413a95b90fada406f91/.jpg
-      when %r{\Ahttps?://(?:ayase\.|yuno\.|files\.)?yande\.re/(?:image|jpeg|sample)/(?<md5>[a-z0-9]{32})(?:/yande\.re.*|/?\.(?:jpg|png))\Z}i
+      when %r{\Ahttps?://(?:[^.]+\.)?yande\.re/(?:image|jpeg|sample)/(?<md5>\h{32})(?:/yande\.re.*|/?\.(?:jpg|png))\z}i
         "https://yande.re/post?tags=md5:#{$~[:md5]}"
 
       # https://gfee_li.artstation.com/projects/XPGOD

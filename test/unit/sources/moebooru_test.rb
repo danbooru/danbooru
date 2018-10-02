@@ -82,5 +82,23 @@ module Sources
         end
       end
     end
+
+    context "Post#normalized_source" do
+      should "convert image urls to post urls" do
+        @post = FactoryBot.build(:post)
+
+        @post.source = "https://files.yande.re/image/b66909b940e8d77accab7c9b25aa4dc3/yande.re%20377828.png"
+        assert_equal("https://yande.re/post/show/377828", @post.normalized_source)
+
+        @post.source = "https://files.yande.re/image/2a5d1d688f565cb08a69ecf4e35017ab/yande.re%20349790%20breast_hold%20kurashima_tomoyasu%20mahouka_koukou_no_rettousei%20naked%20nipples.jpg"
+        assert_equal("https://yande.re/post/show/349790", @post.normalized_source)
+
+        @post.source = "https://yande.re/image/b4b1d11facd1700544554e4805d47bb6/.png"
+        assert_equal("https://yande.re/post?tags=md5:b4b1d11facd1700544554e4805d47bb6", @post.normalized_source)
+
+        @post.source = "https://yande.re/jpeg/22577d2344fe694cf47f80563031b3cd.jpg"
+        assert_equal("https://yande.re/post?tags=md5:22577d2344fe694cf47f80563031b3cd", @post.normalized_source)
+      end
+    end
   end
 end
