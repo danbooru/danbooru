@@ -2,7 +2,7 @@ var $div = $('div.comments-for-post[data-post-id="<%= @comment.post_id %>"] div.
 $div.find(".expand-comment-response").click();
 
 var $textarea = $div.find("textarea");
-var msg = "<%= j @comment.body %>";
+var msg = <%= raw @comment.body.to_json %>;
 if ($textarea.val().length > 0) {
   msg = $textarea.val() + "\n\n" + msg;
 }
