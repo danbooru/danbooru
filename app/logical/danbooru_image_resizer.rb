@@ -18,11 +18,7 @@ module DanbooruImageResizer
   end
 
   def self.crop(file, width, height, quality = 90)
-    if Vips.at_least_libvips?(8, 5)
-      crop_ruby(file, width, height, quality)
-    else
-      crop_shell(file, width, height, quality)
-    end    
+    crop_shell(file, width, height, quality)
   end
 
   # https://github.com/jcupitt/libvips/wiki/HOWTO----Image-shrinking
