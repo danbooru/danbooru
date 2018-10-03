@@ -141,14 +141,6 @@ class UserPresenter
     end
   end
 
-  def inviter(template)
-    if user.inviter_id
-      template.link_to_user(user.inviter)
-    else
-      "None"
-    end
-  end
-
   def appeal_count(template)
     template.link_to(user.appeal_count, template.post_appeals_path(:search => {:creator_name => user.name}))
   end

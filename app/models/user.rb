@@ -757,10 +757,6 @@ class User < ApplicationRecord
       where("lower(name) = ?", name)
     end
 
-    def name_matches(name)
-      where("lower(name) like ? escape E'\\\\'", name.to_escaped_for_sql_like)
-    end
-
     def admins
       where("level = ?", Levels::ADMIN)
     end
@@ -794,12 +790,15 @@ class User < ApplicationRecord
     def search(params)
       q = super
 
-      if params[:name].present?
-        q = q.name_matches(params[:name].mb_chars.downcase.strip.tr(" ", "_"))
-      end
+      params = params.dup
+      params[:name_matches] = params.delete(:name) if params[:name].present?
 
       if params[:name_matches].present?
-        q = q.name_matches(params[:name_matches].mb_chars.downcase.strip.tr(" ", "_"))
+        q = q.where_ilike(:name, normalize_name(params[:name_matches]))
+      end
+
+      if params[:inviter].present?
+        q = q.where(inviter_id: search(params[:inviter]))
       end
 
       if params[:min_level].present?
