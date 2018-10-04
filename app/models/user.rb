@@ -84,7 +84,6 @@ class User < ApplicationRecord
   before_create :encrypt_password_on_create
   before_update :encrypt_password_on_update
   after_save :update_cache
-  after_update :update_remote_cache
   before_create :promote_to_admin_if_first_user
   before_create :customize_new_user
   #after_create :notify_sock_puppets
@@ -171,16 +170,6 @@ class User < ApplicationRecord
     def update_cache
       Cache.put("uin:#{id}", name, 4.hours)
       Cache.put("uni:#{Cache.hash(name)}", id, 4.hours)
-    end
-
-    def update_remote_cache
-      if saved_change_to_name?
-        Danbooru.config.other_server_hosts.each do |server|
-          delay(queue: server).update_cache
-        end
-      end
-    rescue Exception
-      # swallow, since it'll be expired eventually anyway
     end
   end
 

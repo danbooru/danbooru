@@ -139,9 +139,6 @@ class Tag < ApplicationRecord
 
     def update_category_cache_for_all
       update_category_cache
-      Danbooru.config.other_server_hosts.each do |host|
-        delay(:queue => host).update_category_cache
-      end
       delay(:queue => "default", :priority => 10).update_category_post_counts
     end
 
