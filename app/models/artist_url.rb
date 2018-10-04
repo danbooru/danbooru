@@ -1,5 +1,4 @@
 class ArtistUrl < ApplicationRecord
-  before_validation :parse_prefix
   before_validation :initialize_normalized_url, on: :create
   before_validation :normalize
   validates :url, presence: true, uniqueness: { scope: :artist_id }
@@ -9,12 +8,11 @@ class ArtistUrl < ApplicationRecord
   scope :url_matches, ->(url) { url_attribute_matches(:url, url) }
   scope :normalized_url_matches, ->(url) { url_attribute_matches(:normalized_url, url) }
 
-  def self.strip_prefixes(url)
-    url.sub(/^[-]+/, "")
-  end
+  def self.parse_prefix(url)
+    prefix, url = url.match(/\A(-)?(.*)/)[1, 2]
+    is_active = prefix.nil?
 
-  def self.is_active?(url)
-    url !~ /^-/
+    [is_active, url]
   end
 
   def self.normalize(url)
@@ -88,14 +86,6 @@ class ArtistUrl < ApplicationRecord
     end
   end
 
-  def parse_prefix
-    case url
-    when /^-/
-      self.url = url[1..-1]
-      self.is_active = false
-    end
-  end
-
   def priority
     if normalized_url =~ /pixiv\.net\/member\.php/
       10
@@ -132,8 +122,8 @@ class ArtistUrl < ApplicationRecord
 
   def validate_url_format
     uri = Addressable::URI.parse(url)
-    errors[:url] << "#{uri} must begin with http:// or https://" if !uri.scheme.in?(%w[http https])
+    errors[:url] << "'#{uri}' must begin with http:// or https:// " if !uri.scheme.in?(%w[http https])
   rescue Addressable::URI::InvalidURIError => error
-    errors[:url] << "is malformed: #{error}"
+    errors[:url] << "'#{uri}' is malformed: #{error}"
   end
 end

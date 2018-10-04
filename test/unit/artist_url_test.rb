@@ -17,10 +17,17 @@ class ArtistUrlTest < ActiveSupport::TestCase
     end
 
     should "allow urls to be marked as inactive" do
-      url = FactoryBot.create(:artist_url, :url => "-http://monet.com")
+      url = FactoryBot.create(:artist_url, url: "http://monet.com", is_active: false)
       assert_equal("http://monet.com", url.url)
       assert_equal("http://monet.com/", url.normalized_url)
-      refute(url.is_active?)
+      assert_equal("-http://monet.com", url.to_s)
+    end
+
+    should "disallow invalid urls" do
+      url = FactoryBot.build(:artist_url, url: "www.example.com")
+
+      assert_equal(false, url.valid?)
+      assert_match(/must begin with http/, url.errors.full_messages.join)
     end
 
     should "always add a trailing slash when normalized" do

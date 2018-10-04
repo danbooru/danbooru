@@ -2,19 +2,17 @@ class Artist < ApplicationRecord
   extend Memoist
   class RevertError < Exception ; end
 
-  attribute :url_string, :string, default: nil
+  attr_accessor :url_string_was
+
   before_validation :normalize_name
   after_save :create_version
   after_save :categorize_tag
   after_save :update_wiki
-  after_save :save_urls
-  validates_associated :urls
   validates :name, tag_name: true, uniqueness: true
   validate :validate_wiki, :on => :create
-  after_validation :merge_validation_errors
   belongs_to_creator
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
-  has_many :urls, :dependent => :destroy, :class_name => "ArtistUrl"
+  has_many :urls, :dependent => :destroy, :class_name => "ArtistUrl", :autosave => true
   has_many :versions, -> {order("artist_versions.id ASC")}, :class_name => "ArtistVersion"
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :tag_alias, :foreign_key => "antecedent_name", :primary_key => "name"
@@ -175,18 +173,24 @@ class Artist < ApplicationRecord
     end
 
     def url_array
-      urls.map(&:url)
+      urls.map(&:to_s)
     end
 
-    def save_urls
-      if url_string && saved_change_to_url_string?
-        Artist.transaction do
-          self.urls.clear
-          self.urls = url_string.scan(/[^[:space:]]+/).uniq.map do |url|
-            self.urls.find_or_create_by(url: url)
-          end
-        end
-      end
+    def url_string
+      url_array.sort.join("\n")
+    end
+
+    def url_string=(string)
+      self.url_string_was = url_string
+
+      self.urls = string.to_s.scan(/[^[:space:]]+/).map do |url|
+        is_active, url = ArtistUrl.parse_prefix(url)
+        self.urls.find_or_initialize_by(url: url, is_active: is_active)
+      end.uniq(&:url)
+    end
+
+    def url_string_changed?
+      url_string_was != url_string
     end
 
     def map_domain(x)
@@ -253,7 +257,7 @@ class Artist < ApplicationRecord
 
   module VersionMethods
     def create_version(force=false)
-      if saved_change_to_name? || saved_change_to_url_string? || saved_change_to_is_active? || saved_change_to_is_banned? || saved_change_to_other_names? || saved_change_to_group_name? || saved_change_to_notes? || force
+      if saved_change_to_name? || url_string_changed? || saved_change_to_is_active? || saved_change_to_is_banned? || saved_change_to_other_names? || saved_change_to_group_name? || saved_change_to_notes? || force
         if merge_version?
           merge_version
         else
@@ -268,7 +272,7 @@ class Artist < ApplicationRecord
         :name => name,
         :updater_id => CurrentUser.id,
         :updater_ip_addr => CurrentUser.ip_addr,
-        :url_string => url_string || url_array.join("\n"),
+        :url_string => url_string,
         :is_active => is_active,
         :is_banned => is_banned,
         :other_names => other_names,
@@ -280,7 +284,7 @@ class Artist < ApplicationRecord
       prev = versions.last
       prev.update_attributes(
         :name => name,
-        :url_string => url_string || url_array.join("\n"),
+        :url_string => url_string,
         :is_active => is_active,
         :is_banned => is_banned,
         :other_names => other_names,
@@ -545,13 +549,6 @@ class Artist < ApplicationRecord
   include BanMethods
   extend SearchMethods
   include ApiMethods
-
-  def merge_validation_errors
-    errors[:urls].clear
-    urls.select(&:invalid?).each do |url|
-      errors[:url] << url.errors.full_messages.join("; ")
-    end
-  end
 
   def status
     if is_banned? && is_active?
