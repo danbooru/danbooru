@@ -1,6 +1,10 @@
 set :output, "/var/log/whenever.log"
 #env "MAILTO", "webmaster@danbooru.donmai.us"
 
+every 10.minutes do
+  runner "DailyMaintenance.new.hourly"
+end
+
 every 1.hour do
   runner "UploadErrorChecker.new.check!"
 end
@@ -14,7 +18,7 @@ every 1.day do
 end
 
 every 1.day, :at => "1:00 am" do
-  command "psql --set statement_timeout=0 -hdbserver -c \"vacuum analyze;\" danbooru2"
+  command "psql --set statement_timeout=0 -h inuyama -c \"vacuum analyze;\" danbooru2"
 end
 
 every 1.week, :at => "1:30 am" do

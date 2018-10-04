@@ -1,4 +1,18 @@
 class DailyMaintenance
+  def hourly
+    sm = Danbooru.config.storage_manager
+    Post.where("id >= ? and created_at > ?", 3275713, 10.minutes.ago).find_each do |post|
+      file_path = sm.file_path(post, post.file_ext, :original)
+      sm.store_file(File.open(file_path, "rb"), post, :original)
+      preview_path = sm.file_path(post, post.file_ext, :preview)
+      sm.store_file(File.open(preview_path, "rb"), post, :preview)
+      if post.has_large?
+        sample_path = sm.file_path(post, post.file_ext, :large)
+        sm.store_file(File.open(sample_path, "rb"), post, :large)
+      end
+    end
+  end
+
   def run
     ActiveRecord::Base.connection.execute("set statement_timeout = 0")
     PostPruner.new.prune!
