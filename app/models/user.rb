@@ -793,6 +793,14 @@ class User < ApplicationRecord
       params = params.dup
       params[:name_matches] = params.delete(:name) if params[:name].present?
 
+      q = q.search_text_attribute(:name, params)
+      q = q.attribute_matches(:level, params[:level])
+      q = q.attribute_matches(:inviter_id, params[:inviter_id])
+      q = q.attribute_matches(:post_upload_count, params[:post_upload_count])
+      q = q.attribute_matches(:post_update_count, params[:post_update_count])
+      q = q.attribute_matches(:note_update_count, params[:note_update_count])
+      q = q.attribute_matches(:favorite_count, params[:favorite_count])
+
       if params[:name_matches].present?
         q = q.where_ilike(:name, normalize_name(params[:name_matches]))
       end
@@ -807,10 +815,6 @@ class User < ApplicationRecord
 
       if params[:max_level].present?
         q = q.where("level <= ?", params[:max_level].to_i)
-      end
-
-      if params[:level].present?
-        q = q.where("level = ?", params[:level].to_i)
       end
 
       bitprefs_length = BOOLEAN_ATTRIBUTES.length
