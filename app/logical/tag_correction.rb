@@ -1,42 +1,21 @@
 class TagCorrection
-  attr_reader :tag_id, :tag, :hostname
+  include ActiveModel::Model
+  include ActiveModel::Serializers::JSON
+  include ActiveModel::Serializers::Xml
 
-  def initialize(tag_id, hostname = Socket.gethostname)
-    @tag_id = tag_id
+  attr_reader :tag
+  delegate :category, :post_count, :real_post_count, to: :tag
+
+  def initialize(tag_id)
     @tag = Tag.find(tag_id)
-    @hostname = hostname
   end
 
-  def to_json(options = {})
-    statistics_hash.to_json
+  def attributes
+    { post_count: post_count, real_post_count: real_post_count, category: category, category_cache: category_cache, tag: tag }
   end
 
-  def statistics_hash
-    @statistics_hash ||= {
-      "category_cache" => Cache.get("tc:" + Cache.hash(tag.name)),
-      "post_fast_count_cache" => Cache.get("pfc:" + Cache.hash(tag.name))
-    }
-  end
-
-  def fill_hash!
-    res = HTTParty.get("https://#{hostname}.#{Danbooru.config.domain}/tags/#{tag_id}/correction.json", Danbooru.config.httparty_options)
-    if res.success?
-      json = JSON.parse(res.body)
-      statistics_hash["category_cache"] = json["category_cache"]
-      statistics_hash["post_fast_count_cache"] = json["post_fast_count_cache"]
-    end
-  end
-
-  def each_server
-    Danbooru.config.all_server_hosts.each do |host|
-      other = TagCorrection.new(tag_id, host)
-
-      if host != Socket.gethostname
-        other.fill_hash!
-      end
-
-      yield other
-    end
+  def category_cache
+    Cache.get("tc:" + Cache.hash(tag.name))
   end
 
   def fix!

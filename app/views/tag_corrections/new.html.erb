@@ -2,18 +2,14 @@
   <div id="a-new">
     <h1>Fix Tag: <%= @correction.tag.name %></h1>
 
-    <% @correction.each_server do |server| %>
-      <div style="margin-bottom: 1em;">
-        <h2>Server: <%= server.hostname %></h2>
-        <ul>
-          <li><strong>category actual</strong>: <%= @correction.tag.category %></li>
-          <li><strong>category memcache</strong>: <%= server.statistics_hash["category_cache"] %></li>
-          <li><strong>post count memcache</strong>: <%= server.statistics_hash["post_fast_count_cache"] %></li>
-          <li><strong>post count db cache</strong>: <%= @correction.tag.post_count %></li>
-          <li><strong>post count actual:</strong> <%= @correction.tag.real_post_count %></li>
-        </ul>
-      </div>
-    <% end %>
+    <div style="margin-bottom: 1em;">
+      <ul>
+        <li><strong>category actual</strong>: <%= @correction.category %></li>
+        <li><strong>category memcache</strong>: <%= @correction.category_cache || "none" %></li>
+        <li><strong>post count db cache</strong>: <%= @correction.post_count %></li>
+        <li><strong>post count actual:</strong> <%= @correction.real_post_count %></li>
+      </ul>
+    </div>
 
     <%= form_tag(tag_correction_path(:tag_id => @correction.tag.id)) do %>
       <%= submit_tag "Fix" %>
