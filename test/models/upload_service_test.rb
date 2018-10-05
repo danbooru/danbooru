@@ -14,6 +14,14 @@ class UploadServiceTest < ActiveSupport::TestCase
     }
   }
 
+  setup do
+    Delayed::Worker.delay_jobs = true
+  end
+
+  teardown do
+    Delayed::Worker.delay_jobs = false
+  end
+
   context "::Utils" do
     subject { UploadService::Utils }
 
@@ -781,14 +789,6 @@ class UploadServiceTest < ActiveSupport::TestCase
       end
 
       context "a post with a pixiv html source" do
-        setup do
-          Delayed::Worker.delay_jobs = true
-        end
-
-        teardown do
-          Delayed::Worker.delay_jobs = false
-        end
-
         should "replace with the full size image" do
           begin
             as_user do
@@ -847,14 +847,6 @@ class UploadServiceTest < ActiveSupport::TestCase
       end
 
       context "a post that is replaced to another file then replaced back to the original file" do
-        setup do
-          Delayed::Worker.delay_jobs = true
-        end
-
-        teardown do
-          Delayed::Worker.delay_jobs = false
-        end
-
         should "not delete the original files" do
           begin
             FileUtils.expects(:rm_f).never
@@ -885,16 +877,10 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       context "two posts that have had their files swapped" do
         setup do
-          Delayed::Worker.delay_jobs = true
-
           as_user do
             @post1 = FactoryBot.create(:post)
             @post2 = FactoryBot.create(:post)
           end
-        end
-
-        teardown do
-          Delayed::Worker.delay_jobs = false
         end
 
         should "not delete the still active files" do
@@ -1016,11 +1002,6 @@ class UploadServiceTest < ActiveSupport::TestCase
     context "with a preprocessing predecessor" do
       setup do
         @predecessor = FactoryBot.create(:source_upload, status: "preprocessing", source: @source, image_height: 0, image_width: 0, file_ext: "jpg")
-        Delayed::Worker.delay_jobs = true
-      end
-
-      teardown do
-        Delayed::Worker.delay_jobs = false
       end
 
       should "schedule a job later" do
