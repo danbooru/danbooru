@@ -131,7 +131,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
     context "with an artist that has notes" do
       setup do
         as(@admin) do
-          @artist = create(:artist, name: "aaa", notes: "testing", url_string: "htttp://example.com")
+          @artist = create(:artist, name: "aaa", notes: "testing", url_string: "http://example.com")
         end
         @wiki_page = @artist.wiki_page
         @another_user = create(:user)
