@@ -493,15 +493,44 @@ class ArtistTest < ActiveSupport::TestCase
       assert_equal(Tag.categories.artist, tag.category)
     end
 
-    context "when updated" do
+    context "when saving" do
       setup do
-        @artist = FactoryBot.create(:artist)
+        @artist = FactoryBot.create(:artist, url_string: "http://foo.com")
         @artist.stubs(:merge_version?).returns(false)
       end
 
-      should "create a new version" do
+      should "create a new version when an url is added" do
         assert_difference("ArtistVersion.count") do
-          @artist.update(:url_string => "http://foo.com")
+          @artist.update(:url_string => "http://foo.com http://bar.com")
+          assert_equal(%w[http://bar.com http://foo.com], @artist.versions.last.url_array)
+        end
+      end
+
+      should "create a new version when an url is removed" do
+        assert_difference("ArtistVersion.count") do
+          @artist.update(:url_string => "")
+          assert_equal(%w[], @artist.versions.last.url_array)
+        end
+      end
+
+      should "create a new version when an url is marked inactive" do
+        assert_difference("ArtistVersion.count") do
+          @artist.update(:url_string => "-http://foo.com")
+          assert_equal(%w[-http://foo.com], @artist.versions.last.url_array)
+        end
+      end
+
+      should "not create a new version when nothing has changed" do
+        assert_no_difference("ArtistVersion.count") do
+          @artist.save
+          assert_equal(%w[http://foo.com], @artist.versions.last.url_array)
+        end
+      end
+
+      should "not save invalid urls" do
+        assert_no_difference("ArtistVersion.count") do
+          @artist.update(:url_string => "http://foo.com www.example.com")
+          assert_equal(%w[http://foo.com], @artist.versions.last.url_array)
         end
       end
     end

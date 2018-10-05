@@ -2,12 +2,13 @@ class Artist < ApplicationRecord
   extend Memoist
   class RevertError < Exception ; end
 
-  attr_accessor :url_string_was
+  attr_accessor :url_string_changed
 
   before_validation :normalize_name
   after_save :create_version
   after_save :categorize_tag
   after_save :update_wiki
+  after_save :clear_url_string_changed
   validates :name, tag_name: true, uniqueness: true
   validate :validate_wiki, :on => :create
   belongs_to_creator
@@ -181,16 +182,18 @@ class Artist < ApplicationRecord
     end
 
     def url_string=(string)
-      self.url_string_was = url_string
+      url_string_was = url_string
 
       self.urls = string.to_s.scan(/[^[:space:]]+/).map do |url|
         is_active, url = ArtistUrl.parse_prefix(url)
         self.urls.find_or_initialize_by(url: url, is_active: is_active)
       end.uniq(&:url)
+
+      self.url_string_changed = (url_string_was != url_string)
     end
 
-    def url_string_changed?
-      url_string_was != url_string
+    def clear_url_string_changed
+      self.url_string_changed = false
     end
 
     def map_domain(x)
@@ -257,7 +260,7 @@ class Artist < ApplicationRecord
 
   module VersionMethods
     def create_version(force=false)
-      if saved_change_to_name? || url_string_changed? || saved_change_to_is_active? || saved_change_to_is_banned? || saved_change_to_other_names? || saved_change_to_group_name? || saved_change_to_notes? || force
+      if saved_change_to_name? || url_string_changed || saved_change_to_is_active? || saved_change_to_is_banned? || saved_change_to_other_names? || saved_change_to_group_name? || saved_change_to_notes? || force
         if merge_version?
           merge_version
         else
