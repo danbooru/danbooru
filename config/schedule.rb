@@ -1,10 +1,6 @@
 set :output, "/var/log/whenever.log"
 #env "MAILTO", "webmaster@danbooru.donmai.us"
 
-every 10.minutes do
-  runner "DailyMaintenance.new.hourly"
-end
-
 every 1.hour do
   runner "UploadErrorChecker.new.check!"
 end

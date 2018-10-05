@@ -1,14 +1,20 @@
 class DailyMaintenance
   def hourly
     sm = Danbooru.config.storage_manager
-    Post.where("id >= ? and created_at > ?", 3275713, 10.minutes.ago).find_each do |post|
-      file_path = sm.file_path(post, post.file_ext, :original)
-      sm.store_file(File.open(file_path, "rb"), post, :original)
-      preview_path = sm.file_path(post, post.file_ext, :preview)
-      sm.store_file(File.open(preview_path, "rb"), post, :preview)
-      if post.has_large?
-        sample_path = sm.file_path(post, post.file_ext, :large)
-        sm.store_file(File.open(sample_path, "rb"), post, :large)
+    Post.where("id >= ? and created_at > ?", 3275713, 1.day.ago).find_each do |post|
+      if HTTParty.head("https://sonohara.donmai.us/data/#{post.md5}.#{post.file_ext}").code == 404
+        puts ["o", post.id, post.md5].inspect
+        UploadService::Utils.distribute_files File.open(sm.file_path(post, post.file_ext, :original), "rb"), post, :original
+      end
+
+      if post.has_preview? && HTTParty.head("https://sonohara.donmai.us/data/preview/#{post.md5}.jpg").code == 404
+        puts ["p", post.id, post.md5].inspect
+        UploadService::Utils.distribute_files File.open(sm.file_path(post, post.file_ext, :preview), "rb"), post, :preview
+      end
+
+      if post.has_large? && HTTParty.head("https://sonohara.donmai.us/data/sample/sample-#{post.md5}.jpg").code == 404
+        puts ["l", post.id, post.md5].inspect
+        UploadService::Utils.distribute_files File.open(sm.file_path(post, post.file_ext, :large), "rb"), post, :large
       end
     end
   end
