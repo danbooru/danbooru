@@ -2,13 +2,15 @@ require "test_helper"
 
 module Sources
   class MoebooruTest < ActiveSupport::TestCase
-    def assert_source_data_equals(url, referer = nil, site_name: nil, image_url: nil, page_url: nil, size: nil, tags: [])
+    def assert_source_data_equals(url, referer = nil, site_name: nil, image_url: nil, page_url: nil, preview_url: nil, size: nil, tags: [])
       site = Sources::Strategies.find(url)
 
       assert_equal(site_name, site.site_name)
       assert_equal(image_url, site.image_url)
       assert_equal([image_url], site.image_urls)
       assert_equal(image_url, site.canonical_url)
+      assert_equal(preview_url, site.preview_url)
+      assert_equal([preview_url], site.preview_urls)
       assert_equal(page_url, site.page_url) if page_url.present?
       assert_equal(tags.sort, site.tags.map(&:first).sort)
       assert_equal(size, site.size)
@@ -27,12 +29,13 @@ module Sources
 
       context "Fetching data for an active yande.re .jpg post" do
         should "work" do
+          @prev = "https://files.yande.re/data/preview/7e/cf/7ecfdead705d7b956b26b1d37b98d089.jpg"
           @samp = "https://files.yande.re/sample/7ecfdead705d7b956b26b1d37b98d089/yande.re%20482880%20sample%20bayashiko%20journey_to_the_west%20sun_wukong.jpg"
           @full = "https://files.yande.re/image/7ecfdead705d7b956b26b1d37b98d089/yande.re%20482880.jpg"
           @page = "https://yande.re/post/show/482880"
           @tags = ["bayashiko", "journey to the west", "sun wukong"]
           @size = 362_554
-          @data = { site_name: "yande.re", image_url: @full, page_url: @page, size: @size, tags: @tags}
+          @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags}
 
           assert_source_data_equals(@samp, @data)
           assert_source_data_equals(@full, @data)
@@ -42,13 +45,14 @@ module Sources
 
       context "Fetching data for a deleted yande.re .png post with the post id" do
         should "work" do
+          @prev = "https://files.yande.re/data/preview/fb/27/fb27a7ea6c48b2ef76fe915e378b9098.jpg"
           @samp = "https://files.yande.re/sample/fb27a7ea6c48b2ef76fe915e378b9098/yande.re%20398018%20detexted%20misaki_kurehito%20saenai_heroine_no_sodatekata%20sawamura_spencer_eriri%20thighhighs.jpg"
           @jpeg = "https://files.yande.re/sample/fb27a7ea6c48b2ef76fe915e378b9098/yande.re%20398018%20detexted%20misaki_kurehito%20saenai_heroine_no_sodatekata%20sawamura_spencer_eriri%20thighhighs.jpg"
           @full = "https://files.yande.re/image/fb27a7ea6c48b2ef76fe915e378b9098/yande.re%20398018.png"
           @page = "https://yande.re/post/show/398018"
           @tags = ["misaki kurehito", "saenai heroine no sodatekata", "sawamura spencer eriri", "detexted", "thighhighs"]
           @size = 9_118_998
-          @data = { site_name: "yande.re", image_url: @full, page_url: @page, size: @size, tags: @tags}
+          @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags}
 
           assert_source_data_equals(@samp, @data)
           assert_source_data_equals(@jpeg, @data)
@@ -59,12 +63,13 @@ module Sources
 
       context "Fetching data for a deleted yande.re .png post without the post id" do
         should "work" do
+          @prev = "https://files.yande.re/data/preview/fb/27/fb27a7ea6c48b2ef76fe915e378b9098.jpg"
           @samp = "https://files.yande.re/sample/fb27a7ea6c48b2ef76fe915e378b9098.jpg"
           @jpeg = "https://files.yande.re/jpeg/fb27a7ea6c48b2ef76fe915e378b9098.jpg"
           @full = "https://files.yande.re/image/fb27a7ea6c48b2ef76fe915e378b9098.png"
           @tags = []
           @size = 9_118_998
-          @data = { site_name: "yande.re", image_url: @full, page_url: @page, size: @size, tags: @tags}
+          @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags}
 
           assert_source_data_equals(@samp, @data)
           assert_source_data_equals(@jpeg, @data)
@@ -76,6 +81,7 @@ module Sources
     context "Konachan.com:" do
       context "Fetching data for an active konachan.com .png post" do
         should "work" do
+          @prev = "https://konachan.com/data/preview/ca/12/ca12cdb79a66d242e95a6f958341bf05.jpg"
           @samp = "https://konachan.com/sample/ca12cdb79a66d242e95a6f958341bf05/Konachan.com%20-%20270916%20sample.jpg"
           @jpeg = "https://konachan.com/jpeg/ca12cdb79a66d242e95a6f958341bf05/Konachan.com%20-%20270916%20anthropomorphism%20bed%20blonde_hair%20bow%20brown_eyes%20doll%20girls_frontline%20hara_shoutarou%20hoodie%20long_hair%20pantyhose%20scar%20skirt%20twintails.jpg"
           @full = "https://konachan.com/image/ca12cdb79a66d242e95a6f958341bf05/Konachan.com%20-%20270916.png"
@@ -87,7 +93,7 @@ module Sources
             twintails ump-45_(girls_frontline) ump-9_(girls_frontline)
           ].map { |tag| tag.tr("_", " ") }
 
-          @data = { site_name: "konachan.com", image_url: @full, page_url: @page, size: @size, tags: @tags}
+          @data = { site_name: "konachan.com", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags}
           assert_source_data_equals(@samp, @data)
           assert_source_data_equals(@jpeg, @data)
           assert_source_data_equals(@full, @data)
