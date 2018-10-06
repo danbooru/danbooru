@@ -2,7 +2,7 @@ require "test_helper"
 
 module Sources
   class MoebooruTest < ActiveSupport::TestCase
-    def assert_source_data_equals(url, referer = nil, site_name: nil, image_url: nil, page_url: nil, preview_url: nil, size: nil, tags: [])
+    def assert_source_data_equals(url, referer = nil, site_name: nil, image_url: nil, page_url: nil, preview_url: nil, size: nil, tags: [], profile_url: nil)
       site = Sources::Strategies.find(url)
 
       assert_equal(site_name, site.site_name)
@@ -13,6 +13,7 @@ module Sources
       assert_equal([preview_url], site.preview_urls)
       assert_equal(page_url, site.page_url) if page_url.present?
       assert_equal(tags.sort, site.tags.map(&:first).sort)
+      assert_equal(profile_url.to_s, site.profile_url.to_s)
       assert_equal(size, site.size)
       assert_nothing_raised { site.to_h }
     end
@@ -35,7 +36,8 @@ module Sources
           @page = "https://yande.re/post/show/482880"
           @tags = ["bayashiko", "journey to the west", "sun wukong"]
           @size = 362_554
-          @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags}
+          @profile_url = "https://twitter.com/apononori"
+          @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: @profile_url }
 
           assert_source_data_equals(@samp, @data)
           assert_source_data_equals(@full, @data)
@@ -52,7 +54,7 @@ module Sources
           @page = "https://yande.re/post/show/398018"
           @tags = ["misaki kurehito", "saenai heroine no sodatekata", "sawamura spencer eriri", "detexted", "thighhighs"]
           @size = 9_118_998
-          @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags}
+          @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: nil }
 
           assert_source_data_equals(@samp, @data)
           assert_source_data_equals(@jpeg, @data)
@@ -69,7 +71,7 @@ module Sources
           @full = "https://files.yande.re/image/fb27a7ea6c48b2ef76fe915e378b9098.png"
           @tags = []
           @size = 9_118_998
-          @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags}
+          @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: nil }
 
           assert_source_data_equals(@samp, @data)
           assert_source_data_equals(@jpeg, @data)
@@ -92,8 +94,9 @@ module Sources
             girls_frontline hara_shoutarou hoodie long_hair pantyhose scar skirt
             twintails ump-45_(girls_frontline) ump-9_(girls_frontline)
           ].map { |tag| tag.tr("_", " ") }
+          @profile_url = "https://www.pixiv.net/member.php?id=22528152"
 
-          @data = { site_name: "konachan.com", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags}
+          @data = { site_name: "konachan.com", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: @profile_url }
           assert_source_data_equals(@samp, @data)
           assert_source_data_equals(@jpeg, @data)
           assert_source_data_equals(@full, @data)

@@ -36,6 +36,8 @@ module Sources
       URL_SLUG = %r!/(?:yande\.re%20|Konachan\.com%20-%20)(?<id>\d+).*!i
       IMAGE_URL = %r!#{BASE_URL}/(?<type>image|jpeg|sample)/(?<md5>\h{32})#{URL_SLUG}?\.(?<ext>jpg|jpeg|png|gif)\z!i
 
+      delegate :artist_name, :profile_url, :unique_id, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_strategy, allow_nil: true
+
       def self.match?(*urls)
         urls.compact.any? { |x| x.match?(BASE_URL) }
       end
@@ -73,14 +75,6 @@ module Sources
         image_url
       end
 
-      def profile_url
-        nil
-      end
-
-      def artist_name
-        nil
-      end
-
       def tags
         api_response[:tags].to_s.split.map do |tag|
           [tag.tr("_", " "), "https://#{site_name}/post?tags=#{CGI.escape(tag)}"]
@@ -109,6 +103,10 @@ module Sources
       memoize :api_response
 
       concerning :HelperMethods do
+        def sub_strategy
+          @sub_strategy ||= Sources::Strategies.find(api_response[:source], default: nil)
+        end
+
         def file_host
           case site_name
           when "yande.re" then "files.yande.re"

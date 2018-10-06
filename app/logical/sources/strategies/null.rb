@@ -1,10 +1,6 @@
 module Sources
   module Strategies
     class Null < Base
-      def self.match?(*urls)
-        true
-      end
-
       def image_urls
         [url]
       end
