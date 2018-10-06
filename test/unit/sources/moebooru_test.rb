@@ -97,7 +97,7 @@ module Sources
     end
 
     context "Post#normalized_source" do
-      should "convert image urls to post urls" do
+      should "convert yande.re image urls to post urls" do
         @post = FactoryBot.build(:post)
 
         @post.source = "https://files.yande.re/image/b66909b940e8d77accab7c9b25aa4dc3/yande.re%20377828.png"
@@ -111,6 +111,19 @@ module Sources
 
         @post.source = "https://yande.re/jpeg/22577d2344fe694cf47f80563031b3cd.jpg"
         assert_equal("https://yande.re/post?tags=md5:22577d2344fe694cf47f80563031b3cd", @post.normalized_source)
+      end
+
+      should "convert konachan.com image urls to post urls" do
+        @post = FactoryBot.build(:post)
+
+        @post.source = "https://konachan.com/image/5d633771614e4bf5c17df19a0f0f333f/Konachan.com%20-%20270807%20black_hair%20bokuden%20clouds%20grass%20landscape%20long_hair%20original%20phone%20rope%20scenic%20seifuku%20skirt%20sky%20summer%20torii%20tree.jpg"
+        assert_equal("https://konachan.com/post/show/270807", @post.normalized_source)
+
+        @post.source = "https://konachan.com/sample/e2e2994bae738ff52fff7f4f50b069d5/Konachan.com%20-%20270803%20sample.jpg"
+        assert_equal("https://konachan.com/post/show/270803", @post.normalized_source)
+
+        @post.source = "https://konachan.com/image/99a3c4f10c327d54486259a74173fc0b.jpg"
+        assert_equal("https://konachan.com/post?tags=md5:99a3c4f10c327d54486259a74173fc0b", @post.normalized_source)
       end
     end
   end

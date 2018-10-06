@@ -507,6 +507,12 @@ class Post < ApplicationRecord
       when %r{\Ahttps?://(?:[^.]+\.)?yande\.re/(?:image|jpeg|sample)/(?<md5>\h{32})(?:/yande\.re.*|/?\.(?:jpg|png))\z}i
         "https://yande.re/post?tags=md5:#{$~[:md5]}"
 
+      when %r{\Ahttps?://(?:[^.]+\.)?konachan\.com/(?:image|jpeg|sample)/\h{32}/Konachan\.com%20-%20(?<post_id>\d+)}i
+        "https://konachan.com/post/show/#{$~[:post_id]}"
+
+      when %r{\Ahttps?://(?:[^.]+\.)?konachan\.com/(?:image|jpeg|sample)/(?<md5>\h{32})(?:/Konachan\.com%20-%20.*|/?\.(?:jpg|png))\z}i
+        "https://konachan.com/post?tags=md5:#{$~[:md5]}"
+
       # https://gfee_li.artstation.com/projects/XPGOD
       # https://gfee_li.artstation.com/projects/asuka-7
       when %r{\Ahttps?://\w+\.artstation.com/(?:artwork|projects)/(?<project_id>[a-z0-9-]+)\z/}i
