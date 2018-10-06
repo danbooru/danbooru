@@ -27,9 +27,14 @@ class PostTest < ActiveSupport::TestCase
   context "Deletion:" do
     context "Expunging a post" do
       setup do
+        Delayed::Worker.delay_jobs = true
         @upload = UploadService.new(FactoryBot.attributes_for(:jpg_upload)).start!
         @post = @upload.post
         Favorite.add(post: @post, user: @user)
+      end
+
+      teardown do
+        Delayed::Worker.delay_jobs = false
       end
 
       should "delete the files" do
