@@ -4,6 +4,8 @@ module Maintenance
   def hourly
     UploadErrorChecker.new.check!
     DelayedJobErrorChecker.new.check!
+  rescue Exception => exception
+    rescue_exception(exception)
   end
 
   def daily
@@ -24,6 +26,8 @@ module Maintenance
     TagChangeRequestPruner.warn_all
     TagChangeRequestPruner.reject_all
     Ban.prune!
+  rescue Exception => exception
+    rescue_exception(exception)
   end
 
   def weekly
@@ -31,5 +35,18 @@ module Maintenance
     UserPasswordResetNonce.prune!
     ApproverPruner.prune!
     TagRelationshipRetirementService.find_and_retire!
+  rescue Exception => exception
+    rescue_exception(exception)
+  end
+
+  def rescue_exception(exception)
+    backtrace = Rails.backtrace_cleaner.clean(exception.backtrace).join("\n")
+    Rails.logger.error("#{exception.class}: #{exception.message}\n#{backtrace}")
+
+    if defined?(NewRelic::Agent)
+      NewRelic::Agent.notice_error(exception, custom_params: { backtrace: backtrace })
+    end
+
+    raise exception
   end
 end
