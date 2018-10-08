@@ -1,5 +1,12 @@
-class DailyMaintenance
-  def run
+module Maintenance
+  module_function
+
+  def hourly
+    UploadErrorChecker.new.check!
+    DelayedJobErrorChecker.new.check!
+  end
+
+  def daily
     ActiveRecord::Base.connection.execute("set statement_timeout = 0")
     PostPruner.new.prune!
     Upload.where('created_at < ?', 1.day.ago).delete_all
@@ -17,5 +24,12 @@ class DailyMaintenance
     TagChangeRequestPruner.warn_all
     TagChangeRequestPruner.reject_all
     Ban.prune!
+  end
+
+  def weekly
+    ActiveRecord::Base.connection.execute("set statement_timeout = 0")
+    UserPasswordResetNonce.prune!
+    ApproverPruner.prune!
+    TagRelationshipRetirementService.find_and_retire!
   end
 end
