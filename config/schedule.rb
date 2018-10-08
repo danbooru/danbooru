@@ -2,11 +2,11 @@ set :output, "/var/log/whenever.log"
 #env "MAILTO", "webmaster@danbooru.donmai.us"
 
 every 1.hour do
-  runner "Maintenance.hourly"
+  rake "maintenance:hourly"
 end
 
 every 1.day do
-  runner "Maintenance.daily"
+  rake "maintenance:daily"
 end
 
 every 1.day, :at => "1:00 am" do
@@ -14,5 +14,5 @@ every 1.day, :at => "1:00 am" do
 end
 
 every 1.week, :at => "1:30 am" do
-  runner "Maintenance.weekly"
+  rake "maintenance:weekly"
 end
