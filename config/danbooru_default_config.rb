@@ -240,7 +240,7 @@ module Danbooru
     end
 
     def remote_server_login
-      "albert"
+      "danbooru"
     end
 
     def archive_server_login
