@@ -73,6 +73,10 @@ module Sources
         assert_equal("https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_250.png", @site.preview_url)
       end
 
+      should "get the canonical url" do
+        assert_equal("https://noizave.tumblr.com/post/162206271767", @site.canonical_url)
+      end
+
       should "get the artist" do
         CurrentUser.user = FactoryBot.create(:user)
         CurrentUser.ip_addr = "127.0.0.1"
@@ -89,6 +93,10 @@ module Sources
 
       should "get the image url" do
         assert_equal("https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png", @site.image_url)
+      end
+
+      should "get the canonical url" do
+        assert_equal("https://noizave.tumblr.com/post/162206271767", @site.canonical_url)
       end
 
       should "get the tags" do
@@ -110,6 +118,7 @@ module Sources
             artist_name: "noizave",
             profile_url: "https://noizave.tumblr.com",
             tags: [["tag1", "https://tumblr.com/tagged/tag1"], ["tag2", "https://tumblr.com/tagged/tag2"]],
+            canonical_url: @ref,
             image_url: "https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg",
             image_urls: %w[
               https://media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_orwwptNBCE1wsfqepo1_1280.png
@@ -131,6 +140,7 @@ module Sources
             artist_name: nil,
             profile_url: nil,
             tags: [],
+            canonical_url: nil,
             image_url: "https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg",
             image_urls: ["https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg"],
           }
@@ -177,6 +187,7 @@ module Sources
 
           assert_equal(@url, site.image_url)
           assert_equal(urls, site.image_urls)
+          assert_equal(@ref, site.canonical_url)
         end
       end
 
@@ -186,6 +197,7 @@ module Sources
 
           assert_equal(@url, site.image_url)
           assert_equal([@url], site.image_urls)
+          assert_nil(site.canonical_url)
         end
       end
     end
@@ -203,6 +215,10 @@ module Sources
       should "get the commentary" do
         assert_equal("Anonymous asked: test ask", @site.artist_commentary_title)
         assert_match("test answer", @site.artist_commentary_desc)
+      end
+
+      should "get the canonical url" do
+        assert_equal("https://noizave.tumblr.com/post/171237880542", @site.canonical_url)
       end
     end
 
