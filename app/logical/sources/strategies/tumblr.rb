@@ -1,12 +1,13 @@
 module Sources::Strategies
   class Tumblr < Base
+    SIZES = %w[1280 640 540 500h 500 400 250 100]
+
     BASE_URL = %r!\Ahttps?://(?:[^/]+\.)*tumblr\.com!i
     DOMAIN = %r{(data|(\d+\.)?media)\.tumblr\.com}
     MD5 = %r{(?<md5>[0-9a-f]{32})}i
     FILENAME = %r{(?<filename>(tumblr_(inline_)?)?[a-z0-9]+(_r[0-9]+)?)}i
-    SIZES = %r{(?:250|400|500|500h|540|1280|raw)}i
     EXT = %r{(?<ext>\w+)}
-    IMAGE = %r!\Ahttps?://#{DOMAIN}/(?<dir>#{MD5}/)?#{FILENAME}_#{SIZES}\.#{EXT}\z!i
+    IMAGE = %r!\Ahttps?://#{DOMAIN}/(?<dir>#{MD5}/)?#{FILENAME}_(?<size>\w+)\.#{EXT}\z!i
     POST = %r!\Ahttps?://(?<blog_name>[^.]+)\.tumblr\.com/(?:post|image)/(?<post_id>\d+)!i
 
     def self.enabled?
@@ -132,19 +133,16 @@ module Sources::Strategies
     #
     # http://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg
     # => https://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg
-    def find_largest(x)
-      if x =~ IMAGE
-        sizes = [1280, 640, 540, "500h", 500, 400, 250]
-        candidates = sizes.map do |size|
-          "https://media.tumblr.com/#{$~[:dir]}#{$~[:filename]}_#{size}.#{$~[:ext]}"
-        end
+    def find_largest(url, sizes: SIZES)
+      return url unless url =~ IMAGE
 
-        return candidates.find do |candidate|
-          http_exists?(candidate, headers)
-        end
+      candidates = sizes.map do |size|
+        "https://media.tumblr.com/#{$~[:dir]}#{$~[:filename]}_#{size}.#{$~[:ext]}"
       end
 
-      return x
+      candidates.find do |candidate|
+        http_exists?(candidate, headers)
+      end
     end
 
     def inline_images

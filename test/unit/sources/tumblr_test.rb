@@ -209,5 +209,19 @@ module Sources
         assert_operator(data, :<, site.to_h)
       end
     end
+
+    context "A download for a 'http://*.media.tumblr.com/$hash/tumblr_$id_$size.png' image" do
+      should "find the largest image" do
+        %w[100 250 400 500 500h 540 640 1280].each do |size|
+          page = "https://natsuki-teru.tumblr.com/post/178728919271"
+          image = "https://66.media.tumblr.com/b9395771b2d0435fe4efee926a5a7d9c/tumblr_pg2wu1L9DM1trd056o2_#{size}.png"
+          full = "https://media.tumblr.com/b9395771b2d0435fe4efee926a5a7d9c/tumblr_pg2wu1L9DM1trd056o2_1280.png"
+          site = Sources::Strategies.find(image, page)
+
+          assert_equal(full, site.image_url)
+          assert_equal(full, site.image_urls.second)
+        end
+      end
+    end
   end
 end
