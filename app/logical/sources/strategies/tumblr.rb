@@ -8,6 +8,7 @@ module Sources::Strategies
     FILENAME = %r{(?<filename>(tumblr_(inline_)?)?[a-z0-9]+(_r[0-9]+)?)}i
     EXT = %r{(?<ext>\w+)}
     IMAGE = %r!\Ahttps?://#{DOMAIN}/(?<dir>#{MD5}/)?#{FILENAME}_(?<size>\w+)\.#{EXT}\z!i
+    VIDEO = %r!\Ahttps?://(?:vtt|ve\.media)\.tumblr\.com/!i
     POST = %r!\Ahttps?://(?<blog_name>[^.]+)\.tumblr\.com/(?:post|image)/(?<post_id>\d+)!i
 
     def self.enabled?
@@ -23,7 +24,7 @@ module Sources::Strategies
     end
 
     def image_url
-      return image_urls.first unless url.match?(IMAGE)
+      return image_urls.first unless url.match?(IMAGE) || url.match?(VIDEO)
       find_largest(url)
     end
 
@@ -39,7 +40,7 @@ module Sources::Strategies
 
       # api response is blank (work is deleted or we were given a direct image with no referer url)
       when nil
-        list += [url] if url.match?(IMAGE)
+        list += [url] if url.match?(IMAGE) || url.match?(VIDEO)
       end
 
       list += inline_images

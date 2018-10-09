@@ -161,18 +161,32 @@ module Sources
       end
     end
 
-    context "The source for a 'http://*.tumblr.com/post/*' video post with inline images" do
+    context "The source for a 'http://ve.media.tumblr.com/*' video post with inline images" do
       setup do
-        @site = Sources::Strategies.find("https://noizave.tumblr.com/post/162222617101")
+        @url = "https://ve.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4"
+        @ref = "https://noizave.tumblr.com/post/162222617101"
       end
 
-      should "get the image urls" do
-        urls = %w[
-          https://ve.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4
-          https://media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os31dclyCR1v11u29_1280.png
-        ]
+      context "with a referer" do
+        should "get the video and inline images" do
+          site = Sources::Strategies.find(@url, @ref)
+          urls = %w[
+            https://ve.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4
+            https://media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os31dclyCR1v11u29_1280.png
+          ]
 
-        assert_equal(urls, @site.image_urls)
+          assert_equal(@url, site.image_url)
+          assert_equal(urls, site.image_urls)
+        end
+      end
+
+      context "without a referer" do
+        should "get the video" do
+          site = Sources::Strategies.find(@url)
+
+          assert_equal(@url, site.image_url)
+          assert_equal([@url], site.image_urls)
+        end
       end
     end
 
