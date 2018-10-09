@@ -28,12 +28,7 @@ module Sources::Strategies
     end
 
     def image_urls
-      image_urls_sub
-        .uniq
-        .map {|x| normalize_cdn(x)}
-        .map {|x| find_largest(x)}
-        .compact
-        .uniq
+      image_urls_sub.uniq.map {|x| find_largest(x) }.compact.uniq
     end
 
     def preview_urls
@@ -138,15 +133,6 @@ module Sources::Strategies
       end
 
       raise "image url not found for (#{url}, #{referer_url})"
-    end
-
-    # Normalize cdn subdomains.
-    #
-    # https://gs1.wac.edgecastcdn.net/8019B6/data.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_500.png
-    # => http://data.tumblr.com/tumblr_m2dxb8aOJi1rop2v0o1_500.png
-    def normalize_cdn(x)
-      # does this work?
-      x.sub(%r!\Ahttps?://gs1\.wac\.edgecastcdn\.net/8019B6/media\.tumblr\.com!i, "http://media.tumblr.com")
     end
 
     # Look for the biggest available version on media.tumblr.com. A bigger
