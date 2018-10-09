@@ -221,6 +221,8 @@ module Sources
           :profile_url => profile_url,
           :image_url => image_url,
           :image_urls => image_urls,
+          :page_url => page_url,
+          :canonical_url => canonical_url,
           :normalized_for_artist_finder_url => normalize_for_artist_finder,
           :tags => tags,
           :translated_tags => translated_tags,

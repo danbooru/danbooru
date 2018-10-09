@@ -16,7 +16,7 @@ module Sources
       end
 
       should "get the profile" do
-        assert_equal("https://noizave.tumblr.com/", @site.profile_url)
+        assert_equal("https://noizave.tumblr.com", @site.profile_url)
       end
 
       should "get the tags" do
@@ -180,10 +180,20 @@ module Sources
     end
 
     context "A deleted tumblr post" do
-      should "work" do
+      should "extract the info from the url" do
         site = Sources::Strategies.find("http://shimetsukage.tumblr.com/post/176805588268/20180809-ssb-coolboy")
+        data = {
+          artist_name: "shimetsukage",
+          profile_url: "https://shimetsukage.tumblr.com",
+          page_url: "https://shimetsukage.tumblr.com/post/176805588268",
+          canonical_url: "https://shimetsukage.tumblr.com/post/176805588268",
+          image_url: nil,
+          image_urls: [],
+          tags: [],
+        }
 
         assert_nothing_raised { site.to_h }
+        assert_operator(data, :<, site.to_h)
       end
     end
   end

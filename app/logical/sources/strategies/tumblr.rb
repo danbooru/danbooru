@@ -1,5 +1,6 @@
 module Sources::Strategies
   class Tumblr < Base
+    BASE_URL = %r!\Ahttps?://(?:[^/]+\.)*tumblr\.com!i
     DOMAIN = %r{(data|(\d+\.)?media)\.tumblr\.com}
     MD5 = %r{(?<md5>[0-9a-f]{32})}i
     FILENAME = %r{(?<filename>(tumblr_(inline_)?)?[a-z0-9]+(_r[0-9]+)?)}i
@@ -13,18 +14,7 @@ module Sources::Strategies
     end
 
     def self.match?(*urls)
-      urls.compact.any? do |url|
-        blog_name, post_id = parse_info_from_url(url)
-        url =~ IMAGE || blog_name.present? && post_id.present?
-      end
-    end
-
-    def self.parse_info_from_url(url)
-      if url =~ POST
-        [$~[:blog_name], $~[:post_id]]
-      else
-        []
-      end
+      urls.compact.any? { |url| url.match?(BASE_URL) }
     end
 
     def site_name
@@ -42,22 +32,21 @@ module Sources::Strategies
     end
 
     def page_url
-      [url, referer_url].each do |x|
-        if x =~ POST
-          blog_name, post_id = self.class.parse_info_from_url(x)
-          return "https://#{blog_name}.tumblr.com/post/#{post_id}"
-        end
-      end
+      return nil unless blog_name.present? && post_id.present?
+      "https://#{blog_name}.tumblr.com/post/#{post_id}"
+    end
 
-      return super
+    def canonical_url
+      page_url
     end
 
     def profile_url
-      "https://#{artist_name}.tumblr.com/"
+      return nil if artist_name.blank?
+      "https://#{artist_name}.tumblr.com"
     end
 
     def artist_name
-      post[:blog_name]
+      post[:blog_name] || blog_name
     end
 
     def artist_commentary_title
@@ -99,7 +88,6 @@ module Sources::Strategies
         [etag, "https://tumblr.com/tagged/#{CGI.escape(etag)}"]
       end.uniq
     end
-    memoize :tags
 
     def dtext_artist_commentary_desc
       DText.from_html(artist_commentary_desc).strip
@@ -175,11 +163,18 @@ module Sources::Strategies
       html = Nokogiri::HTML.fragment(artist_commentary_desc)
       html.css("img").map { |node| node["src"] }
     end
-    memoize :inline_images
+
+    def blog_name
+      urls.map { |url| url[POST, :blog_name] }.compact.first
+    end
+
+    def post_id
+      urls.map { |url| url[POST, :post_id] }.compact.first
+    end
 
     def api_response
       return {} unless self.class.enabled?
-      blog_name, post_id = self.class.parse_info_from_url(page_url)
+      return {} unless blog_name.present? && post_id.present?
 
       body, code = HttpartyCache.get("/#{blog_name}/posts",
         params: { id: post_id, api_key: Danbooru.config.tumblr_consumer_key },
