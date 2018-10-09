@@ -97,33 +97,46 @@ module Sources
       end
     end
 
-    context "The source for a 'http://*.media.tumblr.com/$hash/tumblr_$id_1280.jpg' image with a referer" do
+    context "The source for a 'http://*.media.tumblr.com/$hash/tumblr_$id_540.jpg' image" do
       setup do
-        @url = "https://78.media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg"
+        @url = "https://78.media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_540.jpg"
         @ref = "https://noizave.tumblr.com/post/162094447052"
-        @site = Sources::Strategies.find(@url, @ref)
       end
 
-      should "get the image urls" do
-        urls = %w[
-          https://media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_orwwptNBCE1wsfqepo1_1280.png
-          https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg
-          https://media.tumblr.com/d2ed224f135b0c81f812df81a0a8692d/tumblr_orwwptNBCE1wsfqepo3_1280.gif
-          https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_inline_os3134mABB1v11u29_1280.png
-          https://media.tumblr.com/34ed9d0ff4a21625981372291cb53040/tumblr_nv3hwpsZQY1uft51jo1_1280.gif
-        ]
+      context "with a referer" do
+        should "get all the images and metadata" do
+          site = Sources::Strategies.find(@url, @ref)
+          data = {
+            artist_name: "noizave",
+            profile_url: "https://noizave.tumblr.com",
+            tags: [["tag1", "https://tumblr.com/tagged/tag1"], ["tag2", "https://tumblr.com/tagged/tag2"]],
+            image_url: "https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg",
+            image_urls: %w[
+              https://media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_orwwptNBCE1wsfqepo1_1280.png
+              https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg
+              https://media.tumblr.com/d2ed224f135b0c81f812df81a0a8692d/tumblr_orwwptNBCE1wsfqepo3_1280.gif
+              https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_inline_os3134mABB1v11u29_1280.png
+              https://media.tumblr.com/34ed9d0ff4a21625981372291cb53040/tumblr_nv3hwpsZQY1uft51jo1_1280.gif
+            ],
+          }
 
-        assert_equal(urls.sort, @site.image_urls.sort)
+          assert_operator(data, :<, site.to_h)
+        end
       end
 
-      should "get the tags" do
-        tags = [["tag1", "https://tumblr.com/tagged/tag1"], ["tag2", "https://tumblr.com/tagged/tag2"]]
-        assert_equal(tags, @site.tags)
-      end
+      context "without a referer" do
+        should "get the original image" do
+          site = Sources::Strategies.find(@url)
+          data = {
+            artist_name: nil,
+            profile_url: nil,
+            tags: [],
+            image_url: "https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg",
+            image_urls: ["https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg"],
+          }
 
-      should "get the commentary" do
-        desc = %r!<p>description</p><figure data-orig-width="1152" data-orig-height="648" class="tmblr-full"><img src="https://\d+.media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_inline_os3134mABB1v11u29_540.png" data-orig-width="1152" data-orig-height="648"/></figure><figure class="tmblr-full" data-orig-height="273" data-orig-width="300" data-tumblr-attribution="skeleton-war-draft:nYQhsQFR8-n3brTTGanKzA:Ze6nYj1umLk8W"><img src="https://\d+.media.tumblr.com/34ed9d0ff4a21625981372291cb53040/tumblr_nv3hwpsZQY1uft51jo1_400.gif" data-orig-height="273" data-orig-width="300"/></figure>!
-        assert_match(desc, @site.artist_commentary_desc)
+          assert_operator(data, :<, site.to_h)
+        end
       end
     end
 

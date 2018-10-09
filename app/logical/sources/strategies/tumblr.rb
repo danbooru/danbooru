@@ -21,8 +21,28 @@ module Sources::Strategies
       "Tumblr"
     end
 
+    def image_url
+      return image_urls.first unless url.match?(IMAGE)
+      find_largest(url)
+    end
+
     def image_urls
-      image_urls_sub.uniq.map {|x| find_largest(x) }.compact.uniq
+      list = []
+
+      case post[:type]
+      when "photo"
+        list += post[:photos].map { |photo| photo[:original_size][:url] }
+
+      when "video"
+        list += [post[:video_url]]
+
+      # api response is blank (work is deleted or we were given a direct image with no referer url)
+      when nil
+        list += [url] if url.match?(IMAGE)
+      end
+
+      list += inline_images
+      list.map { |url| find_largest(url) }
     end
 
     def preview_urls
@@ -94,38 +114,6 @@ module Sources::Strategies
     end
 
   public
-
-    def image_urls_sub
-      list = []
-
-      if url =~ IMAGE
-        list << url
-      end
-
-      if page_url !~ POST
-        return list
-      end
-
-      if post[:type] == "photo"
-        list += post[:photos].map do |photo|
-          photo[:original_size][:url]
-        end
-      end
-
-      if post[:type] == "video"
-        list << post[:video_url]
-      end
-
-      if inline_images.any?
-        list += inline_images.to_a
-      end
-
-      if list.any?
-        return list
-      end
-
-      []
-    end
 
     # Look for the biggest available version on media.tumblr.com. A bigger
     # version may or may not exist.
