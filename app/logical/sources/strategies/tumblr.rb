@@ -93,7 +93,7 @@ module Sources::Strategies
     end
 
     def tags
-      post[:tags].map do |tag|
+      post[:tags].to_a.map do |tag|
         # normalize tags: space, underscore, and hyphen are equivalent in tumblr tags.
         etag = tag.gsub(/[ _-]/, "_")
         [etag, "https://tumblr.com/tagged/#{CGI.escape(etag)}"]
@@ -136,7 +136,7 @@ module Sources::Strategies
         return list
       end
 
-      raise "image url not found for (#{url}, #{referer_url})"
+      []
     end
 
     # Look for the biggest available version on media.tumblr.com. A bigger
@@ -177,24 +177,26 @@ module Sources::Strategies
     end
     memoize :inline_images
 
-    def client
-      return {} unless self.class.enabled?
-
-      TumblrApiClient.new(Danbooru.config.tumblr_consumer_key)
-    end
-    memoize :client
-
     def api_response
+      return {} unless self.class.enabled?
       blog_name, post_id = self.class.parse_info_from_url(page_url)
 
-      raise "Page url not found for (#{url}, #{referer_url})" if blog_name.nil?
+      body, code = HttpartyCache.get("/#{blog_name}/posts",
+        params: { id: post_id, api_key: Danbooru.config.tumblr_consumer_key },
+        base_uri: "https://api.tumblr.com/v2/blog/"
+      )
 
-      client.posts(blog_name, post_id)
+      if code == 200
+        return JSON.parse(body, symbolize_names: true)
+      else
+        Rails.logger.debug("TumblrApiClient call failed (code=#{code}, body=#{body}, blog_name=#{blog_name}, post_id=#{post_id})")
+        return {}
+      end
     end
     memoize :api_response
 
     def post
-      api_response[:posts].first
+      api_response.dig(:response, :posts)&.first || {}
     end
   end
 end

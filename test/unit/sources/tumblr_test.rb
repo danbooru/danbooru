@@ -155,7 +155,7 @@ module Sources
 
       should "get the image urls" do
         urls = %w[
-          https://vtt.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4
+          https://ve.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4
           https://media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os31dclyCR1v11u29_1280.png
         ]
 
@@ -176,6 +176,14 @@ module Sources
       should "get the commentary" do
         assert_equal("Anonymous asked: test ask", @site.artist_commentary_title)
         assert_match("test answer", @site.artist_commentary_desc)
+      end
+    end
+
+    context "A deleted tumblr post" do
+      should "work" do
+        site = Sources::Strategies.find("http://shimetsukage.tumblr.com/post/176805588268/20180809-ssb-coolboy")
+
+        assert_nothing_raised { site.to_h }
       end
     end
   end
