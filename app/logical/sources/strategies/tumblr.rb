@@ -8,6 +8,10 @@ module Sources::Strategies
     IMAGE = %r!\Ahttps?://#{DOMAIN}/(?<dir>#{MD5}/)?#{FILENAME}_#{SIZES}\.#{EXT}\z!i
     POST = %r!\Ahttps?://(?<blog_name>[^.]+)\.tumblr\.com/(?:post|image)/(?<post_id>\d+)!i
 
+    def self.enabled?
+      Danbooru.config.tumblr_consumer_key.present?
+    end
+
     def self.match?(*urls)
       urls.compact.any? do |url|
         blog_name, post_id = parse_info_from_url(url)
@@ -174,7 +178,7 @@ module Sources::Strategies
     memoize :inline_images
 
     def client
-      raise NotImplementedError.new("Tumblr support is not available (API key not configured).") if Danbooru.config.tumblr_consumer_key.nil?
+      return {} unless self.class.enabled?
 
       TumblrApiClient.new(Danbooru.config.tumblr_consumer_key)
     end

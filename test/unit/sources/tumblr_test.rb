@@ -3,8 +3,7 @@ require 'test_helper'
 module Sources
   class TumblrTest < ActiveSupport::TestCase
     def setup
-      super
-      skip "Tumblr key is not configured" unless Danbooru.config.tumblr_consumer_key
+      skip "Tumblr key is not configured" unless Sources::Strategies::Tumblr.enabled?
     end
 
     context "The source for a 'http://*.tumblr.com/post/*' photo post with a single image" do
