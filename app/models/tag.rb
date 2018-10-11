@@ -21,7 +21,7 @@ class Tag < ApplicationRecord
   validates :name, uniqueness: true, tag_name: true, on: :create
   validates_inclusion_of :category, in: TagCategory.category_ids
 
-  after_save :update_category_cache_for_all, if: ->(rec) { rec.saved_change_to_attribute?(:category)}
+  after_save :update_category_cache, if: ->(rec) { rec.saved_change_to_attribute?(:category)}
 
   module ApiMethods
     def to_legacy_json
@@ -135,11 +135,6 @@ class Tag < ApplicationRecord
 
     def category_name
       TagCategory.reverse_mapping[category].capitalize
-    end
-
-    def update_category_cache_for_all
-      update_category_cache
-      delay(:queue => "default", :priority => 10).update_category_post_counts
     end
 
     def update_category_post_counts
