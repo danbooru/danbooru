@@ -25,7 +25,7 @@ class CloudflareService
   def delete(md5, ext)
     url = "https://api.cloudflare.com/client/v4/zones/#{zone}/purge_cache"
     files = ["#{md5}.#{ext}", "preview/#{md5}.jpg", "sample/sample-#{md5}.jpg"].map do |name|
-      ["danbooru", "safebooru", "raikou1"].map do |subdomain|
+      ["danbooru", "safebooru", "raikou1", "raikou2", "raikou3", "raikou4"].map do |subdomain|
         "http://#{subdomain}.donmai.us/data/#{name}"
       end
     end.flatten
