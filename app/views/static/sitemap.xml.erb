@@ -15,7 +15,7 @@
       <changefreq>daily</changefreq>
    </url>
 
-   <%# cache("sitemap", :expires_in => 24.hours) do %>
+   <% cache("sitemap", :expires_in => 24.hours) do %>
       <% @popular_search_service.each_search do |tags, count| %>
          <url>
             <loc><%= posts_url(tags: tags) %></loc>
@@ -37,5 +37,5 @@
             <lastmod><%= post.created_at.to_date %></lastmod>
          </url>
       <% end %>
-   <%# end %>
+   <% end %>
 </urlset>
