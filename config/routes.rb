@@ -421,6 +421,7 @@ Rails.application.routes.draw do
   get "/wiki/recent_changes" => redirect {|params, req| "/wiki_page_versions?search[updater_id]=#{req.params[:user_id]}"}
   get "/wiki/history/:title" => redirect("/wiki_page_versions?title=%{title}")
 
+  get "/sitemap" => "static#sitemap"
   get "/static/keyboard_shortcuts" => "static#keyboard_shortcuts", :as => "keyboard_shortcuts"
   get "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
   get "/static/site_map" => "static#site_map", :as => "site_map"

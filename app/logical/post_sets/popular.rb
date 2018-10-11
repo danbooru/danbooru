@@ -1,10 +1,11 @@
 module PostSets
   class Popular < PostSets::Base
-    attr_reader :date, :scale
+    attr_reader :date, :scale, :limit
 
-    def initialize(date, scale)
+    def initialize(date, scale, limit: nil)
       @date = date.blank? ? Time.zone.now : Time.zone.parse(date)
       @scale = scale
+      @limit = limit || CurrentUser.per_page
     end
 
     def posts
@@ -13,10 +14,6 @@ module PostSets
         query.each # hack to force rails to eager load
         query
       end
-    end
-
-    def limit
-       CurrentUser.user.per_page
     end
 
     def min_date
