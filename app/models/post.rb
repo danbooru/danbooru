@@ -201,6 +201,14 @@ class Post < ApplicationRecord
       file_ext =~ /jpg|jpeg|gif|png/i
     end
 
+    def is_png?
+      file_ext =~ /png/i
+    end
+
+    def is_gif?
+      file_ext =~ /gif/i
+    end
+
     def is_flash?
       file_ext =~ /swf/i
     end
@@ -763,6 +771,14 @@ class Post < ApplicationRecord
 
       if is_ugoira?
         tags << "ugoira"
+      end
+
+      if !is_gif?
+        tags -= ["animated_gif"]
+      end
+
+      if !is_png?
+        tags -= ["animated_png"]
       end
 
       return tags
