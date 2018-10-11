@@ -34,7 +34,7 @@ class UploadService
         return
       end
 
-      if upload_id
+      if upload_id && Upload.where(id: upload_id).exists?
         CurrentUser.as_system do
           Upload.find(upload_id).update(status: "preprocessed + deleted")
         end
