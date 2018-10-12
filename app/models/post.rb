@@ -1155,7 +1155,7 @@ class Post < ApplicationRecord
   end
 
   module CountMethods
-    def fast_count(tags = "", timeout: 1_000, raise_on_timeout: false)
+    def fast_count(tags = "", timeout: 1_000, raise_on_timeout: false, skip_cache: false)
       tags = tags.to_s
       tags += " rating:s" if CurrentUser.safe_mode?
       tags += " -status:deleted" if CurrentUser.hide_deleted_posts? && !Tag.has_metatag?(tags, "status", "-status")
@@ -1176,13 +1176,14 @@ class Post < ApplicationRecord
         elsif tags =~ /^rating:e(?:xplicit)?$/
           return (Post.maximum(:id) * (201650.0 / 2200402)).floor
 
-        elsif tags =~ /status:deleted.status:deleted/
-          # temp fix for degenerate crawlers
-          return 0
         end
       end
 
-      count = get_count_from_cache(tags)
+      count = nil
+
+      unless skip_cache
+        count = get_count_from_cache(tags)
+      end
 
       if count.nil?
         count = fast_count_search(tags, timeout: timeout, raise_on_timeout: raise_on_timeout)
