@@ -58,20 +58,10 @@ class UploadsController < ApplicationController
       flash[:notice] = @service.warnings.join(".\n \n")
     end
 
-    save_recent_tags
     respond_with(@upload)
   end
 
   private
-
-  def save_recent_tags
-    if @upload
-      tags = Tag.scan_tags(@upload.tag_string)
-      tags = (TagAlias.to_aliased(tags) + Tag.scan_tags(cookies[:recent_tags])).compact.uniq.slice(0, 30)
-      cookies[:recent_tags] = tags.join(" ")
-      cookies[:recent_tags_with_categories] = Tag.categories_for(tags).to_a.flatten.join(" ")
-    end
-  end
 
   def upload_params
     permitted_params = %i[

@@ -2,7 +2,7 @@
 
 <div id="related-tags" class="related-tags">
   <% if local_assigns[:related_tags] %>
-    <%= render "tag_column", tags: cookies[:recent_tags].to_s.split, title: "Recent" %>
+    <%= render "tag_column", tags: related_tags.recent_tags, title: "Recent" %>
     <%= render "tag_column", tags: related_tags.favorite_tags, title: "Frequent" %>
     <%= render "tag_column", tags: related_tags.tags, class: "general-related-tags-column", title: related_tags.pretty_name %>
     <%= render "tag_column", tags: related_tags.translated_tags, title: "Translated Tags" %>
