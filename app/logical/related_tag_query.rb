@@ -1,7 +1,8 @@
 class RelatedTagQuery
-  attr_reader :query, :category, :translated_tags, :artists
+  attr_reader :query, :category, :translated_tags, :artists, :user
 
-  def initialize(query, category: nil, translated_tags: nil, artists: nil);
+  def initialize(query, category: nil, translated_tags: nil, artists: nil, user: nil)
+    @user = user
     @query = TagAlias.to_aliased(query.to_s.downcase.strip).join(" ")
     @category = category
     @translated_tags = translated_tags.to_s.split
@@ -23,6 +24,10 @@ class RelatedTagQuery
     else
       []
     end
+  end
+
+  def favorite_tags
+    user&.favorite_tags.to_s.split
   end
 
   def wiki_page_tags

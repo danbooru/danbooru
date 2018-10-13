@@ -3,7 +3,7 @@ class RelatedTagsController < ApplicationController
   before_action :require_reportbooru_key, only: [:update]
 
   def show
-    @query = RelatedTagQuery.new(params[:query], category: params[:category], translated_tags: params[:translated_tags], artists: params[:artists])
+    @query = RelatedTagQuery.new(params[:query], category: params[:category], translated_tags: params[:translated_tags], artists: params[:artists], user: CurrentUser.user)
     respond_with(@query) do |format|
       format.json do
         render :json => @query.to_json
