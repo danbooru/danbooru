@@ -3,8 +3,10 @@
 div#related-tags-container {
   padding-right: 2em;
 
-  h1 {
-    font-size: $h3_size;
+  &.visible a#show-related-tags-link,
+  &.hidden a#hide-related-tags-link,
+  &.hidden div.related-tags {
+    display: none;
   }
 }
 

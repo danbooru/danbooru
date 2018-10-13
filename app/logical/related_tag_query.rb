@@ -1,9 +1,16 @@
 class RelatedTagQuery
-  attr_reader :query, :category
+  attr_reader :query, :category, :translated_tags, :artists
 
-  def initialize(query, category = nil)
-    @query = TagAlias.to_aliased(query.strip).join(" ")
+  def initialize(query, category: nil, translated_tags: nil, artists: nil);
+    @query = TagAlias.to_aliased(query.to_s.downcase.strip).join(" ")
     @category = category
+    @translated_tags = translated_tags.to_s.split
+    @artists = Artist.where(name: artists.to_s.split)
+    @artists = [Artist.find_by(name: "banned_artist")] + @artists if @artists.any?(&:is_banned?)
+  end
+
+  def pretty_name
+    query.tr("_", " ")
   end
 
   def tags
@@ -27,17 +34,12 @@ class RelatedTagQuery
   end
 
   def other_wiki_category_tags
-    if Tag.category_for(query) != Tag.categories.copyright
-      return []
-    end
-    listtags = (wiki_page.try(:tags) || []).select {|name| name =~ /^list_of_/i }
-    results = listtags.map do |name|
-      listlinks = WikiPage.titled(name).first.try(:tags) || []
-      if listlinks.length > 0
-        {"title" => name, "wiki_page_tags" => map_with_category_data(listlinks)}
-      end
-    end
-    results.reject {|list| list.nil?}
+    return [] unless Tag.category_for(query) == Tag.categories.copyright
+
+    other_wikis = wiki_page&.tags.to_a.grep(/^list_of_/i)
+    other_wikis = other_wikis.map { |name| WikiPage.titled(name).first }
+    other_wikis = other_wikis.select { |wiki| wiki.tags.present? }
+    other_wikis
   end
 
   def tags_for_html

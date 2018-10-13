@@ -2,7 +2,6 @@
 
 import Utility from './utility'
 import Hammer from 'hammerjs'
-import RelatedTag from './related_tag.js.erb'
 import Cookie from './cookie'
 import Note from './notes'
 import SavedSearch from './saved_searches'
@@ -85,11 +84,6 @@ Post.initialize_edit_dialog = function() {
     Post.open_edit_dialog();
     e.preventDefault();
   });
-
-  $("#toggle-related-tags-link").on("click.danbooru", function(e) {
-    RelatedTag.toggle();
-    e.preventDefault();
-  });
 }
 
 Post.open_edit_dialog = function() {
@@ -102,13 +96,10 @@ Post.open_edit_dialog = function() {
   $("#share").hide();
   $("#post-sections li").removeClass("active");
   $("#post-edit-link").parent("li").addClass("active");
-  $("#related-tags-container").show();
 
   var $tag_string = $("#post_tag_string,#upload_tag_string");
   $("div.input").has($tag_string).prevAll().hide();
   $("#open-edit-dialog").hide();
-
-  $("#toggle-related-tags-link").show().click();
 
   var dialog = $("<div/>").attr("id", "edit-dialog");
   $("#form").appendTo(dialog);
@@ -161,17 +152,19 @@ Post.open_edit_dialog = function() {
 
   $tag_string.css({"resize": "none", "width": "100%"});
   $tag_string.focus().selectEnd().height($tag_string[0].scrollHeight);
+
+  $(document).trigger("danbooru:show-post-edit-form");
+  $(document).trigger("danbooru:open-post-edit-dialog");
 }
 
 Post.close_edit_dialog = function(e, ui) {
   $("#form").appendTo($("#c-posts #edit,#c-uploads #a-new"));
   $("#edit-dialog").remove();
-  RelatedTag.show();
-  $("#toggle-related-tags-link").hide();
   var $tag_string = $("#post_tag_string,#upload_tag_string");
   $("div.input").has($tag_string).prevAll().show();
   $("#open-edit-dialog").show();
   $tag_string.css({"resize": "", "width": ""});
+  $(document).trigger("danbooru:close-post-edit-dialog");
 }
 
 Post.initialize_similar = function() {
@@ -439,9 +432,8 @@ Post.initialize_post_sections = function() {
       $("#comments").hide();
       $("#share").hide();
       $("#post_tag_string").focus().selectEnd().height($("#post_tag_string")[0].scrollHeight);
-      $("#related-tags-button").trigger("click");
-      $("#fetch-data-manual").trigger("click");
       $("#recommended").hide();
+      $(document).trigger("danbooru:show-post-edit-form");
     } else if (e.target.hash === "#recommended") {
       $("#comments").hide();
       $("#edit").hide();

@@ -1,5 +1,5 @@
 class ArtistUrlsController < ApplicationController
-  respond_to :json, :xml, :html
+  respond_to :js, :json, :xml, :html
   before_action :member_only, except: [:index]
 
   def index

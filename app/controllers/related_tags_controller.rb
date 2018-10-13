@@ -1,10 +1,9 @@
 class RelatedTagsController < ApplicationController
-  respond_to :json
-  respond_to :html, :only=>[:show]
+  respond_to :json, :xml, :js, :html, except: [:update]
   before_action :require_reportbooru_key, only: [:update]
 
   def show
-    @query = RelatedTagQuery.new(params[:query].to_s.downcase, params[:category])
+    @query = RelatedTagQuery.new(params[:query], category: params[:category], translated_tags: params[:translated_tags], artists: params[:artists])
     respond_with(@query) do |format|
       format.json do
         render :json => @query.to_json

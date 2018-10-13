@@ -1,0 +1,40 @@
+<%# related_tags %>
+
+<div id="related-tags" class="related-tags">
+  <% if local_assigns[:related_tags] %>
+    <%= render "tag_column", tags: cookies[:recent_tags].to_s.split, title: "Recent" %>
+    <%= render "tag_column", tags: cookies[:favorite_tags].to_s.split, title: "Frequent" %>
+    <%= render "tag_column", tags: related_tags.tags, class: "general-related-tags-column", title: related_tags.pretty_name %>
+    <%= render "tag_column", tags: related_tags.translated_tags, title: "Translated Tags" %>
+    <%= render "tag_column", tags: related_tags.wiki_page_tags, class: "wiki-related-tags-column", title: link_to("wiki:#{related_tags.pretty_name}", show_or_new_wiki_pages_path(title: related_tags.query)) %>
+
+    <% related_tags.other_wiki_category_tags.each do |wiki| %>
+      <%= render "tag_column", tags: wiki.tags, class: "other-wiki-related-tags-column", title: link_to("wiki:#{wiki.pretty_title}", show_or_new_wiki_pages_path(title: wiki.title)) %>
+    <% end %>
+
+    <div class="tag-column wide-column artist-related-tags-column">
+      <h6>Artist</h6>
+
+      <% if related_tags.artists.size == 0 %>
+        none
+      <% else %>
+        <% related_tags.artists.each do |artist| %>
+          <%= TagSetPresenter.new([artist.name]).tag_list_html(name_only: true) %>
+
+          <ul>
+            <% artist.sorted_urls.each do |url| %>
+              <li>
+                <% if url.is_active %>
+                  <%= external_link_to url.url, truncate: 30 %>
+                  <%= link_to tag.i(class: "fas fa-minus-circle"), artist_url_path(id: url.id, artist_url: { is_active: false }), remote: true, method: :put, "data-confirm": "This will mark the URL as inactive. Continue?" %>
+                <% else %>
+                  <del><%= truncate(url.url, length: 30) %></del>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
