@@ -82,20 +82,12 @@
       <span id="open-edit-dialog" class="ui-icon ui-icon-arrow-1-ne" title="detach" style="display: none;" data-shortcut="shift+e"/>
     </div>
 
-    <%= button_tag "Related tags", :id => "related-tags-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
-
-    <% TagCategory.related_button_list.each do |category| %>
-      <%= button_tag "#{TagCategory.related_button_mapping[category]}", :id => "related-#{category}-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
-    <% end %>
+    <%= render "related_tags/buttons" %>
   </div>
 
   <div class="input">
     <%= submit_tag "Submit", :class => "ui-button ui-widget ui-corner-all" %>
   </div>
 
-  <div id="related-tags-container">
-    <h1>Related Tags <a href="#" id="toggle-related-tags-link" style="display: none;">&laquo;</a></h1>
-    <div id="related-tags" class="related-tags">
-    </div>
-  </div>
+  <%= render "related_tags/container" %>
 <% end %>
