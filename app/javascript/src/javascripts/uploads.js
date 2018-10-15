@@ -5,6 +5,7 @@ let Upload = {};
 Upload.initialize_all = function() {
   if ($("#c-uploads,#c-posts").length) {
     this.initialize_enter_on_tags();
+    $("#upload_source").on("change.danbooru", Upload.fetch_data_manual);
     $(document).on("click.danbooru", "#fetch-data-manual", Upload.fetch_data_manual);
   }
 
@@ -14,10 +15,8 @@ Upload.initialize_all = function() {
     } else {
       $("#image").on("load.danbooru error.danbooru", this.initialize_image);
     }
-    this.initialize_info_bookmarklet();
     this.initialize_similar();
     this.initialize_submit();
-    $(() => $("#related-tags-button").click()); // delay so we don't click until button is bound (#3895).
 
     $("#toggle-artist-commentary").on("click.danbooru", function(e) {
       Upload.toggle_commentary();
@@ -75,11 +74,6 @@ Upload.initialize_similar = function() {
     $.get("/iqdb_queries", {"url": $("#upload_source").val()}).done(function(html) {$("#iqdb-similar").html(html).show()});
     e.preventDefault();
   });
-}
-
-Upload.initialize_info_bookmarklet = function() {
-  $("#upload_source").on("change.danbooru", Upload.fetch_data_manual);
-  $("#fetch-data-manual").click();
 }
 
 Upload.update_scale = function() {

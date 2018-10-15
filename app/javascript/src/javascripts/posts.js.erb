@@ -153,7 +153,6 @@ Post.open_edit_dialog = function() {
   $tag_string.css({"resize": "none", "width": "100%"});
   $tag_string.focus().selectEnd().height($tag_string[0].scrollHeight);
 
-  $(document).trigger("danbooru:show-post-edit-form");
   $(document).trigger("danbooru:open-post-edit-dialog");
 }
 
@@ -433,7 +432,7 @@ Post.initialize_post_sections = function() {
       $("#share").hide();
       $("#post_tag_string").focus().selectEnd().height($("#post_tag_string")[0].scrollHeight);
       $("#recommended").hide();
-      $(document).trigger("danbooru:show-post-edit-form");
+      $(document).trigger("danbooru:open-post-edit-tab");
     } else if (e.target.hash === "#recommended") {
       $("#comments").hide();
       $("#edit").hide();
