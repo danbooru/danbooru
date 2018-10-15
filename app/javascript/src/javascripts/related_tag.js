@@ -89,7 +89,7 @@ RelatedTag.current_tag = function() {
 
 RelatedTag.update_selected = function(e) {
   var current_tags = $("#upload_tag_string,#post_tag_string").val().toLowerCase().match(/\S+/g) || [];
-  var $all_tags = $("#related-tags a");
+  var $all_tags = $(".related-tags a.search-tag");
   $all_tags.removeClass("selected");
 
   $all_tags.each(function(i, tag) {
