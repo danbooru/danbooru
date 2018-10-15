@@ -1,0 +1,6 @@
+<div class="user-related-tags-columns">
+  <% if related_tags.present? %>
+    <%= render "related_tags/tag_column", tags: related_tags.recent_tags, title: "Recent" %>
+    <%= render "related_tags/tag_column", tags: related_tags.favorite_tags, title: "Frequent" %>
+  <% end %>
+</div>

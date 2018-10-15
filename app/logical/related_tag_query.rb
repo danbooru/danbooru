@@ -1,13 +1,10 @@
 class RelatedTagQuery
-  attr_reader :query, :category, :translated_tags, :artists, :user
+  attr_reader :query, :category, :user
 
-  def initialize(query, category: nil, translated_tags: nil, artists: nil, user: nil)
+  def initialize(query: nil, category: nil, user: nil)
     @user = user
     @query = TagAlias.to_aliased(query.to_s.downcase.strip).join(" ")
     @category = category
-    @translated_tags = translated_tags.to_s.split
-    @artists = Artist.where(name: artists.to_s.split)
-    @artists = [Artist.find_by(name: "banned_artist")] + @artists if @artists.any?(&:is_banned?)
   end
 
   def pretty_name
@@ -31,7 +28,7 @@ class RelatedTagQuery
     return [] unless user.present? && PostArchive.enabled?
 
     versions = PostArchive.where(updater_id: user.id).where("updated_at > ?", since).order(id: :desc).limit(max_edits)
-    tags = versions.flat_map { |v| v.diff[:added_tags] }
+    tags = versions.flat_map(&:added_tags)
     tags = tags.reject { |tag| Tag.is_metatag?(tag) }
     tags = tags.group_by(&:itself).transform_values(&:size).sort_by { |tag, count| [-count, tag] }.map(&:first)
     tags.take(max_tags)

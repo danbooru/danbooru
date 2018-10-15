@@ -104,7 +104,7 @@
           <%= submit_tag "Submit", :id => "submit-button", :class => "large ui-button ui-widget ui-corner-all gradient", data: {disable_with: false} %>
         </div>
 
-        <%= render "related_tags/container" %>
+        <%= render "related_tags/container", related_tags: nil %>
       <% end %>
     <% else %>
       <h2 style="margin-bottom: 1em;">You <%= CurrentUser.user.upload_limited_reason %></h2>

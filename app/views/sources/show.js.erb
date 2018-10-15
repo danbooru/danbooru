@@ -1,6 +1,9 @@
 $("#source-info").replaceWith("<%= j render "info", source: @source %>");
 
-$(document).trigger("danbooru:update-source-data", <%= raw @source.to_json %>);
+$(document).trigger("danbooru:update-source-data", {
+  source: <%= raw @source.to_json %>,
+  related_tags_html: "<%= j render "related_tags/source_tags", source: @source %>",
+});
 
 if ($("#c-uploads #a-new").length) {
   $("#upload_artist_commentary_title").val(<%= raw @source.dtext_artist_commentary_title.to_json %>);

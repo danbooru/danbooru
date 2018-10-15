@@ -5,5 +5,9 @@
     <a href="#" id="hide-related-tags-link">«</a>
   </h3>
 
-  <%= render "related_tags/related_tags" %>
+  <div id="related-tags" class="related-tags">
+    <%= render "related_tags/user_tags", related_tags: nil %>
+    <%= render "related_tags/current_tags", related_tags: nil %>
+    <%= render "related_tags/source_tags", source: nil %>
+  </div>
 </div>

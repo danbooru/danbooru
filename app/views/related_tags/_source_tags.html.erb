@@ -1,0 +1,34 @@
+<div class="source-related-tags-columns">
+  <% if source.present? %>
+    <%= render "related_tags/tag_column", tags: source.translated_tags.map(&:first), title: "Translated Tags" %>
+
+    <div class="tag-column wide-column artist-related-tags-column">
+      <h6>Artist</h6>
+
+      <% if source.artists.any?(&:is_banned?) %>
+        <%= TagSetPresenter.new(["banned_artist"]).tag_list_html(name_only: true) %>
+      <% end %>
+
+      <% if source.artists.size == 0 %>
+        none
+      <% else %>
+        <% source.artists.each do |artist| %>
+          <%= TagSetPresenter.new([artist.name]).tag_list_html(name_only: true) %>
+
+          <ul>
+            <% artist.sorted_urls.each do |url| %>
+              <li>
+                <% if url.is_active %>
+                  <%= external_link_to url.url, truncate: 30 %>
+                  <%= link_to tag.i(class: "fas fa-minus-circle"), artist_url_path(id: url.id, artist_url: { is_active: false }), remote: true, method: :put, "data-confirm": "This will mark the URL as inactive. Continue?" %>
+                <% else %>
+                  <del><%= truncate(url.url, length: 30) %></del>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+</div>
