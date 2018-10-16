@@ -34,7 +34,7 @@ RelatedTag.on_click_related_tags_button = function (event) {
   RelatedTag.show();
 }
 
-RelatedTag.on_update_source_data = function (event, { source, related_tags_html }) {
+RelatedTag.on_update_source_data = function (event, { related_tags_html }) {
   $(".source-related-tags-columns").replaceWith(related_tags_html);
   RelatedTag.update_selected();
 }
@@ -126,12 +126,18 @@ RelatedTag.toggle_tag = function(e) {
 RelatedTag.show = function(e) {
   $(document).trigger("danbooru:show-related-tags");
   $("#related-tags-container").removeClass("hidden").addClass("visible");
-  return false;
+
+  if (e) {
+    e.preventDefault();
+  }
 }
 
 RelatedTag.hide = function(e) {
   $("#related-tags-container").removeClass("visible").addClass("hidden");
-  return false;
+
+  if (e) {
+    e.preventDefault();
+  }
 }
 
 $(function() {

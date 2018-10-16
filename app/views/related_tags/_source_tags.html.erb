@@ -5,13 +5,13 @@
     <div class="tag-column wide-column artist-related-tags-column">
       <h6>Artist</h6>
 
-      <% if source.artists.any?(&:is_banned?) %>
-        <%= TagSetPresenter.new(["banned_artist"]).tag_list_html(name_only: true) %>
-      <% end %>
-
       <% if source.artists.size == 0 %>
         none
       <% else %>
+        <% if source.artists.any?(&:is_banned?) %>
+          <%= TagSetPresenter.new(["banned_artist"]).tag_list_html(name_only: true) %>
+        <% end %>
+
         <% source.artists.each do |artist| %>
           <%= TagSetPresenter.new([artist.name]).tag_list_html(name_only: true) %>
 
