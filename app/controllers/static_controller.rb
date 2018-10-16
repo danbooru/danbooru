@@ -20,7 +20,7 @@ class StaticController < ApplicationController
 
   def sitemap
     @popular_search_service = PopularSearchService.new(Date.yesterday)
-    @post_set = PostSets::Popular.new(Date.yesterday.to_s, "week", limit: 100)
+    @post_set = PostSets::Popular.new(Date.yesterday.to_s, "week", limit: 200)
     @posts = @post_set.posts
     render layout: false
   end  
