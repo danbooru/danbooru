@@ -199,15 +199,17 @@ class ApplicationController < ActionController::Base
   # /tags?search[name]=touhou&search[category]=&search[order]=
   # => /tags?search[name]=touhou
   def normalize_search
-    if request.get?
-      if params[:search].blank?
-        params[:search] = ActionController::Parameters.new
-      end
+    return unless request.get?
+    params[:search] ||= ActionController::Parameters.new
 
-      if params[:search].is_a?(ActionController::Parameters) && params[:search].values.any?(&:blank?)
-        params[:search].reject! {|k,v| v.blank?}
-        redirect_to url_for(params: params.except(:controller, :action, :index).permit!)
-      end
+    deep_reject_blank = lambda do |hash|
+      hash.reject { |k, v| v.blank? || (v.is_a?(Hash) && deep_reject_blank.call(v).blank?) }
+    end
+    nonblank_search_params = deep_reject_blank.call(params[:search])
+
+    if nonblank_search_params != params[:search]
+      params[:search] = nonblank_search_params
+      redirect_to url_for(params: params.except(:controller, :action, :index).permit!)
     end
   end
 

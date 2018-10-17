@@ -26,6 +26,11 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         get users_path, params: {:search => {:name_matches => @user.name}}
         assert_response :success
       end
+
+      should "list all users (with blank search parameters)" do
+        get users_path, params: { search: { inviter: { name_matches: "" }, level: "", name: "test" } }
+        assert_redirected_to users_path(search: { name: "test" })
+      end
     end
 
     context "show action" do
