@@ -1,6 +1,7 @@
 class UploadService
   module Utils
     extend self
+    class CorruptFileError < RuntimeError; end
 
     def file_header_to_file_ext(file)
       case File.read(file.path, 16)
@@ -23,9 +24,9 @@ class UploadService
       end
     end
 
-    def delete_file(md5, file_ext, upload_id = nil)
+    def delete_file(md5, file_ext, upload_id = nil)     
       if Post.where(md5: md5).exists?
-        if upload_id
+        if upload_id.present? && Upload.where(id: upload_id).exists?
           CurrentUser.as_system do
             Upload.find(upload_id).update(status: "completed")
           end
@@ -34,7 +35,7 @@ class UploadService
         return
       end
 
-      if upload_id && Upload.where(id: upload_id).exists?
+      if upload_id.present? && Upload.where(id: upload_id).exists?
         CurrentUser.as_system do
           Upload.find(upload_id).update(status: "preprocessed + deleted")
         end
@@ -206,8 +207,24 @@ class UploadService
     end
 
     def download_for_upload(upload)
-      download = Downloads::File.new(upload.source, upload.referer_url)
-      file, strategy = download.download!
+      attempts = 0
+
+      begin
+        download = Downloads::File.new(upload.source, upload.referer_url)
+        file, strategy = download.download!
+
+        if !DanbooruImageResizer.validate_shell(file)
+          raise CorruptFileError.new("File is corrupted")
+        end
+
+      rescue
+        if attempts == 3
+          raise
+        end
+
+        attempts += 1
+        retry
+      end
 
       if download.data[:ugoira_frame_data]
         upload.context = { 

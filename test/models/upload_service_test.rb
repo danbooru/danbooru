@@ -42,6 +42,28 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
       end
 
+      context "for a corrupt jpeg" do
+        setup do
+          @source = "https://raikou1.donmai.us/93/f4/93f4dd66ef1eb11a89e56d31f9adc8d0.jpg"
+          @mock_upload = mock("upload")
+          @mock_upload.stubs(:source).returns(@source)
+          @mock_upload.stubs(:referer_url).returns(nil)
+          @bad_file = File.open("#{Rails.root}/test/files/test-corrupt.jpg", "rb")
+          Downloads::File.any_instance.stubs(:download!).returns([@bad_file, nil])
+        end
+
+        teardown do
+          @bad_file.close
+        end
+
+        should "retry three times" do
+          DanbooruImageResizer.expects(:validate_shell).times(4).returns(false)
+          assert_raise(UploadService::Utils::CorruptFileError) do
+            subject.download_for_upload(@mock_upload)
+          end
+        end
+      end
+
       context "for a pixiv" do
         setup do
           @source = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350"
@@ -849,7 +871,8 @@ class UploadServiceTest < ActiveSupport::TestCase
       context "a post that is replaced to another file then replaced back to the original file" do
         should "not delete the original files" do
           begin
-            FileUtils.expects(:rm_f).never
+            # this is called thrice to delete the file for 62247364
+            FileUtils.expects(:rm_f).times(3) 
 
             as_user do
               @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
