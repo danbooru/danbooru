@@ -3,6 +3,10 @@ import Cookie from './cookie'
 let NewsUpdate = {};
 
 NewsUpdate.initialize = function() {
+  if (!$("#news-updates").length) {
+    return;
+  }
+
   var key = $("#news-updates").data("id").toString();
 
   if (Cookie.get("news-ticker") === key) {
