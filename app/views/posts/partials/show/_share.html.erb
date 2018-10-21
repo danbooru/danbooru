@@ -10,10 +10,10 @@
   var addthis_config = {"data_track_addressbar": false, "pubid": "<%= Danbooru.config.addthis_key %>"};
   var addthis_share = {
     "url":"<%= j post_url(post) %>",
-    "title": "<%= '#r_18 ' unless post.rating == 's' %><%= escape_javascript post.presenter.humanized_essential_tag_string.html_safe %> - <%= Danbooru.config.app_name %>"
+    "title": "<%= escape_javascript post.presenter.humanized_essential_tag_string.html_safe %> on <%= Danbooru.config.app_name %>"
   };
 </script>
 
-<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#async=1"></script>
+<script type="text/javascript" src="https://s7.addthis.com/js/300/addthis_widget.js#async=1"></script>
 
 <% end %>
