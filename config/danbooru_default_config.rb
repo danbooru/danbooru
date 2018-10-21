@@ -632,9 +632,6 @@ module Danbooru
     def twitter_site
     end
 
-    def addthis_key
-    end
-
     # enable s3-nginx proxy caching
     def use_s3_proxy?(post)
       false

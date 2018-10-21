@@ -1,5 +1,3 @@
-/* global addthis */
-
 import Utility from './utility'
 import Hammer from 'hammerjs'
 import RelatedTag from './related_tag.js.erb'
@@ -454,7 +452,6 @@ Post.initialize_post_sections = function() {
       $("#edit").hide();
       $("#comments").hide();
       $("#share").show();
-      addthis.init();
       $("#recommended").hide();
     }
 
