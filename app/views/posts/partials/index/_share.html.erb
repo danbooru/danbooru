@@ -7,13 +7,16 @@
 </div>
 
 <script type="text/javascript">
-  var addthis_config = {"data_track_addressbar": false, "pubid": "<%= Danbooru.config.addthis_key %>"};
-  var addthis_share = {
+  window.addthis_config = {"data_track_addressbar": false, "pubid": "<%= Danbooru.config.addthis_key %>"};
+  window.addthis_share = {
     "url":"<%= j posts_url(tags: params[:tags]) %>",
-    "title": "<%= escape_javascript @post_set.humanized_tag_string %> - <%= Danbooru.config.app_name %>"
+    "title": "Find more art about <%= escape_javascript @post_set.humanized_tag_string %> on <%= Danbooru.config.app_name %>"
   };
+  $(function() {
+  	addthis.init();
+  });
 </script>
 
-<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#async=1"></script>
+<script type="text/javascript" src="https://s7.addthis.com/js/300/addthis_widget.js#async=1"></script>
 
 <% end %>
