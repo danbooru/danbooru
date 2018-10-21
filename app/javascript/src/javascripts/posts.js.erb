@@ -1,5 +1,3 @@
-/* global addthis */
-
 import Utility from './utility'
 import Hammer from 'hammerjs'
 import RelatedTag from './related_tag.js.erb'
@@ -99,7 +97,6 @@ Post.open_edit_dialog = function() {
 
   $("#edit").show();
   $("#comments").hide();
-  $("#share").hide();
   $("#post-sections li").removeClass("active");
   $("#post-edit-link").parent("li").addClass("active");
   $("#related-tags-container").show();
@@ -432,12 +429,10 @@ Post.initialize_post_sections = function() {
     if (e.target.hash === "#comments") {
       $("#comments").show();
       $("#edit").hide();
-      $("#share").hide();
       $("#recommended").hide();
     } else if (e.target.hash === "#edit") {
       $("#edit").show();
       $("#comments").hide();
-      $("#share").hide();
       $("#post_tag_string").focus().selectEnd().height($("#post_tag_string")[0].scrollHeight);
       $("#related-tags-button").trigger("click");
       $("#fetch-data-manual").trigger("click");
@@ -445,7 +440,6 @@ Post.initialize_post_sections = function() {
     } else if (e.target.hash === "#recommended") {
       $("#comments").hide();
       $("#edit").hide();
-      $("#share").hide();
       $("#recommended").show();
       $.get("/recommended_posts", {context: "post", post_id: Utility.meta("post-id")}, function(data) {
         $("#recommended").html(data);
@@ -453,8 +447,6 @@ Post.initialize_post_sections = function() {
     } else {
       $("#edit").hide();
       $("#comments").hide();
-      $("#share").show();
-      addthis.init();
       $("#recommended").hide();
     }
 

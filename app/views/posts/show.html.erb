@@ -170,6 +170,8 @@
     <meta name="report-server" content="<%= Danbooru.config.reportbooru_server %>">
   <% end %>
 
+  <%= tag.meta name: "canonical", content: post_url(@post, host: Danbooru.config.hostname, protocol: "https") %>
+
   <%# Twitter properties %>
   <% if @post.twitter_card_supported? %>
     <meta name="twitter:card" content="summary_large_image">
@@ -185,6 +187,9 @@
   <% if @post.rating == "e" %>
     <meta name="rating" content="adult">
   <% end %>
+
+  <%= tag.meta name: "og:type", content: "website" %>
+  <%= tag.meta name: "og:site", content: Danbooru.config.app_name %>
 
   <%= auto_discovery_link_tag(:atom, comments_url(:atom, search: { post_id: @post.id }), title: "Comments for post ##{@post.id}") %>
 <% end %>

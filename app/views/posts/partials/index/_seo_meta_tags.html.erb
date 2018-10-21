@@ -23,7 +23,7 @@
   <meta name="rating" content="adult">
 <% end %>
 
-<%= tag.meta name: "canonical", content: posts_url(tags: params[:tags], host: Danbooru.config.domain) %>
+<%= tag.meta name: "canonical", content: posts_url(tags: params[:tags], host: Danbooru.config.hostname, protocol: "https") %>
 
 <% if params[:tags].present? %>
   <% "Find the best art of #{params[:tags].tr('_', ' ').titleize} on #{Danbooru.config.app_name}".tap do |desc| %>
@@ -43,7 +43,7 @@
 <%= tag.meta name: "og:site", content: Danbooru.config.app_name %>
 
 <% if @post_set.best_post.present? %>
-  <%= tag.meta name: "twitter:image", content: @post_set.best_post.file_url %>
-  <%= tag.meta name: "og:image", content: @post_set.best_post.file_url %>
+  <%= tag.meta name: "twitter:image", content: @post_set.best_post.open_graph_image_url %>
+  <%= tag.meta name: "og:image", content: @post_set.best_post.open_graph_image_url %>
   <%= tag.meta name: "twitter:card", content: "summary_large_image" %>
 <% end %>
