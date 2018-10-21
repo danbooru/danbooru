@@ -96,32 +96,22 @@ end
 CurrentUser.as_admin
 
 if Upload.count == 0
+  ENV["SKIP_CLOUDFLARE_CHECK"] = "true"
+
   puts "Creating uploads"
   1.upto(50) do |i|
     color1 = rand(4096).to_s(16)
     color2 = rand(4096).to_s(16)
     width = rand(2000) + 100
-    height = rand(2000) + 100
+    height = (width * (rand(0.5) + 1)).to_i
     url = "http://ipsumimage.appspot.com/#{width}x#{height},#{color1}"
     tags = rand(1_000_000_000).to_s.scan(/../).join(" ")
-
+    puts url
     service = UploadService.new(source: url, tag_string: tags, rating: "s")
     service.start!
   end
 else
   puts "Skipping uploads"
-end
-
-if Post.count == 0
-  puts "Creating posts"
-  Upload.all.each do |upload|
-    upload.process!
-  end
-  if Post.count == 0
-    raise "Uploads failed conversion"
-  end
-else
-  puts "Skipping posts"
 end
 
 if Comment.count == 0

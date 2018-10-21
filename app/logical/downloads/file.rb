@@ -22,6 +22,8 @@ module Downloads
     end
 
     def is_cloudflare?
+      return false if ENV["SKIP_CLOUDFLARE_CHECK"]
+
       Cache.get("is_cloudflare:#{file_url.origin}", 4.hours) do
         res = HTTParty.head(file_url, httparty_options)
         raise Error.new("HTTP error code: #{res.code} #{res.message}") unless res.success?

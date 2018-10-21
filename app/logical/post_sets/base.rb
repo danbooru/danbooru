@@ -36,6 +36,10 @@ module PostSets
       false
     end
 
+    def best_post
+      nil
+    end
+
     def presenter
       raise NotImplementedError
     end

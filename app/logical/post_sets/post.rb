@@ -26,7 +26,7 @@ module PostSets
     end
 
     def has_wiki?
-      is_single_tag? && ::WikiPage.titled(tag_string).exists? && wiki_page.visible?
+      is_single_tag? && ::WikiPage.titled(tag_string).exists? && wiki_page.visible? && wiki_page.body.present?
     end
 
     def has_blank_wiki?
@@ -183,6 +183,11 @@ module PostSets
 
     def presenter
       @presenter ||= ::PostSetPresenters::Post.new(self)
+    end
+
+    def best_post
+      # be smarter about this in the future
+      posts[0]
     end
   end
 end
