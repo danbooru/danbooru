@@ -38,7 +38,7 @@ class PopularSearchService
       response
     end.to_s.force_encoding("utf-8")
 
-    if data.blank?
+    if data.blank? || data == "[]"
       dates = date.yesterday.strftime("%Y-%m-%d")
 
       data = Cache.get("ps-day-#{dates}", 1.minute) do
