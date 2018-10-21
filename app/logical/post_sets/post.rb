@@ -187,7 +187,7 @@ module PostSets
 
     def best_post
       # be smarter about this in the future
-      posts[0]
+      posts.max {|a, b| a.fav_count <=> b.fav_count}
     end
   end
 end
