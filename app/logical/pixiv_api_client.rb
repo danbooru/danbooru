@@ -148,7 +148,11 @@ class PixivApiClient
     end
 
     def pages
-      json["body"]["body"]["images"].map {|x| x["originalUrl"]}
+      if json["body"]["body"]
+        json["body"]["body"]["images"].map {|x| x["originalUrl"]}
+      else
+        []
+      end
     end
   end
 

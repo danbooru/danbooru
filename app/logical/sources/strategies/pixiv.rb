@@ -180,10 +180,13 @@ module Sources
     public
 
       def image_urls_sub
+        if url =~ FANBOX_IMAGE
+          return [url]
+        end
+
         # there's too much normalization bullshit we have to deal with
         # raw urls, so just fetch the canonical url from the api every
         # time.
-
         if manga_page.present?
           return [metadata.pages[manga_page]]
         end
