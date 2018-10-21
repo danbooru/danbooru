@@ -14,6 +14,11 @@
         <%= render "posts/partials/show/information", :post => @post %>
       </section>
 
+      <section id="post-share">
+        <h1>Share</h1>
+        <%= render "posts/partials/show/share", :post => @post %>
+      </section>
+
       <section id="post-options">
         <h1>Options</h1>
         <%= render "posts/partials/show/options", :post => @post %>
@@ -98,8 +103,6 @@
         <% if CurrentUser.is_member? && @post.visible? %>
           <li><a href="#edit" id="post-edit-link" data-shortcut="e">Edit</a></li>
         <% end %>
-
-        <li><a href="#share">Share</a></li>
       </menu>
 
       <% if RecommenderService.available_for_post?(@post) %>
@@ -128,10 +131,6 @@
           <%= render "posts/partials/show/edit", :post => @post %>
         </section>
       <% end %>
-
-      <section id="share" style="display: none;">
-        <%= render "posts/partials/show/share", :post => @post %>
-      </section>
     </section>
   </div>
 

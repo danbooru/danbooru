@@ -9,8 +9,8 @@
 <script type="text/javascript">
   var addthis_config = {"data_track_addressbar": false, "pubid": "<%= Danbooru.config.addthis_key %>"};
   var addthis_share = {
-    "url":"<%= j post_url(post) %>",
-    "title": "<%= '#r_18 ' unless post.rating == 's' %><%= escape_javascript post.presenter.humanized_essential_tag_string.html_safe %> - <%= Danbooru.config.app_name %>"
+    "url":"<%= j posts_url(tags: params[:tags]) %>",
+    "title": "<%= escape_javascript @post_set.humanized_tag_string %> - <%= Danbooru.config.app_name %>"
   };
 </script>
 
