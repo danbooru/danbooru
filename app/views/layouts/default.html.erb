@@ -86,10 +86,14 @@
   </script>
   <script>
     window.Danbooru.mixpanelInit(
-      <%= CurrentUser.id %>,
+      <%= CurrentUser.id || "null" %>,
       <%= raw session.id.to_json %>,
       <%= CurrentUser.opt_out_mixpanel? %>,
-      <%= raw({"$created" =>CurrentUser.created_at.strftime('%F %T'), "$name" => CurrentUser.name, "level" => CurrentUser.level, "upload_count" => CurrentUser.post_upload_count, "post_update_count" => CurrentUser.post_update_count, "note_update_count" => CurrentUser.note_update_count, "favorite_count" => CurrentUser.favorite_count}.to_json) %>
+      <% if CurrentUser.is_anonymous? %>
+        {}
+      <% else %>
+        <%= raw({"$created" =>CurrentUser.created_at.strftime('%F %T'), "$name" => CurrentUser.name, "level" => CurrentUser.level, "upload_count" => CurrentUser.post_upload_count, "post_update_count" => CurrentUser.post_update_count, "note_update_count" => CurrentUser.note_update_count, "favorite_count" => CurrentUser.favorite_count}.to_json) %>
+      <% end %>
     );
   </script>
 
