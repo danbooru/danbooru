@@ -517,6 +517,8 @@ inline := |*
       sm->header_mode = false;
       dstack_rewind(sm);
       fret;
+    } else if (sm->f_strip) {
+      append_c(sm, ' ');
     } else {
       append(sm, true, "<br>");
     }
@@ -914,7 +916,7 @@ static inline bool dstack_check2(const StateMachine * sm, element_t expected_ele
 }
 
 static inline void append(StateMachine * sm, bool is_markup, const char * s) {
-  if (!(is_markup && sm->f_strip)) {
+  if (!is_markup || !sm->f_strip) {
     sm->output = g_string_append(sm->output, s);
   }
 }
