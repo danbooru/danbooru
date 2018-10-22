@@ -21,7 +21,7 @@
 <%= tag.meta name: "canonical", content: posts_url(tags: params[:tags], host: Danbooru.config.hostname, protocol: "https") %>
 
 <% if @post_set.has_wiki_text? %>
-  <% strip_dtext(@post_set.wiki_page.presenter.excerpt).tap do |desc| %>
+  <% strip_dtext(truncate(@post_set.wiki_page.presenter.excerpt, length: 350)).tap do |desc| %>
     <%= tag.meta name: "description", content: desc %>
     <%= tag.meta name: "og:description", content: desc %>
     <%= tag.meta name: "twitter:description", content: desc %>
