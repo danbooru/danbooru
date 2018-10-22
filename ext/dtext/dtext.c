@@ -307,6 +307,9 @@ static inline void append_url(StateMachine * sm, const char * url_start, const c
   append(sm, true, "<a class=\"dtext-link\" href=\"");
   append_segment_html_escaped(sm, url_start, url_end);
   append(sm, true, "\">");
+  if (sm->f_strip) {
+    append_c(sm, ' ');
+  }
   append_segment_html_escaped(sm, title_start, title_end);
   append(sm, true, "</a>");
 }
@@ -326,6 +329,9 @@ static inline bool append_named_url(StateMachine * sm, const char * url_start, c
 
   append_segment_html_escaped(sm, url_start, url_end);
   append(sm, true, "\">");
+  if (sm->f_strip) {
+    append_c(sm, ' ');
+  }
   append_segment(sm, false, parsed_title->str, parsed_title->str + parsed_title->len - 1);
   append(sm, true, "</a>");
 
@@ -620,7 +626,7 @@ gboolean parse_helper(StateMachine* sm) {
   }
 
   
-#line 624 "ext/dtext/dtext.c"
+#line 630 "ext/dtext/dtext.c"
 	{
 	( sm->top) = 0;
 	( sm->ts) = 0;
@@ -628,9 +634,9 @@ gboolean parse_helper(StateMachine* sm) {
 	( sm->act) = 0;
 	}
 
-#line 1303 "ext/dtext/dtext.rl"
+#line 1309 "ext/dtext/dtext.rl"
   
-#line 634 "ext/dtext/dtext.c"
+#line 640 "ext/dtext/dtext.c"
 	{
 	if ( ( sm->p) == ( sm->pe) )
 		goto _test_eof;
@@ -640,7 +646,7 @@ _resume:
 #line 1 "NONE"
 	{( sm->ts) = ( sm->p);}
 	break;
-#line 644 "ext/dtext/dtext.c"
+#line 650 "ext/dtext/dtext.c"
 	}
 
 	switch (  sm->cs ) {
@@ -5892,7 +5898,7 @@ _again:
 #line 1 "NONE"
 	{( sm->ts) = 0;}
 	break;
-#line 5896 "ext/dtext/dtext.c"
+#line 5902 "ext/dtext/dtext.c"
 	}
 
 	if ( ++( sm->p) != ( sm->pe) )
@@ -6408,7 +6414,7 @@ _again:
 	_out: {}
 	}
 
-#line 1304 "ext/dtext/dtext.rl"
+#line 1310 "ext/dtext/dtext.rl"
 
   dstack_close(sm);
 

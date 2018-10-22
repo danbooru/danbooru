@@ -987,6 +987,9 @@ static inline void append_url(StateMachine * sm, const char * url_start, const c
   append(sm, true, "<a class=\"dtext-link\" href=\"");
   append_segment_html_escaped(sm, url_start, url_end);
   append(sm, true, "\">");
+  if (sm->f_strip) {
+    append_c(sm, ' ');
+  }
   append_segment_html_escaped(sm, title_start, title_end);
   append(sm, true, "</a>");
 }
@@ -1006,6 +1009,9 @@ static inline bool append_named_url(StateMachine * sm, const char * url_start, c
 
   append_segment_html_escaped(sm, url_start, url_end);
   append(sm, true, "\">");
+  if (sm->f_strip) {
+    append_c(sm, ' ');
+  }
   append_segment(sm, false, parsed_title->str, parsed_title->str + parsed_title->len - 1);
   append(sm, true, "</a>");
 

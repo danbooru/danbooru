@@ -371,6 +371,9 @@ class DTextTest < Minitest::Test
     assert_equal("hello z wo rld ", DTextRagel.parse_strip("h[b]e[/b]llo[quote]z[/quote]wo[expand]rld[/expand]"))
     assert_equal("this is a header a paragraph this is a list ", DTextRagel.parse_strip("h1. this is a header\n\na paragraph\n\n* this\n* is\n* a list\n"))
     assert_equal("one line after the other ", DTextRagel.parse_strip("one\nline\nafter\nthe\nother"))
+    assert_equal("one http://google.com this is a link after ", DTextRagel.parse_strip("one \"this is a link\":http://google.com after\n"))
+    assert_equal("one http://google.com this is a link after ", DTextRagel.parse_strip("one \"this is a link\":[http://google.com] after\n"))
+    assert_equal("one wiki after ", DTextRagel.parse_strip("one [[wiki]] after\n"))
   end
 
   def test_old_asterisks
