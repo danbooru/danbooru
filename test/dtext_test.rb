@@ -368,7 +368,8 @@ class DTextTest < Minitest::Test
   end
 
   def test_strip
-    assert_equal("hellozworld", DTextRagel.parse_strip("h[b]e[/b]llo[quote]z[/quote]wo[expand]rld[/expand]"))
+    assert_equal("hello z wo rld ", DTextRagel.parse_strip("h[b]e[/b]llo[quote]z[/quote]wo[expand]rld[/expand]"))
+    assert_equal("this is a header a paragraph this is a list ", DTextRagel.parse_strip("h1. this is a header\n\na paragraph\n\n* this\n* is\n* a list\n"))
   end
 
   def test_old_asterisks

@@ -1,4 +1,4 @@
-#ENV["G_MESSAGES_DEBUG"] = "all"
+# ENV["G_MESSAGES_DEBUG"] = "all"
 
 begin
   require "rake/extensiontask"
@@ -63,7 +63,7 @@ end
 
 task test: :compile do
   Bundler.with_clean_env do
-    ruby "-Ilib", '-rdtext', "test/dtext_test.rb" #, '--name=test_headers_with_ids'
+    ruby "-Ilib", '-rdtext', "test/dtext_test.rb" #, '--name=test_strip'
   end
 end
 

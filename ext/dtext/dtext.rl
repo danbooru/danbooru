@@ -44,6 +44,7 @@ typedef enum element_t {
   BLOCK_H5 = 27,
   BLOCK_H6 = 28,
   INLINE_CODE = 29,
+  BLOCK_STRIP = 30,
 } element_t;
 
 %%{
@@ -672,6 +673,10 @@ main := |*
       header = '6';
     }
 
+    if (sm->f_strip) {
+      dstack_push(sm, BLOCK_STRIP);
+    }
+
     if (!sm->f_strip) {
       switch (header) {
         case '1':
@@ -727,6 +732,10 @@ main := |*
 
     if (sm->f_inline) {
       header = '6';
+    }
+
+    if (sm->f_strip) {
+      dstack_push(sm, BLOCK_STRIP);
     }
 
     if (!sm->f_strip) {
@@ -1029,7 +1038,9 @@ static inline void append_block_segment(StateMachine * sm, const char * a, const
   if (sm->f_inline) {
     // sm->output = g_string_append_c(sm->output, ' ');
   } else if (sm->f_strip) {
-    // do nothing
+    if (sm->output->len > 0 && sm->output->str[sm->output->len-1] != ' ') {
+      append_c(sm, ' ');
+    }
   } else {
     sm->output = g_string_append_len(sm->output, a, b - a + 1);
   }
@@ -1140,6 +1151,7 @@ static void dstack_rewind(StateMachine * sm) {
     case BLOCK_H3: append_block(sm, "</h3>"); break;
     case BLOCK_H2: append_block(sm, "</h2>"); break;
     case BLOCK_H1: append_block(sm, "</h1>"); break;
+    case BLOCK_STRIP: append_c(sm, ' '); break;
 
     case QUEUE_EMPTY: break;
   } 
