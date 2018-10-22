@@ -26,7 +26,11 @@ module PostSets
     end
 
     def has_wiki?
-      is_single_tag? && ::WikiPage.titled(tag_string).exists? && wiki_page.visible? && wiki_page.body.present?
+      is_single_tag? && ::WikiPage.titled(tag_string).exists? && wiki_page.visible?
+    end
+
+    def has_wiki_text?
+      has_wiki? && wiki_page.body.present?
     end
 
     def has_blank_wiki?
