@@ -50,6 +50,7 @@ class UsersController < ApplicationController
       @user.save
       if @user.errors.empty?
         session[:user_id] = @user.id
+        flash[:alias_mixpanel] = true
       else
         flash[:notice] = "Sign up failed: #{@user.errors.full_messages.join("; ")}"
       end
