@@ -26,7 +26,7 @@
     <%= tag.meta name: "og:description", content: desc %>
     <%= tag.meta name: "twitter:description", content: desc %>
   <% end %>
-<% elsif params[:tags].present? %>
+<% elsif @post_set.is_single_tag? %>
   <% "Find the best art of #{params[:tags].tr('_', ' ').titleize} on #{Danbooru.config.app_name}".tap do |desc| %>
     <%= tag.meta name: "description", content: desc %>
     <%= tag.meta name: "og:description", content: desc %>
