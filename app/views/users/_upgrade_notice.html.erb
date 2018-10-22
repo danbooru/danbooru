@@ -1,4 +1,17 @@
 <div class="ui-corner-all ui-state-highlight" id="upgrade-account-notice">
-  <h1><%= link_to "Upgrade your account for only $20!", new_user_upgrade_path %></h1>
+  <h1><%= link_to "Upgrade your account for only $20!", new_user_upgrade_path, id: "goto-upgrade-account" %></h1>
   <p><%= link_to "No thanks", "#", :id => "hide-upgrade-account-notice" %></p>
 </div>
+
+<%= content_for(:html_header) do %>
+  <script>
+    $(function() {
+      $("#goto-upgrade-account").click(function() {
+        window.Danbooru.mixpanelEvent("clicked upgrade notice");        
+      });
+      $("#hide-upgrade-account-notice").click(function() {
+        window.Danbooru.mixpanelEvent("hide upgrade notice");        
+      });
+    })
+  </script>
+<% end %>
