@@ -82,7 +82,8 @@
     $(function() {
       window.Danbooru.mixpanelEvent("Post Search", {
         "tags": <%= params[:tags].to_json %>,
-        "page": <%= params[:page].to_json %>
+        "page": <%= params[:page].to_json %>,
+        "referer": <%= request.referer.to_json %>
       });
     });
   </script>
