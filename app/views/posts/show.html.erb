@@ -192,6 +192,19 @@
   <%= tag.meta name: "og:site", content: Danbooru.config.app_name %>
 
   <%= auto_discovery_link_tag(:atom, comments_url(:atom, search: { post_id: @post.id }), title: "Comments for post ##{@post.id}") %>
+
+  <script>
+    $(function() {
+      window.Danbooru.mixpanelEvent("Post View", {
+        "id": <%= @post.id %>,
+        "rating": '<%= @post.rating %>',
+        "size": <%= @post.file_size %>,
+        "fav_count": <%= @post.fav_count %>,
+        "created_at": <%= @post.created_at.strftime('%F %T').to_json %>,
+        "tags": <%= @post.presenter.humanized_essential_tag_string.to_json %>
+      });
+    });
+  </script>
 <% end %>
 
 <%= render "posts/partials/common/secondary_links" %>

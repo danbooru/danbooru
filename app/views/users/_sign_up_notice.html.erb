@@ -6,12 +6,10 @@
 <% content_for(:html_header) do %>
   <script>
     $(function() {
-      $("#sign-up-link").click(function() {
-        window.Danbooru.mixpanelEvent("clicked sign up");        
-      });
-      $("#hide-sign-up-notice").click(function() {
-        window.Danbooru.mixpanelEvent("hide sign up notice");        
-      });
-    })
+      if (typeof window.mixpanel === 'object') {
+        window.mixpanel.track_links('#sign-up-link', 'clicked sign up');
+        window.mixpanel.track_links('#hide-sign-up-notice', 'hide sign up notice');
+      }
+    });
   </script>
 <% end %>

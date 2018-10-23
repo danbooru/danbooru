@@ -78,4 +78,12 @@
   <% end %>
   <%= missed_post_search_count_js %>
   <%= render "posts/partials/index/seo_meta_tags" %>
+  <script>
+    $(function() {
+      window.Danbooru.mixpanelEvent("Post Search", {
+        "tags": <%= params[:tags].to_json %>,
+        "page": <%= params[:page].to_json %>
+      });
+    });
+  </script>
 <% end %>

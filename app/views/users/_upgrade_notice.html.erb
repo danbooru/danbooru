@@ -6,12 +6,10 @@
 <% content_for(:html_header) do %>
   <script>
     $(function() {
-      $("#goto-upgrade-account").click(function() {
-        window.Danbooru.mixpanelEvent("clicked upgrade notice");        
-      });
-      $("#hide-upgrade-account-notice").click(function() {
-        window.Danbooru.mixpanelEvent("hide upgrade notice");        
-      });
-    })
+      if (typeof window.mixpanel === 'object') {
+        window.mixpanel.track_links('#goto-upgrade-account', 'clicked upgrade notice');
+        window.mixpanel.track_links('#hide-upgrade-account-notice', 'hide upgrade notice');
+      }
+    });
   </script>
 <% end %>

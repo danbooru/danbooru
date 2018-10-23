@@ -13,19 +13,3 @@
     <%= hidden_field_tag "ms", "1" %>
   <% end %>
 </section>
-
-<% content_for(:html_header) do %>
-  <script>
-    /*$(function() {
-      $("#tags").on("keypress autocompleteclose", function(e) {
-        if (!$(this).data("fakeWidth")) {
-          $(this).data("fakeWidth", $('<span>').hide().appendTo(document.body));
-        }
-        var width = $(this).data("fakeWidth").text($(this).val()).css('font', $(this).css("font")).width() + 15;
-        if (width > $(this).width()) {
-          $(this).width(width);
-        }
-      });
-    });*/
-  </script>
-<% end %>
