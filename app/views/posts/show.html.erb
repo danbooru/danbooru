@@ -200,9 +200,9 @@
         "rating": '<%= @post.rating %>',
         "size": <%= @post.file_size %>,
         "fav_count": <%= @post.fav_count %>,
-        "created_at": <%= @post.created_at.strftime('%F %T').to_json %>,
-        "tags": <%= @post.presenter.humanized_essential_tag_string.to_json %>,
-        "referer": <%= request.referer.to_json %>
+        "created_at": <%= raw @post.created_at.strftime('%F %T').to_json %>,
+        "tags": <%= raw @post.presenter.humanized_essential_tag_string.to_json %>,
+        "referer": <%= raw request.referer.to_json %>
       });
     });
   </script>
