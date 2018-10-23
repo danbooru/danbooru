@@ -69,7 +69,7 @@
   <% end %>
 <% end %>
 
-<%= content_for(:html_header) do %>
+<% content_for(:html_header) do %>
   <%= tag.link href: posts_path(format: "atom", tags: params[:tags]), rel: "alternate", title: "ATOM", type: "application/atom+xml" %>
   <%= tag.link rel: "prefetch", href: next_page_url, as: "html", crossorigin: "use-credentials" %>
   <%= tag.link rel: "next", href: next_page_url %>

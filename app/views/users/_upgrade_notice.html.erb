@@ -3,7 +3,7 @@
   <p><%= link_to "No thanks", "#", :id => "hide-upgrade-account-notice" %></p>
 </div>
 
-<%= content_for(:html_header) do %>
+<% content_for(:html_header) do %>
   <script>
     $(function() {
       $("#goto-upgrade-account").click(function() {

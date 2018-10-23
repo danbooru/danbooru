@@ -38,11 +38,11 @@
 
 <%= render "secondary_links" %>
 
-<%= content_for(:page_title) do %>
+<% content_for(:page_title) do %>
   Forum - <%= @forum_topic.title %> - <%= Danbooru.config.app_name %>
 <% end %>
 
-<%= content_for(:html_header) do %>
+<% content_for(:html_header) do %>
   <%= auto_discovery_link_tag(:atom, {format: :atom}, {title: @forum_topic.title}) %>
 
   <script>
