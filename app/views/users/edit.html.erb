@@ -97,7 +97,7 @@
 
         <%= f.input :disable_responsive_mode, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false, :hint => "Disable alternative layout for mobile and tablet" %>
 
-        <%= f.input :opt_out_mixpanel, :as => :select, :collection => [["No", "false"], "Yes", "true"]], :include_blank => false, :hint => "Opt out of MixPanel tracking" %>
+        <%= f.input :opt_out_mixpanel, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false, :hint => "Opt out of MixPanel tracking" %>
 
         <%= f.input :custom_style, :label => "Custom <a href='https://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "Style to apply to the whole site.", :input_html => {:size => "40x5"} %>
       </fieldset>

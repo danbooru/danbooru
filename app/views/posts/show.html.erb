@@ -196,13 +196,10 @@
   <script>
     $(function() {
       window.Danbooru.mixpanelEvent("Post View", {
-        //"id": <%= @post.id %>,
         "rating": '<%= @post.rating %>',
         "size": <%= @post.file_size %>,
-        //"fav_count": <%= @post.fav_count %>,
-        "created_at": <%= raw @post.created_at.strftime('%F %T').to_json %>,
-        //"tags": <%= raw @post.presenter.humanized_essential_tag_string.to_json %>,
-        //"referer": <%= raw request.referer.to_json %>
+        "fav_count": <%= @post.fav_count %>,
+        "created_at": <%= raw @post.created_at.strftime('%F %T').to_json %>
       });
     });
   </script>
