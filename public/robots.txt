@@ -1,7 +1,7 @@
 User-agent: *
 Disallow: /admin
 Disallow: /advertisements
-Disallow: /artists/new
+Disallow: /artists
 Disallow: /artist_commentaries
 Disallow: /artist_commentary_versions
 Disallow: /artist_versions
