@@ -160,9 +160,34 @@ div#c-posts {
     text-align: center;
     margin: 0.5em 0;
 
-    input[type=submit] {
-      padding: 0.2em 0.75em;
+    form {
+      display: inline-block;
     }
+
+    i {
+      margin-right: 0.1em;
+      color: deeppink;
+    }
+
+    button.ui-button {
+      padding: 0.25em 0.75em;
+    }
+  }
+
+  .fav-buttons-true #add-fav-button {
+    display: none;
+  }
+
+  .fav-buttons-true #remove-fav-button {
+    display: inline-block;
+  }
+
+  .fav-buttons-false #remove-fav-button {
+    display: none;
+  }
+
+  .fav-buttons-false #add-fav-button {
+    display: inline-block;
   }
 
   #ugoira-controls {
@@ -300,10 +325,6 @@ div#c-posts {
     }
 
     .recommended-posts {
-      margin-top: 1em;
-    }
-
-    #add-fav-button, #remove-fav-button {
       margin-top: 1em;
     }
 

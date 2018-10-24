@@ -56,7 +56,14 @@ div#page {
     button[type=submit] {
       padding: 2px 6px;
       background: #EEE;
+    }
+
+    #search-box button[type=submit] {
       border-left: none;
+    }
+
+    #options-box i.fa-bookmark {
+      margin-right: 0.25em;
     }
   }
 

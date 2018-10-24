@@ -54,10 +54,15 @@
       </section>
 
       <% if CurrentUser.is_member? %>
-        <div class="fav-buttons">
-          <%= button_to "Favorite", favorites_path(post_id: @post.id), remote: true, method: :post, form: {id: "add-fav-button", style: ("display: none;" if @post.is_favorited?)}, class: "ui-button ui-widget ui-corner-all gradient", data: {disable_with: "Favoriting..."} %>
-          <%= button_to "Unfavorite", favorite_path(@post), remote: true, method: :delete, form: {id: "remove-fav-button", style: ("display: none;" if !@post.is_favorited?)}, class: "ui-button ui-widget ui-corner-all gradient", data: {disable_with: "Unfavoriting..."} %>
-        </div>
+        <%= content_tag(:div, class: "fav-buttons fav-buttons-#{@post.is_favorited?}") do %>
+          <%= form_tag(favorites_path(post_id: @post.id), method: "post", id: "add-fav-button", "data-remote": true) do %>
+            <%= button_tag tag.i(class: "far fa-heart") + " Favorite", class: "ui-button ui-widget ui-corner-all gradient", "data-disable-with": "Favoriting..." %>
+          <% end %>
+
+          <%= form_tag(favorite_path(@post.id), method: "delete", id: "remove-fav-button", "data-remote": true) do %>
+            <%= button_tag tag.i(class: "fas fa-heart") + " Unfavorite", class: "ui-button ui-widget ui-corner-all gradient", "data-disable-with": "Updating..." %>
+          <% end %>
+        <% end %>
       <% end %>
 
       <section id="mark-as-translated-section" style="display: none;">

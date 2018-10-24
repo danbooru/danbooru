@@ -15,7 +15,7 @@
       <li id="copy-all-notes-list"><%= link_to "Copy notes", "#", :id => "copy-notes" %></li>
     <% end %>
     <li id="add-artist-commentary-list"><%= link_to "Add commentary", "#", :id => "add-commentary" %></li>
-    <li><%= link_to "Add to favorite group", "#", :id => "open-favgroup-dialog-link", :"data-shortcut" => "g" %></li>
+    <li><%= link_to "Add to fav group", "#", :id => "open-favgroup-dialog-link", :"data-shortcut" => "g" %></li>
     <li><%= link_to "Find similar", iqdb_queries_path(:post_id => post.id) %></li>
 
     <% if post.is_status_locked? %>
@@ -53,7 +53,7 @@
         <% end %>
 
         <% if CurrentUser.is_moderator? %>
-          <li><%= link_to "Replace Image", new_post_replacement_path(post_id: post.id), id: "replace-image", remote: true %></li>
+          <li><%= link_to "Replace image", new_post_replacement_path(post_id: post.id), id: "replace-image", remote: true %></li>
           <li><%= link_to "Down vote report", reports_down_voting_post_path(post_id: post.id) %></li>
         <% end %>
       <% end %>
