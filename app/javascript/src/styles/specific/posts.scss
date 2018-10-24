@@ -157,16 +157,10 @@ body[data-user-can-approve-posts="true"] .post-preview {
 div#c-posts {
   .fav-buttons {
     font-size: 14pt;
-    text-align: center;
     margin: 0.5em 0;
-
-    form {
-      display: inline-block;
-    }
 
     i {
       margin-right: 0.1em;
-      color: deeppink;
     }
 
     button.ui-button {
@@ -174,20 +168,16 @@ div#c-posts {
     }
   }
 
+  #remove-fav-button i {
+    color: deeppink;
+  }
+
   .fav-buttons-true #add-fav-button {
     display: none;
   }
 
-  .fav-buttons-true #remove-fav-button {
-    display: inline-block;
-  }
-
   .fav-buttons-false #remove-fav-button {
     display: none;
-  }
-
-  .fav-buttons-false #add-fav-button {
-    display: inline-block;
   }
 
   #ugoira-controls {

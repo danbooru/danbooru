@@ -1,6 +1,7 @@
 $("#add-to-favorites, #add-fav-button, #remove-from-favorites, #remove-fav-button").toggle();
 $("#score-for-post-<%= @post.id %>").text(<%= @post.score %>);
 $("#favcount-for-post-<%= @post.id %>").text(<%= @post.fav_count %>);
+$(".fav-buttons").toggleClass("fav-buttons-false").toggleClass("fav-buttons-true");
 
 <% if CurrentUser.is_gold? %>
   var fav_count = <%= @post.fav_count %>;
