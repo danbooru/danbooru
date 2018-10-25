@@ -493,7 +493,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       context "for a video" do
         setup do
-          @source = "https://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_1mb.mp4"
+          @source = "https://raikou2.donmai.us/b7/cb/b7cb80092be273771510952812380fa2.mp4"
         end
 
         should "work for a video" do
