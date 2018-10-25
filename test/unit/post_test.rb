@@ -2754,7 +2754,7 @@ class PostTest < ActiveSupport::TestCase
   end
 
   context "#replace!" do
-    subject { @post.replace!(tags: "something", replacement_url: "https://danbooru.donmai.us/data/preview/download.png") }
+    subject { @post.replace!(tags: "something", replacement_url: "https://danbooru.donmai.us/images/download-preview.png") }
 
     setup do
       @post = FactoryBot.create(:post)
