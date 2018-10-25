@@ -19,7 +19,6 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
     should "return tags from the associated list wiki" do
       result = subject.other_wiki_category_tags
       assert_not_nil(result[0])
-      assert_not_nil(result[0])
       assert_equal(%w(alpha beta), result[0].tags)
     end
   end
