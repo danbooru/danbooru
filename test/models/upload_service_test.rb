@@ -736,9 +736,9 @@ class UploadServiceTest < ActiveSupport::TestCase
         setup do
           @user = travel_to(1.month.ago) { FactoryBot.create(:user) }
           as_user do
-            @post = FactoryBot.create(:post, source: "https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png")
+            @post = FactoryBot.create(:post, source: "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg")
             @post.stubs(:queue_delete_files)
-            @post.replace!(replacement_url: "https://danbooru.donmai.us/data/preview/download.png", tags: "-tag1 tag2")
+            @post.replace!(replacement_url: "https://raikou1.donmai.us/fd/b4/fdb47f79fb8da82e66eeb1d84a1cae8d.jpg", tags: "-tag1 tag2")
           end
 
           @replacement = @post.replacements.last
@@ -749,14 +749,14 @@ class UploadServiceTest < ActiveSupport::TestCase
             subject.undo!
           end
 
-          assert_equal("lowres tag2", @post.tag_string)
-          assert_equal(272, @post.image_width)
-          assert_equal(92, @post.image_height)
-          assert_equal(5969, @post.file_size)
-          assert_equal("png", @post.file_ext)
-          assert_equal("8f9327db2597fa57d2f42b4a6c5a9855", @post.md5)
-          assert_equal("8f9327db2597fa57d2f42b4a6c5a9855", Digest::MD5.file(@post.file).hexdigest)
-          assert_equal("https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png", @post.source)
+          assert_equal("tag2", @post.tag_string)
+          assert_equal(459, @post.image_width)
+          assert_equal(650, @post.image_height)
+          assert_equal(127238, @post.file_size)
+          assert_equal("jpg", @post.file_ext)
+          assert_equal("d34e4cf0a437a5d65f8e82b7bcd02606", @post.md5)
+          assert_equal("d34e4cf0a437a5d65f8e82b7bcd02606", Digest::MD5.file(@post.file).hexdigest)
+          assert_equal("https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", @post.source)
         end
       end
 
