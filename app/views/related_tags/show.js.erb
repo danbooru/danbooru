@@ -1,0 +1,7 @@
+<% if params[:user_tags] %>
+  $(".user-related-tags-columns").replaceWith("<%= j render "user_tags", related_tags: @query %>");
+<% else %>
+  $(".current-related-tags-columns").replaceWith("<%= j render "current_tags", related_tags: @query %>");
+<% end %>
+
+Danbooru.RelatedTag.update_selected();

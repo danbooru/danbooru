@@ -28,7 +28,6 @@ class SessionLoader
     update_last_logged_in_at
     update_last_ip_addr
     set_time_zone
-    store_favorite_tags_in_cookies
     CurrentUser.user.unban! if CurrentUser.user.ban_expired?
   end
 
@@ -90,14 +89,6 @@ private
 
   def cookie_password_hash_valid?
     cookies[:password_hash] && cookies.signed[:user_name] && User.authenticate_cookie_hash(cookies.signed[:user_name], cookies[:password_hash])
-  end
-
-  def store_favorite_tags_in_cookies
-    if (cookies[:favorite_tags].blank? || cookies[:favorite_tags_with_categories].blank?) && CurrentUser.user.favorite_tags.present?
-      favorite_tags = CurrentUser.user.favorite_tags.slice(0, 1024)
-      cookies[:favorite_tags] = favorite_tags
-      cookies[:favorite_tags_with_categories] = Tag.categories_for(favorite_tags.split(/[[:space:]]+/)).to_a.flatten.join(" ")
-    end
   end
 
   def update_last_logged_in_at

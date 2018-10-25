@@ -1,0 +1,8 @@
+<%# tags, title, class (optional) %>
+
+<div class="tag-column <%= local_assigns[:class] || "#{title.parameterize}-related-tags-column" %>">
+  <% if tags.present? %>
+    <h6><%= title %></h6>
+    <%= TagSetPresenter.new(tags).tag_list_html(name_only: true) %>
+  <% end %>
+</div>

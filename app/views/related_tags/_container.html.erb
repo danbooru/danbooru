@@ -1,0 +1,13 @@
+<div id="related-tags-container" class="visible">
+  <h3>
+    Related Tags
+    <a href="#" id="show-related-tags-link">»</a>
+    <a href="#" id="hide-related-tags-link">«</a>
+  </h3>
+
+  <div class="related-tags">
+    <%= render "related_tags/user_tags", related_tags: nil %>
+    <%= render "related_tags/current_tags", related_tags: nil %>
+    <%= render "related_tags/source_tags", source: nil %>
+  </div>
+</div>

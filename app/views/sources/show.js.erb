@@ -1,8 +1,9 @@
 $("#source-info").replaceWith("<%= j render "info", source: @source %>");
 
-Danbooru.RelatedTag.recent_artists = <%= raw @source.artists.to_json(include: :sorted_urls) %>;
-Danbooru.RelatedTag.translated_tags = <%= raw @source.translated_tags.to_json %>;
-Danbooru.RelatedTag.build_all();
+$(document).trigger("danbooru:update-source-data", {
+  source: <%= raw @source.to_json %>,
+  related_tags_html: "<%= j render "related_tags/source_tags", source: @source %>",
+});
 
 if ($("#c-uploads #a-new").length) {
   $("#upload_artist_commentary_title").val(<%= raw @source.dtext_artist_commentary_title.to_json %>);

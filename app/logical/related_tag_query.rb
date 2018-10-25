@@ -1,9 +1,14 @@
 class RelatedTagQuery
-  attr_reader :query, :category
+  attr_reader :query, :category, :user
 
-  def initialize(query, category = nil)
-    @query = TagAlias.to_aliased(query.strip).join(" ")
+  def initialize(query: nil, category: nil, user: nil)
+    @user = user
+    @query = TagAlias.to_aliased(query.to_s.downcase.strip).join(" ")
     @category = category
+  end
+
+  def pretty_name
+    query.tr("_", " ")
   end
 
   def tags
@@ -18,6 +23,21 @@ class RelatedTagQuery
     end
   end
 
+  # Returns the top 20 most frequently added tags within the last 20 edits made by the user in the last hour.
+  def recent_tags(since: 1.hour.ago, max_edits: 20, max_tags: 20)
+    return [] unless user.present? && PostArchive.enabled?
+
+    versions = PostArchive.where(updater_id: user.id).where("updated_at > ?", since).order(id: :desc).limit(max_edits)
+    tags = versions.flat_map(&:added_tags)
+    tags = tags.reject { |tag| Tag.is_metatag?(tag) }
+    tags = tags.group_by(&:itself).transform_values(&:size).sort_by { |tag, count| [-count, tag] }.map(&:first)
+    tags.take(max_tags)
+  end
+
+  def favorite_tags
+    user&.favorite_tags.to_s.split
+  end
+
   def wiki_page_tags
     results = wiki_page.try(:tags) || []
     results.reject! do |name|
@@ -27,17 +47,12 @@ class RelatedTagQuery
   end
 
   def other_wiki_category_tags
-    if Tag.category_for(query) != Tag.categories.copyright
-      return []
-    end
-    listtags = (wiki_page.try(:tags) || []).select {|name| name =~ /^list_of_/i }
-    results = listtags.map do |name|
-      listlinks = WikiPage.titled(name).first.try(:tags) || []
-      if listlinks.length > 0
-        {"title" => name, "wiki_page_tags" => map_with_category_data(listlinks)}
-      end
-    end
-    results.reject {|list| list.nil?}
+    return [] unless Tag.category_for(query) == Tag.categories.copyright
+
+    other_wikis = wiki_page&.tags.to_a.grep(/^list_of_/i)
+    other_wikis = other_wikis.map { |name| WikiPage.titled(name).first }
+    other_wikis = other_wikis.select { |wiki| wiki.tags.present? }
+    other_wikis
   end
 
   def tags_for_html
