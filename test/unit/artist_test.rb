@@ -208,11 +208,15 @@ class ArtistTest < ActiveSupport::TestCase
       a2 = FactoryBot.create(:artist, :name => "subway", :url_string => "http://subway.com/x/test.jpg")
       a3 = FactoryBot.create(:artist, :name => "minko", :url_string => "https://minko.com/x/test.jpg")
 
-      assert_artist_found("rembrandt", "http://rembrandt.com/x/test.jpg")
-      assert_artist_found("rembrandt", "http://rembrandt.com/x/another.jpg")
-      assert_artist_not_found("http://nonexistent.com/test.jpg")
-      assert_artist_found("minko", "https://minko.com/x/test.jpg")
-      assert_artist_found("minko", "http://minko.com/x/test.jpg")
+      begin
+        assert_artist_found("rembrandt", "http://rembrandt.com/x/test.jpg")
+        assert_artist_found("rembrandt", "http://rembrandt.com/x/another.jpg")
+        assert_artist_not_found("http://nonexistent.com/test.jpg")
+        assert_artist_found("minko", "https://minko.com/x/test.jpg")
+        assert_artist_found("minko", "http://minko.com/x/test.jpg")
+      rescue Net::OpenTimeout
+        skip "network failure"
+      end
     end
 
     should "be case-insensitive to domains when finding matches by url" do
