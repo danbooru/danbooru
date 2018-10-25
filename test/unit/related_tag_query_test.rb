@@ -8,7 +8,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
   end
 
   context "#other_wiki_category_tags" do
-    subject { RelatedTagQuery.new("copyright") }
+    subject { RelatedTagQuery.new(query: "copyright") }
 
     setup do
       @copyright = FactoryBot.create(:copyright_tag, name: "copyright")
@@ -19,8 +19,8 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
     should "return tags from the associated list wiki" do
       result = subject.other_wiki_category_tags
       assert_not_nil(result[0])
-      assert_not_nil(result[0]["wiki_page_tags"])
-      assert_equal(%w(alpha beta), result[0]["wiki_page_tags"].map(&:first))
+      assert_not_nil(result[0])
+      assert_equal(%w(alpha beta), result[0].tags)
     end
   end
 
@@ -33,7 +33,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
     context "for a tag that already exists" do
       setup do
         Tag.named("aaa").first.update_related
-        @query = RelatedTagQuery.new("aaa", "")
+        @query = RelatedTagQuery.new(query: "aaa")
       end
 
       should "work" do
@@ -41,13 +41,13 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
 
       should "render the json" do
-        assert_equal("{\"query\":\"aaa\",\"category\":\"\",\"tags\":[[\"aaa\",0],[\"bbb\",0],[\"ccc\",0]],\"wiki_page_tags\":[],\"other_wikis\":[]}", @query.to_json)
+        assert_equal("{\"query\":\"aaa\",\"category\":null,\"tags\":[[\"aaa\",0],[\"bbb\",0],[\"ccc\",0]],\"wiki_page_tags\":[],\"other_wikis\":[]}", @query.to_json)
       end
     end
 
     context "for a tag that doesn't exist" do
       setup do
-        @query = RelatedTagQuery.new("zzz", "")
+        @query = RelatedTagQuery.new(query: "zzz")
       end
 
       should "work" do
@@ -59,7 +59,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       setup do
         @ta = FactoryBot.create(:tag_alias, antecedent_name: "xyz", consequent_name: "aaa")
         @wp = FactoryBot.create(:wiki_page, title: "aaa", body: "blah [[foo|blah]] [[FOO]] [[bar]] blah")
-        @query = RelatedTagQuery.new("xyz", "")
+        @query = RelatedTagQuery.new(query: "xyz")
 
         Tag.named("aaa").first.update_related
       end
@@ -75,7 +75,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
 
     context "for a pattern search" do
       setup do
-        @query = RelatedTagQuery.new("a*", "")
+        @query = RelatedTagQuery.new(query: "a*")
       end
 
       should "work" do
@@ -86,7 +86,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
     context "for a tag with a wiki page" do
       setup do
         @wiki_page = FactoryBot.create(:wiki_page, :title => "aaa", :body => "[[bbb]] [[ccc]]")
-        @query = RelatedTagQuery.new("aaa", "")
+        @query = RelatedTagQuery.new(query: "aaa")
       end
 
       should "find any tags embedded in the wiki page" do
@@ -100,7 +100,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       @post_1 = FactoryBot.create(:post, :tag_string => "aaa bbb")
       @post_2 = FactoryBot.create(:post, :tag_string => "aaa art:ccc")
       @post_3 = FactoryBot.create(:post, :tag_string => "aaa copy:ddd")
-      @query = RelatedTagQuery.new("aaa", "artist")
+      @query = RelatedTagQuery.new(query: "aaa", category: "artist")
     end
 
     should "find the related tags" do
