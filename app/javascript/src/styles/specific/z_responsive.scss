@@ -59,12 +59,16 @@
     }
   }
 
+  header {
+    position: relative;
+  }
+
   #maintoggle {
     display: block;
     font-weight: bold;
     position: absolute;
-    top: 3vw;
-    right: 4vw;
+    top: 2vw;
+    right: 3vw;
     font-size: 2em;
 
     &.toggler-active {

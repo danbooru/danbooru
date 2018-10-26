@@ -96,9 +96,9 @@
 
 </head>
 <%= tag.body **body_attributes(CurrentUser.user) do %>
-  <header id="top">
-    <%= render "news_updates/listing" %>
+  <%= render "news_updates/listing" %>
 
+  <header id="top">
     <h1><%= link_to Danbooru.config.app_name, "/" %></h1>
     
     <div id="maintoggle">
