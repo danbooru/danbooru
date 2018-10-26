@@ -107,12 +107,10 @@ module ApplicationHelper
     time_tag(time.strftime("%Y-%m-%d %H:%M"), time)
   end
 
-  def external_link_to(url, options = {})
-    if options[:truncate]
-      text = truncate(url, length: options[:truncate])
-    else
-      text = url
-    end
+  def external_link_to(url, truncate: nil, strip_scheme: false)
+    text = url
+    text = text.gsub(%r!\Ahttps?://!i, "") if strip_scheme
+    text = text.truncate(truncate) if truncate
 
     if url =~ %r!\Ahttps?://!i
       link_to text, url, {rel: :nofollow}
