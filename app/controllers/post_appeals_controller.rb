@@ -24,7 +24,9 @@ class PostAppealsController < ApplicationController
 
   def show
     @post_appeal = PostAppeal.find(params[:id])
-    respond_with(@post_appeal)
+    respond_with(@post_appeal) do |fmt|
+      fmt.html { redirect_to post_appeals_path(search: { id: @post_appeal.id }) }
+    end
   end
 
   private
