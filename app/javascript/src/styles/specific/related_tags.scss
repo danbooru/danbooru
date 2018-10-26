@@ -1,8 +1,6 @@
 @import "../base/000_vars.scss";
 
 div#related-tags-container {
-  padding-right: 2em;
-
   &.visible a#show-related-tags-link,
   &.hidden a#hide-related-tags-link,
   &.hidden div.related-tags {
@@ -17,11 +15,20 @@ div.related-tags {
   background: #EEE;
   overflow: auto;
   border-radius: 4px;
+  display: flex;
+  flex-wrap: wrap;
+
+  div.user-related-tags-columns, div.current-related-tags-columns, div.source-related-tags-columns {
+    display: flex;
+  }
 
   div.tag-column {
     max-width: 15em;
-    margin-right: 2em;
-    float: left;
+    margin-right: 3em;
+
+    &.is-empty-true {
+      display: none;
+    }
 
     ul {
       margin: 0;
@@ -46,9 +53,5 @@ div.related-tags {
         }
       }
     }
-  }
-  
-  div.wide-column {
-    max-width: 45em;
   }
 }
