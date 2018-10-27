@@ -6,14 +6,14 @@
   input, select, textarea, button {
     font-family: $base_font_family;
   }
+}
 
-  a, a:active, a:visited {
-    color: $link_color;
-  }
+.ui-widget-content a {
+  color: $link_color;
+}
 
-  a:hover {
-    color: $link_hover_color;
-  }
+.ui-widget-content a:hover {
+  color: $link_hover_color;
 }
 
 div.ui-dialog {

@@ -1,7 +1,10 @@
 @import "../base/000_vars.scss";
 
 <% TagCategory.css_mapping.each do |category,cssmap| %>
-  .category-<%= category %> a, a.tag-type-<%= category %>, .ui-widget-content a.tag-type-<%= category %> {
+  .category-<%= category %> a,
+  a.tag-type-<%= category %>,
+  .ui-widget-content .category-<%= category %> a,
+  .ui-widget-content a.tag-type-<%= category %> {
     color: <%= cssmap["color"] %>;
 
     &:link, &:visited {
