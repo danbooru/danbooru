@@ -24,10 +24,14 @@ div.related-tags {
 
   div.tag-column {
     max-width: 15em;
-    margin-right: 3em;
+    margin-right: 2em;
 
     &.is-empty-true {
       display: none;
+    }
+
+    &.wide-column {
+      max-width: 45em;
     }
 
     ul {
