@@ -7,7 +7,7 @@
 <%= render "sources/info" %>
 
 <%= form_for(post, :html => {:class => "simple_form", :id => "form"}) do |f| %>
-  <%= hidden_field_tag :tags_query, params[:tags] %>
+  <%= hidden_field_tag :tags_query, params[:q] %>
   <%= hidden_field_tag :pool_id, params[:pool_id] %>
   <%= hidden_field_tag :favgroup_id, params[:favgroup_id] %>
   <%= f.hidden_field :old_tag_string, :value => post.tag_string %>

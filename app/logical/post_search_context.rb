@@ -5,7 +5,7 @@ class PostSearchContext
   def initialize(params)
     @id = params[:id].to_i
     @seq = params[:seq]
-    @tags = params[:tags].presence || "status:any"
+    @tags = params[:q].presence || "status:any"
   end
 
   def post_id

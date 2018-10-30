@@ -187,7 +187,7 @@ class PostPresenter < Presenter
   end
 
   def has_sequential_navigation?(params)
-    return false if Tag.has_metatag?(params[:tags], :order, :ordfav, :ordpool)
+    return false if Tag.has_metatag?(params[:q], :order, :ordfav, :ordpool)
     return false if params[:pool_id].present? || params[:favgroup_id].present?
     return CurrentUser.user.enable_sequential_post_navigation 
   end
@@ -219,7 +219,7 @@ class PostPresenter < Presenter
       first = true
       pools = @post.pools.undeleted
       pools.each do |pool|
-        if first && template.params[:tags].blank? && template.params[:favgroup_id].blank?
+        if first && template.params[:q].blank? && template.params[:favgroup_id].blank?
           html += pool_link_html(template, pool, :include_rel => true)
           first = false
         else

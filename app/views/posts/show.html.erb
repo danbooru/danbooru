@@ -1,12 +1,12 @@
 <div id="c-posts">
   <div id="a-show">
     <aside id="sidebar">
-      <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:tags], :tags_dom_id => "tags" %>
+      <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:q], :tags_dom_id => "tags" %>
 
       <%= render "posts/partials/index/blacklist" %>
 
       <section id="tag-list">
-        <%= @post.presenter.split_tag_list_html(current_query: params[:tags], show_extra_links: CurrentUser.user.is_gold?) %>
+        <%= @post.presenter.split_tag_list_html(current_query: params[:q], show_extra_links: CurrentUser.user.is_gold?) %>
       </section>
 
       <section id="post-information">
@@ -67,7 +67,7 @@
 
       <section id="mark-as-translated-section" style="display: none;">
         <%= form_tag(mark_as_translated_post_path(@post), :class => "simple_form", :method => :put) do |f| %>
-          <%= hidden_field_tag :tags_query, params[:tags] %>
+          <%= hidden_field_tag :tags_query, params[:q] %>
           <%= hidden_field_tag :pool_id, params[:pool_id] %>
 
           <fieldset>

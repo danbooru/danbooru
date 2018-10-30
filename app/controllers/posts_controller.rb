@@ -36,9 +36,9 @@ class PostsController < ApplicationController
   def show_seq
     context = PostSearchContext.new(params)
     if context.post_id
-      redirect_to(post_path(context.post_id, :tags => params[:tags]))
+      redirect_to(post_path(context.post_id, q: params[:q]))
     else
-      redirect_to(post_path(params[:id], :tags => params[:tags]))
+      redirect_to(post_path(params[:id], q: params[:q]))
     end
   end
 
@@ -106,7 +106,7 @@ private
           @error_message = post.errors.full_messages.join("; ")
           render :template => "static/error", :status => 500
         else
-          response_params = {:tags => params[:tags_query], :pool_id => params[:pool_id], :favgroup_id => params[:favgroup_id]}
+          response_params = {:q => params[:tags_query], :pool_id => params[:pool_id], :favgroup_id => params[:favgroup_id]}
           response_params.reject!{|key, value| value.blank?}
           redirect_to post_path(post, response_params)
         end
