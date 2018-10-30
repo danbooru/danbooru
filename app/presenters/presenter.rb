@@ -12,6 +12,6 @@ class Presenter
   end
 
   def u(s)
-    CGI::escape(s)
+    CGI.escape(s)
   end
 end

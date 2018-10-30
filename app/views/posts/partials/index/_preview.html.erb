@@ -1,0 +1,24 @@
+<%= content_tag(:article, article_attrs) do -%>
+  <%= content_tag(:a, href: url_for(link_params)) do -%>
+    <%= content_tag(:picture) do -%>
+      <%= tag.source media: "(max-width: 660px)", srcset: cropped_url -%>
+      <%= tag.source media: "(min-width: 660px)", srcset: preview_url -%>
+      <%= tag.img class: "has-cropped-#{has_cropped}", src: preview_url, title: tooltip, alt: alt_text -%>
+    <% end -%>
+  <% end -%>
+  <% if pool -%>
+    <p class="desc">
+      <%= link_to truncate(pool.pretty_name, 80), pool_path(pool.id) %>
+    </p>
+  <% end -%>
+  <% if similarity -%>
+    <p class="desc">
+      Similarity: <%= similarity %>
+    </p>
+  <% end -%>
+  <% if size -%>
+    <p class="desc">
+      <%= number_to_human_size(size) %> (<%= width %>x<%= height %>)
+    </p>
+  <% end -%>
+<% end -%>

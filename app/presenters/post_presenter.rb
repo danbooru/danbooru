@@ -20,111 +20,115 @@ class PostPresenter < Presenter
       return ""
     end
 
-    path = options[:path_prefix] || "/posts"
-    if Danbooru.config.enable_image_cropping && options[:show_cropped] && post.has_cropped? && !CurrentUser.user.disable_cropped_thumbnails?
-      cropped_src = post.crop_file_url
-    else
-      cropped_src = post.preview_file_url
-    end
+    locals = {}
 
-    html =  %{<article itemscope itemtype="http://schema.org/ImageObject" id="post_#{post.id}" class="#{preview_class(post, options)}" #{data_attributes(post)}>}
+    locals[:article_attrs] = {
+      "id" => "post_##{post.id}",
+      "class" => preview_class(post, options).join(" ")
+    }.merge(data_attributes(post))
+
+    # TODO: rename path_prefix to controller
+    locals[:link_params] = {
+      "controller" => options[:path_prefix] || "posts",
+      "action" => "show",
+      "id" => post.id
+    }
     if options[:tags].present? && !CurrentUser.is_anonymous?
-      tag_param = "?tags=#{CGI::escape(options[:tags])}"
-    elsif options[:pool_id] || options[:pool]
-      tag_param = "?pool_id=#{CGI::escape((options[:pool_id] || options[:pool].id).to_s)}"
-    elsif options[:favgroup_id] || options[:favgroup]
-      tag_param = "?favgroup_id=#{CGI::escape((options[:favgroup_id] || options[:favgroup].id).to_s)}"
-    else
-      tag_param = nil
+      locals[:link_params]["q"] = options[:tags]
     end
-    html << %{<a href="#{path}/#{post.id}#{tag_param}">}
+    if options[:pool_id] || options[:pool]
+      locals[:link_params]["pool_id"] = options[:pool_id] || options[:pool].id
+    end
+    if options[:favgroup_id] || options[:favgroup]
+      locals[:link_params]["favgroup_id"] = options[:favgroup_id] || options[:favgroup].id
+    end
 
-    tooltip = "#{post.tag_string} rating:#{post.rating} score:#{post.score}"
-    html << %{<picture>}
-    html << %{<source media="(max-width: 660px)" srcset="#{cropped_src}">}
-    html << %{<source media="(min-width: 660px)" srcset="#{post.preview_file_url}">}
-    html << %{<img itemprop="thumbnailUrl" class="has-cropped-#{post.has_cropped?}" src="#{post.preview_file_url}" title="#{h(tooltip)}" alt="#{h(post.tag_string)}">}
-    html << %{</picture>}
-    html << %{</a>}
+    locals[:tooltip] = "#{post.tag_string} rating:#{post.rating} score:#{post.score}"
+
+    locals[:cropped_url] = if Danbooru.config.enable_image_cropping && options[:show_cropped] && post.has_cropped? && !CurrentUser.user.disable_cropped_thumbnails?
+      post.crop_file_url
+    else
+      post.preview_file_url
+    end
+
+    locals[:preview_url] = post.preview_file_url
+
+    locals[:alt_text] = post.tag_string
+
+    locals[:has_cropped] = post.has_cropped?
 
     if options[:pool]
-      html << %{<p class="desc">}
-      html << %{<a href="/pools/#{options[:pool].id}">}
-      html << h(options[:pool].pretty_name.truncate(80))
-      html << %{</a>}
-      html << %{</p>}
+      locals[:pool] = options[:pool]
+    else
+      locals[:pool] = nil
     end
 
     if options[:similarity]
-      html << %{<p class="desc">}
-      html << "Similarity: #{options[:similarity].round}%"
-      html << %{</p>}
+      locals[:similarity] = options[:similarity].round
+      locals[:width] = post.image_width
+      locals[:height] = post.image_height
+    else
+      locals[:similarity] = nil
     end
 
     if options[:size]
-      html << %{<p class="desc">}
-      html << post.file_size.to_s(:human_size)
-      html << " (#{post.image_width}x#{post.image_height})"
-      html << %{</p>}
+      locals[:size] = post.file_size
+    else
+      locals[:size] = nil
     end
 
-    html << %{</article>}
-    html.html_safe
+    ApplicationController.render(partial: "posts/partials/index/preview", locals: locals)
   end
 
   def self.preview_class(post, options = {})
-    klass = "post-preview"
+    klass = ["post-preview"]
     # klass << " large-cropped" if post.has_cropped? && options[:show_cropped]
-    klass << " captioned" if options.values_at(:pooled, :size, :similarity).any?(&:present?)
-    klass << " post-status-pending" if post.is_pending?
-    klass << " post-status-flagged" if post.is_flagged?
-    klass << " post-status-deleted" if post.is_deleted?
-    klass << " post-status-has-parent" if post.parent_id
-    klass << " post-status-has-children" if post.has_visible_children?
+    klass << "captioned" if options.values_at(:pooled, :size, :similarity).any?(&:present?)
+    klass << "post-status-pending" if post.is_pending?
+    klass << "post-status-flagged" if post.is_flagged?
+    klass << "post-status-deleted" if post.is_deleted?
+    klass << "post-status-has-parent" if post.parent_id
+    klass << "post-status-has-children" if post.has_visible_children?
     klass
   end
 
   def self.data_attributes(post)
-    attributes = %{
-      data-id="#{post.id}"
-      data-has-sound="#{post.has_tag?('video_with_sound|flash_with_sound')}"
-      data-tags="#{h(post.tag_string)}"
-      data-pools="#{post.pool_string}"
-      data-approver-id="#{post.approver_id}"
-      data-rating="#{post.rating}"
-      data-width="#{post.image_width}"
-      data-height="#{post.image_height}"
-      data-flags="#{post.status_flags}"
-      data-parent-id="#{post.parent_id}"
-      data-has-children="#{post.has_children?}"
-      data-score="#{post.score}"
-      data-views="#{post.view_count}"
-      data-fav-count="#{post.fav_count}"
-      data-pixiv-id="#{post.pixiv_id}"
-      data-file-ext="#{post.file_ext}"
-      data-source="#{h(post.source)}"
-      data-top-tagger="#{post.keeper_id}"
-      data-uploader-id="#{post.uploader_id}"
-      data-normalized-source="#{h(post.normalized_source)}"
-      data-is-favorited="#{post.favorited_by?(CurrentUser.user.id)}"
+    attributes = {
+      "data-id" => post.id,
+      "data-has-sound" => post.has_tag?('video_with_sound|flash_with_sound'),
+      "data-tags" => post.tag_string,
+      "data-pools" => post.pool_string,
+      "data-approver-id" => post.approver_id,
+      "data-rating" => post.rating,
+      "data-width" => post.image_width,
+      "data-height" => post.image_height,
+      "data-flags" => post.status_flags,
+      "data-parent-id" => post.parent_id,
+      "data-has-children" => post.has_children?,
+      "data-score" => post.score,
+      "data-views" => post.view_count,
+      "data-fav-count" => post.fav_count,
+      "data-pixiv-id" => post.pixiv_id,
+      "data-file-ext" => post.file_ext,
+      "data-source" => post.source,
+      "data-top-tagger" => post.keeper_id,
+      "data-uploader-id" => post.uploader_id,
+      "data-normalized-source" => post.normalized_source,
+      "data-is-favorited" => post.favorited_by?(CurrentUser.user.id)
     }
 
     if CurrentUser.is_moderator?
-      attributes += %{
-        data-uploader="#{h(post.uploader_name)}"
-      }
+      attributes["data-uploader"] = post.uploader_name
     end
 
     if post.visible?
-      attributes += %{
-        data-md5="#{post.md5}"
-        data-file-url="#{post.file_url}"
-        data-large-file-url="#{post.large_file_url}"
-        data-preview-file-url="#{post.preview_file_url}"
-      }
+      attributes["data-md5"] = post.md5
+      attributes["data-file-url"] = post.file_url
+      attributes["data-large-file-url"] = post.large_file_url
+      attributes["data-preview-file-url"] = post.preview_file_url
     end
 
-    attributes.html_safe
+    attributes
   end
 
   def initialize(post)
