@@ -43,7 +43,7 @@ class PoolArchive < ApplicationRecord
     SqsService.new(Danbooru.config.aws_sqs_archives_url)
   end
 
-  def self.queue(pool)
+  def self.queue(pool, updater, updater_ip_addr)
     # queue updates to sqs so that if archives goes down for whatever reason it won't
     # block pool updates
     raise NotImplementedError.new("Archive service is not configured.") if !enabled?
@@ -51,8 +51,8 @@ class PoolArchive < ApplicationRecord
     json = {
       pool_id: pool.id,
       post_ids: pool.post_ids.scan(/\d+/).map(&:to_i),
-      updater_id: CurrentUser.id,
-      updater_ip_addr: CurrentUser.ip_addr.to_s,
+      updater_id: updater.id,
+      updater_ip_addr: updater_ip_addr.to_s,
       created_at: pool.created_at.try(:iso8601),
       updated_at: pool.updated_at.try(:iso8601),
       description: pool.description,

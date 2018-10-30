@@ -252,6 +252,8 @@ class PoolTest < ActiveSupport::TestCase
 
       @pool.reload
       assert_equal(2, @pool.versions.size)
+      assert_equal(user2.id, @pool.versions.last.updater_id)
+      assert_equal("127.0.0.2", @pool.versions.last.updater_ip_addr.to_s)
 
       CurrentUser.scoped(user2, "127.0.0.3") do
         @pool.post_ids = "#{@p1.id} #{@p2.id}"
@@ -260,6 +262,8 @@ class PoolTest < ActiveSupport::TestCase
 
       @pool.reload
       assert_equal(3, @pool.versions.size)
+      assert_equal(user2.id, @pool.versions.last.updater_id)
+      assert_equal("127.0.0.3", @pool.versions.last.updater_ip_addr.to_s)
     end
 
     should "should create a version if the name changes" do

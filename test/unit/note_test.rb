@@ -85,6 +85,8 @@ class NoteTest < ActiveSupport::TestCase
         assert_equal(@note.body, @note.versions.first.body)
         assert_equal(1, @note.version)
         assert_equal(1, @note.versions.first.version)
+        assert_equal(@user.id, @note.versions.first.updater_id)
+        assert_equal(CurrentUser.ip_addr, @note.versions.first.updater_ip_addr.to_s)
       end
 
       should "update the post's last_noted_at field" do
@@ -141,6 +143,8 @@ class NoteTest < ActiveSupport::TestCase
         assert_equal(2, @note.versions.last.version)
         assert_equal("fafafa", @note.versions.last.body)
         assert_equal(2, @note.version)
+        assert_equal(@user.id, @note.versions.last.updater_id)
+        assert_equal(CurrentUser.ip_addr, @note.versions.last.updater_ip_addr.to_s)
       end
 
       context "for a note-locked post" do

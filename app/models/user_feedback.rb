@@ -2,12 +2,12 @@ class UserFeedback < ApplicationRecord
   self.table_name = "user_feedback"
   belongs_to :user
   belongs_to_creator
-  attribute :disable_dmail_notification, :boolean
+  attr_accessor :disable_dmail_notification
   validates_presence_of :user, :creator, :body, :category
   validates_inclusion_of :category, :in => %w(positive negative neutral)
   validate :creator_is_gold
   validate :user_is_not_creator
-  after_create :create_dmail
+  after_create :create_dmail, unless: :disable_dmail_notification
   after_update(:if => ->(rec) { CurrentUser.id != rec.creator_id}) do |rec|
     ModAction.log(%{#{CurrentUser.name} updated user feedback for "#{rec.user_name}":/users/#{rec.user_id}},:user_feedback_update)
   end
@@ -93,10 +93,8 @@ class UserFeedback < ApplicationRecord
   end
 
   def create_dmail
-    unless disable_dmail_notification
-      body = %{#{disclaimer}@#{creator_name} created a "#{category} record":/user_feedbacks?search[user_id]=#{user_id} for your account:\n\n#{self.body}}
-      Dmail.create_automated(:to_id => user_id, :title => "Your user record has been updated", :body => body)
-    end
+    body = %{#{disclaimer}@#{creator_name} created a "#{category} record":/user_feedbacks?search[user_id]=#{user_id} for your account:\n\n#{self.body}}
+    Dmail.create_automated(:to_id => user_id, :title => "Your user record has been updated", :body => body)
   end
 
   def creator_is_gold

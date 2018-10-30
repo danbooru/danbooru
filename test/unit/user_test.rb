@@ -35,6 +35,7 @@ class UserTest < ActiveSupport::TestCase
         end
 
         assert(@user.dmails.exists?(from: bot, to: @user, title: "You have been promoted"))
+        refute(@user.dmails.exists?(from: bot, to: @user, title: "Your user record has been updated"))
       end
     end
 

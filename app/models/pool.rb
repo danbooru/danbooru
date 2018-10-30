@@ -3,7 +3,6 @@ require 'ostruct'
 class Pool < ApplicationRecord
   class RevertError < Exception ; end
 
-  attribute :updater_id, :integer
   validates_uniqueness_of :name, :case_sensitive => false, :if => :saved_change_to_name?
   validate :validate_name, :if => :saved_change_to_name?
   validates_inclusion_of :category, :in => %w(series collection)
@@ -11,7 +10,6 @@ class Pool < ApplicationRecord
   validate :updater_can_remove_posts
   validate :updater_can_edit_deleted
   belongs_to_creator
-  belongs_to_updater
   before_validation :normalize_post_ids
   before_validation :normalize_name
   before_validation :initialize_is_active, :on => :create
@@ -323,9 +321,9 @@ class Pool < ApplicationRecord
     post_ids[/^(\d+)/, 1]
   end
 
-  def create_version(force = false)
+  def create_version(updater: CurrentUser.user, updater_ip_addr: CurrentUser.ip_addr)
     if PoolArchive.enabled?
-      PoolArchive.queue(self)
+      PoolArchive.queue(self, updater, updater_ip_addr)
     else
       Rails.logger.warn("Archive service is not configured. Pool versions will not be saved.")
     end
