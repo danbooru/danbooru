@@ -1,4 +1,4 @@
-<ul itemscope itemtype="http://schema.org/ImageObject">
+<ul>
   <li>ID: <%= post.id %></li>
   <li>Top Tagger: <%= link_to_user(post.keeper) %></li>
   <% if CurrentUser.is_moderator? %>

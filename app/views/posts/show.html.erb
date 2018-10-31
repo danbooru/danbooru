@@ -47,11 +47,11 @@
 
       <%= render "posts/partials/show/notices", :post => @post %>
 
-      <section itemscope itemtype="http://schema.org/ImageObject" id="image-container" <%= PostPresenter.data_attributes(@post) %>>
+      <%= content_tag(:section, PostPresenter.data_attributes(@post).merge(id: "image-container")) do -%>
         <div id="note-container"></div>
         <div id="note-preview"></div>
         <%= @post.presenter.image_html(self) %>
-      </section>
+      <% end -%>
 
       <% if CurrentUser.is_member? %>
         <%= content_tag(:div, class: "fav-buttons fav-buttons-#{@post.is_favorited?}") do %>
