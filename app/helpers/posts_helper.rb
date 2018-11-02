@@ -136,6 +136,17 @@ module PostsHelper
     html.html_safe
   end
 
+  def pool_link(pool)
+    render("posts/partials/show/pool_link", post: @post, pool: pool)
+  end
+
+  def is_pool_selected?(pool)
+    return false if params.has_key?(:q)
+    return false if params.has_key?(:favgroup_id)
+    return false if !params.has_key?(:pool_id)
+    return params[:pool_id].to_i == pool.id
+  end
+
   private
 
   def nav_params_for(page)

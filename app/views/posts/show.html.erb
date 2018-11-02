@@ -50,7 +50,7 @@
       <%= content_tag(:section, PostPresenter.data_attributes(@post).merge(id: "image-container")) do -%>
         <div id="note-container"></div>
         <div id="note-preview"></div>
-        <%= @post.presenter.image_html(self) %>
+        <%= render "posts/partials/show/embedded", post: @post %>
       <% end -%>
 
       <% if CurrentUser.is_member? %>

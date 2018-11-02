@@ -39,6 +39,12 @@ class Pool < ApplicationRecord
       order(Arel.sql("(case pools.category when 'series' then 0 else 1 end), pools.name"))
     end
 
+    def selected_first(current_pool_id)
+      return where("true") if current_pool_id.blank?
+      current_pool_id = current_pool_id.to_i
+      reorder(Arel.sql("(case pools.id when #{current_pool_id} then 0 else 1 end), pools.name"))
+    end
+
     def name_matches(name)
       name = normalize_name_for_search(name)
       name = "*#{name}*" unless name =~ /\*/
@@ -280,6 +286,14 @@ class Pool < ApplicationRecord
     save if will_save_change_to_post_ids?
   end
 
+  def first_post?(post_id)
+    page_number(post_id) == 1
+  end
+
+  def first_post_id
+    post_id_array[0]
+  end
+
   def post_id_array
     @post_id_array ||= post_ids.scan(/\d+/).map(&:to_i)
   end
@@ -301,20 +315,26 @@ class Pool < ApplicationRecord
     self
   end
 
-  def neighbors(post)
-    @neighbor_posts ||= begin
-      post_ids =~ /\A#{post.id} (\d+)|(\d+) #{post.id} (\d+)|(\d+) #{post.id}\Z/
+  def neighbors(post, relation)
+    post_ids =~ /\A#{post.id} (\d+)|(\d+) #{post.id} (\d+)|(\d+) #{post.id}\Z/
 
-      if $2 && $3
-        OpenStruct.new(:previous => $2.to_i, :next => $3.to_i)
-      elsif $1
-        OpenStruct.new(:next => $1.to_i)
-      elsif $4
-        OpenStruct.new(:previous => $4.to_i)
+    if $2 && $3
+      if relation == :previous
+        return $2.to_i
       else
-        OpenStruct.new
+        return $3.to_i
+      end
+    elsif $1
+      if relation == :next
+        return $1.to_i
+      end
+    elsif $4
+      if relation == :previous
+        return $4.to_i
       end
     end
+
+    return nil
   end
 
   def cover_post_id

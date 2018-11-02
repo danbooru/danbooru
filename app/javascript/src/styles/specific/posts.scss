@@ -310,7 +310,7 @@ div#c-posts {
   }
 
   div#a-show {
-    .active {
+    .active, .pool-selected-true {
       font-weight: bold;
     }
 

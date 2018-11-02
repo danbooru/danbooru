@@ -1,0 +1,7 @@
+<div id="pool-nav">
+  <ul>
+    <% pools.each do |pool| -%>
+      <%= render "posts/partials/show/pool_list_item", pool: pool, post: post, selected: is_pool_selected?(pool) -%>
+    <% end -%>
+  </ul>
+</div>

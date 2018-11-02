@@ -1,0 +1,33 @@
+<%= content_tag :li, id: "nav-link-for-pool-#{pool.id}", class: "pool-category-#{pool.category} pool-selected-#{selected}" do -%>
+  <% if !pool.first_post?(post.id) -%>
+    <%= link_to("&laquo;".html_safe, post_path(pool.first_post_id, pool_id: pool.id), class: "first", title: "to page 1") %>
+  <% else -%>
+    <span class="first">&laquo;</span>
+  <% end -%>
+
+  <% pool.neighbors(post, :previous).tap do |previous_post_id| -%>
+    <% if previous_post_id %>
+      <%= link_to "&lsaquo;&thinsp;prev".html_safe, post_path(previous_post_id, pool_id: pool.id), rel: selected ? "prev" : nil, class: "prev", title: "to page #{pool.page_number(previous_post_id)}" -%>
+    <% else -%>
+      <span class="prev">&lsaquo;&thinsp;prev</span>
+    <% end %>
+  <% end -%>
+
+  <span class="pool-name">
+    <%= link_to("Pool: #{pool.pretty_name}", pool_path(pool), title: "page #{pool.page_number(post.id)}/#{pool.post_count}") -%>
+  </span>
+
+  <% if pool.neighbors(post, :next).tap do |previous_post_id| -%>
+    <% if previous_post_id %>
+      <%= link_to("next&thinsp;&rsaquo;".html_safe, post_path(next_post_in_pool, pool_id: pool.id), rel: selected ? "next" : nil, class: "next", title: "to page #{pool.page_number(previous_post_id)}") -%>
+    <% else -%>
+      <span class="next">next&thinsp;&rsaquo;</span>
+    <% end -%>
+  <% end -%>
+
+  <% if post.id != pool.post_id_array.last -%>
+    <%= link_to("&raquo;".html_safe, post_path(pool.post_id_array.last, pool_id: pool.id), class: "last", title: "to page #{pool.post_count}") -%>
+  <% else -%>
+    <span class="last">&raquo;</span>
+  <% end -%>
+<% end -%>

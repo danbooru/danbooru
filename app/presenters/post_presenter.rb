@@ -155,33 +155,6 @@ class PostPresenter < Presenter
     "#{humanized_essential_tag_string} - #{@post.md5}.#{@post.file_ext}"
   end
 
-  def safe_mode_message(template)
-    html = ["This image is unavailable on safe mode (#{Danbooru.config.app_name}). Go to "]
-    html << template.link_to("Danbooru", "https://danbooru.donmai.us") # XXX don't hardcode.
-    html << " or disable safe mode to view ("
-    html << template.link_to("learn more", template.wiki_pages_path(title: "help:user_settings"))
-    html << ")."
-    html.join.html_safe
-  end
-
-  def image_html(template)
-    return template.content_tag("p", "The artist requested removal of this image") if @post.banblocked?
-    return template.content_tag("p", template.link_to("You need a gold account to see this image.", template.new_user_upgrade_path)) if @post.levelblocked?
-    return template.content_tag("p", safe_mode_message(template)) if @post.safeblocked?
-
-    if @post.is_flash?
-      template.render("posts/partials/show/flash", :post => @post)
-    elsif @post.is_video?
-      template.render("posts/partials/show/video", :post => @post)
-    elsif @post.is_ugoira?
-      template.render("posts/partials/show/ugoira", :post => @post)      
-    elsif !@post.is_image?
-      template.render("posts/partials/show/download", :post => @post)
-    elsif @post.is_image?
-      template.render("posts/partials/show/image", :post => @post)
-    end
-  end
-
   def has_nav_links?(template)
     has_sequential_navigation?(template.params) || @post.pools.undeleted.any? || @post.favorite_groups(active_id=template.params[:favgroup_id]).any?
   end
@@ -190,94 +163,5 @@ class PostPresenter < Presenter
     return false if Tag.has_metatag?(params[:q], :order, :ordfav, :ordpool)
     return false if params[:pool_id].present? || params[:favgroup_id].present?
     return CurrentUser.user.enable_sequential_post_navigation 
-  end
-
-  def post_footer_for_pool_html(template)
-    if template.params[:pool_id]
-      pool = Pool.where(:id => template.params[:pool_id]).first
-      return if pool.nil?
-      return if pool.neighbors(@post).next.nil?
-      template.link_to("Next in #{pool.pretty_name}", template.post_path(pool.neighbors(@post).next))
-    else
-      nil
-    end
-  end
-
-  def pool_html(template)
-    html = ["<ul>"]
-
-    if template.params[:pool_id].present? && @post.belongs_to_pool_with_id?(template.params[:pool_id])
-      pool = Pool.where(:id => template.params[:pool_id]).first
-      return if pool.nil?
-      html += pool_link_html(template, pool, :include_rel => true)
-
-      other_pools = @post.pools.undeleted.where("id <> ?", template.params[:pool_id]).series_first
-      other_pools.each do |other_pool|
-        html += pool_link_html(template, other_pool)
-      end
-    else
-      first = true
-      pools = @post.pools.undeleted
-      pools.each do |pool|
-        if first && template.params[:q].blank? && template.params[:favgroup_id].blank?
-          html += pool_link_html(template, pool, :include_rel => true)
-          first = false
-        else
-          html += pool_link_html(template, pool)
-        end
-      end
-    end
-
-    html << "</ul>"
-    html.join("\n").html_safe
-  end
-
-  def pool_link_html(template, pool, options = {})
-    pool_html = [%{<li id="nav-link-for-pool-#{pool.id}" class="pool-category-#{pool.category}">}]
-    match_found = false
-
-    if options[:include_rel]
-      prev_rel = "prev"
-      next_rel = "next"
-      klass = "active"
-    else
-      prev_rel = nil
-      next_rel = nil
-      klass = ""
-    end
-
-    if @post.id != pool.post_id_array.first
-      pool_html << template.link_to("&laquo;".html_safe, template.post_path(pool.post_id_array.first, :pool_id => pool.id), :class => "#{klass} first", :title => "to page 1")
-    else
-      pool_html << '<span class="first">&laquo;</span>'
-    end
-
-    if pool.neighbors(@post).previous
-      pool_html << template.link_to("&lsaquo;&thinsp;prev".html_safe, template.post_path(pool.neighbors(@post).previous, :pool_id => pool.id), :rel => prev_rel, :class => "#{klass} prev", :title => "to page #{pool.page_number(pool.neighbors(@post).previous)}")
-      match_found = true
-    else
-      pool_html << '<span class="prev">&lsaquo;&thinsp;prev</span>'
-    end
-
-    pool_html << ' <span class="pool-name ' + klass + '">'
-    pool_html << template.link_to("Pool: #{pool.pretty_name}", template.pool_path(pool), :title => "page #{pool.page_number(@post.id)}/#{pool.post_count}")
-    pool_html << '</span> '
-
-    if pool.neighbors(@post).next
-      @next_post_in_pool = pool.neighbors(@post).next
-      pool_html << template.link_to("next&thinsp;&rsaquo;".html_safe, template.post_path(@next_post_in_pool, :pool_id => pool.id), :rel => next_rel, :class => "#{klass} next", :title => "to page #{pool.page_number(@next_post_in_pool)}")
-      match_found = true
-    else
-      pool_html << '<span class="next">next&thinsp;&rsaquo;</span>'
-    end
-
-    if @post.id != pool.post_id_array.last
-      pool_html << template.link_to("&raquo;".html_safe, template.post_path(pool.post_id_array.last, :pool_id => pool.id), :class => "#{klass} last", :title => "to page #{pool.post_count}")
-    else
-      pool_html << '<span class="last">&raquo;</span>'
-    end
-
-    pool_html << "</li>"
-    pool_html
   end
 end
