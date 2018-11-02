@@ -165,7 +165,7 @@ module Sources
 
             # href may be missing the `http://` bit (ex: `inprnt.com`, `//inprnt.com`). Add it if missing.
             uri = Addressable::URI.heuristic_parse(element["href"]) rescue nil
-            if uri.present?
+            if uri.present? && uri.path.present?
               uri.scheme ||= "http"
               element["href"] = uri.to_s
             end
