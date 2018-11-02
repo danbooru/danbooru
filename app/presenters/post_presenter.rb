@@ -23,7 +23,7 @@ class PostPresenter < Presenter
     locals = {}
 
     locals[:article_attrs] = {
-      "id" => "post_##{post.id}",
+      "id" => "post_#{post.id}",
       "class" => preview_class(post, options).join(" ")
     }.merge(data_attributes(post))
 
