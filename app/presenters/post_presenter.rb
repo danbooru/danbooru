@@ -63,10 +63,11 @@ class PostPresenter < Presenter
       locals[:pool] = nil
     end
 
+    locals[:width] = post.image_width
+    locals[:height] = post.image_height
+
     if options[:similarity]
       locals[:similarity] = options[:similarity].round
-      locals[:width] = post.image_width
-      locals[:height] = post.image_height
     else
       locals[:similarity] = nil
     end
