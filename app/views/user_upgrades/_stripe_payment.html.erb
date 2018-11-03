@@ -8,3 +8,13 @@
     <%= stripe_button("Upgrade Gold to Platinum", 2000, user) %>
   <% end %>
 </div>
+
+<% content_for(:html_header) do %>
+  <script>
+    $(function() {
+      if (typeof window.mixpanel === 'object') {
+        window.mixpanel.track_forms(".stripe", "Clicked Account Upgrade");
+      }
+    });
+  </script>
+<% end %>
