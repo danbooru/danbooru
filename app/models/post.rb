@@ -1675,9 +1675,10 @@ class Post < ApplicationRecord
   module PixivMethods
     def parse_pixiv_id
       self.pixiv_id = nil
-      
-      if Sources::Strategies::Pixiv.match?(source)
-        self.pixiv_id = Sources::Strategies::Pixiv.new(source).illust_id
+
+      site = Sources::Strategies::Pixiv.new(source)
+      if site.match?
+        self.pixiv_id = site.illust_id
       end
     end
   end
