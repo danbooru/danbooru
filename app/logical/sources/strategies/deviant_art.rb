@@ -49,8 +49,8 @@ module Sources
       PATH_PROFILE = %r{\Ahttps?://(www\.)?deviantart\.com/#{ARTIST}/?\z}i
       SUBDOMAIN_PROFILE = %r{\Ahttps?://#{ARTIST}\.deviantart\.com/?\z}i
 
-      def self.match?(*urls)
-        urls.compact.any? { |x| x.match?(/^https?:\/\/(?:.+?\.)?deviantart\.(?:com|net)/) }
+      def domains
+        ["deviantart.net", "deviantart.com"]
       end
 
       def site_name

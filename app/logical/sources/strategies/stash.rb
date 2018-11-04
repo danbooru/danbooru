@@ -15,8 +15,12 @@ module Sources
     class Stash < DeviantArt
       STASH = %r{\Ahttps?://sta\.sh/(?<post_id>[0-9a-zA-Z]+)}i
 
-      def self.match?(*urls)
-        urls.compact.any? { |x| x =~ STASH }
+      def domains
+        ["deviantart.net", "sta.sh"]
+      end
+
+      def match?
+        parsed_urls.map(&:domain).any?("sta.sh")
       end
 
       def site_name

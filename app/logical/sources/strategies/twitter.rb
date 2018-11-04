@@ -9,10 +9,6 @@ module Sources::Strategies
     # https://developer.twitter.com/en/docs/developer-utilities/configuration/api-reference/get-help-configuration
     RESERVED_USERNAMES = %w[home i intent search]
 
-    def self.match?(*urls)
-      urls.compact.any? { |x| x =~ PAGE || x =~ ASSET}
-    end
-
     def self.enabled?
       TwitterService.new.enabled?
     end
@@ -33,6 +29,10 @@ module Sources::Strategies
       else
         nil
       end
+    end
+
+    def domains
+      ["twitter.com", "twimg.com"]
     end
 
     def site_name

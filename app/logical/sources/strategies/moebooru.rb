@@ -38,8 +38,8 @@ module Sources
 
       delegate :artist_name, :profile_url, :unique_id, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_strategy, allow_nil: true
 
-      def self.match?(*urls)
-        urls.compact.any? { |x| x.match?(BASE_URL) }
+      def domains
+        ["yande.re", "konachan.com"]
       end
 
       def site_name

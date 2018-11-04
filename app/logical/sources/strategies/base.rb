@@ -14,13 +14,9 @@
 module Sources
   module Strategies
     class Base
-      attr_reader :url, :referer_url
+      attr_reader :url, :referer_url, :urls, :parsed_url, :parsed_referer, :parsed_urls
 
       extend Memoist
-
-      def self.match?(*urls)
-        false
-      end
 
       # Should return true if all prerequisites for using the strategy are met.
       # Return false if the strategy requires api keys that have not been configured.
@@ -41,10 +37,24 @@ module Sources
       def initialize(url, referer_url = nil)
         @url = url
         @referer_url = referer_url
+        @urls = [url, referer_url].select(&:present?)
+
+        @parsed_url = Addressable::URI.heuristic_parse(url) rescue nil
+        @parsed_referer = Addressable::URI.heuristic_parse(referer_url) rescue nil
+        @parsed_urls = [parsed_url, parsed_referer].select(&:present?)
       end
 
-      def urls
-        [url, referer_url].select(&:present?)
+      # Should return true if this strategy should be used. By default, checks
+      # if the main url belongs to any of the domains associated with this site.
+      def match?
+        return false if parsed_url.nil?
+        parsed_url.domain.in?(domains)
+      end
+
+      # The list of base domains belonging to this site. Subdomains are
+      # automatically included (i.e. "pixiv.net" matches "fanbox.pixiv.net").
+      def domains
+        []
       end
 
       def site_name

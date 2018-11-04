@@ -53,8 +53,8 @@ module Sources
       FILENAME = %r!(?:(?<illust_id>\d+)_(?<page>\d+_))?(?<artist_id>\d+)_(?<timestamp>\d{14})(?:_\d+)?!i
       IMAGE_URL = %r!\Ahttps?://pic\d+\.nijie\.info/#{DIR}/#{FILENAME}\.\w+\z!i
 
-      def self.match?(*urls)
-        urls.compact.any? { |x| x.match?(BASE_URL) }
+      def domains
+        ["nijie.info"]
       end
 
       def site_name

@@ -7,8 +7,8 @@ module Sources
       PAGE = %r!\Ahttps?://seiga\.nicovideo\.jp/seiga/im(\d+)!i
       PROFILE = %r!\Ahttps?://seiga\.nicovideo\.jp/user/illust/(\d+)!i
 
-      def self.match?(*urls)
-        urls.compact.any? { |x| x.match?(URL) }
+      def domains
+        ["nicoseiga.jp", "nicovideo.jp"]
       end
 
       def site_name

@@ -2,10 +2,8 @@ module Sources::Strategies
   class Pawoo < Base
     IMAGE = %r!\Ahttps?://img\.pawoo\.net/media_attachments/files/(\d+/\d+/\d+)!
 
-    def self.match?(*urls)
-      urls.compact.any? do |x| 
-        x =~ IMAGE || PawooApiClient::Status.is_match?(x) || PawooApiClient::Account.is_match?(x)
-      end
+    def domains
+      ["pawoo.net"]
     end
 
     def site_name

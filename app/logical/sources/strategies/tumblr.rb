@@ -15,8 +15,8 @@ module Sources::Strategies
       Danbooru.config.tumblr_consumer_key.present?
     end
 
-    def self.match?(*urls)
-      urls.compact.any? { |url| url.match?(BASE_URL) }
+    def domains
+      ["tumblr.com"]
     end
 
     def site_name

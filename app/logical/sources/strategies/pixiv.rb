@@ -21,10 +21,6 @@ module Sources
       FANBOX_IMAGE = %r!(?:\Ahttps?://fanbox\.pixiv\.net/images/post/(\d+))!
       FANBOX_PAGE = %r!(?:\Ahttps?://www\.pixiv\.net/fanbox/creator/\d+/post/(\d+))!
 
-      def self.match?(*urls)
-        urls.compact.any? { |x| x.match?(/#{WEB}|#{IMG}|#{I12}|#{TOUCH}|#{PXIMG}|#{FANBOX_IMAGE}|#{FANBOX_ACCOUNT}/i) }
-      end
-
       def self.to_dtext(text)
         if text.nil?
           return nil
@@ -45,6 +41,10 @@ module Sources
 
         text = text.gsub(/\r\n|\r|\n/, "<br>")
         DText.from_html(text)
+      end
+
+      def domains
+        ["pixiv.net", "pximg.net"]
       end
 
       def site_name

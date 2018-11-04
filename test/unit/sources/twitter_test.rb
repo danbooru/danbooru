@@ -229,5 +229,14 @@ module Sources
         assert_equal(desc2, site.dtext_artist_commentary_desc)
       end
     end
+
+    context "A twitter post with a pixiv referer" do
+      should "use the twitter strategy" do
+        site = Sources::Strategies.find("https://twitter.com/Mityubi/status/849630665603665920", "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=56735489")
+
+        assert_equal(site.site_name, "Twitter")
+        assert_equal("https://pbs.twimg.com/media/C8p-gPhVoAMZupS.png:orig", site.image_url)
+      end
+    end
   end
 end

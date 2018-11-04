@@ -9,10 +9,6 @@ module Sources::Strategies
 
     attr_reader :json, :image_urls
 
-    def self.match?(*urls)
-      urls.compact.any? { |x| x.match?(PROJECT) || x.match?(ASSET) || x.match?(PROFILE)}
-    end
-
     # https://www.artstation.com/artwork/04XA4
     # https://www.artstation.com/artwork/cody-from-sf
     # https://sa-dui.artstation.com/projects/DVERn
@@ -22,6 +18,10 @@ module Sources::Strategies
       else
         nil
       end
+    end
+
+    def domains
+      ["artstation.com"]
     end
 
     def site_name
