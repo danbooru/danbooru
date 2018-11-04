@@ -17,7 +17,7 @@ module Sources
 
     def self.find(url, referer=nil, default: Strategies::Null)
       strategy = all.map { |strategy| strategy.new(url, referer) }.detect(&:match?)
-      strategy || default.new(url, referer)
+      strategy || default&.new(url, referer)
     end
 
     def self.canonical(url, referer)
