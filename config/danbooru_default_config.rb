@@ -341,7 +341,7 @@ module Danbooru
           "extra" => ["co"],
           "header" => %{<h2 class="copyright-tag-list">Copyrights</h2>},
           "humanized" => {
-            "slice" => 5,
+            "slice" => 1,
             "exclusion" => [],
             "regexmap" => //,
             "formatstr" => "(%s)"

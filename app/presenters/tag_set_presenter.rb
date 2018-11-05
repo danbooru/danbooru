@@ -73,7 +73,7 @@ class TagSetPresenter < Presenter
       next if type_tags.empty?
 
       if max_tags > 0 && type_tags.length > max_tags
-        type_tags = type_tags.take(max_tags) + ["others"]
+        type_tags = type_tags.sort_by {|x| -x.size}.take(max_tags) + ["etc"]
       end
 
       if regexmap != //
