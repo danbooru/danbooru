@@ -2,7 +2,7 @@
   <div id="a-show">
     <div class="comments-for-post">
       <div class="list-of-comments">
-        <div id="post_<%= @comment.post.id %>" class="post <%= PostPresenter.preview_class(@comment.post) %>" <%= PostPresenter.data_attributes(@comment.post) %>>
+        <%= content_tag(:div, { id: "post_#{@comment.post_id}", class: ["post", *PostPresenter.preview_class(@comment.post)].join(" ") }.merge(PostPresenter.data_attributes(@comment.post))) do %>
           <div class="preview">
             <% if @comment.post.visible? %>
               <%= link_to(image_tag(@comment.post.preview_file_url), post_path(@comment.post)) %>
@@ -10,7 +10,7 @@
           </div>
           <%= render :partial => "comments/partials/show/comment", :collection => [@comment] %>
           <div class="clearfix"></div>
-        </div>
+        <% end %>
       </div>
     </div>
   </div>

@@ -47,7 +47,7 @@
 
       <%= render "posts/partials/show/notices", :post => @post %>
 
-      <%= content_tag(:section, PostPresenter.data_attributes(@post).merge(id: "image-container")) do -%>
+      <%= content_tag(:section, { id: "image-container" }.merge(PostPresenter.data_attributes(@post))) do -%>
         <div id="note-container"></div>
         <div id="note-preview"></div>
         <%= render "posts/partials/show/embedded", post: @post %>

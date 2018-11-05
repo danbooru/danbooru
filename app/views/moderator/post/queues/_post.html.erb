@@ -1,4 +1,4 @@
-<div id="post-<%= post.id %>" class="post mod-queue-preview <%= PostPresenter.preview_class(post) %>" <%= PostPresenter.data_attributes(post) %>>
+<%= content_tag(:div, { id: "post-#{post.id}", class: ["post", "mod-queue-preview", *PostPresenter.preview_class(post)].join(" ") }.join(PostPresenter.data_attributes(post))) do %>
   <aside>
     <%= link_to(image_tag(post.preview_file_url), post_path(post), :target => "_blank") %>
   </aside>
@@ -34,4 +34,4 @@
       <li><strong>Tags</strong>: <%= post.presenter.inline_tag_list_html %></li>
     </ul>
   </section>
-</div>
+<% end %>
