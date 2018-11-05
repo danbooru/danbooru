@@ -25,7 +25,7 @@ class PoolElementsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "add a post to a pool once and only once" do
-        @pool.add!(@post)
+        as_user { @pool.add!(@post) }
         post_auth pool_element_path, @user, params: {:pool_id => @pool.id, :post_id => @post.id, :format => "json"}
         @pool.reload
         assert_equal([@post.id], @pool.post_id_array)
@@ -34,7 +34,7 @@ class PoolElementsControllerTest < ActionDispatch::IntegrationTest
 
     context "destroy action" do
       setup do
-        @pool.add!(@post)
+        as_user { @pool.add!(@post) }
       end
 
       should "remove a post from a pool" do
