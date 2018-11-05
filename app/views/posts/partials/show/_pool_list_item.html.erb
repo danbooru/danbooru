@@ -5,7 +5,7 @@
     <span class="first">&laquo;</span>
   <% end -%>
 
-  <% pool.neighbors(post, :previous).tap do |previous_post_id| -%>
+  <% pool.previous_post_id(post.id).tap do |previous_post_id| -%>
     <% if previous_post_id %>
       <%= link_to "&lsaquo;&thinsp;prev".html_safe, post_path(previous_post_id, pool_id: pool.id), rel: selected ? "prev" : nil, class: "prev", title: "to page #{pool.page_number(previous_post_id)}" -%>
     <% else -%>
@@ -17,7 +17,7 @@
     <%= link_to("Pool: #{pool.pretty_name}", pool_path(pool), title: "page #{pool.page_number(post.id)}/#{pool.post_count}") -%>
   </span>
 
-  <% pool.neighbors(post, :next).tap do |next_post_id| -%>
+  <% pool.next_post_id(post.id).tap do |next_post_id| -%>
     <% if next_post_id %>
       <%= link_to("next&thinsp;&rsaquo;".html_safe, post_path(next_post_id, pool_id: pool.id), rel: selected ? "next" : nil, class: "next", title: "to page #{pool.page_number(next_post_id)}") -%>
     <% else -%>

@@ -312,11 +312,6 @@ class PoolTest < ActiveSupport::TestCase
       @pool.add!(@p1)
       @pool.add!(@p2)
       @pool.add!(@p3)
-      @p1_neighbors = @pool.neighbors(@p1)
-      @pool.reload # clear cached neighbors
-      @p2_neighbors = @pool.neighbors(@p2)
-      @pool.reload # clear cached neighbors
-      @p3_neighbors = @pool.neighbors(@p3)
     end
 
     context "that is synchronized" do
@@ -343,18 +338,18 @@ class PoolTest < ActiveSupport::TestCase
     end
 
     should "find the neighbors for the first post" do
-      assert_nil(@p1_neighbors.previous)
-      assert_equal(@p2.id, @p1_neighbors.next)
+      assert_nil(@pool.previous_post_id(@p1.id))
+      assert_equal(@p2.id, @pool.next_post_id(@p1.id))
     end
 
     should "find the neighbors for the middle post" do
-      assert_equal(@p1.id, @p2_neighbors.previous)
-      assert_equal(@p3.id, @p2_neighbors.next)
+      assert_equal(@p1.id, @pool.previous_post_id(@p2.id))
+      assert_equal(@p3.id, @pool.next_post_id(@p2.id))
     end
 
     should "find the neighbors for the last post" do
-      assert_equal(@p2.id, @p3_neighbors.previous)
-      assert_nil(@p3_neighbors.next)
+      assert_equal(@p2.id, @pool.previous_post_id(@p3.id))
+      assert_nil(@pool.next_post_id(@p3.id))
     end
   end
 end

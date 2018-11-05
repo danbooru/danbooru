@@ -315,26 +315,17 @@ class Pool < ApplicationRecord
     self
   end
 
-  def neighbors(post, relation)
-    post_ids =~ /\A#{post.id} (\d+)|(\d+) #{post.id} (\d+)|(\d+) #{post.id}\Z/
+  # XXX finds wrong post when the pool contains multiple copies of the same post (#2042).
+  def previous_post_id(post_id)
+    n = post_id_array.index(post_id) - 1
+    return nil if n < 0
+    post_id_array[n]
+  end
 
-    if $2 && $3
-      if relation == :previous
-        return $2.to_i
-      else
-        return $3.to_i
-      end
-    elsif $1
-      if relation == :next
-        return $1.to_i
-      end
-    elsif $4
-      if relation == :previous
-        return $4.to_i
-      end
-    end
-
-    return nil
+  def next_post_id(post_id)
+    n = post_id_array.index(post_id) + 1
+    return nil if n >= post_id_array.size
+    post_id_array[n]
   end
 
   def cover_post_id
@@ -355,7 +346,6 @@ class Pool < ApplicationRecord
 
   def reload(options = {})
     super
-    @neighbor_posts = nil
     clear_post_id_array
     self
   end
