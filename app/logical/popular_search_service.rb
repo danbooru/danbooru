@@ -33,7 +33,7 @@ class PopularSearchService
       if response.success?
         response = response.body
       else
-        response = ""
+        response = "[]"
       end
       response
     end.to_s.force_encoding("utf-8")
@@ -47,7 +47,7 @@ class PopularSearchService
         if response.success?
           response = response.body
         else
-          response = ""
+          response = "[]"
         end
         response
       end.to_s.force_encoding("utf-8")
