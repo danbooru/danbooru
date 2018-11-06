@@ -30,27 +30,11 @@ ModQueue.initialize_hilights = function() {
   });
 }
 
-ModQueue.initialize_detailed_rejection_links = function() {
-  $(".detailed-rejection-link").on("click.danbooru", ModQueue.detailed_rejection_dialog)
-}
-
 ModQueue.detailed_rejection_dialog = function() {
   $("#post_disapproval_post_id").val($(this).data("post-id"));
   $("#detailed-rejection-dialog").find("form")[0].reset();
 
-  $("#detailed-rejection-dialog").dialog({
-    width: 500,
-    buttons: {
-      "Submit": function() {
-        $(this).find("form").submit();
-        $(this).dialog("close");
-      },
-      "Cancel": function() {
-        $(this).dialog("close");
-      }
-    }
-  });
-
+  Utility.dialog("Detailed Rejection", "#detailed-rejection-dialog");
   return false;
 }
 
@@ -59,12 +43,9 @@ $(function() {
 
   if ($("#c-moderator-post-queues").length) {
     ModQueue.initialize_hilights();
-    ModQueue.initialize_detailed_rejection_links();
   }
 
-  if ($("#c-posts #a-show").length) {
-    ModQueue.initialize_detailed_rejection_links();
-  }
+  $(document).on("click.danbooru", ".quick-mod .detailed-rejection-link", ModQueue.detailed_rejection_dialog);
 });
 
 export default ModQueue
