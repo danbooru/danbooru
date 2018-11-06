@@ -7,7 +7,7 @@ module PostSetPresenters
       @post_set = post_set
     end
 
-    def post_previews_html(template, options = {})
+    def post_previews_html(template)
       html = ""
 
       if pools.empty?
@@ -17,7 +17,7 @@ module PostSetPresenters
       pools.each do |pool|
         if pool.cover_post_id
           post = ::Post.find(pool.cover_post_id)
-          html << PostPresenter.preview(post, options.merge(:tags => @post_set.tag_string, :raw => @post_set.raw, :pool => pool, :show_deleted => true))
+          html << PostPresenter.preview(post, link_target: pool, pool: pool, show_deleted: true)
           html << "\n"
         end
       end

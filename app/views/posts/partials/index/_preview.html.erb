@@ -1,5 +1,5 @@
 <%= content_tag(:article, article_attrs) do -%>
-  <%= content_tag(:a, href: url_for(link_params)) do -%>
+  <%= link_to polymorphic_path(link_target, link_params) do -%>
     <%= content_tag(:picture) do -%>
       <%= tag.source media: "(max-width: 660px)", srcset: cropped_url -%>
       <%= tag.source media: "(min-width: 660px)", srcset: preview_url -%>

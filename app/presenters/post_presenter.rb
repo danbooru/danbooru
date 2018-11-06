@@ -27,20 +27,17 @@ class PostPresenter < Presenter
       "class" => preview_class(post, options).join(" ")
     }.merge(data_attributes(post))
 
-    # TODO: rename path_prefix to controller
-    locals[:link_params] = {
-      "controller" => options[:path_prefix] || "posts",
-      "action" => "show",
-      "id" => post.id
-    }
+    locals[:link_target] = options[:link_target] || post
+
+    locals[:link_params] = {}
     if options[:tags].present? && !CurrentUser.is_anonymous?
       locals[:link_params]["q"] = options[:tags]
     end
-    if options[:pool_id] || options[:pool]
-      locals[:link_params]["pool_id"] = options[:pool_id] || options[:pool].id
+    if options[:pool_id]
+      locals[:link_params]["pool_id"] = options[:pool_id]
     end
-    if options[:favgroup_id] || options[:favgroup]
-      locals[:link_params]["favgroup_id"] = options[:favgroup_id] || options[:favgroup].id
+    if options[:favgroup_id]
+      locals[:link_params]["favgroup_id"] = options[:favgroup_id]
     end
 
     locals[:tooltip] = "#{post.tag_string} rating:#{post.rating} score:#{post.score}"
