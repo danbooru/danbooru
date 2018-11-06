@@ -8,7 +8,7 @@
   <% end -%>
   <% if pool -%>
     <p class="desc">
-      <%= link_to truncate(pool.pretty_name, 80), pool_path(pool.id) %>
+      <%= link_to pool.pretty_name.truncate(80), pool %>
     </p>
   <% end -%>
   <% if similarity -%>
