@@ -13,7 +13,7 @@
     <%= nav_link_to("Aliases", tag_aliases_path) %>
     <%= nav_link_to("Implications", tag_implications_path) %>
   <% end %>
-  <%= nav_link_to("Pools", pools_path) %>
+  <%= nav_link_to("Pools", gallery_pools_path) %>
   <%= nav_link_to("Wiki", wiki_pages_path(:title => "help:home")) %>
   <%= nav_link_to("Forum", forum_topics_path, :class => (CurrentUser.has_forum_been_updated? ? "forum-updated" : nil)) %>
   <% if CurrentUser.is_moderator? %>
