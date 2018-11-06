@@ -36,6 +36,7 @@ ModQueue.initialize_detailed_rejection_links = function() {
 
 ModQueue.detailed_rejection_dialog = function() {
   $("#post_disapproval_post_id").val($(this).data("post-id"));
+  $("#detailed-rejection-dialog").find("form")[0].reset();
 
   $("#detailed-rejection-dialog").dialog({
     width: 500,
