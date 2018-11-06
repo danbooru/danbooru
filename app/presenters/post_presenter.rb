@@ -81,10 +81,10 @@ class PostPresenter < Presenter
     ApplicationController.render(partial: "posts/partials/index/preview", locals: locals)
   end
 
-  def self.preview_class(post, highlight_score: nil, pooled: nil, size: nil, similarity: nil, **options)
+  def self.preview_class(post, highlight_score: nil, pool: nil, size: nil, similarity: nil, **options)
     klass = ["post-preview"]
     # klass << " large-cropped" if post.has_cropped? && options[:show_cropped]
-    klass << "captioned" if pooled || size || similarity
+    klass << "captioned" if pool || size || similarity
     klass << "post-status-pending" if post.is_pending?
     klass << "post-status-flagged" if post.is_flagged?
     klass << "post-status-deleted" if post.is_deleted?
