@@ -120,7 +120,7 @@ class PoolTest < ActiveSupport::TestCase
 
   context "Updating a pool" do
     setup do
-      @pool = FactoryBot.create(:pool)
+      @pool = FactoryBot.create(:pool, category: "series")
       @p1 = FactoryBot.create(:post)
       @p2 = FactoryBot.create(:post)
     end
@@ -241,6 +241,35 @@ class PoolTest < ActiveSupport::TestCase
       end
     end
 
+    context "by changing the category" do
+      setup do
+        Danbooru.config.stubs(:pool_category_change_limit).returns(1)
+        @pool.add!(@p1)
+        @pool.add!(@p2)
+      end
+
+      teardown do
+        Danbooru.config.unstub(:pool_category_change_limit)
+      end
+
+      should "not allow Members to change the category of large pools" do
+        @member = FactoryBot.create(:member_user)
+        as(@member) { @pool.update(category: "collection") }
+
+        assert_equal(["You cannot change the category of pools with greater than 1 posts"], @pool.errors[:base])
+      end
+
+      should "allow Builders to change the category of large pools" do
+        @builder = FactoryBot.create(:builder_user)
+        as(@builder) { @pool.update(category: "collection") }
+
+        assert_equal(true, @pool.valid?)
+        assert_equal("collection", @pool.category)
+        assert_equal("pool:#{@pool.id} pool:collection", @p1.reload.pool_string)
+        assert_equal("pool:#{@pool.id} pool:collection", @p2.reload.pool_string)
+      end
+    end
+
     should "create new versions for each distinct user" do
       assert_equal(1, @pool.versions.size)
       user2 = Timecop.travel(1.month.ago) {FactoryBot.create(:user)}
@@ -294,11 +323,8 @@ class PoolTest < ActiveSupport::TestCase
     end
 
     context "when validating names" do
-      should "not be valid for bad names" do
-        ["foo,bar", "foo*bar", "123", "___", "   ", "any", "none", "series", "collection"].each do |bad_name|
-          pool = Pool.create(name: bad_name)
-          assert pool.invalid?
-        end
+      ["foo,bar", "foo*bar", "123", "___", "   ", "any", "none", "series", "collection"].each do |bad_name|
+        should_not allow_value(bad_name).for(:name)
       end
     end
   end

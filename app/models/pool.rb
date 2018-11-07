@@ -3,8 +3,8 @@ require 'ostruct'
 class Pool < ApplicationRecord
   class RevertError < Exception ; end
 
-  validates_uniqueness_of :name, :case_sensitive => false, :if => :saved_change_to_name?
-  validate :validate_name, :if => :saved_change_to_name?
+  validates_uniqueness_of :name, case_sensitive: false, if: :name_changed?
+  validate :validate_name, if: :name_changed?
   validates_inclusion_of :category, :in => %w(series collection)
   validate :updater_can_change_category
   validate :updater_can_remove_posts
@@ -369,12 +369,12 @@ class Pool < ApplicationRecord
   end
 
   def category_changeable_by?(user)
-    user.is_builder? || (user.is_member? && post_count <= 100)
+    user.is_builder? || (user.is_member? && post_count <= Danbooru.config.pool_category_change_limit)
   end
 
   def updater_can_change_category
-    if saved_change_to_category? && !category_changeable_by?(CurrentUser.user)
-      errors[:base] << "You cannot change the category of pools with greater than 100 posts"
+    if category_changed? && !category_changeable_by?(CurrentUser.user)
+      errors[:base] << "You cannot change the category of pools with greater than #{Danbooru.config.pool_category_change_limit} posts"
       false
     else
       true
