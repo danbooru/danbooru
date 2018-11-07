@@ -90,7 +90,7 @@ div.prose {
 
   a.dtext-external-link::after {
     // https://fontawesome.com/icons/external-link-alt?style=solid
-    @include fa-icon("Font Awesome 5 Free", 900, "\f35d");
+    @include fa-solid-icon("\f35d");
 
     font-size: 0.6em;
     padding: 0 0.2em 0 0.3em;

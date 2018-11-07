@@ -53,14 +53,14 @@ $success_color: hsl(120, 100%, 95%); // light green
 }
 
 // https://fontawesome.com/how-to-use/on-the-web/advanced/css-pseudo-elements
-@mixin fa-icon($family, $weight, $content) {
+@mixin fa-solid-icon($content) {
   display: inline-block;
   font-style: normal;
   font-variant: normal;
   text-rendering: auto;
   -webkit-font-smoothing: antialiased;
 
-  font-family: $family;
-  font-weight: $weight;
+  font-family: "Font Awesome 5 Free", "Font Awesome 5 Pro";
+  font-weight: 900;
   content: $content;
 }
