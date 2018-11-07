@@ -5,10 +5,8 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     setup do
       @mod = create(:mod_user)
       @users = FactoryBot.create_list(:contributor_user, 2)
-      @posts = @users.map do |u| 
-        as(u) do
-          create(:post)
-        end
+      @posts = @users.map do |u|
+        create(:post, uploader: u)
       end
     end
 
@@ -22,6 +20,13 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
     context "post_versions action" do
       should "render" do
         get_auth reports_post_versions_path, @mod
+        assert_response :success
+      end
+    end
+
+    context "upload_tags action" do
+      should "render" do
+        get reports_upload_tags_path(user_id: @users.first)
         assert_response :success
       end
     end
