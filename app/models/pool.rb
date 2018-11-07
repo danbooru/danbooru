@@ -1,5 +1,3 @@
-require 'ostruct'
-
 class Pool < ApplicationRecord
   class RevertError < Exception ; end
 
@@ -12,11 +10,9 @@ class Pool < ApplicationRecord
   belongs_to_creator
   before_validation :normalize_post_ids
   before_validation :normalize_name
-  before_validation :initialize_is_active, :on => :create
   after_save :update_category_pseudo_tags_for_posts_async
   after_save :create_version
   after_create :synchronize!
-  before_destroy :create_mod_action_for_destroy
 
   module SearchMethods
     def deleted
@@ -149,11 +145,6 @@ class Pool < ApplicationRecord
     category == "collection"
   end
 
-  def initialize_is_active
-    self.is_deleted = false if is_deleted.nil?
-    self.is_active = true if is_active.nil?
-  end
-
   def normalize_name
     self.name = Pool.normalize_name(name)
   end
@@ -164,10 +155,6 @@ class Pool < ApplicationRecord
 
   def pretty_category
     category.titleize
-  end
-
-  def creator_name
-    User.id_to_name(creator_id)
   end
 
   def normalize_post_ids
@@ -200,9 +187,6 @@ class Pool < ApplicationRecord
   def updater_can_edit_deleted
     if is_deleted? && !deletable_by?(CurrentUser.user)
       errors[:base] << "You cannot update pools that are deleted"
-      false
-    else
-      true
     end
   end
 
@@ -375,9 +359,6 @@ class Pool < ApplicationRecord
   def updater_can_change_category
     if category_changed? && !category_changeable_by?(CurrentUser.user)
       errors[:base] << "You cannot change the category of pools with greater than #{Danbooru.config.pool_category_change_limit} posts"
-      false
-    else
-      true
     end
   end
 
@@ -400,9 +381,6 @@ class Pool < ApplicationRecord
     removed = post_id_array_was - post_id_array
     if removed.any? && !CurrentUser.user.can_remove_from_pools?
       errors[:base] << "You cannot removes posts from pools within the first week of sign up"
-      false
-    else
-      true
     end
   end
 end
