@@ -406,7 +406,7 @@ class PostQueryBuilder
 
     if q[:ordpool].present?
       pool_id = q[:ordpool].to_i
-      relation = relation.order(Arel.sql("position(' '||posts.id||' ' in ' '||(select post_ids from pools where id = #{pool_id})||' ')"))
+      relation = relation.find_ordered(Pool.find(pool_id).post_ids)
     end
 
     if q[:favgroups_neg].present?

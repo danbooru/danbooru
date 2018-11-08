@@ -8,7 +8,7 @@
       <%= f.input :name, :as => :string, :input_html => { :value => @pool.pretty_name } %>
       <%= dtext_field "pool", "description" %>
       <%= dtext_preview_button "pool", "description" %>
-      <%= f.input :post_ids, :label => "Posts" %>
+      <%= f.input :post_ids, as: :text, label: "Posts", input_html: { value: @pool.post_ids.join(" ") } %>
       <%= f.input :category, :collection => ["series", "collection"], :include_blank => false %>
       <%= f.input :is_active %>
       <%= f.button :submit %>

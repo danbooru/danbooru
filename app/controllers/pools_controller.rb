@@ -95,6 +95,6 @@ class PoolsController < ApplicationController
 
   def pool_params
     permitted_params = %i[name description category is_active post_ids]
-    params.require(:pool).permit(*permitted_params, post_id_array: [])
+    params.require(:pool).permit(*permitted_params, post_ids: [])
   end
 end
