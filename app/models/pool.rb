@@ -84,7 +84,7 @@ class Pool < ApplicationRecord
       when "created_at"
         q = q.order("pools.created_at desc")
       when "post_count"
-        q = q.order("pools.post_count desc").default_order
+        q = q.order(Arel.sql("cardinality(post_ids) desc")).default_order
       else
         q = q.apply_default_order(params)
       end
@@ -207,7 +207,7 @@ class Pool < ApplicationRecord
     return if is_deleted?
 
     with_lock do
-      update(post_ids: post_ids + [post.id], post_count: post_count + 1)
+      update(post_ids: post_ids + [post.id])
       post.add_pool!(self, true)
     end
   end
@@ -218,7 +218,7 @@ class Pool < ApplicationRecord
 
     with_lock do
       reload
-      update(post_ids: post_ids - [post.id], post_count: post_count - 1)
+      update(post_ids: post_ids - [post.id])
       post.remove_pool!(self)
     end
   end
@@ -255,12 +255,15 @@ class Pool < ApplicationRecord
     end
 
     normalize_post_ids
-    self.post_count = post_ids.size
   end
 
   def synchronize!
     synchronize
     save if will_save_change_to_post_ids?
+  end
+
+  def post_count
+    post_ids.size
   end
 
   def first_post?(post_id)
@@ -297,7 +300,7 @@ class Pool < ApplicationRecord
   end
 
   def method_attributes
-    super + [:creator_name]
+    super + [:creator_name, :post_count]
   end
 
   def update_category_pseudo_tags_for_posts_async
