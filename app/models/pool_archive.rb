@@ -50,7 +50,7 @@ class PoolArchive < ApplicationRecord
 
     json = {
       pool_id: pool.id,
-      post_ids: pool.post_ids.scan(/\d+/).map(&:to_i),
+      post_ids: pool.post_ids,
       updater_id: updater.id,
       updater_ip_addr: updater_ip_addr.to_s,
       created_at: pool.created_at.try(:iso8601),

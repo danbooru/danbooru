@@ -7,7 +7,7 @@
 
     <ul id="sortable">
       <% @pool.posts(:limit => 1_000).each do |post| %>
-        <li class="ui-state-default" id="pool[post_id_array]_<%= post.id %>">
+        <li class="ui-state-default" id="pool[post_ids]_<%= post.id %>">
           <%= PostPresenter.preview(post).presence || "Hidden: Post ##{post.id}" %>
         </li>
       <% end %>

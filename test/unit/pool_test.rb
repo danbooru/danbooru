@@ -55,7 +55,7 @@ class PoolTest < ActiveSupport::TestCase
   context "Creating a pool" do
     setup do
       @posts = FactoryBot.create_list(:post, 5)
-      @pool = FactoryBot.create(:pool, post_ids: @posts.map(&:id).join(" "))
+      @pool = FactoryBot.create(:pool, post_ids: @posts.map(&:id))
     end
 
     should "initialize the post count" do
@@ -104,7 +104,7 @@ class PoolTest < ActiveSupport::TestCase
     end
 
     should "update its post_ids" do
-      assert_equal([@p1.id], @pool.post_id_array)
+      assert_equal([@p1.id], @pool.post_ids)
     end
 
     should "update any old posts that were removed" do
@@ -132,7 +132,7 @@ class PoolTest < ActiveSupport::TestCase
 
       context "by #attributes=" do
         setup do
-          @pool.attributes = {post_ids: [@p1, @p2].map(&:id).join(" ")}
+          @pool.attributes = {post_ids: [@p1.id, @p2.id]}
           @pool.synchronize
           @pool.save
         end
@@ -143,7 +143,7 @@ class PoolTest < ActiveSupport::TestCase
       end
 
       should "add the post to the pool" do
-        assert_equal("#{@p1.id}", @pool.post_ids)
+        assert_equal([@p1.id], @pool.post_ids)
       end
 
       should "add the pool to the post" do
@@ -160,7 +160,7 @@ class PoolTest < ActiveSupport::TestCase
         end
 
         should "not double add the post to the pool" do
-          assert_equal("#{@p1.id}", @pool.post_ids)
+          assert_equal([@p1.id], @pool.post_ids)
         end
 
         should "not double add the pool to the post" do
@@ -178,7 +178,7 @@ class PoolTest < ActiveSupport::TestCase
           CurrentUser.user = FactoryBot.create(:builder_user)
 
           @pool.update_attribute(:is_deleted, true)
-          @pool.post_ids = "#{@pool.post_ids} #{@p2.id}"
+          @pool.post_ids += [@p2.id]
           @pool.synchronize!
           @pool.save
           @pool.reload
@@ -186,7 +186,7 @@ class PoolTest < ActiveSupport::TestCase
         end
 
         should "add the post to the pool" do
-          assert_equal("#{@p1.id} #{@p2.id}", @pool.post_ids)
+          assert_equal([@p1.id, @p2.id], @pool.post_ids)
         end
 
         should "add the pool to the post" do
@@ -210,7 +210,7 @@ class PoolTest < ActiveSupport::TestCase
         end
 
         should "remove the post from the pool" do
-          assert_equal("", @pool.post_ids)
+          assert_equal([], @pool.post_ids)
         end
 
         should "remove the pool from the post" do
@@ -228,7 +228,7 @@ class PoolTest < ActiveSupport::TestCase
         end
 
         should "not affect the pool" do
-          assert_equal("#{@p1.id}", @pool.post_ids)
+          assert_equal([@p1.id], @pool.post_ids)
         end
 
         should "not affect the post" do
@@ -275,7 +275,7 @@ class PoolTest < ActiveSupport::TestCase
       user2 = Timecop.travel(1.month.ago) {FactoryBot.create(:user)}
 
       CurrentUser.scoped(user2, "127.0.0.2") do
-        @pool.post_ids = "#{@p1.id}"
+        @pool.post_ids = [@p1.id]
         @pool.save
       end
 
@@ -285,7 +285,7 @@ class PoolTest < ActiveSupport::TestCase
       assert_equal("127.0.0.2", @pool.versions.last.updater_ip_addr.to_s)
 
       CurrentUser.scoped(user2, "127.0.0.3") do
-        @pool.post_ids = "#{@p1.id} #{@p2.id}"
+        @pool.post_ids = [@p1.id, @p2.id]
         @pool.save
       end
 
@@ -304,9 +304,8 @@ class PoolTest < ActiveSupport::TestCase
     end
 
     should "know what its post ids were previously" do
-      @pool.post_ids = "#{@p1.id}"
-      assert_equal("", @pool.post_ids_was)
-      assert_equal([], @pool.post_id_array_was)
+      @pool.post_ids = [@p1.id]
+      assert_equal([], @pool.post_ids_was)
     end
 
     should "normalize its name" do
@@ -318,8 +317,8 @@ class PoolTest < ActiveSupport::TestCase
     end
 
     should "normalize its post ids" do
-      @pool.update_attributes(:post_ids => " 1  2 ")
-      assert_equal("1 2", @pool.post_ids)
+      @pool.update(category: "collection", post_ids: [1, 2, 2, 3, 1])
+      assert_equal([1, 2, 3], @pool.post_ids)
     end
 
     context "when validating names" do
@@ -343,14 +342,14 @@ class PoolTest < ActiveSupport::TestCase
     context "that is synchronized" do
       setup do
         @pool.reload
-        @pool.post_ids = "#{@p2.id}"
+        @pool.post_ids = [@p2.id]
         @pool.synchronize!
       end
 
       should "update the pool" do
         @pool.reload
         assert_equal(1, @pool.post_count)
-        assert_equal("#{@p2.id}", @pool.post_ids)
+        assert_equal([@p2.id], @pool.post_ids)
       end
 
       should "update the posts" do

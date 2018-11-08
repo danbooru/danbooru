@@ -115,11 +115,11 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "remove the post from all pools" do
-          assert_equal("", @pool.post_ids)
+          assert_equal([], @pool.post_ids)
         end
 
         should "remove the post from deleted pools" do
-          assert_equal("", @deleted_pool.post_ids)
+          assert_equal([], @deleted_pool.post_ids)
         end
 
         should "destroy the record" do
@@ -840,7 +840,7 @@ class PostTest < ActiveSupport::TestCase
             should "add the post to the pool" do
               @post.reload
               @pool.reload
-              assert_equal("#{@post.id}", @pool.post_ids)
+              assert_equal([@post.id], @pool.post_ids)
               assert_equal("pool:#{@pool.id} pool:series", @post.pool_string)
             end
           end
@@ -857,7 +857,7 @@ class PostTest < ActiveSupport::TestCase
             should "remove the post from the pool" do
               @post.reload
               @pool.reload
-              assert_equal("", @pool.post_ids)
+              assert_equal([], @pool.post_ids)
               assert_equal("", @post.pool_string)
             end
           end
@@ -871,7 +871,7 @@ class PostTest < ActiveSupport::TestCase
             should "add the post to the pool" do
               @post.reload
               @pool.reload
-              assert_equal("#{@post.id}", @pool.post_ids)
+              assert_equal([@post.id], @pool.post_ids)
               assert_equal("pool:#{@pool.id} pool:series", @post.pool_string)
             end
           end
@@ -886,7 +886,7 @@ class PostTest < ActiveSupport::TestCase
               should "add the post to the pool" do
                 @post.reload
                 @pool.reload
-                assert_equal("#{@post.id}", @pool.post_ids)
+                assert_equal([@post.id], @pool.post_ids)
                 assert_equal("pool:#{@pool.id} pool:series", @post.pool_string)
               end
             end
@@ -897,7 +897,7 @@ class PostTest < ActiveSupport::TestCase
                 @pool = Pool.find_by_name("abc")
                 @post.reload
                 assert_not_nil(@pool)
-                assert_equal("#{@post.id}", @pool.post_ids)
+                assert_equal([@post.id], @pool.post_ids)
                 assert_equal("pool:#{@pool.id} pool:series", @post.pool_string)
               end
             end

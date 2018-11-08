@@ -2563,7 +2563,7 @@ CREATE TABLE public.pools (
     creator_id integer NOT NULL,
     description text,
     is_active boolean DEFAULT true NOT NULL,
-    post_ids text DEFAULT ''::text NOT NULL,
+    post_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
     post_count integer DEFAULT 0 NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone,
@@ -7578,6 +7578,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20180816230604'),
 ('20180912185624'),
 ('20180913184128'),
-('20180916002448');
+('20180916002448'),
+('20181108162204');
 
 

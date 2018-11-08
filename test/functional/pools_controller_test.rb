@@ -71,9 +71,9 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
 
     context "update action" do
       should "update a pool" do
-        put_auth pool_path(@pool), @user, params: { pool: { name: "xyz", post_ids: @post.id.to_s }}
+        put_auth pool_path(@pool), @user, params: { pool: { name: "xyz", post_ids: [@post.id] }}
         assert_equal("xyz", @pool.reload.name)
-        assert_equal(@post.id.to_s, @pool.post_ids)
+        assert_equal([@post.id], @pool.post_ids)
       end
 
       should "not allow updating unpermitted attributes" do
@@ -110,10 +110,10 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
       setup do
         as_user do
           @post_2 = create(:post)
-          @pool = create(:pool, :post_ids => "#{@post.id}")
+          @pool = create(:pool, post_ids: [@post.id])
         end
         CurrentUser.scoped(@user, "1.2.3.4") do
-          @pool.update(:post_ids => "#{@post.id} #{@post_2.id}")
+          @pool.update(post_ids: [@post.id, @post_2.id])
         end
       end
 
@@ -123,7 +123,7 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
         assert_equal([@post.id], version.post_ids)
         put_auth revert_pool_path(@pool), @mod, params: {:version_id => version.id}
         @pool.reload
-        assert_equal([@post.id], @pool.post_id_array)
+        assert_equal([@post.id], @pool.post_ids)
       end
 
       should "not allow reverting to a previous version of another pool" do

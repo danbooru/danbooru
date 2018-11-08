@@ -111,14 +111,6 @@ class Pool < ApplicationRecord
     normalize_name(name).mb_chars.downcase
   end
 
-  def self.normalize_post_ids(post_ids, unique)
-    hoge = post_ids.scan(/\d+/)
-    if unique
-      hoge = hoge.uniq
-    end
-    hoge.join(" ")
-  end
-
   def self.find_by_name(name)
     if name =~ /^\d+$/
       where("pools.id = ?", name.to_i).first
@@ -158,7 +150,19 @@ class Pool < ApplicationRecord
   end
 
   def normalize_post_ids
-    self.post_ids = self.class.normalize_post_ids(post_ids, is_collection?)
+    self.post_ids = post_ids.uniq if is_collection?
+  end
+
+  # allow assigning a string to post_ids so it can be assigned from the text
+  # field in the pool edit form (PUT /pools/1?post_ids=1+2+3).
+  def post_ids=(value)
+    if value.respond_to?(:to_str)
+      super value.to_str.scan(/\d+/).map(&:to_i)
+    elsif value.respond_to?(:to_a)
+      super value.to_a
+    else
+      raise ArgumentError, "post_ids must be a String or an Array"
+    end
   end
 
   def revert_to!(version)
@@ -166,18 +170,18 @@ class Pool < ApplicationRecord
       raise RevertError.new("You cannot revert to a previous version of another pool.")
     end
 
-    self.post_ids = version.post_ids.join(" ")
+    self.post_ids = version.post_ids
     self.name = version.name
     self.description = version.description
     synchronize!
   end
 
   def contains?(post_id)
-    post_ids =~ /(?:\A| )#{post_id}(?:\Z| )/
+    post_ids.include?(post_id)
   end
 
   def page_number(post_id)
-    post_id_array.find_index(post_id).to_i + 1
+    post_ids.find_index(post_id).to_i + 1
   end
 
   def deletable_by?(user)
@@ -203,9 +207,8 @@ class Pool < ApplicationRecord
     return if is_deleted?
 
     with_lock do
-      update_attributes(:post_ids => add_number_to_string(post.id, post_ids), :post_count => post_count + 1)
+      update(post_ids: post_ids + [post.id], post_count: post_count + 1)
       post.add_pool!(self, true)
-      clear_post_id_array
     end
   end
 
@@ -215,24 +218,15 @@ class Pool < ApplicationRecord
 
     with_lock do
       reload
-      update_attributes(:post_ids => remove_number_from_string(post.id, post_ids), :post_count => post_count - 1)
+      update(post_ids: post_ids - [post.id], post_count: post_count - 1)
       post.remove_pool!(self)
-      clear_post_id_array
     end
-  end
-
-  def add_number_to_string(number, string)
-    "#{string} #{number}"
-  end
-
-  def remove_number_from_string(number, string)
-    string.gsub(/(?:\A| )#{number}(?:\Z| )/, " ")
   end
 
   def posts(options = {})
     offset = options[:offset] || 0
     limit = options[:limit] || Danbooru.config.posts_per_page
-    slice = post_id_array.slice(offset, limit)
+    slice = post_ids.slice(offset, limit)
     if slice && slice.any?
       slice.map do |id|
         begin
@@ -247,8 +241,8 @@ class Pool < ApplicationRecord
   end
 
   def synchronize
-    added = post_id_array - post_id_array_was
-    removed = post_id_array_was - post_id_array
+    added = post_ids - post_ids_was
+    removed = post_ids_was - post_ids
 
     added.each do |post_id|
       post = Post.find(post_id)
@@ -261,8 +255,7 @@ class Pool < ApplicationRecord
     end
 
     normalize_post_ids
-    clear_post_id_array
-    self.post_count = post_id_array.size
+    self.post_count = post_ids.size
   end
 
   def synchronize!
@@ -274,46 +267,21 @@ class Pool < ApplicationRecord
     page_number(post_id) == 1
   end
 
-  def first_post_id
-    post_id_array[0]
-  end
-
-  def post_id_array
-    @post_id_array ||= post_ids.scan(/\d+/).map(&:to_i)
-  end
-
-  def post_id_array=(array)
-    self.post_ids = array.join(" ")
-    clear_post_id_array
-    self
-  end
-
-  def post_id_array_was
-    old_post_ids = post_ids_before_last_save || post_ids_was
-    @post_id_array_was ||= old_post_ids.to_s.scan(/\d+/).map(&:to_i)
-  end
-
-  def clear_post_id_array
-    @post_id_array = nil
-    @post_id_array_was = nil
-    self
-  end
-
   # XXX finds wrong post when the pool contains multiple copies of the same post (#2042).
   def previous_post_id(post_id)
-    n = post_id_array.index(post_id) - 1
+    n = post_ids.index(post_id) - 1
     return nil if n < 0
-    post_id_array[n]
+    post_ids[n]
   end
 
   def next_post_id(post_id)
-    n = post_id_array.index(post_id) + 1
-    return nil if n >= post_id_array.size
-    post_id_array[n]
+    n = post_ids.index(post_id) + 1
+    return nil if n >= post_ids.size
+    post_ids[n]
   end
 
   def cover_post_id
-    post_ids[/^(\d+)/, 1]
+    post_ids.first
   end
 
   def create_version(updater: CurrentUser.user, updater_ip_addr: CurrentUser.ip_addr)
@@ -328,12 +296,6 @@ class Pool < ApplicationRecord
     (post_count / CurrentUser.user.per_page.to_f).ceil
   end
 
-  def reload(options = {})
-    super
-    clear_post_id_array
-    self
-  end
-
   def method_attributes
     super + [:creator_name]
   end
@@ -345,7 +307,7 @@ class Pool < ApplicationRecord
   end
 
   def update_category_pseudo_tags_for_posts
-    Post.where("id in (?)", post_id_array).find_each do |post|
+    Post.where(id: post_ids).find_each do |post|
       post.reload
       post.set_pool_category_pseudo_tags
       Post.where(:id => post.id).update_all(:pool_string => post.pool_string)
@@ -378,7 +340,7 @@ class Pool < ApplicationRecord
   end
 
   def updater_can_remove_posts
-    removed = post_id_array_was - post_id_array
+    removed = post_ids_was - post_ids
     if removed.any? && !CurrentUser.user.can_remove_from_pools?
       errors[:base] << "You cannot removes posts from pools within the first week of sign up"
     end
