@@ -128,7 +128,7 @@ class ApplicationRecord < ActiveRecord::Base
         ids.each do |id|
           order_clause << sanitize_sql_array(["ID=? DESC", id])
         end
-        where(id: ids).order(order_clause.join(', '))
+        where(id: ids).order(Arel.sql(order_clause.join(', ')))
       end
 
       def search(params = {})

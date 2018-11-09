@@ -611,8 +611,8 @@ class Tag < ApplicationRecord
             elsif g2.downcase == "collection"
               q[:tags][:related] << "pool:collection"
             elsif g2.include?("*")
-              pools = Pool.name_matches(g2).select("id").limit(Danbooru.config.tag_query_limit).order("post_count DESC")
-              q[:tags][:include] += pools.map {|pool| "pool:#{pool.id}"}
+              pool_ids = Pool.search(name_matches: g2, order: "post_count").limit(Danbooru.config.tag_query_limit).pluck(:id)
+              q[:tags][:include] += pool_ids.map { |id| "pool:#{id}" }
             else
               q[:tags][:related] << "pool:#{Pool.name_to_id(g2)}"
             end
