@@ -34,8 +34,6 @@
   <% if CurrentUser.user.custom_style.present? %>
     <%= stylesheet_link_tag custom_style_users_path, :media => "screen" %>
   <% end %>
-  <%= raw Danbooru.config.custom_html_header_content %>
-  <%= yield :html_header %>
   <% if Danbooru.config.twitter_site %>
     <script type="application/ld+json">
       {
@@ -88,17 +86,20 @@
       console.warn("Danbooru.error will be deprecated. Use $(window).trigger('danbooru:error', msg) instead.")
       $(window).trigger("danbooru:error", msg);
     }
+    window._paq = _paq || [];
+    <% if CurrentUser.is_member? && !CurrentUser.opt_out_mixpanel? %>
+      window._paq.push(["setUserId", <%= CurrentUser.id %>]);
+    <% end %>
+    window._paq.push(["setDomains", "*.donmai.us"]);
+    <% if !CurrentUser.opt_out_mixpanel? %>
+      window._paq.push(["setCustomVariable", 1, "level", <%= CurrentUser.level %>, "visit"]);
+      window._paq.push(["setCustomVariable", 2, "age", <%= ((Time.now - CurrentUser.created_at) / 1.year).to_i %>, "visit"]);
+      window._paq.push(["setCustomVariable", 3, "postUpdateCount", <%= CurrentUser.post_update_count %>, "visit"]);
+      window._paq.push(["setCustomVariable", 4, "favoriteCount", <%= CurrentUser.favorite_count %>, "visit"]);
+    <% end %>
   </script>
-  <% unless CurrentUser.is_anonymous? %>
-    <script>
-      window.Danbooru.mixpanelInit(
-        "<%= CurrentUser.id %>",
-        <%= CurrentUser.opt_out_mixpanel? %>,
-        <%= raw({"$created" =>CurrentUser.created_at.strftime('%F %T'), "$name" => CurrentUser.name, "level" => CurrentUser.level, "upload_count" => CurrentUser.post_upload_count, "post_update_count" => CurrentUser.post_update_count, "note_update_count" => CurrentUser.note_update_count, "favorite_count" => CurrentUser.favorite_count}.to_json) %>
-      );
-    </script>
-  <% end %>
-
+  <%= yield :html_header %>
+  <%= raw Danbooru.config.custom_html_header_content %>
 </head>
 <%= tag.body **body_attributes(CurrentUser.user) do %>
   <%= render "news_updates/listing" %>

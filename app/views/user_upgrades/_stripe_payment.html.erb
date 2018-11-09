@@ -12,9 +12,10 @@
 <% content_for(:html_header) do %>
   <script>
     $(function() {
-      if (typeof window.mixpanel === 'object') {
-        window.mixpanel.track_forms(".stripe", "Clicked Account Upgrade");
-      }
+      $(".stripe").submit(function(e) {
+        window._paq = _paq || [];
+        window._paq.push(['trackEvent', 'clickedAccountUpgrade']);
+      });
     });
   </script>
 <% end %>

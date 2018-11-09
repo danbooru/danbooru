@@ -6,10 +6,14 @@
 <% content_for(:html_header) do %>
   <script>
     $(function() {
-      if (typeof window.mixpanel === 'object') {
-        window.mixpanel.track_links('#sign-up-link', 'clicked sign up');
-        window.mixpanel.track_links('#hide-sign-up-notice', 'hide sign up notice');
-      }
+      $("#sign-up-link").click(function() {
+        window._paq = _paq || [];
+        window._paq.push(['trackEvent', 'clickedSignUpLink']);
+      });
+      $("#hide-sign-up-notice").click(function() {
+        window._paq = _paq || [];
+        window._paq.push(['trackEvent', 'clickedHideSignUpLink']);
+      });
     });
   </script>
 <% end %>

@@ -197,6 +197,14 @@
   <%= tag.meta name: "og:site", content: Danbooru.config.app_name %>
 
   <%= auto_discovery_link_tag(:atom, comments_url(:atom, search: { post_id: @post.id }), title: "Comments for post ##{@post.id}") %>
+
+  <script>
+    window._paq = _paq || [];
+    window._paq.push(["setCustomVariable", 1, "rating", '<%= j @post.rating %>', "page"]);
+    window._paq.push(["setCustomVariable", 2, "fileSize", <%= @post.file_size %>, "page"]);
+    window._paq.push(["setCustomVariable", 3, "sourceDomain", '<%= j @post.source_domain %>', "page"]);
+    window._paq.push(["setCustomVariable", 3, "blocked", <%= @post.levelblocked? %>, "page"]);
+  </script>
 <% end %>
 
 <%= render "posts/partials/common/secondary_links" %>

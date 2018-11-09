@@ -124,7 +124,8 @@
 <% content_for(:html_header) do %>
   <script>
     $(function() {
-      window.Danbooru.mixpanelEvent("View Account Upgrade");
+      window._paq = _paq || [];
+      window._paq.push(['trackEvent', 'viewAccountUpgrade']);
     });
   </script>
 <% end %>
