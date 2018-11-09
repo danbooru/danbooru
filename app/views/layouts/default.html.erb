@@ -86,7 +86,7 @@
       console.warn("Danbooru.error will be deprecated. Use $(window).trigger('danbooru:error', msg) instead.")
       $(window).trigger("danbooru:error", msg);
     }
-    window._paq = _paq || [];
+    window._paq = window._paq || [];
     <% if CurrentUser.is_member? && !CurrentUser.opt_out_mixpanel? %>
       window._paq.push(["setUserId", <%= CurrentUser.id %>]);
     <% end %>
