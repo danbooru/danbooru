@@ -241,8 +241,9 @@ class Pool < ApplicationRecord
   end
 
   def synchronize
-    added = post_ids - post_ids_was
-    removed = post_ids_was - post_ids
+    post_ids_before = post_ids_before_last_save || post_ids_was
+    added = post_ids - post_ids_before
+    removed = post_ids_before - post_ids
 
     added.each do |post_id|
       post = Post.find(post_id)

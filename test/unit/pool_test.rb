@@ -61,6 +61,13 @@ class PoolTest < ActiveSupport::TestCase
     should "initialize the post count" do
       assert_equal(@posts.size, @pool.post_count)
     end
+
+    should "synchronize the posts with the pool" do
+      assert_equal(@posts.map(&:id), @pool.post_ids)
+
+      @posts.each(&:reload)
+      assert_equal(["pool:#{@pool.id} pool:series"] * @posts.size, @posts.map(&:pool_string))
+    end
   end
 
   context "Reverting a pool" do
