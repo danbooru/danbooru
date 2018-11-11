@@ -35,7 +35,7 @@ Upload.initialize_submit = function() {
 
 Upload.validate_upload = function (e) {
   var error_messages = [];
-  if (($("#upload_file").val() === "") && ($("#upload_source").val() === "") && $("#upload_md5_confirmation").val() === "") {
+  if (($("#upload_file").val() === "") && !/^https?:\/\//i.test($("#upload_source").val()) && $("#upload_md5_confirmation").val() === "") {
     error_messages.push("Must choose file or specify source");
   }
   if (!$("#upload_rating_s").prop("checked") && !$("#upload_rating_q").prop("checked") && !$("#upload_rating_e").prop("checked") &&

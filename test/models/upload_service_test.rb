@@ -25,7 +25,7 @@ class UploadServiceTest < ActiveSupport::TestCase
   context "::Utils" do
     subject { UploadService::Utils }
 
-    context "#download_for_upload" do
+    context "#get_file_for_upload" do
       context "for a non-source site" do
         setup do
           @source = "https://upload.wikimedia.org/wikipedia/commons/c/c5/Moraine_Lake_17092005.jpg"          
@@ -34,7 +34,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "work on a jpeg" do
-          file = subject.download_for_upload(@upload)
+          file = subject.get_file_for_upload(@upload)
 
           assert_operator(File.size(file.path), :>, 0)
 
@@ -59,7 +59,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         should "retry three times" do
           DanbooruImageResizer.expects(:validate_shell).times(4).returns(false)
           assert_raise(UploadService::Utils::CorruptFileError) do
-            subject.download_for_upload(@mock_upload)
+            subject.get_file_for_upload(@mock_upload)
           end
         end
       end
@@ -73,7 +73,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         should "work on an ugoira url" do
           begin
-            file = subject.download_for_upload(@upload)
+            file = subject.get_file_for_upload(@upload)
 
             assert_operator(File.size(file.path), :>, 0)
 
@@ -95,7 +95,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         should "work on an ugoira url" do
           begin
-            file = subject.download_for_upload(@upload)
+            file = subject.get_file_for_upload(@upload)
 
             assert_not_nil(@upload.context["ugoira"])
             assert_operator(File.size(file.path), :>, 0)
@@ -1106,6 +1106,27 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         assert_nothing_raised { @upload = service.start! }
         assert_equal(source2, @upload.source)
+      end
+    end
+
+    context "without a file or a source url" do
+      should "fail gracefully" do
+        service = subject.new(source: "blah", rating: "s")
+
+        assert_nothing_raised { @upload = service.start! }
+        assert_equal(true, @upload.is_errored?)
+        assert_match(/No file or source URL provided/, @upload.status)
+      end
+    end
+
+    context "with both a file and a source url" do
+      should "upload the file and set the source field to the given source" do
+        service = subject.new(file: upload_file("test/files/test.jpg"), source: "http://www.example.com", rating: "s")
+
+        assert_nothing_raised { @upload = service.start! }
+        assert_equal(true, @upload.is_completed?)
+        assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", @upload.md5)
+        assert_equal("http://www.example.com", @upload.source)
       end
     end
   end

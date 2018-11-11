@@ -115,11 +115,11 @@ class Upload < ApplicationRecord
     end
 
     def is_duplicate?
-      status =~ /duplicate: \d+/
+      status.match?(/duplicate: \d+/)
     end
 
     def is_errored?
-      status =~ /error:/
+      status.match?(/error:/)
     end
 
     def sanitized_status

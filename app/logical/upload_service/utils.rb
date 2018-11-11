@@ -206,7 +206,10 @@ class UploadService
       tags.join(" ")
     end
 
-    def download_for_upload(upload)
+    def get_file_for_upload(upload, file: nil)
+      return file if file.present?
+      raise RuntimeError, "No file or source URL provided" if upload.source_url.blank?
+
       attempts = 0
 
       begin
