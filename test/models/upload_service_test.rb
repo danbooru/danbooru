@@ -46,7 +46,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         setup do
           @source = "https://raikou1.donmai.us/93/f4/93f4dd66ef1eb11a89e56d31f9adc8d0.jpg"
           @mock_upload = mock("upload")
-          @mock_upload.stubs(:source).returns(@source)
+          @mock_upload.stubs(:source_url).returns(@source)
           @mock_upload.stubs(:referer_url).returns(nil)
           @bad_file = File.open("#{Rails.root}/test/files/test-corrupt.jpg", "rb")
           Downloads::File.any_instance.stubs(:download!).returns([@bad_file, nil])
@@ -1085,6 +1085,27 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         assert_equal("s", upload.post.rating)
         assert_equal("blah", upload.post.tag_string)
+      end
+    end
+
+    context "with a source containing unicode characters" do
+      should "upload successfully" do
+        source1 = "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg?one=東方&two=a%20b"
+        source2 = "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg?one=%E6%9D%B1%E6%96%B9&two=a%20b"
+        service = subject.new(source: source1, rating: "s")
+
+        assert_nothing_raised { @upload = service.start! }
+        assert_equal(true, @upload.is_completed?)
+        assert_equal(source2, @upload.source)
+      end
+
+      should "normalize unicode characters in the source field" do
+        source1 = "poke\u0301mon" # pokémon (nfd form)
+        source2 = "pok\u00e9mon"  # pokémon (nfc form)
+        service = subject.new(source: source1, rating: "s", file: upload_file("test/files/test.jpg"))
+
+        assert_nothing_raised { @upload = service.start! }
+        assert_equal(source2, @upload.source)
       end
     end
   end

@@ -48,7 +48,7 @@ class UploadService
 
       @upload.update(status: "processing")
 
-      if @upload.file.nil? && Utils.is_downloadable?(source)
+      if @upload.file.nil? && @upload.source_url.present?
         @upload.file = Utils.download_for_upload(@upload)
       end
 
@@ -69,10 +69,6 @@ class UploadService
   def warnings
     return [] if @post.nil?
     return @post.warnings.full_messages
-  end
-
-  def source
-    params[:source]
   end
 
   def include_artist_commentary?

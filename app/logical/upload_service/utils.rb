@@ -210,7 +210,7 @@ class UploadService
       attempts = 0
 
       begin
-        download = Downloads::File.new(upload.source, upload.referer_url)
+        download = Downloads::File.new(upload.source_url, upload.referer_url)
         file, strategy = download.download!
 
         if !DanbooruImageResizer.validate_shell(file)

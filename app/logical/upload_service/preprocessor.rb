@@ -93,7 +93,7 @@ class UploadService
 
         if params[:file].present?
           file = params[:file]
-        elsif Utils.is_downloadable?(source)
+        elsif upload.source_url.present?
           file = Utils.download_for_upload(upload)
         end
 
