@@ -41,15 +41,11 @@ module Sources::Strategies
 
     def image_urls
       if url =~ /(#{ASSET}[^:]+)/
-        return [$1 + ":orig" ]
-      elsif api_response.blank?
-        return [url]
-      end
-
-      [url, referer_url].each do |x|
-        if x =~ PAGE
-          return service.image_urls(api_response)
-        end
+        [$1 + ":orig" ]
+      elsif api_response.present?
+        service.image_urls(api_response)
+      else
+        [url]
       end
     end
     memoize :image_urls

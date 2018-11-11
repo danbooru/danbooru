@@ -97,6 +97,15 @@ module Sources
       end
     end
 
+    context "A tweet without any images" do
+      should "not fail" do
+        @site = Sources::Strategies.find("https://twitter.com/teruyo/status/1058452066060853248")
+
+        assert_nil(@site.image_url)
+        assert_nothing_raised { @site.to_h }
+      end
+    end
+
     context "The source site for twitter" do
       setup do
         @site = Sources::Strategies.find("https://mobile.twitter.com/nounproject/status/540944400767922176")

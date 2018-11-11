@@ -67,6 +67,8 @@ class TwitterService
       extract_urls_for_status(tweet)
     elsif tweet.urls.any?
       extract_urls_for_card(tweet)
+    else
+      []
     end
   end
 end
