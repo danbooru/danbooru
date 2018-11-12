@@ -94,8 +94,8 @@
     <% if !CurrentUser.opt_out_mixpanel? %>
       window._paq.push(["setCustomVariable", 1, "level", <%= CurrentUser.level %>, "visit"]);
       window._paq.push(["setCustomVariable", 2, "age", <%= ((Time.now - CurrentUser.created_at) / 1.year).to_i %>, "visit"]);
-      window._paq.push(["setCustomVariable", 3, "postUpdateCount", <%= CurrentUser.post_update_count %>, "visit"]);
-      window._paq.push(["setCustomVariable", 4, "favoriteCount", <%= CurrentUser.favorite_count %>, "visit"]);
+      window._paq.push(["setCustomVariable", 3, "postUpdateCount", <%= CurrentUser.post_update_count.to_i / 100 %>, "visit"]);
+      window._paq.push(["setCustomVariable", 4, "favoriteCount", <%= CurrentUser.favorite_count.to_i / 100 %>, "visit"]);
     <% end %>
   </script>
   <%= yield :html_header %>

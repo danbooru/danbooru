@@ -201,7 +201,7 @@
   <script>
     window._paq = window._paq || [];
     window._paq.push(["setCustomVariable", 1, "rating", '<%= j @post.rating %>', "page"]);
-    window._paq.push(["setCustomVariable", 2, "fileSize", <%= @post.file_size %>, "page"]);
+    window._paq.push(["setCustomVariable", 2, "fileSize", <%= @post.file_size.to_i / 100.kilobytes %>, "page"]);
     window._paq.push(["setCustomVariable", 3, "sourceDomain", '<%= j @post.source_domain %>', "page"]);
     window._paq.push(["setCustomVariable", 3, "blocked", <%= @post.levelblocked? %>, "page"]);
   </script>
