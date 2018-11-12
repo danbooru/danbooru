@@ -186,7 +186,7 @@ module Sources
       end
     end
 
-    context "An image url that contains the illust id" do
+    context "An image url that contains the illust id and artist id (format 1)" do
       should "fetch all the data" do
         site = Sources::Strategies.find("https://pic03.nijie.info/nijie_picture/diff/main/218856_4_236014_20170620101333.png")
 
@@ -197,6 +197,19 @@ module Sources
         assert_equal(site.url, site.image_url)
         assert_equal(6, site.image_urls.size)
         assert_equal(6, site.preview_urls.size)
+      end
+    end
+
+    context "An image url that contains the illust id and artist id (format 2)" do
+      should "fetch all the data" do
+        site = Sources::Strategies.find("https://pic04.nijie.info/nijie_picture/diff/main/287736_161475_20181112032855_1.png")
+
+        assert_equal("https://nijie.info/view.php?id=287736", site.page_url)
+        assert_equal("https://nijie.info/view.php?id=287736", site.canonical_url)
+        assert_equal("https://nijie.info/members.php?id=161475", site.profile_url)
+        assert_equal("みな本", site.artist_name)
+        assert_equal(site.url, site.image_url)
+        assert_equal(3, site.image_urls.size)
       end
     end
 

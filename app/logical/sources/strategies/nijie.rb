@@ -5,6 +5,7 @@
 # * https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png (page: http://nijie.info/view.php?id=218856)
 # * https://pic01.nijie.info/nijie_picture/diff/main/218856_1_236014_20170620101330.png
 # * https://pic05.nijie.info/nijie_picture/diff/main/559053_20180604023346_1.png (page: http://nijie.info/view_popup.php?id=265428#diff_2)
+# * https://pic04.nijie.info/nijie_picture/diff/main/287736_161475_20181112032855_1.png (page: http://nijie.info/view_popup.php?id=287736#diff_2)
 #
 # Unhandled:
 #
@@ -47,11 +48,17 @@ module Sources
 
       # https://pic03.nijie.info/nijie_picture/28310_20131101215959.jpg
       # https://pic03.nijie.info/nijie_picture/236014_20170620101426_0.png
-      # https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png
       # https://pic05.nijie.info/nijie_picture/diff/main/559053_20180604023346_1.png
+      FILENAME1 = %r!(?<artist_id>\d+)_(?<timestamp>\d{14})(?:_\d+)?!i
+
+      # https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png
+      FILENAME2 = %r!(?<illust_id>\d+)_\d+_(?<artist_id>\d+)_(?<timestamp>\d{14})!i
+
+      # https://pic04.nijie.info/nijie_picture/diff/main/287736_161475_20181112032855_1.png
+      FILENAME3 = %r!(?<illust_id>\d+)_(?<artist_id>\d+)_(?<timestamp>\d{14})_\d+!i
+
       DIR = %r!(?:__rs_\w+/)?nijie_picture(?:/diff/main)?!
-      FILENAME = %r!(?:(?<illust_id>\d+)_(?<page>\d+_))?(?<artist_id>\d+)_(?<timestamp>\d{14})(?:_\d+)?!i
-      IMAGE_URL = %r!\Ahttps?://pic\d+\.nijie\.info/#{DIR}/#{FILENAME}\.\w+\z!i
+      IMAGE_URL = %r!\Ahttps?://pic\d+\.nijie\.info/#{DIR}/#{Regexp.union(FILENAME1, FILENAME2, FILENAME3)}\.\w+\z!i
 
       def domains
         ["nijie.info"]
