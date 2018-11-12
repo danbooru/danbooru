@@ -24,4 +24,10 @@ class CloudflareServiceTest < ActiveSupport::TestCase
       end
     end
   end
+
+  context "#ips" do
+    should "work" do
+      refute_empty(subject.ips)
+    end
+  end
 end

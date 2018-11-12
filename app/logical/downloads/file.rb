@@ -10,28 +10,6 @@ module Downloads
 
     validate :validate_url
 
-    # Prevent Cloudflare from potentially mangling the image. See issue #3528.
-    def uncached_url
-      url = file_url.dup
-
-      if is_cloudflare?
-        url.query_values = (url.query_values || {}).merge(danbooru_no_cache: SecureRandom.uuid)
-      end
-
-      url
-    end
-
-    def is_cloudflare?
-      return false if ENV["SKIP_CLOUDFLARE_CHECK"]
-
-      Cache.get("is_cloudflare:#{file_url.origin}", 4.hours) do
-        res = HTTParty.head(file_url, httparty_options)
-        raise Error.new("HTTP error code: #{res.code} #{res.message}") unless res.success?
-
-        res.key?("CF-Ray")
-      end
-    end
-
     def initialize(url, referer=nil)
       @url = Addressable::URI.parse(url) rescue nil
       @referer = referer
@@ -79,6 +57,15 @@ module Downloads
       end
     end # def
 
+    # Prevent Cloudflare from potentially mangling the image. See issue #3528.
+    def uncached_url
+      return file_url unless is_cloudflare?(file_url)
+
+      url = file_url.dup
+      url.query_values = url.query_values.to_h.merge(danbooru_no_cache: SecureRandom.uuid)
+      url
+    end
+
     def file_url
       @file_url ||= Addressable::URI.parse(strategy.image_url)
     end
@@ -94,6 +81,13 @@ module Downloads
         headers: strategy.headers,
         connection_adapter: ValidatingConnectionAdapter,
       }.deep_merge(Danbooru.config.httparty_options)
+    end
+
+    def is_cloudflare?(url)
+      return false if ENV["SKIP_CLOUDFLARE_CHECK"]
+
+      ip_addr = IPAddr.new(Resolv.getaddress(url.hostname))
+      CloudflareService.new.ips.any? { |subnet| subnet.include?(ip_addr) }
     end
   end
 

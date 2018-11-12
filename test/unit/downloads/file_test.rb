@@ -9,13 +9,15 @@ module Downloads
       end
 
       context "for a banned IP" do
+        setup do
+          Resolv.expects(:getaddress).returns("127.0.0.1").at_least_once
+        end
+
         should "not try to download the file" do
-          Resolv.expects(:getaddress).returns("127.0.0.1")
           assert_raise(Downloads::File::Error) { Downloads::File.new("http://evil.com").download! }
         end
 
         should "not try to fetch the size" do
-          Resolv.expects(:getaddress).returns("127.0.0.1")
           assert_raise(Downloads::File::Error) { Downloads::File.new("http://evil.com").size }
         end
 
@@ -29,14 +31,8 @@ module Downloads
         should "not follow redirects that resolve to a banned IP" do
           url = "http://httpbin.org/redirect-to?url=http://127.0.0.1.nip.io"
           stub_request(:get, url).to_return(status: 301, headers: { "Location": "http://127.0.0.1.xip.io" })
-          Resolv.expects(:getaddress).returns("127.0.0.1")
 
           assert_raise(Downloads::File::Error) { Downloads::File.new(url).download! }
-        end
-
-        should "not send a HEAD request when checking for cloudflare" do
-          Resolv.expects(:getaddress).with("www.google.com").returns("127.0.0.1")
-          assert_raise(Downloads::File::Error) { @download.is_cloudflare? }
         end
       end
 
@@ -52,6 +48,7 @@ module Downloads
           resp = stub("resp", success?: true)
 
           HTTParty.expects(:get).twice.multiple_yields("a", bomb, "b", "c").then.multiple_yields("a", "b", "c").returns(resp)
+          @download.stubs(:is_cloudflare?).returns(false)
           tempfile, _ = @download.download!
 
           assert_equal("abc", tempfile.read)
