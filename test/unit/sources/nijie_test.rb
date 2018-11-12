@@ -75,7 +75,7 @@ module Sources
         @site = Sources::Strategies.find("https://nijie.info/view.php?id=208316")
 
         assert_includes(@site.tags.map(&:first), "加賀（艦これ）")
-        assert_includes(@site.translated_tags.map(&:first), "kaga")
+        assert_includes(@site.translated_tags.map(&:name), "kaga")
       end
 
       should "get the commentary" do

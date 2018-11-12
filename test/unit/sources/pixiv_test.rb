@@ -220,7 +220,7 @@ module Sources
 
           @site = get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65981746")
           @tags = @site.tags.map(&:first)
-          @translated_tags = @site.translated_tags.map(&:first)
+          @translated_tags = @site.translated_tags.map(&:name)
         end
 
         should "get the original tags" do
@@ -275,7 +275,7 @@ module Sources
           tags = %w[Fate/GrandOrder グランブルーファンタジー 手袋 1000users入り]
 
           assert_equal(tags.sort, source.tags.map(&:first).sort)
-          assert_equal(["fate/grand_order"], source.translated_tags.map(&:first))
+          assert_equal(["fate/grand_order"], source.translated_tags.map(&:name))
         end
       end
     end
