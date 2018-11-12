@@ -88,7 +88,7 @@
     }
     window._paq = window._paq || [];
     <% if CurrentUser.is_member? && !CurrentUser.opt_out_mixpanel? %>
-      window._paq.push(["setUserId", <%= CurrentUser.id %>]);
+      window._paq.push(["setUserId", '<%= CurrentUser.id %>']);
     <% end %>
     window._paq.push(["setDomains", "*.donmai.us"]);
     <% if !CurrentUser.opt_out_mixpanel? %>
