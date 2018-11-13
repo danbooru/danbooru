@@ -796,6 +796,9 @@ module Danbooru
 
     def recommender_key
     end
+
+    def redis_url
+    end
   end
 
   class EnvironmentConfiguration

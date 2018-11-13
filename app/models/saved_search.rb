@@ -1,92 +1,103 @@
 class SavedSearch < ApplicationRecord
-  module ListbooruMethods
-    extend ActiveSupport::Concern
+  REDIS_EXPIRY = 3600
+  QUERY_LIMIT = 500
 
-    module ClassMethods
+  concerning :Redis do
+    class_methods do
       def enabled?
-        Danbooru.config.aws_sqs_saved_search_url.present?
+        Danbooru.config.redis_url.present?
       end
 
-      def posts_search_available?
-        enabled? && CurrentUser.is_gold?
-      end
-
-      def sqs_service
-        SqsService.new(Danbooru.config.aws_sqs_saved_search_url)
-      end
-
-      def post_ids(user_id, label = nil)
-        return [] unless enabled?
+      def post_ids_for(user_id, label: nil)
+        redis = Redis.new(url: Danbooru.config.redis_url)
         label = normalize_label(label) if label
-
-        Cache.get("ss-#{user_id}-#{Cache.hash(label)}", 60) do
-          queries = SavedSearch.queries_for(user_id, label)
-          return [] if queries.empty?
-
-          json = {
-            "key" => Danbooru.config.listbooru_auth_key,
-            "queries" => queries
-          }.to_json
-
-          uri = "#{Danbooru.config.listbooru_server}/v2/search"
-
-          resp = HTTParty.post(uri, Danbooru.config.httparty_options.merge(body: json))
-          if resp.success?
-            resp.body.to_s.scan(/\d+/).map(&:to_i)
+        queries = queries_for(user_id, label: label)
+        post_ids = Set.new
+        queries.each do |query|
+          query_hash = Cache.hash(query)
+          redis_key = "search:#{query_hash}"
+          if redis.exists(redis_key)
+            sub_ids = redis.smembers(redis_key)
+            post_ids.merge(sub_ids)
+            redis.expire(redis_key, REDIS_EXPIRY)
           else
-            raise "HTTP error code: #{resp.code} #{resp.message}"
+            SavedSearch.delay(queue: "default").populate(query)
           end
+        end
+        post_ids.to_a.sort
+      end
+    end
+  end
+
+  concerning :Labels do
+    class_methods do
+      def normalize_label(label)
+        label.
+          to_s.
+          strip.
+          downcase.
+          gsub(/[[:space:]]/, "_")
+      end
+
+      def search_labels(user_id, params)
+        labels = labels_for(user_id)
+
+        if params[:label].present?
+          query = Regexp.escape(params[:label]).gsub("\\*", ".*")
+          query = ".*#{query}.*" unless query.include?("*")
+          query = /\A#{query}\z/
+          labels = labels.grep(query)
+        end
+
+        labels
+      end
+
+      def self.labels_for(user_id)
+        Cache.get(cache_key(user_id)) do
+          SavedSearch.
+            where(user_id: user_id).
+            order("label").
+            pluck(Arel.sql("distinct unnest(labels) as label"))
         end
       end
     end
   end
 
-  include ListbooruMethods
+  concerning :Search do
+    class_methods do
+      def populate(query)
+        CurrentUser.as_system do
+          query_hash = Cache.hash(query)
+          redis_key = "search:#{query_hash}"
+          redis = Redis.new(url: Danbooru.config.redis_url)
+          return if redis.exists(redis_key)
+          post_ids = Post.tag_match(query, true).limit(QUERY_LIMIT).pluck(:id)
+          redis.sadd(redis_key, post_ids)
+          redis.expire(redis_key, REDIS_EXPIRY)
+        end
+      rescue
+        # swallow
+      end
+    end
+  end
 
   attr_accessor :disable_labels
   belongs_to :user
-  validates :query, :presence => true
+  validates :query, presence: true
   validate :validate_count
   before_create :update_user_on_create
   after_destroy :update_user_on_destroy
-  after_save {|rec| Cache.delete(SavedSearch.cache_key(rec.user_id))}
-  after_destroy {|rec| Cache.delete(SavedSearch.cache_key(rec.user_id))}
   before_validation :normalize
   scope :labeled, ->(label) { where("labels @> string_to_array(?, '~~~~')", label)}
 
-  def self.normalize_label(label)
-    label.to_s.strip.downcase.gsub(/[[:space:]]/, "_")
-  end
-
-  def self.search_labels(user_id, params)
-    labels = labels_for(user_id)
-
-    if params[:label].present?
-      query = Regexp.escape(params[:label]).gsub("\\*", ".*")
-      query = ".*#{query}.*" unless query.include?("*")
-      query = /\A#{query}\z/
-      labels = labels.grep(query)
-    end
-
-    labels
-  end
-
-  def self.labels_for(user_id)
-    Cache.get(cache_key(user_id)) do
-      SavedSearch.where(user_id: user_id).order("label").pluck(Arel.sql("distinct unnest(labels) as label"))
-    end
-  end
-
-  def self.cache_key(user_id)
-    "ss-labels-#{user_id}"
-  end
-
-  def self.queries_for(user_id, label = nil, options = {})
-    if label
-      SavedSearch.where(user_id: user_id).labeled(label).map(&:normalized_query).sort.uniq
-    else
-      SavedSearch.where(user_id: user_id).map(&:normalized_query).sort.uniq
-    end
+  def self.queries_for(user_id, label: nil, options: {})
+    SavedSearch.
+      where(user_id: user_id).
+      tap {|arel| label ? arel.labeled(label) : arel}.
+      pluck(:query).
+      map {|x| Tag.normalize_query(x, sort: true)}.
+      sort.
+      uniq
   end
 
   def normalized_query
@@ -95,7 +106,9 @@ class SavedSearch < ApplicationRecord
 
   def normalize
     self.query = Tag.normalize_query(query, sort: false)
-    self.labels = labels.map {|x| SavedSearch.normalize_label(x)}.reject {|x| x.blank?}
+    self.labels = labels.
+      map {|x| SavedSearch.normalize_label(x)}.
+      reject {|x| x.blank?}
   end
 
   def validate_count
@@ -106,13 +119,13 @@ class SavedSearch < ApplicationRecord
 
   def update_user_on_create
     if !user.has_saved_searches?
-      user.update_attribute(:has_saved_searches, true)
+      user.update(has_saved_searches: true)
     end
   end
 
   def update_user_on_destroy
     if user.saved_searches.count == 0
-      user.update_attribute(:has_saved_searches, false)
+      user.update(has_saved_searches: false)
     end
   end
 

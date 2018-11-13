@@ -314,6 +314,7 @@ GEM
       ffi (>= 0.5.0, < 2)
     recaptcha (4.8.0)
       json
+    redis (4.0.3)
     ref (2.0.0)
     representable (2.3.0)
       uber (~> 0.0.7)
@@ -488,6 +489,7 @@ DEPENDENCIES
   rails (~> 5.2)
   rakismet
   recaptcha
+  redis
   responders
   retriable
   ruby-imagespec!
