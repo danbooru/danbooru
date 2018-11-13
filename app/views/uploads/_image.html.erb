@@ -1,11 +1,15 @@
 <% if params[:url] %>
-  <% if ImageProxy.needs_proxy?(@source.image_url) %>
-    <%= image_tag(image_proxy_uploads_path(:url => @source.image_url), :title => "Preview", :id => "image") %>
-  <% elsif @source.image_url.present? %>
-    <%= image_tag(@source.image_url, :title => "Preview", :id => "image") %>
-  <% end %>
+  <div id="upload-image">
+    <% if ImageProxy.needs_proxy?(@source.image_url) %>
+      <%= image_tag(image_proxy_uploads_path(:url => @source.image_url), :title => "Preview", :id => "image") %>
+    <% elsif @source.image_url.present? %>
+      <%= image_tag(@source.image_url, :title => "Preview", :id => "image") %>
+    <% end %>
+  </div>
 
   <ul id="upload-image-metadata">
+    <li id="no-image-available"><em>No image preview available</em></li>
+
     <% if @remote_size %>
       <li><strong>Size:</strong> <%= number_to_human_size(@remote_size) %></li>
     <% end %>
@@ -14,6 +18,6 @@
       <li><strong>Referrer:</strong> <%= params[:ref] %></li>
     <% end %>
 
-    <li><span id="scale"></span> (<%= link_to "toggle size", "#", :id => "image-resize-to-window-link" %>)</li>
+    <li id="scale-link"><span id="scale"></span> (<%= link_to "toggle size", "#", :id => "image-resize-to-window-link" %>)</li>
   </ul>
 <% end %>

@@ -13,7 +13,12 @@ Upload.initialize_all = function() {
     if ($("#image").prop("complete")) {
       this.initialize_image();
     } else {
-      $("#image").on("load.danbooru error.danbooru", this.initialize_image);
+      $("#image").on("error.danbooru", (e) => {
+        $("#upload-image").hide();
+        $("#scale-link").hide();
+        $("#iqdb-similar").hide();
+      });
+      $("#image").on("load.danbooru", this.initialize_image);
     }
     this.initialize_similar();
     this.initialize_submit();
@@ -106,10 +111,10 @@ Upload.initialize_image = function() {
   var width = $image.width();
   var height = $image.height();
   if (!width || !height) {
-    // try again later
-    $.timeout(100).done(function() {Upload.initialize_image()});
+    // we errored out
     return;
   }
+  $("#no-image-available").hide();
   $image.data("original-width", width);
   $image.data("original-height", height);
   Post.resize_image_to_window($image);
