@@ -1,13 +1,15 @@
 class Pool < ApplicationRecord
   class RevertError < Exception ; end
 
+  array_attribute :post_ids, parse: /\d+/, cast: :to_i
+  belongs_to_creator
+
   validates_uniqueness_of :name, case_sensitive: false, if: :name_changed?
   validate :validate_name, if: :name_changed?
   validates_inclusion_of :category, :in => %w(series collection)
   validate :updater_can_change_category
   validate :updater_can_remove_posts
   validate :updater_can_edit_deleted
-  belongs_to_creator
   before_validation :normalize_post_ids
   before_validation :normalize_name
   after_save :update_category_pseudo_tags_for_posts_async
@@ -151,18 +153,6 @@ class Pool < ApplicationRecord
 
   def normalize_post_ids
     self.post_ids = post_ids.uniq if is_collection?
-  end
-
-  # allow assigning a string to post_ids so it can be assigned from the text
-  # field in the pool edit form (PUT /pools/1?post_ids=1+2+3).
-  def post_ids=(value)
-    if value.respond_to?(:to_str)
-      super value.to_str.scan(/\d+/).map(&:to_i)
-    elsif value.respond_to?(:to_a)
-      super value.to_a
-    else
-      raise ArgumentError, "post_ids must be a String or an Array"
-    end
   end
 
   def revert_to!(version)
