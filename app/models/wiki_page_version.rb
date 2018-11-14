@@ -1,4 +1,5 @@
 class WikiPageVersion < ApplicationRecord
+  array_attribute :other_names
   belongs_to :wiki_page
   belongs_to_updater
   belongs_to :artist, optional: true
@@ -44,9 +45,5 @@ class WikiPageVersion < ApplicationRecord
 
   def category_name
     Tag.category_for(title)
-  end
-
-  def other_names_array
-    other_names.to_s.split(/[[:space:]]+/)
   end
 end

@@ -5,7 +5,7 @@ class WikiPagesController < ApplicationController
   before_action :normalize_search_params, :only => [:index]
   
   def new
-    @wiki_page = WikiPage.new(wiki_page_create_params)
+    @wiki_page = WikiPage.new(wiki_page_params(:create))
     respond_with(@wiki_page)
   end
 
@@ -54,13 +54,13 @@ class WikiPagesController < ApplicationController
   end
 
   def create
-    @wiki_page = WikiPage.create(wiki_page_create_params)
+    @wiki_page = WikiPage.create(wiki_page_params(:create))
     respond_with(@wiki_page)
   end
 
   def update
     @wiki_page = WikiPage.find(params[:id])
-    @wiki_page.update(wiki_page_update_params)
+    @wiki_page.update(wiki_page_params(:update))
     respond_with(@wiki_page)
   end
 
@@ -98,18 +98,11 @@ class WikiPagesController < ApplicationController
     end
   end
 
-  def wiki_page_create_params
-    permitted_params = %i[title body other_names skip_secondary_validations]
+  def wiki_page_params(context)
+    permitted_params = %i[body other_names other_names_string skip_secondary_validations]
     permitted_params += %i[is_locked is_deleted] if CurrentUser.is_builder?
+    permitted_params += %i[title] if context == :create || CurrentUser.is_builder?
 
     params.fetch(:wiki_page, {}).permit(permitted_params)
   end
-
-  def wiki_page_update_params
-    permitted_params = %i[body other_names skip_secondary_validations]
-    permitted_params += %i[title is_locked is_deleted] if CurrentUser.is_builder?
-
-    params.fetch(:wiki_page, {}).permit(permitted_params)
-  end
-
 end

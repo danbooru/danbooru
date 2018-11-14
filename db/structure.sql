@@ -3363,7 +3363,7 @@ CREATE TABLE public.wiki_page_versions (
     is_locked boolean NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    other_names text,
+    other_names text[] DEFAULT '{}'::text[],
     is_deleted boolean DEFAULT false NOT NULL
 );
 
@@ -3402,8 +3402,7 @@ CREATE TABLE public.wiki_pages (
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     updater_id integer,
-    other_names text,
-    other_names_index tsvector,
+    other_names text[] DEFAULT '{}'::text[],
     is_deleted boolean DEFAULT false NOT NULL
 );
 
@@ -7312,10 +7311,10 @@ CREATE INDEX index_wiki_pages_on_body_index_index ON public.wiki_pages USING gin
 
 
 --
--- Name: index_wiki_pages_on_other_names_index; Type: INDEX; Schema: public; Owner: -
+-- Name: index_wiki_pages_on_other_names; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_wiki_pages_on_other_names_index ON public.wiki_pages USING gin (other_names_index);
+CREATE INDEX index_wiki_pages_on_other_names ON public.wiki_pages USING gin (other_names);
 
 
 --
@@ -7400,13 +7399,6 @@ CREATE TRIGGER trigger_posts_on_tag_index_update BEFORE INSERT OR UPDATE ON publ
 --
 
 CREATE TRIGGER trigger_wiki_pages_on_update BEFORE INSERT OR UPDATE ON public.wiki_pages FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('body_index', 'public.danbooru', 'body', 'title');
-
-
---
--- Name: wiki_pages trigger_wiki_pages_on_update_for_other_names; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER trigger_wiki_pages_on_update_for_other_names BEFORE INSERT OR UPDATE ON public.wiki_pages FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('other_names_index', 'public.danbooru', 'other_names');
 
 
 --
@@ -7579,6 +7571,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20180913184128'),
 ('20180916002448'),
 ('20181108162204'),
-('20181108205842');
+('20181108205842'),
+('20181113174914');
 
 
