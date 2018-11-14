@@ -726,9 +726,9 @@ CREATE TABLE public.artist_versions (
     updater_id integer NOT NULL,
     updater_ip_addr inet NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
-    other_names text,
+    other_names text[] DEFAULT '{}'::text[],
     group_name character varying,
-    url_string text,
+    urls text[] DEFAULT '{}'::text[],
     is_banned boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
@@ -7573,6 +7573,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20181108162204'),
 ('20181108205842'),
 ('20181113174914'),
-('20181114180205');
+('20181114180205'),
+('20181114185032');
 
 

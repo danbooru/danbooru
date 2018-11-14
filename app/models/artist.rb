@@ -174,11 +174,11 @@ class Artist < ApplicationRecord
     end
 
     def url_array
-      urls.map(&:to_s)
+      urls.map(&:to_s).sort
     end
 
     def url_string
-      url_array.sort.join("\n")
+      url_array.join("\n")
     end
 
     def url_string=(string)
@@ -275,7 +275,7 @@ class Artist < ApplicationRecord
         :name => name,
         :updater_id => CurrentUser.id,
         :updater_ip_addr => CurrentUser.ip_addr,
-        :url_string => url_string,
+        :urls => url_array,
         :is_active => is_active,
         :is_banned => is_banned,
         :other_names => other_names,
@@ -287,7 +287,7 @@ class Artist < ApplicationRecord
       prev = versions.last
       prev.update_attributes(
         :name => name,
-        :url_string => url_string,
+        :urls => url_array,
         :is_active => is_active,
         :is_banned => is_banned,
         :other_names => other_names,
@@ -306,9 +306,9 @@ class Artist < ApplicationRecord
       end
 
       self.name = version.name
-      self.url_string = version.url_string
+      self.url_string = version.urls.join("\n")
       self.is_active = version.is_active
-      self.other_names = version.other_names
+      self.other_names = version.other_names.join(" ")
       self.group_name = version.group_name
       save
     end

@@ -1,4 +1,7 @@
 class ArtistVersion < ApplicationRecord
+  array_attribute :urls
+  array_attribute :other_names
+
   belongs_to_updater
   belongs_to :artist
   delegate :visible?, :to => :artist
@@ -47,18 +50,10 @@ class ArtistVersion < ApplicationRecord
 
   extend SearchMethods
 
-  def url_array
-    url_string.to_s.split(/[[:space:]]+/)
-  end
-
-  def other_names_array
-    other_names.to_s.split(/[[:space:]]+/)
-  end
-
   def urls_diff(version)
     latest_urls = artist.url_array || []
-    new_urls = url_array
-    old_urls = version.present? ? version.url_array : []
+    new_urls = urls
+    old_urls = version.present? ? version.urls : []
 
     added_urls = new_urls - old_urls
     removed_urls = old_urls - new_urls
@@ -74,8 +69,8 @@ class ArtistVersion < ApplicationRecord
 
   def other_names_diff(version)
     latest_names = artist.other_names_array || []
-    new_names = other_names_array
-    old_names = version.present? ? version.other_names_array : []
+    new_names = other_names
+    old_names = version.present? ? version.other_names : []
 
     added_names = new_names - old_names
     removed_names = old_names - new_names

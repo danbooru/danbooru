@@ -475,7 +475,7 @@ class ArtistTest < ActiveSupport::TestCase
       end
 
       first_version = ArtistVersion.first
-      assert_equal("yyy", first_version.other_names)
+      assert_equal(%w[yyy], first_version.other_names)
       artist.revert_to!(first_version)
       artist.reload
       assert_equal("yyy", artist.other_names)
@@ -506,35 +506,35 @@ class ArtistTest < ActiveSupport::TestCase
       should "create a new version when an url is added" do
         assert_difference("ArtistVersion.count") do
           @artist.update(:url_string => "http://foo.com http://bar.com")
-          assert_equal(%w[http://bar.com http://foo.com], @artist.versions.last.url_array)
+          assert_equal(%w[http://bar.com http://foo.com], @artist.versions.last.urls)
         end
       end
 
       should "create a new version when an url is removed" do
         assert_difference("ArtistVersion.count") do
           @artist.update(:url_string => "")
-          assert_equal(%w[], @artist.versions.last.url_array)
+          assert_equal(%w[], @artist.versions.last.urls)
         end
       end
 
       should "create a new version when an url is marked inactive" do
         assert_difference("ArtistVersion.count") do
           @artist.update(:url_string => "-http://foo.com")
-          assert_equal(%w[-http://foo.com], @artist.versions.last.url_array)
+          assert_equal(%w[-http://foo.com], @artist.versions.last.urls)
         end
       end
 
       should "not create a new version when nothing has changed" do
         assert_no_difference("ArtistVersion.count") do
           @artist.save
-          assert_equal(%w[http://foo.com], @artist.versions.last.url_array)
+          assert_equal(%w[http://foo.com], @artist.versions.last.urls)
         end
       end
 
       should "not save invalid urls" do
         assert_no_difference("ArtistVersion.count") do
           @artist.update(:url_string => "http://foo.com www.example.com")
-          assert_equal(%w[http://foo.com], @artist.versions.last.url_array)
+          assert_equal(%w[http://foo.com], @artist.versions.last.urls)
         end
       end
     end
