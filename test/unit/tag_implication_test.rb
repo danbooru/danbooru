@@ -46,7 +46,7 @@ class TagImplicationTest < ActiveSupport::TestCase
       ti2 = FactoryBot.build(:tag_implication, :antecedent_name => "b", :consequent_name => "c", :status => "pending")
       ti2.save
       ti1 = FactoryBot.create(:tag_implication, :antecedent_name => "a", :consequent_name => "b")
-      assert_equal("b", ti1.descendant_names)
+      assert_equal(%w[b], ti1.descendant_names)
     end
 
     should "populate the creator information" do
@@ -89,14 +89,11 @@ class TagImplicationTest < ActiveSupport::TestCase
 
     should "calculate all its descendants" do
       ti1 = FactoryBot.create(:tag_implication, :antecedent_name => "bbb", :consequent_name => "ccc")
-      assert_equal("ccc", ti1.descendant_names)
-      assert_equal(["ccc"], ti1.descendant_names_array)
+      assert_equal(%w[ccc], ti1.descendant_names)
       ti2 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
-      assert_equal("bbb ccc", ti2.descendant_names)
-      assert_equal(["bbb", "ccc"], ti2.descendant_names_array)
+      assert_equal(%w[bbb ccc], ti2.descendant_names)
       ti1.reload
-      assert_equal("ccc", ti1.descendant_names)
-      assert_equal(["ccc"], ti1.descendant_names_array)
+      assert_equal(%w[ccc], ti1.descendant_names)
     end
 
     should "update its descendants on save" do
@@ -109,8 +106,8 @@ class TagImplicationTest < ActiveSupport::TestCase
       )
       ti1.reload
       ti2.reload
-      assert_equal("bbb ddd", ti1.descendant_names)
-      assert_equal("ddd", ti2.descendant_names)
+      assert_equal(%w[bbb ddd], ti1.descendant_names)
+      assert_equal(%w[ddd], ti2.descendant_names)
     end
 
     should "update the descendants for all of its parents on destroy" do
@@ -122,49 +119,49 @@ class TagImplicationTest < ActiveSupport::TestCase
       ti2.reload
       ti3.reload
       ti4.reload
-      assert_equal("bbb ccc ddd", ti1.descendant_names)
-      assert_equal("bbb ccc ddd", ti2.descendant_names)
-      assert_equal("ccc ddd", ti3.descendant_names)
-      assert_equal("ddd", ti4.descendant_names)
+      assert_equal(%w[bbb ccc ddd], ti1.descendant_names)
+      assert_equal(%w[bbb ccc ddd], ti2.descendant_names)
+      assert_equal(%w[ccc ddd], ti3.descendant_names)
+      assert_equal(%w[ddd], ti4.descendant_names)
       ti3.destroy
       ti1.reload
       ti2.reload
       ti4.reload
-      assert_equal("bbb", ti1.descendant_names)
-      assert_equal("bbb", ti2.descendant_names)
-      assert_equal("ddd", ti4.descendant_names)
+      assert_equal(%w[bbb], ti1.descendant_names)
+      assert_equal(%w[bbb], ti2.descendant_names)
+      assert_equal(%w[ddd], ti4.descendant_names)
     end
 
     should "update the descendants for all of its parents on create" do
       ti1 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ti1.reload
       assert_equal("active", ti1.status)
-      assert_equal("bbb", ti1.descendant_names)
+      assert_equal(%w[bbb], ti1.descendant_names)
 
       ti2 = FactoryBot.create(:tag_implication, :antecedent_name => "bbb", :consequent_name => "ccc")
       ti1.reload
       ti2.reload
       assert_equal("active", ti1.status)
       assert_equal("active", ti2.status)
-      assert_equal("bbb ccc", ti1.descendant_names)
-      assert_equal("ccc", ti2.descendant_names)
+      assert_equal(%w[bbb ccc], ti1.descendant_names)
+      assert_equal(%w[ccc], ti2.descendant_names)
 
       ti3 = FactoryBot.create(:tag_implication, :antecedent_name => "ccc", :consequent_name => "ddd")
       ti1.reload
       ti2.reload
       ti3.reload
-      assert_equal("bbb ccc ddd", ti1.descendant_names)
-      assert_equal("ccc ddd", ti2.descendant_names)
+      assert_equal(%w[bbb ccc ddd], ti1.descendant_names)
+      assert_equal(%w[ccc ddd], ti2.descendant_names)
 
       ti4 = FactoryBot.create(:tag_implication, :antecedent_name => "ccc", :consequent_name => "eee")
       ti1.reload
       ti2.reload
       ti3.reload
       ti4.reload
-      assert_equal("bbb ccc ddd eee", ti1.descendant_names)
-      assert_equal("ccc ddd eee", ti2.descendant_names)
-      assert_equal("ddd", ti3.descendant_names)
-      assert_equal("eee", ti4.descendant_names)
+      assert_equal(%w[bbb ccc ddd eee], ti1.descendant_names)
+      assert_equal(%w[ccc ddd eee], ti2.descendant_names)
+      assert_equal(%w[ddd], ti3.descendant_names)
+      assert_equal(%w[eee], ti4.descendant_names)
 
       ti5 = FactoryBot.create(:tag_implication, :antecedent_name => "xxx", :consequent_name => "bbb")
       ti1.reload
@@ -172,11 +169,11 @@ class TagImplicationTest < ActiveSupport::TestCase
       ti3.reload
       ti4.reload
       ti5.reload
-      assert_equal("bbb ccc ddd eee", ti1.descendant_names)
-      assert_equal("ccc ddd eee", ti2.descendant_names)
-      assert_equal("ddd", ti3.descendant_names)
-      assert_equal("eee", ti4.descendant_names)
-      assert_equal("bbb ccc ddd eee", ti5.descendant_names)
+      assert_equal(%w[bbb ccc ddd eee], ti1.descendant_names)
+      assert_equal(%w[ccc ddd eee], ti2.descendant_names)
+      assert_equal(%w[ddd], ti3.descendant_names)
+      assert_equal(%w[eee], ti4.descendant_names)
+      assert_equal(%w[bbb ccc ddd eee], ti5.descendant_names)
     end
 
     should "update any affected post upon save" do

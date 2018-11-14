@@ -3012,7 +3012,7 @@ CREATE TABLE public.tag_implications (
     id integer NOT NULL,
     antecedent_name character varying NOT NULL,
     consequent_name character varying NOT NULL,
-    descendant_names text NOT NULL,
+    descendant_names text[] DEFAULT '{}'::text[] NOT NULL,
     creator_id integer NOT NULL,
     creator_ip_addr inet NOT NULL,
     forum_topic_id integer,
@@ -7572,6 +7572,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20180916002448'),
 ('20181108162204'),
 ('20181108205842'),
-('20181113174914');
+('20181113174914'),
+('20181114180205');
 
 
