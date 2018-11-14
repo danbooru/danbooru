@@ -407,8 +407,8 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "normalize its other names" do
-      artist = FactoryBot.create(:artist, :name => "a1", :other_names_comma => "aaa, bbb, ccc ddd")
-      assert_equal("aaa, bbb, ccc_ddd", artist.other_names_comma)
+      artist = FactoryBot.create(:artist, :name => "a1", :other_names => "aaa bbb ccc_ddd")
+      assert_equal("aaa bbb ccc_ddd", artist.other_names_string)
     end
 
     should "search on its name should return results" do
@@ -421,11 +421,11 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "search on other names should return matches" do
-      artist = FactoryBot.create(:artist, :name => "artist", :other_names_comma => "aaa, ccc ddd")
+      artist = FactoryBot.create(:artist, :name => "artist", :other_names_string => "aaa ccc_ddd")
 
-      assert_nil(Artist.search(other_names_like: "*artist*").first)
-      assert_not_nil(Artist.search(other_names_like: "*aaa*").first)
-      assert_not_nil(Artist.search(other_names_like: "*ccc_ddd*").first)
+      assert_nil(Artist.search(any_other_name_like: "*artist*").first)
+      assert_not_nil(Artist.search(any_other_name_like: "*aaa*").first)
+      assert_not_nil(Artist.search(any_other_name_like: "*ccc_ddd*").first)
       assert_not_nil(Artist.search(name: "artist").first)
       assert_not_nil(Artist.search(:any_name_matches => "aaa").first)
       assert_not_nil(Artist.search(:any_name_matches => "/a/").first)
@@ -478,7 +478,7 @@ class ArtistTest < ActiveSupport::TestCase
       assert_equal(%w[yyy], first_version.other_names)
       artist.revert_to!(first_version)
       artist.reload
-      assert_equal("yyy", artist.other_names)
+      assert_equal(%w[yyy], artist.other_names)
     end
 
     should "update the category of the tag when created" do

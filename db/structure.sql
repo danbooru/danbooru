@@ -765,8 +765,7 @@ CREATE TABLE public.artists (
     creator_id integer NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
-    other_names text,
-    other_names_index tsvector,
+    other_names text[] DEFAULT '{}'::text[],
     group_name character varying,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
@@ -5078,17 +5077,10 @@ CREATE INDEX index_artists_on_name_trgm ON public.artists USING gin (name public
 
 
 --
--- Name: index_artists_on_other_names_index; Type: INDEX; Schema: public; Owner: -
+-- Name: index_artists_on_other_names; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_artists_on_other_names_index ON public.artists USING gin (other_names_index);
-
-
---
--- Name: index_artists_on_other_names_trgm; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_artists_on_other_names_trgm ON public.artists USING gin (other_names public.gin_trgm_ops);
+CREATE INDEX index_artists_on_other_names ON public.artists USING gin (other_names);
 
 
 --
@@ -7346,13 +7338,6 @@ CREATE TRIGGER insert_favorites_trigger BEFORE INSERT ON public.favorites FOR EA
 
 
 --
--- Name: artists trigger_artists_on_update; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER trigger_artists_on_update BEFORE INSERT OR UPDATE ON public.artists FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('other_names_index', 'public.danbooru', 'other_names');
-
-
---
 -- Name: comments trigger_comments_on_update; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -7574,6 +7559,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20181108205842'),
 ('20181113174914'),
 ('20181114180205'),
-('20181114185032');
+('20181114185032'),
+('20181114202744');
 
 

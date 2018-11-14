@@ -68,7 +68,7 @@ class ArtistVersion < ApplicationRecord
   end
 
   def other_names_diff(version)
-    latest_names = artist.other_names_array || []
+    latest_names = artist.other_names || []
     new_names = other_names
     old_names = version.present? ? version.other_names : []
 
