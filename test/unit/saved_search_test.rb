@@ -6,7 +6,8 @@ class SavedSearchTest < ActiveSupport::TestCase
     @user = FactoryBot.create(:user)
     CurrentUser.user = @user
     CurrentUser.ip_addr = "127.0.0.1"
-    mock_saved_search_service!
+    @mock_redis = MockRedis.new
+    SavedSearch.stubs(:redis).returns(@mock_redis)
   end
 
   def teardown
@@ -24,11 +25,6 @@ class SavedSearchTest < ActiveSupport::TestCase
     should "fetch the labels used by a user" do
       assert_equal(%w(blah zah), SavedSearch.labels_for(@user.id))
     end
-
-    should "expire when a search is updated" do
-      Cache.expects(:delete).once
-      FactoryBot.create(:saved_search, user: @user, query: "blah")
-    end
   end
 
   context ".queries_for" do
@@ -40,47 +36,81 @@ class SavedSearchTest < ActiveSupport::TestCase
     end
 
     should "fetch the queries used by a user for a label" do
-      assert_equal(%w(aaa), SavedSearch.queries_for(@user.id, "blah"))
+      assert_equal(%w(aaa), SavedSearch.queries_for(@user.id, label: "blah"))
     end
 
-    should "return fully normalized queries" do
+    should "fetch the queries used by a user without a label" do
       assert_equal(["aaa", "aaa ccc"], SavedSearch.queries_for(@user.id))
     end
   end
 
-  context "Fetching the post ids for a search" do
+  context ".search_labels" do
+    setup do
+      FactoryBot.create(:tag_alias, antecedent_name: "bbb", consequent_name: "ccc", creator: @user)
+      FactoryBot.create(:saved_search, user: @user, label_string: "blah", query: "aaa")
+      FactoryBot.create(:saved_search, user: @user, label_string: "blahbling", query: "CCC BBB AAA")
+      FactoryBot.create(:saved_search, user: @user, label_string: "qux", query: " aaa  bbb  ccc ")
+    end
+
+    should "fetch the queries used by a user for a label" do
+      assert_equal(%w(blah blahbling), SavedSearch.search_labels(@user.id, label: "blah"))
+    end
+  end
+
+  context ".post_ids_for" do
     context "with a label" do
       setup do
-        SavedSearch.expects(:queries_for).with(1, "blah").returns(%w(a b c))
-        stub_request(:post, "http://localhost:3001/v2/search").to_return(:body => "1 2 3 4")
+        SavedSearch.expects(:queries_for).with(1, label: "blah").returns(%w(a b c))
       end
 
-      should "return a list of ids" do
-        post_ids = SavedSearch.post_ids(1, "blah")
-        assert_equal([1,2,3,4], post_ids)
+      context "without a primed cache" do
+        should "delay processing three times" do
+          SavedSearch.expects(:populate).times(3)
+          post_ids = SavedSearch.post_ids_for(1, label: "blah")
+          assert_equal([], post_ids)
+        end
+      end
+
+      context "with a primed cached" do
+        setup do
+          @mock_redis.sadd("search:a", 1)
+          @mock_redis.sadd("search:b", 2)
+          @mock_redis.sadd("search:c", 3)
+        end
+
+        should "fetch the post ids" do
+          SavedSearch.expects(:delay).never
+          post_ids = SavedSearch.post_ids_for(1, label: "blah")
+          assert_equal([1,2,3], post_ids)
+        end
       end
     end
 
     context "without a label" do
       setup do
-        SavedSearch.expects(:queries_for).with(1, nil).returns(%w(a b c))
-        stub_request(:post, "http://localhost:3001/v2/search").to_return(:body => "1 2 3 4")
+        SavedSearch.expects(:queries_for).with(1, label: nil).returns(%w(a b c))
       end
 
-      should "return a list of ids" do
-        post_ids = SavedSearch.post_ids(1)
-        assert_equal([1,2,3,4], post_ids)
-      end
-    end
-
-    context "with a nonexistent label" do
-      setup do
-        SavedSearch.expects(:queries_for).with(1, "empty").returns([])
+      context "without a primed cache" do
+        should "delay processing three times" do
+          SavedSearch.expects(:populate).times(3)
+          post_ids = SavedSearch.post_ids_for(1)
+          assert_equal([], post_ids)
+        end
       end
 
-      should "return an empty list of ids" do
-        post_ids = SavedSearch.post_ids(1, "empty")
-        assert_equal([], post_ids)
+      context "with a primed cache" do
+        setup do
+          @mock_redis.sadd("search:a", 1)
+          @mock_redis.sadd("search:b", 2)
+          @mock_redis.sadd("search:c", 3)
+        end
+
+        should "fetch the post ids" do
+          SavedSearch.expects(:delay).never
+          post_ids = SavedSearch.post_ids_for(1)
+          assert_equal([1,2,3], post_ids)
+        end
       end
     end
   end
@@ -88,7 +118,7 @@ class SavedSearchTest < ActiveSupport::TestCase
   context "Creating a saved search" do
     setup do
       FactoryBot.create(:tag_alias, antecedent_name: "zzz", consequent_name: "yyy", creator: @user)
-      @saved_search = @user.saved_searches.create(:query => " ZZZ xxx ")
+      @saved_search = @user.saved_searches.create(query: " ZZZ xxx ")
     end
 
     should "update the bitpref on the user" do

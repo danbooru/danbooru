@@ -50,7 +50,7 @@ class SavedSearchesController < ApplicationController
 
   def check_availability
     if !SavedSearch.enabled?
-      raise NotImplementedError.new("Listbooru service is not configured. Saved searches are not available.")
+      raise NotImplementedError.new("Saved searches are not available.")
     end
   end
 
