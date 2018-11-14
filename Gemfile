@@ -89,4 +89,5 @@ group :test do
   gem "timecop"
   gem "webmock"
   gem "minitest-ci"
+  gem "mock_redis"
 end
