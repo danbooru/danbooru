@@ -68,11 +68,6 @@ The following features requires a Google API account:
 
 IQDB integration is delegated to the [IQDBS service](https://github.com/r888888888/iqdbs). 
 
-### Listbooru Service
-
-In order to access saved search functionality you will need to install and 
-configure the [Listbooru service](https://github.com/r888888888/listbooru).
-
 ### Archive Service
 
 In order to access versioned data for pools and posts you will 

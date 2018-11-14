@@ -2,29 +2,34 @@ class SavedSearch < ApplicationRecord
   REDIS_EXPIRY = 3600
   QUERY_LIMIT = 500
 
+  def self.enabled?
+    Danbooru.config.redis_url.present?
+  end
+
   concerning :Redis do
     class_methods do
-      def enabled?
-        Danbooru.config.redis_url.present?
+      extend Memoist
+
+      def redis
+        ::Redis.new(url: Danbooru.config.redis_url)
       end
+      memoize :redis
 
       def post_ids_for(user_id, label: nil)
-        redis = Redis.new(url: Danbooru.config.redis_url)
         label = normalize_label(label) if label
         queries = queries_for(user_id, label: label)
         post_ids = Set.new
         queries.each do |query|
-          query_hash = Cache.hash(query)
-          redis_key = "search:#{query_hash}"
+          redis_key = "search:#{query}"
           if redis.exists(redis_key)
-            sub_ids = redis.smembers(redis_key)
+            sub_ids = redis.smembers(redis_key).map(&:to_i)
             post_ids.merge(sub_ids)
             redis.expire(redis_key, REDIS_EXPIRY)
           else
             SavedSearch.delay(queue: "default").populate(query)
           end
         end
-        post_ids.to_a.sort
+        post_ids.to_a.sort.slice(-QUERY_LIMIT, QUERY_LIMIT)
       end
     end
   end
@@ -52,14 +57,31 @@ class SavedSearch < ApplicationRecord
         labels
       end
 
-      def self.labels_for(user_id)
-        Cache.get(cache_key(user_id)) do
-          SavedSearch.
-            where(user_id: user_id).
-            order("label").
-            pluck(Arel.sql("distinct unnest(labels) as label"))
-        end
+      def labels_for(user_id)
+        SavedSearch.
+          where(user_id: user_id).
+          order("label").
+          pluck(Arel.sql("distinct unnest(labels) as label"))
       end
+    end
+
+    def normalize_labels
+      self.labels = labels.
+        map {|x| SavedSearch.normalize_label(x)}.
+        reject {|x| x.blank?}
+    end
+
+    def label_string
+      labels.join(" ")
+    end
+
+    def label_string=(val)
+      self.labels = val.to_s.split(/[[:space:]]+/)
+    end
+
+    def labels=(labels)
+      labels = labels.map { |label| SavedSearch.normalize_label(label) }
+      super(labels)
     end
   end
 
@@ -67,9 +89,7 @@ class SavedSearch < ApplicationRecord
     class_methods do
       def populate(query)
         CurrentUser.as_system do
-          query_hash = Cache.hash(query)
-          redis_key = "search:#{query_hash}"
-          redis = Redis.new(url: Danbooru.config.redis_url)
+          redis_key = "search:#{query}"
           return if redis.exists(redis_key)
           post_ids = Post.tag_match(query, true).limit(QUERY_LIMIT).pluck(:id)
           redis.sadd(redis_key, post_ids)
@@ -81,35 +101,37 @@ class SavedSearch < ApplicationRecord
     end
   end
 
+  concerning :Queries do
+    class_methods do
+      def queries_for(user_id, label: nil, options: {})
+        SavedSearch.
+          where(user_id: user_id).
+          labeled(label).
+          pluck(:query).
+          map {|x| Tag.normalize_query(x, sort: true)}.
+          sort.
+          uniq
+      end
+    end
+
+    def normalized_query
+      Tag.normalize_query(query, sort: true)
+    end
+
+    def normalize_query
+      self.query = Tag.normalize_query(query, sort: false)
+    end
+  end
+
   attr_accessor :disable_labels
   belongs_to :user
   validates :query, presence: true
   validate :validate_count
   before_create :update_user_on_create
   after_destroy :update_user_on_destroy
-  before_validation :normalize
-  scope :labeled, ->(label) { where("labels @> string_to_array(?, '~~~~')", label)}
-
-  def self.queries_for(user_id, label: nil, options: {})
-    SavedSearch.
-      where(user_id: user_id).
-      tap {|arel| label ? arel.labeled(label) : arel}.
-      pluck(:query).
-      map {|x| Tag.normalize_query(x, sort: true)}.
-      sort.
-      uniq
-  end
-
-  def normalized_query
-    Tag.normalize_query(query, sort: true)
-  end
-
-  def normalize
-    self.query = Tag.normalize_query(query, sort: false)
-    self.labels = labels.
-      map {|x| SavedSearch.normalize_label(x)}.
-      reject {|x| x.blank?}
-  end
+  before_validation :normalize_query
+  before_validation :normalize_labels
+  scope :labeled, ->(label) { label.present? ? where("labels @> string_to_array(?, '~~~~')", label) : where("true") }
 
   def validate_count
     if user.saved_searches.count + 1 > user.max_saved_searches
@@ -127,19 +149,6 @@ class SavedSearch < ApplicationRecord
     if user.saved_searches.count == 0
       user.update(has_saved_searches: false)
     end
-  end
-
-  def label_string
-    labels.join(" ")
-  end
-
-  def label_string=(val)
-    self.labels = val.to_s.split(/[[:space:]]+/)
-  end
-
-  def labels=(labels)
-    labels = labels.map { |label| SavedSearch.normalize_label(label) }
-    super(labels)
   end
 
   def disable_labels=(value)
