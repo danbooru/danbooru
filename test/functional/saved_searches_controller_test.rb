@@ -3,6 +3,7 @@ require 'test_helper'
 class SavedSearchesControllerTest < ActionDispatch::IntegrationTest
   context "The saved searches controller" do
     setup do
+      SavedSearch.stubs(:enabled?).returns(true)
       @user = create(:user)
       as_user do
         @saved_search = create(:saved_search, user: @user)

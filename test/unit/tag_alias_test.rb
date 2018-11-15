@@ -68,13 +68,19 @@ class TagAliasTest < ActiveSupport::TestCase
       assert_nil(Cache.get("ta:#{Cache.hash("aaa")}"))
     end
 
-    should "move saved searches" do
-      tag1 = FactoryBot.create(:tag, :name => "...")
-      tag2 = FactoryBot.create(:tag, :name => "bbb")
-      ss = FactoryBot.create(:saved_search, :query => "123 ... 456", :user => CurrentUser.user)
-      ta = FactoryBot.create(:tag_alias, :antecedent_name => "...", :consequent_name => "bbb")
-      ss.reload
-      assert_equal(%w(123 456 bbb), ss.query.split.sort)
+    context "saved searches" do
+      setup do
+        SavedSearch.stubs(:enabled?).returns(true)
+      end
+
+      should "move saved searches" do
+        tag1 = FactoryBot.create(:tag, :name => "...")
+        tag2 = FactoryBot.create(:tag, :name => "bbb")
+        ss = FactoryBot.create(:saved_search, :query => "123 ... 456", :user => CurrentUser.user)
+        ta = FactoryBot.create(:tag_alias, :antecedent_name => "...", :consequent_name => "bbb")
+        ss.reload
+        assert_equal(%w(123 456 bbb), ss.query.split.sort)
+      end
     end
 
     should "update any affected posts when saved" do

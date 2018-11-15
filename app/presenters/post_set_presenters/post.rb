@@ -19,7 +19,7 @@ module PostSetPresenters
       if post_set.is_pattern_search?
         pattern_tags
       elsif post_set.is_saved_search?
-        SavedSearch.labels_for(CurrentUser.user.id).map {|x| "search:#{x}"}
+        ["search:all"] + SavedSearch.labels_for(CurrentUser.user.id).map {|x| "search:#{x}"}
       elsif post_set.is_empty_tag? || post_set.tag_string == "order:rank"
         popular_tags
       elsif post_set.is_single_tag?

@@ -673,13 +673,6 @@ module Danbooru
     def reportbooru_key
     end
 
-    # listbooru options - see https://github.com/r888888888/listbooru
-    def listbooru_server
-    end
-
-    def listbooru_auth_key
-    end
-
     # iqdbs options - see https://github.com/r888888888/iqdbs
     def iqdbs_auth_key
     end
@@ -795,6 +788,9 @@ module Danbooru
     end
 
     def recommender_key
+    end
+
+    def redis_url
     end
   end
 

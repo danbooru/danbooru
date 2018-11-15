@@ -51,6 +51,7 @@ gem 'ptools'
 gem 'jquery-rails'
 gem 'webpacker', '>= 4.0.x'
 gem 'retriable'
+gem 'redis'
 
 # needed for looser jpeg header compat
 gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888888888/ruby-imagespec.git", :branch => "exif-fixes"
@@ -88,4 +89,5 @@ group :test do
   gem "timecop"
   gem "webmock"
   gem "minitest-ci"
+  gem "mock_redis"
 end

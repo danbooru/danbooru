@@ -71,9 +71,9 @@ class PostQueryBuilder
     if SavedSearch.enabled?
       saved_searches.each do |saved_search|
         if saved_search == "all"
-          post_ids = SavedSearch.post_ids(CurrentUser.id)
+          post_ids = SavedSearch.post_ids_for(CurrentUser.id)
         else
-          post_ids = SavedSearch.post_ids(CurrentUser.id, saved_search)
+          post_ids = SavedSearch.post_ids_for(CurrentUser.id, label: saved_search)
         end
 
         post_ids = [0] if post_ids.empty?
