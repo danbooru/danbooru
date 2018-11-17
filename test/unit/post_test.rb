@@ -2014,6 +2014,13 @@ class PostTest < ActiveSupport::TestCase
       assert_tag_match(posts, "ordpool:test")
     end
 
+    should "return posts for the ordpool:<name> metatag for a series pool containing duplicate posts" do
+      posts = FactoryBot.create_list(:post, 2)
+      pool = FactoryBot.create(:pool, name: "test", category: "series", post_ids: [posts[0].id, posts[1].id, posts[1].id])
+
+      assert_tag_match([posts[0], posts[1], posts[1]], "ordpool:test")
+    end
+
     should "return posts for the parent:<N> metatag" do
       parent = FactoryBot.create(:post)
       child = FactoryBot.create(:post, tag_string: "parent:#{parent.id}")
