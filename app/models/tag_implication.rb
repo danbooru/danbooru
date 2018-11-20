@@ -1,6 +1,8 @@
 class TagImplication < TagRelationship
   extend Memoist
 
+  array_attribute :descendant_names
+
   before_save :update_descendant_names
   after_save :update_descendant_names_for_parents
   after_destroy :update_descendant_names_for_parents
@@ -22,7 +24,7 @@ class TagImplication < TagRelationship
     module ClassMethods
       # assumes names are normalized
       def with_descendants(names)
-        (names + active.where(antecedent_name: names).flat_map(&:descendant_names_array)).uniq
+        (names + active.where(antecedent_name: names).flat_map(&:descendant_names)).uniq
       end
 
       def automatic_tags_for(names)
@@ -44,12 +46,8 @@ class TagImplication < TagRelationship
     end
     memoize :descendants
 
-    def descendant_names_array
-      descendant_names.split(/ /)
-    end
-
     def update_descendant_names
-      self.descendant_names = descendants.join(" ")
+      self.descendant_names = descendants
     end
 
     def update_descendant_names!
@@ -88,7 +86,7 @@ class TagImplication < TagRelationship
     def absence_of_transitive_relation
       # Find everything else the antecedent implies, not including the current implication.
       implications = TagImplication.active.where("antecedent_name = ? and consequent_name != ?", antecedent_name, consequent_name)
-      implied_tags = implications.flat_map(&:descendant_names_array)
+      implied_tags = implications.flat_map(&:descendant_names)
       if implied_tags.include?(consequent_name)
         self.errors[:base] << "#{antecedent_name} already implies #{consequent_name} through another implication"
       end
@@ -170,7 +168,7 @@ class TagImplication < TagRelationship
     def update_posts
       Post.without_timeout do
         Post.raw_tag_match(antecedent_name).where("true /* TagImplication#update_posts */").find_each do |post|
-          fixed_tags = "#{post.tag_string} #{descendant_names}".strip
+          fixed_tags = "#{post.tag_string} #{descendant_names_string}".strip
           CurrentUser.scoped(creator, creator_ip_addr) do
             post.update_attributes(
               :tag_string => fixed_tags

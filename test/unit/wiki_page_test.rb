@@ -63,7 +63,7 @@ class WikiPageTest < ActiveSupport::TestCase
 
       should "normalize its other names" do
         @wiki_page.update(:other_names => "foo*bar baz baz 加賀（艦これ）")
-        assert(%w[foo*bar baz 加賀(艦これ)], @wiki_page.other_names_array)
+        assert_equal(%w[foo*bar baz 加賀(艦これ)], @wiki_page.other_names)
       end
 
       should "search by title" do

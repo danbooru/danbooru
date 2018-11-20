@@ -7,7 +7,7 @@
       <li><strong>Tag Alias</strong> <%= artist.tag_alias_name %></li>
     <% end %>
     <% if artist.other_names.present? %>
-      <li><strong>Other Names</strong> <%= link_to_artists(artist.other_names.split(/ /)) %></li>
+      <li><strong>Other Names</strong> <%= link_to_artists(artist.other_names) %></li>
     <% end %>
     <% if artist.group_name.present? %>
       <li><strong>Group</strong> <%= link_to_artist(artist.group_name) %></li>

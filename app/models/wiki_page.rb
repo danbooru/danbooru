@@ -4,14 +4,16 @@ class WikiPage < ApplicationRecord
   before_save :normalize_title
   before_save :normalize_other_names
   after_save :create_version
-  belongs_to_creator
-  belongs_to_updater
   validates_uniqueness_of :title, :case_sensitive => false
   validates_presence_of :title
   validates_presence_of :body, :unless => -> { is_deleted? || other_names.present? }
   validate :validate_rename
   validate :validate_not_locked
+
   attr_accessor :skip_secondary_validations
+  array_attribute :other_names
+  belongs_to_creator
+  belongs_to_updater
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, -> {where(:is_active => true)}, :foreign_key => "name", :primary_key => "title"
   has_many :versions, -> {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
@@ -29,17 +31,16 @@ class WikiPage < ApplicationRecord
       order("updated_at DESC").limit(25)
     end
 
-    def other_names_equal(name)
-      query_sql = name.unicode_normalize(:nfkc).to_escaped_for_tsquery
-      where("other_names_index @@ to_tsquery('danbooru', E?)", query_sql)
+    def other_names_include(name)
+      where("wiki_pages.other_names @> ARRAY[?]", name.unicode_normalize(:nfkc))
     end
 
     def other_names_match(name)
       if name =~ /\*/
-        subquery = WikiPage.from("unnest(string_to_array(other_names, ' ')) AS other_name").where("other_name ILIKE ?", name.to_escaped_for_sql_like)
+        subquery = WikiPage.from("unnest(other_names) AS other_name").where("other_name ILIKE ?", name.to_escaped_for_sql_like)
         where(id: subquery)
       else
-        other_names_equal(name)
+        other_names_include(name)
       end
     end
 
@@ -73,9 +74,9 @@ class WikiPage < ApplicationRecord
       end
 
       if params[:other_names_present].to_s.truthy?
-        q = q.where("other_names is not null and other_names != ''")
+        q = q.where("other_names is not null and other_names != '{}'")
       elsif params[:other_names_present].to_s.falsy?
-        q = q.where("other_names is null or other_names = ''")
+        q = q.where("other_names is null or other_names = '{}'")
       end
 
       q = q.attribute_matches(:is_locked, params[:is_locked])
@@ -97,7 +98,7 @@ class WikiPage < ApplicationRecord
 
   module ApiMethods
     def hidden_attributes
-      super + [:body_index, :other_names_index]
+      super + [:body_index]
     end
 
     def method_attributes
@@ -145,8 +146,7 @@ class WikiPage < ApplicationRecord
   end
 
   def normalize_other_names
-    normalized_other_names = other_names.to_s.unicode_normalize(:nfkc).scan(/[^[:space:]]+/)
-    self.other_names = normalized_other_names.uniq.join(" ")
+    self.other_names = other_names.map { |name| name.unicode_normalize(:nfkc) }.uniq
   end
 
   def skip_secondary_validations=(value)
@@ -223,9 +223,5 @@ class WikiPage < ApplicationRecord
 
   def visible?
     artist.blank? || !artist.is_banned? || CurrentUser.is_builder?
-  end
-
-  def other_names_array
-    other_names.to_s.split(/[[:space:]]+/)
   end
 end

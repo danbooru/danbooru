@@ -105,7 +105,7 @@ private
   end
 
   def artist_params
-    permitted_params = %i[name other_names other_names_comma group_name url_string notes]
+    permitted_params = %i[name other_names other_names_string group_name url_string notes]
     permitted_params << :is_active if CurrentUser.is_builder?
 
     params.fetch(:artist, {}).permit(permitted_params)
