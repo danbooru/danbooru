@@ -95,7 +95,7 @@ class SavedSearch < ApplicationRecord
           redis.sadd(redis_key, post_ids)
           redis.expire(redis_key, REDIS_EXPIRY)
         end
-      rescue
+      rescue Exception
         # swallow
       end
     end
