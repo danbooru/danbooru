@@ -1,10 +1,11 @@
 class ChangeOtherNamesToArrayOnArtists < ActiveRecord::Migration[5.2]
   def up
     Artist.without_timeout do
-      change_column :artists, :other_names, :text, null: false, default: ""
-      change_column_default :artists, :other_names, from: '', to: false
+      add_column :artists, :other_names_arr, "text[]", default: "{}"
+      execute "update artists set other_names_arr = array_remove(regexp_split_to_array(other_names, '\\s+'), '')"
       remove_index :artists, name: "index_artists_on_other_names_trgm"
-      change_column :artists, :other_names, "text[]", using: "array_remove(regexp_split_to_array(other_names, '\\s+'), '')", default: "{}"
+      remove_column :artists, :other_names
+      rename_column :artists, :other_names_arr, :other_names
       add_index :artists, :other_names, using: :gin
 
       remove_column :artists, :other_names_index
