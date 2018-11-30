@@ -43,6 +43,15 @@ module Sources
       end
     end
 
+    context "The source for a download-enabled DeviantArt artwork page" do
+      should "get the download image url" do
+        @site = Sources::Strategies.find("https://www.deviantart.com/len1/art/All-that-Glitters-II-774592781")
+
+        assert_equal(["http://origin-orig.deviantart.net/a713/f/2018/333/3/6/all_that_glitters_ii_by_len1-dct67m5.jpg"], @site.image_urls)
+        assert_equal(@site.image_url, @site.canonical_url)
+      end
+    end
+
     context "The source for a DeviantArt image url" do
       should "fetch the source data" do
         @site = Sources::Strategies.find("https://pre00.deviantart.net/b5e6/th/pre/f/2016/265/3/5/legend_of_galactic_heroes_by_hideyoshi-daihpha.jpg")
