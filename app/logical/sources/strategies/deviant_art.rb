@@ -18,6 +18,8 @@
 # * http://fc09.deviantart.net/fs22/o/2009/197/3/7/37ac79eaeef9fb32e6ae998e9a77d8dd.jpg
 # * http://pre06.deviantart.net/8497/th/pre/f/2009/173/c/c/cc9686111dcffffffb5fcfaf0cf069fb.jpg
 #
+# * https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg
+#
 # Page URLs:
 #
 # * https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408
@@ -41,7 +43,12 @@ module Sources
       ARTIST = %r{(?<artist>[a-z0-9_-]+?)}i
       DEVIATION_ID = %r{(?<deviation_id>[0-9]+)}i
 
-      ASSET = %r{\Ahttps?://#{ASSET_SUBDOMAINS}\.deviantart\.net/.+/#{TITLE}(?:_by_#{ARTIST}(?:-d(?<base36_deviation_id>\w+))?)?\.}i
+      DA_FILENAME  = %r{#{TITLE}(?:_by_#{ARTIST}(?:-d(?<base36_deviation_id>[a-z0-9]+))?)?\.}i
+      WIX_FILENAME = %r{#{TITLE}_by_#{ARTIST}_d(?<base36_deviation_id>[a-z0-9]+)-[a-z0-9]+\.}i
+
+      DA_ASSET = %r{\Ahttps?://#{ASSET_SUBDOMAINS}\.deviantart\.net/.+/#{DA_FILENAME}}i
+      WIX_ASSET = %r{\Ahttps?://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/.+/#{WIX_FILENAME}}i
+      ASSET = Regexp.union(DA_ASSET, WIX_ASSET)
 
       PATH_ART = %r{\Ahttps?://www\.deviantart\.com/#{ARTIST}/art/#{TITLE}-#{DEVIATION_ID}\z}i
       SUBDOMAIN_ART = %r{\Ahttps?://#{ARTIST}\.deviantart\.com/art/#{TITLE}-#{DEVIATION_ID}\z}i
@@ -55,6 +62,11 @@ module Sources
 
       def site_name
         "Deviant Art"
+      end
+
+      def match?
+        return false if parsed_url.nil?
+        parsed_url.domain.in?(domains) || parsed_url.host == "images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com"
       end
 
       def canonical_url
@@ -80,6 +92,7 @@ module Sources
         elsif api_deviation.present?
           src = api_deviation.dig(:content, :src)
           src = src.gsub(%r!\Ahttps?://orig\d+\.deviantart\.net!i, "http://origin-orig.deviantart.net")
+          src = src.gsub(%r!/v1/(fit|fill)/.*\z!i, "")
           [src]
         else
           raise "Couldn't find image url" # this should never happen
