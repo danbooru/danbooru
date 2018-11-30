@@ -286,6 +286,13 @@ module Sources
       end
       memoize :api_download
 
+      def api_response
+        {
+          deviation: api_deviation,
+          metadata: api_metadata,
+          download: api_download,
+        }
+      end
     end
   end
 end

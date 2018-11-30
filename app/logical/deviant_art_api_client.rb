@@ -55,12 +55,7 @@ class DeviantArtApiClient
     }
 
     body, code = HttpartyCache.get(url, **options)
-
-    if code == 200
-      return JSON.parse(Zlib.gunzip(body), symbolize_names: true)
-    end
-
-    raise "DeviantArtApiClient call failed (code=#{code}, url=#{url}, body=#{body})"
+     JSON.parse(Zlib.gunzip(body), symbolize_names: true)
   end
 
   def oauth

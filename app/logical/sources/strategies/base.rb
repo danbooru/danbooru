@@ -224,6 +224,11 @@ module Sources
       end
       memoize :related_posts
 
+      # A hash containing the results of any API calls made by the strategy. For debugging purposes only.
+      def api_response
+        nil
+      end
+
       def to_h
         return {
           :artist_name => artist_name,
@@ -242,7 +247,8 @@ module Sources
             :description => artist_commentary_desc,
             :dtext_title => dtext_artist_commentary_title,
             :dtext_description => dtext_artist_commentary_desc,
-          }
+          },
+          :api_response => api_response.to_h,
         }
       end
 
