@@ -3149,7 +3149,8 @@ CREATE TABLE public.user_feedback (
     category character varying NOT NULL,
     body text NOT NULL,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    creator_ip_addr inet
 );
 
 
@@ -7175,6 +7176,13 @@ CREATE INDEX index_user_feedback_on_creator_id ON public.user_feedback USING btr
 
 
 --
+-- Name: index_user_feedback_on_creator_ip_addr; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_feedback_on_creator_ip_addr ON public.user_feedback USING btree (creator_ip_addr);
+
+
+--
 -- Name: index_user_feedback_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7509,6 +7517,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20181113174914'),
 ('20181114180205'),
 ('20181114185032'),
-('20181114202744');
+('20181114202744'),
+('20181130004740');
 
 
