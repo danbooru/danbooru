@@ -50,7 +50,6 @@
     <ul>
       <li>The URL of the infringing post.</li>
       <li>Proof that you own the copyright.</li>
-      <li>An email address that will be provided to the person who uploaded the infringing post to facilitate communication.</li>
     </ul>
   </div>
 
@@ -62,16 +61,12 @@
   </div>
 
   <div class="section">
-    <h4>Recent Changes</h4>
+    <h4>Accounts</h4>
 
-    <ul>
-      <li><strong>2.105.0</strong>: Explicit provision about Western art; Limit restricted posts to 20 per day; Added rule about self-artwork</li>
-      <li><strong>2.89.0</strong>: You can now post up to two comments an hour</li>
-      <li><strong>2.89.0</strong>: You can now upload furry and grotesque art, but it will be subject to higher standards, and they must be tagged appropriately</li>
-      <li><strong>2.89.0</strong>: You can now upload watermarked, poorly compressed, and nude filter images, but they are discouraged and the original uncompressed artwork is preferred</li>
-    </ul>
+    <p>You may have alternative accounts for bots or scripts, but if there's any suspicion you either create a new account or reuse an existing one to evade a ban, then all your accounts will be banned. Bot accounts that flag posts or leave user feedback are not permitted and will be banned.</p>
+    <p>Account sharing is not permitted. If you are suspected of sharing an account, then it will be banned.</p>
   </div>
-  
+
   <%= form_tag(accept_terms_of_service_path) do %>
     <%= hidden_field_tag :url, params[:url] %>
     <%= submit_tag "I have read and agree to these rules" %>
