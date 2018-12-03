@@ -90,18 +90,25 @@
           </div>
         </div>
 
-        <div class="input">
-          <div>
+        <div class="input" id="tags-container">
+          <div class="header">
             <%= f.label :tag_string, "Tags" %>
-            <%= f.text_area :tag_string, :size => "60x5", :spellcheck => false, :"data-autocomplete" => "tag-edit", :"data-shortcut" => "e", :value => params[:tag_string] %>
-            <span id="open-edit-dialog" class="ui-icon ui-icon-arrow-1-ne" title="detach" style="display: none;" data-shortcut="shift+e"/>
+
+            <span class="options">
+              <i id="face" class="fas"></i>
+              <span class="count"></span>
+              <a href="#"><i id="open-edit-dialog" class="fas fa-arrows-alt" title="detach" data-shortcut="shift+e"></i></a>
+            </span>
           </div>
 
+          <div>
+            <%= f.text_area :tag_string, :size => "60x5", :spellcheck => false, :"data-autocomplete" => "tag-edit", :"data-shortcut" => "e", :value => params[:tag_string] %>
+          </div>
           <%= render "related_tags/buttons" %>
         </div>
 
         <div class="input">
-          <%= submit_tag "Submit", :id => "submit-button", :class => "large ui-button ui-widget ui-corner-all gradient", data: {disable_with: false} %>
+          <%= submit_tag "Submit", :id => "submit-button", :class => "large ui-button ui-widget ui-corner-all gradient", data: { disable_with: false } %>
         </div>
 
         <%= render "related_tags/container" %>
