@@ -1,24 +1,29 @@
+# Page URLs:
+#
+# * https://www.artstation.com/artwork/04XA4
+# * https://www.artstation.com/artwork/cody-from-sf
+# * https://sa-dui.artstation.com/projects/DVERn
+#
+# Profile URLs:
+#
+# * https://www.artstation.com/artist/sa-dui
+# * https://www.artstation.com/sa-dui
+# * https://sa-dui.artstation.com/
+#
+# Image URLs
+#
+# * https://cdna.artstation.com/p/assets/images/images/005/804/224/large/titapa-khemakavat-sa-dui-srevere.jpg?1493887236
+# * https://cdnb.artstation.com/p/assets/images/images/014/410/217/smaller_square/bart-osz-bartosz1812041.jpg?1543866276
+
 module Sources::Strategies
   class ArtStation < Base
-    PROJECT = %r!\Ahttps?://[a-z0-9-]+\.artstation\.com/(?:artwork|projects)/(?<project_id>[a-z0-9-]+)/?\z!i
+    PROJECT1 = %r!\Ahttps?://www\.artstation\.com/artwork/(?<project_id>[a-z0-9-]+)/?\z!i
+    PROJECT2 = %r!\Ahttps?://(?<artist_name>[a-z0-9-]+)\.artstation\.com/projects/(?<project_id>[a-z0-9-]+)/?\z!i
+    PROJECT = Regexp.union(PROJECT1, PROJECT2)
+
     ASSET = %r!\Ahttps?://cdn\w*\.artstation\.com/p/assets/images/images/\d+/\d+/\d+/(?:medium|small|large)/!i
-    PROFILE1 = %r!\Ahttps?://(\w+)\.artstation\.com!i
-    PROFILE2 = %r!\Ahttps?://www.artstation.com/artist/(\w+)!i
-    PROFILE3 = %r!\Ahttps?://www.artstation.com/(\w+)!i
-    PROFILE = %r!#{PROFILE2}|#{PROFILE3}|#{PROFILE1}!
 
     attr_reader :json, :image_urls
-
-    # https://www.artstation.com/artwork/04XA4
-    # https://www.artstation.com/artwork/cody-from-sf
-    # https://sa-dui.artstation.com/projects/DVERn
-    def self.project_id(url)
-      if url =~ PROJECT
-        $~[:project_id]
-      else
-        nil
-      end
-    end
 
     def domains
       ["artstation.com"]
@@ -35,62 +40,44 @@ module Sources::Strategies
     memoize :image_urls
 
     def page_url
-      [url, referer_url].each do |x|
-        if x =~ PROJECT
-          return "https://www.artstation.com/artwork/#{$~[:project_id]}"
-        end
-      end
+      return nil unless project_id.present?
 
-      return super
+      if artist_name.present?
+        "https://#{artist_name}.artstation.com/projects/#{project_id}"
+      else
+        "https://www.artstation.com/artwork/#{project_id}"
+      end
     end
 
     def profile_url
-      if url =~ PROFILE1 && $1 != "www"
-        return "https://www.artstation.com/#{$1}"
-      end
-
-      if url =~ PROFILE2
-        return "https://www.artstation.com/#{$1}"
-      end
-
-      if url =~ PROFILE3 && url !~ PROJECT
-        return url
-      end
-
-      api_json["user"]["permalink"]
+      return nil unless artist_name.present?
+      "https://www.artstation.com/#{artist_name}"
     end
 
     def artist_name
-      api_json["user"]["username"]
+      artist_name_from_url || api_response.dig(:user, :username)
     end
 
     def artist_commentary_title
-      api_json["title"]
+      api_response[:title]
     end
 
     def artist_commentary_desc
-      ActionView::Base.full_sanitizer.sanitize(api_json["description"])
+      api_response[:description]
     end
-    memoize :artist_commentary_desc
+
+    def dtext_artist_commentary_desc
+      ActionView::Base.full_sanitizer.sanitize(artist_commentary_desc)
+    end
 
     def tags
-      return nil if !api_json.has_key?("tags")
-
-      api_json["tags"].
-        map { |tag| [tag.downcase.tr(" ", "_"), tag_url(tag)]}
+      api_response[:tags].to_a.map do |tag|
+        [tag.downcase.tr(" ", "_"), "https://www.artstation.com/search?q=" + CGI.escape(tag)]
+      end
     end
-    memoize :tags
 
     def normalized_for_artist_finder?
-      url =~ PROFILE3 && url !~ PROFILE2 && url !~ PROJECT
-    end
-
-    def normalizable_for_artist_finder?
-      url =~ PROFILE || url =~ PROJECT
-    end
-
-    def normalize_for_artist_finder
-      profile_url
+      profile_url.present? && url == profile_url
     end
 
   public
@@ -100,39 +87,31 @@ module Sources::Strategies
         return [url]
       end
 
-      api_json["assets"]
-        .select { |asset| asset["asset_type"] == "image" }
-        .map { |asset| asset["image_url"] }
+      api_response[:assets].to_a
+        .select { |asset| asset[:asset_type] == "image" }
+        .map { |asset| asset[:image_url] }
     end
 
     # these are de facto private methods but are public for testing
     # purposes
 
+    def artist_name_from_url
+      urls.map { |url| url[PROJECT, :artist_name]  }.compact.first
+    end
+
     def project_id
-      self.class.project_id(url) || self.class.project_id(referer_url)
-    end
-    memoize :project_id
-
-    def api_url
-      "https://www.artstation.com/projects/#{project_id}.json"
+      urls.map { |url| url[PROJECT, :project_id]  }.compact.first
     end
 
-    def api_json
-      if project_id.nil?
-        raise ::Sources::Error.new("Project id could not be determined from (#{url}, #{referer_url})")
-      end
+    def api_response
+      return {} unless project_id.present?
 
-      resp = HTTParty.get(api_url, Danbooru.config.httparty_options)
+      resp, code = HttpartyCache.get("https://www.artstation.com/projects/#{project_id}.json")
+      return {} if code != 200
 
-      if resp.success?
-        json = JSON.parse(resp.body)
-      else
-        raise HTTParty::ResponseError.new(resp)
-      end
-
-      return json
+      JSON.parse(resp, symbolize_names: true)
     end
-    memoize :api_json
+    memoize :api_response
 
     # Returns the original representation of the asset, if it exists. Otherwise
     # return the url.
@@ -156,10 +135,5 @@ module Sources::Strategies
 
       return x
     end
-
-    def tag_url(name)
-      "https://www.artstation.com/search?q=" + CGI.escape(name)
-    end
-
   end
 end
