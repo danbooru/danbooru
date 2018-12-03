@@ -718,9 +718,9 @@ CREATE TABLE public.artist_versions (
     updater_id integer NOT NULL,
     updater_ip_addr inet NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
-    other_names text[] DEFAULT '{}'::text[],
-    group_name character varying,
-    urls text[] DEFAULT '{}'::text[],
+    other_names text[] DEFAULT '{}'::text[] NOT NULL,
+    group_name character varying DEFAULT ''::character varying NOT NULL,
+    urls text[] DEFAULT '{}'::text[] NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
@@ -756,8 +756,8 @@ CREATE TABLE public.artists (
     creator_id integer NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
-    other_names text[] DEFAULT '{}'::text[],
-    group_name character varying,
+    other_names text[] DEFAULT '{}'::text[] NOT NULL,
+    group_name character varying DEFAULT ''::character varying NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -3314,7 +3314,7 @@ CREATE TABLE public.wiki_page_versions (
     is_locked boolean NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    other_names text[] DEFAULT '{}'::text[],
+    other_names text[] DEFAULT '{}'::text[] NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL
 );
 
@@ -3352,7 +3352,7 @@ CREATE TABLE public.wiki_pages (
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     updater_id integer,
-    other_names text[] DEFAULT '{}'::text[],
+    other_names text[] DEFAULT '{}'::text[] NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL
 );
 
@@ -7518,6 +7518,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20181114180205'),
 ('20181114185032'),
 ('20181114202744'),
-('20181130004740');
+('20181130004740'),
+('20181202172145');
 
 
