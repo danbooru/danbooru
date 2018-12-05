@@ -81,6 +81,11 @@ module Sources
         end
       end
 
+      # XXX the base strategy excludes artist tags from the translated tags; we don't want that for moebooru.
+      def translated_tags
+        tags.map(&:first).flat_map(&method(:translate_tag)).uniq.sort
+      end
+
       def headers
         { "Referer" => "http://#{site_name}" }
       end
