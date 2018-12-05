@@ -731,9 +731,9 @@ class PostTest < ActiveSupport::TestCase
           end
         end
 
-        context "for a cosplay tag" do
+        context "for a wildcard implication" do
           setup do
-            @post = FactoryBot.create(:post, tag_string: "char:someone_(cosplay)")
+            @post = FactoryBot.create(:post, tag_string: "char:someone_(cosplay) test_school_uniform")
             @tags = @post.tag_array
           end
 
@@ -741,10 +741,15 @@ class PostTest < ActiveSupport::TestCase
             assert(@tags.include?("cosplay"))
           end
 
+          should "add the school_uniform tag" do
+            assert(@tags.include?("school_uniform"))
+          end
+
           should "create the tag" do
             assert(Tag.where(name: "someone_(cosplay)").exists?, "expected 'someone_(cosplay)' tag to be created")
             assert(Tag.where(name: "someone_(cosplay)", category: 4).exists?, "expected 'someone_(cosplay)' tag to be created as character")
             assert(Tag.where(name: "someone", category: 4).exists?, "expected 'someone' tag to be created")
+            assert(Tag.where(name: "school_uniform", category: 0).exists?, "expected 'school_uniform' tag to be created")
           end
 
           should "apply aliases when the character tag is added" do
