@@ -50,40 +50,6 @@ class ArtistVersion < ApplicationRecord
 
   extend SearchMethods
 
-  def urls_diff(version)
-    latest_urls = artist.url_array || []
-    new_urls = urls
-    old_urls = version.present? ? version.urls : []
-
-    added_urls = new_urls - old_urls
-    removed_urls = old_urls - new_urls
-
-    return {
-      :added_urls => added_urls,
-      :removed_urls => removed_urls,
-      :obsolete_added_urls => added_urls - latest_urls,
-      :obsolete_removed_urls => removed_urls & latest_urls,
-      :unchanged_urls => new_urls & old_urls,
-    }
-  end
-
-  def other_names_diff(version)
-    latest_names = artist.other_names || []
-    new_names = other_names
-    old_names = version.present? ? version.other_names : []
-
-    added_names = new_names - old_names
-    removed_names = old_names - new_names
-
-    return {
-      :added_names => added_names,
-      :removed_names => removed_names,
-      :obsolete_added_names => added_names - latest_names,
-      :obsolete_removed_names => removed_names & latest_names,
-      :unchanged_names => new_names & old_names,
-    }
-  end
-
   def previous
     ArtistVersion.where("artist_id = ? and created_at < ?", artist_id, created_at).order("created_at desc").first
   end

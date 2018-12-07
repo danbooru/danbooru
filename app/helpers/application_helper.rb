@@ -1,6 +1,11 @@
 require 'dtext'
 
 module ApplicationHelper
+  def diff_list_html(new, old, latest)
+    diff = SetDiff.new(new, old, latest)
+    render "diff_list", diff: diff
+  end
+
   def wordbreakify(string)
     lines = string.scan(/.{1,10}/)
     wordbreaked_string = lines.map{|str| h(str)}.join("<wbr>")
