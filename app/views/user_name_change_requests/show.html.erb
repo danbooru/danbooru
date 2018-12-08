@@ -8,9 +8,7 @@
           <th>Date</th>
           <td>
             <%= compact_time @change_request.created_at %>
-            <% if @change_request.updated_at - @change_request.created_at > 5.minutes %>
-              (updated <%= time_ago_in_words_tagged @change_request.updated_at %>)
-            <% end %>
+            <%= render "update_notice", record: @change_request %>
           </td>
         </tr>
         <tr>

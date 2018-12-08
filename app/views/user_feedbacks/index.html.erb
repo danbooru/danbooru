@@ -20,9 +20,7 @@
             <td><%= compact_time(feedback.created_at) %></td>
             <td>
               <%= format_text(feedback.body) %>
-              <% if feedback.updated_at > feedback.created_at %>
-                <p class="info">Updated <%= time_ago_in_words_tagged(feedback.updated_at) %></p>
-              <% end %>
+              <%= render "update_notice", record: feedback, interval: 0.minutes %>
             </td>
             <td>
               <% if feedback.editable_by?(CurrentUser.user) %>
