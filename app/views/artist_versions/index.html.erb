@@ -2,12 +2,7 @@
   <div id="a-index">
     <h1>Artist History</h1>
 
-    <% if params.dig(:search, :artist_id).present? %>
-      <%= render "revert_listing" %>
-    <% else %>
-      <%= render "standard_listing" %>
-    <% end %>
-
+    <%= render "standard_listing" %>
     <%= numbered_paginator(@artist_versions, :search_count => params[:search]) %>
   </div>
 </div>

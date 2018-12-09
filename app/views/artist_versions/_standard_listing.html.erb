@@ -1,17 +1,14 @@
-<div id="p-standard-listing">
+<div id="p-<%= artist_versions_listing_type %>-listing">
   <table width="100%" class="striped autofit">
     <thead>
       <tr>
-        <th width="10%">Name</th>
-        <th width="10%">Other Names</th>
-        <th>Group</th>
+        <th>Name</th>
+        <th>Other Names</th>
+        <th>URLs</th>
         <th>Updated</th>
-        <th>Updated by</th>
-        <% if CurrentUser.is_moderator? %>
-          <th>IP Address</th>
+        <% if artist_versions_listing_type == :revert %>
+          <th></th>
         <% end %>
-        <th>Active</th>
-        <th width="30%">URLs</th>
       </tr>
     </thead>
     <tbody>
@@ -21,26 +18,35 @@
             <td>
               <%= link_to artist_version.name, artist_path(artist_version.artist_id) %>
               <%= link_to "»", artist_versions_path(search: {artist_id: artist_version.artist_id}) %>
+
+              <% if !artist_version.is_active? %>
+                (deleted)
+              <% end %>
+
+              <% if artist_version.group_name.present? %>
+                <p>(group: <%= artist_version.group_name %>)</p>
+              <% end %>
             </td>
-            <td class="col-expand"><%= artist_version_other_names_diff(artist_version) %></td>
-            <td><%= artist_version.group_name %></td>
+            <td><%= artist_version_other_names_diff(artist_version) %></td>
           <% else %>
             <td></td>
             <td></td>
-            <td></td>
           <% end %>
-          <td><%= compact_time artist_version.created_at %></td>
-          <td><%= link_to_user artist_version.updater %></td>
-          <% if CurrentUser.is_moderator? %>
-            <td>
-              <%= link_to_ip artist_version.updater_ip_addr %>
-            </td>
-          <% end %>
-          <td><%= artist_version.is_active? %></td>
-          <% if artist_version.visible? %>
-            <td><%= artist_version_urls_diff(artist_version) %></td>
-          <% else %>
-            <td></td>
+          <td class="col-expand">
+            <%= artist_version_urls_diff(artist_version) if artist_version.visible? %>
+          </td>
+          <td>
+            <%= link_to_user artist_version.updater %>
+            <%= link_to "»", artist_versions_path(search: { updater_name: artist_version.updater_name }) %>
+            <p>
+              <%= compact_time(artist_version.updated_at) %>
+              <% if CurrentUser.is_moderator? %>
+                (<%= link_to_ip artist_version.updater_ip_addr %>)
+              <% end %>
+            </p>
+          </td>
+          <% if artist_versions_listing_type == :revert %>
+            <td><%= link_to "Revert to", revert_artist_path(artist_version.artist_id, version_id: artist_version.id), method: :put, "data-confirm": "Are you sure you want to revert to this version?" %></td>
           <% end %>
         </tr>
       <% end %>
