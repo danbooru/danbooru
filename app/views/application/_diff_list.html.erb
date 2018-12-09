@@ -1,0 +1,21 @@
+<%# diff %>
+
+<ul class="diff-list">
+  <% diff.added.each do |item| %>
+    <%= tag.li item, class: (item.in?(diff.obsolete_added) ? "obsolete added" : "added") %>
+  <% end %>
+
+  <% diff.removed.each do |item| %>
+    <%= tag.li item, class: (item.in?(diff.obsolete_removed) ? "obsolete removed" : "removed") %>
+  <% end %>
+
+  <% diff.changed.each do |old, new| %>
+    <%= tag.li class: "changed" do %>
+      <%= tag.span old, class: "removed" %>→ <%= tag.span new, class: "added" %>
+    <% end %>
+  <% end %>
+
+  <% diff.unchanged.each do |item| %>
+    <%= tag.li item, class: "unchanged" %>
+  <% end %>
+</ul>
