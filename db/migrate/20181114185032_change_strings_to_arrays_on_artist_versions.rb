@@ -1,7 +1,7 @@
 class ChangeStringsToArraysOnArtistVersions < ActiveRecord::Migration[5.2]
   def up
     ArtistVersion.without_timeout do
-      change_column_default :artist_versions, :other_names, from: '', to: false
+      change_column_default :artist_versions, :other_names, from: '', to: nil
       change_column :artist_versions, :other_names, "text[]", using: "array_remove(regexp_split_to_array(other_names, '\\s+'), '')", default: "{}"
 
       change_column :artist_versions, :url_string, "text[]", using: "array_remove(regexp_split_to_array(url_string, '\\s+'), '')", default: "{}"
