@@ -433,14 +433,10 @@ Autocomplete.static_metatags = {
 Autocomplete.static_metatag_source = function(term, resp, metatag) {
   var sub_metatags = this.static_metatags[metatag];
 
-  var regexp = new RegExp("^" + $.ui.autocomplete.escapeRegex(term), "i");
-  var matches = $.grep(sub_metatags, function (sub_metatag) {
-    return regexp.test(sub_metatag);
-  });
+  var matches = sub_metatags.filter(sub_metatag => sub_metatag.startsWith(term.toLowerCase()));
+  matches = matches.map(sub_metatag => `${metatag}:${sub_metatag}`).sort().slice(0, 10);
 
-  resp($.map(matches, function(sub_metatag) {
-    return metatag + ":" + sub_metatag;
-  }));
+  resp(matches);
 }
 
 Autocomplete.user_source = function(term, resp, metatag) {
