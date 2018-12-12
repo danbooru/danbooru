@@ -11,7 +11,7 @@ class PostAppeal < ApplicationRecord
 
   module SearchMethods
     def post_tags_match(query)
-      PostQueryBuilder.new(query).build(self.joins(:post))
+      where(post_id: PostQueryBuilder.new(query).build.reorder(""))
     end
 
     def resolved

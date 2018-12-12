@@ -1,8 +1,9 @@
 class PostQueryBuilder
-  attr_accessor :query_string
+  attr_accessor :query_string, :read_only
 
-  def initialize(query_string)
+  def initialize(query_string, read_only: false)
     @query_string = query_string
+    @read_only = read_only
   end
 
   def add_range_relation(arr, field, relation)
@@ -91,14 +92,12 @@ class PostQueryBuilder
     return CurrentUser.user.hide_deleted_posts?
   end
 
-  def build(relation = nil)
+  def build
     unless query_string.is_a?(Hash)
       q = Tag.parse_query(query_string)
     end
 
-    if relation.nil?
-      relation = Post.where("true")
-    end
+    relation = read_only ? PostReadOnly.all : Post.all
 
     if q[:tag_count].to_i > Danbooru.config.tag_query_limit
       raise ::Post::SearchError.new("You cannot search for more than #{Danbooru.config.tag_query_limit} tags at a time")

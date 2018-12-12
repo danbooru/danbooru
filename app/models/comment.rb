@@ -52,7 +52,7 @@ class Comment < ApplicationRecord
     end
 
     def post_tags_match(query)
-      PostQueryBuilder.new(query).build(self.joins(:post)).reorder("")
+      where(post_id: PostQueryBuilder.new(query).build.reorder(""))
     end
 
     def for_creator(user_id)

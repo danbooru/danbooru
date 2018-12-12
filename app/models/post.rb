@@ -1662,7 +1662,7 @@ class Post < ApplicationRecord
 
       if read_only
         begin
-          PostQueryBuilder.new(query).build(PostReadOnly.where("true"))
+          PostQueryBuilder.new(query, read_only: true).build
         rescue PG::ConnectionBad
           PostQueryBuilder.new(query).build
         end
