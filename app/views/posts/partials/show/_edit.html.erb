@@ -89,7 +89,7 @@
     </div>
 
     <div>
-      <%= f.text_area :tag_string, :size => "60x5", :spellcheck => false, :"data-autocomplete" => "tag-edit", :"data-shortcut" => "e", :value => params[:tag_string] %>
+      <%= f.text_area :tag_string, :size => "60x5", :spellcheck => false, :"data-autocomplete" => "tag-edit", :"data-shortcut" => "e", :value => post.presenter.split_tag_list_text + " " %>
     </div>
     <%= render "related_tags/buttons" %>
   </div>
