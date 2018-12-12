@@ -343,8 +343,11 @@ div#c-posts {
     }
 
     textarea {
-      width: 100%;
       margin-bottom: 0.25em;
+    }
+
+    #edit textarea {
+      width: 100%;
     }
 
     #favlist {

@@ -1,5 +1,6 @@
 import Uploads from './uploads';
 import Utility from './utility';
+import Post from './posts.js.erb';
 
 let RelatedTag = {};
 
@@ -121,6 +122,8 @@ RelatedTag.toggle_tag = function(e) {
   // The timeout is needed on Chrome since it will clobber the field attribute otherwise
   setTimeout(function () { $field.prop('selectionStart', $field.val().length);}, 100);
   e.preventDefault();
+
+  Post.update_tag_count({ target: $field });
 }
 
 RelatedTag.show = function(e) {

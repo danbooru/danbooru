@@ -41,7 +41,7 @@ Post.initialize_all = function() {
 
   var $fields_multiple = $('[data-autocomplete="tag-edit"]');
   $fields_multiple.on("keypress.danbooru", Post.update_tag_count);
-  Post.update_tag_count();
+  $fields_multiple.on("click", Post.update_tag_count);
 
   $(window).on('danbooru:initialize_saved_seraches', () => {
     Post.initialize_saved_searches();
@@ -421,7 +421,7 @@ Post.initialize_excerpt = function() {
 }
 
 Post.initialize_post_sections = function() {
-  $("#post-sections li a").on("click.danbooru", function(e) {
+  $("#post-sections li a,#side-edit-link").on("click.danbooru", function(e) {
     if (e.target.hash === "#comments") {
       $("#comments").show();
       $("#edit").hide();
@@ -432,6 +432,7 @@ Post.initialize_post_sections = function() {
       $("#post_tag_string").focus().selectEnd().height($("#post_tag_string")[0].scrollHeight);
       $("#recommended").hide();
       $(document).trigger("danbooru:open-post-edit-tab");
+      Post.update_tag_count({target: $("#post_tag_string")});
     } else if (e.target.hash === "#recommended") {
       $("#comments").hide();
       $("#edit").hide();
@@ -607,7 +608,7 @@ Post.update_tag_count = function(event) {
   let count = 0;
 
   if (event) {
-    let tags = $(event.target).val().match(/\S+/g);
+    let tags = [...new Set($(event.target).val().match(/\S+/g))];
     if (tags) {
       count = tags.length;
       string = (count == 1) ? (count + " tag") : (count + " tags")
