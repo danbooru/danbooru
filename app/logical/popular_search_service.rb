@@ -57,7 +57,9 @@ class PopularSearchService
 
   rescue => e
     Rails.logger.error(e.to_s)
-    NewRelic::Agent.notice_error(e)
+    if defined?(NewRelic)
+      NewRelic::Agent.notice_error(e)
+    end
     return []
   end
 end

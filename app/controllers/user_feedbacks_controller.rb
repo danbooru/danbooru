@@ -1,5 +1,6 @@
 class UserFeedbacksController < ApplicationController
   before_action :gold_only, :only => [:new, :edit, :create, :update, :destroy]
+  before_action :check_no_feedback, only: [:new, :edit, :create, :update, :destroy]
   respond_to :html, :xml, :json
 
   def new
@@ -51,6 +52,12 @@ class UserFeedbacksController < ApplicationController
 
   def check_privilege(user_feedback)
     raise User::PrivilegeError unless user_feedback.editable_by?(CurrentUser.user)
+  end
+
+  def check_no_feedback
+    if CurrentUser.no_feedback?
+      raise User::PrivilegeError
+    end
   end
 
   def user_feedback_params(context)

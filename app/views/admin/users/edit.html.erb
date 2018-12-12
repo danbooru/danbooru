@@ -20,6 +20,16 @@
         <%= select(:user, :can_approve_posts, [["Yes", true], ["No", false]]) %>
       </div>
 
+      <div class="input">
+        <label for="user_no_flagging" class="optional">Banned From Flagging</label>
+        <%= select(:user, :no_flagging, [["Yes", true], ["No", false]]) %>
+      </div>
+
+      <div class="input">
+        <label for="user_no_feedback" class="optional">Banned From Giving Feedback</label>
+        <%= select(:user, :no_feedback, [["Yes", true], ["No", false]]) %>
+      </div>
+
       <%= submit_tag "Update" %>
     <% end %>
   </div>

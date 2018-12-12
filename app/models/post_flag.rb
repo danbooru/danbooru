@@ -146,6 +146,10 @@ class PostFlag < ApplicationRecord
   def validate_creator_is_not_limited
     return if is_deletion
 
+    if creator.no_flagging?
+      errors[:creator] << "cannot flag posts"
+    end
+
     if creator_id != User.system.id && PostFlag.for_creator(creator_id).where("created_at > ?", 30.days.ago).count >= CREATION_THRESHOLD
       report = Reports::PostFlags.new(user_id: post.uploader_id, date_range: 90.days.ago)
 
