@@ -8,6 +8,10 @@ class Tag < ApplicationRecord
     pool_count deleted_pool_count active_pool_count series_pool_count collection_pool_count
     appeal_count approval_count replacement_count
   ]
+
+  # allow e.g. `deleted_comments` as a synonym for `deleted_comment_count`
+  COUNT_METATAG_SYNONYMS = COUNT_METATAGS.map { |str| str.delete_suffix("_count").pluralize }
+
   METATAGS = %w[
     -user user -approver approver commenter comm noter noteupdater artcomm
     -pool pool ordpool -favgroup favgroup -fav fav ordfav md5 -rating rating
@@ -15,7 +19,7 @@ class Tag < ApplicationRecord
     -source id -id date age order limit -status status tagcount parent -parent
     child pixiv_id pixiv search upvote downvote filetype -filetype flagger
     -flagger appealer -appealer disapproval -disapproval
-  ] + TagCategory.short_name_list.map {|x| "#{x}tags"} + COUNT_METATAGS
+  ] + TagCategory.short_name_list.map {|x| "#{x}tags"} + COUNT_METATAGS + COUNT_METATAG_SYNONYMS
 
   SUBQUERY_METATAGS = %w[commenter comm noter noteupdater artcomm flagger -flagger appealer -appealer]
 
@@ -764,7 +768,14 @@ class Tag < ApplicationRecord
             q[:child] = g2.downcase
 
           when "order"
-            q[:order] = g2.downcase
+            g2 = g2.downcase
+
+            order, suffix, _ = g2.partition(/_(asc|desc)\z/i)
+            if order.in?(COUNT_METATAG_SYNONYMS)
+              g2 = order.singularize + "_count" + suffix
+            end
+
+            q[:order] = g2
 
           when "limit"
             # Do nothing. The controller takes care of it.
@@ -799,6 +810,10 @@ class Tag < ApplicationRecord
             end
 
           when *COUNT_METATAGS
+            q[g1.to_sym] = parse_helper(g2)
+
+          when *COUNT_METATAG_SYNONYMS
+            g1 = "#{g1.singularize}_count"
             q[g1.to_sym] = parse_helper(g2)
 
           end
