@@ -23,6 +23,28 @@ class Tag < ApplicationRecord
 
   SUBQUERY_METATAGS = %w[commenter comm noter noteupdater artcomm flagger -flagger appealer -appealer]
 
+  ORDER_METATAGS = %w[
+    id id_desc
+    score score_asc
+    favcount favcount_asc
+    created_at created_at_asc
+    change change_asc
+    comment comment_asc
+    comment_bumped comment_bumped_asc
+    note note_asc
+    artcomm artcomm_asc
+    mpixels mpixels_asc
+    portrait landscape
+    filesize filesize_asc
+    tagcount tagcount_asc
+    rank
+    random
+    custom
+  ] +
+  COUNT_METATAGS +
+  COUNT_METATAG_SYNONYMS.flat_map { |str| [str, "#{str}_asc"] } +
+  TagCategory.short_name_list.flat_map { |str| ["#{str}tags", "#{str}tags_asc"] }
+
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :artist, :foreign_key => "name", :primary_key => "name"
   has_one :antecedent_alias, -> {active}, :class_name => "TagAlias", :foreign_key => "antecedent_name", :primary_key => "name"

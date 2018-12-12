@@ -5,6 +5,7 @@ let Autocomplete = {};
 
 Autocomplete.METATAGS = <%= Tag::METATAGS.to_json.html_safe %>;
 Autocomplete.TAG_CATEGORIES = <%= TagCategory.mapping.to_json.html_safe %>;
+Autocomplete.ORDER_METATAGS = <%= Tag::ORDER_METATAGS.to_json.html_safe %>;
 
 Autocomplete.TAG_PREFIXES = "-|~|" + Object.keys(Autocomplete.TAG_CATEGORIES).map(category => category + ":").join("|");
 Autocomplete.TAG_PREFIXES_REGEX = new RegExp("^(" + Autocomplete.TAG_PREFIXES + ")(.*)$", "i");
@@ -389,24 +390,7 @@ Autocomplete.render_item = function(list, item) {
 };
 
 Autocomplete.static_metatags = {
-  order: [
-    "id", "id_desc",
-    "score", "score_asc",
-    "favcount", "favcount_asc",
-    "created_at", "created_at_asc",
-    "change", "change_asc",
-    "comment", "comment_asc",
-    "comment_bumped", "comment_bumped_asc",
-    "note", "note_asc",
-    "artcomm", "artcomm_asc",
-    "mpixels", "mpixels_asc",
-    "portrait", "landscape",
-    "filesize", "filesize_asc",
-    "tagcount", "tagcount_asc",
-    "rank",
-    "random",
-    "custom"
-  ].concat(<%= TagCategory.short_name_list.map {|category| [category + "tags", category + "tags_asc"]}.flatten %>),
+  order: Autocomplete.ORDER_METATAGS,
   status: [
     "any", "deleted", "active", "pending", "flagged", "banned", "modqueue", "unmoderated"
   ],
