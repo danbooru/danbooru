@@ -44,10 +44,6 @@ article.post-preview {
   margin-top: 1em;
 }
 
-#open-edit-dialog {
-  padding: 0;
-}
-
 #edit-dialog textarea {
   margin-bottom: 0.25em;
 }
@@ -56,7 +52,6 @@ article.post-preview {
   img {
     border: 2px solid transparent;
   }
-
 
   &.post-status-has-children img {
     border-color: $preview_has_children_color;
@@ -348,6 +343,7 @@ div#c-posts {
     }
 
     textarea {
+      width: 100%;
       margin-bottom: 0.25em;
     }
 

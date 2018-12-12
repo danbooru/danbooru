@@ -1,8 +1,10 @@
 class ChangeDescendantNamesToArrayOnTagImplications < ActiveRecord::Migration[5.2]
   def up
     TagImplication.without_timeout do
-      change_column_default :tag_implications, :descendant_names, from: '', to: nil
-      change_column :tag_implications, :descendant_names, "text[]", using: "string_to_array(descendant_names, ' ')::text[]", default: "{}"
+      add_column :tag_implications, :descendant_names_array, "text[]", default: "{}"
+      execute "update tag_implications set descendant_names_array = string_to_array(descendant_names, ' ')::text[]"
+      remove_column :tag_implications, :descendant_names
+      rename_column :tag_implications, :descendant_names_array, :descendant_names
     end
   end
 

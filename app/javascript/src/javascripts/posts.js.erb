@@ -39,6 +39,10 @@ Post.initialize_all = function() {
     this.initialize_edit_dialog();
   }
 
+  var $fields_multiple = $('[data-autocomplete="tag-edit"]');
+  $fields_multiple.on("keypress.danbooru", Post.update_tag_count);
+  Post.update_tag_count();
+
   $(window).on('danbooru:initialize_saved_seraches', () => {
     Post.initialize_saved_searches();
   });
@@ -78,7 +82,7 @@ Post.initialize_gestures = function() {
 }
 
 Post.initialize_edit_dialog = function() {
-  $("#open-edit-dialog").button().show().on("click.danbooru", function(e) {
+  $("#open-edit-dialog").show().on("click.danbooru", function(e) {
     Post.open_edit_dialog();
     e.preventDefault();
   });
@@ -596,6 +600,27 @@ Post.initialize_saved_searches = function() {
 
     e.preventDefault();
   });
+}
+
+Post.update_tag_count = function(event) {
+  let string = "0 tags";
+  let count = 0;
+
+  if (event) {
+    let tags = $(event.target).val().match(/\S+/g);
+    if (tags) {
+      count = tags.length;
+      string = (count == 1) ? (count + " tag") : (count + " tags")
+    }
+  }
+  $("#tags-container .count").html(string);
+  let klass = "smile";
+  if (count < 25) {
+    klass = "frown";
+  } else if (count < 35) {
+    klass = "meh";
+  }
+  $("#tags-container .options #face").removeClass().addClass(`far fa-${klass}`);
 }
 
 $(document).ready(function() {

@@ -75,16 +75,25 @@
     <div class="input" id="iqdb-similar" style="display: none;"></div>
   <% end %>
 
-  <div class="input">
-    <div>
+
+
+  <div class="input" id="tags-container">
+    <div class="header">
       <%= f.label :tag_string, "Tags" %>
-      <%= f.text_area :tag_string, :size => "50x5", :value => post.presenter.split_tag_list_text + " ", :data => { :autocomplete => "tag-edit" } %>
-      <span id="open-edit-dialog" class="ui-icon ui-icon-arrow-1-ne" title="detach" style="display: none;" data-shortcut="shift+e"/>
+
+      <span class="options">
+        <i id="face" class="fas"></i>
+        <span class="count"></span>
+        <a href="#"><i id="open-edit-dialog" class="fas fa-arrows-alt" title="detach" data-shortcut="shift+e"></i></a>
+      </span>
     </div>
 
+    <div>
+      <%= f.text_area :tag_string, :size => "60x5", :spellcheck => false, :"data-autocomplete" => "tag-edit", :"data-shortcut" => "e", :value => params[:tag_string] %>
+    </div>
     <%= render "related_tags/buttons" %>
   </div>
-
+  
   <div class="input">
     <%= submit_tag "Submit", :class => "ui-button ui-widget ui-corner-all" %>
   </div>

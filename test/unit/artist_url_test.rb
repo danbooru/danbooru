@@ -65,7 +65,6 @@ class ArtistUrlTest < ActiveSupport::TestCase
       setup do
         @urls = [
           FactoryBot.create(:artist_url, url: "https://www.artstation.com/koyorin"),
-          FactoryBot.create(:artist_url, url: "https://www.artstation.com/artist/koyorin"),
           FactoryBot.create(:artist_url, url: "https://koyorin.artstation.com"),
           FactoryBot.create(:artist_url, url: "https://www.artstation.com/artwork/04XA4")
         ]
@@ -74,8 +73,7 @@ class ArtistUrlTest < ActiveSupport::TestCase
       should "normalize" do
         assert_equal("http://www.artstation.com/koyorin/", @urls[0].normalized_url)
         assert_equal("http://www.artstation.com/koyorin/", @urls[1].normalized_url)
-        assert_equal("http://www.artstation.com/koyorin/", @urls[2].normalized_url)
-        assert_equal("http://www.artstation.com/jeyrain/", @urls[3].normalized_url)
+        assert_equal("http://www.artstation.com/jeyrain/", @urls[2].normalized_url)
       end
     end
 
