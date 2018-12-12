@@ -101,6 +101,9 @@ class UserFeedback < ApplicationRecord
     if !creator.is_gold?
       errors[:creator] << "must be gold"
       return false
+    elsif creator.no_feedback?
+      errors[:creator] << "cannot submit feedback"
+      return false
     else
       return true
     end

@@ -61,6 +61,8 @@ class User < ApplicationRecord
     disable_post_tooltips
     enable_recommended_posts
     opt_out_mixpanel
+    no_flagging
+    no_feedback
   )
 
   include Danbooru::HasBitFlags

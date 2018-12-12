@@ -167,5 +167,22 @@ class PostFlagTest < ActiveSupport::TestCase
         end
       end
     end
+
+    context "a user with no_flag=true" do
+      setup do
+        travel_to(2.weeks.ago) do
+          @bob = create(:user, no_flagging: true)
+        end
+      end
+
+      should "not be able to flag more than 1 post in 24 hours" do
+        @post_flag = PostFlag.new(post: @post, reason: "aaa", is_resolved: false)
+        @post_flag.expects(:flag_count_for_creator).returns(1)
+        assert_difference("PostFlag.count", 0) do
+          as(@bob) { @post_flag.save }
+        end
+        assert_equal(["You cannot flag posts"], @post_flag.errors.full_messages.grep(/cannot flag posts/))
+      end
+    end
   end
 end
