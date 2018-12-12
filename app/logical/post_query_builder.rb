@@ -85,6 +85,28 @@ class PostQueryBuilder
     relation
   end
 
+  def table_for_metatag(metatag)
+    if metatag.in?(Tag::COUNT_METATAGS)
+      metatag[/(?<table>[a-z]+)_count\z/i, :table]
+    else
+      nil
+    end
+  end
+
+  def tables_for_query(q)
+    metatags = q.keys
+    metatags << q[:order].remove(/_(asc|desc)\z/i) if q[:order].present?
+
+    tables = metatags.map { |metatag| table_for_metatag(metatag.to_s) }
+    tables.compact.uniq
+  end
+
+  def add_joins(q, relation)
+    tables = tables_for_query(q)
+    relation = relation.with_stats(tables)
+    relation
+  end
+
   def hide_deleted_posts?(q)
     return false if CurrentUser.admin_mode?
     return false if q[:status].in?(%w[deleted active any all])
@@ -107,6 +129,7 @@ class PostQueryBuilder
       relation = relation.where("posts.rating = 's'")
     end
 
+    relation = add_joins(q, relation)
     relation = add_range_relation(q[:post_id], "posts.id", relation)
     relation = add_range_relation(q[:mpixels], "posts.image_width * posts.image_height / 1000000.0", relation)
     relation = add_range_relation(q[:ratio], "ROUND(1.0 * posts.image_width / GREATEST(1, posts.image_height), 2)", relation)
@@ -121,6 +144,10 @@ class PostQueryBuilder
       relation = add_range_relation(q["#{category}_tag_count".to_sym], "posts.tag_count_#{category}", relation)
     end
     relation = add_range_relation(q[:post_tag_count], "posts.tag_count", relation)
+
+    Tag::COUNT_METATAGS.each do |column|
+      relation = add_range_relation(q[column.to_sym], "posts.#{column}", relation)
+    end
 
     if q[:md5]
       relation = relation.where("posts.md5": q[:md5])
@@ -543,6 +570,11 @@ class PostQueryBuilder
 
     when "filesize_asc"
       relation = relation.order("posts.file_size ASC")
+
+    when /\A(?<column>#{Tag::COUNT_METATAGS.join("|")})(_(?<direction>asc|desc))?\z/i
+      column = $~[:column]
+      direction = $~[:direction] || "desc"
+      relation = relation.order(column => direction, :id => direction)
 
     when "tagcount", "tagcount_desc"
       relation = relation.order("posts.tag_count DESC")

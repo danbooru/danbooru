@@ -1,5 +1,9 @@
 class Tag < ApplicationRecord
   COSINE_SIMILARITY_RELATED_TAG_THRESHOLD = 300
+  COUNT_METATAGS = %w[
+    comment_count deleted_comment_count active_comment_count
+    note_count deleted_note_count active_note_count
+  ]
   METATAGS = %w[
     -user user -approver approver commenter comm noter noteupdater artcomm
     -pool pool ordpool -favgroup favgroup -fav fav ordfav md5 -rating rating
@@ -7,7 +11,7 @@ class Tag < ApplicationRecord
     -source id -id date age order limit -status status tagcount parent -parent
     child pixiv_id pixiv search upvote downvote filetype -filetype flagger
     -flagger appealer -appealer disapproval -disapproval
-  ] + TagCategory.short_name_list.map {|x| "#{x}tags"}
+  ] + TagCategory.short_name_list.map {|x| "#{x}tags"} + COUNT_METATAGS
 
   SUBQUERY_METATAGS = %w[commenter comm noter noteupdater artcomm flagger -flagger appealer -appealer]
 
@@ -789,6 +793,9 @@ class Tag < ApplicationRecord
             if CurrentUser.user.is_moderator?
               q[:downvote] = User.name_to_id(g2)
             end
+
+          when *COUNT_METATAGS
+            q[g1.to_sym] = parse_helper(g2)
 
           end
 

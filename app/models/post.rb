@@ -1609,6 +1609,33 @@ class Post < ApplicationRecord
       joins("CROSS JOIN unnest(string_to_array(tag_string, ' ')) AS tag")
     end
 
+    def with_comment_stats
+      relation = left_outer_joins(:comments).group(:id).select("posts.*")
+      relation = relation.select("COUNT(comments.id) AS comment_count")
+      relation = relation.select("COUNT(comments.id) FILTER (WHERE comments.is_deleted = TRUE)  AS deleted_comment_count")
+      relation = relation.select("COUNT(comments.id) FILTER (WHERE comments.is_deleted = FALSE) AS active_comment_count")
+      relation
+    end
+
+    def with_note_stats
+      relation = left_outer_joins(:notes).group(:id).select("posts.*")
+      relation = relation.select("COUNT(notes.id) AS note_count")
+      relation = relation.select("COUNT(notes.id) FILTER (WHERE notes.is_active = TRUE)  AS active_note_count")
+      relation = relation.select("COUNT(notes.id) FILTER (WHERE notes.is_active = FALSE) AS deleted_note_count")
+      relation
+    end
+
+    def with_stats(tables)
+      return all if tables.empty?
+
+      relation = all
+      tables.each do |table|
+        relation = relation.send("with_#{table}_stats")
+      end
+
+      from(relation.arel.as("posts"))
+    end
+
     def pending
       where(is_pending: true)
     end
