@@ -1625,6 +1625,52 @@ class Post < ApplicationRecord
       relation
     end
 
+    def with_flag_stats
+      relation = left_outer_joins(:flags).group(:id).select("posts.*")
+      relation = relation.select("COUNT(post_flags.id) AS flag_count")
+      relation = relation.select("COUNT(post_flags.id) FILTER (WHERE post_flags.is_resolved = TRUE)  AS resolved_flag_count")
+      relation = relation.select("COUNT(post_flags.id) FILTER (WHERE post_flags.is_resolved = FALSE) AS unresolved_flag_count")
+      relation
+    end
+
+    def with_appeal_stats
+      relation = left_outer_joins(:appeals).group(:id).select("posts.*")
+      relation = relation.select("COUNT(post_appeals.id) AS appeal_count")
+      relation
+    end
+
+    def with_approval_stats
+      relation = left_outer_joins(:approvals).group(:id).select("posts.*")
+      relation = relation.select("COUNT(post_approvals.id) AS approval_count")
+      relation
+    end
+
+    def with_replacement_stats
+      relation = left_outer_joins(:replacements).group(:id).select("posts.*")
+      relation = relation.select("COUNT(post_replacements.id) AS replacement_count")
+      relation
+    end
+
+    def with_child_stats
+      relation = left_outer_joins(:children).group(:id).select("posts.*")
+      relation = relation.select("COUNT(children_posts.id) AS child_count")
+      relation = relation.select("COUNT(children_posts.id) FILTER (WHERE children_posts.is_deleted = TRUE)  AS deleted_child_count")
+      relation = relation.select("COUNT(children_posts.id) FILTER (WHERE children_posts.is_deleted = FALSE) AS active_child_count")
+      relation
+    end
+
+    def with_pool_stats
+      pool_posts = Pool.joins("CROSS JOIN unnest(post_ids) AS post_id").select(:id, :is_deleted, :category, "post_id")
+      relation = joins("LEFT OUTER JOIN (#{pool_posts.to_sql}) pools ON pools.post_id = posts.id").group(:id).select("posts.*")
+
+      relation = relation.select("COUNT(pools.id) AS pool_count")
+      relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.is_deleted = TRUE) AS deleted_pool_count")
+      relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.is_deleted = FALSE) AS active_pool_count")
+      relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.category = 'series') AS series_pool_count")
+      relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.category = 'collection') AS collection_pool_count")
+      relation
+    end
+
     def with_stats(tables)
       return all if tables.empty?
 
