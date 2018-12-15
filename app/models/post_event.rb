@@ -61,4 +61,11 @@ class PostEvent
       "type": nil,
     }
   end
+
+  # XXX can't use hidden_attributes because we don't inherit from ApplicationRecord.
+  def serializable_hash(**options)
+    hash = super
+    hash = hash.except(:creator_id) unless is_creator_visible?
+    hash
+  end
 end
