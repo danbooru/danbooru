@@ -113,9 +113,10 @@ class UploadService
       post.image_width = upload.image_width
       post.image_height = upload.image_height
       post.file_size = upload.file_size
-      post.source = replacement.replacement_url
+      post.source = replacement.final_source.presence || replacement.replacement_url
       post.tag_string = upload.tag_string
 
+      rescale_notes(post)
       update_ugoira_frame_data(post, upload)
 
       if md5_changed
@@ -124,24 +125,17 @@ class UploadService
         end
       end
 
-      if replacement.final_source.present?
-        post.update(source: replacement.final_source)
-      end
-
       replacement.save!
       post.save!
 
       post.update_iqdb_async
-
-      rescale_notes(post)
     end
 
     def rescale_notes(post)
-      x_scale = post.image_width.to_f  / post.image_width_before_last_save.to_f
-      y_scale = post.image_height.to_f / post.image_height_before_last_save.to_f
+      x_scale = post.image_width.to_f  / post.image_width_was.to_f
+      y_scale = post.image_height.to_f / post.image_height_was.to_f
 
       post.notes.each do |note|
-        note.reload
         note.rescale!(x_scale, y_scale)
       end
     end

@@ -956,14 +956,16 @@ class UploadServiceTest < ActiveSupport::TestCase
             assert_difference(-> { @note.versions.count }) do
               # replacement image is 80x82, so we're downscaling by 50% (160x164 -> 80x82).
               as_user do
-                @post.replace!(replacement_url: "https://upload.wikimedia.org/wikipedia/commons/c/c5/Moraine_Lake_17092005.jpg")
+                @post.replace!(
+                  replacement_url: "https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png",
+                  final_source: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350"
+                )
               end
               @note.reload
             end
 
-            assert_equal([1024, 768, 1024, 768], [@note.x, @note.y, @note.width, @note.height])
-          rescue Net::OpenTimeout
-            skip "Remote connection to Pixiv failed"
+            assert_equal([40, 41, 40, 41], [@note.x, @note.y, @note.width, @note.height])
+            assert_equal("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350", @post.source)
           end
         end
       end
