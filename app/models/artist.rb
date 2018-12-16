@@ -490,6 +490,14 @@ class Artist < ApplicationRecord
       end
     end
 
+    def any_name_or_url_matches(query)
+      if query =~ %r!\Ahttps?://!i
+        url_matches(query)
+      else
+        any_name_matches(query)
+      end
+    end
+
     def search(params)
       q = super
 
@@ -502,6 +510,10 @@ class Artist < ApplicationRecord
 
       if params[:any_name_matches].present?
         q = q.any_name_matches(params[:any_name_matches])
+      end
+
+      if params[:any_name_or_url_matches].present?
+        q = q.any_name_or_url_matches(params[:any_name_or_url_matches])
       end
 
       if params[:url_matches].present?
