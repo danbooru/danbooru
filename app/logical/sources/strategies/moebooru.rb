@@ -77,7 +77,7 @@ module Sources
 
       def tags
         api_response[:tags].to_s.split.map do |tag|
-          [tag.tr("_", " "), "https://#{site_name}/post?tags=#{CGI.escape(tag)}"]
+          [tag, "https://#{site_name}/post?tags=#{CGI.escape(tag)}"]
         end
       end
 

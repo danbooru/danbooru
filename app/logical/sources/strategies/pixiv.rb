@@ -160,14 +160,16 @@ module Sources
       rescue PixivApiClient::BadIDError
         []
       end
-      memoize :tags
+
+      def normalize_tag(tag)
+        tag.gsub(/\d+users入り\z/i, "")
+      end
 
       def translate_tag(tag)
-        normalized_tag = tag.gsub(/\d+users入り\z/i, "")
-        translated_tags = super(normalized_tag)
+        translated_tags = super(tag)
 
-        if translated_tags.empty? && normalized_tag.include?("/")
-          translated_tags = normalized_tag.split("/").flat_map { |tag| super(tag) }
+        if translated_tags.empty? && tag.include?("/")
+          translated_tags = tag.split("/").flat_map { |tag| super(tag) }
         end
 
         translated_tags

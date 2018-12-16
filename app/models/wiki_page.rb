@@ -32,7 +32,9 @@ class WikiPage < ApplicationRecord
     end
 
     def other_names_include(name)
-      where("wiki_pages.other_names @> ARRAY[?]", name.unicode_normalize(:nfkc))
+      name = normalize_other_name(name).downcase
+      subquery = WikiPage.from("unnest(other_names) AS other_name").where("lower(other_name) = ?", name)
+      where(id: subquery)
     end
 
     def other_names_match(name)
@@ -146,7 +148,11 @@ class WikiPage < ApplicationRecord
   end
 
   def normalize_other_names
-    self.other_names = other_names.map { |name| name.unicode_normalize(:nfkc) }.uniq
+    self.other_names = other_names.map { |name| WikiPage.normalize_other_name(name) }.uniq
+  end
+
+  def self.normalize_other_name(name)
+    name.unicode_normalize(:nfkc).gsub(/[[:space:]]+/, " ").strip.tr(" ", "_")
   end
 
   def skip_secondary_validations=(value)

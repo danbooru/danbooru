@@ -34,7 +34,7 @@ module Sources
           @samp = "https://files.yande.re/sample/7ecfdead705d7b956b26b1d37b98d089/yande.re%20482880%20sample%20bayashiko%20journey_to_the_west%20sun_wukong.jpg"
           @full = "https://files.yande.re/image/7ecfdead705d7b956b26b1d37b98d089/yande.re%20482880.jpg"
           @page = "https://yande.re/post/show/482880"
-          @tags = ["bayashiko", "journey to the west", "sun wukong"]
+          @tags = ["bayashiko", "journey_to_the_west", "sun_wukong"]
           @size = 362_554
           @profile_url = "https://twitter.com/apononori"
           @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: @profile_url }
@@ -52,7 +52,7 @@ module Sources
           @jpeg = "https://files.yande.re/sample/fb27a7ea6c48b2ef76fe915e378b9098/yande.re%20398018%20detexted%20misaki_kurehito%20saenai_heroine_no_sodatekata%20sawamura_spencer_eriri%20thighhighs.jpg"
           @full = "https://files.yande.re/image/fb27a7ea6c48b2ef76fe915e378b9098/yande.re%20398018.png"
           @page = "https://yande.re/post/show/398018"
-          @tags = ["misaki kurehito", "saenai heroine no sodatekata", "sawamura spencer eriri", "detexted", "thighhighs"]
+          @tags = ["misaki_kurehito", "saenai_heroine_no_sodatekata", "sawamura_spencer_eriri", "detexted", "thighhighs"]
           @size = 9_118_998
           @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: nil }
 
@@ -93,7 +93,7 @@ module Sources
             anthropomorphism bed blonde_hair bow brown_eyes doll
             girls_frontline hara_shoutarou hoodie long_hair pantyhose scar skirt
             twintails ump-45_(girls_frontline) ump-9_(girls_frontline)
-          ].map { |tag| tag.tr("_", " ") }
+          ]
           @profile_url = "https://www.pixiv.net/member.php?id=22528152"
 
           @data = { site_name: "konachan.com", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: @profile_url }

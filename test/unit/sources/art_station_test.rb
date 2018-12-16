@@ -56,7 +56,8 @@ module Sources
       end
 
       should "get the tags" do
-        assert_equal(%w[gantz reika], @site.tags.map(&:first))
+        assert_equal(%w[gantz Reika], @site.tags.map(&:first))
+        assert_equal(%w[gantz reika], @site.normalized_tags)
       end
 
       should "get the artist commentary" do
@@ -73,6 +74,11 @@ module Sources
       should "get the image url" do
         url = "https://cdna.artstation.com/p/assets/images/images/000/144/922/large/cassio-yoshiyaki-cody2backup2-yoshiyaki.jpg?1406314198"
         assert_equal(url, @site.image_url)
+      end
+
+      should "get the tags" do
+        assert_equal(["Street Fighter", "Cody", "SF"].sort, @site.tags.map(&:first).sort)
+        assert_equal(["street_fighter", "cody", "sf"].sort, @site.normalized_tags.sort)
       end
     end
 

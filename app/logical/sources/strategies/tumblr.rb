@@ -105,10 +105,13 @@ module Sources::Strategies
 
     def tags
       post[:tags].to_a.map do |tag|
-        # normalize tags: space, underscore, and hyphen are equivalent in tumblr tags.
-        etag = tag.gsub(/[ _-]/, "_")
-        [etag, "https://tumblr.com/tagged/#{CGI.escape(etag)}"]
+        [tag, "https://tumblr.com/tagged/#{CGI.escape(tag)}"]
       end.uniq
+    end
+
+    def normalize_tag(tag)
+      tag = tag.tr("-", "_")
+      super(tag)
     end
 
     def dtext_artist_commentary_desc

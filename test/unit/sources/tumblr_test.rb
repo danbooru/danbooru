@@ -20,8 +20,9 @@ module Sources
       end
 
       should "get the tags" do
-        tags = [["tag", "https://tumblr.com/tagged/tag"], ["red_hair", "https://tumblr.com/tagged/red_hair"]]
-        assert_equal(tags, @site.tags)
+        tags = ["tag", "red hair", "red-hair", "red_hair"]
+        assert_equal(tags, @site.tags.map(&:first))
+        assert_equal(["red_hair", "tag"], @site.normalized_tags)
       end
 
       should "get the commentary" do
@@ -100,8 +101,9 @@ module Sources
       end
 
       should "get the tags" do
-        tags = [["tag", "https://tumblr.com/tagged/tag"], ["red_hair", "https://tumblr.com/tagged/red_hair"]]
-        assert_equal(tags, @site.tags)
+        tags = ["tag", "red hair", "red-hair", "red_hair"]
+        assert_equal(tags, @site.tags.map(&:first))
+        assert_equal(["red_hair", "tag"], @site.normalized_tags)
       end
     end
 

@@ -72,7 +72,7 @@ module Sources::Strategies
 
     def tags
       api_response[:tags].to_a.map do |tag|
-        [tag.downcase.tr(" ", "_"), "https://www.artstation.com/search?q=" + CGI.escape(tag)]
+        [tag, "https://www.artstation.com/search?q=" + CGI.escape(tag)]
       end
     end
 

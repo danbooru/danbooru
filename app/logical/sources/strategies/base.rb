@@ -178,8 +178,16 @@ module Sources
         (@tags || []).uniq
       end
 
+      def normalized_tags
+        tags.map { |tag, url| normalize_tag(tag) }.sort.uniq
+      end
+
+      def normalize_tag(tag)
+        WikiPage.normalize_other_name(tag).downcase
+      end
+
       def translated_tags
-        translated_tags = tags.map(&:first).flat_map(&method(:translate_tag)).uniq.sort
+        translated_tags = normalized_tags.flat_map(&method(:translate_tag)).uniq.sort
         translated_tags.reject { |tag| tag.category == Tag.categories.artist }
       end
 
@@ -240,6 +248,7 @@ module Sources
           :canonical_url => canonical_url,
           :normalized_for_artist_finder_url => normalize_for_artist_finder,
           :tags => tags,
+          :normalized_tags => normalized_tags,
           :translated_tags => translated_tags,
           :unique_id => unique_id,
           :artist_commentary => {
