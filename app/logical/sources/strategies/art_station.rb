@@ -20,6 +20,10 @@ module Sources::Strategies
     PROJECT1 = %r!\Ahttps?://www\.artstation\.com/artwork/(?<project_id>[a-z0-9-]+)/?\z!i
     PROJECT2 = %r!\Ahttps?://(?<artist_name>[a-z0-9-]+)\.artstation\.com/projects/(?<project_id>[a-z0-9-]+)/?\z!i
     PROJECT = Regexp.union(PROJECT1, PROJECT2)
+    ARTIST1 = %r!\Ahttps?://(?<artist_name>[a-z0-9-]+)\.artstation\.com!
+    ARTIST2 = %r!\Ahttps?://www\.artstation\.com/artist/(?<artist_name>[a-z0-9-]+)!
+    ARTIST3 = %r!\Ahttps?://www\.artstation\.com/(?<artist_name>[a-z0-9-]+)!
+    ARTIST = Regexp.union(ARTIST1, ARTIST2, ARTIST3)
 
     ASSET = %r!\Ahttps?://cdn\w*\.artstation\.com/p/assets/images/images/\d+/\d+/\d+/(?:medium|small|large)/!i
 
@@ -96,7 +100,8 @@ module Sources::Strategies
     # purposes
 
     def artist_name_from_url
-      urls.map { |url| url[PROJECT, :artist_name]  }.compact.first
+      urls.map { |url| url[PROJECT, :artist_name]  }.compact.first ||
+        (urls.map { |url| url[ARTIST, :artist_name] }.compact - ["www"]).first
     end
 
     def project_id
