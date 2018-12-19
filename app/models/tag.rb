@@ -21,7 +21,8 @@ class Tag < ApplicationRecord
   validates :name, uniqueness: true, tag_name: true, on: :create
   validates_inclusion_of :category, in: TagCategory.category_ids
 
-  after_save :update_category_cache, if: ->(rec) { rec.saved_change_to_attribute?(:category)}
+  before_save :update_category_cache, if: :category_changed?
+  before_save :update_category_post_counts, if: :category_changed?
 
   module ApiMethods
     def to_legacy_json

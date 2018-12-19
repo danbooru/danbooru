@@ -208,6 +208,17 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(0, tag.reload.category)
     end
 
+    should "update post tag counts when the category is changed" do
+      post = FactoryBot.create(:post, tag_string: "test")
+      assert_equal(1, post.tag_count_general)
+      assert_equal(0, post.tag_count_character)
+
+      tag = Tag.find_or_create_by_name("char:test")
+      post.reload
+      assert_equal(0, post.tag_count_general)
+      assert_equal(1, post.tag_count_character)
+    end
+
     should "be created when one doesn't exist" do
       assert_difference("Tag.count", 1) do
         tag = Tag.find_or_create_by_name("hoge")
