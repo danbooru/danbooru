@@ -54,6 +54,6 @@ class UserUpgradesController < ApplicationController
       flash[:error] = e.message
     end
 
-    redirect_to user_upgrade_path
+    redirect_to user_upgrade_path(user_id: params[:user_id])
   end
 end
