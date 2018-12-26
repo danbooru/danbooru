@@ -77,7 +77,7 @@ class TagImplication < TagRelationship
   module ValidationMethods
     def absence_of_circular_relation
       # We don't want a -> b && b -> a chains
-      if TagImplication.active.exists?(["antecedent_name = ? and consequent_name = ?", consequent_name, antecedent_name])
+      if descendants.include?(antecedent_name)
         errors[:base] << "Tag implication can not create a circular relation with another tag implication"
       end
     end

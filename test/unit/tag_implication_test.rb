@@ -80,10 +80,13 @@ class TagImplicationTest < ActiveSupport::TestCase
 
     should "not validate when a circular relation is created" do
       ti1 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
-      ti2 = FactoryBot.build(:tag_implication, :antecedent_name => "bbb", :consequent_name => "aaa")
-      ti2.save
-      assert(ti2.errors.any?, "Tag implication should not have validated.")
-      assert_equal("Tag implication can not create a circular relation with another tag implication", ti2.errors.full_messages.join(""))
+      ti2 = FactoryBot.create(:tag_implication, :antecedent_name => "bbb", :consequent_name => "ccc")
+      ti3 = FactoryBot.build(:tag_implication, :antecedent_name => "bbb", :consequent_name => "aaa")
+
+      assert(ti1.valid?)
+      assert(ti2.valid?)
+      refute(ti3.valid?)
+      assert_equal("Tag implication can not create a circular relation with another tag implication", ti3.errors.full_messages.join(""))
     end
 
     should "not validate when a transitive relation is created" do
