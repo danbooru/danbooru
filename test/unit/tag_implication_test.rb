@@ -64,6 +64,13 @@ class TagImplicationTest < ActiveSupport::TestCase
       assert_equal(CurrentUser.user.id, ti.creator_id)
     end
 
+    should "ensure both tags exist" do
+      FactoryBot.create(:tag_implication, antecedent_name: "a", consequent_name: "b")
+
+      assert(Tag.exists?(name: "a"))
+      assert(Tag.exists?(name: "b"))
+    end
+
     should "not validate when a tag directly implicates itself" do
       ti = FactoryBot.build(:tag_implication, antecedent_name: "a", consequent_name: "a")
 

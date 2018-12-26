@@ -1,5 +1,4 @@
 class TagAlias < TagRelationship
-  before_save :ensure_tags_exist
   after_save :clear_all_cache
   after_destroy :clear_all_cache
   after_save :clear_all_cache, if: ->(rec) {rec.is_retired?}
@@ -143,11 +142,6 @@ class TagAlias < TagRelationship
         ti.destroy
       end
     end
-  end
-
-  def ensure_tags_exist
-    Tag.find_or_create_by_name(antecedent_name)
-    Tag.find_or_create_by_name(consequent_name)
   end
 
   def ensure_category_consistency

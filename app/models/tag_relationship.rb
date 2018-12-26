@@ -10,8 +10,8 @@ class TagRelationship < ApplicationRecord
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :forum_post, optional: true
   belongs_to :forum_topic, optional: true
-  has_one :antecedent_tag, :class_name => "Tag", :foreign_key => "name", :primary_key => "antecedent_name"
-  has_one :consequent_tag, :class_name => "Tag", :foreign_key => "name", :primary_key => "consequent_name"
+  belongs_to :antecedent_tag, class_name: "Tag", foreign_key: "antecedent_name", primary_key: "name", default: -> { Tag.find_or_create_by_name(antecedent_name) }
+  belongs_to :consequent_tag, class_name: "Tag", foreign_key: "consequent_name", primary_key: "name", default: -> { Tag.find_or_create_by_name(consequent_name) }
   has_one :antecedent_wiki, through: :antecedent_tag, source: :wiki_page
   has_one :consequent_wiki, through: :consequent_tag, source: :wiki_page
 
