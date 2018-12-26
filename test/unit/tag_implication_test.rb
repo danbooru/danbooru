@@ -42,6 +42,16 @@ class TagImplicationTest < ActiveSupport::TestCase
       should_not allow_value(-1).for(:creator_id).with_message("must exist", against: :creator)
     end
 
+    context "on secondary validation" do
+      should "warn if either tag is missing a wiki" do
+        ti = FactoryBot.build(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", skip_secondary_validations: false)
+
+        assert(ti.invalid?)
+        assert_includes(ti.errors[:base], "The aaa tag needs a corresponding wiki page")
+        assert_includes(ti.errors[:base], "The bbb tag needs a corresponding wiki page")
+      end
+    end
+
     should "ignore pending implications when building descendant names" do
       ti2 = FactoryBot.build(:tag_implication, :antecedent_name => "b", :consequent_name => "c", :status => "pending")
       ti2.save
@@ -52,6 +62,13 @@ class TagImplicationTest < ActiveSupport::TestCase
     should "populate the creator information" do
       ti = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       assert_equal(CurrentUser.user.id, ti.creator_id)
+    end
+
+    should "not validate when a tag directly implicates itself" do
+      ti = FactoryBot.build(:tag_implication, antecedent_name: "a", consequent_name: "a")
+
+      assert(ti.invalid?)
+      assert_includes(ti.errors[:base], "Cannot alias or implicate a tag to itself")
     end
 
     should "not validate when a circular relation is created" do
@@ -79,12 +96,14 @@ class TagImplicationTest < ActiveSupport::TestCase
       assert_includes(ti2.errors.full_messages, "Antecedent name has already been taken")
     end
 
-    should "not validate if its consequent is aliased to another tag" do
-      ta = FactoryBot.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc")
+    should "not validate if its antecedent or consequent are aliased to another tag" do
+      ta1 = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "a")
+      ta2 = FactoryBot.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "b")
       ti = FactoryBot.build(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
-      ti.save
-      assert(ti.errors.any?, "Tag implication should not have validated.")
-      assert_equal("Consequent tag must not be aliased to another tag", ti.errors.full_messages.join(""))
+
+      assert(ti.invalid?)
+      assert_includes(ti.errors[:base], "Antecedent tag must not be aliased to another tag")
+      assert_includes(ti.errors[:base], "Consequent tag must not be aliased to another tag")
     end
 
     should "calculate all its descendants" do

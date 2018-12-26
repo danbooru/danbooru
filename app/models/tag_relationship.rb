@@ -12,6 +12,8 @@ class TagRelationship < ApplicationRecord
   belongs_to :forum_topic, optional: true
   has_one :antecedent_tag, :class_name => "Tag", :foreign_key => "name", :primary_key => "antecedent_name"
   has_one :consequent_tag, :class_name => "Tag", :foreign_key => "name", :primary_key => "consequent_name"
+  has_one :antecedent_wiki, through: :antecedent_tag, source: :wiki_page
+  has_one :consequent_wiki, through: :consequent_tag, source: :wiki_page
 
   scope :active, ->{where(status: "active")}
   scope :expired, ->{where("created_at < ?", EXPIRY.days.ago)}
@@ -26,6 +28,7 @@ class TagRelationship < ApplicationRecord
   validates :creator, presence: { message: "must exist" }, if: -> { creator_id.present? }
   validates :approver, presence: { message: "must exist" }, if: -> { approver_id.present? }
   validates :forum_topic, presence: { message: "must exist" }, if: -> { forum_topic_id.present? }
+  validate :antecedent_and_consequent_are_different
 
   def initialize_creator
     self.creator_id = CurrentUser.user.id
@@ -160,6 +163,12 @@ class TagRelationship < ApplicationRecord
 
     def forum_link
       "(forum ##{forum_post.id})" if forum_post.present?
+    end
+  end
+
+  def antecedent_and_consequent_are_different
+    if antecedent_name == consequent_name
+      errors[:base] << "Cannot alias or implicate a tag to itself"
     end
   end
 
