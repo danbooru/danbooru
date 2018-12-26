@@ -5,7 +5,7 @@ class TagAlias < TagRelationship
   after_save :create_mod_action
   validates_uniqueness_of :antecedent_name
   validate :absence_of_transitive_relation
-  validate :consequent_has_wiki_page, on: :create, unless: :skip_secondary_validations
+  validate :wiki_pages_present, on: :create, unless: :skip_secondary_validations
   validate :mininum_antecedent_count, on: :create, unless: :skip_secondary_validations
 
   module CacheMethods
@@ -195,8 +195,10 @@ class TagAlias < TagRelationship
     destroy
   end
 
-  def consequent_has_wiki_page
-    if consequent_wiki.nil?
+  def wiki_pages_present
+    if antecedent_wiki.present? && consequent_wiki.present?
+      errors[:base] << conflict_message
+    elsif antecedent_wiki.blank? && consequent_wiki.blank?
       errors[:base] << "The #{consequent_name} tag needs a corresponding wiki page"
     end
   end
