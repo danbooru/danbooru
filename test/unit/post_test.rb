@@ -764,6 +764,8 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "apply implications after the character tag is added" do
+            FactoryBot.create(:tag, name: "jimmy", category: Tag.categories.character)
+            FactoryBot.create(:tag, name: "jim", category: Tag.categories.character)
             FactoryBot.create(:tag_implication, antecedent_name: "jimmy", consequent_name: "jim")
             @post.add_tag("jimmy_(cosplay)")
             @post.save
