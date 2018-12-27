@@ -62,8 +62,19 @@ module Sources::Strategies
     end
 
     def profile_url
-      return "" if artist_name.blank?
+      return nil if artist_name.blank?
       "https://twitter.com/#{artist_name}"
+    end
+
+    def intent_url
+      return nil if api_response.blank?
+
+      user_id = api_response.attrs[:user][:id_str]
+      "https://twitter.com/intent/user?user_id=#{user_id}"
+    end
+
+    def profile_urls
+      [profile_url, intent_url].compact
     end
 
     def artist_name

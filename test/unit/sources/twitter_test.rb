@@ -111,8 +111,13 @@ module Sources
         @site = Sources::Strategies.find("https://mobile.twitter.com/nounproject/status/540944400767922176")
       end
 
-      should "get the profile" do
+      should "get the main profile url" do
         assert_equal("https://twitter.com/nounproject", @site.profile_url)
+      end
+
+      should "get the profile urls" do
+        assert_includes(@site.profile_urls, "https://twitter.com/nounproject")
+        assert_includes(@site.profile_urls, "https://twitter.com/intent/user?user_id=88996186")
       end
 
       should "get the artist name" do
