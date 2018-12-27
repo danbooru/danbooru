@@ -149,7 +149,7 @@ module Sources
         illust_id.present? || novel_id.present? || fanbox_id.present? || fanbox_account_id.present?
       end
 
-      def unique_id
+      def tag_name
         moniker
       end
 

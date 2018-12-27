@@ -24,10 +24,6 @@ module Sources
       def normalize_for_artist_finder
         url
       end
-
-      def unique_id
-        url
-      end
     end
   end
 end

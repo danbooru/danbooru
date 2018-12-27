@@ -101,13 +101,33 @@ module Sources
         page_url || image_url
       end
 
-      # A link to the artist's profile page on the site.
-      def profile_url
-        ""
+      # A name to suggest as the artist's tag name when creating a new artist.
+      # This should usually be the artist's account name.
+      def tag_name
+        artist_name
       end
 
+      # The artists's primary name. If an artist has both a display name and an
+      # account name, this should be the display name.
       def artist_name
-        ""
+        nil
+      end
+
+      # A list of all names associated with the artist. These names will be suggested
+      # as other names when creating a new artist.
+      def other_names
+        [artist_name, tag_name].compact.uniq
+      end
+
+      # A link to the artist's profile page on the site.
+      def profile_url
+        nil
+      end
+
+      # A list of all profile urls associated with the artist. These urls will
+      # be suggested when creating a new artist.
+      def profile_urls
+        [normalize_for_artist_finder]
       end
 
       def artist_commentary_title
@@ -157,11 +177,6 @@ module Sources
         profile_url.presence || url
       end
 
-      # A unique identifier for the artist. This is used for artist creation.
-      def unique_id
-        artist_name
-      end
-
       def artists
         Artist.find_artists(normalize_for_artist_finder)
       end
@@ -170,9 +185,9 @@ module Sources
       # exist. Used in Artist.new_with_defaults to prefill the new artist form.
       def new_artist
         Artist.new(
-          name: unique_id,
-          other_names: [artist_name],
-          url_string: [profile_url, normalize_for_artist_finder].sort.uniq.join("\n")
+          name: tag_name,
+          other_names: other_names,
+          url_string: profile_urls.join("\n")
         )
       end
 
@@ -249,9 +264,14 @@ module Sources
 
       def to_h
         return {
-          :artist_name => artist_name,
+          :artist => {
+            :name => artist_name,
+            :tag_name => tag_name,
+            :other_names => other_names,
+            :profile_url => profile_url,
+            :profile_urls => profile_urls,
+          },
           :artists => artists.as_json(include: :sorted_urls),
-          :profile_url => profile_url,
           :image_url => image_url,
           :image_urls => image_urls,
           :page_url => page_url,
@@ -260,7 +280,6 @@ module Sources
           :tags => tags,
           :normalized_tags => normalized_tags,
           :translated_tags => translated_tags,
-          :unique_id => unique_id,
           :artist_commentary => {
             :title => artist_commentary_title,
             :description => artist_commentary_desc,

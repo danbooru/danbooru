@@ -112,7 +112,7 @@ module Sources
         "#{profile_url}/"
       end
 
-      def unique_id
+      def tag_name
         "nicoseiga#{api_client.user_id}"
       end
 

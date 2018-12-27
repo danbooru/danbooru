@@ -36,7 +36,7 @@ module Sources
       URL_SLUG = %r!/(?:yande\.re%20|Konachan\.com%20-%20)(?<id>\d+).*!i
       IMAGE_URL = %r!#{BASE_URL}/(?<type>image|jpeg|sample)/(?<md5>\h{32})#{URL_SLUG}?\.(?<ext>jpg|jpeg|png|gif)\z!i
 
-      delegate :artist_name, :profile_url, :unique_id, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_strategy, allow_nil: true
+      delegate :artist_name, :profile_url, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_strategy, allow_nil: true
 
       def domains
         ["yande.re", "konachan.com"]

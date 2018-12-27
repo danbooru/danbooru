@@ -123,7 +123,7 @@ module Sources
         end
       end
 
-      def unique_id
+      def tag_name
         "nijie" + artist_id.to_s
       end
 
