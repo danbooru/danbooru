@@ -116,38 +116,32 @@ module Sources
       context "with a referer" do
         should "get all the images and metadata" do
           site = Sources::Strategies.find(@url, @ref)
-          data = {
-            artist_name: "noizave",
-            profile_url: "https://noizave.tumblr.com",
-            tags: [["tag1", "https://tumblr.com/tagged/tag1"], ["tag2", "https://tumblr.com/tagged/tag2"]],
-            canonical_url: @ref,
-            image_url: "https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg",
-            image_urls: %w[
-              https://media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_orwwptNBCE1wsfqepo1_1280.png
-              https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg
-              https://media.tumblr.com/d2ed224f135b0c81f812df81a0a8692d/tumblr_orwwptNBCE1wsfqepo3_1280.gif
-              https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_inline_os3134mABB1v11u29_1280.png
-              https://media.tumblr.com/34ed9d0ff4a21625981372291cb53040/tumblr_nv3hwpsZQY1uft51jo1_1280.gif
-            ],
-          }
 
-          assert_operator(data, :<, site.to_h)
+          assert_equal("noizave", site.artist_name)
+          assert_equal("https://noizave.tumblr.com", site.profile_url)
+          assert_equal(["tag1", "tag2"], site.tags.map(&:first))
+          assert_equal(@ref, site.canonical_url)
+          assert_equal("https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg", site.image_url)
+          assert_equal(%w[
+            https://media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_orwwptNBCE1wsfqepo1_1280.png
+            https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg
+            https://media.tumblr.com/d2ed224f135b0c81f812df81a0a8692d/tumblr_orwwptNBCE1wsfqepo3_1280.gif
+            https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_inline_os3134mABB1v11u29_1280.png
+            https://media.tumblr.com/34ed9d0ff4a21625981372291cb53040/tumblr_nv3hwpsZQY1uft51jo1_1280.gif
+          ], site.image_urls)
         end
       end
 
       context "without a referer" do
         should "get the original image" do
           site = Sources::Strategies.find(@url)
-          data = {
-            artist_name: nil,
-            profile_url: nil,
-            tags: [],
-            canonical_url: nil,
-            image_url: "https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg",
-            image_urls: ["https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg"],
-          }
 
-          assert_operator(data, :<, site.to_h)
+          assert_nil(site.artist_name)
+          assert_nil(site.profile_url)
+          assert_nil(site.canonical_url)
+          assert_equal([], site.tags)
+          assert_equal("https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg", site.image_url)
+          assert_equal(["https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg"], site.image_urls)
         end
       end
     end
@@ -227,18 +221,15 @@ module Sources
     context "A deleted tumblr post" do
       should "extract the info from the url" do
         site = Sources::Strategies.find("http://shimetsukage.tumblr.com/post/176805588268/20180809-ssb-coolboy")
-        data = {
-          artist_name: "shimetsukage",
-          profile_url: "https://shimetsukage.tumblr.com",
-          page_url: "https://shimetsukage.tumblr.com/post/176805588268",
-          canonical_url: "https://shimetsukage.tumblr.com/post/176805588268",
-          image_url: nil,
-          image_urls: [],
-          tags: [],
-        }
 
         assert_nothing_raised { site.to_h }
-        assert_operator(data, :<, site.to_h)
+        assert_equal("shimetsukage", site.artist_name)
+        assert_equal("https://shimetsukage.tumblr.com", site.profile_url)
+        assert_equal("https://shimetsukage.tumblr.com/post/176805588268", site.page_url)
+        assert_equal("https://shimetsukage.tumblr.com/post/176805588268", site.canonical_url)
+        assert_nil(site.image_url)
+        assert_equal([], site.image_urls)
+        assert_equal([], site.tags)
       end
     end
 
