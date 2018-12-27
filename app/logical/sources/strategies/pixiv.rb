@@ -109,10 +109,23 @@ module Sources
         nil
       end
 
+      def stacc_url
+        return nil if moniker.blank?
+        "https://www.pixiv.net/stacc/#{moniker}"
+      end
+
+      def profile_urls
+        [profile_url, stacc_url].compact
+      end
+
       def artist_name
         metadata.name
       rescue PixivApiClient::BadIDError
         nil
+      end
+
+      def other_names
+        [artist_name, moniker].compact.uniq
       end
 
       def artist_commentary_title

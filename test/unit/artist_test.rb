@@ -558,7 +558,8 @@ class ArtistTest < ActiveSupport::TestCase
 
         assert_equal("niceandcool", artist.name)
         assert_equal("nice_and_cool", artist.other_names_string)
-        assert_equal("https://www.pixiv.net/member.php?id=906442", artist.url_string)
+        assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/member.php?id=906442")
+        assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/stacc/niceandcool")
       end
 
       should "fetch the defaults from the given tag" do
@@ -567,8 +568,9 @@ class ArtistTest < ActiveSupport::TestCase
         artist = Artist.new_with_defaults(name: "test_artist")
 
         assert_equal("test_artist", artist.name)
-        assert_equal("nice_and_cool", artist.other_names_string)
-        assert_equal("https://www.pixiv.net/member.php?id=906442", artist.url_string)
+        assert_equal("nice_and_cool niceandcool", artist.other_names_string)
+        assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/member.php?id=906442")
+        assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/stacc/niceandcool")
       end
     end
   end
