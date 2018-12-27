@@ -6,7 +6,7 @@ class ArtistsController < ApplicationController
   before_action :load_artist, :only => [:ban, :unban, :show, :edit, :update, :destroy, :undelete]
 
   def new
-    @artist = Artist.new_with_defaults(artist_params)
+    @artist = Artist.new_with_defaults(artist_params(:new))
     respond_with(@artist)
   end
 
@@ -104,9 +104,10 @@ private
     sp.permit!
   end
 
-  def artist_params
+  def artist_params(context = nil)
     permitted_params = %i[name other_names other_names_string group_name url_string notes]
     permitted_params << :is_active if CurrentUser.is_builder?
+    permitted_params << :source if context == :new
 
     params.fetch(:artist, {}).permit(permitted_params)
   end

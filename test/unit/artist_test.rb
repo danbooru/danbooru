@@ -550,5 +550,26 @@ class ArtistTest < ActiveSupport::TestCase
         assert_equal(1, @artist.urls.count)
       end
     end
+
+    context "#new_with_defaults" do
+      should "fetch the defaults from the given source" do
+        source = "https://i.pximg.net/img-original/img/2018/01/28/23/56/50/67014762_p0.jpg"
+        artist = Artist.new_with_defaults(source: source)
+
+        assert_equal("niceandcool", artist.name)
+        assert_equal("nice_and_cool", artist.other_names_string)
+        assert_equal("https://www.pixiv.net/member.php?id=906442", artist.url_string)
+      end
+
+      should "fetch the defaults from the given tag" do
+        source = "https://i.pximg.net/img-original/img/2018/01/28/23/56/50/67014762_p0.jpg"
+        FactoryBot.create(:post, source: source, tag_string: "test_artist")
+        artist = Artist.new_with_defaults(name: "test_artist")
+
+        assert_equal("test_artist", artist.name)
+        assert_equal("nice_and_cool", artist.other_names_string)
+        assert_equal("https://www.pixiv.net/member.php?id=906442", artist.url_string)
+      end
+    end
   end
 end

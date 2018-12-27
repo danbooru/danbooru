@@ -166,6 +166,16 @@ module Sources
         Artist.find_artists(normalize_for_artist_finder)
       end
 
+      # A new artist entry with suggested defaults for when the artist doesn't
+      # exist. Used in Artist.new_with_defaults to prefill the new artist form.
+      def new_artist
+        Artist.new(
+          name: unique_id,
+          other_names: [artist_name],
+          url_string: [profile_url, normalize_for_artist_finder].sort.uniq.join("\n")
+        )
+      end
+
       def file_url
         image_url
       end

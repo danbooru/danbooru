@@ -15,7 +15,7 @@
             <%= link_to @source.artist_name, @source.profile_url, id: "source-info-artist-profile" %>
 
             <% if @source.artists.empty? %>
-              (<%= link_to "Create new artist", new_artist_path(artist: { name: @source.unique_id, other_names: @source.artist_name, url_string: [@source.profile_url, @source.normalize_for_artist_finder].uniq.sort.join("\n") }), id: "source-info-create-new-artist" %>)
+              (<%= link_to "Create new artist", new_artist_path(artist: { source: @source.canonical_url }), id: "source-info-create-new-artist" %>)
             <% else %>
               (<ul id="source-info-translated-artists">
                 <% @source.artists.each do |artist| %>
