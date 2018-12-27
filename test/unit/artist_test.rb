@@ -407,7 +407,7 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "normalize its other names" do
-      artist = FactoryBot.create(:artist, :name => "a1", :other_names => "aaa bbb ccc_ddd")
+      artist = FactoryBot.create(:artist, name: "a1", other_names: "a1 aaa aaa AAA bbb ccc_ddd")
       assert_equal("aaa bbb ccc_ddd", artist.other_names_string)
     end
 

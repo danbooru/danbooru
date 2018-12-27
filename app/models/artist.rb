@@ -242,7 +242,8 @@ class Artist < ApplicationRecord
     end
 
     def normalize_other_names
-      self.other_names = other_names.map { |x| Artist.normalize_name(x) }
+      self.other_names = other_names.map { |x| Artist.normalize_name(x) }.uniq
+      self.other_names -= [name]
     end
   end
 
