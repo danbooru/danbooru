@@ -1788,7 +1788,7 @@ class Post < ApplicationRecord
       return if tags.any? { |t| t.category == Tag.categories.artist }
       return if Sources::Strategies.find(source).is_a?(Sources::Strategies::Null)
 
-      self.warnings[:base] << "Artist tag is required. Create a new tag with [[artist:<artist_name>]]. Ask on the forum if you need naming help"
+      self.warnings[:base] << "Artist tag is required. \"Create new artist tag\":[/artists/new?artist%5Bsource%5D=#{CGI::escape(source)}]. Ask on the forum if you need naming help"
     end
 
     def has_copyright_tag
