@@ -33,6 +33,7 @@ module NoteSanitizer
     line-height
     list-style list-style-position list-style-type
     margin margin-bottom margin-left margin-right margin-top
+    mask mask-border mask-clip mask-composite mask-image mask-mode mask-origin mask-position mask-repeat mask-size
     opacity
     outline outline-color outline-offset outline-width outline-style
     padding padding-bottom padding-left padding-right padding-top
