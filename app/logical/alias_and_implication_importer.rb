@@ -102,12 +102,12 @@ private
         when :remove_alias
           tag_alias = TagAlias.where("antecedent_name = ?", token[1]).first
           raise Error, "Alias for #{token[1]} not found" if tag_alias.nil?
-          tag_alias.destroy
+          tag_alias.reject!(update_topic: false)
 
         when :remove_implication
           tag_implication = TagImplication.where("antecedent_name = ? and consequent_name = ?", token[1], token[2]).first
           raise Error, "Implication for #{token[1]} not found" if tag_implication.nil?
-          tag_implication.destroy
+          tag_implication.reject!(update_topic: false)
 
         when :mass_update
           Delayed::Job.enqueue(Moderator::TagBatchChange.new(token[1], token[2], CurrentUser.id, CurrentUser.ip_addr), :queue => "default")

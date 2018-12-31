@@ -75,5 +75,32 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
       assert_equal("bbb", artist.name)
       assert_equal("testing", artist.notes)
     end
+
+    context "remove alias and remove implication commands" do
+      setup do
+        @ta = FactoryBot.create(:tag_alias, antecedent_name: "a", consequent_name: "b", status: "active")
+        @ti = FactoryBot.create(:tag_implication, antecedent_name: "c", consequent_name: "d", status: "active")
+        @script = %{
+          remove alias a -> b
+          remove implication c -> d
+        }
+      end
+
+      should "set aliases and implications as deleted" do
+        @importer = AliasAndImplicationImporter.new(@script, nil)
+        @importer.process!
+
+        assert_equal("deleted", @ta.reload.status)
+        assert_equal("deleted", @ti.reload.status)
+      end
+
+      should "create modactions for each removal" do
+        @importer = AliasAndImplicationImporter.new(@script, nil)
+
+        assert_difference(-> { ModAction.count }, 2) do
+          @importer.process!
+        end
+      end
+    end
   end
 end

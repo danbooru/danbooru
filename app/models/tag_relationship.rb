@@ -16,6 +16,7 @@ class TagRelationship < ApplicationRecord
   has_one :consequent_wiki, through: :consequent_tag, source: :wiki_page
 
   scope :active, ->{where(status: "active")}
+  scope :deleted, ->{where(status: "deleted")}
   scope :expired, ->{where("created_at < ?", EXPIRY.days.ago)}
   scope :old, ->{where("created_at >= ? and created_at < ?", EXPIRY.days.ago, EXPIRY_WARNING.days.ago)}
   scope :pending, ->{where(status: "pending")}

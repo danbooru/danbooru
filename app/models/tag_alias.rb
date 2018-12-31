@@ -188,11 +188,10 @@ class TagAlias < TagRelationship
     end
   end
 
-  def reject!
+  def reject!(update_topic: true)
     update(status: "deleted")
     clear_all_cache
-    forum_updater.update(reject_message(CurrentUser.user), "REJECTED")
-    destroy
+    forum_updater.update(reject_message(CurrentUser.user), "REJECTED") if update_topic
   end
 
   def wiki_pages_present

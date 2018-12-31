@@ -169,10 +169,9 @@ class TagImplication < TagRelationship
       delay(:queue => "default").process!(update_topic: update_topic)
     end
 
-    def reject!
+    def reject!(update_topic: true)
       update(status: "deleted")
-      forum_updater.update(reject_message(CurrentUser.user), "REJECTED")
-      destroy
+      forum_updater.update(reject_message(CurrentUser.user), "REJECTED") if update_topic
     end
 
     def create_mod_action
