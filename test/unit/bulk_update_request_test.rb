@@ -126,7 +126,12 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @req.forum_updater.stubs(:update).raises(RuntimeError.new("blah"))
         assert_raises(RuntimeError) { @req.approve!(@admin) }
 
-        assert_equal("pending", @req.reload.status)
+        # XXX Raises "Couldn't find BulkUpdateRequest without an ID". Possible
+        # rails bug? (cf rails #34637, #34504, #30167, #15018).
+        # @req.reload
+
+        @req = BulkUpdateRequest.find(@req.id)
+        assert_equal("pending", @req.status)
       end
 
       should "downcase the text" do
