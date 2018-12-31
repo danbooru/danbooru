@@ -209,8 +209,10 @@ class TagImplicationTest < ActiveSupport::TestCase
       p1 = FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
       ti1 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "xxx")
       ti2 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "yyy")
-      p1.reload
-      assert_equal("aaa bbb ccc xxx yyy", p1.tag_string)
+      ti1.approve!
+      ti2.approve!
+
+      assert_equal("aaa bbb ccc xxx yyy", p1.reload.tag_string)
     end
 
     context "with an associated forum topic" do

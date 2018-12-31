@@ -3,6 +3,8 @@ require 'test_helper'
 class TagAliasTest < ActiveSupport::TestCase
   context "A tag alias" do
     setup do
+      @admin = FactoryBot.create(:admin_user)
+
       Timecop.travel(1.month.ago) do
         user = FactoryBot.create(:user)
         CurrentUser.user = user
@@ -20,7 +22,7 @@ class TagAliasTest < ActiveSupport::TestCase
       subject do
         FactoryBot.create(:tag, :name => "aaa")
         FactoryBot.create(:tag, :name => "bbb")
-        FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+        FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :status => "active")
       end
 
       should allow_value('active').for(:status)
@@ -42,7 +44,6 @@ class TagAliasTest < ActiveSupport::TestCase
 
       should_not allow_value(nil).for(:creator_id)
       should_not allow_value(-1).for(:creator_id).with_message("must exist", against: :creator)
-
     end
 
     context "on secondary validation" do
@@ -97,22 +98,21 @@ class TagAliasTest < ActiveSupport::TestCase
         tag2 = FactoryBot.create(:tag, :name => "bbb")
         ss = FactoryBot.create(:saved_search, :query => "123 ... 456", :user => CurrentUser.user)
         ta = FactoryBot.create(:tag_alias, :antecedent_name => "...", :consequent_name => "bbb")
-        ss.reload
-        assert_equal(%w(123 456 bbb), ss.query.split.sort)
+        ta.approve!(approver: @admin)
+
+        assert_equal(%w(123 456 bbb), ss.reload.query.split.sort)
       end
     end
 
     should "update any affected posts when saved" do
-      assert_equal(0, TagAlias.count)
       post1 = FactoryBot.create(:post, :tag_string => "aaa bbb")
       post2 = FactoryBot.create(:post, :tag_string => "ccc ddd")
-      assert_equal("aaa bbb", post1.tag_string)
-      assert_equal("ccc ddd", post2.tag_string)
+
       ta = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "ccc")
-      post1.reload
-      post2.reload
-      assert_equal("bbb ccc", post1.tag_string)
-      assert_equal("ccc ddd", post2.tag_string)
+      ta.approve!(approver: @admin)
+
+      assert_equal("bbb ccc", post1.reload.tag_string)
+      assert_equal("ccc ddd", post2.reload.tag_string)
     end
 
     should "not validate for transitive relations" do
@@ -126,15 +126,19 @@ class TagAliasTest < ActiveSupport::TestCase
     end
 
     should "move existing aliases" do
-      ta1 = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
-      ta2 = FactoryBot.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc")
-      ta1.reload
-      assert_equal("ccc", ta1.consequent_name)
+      ta1 = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :status => "pending")
+      ta2 = FactoryBot.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc", :status => "pending")
+      ta1.approve!(approver: @admin)
+      ta2.approve!(approver: @admin)
+
+      assert_equal("ccc", ta1.reload.consequent_name)
     end
 
     should "move existing implications" do
       ti = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ta = FactoryBot.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc")
+      ta.approve!(approver: @admin)
+
       ti.reload
       assert_equal("ccc", ti.consequent_name)
     end
@@ -149,10 +153,11 @@ class TagAliasTest < ActiveSupport::TestCase
 
     should "push the antecedent's category to the consequent" do
       tag1 = FactoryBot.create(:tag, :name => "aaa", :category => 1)
-      tag2 = FactoryBot.create(:tag, :name => "bbb")
+      tag2 = FactoryBot.create(:tag, :name => "bbb", :category => 0)
       ta = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
-      tag2.reload
-      assert_equal(1, tag2.category)
+      ta.approve!(approver: @admin)
+
+      assert_equal(1, tag2.reload.category)
     end
 
     context "with an associated forum topic" do
