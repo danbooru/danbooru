@@ -7,7 +7,7 @@ class TagImplication < TagRelationship
   after_save :update_descendant_names_for_parents
   after_destroy :update_descendant_names_for_parents
   after_save :create_mod_action
-  validates_uniqueness_of :antecedent_name, :scope => :consequent_name
+  validates_uniqueness_of :antecedent_name, scope: [:consequent_name, :status], conditions: -> { active }
   validate :absence_of_circular_relation
   validate :absence_of_transitive_relation
   validate :antecedent_is_not_aliased

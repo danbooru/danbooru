@@ -3,7 +3,7 @@ class TagAlias < TagRelationship
   after_destroy :clear_all_cache
   after_save :clear_all_cache, if: ->(rec) {rec.is_retired?}
   after_save :create_mod_action
-  validates_uniqueness_of :antecedent_name
+  validates_uniqueness_of :antecedent_name, scope: :status, conditions: -> { active }
   validate :absence_of_transitive_relation
   validate :wiki_pages_present, on: :create, unless: :skip_secondary_validations
   validate :mininum_antecedent_count, on: :create, unless: :skip_secondary_validations

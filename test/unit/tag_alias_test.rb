@@ -44,6 +44,18 @@ class TagAliasTest < ActiveSupport::TestCase
 
       should_not allow_value(nil).for(:creator_id)
       should_not allow_value(-1).for(:creator_id).with_message("must exist", against: :creator)
+
+      should "not allow duplicate active aliases" do
+        ta1 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "active")
+        ta2 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "retired")
+        ta3 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
+        ta4 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
+        ta5 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
+        [ta1, ta2, ta3, ta4, ta5].each { |ta| assert(ta.valid?) }
+
+        ta5.update(status: "active")
+        assert_includes(ta5.errors[:antecedent_name], "has already been taken")
+      end
     end
 
     context "on secondary validation" do
