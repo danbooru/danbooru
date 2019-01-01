@@ -84,9 +84,10 @@ class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      should "destroy a tag_implication" do
-        assert_difference("TagImplication.count", -1) do
+      should "mark the implication as deleted" do
+        assert_difference("TagImplication.count", 0) do
           delete_auth tag_implication_path(@tag_implication), @user
+          assert_equal("deleted", @tag_implication.reload.status)
         end
       end
     end

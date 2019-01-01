@@ -87,9 +87,10 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      should "destroy a tag_alias" do
-        assert_difference("TagAlias.count", -1) do
+      should "mark the alias as deleted" do
+        assert_difference("TagAlias.count", 0) do
           delete_auth tag_alias_path(@tag_alias), @user
+          assert_equal("deleted", @tag_alias.reload.status)
         end
       end
     end
