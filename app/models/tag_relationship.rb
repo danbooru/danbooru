@@ -15,7 +15,8 @@ class TagRelationship < ApplicationRecord
   has_one :antecedent_wiki, through: :antecedent_tag, source: :wiki_page
   has_one :consequent_wiki, through: :consequent_tag, source: :wiki_page
 
-  scope :active, ->{where(status: "active")}
+  scope :active, ->{approved}
+  scope :approved, ->{where(status: %w[active processing queued])}
   scope :deleted, ->{where(status: "deleted")}
   scope :expired, ->{where("created_at < ?", EXPIRY.days.ago)}
   scope :old, ->{where("created_at >= ? and created_at < ?", EXPIRY.days.ago, EXPIRY_WARNING.days.ago)}
@@ -87,10 +88,6 @@ class TagRelationship < ApplicationRecord
     def pending_first
       # unknown statuses return null and are sorted first
       order(Arel.sql("array_position(array['queued', 'processing', 'pending', 'active', 'deleted', 'retired'], status) NULLS FIRST, antecedent_name, consequent_name"))
-    end
-
-    def active
-      where(status: %w[active processing queued])
     end
 
     def default_order
