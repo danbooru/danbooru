@@ -1,13 +1,6 @@
 <div id="c-tag-implications">
   <div id="a-index">
-    <%= simple_form_for(:search, method: :get, url: tag_implications_path, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
-      <%= f.input :name_matches, label: "Name", input_html: { value: params[:search][:name_matches], data: { autocomplete: "tag" } } %>
-      <%= f.input :status, label: "Status", collection: ["", "Approved", "Pending", "Retired"], selected: params[:search][:status] %>
-      <%= f.input :category, label: "Category", collection: TagCategory.canonical_mapping.to_a, include_blank: true, selected: params[:search][:category] %>
-      <%= f.input :order, label: "Order", collection: [%w[Status status], %w[Recently\ created created_at], %w[Recently\ updated updated_at], %w[Name name], %w[Tag\ count tag_count]], selected: params[:search][:order] %>
-      <%= f.submit "Search" %>
-    <% end %>
-
+    <%= render "tag_relationships/search", url: tag_implications_path %>
     <%= render "listing", :tag_implications => @tag_implications %>
 
     <%= numbered_paginator(@tag_implications) %>
