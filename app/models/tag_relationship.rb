@@ -79,6 +79,11 @@ class TagRelationship < ApplicationRecord
       end
     end
 
+    def tag_matches(field, params)
+      return all if params.blank?
+      where(field => Tag.search(params).reorder(nil).select(:name))
+    end
+
     def pending_first
       # unknown statuses return null and are sorted first
       order(Arel.sql("array_position(array['queued', 'processing', 'pending', 'active', 'deleted', 'retired'], status) NULLS FIRST, antecedent_name, consequent_name"))
@@ -110,6 +115,9 @@ class TagRelationship < ApplicationRecord
       if params[:status].present?
         q = q.status_matches(params[:status])
       end
+
+      q = q.tag_matches(:antecedent_name, params[:antecedent_tag])
+      q = q.tag_matches(:consequent_name, params[:consequent_tag])
 
       if params[:category].present?
         q = q.joins(:consequent_tag).where("tags.category": params[:category].split)
