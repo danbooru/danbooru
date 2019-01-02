@@ -8,6 +8,7 @@ class TagAliasCorrectionTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = "127.0.0.1"
       @post = FactoryBot.create(:post, :tag_string => "aaa")
       @tag_alias = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+      @tag_alias.update_posts
     end
 
     teardown do

@@ -4,17 +4,14 @@
 
     <p>Because tag aliases are cached in memory, they may go out of sync. This action will clear out the cache and fix any lingering posts.</p>
 
-    <% @correction.each_server do |server| %>
-      <div style="margin-bottom: 1em;">
-        <h2>Server: <%= server.hostname %></h2>
-        <ul>
-          <li><strong><%= link_to server.antecedent_name, posts_path(:tags => server.antecedent_name, :raw => true) %></strong> aliased to <strong><%= server.statistics_hash["antecedent_cache"] %></strong> in cache</li>
-          <li><strong><%= server.consequent_name %></strong> aliased to <strong><%= server.statistics_hash["consequent_cache"] %></strong> in cache</li>
-          <li><strong><%= server.antecedent_name %></strong> count is <%= server.statistics_hash["antecedent_count"] %></li>
-          <li><strong><%= server.consequent_name %></strong> count is <%= server.statistics_hash["consequent_count"] %></li>
-        </ul>
-      </div>
-    <% end %>
+    <div style="margin-bottom: 1em;">
+      <ul>
+        <li><strong><%= link_to @correction.antecedent_name, posts_path(:tags => @correction.antecedent_name, :raw => true) %></strong> aliased to <strong><%= @correction.statistics_hash["antecedent_cache"] %></strong> in cache</li>
+        <li><strong><%= @correction.consequent_name %></strong> aliased to <strong><%= @correction.statistics_hash["consequent_cache"] %></strong> in cache</li>
+        <li><strong><%= @correction.antecedent_name %></strong> count is <%= @correction.statistics_hash["antecedent_count"] %></li>
+        <li><strong><%= @correction.consequent_name %></strong> count is <%= @correction.statistics_hash["consequent_count"] %></li>
+      </ul>
+    </div>
 
     <p>You can try to fix this alias. This will clear the cache and re-save all posts associated with <strong><%= @correction.antecedent_name %></strong>.</p>
 

@@ -1,11 +1,10 @@
 class TagAliasCorrection
-  attr_reader :tag_alias_id, :tag_alias, :hostname
+  attr_reader :tag_alias_id, :tag_alias
   delegate :antecedent_name, :consequent_name, :to => :tag_alias
 
-  def initialize(tag_alias_id, hostname = Socket.gethostname)
+  def initialize(tag_alias_id)
     @tag_alias_id = tag_alias_id
     @tag_alias = TagAlias.find(tag_alias_id)
-    @hostname = hostname
   end
 
   def to_json(options = {})
@@ -19,27 +18,6 @@ class TagAliasCorrection
       "antecedent_count" => Tag.find_by_name(tag_alias.antecedent_name).try(:post_count),
       "consequent_count" => Tag.find_by_name(tag_alias.consequent_name).try(:post_count)
     }
-  end
-
-  def fill_hash!
-    res = HTTParty.get("https://#{hostname}.#{Danbooru.config.domain}/tag_aliases/#{tag_alias_id}/correction.json", Danbooru.config.httparty_options)
-    if res.success?
-      json = JSON.parse(res.body)
-      statistics_hash["antecedent_cache"] = json["antecedent_cache"]
-      statistics_hash["consequent_cache"] = json["consequent_cache"]
-    end
-  end
-
-  def each_server
-    Danbooru.config.all_server_hosts.each do |host|
-      other = TagAliasCorrection.new(tag_alias_id, host)
-
-      if host != Socket.gethostname
-        other.fill_hash!
-      end
-
-      yield other
-    end
   end
 
   def clear_cache
