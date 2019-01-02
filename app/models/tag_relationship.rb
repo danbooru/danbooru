@@ -87,7 +87,7 @@ class TagRelationship < ApplicationRecord
 
     def pending_first
       # unknown statuses return null and are sorted first
-      order(Arel.sql("array_position(array['queued', 'processing', 'pending', 'active', 'deleted', 'retired'], status) NULLS FIRST, antecedent_name, consequent_name"))
+      order(Arel.sql("array_position(array['queued', 'processing', 'pending', 'active', 'deleted', 'retired'], status::text) NULLS FIRST, antecedent_name, consequent_name"))
     end
 
     def default_order
