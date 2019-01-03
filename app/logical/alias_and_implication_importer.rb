@@ -100,12 +100,12 @@ private
           tag_implication.approve!(approver: approver, update_topic: false)
 
         when :remove_alias
-          tag_alias = TagAlias.where("antecedent_name = ?", token[1]).first
+          tag_alias = TagAlias.active.find_by(antecedent_name: token[1], consequent_name: token[2])
           raise Error, "Alias for #{token[1]} not found" if tag_alias.nil?
           tag_alias.reject!(update_topic: false)
 
         when :remove_implication
-          tag_implication = TagImplication.where("antecedent_name = ? and consequent_name = ?", token[1], token[2]).first
+          tag_implication = TagImplication.active.find_by(antecedent_name: token[1], consequent_name: token[2])
           raise Error, "Implication for #{token[1]} not found" if tag_implication.nil?
           tag_implication.reject!(update_topic: false)
 

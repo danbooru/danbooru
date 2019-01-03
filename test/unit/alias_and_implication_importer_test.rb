@@ -84,10 +84,10 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
           remove alias a -> b
           remove implication c -> d
         }
+        @importer = AliasAndImplicationImporter.new(@script, nil)
       end
 
       should "set aliases and implications as deleted" do
-        @importer = AliasAndImplicationImporter.new(@script, nil)
         @importer.process!
 
         assert_equal("deleted", @ta.reload.status)
@@ -95,11 +95,18 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
       end
 
       should "create modactions for each removal" do
-        @importer = AliasAndImplicationImporter.new(@script, nil)
-
         assert_difference(-> { ModAction.count }, 2) do
           @importer.process!
         end
+      end
+
+      should "only remove active aliases and implications" do
+        @ta2 = FactoryBot.create(:tag_alias, antecedent_name: "a", consequent_name: "b", status: "pending")
+        @ti2 = FactoryBot.create(:tag_implication, antecedent_name: "c", consequent_name: "d", status: "pending")
+
+        @importer.process!
+        assert_equal("pending", @ta2.reload.status)
+        assert_equal("pending", @ti2.reload.status)
       end
     end
   end
