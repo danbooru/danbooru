@@ -76,6 +76,7 @@ module PostSetPresenters
           :date => prev_date_for_scale(scale),
           :scale => scale.downcase
         ),
+        :id => (link_rel_for_scale?(template, scale.downcase) ? "paginator-prev" : nil),
         :rel => (link_rel_for_scale?(template, scale.downcase) ? "prev" : nil),
         :"data-shortcut" => (link_rel_for_scale?(template, scale.downcase) ? "a left" : nil)
       )
@@ -93,6 +94,7 @@ module PostSetPresenters
           :date => next_date_for_scale(scale),
           :scale => scale.downcase
         ),
+        :id => (link_rel_for_scale?(template, scale.downcase) ? "paginator-next" : nil),
         :rel => (link_rel_for_scale?(template, scale.downcase) ? "next" : nil),
         :"data-shortcut" => (link_rel_for_scale?(template, scale.downcase) ? "d right" : nil)
       )

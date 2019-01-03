@@ -4,11 +4,11 @@ module PaginationHelper
 
     if records.any?
       if params[:page] =~ /[ab]/ && !records.is_first_page?
-        html << '<li>' + link_to("< Previous", nav_params_for("a#{records[0].id}"), rel: "prev", "data-shortcut": "a left") + '</li>'
+        html << '<li>' + link_to("< Previous", nav_params_for("a#{records[0].id}"), rel: "prev", id: "paginator-prev", "data-shortcut": "a left") + '</li>'
       end
 
       unless records.is_last_page?
-        html << '<li>' + link_to("Next >", nav_params_for("b#{records[-1].id}"), rel: "next", "data-shortcut": "d right") + '</li>'
+        html << '<li>' + link_to("Next >", nav_params_for("b#{records[-1].id}"), rel: "next", id: "paginator-next", "data-shortcut": "d right") + '</li>'
       end
     end
 
@@ -29,7 +29,7 @@ module PaginationHelper
     window = 4
 
     if records.current_page >= 2
-      html << "<li class='arrow'>" + link_to(content_tag(:i, nil, class: "fas fa-chevron-left"), nav_params_for(records.current_page - 1), rel: "prev", "data-shortcut": "a left") + "</li>"
+      html << "<li class='arrow'>" + link_to(content_tag(:i, nil, class: "fas fa-chevron-left"), nav_params_for(records.current_page - 1), rel: "prev", id: "paginator-prev", "data-shortcut": "a left") + "</li>"
     else
       html << "<li class='arrow'><span>" + content_tag(:i, nil, class: "fas fa-chevron-left") + "</span></li>"
     end
@@ -69,7 +69,7 @@ module PaginationHelper
     end
 
     if records.current_page < records.total_pages && records.size > 0
-      html << "<li class='arrow'>" + link_to(content_tag(:i, nil, class: "fas fa-chevron-right"), nav_params_for(records.current_page + 1), rel: "next", "data-shortcut": "d right") + "</li>"
+      html << "<li class='arrow'>" + link_to(content_tag(:i, nil, class: "fas fa-chevron-right"), nav_params_for(records.current_page + 1), rel: "next", id: "paginator-next", "data-shortcut": "d right") + "</li>"
     else
       html << "<li class='arrow'><span>" + content_tag(:i, nil, class: "fas fa-chevron-right") + "</span></li>"
     end
