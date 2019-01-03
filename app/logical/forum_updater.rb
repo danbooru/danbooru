@@ -5,6 +5,7 @@ class ForumUpdater
     @forum_topic = forum_topic
     @forum_post = options[:forum_post]
     @expected_title = options[:expected_title]
+    @skip_update = options[:skip_update]
   end
 
   def update(message, title_tag = nil)
@@ -31,6 +32,7 @@ class ForumUpdater
   end
 
   def update_post(body)
+    return if @skip_update
     forum_post.update(body: "#{forum_post.body}\n\nEDIT: #{body}", skip_mention_notifications: true)
   end
 end

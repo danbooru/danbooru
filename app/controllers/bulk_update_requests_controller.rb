@@ -15,9 +15,7 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def show
-    respond_with(@bulk_update_request) do |fmt|
-      fmt.html { redirect_to bulk_update_requests_path(search: { id: @bulk_update_request.id }) }
-    end
+    @bulk_update_request = BulkUpdateRequest.find(params[:id])
   end
 
   def edit

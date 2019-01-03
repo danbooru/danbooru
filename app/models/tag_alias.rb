@@ -36,14 +36,15 @@ class TagAlias < TagRelationship
     def forum_updater
       @forum_updater ||= begin
         post = if forum_topic
-          forum_post || forum_topic.posts.where("body like ?", TagAliasRequest.command_string(antecedent_name, consequent_name) + "%").last
+          forum_post || forum_topic.posts.where("body like ?", TagAliasRequest.command_string(antecedent_name, consequent_name, id) + "%").last
         else
           nil
         end
         ForumUpdater.new(
           forum_topic, 
           forum_post: post,
-          expected_title: TagAliasRequest.topic_title(antecedent_name, consequent_name)
+          expected_title: TagAliasRequest.topic_title(antecedent_name, consequent_name),
+          skip_update: !TagRelationship::SUPPORT_HARD_CODED
         )
       end
     end
@@ -52,6 +53,14 @@ class TagAlias < TagRelationship
   include CacheMethods
   include ApprovalMethods
   include ForumMethods
+
+  concerning :EmbeddedText do
+    class_methods do
+      def embedded_pattern
+        /\[ta:(?<id>\d+)\]/m
+      end
+    end
+  end
 
   def self.to_aliased(names)
     Cache.get_multi(Array(names), "ta") do |tag|

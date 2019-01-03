@@ -1,0 +1,29 @@
+<div id="c-bulk-update-requests">
+  <div id="a-show">
+    <h1>Bulk Update Request: <%= @bulk_update_request.title %></h1>
+
+    <ul>
+      <% if @bulk_update_request.forum_topic_id %>
+        <li><strong>Reference</strong> <%= link_to "topic ##{@bulk_update_request.forum_topic_id}", forum_topic_path(@bulk_update_request.forum_topic_id) %></li>
+      <% end %>
+      <li><strong>Creator</strong> <%= link_to_user @bulk_update_request.user %></li>
+      <li><strong>Date</strong> <%= @bulk_update_request.created_at %></li>
+      <li><strong>Status</strong>: <%= @bulk_update_request.status %></li>
+
+      <% if CurrentUser.is_admin? && @bulk_update_request.is_pending? %>
+        <li><strong>Commands</strong> <%= link_to "Approve", approve_bulk_update_request_path(@bulk_update_request), :method => :post %></li>
+      <% end %>
+    </ul>
+
+    <div style="margin: 1em 0;">
+      <h2>Script</h2>
+      <pre><%= format_text @bulk_update_request.script_with_links %></pre>
+    </div>
+  </div>
+</div>
+
+<%= render "secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Bulk Update Request - <%= Danbooru.config.app_name %>
+<% end %>
