@@ -326,6 +326,8 @@ module Sources
         end
 
         return metadata.moniker
+      rescue PixivApiClient::BadIDError
+        nil
       end
       memoize :moniker
 
@@ -344,6 +346,8 @@ module Sources
 
       def ugoira_frame_data
         return metadata.json.dig("metadata", "frames")
+      rescue PixivApiClient::BadIDError
+        nil
       end
       memoize :ugoira_frame_data
 

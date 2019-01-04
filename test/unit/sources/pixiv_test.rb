@@ -168,10 +168,13 @@ module Sources
         end
       end
 
-      context "fetching source data for a deleted work" do
-        should "return the same url" do
-          get_source("https://i.pximg.net/img-original/img/2017/11/22/01/06/44/65991677_p0.png")
-          assert_equal(["https://i.pximg.net/img-original/img/2017/11/22/01/06/44/65991677_p0.png"], @site.image_urls)
+      context "A deleted pixiv post" do
+        should "not fail when fetching the source data" do
+          @source = "https://i.pximg.net/img-original/img/2018/12/30/01/04/55/72373728_p0.png"
+          get_source(@source)
+
+          assert_equal([@source], @site.image_urls)
+          assert_nothing_raised { @site.to_h }
         end
       end
 

@@ -229,7 +229,7 @@ class UploadService
         retry
       end
 
-      if download.data[:ugoira_frame_data]
+      if download.data[:ugoira_frame_data].present?
         upload.context = { 
           "ugoira" => {
             "frame_data" => download.data[:ugoira_frame_data],
