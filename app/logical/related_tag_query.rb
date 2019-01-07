@@ -1,4 +1,7 @@
 class RelatedTagQuery
+  include ActiveModel::Serializers::JSON
+  include ActiveModel::Serializers::Xml
+
   attr_reader :query, :category, :user
 
   def initialize(query: nil, category: nil, user: nil)
@@ -46,7 +49,7 @@ class RelatedTagQuery
     results
   end
 
-  def other_wiki_category_tags
+  def other_wiki_pages
     return [] unless Tag.category_for(query) == Tag.categories.copyright
 
     other_wikis = wiki_page&.tags.to_a.grep(/^list_of_/i)
@@ -56,16 +59,22 @@ class RelatedTagQuery
   end
 
   def tags_for_html
-    map_with_category_data(tags)
+    tags_with_categories(tags)
   end
 
-  def to_json
-    {:query => query, :category => category, :tags => map_with_category_data(tags), :wiki_page_tags => map_with_category_data(wiki_page_tags), :other_wikis => other_wiki_category_tags}.to_json
+  def serializable_hash(**options)
+    {
+      query: query,
+      category: category,
+      tags: tags_with_categories(tags),
+      wiki_page_tags: tags_with_categories(wiki_page_tags),
+      other_wikis: other_wiki_pages.map { |wiki| [wiki.title, tags_with_categories(wiki.tags)] }.to_h
+    }
   end
 
 protected
 
-  def map_with_category_data(list_of_tag_names)
+  def tags_with_categories(list_of_tag_names)
     Tag.categories_for(list_of_tag_names).to_a
   end
 

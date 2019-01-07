@@ -3,7 +3,7 @@
     <%= render "related_tags/tag_column", tags: related_tags.tags, class: "general-related-tags-column", title: related_tags.pretty_name %>
     <%= render "related_tags/tag_column", tags: related_tags.wiki_page_tags, class: "wiki-related-tags-column", title: link_to("wiki:#{related_tags.pretty_name}", show_or_new_wiki_pages_path(title: related_tags.query)) %>
 
-    <% related_tags.other_wiki_category_tags.each do |wiki| %>
+    <% related_tags.other_wiki_pages.each do |wiki| %>
       <%= render "related_tags/tag_column", tags: wiki.tags, class: "other-wiki-related-tags-column", title: link_to("wiki:#{wiki.pretty_title}", show_or_new_wiki_pages_path(title: wiki.title)) %>
     <% end %>
   <% end %>

@@ -7,7 +7,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
     CurrentUser.ip_addr = "127.0.0.1"
   end
 
-  context "#other_wiki_category_tags" do
+  context "#other_wiki_pages" do
     subject { RelatedTagQuery.new(query: "copyright") }
 
     setup do
@@ -17,7 +17,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
     end
 
     should "return tags from the associated list wiki" do
-      result = subject.other_wiki_category_tags
+      result = subject.other_wiki_pages
       assert_not_nil(result[0])
       assert_equal(%w(alpha beta), result[0].tags)
     end
@@ -40,7 +40,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       end
 
       should "render the json" do
-        assert_equal("{\"query\":\"aaa\",\"category\":null,\"tags\":[[\"aaa\",0],[\"bbb\",0],[\"ccc\",0]],\"wiki_page_tags\":[],\"other_wikis\":[]}", @query.to_json)
+        assert_equal("{\"query\":\"aaa\",\"category\":null,\"tags\":[[\"aaa\",0],[\"bbb\",0],[\"ccc\",0]],\"wiki_page_tags\":[],\"other_wikis\":{}}", @query.to_json)
       end
     end
 
