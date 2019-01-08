@@ -24,6 +24,7 @@
         <td><%= script_with_line_breaks(request.script) %></td>
         <td id="request-status-for-<%= request.id %>"><%= request.status %></td>
         <td>
+          <%= link_to "Show", bulk_update_request_path(request) %> |
           <% if CurrentUser.is_admin? && request.status == "pending" %>
             <%= link_to "Approve", approve_bulk_update_request_path(request), :remote => true, :method => :post %> |
           <% end %>

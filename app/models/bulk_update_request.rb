@@ -90,7 +90,8 @@ class BulkUpdateRequest < ApplicationRecord
         ForumUpdater.new(
           forum_topic, 
           forum_post: post, 
-          expected_title: title
+          expected_title: title,
+          skip_update: !TagRelationship::SUPPORT_HARD_CODED
         )
       end
     end
@@ -168,12 +169,20 @@ class BulkUpdateRequest < ApplicationRecord
   include ApprovalMethods
   include ValidationMethods
 
+  concerning :EmbeddedText do
+    class_methods do
+      def embedded_pattern
+        /\[bur:(?<id>\d+)\]/m
+      end
+    end
+  end
+
   def editable?(user)
     user_id == user.id || user.is_builder?
   end
 
   def reason_with_link
-    "#{script_with_links}\n\n\"Link to request\":/bulk_update_requests?search[id]=#{id}\n\n#{reason}"
+    "[bur:#{id}]\n\nReason: #{reason}"
   end
 
   def script_with_links

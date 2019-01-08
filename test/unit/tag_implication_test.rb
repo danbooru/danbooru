@@ -232,7 +232,7 @@ class TagImplicationTest < ActiveSupport::TestCase
         @admin = FactoryBot.create(:admin_user)
         @topic = FactoryBot.create(:forum_topic, :title => TagImplicationRequest.topic_title("aaa", "bbb"))
         @post = FactoryBot.create(:forum_post, topic_id: @topic.id, :body => TagImplicationRequest.command_string("aaa", "bbb"))
-        @implication = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic, :status => "pending")
+        @implication = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic, :forum_post => @post, :status => "pending")
       end
 
       should "update the topic when processed" do

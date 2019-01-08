@@ -196,14 +196,15 @@ class TagImplication < TagRelationship
 
     def forum_updater
       post = if forum_topic
-        forum_post || forum_topic.posts.where("body like ?", TagImplicationRequest.command_string(antecedent_name, consequent_name) + "%").last
+        forum_post || forum_topic.posts.where("body like ?", TagImplicationRequest.command_string(antecedent_name, consequent_name, id) + "%").last
       else
         nil
       end
       ForumUpdater.new(
         forum_topic, 
         forum_post: post, 
-        expected_title: TagImplicationRequest.topic_title(antecedent_name, consequent_name)
+        expected_title: TagImplicationRequest.topic_title(antecedent_name, consequent_name),
+        skip_update: !TagRelationship::SUPPORT_HARD_CODED
       )
     end
     memoize :forum_updater
@@ -213,6 +214,14 @@ class TagImplication < TagRelationship
   include ParentMethods
   include ValidationMethods
   include ApprovalMethods
+
+  concerning :EmbeddedText do
+    class_methods do
+      def embedded_pattern
+        /\[ti:(?<id>\d+)\]/m
+      end
+    end
+  end
 
   def reload(options = {})
     flush_cache

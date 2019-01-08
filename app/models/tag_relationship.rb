@@ -1,6 +1,7 @@
 class TagRelationship < ApplicationRecord
   self.abstract_class = true
 
+  SUPPORT_HARD_CODED = true
   EXPIRY = 60
   EXPIRY_WARNING = 55
 
@@ -52,6 +53,10 @@ class TagRelationship < ApplicationRecord
 
   def is_active?
     status == "active"
+  end
+
+  def is_errored?
+    status =~ /\Aerror:/
   end
 
   def deletable_by?(user)
@@ -170,6 +175,14 @@ class TagRelationship < ApplicationRecord
 
     def forum_link
       "(forum ##{forum_post.id})" if forum_post.present?
+    end
+  end
+
+  concerning :EmbeddedText do
+    class_methods do
+      def embedded_pattern
+        raise NotImplementedError
+      end
     end
   end
 

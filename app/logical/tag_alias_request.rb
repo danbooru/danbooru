@@ -10,7 +10,11 @@ class TagAliasRequest
     "Tag alias: #{antecedent_name} -> #{consequent_name}"
   end
 
-  def self.command_string(antecedent_name, consequent_name)
+  def self.command_string(antecedent_name, consequent_name, id=nil)
+    if id
+      return "[ta:#{id}]"
+    end
+
     "create alias [[#{antecedent_name}]] -> [[#{consequent_name}]]"
   end
 
@@ -51,7 +55,7 @@ class TagAliasRequest
     ForumTopic.new(
       :title => TagAliasRequest.topic_title(antecedent_name, consequent_name),
       :original_post_attributes => {
-        :body => TagAliasRequest.command_string(antecedent_name, consequent_name) + "\n\n\"Link to alias\":/tag_aliases?search[id]=#{tag_alias_id}\n\n#{reason}"
+        :body => TagAliasRequest.command_string(antecedent_name, consequent_name, tag_alias_id) + "\n\nReason: #{reason}"
       },
       :category_id => 1
     )

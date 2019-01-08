@@ -10,7 +10,11 @@ class TagImplicationRequest
     "Tag implication: #{antecedent_name} -> #{consequent_name}"
   end
 
-  def self.command_string(antecedent_name, consequent_name)
+  def self.command_string(antecedent_name, consequent_name, id=nil)
+    if id
+      return "[ti:#{id}]"
+    end
+
     "create implication [[#{antecedent_name}]] -> [[#{consequent_name}]]"
   end
 
@@ -51,7 +55,7 @@ class TagImplicationRequest
     ForumTopic.new(
       :title => TagImplicationRequest.topic_title(antecedent_name, consequent_name),
       :original_post_attributes => {
-        :body => TagImplicationRequest.command_string(antecedent_name, consequent_name) + "\n\n\"Link to implication\":/tag_implications?search[id]=#{tag_implication_id}\n\n#{reason}"
+        :body => TagImplicationRequest.command_string(antecedent_name, consequent_name, tag_implication_id) + "\n\nReason: #{reason}"
       },
       :category_id => 1
     )

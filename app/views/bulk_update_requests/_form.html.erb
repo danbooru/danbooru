@@ -7,16 +7,16 @@
 
   <div class="input">
     <label class="text optional" for="bulk_update_request_script">Script</label>
-<pre class="hint">
-Use the following format:
-unalias aaa -> bbb
-unimply aaa -> bbb
-alias aaa -> bbb
-imply aaa -> bbb
-update aaa -> bbb
-category tag_name -> category_name
-</pre>
     <%= text_area :bulk_update_request, :script, :size => "50x10" %>
+    <p><a href="#" id="script-help-link">Help</a></p>
+    <ul class="hint" id="script-help" title="Bulk Update Request Help">
+      <li>unalias aaa -> bbb</li>
+      <li>unimply aaa -> bbb</li>
+      <li>alias aaa -> bbb</li>
+      <li>imply aaa -> bbb</li>
+      <li>update aaa -> bbb</li>
+      <li>category tag_name -> category_name</li>
+    </ul>
   </div>
 
   <% if @bulk_update_request.new_record? %>
@@ -44,4 +44,16 @@ category tag_name -> category_name
 
   <%= f.button :submit, :value => "Submit" %>
   <%= dtext_preview_button "bulk_update_request", "reason" %>
+<% end %>
+
+<%= content_for(:html_header) do %>
+  <script>
+    $(function() {
+      $("#script-help").hide();
+      $("#script-help-link").click(function() {
+        $("#script-help").dialog({width: "30em"});
+        return false;
+      });
+    });
+  </script>
 <% end %>
