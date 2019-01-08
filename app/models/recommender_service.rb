@@ -46,6 +46,9 @@ module RecommenderService
       )
       JSON.parse(resp.body)
     end
+    if ids == "error"
+      return []
+    end
     Post.find(ids.reject {|x| x[0] == post_id}.map(&:first))
   end
 
