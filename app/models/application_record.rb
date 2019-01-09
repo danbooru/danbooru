@@ -178,7 +178,7 @@ class ApplicationRecord < ActiveRecord::Base
     protected
 
     def hidden_attributes
-      [:uploader_ip_addr, :updater_ip_addr, :creator_ip_addr, :ip_addr]
+      [:uploader_ip_addr, :updater_ip_addr, :creator_ip_addr]
     end
 
     def method_attributes
@@ -243,7 +243,6 @@ class ApplicationRecord < ActiveRecord::Base
             if rec.creator_id.nil?
               rec.creator_id = CurrentUser.id
               rec.creator_ip_addr = CurrentUser.ip_addr if rec.respond_to?(:creator_ip_addr=)
-              rec.ip_addr = CurrentUser.ip_addr if rec.respond_to?(:ip_addr=)
             end
           end
 

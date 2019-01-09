@@ -895,7 +895,7 @@ CREATE TABLE public.comments (
     post_id integer NOT NULL,
     creator_id integer NOT NULL,
     body text NOT NULL,
-    ip_addr inet NOT NULL,
+    creator_ip_addr inet NOT NULL,
     body_index tsvector NOT NULL,
     score integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone,
@@ -5090,10 +5090,10 @@ CREATE INDEX index_comments_on_creator_id_and_post_id ON public.comments USING b
 
 
 --
--- Name: index_comments_on_ip_addr; Type: INDEX; Schema: public; Owner: -
+-- Name: index_comments_on_creator_ip_addr; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_comments_on_ip_addr ON public.comments USING btree (ip_addr);
+CREATE INDEX index_comments_on_creator_ip_addr ON public.comments USING btree (creator_ip_addr);
 
 
 --
@@ -7519,6 +7519,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20181114185032'),
 ('20181114202744'),
 ('20181130004740'),
-('20181202172145');
+('20181202172145'),
+('20190109210822');
 
 
