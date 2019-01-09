@@ -1,5 +1,17 @@
 class Tag < ApplicationRecord
   COSINE_SIMILARITY_RELATED_TAG_THRESHOLD = 300
+  COUNT_METATAGS = %w[
+    comment_count deleted_comment_count active_comment_count
+    note_count deleted_note_count active_note_count
+    flag_count resolved_flag_count unresolved_flag_count
+    child_count deleted_child_count active_child_count
+    pool_count deleted_pool_count active_pool_count series_pool_count collection_pool_count
+    appeal_count approval_count replacement_count
+  ]
+
+  # allow e.g. `deleted_comments` as a synonym for `deleted_comment_count`
+  COUNT_METATAG_SYNONYMS = COUNT_METATAGS.map { |str| str.delete_suffix("_count").pluralize }
+
   METATAGS = %w[
     -user user -approver approver commenter comm noter noteupdater artcomm
     -pool pool ordpool -favgroup favgroup -fav fav ordfav md5 -rating rating
@@ -7,9 +19,31 @@ class Tag < ApplicationRecord
     -source id -id date age order limit -status status tagcount parent -parent
     child pixiv_id pixiv search upvote downvote filetype -filetype flagger
     -flagger appealer -appealer disapproval -disapproval
-  ] + TagCategory.short_name_list.map {|x| "#{x}tags"}
+  ] + TagCategory.short_name_list.map {|x| "#{x}tags"} + COUNT_METATAGS + COUNT_METATAG_SYNONYMS
 
   SUBQUERY_METATAGS = %w[commenter comm noter noteupdater artcomm flagger -flagger appealer -appealer]
+
+  ORDER_METATAGS = %w[
+    id id_desc
+    score score_asc
+    favcount favcount_asc
+    created_at created_at_asc
+    change change_asc
+    comment comment_asc
+    comment_bumped comment_bumped_asc
+    note note_asc
+    artcomm artcomm_asc
+    mpixels mpixels_asc
+    portrait landscape
+    filesize filesize_asc
+    tagcount tagcount_asc
+    rank
+    random
+    custom
+  ] +
+  COUNT_METATAGS +
+  COUNT_METATAG_SYNONYMS.flat_map { |str| [str, "#{str}_asc"] } +
+  TagCategory.short_name_list.flat_map { |str| ["#{str}tags", "#{str}tags_asc"] }
 
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :artist, :foreign_key => "name", :primary_key => "name"
@@ -757,7 +791,14 @@ class Tag < ApplicationRecord
             q[:child] = g2.downcase
 
           when "order"
-            q[:order] = g2.downcase
+            g2 = g2.downcase
+
+            order, suffix, _ = g2.partition(/_(asc|desc)\z/i)
+            if order.in?(COUNT_METATAG_SYNONYMS)
+              g2 = order.singularize + "_count" + suffix
+            end
+
+            q[:order] = g2
 
           when "limit"
             # Do nothing. The controller takes care of it.
@@ -790,6 +831,13 @@ class Tag < ApplicationRecord
             if CurrentUser.user.is_moderator?
               q[:downvote] = User.name_to_id(g2)
             end
+
+          when *COUNT_METATAGS
+            q[g1.to_sym] = parse_helper(g2)
+
+          when *COUNT_METATAG_SYNONYMS
+            g1 = "#{g1.singularize}_count"
+            q[g1.to_sym] = parse_helper(g2)
 
           end
 

@@ -2105,6 +2105,20 @@ class PostTest < ActiveSupport::TestCase
       assert_tag_match([posts[1]], "noter:none")
     end
 
+    should "return posts for the note_count:<N> metatag" do
+      posts = FactoryBot.create_list(:post, 3)
+      FactoryBot.create(:note, post: posts[0], is_active: true)
+      FactoryBot.create(:note, post: posts[1], is_active: false)
+
+      assert_tag_match([posts[1], posts[0]], "note_count:1")
+      assert_tag_match([posts[0]], "active_note_count:1")
+      assert_tag_match([posts[1]], "deleted_note_count:1")
+
+      assert_tag_match([posts[1], posts[0]], "notes:1")
+      assert_tag_match([posts[0]], "active_notes:1")
+      assert_tag_match([posts[1]], "deleted_notes:1")
+    end
+
     should "return posts for the artcomm:<name> metatag" do
       users = FactoryBot.create_list(:user, 2)
       posts = FactoryBot.create_list(:post, 2)
@@ -2389,6 +2403,8 @@ class PostTest < ActiveSupport::TestCase
         p
       end
 
+      FactoryBot.create(:note, post: posts.second)
+
       assert_tag_match(posts.reverse, "order:id_desc")
       assert_tag_match(posts.reverse, "order:score")
       assert_tag_match(posts.reverse, "order:favcount")
@@ -2406,6 +2422,10 @@ class PostTest < ActiveSupport::TestCase
       assert_tag_match(posts.reverse, "order:chartags")
       assert_tag_match(posts.reverse, "order:copytags")
       assert_tag_match(posts.reverse, "order:rank")
+      assert_tag_match(posts.reverse, "order:note_count")
+      assert_tag_match(posts.reverse, "order:note_count_desc")
+      assert_tag_match(posts.reverse, "order:notes")
+      assert_tag_match(posts.reverse, "order:notes_desc")
 
       assert_tag_match(posts, "order:id_asc")
       assert_tag_match(posts, "order:score_asc")
@@ -2423,6 +2443,8 @@ class PostTest < ActiveSupport::TestCase
       assert_tag_match(posts, "order:arttags_asc")
       assert_tag_match(posts, "order:chartags_asc")
       assert_tag_match(posts, "order:copytags_asc")
+      assert_tag_match(posts, "order:note_count_asc")
+      assert_tag_match(posts, "order:notes_asc")
     end
 
     should "return posts for order:comment_bumped" do
