@@ -9,6 +9,7 @@
       <li><strong>Creator</strong> <%= link_to_user @bulk_update_request.user %></li>
       <li><strong>Date</strong> <%= @bulk_update_request.created_at %></li>
       <li><strong>Status</strong>: <%= @bulk_update_request.status %></li>
+      <li><strong title="How many posts will be affected">Estimate</strong>: <%= @bulk_update_request.estimate_update_count %></li>
 
       <% if CurrentUser.is_admin? && @bulk_update_request.is_pending? %>
         <li><strong>Commands</strong> <%= link_to "Approve", approve_bulk_update_request_path(@bulk_update_request), :method => :post %></li>

@@ -26,6 +26,28 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
       end
     end
 
+    context "#estimate_update_count" do
+      setup do
+        FactoryBot.create(:post, tag_string: "aaa")
+        FactoryBot.create(:post, tag_string: "bbb")
+        FactoryBot.create(:post, tag_string: "ccc")
+        FactoryBot.create(:post, tag_string: "ddd")
+        FactoryBot.create(:post, tag_string: "eee")
+
+        @script = "create alias aaa -> 000\n" +
+          "create implication bbb -> 111\n" +
+          "remove alias ccc -> 222\n" +
+          "remove implication ddd -> 333\n" +
+          "mass update eee -> 444\n"
+      end
+
+      subject { AliasAndImplicationImporter.new(@script, nil) }
+
+      should "return the correct count" do
+        assert_equal(3, subject.estimate_update_count)
+      end
+    end
+
     context "given a valid list" do
       setup do
         @list = "create alias abc -> def\ncreate implication aaa -> bbb\n"
