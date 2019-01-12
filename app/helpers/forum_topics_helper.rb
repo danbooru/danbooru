@@ -21,12 +21,18 @@ module ForumTopicsHelper
     end
 
     if obj.is_a?(BulkUpdateRequest)
+      if obj.script.size < 700
+        embedded_script = obj.script_with_links
+      else
+        embedded_script = "[expand]#{obj.script_with_links}[/expand]"
+      end
+
       if obj.is_approved?
-        return "The bulk update request ##{obj.id} is active.\n\n[expand]#{obj.script_with_links}[/expand]"
+        return "The bulk update request ##{obj.id} is active.\n\n#{embedded_script}"
       elsif obj.is_pending?
-        return "The \"bulk update request ##{obj.id}\":/bulk_update_requests/#{obj.id} is pending approval.\n\n[expand]#{obj.script_with_links}[/expand]"
+        return "The \"bulk update request ##{obj.id}\":/bulk_update_requests/#{obj.id} is pending approval.\n\n#{embedded_script}"
       elsif obj.is_rejected?
-        return "The bulk update request ##{obj.id} has been rejected.\n\n[expand]#{obj.script_with_links}[/expand]"
+        return "The bulk update request ##{obj.id} has been rejected.\n\n#{embedded_script}"
       end
     end
   end
