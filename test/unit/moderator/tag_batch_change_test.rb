@@ -20,6 +20,16 @@ module Moderator
         CurrentUser.ip_addr = nil
       end
 
+      context "#estimate_update_count" do
+        setup do
+          @change = TagBatchChange.new("aaa", "bbb", @user.id, "127.0.0.1")
+        end
+
+        should "find the correct count" do
+          assert_equal(1, @change.estimate_update_count)
+        end
+      end
+
       should "execute" do
         tag_batch_change = TagBatchChange.new("aaa", "bbb", @user.id, "127.0.0.1")
         tag_batch_change.perform

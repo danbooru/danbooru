@@ -229,4 +229,8 @@ class BulkUpdateRequest < ApplicationRecord
   def is_rejected?
     status == "rejected"
   end
+
+  def estimate_update_count
+    AliasAndImplicationImporter.new(script, nil).estimate_update_count
+  end
 end

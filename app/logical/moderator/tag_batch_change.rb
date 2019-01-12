@@ -20,6 +20,10 @@ module Moderator
       ModAction.log("processed mass update: #{antecedent} -> #{consequent}",:mass_update)
     end
 
+    def estimate_update_count
+      PostReadOnly.tag_match(antecedent).count
+    end
+
     def migrate_posts(normalized_antecedent, normalized_consequent)
       ::Post.tag_match(normalized_antecedent.join(" ")).find_each do |post|
         post.reload

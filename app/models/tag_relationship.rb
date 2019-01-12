@@ -192,6 +192,10 @@ class TagRelationship < ApplicationRecord
     end
   end
 
+  def estimate_update_count
+    Post.fast_count(antecedent_name, skip_cache: true)
+  end
+
   extend SearchMethods
   include MessageMethods
 end

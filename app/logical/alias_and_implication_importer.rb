@@ -78,6 +78,28 @@ class AliasAndImplicationImporter
     end
   end
 
+  def estimate_update_count
+    tokens = self.class.tokenize(text)
+    tokens.inject(0) do |sum, token|
+      case token[0]
+      when :create_alias
+        sum + TagAlias.new(antecedent_name: token[1], consequent_name: token[2]).estimate_update_count
+
+      when :create_implication
+        sum + TagImplication.new(antecedent_name: token[1], consequent_name: token[2]).estimate_update_count
+
+      when :mass_update
+        sum + Moderator::TagBatchChange.new(token[1], token[2]).estimate_update_count
+
+      when :change_category
+        sum + Tag.find_by_name(token[1]).try(:post_count) || 0
+
+      else
+        sum + 0
+      end
+    end
+  end
+
 private
 
   def parse(tokens, approver)
