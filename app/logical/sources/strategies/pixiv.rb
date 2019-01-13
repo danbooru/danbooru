@@ -282,7 +282,7 @@ module Sources
           # http://i1.pixiv.net/img07/img/pasirism/18557054_p1.png
           # http://i1.pixiv.net/img07/img/pasirism/18557054_big_p1.png
           elsif url.host =~ %r!\A(?:i\d+|img\d+)\.pixiv\.net\z!i &&
-                url.path =~ %r!\A(?:/img\d+)?/img/\w+/(?<illust_id>\d+)(?:_\w+)?\.(?:jpg|jpeg|png|gif|zip)!i
+                url.path =~ %r!\A(?:/img\d+)?/img/#{MONIKER}/(?<illust_id>\d+)(?:_\w+)?\.(?:jpg|jpeg|png|gif|zip)!i
             return $~[:illust_id].to_i
 
           # http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg
@@ -298,7 +298,7 @@ module Sources
           # https://i.pximg.net/novel-cover-original/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42.jpg
           # https://img-sketch.pixiv.net/uploads/medium/file/4463372/8906921629213362989.jpg
           elsif url.host =~ %r!\A(?:i\.pximg\.net|i\d+\.pixiv\.net)\z!i &&
-                url.path =~ %r!\A(/c/\w+)?/img-[a-z-]+/img/\d{4}(?:/\d{2}){5}/(?<illust_id>\d+)(?:_\w+)?\.(?:jpg|jpeg|png|gif|zip)!i
+                url.path =~ %r!\A(/c/\w+)?/img-[a-z-]+/img/#{DATE}/(?<illust_id>\d+)(?:_\w+)?\.(?:jpg|jpeg|png|gif|zip)!i
             return $~[:illust_id].to_i
           end
         end
