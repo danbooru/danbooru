@@ -26,7 +26,7 @@ class SetDiff
     [added, removed, changed]
   end
 
-  def find_similar(string, candidates, max_dissimilarity: 0.75)
+  def find_similar(string, candidates, max_dissimilarity: 0.70)
     distance = ->(other) { DidYouMean::Levenshtein.distance(string, other) }
     max_distance = string.size * max_dissimilarity
 
