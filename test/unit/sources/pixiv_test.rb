@@ -2,9 +2,20 @@ require 'test_helper'
 
 module Sources
   class PixivTest < ActiveSupport::TestCase
+    def assert_illust_id(illust_id, url)
+      site = Sources::Strategies.find(url)
+      assert_equal(illust_id, site.illust_id)
+      assert_nothing_raised { site.to_h }
+    end
+
+    def assert_nil_illust_id(url)
+      site = Sources::Strategies.find(url)
+      assert_nil(site.illust_id)
+    end
+
     def get_source(source)
       @site = Sources::Strategies.find(source)
-      
+
       @site
     rescue Net::OpenTimeout
       skip "Remote connection to #{source} failed"
@@ -19,23 +30,8 @@ module Sources
       save_pixiv_tokens!
       super
     end
-    
+
     context "in all cases" do
-      context "A touch page" do
-        setup do
-          @site = Sources::Strategies.find("http://touch.pixiv.net/member_illust.php?mode=medium&illust_id=59687915")
-          @image_urls = @site.image_urls
-        end
-
-        should "get all the image urls" do
-          expected_urls = [
-            "https://i.pximg.net/img-original/img/2016/10/29/17/13/23/59687915_p0.png",
-            "https://i.pximg.net/img-original/img/2016/10/29/17/13/23/59687915_p1.png"
-          ].sort
-          assert_equal(expected_urls, @image_urls.sort)
-        end
-      end
-
       context "A gallery page" do
         setup do
           @site = Sources::Strategies.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=49270482")
@@ -290,6 +286,51 @@ module Sources
           assert_equal(["uroobnad"], source.other_names)
           assert_includes(source.profile_urls, "https://www.pixiv.net/member.php?id=696859")
           assert_includes(source.profile_urls, "https://www.pixiv.net/stacc/uroobnad")
+        end
+      end
+
+      context "parsing illust ids" do
+        should "parse ids from illust urls" do
+          assert_illust_id(46324488, "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=46324488")
+          assert_illust_id(46324488, "https://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=46324488&page=0")
+          assert_illust_id(46324488, "https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png")
+          assert_illust_id(46324488, "https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg")
+
+          assert_illust_id(46785915, "https://i.pximg.net/c/250x250_80_a2/img-master/img/2014/10/29/09/27/19/46785915_p0_square1200.jpg")
+
+          assert_illust_id(46323924, "http://i1.pixiv.net/img-zip-ugoira/img/2014/10/03/17/29/16/46323924_ugoira1920x1080.zip")
+          assert_illust_id(46304396, "http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p0.png")
+          assert_illust_id(46304396, "http://i1.pixiv.net/c/600x600/img-master/img/2014/10/02/13/51/23/46304396_p0_master1200.jpg")
+
+          assert_illust_id(14901720, "http://img18.pixiv.net/img/evazion/14901720.png")
+          assert_illust_id(14901720, "http://i2.pixiv.net/img18/img/evazion/14901720.png")
+          assert_illust_id(14901720, "http://i2.pixiv.net/img18/img/evazion/14901720_m.png")
+          assert_illust_id(14901720, "http://i2.pixiv.net/img18/img/evazion/14901720_s.png")
+
+          assert_illust_id(18557054, "http://i1.pixiv.net/img07/img/pasirism/18557054_p1.png")
+          assert_illust_id(18557054, "http://i1.pixiv.net/img07/img/pasirism/18557054_big_p1.png")
+          assert_illust_id(18557054, "http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg")
+          assert_illust_id(18557054, "http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_s.png")
+          assert_illust_id(18557054, "http://www.pixiv.net/i/18557054")
+        end
+
+        should "not misparse ids from fanbox urls" do
+          assert_nil_illust_id("https://fanbox.pixiv.net/images/post/39714/JvjJal8v1yLgc5DPyEI05YpT.png")
+          assert_nil_illust_id("https://pixiv.pximg.net/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg")
+          assert_nil_illust_id("https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg")
+          assert_nil_illust_id("https://pixiv.pximg.net/c/1200x630_90_a2_g5/fanbox/public/images/post/186919/cover/VCI1Mcs2rbmWPg0mmiTisovn.jpeg")
+        end
+
+        should "not misparse ids from sketch urls" do
+          assert_nil_illust_id("https://img-sketch.pixiv.net/uploads/medium/file/4463372/8906921629213362989.jpg")
+          assert_nil_illust_id("https://img-sketch.pximg.net/c!/w=540,f=webp:jpeg/uploads/medium/file/4463372/8906921629213362989.jpg")
+          assert_nil_illust_id("https://sketch.pixiv.net/items/1588346448904706151")
+        end
+
+        should "not misparse ids from novel urls" do
+          assert_nil_illust_id("https://i.pximg.net/novel-cover-original/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42.jpg")
+          assert_nil_illust_id("https://i.pximg.net/c/600x600/novel-cover-master/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42_master1200.jpg")
+          assert_nil_illust_id("https://www.pixiv.net/novel/show.php?id=10617324")
         end
       end
     end
