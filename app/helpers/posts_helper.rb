@@ -147,6 +147,10 @@ module PostsHelper
     return params[:pool_id].to_i == pool.id
   end
 
+  def show_tag_change_notice?
+    Tag.scan_query(params[:tags]).size == 1 && TagChangeNoticeService.get_forum_topic_id(params[:tags])
+  end
+
   private
 
   def nav_params_for(page)

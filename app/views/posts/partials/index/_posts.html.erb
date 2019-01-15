@@ -19,6 +19,12 @@
     </div>
   <% end %>
 
+  <% if show_tag_change_notice? %>
+    <div class="tag-change-notice">
+      <p>This tag is the subject of an ongoing discussion. If you have any relevant information, please join the <%= link_to "discussion", forum_topic_path(TagChangeNoticeService.get_forum_topic_id(params[:tags]) || 1) %>.</p>
+    </div>
+  <% end %>
+
   <% unless post_set.is_random? %>
     <%= numbered_paginator(post_set.posts) %>
   <% end %>
