@@ -26,6 +26,28 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
       end
     end
 
+    context "#affected_tags" do
+      setup do
+        FactoryBot.create(:post, tag_string: "aaa")
+        FactoryBot.create(:post, tag_string: "bbb")
+        FactoryBot.create(:post, tag_string: "ccc")
+        FactoryBot.create(:post, tag_string: "ddd")
+        FactoryBot.create(:post, tag_string: "eee")
+
+        @script = "create alias aaa -> 000\n" +
+          "create implication bbb -> 111\n" +
+          "remove alias ccc -> 222\n" +
+          "remove implication ddd -> 333\n" +
+          "mass update eee -> 444\n"
+      end
+
+      subject { AliasAndImplicationImporter.new(@script, nil) }
+
+      should "return the correct tags" do
+        assert_equal(%w(aaa 000 bbb 111 ccc 222 ddd 333 eee 444), subject.affected_tags)
+      end
+    end
+
     context "#estimate_update_count" do
       setup do
         FactoryBot.create(:post, tag_string: "aaa")
