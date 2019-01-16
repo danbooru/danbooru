@@ -181,6 +181,14 @@ class BulkUpdateRequest < ApplicationRecord
     user_id == user.id || user.is_builder?
   end
 
+  def approvable?(user)
+    !is_approved? && user.is_admin?
+  end
+
+  def rejectable?(user)
+    is_pending? && editable?(user)
+  end
+
   def reason_with_link
     "[bur:#{id}]\n\nReason: #{reason}"
   end

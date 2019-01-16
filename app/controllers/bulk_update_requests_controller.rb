@@ -16,6 +16,7 @@ class BulkUpdateRequestsController < ApplicationController
 
   def show
     @bulk_update_request = BulkUpdateRequest.find(params[:id])
+    respond_with(@bulk_update_request)
   end
 
   def edit
@@ -37,7 +38,7 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def destroy
-    if @bulk_update_request.editable?(CurrentUser.user)
+    if @bulk_update_request.rejectable?(CurrentUser.user)
       @bulk_update_request.reject!(CurrentUser.user)
       flash[:notice] = "Bulk update request rejected"
       respond_with(@bulk_update_request, :location => bulk_update_requests_path)
