@@ -10,15 +10,13 @@
       <li><strong>Date</strong> <%= @bulk_update_request.created_at %></li>
       <li><strong>Status</strong>: <%= @bulk_update_request.status %></li>
       <li><strong title="How many posts will be affected">Estimate</strong>: <%= @bulk_update_request.estimate_update_count %></li>
-
-      <% if CurrentUser.is_admin? && @bulk_update_request.is_pending? %>
-        <li><strong>Commands</strong> <%= link_to "Approve", approve_bulk_update_request_path(@bulk_update_request), :method => :post %></li>
-      <% end %>
     </ul>
 
     <div style="margin: 1em 0;">
       <h2>Script</h2>
       <pre><%= format_text @bulk_update_request.script_with_links %></pre>
+
+      <%= render "bur_edit_links", bur: @bulk_update_request %>
     </div>
   </div>
 </div>
