@@ -46,7 +46,7 @@ module RecommenderService
       )
       JSON.parse(resp.body)
     end
-    if ids == "error"
+    if ids.is_a?(Hash) # error state
       return []
     end
     Post.find(ids.reject {|x| x[0] == post_id}.map(&:first))
