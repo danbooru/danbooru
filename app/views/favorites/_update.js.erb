@@ -1,4 +1,8 @@
 $("#add-to-favorites, #add-fav-button, #remove-from-favorites, #remove-fav-button").toggle();
+$("#remove-fav-button").addClass("animate");
+$.timeout(30000, function() {
+  $("#remove-fav-button").removeClass("animate");
+});
 $("#score-for-post-<%= @post.id %>").text(<%= @post.score %>);
 $("#favcount-for-post-<%= @post.id %>").text(<%= @post.fav_count %>);
 $(".fav-buttons").toggleClass("fav-buttons-false").toggleClass("fav-buttons-true");

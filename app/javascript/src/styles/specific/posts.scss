@@ -149,6 +149,18 @@ body[data-user-can-approve-posts="true"] .post-preview {
   color: red;
 }
 
+@keyframes heartbeat {
+  0% {
+    transform:scale(1);
+  }
+  50% {
+    transform:scale(1.3);
+  }
+  100% {
+    transform:scale(1);
+  }
+}
+
 div#c-posts {
   .fav-buttons {
     font-size: 14pt;
@@ -163,8 +175,12 @@ div#c-posts {
     }
   }
 
-  #remove-fav-button i {
+  #remove-fav-button i.fa-heart {
     color: deeppink;
+  }
+
+  #remove-fav-button.animate i {
+    animation: heartbeat 0.4s ease;
   }
 
   .fav-buttons-true #add-fav-button {
