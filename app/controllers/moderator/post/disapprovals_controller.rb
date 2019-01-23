@@ -11,6 +11,10 @@ module Moderator
         respond_with(@post_disapproval)
       end
 
+      def index
+        @post_disapprovals = PostDisapproval.paginate(params[:page])
+      end
+
       private
 
       def post_disapproval_params
