@@ -3,7 +3,7 @@
 <% elsif post.levelblocked? -%>
   <p><%= link_to("You need a gold account to see this image", new_user_upgrade_path) %>.</p>
 <% elsif post.safeblocked? -%>
-  <p>This image is unavailable on safe mode (<%= Danbooru.config.app_name %>). Go to <%= link_to("Danbooru", "https://danbooru.donmai.us") %> or disable safe mode to view (<%= link_to("learn more", template.wiki_pages_path(title: "help:user_settings")) -%>).</p>
+  <p>This image is unavailable on safe mode (<%= Danbooru.config.app_name %>). Go to <%= link_to("Danbooru", "https://danbooru.donmai.us") %> or disable safe mode to view (<%= link_to("learn more", wiki_pages_path(title: "help:user_settings")) -%>).</p>
 <% elsif post.is_flash? -%>
   <%= render("posts/partials/show/flash", post: post) -%>
 <% elsif post.is_video? -%>
