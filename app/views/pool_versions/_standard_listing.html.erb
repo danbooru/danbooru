@@ -20,7 +20,11 @@
           <td><%= link_to pool_version.post_ids.size, pool_versions_path(:search => {:pool_id => pool_version.pool_id}) %></td>
           <td class="col-expand"><%= pool_version_diff(pool_version) %></td>
           <td><%= link_to_if pool_version.description_changed, pool_version.description_changed, diff_pool_version_path(pool_version.id) %></td>
-          <td><%= link_to_user pool_version.updater %></td>
+          <td>
+            <% if pool_version.updater %>
+              <%= link_to_user pool_version.updater %>
+            <% end %>
+          </td>
           <% if CurrentUser.is_moderator? %>
             <td>
               <%= link_to_ip pool_version.updater_ip_addr %>
