@@ -315,11 +315,11 @@ Post.expand_image = function(e) {
   var $image = $("#image");
   var $notice = $("#image-resize-notice");
   $image.attr("src", $link.attr("href"));
-  $image.css("opacity", "0.25");
+  $image.css("filter", "blur(8px)");
   $image.width($image.data("original-width"));
   $image.height($image.data("original-height"));
   $image.on("load.danbooru", function() {
-    $image.css("opacity", "1");
+    $image.css("animation", "sharpen 0.5s forwards");
     $notice.hide();
   });
   $notice.children().eq(0).hide();
@@ -340,13 +340,13 @@ Post.initialize_post_image_resize_links = function() {
         var $image = $("#image");
         var $notice = $("#image-resize-notice");
         $image.attr("src", $("#image-container").data("large-file-url"));
-        $image.css("opacity", "0.25");
+        $image.css("filter", "blur(8px)");
         $image.width($image.data("large-width"));
         $image.height($image.data("large-height"));
         $notice.children().eq(0).show();
         $notice.children().eq(1).hide(); // Loading message
         $image.on("load.danbooru", function() {
-          $image.css("opacity", "1");
+          $image.css("animation", "sharpen 0.5s forwards");
           $notice.show();
         });
         Note.Box.scale_all();
