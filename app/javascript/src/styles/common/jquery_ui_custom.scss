@@ -22,6 +22,12 @@ div.ui-dialog {
   font-size: 1em;
   z-index: 999 !important;
   box-shadow: 2px 2px 1px grey;
+  padding: 0;
+
+  .ui-dialog-titlebar {
+    border-radius: 0;
+    border: none;
+  }
 
   ul {
     margin-left: 1em;
@@ -52,7 +58,11 @@ div.ui-dialog {
   margin: 0;
   padding: 0.25em 1em;
   background-color: #f6f6f6;
-  border: 1px solid #c5c5c5;
+  border-top: 1px solid silver;
+  border-left: 1px solid silver;
+  border-bottom: 1px solid darkgrey;
+  border-right: 1px solid darkgrey;
+  background: linear-gradient(#f6f6f6, #e5e5e5);
 
   &.sub {
     font-size: 90%;
@@ -62,19 +72,11 @@ div.ui-dialog {
     font-size: 90%;
     padding: 0.25em 0.5em;
   }
-
-  &.gradient {
-    background: linear-gradient(#f6f6f6, #e5e5e5);
-  }
 }
 
 .ui-button:hover {
   box-shadow: 1px 1px grey;
-  transform: translateY(-1px);
-
-  &.gradient {
-    background: linear-gradient(#fefefe, #f0f0f0);
-  }
+  background: linear-gradient(#fefefe, #f0f0f0);
 }
 
 .ui-front {

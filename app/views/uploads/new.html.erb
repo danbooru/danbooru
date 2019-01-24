@@ -42,7 +42,7 @@
         <div class="input">
           <%= f.label :source %>
           <%= f.text_field :source, :size => 50, :value => params[:url] %>
-          <%= button_tag "Similar", :id => "similar-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub gradient" %>
+          <%= button_tag "Similar", :id => "similar-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub" %>
           <span class="hint">You can enter a URL to have <%= Danbooru.config.app_name %> automatically download and process it</span>
         </div>
 
@@ -108,7 +108,7 @@
         </div>
 
         <div class="input">
-          <%= submit_tag "Submit", :id => "submit-button", :class => "large ui-button ui-widget ui-corner-all gradient", data: { disable_with: false } %>
+          <%= submit_tag "Submit", :id => "submit-button", :class => "large ui-button ui-widget ui-corner-all", data: { disable_with: false } %>
         </div>
 
         <%= render "related_tags/container" %>
