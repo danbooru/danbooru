@@ -43,7 +43,7 @@ module ForumTopicsHelper
 
   def parse_embedded_tag_request_text(text)
     [TagAlias, TagImplication, BulkUpdateRequest].each do |tag_request|
-      text.gsub!(tag_request.embedded_pattern) do |match|
+      text = text.gsub(tag_request.embedded_pattern) do |match|
         begin
           obj = tag_request.find($~[:id])
           tag_request_message(obj) || match
