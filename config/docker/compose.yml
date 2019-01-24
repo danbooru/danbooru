@@ -67,3 +67,4 @@ services:
       - db
       - memcached
       - archives
+      - redis
