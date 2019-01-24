@@ -16,6 +16,7 @@ class BulkUpdateRequest < ApplicationRecord
   before_validation :initialize_attributes, :on => :create
   before_validation :normalize_text
   after_create :create_forum_topic
+  after_save :update_notice
 
   scope :pending_first, -> { order(Arel.sql("(case status when 'pending' then 0 when 'approved' then 1 else 2 end)")) }
   scope :pending, -> {where(status: "pending")}
@@ -240,5 +241,12 @@ class BulkUpdateRequest < ApplicationRecord
 
   def estimate_update_count
     AliasAndImplicationImporter.new(script, nil).estimate_update_count
+  end
+
+  def update_notice
+    TagChangeNoticeService.update_cache(
+      AliasAndImplicationImporter.new(script, nil).affected_tags,
+      forum_topic_id
+    )
   end
 end

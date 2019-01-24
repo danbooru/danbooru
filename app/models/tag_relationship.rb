@@ -32,6 +32,7 @@ class TagRelationship < ApplicationRecord
   validates :approver, presence: { message: "must exist" }, if: -> { approver_id.present? }
   validates :forum_topic, presence: { message: "must exist" }, if: -> { forum_topic_id.present? }
   validate :antecedent_and_consequent_are_different
+  after_save :update_notice
 
   def initialize_creator
     self.creator_id = CurrentUser.user.id
@@ -202,6 +203,13 @@ class TagRelationship < ApplicationRecord
 
   def estimate_update_count
     Post.fast_count(antecedent_name, skip_cache: true)
+  end
+
+  def update_notice
+    TagChangeNoticeService.update_cache(
+      [antecedent_name, consequent_name],
+      forum_topic_id
+    )
   end
 
   extend SearchMethods

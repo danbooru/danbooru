@@ -100,6 +100,30 @@ class AliasAndImplicationImporter
     end
   end
 
+  def affected_tags
+    tokens = self.class.tokenize(text)
+    tokens.inject([]) do |all, token|
+      case token[0]
+      when :create_alias, :remove_alias, :create_implication, :remove_implication
+        all << token[1]
+        all << token[2]
+        all
+
+      when :mass_update
+        all += Tag.scan_tags(token[1])
+        all += Tag.scan_tags(token[2])
+        all
+
+      when :change_category
+        all << token[1]
+        all
+
+      else
+        all
+      end
+    end
+  end
+
 private
 
   def parse(tokens, approver)
