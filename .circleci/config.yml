@@ -44,7 +44,6 @@ jobs:
             docker-compose -f config/docker/compose.yml exec archives dockerize -wait tcp://$PGHOST:$PGPORT bash -l -c 'cd /app ; bundle exec rake db:create ; bundle exec rake db:migrate'
             docker-compose -f config/docker/compose.yml exec web dockerize -wait tcp://$PGHOST:$PGPORT bash -l -c 'cd /app ; bin/rake db:create ; bin/rake db:migrate'
       - run:
-
           name: Run tests
           command: |
             circleci tests glob test/**/*_test.rb | circleci tests split --split-by=timings | xargs -I{} docker-compose -f config/docker/compose.yml exec -T web bash -l -c 'cd /app ; bin/rails test --no-ci-clean {}'
