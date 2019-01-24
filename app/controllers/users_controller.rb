@@ -50,7 +50,6 @@ class UsersController < ApplicationController
       @user.save
       if @user.errors.empty?
         session[:user_id] = @user.id
-        flash[:alias_mixpanel] = true
       else
         flash[:notice] = "Sign up failed: #{@user.errors.full_messages.join("; ")}"
       end
@@ -95,7 +94,7 @@ class UsersController < ApplicationController
       disable_categorized_saved_searches disable_tagged_filenames
       enable_recent_searches disable_cropped_thumbnails disable_mobile_gestures
       enable_safe_mode disable_responsive_mode disable_post_tooltips
-      enable_recommended_posts opt_out_mixpanel
+      enable_recommended_posts opt_out_tracking
     ]
 
     permitted_params += [dmail_filter_attributes: %i[id words]]

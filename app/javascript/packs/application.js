@@ -43,4 +43,3 @@ export { default as Shortcuts } from '../src/javascripts/shortcuts.js';
 export { default as Upload } from '../src/javascripts/uploads.js';
 export { default as Utility } from '../src/javascripts/utility.js';
 export { default as Ugoira } from '../src/javascripts/ugoira.js';
-export { mixpanelInit, mixpanelEvent, mixpanelAlias } from '../src/javascripts/mixpanel.js';

@@ -20,13 +20,3 @@
 <% content_for(:page_title) do %>
   Feedback - <%= @user_feedback.user_name %> - <%= Danbooru.config.app_name %>
 <% end %>
-
-<% if flash[:alias_mixpanel] %>
-  <% content_for(:html_header) do %>
-    <script>
-      $(function() {
-        window.Danbooru.mixpanelAlias("<%= CurrentUser.id %>");
-      });
-    </script>
-  <% end %>
-<% end %>

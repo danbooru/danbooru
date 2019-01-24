@@ -2,14 +2,3 @@
   <h1><%= link_to "Upgrade your account for only $20!", new_user_upgrade_path, id: "goto-upgrade-account" %></h1>
   <p><%= link_to "No thanks", "#", :id => "hide-upgrade-account-notice" %></p>
 </div>
-
-<% content_for(:html_header) do %>
-  <script>
-    $(function() {
-      if (typeof window.mixpanel === 'object') {
-        window.mixpanel.track_links('#goto-upgrade-account', 'clicked upgrade notice');
-        window.mixpanel.track_links('#hide-upgrade-account-notice', 'hide upgrade notice');
-      }
-    });
-  </script>
-<% end %>

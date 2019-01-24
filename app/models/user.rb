@@ -60,7 +60,7 @@ class User < ApplicationRecord
     disable_responsive_mode
     disable_post_tooltips
     enable_recommended_posts
-    opt_out_mixpanel
+    opt_out_tracking
     no_flagging
     no_feedback
   )
