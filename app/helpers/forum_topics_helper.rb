@@ -9,14 +9,18 @@ module ForumTopicsHelper
 
   def tag_request_message(obj)
     if obj.is_a?(TagRelationship)
-      if obj.is_active?
-        return "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] is active."
+      if obj.is_approved?
+        return "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] has been approved."
       elsif obj.is_retired?
-        return "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]]  has been retired"
+        return "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] has been retired."
+      elsif obj.is_deleted?
+        return "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] has been rejected."
       elsif obj.is_pending?
         return "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] is pending approval."
       elsif obj.is_errored?
         return "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] (#{relationship} failed during processing."
+      else # should never happen
+        return "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] has an unknown status."
       end
     end
 
@@ -38,12 +42,7 @@ module ForumTopicsHelper
   end
 
   def parse_embedded_tag_request_text(text)
-    # for dev mode, prime these
-    if Rails.env.development?
-      [TagAlias, TagImplication]
-    end
-
-    [*TagRelationship.subclasses, BulkUpdateRequest].each do |tag_request|
+    [TagAlias, TagImplication, BulkUpdateRequest].each do |tag_request|
       text.gsub!(tag_request.embedded_pattern) do |match|
         begin
           obj = tag_request.find($~[:id])

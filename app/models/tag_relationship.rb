@@ -43,8 +43,16 @@ class TagRelationship < ApplicationRecord
     self.consequent_name = consequent_name.mb_chars.downcase.tr(" ", "_")
   end
 
+  def is_approved?
+    status.in?(%w[active processing queued])
+  end
+
   def is_retired?
     status == "retired"
+  end
+
+  def is_deleted?
+    status == "deleted"
   end
 
   def is_pending?
