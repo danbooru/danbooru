@@ -1,7 +1,7 @@
 <div id="detailed-rejection-dialog" title="Detailed Rejection" style="display: none;">
   <p>You can supply a short message to the uploader explaining why you rejected this upload.</p>
 
-  <%= simple_form_for(PostDisapproval.new, url: moderator_post_disapproval_path, remote: true, id: "detailed-rejection-form") do |f| %>
+  <%= simple_form_for(PostDisapproval.new, url: moderator_post_disapprovals_path, remote: true, id: "detailed-rejection-form") do |f| %>
     <%= f.hidden_field :post_id, value: "x" %>
     <%= f.input :reason, collection: [["Breaks Rules", "breaks_rules"], ["Poor Quality", "poor_quality"], ["No interest", "disinterest"]] %>
     <%= f.input :message, as: :string %>

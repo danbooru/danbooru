@@ -1,0 +1,30 @@
+<div id="c-moderator-post-disapprovals">
+  <div id="a-index">
+    <h1>Disapprovals</h1>
+
+    <table class="striped" width="100%">
+      <thead>
+        <tr>
+          <th>Post</th>
+          <th>Reason</th>
+          <th>Creator</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @post_disapprovals.each do |post_disapproval| %>
+          <tr>
+            <td><%= link_to post_disapproval.post_id, post_path(post_disapproval.post_id) %></td>
+            <td><%= post_disapproval.reason %>: <%= post_disapproval.message %></td>
+            <td><%= post_disapproval.user.name %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <%= numbered_paginator(@post_disapprovals) %>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Post Disapprovals - <%= Danbooru.config.app_name %>
+<% end %>
