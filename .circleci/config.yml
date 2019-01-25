@@ -3,7 +3,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/app
   docker:
-    - image: buildpack-deps:trusty
+    - image: circleci/buildpack-deps:trusty
       environment:
         DOCKER_VERSION: 18.03.1-ce
         DOCKER_COMPOSE_VERSION: 1.21.1
@@ -16,21 +16,6 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
-      - run:
-          name: Install Docker
-          command: |
-            set -x
-            curl -L -o /tmp/docker-${DOCKER_VERSION}.tgz https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKER_VERSION}.tgz
-            tar -xz -C /tmp -f /tmp/docker-${DOCKER_VERSION}.tgz
-            chmod +x /tmp/docker/*
-            mv /tmp/docker/* /usr/bin
-      - run: 
-          name: Install Docker Compose
-          command: |
-            sudo rm -f /usr/local/bin/docker-compose
-            curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-            chmod +x docker-compose
-            sudo mv docker-compose /usr/local/bin
       - run: 
           name: Create .env.test file
           command: env | egrep 'DEBUG|DANBOORU|RAILS|DATABASE_URL|SECRET' > .env.test
@@ -50,6 +35,3 @@ jobs:
             docker cp docker_web_1:/app/test/reports /tmp
       - store_test_results:
           path: /tmp/reports
-      # - run: 
-      #     name: Teardown
-      #     command: docker-compose -f config/docker/compose.yml down
