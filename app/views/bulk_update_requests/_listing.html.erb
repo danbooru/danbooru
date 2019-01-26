@@ -25,7 +25,7 @@
         <td id="request-status-for-<%= request.id %>"><%= request.status %></td>
         <td>
           <%= link_to "Show", bulk_update_request_path(request) %> |
-          <%= render "bur_edit_links", bur: request %>
+          <%= render "bulk_update_requests/bur_edit_links", bur: request %>
         </td>
       </tr>
     <% end %>
