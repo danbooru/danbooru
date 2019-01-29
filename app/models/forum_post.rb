@@ -125,7 +125,9 @@ class ForumPost < ApplicationRecord
   end
 
   def votable?
-    body.to_s.match?(/->/)
+    TagAlias.where(forum_post_id: id).exists? ||
+      TagImplication.where(forum_post_id: id).exists? ||
+      BulkUpdateRequest.where(forum_post_id: id).exists?
   end
 
   def voted?(user, score)
