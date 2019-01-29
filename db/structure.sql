@@ -5055,6 +5055,13 @@ CREATE INDEX index_bans_on_user_id ON public.bans USING btree (user_id);
 
 
 --
+-- Name: index_bulk_update_requests_on_forum_post_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bulk_update_requests_on_forum_post_id ON public.bulk_update_requests USING btree (forum_post_id);
+
+
+--
 -- Name: index_comment_votes_on_comment_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7064,6 +7071,13 @@ CREATE INDEX index_tag_aliases_on_consequent_name ON public.tag_aliases USING bt
 
 
 --
+-- Name: index_tag_aliases_on_forum_post_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_aliases_on_forum_post_id ON public.tag_aliases USING btree (forum_post_id);
+
+
+--
 -- Name: index_tag_aliases_on_post_count; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7082,6 +7096,13 @@ CREATE INDEX index_tag_implications_on_antecedent_name ON public.tag_implication
 --
 
 CREATE INDEX index_tag_implications_on_consequent_name ON public.tag_implications USING btree (consequent_name);
+
+
+--
+-- Name: index_tag_implications_on_forum_post_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tag_implications_on_forum_post_id ON public.tag_implications USING btree (forum_post_id);
 
 
 --
@@ -7520,6 +7541,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20181114202744'),
 ('20181130004740'),
 ('20181202172145'),
-('20190109210822');
+('20190109210822'),
+('20190129012253');
 
 
