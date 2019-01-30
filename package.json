@@ -16,7 +16,7 @@
     "eslint": "^5.3.0",
     "eslint-loader": "^2.1.0",
     "eslint-plugin-ignore-erb": "^0.1.1",
-    "webpack-dev-server": "^2.11.1"
+    "webpack-dev-server": "^3.1.11"
   },
   "scripts": {
     "lint": "yarn run eslint --plugin eslint-plugin-ignore-erb --ext .js,.js.erb app/javascript/src/javascripts"
