@@ -2,6 +2,10 @@ module Automod
   class UpdateDynamoDbJob < Struct.new(:post_id)
     extend Memoist
 
+    def self.enabled?
+      Danbooru.config.aws_access_key_id.present?
+    end
+
     def perform
       post = Post.find(post_id)
       data = {
@@ -27,7 +31,14 @@ module Automod
     end
 
     def dynamo_db_client
-      Aws::DynamoDB::Client.new(region: "us-west-1")
+      credentials = Aws::Credentials.new(
+        Danbooru.config.aws_access_key_id,
+        Danbooru.config.aws_secret_access_key
+      )
+      Aws::DynamoDB::Client.new(
+        credentials: credentials,
+        region: "us-west-1"
+      )
     end
     memoize :dynamo_db_client
 

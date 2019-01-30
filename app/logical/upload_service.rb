@@ -90,6 +90,11 @@ class UploadService
     end
 
     upload.update(status: "completed", post_id: @post.id)
+
+    if @post.is_pending? && Automod::UpdateDynamoDbJob.enabled?
+      Delayed::Job.enqueue(Automod::UpdateDynamoDbJob.new(@post.id), run_at: 84.hours.from_now, queue: "default")
+    end
+
     @post
   end
 
