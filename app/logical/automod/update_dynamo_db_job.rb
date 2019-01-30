@@ -28,6 +28,8 @@ module Automod
       }
 
       dynamo_db_client.put_item(table_name: "automod_events_#{Rails.env}", item: data)
+    rescue ActiveRecord::RecordNotFound
+      # do nothing
     end
 
     def dynamo_db_client
