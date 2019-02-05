@@ -6,10 +6,53 @@ module Automod
       Danbooru.config.aws_access_key_id.present?
     end
 
-    def perform
-      post = Post.find(post_id)
+    def self.export_csv(start, stop)
+      CSV.open("/tmp/automod.csv", "w") do |csv|
+        csv << [
+          "post_id",
+          "is_approved",
+          "fav_count",
+          "file_size",
+          "width",
+          "height",
+          "tag_count",
+          "artist_identified",
+          "artist_count",
+          "character_identified",
+          "character_count",
+          "copyright_identified",
+          "copyright_count",
+          "translated",
+          "comment_count",
+          "note_count"
+        ]
+        Post.where("created_at between ? and ?", start, stop).find_each do |post|
+          data = build_hash(post)
+          csv << [
+            data[:post_id],
+            data[:is_approved],
+            data[:fav_count],
+            data[:file_size],
+            data[:width],
+            data[:height],
+            data[:tag_count],
+            data[:artist_identified],
+            data[:artist_count],
+            data[:character_identified],
+            data[:character_count],
+            data[:copyright_identified],
+            data[:copyright_count],
+            data[:translated],
+            data[:comment_count],
+            data[:note_count]
+          ]
+        end
+      end
+    end
+
+    def build_hash(post)
       data = {
-        post_id: post_id,
+        post_id: post.id,
         is_approved: is_approved?(post),
         fav_count: post.fav_count,
         file_size: post.file_size,
@@ -26,7 +69,11 @@ module Automod
         comment_count: post.comments.count,
         note_count: post.notes.count
       }
+    end
 
+    def perform
+      post = Post.find(post_id)
+      data = build_hash(post)
       dynamo_db_client.put_item(table_name: "automod_events_#{Rails.env}", item: data)
     rescue ActiveRecord::RecordNotFound
       # do nothing
