@@ -1,10 +1,8 @@
 <div class="post-tooltip-header">
   <span class="post-tooltip-header-left">
-    <% if CurrentUser.is_moderator? && @post.uploader != @post.keeper %>
-      <%= link_to_user @post.uploader %> +
+    <% if CurrentUser.is_moderator? %>
+      <%= link_to_user @post.uploader %>
     <% end %>
-
-    <%= link_to_user @post.keeper %>
 
     <%= link_to time_ago_in_words_tagged(@post.created_at, compact: true), posts_path(tags: "date:#{@post.created_at.strftime("%Y-%m-%d")}"), class: "post-tooltip-date post-tooltip-info" %>
 

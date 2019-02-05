@@ -111,7 +111,6 @@ class PostPresenter < Presenter
       "data-pixiv-id" => post.pixiv_id,
       "data-file-ext" => post.file_ext,
       "data-source" => post.source,
-      "data-top-tagger" => post.keeper_id,
       "data-uploader-id" => post.uploader_id,
       "data-normalized-source" => post.normalized_source,
       "data-is-favorited" => post.favorited_by?(CurrentUser.user.id)
