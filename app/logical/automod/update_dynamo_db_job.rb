@@ -24,7 +24,10 @@ module Automod
           "copyright_count",
           "translated",
           "comment_count",
-          "note_count"
+          "note_count",
+          "rating",
+          "median_score",
+          "is_comic"
         ]
         Post.where("created_at between ? and ?", start, stop).find_each do |post|
           data = build_hash(post)
@@ -44,9 +47,17 @@ module Automod
             data[:copyright_count],
             data[:translated],
             data[:comment_count],
-            data[:note_count]
+            data[:note_count],
+            data[:rating],
+            data[:median_score]
           ]
         end
+      end
+    end
+
+    def self.backfill
+      Post.where("id >= ?", 3_400_840).find_each do |post|
+        dynamo_db_client
       end
     end
 
@@ -67,7 +78,9 @@ module Automod
         copyright_count: copyright_count(post),
         translated: is_translated?(post),
         comment_count: post.comments.count,
-        note_count: post.notes.count
+        note_count: post.notes.count,
+        rating: post.rating,
+        median_score: median_score(post)
       }
     end
 
@@ -121,6 +134,10 @@ module Automod
 
     def is_translated?(post)
       post.has_tag?("translated")
+    end
+
+    def median_score(post)
+      Post.where("uploader_id = ?", post.uploader_id).where("created_at >= ?", 1.year.ago).pluck("percentile_cont(0.5) within group (order by score)").first
     end
   end
 end
