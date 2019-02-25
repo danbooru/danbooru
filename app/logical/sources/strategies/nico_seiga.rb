@@ -4,8 +4,10 @@ module Sources
       URL = %r!\Ahttps?://(?:\w+\.)?nico(?:seiga|video)\.jp!
       DIRECT1 = %r!\Ahttps?://lohas\.nicoseiga\.jp/priv/[0-9a-f]+!
       DIRECT2 = %r!\Ahttps?://lohas\.nicoseiga\.jp/o/[0-9a-f]+/\d+/\d+!
+      DIRECT3 = %r!\Ahttps?://seiga\.nicovideo\.jp/images/source/\d+!
       PAGE = %r!\Ahttps?://seiga\.nicovideo\.jp/seiga/im(\d+)!i
       PROFILE = %r!\Ahttps?://seiga\.nicovideo\.jp/user/illust/(\d+)!i
+      MANGA_PAGE = %r!\Ahttps?://seiga\.nicovideo\.jp/watch/mg(\d+)!i
 
       def domains
         ["nicoseiga.jp", "nicovideo.jp"]
@@ -18,6 +20,12 @@ module Sources
       def image_urls
         if url =~ DIRECT1
           return [url]
+        end
+
+        if theme_id
+          return api_client.image_ids.map do |image_id|
+            "https://seiga.nicovideo.jp/image/source/#{image_id}"
+          end
         end
 
         link = page.search("a#illust_link")
@@ -65,6 +73,10 @@ module Sources
           if x =~ %r{/seiga/im\d+}
             return x
           end
+
+          if x =~ %r{/watch/mg\d+}
+            return x
+          end
         end
 
         return super
@@ -105,7 +117,7 @@ module Sources
       end
 
       def normalizable_for_artist_finder?
-        url =~ PAGE || url =~ PROFILE || url =~ DIRECT1 || url =~ DIRECT2
+        url =~ PAGE || url =~ MANGA_PAGE || url =~ PROFILE || url =~ DIRECT1 || url =~ DIRECT2
       end
 
       def normalize_for_artist_finder
@@ -127,12 +139,24 @@ module Sources
     public
 
       def api_client
-        NicoSeigaApiClient.new(illust_id: illust_id)
+        if illust_id
+          NicoSeigaApiClient.new(illust_id: illust_id)
+        elsif theme_id
+          NicoSeigaMangaApiClient.new(theme_id)
+        end
       end
       memoize :api_client
 
       def illust_id
         if page_url =~ PAGE
+          return $1.to_i
+        end
+
+        return nil
+      end
+
+      def theme_id
+        if page_url =~ MANGA_PAGE
           return $1.to_i
         end
 

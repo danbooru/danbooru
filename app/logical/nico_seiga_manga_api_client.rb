@@ -1,6 +1,6 @@
 class NicoSeigaMangaApiClient
   extend Memoist
-  BASE_URL = "http://seiga.nicovideo.jp/api"
+  BASE_URL = "https://seiga.nicovideo.jp/api"
   attr_reader :theme_id
 
   def initialize(theme_id)
@@ -24,7 +24,9 @@ class NicoSeigaMangaApiClient
   end
 
   def image_ids
-    theme_data_xml["response"]["image_list"]["image"].map {|x| x["id"]}
+    images = theme_data_xml["response"]["image_list"]["image"]
+    images = [images] unless images.is_a?(Array)
+    images.map {|x| x["id"]}
   end
 
   def tags
