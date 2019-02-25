@@ -3,7 +3,8 @@ module Sources
     def self.all
       return [
         Strategies::Pixiv, 
-        Strategies::NicoSeiga, 
+        Strategies::NicoSeigaManga, # must come before NicoSeiga
+        Strategies::NicoSeiga,
         Strategies::Twitter, 
         Strategies::Stash, # must come before DeviantArt
         Strategies::DeviantArt, 

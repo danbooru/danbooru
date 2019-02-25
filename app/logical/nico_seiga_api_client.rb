@@ -1,8 +1,47 @@
+# http://seiga.nicovideo.jp/api/manga/info?id=376206
+# http://api.search.nicovideo.jp/api/v2/manga/contents/search?
+
 class NicoSeigaApiClient
   extend Memoist
   BASE_URL = "http://seiga.nicovideo.jp/api"
   attr_reader :illust_id
 
+  def self.agent
+    mech = Mechanize.new
+    mech.redirect_ok = false
+    mech.keep_alive = false
+
+    session = Cache.get("nico-seiga-session")
+    if session
+      cookie = Mechanize::Cookie.new("user_session", session)
+      cookie.domain = ".nicovideo.jp"
+      cookie.path = "/"
+      mech.cookie_jar.add(cookie)
+    else
+      mech.get("https://account.nicovideo.jp/login") do |page|
+        page.form_with(:id => "login_form") do |form|
+          form["mail_tel"] = Danbooru.config.nico_seiga_login
+          form["password"] = Danbooru.config.nico_seiga_password
+        end.click_button
+      end
+      session = mech.cookie_jar.cookies.select{|c| c.name == "user_session"}.first
+      if session
+        Cache.put("nico-seiga-session", session.value, 1.week)
+      else
+        raise "Session not found"
+      end
+    end
+
+    # This cookie needs to be set to allow viewing of adult works
+    cookie = Mechanize::Cookie.new("skip_fetish_warning", "1")
+    cookie.domain = "seiga.nicovideo.jp"
+    cookie.path = "/"
+    mech.cookie_jar.add(cookie)
+
+    mech.redirect_ok = true
+    mech
+  end
+  
   def initialize(illust_id:, user_id: nil)
     @illust_id = illust_id
     @user_id = user_id

@@ -6,6 +6,7 @@ module Sources
       setup do
         @site_1 = Sources::Strategies.find("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663")
         @site_2 = Sources::Strategies.find("http://seiga.nicovideo.jp/seiga/im4937663")
+        @site_3 = Sources::Strategies.find("http://seiga.nicovideo.jp/watch/mg376206")
       end
 
       should "get the profile" do
@@ -58,6 +59,12 @@ module Sources
         full_image_url = %r!https?://lohas.nicoseiga.jp/priv/[a-f0-9]{40}/[0-9]+/6844226!
         assert_match(full_image_url, site.image_url)
         assert_match(full_image_url, site.canonical_url)
+      end
+
+      context "for a manga page" do
+        should "not try to find the image url" do
+          assert_nil(@site_3.image_url)
+        end
       end
     end
   end
