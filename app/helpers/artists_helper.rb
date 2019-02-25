@@ -9,7 +9,7 @@ module ArtistsHelper
     if artist
       link_to(artist.name, artist_path(artist))
     else
-      link_to(name, new_artist_path(:name => name)) + " " + content_tag("span", "*", :class => "new-artist", :title => "No artist with this name currently exists.")
+      link_to(name, new_artist_path(artist: {name: name})) + " " + content_tag("span", "*", :class => "new-artist", :title => "No artist with this name currently exists.")
     end
   end
 
