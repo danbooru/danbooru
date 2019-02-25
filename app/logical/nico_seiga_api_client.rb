@@ -57,7 +57,7 @@ class NicoSeigaApiClient
   end
 
   def desc
-    illust_xml["response"]["image"]["description"] || illust_xml["response"]["image"]["summary"]
+    illust_xml["response"]["image"]["description"]
   end
 
   def moniker
