@@ -1,6 +1,3 @@
-# http://seiga.nicovideo.jp/api/manga/info?id=376206
-# http://api.search.nicovideo.jp/api/v2/manga/contents/search?
-
 class NicoSeigaApiClient
   extend Memoist
   BASE_URL = "http://seiga.nicovideo.jp/api"
@@ -41,7 +38,7 @@ class NicoSeigaApiClient
     mech.redirect_ok = true
     mech
   end
-  
+
   def initialize(illust_id:, user_id: nil)
     @illust_id = illust_id
     @user_id = user_id

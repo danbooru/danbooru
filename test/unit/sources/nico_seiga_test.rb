@@ -60,12 +60,6 @@ module Sources
         assert_match(full_image_url, site.image_url)
         assert_match(full_image_url, site.canonical_url)
       end
-
-      context "for a manga page" do
-        should "not try to find the image url" do
-          assert_nil(@site_3.image_url)
-        end
-      end
     end
   end
 end
