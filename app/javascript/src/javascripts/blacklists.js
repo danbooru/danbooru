@@ -156,7 +156,6 @@ Blacklist.post_match = function(post, entry) {
     tags.push("user:" + $post.attr("data-uploader").toLowerCase());
   }
   tags.push("uploaderid:" + $post.attr("data-uploader-id"));
-  tags.push("toptaggerid:" + $post.attr("data-top-tagger"));
   $.each(String($post.data("flags")).match(/\S+/g) || [], function(i, v) {
     tags.push("status:" + v);
   });
