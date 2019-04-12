@@ -70,7 +70,7 @@ module Sources
       end
 
       def canonical_url
-        if self.class.deviation_id_from_url(image_url).present? || page_url.blank?
+        if page_url.blank?
           image_url
         else
           page_url
@@ -92,7 +92,7 @@ module Sources
         elsif api_deviation.present?
           src = api_deviation.dig(:content, :src)
           src = src.gsub(%r!\Ahttps?://orig\d+\.deviantart\.net!i, "http://origin-orig.deviantart.net")
-          src = src.gsub(%r!/v1/(fit|fill)/.*\z!i, "")
+          src = src.gsub(%r!q_(\d+)!, 'q_100')
           [src]
         else
           raise "Couldn't find image url" # this should never happen

@@ -14,7 +14,7 @@ module Sources
 
       should "work" do
         assert_equal(["http://origin-orig.deviantart.net/d533/f/2014/004/8/d/holiday_elincia_by_aeror404-d70rm0s.jpg"], @site.image_urls)
-        assert_equal(@site.image_url, @site.canonical_url)
+        assert_equal("https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484", @site.canonical_url)
         assert_equal("aeror404", @site.artist_name)
         assert_equal("https://www.deviantart.com/aeror404", @site.profile_url)
       end
@@ -26,7 +26,7 @@ module Sources
         @artist = FactoryBot.create(:artist, name: "nickbeja", url_string: "https://nickbeja.deviantart.com")
 
         assert_equal("https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png", @site.image_url)
-        assert_equal(@site.image_url, @site.canonical_url)
+        assert_equal("https://www.deviantart.com/deviation/708675884", @site.canonical_url)
         assert_equal("nickbeja", @site.artist_name)
         assert_equal("https://www.deviantart.com/nickbeja", @site.profile_url)
         assert_equal([@artist], @site.artists)
@@ -38,7 +38,7 @@ module Sources
       should "get the image url" do
         @site = Sources::Strategies.find("https://noizave.deviantart.com/art/test-no-download-697415967")
 
-        assert_equal(["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbj81lr-3306feb1-87dc-4d25-9a4c-da8d2973a8b7.jpg"], @site.image_urls)
+        assert_match(%r!^https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbj81lr-3306feb1-87dc-4d25-9a4c-da8d2973a8b7.jpg!, @site.image_urls.join(" "))
         assert_equal("https://www.deviantart.com/noizave/art/test-no-download-697415967", @site.canonical_url)
       end
     end
@@ -48,7 +48,7 @@ module Sources
         @site = Sources::Strategies.find("https://www.deviantart.com/len1/art/All-that-Glitters-II-774592781")
 
         assert_equal(["http://origin-orig.deviantart.net/a713/f/2018/333/3/6/all_that_glitters_ii_by_len1-dct67m5.jpg"], @site.image_urls)
-        assert_equal(@site.image_url, @site.canonical_url)
+        assert_equal("https://www.deviantart.com/len1/art/All-that-Glitters-II-774592781", @site.canonical_url)
       end
     end
 
@@ -59,7 +59,7 @@ module Sources
         assert_equal("hideyoshi", @site.artist_name)
         assert_equal("https://www.deviantart.com/hideyoshi", @site.profile_url)
         assert_equal("http://origin-orig.deviantart.net/9e1f/f/2016/265/3/5/legend_of_galactic_heroes_by_hideyoshi-daihpha.jpg", @site.image_url)
-        assert_equal(@site.image_url, @site.canonical_url)
+        assert_equal("https://www.deviantart.com/hideyoshi/art/Legend-of-Galactic-Heroes-635721022", @site.canonical_url)
       end
     end
 
@@ -69,7 +69,7 @@ module Sources
 
         assert_equal(@site.url, @site.image_url)
         assert_equal("https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408", @site.page_url)
-        assert_equal(@site.image_url, @site.canonical_url)
+        assert_equal("https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408", @site.canonical_url)
         assert_equal("noizave", @site.artist_name)
         assert_equal("https://www.deviantart.com/noizave", @site.profile_url)
         assert_equal(%w[bar baz foo], @site.tags.map(&:first))
@@ -162,7 +162,7 @@ module Sources
         should "work" do
           @site = Sources::Strategies.find(@url, @ref)
 
-          assert_equal("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg", @site.image_url)
+          assert_match(%r!^https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg!, @site.image_url)
           assert_equal("edsfox", @site.artist_name)
           assert_equal("https://www.deviantart.com/edsfox", @site.profile_url)
           assert_equal("https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896", @site.page_url)
@@ -184,7 +184,7 @@ module Sources
         should "work" do
           @site = Sources::Strategies.find(@url, @ref)
 
-          assert_equal("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg", @site.image_url)
+          assert_match(%r!^https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg!, @site.image_url)
           assert_equal("edsfox", @site.artist_name)
           assert_equal("https://www.deviantart.com/edsfox", @site.profile_url)
           assert_equal("https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896", @site.page_url)
