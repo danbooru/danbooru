@@ -91,13 +91,20 @@ Autocomplete.initialize_tag_autocomplete = function() {
       return false;
     },
     source: function(req, resp) {
+      var is_tag_edit = this.element.data('autocomplete') === "tag-edit";
+      var tag_category = -1;
       var query = Autocomplete.parse_query(req.term, this.element.get(0).selectionStart);
       var metatag = query.metatag;
       var term = query.term;
+      var is_category_prefix = metatag.slice(0,-1) in Danbooru.Autocomplete.TAG_CATEGORIES;
 
-      if (!metatag && !term) {
+      if (!term && (!metatag || is_category_prefix)) {
         this.close();
         return;
+      }
+
+      if(!is_tag_edit && is_category_prefix) {
+        tag_category = Danbooru.Autocomplete.TAG_CATEGORIES[metatag.slice(0,-1)];
       }
 
       switch (metatag) {
@@ -158,7 +165,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
         Autocomplete.saved_search_source(term, resp);
         break;
       default:
-        Autocomplete.normal_source(term, resp);
+        Autocomplete.normal_source(term, resp, tag_category);
         break;
       }
     }
@@ -169,7 +176,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
       $(this).data("ui-autocomplete").menu.bindings = $();
     },
     source: function(req, resp) {
-      Autocomplete.normal_source(req.term, resp);
+      Autocomplete.normal_source(req.term, resp, -1);
     }
   });
 }
@@ -247,11 +254,12 @@ Autocomplete.initialize_wiki_autocomplete = function($fields) {
   });
 };
 
-Autocomplete.normal_source = function(term, resp) {
+Autocomplete.normal_source = function(term, resp, tag_category) {
   return $.ajax({
     url: "/tags/autocomplete.json",
     data: {
       "search[name_matches]": term,
+      "search[category]": tag_category,
       "expiry": 7
     },
     method: "get",

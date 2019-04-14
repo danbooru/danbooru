@@ -22,15 +22,15 @@ module TagAutocomplete
     end
   end
 
-  def search(query)
+  def search(query,category)
     query = Tag.normalize_name(query)
 
     candidates = count_sort(
       query,
-      search_exact(query, 8) +
-      search_prefix(query, 4) + 
-      search_correct(query, 2) +
-      search_aliases(query, 3)
+      search_exact(query, category, 8) +
+      search_prefix(query, category, 4) +
+      search_correct(query, category, 2) +
+      search_aliases(query, category, 3)
     )
   end
 
@@ -40,17 +40,18 @@ module TagAutocomplete
     end.reverse.slice(0, LIMIT)
   end
 
-  def search_exact(query, n=4)
+  def search_exact(query, category, n=4)
     Tag
       .where("name like ? escape e'\\\\'", query.to_escaped_for_sql_like + "%")
       .where("post_count > 0")
+      .where("? = -1 OR category = ?", category, category)
       .order("post_count desc")
       .limit(n)
       .pluck(:name, :post_count, :category)
       .map {|row| Result.new(*row, nil, :exact)}
   end
 
-  def search_correct(query, n=2)
+  def search_correct(query, category, n=2)
     if query.size <= 3
       return []
     end
@@ -60,13 +61,14 @@ module TagAutocomplete
       .where("abs(length(name) - ?) <= 3", query.size)
       .where("name like ? escape E'\\\\'", query[0].to_escaped_for_sql_like + '%')
       .where("post_count > 0")
+      .where("? = -1 OR category = ?", category, category)
       .order(Arel.sql("similarity(name, #{Tag.connection.quote(query)}) DESC"))
       .limit(n)
       .pluck(:name, :post_count, :category)
       .map {|row| Result.new(*row, nil, :correct)}
   end
 
-  def search_prefix(query, n=3)
+  def search_prefix(query, category, n=3)
     if query.size >= 5
       return []
     end
@@ -91,13 +93,14 @@ module TagAutocomplete
       .where('regexp_replace(name, ?, ?, ?) like ?', regexp, '\1', 'g', query.to_escaped_for_sql_like + '%')
       .where("post_count > ?", min_post_count)
       .where("post_count > 0")
+      .where("? = -1 OR category = ?", category, category)
       .order("post_count desc")
       .limit(n)
       .pluck(:name, :post_count, :category)
       .map {|row| Result.new(*row, nil, :prefix)}
   end
 
-  def search_aliases(query, n=10)
+  def search_aliases(query, category, n=10)
     wildcard_name = query + "*"
     TagAlias
       .select("tags.name, tags.post_count, tags.category, tag_aliases.antecedent_name")
@@ -105,6 +108,7 @@ module TagAutocomplete
       .where("tag_aliases.antecedent_name LIKE ? ESCAPE E'\\\\'", wildcard_name.to_escaped_for_sql_like)
       .active
       .where("tags.name NOT LIKE ? ESCAPE E'\\\\'", wildcard_name.to_escaped_for_sql_like)
+      .where("? = -1 OR tags.category = ?", category, category)
       .where("tag_aliases.post_count > 0")
       .order("tag_aliases.post_count desc")
       .limit(n)

@@ -842,6 +842,7 @@ class Tag < ApplicationRecord
           end
 
         else
+          token.gsub!(/\A([-~])?#{Tag.categories.regexp}:(.+)\z/i,'\1\2')
           parse_tag(token, q[:tags])
         end
       end
@@ -953,7 +954,7 @@ class Tag < ApplicationRecord
         q = q.where("tags.name": normalize_name(params[:name]).split(","))
       end
 
-      if params[:category].present?
+      if params[:category].present? && TagCategory.category_ids.include?(params[:category])
         q = q.where("category = ?", params[:category])
       end
 
@@ -992,12 +993,12 @@ class Tag < ApplicationRecord
       q
     end
 
-    def names_matches_with_aliases(name)
+    def names_matches_with_aliases(name, category)
       name = normalize_name(name)
       wildcard_name = name + '*'
 
       query1 = Tag.select("tags.name, tags.post_count, tags.category, null AS antecedent_name")
-        .search(:name_matches => wildcard_name, :order => "count").limit(10)
+        .search(:name_matches => wildcard_name, :order => "count", :category => category).limit(10)
 
       query2 = TagAlias.select("tags.name, tags.post_count, tags.category, tag_aliases.antecedent_name")
         .joins("INNER JOIN tags ON tags.name = tag_aliases.consequent_name")
@@ -1005,6 +1006,7 @@ class Tag < ApplicationRecord
         .active
         .where("tags.name NOT LIKE ? ESCAPE E'\\\\'", wildcard_name.to_escaped_for_sql_like)
         .where("tag_aliases.post_count > 0")
+        .where("? = -1 OR category = ?", category, category)
         .order("tag_aliases.post_count desc")
         .limit(20) # Get 20 records even though only 10 will be displayed in case some duplicates get filtered out.
 

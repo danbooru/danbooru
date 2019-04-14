@@ -19,11 +19,12 @@ class TagsController < ApplicationController
   end
 
   def autocomplete
+    category = (params[:search][:category].present? ? params[:search][:category] : -1)
     if CurrentUser.is_builder?
       # limit rollout
-      @tags = TagAutocomplete.search(params[:search][:name_matches])
+      @tags = TagAutocomplete.search(params[:search][:name_matches], category)
     else
-      @tags = Tag.names_matches_with_aliases(params[:search][:name_matches])
+      @tags = Tag.names_matches_with_aliases(params[:search][:name_matches], category)
     end
 
     expires_in params[:expiry].to_i.days if params[:expiry]
