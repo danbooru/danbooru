@@ -84,7 +84,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a twitter post" do
         setup do
-          @source = "https://twitter.com/frappuccino/status/566030116182949888"
+          @source = "https://twitter.com/onsen_musume_jp/status/865534101918330881"
         end
 
         should "render" do
