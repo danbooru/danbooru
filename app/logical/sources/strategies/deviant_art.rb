@@ -84,15 +84,19 @@ module Sources
         # work is downloadable
         elsif api_deviation[:is_downloadable]
           src = api_download[:src]
-          src.gsub!(%r!\Ahttps?://s3\.amazonaws\.com/!i, "https://")
-          src.gsub!(/\?.*\z/, "") # strip s3 query params
-          src.gsub!(%r!\Ahttps://origin-orig\.deviantart\.net!, "http://origin-orig.deviantart.net") # https://origin-orig.devianart.net doesn't work
+          src.sub!(%r!\Ahttps?://s3\.amazonaws\.com/!i, "https://")
+          src.sub!(/\?.*\z/, "") # strip s3 query params
+          src.sub!(%r!\Ahttps://origin-orig\.deviantart\.net!, "http://origin-orig.deviantart.net") # https://origin-orig.devianart.net doesn't work
           [src]
         # work isn't downloadable, or download size is same as regular size.
         elsif api_deviation.present?
           src = api_deviation.dig(:content, :src)
-          src = src.gsub(%r!\Ahttps?://orig\d+\.deviantart\.net!i, "http://origin-orig.deviantart.net")
-          src = src.gsub(%r!/v1/(fit|fill)/.*\z!i, "")
+          if deviation_id.to_i <= 790677560 && src =~ /^https:\/\/images-wixmp-/
+            src = src.sub(%r!(/f/[a-f0-9-]+/[a-f0-9-]+)!, '/intermediary\1')
+            src = src.sub(%r!/v1/(fit|fill)/.*\z!i, "")
+          end
+          src = src.sub(%r!\Ahttps?://orig\d+\.deviantart\.net!i, "http://origin-orig.deviantart.net")
+          src = src.sub(%r!q_\d+!, "q_100")
           [src]
         else
           raise "Couldn't find image url" # this should never happen

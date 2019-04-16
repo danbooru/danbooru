@@ -38,7 +38,7 @@ module Sources
       should "get the image url" do
         @site = Sources::Strategies.find("https://noizave.deviantart.com/art/test-no-download-697415967")
 
-        assert_equal(["https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbj81lr-3306feb1-87dc-4d25-9a4c-da8d2973a8b7.jpg"], @site.image_urls)
+        assert_match(%r!^https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbj81lr-3306feb1-87dc-4d25-9a4c-da8d2973a8b7.jpg!, @site.image_urls[0])
         assert_equal("https://www.deviantart.com/noizave/art/test-no-download-697415967", @site.canonical_url)
       end
     end
@@ -162,7 +162,7 @@ module Sources
         should "work" do
           @site = Sources::Strategies.find(@url, @ref)
 
-          assert_equal("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg", @site.image_url)
+          assert_match(%r!^https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg!, @site.image_url)
           assert_equal("edsfox", @site.artist_name)
           assert_equal("https://www.deviantart.com/edsfox", @site.profile_url)
           assert_equal("https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896", @site.page_url)
@@ -173,18 +173,18 @@ module Sources
       end
     end
 
-    context "The source for a images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com sample image" do
+    context "The source for a images-wixmp-.* sample image" do
       setup do
         @url = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg"
         @ref = "https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896"
         @artist = FactoryBot.create(:artist, name: "edsfox", url_string: "https://edsfox.deviantart.com")
       end
 
-      context "without a referer" do
+      context "with a referer" do
         should "work" do
           @site = Sources::Strategies.find(@url, @ref)
 
-          assert_equal("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg", @site.image_url)
+          assert_match(%r!^https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg!, @site.image_url)
           assert_equal("edsfox", @site.artist_name)
           assert_equal("https://www.deviantart.com/edsfox", @site.profile_url)
           assert_equal("https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896", @site.page_url)
