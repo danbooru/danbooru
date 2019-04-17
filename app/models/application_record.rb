@@ -149,11 +149,24 @@ class ApplicationRecord < ActiveRecord::Base
 
     def as_json(options = {})
       options ||= {}
+
       options[:except] ||= []
       options[:except] += hidden_attributes
 
       options[:methods] ||= []
       options[:methods] += method_attributes
+
+      if !options.key?(:only) && RequestStore.exist?(:only_param)
+        options[:only] = RequestStore[:only_param]
+      end
+
+      if options[:only].is_a?(String)
+        options[:only] = options[:only].split(/,/)
+      end
+
+      if options[:only]
+        options[:methods] = options[:methods] & options[:only]
+      end
 
       super(options)
     end
@@ -166,6 +179,18 @@ class ApplicationRecord < ActiveRecord::Base
 
       options[:methods] ||= []
       options[:methods] += method_attributes
+
+      if !options.key?(:only) && RequestStore.exist?(:only_param)
+        options[:only] = RequestStore[:only_param]
+      end
+
+      if options[:only].is_a?(String)
+        options[:only] = options[:only].split(/,/)
+      end
+
+      if options[:only]
+        options[:methods] = options[:methods] & options[:only]
+      end
 
       super(options, &block)
     end

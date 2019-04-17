@@ -10,6 +10,7 @@ class ApplicationController < ActionController::Base
   before_action :api_check
   before_action :set_safe_mode
   before_action :set_variant
+  before_action :track_only_param
   # before_action :secure_cookies_check
   layout "default"
   helper_method :show_moderation_notice?
@@ -45,6 +46,12 @@ class ApplicationController < ActionController::Base
       format.html do
         render template: "static/service_unavailable", status: 503
       end
+    end
+  end
+
+  def track_only_param
+    if params[:only]
+      RequestStore[:only_param] = params[:only].split(/,/)
     end
   end
 

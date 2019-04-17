@@ -14,7 +14,7 @@ class PostsController < ApplicationController
       respond_with(@posts) do |format|
         format.atom
         format.xml do
-          render :xml => @posts.to_xml(:root => "posts")
+          render xml: @posts.to_xml(root: "posts")
         end
       end
     end
