@@ -167,8 +167,8 @@ class ApplicationRecord < ActiveRecord::Base
       end
 
       if options[:only]
-        options[:methods] = options[:methods] & options[:only]
-        options[:include] = options[:include] & options[:only]
+        options[:methods] = options[:methods] & options[:only].map(&:to_sym)
+        options[:include] = options[:include] & options[:only].map(&:to_sym)
       end
 
       super(options)
