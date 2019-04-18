@@ -150,6 +150,8 @@ class ApplicationRecord < ActiveRecord::Base
     def as_json(options = {})
       options ||= {}
 
+      options[:include] ||= []
+
       options[:except] ||= []
       options[:except] += hidden_attributes
 
@@ -166,6 +168,7 @@ class ApplicationRecord < ActiveRecord::Base
 
       if options[:only]
         options[:methods] = options[:methods] & options[:only]
+        options[:include] = options[:include] & options[:only]
       end
 
       super(options)
@@ -174,6 +177,8 @@ class ApplicationRecord < ActiveRecord::Base
     def to_xml(options = {}, &block)
       options ||= {}
 
+      options[:include] ||= []
+
       options[:except] ||= []
       options[:except] += hidden_attributes
 
@@ -190,6 +195,7 @@ class ApplicationRecord < ActiveRecord::Base
 
       if options[:only]
         options[:methods] = options[:methods] & options[:only]
+        options[:include] = options[:include] & options[:only]
       end
 
       super(options, &block)
