@@ -1,5 +1,5 @@
 module Maintenance
-  module_function
+  extend self
 
   def hourly
     UploadErrorChecker.new.check!

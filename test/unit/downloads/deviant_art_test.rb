@@ -6,13 +6,13 @@ module Downloads
       setup do
         skip "DeviantArt API keys not set" unless Danbooru.config.deviantart_client_id.present?
         
-        @source = "http://starbitt.deviantart.com/art/09271X-636962118"
+        @source = "https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484"
         @download = Downloads::File.new(@source)
         @tempfile, strategy = @download.download!
       end
 
       should "work" do
-        assert_equal(2948, ::File.size(@tempfile.path))
+        assert_equal(877987, ::File.size(@tempfile.path))
       end
     end
   end

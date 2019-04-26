@@ -4,8 +4,13 @@ module Downloads
   class FileTest < ActiveSupport::TestCase
     context "A post download" do
       setup do
+        ENV["SKIP_CLOUDFLARE_CHECK"] = "1"
         @source = "http://www.google.com/intl/en_ALL/images/logo.gif"
         @download = Downloads::File.new(@source)
+      end
+
+      teardown do
+        ENV["SKIP_CLOUDFLARE_CHECK"] = nil        
       end
 
       context "for a banned IP" do

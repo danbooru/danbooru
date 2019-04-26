@@ -12,7 +12,7 @@ module Downloads
         @source = "https://24.media.tumblr.com/fc328250915434e66e8e6a92773f79d0/tumblr_mf4nshfibc1s0oswoo1_500.jpg"
         @rewrite = "https://media.tumblr.com/fc328250915434e66e8e6a92773f79d0/tumblr_mf4nshfibc1s0oswoo1_1280.jpg"
         assert_rewritten(@rewrite, @source, @ref)
-        assert_downloaded(113909, @source, @ref)
+        assert_downloaded(118315, @source, @ref)
         # assert_downloaded(196_617, @source)
       end
     end
@@ -24,7 +24,7 @@ module Downloads
         @source = "https://25.media.tumblr.com/tumblr_lxbzel2H5y1r9yjhso1_500.jpg"
         @rewrite = "https://media.tumblr.com/tumblr_lxbzel2H5y1r9yjhso1_1280.jpg"
         assert_rewritten(@rewrite, @source, @ref)
-        assert_downloaded(41803, @source, @ref)
+        assert_downloaded(42997, @source, @ref)
         # assert_downloaded(90_122, @source)
       end
     end
@@ -68,7 +68,7 @@ module Downloads
         @source = "http://media.tumblr.com/0DNBGJovY5j3smfeQs8nB53z_400.jpg"
         @rewrite = "https://media.tumblr.com/0DNBGJovY5j3smfeQs8nB53z_1280.jpg"
         assert_rewritten(@rewrite, @source, @ref)
-        assert_downloaded(122413, @source)
+        assert_downloaded(125850, @source)
         # assert_downloaded(153_885, @source)
       end
     end
