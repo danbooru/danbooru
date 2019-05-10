@@ -64,6 +64,7 @@ end
 
 
 class ActiveSupport::TestCase
+  include FactoryBot::Syntax::Methods
   include PostArchiveTestHelper
   include PoolArchiveTestHelper
   include ReportbooruHelper
