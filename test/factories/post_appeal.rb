@@ -1,5 +1,5 @@
 FactoryBot.define do
   factory(:post_appeal) do
-    reason "xxx"
+    reason {"xxx"}
   end
 end

@@ -5,7 +5,7 @@ class Note < ApplicationRecord
   belongs_to :post
   belongs_to_creator
   has_many :versions, -> {order("note_versions.id ASC")}, :class_name => "NoteVersion", :dependent => :destroy
-  validates_presence_of :post_id, :creator_id, :x, :y, :width, :height, :body
+  validates_presence_of :creator_id, :x, :y, :width, :height, :body
   validate :post_must_exist
   validate :note_within_image
   after_save :update_post

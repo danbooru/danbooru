@@ -3,61 +3,61 @@ FactoryBot.define do
     sequence :name do |n|
       "user#{n}"
     end
-    password "password"
+    password {"password"}
     password_hash {User.sha1("password")}
     email {FFaker::Internet.email}
-    default_image_size "large"
-    base_upload_limit 10
-    level 20
+    default_image_size {"large"}
+    base_upload_limit {10}
+    level {20}
     created_at {Time.now}
     last_logged_in_at {Time.now}
-    favorite_count 0
-    bit_prefs 0
+    favorite_count {0}
+    bit_prefs {0}
 
     factory(:banned_user) do
-      transient { ban_duration 3 }
-      is_banned true
+      transient { ban_duration {3} }
+      is_banned {true}
     end
 
     factory(:member_user) do
-      level 20
+      level {20}
     end
 
     factory(:gold_user) do
-      level 30
+      level {30}
     end
 
     factory(:platinum_user) do
-      level 31
+      level {31}
     end
 
     factory(:builder_user) do
-      level 32
+      level {32}
     end
 
     factory(:contributor_user) do
-      level 32
-      bit_prefs User.flag_value_for("can_upload_free")
+      level {32}
+      bit_prefs {User.flag_value_for("can_upload_free")}
     end
 
     factory(:contrib_user) do
-      level 32
-      bit_prefs User.flag_value_for("can_upload_free")
+      level {32}
+      bit_prefs {User.flag_value_for("can_upload_free")}
     end
 
     factory(:moderator_user) do
-      level 40
-      can_approve_posts true
+      level {40}
+      can_approve_posts {true}
     end
 
     factory(:mod_user) do
-      level 40
-      can_approve_posts true
+      level {40}
+      can_approve_posts {true}
     end
 
     factory(:admin_user) do
-      level 50
-      can_approve_posts true
+      level {50}
+      can_approve_posts {true}
     end
   end
 end

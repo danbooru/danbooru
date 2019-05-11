@@ -68,7 +68,7 @@ class NoteTest < ActiveSupport::TestCase
       end
 
       should "not validate if the body is blank" do
-        @note = FactoryBot.build(:note, body: "   ")
+        @note = FactoryBot.build(:note, body: "   ", :post => @post)
 
         assert_equal(false, @note.valid?)
         assert_equal(["Body can't be blank"], @note.errors.full_messages)

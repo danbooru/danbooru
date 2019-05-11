@@ -2,16 +2,16 @@ require 'fileutils'
 
 FactoryBot.define do
   factory(:upload) do
-    rating "s"
+    rating {"s"}
     uploader :factory => :user, :level => 20
-    uploader_ip_addr "127.0.0.1"
-    tag_string "special"
-    status "pending"
-    server Socket.gethostname
-    source "xxx"
+    uploader_ip_addr {"127.0.0.1"}
+    tag_string {"special"}
+    status {"pending"}
+    server {Socket.gethostname}
+    source {"xxx"}
 
     factory(:source_upload) do
-      source "http://www.google.com/intl/en_ALL/images/logo.gif"
+      source {"http://www.google.com/intl/en_ALL/images/logo.gif"}
     end
 
     factory(:ugoira_upload) do

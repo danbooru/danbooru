@@ -89,7 +89,8 @@ class CommentTest < ActiveSupport::TestCase
       end
 
       should "fail creation" do
-        comment = FactoryBot.build(:comment)
+        post = FactoryBot.create(:post)
+        comment = FactoryBot.build(:comment, post: post)
         comment.save
         assert_equal(["You can not post comments within 1 week of sign up"], comment.errors.full_messages)
       end
