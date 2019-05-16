@@ -1,5 +1,5 @@
 set :stages, %w(production development staging)
-set :default_stage, "production"
+set :default_stage, "staging"
 set :application, "danbooru"
 set :repo_url,  "git://github.com/GlassedSilver/danbooru.git"
 set :scm, :git
