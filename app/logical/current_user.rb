@@ -79,7 +79,7 @@ class CurrentUser
   end
 
   def self.safe_mode?
-    Thread.current[:safe_mode]
+    RequestStore[:safe_mode]
   end
 
   def self.admin_mode?
@@ -87,17 +87,17 @@ class CurrentUser
   end
 
   def self.without_safe_mode
-    prev = Thread.current[:safe_mode]
-    Thread.current[:safe_mode] = false
+    prev = RequestStore[:safe_mode]
+    RequestStore[:safe_mode] = false
     Thread.current[:admin_mode] = true
     yield
   ensure
-    Thread.current[:safe_mode] = prev
+    RequestStore[:safe_mode] = prev
     Thread.current[:admin_mode] = false
   end
 
   def self.set_safe_mode(req)
-    Thread.current[:safe_mode] = Danbooru.config.enable_safe_mode?(req, CurrentUser.user)
+    RequestStore[:safe_mode] = Danbooru.config.enable_safe_mode?(req, CurrentUser.user)
   end
 
   def self.method_missing(method, *params, &block)
