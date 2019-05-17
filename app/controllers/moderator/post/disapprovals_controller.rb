@@ -8,7 +8,7 @@ module Moderator
       def create
         cookies.permanent[:moderated] = Time.now.to_i
         @post_disapproval = PostDisapproval.create(post_disapproval_params)
-        respond_with(@post_disapproval)
+        respond_with(@post_disapproval, location: moderator_post_disapprovals_path)
       end
 
       def index

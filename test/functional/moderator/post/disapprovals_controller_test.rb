@@ -18,6 +18,15 @@ module Moderator
             end
             assert_response :success
           end
+
+          context "for json" do
+            should "render" do
+              assert_difference("PostDisapproval.count", 1) do
+                post_auth moderator_post_disapprovals_path, @admin, params: { post_disapproval: { post_id: @post.id, reason: "breaks_rules" }, format: "json" }
+              end
+              assert_response :success 
+            end
+          end
         end
       end
     end
