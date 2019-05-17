@@ -1,6 +1,4 @@
-<%- # original_forum_post_id: used to accelerate #is_original_post? calls %>
-
-<% if forum_post.visible?(CurrentUser.user) %>
+<% if forum_post.visible?(CurrentUser.user, ActiveModel::Type::Boolean.new.cast(params.dig(:search, :is_deleted))) %>
   <article class="forum-post" id="forum_post_<%= forum_post.id %>" data-forum-post-id="<%= forum_post.id %>" data-creator="<%= forum_post.creator.name %>">
     <div class="author">
       <h4>
