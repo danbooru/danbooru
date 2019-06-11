@@ -17,7 +17,7 @@ module Danbooru
     config.assets.version = '1.0'
     config.autoload_paths += %W(#{config.root}/app/presenters #{config.root}/app/logical #{config.root}/app/mailers)
     config.plugins = [:all]
-    config.time_zone = 'UTC+01:00'
+    config.time_zone = 'Europe/Berlin'
     config.action_mailer.delivery_method = :smtp
     config.action_mailer.smtp_settings = {:enable_starttls_auto => false}
     config.action_mailer.perform_deliveries = true
