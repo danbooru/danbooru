@@ -43,7 +43,7 @@ Danbooru employs numerous external services to delegate some
 functionality.
 
 For development purposes, you can just run mocked version of these
-services. They're available in `scrtip/mock_services` and can be started
+services. They're available in `scripts/mock_services` and can be started
 automatically using Foreman and the provided Procfile.
 
 ### Amazon Web Services
