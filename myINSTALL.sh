@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Run: curl -L -s https://raw.githubusercontent.com/r888888888/danbooru/master/INSTALL.debian -o install.sh ; chmod +x install.sh ; ./install.sh
+# Run: curl -L -s https://raw.githubusercontent.com/GlassedSilver/danbooru/master/myINSTALL.sh -o install.sh ; chmod +x install.sh ; ./install.sh
 
 export RUBY_VERSION=2.5.1
 export GITHUB_INSTALL_SCRIPTS=https://raw.githubusercontent.com/kdoshere/booru/master/script/install
