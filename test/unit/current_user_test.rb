@@ -7,7 +7,7 @@ class CurrentUserTest < ActiveSupport::TestCase
   end
 
   teardown do
-    Thread.current[:safe_mode] = false
+    RequestStore[:safe_mode] = false
   end
 
   context ".safe_mode?" do

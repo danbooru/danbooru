@@ -146,7 +146,7 @@
         <td><%= presenter.feedbacks(self) %></td>    </tbody>
       </tr>
       
-      <% if presenter.previous_names(self).present? %>
+      <% if CurrentUser.is_moderator? && presenter.previous_names(self).present? %>
         <tr>
           <th>Previous Names</th>
           <td><%= presenter.previous_names(self) %></td>

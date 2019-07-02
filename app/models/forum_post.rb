@@ -162,8 +162,8 @@ class ForumPost < ApplicationRecord
     (creator_id == user.id || user.is_moderator?) && visible?(user)
   end
 
-  def visible?(user)
-    user.is_moderator? || (topic.visible?(user) && !is_deleted?)
+  def visible?(user, show_deleted_posts = false)
+    user.is_moderator? || (topic.visible?(user) && (show_deleted_posts || !is_deleted?))
   end
 
   def update_topic_updated_at_on_create
