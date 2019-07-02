@@ -1,5 +1,14 @@
 module Danbooru
   class CustomConfiguration < Configuration
     # Define your custom overloads here
+    
+    # Permanently redirect all HTTP requests to HTTPS.
+    def ssl_options
+      false
+    end
+
+    def redis_url
+      "redis://localhost:6379/1"
+    end
   end
 end
