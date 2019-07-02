@@ -25,6 +25,10 @@ class SavedSearch < ApplicationRecord
             sub_ids = redis.smembers(redis_key).map(&:to_i)
             post_ids.merge(sub_ids)
             redis.expire(redis_key, REDIS_EXPIRY)
+          elsif CurrentUser.is_gold?
+            SavedSearch.populate(query)
+            sub_ids = redis.smembers(redis_key).map(&:to_i)
+            post_ids.merge(sub_ids)
           else
             SavedSearch.delay(queue: "default").populate(query)
           end
