@@ -3,8 +3,8 @@
 # Run: curl -L -s https://raw.githubusercontent.com/GlassedSilver/danbooru/master/myINSTALL.sh -o install.sh ; chmod +x install.sh ; ./install.sh
 
 export RUBY_VERSION=2.5.1
-export GITHUB_INSTALL_SCRIPTS=https://raw.githubusercontent.com/kdoshere/booru/master/script/install
-export GITHUB_ENV=https://raw.githubusercontent.com/kdoshere/booru/master
+export GITHUB_INSTALL_SCRIPTS=https://raw.githubusercontent.com/GlassedSilver/danbooru/master/script/install
+export GITHUB_ENV=https://raw.githubusercontent.com/GlassedSilver/danbooru/master
 export VIPS_VERSION=8.7.0
 
 if [[ "$(whoami)" != "root" ]] ; then
@@ -127,7 +127,7 @@ passwd danbooru
 echo "* Setting up SSH keys for the danbooru account"
 sudo -i -u danbooru ssh-keygen
 
-sudo -i -u danbooru git clone https://github.com/kdoshere/booru.git ~danbooru/danbooru
+sudo -i -u danbooru git clone https://github.com/GlassedSilver/danbooru.git ~danbooru/danbooru
 mkdir -p /var/www/danbooru/shared/config
 mkdir -p /var/www/danbooru/shared/data
 mkdir -p /var/www/danbooru/shared/data/preview
