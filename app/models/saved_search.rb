@@ -19,16 +19,18 @@ class SavedSearch < ApplicationRecord
         label = normalize_label(label) if label
         queries = queries_for(user_id, label: label)
         post_ids = Set.new
+        update_count = 0
         queries.each do |query|
           redis_key = "search:#{query}"
           if redis.exists(redis_key)
             sub_ids = redis.smembers(redis_key).map(&:to_i)
             post_ids.merge(sub_ids)
             redis.expire(redis_key, REDIS_EXPIRY)
-          elsif CurrentUser.is_gold?
+          elsif CurrentUser.is_gold? && update_count < 5
             SavedSearch.populate(query)
             sub_ids = redis.smembers(redis_key).map(&:to_i)
             post_ids.merge(sub_ids)
+            update_count += 1
           else
             SavedSearch.delay(queue: "default").populate(query)
           end
