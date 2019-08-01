@@ -191,7 +191,7 @@ module PostSets
 
     def best_post
       # be smarter about this in the future
-      posts.max {|a, b| a.fav_count <=> b.fav_count}
+      posts.reject(&:is_deleted).select(&:visible?).max_by(&:fav_count)
     end
   end
 end
