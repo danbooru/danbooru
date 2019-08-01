@@ -75,6 +75,11 @@ class UsersController < ApplicationController
     end
   end
 
+  def custom_style
+    @css = CustomCss.parse(CurrentUser.user.custom_style)
+    expires_in 10.years
+  end
+
   private
 
   def check_privilege(user)
