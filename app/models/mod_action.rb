@@ -73,12 +73,24 @@ class ModAction < ApplicationRecord
     q.apply_default_order(params)
   end
 
+  def filtered_description
+    if (ip_ban_create? || ip_ban_delete?) && !CurrentUser.user.is_moderator?
+      description.gsub(/(created|deleted) ip ban for .*/, "\\1 ip ban")
+    else
+      description
+    end
+  end
+
   def category_id
     self.class.categories[category]
   end
 
   def method_attributes
     super + [:category_id]
+  end
+
+  def serializable_hash(*args)
+    super(*args).merge("description" => filtered_description)
   end
 
   def self.log(desc, cat = :other)
