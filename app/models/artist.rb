@@ -8,9 +8,9 @@ class Artist < ApplicationRecord
   before_validation :normalize_name
   before_validation :normalize_other_names
   after_save :create_version
-  after_save :categorize_tag
   after_save :update_wiki
   after_save :clear_url_string_changed
+  validate :validate_tag_category
   validates :name, tag_name: true, uniqueness: true
   belongs_to_creator
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
@@ -18,7 +18,7 @@ class Artist < ApplicationRecord
   has_many :versions, -> {order("artist_versions.id ASC")}, :class_name => "ArtistVersion"
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :tag_alias, :foreign_key => "antecedent_name", :primary_key => "name"
-  has_one :tag, :foreign_key => "name", :primary_key => "name"
+  belongs_to :tag, foreign_key: "name", primary_key: "name", default: -> { Tag.new(name: name, category: Tag.categories.artist) }
   attribute :notes, :string
 
   scope :active, -> { where(is_active: true) }
@@ -405,9 +405,13 @@ class Artist < ApplicationRecord
       Tag.category_for(name)
     end
 
-    def categorize_tag
-      if new_record? || saved_change_to_name?
-        Tag.find_or_create_by_name("artist:#{name}")
+    def validate_tag_category
+      return unless is_active? && name_changed?
+
+      if tag.category_name == "General"
+        tag.update(category: Tag.categories.artist)
+      elsif tag.category_name != "Artist"
+        errors[:base] << "'#{name}' is a #{tag.category_name.downcase} tag; artist entries can only be created for artist tags"
       end
     end
   end

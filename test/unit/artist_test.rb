@@ -469,20 +469,36 @@ class ArtistTest < ActiveSupport::TestCase
       assert_equal(%w[yyy], artist.other_names)
     end
 
-    should "update the category of the tag when created" do
-      tag = FactoryBot.create(:tag, :name => "abc")
-      artist = FactoryBot.create(:artist, :name => "abc")
-      tag.reload
-      assert_equal(Tag.categories.artist, tag.category)
+    context "when creating" do
+      should "create a new artist tag if one does not already exist" do
+        FactoryBot.create(:artist, name: "bkub")
+        assert(Tag.exists?(name: "bkub", category: Tag.categories.artist))
+      end
+
+      should "change the tag to an artist tag if it was a gentag" do
+        tag = FactoryBot.create(:tag, name: "abc", category: Tag.categories.general)
+        artist = FactoryBot.create(:artist, name: "abc")
+
+        assert_equal(Tag.categories.artist, tag.reload.category)
+      end
+
+      should "not allow creating artist entries for non-artist tags" do
+        tag = FactoryBot.create(:tag, name: "touhou", category: Tag.categories.copyright)
+        artist = FactoryBot.build(:artist, name: "touhou")
+
+        assert(artist.invalid?)
+        assert_match(/'touhou' is a copyright tag/, artist.errors.full_messages.join)
+      end
     end
 
-    should "update the category of the tag when renamed" do
-      tag = FactoryBot.create(:tag, :name => "def")
-      artist = FactoryBot.create(:artist, :name => "abc")
-      artist.name = "def"
-      artist.save
-      tag.reload
-      assert_equal(Tag.categories.artist, tag.category)
+    context "when renaming" do
+      should "change the new tag to an artist tag if it was a gentag" do
+        tag = FactoryBot.create(:tag, name: "def", category: Tag.categories.general)
+        artist = FactoryBot.create(:artist, name: "abc")
+        artist.update(name: "def")
+
+        assert_equal(Tag.categories.artist, tag.reload.category)
+      end
     end
 
     context "when saving" do
