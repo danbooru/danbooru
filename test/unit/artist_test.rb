@@ -128,18 +128,6 @@ class ArtistTest < ActiveSupport::TestCase
       assert_equal(artist.name, artist.wiki_page.title)
     end
 
-    context "when a wiki page with the same name already exists" do
-      setup do
-        @wiki_page = FactoryBot.create(:wiki_page, :title => "aaa")
-        @artist = FactoryBot.build(:artist, :name => "aaa")
-      end
-
-      should "not validate" do
-        @artist.save
-        assert_equal(["Name conflicts with a wiki page"], @artist.errors.full_messages)
-      end
-    end
-
     should "update the wiki page when notes are assigned" do
       artist = FactoryBot.create(:artist, :name => "aaa", :notes => "testing")
       artist.update_attribute(:notes, "kokoko")

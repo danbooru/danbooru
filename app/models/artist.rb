@@ -12,7 +12,6 @@ class Artist < ApplicationRecord
   after_save :update_wiki
   after_save :clear_url_string_changed
   validates :name, tag_name: true, uniqueness: true
-  validate :validate_wiki, :on => :create
   belongs_to_creator
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
   has_many :urls, :dependent => :destroy, :class_name => "ArtistUrl", :autosave => true
@@ -389,13 +388,6 @@ class Artist < ApplicationRecord
         wiki_page.body = @notes unless @notes.nil?
         wiki_page.title = name
         wiki_page.save
-      end
-    end
-
-    def validate_wiki
-      if WikiPage.titled(name).exists?
-        errors.add(:name, "conflicts with a wiki page")
-        return false
       end
     end
   end
