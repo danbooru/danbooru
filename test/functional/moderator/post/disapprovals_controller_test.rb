@@ -9,6 +9,8 @@ module Moderator
           as_user do
             @post = create(:post, :is_pending => true)
           end
+
+          CurrentUser.user = @admin
         end
 
         context "create action" do
@@ -26,6 +28,15 @@ module Moderator
               end
               assert_response :success 
             end
+          end
+        end
+
+        context "index action" do
+          should "render" do
+            disapproval = FactoryBot.create(:post_disapproval, post: @post)
+            get_auth moderator_post_disapprovals_path, @admin
+
+            assert_response :success
           end
         end
       end

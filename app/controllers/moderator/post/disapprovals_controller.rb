@@ -3,7 +3,7 @@ module Moderator
     class DisapprovalsController < ApplicationController
       before_action :approver_only
       skip_before_action :api_check
-      respond_to :js, :json, :xml
+      respond_to :js, :html, :json, :xml
 
       def create
         cookies.permanent[:moderated] = Time.now.to_i
@@ -12,7 +12,8 @@ module Moderator
       end
 
       def index
-        @post_disapprovals = PostDisapproval.paginate(params[:page])
+        @post_disapprovals = PostDisapproval.includes(:user).search(search_params).paginate(params[:page], limit: params[:limit])
+        respond_with(@post_disapprovals)
       end
 
       private
