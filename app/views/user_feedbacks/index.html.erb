@@ -20,7 +20,7 @@
             <td><%= compact_time(feedback.created_at) %></td>
             <td>
               <%= format_text(feedback.body) %>
-              <%= render "update_notice", record: feedback, interval: 0.minutes %>
+              <%= render "application/update_notice", record: feedback, interval: 0.minutes %>
             </td>
             <td>
               <% if feedback.editable_by?(CurrentUser.user) %>

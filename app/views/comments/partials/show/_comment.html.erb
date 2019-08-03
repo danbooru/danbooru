@@ -16,7 +16,7 @@
       <div class="body prose">
         <%= format_text(comment.body) %>
 
-        <%= render "update_notice", record: comment %>
+        <%= render "application/update_notice", record: comment %>
       </div>
       
       <% if CurrentUser.is_member? %>

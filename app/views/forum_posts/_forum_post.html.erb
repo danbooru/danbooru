@@ -15,7 +15,7 @@
       <div class="prose">
         <%= format_text(parse_embedded_tag_request_text(forum_post.body)) %>
       </div>
-      <%= render "update_notice", record: forum_post %>
+      <%= render "application/update_notice", record: forum_post %>
       <menu>
         <li>ID: <%= forum_post.id %></li>
         <% if CurrentUser.is_member? && @forum_topic %>
