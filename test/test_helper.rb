@@ -26,13 +26,6 @@ Shoulda::Matchers.configure do |config|
 end
 
 module TestHelpers
-  def create(factory_bot_model, params = {})
-    record = FactoryBot.build(factory_bot_model, params)
-    record.save
-    raise ActiveRecord::RecordInvalid.new(record) if record.errors.any?
-    record
-  end
-
   def as(user, &block)
     CurrentUser.as(user, &block)
   end

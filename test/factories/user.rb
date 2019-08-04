@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory(:user, aliases: [:creator, :updater]) do
+  factory(:user, aliases: [:creator, :updater, :uploader]) do
     sequence :name do |n|
       "user#{n}"
     end
