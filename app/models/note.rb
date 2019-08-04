@@ -5,8 +5,7 @@ class Note < ApplicationRecord
   belongs_to :post
   belongs_to_creator
   has_many :versions, -> {order("note_versions.id ASC")}, :class_name => "NoteVersion", :dependent => :destroy
-  validates_presence_of :creator_id, :x, :y, :width, :height, :body
-  validate :post_must_exist
+  validates_presence_of :x, :y, :width, :height, :body
   validate :note_within_image
   after_save :update_post
   after_save :create_version
@@ -67,13 +66,6 @@ class Note < ApplicationRecord
 
   extend SearchMethods
   include ApiMethods
-
-  def post_must_exist
-    if !Post.exists?(post_id)
-      errors.add :post, "must exist"
-      return false
-    end
-  end
 
   def post_must_not_be_note_locked
     if is_locked?

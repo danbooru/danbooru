@@ -1,7 +1,7 @@
 class IpBan < ApplicationRecord
   IP_ADDR_REGEX = /\A(?:[0-9]{1,3}\.){3}[0-9]{1,3}\Z/
   belongs_to_creator
-  validates_presence_of :reason, :creator, :ip_addr
+  validates_presence_of :reason, :ip_addr
   validates_format_of :ip_addr, :with => IP_ADDR_REGEX
   validates_uniqueness_of :ip_addr, :if => ->(rec) {rec.ip_addr =~ IP_ADDR_REGEX}
   after_create do |rec|

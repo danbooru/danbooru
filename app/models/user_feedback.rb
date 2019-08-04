@@ -3,7 +3,7 @@ class UserFeedback < ApplicationRecord
   belongs_to :user
   belongs_to_creator
   attr_accessor :disable_dmail_notification
-  validates_presence_of :user, :creator, :body, :category
+  validates_presence_of :body, :category
   validates_inclusion_of :category, :in => %w(positive negative neutral)
   validate :creator_is_gold
   validate :user_is_not_creator

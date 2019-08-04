@@ -3,7 +3,7 @@ class PostAppeal < ApplicationRecord
 
   belongs_to :creator, :class_name => "User"
   belongs_to :post
-  validates_presence_of :post, :reason, :creator_id, :creator_ip_addr
+  validates_presence_of :reason, :creator_ip_addr
   validate :validate_post_is_inactive
   validate :validate_creator_is_not_limited
   before_validation :initialize_creator, :on => :create

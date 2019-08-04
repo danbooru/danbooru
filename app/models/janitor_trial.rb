@@ -2,7 +2,6 @@ class JanitorTrial < ApplicationRecord
   belongs_to :user
   after_create :send_dmail
   after_create :promote_user
-  validates_presence_of :user
   belongs_to_creator
   validates_inclusion_of :status, :in => %w(active inactive)
   before_validation :initialize_status

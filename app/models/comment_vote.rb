@@ -4,7 +4,7 @@ class CommentVote < ApplicationRecord
   belongs_to :comment
   belongs_to :user
   before_validation :initialize_user, :on => :create
-  validates_presence_of :user_id, :comment_id, :score
+  validates_presence_of :score
   validates_uniqueness_of :user_id, :scope => :comment_id, :message => "have already voted for this comment"
   validate :validate_user_can_vote
   validate :validate_comment_can_be_down_voted

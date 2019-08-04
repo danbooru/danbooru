@@ -136,10 +136,6 @@ class Comment < ApplicationRecord
   extend SearchMethods
   include VoteMethods
 
-  def validate_post_exists
-    errors.add(:post, "must exist") unless Post.exists?(post_id)
-  end
-
   def validate_creator_is_not_limited
     if creator.is_comment_limited? && !do_not_bump_post?
       errors.add(:base, "You can only post #{Danbooru.config.member_comment_limit} comments per hour")

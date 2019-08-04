@@ -7,7 +7,7 @@ class Ban < ApplicationRecord
   belongs_to :user
   belongs_to :banner, :class_name => "User"
   validate :user_is_inferior
-  validates_presence_of :user_id, :reason, :duration
+  validates_presence_of :reason, :duration
   before_validation :initialize_banner_id, :on => :create
 
   scope :unexpired, -> { where("bans.expires_at > ?", Time.now) }

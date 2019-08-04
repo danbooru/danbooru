@@ -2,7 +2,6 @@ class DmailFilter < ApplicationRecord
   extend Memoist
 
   belongs_to :user
-  validates_presence_of :user
   before_validation :initialize_user
 
   def initialize_user
