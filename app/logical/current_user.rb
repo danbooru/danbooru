@@ -42,28 +42,28 @@ class CurrentUser
     end
   end
 
-  def self.user=(user)
-    Thread.current[:current_user] = user
-  end
-
-  def self.ip_addr=(ip_addr)
-    Thread.current[:current_ip_addr] = ip_addr
-  end
-
   def self.user
-    Thread.current[:current_user]
+    RequestStore[:current_user]
+  end
+
+  def self.user=(user)
+    RequestStore[:current_user] = user
   end
 
   def self.ip_addr
-    Thread.current[:current_ip_addr]
+    RequestStore[:current_ip_addr]
+  end
+
+  def self.ip_addr=(ip_addr)
+    RequestStore[:current_ip_addr] = ip_addr
   end
 
   def self.root_url
-    Thread.current[:current_root_url] || "https://#{Danbooru.config.hostname}"
+    RequestStore[:current_root_url] || "https://#{Danbooru.config.hostname}"
   end
 
   def self.root_url=(root_url)
-    Thread.current[:current_root_url] = root_url
+    RequestStore[:current_root_url] = root_url
   end
 
   def self.id
@@ -83,17 +83,17 @@ class CurrentUser
   end
 
   def self.admin_mode?
-    Thread.current[:admin_mode]
+    RequestStore[:admin_mode]
   end
 
   def self.without_safe_mode
     prev = RequestStore[:safe_mode]
     RequestStore[:safe_mode] = false
-    Thread.current[:admin_mode] = true
+    RequestStore[:admin_mode] = true
     yield
   ensure
     RequestStore[:safe_mode] = prev
-    Thread.current[:admin_mode] = false
+    RequestStore[:admin_mode] = false
   end
 
   def self.set_safe_mode(req)
