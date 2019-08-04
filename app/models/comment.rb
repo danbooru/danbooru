@@ -139,12 +139,8 @@ class Comment < ApplicationRecord
   def validate_creator_is_not_limited
     if creator.is_comment_limited? && !do_not_bump_post?
       errors.add(:base, "You can only post #{Danbooru.config.member_comment_limit} comments per hour")
-      false
-    elsif creator.can_comment?
-      true
-    else
+    elsif !creator.can_comment?
       errors.add(:base, "You can not post comments within 1 week of sign up")
-      false
     end
   end
 
@@ -153,7 +149,6 @@ class Comment < ApplicationRecord
     if Comment.where("post_id = ?", post_id).count <= Danbooru.config.comment_threshold && !do_not_bump_post?
       Post.where(:id => post_id).update_all(:last_comment_bumped_at => created_at)
     end
-    true
   end
 
   def update_last_commented_at_on_destroy
@@ -170,8 +165,6 @@ class Comment < ApplicationRecord
     else
       Post.where(:id => post_id).update_all(:last_comment_bumped_at => other_comments.first.created_at)
     end
-
-    true
   end
 
   def below_threshold?(user = CurrentUser.user)

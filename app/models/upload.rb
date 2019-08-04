@@ -255,10 +255,7 @@ class Upload < ApplicationRecord
 
   def uploader_is_not_limited
     if !uploader.can_upload?
-      self.errors.add(:uploader, uploader.upload_limited_reason)
-      return false
-    else
-      return true
+      errors.add(:uploader, uploader.upload_limited_reason)
     end
   end
 

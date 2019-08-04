@@ -114,7 +114,6 @@ class WikiPage < ApplicationRecord
   def validate_not_locked
     if is_locked? && !CurrentUser.is_builder?
       errors.add(:is_locked, "and cannot be updated")
-      return false
     end
   end
 

@@ -146,7 +146,6 @@ class ForumPost < ApplicationRecord
   def topic_is_not_restricted
     if topic && !topic.visible?(creator)
       errors[:topic] << "is restricted"
-      return false
     end
   end
 
@@ -238,8 +237,6 @@ class ForumPost < ApplicationRecord
     if is_deleted? && is_original_post?
       topic.update_attribute(:is_deleted, true)
     end
-
-    true
   end
 
   def build_response

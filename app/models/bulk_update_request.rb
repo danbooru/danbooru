@@ -141,10 +141,8 @@ class BulkUpdateRequest < ApplicationRecord
   module ValidationMethods
     def script_formatted_correctly
       AliasAndImplicationImporter.tokenize(script)
-      return true
     rescue StandardError => e
       errors[:base] << e.message
-      return false
     end
 
     def forum_topic_id_not_invalid
@@ -157,11 +155,8 @@ class BulkUpdateRequest < ApplicationRecord
       begin
         AliasAndImplicationImporter.new(script, forum_topic_id, "1", skip_secondary_validations).validate!
       rescue RuntimeError => e
-        self.errors[:base] << e.message
-        return false
+        errors[:base] << e.message
       end
-
-      errors.empty?
     end
   end
 

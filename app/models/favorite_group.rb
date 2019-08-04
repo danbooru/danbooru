@@ -88,18 +88,12 @@ class FavoriteGroup < ApplicationRecord
         error += " Upgrade your account to create more."
       end
       self.errors.add(:base, error)
-      return false
-    else
-      return true
     end
   end
 
   def validate_number_of_posts
     if post_id_array.size > 10_000
       self.errors.add(:base, "Favorite groups can have up to 10,000 posts each")
-      return false
-    else
-      return true
     end
   end
 

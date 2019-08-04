@@ -117,8 +117,7 @@ class User < ApplicationRecord
   module BanMethods
     def validate_ip_addr_is_not_banned
       if IpBan.is_banned?(CurrentUser.ip_addr)
-        self.errors[:base] << "IP address is banned"
-        return false
+        errors[:base] << "IP address is banned"
       end
     end
 
@@ -407,8 +406,6 @@ class User < ApplicationRecord
       if per_page.nil? || !is_gold?
         self.per_page = Danbooru.config.posts_per_page
       end
-      
-      return true
     end
 
     def level_class

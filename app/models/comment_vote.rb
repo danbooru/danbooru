@@ -28,18 +28,12 @@ class CommentVote < ApplicationRecord
   def validate_user_can_vote
     if !user.can_comment_vote?
       errors.add :base, "You cannot vote on more than 10 comments per hour"
-      false
-    else
-      true
     end
   end
 
   def validate_comment_can_be_down_voted
     if is_positive? && comment.creator == CurrentUser.user
       errors.add :base, "You cannot upvote your own comments"
-      false
-    else
-      true
     end
   end
 

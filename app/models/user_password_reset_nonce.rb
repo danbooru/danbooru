@@ -15,7 +15,6 @@ class UserPasswordResetNonce < ApplicationRecord
   def validate_existence_of_email
     if !User.with_email(email).exists?
       errors[:email] << "is invalid"
-      return false
     end
   end
 

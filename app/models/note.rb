@@ -70,7 +70,6 @@ class Note < ApplicationRecord
   def post_must_not_be_note_locked
     if is_locked?
       errors.add :post, "is note locked"
-      return false
     end
   end
 
@@ -78,7 +77,6 @@ class Note < ApplicationRecord
     return false unless post.present?
     if x < 0 || y < 0 || (x > post.image_width) || (y > post.image_height) || width < 0 || height < 0 || (x + width > post.image_width) || (y + height > post.image_height)
       self.errors.add(:note, "must be inside the image")
-      return false
     end
   end
 
