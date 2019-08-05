@@ -30,12 +30,12 @@ RUN apt-get update && \
   mkdir -p /var/www/danbooru/shared/data && \
   mkdir -p /var/www/danbooru/shared/data/preview && \
   mkdir -p /var/www/danbooru/shared/data/crop && \
-  mkdir -p /var/www/danbooru/shared/data/sample 
+  mkdir -p /var/www/danbooru/shared/data/sample
 COPY . /app
 RUN chown -R danbooru:danbooru /app && \
   chown -R danbooru:danbooru /var/www/danbooru && \
   mkdir /var/run/danbooru && \
-  chown danbooru:danbooru /var/run/danbooru 
+  chown danbooru:danbooru /var/run/danbooru
 EXPOSE 3000
 USER danbooru
 RUN echo 'gem: --no-document' > ~/.gemrc && \
