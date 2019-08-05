@@ -40,13 +40,17 @@ echo "* Installing packages..."
 
 if [ -n "$(uname -a | grep Ubuntu)" ] ; then
   LIBSSL_DEV_PKG=libssl-dev
+  LIBJPEG_TURBO_DEV_PKG=libjpeg-turbo8-dev
 else
   LIBSSL_DEV_PKG=$( verlt `lsb_release -sr` 9.0 && echo libssl-dev || echo libssl1.0-dev )
+  LIBJPEG_TURBO_DEV_PKG=libjpeg62-turbo-dev
 fi
 apt-get update
+apt-get -y install apt-transport-https
+apt-get -y install zlib1g-dev libglib2.0-dev
 apt-get -y install $LIBSSL_DEV_PKG build-essential automake libxml2-dev libxslt-dev ncurses-dev sudo libreadline-dev flex bison ragel memcached libmemcached-dev git curl libcurl4-openssl-dev sendmail-bin sendmail nginx ssh coreutils ffmpeg mkvtoolnix
 apt-get -y install libpq-dev postgresql-client
-apt-get -y install liblcms2-dev libjpeg-turbo8-dev libexpat1-dev libgif-dev libpng-dev libexif-dev
+apt-get -y install liblcms2-dev $LIBJPEG_TURBO_DEV_PKG libexpat1-dev libgif-dev libpng-dev libexif-dev
 
 # vrack specific stuff
 if [ -n "$VLAN_IP_ADDR" ] ; then
@@ -103,7 +107,7 @@ echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~danbooru/.bash_profile
 echo 'eval "$(rbenv init -)"' >> ~danbooru/.bash_profile
 sudo -u danbooru mkdir -p ~danbooru/.rbenv/plugins
 sudo -u danbooru git clone git://github.com/sstephenson/ruby-build.git ~danbooru/.rbenv/plugins/ruby-build
-sudo -u danbooru bash -l -c "rbenv install $RUBY_VERSION"
+sudo -u danbooru bash -l -c "RUBY_CONFIGURE_OPTS=--disable-install-doc rbenv install --verbose $RUBY_VERSION"
 sudo -u danbooru bash -l -c "rbenv global $RUBY_VERSION"
 
 # Generate secret token and secret key
@@ -138,7 +142,10 @@ echo "* Enter a new password for the danbooru account"
 passwd danbooru
 
 echo "* Setting up SSH keys for the danbooru account"
-sudo -u danbooru ssh-keygen
+sudo -u danbooru ssh-keygen -t rsa -f ~danbooru/.ssh/id_rsa -N ""
+sudo -u danbooru touch ~danbooru/.ssh/authorized_keys
+sudo -u danbooru cat ~danbooru/.ssh/id_rsa.pub >> ~danbooru/.ssh/authorized_keys
+sudo -u danbooru chmod 600 ~danbooru/.ssh/authorized_keys
 
 mkdir -p /var/www/danbooru2/shared/config
 mkdir -p /var/www/danbooru2/shared/data
@@ -166,7 +173,7 @@ read -p "Press [enter] to continue..."
 echo "* Commit your changes and push them to your fork. You are now ready to"
 echo "* deploy with the following command:"
 echo "*"
-echo "*   bundle exec capistrano production deploy"
+echo "*   bundle exec cap production deploy"
 echo "*"
 echo "* You can also run a server locally without having to deal with deploys"
 echo "* by running the following command:"
