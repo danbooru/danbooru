@@ -8,9 +8,9 @@ class SessionsController < ApplicationController
 
     if session_creator.authenticate
       url = params[:url] if params[:url] && params[:url].start_with?("/")
-      redirect_to(url || session[:previous_uri] || posts_path, :notice => "You are now logged in.")
+      redirect_to(url || session[:previous_uri] || posts_path, :notice => "You are now logged in")
     else
-      redirect_to(new_session_path, :notice => "Password was incorrect.")
+      redirect_to(new_session_path, :notice => "Password was incorrect")
     end
   end
 
@@ -18,7 +18,7 @@ class SessionsController < ApplicationController
     session.delete(:user_id)
     cookies.delete(:user_name)
     cookies.delete(:password_hash)
-    redirect_to(posts_path, :notice => "You are now logged out.")
+    redirect_to(posts_path, :notice => "You are now logged out")
   end
 
   def sign_out
