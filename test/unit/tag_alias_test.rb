@@ -42,7 +42,7 @@ class TagAliasTest < ActiveSupport::TestCase
       should allow_value(nil).for(:approver_id)
       should_not allow_value(-1).for(:approver_id).with_message("must exist", against: :approver)
 
-      should_not allow_value(nil).for(:creator_id)
+      # should_not allow_value(nil).for(:creator_id) # XXX https://github.com/thoughtbot/shoulda-context/issues/53
       should_not allow_value(-1).for(:creator_id).with_message("must exist", against: :creator)
 
       should "not allow duplicate active aliases" do
