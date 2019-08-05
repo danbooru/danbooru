@@ -24,7 +24,7 @@ module Sources
         assert_equal(urls, @site.image_urls)
       end
     end
-    
+
     context "A video" do
       setup do
         @site = Sources::Strategies.find("https://twitter.com/CincinnatiZoo/status/859073537713328129")
@@ -176,6 +176,18 @@ module Sources
         assert(@site.artist_commentary_desc.blank?)
         assert(@site.dtext_artist_commentary_desc.blank?)
         assert_nothing_raised { @site.to_h }
+      end
+    end
+
+    context "The source site for a direct image url (pbs.twimg.com/media/*?format=jpg&name=*) without a referer url" do
+      setup do
+        @site = Sources::Strategies.find("https://pbs.twimg.com/media/EBGp2YdUYAA19Uj?format=jpg&name=small")
+      end
+
+      should "work" do
+        assert_equal("https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:orig", @site.image_url)
+        assert_equal(["https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:orig"], @site.image_urls)
+        assert_equal("https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:orig", @site.canonical_url)
       end
     end
 

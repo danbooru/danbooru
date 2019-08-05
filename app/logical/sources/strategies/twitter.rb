@@ -4,6 +4,13 @@ module Sources::Strategies
     ASSET = %r!\A(https?://(?:video|pbs)\.twimg\.com/media/)!i
     PROFILE = %r!\Ahttps?://(?:mobile\.)?twitter.com/(?<username>[a-z0-9_]+)!i
 
+    # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg
+    # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb?format=jpg&name=900x900
+    BASE_IMAGE_URL = %r!\Ahttps?://pbs\.twimg\.com/media!i
+    FILENAME1 = %r!(?<file_name>\w+)\.(?<file_ext>\w+)!i
+    FILENAME2 = %r!(?<file_name>\w+)\?.*format=(?<file_ext>\w+)!i
+    IMAGE_URL = %r!#{BASE_IMAGE_URL}/#{Regexp.union(FILENAME1, FILENAME2)}!i
+
     # Twitter provides a list but it's inaccurate; some names ('intent') aren't
     # included and other names in the list aren't actually reserved.
     # https://developer.twitter.com/en/docs/developer-utilities/configuration/api-reference/get-help-configuration
@@ -40,8 +47,8 @@ module Sources::Strategies
     end
 
     def image_urls
-      if url =~ /(#{ASSET}[^:]+)/
-        [$1 + ":orig" ]
+      if url =~ IMAGE_URL
+        ["https://pbs.twimg.com/media/#{$~[:file_name]}.#{$~[:file_ext]}:orig"]
       elsif api_response.present?
         service.image_urls(api_response)
       else
@@ -57,7 +64,7 @@ module Sources::Strategies
     end
 
     def page_url
-      return "" if status_id.blank? || artist_name.blank?
+      return nil if status_id.blank? || artist_name.blank?
       "https://twitter.com/#{artist_name}/status/#{status_id}"
     end
 
