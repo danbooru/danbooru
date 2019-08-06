@@ -1,14 +1,13 @@
 module Sources::Strategies
   class Twitter < Base
     PAGE = %r!\Ahttps?://(?:mobile\.)?twitter\.com!i
-    ASSET = %r!\A(https?://(?:video|pbs)\.twimg\.com/media/)!i
     PROFILE = %r!\Ahttps?://(?:mobile\.)?twitter.com/(?<username>[a-z0-9_]+)!i
 
     # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg
     # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb?format=jpg&name=900x900
     BASE_IMAGE_URL = %r!\Ahttps?://pbs\.twimg\.com/media!i
-    FILENAME1 = %r!(?<file_name>\w+)\.(?<file_ext>\w+)!i
-    FILENAME2 = %r!(?<file_name>\w+)\?.*format=(?<file_ext>\w+)!i
+    FILENAME1 = %r!(?<file_name>[a-zA-Z0-9_-]+)\.(?<file_ext>\w+)!i
+    FILENAME2 = %r!(?<file_name>[a-zA-Z0-9_-]+)\?.*format=(?<file_ext>\w+)!i
     IMAGE_URL = %r!#{BASE_IMAGE_URL}/#{Regexp.union(FILENAME1, FILENAME2)}!i
 
     # Twitter provides a list but it's inaccurate; some names ('intent') aren't

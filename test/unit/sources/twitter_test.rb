@@ -189,6 +189,11 @@ module Sources
         assert_equal(["https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:orig"], @site.image_urls)
         assert_equal("https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:orig", @site.canonical_url)
       end
+
+      should "work for filenames containing dashes" do
+        @site = Sources::Strategies.find("https://pbs.twimg.com/media/EAjc-OWVAAAxAgQ.jpg", "https://twitter.com/asteroid_ill/status/1155420330128625664")
+        assert_equal("https://pbs.twimg.com/media/EAjc-OWVAAAxAgQ.jpg:orig", @site.image_url)
+      end
     end
 
     context "The source site for a https://twitter.com/i/web/status/:id url" do
