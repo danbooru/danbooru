@@ -1,3 +1,0 @@
-#!/bin/bash
-
-mv public/maintenance.html.bak public/maintenance.html

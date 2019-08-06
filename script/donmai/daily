@@ -1,7 +1,0 @@
-#!/bin/bash
-
-export RAILS_ENV=production
-cd "$(dirname $0)/../../"
-script/donmai/backup_db
-script/donmai/backup_db_to_s3
-script/donmai/prune_backup_dbs
