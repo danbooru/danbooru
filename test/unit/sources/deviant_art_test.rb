@@ -17,6 +17,7 @@ module Sources
         assert_equal(@site.image_url, @site.canonical_url)
         assert_equal("aeror404", @site.artist_name)
         assert_equal("https://www.deviantart.com/aeror404", @site.profile_url)
+        assert_equal("https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484", @site.page_url_from_image_url)
       end
     end
 
@@ -29,6 +30,7 @@ module Sources
         assert_equal(@site.image_url, @site.canonical_url)
         assert_equal("nickbeja", @site.artist_name)
         assert_equal("https://www.deviantart.com/nickbeja", @site.profile_url)
+        assert_equal("https://www.deviantart.com/nickbeja/art/Mindflayer-Girl01-708675884", @site.page_url_from_image_url)
         assert_equal([@artist], @site.artists)
         assert_nothing_raised { @site.to_h }
       end
@@ -40,6 +42,7 @@ module Sources
 
         assert_match(%r!^https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbj81lr-3306feb1-87dc-4d25-9a4c-da8d2973a8b7.jpg!, @site.image_urls[0])
         assert_equal("https://www.deviantart.com/noizave/art/test-no-download-697415967", @site.canonical_url)
+        assert_equal("https://www.deviantart.com/noizave/art/Test-No-Download-697415967", @site.page_url_from_image_url)
       end
     end
 
@@ -59,6 +62,7 @@ module Sources
         assert_equal("hideyoshi", @site.artist_name)
         assert_equal("https://www.deviantart.com/hideyoshi", @site.profile_url)
         assert_equal("http://origin-orig.deviantart.net/9e1f/f/2016/265/3/5/legend_of_galactic_heroes_by_hideyoshi-daihpha.jpg", @site.image_url)
+        assert_equal("https://www.deviantart.com/hideyoshi/art/Legend-Of-Galactic-Heroes-635721022", @site.page_url_from_image_url)
         assert_equal(@site.image_url, @site.canonical_url)
       end
     end
@@ -69,6 +73,7 @@ module Sources
 
         assert_equal(@site.url, @site.image_url)
         assert_equal("https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408", @site.page_url)
+        assert_equal("https://www.deviantart.com/noizave/art/Test-Post-Please-Ignore-685436408", @site.page_url_from_image_url)
         assert_equal(@site.image_url, @site.canonical_url)
         assert_equal("noizave", @site.artist_name)
         assert_equal("https://www.deviantart.com/noizave", @site.profile_url)
@@ -81,6 +86,7 @@ module Sources
       should "return the full size image url" do
         @site = Sources::Strategies.find("https://img00.deviantart.net/a233/i/2017/160/5/1/test_post_please_ignore_by_noizave-dbc3a48.png")
         assert_equal("http://origin-orig.deviantart.net/7b5b/f/2017/160/c/5/test_post_please_ignore_by_noizave-dbc3a48.png", @site.image_url)
+        assert_equal("https://www.deviantart.com/noizave/art/Test-Post-Please-Ignore-685436408", @site.page_url_from_image_url)
       end
     end
 
@@ -88,6 +94,7 @@ module Sources
       should "return the full size image url" do
         @site = Sources::Strategies.find("http://th00.deviantart.net/fs71/PRE/f/2014/065/3/b/goruto_by_xyelkiltrox-d797tit.png")
         assert_equal("http://origin-orig.deviantart.net/0f1e/f/2014/065/3/b/goruto_by_xyelkiltrox-d797tit.png", @site.image_url)
+        assert_equal("https://www.deviantart.com/xyelkiltrox/art/Goruto-438744629", @site.page_url_from_image_url)
       end
     end
 
@@ -98,6 +105,7 @@ module Sources
 
         assert_equal("mikoto-chan", @site.artist_name)
         assert_equal([@artist], @site.artists)
+        assert_nil(@site.page_url_from_image_url)
       end
     end
 
@@ -116,6 +124,7 @@ module Sources
           assert_equal("47ness", @site.artist_name)
           assert_equal("https://www.deviantart.com/47ness", @site.profile_url)
           assert_equal("", @site.page_url)
+          assert_nil(@site.page_url_from_image_url)
           assert_equal(@site.image_url, @site.canonical_url)
           assert_equal([@artist], @site.artists)
           assert_nothing_raised { @site.to_h }
@@ -152,6 +161,7 @@ module Sources
           assert_equal("", @site.artist_name)
           assert_equal("", @site.profile_url)
           assert_equal("", @site.page_url)
+          assert_nil(@site.page_url_from_image_url)
           assert_equal(@site.image_url, @site.canonical_url)
           assert_equal([], @site.artists)
           assert_nothing_raised { @site.to_h }

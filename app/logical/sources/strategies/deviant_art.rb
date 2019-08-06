@@ -19,6 +19,7 @@
 # * http://pre06.deviantart.net/8497/th/pre/f/2009/173/c/c/cc9686111dcffffffb5fcfaf0cf069fb.jpg
 #
 # * https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg
+# * https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/fe7ab27f-7530-4252-99ef-2baaf81b36fd/dddf6pe-1a4a091c-768c-4395-9465-5d33899be1eb.png/v1/fill/w_800,h_1130,q_80,strp/stay_hydrated_and_in_the_shade_by_raikoart_dddf6pe-fullview.jpg?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7ImhlaWdodCI6Ijw9MTEzMCIsInBhdGgiOiJcL2ZcL2ZlN2FiMjdmLTc1MzAtNDI1Mi05OWVmLTJiYWFmODFiMzZmZFwvZGRkZjZwZS0xYTRhMDkxYy03NjhjLTQzOTUtOTQ2NS01ZDMzODk5YmUxZWIucG5nIiwid2lkdGgiOiI8PTgwMCJ9XV0sImF1ZCI6WyJ1cm46c2VydmljZTppbWFnZS5vcGVyYXRpb25zIl19.J0W4k-iV6Mg8Kt_5Lr_L_JbBq4lyr7aCausWWJ_Fsbw
 #
 # Page URLs:
 #
@@ -110,6 +111,18 @@ module Sources
           api_url
         else
           ""
+        end
+      end
+
+      def page_url_from_image_url
+        artist, title, id = artist_name_from_url, title_from_url, deviation_id
+
+        if artist.present? && title.present? && id.present?
+          "https://www.deviantart.com/#{artist}/art/#{title}-#{id}"
+        elsif id.present?
+          "https://deviantart.com/deviation/#{id}"
+        else
+          nil
         end
       end
 
@@ -212,12 +225,26 @@ module Sources
         end
       end
 
+      def self.title_from_url(url)
+        if url =~ ASSET || url =~ PATH_ART || url =~ PATH_PROFILE
+          $~[:title].to_s.titleize.strip.squeeze(" ").tr(" ", "-").presence
+        elsif url !~ RESERVED_SUBDOMAINS && (url =~ SUBDOMAIN_ART || url =~ SUBDOMAIN_PROFILE)
+          $~[:title].to_s.titleize.strip.squeeze(" ").tr(" ", "-").presence
+        else
+          nil
+        end
+      end
+
       def deviation_id
         self.class.deviation_id_from_url(url) || self.class.deviation_id_from_url(referer_url)
       end
 
       def artist_name_from_url
         self.class.artist_name_from_url(url) || self.class.artist_name_from_url(referer_url)
+      end
+
+      def title_from_url
+        self.class.title_from_url(url) || self.class.title_from_url(referer_url)
       end
 
       def api_url
