@@ -26,7 +26,7 @@ module Maintenance
     TagChangeRequestPruner.warn_all
     TagChangeRequestPruner.reject_all
     Ban.prune!
-    ActiveRecord::Base.connection.execute("vacuum analyze")
+    ActiveRecord::Base.connection.execute("vacuum analyze") unless Rails.env.test?
   rescue Exception => exception
     rescue_exception(exception)
   end
