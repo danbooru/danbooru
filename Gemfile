@@ -44,6 +44,7 @@ gem 'webpacker', '>= 4.0.x'
 gem 'retriable'
 gem 'redis'
 gem 'request_store'
+gem 'term-ansicolor', require: "term/ansicolor"
 
 # needed for looser jpeg header compat
 gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888888888/ruby-imagespec.git", :branch => "exif-fixes"
