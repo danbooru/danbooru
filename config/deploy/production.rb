@@ -7,3 +7,5 @@ server "oogaki", :roles => %w(worker)
 
 set :linked_files, fetch(:linked_files, []).push(".env.production")
 set :rbenv_path, "/home/danbooru/.rbenv"
+
+after "deploy:finished", "newrelic:notice_deployment"
