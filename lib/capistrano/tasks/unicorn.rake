@@ -14,7 +14,3 @@ namespace :unicorn do
     end
   end
 end
-
-after "deploy:published", "unicorn:terminate"
-after "deploy:published", "unicorn:kill"
-after "deploy:published", "unicorn:start"
