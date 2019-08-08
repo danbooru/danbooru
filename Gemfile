@@ -18,7 +18,6 @@ gem "whenever", :require => false
 gem "sanitize"
 gem 'ruby-vips'
 gem 'net-sftp'
-gem 'term-ansicolor', :require => "term/ansicolor"
 gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt', :require => "bcrypt"
 gem 'statistics2'

@@ -389,8 +389,6 @@ GEM
     stripe (4.21.3)
       faraday (~> 0.13)
       net-http-persistent (~> 3.0)
-    term-ansicolor (1.7.1)
-      tins (~> 1.0)
     therubyracer (0.12.3)
       libv8 (~> 3.16.14.15)
       ref
@@ -398,7 +396,6 @@ GEM
     thread_safe (0.3.6)
     tilt (2.0.9)
     timecop (0.9.1)
-    tins (1.21.1)
     twitter (6.2.0)
       addressable (~> 2.3)
       buftok (~> 0.2.0)
@@ -516,7 +513,6 @@ DEPENDENCIES
   statistics2
   streamio-ffmpeg
   stripe
-  term-ansicolor
   therubyracer
   timecop
   twitter
