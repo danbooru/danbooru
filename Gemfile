@@ -19,7 +19,6 @@ gem 'statistics2'
 gem 'capistrano', '~> 3.10'
 gem 'capistrano-rails'
 gem 'capistrano-rbenv'
-gem 'radix62', '~> 1.0.1'
 gem 'streamio-ffmpeg'
 gem 'rubyzip', :require => "zip"
 gem 'stripe'
