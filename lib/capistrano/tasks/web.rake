@@ -19,6 +19,3 @@ namespace :web do
     end
   end
 end
-
-before "deploy:started", "web:disable"
-after "deploy:published", "web:enable"
