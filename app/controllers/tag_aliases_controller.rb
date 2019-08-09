@@ -22,7 +22,7 @@ class TagAliasesController < ApplicationController
   end
 
   def index
-    @tag_aliases = TagAlias.search(search_params).paginate(params[:page], :limit => params[:limit])
+    @tag_aliases = TagAlias.includes(:antecedent_tag, :consequent_tag, :approver).search(search_params).paginate(params[:page], :limit => params[:limit])
     respond_with(@tag_aliases) do |format|
       format.xml do
         render :xml => @tag_aliases.to_xml(:root => "tag-aliases")

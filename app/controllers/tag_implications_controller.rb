@@ -22,7 +22,7 @@ class TagImplicationsController < ApplicationController
   end
 
   def index
-    @tag_implications = TagImplication.search(search_params).paginate(params[:page], :limit => params[:limit])
+    @tag_implications = TagImplication.includes(:antecedent_tag, :consequent_tag, :approver).search(search_params).paginate(params[:page], :limit => params[:limit])
     respond_with(@tag_implications) do |format|
       format.xml do
         render :xml => @tag_implications.to_xml(:root => "tag-implications")
