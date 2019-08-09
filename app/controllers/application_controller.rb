@@ -18,8 +18,6 @@ class ApplicationController < ActionController::Base
   rescue_from Exception, :with => :rescue_exception
   rescue_from User::PrivilegeError, :with => :access_denied
   rescue_from SessionLoader::AuthenticationFailure, :with => :authentication_failed
-  rescue_from Danbooru::Paginator::PaginationError, :with => :render_pagination_limit
-  rescue_from PG::ConnectionBad, with: :bad_db_connection
   rescue_from ActionController::UnpermittedParameters, :with => :access_denied
 
   # This is raised on requests to `/blah.js`. Rails has already rendered StaticController#not_found
@@ -34,18 +32,6 @@ class ApplicationController < ActionController::Base
 
   def enable_cors
     response.headers["Access-Control-Allow-Origin"] = "*"
-  end
-
-  def bad_db_connection
-    respond_to do |format|
-      format.json do
-        render json: {success: false, reason: "database is unavailable"}.to_json, status: 503
-      end
-
-      format.html do
-        render template: "static/service_unavailable", status: 503
-      end
-    end
   end
 
   def track_only_param
@@ -89,39 +75,37 @@ class ApplicationController < ActionController::Base
   def rescue_exception(exception)
     @exception = exception
 
-    if Rails.env.test? && ENV["DEBUG"]
-      puts "---"
-      STDERR.puts("#{exception.class} exception thrown: #{exception.message}")
-      exception.backtrace.each {|x| STDERR.puts(x)}
-      puts "---"
-    end
-
-    if exception.is_a?(::ActiveRecord::StatementInvalid) && exception.to_s =~ /statement timeout/
+    case exception
+    when ActiveRecord::QueryCanceled
       if Rails.env.production?
         NewRelic::Agent.notice_error(exception, :uri => request.original_url, :referer => request.referer, :request_params => params, :custom_params => {:user_id => CurrentUser.user.id, :user_ip_addr => CurrentUser.ip_addr})
       end
 
-      @error_message = "The database timed out running your query."
-      render :template => "static/error", :status => 500
-    elsif exception.is_a?(::ActiveRecord::RecordNotFound)
-      @error_message = "That record was not found"
-      render :template => "static/error", :status => 404
-    elsif exception.is_a?(NotImplementedError)
-      flash[:notice] = "This feature isn't available: #{@exception.message}"
-      respond_to do |fmt|
-        fmt.html { redirect_back fallback_location: root_path }
-        fmt.js { head 501 }
-        fmt.json { render template: "static/error", status: 501 }
-        fmt.xml  { render template: "static/error", status: 501 }
-      end
+      render_error_page(500, "The database timed out running your query.")
+    when ActiveRecord::RecordNotFound
+      render_error_page(404, "That record was not found")
+    when ActionController::UnknownFormat
+      @error_message = "#{request.format.to_s} is not a supported format for this page."
+      render "static/error.html", status: 406
+    when Danbooru::Paginator::PaginationError
+      render_error_page(410, @exception.message)
+    when NotImplementedError
+      render_error_page(501, "This feature isn't available: #{@exception.message}")
+    when PG::ConnectionBad
+      render_error_page(503, "The database is unavailable. Try again later.")
     else
-      render template: "static/error", status: 500
+      render_error_page(500, @exception.message)
     end
   end
 
-  def render_pagination_limit
-    @error_message = "You can only view up to #{Danbooru.config.max_numbered_pages} pages. Please narrow your search terms."
-    render :template => "static/error", :status => 410
+  def render_error_page(status, message)
+    @error_message = message
+
+    if request.format.symbol.in?(%i[html json xml js atom])
+      render template: "static/error", status: status
+    else
+      render template: "static/error.html", status: status
+    end
   end
 
   def authentication_failed
