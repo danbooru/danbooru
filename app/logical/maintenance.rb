@@ -41,13 +41,7 @@ module Maintenance
   end
 
   def rescue_exception(exception)
-    backtrace = Rails.backtrace_cleaner.clean(exception.backtrace).join("\n")
-    Rails.logger.error("#{exception.class}: #{exception.message}\n#{backtrace}")
-
-    if defined?(NewRelic::Agent)
-      NewRelic::Agent.notice_error(exception, custom_params: { backtrace: backtrace })
-    end
-
+    DanbooruLogger.log(exception)
     raise exception
   end
 end

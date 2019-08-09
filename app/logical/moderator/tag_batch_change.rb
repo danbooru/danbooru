@@ -72,7 +72,7 @@ module Moderator
             user.update(blacklisted_tags: repl.join("\n"))
           end
         rescue Exception => e
-          NewRelic::Agent.notice_error(e)
+          DanbooruLogger.log(e)
         end
       end
     end

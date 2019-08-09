@@ -77,29 +77,27 @@ class ApplicationController < ActionController::Base
 
     case exception
     when ActiveRecord::QueryCanceled
-      if Rails.env.production?
-        NewRelic::Agent.notice_error(exception, :uri => request.original_url, :referer => request.referer, :request_params => params, :custom_params => {:user_id => CurrentUser.user.id, :user_ip_addr => CurrentUser.ip_addr})
-      end
-
-      render_error_page(500, "The database timed out running your query.")
+      render_error_page(500, exception, message: "The database timed out running your query.")
     when ActiveRecord::RecordNotFound
-      render_error_page(404, "That record was not found")
+      render_error_page(404, exception, message: "That record was not found", expected: true)
     when ActionController::UnknownFormat
       @error_message = "#{request.format.to_s} is not a supported format for this page."
       render "static/error.html", status: 406
     when Danbooru::Paginator::PaginationError
-      render_error_page(410, @exception.message)
+      render_error_page(410, exception, expected: true)
     when NotImplementedError
-      render_error_page(501, "This feature isn't available: #{@exception.message}")
+      render_error_page(501, exception, message: "This feature isn't available: #{exception.message}")
     when PG::ConnectionBad
-      render_error_page(503, "The database is unavailable. Try again later.")
+      render_error_page(503, exception, message: "The database is unavailable. Try again later.")
     else
-      render_error_page(500, @exception.message)
+      render_error_page(500, exception)
     end
   end
 
-  def render_error_page(status, message)
+  def render_error_page(status, exception, message: exception.message, expected: false)
     @error_message = message
+
+    DanbooruLogger.log(exception, expected: expected)
 
     if request.format.symbol.in?(%i[html json xml js atom])
       render template: "static/error", status: status

@@ -145,9 +145,7 @@ class TagImplication < TagRelationship
         forum_updater.update(failure_message(e), "FAILED") if update_topic
         update(status: "error: #{e}")
 
-        if Rails.env.production?
-          NewRelic::Agent.notice_error(e, :custom_params => {:tag_implication_id => id, :antecedent_name => antecedent_name, :consequent_name => consequent_name})
-        end
+        DanbooruLogger.log(e, tag_implication_id: id, antecedent_name: antecedent_name, consequent_name: consequent_name)
       end
     end
 

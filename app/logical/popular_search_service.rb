@@ -56,10 +56,7 @@ class PopularSearchService
     data
 
   rescue => e
-    Rails.logger.error(e.to_s)
-    if defined?(NewRelic)
-      NewRelic::Agent.notice_error(e)
-    end
+    DanbooruLogger.log(e)
     return []
   end
 end
