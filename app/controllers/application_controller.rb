@@ -78,11 +78,14 @@ class ApplicationController < ActionController::Base
     case exception
     when ActiveRecord::QueryCanceled
       render_error_page(500, exception, message: "The database timed out running your query.")
+    when ActionController::BadRequest
+      render_error_page(400, exception, expected: true)
     when ActiveRecord::RecordNotFound
       render_error_page(404, exception, message: "That record was not found", expected: true)
-    when ActionController::UnknownFormat
-      @error_message = "#{request.format.to_s} is not a supported format for this page."
-      render "static/error.html", status: 406
+    when ActionController::RoutingError
+      render_error_page(405, exception, expected: true)
+    when ActionController::UnknownFormat, ActionView::MissingTemplate
+      render_error_page(406, exception, message: "#{request.format.to_s} is not a supported format for this page", html: true, expected: true)
     when Danbooru::Paginator::PaginationError
       render_error_page(410, exception, expected: true)
     when NotImplementedError
@@ -94,15 +97,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def render_error_page(status, exception, message: exception.message, expected: false)
+  def render_error_page(status, exception, message: exception.message, html: false, expected: false)
     @error_message = message
 
     DanbooruLogger.log(exception, expected: expected)
 
-    if request.format.symbol.in?(%i[html json xml js atom])
-      render template: "static/error", status: status
-    else
+    if html || !request.format.symbol.in?(%i[html json xml js atom])
       render template: "static/error.html", status: status
+    else
+      render template: "static/error", status: status
     end
   end
 
