@@ -433,6 +433,7 @@ class PostQueryBuilder
     if q[:ordpool].present?
       pool_id = q[:ordpool].to_i
 
+      # XXX unify with Pool#posts
       pool_posts = Pool.joins("CROSS JOIN unnest(pools.post_ids) WITH ORDINALITY AS row(post_id, pool_index)").where(id: pool_id).select(:post_id, :pool_index)
       relation = relation.joins("JOIN (#{pool_posts.to_sql}) pool_posts ON pool_posts.post_id = posts.id").order("pool_posts.pool_index ASC")
     end

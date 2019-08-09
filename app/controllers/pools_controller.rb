@@ -39,7 +39,7 @@ class PoolsController < ApplicationController
 
   def show
     @pool = Pool.find(params[:id])
-    @post_set = PostSets::Pool.new(@pool, params[:page])
+    @posts = @pool.posts.paginate(params[:page], limit: params[:limit], count: @pool.post_count)
     respond_with(@pool)
   end
 

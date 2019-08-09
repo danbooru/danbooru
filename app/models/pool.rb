@@ -213,21 +213,10 @@ class Pool < ApplicationRecord
     end
   end
 
-  def posts(options = {})
-    offset = options[:offset] || 0
-    limit = options[:limit] || Danbooru.config.posts_per_page
-    slice = post_ids.slice(offset, limit)
-    if slice && slice.any?
-      slice.map do |id|
-        begin
-          Post.find(id)
-        rescue ActiveRecord::RecordNotFound
-          # swallow
-        end
-      end.compact
-    else
-      []
-    end
+  # XXX unify with PostQueryBuilder ordpool search
+  def posts
+    pool_posts = Pool.where(id: id).joins("CROSS JOIN unnest(pools.post_ids) WITH ORDINALITY AS row(post_id, pool_index)").select(:post_id, :pool_index)
+    posts = Post.joins("JOIN (#{pool_posts.to_sql}) pool_posts ON pool_posts.post_id = posts.id").order("pool_posts.pool_index ASC")
   end
 
   def synchronize

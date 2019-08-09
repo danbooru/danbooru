@@ -15,9 +15,15 @@
     <%= render "posts/partials/common/inline_blacklist" %>
 
     <section>
-      <%= @post_set.presenter.post_previews_html(self) %>
+      <% if @pool.post_count == 0 %>
+        <%= render "post_sets/blank" %>
+      <% else %>
+        <% @posts.each do |post| %>
+          <%= PostPresenter.preview(post, pool_id: @pool.id) %>
+        <% end %>
 
-      <%= numbered_paginator(@post_set) %>
+        <%= numbered_paginator(@posts) %>
+      <% end %>
     </section>
   </div>
 </div>
