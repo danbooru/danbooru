@@ -29,6 +29,7 @@ class SessionLoader
     update_last_ip_addr
     set_time_zone
     CurrentUser.user.unban! if CurrentUser.user.ban_expired?
+    DanbooruLogger.initialize(request, session, CurrentUser.user)
   end
 
 private
