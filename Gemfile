@@ -62,11 +62,18 @@ end
 
 group :development do
   gem 'sinatra'
+  gem 'meta_request'
+  gem 'rack-mini-profiler'
+  gem 'stackprof'
+  gem 'flamegraph'
+  gem 'memory_profiler'
 end
 
 group :development, :test do
   gem 'awesome_print'
   gem 'pry-byebug'
+  gem 'pry-rails'
+  gem 'pry-inline'
   gem 'foreman'
   gem 'listen'
 end
