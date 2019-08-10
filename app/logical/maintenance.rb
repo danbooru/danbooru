@@ -3,7 +3,6 @@ module Maintenance
 
   def hourly
     UploadErrorChecker.new.check!
-    DelayedJobErrorChecker.new.check!
   rescue Exception => exception
     rescue_exception(exception)
   end
