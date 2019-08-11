@@ -7,7 +7,7 @@
     <%= form_tag(moderator_bulk_revert_path, :class => "simple_form") do %>
       <div class="input">
         <label>User Name</label>
-        <%= text_field :constraints, :user_name, :value => @constraints[:user_name] %>
+        <%= text_field :constraints, :user_name, :value => @constraints[:user_name], :data => { autocomplete: "user" } %>
       </div>
 
       <div class="input">

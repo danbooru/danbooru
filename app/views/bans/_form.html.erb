@@ -1,7 +1,7 @@
 <%= simple_form_for(ban) do |f| %>
   <%= error_messages_for("ban") %>
 
-  <%= f.input :user_name, :as => :string %>
+  <%= f.input :user_name, :as => :string, :input_html => { data: { autocomplete: "user" } } %>
   <%= f.input :duration, :hint => "in days" %>
   <%= f.input :reason %>
   <%= f.button :submit, :value => "Ban" %>

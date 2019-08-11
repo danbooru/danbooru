@@ -4,7 +4,7 @@
 
     <%= simple_form_for(:search, :method => :get, url: comments_path, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
       <%= hidden_field_tag "group_by", "comment", :id => "group_by_full" %>
-      <%= f.input :creator_name, label: "Commenter" %>
+      <%= f.input :creator_name, label: "Commenter", input_html: { data: { autocomplete: "user" } } %>
       <%= f.input :body_matches, label: "Body" %>
       <%= f.input :post_tags_match, label: "Tags", input_html: { data: { autocomplete: "tag-query" } } %>
       <%= f.input :is_deleted, label: "Deleted?", collection: [["Yes", true], ["No", false]] %>

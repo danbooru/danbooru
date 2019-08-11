@@ -3,10 +3,8 @@
     <h1>Search User Feedbacks</h1>
 
     <%= form_tag(user_feedbacks_path, :method => :get, :class => "simple_form") do %>
-      <%= search_field "user_name", :label => "User" %>
-
-      <%= search_field "creator_name", :label => "Creator" %>
-
+      <%= search_field "user_name", :label => "User", :data => { autocomplete: "user" } %>
+      <%= search_field "creator_name", :label => "Creator", :data => { autocomplete: "user" } %>
       <%= search_field "body_matches", :label => "Message" %>
 
       <div class="input">

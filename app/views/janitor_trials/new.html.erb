@@ -5,7 +5,7 @@
     <%= error_messages_for :janitor_trial %>
 
     <%= simple_form_for(@janitor_trial) do |f| %>
-      <%= f.input :user_name %>
+      <%= f.input :user_name, input_html: { data: { autocomplete: "user" } } %>
       <%= f.button :submit, "Submit" %>
       <%= f.button :submit, "Test" %>
     <% end %>

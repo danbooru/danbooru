@@ -11,7 +11,7 @@
 <%= form_tag(moderator_ip_addrs_path, :method => :get, :class => "simple_form") do %>
   <div class="input">
     <label for="user_names">Search User Names</label>
-    <%= text_field_tag "search[user_name]", params[:user_names] %>
+    <%= text_field_tag "search[user_name]", params[:user_names], data: { autocomplete: "user" } %>
     <span class="hint">Separate with commas</span>
   </div>
 

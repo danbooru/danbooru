@@ -31,6 +31,7 @@ Autocomplete.initialize_all = function() {
     this.initialize_mention_autocomplete($(".autocomplete-mentions textarea"));
     this.initialize_artist_autocomplete($('[data-autocomplete="artist"]'));
     this.initialize_pool_autocomplete($('[data-autocomplete="pool"]'));
+    this.initialize_user_autocomplete($('[data-autocomplete="user"]'));
     this.initialize_wiki_autocomplete($('[data-autocomplete="wiki-page"]'));
   }
 }
@@ -145,7 +146,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
       case "flagger":
       case "upvote":
       case "downvote":
-        Autocomplete.user_source(term, resp, metatag);
+        Autocomplete.user_source(term, resp, metatag + ":");
         break;
       case "pool":
       case "ordpool":
@@ -212,6 +213,17 @@ Autocomplete.initialize_pool_autocomplete = function($fields) {
     },
     source: function(req, resp) {
       Autocomplete.pool_source(req.term, resp);
+    },
+  });
+};
+
+Autocomplete.initialize_user_autocomplete = function($fields) {
+  $fields.autocomplete({
+    search: function() {
+      $(this).data("ui-autocomplete").menu.bindings = $();
+    },
+    source: function(req, resp) {
+      Autocomplete.user_source(req.term, resp, "");
     },
   });
 };
@@ -423,7 +435,7 @@ Autocomplete.static_metatag_source = function(term, resp, metatag) {
   resp(matches);
 }
 
-Autocomplete.user_source = function(term, resp, metatag) {
+Autocomplete.user_source = function(term, resp, prefix) {
   return $.ajax({
     url: "/users.json",
     data: {
@@ -434,21 +446,10 @@ Autocomplete.user_source = function(term, resp, metatag) {
     },
     method: "get",
     success: function(data) {
-      var prefix = "";
-      var display_name = null;
-
-      if (metatag === "@") {
-        prefix = "@";
-        display_name = function(name) {return name;};
-      } else {
-        prefix = metatag + ":";
-        display_name = function(name) {return name.replace(/_/g, " ");};
-      }
-
       resp($.map(data, function(user) {
         return {
           type: "user",
-          label: display_name(user.name),
+          label: user.name.replace(/_/, " "),
           value: prefix + user.name,
           level: user.level_string
         };

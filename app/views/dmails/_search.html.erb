@@ -2,7 +2,7 @@
   <%= f.hidden_field :folder, value: params[:folder] %>
   <%= f.input :title_matches, label: "Title", hint: "Use * for wildcard", input_html: { value: params[:search][:title_matches] } %>
   <%= f.input :message_matches, label: "Message", hint: "Use * for wildcard", input_html: { value: params[:search][:messages_matches] } %>
-  <%= f.input :to_name, label: "To", input_html: { value: params[:search][:to_name] } %>
-  <%= f.input :from_name, label: "From", input_html: { value: params[:search][:from_name] } %>
+  <%= f.input :to_name, label: "To", input_html: { value: params[:search][:to_name], data: { autocomplete: "user" } } %>
+  <%= f.input :from_name, label: "From", input_html: { value: params[:search][:from_name], data: { autocomplete: "user" } } %>
   <%= f.submit "Search" %>
 <% end %>

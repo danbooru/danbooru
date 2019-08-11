@@ -23,7 +23,7 @@
         <th><label for="search_creator_name">Creator</th>
         <td>
           <div class="input">
-            <%= text_field "search", "creator_name", :value => params[:search][:creator_name] %>
+            <%= text_field "search", "creator_name", :value => params[:search][:creator_name], :data => { autocomplete: "pool" } %>
           </div>
         </td>
       </tr>
