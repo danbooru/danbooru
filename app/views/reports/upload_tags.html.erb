@@ -17,11 +17,7 @@
           <tr>
             <td><%= PostPresenter.preview(upload_report.becomes(Post), show_deleted: true, tags: "user:#{upload_report.uploader_name}") %></td>
             <td>
-              <% upload_report.uploader_tags_array.each do |tag_name| %>
-                <span class="category-<%= Tag.category_for(tag_name) %>">
-                  <%= link_to(tag_name.tr("_", " "), posts_path(:tags => tag_name)) %>
-                </span>
-              <% end %>
+              <%= TagSetPresenter.new(upload_report.uploader_tags_array).inline_tag_list_html %>
             </td>
             <td><%= diff_to_current(upload_report) %>
           </tr>
