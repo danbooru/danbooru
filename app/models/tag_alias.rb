@@ -1,27 +1,9 @@
 class TagAlias < TagRelationship
-  after_save :clear_all_cache
-  after_destroy :clear_all_cache
-  after_save :clear_all_cache, if: ->(rec) {rec.is_retired?}
   after_save :create_mod_action
   validates_uniqueness_of :antecedent_name, scope: :status, conditions: -> { active }
   validate :absence_of_transitive_relation
   validate :wiki_pages_present, on: :create, unless: :skip_secondary_validations
   validate :mininum_antecedent_count, on: :create, unless: :skip_secondary_validations
-
-  module CacheMethods
-    extend ActiveSupport::Concern
-
-    module ClassMethods
-      def clear_cache_for(name)
-        Cache.delete("ta:#{Cache.hash(name)}")
-      end
-    end
-
-    def clear_all_cache
-      TagAlias.clear_cache_for(antecedent_name)
-      TagAlias.clear_cache_for(consequent_name)
-    end
-  end
 
   module ApprovalMethods
     def approve!(update_topic: true, approver: CurrentUser.user)
@@ -50,7 +32,6 @@ class TagAlias < TagRelationship
     end
   end
 
-  include CacheMethods
   include ApprovalMethods
   include ForumMethods
 
@@ -63,9 +44,9 @@ class TagAlias < TagRelationship
   end
 
   def self.to_aliased(names)
-    Cache.get_multi(Array(names), "ta") do |tag|
-      ActiveRecord::Base.select_value_sql("select consequent_name from tag_aliases where status in ('active', 'processing') and antecedent_name = ?", tag) || tag.to_s
-    end.values
+    names = Array(names)
+    aliases = active.where(antecedent_name: names).map { |ta| [ta.antecedent_name, ta.consequent_name] }.to_h
+    names.map { |name| aliases[name] || name }
   end
 
   def process!(update_topic: true)
@@ -80,7 +61,6 @@ class TagAlias < TagRelationship
         update(status: "processing")
         move_aliases_and_implications
         move_saved_searches
-        clear_all_cache
         ensure_category_consistency
         update_posts
         forum_updater.update(approval_message(approver), "APPROVED") if update_topic
@@ -197,7 +177,6 @@ class TagAlias < TagRelationship
 
   def reject!(update_topic: true)
     update(status: "deleted")
-    clear_all_cache
     forum_updater.update(reject_message(CurrentUser.user), "REJECTED") if update_topic
   end
 

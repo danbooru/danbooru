@@ -106,22 +106,14 @@ class TagAliasTest < ActiveSupport::TestCase
     end
 
     should "convert a tag to its normalized version" do
-      tag1 = FactoryBot.create(:tag, :name => "aaa")
-      tag2 = FactoryBot.create(:tag, :name => "bbb")
-      ta = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
-      normalized_tags = TagAlias.to_aliased(["aaa", "ccc"])
-      assert_equal(["bbb", "ccc"], normalized_tags.sort)
-    end
+      tag1 = create(:tag, name: "aaa")
+      tag2 = create(:tag, name: "bbb")
+      ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
 
-    should "update the cache" do
-      tag1 = FactoryBot.create(:tag, :name => "aaa")
-      tag2 = FactoryBot.create(:tag, :name => "bbb")
-      ta = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
-      assert_nil(Cache.get("ta:#{Cache.hash("aaa")}"))
-      TagAlias.to_aliased(["aaa"])
-      assert_equal("bbb", Cache.get("ta:#{Cache.hash("aaa")}"))
-      ta.destroy
-      assert_nil(Cache.get("ta:#{Cache.hash("aaa")}"))
+      assert_equal(["bbb"], TagAlias.to_aliased("aaa"))
+      assert_equal(["bbb", "ccc"], TagAlias.to_aliased(["aaa", "ccc"]))
+      assert_equal(["ccc", "bbb"], TagAlias.to_aliased(["ccc", "bbb"]))
+      assert_equal(["bbb", "bbb"], TagAlias.to_aliased(["aaa", "aaa"]))
     end
 
     context "saved searches" do

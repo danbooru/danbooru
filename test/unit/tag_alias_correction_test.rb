@@ -16,17 +16,13 @@ class TagAliasCorrectionTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
-    context "with a bad cache and post counts" do
+    context "with a bad post count" do
       setup do
-        Cache.delete("ta:#{Cache.hash('bbb')}")
-        Cache.put("ta:#{Cache.hash('aaa')}", "zzz")
         Tag.where(:name => "aaa").update_all("post_count = -3")
         @correction = TagAliasCorrection.new(@tag_alias.id)
       end
 
       should "have the correct statistics hash" do
-        assert_equal("zzz", @correction.statistics_hash["antecedent_cache"])
-        assert_nil(@correction.statistics_hash["consequent_cache"])
         assert_equal(-3, @correction.statistics_hash["antecedent_count"])
         assert_equal(1, @correction.statistics_hash["consequent_count"])
       end
@@ -44,11 +40,6 @@ class TagAliasCorrectionTest < ActiveSupport::TestCase
       context "that is fixed" do
         setup do
           @correction.fix!
-          TagAlias.to_aliased(["aaa"])
-        end
-
-        should "now have the correct cache" do
-          assert_equal("bbb", Cache.get("ta:#{Cache.hash('aaa')}"))
         end
 
         should "now have the correct count" do
