@@ -33,9 +33,6 @@
                   <% if tag.editable_by?(CurrentUser.user) %>
                     <%= link_to "edit", edit_tag_path(tag) %>
                   <% end %>
-                  <% if CurrentUser.is_builder? %>
-                    | <%= link_to "fix", new_tag_correction_path(:tag_id => tag.id) %>
-                  <% end %>
                 </td>
               </tr>
             <% end %>
