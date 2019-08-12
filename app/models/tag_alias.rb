@@ -44,8 +44,8 @@ class TagAlias < TagRelationship
   end
 
   def self.to_aliased(names)
-    names = Array(names)
-    return names if names.empty?
+    names = Array(names).map(&:to_s)
+    return [] if names.empty?
     aliases = active.where(antecedent_name: names).map { |ta| [ta.antecedent_name, ta.consequent_name] }.to_h
     names.map { |name| aliases[name] || name }
   end

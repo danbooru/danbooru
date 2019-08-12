@@ -2407,6 +2407,15 @@ class PostTest < ActiveSupport::TestCase
       assert_tag_match([], "filesize:1048000")
     end
 
+    should "resolve aliases to the actual tag" do
+      create(:tag_alias, antecedent_name: "kitten", consequent_name: "cat")
+      post1 = create(:post, tag_string: "cat")
+      post2 = create(:post, tag_string: "dog")
+
+      assert_tag_match([post1], "kitten")
+      assert_tag_match([post2], "-kitten")
+    end
+
     should "fail for more than 6 tags" do
       post1 = FactoryBot.create(:post, :rating => "s")
 
