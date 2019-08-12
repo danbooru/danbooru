@@ -5,9 +5,9 @@ namespace :unicorn do
     on roles(:app) do
       within current_path do
         kill_unicorn("SIGQUIT")
-        sleep(10)
+        execute :sleep, 10
         kill_unicorn("SIGTERM")
-        sleep(2)
+        execute :sleep, 2
         kill_unicorn("SIGKILL")
       end
     end
