@@ -76,9 +76,53 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      context "with a search" do
+      context "with a single tag search" do
+        should "render for an empty tag" do
+          get posts_path, params: { tags: "does_not_exist" }
+          assert_response :success
+        end
+
+        should "render for an artist tag" do
+          create(:post, tag_string: "artist:bkub")
+          get posts_path, params: { tags: "bkub" }
+          assert_response :success
+
+          artist = create(:artist, name: "bkub")
+          get posts_path, params: { tags: "bkub" }
+          assert_response :success
+
+          artist.update(is_banned: true)
+          get posts_path, params: { tags: "bkub" }
+          assert_response :success
+
+          artist.update(is_banned: false, is_active: false)
+          get posts_path, params: { tags: "bkub" }
+          assert_response :success
+
+          as_user { create(:wiki_page, title: "bkub") }
+          get posts_path, params: { tags: "bkub" }
+          assert_response :success
+        end
+
+        should "render for a tag with a wiki page" do
+          create(:post, tag_string: "char:fumimi")
+          get posts_path, params: { tags: "fumimi" }
+          assert_response :success
+
+          as_user { @wiki = create(:wiki_page, title: "fumimi") }
+          get posts_path, params: { tags: "fumimi" }
+          assert_response :success
+
+          as_user { @wiki.update(is_deleted: true) }
+          get posts_path, params: { tags: "bkub" }
+          assert_response :success
+        end
+      end
+
+      context "with a multi-tag search" do
         should "render" do
-          get posts_path, params: {:tags => "aaaa"}
+          create(:post, tag_string: "1girl solo")
+          get posts_path, params: {:tags => "1girl solo"}
           assert_response :success
         end
       end
