@@ -40,10 +40,12 @@ class UserTest < ActiveSupport::TestCase
     end
 
     should "not validate if the originating ip address is banned" do
-      FactoryBot.create(:ip_ban, ip_addr: '127.0.0.1')
-      user = FactoryBot.build(:user)
-      user.save
-      assert_equal("IP address is banned", user.errors.full_messages.join)
+      CurrentUser.scoped(User.anonymous, "1.2.3.4") do
+        create(:ip_ban, ip_addr: '1.2.3.4')
+        user = build(:user, last_ip_addr: '1.2.3.4')
+        refute(user.valid?)
+        assert_equal("IP address is banned", user.errors.full_messages.join)
+      end
     end
 
     should "limit post uploads" do
