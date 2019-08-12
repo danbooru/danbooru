@@ -1,7 +1,7 @@
 <%# post_set %>
 
 <div id="excerpt" style="display: none;">
-  <% if post_set.has_artist? %>
+  <% if post_set.artist.present? %>
     <% post_set.artist.tap do |artist| %>
       <% if artist.visible? %>
         <% unless artist.notes.blank? %>
@@ -21,7 +21,7 @@
         </div>
       <% end %>
     <% end %>
-  <% elsif post_set.has_wiki? %>
+  <% elsif post_set.wiki_page.present? %>
     <% post_set.wiki_page.tap do |wiki_page| %>
       <div class="prose">
         <% if wiki_page.other_names.present? %>

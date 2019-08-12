@@ -25,24 +25,14 @@ module PostSets
       tag_array.reject {|tag| tag =~ /\Aorder:/i }
     end
 
-    def has_wiki?
-      is_single_tag? && ::WikiPage.titled(tag_string).exists? && wiki_page.visible?
-    end
-
-    def has_wiki_text?
-      has_wiki? && wiki_page.body.present?
-    end
-
     def has_blank_wiki?
-      is_simple_tag? && !has_wiki?
+      tag.present? && !wiki_page.present?
     end
 
     def wiki_page
-      if is_single_tag?
-        ::WikiPage.titled(tag_string).first
-      else
-        nil
-      end
+      return nil unless tag.present? && tag.wiki_page.present?
+      return nil unless !tag.wiki_page.is_deleted? && tag.wiki_page.visible?
+      tag.wiki_page
     end
 
     def tag
@@ -50,12 +40,10 @@ module PostSets
       @tag ||= Tag.find_by(name: Tag.normalize_name(tag_string))
     end
 
-    def has_artist?
-      is_single_tag? && artist.present? && artist.visible?
-    end
-
     def artist
-      @artist ||= ::Artist.named(tag_string).active.first
+      return nil unless tag.present? && tag.category == Tag.categories.artist
+      return nil unless tag.artist.present? && tag.artist.is_active? && tag.artist.visible?
+      tag.artist
     end
 
     def pool_name

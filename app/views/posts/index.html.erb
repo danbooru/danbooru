@@ -26,9 +26,9 @@
       <menu id="post-sections">
         <li class="active"><a href="#" id="show-posts-link">Posts</a></li>
 
-        <% if @post_set.has_artist? %>
+        <% if @post_set.artist.present? %>
           <li><%= link_to "Artist", artist_path(@post_set.artist), :id => "show-excerpt-link" %></li>
-        <% elsif @post_set.has_wiki? %>
+        <% elsif @post_set.wiki_page.present? %>
           <li><%= link_to "Wiki", wiki_page_path(@post_set.wiki_page), :id => "show-excerpt-link" %></li>
         <% elsif @post_set.has_pool? %>
           <li><%= link_to "Pool", pool_path(@post_set.pool), :id => "show-excerpt-link" %></li>

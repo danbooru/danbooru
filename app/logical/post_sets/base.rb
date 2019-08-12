@@ -1,19 +1,11 @@
 module PostSets
   class Base
-    def has_wiki?
-      false
-    end
-
     def raw
       false
     end
 
     def wiki_page
       nil
-    end
-
-    def has_artist?
-      false
     end
 
     def artist
