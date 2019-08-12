@@ -1111,7 +1111,7 @@ class Post < ApplicationRecord
       tags = tags.to_s
       tags += " rating:s" if CurrentUser.safe_mode?
       tags += " -status:deleted" if CurrentUser.hide_deleted_posts? && !Tag.has_metatag?(tags, "status", "-status")
-      tags = Tag.normalize_query(tags)
+      tags = Tag.normalize_query(tags, normalize_aliases: false)
 
       # optimize some cases. these are just estimates but at these
       # quantities being off by a few hundred doesn't matter much

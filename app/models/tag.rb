@@ -272,10 +272,10 @@ class Tag < ApplicationRecord
       query.to_s.gsub(/\u3000/, " ").strip
     end
 
-    def normalize_query(query, sort: true)
+    def normalize_query(query, normalize_aliases: true, sort: true)
       tags = Tag.scan_query(query.to_s)
       tags = tags.map { |t| Tag.normalize_name(t) }
-      tags = TagAlias.to_aliased(tags)
+      tags = TagAlias.to_aliased(tags) if normalize_aliases
       tags = tags.sort if sort
       tags = tags.uniq
       tags.join(" ")
