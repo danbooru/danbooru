@@ -29,7 +29,7 @@ module PostSetPresenters
       elsif Tag.has_metatag?(post_set.tag_array, *Tag::SUBQUERY_METATAGS)
         calculate_related_tags_from_post_set
       else
-        related_tags_for_group
+        calculate_related_tags_from_post_set
       end
     end
 
@@ -46,7 +46,10 @@ module PostSetPresenters
     end
 
     def related_tags_for_group
-      RelatedTagCalculator.calculate_from_sample_to_array(post_set.tag_string).map(&:first)
+      normalized_tags = Tag.normalize_query(post_set.tag_string, normalize_aliases: false)
+      Cache.get("PostSetPresenters::Post#related_tags_for_group(#{normalized_tags})", 5.minutes) do
+        RelatedTagCalculator.calculate_from_sample_to_array(normalized_tags).map(&:first)
+      end
     end
 
     def related_tags_for_single(tag_string)
