@@ -1177,7 +1177,7 @@ class Post < ApplicationRecord
 
     def get_count_from_cache(tags)
       if Tag.is_simple_tag?(tags)
-        count = select_value_sql("SELECT post_count FROM tags WHERE name = ?", tags.to_s)
+        count = Tag.find_by(name: tags).try(:post_count)
       else
         # this will only have a value for multi-tag searches or single metatag searches
         count = Cache.get(count_cache_key(tags))
