@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory(:ip_ban) do
-    creator :factory => :user
-    reason {FFaker::Lorem.words.join(" ")}
-    ip_addr {"127.0.0.2"}
+    creator
+    reason { FFaker::Lorem.words.join(" ") }
+    ip_addr { FFaker::Internet.ip_v4_address }
   end
 end
