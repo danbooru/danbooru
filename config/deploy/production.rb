@@ -8,4 +8,5 @@ server "shima", :roles => %w(web app)
 server "saitou", :roles => %w(web app)
 server "oogaki", :roles => %w(worker)
 
+set :newrelic_appname, "Danbooru"
 after "deploy:finished", "newrelic:notice_deployment"
