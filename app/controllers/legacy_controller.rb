@@ -7,7 +7,7 @@ class LegacyController < ApplicationController
 
     respond_with(@posts) do |format|
       format.xml do
-        xml = Builder::XmlMarkup.new(indent: 2)
+        xml = ::Builder::XmlMarkup.new(indent: 2)
         xml.instruct!
         xml.posts do
           @posts.each { |attrs| xml.post(attrs) }

@@ -451,6 +451,7 @@ DEPENDENCIES
   bcrypt
   bigquery!
   bootsnap
+  builder
   capistrano (~> 3.10)
   capistrano-deploytags (~> 1.0.0)
   capistrano-rails
