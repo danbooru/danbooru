@@ -7,7 +7,7 @@ class Favorite < ApplicationRecord
 
   def self.add(post:, user:)
     Favorite.transaction do
-      User.where(:id => user.id).select("id").lock("FOR UPDATE NOWAIT").first
+      User.where(id: user.id).select("id").lock("FOR UPDATE").first
 
       if user.favorite_count >= user.favorite_limit
         raise Error, "You can only keep up to #{user.favorite_limit} favorites. Upgrade your account to save more."
@@ -29,7 +29,7 @@ class Favorite < ApplicationRecord
         post_id = post.id
       end
 
-      User.where(:id => user.id).select("id").lock("FOR UPDATE NOWAIT").first
+      User.where(id: user.id).select("id").lock("FOR UPDATE").first
 
       return unless Favorite.for_user(user.id).where(:user_id => user.id, :post_id => post_id).exists?
       Favorite.for_user(user.id).where(post_id: post_id).delete_all
