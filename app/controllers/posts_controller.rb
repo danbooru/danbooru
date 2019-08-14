@@ -4,7 +4,7 @@ class PostsController < ApplicationController
 
   def index
     if params[:md5].present?
-      @post = Post.find_by_md5(params[:md5])
+      @post = Post.find_by!(md5: params[:md5])
       respond_with(@post) do |format|
         format.html { redirect_to(@post) }
       end

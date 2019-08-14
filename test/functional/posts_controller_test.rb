@@ -132,6 +132,11 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { md5: @post.md5 }
           assert_redirected_to(@post)
         end
+
+        should "return error on nonexistent md5" do
+          get posts_path(md5: "foo")
+          assert_response 404
+        end
       end
 
       context "with a random search" do
