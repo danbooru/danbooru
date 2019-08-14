@@ -67,16 +67,18 @@ Post.initialize_gestures = function() {
   $body.data("hammer", hammer);
 
   if (hasPrev) {
-    hammer.on("swiperight", function(e) {
+    hammer.on("swiperight", async function(e) {
       $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(150%)"});
-      $.timeout(200).done(function() {Post.swipe_prev(e)});
+      await Danbooru.Utility.delay(200);
+      Post.swipe_prev(e);
     });
   }
 
   if (hasNext) {
-    hammer.on("swipeleft", function(e) {
+    hammer.on("swipeleft", async function(e) {
       $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(-150%)"});
-      $.timeout(200).done(function() {Post.swipe_next(e)});
+      await Danbooru.Utility.delay(200);
+      Post.swipe_next(e);
     });
   }
 }

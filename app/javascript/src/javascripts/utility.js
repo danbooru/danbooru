@@ -1,5 +1,9 @@
 let Utility = {};
 
+Utility.delay = function(milliseconds) {
+  return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
 Utility.meta = function(key) {
   return $("meta[name=" + key + "]").attr("content");
 }
