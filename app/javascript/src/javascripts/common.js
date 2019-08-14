@@ -2,13 +2,6 @@ import Cookie from './cookie'
 import Utility from './utility'
 
 $(function() {
-  // Account notices
-  $("#hide-sign-up-notice").on("click.danbooru", function(e) {
-    $("#sign-up-notice").hide();
-    Cookie.put("hide_sign_up_notice", "1", 7);
-    e.preventDefault();
-  });
-
   $("#hide-upgrade-account-notice").on("click.danbooru", function(e) {
     $("#upgrade-account-notice").hide();
     Cookie.put('hide_upgrade_account_notice', '1', 7);
