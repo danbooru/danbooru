@@ -5,7 +5,7 @@
 #
 # Run: curl -L -s https://raw.githubusercontent.com/r888888888/danbooru/master/script/install/app_server.sh | sh
 
-export RUBY_VERSION=2.5.1
+export RUBY_VERSION=2.6.3
 export GITHUB_INSTALL_SCRIPTS=https://raw.githubusercontent.com/r888888888/danbooru/master/script/install
 export VIPS_VERSION=8.7.0
 

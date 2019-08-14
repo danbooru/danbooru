@@ -1,4 +1,4 @@
-FROM ruby:2.5.1-slim-stretch
+FROM ruby:2.6.3-slim-stretch
 
 ENV DOCKERIZE_VERSION v0.6.1
 ENV VIPS_VERSION 8.7.0
