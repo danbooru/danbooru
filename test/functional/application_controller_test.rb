@@ -35,10 +35,5 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         assert_response 410
       end
     end
-
-    should "normalize search params" do
-      get tags_path, params: { search: { name: "bkub", post_count: "" } }
-      assert_redirected_to tags_path(search: { name: "bkub" })
-    end
   end
 end

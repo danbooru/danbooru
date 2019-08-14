@@ -195,8 +195,8 @@ class ApplicationController < ActionController::Base
   # /tags?search[name]=touhou&search[category]=&search[order]=
   # => /tags?search[name]=touhou
   def normalize_search
-    return unless request.get? && params[:action] == "index"
-    params[:search] = search_params
+    return unless request.get?
+    params[:search] ||= ActionController::Parameters.new
 
     deep_reject_blank = lambda do |hash|
       hash.reject { |k, v| v.blank? || (v.is_a?(Hash) && deep_reject_blank.call(v).blank?) }
@@ -210,9 +210,7 @@ class ApplicationController < ActionController::Base
   end
 
   def search_params
-    search_params = params.fetch(:search, {})
-    search_params = ActionController::Parameters.new unless search_params.is_a?(ActionController::Parameters)
-    search_params.permit!
+    params.fetch(:search, {}).permit!
   end
 
   def set_safe_mode
