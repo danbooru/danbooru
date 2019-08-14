@@ -45,6 +45,7 @@ gem 'retriable'
 gem 'redis'
 gem 'request_store'
 gem 'builder'
+gem 'did_you_mean'
 gem 'term-ansicolor', require: "term/ansicolor"
 
 # needed for looser jpeg header compat

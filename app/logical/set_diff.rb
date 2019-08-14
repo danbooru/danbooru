@@ -27,7 +27,7 @@ class SetDiff
   end
 
   def find_similar(string, candidates, max_dissimilarity: 0.70)
-    distance = ->(other) { DidYouMean::Levenshtein.distance(string, other) }
+    distance = ->(other) { ::DidYouMean::Levenshtein.distance(string, other) }
     max_distance = string.size * max_dissimilarity
 
     candidates.select { |candidate| distance[candidate] <= max_distance }.sort_by(&distance).first
