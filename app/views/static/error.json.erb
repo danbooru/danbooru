@@ -1,9 +1,5 @@
-<% if @error_message %>
-{"success": false, "message": <%= raw @error_message.encode("utf-8", {:invalid => :replace, :undef => :replace, :replace => "?"}).to_json %>}
-<% else %>
-  {
-    "success": false,
-    "message": <%= raw @exception.to_s.encode("utf-8", {:invalid => :replace, :undef => :replace, :replace => "?"}).to_json %>,
-    "backtrace": <%= raw Rails.backtrace_cleaner.clean(@exception.backtrace).to_json %>
-  }
-<% end %>
+{
+  "success": false,
+  "message": <%= raw @message.to_json %>,
+  "backtrace": <%= raw @backtrace.to_json %>
+}

@@ -1,6 +1,2 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<% if @error_message %>
-<result success="false"><%= @error_message %></result>
-<% else %>
-<result success="false"><%= @exception.to_s %></result>
-<% end %>
+<result success="false"><%= @message %></result>

@@ -1,6 +1,8 @@
 class DanbooruLogger
   def self.log(exception, expected: false, **params)
-    if !expected
+    if expected
+      Rails.logger.info("#{exception.class}: #{exception.message}")
+    else
       backtrace = Rails.backtrace_cleaner.clean(exception.backtrace).join("\n")
       Rails.logger.error("#{exception.class}: #{exception.message}\n#{backtrace}")
     end

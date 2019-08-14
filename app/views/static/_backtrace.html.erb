@@ -1,6 +1,10 @@
 <%# backtrace %>
 
 <ul class="backtrace">
+  <% if exception.present? %>
+    <li><%= exception.class.to_s %> exception raised</li>
+  <% end %>
+
   <% Rails.backtrace_cleaner.clean(backtrace).each do |b| %>
     <li class="backtrace-line"><%= b %></li>
   <% end %>
