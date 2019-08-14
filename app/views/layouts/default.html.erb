@@ -135,10 +135,6 @@
       <%= render "moderator/post/queues/notice" %>
     <% end %>
 
-    <% if cookies["accepted_tos"].blank? && !CurrentUser.is_gold? %>
-      <%= render "users/tos" %>
-    <% end %>
-
     <div class="ui-corner-all ui-state-highlight" id="notice" style="<%= "display: none;" unless flash[:notice] %>">
       <span><%= format_text(flash[:notice], inline: true) %>.</span>
       <a href="#" id="close-notice-link">close</a>

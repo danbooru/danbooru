@@ -423,8 +423,6 @@ Rails.application.routes.draw do
   get "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
   get "/static/site_map" => "static#site_map", :as => "site_map"
   get "/static/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
-  post "/static/accept_terms_of_service" => "static#accept_terms_of_service", :as => "accept_terms_of_service"
-  get "/static/mrtg" => "static#mrtg", :as => "mrtg"
   get "/static/contact" => "static#contact", :as => "contact"
   get "/meta_searches/tags" => "meta_searches#tags", :as => "meta_searches_tags"
 

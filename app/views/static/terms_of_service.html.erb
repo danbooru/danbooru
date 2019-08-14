@@ -66,11 +66,6 @@
     <p>You may have alternative accounts for bots or scripts, but if there's any suspicion you either create a new account or reuse an existing one to evade a ban or any sort of account limitation (limited uploads, loss of flagging or user feedback permissions), then all your accounts will be banned. Bot accounts that flag posts or leave user feedback are not permitted and will be banned.</p>
     <p>Account sharing is not permitted. If you are suspected of sharing an account, then it will be banned.</p>
   </div>
-
-  <%= form_tag(accept_terms_of_service_path) do %>
-    <%= hidden_field_tag :url, params[:url] %>
-    <%= submit_tag "I have read and agree to these rules" %>
-  <% end %>
 </div>
 
 <% content_for(:page_title) do %>
