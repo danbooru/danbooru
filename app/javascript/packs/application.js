@@ -9,6 +9,8 @@ require('jquery-ujs');
 require('hammerjs');
 require('dropzone');
 require('spark-md5');
+require('stupid-table-plugin');
+require('jquery-hotkeys');
 
 // should start looking for nodejs replacements
 importAll(require.context('../vendor', true, /\.js$/));
