@@ -86,6 +86,8 @@ class ApplicationController < ActionController::Base
       render_error_page(406, exception, message: "#{request.format.to_s} is not a supported format for this page", format: :html)
     when Danbooru::Paginator::PaginationError
       render_error_page(410, exception)
+    when Post::SearchError
+      render_error_page(422, exception)
     when NotImplementedError
       render_error_page(501, exception, message: "This feature isn't available: #{exception.message}")
     when PG::ConnectionBad
