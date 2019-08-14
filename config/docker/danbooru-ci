@@ -4,6 +4,16 @@ FROM r888888888/danbooru-base
 
 ENV PATH $PATH:/usr/local/bin
 
+# Work around a bug in the ruby:2.5.1-slim-stretch base image. The base image
+# sets BUNDLER_VERSION=1.16.4, which forces `bundle install` to use an outdated
+# version even when we install a newer version. Remove this after updating the
+# base image.
+#
+# https://discuss.circleci.com/t/using-bundler-2-0-during-ci-fails/27411
+# https://github.com/bundler/bundler/issues/6782
+# https://github.com/docker-library/ruby/issues/246
+ENV BUNDLER_VERSION 2.0.2
+
 USER root
 COPY . /app
 RUN chown -R danbooru:danbooru /app
@@ -15,4 +25,5 @@ RUN sed -i'' -e 's/run -it/run -i/' /usr/local/bin/circleci
 
 USER danbooru
 RUN git reset --hard master
+RUN gem install bundler --version $BUNDLER_VERSION
 RUN bundle install > /dev/null
