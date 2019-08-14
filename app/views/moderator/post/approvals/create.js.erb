@@ -1,11 +1,11 @@
 <% if @approval.errors.any? %>
-  $(window).trigger("danbooru:error", "Error: " + <%= @approval.errors.full_messages.join("; ").to_json.html_safe %>);
+  Danbooru.error("Error: " + <%= @approval.errors.full_messages.join("; ").to_json.html_safe %>);
 <% else %>
   if ($("#c-posts #a-show").length) {
     location.reload();
   } else if ($("#c-moderator-post-queues").length) {
     $("#c-moderator-post-queues #post-<%= @approval.post.id %>").hide();
     $(window).trigger("danbooru:modqueue_increment_processed");
-    $(window).trigger("danbooru:notice", "Post was approved");
+    Danbooru.notice("Post was approved");
   }
 <% end %>

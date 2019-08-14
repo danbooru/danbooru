@@ -251,15 +251,15 @@ Post.initialize_links = function() {
           other_post_id: other_post_id
         },
         success: function(data) {
-          $(window).trigger("danbooru:notice", "Successfully copied notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
+          Danbooru.notice("Successfully copied notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
         },
         error: function(data) {
           if (data.status === 404) {
-            $(window).trigger("danbooru:error", "Error: Invalid destination post");
+            Danbooru.error("Error: Invalid destination post");
           } else if (data.responseJSON && data.responseJSON.reason) {
-            $(window).trigger("danbooru:error", "Error: " + data.responseJSON.reason);
+            Danbooru.error("Error: " + data.responseJSON.reason);
           } else {
-            $(window).trigger("danbooru:error", "There was an error copying notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
+            Danbooru.error("There was an error copying notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
           }
         }
       });
@@ -467,14 +467,14 @@ Post.resize_ugoira_controls = function() {
 Post.notice_update = function(x) {
   if (x === "inc") {
     Post.pending_update_count += 1;
-    $(window).trigger("danbooru:notice", "Updating posts (" + Post.pending_update_count + " pending)...", true);
+    Danbooru.notice("Updating posts (" + Post.pending_update_count + " pending)...", true);
   } else {
     Post.pending_update_count -= 1;
 
     if (Post.pending_update_count < 1) {
-      $(window).trigger("danbooru:notice", "Posts updated");
+      Danbooru.notice("Posts updated");
     } else {
-      $(window).trigger("danbooru:notice", "Updating posts (" + Post.pending_update_count + " pending)...", true);
+      Danbooru.notice("Updating posts (" + Post.pending_update_count + " pending)...", true);
     }
   }
 }
@@ -493,7 +493,7 @@ Post.update_data = function(data) {
 }
 
 Post.vote = function(score, id) {
-  $(window).trigger("danbooru:notice", "Voting...");
+  Danbooru.notice("Voting...");
 
   $.post("/posts/" + id + "/votes.js", {
     score: score
@@ -518,7 +518,7 @@ Post.update = function(post_id, params) {
     },
     error: function(data) {
       Post.notice_update("dec");
-      $(window).trigger("danbooru:error", 'There was an error updating <a href="/posts/' + post_id + '">post #' + post_id + '</a>');
+      Danbooru.error(`There was an error updating <a href="/posts/${post_id}">post #${post_id}</a>`);
     }
   });
 }
@@ -534,7 +534,7 @@ Post.ban = function(post_id) {
       $("#post_" + post_id).remove();
     },
     error: function(data) {
-      $(window).trigger("danbooru:error", 'There was an error updating <a href="/posts/' + post_id + '">post #' + post_id + '</a>');
+      Danbooru.error(`There was an error updating <a href="/posts/${post_id}">post #${post_id}</a>`);
     }
   });
 }
@@ -545,13 +545,13 @@ Post.approve = function(post_id) {
     {"post_id": post_id}
   ).fail(function(data) {
     var message = $.map(data.responseJSON.errors, function(msg, attr) { return msg; }).join("; ");
-    $(window).trigger("danbooru:error", "Error: " + message);
+    Danbooru.error("Error: " + message);
   }).done(function(data) {
     var $post = $("#post_" + post_id);
     if ($post.length) {
       $post.data("flags", $post.data("flags").replace(/pending/, ""));
       $post.removeClass("post-status-pending");
-      $(window).trigger("danbooru:notice", "Approved post #" + post_id);
+      Danbooru.notice("Approved post #" + post_id);
     }
   });
 }

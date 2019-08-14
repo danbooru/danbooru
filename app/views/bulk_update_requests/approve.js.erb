@@ -1,5 +1,5 @@
 <% if @bulk_update_request.errors.any? %>
-  $(window).trigger("danbooru:error", <%= j @bulk_update_request.errors.full_messages.join(',') %>);
+  Danbooru.error(<%= j @bulk_update_request.errors.full_messages.join(',') %>);
 <% else %>
   if ($("#a-index").length) {
     $("#request-status-for-<%= @bulk_update_request.id %>").html("queued");

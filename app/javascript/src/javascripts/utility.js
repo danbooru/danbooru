@@ -111,14 +111,4 @@ $.fn.selectEnd = function() {
   })
 }
 
-$(function() {
-  $(window).on("danbooru:notice", function(event, msg) {
-    Utility.notice(msg);
-  })
-
-  $(window).on("danbooru:error", function(event, msg) {
-    Utility.error(msg);
-  })
-});
-
 export default Utility

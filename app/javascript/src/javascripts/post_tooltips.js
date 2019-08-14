@@ -107,7 +107,7 @@ PostTooltip.on_disable_tooltips = function (event) {
   $(event.target).parents(".qtip").qtip("hide");
 
   if (Utility.meta("current-user-id") === "") {
-    $(window).trigger("danbooru:notice", '<a href="/session/new">Login</a> to disable tooltips permanently');
+    Danbooru.notice('<a href="/session/new">Login</a> to disable tooltips permanently');
     return;
   }
 
@@ -115,7 +115,7 @@ PostTooltip.on_disable_tooltips = function (event) {
     method: "PUT",
     data: { "user[disable_post_tooltips]": "true" },
   }).then(function() {
-    $(window).trigger("danbooru:notice", "Tooltips disabled; check your account settings to re-enable.");
+    Danbooru.notice("Tooltips disabled; check your account settings to re-enable.");
     location.reload();
   });
 };

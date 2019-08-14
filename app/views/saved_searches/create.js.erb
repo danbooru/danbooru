@@ -1,5 +1,5 @@
 <% if @saved_search.errors.any? %>
-  $(window).trigger("danbooru:error", "<%= j @saved_search.errors.full_messages.join(', ') %>");
+  Danbooru.error("<%= j @saved_search.errors.full_messages.join(', ') %>");
 <% else %>
-  $(window).trigger("danbooru:notice", "Search '<%= j @saved_search.query %>' was saved");
+  Danbooru.notice("Search '<%= j @saved_search.query %>' was saved");
 <% end %>

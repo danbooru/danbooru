@@ -1,9 +1,9 @@
 <% if @api_key.errors.any? %>
-  $(window).trigger("danbooru:error", "<%= j @api_key.errors.full_messages.join(', ') %>");
+  Danbooru.error("<%= j @api_key.errors.full_messages.join(', ') %>");
 <% else %>
   $("#api-key").text("<%= j @api_key.key %>");
   $("#api-key-created").html("<%= j compact_time @api_key.created_at %>");
   $("#api-key-updated").html("<%= j compact_time @api_key.updated_at %>");
 
-  $(window).trigger("danbooru:notice", "API key regenerated.");
+  Danbooru.notice("API key regenerated.");
 <% end %>
