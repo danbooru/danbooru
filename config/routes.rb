@@ -255,10 +255,8 @@ Rails.application.routes.draw do
       get :labels
     end
   end
-  resource :session do
-    collection do
-      get :sign_out
-    end
+  resource :session, only: [:new, :create, :destroy] do
+    get :sign_out, on: :collection
   end
   resource :source, :only => [:show]
   resources :tags do

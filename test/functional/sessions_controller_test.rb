@@ -30,5 +30,13 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_nil(session[:user_id])
       end
     end
+
+    context "sign_out action" do
+      should "clear the session" do
+        get_auth sign_out_session_path, @user
+        assert_redirected_to posts_path
+        assert_nil(session[:user_id])
+      end
+    end
   end
 end
