@@ -48,9 +48,14 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should "redirect for a nonexistent title" do
-        get wiki_page_path(:id => "what")
+      should "redirect html requests for a nonexistent title" do
+        get wiki_page_path("what")
         assert_redirected_to(show_or_new_wiki_pages_path(title: "what"))
+      end
+
+      should "return 404 to api requests for a nonexistent title" do
+        get wiki_page_path("what"), as: :json
+        assert_response 404
       end
 
       should "render for a negated tag" do
