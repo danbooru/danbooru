@@ -1,7 +1,7 @@
 <%# backtrace %>
 
 <ul class="backtrace">
-  <% if exception.present? %>
+  <% if defined?(exception) %>
     <li><%= exception.class.to_s %> exception raised</li>
   <% end %>
 
