@@ -3,6 +3,7 @@
   "dependencies": {
     "@rails/webpacker": "^4.0.0",
     "debug-loader": "^0.0.1",
+    "dropzone": "^5.5.1",
     "expose-loader": "^0.7.5",
     "hammerjs": "^2.0.8",
     "jquery-ui": "^1.12.1",
@@ -10,6 +11,7 @@
     "qtip2": "^3.0.3",
     "rails-erb-loader": "^5.4.2",
     "script-loader": "^0.7.2",
+    "spark-md5": "^3.0.0",
     "webpack-cli": "^3.0.8"
   },
   "devDependencies": {

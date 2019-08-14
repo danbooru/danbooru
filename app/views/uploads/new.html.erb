@@ -124,8 +124,6 @@
 <% end %>
 
 <% content_for(:html_header) do %>
-  <script async src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.4.0/min/dropzone.min.js"></script>
-  <script async src="https://cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.0/spark-md5.min.js"></script>
   <script>
     $(function() {
       var enabled = true;
@@ -140,7 +138,7 @@
         return;
       }
 
-      $("#filedropzone").dropzone({ 
+      Danbooru.Upload.dropzone = new Danbooru.Dropzone("#filedropzone", {
         paramName: "upload[file]", 
         url: "/uploads/preprocess", 
         createImageThumbnails: false,
@@ -161,7 +159,7 @@
           this.on("addedfile", function(file) {
             var reader = new FileReader();
             reader.addEventListener("loadend", function() {
-              var buf = new SparkMD5.ArrayBuffer();
+              var buf = new Danbooru.SparkMD5.ArrayBuffer();
               buf.append(this.result);
               var hash = buf.end();
               $("#upload_md5_confirmation").val(hash);
