@@ -26,6 +26,12 @@ class ApplicationController < ActionController::Base
 
   protected
 
+  def self.rescue_with(*klasses, status: 500)
+    rescue_from *klasses do |exception|
+      render_error_page(status, exception)
+    end
+  end
+
   def show_moderation_notice?
     CurrentUser.can_approve_posts? && (cookies[:moderated].blank? || Time.at(cookies[:moderated].to_i) < 20.hours.ago)
   end

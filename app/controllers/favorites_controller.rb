@@ -2,6 +2,7 @@ class FavoritesController < ApplicationController
   before_action :member_only, except: [:index]
   respond_to :html, :xml, :json, :js
   skip_before_action :api_check
+  rescue_with Favorite::Error, status: 422
 
   def index
     if params[:tags]

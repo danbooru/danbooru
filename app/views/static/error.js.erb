@@ -1,2 +1,10 @@
+var klass = <%= raw @exception.class.to_s.to_json %>;
 var message = <%= raw @message.to_json %>;
-Danbooru.Utility.error(message);
+var backtrace = <%= raw @backtrace.to_json %>;
+
+<% if @expected %>
+  Danbooru.Utility.error(message);
+<% else %>
+  console.error(klass, message, backtrace);
+  Danbooru.Utility.error(message);
+<% end %>
