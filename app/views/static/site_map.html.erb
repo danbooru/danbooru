@@ -114,23 +114,35 @@
     </section>
     <section>
       <ul>
+        <li><h1>Profile</h1></li>
+        <% if CurrentUser.is_anonymous? %>
+          <li><%= link_to "Sign in", new_session_path %></li>
+          <li><%= link_to "Sign up", new_user_path %></li>
+        <% else %>
+          <li><%= link_to "Profile", CurrentUser.user %></li>
+          <li><%= link_to "Settings", edit_user_path(CurrentUser.user) %></li>
+          <% if CurrentUser.is_gold? %>
+            <li><%= link_to "Change name", new_user_name_change_request_path %></li>
+          <% end %>
+          <li><%= link_to "Delete account", maintenance_user_deletion_path %></li>
+          <li><%= link_to "Dmails", dmails_path %></li>
+          <li><%= link_to "Favorites", favorites_path %></li>
+          <li><%= link_to "Favorite groups", favorite_groups_path %></li>
+          <li><%= link_to "Saved searches", saved_searches_path %></li>
+        <% end %>
+        <li><%= link_to "Upgrade information", new_user_upgrade_path %></li>
+      </ul>
+      <ul>
         <li><h1>Users</h1></li>
         <% if CurrentUser.is_moderator? %>
           <li><%= link_to("Dashboard", moderator_dashboard_path) %></li>
         <% end %>
         <li><%= link_to("Help", wiki_pages_path(:title => "help:users")) %></li>
-        <li><%= link_to("Bans", bans_path) %></li>
         <li><%= link_to("Listing", users_path) %></li>
-        <% unless CurrentUser.is_anonymous? %>
-          <li><%= link_to("Profile", user_path(CurrentUser.user)) %></li>
-          <li><%= link_to("Settings", edit_user_path(CurrentUser.user)) %></li>
-        <% end %>
         <li><%= link_to("Search", search_users_path) %></li>
+        <li><%= link_to("Bans", bans_path) %></li>
         <li><%= link_to("Feedback", user_feedbacks_path) %></li>
-        <li><%= link_to("Signup", new_user_path) %></li>
         <li><%= link_to("Terms of Service", terms_of_service_path) %></li>
-        <li><%= link_to("Upgrade Information", new_user_upgrade_path) %></li>
-        <li><%= link_to("Refresh counts", new_maintenance_user_count_fixes_path) %>
       </ul>
       <ul>
         <li><h1>Admin</h1></li>
