@@ -124,7 +124,6 @@ GEM
     delayed_job_active_record (4.1.3)
       activerecord (>= 3.0, < 5.3)
       delayed_job (>= 3.0, < 5)
-    did_you_mean (1.3.0)
     diff-lcs (1.3)
     docile (1.3.2)
     domain_name (0.5.20190701)
@@ -463,7 +462,6 @@ DEPENDENCIES
   dalli
   delayed_job
   delayed_job_active_record
-  did_you_mean
   diff-lcs
   dotenv-rails
   dtext_rb!
