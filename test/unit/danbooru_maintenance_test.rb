@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class MaintenanceTest < ActiveSupport::TestCase
+class DanbooruMaintenanceTest < ActiveSupport::TestCase
   context "daily maintenance" do
     setup do
       # have ApiCacheGenerator save files to a temp dir.
@@ -17,14 +17,14 @@ class MaintenanceTest < ActiveSupport::TestCase
     end
 
     should "work" do
-      assert_nothing_raised { Maintenance.daily }
+      assert_nothing_raised { DanbooruMaintenance.daily }
     end
 
     should "prune expired posts" do
       @pending = FactoryBot.create(:post, is_pending: true, created_at: 4.days.ago)
       @flagged = FactoryBot.create(:post, is_flagged: true, created_at: 4.days.ago)
 
-      Maintenance.daily
+      DanbooruMaintenance.daily
 
       assert(true, @pending.reload.is_deleted)
       assert(true, @flagged.reload.is_deleted)
@@ -38,7 +38,7 @@ class MaintenanceTest < ActiveSupport::TestCase
         CurrentUser.as(banner) { FactoryBot.create(:ban, user: user, banner: banner, duration: 1) }
 
         assert_equal(true, user.reload.is_banned)
-        travel_to(2.days.from_now) { Maintenance.daily }
+        travel_to(2.days.from_now) { DanbooruMaintenance.daily }
         assert_equal(false, user.reload.is_banned)
       end
     end

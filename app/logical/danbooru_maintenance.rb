@@ -1,4 +1,4 @@
-module Maintenance
+module DanbooruMaintenance
   module_function
 
   def hourly
