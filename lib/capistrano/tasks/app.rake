@@ -9,7 +9,7 @@ namespace :app do
       # do nothing
     else
       invoke "web:disable"
-      invoke "unicorn:terminate"
+      invoke "unicorn:stop"
     end
   end
 
