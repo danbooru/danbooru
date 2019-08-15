@@ -16,12 +16,14 @@
           <li><%= link_to("Mass Edit", edit_moderator_tag_path) %></li>
         <% end %>
         <li><%= link_to("Similar Images Search", iqdb_queries_path) %></li>
-        <li><%= link_to("Disapprovals", moderator_post_disapprovals_path) %></li>
       </ul>
       <ul>
         <li><h1>Post Events</h1></li>
         <li><%= link_to("Changes", post_versions_path) %></li>
         <li><%= link_to("Approvals", post_approvals_path) %></li>
+        <% if CurrentUser.is_approver? %>
+          <li><%= link_to("Disapprovals", moderator_post_disapprovals_path) %></li>
+        <% end %>
         <li><%= link_to("Appeals", post_appeals_path) %></li>
         <li><%= link_to("Flags", post_flags_path) %></li>
         <li><%= link_to("Replacements", post_replacements_path) %></li>
@@ -39,6 +41,7 @@
         <li><h1>Artists</h1></li>
         <li><%= link_to("Help", wiki_pages_path(:title => "help:artists")) %></li>
         <li><%= link_to("Listing", artists_path) %></li>
+        <li><%= link_to("Banned", banned_artists_path) %></li>
         <li><%= link_to("Changes", artist_versions_path) %></li>
       </ul>
     </section>
@@ -50,17 +53,20 @@
         <li><%= link_to("Aliases", tag_aliases_path) %></li>
         <li><%= link_to("Implications", tag_implications_path) %></li>
         <li><%= link_to("Listing", tags_path) %></li>
+        <li><%= link_to("Search", meta_searches_tags_path) %></li>
       </ul>
       <ul>
         <li><h1>Notes</h1></li>
         <li><%= link_to("Help", wiki_pages_path(:title => "help:notes")) %></li>
-        <li><%= link_to("Changes", note_versions_path) %></li>
         <li><%= link_to("Listing", notes_path) %></li>
+        <li><%= link_to("Search", search_notes_path) %></li>
+        <li><%= link_to("Changes", note_versions_path) %></li>
       </ul>
       <ul>
         <li><h1>Pools</h1></li>
         <li><%= link_to("Help", wiki_pages_path(:title => "help:pools")) %></li>
         <li><%= link_to("Listing", pools_path) %></li>
+        <li><%= link_to("Gallery", gallery_pools_path) %></li>
         <% if PoolArchive.enabled? %>
           <li><%= link_to("Changes", pool_versions_path) %></li>
         <% end %>
@@ -81,24 +87,28 @@
         <li><h1>Comments</h1></li>
         <li><%= link_to("Help", wiki_pages_path(:title => "help:comments")) %></li>
         <li><%= link_to("Listing", comments_path) %></li>
+        <li><%= link_to("Search", search_comments_path) %></li>
         <li><%= link_to("RSS", comments_path(:atom)) %></li>
       </ul>
       <ul>
         <li><h1>Forum</h1></li>
         <li><%= link_to("Help", wiki_pages_path(:title => "help:forum")) %></li>
         <li><%= link_to("Listing", forum_topics_path) %></li>
+        <li><%= link_to("Search", search_forum_posts_path) %></li>
         <li><%= link_to("RSS", forum_topics_path(:atom)) %></li>
       </ul>
       <ul>
         <li><h1>Wiki</h1></li>
         <li><%= link_to("Help", wiki_pages_path(:title => "help:wiki")) %></li>
         <li><%= link_to("Listing", wiki_pages_path) %></li>
+        <li><%= link_to("Search", search_wiki_pages_path) %></li>
         <li><%= link_to("Changes", wiki_page_versions_path) %></li>
       </ul>
       <ul>
         <li><h1>Artist commentary</h1></li>
         <li><%= link_to("Help", wiki_pages_path(:title => "help:artist_commentary")) %></li>
         <li><%= link_to("Listing", artist_commentaries_path) %></li>
+        <li><%= link_to("Search", search_artist_commentaries_path) %></li>
         <li><%= link_to("Changes", artist_commentary_versions_path) %></li>
       </ul>
     </section>
@@ -115,6 +125,7 @@
           <li><%= link_to("Profile", user_path(CurrentUser.user)) %></li>
           <li><%= link_to("Settings", edit_user_path(CurrentUser.user)) %></li>
         <% end %>
+        <li><%= link_to("Search", search_users_path) %></li>
         <li><%= link_to("Feedback", user_feedbacks_path) %></li>
         <li><%= link_to("Signup", new_user_path) %></li>
         <li><%= link_to("Terms of Service", terms_of_service_path) %></li>
@@ -127,6 +138,10 @@
         <li><%= link_to("Jobs", delayed_jobs_path) %></li>
         <li><%= link_to("Bulk Update Requests", bulk_update_requests_path) %></li>
         <li><%= link_to("Janitor Trials", janitor_trials_path) %></li>
+
+        <% if CurrentUser.is_member? %>
+          <li><%= link_to("User Name Change  Requests", user_name_change_requests_path) %></li>
+        <% end %>
 
         <% if CurrentUser.is_moderator? %>
           <li><%= link_to("IP Bans", ip_bans_path) %></li>
