@@ -260,6 +260,17 @@ class TagTest < ActiveSupport::TestCase
       metatags.each do |metatag|
         should_not allow_value("#{metatag}:foo").for(:name).on(:create)
       end
+
+      context "a cosplay tag" do
+        setup do
+          create(:tag, name: "bkub", category: Tag.categories.artist)
+          create(:tag, name: "fumimi", category: Tag.categories.character)
+        end
+
+        should allow_value("fumimi_(cosplay)").for(:name)
+        should allow_value("new_tag_(cosplay)").for(:name)
+        should_not allow_value("bkub_(cosplay)").for(:name)
+      end
     end
   end
 

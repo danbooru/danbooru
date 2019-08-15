@@ -5,6 +5,16 @@ class PostTest < ActiveSupport::TestCase
     assert_equal(posts.map(&:id), Post.tag_match(query).pluck(:id))
   end
 
+  def self.assert_invalid_tag(tag_name)
+    should "not allow '#{tag_name}' to be tagged" do
+      post = build(:post, tag_string: "touhou #{tag_name}")
+
+      assert(post.valid?)
+      assert_equal("touhou", post.tag_string)
+      assert_equal(1, post.warnings[:base].grep(/Couldn't add tag/).count)
+    end
+  end
+
   def setup
     super
 
@@ -664,43 +674,41 @@ class PostTest < ActiveSupport::TestCase
       end
 
       context "tagged with an invalid tag" do
-        subject { @post }
-
         context "that doesn't already exist" do
-          should_not allow_value("touhou user:evazion").for(:tag_string)
-          should_not allow_value("touhou *~foo").for(:tag_string)
-          should_not allow_value("touhou *-foo").for(:tag_string)
-          should_not allow_value("touhou ,-foo").for(:tag_string)
+          assert_invalid_tag("user:evazion")
+          assert_invalid_tag("*~foo")
+          assert_invalid_tag("*-foo")
+          assert_invalid_tag(",-foo")
 
-          should_not allow_value("touhou ___").for(:tag_string)
-          should_not allow_value("touhou ~foo").for(:tag_string)
-          should_not allow_value("touhou _foo").for(:tag_string)
-          should_not allow_value("touhou foo_").for(:tag_string)
-          should_not allow_value("touhou foo__bar").for(:tag_string)
-          should_not allow_value("touhou foo*bar").for(:tag_string)
-          should_not allow_value("touhou foo,bar").for(:tag_string)
-          should_not allow_value("touhou foo\abar").for(:tag_string)
-          should_not allow_value("touhou café").for(:tag_string)
-          should_not allow_value("touhou 東方").for(:tag_string)
+          assert_invalid_tag("___")
+          assert_invalid_tag("~foo")
+          assert_invalid_tag("_foo")
+          assert_invalid_tag("foo_")
+          assert_invalid_tag("foo__bar")
+          assert_invalid_tag("foo*bar")
+          assert_invalid_tag("foo,bar")
+          assert_invalid_tag("foo\abar")
+          assert_invalid_tag("café")
+          assert_invalid_tag("東方")
         end
 
         context "that already exists" do
           setup do
             %W(___ ~foo _foo foo_ foo__bar foo*bar foo,bar foo\abar café 東方).each do |tag|
-              FactoryBot.build(:tag, name: tag).save(validate: false)
+              build(:tag, name: tag).save(validate: false)
             end
           end
 
-          should allow_value("touhou ___").for(:tag_string)
-          should allow_value("touhou ~foo").for(:tag_string)
-          should allow_value("touhou _foo").for(:tag_string)
-          should allow_value("touhou foo_").for(:tag_string)
-          should allow_value("touhou foo__bar").for(:tag_string)
-          should allow_value("touhou foo*bar").for(:tag_string)
-          should allow_value("touhou foo,bar").for(:tag_string)
-          should allow_value("touhou foo\abar").for(:tag_string)
-          should allow_value("touhou café").for(:tag_string)
-          should allow_value("touhou 東方").for(:tag_string)
+          assert_invalid_tag("___")
+          assert_invalid_tag("~foo")
+          assert_invalid_tag("_foo")
+          assert_invalid_tag("foo_")
+          assert_invalid_tag("foo__bar")
+          assert_invalid_tag("foo*bar")
+          assert_invalid_tag("foo,bar")
+          assert_invalid_tag("foo\abar")
+          assert_invalid_tag("café")
+          assert_invalid_tag("東方")
         end
       end
 
@@ -1234,16 +1242,23 @@ class PostTest < ActiveSupport::TestCase
       end
 
       context "with *_(cosplay) tags" do
-        setup do
+        should "add the character tags and the cosplay tag" do
           @post.add_tag("hakurei_reimu_(cosplay)")
           @post.add_tag("hatsune_miku_(cosplay)")
           @post.save
-        end
 
-        should "add the character tags and the cosplay tag" do
           assert(@post.has_tag?("hakurei_reimu"))
           assert(@post.has_tag?("hatsune_miku"))
           assert(@post.has_tag?("cosplay"))
+        end
+
+        should "not add the _(cosplay) tag if it conflicts with an existing tag" do
+          create(:tag, name: "little_red_riding_hood", category: Tag.categories.copyright)
+          @post = create(:post, tag_string: "little_red_riding_hood_(cosplay)")
+
+          refute(@post.has_tag?("little_red_riding_hood"))
+          refute(@post.has_tag?("cosplay"))
+          assert(@post.warnings[:base].grep(/Couldn't add tag/).present?)
         end
       end
 

@@ -21,7 +21,6 @@ class Post < ApplicationRecord
   before_validation :remove_parent_loops
   validates_uniqueness_of :md5, :on => :create, message: ->(obj, data) { "duplicate: #{Post.find_by_md5(obj.md5).id}"}
   validates_inclusion_of :rating, in: %w(s q e), message: "rating must be s, q, or e"
-  validate :tag_names_are_valid
   validate :added_tags_are_valid
   validate :removed_tags_are_valid
   validate :has_artist_tag
@@ -662,12 +661,16 @@ class Post < ApplicationRecord
       set_tag_string(normalized_tags.join(" "))
     end
 
-    def remove_invalid_tags(tags)
-      invalid_tags = Tag.invalid_cosplay_tags(tags)
-      if invalid_tags.present?
-        self.warnings[:base] << "The root tag must be a character tag: #{invalid_tags.map {|tag| "[b]#{tag}[/b]" }.join(", ")}"
+    def remove_invalid_tags(tag_names)
+      invalid_tags = tag_names.map { |name| Tag.new(name: name) }.select { |tag| tag.invalid?(:name) }
+
+      invalid_tags.each do |tag|
+        tag.errors.messages.each do |attribute, messages|
+          warnings[:base] << "Couldn't add tag: #{messages.join(';')}"
+        end
       end
-      tags - invalid_tags
+
+      tag_names - invalid_tags.map(&:name)
     end
 
     def remove_negated_tags(tags)
@@ -1751,22 +1754,6 @@ class Post < ApplicationRecord
         # Don't forbid changes if the rating lock was just now set in the same update.
         if !is_rating_locked_changed?
           errors.add(:rating, "is locked and cannot be changed. Unlock the post first.")
-        end
-      end
-    end
-
-    def tag_names_are_valid
-      # only validate new tags; allow invalid names for tags that already exist.
-      added_tags = tag_array - tag_array_was
-      new_tags = added_tags - Tag.where(name: added_tags).pluck(:name)
-
-      new_tags.each do |name|
-        tag = Tag.new
-        tag.name = name
-        tag.valid?
-
-        tag.errors.messages.each do |attribute, messages|
-          errors[:tag_string] << "tag #{attribute} #{messages.join(';')}"
         end
       end
     end

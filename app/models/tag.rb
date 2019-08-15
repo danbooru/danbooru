@@ -52,7 +52,8 @@ class Tag < ApplicationRecord
   has_many :antecedent_implications, -> {active}, :class_name => "TagImplication", :foreign_key => "antecedent_name", :primary_key => "name"
   has_many :consequent_implications, -> {active}, :class_name => "TagImplication", :foreign_key => "consequent_name", :primary_key => "name"
 
-  validates :name, uniqueness: true, tag_name: true, on: :create
+  validates :name, tag_name: true, uniqueness: true, on: :create
+  validates :name, tag_name: true, on: :name
   validates_inclusion_of :category, in: TagCategory.category_ids
 
   before_save :update_category_cache, if: :category_changed?
@@ -1017,14 +1018,6 @@ class Tag < ApplicationRecord
   def self.convert_cosplay_tags(tags)
     cosplay_tags,other_tags = tags.partition {|tag| tag.match(/\A(.+)_\(cosplay\)\Z/) }
     cosplay_tags.grep(/\A(.+)_\(cosplay\)\Z/) { "#{TagAlias.to_aliased([$1]).first}_(cosplay)" } + other_tags
-  end
-
-  def self.invalid_cosplay_tags(tags)
-    tags.grep(/\A(.+)_\(cosplay\)\Z/) {|match| [match,TagAlias.to_aliased([$1]).first] }.
-      select do |name|
-        tag = Tag.find_by_name(name[1])
-        !tag.nil? && tag.category != Tag.categories.character
-      end.map {|tag| tag[0]}
   end
 
   def editable_by?(user)
