@@ -2584,7 +2584,7 @@ class PostTest < ActiveSupport::TestCase
           end
         end
 
-        should "translate an alias" do
+        should_eventually "translate an alias" do
           assert_equal(1, Post.fast_count("alias"))
         end
 
