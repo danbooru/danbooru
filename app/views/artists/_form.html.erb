@@ -1,19 +1,12 @@
 <%= simple_form_for(@artist) do |f| %>
-  <div class="input">
-    <label for="artist_name">Name</label>
-    <% if @artist.new_record? %>
-      <%= text_field "artist", "name" %>
-      <span id="check-name-result"></span>
+  <% if @artist.new_record? %>
+    <%= f.input :name, input_html: { data: { autocomplete: "tag" } } %>
+  <% elsif CurrentUser.user.is_builder? %>
+    <%= f.input :name, input_html: { data: { autocomplete: "tag" } }, hint: "Change to rename this artist entry and its wiki page" %>
+  <% else %>
+    <p><%= @artist.name %></p>
+  <% end %>
 
-    <% elsif CurrentUser.user.is_builder? %>
-      <%= text_field "artist", "name" %>
-      <span id="check-name-result"></span>
-      <span class="hint">Change to rename this artist entry and its wiki page</span>
-
-    <% else %>
-      <p><%= @artist.name %></p>
-    <% end %>
-  </div>
   <%= f.input :other_names_string, label: "Other names", as: :text, hint: '<b style="color: red;">NEW</b> Separate names with spaces, not commas. Use underscores for spaces inside names.'.html_safe %>
   <%= f.input :group_name %>
   <%= f.input :url_string, :label => "URLs", :as => :text, :input_html => {:size => "50x5", :value => params.dig(:artist, :url_string) || @artist.urls.join("\n")}, :hint => "You can prefix a URL with - to mark it as dead." %>
