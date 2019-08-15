@@ -18,7 +18,12 @@
 
       <tr>
         <th>Level</th>
-        <td><%= presenter.level %></td>
+        <td>
+          <%= user.level_string %>
+          <% if CurrentUser.user == user && !CurrentUser.is_gold? %>
+            (<%= link_to "upgrade", new_user_upgrade_path %>)
+          <% end %>
+        </td>
       </tr>
 
       <tr>

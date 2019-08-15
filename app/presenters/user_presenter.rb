@@ -13,10 +13,6 @@ class UserPresenter
     user.created_at.strftime("%Y-%m-%d")
   end
 
-  def level
-    user.level_string
-  end
-
   def ban_reason
     if user.is_banned?
       "#{user.recent_ban.reason}; expires #{user.recent_ban.expires_at} (#{user.bans.count} bans total)"
