@@ -31,7 +31,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
 
     context "for a tag that already exists" do
       setup do
-        Tag.named("aaa").first.update_related
+        Tag.find_by_name("aaa").update_related
         @query = RelatedTagQuery.new(query: "aaa")
       end
 
@@ -60,7 +60,7 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
         @wp = FactoryBot.create(:wiki_page, title: "aaa", body: "blah [[foo|blah]] [[FOO]] [[bar]] blah")
         @query = RelatedTagQuery.new(query: "xyz")
 
-        Tag.named("aaa").first.update_related
+        Tag.find_by_name("aaa").update_related
       end
 
       should "take wiki tags from the consequent's wiki" do

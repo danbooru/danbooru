@@ -86,7 +86,6 @@ class WikiPagesController < ApplicationController
       redirect_to wiki_page_path(@wiki_page)
     else
       @wiki_page = WikiPage.new(:title => params[:title])
-      @artist = Artist.named(@wiki_page.title).active.first
       respond_with(@wiki_page)
     end
   end

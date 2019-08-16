@@ -930,10 +930,6 @@ class Tag < ApplicationRecord
       where("tags.name LIKE ? ESCAPE E'\\\\'", normalize_name(name).to_escaped_for_sql_like)
     end
 
-    def named(name)
-      where("tags.name = ?", TagAlias.to_aliased([name]).join(""))
-    end
-
     def search(params)
       q = super
 

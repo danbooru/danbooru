@@ -742,10 +742,6 @@ class User < ApplicationRecord
   end
 
   module SearchMethods
-    def named(name)
-      where("lower(name) = ?", name)
-    end
-
     def admins
       where("level = ?", Levels::ADMIN)
     end

@@ -83,7 +83,7 @@ protected
   end
 
   def related_tags
-    tag = Tag.named(query.strip).first
+    tag = Tag.find_by_name(query.strip)
 
     if tag
       tag.related_tag_array.map(&:first)

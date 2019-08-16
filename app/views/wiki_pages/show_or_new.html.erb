@@ -10,8 +10,8 @@
         <p>This wiki page does not exist. <%= link_to "Create new wiki page", new_wiki_page_path(:wiki_page => {:title => params[:title]}) %>.</p>
       </div>
 
-      <% if @artist %>
-        <p><%= link_to "View artist", @artist %></p>
+      <% if @wiki_page.artist.present? %>
+        <p><%= link_to "View artist", @wiki_page.artist %></p>
       <% end %>
 
       <%= wiki_page_alias_and_implication_list(@wiki_page)%>
