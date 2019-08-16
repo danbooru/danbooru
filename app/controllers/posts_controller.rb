@@ -9,7 +9,7 @@ class PostsController < ApplicationController
         format.html { redirect_to(@post) }
       end
     else
-      @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], raw: params[:raw], random: params[:random], format: params[:format], read_only: params[:ro])
+      @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], raw: params[:raw], random: params[:random], format: params[:format])
       @posts = @post_set.posts
       respond_with(@posts) do |format|
         format.atom

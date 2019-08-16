@@ -97,7 +97,7 @@ class SavedSearch < ApplicationRecord
         CurrentUser.as_system do
           redis_key = "search:#{query}"
           return if redis.exists(redis_key)
-          post_ids = Post.tag_match(query, true).limit(QUERY_LIMIT).pluck(:id)
+          post_ids = Post.tag_match(query, read_only: true).limit(QUERY_LIMIT).pluck(:id)
           redis.sadd(redis_key, post_ids)
           redis.expire(redis_key, REDIS_EXPIRY)
         end

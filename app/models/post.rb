@@ -1682,21 +1682,8 @@ class Post < ApplicationRecord
       where("posts.tag_index @@ to_tsquery('danbooru', E?)", tag.to_escaped_for_tsquery)
     end
 
-    def tag_match(query, read_only = false)
-      if query =~ /status:deleted.status:deleted/
-        # temp fix for degenerate crawlers
-        raise ActiveRecord::RecordNotFound
-      end
-
-      if read_only
-        begin
-          PostQueryBuilder.new(query, read_only: true).build
-        rescue PG::ConnectionBad
-          PostQueryBuilder.new(query).build
-        end
-      else
-        PostQueryBuilder.new(query).build
-      end
+    def tag_match(query, read_only: false)
+      PostQueryBuilder.new(query, read_only: read_only).build
     end
   end
   
