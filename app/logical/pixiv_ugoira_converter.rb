@@ -83,6 +83,6 @@ class PixivUgoiraConverter
 
     DanbooruImageResizer.resize(file, Danbooru.config.small_image_width, Danbooru.config.small_image_width, 85)
   ensure
-    file.close!
+    file&.close!
   end
 end
