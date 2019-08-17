@@ -72,6 +72,9 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @bur = FactoryBot.create(:bulk_update_request, :script => @script)
         @bur.approve!(@admin)
 
+        assert_enqueued_jobs(2)
+        workoff_active_jobs
+
         @ta = TagAlias.where(:antecedent_name => "foo", :consequent_name => "bar").first
         @ti = TagImplication.where(:antecedent_name => "bar", :consequent_name => "baz").first
       end

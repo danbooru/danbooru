@@ -57,8 +57,9 @@ module TestHelpers
   # XXX replace with `perform_enqueued_jobs` after rails 6 upgrade.
   def workoff_active_jobs
     queue_adapter.enqueued_jobs.each do |job_data|
-      klass = job_data[:job]
-      klass.perform_now(*job_data[:args])
+      args = ActiveJob::Arguments.deserialize(job_data[:args])
+      job = job_data[:job].new(*args)
+      job.perform_now
     end
   end
 end
