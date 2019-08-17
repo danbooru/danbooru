@@ -1000,7 +1000,9 @@ class Post < ApplicationRecord
     end
 
     def remove_from_fav_groups
-      FavoriteGroup.delay.purge_post(id)
+      FavoriteGroup.for_post(id).find_each do |favgroup|
+        favgroup.remove!(id)
+      end
     end
   end
 

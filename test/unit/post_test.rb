@@ -41,6 +41,7 @@ class PostTest < ActiveSupport::TestCase
         @upload = UploadService.new(FactoryBot.attributes_for(:jpg_upload)).start!
         @post = @upload.post
         Favorite.add(post: @post, user: @user)
+        create(:favorite_group).add!(@post.id)
       end
 
       teardown do
@@ -61,6 +62,12 @@ class PostTest < ActiveSupport::TestCase
         @post.expunge!
 
         assert_equal(0, Favorite.for_user(@user.id).where("post_id = ?", @post.id).count)
+      end
+
+      should "remove all favgroups" do
+        assert_equal(1, FavoriteGroup.for_post(@post.id).count)
+        @post.expunge!
+        assert_equal(0, FavoriteGroup.for_post(@post.id).count)
       end
 
       should "decrement the uploader's upload count" do

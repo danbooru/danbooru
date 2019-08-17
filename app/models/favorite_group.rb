@@ -178,13 +178,6 @@ class FavoriteGroup < ApplicationRecord
     end
   end
 
-  def self.purge_post(post_id)
-    post_id = post_id.id if post_id.is_a?(Post)
-    for_post(post_id).find_each do |group|
-      group.remove!(post_id)
-    end
-  end
-
   def remove!(post_id)
     with_lock do
       post_id = post_id.id if post_id.is_a?(Post)
