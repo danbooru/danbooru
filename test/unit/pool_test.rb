@@ -267,8 +267,10 @@ class PoolTest < ActiveSupport::TestCase
       end
 
       should "allow Builders to change the category of large pools" do
-        @builder = FactoryBot.create(:builder_user)
-        as(@builder) { @pool.update(category: "collection") }
+        perform_enqueued_jobs do
+          @builder = create(:builder_user)
+          as(@builder) { @pool.update(category: "collection") }
+        end
 
         assert_equal(true, @pool.valid?)
         assert_equal("collection", @pool.category)

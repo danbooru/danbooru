@@ -291,7 +291,7 @@ class Pool < ApplicationRecord
 
   def update_category_pseudo_tags_for_posts_async
     if saved_change_to_category?
-      delay(:queue => "default").update_category_pseudo_tags_for_posts
+      UpdatePoolPseudoTagsJob.perform_later(self)
     end
   end
 
