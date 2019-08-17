@@ -245,8 +245,11 @@ class TagImplicationTest < ActiveSupport::TestCase
       p1 = FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
       ti1 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "xxx")
       ti2 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "yyy")
-      ti1.approve!
-      ti2.approve!
+
+      perform_enqueued_jobs do
+        ti1.approve!
+        ti2.approve!
+      end
 
       assert_equal("aaa bbb ccc xxx yyy", p1.reload.tag_string)
     end
@@ -261,12 +264,13 @@ class TagImplicationTest < ActiveSupport::TestCase
 
       should "update the topic when processed" do
         assert_difference("ForumPost.count") do
-          @implication.approve!
+          perform_enqueued_jobs do
+            @implication.approve!
+          end
         end
-        @post.reload
-        @topic.reload
-        assert_match(/The tag implication .* has been approved/, @post.body)
-        assert_equal("[APPROVED] Tag implication: aaa -> bbb", @topic.title)
+
+        assert_match(/The tag implication .* has been approved/, @post.reload.body)
+        assert_equal("[APPROVED] Tag implication: aaa -> bbb", @topic.reload.title)
       end
 
       should "update the topic when rejected" do

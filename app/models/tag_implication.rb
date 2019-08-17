@@ -163,8 +163,8 @@ class TagImplication < TagRelationship
     end
 
     def approve!(approver: CurrentUser.user, update_topic: true)
-      update(status: "queued", approver_id: approver.id)
-      delay(:queue => "default").process!(update_topic: update_topic)
+      update(approver: approver, status: "queued")
+      ProcessTagImplicationJob.perform_later(self, update_topic: update_topic)
     end
 
     def reject!(update_topic: true)

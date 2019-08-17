@@ -6,11 +6,9 @@ class TagAlias < TagRelationship
   validate :mininum_antecedent_count, on: :create, unless: :skip_secondary_validations
 
   module ApprovalMethods
-    def approve!(update_topic: true, approver: CurrentUser.user)
-      CurrentUser.scoped(approver) do
-        update(status: "queued", approver_id: approver.id)
-        delay(:queue => "default").process!(update_topic: update_topic)
-      end
+    def approve!(approver: CurrentUser.user, update_topic: true)
+      update(approver: approver, status: "queued")
+      ProcessTagAliasJob.perform_later(self, update_topic: update_topic)
     end
   end
 
