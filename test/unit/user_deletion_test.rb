@@ -3,14 +3,10 @@ require 'test_helper'
 class UserDeletionTest < ActiveSupport::TestCase
   context "an invalid user deletion" do
     context "for an invalid password" do
-      setup do
-        @user = FactoryBot.create(:user)
-        CurrentUser.user = @user
-        CurrentUser.ip_addr = "127.0.0.1"
-        @deletion = UserDeletion.new(@user, "wrongpassword")
-      end
-
       should "fail" do
+        @user = create(:user)
+        @deletion = UserDeletion.new(@user, "wrongpassword")
+
         assert_raise(UserDeletion::ValidationError) do
           @deletion.delete!
         end
@@ -18,14 +14,10 @@ class UserDeletionTest < ActiveSupport::TestCase
     end
 
     context "for an admin" do
-      setup do
-        @user = FactoryBot.create(:admin_user)
-        CurrentUser.user = @user
-        CurrentUser.ip_addr = "127.0.0.1"
-        @deletion = UserDeletion.new(@user, "password")
-      end
-
       should "fail" do
+        @user = create(:admin_user)
+        @deletion = UserDeletion.new(@user, "password")
+
         assert_raise(UserDeletion::ValidationError) do
           @deletion.delete!
         end
@@ -35,36 +27,33 @@ class UserDeletionTest < ActiveSupport::TestCase
 
   context "a valid user deletion" do
     setup do
-      @user = FactoryBot.create(:user)
-      CurrentUser.user = @user
-      CurrentUser.ip_addr = "127.0.0.1"
-
-      @post = FactoryBot.create(:post)
-      Favorite.add(post: @post, user: @user)
-
-      @user.update_attributes(:email => "ted@danbooru.com")
-
+      @user = create(:user, email: "ted@danbooru.com")
       @deletion = UserDeletion.new(@user, "password")
-      @deletion.delete!
-      @user.reload
     end
 
     should "blank out the email" do
-      assert_nil(@user.email)
+      @deletion.delete!
+      assert_nil(@user.reload.email)
     end
 
     should "rename the user" do
-      assert_equal("user_#{@user.id}", @user.name)
+      @deletion.delete!
+      assert_equal("user_#{@user.id}", @user.reload.name)
     end
 
     should "reset the password" do
+      @deletion.delete!
       assert_nil(User.authenticate(@user.name, "password"))
     end
 
     should "remove any favorites" do
-      @post.reload
+      @post = create(:post)
+      Favorite.add(post: @post, user: @user)
+
+      perform_enqueued_jobs { @deletion.delete! }
+
       assert_equal(0, Favorite.count)
-      assert_equal("", @post.fav_string)
+      assert_equal("", @post.reload.fav_string)
       assert_equal(0, @post.fav_count)
     end
   end

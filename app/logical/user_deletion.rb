@@ -3,15 +3,6 @@ class UserDeletion
 
   attr_reader :user, :password
 
-  def self.remove_favorites_for(user_id)
-    user = User.find(user_id)
-    Post.without_timeout do
-      Post.raw_tag_match("fav:#{user_id}").where("true /* UserDeletion.remove_favorites_for */").find_each do |post|
-        Favorite.remove(post: post, user: user)
-      end
-    end
-  end
-
   def initialize(user, password)
     @user = user
     @password = password
@@ -59,7 +50,7 @@ private
   end
 
   def remove_favorites
-    UserDeletion.delay(:queue => "default").remove_favorites_for(user.id)
+    DeleteFavoritesJob.perform_later(user)
   end
 
   def rename
