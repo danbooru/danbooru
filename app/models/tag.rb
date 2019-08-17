@@ -872,7 +872,7 @@ class Tag < ApplicationRecord
 
       if Cache.get("urt:#{key}").nil? && should_update_related?
         if post_count < COSINE_SIMILARITY_RELATED_TAG_THRESHOLD
-          delay(:queue => "default").update_related
+          UpdateRelatedTagsJob.perform_later(self)
         else
           sqs = SqsService.new(Danbooru.config.aws_sqs_reltagcalc_url)
           sqs.send_message("calculate #{name}")
