@@ -73,7 +73,7 @@ class PixivUgoiraConverter
 
     DanbooruImageResizer.crop(file, Danbooru.config.small_image_width, Danbooru.config.small_image_width, 85)
   ensure
-    file.close!
+    file&.close!
   end
 
   def self.generate_preview(ugoira_file)
