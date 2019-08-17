@@ -166,7 +166,7 @@ class UploadService
 
       # in case this upload never finishes processing, we need to delete the
       # distributed files in the future
-      UploadService::Utils.delay(priority: -1, queue: "default", run_at: 24.hours.from_now).delete_file(upload.md5, upload.file_ext, upload.id)
+      DeleteUploadFilesJob.set(wait: 24.hours).perform_later(upload.md5, upload.file_ext, upload.id)
     end
 
     # these methods are only really used during upload processing even 

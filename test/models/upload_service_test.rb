@@ -838,7 +838,7 @@ class UploadServiceTest < ActiveSupport::TestCase
             as_user { @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350") }
 
             travel_to((PostReplacement::DELETION_GRACE_PERIOD + 1).days.from_now) do
-              Delayed::Worker.new.work_off
+              workoff_active_jobs
             end
           rescue Net::OpenTimeout
             skip "Remote connection to Pixiv failed"
@@ -887,7 +887,7 @@ class UploadServiceTest < ActiveSupport::TestCase
             assert_nothing_raised { @post.file(:preview) }
 
             travel_to((PostReplacement::DELETION_GRACE_PERIOD + 1).days.from_now) do
-              Delayed::Worker.new.work_off
+              workoff_active_jobs
             end
 
             assert_nothing_raised { @post.file(:original) }
@@ -914,20 +914,24 @@ class UploadServiceTest < ActiveSupport::TestCase
               @post2.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
               assert_equal("4ceadc314938bc27f3574053a3e1459a", @post1.md5)
               assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post2.md5)
+
               @post2.reload
               @post2.replace!(replacement_url: "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg")
               assert_equal("d34e4cf0a437a5d65f8e82b7bcd02606", @post2.md5)
               Upload.destroy_all
               @post1.reload
               @post2.reload
+
               @post1.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
               @post2.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
               assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post1.md5)
               assert_equal("4ceadc314938bc27f3574053a3e1459a", @post2.md5)
             end
 
-            Timecop.travel(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
-              Delayed::Worker.new.work_off
+            travel_to (PostReplacement::DELETION_GRACE_PERIOD + 1).days.from_now do
+              assert_raise(Post::DeletionError) do
+                workoff_active_jobs
+              end
             end
 
             assert_nothing_raised { @post1.file(:original) }
