@@ -60,56 +60,64 @@ class SavedSearchTest < ActiveSupport::TestCase
   context ".post_ids_for" do
     context "with a label" do
       setup do
-        SavedSearch.expects(:queries_for).with(1, label: "blah").returns(%w(a b c))
+        create(:saved_search, query: "a", labels: ["blah"], user: @user)
+        create(:saved_search, query: "b", labels: ["blah"], user: @user)
+        create(:saved_search, query: "c", labels: ["blah"], user: @user)
+
+        create(:post, tag_string: "a")
+        create(:post, tag_string: "b")
+        create(:post, tag_string: "c")
       end
 
       context "without a primed cache" do
-        should "delay processing three times" do
-          SavedSearch.expects(:populate).times(3)
-          post_ids = SavedSearch.post_ids_for(1, label: "blah")
-          assert_equal([], post_ids)
-        end
-      end
-
-      context "with a primed cached" do
-        setup do
-          @mock_redis.sadd("search:a", 1)
-          @mock_redis.sadd("search:b", 2)
-          @mock_redis.sadd("search:c", 3)
-        end
-
-        should "fetch the post ids" do
-          SavedSearch.expects(:delay).never
-          post_ids = SavedSearch.post_ids_for(1, label: "blah")
-          assert_equal([1,2,3], post_ids)
-        end
-      end
-    end
-
-    context "without a label" do
-      setup do
-        SavedSearch.expects(:queries_for).with(1, label: nil).returns(%w(a b c))
-      end
-
-      context "without a primed cache" do
-        should "delay processing three times" do
-          SavedSearch.expects(:populate).times(3)
-          post_ids = SavedSearch.post_ids_for(1)
+        should "return nothing" do
+          post_ids = SavedSearch.post_ids_for(@user.id, label: "blah")
           assert_equal([], post_ids)
         end
       end
 
       context "with a primed cache" do
         setup do
-          @mock_redis.sadd("search:a", 1)
-          @mock_redis.sadd("search:b", 2)
-          @mock_redis.sadd("search:c", 3)
+          perform_enqueued_jobs do
+            SavedSearch.post_ids_for(@user.id, label: "blah")
+          end
         end
 
         should "fetch the post ids" do
-          SavedSearch.expects(:delay).never
-          post_ids = SavedSearch.post_ids_for(1)
-          assert_equal([1,2,3], post_ids)
+          post_ids = SavedSearch.post_ids_for(@user.id, label: "blah")
+          assert_equal(Post.pluck(:id).sort, post_ids.sort)
+        end
+      end
+    end
+
+    context "without a label" do
+      setup do
+        create(:saved_search, query: "a", user: @user)
+        create(:saved_search, query: "b", user: @user)
+        create(:saved_search, query: "c", user: @user)
+
+        create(:post, tag_string: "a")
+        create(:post, tag_string: "b")
+        create(:post, tag_string: "c")
+      end
+
+      context "without a primed cache" do
+        should "return nothing" do
+          post_ids = SavedSearch.post_ids_for(@user.id)
+          assert_equal([], post_ids)
+        end
+      end
+
+      context "with a primed cache" do
+        setup do
+          perform_enqueued_jobs do
+            SavedSearch.post_ids_for(@user.id)
+          end
+        end
+
+        should "fetch the post ids" do
+          post_ids = SavedSearch.post_ids_for(@user.id)
+          assert_equal(Post.pluck(:id).sort, post_ids.sort)
         end
       end
     end
