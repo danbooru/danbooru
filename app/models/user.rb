@@ -156,10 +156,6 @@ class User < ApplicationRecord
         where("lower(name) = ?", name.mb_chars.downcase.tr(" ", "_")).first
       end
 
-      def id_to_pretty_name(user_id)
-        id_to_name(user_id).gsub(/([^_])_+(?=[^_])/, "\\1 \\2")
-      end
-
       def normalize_name(name)
         name.to_s.mb_chars.downcase.strip.tr(" ", "_").to_s
       end
