@@ -69,7 +69,7 @@ Post.initialize_gestures = function() {
   if (hasPrev) {
     hammer.on("swiperight", async function(e) {
       $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(150%)"});
-      await Danbooru.Utility.delay(200);
+      await Utility.delay(200);
       Post.swipe_prev(e);
     });
   }
@@ -77,7 +77,7 @@ Post.initialize_gestures = function() {
   if (hasNext) {
     hammer.on("swipeleft", async function(e) {
       $("body").css({"transition-timing-function": "ease", "transition-duration": "0.2s", "opacity": "0", "transform": "translateX(-150%)"});
-      await Danbooru.Utility.delay(200);
+      await Utility.delay(200);
       Post.swipe_next(e);
     });
   }
@@ -251,15 +251,15 @@ Post.initialize_links = function() {
           other_post_id: other_post_id
         },
         success: function(data) {
-          Danbooru.notice("Successfully copied notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
+          Utility.notice("Successfully copied notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
         },
         error: function(data) {
           if (data.status === 404) {
-            Danbooru.error("Error: Invalid destination post");
+            Utility.error("Error: Invalid destination post");
           } else if (data.responseJSON && data.responseJSON.reason) {
-            Danbooru.error("Error: " + data.responseJSON.reason);
+            Utility.error("Error: " + data.responseJSON.reason);
           } else {
-            Danbooru.error("There was an error copying notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
+            Utility.error("There was an error copying notes to <a href='" + other_post_id + "'>post #" + other_post_id + "</a>");
           }
         }
       });
@@ -467,14 +467,14 @@ Post.resize_ugoira_controls = function() {
 Post.notice_update = function(x) {
   if (x === "inc") {
     Post.pending_update_count += 1;
-    Danbooru.notice("Updating posts (" + Post.pending_update_count + " pending)...", true);
+    Utility.notice("Updating posts (" + Post.pending_update_count + " pending)...", true);
   } else {
     Post.pending_update_count -= 1;
 
     if (Post.pending_update_count < 1) {
-      Danbooru.notice("Posts updated");
+      Utility.notice("Posts updated");
     } else {
-      Danbooru.notice("Updating posts (" + Post.pending_update_count + " pending)...", true);
+      Utility.notice("Updating posts (" + Post.pending_update_count + " pending)...", true);
     }
   }
 }
@@ -493,7 +493,7 @@ Post.update_data = function(data) {
 }
 
 Post.vote = function(score, id) {
-  Danbooru.notice("Voting...");
+  Utility.notice("Voting...");
 
   $.post("/posts/" + id + "/votes.js", {
     score: score
@@ -518,7 +518,7 @@ Post.update = function(post_id, params) {
     },
     error: function(data) {
       Post.notice_update("dec");
-      Danbooru.error(`There was an error updating <a href="/posts/${post_id}">post #${post_id}</a>`);
+      Utility.error(`There was an error updating <a href="/posts/${post_id}">post #${post_id}</a>`);
     }
   });
 }
@@ -534,7 +534,7 @@ Post.ban = function(post_id) {
       $("#post_" + post_id).remove();
     },
     error: function(data) {
-      Danbooru.error(`There was an error updating <a href="/posts/${post_id}">post #${post_id}</a>`);
+      Utility.error(`There was an error updating <a href="/posts/${post_id}">post #${post_id}</a>`);
     }
   });
 }
@@ -545,13 +545,13 @@ Post.approve = function(post_id) {
     {"post_id": post_id}
   ).fail(function(data) {
     var message = $.map(data.responseJSON.errors, function(msg, attr) { return msg; }).join("; ");
-    Danbooru.error("Error: " + message);
+    Utility.error("Error: " + message);
   }).done(function(data) {
     var $post = $("#post_" + post_id);
     if ($post.length) {
       $post.data("flags", $post.data("flags").replace(/pending/, ""));
       $post.removeClass("post-status-pending");
-      Danbooru.notice("Approved post #" + post_id);
+      Utility.notice("Approved post #" + post_id);
     }
   });
 }
@@ -616,7 +616,7 @@ Post.update_tag_count = function(event) {
     let tags = [...new Set($(event.target).val().match(/\S+/g))];
     if (tags) {
       count = tags.length;
-      string = (count == 1) ? (count + " tag") : (count + " tags")
+      string = (count === 1) ? (count + " tag") : (count + " tags")
     }
   }
   $("#tags-container .count").html(string);
