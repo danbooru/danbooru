@@ -47,7 +47,7 @@ if User.count == 0
     )
 
     CurrentUser.user = user
-    User::Levels.constants.reject{|x| [:ADMIN, :BLOCKED].include?(x)}.each do |level|
+    User::Levels.constants.reject{ |x| x == :ADMIN }.each do |level|
       newuser = User.create(
       :name => level.to_s.downcase,
       :password => "password1",

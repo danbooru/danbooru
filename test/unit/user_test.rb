@@ -94,17 +94,6 @@ class UserTest < ActiveSupport::TestCase
       assert(@user.is_comment_limited?)
     end
 
-    should "verify" do
-      assert(@user.is_verified?)
-      @user = FactoryBot.create(:user)
-      @user.generate_email_verification_key
-      @user.save
-      assert(!@user.is_verified?)
-      assert_raise(User::Error) {@user.verify!("bbb")}
-      assert_nothing_raised {@user.verify!(@user.email_verification_key)}
-      assert(@user.is_verified?)
-    end
-
     should "authenticate" do
       assert(User.authenticate(@user.name, "password"), "Authentication should have succeeded")
       assert(!User.authenticate(@user.name, "password2"), "Authentication should not have succeeded")

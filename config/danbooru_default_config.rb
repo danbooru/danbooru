@@ -413,11 +413,6 @@ module Danbooru
 
 #END TAG
 
-    # If enabled, users must verify their email addresses.
-    def enable_email_verification?
-      false
-    end
-
     # Any custom code you want to insert into the default layout without
     # having to modify the templates.
     def custom_html_header_content

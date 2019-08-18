@@ -7,7 +7,6 @@ class User < ApplicationRecord
 
   module Levels
     ANONYMOUS = 0
-    BLOCKED = 10
     MEMBER = 20
     GOLD = 30
     PLATINUM = 31
@@ -77,7 +76,6 @@ class User < ApplicationRecord
   validates_inclusion_of :default_image_size, :in => %w(large original)
   validates_inclusion_of :per_page, :in => 1..100
   validates_confirmation_of :password
-  validates_presence_of :email, :if => ->(rec) { rec.new_record? && Danbooru.config.enable_email_verification?}
   validates_presence_of :comment_threshold
   validate :validate_ip_addr_is_not_banned, :on => :create
   validate :validate_sock_puppets, :on => :create, :if => -> { Danbooru.config.enable_sock_puppet_validation? }
@@ -89,7 +87,6 @@ class User < ApplicationRecord
   after_save :update_cache
   before_create :promote_to_admin_if_first_user
   before_create :customize_new_user
-  #after_create :notify_sock_puppets
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   has_many :posts, :foreign_key => "uploader_id"
   has_many :post_approvals, :dependent => :destroy
@@ -294,9 +291,6 @@ class User < ApplicationRecord
         when Levels::ANONYMOUS
           "Anonymous"
 
-        when Levels::BLOCKED
-          "Banned"
-
         when Levels::MEMBER
           "Member"
 
@@ -342,10 +336,6 @@ class User < ApplicationRecord
       Danbooru.config.customize_new_user(self)
     end
 
-    def role
-      level_string.downcase.to_sym
-    end
-
     def level_string_was
       level_string(level_was)
     end
@@ -362,10 +352,6 @@ class User < ApplicationRecord
       level >= Levels::MEMBER
     end
 
-    def is_blocked?
-      is_banned?
-    end
-
     def is_builder?
       level >= Levels::BUILDER
     end
@@ -379,10 +365,6 @@ class User < ApplicationRecord
     end
 
     def is_moderator?
-      level >= Levels::MODERATOR
-    end
-
-    def is_mod?
       level >= Levels::MODERATOR
     end
 
@@ -403,29 +385,9 @@ class User < ApplicationRecord
         self.per_page = Danbooru.config.posts_per_page
       end
     end
-
-    def level_class
-      "user-#{level_string.downcase}"
-    end
   end
 
   module EmailMethods
-    def is_verified?
-      email_verification_key.blank?
-    end
-
-    def generate_email_verification_key
-      self.email_verification_key = Digest::SHA1.hexdigest("#{Time.now.to_f}--#{name}--#{rand(1_000_000)}--")
-    end
-
-    def verify!(key)
-      if email_verification_key == key
-        self.update_column(:email_verification_key, nil)
-      else
-        raise User::Error.new("Verification key does not match")
-      end
-    end
-
     def normalize_email
       self.email = nil if email.blank?
     end
@@ -456,10 +418,6 @@ class User < ApplicationRecord
       else
         250
       end
-    end
-
-    def show_saved_searches?
-      true
     end
 
     def can_upload?
@@ -760,14 +718,6 @@ class User < ApplicationRecord
       end
     end
 
-    def find_for_password_reset(name, email)
-      if email.blank?
-        where("FALSE")
-      else
-        where(["name = ? AND email = ?", name, email])
-      end
-    end
-
     def search(params)
       q = super
 
@@ -878,10 +828,6 @@ class User < ApplicationRecord
 
   def as_current(&block)
     CurrentUser.as(self, &block)
-  end
-
-  def can_update?(object, foreign_key = :user_id)
-    is_moderator? || is_admin? || object.__send__(foreign_key) == id
   end
 
   def dmail_count
