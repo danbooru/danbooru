@@ -128,29 +128,23 @@ class User < ApplicationRecord
     end
   end
 
-  module NameMethods
-    extend ActiveSupport::Concern
-
-    module ClassMethods
+  concerning :NameMethods do
+    class_methods do
       def name_to_id(name)
         Cache.get("uni:#{Cache.hash(name)}", 4.hours) do
-          val = select_value_sql("SELECT id FROM users WHERE lower(name) = ?", name.mb_chars.downcase.tr(" ", "_").to_s)
-          if val.present?
-            val.to_i
-          else
-            nil
-          end
+          find_by_name(name).try(:id)
         end
       end
 
       def id_to_name(user_id)
         Cache.get("uin:#{user_id}", 4.hours) do
-          select_value_sql("SELECT name FROM users WHERE id = ?", user_id) || Danbooru.config.default_guest_name
+          find_by_id(user_id).try(:name) || Danbooru.config.default_guest_name
         end
       end
 
+      # XXX downcasing is the wrong way to do case-insensitive comparison for unicode (should use casefolding).
       def find_by_name(name)
-        where("lower(name) = ?", name.mb_chars.downcase.tr(" ", "_")).first
+        where("lower(name) = ?", normalize_name(name)).first
       end
 
       def normalize_name(name)
@@ -813,7 +807,6 @@ class User < ApplicationRecord
   end
 
   include BanMethods
-  include NameMethods
   include PasswordMethods
   include AuthenticationMethods
   include LevelMethods

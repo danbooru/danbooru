@@ -164,6 +164,29 @@ class UserTest < ActiveSupport::TestCase
       end
     end
 
+    context "searching for users by name" do
+      setup do
+        @miku = create(:user, name: "hatsune_miku")
+      end
+
+      should "be case-insensitive" do
+        assert_equal("hatsune_miku", User.normalize_name("Hatsune_Miku"))
+        assert_equal(@miku.id, User.find_by_name("Hatsune_Miku").id)
+        assert_equal(@miku.id, User.name_to_id("Hatsune_Miku"))
+      end
+
+      should "handle whitespace" do
+        assert_equal("hatsune_miku", User.normalize_name(" hatsune miku "))
+        assert_equal(@miku.id, User.find_by_name(" hatsune miku ").id)
+        assert_equal(@miku.id, User.name_to_id(" hatsune miku "))
+      end
+
+      should "return nil for nonexistent names" do
+        assert_nil(User.find_by_name("does_not_exist"))
+        assert_nil(User.name_to_id("does_not_exist"))
+      end
+    end
+
     context "ip address" do
       setup do
         @user = FactoryBot.create(:user)
