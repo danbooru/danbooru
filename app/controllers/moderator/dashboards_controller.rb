@@ -4,7 +4,7 @@ module Moderator
     helper :post_flags, :post_appeals
 
     def show
-      @dashboard = Moderator::Dashboard::Report.new(params[:min_date] || 2.days.ago.to_date, params[:max_level] || 20)
+      @dashboard = Moderator::Dashboard::Report.new(**search_params.to_h.symbolize_keys)
     end
   end
 end

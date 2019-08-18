@@ -2,35 +2,13 @@
   <div id="a-edit">
     <h1>Edit User: <%= @user.name %></h1>
 
-    <%= form_tag(admin_user_path(@user), :method => :put, :class => "simple_form") do %>
-      <%= hidden_field_tag "id", @user.id %>
-
-      <div class="input integer optional">
-        <label for="user_level" class="optional">Level</label>
-        <%= user_level_select(:user, :level) %>
-      </div>
-
-      <div class="input">
-        <label for="user_can_upload_free" class="optional">Unrestricted Uploads</label>
-        <%= select(:user, :can_upload_free, [["Yes", true], ["No", false]]) %>
-      </div>
-
-      <div class="input">
-        <label for="user_can_approve_posts" class="optional">Approve Posts</label>
-        <%= select(:user, :can_approve_posts, [["Yes", true], ["No", false]]) %>
-      </div>
-
-      <div class="input">
-        <label for="user_no_flagging" class="optional">Banned From Flagging</label>
-        <%= select(:user, :no_flagging, [["Yes", true], ["No", false]]) %>
-      </div>
-
-      <div class="input">
-        <label for="user_no_feedback" class="optional">Banned From Giving Feedback</label>
-        <%= select(:user, :no_feedback, [["Yes", true], ["No", false]]) %>
-      </div>
-
-      <%= submit_tag "Update" %>
+    <%= simple_form_for(@user, url: admin_user_path(@user), method: :put) do |f| %>
+      <%= f.input :level, collection: User.level_hash.to_a, selected: @user.level %>
+      <%= f.input :can_upload_free, label: "Unrestricted Uploads", as: :boolean, selected: @user.can_upload_free %>
+      <%= f.input :can_approve_posts, label: "Approve Posts", as: :boolean, selected: @user.can_approve_posts %>
+      <%= f.input :no_flagging, label: "Banned From Flagging", as: :boolean, selected: @user.no_flagging %>
+      <%= f.input :no_feedback, label: "Banned From Giving Feedback", as: :boolean, selected: @user.no_feedback %>
+      <%= f.submit "Update" %>
     <% end %>
   </div>
 </div>
