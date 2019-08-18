@@ -1,5 +1,5 @@
 <section>
-  <h1>Recent Changes (<%= link_to "all", wiki_pages_path(:order => "time") %>)</h1>
+  <h1>Recent Changes (<%= link_to "all", wiki_page_versions_path %>)</h1>
   <ul>
     <% WikiPage.recent.each do |page| %>
       <li class="category-<%= page.category_name %>"><%= link_to page.pretty_title, wiki_page_path(page) %></li>

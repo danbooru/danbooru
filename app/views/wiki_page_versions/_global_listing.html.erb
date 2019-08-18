@@ -2,34 +2,32 @@
   <table width="100%" class="striped">
     <thead>
       <tr>
+        <th width="3%"></th>
         <th>Title</th>
-        <th width="3%">Del</th>
-        <th width="5%"></th>
-        <% if CurrentUser.is_moderator? %>
-          <th width="10%">IP Address</th>
-        <% end %>
+        <th width="5%">Status</th>
         <th width="26%">Last edited</th>
       </tr>
     </thead>
     <tbody>
       <% @wiki_page_versions.each do |wiki_page_version| %>
         <tr>
-          <td class="category-<%= wiki_page_version.category_name %>">
-            <%= link_to wiki_page_version.title, wiki_page_version_path(wiki_page_version) %>
+          <td>
+            <%= link_to_if wiki_page_version.previous.present?, "diff", diff_wiki_page_versions_path(otherpage: wiki_page_version.previous.try(:id), thispage: wiki_page_version.id) %>
           </td>
-          <td><%= wiki_page_version.is_deleted? ? "Y" : "" %></td>
-          <td><%= link_to "wiki", wiki_page_path(wiki_page_version.wiki_page_id) %></td>
-          <% if CurrentUser.is_moderator? %>
-            <td>
-              <%= link_to_ip wiki_page_version.updater_ip_addr %>
-            </td>
-          <% end %>
+          <td class="category-<%= wiki_page_version.category_name %>">
+            <%= link_to "?", wiki_page_path(wiki_page_version.wiki_page_id) %>
+            <%= link_to wiki_page_version.title, wiki_page_version %>
+            <%= link_to "»", wiki_page_versions_path(search: { wiki_page_id: wiki_page_version.wiki_page_id }) %>
+          </td>
+          <td><%= wiki_page_version_status_diff(wiki_page_version) %></td>
           <td>
             <%= compact_time(wiki_page_version.updated_at) %>
-            <% if wiki_page_version.updater %>
-              by
-              <%= link_to_user wiki_page_version.updater %>
+            by
+            <%= link_to_user wiki_page_version.updater %>
+            <% if CurrentUser.is_moderator? %>
+              (<%= link_to_ip wiki_page_version.updater_ip_addr %>)
             <% end %>
+            <%= link_to "»", wiki_page_versions_path(search: { updater_id: wiki_page_version.updater.id }) %>
           </td>
         </tr>
       <% end %>
