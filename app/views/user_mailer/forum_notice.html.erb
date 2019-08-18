@@ -2,7 +2,7 @@
 
 <% @forum_posts.each do |forum_post| %>
   <p>
-    <strong><%= forum_post.creator_name %> said:</strong>
+    <strong><%= forum_post.creator.name %> said:</strong>
   </p>
   <%= format_text(forum_post.body, base_url: root_url) %>
   <br>

@@ -117,7 +117,7 @@ class PostPresenter < Presenter
     }
 
     if CurrentUser.is_moderator?
-      attributes["data-uploader"] = post.uploader_name
+      attributes["data-uploader"] = post.uploader.name
     end
 
     if post.visible?

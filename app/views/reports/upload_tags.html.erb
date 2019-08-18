@@ -15,7 +15,7 @@
       <tbody>
         <% @upload_reports.each do |upload_report| %>
           <tr>
-            <td><%= PostPresenter.preview(upload_report.becomes(Post), show_deleted: true, tags: "user:#{upload_report.uploader_name}") %></td>
+            <td><%= PostPresenter.preview(upload_report.becomes(Post), show_deleted: true, tags: "user:#{upload_report.uploader.name}") %></td>
             <td>
               <%= TagSetPresenter.new(upload_report.uploader_tags_array).inline_tag_list_html %>
             </td>

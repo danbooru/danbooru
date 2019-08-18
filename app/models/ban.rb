@@ -101,7 +101,7 @@ class Ban < ApplicationRecord
   end
 
   def user_name=(username)
-    self.user_id = User.name_to_id(username)
+    self.user = User.find_by_name(username)
   end
 
   def duration=(dur)

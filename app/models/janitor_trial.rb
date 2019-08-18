@@ -30,7 +30,7 @@ class JanitorTrial < ApplicationRecord
   end
 
   def user_name=(name)
-    self.user_id = User.name_to_id(name)
+    self.user = User.find_by_name(name)
   end
 
   def send_dmail

@@ -1015,7 +1015,7 @@ class Post < ApplicationRecord
     end
 
     def uploader_name
-      User.id_to_name(uploader_id)
+      uploader.name
     end
   end
 
@@ -1507,7 +1507,7 @@ class Post < ApplicationRecord
         "created_at" => created_at.to_formatted_s(:db),
         "has_notes" => has_notes?,
         "rating" => rating,
-        "author" => uploader_name,
+        "author" => uploader.name,
         "creator_id" => uploader_id,
         "width" => image_width,
         "source" => source,

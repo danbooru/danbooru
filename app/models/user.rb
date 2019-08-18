@@ -21,7 +21,6 @@ class User < ApplicationRecord
     :approver,
     :voter,
     :super_voter,
-    :verified,
   ]
 
   # candidates for removal:
@@ -84,7 +83,6 @@ class User < ApplicationRecord
   before_validation :normalize_email
   before_create :encrypt_password_on_create
   before_update :encrypt_password_on_update
-  after_save :update_cache
   before_create :promote_to_admin_if_first_user
   before_create :customize_new_user
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
@@ -131,15 +129,7 @@ class User < ApplicationRecord
   concerning :NameMethods do
     class_methods do
       def name_to_id(name)
-        Cache.get("uni:#{Cache.hash(name)}", 4.hours) do
-          find_by_name(name).try(:id)
-        end
-      end
-
-      def id_to_name(user_id)
-        Cache.get("uin:#{user_id}", 4.hours) do
-          find_by_id(user_id).try(:name) || Danbooru.config.default_guest_name
-        end
+        find_by_name(name).try(:id)
       end
 
       # XXX downcasing is the wrong way to do case-insensitive comparison for unicode (should use casefolding).
@@ -154,11 +144,6 @@ class User < ApplicationRecord
 
     def pretty_name
       name.gsub(/([^_])_+(?=[^_])/, "\\1 \\2")
-    end
-
-    def update_cache
-      Cache.put("uin:#{id}", name, 4.hours)
-      Cache.put("uni:#{Cache.hash(name)}", id, 4.hours)
     end
   end
 

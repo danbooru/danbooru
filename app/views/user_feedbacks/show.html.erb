@@ -18,5 +18,5 @@
 <%= render "secondary_links" %>
 
 <% content_for(:page_title) do %>
-  Feedback - <%= @user_feedback.user_name %> - <%= Danbooru.config.app_name %>
+  Feedback - <%= @user_feedback.user.name %> - <%= Danbooru.config.app_name %>
 <% end %>

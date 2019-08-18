@@ -274,10 +274,6 @@ class ApplicationRecord < ActiveRecord::Base
               rec.creator_ip_addr = CurrentUser.ip_addr if rec.respond_to?(:creator_ip_addr=)
             end
           end
-
-          define_method :creator_name do
-            User.id_to_name(creator_id)
-          end
         end
       end
 
@@ -287,10 +283,6 @@ class ApplicationRecord < ActiveRecord::Base
           before_validation do |rec|
             rec.updater_id = CurrentUser.id
             rec.updater_ip_addr = CurrentUser.ip_addr if rec.respond_to?(:updater_ip_addr=)
-          end
-
-          define_method :updater_name do
-            User.id_to_name(updater_id)
           end
         end
       end

@@ -16,7 +16,7 @@
         <% @uploads.each do |upload| %>
           <tr>
             <td>
-              <%= PostPresenter.preview(upload.post, tags: "user:#{upload.uploader_name}", show_deleted: true) %>
+              <%= PostPresenter.preview(upload.post, tags: "user:#{upload.uploader.name}", show_deleted: true) %>
             </td>
             <td class="col-expand upload-info">
               <span class="info">
@@ -62,7 +62,7 @@
             </td>
             <td>
               <%= link_to_user upload.uploader %>
-              <%= link_to "»", uploads_path(search: params[:search].merge(uploader_name: upload.uploader_name)) %>
+              <%= link_to "»", uploads_path(search: params[:search].merge(uploader_name: upload.uploader.name)) %>
               <br><%= time_ago_in_words_tagged  upload.created_at %>
             </td>
             <td class="col-normal">

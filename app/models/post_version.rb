@@ -156,7 +156,7 @@ class PostVersion < ApplicationRecord
   end
 
   def updater_name
-    User.id_to_name(updater_id)
+    updater.name
   end
 
   def method_attributes

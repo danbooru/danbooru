@@ -64,6 +64,10 @@ class Note < ApplicationRecord
     end
   end
 
+  def creator_name
+    creator.name
+  end
+
   extend SearchMethods
   include ApiMethods
 

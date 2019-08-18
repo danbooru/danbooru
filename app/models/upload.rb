@@ -155,7 +155,7 @@ class Upload < ApplicationRecord
 
   module UploaderMethods
     def uploader_name
-      User.id_to_name(uploader_id)
+      uploader.name
     end
   end
 

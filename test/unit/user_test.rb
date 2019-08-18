@@ -123,10 +123,6 @@ class UserTest < ActiveSupport::TestCase
     end
 
     context "name" do
-      should "be #{Danbooru.config.default_guest_name} given an invalid user id" do
-        assert_equal(Danbooru.config.default_guest_name, User.id_to_name(-1))
-      end
-
       should "not contain whitespace" do
         # U+2007: https://en.wikipedia.org/wiki/Figure_space
         user = FactoryBot.build(:user, :name => "foo\u2007bar")
@@ -152,15 +148,9 @@ class UserTest < ActiveSupport::TestCase
         assert_equal(["Name cannot begin or end with an underscore"], user.errors.full_messages)
       end
 
-      should "be fetched given a user id" do
-        @user = FactoryBot.create(:user)
-        assert_equal(@user.name, User.id_to_name(@user.id))
-      end
-
       should "be updated" do
         @user = FactoryBot.create(:user)
         @user.update_attribute(:name, "danzig")
-        assert_equal(@user.name, User.id_to_name(@user.id))
       end
     end
 

@@ -288,7 +288,7 @@ class CommentTest < ActiveSupport::TestCase
 
           assert_equal(<<-EOS.strip_heredoc, comment.quoted_response)
             [quote]
-            #{comment.creator_name} said:
+            #{comment.creator.name} said:
 
             paragraph one
 

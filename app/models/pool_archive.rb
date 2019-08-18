@@ -95,10 +95,6 @@ class PoolArchive < ApplicationRecord
     User.find(updater_id)
   end
 
-  def updater_name
-    User.id_to_name(updater_id)
-  end
-
   def pretty_name
     name.tr("_", " ")
   end

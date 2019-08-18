@@ -49,7 +49,7 @@ class Dmail < ApplicationRecord
 
   module AddressMethods
     def to_name=(name)
-      self.to_id = User.name_to_id(name)
+      self.to = User.find_by_name(name)
     end
 
     def initialize_attributes

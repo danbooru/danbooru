@@ -37,7 +37,7 @@
           </td>
           <td>
             <%= link_to_user artist_version.updater %>
-            <%= link_to "»", artist_versions_path(search: { updater_name: artist_version.updater_name }) %>
+            <%= link_to "»", artist_versions_path(search: { updater_name: artist_version.updater.name }) %>
             <p>
               <%= compact_time(artist_version.updated_at) %>
               <% if CurrentUser.is_moderator? %>

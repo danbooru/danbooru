@@ -17,8 +17,8 @@ class Comment < ApplicationRecord
   end
   mentionable(
     :message_field => :body, 
-    :title => ->(user_name) {"#{creator_name} mentioned you in a comment on post ##{post_id}"},
-    :body => ->(user_name) {"@#{creator_name} mentioned you in a \"comment\":/posts/#{post_id}#comment-#{id} on post ##{post_id}:\n\n[quote]\n#{DText.excerpt(body, "@"+user_name)}\n[/quote]\n"},
+    :title => ->(user_name) {"#{creator.name} mentioned you in a comment on post ##{post_id}"},
+    :body => ->(user_name) {"@#{creator.name} mentioned you in a \"comment\":/posts/#{post_id}#comment-#{id} on post ##{post_id}:\n\n[quote]\n#{DText.excerpt(body, "@"+user_name)}\n[/quote]\n"},
   )
 
   module SearchMethods
@@ -183,6 +183,14 @@ class Comment < ApplicationRecord
     super + [:creator_name, :updater_name]
   end
 
+  def creator_name
+    creator.name
+  end
+
+  def updater_name
+    updater.name
+  end
+
   def delete!
     update(is_deleted: true)
   end
@@ -192,6 +200,6 @@ class Comment < ApplicationRecord
   end
 
   def quoted_response
-    DText.quote(body, creator_name)
+    DText.quote(body, creator.name)
   end
 end

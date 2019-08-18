@@ -135,6 +135,10 @@ module PostSets
         else
           temp = ::Post.tag_match(tag_string).where("true /* PostSets::Post#posts:2 */").paginate(page, :count => post_count, :limit => per_page)
         end
+
+        # XXX HACK: uploader_name is needed in api responses and in data-uploader attribs (visible to mods only).
+        temp = temp.includes(:uploader) if format.to_sym != :html || CurrentUser.is_moderator?
+
         temp.each # hack to force rails to eager load
         temp
       end

@@ -9,10 +9,10 @@ class UserFeedback < ApplicationRecord
   validate :user_is_not_creator
   after_create :create_dmail, unless: :disable_dmail_notification
   after_update(:if => ->(rec) { CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log(%{#{CurrentUser.name} updated user feedback for "#{rec.user_name}":/users/#{rec.user_id}},:user_feedback_update)
+    ModAction.log(%{#{CurrentUser.name} updated user feedback for "#{rec.user.name}":/users/#{rec.user_id}},:user_feedback_update)
   end
   after_destroy(:if => ->(rec) { CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log(%{#{CurrentUser.name} deleted user feedback for "#{rec.user_name}":/users/#{rec.user_id}},:user_feedback_delete)
+    ModAction.log(%{#{CurrentUser.name} deleted user feedback for "#{rec.user.name}":/users/#{rec.user_id}},:user_feedback_delete)
   end
 
   module SearchMethods
@@ -76,12 +76,8 @@ class UserFeedback < ApplicationRecord
 
   extend SearchMethods
 
-  def user_name
-    User.id_to_name(user_id)
-  end
-
   def user_name=(name)
-    self.user_id = User.name_to_id(name)
+    self.user = User.find_by_name(name)
   end
 
   def disclaimer
@@ -89,11 +85,11 @@ class UserFeedback < ApplicationRecord
       return nil
     end
 
-    "The purpose of feedback is to help you become a valuable member of the site by highlighting adverse behaviors. The author, #{creator_name}, should have sent you a message in the recent past as a warning. The fact that you're receiving this feedback now implies you've ignored their advice.\n\nYou can protest this feedback by petitioning the mods and admins in the forum. If #{creator_name} fails to provide sufficient evidence, you can have the feedback removed. However, if you fail to defend yourself against the accusations, you will likely earn yourself another negative feedback.\n\nNegative feedback generally doesn't affect your usability of the site. But it does mean other users may trust you less and give you less benefit of the doubt.\n\n"
+    "The purpose of feedback is to help you become a valuable member of the site by highlighting adverse behaviors. The author, #{creator.name}, should have sent you a message in the recent past as a warning. The fact that you're receiving this feedback now implies you've ignored their advice.\n\nYou can protest this feedback by petitioning the mods and admins in the forum. If #{creator.name} fails to provide sufficient evidence, you can have the feedback removed. However, if you fail to defend yourself against the accusations, you will likely earn yourself another negative feedback.\n\nNegative feedback generally doesn't affect your usability of the site. But it does mean other users may trust you less and give you less benefit of the doubt.\n\n"
   end
 
   def create_dmail
-    body = %{#{disclaimer}@#{creator_name} created a "#{category} record":/user_feedbacks?search[user_id]=#{user_id} for your account:\n\n#{self.body}}
+    body = %{#{disclaimer}@#{creator.name} created a "#{category} record":/user_feedbacks?search[user_id]=#{user_id} for your account:\n\n#{self.body}}
     Dmail.create_automated(:to_id => user_id, :title => "Your user record has been updated", :body => body)
   end
 

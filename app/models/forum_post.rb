@@ -26,8 +26,8 @@ class ForumPost < ApplicationRecord
   end
   mentionable(
     :message_field => :body, 
-    :title => ->(user_name) {%{#{creator_name} mentioned you in topic ##{topic_id} (#{topic.title})}},
-    :body => ->(user_name) {%{@#{creator_name} mentioned you in topic ##{topic_id} ("#{topic.title}":[/forum_topics/#{topic_id}?page=#{forum_topic_page}]):\n\n[quote]\n#{DText.excerpt(body, "@"+user_name)}\n[/quote]\n}},
+    :title => ->(user_name) {%{#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})}},
+    :body => ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[/forum_topics/#{topic_id}?page=#{forum_topic_page}]):\n\n[quote]\n#{DText.excerpt(body, "@"+user_name)}\n[/quote]\n}},
   )
 
   module SearchMethods
@@ -209,16 +209,8 @@ class ForumPost < ApplicationRecord
     self.is_deleted = false if is_deleted.nil?
   end
 
-  def creator_name
-    User.id_to_name(creator_id)
-  end
-
-  def updater_name
-    User.id_to_name(updater_id)
-  end
-
   def quoted_response
-    DText.quote(body, creator_name)
+    DText.quote(body, creator.name)
   end
 
   def forum_topic_page

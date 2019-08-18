@@ -148,7 +148,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       context "with search parameters" do
         should "render" do
           search_params = {
-            uploader_name: @upload.uploader_name,
+            uploader_name: @upload.uploader.name,
             source_matches: @upload.source,
             rating: @upload.rating,
             has_post: "yes",

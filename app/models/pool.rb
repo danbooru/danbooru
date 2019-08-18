@@ -289,6 +289,10 @@ class Pool < ApplicationRecord
     super + [:creator_name, :post_count]
   end
 
+  def creator_name
+    creator.name
+  end
+
   def update_category_pseudo_tags_for_posts_async
     if saved_change_to_category?
       UpdatePoolPseudoTagsJob.perform_later(self)

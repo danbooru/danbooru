@@ -1793,7 +1793,7 @@ class PostTest < ActiveSupport::TestCase
         post.uploader_id = user2.id
         assert_equal(user2.id, post.uploader_id)
         assert_equal(user2.id, post.uploader_id)
-        assert_equal(user2.name, post.uploader_name)
+        assert_equal(user2.name, post.uploader.name)
       end
 
       context "tag post counts" do
