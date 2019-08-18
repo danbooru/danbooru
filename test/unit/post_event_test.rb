@@ -4,7 +4,7 @@ class PostEventTest < ActiveSupport::TestCase
   def setup
     super
 
-    Timecop.travel(2.weeks.ago) do
+    travel_to(2.weeks.ago) do
       CurrentUser.user = FactoryBot.create(:user)
       CurrentUser.ip_addr = "127.0.0.1"
     end

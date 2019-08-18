@@ -8,7 +8,7 @@ class PostPrunerTest < ActiveSupport::TestCase
     CurrentUser.user = @user
     CurrentUser.ip_addr = "127.0.0.1"
 
-    Timecop.travel(2.weeks.ago) do
+    travel_to(2.weeks.ago) do
       @flagger = FactoryBot.create(:gold_user)
     end
     @old_post = FactoryBot.create(:post, :created_at => 5.days.ago, :is_pending => true)

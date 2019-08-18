@@ -10,10 +10,10 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
       setup do        
         @user.as_current do
           @post = create(:post)
-          travel_to(2.hours.from_now) do
+          travel(2.hours) do
             @post.update(:tag_string => "1 2", :source => "xxx")
           end
-          travel_to(4.hours.from_now) do
+          travel(4.hours) do
             @post.update(:tag_string => "2 3", :rating => "e")
           end
           @versions = @post.versions

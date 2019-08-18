@@ -80,7 +80,7 @@ class ForumPostTest < ActiveSupport::TestCase
         9.times do
           @posts << FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
         end
-        Timecop.travel(2.seconds.from_now) do
+        travel(2.seconds) do
           @posts << FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
         end
       end
@@ -135,7 +135,7 @@ class ForumPostTest < ActiveSupport::TestCase
 
     should "update the topic when created" do
       @original_topic_updated_at = @topic.updated_at
-      Timecop.travel(1.second.from_now) do
+      travel(1.second) do
         post = FactoryBot.create(:forum_post, :topic_id => @topic.id)
       end
       @topic.reload
@@ -149,14 +149,14 @@ class ForumPostTest < ActiveSupport::TestCase
       end
       
       # updating the original post
-      Timecop.travel(1.second.from_now) do
+      travel(1.second) do
         posts.first.update_attributes(:body => "xxx")
       end
       @topic.reload
       assert_equal(posts.first.updated_at.to_s, @topic.updated_at.to_s)
 
       # updating a non-original post
-      Timecop.travel(2.seconds.from_now) do
+      travel(2.seconds) do
         posts.last.update_attributes(:body => "xxx")
       end
       assert_equal(posts.first.updated_at.to_s, @topic.updated_at.to_s)

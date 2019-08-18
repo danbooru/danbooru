@@ -18,7 +18,7 @@ class PostTest < ActiveSupport::TestCase
   def setup
     super
 
-    Timecop.travel(2.weeks.ago) do
+    travel_to(2.weeks.ago) do
       @user = FactoryBot.create(:user)
     end
     CurrentUser.user = @user
@@ -1278,7 +1278,7 @@ class PostTest < ActiveSupport::TestCase
 
         should "create a new version if it's been over an hour since the last update" do
           post = FactoryBot.create(:post)
-          Timecop.travel(6.hours.from_now) do
+          travel(6.hours) do
             assert_difference("PostArchive.count", 1) do
               post.update_attributes(:tag_string => "zzz")
             end
@@ -2660,7 +2660,7 @@ class PostTest < ActiveSupport::TestCase
     context "a post that is rating locked" do
       setup do
         @post = FactoryBot.create(:post, :rating => "s")
-        Timecop.travel(2.hours.from_now) do
+        travel(2.hours) do
           @post.update(rating: "q", is_rating_locked: true)
         end
       end

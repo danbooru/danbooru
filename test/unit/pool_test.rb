@@ -4,7 +4,7 @@ require 'test_helper'
 
 class PoolTest < ActiveSupport::TestCase
   setup do
-    Timecop.travel(1.month.ago) do
+    travel_to(1.month.ago) do
       @user = FactoryBot.create(:user)
       CurrentUser.user = @user
     end
@@ -281,7 +281,7 @@ class PoolTest < ActiveSupport::TestCase
 
     should "create new versions for each distinct user" do
       assert_equal(1, @pool.versions.size)
-      user2 = Timecop.travel(1.month.ago) {FactoryBot.create(:user)}
+      user2 = travel_to(1.month.ago) {FactoryBot.create(:user)}
 
       CurrentUser.scoped(user2, "127.0.0.2") do
         @pool.post_ids = [@p1.id]

@@ -76,10 +76,10 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     context "revert action" do
       setup do
         as_user do
-          travel_to(1.day.from_now) do
+          travel(1.day) do
             @note.update(:body => "111")
           end
-          travel_to(2.days.from_now) do
+          travel(2.days) do
             @note.update(:body => "222")
           end
         end

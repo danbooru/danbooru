@@ -49,7 +49,7 @@ class PostApprovalTest < ActiveSupport::TestCase
           @post.approve!(@approver2)
           assert_not_equal(@approver.id, @post.approver_id)
           CurrentUser.user = @user3
-          travel_to(PostFlag::COOLDOWN_PERIOD.from_now + 1.minute) do
+          travel(PostFlag::COOLDOWN_PERIOD + 1.minute) do
             @post.flag!("blah blah")
           end
 

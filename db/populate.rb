@@ -1,5 +1,4 @@
 require 'set'
-require 'timecop'
 
 CurrentUser.ip_addr = "127.0.0.1"
 Delayed::Worker.delay_jobs = false
@@ -40,7 +39,7 @@ end
 if User.count == 0
   puts "Creating users"
 
-  Timecop.travel(1.month.ago) do
+  begin
     user = User.create(
       :name => "admin",
       :password => "password1",

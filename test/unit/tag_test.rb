@@ -16,7 +16,7 @@ class TagTest < ActiveSupport::TestCase
     setup do
       Tag.stubs(:trending_count_limit).returns(0)
 
-      Timecop.travel(1.week.ago) do
+      travel_to(1.week.ago) do
         FactoryBot.create(:post, :tag_string => "aaa")
         FactoryBot.create(:post, :tag_string => "bbb")
       end

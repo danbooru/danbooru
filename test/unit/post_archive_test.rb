@@ -5,7 +5,7 @@ class PostArchiveTest < ActiveSupport::TestCase
 
   context "A post" do
     setup do
-      Timecop.travel(1.month.ago) do
+      travel_to(1.month.ago) do
         @user = FactoryBot.create(:user)
       end
       CurrentUser.user = @user

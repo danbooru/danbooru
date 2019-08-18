@@ -391,7 +391,6 @@ GEM
     thor (0.19.4)
     thread_safe (0.3.6)
     tilt (2.0.9)
-    timecop (0.9.1)
     tins (1.21.1)
     twitter (6.2.0)
       addressable (~> 2.3)
@@ -510,7 +509,6 @@ DEPENDENCIES
   streamio-ffmpeg
   stripe
   term-ansicolor
-  timecop
   twitter
   unicorn
   unicorn-worker-killer

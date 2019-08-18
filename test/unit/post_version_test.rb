@@ -3,7 +3,7 @@ require 'test_helper'
 class PostVersionTest < ActiveSupport::TestCase
   context "A post" do
     setup do
-      Timecop.travel(1.month.ago) do
+      travel_to(1.month.ago) do
         @user = FactoryBot.create(:user)
       end
       CurrentUser.user = @user
@@ -68,7 +68,7 @@ class PostVersionTest < ActiveSupport::TestCase
     context "that has been updated" do
       setup do
         PostArchive.sqs_service.stubs(:merge?).returns(false)
-        Timecop.travel(1.minute.ago) do
+        travel_to(1.minute.ago) do
           @post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
         end
         @post.update_attributes(:tag_string => "bbb ccc xxx", :source => "")

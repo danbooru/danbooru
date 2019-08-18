@@ -139,7 +139,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
       should "update an artist" do
         old_timestamp = @wiki_page.updated_at
-        travel_to(1.minute.from_now) do
+        travel(1.minute) do
           put_auth artist_path(@artist.id), @user, params: {artist: {notes: "rex", url_string: "http://example.com\nhttp://monet.com"}}
         end
         @artist.reload
@@ -153,7 +153,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         old_timestamp = @wiki_page.updated_at
         old_updater_id = @wiki_page.updater_id
 
-        travel_to(1.minutes.from_now) do
+        travel(1.minute) do
           as(@another_user) do
             @artist.update(notes: "testing")
           end

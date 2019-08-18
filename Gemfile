@@ -87,7 +87,6 @@ group :test do
   gem "mocha", :require => "mocha/setup"
   gem "ffaker"
   gem "simplecov", :require => false
-  gem "timecop"
   gem "webmock"
   gem "minitest-ci"
   gem "mock_redis"

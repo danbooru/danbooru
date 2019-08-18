@@ -19,7 +19,7 @@ class ArtistTest < ActiveSupport::TestCase
 
   context "An artist" do
     setup do
-      user = Timecop.travel(1.month.ago) {FactoryBot.create(:user)}
+      user = travel_to(1.month.ago) {FactoryBot.create(:user)}
       CurrentUser.user = user
       CurrentUser.ip_addr = "127.0.0.1"
     end
@@ -458,7 +458,7 @@ class ArtistTest < ActiveSupport::TestCase
 
       assert_difference("ArtistVersion.count") do
         artist.other_names = "xxx"
-        Timecop.travel(1.day.from_now) do
+        travel(1.day) do
           artist.save
         end
       end

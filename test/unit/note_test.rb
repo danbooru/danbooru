@@ -76,7 +76,7 @@ class NoteTest < ActiveSupport::TestCase
 
       should "create a version" do
         assert_difference("NoteVersion.count", 1) do
-          Timecop.travel(1.day.from_now) do
+          travel(1.day) do
             @note = FactoryBot.create(:note, :post => @post)
           end
         end
@@ -135,7 +135,7 @@ class NoteTest < ActiveSupport::TestCase
 
       should "create a version" do
         assert_difference("NoteVersion.count", 1) do
-          Timecop.travel(1.day.from_now) do
+          travel(1.day) do
             @note.update_attributes(:body => "fafafa")
           end
         end
@@ -181,7 +181,7 @@ class NoteTest < ActiveSupport::TestCase
           assert_equal(2, NoteVersion.count)
           assert_equal([1, 2], @note.versions.map(&:version))
           assert_equal([@user.id, @vandal.id], @note.versions.map(&:updater_id))
-          Timecop.travel(1.day.from_now) do
+          travel(1.day) do
             Note.undo_changes_by_user(@vandal.id)
           end
           @note.reload

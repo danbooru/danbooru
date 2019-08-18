@@ -5,7 +5,7 @@ class TagAliasTest < ActiveSupport::TestCase
     setup do
       @admin = FactoryBot.create(:admin_user)
 
-      Timecop.travel(1.month.ago) do
+      travel_to(1.month.ago) do
         user = FactoryBot.create(:user)
         CurrentUser.user = user
       end

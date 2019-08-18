@@ -31,7 +31,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           @post.reload
         end
 
-        travel_to(Time.now + PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
+        travel(PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
           Delayed::Worker.new.work_off
         end
 

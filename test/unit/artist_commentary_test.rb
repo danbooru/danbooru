@@ -71,7 +71,7 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
       end
 
       should "create a new version if outside merge window" do
-        travel_to(2.hours.from_now) do
+        travel(2.hours) do
           @artcomm.update(original_title: "bar")
 
           assert_equal(2, @post.artist_commentary.versions.size)
