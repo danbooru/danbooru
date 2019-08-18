@@ -1,6 +1,8 @@
 import Utility from './utility'
 
 let Note = {
+  HIDE_DELAY: 250,
+
   Box: {
     create: function(id) {
       var $inner_border = $('<div/>');
@@ -264,7 +266,7 @@ let Note = {
 
     hide: function(id) {
       var $note_body = Note.Body.find(id);
-      Note.timeouts.push($.timeout(250).done(function() {$note_body.hide();}));
+      Note.timeouts.push(setTimeout(() => $note_body.hide(), Note.HIDE_DELAY));
     },
 
     hide_all: function() {
@@ -762,10 +764,7 @@ let Note = {
   },
 
   clear_timeouts: function() {
-    $.each(Note.timeouts, function(i, v) {
-      v.clear();
-    });
-
+    Note.timeouts.forEach(clearTimeout);
     Note.timeouts = [];
   },
 
