@@ -6,7 +6,9 @@
   &ndash; <%= link_to "Rules", terms_of_service_path %>
   &ndash; <%= link_to "Contact", contact_path %>
   <% if CurrentUser.user.enable_post_navigation %>
-    &ndash; <%= link_to "Keyboard shortcuts available", keyboard_shortcuts_path %>
+    <span id="keyboard-shortcuts-link">
+      &ndash; <%= link_to "Keyboard shortcuts", keyboard_shortcuts_path %>
+    </span>
   <% end %>
   <% if CurrentUser.is_member? %>
     <span id="desktop-version-link">

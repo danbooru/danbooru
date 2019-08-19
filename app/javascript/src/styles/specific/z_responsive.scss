@@ -9,6 +9,10 @@
 }
 
 @media screen and (max-width: 660px) {
+  #keyboard-shortcuts-link {
+    display: none;
+  }
+
   #desktop-version-link {
     display: inline;
   }
