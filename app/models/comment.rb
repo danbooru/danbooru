@@ -48,14 +48,7 @@ class Comment < ApplicationRecord
         q = q.post_tags_match(params[:post_tags_match])
       end
 
-      if params[:creator_name].present?
-        q = q.for_creator_name(params[:creator_name])
-      end
-
-      if params[:creator_id].present?
-        q = q.for_creator(params[:creator_id].to_i)
-      end
-
+      q = q.search_user_attribute(:creator, params)
       q = q.attribute_matches(:is_deleted, params[:is_deleted])
       q = q.attribute_matches(:is_sticky, params[:is_sticky])
       q = q.attribute_matches(:do_not_bump_post, params[:do_not_bump_post])

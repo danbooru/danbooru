@@ -109,6 +109,18 @@ class ApplicationRecord < ActiveRecord::Base
         end
       end
 
+      def search_user_attribute(attr, params)
+        if params["#{attr}_id"]
+          numeric_attribute_matches("#{attr}_id", params["#{attr}_id"])
+        elsif params["#{attr}_name"]
+          where(attr => User.search(name_matches: params["#{attr}_name"]).reorder(nil))
+        elsif params[attr]
+          where(attr => User.search(params[attr]).reorder(nil))
+        else
+          all
+        end
+      end
+
       def apply_default_order(params)
         if params[:order] == "custom"
           parse_ids = Tag.parse_helper(params[:id])

@@ -181,13 +181,7 @@ class Upload < ApplicationRecord
     def search(params)
       q = super
 
-      if params[:uploader_id].present?
-        q = q.attribute_matches(:uploader_id, params[:uploader_id])
-      end
-
-      if params[:uploader_name].present?
-        q = q.where(uploader_id: User.name_to_id(params[:uploader_name]))
-      end
+      q = q.search_user_attribute(:uploader, params)
 
       if params[:source].present?
         q = q.where(source: params[:source])

@@ -9,10 +9,6 @@ class WikiPageVersion < ApplicationRecord
     def search(params)
       q = super
 
-      if params[:updater_id].present?
-        q = q.for_user(params[:updater_id].to_i)
-      end
-
       if params[:wiki_page_id].present?
         q = q.where("wiki_page_id = ?", params[:wiki_page_id].to_i)
       end
@@ -21,6 +17,7 @@ class WikiPageVersion < ApplicationRecord
       q = q.attribute_matches(:body, params[:body])
       q = q.attribute_matches(:is_locked, params[:is_locked])
       q = q.attribute_matches(:is_deleted, params[:is_deleted])
+      q = q.search_user_attribute(:updater, params)
 
       q.apply_default_order(params)
     end

@@ -33,14 +33,7 @@ class PostReplacement < ApplicationRecord
         q = q.attribute_matches(:file_ext, params[:file_ext])
         q = q.attribute_matches(:md5_was, params[:md5_was])
         q = q.attribute_matches(:md5, params[:md5])
-
-        if params[:creator_id].present?
-          q = q.where(creator_id: params[:creator_id].split(",").map(&:to_i))
-        end
-
-        if params[:creator_name].present?
-          q = q.where(creator_id: User.name_to_id(params[:creator_name]))
-        end
+        q = q.search_user_attribute(:creator, params)
 
         if params[:post_id].present?
           q = q.where(post_id: params[:post_id].split(",").map(&:to_i))

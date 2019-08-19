@@ -710,18 +710,14 @@ class User < ApplicationRecord
 
       q = q.search_text_attribute(:name, params)
       q = q.attribute_matches(:level, params[:level])
-      q = q.attribute_matches(:inviter_id, params[:inviter_id])
       q = q.attribute_matches(:post_upload_count, params[:post_upload_count])
       q = q.attribute_matches(:post_update_count, params[:post_update_count])
       q = q.attribute_matches(:note_update_count, params[:note_update_count])
       q = q.attribute_matches(:favorite_count, params[:favorite_count])
+      q = q.search_user_attribute(:inviter, params)
 
       if params[:name_matches].present?
         q = q.where_ilike(:name, normalize_name(params[:name_matches]))
-      end
-
-      if params[:inviter].present?
-        q = q.where(inviter_id: search(params[:inviter]))
       end
 
       if params[:min_level].present?

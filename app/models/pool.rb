@@ -62,14 +62,7 @@ class Pool < ApplicationRecord
       end
 
       q = q.attribute_matches(:description, params[:description_matches])
-
-      if params[:creator_name].present?
-        q = q.where("pools.creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].tr(" ", "_").mb_chars.downcase)
-      end
-
-      if params[:creator_id].present?
-        q = q.where(creator_id: params[:creator_id].split(",").map(&:to_i))
-      end
+      q = q.search_user_attribute(:creator, params)
 
       if params[:category] == "series"
         q = q.series

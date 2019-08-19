@@ -45,22 +45,8 @@ class UserFeedback < ApplicationRecord
       q = super
 
       q = q.attribute_matches(:body, params[:body_matches])
-
-      if params[:user_id].present?
-        q = q.for_user(params[:user_id].to_i)
-      end
-
-      if params[:user_name].present?
-        q = q.where("user_id = (select _.id from users _ where lower(_.name) = ?)", params[:user_name].mb_chars.downcase.strip.tr(" ", "_"))
-      end
-
-      if params[:creator_id].present?
-         q = q.where("creator_id = ?", params[:creator_id].to_i)
-      end
-
-      if params[:creator_name].present?
-        q = q.where("creator_id = (select _.id from users _ where lower(_.name) = ?)", params[:creator_name].mb_chars.downcase.strip.tr(" ", "_"))
-      end
+      q = q.search_user_attribute(:user, params)
+      q = q.search_user_attribute(:creator, params)
 
       if params[:category].present?
         q = q.where("category = ?", params[:category])

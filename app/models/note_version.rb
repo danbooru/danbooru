@@ -4,10 +4,6 @@ class NoteVersion < ApplicationRecord
   def self.search(params)
     q = super
 
-    if params[:updater_id]
-      q = q.where(updater_id: params[:updater_id].split(",").map(&:to_i))
-    end
-
     if params[:post_id]
       q = q.where(post_id: params[:post_id].split(",").map(&:to_i))
     end
@@ -18,6 +14,7 @@ class NoteVersion < ApplicationRecord
 
     q = q.attribute_matches(:is_active, params[:is_active])
     q = q.attribute_matches(:body, params[:body_matches])
+    q = q.search_user_attribute(:updater, params)
 
     q.apply_default_order(params)
   end

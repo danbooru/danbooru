@@ -9,15 +9,7 @@ class JanitorTrial < ApplicationRecord
 
   def self.search(params)
     q = super.where(status: "active")
-
-    if params[:user_name]
-      q = q.where("user_id = (select _.id from users _ where lower(_.name) = ?)", params[:user_name].mb_chars.downcase)
-    end
-
-    if params[:user_id]
-      q = q.where("user_id = ?", params[:user_id].to_i)
-    end
-
+    q = q.search_user_attribute(:user, params)
     q.apply_default_order(params)
   end
 

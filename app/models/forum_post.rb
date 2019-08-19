@@ -48,9 +48,7 @@ class ForumPost < ApplicationRecord
       q = super
       q = q.permitted
 
-      if params[:creator_id].present?
-        q = q.where("forum_posts.creator_id = ?", params[:creator_id].to_i)
-      end
+      q = q.search_user_attribute(:creator, params)
 
       if params[:topic_id].present?
         q = q.where("forum_posts.topic_id = ?", params[:topic_id].to_i)
@@ -61,10 +59,6 @@ class ForumPost < ApplicationRecord
       end
 
       q = q.attribute_matches(:body, params[:body_matches], index_column: :text_index)
-
-      if params[:creator_name].present?
-        q = q.creator_name(params[:creator_name].tr(" ", "_"))
-      end
 
       if params[:topic_category_id].present?
         q = q.joins(:topic).where("forum_topics.category_id = ?", params[:topic_category_id].to_i)

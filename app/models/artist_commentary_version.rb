@@ -4,10 +4,7 @@ class ArtistCommentaryVersion < ApplicationRecord
 
   def self.search(params)
     q = super
-
-    if params[:updater_id]
-      q = q.where("updater_id = ?", params[:updater_id].to_i)
-    end
+    q = q.search_user_attribute(:updater, params)
 
     if params[:post_id]
       q = q.where("post_id = ?", params[:post_id].to_i)

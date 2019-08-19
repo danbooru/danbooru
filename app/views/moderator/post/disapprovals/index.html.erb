@@ -3,7 +3,7 @@
     <h1>Disapprovals</h1>
 
     <%= simple_form_for(:search, url: moderator_post_disapprovals_path, method: :get, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
-      <%= f.input :creator_name, label: "Creator", input_html: { value: params[:search][:creator_name] } %>
+      <%= f.input :user_name, label: "Creator", input_html: { value: params[:search][:user_name] } %>
       <%= f.input :post_id, label: "Post ID", input_html: { value: params[:search][:post_id] } %>
       <%= f.input :post_tags_match, label: "Tags", input_html: { value: params[:search][:post_tags_match], data: { autocomplete: "tag-query" } } %>
       <%= f.input :message_matches, label: "Message", input_html: { value: params[:search][:message_matches] } %>

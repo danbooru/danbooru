@@ -40,13 +40,12 @@ class PostApproval < ApplicationRecord
 
       def search(params)
         q = super
-        params[:user_id] = User.name_to_id(params[:user_name]) if params[:user_name]
 
         if params[:post_tags_match].present?
           q = q.post_tags_match(params[:post_tags_match])
         end
 
-        q = q.attribute_matches(:user_id, params[:user_id])
+        q = q.search_user_attribute(:user, params)
         q = q.attribute_matches(:post_id, params[:post_id])
 
         q.apply_default_order(params)

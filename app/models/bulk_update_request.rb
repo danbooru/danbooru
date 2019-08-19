@@ -30,21 +30,8 @@ class BulkUpdateRequest < ApplicationRecord
     def search(params = {})
       q = super
 
-      if params[:user_name].present?
-        q = q.where(user_id: User.name_to_id(params[:user_name]))
-      end
-
-      if params[:user_id].present?
-        q = q.where(user_id: params[:user_id].split(",").map(&:to_i))
-      end
-
-      if params[:approver_name].present?
-        q = q.where(approver_id: User.name_to_id(params[:approver_name]))
-      end
-
-      if params[:approver_id].present?
-        q = q.where(approver_id: params[:approver_id].split(",").map(&:to_i))
-      end
+      q = q.search_user_attribute(:user, params)
+      q = q.search_user_attribute(:approver, params)
 
       if params[:forum_topic_id].present?
         q = q.where(forum_topic_id: params[:forum_topic_id].split(",").map(&:to_i))

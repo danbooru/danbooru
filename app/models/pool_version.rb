@@ -12,13 +12,7 @@ class PoolVersion < ApplicationRecord
     def search(params)
       q = super
 
-      if params[:updater_id].present?
-        q = q.for_user(params[:updater_id].to_i)
-      end
-
-      if params[:updater_name].present?
-        q = q.where("updater_id = (select _.id from users _ where lower(_.name) = ?)", params[:updater_name].mb_chars.downcase)
-      end
+      q = q.search_user_attribute(:updater, params)
 
       if params[:pool_id].present?
         q = q.where("pool_id = ?", params[:pool_id].to_i)

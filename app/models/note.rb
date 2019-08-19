@@ -25,6 +25,7 @@ class Note < ApplicationRecord
 
       q = q.attribute_matches(:body, params[:body_matches], index_column: :body_index)
       q = q.attribute_matches(:is_active, params[:is_active])
+      q = q.search_user_attribute(:creator, params)
 
       if params[:post_id].present?
         q = q.where(post_id: params[:post_id].split(",").map(&:to_i))
@@ -32,14 +33,6 @@ class Note < ApplicationRecord
 
       if params[:post_tags_match].present?
         q = q.post_tags_match(params[:post_tags_match])
-      end
-
-      if params[:creator_name].present?
-        q = q.creator_name(params[:creator_name].tr(" ", "_"))
-      end
-
-      if params[:creator_id].present?
-        q = q.where(creator_id: params[:creator_id].split(",").map(&:to_i))
       end
 
       q.apply_default_order(params)

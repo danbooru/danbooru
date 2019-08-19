@@ -143,22 +143,8 @@ class Dmail < ApplicationRecord
 
       q = q.attribute_matches(:title, params[:title_matches])
       q = q.attribute_matches(:body, params[:message_matches], index_column: :message_index)
-
-      if params[:to_name].present?
-        q = q.to_name_matches(params[:to_name])
-      end
-
-      if params[:to_id].present?
-        q = q.where("to_id = ?", params[:to_id].to_i)
-      end
-
-      if params[:from_name].present?
-        q = q.from_name_matches(params[:from_name])
-      end
-
-      if params[:from_id].present?
-        q = q.where("from_id = ?", params[:from_id].to_i)
-      end
+      q = q.search_user_attribute(:to, params)
+      q = q.search_user_attribute(:from, params)
 
       params[:is_spam] = false unless params[:is_spam].present?
       q = q.attribute_matches(:is_spam, params[:is_spam])
