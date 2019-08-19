@@ -37,11 +37,6 @@ class UserNameChangeRequestTest < ActiveSupport::TestCase
         assert_equal("abc", @requester.name)
       end
       
-      should "clear the user name cache" do
-        @change_request.approve!
-        assert_equal("abc", Cache.get("uin:#{@requester.id}"))
-      end
-      
       should "create feedback" do
         assert_difference("UserFeedback.count", 1) do
           @change_request.approve!
