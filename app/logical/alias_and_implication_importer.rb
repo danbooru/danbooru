@@ -89,7 +89,7 @@ class AliasAndImplicationImporter
         sum + TagImplication.new(antecedent_name: token[1], consequent_name: token[2]).estimate_update_count
 
       when :mass_update
-        sum + Moderator::TagBatchChange.new(token[1], token[2]).estimate_update_count
+        sum + TagBatchChangeJob.estimate_update_count(token[1], token[2])
 
       when :change_category
         sum + Tag.find_by_name(token[1]).try(:post_count) || 0
@@ -156,7 +156,7 @@ private
           tag_implication.reject!(update_topic: false)
 
         when :mass_update
-          Delayed::Job.enqueue(Moderator::TagBatchChange.new(token[1], token[2], CurrentUser.id, CurrentUser.ip_addr), :queue => "default")
+          TagBatchChangeJob.perform_later(token[1], token[2], CurrentUser.user, CurrentUser.ip_addr)
 
         when :change_category
           tag = Tag.find_by_name(token[1])

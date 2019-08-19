@@ -64,15 +64,17 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
     context "on approval" do
       setup do
+        @post = create(:post, tag_string: "foo aaa")
         @script = %q(
           create alias foo -> bar
           create implication bar -> baz
+          mass update aaa -> bbb
         )
 
         @bur = FactoryBot.create(:bulk_update_request, :script => @script)
         @bur.approve!(@admin)
 
-        assert_enqueued_jobs(2)
+        assert_enqueued_jobs(3)
         workoff_active_jobs
 
         @ta = TagAlias.where(:antecedent_name => "foo", :consequent_name => "bar").first
@@ -90,6 +92,10 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       should "create aliases/implications" do
         assert_equal("active", @ta.status)
         assert_equal("active", @ti.status)
+      end
+
+      should "process mass updates" do
+        assert_equal("bar baz bbb", @post.reload.tag_string)
       end
 
       should "set the alias/implication approvers" do
