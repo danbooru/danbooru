@@ -146,6 +146,9 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
           get posts_path, params: { random: "1" }
           assert_response :success
+
+          get posts_path(format: :json), params: { random: "1" }
+          assert_response :success
         end
       end
     end
