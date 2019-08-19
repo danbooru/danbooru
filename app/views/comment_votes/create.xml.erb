@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<% if @comment_vote.errors.any? %>
-  <response success="false"><%= @comment_vote.errors.full_messages.to_json.html_safe %></response>
-<% else %>
-  <response success="true"/>
-<% end %>

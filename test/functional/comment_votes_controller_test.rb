@@ -17,18 +17,24 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
     context "#create.json" do
       should "create a vote" do
         assert_difference("CommentVote.count", 1) do
-          post_auth comment_votes_path(comment_id: @comment.id, format: "json"), @user
+          post_auth comment_votes_path(comment_id: @comment.id, score: "down", format: "json"), @user
           assert_response :success
-          assert_equal("{\"success\": true}", @response.body.strip)
+
+          comment = JSON.parse(@response.body)
+          assert_equal(@comment.id, comment["id"])
+          assert_equal(-1, comment["score"])
         end
       end
 
       should "fail silently on errors" do
         create(:comment_vote, comment: @comment, score: -1)
         assert_difference("CommentVote.count", 0) do
-          post_auth comment_votes_path(comment_id: @comment.id, score: "-1", format: "json"), @user
+          post_auth comment_votes_path(comment_id: @comment.id, score: "down", format: "json"), @user
           assert_response 422
-          assert_equal("{\"success\": false, \"errors\": \"Validation failed: You have already voted for this comment\"}", @response.body.strip)
+
+          comment = JSON.parse(@response.body)
+          assert_equal(false, comment["success"])
+          assert_equal("Validation failed: You have already voted for this comment", comment["message"])
         end
       end
     end
@@ -36,7 +42,7 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
     context "#create.js" do
       should "create a vote" do
         assert_difference("CommentVote.count", 1) do
-          post_auth comment_votes_path(comment_id: @comment.id, format: "json", score: 1), @user
+          post_auth comment_votes_path(comment_id: @comment.id, format: "json", score: "down"), @user
           assert_response :success
         end
       end
@@ -44,7 +50,7 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
       should "fail on errors" do
         create(:comment_vote, :comment => @comment, :score => -1)
         assert_difference("CommentVote.count", 0) do
-          post_auth comment_votes_path(comment_id: @comment.id, :score => -1, format: "js"), @user
+          post_auth comment_votes_path(comment_id: @comment.id, :score => "down", format: "js"), @user
           assert_response 422
         end
       end

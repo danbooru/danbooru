@@ -1,7 +1,0 @@
-<% if @error %>
-  {"success": false, "errors": <%= @error.to_s.to_json.html_safe %>}
-<% elsif @comment_vote.errors.any? %>
-  {"success": false, "errors": <%= @comment_vote.errors.full_messages.to_json.html_safe %>}
-<% else %>
-  {"success": true}
-<% end %>
