@@ -167,12 +167,12 @@ class Comment < ApplicationRecord
     end
   end
 
-  def below_threshold?(user = CurrentUser.user)
-    score < user.comment_threshold
-  end
-
   def editable_by?(user)
     creator_id == user.id || user.is_moderator?
+  end
+
+  def voted_by?(user)
+    user.id.in?(votes.map(&:user_id))
   end
 
   def hidden_attributes

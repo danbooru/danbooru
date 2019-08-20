@@ -1,3 +1,2 @@
-$("#comment-vote-up-link-for-<%= @comment.id %>").show();
-$("#comment-vote-down-link-for-<%= @comment.id %>").show();
-$("#comment-unvote-link-for-<%= @comment.id %>").hide();
+Danbooru.Utility.notice("Removed vote");
+$(".comment[data-id=<%= @comment.id %>]").attr("data-is-voted", "false");

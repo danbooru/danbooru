@@ -15,6 +15,26 @@ div.comments-for-post {
         background: $menu_color;
       }
 
+      &[data-is-voted="true"] {
+        .comment-vote-up-link, .comment-vote-down-link {
+          display: none;
+        }
+      }
+
+      &[data-is-voted="false"] {
+        .comment-unvote-link {
+          display: none;
+        }
+      }
+
+      &[data-below-threshold="true"][data-is-sticky="false"] {
+        opacity: 0.3;
+
+        &:hover {
+          opacity: 1.0;
+        }
+      }
+
       div.author {
         width: 12em;
         float: left;
@@ -37,14 +57,6 @@ div.comments-for-post {
           }
         }
       }
-    }
-
-    article.comment.below-threshold:not([data-is-sticky="true"]) {
-      opacity: 0.3;
-    }
-
-    article.comment.below-threshold:hover {
-      opacity: 1.0;
     }
   }
 }

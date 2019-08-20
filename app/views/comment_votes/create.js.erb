@@ -1,7 +1,2 @@
-<% if @comment_vote.is_negative? %>
-  $(".comment[data-comment-id=<%= @comment.id %>]").remove();
-<% end %>
-
-$("#comment-vote-up-link-for-<%= @comment.id %>").hide();
-$("#comment-vote-down-link-for-<%= @comment.id %>").hide();
-$("#comment-unvote-link-for-<%= @comment.id %>").show();
+Danbooru.Utility.notice("Vote saved");
+$(".comment[data-id=<%= @comment.id %>]").attr("data-is-voted", "true");
