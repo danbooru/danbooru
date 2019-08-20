@@ -1,8 +1,8 @@
 <%= simple_form_for(@artist) do |f| %>
   <% if @artist.new_record? %>
-    <%= f.input :name, input_html: { data: { autocomplete: "tag" } } %>
+    <%= f.input :name, as: :string, input_html: { data: { autocomplete: "tag" } } %>
   <% elsif CurrentUser.user.is_builder? %>
-    <%= f.input :name, input_html: { data: { autocomplete: "tag" } }, hint: "Change to rename this artist entry and its wiki page" %>
+    <%= f.input :name, as: :string, input_html: { data: { autocomplete: "tag" } }, hint: "Change to rename this artist entry and its wiki page" %>
   <% else %>
     <p><%= @artist.name %></p>
   <% end %>
