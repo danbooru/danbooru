@@ -22,26 +22,6 @@ class Comment < ApplicationRecord
   )
 
   module SearchMethods
-    def recent
-      reorder("comments.id desc").limit(6)
-    end
-
-    def hidden(user)
-      if user.is_moderator?
-        where("(score < ? and is_sticky = false) or is_deleted = true", user.comment_threshold)
-      else
-        where("score < ? and is_sticky = false", user.comment_threshold)
-      end
-    end
-
-    def visible(user)
-      if user.is_moderator?
-        where("(score >= ? or is_sticky = true) and is_deleted = false", user.comment_threshold)
-      else
-        where("score >= ? or is_sticky = true", user.comment_threshold)
-      end
-    end
-
     def deleted
       where("comments.is_deleted = true")
     end
@@ -172,7 +152,14 @@ class Comment < ApplicationRecord
   end
 
   def voted_by?(user)
+    return false if user.is_anonymous?
     user.id.in?(votes.map(&:user_id))
+  end
+
+  def visible_by?(user, show_thresholded: false, show_deleted: false)
+    return false if is_deleted? && !show_deleted && !user.is_moderator?
+    return false if score < user.comment_threshold && !is_sticky? && !show_thresholded
+    true
   end
 
   def hidden_attributes

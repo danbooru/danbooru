@@ -23,6 +23,10 @@ class PostsController < ApplicationController
   def show
     @post = Post.find(params[:id])
 
+    @comments = @post.last_commented_at.present? ? @post.comments : Comment.none
+    @comments = @comments.includes(:creator)
+    @comments = @comments.includes(:votes) if CurrentUser.is_member?
+
     include_deleted = @post.is_deleted? || (@post.parent_id.present? && @post.parent.is_deleted?) || CurrentUser.user.show_deleted_children?
     @parent_post_set = PostSets::PostRelationship.new(@post.parent_id, :include_deleted => include_deleted)
     @children_post_set = PostSets::PostRelationship.new(@post.id, :include_deleted => include_deleted)

@@ -5,19 +5,17 @@
     </div>
   <% end %>
 
-  <% if @posts.empty? %>
+  <% if @posts.blank? %>
     <%= render "post_sets/blank" %>
   <% end %>
 
-  <% @posts.select {|x| x.visible?}.each do |post| %>
-    <% if CurrentUser.is_moderator? || post.comments.undeleted.exists? %>
+  <% @posts.select(&:visible?).each do |post| %>
+    <% if post.comments.any? { |c| c.visible_by?(CurrentUser.user, show_thresholded: true) } %>
       <%= content_tag(:div, { id: "post_#{post.id}", class: ["post", *PostPresenter.preview_class(post)].join(" ") }.merge(PostPresenter.data_attributes(post))) do %>
         <div class="preview">
-          <% if post.visible? %>
-            <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>
-          <% end %>
+          <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>
         </div>
-        <%= render "comments/partials/index/list", :post => post, :comments => post.comments.visible(CurrentUser.user).recent.reverse, :show_header => true %>
+        <%= render "comments/partials/index/list", post: post, comments: post.comments.select { |c| c.visible_by?(CurrentUser.user) }.last(6), page: :comments %>
         <div class="clearfix"></div>
       <% end %>
     <% end %>

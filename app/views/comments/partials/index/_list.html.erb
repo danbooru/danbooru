@@ -1,10 +1,10 @@
 <div class="comments-for-post" data-post-id="<%= post.id %>">
-  <% if show_header %>
+  <% if page == :comments %>
     <%= render "comments/partials/index/header", :post => post %>
   <% end %>
 
   <div class="row notices">
-    <% if post.comments.hidden(CurrentUser.user).count > 0 || (params[:controller] == "comments" && post.comments.count > 6) %>
+    <% if (post.last_commented_at.present? && post.comments.any? { |c| !c.visible_by?(CurrentUser.user) }) || (page == :comments && post.comments.size > 6) %>
       <span class="info" id="threshold-comments-notice-for-<%= post.id %>">
         <%= link_to "Show all comments", comments_path(:post_id => post.id), :remote => true %>
       </span>
@@ -12,14 +12,12 @@
   </div>
 
   <div class="list-of-comments">
-    <% if comments.empty? %>
-      <% if post.last_commented_at.present? %>
-        <p>There are no visible comments.</p>
-      <% else %>
-        <p>There are no comments.</p>
-      <% end %>
+    <% if comments.present? %>
+      <%= render partial: "comments/partials/show/comment", collection: comments %>
+    <% elsif post.last_commented_at.present? %>
+      <p>There are no visible comments.</p>
     <% else %>
-      <%= render :partial => "comments/partials/show/comment", :collection => comments %>
+      <p>There are no comments.</p>
     <% end %>
   </div>
 
