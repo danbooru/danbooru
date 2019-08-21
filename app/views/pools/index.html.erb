@@ -21,7 +21,7 @@
                 <span class="inactive">(deleted)</span>
               <% end %>
 
-              <% if pool.post_count > CurrentUser.user.per_page %>
+              <% if pool.last_page > 1 %>
                 <%= link_to "page #{pool.last_page}", pool_path(pool, :page => pool.last_page), :class => "last-page" %>
               <% end %>
             </td>
