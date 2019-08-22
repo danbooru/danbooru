@@ -17,29 +17,31 @@ class DmailTest < ActiveSupport::TestCase
 
     context "spam" do
       setup do
-        Dmail.any_instance.stubs(:spam?).returns(true)
-        @recipient = FactoryBot.create(:user)
+        Dmail.any_instance.stubs(:spam?).returns(true) unless Danbooru.config.rakismet_key.present?
+
+        # viagra-test-123 is guaranteed to be flagged as spam.
+        # https://akismet.com/development/api/#detailed-docs
+        @spammer = create(:user, name: "viagra-test-123")
+        @recipient = create(:user)
       end
 
       should "not validate" do
         assert_difference("Dmail.count", 2)do
-          Dmail.create_split(:to_id => @recipient.id, :title => "My video", :body => "hey Noneeditsonlyme.  My webcam see here http://bit.ly/2vTv9Ki")
+          Dmail.create_split(from: @spammer, to: @recipient, title: "spam", body: "wonderful spam")
           assert(@recipient.dmails.last.is_spam?)
         end
       end
 
       should "autoban spammers after sending spam to N distinct users" do
-        Dmail.any_instance.expects(:spam?).returns(true)
-
-        users = FactoryBot.create_list(:user, Dmail::AUTOBAN_THRESHOLD)
+        users = create_list(:user, Dmail::AUTOBAN_THRESHOLD)
         users.each do |user|
-          Dmail.create_split(from: @user, to: user, title: "spam", body: "wonderful spam")
+          Dmail.create_split(from: @spammer, to: user, title: "spam", body: "wonderful spam")
         end
 
-        assert_equal(true, Dmail.is_spammer?(@user))
-        assert_equal(true, @user.reload.is_banned)
-        assert_equal(1, @user.bans.count)
-        assert_match(/Spambot./, @user.bans.last.reason)
+        assert_equal(true, Dmail.is_spammer?(@spammer))
+        assert_equal(true, @spammer.reload.is_banned)
+        assert_equal(1, @spammer.bans.count)
+        assert_match(/Spambot./, @spammer.bans.last.reason)
       end
     end
 

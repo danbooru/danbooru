@@ -20,7 +20,7 @@ class Dmail < ApplicationRecord
   after_create :update_recipient
   after_commit :send_email, on: :create
 
-  rakismet_attrs author: -> { from.name }, author_email: -> { from.email }, content: -> { title + "\n\n" + body }, user_ip: -> { creator_ip_addr.to_s }
+  rakismet_attrs author: proc { from.name }, author_email: proc { from.email }, content: proc { title + "\n\n" + body }, user_ip: proc { creator_ip_addr.to_s }
 
   concerning :SpamMethods do
     class_methods do
