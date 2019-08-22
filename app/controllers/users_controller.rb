@@ -15,12 +15,8 @@ class UsersController < ApplicationController
 
   def index
     if params[:name].present?
-      @user = User.find_by_name(params[:name])
-      if @user.nil?
-        raise "No user found with name: #{params[:name]}"
-      else
-        redirect_to user_path(@user)
-      end
+      @user = User.find_by_name!(params[:name])
+      redirect_to user_path(@user)
     else
       @users = User.search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
       respond_with(@users) do |format|
