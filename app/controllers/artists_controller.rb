@@ -83,7 +83,10 @@ class ArtistsController < ApplicationController
 
   def show_or_new
     @artist = Artist.find_by_name(params[:name])
-    if @artist
+
+    if params[:name].blank?
+      redirect_to new_artist_path(artist_params(:new))
+    elsif @artist.present?
       redirect_to artist_path(@artist)
     else
       @artist = Artist.new(name: params[:name])

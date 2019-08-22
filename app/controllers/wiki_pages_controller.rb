@@ -82,7 +82,10 @@ class WikiPagesController < ApplicationController
 
   def show_or_new
     @wiki_page = WikiPage.find_by_title(params[:title])
-    if @wiki_page
+
+    if params[:title].blank?
+      redirect_to new_wiki_page_path(wiki_page_params(:create))
+    elsif @wiki_page.present?
       redirect_to wiki_page_path(@wiki_page)
     else
       @wiki_page = WikiPage.new(:title => params[:title])
