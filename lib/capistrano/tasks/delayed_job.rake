@@ -35,6 +35,3 @@ namespace :delayed_job do
     end
   end
 end
-
-before "deploy:started", "delayed_job:stop"
-after "deploy:published", "delayed_job:start"

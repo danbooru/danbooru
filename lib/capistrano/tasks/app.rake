@@ -1,9 +1,6 @@
 namespace :app do
   set :rolling_deploy, false
 
-  before "deploy:migrate", "app:disable"
-  after "deploy:published", "app:enable"
-
   task :disable do
     if fetch(:rolling_deploy)
       # do nothing
@@ -30,3 +27,9 @@ namespace :deploy do
     invoke "deploy"
   end
 end
+
+before "deploy:migrate", "app:disable"
+after "deploy:published", "app:enable"
+
+before "app:disable", "delayed_job:stop"
+after "app:enable", "delayed_job:start"
