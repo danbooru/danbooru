@@ -8,7 +8,6 @@ module DanbooruMaintenance
   end
 
   def daily
-    ActiveRecord::Base.connection.execute("set statement_timeout = 0")
     PostPruner.new.prune!
     Upload.where('created_at < ?', 1.day.ago).delete_all
     Delayed::Job.where('created_at < ?', 45.days.ago).delete_all
@@ -25,7 +24,10 @@ module DanbooruMaintenance
     TagChangeRequestPruner.warn_all
     TagChangeRequestPruner.reject_all
     Ban.prune!
-    ActiveRecord::Base.connection.execute("vacuum analyze") unless Rails.env.test?
+
+    ApplicationRecord.without_timeout do
+      ActiveRecord::Base.connection.execute("vacuum analyze") unless Rails.env.test?
+    end
   rescue Exception => exception
     rescue_exception(exception)
   end
