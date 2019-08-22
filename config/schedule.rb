@@ -1,5 +1,7 @@
-set :output, "/var/log/whenever.log"
-#env "MAILTO", "webmaster@danbooru.donmai.us"
+# this is used in config/environments/production.rb.
+env "RAILS_LOG_TO_STDOUT", "true"
+
+set :output, "log/whenever.log"
 
 every 1.hour do
   rake "maintenance:hourly"
