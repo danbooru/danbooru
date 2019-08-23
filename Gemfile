@@ -2,7 +2,7 @@ source 'https://rubygems.org/'
 
 gem 'dotenv-rails', :require => "dotenv/rails-now"
 
-gem "rails", "~> 5.2"
+gem "rails", "~> 6.0"
 gem "pg"
 gem "delayed_job"
 gem "delayed_job_active_record"
