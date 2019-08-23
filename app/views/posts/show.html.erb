@@ -28,11 +28,11 @@
         <section id="post-history">
           <h1>History</h1>
           <ul>
-            <li><%= fast_link_to "Tags", post_versions_path(:search => {:post_id => @post.id}) %></li>
-            <li><%= fast_link_to "Notes", note_versions_path(:search => {:post_id => @post.id}) %></li>
-            <li><%= fast_link_to "Moderation", post_events_path(@post.id) %></li>
-            <li><%= fast_link_to "Commentary", artist_commentary_versions_path(:search => {:post_id => @post.id}) %></li>
-            <li><%= fast_link_to "Replacements", post_replacements_path(:search => {:post_id => @post.id}) %></li>
+            <li><%= link_to "Tags", post_versions_path(search: { post_id: @post.id }) %></li>
+            <li><%= link_to "Notes", note_versions_path(search: { post_id: @post.id }) %></li>
+            <li><%= link_to "Moderation", post_events_path(@post.id) %></li>
+            <li><%= link_to "Commentary", artist_commentary_versions_path(search: { post_id: @post.id }) %></li>
+            <li><%= link_to "Replacements", post_replacements_path(search: {post_id: @post.id }) %></li>
           </ul>
         </section>
 
