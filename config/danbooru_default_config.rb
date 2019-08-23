@@ -129,11 +129,6 @@ module Danbooru
       300
     end
 
-    # List of memcached servers
-    def memcached_servers
-      %w(127.0.0.1:11211)
-    end
-
     # After a post receives this many comments, new comments will no longer bump the post in comment/index.
     def comment_threshold
       40
@@ -786,6 +781,7 @@ module Danbooru
     end
 
     def redis_url
+      "redis://localhost:6379"
     end
   end
 

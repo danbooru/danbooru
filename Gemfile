@@ -4,7 +4,6 @@ gem 'dotenv-rails', :require => "dotenv/rails-now"
 
 gem "rails", "~> 5.2"
 gem "pg"
-gem "dalli", :platforms => :ruby
 gem "delayed_job"
 gem "delayed_job_active_record"
 gem "simple_form"
