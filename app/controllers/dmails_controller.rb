@@ -58,13 +58,11 @@ class DmailsController < ApplicationController
   def spam
     @dmail = Dmail.find(params[:id])
     @dmail.update_column(:is_spam, true)
-    @dmail.spam!
   end
 
   def ham
     @dmail = Dmail.find(params[:id])
     @dmail.update_column(:is_spam, false)
-    @dmail.ham!
   end
 
 private

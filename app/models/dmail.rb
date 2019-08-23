@@ -6,8 +6,6 @@ class Dmail < ApplicationRecord
   AUTOBAN_WINDOW = 24.hours
   AUTOBAN_DURATION = 3
 
-  include Rakismet::Model
-
   validates_presence_of :title, :body, on: :create
   validate :validate_sender_is_not_banned, on: :create
 
@@ -19,8 +17,6 @@ class Dmail < ApplicationRecord
   before_create :auto_read_if_filtered
   after_create :update_recipient
   after_commit :send_email, on: :create
-
-  rakismet_attrs author: proc { from.name }, author_email: proc { from.email }, content: proc { title + "\n\n" + body }, user_ip: proc { creator_ip_addr.to_s }
 
   concerning :SpamMethods do
     class_methods do
@@ -41,9 +37,7 @@ class Dmail < ApplicationRecord
     end
 
     def spam?
-      return false if Danbooru.config.rakismet_key.blank?
-      return false if from.is_gold?
-      super()
+      SpamDetector.new(self).spam?
     end
   end
 

@@ -17,11 +17,8 @@ class DmailTest < ActiveSupport::TestCase
 
     context "spam" do
       setup do
-        Dmail.any_instance.stubs(:spam?).returns(true) unless Danbooru.config.rakismet_key.present?
-
-        # viagra-test-123 is guaranteed to be flagged as spam.
-        # https://akismet.com/development/api/#detailed-docs
-        @spammer = create(:user, name: "viagra-test-123")
+        Dmail.any_instance.stubs(:spam?).returns(true)
+        @spammer = create(:user)
         @recipient = create(:user)
       end
 
