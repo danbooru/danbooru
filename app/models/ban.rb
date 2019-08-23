@@ -89,7 +89,7 @@ class Ban < ApplicationRecord
   end
 
   def update_user_on_create
-    user.update_attribute(:is_banned, true)
+    user.update!(is_banned: true)
   end
 
   def update_user_on_destroy
@@ -122,7 +122,7 @@ class Ban < ApplicationRecord
   end
 
   def create_feedback
-    user.feedback.create(category: "negative", body: "Banned for #{humanized_duration}: #{reason}")
+    user.feedback.create!(creator: banner, category: "negative", body: "Banned for #{humanized_duration}: #{reason}")
   end
 
   def create_ban_mod_action

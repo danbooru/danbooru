@@ -42,6 +42,7 @@ class DmailTest < ActiveSupport::TestCase
         assert_equal(true, @spammer.reload.is_banned)
         assert_equal(1, @spammer.bans.count)
         assert_match(/Spambot./, @spammer.bans.last.reason)
+        assert_match(/Spambot./, @spammer.feedback.last.body)
       end
     end
 
