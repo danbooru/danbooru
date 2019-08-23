@@ -9,7 +9,7 @@ require_relative "danbooru_local_config"
 module Danbooru
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 5.1
+    config.load_defaults 5.2
     config.active_record.schema_format = :sql
     config.encoding = "utf-8"
     config.filter_parameters += [:password]

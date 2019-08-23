@@ -1,5 +1,4 @@
 class ApplicationController < ActionController::Base
-  protect_from_forgery
   helper :pagination
   before_action :reset_current_user
   before_action :set_current_user
