@@ -71,14 +71,12 @@ class TagAliasTest < ActiveSupport::TestCase
 
     context "#update_notice" do
       setup do
-        @mock_redis = MockRedis.new
         @forum_topic = FactoryBot.create(:forum_topic)
-        TagChangeNoticeService.stubs(:redis_client).returns(@mock_redis)
       end
 
-      should "update redis" do
+      should "update the cache" do
         FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", skip_secondary_validations: true, forum_topic: @forum_topic)
-        assert_equal(@forum_topic.id.to_s, @mock_redis.get("tcn:aaa"))
+        assert_equal(@forum_topic.id, Cache.get("tcn:aaa"))
       end
     end
 
