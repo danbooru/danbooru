@@ -19,7 +19,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "raise error for /users?name=<nonexistent>" do
         get users_path, params: { name: "nobody" }
-        assert_response :error
+        assert_response 404
       end
 
       should "list all users (with search)" do
