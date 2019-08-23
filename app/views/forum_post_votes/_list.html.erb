@@ -7,7 +7,7 @@
   <%= render "forum_post_votes/vote", vote: vote, forum_post: forum_post %>
 <% end %>
 
-<% votes.excluding(CurrentUser.user.id).each do |vote| %>
+<% votes.excluding_user(CurrentUser.user.id).each do |vote| %>
   <%= render "forum_post_votes/vote", vote: vote, forum_post: forum_post %>
 <% end %>
 
