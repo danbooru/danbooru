@@ -2,6 +2,7 @@ class Comment < ApplicationRecord
   include Mentionable
 
   validate :validate_creator_is_not_limited, :on => :create
+  validate :validate_comment_is_not_spam, on: :create
   validates_presence_of :body, :message => "has no content"
   belongs_to :post
   belongs_to_creator
@@ -122,6 +123,10 @@ class Comment < ApplicationRecord
     elsif !creator.can_comment?
       errors.add(:base, "You can not post comments within 1 week of sign up")
     end
+  end
+
+  def validate_comment_is_not_spam
+    errors[:base] << "Failed to create comment" if SpamDetector.new(self).spam?
   end
 
   def update_last_commented_at_on_create

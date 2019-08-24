@@ -4,7 +4,7 @@
 class SpamDetector
   include Rakismet::Model
 
-  attr_accessor :user, :user_ip, :content, :comment_type
+  attr_accessor :record, :user, :user_ip, :content, :comment_type
   rakismet_attrs author: proc { user.name },
                  author_email: proc { user.email },
                  blog_lang: "en",
@@ -24,13 +24,26 @@ class SpamDetector
     false
   end
 
-  def initialize(record)
+  def initialize(record, user_ip: nil)
     case record
     when Dmail
+      @record = record
       @user = record.from
       @content = record.body
       @comment_type = "message"
-      @user_ip = record.creator_ip_addr.to_s
+      @user_ip = user_ip || record.creator_ip_addr.to_s
+    when ForumPost
+      @record = record
+      @user = record.creator
+      @content = record.body
+      @comment_type = record.is_original_post? ? "forum-post" : "reply"
+      @user_ip = user_ip
+    when Comment
+      @record = record
+      @user = record.creator
+      @content = record.body
+      @comment_type = "comment"
+      @user_ip = user_ip || record.creator_ip_addr.to_s
     else
       raise ArgumentError
     end
@@ -39,6 +52,16 @@ class SpamDetector
   def spam?
     return false if !SpamDetector.enabled?
     return false if user.is_gold?
-    super
+
+    is_spam = super
+
+    if is_spam
+      DanbooruLogger.info("Spam detected: user_name=#{user.name} comment_type=#{comment_type} content=#{content.dump}", record.as_json)
+    end
+
+    is_spam
+  rescue => exception
+    DanbooruLogger.log(exception)
+    false
   end
 end

@@ -1,4 +1,12 @@
 class DanbooruLogger
+  def self.info(message, params = {})
+    Rails.logger.info(message)
+
+    if defined?(::NewRelic)
+      ::NewRelic::Agent.record_custom_event(:spam, message: message, **params)
+    end
+  end
+
   def self.log(exception, expected: false, **params)
     if expected
       Rails.logger.info("#{exception.class}: #{exception.message}")

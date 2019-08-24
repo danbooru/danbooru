@@ -15,6 +15,7 @@ class ForumPost < ApplicationRecord
   after_destroy :update_topic_updated_at_on_destroy
   validates_presence_of :body
   validate :validate_topic_is_unlocked
+  validate :validate_post_is_not_spam, on: :create
   validate :topic_is_not_restricted, :on => :create
   before_destroy :validate_topic_is_unlocked
   after_save :delete_topic_if_original_post
@@ -131,6 +132,10 @@ class ForumPost < ApplicationRecord
 
   def voted?(user, score)
     votes.where(creator_id: user.id, score: score).exists?
+  end
+
+  def validate_post_is_not_spam
+    errors[:base] << "Failed to create forum post" if SpamDetector.new(self, user_ip: CurrentUser.ip_addr).spam?
   end
 
   def validate_topic_is_unlocked
