@@ -202,7 +202,7 @@ class Dmail < ApplicationRecord
   end
 
   def send_email
-    if !is_spam? && to.receive_email_notifications? && to.email =~ /@/ && owner_id == to.id
+    if is_recipient? && !is_spam? && to.receive_email_notifications? && to.email =~ /@/
       UserMailer.dmail_notice(self).deliver_now
     end
   end
@@ -218,18 +218,26 @@ class Dmail < ApplicationRecord
     from == User.system
   end
 
+  def is_sender?
+    owner == from
+  end
+
+  def is_recipient?
+    owner == to
+  end
+
   def filtered?
     CurrentUser.dmail_filter.try(:filtered?, self)
   end
 
   def auto_read_if_filtered
-    if owner_id != CurrentUser.id && to.dmail_filter.try(:filtered?, self)
+    if is_recipient? && to.dmail_filter.try(:filtered?, self)
       self.is_read = true
     end
   end
 
   def update_recipient
-    if owner_id != CurrentUser.user.id && !is_deleted? && !is_read?
+    if is_recipient? && !is_deleted? && !is_read?
       to.update(has_mail: true, unread_dmail_count: to.dmails.unread.count)
     end
   end
