@@ -198,7 +198,25 @@ module ApplicationHelper
       [:"#{prefix}-#{name}", value]
     end.to_h
   end
-  
+
+  def page_title
+    if content_for(:page_title).present?
+      content_for(:page_title)
+    elsif action_name == "index"
+      "#{controller_name.titleize} - #{Danbooru.config.app_name}"
+    elsif action_name == "show"
+      "#{controller_name.singularize.titleize} - #{Danbooru.config.app_name}"
+    elsif action_name == "new"
+      "New #{controller_name.singularize.titleize} - #{Danbooru.config.app_name}"
+    elsif action_name == "edit"
+      "Edit #{controller_name.singularize.titleize} - #{Danbooru.config.app_name}"
+    elsif action_name == "search"
+      "Search #{controller_name.titleize} - #{Danbooru.config.app_name}"
+    else
+      "#{Danbooru.config.app_name}/#{controller_name}"
+    end
+  end
+
 protected
   def nav_link_match(controller, url)
     url =~ case controller

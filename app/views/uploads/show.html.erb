@@ -45,10 +45,6 @@
 
 <%= render "uploads/secondary_links" %>
 
-<% content_for(:page_title) do %>
-  Upload - <%= Danbooru.config.app_name %>
-<% end %>
-
 <% if @upload.is_pending? || @upload.is_processing? || @upload.is_preprocessing? || @upload.is_preprocessed? %>
   <% content_for(:html_header) do %>
     <meta http-equiv="refresh" content="2">
