@@ -27,6 +27,7 @@ class SessionLoader
     update_last_ip_addr
     set_time_zone
     set_safe_mode
+    set_started_at_session
     CurrentUser.user.unban! if CurrentUser.user.ban_expired?
     DanbooruLogger.initialize(request, session, CurrentUser.user)
   end
@@ -109,5 +110,11 @@ private
   def set_safe_mode
     safe_mode = request.host.match?(/safebooru/i) || params[:safe_mode].to_s.truthy? || CurrentUser.user.enable_safe_mode?
     CurrentUser.safe_mode = safe_mode
+  end
+
+  def set_started_at_session
+    if session[:started_at].blank?
+      session[:started_at] = Time.now
+    end
   end
 end

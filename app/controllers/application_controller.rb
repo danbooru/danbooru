@@ -5,7 +5,6 @@ class ApplicationController < ActionController::Base
   before_action :set_current_user
   after_action :reset_current_user
   before_action :normalize_search
-  before_action :set_started_at_session
   before_action :api_check
   before_action :set_variant
   before_action :track_only_param
@@ -169,12 +168,6 @@ class ApplicationController < ActionController::Base
     CurrentUser.ip_addr = nil
     CurrentUser.safe_mode = false
     CurrentUser.root_url = root_url.chomp("/")
-  end
-
-  def set_started_at_session
-    if session[:started_at].blank?
-      session[:started_at] = Time.now
-    end
   end
 
   def set_variant
