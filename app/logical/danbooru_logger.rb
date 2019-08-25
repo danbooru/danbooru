@@ -21,7 +21,7 @@ class DanbooruLogger
   end
 
   def self.initialize(request, session, user)
-    add_attributes("request.params", request.params)
+    add_attributes("request.params", request.parameters)
     add_attributes("session.params", session.to_h)
     add_attributes("user", { id: user.id, name: user.name, level: user.level_string, ip: request.remote_ip })
   end

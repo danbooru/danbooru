@@ -96,8 +96,8 @@ class CurrentUser
     RequestStore[:admin_mode] = false
   end
 
-  def self.set_safe_mode(req)
-    RequestStore[:safe_mode] = Danbooru.config.enable_safe_mode?(req, CurrentUser.user)
+  def self.safe_mode=(safe_mode)
+    RequestStore[:safe_mode] = safe_mode
   end
 
   def self.method_missing(method, *params, &block)
