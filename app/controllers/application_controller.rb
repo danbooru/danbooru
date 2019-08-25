@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  class ApiLimitError < StandardError; end
+
   skip_forgery_protection if: -> { SessionLoader.new(request).has_api_authentication? }
   helper :pagination
   before_action :reset_current_user
@@ -44,35 +46,19 @@ class ApplicationController < ActionController::Base
   end
 
   def api_check
-    if !CurrentUser.is_anonymous? && !request.get? && !request.head?
-      if CurrentUser.user.token_bucket.nil?
-        TokenBucket.create_default(CurrentUser.user)
-        CurrentUser.user.reload
-      end
+    return if CurrentUser.is_anonymous? || request.get? || request.head?
 
-      throttled = CurrentUser.user.token_bucket.throttled?
-      headers["X-Api-Limit"] = CurrentUser.user.token_bucket.token_count.to_s
-
-      if throttled
-        respond_to do |format|
-          format.json do
-            render json: {success: false, reason: "too many requests"}.to_json, status: 429
-          end
-
-          format.xml do
-            render xml: {success: false, reason: "too many requests"}.to_xml(:root => "response"), status: 429
-          end
-
-          format.html do
-            render :template => "static/too_many_requests", :status => 429
-          end
-        end
-
-        return false
-      end
+    if CurrentUser.user.token_bucket.nil?
+      TokenBucket.create_default(CurrentUser.user)
+      CurrentUser.user.reload
     end
 
-    return true
+    throttled = CurrentUser.user.token_bucket.throttled?
+    headers["X-Api-Limit"] = CurrentUser.user.token_bucket.token_count.to_s
+
+    if throttled
+      raise ApiLimitError, "too many requests"
+    end
   end
 
   def rescue_exception(exception)
@@ -93,6 +79,8 @@ class ApplicationController < ActionController::Base
       render_error_page(410, exception)
     when Post::SearchError
       render_error_page(422, exception)
+    when ApiLimitError
+      render_error_page(429, exception)
     when NotImplementedError
       render_error_page(501, exception, message: "This feature isn't available: #{exception.message}")
     when PG::ConnectionBad
