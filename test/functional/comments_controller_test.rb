@@ -93,13 +93,13 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "update the body" do
-        put_auth comment_path(@comment.id), @comment.creator, params: {comment: {body: "abc"}}
+        put_auth comment_path(@comment.id), @user, params: {comment: {body: "abc"}}
         assert_equal("abc", @comment.reload.body)
         assert_redirected_to post_path(@comment.post)
       end
 
       should "allow changing the body and is_deleted" do
-        put_auth comment_path(@comment.id), @comment.creator, params: {comment: {body: "herp derp", is_deleted: true}}
+        put_auth comment_path(@comment.id), @user, params: {comment: {body: "herp derp", is_deleted: true}}
         assert_equal("herp derp", @comment.reload.body)
         assert_equal(true, @comment.is_deleted)
         assert_redirected_to post_path(@post)

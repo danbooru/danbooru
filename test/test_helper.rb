@@ -98,10 +98,8 @@ class ActionDispatch::IntegrationTest
   include TestHelpers
 
   def method_authenticated(method_name, url, user, options)
-    Thread.current[:test_user_id] = user.id
+    post session_path, params: { name: user.name, password: user.password }
     self.send(method_name, url, options)
-  ensure
-    Thread.current[:test_user_id] = nil
   end
 
   def get_auth(url, user, options = {})
