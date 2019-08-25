@@ -2,17 +2,15 @@ class ApplicationController < ActionController::Base
   class ApiLimitError < StandardError; end
 
   skip_forgery_protection if: -> { SessionLoader.new(request).has_api_authentication? }
-  helper :pagination
   before_action :reset_current_user
   before_action :set_current_user
-  after_action :reset_current_user
   before_action :normalize_search
   before_action :api_check
   before_action :set_variant
   before_action :track_only_param
-  layout "default"
-  helper_method :show_moderation_notice?
   before_action :enable_cors
+  after_action :reset_current_user
+  layout "default"
 
   rescue_from Exception, :with => :rescue_exception
   rescue_from User::PrivilegeError, :with => :access_denied
@@ -29,10 +27,6 @@ class ApplicationController < ActionController::Base
     rescue_from *klasses do |exception|
       render_error_page(status, exception)
     end
-  end
-
-  def show_moderation_notice?
-    CurrentUser.can_approve_posts? && (cookies[:moderated].blank? || Time.at(cookies[:moderated].to_i) < 20.hours.ago)
   end
 
   def enable_cors

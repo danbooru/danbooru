@@ -217,6 +217,10 @@ module ApplicationHelper
     end
   end
 
+  def show_moderation_notice?
+    CurrentUser.can_approve_posts? && (cookies[:moderated].blank? || Time.at(cookies[:moderated].to_i) < 20.hours.ago)
+  end
+
 protected
   def nav_link_match(controller, url)
     url =~ case controller
