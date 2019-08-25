@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  skip_forgery_protection if: -> { SessionLoader.new(request).has_api_authentication? }
   helper :pagination
   before_action :reset_current_user
   before_action :set_current_user
@@ -83,6 +84,8 @@ class ApplicationController < ActionController::Base
       render_error_page(500, exception, message: "The database timed out running your query.")
     when ActionController::BadRequest
       render_error_page(400, exception)
+    when ActionController::InvalidAuthenticityToken
+      render_error_page(403, exception)
     when ActiveRecord::RecordNotFound
       render_error_page(404, exception, message: "That record was not found.")
     when ActionController::RoutingError
@@ -109,8 +112,11 @@ class ApplicationController < ActionController::Base
     @backtrace = Rails.backtrace_cleaner.clean(@exception.backtrace)
     format = :html unless format.in?(%i[html json xml js atom])
 
+    # if InvalidAuthenticityToken was raised, CurrentUser isn't set so we have to use the blank layout.
+    layout = CurrentUser.user.present? ? "default" : "blank"
+
     DanbooruLogger.log(@exception, expected: @expected)
-    render "static/error", status: status, formats: format
+    render "static/error", layout: layout, status: status, formats: format
   end
 
   def authentication_failed
@@ -157,8 +163,7 @@ class ApplicationController < ActionController::Base
   end
 
   def set_current_user
-    session_loader = SessionLoader.new(session, cookies, request, params)
-    session_loader.load
+    SessionLoader.new(request).load
   end
 
   def reset_current_user

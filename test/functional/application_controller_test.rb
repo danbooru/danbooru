@@ -40,6 +40,12 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       setup do
         @user = create(:user, password: "password")
         @api_key = ApiKey.generate!(@user)
+
+        ActionController::Base.allow_forgery_protection = true
+      end
+
+      teardown do
+        ActionController::Base.allow_forgery_protection = false
       end
 
       context "using http basic auth" do
@@ -53,6 +59,14 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:badpassword")}"
           get edit_user_path(@user), headers: { HTTP_AUTHORIZATION: basic_auth_string }
           assert_response 401
+        end
+
+        should "succeed for non-GET requests without a CSRF token" do
+          assert_changes -> { @user.reload.enable_safe_mode }, from: false, to: true do
+            basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:#{@api_key.key}")}"
+            put user_path(@user), headers: { HTTP_AUTHORIZATION: basic_auth_string }, params: { user: { enable_safe_mode: "true" } }, as: :json
+            assert_response :success
+          end
         end
       end
 
@@ -72,6 +86,13 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           get edit_user_path(@user), params: { login: @user.name, api_key: "bad" }
           assert_response 401
         end
+
+        should "succeed for non-GET requests without a CSRF token" do
+          assert_changes -> { @user.reload.enable_safe_mode }, from: false, to: true do
+            put user_path(@user), params: { login: @user.name, api_key: @api_key.key, user: { enable_safe_mode: "true" } }, as: :json
+            assert_response :success
+          end
+        end
       end
 
       context "using the password_hash parameter" do
@@ -90,12 +111,38 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           get edit_user_path(@user), params: { login: @user.name, password_hash: "bad" }
           assert_response 401
         end
+
+        should "succeed for non-GET requests without a CSRF token" do
+          assert_changes -> { @user.reload.enable_safe_mode }, from: false, to: true do
+            put user_path(@user), params: { login: @user.name, password_hash: User.sha1("password"), user: { enable_safe_mode: "true" } }, as: :json
+            assert_response :success
+          end
+        end
       end
 
       context "without any authentication" do
         should "redirect to the login page" do
           get edit_user_path(@user)
           assert_redirected_to new_session_path(url: edit_user_path(@user))
+        end
+      end
+
+      context "with cookie-based authentication" do
+        should "not allow non-GET requests without a CSRF token" do
+          # get the csrf token from the login page so we can login
+          get new_session_path
+          assert_response :success
+          token = css_select("form input[name=authenticity_token]").first["value"]
+
+          # login
+          post session_path, params: { authenticity_token: token, name: @user.name, password: "password" }
+          assert_redirected_to posts_path
+
+          # try to submit a form with cookies but without the csrf token
+          put user_path(@user), headers: { HTTP_COOKIE: headers["Set-Cookie"] }, params: { user: { enable_safe_mode: "true" } }
+          assert_response 403
+          assert_equal("ActionController::InvalidAuthenticityToken", css_select("p").first.content)
+          assert_equal(false, @user.reload.enable_safe_mode)
         end
       end
     end
