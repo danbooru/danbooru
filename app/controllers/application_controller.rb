@@ -14,7 +14,6 @@ class ApplicationController < ActionController::Base
 
   rescue_from Exception, :with => :rescue_exception
   rescue_from User::PrivilegeError, :with => :access_denied
-  rescue_from SessionLoader::AuthenticationFailure, :with => :authentication_failed
   rescue_from ActionController::UnpermittedParameters, :with => :access_denied
 
   # This is raised on requests to `/blah.js`. Rails has already rendered StaticController#not_found
@@ -61,6 +60,8 @@ class ApplicationController < ActionController::Base
       render_error_page(500, exception, message: "The database timed out running your query.")
     when ActionController::BadRequest
       render_error_page(400, exception)
+    when SessionLoader::AuthenticationFailure
+      render_error_page(401, exception)
     when ActionController::InvalidAuthenticityToken
       render_error_page(403, exception)
     when ActiveRecord::RecordNotFound
@@ -96,22 +97,6 @@ class ApplicationController < ActionController::Base
 
     DanbooruLogger.log(@exception, expected: @expected)
     render "static/error", layout: layout, status: status, formats: format
-  end
-
-  def authentication_failed
-    respond_to do |fmt|
-      fmt.html do
-        render :plain => "authentication failed", :status => 401
-      end
-
-      fmt.xml do
-        render :xml => {:sucess => false, :reason => "authentication failed"}.to_xml(:root => "response"), :status => 401
-      end
-
-      fmt.json do
-        render :json => {:success => false, :reason => "authentication failed"}.to_json, :status => 401
-      end
-    end
   end
 
   def access_denied(exception = nil)
