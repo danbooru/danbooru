@@ -10,65 +10,6 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         @post = create(:post, :tag_string => "aaaa")
       end
     end
-    
-    context "for api calls" do
-      setup do
-        @api_key = ApiKey.generate!(@user)
-      end
-
-      context "passing the api limit" do
-        setup do
-          as_user do
-            @post = create(:post)
-          end
-          TokenBucket.any_instance.stubs(:throttled?).returns(true)
-          @bucket = TokenBucket.create(user_id: @user.id, token_count: 0, last_touched_at: Time.now)
-        end
-        
-        should "work" do
-          put post_path(@post), params: {:format => "json", :post => {:rating => "q"}, :login => @user.name, :api_key => @user.api_key.key}
-          assert_response 429
-        end
-      end
-      
-      context "using http basic auth" do
-        should "succeed for password matches" do
-          @basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:#{@api_key.key}")}"
-          get posts_path, params: {:format => "json"}, headers: {'HTTP_AUTHORIZATION' => @basic_auth_string}
-          assert_response :success
-        end
-        
-        should "fail for password mismatches" do
-          @basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:badpassword")}"
-          get posts_path, params: {:format => "json"}, headers: {'HTTP_AUTHORIZATION' => @basic_auth_string}
-          assert_response 401
-        end
-      end
-      
-      context "using the api_key parameter" do
-        should "succeed for password matches" do
-          get posts_path, params: {:format => "json", :login => @user.name, :api_key => @api_key.key}
-          assert_response :success
-        end
-        
-        should "fail for password mismatches" do
-          get posts_path, params: {:format => "json", :login => @user.name, :api_key => "bad"}
-          assert_response 401
-        end
-      end
-      
-      context "using the password_hash parameter" do
-        should "succeed for password matches" do
-          get posts_path, params: {:format => "json", :login => @user.name, :password_hash => User.sha1("password")}
-          assert_response :success
-        end
-        
-        # should "fail for password mismatches" do
-        #   get posts_path, {:format => "json", :login => @user.name, :password_hash => "bad"}
-        #   assert_response 403
-        # end
-      end
-    end
 
     context "index action" do
       should "render" do
