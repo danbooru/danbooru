@@ -14,11 +14,6 @@ class ApplicationController < ActionController::Base
 
   rescue_from Exception, :with => :rescue_exception
   rescue_from User::PrivilegeError, :with => :access_denied
-  rescue_from ActionController::UnpermittedParameters, :with => :access_denied
-
-  # This is raised on requests to `/blah.js`. Rails has already rendered StaticController#not_found
-  # here, so calling `rescue_exception` would cause a double render error.
-  rescue_from ActionController::InvalidCrossOriginRequest, with: -> {}
 
   protected
 
@@ -62,7 +57,7 @@ class ApplicationController < ActionController::Base
       render_error_page(400, exception)
     when SessionLoader::AuthenticationFailure
       render_error_page(401, exception)
-    when ActionController::InvalidAuthenticityToken
+    when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest
       render_error_page(403, exception)
     when ActiveRecord::RecordNotFound
       render_error_page(404, exception, message: "That record was not found.")
@@ -144,7 +139,7 @@ class ApplicationController < ActionController::Base
   User::Roles.each do |role|
     define_method("#{role}_only") do
       if !CurrentUser.user.send("is_#{role}?") || CurrentUser.user.is_banned? || IpBan.is_banned?(CurrentUser.ip_addr)
-        access_denied
+        raise User::PrivilegeError
       end
     end
   end

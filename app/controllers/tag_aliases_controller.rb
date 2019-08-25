@@ -32,12 +32,10 @@ class TagAliasesController < ApplicationController
 
   def destroy
     @tag_alias = TagAlias.find(params[:id])
-    if @tag_alias.deletable_by?(CurrentUser.user)
-      @tag_alias.reject!
-      respond_with(@tag_alias, :location => tag_aliases_path)
-    else
-      access_denied
-    end
+    raise User::PrivilegeError unless @tag_alias.deletable_by?(CurrentUser.user)
+
+    @tag_alias.reject!
+    respond_with(@tag_alias, location: tag_aliases_path, notice: "Tag alias was deleted")
   end
 
   def approve

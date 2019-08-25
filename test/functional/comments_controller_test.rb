@@ -23,7 +23,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       should "render for post" do
-        get comments_path(post_id: @post.id, group_by: "post", format: "js")
+        get comments_path(post_id: @post.id, group_by: "post", format: "js"), xhr: true
         assert_response :success
       end
 
