@@ -13,7 +13,6 @@ class ApplicationController < ActionController::Base
   layout "default"
 
   rescue_from Exception, :with => :rescue_exception
-  rescue_from User::PrivilegeError, :with => :access_denied
 
   protected
 
@@ -59,12 +58,14 @@ class ApplicationController < ActionController::Base
       render_error_page(401, exception)
     when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest
       render_error_page(403, exception)
+    when User::PrivilegeError
+      render_error_page(403, exception, template: "static/access_denied")
     when ActiveRecord::RecordNotFound
       render_error_page(404, exception, message: "That record was not found.")
     when ActionController::RoutingError
       render_error_page(405, exception)
     when ActionController::UnknownFormat, ActionView::MissingTemplate
-      render_error_page(406, exception, message: "#{request.format.to_s} is not a supported format for this page", format: :html)
+      render_error_page(406, exception, message: "#{request.format.to_s} is not a supported format for this page")
     when Danbooru::Paginator::PaginationError
       render_error_page(410, exception)
     when Post::SearchError
@@ -80,45 +81,19 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def render_error_page(status, exception, message: exception.message, format: request.format.symbol)
+  def render_error_page(status, exception, message: exception.message, template: "static/error")
     @exception = exception
     @expected = status < 500
     @message = message.encode("utf-8", { invalid: :replace, undef: :replace })
     @backtrace = Rails.backtrace_cleaner.clean(@exception.backtrace)
-    format = :html unless format.in?(%i[html json xml js atom])
 
     # if InvalidAuthenticityToken was raised, CurrentUser isn't set so we have to use the blank layout.
     layout = CurrentUser.user.present? ? "default" : "blank"
 
     DanbooruLogger.log(@exception, expected: @expected)
-    render "static/error", layout: layout, status: status, formats: format
-  end
-
-  def access_denied(exception = nil)
-    previous_url = params[:url] || request.fullpath
-
-    respond_to do |fmt|
-      fmt.html do
-        if CurrentUser.is_anonymous?
-          if request.get?
-            redirect_to new_session_path(:url => previous_url), :notice => "Access denied"
-          else
-            redirect_to new_session_path, :notice => "Access denied"
-          end
-        else
-          render :template => "static/access_denied", :status => 403
-        end
-      end
-      fmt.xml do
-        render :xml => {:success => false, :reason => "access denied"}.to_xml(:root => "response"), :status => 403
-      end
-      fmt.json do
-        render :json => {:success => false, :reason => "access denied"}.to_json, :status => 403
-      end
-      fmt.js do
-        render js: "", :status => 403
-      end
-    end
+    render template, layout: layout, status: status
+  rescue ActionView::MissingTemplate
+    render "static/error.html", layout: layout, status: status
   end
 
   def set_current_user

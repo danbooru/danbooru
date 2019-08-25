@@ -17,7 +17,8 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow banned users to vote" do
-        @banned = create(:banned_user)
+        @banned = create(:user)
+        @ban = create(:ban, user: @banned)
         post_auth post_votes_path(post_id: @post.id), @banned, params: {:score => "up", :format => "js"}
         assert_response 403
         assert_equal(0, @post.reload.score)

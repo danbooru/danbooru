@@ -120,13 +120,6 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      context "without any authentication" do
-        should "redirect to the login page" do
-          get edit_user_path(@user)
-          assert_redirected_to new_session_path(url: edit_user_path(@user))
-        end
-      end
-
       context "with cookie-based authentication" do
         should "not allow non-GET requests without a CSRF token" do
           # get the csrf token from the login page so we can login
@@ -155,6 +148,15 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         get edit_user_path(user)
 
         assert_response :success
+      end
+    end
+
+    context "accessing an unauthorized page" do
+      should "render the access denied page" do
+        get news_updates_path
+
+        assert_response 403
+        assert_select "h1", /Access Denied/
       end
     end
 
