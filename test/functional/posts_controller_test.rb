@@ -4,7 +4,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
   context "The posts controller" do
     setup do
       PopularSearchService.stubs(:enabled?).returns(false)
-      
+
       @user = travel_to(1.month.ago) {create(:user)}
       as_user do
         @post = create(:post, :tag_string => "aaaa")
@@ -90,6 +90,30 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
           get posts_path(format: :json), params: { random: "1" }
           assert_response :success
+        end
+      end
+
+      context "with the .atom format" do
+        should "render without tags" do
+          get posts_path(format: :atom)
+
+          assert_response :success
+          assert_select "entry", 1
+        end
+
+        should "render with tags" do
+          get posts_path(format: :atom), params: { tags: "aaaa" }
+
+          assert_response :success
+          assert_select "entry", 1
+        end
+
+        should "hide restricted posts" do
+          @post.update(is_banned: true)
+          get posts_path(format: :atom)
+
+          assert_response :success
+          assert_select "entry", 0
         end
       end
     end

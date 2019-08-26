@@ -405,10 +405,6 @@ module Danbooru
       end
     end
 
-    def select_posts_visible_to_user(user, posts)
-      posts.select {|x| can_user_see_post?(user, x)}
-    end
-
     def max_appeals_per_day
       1
     end
