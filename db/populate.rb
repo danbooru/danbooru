@@ -131,7 +131,7 @@ if Note.count == 0
       note = Note.create(:post_id => post.id, :x => rand(post.image_width), :y => rand(post.image_height), :width => 100, :height => 100, :body => Time.now.to_f.to_s)
 
       rand(20).times do |i|
-        note.update_attributes(:body => rand_sentence(6))
+        note.update(body: rand_sentence(6))
       end
     end
   end

@@ -16,7 +16,7 @@ class WikiPageTest < ActiveSupport::TestCase
         CurrentUser.user = FactoryBot.create(:moderator_user)
         @wiki_page = FactoryBot.create(:wiki_page, :is_locked => true)
         CurrentUser.user = FactoryBot.create(:user)
-        @wiki_page.update_attributes(:body => "hello")
+        @wiki_page.update(body: "hello")
         assert_equal(["Is locked and cannot be updated"], @wiki_page.errors.full_messages)
       end
 
@@ -24,7 +24,7 @@ class WikiPageTest < ActiveSupport::TestCase
         CurrentUser.user = FactoryBot.create(:moderator_user)
         @wiki_page = FactoryBot.create(:wiki_page, :is_locked => true)
         CurrentUser.user = FactoryBot.create(:moderator_user)
-        @wiki_page.update_attributes(:body => "hello")
+        @wiki_page.update(body: "hello")
         assert_equal([], @wiki_page.errors.full_messages)
       end
     end
@@ -37,7 +37,7 @@ class WikiPageTest < ActiveSupport::TestCase
       end
 
       should "allow the is_locked attribute to be updated" do
-        @wiki_page.update_attributes(:is_locked => true)
+        @wiki_page.update(is_locked: true)
         @wiki_page.reload
         assert_equal(true, @wiki_page.is_locked?)
       end
@@ -51,7 +51,7 @@ class WikiPageTest < ActiveSupport::TestCase
       end
 
       should "not allow the is_locked attribute to be updated" do
-        @wiki_page.update_attributes(:is_locked => true)
+        @wiki_page.update(is_locked: true)
         assert_equal(["Is locked and cannot be updated"], @wiki_page.errors.full_messages)
         @wiki_page.reload
         assert_equal(false, @wiki_page.is_locked?)

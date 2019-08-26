@@ -13,6 +13,6 @@ dead_post_ids = all_post_ids - live_post_ids
 
 dead_post_ids.each do |post_id|
   Pool.where("post_ids like '? %' or post_ids like '% ? %' or post_ids like '% ?'", post_id, post_id, post_id).find_each do |pool|
-    pool.update_attributes(:post_ids => pool.remove_number_from_string(post_id, pool.post_ids), :post_count => pool.post_count - 1)
+    pool.update(post_ids: pool.remove_number_from_string(post_id, pool.post_ids), post_count: pool.post_count - 1)
   end
 end

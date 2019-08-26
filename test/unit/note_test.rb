@@ -20,7 +20,7 @@ class NoteTest < ActiveSupport::TestCase
       end
 
       should "not increment version" do
-        @note.update_attributes(:x => 100)       
+        @note.update(x: 100)
         assert_equal(1, @note.versions.count)
         assert_equal(1, @note.versions.first.version)
       end
@@ -121,14 +121,14 @@ class NoteTest < ActiveSupport::TestCase
       should "increment the updater's note_update_count" do
         @user.reload
         assert_difference("@user.note_update_count", 1) do
-          @note.update_attributes(:body => "zzz")
+          @note.update(body: "zzz")
           @user.reload
         end
       end
 
       should "update the post's last_noted_at field" do
         assert_nil(@post.last_noted_at)
-        @note.update_attributes(:x => 500)
+        @note.update(x: 500)
         @post.reload
         assert_equal(@post.last_noted_at.to_i, @note.updated_at.to_i)
       end
@@ -136,7 +136,7 @@ class NoteTest < ActiveSupport::TestCase
       should "create a version" do
         assert_difference("NoteVersion.count", 1) do
           travel(1.day) do
-            @note.update_attributes(:body => "fafafa")
+            @note.update(body: "fafafa")
           end
         end
         assert_equal(2, @note.versions.count)
@@ -153,7 +153,7 @@ class NoteTest < ActiveSupport::TestCase
         end
 
         should "fail" do
-          @note.update_attributes(:x => 500)
+          @note.update(x: 500)
           assert_equal(["Post is note locked"], @note.errors.full_messages)
         end
       end
@@ -172,7 +172,7 @@ class NoteTest < ActiveSupport::TestCase
         @vandal = FactoryBot.create(:user)
         @note = FactoryBot.create(:note, :x => 5, :y => 5)
         CurrentUser.scoped(@vandal, "127.0.0.1") do
-          @note.update_attributes(:x => 10, :y => 10)
+          @note.update(x: 10, y: 10)
         end
       end
 

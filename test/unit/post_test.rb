@@ -592,12 +592,12 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "not allow you to remove tags" do
-          @post.update_attributes(:tag_string => "aaa")
+          @post.update(tag_string: "aaa")
           assert_equal(["You must have an account at least 1 week old to remove tags"], @post.errors.full_messages)
         end
 
         should "allow you to remove request tags" do
-          @post.update_attributes(:tag_string => "aaa bbb ccc ddd")
+          @post.update(tag_string: "aaa bbb ccc ddd")
           @post.reload
           assert_equal("aaa bbb ccc ddd", @post.tag_string)
         end
@@ -795,7 +795,7 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "update the parent relationships for both posts" do
-            @post.update_attributes(:tag_string => "aaa parent:#{@parent.id}")
+            @post.update(tag_string: "aaa parent:#{@parent.id}")
             @post.reload
             @parent.reload
             assert_equal(@parent.id, @post.parent_id)
@@ -887,7 +887,7 @@ class PostTest < ActiveSupport::TestCase
           context "id" do
             setup do
               @pool = FactoryBot.create(:pool)
-              @post.update_attributes(:tag_string => "aaa pool:#{@pool.id}")
+              @post.update(tag_string: "aaa pool:#{@pool.id}")
             end
 
             should "add the post to the pool" do
@@ -902,7 +902,7 @@ class PostTest < ActiveSupport::TestCase
             context "that exists" do
               setup do
                 @pool = FactoryBot.create(:pool, :name => "abc")
-                @post.update_attributes(:tag_string => "aaa pool:abc")
+                @post.update(tag_string: "aaa pool:abc")
               end
 
               should "add the post to the pool" do
@@ -915,7 +915,7 @@ class PostTest < ActiveSupport::TestCase
 
             context "that doesn't exist" do
               should "create a new pool and add the post to that pool" do
-                @post.update_attributes(:tag_string => "aaa newpool:abc")
+                @post.update(tag_string: "aaa newpool:abc")
                 @pool = Pool.find_by_name("abc")
                 @post.reload
                 assert_not_nil(@pool)
@@ -936,7 +936,7 @@ class PostTest < ActiveSupport::TestCase
         context "for a rating" do
           context "that is valid" do
             should "update the rating if the post is unlocked" do
-              @post.update_attributes(:tag_string => "aaa rating:e")
+              @post.update(tag_string: "aaa rating:e")
               @post.reload
               assert_equal("e", @post.rating)
             end
@@ -944,7 +944,7 @@ class PostTest < ActiveSupport::TestCase
 
           context "that is invalid" do
             should "not update the rating" do
-              @post.update_attributes(:tag_string => "aaa rating:z")
+              @post.update(tag_string: "aaa rating:z")
               @post.reload
               assert_equal("q", @post.rating)
             end
@@ -972,10 +972,10 @@ class PostTest < ActiveSupport::TestCase
 
         context "for a fav" do
           should "add/remove the current user to the post's favorite listing" do
-            @post.update_attributes(:tag_string => "aaa fav:self")
+            @post.update(tag_string: "aaa fav:self")
             assert_equal("fav:#{@user.id}", @post.fav_string)
 
-            @post.update_attributes(:tag_string => "aaa -fav:self")
+            @post.update(tag_string: "aaa -fav:self")
             assert_equal("", @post.fav_string)
           end
         end
@@ -1148,8 +1148,8 @@ class PostTest < ActiveSupport::TestCase
 
       context "tagged with a negated tag" do
         should "remove the tag if present" do
-          @post.update_attributes(:tag_string => "aaa bbb ccc")
-          @post.update_attributes(:tag_string => "aaa bbb ccc -bbb")
+          @post.update(tag_string: "aaa bbb ccc")
+          @post.update(tag_string: "aaa bbb ccc -bbb")
           @post.reload
           assert_equal("aaa ccc", @post.tag_string)
         end
@@ -1280,7 +1280,7 @@ class PostTest < ActiveSupport::TestCase
           post = FactoryBot.create(:post)
           travel(6.hours) do
             assert_difference("PostArchive.count", 1) do
-              post.update_attributes(:tag_string => "zzz")
+              post.update(tag_string: "zzz")
             end
           end
         end
@@ -1288,7 +1288,7 @@ class PostTest < ActiveSupport::TestCase
         should "merge with the previous version if the updater is the same user and it's been less than an hour" do
           post = FactoryBot.create(:post)
           assert_difference("PostArchive.count", 0) do
-            post.update_attributes(:tag_string => "zzz")
+            post.update(tag_string: "zzz")
           end
           assert_equal("zzz", post.versions.last.tags)
         end
@@ -1302,7 +1302,7 @@ class PostTest < ActiveSupport::TestCase
           # production the counter cache doesn't bump the count, because
           # versions are created on a separate server.
           assert_difference("CurrentUser.user.reload.post_update_count", 2) do
-            post.update_attributes(:tag_string => "zzz")
+            post.update(tag_string: "zzz")
           end
         end
 

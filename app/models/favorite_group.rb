@@ -174,7 +174,7 @@ class FavoriteGroup < ApplicationRecord
       return if contains?(post_id)
 
       clear_post_id_array
-      update_attributes(:post_ids => add_number_to_string(post_id, post_ids))
+      update(post_ids: add_number_to_string(post_id, post_ids))
     end
   end
 
@@ -184,7 +184,7 @@ class FavoriteGroup < ApplicationRecord
       return unless contains?(post_id)
 
       clear_post_id_array
-      update_attributes(:post_ids => remove_number_from_string(post_id, post_ids))
+      update(post_ids: remove_number_from_string(post_id, post_ids))
     end
   end
 

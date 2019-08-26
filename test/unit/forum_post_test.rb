@@ -121,7 +121,7 @@ class ForumPostTest < ActiveSupport::TestCase
       end
 
       should "not be updateable" do
-        @post.update_attributes(:body => "xxx")
+        @post.update(body: "xxx")
         @post.reload
         assert_equal("zzz", @post.body)
       end
@@ -150,14 +150,14 @@ class ForumPostTest < ActiveSupport::TestCase
       
       # updating the original post
       travel(1.second) do
-        posts.first.update_attributes(:body => "xxx")
+        posts.first.update(body: "xxx")
       end
       @topic.reload
       assert_equal(posts.first.updated_at.to_s, @topic.updated_at.to_s)
 
       # updating a non-original post
       travel(2.seconds) do
-        posts.last.update_attributes(:body => "xxx")
+        posts.last.update(body: "xxx")
       end
       assert_equal(posts.first.updated_at.to_s, @topic.updated_at.to_s)
     end
@@ -181,7 +181,7 @@ class ForumPostTest < ActiveSupport::TestCase
       end
 
       should "record its updater" do
-        @post.update_attributes(:body => "abc")
+        @post.update(body: "abc")
         assert_equal(@second_user.id, @post.updater_id)
       end
     end

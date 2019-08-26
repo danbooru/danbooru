@@ -154,9 +154,7 @@ class TagImplication < TagRelationship
         Post.raw_tag_match(antecedent_name).where("true /* TagImplication#update_posts */").find_each do |post|
           fixed_tags = "#{post.tag_string} #{descendant_names_string}".strip
           CurrentUser.scoped(creator, creator_ip_addr) do
-            post.update_attributes(
-              :tag_string => fixed_tags
-            )
+            post.update(tag_string: fixed_tags)
           end
         end
       end

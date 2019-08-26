@@ -176,13 +176,7 @@ class WikiPage < ApplicationRecord
 
   def merge_version
     prev = versions.last
-    prev.update_attributes(
-      :title => title,
-      :body => body,
-      :is_locked => is_locked,
-      :is_deleted => is_deleted,
-      :other_names => other_names
-    )
+    prev.update(title: title, body: body, is_locked: is_locked, is_deleted: is_deleted, other_names: other_names)
   end
 
   def merge_version?

@@ -239,25 +239,25 @@ class UserTest < ActiveSupport::TestCase
 
       should "not change the password if the password and old password are blank" do
         @user = FactoryBot.create(:user, :password => "67890")
-        @user.update_attributes(:password => "", :old_password => "")
+        @user.update(password: "", old_password: "")
         assert(@user.bcrypt_password == User.sha1("67890"))
       end
 
       should "not change the password if the old password is incorrect" do
         @user = FactoryBot.create(:user, :password => "67890")
-        @user.update_attributes(:password => "12345", :old_password => "abcdefg")
+        @user.update(password: "12345", old_password: "abcdefg")
         assert(@user.bcrypt_password == User.sha1("67890"))
       end
 
       should "not change the password if the old password is blank" do
         @user = FactoryBot.create(:user, :password => "67890")
-        @user.update_attributes(:password => "12345", :old_password => "")
+        @user.update(password: "12345", old_password: "")
         assert(@user.bcrypt_password == User.sha1("67890"))
       end
 
       should "change the password if the old password is correct" do
         @user = FactoryBot.create(:user, :password => "67890")
-        @user.update_attributes(:password => "12345", :old_password => "67890")
+        @user.update(password: "12345", old_password: "67890")
         assert(@user.bcrypt_password == User.sha1("12345"))
       end
 

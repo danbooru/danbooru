@@ -139,14 +139,7 @@ class Note < ApplicationRecord
 
   def merge_version
     prev = versions.last
-    prev.update_attributes(
-      :x => x,
-      :y => y,
-      :width => width,
-      :height => height,
-      :is_active => is_active,
-      :body => body
-    )
+    prev.update(x: x, y: y, width: width, height: height, is_active: is_active, body: body)
   end
 
   def merge_version?(updater_id)

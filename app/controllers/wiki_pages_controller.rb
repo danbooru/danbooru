@@ -68,7 +68,7 @@ class WikiPagesController < ApplicationController
 
   def destroy
     @wiki_page = WikiPage.find(params[:id])
-    @wiki_page.update_attributes(:is_deleted => true)
+    @wiki_page.update(is_deleted: true)
     respond_with(@wiki_page)
   end
 

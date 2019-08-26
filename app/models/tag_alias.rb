@@ -142,9 +142,7 @@ class TagAlias < TagRelationship
         escaped_antecedent_name = Regexp.escape(antecedent_name)
         fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_antecedent_name}(?:\Z| )/, " #{consequent_name} ").strip
         CurrentUser.scoped(creator, creator_ip_addr) do
-          post.update_attributes(
-            :tag_string => fixed_tags
-          )
+          post.update(tag_string: fixed_tags)
         end
       end
 

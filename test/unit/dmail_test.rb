@@ -77,7 +77,7 @@ class DmailTest < ActiveSupport::TestCase
 
       context "that is empty" do
         setup do
-          @recipient.dmail_filter.update_attributes(:words => "   ")
+          @recipient.dmail_filter.update(words: "   ")
         end
 
         should "not filter everything" do

@@ -242,7 +242,7 @@ class CommentTest < ActiveSupport::TestCase
 
         should "create a mod action" do
           assert_difference("ModAction.count") do
-            @comment.update_attributes(:body => "nope")
+            @comment.update(body: "nope")
           end
         end
 

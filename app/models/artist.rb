@@ -279,14 +279,7 @@ class Artist < ApplicationRecord
 
     def merge_version
       prev = versions.last
-      prev.update_attributes(
-        :name => name,
-        :urls => url_array,
-        :is_active => is_active,
-        :is_banned => is_banned,
-        :other_names => other_names,
-        :group_name => group_name
-      )
+      prev.update(name: name, urls: url_array, is_active: is_active, is_banned: is_banned, other_names: other_names, group_name: group_name)
     end
 
     def merge_version?
@@ -427,7 +420,7 @@ class Artist < ApplicationRecord
             Post.tag_match(name).where("true /* Artist.unban */").each do |post|
               post.unban!
               fixed_tags = post.tag_string.sub(/(?:\A| )banned_artist(?:\Z| )/, " ").strip
-              post.update_attributes(:tag_string => fixed_tags)
+              post.update(tag_string: fixed_tags)
             end
           rescue Post::SearchError
             # swallow

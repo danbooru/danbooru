@@ -153,7 +153,7 @@ class ForumTopicTest < ActiveSupport::TestCase
       end
 
       should "record its updater" do
-        @topic.update_attributes(:title => "abc")
+        @topic.update(title: "abc")
         assert_equal(@second_user.id, @topic.updater_id)
       end
     end
