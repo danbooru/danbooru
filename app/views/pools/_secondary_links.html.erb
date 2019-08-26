@@ -22,7 +22,7 @@
       <% if PoolArchive.enabled? %>
         <%= subnav_link_to "History", pool_versions_path(:search => {:pool_id => @pool.id}) %>
       <% end %>
-      <% if @pool.post_count <= 100 && CurrentUser.is_member? %>
+      <% if CurrentUser.is_member? %>
         <%= subnav_link_to "Order", edit_pool_order_path(@pool) %>
       <% end %>
     <% end %>
