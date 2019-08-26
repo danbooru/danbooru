@@ -75,7 +75,6 @@ group :development, :test do
   gem 'pry-byebug'
   gem 'pry-rails'
   gem 'pry-inline'
-  gem 'foreman'
   gem 'listen'
 end
 

@@ -143,8 +143,6 @@ GEM
     ffi-win32-extensions (1.0.3)
       ffi
     flamegraph (0.9.5)
-    foreman (0.85.0)
-      thor (~> 0.19.1)
     get_process_mem (0.2.4)
       ffi (~> 1.0)
     globalid (0.4.2)
@@ -465,7 +463,6 @@ DEPENDENCIES
   factory_bot
   ffaker
   flamegraph
-  foreman
   google-api-client
   httparty
   jquery-rails
