@@ -1,6 +1,6 @@
 class Pool < ApplicationRecord
   class RevertError < Exception ; end
-  POOL_ORDER_LIMIT = 100
+  POOL_ORDER_LIMIT = 1000
 
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
   belongs_to_creator
