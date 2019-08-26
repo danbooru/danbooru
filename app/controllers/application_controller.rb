@@ -59,7 +59,7 @@ class ApplicationController < ActionController::Base
     when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest
       render_error_page(403, exception)
     when User::PrivilegeError
-      render_error_page(403, exception, template: "static/access_denied")
+      render_error_page(403, exception, template: "static/access_denied", message: "Access denied")
     when ActiveRecord::RecordNotFound
       render_error_page(404, exception, message: "That record was not found.")
     when ActionController::RoutingError
@@ -81,19 +81,20 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def render_error_page(status, exception, message: exception.message, template: "static/error")
+  def render_error_page(status, exception, message: exception.message, template: "static/error", format: request.format.symbol)
     @exception = exception
     @expected = status < 500
     @message = message.encode("utf-8", { invalid: :replace, undef: :replace })
     @backtrace = Rails.backtrace_cleaner.clean(@exception.backtrace)
+    format = :html unless format.in?(%i[html json xml js atom])
 
     # if InvalidAuthenticityToken was raised, CurrentUser isn't set so we have to use the blank layout.
     layout = CurrentUser.user.present? ? "default" : "blank"
 
     DanbooruLogger.log(@exception, expected: @expected)
-    render template, layout: layout, status: status
+    render template, layout: layout, status: status, formats: format
   rescue ActionView::MissingTemplate
-    render "static/error.html", layout: layout, status: status
+    render "static/error", layout: layout, status: status, formats: format
   end
 
   def set_current_user

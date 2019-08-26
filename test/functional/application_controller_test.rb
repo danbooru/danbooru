@@ -158,6 +158,14 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         assert_response 403
         assert_select "h1", /Access Denied/
       end
+
+      should "render a json response for json requests" do
+        get news_updates_path(format: :json)
+
+        assert_response 403
+        assert_equal "application/json", response.content_type
+        assert_equal "Access denied", response.parsed_body["message"]
+      end
     end
 
     context "when the api limit is exceeded" do
