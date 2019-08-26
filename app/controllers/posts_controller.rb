@@ -23,7 +23,7 @@ class PostsController < ApplicationController
   def show
     @post = Post.find(params[:id])
 
-    @comments = @post.last_commented_at.present? ? @post.comments : Comment.none
+    @comments = @post.comments
     @comments = @comments.includes(:creator)
     @comments = @comments.includes(:votes) if CurrentUser.is_member?
     @comments = @comments.select { |c| c.visible_by?(CurrentUser.user) }
