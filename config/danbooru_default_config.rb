@@ -1,12 +1,5 @@
-require 'socket'
-
 module Danbooru
   class Configuration
-    # The version of this Danbooru.
-    def version
-      "2.105.0"
-    end
-
     # The name of this Danbooru.
     def app_name
       if CurrentUser.safe_mode?
@@ -18,10 +11,6 @@ module Danbooru
 
     def description
       "Find good anime art fast"
-    end
-
-    def domain
-      "donmai.us"
     end
 
     # The canonical hostname of the site.
@@ -52,10 +41,6 @@ module Danbooru
       ForumTopic.where(title: "Upload Feedback Thread").first
     end
 
-    def upgrade_account_email
-      contact_email
-    end
-
     def source_code_url
       "https://github.com/r888888888/danbooru"
     end
@@ -64,22 +49,8 @@ module Danbooru
       "#{source_code_url}/commit/#{hash}"
     end
 
-    def releases_url
-      "#{source_code_url}/releases"
-    end
-
     def issues_url
       "#{source_code_url}/issues"
-    end
-
-    # Stripped of any special characters.
-    def safe_app_name
-      app_name.gsub(/[^a-zA-Z0-9_-]/, "_")
-    end
-
-    # The default name to use for anyone who isn't logged in.
-    def default_guest_name
-      "Anonymous"
     end
 
     # This is a salt used to make dictionary attacks on account passwords harder.
@@ -101,13 +72,6 @@ module Danbooru
       # user.per_page = 20
       # user.disable_tagged_filenames = false
       true
-    end
-
-    # What method to use to store images.
-    # local_flat: Store every image in one directory.
-    # local_hierarchy: Store every image in a hierarchical directory, based on the post's MD5 hash. On some file systems this may be faster.
-    def image_store
-      :local_flat
     end
 
     # Thumbnail size
@@ -142,11 +106,6 @@ module Danbooru
     # Members cannot change the category of pools with more than this many posts.
     def pool_category_change_limit
       100
-    end
-
-    # Determines who can see ads.
-    def can_see_ads?(user)
-      !user.is_gold?
     end
 
     # Users cannot search for more than X regular tags at a time.
@@ -469,27 +428,11 @@ module Danbooru
       nil
     end
 
-    def tinami_login
-      nil
-    end
-
-    def tinami_password
-      nil
-    end
-
     def nico_seiga_login
       nil
     end
 
     def nico_seiga_password
-      nil
-    end
-
-    def pixa_login
-      nil
-    end
-
-    def pixa_password
       nil
     end
 
@@ -564,7 +507,7 @@ module Danbooru
     # services will fail if you don't set a valid User-Agent.
     def http_headers
       {
-        "User-Agent" => "#{Danbooru.config.safe_app_name}/#{Danbooru.config.version}",
+        "User-Agent" => "#{Danbooru.config.app_name}/#{Rails.application.config.x.git_hash}",
       }
     end
 
@@ -623,11 +566,6 @@ module Danbooru
     end
 
     def addthis_key
-    end
-
-    # enable s3-nginx proxy caching
-    def use_s3_proxy?(post)
-      false
     end
 
     # include essential tags in image urls (requires nginx/apache rewrites)
@@ -709,9 +647,6 @@ module Danbooru
       false
     end
 
-    def aws_sqs_saved_search_url
-    end
-
     def aws_sqs_reltagcalc_url
     end
 
@@ -725,15 +660,6 @@ module Danbooru
     end
 
     def aws_sqs_archives_url
-    end
-
-    def ccs_server
-    end
-
-    def ccs_key
-    end
-
-    def aws_sqs_cropper_url
     end
 
     # Use a recaptcha on the signup page to protect against spambots creating new accounts.

@@ -18,7 +18,7 @@ class CloudflareService
       "X-Auth-Email" => email,
       "X-Auth-Key" => key,
       "Content-Type" => "application/json",
-      "User-Agent" => "#{Danbooru.config.app_name}/#{Danbooru.config.version}"
+      "User-Agent" => "#{Danbooru.config.app_name}/#{Rails.application.config.x.git_hash}"
     })
   end
 
