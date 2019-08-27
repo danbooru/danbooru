@@ -5,22 +5,9 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
+SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
-
---
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
-
-
---
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
-
 
 --
 -- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
@@ -4769,14 +4756,6 @@ ALTER TABLE ONLY public.saved_searches
 
 
 --
--- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.schema_migrations
-    ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
-
-
---
 -- Name: super_voters super_voters_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5125,10 +5104,24 @@ CREATE UNIQUE INDEX index_dmail_filters_on_user_id ON public.dmail_filters USING
 
 
 --
+-- Name: index_dmails_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_dmails_on_created_at ON public.dmails USING btree (created_at);
+
+
+--
 -- Name: index_dmails_on_creator_ip_addr; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_dmails_on_creator_ip_addr ON public.dmails USING btree (creator_ip_addr);
+
+
+--
+-- Name: index_dmails_on_from_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_dmails_on_from_id ON public.dmails USING btree (from_id);
 
 
 --
@@ -6994,13 +6987,6 @@ CREATE INDEX index_posts_on_pixiv_id ON public.posts USING btree (pixiv_id) WHER
 
 
 --
--- Name: index_posts_on_source; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_posts_on_source ON public.posts USING btree (lower((source)::text));
-
-
---
 -- Name: index_posts_on_source_pattern; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7019,13 +7005,6 @@ CREATE INDEX index_posts_on_tags_index ON public.posts USING gin (tag_index);
 --
 
 CREATE INDEX index_posts_on_uploader_id ON public.posts USING btree (uploader_id);
-
-
---
--- Name: index_posts_on_uploader_ip_addr; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_posts_on_uploader_ip_addr ON public.posts USING btree (uploader_ip_addr);
 
 
 --
@@ -7309,6 +7288,13 @@ CREATE INDEX index_wiki_pages_on_updated_at ON public.wiki_pages USING btree (up
 
 
 --
+-- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING btree (version);
+
+
+--
 -- Name: favorites insert_favorites_trigger; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -7542,6 +7528,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20181130004740'),
 ('20181202172145'),
 ('20190109210822'),
-('20190129012253');
+('20190129012253'),
+('20190712174818'),
+('20190827013252');
 
 
