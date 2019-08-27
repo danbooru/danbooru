@@ -413,76 +413,6 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: advertisement_hits; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.advertisement_hits (
-    id integer NOT NULL,
-    advertisement_id integer NOT NULL,
-    ip_addr inet NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: advertisement_hits_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.advertisement_hits_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: advertisement_hits_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.advertisement_hits_id_seq OWNED BY public.advertisement_hits.id;
-
-
---
--- Name: advertisements; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.advertisements (
-    id integer NOT NULL,
-    referral_url text NOT NULL,
-    ad_type character varying NOT NULL,
-    status character varying NOT NULL,
-    hit_count integer DEFAULT 0 NOT NULL,
-    width integer NOT NULL,
-    height integer NOT NULL,
-    file_name character varying NOT NULL,
-    is_work_safe boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: advertisements_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.advertisements_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: advertisements_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.advertisements_id_seq OWNED BY public.advertisements.id;
-
-
---
 -- Name: amazon_backups; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3364,20 +3294,6 @@ ALTER SEQUENCE public.wiki_pages_id_seq OWNED BY public.wiki_pages.id;
 
 
 --
--- Name: advertisement_hits id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.advertisement_hits ALTER COLUMN id SET DEFAULT nextval('public.advertisement_hits_id_seq'::regclass);
-
-
---
--- Name: advertisements id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.advertisements ALTER COLUMN id SET DEFAULT nextval('public.advertisements_id_seq'::regclass);
-
-
---
 -- Name: amazon_backups id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4428,22 +4344,6 @@ ALTER TABLE ONLY public.wiki_pages ALTER COLUMN id SET DEFAULT nextval('public.w
 
 
 --
--- Name: advertisement_hits advertisement_hits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.advertisement_hits
-    ADD CONSTRAINT advertisement_hits_pkey PRIMARY KEY (id);
-
-
---
--- Name: advertisements advertisements_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.advertisements
-    ADD CONSTRAINT advertisements_pkey PRIMARY KEY (id);
-
-
---
 -- Name: amazon_backups amazon_backups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4849,27 +4749,6 @@ ALTER TABLE ONLY public.wiki_page_versions
 
 ALTER TABLE ONLY public.wiki_pages
     ADD CONSTRAINT wiki_pages_pkey PRIMARY KEY (id);
-
-
---
--- Name: index_advertisement_hits_on_advertisement_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_advertisement_hits_on_advertisement_id ON public.advertisement_hits USING btree (advertisement_id);
-
-
---
--- Name: index_advertisement_hits_on_created_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_advertisement_hits_on_created_at ON public.advertisement_hits USING btree (created_at);
-
-
---
--- Name: index_advertisements_on_ad_type; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_advertisements_on_ad_type ON public.advertisements USING btree (ad_type);
 
 
 --
@@ -7545,6 +7424,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190129012253'),
 ('20190712174818'),
 ('20190827013252'),
-('20190827014726');
+('20190827014726'),
+('20190827233235');
 
 
