@@ -114,7 +114,7 @@ private
 
   def set_started_at_session
     if session[:started_at].blank?
-      session[:started_at] = Time.now
+      session[:started_at] = Time.now.utc.to_s
     end
   end
 end
