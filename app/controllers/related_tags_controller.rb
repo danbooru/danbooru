@@ -1,6 +1,7 @@
 class RelatedTagsController < ApplicationController
   respond_to :json, :xml, :js, :html, except: [:update]
   before_action :require_reportbooru_key, only: [:update]
+  skip_forgery_protection only: [:update]
 
   def show
     @query = RelatedTagQuery.new(query: params[:query], category: params[:category], user: CurrentUser.user)
