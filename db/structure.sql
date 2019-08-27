@@ -5090,6 +5090,20 @@ CREATE INDEX index_comments_on_post_id ON public.comments USING btree (post_id);
 
 
 --
+-- Name: index_delayed_jobs_on_locked_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_delayed_jobs_on_locked_at ON public.delayed_jobs USING btree (locked_at);
+
+
+--
+-- Name: index_delayed_jobs_on_locked_by; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_delayed_jobs_on_locked_by ON public.delayed_jobs USING btree (locked_by);
+
+
+--
 -- Name: index_delayed_jobs_on_run_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7530,6 +7544,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190109210822'),
 ('20190129012253'),
 ('20190712174818'),
-('20190827013252');
+('20190827013252'),
+('20190827014726');
 
 
