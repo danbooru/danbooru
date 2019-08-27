@@ -444,37 +444,6 @@ ALTER SEQUENCE public.amazon_backups_id_seq OWNED BY public.amazon_backups.id;
 
 
 --
--- Name: anti_voters; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.anti_voters (
-    id integer NOT NULL,
-    user_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: anti_voters_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.anti_voters_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: anti_voters_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.anti_voters_id_seq OWNED BY public.anti_voters.id;
-
-
---
 -- Name: api_keys; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3301,13 +3270,6 @@ ALTER TABLE ONLY public.amazon_backups ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
--- Name: anti_voters id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.anti_voters ALTER COLUMN id SET DEFAULT nextval('public.anti_voters_id_seq'::regclass);
-
-
---
 -- Name: api_keys id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4349,14 +4311,6 @@ ALTER TABLE ONLY public.wiki_pages ALTER COLUMN id SET DEFAULT nextval('public.w
 
 ALTER TABLE ONLY public.amazon_backups
     ADD CONSTRAINT amazon_backups_pkey PRIMARY KEY (id);
-
-
---
--- Name: anti_voters anti_voters_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.anti_voters
-    ADD CONSTRAINT anti_voters_pkey PRIMARY KEY (id);
 
 
 --
@@ -7425,6 +7379,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190712174818'),
 ('20190827013252'),
 ('20190827014726'),
-('20190827233235');
+('20190827233235'),
+('20190827234625');
 
 
