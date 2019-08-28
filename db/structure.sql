@@ -413,37 +413,6 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: amazon_backups; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.amazon_backups (
-    id integer NOT NULL,
-    last_id integer,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: amazon_backups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.amazon_backups_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: amazon_backups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.amazon_backups_id_seq OWNED BY public.amazon_backups.id;
-
-
---
 -- Name: api_keys; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3263,13 +3232,6 @@ ALTER SEQUENCE public.wiki_pages_id_seq OWNED BY public.wiki_pages.id;
 
 
 --
--- Name: amazon_backups id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.amazon_backups ALTER COLUMN id SET DEFAULT nextval('public.amazon_backups_id_seq'::regclass);
-
-
---
 -- Name: api_keys id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4303,14 +4265,6 @@ ALTER TABLE ONLY public.wiki_page_versions ALTER COLUMN id SET DEFAULT nextval('
 --
 
 ALTER TABLE ONLY public.wiki_pages ALTER COLUMN id SET DEFAULT nextval('public.wiki_pages_id_seq'::regclass);
-
-
---
--- Name: amazon_backups amazon_backups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.amazon_backups
-    ADD CONSTRAINT amazon_backups_pkey PRIMARY KEY (id);
 
 
 --
@@ -7380,6 +7334,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190827013252'),
 ('20190827014726'),
 ('20190827233235'),
-('20190827234625');
+('20190827234625'),
+('20190828005453');
 
 
