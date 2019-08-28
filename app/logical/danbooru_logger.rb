@@ -20,10 +20,14 @@ class DanbooruLogger
     end
   end
 
-  def self.initialize(request, session, user)
-    add_attributes("request.params", request.parameters)
-    add_attributes("session.params", session.to_h)
-    add_attributes("user", { id: user.id, name: user.name, level: user.level_string, ip: request.remote_ip })
+  def self.add_session_attributes(request, session, user)
+    request_params = request.parameters.with_indifferent_access.except(*Rails.application.config.filter_parameters, :controller, :action)
+    session_params = session.to_h.with_indifferent_access.slice(:session_id, :started_at)
+    user_params = { id: user.id, name: user.name, level: user.level_string, ip: request.remote_ip, safe_mode: CurrentUser.safe_mode? }
+
+    add_attributes("request.params", request_params)
+    add_attributes("session.params", session_params)
+    add_attributes("user", user_params)
   end
 
   def self.add_attributes(prefix, hash)

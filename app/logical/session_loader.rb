@@ -29,7 +29,8 @@ class SessionLoader
     set_safe_mode
     set_started_at_session
     CurrentUser.user.unban! if CurrentUser.user.ban_expired?
-    DanbooruLogger.initialize(request, session, CurrentUser.user)
+  ensure
+    DanbooruLogger.add_session_attributes(request, session, CurrentUser.user)
   end
 
   def has_api_authentication?
@@ -58,6 +59,7 @@ private
   def authenticate_basic_auth
     credentials = ::Base64.decode64(request.authorization.split(' ', 2).last || '')
     login, api_key = credentials.split(/:/, 2)
+    DanbooruLogger.add_attributes("request.params", login: login)
     authenticate_api_key(login, api_key)
   end
 
