@@ -36,14 +36,6 @@ class ForumPost < ApplicationRecord
       joins(:topic).merge(ForumTopic.search(title_matches: title))
     end
 
-    def for_user(user_id)
-      where("forum_posts.creator_id = ?", user_id)
-    end
-
-    def creator_name(name)
-      where("forum_posts.creator_id = (select _.id from users _ where lower(_.name) = ?)", name.mb_chars.downcase)
-    end
-
     def active
       where("forum_posts.is_deleted = false")
     end

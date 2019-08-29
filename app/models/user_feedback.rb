@@ -28,10 +28,6 @@ class UserFeedback < ApplicationRecord
       where("category = ?", "negative")
     end
 
-    def for_user(user_id)
-      where("user_id = ?", user_id)
-    end
-
     def visible(viewer = CurrentUser.user)
       if viewer.is_admin?
         all

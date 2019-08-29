@@ -35,14 +35,6 @@ class Comment < ApplicationRecord
       where(post_id: PostQueryBuilder.new(query).build.reorder(""))
     end
 
-    def for_creator(user_id)
-      user_id.present? ? where("creator_id = ?", user_id) : none
-    end
-
-    def for_creator_name(user_name)
-      for_creator(User.name_to_id(user_name))
-    end
-
     def search(params)
       q = super
 

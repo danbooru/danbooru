@@ -85,13 +85,18 @@ class User < ApplicationRecord
   before_update :encrypt_password_on_update
   before_create :promote_to_admin_if_first_user
   before_create :customize_new_user
+  has_many :artist_versions, foreign_key: :updater_id
+  has_many :artist_commentary_versions, foreign_key: :updater_id
+  has_many :comments, foreign_key: :creator_id
+  has_many :wiki_page_versions, foreign_key: :updater_id
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   has_many :posts, :foreign_key => "uploader_id"
+  has_many :post_appeals, foreign_key: :creator_id
   has_many :post_approvals, :dependent => :destroy
   has_many :post_disapprovals, :dependent => :destroy
+  has_many :post_flags, foreign_key: :creator_id
   has_many :post_votes
   has_many :post_archives
-  has_many :note_versions
   has_many :bans, -> {order("bans.id desc")}
   has_one :recent_ban, -> {order("bans.id desc")}, :class_name => "Ban"
 
@@ -456,8 +461,8 @@ class User < ApplicationRecord
     end
 
     def used_upload_slots
-      uploaded_count = Post.for_user(id).where("created_at >= ?", 23.hours.ago).count
-      uploaded_comic_count = Post.for_user(id).tag_match("comic").where("created_at >= ?", 23.hours.ago).count / 3
+      uploaded_count = posts.where("created_at >= ?", 23.hours.ago).count
+      uploaded_comic_count = posts.tag_match("comic").where("created_at >= ?", 23.hours.ago).count / 3
       uploaded_count - uploaded_comic_count
     end
     memoize :used_upload_slots
@@ -615,15 +620,15 @@ class User < ApplicationRecord
 
   module CountMethods
     def wiki_page_version_count
-      WikiPageVersion.for_user(id).count
+      wiki_page_versions.count
     end
 
     def artist_version_count
-      ArtistVersion.for_user(id).count
+      artist_versions.count
     end
 
     def artist_commentary_version_count
-      ArtistCommentaryVersion.for_user(id).count
+      artist_commentary_versions.count
     end
 
     def pool_version_count
@@ -632,11 +637,11 @@ class User < ApplicationRecord
     end
 
     def forum_post_count
-      ForumPost.for_user(id).count
+      forum_posts.count
     end
 
     def comment_count
-      Comment.for_creator(id).count
+      comments.count
     end
 
     def favorite_group_count
@@ -644,11 +649,11 @@ class User < ApplicationRecord
     end
 
     def appeal_count
-      PostAppeal.for_creator(id).count
+      post_appeals.count
     end
 
     def flag_count
-      PostFlag.for_creator(id).count
+      post_flags.count
     end
 
     def positive_feedback_count
@@ -666,9 +671,9 @@ class User < ApplicationRecord
     def refresh_counts!
       self.class.without_timeout do
         User.where(id: id).update_all(
-          post_upload_count: Post.for_user(id).count,
+          post_upload_count: posts.count,
           post_update_count: PostArchive.for_user(id).count,
-          note_update_count: NoteVersion.where(updater_id: id).count
+          note_update_count: note_versions.count
         )
       end
     end

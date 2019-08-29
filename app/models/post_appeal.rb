@@ -22,16 +22,8 @@ class PostAppeal < ApplicationRecord
       joins(:post).where("posts.is_deleted = true or posts.is_flagged = true")
     end
 
-    def for_user(user_id)
-      where("creator_id = ?", user_id)
-    end
-
     def recent
       where("created_at >= ?", 1.day.ago)
-    end
-
-    def for_creator(user_id)
-      where("creator_id = ?", user_id)
     end
 
     def search(params)
@@ -90,7 +82,7 @@ class PostAppeal < ApplicationRecord
   end
 
   def appeal_count_for_creator
-    PostAppeal.for_user(creator_id).recent.count
+    creator.post_appeals.recent.count
   end
 
   def method_attributes

@@ -43,7 +43,7 @@ class UserNameChangeRequest < ApplicationRecord
   end
   
   def feedback
-    UserFeedback.for_user(user_id).order("id desc")
+    user.feedback.order("id desc")
   end
   
   def approve!

@@ -1,6 +1,5 @@
 class NoteVersion < ApplicationRecord
   belongs_to_updater :counter_cache => "note_update_count"
-  scope :for_user, ->(user_id) {where("updater_id = ?", user_id)}
 
   def self.search(params)
     q = super

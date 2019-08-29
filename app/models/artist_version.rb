@@ -7,14 +7,6 @@ class ArtistVersion < ApplicationRecord
   delegate :visible?, :to => :artist
 
   module SearchMethods
-    def for_user(user_id)
-      where("updater_id = ?", user_id)
-    end
-
-    def updater_name(name)
-      where("updater_id = (select _.id from users _ where lower(_.name) = ?)", name.mb_chars.downcase)
-    end
-
     def search(params)
       q = super
 

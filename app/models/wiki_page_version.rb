@@ -6,10 +6,6 @@ class WikiPageVersion < ApplicationRecord
   delegate :visible?, :to => :wiki_page
 
   module SearchMethods
-    def for_user(user_id)
-      where("updater_id = ?", user_id)
-    end
-
     def search(params)
       q = super
 
