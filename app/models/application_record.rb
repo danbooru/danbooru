@@ -121,6 +121,20 @@ class ApplicationRecord < ActiveRecord::Base
         end
       end
 
+      def search_post_id_attribute(params)
+        relation = self
+
+        if params[:post_id].present?
+          relation = relation.attribute_matches(:post_id, params[:post_id])
+        end
+
+        if params[:post_tags_match].present?
+          relation = relation.where(post_id: Post.tag_match(params[:post_tags_match]).reorder(nil))
+        end
+
+        relation
+      end
+
       def apply_default_order(params)
         if params[:order] == "custom"
           parse_ids = Tag.parse_helper(params[:id])

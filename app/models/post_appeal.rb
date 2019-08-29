@@ -10,10 +10,6 @@ class PostAppeal < ApplicationRecord
   validates_uniqueness_of :creator_id, :scope => :post_id, :message => "have already appealed this post"
 
   module SearchMethods
-    def post_tags_match(query)
-      where(post_id: PostQueryBuilder.new(query).build.reorder(""))
-    end
-
     def resolved
       joins(:post).where("posts.is_deleted = false and posts.is_flagged = false")
     end
@@ -31,15 +27,7 @@ class PostAppeal < ApplicationRecord
 
       q = q.attribute_matches(:reason, params[:reason_matches])
       q = q.search_user_attribute(:creator, params)
-
-      if params[:post_id].present?
-        q = q.where(post_id: params[:post_id].split(",").map(&:to_i))
-      end
-
-      if params[:post_tags_match].present?
-        q = q.post_tags_match(params[:post_tags_match])
-      end
-
+      q = q.search_post_id_attribute(params)
       q = q.resolved if params[:is_resolved].to_s.truthy?
       q = q.unresolved if params[:is_resolved].to_s.falsy?
 

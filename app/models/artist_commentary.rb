@@ -18,10 +18,6 @@ class ArtistCommentary < ApplicationRecord
       where("original_title ILIKE ? ESCAPE E'\\\\' OR original_description ILIKE ? ESCAPE E'\\\\' OR translated_title ILIKE ? ESCAPE E'\\\\' OR translated_description ILIKE ? ESCAPE E'\\\\'", escaped_query, escaped_query, escaped_query, escaped_query)
     end
 
-    def post_tags_match(query)
-      where(post_id: PostQueryBuilder.new(query).build.reorder(""))
-    end
-
     def deleted
       where(original_title: "", original_description: "", translated_title: "", translated_description: "")
     end
@@ -33,12 +29,10 @@ class ArtistCommentary < ApplicationRecord
     def search(params)
       q = super
 
+      q = q.search_post_id_attribute(params)
+
       if params[:text_matches].present?
         q = q.text_matches(params[:text_matches])
-      end
-
-      if params[:post_id].present?
-        q = q.where(post_id: params[:post_id].split(",").map(&:to_i))
       end
 
       if params[:original_present].to_s.truthy?
@@ -51,10 +45,6 @@ class ArtistCommentary < ApplicationRecord
         q = q.where("(translated_title != '') or (translated_description != '')")
       elsif params[:translated_present].to_s.falsy?
         q = q.where("(translated_title = '') and (translated_description = '')")
-      end
-
-      if params[:post_tags_match].present?
-        q = q.post_tags_match(params[:post_tags_match])
       end
 
       q = q.deleted if params[:is_deleted] == "yes"

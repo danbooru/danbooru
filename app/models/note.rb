@@ -16,24 +16,13 @@ class Note < ApplicationRecord
       where("is_active = TRUE")
     end
 
-    def post_tags_match(query)
-      where(post_id: PostQueryBuilder.new(query).build.reorder(""))
-    end
-
     def search(params)
       q = super
 
       q = q.attribute_matches(:body, params[:body_matches], index_column: :body_index)
       q = q.attribute_matches(:is_active, params[:is_active])
       q = q.search_user_attribute(:creator, params)
-
-      if params[:post_id].present?
-        q = q.where(post_id: params[:post_id].split(",").map(&:to_i))
-      end
-
-      if params[:post_tags_match].present?
-        q = q.post_tags_match(params[:post_tags_match])
-      end
+      q = q.search_post_id_attribute(params)
 
       q.apply_default_order(params)
     end

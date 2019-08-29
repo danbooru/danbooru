@@ -174,14 +174,11 @@ class Upload < ApplicationRecord
       where(:status => "pending")
     end
 
-    def post_tags_match(query)
-      where(post_id: PostQueryBuilder.new(query).build.reorder(""))
-    end
-
     def search(params)
       q = super
 
       q = q.search_user_attribute(:uploader, params)
+      q = q.search_post_id_attribute(params)
 
       if params[:source].present?
         q = q.where(source: params[:source])
@@ -199,18 +196,10 @@ class Upload < ApplicationRecord
         q = q.attribute_matches(:rating, params[:parent_id])
       end
 
-      if params[:post_id].present?
-        q = q.attribute_matches(:post_id, params[:post_id])
-      end
-
       if params[:has_post].to_s.truthy?
         q = q.where.not(post_id: nil)
       elsif params[:has_post].to_s.falsy?
         q = q.where(post_id: nil)
-      end
-
-      if params[:post_tags_match].present?
-        q = q.post_tags_match(params[:post_tags_match])
       end
 
       if params[:status].present?

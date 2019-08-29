@@ -32,24 +32,12 @@ class PostApproval < ApplicationRecord
     post.update(approver: user, is_flagged: false, is_pending: false, is_deleted: false)
   end
 
-  concerning :SearchMethods do
-    class_methods do
-      def post_tags_match(query)
-        where(post_id: PostQueryBuilder.new(query).build.reorder(""))
-      end
+  def self.search(params)
+    q = super
 
-      def search(params)
-        q = super
+    q = q.search_user_attribute(:user, params)
+    q = q.search_post_id_attribute(params)
 
-        if params[:post_tags_match].present?
-          q = q.post_tags_match(params[:post_tags_match])
-        end
-
-        q = q.search_user_attribute(:user, params)
-        q = q.attribute_matches(:post_id, params[:post_id])
-
-        q.apply_default_order(params)
-      end
-    end
+    q.apply_default_order(params)
   end
 end

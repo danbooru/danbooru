@@ -32,10 +32,6 @@ class PostFlag < ApplicationRecord
       where("to_tsvector('english', post_flags.reason) @@ to_tsquery('!dup & !duplicate & !sample & !smaller')")
     end
 
-    def post_tags_match(query)
-      where(post_id: PostQueryBuilder.new(query).build.reorder(""))
-    end
-
     def resolved
       where("is_resolved = ?", true)
     end
@@ -78,14 +74,7 @@ class PostFlag < ApplicationRecord
         end
       end
 
-      if params[:post_id].present?
-        q = q.where(post_id: params[:post_id].split(",").map(&:to_i))
-      end
-
-      if params[:post_tags_match].present?
-        q = q.post_tags_match(params[:post_tags_match])
-      end
-
+      q = q.search_post_id_attribute(params)
       q = q.attribute_matches(:is_resolved, params[:is_resolved])
 
       case params[:category]
