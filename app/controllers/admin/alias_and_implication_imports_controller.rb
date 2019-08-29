@@ -10,9 +10,6 @@ module Admin
       @importer.process!
       flash[:notice] = "Import queued"
       redirect_to new_admin_alias_and_implication_import_path
-    rescue => x
-      flash[:notice] = x.to_s
-      redirect_to new_admin_alias_and_implication_import_path
     end
   end
 end

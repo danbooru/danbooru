@@ -416,14 +416,10 @@ class Artist < ApplicationRecord
           ti = TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").first
           ti.destroy if ti
 
-          begin
-            Post.tag_match(name).where("true /* Artist.unban */").each do |post|
-              post.unban!
-              fixed_tags = post.tag_string.sub(/(?:\A| )banned_artist(?:\Z| )/, " ").strip
-              post.update(tag_string: fixed_tags)
-            end
-          rescue Post::SearchError
-            # swallow
+          Post.tag_match(name).where("true /* Artist.unban */").each do |post|
+            post.unban!
+            fixed_tags = post.tag_string.sub(/(?:\A| )banned_artist(?:\Z| )/, " ").strip
+            post.update(tag_string: fixed_tags)
           end
 
           update_column(:is_banned, false)
@@ -435,12 +431,8 @@ class Artist < ApplicationRecord
     def ban!
       Post.transaction do
         CurrentUser.without_safe_mode do
-          begin
-            Post.tag_match(name).where("true /* Artist.ban */").each do |post|
-              post.ban!
-            end
-          rescue Post::SearchError
-            # swallow
+          Post.tag_match(name).where("true /* Artist.ban */").each do |post|
+            post.ban!
           end
 
           # potential race condition but unlikely

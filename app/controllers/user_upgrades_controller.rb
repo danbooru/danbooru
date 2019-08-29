@@ -51,6 +51,7 @@ class UserUpgradesController < ApplicationController
       @user.promote_to!(level, is_upgrade: true)
       flash[:success] = true
     rescue Stripe::CardError => e
+      DanbooruLogger.log(e)
       flash[:error] = e.message
     end
 
