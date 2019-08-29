@@ -3,17 +3,7 @@ require 'test_helper'
 class DanbooruMaintenanceTest < ActiveSupport::TestCase
   context "daily maintenance" do
     setup do
-      # have ApiCacheGenerator save files to a temp dir.
-      @temp_shared_dir_path = "/tmp/#{SecureRandom.uuid}"
-      Danbooru.config.stubs(:shared_dir_path).returns(@temp_shared_dir_path)
-
-      FactoryBot.create(:tag, post_count: 1) # for ApiCacheGenerator
       FactoryBot.create(:admin_user) # for SuperVoter.init!
-    end
-
-    teardown do
-      FileUtils.rm_rf(@temp_shared_dir_path)
-      Danbooru.config.unstub(:shared_dir_path)
     end
 
     should "work" do

@@ -15,12 +15,6 @@ namespace :symlink do
     on roles(:app, :worker) do
       execute :rm, "-f", "#{release_path}/public/data"
       execute :ln, "-s", "#{deploy_to}/shared/data", "#{release_path}/public/data"
-      execute :mkdir, "-p", "#{release_path}/public/cache"
-      execute :mkdir, "-p", "#{deploy_to}/shared/system/cache"
-      execute :touch, "#{deploy_to}/shared/system/cache/tags.json"
-      execute :ln, "-s", "#{deploy_to}/shared/system/cache/tags.json", "#{release_path}/public/cache/tags.json"
-      execute :touch, "#{deploy_to}/shared/system/cache/tags.json.gz"
-      execute :ln, "-s", "#{deploy_to}/shared/system/cache/tags.json.gz", "#{release_path}/public/cache/tags.json.gz"
     end
   end
 end

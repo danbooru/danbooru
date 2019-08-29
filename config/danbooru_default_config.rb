@@ -188,19 +188,6 @@ module Danbooru
       [server_host]
     end
 
-    # Names of other Danbooru servers.
-    def other_server_hosts
-      @other_server_hosts ||= all_server_hosts.reject {|x| x == server_host}
-    end
-
-    def remote_server_login
-      "danbooru"
-    end
-
-    def archive_server_login
-      "danbooru"
-    end
-
     # The method to use for storing image files.
     def storage_manager
       # Store files on the local filesystem.
@@ -472,10 +459,6 @@ module Danbooru
     # Posts with these tags will be highlighted red in the modqueue.
     def modqueue_sample_warning_tags
       %w[duplicate image_sample md5_mismatch resized upscaled downscaled]
-    end
-
-    def shared_dir_path
-      "/var/www/danbooru2/shared"
     end
 
     def stripe_secret_key
