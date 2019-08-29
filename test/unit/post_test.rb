@@ -2206,8 +2206,6 @@ class PostTest < ActiveSupport::TestCase
       assert_tag_match([],     "source:*.pixiv.net/img*/artist-fake/*")
       assert_tag_match([post], "source:http://*.pixiv.net/img*/img/artist-name/*")
       assert_tag_match([],     "source:http://*.pixiv.net/img*/img/artist-fake/*")
-      assert_tag_match([post], "source:pixiv/artist-name/*")
-      assert_tag_match([],     "source:pixiv/artist-fake/*")
     end
 
     should "return posts for a pixiv id search (type 1)" do

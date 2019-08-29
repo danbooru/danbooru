@@ -195,30 +195,19 @@ class PostQueryBuilder
       relation = relation.where.not("posts.file_ext": q[:filetype_neg])
     end
 
-    # The SourcePattern SQL function replaces Pixiv sources with "pixiv/[suffix]", where
-    # [suffix] is everything past the second-to-last slash in the URL.  It leaves non-Pixiv
-    # URLs unchanged.  This is to ease database load for Pixiv source searches.
     if q[:source]
-      if q[:source] == "none%"
+      if q[:source] == "none"
         relation = relation.where("posts.source = ''")
-      elsif q[:source] == "http%"
-        relation = relation.where("(lower(posts.source) like ?)", "http%")
-      elsif q[:source] =~ /^(?:https?:\/\/)?%\.?pixiv(?:\.net(?:\/img)?)?(?:%\/img\/|%\/|(?=%$))(.+)$/i
-        relation = relation.where("SourcePattern(lower(posts.source)) LIKE lower(?) ESCAPE E'\\\\'", "pixiv/" + $1)
       else
-        relation = relation.where("SourcePattern(lower(posts.source)) LIKE SourcePattern(lower(?)) ESCAPE E'\\\\'", q[:source])
+        relation = relation.where_ilike(:source, q[:source].downcase + "*")
       end
     end
 
     if q[:source_neg]
-      if q[:source_neg] == "none%"
+      if q[:source_neg] == "none"
         relation = relation.where("posts.source != ''")
-      elsif q[:source_neg] == "http%"
-        relation = relation.where("(lower(posts.source) not like ?)", "http%")
-      elsif q[:source_neg] =~ /^(?:https?:\/\/)?%\.?pixiv(?:\.net(?:\/img)?)?(?:%\/img\/|%\/|(?=%$))(.+)$/i
-        relation = relation.where("SourcePattern(lower(posts.source)) NOT LIKE lower(?) ESCAPE E'\\\\'", "pixiv/" + $1)
       else
-        relation = relation.where("SourcePattern(lower(posts.source)) NOT LIKE SourcePattern(lower(?)) ESCAPE E'\\\\'", q[:source_neg])
+        relation = relation.where_not_ilike(:source, q[:source_neg].downcase + "*")
       end
     end
 

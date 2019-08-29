@@ -337,19 +337,6 @@ CREATE FUNCTION public.favorites_insert_trigger() RETURNS trigger
 
 
 --
--- Name: sourcepattern(text); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION public.sourcepattern(src text) RETURNS text
-    LANGUAGE plpgsql IMMUTABLE STRICT
-    AS $_$
-               BEGIN
-                 RETURN regexp_replace(src, '^[^/]*(//)?[^/]*.pixiv.net/img.*(/[^/]*/[^/]*)$', E'pixiv\\2');
-               END;
-             $_$;
-
-
---
 -- Name: testprs_end(internal); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -6779,10 +6766,10 @@ CREATE INDEX index_posts_on_pixiv_id ON public.posts USING btree (pixiv_id) WHER
 
 
 --
--- Name: index_posts_on_source_pattern; Type: INDEX; Schema: public; Owner: -
+-- Name: index_posts_on_source_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_posts_on_source_pattern ON public.posts USING btree (public.sourcepattern(lower((source)::text)) text_pattern_ops);
+CREATE INDEX index_posts_on_source_trgm ON public.posts USING gin (lower((source)::text) public.gin_trgm_ops) WHERE ((source)::text <> ''::text);
 
 
 --
@@ -7327,6 +7314,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190827233235'),
 ('20190827234625'),
 ('20190828005453'),
-('20190829052629');
+('20190829052629'),
+('20190829055758');
 
 

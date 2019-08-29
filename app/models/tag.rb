@@ -751,12 +751,10 @@ class Tag < ApplicationRecord
             q[:filesize] = parse_helper_fudged(g2, :filesize)
 
           when "source"
-            src = g2.gsub(/\A"(.*)"\Z/, '\1')
-            q[:source] = (src.to_escaped_for_sql_like + "%").gsub(/%+/, '%')
+            q[:source] = g2.gsub(/\A"(.*)"\Z/, '\1')
 
           when "-source"
-            src = g2.gsub(/\A"(.*)"\Z/, '\1')
-            q[:source_neg] = (src.to_escaped_for_sql_like + "%").gsub(/%+/, '%')
+            q[:source_neg] = g2.gsub(/\A"(.*)"\Z/, '\1')
 
           when "date"
             q[:date] = parse_helper(g2, :date)
