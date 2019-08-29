@@ -2594,15 +2594,6 @@ ALTER SEQUENCE public.post_replacements_id_seq OWNED BY public.post_replacements
 
 
 --
--- Name: post_updates; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE UNLOGGED TABLE public.post_updates (
-    post_id integer
-);
-
-
---
 -- Name: post_votes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -7335,6 +7326,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190827014726'),
 ('20190827233235'),
 ('20190827234625'),
-('20190828005453');
+('20190828005453'),
+('20190829052629');
 
 
