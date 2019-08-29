@@ -178,7 +178,7 @@ module Sources
       end
 
       def artists
-        Artist.find_artists(normalize_for_artist_finder)
+        Artist.find_artists(normalize_for_artist_finder.to_s)
       end
 
       # A new artist entry with suggested defaults for when the artist doesn't

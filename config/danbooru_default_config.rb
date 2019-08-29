@@ -440,15 +440,6 @@ module Danbooru
       nil
     end
 
-    # Register at https://www.deviantart.com/developers/.
-    def deviantart_client_id
-      nil
-    end
-
-    def deviantart_client_secret
-      nil
-    end
-
     # http://tinysubversions.com/notes/mastodon-bot/
     def pawoo_client_id
       nil

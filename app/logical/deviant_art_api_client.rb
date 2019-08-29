@@ -1,73 +1,29 @@
-# Authentication is via OAuth2 with the client credentials grant. Register a
-# new app at https://www.deviantart.com/developers/ to obtain a client_id and
-# client_secret. The app doesn't need to be published.
+# https://github.com/r888888888/danbooru/issues/4144
 #
 # API requests must send a user agent and must use gzip compression, otherwise
 # 403 errors will be returned.
-#
-# API calls operate on UUIDs. The deviation ID in the URL is not the UUID. UUIDs
-# are obtained by scraping the HTML page for the <meta property="da:appurl"> element.
-#
-# * https://www.deviantart.com/developers/
-# * https://www.deviantart.com/developers/authentication
-# * https://www.deviantart.com/developers/errors
-# * https://www.deviantart.com/developers/http/v1/20160316
 
-class DeviantArtApiClient
-  class Error < StandardError; end
-  BASE_URL = "https://www.deviantart.com/api/v1/oauth2"
+class DeviantArtApiClient < Struct.new(:deviation_id)
+  extend Memoist
 
-  attr_reader :client_id, :client_secret, :httparty_options
-
-  def initialize(client_id, client_secret, httparty_options = {})
-    @client_id, @client_secret, @httparty_options = client_id, client_secret, httparty_options
+  def extended_fetch
+    params = { deviationid: deviation_id, type: "art", include_session: false }
+    http.get("https://www.deviantart.com/_napi/da-deviation/shared_api/deviation/extended_fetch", params: params)
   end
 
-  # https://www.deviantart.com/developers/http/v1/20160316/deviation_single/bcc296bdf3b5e40636825a942a514816
-  def deviation(uuid)
-    request("/deviation/#{uuid}")
+  def extended_fetch_json
+    JSON.parse(extended_fetch.body).with_indifferent_access
   end
 
-  # https://www.deviantart.com/developers/http/v1/20160316/deviation_download/bed6982b88949bdb08b52cd6763fcafd
-  def download(uuid, mature_content: "1")
-    request("/deviation/download/#{uuid}", mature_content: mature_content)
+  def download_url
+    url = extended_fetch_json.dig(:deviation, :extended, :download, :url)
+    response = http.cookies(extended_fetch.cookies).get(url)
+    response.headers[:location]
   end
 
-  # https://www.deviantart.com/developers/http/v1/20160316/deviation_metadata/7824fc14d6fba6acbacca1cf38c24158
-  def metadata(*uuids, mature_content: "1", ext_submission: "1", ext_camera: "1", ext_stats: "1")
-    params = {
-      deviationids: uuids.flatten,
-      mature_content: mature_content,
-      ext_submission: ext_submission,
-      ext_camera: ext_camera,
-      ext_stats: ext_stats,
-    }
-
-    request("/deviation/metadata", params)
+  def http
+    HTTP.use(:auto_inflate).headers(Danbooru.config.http_headers.merge("Accept-Encoding" => "gzip"))
   end
 
-  def request(url, **params)
-    options = {
-      base_uri: BASE_URL,
-      params: { access_token: access_token.token, **params },
-      headers: { "Accept-Encoding" => "gzip" },
-      format: :plain,
-    }
-
-    body, code = HttpartyCache.get(url, **options)
-     JSON.parse(Zlib.gunzip(body), symbolize_names: true)
-  end
-
-  def oauth
-    OAuth2::Client.new(client_id, client_secret, site: "https://www.deviantart.com", token_url: "/oauth2/token")
-  end
-
-  def access_token
-    @access_token = oauth.client_credentials.get_token if @access_token.nil? || @access_token.expired?
-    @access_token
-  end
-
-  def access_token=(hash)
-    @access_token = OAuth2::AccessToken.from_hash(oauth, hash)
-  end
+  memoize :extended_fetch, :extended_fetch_json, :download_url
 end
