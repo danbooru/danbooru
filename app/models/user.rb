@@ -708,13 +708,7 @@ class User < ApplicationRecord
       params = params.dup
       params[:name_matches] = params.delete(:name) if params[:name].present?
 
-      q = q.search_text_attribute(:name, params)
-      q = q.attribute_matches(:level, params[:level])
-      q = q.attribute_matches(:post_upload_count, params[:post_upload_count])
-      q = q.attribute_matches(:post_update_count, params[:post_update_count])
-      q = q.attribute_matches(:note_update_count, params[:note_update_count])
-      q = q.attribute_matches(:favorite_count, params[:favorite_count])
-      q = q.search_user_attribute(:inviter, params)
+      q = q.search_attributes(params, :name, :level, :inviter, :post_upload_count, :post_update_count, :note_update_count, :favorite_count)
 
       if params[:name_matches].present?
         q = q.where_ilike(:name, normalize_name(params[:name_matches]))

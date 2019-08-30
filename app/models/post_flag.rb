@@ -51,7 +51,8 @@ class PostFlag < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.attribute_matches(:reason, params[:reason_matches])
+      q = q.search_attributes(params, :post, :is_resolved)
+      q = q.text_attribute_matches(:reason, params[:reason_matches])
 
       # XXX
       if params[:creator_id].present?
@@ -73,9 +74,6 @@ class PostFlag < ApplicationRecord
           q = q.none
         end
       end
-
-      q = q.search_post_id_attribute(params)
-      q = q.attribute_matches(:is_resolved, params[:is_resolved])
 
       case params[:category]
       when "normal"

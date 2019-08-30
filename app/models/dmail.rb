@@ -141,15 +141,11 @@ class Dmail < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.attribute_matches(:title, params[:title_matches])
-      q = q.attribute_matches(:body, params[:message_matches], index_column: :message_index)
-      q = q.search_user_attribute(:to, params)
-      q = q.search_user_attribute(:from, params)
+      q = q.search_attributes(params, :to, :from, :is_spam, :is_read, :is_deleted)
+      q = q.text_attribute_matches(:title, params[:title_matches])
+      q = q.text_attribute_matches(:body, params[:message_matches], index_column: :message_index)
 
       params[:is_spam] = false unless params[:is_spam].present?
-      q = q.attribute_matches(:is_spam, params[:is_spam])
-      q = q.attribute_matches(:is_read, params[:is_read])
-      q = q.attribute_matches(:is_deleted, params[:is_deleted])
 
       q = q.read if params[:read].to_s.truthy?
       q = q.unread if params[:read].to_s.falsy?

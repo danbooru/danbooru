@@ -35,36 +35,23 @@ class ApplicationRecord < ActiveRecord::Base
         where.not("#{qualified_column_for(attr)} ~ ?", "(?e)" + value)
       end
 
-      def attribute_matches(attribute, value, **options)
-        return all if value.nil?
+      def search_boolean_attribute(attribute, params)
+        return all unless params[attribute]
 
-        column = column_for_attribute(attribute)
-        case column.sql_type_metadata.type
-        when :boolean
-          boolean_attribute_matches(attribute, value, **options)
-        when :integer, :datetime
-          numeric_attribute_matches(attribute, value, **options)
-        when :string, :text
-          text_attribute_matches(attribute, value, **options)
-        else
-          raise ArgumentError, "unhandled attribute type"
-        end
-      end
-
-      def boolean_attribute_matches(attribute, value)
-        if value.to_s.truthy?
-          value = true
-        elsif value.to_s.falsy?
-          value = false
+        value = params[attribute].to_s
+        if value.truthy?
+          where(attribute => true)
+        elsif value.falsy?
+          where(attribute => false)
         else
           raise ArgumentError, "value must be truthy or falsy"
         end
-
-        where(attribute => value)
       end
 
       # range: "5", ">5", "<5", ">=5", "<=5", "5..10", "5,6,7"
       def numeric_attribute_matches(attribute, range)
+        return all unless range.present?
+
         column = column_for_attribute(attribute)
         qualified_column = "#{table_name}.#{column.name}"
         parsed_range = Tag.parse_helper(range, column.type)
@@ -73,6 +60,8 @@ class ApplicationRecord < ActiveRecord::Base
       end
 
       def text_attribute_matches(attribute, value, index_column: nil, ts_config: "english")
+        return all unless value.present?
+
         column = column_for_attribute(attribute)
         qualified_column = "#{table_name}.#{column.name}"
 
@@ -82,6 +71,31 @@ class ApplicationRecord < ActiveRecord::Base
           where("#{table_name}.#{index_column} @@ plainto_tsquery(:ts_config, :value)", ts_config: ts_config, value: value)
         else
           where("to_tsvector(:ts_config, #{qualified_column}) @@ plainto_tsquery(:ts_config, :value)", ts_config: ts_config, value: value)
+        end
+      end
+
+      def search_attributes(params, *attributes)
+        attributes.reduce(self) do |relation, attribute|
+          relation.search_attribute(attribute, params)
+        end
+      end
+
+      def search_attribute(name, params)
+        type = type_for_attribute(name).type || reflect_on_association(name)&.class_name
+
+        case type
+        when "User"
+          search_user_attribute(name, params)
+        when "Post"
+          search_post_id_attribute(params)
+        when :string, :text
+          search_text_attribute(name, params)
+        when :boolean
+          search_boolean_attribute(name, params)
+        when :integer, :datetime
+          numeric_attribute_matches(name, params[name])
+        else
+          raise NotImplementedError, "unhandled attribute type"
         end
       end
 
@@ -111,7 +125,7 @@ class ApplicationRecord < ActiveRecord::Base
 
       def search_user_attribute(attr, params)
         if params["#{attr}_id"]
-          numeric_attribute_matches("#{attr}_id", params["#{attr}_id"])
+          search_attribute("#{attr}_id", params)
         elsif params["#{attr}_name"]
           where(attr => User.search(name_matches: params["#{attr}_name"]).reorder(nil))
         elsif params[attr]
@@ -125,7 +139,7 @@ class ApplicationRecord < ActiveRecord::Base
         relation = self
 
         if params[:post_id].present?
-          relation = relation.attribute_matches(:post_id, params[:post_id])
+          relation = relation.search_attribute(:post_id, params)
         end
 
         if params[:post_tags_match].present?
@@ -161,9 +175,9 @@ class ApplicationRecord < ActiveRecord::Base
         params ||= {}
 
         q = all
-        q = q.attribute_matches(:id, params[:id])
-        q = q.attribute_matches(:created_at, params[:created_at]) if attribute_names.include?("created_at")
-        q = q.attribute_matches(:updated_at, params[:updated_at]) if attribute_names.include?("updated_at")
+        q = search_attribute(:id, params)
+        q = search_attribute(:created_at, params) if attribute_names.include?("created_at")
+        q = search_attribute(:updated_at, params) if attribute_names.include?("updated_at")
 
         q
       end

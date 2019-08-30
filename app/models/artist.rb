@@ -490,8 +490,7 @@ class Artist < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_text_attribute(:name, params)
-      q = q.search_text_attribute(:group_name, params)
+      q = q.search_attributes(params, :is_active, :is_banned, :creator, :name, :group_name)
 
       if params[:any_other_name_like]
         q = q.any_other_name_like(params[:any_other_name_like])
@@ -508,10 +507,6 @@ class Artist < ApplicationRecord
       if params[:url_matches].present?
         q = q.url_matches(params[:url_matches])
       end
-
-      q = q.attribute_matches(:is_active, params[:is_active])
-      q = q.attribute_matches(:is_banned, params[:is_banned])
-      q = q.search_user_attribute(:creator, params)
 
       if params[:has_tag].to_s.truthy?
         q = q.joins(:tag).where("tags.post_count > 0")

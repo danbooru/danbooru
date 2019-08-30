@@ -47,20 +47,11 @@ class PostDisapproval < ApplicationRecord
 
   concerning :SearchMethods do
     class_methods do
-      def post_tags_match(query)
-        where(post_id: PostQueryBuilder.new(query).build.reorder(""))
-      end
-
       def search(params)
         q = super
 
-        q = q.attribute_matches(:post_id, params[:post_id])
-        q = q.attribute_matches(:message, params[:message_matches])
-        q = q.search_user_attribute(:user, params)
-        q = q.search_text_attribute(:message, params)
-
-        q = q.post_tags_match(params[:post_tags_match]) if params[:post_tags_match].present?
-        q = q.where(reason: params[:reason]) if params[:reason].present?
+        q = q.search_attributes(params, :post, :user, :message, :reason)
+        q = q.text_attribute_matches(:message, params[:message_matches])
 
         q = q.with_message if params[:has_message].to_s.truthy?
         q = q.without_message if params[:has_message].to_s.falsy?

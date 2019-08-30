@@ -34,12 +34,8 @@ class Comment < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.attribute_matches(:body, params[:body_matches], index_column: :body_index)
-      q = q.search_post_id_attribute(params)
-      q = q.search_user_attribute(:creator, params)
-      q = q.attribute_matches(:is_deleted, params[:is_deleted])
-      q = q.attribute_matches(:is_sticky, params[:is_sticky])
-      q = q.attribute_matches(:do_not_bump_post, params[:do_not_bump_post])
+      q = q.search_attributes(params, :post, :creator, :is_deleted, :is_sticky, :do_not_bump_post)
+      q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index)
 
       case params[:order]
       when "post_id", "post_id_desc"

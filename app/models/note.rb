@@ -19,10 +19,8 @@ class Note < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.attribute_matches(:body, params[:body_matches], index_column: :body_index)
-      q = q.attribute_matches(:is_active, params[:is_active])
-      q = q.search_user_attribute(:creator, params)
-      q = q.search_post_id_attribute(params)
+      q = q.search_attributes(params, :creator, :post, :is_active)
+      q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index)
 
       q.apply_default_order(params)
     end

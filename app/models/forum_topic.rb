@@ -39,10 +39,6 @@ class ForumTopic < ApplicationRecord
       def reverse_category_mapping
         @reverse_category_mapping ||= CATEGORIES.invert
       end
-
-      def for_category_id(cid)
-        where(:category_id => cid)
-      end
     end
 
     def category_name
@@ -70,24 +66,12 @@ class ForumTopic < ApplicationRecord
     def search(params)
       q = super
       q = q.permitted
+      q = q.search_attributes(params, :is_sticky, :is_locked, :is_deleted, :category_id, :title)
+      q = q.text_attribute_matches(:title, params[:title_matches], index_column: :text_index)
 
       if params[:mod_only].present?
         q = q.where("min_level >= ?", MIN_LEVELS[:Moderator])
       end
-
-      q = q.attribute_matches(:title, params[:title_matches], index_column: :text_index)
-
-      if params[:category_id].present?
-        q = q.for_category_id(params[:category_id])
-      end
-
-      if params[:title].present?
-        q = q.where("title = ?", params[:title])
-      end
-
-      q = q.attribute_matches(:is_sticky, params[:is_sticky])
-      q = q.attribute_matches(:is_locked, params[:is_locked])
-      q = q.attribute_matches(:is_deleted, params[:is_deleted])
 
       case params[:order]
       when "sticky"

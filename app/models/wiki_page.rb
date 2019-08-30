@@ -57,8 +57,8 @@ class WikiPage < ApplicationRecord
         q = q.where("title LIKE ? ESCAPE E'\\\\'", params[:title].mb_chars.downcase.strip.tr(" ", "_").to_escaped_for_sql_like)
       end
 
-      q = q.search_user_attribute(:creator, params)
-      q = q.attribute_matches(:body, params[:body_matches], index_column: :body_index, ts_config: "danbooru")
+      q = q.search_attributes(params, :creator, :is_locked, :is_deleted)
+      q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index, ts_config: "danbooru")
 
       if params[:other_names_match].present?
         q = q.other_names_match(params[:other_names_match])
@@ -73,9 +73,6 @@ class WikiPage < ApplicationRecord
       elsif params[:other_names_present].to_s.falsy?
         q = q.where("other_names is null or other_names = '{}'")
       end
-
-      q = q.attribute_matches(:is_locked, params[:is_locked])
-      q = q.attribute_matches(:is_deleted, params[:is_deleted])
 
       params[:order] ||= params.delete(:sort)
       case params[:order]

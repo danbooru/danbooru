@@ -57,21 +57,18 @@ class Pool < ApplicationRecord
     def search(params)
       q = super
 
+      q = q.search_attributes(params, :creator, :is_active, :is_deleted)
+      q = q.text_attribute_matches(:description, params[:description_matches])
+
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
       end
-
-      q = q.attribute_matches(:description, params[:description_matches])
-      q = q.search_user_attribute(:creator, params)
 
       if params[:category] == "series"
         q = q.series
       elsif params[:category] == "collection"
         q = q.collection
       end
-
-      q = q.attribute_matches(:is_active, params[:is_active])
-      q = q.attribute_matches(:is_deleted, params[:is_deleted])
 
       params[:order] ||= params.delete(:sort)
       case params[:order]

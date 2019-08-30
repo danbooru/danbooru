@@ -931,6 +931,8 @@ class Tag < ApplicationRecord
     def search(params)
       q = super
 
+      q = q.search_attributes(params, :is_locked, :category)
+
       if params[:fuzzy_name_matches].present?
         q = q.fuzzy_name_matches(params[:fuzzy_name_matches])
       end
@@ -941,10 +943,6 @@ class Tag < ApplicationRecord
 
       if params[:name].present?
         q = q.where("tags.name": normalize_name(params[:name]).split(","))
-      end
-
-      if params[:category].present?
-        q = q.where("category = ?", params[:category])
       end
 
       if params[:hide_empty].blank? || params[:hide_empty].to_s.truthy?
@@ -962,8 +960,6 @@ class Tag < ApplicationRecord
       elsif params[:has_artist].to_s.falsy?
         q = q.joins("LEFT JOIN artists ON tags.name = artists.name").where("artists.name IS NULL OR artists.is_active = false")
       end
-
-      q = q.attribute_matches(:is_locked, params[:is_locked])
 
       params[:order] ||= params.delete(:sort)
       case params[:order]

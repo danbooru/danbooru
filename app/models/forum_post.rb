@@ -47,24 +47,16 @@ class ForumPost < ApplicationRecord
     def search(params)
       q = super
       q = q.permitted
-
-      q = q.search_user_attribute(:creator, params)
-
-      if params[:topic_id].present?
-        q = q.where("forum_posts.topic_id = ?", params[:topic_id].to_i)
-      end
+      q = q.search_attributes(params, :creator, :topic_id, :is_deleted)
+      q = q.text_attribute_matches(:body, params[:body_matches], index_column: :text_index)
 
       if params[:topic_title_matches].present?
         q = q.topic_title_matches(params[:topic_title_matches])
       end
 
-      q = q.attribute_matches(:body, params[:body_matches], index_column: :text_index)
-
       if params[:topic_category_id].present?
         q = q.joins(:topic).where("forum_topics.category_id = ?", params[:topic_category_id].to_i)
       end
-
-      q = q.attribute_matches(:is_deleted, params[:is_deleted])
 
       q.apply_default_order(params)
     end

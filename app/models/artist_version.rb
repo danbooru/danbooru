@@ -14,14 +14,7 @@ class ArtistVersion < ApplicationRecord
         q = q.where("name like ? escape E'\\\\'", params[:name].to_escaped_for_sql_like)
       end
 
-      q = q.search_user_attribute(:updater, params)
-
-      if params[:artist_id].present?
-        q = q.where(artist_id: params[:artist_id].split(",").map(&:to_i))
-      end
-
-      q = q.attribute_matches(:is_active, params[:is_active])
-      q = q.attribute_matches(:is_banned, params[:is_banned])
+      q = q.search_attributes(params, :updater, :is_active, :is_banned, :artist_id)
 
       params[:order] ||= params.delete(:sort)
       if params[:order] == "name"

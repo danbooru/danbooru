@@ -177,23 +177,10 @@ class Upload < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_user_attribute(:uploader, params)
-      q = q.search_post_id_attribute(params)
-
-      if params[:source].present?
-        q = q.where(source: params[:source])
-      end
+      q = q.search_attributes(params, :uploader, :post, :source, :rating, :parent_id, :server)
 
       if params[:source_matches].present?
         q = q.where("uploads.source LIKE ? ESCAPE E'\\\\'", params[:source_matches].to_escaped_for_sql_like)
-      end
-
-      if params[:rating].present?
-        q = q.where(rating: params[:rating])
-      end
-
-      if params[:parent_id].present?
-        q = q.attribute_matches(:rating, params[:parent_id])
       end
 
       if params[:has_post].to_s.truthy?
@@ -212,10 +199,6 @@ class Upload < ApplicationRecord
 
       if params[:tag_string].present?
         q = q.where("uploads.tag_string LIKE ? ESCAPE E'\\\\'", params[:tag_string].to_escaped_for_sql_like)
-      end
-
-      if params[:server].present?
-        q = q.where(server: params[:server])
       end
 
       q.apply_default_order(params)

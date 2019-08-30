@@ -9,15 +9,9 @@ class WikiPageVersion < ApplicationRecord
     def search(params)
       q = super
 
-      if params[:wiki_page_id].present?
-        q = q.where("wiki_page_id = ?", params[:wiki_page_id].to_i)
-      end
-
-      q = q.attribute_matches(:title, params[:title])
-      q = q.attribute_matches(:body, params[:body])
-      q = q.attribute_matches(:is_locked, params[:is_locked])
-      q = q.attribute_matches(:is_deleted, params[:is_deleted])
-      q = q.search_user_attribute(:updater, params)
+      q = q.search_attributes(params, :updater, :is_locked, :is_deleted, :wiki_page_id)
+      q = q.text_attribute_matches(:title, params[:title])
+      q = q.text_attribute_matches(:body, params[:body])
 
       q.apply_default_order(params)
     end

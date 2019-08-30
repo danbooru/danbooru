@@ -24,10 +24,9 @@ class PostAppeal < ApplicationRecord
 
     def search(params)
       q = super
+      q = q.search_attributes(params, :creator, :post)
+      q = q.text_attribute_matches(:reason, params[:reason_matches])
 
-      q = q.attribute_matches(:reason, params[:reason_matches])
-      q = q.search_user_attribute(:creator, params)
-      q = q.search_post_id_attribute(params)
       q = q.resolved if params[:is_resolved].to_s.truthy?
       q = q.unresolved if params[:is_resolved].to_s.falsy?
 
