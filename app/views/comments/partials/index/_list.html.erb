@@ -4,7 +4,7 @@
   <% end %>
 
   <div class="row notices">
-    <% if post.comments.any? { |c| !c.visible_by?(CurrentUser.user, show_deleted: true) } || (page == :comments && post.comments.size > 6) %>
+    <% if post.comments.hidden(CurrentUser.user).any? || (page == :comments && post.comments.size > 6) %>
       <span class="info" id="threshold-comments-notice-for-<%= post.id %>">
         <%= link_to "Show all comments", comments_path(post_id: post.id), id: "show-all-comments-link", remote: true %>
       </span>

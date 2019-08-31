@@ -130,10 +130,19 @@ class Comment < ApplicationRecord
     user.id.in?(votes.map(&:user_id))
   end
 
-  def visible_by?(user, show_thresholded: false, show_deleted: false)
-    return false if is_deleted? && !show_deleted && !user.is_moderator?
-    return false if score < user.comment_threshold && !is_sticky? && !show_thresholded
-    true
+  def visibility(user)
+    return :invisible if is_deleted? && !user.is_moderator?
+    return :hidden if is_deleted? && user.is_moderator?
+    return :hidden if score < user.comment_threshold && !is_sticky?
+    return :visible
+  end
+
+  def self.hidden(user)
+    select { |comment| comment.visibility(user) == :hidden }
+  end
+
+  def self.visible(user)
+    select { |comment| comment.visibility(user) == :visible }
   end
 
   def hidden_attributes

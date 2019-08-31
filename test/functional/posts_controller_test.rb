@@ -157,12 +157,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_select "div.list-of-comments p", /There are no comments/
         end
 
-        should "show deleted comments to moderators" do
+        should "not show deleted comments to moderators by default, but allow them to be unhidden" do
           mod = create(:mod_user)
           get_auth post_path(@post), mod, params: { id: @post.id }
 
           assert_response :success
-          assert_select "article.comment", 1
+          assert_select "article.comment", 0
+          assert_select "a#show-all-comments-link", 1
+          assert_select "div.list-of-comments p", /There are no comments/
         end
       end
 

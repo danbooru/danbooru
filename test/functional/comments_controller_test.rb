@@ -5,15 +5,12 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     setup do
       @mod = FactoryBot.create(:moderator_user)
       @user = FactoryBot.create(:member_user)
+      @post = create(:post)
+
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
       Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
-
-      @post = FactoryBot.create(:post)
-      @comment = FactoryBot.create(:comment, :post => @post)
-      CurrentUser.scoped(@mod) do
-        @mod_comment = FactoryBot.create(:comment, :post => @post)
-      end
+      Danbooru.config.stubs(:member_comment_limit).returns(100)
     end
 
     teardown do
@@ -22,14 +19,70 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
-      should "render for post" do
-        get comments_path(post_id: @post.id, group_by: "post", format: "js"), xhr: true
-        assert_response :success
-      end
+      context "grouped by post" do
+        should "render all comments for .js" do
+          get comments_path(post_id: @post.id, group_by: "post", format: "js"), xhr: true
+          assert_response :success
+        end
 
-      should "render by post" do
-        get comments_path(group_by: "post")
-        assert_response :success
+        should "show posts with visible comments" do
+          @comment = as(@user) { create(:comment, post: @post) }
+          get comments_path(group_by: "post")
+
+          assert_response :success
+          assert_select "#post_#{@post.id}", 1
+          assert_select "#post_#{@post.id} .comment", 1
+          assert_select "#post_#{@post.id} #show-all-comments-link", 0
+        end
+
+        should "show the 'Show all comments' link on posts with thresholded comments" do
+          as(@user) { create(:comment, post: @post, score: -10) }
+          get comments_path(group_by: "post")
+
+          assert_response :success
+          assert_select "#post_#{@post.id}", 1
+          assert_select "#post_#{@post.id} #show-all-comments-link", 1
+          assert_select "#post_#{@post.id} .comment", 0
+          assert_select "#post_#{@post.id} .list-of-comments", /There are no visible comments/
+        end
+
+        should "not show the 'Show all comments' link on posts with deleted comments to Members" do
+          @comment1 = as(@user) { create(:comment, post: @post) }
+          @comment2 = as(@user) { create(:comment, post: @post, is_deleted: true) }
+          get comments_path(group_by: "post")
+
+          assert_response :success
+          assert_select "#post_#{@post.id}", 1
+          assert_select "#post_#{@post.id} .comment", 1
+          assert_select "#post_#{@post.id} #show-all-comments-link", 0
+        end
+
+        should "show the 'Show all comments' link on posts with deleted comments to Moderators" do
+          @comment1 = as(@user) { create(:comment, post: @post) }
+          @comment2 = as(@user) { create(:comment, post: @post, is_deleted: true) }
+          get_auth comments_path(group_by: "post"), @mod
+
+          assert_response :success
+          assert_select "#post_#{@post.id}", 1
+          assert_select "#post_#{@post.id} .comment", 1
+          assert_select "#post_#{@post.id} #show-all-comments-link", 1
+        end
+
+        should "not bump posts with nonbumping comments" do
+          as(@user) { create(:comment, post: @post, do_not_bump_post: true) }
+          get comments_path(group_by: "post")
+
+          assert_response :success
+          assert_select "#post_#{@post.id}", 0
+        end
+
+        should "not bump posts with only deleted comments" do
+          as(@user) { create(:comment, post: @post, is_deleted: true) }
+          get comments_path(group_by: "post")
+
+          assert_response :success
+          assert_select "#post_#{@post.id}", 0
+        end
       end
 
       should "render by comment" do
@@ -45,6 +98,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
     context "search action" do
       should "render" do
+        @comment = create(:comment, post: @post)
         get search_comments_path
         assert_response :success
       end
@@ -52,6 +106,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
     context "show action" do
       should "render" do
+        @comment = create(:comment, post: @post)
         get comment_path(@comment.id)
         assert_response :success
       end
@@ -59,12 +114,17 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
     context "edit action" do
       should "render" do
+        @comment = create(:comment, post: @post)
         get_auth edit_comment_path(@comment.id), @user
         assert_response :success
       end
     end
 
     context "update action" do
+      setup do
+        @comment = create(:comment, post: @post)
+      end
+
       context "when updating another user's comment" do
         should "succeed if updater is a moderator" do
           put_auth comment_path(@comment.id), @user, params: {comment: {body: "abc"}}
@@ -73,6 +133,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "fail if updater is not a moderator" do
+          @mod_comment = as(@mod) { create(:comment, post: @post) }
           put_auth comment_path(@mod_comment.id), @user, params: {comment: {body: "abc"}}
           assert_not_equal("abc", @mod_comment.reload.body)
           assert_response 403
@@ -141,19 +202,19 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
     context "destroy action" do
       should "mark comment as deleted" do
+        @comment = create(:comment, post: @post)
         delete_auth comment_path(@comment.id), @user
+
         assert_equal(true, @comment.reload.is_deleted)
         assert_redirected_to @comment
       end
     end
 
     context "undelete action" do
-      setup do
-        @comment.delete!        
-      end
-      
       should "mark comment as undeleted" do
+        @comment = create(:comment, post: @post, is_deleted: true)
         post_auth undelete_comment_path(@comment.id), @user
+
         assert_equal(false, @comment.reload.is_deleted)
         assert_redirected_to(@comment)
       end
