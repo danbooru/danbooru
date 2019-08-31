@@ -163,7 +163,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         get news_updates_path(format: :json)
 
         assert_response 403
-        assert_equal "application/json", response.content_type
+        assert_equal "application/json", response.media_type
         assert_equal "Access denied", response.parsed_body["message"]
       end
     end
