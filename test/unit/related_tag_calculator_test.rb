@@ -12,57 +12,55 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
     CurrentUser.ip_addr = nil
   end
 
-  context "A related tag calculator" do
-    context "for a post set" do
-      setup do
-        FactoryBot.create(:post, :tag_string => "aaa bbb ccc ddd")
-        FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
-        FactoryBot.create(:post, :tag_string => "aaa bbb")
-        @posts = Post.tag_match("aaa")
-      end
+  context "RelatedTagCalculator" do
+    context "#frequent_tags_for_posts" do
+      should "calculate the most frequent tags for a set of posts" do
+        create(:post, tag_string: "aaa bbb ccc ddd")
+        create(:post, tag_string: "aaa bbb ccc")
+        create(:post, tag_string: "aaa bbb")
+        posts = Post.tag_match("aaa")
 
-      should "calculate the related tags" do
-        assert_equal({"aaa"=>3, "bbb"=>3, "ccc"=>2, "ddd"=>1}, RelatedTagCalculator.calculate_from_posts(@posts))
+        assert_equal(%w[aaa bbb ccc ddd], RelatedTagCalculator.frequent_tags_for_posts(posts))
       end
     end
 
-    should "calculate related tags for a tag" do
-      posts = []
-      posts << FactoryBot.create(:post, :tag_string => "aaa bbb ccc ddd")
-      posts << FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
-      posts << FactoryBot.create(:post, :tag_string => "aaa bbb")
+    context "#frequent_tags_for_search" do
+      should "calculate the most frequent tags for a single tag search" do
+        create(:post, tag_string: "aaa bbb ccc ddd")
+        create(:post, tag_string: "aaa bbb ccc")
+        create(:post, tag_string: "aaa bbb")
 
-      assert_equal({"aaa" => 3, "bbb" => 3, "ccc" => 2, "ddd" => 1}, RelatedTagCalculator.calculate_from_sample("aaa", 10))
+        assert_equal(%w[aaa bbb ccc ddd], RelatedTagCalculator.frequent_tags_for_search("aaa").pluck(:name))
+      end
+
+      should "calculate the most frequent tags for a multiple tag search" do
+        create(:post, tag_string: "aaa bbb ccc")
+        create(:post, tag_string: "aaa bbb ccc ddd")
+        create(:post, tag_string: "aaa eee fff")
+
+        assert_equal(%w[aaa bbb ccc ddd], RelatedTagCalculator.frequent_tags_for_search("aaa bbb").pluck(:name))
+      end
+
+      should "calculate the most frequent tags with a category constraint" do
+        create(:post, tag_string: "aaa bbb art:ccc copy:ddd")
+        create(:post, tag_string: "aaa bbb art:ccc")
+        create(:post, tag_string: "aaa bbb")
+
+        assert_equal(%w[aaa bbb], RelatedTagCalculator.frequent_tags_for_search("aaa", category: Tag.categories.general).pluck(:name))
+        assert_equal(%w[ccc], RelatedTagCalculator.frequent_tags_for_search("aaa", category: Tag.categories.artist).pluck(:name))
+      end
     end
 
-    should "calculate related tags for multiple tag" do
-      posts = []
-      posts << FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
-      posts << FactoryBot.create(:post, :tag_string => "aaa bbb ccc ddd")
-      posts << FactoryBot.create(:post, :tag_string => "aaa eee fff")
+    context "#similar_tags_for_search" do
+      should "calculate the most similar tags for a search" do
+        create(:post, tag_string: "1girl solo", rating: "s")
+        create(:post, tag_string: "1girl solo", rating: "q")
+        create(:post, tag_string: "1girl 1boy", rating: "q")
 
-      assert_equal({"aaa"=>2, "bbb"=>2, "ddd"=>1, "ccc"=>2}, RelatedTagCalculator.calculate_from_sample("aaa bbb", 10))
-    end
-
-    should "calculate typed related tags for a tag" do
-      posts = []
-      posts << FactoryBot.create(:post, :tag_string => "aaa bbb art:ccc copy:ddd")
-      posts << FactoryBot.create(:post, :tag_string => "aaa bbb art:ccc")
-      posts << FactoryBot.create(:post, :tag_string => "aaa bbb")
-
-      assert_equal({"ccc" => 2}, RelatedTagCalculator.calculate_from_sample("aaa", 10, Tag.categories.artist))
-      assert_equal({"ddd" => 1}, RelatedTagCalculator.calculate_from_sample("aaa", 10, Tag.categories.copyright))
-    end
-
-    should "convert a hash into string format" do
-      posts = []
-      posts << FactoryBot.create(:post, :tag_string => "aaa bbb ccc ddd")
-      posts << FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
-      posts << FactoryBot.create(:post, :tag_string => "aaa bbb")
-
-      tag = Tag.find_by_name("aaa")
-      counts = RelatedTagCalculator.calculate_from_sample("aaa", 10)
-      assert_equal("aaa 3 bbb 3 ccc 2 ddd 1", RelatedTagCalculator.convert_hash_to_string(counts))
+        assert_equal(%w[1girl solo 1boy], RelatedTagCalculator.similar_tags_for_search("1girl").pluck(:name))
+        assert_equal(%w[1girl 1boy solo], RelatedTagCalculator.similar_tags_for_search("rating:q").pluck(:name))
+        assert_equal(%w[solo 1girl], RelatedTagCalculator.similar_tags_for_search("solo").pluck(:name))
+      end
     end
   end
 end

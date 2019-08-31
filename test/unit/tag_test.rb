@@ -283,15 +283,4 @@ class TagTest < ActiveSupport::TestCase
       assert_equal(1, tag.reload.post_count)
     end
   end
-
-  context "The #related_tag_array method" do
-    should "update the related tags" do
-      create(:post, tag_string: "bkub")
-      tag = Tag.find_by_name("bkub")
-
-      assert_nil(tag.related_tags)
-      perform_enqueued_jobs { tag.related_tag_array }
-      assert_equal([["bkub", "1"]], tag.reload.related_tag_array)
-    end
-  end
 end

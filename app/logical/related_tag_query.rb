@@ -18,9 +18,9 @@ class RelatedTagQuery
     if query =~ /\*/
       pattern_matching_tags
     elsif category.present?
-      related_tags_by_category
+      RelatedTagCalculator.frequent_tags_for_search(query, category: Tag.categories.value_for(category)).take(25).pluck(:name)
     elsif query.present?
-      related_tags
+      RelatedTagCalculator.similar_tags_for_search(query).take(25).map(&:name)
     else
       []
     end
@@ -80,20 +80,6 @@ protected
 
   def pattern_matching_tags
     Tag.name_matches(query).where("post_count > 0").order("post_count desc").limit(50).sort_by {|x| x.name}.map(&:name)
-  end
-
-  def related_tags
-    tag = Tag.find_by_name(query.strip)
-
-    if tag
-      tag.related_tag_array.map(&:first)
-    else
-      []
-    end
-  end
-
-  def related_tags_by_category
-    RelatedTagCalculator.calculate_from_sample_to_array(query, Tag.categories.value_for(category)).map(&:first)
   end
 
   def wiki_page

@@ -14,8 +14,8 @@ class Cache
     keys_to_values_hash
   end
 
-  def self.get(key, expiry_in_seconds = nil, &block)
-    Rails.cache.fetch(key, expires_in: expiry_in_seconds, &block)
+  def self.get(key, expiry_in_seconds = nil, **options, &block)
+    Rails.cache.fetch(key, expires_in: expiry_in_seconds, **options, &block)
   end
 
   def self.put(key, value, expiry_in_seconds = nil)

@@ -1,5 +1,4 @@
 class Tag < ApplicationRecord
-  COSINE_SIMILARITY_RELATED_TAG_THRESHOLD = 300
   COUNT_METATAGS = %w[
     comment_count deleted_comment_count active_comment_count
     note_count deleted_note_count active_note_count
@@ -852,57 +851,6 @@ class Tag < ApplicationRecord
     end
   end
 
-  module RelationMethods
-    def update_related
-      return unless should_update_related?
-
-      CurrentUser.scoped(User.first, "127.0.0.1") do
-        self.related_tags = RelatedTagCalculator.calculate_from_sample_to_array(name).join(" ")
-      end
-      self.related_tags_updated_at = Time.now
-      fix_post_count if post_count > 20 && rand(post_count) <= 1
-      save
-    rescue ActiveRecord::StatementInvalid
-    end
-
-    def update_related_if_outdated
-      key = Cache.hash(name)
-
-      if Cache.get("urt:#{key}").nil? && should_update_related?
-        if post_count < COSINE_SIMILARITY_RELATED_TAG_THRESHOLD
-          UpdateRelatedTagsJob.perform_later(self)
-        else
-          sqs = SqsService.new(Danbooru.config.aws_sqs_reltagcalc_url)
-          sqs.send_message("calculate #{name}")
-          self.related_tags_updated_at = Time.now
-          save
-        end
-
-        Cache.put("urt:#{key}", true, 600) # mutex to prevent redundant updates
-      end
-    end
-
-    def related_cache_expiry
-      base = Math.sqrt([post_count, 0].max)
-      if base > 24 * 30
-        24 * 30
-      elsif base < 24
-        24
-      else
-        base
-      end
-    end
-
-    def should_update_related?
-      related_tags.blank? || related_tags_updated_at.blank? || related_tags_updated_at < related_cache_expiry.hours.ago
-    end
-
-    def related_tag_array
-      update_related_if_outdated
-      related_tags.to_s.split(/ /).in_groups_of(2)
-    end
-  end
-
   module SearchMethods
     def empty
       where("tags.post_count <= 0")
@@ -1023,6 +971,5 @@ class Tag < ApplicationRecord
   extend StatisticsMethods
   extend NameMethods
   extend ParseMethods
-  include RelationMethods
   extend SearchMethods
 end
