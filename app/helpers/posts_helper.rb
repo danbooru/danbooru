@@ -58,18 +58,6 @@ module PostsHelper
     return render("posts/partials/show/view_count", msg: msg)
   end
 
-  def common_searches_html(user)
-    return nil unless post_search_counts_enabled?
-    return nil unless user.is_platinum?
-    return nil unless user.enable_recent_searches?
-
-    key = "uid"
-    value = user.id
-    verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.reportbooru_key, serializer: JSON, digest: "SHA256")
-    sig = verifier.generate("#{key},#{value}")
-    render("users/common_searches", user: user, sig: sig)
-  end
-
   def post_source_tag(post)
     if post.source =~ %r!\Ahttp://img\d+\.pixiv\.net/img/([^\/]+)/!i
       text = "pixiv/<wbr>#{wordbreakify($1)}".html_safe

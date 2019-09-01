@@ -114,7 +114,7 @@ class UsersController < ApplicationController
       enable_sequential_post_navigation hide_deleted_posts style_usernames
       enable_auto_complete show_deleted_children
       disable_categorized_saved_searches disable_tagged_filenames
-      enable_recent_searches disable_cropped_thumbnails disable_mobile_gestures
+      disable_cropped_thumbnails disable_mobile_gestures
       enable_safe_mode disable_responsive_mode disable_post_tooltips
       enable_recommended_posts opt_out_tracking
     ]
