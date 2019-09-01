@@ -11,8 +11,6 @@ module DanbooruMaintenance
     PostPruner.new.prune!
     Upload.where('created_at < ?', 1.day.ago).delete_all
     Delayed::Job.where('created_at < ?', 45.days.ago).delete_all
-    PostVote.prune!
-    CommentVote.prune!
     PostDisapproval.prune!
     ForumSubscription.process_all!
     TagAlias.update_cached_post_counts_for_all
