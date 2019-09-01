@@ -36,8 +36,19 @@ class UsersController < ApplicationController
 
   def show
     @user = User.find(params[:id])
-    @presenter = UserPresenter.new(@user)
     respond_with(@user, methods: @user.full_attributes)
+  end
+
+  def profile
+    @user = CurrentUser.user
+
+    if @user.is_member?
+      respond_with(@user, methods: @user.full_attributes, template: "users/show")
+    elsif request.format.html?
+      redirect_to new_session_path
+    else
+      raise ActiveRecord::RecordNotFound
+    end
   end
 
   def create

@@ -2,7 +2,7 @@
   <% if CurrentUser.is_anonymous? %>
     <%= nav_link_to("Sign in", new_session_path) %>
   <% else %>
-    <%= nav_link_to("My Account #{CurrentUser.dmail_count}", user_path(CurrentUser.user)) %>
+    <%= nav_link_to("My Account #{CurrentUser.dmail_count}", profile_path) %>
   <% end %>
   <%= nav_link_to("Posts", posts_path) %>
   <%= nav_link_to("Comments", comments_path(:group_by => "post")) %>

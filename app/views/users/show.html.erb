@@ -2,11 +2,11 @@
   <div id="a-show">
     <h1><%= link_to_user @user %></h1>
 
-    <%= render "statistics", :presenter => @presenter, :user => @user %>
+    <%= render "statistics", presenter: @user.presenter, user: @user %>
 
     <% if !CurrentUser.is_admin? && !@user.enable_privacy_mode? || CurrentUser.id == @user.id %>
       <%= render "posts/partials/common/inline_blacklist" %>
-      <%= render "post_summary", :presenter => @presenter, :user => @user %>
+      <%= render "post_summary", presenter: @user.presenter, user: @user %>
     <% end %>
   </div>
 </div>
@@ -14,7 +14,7 @@
 <%= render "secondary_links" %>
 
 <% content_for(:page_title) do %>
-  User - <%= @presenter.name %> - <%= Danbooru.config.app_name %>
+  User - <%= @user.presenter.name %> - <%= Danbooru.config.app_name %>
 <% end %>
 
 <% content_for(:html_header, auto_discovery_link_tag(:atom, comments_url(:atom, search: { post_tags_match: "user:#{@user.name}" }), title: "Comments on #{@user.name}'s uploads")) %>

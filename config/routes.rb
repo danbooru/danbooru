@@ -410,6 +410,7 @@ Rails.application.routes.draw do
   get "/user/show/:id" => redirect("/users/%{id}")
   get "/user/login" => redirect("/sessions/new")
   get "/user_record" => redirect {|params, req| "/user_feedbacks?search[user_id]=#{req.params[:user_id]}"}
+  get "/profile", to: "users#profile", as: :profile
 
   get "/wiki" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
   get "/wiki/index" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}

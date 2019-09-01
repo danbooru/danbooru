@@ -119,7 +119,7 @@
           <li><%= link_to "Sign in", new_session_path %></li>
           <li><%= link_to "Sign up", new_user_path %></li>
         <% else %>
-          <li><%= link_to "Profile", CurrentUser.user %></li>
+          <li><%= link_to "Profile", profile_path %></li>
           <li><%= link_to "Settings", edit_user_path(CurrentUser.user) %></li>
           <% if CurrentUser.is_gold? %>
             <li><%= link_to "Change name", new_user_name_change_request_path %></li>

@@ -75,6 +75,33 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "profile action" do
+      should "render the current user's profile" do
+        get_auth profile_path, @user
+
+        assert_response :success
+        assert_select "#page h1", @user.name
+      end
+
+      should "render the current users's profile in json" do
+        get_auth profile_path(format: :json), @user
+        assert_response :success
+
+        json = as(@user) { @user.as_json(methods: @user.full_attributes + @user.method_attributes) }
+        assert_equal(json, response.parsed_body)
+      end
+
+      should "redirect anonymous users to the sign in page" do
+        get profile_path
+        assert_redirected_to new_session_path
+      end
+
+      should "return 404 for anonymous api calls" do
+        get profile_path(format: :json)
+        assert_response 404
+      end
+    end
+
     context "new action" do
       setup do
         Danbooru.config.stubs(:enable_recaptcha?).returns(false)
