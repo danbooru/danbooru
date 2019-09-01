@@ -1,4 +1,5 @@
 require 'delayed/plugin'
+require 'danbooru/paginator/active_record_extension'
 
 class DelayedJobTimeoutPlugin < ::Delayed::Plugin
   callbacks do |lifecycle|
