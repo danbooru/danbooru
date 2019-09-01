@@ -24,31 +24,6 @@ class UploadService
       end
     end
 
-    def delete_file(md5, file_ext, upload_id = nil)     
-      if Post.where(md5: md5).exists?
-        if upload_id.present? && Upload.where(id: upload_id).exists?
-          CurrentUser.as_system do
-            Upload.find(upload_id).update(status: "completed")
-          end
-        end
-
-        return
-      end
-
-      if upload_id.present? && Upload.where(id: upload_id).exists?
-        CurrentUser.as_system do
-          Upload.find(upload_id).update(status: "preprocessed + deleted")
-        end
-      end
-
-      Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :original)
-      Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :large)
-      Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :preview)
-      Danbooru.config.backup_storage_manager.delete_file(nil, md5, file_ext, :original)
-      Danbooru.config.backup_storage_manager.delete_file(nil, md5, file_ext, :large)
-      Danbooru.config.backup_storage_manager.delete_file(nil, md5, file_ext, :preview)
-    end
-
     def calculate_ugoira_dimensions(source_path)
       folder = Zip::File.new(source_path)
       Tempfile.open("ugoira-dim-") do |tempfile|
@@ -163,10 +138,6 @@ class UploadService
         crop_file.try(:close!)
         sample_file.try(:close!)
       end
-
-      # in case this upload never finishes processing, we need to delete the
-      # distributed files in the future
-      DeleteUploadFilesJob.set(wait: 24.hours).perform_later(upload.md5, upload.file_ext, upload.id)
     end
 
     # these methods are only really used during upload processing even 

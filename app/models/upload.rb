@@ -67,12 +67,19 @@ class Upload < ApplicationRecord
   validates :md5, confirmation: true, if: -> (rec) { rec.md5_confirmation.present? }
   validates_with FileValidator, on: :file
   serialize :context, JSON
+
+  after_destroy_commit :delete_files
+
   scope :preprocessed, -> { where(status: "preprocessed") }
 
   def initialize_attributes
     self.uploader_id = CurrentUser.id
     self.uploader_ip_addr = CurrentUser.ip_addr
     self.server = Danbooru.config.server_host
+  end
+
+  def self.prune!(date = 1.day.ago)
+    where("created_at < ?", date).lock.destroy_all
   end
 
   module FileMethods
@@ -90,6 +97,21 @@ class Upload < ApplicationRecord
 
     def is_ugoira?
       %w(zip).include?(file_ext)
+    end
+
+    def delete_files
+      # md5 is blank if the upload errored out before downloading the file.
+      if md5.blank? || Upload.where(md5: md5).exists? || Post.where(md5: md5).exists?
+        return
+      end
+
+      DanbooruLogger.info("Uploads: Deleting files for upload md5=#{md5}", upload: as_json)
+      Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :original)
+      Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :large)
+      Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :preview)
+      Danbooru.config.backup_storage_manager.delete_file(nil, md5, file_ext, :original)
+      Danbooru.config.backup_storage_manager.delete_file(nil, md5, file_ext, :large)
+      Danbooru.config.backup_storage_manager.delete_file(nil, md5, file_ext, :preview)
     end
   end
 

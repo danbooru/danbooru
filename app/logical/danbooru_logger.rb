@@ -3,7 +3,8 @@ class DanbooruLogger
     Rails.logger.info(message)
 
     if defined?(::NewRelic)
-      ::NewRelic::Agent.record_custom_event(:spam, message: message, **params)
+      params = flatten_hash(params).symbolize_keys
+      ::NewRelic::Agent.record_custom_event(:info, message: message, **params)
     end
   end
 

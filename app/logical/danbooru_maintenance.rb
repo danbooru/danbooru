@@ -9,7 +9,7 @@ module DanbooruMaintenance
 
   def daily
     PostPruner.new.prune!
-    Upload.where('created_at < ?', 1.day.ago).delete_all
+    Upload.prune!
     Delayed::Job.where('created_at < ?', 45.days.ago).delete_all
     PostDisapproval.prune!
     ForumSubscription.process_all!

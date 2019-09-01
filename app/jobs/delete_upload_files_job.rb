@@ -3,6 +3,6 @@ class DeleteUploadFilesJob < ApplicationJob
   queue_with_priority 20
 
   def perform(md5, file_ext, upload_id)
-    UploadService::Utils.delete_file(md5, file_ext, upload_id)
+    # do nothing
   end
 end

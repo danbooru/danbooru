@@ -1233,4 +1233,53 @@ class UploadServiceTest < ActiveSupport::TestCase
     end
 
   end
+
+  context "Upload#prune!" do
+    setup do
+      @user = create(:user, created_at: 1.year.ago)
+    end
+
+    should "delete stale upload records" do
+      @upload = as(@user) { UploadService.new(file: upload_file("test/files/test.jpg")).start! }
+
+      assert_difference("Upload.count", -1) { Upload.prune!(0.seconds.ago) }
+    end
+
+    should "delete unused files after deleting the upload" do
+      @upload = as(@user) { UploadService::Preprocessor.new(file: upload_file("test/files/test.jpg")).start! }
+      assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+
+      @upload.destroy!
+      refute(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+    end
+
+    should "not delete files that are still in use by a post" do
+      @upload = as(@user) { UploadService.new(file: upload_file("test/files/test.jpg")).start! }
+      assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+
+      @upload.destroy!
+      assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+    end
+
+    should "not delete files if they're still in use by another upload" do
+      @upload1 = as(@user) { UploadService::Preprocessor.new(file: upload_file("test/files/test.jpg")).start! }
+      @upload2 = as(@user) { UploadService::Preprocessor.new(file: upload_file("test/files/test.jpg")).start! }
+      assert_equal(@upload1.md5, @upload2.md5)
+      assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload1.md5, "jpg", :original)))
+
+      @upload1.destroy!
+      assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload1.md5, "jpg", :original)))
+
+      @upload2.destroy!
+      refute(File.exists?(Danbooru.config.storage_manager.file_path(@upload2.md5, "jpg", :original)))
+    end
+
+    should "work on uploads without a file" do
+      @upload = as(@user) { UploadService.new(source: "http://14903gf0vm3g134yjq3n535yn3n.com/does_not_exist.jpg").start! }
+
+      assert(@upload.is_errored?)
+      assert_nil(@upload.md5)
+      assert_difference("Upload.count", -1) { @upload.destroy! }
+    end
+  end
 end
