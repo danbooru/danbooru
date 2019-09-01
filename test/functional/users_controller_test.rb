@@ -135,21 +135,27 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "edit action" do
-      setup do
-        @user = create(:user)
-      end
-
       should "render" do
         get_auth edit_user_path(@user), @user
         assert_response :success
       end
     end
 
-    context "update action" do
-      setup do
-        @user = create(:user)
+    context "settings action" do
+      should "render" do
+        get_auth settings_path, @user
+
+        assert_response :success
+        assert_select "#page h1", "Settings"
       end
 
+      should "redirect anonymous users to the sign in page" do
+        get settings_path
+        assert_redirected_to new_session_path
+      end
+    end
+
+    context "update action" do
       should "update a user" do
         put_auth user_path(@user), @user, params: {:user => {:favorite_tags => "xyz"}}
         @user.reload

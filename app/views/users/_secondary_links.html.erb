@@ -11,8 +11,8 @@
     <% if @user && !@user.new_record? && !CurrentUser.user.is_anonymous? %>
       <li>|</li>
       <% if @user.id == CurrentUser.user.id %>
-        <%= subnav_link_to "Settings", edit_user_path(CurrentUser.user) %>
         <%= subnav_link_to "Profile", profile_path %>
+        <%= subnav_link_to "Settings", settings_path %>
         <%= subnav_link_to "Messages #{CurrentUser.user.dmail_count}", dmails_current_folder_path %>
 
         <% if !@user.is_platinum? %>

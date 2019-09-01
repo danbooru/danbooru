@@ -13,6 +13,16 @@ class UsersController < ApplicationController
     respond_with(@user)
   end
 
+  def settings
+    @user = CurrentUser.user
+
+    if @user.is_anonymous?
+      redirect_to new_session_path
+    else
+      respond_with(@user, template: "users/edit")
+    end
+  end
+
   def index
     if params[:name].present?
       @user = User.find_by_name!(params[:name])
