@@ -6,7 +6,7 @@ class NoteVersion < ApplicationRecord
   def self.search(params)
     q = super
 
-    q = q.search_attributes(params, :updater, :is_active, :post, :note_id)
+    q = q.search_attributes(params, :updater, :is_active, :post, :note_id, :x, :y, :width, :height, :body, :version)
     q = q.text_attribute_matches(:body, params[:body_matches])
 
     q.apply_default_order(params)

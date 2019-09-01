@@ -51,7 +51,7 @@ class PostFlag < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :post, :is_resolved)
+      q = q.search_attributes(params, :post, :is_resolved, :reason)
       q = q.text_attribute_matches(:reason, params[:reason_matches])
 
       # XXX

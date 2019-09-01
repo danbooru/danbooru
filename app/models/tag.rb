@@ -879,7 +879,7 @@ class Tag < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :is_locked, :category)
+      q = q.search_attributes(params, :is_locked, :category, :post_count)
 
       if params[:fuzzy_name_matches].present?
         q = q.fuzzy_name_matches(params[:fuzzy_name_matches])

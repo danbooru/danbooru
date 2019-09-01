@@ -29,7 +29,7 @@ class ArtistCommentary < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_post_id_attribute(params)
+      q = q.search_attributes(params, :post, :original_title, :original_description, :translated_title, :translated_description)
 
       if params[:text_matches].present?
         q = q.text_matches(params[:text_matches])

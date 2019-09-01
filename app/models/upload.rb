@@ -177,7 +177,7 @@ class Upload < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :uploader, :post, :source, :rating, :parent_id, :server)
+      q = q.search_attributes(params, :uploader, :post, :source, :rating, :parent_id, :server, :md5, :server, :file_ext, :file_size, :image_width, :image_height, :referer_url)
 
       if params[:source_matches].present?
         q = q.where("uploads.source LIKE ? ESCAPE E'\\\\'", params[:source_matches].to_escaped_for_sql_like)

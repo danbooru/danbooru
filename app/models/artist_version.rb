@@ -10,11 +10,7 @@ class ArtistVersion < ApplicationRecord
     def search(params)
       q = super
 
-      if params[:name].present?
-        q = q.where("name like ? escape E'\\\\'", params[:name].to_escaped_for_sql_like)
-      end
-
-      q = q.search_attributes(params, :updater, :is_active, :is_banned, :artist_id)
+      q = q.search_attributes(params, :updater, :is_active, :is_banned, :artist_id, :name, :group_name)
 
       params[:order] ||= params.delete(:sort)
       if params[:order] == "name"

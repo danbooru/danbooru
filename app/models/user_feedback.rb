@@ -44,7 +44,7 @@ class UserFeedback < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :user, :creator, :category)
+      q = q.search_attributes(params, :user, :creator, :category, :body)
       q = q.text_attribute_matches(:body, params[:body_matches])
 
       q.apply_default_order(params)

@@ -55,7 +55,7 @@ class ModAction < ApplicationRecord
   def self.search(params)
     q = super
 
-    q = q.search_attributes(params, :creator, :category)
+    q = q.search_attributes(params, :creator, :category, :description)
     q = q.text_attribute_matches(:description, params[:description_matches])
 
     q.apply_default_order(params)

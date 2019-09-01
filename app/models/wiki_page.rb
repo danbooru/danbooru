@@ -53,12 +53,12 @@ class WikiPage < ApplicationRecord
     def search(params = {})
       q = super
 
+      q = q.search_attributes(params, :creator, :updater, :is_locked, :is_deleted, :body)
+      q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index, ts_config: "danbooru")
+
       if params[:title].present?
         q = q.where("title LIKE ? ESCAPE E'\\\\'", params[:title].mb_chars.downcase.strip.tr(" ", "_").to_escaped_for_sql_like)
       end
-
-      q = q.search_attributes(params, :creator, :is_locked, :is_deleted)
-      q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index, ts_config: "danbooru")
 
       if params[:other_names_match].present?
         q = q.other_names_match(params[:other_names_match])

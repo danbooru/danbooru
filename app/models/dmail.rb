@@ -141,7 +141,7 @@ class Dmail < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :to, :from, :is_spam, :is_read, :is_deleted)
+      q = q.search_attributes(params, :to, :from, :is_spam, :is_read, :is_deleted, :title, :body)
       q = q.text_attribute_matches(:title, params[:title_matches])
       q = q.text_attribute_matches(:body, params[:message_matches], index_column: :message_index)
 

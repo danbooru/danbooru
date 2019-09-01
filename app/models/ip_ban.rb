@@ -12,6 +12,7 @@ class IpBan < ApplicationRecord
 
   def self.search(params)
     q = super
+    q = q.search_attributes(params, :creator, :reason)
 
     if params[:ip_addr].present?
       q = q.where("ip_addr = ?", params[:ip_addr])

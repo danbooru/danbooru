@@ -9,7 +9,7 @@ class JanitorTrial < ApplicationRecord
 
   def self.search(params)
     q = super.where(status: "active")
-    q = q.search_user_attribute(:user, params)
+    q = q.search_attributes(params, :user, :creator, :original_level)
     q.apply_default_order(params)
   end
 

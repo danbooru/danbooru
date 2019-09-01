@@ -66,7 +66,7 @@ class ForumTopic < ApplicationRecord
     def search(params)
       q = super
       q = q.permitted
-      q = q.search_attributes(params, :is_sticky, :is_locked, :is_deleted, :category_id, :title)
+      q = q.search_attributes(params, :creator, :updater, :is_sticky, :is_locked, :is_deleted, :category_id, :title, :response_count)
       q = q.text_attribute_matches(:title, params[:title_matches], index_column: :text_index)
 
       if params[:mod_only].present?

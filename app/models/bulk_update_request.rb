@@ -30,7 +30,7 @@ class BulkUpdateRequest < ApplicationRecord
     def search(params = {})
       q = super
 
-      q = q.search_attributes(params, :user, :approver, :forum_topic_id, :forum_post_id)
+      q = q.search_attributes(params, :user, :approver, :forum_topic_id, :forum_post_id, :title, :script)
       q = q.text_attribute_matches(:title, params[:title_matches])
       q = q.text_attribute_matches(:script, params[:script_matches])
 

@@ -11,13 +11,7 @@ class PoolVersion < ApplicationRecord
 
     def search(params)
       q = super
-
-      q = q.search_user_attribute(:updater, params)
-
-      if params[:pool_id].present?
-        q = q.where("pool_id = ?", params[:pool_id].to_i)
-      end
-
+      q = q.search_attributes(params, :updater, :pool_id)
       q.apply_default_order(params)
     end
   end
