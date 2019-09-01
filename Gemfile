@@ -39,6 +39,7 @@ gem 'recaptcha', require: "recaptcha/rails"
 gem 'activemodel-serializers-xml'
 gem 'jquery-rails'
 gem 'webpacker', '>= 4.0.x'
+gem 'rake'
 gem 'retriable'
 gem 'redis'
 gem 'request_store'

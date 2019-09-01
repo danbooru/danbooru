@@ -485,6 +485,7 @@ DEPENDENCIES
   pry-rails
   rack-mini-profiler
   rails (~> 6.0)
+  rake
   rakismet
   recaptcha
   redis
