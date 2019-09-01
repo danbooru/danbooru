@@ -5,22 +5,13 @@ class FavoritesController < ApplicationController
   rescue_with Favorite::Error, status: 422
 
   def index
-    if params[:tags]
-      redirect_to(posts_path(:tags => params[:tags]))
+    if params[:user_id].present?
+      user = User.find(params[:user_id])
+      redirect_to posts_path(tags: "ordfav:#{user.name}")
+    elsif CurrentUser.is_member?
+      redirect_to posts_path(tags: "ordfav:#{CurrentUser.name}")
     else
-      user_id = params[:user_id] || CurrentUser.user.id
-      @user = User.find(user_id)
-
-      if @user.hide_favorites?
-        raise User::PrivilegeError.new
-      end
-
-      @favorite_set = PostSets::Favorite.new(user_id, params[:page], params)
-      respond_with(@favorite_set.posts) do |format|
-        format.xml do
-          render :xml => @favorite_set.posts.to_xml(:root => "posts")
-        end
-      end
+      redirect_to posts_path
     end
   end
 

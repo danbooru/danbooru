@@ -14,7 +14,7 @@
 <% if presenter.has_favorites? %>
   <div class="box user-favorites">
     <h2>
-      <%= link_to "Favorites", favorites_path(:user_id => user.id) %>
+      <%= link_to "Favorites", posts_path(tags: "ordfav:#{user.name}") %>
     </h2>
     <div>
       <% presenter.favorites.each do |post| %>

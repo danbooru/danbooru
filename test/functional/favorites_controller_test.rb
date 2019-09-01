@@ -12,16 +12,19 @@ class FavoritesControllerTest < ActionDispatch::IntegrationTest
         @post.add_favorite!(@user)
       end
 
-      context "with a specified tags parameter" do
-        should "redirect to the posts controller" do
-          get_auth favorites_path, @user, params: {:tags => "fav:#{@user.name} abc"}
-          assert_redirected_to(posts_path(:tags => "fav:#{@user.name} abc"))
-        end
+      should "redirect the user_id param to an ordfav: search" do
+        get favorites_path(user_id: @user.id)
+        assert_redirected_to posts_path(tags: "ordfav:#{@user.name}")
       end
 
-      should "display the current user's favorites" do
+      should "redirect members to an ordfav: search" do
         get_auth favorites_path, @user
-        assert_response :success
+        assert_redirected_to posts_path(tags: "ordfav:#{@user.name}")
+      end
+
+      should "redirect anonymous users to the posts index" do
+        get favorites_path
+        assert_redirected_to posts_path
       end
     end
 
