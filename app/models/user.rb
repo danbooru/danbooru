@@ -752,9 +752,9 @@ class User < ApplicationRecord
       end
 
       if params[:current_user_first].to_s.truthy? && !CurrentUser.is_anonymous?
-        q = q.order("id = #{CurrentUser.user.id.to_i} desc")
+        q = q.order(Arel.sql("id = #{CurrentUser.id} desc"))
       end
-      
+
       case params[:order]
       when "name"
         q = q.order("name")
