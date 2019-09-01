@@ -6,11 +6,7 @@ module PostSetPresenters
 
     def initialize(post_set)
       @post_set = post_set
-      @tag_set_presenter = TagSetPresenter.new(
-        RelatedTagCalculator.calculate_from_sample_to_array(
-          post_set.tag_string
-        ).map {|x| x[0]}
-      )
+      @tag_set_presenter = TagSetPresenter.new(RelatedTagCalculator.frequent_tags_for_posts(post_set.posts).take(25))
     end
   end
 end
