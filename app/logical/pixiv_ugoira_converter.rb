@@ -1,5 +1,11 @@
 class PixivUgoiraConverter
+  def self.enabled?
+    system("type -p ffmpeg > /dev/null") && system("type -p mkvmerge > /dev/null")
+  end
+
   def self.generate_webm(ugoira_file, frame_data)
+    raise NotImplementedError, "can't convert ugoira to webm: ffmpeg or mkvmerge not installed" unless enabled?
+
     folder = Zip::File.new(ugoira_file.path)
     output_file = Tempfile.new(binmode: true)
     write_path = output_file.path

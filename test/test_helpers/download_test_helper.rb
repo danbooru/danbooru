@@ -1,5 +1,3 @@
-require 'ptools'
-
 module DownloadTestHelper
   def assert_downloaded(expected_filesize, source, referer=nil)
     download = Downloads::File.new(source, referer)
@@ -32,9 +30,5 @@ module DownloadTestHelper
   def assert_http_size(size, url, headers: {})
     res = HTTParty.head(url, Danbooru.config.httparty_options.deep_merge(headers: headers))
     assert_equal(size, res.content_length)
-  end
-
-  def check_ffmpeg
-    File.which("ffmpeg") && File.which("mkvmerge")
   end
 end
