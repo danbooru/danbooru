@@ -29,7 +29,11 @@ class PixivApiClient
     attr_reader :json, :pages, :name, :moniker, :user_id, :page_count, :tags
     attr_reader :artist_commentary_title, :artist_commentary_desc
 
-    def initialize(json)
+    def initialize(url)
+      @tags = []
+      @pages = [url]
+      return
+
       @json = json
       @name = json["user"]["name"]
       @user_id = json["user"]["id"]
