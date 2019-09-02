@@ -350,8 +350,6 @@ module Sources
       memoize :agent
 
       def metadata
-        return PixivApiClient::WorkResponse.new(url)
-
         if novel_id.present?
           return PixivApiClient.new.novel(novel_id)
         end

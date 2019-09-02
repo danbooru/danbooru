@@ -29,11 +29,7 @@ class PixivApiClient
     attr_reader :json, :pages, :name, :moniker, :user_id, :page_count, :tags
     attr_reader :artist_commentary_title, :artist_commentary_desc
 
-    def initialize(url)
-      @tags = []
-      @pages = [url]
-      return
-
+    def initialize(json)
       @json = json
       @name = json["user"]["name"]
       @user_id = json["user"]["id"]
@@ -224,15 +220,22 @@ class PixivApiClient
   def access_token
     Cache.get("pixiv-papi-access-token", 3000) do
       access_token = nil
+
+      # Client time and hash are sniffed from the Pixiv Android app. They must
+      # be correct or the request will fail with code=1508.
       headers = {
-        "Referer" => "http://www.pixiv.net"
+        "Referer" => "http://www.pixiv.net",
+        "X-Client-Time": "2019-07-15T12:10:34+08:00",
+        "X-Client-Hash": "124be817ab64a2505833b190a9319d81",
+        #"X-Client-Time": "2019-09-03T00:35:23+08:00",
+        #"X-Client-Hash": "00a470c1b9064e623fa7e955e278c47c",
       }
       params = {
-        "username" => Danbooru.config.pixiv_login,
-        "password" => Danbooru.config.pixiv_password,
-        "grant_type" => "password",
-        "client_id" => CLIENT_ID,
-        "client_secret" => CLIENT_SECRET
+        username: Danbooru.config.pixiv_login,
+        password: Danbooru.config.pixiv_password,
+        grant_type: "password",
+        client_id: CLIENT_ID,
+        client_secret: CLIENT_SECRET,
       }
       url = "https://oauth.secure.pixiv.net/auth/token"
 
