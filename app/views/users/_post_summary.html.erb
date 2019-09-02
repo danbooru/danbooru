@@ -24,7 +24,7 @@
   </div>
 <% end %>
 
-<% if CurrentUser.user.id == @user.id && @user.has_saved_searches? && @user.is_gold? %>
+<% if false %>
   <% presenter.saved_search_labels.each do |label| %>
     <div class="box user-saved-search" data-label="<%= label %>">
       <h2>
