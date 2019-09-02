@@ -6552,7 +6552,7 @@ CREATE INDEX index_pools_on_name ON public.pools USING btree (name);
 -- Name: index_pools_on_name_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_pools_on_name_trgm ON public.pools USING gin (lower((name)::text) public.gin_trgm_ops);
+CREATE INDEX index_pools_on_name_trgm ON public.pools USING gin (name public.gin_trgm_ops);
 
 
 --
@@ -6769,7 +6769,7 @@ CREATE INDEX index_posts_on_pixiv_id ON public.posts USING btree (pixiv_id) WHER
 -- Name: index_posts_on_source_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_posts_on_source_trgm ON public.posts USING gin (lower((source)::text) public.gin_trgm_ops) WHERE ((source)::text <> ''::text);
+CREATE INDEX index_posts_on_source_trgm ON public.posts USING gin (source public.gin_trgm_ops);
 
 
 --
@@ -7007,7 +7007,7 @@ CREATE UNIQUE INDEX index_users_on_name ON public.users USING btree (lower((name
 -- Name: index_users_on_name_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_users_on_name_trgm ON public.users USING gin (lower((name)::text) public.gin_trgm_ops);
+CREATE INDEX index_users_on_name_trgm ON public.users USING gin (name public.gin_trgm_ops);
 
 
 --
@@ -7315,6 +7315,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190827234625'),
 ('20190828005453'),
 ('20190829052629'),
-('20190829055758');
+('20190829055758'),
+('20190902224045');
 
 

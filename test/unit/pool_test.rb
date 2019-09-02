@@ -52,6 +52,15 @@ class PoolTest < ActiveSupport::TestCase
     end
   end
 
+  context "Searching pools" do
+    should "find pools by name" do
+      @pool = FactoryBot.create(:pool, name: "Test Pool")
+
+      assert_equal(@pool.id, Pool.find_by_name("test pool").id)
+      assert_equal(@pool.id, Pool.search(name_matches: "test pool").first.id)
+    end
+  end
+
   context "Creating a pool" do
     setup do
       @posts = FactoryBot.create_list(:post, 5)

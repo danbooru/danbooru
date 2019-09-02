@@ -47,7 +47,7 @@ class Pool < ApplicationRecord
     def name_matches(name)
       name = normalize_name_for_search(name)
       name = "*#{name}*" unless name =~ /\*/
-      where("lower(pools.name) like ? escape E'\\\\'", name.to_escaped_for_sql_like)
+      where_ilike(:name, name)
     end
 
     def default_order
@@ -108,7 +108,7 @@ class Pool < ApplicationRecord
     if name =~ /^\d+$/
       where("pools.id = ?", name.to_i).first
     elsif name
-      where("lower(pools.name) = ?", normalize_name_for_search(name)).first
+      where_ilike(:name, normalize_name_for_search(name)).first
     else
       nil
     end

@@ -197,7 +197,7 @@ class PostQueryBuilder
 
     if q[:source]
       if q[:source] == "none"
-        relation = relation.where("posts.source = ''")
+        relation = relation.where_like(:source, '')
       else
         relation = relation.where_ilike(:source, q[:source].downcase + "*")
       end
@@ -205,7 +205,7 @@ class PostQueryBuilder
 
     if q[:source_neg]
       if q[:source_neg] == "none"
-        relation = relation.where("posts.source != ''")
+        relation = relation.where_not_like(:source, '')
       else
         relation = relation.where_not_ilike(:source, q[:source_neg].downcase + "*")
       end
