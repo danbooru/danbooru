@@ -181,4 +181,15 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       end
     end
   end
+
+  context "all index methods" do
+    should "support searching by the id attribute" do
+      tags = create_list(:tag, 2, post_count: 42)
+      get tags_path(format: :json), params: { search: { id: tags.first.id } }
+
+      assert_response :success
+      assert_equal(1, response.parsed_body.size)
+      assert_equal(tags.first.id, response.parsed_body.first.fetch("id"))
+    end
+  end
 end

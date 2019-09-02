@@ -174,12 +174,8 @@ class ApplicationRecord < ActiveRecord::Base
       def search(params = {})
         params ||= {}
 
-        q = all
-        q = search_attribute(:id, params)
-        q = search_attribute(:created_at, params) if attribute_names.include?("created_at")
-        q = search_attribute(:updated_at, params) if attribute_names.include?("updated_at")
-
-        q
+        default_attributes = (attribute_names & %w[id created_at updated_at])
+        search_attributes(params, *default_attributes)
       end
     end
   end
