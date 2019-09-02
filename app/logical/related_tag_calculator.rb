@@ -29,4 +29,14 @@ module RelatedTagCalculator
     tags_with_counts = posts.flat_map(&:tag_array).group_by(&:itself).transform_values(&:size)
     tags_with_counts.sort_by { |tag_name, count| [-count, tag_name] }.map(&:first)
   end
+
+  def self.cached_similar_tags_for_search(tag_query, max_tags, search_timeout: 2000, cache_timeout: 8.hours)
+    Cache.get("similar_tags:#{tag_query}", cache_timeout, race_condition_ttl: 60.seconds) do
+      ApplicationRecord.with_timeout(search_timeout, []) do
+        CurrentUser.without_safe_mode do
+          RelatedTagCalculator.similar_tags_for_search(tag_query).take(max_tags).pluck(:name)
+        end
+      end
+    end
+  end
 end

@@ -40,11 +40,7 @@ module PostSetPresenters
     end
 
     def similar_tags
-      Cache.get("similar_tags:#{post_set.tag_string}", 4.hours, race_condition_ttl: 60.seconds) do
-        ApplicationRecord.with_timeout(1_000, []) do
-          RelatedTagCalculator.similar_tags_for_search(post_set.tag_string).take(MAX_TAGS).pluck(:name)
-        end
-      end
+      RelatedTagCalculator.cached_similar_tags_for_search(post_set.tag_string, MAX_TAGS)
     end
 
     def frequent_tags
