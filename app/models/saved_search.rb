@@ -1,5 +1,5 @@
 class SavedSearch < ApplicationRecord
-  REDIS_EXPIRY = 3600
+  REDIS_EXPIRY = 1.hour
   QUERY_LIMIT = 1000
 
   def self.enabled?
@@ -7,6 +7,8 @@ class SavedSearch < ApplicationRecord
   end
 
   concerning :Redis do
+    extend Memoist
+
     class_methods do
       extend Memoist
 
@@ -24,7 +26,7 @@ class SavedSearch < ApplicationRecord
           if redis.exists(redis_key)
             sub_ids = redis.smembers(redis_key).map(&:to_i)
             post_ids.merge(sub_ids)
-            redis.expire(redis_key, REDIS_EXPIRY)
+            redis.expire(redis_key, REDIS_EXPIRY.to_i)
           else
             PopulateSavedSearchJob.perform_later(query)
           end
@@ -32,6 +34,13 @@ class SavedSearch < ApplicationRecord
         post_ids.to_a.sort.last(QUERY_LIMIT)
       end
     end
+
+    def refreshed_at
+      ttl = SavedSearch.redis.ttl("search:#{query}")
+      return nil if ttl < 0
+      (REDIS_EXPIRY.to_i - ttl).seconds.ago
+    end
+    memoize :refreshed_at
   end
 
   concerning :Labels do
@@ -109,7 +118,7 @@ class SavedSearch < ApplicationRecord
 
           if post_ids.present?
             redis.sadd(redis_key, post_ids)
-            redis.expire(redis_key, REDIS_EXPIRY)
+            redis.expire(redis_key, REDIS_EXPIRY.to_i)
           end
         end
       end

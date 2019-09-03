@@ -18,6 +18,7 @@
         <tr>
           <th data-sort="string">Query</th>
           <th data-sort="string">Labels</th>
+          <th>Last Refreshed</th>
           <th class="links"></th>
         </tr>
       </thead>
@@ -30,6 +31,13 @@
               <% ss.labels.each do |label| %>
                 <%= link_to label, posts_path(:tags => "search:#{label}") %>
               <% end %>          
+            </td>
+            <td>
+              <% if ss.refreshed_at.present? %>
+                <%= time_ago_in_words_tagged ss.refreshed_at %>
+              <% else %>
+                &gt;<%= SavedSearch::REDIS_EXPIRY.inspect %> ago
+              <% end %>
             </td>
             <td class="links">
               <%= link_to "edit", edit_saved_search_path(ss) %>
