@@ -93,6 +93,17 @@ class SavedSearch < ApplicationRecord
 
   concerning :Search do
     class_methods do
+      def search(params)
+        q = super
+        q = q.search_attributes(params, :query)
+
+        if params[:label]
+          q = q.labeled(params[:label])
+        end
+
+        q.apply_default_order(params)
+      end
+
       def populate(query)
         CurrentUser.as_system do
           redis_key = "search:#{query}"

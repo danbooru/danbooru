@@ -7,19 +7,25 @@
       <% end %>
     </h1>
 
-    <table class="striped" width="100%">
+    <%= simple_form_for(:search, url: saved_searches_path, method: :get, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+      <%= f.input :query_ilike, label: "Query", input_html: { value: params[:search][:query_ilike] } %>
+      <%= f.input :label, label: "Label", input_html: { value: params[:search][:label] } %>
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <table class="striped autofit" width="100%">
       <thead>
         <tr>
-          <th data-sort="string" width="60%">Query</th>
-          <th data-sort="string" width="20%">Labels</th>
-          <th width="20%" class="links"></th>
+          <th data-sort="string">Query</th>
+          <th data-sort="string">Labels</th>
+          <th class="links"></th>
         </tr>
       </thead>
 
       <tbody>
         <% @saved_searches.each do |ss| %>
           <tr id="saved-search-<%= ss.id %>">
-            <td><%= link_to ss.query, posts_path(:tags => ss.query) %></td>
+            <td class="col-expand"><%= link_to ss.query, posts_path(tags: ss.query) %></td>
             <td>
               <% ss.labels.each do |label| %>
                 <%= link_to label, posts_path(:tags => "search:#{label}") %>
@@ -33,6 +39,8 @@
         <% end %>
       </tbody>
     </table>
+
+    <%= numbered_paginator(@saved_searches) %>
   </div>
 </div>
 

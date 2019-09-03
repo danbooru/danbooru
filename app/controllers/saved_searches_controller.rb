@@ -3,11 +3,7 @@ class SavedSearchesController < ApplicationController
   respond_to :html, :xml, :json, :js
   
   def index
-    @saved_searches = saved_searches.order("id")
-
-    if params[:label]
-      @saved_searches = saved_searches.labeled(params[:label])
-    end
+    @saved_searches = saved_searches.search(search_params).paginate(params[:page], limit: params[:limit])
 
     respond_with(@saved_searches) do |format|
       format.xml do
