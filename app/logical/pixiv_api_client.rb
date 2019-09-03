@@ -2,10 +2,11 @@ require 'resolv-replace'
 
 class PixivApiClient
   extend Memoist
-  
+
   API_VERSION = "1"
   CLIENT_ID = "bYGKuGVw91e0NMfPGp44euvGt59s"
   CLIENT_SECRET = "HP3RmkgAmEGro0gn1x9ioawQE8WMfvLXDz3ZqxpK"
+  CLIENT_HASH_SALT = "28c1fdd170a5204386cb1313c7077b34f83e4aaf4aa829ce78c231e05b0bae2c"
 
   # Tools to not include in the tags list. We don't tag digital media, so
   # including these results in bad translated tags suggestions.
@@ -221,14 +222,13 @@ class PixivApiClient
     Cache.get("pixiv-papi-access-token", 3000) do
       access_token = nil
 
-      # Client time and hash are sniffed from the Pixiv Android app. They must
-      # be correct or the request will fail with code=1508.
+      client_time = Time.now.rfc3339
+      client_hash = Digest::MD5.hexdigest(client_time + CLIENT_HASH_SALT)
+
       headers = {
-        "Referer" => "http://www.pixiv.net",
-        "X-Client-Time": "2019-07-15T12:10:34+08:00",
-        "X-Client-Hash": "124be817ab64a2505833b190a9319d81",
-        #"X-Client-Time": "2019-09-03T00:35:23+08:00",
-        #"X-Client-Hash": "00a470c1b9064e623fa7e955e278c47c",
+        "Referer": "http://www.pixiv.net",
+        "X-Client-Time": client_time,
+        "X-Client-Hash": client_hash,
       }
       params = {
         username: Danbooru.config.pixiv_login,
