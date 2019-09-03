@@ -75,7 +75,7 @@ class ApplicationRecord < ActiveRecord::Base
       end
 
       def search_attributes(params, *attributes)
-        attributes.reduce(self) do |relation, attribute|
+        attributes.reduce(all) do |relation, attribute|
           relation.search_attribute(attribute, params)
         end
       end
@@ -136,7 +136,7 @@ class ApplicationRecord < ActiveRecord::Base
       end
 
       def search_post_id_attribute(params)
-        relation = self
+        relation = all
 
         if params[:post_id].present?
           relation = relation.search_attribute(:post_id, params)
@@ -174,7 +174,7 @@ class ApplicationRecord < ActiveRecord::Base
       def search(params = {})
         params ||= {}
 
-        default_attributes = (attribute_names & %w[id created_at updated_at])
+        default_attributes = (attribute_names.map(&:to_sym) & %i[id created_at updated_at])
         search_attributes(params, *default_attributes)
       end
     end
