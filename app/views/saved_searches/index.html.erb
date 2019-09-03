@@ -18,7 +18,9 @@
         <tr>
           <th data-sort="string">Query</th>
           <th data-sort="string">Labels</th>
-          <th>Last Refreshed</th>
+          <th>Posts</th>
+          <th>Refreshed</th>
+          <th>Created</th>
           <th class="links"></th>
         </tr>
       </thead>
@@ -32,6 +34,7 @@
                 <%= link_to label, posts_path(:tags => "search:#{label}") %>
               <% end %>          
             </td>
+            <td><%= ss.cached_size if ss.cached_size > 0 %></td>
             <td>
               <% if ss.refreshed_at.present? %>
                 <%= time_ago_in_words_tagged ss.refreshed_at %>
@@ -39,6 +42,7 @@
                 &gt;<%= SavedSearch::REDIS_EXPIRY.inspect %> ago
               <% end %>
             </td>
+            <td><%= time_ago_in_words_tagged ss.created_at %></td>
             <td class="links">
               <%= link_to "edit", edit_saved_search_path(ss) %>
                 | <%= link_to "delete", saved_search_path(ss), :method => :delete, :remote => true %>

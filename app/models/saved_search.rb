@@ -41,6 +41,11 @@ class SavedSearch < ApplicationRecord
       (REDIS_EXPIRY.to_i - ttl).seconds.ago
     end
     memoize :refreshed_at
+
+    def cached_size
+      SavedSearch.redis.scard("search:#{query}")
+    end
+    memoize :cached_size
   end
 
   concerning :Labels do
