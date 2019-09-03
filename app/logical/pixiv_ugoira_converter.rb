@@ -1,6 +1,6 @@
 class PixivUgoiraConverter
   def self.enabled?
-    system("type -p ffmpeg > /dev/null") && system("type -p mkvmerge > /dev/null")
+    system("ffmpeg -version > /dev/null") && system("mkvmerge --version > /dev/null")
   end
 
   def self.generate_webm(ugoira_file, frame_data)
