@@ -36,14 +36,14 @@ class SavedSearch < ApplicationRecord
     end
 
     def refreshed_at
-      ttl = SavedSearch.redis.ttl("search:#{query}")
+      ttl = SavedSearch.redis.ttl("search:#{normalized_query}")
       return nil if ttl < 0
       (REDIS_EXPIRY.to_i - ttl).seconds.ago
     end
     memoize :refreshed_at
 
     def cached_size
-      SavedSearch.redis.scard("search:#{query}")
+      SavedSearch.redis.scard("search:#{normalized_query}")
     end
     memoize :cached_size
   end
