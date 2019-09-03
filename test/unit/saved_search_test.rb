@@ -123,6 +123,23 @@ class SavedSearchTest < ActiveSupport::TestCase
     end
   end
 
+  context "Populating a saved search" do
+    setup do
+      @saved_search = create(:saved_search, query: "bkub", user: @user)
+      @post = create(:post, tag_string: "bkub")
+    end
+
+    should "work for a single tag search" do
+      SavedSearch.populate("bkub")
+      assert_equal([@post.id], SavedSearch.post_ids_for(@user.id))
+    end
+
+    should "work for a tag search returning no posts" do
+      SavedSearch.populate("does_not_exist")
+      assert_equal([], SavedSearch.post_ids_for(@user.id))
+    end
+  end
+
   context "Creating a saved search" do
     setup do
       FactoryBot.create(:tag_alias, antecedent_name: "zzz", consequent_name: "yyy", creator: @user)

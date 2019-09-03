@@ -266,7 +266,7 @@ class ApplicationRecord < ActiveRecord::Base
         connection.execute("SET STATEMENT_TIMEOUT = #{n}") unless Rails.env == "test"
         yield
       rescue ::ActiveRecord::StatementInvalid => x
-        DanbooruLogger.log(x, expected: true)
+        DanbooruLogger.log(x, expected: false, **new_relic_params)
         return default_value
       ensure
         connection.execute("SET STATEMENT_TIMEOUT = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env == "test"

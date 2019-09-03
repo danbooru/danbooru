@@ -19,18 +19,12 @@ class SavedSearch < ApplicationRecord
         label = normalize_label(label) if label
         queries = queries_for(user_id, label: label)
         post_ids = Set.new
-        update_count = 0
         queries.each do |query|
           redis_key = "search:#{query}"
           if redis.exists(redis_key)
             sub_ids = redis.smembers(redis_key).map(&:to_i)
             post_ids.merge(sub_ids)
             redis.expire(redis_key, REDIS_EXPIRY)
-          elsif CurrentUser.is_gold? && update_count < 5
-            SavedSearch.populate(query)
-            sub_ids = redis.smembers(redis_key).map(&:to_i)
-            post_ids.merge(sub_ids)
-            update_count += 1
           else
             PopulateSavedSearchJob.perform_later(query)
           end
@@ -104,13 +98,19 @@ class SavedSearch < ApplicationRecord
         q.apply_default_order(params)
       end
 
-      def populate(query)
+      def populate(query, timeout: 10_000)
         CurrentUser.as_system do
           redis_key = "search:#{query}"
           return if redis.exists(redis_key)
-          post_ids = Post.tag_match(query, read_only: Rails.env.production?).limit(QUERY_LIMIT).pluck(:id)
-          redis.sadd(redis_key, post_ids)
-          redis.expire(redis_key, REDIS_EXPIRY)
+
+          post_ids = Post.with_timeout(timeout, [], query: query) do
+            Post.tag_match(query).limit(QUERY_LIMIT).pluck(:id)
+          end
+
+          if post_ids.present?
+            redis.sadd(redis_key, post_ids)
+            redis.expire(redis_key, REDIS_EXPIRY)
+          end
         end
       end
     end
