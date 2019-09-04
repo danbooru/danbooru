@@ -220,6 +220,15 @@ module Sources
       end
     end
 
+    context "An mp4 post" do
+      should "find the mp4 file" do
+        site = Sources::Strategies.find("https://nijie.info/view.php?id=319485")
+
+        assert_equal(["https://pic.nijie.net/03/nijie_picture/829001_20190620004513_0.mp4"], site.image_urls)
+        assert_equal("https://pic.nijie.net/03/nijie_picture/829001_20190620004513_0.mp4", site.image_url)
+      end
+    end
+
     context "An artist profile url" do
       should "not fail" do
         site = Sources::Strategies.find("https://nijie.info/members_illust.php?id=236014")

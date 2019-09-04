@@ -50,6 +50,7 @@ module Sources
 
       # https://pic03.nijie.info/nijie_picture/28310_20131101215959.jpg
       # https://pic03.nijie.info/nijie_picture/236014_20170620101426_0.png
+      # http://pic.nijie.net/03/nijie_picture/829001_20190620004513_0.mp4
       # https://pic05.nijie.info/nijie_picture/diff/main/559053_20180604023346_1.png
       FILENAME1 = %r!(?<artist_id>\d+)_(?<timestamp>\d{14})(?:_\d+)?!i
 
@@ -77,7 +78,7 @@ module Sources
       end
 
       def image_urls
-        images = page&.search("div#gallery a > img").to_a.map do |img|
+        images = page&.search("div#gallery a > .mozamoza").to_a.map do |img|
           "https:#{img["src"]}"
         end
 
