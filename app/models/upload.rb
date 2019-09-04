@@ -101,7 +101,7 @@ class Upload < ApplicationRecord
 
     def delete_files
       # md5 is blank if the upload errored out before downloading the file.
-      if md5.blank? || Upload.where(md5: md5).exists? || Post.where(md5: md5).exists?
+      if is_completed? || md5.blank? || Upload.where(md5: md5).exists? || Post.where(md5: md5).exists?
         return
       end
 

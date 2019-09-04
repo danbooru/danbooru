@@ -1274,6 +1274,23 @@ class UploadServiceTest < ActiveSupport::TestCase
       refute(File.exists?(Danbooru.config.storage_manager.file_path(@upload2.md5, "jpg", :original)))
     end
 
+    should "not delete files that were replaced after upload and are still pending deletion" do
+      @upload = as(@user) { UploadService.new(file: upload_file("test/files/test.jpg")).start! }
+      assert(@upload.is_completed?)
+
+      as(@user) { @upload.post.replace!(replacement_file: upload_file("test/files/test.png"), replacement_url: "") }
+      assert_not_equal(@upload.md5, @upload.post.md5)
+
+      # after replacement the uploaded file is no longer in use, but it shouldn't be
+      # deleted yet. it should only be deleted by the replacer after the grace period.
+      @upload.destroy!
+      assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+
+      travel (PostReplacement::DELETION_GRACE_PERIOD + 1).days
+      workoff_active_jobs
+      refute(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+    end
+
     should "work on uploads without a file" do
       @upload = as(@user) { UploadService.new(source: "http://14903gf0vm3g134yjq3n535yn3n.com/does_not_exist.jpg").start! }
 
