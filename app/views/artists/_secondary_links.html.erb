@@ -3,7 +3,9 @@
     <li><%= render "artists/quick_search" %></li>
     <%= subnav_link_to "Listing", artists_path %>
     <%= subnav_link_to "Banned", banned_artists_path %>
-    <%= subnav_link_to "New", new_artist_path %>
+    <% if CurrentUser.is_member? %>
+      <%= subnav_link_to "New", new_artist_path %>
+    <% end %>
     <%= subnav_link_to "Recent changes", artist_versions_path %>
     <%= subnav_link_to "URLs", artist_urls_path %>
     <% if @artist && !@artist.new_record? %>
