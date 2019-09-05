@@ -3,16 +3,13 @@
   <li><strong>Status</strong> <%= artist.status %></li>
 
   <% if !artist.is_banned? || CurrentUser.is_member? %>
-    <% if artist.has_tag_alias? %>
-      <li><strong>Tag Alias</strong> <%= artist.tag_alias_name %></li>
-    <% end %>
     <% if artist.other_names.present? %>
       <li><strong>Other Names</strong> <%= link_to_artists(artist.other_names) %></li>
     <% end %>
     <% if artist.group_name.present? %>
       <li><strong>Group</strong> <%= link_to_artist(artist.group_name) %></li>
     <% end %>
-    <% if artist.members.any? %>
+    <% if artist.members.present? %>
       <li><strong>Members</strong> <%= link_to_artists(artist.members.map(&:name)) %></li>
     <% end %>
     <% if artist.domains.any? %>
@@ -23,7 +20,7 @@
         <% end %>
       </ul>
     <% end %>
-    <% if artist.urls.any? %>
+    <% if artist.urls.present? %>
       <li><strong>URLs</strong></li>
       <ul>
         <% artist.urls.each do |url| %>
