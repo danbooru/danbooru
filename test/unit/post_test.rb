@@ -2550,6 +2550,12 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "an aliased tag" do
+        should "return the count of the consequent tag" do
+          assert_equal(Post.fast_count("aaa"), Post.fast_count("alias"))
+        end
+      end
+
       context "a single metatag" do
         should "return the correct cached count" do
           FactoryBot.build(:tag, name: "score:42", post_count: -100).save(validate: false)

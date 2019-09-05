@@ -61,6 +61,14 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
         assert_equal(%w[1girl 1boy solo], RelatedTagCalculator.similar_tags_for_search("rating:q").pluck(:name))
         assert_equal(%w[solo 1girl], RelatedTagCalculator.similar_tags_for_search("solo").pluck(:name))
       end
+
+      should "calculate the similar tags for an aliased tag" do
+        create(:tag_alias, antecedent_name: "rabbit", consequent_name: "bunny")
+        create(:post, tag_string: "bunny dog")
+        create(:post, tag_string: "bunny cat")
+
+        assert_equal(%w[bunny cat dog], RelatedTagCalculator.similar_tags_for_search("rabbit").pluck(:name))
+      end
     end
   end
 end
