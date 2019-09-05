@@ -26,7 +26,6 @@ class SavedSearch < ApplicationRecord
           if redis.exists(redis_key)
             sub_ids = redis.smembers(redis_key).map(&:to_i)
             post_ids.merge(sub_ids)
-            redis.expire(redis_key, REDIS_EXPIRY.to_i)
           else
             PopulateSavedSearchJob.perform_later(query)
           end
