@@ -35,7 +35,7 @@ module PostsHelper
   def post_search_count_js
     return nil unless post_search_counts_enabled?
     
-    if action_name == "index" && params[:page].nil?
+    if params[:action] == "index" && params[:page].nil?
       tags = Tag.scan_query(params[:tags]).sort.join(" ")
 
       if tags.present?
