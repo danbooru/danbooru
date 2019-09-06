@@ -59,6 +59,25 @@ class PoolTest < ActiveSupport::TestCase
       assert_equal(@pool.id, Pool.find_by_name("test pool").id)
       assert_equal(@pool.id, Pool.search(name_matches: "test pool").first.id)
     end
+
+    should "find pools by post id" do
+      @pool1 = create(:pool, name: "pool1")
+      @pool2 = create(:pool, name: "pool2")
+      @post1 = create(:post, tag_string: "pool:pool1")
+      @post2 = create(:post, tag_string: "pool:pool2")
+
+      assert_equal([@pool1.id], Pool.search(post_ids_include: @post1.id).pluck(:id))
+      assert_equal([@pool2.id, @pool1.id], Pool.search(post_ids_include: "#{@post1.id} #{@post2.id}").pluck(:id))
+    end
+
+    should "find pools by post id count" do
+      @pool1 = create(:pool, name: "pool1")
+      @pool2 = create(:pool, name: "pool2")
+      @post1 = create(:post, tag_string: "pool:pool1")
+      @post2 = create(:post, tag_string: "pool:pool1")
+
+      assert_equal([@pool1.id], Pool.search(post_id_count: 2).pluck(:id))
+    end
   end
 
   context "Creating a pool" do

@@ -35,6 +35,18 @@ class ApplicationRecord < ActiveRecord::Base
         where.not("#{qualified_column_for(attr)} ~ ?", "(?e)" + value)
       end
 
+      def where_array_includes(attr, values)
+        where("#{qualified_column_for(attr)} && ARRAY[?]", values)
+      end
+
+      def where_array_count(attr, value)
+        relation = all
+        qualified_column = "cardinality(#{qualified_column_for(attr)})"
+        parsed_range = Tag.parse_helper(value, :integer)
+
+        PostQueryBuilder.new(nil).add_range_relation(parsed_range, qualified_column, relation)
+      end
+
       def search_boolean_attribute(attribute, params)
         return all unless params[attribute]
 
@@ -81,7 +93,8 @@ class ApplicationRecord < ActiveRecord::Base
       end
 
       def search_attribute(name, params)
-        type = type_for_attribute(name).type || reflect_on_association(name)&.class_name
+        column = column_for_attribute(name)
+        type = column.type || reflect_on_association(name)&.class_name
 
         case type
         when "User"
@@ -93,7 +106,11 @@ class ApplicationRecord < ActiveRecord::Base
         when :boolean
           search_boolean_attribute(name, params)
         when :integer, :datetime
-          numeric_attribute_matches(name, params[name])
+          if column.array?
+            search_array_attribute(name, type, params)
+          else
+            numeric_attribute_matches(name, params[name])
+          end
         else
           raise NotImplementedError, "unhandled attribute type"
         end
@@ -144,6 +161,21 @@ class ApplicationRecord < ActiveRecord::Base
 
         if params[:post_tags_match].present?
           relation = relation.where(post_id: Post.tag_match(params[:post_tags_match]).reorder(nil))
+        end
+
+        relation
+      end
+
+      def search_array_attribute(name, type, params)
+        relation = all
+
+        if params[:"#{name}_include"] && type == :integer
+          items = params[:"#{name}_include"].to_s.scan(/\d+/).map(&:to_i)
+          relation = relation.where_array_includes(name, items)
+        end
+
+        if params[:"#{name.to_s.singularize}_count"]
+          relation = relation.where_array_count(name, params[:"#{name.to_s.singularize}_count"])
         end
 
         relation

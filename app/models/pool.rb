@@ -57,7 +57,7 @@ class Pool < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :creator, :is_active, :is_deleted, :name, :description)
+      q = q.search_attributes(params, :creator, :is_active, :is_deleted, :name, :description, :post_ids)
       q = q.text_attribute_matches(:description, params[:description_matches])
 
       if params[:name_matches].present?
