@@ -246,12 +246,6 @@ class Artist < ApplicationRecord
     end
   end
 
-  module GroupMethods
-    def member_names
-      members.map(&:name).join(", ")
-    end
-  end
-
   module VersionMethods
     def create_version(force=false)
       if saved_change_to_name? || url_string_changed || saved_change_to_is_active? || saved_change_to_is_banned? || saved_change_to_other_names? || saved_change_to_group_name? || saved_change_to_notes? || force
@@ -524,7 +518,6 @@ class Artist < ApplicationRecord
 
   include UrlMethods
   include NameMethods
-  include GroupMethods
   include VersionMethods
   extend FactoryMethods
   include NoteMethods

@@ -408,7 +408,6 @@ class ArtistTest < ActiveSupport::TestCase
       cat_or_fish = FactoryBot.create(:artist, :name => "cat_or_fish")
       yuu = FactoryBot.create(:artist, :name => "yuu", :group_name => "cat_or_fish")
 
-      assert_equal("yuu", cat_or_fish.member_names)
       assert_not_nil(Artist.search(:group_name => "cat_or_fish").first)
       assert_not_nil(Artist.search(:any_name_matches => "cat_or_fish").first)
       assert_not_nil(Artist.search(:any_name_matches => "/cat/").first)
