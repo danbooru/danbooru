@@ -50,6 +50,11 @@ class Pool < ApplicationRecord
       where_ilike(:name, name)
     end
 
+    def post_tags_match(query)
+      posts = Post.tag_match(query).select(:id).reorder(nil)
+      joins("CROSS JOIN unnest(post_ids) AS post_id").group(:id).where("post_id IN (?)", posts)
+    end
+
     def default_order
       order(updated_at: :desc)
     end
@@ -59,6 +64,10 @@ class Pool < ApplicationRecord
 
       q = q.search_attributes(params, :creator, :is_active, :is_deleted, :name, :description, :post_ids)
       q = q.text_attribute_matches(:description, params[:description_matches])
+
+      if params[:post_tags_match]
+        q = q.post_tags_match(params[:post_tags_match])
+      end
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])

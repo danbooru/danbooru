@@ -78,6 +78,18 @@ class PoolTest < ActiveSupport::TestCase
 
       assert_equal([@pool1.id], Pool.search(post_id_count: 2).pluck(:id))
     end
+
+    should "find pools by post tags" do
+      @pool1 = create(:pool, name: "pool1")
+      @pool2 = create(:pool, name: "pool2")
+      @post1 = create(:post, tag_string: "pool:pool1 bkub")
+      @post2 = create(:post, tag_string: "pool:pool1 fumimi")
+      @post3 = create(:post, tag_string: "pool:pool2 bkub fumimi")
+
+      assert_equal([@pool2.id, @pool1.id], Pool.search(post_tags_match: "bkub").pluck(:id))
+      assert_equal([@pool2.id, @pool1.id], Pool.search(post_tags_match: "fumimi").pluck(:id))
+      assert_equal([@pool2.id], Pool.search(post_tags_match: "bkub fumimi").pluck(:id))
+    end
   end
 
   context "Creating a pool" do

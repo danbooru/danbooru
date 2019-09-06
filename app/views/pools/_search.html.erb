@@ -20,6 +20,15 @@
       </tr>
 
       <tr>
+        <th><label for="search_post_tags">Post Tags</th>
+        <td>
+          <div class="input">
+            <%= text_field "search", "post_tags_match", :value => params[:search][:post_tags_match], :data => { autocomplete: "tag-query" } %>
+          </div>
+        </td>
+      </tr>
+
+      <tr>
         <th><label for="search_creator_name">Creator</th>
         <td>
           <div class="input">
