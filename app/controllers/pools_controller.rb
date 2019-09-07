@@ -52,11 +52,8 @@ class PoolsController < ApplicationController
   end
 
   def update
-    # need to do this in order for synchronize! to work correctly
     @pool = Pool.find(params[:id])
-    @pool.attributes = pool_params
-    @pool.synchronize
-    @pool.save
+    @pool.update(pool_params)
     unless @pool.errors.any?
       flash[:notice] = "Pool updated"
     end

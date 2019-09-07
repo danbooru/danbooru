@@ -28,7 +28,7 @@
         <strong>Hidden</strong>: <%= render "post_disapprovals/compact_counts", :disapprovals => post.disapprovals, :post => post %>
       </li>
       <li><strong>Source</strong>: <%= post.source %></li>
-      <% if post.has_active_pools? %>
+      <% if post.pools.undeleted.length > 0 %>
         <li><strong>Pools</strong>: <%= render "pools/inline_list", pools: post.pools.undeleted %></li>
       <% end %>
       <li><strong>Tags</strong>: <%= post.presenter.inline_tag_list_html %></li>

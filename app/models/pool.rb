@@ -8,14 +8,11 @@ class Pool < ApplicationRecord
   validates_uniqueness_of :name, case_sensitive: false, if: :name_changed?
   validate :validate_name, if: :name_changed?
   validates_inclusion_of :category, :in => %w(series collection)
-  validate :updater_can_change_category
   validate :updater_can_remove_posts
   validate :updater_can_edit_deleted
   before_validation :normalize_post_ids
   before_validation :normalize_name
-  after_save :update_category_pseudo_tags_for_posts_async
   after_save :create_version
-  after_create :synchronize!
 
   module SearchMethods
     def deleted
@@ -166,7 +163,6 @@ class Pool < ApplicationRecord
     self.post_ids = version.post_ids
     self.name = version.name
     self.description = version.description
-    synchronize!
   end
 
   def contains?(post_id)
@@ -201,7 +197,6 @@ class Pool < ApplicationRecord
 
     with_lock do
       update(post_ids: post_ids + [post.id])
-      post.add_pool!(self, true)
     end
   end
 
@@ -210,9 +205,7 @@ class Pool < ApplicationRecord
     return unless CurrentUser.user.can_remove_from_pools?
 
     with_lock do
-      reload
       update(post_ids: post_ids - [post.id])
-      post.remove_pool!(self)
     end
   end
 
@@ -220,29 +213,6 @@ class Pool < ApplicationRecord
   def posts
     pool_posts = Pool.where(id: id).joins("CROSS JOIN unnest(pools.post_ids) WITH ORDINALITY AS row(post_id, pool_index)").select(:post_id, :pool_index)
     posts = Post.joins("JOIN (#{pool_posts.to_sql}) pool_posts ON pool_posts.post_id = posts.id").order("pool_posts.pool_index ASC")
-  end
-
-  def synchronize
-    post_ids_before = post_ids_before_last_save || post_ids_was
-    added = post_ids - post_ids_before
-    removed = post_ids_before - post_ids
-
-    added.each do |post_id|
-      post = Post.find(post_id)
-      post.add_pool!(self, true)
-    end
-
-    removed.each do |post_id|
-      post = Post.find(post_id)
-      post.remove_pool!(self)
-    end
-
-    normalize_post_ids
-  end
-
-  def synchronize!
-    synchronize
-    save if will_save_change_to_post_ids?
   end
 
   def post_count
@@ -294,30 +264,6 @@ class Pool < ApplicationRecord
 
   def creator_name
     creator.name
-  end
-
-  def update_category_pseudo_tags_for_posts_async
-    if saved_change_to_category?
-      UpdatePoolPseudoTagsJob.perform_later(self)
-    end
-  end
-
-  def update_category_pseudo_tags_for_posts
-    Post.where(id: post_ids).find_each do |post|
-      post.reload
-      post.set_pool_category_pseudo_tags
-      Post.where(:id => post.id).update_all(:pool_string => post.pool_string)
-    end
-  end
-
-  def category_changeable_by?(user)
-    user.is_builder? || (user.is_member? && post_count <= Danbooru.config.pool_category_change_limit)
-  end
-
-  def updater_can_change_category
-    if category_changed? && !category_changeable_by?(CurrentUser.user)
-      errors[:base] << "You cannot change the category of pools with greater than #{Danbooru.config.pool_category_change_limit} posts"
-    end
   end
 
   def validate_name

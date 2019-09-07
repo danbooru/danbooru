@@ -30,7 +30,6 @@ class Post < ApplicationRecord
   validate :updater_can_change_rating
   before_save :update_tag_post_counts
   before_save :set_tag_counts
-  before_save :set_pool_category_pseudo_tags
   before_create :autoban
   after_save :create_version
   after_save :update_parent_on_save
@@ -789,23 +788,23 @@ class Post < ApplicationRecord
         case tag
         when /^-pool:(\d+)$/i
           pool = Pool.find_by_id($1.to_i)
-          remove_pool!(pool) if pool
+          pool.remove!(self) if pool
 
         when /^-pool:(.+)$/i
           pool = Pool.find_by_name($1)
-          remove_pool!(pool) if pool
+          pool.remove!(self) if pool
 
         when /^pool:(\d+)$/i
           pool = Pool.find_by_id($1.to_i)
-          add_pool!(pool) if pool
+          pool.add!(self) if pool
 
         when /^pool:(.+)$/i
           pool = Pool.find_by_name($1)
-          add_pool!(pool) if pool
+          pool.add!(self) if pool
 
         when /^newpool:(.+)$/i
           pool = Pool.find_by_name($1)
-          add_pool!(pool) if pool
+          pool.add!(self) if pool
 
         when /^fav:(.+)$/i
           add_favorite!(CurrentUser.user)
@@ -1023,57 +1022,9 @@ class Post < ApplicationRecord
       Pool.where("pools.post_ids && array[?]", id).series_first
     end
 
-    def has_active_pools?
-      pools.undeleted.length > 0
-    end
-
-    def belongs_to_pool?(pool)
-      pool_string =~ /(?:\A| )pool:#{pool.id}(?:\Z| )/
-    end
-
-    def belongs_to_pool_with_id?(pool_id)
-      pool_string =~ /(?:\A| )pool:#{pool_id}(?:\Z| )/
-    end
-
-    def add_pool!(pool, force = false)
-      return if belongs_to_pool?(pool)
-      return if pool.is_deleted? && !force
-
-      with_lock do
-        self.pool_string = "#{pool_string} pool:#{pool.id}".strip
-        set_pool_category_pseudo_tags
-        update_column(:pool_string, pool_string) unless new_record?
-        pool.add!(self)
-      end
-    end
-
-    def remove_pool!(pool)
-      return unless belongs_to_pool?(pool)
-      return unless CurrentUser.user.can_remove_from_pools?
-
-      with_lock do
-        self.pool_string = pool_string.gsub(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ").strip
-        set_pool_category_pseudo_tags
-        update_column(:pool_string, pool_string) unless new_record?
-        pool.remove!(self)
-      end
-    end
-
     def remove_from_all_pools
       pools.find_each do |pool|
         pool.remove!(self)
-      end
-    end
-
-    def set_pool_category_pseudo_tags
-      self.pool_string = (pool_string.split - ["pool:series", "pool:collection"]).join(" ")
-
-      pool_categories = pools.undeleted.pluck(:category)
-      if pool_categories.include?("series")
-        self.pool_string = "#{pool_string} pool:series".strip
-      end
-      if pool_categories.include?("collection")
-        self.pool_string = "#{pool_string} pool:collection".strip
       end
     end
   end

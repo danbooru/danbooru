@@ -863,7 +863,6 @@ class PostTest < ActiveSupport::TestCase
               @post.reload
               @pool.reload
               assert_equal([@post.id], @pool.post_ids)
-              assert_equal("pool:#{@pool.id} pool:series", @post.pool_string)
             end
           end
 
@@ -871,7 +870,7 @@ class PostTest < ActiveSupport::TestCase
             setup do
               @pool = FactoryBot.create(:pool)
               @post = FactoryBot.create(:post, :tag_string => "aaa")
-              @post.add_pool!(@pool)
+              @pool.add!(@post)
               @post.tag_string = "aaa -pool:#{@pool.id}"
               @post.save
             end
@@ -880,7 +879,6 @@ class PostTest < ActiveSupport::TestCase
               @post.reload
               @pool.reload
               assert_equal([], @pool.post_ids)
-              assert_equal("", @post.pool_string)
             end
           end
 
@@ -894,7 +892,6 @@ class PostTest < ActiveSupport::TestCase
               @post.reload
               @pool.reload
               assert_equal([@post.id], @pool.post_ids)
-              assert_equal("pool:#{@pool.id} pool:series", @post.pool_string)
             end
           end
 
@@ -909,7 +906,6 @@ class PostTest < ActiveSupport::TestCase
                 @post.reload
                 @pool.reload
                 assert_equal([@post.id], @pool.post_ids)
-                assert_equal("pool:#{@pool.id} pool:series", @post.pool_string)
               end
             end
 
@@ -920,7 +916,6 @@ class PostTest < ActiveSupport::TestCase
                 @post.reload
                 assert_not_nil(@pool)
                 assert_equal([@post.id], @pool.post_ids)
-                assert_equal("pool:#{@pool.id} pool:series", @post.pool_string)
               end
             end
 
@@ -1739,42 +1734,6 @@ class PostTest < ActiveSupport::TestCase
         assert(@parent.votes.where(user: @gold1).exists?)
         assert(@parent.votes.where(user: @supervoter1).exists?)
         assert_equal(4, @parent.score)
-      end
-    end
-  end
-
-  context "Pools:" do
-    setup do
-      SqsService.any_instance.stubs(:send_message)
-    end
-
-    context "Removing a post from a pool" do
-      should "update the post's pool string" do
-        post = FactoryBot.create(:post)
-        pool = FactoryBot.create(:pool)
-        post.add_pool!(pool)
-        post.remove_pool!(pool)
-        post.reload
-        assert_equal("", post.pool_string)
-        post.remove_pool!(pool)
-        post.reload
-        assert_equal("", post.pool_string)
-      end
-    end
-
-    context "Adding a post to a pool" do
-      should "update the post's pool string" do
-        post = FactoryBot.create(:post)
-        pool = FactoryBot.create(:pool)
-        post.add_pool!(pool)
-        post.reload
-        assert_equal("pool:#{pool.id} pool:series", post.pool_string)
-        post.add_pool!(pool)
-        post.reload
-        assert_equal("pool:#{pool.id} pool:series", post.pool_string)
-        post.remove_pool!(pool)
-        post.reload
-        assert_equal("", post.pool_string)
       end
     end
   end
