@@ -39,9 +39,8 @@ class Pool < ApplicationRecord
     end
 
     def selected_first(current_pool_id)
-      return where("true") if current_pool_id.blank?
-      current_pool_id = current_pool_id.to_i
-      reorder(Arel.sql("(case pools.id when #{current_pool_id} then 0 else 1 end), pools.name"))
+      return all if current_pool_id.blank?
+      reorder(Arel.sql("(case pools.id when #{current_pool_id.to_i} then 0 else 1 end), pools.name"))
     end
 
     def name_matches(name)

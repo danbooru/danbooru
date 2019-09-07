@@ -4,7 +4,7 @@
       <%= render "posts/partials/show/search_seq", :post => post %>
     <% end %>
 
-    <% if post.pools.undeleted.any? %>
+    <% if post.pools.undeleted.present? %>
       <%= render "posts/partials/show/pool_list", post: post, pools: post.pools.undeleted.selected_first(params[:pool_id]) %>
     <% end %>
 
