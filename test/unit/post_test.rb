@@ -1948,17 +1948,28 @@ class PostTest < ActiveSupport::TestCase
     should "return posts for the pool:<name> metatag" do
       SqsService.any_instance.stubs(:send_message)
 
-      FactoryBot.create(:pool, name: "test_a", category: "series")
-      FactoryBot.create(:pool, name: "test_b", category: "collection")
-      post1 = FactoryBot.create(:post, tag_string: "pool:test_a")
-      post2 = FactoryBot.create(:post, tag_string: "pool:test_b")
+      pool1 = create(:pool, name: "test_a", category: "series")
+      pool2 = create(:pool, name: "test_b", category: "collection")
+      post1 = create(:post, tag_string: "pool:test_a")
+      post2 = create(:post, tag_string: "pool:test_b")
+
+      assert_tag_match([post1], "pool:#{pool1.id}")
+      assert_tag_match([post2], "pool:#{pool2.id}")
+
+      assert_tag_match([post1], "pool:TEST_A")
+      assert_tag_match([post2], "pool:Test_B")
 
       assert_tag_match([post1], "pool:test_a")
       assert_tag_match([post2], "-pool:test_a")
+
+      assert_tag_match([], "pool:test_a pool:test_b")
       assert_tag_match([], "-pool:test_a -pool:test_b")
+
       assert_tag_match([post2, post1], "pool:test*")
 
       assert_tag_match([post2, post1], "pool:any")
+      assert_tag_match([post2, post1], "-pool:none")
+      assert_tag_match([], "-pool:any")
       assert_tag_match([], "pool:none")
 
       assert_tag_match([post1], "pool:series")

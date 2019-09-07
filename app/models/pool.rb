@@ -112,14 +112,18 @@ class Pool < ApplicationRecord
     normalize_name(name).mb_chars.downcase
   end
 
-  def self.find_by_name(name)
+  def self.named(name)
     if name =~ /^\d+$/
-      where("pools.id = ?", name.to_i).first
+      where("pools.id = ?", name.to_i)
     elsif name
-      where_ilike(:name, normalize_name_for_search(name)).first
+      where_ilike(:name, normalize_name_for_search(name))
     else
       nil
     end
+  end
+
+  def self.find_by_name(name)
+    named(name).try(:first)
   end
 
   def versions

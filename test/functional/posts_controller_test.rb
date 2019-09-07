@@ -143,6 +143,16 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      context "with pools" do
+        should "render the pool list" do
+          as(@user) { @post.update(tag_string: "newpool:comic") }
+          get post_path(@post)
+
+          assert_response :success
+          assert_select "#pool-nav .pool-name", /Pool: comic/
+        end
+      end
+
       context "with only deleted comments" do
         setup do
           as(@user) { create(:comment, post: @post, is_deleted: true) }

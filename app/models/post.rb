@@ -1020,11 +1020,7 @@ class Post < ApplicationRecord
 
   module PoolMethods
     def pools
-      @pools ||= begin
-        return Pool.none if pool_string.blank?
-        pool_ids = pool_string.scan(/\d+/)
-        Pool.where(id: pool_ids).series_first
-      end
+      Pool.where("pools.post_ids && array[?]", id).series_first
     end
 
     def has_active_pools?

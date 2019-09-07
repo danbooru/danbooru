@@ -619,37 +619,15 @@ class Tag < ApplicationRecord
             q[:disapproval_neg] << g2
 
           when "-pool"
-            if g2.downcase == "none"
-              q[:pool] = "any"
-            elsif g2.downcase == "any"
-              q[:pool] = "none"
-            elsif g2.downcase == "series"
-              q[:tags][:exclude] << "pool:series"
-            elsif g2.downcase == "collection"
-              q[:tags][:exclude] << "pool:collection"
-            else
-              q[:tags][:exclude] << "pool:#{Pool.name_to_id(g2)}"
-            end
+            q[:pool_neg] ||= []
+            q[:pool_neg] << g2
 
           when "pool"
-            if g2.downcase == "none"
-              q[:pool] = "none"
-            elsif g2.downcase == "any"
-              q[:pool] = "any"
-            elsif g2.downcase == "series"
-              q[:tags][:related] << "pool:series"
-            elsif g2.downcase == "collection"
-              q[:tags][:related] << "pool:collection"
-            elsif g2.include?("*")
-              pool_ids = Pool.search(name_matches: g2, order: "post_count").limit(Danbooru.config.tag_query_limit).pluck(:id)
-              q[:tags][:include] += pool_ids.map { |id| "pool:#{id}" }
-            else
-              q[:tags][:related] << "pool:#{Pool.name_to_id(g2)}"
-            end
+            q[:pool] ||= []
+            q[:pool] << g2
 
           when "ordpool"
             pool_id = Pool.name_to_id(g2)
-            q[:tags][:related] << "pool:#{pool_id}"
             q[:ordpool] = pool_id
 
           when "-favgroup"
