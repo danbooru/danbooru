@@ -30,7 +30,7 @@ class Post < ApplicationRecord
   validate :updater_can_change_rating
   before_save :update_tag_post_counts
   before_save :set_tag_counts
-  before_save :set_pool_category_pseudo_tags
+  after_save :set_pool_category_pseudo_tags
   before_create :autoban
   after_save :create_version
   after_save :update_parent_on_save
