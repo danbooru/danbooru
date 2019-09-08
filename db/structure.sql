@@ -6526,10 +6526,24 @@ CREATE UNIQUE INDEX index_pixiv_ugoira_frame_data_on_post_id ON public.pixiv_ugo
 
 
 --
+-- Name: index_pools_on_category; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pools_on_category ON public.pools USING btree (category);
+
+
+--
 -- Name: index_pools_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_pools_on_creator_id ON public.pools USING btree (creator_id);
+
+
+--
+-- Name: index_pools_on_is_deleted; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pools_on_is_deleted ON public.pools USING btree (is_deleted);
 
 
 --
@@ -6551,6 +6565,13 @@ CREATE INDEX index_pools_on_name ON public.pools USING btree (name);
 --
 
 CREATE INDEX index_pools_on_name_trgm ON public.pools USING gin (name public.gin_trgm_ops);
+
+
+--
+-- Name: index_pools_on_post_ids; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pools_on_post_ids ON public.pools USING gin (post_ids);
 
 
 --
@@ -7315,6 +7336,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190829052629'),
 ('20190829055758'),
 ('20190902224045'),
-('20190908031103');
+('20190908031103'),
+('20190908035317');
 
 
