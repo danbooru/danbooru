@@ -4,11 +4,7 @@ class ArtistCommentariesController < ApplicationController
 
   def index
     @commentaries = ArtistCommentary.search(search_params).paginate(params[:page], :limit => params[:limit])
-    respond_with(@commentaries) do |format|
-      format.xml do
-        render :xml => @commentaries.to_xml(:root => "artist-commentaries")
-      end
-    end
+    respond_with(@commentaries)
   end
 
   def search

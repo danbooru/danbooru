@@ -7,12 +7,8 @@ class NotesController < ApplicationController
 
   def index
     @notes = Note.includes(:creator).search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
-    respond_with(@notes) do |format|
-      format.html { @notes = @notes.includes(:creator) }
-      format.xml do
-        render :xml => @notes.to_xml(:root => "notes")
-      end
-    end
+    @notes = @notes.includes(:creator) if request.format.html?
+    respond_with(@notes)
   end
 
   def show

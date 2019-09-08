@@ -26,11 +26,7 @@ class ForumPostsController < ApplicationController
   def index
     @query = ForumPost.search(search_params)
     @forum_posts = @query.includes(:topic).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
-    respond_with(@forum_posts) do |format|
-      format.xml do
-        render :xml => @forum_posts.to_xml(:root => "forum-posts")
-      end
-    end
+    respond_with(@forum_posts)
   end
 
   def search

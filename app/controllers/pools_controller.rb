@@ -19,9 +19,6 @@ class PoolsController < ApplicationController
   def index
     @pools = Pool.includes(:creator).search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
     respond_with(@pools) do |format|
-      format.xml do
-        render :xml => @pools.to_xml(:root => "pools")
-      end
       format.json do
         render json: @pools.to_json
         expires_in params[:expiry].to_i.days if params[:expiry]

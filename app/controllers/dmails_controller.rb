@@ -21,11 +21,7 @@ class DmailsController < ApplicationController
     end
     @query = Dmail.active.visible.search(search_params)
     @dmails = @query.paginate(params[:page], :limit => params[:limit])
-    respond_with(@dmails) do |format|
-      format.xml do
-        render :xml => @dmails.to_xml(:root => "dmails")
-      end
-    end
+    respond_with(@dmails)
   end
 
   def show

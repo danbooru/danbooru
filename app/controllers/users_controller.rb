@@ -31,9 +31,6 @@ class UsersController < ApplicationController
     else
       @users = User.search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
       respond_with(@users) do |format|
-        format.xml do
-          render :xml => @users.to_xml(:root => "users")
-        end
         format.json do
           render json: @users.to_json
           expires_in params[:expiry].to_i.days if params[:expiry]

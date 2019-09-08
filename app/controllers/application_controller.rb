@@ -1,6 +1,8 @@
 class ApplicationController < ActionController::Base
   class ApiLimitError < StandardError; end
 
+  self.responder = ApplicationResponder
+
   skip_forgery_protection if: -> { SessionLoader.new(request).has_api_authentication? }
   before_action :reset_current_user
   before_action :set_current_user

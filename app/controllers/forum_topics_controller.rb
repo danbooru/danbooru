@@ -1,5 +1,6 @@
 class ForumTopicsController < ApplicationController
   respond_to :html, :xml, :json
+  respond_to :atom, only: [:index, :show]
   before_action :member_only, :except => [:index, :show]
   before_action :moderator_only, :only => [:new_merge, :create_merge]
   before_action :normalize_search, :only => :index
@@ -24,21 +25,10 @@ class ForumTopicsController < ApplicationController
 
     @query = ForumTopic.active.search(search_params)
     @forum_topics = @query.paginate(params[:page], :limit => per_page, :search_count => params[:search])
+    @forum_topics = @forum_topics.includes(:creator, :updater).load if request.format.html?
+    @forum_topics = @forum_topics.includes(:creator, :original_post).load if request.format.atom?
 
-    respond_with(@forum_topics) do |format|
-      format.html do
-        @forum_topics = @forum_topics.includes(:creator, :updater).load
-      end
-      format.atom do
-        @forum_topics = @forum_topics.includes(:creator, :original_post).load
-      end
-      format.json do
-        render :json => @forum_topics.to_json
-      end
-      format.xml do
-        render :xml => @forum_topics.to_xml(:root => "forum-topics")
-      end
-    end
+    respond_with(@forum_topics)
   end
 
   def show
@@ -46,12 +36,9 @@ class ForumTopicsController < ApplicationController
       @forum_topic.mark_as_read!(CurrentUser.user)
     end
     @forum_posts = ForumPost.search(:topic_id => @forum_topic.id).reorder("forum_posts.id").paginate(params[:page])
+    @forum_posts = @forum_posts.reverse_order.includes(:creator).load if request.format.atom?
     @original_forum_post_id = @forum_topic.original_post.id
-    respond_with(@forum_topic) do |format|
-      format.atom do
-        @forum_posts = @forum_posts.reverse_order.includes(:creator).load
-      end
-    end
+    respond_with(@forum_topic)
   end
 
   def create

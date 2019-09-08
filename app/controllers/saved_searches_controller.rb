@@ -4,12 +4,7 @@ class SavedSearchesController < ApplicationController
   
   def index
     @saved_searches = saved_searches.search(search_params).paginate(params[:page], limit: params[:limit])
-
-    respond_with(@saved_searches) do |format|
-      format.xml do
-        render :xml => @saved_searches.to_xml(:root => "saved-searches")
-      end
-    end
+    respond_with(@saved_searches)
   end
 
   def labels

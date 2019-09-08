@@ -191,5 +191,13 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_equal(1, response.parsed_body.size)
       assert_equal(tags.first.id, response.parsed_body.first.fetch("id"))
     end
+
+    should "return the correct root element name for empty xml responses" do
+      get tags_path, as: :xml
+
+      assert_response :success
+      assert_equal("tags", response.parsed_body.root.name)
+      assert_equal(0, response.parsed_body.root.children.size)
+    end
   end
 end

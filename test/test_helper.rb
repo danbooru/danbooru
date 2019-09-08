@@ -113,6 +113,8 @@ class ActionDispatch::IntegrationTest
     super
     Socket.stubs(:gethostname).returns("www.example.com")
     Danbooru.config.stubs(:enable_sock_puppet_validation?).returns(false)
+
+    ActionDispatch::IntegrationTest.register_encoder :xml, response_parser: ->(body) { Nokogiri.XML(body) }
   end
 
   def teardown

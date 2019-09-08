@@ -4,11 +4,7 @@ class FavoriteGroupsController < ApplicationController
 
   def index
     @favorite_groups = FavoriteGroup.search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
-    respond_with(@favorite_groups) do |format|
-      format.xml do
-        render :xml => @favorite_groups.to_xml(:root => "favorite-groups")
-      end
-    end
+    respond_with(@favorite_groups)
   end
 
   def show

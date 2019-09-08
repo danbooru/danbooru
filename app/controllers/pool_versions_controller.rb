@@ -8,11 +8,7 @@ class PoolVersionsController < ApplicationController
     end
 
     @pool_versions = PoolArchive.search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
-    respond_with(@pool_versions) do |format|
-      format.xml do
-        render :xml => @pool_versions.to_xml(:root => "pool-versions")
-      end
-    end
+    respond_with(@pool_versions)
   end
 
   def diff
