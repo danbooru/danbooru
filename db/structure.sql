@@ -2880,8 +2880,6 @@ CREATE TABLE public.tags (
     name character varying NOT NULL,
     post_count integer DEFAULT 0 NOT NULL,
     category integer DEFAULT 0 NOT NULL,
-    related_tags text,
-    related_tags_updated_at timestamp without time zone,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     is_locked boolean DEFAULT false NOT NULL
@@ -7316,6 +7314,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190828005453'),
 ('20190829052629'),
 ('20190829055758'),
-('20190902224045');
+('20190902224045'),
+('20190908031103');
 
 
