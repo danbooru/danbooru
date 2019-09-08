@@ -21,8 +21,6 @@ class TagsController < ApplicationController
       @tags = Tag.names_matches_with_aliases(params[:search][:name_matches])
     end
 
-    expires_in params[:expiry].to_i.days if params[:expiry]
-
     respond_with(@tags, root: "tags")
   end
 

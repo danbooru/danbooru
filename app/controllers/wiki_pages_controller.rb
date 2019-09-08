@@ -26,10 +26,6 @@ class WikiPagesController < ApplicationController
           end
         end
       end
-      format.json do
-        render json: @wiki_pages.to_json
-        expires_in params[:expiry].to_i.days if params[:expiry]
-      end
     end
   end
 

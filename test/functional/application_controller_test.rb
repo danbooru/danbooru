@@ -192,6 +192,13 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_equal(tags.first.id, response.parsed_body.first.fetch("id"))
     end
 
+    should "support the expiry parameter" do
+      get posts_path, as: :json, params: { expiry: "1" }
+
+      assert_response :success
+      assert_equal("max-age=#{1.day}, private", response.headers["Cache-Control"])
+    end
+
     should "return the correct root element name for empty xml responses" do
       get tags_path, as: :xml
 
