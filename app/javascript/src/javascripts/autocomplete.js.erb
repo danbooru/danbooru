@@ -466,6 +466,7 @@ Autocomplete.pool_source = function(term, resp, metatag) {
     data: {
       "search[order]": "post_count",
       "search[name_matches]": term,
+      "search[is_deleted]": false,
       "limit": 10
     },
     method: "get",
