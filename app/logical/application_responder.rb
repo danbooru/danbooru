@@ -3,9 +3,14 @@
 class ApplicationResponder < ActionController::Responder
   # this is called by respond_with for non-html, non-js responses.
   def to_format
+    params = request.params
+
     if get?
-      expiry = request.params["expiry"]
-      controller.expires_in expiry.to_i.days if expiry.present?
+      if params["expires_in"]
+        controller.expires_in(DurationParser.parse(params["expires_in"]))
+      elsif request.params["expiry"]
+        controller.expires_in(params["expiry"].to_i.days)
+      end
     end
 
     if format == :xml

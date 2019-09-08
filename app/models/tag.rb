@@ -313,29 +313,7 @@ class Tag < ApplicationRecord
         end
 
       when :age
-        object =~ /(\d+)(s(econds?)?|mi(nutes?)?|h(ours?)?|d(ays?)?|w(eeks?)?|mo(nths?)?|y(ears?)?)?/i
-
-        size = $1.to_i
-        unit = $2
-
-        case unit
-        when /^s/i
-          size.seconds.ago
-        when /^mi/i
-          size.minutes.ago
-        when /^h/i
-          size.hours.ago
-        when /^d/i
-          size.days.ago
-        when /^w/i
-          size.weeks.ago
-        when /^mo/i
-          size.months.ago
-        when /^y/i
-          size.years.ago
-        else
-          size.seconds.ago
-        end
+        DurationParser.parse(object).ago
 
       when :ratio
         object =~ /\A(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)\Z/i
