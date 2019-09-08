@@ -246,7 +246,7 @@ class TagImplicationTest < ActiveSupport::TestCase
 
       ti1.approve!
       ti2.approve!
-      workoff_active_jobs
+      perform_enqueued_jobs
 
       assert_equal("aaa bbb ccc xxx yyy", p1.reload.tag_string)
     end
@@ -262,7 +262,7 @@ class TagImplicationTest < ActiveSupport::TestCase
       should "update the topic when processed" do
         assert_difference("ForumPost.count") do
           @implication.approve!
-          workoff_active_jobs
+          perform_enqueued_jobs
         end
 
         assert_match(/The tag implication .* has been approved/, @post.reload.body)

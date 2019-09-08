@@ -127,7 +127,7 @@ class TagAliasTest < ActiveSupport::TestCase
         ta = FactoryBot.create(:tag_alias, :antecedent_name => "...", :consequent_name => "bbb")
 
         ta.approve!(approver: @admin)
-        workoff_active_jobs
+        perform_enqueued_jobs
 
         assert_equal(%w(123 456 bbb), ss.reload.query.split.sort)
       end
@@ -139,7 +139,7 @@ class TagAliasTest < ActiveSupport::TestCase
 
       ta = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "ccc")
       ta.approve!(approver: @admin)
-      workoff_active_jobs
+      perform_enqueued_jobs
 
       assert_equal("bbb ccc", post1.reload.tag_string)
       assert_equal("ccc ddd", post2.reload.tag_string)
@@ -162,7 +162,7 @@ class TagAliasTest < ActiveSupport::TestCase
       # XXX this is broken, it depends on the order the jobs are executed in.
       ta2.approve!(approver: @admin)
       ta1.approve!(approver: @admin)
-      workoff_active_jobs
+      perform_enqueued_jobs
 
       assert_equal("ccc", ta1.reload.consequent_name)
     end
@@ -171,7 +171,7 @@ class TagAliasTest < ActiveSupport::TestCase
       ti = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ta = FactoryBot.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc")
       ta.approve!(approver: @admin)
-      workoff_active_jobs
+      perform_enqueued_jobs
 
       assert_equal("ccc", ti.reload.consequent_name)
     end
@@ -190,7 +190,7 @@ class TagAliasTest < ActiveSupport::TestCase
       ta = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
 
       ta.approve!(approver: @admin)
-      workoff_active_jobs
+      perform_enqueued_jobs
 
       assert_equal(1, tag2.reload.category)
     end
@@ -211,7 +211,7 @@ class TagAliasTest < ActiveSupport::TestCase
             @wiki1 = FactoryBot.create(:wiki_page, :title => "aaa")
             @wiki2 = FactoryBot.create(:wiki_page, :title => "bbb")
             @alias.approve!(approver: @admin)
-            workoff_active_jobs
+            perform_enqueued_jobs
           end
         end
 
@@ -228,14 +228,14 @@ class TagAliasTest < ActiveSupport::TestCase
       should "update the topic when processed" do
         assert_difference("ForumPost.count") do
           @alias.approve!(approver: @admin)
-          workoff_active_jobs
+          perform_enqueued_jobs
         end
       end
 
       should "update the parent post" do
         previous = @post.body
         @alias.approve!(approver: @admin)
-        workoff_active_jobs
+        perform_enqueued_jobs
         assert_not_equal(previous, @post.reload.body)
       end
 

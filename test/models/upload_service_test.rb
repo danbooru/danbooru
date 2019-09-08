@@ -841,7 +841,7 @@ class UploadServiceTest < ActiveSupport::TestCase
             as_user { @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350") }
 
             travel_to((PostReplacement::DELETION_GRACE_PERIOD + 1).days.from_now) do
-              workoff_active_jobs
+              perform_enqueued_jobs
             end
           rescue Net::OpenTimeout
             skip "Remote connection to Pixiv failed"
@@ -892,7 +892,7 @@ class UploadServiceTest < ActiveSupport::TestCase
             assert_nothing_raised { @post.file(:preview) }
 
             travel_to((PostReplacement::DELETION_GRACE_PERIOD + 1).days.from_now) do
-              workoff_active_jobs
+              perform_enqueued_jobs
             end
 
             assert_nothing_raised { @post.file(:original) }
@@ -937,7 +937,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
             travel_to (PostReplacement::DELETION_GRACE_PERIOD + 1).days.from_now do
               assert_raise(Post::DeletionError) do
-                workoff_active_jobs
+                perform_enqueued_jobs
               end
             end
 
@@ -1287,7 +1287,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
 
       travel (PostReplacement::DELETION_GRACE_PERIOD + 1).days
-      workoff_active_jobs
+      perform_enqueued_jobs
       refute(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
     end
 

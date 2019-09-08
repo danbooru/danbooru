@@ -74,7 +74,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @bur.approve!(@admin)
 
         assert_enqueued_jobs(3)
-        workoff_active_jobs
+        perform_enqueued_jobs
 
         @ta = TagAlias.where(:antecedent_name => "foo", :consequent_name => "bar").first
         @ti = TagImplication.where(:antecedent_name => "bar", :consequent_name => "baz").first
