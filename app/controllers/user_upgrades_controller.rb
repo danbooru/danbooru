@@ -1,5 +1,5 @@
 class UserUpgradesController < ApplicationController
-  before_action :member_only, :only => [:new, :show]
+  before_action :member_only, only: [:show]
   helper_method :user
   skip_before_action :verify_authenticity_token, only: [:create]
 
