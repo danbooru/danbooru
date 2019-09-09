@@ -17,12 +17,11 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
     context "#create.json" do
       should "create a vote" do
         assert_difference("CommentVote.count", 1) do
-          post_auth comment_votes_path(comment_id: @comment.id, score: "down", format: "json"), @user
+          post_auth comment_votes_path(comment_id: @comment.id, score: "down"), @user, as: :json
           assert_response :success
 
-          comment = JSON.parse(@response.body)
-          assert_equal(@comment.id, comment["id"])
-          assert_equal(-1, comment["score"])
+          assert_equal(@comment.id, response.parsed_body["id"])
+          assert_equal(-1, response.parsed_body["score"])
         end
       end
 

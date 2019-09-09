@@ -235,6 +235,7 @@ class ApplicationRecord < ActiveRecord::Base
     end
 
     def serializable_hash(options = {})
+      options ||= {}
       options[:only] ||= []
       options[:include] ||= []
       options[:methods] ||= []

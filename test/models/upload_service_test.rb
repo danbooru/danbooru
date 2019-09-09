@@ -875,6 +875,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         should "not delete the original files" do
           begin
             skip unless PixivUgoiraConverter.enabled?
+            @post.unstub(:queue_delete_files)
 
             # this is called thrice to delete the file for 62247364
             FileUtils.expects(:rm_f).times(3) 
@@ -891,9 +892,9 @@ class UploadServiceTest < ActiveSupport::TestCase
             assert_nothing_raised { @post.file(:original) }
             assert_nothing_raised { @post.file(:preview) }
 
-            travel_to((PostReplacement::DELETION_GRACE_PERIOD + 1).days.from_now) do
-              perform_enqueued_jobs
-            end
+            assert_enqueued_jobs 3, only: DeletePostFilesJob
+            travel PostReplacement::DELETION_GRACE_PERIOD + 1.day
+            assert_raise(Post::DeletionError) { perform_enqueued_jobs }
 
             assert_nothing_raised { @post.file(:original) }
             assert_nothing_raised { @post.file(:preview) }

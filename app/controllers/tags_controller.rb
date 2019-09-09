@@ -21,7 +21,8 @@ class TagsController < ApplicationController
       @tags = Tag.names_matches_with_aliases(params[:search][:name_matches])
     end
 
-    respond_with(@tags, root: "tags")
+    # XXX
+    respond_with(@tags.map(&:attributes))
   end
 
   def show

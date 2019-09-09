@@ -21,7 +21,7 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow users to see the topic" do
         get_auth forum_topic_path(@forum_topic), @user
-        assert_redirected_to forum_topics_path
+        assert_response 403
       end
 
       should "not bump the forum for users without access" do
