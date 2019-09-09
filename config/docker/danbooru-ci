@@ -25,5 +25,6 @@ RUN sed -i'' -e 's/run -it/run -i/' /usr/local/bin/circleci
 
 USER danbooru
 RUN git reset --hard master
+RUN git clean --force
 RUN gem install bundler --version $BUNDLER_VERSION
 RUN bundle install > /dev/null

@@ -220,7 +220,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
       context "in api responses" do
         should "not include restricted attributes" do
-          as(@user) { @post.update(tag_string: "loli") }
+          Post.any_instance.stubs(:visible?).returns(false)
           get_auth post_path(@post), @user, as: :json
 
           assert_response :success
