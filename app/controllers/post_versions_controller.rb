@@ -1,5 +1,5 @@
 class PostVersionsController < ApplicationController
-  before_action :member_only
+  before_action :member_only, except: [:index, :search]
   before_action :check_availabililty
   respond_to :html, :xml, :json
 
