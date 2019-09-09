@@ -1,0 +1,17 @@
+<span class="diff-list">
+  <% diff[:added_post_ids].each do |post_id| %>
+    <ins>
+      <%= link_to post_id, post_path(post_id) %><%#
+    %><%= link_to "»", pool_versions_path(search: { post_id: post_id }) %>
+    </ins>
+  <% end %>
+</span>
+
+<span class="diff-list">
+  <% diff[:removed_post_ids].each do |post_id| %>
+    <del>
+      <%= link_to post_id, post_path(post_id) %><%#
+    %><%= link_to "»", pool_versions_path(search: { post_id: post_id }) %>
+    </del>
+  <% end %>
+</span>
