@@ -73,7 +73,7 @@ class User < ApplicationRecord
   validates_uniqueness_of :email, :case_sensitive => false, :if => ->(rec) { rec.email.present? && rec.saved_change_to_email? }
   validates_length_of :password, :minimum => 5, :if => ->(rec) { rec.new_record? || rec.password.present?}
   validates_inclusion_of :default_image_size, :in => %w(large original)
-  validates_inclusion_of :per_page, :in => 1..100
+  validates_inclusion_of :per_page, in: (1..PostSets::Post::MAX_PER_PAGE)
   validates_confirmation_of :password
   validates_presence_of :comment_threshold
   validate :validate_ip_addr_is_not_banned, :on => :create
