@@ -1457,23 +1457,13 @@ class Post < ApplicationRecord
   end
 
   module ApiMethods
-    def hidden_attributes
-      list = super + [:tag_index]
-      unless CurrentUser.is_moderator?
-        list += [:fav_string]
-      end
-      if !visible?
-        list += [:md5, :file_ext]
-      end
-      super + list
-    end
-
-    def method_attributes
-      list = super + [:uploader_name, :has_large, :has_visible_children, :children_ids, :is_favorited?] + TagCategory.categories.map {|x| "tag_string_#{x}".to_sym}
-      if visible?
-        list += [:file_url, :large_file_url, :preview_file_url]
-      end
-      list
+    def api_attributes
+      attributes = super
+      attributes += [:uploader_name, :has_large, :has_visible_children, :children_ids, :is_favorited?] + TagCategory.categories.map {|x| "tag_string_#{x}".to_sym}
+      attributes += [:file_url, :large_file_url, :preview_file_url] if visible?
+      attributes -= [:md5, :file_ext] if !visible?
+      attributes -= [:fav_string] if !CurrentUser.is_moderator?
+      attributes
     end
 
     def associated_attributes

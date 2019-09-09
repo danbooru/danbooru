@@ -84,11 +84,10 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "render the current users's profile in json" do
-        get_auth profile_path(format: :json), @user
+        get_auth profile_path, @user, as: :json
         assert_response :success
 
-        json = as(@user) { @user.as_json(methods: @user.full_attributes + @user.method_attributes) }
-        assert_equal(json, response.parsed_body)
+        assert_equal(@user.upload_limit, response.parsed_body["upload_limit"])
       end
 
       should "redirect anonymous users to the sign in page" do

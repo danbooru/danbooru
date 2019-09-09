@@ -155,26 +155,6 @@ class ForumTopic < ApplicationRecord
     (response_count / Danbooru.config.posts_per_page.to_f).ceil
   end
 
-  def as_json(options = {})
-    if CurrentUser.user.level < min_level
-      options[:only] = [:id]
-    end
-
-    super(options)
-  end
-
-  def to_xml(options = {})
-    if CurrentUser.user.level < min_level
-      options[:only] = [:id]
-    end
-
-    super(options)
-  end
-
-  def hidden_attributes
-    super + [:text_index, :min_level]
-  end
-
   def merge(topic)
     ForumPost.where(:id => self.posts.map(&:id)).update_all(:topic_id => topic.id)
     topic.update(response_count: topic.response_count + self.posts.length, updater_id: CurrentUser.id)

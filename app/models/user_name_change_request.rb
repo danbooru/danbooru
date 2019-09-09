@@ -67,11 +67,9 @@ class UserNameChangeRequest < ApplicationRecord
     end
   end
 
-  def hidden_attributes
-    if CurrentUser.is_admin? || user == CurrentUser.user
-      []
-    else
-      super + [:change_reason, :rejection_reason]
-    end
+  def api_attributes
+    attributes = super
+    attributes -= [:change_reason, :rejection_reason] unless CurrentUser.is_admin? || user == CurrentUser.user
+    attributes
   end
 end

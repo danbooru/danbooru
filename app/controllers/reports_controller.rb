@@ -1,6 +1,7 @@
 class ReportsController < ApplicationController
   before_action :member_only, :except => [:upload_tags]
   before_action :moderator_only, :only => [:post_versions, :post_versions_create, :down_voting_post_report, :down_voting_post_report_create]
+  respond_to :html, :xml, :json, only: [:upload_tags]
 
   def uploads
     @report = Reports::Uploads.new(params[:min_date], params[:max_date], params[:queries])
@@ -16,6 +17,7 @@ class ReportsController < ApplicationController
   def upload_tags
     @user = User.find(params[:user_id])
     @upload_reports = Reports::UploadTags.includes(versions: { post: :versions }).for_user(params[:user_id]).order("id desc").paginate(params[:page], :limit => params[:limit])
+    respond_with(@upload_reports)
   end
 
   def down_voting_post

@@ -215,34 +215,46 @@ class ApplicationRecord < ActiveRecord::Base
   module ApiMethods
     extend ActiveSupport::Concern
 
-    def serializable_hash(options = {})
-      options ||= {}
+    class_methods do
+      def api_attributes(*attributes, including: [])
+        return @api_attributes if @api_attributes
 
-      options[:include] ||= []
+        if attributes.present?
+          @api_attributes = attributes
+        else
+          @api_attributes = attribute_types.reject { |name, attr| attr.type.in?([:inet, :tsvector]) }.keys.map(&:to_sym)
+        end
 
-      options[:except] ||= []
-      options[:except] += hidden_attributes
-
-      options[:methods] ||= []
-      options[:methods] += method_attributes
-
-      if options[:only]
-        options[:methods] = options[:methods] & options[:only].map(&:to_sym)
-        options[:include] = options[:include] & options[:only].map(&:to_sym)
+        @api_attributes += including
+        @api_attributes
       end
+    end
+
+    def api_attributes
+      self.class.api_attributes
+    end
+
+    def serializable_hash(options = {})
+      options[:only] ||= []
+      options[:include] ||= []
+      options[:methods] ||= []
+
+      attributes, methods = api_attributes.partition { |attr| has_attribute?(attr) }
+      methods += options[:methods]
+      includes = options[:include]
+
+      if options[:only].present?
+        attributes &= options[:only]
+        methods &= options[:only]
+        includes &= options[:only]
+      end
+
+      options[:only] = attributes
+      options[:methods] = methods
+      options[:include] = includes
 
       hash = super(options)
       hash.transform_keys { |key| key.delete("?") }
-    end
-
-    protected
-
-    def hidden_attributes
-      [:uploader_ip_addr, :updater_ip_addr, :creator_ip_addr]
-    end
-
-    def method_attributes
-      []
     end
   end
 

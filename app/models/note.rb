@@ -11,6 +11,8 @@ class Note < ApplicationRecord
   after_save :create_version
   validate :post_must_not_be_note_locked
 
+  api_attributes including: [:creator_name]
+
   module SearchMethods
     def active
       where("is_active = TRUE")
@@ -26,22 +28,11 @@ class Note < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def hidden_attributes
-      super + [:body_index]
-    end
-
-    def method_attributes
-      super + [:creator_name]
-    end
-  end
-
   def creator_name
     creator.name
   end
 
   extend SearchMethods
-  include ApiMethods
 
   def post_must_not_be_note_locked
     if is_locked?

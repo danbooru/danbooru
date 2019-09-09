@@ -94,22 +94,13 @@ class PostFlag < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def hidden_attributes
-      list = super
-      unless CurrentUser.can_view_flagger_on_post?(self)
-        list += [:creator_id]
-      end
-      super + list
-    end
-
-    def method_attributes
-      super + [:category]
-    end
+  def api_attributes
+    attributes = super + [:category]
+    attributes -= [:creator_id] unless CurrentUser.can_view_flagger_on_post?(self)
+    attributes
   end
 
   extend SearchMethods
-  include ApiMethods
 
   def category
     case reason

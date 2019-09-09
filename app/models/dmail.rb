@@ -18,6 +18,8 @@ class Dmail < ApplicationRecord
   after_create :update_recipient
   after_commit :send_email, on: :create
 
+  api_attributes including: [:key]
+
   concerning :SpamMethods do
     class_methods do
       def is_spammer?(user)
@@ -103,16 +105,6 @@ class Dmail < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def hidden_attributes
-      super + [:message_index]
-    end
-    
-    def method_attributes
-      super + [:key]
-    end
-  end
-  
   module SearchMethods
     def sent_by(user)
       where("dmails.from_id = ? AND dmails.owner_id != ?", user.id, user.id)
@@ -156,7 +148,6 @@ class Dmail < ApplicationRecord
 
   include AddressMethods
   include FactoryMethods
-  include ApiMethods
   extend SearchMethods
 
   def validate_sender_is_not_banned

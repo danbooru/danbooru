@@ -9,6 +9,8 @@ class PostAppeal < ApplicationRecord
   before_validation :initialize_creator, :on => :create
   validates_uniqueness_of :creator_id, :scope => :post_id, :message => "have already appealed this post"
 
+  api_attributes including: [:is_resolved]
+
   module SearchMethods
     def resolved
       joins(:post).where("posts.is_deleted = false and posts.is_flagged = false")
@@ -63,9 +65,5 @@ class PostAppeal < ApplicationRecord
 
   def appeal_count_for_creator
     creator.post_appeals.recent.count
-  end
-
-  def method_attributes
-    super + [:is_resolved]
   end
 end

@@ -260,7 +260,7 @@ class PostArchive < ApplicationRecord
     updater.name
   end
 
-  def method_attributes
+  def api_attributes
     super + [:obsolete_added_tags, :obsolete_removed_tags, :unchanged_tags, :updater_name]
   end
 

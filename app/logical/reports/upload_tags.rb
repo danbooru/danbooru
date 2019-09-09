@@ -1,31 +1,12 @@
 module Reports
   class UploadTags < ::Post
-
     def readonly?
       true
     end
 
-    module ApiMethods
-
-      def as_json(options = {})
-        options ||= {}
-        options[:only] ||= [:id]
-        super(options)
-      end
-
-      def to_xml(options = {}, &block)
-        options ||= {}
-        options[:only] ||= [:id, :uploader_id]
-        super(options, &block)
-      end
-
-      def method_attributes
-        [:uploader_tags, :added_tags, :removed_tags]
-      end
-
+    def api_attributes
+      [:id, :uploader_id, :uploader_tags, :added_tags, :removed_tags]
     end
-
-    include ApiMethods
 
     def uploader_tags_array
       @uploader_tags ||= begin

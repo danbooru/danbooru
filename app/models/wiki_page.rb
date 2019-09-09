@@ -18,6 +18,8 @@ class WikiPage < ApplicationRecord
   has_one :artist, -> {where(:is_active => true)}, :foreign_key => "name", :primary_key => "title"
   has_many :versions, -> {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
 
+  api_attributes including: [:creator_name, :category_name]
+
   module SearchMethods
     def titled(title)
       where("title = ?", title.mb_chars.downcase.tr(" ", "_"))
@@ -88,22 +90,11 @@ class WikiPage < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def hidden_attributes
-      super + [:body_index]
-    end
-
-    def method_attributes
-      super + [:creator_name, :category_name]
-    end
-  end
-
   def creator_name
     creator.name
   end
 
   extend SearchMethods
-  include ApiMethods
 
   def validate_not_locked
     if is_locked? && !CurrentUser.is_builder?

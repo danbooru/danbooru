@@ -217,6 +217,19 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
       end
+
+      context "in api responses" do
+        should "not include restricted attributes" do
+          as(@user) { @post.update(tag_string: "loli") }
+          get_auth post_path(@post), @user, as: :json
+
+          assert_response :success
+          assert_nil(response.parsed_body["md5"])
+          assert_nil(response.parsed_body["file_url"])
+          assert_nil(response.parsed_body["fav_string"])
+          assert_equal(@post.uploader_name, response.parsed_body["uploader_name"])
+        end
+      end
     end
 
     context "update action" do

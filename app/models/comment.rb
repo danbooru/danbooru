@@ -22,6 +22,8 @@ class Comment < ApplicationRecord
     :body => ->(user_name) {"@#{creator.name} mentioned you in a \"comment\":/posts/#{post_id}#comment-#{id} on post ##{post_id}:\n\n[quote]\n#{DText.excerpt(body, "@"+user_name)}\n[/quote]\n"},
   )
 
+  api_attributes including: [:creator_name, :updater_name]
+
   module SearchMethods
     def deleted
       where("comments.is_deleted = true")
@@ -143,14 +145,6 @@ class Comment < ApplicationRecord
 
   def self.visible(user)
     select { |comment| comment.visibility(user) == :visible }
-  end
-
-  def hidden_attributes
-    super + [:body_index]
-  end
-
-  def method_attributes
-    super + [:creator_name, :updater_name]
   end
 
   def creator_name

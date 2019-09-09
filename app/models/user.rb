@@ -567,33 +567,28 @@ class User < ApplicationRecord
   end
 
   module ApiMethods
-    # blacklist all attributes by default. whitelist only safe attributes.
-    def hidden_attributes
-      super + attributes.keys.map(&:to_sym)
-    end
-
-    def method_attributes
-      list = super + [
+    def api_attributes
+      attributes = [
         :id, :created_at, :name, :inviter_id, :level, :base_upload_limit,
-        :post_upload_count, :post_update_count, :note_update_count,
-        :is_banned, :can_approve_posts, :can_upload_free, :is_super_voter,
-        :level_string,
+        :post_upload_count, :post_update_count, :note_update_count, :is_banned,
+        :can_approve_posts, :can_upload_free, :is_super_voter, :level_string,
       ]
 
       if id == CurrentUser.user.id
-        list += BOOLEAN_ATTRIBUTES + [
+        attributes += BOOLEAN_ATTRIBUTES
+        attributes += [
           :updated_at, :email, :last_logged_in_at, :last_forum_read_at,
           :recent_tags, :comment_threshold, :default_image_size,
           :favorite_tags, :blacklisted_tags, :time_zone, :per_page,
-          :custom_style, :favorite_count,
-          :api_regen_multiplier, :api_burst_limit, :remaining_api_limit,
-          :statement_timeout, :favorite_group_limit, :favorite_limit,
-          :tag_query_limit, :can_comment_vote?, :can_remove_from_pools?,
-          :is_comment_limited?, :can_comment?, :can_upload?, :max_saved_searches,
+          :custom_style, :favorite_count, :api_regen_multiplier,
+          :api_burst_limit, :remaining_api_limit, :statement_timeout,
+          :favorite_group_limit, :favorite_limit, :tag_query_limit,
+          :can_comment_vote?, :can_remove_from_pools?, :is_comment_limited?,
+          :can_comment?, :can_upload?, :max_saved_searches,
         ]
       end
 
-      list
+      attributes
     end
 
     # extra attributes returned for /users/:id.json but not for /users.json.

@@ -17,6 +17,8 @@ class Pool < ApplicationRecord
   after_save :create_version
   after_create :synchronize!
 
+  api_attributes including: [:creator_name, :post_count]
+
   module SearchMethods
     def deleted
       where("pools.is_deleted = true")
@@ -286,10 +288,6 @@ class Pool < ApplicationRecord
 
   def last_page
     (post_count / CurrentUser.user.per_page.to_f).ceil
-  end
-
-  def method_attributes
-    super + [:creator_name, :post_count]
   end
 
   def creator_name
