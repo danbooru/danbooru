@@ -2,7 +2,7 @@
   <div id="a-index">
     <h1>Pool History</h1>
 
-    <% if params.dig(:search, :pool_id).present? %>
+    <% if params.dig(:search, :pool_id).present? || params.dig(:search, :post_id).present? %>
       <%= render "revert_listing" %>
     <% else %>
       <%= render "standard_listing" %>

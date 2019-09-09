@@ -18,19 +18,16 @@ class PoolArchive < ApplicationRecord
       where("updater_id = ?", user_id)
     end
 
+    def for_post_id(post_id)
+      where_array_includes(:added_post_ids, [post_id]).or(where_array_includes(:removed_post_ids, [post_id]))
+    end
+
     def search(params)
       q = super
+      q = q.search_attributes(params, :pool_id, :post_ids, :added_post_ids, :removed_post_ids, :updater, :description, :description_changed, :name, :name_changed, :version, :is_active, :is_deleted, :category)
 
-      if params[:updater_id].present?
-        q = q.where(updater_id: params[:updater_id].split(",").map(&:to_i))
-      end
-
-      if params[:updater_name].present?
-        q = q.where("updater_id = ?", User.name_to_id(params[:updater_name]))
-      end
-
-      if params[:pool_id].present?
-        q = q.where(pool_id: params[:pool_id].split(",").map(&:to_i))
+      if params[:post_id]
+        q = q.for_post_id(params[:post_id].to_i)
       end
 
       q.apply_default_order(params)
