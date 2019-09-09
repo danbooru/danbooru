@@ -206,6 +206,14 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       assert_equal("max-age=#{5.minutes}, private", response.headers["Cache-Control"])
     end
 
+    should "support the only parameter" do
+      create(:post)
+      get posts_path, as: :json, params: { only: "id,rating score" }
+
+      assert_response :success
+      assert_equal(%w[id rating score].sort, response.parsed_body.first.keys.sort)
+    end
+
     should "return the correct root element name for empty xml responses" do
       get tags_path, as: :xml
 

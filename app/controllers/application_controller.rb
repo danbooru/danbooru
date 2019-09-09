@@ -9,7 +9,6 @@ class ApplicationController < ActionController::Base
   before_action :normalize_search
   before_action :api_check
   before_action :set_variant
-  before_action :track_only_param
   before_action :enable_cors
   after_action :reset_current_user
   layout "default"
@@ -26,12 +25,6 @@ class ApplicationController < ActionController::Base
 
   def enable_cors
     response.headers["Access-Control-Allow-Origin"] = "*"
-  end
-
-  def track_only_param
-    if params[:only]
-      RequestStore[:only_param] = params[:only].split(/,/)
-    end
   end
 
   def api_check
