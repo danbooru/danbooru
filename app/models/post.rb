@@ -30,7 +30,6 @@ class Post < ApplicationRecord
   validate :updater_can_change_rating
   before_save :update_tag_post_counts
   before_save :set_tag_counts
-  after_save :set_pool_category_pseudo_tags
   before_create :autoban
   after_save :create_version
   after_save :update_parent_on_save
@@ -1041,7 +1040,6 @@ class Post < ApplicationRecord
 
       with_lock do
         self.pool_string = "#{pool_string} pool:#{pool.id}".strip
-        set_pool_category_pseudo_tags
         update_column(:pool_string, pool_string) unless new_record?
         pool.add!(self)
       end
@@ -1053,7 +1051,6 @@ class Post < ApplicationRecord
 
       with_lock do
         self.pool_string = pool_string.gsub(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ").strip
-        set_pool_category_pseudo_tags
         update_column(:pool_string, pool_string) unless new_record?
         pool.remove!(self)
       end
@@ -1062,18 +1059,6 @@ class Post < ApplicationRecord
     def remove_from_all_pools
       pools.find_each do |pool|
         pool.remove!(self)
-      end
-    end
-
-    def set_pool_category_pseudo_tags
-      self.pool_string = (pool_string.split - ["pool:series", "pool:collection"]).join(" ")
-
-      pool_categories = pools.undeleted.pluck(:category)
-      if pool_categories.include?("series")
-        self.pool_string = "#{pool_string} pool:series".strip
-      end
-      if pool_categories.include?("collection")
-        self.pool_string = "#{pool_string} pool:collection".strip
       end
     end
   end

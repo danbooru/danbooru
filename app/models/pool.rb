@@ -8,12 +8,10 @@ class Pool < ApplicationRecord
   validates_uniqueness_of :name, case_sensitive: false, if: :name_changed?
   validate :validate_name, if: :name_changed?
   validates_inclusion_of :category, :in => %w(series collection)
-  validate :updater_can_change_category
   validate :updater_can_remove_posts
   validate :updater_can_edit_deleted
   before_validation :normalize_post_ids
   before_validation :normalize_name
-  after_save :update_category_pseudo_tags_for_posts_async
   after_save :create_version
   after_create :synchronize!
 
@@ -292,30 +290,6 @@ class Pool < ApplicationRecord
 
   def creator_name
     creator.name
-  end
-
-  def update_category_pseudo_tags_for_posts_async
-    if saved_change_to_category?
-      UpdatePoolPseudoTagsJob.perform_later(self)
-    end
-  end
-
-  def update_category_pseudo_tags_for_posts
-    Post.where(id: post_ids).find_each do |post|
-      post.reload
-      post.set_pool_category_pseudo_tags
-      Post.where(:id => post.id).update_all(:pool_string => post.pool_string)
-    end
-  end
-
-  def category_changeable_by?(user)
-    user.is_builder? || (user.is_member? && post_count <= Danbooru.config.pool_category_change_limit)
-  end
-
-  def updater_can_change_category
-    if category_changed? && !category_changeable_by?(CurrentUser.user)
-      errors[:base] << "You cannot change the category of pools with greater than #{Danbooru.config.pool_category_change_limit} posts"
-    end
   end
 
   def validate_name

@@ -103,11 +103,6 @@ module Danbooru
       2
     end
 
-    # Members cannot change the category of pools with more than this many posts.
-    def pool_category_change_limit
-      100
-    end
-
     # Users cannot search for more than X regular tags at a time.
     def base_tag_query_limit
       6

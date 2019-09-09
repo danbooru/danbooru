@@ -79,7 +79,7 @@ class PostArchiveTest < ActiveSupport::TestCase
 
       should "create a version" do
         assert_equal("tagme", @post.tag_string)
-        assert_equal("pool:#{@pool.id} pool:series", @post.pool_string)
+        assert_equal("pool:#{@pool.id}", @post.pool_string)
 
         assert_equal(1, @post.versions.size)
         assert_equal("tagme", @post.versions.last.tags)

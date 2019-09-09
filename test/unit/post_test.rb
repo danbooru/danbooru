@@ -863,7 +863,7 @@ class PostTest < ActiveSupport::TestCase
               @post.reload
               @pool.reload
               assert_equal([@post.id], @pool.post_ids)
-              assert_equal("pool:#{@pool.id} pool:series", @post.pool_string)
+              assert_equal("pool:#{@pool.id}", @post.pool_string)
             end
           end
 
@@ -894,7 +894,7 @@ class PostTest < ActiveSupport::TestCase
               @post.reload
               @pool.reload
               assert_equal([@post.id], @pool.post_ids)
-              assert_equal("pool:#{@pool.id} pool:series", @post.pool_string)
+              assert_equal("pool:#{@pool.id}", @post.pool_string)
             end
           end
 
@@ -909,7 +909,7 @@ class PostTest < ActiveSupport::TestCase
                 @post.reload
                 @pool.reload
                 assert_equal([@post.id], @pool.post_ids)
-                assert_equal("pool:#{@pool.id} pool:series", @post.pool_string)
+                assert_equal("pool:#{@pool.id}", @post.pool_string)
               end
             end
 
@@ -920,7 +920,7 @@ class PostTest < ActiveSupport::TestCase
                 @post.reload
                 assert_not_nil(@pool)
                 assert_equal([@post.id], @pool.post_ids)
-                assert_equal("pool:#{@pool.id} pool:series", @post.pool_string)
+                assert_equal("pool:#{@pool.id}", @post.pool_string)
               end
             end
 
@@ -1768,10 +1768,10 @@ class PostTest < ActiveSupport::TestCase
         pool = FactoryBot.create(:pool)
         post.add_pool!(pool)
         post.reload
-        assert_equal("pool:#{pool.id} pool:series", post.pool_string)
+        assert_equal("pool:#{pool.id}", post.pool_string)
         post.add_pool!(pool)
         post.reload
-        assert_equal("pool:#{pool.id} pool:series", post.pool_string)
+        assert_equal("pool:#{pool.id}", post.pool_string)
         post.remove_pool!(pool)
         post.reload
         assert_equal("", post.pool_string)
