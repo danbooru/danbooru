@@ -1,0 +1,15 @@
+<h1>Search Error</h1>
+
+<p>
+  <%= @message %>
+
+  <% unless CurrentUser.is_platinum? %>
+    <%= link_to "Upgrade your account", new_user_upgrade_path  %> to search for more tags at once.
+  <% end %>
+</p>
+
+<%= link_to "Go back", :back, rel: "prev" %>
+
+<% content_for(:page_title) do %>
+  Search Error - <%= Danbooru.config.app_name %>
+<% end %>

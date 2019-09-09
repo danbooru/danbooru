@@ -62,9 +62,9 @@ class ApplicationController < ActionController::Base
     when ActionController::UnknownFormat, ActionView::MissingTemplate
       render_error_page(406, exception, message: "#{request.format.to_s} is not a supported format for this page")
     when Danbooru::Paginator::PaginationError
-      render_error_page(410, exception)
+      render_error_page(410, exception, template: "static/pagination_error", message: "You cannot go beyond page #{Danbooru.config.max_numbered_pages}.")
     when Post::SearchError
-      render_error_page(422, exception)
+      render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
     when ApiLimitError
       render_error_page(429, exception)
     when NotImplementedError

@@ -1,0 +1,17 @@
+<h1>Search Error</h1>
+
+<p>
+  <%= @message %>
+
+  <% if CurrentUser.is_platinum? %>
+    Try narrowing your search terms.
+  <% else %>
+    Try narrowing your search terms, or <%= link_to "upgrade your account", new_user_upgrade_path  %> to go beyond page <%= Danbooru.config.max_numbered_pages %>.
+  <% end %>
+</p>
+
+<%= link_to "Go back", :back, rel: "prev" %>
+
+<% content_for(:page_title) do %>
+  Search Error - <%= Danbooru.config.app_name %>
+<% end %>

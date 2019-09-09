@@ -66,6 +66,20 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: {:tags => "1girl solo"}
           assert_response :success
         end
+
+        should "render an error when searching for too many tags" do
+          get posts_path, params: { tags: "1 2 3" }
+
+          assert_response 422
+          assert_select "h1", "Search Error"
+        end
+
+        should "render an error when exceeding the page limit" do
+          get posts_path, params: { page: 1001 }
+
+          assert_response 410
+          assert_select "h1", "Search Error"
+        end
       end
 
       context "with an md5 param" do
