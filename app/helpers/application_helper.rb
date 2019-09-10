@@ -12,10 +12,6 @@ module ApplicationHelper
     raw(wordbreaked_string)
   end
 
-  def pro_fontawesome_enabled?
-    request.domain =~ /donmai\.us/
-  end
-
   def nav_link_to(text, url, **options)
     klass = options.delete(:class)
 
@@ -167,16 +163,6 @@ module ApplicationHelper
     html_options = { autocomplete: "off", class: "search-form #{classes}" }
 
     simple_form_for(:search, method: :get, url: url, defaults: defaults, html: html_options, &block)
-  end
-
-  def search_field(method, label: method.titleize, hint: nil, value: nil, **attributes)
-    content_tag(:div, class: "input") do
-      label_html = label_tag("search_#{method}", label)
-      input_html = text_field_tag(method, value, id: "search_#{method}", name: "search[#{method}]", **attributes)
-      hint_html = hint.present? ? content_tag(:p, hint, class: "hint") : ""
-
-      label_html + input_html + hint_html
-    end
   end
 
   def body_attributes(user = CurrentUser.user)
