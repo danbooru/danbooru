@@ -47,5 +47,16 @@ class PoolVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_select "#pool-version-#{@versions[2].id}", false
       end
     end
+
+    context "diff action" do
+      should "render" do
+        @post = create(:post)
+        @pool = as (@user) { create(:pool) }
+        as (@user) { @pool.update(name: "blah", description: "desc", post_ids: [@post.id]) }
+
+        get diff_pool_version_path(@pool.versions.last.id)
+        assert_response :success
+      end
+    end
   end
 end

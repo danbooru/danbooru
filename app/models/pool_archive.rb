@@ -62,19 +62,18 @@ class PoolArchive < ApplicationRecord
     sqs_service.send_message(msg, message_group_id: "pool:#{pool.id}")
   end
 
-  def build_diff(other = nil)
+  def build_diff(other = previous)
     diff = {}
-    prev = previous
 
-    if prev.nil?
+    if other.nil?
       diff[:added_post_ids] = added_post_ids
       diff[:removed_post_ids] = removed_post_ids
       diff[:added_desc] = description
     else
-      diff[:added_post_ids] = post_ids - prev.post_ids
-      diff[:removed_post_ids] = prev.post_ids - post_ids
+      diff[:added_post_ids] = post_ids - other.post_ids
+      diff[:removed_post_ids] = other.post_ids - post_ids
       diff[:added_desc] = description
-      diff[:removed_desc] = prev.description
+      diff[:removed_desc] = other.description
     end
 
     diff

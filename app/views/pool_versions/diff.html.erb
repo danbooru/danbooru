@@ -3,7 +3,10 @@
     <h1>Pool Version Comparison: <%= @pool_version.name %></h1>
 
     <ul>
-      <li><strong>Posts</strong>: <%= pool_version_diff(@pool_version, @other_version) %></li>
+      <li>
+        <strong>Posts</strong>:
+        <%= render "pool_versions/diff", diff: @pool_version.build_diff(@other_version) %>
+      </li>
       <% if @other_version %>
         <li><strong>Old Desc</strong>: <%= @other_version.description %></li>
       <% end %>
