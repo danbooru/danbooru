@@ -1,19 +1,5 @@
-<%= form_tag(moderator_ip_addrs_path, :method => :get, :class => "simple_form") do %>
-  <div class="input">
-    <label for="user_ids">Search IPs</label>
-    <%= text_field_tag "search[ip_addr]", params[:ip_addrs] %>
-    <span class="hint">Separate with commas</span>
-  </div>
-
-  <%= submit_tag "Search" %>
-<% end %>
-
-<%= form_tag(moderator_ip_addrs_path, :method => :get, :class => "simple_form") do %>
-  <div class="input">
-    <label for="user_names">Search User Names</label>
-    <%= text_field_tag "search[user_name]", params[:user_names], data: { autocomplete: "user" } %>
-    <span class="hint">Separate with commas</span>
-  </div>
-
-  <%= submit_tag "Search" %>
+<%= search_form_for(moderator_ip_addrs_path) do |f| %>
+  <%= f.input :ip_addr, label: "IPs ", hint: "Separate with spaces", input_html: { value: params.dig(:search, :ip_addr) } %>
+  <%= f.input :user_name, label: "Users", hint: "Separate with spaces", input_html: { value: params.dig(:search, :user_name), "data-autocomplete": "user" } %>
+  <%= f.submit "Search" %>
 <% end %>

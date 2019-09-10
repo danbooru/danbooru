@@ -2,13 +2,11 @@
   <div id="a-search">
     <h1>Search Changes</h1>
 
-    <div id="search">
-      <%= form_tag(post_versions_path, :method => :get, :class => "simple_form") do %>
-        <%= search_field "updater_name", :label => "User", :data => { autocomplete: "user" } %>
-        <%= search_field "post_id", :label => "Post" %>
-        <%= submit_tag "Search" %>
-      <% end %>
-    </div>
+    <%= search_form_for(post_versions_path) do |f| %>
+      <%= f.input :updater_name, label: "Updater", input_html: { "data-autocomplete": "user" } %>
+      <%= f.input :post_id %>
+      <%= f.submit "Search" %>
+    <% end %>
   </div>
 </div>
 

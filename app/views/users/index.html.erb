@@ -2,11 +2,6 @@
   <div id="a-index">
     <h1>Users</h1>
 
-    <% form_tag(users_path, :method => :get, :class => "simple_form") do %>
-      <%= search_field "name_matches", :label => "Name" %>
-      <%= submit_tag "Search" %>
-    <% end %>
-
     <table width="100%" class="striped">
       <thead>
         <tr>

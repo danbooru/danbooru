@@ -10,12 +10,12 @@ module Moderator
       def show
         cookies.permanent[:moderated] = Time.now.to_i
 
-        if params[:per_page]
-          cookies.permanent["mq_per_page"] = params[:per_page]
+        if search_params[:per_page]
+          cookies.permanent["mq_per_page"] = search_params[:per_page]
         end
 
         ::Post.without_timeout do
-          @posts = ::Post.includes(:disapprovals, :uploader).order("posts.id asc").pending_or_flagged.available_for_moderation(params[:hidden]).tag_match(params[:query]).paginate(params[:page], :limit => per_page)
+          @posts = ::Post.includes(:disapprovals, :uploader).order("posts.id asc").pending_or_flagged.available_for_moderation(search_params[:hidden]).tag_match(search_params[:tags]).paginate(params[:page], :limit => per_page)
           @posts.each # hack to force rails to eager load
         end
         respond_with(@posts)
@@ -45,7 +45,7 @@ module Moderator
       end
 
       def per_page
-        cookies["mq_per_page"] || params[:per_page] || 25
+        cookies["mq_per_page"] || search_params[:per_page] || 25
       end
     end
   end

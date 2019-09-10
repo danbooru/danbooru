@@ -2,10 +2,10 @@
   <div id="a-search">
     <h1>Search IP Addresses</h1>
 
-    <%= form_tag(moderator_ip_addrs_path, :method => :get, :class => "simple_form") do %>
-      <%= search_field "user_name", :label => "User" %>
-      <%= search_field "ip_addr", :label => "IP Addr" %>
-      <%= submit_tag "Search" %>
+    <%= search_form_for(moderator_ip_addrs_path) do |f| %>
+      <%= f.input :ip_addr, label: "IPs ", hint: "Separate with spaces", input_html: { value: params.dig(:search, :ip_addr) } %>
+      <%= f.input :user_name, label: "Users", hint: "Separate with spaces", input_html: { value: params.dig(:search, :user_name), "data-autocomplete": "user" } %>
+      <%= f.submit "Search" %>
     <% end %>
   </div>
 </div>

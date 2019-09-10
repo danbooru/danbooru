@@ -2,19 +2,12 @@
   <div id="a-search">
     <h1>Search User Feedbacks</h1>
 
-    <%= form_tag(user_feedbacks_path, :method => :get, :class => "simple_form") do %>
-      <%= search_field "user_name", :label => "User", :data => { autocomplete: "user" } %>
-      <%= search_field "creator_name", :label => "Creator", :data => { autocomplete: "user" } %>
-      <%= search_field "body_matches", :label => "Message" %>
-
-      <div class="input">
-        <label for="search_category">Category</label>
-        <%= select "search", "category", %w(positive negative neutral), :include_blank => true %>
-      </div>
-
-      <div class="input">
-        <%= submit_tag "Search" %>
-      </div>
+    <%= search_form_for(user_feedbacks_path) do |f| %>
+      <%= f.input :user_name, input_html: { value: params.dig(:search, :user_name), "data-autocomplete": "user" } %>
+      <%= f.input :creator_name, input_html: { value: params.dig(:search, :creator_name), "data-autocomplete": "user" } %>
+      <%= f.input :body_matches, label: "Message", input_html: { value: params.dig(:search, :body_matches) } %>
+      <%= f.input :category, collection: %w[positive negative neutral], include_blank: true, selected: params.dig(:search, :category) %>
+      <%= f.submit "Search" %>
     <% end %>
   </div>
 </div>

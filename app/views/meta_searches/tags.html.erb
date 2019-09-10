@@ -3,9 +3,9 @@
     <h1>MetaSearch Tags</h1>
 
     <section>
-      <%= form_tag(meta_searches_tags_path, :method => :get) do %>
-        <%= text_field_tag "name", params[:name], :data => { :autocomplete => "tag" } %>
-        <%= submit_tag "Go" %>
+      <%= search_form_for(meta_searches_tags_path) do |f| %>
+        <%= f.input :name, input_html: { value: params.dig(:search, :name), "data-autocomplete": "tag" } %>
+        <%= f.submit "Search" %>
       <% end %>
     </section>
 

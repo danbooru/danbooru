@@ -1,15 +1,13 @@
 <div id="c-forum-posts">
   <div id="a-search">
     <h1>Search Forum</h1>
-    <%= form_tag(forum_posts_path, :method => :get, :class => "simple_form") do %>
-      <%= search_field "topic_title_matches", :label => "Title" %>
-      <%= search_field "body_matches", :label => "Body" %>
-      <%= search_field "creator_name", :label => "Author", :data => { autocomplete: "user" } %>
-      <div class="input">
-        <label for="search_topic_category_id">Category</label>
-        <%= select "search", "topic_category_id", ForumTopic::CATEGORIES.invert.to_a, :include_blank => true %>
-      </div>
-      <%= submit_tag "Search" %>
+
+    <%= search_form_for(forum_posts_path) do |f| %>
+      <%= f.input :topic_title_matches, label: "Title" %>
+      <%= f.input :body_matches, label: "Body" %>
+      <%= f.input :creator_name, label: "Creator", input_html: { "data-autocomplete": "user" } %>
+      <%= f.input :topic_category_id, label: "Category", collection: ForumTopic::CATEGORIES.invert.to_a, include_blank: true %>
+      <%= f.submit "Search" %>
     <% end %>
   </div>
 </div>
