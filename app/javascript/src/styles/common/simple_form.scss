@@ -20,9 +20,16 @@ form.simple_form {
       max-width: 20em;
     }
 
-    span.hint {
-      display: block;
+    .hint {
+      padding-left: 1em;
       font-size: 70%;
+    }
+
+    &.text {
+      .hint {
+        padding-left: 0em;
+        display: block;
+      }
     }
 
     textarea {

@@ -10,20 +10,6 @@ div#c-artists, div#excerpt {
     margin-left: 1em;
   }
 
-  div#a-edit, div#a-new {
-    textarea {
-      height: 10em;
-      
-      &#artist_other_names_string {
-        height: 3em;
-      }
-    }
-
-    .hint {
-      display: block;
-    } 
-  }
-
   div.recent-posts {
     margin-top: 1em;
 

@@ -7,7 +7,7 @@
     <p><%= @artist.name %></p>
   <% end %>
 
-  <%= f.input :other_names_string, label: "Other names", as: :text, hint: '<b style="color: red;">NEW</b> Separate names with spaces, not commas. Use underscores for spaces inside names.'.html_safe %>
+  <%= f.input :other_names_string, label: "Other names", as: :text, input_html: { size: "50x1" }, hint: '<b style="color: red;">NEW</b> Separate names with spaces, not commas. Use underscores for spaces inside names.'.html_safe %>
   <%= f.input :group_name %>
   <%= f.input :url_string, :label => "URLs", :as => :text, :input_html => {:size => "50x5", :value => params.dig(:artist, :url_string) || @artist.urls.join("\n")}, :hint => "You can prefix a URL with - to mark it as dead." %>
 
