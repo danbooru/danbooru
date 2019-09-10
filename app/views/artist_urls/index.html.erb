@@ -1,6 +1,6 @@
 <div id="c-artist-urls">
   <div id="a-index">
-    <%= simple_form_for(:search, url: artist_urls_path, method: :get, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+    <%= search_form_for(artist_urls_path) do |f| %>
       <%= f.simple_fields_for :artist do |fa| %>
         <%= fa.input :name, label: "Artist Name", input_html: { value: params.dig(:search, :artist, :name), "data-autocomplete": "artist" } %>
       <% end %>

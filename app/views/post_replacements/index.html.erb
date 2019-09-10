@@ -4,7 +4,7 @@
 
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <%= simple_form_for(:search, url: post_replacements_path, method: :get, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+    <%= search_form_for(post_replacements_path) do |f| %>
       <%= f.input :creator_name, label: "Replacer", input_html: { value: params[:search][:creator_name], data: { autocomplete: "user" } } %>
       <%= f.input :post_tags_match, label: "Tags", input_html: { value: params[:search][:post_tags_match], data: { autocomplete: "tag-query" } } %>
       <%= f.submit "Search" %>

@@ -1,4 +1,4 @@
-<%= simple_form_for(:search, url: post_appeals_path, method: :get, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+<%= search_form_for(post_appeals_path) do |f| %>
   <%= f.input :reason_matches, label: "Reason", hint: "Use * for wildcard searches", input_html: { value: params[:search][:reason_matches] } %>
   <%= f.input :post_tags_match, label: "Tags", input_html: { value: params[:search][:post_tags_match], data: { autocomplete: "tag-query" } } %>
   <%= f.input :post_id, label: "Post ID", input_html: { value: params[:search][:post_id] } %>

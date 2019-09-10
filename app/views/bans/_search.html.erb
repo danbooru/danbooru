@@ -1,4 +1,4 @@
-<%= simple_form_for(:search, method: :get, url: bans_path, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+<%= search_form_for(bans_path) do |f| %>
   <%= f.input :user_name, label: "User", input_html: { value: params[:search][:user_name], data: { autocomplete: "user" } } %>
   <%= f.input :banner_name, label: "Banner", input_html: { value: params[:search][:banner_name], data: { autocomplete: "user" } } %>
   <%= f.input :reason_matches, label: "Reason", hint: "Use * for wildcard", input_html: { value: params[:search][:reason_matches] } %>

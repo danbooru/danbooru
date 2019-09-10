@@ -1,4 +1,4 @@
-<%= simple_form_for(:search, url: artists_path, method: :get, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+<%= search_form_for(artists_path) do |f| %>
   <%= f.input :any_name_matches, label: "Name", hint: "Use * for wildcard", input_html: { value: params[:search][:any_name_matches], data: { autocomplete: "artist" }} %>
   <%= f.input :url_matches, label: "URL", as: "string", input_html: { value: params[:search][:url_matches] } %>
   <%= f.input :creator_name, label: "Creator", input_html: { value: params[:search][:creator_name], data: { autocomplete: "user" } } %>

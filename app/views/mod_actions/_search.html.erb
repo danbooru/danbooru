@@ -1,4 +1,4 @@
-<%= simple_form_for(:search, method: :get, url: mod_actions_path, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+<%= search_form_for(mod_actions_path) do |f| %>
   <%= f.input :creator_name, label: "Creator", input_html: { value: params[:search][:creator_name], data: { autocomplete: "user" } } %>
   <%= f.input :description_matches, label: "Description" %>
   <%= f.input :category, label: "Category", collection: ModAction.categories.map {|k,v| [k.capitalize.tr("_"," "), v]}, include_blank: true,selected: params[:search][:category] %>

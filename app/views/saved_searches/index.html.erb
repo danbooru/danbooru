@@ -7,7 +7,7 @@
       <% end %>
     </h1>
 
-    <%= simple_form_for(:search, url: saved_searches_path, method: :get, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+    <%= search_form_for(saved_searches_path) do |f| %>
       <%= f.input :query_ilike, label: "Query", input_html: { value: params[:search][:query_ilike] } %>
       <%= f.input :label, label: "Label", input_html: { value: params[:search][:label] } %>
       <%= f.submit "Search" %>

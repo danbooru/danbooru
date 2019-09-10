@@ -2,7 +2,7 @@
   <div id="a-search">
     <h1>Search Comments</h1>
 
-    <%= simple_form_for(:search, :method => :get, url: comments_path, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+    <%= search_form_for(comments_path) do |f| %>
       <%= hidden_field_tag "group_by", "comment", :id => "group_by_full" %>
       <%= f.input :creator_name, label: "Commenter", input_html: { data: { autocomplete: "user" } } %>
       <%= f.input :body_matches, label: "Body" %>

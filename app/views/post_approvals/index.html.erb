@@ -3,7 +3,7 @@
     <h1>Approvals</h1>
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <%= simple_form_for(:search, url: post_approvals_path, method: :get, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+    <%= search_form_for(post_approvals_path) do |f| %>
       <%= f.input :user_name, label: "Approver", input_html: { value: params[:search][:user_name], data: { autocomplete: "user" } } %>
       <%= f.input :post_tags_match, label: "Tags", input_html: { value: params[:search][:post_tags_match], data: { autocomplete: "tag-query" } } %>
       <%= f.submit "Search" %>

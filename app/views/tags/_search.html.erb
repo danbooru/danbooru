@@ -1,4 +1,4 @@
-<%= simple_form_for(:search, url: tags_path, method: :get, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+<%= search_form_for(tags_path) do |f| %>
   <%= f.input :name_matches, label: "Name", hint: "Use * for wildcard", input_html: { value: params[:search][:name_matches], data: { autocomplete: "tag" } } %>
   <%= f.input :category, label: "Category", collection: TagCategory.canonical_mapping.to_a, include_blank: true,selected: params[:search][:category] %>
   <%= f.input :order, collection: [%w[Newest date], %w[Count count], %w[Name name]], include_blank: false, selected: params[:search][:order] %>

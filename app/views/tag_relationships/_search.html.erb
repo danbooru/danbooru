@@ -1,6 +1,6 @@
 <%# url %>
 
-<%= simple_form_for(:search, method: :get, url: url, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+<%= search_form_for(url) do |f| %>
   <%= f.input :name_matches, label: "Name", input_html: { value: params[:search][:name_matches], data: { autocomplete: "tag" } } %>
   <%= f.input :status, label: "Status", collection: %w[Approved Active Pending Deleted Retired Processing Queued], include_blank: true, selected: params[:search][:status] %>
   <%= f.simple_fields_for :antecedent_tag do |fa| %>

@@ -1,6 +1,6 @@
 <div id="c-users">
   <div id="a-search">
-    <%= simple_form_for(:search, url: users_path, method: :get, defaults: { required: false }, html: { class: "inline-form" }) do |f| %>
+    <%= search_form_for(users_path) do |f| %>
       <%= f.input :name_matches, label: "Name", hint: "Use * for wildcard", input_html: { value: params[:search][:name_matches], data: { autocomplete: "user" } } %>
       <%= f.input :inviter_name, label: "Inviter Name", hint: "Use * for wildcard", input_html: { value: params.dig(:search, :inviter_name), data: { autocomplete: "user" } } %>
 

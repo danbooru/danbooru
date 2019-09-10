@@ -2,7 +2,7 @@
   <div id="a-search">
     <h1>Search Notes</h1>
 
-    <%= simple_form_for(:search, url: notes_path, method: :get, defaults: { required: false }) do |f| %>
+    <%= search_form_for(notes_path) do |f| %>
       <%= f.hidden_field :group_by, value: "note" %>
 
       <%= f.input :body_matches, label: "Body" %>

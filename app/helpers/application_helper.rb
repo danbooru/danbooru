@@ -162,6 +162,13 @@ module ApplicationHelper
     tag.input value: "Preview", type: "button", class: "dtext-preview-button", "data-input-id": input_id, "data-preview-id": preview_id
   end
 
+  def search_form_for(url, classes: "inline-form", &block)
+    defaults = { required: false }
+    html_options = { autocomplete: "off", class: "search-form #{classes}" }
+
+    simple_form_for(:search, method: :get, url: url, defaults: defaults, html: html_options, &block)
+  end
+
   def search_field(method, label: method.titleize, hint: nil, value: nil, **attributes)
     content_tag(:div, class: "input") do
       label_html = label_tag("search_#{method}", label)
