@@ -2,7 +2,7 @@
   <div id="a-new">
     <h1>Alias &amp; Implication Import</h1>
 
-    <%= form_tag(admin_alias_and_implication_import_path, :class => "simple_form") do %>
+    <%= simple_form_for(:batch, url: admin_alias_and_implication_import_path) do |f| %>
       <pre>
 Use the following format:
 
@@ -13,28 +13,10 @@ create implication aaa -> bbb
 mass update aaa -> bbb
       </pre>
 
-      <div class="input">
-        <label for="batch_text">
-          Script
-        </label>
-        <%= text_area "batch", "text", :size => "60x20" %>
-      </div>
-
-      <div class="input">
-        <label for="batch_forum_id">
-          Forum ID
-        </label>
-        <%= text_field "batch", "forum_id" %>
-      </div>
-
-      <div class="input">
-        <label for="batch_rename_aliased_pages">
-          <%= check_box "batch", "rename_aliased_pages", :checked => true %>
-          Rename aliased wiki pages and artists
-        </label>
-      </div>
-
-      <%= submit_tag %>
+      <%= f.input :text, label: "Script", as: :text, input_html: { size: "60x20" } %>
+      <%= f.input :forum_id, label: "Forum ID" %>
+      <%= f.input :rename_aliased_pages, label: "Renamed aliased wiki pages and artists", as: :boolean, checked: true %>
+      <%= f.submit "Submit" %>
     <% end %>
   </div>
 </div>
