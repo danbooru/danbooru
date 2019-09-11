@@ -1,63 +1,75 @@
 <ul>
-  <li><%= link_to "Resize to window", "#", :id => "image-resize-to-window-link" %></li>
-  <li><%= link_to "Find similar", iqdb_queries_path(:post_id => post.id) %></li>
-  <li><%= link_to_if post.visible?, "Download", post.tagged_file_url + "?download=1", download: post.presenter.filename_for_download %></li>
+  <li id="post-option-resize-to-window">
+    <%= link_to "Resize to window", "#", id: "image-resize-to-window-link" %>
+  </li>
+  <li id="post-option-find-similar">
+    <%= link_to "Find similar", iqdb_queries_path(post_id: post.id) %>
+  </li>
+  <li id="post-option-download">
+    <%= link_to_if post.visible?, "Download", post.tagged_file_url + "?download=1", download: post.presenter.filename_for_download %>
+  </li>
 
   <% if CurrentUser.is_member? %>
-    <li><%= link_to "Favorite", favorites_path(:post_id => post.id), :remote => true, :method => :post, :id => "add-to-favorites", :"data-shortcut" => "f", style: ("display: none;" if @post.is_favorited?) %></li>
-    <li><%= link_to "Unfavorite", favorite_path(post), :remote => true, :method => :delete, :id => "remove-from-favorites", :"data-shortcut" => "shift+f", style: ("display: none;" if !@post.is_favorited?) %></li>
-    <li><%= link_to "Edit", "#edit", :id => "side-edit-link" %></li>
-    <li id="add-to-pool-list"><%= link_to "Add to pool", "#", :id => "pool" %></li>
-    <% if post.is_note_locked? %>
-      <li id="add-notes-list"><span id="note-locked-notice">Note locked</span></li>
-    <% else %>
-      <li id="add-notes-list"><%= link_to "Add note", "#", :id => "translate", :"data-shortcut" => "n" %></li>
-    <% end %>
+    <li id="post-option-add-to-favorites">
+      <%= link_to "Favorite", favorites_path(post_id: post.id), remote: true, method: :post, id: "add-to-favorites", "data-shortcut": "f", style: ("display: none;" if @post.is_favorited?) %>
+    </li>
+    <li id="post-option-remove-from-favorites">
+      <%= link_to "Unfavorite", favorite_path(post), remote: true, method: :delete, id: "remove-from-favorites", "data-shortcut": "shift+f", style: ("display: none;" if !@post.is_favorited?) %>
+    </li>
+    <li id="post-option-edit"><%= link_to "Edit", "#edit", id: "side-edit-link" %></li>
+    <li id="post-option-add-to-pool"><%= link_to "Add to pool", "#", id: "pool" %></li>
+    <li id="post-option-add-note">
+      <% if post.is_note_locked? %>
+        <span id="note-locked-notice">Note locked</span>
+      <% else %>
+        <%= link_to "Add note", "#", id: "translate", "data-shortcut": "n" %>
+      <% end %>
+    </li>
     <% if post.has_notes? %>
-      <li id="copy-all-notes-list"><%= link_to "Copy notes", "#", :id => "copy-notes" %></li>
+      <li id="post-option-copy-notes"><%= link_to "Copy notes", "#", id: "copy-notes" %></li>
     <% end %>
-    <li id="add-artist-commentary-list"><%= link_to "Add commentary", "#", :id => "add-commentary" %></li>
-    <li><%= link_to "Add to fav group", "#", :id => "open-favgroup-dialog-link", :"data-shortcut" => "g" %></li>
+    <li id="post-option-add-commentary"><%= link_to "Add commentary", "#", id: "add-commentary" %></li>
+    <li id="post-option-add-fav-group"><%= link_to "Add to fav group", "#", id: "open-favgroup-dialog-link", "data-shortcut": "g" %></li>
 
     <% if post.is_status_locked? %>
-      <li><span id="status-locked-notice">Status locked</span></li>
+      <li id="post-option-status-locked">Status locked</li>
     <% else %>
       <% unless CurrentUser.no_flagging? %>
         <% if !post.is_deleted? && !post.is_pending? && !post.is_flagged? %>
-          <li><%= link_to "Flag", new_post_flag_path(post_flag: { post_id: post.id }), id: "flag", remote: true %></li>
+          <li id="post-option-flag"><%= link_to "Flag", new_post_flag_path(post_flag: { post_id: post.id }), remote: true %></li>
         <% elsif post.is_flagged? || post.is_deleted? %>
-          <li><%= link_to "Appeal", new_post_appeal_path(post_appeal: { post_id: post.id }), id: "appeal", remote: true %></li>
+          <li id="post-option-appeal"><%= link_to "Appeal", new_post_appeal_path(post_appeal: { post_id: post.id }), remote: true %></li>
         <% end %>
       <% end %>
 
       <% if CurrentUser.can_approve_posts? %>
         <% if post.is_deleted? %>
-          <li><%= link_to "Undelete", undelete_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "undelete", :data => { :confirm => "Are you sure you want to undelete this post?" } %></li>
+          <li id="post-option-undelete"><%= link_to "Undelete", undelete_moderator_post_post_path(post_id: post.id), remote: true, method: :post, "data-confirm": "Are you sure you want to undelete this post?" %></li>
           <% if post.fav_count > 0 && post.parent_id %>
-            <li><%= link_to "Move favorites", confirm_move_favorites_moderator_post_post_path(:post_id => post.id) %></li>
+            <li id="post-option-move-favorites"><%= link_to "Move favorites", confirm_move_favorites_moderator_post_post_path(post_id: post.id) %></li>
           <% end %>
         <% else %>
-          <li><%= link_to "Delete", confirm_delete_moderator_post_post_path(:post_id => post.id) %></li>
+          <li id="post-option-delete"><%= link_to "Delete", confirm_delete_moderator_post_post_path(post_id: post.id) %></li>
         <% end %>
 
         <% if post.is_approvable? && !post.is_deleted? %>
-          <li><%= link_to "Approve", moderator_post_approval_path(:post_id => post.id), :remote => true, :method => :post, :id => "approve", :"data-shortcut" => "shift+o", :"data-confirm" => "Are you sure you want to approve this post?" %></li>
-          <li><%= link_to "Hide from queue", moderator_post_disapprovals_path(post_disapproval: { post_id: post.id, reason: "disinterest" }), remote: true, method: :post, id: "disapprove" %></li>
+          <li id="post-option-approve"><%= link_to "Approve", moderator_post_approval_path(post_id: post.id), remote: true, method: :post, id: "approve", "data-shortcut": "shift+o", "data-confirm": "Are you sure you want to approve this post?" %></li>
+          <li id="post-option-disapprove"><%= link_to "Hide from queue", moderator_post_disapprovals_path(post_disapproval: { post_id: post.id, reason: "disinterest" }), remote: true, method: :post, id: "disapprove" %></li>
         <% end %>
 
         <% if post.is_banned? %>
-          <li><%= link_to "Unban", unban_moderator_post_post_path(post), method: :post, "data-confirm": "Are you sure you want to unban this post?" %></li>
+          <li id="post-option-unban"><%= link_to "Unban", unban_moderator_post_post_path(post), method: :post, "data-confirm": "Are you sure you want to unban this post?" %></li>
         <% else %>
-          <li><%= link_to "Ban", confirm_ban_moderator_post_post_path(post) %></li>
+          <li id="post-option-ban"><%= link_to "Ban", confirm_ban_moderator_post_post_path(post) %></li>
         <% end %>
 
         <% if CurrentUser.is_admin? %>
-          <li><%= link_to "Expunge", expunge_moderator_post_post_path(:post_id => post.id), :remote => true, :method => :post, :id => "expunge", :data => {:confirm => "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to delete this post?"} %></li>
+          <li id="post-option-expunge"><%= link_to "Expunge", expunge_moderator_post_post_path(post_id: post.id), remote: true, method: :post, "data-confirm": "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to delete this post?" %></li>
         <% end %>
 
         <% if CurrentUser.is_moderator? %>
-          <li><%= link_to "Replace image", new_post_replacement_path(post_id: post.id), id: "replace-image", remote: true %></li>
-          <li><%= link_to "Down vote report", reports_down_voting_post_path(post_id: post.id) %></li>
+          <li id="post-option-replace-image"><%= link_to "Replace image", new_post_replacement_path(post_id: post.id), remote: true %></li>
+          <li id="post-option-down-vote-report"><%= link_to "Down vote report", reports_down_voting_post_path(post_id: post.id) %></li>
         <% end %>
       <% end %>
     <% end %>

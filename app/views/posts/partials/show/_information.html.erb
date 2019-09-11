@@ -1,24 +1,24 @@
 <ul>
-  <li>ID: <%= post.id %></li>
+  <li id="post-info-id">ID: <%= post.id %></li>
   <% if CurrentUser.is_moderator? %>
-    <li>Uploader: <%= link_to_user(post.uploader) %></li>
+    <li id="post-info-uploader">Uploader: <%= link_to_user(post.uploader) %></li>
   <% end %>
-  <li>
+  <li id="post-info-date">
     Date: <%= link_to time_ago_in_words_tagged(post.created_at), posts_path(:tags => "date:#{post.created_at.to_date}"), :rel => "nofollow" %>
     <meta itemprop="uploadDate" content="<%= post.created_at.iso8601 %>">
   </li>
   <% if post.approver %>
-    <li>Approver: <%= link_to_user(post.approver) %></li>
+    <li id="post-info-approver">Approver: <%= link_to_user(post.approver) %></li>
   <% end %>
-  <li>
+  <li id="post-info-size">
     Size: <%= link_to_if post.visible?, number_to_human_size(post.file_size), post.tagged_file_url %>
     <% if post.has_dimensions? %>
       (<span itemprop="width"><%= post.image_width %></span>x<span itemprop="height"><%= post.image_height %></span>)
     <% end %>
   </li>
-  <li>Source: <%= post_source_tag(post) %></li>
-  <li>Rating: <%= post.pretty_rating %></li>
-  <li>Score: <span id="score-for-post-<%= post.id %>"><%= post.score %></span>
+  <li id="post-info-source">Source: <%= post_source_tag(post) %></li>
+  <li id="post-info-rating">Rating: <%= post.pretty_rating %></li>
+  <li id="post-info-score">Score: <span id="score-for-post-<%= post.id %>"><%= post.score %></span>
     <% if CurrentUser.is_voter? %>
       <%= tag.span id: "vote-links-for-post-#{post.id}", style: ("display: none;" if !@post.can_be_voted_by?(CurrentUser.user)) do %>
         (vote
@@ -30,13 +30,13 @@
       <% end %>
     <% end %>
   </li>
-  <li>Favorites: <span id="favcount-for-post-<%= post.id %>"><%= post.fav_count %></span>
+  <li id="post-info-favorites">Favorites: <span id="favcount-for-post-<%= post.id %>"><%= post.fav_count %></span>
   <% if CurrentUser.is_gold? %>
     <%= link_to "Show »", "#", id: "show-favlist-link", style: ("display: none;" if post.fav_count == 0) %>
     <%= link_to "« Hide", "#", id: "hide-favlist-link", style: "display: none;" %>
     <div id="favlist" style="display: none;"><%= post_favlist(post) %></div>
   <% end %></li>
-  <li>
+  <li id="post-info-status">
     Status:
     <% if post.is_pending? %>
       Pending
