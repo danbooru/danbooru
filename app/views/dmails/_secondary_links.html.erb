@@ -1,6 +1,6 @@
 <% content_for(:secondary_links) do %>
   <menu>
-    <li><%= render "quick_search" %></li>
+    <%= quick_search_form_for(:message_matches, dmails_path, "dmails") %>
     <%= subnav_link_to "All", all_dmails_path(set_default_folder: true) %>
     <%= subnav_link_to "Received", received_dmails_path(set_default_folder: true) %>
     <%= subnav_link_to "Sent", sent_dmails_path(set_default_folder: true) %>

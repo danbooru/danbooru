@@ -1,6 +1,6 @@
 <% content_for(:secondary_links) do %>
   <menu>
-    <li><%= render "notes/quick_search" %></li>
+    <%= quick_search_form_for(:body_matches, notes_path, "notes") %>
     <%= subnav_link_to "Listing", notes_path %>
     <%= subnav_link_to "Posts", posts_path(:tags => "order:note") %>
     <%= subnav_link_to "Search", search_notes_path %>

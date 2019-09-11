@@ -1,6 +1,6 @@
 <% content_for(:secondary_links) do %>
   <menu>
-    <li><%= render "artist_commentaries/quick_search" %></li>
+    <%= quick_search_form_for(:text_matches, artist_commentaries_path, "commentaries") %>
     <%= subnav_link_to "Search", search_artist_commentaries_path %>
     <%= subnav_link_to "Listing", artist_commentaries_path %>
     <%= subnav_link_to "Recent changes", artist_commentary_versions_path %>

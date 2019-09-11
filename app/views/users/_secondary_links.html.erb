@@ -1,6 +1,6 @@
 <% content_for(:secondary_links) do %>
   <menu>
-    <li><%= render "users/quick_search" %></li>
+    <%= quick_search_form_for(:name_matches, users_path, "users", autocomplete: "user") %>
     <%= subnav_link_to "Listing", users_path %>
     <%= subnav_link_to "Search", search_users_path %>
 

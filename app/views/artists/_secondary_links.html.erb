@@ -1,6 +1,6 @@
 <% content_for(:secondary_links) do %>
   <menu>
-    <li><%= render "artists/quick_search" %></li>
+    <%= quick_search_form_for(:any_name_or_url_matches, artists_path, "artists", autocomplete: "artist") %>
     <%= subnav_link_to "Listing", artists_path %>
     <%= subnav_link_to "Banned", banned_artists_path %>
     <% if CurrentUser.is_member? %>

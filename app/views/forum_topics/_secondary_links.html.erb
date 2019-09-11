@@ -1,6 +1,6 @@
 <% content_for(:secondary_links) do %>
   <menu>
-    <li><%= render "forum_posts/quick_search" %></li>
+    <%= quick_search_form_for(:body_matches, forum_posts_path, "forum posts") %>
     <%= subnav_link_to "Listing", forum_topics_path %>
     
     <% if CurrentUser.is_member? %>

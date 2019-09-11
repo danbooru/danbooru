@@ -1,6 +1,6 @@
 <% content_for(:secondary_links) do %>
   <menu>
-    <li><%= render "pools/quick_search" %></li>
+    <%= quick_search_form_for(:name_matches, pools_path, "pools", autocomplete: "pool") %>
     <%= subnav_link_to "Gallery", gallery_pools_path %>
     <%= subnav_link_to "Listing", pools_path %>
     <%= subnav_link_to "New", new_pool_path %>

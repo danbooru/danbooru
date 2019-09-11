@@ -78,6 +78,10 @@ form.inline-form {
   }
 }
 
+form.quick-search-form {
+  margin: 0;
+}
+
 form.one-line-form {
   > input, > div.input {
     display: inline;
