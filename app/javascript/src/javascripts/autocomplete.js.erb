@@ -101,30 +101,12 @@ Autocomplete.initialize_tag_autocomplete = function() {
       if (!metatag && !term) {
         this.close();
         return;
+      } else if (!metatag && term) {
+        Autocomplete.normal_source(term, resp);
+        return;
       }
 
       switch (metatag) {
-      case "md5":
-      case "width":
-      case "height":
-      case "mpixels":
-      case "ratio":
-      case "score":
-      case "favcount":
-      case "filesize":
-      case "source":
-      case "id":
-      case "date":
-      case "age":
-      case "limit":
-      case "tagcount":
-      case "pixiv_id":
-      case "pixiv":
-      <% TagCategory.short_name_list.each do |category| %>
-        case "<%= category %>tags": // eslint-disable-line
-      <% end %>
-        resp([]);
-        return;
       case "order":
       case "status":
       case "rating":
@@ -161,7 +143,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
         Autocomplete.saved_search_source(term, resp);
         break;
       default:
-        Autocomplete.normal_source(term, resp);
+        resp([]);
         break;
       }
     }
