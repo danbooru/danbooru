@@ -10,6 +10,7 @@ class ApplicationController < ActionController::Base
   before_action :api_check
   before_action :set_variant
   before_action :enable_cors
+  before_action :cause_error
   after_action :reset_current_user
   layout "default"
 
@@ -105,6 +106,19 @@ class ApplicationController < ActionController::Base
 
   def set_variant
     request.variant = params[:variant].try(:to_sym)
+  end
+
+  # allow api clients to force errors for testing purposes.
+  def cause_error
+    return unless params[:error].present?
+
+    status = params[:error].to_i
+    raise ArgumentError, "invalid status code" unless status.in?(400..599)
+
+    error = StandardError.new(params[:message])
+    error.set_backtrace(caller)
+
+    render_error_page(status, error)
   end
 
   User::Roles.each do |role|
