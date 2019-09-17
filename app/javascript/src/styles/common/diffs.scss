@@ -1,43 +1,43 @@
 .diff-list {
   .added, .added a {
-    color: green;
+    color: var(--diff-list-added-color);
     text-decoration: none;
     margin-right: 0.5em;
   }
 
   .added.obsolete, .added.obsolete a {
-    color: darkGreen;
+    color: var(--diff-list-obsolete-added-color);
   }
 
   .removed, .removed a {
-    color: red;
+    color: var(--dif-list-removed-color);
     text-decoration: line-through;
     margin-right: 0.5em;
   }
 
   .removed.obsolete, .removed.obsolete a {
-    color: darkRed;
+    color: var(--diff-list-obsolete-removed-color);
   }
 }
 
 .diff-list {
   ins, ins a {
-    color: green;
+    color: var(--diff-list-added-color);
     text-decoration: none;
     margin-right: 0.5em;
   }
 
   del, del a {
-    color: red;
+    color: var(--diff-list-removed-color);
     text-decoration: line-through;
     margin-right: 0.5em;
   }
 
   ins.obsolete, ins.obsolete a {
-    color: darkGreen;
+    color: var(--diff-list-obsolete-added-color);
   }
 
   del.obsolete, del.obsolete a {
-    color: darkRed;
+    color: var(--diff-list-obsolete-removed-color);
   }
 }

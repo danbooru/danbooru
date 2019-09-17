@@ -1,27 +1,23 @@
 a.user-admin.with-style {
-  color: red;
+  color: var(--user-admin-color);
 }
 
 a.user-moderator.with-style {
-  color: orange;
-}
-
-a.user-contributor.with-style {
-  color: purple;
+  color: var(--user-moderator-color);
 }
 
 a.user-builder.with-style {
-  color: #6633FF;
+  color: var(--user-builder-color);
 }
 
 a.user-platinum.with-style {
-  color: gray;
+  color: var(--user-platinum-color);
 }
 
 a.user-gold.with-style {
-  color: #0000FF;
+  color: var(--user-gold-color);
 }
 
 a.user-member.with-style {
-  color: auto;
+  color: var(--user-member-color);
 }

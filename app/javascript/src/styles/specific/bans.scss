@@ -1,19 +1,17 @@
-@import "../base/000_vars.scss";
-
 #c-bans #a-index {
   tr[data-expired="true"] {
-    background-color: $success_color !important;
+    background-color: var(--success-color) !important;
 
     &:hover {
-      background-color: darken($success_color, 5%) !important;
+      background-color: var(--success-hover-color) !important;
     }
   }
 
   tr[data-expired="false"] {
-    background-color: $error_color !important;
+    background-color: var(--error-color) !important;
 
     &:hover {
-      background-color: darken($error_color, 5%) !important;
+      background-color: var(--error-hover-color) !important;
     }
   }
 }

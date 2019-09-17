@@ -26,11 +26,11 @@ div#c-user-upgrades {
         }
 
         colgroup#gold  {
-          background-color: #FFF380;
+          background-color: var(--user-upgrade-gold-background-color);
         }
 
         colgroup#platinum {
-          background-color: #eee;
+          background-color: var(--user-upgrade-platinum-background-color);
         }
 
         td, th {
@@ -41,13 +41,13 @@ div#c-user-upgrades {
 
         tbody {
           tr:hover {
-            background-color: #FEF;
+            background-color: var(--user-upgrade-table-row-hover-background-color);
           }
         }
 
         p.cost-footnote {
           font-size: 80%;
-          color: gray;
+          color: var(--user-upgrade-cost-footnote-color);
           margin: 0;
         }
       }

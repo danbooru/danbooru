@@ -1,9 +1,9 @@
 #c-bulk-update-requests {
   s.approved {
-    color: green;
+    color: var(--bulk-update-request-approved-color);
   }
 
   s.failed {
-    color: red;
+    color: var(--bulk-update-request-rejected-color);
   }
 }

@@ -4,7 +4,7 @@ div.error-messages {
 
   h1 {
     font-size: 1em;
-    color: #A00;
+    color: var(--error-message-color);
   }
 }
 
@@ -17,8 +17,8 @@ div#notice {
   z-index: 100;
 
   &:not(.ui-state-error) {
-    background-color: #FFFBBF;
-    border: 1px solid #CCC999;
+    background: var(--notice-background);
+    border: var(--notice-border);
   }
 }
 

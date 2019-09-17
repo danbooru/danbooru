@@ -15,8 +15,6 @@ require('jquery-hotkeys');
 // should start looking for nodejs replacements
 importAll(require.context('../vendor', true, /\.js$/));
 
-importAll(require.context('../src/styles/base', true, /\.scss$/));
-
 require("jquery-ui/ui/widgets/autocomplete");
 require("jquery-ui/ui/widgets/button");
 require("jquery-ui/ui/widgets/dialog");
@@ -31,8 +29,7 @@ require("jquery-ui/themes/base/resizable.css");
 require("jquery-ui/themes/base/theme.css");
 
 importAll(require.context('../src/javascripts', true, /\.js(\.erb)?$/));
-importAll(require.context('../src/styles/common', true, /\.scss(?:\.erb)?$/));
-importAll(require.context('../src/styles/specific', true, /\.scss(?:\.erb)?$/));
+importAll(require.context('../src/styles', true, /\.s?css(?:\.erb)?$/));
 
 export { default as Autocomplete } from '../src/javascripts/autocomplete.js.erb';
 export { default as Blacklist } from '../src/javascripts/blacklists.js';

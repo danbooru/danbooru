@@ -1,5 +1,3 @@
-@import "../base/000_vars.scss";
-
 div.paginator {
   display: block;
   padding: 2em 0 1em 0;
@@ -13,17 +11,17 @@ div.paginator {
     }
 
     &.more {
-      color: grey;
+      color: var(--paginator-ellipsis-color);
     }
 
     a.arrow:hover {
-      background: white;
-      color: $link_color;
+      background: var(--paginator-arrow-background-color);
+      color: var(--paginator-arrow-color);
     }
 
     a:hover {
-      background: $link_color;
-      color: white;
+      background: var(--paginator-arrow-color);
+      color: var(--paginator-arrow-background-color);
     }
 
     span {

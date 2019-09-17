@@ -1,51 +1,51 @@
 body.mode-view {
-  background-color: #FFF;
+  background-color: var(--post-mode-menu-view-background);
 }
 
 body.mode-edit {
-  background-color: #5C5;
+  background-color: var(--post-mode-menu-edit-background);
 }
 
 body.mode-tag-script {
-  background-color: #D6D;
+  background-color: var(--post-mode-menu-tag-script-background);
 }
 
 body.mode-add-fav {
-  background-color: #FFA;
+  background-color: var(--post-mode-menu-add-fav-background);
 }
 
 body.mode-remove-fav {
-  background-color: #FFA;
+  background-color: var(--post-mode-menu-remove-fav-background);
 }
 
 body.mode-vote-up {
-  background-color: #AFA;
+  background-color: var(--post-mode-menu-vote-up-background);
 }
 
 body.mode-vote-down {
-  background-color: #FAA;
+  background-color: var(--post-mode-menu-vote-down-background);
 }
 
 body.mode-lock-rating {
-  background-color: #AA3;
+  background-color: var(--post-mode-menu-lock-rating-background);
 }
 
 body.mode-lock-note {
-  background-color: #3AA;
+  background-color: var(--post-mode-menu-lock-note-background);
 }
 
 body.mode-approve {
-  background-color: #48C;
+  background-color: var(--post-mode-menu-approve-background);
 }
 
 body.mode-translation {
-  background-color: #5CD;
+  background-color: var(--post-mode-menu-translation-background);
 }
 
 body.mode-ban {
-  background-color: #F33;
+  background-color: var(--post-mode-menu-ban-background);
 }
 
 #page, #top, #page-footer {
-  background-color: white;
+  background-color: var(--body-background-color);
 }

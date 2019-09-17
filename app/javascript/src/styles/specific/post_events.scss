@@ -1,11 +1,11 @@
 div#c-post-events {
   #a-index {
     tr.resolved-true {
-      background: #DDD;
+      background: var(--post-events-resolved-background);
     }
 
     tr.resolved-false {
-      background: #FFF;
+      background: var(--post-events-unresolved-background);
     }
   }
 }

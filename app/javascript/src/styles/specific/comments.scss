@@ -12,7 +12,7 @@ div.comments-for-post {
       padding: 5px;
 
       &[data-is-sticky="true"] {
-        background: $menu_color;
+        background: var(--comment-sticky-background-color);
       }
 
       &[data-is-voted="true"] {

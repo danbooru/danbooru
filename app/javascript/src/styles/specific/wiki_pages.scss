@@ -9,7 +9,7 @@ div#c-wiki-pages {
 }
 
 .wiki-other-name {
-  background-color: #EEE;
+  background-color: var(--wiki-page-other-name-background-color);
   padding: 3px;
   border-radius: 3px;
 }

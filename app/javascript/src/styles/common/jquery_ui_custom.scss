@@ -9,11 +9,11 @@
 }
 
 .ui-widget-content a {
-  color: $link_color;
+  color: var(--link-color);
 }
 
 .ui-widget-content a:hover {
-  color: $link_hover_color;
+  color: var(--link-hover-color);
 }
 
 div.ui-dialog {
@@ -21,7 +21,7 @@ div.ui-dialog {
   overflow: visible;
   font-size: 1em;
   z-index: 999 !important;
-  box-shadow: 2px 2px 1px grey;
+  box-shadow: var(--jquery-ui-dialog-box-shadow);
   padding: 0;
 
   .ui-dialog-titlebar {
@@ -36,33 +36,29 @@ div.ui-dialog {
 }
 
 .ui-state-highlight {
-  border: 1px solid #FCEEC1;
-  background: #FDF5D9;
-  color: #363636;
+  border: var(--jquery-ui-state-highlight-border);
+  background: var(--jquery-ui-state-highlight-background);
+  color: var(--jquery-ui-state-highlight-color);
 
   a, a:active, a:visited {
-    color: $link_color;
+    color: var(--link-color);
   }
 
   a:hover {
-    color: $link_hover_color;
+    color: var(--link-hover-color);
   }
 }
 
 .ui-state-error {
-  border: 1px solid #FBC7C6;
-  background: #FDDFDE;
+  border: var(--jquery-ui-state-error-border);
+  background: var(--jquery-ui-state-error-background);
 }
 
 .ui-button {
   margin: 0;
   padding: 0.25em 1em;
-  background-color: #f6f6f6;
-  border-top: 1px solid silver;
-  border-left: 1px solid silver;
-  border-bottom: 1px solid darkgrey;
-  border-right: 1px solid darkgrey;
-  background: linear-gradient(#f6f6f6, #e5e5e5);
+  border: var(--jquery-ui-button-border);
+  background: var(--jquery-ui-button-background);
 
   &.sub {
     font-size: 90%;
@@ -75,8 +71,8 @@ div.ui-dialog {
 }
 
 .ui-button:hover {
-  box-shadow: 1px 1px grey;
-  background: linear-gradient(#fefefe, #f0f0f0);
+  box-shadow: var(--jquery-ui-button-hover-box-shadow);
+  background: var(--jquery-ui-button-hover-background);
 }
 
 .ui-front {

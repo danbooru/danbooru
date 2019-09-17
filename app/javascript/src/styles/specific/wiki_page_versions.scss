@@ -1,12 +1,12 @@
 div#c-wiki-page-versions {
   #a-diff {
     del {
-      background: #FCC;
+      background: var(--wiki-page-versions-diff-del-background);
       text-decoration: none;
     }
 
     ins {
-      background: #CFC;
+      background: var(--wiki-page-versions-diff-ins-background);
       text-decoration: none;
     }
   }
@@ -19,7 +19,7 @@ div#c-wiki-page-versions {
 
   #a-show {
     span.version {
-      color: #AAA;
+      color: var(--wiki-page-versions-version-color);
     }
   }
 }

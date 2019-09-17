@@ -1,5 +1,3 @@
-@import "../base/000_vars.scss";
-
 $tooltip-line-height: 16px;
 $tooltip-body-height: $tooltip-line-height * 6; // 6 lines high.
 $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
@@ -16,31 +14,31 @@ $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
   }
 
   &::-webkit-scrollbar-thumb {
-    background: #999999;
-    border: 0px none #FFFFFF;
+    background: var(--post-tooltip-scrollbar-background);
+    border: none;
     border-radius: 0px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: #AAAAAA;
+    background: var(--post-tooltip-scrollbar-thumb-color);
   }
 
   &::-webkit-scrollbar-thumb:active {
-    background: #AAAAAA;
+    background: var(--post-tooltip-scrollbar-thumb-color);
   }
 
   &::-webkit-scrollbar-track {
-    background: #EEEEEE;
-    border: 0px none #ffffff;
+    background: var(--post-tooltip-scrollbar-track-background);
+    border: none;
     border-radius: 0px;
   }
 
   &::-webkit-scrollbar-track:hover {
-    background: #EEEEEE;
+    background: var(--post-tooltip-scrollbar-track-background);
   }
 
   &::-webkit-scrollbar-track:active {
-    background: #EEEEEE;
+    background: var(--post-tooltip-scrollbar-track-background);
   }
 
   &::-webkit-scrollbar-corner {
@@ -55,7 +53,7 @@ $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
   box-sizing: border-box;
   font-size: 11px;
   line-height: $tooltip-line-height;
-  border-color: #767676;
+  border-color: var(--post-tooltip-border-color);
 
   .qtip-content {
     padding: 0;
@@ -75,7 +73,7 @@ $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
     }
 
     .post-tooltip-header {
-      background-color: $menu_color;
+      background-color: var(--post-tooltip-header-background-color);
       display: flex;
       white-space: nowrap;
       overflow: hidden;
@@ -100,14 +98,14 @@ $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
 
     .post-tooltip-info {
       margin-left: 0.5em;
-      color: #555;
+      color: var(--post-tooltip-info-color);
       font-size: 10px;
     }
   }
 
   &:not(:hover) {
     a, span {
-      color: #777 !important;
+      color: var(--post-tooltip-inactive-color) !important;
     }
   }
 

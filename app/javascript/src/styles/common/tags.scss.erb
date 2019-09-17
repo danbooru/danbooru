@@ -1,5 +1,3 @@
-@import "../base/000_vars.scss";
-
 <% TagCategory.css_mapping.each do |category,cssmap| %>
   .category-<%= category %> a,
   a.tag-type-<%= category %>,
@@ -16,7 +14,7 @@
     }
 
     &.selected {
-      color: white;
+      color: var(--selected-tag-color);
     }
   }
 
@@ -32,7 +30,7 @@
     }
 
     &.selected {
-      color: white;
+      color: var(--selected-tag-color);
     }
   }
 <% end %>

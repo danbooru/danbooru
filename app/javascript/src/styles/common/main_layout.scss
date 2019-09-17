@@ -6,12 +6,12 @@ div#search {
 
 div#search-box button {
   -webkit-appearance: button;
-  border: 1px solid $link_color;
-  background-color: $link_color;
-  color: #FFF;
+  border: 1px solid var(--link-color);
+  background-color: var(--link-color);
+  color: var(--search-box-button-color);
   &:hover, &:focus {
-    border: 1px solid $link_hover_color;
-    background-color: $link_hover_color;
+    border: 1px solid var(--link-hover-color);
+    background-color: var(--link-hover-color);
   }
 }
 
@@ -55,7 +55,7 @@ div#page {
 
     button[type=submit] {
       padding: 2px 6px;
-      background: #EEE;
+      background: var(--sidebar-submit-button-color);
     }
 
     #search-box button[type=submit] {
@@ -84,7 +84,7 @@ footer#page-footer {
   margin-top: 1em;
   text-align: center;
   padding: 1em 0 1em;
-  border-top: 1px solid #EEE;
+  border-top: var(--footer-border);
 }
 
 div.clearfix {

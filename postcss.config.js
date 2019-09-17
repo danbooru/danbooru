@@ -6,6 +6,10 @@ module.exports = {
       autoprefixer: {
         flexbox: 'no-2009'
       },
+      // https://github.com/csstools/postcss-preset-env#importfrom
+      importFrom: [
+        'app/javascript/src/styles/base/040_colors.css'
+      ],
       stage: 3
     })
   ]

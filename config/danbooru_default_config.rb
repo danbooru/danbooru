@@ -250,8 +250,8 @@ module Danbooru
           "humanized" => nil,
           "relatedbutton" => "General",
           "css" => {
-            "color" => "$link_color",
-            "hover" => "$link_hover_color"
+            "color" => "var(--general-tag-color)",
+            "hover" => "var(--general-tag-hover-color)"
           }
         },
         "character" => {
@@ -267,8 +267,8 @@ module Danbooru
           },
           "relatedbutton" => "Characters",
           "css" => {
-            "color" => "#0A0",
-            "hover" => "#6B6"
+            "color" => "var(--character-tag-color)",
+            "hover" => "var(--character-tag-hover-color)"
           }
         },
         "copyright" => {
@@ -284,8 +284,8 @@ module Danbooru
           },
           "relatedbutton" => "Copyrights",
           "css" => {
-            "color" => "#A0A",
-            "hover" => "#B6B"
+            "color" => "var(--copyright-tag-color)",
+            "hover" => "var(--copyright-tag-hover-color)"
           }
         },
         "artist" => {
@@ -301,8 +301,8 @@ module Danbooru
           },
           "relatedbutton" => "Artists",
           "css" => {
-            "color" => "#A00",
-            "hover" => "#B66"
+            "color" => "var(--artist-tag-color)",
+            "hover" => "var(--artist-tag-hover-color)"
           }
         },
         "meta" => {
@@ -313,8 +313,8 @@ module Danbooru
           "humanized" => nil,
           "relatedbutton" => nil,
           "css" => {
-            "color" => "#F80",
-            "hover" => "#FA6"
+            "color" => "var(--meta-tag-color)",
+            "hover" => "var(--meta-tag-hover-color)"
           }
         }
       }

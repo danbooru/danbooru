@@ -1,14 +1,12 @@
-@import "../base/000_vars.scss";
-
 .ui-autocomplete {
   font-size: 0.9em;
 
   .ui-state-active {
     border: none;
     margin: 0 -1px;
-    background-color: #F0F0F0;
-    border-left: 1px solid #C5C5C5;
-    border-right: 1px solid #C5C5C5;
+    background-color: var(--autocomplete-background-color);
+    border-left: 1px solid var(--autocomplete-border-color);
+    border-right: 1px solid var(--autocomplete-border-color);
   }
 
   .ui-menu-item-wrapper {

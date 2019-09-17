@@ -30,7 +30,7 @@ div#c-tags {
       justify-self: end;
 
       .count {
-        color: gray;
+        color: var(--tag-count-color);
         text-decoration: italic;
         margin-left: 0.25em;
         padding-bottom: 0.2em;
@@ -42,15 +42,15 @@ div#c-tags {
       }
 
       .fa-frown {
-        color: red;
+        color: var(--tag-count-indicator-frown-color);
       }
 
       .fa-meh {
-        color: darkkhaki;
+        color: var(--tag-count-indicator-meh-color);
       }
 
       .fa-smile {
-        color: green;
+        color: var(--tag-count-indicator-smile-color);
       }
     }
   }

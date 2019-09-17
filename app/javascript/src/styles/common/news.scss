@@ -1,7 +1,7 @@
 div#news-updates {
   padding: 5px;
-  background: #EEE;
-  border-bottom: 2px solid #666;
+  background: var(--news-updates-background);
+  border-bottom: var(--news-updates-border);
   overflow: hidden;
   font-size: 0.8em;
 

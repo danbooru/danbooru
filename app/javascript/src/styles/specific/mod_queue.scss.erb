@@ -6,11 +6,11 @@ div#c-moderator-post-queues {
     overflow: hidden;
 
     &.post-pos-score {
-      background: rgb(230, 255, 230);
+      background: var(--modqueue-positive-score-background-color);
     }
 
     &.post-neg-score {
-      background: rgb(255, 230, 230);
+      background: var(--modqueue-negative-score-background-color);
     }
 
     aside {
@@ -27,13 +27,13 @@ div#c-moderator-post-queues {
 
     <% Danbooru.config.modqueue_quality_warning_tags.each do |tag| %>
       &[data-tags~="<%= tag %>"] {
-        background-color: $preview_quality_warning_color;
+        background-color: var(--modqueue-quality-warning-color);
       }
     <% end %>
 
     <% Danbooru.config.modqueue_sample_warning_tags.each do |tag| %>
       &[data-tags~="<%= tag %>"] {
-        background-color: $preview_sample_warning_color;
+        background-color: var(--modqueue-sample-warning-color);
       }
     <% end %>
 

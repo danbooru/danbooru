@@ -1,5 +1,3 @@
-@import "../base/000_vars.scss";
-
 table.striped {
   td, th {
     padding: 4px 6px;
@@ -7,10 +5,10 @@ table.striped {
 
   tbody {
     tr {
-      border-bottom: 1px solid #CCC;
+      border-bottom: var(--table-row-border);
 
       &:hover {
-        background-color: $highlight_color;
+        background: var(--table-row-hover-background);
       }
     }
   }
@@ -21,18 +19,18 @@ table.striped {
 
   thead {
     tr {
-      border-bottom: 2px solid #666;
+      border-bottom: var(--table-header-border);
     }
 
     th {
       font-weight: bold;
       text-align: left;
-      color: #333;
+      color: var(--table-header-text-color);
     }
   }
 
   tr:nth-child(even) {
-    background-color: #FAFAFA;
+    background: var(--table-even-row-background);
   }
 }
 

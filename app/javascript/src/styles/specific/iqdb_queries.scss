@@ -3,7 +3,7 @@ div#c-iqdb-queries {
     article.post-preview {
       height: 180px;
       width: 180px;
-      border: lightgrey solid 1px;
+      border: var(--iqdb-preview-border);
 
       img {
         margin-top: 10px;

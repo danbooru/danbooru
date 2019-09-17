@@ -1,5 +1,5 @@
 #filedropzone {
-  border: 4px dashed #DDD;
+  border: var(--uploads-dropzone-border);
   padding: 0;
   min-height: 100px;
   display: flex;
@@ -9,18 +9,18 @@
 
   .placeholder {
     font-style: italic;
-    color: #333;
+    color: var(--uploads-dropzone-place-holder-color);
     height: 100%;
   }
 
   &.error {
-    border-color: darken(#f2dede, 30%);
-    background-color: #f2dede;
+    border-color: var(--uploads-dropzone-error-border-color);
+    background-color: var(--uploads-dropzone-error-background-color);
   }
 
   &.success {
-    border-color: darken(#dff0d8, 30%);
-    background-color: #dff0d8;
+    border-color: var(--uploads-dropzone-success-border-color);
+    background-color: var(--uploads-dropzone-success-background-color);
   }
 }
 
@@ -31,10 +31,10 @@
 .dz-progress {
   height: 20px;
   width: 300px;
-  border: 1px solid #CCC;
+    background-color: var(--uploads-dropzone-progress-border);
 
   .dz-upload {
-    background-color: #F5F5FF;
+    background-color: var(--uploads-dropzone-progress-background-color);
     display: block;
     height: 20px;
   }

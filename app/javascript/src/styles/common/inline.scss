@@ -1,26 +1,24 @@
-@import "../base/000_vars.scss";
-
 span.error {
   display: block;
   font-weight: bold;
-  color: red;
+  color: var(--error-color);
 }
 
 span.link {
-  color: $link_color;
+  color: var(--link-color);
   cursor: pointer;
 }
 
 span.count {
-  color: #CCC;
+  color: var(--tag-count-color);
   margin-left: 0.5em;
 }
 
 kbd.key {
-  background: #333;
-  border: 1px solid #333;
+  background: var(--keyboard-shortcut-background-color);
+  border: 1px solid var(--keyboard-shortcut-background-color);
   padding: 1px 6px;
-  color: white;
+  color: var(--keyboard-shortcut-color);
 /*  width: 1em;*/
   text-align: center;
   display: inline-block;
@@ -28,9 +26,9 @@ kbd.key {
 }
 
 span.inactive {
-  color: #AAA;
+  color: var(--inactive-color);
 }
 
 td a.last-page {
-  color: #666;
+  color: var(--last-page-link-color);
 }

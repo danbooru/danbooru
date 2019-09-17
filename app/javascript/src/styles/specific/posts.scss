@@ -76,78 +76,78 @@ article.post-preview {
   }
 
   &.post-status-has-children img {
-    border-color: $preview_has_children_color;
+    border-color: var(--preview-has-children-color);
   }
 
   &.post-status-has-parent img {
-    border-color: $preview_has_parent_color;
+    border-color: var(--preview-has-parent-color);
   }
   
   &.post-status-has-children.post-status-has-parent img {
-    border-color: $preview_has_children_color $preview_has_parent_color $preview_has_parent_color $preview_has_children_color;
+    border-color: var(--preview-has-children-color) var(--preview-has-parent-color) var(--preview-has-parent-color) var(--preview-has-children-color);
   }
 
 
   &.post-status-deleted img {
-    border-color: $preview_deleted_color;
+    border-color: var(--preview-deleted-color);
   }
 
   &.post-status-has-children.post-status-deleted img {
-    border-color: $preview_has_children_color $preview_deleted_color $preview_deleted_color $preview_has_children_color;
+    border-color: var(--preview-has-children-color) var(--preview-deleted-color) var(--preview-deleted-color) var(--preview-has-children-color);
   }
 
   &.post-status-has-parent.post-status-deleted img {
-    border-color: $preview_has_parent_color $preview_deleted_color $preview_deleted_color $preview_has_parent_color;
+    border-color: var(--preview-has-parent-color) var(--preview-deleted-color) var(--preview-deleted-color) var(--preview-has-parent-color);
   }
 
   &.post-status-has-children.post-status-has-parent.post-status-deleted img {
-    border-color: $preview_has_children_color $preview_deleted_color $preview_deleted_color $preview_has_parent_color;
+    border-color: var(--preview-has-children-color) var(--preview-deleted-color) var(--preview-deleted-color) var(--preview-has-parent-color);
   }
 
 
   /* Pending and flagged posts have blue borders (except in the modqueue). */
   &.post-status-pending:not(.mod-queue-preview) img,
   &.post-status-flagged:not(.mod-queue-preview) img {
-    border-color: $preview_pending_color;
+    border-color: var(--preview-pending-color);
   }
 
   &.post-status-has-children.post-status-pending:not(.mod-queue-preview) img,
   &.post-status-has-children.post-status-flagged:not(.mod-queue-preview) img {
-    border-color: $preview_has_children_color $preview_pending_color $preview_pending_color $preview_has_children_color;
+    border-color: var(--preview-has-children-color) var(--preview-pending-color) var(--preview-pending-color) var(--preview-has-children-color);
   }
 
   &.post-status-has-parent.post-status-pending:not(.mod-queue-preview) img,
   &.post-status-has-parent.post-status-flagged:not(.mod-queue-preview) img {
-    border-color: $preview_has_parent_color $preview_pending_color $preview_pending_color $preview_has_parent_color;
+    border-color: var(--preview-has-parent-color) var(--preview-pending-color) var(--preview-pending-color) var(--preview-has-parent-color);
   }
 
   &.post-status-has-children.post-status-has-parent.post-status-pending:not(.mod-queue-preview) img,
   &.post-status-has-children.post-status-has-parent.post-status-flagged:not(.mod-queue-preview) img {
-    border-color: $preview_has_children_color $preview_pending_color $preview_pending_color $preview_has_parent_color;
+    border-color: var(--preview-has-children-color) var(--preview-pending-color) var(--preview-pending-color) var(--preview-has-parent-color);
   }
 }
 
 /* Flagged posts have red borders for approvers. */
 body[data-user-can-approve-posts="true"] .post-preview {
   &.post-status-flagged img {
-    border-color: $preview_flagged_color;
+    border-color: var(--preview-flagged-color);
   }
 
   &.post-status-has-children.post-status-flagged img {
-    border-color: $preview_has_children_color $preview_flagged_color $preview_flagged_color $preview_has_children_color;
+    border-color: var(--preview-has-children-color) var(--preview-flagged-color) var(--preview-flagged-color) var(--preview-has-children-color);
   }
 
   &.post-status-has-parent.post-status-flagged img {
-    border-color: $preview_has_parent_color $preview_flagged_color $preview_flagged_color $preview_has_parent_color;
+    border-color: var(--preview-has-parent-color) var(--preview-flagged-color) var(--preview-flagged-color) var(--preview-has-parent-color);
   }
 
   &.post-status-has-children.post-status-has-parent.post-status-flagged img {
-    border-color: $preview_has_children_color $preview_flagged_color $preview_flagged_color $preview_has_parent_color;
+    border-color: var(--preview-has-children-color) var(--preview-flagged-color) var(--preview-flagged-color) var(--preview-has-parent-color);
   }
 }
 
 .post-preview.current-post {
-  background-color: rgba(0,0,0,0.1);
+  background-color: var(--preview-current-post-background);
 }
 
 #has-parent-relationship-preview, #has-children-relationship-preview {
@@ -163,12 +163,12 @@ body[data-user-can-approve-posts="true"] .post-preview {
 }
 
 .post-count {
-  color: #CCC;
+  color: var(--tag-count-color);
   margin-left: 0.2em;
 }
 
 .low-post-count {
-  color: red;
+  color: var(--low-post-count-color);
 }
 
 div#c-posts {
@@ -186,7 +186,7 @@ div#c-posts {
   }
 
   #remove-fav-button i.fa-heart {
-    color: deeppink;
+    color: var(--remove-favorite-button);
   }
 
   #remove-fav-button.animate i {
@@ -206,10 +206,10 @@ div#c-posts {
       margin-top: 0.5em;
       float: right;
       overflow: visible;
-      background: #EEE;
+      background: var(--ugoira-seek-slider-background);
 
       .ui-progressbar-value {
-        background: white;
+        background: var(--ugoira-seek-slider-progressbar-background);
       }
     }
 
@@ -251,46 +251,46 @@ div#c-posts {
     }
 
     &.notice-parent {
-      border-color: #C0FCC0;
-      background: #D8FCD9;
+      border-color: var(--post-parent-notice-border-color);
+      background: var(--post-parent-notice-background);
     }
 
     &.notice-child {
-      border-color: #FCFCC0;
-      background: #FBFCD8;
+      border-color: var(--post-child-notice-border-color);
+      background: var(--post-child-notice-background);
     }
 
     &.notice-pending {
-      border-color: #C0C0FC;
-      background: #D8D8FC;
+      border-color: var(--post-pending-notice-border-color);
+      background: var(--post-pending-notice-background);
     }
 
     &.notice-flagged {
-      border-color: #FCC0C0;
-      background: #FCD9D8;
+      border-color: var(--post-flagged-notice-border-color);
+      background: var(--post-flagged-notice-background);
     }
 
     &.notice-deleted {
-      border-color: #FF8C8C;
-      background: #FFA7A5;
+      border-color: var(--post-deleted-notice-border-color);
+      background: var(--post-deleted-notice-background);
     }
 
     &.notice-appealed {
-      border-color: #C0ECFC;
-      background: #D8F2FC;
+      border-color: var(--post-appealed-notice-border-color);
+      background: var(--post-appealed-notice-background);
     }
 
     &.notice-resized {
-      border-color: #E4C0FC;
-      background: #EED8FC;
+      border-color: var(--post-resized-notice-border-color);
+      background: var(--post-resized-notice-background);
     }
   }
 
   div.nav-notice {
     padding: 0.5em;
     margin: 1em 0;
-    background: #EEE;
-    border: 1px solid #AAA;
+    background: var(--post-nav-notice-background);
+    border: var(--post-nav-notice-border);
     position: relative;
 
     p {
@@ -416,7 +416,7 @@ div#c-posts {
         }
 
         &:hover {
-          background: rgb(250, 250, 250);
+          background: var(--post-seq-nav-hover-background);
         }
       }
     }
@@ -433,9 +433,9 @@ div#c-posts {
     }
 
     #artist-commentary {
-      border: 1px solid #CCC;
+      border: var(--post-artist-commentary-container-border);
       border-radius: 8px;
-      background-color: #F8F8F8;
+      background: var(--post-artist-commentary-container-background);
       margin-top: 1em;
       padding: 0.5em;
 
@@ -445,7 +445,7 @@ div#c-posts {
       }
 
       .disabled {
-        color: gray;
+        color: var(--post-artist-commentary-disabled-color);
       }
     }
   }
@@ -473,7 +473,7 @@ div#c-posts, div#c-uploads {
     border-radius: 4px;
     margin: 1em 0;
     padding: 1em;
-    border: 1px solid #666;
+    border: 1px solid var(--fetch-source-data-border-color);
 
     &:not(.loading) #source-info-loading { display: none; }
     &.loading #source-info-content { display: none; }

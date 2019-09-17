@@ -1,0 +1,261 @@
+:root {
+  --body-background-color: white;
+
+  --hint-color: #666;
+  --translation-note-color: gray;
+
+  --info-color: #AAA;
+
+  --link-color: hsl(213, 100%, 50%);
+  --link-hover-color: hsl(213, 100%, 75%);
+  --note-highlight-color: var(--preview-pending-color);
+
+  --subnav-menu-background-color: #F5F5FF;
+
+  --responsive-menu-background-color: var(--link-hover-color);
+  --responsive-sidebar-submit-button-background-color: #EEE;
+  --responsive-sidebar-submit-button-border: 1px solid rgb(197, 197, 197);
+  --responsive-form-input-border: 1px solid #c5c5c5;
+
+  --user-upgrade-gold-background-color: #FFF380;
+  --user-upgrade-platinum-background-color: #EEE;
+  --user-upgrade-table-row-hover-background-color: #FEF;
+  --user-upgrade-cost-footnote-color: gray;
+
+  --table-header-border: 2px solid #666;
+  --table-header-text-color: #333;
+  --table-row-border: 1px solid #CCC;
+  --table-row-hover-background: hsl(213, 100%, 95%);
+  --table-even-row-background: #FAFAFA;
+
+  --preview-pending-color: #00F;
+  --preview-flagged-color: #F00;
+  --preview-deleted-color: black;
+  --preview-has-children-color: #0F0;
+  --preview-has-parent-color: #CC0;
+
+  --preview-icon-color: white;
+  --preview-icon-background: rgba(0, 0, 0, 0.5);
+
+  --modqueue-sample-warning-color: hsl(0,  100%, 90%); // light red
+  --modqueue-quality-warning-color: hsl(50, 100%, 90%); // light yellow
+  --modqueue-postive-score-background-color: rgb(230, 255, 230);
+  --modqueue-negative-score-background-color: rgb(255, 230, 230);
+
+  --uploads-dropzone-border: 4xp dashed #DDD;
+  --uploads-dropzone-placeholder-color: #333;
+  --uploads-dropzone-error-border-color: hsl(0, 43%, 61%);
+  --uploads-dropzone-error-background-color: hsl(0, 43%, 91%);
+  --uploads-dropzone-success-border-color: hsl(103, 44%, 59%);
+  --uploads-dropzone-success-background-color: hsl(103, 44%, 89%);
+  --uploads-dropzone-progress-border: 1px solid #CCC;
+  --uploads-dropzone-progress-background-color: 1px solid #CCC;
+
+  --forum-new-topic-color: red;
+  --forum-locked-topic-color: gray;
+  --forum-level-restricted-topic-color: #F66;
+  --forum-deleted-topic-color: gray;
+  --forum-info-color: #AAA;
+  --forum-vote-up-color: green;
+  --forum-vote-meh-color: goldrenrod;
+  --forum-vote-down-color: red;
+  --forum-post-box-shadow: 1px 1px 2px #AAA;
+  --forum-post-border: 1px solid #AAA;
+  --forum-post-highlight-background-color: #FFC;
+
+  --comment-sticky-background-color: var(--subnav-menu-background-color);
+
+  --post-tooltip-border-color: #767676;
+  --post-tooltip-header-background-color: var(--subnav-menu-background-color);
+  --post-tooltip-info-color: #555;
+  --post-tooltip-inactive-color: #777;
+  --post-tooltip-scrollbar-background: #999999;
+  --post-tooltip-scrollbar-border: 0px none white;
+  --post-tooltip-scrollbar-thumb-color: #AAAAAA;
+  --post-tooltip-scrollbar-track-background: #EEEEEE;
+  --post-tooltip-scrollbar-track-border: 0px none white;
+
+  --iqdb-preview-border: 1px solid lightgrey;
+
+  --preview-current-post-background: rgba(0, 0, 0, 0.1);
+
+  --error-color: hsl(0, 100%, 95%); // light red
+  --error-hover-color: hsl(0, 100%, 90%);
+  --success-color: hsl(120, 100%, 95%); // light green
+  --success-hover-color: hsl(120, 100%, 90%);
+
+  --autocomplete-background-color: #F0F0F0;
+  --autocomplete-border-color: #C5C5C5;
+
+  --diff-list-added-color: green;
+  --diff-list-removed-color: red;
+  --diff-list-obsolete-added-color: darkGreen;
+  --diff-list-obsolete-removed-color: darkRed;
+
+  --wiki-page-versions-diff-del-background: #FCC;
+  --wiki-page-versions-diff-ins-background: #CFC;
+  --wiki-page-versions-version-color: #AAA;
+
+  --post-parent-notice-border-color: #C0FCC0;
+  --post-parent-notice-background: #D8FCD9;
+  --post-child-notice-border-color: #FCFCC0;
+  --post-child-notice-background: #FBFCD8;
+  --post-pending-notice-border-color: #C0C0FC;
+  --post-pending-notice-background: #D8D8FC;
+  --post-flagged-notice-border-color: #FCC0C0;
+  --post-flagged-notice-background: #FCD9D8;
+  --post-deleted-notice-border-color: #FF8C8C;
+  --post-deleted-notice-background: #FFA7A5;
+  --post-appealed-notice-border-color: #C0ECFC;
+  --post-appealed-notice-background: #D8F2FC;
+  --post-resized-notice-border-color: #E4C0FC;
+  --post-resized-notice-background: #EED8FC;
+
+  --post-nav-notice-background: #EEE;
+  --post-nav-notice-border: 1px solid #AAA;
+  --post-seq-nav-hover-background: rgb(250, 250, 250);
+
+  --post-artist-commentary-container-background: #F8F8F8;
+  --post-artist-commentary-container-border: 1px solid #CCC;
+  --post-artist-commentary-disabled-color: gray;
+
+  --note-body-background: #FFE;
+  --note-body-border: 1px solid black;
+  --note-box-border: 1px solid white;
+  --note-box-background: transparent;
+  --note-box-inner-border: 1px solid black;
+  --unsaved-note-box-inner-border: 1px solid red;
+  --note-preview-border: 1px solid red;
+  --note-preview-background: white;
+  --note-highlight-color: blue;
+  --note-tn-color: gray;
+
+  --post-events-resolved-background: #DDD;
+  --post-events-unresolved-background: white;
+
+  --user-name-change-requests-positive-background: #DDFFDD;
+  --user-name-change-requests-negative-background: #FFDDDD;
+
+  --series-pool-color: #A0A;
+  --series-pool-hover-color: #B6B;
+
+  --collection-pool-color: var(--general-tag-color);
+  --collection-pool-hover-color: var(--general-tag-hover-color);
+
+  --profile-page-header-color: #333;
+  --settings-page-active-tab-color: black;
+
+  --fetch-source-data-border-color: #666;
+
+  --post-mode-menu-view-background: white;
+  --post-mode-menu-edit-background: #5C5;
+  --post-mode-menu-tag-script-background: #D6D;
+  --post-mode-menu-add-fav-background: #FFA;
+  --post-mode-menu-remove-fav-background: #FFA;
+  --post-mode-menu-vote-up-background: #AFA;
+  --post-mode-menu-vote-down-background: #FAA;
+  --post-mode-menu-lock-rating-background: #AA3;
+  --post-mode-menu-lock-note-background: #3AA;
+  --post-mode-menu-approve-background: #48C;
+  --post-mode-menu-translation-background: #5CD;
+  --post-mode-menu-ban-background: #F33;
+
+  --tag-count-color: #CCC;
+  --low-post-count-color: red;
+
+  --tag-count-indicator-frown-color: red;
+  --tag-count-indicator-meh-color: darkkhaki;
+  --tag-count-indicator-smile-color: green;
+
+  --remove-favorite-button: deeppink;
+
+  --ugoira-seek-slider-background: #EEE;
+  --ugoira-seek-slider-progressbar-background: white;
+
+  // used for "(deleted)" messages
+  --inactive-color: #AAA;
+
+  // used for "page N" links in /forum_topics and /pools
+  --last-page-link-color: #666;
+
+  --keyboard-shortcut-color: white;
+  --keyboard-shortcut-background-color: #333;
+
+  // XXX unused?
+  --error-color: red;
+  --error-message-color: #A00;
+
+  --new-artist-color: #A00;
+
+  --bulk-update-request-approved-color: green;
+  --bulk-update-request-failed-color: red;
+
+  --dmail-preview-border-color: #CCC;
+
+  --notice-background: #FFFBBF;
+  --notice-border: 1px solid #CCC999;
+
+  --sign-in-link-color: #E00;
+
+  --search-box-button-color: white;
+  --sidebar-submit-button-color: #EEE;
+  --footer-border: 1px solid #EEE;
+
+  --jquery-ui-button-border: 1px solid darkgrey;
+  --jquery-ui-button-background: #f6f6f6;
+  --jquery-ui-button-hover-background: #fefefe;
+  --jquery-ui-button-hover-box-shadow: grey;
+
+  --jquery-ui-state-error-background: #FDDFDE;
+  --jquery-ui-state-error-border: 1px solid #FBC7C6;
+
+  --jquery-ui-state-highlight-background: #FDF5D9;
+  --jquery-ui-state-highlight-border: 1px solid #FCEEC1;
+  --jquery-ui-state-highlight-color: #363636;
+
+  --jquery-ui-dialog-box-shadow: 2px 2px 1px grey;
+
+  --dtext-blockquote-border: 1px solid #666;
+  --dtext-blockquote-background: #EEE;
+  --dtext-code-background: #EEE;
+  --dtext-expand-border: 1px inset #666;
+  --dtext-spoiler-color: black;
+  --dtext-spoiler-background-color: black;
+  --dtext-spoiler-hover-color: white;
+
+  --wiki-page-other-name-background-color: #EEE;
+
+  --user-feedback-positive-background-color: #DDFFDD !important;
+  --user-feedback-negative-background-color: #FFDDDD !important;
+  --user-feedback-neutral-background-color: #FFFFFF !important;
+
+  --paginator-ellipsis-color: grey;
+  --paginator-arrow-background-color: white;
+  --paginator-arrow-color: var(--link-color);
+
+  --general-tag-color: var(--link-color);
+  --general-tag-hover-color: var(--link-hover-color);
+  --character-tag-color: #0A0;
+  --character-tag-hover-color: #6B6;
+  --copyright-tag-color: #A0A;
+  --copyright-tag-hover-color: #B6B;
+  --artist-tag-color: #A00;
+  --artist-tag-hover-color: #B66;
+  --meta-tag-color: #F80;
+  --meta-tag-hover-color: #FA6;
+  --selected-tag-color: white;
+
+  --user-admin-color: red;
+  --user-moderator-color: orange;
+  --user-builder-color: #6633FF;
+  --user-platinum-color: gray;
+  --user-gold-color: blue;
+  --user-member-color: auto;
+
+  --news-updates-background: #EEE;
+  --news-updates-border: 2px solid #666;
+
+  --related-tags-container-background: #EEE;
+  --selected-related-tag-background-color: var(--link-color);
+  --selected-related-tag-color: white;
+}

@@ -1,9 +1,9 @@
 div#c-post-flags {
   tr.resolved-true {
-    background: #DDD !important;
+    background: var(--post-events-resolved-background) !important;
   }
 
   tr.resolved-false {
-    background: #FFF !important;
+    background: var(--post-events-unresolved-background) !important;
   }
 }
