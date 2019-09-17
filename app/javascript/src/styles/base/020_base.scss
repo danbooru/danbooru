@@ -1,6 +1,7 @@
 @import "../base/000_vars.scss";
 
 body {
+  color: var(--text-color);
   background-color: var(--body-background-color);
   font-family: $base_font_family;
   font-size: 87.5%;
@@ -81,7 +82,7 @@ table tfoot {
 }
 
 .fineprint {
-  color: var(--fineprint-color);
+  color: var(--muted-text-color);
   font-style: italic;
   font-size: 0.8em;
 }

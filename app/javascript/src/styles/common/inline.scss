@@ -25,10 +25,12 @@ kbd.key {
   border-radius: 3px;
 }
 
+/* used for "(deleted)" messages */
 span.inactive {
-  color: var(--inactive-color);
+  color: var(--muted-text-color);
 }
 
+/* used for "page N" links in /forum_topics and /pools */
 td a.last-page {
-  color: var(--last-page-link-color);
+  color: var(--muted-text-color);
 }

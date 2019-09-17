@@ -1,14 +1,23 @@
 :root {
+  --very-light-grey: hsl(0, 0%, 95%);
+  --light-grey: hsl(0, 0%, 90%);
+  --grey: hsl(0, 0%, 55%);
+  --dark-grey: hsl(0, 0%, 40%);
+  --very-dark-grey: hsl(0, 0%, 15%);
+}
+
+:root {
   --body-background-color: white;
+
+  --text-color: var(--very-dark-grey);
+  --muted-text-color: var(--grey);
 
   --link-color: hsl(213, 100%, 50%);
   --link-hover-color: hsl(213, 100%, 75%);
 
-  --fineprint-color: #888;
-
-  --error-background-color: hsl(0, 100%, 95%); // light red
-  --success-background-color: hsl(120, 100%, 95%); // light green
-  --warning-background-color: hsl(50, 100%, 95%); // light yellow
+  --error-background-color: hsl(0, 100%, 95%); /* light red */
+  --success-background-color: hsl(120, 100%, 95%); /* light green */
+  --warning-background-color: hsl(50, 100%, 95%); /* light yellow */
 
   --subnav-menu-background-color: #F5F5FF;
 
@@ -22,7 +31,6 @@
   --user-upgrade-table-row-hover-background-color: #FEF;
 
   --table-header-border: 2px solid #666;
-  --table-header-text-color: #333;
   --table-row-border: 1px solid #CCC;
   --table-row-hover-background: hsl(213, 100%, 95%);
   --table-even-row-background: #FAFAFA;
@@ -46,9 +54,7 @@
   --uploads-dropzone-progress-bar-background-color: var(--link-hover-color);
 
   --forum-new-topic-color: red;
-  --forum-locked-topic-color: gray;
   --forum-level-restricted-topic-color: #F66;
-  --forum-deleted-topic-color: gray;
   --forum-vote-up-color: green;
   --forum-vote-meh-color: goldrenrod;
   --forum-vote-down-color: red;
@@ -72,7 +78,7 @@
 
   --autocomplete-selected-background-color: var(--subnav-menu-background-color);
   --autocomplete-border: 1px solid #CCC;
-  --autocomplete-arrow-color: black;
+  --autocomplete-arrow-color: var(--text-color);
 
   --diff-list-added-color: green;
   --diff-list-removed-color: red;
@@ -96,7 +102,6 @@
 
   --post-artist-commentary-container-background: #F8F8F8;
   --post-artist-commentary-container-border: 1px solid #CCC;
-  --post-artist-commentary-disabled-color: gray;
 
   --note-body-background: #FFE;
   --note-body-border: 1px solid black;
@@ -107,7 +112,7 @@
   --note-preview-border: 1px solid red;
   --note-preview-background: white;
   --note-highlight-color: blue;
-  --note-tn-color: gray;
+  --note-tn-color: var(--muted-text-color);
 
   --series-pool-color: #A0A;
   --series-pool-hover-color: #B6B;
@@ -115,10 +120,7 @@
   --collection-pool-color: var(--general-tag-color);
   --collection-pool-hover-color: var(--general-tag-hover-color);
 
-  --profile-page-header-color: #333;
-  --settings-page-active-tab-color: black;
-
-  --fetch-source-data-border-color: #666;
+  --fetch-source-data-border: 1px solid #666;
 
   --post-mode-menu-view-background: white;
   --post-mode-menu-edit-background: #5C5;
@@ -133,7 +135,7 @@
   --post-mode-menu-translation-background: #5CD;
   --post-mode-menu-ban-background: #F33;
 
-  --tag-count-color: #CCC;
+  --tag-count-color: var(--muted-text-color);
   --low-post-count-color: red;
 
   --tag-count-indicator-frown-color: red;
@@ -144,12 +146,6 @@
 
   --ugoira-seek-slider-background: #EEE;
   --ugoira-seek-slider-progressbar-background: white;
-
-  // used for "(deleted)" messages
-  --inactive-color: #AAA;
-
-  // used for "page N" links in /forum_topics and /pools
-  --last-page-link-color: #666;
 
   --keyboard-shortcut-color: white;
   --keyboard-shortcut-background-color: #333;

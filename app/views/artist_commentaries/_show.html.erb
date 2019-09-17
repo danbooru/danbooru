@@ -26,14 +26,14 @@
       <% if artist_commentary.translated_title.present? %>
         <%= artist_commentary.translated_title %>
       <% else %>
-        <span class="disabled"><%= artist_commentary.original_title %></span>
+        <span class="inactive"><%= artist_commentary.original_title %></span>
       <% end %>
     </h3>
     <div class="prose">
       <% if artist_commentary.translated_description.present? %>
         <%= format_text(artist_commentary.translated_description, :disable_mentions => true) %>
       <% else %>
-        <span class="disabled"><%= format_text(artist_commentary.original_description, :disable_mentions => true) %></span>
+        <span class="inactive"><%= format_text(artist_commentary.original_description, :disable_mentions => true) %></span>
       <% end %>
     </div>
   </section>

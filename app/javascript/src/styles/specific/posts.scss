@@ -395,10 +395,6 @@ div#c-posts {
         max-height: 20em;
         overflow-y: auto;
       }
-
-      .disabled {
-        color: var(--post-artist-commentary-disabled-color);
-      }
     }
   }
 
@@ -425,7 +421,7 @@ div#c-posts, div#c-uploads {
     border-radius: 4px;
     margin: 1em 0;
     padding: 1em;
-    border: 1px solid var(--fetch-source-data-border-color);
+    border: var(--fetch-source-data-border);
 
     &:not(.loading) #source-info-loading { display: none; }
     &.loading #source-info-content { display: none; }
