@@ -21,8 +21,10 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       context "grouped by post" do
         should "render all comments for .js" do
-          get comments_path(post_id: @post.id, group_by: "post", format: "js"), xhr: true
+          get comments_path(post_id: @post.id), xhr: true
+
           assert_response :success
+          assert_equal("text/javascript", response.media_type)
         end
 
         should "show posts with visible comments" do

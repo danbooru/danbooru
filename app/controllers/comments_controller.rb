@@ -5,7 +5,7 @@ class CommentsController < ApplicationController
   skip_before_action :api_check
 
   def index
-    params[:group_by] ||= "comment" if params[:search]
+    params[:group_by] ||= "comment" if params[:search].present?
 
     if params[:group_by] == "comment" || request.format == Mime::Type.lookup("application/atom+xml")
       index_by_comment
