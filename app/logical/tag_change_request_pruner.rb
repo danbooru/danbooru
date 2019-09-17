@@ -29,7 +29,7 @@ class TagChangeRequestPruner
 
   def reject_expired(model)
     model.expired.pending.find_each do |tag_change|
-      transaction do
+      ApplicationRecord.transaction do
         if tag_change.forum_topic
           name = model.model_name.human.downcase
           body = "This #{name} has been rejected because it was not approved within 60 days."
