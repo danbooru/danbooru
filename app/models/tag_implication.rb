@@ -76,6 +76,8 @@ class TagImplication < TagRelationship
 
   module ValidationMethods
     def absence_of_circular_relation
+      return if is_rejected?
+
       # We don't want a -> b && b -> a chains
       if descendants.include?(antecedent_name)
         errors[:base] << "Tag implication can not create a circular relation with another tag implication"
@@ -84,6 +86,8 @@ class TagImplication < TagRelationship
 
     # If we already have a -> b -> c, don't allow a -> c.
     def absence_of_transitive_relation
+      return if is_rejected?
+
       # Find everything else the antecedent implies, not including the current implication.
       implications = TagImplication.active.where("antecedent_name = ? and consequent_name != ?", antecedent_name, consequent_name)
       implied_tags = implications.flat_map(&:descendant_names)
@@ -93,6 +97,8 @@ class TagImplication < TagRelationship
     end
 
     def antecedent_is_not_aliased
+      return if is_rejected?
+
       # We don't want to implicate a -> b if a is already aliased to c
       if TagAlias.active.exists?(["antecedent_name = ?", antecedent_name])
         errors[:base] << "Antecedent tag must not be aliased to another tag"
@@ -100,6 +106,8 @@ class TagImplication < TagRelationship
     end
 
     def consequent_is_not_aliased
+      return if is_rejected?
+
       # We don't want to implicate a -> b if b is already aliased to c
       if TagAlias.active.exists?(["antecedent_name = ?", consequent_name])
         errors[:base] << "Consequent tag must not be aliased to another tag"
@@ -163,11 +171,6 @@ class TagImplication < TagRelationship
     def approve!(approver: CurrentUser.user, update_topic: true)
       update(approver: approver, status: "queued")
       ProcessTagImplicationJob.perform_later(self, update_topic: update_topic)
-    end
-
-    def reject!(update_topic: true)
-      update(status: "deleted")
-      forum_updater.update(reject_message(CurrentUser.user), "REJECTED") if update_topic
     end
 
     def create_mod_action

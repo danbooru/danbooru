@@ -83,6 +83,8 @@ class TagAlias < TagRelationship
   end
 
   def absence_of_transitive_relation
+    return if is_rejected?
+
     # We don't want a -> b && b -> c chains if the b -> c alias was created first.
     # If the a -> b alias was created first, the new one will be allowed and the old one will be moved automatically instead.
     if TagAlias.active.exists?(antecedent_name: consequent_name)
@@ -170,11 +172,6 @@ class TagAlias < TagRelationship
         end
       end
     end
-  end
-
-  def reject!(update_topic: true)
-    update(status: "deleted")
-    forum_updater.update(reject_message(CurrentUser.user), "REJECTED") if update_topic
   end
 
   def wiki_pages_present

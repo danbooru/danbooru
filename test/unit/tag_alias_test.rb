@@ -80,6 +80,16 @@ class TagAliasTest < ActiveSupport::TestCase
       end
     end
 
+    context "#reject!" do
+      should "not be blocked by validations" do
+        ta1 = create(:tag_alias, antecedent_name: "kitty", consequent_name: "kitten", status: "active")
+        ta2 = build(:tag_alias, antecedent_name: "cat", consequent_name: "kitty", status: "pending")
+
+        ta2.reject!
+        assert_equal("deleted", ta2.reload.status)
+      end
+    end
+
     context "on secondary validation" do
       should "warn about missing wiki pages" do
         ti = FactoryBot.build(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", skip_secondary_validations: false)

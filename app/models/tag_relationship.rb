@@ -47,6 +47,10 @@ class TagRelationship < ApplicationRecord
     status.in?(%w[active processing queued])
   end
 
+  def is_rejected?
+    status.in?(%w[retired deleted])
+  end
+
   def is_retired?
     status == "retired"
   end
@@ -76,6 +80,13 @@ class TagRelationship < ApplicationRecord
 
   def editable_by?(user)
     deletable_by?(user)
+  end
+
+  def reject!(update_topic: true)
+    transaction do
+      update!(status: "deleted")
+      forum_updater.update(reject_message(CurrentUser.user), "REJECTED") if update_topic
+    end
   end
 
   module SearchMethods

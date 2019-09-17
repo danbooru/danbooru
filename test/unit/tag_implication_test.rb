@@ -76,6 +76,16 @@ class TagImplicationTest < ActiveSupport::TestCase
       end
     end
 
+    context "#reject!" do
+      should "not be blocked by alias validations" do
+        ti = create(:tag_implication, antecedent_name: "cat", consequent_name: "animal", status: "pending")
+        ta = create(:tag_alias, antecedent_name: "cat", consequent_name: "kitty", status: "active")
+
+        ti.reject!
+        assert_equal("deleted", ti.reload.status)
+      end
+    end
+
     context "on secondary validation" do
       should "warn if either tag is missing a wiki" do
         ti = FactoryBot.build(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", skip_secondary_validations: false)
