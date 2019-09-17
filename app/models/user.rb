@@ -311,12 +311,11 @@ class User < ApplicationRecord
         self.can_approve_posts = true
         self.can_upload_free = true
         self.is_super_voter = true
-      else
-        self.level = Levels::MEMBER
       end
     end
 
     def customize_new_user
+      self.level = User::Levels::MEMBER
       Danbooru.config.customize_new_user(self)
     end
 
