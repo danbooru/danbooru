@@ -98,6 +98,11 @@ div.prose {
   }
 }
 
+// avoid empty gaps beneath dtext blocks in table rows.
+table td div.prose > *:last-child {
+  margin-bottom: 0;
+}
+
 div.dtext-preview {
   display: none;
 
