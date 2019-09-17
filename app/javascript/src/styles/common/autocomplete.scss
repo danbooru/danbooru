@@ -1,12 +1,13 @@
-.ui-autocomplete {
+.ui-autocomplete.ui-widget {
   font-size: 0.9em;
+  border: var(--autocomplete-border);
 
   .ui-state-active {
     border: none;
     margin: 0 -1px;
-    background-color: var(--autocomplete-background-color);
-    border-left: 1px solid var(--autocomplete-border-color);
-    border-right: 1px solid var(--autocomplete-border-color);
+    background-color: var(--autocomplete-selected-background-color);
+    border-left: var(--autocomplete-border);
+    border-right: var(--autocomplete-border);
   }
 
   .ui-menu-item-wrapper {
@@ -18,6 +19,6 @@
   }
 
   .autocomplete-arrow {
-    color: black;
+    color: var(--autocomplete-arrow-color);
   }
 }
