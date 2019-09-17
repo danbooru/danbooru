@@ -101,9 +101,6 @@ Autocomplete.initialize_tag_autocomplete = function() {
       if (!metatag && !term) {
         this.close();
         return;
-      } else if (!metatag && term) {
-        Autocomplete.normal_source(term, resp);
-        return;
       }
 
       switch (metatag) {
@@ -141,6 +138,9 @@ Autocomplete.initialize_tag_autocomplete = function() {
         break;
       case "search":
         Autocomplete.saved_search_source(term, resp);
+        break;
+      case "tag":
+        Autocomplete.normal_source(term, resp);
         break;
       default:
         resp([]);
@@ -271,6 +271,7 @@ Autocomplete.normal_source = function(term, resp) {
 }
 
 Autocomplete.parse_query = function(text, caret) {
+  var operator = "";
   var metatag = "";
   var term = "";
 
@@ -282,9 +283,14 @@ Autocomplete.parse_query = function(text, caret) {
     return {};
   }
 
+  match = term.match(/^([-~])(.*)$/);
+  if (match) {
+    operator = match[1];
+    term = match[2];
+  }
+
   match = term.match(Autocomplete.TAG_PREFIXES_REGEX);
   if (match) {
-    metatag = match[1].toLowerCase();
     term = match[2];
   }
 
@@ -292,9 +298,11 @@ Autocomplete.parse_query = function(text, caret) {
   if (match) {
     metatag = match[1].toLowerCase();
     term = match[2];
+  } else {
+    metatag = "tag";
   }
 
-  return { metatag: metatag, term: term };
+  return { operator: operator, metatag: metatag, term: term };
 };
 
 // Update the input field with the item currently focused in the
