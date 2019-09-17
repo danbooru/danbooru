@@ -1,10 +1,10 @@
 #c-user-name-change-requests {
   .feedback-category-positive {
-    background: var(--user-name-change-requests-positive-background) !important;
+    background: var(--success-background-color);
   }
 
   .feedback-category-negative {
-    background: var(--user-name-change-requests-negative-background) !important;
+    background: var(--error-background-color);
   }
   
   li {

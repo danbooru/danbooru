@@ -1,17 +1,9 @@
 #c-bans #a-index {
   tr[data-expired="true"] {
-    background-color: var(--success-color) !important;
-
-    &:hover {
-      background-color: var(--success-hover-color) !important;
-    }
+    background-color: var(--success-background-color);
   }
 
   tr[data-expired="false"] {
-    background-color: var(--error-color) !important;
-
-    &:hover {
-      background-color: var(--error-hover-color) !important;
-    }
+    background-color: var(--error-background-color);
   }
 }

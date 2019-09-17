@@ -1,14 +1,10 @@
 div#c-user-feedbacks, div#c-moderator-dashboards div#col2 {
   .feedback-category-positive {
-    background: var(--user-feedback-positive-background-color);
+    background: var(--success-background-color);
   }
 
   .feedback-category-negative {
-    background: var(--user-feedback-negative-background-color);
-  }
-
-  .feedback-category-neutral {
-    background: var(--user-feedback-neutral-background-color);
+    background: var(--error-background-color);
   }
 
   #negative-policy {
