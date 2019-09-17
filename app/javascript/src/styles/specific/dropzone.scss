@@ -1,41 +1,39 @@
 #filedropzone {
-  border: var(--uploads-dropzone-border);
+  background: var(--uploads-dropzone-background);
   padding: 0;
   min-height: 100px;
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 4px;
+  cursor: pointer;
+  position: relative;
 
-  .placeholder {
-    font-style: italic;
-    color: var(--uploads-dropzone-place-holder-color);
-    height: 100%;
+  &.dz-started .placeholder {
+    display: none;
   }
 
   &.error {
-    border-color: var(--uploads-dropzone-error-border-color);
-    background-color: var(--uploads-dropzone-error-background-color);
+    background: var(--error-background-color);
   }
 
   &.success {
-    border-color: var(--uploads-dropzone-success-border-color);
-    background-color: var(--uploads-dropzone-success-background-color);
+    background: var(--success-background-color);
   }
 }
 
-.dz-preview {
-  margin-bottom: 1em;
-}
-
 .dz-progress {
-  height: 20px;
-  width: 300px;
-    background-color: var(--uploads-dropzone-progress-border);
+  position: absolute;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  height: 5px;
+
+  background-color: var(--uploads-dropzone-progress-bar-background-color);
 
   .dz-upload {
-    background-color: var(--uploads-dropzone-progress-background-color);
+    background-color: var(--uploads-dropzone-progress-bar-foreground-color);
     display: block;
-    height: 20px;
+    height: 5px;
   }
 }

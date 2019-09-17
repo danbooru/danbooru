@@ -41,14 +41,9 @@
   --modqueue-postive-score-background-color: var(--success-background-color);
   --modqueue-negative-score-background-color: var(--error-background-color);
 
-  --uploads-dropzone-border: 4xp dashed #DDD;
-  --uploads-dropzone-placeholder-color: #333;
-  --uploads-dropzone-error-border-color: hsl(0, 43%, 61%);
-  --uploads-dropzone-error-background-color: hsl(0, 43%, 91%);
-  --uploads-dropzone-success-border-color: hsl(103, 44%, 59%);
-  --uploads-dropzone-success-background-color: hsl(103, 44%, 89%);
-  --uploads-dropzone-progress-border: 1px solid #CCC;
-  --uploads-dropzone-progress-background-color: 1px solid #CCC;
+  --uploads-dropzone-background: #EEE;
+  --uploads-dropzone-progress-bar-foreground-color: var(--link-color);
+  --uploads-dropzone-progress-bar-background-color: var(--link-hover-color);
 
   --forum-new-topic-color: red;
   --forum-locked-topic-color: gray;
