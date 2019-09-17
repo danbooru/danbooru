@@ -231,72 +231,28 @@ div#c-posts {
     overflow: hidden;
   }
 
-  div.notice {
+  .post-notice {
     font-size: 0.8em;
     padding: 0.5em;
     margin-bottom: 0.5em;
     overflow: hidden;
-
-    ul {
-      margin-left: 1em;
-    }
-
-    p {
-      margin: 0;
-    }
+    border: var(--post-notice-border);
+    border-radius: 3px;
 
     .resolved {
       margin-left: 0.5em;
       font-weight: bold;
     }
 
-    &.notice-parent {
-      border-color: var(--post-parent-notice-border-color);
-      background: var(--post-parent-notice-background);
-    }
-
-    &.notice-child {
-      border-color: var(--post-child-notice-border-color);
-      background: var(--post-child-notice-background);
-    }
-
-    &.notice-pending {
-      border-color: var(--post-pending-notice-border-color);
-      background: var(--post-pending-notice-background);
-    }
-
-    &.notice-flagged {
-      border-color: var(--post-flagged-notice-border-color);
-      background: var(--post-flagged-notice-background);
-    }
-
-    &.notice-deleted {
-      border-color: var(--post-deleted-notice-border-color);
-      background: var(--post-deleted-notice-background);
-    }
-
-    &.notice-appealed {
-      border-color: var(--post-appealed-notice-border-color);
-      background: var(--post-appealed-notice-background);
-    }
-
-    &.notice-resized {
-      border-color: var(--post-resized-notice-border-color);
-      background: var(--post-resized-notice-background);
-    }
-  }
-
-  div.nav-notice {
-    padding: 0.5em;
-    margin: 1em 0;
-    background: var(--post-nav-notice-background);
-    border: var(--post-nav-notice-border);
-    position: relative;
-
-    p {
-      margin: 0;
-      text-align: center;
-    }
+    &.post-notice-parent { background: var(--post-parent-notice-background); }
+    &.post-notice-child { background: var(--post-child-notice-background); }
+    &.post-notice-pending { background: var(--post-pending-notice-background); }
+    &.post-notice-flagged { background: var(--post-flagged-notice-background); }
+    &.post-notice-banned { background: var(--post-banned-notice-background); }
+    &.post-notice-deleted { background: var(--post-deleted-notice-background); }
+    &.post-notice-appealed { background: var(--post-appealed-notice-background); }
+    &.post-notice-resized { background: var(--post-resized-notice-background); }
+    &.post-notice-search { background: var(--post-search-notice-background); font-size: 1em; }
   }
 
   aside#sidebar #tag-list h2 {
@@ -413,10 +369,6 @@ div#c-posts {
           position: absolute;
           right: 0.5em;
           top: 0;
-        }
-
-        &:hover {
-          background: var(--post-seq-nav-hover-background);
         }
       }
     }

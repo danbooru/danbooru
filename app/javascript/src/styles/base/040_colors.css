@@ -83,24 +83,16 @@
   --wiki-page-versions-diff-ins-background: #CFC;
   --wiki-page-versions-version-color: #AAA;
 
-  --post-parent-notice-border-color: #C0FCC0;
-  --post-parent-notice-background: #D8FCD9;
-  --post-child-notice-border-color: #FCFCC0;
-  --post-child-notice-background: #FBFCD8;
-  --post-pending-notice-border-color: #C0C0FC;
+  --post-notice-border: 1px solid #DDD;
+  --post-parent-notice-background: var(--warning-background-color);
+  --post-child-notice-background: var(--success-background-color);
   --post-pending-notice-background: #D8D8FC;
-  --post-flagged-notice-border-color: #FCC0C0;
-  --post-flagged-notice-background: #FCD9D8;
-  --post-deleted-notice-border-color: #FF8C8C;
-  --post-deleted-notice-background: #FFA7A5;
-  --post-appealed-notice-border-color: #C0ECFC;
+  --post-flagged-notice-background: var(--error-background-color);
+  --post-banned-notice-background: var(--error-background-color);
+  --post-deleted-notice-background: var(--error-background-color);
   --post-appealed-notice-background: #D8F2FC;
-  --post-resized-notice-border-color: #E4C0FC;
   --post-resized-notice-background: #EED8FC;
-
-  --post-nav-notice-background: #EEE;
-  --post-nav-notice-border: 1px solid #AAA;
-  --post-seq-nav-hover-background: rgb(250, 250, 250);
+  --post-search-notice-background: #EEE;
 
   --post-artist-commentary-container-background: #F8F8F8;
   --post-artist-commentary-container-border: 1px solid #CCC;
