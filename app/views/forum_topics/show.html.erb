@@ -12,7 +12,7 @@
       <% end %>
     </h1>
 
-    <p class="info">Posted under <%= link_to @forum_topic.category_name, forum_topics_path(:search => {:category_id => @forum_topic.category_id}) %></p>
+    <p class="fineprint">Posted under <%= link_to @forum_topic.category_name, forum_topics_path(:search => {:category_id => @forum_topic.category_id}) %></p>
 
     <% if @forum_topic.is_locked? %>
       <div class="notice">

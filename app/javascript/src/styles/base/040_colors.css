@@ -1,14 +1,10 @@
 :root {
   --body-background-color: white;
 
-  --hint-color: #666;
-  --translation-note-color: gray;
-
-  --info-color: #AAA;
+  --fineprint-color: #888;
 
   --link-color: hsl(213, 100%, 50%);
   --link-hover-color: hsl(213, 100%, 75%);
-  --note-highlight-color: var(--preview-pending-color);
 
   --subnav-menu-background-color: #F5F5FF;
 
@@ -20,7 +16,6 @@
   --user-upgrade-gold-background-color: #FFF380;
   --user-upgrade-platinum-background-color: #EEE;
   --user-upgrade-table-row-hover-background-color: #FEF;
-  --user-upgrade-cost-footnote-color: gray;
 
   --table-header-border: 2px solid #666;
   --table-header-text-color: #333;
@@ -55,7 +50,6 @@
   --forum-locked-topic-color: gray;
   --forum-level-restricted-topic-color: #F66;
   --forum-deleted-topic-color: gray;
-  --forum-info-color: #AAA;
   --forum-vote-up-color: green;
   --forum-vote-meh-color: goldrenrod;
   --forum-vote-down-color: red;

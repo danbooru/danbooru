@@ -80,18 +80,8 @@ table tfoot {
   margin-top: 2em;
 }
 
-.hint {
-  color: var(--hint-color);
+.fineprint {
+  color: var(--fineprint-color);
   font-style: italic;
-}
-
-.tn {
   font-size: 0.8em;
-  color: var(--translation-note-color);
-}
-
-p.info {
-  color: var(--info-color);
-  font-style: italic;
-  font-size: 80%;
 }

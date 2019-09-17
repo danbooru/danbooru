@@ -1,3 +1,5 @@
+@import "../base/020_base.scss";
+
 form.simple_form {
   margin: 0 0 1em 0;
 
@@ -21,8 +23,8 @@ form.simple_form {
     }
 
     .hint {
+      @extend .fineprint;
       padding-left: 1em;
-      font-size: 70%;
     }
 
     &.text {
