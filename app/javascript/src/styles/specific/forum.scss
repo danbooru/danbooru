@@ -1,9 +1,7 @@
 div.list-of-forum-posts {
   article {
-    border: var(--forum-post-border);
     margin: 1em 0em;
     word-wrap: break-word;
-    box-shadow: var(--forum-post-box-shadow);
 
     a.voted {
       font-weight: bold;
@@ -84,5 +82,29 @@ div#c-forum-topics {
   tr[data-is-deleted="true"] .forum-post-excerpt::after {
     content: " (deleted)";
     color: var(--forum-deleted-topic-color);
+  }
+}
+
+@media screen and (max-width: 660px) {
+  #c-forum-topics #a-show {
+    padding: 0 0.5em;
+  }
+
+  div.list-of-forum-posts article {
+    border: var(--forum-post-border);
+
+    div.author, div.content {
+      width: auto;
+      float: none;
+    }
+
+    div.author {
+      border-bottom: var(--forum-post-border);
+      background: var(--forum-post-author-background);
+    }
+
+    div.content {
+      margin-left: 0;
+    }
   }
 }

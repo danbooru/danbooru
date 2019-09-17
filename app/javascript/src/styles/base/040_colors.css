@@ -52,8 +52,8 @@
   --forum-vote-up-color: green;
   --forum-vote-meh-color: goldrenrod;
   --forum-vote-down-color: red;
-  --forum-post-box-shadow: 1px 1px 2px #AAA;
-  --forum-post-border: 1px solid #AAA;
+  --forum-post-border: 1px solid #DDD;
+  --forum-post-author-background: #EEE;
   --forum-post-highlight-background-color: #FFC;
 
   --comment-sticky-background-color: var(--subnav-menu-background-color);
