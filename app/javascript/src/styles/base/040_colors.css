@@ -212,8 +212,8 @@
   --user-moderator-color: orange;
   --user-builder-color: #6633FF;
   --user-platinum-color: gray;
-  --user-gold-color: blue;
-  --user-member-color: auto;
+  --user-gold-color: #00F;
+  --user-member-color: var(--link-color);
 
   --news-updates-background: #EEE;
   --news-updates-border: 2px solid #666;
