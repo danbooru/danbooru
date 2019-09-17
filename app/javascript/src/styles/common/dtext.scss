@@ -71,6 +71,11 @@ div.prose {
     background: var(--dtext-code-background);
   }
 
+  .tn {
+    font-size: 0.8em;
+    color: var(--muted-text-color);
+  }
+
   div.expandable {
     margin-bottom: 1em;
     border: var(--dtext-expand-border);
