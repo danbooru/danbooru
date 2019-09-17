@@ -1,7 +1,5 @@
 <% content_for(:secondary_links) do %>
-  <menu>
-    <%= subnav_link_to "Sign up", new_user_path %>
-    <%= subnav_link_to "Reset Password", new_maintenance_user_password_reset_path %>
-    <%= subnav_link_to "Login Reminder", new_maintenance_user_login_reminder_path %>
-  </menu>
+  <%= subnav_link_to "Sign up", new_user_path %>
+  <%= subnav_link_to "Reset Password", new_maintenance_user_password_reset_path %>
+  <%= subnav_link_to "Login Reminder", new_maintenance_user_login_reminder_path %>
 <% end %>

@@ -1,41 +1,39 @@
 <% content_for(:secondary_links) do %>
-  <menu>
-    <%= quick_search_form_for(:name_matches, users_path, "users", autocomplete: "user") %>
-    <%= subnav_link_to "Listing", users_path %>
-    <%= subnav_link_to "Search", search_users_path %>
+  <%= quick_search_form_for(:name_matches, users_path, "users", autocomplete: "user") %>
+  <%= subnav_link_to "Listing", users_path %>
+  <%= subnav_link_to "Search", search_users_path %>
 
-    <% if CurrentUser.user.is_anonymous? %>
-      <%= subnav_link_to "Sign up", new_user_path %>
+  <% if CurrentUser.user.is_anonymous? %>
+    <%= subnav_link_to "Sign up", new_user_path %>
+  <% end %>
+
+  <% if @user && !@user.new_record? && !CurrentUser.user.is_anonymous? %>
+    <li>|</li>
+    <% if @user.id == CurrentUser.user.id %>
+      <%= subnav_link_to "Profile", profile_path %>
+      <%= subnav_link_to "Settings", settings_path %>
+      <%= subnav_link_to "Messages #{CurrentUser.user.dmail_count}", dmails_current_folder_path %>
+
+      <% if !@user.is_platinum? %>
+        <%= subnav_link_to "Upgrade", new_user_upgrade_path %>
+      <% end %>
+    <% else %>
+      <%= subnav_link_to "Send message", new_dmail_path(:dmail => {:to_id => @user.id}) %>
+      <% if !@user.is_platinum? %>
+        <%= subnav_link_to "Gift upgrade", new_user_upgrade_path(:user_id => @user.id) %>
+      <% end %>
     <% end %>
 
-    <% if @user && !@user.new_record? && !CurrentUser.user.is_anonymous? %>
-      <li>|</li>
-      <% if @user.id == CurrentUser.user.id %>
-        <%= subnav_link_to "Profile", profile_path %>
-        <%= subnav_link_to "Settings", settings_path %>
-        <%= subnav_link_to "Messages #{CurrentUser.user.dmail_count}", dmails_current_folder_path %>
-
-        <% if !@user.is_platinum? %>
-          <%= subnav_link_to "Upgrade", new_user_upgrade_path %>
-        <% end %>
+    <% if CurrentUser.user.is_moderator? %>
+      <%= subnav_link_to "Promote", edit_admin_user_path(@user) %>
+      <% if @user.is_banned? %>
+        <%= subnav_link_to "Unban", ban_path(@user.recent_ban) %>
       <% else %>
-        <%= subnav_link_to "Send message", new_dmail_path(:dmail => {:to_id => @user.id}) %>
-        <% if !@user.is_platinum? %>
-          <%= subnav_link_to "Gift upgrade", new_user_upgrade_path(:user_id => @user.id) %>
-        <% end %>
+        <%= subnav_link_to "Ban", new_ban_path(:ban => {:user_id => @user.id}) %>
       <% end %>
-
-      <% if CurrentUser.user.is_moderator? %>
-        <%= subnav_link_to "Promote", edit_admin_user_path(@user) %>
-        <% if @user.is_banned? %>
-          <%= subnav_link_to "Unban", ban_path(@user.recent_ban) %>
-        <% else %>
-          <%= subnav_link_to "Ban", new_ban_path(:ban => {:user_id => @user.id}) %>
-        <% end %>
-      <% end %>
-
-      <li>|</li>
-      <%= subnav_link_to "Sign out", sign_out_session_path %>
     <% end %>
-  </menu>
+
+    <li>|</li>
+    <%= subnav_link_to "Sign out", sign_out_session_path %>
+  <% end %>
 <% end %>

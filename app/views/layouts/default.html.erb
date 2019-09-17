@@ -101,7 +101,7 @@
   <%= render "news_updates/listing" %>
 
   <header id="top">
-    <h1><%= link_to Danbooru.config.app_name, "/" %></h1>
+    <h1 id="app-name-header"><%= link_to Danbooru.config.app_name, "/" %></h1>
     
     <div id="maintoggle">
       <a href="#"><i id="maintoggle-on" class="fas fa-bars"></i></a>
@@ -110,7 +110,11 @@
     
     <nav id="nav">
       <%= render "layouts/main_links" %>
-      <%= yield :secondary_links %>
+      <% if content_for(:secondary_links).present? %>
+        <menu id="subnav-menu">
+          <%= yield :secondary_links %>
+        </menu>
+      <% end %>
     </nav>
   </header>
 

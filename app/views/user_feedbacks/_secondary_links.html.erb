@@ -1,15 +1,13 @@
 <% content_for(:secondary_links) do %>
-  <menu>
-    <% if CurrentUser.is_gold? %>
-      <% if @user_feedback %>
-        <%= subnav_link_to "New", new_user_feedback_path(:user_feedback => {:user_id => @user_feedback.user_id}) %>
-      <% elsif params[:search] && params[:search][:user_id] %>
-        <%= subnav_link_to "New", new_user_feedback_path(:user_feedback => {:user_id => params[:search][:user_id]}) %>
-      <% else %>
-        <%= subnav_link_to "New", new_user_feedback_path %>
-      <% end %>
+  <% if CurrentUser.is_gold? %>
+    <% if @user_feedback %>
+      <%= subnav_link_to "New", new_user_feedback_path(:user_feedback => {:user_id => @user_feedback.user_id}) %>
+    <% elsif params[:search] && params[:search][:user_id] %>
+      <%= subnav_link_to "New", new_user_feedback_path(:user_feedback => {:user_id => params[:search][:user_id]}) %>
+    <% else %>
+      <%= subnav_link_to "New", new_user_feedback_path %>
     <% end %>
-    <%= subnav_link_to "Listing", user_feedbacks_path %>
-    <%= subnav_link_to "Search", search_user_feedbacks_path %>
-  </menu>
+  <% end %>
+  <%= subnav_link_to "Listing", user_feedbacks_path %>
+  <%= subnav_link_to "Search", search_user_feedbacks_path %>
 <% end %>

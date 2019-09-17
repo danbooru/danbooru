@@ -1,22 +1,20 @@
 <% content_for(:secondary_links) do %>
-  <menu>
-    <%= subnav_link_to "Listing", posts_path %>
-    <%= subnav_link_to "Upload", new_upload_path %>
-    <%= subnav_link_to "Hot", posts_path(:tags => "order:rank", :d => "1") %>
-    <% if RecommenderService.available_for_user? %>
-      <%= subnav_link_to "Recommended", recommended_posts_path(context: "user") %>
+  <%= subnav_link_to "Listing", posts_path %>
+  <%= subnav_link_to "Upload", new_upload_path %>
+  <%= subnav_link_to "Hot", posts_path(:tags => "order:rank", :d => "1") %>
+  <% if RecommenderService.available_for_user? %>
+    <%= subnav_link_to "Recommended", recommended_posts_path(context: "user") %>
+  <% end %>
+  <% unless CurrentUser.is_anonymous? %>
+    <%= subnav_link_to "Favorites", posts_path(tags: "ordfav:#{CurrentUser.user.name}") %>
+    <%= subnav_link_to "Fav groups", favorite_groups_path %>
+    <% if CurrentUser.has_saved_searches? %>
+      <%= subnav_link_to "Saved searches", posts_path(:tags => "search:all") %>
     <% end %>
-    <% unless CurrentUser.is_anonymous? %>
-      <%= subnav_link_to "Favorites", posts_path(tags: "ordfav:#{CurrentUser.user.name}") %>
-      <%= subnav_link_to "Fav groups", favorite_groups_path %>
-      <% if CurrentUser.has_saved_searches? %>
-        <%= subnav_link_to "Saved searches", posts_path(:tags => "search:all") %>
-      <% end %>
-    <% end %>
-    <%= subnav_link_to "Changes", post_versions_path %>
-    <% if CurrentUser.can_approve_posts? %>
-      <%= subnav_link_to "Moderate", moderator_post_queue_path %>
-    <% end %>
-    <%= subnav_link_to "Help", wiki_pages_path(:title => "help:posts") %>
-  </menu>
+  <% end %>
+  <%= subnav_link_to "Changes", post_versions_path %>
+  <% if CurrentUser.can_approve_posts? %>
+    <%= subnav_link_to "Moderate", moderator_post_queue_path %>
+  <% end %>
+  <%= subnav_link_to "Help", wiki_pages_path(:title => "help:posts") %>
 <% end %>

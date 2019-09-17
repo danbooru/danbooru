@@ -1,9 +1,7 @@
 <% content_for(:secondary_links) do %>
-  <menu>
-    <%= subnav_link_to "Listing", posts_path %>
-    <%= subnav_link_to "Upload", new_upload_path %>
-    <%= subnav_link_to "Search", search_post_versions_path %>
-    <%= subnav_link_to "Changes", post_versions_path %>
-    <%= subnav_link_to "Help", wiki_pages_path(:title => "help:posts") %>
-  </menu>
+  <%= subnav_link_to "Listing", posts_path %>
+  <%= subnav_link_to "Upload", new_upload_path %>
+  <%= subnav_link_to "Search", search_post_versions_path %>
+  <%= subnav_link_to "Changes", post_versions_path %>
+  <%= subnav_link_to "Help", wiki_pages_path(:title => "help:posts") %>
 <% end %>

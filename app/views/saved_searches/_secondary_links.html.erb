@@ -1,6 +1,4 @@
 <% content_for(:secondary_links) do %>
-  <menu>
-    <%= subnav_link_to "View posts", posts_path(:tags => "search:all") %>
-    <%= subnav_link_to "Manage saved searches", saved_searches_path %>
-  </menu>
+  <%= subnav_link_to "View posts", posts_path(:tags => "search:all") %>
+  <%= subnav_link_to "Manage saved searches", saved_searches_path %>
 <% end %>
