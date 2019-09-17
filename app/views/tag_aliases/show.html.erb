@@ -11,9 +11,14 @@
       <li><strong>Creator</strong> <%= link_to_user @tag_alias.creator %></li>
       <li><strong>Date</strong> <%= @tag_alias.created_at %></li>
       <% if @tag_alias.respond_to?(:reason) && @tag_alias.reason.present? %>
-        <li><strong>Reason</strong> <%= format_text @tag_alias.reason %></li>
+        <li>
+          <strong>Reason</strong>
+          <div class="prose">
+            <%= format_text @tag_alias.reason %>
+          </div>
+        </li>
       <% end %>
-      <li><strong>Status</strong>: <%= @tag_alias.status %></li>
+      <li><strong>Status</strong> <%= @tag_alias.status %></li>
 
       <% if CurrentUser.is_admin? && @tag_alias.is_pending? %>
         <li><strong>Commands</strong> <%= link_to "Approve", approve_tag_alias_path(@tag_alias), :method => :post %></li>

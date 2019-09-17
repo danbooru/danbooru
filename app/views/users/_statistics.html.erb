@@ -38,7 +38,11 @@
       <% if user.is_banned? && user.recent_ban %>
         <tr>
           <th>Ban reason</th>
-          <td><%= format_text presenter.ban_reason %></td>
+          <td>
+            <div class="prose">
+              <%= format_text presenter.ban_reason %>
+            </div>
+          </td>
         </tr>
       <% end %>
 

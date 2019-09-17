@@ -23,7 +23,11 @@
               <% end %>
               <br><%= time_ago_in_words_tagged event.created_at %>
             </td>
-            <td class="col-expand"><%= format_text event.reason %></td>
+            <td class="col-expand">
+              <div class="prose">
+                <%= format_text event.reason %>
+              </div>
+            </td>
             <td><%= event.is_resolved %></td>
           </tr>
         <% end %>

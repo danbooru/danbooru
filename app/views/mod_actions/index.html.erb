@@ -17,7 +17,11 @@
           <tr>
             <td><%= compact_time mod_action.created_at %></td>
             <td><%= link_to_user mod_action.creator %></td>
-            <td><%= format_text(mod_action.filtered_description) %></td>
+            <td>
+              <div class="prose">
+                <%= format_text(mod_action.filtered_description) %>
+              </div>
+            </td>
           </tr>
         <% end %>
       </tbody>

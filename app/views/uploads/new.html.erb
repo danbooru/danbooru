@@ -3,7 +3,7 @@
     <h1>Upload</h1>
 
     <% if CurrentUser.can_upload? %>
-      <div id="upload-guide-notice">
+      <div id="upload-guide-notice" class="prose">
         <%= format_text(@upload_notice_wiki.try(&:body)) %>
       </div>
 

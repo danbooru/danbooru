@@ -14,7 +14,9 @@
 
     <div style="margin: 1em 0;">
       <h2>Script</h2>
-      <pre><%= format_text @bulk_update_request.script_with_links %></pre>
+      <div class="prose">
+        <%= format_text @bulk_update_request.script_with_links %>
+      </div>
 
       <%= render "bur_edit_links", bur: @bulk_update_request %>
     </div>

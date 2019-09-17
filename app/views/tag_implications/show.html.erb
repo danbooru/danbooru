@@ -11,7 +11,12 @@
       <li><strong>Creator</strong> <%= link_to_user @tag_implication.creator %></li>
       <li><strong>Date</strong> <%= @tag_implication.created_at %></li>
       <% if @tag_implication.respond_to?(:reason) && @tag_implication.reason.present? %>
-        <li><strong>Reason</strong> <%= format_text @tag_implication.reason %></li>
+        <li>
+          <strong>Reason</strong>
+          <div class="prose">
+            <%= format_text @tag_implication.reason %>
+          </div>
+        </li>
       <% end %>
       <li><strong>Status</strong>: <%= @tag_implication.status %></li>
 

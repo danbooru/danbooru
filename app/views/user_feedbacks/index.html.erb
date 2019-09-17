@@ -19,7 +19,9 @@
             <td><%= link_to_user feedback.creator %></td>
             <td><%= compact_time(feedback.created_at) %></td>
             <td>
-              <%= format_text(feedback.body) %>
+              <div class="prose">
+                <%= format_text(feedback.body) %>
+              </div>
               <%= render "application/update_notice", record: feedback, interval: 0.minutes %>
             </td>
             <td>
