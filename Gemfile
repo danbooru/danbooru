@@ -46,6 +46,7 @@ gem 'request_store'
 gem 'builder'
 # gem 'did_you_mean' # github.com/yuki24/did_you_mean/issues/117
 gem 'term-ansicolor', require: "term/ansicolor"
+gem 'puma'
 
 # needed for looser jpeg header compat
 gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888888888/ruby-imagespec.git", :branch => "exif-fixes"
@@ -88,4 +89,6 @@ group :test do
   gem "webmock"
   gem "minitest-ci"
   gem "mock_redis"
+  gem "capybara"
+  gem "selenium-webdriver"
 end
