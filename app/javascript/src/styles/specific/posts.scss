@@ -239,6 +239,14 @@ div#c-posts {
     border: var(--post-notice-border);
     border-radius: 3px;
 
+    ul.post-flag-reasons, ul.post-appeal-reasons {
+      list-style: inside;
+    }
+
+    p {
+      margin-bottom: 0;
+    }
+
     .resolved {
       margin-left: 0.5em;
       font-weight: bold;
