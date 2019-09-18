@@ -1,0 +1,21 @@
+<ul class="post-flag-reasons">
+  <% flags.each do |flag| %>
+    <li class="post-flag-reason">
+      <span class="prose"><%= format_text(flag.reason, inline: true) %></span>
+
+      <% if CurrentUser.can_view_flagger_on_post?(flag) %>
+        - <%= link_to_user(flag.creator) %>
+
+        <% if CurrentUser.is_moderator? %>
+          (<%= link_to_ip(flag.creator_ip_addr) %>)
+        <% end %>
+      <% end %>
+
+      - <%= time_ago_in_words_tagged(flag.created_at) %>
+
+      <% if flag.is_resolved? %>
+        <span class="resolved">RESOLVED</span>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

@@ -19,10 +19,10 @@
       </li>
       <li><strong>Uploader</strong>: <%= link_to_user(post.uploader) %> <%= time_ago_in_words_tagged(post.created_at) %></li>
       <% if post.is_flagged? %>
-        <li><strong>Flagged</strong>: <%= post_flag_reasons(post) %></li>
+        <li><strong>Flagged</strong>: <%= render "post_flags/reasons", flags: post.flags %></li>
       <% end %>
       <% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
-        <li><strong>Appeals</strong>: <%= post_appeal_reasons(post) %></li>
+        <li><strong>Appeals</strong>: <%= render "post_appeals/reasons", appeals: post.appeals %></li>
       <% end %>
       <li>
         <strong>Hidden</strong>: <%= render "post_disapprovals/compact_counts", :disapprovals => post.disapprovals, :post => post %>

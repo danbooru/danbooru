@@ -2,7 +2,7 @@
   <div class="post-notice post-notice-flagged">
     <p>This post was flagged for review (<%= link_to "learn more", wiki_pages_path(:title => "howto:flag") %>): </p>
 
-    <%= post_flag_reasons(post) %>
+    <%= render "post_flags/reasons", flags: post.flags %>
   </div>
 <% end %>
 
@@ -16,7 +16,7 @@
   <div class="post-notice post-notice-deleted">
     <% if post.flags.any? %>
       <p>This post was deleted for the following reasons: </p>
-      <%= post_flag_reasons(post) %>
+      <%= render "post_flags/reasons", flags: post.flags %>
     <% else %>
       <p>This post was deleted</p>
     <% end %>
@@ -50,7 +50,7 @@
 <% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
   <div class="post-notice post-notice-appealed">
     <p>This post was appealed:</p>
-    <%= post_appeal_reasons(post) %>
+    <%= render "post_appeals/reasons", appeals: post.appeals %>
   </div>
 <% end %>
 

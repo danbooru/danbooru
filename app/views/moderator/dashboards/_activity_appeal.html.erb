@@ -14,8 +14,8 @@
       <tr>
         <td><%= PostPresenter.preview(post, show_deleted: true) %></td>
         <td><%= mod_link_to_user post.uploader, :negative %></td>
-        <td><%= post_flag_reasons(post) %></td>
-        <td><%= post_appeal_reasons(post) %></td>
+        <td><%= render "post_flags/reasons", flags: post.flags %></td>
+        <td><%= render "post_appeals/reasons", appeals: post.appeals %></td>
         <td><%= post.score %></td>
       </tr>
     <% end %>
