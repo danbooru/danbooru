@@ -330,8 +330,8 @@ div#c-posts {
       margin: 1em 0;
     }
 
-    section {
-      margin-top: 1em;
+    #image-container {
+      margin: 1em 0 0.5em;
     }
 
     span.quick-mod {
@@ -404,9 +404,9 @@ div#c-posts {
 
     #artist-commentary {
       border: var(--post-artist-commentary-container-border);
-      border-radius: 8px;
+      border-radius: 3px;
       background: var(--post-artist-commentary-container-background);
-      margin-top: 1em;
+      margin-bottom: 0.5em;
       padding: 0.5em;
 
       #original-artist-commentary, #translated-artist-commentary {
