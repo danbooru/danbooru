@@ -91,12 +91,6 @@ class Tag < ApplicationRecord
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def highest_post_count
-        Cache.get("highest-post-count", 4.hours) do
-          select("post_count").order("post_count DESC").first.post_count
-        end
-      end
-
       def increment_post_counts(tag_names)
         Tag.where(:name => tag_names).update_all("post_count = post_count + 1")
       end
