@@ -279,6 +279,16 @@ div#c-posts {
     margin-left: 1em;
   }
 
+  #search-box-form {
+    display: flex;
+
+    #search-box-submit {
+      padding: 2px 6px;
+      border-left: none;
+      border-radius: 0px;
+    }
+  }
+
   div#a-index {
     menu#post-sections {
       margin-bottom: 0.5em;

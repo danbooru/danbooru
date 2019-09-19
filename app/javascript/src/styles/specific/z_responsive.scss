@@ -33,7 +33,7 @@
     padding: 5px;
 
     input#tags {
-      width: 80%;
+      min-width: 0px;
     }
 
     button[type=submit] {
