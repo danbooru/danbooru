@@ -585,7 +585,7 @@ class User < ApplicationRecord
           :api_burst_limit, :remaining_api_limit, :statement_timeout,
           :favorite_group_limit, :favorite_limit, :tag_query_limit,
           :can_comment_vote?, :can_remove_from_pools?, :is_comment_limited?,
-          :can_comment?, :can_upload?, :max_saved_searches,
+          :can_comment?, :can_upload?, :max_saved_searches, :theme
         ]
       end
 
