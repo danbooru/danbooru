@@ -3,7 +3,8 @@
     <%= render "wiki_pages/sidebar" %>
 
     <section id="content">
-      <h1 id="wiki-page-title"><%= @wiki_page_version.pretty_title %> <span class="version">(<%= time_ago_in_words_tagged(@wiki_page_version.updated_at) %>)</span></h1>
+      <h1 id="wiki-page-title"><%= @wiki_page_version.pretty_title %></h1>
+      <p class="fineprint"><%= time_ago_in_words_tagged(@wiki_page_version.updated_at) %></p>
 
       <div id="wiki-page-body" class="dtext prose">
         <% if @wiki_page_version.visible? %>
