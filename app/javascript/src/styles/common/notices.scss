@@ -19,6 +19,7 @@ div#notice {
   &:not(.ui-state-error) {
     background: var(--notice-background);
     border: var(--notice-border);
+    color: var(--notice-text-color);
   }
 }
 

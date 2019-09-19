@@ -6,6 +6,7 @@ div#note-container {
     position: absolute;
     border: var(--note-body-border);
     background: var(--note-body-background);
+    color: var(--note-body-text-color);
     min-width: 140px;
     min-height: 1em;
     line-height: normal;

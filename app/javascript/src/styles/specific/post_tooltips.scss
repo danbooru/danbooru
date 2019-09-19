@@ -54,6 +54,7 @@ $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
   font-size: 11px;
   line-height: $tooltip-line-height;
   border-color: var(--post-tooltip-border-color);
+  background-color: var(--post-tooltip-background-color);
 
   .qtip-content {
     padding: 0;
