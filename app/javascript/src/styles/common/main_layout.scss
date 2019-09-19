@@ -1,20 +1,5 @@
 @import "../base/000_vars.scss";
 
-div#search {
-  margin-bottom: 1em;
-}
-
-div#search-box button {
-  -webkit-appearance: button;
-  border: 1px solid var(--link-color);
-  background-color: var(--link-color);
-  color: var(--search-box-button-color);
-  &:hover, &:focus {
-    border: 1px solid var(--link-hover-color);
-    background-color: var(--link-hover-color);
-  }
-}
-
 div#page {
   overflow: visible;
   margin: 0 20px;
@@ -55,7 +40,6 @@ div#page {
 
     button[type=submit] {
       padding: 2px 6px;
-      background: var(--sidebar-submit-button-color);
     }
 
     #search-box button[type=submit] {
