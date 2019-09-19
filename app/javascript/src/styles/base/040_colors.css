@@ -294,7 +294,7 @@ body[data-user-theme="dark"] {
 
   --user-member-color: var(--blue-1);
   --user-gold-color: var(--yellow-1);
-  --user-platinum-color: var(--grey-5);
+  --user-platinum-color: var(--grey-4);
   --user-builder-color: var(--purple-1);
   --user-moderator-color: var(--green-1);
   --user-admin-color: var(--red-1);
@@ -351,7 +351,7 @@ body[data-user-theme="dark"] {
   --jquery-ui-state-error-border: 1px solid var(--grey-4);
   --jquery-ui-state-error-text-color: var(--text-color);
   --jquery-ui-state-highlight-background: var(--grey-3);
-  --jquery-ui-state-highlight-border: 1px solid var(--grey-4);
+  --jquery-ui-state-highlight-border: 1px solid var(--blue-1);
   --jquery-ui-state-highlight-text-color: var(--text-color);
 
   --keyboard-shortcut-color: var(--text-color);
@@ -378,8 +378,8 @@ body[data-user-theme="dark"] {
   --note-tn-color: var(--muted-text-color);
 
   --notice-text-color: var(--grey-5);
-  --notice-background: var(--indigo-0);
-  --notice-border: 1px solid var(--grey-3);
+  --notice-background: var(--grey-3);
+  --notice-border: 1px solid var(--blue-1);
 
   --paginator-arrow-background-color: white;
   --paginator-arrow-color: var(--link-color);

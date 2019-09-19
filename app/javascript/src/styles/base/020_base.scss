@@ -60,6 +60,7 @@ input, select, textarea {
   background: var(--form-input-background);
   border: var(--form-input-border);
   color: var(--form-input-text-color);
+  padding-left: 0.25em;
 }
 
 input[type="button"], input[type="submit"], button {
