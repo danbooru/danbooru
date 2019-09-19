@@ -29,6 +29,7 @@
   --form-input-text-color: var(--text-color);
   --form-input-background: var(--body-background-color);
   --form-input-border: 1px solid #CCC;
+  --form-input-placeholder-text-color: grey;
   --form-button-text-color: var(--form-input-text-color);
   --form-button-background: #EEE;
   --form-button-border: var(--form-input-border);
@@ -37,6 +38,8 @@
   --form-button-active-background: #DDD;
   --form-button-active-border: var(--form-button-border);
   --form-button-active-color: var(--form-button-text-color);
+
+  --quick-search-form-background: var(--body-background-color);
 
   --user-upgrade-gold-background-color: #FFF380;
   --user-upgrade-platinum-background-color: #EEE;

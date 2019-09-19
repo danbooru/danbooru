@@ -82,6 +82,10 @@ form.inline-form {
 
 form.quick-search-form {
   margin: 0;
+
+  input {
+    background: var(--quick-search-form-background);
+  }
 }
 
 form.one-line-form {

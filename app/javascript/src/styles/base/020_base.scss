@@ -81,6 +81,13 @@ input[type="button"], input[type="submit"], button {
   }
 }
 
+/* placeholder text in <input type="text"> elements */
+::placeholder {
+  color: var(--form-input-placeholder-text-color);
+  font-size: 0.9em;
+  padding-left: 0.5em;
+}
+
 menu {
   margin: 0;
   padding: 0;
