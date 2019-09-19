@@ -222,3 +222,237 @@
   --selected-related-tag-background-color: var(--link-color);
   --selected-related-tag-color: white;
 }
+
+body[data-user-theme="light"] {
+}
+
+/* variables that aren't defined in the dark theme fall back to the :root theme */
+body[data-user-theme="dark"] {
+  --grey-1: hsl(0, 0%, 15%);
+  --grey-2: hsl(0, 0%, 20%);
+  --grey-3: hsl(0, 0%, 30%);
+  --grey-4: hsl(0, 0%, 60%);
+  --grey-5: hsl(0, 0%, 85%);
+
+  --red-0: hsl(0, 75%, 30%);
+  --red-1: hsl(0, 90%, 65%);
+  --red-2: hsl(0, 90%, 75%);
+  --aqua-0: hsl(180, 60%, 20%);
+  --blue-0: hsl(225, 65%, 25%);
+  --blue-1: hsl(200, 70%, 50%);
+  --blue-2: hsl(200, 70%, 65%);
+  --indigo-0: hsl(240, 35%, 40%);
+  --indigo-1: hsl(240, 80%, 80%);
+  --green-0: hsl(120, 40%, 20%);
+  --green-1: hsl(130, 65%, 50%);
+  --green-2: hsl(130, 65%, 70%);
+  --purple-0: hsl(300, 65%, 20%);
+  --purple-1: hsl(285, 65%, 65%);
+  --purple-2: hsl(285, 65%, 75%);
+  --yellow-0: hsl(60, 90%, 15%);
+  --yellow-1: hsl(50, 90%, 50%);
+  --yellow-2: hsl(50, 90%, 75%);
+
+  /* main background colors */
+  --body-background-color: var(--grey-1);
+
+  --error-background-color: var(--red-0);
+  --success-background-color: var(--green-0);
+  --warning-background-color: var(--yellow-0);
+
+  --subnav-menu-background-color: var(--grey-2);
+  --responsive-menu-background-color: var(--grey-3);
+  --footer-border: 1px solid var(--grey-3);
+
+  --table-header-border: 2px solid var(--grey-3);
+  --table-even-row-background: var(--grey-2);
+  --table-row-hover-background: var(--grey-3);
+  --table-row-border: 1px solid var(--grey-3);
+
+  /* main text colors */
+  --text-color: var(--grey-5);
+  --muted-text-color: var(--grey-4);
+
+  --link-color: var(--blue-1);
+  --link-hover-color: var(--blue-2);
+
+  --artist-tag-color: var(--red-1);
+  --artist-tag-hover-color: var(--red-2);
+  --copyright-tag-color: var(--purple-1);
+  --copyright-tag-hover-color: var(--purple-2);
+  --character-tag-color: var(--green-1);
+  --character-tag-hover-color: var(--green-2);
+  --general-tag-color: var(--blue-1);
+  --general-tag-hover-color: var(--blue-2);
+  --meta-tag-color: var(--yellow-1);
+  --meta-tag-hover-color: var(--yellow-2);
+
+  --series-pool-color: var(--copyright-tag-color);
+  --series-pool-hover-color: var(--copyright-tag-hover-color);
+  --collection-pool-color: var(--general-tag-color);
+  --collection-pool-hover-color: var(--general-tag-hover-color);
+
+  --user-member-color: var(--blue-1);
+  --user-gold-color: var(--yellow-1);
+  --user-platinum-color: var(--grey-5);
+  --user-builder-color: var(--purple-1);
+  --user-moderator-color: var(--green-1);
+  --user-admin-color: var(--red-1);
+
+  /* misc specific colors */
+  --autocomplete-selected-background-color: var(--grey-2);
+  --autocomplete-border: 1px solid var(--grey-3);
+  --autocomplete-arrow-color: var(--text-color);
+
+  --bulk-update-request-approved-color: var(--green-1);
+  --bulk-update-request-failed-color: var(--red-1);
+
+  --comment-sticky-background-color: var(--grey-2);
+
+  --diff-list-added-color: var(--green-1);
+  --diff-list-removed-color: var(--red-1);
+  --diff-list-obsolete-added-color: var(--green-0);
+  --diff-list-obsolete-removed-color: var(--red-0);
+
+  --dtext-blockquote-background: var(--grey-2);
+  --dtext-blockquote-border: 1px solid var(--grey-4);
+  --dtext-code-background: var(--grey-3);
+  --dtext-expand-border: 1px inset var(--grey-4);
+  --dtext-spoiler-color: black;
+  --dtext-spoiler-background-color: black;
+  --dtext-spoiler-hover-color: var(--text-color);
+
+  --form-input-text-color: var(--grey-5);
+  --form-input-background: var(--grey-3);
+  --form-input-border: 1px solid var(--grey-4);
+  --form-input-placeholder-text-color: var(--grey-4);
+  --form-button-text-color: var(--grey-1);
+  --form-button-background: var(--grey-5);
+  --form-button-border: 1px solid var(--grey-4);
+  --form-button-hover-background: white;
+  --form-button-hover-box-shadow: 0px 0px 2px var(--grey-5);
+  --form-button-active-background: var(--grey-5);
+  --form-button-active-border: 1px solid var(--grey-5);
+  --form-button-active-color: white;
+
+  --forum-new-topic-color: var(--red-1);
+  --forum-level-restricted-topic-color: var(--red-1);
+  --forum-vote-up-color: var(--green-1);
+  --forum-vote-meh-color: var(--yellow-1);
+  --forum-vote-down-color: var(--red-1);
+  --forum-post-border: 1px solid var(--grey-3);
+  --forum-post-author-background: var(--grey-3);
+  --forum-post-highlight-background-color: var(--blue-0);
+
+  --jquery-ui-widget-content-text-color: var(--text-color);
+  --jquery-ui-widget-content-background: var(--body-background-color);
+  --jquery-ui-dialog-box-shadow: none;
+  --jquery-ui-state-error-background: var(--red-0);
+  --jquery-ui-state-error-border: 1px solid var(--grey-4);
+  --jquery-ui-state-error-text-color: var(--text-color);
+  --jquery-ui-state-highlight-background: var(--grey-3);
+  --jquery-ui-state-highlight-border: 1px solid var(--grey-4);
+  --jquery-ui-state-highlight-text-color: var(--text-color);
+
+  --keyboard-shortcut-color: var(--text-color);
+  --keyboard-shortcut-background-color: var(--grey-2);
+
+  --modqueue-sample-warning-color: var(--error-background-color);
+  --modqueue-quality-warning-color: var(--warning-background-color);
+  --modqueue-positive-score-background-color: var(--success-background-color);
+  --modqueue-negative-score-background-color: var(--error-background-color);
+
+  --news-updates-background: var(--grey-2);
+  --news-updates-border: 2px solid var(--grey-3);
+
+  --note-body-background: #FFE;
+  --note-body-text-color: var(--grey-1);
+  --note-body-border: 1px solid black;
+  --note-box-border: 1px solid white;
+  --note-box-background: transparent;
+  --note-box-inner-border: 1px solid black;
+  --unsaved-note-box-inner-border: 1px solid var(--red-1);
+  --note-preview-border: 1px solid var(--red-1);
+  --note-preview-background: white;
+  --note-highlight-color: var(--blue-0);
+  --note-tn-color: var(--muted-text-color);
+
+  --notice-text-color: var(--grey-5);
+  --notice-background: var(--indigo-0);
+  --notice-border: 1px solid var(--grey-3);
+
+  --paginator-arrow-background-color: white;
+  --paginator-arrow-color: var(--link-color);
+  --paginator-ellipsis-color: var(--grey-4);
+
+  --post-artist-commentary-container-background: var(--grey-2);
+  --post-artist-commentary-container-border: 1px solid var(--grey-3);
+
+  --post-mode-menu-view-background: var(--body-background-color);
+  --post-mode-menu-edit-background: var(--green-0);
+  --post-mode-menu-tag-script-background: var(--indigo-0);
+  --post-mode-menu-add-fav-background: var(--yellow-0);
+  --post-mode-menu-remove-fav-background: var(--yellow-0);
+  --post-mode-menu-vote-up-background: var(--red-0);
+  --post-mode-menu-vote-down-background: var(--red-0);
+  --post-mode-menu-lock-rating-background: var(--purple-0);
+  --post-mode-menu-lock-note-background: var(--purple-0);
+  --post-mode-menu-approve-background: var(--aqua-0);
+  --post-mode-menu-translation-background: var(--blue-0);
+  --post-mode-menu-ban-background: var(--red-1);
+
+  --post-notice-border: 1px solid var(--grey-3);
+  --post-search-notice-background: var(--grey-2);
+  --post-child-notice-background: var(--yellow-0);
+  --post-parent-notice-background: var(--green-0);
+  --post-resized-notice-background: var(--indigo-0);
+  --post-pending-notice-background: var(--blue-0);
+  --post-flagged-notice-background: var(--red-0);
+  --post-deleted-notice-background: var(--red-0);
+  --post-banned-notice-background: var(--red-0);
+  --post-appealed-notice-background: var(--aqua-0);
+
+  --post-tooltip-background-color: var(--body-background-color);
+  --post-tooltip-border-color: var(--grey-3);
+  --post-tooltip-header-background-color: var(--grey-2);
+  --post-tooltip-info-color: var(--grey-5);
+  --post-tooltip-inactive-color: var(--grey-4);
+  --post-tooltip-scrollbar-background: var(--grey-2);
+  --post-tooltip-scrollbar-border: none;
+  --post-tooltip-scrollbar-thumb-color: var(--grey-4);
+  --post-tooltip-scrollbar-track-background: var(--grey-3);
+  --post-tooltip-scrollbar-track-border: none;
+
+  --preview-pending-color: var(--blue-1);
+  --preview-flagged-color: var(--red-1);
+  --preview-deleted-color: var(--grey-5);
+  --preview-has-children-color: var(--green-1);
+  --preview-has-parent-color: var(--yellow-1);
+
+  --related-tags-container-background: var(--grey-3);
+  --selected-related-tag-background-color: var(--link-color);
+  --selected-related-tag-color: white;
+
+  --tag-count-indicator-frown-color: var(--red-1);
+  --tag-count-indicator-meh-color: var(--yellow-1);
+  --tag-count-indicator-smile-color: var(--green-1);
+
+  --uploads-dropzone-background: var(--grey-3);
+  --uploads-dropzone-progress-bar-foreground-color: var(--link-color);
+  --uploads-dropzone-progress-bar-background-color: var(--link-hover-color);
+
+  --user-upgrade-gold-background-color: var(--yellow-0);
+  --user-upgrade-platinum-background-color: var(--grey-2);
+  --user-upgrade-table-row-hover-background-color: transparent;
+
+  --wiki-page-other-name-background-color: var(--grey-3);
+  --wiki-page-versions-diff-del-background: var(--red-0);
+  --wiki-page-versions-diff-ins-background: var(--green-0);
+
+  --low-post-count-color: var(--red-1);
+  --sign-in-link-color: var(--red-1);
+  --new-artist-color: var(--red-1);
+  --remove-favorite-button: var(--red-1);
+  --fetch-source-data-border: 1px solid var(--grey-3);
+  --quick-search-form-background: var(--grey-1);
+}
