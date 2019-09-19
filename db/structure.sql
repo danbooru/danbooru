@@ -3108,7 +3108,8 @@ furry -rating:s'::text,
     custom_style text,
     bit_prefs bigint DEFAULT 0 NOT NULL,
     last_ip_addr inet,
-    unread_dmail_count integer DEFAULT 0 NOT NULL
+    unread_dmail_count integer DEFAULT 0 NOT NULL,
+    theme integer DEFAULT 0 NOT NULL
 );
 
 
@@ -7337,6 +7338,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190829055758'),
 ('20190902224045'),
 ('20190908031103'),
-('20190908035317');
+('20190908035317'),
+('20190919175836');
 
 

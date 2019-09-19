@@ -114,6 +114,8 @@ class User < ApplicationRecord
   belongs_to :inviter, class_name: "User", optional: true
   accepts_nested_attributes_for :dmail_filter
 
+  enum theme: { light: 0, dark: 100 }, _suffix: true
+
   module BanMethods
     def validate_ip_addr_is_not_banned
       if IpBan.is_banned?(CurrentUser.ip_addr)

@@ -101,7 +101,7 @@ class UsersController < ApplicationController
     permitted_params = %i[
       password old_password password_confirmation email
       comment_threshold default_image_size favorite_tags blacklisted_tags
-      time_zone per_page custom_style
+      time_zone per_page custom_style theme
 
       receive_email_notifications always_resize_images enable_post_navigation
       new_post_navigation_layout enable_privacy_mode
