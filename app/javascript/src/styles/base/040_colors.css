@@ -26,6 +26,18 @@
   --responsive-sidebar-submit-button-border: 1px solid rgb(197, 197, 197);
   --responsive-form-input-border: 1px solid #c5c5c5;
 
+  --form-input-text-color: var(--text-color);
+  --form-input-background: var(--body-background-color);
+  --form-input-border: 1px solid #CCC;
+  --form-button-text-color: var(--form-input-text-color);
+  --form-button-background: #EEE;
+  --form-button-border: var(--form-input-border);
+  --form-button-hover-background: #F5F5F5;
+  --form-button-hover-box-shadow: 0px 0px 2px grey;
+  --form-button-active-background: #DDD;
+  --form-button-active-border: var(--form-button-border);
+  --form-button-active-color: var(--form-button-text-color);
+
   --user-upgrade-gold-background-color: #FFF380;
   --user-upgrade-platinum-background-color: #EEE;
   --user-upgrade-table-row-hover-background-color: #FEF;
@@ -168,18 +180,11 @@
   --sidebar-submit-button-color: #EEE;
   --footer-border: 1px solid #EEE;
 
-  --jquery-ui-button-border: 1px solid darkgrey;
-  --jquery-ui-button-background: #f6f6f6;
-  --jquery-ui-button-hover-background: #fefefe;
-  --jquery-ui-button-hover-box-shadow: grey;
-
   --jquery-ui-state-error-background: #FDDFDE;
   --jquery-ui-state-error-border: 1px solid #FBC7C6;
-
   --jquery-ui-state-highlight-background: #FDF5D9;
   --jquery-ui-state-highlight-border: 1px solid #FCEEC1;
   --jquery-ui-state-highlight-color: #363636;
-
   --jquery-ui-dialog-box-shadow: 2px 2px 1px grey;
 
   --dtext-blockquote-border: 1px solid #666;

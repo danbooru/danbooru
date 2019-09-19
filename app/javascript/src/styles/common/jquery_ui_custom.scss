@@ -57,8 +57,9 @@ div.ui-dialog {
 .ui-button {
   margin: 0;
   padding: 0.25em 1em;
-  border: var(--jquery-ui-button-border);
-  background: var(--jquery-ui-button-background);
+  border: var(--form-button-border);
+  background: var(--form-button-background);
+  color: var(--form-button-text-color);
 
   &.sub {
     font-size: 90%;
@@ -68,11 +69,17 @@ div.ui-dialog {
     font-size: 90%;
     padding: 0.25em 0.5em;
   }
-}
 
-.ui-button:hover {
-  box-shadow: var(--jquery-ui-button-hover-box-shadow);
-  background: var(--jquery-ui-button-hover-background);
+  &:hover {
+    box-shadow: var(--form-button-hover-box-shadow);
+    background: var(--form-button-hover-background);
+  }
+
+  &:active {
+    box-shadow: var(--form-button-hover-box-shadow);
+    background: var(--form-button-active-background);
+    color: var(--form-button-text-color);
+  }
 }
 
 .ui-front {

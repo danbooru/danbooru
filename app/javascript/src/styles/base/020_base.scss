@@ -56,6 +56,31 @@ img {
   vertical-align: middle;
 }
 
+input, select, textarea {
+  background: var(--form-input-background);
+  border: var(--form-input-border);
+  color: var(--form-input-text-color);
+}
+
+input[type="button"], input[type="submit"], button {
+  border-radius: 3px;
+  padding: 0.25em 1em;
+
+  background: var(--form-button-background);
+  border: var(--form-button-border);
+  color: var(--form-button-text-color);
+
+  &:hover {
+    box-shadow: var(--form-button-hover-box-shadow);
+    background: var(--form-button-hover-background);
+  }
+
+  &:active {
+    box-shadow: var(--form-button-hover-box-shadow);
+    background: var(--form-button-active-background);
+  }
+}
+
 menu {
   margin: 0;
   padding: 0;
