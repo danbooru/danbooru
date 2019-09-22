@@ -119,7 +119,7 @@
   </header>
 
   <div id="page">
-    <% if !CurrentUser.is_anonymous? && !CurrentUser.is_gold? && cookies[:hide_upgrade_account_notice].blank? && params[:action] != "upgrade_information" %>
+    <% unless !CurrentUser.is_anonymous? && !CurrentUser.is_gold? && cookies[:hide_upgrade_account_notice].blank? && params[:action] != "upgrade_information" %>
       <%= render "users/upgrade_notice" %>
     <% end %>
 
@@ -135,7 +135,7 @@
       <%= render "moderator/post/queues/notice" %>
     <% end %>
 
-    <div class="ui-corner-all ui-state-highlight" id="notice" style="<%= "display: none;" unless flash[:notice] %>">
+    <div class="notice notice-info" id="notice" style="<%= "display: none;" unless flash[:notice] %>">
       <span class="prose"><%= format_text(flash[:notice], inline: true) %>.</span>
       <a href="#" id="close-notice-link">close</a>
     </div>

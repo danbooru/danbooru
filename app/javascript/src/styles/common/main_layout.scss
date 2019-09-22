@@ -5,21 +5,6 @@ div#page {
   margin: 0 20px;
   padding: 0 10px;
 
-  div#upgrade-account-notice, div#ban-notice, div#dmail-notice, div#mod-notice {
-    margin: 1em 0;
-    padding: 1em;
-    text-align: center;
-    position: relative;
-
-    h1 {
-      font-size: $h2_size;
-    }
-
-    p {
-      margin: 0;
-    }
-  }
-
   aside#sidebar {
     width: 15em;
     float: left;

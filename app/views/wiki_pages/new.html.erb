@@ -6,7 +6,7 @@
       <h1>New Wiki Page</h1>
 
       <% if @wiki_page.title.present? %>
-        <div class="ui-corner-all ui-state-highlight notice">
+        <div class="notice notice-info notice-small" id="new-wiki-page-notice">
           This wiki page does not yet exist. The form below will allow you to create a new page for <%= @wiki_page.title %>. It will act as an explanation on how to use the tag for other users on the site.
         </div>
       <% end %>

@@ -1,4 +1,4 @@
-<div class="ui-corner-all ui-state-highlight" id="dmail-notice" data-id="<%= CurrentUser.dmails.unread.first.id %>">
-  <h1>You have <%= link_to "unread mail", dmails_path(:search => {:owner_id => CurrentUser.id, :to_id => CurrentUser.id}, :folder => "received") %>.</h1>
-  <p><%= link_to "Close this", "#", :id => "hide-dmail-notice" %></p>
+<div class="notice notice-info notice-large" id="dmail-notice" data-id="<%= CurrentUser.dmails.unread.first.id %>">
+  <h2>You have <%= link_to "unread mail", dmails_path(search: {owner_id: CurrentUser.id, to_id: CurrentUser.id}, folder: "received") %>.</h2>
+  <div><%= link_to "Close this", "#", id: "hide-dmail-notice" %></div>
 </div>

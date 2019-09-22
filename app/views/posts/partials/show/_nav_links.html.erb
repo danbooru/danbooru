@@ -1,5 +1,5 @@
 <% if (position == "bottom" && CurrentUser.user.new_post_navigation_layout) || (position == "top" && !CurrentUser.user.new_post_navigation_layout) %>
-  <div id="nav-links" class="post-notice post-notice-search">
+  <div id="nav-links" class="notice post-notice post-notice-search">
     <% if post.presenter.has_sequential_navigation?(params) %>
       <%= render "posts/partials/show/search_seq", :post => post %>
     <% end %>

@@ -9,7 +9,7 @@
 
   --error-background-color: hsl(0, 100%, 95%); /* light red */
   --success-background-color: hsl(120, 100%, 95%); /* light green */
-  --warning-background-color: hsl(50, 100%, 95%); /* light yellow */
+  --warning-background-color: hsl(50, 100%, 93%); /* light yellow */
 
   --subnav-menu-background-color: #F5F5FF;
 
@@ -165,22 +165,17 @@
   --bulk-update-request-approved-color: green;
   --bulk-update-request-failed-color: red;
 
-  --notice-text-color: var(--text-color);
-  --notice-background: #FFFBBF;
-  --notice-border: 1px solid #CCC999;
-
   --sign-in-link-color: #E00;
   --footer-border: 1px solid #EEE;
 
   --jquery-ui-widget-content-background: var(--body-background-color);
   --jquery-ui-widget-content-text-color: var(--text-color);
-  --jquery-ui-state-error-background: #FDDFDE;
-  --jquery-ui-state-error-border: 1px solid #FBC7C6;
-  --jquery-ui-state-error-text-color: var(--text-color);
-  --jquery-ui-state-highlight-background: #FDF5D9;
-  --jquery-ui-state-highlight-border: 1px solid #FCEEC1;
-  --jquery-ui-state-highlight-text-color: var(--text-color);
   --jquery-ui-dialog-box-shadow: 2px 2px 1px grey;
+
+  --notice-error-background: var(--error-background-color);
+  --notice-error-border: 1px solid #FBC7C6;
+  --notice-info-background: var(--warning-background-color);
+  --notice-info-border: 1px solid #CCC999;
 
   --dtext-blockquote-border: 1px solid #666;
   --dtext-blockquote-background: #EEE;
@@ -351,12 +346,6 @@ body[data-user-theme="dark"] {
   --jquery-ui-widget-content-text-color: var(--text-color);
   --jquery-ui-widget-content-background: var(--grey-2);
   --jquery-ui-dialog-box-shadow: 0px 0px 8px var(--grey-1);
-  --jquery-ui-state-error-background: var(--red-0);
-  --jquery-ui-state-error-border: 1px solid var(--grey-4);
-  --jquery-ui-state-error-text-color: var(--text-color);
-  --jquery-ui-state-highlight-background: var(--blue-0);
-  --jquery-ui-state-highlight-border: 1px solid var(--blue-1);
-  --jquery-ui-state-highlight-text-color: var(--text-color);
 
   --keyboard-shortcut-color: var(--text-color);
   --keyboard-shortcut-background-color: var(--grey-2);
@@ -381,9 +370,10 @@ body[data-user-theme="dark"] {
   --note-highlight-color: var(--blue-1);
   --note-tn-color: var(--muted-text-color);
 
-  --notice-text-color: var(--grey-5);
-  --notice-background: var(--blue-0);
-  --notice-border: 1px solid var(--blue-1);
+  --notice-error-background: var(--red-0);
+  --notice-error-border: 1px solid var(--grey-4);
+  --notice-info-background: var(--blue-0);
+  --notice-info-border: 1px solid var(--blue-1);
 
   --paginator-arrow-background-color: white;
   --paginator-arrow-color: var(--link-color);

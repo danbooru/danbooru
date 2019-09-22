@@ -1,5 +1,5 @@
 <% if post.is_flagged? && !post.is_deleted? && post.flags.any? %>
-  <div class="post-notice post-notice-flagged">
+  <div class="notice notice-small post-notice post-notice-flagged">
     <p>This post was flagged for review (<%= link_to "learn more", wiki_pages_path(:title => "howto:flag") %>): </p>
 
     <%= render "post_flags/reasons", flags: post.flags %>
@@ -7,13 +7,13 @@
 <% end %>
 
 <% if post.is_banned? %>
-  <div class="post-notice post-notice-banned">
+  <div class="notice notice-small post-notice post-notice-banned">
     The artist requested removal of this page
   </div>
 <% end %>
 
 <% if post.is_deleted? %>
-  <div class="post-notice post-notice-deleted">
+  <div class="notice notice-small post-notice post-notice-deleted">
     <% if post.flags.any? %>
       <p>This post was deleted for the following reasons: </p>
       <%= render "post_flags/reasons", flags: post.flags %>
@@ -30,7 +30,7 @@
 <% end %>
 
 <% if post.is_pending? || post.is_flagged? %>
-  <div class="post-notice post-notice-pending">
+  <div class="notice notice-small post-notice post-notice-pending">
     <% if post.is_pending? %>
       This post is pending approval. 
       (<%= link_to "learn more", wiki_pages_path(:title => "about:mod_queue") %>)
@@ -48,28 +48,28 @@
 <% end %>
 
 <% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
-  <div class="post-notice post-notice-appealed">
+  <div class="notice notice-small post-notice post-notice-appealed">
     <p>This post was appealed:</p>
     <%= render "post_appeals/reasons", appeals: post.appeals %>
   </div>
 <% end %>
 
 <% if post.parent_id && post.parent_exists? %>
-  <div class="post-notice post-notice-child">
+  <div class="notice notice-small post-notice post-notice-child">
     <%= has_parent_message(post, @parent_post_set) %>
     <div id="has-parent-relationship-preview"><%= @parent_post_set.presenter.post_previews_html(self) %></div>
   </div>
 <% end %>
 
 <% if post.has_visible_children? %>
-  <div class="post-notice post-notice-parent">
+  <div class="notice notice-small post-notice post-notice-parent">
     <%= has_children_message(post, @children_post_set) %>
     <div id="has-children-relationship-preview"><%= @children_post_set.presenter.post_previews_html(self) %></div>
   </div>
 <% end %>
 
 <% if post.visible? && post.has_large? && !post.is_ugoira? %>
-  <div class="post-notice post-notice-resized" id="image-resize-notice" style="<%= CurrentUser.default_image_size == "original" ? "display: none;" : "" %>">
+  <div class="notice notice-small post-notice post-notice-resized" id="image-resize-notice" style="<%= CurrentUser.default_image_size == "original" ? "display: none;" : "" %>">
     <span>Resized to <%= number_to_percentage post.resize_percentage.floor, :precision => 0 %> of original (<%= link_to "view original", post.tagged_file_url, :id => "image-resize-link" %>)</span>
     <span style="display: none;">Loading...</span>
   </div>

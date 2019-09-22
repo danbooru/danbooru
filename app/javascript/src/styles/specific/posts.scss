@@ -232,12 +232,10 @@ div#c-posts {
   }
 
   .post-notice {
-    font-size: 0.8em;
+    margin: 0.5em 0;
     padding: 0.5em;
-    margin-bottom: 0.5em;
     overflow: hidden;
     border: var(--post-notice-border);
-    border-radius: 3px;
 
     ul.post-flag-reasons, ul.post-appeal-reasons {
       list-style: inside;
@@ -260,7 +258,7 @@ div#c-posts {
     &.post-notice-deleted { background: var(--post-deleted-notice-background); }
     &.post-notice-appealed { background: var(--post-appealed-notice-background); }
     &.post-notice-resized { background: var(--post-resized-notice-background); }
-    &.post-notice-search { background: var(--post-search-notice-background); font-size: 1em; }
+    &.post-notice-search { background: var(--post-search-notice-background); }
   }
 
   aside#sidebar #tag-list h2 {

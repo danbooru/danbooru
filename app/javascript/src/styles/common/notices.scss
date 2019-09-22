@@ -9,21 +9,42 @@ div.error-messages {
 }
 
 div#notice {
-  padding: 0.25em;
+  padding: 0.5em;
   position: fixed;
-  top: 0.5em;
+  top: 1em;
   left: 25%;
   width: 50%;
   z-index: 100;
 
-  &:not(.ui-state-error) {
-    background: var(--notice-background);
-    border: var(--notice-border);
-    color: var(--notice-text-color);
+  a#close-notice-link {
+    position: absolute;
+    right: 1em;
   }
 }
 
-a#close-notice-link {
-  position: absolute;
-  right: 1em;
+.notice {
+  border-radius: 3px;
+}
+
+.notice-small {
+  font-size: 0.8em;
+  margin: 0.5em 0;
+  padding: 0.5em 1em;
+}
+
+.notice-large {
+  margin: 1em 0;
+  padding: 1em;
+  text-align: center;
+  position: relative;
+}
+
+.notice-info {
+  background: var(--notice-info-background);
+  border: var(--notice-info-border);
+}
+
+.notice-error {
+  background: var(--notice-error-background);
+  border: var(--notice-error-border);
 }
