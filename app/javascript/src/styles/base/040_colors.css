@@ -228,30 +228,32 @@ body[data-user-theme="light"] {
 
 /* variables that aren't defined in the dark theme fall back to the :root theme */
 body[data-user-theme="dark"] {
-  --grey-1: hsl(0, 0%, 15%);
-  --grey-2: hsl(0, 0%, 20%);
-  --grey-3: hsl(0, 0%, 30%);
-  --grey-4: hsl(0, 0%, 60%);
-  --grey-5: hsl(0, 0%, 85%);
-
-  --red-0: hsl(0, 75%, 30%);
-  --red-1: hsl(0, 90%, 65%);
-  --red-2: hsl(0, 90%, 75%);
-  --aqua-0: hsl(180, 60%, 20%);
-  --blue-0: hsl(225, 65%, 25%);
-  --blue-1: hsl(200, 70%, 50%);
-  --blue-2: hsl(200, 70%, 65%);
-  --indigo-0: hsl(240, 35%, 40%);
-  --indigo-1: hsl(240, 80%, 80%);
-  --green-0: hsl(120, 40%, 20%);
-  --green-1: hsl(130, 65%, 50%);
-  --green-2: hsl(130, 65%, 70%);
-  --purple-0: hsl(300, 65%, 20%);
-  --purple-1: hsl(285, 65%, 65%);
-  --purple-2: hsl(285, 65%, 75%);
-  --yellow-0: hsl(60, 90%, 15%);
-  --yellow-1: hsl(50, 90%, 50%);
-  --yellow-2: hsl(50, 90%, 75%);
+  --grey-1:   #1f202c; /* hsluv(265, 15, 12.50); */
+  --grey-2:   #2c2c3c; /* hsluv(265, 15, 18.75); */
+  --grey-3:   #393a4d; /* hsluv(265, 15, 25.00); */
+  --grey-4:   #9596a8; /* hsluv(265, 15, 62.50); */
+  --grey-5:   #c9c9d2; /* hsluv(265, 15, 81.25); */
+  --red-0:    #652828; /* hsluv(12, 50, 25); */
+  --red-1:    #f07a7b; /* hsluv(12, 80, 65); */
+  --red-2:    #f3a4a4; /* hsluv(12, 80, 75); */
+  --yellow-0: #625121; /* hsluv(65, 80, 35); */
+  --yellow-1: #e8c259; /* hsluv(65, 80, 80); */
+  --yellow-2: #fae0a8; /* hsluv(65, 80, 90); */
+  --green-0:  #164423; /* hsluv(135, 80, 25); */
+  --green-1:  #46b265; /* hsluv(135, 80, 65); */
+  --green-2:  #53d077; /* hsluv(135, 80, 75); */
+  --aqua-0:   #293f3d; /* hsluv(180, 50, 25); */
+  --aqua-1:   #4aada3; /* hsluv(180, 80, 65); */
+  --aqua-2:   #57cabe; /* hsluv(180, 80, 75); */
+  --blue-0:   #2c3d51; /* hsluv(245, 50, 25); */
+  --blue-1:   #51a3ec; /* hsluv(245, 80, 65); */
+  --blue-2:   #8fbcf1; /* hsluv(245, 80, 75); */
+  --indigo-0: #323573; /* hsluv(265, 50, 25); */
+  --indigo-1: #9396ec; /* hsluv(265, 80, 65); */
+  --indigo-2: #b2b4f1; /* hsluv(265, 80, 75); */
+  --purple-0: #473067; /* hsluv(280, 50, 25); */
+  --purple-1: #b38bec; /* hsluv(280, 80, 65); */
+  --purple-2: #c7adf1; /* hsluv(280, 80, 75); */
 
   /* main background colors */
   --body-background-color: var(--grey-1);
