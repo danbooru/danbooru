@@ -32,10 +32,6 @@
   div#page aside#sidebar {
     padding: 5px;
 
-    input#tags {
-      min-width: 0px;
-    }
-
     button[type=submit] {
       font-size: 1.2em;
       background-color: var(--responsive-sidebar-submit-button-background-color);
