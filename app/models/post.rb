@@ -342,6 +342,8 @@ class Post < ApplicationRecord
 
     def normalized_source
       case source
+      when %r{\Ahttps?://twitter.com/[^/]+/status/(\d+)\z}i
+        "https://twitter.com/i/web/status/#{$1}"
       when %r{\Ahttps?://img\d+\.pixiv\.net/img/[^\/]+/(\d+)}i, 
            %r{\Ahttps?://i\d\.pixiv\.net/img\d+/img/[^\/]+/(\d+)}i
         "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
