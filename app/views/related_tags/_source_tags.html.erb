@@ -19,10 +19,10 @@
             <% artist.sorted_urls.each do |url| %>
               <li>
                 <% if url.is_active %>
-                  <%= external_link_to url.url, truncate: 64, strip_scheme: true, link_options: {target: "_blank"} %>
+                  <%= external_link_to url.url, truncate: 64, strip: :scheme, link_options: {target: "_blank"} %>
                   <%= link_to tag.i(class: "fas fa-minus-circle"), artist_url_path(id: url.id, artist_url: { is_active: false }), remote: true, method: :put, "data-confirm": "This will mark the URL as inactive. Continue?" %>
                 <% else %>
-                  <del><%= external_link_to url.url, truncate: 64, strip_scheme: true, link_options: {target: "_blank"} %></del>
+                  <del><%= external_link_to url.url, truncate: 64, strip: :scheme, link_options: {target: "_blank"} %></del>
                 <% end %>
               </li>
             <% end %>

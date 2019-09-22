@@ -80,9 +80,10 @@ module ApplicationHelper
     time_tag(time.strftime("%Y-%m-%d %H:%M"), time)
   end
 
-  def external_link_to(url, truncate: nil, strip_scheme: false, link_options: {})
+  def external_link_to(url, truncate: nil, strip: false, link_options: {})
     text = url
-    text = text.gsub(%r!\Ahttps?://!i, "") if strip_scheme
+    text = text.gsub(%r!\Ahttps?://!i, "") if strip == :scheme
+    text = text.gsub(%r!\Ahttps?://(?:www\.)?!i, "") if strip == :subdomain
     text = text.truncate(truncate) if truncate
 
     if url =~ %r!\Ahttps?://!i
