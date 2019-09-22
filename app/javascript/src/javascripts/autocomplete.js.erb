@@ -10,8 +10,8 @@ Autocomplete.ORDER_METATAGS = <%= Tag::ORDER_METATAGS.to_json.html_safe %>;
 /* eslint-enable */
 
 Autocomplete.TAG_PREFIXES = "-|~|" + Object.keys(Autocomplete.TAG_CATEGORIES).map(category => category + ":").join("|");
-Autocomplete.TAG_PREFIXES_REGEX = new RegExp("^(" + Autocomplete.TAG_PREFIXES + ")(.*)$", "i");
-Autocomplete.METATAGS_REGEX = new RegExp("^(" + Autocomplete.METATAGS.join("|") + "):(.*)$", "i");
+Autocomplete.METATAGS_REGEX = Autocomplete.METATAGS.concat(Object.keys(Autocomplete.TAG_CATEGORIES)).join("|");
+Autocomplete.TERM_REGEX = new RegExp(`([-~]*)(?:(${Autocomplete.METATAGS_REGEX}):)?(\\S*)$`, "i");
 
 Autocomplete.initialize_all = function() {
   if (Utility.meta("enable-auto-complete") === "true") {
@@ -271,34 +271,14 @@ Autocomplete.normal_source = function(term, resp) {
 }
 
 Autocomplete.parse_query = function(text, caret) {
-  var operator = "";
-  var metatag = "";
-  var term = "";
+  let before_caret_text = text.substring(0, caret);
+  let match = before_caret_text.match(Autocomplete.TERM_REGEX);
 
-  var before_caret_text = text.substring(0, caret);
-  var match = before_caret_text.match(/\S+$/g);
-  if (match) {
-    term = match[0];
-  } else {
-    return {};
-  }
+  let operator = match[1];
+  let metatag = match[2] ? match[2].toLowerCase() : "tag";
+  let term = match[3];
 
-  match = term.match(/^([-~])(.*)$/);
-  if (match) {
-    operator = match[1];
-    term = match[2];
-  }
-
-  match = term.match(Autocomplete.TAG_PREFIXES_REGEX);
-  if (match) {
-    term = match[2];
-  }
-
-  match = term.match(Autocomplete.METATAGS_REGEX);
-  if (match) {
-    metatag = match[1].toLowerCase();
-    term = match[2];
-  } else {
+  if (metatag in Autocomplete.TAG_CATEGORIES) {
     metatag = "tag";
   }
 

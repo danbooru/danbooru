@@ -30,6 +30,12 @@ class AutocompleteTest < ApplicationSystemTestCase
     assert_autocomplete_equals(values, text, id: "forum_post_body")
   end
 
+  def assert_inserted_completion(result, query, id: "tags")
+    autocomplete(id, query)
+    first("ul.ui-autocomplete li").click
+    assert_equal(result, find_field(id: id).value)
+  end
+
   context "Autocomplete" do
     context "for post searches" do
       should "work for static metatags" do
@@ -85,8 +91,6 @@ class AutocompleteTest < ApplicationSystemTestCase
         assert_search_autocomplete_equals(["bkub"], "char:bkub")
         assert_search_autocomplete_equals(["bkub"], "gen:bkub")
         assert_search_autocomplete_equals(["bkub"], "meta:bkub")
-        assert_search_autocomplete_equals(["bkub"], "-char:bkub")
-        assert_search_autocomplete_equals(["bkub"], "~char:bkub")
 
         assert_search_autocomplete_equals(["bkub"], "b*")
         assert_search_autocomplete_equals(["bkub"], "B*")
@@ -98,16 +102,38 @@ class AutocompleteTest < ApplicationSystemTestCase
         assert_search_autocomplete_equals([], "one two")
       end
 
+      should "correct invalid operator combinations" do
+        create(:tag, name: "bkub", post_count: 42)
+
+        assert_search_autocomplete_equals(["bkub"], "foo ---bkub")
+        assert_search_autocomplete_equals(["bkub"], "foo ~~~bkub")
+
+        assert_search_autocomplete_equals(["rating:safe"], "--rating:s")
+        assert_search_autocomplete_equals(["rating:safe"], "-~rating:s")
+        assert_search_autocomplete_equals(["rating:safe"], "~-rating:s")
+        assert_search_autocomplete_equals(["rating:safe"], "~~rating:s")
+        assert_search_autocomplete_equals(["rating:safe"], "---rating:s")
+        assert_search_autocomplete_equals(["rating:safe"], "~~~rating:s")
+      end
+
+      should "ignore invalid prefix + metatag combinations" do
+        assert_search_autocomplete_equals([], "char:rating:s")
+      end
+
       should "insert completions on click" do
         visit posts_path
 
-        autocomplete("tags", "rating:s")
-        first("ul.ui-autocomplete li").click
-        assert_equal("rating:safe ", find_field(id: "tags").value)
+        create(:tag, name: "bkub", post_count: 42)
+        assert_inserted_completion("bkub ", "b")
+        assert_inserted_completion("-bkub ", "-b")
+        assert_inserted_completion("~bkub ", "~b")
+        assert_inserted_completion("tag bkub ", "tag b")
+        assert_inserted_completion("tag char:bkub ", "tag char:b")
 
-        autocomplete("tags", "one two rating:s")
-        first("ul.ui-autocomplete li").click
-        assert_equal("one two rating:safe ", find_field(id: "tags").value)
+        assert_inserted_completion("rating:safe ", "rating:s")
+        assert_inserted_completion("-rating:safe ", "-rating:s")
+        assert_inserted_completion("-rating:safe ", "---rating:s")
+        assert_inserted_completion("tag rating:safe ", "tag rating:s")
       end
     end
 
