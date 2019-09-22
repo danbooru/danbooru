@@ -45,11 +45,13 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "update action" do
-      should "render" do
-        params = { favorite_group: { name: "foo" } }
-        put_auth favorite_group_path(@favgroup), @user, params: params
+      should "update posts" do
+        @posts = create_list(:post, 2)
+        put_auth favorite_group_path(@favgroup), @user, params: { favorite_group: { name: "foo", post_id_array: @posts.map(&:id) } }
+
         assert_redirected_to @favgroup
         assert_equal("foo", @favgroup.reload.name)
+        assert_equal(@posts.map(&:id), @favgroup.post_id_array)
       end
     end
 
