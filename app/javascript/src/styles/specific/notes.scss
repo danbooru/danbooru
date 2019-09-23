@@ -85,6 +85,8 @@ div#note-container {
     }
 
     &.embedded {
+      color: var(--note-body-text-color);
+
       div.bg {
         height: 100%;
         text-align: center;
