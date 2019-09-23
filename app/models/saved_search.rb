@@ -104,7 +104,16 @@ class SavedSearch < ApplicationRecord
           q = q.labeled(params[:label])
         end
 
-        q.apply_default_order(params)
+        case params[:order]
+        when "query"
+          q = q.order(:query).order(id: :desc)
+        when "label"
+          q = q.order(:labels).order(id: :desc)
+        else
+          q = q.apply_default_order(params)
+        end
+
+        q
       end
 
       def populate(query, timeout: 10_000)

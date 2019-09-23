@@ -8,8 +8,9 @@
     </h1>
 
     <%= search_form_for(saved_searches_path) do |f| %>
-      <%= f.input :query_ilike, label: "Query", input_html: { value: params[:search][:query_ilike] } %>
+      <%= f.input :query_ilike, label: "Query", hint: "Use * for wildcard", input_html: { value: params[:search][:query_ilike] } %>
       <%= f.input :label, label: "Label", input_html: { value: params[:search][:label] } %>
+      <%= f.input :order, collection: [%w[Newest id], %w[Query query], %w[Label label]], include_blank: false, selected: params[:search][:order] %>
       <%= f.submit "Search" %>
     <% end %>
 
