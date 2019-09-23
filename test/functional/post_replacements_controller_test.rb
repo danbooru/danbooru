@@ -3,17 +3,11 @@ require 'test_helper'
 class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
   context "The post replacements controller" do
     setup do
-      Delayed::Worker.delay_jobs = true # don't delete the old images right away
-
       @user = create(:moderator_user, can_approve_posts: true, created_at: 1.month.ago)
       @user.as_current do
         @post = create(:post, source: "https://google.com")
         @post_replacement = create(:post_replacement, post: @post)
       end
-    end
-
-    teardown do
-      Delayed::Worker.delay_jobs = false
     end
 
     context "create action" do
@@ -31,9 +25,8 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           @post.reload
         end
 
-        travel(PostReplacement::DELETION_GRACE_PERIOD + 1.day) do
-          Delayed::Worker.new.work_off
-        end
+        travel(PostReplacement::DELETION_GRACE_PERIOD + 1.day)
+        perform_enqueued_jobs
 
         assert_response :success
         assert_equal("https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", @post.source)

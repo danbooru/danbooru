@@ -122,6 +122,4 @@ class ActionDispatch::IntegrationTest
   end
 end
 
-Delayed::Worker.delay_jobs = false
-
 Rails.application.load_seed

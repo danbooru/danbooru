@@ -14,14 +14,6 @@ class UploadServiceTest < ActiveSupport::TestCase
     }
   }
 
-  setup do
-    Delayed::Worker.delay_jobs = true
-  end
-
-  teardown do
-    Delayed::Worker.delay_jobs = false
-  end
-
   context "::Utils" do
     subject { UploadService::Utils }
 
@@ -1044,10 +1036,9 @@ class UploadServiceTest < ActiveSupport::TestCase
       should "schedule a job later" do
         service = subject.new(source: @source)
 
-        assert_difference(-> { Delayed::Job.count }) do
-          predecessor = service.start!
-          assert_equal(@predecessor, predecessor)
-        end
+        predecessor = service.start!
+        assert_enqueued_jobs(1, only: UploadServiceDelayedStartJob)
+        assert_equal(@predecessor, predecessor)
       end
     end
 
