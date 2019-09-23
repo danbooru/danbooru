@@ -95,11 +95,9 @@ class TagAlias < TagRelationship
   def move_saved_searches
     escaped = Regexp.escape(antecedent_name)
 
-    if SavedSearch.enabled?
-      SavedSearch.where("query like ?", "%#{antecedent_name}%").find_each do |ss|
-        ss.query = ss.query.sub(/(?:^| )#{escaped}(?:$| )/, " #{consequent_name} ").strip.gsub(/  /, " ")
-        ss.save
-      end
+    SavedSearch.where("query like ?", "%#{antecedent_name}%").find_each do |ss|
+      ss.query = ss.query.sub(/(?:^| )#{escaped}(?:$| )/, " #{consequent_name} ").strip.gsub(/  /, " ")
+      ss.save
     end
   end
 

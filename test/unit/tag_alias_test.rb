@@ -126,10 +126,6 @@ class TagAliasTest < ActiveSupport::TestCase
     end
 
     context "saved searches" do
-      setup do
-        SavedSearch.stubs(:enabled?).returns(true)
-      end
-
       should "move saved searches" do
         tag1 = FactoryBot.create(:tag, :name => "...")
         tag2 = FactoryBot.create(:tag, :name => "bbb")

@@ -2,10 +2,6 @@ class SavedSearch < ApplicationRecord
   REDIS_EXPIRY = 1.hour
   QUERY_LIMIT = 1000
 
-  def self.enabled?
-    Danbooru.config.redis_url.present?
-  end
-
   concerning :Redis do
     extend Memoist
 

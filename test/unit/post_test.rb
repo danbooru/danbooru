@@ -2256,7 +2256,6 @@ class PostTest < ActiveSupport::TestCase
 
     context "saved searches" do
       setup do
-        SavedSearch.stubs(:enabled?).returns(true)
         @post1 = FactoryBot.create(:post, tag_string: "aaa")
         @post2 = FactoryBot.create(:post, tag_string: "bbb")
         FactoryBot.create(:saved_search, query: "aaa", labels: ["zzz"], user: CurrentUser.user)

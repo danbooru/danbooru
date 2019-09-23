@@ -1,5 +1,4 @@
 class SavedSearchesController < ApplicationController
-  before_action :check_availability
   respond_to :html, :xml, :json, :js
   
   def index
@@ -37,12 +36,6 @@ class SavedSearchesController < ApplicationController
 
   def saved_searches
     CurrentUser.user.saved_searches
-  end
-
-  def check_availability
-    if !SavedSearch.enabled?
-      raise NotImplementedError.new("Saved searches are not available.")
-    end
   end
 
   def saved_search_params
