@@ -142,7 +142,7 @@ class User < ApplicationRecord
 
       # XXX downcasing is the wrong way to do case-insensitive comparison for unicode (should use casefolding).
       def find_by_name(name)
-        where_ilike(:name, normalize_name(name)).first
+        where_iequals(:name, normalize_name(name)).first
       end
 
       def normalize_name(name)

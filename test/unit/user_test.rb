@@ -175,6 +175,16 @@ class UserTest < ActiveSupport::TestCase
         assert_nil(User.find_by_name("does_not_exist"))
         assert_nil(User.name_to_id("does_not_exist"))
       end
+
+      should "work for names containing asterisks or backlashes" do
+        @user1 = create(:user, name: "user*1")
+        @user2 = create(:user, name: "user*2")
+        @user3 = create(:user, name: "user\*3")
+
+        assert_equal(@user1.id, User.find_by_name("user*1").id)
+        assert_equal(@user2.id, User.find_by_name("user*2").id)
+        assert_equal(@user3.id, User.find_by_name("user\*3").id)
+      end
     end
 
     context "ip address" do

@@ -25,6 +25,10 @@ class ApplicationRecord < ActiveRecord::Base
         where.not("#{qualified_column_for(attr)} ILIKE ? ESCAPE E'\\\\'", value.mb_chars.to_escaped_for_sql_like)
       end
 
+      def where_iequals(attr, value)
+        where_ilike(attr, value.gsub(/\\/, '\\\\').gsub(/\*/, '\*'))
+      end
+
       # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-REGEXP
       # "(?e)" means force use of ERE syntax; see sections 9.7.3.1 and 9.7.3.4.
       def where_regex(attr, value)
