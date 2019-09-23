@@ -2,11 +2,10 @@
 
 div#c-static {
   div#a-site-map {
-    width: 80em;
+    display: flex;
 
     section {
-      width: 20em;
-      float: left;
+      flex: 1;
 
       h1 {
         font-size: $h3_size;

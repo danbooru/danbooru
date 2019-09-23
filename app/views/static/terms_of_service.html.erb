@@ -1,5 +1,5 @@
 <div id="c-static">
-  <div id="a-terms-of-service">
+  <div id="a-terms-of-service" class="fixed-width-container">
     <h1>Rules</h1>
     
     <p>Please read the following before using the site:</p>
@@ -41,31 +41,30 @@
         <li>Nude Filter: Images that have been edited by someone other than the original creator to remove clothing or censorship. These typically feature crude drawings of breasts or genitalia laid on top of the original image.</li>
       </ul>
     </div>
-  </div>
 
-  <div class="section">
-    <h4>Copyright Infringement</h4>
+    <div class="section">
+      <h4>Copyright Infringement</h4>
 
-    <p>If you believe a post infringes upon your copyright, please send an email to the <%= mail_to Danbooru.config.contact_email, "webmaster", :encode => "hex" %> with the following pieces of information:</p>
-    <ul>
-      <li>The URL of the infringing post.</li>
-      <li>Proof that you own the copyright.</li>
-    </ul>
-  </div>
+      <p>If you believe a post infringes upon your copyright, please send an email to the <%= mail_to Danbooru.config.contact_email, "webmaster", :encode => "hex" %> with the following pieces of information:</p>
+      <ul>
+        <li>The URL of the infringing post.</li>
+        <li>Proof that you own the copyright.</li>
+      </ul>
+    </div>
 
-  <div class="section">
-    <h4>Privacy Policy</h4>
+    <div class="section">
+      <h4>Privacy Policy</h4>
 
-    <p>Danbooru will not disclose the IP address, email address, password, or DMails of any user except to the staff.</p>
-    <p>Danbooru is allowed to make public everything else, including but not limited to: uploaded posts, favorited posts, comments, forum posts, wiki edits, and note edits.</p>
-  </div>
+      <p>Danbooru will not disclose the IP address, email address, password, or DMails of any user except to the staff.</p>
+      <p>Danbooru is allowed to make public everything else, including but not limited to: uploaded posts, favorited posts, comments, forum posts, wiki edits, and note edits.</p>
+    </div>
 
-  <div class="section">
-    <h4>Accounts</h4>
+    <div class="section">
+      <h4>Accounts</h4>
 
-    <p>You may have alternative accounts for bots or scripts, but if there's any suspicion you either create a new account or reuse an existing one to evade a ban or any sort of account limitation (limited uploads, loss of flagging or user feedback permissions), then all your accounts will be banned. Bot accounts that flag posts or leave user feedback are not permitted and will be banned.</p>
-    <p>Account sharing is not permitted. If you are suspected of sharing an account, then it will be banned.</p>
-  </div>
+      <p>You may have alternative accounts for bots or scripts, but if there's any suspicion you either create a new account or reuse an existing one to evade a ban or any sort of account limitation (limited uploads, loss of flagging or user feedback permissions), then all your accounts will be banned. Bot accounts that flag posts or leave user feedback are not permitted and will be banned.</p>
+      <p>Account sharing is not permitted. If you are suspected of sharing an account, then it will be banned.</p>
+    </div>
 </div>
 
 <% content_for(:page_title) do %>

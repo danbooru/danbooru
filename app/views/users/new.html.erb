@@ -1,12 +1,17 @@
 <div id="c-users">
-  <div id="a-new">
+  <div id="a-new" class="fixed-width-container">
     <h1>Sign Up</h1>
 
-    <p>A basic account is <strong>free</strong> and lets you keep favorites, upload artwork, edit tags, and post comments. If you want <%= link_to "more features", new_user_upgrade_path %> you can upgrade your account later.</p>
+    <p>
+      A basic account is <strong>free</strong> and lets you keep favorites, upload artwork, edit tags, and post
+      comments. If you want <%= link_to "more features", new_user_upgrade_path %> you can upgrade your account later.
+    </p>
 
-    <h1 style="margin-bottom: 1em;">This site is open to web crawlers so whatever name you choose will be public!</h1>
-
-    <p>This includes favorites, uploads, and comments. Almost everything is public. So don't choose a name you don't want to be associated with.</p>
+    <p>
+      <strong>This site is open to web crawlers, so whatever name you choose will be public</strong>. This includes
+      favorites, uploads, and comments. Almost everything is public. So don't choose a name you don't want to be
+      associated with.
+    </p>
 
     <div id="p3">
       <%= simple_form_for(@user, html: {id: "signup-form"}) do |f| %>
