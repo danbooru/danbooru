@@ -147,9 +147,11 @@ Upload.initialize_dropzone = function() {
     return;
   }
 
-  let dropzone = new Dropzone("#filedropzone", {
+  let dropzone = new Dropzone(document.body, {
     paramName: "upload[file]",
     url: "/uploads/preprocess",
+    clickable: "#filedropzone",
+    previewsContainer: "#filedropzone",
     thumbnailHeight: 150,
     thumbnailWidth: 150,
     thumbnailMethod: "contain",
@@ -162,13 +164,12 @@ Upload.initialize_dropzone = function() {
     previewTemplate: $("#dropzone-preview-template").html(),
     init: function() {
       $(".fallback").hide();
-      this.on("drop", function(event) {
-        $("#filedropzone .dropzone-hint").hide();
-      });
       this.on("complete", function(file) {
         $("#filedropzone .dz-progress").hide();
       });
       this.on("addedfile", function(file) {
+        $("#filedropzone .dropzone-hint").hide();
+
         // replace the previous file with the new one.
         dropzone.files.forEach(f => {
           if (f !== file) {
