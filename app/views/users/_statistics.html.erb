@@ -170,7 +170,7 @@
       <% end %>
 
       <% if CurrentUser.id == user.id %>
-        <% if CurrentUser.has_saved_searches? %>
+        <% if SavedSearch.labels_for(CurrentUser.user.id).present? %>
           <tr>
             <th>Saved Searches</th>
             <td>

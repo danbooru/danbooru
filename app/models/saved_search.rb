@@ -151,8 +151,6 @@ class SavedSearch < ApplicationRecord
   belongs_to :user
   validates :query, presence: true
   validate :validate_count
-  before_create :update_user_on_create
-  after_destroy :update_user_on_destroy
   before_validation :normalize_query
   before_validation :normalize_labels
   scope :labeled, ->(label) { label.present? ? where("labels @> string_to_array(?, '~~~~')", label) : where("true") }
@@ -160,18 +158,6 @@ class SavedSearch < ApplicationRecord
   def validate_count
     if user.saved_searches.count + 1 > user.max_saved_searches
       self.errors[:user] << "can only have up to #{user.max_saved_searches} " + "saved search".pluralize(user.max_saved_searches)
-    end
-  end
-
-  def update_user_on_create
-    if !user.has_saved_searches?
-      user.update(has_saved_searches: true)
-    end
-  end
-
-  def update_user_on_destroy
-    if user.saved_searches.count == 0
-      user.update(has_saved_searches: false)
     end
   end
 

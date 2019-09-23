@@ -146,11 +146,6 @@ class SavedSearchTest < ActiveSupport::TestCase
       @saved_search = @user.saved_searches.create(query: " ZZZ xxx ")
     end
 
-    should "update the bitpref on the user" do
-      @user.reload
-      assert(@user.has_saved_searches?, "should have saved_searches bitpref set")
-    end
-
     should "normalize the query aside from the order" do
       assert_equal("yyy xxx", @saved_search.query)
     end
@@ -161,18 +156,6 @@ class SavedSearchTest < ActiveSupport::TestCase
 
       @saved_search.labels = ["Artist 1", "Artist 2"]
       assert_equal(%w[artist_1 artist_2], @saved_search.labels)
-    end
-  end
-
-  context "Destroying a saved search" do
-    setup do
-      @saved_search = @user.saved_searches.create(query: "xxx")
-      @saved_search.destroy
-    end
-
-    should "update the bitpref on the user" do
-      @user.reload
-      assert(!@user.has_saved_searches?, "should not have the saved_searches bitpref set")
     end
   end
 

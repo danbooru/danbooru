@@ -32,6 +32,7 @@ class User < ApplicationRecord
   # - disable_tagged_filenames (enabled by 387)
   # - enable_recent_searches (enabled by 499)
   # - disable_cropped_thumbnails (enabled by 22)
+  # - has_saved_searches
   BOOLEAN_ATTRIBUTES = %w(
     is_banned
     has_mail
