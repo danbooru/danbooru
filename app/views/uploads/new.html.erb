@@ -154,6 +154,13 @@
             $("#filedropzone .dz-progress").hide();
           });
           this.on("addedfile", function(file) {
+            // replace the previous file with this one.
+            Danbooru.Upload.dropzone.files.forEach(f => {
+              if (f !== file) {
+                Danbooru.Upload.dropzone.removeFile(f);
+              }
+            });
+
             var reader = new FileReader();
             reader.addEventListener("loadend", function() {
               var buf = new Danbooru.SparkMD5.ArrayBuffer();
