@@ -3086,7 +3086,7 @@ CREATE TABLE public.users (
     email character varying,
     email_verification_key character varying,
     inviter_id integer,
-    level integer DEFAULT 0 NOT NULL,
+    level integer DEFAULT 20 NOT NULL,
     base_upload_limit integer DEFAULT 10 NOT NULL,
     last_logged_in_at timestamp without time zone,
     last_forum_read_at timestamp without time zone,
@@ -7339,6 +7339,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190902224045'),
 ('20190908031103'),
 ('20190908035317'),
-('20190919175836');
+('20190919175836'),
+('20190923071044');
 
 

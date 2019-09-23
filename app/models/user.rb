@@ -257,7 +257,7 @@ class User < ApplicationRecord
       end
 
       def anonymous
-        user = User.new(name: "Anonymous", created_at: Time.now)
+        user = User.new(name: "Anonymous", level: Levels::ANONYMOUS, created_at: Time.now)
         user.freeze.readonly!
         user
       end
@@ -318,7 +318,6 @@ class User < ApplicationRecord
     end
 
     def customize_new_user
-      self.level = User::Levels::MEMBER
       Danbooru.config.customize_new_user(self)
     end
 
