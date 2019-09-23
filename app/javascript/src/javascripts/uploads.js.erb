@@ -1,6 +1,10 @@
 import Post from './posts.js.erb'
+import Dropzone from 'dropzone';
+import SparkMD5 from 'spark-md5';
 
 let Upload = {};
+
+Upload.MAX_FILE_SIZE = <%= Danbooru.config.max_file_size.to_json %> / (1024 * 1024);
 
 Upload.initialize_all = function() {
   if ($("#c-uploads,#c-posts").length) {
@@ -27,6 +31,10 @@ Upload.initialize_all = function() {
       Upload.toggle_commentary();
       e.preventDefault();
     });
+  }
+
+  if ($("#c-uploads #a-new").length) {
+    this.initialize_dropzone();
   }
 
   if ($("#iqdb-similar").length) {
@@ -131,6 +139,57 @@ Upload.toggle_commentary = function() {
   }
 
   $(".artist-commentary").slideToggle();
+};
+
+Upload.initialize_dropzone = function() {
+  if (!window.FileReader) {
+    $("#filedropzone").remove();
+    return;
+  }
+
+  let dropzone = new Dropzone("#filedropzone", {
+    paramName: "upload[file]",
+    url: "/uploads/preprocess",
+    createImageThumbnails: false,
+    addRemoveLinks: false,
+    maxFiles: 1,
+    maxFilesize: Upload.MAX_FILE_SIZE,
+    timeout: 0,
+    acceptedFiles: "image/jpeg,image/png,image/gif,video/mp4,video/webm,.swf",
+    previewTemplate: $("#dropzone-preview-template").html(),
+    init: function() {
+      $(".fallback").hide();
+      this.on("drop", function(event) {
+        $("#filedropzone .dropzone-hint").hide();
+      });
+      this.on("complete", function(file) {
+        $("#filedropzone .dz-progress").hide();
+      });
+      this.on("addedfile", function(file) {
+        // replace the previous file with the new one.
+        dropzone.files.forEach(f => {
+          if (f !== file) {
+            dropzone.removeFile(f);
+          }
+        });
+
+        let reader = new FileReader();
+        reader.addEventListener("loadend", function() {
+          let buf = new SparkMD5.ArrayBuffer();
+          buf.append(this.result);
+          let hash = buf.end();
+          $("#upload_md5_confirmation").val(hash);
+        });
+        reader.readAsArrayBuffer(file);
+      });
+      this.on("success", function(file) {
+        $("#filedropzone").addClass("success");
+      });
+      this.on("error", function(file, msg) {
+        $("#filedropzone").addClass("error");
+      });
+    }
+  });
 };
 
 $(function() {

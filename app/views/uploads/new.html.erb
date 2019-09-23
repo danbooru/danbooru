@@ -120,66 +120,8 @@
   </div>
 </div>
 
-<% content_for(:html_header) do %>
-  <script>
-    $(function() {
-      var enabled = true;
-      var maxFilesize = <%= Danbooru.config.max_file_size.to_json %> / (1024 * 1024);
-
-      if (!window.FileReader) {
-        enabled = false;
-      }
-
-      if (!enabled) {
-        $("#filedropzone").remove();
-        return;
-      }
-
-      Danbooru.Upload.dropzone = new Danbooru.Dropzone("#filedropzone", {
-        paramName: "upload[file]", 
-        url: "/uploads/preprocess", 
-        createImageThumbnails: false,
-        addRemoveLinks: false,
-        maxFiles: 1,
-        maxFilesize: maxFilesize,
-        timeout: 0,
-        acceptedFiles: "image/jpeg,image/png,image/gif,video/mp4,video/webm,.swf",
-        previewTemplate: '<div class="dz-preview dz-file-preview"><div class="dz-details"><div class="dz-filename"><span data-dz-name></span></div><div class="dz-size" data-dz-size></div></div><div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress></span></div><div class="dz-error-message"><span data-dz-errormessage></span></div></div>',
-        init: function() {
-          $(".fallback").hide();
-          this.on("drop", function(event) {
-            $("#filedropzone .dropzone-hint").hide();
-          });
-          this.on("complete", function(file) {
-            $("#filedropzone .dz-progress").hide();
-          });
-          this.on("addedfile", function(file) {
-            // replace the previous file with this one.
-            Danbooru.Upload.dropzone.files.forEach(f => {
-              if (f !== file) {
-                Danbooru.Upload.dropzone.removeFile(f);
-              }
-            });
-
-            var reader = new FileReader();
-            reader.addEventListener("loadend", function() {
-              var buf = new Danbooru.SparkMD5.ArrayBuffer();
-              buf.append(this.result);
-              var hash = buf.end();
-              $("#upload_md5_confirmation").val(hash);
-            });
-            reader.readAsArrayBuffer(file);
-          });
-          this.on("success", function(file) {
-            $("#filedropzone").addClass("success");
-          });
-          this.on("error", function(file, msg) {
-            $("#filedropzone").addClass("error");
-          });
-        }
-      });
-    });
-  </script>
-<% end %>
+<template id="dropzone-preview-template">
+  <%= render "dropzone_preview" %>
+</template>
 
 <%= render "uploads/secondary_links" %>

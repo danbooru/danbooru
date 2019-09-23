@@ -1,4 +1,4 @@
-import Uploads from './uploads';
+import Uploads from './uploads.js.erb';
 import Utility from './utility';
 import Post from './posts.js.erb';
 
