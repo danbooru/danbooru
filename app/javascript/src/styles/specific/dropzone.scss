@@ -10,6 +10,20 @@
   cursor: pointer;
   position: relative;
 
+  .dz-preview {
+    display: flex;
+
+    img[data-dz-thumbnail] {
+      padding: 1em;
+    }
+
+    .dz-details {
+      display: flex;
+      flex-direction: column;
+      align-self: center;
+    }
+  }
+
   &.dz-started .dropzone-hint {
     display: none;
   }
