@@ -7,7 +7,6 @@ class SavedSearchesControllerTest < ActionDispatch::IntegrationTest
       as_user do
         @saved_search = create(:saved_search, user: @user)
       end
-      mock_saved_search_service!
     end
 
     context "index action" do
