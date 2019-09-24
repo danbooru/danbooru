@@ -101,7 +101,6 @@ menu {
   li {
     margin: 0;
     padding: 0 0.2em;
-    list-style-type: none;
     display: inline;
   }
 }
@@ -122,4 +121,14 @@ table tfoot {
 
 .fixed-width-container {
   max-width: 70em;
+}
+
+ul.list-bulleted {
+  list-style: inside disc;
+}
+
+ul.list-inline {
+  &, li {
+    display: inline;
+  }
 }

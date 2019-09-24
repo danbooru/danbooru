@@ -237,10 +237,6 @@ div#c-posts {
     overflow: hidden;
     border: var(--post-notice-border);
 
-    ul.post-flag-reasons, ul.post-appeal-reasons {
-      list-style: inside;
-    }
-
     p {
       margin-bottom: 0;
     }
@@ -267,10 +263,6 @@ div#c-posts {
 
   aside#sidebar > section > ul {
     margin-bottom: 1em;
-  }
-
-  aside#sidebar > section > ul li {
-    list-style-type: none;
   }
 
   aside#sidebar > section > ul ul li {

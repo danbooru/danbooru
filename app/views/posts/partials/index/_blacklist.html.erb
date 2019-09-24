@@ -1,7 +1,6 @@
 <div id="blacklist-box" class="sidebar-blacklist">
   <h1>Blacklisted (<%= link_to "help", wiki_pages_path(:title => "help:blacklists") %>)</h1>
-  <ul id="blacklist-list">
-  </ul>
+  <ul id="blacklist-list" class="list-bulleted"></ul>
   <%= link_to "Disable all", "#", :id => "disable-all-blacklists", :style => "display: none;" %>
   <%= link_to "Re-enable all", "#", :id => "re-enable-all-blacklists", :style => "display: none;" %>
 </div>
