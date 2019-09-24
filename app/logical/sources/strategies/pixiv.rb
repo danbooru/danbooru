@@ -8,6 +8,7 @@
 # * https://www.pixiv.net/member_illust.php?mode=medium&illust_id=46324488
 # * https://www.pixiv.net/member_illust.php?mode=manga&illust_id=46324488
 # * https://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=46324488&page=0
+# * https://www.pixiv.net/en/artworks/46324488
 #
 # * https://www.pixiv.net/member.php?id=339253
 # * https://www.pixiv.net/member_illust.php?id=339253&type=illust
@@ -127,7 +128,7 @@ module Sources
         end
 
         if illust_id.present?
-          return "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{illust_id}"
+          return "https://www.pixiv.net/artworks/#{illust_id}"
         end
 
         return url
@@ -270,6 +271,10 @@ module Sources
           # http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=18557054&page=1
           if url.host == "www.pixiv.net" && url.path == "/member_illust.php" && url.query_values["illust_id"].present?
             return url.query_values["illust_id"].to_i
+
+          # http://www.pixiv.net/en/artworks/46324488
+          elsif url.host == "www.pixiv.net" && url.path =~ %r!\A/(?:en/)?artworks/(?<illust_id>\d+)!i
+            return $~[:illust_id].to_i
 
           # http://www.pixiv.net/i/18557054
           elsif url.host == "www.pixiv.net" && url.path =~ %r!\A/i/(?<illust_id>\d+)\z!i

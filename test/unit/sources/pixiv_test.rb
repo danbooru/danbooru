@@ -85,6 +85,20 @@ module Sources
         end
       end
 
+      context "A https://www.pixiv.net/*/artworks/* source" do
+        should "work" do
+          @site = Sources::Strategies.find("https://www.pixiv.net/en/artworks/64476642")
+
+          assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.image_url)
+          assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.canonical_url)
+          assert_equal("https://www.pixiv.net/artworks/64476642", @site.page_url)
+
+          @site = Sources::Strategies.find("https://www.pixiv.net/artworks/64476642")
+          assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.image_url)
+          assert_equal("https://www.pixiv.net/artworks/64476642", @site.page_url)
+        end
+      end
+
       context "fetching source data for a new manga image" do
         setup do
           get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=65981735")
@@ -312,6 +326,9 @@ module Sources
           assert_illust_id(18557054, "http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg")
           assert_illust_id(18557054, "http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_s.png")
           assert_illust_id(18557054, "http://www.pixiv.net/i/18557054")
+
+          assert_illust_id(18557054, "http://www.pixiv.net/en/artworks/18557054")
+          assert_illust_id(18557054, "http://www.pixiv.net/artworks/18557054")
         end
 
         should "not misparse ids from fanbox urls" do

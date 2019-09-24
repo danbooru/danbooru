@@ -341,17 +341,13 @@ class Post < ApplicationRecord
     end
 
     def normalized_source
+      if pixiv_id.present?
+        return "https://www.pixiv.net/artworks/#{pixiv_id}"
+      end
+
       case source
       when %r{\Ahttps?://twitter.com/[^/]+/status/(\d+)\z}i
         "https://twitter.com/i/web/status/#{$1}"
-      when %r{\Ahttps?://img\d+\.pixiv\.net/img/[^\/]+/(\d+)}i, 
-           %r{\Ahttps?://i\d\.pixiv\.net/img\d+/img/[^\/]+/(\d+)}i
-        "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
-
-      when %r{\Ahttps?://(?:i\d+\.pixiv\.net|i\.pximg\.net)/img-(?:master|original)/img/(?:\d+\/)+(\d+)_p}i,
-           %r{\Ahttps?://(?:i\d+\.pixiv\.net|i\.pximg\.net)/c/\d+x\d+/img-master/img/(?:\d+\/)+(\d+)_p}i,
-           %r{\Ahttps?://(?:i\d+\.pixiv\.net|i\.pximg\.net)/img-zip-ugoira/img/(?:\d+\/)+(\d+)_ugoira\d+x\d+\.zip}i
-        "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=#{$1}"
 
       when %r{\Ahttps?://lohas\.nicoseiga\.jp/priv/(\d+)\?e=\d+&h=[a-f0-9]+}i, 
            %r{\Ahttps?://lohas\.nicoseiga\.jp/priv/[a-f0-9]+/\d+/(\d+)}i
