@@ -8,6 +8,7 @@ class AutocompleteTest < ApplicationSystemTestCase
 
   def assert_autocomplete_equals(expected_results, text, id:)
     autocomplete(id, text)
+    sleep 1 if expected_results.empty?
 
     assert_selector 'ul.ui-autocomplete li', count: expected_results.size
     expected_results.each do |result|
@@ -100,6 +101,11 @@ class AutocompleteTest < ApplicationSystemTestCase
         assert_search_autocomplete_equals([], " ")
         assert_search_autocomplete_equals([], "one")
         assert_search_autocomplete_equals([], "one two")
+      end
+
+      should "not complete tags after a space" do
+        create(:tag, name: "bkub", post_count: 42)
+        assert_search_autocomplete_equals([], "bkub ")
       end
 
       should "correct invalid operator combinations" do

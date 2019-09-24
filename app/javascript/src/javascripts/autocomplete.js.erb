@@ -98,11 +98,6 @@ Autocomplete.initialize_tag_autocomplete = function() {
       var metatag = query.metatag;
       var term = query.term;
 
-      if (!metatag && !term) {
-        this.close();
-        return;
-      }
-
       switch (metatag) {
       case "order":
       case "status":
@@ -244,6 +239,11 @@ Autocomplete.initialize_wiki_autocomplete = function($fields) {
 };
 
 Autocomplete.normal_source = function(term, resp) {
+  if (term === "") {
+    resp([]);
+    return;
+  }
+
   return $.ajax({
     url: "/tags/autocomplete.json",
     data: {
