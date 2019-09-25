@@ -18,7 +18,7 @@
     </thead>
     <tbody>
       <% @post_versions.each do |post_version| %>
-        <tr id="post-version-<%= post_version.id %>" <% if params[:hilite].to_i == post_version.id %>class="hilite"<% end %>>
+        <tr id="post-version-<%= post_version.id %>">
           <td>
             <%= link_to("#{post_version.post_id}.#{post_version.id}", post_path(post_version.post_id)) %>
             <%= link_to "»", post_versions_path(search: {post_id: post_version.post_id}) %>

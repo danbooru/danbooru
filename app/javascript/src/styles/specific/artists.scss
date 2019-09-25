@@ -1,21 +1,10 @@
-@import "../base/000_vars.scss";
-
 div#c-artists, div#excerpt {
   span.new-artist {
     font-weight: bold;
     color: var(--new-artist-color);
   }
 
-  ul ul {
-    margin-left: 1em;
-  }
-
-  div.recent-posts {
-    margin-top: 1em;
-
-    h1 {
-      font-size: $h2_size;
-      margin: 0;
-    }
+  .recent-posts h2 {
+    margin: 1em 0 0.5em;
   }
 }

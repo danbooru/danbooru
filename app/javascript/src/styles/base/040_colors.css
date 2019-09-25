@@ -130,7 +130,6 @@
 
   --fetch-source-data-border: 1px solid #666;
 
-  --post-mode-menu-view-background: white;
   --post-mode-menu-edit-background: #5C5;
   --post-mode-menu-tag-script-background: #D6D;
   --post-mode-menu-add-fav-background: #FFA;
@@ -382,7 +381,6 @@ body[data-user-theme="dark"] {
   --post-artist-commentary-container-background: var(--grey-3);
   --post-artist-commentary-container-border: 1px solid var(--grey-3);
 
-  --post-mode-menu-view-background: var(--body-background-color);
   --post-mode-menu-edit-background: var(--green-0);
   --post-mode-menu-tag-script-background: var(--indigo-0);
   --post-mode-menu-add-fav-background: var(--yellow-0);

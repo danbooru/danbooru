@@ -14,7 +14,7 @@
     <% end %>
     <% if artist.domains.any? %>
       <li><strong>Domains</strong></li>
-      <ul>
+      <ul class="list-bulleted">
         <% artist.domains.each do |url, count| %>
           <li><%= url %>: <%= count %></li>
         <% end %>
