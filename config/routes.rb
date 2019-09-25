@@ -260,7 +260,6 @@ Rails.application.routes.draw do
   end
   resource :source, :only => [:show]
   resources :tags do
-    resource :correction, :only => [:new, :create, :show], :controller => "tag_corrections"
     collection do
       get :autocomplete
     end

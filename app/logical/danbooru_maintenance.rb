@@ -15,7 +15,7 @@ module DanbooruMaintenance
     ForumSubscription.process_all!
     TagAlias.update_cached_post_counts_for_all
     PostDisapproval.dmail_messages!
-    Tag.clean_up_negative_post_counts!
+    regenerate_post_counts!
     SuperVoter.init!
     TokenBucket.prune!
     TagChangeRequestPruner.warn_all
@@ -36,6 +36,13 @@ module DanbooruMaintenance
     TagRelationshipRetirementService.find_and_retire!
   rescue Exception => exception
     rescue_exception(exception)
+  end
+
+  def regenerate_post_counts!
+    updated_tags = Tag.regenerate_post_counts!
+    updated_tags.each do |tag|
+      DanbooruLogger.info("Updated tag count", tag.attributes)
+    end
   end
 
   def rescue_exception(exception)

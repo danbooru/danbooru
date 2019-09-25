@@ -274,13 +274,15 @@ class TagTest < ActiveSupport::TestCase
     end
   end
 
-  context "A tag with a negative post count" do
+  context "A tag with an incorrect post count" do
     should "be fixed" do
-      tag = FactoryBot.create(:tag, name: "touhou", post_count: -10)
-      post = FactoryBot.create(:post, tag_string: "touhou")
+      tag1 = FactoryBot.create(:tag, name: "touhou", post_count: -10)
+      tag2 = FactoryBot.create(:tag, name: "bkub", post_count: 10)
+      post = FactoryBot.create(:post, tag_string: "touhou bkub")
 
-      Tag.clean_up_negative_post_counts!
-      assert_equal(1, tag.reload.post_count)
+      Tag.regenerate_post_counts!
+      assert_equal(1, tag1.reload.post_count)
+      assert_equal(1, tag2.reload.post_count)
     end
   end
 end

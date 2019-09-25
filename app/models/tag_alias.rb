@@ -145,9 +145,6 @@ class TagAlias < TagRelationship
           post.update(tag_string: fixed_tags)
         end
       end
-
-      antecedent_tag.fix_post_count if antecedent_tag
-      consequent_tag.fix_post_count if consequent_tag
     end
   end
 
