@@ -7,12 +7,6 @@
       comments. If you want <%= link_to "more features", new_user_upgrade_path %> you can upgrade your account later.
     </p>
 
-    <p>
-      <strong>This site is open to web crawlers, so whatever name you choose will be public</strong>. This includes
-      favorites, uploads, and comments. Almost everything is public. So don't choose a name you don't want to be
-      associated with.
-    </p>
-
     <div id="p3">
       <%= simple_form_for(@user, html: {id: "signup-form"}) do |f| %>
         <%= f.input :name, as: :string %>

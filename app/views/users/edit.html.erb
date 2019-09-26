@@ -11,12 +11,7 @@
       <fieldset id="basic-settings-section">
         <div class="input">
           <label>Name</label>
-          
-          <% if CurrentUser.user.is_gold? %>
-            <p><%= link_to "Change your name", new_user_name_change_request_path %></p>
-          <% else %>
-            <p>You must <%= link_to "upgrade your account", new_user_upgrade_path %> to request a name change</p>
-          <% end %>
+          <p><%= link_to "Change your name", new_user_name_change_request_path %></p>
         </div>
 
         <div class="input">
