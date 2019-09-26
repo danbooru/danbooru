@@ -124,3 +124,46 @@ form.edit_comment div.input.boolean {
     vertical-align: initial;
   }
 }
+
+@media screen and (max-width: 660px) {
+  div.comments-for-post div.list-of-comments article.comment {
+    display: block;
+    margin-top: 1em;
+    padding: 0;
+    border: var(--forum-post-border);
+
+    div.author {
+      margin: 0;
+      padding: 1em;
+      border-bottom: var(--forum-post-border);
+      background: var(--forum-post-author-background);
+    }
+
+    div.content {
+      padding: 1em;
+    }
+  }
+
+  div#c-comments div#a-index, div#c-comments div#a-show {
+    div.post {
+      display: block;
+      margin: 0;
+
+      div.preview {
+        margin: 2em auto;
+        width: auto;
+        height: auto;
+      }
+
+      div.comments-for-post {
+        div.header div.row span.info {
+          display: block;
+        }
+
+        div.new-comment {
+          margin: 1em 0;
+        }
+      }
+    }
+  }
+}
