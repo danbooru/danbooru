@@ -93,18 +93,21 @@ div#c-forum-topics {
 
   div.list-of-forum-posts article.forum-post {
     display: block;
-    margin-top: 1em;
-    border: var(--forum-post-border);
+    margin-top: 3em;
 
     div.author {
-      margin: 0;
-      padding: 1em;
-      border-bottom: var(--forum-post-border);
-      background: var(--forum-post-author-background);
-    }
+      margin: 0 0 1em;
 
-    div.content {
-      padding: 1em;
+      h4 {
+        display: inline;
+        margin-right: 0.5em;
+      }
+
+      time {
+        display: inline;
+        color: var(--muted-text-color);
+        font-size: 0.8em;
+      }
     }
   }
 }
