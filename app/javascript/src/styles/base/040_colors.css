@@ -75,7 +75,6 @@
   --post-tooltip-border-color: #767676;
   --post-tooltip-header-background-color: var(--subnav-menu-background-color);
   --post-tooltip-info-color: #555;
-  --post-tooltip-inactive-color: #777;
   --post-tooltip-scrollbar-background: #999999;
   --post-tooltip-scrollbar-border: 0px none white;
   --post-tooltip-scrollbar-thumb-color: #AAAAAA;
@@ -408,7 +407,6 @@ body[data-user-theme="dark"] {
   --post-tooltip-border-color: var(--grey-4);
   --post-tooltip-header-background-color: var(--grey-3);
   --post-tooltip-info-color: var(--grey-5);
-  --post-tooltip-inactive-color: var(--grey-4);
   --post-tooltip-scrollbar-background: var(--grey-4);
   --post-tooltip-scrollbar-border: none;
   --post-tooltip-scrollbar-thumb-color: var(--grey-5);

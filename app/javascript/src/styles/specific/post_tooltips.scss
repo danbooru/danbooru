@@ -104,12 +104,6 @@ $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
     }
   }
 
-  &:not(:hover) {
-    a, span {
-      color: var(--post-tooltip-inactive-color) !important;
-    }
-  }
-
   &.post-tooltip-loading {
     visibility: hidden;
   }
