@@ -97,7 +97,7 @@ class User < ApplicationRecord
   has_many :post_disapprovals, :dependent => :destroy
   has_many :post_flags, foreign_key: :creator_id
   has_many :post_votes
-  has_many :post_archives
+  has_many :post_versions, class_name: "PostArchive", foreign_key: :updater_id
   has_many :bans, -> {order("bans.id desc")}
   has_one :recent_ban, -> {order("bans.id desc")}, :class_name => "Ban"
 
@@ -668,7 +668,7 @@ class User < ApplicationRecord
       self.class.without_timeout do
         User.where(id: id).update_all(
           post_upload_count: posts.count,
-          post_update_count: PostArchive.for_user(id).count,
+          post_update_count: post_versions.count,
           note_update_count: note_versions.count
         )
       end

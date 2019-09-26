@@ -3,8 +3,16 @@
     <h1>Search Changes</h1>
 
     <%= search_form_for(post_versions_path) do |f| %>
+      <%= f.input :updated_at, label: "Date" %>
       <%= f.input :updater_name, label: "Updater", input_html: { "data-autocomplete": "user" } %>
       <%= f.input :post_id %>
+      <%= f.input :parent_id %>
+      <%= f.input :rating %>
+      <%= f.input :source_ilike, label: "Source", hint: "Use * for wildcard" %>
+      <%= f.input :version %>
+      <%= f.input :rating_changed, as: :select %>
+      <%= f.input :parent_changed, as: :select %>
+      <%= f.input :source_changed, as: :select %>
       <%= f.submit "Search" %>
     <% end %>
   </div>

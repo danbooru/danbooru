@@ -18,36 +18,12 @@ class PostArchive < ApplicationRecord
   end
 
   module SearchMethods
-    def for_user(user_id)
-      if user_id
-        where("updater_id = ?", user_id)
-      else
-        none
-      end
-    end
-
-    def for_user_name(name)
-      user_id = User.name_to_id(name)
-      for_user(user_id)
-    end
-
     def search(params)
       q = super
+      q = q.search_attributes(params, :updater_id, :post_id, :rating, :rating_changed, :parent_id, :parent_changed, :source, :source_changed, :version)
 
       if params[:updater_name].present?
-        q = q.for_user_name(params[:updater_name])
-      end
-
-      if params[:updater_id].present?
-        q = q.where(updater_id: params[:updater_id].split(",").map(&:to_i))
-      end
-
-      if params[:post_id].present?
-        q = q.where(post_id: params[:post_id].split(",").map(&:to_i))
-      end
-
-      if params[:start_id].present?
-        q = q.where("id <= ?", params[:start_id].to_i)
+        q = q.where(updater_id: User.name_to_id(params[:updater_name]))
       end
 
       q.apply_default_order(params)
