@@ -1,15 +1,13 @@
 @import "../base/000_vars.scss";
 
 div.comments-for-post {
-  div.notices {
-    margin: 1em 0;
-  }
-
   div.list-of-comments {
     article.comment {
+      display: flex;
       margin-bottom: 2em;
       word-wrap: break-word;
       padding: 5px;
+      flex: 1;
 
       &[data-is-sticky="true"] {
         background: var(--comment-sticky-background-color);
@@ -36,9 +34,7 @@ div.comments-for-post {
       }
 
       div.author {
-        width: 12em;
-        float: left;
-        overflow: hidden;
+        flex-basis: 12em;
         margin-right: 1em;
 
         h1 {
@@ -48,8 +44,7 @@ div.comments-for-post {
       }
 
       div.content {
-        margin-left: 13em;
-        min-width: 17em;
+        flex: 1;
 
         menu {
           li {
@@ -58,12 +53,6 @@ div.comments-for-post {
         }
       }
     }
-  }
-}
-
-div#c-posts {
-  div.comments-for-post {
-    float: left;
   }
 }
 
@@ -81,15 +70,6 @@ div#c-comments {
       div.notices {
         margin: 1em 0;
       }
-    }
-
-    div.preview {
-      float: left;
-      width: 154px;
-      height: 154px;
-      margin-right: 30px;
-      overflow: hidden;
-      text-align: center;
     }
 
     div.post-preview {
@@ -115,24 +95,19 @@ div#c-comments {
     }
 
     div.post {
+      display: flex;
       margin-bottom: 4em;
 
-      div.comments-for-post {
-        margin-left: 184px;
-        min-width: 30em;
-        
-        div.list-of-comments {
-          float: left;
-          width: 100%;
-        }
+      div.preview {
+        width: 154px;
+        height: 154px;
+        margin-right: 30px;
+        overflow: hidden;
+        text-align: center;
       }
-    }
-    
-    div.comments-for-post {
-      div.post {
-        article.comment {
-          margin-left: 184px;
-        }
+
+      div.comments-for-post {
+        flex: 1;
       }
     }
   }

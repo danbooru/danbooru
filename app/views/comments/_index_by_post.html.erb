@@ -16,7 +16,6 @@
           <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>
         </div>
         <%= render "comments/partials/index/list", post: post, comments: post.comments.visible(CurrentUser.user).last(6), page: :comments %>
-        <div class="clearfix"></div>
       <% end %>
     <% end %>
   <% end %>
