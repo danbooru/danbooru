@@ -5,51 +5,14 @@ class UserNameChangeRequestTest < ActiveSupport::TestCase
     setup do
       @admin = FactoryBot.create(:admin_user)
       @requester = FactoryBot.create(:user)
-      CurrentUser.user = @requester
-      CurrentUser.ip_addr = "127.0.0.1"
     end
 
-    teardown do
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
-    end
-    
-    context "approving a request" do
-      setup do
-        @change_request = UserNameChangeRequest.create(
-          :user_id => @requester.id,
-          :original_name => @requester.name,
-          :desired_name => "abc"
-        )
-        CurrentUser.user = @admin
-      end
-      
-      should "create a dmail" do
-        assert_difference("Dmail.count", 2) do
-          @change_request.approve!
-        end
-      end
-      
-      should "change the user's name" do
-        @change_request.approve!
-        @requester.reload
-        assert_equal("abc", @requester.name)
-      end
-      
-      should "create feedback" do
-        assert_difference("UserFeedback.count", 1) do
-          @change_request.approve!
-        end
-      end
-      
-      should "create mod action" do
-        assert_difference("ModAction.count", 1) do
-          @change_request.approve!
-        end
-      end
-    end
-    
     context "creating a new request" do
+      should "change the user's name" do
+        @change_request = create(:user_name_change_request, user_id: @requester.id, original_name: @requester.name, desired_name: "abc")
+        assert_equal("abc", @requester.reload.name)
+      end
+
       should "not validate if the desired name already exists" do
         assert_difference("UserNameChangeRequest.count", 0) do
           req = UserNameChangeRequest.create(
@@ -62,8 +25,7 @@ class UserNameChangeRequestTest < ActiveSupport::TestCase
       end
 
       should "not convert the desired name to lower case" do
-        uncr = FactoryBot.create(:user_name_change_request, user: @requester, original_name: "provence.", desired_name: "Provence")
-        CurrentUser.scoped(@admin) { uncr.approve! }
+        uncr = create(:user_name_change_request, user: @requester, original_name: "provence.", desired_name: "Provence")
 
         assert_equal("Provence", @requester.name)
       end
