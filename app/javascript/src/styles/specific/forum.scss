@@ -1,8 +1,12 @@
 div.list-of-forum-posts {
-  article {
+  article.forum-post {
     display: flex;
-    margin-top: 3em;
+    margin-top: 2em;
     word-wrap: break-word;
+
+    &:first-of-type {
+      margin-top: 1em;
+    }
 
     a.voted {
       font-weight: bold;
@@ -25,7 +29,8 @@ div.list-of-forum-posts {
     }
 
     div.author {
-      flex-basis: 13em;
+      flex-basis: 12em;
+      margin-right: 1em;
 
       time {
         font-style: italic;
@@ -40,8 +45,6 @@ div.list-of-forum-posts {
       }
 
       menu {
-        margin-top: 0.5em;
-
         ul.votes {
           margin: 0.5em 0;
         }
@@ -88,13 +91,14 @@ div#c-forum-topics {
     padding: 0 0.5em;
   }
 
-  div.list-of-forum-posts article {
+  div.list-of-forum-posts article.forum-post {
     display: block;
     margin-top: 1em;
     border: var(--forum-post-border);
 
     div.author {
-      padding: 1em 1em 0;
+      margin: 0;
+      padding: 1em;
       border-bottom: var(--forum-post-border);
       background: var(--forum-post-author-background);
     }

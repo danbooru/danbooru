@@ -1,13 +1,21 @@
 @import "../base/000_vars.scss";
 
 div.comments-for-post {
+  div.hidden-comments-notice {
+    margin: 1em 0;
+  }
+
   div.list-of-comments {
     article.comment {
       display: flex;
-      margin-bottom: 2em;
+      margin-top: 2em;
       word-wrap: break-word;
       padding: 5px;
       flex: 1;
+
+      &:first-of-type {
+        margin-top: 1em;
+      }
 
       &[data-is-sticky="true"] {
         background: var(--comment-sticky-background-color);
@@ -37,9 +45,8 @@ div.comments-for-post {
         flex-basis: 12em;
         margin-right: 1em;
 
-        h1 {
-          display: block;
-          font-size: $h3_size;
+        time {
+          font-style: italic;
         }
       }
 
@@ -65,10 +72,6 @@ div#c-comments {
 
       strong, time {
         margin-right: 0.3em;
-      }
-
-      div.notices {
-        margin: 1em 0;
       }
     }
 

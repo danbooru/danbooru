@@ -3,13 +3,13 @@
     <%= render "comments/partials/index/header", :post => post %>
   <% end %>
 
-  <div class="row notices">
-    <% if post.comments.hidden(CurrentUser.user).any? || (page == :comments && post.comments.size > 6) %>
+  <% if post.comments.hidden(CurrentUser.user).any? || (page == :comments && post.comments.size > 6) %>
+    <div class="row hidden-comments-notice">
       <span class="info" id="threshold-comments-notice-for-<%= post.id %>">
         <%= link_to "Show #{pluralize post.comments.hidden(CurrentUser.user).size, "hidden comment"}", comments_path(post_id: post.id), id: "show-all-comments-link", remote: true %>
       </span>
-    <% end %>
-  </div>
+    </div>
+  <% end %>
 
   <div class="list-of-comments">
     <% if comments.present? %>

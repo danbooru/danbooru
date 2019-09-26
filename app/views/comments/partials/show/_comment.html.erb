@@ -12,22 +12,19 @@
            data-below-threshold="<%= comment.score < CurrentUser.user.comment_threshold %>"
            data-is-voted="<%= comment.voted_by?(CurrentUser.user) %>">
     <div class="author">
-      <h1>
+      <h4>
         <%= link_to_user comment.creator %>
         <% if comment.is_deleted? %>
           (deleted)
         <% end %>
-      </h1>
-      <p>
-        <%= time_ago_in_words_tagged(comment.created_at) %>
-      </p>
+      </h4>
+      <%= time_ago_in_words_tagged(comment.created_at) %>
     </div>
     <div class="content">
       <div class="body prose">
         <%= format_text(comment.body) %>
-
-        <%= render "application/update_notice", record: comment %>
       </div>
+      <%= render "application/update_notice", record: comment %>
       
       <% if CurrentUser.is_member? %>
         <menu>
