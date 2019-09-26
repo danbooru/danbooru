@@ -3,7 +3,7 @@ class UserNameChangeRequest < ApplicationRecord
   belongs_to :approver, class_name: "User", optional: true
 
   validate :not_limited, on: :create
-  validates :desired_name, user_name: true
+  validates :desired_name, user_name: true, confirmation: true, on: :create
   validates_presence_of :original_name, :desired_name
 
   after_create :update_name!

@@ -9,7 +9,8 @@
     <%= error_messages_for "change_request" %>
 
     <%= simple_form_for(@change_request) do |f| %>
-      <%= f.input :desired_name %>
+      <%= f.input :desired_name, label: "Name" %>
+      <%= f.input :desired_name_confirmation, label: "Confirm name" %>
       <%= f.submit "Submit" %>
     <% end %>
   </div>

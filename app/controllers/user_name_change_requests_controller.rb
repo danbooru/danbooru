@@ -9,7 +9,7 @@ class UserNameChangeRequestsController < ApplicationController
 
   def create
     @change_request = UserNameChangeRequest.create_with(user: CurrentUser.user, original_name: CurrentUser.name).create(change_request_params)
-    flash[:notice] = "Your name has been changed"
+    flash[:notice] = "Your name has been changed" if @change_request.valid?
     respond_with(@change_request, location: profile_path)
   end
 
@@ -32,6 +32,6 @@ class UserNameChangeRequestsController < ApplicationController
   end
 
   def change_request_params
-    params.fetch(:user_name_change_request, {}).permit(%i[desired_name])
+    params.fetch(:user_name_change_request, {}).permit(%i[desired_name desired_name_confirmation])
   end
 end
