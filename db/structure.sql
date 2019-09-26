@@ -3010,13 +3010,9 @@ ALTER SEQUENCE public.user_feedback_id_seq OWNED BY public.user_feedback.id;
 
 CREATE TABLE public.user_name_change_requests (
     id integer NOT NULL,
-    status character varying DEFAULT 'pending'::character varying NOT NULL,
     user_id integer NOT NULL,
-    approver_id integer,
     original_name character varying,
     desired_name character varying,
-    change_reason text,
-    rejection_reason text,
     created_at timestamp without time zone,
     updated_at timestamp without time zone
 );
@@ -7340,6 +7336,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190908031103'),
 ('20190908035317'),
 ('20190919175836'),
-('20190923071044');
+('20190923071044'),
+('20190926000912');
 
 

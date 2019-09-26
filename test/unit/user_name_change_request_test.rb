@@ -19,7 +19,6 @@ class UserNameChangeRequestTest < ActiveSupport::TestCase
         @change_request = UserNameChangeRequest.create(
           :user_id => @requester.id,
           :original_name => @requester.name,
-          :status => "pending",
           :desired_name => "abc"
         )
         CurrentUser.user = @admin
@@ -50,37 +49,12 @@ class UserNameChangeRequestTest < ActiveSupport::TestCase
       end
     end
     
-    context "rejecting a request" do
-      setup do
-        @change_request = UserNameChangeRequest.create(
-          :user_id => @requester.id,
-          :original_name => @requester.name,
-          :status => "pending",
-          :desired_name => "abc"
-        )
-        CurrentUser.user = @admin
-      end
-      
-      should "create a dmail" do
-        assert_difference("Dmail.count", 1) do
-          @change_request.reject!("msg")
-        end
-      end
-      
-      should "preserve the username" do
-        @change_request.reject!("msg")
-        @requester.reload
-        assert_not_equal("abc", @requester.name)
-      end
-    end
-    
     context "creating a new request" do
       should "not validate if the desired name already exists" do
         assert_difference("UserNameChangeRequest.count", 0) do
           req = UserNameChangeRequest.create(
             :user_id => @requester.id,
             :original_name => @requester.name,
-            :status => "pending",
             :desired_name => @requester.name
           )
           assert_equal(["Desired name already exists"], req.errors.full_messages)

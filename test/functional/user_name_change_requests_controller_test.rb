@@ -5,16 +5,8 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
     setup do
       @user = create(:gold_user)
       @admin = create(:admin_user)
-      as(@user) do
-        @change_request = UserNameChangeRequest.create!(
-          :user_id => @user.id,
-          :original_name => @user.name,
-          :desired_name => "abc",
-          :change_reason => "hello"
-        )
-      end
     end
-    
+
     context "new action" do
       should "render" do
         get_auth new_user_name_change_request_path, @user
@@ -25,13 +17,19 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "work" do
         post_auth user_name_change_requests_path, @user, params: { user_name_change_request: { desired_name: "zun" }}
-        assert_response :success
+
+        assert_response :redirect
+        assert_equal("zun", @user.reload.name)
       end
     end
-    
+
     context "show action" do
+      setup do
+        @change_request = as(@user) { create(:user_name_change_request, user_id: @user.id) }
+      end
+
       should "render" do
-        get_auth user_name_change_request_path(@change_request), @user
+        get_auth user_name_change_request_path(@change_request), @admin
         assert_response :success
       end
 
@@ -43,26 +41,12 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
         end
       end
     end
-    
+
     context "for actions restricted to admins" do
       context "index action" do
         should "render" do
           get_auth user_name_change_requests_path, @admin
           assert_response :success
-        end
-      end
-      
-      context "approve action" do
-        should "succeed" do
-          post_auth approve_user_name_change_request_path(@change_request), @admin
-          assert_redirected_to(user_name_change_request_path(@change_request))
-        end
-      end
-      
-      context "reject action" do
-        should "succeed" do
-          post_auth reject_user_name_change_request_path(@change_request), @admin
-          assert_redirected_to(user_name_change_request_path(@change_request))
         end
       end
     end
