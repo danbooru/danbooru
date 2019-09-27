@@ -19,7 +19,7 @@ class PoolArchive < ApplicationRecord
     end
 
     def for_post_id(post_id)
-      where_array_includes(:added_post_ids, [post_id]).or(where_array_includes(:removed_post_ids, [post_id]))
+      where_array_includes_any(:added_post_ids, [post_id]).or(where_array_includes_any(:removed_post_ids, [post_id]))
     end
 
     def search(params)

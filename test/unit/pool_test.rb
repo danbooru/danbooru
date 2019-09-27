@@ -66,8 +66,8 @@ class PoolTest < ActiveSupport::TestCase
       @post1 = create(:post, tag_string: "pool:pool1")
       @post2 = create(:post, tag_string: "pool:pool2")
 
-      assert_equal([@pool1.id], Pool.search(post_ids_include: @post1.id).pluck(:id))
-      assert_equal([@pool2.id, @pool1.id], Pool.search(post_ids_include: "#{@post1.id} #{@post2.id}").pluck(:id))
+      assert_equal([@pool1.id], Pool.search(post_ids_include_any: @post1.id).pluck(:id))
+      assert_equal([@pool2.id, @pool1.id], Pool.search(post_ids_include_any: "#{@post1.id} #{@post2.id}").pluck(:id))
     end
 
     should "find pools by post id count" do

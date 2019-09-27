@@ -7,7 +7,7 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
 
   context "The post versions controller" do
     context "index action" do
-      setup do        
+      setup do
         @user.as_current do
           @post = create(:post)
           travel(2.hours) do
@@ -33,6 +33,17 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
         get_auth post_versions_path, @user, params: {:search => {:post_id => @post.id}}
         assert_response :success
         assert_select "#post-version-#{@post2.versions[0].id}", false
+      end
+
+      should "list all versions for search[changed_tags]" do
+        get post_versions_path, as: :json, params: { search: { changed_tags: "1" }}
+        assert_response :success
+        assert_equal @versions[1].id, response.parsed_body[1]["id"].to_i
+        assert_equal @versions[2].id, response.parsed_body[0]["id"].to_i
+
+        get post_versions_path, as: :json, params: { search: { changed_tags: "1 2" }}
+        assert_response :success
+        assert_equal @versions[1].id, response.parsed_body[0]["id"].to_i
       end
     end
   end

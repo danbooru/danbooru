@@ -39,8 +39,12 @@ class ApplicationRecord < ActiveRecord::Base
         where.not("#{qualified_column_for(attr)} ~ ?", "(?e)" + value)
       end
 
-      def where_array_includes(attr, values)
+      def where_array_includes_any(attr, values)
         where("#{qualified_column_for(attr)} && ARRAY[?]", values)
+      end
+
+      def where_array_includes_all(attr, values)
+        where("#{qualified_column_for(attr)} @> ARRAY[?]", values)
       end
 
       def where_array_count(attr, value)
@@ -100,6 +104,10 @@ class ApplicationRecord < ActiveRecord::Base
         column = column_for_attribute(name)
         type = column.type || reflect_on_association(name)&.class_name
 
+        if column.array?
+          return search_array_attribute(name, type, params)
+        end
+
         case type
         when "User"
           search_user_attribute(name, params)
@@ -110,11 +118,7 @@ class ApplicationRecord < ActiveRecord::Base
         when :boolean
           search_boolean_attribute(name, params)
         when :integer, :datetime
-          if column.array?
-            search_array_attribute(name, type, params)
-          else
-            numeric_attribute_matches(name, params[name])
-          end
+          numeric_attribute_matches(name, params[name])
         else
           raise NotImplementedError, "unhandled attribute type"
         end
@@ -173,9 +177,16 @@ class ApplicationRecord < ActiveRecord::Base
       def search_array_attribute(name, type, params)
         relation = all
 
-        if params[:"#{name}_include"] && type == :integer
-          items = params[:"#{name}_include"].to_s.scan(/\d+/).map(&:to_i)
-          relation = relation.where_array_includes(name, items)
+        if params[:"#{name}_include_any"]
+          items = params[:"#{name}_include_any"].to_s.scan(/[^[:space:]]+/)
+          items = items.map(&:to_i) if type == :integer
+
+          relation = relation.where_array_includes_any(name, items)
+        elsif params[:"#{name}_include_all"]
+          items = params[:"#{name}_include_any"].to_s.scan(/[^[:space:]]+/)
+          items = items.map(&:to_i) if type == :integer
+
+          relation = relation.where_array_includes_all(name, items)
         end
 
         if params[:"#{name.to_s.singularize}_count"]

@@ -18,9 +18,23 @@ class PostArchive < ApplicationRecord
   end
 
   module SearchMethods
+    def changed_tags_include(tag)
+      where_array_includes_all(:added_tags, [tag]).or(where_array_includes_all(:removed_tags, [tag]))
+    end
+
+    def changed_tags_include_all(tags)
+      tags.reduce(all) do |relation, tag|
+        relation.changed_tags_include(tag)
+      end
+    end
+
     def search(params)
       q = super
-      q = q.search_attributes(params, :updater_id, :post_id, :rating, :rating_changed, :parent_id, :parent_changed, :source, :source_changed, :version)
+      q = q.search_attributes(params, :updater_id, :post_id, :tags, :added_tags, :removed_tags, :rating, :rating_changed, :parent_id, :parent_changed, :source, :source_changed, :version)
+
+      if params[:changed_tags]
+        q = q.changed_tags_include_all(params[:changed_tags].scan(/[^[:space:]]+/))
+      end
 
       if params[:updater_name].present?
         q = q.where(updater_id: User.name_to_id(params[:updater_name]))
