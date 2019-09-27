@@ -816,7 +816,7 @@ class Tag < ApplicationRecord
     def order_similarity(name)
       # trunc(3 * sim) reduces the similarity score from a range of 0.0 -> 1.0 to just 0, 1, or 2.
       # This groups tags first by approximate similarity, then by largest tags within groups of similar tags.
-      order(Arel.sql("trunc(3 * similarity(name, #{connection.quote(name)})) DESC", "post_count DESC", "name DESC"))
+      order(Arel.sql("trunc(3 * similarity(name, #{connection.quote(name)})) DESC"), "post_count DESC", "name DESC")
     end
 
     # ref: https://www.postgresql.org/docs/current/static/pgtrgm.html#idm46428634524336

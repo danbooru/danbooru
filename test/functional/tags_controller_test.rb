@@ -27,6 +27,13 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
           get tags_path, params: {:search => {:name_matches => "touhou"}}
           assert_response :success
         end
+
+        should "work for search[fuzzy_name_matches]" do
+          get tags_path, as: :json, params: { search: { fuzzy_name_matches: "touhuo", order: "similarity" }}
+
+          assert_response :success
+          assert_equal "touhou", response.parsed_body.first["name"]
+        end
       end
 
       context "with blank search parameters" do
