@@ -1,7 +1,7 @@
 <div id="c-tags">
-  <div id="a-index">
+  <div id="a-index" class="fixed-width-container">
     <%= render "search" %>
-    <table class="striped">
+    <table class="striped autofit">
       <thead>
         <tr>
           <th>Count</th>
@@ -13,14 +13,15 @@
         <% @tags.each do |tag| %>
           <tr>
             <td><%= tag.post_count %></td>
-            <td class="category-<%= tag.category %>">
+            <td class="category-<%= tag.category %> col-expand">
               <%= link_to("?", show_or_new_wiki_pages_path(:title => tag.name)) %>
               <%= link_to(tag.name, posts_path(:tags => tag.name)) %>
             </td>
             <td>
-              <% if tag.editable_by?(CurrentUser.user) %>
-                <%= link_to "edit", edit_tag_path(tag) %>
-              <% end %>
+              <%= link_to_if tag.editable_by?(CurrentUser.user), "edit", edit_tag_path(tag) %> |
+              <%= link_to "history", post_versions_path(search: { changed_tags: tag.name }) %> |
+              <%= link_to "related", related_tag_path(search: { query: tag.name }) %> |
+              <%= link_to "similar", tags_path(search: { fuzzy_name_matches: tag.name, order: :similarity }) %>
             </td>
           </tr>
         <% end %>

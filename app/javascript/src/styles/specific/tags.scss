@@ -1,13 +1,7 @@
 div#c-tags {
   div#a-index table.striped {
     td:nth-child(1), th:nth-child(1) {
-      width: 5em;
       text-align: right;
-    }
-
-    td:nth-child(2), th:nth-child(2) {
-      padding-left: 1em;
-      width: 40em;
     }
   }
 }
