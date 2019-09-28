@@ -45,15 +45,10 @@
     padding: 0 0.25vw;
     > div /* div#c-$controller */ {
       > div /* div#a-$action */ {
-        display: flex;
-        flex-direction: column;
 
         /* Move #sidebar below #content. */
         > aside#sidebar {
           font-size: 1.5em;
-          float: none;
-          width: auto;
-          order: 2;
         }
       }
     }

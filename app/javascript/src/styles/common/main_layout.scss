@@ -6,9 +6,6 @@ div#page {
   padding: 0 10px;
 
   aside#sidebar {
-    width: 15em;
-    float: left;
-
     h1 {
       font-size: $h3_size;
     }
@@ -24,8 +21,6 @@ div#page {
 
   section#content {
     overflow: visible;
-    margin-left: 15em;
-    padding-left: 1em;
   }
 }
 
@@ -40,4 +35,24 @@ footer#page-footer {
 
 div.clearfix {
   clear: both;
+}
+
+.sidebar-container {
+  display: flex;
+
+  #sidebar {
+    flex-basis: 15em;
+  }
+
+  #content {
+    flex: 1;
+    padding-left: 1em;
+  }
+
+  @media (max-width: 660px) {
+    flex-direction: column;
+
+    #content { order: 1; }
+    #sidebar { order: 2; }
+  }
 }
