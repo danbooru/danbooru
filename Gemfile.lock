@@ -1,13 +1,4 @@
 GIT
-  remote: https://github.com/abronte/BigQuery.git
-  revision: b92b4e0b54574e3fde7ad910f39a67538ed387ad
-  ref: b92b4e0b54574e3fde7ad910f39a67538ed387ad
-  specs:
-    bigquery (0.9.0)
-      google-api-client (~> 0.9.3)
-      googleauth (~> 0.5.0)
-
-GIT
   remote: https://github.com/r888888888/dtext_rb.git
   revision: 073b369bf90217ab86fdef3d0f88a96e10343d37
   specs:
@@ -465,7 +456,6 @@ DEPENDENCIES
   awesome_print
   aws-sdk (~> 2)
   bcrypt
-  bigquery!
   bootsnap
   builder
   capistrano (~> 3.10)

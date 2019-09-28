@@ -157,7 +157,6 @@
 
         <% if CurrentUser.is_moderator? %>
           <li><%= link_to("IP Bans", ip_bans_path) %></li>
-          <li><%= link_to("Bulk Revert", new_moderator_bulk_revert_path) %></li>
         <% end %>
 
         <% if CurrentUser.is_admin? %>

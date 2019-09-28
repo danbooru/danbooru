@@ -50,7 +50,7 @@ class ModAction < ApplicationRecord
     ip_ban_create: 160,
     ip_ban_delete: 162,
     mass_update: 1000,
-    bulk_revert: 1001,
+    bulk_revert: 1001, # XXX unused
     other: 2000
   }
 
