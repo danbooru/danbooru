@@ -244,8 +244,6 @@ Rails.application.routes.draw do
   resource :related_tag, :only => [:show, :update]
   get "reports/uploads" => "reports#uploads"
   get "reports/upload_tags" => "reports#upload_tags"
-  get "reports/post_versions" => "reports#post_versions"
-  post "reports/post_versions_create" => "reports#post_versions_create"
   get "reports/down_voting_post" => "reports#down_voting_post"
   post "reports/down_voting_post_create" => "reports#down_voting_post_create"
   resource :recommended_posts, only: [:show]
@@ -300,7 +298,6 @@ Rails.application.routes.draw do
     end
   end
   resources :user_name_change_requests, only: [:new, :create, :show, :index]
-  resource :user_revert, :only => [:new, :create]
   resources :wiki_pages do
     member do
       put :revert

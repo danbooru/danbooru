@@ -94,9 +94,6 @@
         <th>Post Changes</th>
         <td>
           <%= presenter.post_version_count(self) %>
-          <% if CurrentUser.is_moderator? && UserRevert.can_revert?(user)%>
-            (<%= link_to "revert all", new_user_revert_path(user_id: user.id) %>)
-          <% end %>
           <% if CurrentUser.id == user.id %> 
             (<%= link_to "refresh", new_maintenance_user_count_fixes_path %>)
           <% end %>
