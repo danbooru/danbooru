@@ -1,24 +1,20 @@
-<div id="c-wiki-page-versions">
-  <div id="a-show">
-    <%= render "wiki_pages/sidebar" %>
+<%= render "wiki_pages/sidebar" %>
 
-    <section id="content">
-      <h1 id="wiki-page-title"><%= @wiki_page_version.pretty_title %></h1>
-      <p class="fineprint"><%= time_ago_in_words_tagged(@wiki_page_version.updated_at) %></p>
+<% content_for(:content) do %>
+  <h1 id="wiki-page-title"><%= @wiki_page_version.pretty_title %></h1>
+  <p class="fineprint"><%= time_ago_in_words_tagged(@wiki_page_version.updated_at) %></p>
 
-      <div id="wiki-page-body" class="dtext prose">
-        <% if @wiki_page_version.visible? %>
-          <% if @wiki_page_version.other_names.present? %>
-            <p><%= wiki_page_other_names_list(@wiki_page_version) %></p>
-          <% end %>
+  <div id="wiki-page-body" class="dtext prose">
+    <% if @wiki_page_version.visible? %>
+      <% if @wiki_page_version.other_names.present? %>
+        <p><%= wiki_page_other_names_list(@wiki_page_version) %></p>
+      <% end %>
 
-          <%= format_text(@wiki_page_version.body) %>
-        <% else %>
-          <p>The artist has requested removal of this page.</p>
-        <% end %>
-      </div>
-    </section>
+      <%= format_text(@wiki_page_version.body) %>
+    <% else %>
+      <p>The artist has requested removal of this page.</p>
+    <% end %>
   </div>
-</div>
+<% end %>
 
 <%= render "wiki_pages/secondary_links" %>

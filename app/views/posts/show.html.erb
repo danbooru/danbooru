@@ -1,155 +1,151 @@
-<div id="c-posts">
-  <div id="a-show">
-    <aside id="sidebar">
-      <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:q], :tags_dom_id => "tags" %>
+<% content_for(:sidebar) do %>
+  <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:q], :tags_dom_id => "tags" %>
 
-      <%= render "posts/partials/index/blacklist" %>
+  <%= render "posts/partials/index/blacklist" %>
 
-      <section id="tag-list">
-        <%= @post.presenter.split_tag_list_html(current_query: params[:q], show_extra_links: CurrentUser.user.is_gold?) %>
-      </section>
+  <section id="tag-list">
+    <%= @post.presenter.split_tag_list_html(current_query: params[:q], show_extra_links: CurrentUser.user.is_gold?) %>
+  </section>
 
-      <section id="post-information">
-        <h1>Information</h1>
-        <%= render "posts/partials/show/information", :post => @post %>
-      </section>
+  <section id="post-information">
+    <h1>Information</h1>
+    <%= render "posts/partials/show/information", :post => @post %>
+  </section>
 
-      <section id="post-share">
-        <h1>Share</h1>
-        <%= render "posts/partials/show/share", :post => @post %>
-      </section>
+  <section id="post-share">
+    <h1>Share</h1>
+    <%= render "posts/partials/show/share", :post => @post %>
+  </section>
 
-      <section id="post-options">
-        <h1>Options</h1>
-        <%= render "posts/partials/show/options", :post => @post %>
-      </section>
+  <section id="post-options">
+    <h1>Options</h1>
+    <%= render "posts/partials/show/options", :post => @post %>
+  </section>
 
-      <section id="post-history">
-        <h1>History</h1>
-        <ul>
-          <li id="post-history-tags"><%= link_to "Tags", post_versions_path(search: { post_id: @post.id }) %></li>
-          <li id="post-history-pools"><%= link_to "Pools", pool_versions_path(search: { post_id: @post.id }) %></li>
-          <li id="post-history-notes"><%= link_to "Notes", note_versions_path(search: { post_id: @post.id }) %></li>
-          <li id="post-history-moderation"><%= link_to "Moderation", post_events_path(@post.id) %></li>
-          <li id="post-history-commentary"><%= link_to "Commentary", artist_commentary_versions_path(search: { post_id: @post.id }) %></li>
-          <li id="post-history-replacements"><%= link_to "Replacements", post_replacements_path(search: {post_id: @post.id }) %></li>
-        </ul>
-      </section>
-    </aside>
+  <section id="post-history">
+    <h1>History</h1>
+    <ul>
+      <li id="post-history-tags"><%= link_to "Tags", post_versions_path(search: { post_id: @post.id }) %></li>
+      <li id="post-history-pools"><%= link_to "Pools", pool_versions_path(search: { post_id: @post.id }) %></li>
+      <li id="post-history-notes"><%= link_to "Notes", note_versions_path(search: { post_id: @post.id }) %></li>
+      <li id="post-history-moderation"><%= link_to "Moderation", post_events_path(@post.id) %></li>
+      <li id="post-history-commentary"><%= link_to "Commentary", artist_commentary_versions_path(search: { post_id: @post.id }) %></li>
+      <li id="post-history-replacements"><%= link_to "Replacements", post_replacements_path(search: {post_id: @post.id }) %></li>
+    </ul>
+  </section>
+<% end %>
 
-    <section id="content">
-      <% if @post.presenter.has_nav_links?(self) %>
-        <%= render "posts/partials/show/nav_links", :post => @post, :position => "top" %>
-      <% end %>
+<% content_for(:content) do %>
+  <% if @post.presenter.has_nav_links?(self) %>
+    <%= render "posts/partials/show/nav_links", :post => @post, :position => "top" %>
+  <% end %>
 
-      <%= render "posts/partials/show/notices", :post => @post %>
+  <%= render "posts/partials/show/notices", :post => @post %>
 
-      <%= content_tag(:section, { id: "image-container" }.merge(PostPresenter.data_attributes(@post))) do -%>
-        <div id="note-container"></div>
-        <div id="note-preview"></div>
-        <%= render "posts/partials/show/embedded", post: @post %>
-      <% end -%>
-
-      <% if CurrentUser.is_member? %>
-        <%= content_tag(:div, class: "fav-buttons fav-buttons-#{@post.is_favorited?}") do %>
-          <%= form_tag(favorites_path(post_id: @post.id), method: "post", id: "add-fav-button", "data-remote": true) do %>
-            <%= button_tag tag.i(class: "far fa-heart"), class: "ui-button ui-widget ui-corner-all", "data-disable-with": tag.i(class: "fas fa-spinner fa-spin") %>
-          <% end %>
-
-          <%= form_tag(favorite_path(@post.id), method: "delete", id: "remove-fav-button", "data-remote": true) do %>
-            <%= button_tag tag.i(class: "fas fa-heart"), class: "ui-button ui-widget ui-corner-all", "data-disable-with": tag.i(class: "fas fa-spinner fa-spin") %>
-          <% end %>
-        <% end %>
-      <% end %>
-
-      <section id="mark-as-translated-section" style="display: none;">
-        <%= form_tag(mark_as_translated_post_path(@post), :class => "simple_form", :method => :put) do |f| %>
-          <%= hidden_field_tag :tags_query, params[:q] %>
-          <%= hidden_field_tag :pool_id, params[:pool_id] %>
-
-          <fieldset>
-            <label for="post_check_translation">
-              <%= check_box "post", "check_translation", :checked => @post.has_tag?("check_translation") %>
-              Check translation
-            </label>
-
-            <label for="post_partially_translated">
-              <%= check_box "post", "partially_translated", :checked => @post.has_tag?("partially_translated") %>
-              Partially translated
-            </label>
-          </fieldset>
-
-          <div class="input">
-            <%= submit_tag "Mark as translated" %>
-          </div>
-        <% end %>
-      </section>
-
-      <% if @post.artist_commentary && @post.artist_commentary.any_field_present? %>
-        <div id="artist-commentary">
-          <%= render "artist_commentaries/show", :artist_commentary => @post.artist_commentary %>
-        </div>
-      <% end %>
-
-      <% if @post.presenter.has_nav_links?(self) %>
-        <%= render "posts/partials/show/nav_links", :post => @post, :position => "bottom" %>
-      <% end %>
-
-      <menu id="post-sections">
-        <li class="active"><a href="#comments">Comments</a></li>
-
-        <% if RecommenderService.available_for_post?(@post) %>
-          <li><a href="#recommended">Recommended</a></li>
-        <% end %>
-
-        <% if CurrentUser.is_member? && @post.visible? %>
-          <li><a href="#edit" id="post-edit-link" data-shortcut="e">Edit</a></li>
-        <% end %>
-      </menu>
-
-      <% if RecommenderService.available_for_post?(@post) %>
-        <section id="recommended" style="display: none;">
-          <p><em>Loading...</em></p>
-        </section>
-      <% end %>
-
-      <section id="comments">
-        <% if !CurrentUser.user.is_builder? %>
-          <h2>Before commenting, read the <%= link_to "how to comment guide", wiki_pages_path(:search => {:title => "howto:comment"}) %>.</h2>
-        <% end %>
-        <%= render "comments/partials/index/list", comments: @comments, post: @post, page: :post %>
-      </section>
-
-      <section id="notes" style="display: none;">
-        <% if @post.has_notes? %>
-          <% cache("p/#{@post.id}/n/#{@post.last_noted_at.to_i}") do %>
-            <%= render :partial => "notes/note", :collection => @post.notes.active %>
-          <% end %>
-        <% end %>
-      </section>
-
-      <% if CurrentUser.is_member? && @post.visible? %>
-        <section id="edit" style="display: none;">
-          <%= render "posts/partials/show/edit", :post => @post %>
-        </section>
-      <% end %>
-    </section>
-  </div>
+  <%= content_tag(:section, { id: "image-container" }.merge(PostPresenter.data_attributes(@post))) do -%>
+    <div id="note-container"></div>
+    <div id="note-preview"></div>
+    <%= render "posts/partials/show/embedded", post: @post %>
+  <% end -%>
 
   <% if CurrentUser.is_member? %>
-    <div id="add-to-pool-dialog" title="Add to pool" style="display: none;">
-      <%= render "pool_elements/new" %>
-    </div>
+    <%= content_tag(:div, class: "fav-buttons fav-buttons-#{@post.is_favorited?}") do %>
+      <%= form_tag(favorites_path(post_id: @post.id), method: "post", id: "add-fav-button", "data-remote": true) do %>
+        <%= button_tag tag.i(class: "far fa-heart"), class: "ui-button ui-widget ui-corner-all", "data-disable-with": tag.i(class: "fas fa-spinner fa-spin") %>
+      <% end %>
 
-    <div id="add-commentary-dialog" title="Add artist commentary" style="display: none;">
-      <%= render "artist_commentaries/form", :post => @post %>
-    </div>
+      <%= form_tag(favorite_path(@post.id), method: "delete", id: "remove-fav-button", "data-remote": true) do %>
+        <%= button_tag tag.i(class: "fas fa-heart"), class: "ui-button ui-widget ui-corner-all", "data-disable-with": tag.i(class: "fas fa-spinner fa-spin") %>
+      <% end %>
+    <% end %>
+  <% end %>
 
-    <div id="add-to-favgroup-dialog" title="Add to favorite group" style="display: none;">
-      <%= render "favorite_groups/add_to_favgroup_dialog", :post => @post %>
+  <section id="mark-as-translated-section" style="display: none;">
+    <%= form_tag(mark_as_translated_post_path(@post), :class => "simple_form", :method => :put) do |f| %>
+      <%= hidden_field_tag :tags_query, params[:q] %>
+      <%= hidden_field_tag :pool_id, params[:pool_id] %>
+
+      <fieldset>
+        <label for="post_check_translation">
+          <%= check_box "post", "check_translation", :checked => @post.has_tag?("check_translation") %>
+          Check translation
+        </label>
+
+        <label for="post_partially_translated">
+          <%= check_box "post", "partially_translated", :checked => @post.has_tag?("partially_translated") %>
+          Partially translated
+        </label>
+      </fieldset>
+
+      <div class="input">
+        <%= submit_tag "Mark as translated" %>
+      </div>
+    <% end %>
+  </section>
+
+  <% if @post.artist_commentary && @post.artist_commentary.any_field_present? %>
+    <div id="artist-commentary">
+      <%= render "artist_commentaries/show", :artist_commentary => @post.artist_commentary %>
     </div>
   <% end %>
-</div>
+
+  <% if @post.presenter.has_nav_links?(self) %>
+    <%= render "posts/partials/show/nav_links", :post => @post, :position => "bottom" %>
+  <% end %>
+
+  <menu id="post-sections">
+    <li class="active"><a href="#comments">Comments</a></li>
+
+    <% if RecommenderService.available_for_post?(@post) %>
+      <li><a href="#recommended">Recommended</a></li>
+    <% end %>
+
+    <% if CurrentUser.is_member? && @post.visible? %>
+      <li><a href="#edit" id="post-edit-link" data-shortcut="e">Edit</a></li>
+    <% end %>
+  </menu>
+
+  <% if RecommenderService.available_for_post?(@post) %>
+    <section id="recommended" style="display: none;">
+      <p><em>Loading...</em></p>
+    </section>
+  <% end %>
+
+  <section id="comments">
+    <% if !CurrentUser.user.is_builder? %>
+      <h2>Before commenting, read the <%= link_to "how to comment guide", wiki_pages_path(:search => {:title => "howto:comment"}) %>.</h2>
+    <% end %>
+    <%= render "comments/partials/index/list", comments: @comments, post: @post, page: :post %>
+  </section>
+
+  <section id="notes" style="display: none;">
+    <% if @post.has_notes? %>
+      <% cache("p/#{@post.id}/n/#{@post.last_noted_at.to_i}") do %>
+        <%= render :partial => "notes/note", :collection => @post.notes.active %>
+      <% end %>
+    <% end %>
+  </section>
+
+  <% if CurrentUser.is_member? && @post.visible? %>
+    <section id="edit" style="display: none;">
+      <%= render "posts/partials/show/edit", :post => @post %>
+    </section>
+  <% end %>
+<% end %>
+
+<% if CurrentUser.is_member? %>
+  <div id="add-to-pool-dialog" title="Add to pool" style="display: none;">
+    <%= render "pool_elements/new" %>
+  </div>
+
+  <div id="add-commentary-dialog" title="Add artist commentary" style="display: none;">
+    <%= render "artist_commentaries/form", :post => @post %>
+  </div>
+
+  <div id="add-to-favgroup-dialog" title="Add to favorite group" style="display: none;">
+    <%= render "favorite_groups/add_to_favgroup_dialog", :post => @post %>
+  </div>
+<% end %>
 
 <%= post_view_count_js %>
 

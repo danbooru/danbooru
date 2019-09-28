@@ -1,19 +1,15 @@
-<div id="c-wiki-page-versions">
-  <div id="a-index">
-    <%= render "wiki_pages/sidebar" %>
+<%= render "wiki_pages/sidebar" %>
 
-    <section id="content">
-      <h1>Wiki Page History</h1>
+<% content_for(:content) do %>
+  <h1>Wiki Page History</h1>
 
-      <% if params.dig(:search, :wiki_page_id).present? %>
-        <%= render "page_listing" %>
-      <% else %>
-        <%= render "global_listing" %>
-      <% end %>
+  <% if params.dig(:search, :wiki_page_id).present? %>
+    <%= render "page_listing" %>
+  <% else %>
+    <%= render "global_listing" %>
+  <% end %>
 
-      <%= numbered_paginator(@wiki_page_versions) %>
-    </section>
-  </div>
-</div>
+  <%= numbered_paginator(@wiki_page_versions) %>
+<% end %>
 
 <%= render "wiki_pages/secondary_links" %>

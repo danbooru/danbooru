@@ -187,6 +187,7 @@ module ApplicationHelper
       data: {
         controller: controller_param,
         action: action_param,
+        layout: controller.class.send(:_layout),
         **data_attributes_for(user, "user", attributes)
       }
     }

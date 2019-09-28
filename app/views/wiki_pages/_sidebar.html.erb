@@ -1,4 +1,4 @@
-<aside id="sidebar">
+<% content_for(:sidebar) do %>
   <%= render "posts/partials/index/blacklist" %>
   <%= render "wiki_pages/recent_changes" %>
-</aside>
+<% end %>

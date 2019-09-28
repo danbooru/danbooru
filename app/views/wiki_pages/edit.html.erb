@@ -1,17 +1,13 @@
-<div id="c-wiki-pages">
-  <div id="a-edit">
-    <%= render "sidebar" %>
+<%= render "sidebar" %>
 
-    <section id="content">
-      <h1>Edit Wiki</h1>
+<% content_for(:content) do %>
+  <h1>Edit Wiki</h1>
 
-      <% if @wiki_page.visible? %>
-        <%= render "form" %>
-      <% else %>
-        <p>The artist requested removal of this page.</p>
-      <% end %>
-    </section>
-  </div>
-</div>
+  <% if @wiki_page.visible? %>
+    <%= render "form" %>
+  <% else %>
+    <p>The artist requested removal of this page.</p>
+  <% end %>
+<% end %>
 
 <%= render "secondary_links" %>

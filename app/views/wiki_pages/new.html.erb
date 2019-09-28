@@ -1,26 +1,17 @@
-<div id="c-wiki-pages">
-  <div id="a-new">
-    <%= render "sidebar" %>
+<%= render "sidebar" %>
 
-    <section id="content">
-      <h1>New Wiki Page</h1>
+<% content_for(:content) do %>
+  <h1>New Wiki Page</h1>
 
-      <% if @wiki_page.title.present? %>
-        <div class="notice notice-info notice-small" id="new-wiki-page-notice">
-          This wiki page does not yet exist. The form below will allow you to create a new page for <%= @wiki_page.title %>. It will act as an explanation on how to use the tag for other users on the site.
-        </div>
-      <% end %>
+  <% if @wiki_page.title.present? %>
+    <div class="notice notice-info notice-small" id="new-wiki-page-notice">
+      This wiki page does not yet exist. The form below will allow you to create a new page for <%= @wiki_page.title %>. It will act as an explanation on how to use the tag for other users on the site.
+    </div>
+  <% end %>
 
-      <%= render "form" %>
-
-      <%= wiki_page_alias_and_implication_list(@wiki_page)%>
-
-      <%= wiki_page_post_previews(@wiki_page) %>
-
-      <div class="clearfix"></div>
-
-    </section>
-  </div>
-</div>
+  <%= render "form" %>
+  <%= wiki_page_alias_and_implication_list(@wiki_page)%>
+  <%= wiki_page_post_previews(@wiki_page) %>
+<% end %>
 
 <%= render "secondary_links" %>

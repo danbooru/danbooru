@@ -3,7 +3,8 @@ class WikiPagesController < ApplicationController
   before_action :member_only, :except => [:index, :search, :show, :show_or_new]
   before_action :builder_only, :only => [:destroy]
   before_action :normalize_search_params, :only => [:index]
-  
+  layout "sidebar"
+
   def new
     @wiki_page = WikiPage.new(wiki_page_params(:create))
     respond_with(@wiki_page)
@@ -30,6 +31,7 @@ class WikiPagesController < ApplicationController
   end
 
   def search
+    render layout: "default"
   end
 
   def show

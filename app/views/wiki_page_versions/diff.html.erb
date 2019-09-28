@@ -1,18 +1,18 @@
-<div id="c-wiki-page-versions">
-  <div id="a-diff">
-    <h1>Wiki Page: <%= @thispage.title %></h1>
+<%= render "wiki_pages/sidebar" %>
 
-    <% if @thispage.visible? %>
-      <p>Showing differences between <%= compact_time @thispage.updated_at %> (<%= link_to_user @thispage.updater %>) and <%= compact_time @otherpage.updated_at %> (<%= link_to_user @otherpage.updater %>)</p>
+<% content_for(:content) do %>
+  <h1>Wiki Page: <%= @thispage.title %></h1>
 
-      <div>
-        <%= wiki_page_diff(@thispage, @otherpage) %>
-      </div>
-    <% else %>
-      <p>The artist requested removal of this page.</p>
-    <% end %>
-  </div>
-</div>
+  <% if @thispage.visible? %>
+    <p>Showing differences between <%= compact_time @thispage.updated_at %> (<%= link_to_user @thispage.updater %>) and <%= compact_time @otherpage.updated_at %> (<%= link_to_user @otherpage.updater %>)</p>
+
+    <div>
+      <%= wiki_page_diff(@thispage, @otherpage) %>
+    </div>
+  <% else %>
+    <p>The artist requested removal of this page.</p>
+  <% end %>
+<% end %>
 
 <%= render "wiki_pages/secondary_links" %>
 

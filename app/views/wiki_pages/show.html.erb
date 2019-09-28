@@ -1,43 +1,38 @@
-<div id="c-wiki-pages">
-  <div id="a-show">
-    <%= render "sidebar" %>
+<%= render "sidebar" %>
 
-    <section id="content">
-      <h1 id="wiki-page-title">
+<% content_for(:content) do %>
+  <h1 id="wiki-page-title">
+    <%= link_to @wiki_page.pretty_title, posts_path(:tags => @wiki_page.title), :class => "tag-type-#{@wiki_page.category_name}" %>
 
-        <%= link_to @wiki_page.pretty_title, posts_path(:tags => @wiki_page.title), :class => "tag-type-#{@wiki_page.category_name}" %>
+    <% if @wiki_page.is_locked? %>
+      (locked)
+    <% end %>
 
-        <% if @wiki_page.is_locked? %>
-          (locked)
-        <% end %>
+    <% if @wiki_page.is_deleted? %>
+      (deleted)
+    <% end %>
+  </h1>
 
-        <% if @wiki_page.is_deleted? %>
-          (deleted)
-        <% end %>
-      </h1>
+  <div id="wiki-page-body" class="prose">
+    <% if @wiki_page.visible? %>
+      <% if @wiki_page.other_names.present? %>
+        <p><%= wiki_page_other_names_list(@wiki_page) %></p>
+      <% end %>
 
-      <div id="wiki-page-body" class="prose">
-        <% if @wiki_page.visible? %>
-          <% if @wiki_page.other_names.present? %>
-            <p><%= wiki_page_other_names_list(@wiki_page) %></p>
-          <% end %>
+      <%= format_text(@wiki_page.body) %>
 
-          <%= format_text(@wiki_page.body) %>
+      <% if @wiki_page.artist %>
+        <p><%= link_to "View artist", @wiki_page.artist %></p>
+      <% end %>
 
-          <% if @wiki_page.artist %>
-            <p><%= link_to "View artist", @wiki_page.artist %></p>
-          <% end %>
-
-          <%= wiki_page_alias_and_implication_list(@wiki_page) %>
-        <% else %>
-          <p>This artist has requested removal of their information.</p>
-        <% end %>
-      </div>
-
-        <%= wiki_page_post_previews(@wiki_page) %>
-    </section>
+      <%= wiki_page_alias_and_implication_list(@wiki_page) %>
+    <% else %>
+      <p>This artist has requested removal of their information.</p>
+    <% end %>
   </div>
-</div>
+
+  <%= wiki_page_post_previews(@wiki_page) %>
+<% end %>
 
 <% content_for(:page_title) do %>
   Wiki - <%= @wiki_page.pretty_title %> - <%= Danbooru.config.app_name %>

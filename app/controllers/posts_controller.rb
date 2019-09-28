@@ -1,6 +1,7 @@
 class PostsController < ApplicationController
   before_action :member_only, :except => [:show, :show_seq, :index, :home, :random]
   respond_to :html, :xml, :json
+  layout "sidebar"
 
   def index
     if params[:md5].present?
