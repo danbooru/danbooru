@@ -4,4 +4,7 @@
   <%= subnav_link_to "Search", search_post_versions_path %>
   <%= subnav_link_to "Changes", post_versions_path %>
   <%= subnav_link_to "Help", wiki_pages_path(:title => "help:posts") %>
+  <% if params[:action] == "index" %>
+    | <%= subnav_link_to "Undo selected", "" %>
+  <% end %>
 <% end %>

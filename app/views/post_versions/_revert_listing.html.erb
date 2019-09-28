@@ -2,6 +2,11 @@
   <table class="striped autofit">
     <thead>
       <tr>
+        <% if CurrentUser.user.is_builder? %>
+          <th class="post-version-select-column">
+            <label><input type="checkbox" id="post-version-select-all-checkbox" class="post-version-select-checkbox"></label>
+          </th>
+        <% end %>
         <th width="5%">Post</th>
         <th width="15%">Date</th>
         <th width="10%">User</th>
@@ -18,7 +23,12 @@
     </thead>
     <tbody>
       <% @post_versions.each do |post_version| %>
-        <tr id="post-version-<%= post_version.id %>">
+        <tr id="post-version-<%= post_version.id %>" data-post-version-id="<%= post_version.id %>">
+          <% if CurrentUser.user.is_builder? %>
+            <td class="post-version-select-column">
+              <input type="checkbox" class="post-version-select-checkbox" <%= "disabled" unless post_version.can_undo?(CurrentUser.user) %>>
+            </td>
+          <% end %>
           <td><%= link_to("#{post_version.post_id}.#{post_version.id}", post_path(post_version.post_id)) %></td>
           <td><%= compact_time(post_version.updated_at) %></td>
           <td>
@@ -34,16 +44,14 @@
             </td>
           <% end %>
           <td class="col-expand"><%= post_version_diff(post_version) %></td>
-          <% if CurrentUser.is_member? %>
-            <td>
-              <% if post_version.visible? %>
-                <% if post_version.version != 1 %>
-                  <%= link_to "Undo", undo_post_version_path(post_version), :method => :put, :remote => true %> |
-                <% end %>
-                <%= link_to "Revert to", revert_post_path(post_version.post_id, :version_id => post_version.id), :method => :put, :remote => true %>
-              <% end %>
-            </td>
-          <% end %>
+          <td>
+            <% if post_version.can_undo?(CurrentUser.user) %>
+              <%= link_to "Undo", undo_post_version_path(post_version), method: :put, remote: true, class: "post-version-undo-link" %> |
+            <% end %>
+            <% if post_version.can_revert_to?(CurrentUser.user) %>
+              <%= link_to "Revert to", revert_post_path(post_version.post_id, version_id: post_version.id), method: :put, remote: true %>
+            <% end %>
+          </td>
         </tr>
       <% end %>
     </tbody>
