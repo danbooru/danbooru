@@ -10,6 +10,7 @@
   --error-background-color: hsl(0, 100%, 95%); /* light red */
   --success-background-color: hsl(120, 100%, 95%); /* light green */
   --warning-background-color: hsl(50, 100%, 93%); /* light yellow */
+  --target-background: #FFC;
 
   --subnav-menu-background-color: #F5F5FF;
 
@@ -65,7 +66,6 @@
   --forum-vote-up-color: green;
   --forum-vote-meh-color: goldrenrod;
   --forum-vote-down-color: red;
-  --forum-post-highlight-background-color: #FFC;
 
   --comment-sticky-background-color: var(--subnav-menu-background-color);
 
@@ -335,7 +335,6 @@ body[data-user-theme="dark"] {
   --forum-vote-up-color: var(--green-1);
   --forum-vote-meh-color: var(--yellow-1);
   --forum-vote-down-color: var(--red-1);
-  --forum-post-highlight-background-color: var(--blue-0);
 
   --jquery-ui-widget-content-text-color: var(--text-color);
   --jquery-ui-widget-content-background: var(--grey-2);
@@ -418,6 +417,8 @@ body[data-user-theme="dark"] {
   --related-tags-container-background: var(--grey-3);
   --selected-related-tag-background-color: var(--link-color);
   --selected-related-tag-color: white;
+
+  --target-background: var(--blue-0);
 
   --tag-count-indicator-frown-color: var(--red-1);
   --tag-count-indicator-meh-color: var(--yellow-1);

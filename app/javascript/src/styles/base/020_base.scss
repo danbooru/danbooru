@@ -89,6 +89,11 @@ input[type="button"], input[type="submit"], button {
   padding-left: 0.5em;
 }
 
+/* Highlight link anchor targets (e.g. /forum_topics/123#forum_post_456). Use !important to override even table row backgrounds. */
+:target {
+  background: var(--target-background) !important;
+}
+
 menu {
   margin: 0;
   padding: 0;

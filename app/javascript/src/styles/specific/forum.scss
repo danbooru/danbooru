@@ -12,10 +12,6 @@ div.list-of-forum-posts {
       font-weight: bold;
     }
 
-    &:target {
-      background-color: var(--forum-post-highlight-background-color);
-    }
-
     .vote-score-up {
       color: var(--forum-vote-up-color);
     }
