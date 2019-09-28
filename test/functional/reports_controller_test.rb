@@ -17,13 +17,6 @@ class ReportsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    context "post_versions action" do
-      should "render" do
-        get_auth reports_post_versions_path, @mod
-        assert_response :success
-      end
-    end
-
     context "upload_tags action" do
       should "render" do
         get reports_upload_tags_path(user_id: @users.first)

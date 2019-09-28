@@ -1,17 +1,10 @@
 class ReportsController < ApplicationController
   before_action :member_only, :except => [:upload_tags]
-  before_action :moderator_only, :only => [:post_versions, :post_versions_create, :down_voting_post_report, :down_voting_post_report_create]
+  before_action :moderator_only, :only => [:down_voting_post_report, :down_voting_post_report_create]
   respond_to :html, :xml, :json, only: [:upload_tags]
 
   def uploads
     @report = Reports::Uploads.new(params[:min_date], params[:max_date], params[:queries])
-  end
-
-  def post_versions
-  end
-
-  def post_versions_create
-    @report = Reports::PostVersions.new(params[:tag], params[:type])
   end
 
   def upload_tags
