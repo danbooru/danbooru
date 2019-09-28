@@ -58,6 +58,13 @@ article.post-preview {
   }
 }
 
+/* Avoid dead space around thumbnails in tables. */
+table article.post-preview {
+  height: auto;
+  width: auto;
+  margin: 0;
+}
+
 #saved-searches-nav {
   margin-top: 1em;
 }
