@@ -5,9 +5,9 @@
     <%= search_form_for(post_versions_path) do |f| %>
       <%= f.input :updated_at, label: "Date" %>
       <%= f.input :updater_name, label: "Updater", input_html: { "data-autocomplete": "user" } %>
-      <%= f.input :changed_tags_include_all, label: "Changed tags" %>
-      <%= f.input :added_tags_include_all, label: "Added tags" %>
-      <%= f.input :removed_tags_include_all, label: "Removed tags" %>
+      <%= f.input :changed_tags_include_all, label: "Changed tags", input_html: { "data-autocomplete": "tag-query" } %>
+      <%= f.input :added_tags_include_all, label: "Added tags", input_html: { "data-autocomplete": "tag-query" } %>
+      <%= f.input :removed_tags_include_all, label: "Removed tags", input_html: { "data-autocomplete": "tag-query" } %>
       <%= f.input :post_id %>
       <%= f.input :parent_id %>
       <%= f.input :rating %>

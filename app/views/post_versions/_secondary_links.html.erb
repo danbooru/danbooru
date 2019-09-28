@@ -1,4 +1,5 @@
 <% content_for(:secondary_links) do %>
+  <%= quick_search_form_for(:changed_tags, post_versions_path, "versions", autocomplete: "tag-query") %>
   <%= subnav_link_to "Listing", posts_path %>
   <%= subnav_link_to "Upload", new_upload_path %>
   <%= subnav_link_to "Search", search_post_versions_path %>
