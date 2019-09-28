@@ -104,7 +104,7 @@ class ApplicationRecord < ActiveRecord::Base
         column = column_for_attribute(name)
         type = column.type || reflect_on_association(name)&.class_name
 
-        if column.array?
+        if column.try(:array?)
           return search_array_attribute(name, type, params)
         end
 
