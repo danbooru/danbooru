@@ -1,4 +1,8 @@
 module PostVersionsHelper
+  def post_version_listing
+    params.dig(:search, :post_id).present? ? :revert : :standard
+  end
+
   def post_version_diff(post_version)
     diff = post_version.diff(post_version.previous)
     html = '<span class="diff-list">'
