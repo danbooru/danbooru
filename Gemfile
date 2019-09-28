@@ -25,7 +25,6 @@ gem 'twitter'
 gem 'aws-sdk', '~> 2'
 gem 'responders'
 gem 'dtext_rb', :git => "https://github.com/r888888888/dtext_rb.git", :require => "dtext"
-gem 'google-api-client'
 gem 'cityhash'
 gem 'memoist'
 gem 'daemons'
