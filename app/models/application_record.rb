@@ -183,7 +183,7 @@ class ApplicationRecord < ActiveRecord::Base
 
           relation = relation.where_array_includes_any(name, items)
         elsif params[:"#{name}_include_all"]
-          items = params[:"#{name}_include_any"].to_s.scan(/[^[:space:]]+/)
+          items = params[:"#{name}_include_all"].to_s.scan(/[^[:space:]]+/)
           items = items.map(&:to_i) if type == :integer
 
           relation = relation.where_array_includes_all(name, items)

@@ -1,5 +1,9 @@
 <div id="p-<%= post_version_listing %>-listing">
-  <table class="striped autofit">
+  <% if post_version_listing == :revert %>
+    <%= PostPresenter.preview(@post_versions.first.post, show_deleted: true) %>
+  <% end %>
+
+  <table id="post-versions-table" class="striped autofit">
     <thead>
       <tr>
         <% if CurrentUser.user.is_builder? %>
@@ -33,7 +37,7 @@
           <td class="col-expand"><%= post_version_diff(post_version) %></td>
           <td>
             <%= link_to_user post_version.updater %>
-            <%= link_to "»", post_versions_path(search: { updater_name: post_version.updater&.name }) %>
+            <%= link_to "»", post_versions_path(search: params[:search].merge({ updater_name: post_version.updater&.name })) %>
             <div>
               <%= compact_time(post_version.updated_at) %>
               <% if CurrentUser.is_moderator? %>

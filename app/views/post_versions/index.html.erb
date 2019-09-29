@@ -1,10 +1,19 @@
 <div id="c-post-versions">
   <div id="a-index">
-    <% if post_version_listing == :revert %>
+    <% if post_version_listing == :revert && @post_versions.present? %>
       <h1>Tag History: <%= link_to "Post ##{params.dig(:search, :post_id)}", @post_versions[0].post %></h1>
-      <%= PostPresenter.preview(@post_versions[0].post, show_deleted: true) %>
     <% else %>
       <h1>Tag History</h1>
+    <% end %>
+
+    <%= search_form_for(post_versions_path, classes: "inline-form") do |f| %>
+      <%= f.input :post_id, label: "Post", input_html: { value: params.dig(:search, :post_id) } %>
+      <%= f.input :updater_name, label: "Updater", input_html: { "data-autocomplete": "user", value: params.dig(:search, :updater_name) } %>
+      <%= f.input :added_tags_include_all, label: "Added Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :added_tags_include_all) } %>
+      <%= f.input :removed_tags_include_all, label: "Removed Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :removed_tags_include_all) } %>
+      <%= f.input :changed_tags, label: "Changed Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :changed_tags) } %>
+      <%= f.submit "Search" %>
+      <%= link_to "Advanced", search_post_versions_path, class: "advanced-search-link" %>
     <% end %>
 
     <%= render "posts/partials/common/inline_blacklist" %>
