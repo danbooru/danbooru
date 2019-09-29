@@ -1,7 +1,7 @@
 <div id="c-forum-topics">
   <div id="a-show">
     <h1>
-      Topic: <%= @forum_topic.title %>
+      <%= @forum_topic.title %>
 
       <% if @forum_topic.min_level >= User::Levels::MODERATOR %>
         <span class="level-topic">(<%= User.level_string(@forum_topic.min_level).downcase %>+ only)</span>
@@ -24,7 +24,7 @@
 
     <% if CurrentUser.is_member? %>
       <% if CurrentUser.is_moderator? || !@forum_topic.is_locked? %>
-        <p><%= link_to "Reply &raquo;".html_safe, new_forum_post_path(:topic_id => @forum_topic.id), :id => "new-response-link" %></p>
+        <p><%= link_to "Post reply", new_forum_post_path(topic_id: @forum_topic.id), id: "new-response-link" %></p>
 
         <div style="display: none;" id="topic-response">
           <%= render "forum_posts/partials/new/form", :forum_post => ForumPost.new(:topic_id => @forum_topic.id) %>
@@ -39,7 +39,7 @@
 <%= render "secondary_links" %>
 
 <% content_for(:page_title) do %>
-  Forum - <%= @forum_topic.title %> - <%= Danbooru.config.app_name %>
+  <%= @forum_topic.title %> - Forum - <%= Danbooru.config.app_name %>
 <% end %>
 
 <% content_for(:html_header) do %>
