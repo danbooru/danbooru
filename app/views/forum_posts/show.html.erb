@@ -1,8 +1,0 @@
-<div id="c-forum-posts">
-  <div id="a-show" class="single-forum-post list-of-forum-posts list-of-messages">
-    <h1>Topic: <%= @forum_post.topic.title %></h1>
-    <%= render "forum_post", :forum_post => @forum_post, :original_forum_post_id => @forum_post.topic.original_post.id %>
-  </div>
-</div>
-
-<%= render "forum_topics/secondary_links" %>

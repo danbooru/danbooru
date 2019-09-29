@@ -15,8 +15,10 @@ div.list-of-messages {
       flex-basis: 12em;
       margin-right: 1em;
 
-      time {
+      a.message-timestamp {
         font-style: italic;
+        color: var(--text-color);
+        &:hover { text-decoration: underline; }
       }
     }
 
@@ -25,7 +27,8 @@ div.list-of-messages {
 
       menu {
         li {
-          margin-right: 1em;
+          padding: 0;
+          margin-right: 1.5em;
         }
       }
     }
@@ -42,7 +45,7 @@ div.list-of-messages {
           margin-right: 0.5em;
         }
 
-        time {
+        a.message-timestamp {
           display: inline;
           color: var(--muted-text-color);
           font-size: 0.8em;

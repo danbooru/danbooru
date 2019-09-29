@@ -110,7 +110,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         @comment = create(:comment, post: @post)
         get comment_path(@comment.id)
-        assert_response :success
+        assert_redirected_to post_path(@comment.post, anchor: "comment_#{@comment.id}")
       end
     end
 

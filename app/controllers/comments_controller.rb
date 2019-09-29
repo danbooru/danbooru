@@ -50,7 +50,12 @@ class CommentsController < ApplicationController
 
   def show
     @comment = Comment.find(params[:id])
-    respond_with(@comment)
+
+    respond_with(@comment) do |format|
+      format.html do
+        redirect_to post_path(@comment.post, anchor: "comment_#{@comment.id}")
+      end
+    end
   end
 
   def destroy

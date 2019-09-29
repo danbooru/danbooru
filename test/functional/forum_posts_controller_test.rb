@@ -110,6 +110,11 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response 403
       end
+
+      should "redirect to the forum topic" do
+        get forum_post_path(@forum_post)
+        assert_redirected_to forum_topic_path(@forum_post.topic, anchor: "forum_post_#{@forum_post.id}")
+      end
     end
 
     context "edit action" do
