@@ -1,7 +1,7 @@
 <div id="c-comments">
   <div id="a-show">
     <div class="comments-for-post">
-      <div class="list-of-comments">
+      <div class="list-of-comments list-of-messages">
         <%= content_tag(:div, { id: "post_#{@comment.post_id}", class: ["post", *PostPresenter.preview_class(@comment.post)].join(" ") }.merge(PostPresenter.data_attributes(@comment.post))) do %>
           <div class="preview">
             <% if @comment.post.visible? %>

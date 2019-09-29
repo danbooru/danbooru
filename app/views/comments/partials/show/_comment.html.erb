@@ -1,6 +1,6 @@
 <% if CurrentUser.is_moderator? || (params[:search] && params[:search][:is_deleted] =~ /t/) || !comment.is_deleted? %>
   <a name="comment-<%= comment.id %>"></a>
-  <article class="comment"
+  <article class="comment message"
            data-id="<%= comment.id %>"
            data-post-id="<%= comment.post_id %>"
            data-creator-id="<%= comment.creator_id %>"

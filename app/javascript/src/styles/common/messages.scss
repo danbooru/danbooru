@@ -1,0 +1,53 @@
+div.list-of-messages {
+  margin: 1em 0;
+
+  article.message {
+    display: flex;
+    margin-top: 2em;
+    word-wrap: break-word;
+    padding: 5px;
+
+    &:first-of-type {
+      margin-top: 1em;
+    }
+
+    div.author {
+      flex-basis: 12em;
+      margin-right: 1em;
+
+      time {
+        font-style: italic;
+      }
+    }
+
+    div.content {
+      flex: 1;
+
+      menu {
+        li {
+          margin-right: 1em;
+        }
+      }
+    }
+
+    @media (max-width: 660px) {
+      display: block;
+      margin-top: 3em;
+
+      div.author {
+        margin: 0 0 1em;
+
+        h4 {
+          display: inline;
+          margin-right: 0.5em;
+        }
+
+        time {
+          display: inline;
+          color: var(--muted-text-color);
+          font-size: 0.8em;
+        }
+      }
+    }
+  }
+}

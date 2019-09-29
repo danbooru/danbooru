@@ -7,15 +7,7 @@ div.comments-for-post {
 
   div.list-of-comments {
     article.comment {
-      display: flex;
-      margin-top: 2em;
-      word-wrap: break-word;
-      padding: 5px;
       flex: 1;
-
-      &:first-of-type {
-        margin-top: 1em;
-      }
 
       &[data-is-sticky="true"] {
         background: var(--comment-sticky-background-color);
@@ -38,25 +30,6 @@ div.comments-for-post {
 
         &:hover {
           opacity: 1.0;
-        }
-      }
-
-      div.author {
-        flex-basis: 12em;
-        margin-right: 1em;
-
-        time {
-          font-style: italic;
-        }
-      }
-
-      div.content {
-        flex: 1;
-
-        menu {
-          li {
-            margin-right: 1em;
-          }
         }
       }
     }
@@ -126,27 +99,6 @@ form.edit_comment div.input.boolean {
 }
 
 @media screen and (max-width: 660px) {
-  div.comments-for-post div.list-of-comments article.comment {
-    display: block;
-    margin-top: 3em;
-    padding: 5px;
-
-    div.author {
-      margin: 0 0 1em;
-
-      h4 {
-        display: inline;
-        margin-right: 0.5em;
-      }
-
-      time {
-        display: inline;
-        color: var(--muted-text-color);
-        font-size: 0.8em;
-      }
-    }
-  }
-
   div#c-comments div#a-index, div#c-comments div#a-show {
     margin: 0 0.5em;
 
@@ -170,9 +122,5 @@ form.edit_comment div.input.boolean {
         }
       }
     }
-  }
-
-  div.new-comment {
-    margin: 1em 0;
   }
 }

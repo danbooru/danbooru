@@ -1,5 +1,5 @@
 <div id="p-index-by-comment" class="comments-for-post">
-  <div class="list-of-comments">
+  <div class="list-of-comments list-of-messages">
     <% @comments.each do |comment| %>
       <% if CurrentUser.is_moderator? || (params[:search] && params[:search][:is_deleted] =~ /t/) || !comment.is_deleted? %>
         <%= content_tag(:div, { id: "post_#{comment.post.id}", class: ["post", *PostPresenter.preview_class(comment.post)].join(" ") }.merge(PostPresenter.data_attributes(comment.post))) do %>

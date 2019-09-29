@@ -11,7 +11,7 @@
     </div>
   <% end %>
 
-  <div class="list-of-comments">
+  <div class="list-of-comments list-of-messages">
     <% if comments.present? %>
       <%= render partial: "comments/partials/show/comment", collection: comments %>
     <% elsif post.last_commented_at.present? %>

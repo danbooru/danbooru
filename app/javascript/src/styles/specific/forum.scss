@@ -1,13 +1,5 @@
 div.list-of-forum-posts {
   article.forum-post {
-    display: flex;
-    margin-top: 2em;
-    word-wrap: break-word;
-
-    &:first-of-type {
-      margin-top: 1em;
-    }
-
     a.voted {
       font-weight: bold;
     }
@@ -24,18 +16,7 @@ div.list-of-forum-posts {
       color: var(--forum-vote-down-color);
     }
 
-    div.author {
-      flex-basis: 12em;
-      margin-right: 1em;
-
-      time {
-        font-style: italic;
-      }
-    }
-
     div.content {
-      flex: 1;
-
       .edit_forum_post, .edit_forum_topic {
         display: none;
       }
@@ -43,10 +24,6 @@ div.list-of-forum-posts {
       menu {
         ul.votes {
           margin: 0.5em 0;
-        }
-
-        li {
-          margin-right: 1em;
         }
       }
     }
@@ -85,25 +62,5 @@ div#c-forum-topics {
 @media screen and (max-width: 660px) {
   #c-forum-topics #a-show {
     padding: 0 0.5em;
-  }
-
-  div.list-of-forum-posts article.forum-post {
-    display: block;
-    margin-top: 3em;
-
-    div.author {
-      margin: 0 0 1em;
-
-      h4 {
-        display: inline;
-        margin-right: 0.5em;
-      }
-
-      time {
-        display: inline;
-        color: var(--muted-text-color);
-        font-size: 0.8em;
-      }
-    }
   }
 }
