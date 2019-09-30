@@ -17,7 +17,6 @@
   --responsive-menu-background-color: var(--link-hover-color);
   --responsive-sidebar-submit-button-background-color: #EEE;
   --responsive-sidebar-submit-button-border: 1px solid rgb(197, 197, 197);
-  --responsive-form-input-border: 1px solid #c5c5c5;
 
   --form-input-text-color: var(--text-color);
   --form-input-background: var(--body-background-color);
