@@ -9,7 +9,7 @@ FavoriteGroup.initialize_all = function() {
 FavoriteGroup.initialize_add_to_favgroup_dialog = function() {
   $("#add-to-favgroup-dialog").dialog({
     autoOpen: false,
-    width: 500,
+    width: 700,
     buttons: {
       "Cancel": function() {
         $(this).dialog("close");

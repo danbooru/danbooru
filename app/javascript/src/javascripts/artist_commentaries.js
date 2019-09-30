@@ -31,7 +31,7 @@ ArtistCommentary.initialize_commentary_display_tabs = function() {
 ArtistCommentary.initialize_edit_commentary_dialog = function() {
   $("#add-commentary-dialog").dialog({
     autoOpen: false,
-    width: 500,
+    width: 700,
     buttons: {
       "Submit": function() {
         $("#add-commentary-dialog #edit-commentary").submit();
