@@ -6,12 +6,12 @@
   &ndash; <%= link_to "Rules", terms_of_service_path %>
   &ndash; <%= link_to "Contact", contact_path %>
   <% if CurrentUser.user.enable_post_navigation %>
-    <span id="keyboard-shortcuts-link">
+    <span id="keyboard-shortcuts-link" class="desktop-only">
       &ndash; <%= link_to "Keyboard shortcuts", keyboard_shortcuts_path %>
     </span>
   <% end %>
   <% if CurrentUser.is_member? %>
-    <span id="desktop-version-link">
+    <span id="desktop-version-link" class="mobile-only">
       &ndash;
       <%= link_to "Disable responsive mode", edit_user_path(CurrentUser.id), :rel => "nofollow" %>
     </span>

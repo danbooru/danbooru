@@ -1,26 +1,6 @@
 @import "../base/000_vars.scss";
 
-#desktop-version-link {
-  display: none;
-}
-
-#searchbox-redirect-link {
-  display: none;
-}
-
 @media screen and (max-width: 660px) {
-  #keyboard-shortcuts-link {
-    display: none;
-  }
-
-  #desktop-version-link {
-    display: inline;
-  }
-
-  #searchbox-redirect-link {
-    display: inline;
-  }
-
   #saved-searches-nav {
     display: none;
   }
