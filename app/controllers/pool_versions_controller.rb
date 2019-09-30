@@ -1,6 +1,7 @@
 class PoolVersionsController < ApplicationController
   respond_to :html, :xml, :json
   before_action :check_availabililty
+  around_action :set_timeout
 
   def index
     if params[:search] && params[:search][:pool_id].present?
@@ -22,6 +23,13 @@ class PoolVersionsController < ApplicationController
   end
 
 private
+
+  def set_timeout
+    PoolArchive.connection.execute("SET statement_timeout = #{CurrentUser.user.statement_timeout}")
+    yield
+  ensure
+    PoolArchive.connection.execute("SET statement_timeout = 0")
+  end
 
   def check_availabililty
     if !PoolArchive.enabled?
