@@ -22,6 +22,10 @@
     "eslint-plugin-ignore-erb": "^0.1.1",
     "webpack-dev-server": "^3.8.0"
   },
+  "browserslist": [
+    "defaults",
+    "since 2012"
+  ],
   "scripts": {
     "lint": "yarn run eslint --plugin eslint-plugin-ignore-erb --ext .js,.js.erb app/javascript/src/javascripts"
   }
