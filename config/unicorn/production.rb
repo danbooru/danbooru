@@ -2,7 +2,7 @@
 app_path = "/var/www/danbooru2/current"
 
 # Set unicorn options
-worker_processes 16
+worker_processes 20
 
 timeout 180
 #listen "127.0.0.1:9000", :tcp_nopush => true
