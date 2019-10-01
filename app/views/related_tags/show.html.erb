@@ -4,7 +4,7 @@
 
     <%= search_form_for(related_tag_path) do |f| %>
       <%= f.input :query, label: "Tag", input_html: { value: params[:search][:query], "data-autocomplete": "tag" } %>
-      <%= f.input :category, collection: TagCategory.canonical_mapping, include_blank: true, selected: params[:search][:category] %>
+      <%= f.input :category, collection: TagCategory.categories.map(&:capitalize), include_blank: true, selected: params[:search][:category] %>
       <%= f.submit "Show" %>
     <% end %>
 
