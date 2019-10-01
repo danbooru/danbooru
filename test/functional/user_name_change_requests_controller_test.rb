@@ -45,8 +45,11 @@ class UserNameChangeRequestsControllerTest < ActionDispatch::IntegrationTest
     context "for actions restricted to admins" do
       context "index action" do
         should "render" do
-          get_auth user_name_change_requests_path, @admin
+          post_auth user_name_change_requests_path, @user, params: { user_name_change_request: { desired_name: "zun", desired_name_confirmation: "zun" }}
+          get user_name_change_requests_path
+
           assert_response :success
+          assert_select "table tbody tr", 1
         end
       end
     end

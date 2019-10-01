@@ -12,7 +12,7 @@ class UserNameChangeRequest < ApplicationRecord
     if viewer.is_admin?
       all
     elsif viewer.is_member?
-      joins(:user).merge(User.undeleted).where("user_name_change_requests.user_id = ?", viewer.id)
+      where(user: User.undeleted)
     else
       none
     end
