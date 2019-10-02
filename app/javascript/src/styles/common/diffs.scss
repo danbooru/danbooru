@@ -18,9 +18,7 @@
   .removed.obsolete, .removed.obsolete a {
     color: var(--diff-list-obsolete-removed-color);
   }
-}
 
-.diff-list {
   ins, ins a {
     color: var(--diff-list-added-color);
     text-decoration: none;

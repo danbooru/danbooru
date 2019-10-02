@@ -9,14 +9,14 @@ $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
   }
 
   &::-webkit-scrollbar-button {
-    width: 0px;
-    height: 0px;
+    width: 0;
+    height: 0;
   }
 
   &::-webkit-scrollbar-thumb {
     background: var(--post-tooltip-scrollbar-background);
     border: none;
-    border-radius: 0px;
+    border-radius: 0;
   }
 
   &::-webkit-scrollbar-thumb:hover {
@@ -30,7 +30,7 @@ $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
   &::-webkit-scrollbar-track {
     background: var(--post-tooltip-scrollbar-track-background);
     border: none;
-    border-radius: 0px;
+    border-radius: 0;
   }
 
   &::-webkit-scrollbar-track:hover {
@@ -45,7 +45,6 @@ $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
     background: transparent;
   }
 }
-
 
 .post-tooltip {
   max-width: $tooltip-width;

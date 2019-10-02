@@ -26,7 +26,7 @@
   --form-button-background: #EEE;
   --form-button-border: var(--form-input-border);
   --form-button-hover-background: #F5F5F5;
-  --form-button-hover-box-shadow: 0px 0px 2px grey;
+  --form-button-hover-box-shadow: 0 0 2px grey;
   --form-button-active-background: #DDD;
   --form-button-active-border: var(--form-button-border);
   --form-button-active-color: var(--form-button-text-color);
@@ -73,10 +73,10 @@
   --post-tooltip-header-background-color: var(--subnav-menu-background-color);
   --post-tooltip-info-color: #555;
   --post-tooltip-scrollbar-background: #999999;
-  --post-tooltip-scrollbar-border: 0px none white;
+  --post-tooltip-scrollbar-border: 0 none white;
   --post-tooltip-scrollbar-thumb-color: #AAAAAA;
   --post-tooltip-scrollbar-track-background: #EEEEEE;
-  --post-tooltip-scrollbar-track-border: 0px none white;
+  --post-tooltip-scrollbar-track-border: 0 none white;
 
   --preview-current-post-background: rgba(0, 0, 0, 0.1);
 
@@ -213,9 +213,6 @@
   --selected-related-tag-color: white;
 }
 
-body[data-user-theme="light"] {
-}
-
 /* variables that aren't defined in the dark theme fall back to the :root theme */
 body[data-user-theme="dark"] {
   --grey-1:   #1f202c; /* hsluv(265, 15, 12.50); */
@@ -324,7 +321,7 @@ body[data-user-theme="dark"] {
   --form-button-background: var(--grey-5);
   --form-button-border: 1px solid var(--grey-4);
   --form-button-hover-background: white;
-  --form-button-hover-box-shadow: 0px 0px 2px var(--grey-5);
+  --form-button-hover-box-shadow: 0 0 2px var(--grey-5);
   --form-button-active-background: var(--grey-5);
   --form-button-active-border: 1px solid var(--grey-5);
   --form-button-active-color: white;
@@ -337,7 +334,7 @@ body[data-user-theme="dark"] {
 
   --jquery-ui-widget-content-text-color: var(--text-color);
   --jquery-ui-widget-content-background: var(--grey-2);
-  --jquery-ui-dialog-box-shadow: 0px 0px 8px var(--grey-1);
+  --jquery-ui-dialog-box-shadow: 0 0 8px var(--grey-1);
 
   --keyboard-shortcut-color: var(--text-color);
   --keyboard-shortcut-background-color: var(--grey-2);

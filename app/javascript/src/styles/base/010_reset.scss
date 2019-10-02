@@ -17,8 +17,8 @@ h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, cite, cod
   margin: 0;
   padding: 0;
   border: 0;
-/*  font-weight: normal;*/
-/*  font-style: normal;*/
+  /*  font-weight: normal;*/
+  /*  font-style: normal;*/
   font-size: 100%;
   line-height: 1.25em;
   font-family: inherit;
@@ -33,7 +33,7 @@ ol, ul {
   list-style: none;
 }
 
-q:before, q:after, blockquote:before, blockquote:after {
+q::before, q::after, blockquote::before, blockquote::after {
   content: "";
 }
 

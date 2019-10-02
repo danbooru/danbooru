@@ -4,9 +4,11 @@
   0% {
     transform:scale(1);
   }
+
   50% {
     transform:scale(1.3);
   }
+
   100% {
     transform:scale(1);
   }
@@ -41,19 +43,19 @@ article.post-preview {
   }
 
   .desc {
-   font-size: 80%;
-   margin-bottom: 0;
+    font-size: 80%;
+    margin-bottom: 0;
   }
 
   img {
     margin: auto;
   }
 
-  &[data-tags~=animated]:before, &[data-file-ext=swf]:before, &[data-file-ext=webm]:before, &[data-file-ext=mp4]:before, &[data-file-ext=zip]:before {
+  &[data-tags~=animated]::before, &[data-file-ext=swf]::before, &[data-file-ext=webm]::before, &[data-file-ext=mp4]::before, &[data-file-ext=zip]::before {
     @include animated-icon;
   }
 
-  &[data-has-sound=true]:before {
+  &[data-has-sound=true]::before {
     @include sound-icon;
   }
 }
@@ -89,11 +91,10 @@ table article.post-preview {
   &.post-status-has-parent img {
     border-color: var(--preview-has-parent-color);
   }
-  
+
   &.post-status-has-children.post-status-has-parent img {
     border-color: var(--preview-has-children-color) var(--preview-has-parent-color) var(--preview-has-parent-color) var(--preview-has-children-color);
   }
-
 
   &.post-status-deleted img {
     border-color: var(--preview-deleted-color);
@@ -110,7 +111,6 @@ table article.post-preview {
   &.post-status-has-children.post-status-has-parent.post-status-deleted img {
     border-color: var(--preview-has-children-color) var(--preview-deleted-color) var(--preview-deleted-color) var(--preview-has-parent-color);
   }
-
 
   /* Pending and flagged posts have blue borders (except in the modqueue). */
   &.post-status-pending:not(.mod-queue-preview) img,
@@ -160,7 +160,7 @@ body[data-user-can-approve-posts="true"] .post-preview {
 #has-parent-relationship-preview, #has-children-relationship-preview {
   overflow-x: auto;
   white-space: nowrap;
-  
+
   article.post-preview {
     width: auto;
     border: none;
@@ -280,13 +280,13 @@ div#c-posts {
     display: flex;
 
     input {
-      min-width: 0px;
+      min-width: 0;
     }
 
     #search-box-submit {
       padding: 2px 6px;
       border-left: none;
-      border-radius: 0px;
+      border-radius: 0;
     }
   }
 
@@ -421,7 +421,7 @@ div#c-posts {
 div#c-post-versions, div#c-artist-versions {
   div#a-index {
     a {
-      word-wrap: break-word
+      word-wrap: break-word;
     }
   }
 }
