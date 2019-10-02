@@ -1,13 +1,6 @@
 div#c-moderator-dashboards {
-  div#col1 {
-    width: 45%;
-    float: left;
-    padding-right: 5%;
-  }
-
-  div#col2 {
-    width: 45%;
-    float: left;
+  #column-left {
+    margin-right: 2em;
   }
 
   div.activity {

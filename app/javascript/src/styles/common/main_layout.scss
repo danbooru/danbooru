@@ -25,16 +25,11 @@ div#page {
 }
 
 footer#page-footer {
-  clear: both;
   width: 100%;
   margin-top: 1em;
   text-align: center;
   padding: 1em 0 1em;
   border-top: var(--footer-border);
-}
-
-div.clearfix {
-  clear: both;
 }
 
 .sidebar-container {

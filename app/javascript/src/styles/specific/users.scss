@@ -4,16 +4,6 @@ div#c-users {
       margin-bottom: 2em;
     }
 
-    /* clearfix hacks */
-    div.box:before, div.box:after {
-      content: "";
-      display: table;
-    }
-
-    div.box:after {
-      clear: both;
-    }
-
     table.user-statistics {
       tr {
         height: 1.75em;

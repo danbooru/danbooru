@@ -128,6 +128,13 @@ table tfoot {
   max-width: 70em;
 }
 
+.column-container {
+  display: flex;
+
+  .column-expand { flex: 1; }
+  .column-shrink { flex: 0; }
+}
+
 ul.list-bulleted {
   list-style: inside disc;
 }
