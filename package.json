@@ -20,6 +20,8 @@
     "eslint": "^6.0.0",
     "eslint-loader": "^2.2.0",
     "eslint-plugin-ignore-erb": "^0.1.1",
+    "stylelint": "^11.0.0",
+    "stylelint-config-standard": "^19.0.0",
     "webpack-dev-server": "^3.8.0"
   },
   "browserslist": [
@@ -27,6 +29,7 @@
     "since 2012"
   ],
   "scripts": {
-    "lint": "yarn run eslint --plugin eslint-plugin-ignore-erb --ext .js,.js.erb app/javascript/src/javascripts"
+    "eslint-all": "yarn run eslint --plugin eslint-plugin-ignore-erb --ext .js,.js.erb app/javascript/src/javascripts",
+    "stylelint-all": "yarn run stylelint 'app/javascript/src/styles/**/*.scss'"
   }
 }
