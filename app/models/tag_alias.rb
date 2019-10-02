@@ -184,9 +184,7 @@ class TagAlias < TagRelationship
   end
 
   def self.update_cached_post_counts_for_all
-    TagAlias.without_timeout do
-      execute_sql("UPDATE tag_aliases SET post_count = tags.post_count FROM tags WHERE tags.name = tag_aliases.consequent_name")
-    end
+    execute_sql("UPDATE tag_aliases SET post_count = tags.post_count FROM tags WHERE tags.name = tag_aliases.consequent_name")
   end
 
   def create_mod_action

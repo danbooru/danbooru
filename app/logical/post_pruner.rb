@@ -1,10 +1,8 @@
 class PostPruner
   def prune!
-    Post.without_timeout do
-      prune_pending!
-      prune_flagged!
-      prune_mod_actions!
-    end
+    prune_pending!
+    prune_flagged!
+    prune_mod_actions!
   end
 
 protected
