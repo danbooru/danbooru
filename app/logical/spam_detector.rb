@@ -52,6 +52,7 @@ class SpamDetector
   def spam?
     return false if !SpamDetector.enabled?
     return false if user.is_gold?
+    return false if user.created_at < 1.month.ago
 
     is_spam = super
 

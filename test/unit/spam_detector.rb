@@ -7,7 +7,7 @@ class SpamDetectorTest < ActiveSupport::TestCase
       SpamDetector.stubs(:enabled?).returns(true)
 
       @user = create(:gold_user, created_at: 1.month.ago)
-      @spammer = create(:user, created_at: 1.month.ago, email: "akismet-guaranteed-spam@example.com")
+      @spammer = create(:user, created_at: 2.weeks.ago, email: "akismet-guaranteed-spam@example.com")
     end
 
     context "for dmails" do
@@ -20,6 +20,15 @@ class SpamDetectorTest < ActiveSupport::TestCase
       end
 
       should "not detect gold users as spammers" do
+        Dmail.create_split(from: @user, to: @spammer, title: "spam", body: "wonderful spam", creator_ip_addr: "127.0.0.1")
+
+        dmail = @spammer.dmails.last
+        refute(SpamDetector.new(dmail).spam?)
+        refute(dmail.is_spam?)
+      end
+
+      should "not detect old users as spammers" do
+        @spammer.update!(created_at: 2.months.ago)
         Dmail.create_split(from: @user, to: @spammer, title: "spam", body: "wonderful spam", creator_ip_addr: "127.0.0.1")
 
         dmail = @spammer.dmails.last
