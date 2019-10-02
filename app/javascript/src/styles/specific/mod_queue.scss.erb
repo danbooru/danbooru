@@ -2,6 +2,7 @@
 
 div#c-moderator-post-queues {
   div.post {
+    padding: 1em;
     margin-bottom: 4em;
     overflow: hidden;
 
@@ -13,16 +14,28 @@ div#c-moderator-post-queues {
       background: var(--modqueue-negative-score-background-color);
     }
 
-    aside {
-      float: left;
-      width: 220px;
-      text-align: right;
-      padding-right: 20px;
+    aside.column {
+      text-align: center;
+      margin-bottom: 1em;
+
+      @media (min-width: 660px) {
+        flex-basis: 220px;
+        text-align: right;
+        padding-right: 2em;
+      }
     }
 
-    section {
-      float: left;
-      width: 800px;
+    .quick-mod {
+      margin-bottom: 0.5em;
+
+      @media (min-width: 660px) {
+        font-size: $h2_size;
+        font-weight: bold;
+      }
+    }
+
+    .mod-queue-post-source {
+      word-break: break-all;
     }
 
     <% Danbooru.config.modqueue_quality_warning_tags.each do |tag| %>
@@ -47,14 +60,6 @@ div#c-moderator-post-queues {
       aside:before {
         @include sound-icon;
       }
-    }
-  }
-
-  div#moderation-guideline {
-    width: 900px;
-
-    h1 {
-      font-size: $h2_size;
     }
   }
 }

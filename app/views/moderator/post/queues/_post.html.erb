@@ -1,12 +1,12 @@
-<%= content_tag(:div, { id: "post-#{post.id}", class: ["post", "mod-queue-preview", *PostPresenter.preview_class(post, highlight_score: true)].join(" ") }.merge(PostPresenter.data_attributes(post))) do %>
-  <aside>
+<%= content_tag(:div, { id: "post-#{post.id}", class: ["post", "mod-queue-preview", "column-container", *PostPresenter.preview_class(post, highlight_score: true)].join(" ") }.merge(PostPresenter.data_attributes(post))) do %>
+  <aside class="column column-shrink">
     <%= link_to(image_tag(post.preview_file_url), post_path(post), :target => "_blank") %>
   </aside>
 
-  <section>
+  <section class="column column-expand">
     <ul>
       <li>
-        <h2><%= render "moderator/post/queues/quick_mod", post: post %></h2>
+        <%= render "moderator/post/queues/quick_mod", post: post %>
       </li>
       <li><strong>Rating</strong>: <%= post.pretty_rating %></li>
       <li><strong>Score</strong>: <%= post.score %></li>
@@ -27,7 +27,7 @@
       <li>
         <strong>Hidden</strong>: <%= render "post_disapprovals/compact_counts", :disapprovals => post.disapprovals, :post => post %>
       </li>
-      <li><strong>Source</strong>: <%= post.source %></li>
+      <li class="mod-queue-post-source"><strong>Source</strong>: <%= post.source %></li>
       <% if post.has_active_pools? %>
         <li><strong>Pools</strong>: <%= render "pools/inline_list", pools: post.pools.undeleted %></li>
       <% end %>

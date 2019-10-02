@@ -133,6 +133,7 @@ table tfoot {
 
   .column-expand { flex: 1; }
   .column-shrink { flex: 0; }
+  @media (max-width: 660px) { display: block; }
 }
 
 ul.list-bulleted {
