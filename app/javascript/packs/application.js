@@ -31,6 +31,7 @@ importAll(require.context('../src/styles', true, /\.s?css(?:\.erb)?$/));
 export { default as Autocomplete } from '../src/javascripts/autocomplete.js.erb';
 export { default as Blacklist } from '../src/javascripts/blacklists.js';
 export { default as Comment } from '../src/javascripts/comments.js';
+export { default as CurrentUser } from '../src/javascripts/current_user.js';
 export { default as Dtext } from '../src/javascripts/dtext.js';
 export { default as Note } from '../src/javascripts/notes.js';
 export { default as Post } from '../src/javascripts/posts.js.erb';

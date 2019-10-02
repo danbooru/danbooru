@@ -1,3 +1,4 @@
+import CurrentUser from './current_user'
 import Utility from './utility'
 import Hammer from 'hammerjs'
 import Cookie from './cookie'
@@ -49,7 +50,7 @@ Post.initialize_all = function() {
 }
 
 Post.initialize_gestures = function() {
-  if (Utility.meta("disable-mobile-gestures") === "true") {
+  if (CurrentUser.data("disable-mobile-gestures")) {
     return;
   }
   var $body = $("body");
@@ -117,7 +118,7 @@ Post.open_edit_dialog = function() {
       of: window
     },
     drag: function(e, ui) {
-      if (Utility.meta("enable-auto-complete") === "true") {
+      if (CurrentUser.data("enable-auto-complete")) {
         $tag_string.data("uiAutocomplete").close();
       }
     },
@@ -591,7 +592,7 @@ Post.initialize_saved_searches = function() {
   $("#save-search").on("click.danbooru", function(e) {
     $("#save-search-dialog #saved_search_query").val($("#tags").val());
 
-    if (Utility.meta("disable-labeled-saved-searches") === "false") {
+    if (CurrentUser.data("disable-categorized-saved-searches") === false) {
       $("#save-search-dialog").dialog("open");
     } else {
       $.post(

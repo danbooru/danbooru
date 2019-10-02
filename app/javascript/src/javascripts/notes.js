@@ -1,3 +1,4 @@
+import CurrentUser from './current_user'
 import Utility from './utility'
 
 let Note = {
@@ -348,7 +349,7 @@ let Note = {
         e.stopPropagation();
       });
 
-      if (Utility.meta("current-user-name") !== "Anonymous") {
+      if (CurrentUser.data("is-anonymous") === false) {
         $note_body.on("click.danbooru", function(e) {
           if (e.target.tagName !== "A") {
             var $note_body_inner = $(e.currentTarget);
@@ -573,7 +574,7 @@ let Note = {
     start: function(e) {
       e.preventDefault();
 
-      if (Utility.meta("current-user-id") === "") {
+      if (CurrentUser.data("is-anonymous")) {
         Utility.notice("You must be logged in to edit notes");
         return;
       }

@@ -1,3 +1,5 @@
+import CurrentUser from "./current_user";
+
 let Utility = {};
 
 Utility.delay = function(milliseconds) {
@@ -66,7 +68,7 @@ Utility.dialog = function(title, html) {
 }
 
 Utility.keydown = function(keys, namespace, handler) {
-  if (Utility.meta("enable-js-navigation") === "true") {
+  if (CurrentUser.data("enable-post-navigation")) {
     $(document).on("keydown.danbooru." + namespace, null, keys, handler);
   }
 };

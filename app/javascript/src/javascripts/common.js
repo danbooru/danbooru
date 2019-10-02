@@ -1,5 +1,5 @@
 import Cookie from './cookie'
-import Utility from './utility'
+import CurrentUser from './current_user'
 
 $(function() {
   $("#hide-upgrade-account-notice").on("click.danbooru", function(e) {
@@ -21,16 +21,10 @@ $(function() {
     e.preventDefault();
   });
 
-  $("#desktop-version-link a").on("click.danbooru", function(e) {
+  $("#desktop-version-link a").on("click.danbooru", async function(e) {
     e.preventDefault();
-    $.ajax("/users/" + Utility.meta("current-user-id") + ".json", {
-      method: "PUT",
-      data: {
-        "user[disable_responsive_mode]": "true"
-      }
-    }).then(function() {
-      location.reload();
-    });
+    await CurrentUser.update({ disable_responsive_mode: true });
+    location.reload();
   });
 });
 

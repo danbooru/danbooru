@@ -1,3 +1,4 @@
+import CurrentUser from './current_user'
 import Utility from './utility'
 
 require('qtip2');
@@ -99,25 +100,21 @@ PostTooltip.hide = function (event) {
 };
 
 PostTooltip.disabled = function (event) {
-  return PostTooltip.isTouching || Utility.meta("disable-post-tooltips") === "true";
+  return PostTooltip.isTouching || CurrentUser.data("disable-post-tooltips");
 };
 
-PostTooltip.on_disable_tooltips = function (event) {
+PostTooltip.on_disable_tooltips = async function (event) {
   event.preventDefault();
   $(event.target).parents(".qtip").qtip("hide");
 
-  if (Utility.meta("current-user-id") === "") {
-    Utility.notice('<a href="/session/new">Login</a> to disable tooltips permanently');
+  if (CurrentUser.data("is-anonymous")) {
+    Utility.notice('You must <a href="/session/new">login</a> to disable tooltips');
     return;
   }
 
-  $.ajax("/users/" + Utility.meta("current-user-id") + ".json", {
-    method: "PUT",
-    data: { "user[disable_post_tooltips]": "true" },
-  }).then(function() {
-    Utility.notice("Tooltips disabled; check your account settings to re-enable.");
-    location.reload();
-  });
+  await CurrentUser.update({ disable_post_tooltips: true });
+  Utility.notice("Tooltips disabled; check your account settings to re-enable.");
+  location.reload();
 };
 
 $(document).ready(PostTooltip.initialize);

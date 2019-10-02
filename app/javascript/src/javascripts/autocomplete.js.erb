@@ -1,4 +1,4 @@
-import Utility from './utility'
+import CurrentUser from './current_user'
 import SavedSearch from './saved_searches'
 
 let Autocomplete = {};
@@ -14,7 +14,7 @@ Autocomplete.METATAGS_REGEX = Autocomplete.METATAGS.concat(Object.keys(Autocompl
 Autocomplete.TERM_REGEX = new RegExp(`([-~]*)(?:(${Autocomplete.METATAGS_REGEX}):)?(\\S*)$`, "i");
 
 Autocomplete.initialize_all = function() {
-  if (Utility.meta("enable-auto-complete") === "true") {
+  if (CurrentUser.data("enable-auto-complete")) {
     $.widget("ui.autocomplete", $.ui.autocomplete, {
       options: {
         delay: 0,
@@ -355,7 +355,7 @@ Autocomplete.render_item = function(list, item) {
   } else if (item.type === "user") {
     var level_class = "user-" + item.level.toLowerCase();
     $link.addClass(level_class);
-    if (Utility.meta("style-usernames") === "true") {
+    if (CurrentUser.data("style-usernames")) {
       $link.addClass("with-style");
     }
   } else if (item.type === "pool") {

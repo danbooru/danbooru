@@ -1,7 +1,8 @@
-import Utility from './utility'
 import Cookie from './cookie'
-import Post from './posts.js.erb'
+import CurrentUser from './current_user'
 import Favorite from './favorites'
+import Post from './posts.js.erb'
+import Utility from './utility'
 
 let PostModeMenu = {};
 
@@ -91,7 +92,7 @@ PostModeMenu.initialize_edit_form = function() {
 
 PostModeMenu.close_edit_form = function() {
   $("#quick-edit-div").slideUp("fast");
-  if (Utility.meta("enable-auto-complete") === "true") {
+  if (CurrentUser.data("enable-auto-complete")) {
     $("#post_tag_string").data("uiAutocomplete").close();
   }
 }
