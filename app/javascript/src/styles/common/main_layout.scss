@@ -36,7 +36,8 @@ footer#page-footer {
   display: flex;
 
   #sidebar {
-    flex-basis: 15em;
+    flex: 0;
+    min-width: 15em;
   }
 
   #content {
