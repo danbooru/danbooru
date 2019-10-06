@@ -175,8 +175,7 @@ module ApplicationHelper
   end
 
   def body_attributes(user = CurrentUser.user)
-    attributes = user.api_attributes
-    attributes -= [:custom_style, :blacklisted_tags, :favorite_tags]
+    attributes = %i[id name level level_string theme] + User::BOOLEAN_ATTRIBUTES.map(&:to_sym)
     attributes += User::Roles.map { |role| :"is_#{role}?" }
 
     controller_param = params[:controller].parameterize.dasherize
