@@ -255,7 +255,7 @@ class PostArchive < ApplicationRecord
   end
 
   def updater_name
-    updater.name
+    updater&.name
   end
 
   def api_attributes
