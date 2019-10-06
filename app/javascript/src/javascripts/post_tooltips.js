@@ -42,7 +42,10 @@ PostTooltip.POST_SELECTOR = "*:not(.ui-sortable-handle) > .post-preview img, .dt
 
 // http://qtip2.com/options
 PostTooltip.QTIP_OPTIONS = {
-  style: "qtip-light post-tooltip",
+  style: {
+    classes: "qtip-light post-tooltip",
+    tip: false
+  },
   content: PostTooltip.render_tooltip,
   overwrite: false,
   position: {
