@@ -3,7 +3,7 @@
     <%= content_tag(:picture) do -%>
       <%= tag.source media: "(max-width: 660px)", srcset: cropped_url -%>
       <%= tag.source media: "(min-width: 660px)", srcset: preview_url -%>
-      <%= tag.img class: "has-cropped-#{has_cropped}", src: preview_url, title: tooltip, alt: alt_text -%>
+      <%= tag.img class: "has-cropped-#{has_cropped}", src: preview_url, style: "min-width: #{preview_width}px; min-height: #{preview_height}px;", title: tooltip, alt: alt_text -%>
     <% end -%>
   <% end -%>
   <% if pool -%>
