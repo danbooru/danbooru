@@ -6,18 +6,20 @@ require('qtip2/dist/jquery.qtip.css');
 
 let PostTooltip = {};
 
-PostTooltip.render_tooltip = function (event, qtip) {
+PostTooltip.render_tooltip = async function (event, qtip) {
   var post_id = $(this).parents("[data-id]").data("id");
 
-  $.get("/posts/" + post_id, { variant: "tooltip" }).then(function (html) {
+  try {
+    qtip.cache.request = $.get(`/posts/${post_id}?variant=tooltip`);
+    let html = await qtip.cache.request;
+
     qtip.set("content.text", html);
     qtip.elements.tooltip.removeClass("post-tooltip-loading");
-
-    // Hide the tooltip if the user stopped hovering before the ajax request completed.
-    if (PostTooltip.lostFocus) {
-      qtip.hide();
+  } catch (error) {
+    if (error.status !== 0 && error.statusText !== "abort") {
+      Utility.error(`Error displaying tooltip for post #${post_id} (error: ${error.status} ${error.statusText})`);
     }
-  });
+  }
 };
 
 // Hide the tooltip the first time it is shown, while we wait on the ajax call to complete.
@@ -70,12 +72,15 @@ PostTooltip.initialize = function () {
     } else {
       $(this).qtip(PostTooltip.QTIP_OPTIONS, event);
     }
-
-    PostTooltip.lostFocus = false;
   });
 
+  // Cancel pending ajax requests when we mouse out of the thumbnail.
   $(document).on("mouseleave.danbooru.postTooltip", PostTooltip.POST_SELECTOR, function (event) {
-    PostTooltip.lostFocus = true;
+    let qtip = $(event.target).qtip("api");
+
+    if (qtip.cache.request && qtip.cache.request.state() === "pending") {
+      qtip.cache.request.abort();
+    }
   });
 
   $(document).on("click.danbooru.postTooltip", ".post-tooltip-disable", PostTooltip.on_disable_tooltips);
