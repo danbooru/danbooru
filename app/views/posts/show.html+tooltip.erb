@@ -35,14 +35,22 @@
   </span>
 </div>
 
-<div class="post-tooltip-body">
-  <div class="post-tooltip-pools">
-    <% @post.pools.series.undeleted.each do |pool| %>
-      <%= link_to pool, class: "pool-category-#{pool.category}" do %>
-        <%= "pool:#{pool.pretty_name} [#{pool.page_number(@post.id)}/#{pool.post_count}]" %>
-      <% end %>
+<div class="post-tooltip-body <%= "has-preview" if params[:preview].truthy? %>">
+  <div class="post-tooltip-body-left">
+    <% if params[:preview].truthy? %>
+      <%= PostPresenter.preview(@post, show_deleted: true) %>
     <% end %>
   </div>
 
-  <%= @post.presenter.inline_tag_list_html(humanize_tags: false) %>
+  <div class="post-tooltip-body-right">
+    <div class="post-tooltip-pools">
+      <% @post.pools.series.undeleted.each do |pool| %>
+        <%= link_to pool, class: "pool-category-#{pool.category}" do %>
+          <%= "pool:#{pool.pretty_name} [#{pool.page_number(@post.id)}/#{pool.post_count}]" %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%= @post.presenter.inline_tag_list_html(humanize_tags: false) %>
+  </div>
 </div>

@@ -59,17 +59,30 @@ $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
     padding: 0;
 
     > * {
-      padding: 2px 6px;
+      padding: 4px 8px;
     }
 
     .post-tooltip-body {
       @include thin-scrollbar;
       max-height: $tooltip-body-height;
       overflow-y: auto;
+      display: flex;
+
+      &.has-preview {
+        max-height: 154px;
+        padding: 8px;
+
+        article.post-preview {
+          margin: 0 8px 0 0;
+        }
+      }
 
       li {
         margin-right: 0;
       }
+
+      .post-tooltip-body-left  { flex: 0; }
+      .post-tooltip-body-right { flex: 1; }
     }
 
     .post-tooltip-header {

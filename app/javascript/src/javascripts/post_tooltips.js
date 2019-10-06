@@ -7,10 +7,18 @@ require('qtip2/dist/jquery.qtip.css');
 let PostTooltip = {};
 
 PostTooltip.render_tooltip = async function (event, qtip) {
-  var post_id = $(this).parents("[data-id]").data("id");
+  let post_id = null;
+  let preview = false;
+
+  if ($(this).is(".dtext-post-id-link")) {
+    preview = true;
+    post_id = /\/posts\/(\d+)/.exec($(this).attr("href"))[1];
+  } else {
+    post_id = $(this).parents("[data-id]").data("id");
+  }
 
   try {
-    qtip.cache.request = $.get(`/posts/${post_id}?variant=tooltip`);
+    qtip.cache.request = $.get(`/posts/${post_id}`, { variant: "tooltip", preview: preview });
     let html = await qtip.cache.request;
 
     qtip.set("content.text", html);
@@ -30,7 +38,7 @@ PostTooltip.on_show = function (event, qtip) {
   }
 };
 
-PostTooltip.POST_SELECTOR = "*:not(.ui-sortable-handle) > .post-preview img";
+PostTooltip.POST_SELECTOR = "*:not(.ui-sortable-handle) > .post-preview img, .dtext-post-id-link";
 
 // http://qtip2.com/options
 PostTooltip.QTIP_OPTIONS = {
