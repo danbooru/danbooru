@@ -106,12 +106,6 @@ module Sources
         api_client.desc
       end
 
-      def headers
-        super.merge(
-          "Referer" => "https://seiga.nicovideo.jp"
-        )
-      end
-
       def normalized_for_artist_finder?
         url =~ PROFILE
       end
