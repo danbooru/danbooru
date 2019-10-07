@@ -612,6 +612,10 @@ class User < ApplicationRecord
         "created_at" => created_at.strftime("%Y-%m-%d %H:%M")
       }.to_json
     end
+
+    def api_token
+      api_key.try(:key)
+    end
   end
 
   module CountMethods
