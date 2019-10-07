@@ -1,9 +1,9 @@
 <% if params[:url] %>
   <div id="upload-image">
     <% if ImageProxy.needs_proxy?(@source.image_url) %>
-      <%= image_tag(image_proxy_uploads_path(:url => @source.image_url), :title => "Preview", :id => "image") %>
+      <%= tag.img src: image_proxy_uploads_path(url: @source.image_url), title: "Preview", id: "image" %>
     <% elsif @source.image_url.present? %>
-      <%= image_tag(@source.image_url, :title => "Preview", :id => "image") %>
+      <%= tag.img src: @source.image_url, title: "Preview", id: "image", referrerpolicy: "no-referrer" %>
     <% end %>
   </div>
 
