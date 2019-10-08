@@ -6,6 +6,11 @@ class ApplicationRecord < ActiveRecord::Base
       def paginate(*options)
         extending(PaginationExtension).paginate(*options)
       end
+
+      def paginated_search(params)
+        search_params = params.fetch(:search, {}).permit!
+        search(search_params).paginate(params[:page], limit: params[:limit], search_count: params[:search])
+      end
     end
   end
 

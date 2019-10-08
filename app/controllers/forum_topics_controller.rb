@@ -23,8 +23,7 @@ class ForumTopicsController < ApplicationController
     params[:search] ||= {}
     params[:search][:order] ||= "sticky" if request.format == Mime::Type.lookup("text/html")
 
-    @query = ForumTopic.active.search(search_params)
-    @forum_topics = @query.paginate(params[:page], :limit => per_page, :search_count => params[:search])
+    @forum_topics = ForumTopic.active.paginated_search(params)
     @forum_topics = @forum_topics.includes(:creator, :updater).load if request.format.html?
     @forum_topics = @forum_topics.includes(:creator, :original_post).load if request.format.atom?
 

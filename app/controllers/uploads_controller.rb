@@ -24,7 +24,7 @@ class UploadsController < ApplicationController
   end
 
   def index
-    @uploads = Upload.search(search_params).includes(:post, :uploader).paginate(params[:page], :limit => params[:limit])
+    @uploads = Upload.paginated_search(params).includes(:post, :uploader)
     respond_with(@uploads)
   end
 

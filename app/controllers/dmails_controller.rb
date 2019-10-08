@@ -19,8 +19,7 @@ class DmailsController < ApplicationController
     if params[:folder] && params[:set_default_folder]
       cookies.permanent[:dmail_folder] = params[:folder]
     end
-    @query = Dmail.active.visible.search(search_params)
-    @dmails = @query.paginate(params[:page], :limit => params[:limit])
+    @dmails = Dmail.active.visible.paginated_search(params)
     respond_with(@dmails)
   end
 

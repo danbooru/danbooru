@@ -12,7 +12,7 @@ class IpBansController < ApplicationController
   end
 
   def index
-    @ip_bans = IpBan.includes(:creator).search(search_params).paginate(params[:page], :limit => params[:limit])
+    @ip_bans = IpBan.includes(:creator).paginated_search(params)
     respond_with(@ip_bans)
   end
 

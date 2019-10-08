@@ -3,7 +3,7 @@ class FavoriteGroupsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def index
-    @favorite_groups = FavoriteGroup.search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+    @favorite_groups = FavoriteGroup.paginated_search(params)
     respond_with(@favorite_groups)
   end
 

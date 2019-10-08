@@ -29,7 +29,7 @@ class UsersController < ApplicationController
       @user = User.find_by_name!(params[:name])
       redirect_to user_path(@user)
     else
-      @users = User.search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+      @users = User.paginated_search(params)
       respond_with(@users)
     end
   end

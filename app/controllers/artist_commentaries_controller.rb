@@ -3,7 +3,7 @@ class ArtistCommentariesController < ApplicationController
   before_action :member_only, only: [:create_or_update, :revert]
 
   def index
-    @commentaries = ArtistCommentary.search(search_params).paginate(params[:page], :limit => params[:limit])
+    @commentaries = ArtistCommentary.paginated_search(params)
     respond_with(@commentaries)
   end
 

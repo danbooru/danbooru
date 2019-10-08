@@ -2,7 +2,7 @@ class ArtistCommentaryVersionsController < ApplicationController
   respond_to :html, :xml, :json
 
   def index
-    @commentary_versions = ArtistCommentaryVersion.search(search_params).paginate(params[:page], :limit => params[:limit])
+    @commentary_versions = ArtistCommentaryVersion.paginated_search(params)
     respond_with(@commentary_versions)
   end
 end

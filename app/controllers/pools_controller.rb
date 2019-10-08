@@ -17,7 +17,7 @@ class PoolsController < ApplicationController
   end
 
   def index
-    @pools = Pool.includes(:creator).search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+    @pools = Pool.includes(:creator).paginated_search(search_params)
     respond_with(@pools)
   end
 

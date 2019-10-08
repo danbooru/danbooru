@@ -6,7 +6,7 @@ class NotesController < ApplicationController
   end
 
   def index
-    @notes = Note.includes(:creator).search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+    @notes = Note.includes(:creator).paginated_search(params)
     @notes = @notes.includes(:creator) if request.format.html?
     respond_with(@notes)
   end

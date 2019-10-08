@@ -3,7 +3,7 @@ class WikiPageVersionsController < ApplicationController
   layout "sidebar"
 
   def index
-    @wiki_page_versions = WikiPageVersion.search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
+    @wiki_page_versions = WikiPageVersion.paginated_search(params)
     respond_with(@wiki_page_versions)
   end
 
