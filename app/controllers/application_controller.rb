@@ -51,7 +51,7 @@ class ApplicationController < ActionController::Base
     when ActionController::BadRequest
       render_error_page(400, exception)
     when SessionLoader::AuthenticationFailure
-      render_error_page(401, exception)
+      render_error_page(401, exception, template: "sessions/new")
     when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest
       render_error_page(403, exception)
     when User::PrivilegeError

@@ -1,6 +1,6 @@
 class SessionsController < ApplicationController
   respond_to :html, :json
-  skip_forgery_protection only: :create, if: -> { request.format.json? }
+  skip_forgery_protection only: :create, if: -> { !request.format.html? }
 
   def new
     @user = User.new
@@ -14,15 +14,8 @@ class SessionsController < ApplicationController
       url = posts_path if url.nil?
       respond_with(session_creator.user, location: url, methods: [:api_token])
     else
-      respond_with("password was incorrect", location: new_session_path) do |fmt|
-        fmt.json do
-          render json: { error: true, message: "password was incorrect"}.to_json, status: 401
-        end
-
-        fmt.html do
-          flash[:notice] = "Password was incorrect"
-        end
-      end
+      flash.now[:notice] = "Password was incorrect"
+      raise SessionLoader::AuthenticationFailure
     end
   end
 
