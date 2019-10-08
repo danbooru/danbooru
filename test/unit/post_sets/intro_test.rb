@@ -1,5 +1,4 @@
 require 'test_helper'
-require "danbooru/paginator/pagination_error"
 
 module PostSets
   class IntroTest < ActiveSupport::TestCase

@@ -1,5 +1,4 @@
 require 'test_helper'
-require "danbooru/paginator/pagination_error"
 
 module PostSets
   class PostTest < ActiveSupport::TestCase
@@ -86,7 +85,7 @@ module PostSets
         end
 
         should "fail" do
-          assert_raises(Danbooru::Paginator::PaginationError) do
+          assert_raises(PaginationExtension::PaginationError) do
             @set.posts
           end
         end

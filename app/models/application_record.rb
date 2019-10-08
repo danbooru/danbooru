@@ -1,7 +1,13 @@
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
-  include Danbooru::Paginator::ActiveRecordExtension
+  concerning :PaginationMethods do
+    class_methods do
+      def paginate(*options)
+        extending(PaginationExtension).paginate(*options)
+      end
+    end
+  end
 
   concerning :SearchMethods do
     class_methods do

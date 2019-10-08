@@ -1,5 +1,4 @@
 require 'delayed/plugin'
-require 'danbooru/paginator/active_record_extension'
 
 class DelayedJobTimeoutPlugin < ::Delayed::Plugin
   callbacks do |lifecycle|
@@ -13,4 +12,3 @@ Delayed::Worker.logger = Logger.new(STDOUT, level: :debug)
 Delayed::Worker.default_queue_name = "default"
 Delayed::Worker.destroy_failed_jobs = false
 Delayed::Worker.plugins << DelayedJobTimeoutPlugin
-Delayed::Job.include(Danbooru::Paginator::ActiveRecordExtension)
