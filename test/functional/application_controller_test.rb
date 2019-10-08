@@ -57,7 +57,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
         should "fail for api key mismatches" do
           basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:badpassword")}"
-          get edit_user_path(@user), headers: { HTTP_AUTHORIZATION: basic_auth_string }
+          get profile_path, as: :json, headers: { HTTP_AUTHORIZATION: basic_auth_string }
           assert_response 401
         end
 
@@ -77,13 +77,13 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "fail for api key mismatches" do
-          get edit_user_path(@user), params: { login: @user.name }
+          get profile_path, as: :json, params: { login: @user.name }
           assert_response 401
 
-          get edit_user_path(@user), params: { api_key: @api_key.key }
+          get profile_path, as: :json, params: { api_key: @api_key.key }
           assert_response 401
 
-          get edit_user_path(@user), params: { login: @user.name, api_key: "bad" }
+          get profile_path, as: :json, params: { login: @user.name, api_key: "bad" }
           assert_response 401
         end
 
@@ -102,13 +102,13 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "fail for password mismatches" do
-          get edit_user_path(@user), params: { login: @user.name }
+          get profile_path, as: :json, params: { login: @user.name }
           assert_response 401
 
-          get edit_user_path(@user), params: { password_hash: User.sha1("password") }
+          get profile_path, as: :json, params: { password_hash: User.sha1("password") }
           assert_response 401
 
-          get edit_user_path(@user), params: { login: @user.name, password_hash: "bad" }
+          get profile_path, as: :json, params: { login: @user.name, password_hash: "bad" }
           assert_response 401
         end
 
