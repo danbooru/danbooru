@@ -29,7 +29,6 @@ Post.initialize_all = function() {
     this.initialize_post_image_resize_links();
     this.initialize_post_image_resize_to_window_link();
     this.initialize_similar();
-    this.initialize_gestures();
 
     if ((Utility.meta("always-resize-images") === "true") || (Utility.meta("viewport") && (window.screen.width <= 660))) {
       $("#image-resize-to-window-link").click();
@@ -61,8 +60,8 @@ Post.initialize_gestures = function() {
     return;
   }
   $("#image-container").css({overflow: "visible"});
-  var hasPrev = $("#a-show").length || $(".paginator a[rel~=prev]").length;
-  var hasNext = $("#a-index").length && $(".paginator a[rel~=next]").length;
+  var hasPrev = $(".paginator a[rel~=prev]").length;
+  var hasNext = $(".paginator a[rel~=next]").length;
 
   var hammer = new Hammer($body[0], {touchAction: 'pan-y', recognizers: [[Hammer.Swipe, { threshold: 20, velocity: 0.4, direction: Hammer.DIRECTION_HORIZONTAL }]], inputClass: Hammer.TouchInput});
   $body.data("hammer", hammer);
@@ -178,9 +177,7 @@ Post.initialize_similar = function() {
 }
 
 Post.swipe_prev = function(e) {
-  if ($("#a-show").length) {
-    window.history.back();
-  } if ($(".paginator a[rel~=prev]").length) {
+  if ($(".paginator a[rel~=prev]").length) {
     location.href = $("a[rel~=prev]").attr("href");
   }
 
