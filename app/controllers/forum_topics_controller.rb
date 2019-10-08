@@ -22,6 +22,7 @@ class ForumTopicsController < ApplicationController
   def index
     params[:search] ||= {}
     params[:search][:order] ||= "sticky" if request.format == Mime::Type.lookup("text/html")
+    params[:limit] ||= 40
 
     @forum_topics = ForumTopic.active.paginated_search(params)
     @forum_topics = @forum_topics.includes(:creator, :updater).load if request.format.html?
@@ -99,10 +100,6 @@ class ForumTopicsController < ApplicationController
   end
 
 private
-  def per_page
-    params[:limit] || 40
-  end
-
   def normalize_search
     if params[:title_matches]
       params[:search] ||= {}
