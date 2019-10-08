@@ -8,6 +8,8 @@ import SavedSearch from './saved_searches'
 let Post = {};
 
 Post.pending_update_count = 0;
+Post.SWIPE_THRESHOLD = 60;
+Post.SWIPE_VELOCITY = 0.6;
 
 Post.initialize_all = function() {
 
@@ -30,7 +32,7 @@ Post.initialize_all = function() {
     this.initialize_post_image_resize_to_window_link();
     this.initialize_similar();
 
-    if ((Utility.meta("always-resize-images") === "true") || (Utility.meta("viewport") && (window.screen.width <= 660))) {
+    if (CurrentUser.data("always-resize-images") || (Utility.meta("viewport") && (window.screen.width <= 660))) {
       $("#image-resize-to-window-link").click();
     }
   }
@@ -63,7 +65,7 @@ Post.initialize_gestures = function() {
   var hasPrev = $(".paginator a[rel~=prev]").length;
   var hasNext = $(".paginator a[rel~=next]").length;
 
-  var hammer = new Hammer($body[0], {touchAction: 'pan-y', recognizers: [[Hammer.Swipe, { threshold: 20, velocity: 0.4, direction: Hammer.DIRECTION_HORIZONTAL }]], inputClass: Hammer.TouchInput});
+  var hammer = new Hammer($body[0], {touchAction: 'pan-y', recognizers: [[Hammer.Swipe, { threshold: Post.SWIPE_THRESHOLD, velocity: Post.SWIPE_VELOCITY, direction: Hammer.DIRECTION_HORIZONTAL }]], inputClass: Hammer.TouchInput});
   $body.data("hammer", hammer);
 
   if (hasPrev) {
