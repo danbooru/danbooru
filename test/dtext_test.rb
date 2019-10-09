@@ -167,8 +167,19 @@ class DTextTest < Minitest::Test
     assert_parse("<blockquote><p>a</p><div class=\"expandable\"><div class=\"expandable-header\"><input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div><div class=\"expandable-content\"><p>b</p></div></div><p>c</p></blockquote>", "[quote]\na\n[expand]\nb\n[/expand]\nc\n[/quote]")
   end
 
-  def test_code
+  def test_block_code
     assert_parse("<pre>for (i=0; i&lt;5; ++i) {\n  printf(1);\n}\n\nexit(1);</pre>", "[code]for (i=0; i<5; ++i) {\n  printf(1);\n}\n\nexit(1);")
+    assert_parse("<pre>[b]lol[/b]</pre>", "[code][b]lol[/b][/code]")
+    assert_parse("<pre>[code]</pre>", "[code][code][/code]")
+    assert_parse("<pre>post #123</pre>", "[code]post #123[/code]")
+    assert_parse("<pre>x</pre>", "[code]x")
+  end
+
+  def test_inline_code
+    assert_parse("<p>foo <code>[b]lol[/b]</code>.</p>", "foo [code][b]lol[/b][/code].")
+    assert_parse("<p>foo <code>[code]</code>.</p>", "foo [code][code][/code].")
+    assert_parse("<p>foo <em><code>post #123</code></em>.</p>", "foo [i][code]post #123[/code][/i].")
+    assert_parse("<p>foo <code>x</code></p>", "foo [code]x")
   end
 
   def test_urls

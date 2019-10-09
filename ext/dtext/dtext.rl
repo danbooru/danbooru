@@ -313,10 +313,7 @@ inline := |*
 
   '[code]'i => {
     dstack_open_inline(sm, INLINE_CODE, "<code>");
-  };
-
-  '[/code]'i => {
-    dstack_close_inline(sm, INLINE_CODE, "</code>");
+    fcall code;
   };
 
   spoilers_open => {
@@ -430,11 +427,7 @@ inline := |*
 
 code := |*
   '[/code]'i => {
-    if (dstack_check(sm, BLOCK_CODE)) {
-      dstack_rewind(sm);
-    } else {
-      append(sm, true, "[/code]");
-    }
+    dstack_rewind(sm);
     fret;
   };
 
