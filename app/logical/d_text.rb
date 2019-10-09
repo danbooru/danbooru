@@ -47,6 +47,27 @@ class DText
     stripped.strip
   end
 
+  def self.strip_dtext(dtext)
+    html = DTextRagel.parse(dtext)
+    text = to_plaintext(html)
+    text
+  end
+
+  def self.to_plaintext(html)
+    text = from_html(html) do |node|
+      case node.name
+      when "a", "strong", "em", "u", "s", "h1", "h2", "h3", "h4", "h5", "h6"
+        node.name = "span"
+        node.content = node.text
+      when "blockquote"
+        node.name = "span"
+        node.content = to_plaintext(node.inner_html).gsub(/^/, "> ")
+      end
+    end
+
+    text = text.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
+  end
+
   def self.from_html(text, inline: false, &block)
     html = Nokogiri::HTML.fragment(text)
 

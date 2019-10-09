@@ -39,7 +39,7 @@ module ApplicationHelper
   end
 
   def strip_dtext(text)
-    format_text(text, strip: true)
+    DText.strip_dtext(text)
   end
 
   def error_messages_for(instance_name)
