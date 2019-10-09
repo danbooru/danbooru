@@ -118,9 +118,6 @@ aliased_wiki_link = '[[' nonpipebracket+ >mark_a1 %mark_a2 '|' nonpipebracket+ >
 
 post_link = '{{' noncurly+ >mark_a1 %mark_a2 '}}';
 
-spoilers_open = '[spoiler'i 's'i? ']';
-spoilers_close = '[/spoiler'i 's'i? ']';
-
 id = digit+ >mark_a1 %mark_a2;
 alnum_id = alnum+ >mark_a1 %mark_a2;
 page = digit+ >mark_b1 %mark_b2;
@@ -133,15 +130,49 @@ aliased_expand = '[expand='i (nonbracket+ >mark_a1 %mark_a2) ']';
 
 list_item = '*'+ >mark_a1 %mark_a2 ws+ nonnewline+ >mark_b1 %mark_b2;
 
+open_spoilers = ('[spoiler'i 's'i? ']') | ('<spoiler'i 's'i? '>');
+open_nodtext = '[nodtext]'i | '<nodtext>'i;
+open_quote = '[quote]'i | '<quote>'i | '<blockquote>'i;
+open_expand = '[expand]' | '<expand>'i;
+open_code = '[code]'i | '<code>'i;
+open_table = '[table]' | '<table>'i;
+open_thead = '[thead]' | '<thead>'i;
+open_tbody = '[tbody]' | '<tbody>'i;
+open_th = '[th]' | '<th>'i;
+open_tr = '[tr]' | '<tr>'i;
+open_td = '[td]' | '<td>'i;
+open_tn = '[tn]'i | '<tn>'i;
+open_b = '[b]'i | '<b>'i | '<strong>'i;
+open_i = '[i]'i | '<i>'i | '<em>'i;
+open_s = '[s]'i | '<s>'i;
+open_u = '[u]'i | '<u>'i;
+
+close_spoilers = ('[/spoiler'i 's'i? ']') | ('</spoiler'i 's'i? '>');
+close_nodtext = '[/nodtext]'i | '</nodtext>'i;
+close_quote = '[/quote]'i | '<quote>'i | '</blockquote>'i;
+close_expand = '[/expand]' | '</expand>'i;
+close_code = '[/code]'i | '</code>'i;
+close_table = '[/table]' | '</table>'i;
+close_thead = '[/thead]' | '</thead>'i;
+close_tbody = '[/tbody]' | '</tbody>'i;
+close_tr = '[/tr]' | '</tr>'i;
+close_th = '[/th]' | '</th>'i;
+close_td = '[/td]' | '</td>'i;
+close_tn = '[/tn]'i | '<tn>'i;
+close_b = '[/b]'i | '</b>'i | '</strong>'i;
+close_i = '[/i]'i | '</i>'i | '</em>'i;
+close_s = '[/s]'i | '</s>'i;
+close_u = '[/u]'i | '</u>'i;
+
 basic_inline := |*
-  '[b]'i  => { dstack_open_inline(sm,  INLINE_B, "<strong>"); };
-  '[/b]'i => { dstack_close_inline(sm, INLINE_B, "</strong>"); };
-  '[i]'i  => { dstack_open_inline(sm,  INLINE_I, "<em>"); };
-  '[/i]'i => { dstack_close_inline(sm, INLINE_I, "</em>"); };
-  '[s]'i  => { dstack_open_inline(sm,  INLINE_S, "<s>"); };
-  '[/s]'i => { dstack_close_inline(sm, INLINE_S, "</s>"); };
-  '[u]'i  => { dstack_open_inline(sm,  INLINE_U, "<u>"); };
-  '[/u]'i => { dstack_close_inline(sm, INLINE_U, "</u>"); };
+  open_b  => { dstack_open_inline(sm,  INLINE_B, "<strong>"); };
+  close_b => { dstack_close_inline(sm, INLINE_B, "</strong>"); };
+  open_i  => { dstack_open_inline(sm,  INLINE_I, "<em>"); };
+  close_i => { dstack_close_inline(sm, INLINE_I, "</em>"); };
+  open_s  => { dstack_open_inline(sm,  INLINE_S, "<s>"); };
+  close_s => { dstack_close_inline(sm, INLINE_S, "</s>"); };
+  open_u  => { dstack_open_inline(sm,  INLINE_U, "<u>"); };
+  close_u => { dstack_close_inline(sm, INLINE_U, "</u>"); };
   any => { append_c_html_escaped(sm, fc); };
 *|;
 
@@ -287,20 +318,20 @@ inline := |*
     fnext list;
   };
 
-  '[b]'i  => { dstack_open_inline(sm,  INLINE_B, "<strong>"); };
-  '[/b]'i => { dstack_close_inline(sm, INLINE_B, "</strong>"); };
-  '[i]'i  => { dstack_open_inline(sm,  INLINE_I, "<em>"); };
-  '[/i]'i => { dstack_close_inline(sm, INLINE_I, "</em>"); };
-  '[s]'i  => { dstack_open_inline(sm,  INLINE_S, "<s>"); };
-  '[/s]'i => { dstack_close_inline(sm, INLINE_S, "</s>"); };
-  '[u]'i  => { dstack_open_inline(sm,  INLINE_U, "<u>"); };
-  '[/u]'i => { dstack_close_inline(sm, INLINE_U, "</u>"); };
+  open_b  => { dstack_open_inline(sm,  INLINE_B, "<strong>"); };
+  close_b => { dstack_close_inline(sm, INLINE_B, "</strong>"); };
+  open_i  => { dstack_open_inline(sm,  INLINE_I, "<em>"); };
+  close_i => { dstack_close_inline(sm, INLINE_I, "</em>"); };
+  open_s  => { dstack_open_inline(sm,  INLINE_S, "<s>"); };
+  close_s => { dstack_close_inline(sm, INLINE_S, "</s>"); };
+  open_u  => { dstack_open_inline(sm,  INLINE_U, "<u>"); };
+  close_u => { dstack_close_inline(sm, INLINE_U, "</u>"); };
 
-  '[tn]'i => {
+  open_tn => {
     dstack_open_inline(sm, INLINE_TN, "<span class=\"tn\">");
   };
 
-  '[/tn]'i => {
+  close_tn => {
     dstack_close_before_block(sm);
 
     if (dstack_check(sm, INLINE_TN)) {
@@ -310,16 +341,16 @@ inline := |*
     }
   };
 
-  '[code]'i => {
+  open_code => {
     dstack_open_inline(sm, INLINE_CODE, "<code>");
     fcall code;
   };
 
-  spoilers_open => {
+  open_spoilers => {
     dstack_open_inline(sm, INLINE_SPOILER, "<span class=\"spoiler\">");
   };
 
-  spoilers_close => {
+  close_spoilers => {
     g_debug("inline [/spoiler]");
     dstack_close_before_block(sm);
 
@@ -330,7 +361,7 @@ inline := |*
     }
   };
 
-  '[nodtext]'i => {
+  open_nodtext => {
     dstack_open_inline(sm, INLINE_NODTEXT, "");
     fcall nodtext;
   };
@@ -338,14 +369,14 @@ inline := |*
   # these are block level elements that should kick us out of the inline
   # scanner
 
-  '[quote]'i => {
+  open_quote => {
     g_debug("inline [quote]");
     dstack_close_before_block(sm);
     fexec sm->ts;
     fret;
   };
 
-  '[/quote]'i space* => {
+  close_quote space* => {
     g_debug("inline [/quote]");
     dstack_close_before_block(sm);
 
@@ -361,14 +392,14 @@ inline := |*
     }
   };
 
-  '[expand]'i => {
+  open_expand => {
     g_debug("inline [expand]");
     dstack_rewind(sm);
     fexec(sm->p - 7);
     fret;
   };
 
-  '[/expand]'i => {
+  close_expand => {
     dstack_close_before_block(sm);
 
     if (dstack_close_block(sm, BLOCK_EXPAND, "</div></div>")) {
@@ -376,13 +407,13 @@ inline := |*
     }
   };
 
-  '[/th]'i => {
+  close_th => {
     if (dstack_close_block(sm, BLOCK_TH, "</th>")) {
       fret;
     }
   };
 
-  '[/td]'i => {
+  close_td => {
     if (dstack_close_block(sm, BLOCK_TD, "</td>")) {
       fret;
     }
@@ -423,7 +454,7 @@ inline := |*
 *|;
 
 code := |*
-  '[/code]'i => {
+  close_code => {
     dstack_rewind(sm);
     fret;
   };
@@ -434,7 +465,7 @@ code := |*
 *|;
 
 nodtext := |*
-  '[/nodtext]'i => {
+  close_nodtext => {
     if (dstack_check2(sm, BLOCK_NODTEXT)) {
       g_debug("block dstack check");
       dstack_pop(sm);
@@ -457,41 +488,41 @@ nodtext := |*
 *|;
 
 table := |*
-  '[thead]'i => {
+  open_thead => {
     dstack_open_block(sm, BLOCK_THEAD, "<thead>");
   };
 
-  '[/thead]'i => {
+  close_thead => {
     dstack_close_block(sm, BLOCK_THEAD, "</thead>");
   };
 
-  '[tbody]'i => {
+  open_tbody => {
     dstack_open_block(sm, BLOCK_TBODY, "<tbody>");
   };
 
-  '[/tbody]'i => {
+  close_tbody => {
     dstack_close_block(sm, BLOCK_TBODY, "</tbody>");
   };
 
-  '[th]'i => {
+  open_th => {
     dstack_open_block(sm, BLOCK_TH, "<th>");
     fcall inline;
   };
 
-  '[tr]'i => {
+  open_tr => {
     dstack_open_block(sm, BLOCK_TR, "<tr>");
   };
 
-  '[/tr]'i => {
+  close_tr => {
     dstack_close_block(sm, BLOCK_TR, "</tr>");
   };
 
-  '[td]'i => {
+  open_td => {
     dstack_open_block(sm, BLOCK_TD, "<td>");
     fcall inline;
   };
 
-  '[/table]'i => {
+  close_table => {
     if (dstack_close_block(sm, BLOCK_TABLE, "</table>")) {
       fret;
     }
@@ -650,17 +681,17 @@ main := |*
     fcall inline;
   };
 
-  '[quote]'i space* => {
+  open_quote space* => {
     dstack_close_before_block(sm);
     dstack_open_block(sm, BLOCK_QUOTE, "<blockquote>");
   };
 
-  spoilers_open space* => {
+  open_spoilers space* => {
     dstack_close_before_block(sm);
     dstack_open_block(sm, BLOCK_SPOILER, "<div class=\"spoiler\">");
   };
 
-  spoilers_close => {
+  close_spoilers => {
     g_debug("block [/spoiler]");
     dstack_close_before_block(sm);
     if (dstack_check(sm, BLOCK_SPOILER)) {
@@ -669,13 +700,13 @@ main := |*
     }
   };
 
-  '[code]'i space* => {
+  open_code space* => {
     dstack_close_before_block(sm);
     dstack_open_block(sm, BLOCK_CODE, "<pre>");
     fcall code;
   };
 
-  '[expand]'i space* => {
+  open_expand space* => {
     dstack_close_before_block(sm);
     const char* html = "<div class=\"expandable\"><div class=\"expandable-header\">"
                        "<input type=\"button\" value=\"Show\" class=\"expandable-button\"/></div>"
@@ -695,20 +726,20 @@ main := |*
     append_block(sm, "<div class=\"expandable-content\">");
   };
 
-  '[nodtext]'i space* => {
+  open_nodtext space* => {
     dstack_close_before_block(sm);
     dstack_open_block(sm, BLOCK_NODTEXT, "");
     dstack_open_block(sm, BLOCK_P, "<p>");
     fcall nodtext;
   };
 
-  '[table]'i => {
+  open_table => {
     dstack_close_before_block(sm);
     dstack_open_block(sm, BLOCK_TABLE, "<table class=\"striped\">");
     fcall table;
   };
 
-  '[tn]'i => {
+  open_tn => {
     dstack_open_block(sm, BLOCK_TN, "<p class=\"tn\">");
     fcall inline;
   };

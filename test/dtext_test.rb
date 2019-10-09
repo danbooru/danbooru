@@ -18,6 +18,10 @@ class DTextTest < Minitest::Test
     end
   end
 
+  def assert_inline_parse(expected, input)
+    assert_parse(expected, input, inline: true)
+  end
+
   def test_relative_urls
     assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="http://danbooru.donmai.us/posts/1234">post #1234</a></p>', "post #1234", base_url: "http://danbooru.donmai.us")
     assert_parse('<p><a class="dtext-link" href="http://danbooru.donmai.us/posts">posts</a></p>', '"posts":/posts', base_url: "http://danbooru.donmai.us")
@@ -135,6 +139,22 @@ class DTextTest < Minitest::Test
 
   def test_headers_with_ids_with_quote
     assert_parse("<p>h1#blah-&quot;blah. header</p>", "h1#blah-\"blah. header")
+  end
+
+  def test_inline_elements
+    assert_inline_parse("<strong>foo</strong>", "[b]foo[/b]")
+    assert_inline_parse("<strong>foo</strong>", "<b>foo</b>")
+    assert_inline_parse("<strong>foo</strong>", "<strong>foo</strong>")
+
+    assert_inline_parse("<em>foo</em>", "[i]foo[/i]")
+    assert_inline_parse("<em>foo</em>", "<i>foo</i>")
+    assert_inline_parse("<em>foo</em>", "<em>foo</em>")
+
+    assert_inline_parse("<s>foo</s>", "[s]foo[/s]")
+    assert_inline_parse("<s>foo</s>", "<s>foo</s>")
+
+    assert_inline_parse("<u>foo</u>", "[u]foo[/u]")
+    assert_inline_parse("<u>foo</u>", "<u>foo</u>")
   end
 
   def test_inline_tn
