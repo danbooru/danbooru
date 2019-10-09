@@ -123,37 +123,8 @@ spoilers_open = '[spoiler'i 's'i? ']';
 spoilers_close = '[/spoiler'i 's'i? ']';
 
 id = digit+ >mark_a1 %mark_a2;
+alnum_id = alnum+ >mark_a1 %mark_a2;
 page = digit+ >mark_b1 %mark_b2;
-
-post_id = 'post #'i id;
-post_appeal_id = 'appeal #'i id;
-post_flag_id = 'flag #'i id;
-note_id = 'note #'i id;
-forum_post_id = 'forum #'i id;
-forum_topic_id = 'topic #'i id;
-forum_topic_paged_id = 'topic #'i id '/p'i page;
-comment_id = 'comment #'i id;
-pool_id = 'pool #'i id;
-user_id = 'user #'i id;
-artist_id = 'artist #'i id;
-ban_id = 'ban #'i id;
-bulk_update_request_id = 'bur #'i id;
-tag_alias_id = 'alias #'i id;
-tag_implication_id = 'implication #'i id;
-favorite_group_id = 'favgroup #'i id;
-mod_action_id = 'mod action #'i id;
-user_feedback_id = 'feedback #'i id;
-wiki_page_id = 'wiki #'i id;
-
-github_issue_id = 'issue #'i id;
-art_station_id = 'artstation #'i alnum+ >mark_a1 %mark_a2;
-deviant_art_id = 'deviantart #'i id;
-nijie_id = 'nijie #'i id;
-pawoo_id = 'pawoo #'i id;
-pixiv_id = 'pixiv #'i id;
-pixiv_paged_id = 'pixiv #'i id '/p'i page;
-seiga_id = 'seiga #'i id;
-twitter_id = 'twitter #'i id;
 
 ws = ' ' | '\t';
 nonperiod = graph - ('.' | '"');
@@ -176,120 +147,43 @@ basic_inline := |*
 *|;
 
 inline := |*
-  post_id => {
-    append_link(sm, "post #", "<a class=\"dtext-link dtext-id-link dtext-post-id-link\" href=\"/posts/");
-  };
+  'post #'i id        => { append_id_link(sm, "post", "post", "/posts/"); };
+  'appeal #'i id      => { append_id_link(sm, "appeal", "post-appeal", "/post_appeals/"); };
+  'flag #'i id        => { append_id_link(sm, "flag", "post-flag", "/post_flags/"); };
+  'note #'i id        => { append_id_link(sm, "note", "note", "/notes/"); };
+  'forum #'i id       => { append_id_link(sm, "forum", "forum-post", "/forum_posts/"); };
+  'topic #'i id       => { append_id_link(sm, "topic", "forum-topic", "/forum_topics/"); };
+  'comment #'i id     => { append_id_link(sm, "comment", "comment", "/comments/"); };
+  'pool #'i id        => { append_id_link(sm, "pool", "pool", "/pools/"); };
+  'user #'i id        => { append_id_link(sm, "user", "user", "/users/"); };
+  'artist #'i id      => { append_id_link(sm, "artist", "artist", "/artists/"); };
+  'ban #'i id         => { append_id_link(sm, "ban", "ban", "/bans/"); };
+  'bur #'i id         => { append_id_link(sm, "BUR", "bulk-update-request", "/bulk_update_requests/"); };
+  'alias #'i id       => { append_id_link(sm, "alias", "tag-alias", "/tag_aliases/"); };
+  'implication #'i id => { append_id_link(sm, "implication", "tag-implication", "/tag_implications/"); };
+  'favgroup #'i id    => { append_id_link(sm, "favgroup", "favorite-group", "/favorite_groups/"); };
+  'mod action #'i id  => { append_id_link(sm, "mod action", "mod-action", "/mod_actions/"); };
+  'feedback #'i id    => { append_id_link(sm, "feedback", "user-feedback", "/user_feedbacks/"); };
+  'wiki #'i id        => { append_id_link(sm, "wiki", "wiki-page", "/wiki_pages/"); };
 
-  post_appeal_id => {
-    append_link(sm, "appeal #", "<a class=\"dtext-link dtext-id-link dtext-post-appeal-id-link\" href=\"/post_appeals/");
-  };
+  'issue #'i id            => { append_id_link(sm, "issue", "github", "https://github.com/r888888888/danbooru/issues/"); };
+  'artstation #'i alnum_id => { append_id_link(sm, "artstation", "artstation", "https://www.artstation.com/artwork/"); };
+  'deviantart #'i id       => { append_id_link(sm, "deviantart", "deviantart", "https://www.deviantart.com/deviation/"); };
+  'nijie #'i id            => { append_id_link(sm, "nijie", "nijie", "https://nijie.info/view.php?id="); };
+  'pawoo #'i id            => { append_id_link(sm, "pawoo", "pawoo", "https://pawoo.net/web/statuses/"); };
+  'pixiv #'i id            => { append_id_link(sm, "pixiv", "pixiv", "https://www.pixiv.net/artworks/"); };
+  'seiga #'i id            => { append_id_link(sm, "seiga", "seiga", "https://seiga.nicovideo.jp/seiga/im"); };
+  'twitter #'i id          => { append_id_link(sm, "twitter", "twitter", "https://twitter.com/i/web/status/"); };
 
-  post_flag_id => {
-    append_link(sm, "flag #", "<a class=\"dtext-link dtext-id-link dtext-post-flag-id-link\" href=\"/post_flags/");
-  };
-
-  note_id => {
-    append_link(sm, "note #", "<a class=\"dtext-link dtext-id-link dtext-note-id-link\" href=\"/notes/");
-  };
-
-  forum_post_id => {
-    append_link(sm, "forum #", "<a class=\"dtext-link dtext-id-link dtext-forum-post-id-link\" href=\"/forum_posts/");
-  };
-
-  forum_topic_id => {
-    append_link(sm, "topic #", "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/");
-  };
-
-  forum_topic_paged_id => {
-    append_paged_link(sm, "topic #", "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/", "?page=");
-  };
-
-  comment_id => {
-    append_link(sm, "comment #", "<a class=\"dtext-link dtext-id-link dtext-comment-id-link\" href=\"/comments/");
-  };
-
-  pool_id => {
-    append_link(sm, "pool #", "<a class=\"dtext-link dtext-id-link dtext-pool-id-link\" href=\"/pools/");
-  };
-
-  user_id => {
-    append_link(sm, "user #", "<a class=\"dtext-link dtext-id-link dtext-user-id-link\" href=\"/users/");
-  };
-
-  artist_id => {
-    append_link(sm, "artist #", "<a class=\"dtext-link dtext-id-link dtext-artist-id-link\" href=\"/artists/");
-  };
-
-  ban_id => {
-    append_link(sm, "ban #", "<a class=\"dtext-link dtext-id-link dtext-ban-id-link\" href=\"/bans/");
-  };
-
-  bulk_update_request_id => {
-    append_link(sm, "BUR #", "<a class=\"dtext-link dtext-id-link dtext-bulk-update-request-id-link\" href=\"/bulk_update_requests/");
-  };
-
-  tag_alias_id => {
-    append_link(sm, "alias #", "<a class=\"dtext-link dtext-id-link dtext-tag-alias-id-link\" href=\"/tag_aliases/");
-  };
-
-  tag_implication_id => {
-    append_link(sm, "implication #", "<a class=\"dtext-link dtext-id-link dtext-tag-implication-id-link\" href=\"/tag_implications/");
-  };
-
-  favorite_group_id => {
-    append_link(sm, "favgroup #", "<a class=\"dtext-link dtext-id-link dtext-favorite-group-id-link\" href=\"/favorite_groups/");
-  };
-
-  mod_action_id => {
-    append_link(sm, "mod action #", "<a class=\"dtext-link dtext-id-link dtext-mod-action-id-link\" href=\"/mod_actions/");
-  };
-
-  user_feedback_id => {
-    append_link(sm, "feedback #", "<a class=\"dtext-link dtext-id-link dtext-user-feedback-id-link\" href=\"/user_feedbacks/");
-  };
-
-  wiki_page_id => {
-    append_link(sm, "wiki #", "<a class=\"dtext-link dtext-id-link dtext-wiki-page-id-link\" href=\"/wiki_pages/");
-  };
-
-  github_issue_id => {
-    append_link(sm, "issue #", "<a class=\"dtext-link dtext-id-link dtext-github-id-link\" href=\"https://github.com/r888888888/danbooru/issues/");
-  };
-
-  art_station_id => {
-    append_link(sm, "artstation #", "<a class=\"dtext-link dtext-id-link dtext-artstation-id-link\" href=\"https://www.artstation.com/artwork/");
-  };
-
-  deviant_art_id => {
-    append_link(sm, "deviantart #", "<a class=\"dtext-link dtext-id-link dtext-deviantart-id-link\" href=\"https://deviantart.com/deviation/");
-  };
-
-  nijie_id => {
-    append_link(sm, "nijie #", "<a class=\"dtext-link dtext-id-link dtext-nijie-id-link\" href=\"https://nijie.info/view.php?id=");
-  };
-
-  pawoo_id => {
-    append_link(sm, "pawoo #", "<a class=\"dtext-link dtext-id-link dtext-pawoo-id-link\" href=\"https://pawoo.net/web/statuses/");
-  };
-
-  pixiv_id => {
-    append_link(sm, "pixiv #", "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"https://www.pixiv.net/artworks/");
-  };
-
-  pixiv_paged_id => {
-    append_paged_link(sm, "pixiv #", "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"https://www.pixiv.net/artworks/", "#");
-  };
-
-  seiga_id => {
-    append_link(sm, "seiga #", "<a class=\"dtext-link dtext-id-link dtext-seiga-id-link\" href=\"https://seiga.nicovideo.jp/seiga/im");
-  };
-
-  twitter_id => {
-    append_link(sm, "twitter #", "<a class=\"dtext-link dtext-id-link dtext-twitter-id-link\" href=\"https://twitter.com/i/web/status/");
-  };
+  'topic #'i id '/p'i page => { append_paged_link(sm, "topic #", "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/", "?page="); };
+  'pixiv #'i id '/p'i page => { append_paged_link(sm, "pixiv #", "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"https://www.pixiv.net/artworks/", "#"); };
 
   post_link => {
-    append_link(sm, "", "<a rel=\"nofollow\" class=\"dtext-link dtext-post-search-link\" href=\"/posts?tags=");
+    append(sm, true, "<a rel=\"nofollow\" class=\"dtext-link dtext-post-search-link\" href=\"/posts?tags=");
+    append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
+    append(sm, true, "\">");
+    append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
+    append(sm, true, "</a>");
   };
 
   basic_wiki_link => {
@@ -974,11 +868,15 @@ static inline void append_segment_html_escaped(StateMachine * sm, const char * a
   sm->output = g_string_append(sm->output, segment);
 }
 
-static inline void append_link(StateMachine * sm, const char * title, const char * ahref) {
-  append(sm, true, ahref);
+static inline void append_id_link(StateMachine * sm, const char * title, const char * id_name, const char * url) {
+  append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-");
+  append(sm, true, id_name);
+  append(sm, true, "-id-link\" href=\"");
+  append(sm, true, url);
   append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
   append(sm, true, "\">");
   append(sm, false, title);
+  append(sm, false, " #");
   append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
   append(sm, true, "</a>");
 }

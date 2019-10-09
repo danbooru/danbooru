@@ -335,7 +335,7 @@ class DTextTest < Minitest::Test
 
     assert_parse_id_link("dtext-github-id-link", "https://github.com/r888888888/danbooru/issues/1234", "issue #1234")
     assert_parse_id_link("dtext-artstation-id-link", "https://www.artstation.com/artwork/A1", "artstation #A1")
-    assert_parse_id_link("dtext-deviantart-id-link", "https://deviantart.com/deviation/1234", "deviantart #1234")
+    assert_parse_id_link("dtext-deviantart-id-link", "https://www.deviantart.com/deviation/1234", "deviantart #1234")
     assert_parse_id_link("dtext-nijie-id-link", "https://nijie.info/view.php?id=1234", "nijie #1234")
     assert_parse_id_link("dtext-pawoo-id-link", "https://pawoo.net/web/statuses/1234", "pawoo #1234")
     assert_parse_id_link("dtext-pixiv-id-link", "https://www.pixiv.net/artworks/1234", "pixiv #1234")
