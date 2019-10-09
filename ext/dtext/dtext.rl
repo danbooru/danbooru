@@ -281,7 +281,7 @@ inline := |*
   };
 
   seiga_id => {
-    append_link(sm, "seiga #", "<a class=\"dtext-link dtext-id-link dtext-seiga-id-link\" href=\"http://seiga.nicovideo.jp/seiga/im");
+    append_link(sm, "seiga #", "<a class=\"dtext-link dtext-id-link dtext-seiga-id-link\" href=\"https://seiga.nicovideo.jp/seiga/im");
   };
 
   twitter_id => {
