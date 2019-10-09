@@ -8,12 +8,8 @@ module DTextRagel
     parse(str, :inline => true)
   end
 
-  def self.parse_strip(str)
-    parse(str, :strip => true)
-  end
-
-  def self.parse(str, strip: false, inline: false, disable_mentions: false, base_url: nil)
-    html = c_parse(str, strip, inline, disable_mentions)
+  def self.parse(str, inline: false, disable_mentions: false, base_url: nil)
+    html = c_parse(str, inline, disable_mentions)
     html = resolve_relative_urls(html, base_url) if base_url
     html
   end
