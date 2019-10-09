@@ -176,10 +176,10 @@ inline := |*
   'twitter #'i id          => { append_id_link(sm, "twitter", "twitter", "https://twitter.com/i/web/status/"); };
 
   'topic #'i id '/p'i page => { append_paged_link(sm, "topic #", "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/", "?page="); };
-  'pixiv #'i id '/p'i page => { append_paged_link(sm, "pixiv #", "<a class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"https://www.pixiv.net/artworks/", "#"); };
+  'pixiv #'i id '/p'i page => { append_paged_link(sm, "pixiv #", "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"https://www.pixiv.net/artworks/", "#"); };
 
   post_link => {
-    append(sm, true, "<a rel=\"nofollow\" class=\"dtext-link dtext-post-search-link\" href=\"/posts?tags=");
+    append(sm, true, "<a class=\"dtext-link dtext-post-search-link\" href=\"/posts?tags=");
     append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
     append(sm, true, "\">");
     append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
@@ -245,7 +245,7 @@ inline := |*
       const char* name_start = sm->a1;
       const char* name_end = find_boundary_c(match_end);
 
-      append(sm, true, "<a rel=\"nofollow\" href=\"/users?name=");
+      append(sm, true, "<a href=\"/users?name=");
       append_segment_uri_escaped(sm, name_start, name_end);
       append(sm, true, "\">");
       append_c(sm, '@');
@@ -260,7 +260,7 @@ inline := |*
 
   delimited_mention => {
     if (sm->f_mentions) {
-      append(sm, true, "<a rel=\"nofollow\" href=\"/users?name=");
+      append(sm, true, "<a href=\"/users?name=");
       append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
       append(sm, true, "\">");
       append_c(sm, '@');
@@ -869,7 +869,12 @@ static inline void append_segment_html_escaped(StateMachine * sm, const char * a
 }
 
 static inline void append_id_link(StateMachine * sm, const char * title, const char * id_name, const char * url) {
-  append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-");
+  if (url[0] == '/') {
+    append(sm, true, "<a class=\"dtext-link dtext-id-link dtext-");
+  } else {
+    append(sm, true, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-id-link dtext-");
+  }
+
   append(sm, true, id_name);
   append(sm, true, "-id-link\" href=\"");
   append(sm, true, url);
@@ -882,7 +887,7 @@ static inline void append_id_link(StateMachine * sm, const char * title, const c
 }
 
 static inline void append_url(StateMachine * sm, const char * url_start, const char * url_end, const char * title_start, const char * title_end) {
-  append(sm, true, "<a class=\"dtext-link\" href=\"");
+  append(sm, true, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link\" href=\"");
   append_segment_html_escaped(sm, url_start, url_end);
   append(sm, true, "\">");
   if (sm->f_strip) {
@@ -902,7 +907,7 @@ static inline bool append_named_url(StateMachine * sm, const char * url_start, c
   if (url_start[0] == '/' || url_start[0] == '#') {
     append(sm, true, "<a class=\"dtext-link\" href=\"");
   } else {
-    append(sm, true, "<a class=\"dtext-link dtext-external-link\" href=\"");
+    append(sm, true, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link\" href=\"");
   }
 
   append_segment_html_escaped(sm, url_start, url_end);
