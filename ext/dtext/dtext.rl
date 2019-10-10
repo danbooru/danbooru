@@ -1,7 +1,3 @@
-// situationally print newlines to make the generated html
-// easier to read
-#define PRETTY_PRINT 0
-
 #include "dtext.h"
 
 #include <stdio.h>
@@ -810,12 +806,6 @@ static inline element_t dstack_peek(const StateMachine * sm) {
   return GPOINTER_TO_INT(g_queue_peek_tail(sm->dstack));
 }
 
-/*
-static inline bool dstack_search(StateMachine * sm, const int * element) {
-  return g_queue_find(sm->dstack, (gconstpointer)element);
-}
-*/
-
 static inline bool dstack_check(const StateMachine * sm, element_t expected_element) {
   return dstack_peek(sm) == expected_element;
 }
@@ -1125,13 +1115,6 @@ static inline const char* find_boundary_c(const char* c) {
   return c - offset;
 }
 
-/*
-static bool print_machine(StateMachine * sm) {
-  printf("p=%c\n", *sm->p);
-  return true;
-}
-*/
-
 StateMachine* init_machine(const char * src, size_t len, bool f_inline, bool f_mentions) {
   size_t output_length = 0;
   StateMachine* sm = (StateMachine *)g_malloc0(sizeof(StateMachine));
@@ -1162,9 +1145,6 @@ StateMachine* init_machine(const char * src, size_t len, bool f_inline, bool f_m
   sm->list_nest = 0;
   sm->list_mode = false;
   sm->header_mode = false;
-  sm->d = 0;
-  sm->b = 0;
-  sm->quote = 0;
 
   return sm;
 }

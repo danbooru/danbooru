@@ -38,9 +38,6 @@ typedef struct StateMachine {
   GQueue * dstack;
   GError * error;
   int list_nest;
-  int d;
-  int b;
-  int quote;
 } StateMachine;
 
 StateMachine* init_machine(const char * src, size_t len, bool f_inline, bool f_mentions);
