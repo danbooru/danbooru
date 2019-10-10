@@ -94,6 +94,7 @@ newline = '\r\n' | '\n';
 nonnewline = any - (newline | '\r');
 nonquote = ^'"';
 nonbracket = ^']';
+nonrparen = ^')';
 nonpipe = ^'|';
 nonpipebracket = nonpipe & nonbracket;
 noncurly = ^'}';
@@ -112,6 +113,10 @@ delimited_url = '<' url :>> '>';
 internal_url = [/#] utf8graph+;
 basic_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':' (url | internal_url) >mark_b1 @mark_b2;
 bracketed_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':[' (url | internal_url) >mark_b1 @mark_b2 :>> ']';
+
+# XXX: internal markdown links aren't allowed to avoid parsing closing tags as links: `[b]foo[/b](bar)`.
+markdown_link = '[' url >mark_a1 %mark_a2 :>> '](' nonrparen+ >mark_b1 %mark_b2 ')';
+html_link = '<a' space+ 'href="'i (url | internal_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
 
 basic_wiki_link = '[[' (nonbracket nonpipebracket*) >mark_a1 %mark_a2 ']]';
 aliased_wiki_link = '[[' nonpipebracket+ >mark_a1 %mark_a2 '|' nonpipebracket+ >mark_b1 %mark_b2 ']]';
@@ -240,6 +245,12 @@ inline := |*
 
   bracketed_textile_link => {
     if (!append_named_url(sm, sm->b1, sm->b2, sm->a1, sm->a2)) {
+      fbreak;
+    }
+  };
+
+  markdown_link | html_link => {
+    if (!append_named_url(sm, sm->a1, sm->a2 - 1, sm->b1, sm->b2)) {
       fbreak;
     }
   };

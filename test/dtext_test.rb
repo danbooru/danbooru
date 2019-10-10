@@ -260,6 +260,22 @@ class DTextTest < Minitest::Test
     assert_parse('<p>[<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/(parentheses)">test</a>]</p>', '["test":[http://test.com/(parentheses)]]')
   end
 
+  def test_markdown_links
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">test</a>', '[http://example.com](test)')
+    assert_inline_parse('<em>one</em>(two)', '[i]one[/i](two)')
+
+    assert_inline_parse(CGI.escapeHTML('[blah](test)'), '[blah](test)')
+    assert_inline_parse(CGI.escapeHTML('[](test)'), '[](test)')
+  end
+
+  def test_html_links
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">test</a>', '<a href="http://example.com">test</a>')
+    assert_inline_parse('<a class="dtext-link" href="/x">a <em>b</em> c</a>', '<a href="/x">a [i]b[/i] c</a>')
+
+    assert_inline_parse(CGI.escapeHTML('<a href="">test</a>'), '<a href="">test</a>')
+    assert_inline_parse(CGI.escapeHTML('<a id="foo" href="">test</a>'), '<a id="foo" href="">test</a>')
+  end
+
   def test_fragment_only_urls
     assert_parse('<p><a class="dtext-link" href="#toc">test</a></p>', '"test":#toc')
     assert_parse('<p><a class="dtext-link" href="#toc">test</a></p>', '"test":[#toc]')
