@@ -1,8 +1,9 @@
 <%- # forum_post %>
 <%- # original_forum_post_id %>
+<%- # dtext_data %>
 
 <div class="list-of-forum-posts list-of-messages">
   <% forum_posts.each do |forum_post| %>
-    <%= render "forum_posts/forum_post", :forum_post => forum_post, :original_forum_post_id => original_forum_post_id %>
+    <%= render "forum_posts/forum_post", forum_post: forum_post, original_forum_post_id: original_forum_post_id, dtext_data: dtext_data %>
   <% end %>
 </div>

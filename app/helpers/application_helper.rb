@@ -33,9 +33,7 @@ module ApplicationHelper
   end
 
   def format_text(text, **options)
-    raw DTextRagel.parse(text, **options)
-  rescue DTextRagel::Error => e
-    raw ""
+    raw DText.format_text(text, **options)
   end
 
   def strip_dtext(text)

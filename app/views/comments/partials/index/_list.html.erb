@@ -13,7 +13,7 @@
 
   <div class="list-of-comments list-of-messages">
     <% if comments.present? %>
-      <%= render partial: "comments/partials/show/comment", collection: comments %>
+      <%= render partial: "comments/partials/show/comment", collection: comments, locals: { dtext_data: DText.preprocess(comments.map(&:body)) } %>
     <% elsif post.last_commented_at.present? %>
       <p>There are no visible comments.</p>
     <% else %>

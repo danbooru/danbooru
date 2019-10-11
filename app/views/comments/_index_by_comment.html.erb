@@ -8,7 +8,7 @@
               <%= link_to(image_tag(comment.post.preview_file_url), post_path(comment.post)) %>
             <% end %>
           </div>
-          <%= render :partial => "comments/partials/show/comment", :collection => [comment] %>
+          <%= render partial: "comments/partials/show/comment", collection: [comment], locals: { dtext_data: DText.preprocess(@comments.map(&:body)) } %>
         <% end %>
       <% end %>
     <% end %>

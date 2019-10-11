@@ -108,6 +108,10 @@ div.prose {
     padding: 0 0.2em 0 0.3em;
     vertical-align: 1px;
   }
+
+  a.dtext-wiki-does-not-exist, a.dtext-tag-does-not-exist {
+    text-decoration: dotted underline;
+  }
 }
 
 // avoid empty gaps beneath dtext blocks in table rows.

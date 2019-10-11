@@ -1,5 +1,5 @@
 $("#threshold-comments-notice-for-<%= @post.id %>").hide();
 
 var current_comment_section = $("div.comments-for-post[data-post-id=<%= @post.id %>] div.list-of-comments");
-current_comment_section.html("<%= j(render(:partial => 'comments/partials/show/comment', :collection => @comments))%>");
+current_comment_section.html("<%= j(render(partial: 'comments/partials/show/comment', collection: @comments, locals: { dtext_data: DText.preprocess(@comments.map(&:body)) })) %>");
 $(window).trigger("danbooru:index_for_post", [<%= @post.id %>]);

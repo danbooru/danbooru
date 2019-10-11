@@ -11,7 +11,7 @@
     </div>
     <div class="content">
       <div class="prose">
-        <%= format_text(parse_embedded_tag_request_text(forum_post.body)) %>
+        <%= format_text(parse_embedded_tag_request_text(forum_post.body), data: dtext_data) %>
       </div>
       <%= render "application/update_notice", record: forum_post %>
       <menu>

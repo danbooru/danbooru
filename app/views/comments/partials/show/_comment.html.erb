@@ -22,7 +22,7 @@
     </div>
     <div class="content">
       <div class="body prose">
-        <%= format_text(comment.body) %>
+        <%= format_text(comment.body, data: dtext_data) %>
       </div>
       <%= render "application/update_notice", record: comment %>
       

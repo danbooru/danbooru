@@ -1,6 +1,8 @@
 class WikiPage < ApplicationRecord
   class RevertError < Exception ; end
 
+  META_WIKIS = ["list_of_", "tag_group:", "pool_group:", "howto:", "about:", "help:", "template:"]
+
   before_save :normalize_title
   before_save :normalize_other_names
   after_save :create_version
@@ -153,6 +155,10 @@ class WikiPage < ApplicationRecord
 
   def pretty_title
     title.tr("_", " ")
+  end
+
+  def self.is_meta_wiki?(title)
+    title.starts_with?(*META_WIKIS)
   end
 
   def wiki_page_changed?

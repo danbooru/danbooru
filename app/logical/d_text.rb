@@ -4,6 +4,54 @@ require 'uri'
 class DText
   MENTION_REGEXP = /(?<=^| )@\S+/
 
+  def self.format_text(text, data: nil, **options)
+    data = preprocess([text]) if data.nil?
+    html = DTextRagel.parse(text, **options)
+    html = postprocess(html, *data)
+    html
+  rescue DTextRagel::Error => e
+    ""
+  end
+
+  def self.preprocess(dtext_messages)
+    names = dtext_messages.map { |message| parse_wiki_titles(message) }.flatten.uniq
+    wiki_pages = WikiPage.where(title: names)
+    tags = Tag.where(name: names)
+
+    [wiki_pages, tags]
+  end
+
+  def self.postprocess(html, wiki_pages, tags)
+    fragment = Nokogiri::HTML.fragment(html)
+
+    fragment.css("a.dtext-wiki-link").each do |node|
+      name = node["href"][%r!\A/wiki_pages/show_or_new\?title=(.*)\z!i, 1]
+      name = CGI.unescape(name)
+      name = WikiPage.normalize_title(name)
+      wiki = wiki_pages.find { |wiki| wiki.title == name }
+      tag = tags.find { |tag| tag.name == name }
+
+      if wiki.blank?
+        node["class"] += " dtext-wiki-does-not-exist"
+        node["title"] = "This wiki page does not exist"
+      end
+
+      if WikiPage.is_meta_wiki?(name)
+        # skip (meta wikis aren't expected to have a tag)
+      elsif tag.blank?
+        node["class"] += " dtext-tag-does-not-exist"
+        node["title"] = "This wiki page does not have a tag"
+      elsif tag.post_count <= 0
+        node["class"] += " dtext-tag-empty"
+        node["title"] = "This wiki page does not have a tag"
+      else
+        node["class"] += " tag-type-#{tag.category}"
+      end
+    end
+
+    fragment.to_s
+  end
+
   def self.quote(message, creator_name)
     stripped_body = DText.strip_blocks(message, "quote")
     "[quote]\n#{creator_name} said:\n\n#{stripped_body}\n[/quote]\n\n"
