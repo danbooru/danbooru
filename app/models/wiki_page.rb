@@ -200,13 +200,8 @@ class WikiPage < ApplicationRecord
   end
 
   def tags
-    body.scan(/\[\[(.+?)\]\]/).flatten.map do |match|
-      if match =~ /^(.+?)\|(.+)/
-        $1
-      else
-        match
-      end
-    end.map {|x| x.mb_chars.downcase.tr(" ", "_").to_s}.uniq
+    titles = DText.parse_wiki_titles(body)
+    Tag.nonempty.where(name: titles.uniq).pluck(:name)
   end
 
   def visible?

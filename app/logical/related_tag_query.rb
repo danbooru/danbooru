@@ -42,11 +42,7 @@ class RelatedTagQuery
   end
 
   def wiki_page_tags
-    results = wiki_page.try(:tags) || []
-    results.reject! do |name|
-      name =~ /^(?:list_of_|tag_group|pool_group|howto:|about:|help:|template:)/
-    end
-    results
+    wiki_page.try(:tags) || []
   end
 
   def other_wiki_pages

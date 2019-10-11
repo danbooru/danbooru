@@ -19,6 +19,18 @@ class DText
     names.uniq
   end
 
+  def self.parse_wiki_titles(text)
+    html = DTextRagel.parse(text)
+    fragment = Nokogiri::HTML.fragment(html)
+
+    titles = fragment.css("a.dtext-wiki-link").map do |node|
+      title = node["href"][%r!\A/wiki_pages/show_or_new\?title=(.*)\z!i, 1]
+      title = CGI.unescape(title)
+      title = WikiPage.normalize_title(title)
+      title
+    end
+  end
+
   def self.strip_blocks(string, tag)
     n = 0
     stripped = ""
