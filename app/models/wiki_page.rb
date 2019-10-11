@@ -22,7 +22,7 @@ class WikiPage < ApplicationRecord
 
   module SearchMethods
     def titled(title)
-      where("title = ?", title.mb_chars.downcase.tr(" ", "_"))
+      where(title: normalize_title(title))
     end
 
     def active
@@ -59,7 +59,7 @@ class WikiPage < ApplicationRecord
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index, ts_config: "danbooru")
 
       if params[:title].present?
-        q = q.where("title LIKE ? ESCAPE E'\\\\'", params[:title].mb_chars.downcase.strip.tr(" ", "_").to_escaped_for_sql_like)
+        q = q.where_like(:title, normalize_title(params[:title]))
       end
 
       if params[:other_names_match].present?
@@ -127,8 +127,12 @@ class WikiPage < ApplicationRecord
     save!
   end
 
+  def self.normalize_title(title)
+    title.downcase.gsub(/[[:space:]]+/, "_").gsub(/__/, "_").gsub(/\A_|_\z/, "")
+  end
+
   def normalize_title
-    self.title = title.mb_chars.downcase.tr(" ", "_")
+    self.title = WikiPage.normalize_title(title)
   end
 
   def normalize_other_names
