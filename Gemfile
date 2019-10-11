@@ -24,7 +24,7 @@ gem 'stripe'
 gem 'twitter'
 gem 'aws-sdk', '~> 2'
 gem 'responders'
-gem 'dtext_rb', :git => "https://github.com/r888888888/dtext_rb.git", :require => "dtext"
+gem 'dtext_rb', git: "https://github.com/evazion/dtext_rb.git", require: "dtext"
 gem 'cityhash'
 gem 'memoist'
 gem 'daemons'
