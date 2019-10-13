@@ -61,9 +61,9 @@ module PostsHelper
   def post_source_tag(post)
     # Only allow http:// and https:// links. Disallow javascript: links.
     if post.source =~ %r!\Ahttps?://!i
-      external_link_to(post.normalized_source, strip: :subdomain, truncate: 20) + "&nbsp;".html_safe + link_to("»", post.source, rel: "noreferrer nofollow")
+      external_link_to(post.normalized_source, strip: :subdomain) + "&nbsp;".html_safe + link_to("»", post.source, rel: "external noreferrer nofollow")
     else
-      truncate(post.source, length: 100)
+      post.source
     end
   end
 

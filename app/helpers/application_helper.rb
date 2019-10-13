@@ -85,7 +85,7 @@ module ApplicationHelper
     text = text.truncate(truncate) if truncate
 
     if url =~ %r!\Ahttps?://!i
-      link_to text, url, rel: "noreferrer nofollow", **link_options
+      link_to text, url, rel: "external noreferrer nofollow", **link_options
     else
       url
     end

@@ -25,3 +25,7 @@ a.active {
 a.wiki-link {
   margin-right: 0.3em;
 }
+
+a[rel*="external"] {
+  word-break: break-all;
+}

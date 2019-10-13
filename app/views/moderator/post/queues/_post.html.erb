@@ -27,7 +27,7 @@
       <li>
         <strong>Hidden</strong>: <%= render "post_disapprovals/compact_counts", :disapprovals => post.disapprovals, :post => post %>
       </li>
-      <li class="mod-queue-post-source"><strong>Source</strong>: <%= post.source %></li>
+      <li class="mod-queue-post-source"><strong>Source</strong>: <%= post_source_tag(post) %></li>
       <% if post.has_active_pools? %>
         <li><strong>Pools</strong>: <%= render "pools/inline_list", pools: post.pools.undeleted %></li>
       <% end %>
