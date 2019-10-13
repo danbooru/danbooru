@@ -12,7 +12,7 @@
           <% if @source.artist_name.blank? %>
             <em>None</em>
           <% else %>
-            <%= link_to @source.artist_name, @source.profile_url, id: "source-info-artist-profile" %>
+            <%= external_link_to @source.profile_url, @source.artist_name, id: "source-info-artist-profile" %>
 
             <% if @source.artists.empty? %>
               (<%= link_to "Create new artist", new_artist_path(artist: { source: @source.canonical_url }), id: "source-info-create-new-artist" %>)
@@ -35,7 +35,7 @@
           <% else %>
             <ul>
               <% @source.tags.each do |tag, href| %>
-                <li><%= link_to tag, href, rel: :nofollow %></li>
+                <li><%= external_link_to href, tag %></li>
               <% end %>
             </ul>
 

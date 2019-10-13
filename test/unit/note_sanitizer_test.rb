@@ -19,19 +19,19 @@ class NoteSanitizerTest < ActiveSupport::TestCase
 
     should "mark links as nofollow" do
       body = '<a href="http://www.google.com">google</a>'
-      assert_equal('<a href="http://www.google.com" rel="nofollow">google</a>', NoteSanitizer.sanitize(body))
+      assert_equal('<a href="http://www.google.com" rel="external noreferrer nofollow">google</a>', NoteSanitizer.sanitize(body))
     end
 
     should "rewrite absolute links to relative links" do
       Danbooru.config.stubs(:hostnames).returns(%w[danbooru.donmai.us sonohara.donmai.us hijiribe.donmai.us])
 
       body = '<a href="http://sonohara.donmai.us/posts?tags=touhou#dtext-intro">touhou</a>'
-      assert_equal('<a href="/posts?tags=touhou#dtext-intro" rel="nofollow">touhou</a>', NoteSanitizer.sanitize(body))
+      assert_equal('<a href="/posts?tags=touhou#dtext-intro" rel="external noreferrer nofollow">touhou</a>', NoteSanitizer.sanitize(body))
     end
 
     should "not fail when rewriting bad links" do
       body = %{<a href ="\nhttp!://www.google.com:12x3">google</a>}
-      assert_equal(%{<a rel="nofollow">google</a>}, NoteSanitizer.sanitize(body))
+      assert_equal(%{<a rel="external noreferrer nofollow">google</a>}, NoteSanitizer.sanitize(body))
     end
   end
 end

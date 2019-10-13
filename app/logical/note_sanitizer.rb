@@ -61,7 +61,7 @@ module NoteSanitizer
       :elements => ALLOWED_ELEMENTS,
       :attributes => ALLOWED_ATTRIBUTES,
       :add_attributes => {
-        "a" => { "rel" => "nofollow" },
+        "a" => { "rel" => "external noreferrer nofollow" },
       },
       :protocols => {
         "a" => {
