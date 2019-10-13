@@ -49,7 +49,7 @@ class TagSetPresenter < Presenter
   end
 
   # compact (horizontal) list, as seen in the /comments index.
-  def inline_tag_list_html(humanize_tags: true)
+  def inline_tag_list_html(humanize_tags: false)
     html = split_tag_list_html(category_list: TagCategory.categorized_list, headers: false, show_extra_links: false, name_only: true, humanize_tags: humanize_tags)
     %{<span class="inline-tag-list">#{html}</span>}.html_safe
   end
