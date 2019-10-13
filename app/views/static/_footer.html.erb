@@ -13,7 +13,7 @@
   <% if CurrentUser.is_member? %>
     <span id="desktop-version-link" class="mobile-only">
       &ndash;
-      <%= link_to "Disable responsive mode", edit_user_path(CurrentUser.id), :rel => "nofollow" %>
+      <%= link_to "Disable responsive mode", edit_user_path(CurrentUser.id) %>
     </span>
   <% end %>
 </footer>

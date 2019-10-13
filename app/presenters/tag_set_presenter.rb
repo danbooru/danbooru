@@ -129,8 +129,8 @@ class TagSetPresenter < Presenter
       end
 
       if show_extra_links && current_query.present?
-        html << %{<a rel="nofollow" href="/posts?tags=#{u(current_query)}+#{u(name)}" class="search-inc-tag">+</a> }
-        html << %{<a rel="nofollow" href="/posts?tags=#{u(current_query)}+-#{u(name)}" class="search-exl-tag">&ndash;</a> }
+        html << %{<a href="/posts?tags=#{u(current_query)}+#{u(name)}" class="search-inc-tag">+</a> }
+        html << %{<a href="/posts?tags=#{u(current_query)}+-#{u(name)}" class="search-exl-tag">&ndash;</a> }
       end
     end
 

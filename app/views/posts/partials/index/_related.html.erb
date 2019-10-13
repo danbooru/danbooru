@@ -12,8 +12,8 @@
       <% end %>
     <% end %>
 
-    <li><%= link_to "Deleted", posts_path(:tags => "#{params[:tags]} status:deleted"), :rel => "nofollow" %></li>
-    <li><%= link_to "Random", random_posts_path(:tags => params[:tags]), :id => "random-post", :rel => "nofollow", :"data-shortcut" => "r" %></li>
+    <li><%= link_to "Deleted", posts_path(tags: "#{params[:tags]} status:deleted") %></li>
+    <li><%= link_to "Random", random_posts_path(tags: params[:tags]), id: "random-post", "data-shortcut": "r" %></li>
     <% if Tag.is_simple_tag?(params[:tags]) %>
       <li><%= link_to "History", post_versions_path(search: { changed_tags: params[:tags] }) %></li>
     <% end %>

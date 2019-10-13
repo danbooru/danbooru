@@ -4,7 +4,7 @@
     <li id="post-info-uploader">Uploader: <%= link_to_user(post.uploader) %></li>
   <% end %>
   <li id="post-info-date">
-    Date: <%= link_to time_ago_in_words_tagged(post.created_at), posts_path(:tags => "date:#{post.created_at.to_date}"), :rel => "nofollow" %>
+    Date: <%= link_to time_ago_in_words_tagged(post.created_at), posts_path(tags: "date:#{post.created_at.to_date}") %>
     <meta itemprop="uploadDate" content="<%= post.created_at.iso8601 %>">
   </li>
   <% if post.approver %>
