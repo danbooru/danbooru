@@ -11,6 +11,8 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
     subject { RelatedTagQuery.new(query: "copyright") }
 
     setup do
+      create(:tag, name: "alpha", post_count: 1)
+      create(:tag, name: "beta", post_count: 1)
       @copyright = FactoryBot.create(:copyright_tag, name: "copyright")
       @wiki = FactoryBot.create(:wiki_page, title: "copyright", body: "[[list_of_hoges]]")
       @list_of_hoges = FactoryBot.create(:wiki_page, title: "list_of_hoges", body: "[[alpha]] and [[beta]]")
@@ -55,13 +57,14 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
 
     context "for an aliased tag" do
       setup do
+        create(:tag, name: "foo", post_count: 42)
         @ta = FactoryBot.create(:tag_alias, antecedent_name: "xyz", consequent_name: "aaa")
-        @wp = FactoryBot.create(:wiki_page, title: "aaa", body: "blah [[foo|blah]] [[FOO]] [[bar]] blah")
+        @wp = FactoryBot.create(:wiki_page, title: "aaa", body: "blah [[foo|blah]] [[FOO]] [[does not exist]] blah")
         @query = RelatedTagQuery.new(query: "xyz")
       end
 
       should "take wiki tags from the consequent's wiki" do
-        assert_equal(%w[foo bar], @query.wiki_page_tags)
+        assert_equal(%w[foo], @query.wiki_page_tags)
       end
 
       should "take related tags from the consequent tag" do
