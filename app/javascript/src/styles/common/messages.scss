@@ -14,6 +14,7 @@ div.list-of-messages {
     div.author {
       flex-basis: 12em;
       margin-right: 1em;
+      min-width: 0;
 
       a.message-timestamp {
         font-style: italic;
