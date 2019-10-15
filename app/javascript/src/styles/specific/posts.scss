@@ -42,6 +42,11 @@ article.post-preview {
     vertical-align: text-top;
   }
 
+  &.post-preview-compact {
+    width: auto;
+    height: auto;
+  }
+
   .desc {
     font-size: 80%;
     margin-bottom: 0;

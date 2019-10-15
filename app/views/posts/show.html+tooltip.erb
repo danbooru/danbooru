@@ -38,7 +38,7 @@
 <div class="post-tooltip-body <%= "has-preview" if params[:preview].truthy? %>">
   <div class="post-tooltip-body-left">
     <% if params[:preview].truthy? %>
-      <%= PostPresenter.preview(@post, show_deleted: true) %>
+      <%= PostPresenter.preview(@post, show_deleted: true, compact: true) %>
     <% end %>
   </div>
 
