@@ -68,7 +68,7 @@ Upload.validate_upload = function (e) {
 
 Upload.initialize_iqdb_source = function() {
   if (/^https?:\/\//.test($("#upload_source").val())) {
-    $.get("/iqdb_queries", {"url": $("#upload_source").val()}).done(function(html) {$("#iqdb-similar").html(html)});
+    $.get("/iqdb_queries.js", { url: $("#upload_source").val() });
   }
 }
 

@@ -1,6 +1,5 @@
 class IqdbQueriesController < ApplicationController
-  respond_to :html, :json
-  before_action :detect_xhr
+  respond_to :html, :json, :xml, :js
 
   def show
     if params[:url]
@@ -16,22 +15,6 @@ class IqdbQueriesController < ApplicationController
       @matches = IqdbProxy.decorate_posts(JSON.parse(params[:matches]))
     end
 
-    respond_with(@matches) do |fmt|
-      fmt.html do |html|
-        html.xhr { render layout: false}
-      end
-      
-      fmt.json do
-        render json: @matches
-      end
-    end
-  end
-
-private
-  
-  def detect_xhr
-    if request.xhr?
-      request.variant = :xhr
-    end
+    respond_with(@matches)
   end
 end
