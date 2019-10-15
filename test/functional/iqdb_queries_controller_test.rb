@@ -23,8 +23,10 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "render a response" do
-          IqdbProxy.expects(:query).with(@url).returns(@mocked_response)
-          get_auth iqdb_queries_path(variant: "xhr"), @user, params: @params
+          IqdbProxy.expects(:query).returns(@mocked_response)
+          get_auth iqdb_queries_path, @user, as: :javascript, params: @params
+
+          assert_response :success
           assert_select("#post_#{@posts[0].id}")
         end
       end
@@ -41,22 +43,24 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "redirect to iqdbs" do
-          IqdbProxy.expects(:query).with(@posts[0].preview_file_url).returns(@mocked_response)
+          IqdbProxy.expects(:query).returns(@mocked_response)
           get_auth iqdb_queries_path, @user, params: @params
+
+          assert_response :success
           assert_select("#post_#{@posts[0].id}")
         end
       end
 
       context "with matches" do
         setup do
-          json = @posts.map {|x| {"post_id" => x.id, "score" => 1}}.to_json          
+          json = @posts.map {|x| {"post_id" => x.id, "score" => 1}}.to_json
           @params = { matches: json }
         end
 
         should "render with matches" do
           get_auth iqdb_queries_path, @user, params: @params
           assert_response :success
-        end        
+        end
       end
     end
   end

@@ -3,15 +3,12 @@ class IqdbQueriesController < ApplicationController
 
   def show
     if params[:url]
-      strategy = Sources::Strategies.find(params[:url])
-      @matches = IqdbProxy.query(strategy.image_url)
-    end
-
-    if params[:post_id]
-      @matches = IqdbProxy.query(Post.find(params[:post_id]).preview_file_url)
-    end
-
-    if params[:matches]
+      url = Sources::Strategies.find(params[:url]).image_url
+      @matches = IqdbProxy.query(url, params[:limit], params[:similarity])
+    elsif params[:post_id]
+      url = Post.find(params[:post_id]).preview_file_url
+      @matches = IqdbProxy.query(url, params[:limit], params[:similarity])
+    elsif params[:matches]
       @matches = IqdbProxy.decorate_posts(JSON.parse(params[:matches]))
     end
 
