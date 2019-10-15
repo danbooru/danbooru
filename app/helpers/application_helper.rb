@@ -164,11 +164,11 @@ module ApplicationHelper
     end
   end
 
-  def search_form_for(url, classes: "inline-form", &block)
+  def search_form_for(url, classes: "inline-form", method: :get, &block)
     defaults = { required: false }
     html_options = { autocomplete: "off", class: "search-form #{classes}" }
 
-    simple_form_for(:search, method: :get, url: url, defaults: defaults, html: html_options, &block)
+    simple_form_for(:search, method: method, url: url, defaults: defaults, html: html_options, &block)
   end
 
   def body_attributes(user = CurrentUser.user)

@@ -2,22 +2,13 @@
   <div id="a-check">
     <h1>Similar Images Search</h1>
     <section>
-      <p>You can upload a file or paste a URL to perform an image similarity search with every upload on <%= Danbooru.config.app_name %>. Note that this page will redirect you to <%= link_to "IQDBS", Danbooru.config.iqdbs_server %>. You will be redirected back here once the search is executed.</p>
+      <p>Paste a URL or upload a file to perform a reverse image search on <%= Danbooru.config.app_name %>.</p>
 
-      <%= form_tag("#{Danbooru.config.iqdbs_server}/similar", method: :post, class: "simple_form", multipart: true ) do %>
-        <%= hidden_field_tag "callback", iqdb_queries_url %>
-
-        <div class="input string optional">
-          <%= label_tag "url", "URL", class: "string optional" %>
-          <%= text_field_tag "url", params[:url] %>
-        </div>
-
-        <div class="input string optional fallback">
-          <%= label_tag "file", "File", class: "string optional" %>
-          <%= file_field_tag :file, :size => 50 %>
-        </div>
-
-        <%= submit_tag "Search" %>
+      <%= search_form_for(iqdb_queries_path, method: :post) do |f| %>
+        <%= f.input :post_id, label: "Post ID", input_html: { value: params[:search][:post_id] } %>
+        <%= f.input :url, input_html: { value: params[:search][:url] } %>
+        <%= f.input :file, as: :file %>
+        <%= f.submit "Search" %>
       <% end %>
     </section>
 
