@@ -63,9 +63,15 @@ class PostPresenter < Presenter
     locals[:width] = post.image_width
     locals[:height] = post.image_height
 
-    downscale_ratio = Danbooru.config.small_image_width.to_f / [post.image_width, post.image_height].max
-    locals[:preview_width] = [(downscale_ratio * post.image_width).floor, post.image_width].min
-    locals[:preview_height] = [(downscale_ratio * post.image_height).floor, post.image_height].min
+    # XXX work around ancient bad posts with null or zero dimensions.
+    if post.image_width.to_i > 0 && post.image_height.to_i > 0
+      downscale_ratio = Danbooru.config.small_image_width.to_f / [post.image_width, post.image_height].max
+      locals[:preview_width] = [(downscale_ratio * post.image_width).floor, post.image_width].min
+      locals[:preview_height] = [(downscale_ratio * post.image_height).floor, post.image_height].min
+    else
+      locals[:preview_width] = 0
+      locals[:preview_height] = 0
+    end
 
     if options[:similarity]
       locals[:similarity] = options[:similarity].round
