@@ -62,20 +62,13 @@
 
   <div class="input">
     <%= f.label :parent_id, "Parent" %>
-    <%= f.text_field :parent_id, :size => 5 %>
+    <%= f.text_field :parent_id, size: 60 %>
   </div>
 
   <div class="input">
     <%= f.label :source %>
-    <%= f.text_field :source %>
-    <%= button_tag "Similar", :id => "similar-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub" %>
+    <%= f.text_field :source, size: 60 %>
   </div>
-
-  <% if Danbooru.config.iqdbs_server %>
-    <div class="input" id="iqdb-similar" style="display: none;"></div>
-  <% end %>
-
-
 
   <div class="input fixed-width-container" id="tags-container">
     <div class="header">

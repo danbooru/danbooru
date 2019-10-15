@@ -30,7 +30,6 @@ Post.initialize_all = function() {
     this.initialize_post_sections();
     this.initialize_post_image_resize_links();
     this.initialize_post_image_resize_to_window_link();
-    this.initialize_similar();
 
     if (CurrentUser.data("always-resize-images") || (Utility.meta("viewport") && (window.screen.width <= 660))) {
       $("#image-resize-to-window-link").click();
@@ -169,13 +168,6 @@ Post.close_edit_dialog = function(e, ui) {
   $("#open-edit-dialog").show();
   $tag_string.css({"resize": "", "width": ""});
   $(document).trigger("danbooru:close-post-edit-dialog");
-}
-
-Post.initialize_similar = function() {
-  $("#similar-button").on("click.danbooru", function(e) {
-    $.get("/iqdb_queries", {"url": $("#post_source").val()}).done(function(html) {$("#iqdb-similar").html(html).show()});
-    e.preventDefault();
-  });
 }
 
 Post.swipe_prev = function(e) {
