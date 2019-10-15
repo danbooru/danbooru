@@ -91,6 +91,13 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
       should "find any tags embedded in the wiki page" do
         assert_equal(["bbb", "ccc"], @query.wiki_page_tags)
       end
+
+      should "return the tags in the same order as given by the wiki" do
+        create(:wiki_page, title: "wiki", body: "[[ccc]] [[bbb]] [[ccc]] [[bbb]] [[aaa]]")
+
+        query = RelatedTagQuery.new(query: "wiki")
+        assert_equal(%w[ccc bbb aaa], query.wiki_page_tags)
+      end
     end
   end
 

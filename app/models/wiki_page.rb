@@ -206,8 +206,9 @@ class WikiPage < ApplicationRecord
   end
 
   def tags
-    titles = DText.parse_wiki_titles(body)
-    Tag.nonempty.where(name: titles.uniq).pluck(:name)
+    titles = DText.parse_wiki_titles(body).uniq
+    tags = Tag.nonempty.where(name: titles).pluck(:name)
+    titles & tags
   end
 
   def visible?
