@@ -6,7 +6,7 @@ let Upload = {};
 
 Upload.MAX_FILE_SIZE = <%= Danbooru.config.max_file_size.to_json %> / (1024 * 1024);
 Upload.IQDB_LIMIT = 5;
-Upload.IQDB_SIMILARITY = 20;
+Upload.IQDB_SIMILARITY = 50;
 
 Upload.initialize_all = function() {
   if ($("#c-uploads,#c-posts").length) {
