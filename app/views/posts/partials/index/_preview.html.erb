@@ -13,12 +13,23 @@
   <% end -%>
   <% if similarity -%>
     <p class="desc">
-      Similarity: <%= similarity %>
+      <% if post.source =~ %r!\Ahttps?://!i %>
+        <%= external_link_to post.normalized_source, post.source_domain %>
+        (<%= time_ago_in_words_tagged(post.created_at, compact: true) %>)
+      <% else %>
+        <%= time_ago_in_words_tagged(post.created_at, compact: true) %>
+      <% end %>
     </p>
-  <% end -%>
+  <% end %>
   <% if size -%>
     <p class="desc">
-      <%= number_to_human_size(size) %> (<%= width %>x<%= height %>)
+      <%= link_to number_to_human_size(size), post.file_url %>
+      (<%= width %>x<%= height %>)
+    </p>
+  <% end -%>
+  <% if similarity -%>
+    <p class="desc">
+      <%= link_to "#{similarity}%", iqdb_queries_path(post_id: post.id) %> similarity
     </p>
   <% end -%>
 <% end -%>

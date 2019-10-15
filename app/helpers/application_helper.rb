@@ -67,7 +67,7 @@ module ApplicationHelper
   def time_ago_in_words_tagged(time, compact: false)
     if time.past?
       text = time_ago_in_words(time) + " ago"
-      text = text.gsub(/almost|about|over/, "") if compact
+      text = text.gsub(/almost|about|over/, "").strip if compact
       raw time_tag(text, time)
     else
       raw time_tag("in " + distance_of_time_in_words(Time.now, time), time)

@@ -21,6 +21,7 @@ class PostPresenter < Presenter
     end
 
     locals = {}
+    locals[:post] = post
 
     locals[:article_attrs] = {
       "id" => "post_#{post.id}",
@@ -74,7 +75,7 @@ class PostPresenter < Presenter
     end
 
     if options[:similarity]
-      locals[:similarity] = options[:similarity].round
+      locals[:similarity] = options[:similarity].round(1)
     else
       locals[:similarity] = nil
     end
