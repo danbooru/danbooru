@@ -48,7 +48,7 @@ class RelatedTagQuery
   def other_wiki_pages
     return [] unless Tag.category_for(query) == Tag.categories.copyright
 
-    other_wikis = DText.parse_wiki_titles(wiki_page.body).grep(/\Alist_of_/i)
+    other_wikis = DText.parse_wiki_titles(wiki_page&.body&.to_s).grep(/\Alist_of_/i)
     other_wikis = other_wikis.map { |name| WikiPage.titled(name).first }
     other_wikis = other_wikis.select { |wiki| wiki.tags.present? }
     other_wikis
