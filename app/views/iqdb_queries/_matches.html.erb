@@ -1,11 +1,26 @@
-<% if @matches.present? %>
-  <h3>Similar Posts</h3>
-  <p class="fineprint">Found <%= pluralize(@matches.length, "similar post") %>:</p>
+<div class="iqdb-posts">
+  <h2>Similar Posts</h2>
 
-  <% @matches.each do |match| %>
-    <%= PostPresenter.preview(match["post"], tags: "status:any", similarity: match["score"], size: true, compact: true) %>
-  <% end %>
-<% else %>
-  <h3>Similar Posts</h3>
-  <p class="fineprint">No similar posts found.</p>
-<% end %>
+  <p class="fineprint">
+    <% if @high_similarity_matches.blank? %>
+      No similar posts found.
+    <% end %>
+
+    <% if @low_similarity_matches.present? %>
+      Found <%= pluralize(@low_similarity_matches.length, "low similarity match") %>
+      (<%= link_to "show", "#", class: "toggle-iqdb-posts-low-similarity" %><%= link_to "hide", "#", class: "toggle-iqdb-posts-low-similarity", style: "display: none" %>)
+    <% end %>
+  </p>
+
+  <span class="iqdb-posts-high-similarity">
+    <% @high_similarity_matches.each do |match| %>
+      <%= PostPresenter.preview(match["post"], tags: "status:any", similarity: match["score"], size: true) %>
+    <% end %>
+  </span>
+
+  <span class="iqdb-posts-low-similarity" style="display: none">
+    <% @low_similarity_matches.each do |match| %>
+      <%= PostPresenter.preview(match["post"], tags: "status:any", similarity: match["score"], size: true) %>
+    <% end %>
+  </span>
+</div>

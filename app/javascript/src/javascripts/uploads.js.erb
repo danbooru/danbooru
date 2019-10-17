@@ -6,7 +6,8 @@ let Upload = {};
 
 Upload.MAX_FILE_SIZE = <%= Danbooru.config.max_file_size.to_json %> / (1024 * 1024);
 Upload.IQDB_LIMIT = 5;
-Upload.IQDB_SIMILARITY = 50;
+Upload.IQDB_MIN_SIMILARITY = 50;
+Upload.IQDB_HIGH_SIMILARITY = 65;
 
 Upload.initialize_all = function() {
   if ($("#c-uploads,#c-posts").length) {
@@ -81,7 +82,14 @@ Upload.initialize_similar = function() {
 
     let source = $("#upload_source").val();
     if (/^https?:\/\//.test(source)) {
-      $.get("/iqdb_queries.js", { url: source, limit: Upload.IQDB_LIMIT, similarity: Upload.IQDB_SIMILARITY });
+      $.get("/iqdb_queries.js", {
+        limit: Upload.IQDB_LIMIT,
+        search: {
+          url: source,
+          similarity: Upload.IQDB_MIN_SIMILARITY,
+          high_similarity: Upload.IQDB_HIGH_SIMILARITY
+        }
+      });
     }
   });
 }

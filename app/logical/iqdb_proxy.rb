@@ -9,7 +9,8 @@ class IqdbProxy
     raise NotImplementedError, "the IQDBs service isn't configured" unless enabled?
 
     limit = params[:limit]&.to_i&.clamp(1, 1000) || 20
-    similarity = params[:similarity].to_f.clamp(0.0, 100.0)
+    similarity = params[:similarity]&.to_f&.clamp(0.0, 100.0) || 0.0
+    high_similarity = params[:high_similarity]&.to_f&.clamp(0.0, 100.0) || 65.0
 
     if params[:file].present?
       results = query(file: params[:file], limit: limit)
@@ -24,7 +25,10 @@ class IqdbProxy
     end
 
     results = results.select { |result| result["score"] >= similarity }.take(limit)
-    decorate_posts(results)
+    matches = decorate_posts(results)
+    high_similarity_matches, low_similarity_matches = matches.partition { |match| match["score"] >= high_similarity }
+
+    [high_similarity_matches, low_similarity_matches, matches]
   end
 
   def self.query(params)
