@@ -17,77 +17,38 @@
 
       <div id="client-errors" class="error-messages ui-state-error ui-corner-all" style="display:none"></div>
 
-      <%= form_for(@upload, :html => {:multipart => true, :class => "simple_form", :id => "form"}) do |f| %>
-        <%= f.hidden_field :md5_confirmation %>
-        <%= f.hidden_field :referer_url, value: params[:ref] %>
+      <%= simple_form_for(@upload, html: { id: "form" }) do |f| %>
+        <%= f.input :md5_confirmation, as: :hidden %>
+        <%= f.input :referer_url, as: :hidden, input_html: { value: params[:ref] } %>
 
         <% if CurrentUser.can_upload_free? %>
-          <div class="input">
-            <label for="upload_as_pending">
-              <%= f.check_box :as_pending, :checked => params[:as_pending].present? %>
-              Upload for approval
-            </label>
-          </div>
+          <%= f.input :as_pending, as: :boolean, label: "Upload for approval", input_html: { checked: params[:as_pending].present? } %>
         <% end %>
 
-        <div class="input fallback">
-          <%= f.label :file %>
-          <%= f.file_field :file, :size => 50 %>
-        </div>
+        <%= f.input :file, as: :file, size: 50, wrapper_html: { class: "fallback" } %>
 
         <div class="input" id="filedropzone">
           <div class="dropzone-hint">Click or drag and drop to upload a file</div>
           <div class="dropzone-hint hint">Max size: <%= number_to_human_size(Danbooru.config.max_file_size) %>. Supported filetypes: jpg, png, gif, swf, mp4, webm.</div>
         </div>
 
-        <div class="input">
-          <%= f.label :source %>
-          <%= f.text_field :source, :size => 50, :value => params[:url] %>
-          <%= button_tag "Similar", :id => "similar-button", :type => "button", :class => "ui-button ui-widget ui-corner-all sub" %>
-          <span class="hint">You can enter a URL to have <%= Danbooru.config.app_name %> automatically download and process it</span>
+        <div class="upload_source_container">
+          <%= f.input :source, as: :string, placeholder: "Enter the URL to upload here", input_html: { size: 50, value: params[:url] } %>
+          <%= tag.button "Similar", id: "similar-button" %>
         </div>
 
-        <div class="input">
-          <%= f.label :rating %>
+        <%= f.input :rating, collection: [["Explicit", "e"], ["Questionable", "q"], ["Safe", "s"]], as: :radio_buttons, selected: params[:rating] %>
 
-          <fieldset class="ratings">
-            <%= f.radio_button :rating, :e, :checked => (params[:rating] == "e") %>
-            <%= f.label :rating_e, "Explicit", :title => "Hardcore porn, visible genitals" %>
+        <%= f.input :parent_id, label: "Parent ID", as: :string, input_html: { value: params[:parent_id] } %>
 
-            <%= f.radio_button :rating, :q, :checked => (params[:rating] == "q") %>
-            <%= f.label :rating_q, "Questionable", :title => "Nudity, anything erotic" %>
-
-            <%= f.radio_button :rating, :s, :checked => (params[:rating] == "s") %>
-            <%= f.label :rating_s, "Safe", :title => "Everything else" %>
-          </fieldset>
-        </div>
-
-        <div class="input">
-          <%= f.label :parent_id, "Parent ID" %>
-          <%= f.text_field :parent_id, :value => params[:parent_id] %>
-        </div>
-
-        <div class="input">
+        <div class="input upload_artist_commentary_container">
           <strong>Commentary</strong>
           <a href="#" id="toggle-artist-commentary">show »</a>
 
           <div class="artist-commentary" style="display: none;">
-            <div class="input">
-              <%= f.label :artist_commentary_title, "Title" %>
-              <%= f.text_field :artist_commentary_title, :value => params[:artist_commentary_title] %>
-            </div>
-
-            <div class="input">
-              <%= f.label :artist_commentary_desc, "Description" %>
-              <%= f.text_area :artist_commentary_desc, :size => "60x5", :value => params[:artist_commentary_desc] %>
-            </div>
-
-            <div class="input">
-              <label for="upload_include_artist_commentary">
-                <%= f.check_box :include_artist_commentary, :checked => params[:include_artist_commentary].present? %>
-                Include Commentary
-              </label>
-            </div>
+            <%= f.input :artist_commentary_title, as: :string, label: "Title", input_html: { size: 60, value: params[:artist_commentary_title] } %>
+            <%= f.input :artist_commentary_desc, as: :text, label: "Description", input_html: { size: "60x5", value: params[:artist_commentary_desc] } %>
+            <%= f.input :include_artist_commentary, as: :boolean, label: "Include Commentary", input_html: { checked: params[:include_artist_commentary].present? } %>
           </div>
         </div>
 
@@ -102,15 +63,11 @@
             </span>
           </div>
 
-          <div>
-            <%= f.text_area :tag_string, :size => "60x5", :spellcheck => false, :"data-autocomplete" => "tag-edit", :"data-shortcut" => "e", :value => params[:tag_string] %>
-          </div>
+          <%= f.input :tag_string, label: false, input_html: { size: "60x5", "data-autocomplete": "tag-edit", "data-shortcut": "e", spellcheck: false, value: params[:tag_string] } %>
           <%= render "related_tags/buttons" %>
         </div>
 
-        <div class="input">
-          <%= submit_tag "Submit", :id => "submit-button", :class => "large ui-button ui-widget ui-corner-all", data: { disable_with: false } %>
-        </div>
+        <%= f.submit "Submit", id: "submit-button", data: { disable_with: false } %>
 
         <%= render "related_tags/container" %>
       <% end %>

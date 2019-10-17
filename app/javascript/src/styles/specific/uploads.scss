@@ -2,7 +2,6 @@ div#c-uploads {
   div#a-new {
     .artist-commentary {
       margin-top: 1em;
-      margin-left: 1em;
     }
 
     div#upload-guide-notice {
@@ -15,30 +14,32 @@ div#c-uploads {
 
     div#related-posts-by-source, div#iqdb-similar {
       display: inline-block;
-
-      .hint {
-        white-space: nowrap;
-        max-width: 100%;
-      }
     }
 
-    label[for="upload_as_pending"] {
+    div.upload_source {
+      display: inline-block;
+    }
+
+    div.upload_rating .radio label {
+      font-weight: normal;
       display: inline;
-    }
+      margin-right: 2em;
 
-    fieldset.ratings {
-      label {
-        display: inline;
+      input {
+        margin-right: 0.5em;
       }
     }
 
-    textarea {
-      margin-bottom: 0.25em;
+    textarea#upload_tag_string {
       width: 100%;
     }
 
     div.field_with_errors {
       display: inline;
+    }
+
+    #related-tags-container {
+      margin-top: 1em;
     }
   }
 
