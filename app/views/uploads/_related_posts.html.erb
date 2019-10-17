@@ -2,7 +2,7 @@
 
 <% if source.present? && source.related_posts.present? %>
   <div id="related-posts-by-source">
-    <h3>Related Posts</h3>
+    <h2>Related Posts</h2>
 
     <p class="fineprint">
       Found <%= link_to pluralize(source.related_posts.total_count, "other post"), posts_path(tags: source.related_posts_search_query) %> from the same source:
