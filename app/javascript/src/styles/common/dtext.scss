@@ -112,6 +112,15 @@ div.prose {
   a.dtext-wiki-does-not-exist, a.dtext-tag-does-not-exist {
     text-decoration: dotted underline;
   }
+
+  .spoiler, .spoiler * {
+    color: var(--dtext-spoiler-color);
+    background: var(--dtext-spoiler-background-color);
+  }
+
+  .spoiler:hover, .spoiler:hover * {
+    color: var(--dtext-spoiler-hover-color);
+  }
 }
 
 // avoid empty gaps beneath dtext blocks in table rows.
