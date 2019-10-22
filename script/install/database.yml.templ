@@ -24,27 +24,6 @@ production:
   timeout: 5000
   url: <%= ENV['DATABASE_URL'] %>
 
-# read only databases, just point to local copies if you have no need
-ro_development:
-  adapter: postgresql
-  database: danbooru2
-  url: <%= ENV['RO_DATABASE_URL'] %>
-
-ro_test:
-  adapter: postgresql
-  database: danbooru2_test
-  url: <%= ENV['RO_DATABASE_URL'] %>
-
-ro_production:
-  adapter: postgresql
-  database: danbooru2
-  url: <%= ENV['RO_DATABASE_URL'] %>
-
-ro_staging:
-  adapter: postgresql
-  database: danbooru2
-  url: <%= ENV['RO_DATABASE_URL'] %>
-
 archive_development:
   adapter: postgresql
   database: archive_development

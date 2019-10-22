@@ -31,7 +31,6 @@ services:
       - SESSION_SECRET_KEY
       - RAILS_ENV
       - DATABASE_URL
-      - RO_DATABASE_URL
       - DEBUG
       - ARCHIVE_DATABASE_URL
       - DANBOORU_AWS_SQS_ARCHIVE_URL
