@@ -10,6 +10,34 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
+-- Name: bktree; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS bktree WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION bktree; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION bktree IS 'BK-tree implementation';
+
+
+--
+-- Name: cube; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS cube WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION cube; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION cube IS 'data type for multidimensional cubes';
+
+
+--
 -- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -2120,6 +2148,45 @@ ALTER SEQUENCE public.forum_topics_id_seq OWNED BY public.forum_topics.id;
 
 
 --
+-- Name: image_hashes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.image_hashes (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    md5 character varying NOT NULL,
+    post_md5 character varying NOT NULL,
+    phash bytea NOT NULL,
+    block_mean_zero_hash bytea NOT NULL,
+    marr_hildreth_hash bytea NOT NULL,
+    color_moment_hash double precision[] NOT NULL,
+    phash_popcount smallint[] NOT NULL,
+    block_mean_zero_hash_popcount smallint[] NOT NULL,
+    marr_hildreth_hash_popcount smallint[] NOT NULL
+);
+
+
+--
+-- Name: image_hashes_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.image_hashes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: image_hashes_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.image_hashes_id_seq OWNED BY public.image_hashes.id;
+
+
+--
 -- Name: ip_bans; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4045,6 +4112,13 @@ ALTER TABLE ONLY public.forum_topics ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
+-- Name: image_hashes id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.image_hashes ALTER COLUMN id SET DEFAULT nextval('public.image_hashes_id_seq'::regclass);
+
+
+--
 -- Name: ip_bans id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4406,6 +4480,14 @@ ALTER TABLE ONLY public.forum_topic_visits
 
 ALTER TABLE ONLY public.forum_topics
     ADD CONSTRAINT forum_topics_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: image_hashes image_hashes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.image_hashes
+    ADD CONSTRAINT image_hashes_pkey PRIMARY KEY (id);
 
 
 --
@@ -6439,6 +6521,41 @@ CREATE INDEX index_forum_topics_on_updated_at ON public.forum_topics USING btree
 
 
 --
+-- Name: index_image_hashes_on_cube_block_mean_zero_hash_popcount; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_image_hashes_on_cube_block_mean_zero_hash_popcount ON public.image_hashes USING gist (public.cube((block_mean_zero_hash_popcount)::double precision[]));
+
+
+--
+-- Name: index_image_hashes_on_cube_color_moment_hash; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_image_hashes_on_cube_color_moment_hash ON public.image_hashes USING gist (public.cube(color_moment_hash));
+
+
+--
+-- Name: index_image_hashes_on_cube_marr_hildreth_hash_popcount; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_image_hashes_on_cube_marr_hildreth_hash_popcount ON public.image_hashes USING gist (public.cube((marr_hildreth_hash_popcount)::double precision[]));
+
+
+--
+-- Name: index_image_hashes_on_cube_phash_popcount; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_image_hashes_on_cube_phash_popcount ON public.image_hashes USING gist (public.cube((phash_popcount)::double precision[]));
+
+
+--
+-- Name: index_image_hashes_on_post_md5; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_image_hashes_on_post_md5 ON public.image_hashes USING btree (post_md5);
+
+
+--
 -- Name: index_ip_bans_on_ip_addr; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7337,6 +7454,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190908035317'),
 ('20190919175836'),
 ('20190923071044'),
-('20190926000912');
+('20190926000912'),
+('20191019195411');
 
 

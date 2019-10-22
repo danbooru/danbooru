@@ -1,0 +1,51 @@
+<div id="c-similar-images">
+  <div id="a-search">
+    <h1>Similar Images Search</h1>
+    <%= render "form" %>
+
+    <table class="striped autofit">
+      <thead>
+        <tr>
+          <th>Post ID</th>
+          <th>Hash</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @image_hashes.each do |image_hash| %>
+          <tr>
+            <!-- <td class="col-expand"><%= PostPresenter.preview(image_hash.post, show_deleted: true, tags: "status:any") %></td> -->
+            <%# XXX %>
+            <td class="col-expand">
+              <%= link_to "https://danbooru.donmai.us/posts?md5=#{image_hash.post_md5}" do %>
+                <%= tag.img src: "https://raikou4.donmai.us/preview/#{image_hash.post_md5[0..1]}/#{image_hash.post_md5[2..3]}/#{image_hash.post_md5}.jpg" %>
+              <% end %>
+            </td>
+
+            <td>
+              <dl>
+                <dt>Marr Hildreth</dt>
+                <dd><%= image_hash.marr_hildreth_hash.unpack("H*").first %></dd>
+
+                <dt>Block Mean Zero</dt>
+                <dd><%= image_hash.block_mean_zero_hash.unpack("H*").first %></dd>
+
+                <dt>PHash</dt>
+                <dd><%= image_hash.phash.unpack("H*").first %></dd>
+
+                <dt>Color Moment</dt>
+                <dd><%= image_hash.color_moment_hash.map { |n| n.round(6) } %></dd>
+              </dl>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+
+    <%= numbered_paginator(@image_hashes) %>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Similar Images Search - <%= Danbooru.config.app_name %>
+<% end %>

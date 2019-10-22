@@ -159,6 +159,12 @@ Rails.application.routes.draw do
       get :check, to: redirect {|path_params, req| "/iqdb_queries?#{req.query_string}"}
     end
   end
+  resources :similar_images, only: [:index] do
+    collection do
+      get :search
+      post :search
+    end
+  end
   resources :janitor_trials do
     collection do
       get :test

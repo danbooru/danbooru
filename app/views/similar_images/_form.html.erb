@@ -1,0 +1,11 @@
+<section>
+  <p>Enter a URL or upload a file to perform a reverse image search on <%= Danbooru.config.app_name %>.</p>
+
+  <%= search_form_for(search_similar_images_path, method: :post) do |f| %>
+    <%= f.input :post_id, label: "Post ID", input_html: { value: params[:search][:post_id] } %>
+    <%= f.input :url, input_html: { value: params[:search][:url] } %>
+    <%= f.input :file, as: :file %>
+    <%= f.input :order, include_blank: false, collection: [["Marr Hildreth", "marr_hildreth_hash"], ["Block Mean Zero", "block_mean_zero_hash"], ["PHash", "phash"], ["Color Moment", "color_moment_hash"]], selected: params.dig(:search, :order) %>
+    <%= f.submit "Search" %>
+  <% end %>
+</section>

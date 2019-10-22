@@ -15,7 +15,8 @@
         <% if CurrentUser.is_moderator? %>
           <li><%= link_to("Mass Edit", edit_moderator_tag_path) %></li>
         <% end %>
-        <li><%= link_to("Similar Images Search", iqdb_queries_path) %></li>
+        <li><%= link_to("IQDB Search", iqdb_queries_path) %></li>
+        <li><%= link_to("Similar Images Search", similar_images_path) %></li>
       </ul>
       <ul>
         <li><h1>Post Events</h1></li>

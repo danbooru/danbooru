@@ -89,6 +89,8 @@ class UploadService
       )
     end
 
+    ImageHash.create_from_post!(@post)
+
     upload.update(status: "completed", post_id: @post.id)
 
     if @post.is_pending? && Automod::UpdateDynamoDbJob.enabled?

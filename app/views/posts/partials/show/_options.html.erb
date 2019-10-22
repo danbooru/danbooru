@@ -5,6 +5,9 @@
   <li id="post-option-find-similar">
     <%= link_to "Find similar", iqdb_queries_path(post_id: post.id) %>
   </li>
+  <li id="post-option-similar-images">
+    <%= link_to "Similar images", similar_images_path(search: { post_id: post.id }) %>
+  </li>
   <li id="post-option-download">
     <%= link_to_if post.visible?, "Download", post.tagged_file_url + "?download=1", download: post.presenter.filename_for_download %>
   </li>

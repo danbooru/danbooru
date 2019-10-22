@@ -79,6 +79,12 @@ class ApplicationRecord < ActiveRecord::Base
         end
       end
 
+      def search_binary_attribute(attribute, params)
+        return all unless params[attribute]
+
+        where(attribute => params[attribute].unpack("H*").first)
+      end
+
       # range: "5", ">5", "<5", ">=5", "<=5", "5..10", "5,6,7"
       def numeric_attribute_matches(attribute, range)
         return all unless range.present?
@@ -130,6 +136,8 @@ class ApplicationRecord < ActiveRecord::Base
           search_boolean_attribute(name, params)
         when :integer, :datetime
           numeric_attribute_matches(name, params[name])
+        when :binary
+          search_binary_attribute(name, params)
         else
           raise NotImplementedError, "unhandled attribute type"
         end
@@ -226,7 +234,7 @@ class ApplicationRecord < ActiveRecord::Base
         ids.each do |id|
           order_clause << sanitize_sql_array(["ID=? DESC", id])
         end
-        where(id: ids).order(Arel.sql(order_clause.join(', ')))
+        where(id: ids).reorder(Arel.sql(order_clause.join(', ')))
       end
 
       def search(params = {})
@@ -282,6 +290,14 @@ class ApplicationRecord < ActiveRecord::Base
 
       hash = super(options)
       hash.transform_keys { |key| key.delete("?") }
+    end
+
+    def read_attribute_for_serialization(attr)
+      if self.class.attribute_types[attr].binary?
+        super(attr).unpack("H*").first
+      else
+        super(attr)
+      end
     end
   end
 

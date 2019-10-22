@@ -54,6 +54,7 @@ class Post < ApplicationRecord
   has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
   has_many :favorites
   has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
+  has_one :image_hash, dependent: :destroy, foreign_key: :post_md5, primary_key: :md5
 
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :view_count
 
