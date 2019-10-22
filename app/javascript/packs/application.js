@@ -25,8 +25,9 @@ require("jquery-ui/themes/base/draggable.css");
 require("jquery-ui/themes/base/resizable.css");
 require("jquery-ui/themes/base/theme.css");
 
-require("@fortawesome/fontawesome-free/css/all.css");
-require("@fortawesome/fontawesome-free/js/all.js");
+require("@fortawesome/fontawesome-free/css/fontawesome.css");
+require("@fortawesome/fontawesome-free/css/solid.css");
+require("@fortawesome/fontawesome-free/css/regular.css");
 
 importAll(require.context('../src/javascripts', true, /\.js(\.erb)?$/));
 importAll(require.context('../src/styles', true, /\.s?css(?:\.erb)?$/));
