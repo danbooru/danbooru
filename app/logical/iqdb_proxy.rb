@@ -15,7 +15,10 @@ class IqdbProxy
     if params[:file].present?
       results = query(file: params[:file], limit: limit)
     elsif params[:url].present?
-      url = Sources::Strategies.find(params[:url]).image_url
+      url = Sources::Strategies.find(params[:url]).preview_url
+      results = query(url: url, limit: limit)
+    elsif params[:image_url].present?
+      url = Sources::Strategies.find(params[:image_url]).image_url
       results = query(url: url, limit: limit)
     elsif params[:post_id].present?
       url = Post.find(params[:post_id]).preview_file_url
@@ -34,6 +37,7 @@ class IqdbProxy
   def self.query(params)
     response = HTTParty.post("#{Danbooru.config.iqdbs_server}/similar", body: params, **Danbooru.config.httparty_options)
     raise Error, "HTTP error: #{response.code} #{response.message}" unless response.success?
+    raise Error, "IQDB error: #{response.parsed_response.first}" if response.parsed_response.try(:first).is_a?(String)
     response.parsed_response
   end
 
