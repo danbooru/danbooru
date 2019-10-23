@@ -77,6 +77,21 @@ class DText
       title = WikiPage.normalize_title(title)
       title
     end
+
+    titles.uniq
+  end
+
+  def self.parse_external_links(text)
+    html = DTextRagel.parse(text)
+    fragment = Nokogiri::HTML.fragment(html)
+
+    links = fragment.css("a.dtext-external-link").map { |node| node["href"] }
+    links.uniq
+  end
+
+  def self.dtext_links_differ?(a, b)
+    Set.new(parse_wiki_titles(a)) != Set.new(parse_wiki_titles(b)) ||
+    Set.new(parse_external_links(a)) != Set.new(parse_external_links(b))
   end
 
   def self.strip_blocks(string, tag)

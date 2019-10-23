@@ -5,6 +5,7 @@ class WikiPage < ApplicationRecord
 
   before_save :normalize_title
   before_save :normalize_other_names
+  before_save :update_dtext_links, if: :dtext_links_changed?
   after_save :create_version
   validates_uniqueness_of :title, :case_sensitive => false
   validates_presence_of :title
@@ -19,6 +20,7 @@ class WikiPage < ApplicationRecord
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, -> {where(:is_active => true)}, :foreign_key => "name", :primary_key => "title"
   has_many :versions, -> {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
+  has_many :dtext_links, as: :model, dependent: :destroy
 
   api_attributes including: [:creator_name, :category_name]
 
@@ -195,6 +197,14 @@ class WikiPage < ApplicationRecord
         create_new_version
       end
     end
+  end
+
+  def dtext_links_changed?
+    body_changed? && DText.dtext_links_differ?(body, body_was)
+  end
+
+  def update_dtext_links
+    self.dtext_links = DtextLink.new_from_dtext(body)
   end
 
   def post_set

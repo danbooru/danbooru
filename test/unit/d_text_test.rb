@@ -56,5 +56,31 @@ class DTextTest < ActiveSupport::TestCase
         refute_match(/dtext-tag-does-not-exist/, DText.format_text("[[help:nothing]]"))
       end
     end
+
+    context "#parse_wiki_titles" do
+      should "parse wiki links in dtext" do
+        assert_equal(["foo"], DText.parse_wiki_titles("[[foo]] [[FOO]"))
+      end
+    end
+
+    context "#parse_external_links" do
+      should "parse external links in dtext" do
+        dtext = <<~EOS
+          * https://test1.com
+          * <https://test2.com>
+          * "test":https://test3.com
+          * "test":[https://test4.com]
+          * [https://test5.com](test)
+          * <a href="https://test6.com">test</a>
+        EOS
+
+        links = %w[
+          https://test1.com https://test2.com https://test3.com
+          https://test4.com https://test5.com https://test6.com
+        ]
+
+        assert_equal(links, DText.parse_external_links(dtext))
+      end
+    end
   end
 end

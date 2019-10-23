@@ -881,6 +881,40 @@ ALTER SEQUENCE public.dmails_id_seq OWNED BY public.dmails.id;
 
 
 --
+-- Name: dtext_links; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.dtext_links (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    model_type character varying NOT NULL,
+    model_id bigint NOT NULL,
+    link_type integer NOT NULL,
+    link_target character varying NOT NULL
+);
+
+
+--
+-- Name: dtext_links_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.dtext_links_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: dtext_links_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.dtext_links_id_seq OWNED BY public.dtext_links.id;
+
+
+--
 -- Name: favorite_groups; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3296,6 +3330,13 @@ ALTER TABLE ONLY public.dmails ALTER COLUMN id SET DEFAULT nextval('public.dmail
 
 
 --
+-- Name: dtext_links id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.dtext_links ALTER COLUMN id SET DEFAULT nextval('public.dtext_links_id_seq'::regclass);
+
+
+--
 -- Name: favorite_groups id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4353,6 +4394,14 @@ ALTER TABLE ONLY public.dmails
 
 
 --
+-- Name: dtext_links dtext_links_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.dtext_links
+    ADD CONSTRAINT dtext_links_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: favorite_groups favorite_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4924,6 +4973,27 @@ CREATE INDEX index_dmails_on_message_index ON public.dmails USING gin (message_i
 --
 
 CREATE INDEX index_dmails_on_owner_id ON public.dmails USING btree (owner_id);
+
+
+--
+-- Name: index_dtext_links_on_link_target; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_dtext_links_on_link_target ON public.dtext_links USING btree (link_target text_pattern_ops);
+
+
+--
+-- Name: index_dtext_links_on_link_type; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_dtext_links_on_link_type ON public.dtext_links USING btree (link_type);
+
+
+--
+-- Name: index_dtext_links_on_model_type_and_model_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_dtext_links_on_model_type_and_model_id ON public.dtext_links USING btree (model_type, model_id);
 
 
 --
@@ -7337,6 +7407,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190908035317'),
 ('20190919175836'),
 ('20190923071044'),
-('20190926000912');
+('20190926000912'),
+('20191023191749');
 
 
