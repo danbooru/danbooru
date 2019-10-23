@@ -354,7 +354,7 @@ static inline void append_id_link(StateMachine * sm, const char * title, const c
 }
 
 static inline void append_url(StateMachine * sm, const char * url_start, const char * url_end, const char * title_start, const char * title_end) {
-  append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link\" href=\"");
+  append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link\" href=\"");
   append_segment_html_escaped(sm, url_start, url_end);
   append(sm, "\">");
   append_segment_html_escaped(sm, title_start, title_end);
@@ -371,7 +371,7 @@ static inline bool append_named_url(StateMachine * sm, const char * url_start, c
   if (url_start[0] == '/' || url_start[0] == '#') {
     append(sm, "<a class=\"dtext-link\" href=\"");
   } else {
-    append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link\" href=\"");
+    append(sm, "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-external-link dtext-named-external-link\" href=\"");
   }
 
   append_segment_html_escaped(sm, url_start, url_end);

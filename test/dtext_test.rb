@@ -203,65 +203,65 @@ class DTextTest < Minitest::Test
   end
 
   def test_urls
-    assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link" href="http://test.com">http://test.com</a> b</p>', 'a http://test.com b')
+    assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a> b</p>', 'a http://test.com b')
   end
 
   def test_urls_with_newline
-    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link" href="http://test.com">http://test.com</a><br>b</p>', "http://test.com\nb")
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a><br>b</p>', "http://test.com\nb")
   end
 
   def test_urls_with_paths
-    assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link" href="http://test.com/~bob/image.jpg">http://test.com/~bob/image.jpg</a> b</p>', 'a http://test.com/~bob/image.jpg b')
+    assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/~bob/image.jpg">http://test.com/~bob/image.jpg</a> b</p>', 'a http://test.com/~bob/image.jpg b')
   end
 
   def test_urls_with_fragment
-    assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link" href="http://test.com/home.html#toc">http://test.com/home.html#toc</a> b</p>', 'a http://test.com/home.html#toc b')
+    assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/home.html#toc">http://test.com/home.html#toc</a> b</p>', 'a http://test.com/home.html#toc b')
   end
 
   def test_auto_urls
-    assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link" href="http://test.com">http://test.com</a>. b</p>', 'a http://test.com. b')
+    assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a>. b</p>', 'a http://test.com. b')
   end
 
   def test_auto_urls_in_parentheses
-    assert_parse('<p>a (<a rel="external nofollow noreferrer" class="dtext-link" href="http://test.com">http://test.com</a>) b</p>', 'a (http://test.com) b')
+    assert_parse('<p>a (<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a>) b</p>', 'a (http://test.com) b')
   end
 
   def test_old_style_links
-    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">test</a></p>', '"test":http://test.com')
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com">test</a></p>', '"test":http://test.com')
   end
 
   def test_old_style_links_with_inline_tags
-    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com"><em>test</em></a></p>', '"[i]test[/i]":http://test.com')
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com"><em>test</em></a></p>', '"[i]test[/i]":http://test.com')
   end
 
   def test_old_style_links_with_nested_links
-    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">post #1</a></p>', '"post #1":http://test.com')
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com">post #1</a></p>', '"post #1":http://test.com')
   end
 
   def test_old_style_links_with_special_entities
-    assert_parse('<p>&quot;1&quot; <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://three.com">2 &amp; 3</a></p>', '"1" "2 & 3":http://three.com')
+    assert_parse('<p>&quot;1&quot; <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://three.com">2 &amp; 3</a></p>', '"1" "2 & 3":http://three.com')
   end
 
   def test_new_style_links
-    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">test</a></p>', '"test":[http://test.com]')
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com">test</a></p>', '"test":[http://test.com]')
   end
 
   def test_new_style_links_with_inline_tags
-    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/(parentheses)"><em>test</em></a></p>', '"[i]test[/i]":[http://test.com/(parentheses)]')
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com/(parentheses)"><em>test</em></a></p>', '"[i]test[/i]":[http://test.com/(parentheses)]')
   end
 
   def test_new_style_links_with_nested_links
-    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">post #1</a></p>', '"post #1":[http://test.com]')
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com">post #1</a></p>', '"post #1":[http://test.com]')
   end
 
   def test_new_style_links_with_parentheses
-    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/(parentheses)">test</a></p>', '"test":[http://test.com/(parentheses)]')
-    assert_parse('<p>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/(parentheses)">test</a>)</p>', '("test":[http://test.com/(parentheses)])')
-    assert_parse('<p>[<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com/(parentheses)">test</a>]</p>', '["test":[http://test.com/(parentheses)]]')
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com/(parentheses)">test</a></p>', '"test":[http://test.com/(parentheses)]')
+    assert_parse('<p>(<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com/(parentheses)">test</a>)</p>', '("test":[http://test.com/(parentheses)])')
+    assert_parse('<p>[<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com/(parentheses)">test</a>]</p>', '["test":[http://test.com/(parentheses)]]')
   end
 
   def test_markdown_links
-    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">test</a>', '[http://example.com](test)')
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">test</a>', '[http://example.com](test)')
     assert_inline_parse('<em>one</em>(two)', '[i]one[/i](two)')
 
     assert_inline_parse(CGI.escapeHTML('[blah](test)'), '[blah](test)')
@@ -269,7 +269,7 @@ class DTextTest < Minitest::Test
   end
 
   def test_html_links
-    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://example.com">test</a>', '<a href="http://example.com">test</a>')
+    assert_inline_parse('<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://example.com">test</a>', '<a href="http://example.com">test</a>')
     assert_inline_parse('<a class="dtext-link" href="/x">a <em>b</em> c</a>', '<a href="/x">a [i]b[/i] c</a>')
 
     assert_inline_parse(CGI.escapeHTML('<a href="">test</a>'), '<a href="">test</a>')
@@ -282,17 +282,17 @@ class DTextTest < Minitest::Test
   end
 
   def test_auto_url_boundaries
-    assert_parse('<p>a （<a rel="external nofollow noreferrer" class="dtext-link" href="http://test.com">http://test.com</a>） b</p>', 'a （http://test.com） b')
-    assert_parse('<p>a 〜<a rel="external nofollow noreferrer" class="dtext-link" href="http://test.com">http://test.com</a>〜 b</p>', 'a 〜http://test.com〜 b')
-    assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link" href="http://test.com">http://test.com</a>　 b</p>', 'a http://test.com　 b')
+    assert_parse('<p>a （<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a>） b</p>', 'a （http://test.com） b')
+    assert_parse('<p>a 〜<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a>〜 b</p>', 'a 〜http://test.com〜 b')
+    assert_parse('<p>a <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">http://test.com</a>　 b</p>', 'a http://test.com　 b')
   end
 
   def test_old_style_link_boundaries
-    assert_parse('<p>a 「<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">title</a>」 b</p>', 'a 「"title":http://test.com」 b')
+    assert_parse('<p>a 「<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com">title</a>」 b</p>', 'a 「"title":http://test.com」 b')
   end
 
   def test_new_style_link_boundaries
-    assert_parse('<p>a 「<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://test.com">title</a>」 b</p>', 'a 「"title":[http://test.com]」 b')
+    assert_parse('<p>a 「<a rel="external nofollow noreferrer" class="dtext-link dtext-external-link dtext-named-external-link" href="http://test.com">title</a>」 b</p>', 'a 「"title":[http://test.com]」 b')
   end
 
   def test_lists_1
@@ -442,12 +442,12 @@ class DTextTest < Minitest::Test
   def test_utf8_links
     assert_parse('<p><a class="dtext-link" href="/posts?tags=approver:葉月">7893</a></p>', '"7893":/posts?tags=approver:葉月')
     assert_parse('<p><a class="dtext-link" href="/posts?tags=approver:葉月">7893</a></p>', '"7893":[/posts?tags=approver:葉月]')
-    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link" href="http://danbooru.donmai.us/posts?tags=approver:葉月">http://danbooru.donmai.us/posts?tags=approver:葉月</a></p>', 'http://danbooru.donmai.us/posts?tags=approver:葉月')
+    assert_parse('<p><a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="http://danbooru.donmai.us/posts?tags=approver:葉月">http://danbooru.donmai.us/posts?tags=approver:葉月</a></p>', 'http://danbooru.donmai.us/posts?tags=approver:葉月')
   end
 
   def test_delimited_links
     dtext = '(blah <https://en.wikipedia.org/wiki/Orange_(fruit)>).'
-    html = '<p>(blah <a rel="external nofollow noreferrer" class="dtext-link" href="https://en.wikipedia.org/wiki/Orange_(fruit)">https://en.wikipedia.org/wiki/Orange_(fruit)</a>).</p>'
+    html = '<p>(blah <a rel="external nofollow noreferrer" class="dtext-link dtext-external-link" href="https://en.wikipedia.org/wiki/Orange_(fruit)">https://en.wikipedia.org/wiki/Orange_(fruit)</a>).</p>'
     assert_parse(html, dtext)
   end
 
