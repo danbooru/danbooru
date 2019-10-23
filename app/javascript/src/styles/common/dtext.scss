@@ -100,7 +100,7 @@ div.prose {
     }
   }
 
-  a.dtext-external-link::after {
+  a.dtext-named-external-link::after {
     // https://fontawesome.com/icons/external-link-alt?style=solid
     @include fa-solid-icon("\f35d");
 
