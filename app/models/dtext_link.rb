@@ -24,10 +24,38 @@ class DtextLink < ApplicationRecord
     where(model_id: WikiPage.search(params).reorder(nil))
   end
 
+  def self.linked_wiki_exists(exists = true)
+    dtext_links = DtextLink.arel_table
+    wiki_pages = WikiPage.arel_table
+    wiki_exists = wiki_pages.project(1).where(wiki_pages[:is_deleted].eq(false)).where(wiki_pages[:title].eq(dtext_links[:link_target])).exists
+
+    if exists
+      where(link_type: :wiki_link).where(wiki_exists)
+    else
+      where(link_type: :wiki_link).where.not(wiki_exists)
+    end
+  end
+
+  def self.linked_tag_exists(exists = true)
+    dtext_links = DtextLink.arel_table
+    tags = Tag.arel_table
+    tag_exists = tags.project(1).where(tags[:post_count].gt(0)).where(tags[:name].eq(dtext_links[:link_target])).exists
+
+    if exists
+      where(link_type: :wiki_link).where(tag_exists)
+    else
+      where(link_type: :wiki_link).where.not(tag_exists)
+    end
+  end
+
   def self.search(params)
     q = super
     q = q.search_attributes(params, :model_type, :model_id, :link_type, :link_target)
+
     q = q.model_matches(params[:model])
+    q = q.linked_wiki_exists(params[:linked_wiki_exists].truthy?) if params[:linked_wiki_exists].present?
+    q = q.linked_tag_exists(params[:linked_tag_exists].truthy?) if params[:linked_tag_exists].present?
+
     q.apply_default_order(params)
   end
 

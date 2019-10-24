@@ -52,6 +52,10 @@ class WikiPage < ApplicationRecord
       end
     end
 
+    def tag_matches(params)
+      where(title: Tag.search(params).select(:name).reorder(nil))
+    end
+
     def default_order
       order(updated_at: :desc)
     end
@@ -68,6 +72,10 @@ class WikiPage < ApplicationRecord
 
       if params[:other_names_match].present?
         q = q.other_names_match(params[:other_names_match])
+      end
+
+      if params[:tag].present?
+        q = q.tag_matches(params[:tag])
       end
 
       if params[:hide_deleted].to_s.truthy?
