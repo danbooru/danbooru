@@ -1,0 +1,44 @@
+<div id="c-dtext-links">
+  <div id="a-index">
+    <%= search_form_for(dtext_links_path) do |f| %>
+      <%= f.simple_fields_for :model do |fa| %>
+        <%= fa.input :title, label: "Wiki", hint: "Use * for wildcard", input_html: { value: params.dig(:search, :model, :title), "data-autocomplete": "wiki-page" } %>
+      <% end %>
+      <%= f.input :link_target_ilike, label: "Link", hint: "Use * for wildcard", input_html: { value: params[:search][:link_target_ilike], data: { autocomplete: "wiki-page" } } %>
+      <%= f.input :link_type, label: "Type", collection: [["Wiki", "0"], ["External", "1"]], include_blank: true, selected: params[:search][:link_type] %>
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <table class="striped autofit">
+      <thead>
+        <tr>
+          <th>Wiki</th>
+          <th>Link</th>
+          <th>Type</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @dtext_links.each do |dtext_link| %>
+          <tr>
+            <td class="category-<%= Tag.category_for(dtext_link.model.title) %>">
+              <%= link_to(dtext_link.model.title, dtext_link.model) %>
+              <%= link_to("»", dtext_links_path(search: { model: { title: dtext_link.model.title }})) %>
+            </td>
+            <td class="col-expand">
+              <% if dtext_link.external_link? %>
+                <%= external_link_to(dtext_link.link_target) %>
+              <% elsif dtext_link.wiki_link? %>
+                <%= link_to(dtext_link.link_target, show_or_new_wiki_pages_path(title: dtext_link.link_target), class: "tag-type-#{Tag.category_for(dtext_link.link_target)}") %>
+              <% end %>
+
+              <%= link_to("»", dtext_links_path(search: { link_target: dtext_link.link_target })) %>
+            </td>
+            <td><%= dtext_link.link_type.delete_suffix("_link").capitalize %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <%= numbered_paginator(@dtext_links) %>
+  </div>
+</div>
