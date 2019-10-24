@@ -3206,14 +3206,12 @@ ALTER SEQUENCE public.wiki_page_versions_id_seq OWNED BY public.wiki_page_versio
 
 CREATE TABLE public.wiki_pages (
     id integer NOT NULL,
-    creator_id integer NOT NULL,
     title character varying NOT NULL,
     body text NOT NULL,
     body_index tsvector NOT NULL,
     is_locked boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    updater_id integer,
     other_names text[] DEFAULT '{}'::text[] NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL
 );
@@ -7408,6 +7406,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190919175836'),
 ('20190923071044'),
 ('20190926000912'),
-('20191023191749');
+('20191023191749'),
+('20191024194544');
 
 

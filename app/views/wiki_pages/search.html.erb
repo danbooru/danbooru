@@ -3,7 +3,6 @@
     <%= search_form_for(wiki_pages_path) do |f| %>
       <%= f.input :title, hint: "Use * for wildcard searches", input_html: { "data-autocomplete": "wiki-page" } %>
       <%= f.input :other_names_match, label: "Other names", hint: "Use * for wildcard searches" %>
-      <%= f.input :creator_name, input_html: { "data-autocomplete": "user" } %>
       <%= f.input :body_matches, label: "Body" %>
       <%= f.input :other_names_present, as: :select %>
       <%= f.input :hide_deleted, as: :select, include_blank: false %>

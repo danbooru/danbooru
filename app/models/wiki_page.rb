@@ -15,14 +15,12 @@ class WikiPage < ApplicationRecord
 
   attr_accessor :skip_secondary_validations
   array_attribute :other_names
-  belongs_to_creator
-  belongs_to_updater
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, -> {where(:is_active => true)}, :foreign_key => "name", :primary_key => "title"
   has_many :versions, -> {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
   has_many :dtext_links, as: :model, dependent: :destroy
 
-  api_attributes including: [:creator_name, :category_name]
+  api_attributes including: [:category_name]
 
   module SearchMethods
     def titled(title)
@@ -63,7 +61,7 @@ class WikiPage < ApplicationRecord
     def search(params = {})
       q = super
 
-      q = q.search_attributes(params, :creator, :updater, :is_locked, :is_deleted, :body)
+      q = q.search_attributes(params, :is_locked, :is_deleted, :body)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index, ts_config: "danbooru")
 
       if params[:title].present?
@@ -100,10 +98,6 @@ class WikiPage < ApplicationRecord
 
       q
     end
-  end
-
-  def creator_name
-    creator.name
   end
 
   extend SearchMethods

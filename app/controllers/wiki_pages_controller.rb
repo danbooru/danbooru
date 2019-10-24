@@ -16,7 +16,7 @@ class WikiPagesController < ApplicationController
   end
 
   def index
-    @wiki_pages = WikiPage.includes(:creator).paginated_search(params)
+    @wiki_pages = WikiPage.paginated_search(params)
     respond_with(@wiki_pages) do |format|
       format.html do
         if params[:page].nil? || params[:page].to_i == 1
