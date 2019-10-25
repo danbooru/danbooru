@@ -98,6 +98,14 @@ class RelatedTagQueryTest < ActiveSupport::TestCase
         query = RelatedTagQuery.new(query: "wiki")
         assert_equal(%w[ccc bbb aaa], query.wiki_page_tags)
       end
+
+      should "return aliased tags" do
+        create(:tag_alias, antecedent_name: "kitten", consequent_name: "cat", status: "active")
+        create(:wiki_page, title: "wiki", body: "[[kitten]]")
+
+        query = RelatedTagQuery.new(query: "wiki")
+        assert_equal(%w[cat], query.wiki_page_tags)
+      end
     end
   end
 

@@ -220,7 +220,8 @@ class WikiPage < ApplicationRecord
   def tags
     titles = DText.parse_wiki_titles(body).uniq
     tags = Tag.nonempty.where(name: titles).pluck(:name)
-    titles & tags
+    tags += TagAlias.active.where(antecedent_name: titles).pluck(:antecedent_name)
+    TagAlias.to_aliased(titles & tags)
   end
 
   def visible?
