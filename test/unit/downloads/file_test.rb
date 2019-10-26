@@ -49,14 +49,19 @@ module Downloads
 
         should "return an uncorrupted file on the second try" do
           bomb = stub("bomb")
-          bomb.expects(:size).raises(IOError)
+          bomb.stubs(:code).raises(IOError)
           resp = stub("resp", success?: true)
 
-          HTTParty.expects(:get).twice.multiple_yields("a", bomb, "b", "c").then.multiple_yields("a", "b", "c").returns(resp)
+          chunk = stub("a")
+          chunk.stubs(:code).returns(200)
+          chunk.stubs(:size).returns(1)
+          chunk.stubs(:to_s).returns("a")
+
+          HTTParty.expects(:get).twice.multiple_yields(chunk, bomb).then.multiple_yields(chunk, chunk).returns(resp)
           @download.stubs(:is_cloudflare?).returns(false)
           tempfile, _ = @download.download!
 
-          assert_equal("abc", tempfile.read)
+          assert_equal("aa", tempfile.read)
         end
       end
 
@@ -69,6 +74,12 @@ module Downloads
       should "store the file in the tempfile path" do
         tempfile, strategy = @download.download!
         assert_operator(tempfile.size, :>, 0, "should have data")
+      end
+
+      should "correctly save the file when following 302 redirects" do
+        download = Downloads::File.new("https://yande.re/post/show/578014")
+        file, strategy  = download.download!(url: download.preview_url)
+        assert_equal(19134, file.size)
       end
     end
   end

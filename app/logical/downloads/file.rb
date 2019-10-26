@@ -26,9 +26,9 @@ module Downloads
       end
     end
 
-    def download!(tries: 3, **options)
+    def download!(url: uncached_url, tries: 3, **options)
       Retriable.retriable(on: RETRIABLE_ERRORS, tries: tries, base_interval: 0) do
-        file = http_get_streaming(uncached_url, headers: strategy.headers, **options)
+        file = http_get_streaming(url, headers: strategy.headers, **options)
         return [file, strategy]
       end
     end
@@ -43,6 +43,8 @@ module Downloads
       size = 0
 
       res = HTTParty.get(url, httparty_options) do |chunk|
+        next if chunk.code == 302
+
         size += chunk.size
         raise Error.new("File is too large (max size: #{max_size})") if size > max_size && max_size > 0
 
@@ -64,6 +66,10 @@ module Downloads
       url = file_url.dup
       url.query_values = url.query_values.to_h.merge(danbooru_no_cache: SecureRandom.uuid)
       url
+    end
+
+    def preview_url
+      @preview_url ||= Addressable::URI.parse(strategy.preview_url)
     end
 
     def file_url
