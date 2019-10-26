@@ -62,7 +62,7 @@ module Sources
       end
 
       def preview_urls
-        return [] unless post_md5.present?
+        return image_urls unless post_md5.present?
         ["https://#{file_host}/data/preview/#{post_md5[0..1]}/#{post_md5[2..3]}/#{post_md5}.jpg"]
       end
 

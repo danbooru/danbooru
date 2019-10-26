@@ -28,6 +28,15 @@ module Sources
         end
       end
 
+      context "A 'https://assets.yande.re/preview/:hh/:hh/:file.jpg' preview url" do
+        should "return a non-empty list of preview_urls" do
+          url = "https://assets.yande.re/data/preview/7c/d1/7cd124fc28203233cce3bade26651d43.jpg"
+          site = Sources::Strategies.find(url)
+
+          assert_equal([url], site.preview_urls)
+        end
+      end
+
       context "Fetching data for an active yande.re .jpg post" do
         should "work" do
           @prev = "https://files.yande.re/data/preview/7e/cf/7ecfdead705d7b956b26b1d37b98d089.jpg"
