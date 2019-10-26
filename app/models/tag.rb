@@ -218,46 +218,52 @@ class Tag < ApplicationRecord
     end
   end
 
-  module NameMethods
-    def normalize_name(name)
-      name.to_s.mb_chars.downcase.strip.tr(" ", "_").to_s
+  concerning :NameMethods do
+    def unqualified_name
+      name.gsub(/_\(.*\)\z/, "").tr("_", " ")
     end
 
-    def create_for_list(names)
-      names.map {|x| find_or_create_by_name(x).name}
-    end
-
-    def find_or_create_by_name(name, creator: CurrentUser.user)
-      name = normalize_name(name)
-      category = nil
-
-      if name =~ /\A(#{categories.regexp}):(.+)\Z/
-        category = $1
-        name = $2
+    class_methods do
+      def normalize_name(name)
+        name.to_s.mb_chars.downcase.strip.tr(" ", "_").to_s
       end
 
-      tag = find_by_name(name)
+      def create_for_list(names)
+        names.map {|x| find_or_create_by_name(x).name}
+      end
 
-      if tag
-        if category
-          category_id = categories.value_for(category)
+      def find_or_create_by_name(name, creator: CurrentUser.user)
+        name = normalize_name(name)
+        category = nil
 
-          # in case a category change hasn't propagated to this server yet,
-          # force an update the local cache. This may get overwritten in the
-          # next few lines if the category is changed.
-          tag.update_category_cache
-
-          if tag.editable_by?(creator)
-            tag.update(category: category_id)
-          end
+        if name =~ /\A(#{categories.regexp}):(.+)\Z/
+          category = $1
+          name = $2
         end
 
-        tag
-      else
-        Tag.new.tap do |t|
-          t.name = name
-          t.category = categories.value_for(category)
-          t.save
+        tag = find_by_name(name)
+
+        if tag
+          if category
+            category_id = categories.value_for(category)
+
+            # in case a category change hasn't propagated to this server yet,
+            # force an update the local cache. This may get overwritten in the
+            # next few lines if the category is changed.
+            tag.update_category_cache
+
+            if tag.editable_by?(creator)
+              tag.update(category: category_id)
+            end
+          end
+
+          tag
+        else
+          Tag.new.tap do |t|
+            t.name = name
+            t.category = categories.value_for(category)
+            t.save
+          end
         end
       end
     end
@@ -921,7 +927,6 @@ class Tag < ApplicationRecord
   include CountMethods
   include CategoryMethods
   extend StatisticsMethods
-  extend NameMethods
   extend ParseMethods
   extend SearchMethods
 end

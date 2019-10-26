@@ -24,11 +24,6 @@ class TagCategory
       @@short_name_mapping ||= Hash[Danbooru.config.full_tag_config_info.map {|k,v| [v["short"],k]}]
     end
 
-    # Returns a hash mapping for humanized_essential_tag_string (models/post.rb)
-    def humanized_mapping
-      @@humanized_mapping ||= Hash[Danbooru.config.full_tag_config_info.map {|k,v| [k,v["humanized"]]}]
-    end
-
     # Returns a hash mapping for split_tag_list_html (presenters/tag_set_presenter.rb)
     def header_mapping
       @@header_mapping ||= Hash[Danbooru.config.full_tag_config_info.map {|k,v| [k,v["header"]]}]
@@ -56,10 +51,6 @@ class TagCategory
 
     def short_name_list
       @@short_name_list ||= short_name_mapping.keys
-    end
-
-    def humanized_list
-      Danbooru.config.humanized_tag_category_list
     end
 
     def split_header_list

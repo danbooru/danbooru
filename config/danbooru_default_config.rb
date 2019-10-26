@@ -247,7 +247,6 @@ module Danbooru
           "short" => "gen",
           "extra" => [],
           "header" => %{<h1 class="general-tag-list">Tags</h1>},
-          "humanized" => nil,
           "relatedbutton" => "General",
           "css" => {
             "color" => "var(--general-tag-color)",
@@ -259,12 +258,6 @@ module Danbooru
           "short" => "char",
           "extra" => ["ch"],
           "header" => %{<h2 class="character-tag-list">Characters</h2>},
-          "humanized" => {
-            "slice" => 5,
-            "exclusion" => [],
-            "regexmap" => /^(.+?)(?:_\(.+\))?$/,
-            "formatstr" => "%s"
-          },
           "relatedbutton" => "Characters",
           "css" => {
             "color" => "var(--character-tag-color)",
@@ -276,12 +269,6 @@ module Danbooru
           "short" => "copy",
           "extra" => ["co"],
           "header" => %{<h2 class="copyright-tag-list">Copyrights</h2>},
-          "humanized" => {
-            "slice" => 1,
-            "exclusion" => [],
-            "regexmap" => //,
-            "formatstr" => "(%s)"
-          },
           "relatedbutton" => "Copyrights",
           "css" => {
             "color" => "var(--copyright-tag-color)",
@@ -293,12 +280,6 @@ module Danbooru
           "short" => "art",
           "extra" => [],
           "header" => %{<h2 class="artist-tag-list">Artists</h2>},
-          "humanized" => {
-            "slice" => 0,
-            "exclusion" => %w(banned_artist),
-            "regexmap" => //,
-            "formatstr" => "drawn by %s"
-          },
           "relatedbutton" => "Artists",
           "css" => {
             "color" => "var(--artist-tag-color)",
@@ -310,7 +291,6 @@ module Danbooru
           "short" => "meta",
           "extra" => [],
           "header" => %{<h2 class="meta-tag-list">Meta</h2>},
-          "humanized" => nil,
           "relatedbutton" => nil,
           "css" => {
             "color" => "var(--meta-tag-color)",
@@ -321,11 +301,6 @@ module Danbooru
     end
 
 #TAG ORDERS
-
-    #Sets the order of the humanized essential tag string (models/post.rb)
-    def humanized_tag_category_list
-      @humanized_tag_category_list ||= ["character","copyright","artist"]
-    end
 
     #Sets the order of the split tag header list (presenters/tag_set_presenter.rb)
     def split_tag_header_list

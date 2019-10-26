@@ -61,33 +61,22 @@ class TagSetPresenter < Presenter
     end.reject(&:blank?).join(" \n")
   end
 
-  def humanized_essential_tag_string(category_list: TagCategory.humanized_list, default: "")
-    strings = category_list.map do |category|
-      mapping = TagCategory.humanized_mapping[category]
-      max_tags = mapping["slice"]
-      regexmap = mapping["regexmap"]
-      formatstr = mapping["formatstr"]
-      excluded_tags = mapping["exclusion"]
+  def humanized_essential_tag_string(default: "")
+    chartags = tags_for_category("character")
+    characters = chartags.max_by(5, &:post_count).map(&:unqualified_name)
+    characters += ["#{chartags.size - 5} more"] if chartags.size > 5
+    characters = characters.to_sentence
 
-      type_tags = tags_for_category(category).map(&:name) - excluded_tags
-      next if type_tags.empty?
+    copytags = tags_for_category("copyright")
+    copyrights = copytags.max_by(1, &:post_count).map(&:unqualified_name)
+    copyrights += ["#{copytags.size - 1} more"] if copytags.size > 1
+    copyrights = copyrights.to_sentence
+    copyrights = "(#{copyrights})" if characters.present?
 
-      if max_tags > 0 && type_tags.length > max_tags
-        type_tags = type_tags.sort_by {|x| -x.size}.take(max_tags) + ["etc"]
-      end
+    artists = tags_for_category("artist").map(&:name).grep_v("banned_artist").to_sentence
+    artists = "drawn by #{artists}" if artists.present?
 
-      if regexmap != //
-        type_tags = type_tags.map { |tag| tag.match(regexmap)[1] }
-      end
-
-      if category == "copyright" && tags_for_category("character").blank?
-        type_tags.to_sentence
-      else
-        formatstr % type_tags.to_sentence
-      end
-    end
-
-    strings = strings.compact.join(" ").tr("_", " ")
+    strings = "#{characters} #{copyrights} #{artists}"
     strings.blank? ? default : strings
   end
 
