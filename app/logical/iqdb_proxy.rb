@@ -36,7 +36,8 @@ class IqdbProxy
 
   def self.query(params)
     response = HTTParty.post("#{Danbooru.config.iqdbs_server}/similar", body: params, **Danbooru.config.httparty_options)
-    raise Error, "HTTP error: #{response.code} #{response.message}" unless response.success?
+    raise Error, "IQDB error: #{response.code} #{response.message}" unless response.success?
+    raise Error, "IQDB error: #{response.parsed_response["error"]}" if response.parsed_response.is_a?(Hash)
     raise Error, "IQDB error: #{response.parsed_response.first}" if response.parsed_response.try(:first).is_a?(String)
     response.parsed_response
   end
