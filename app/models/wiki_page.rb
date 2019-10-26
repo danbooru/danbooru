@@ -76,6 +76,10 @@ class WikiPage < ApplicationRecord
         q = q.tag_matches(params[:tag])
       end
 
+      if params[:linked_to].present?
+        q = q.where(id: DtextLink.wiki_link.where(link_target: params[:linked_to]).select(:model_id))
+      end
+
       if params[:hide_deleted].to_s.truthy?
         q = q.where("is_deleted = false")
       end
@@ -163,6 +167,10 @@ class WikiPage < ApplicationRecord
 
   def self.is_meta_wiki?(title)
     title.starts_with?(*META_WIKIS)
+  end
+
+  def is_meta_wiki?
+    WikiPage.is_meta_wiki?(title)
   end
 
   def wiki_page_changed?

@@ -1,4 +1,16 @@
 <% content_for(:sidebar) do %>
   <%= render "posts/partials/index/blacklist" %>
   <%= render "wiki_pages/recent_changes" %>
+
+  <% if @wiki_page.present? %>
+    <h4>Options</h4>
+
+    <ul class="list-bulleted">
+      <% unless @wiki_page.is_meta_wiki? %>
+        <li><%= link_to "Tag History", post_versions_path(search: { changed_tags: @wiki_page.title }) %></li>
+      <% end %>
+      <li><%= link_to "Wiki History", wiki_page_versions_path(search: { wiki_page_id: @wiki_page.id }) %></li>
+      <li><%= link_to "What Links Here", wiki_pages_path(search: { linked_to: @wiki_page.title }) %></li>
+    </ul>
+  <% end %>
 <% end %>
