@@ -5,6 +5,12 @@ class IqdbProxy
     Danbooru.config.iqdbs_server.present?
   end
 
+  def self.download(url, type)
+    download = Downloads::File.new(url)
+    file, strategy = download.download!(url: download.send(type))
+    file
+  end
+
   def self.search(params)
     raise NotImplementedError, "the IQDBs service isn't configured" unless enabled?
 
@@ -13,13 +19,14 @@ class IqdbProxy
     high_similarity = params[:high_similarity]&.to_f&.clamp(0.0, 100.0) || 65.0
 
     if params[:file].present?
-      results = query(file: params[:file], limit: limit)
+      file = params[:file]
+      results = query(file: file, limit: limit)
     elsif params[:url].present?
-      url = Sources::Strategies.find(params[:url]).preview_url
-      results = query(url: url, limit: limit)
+      file = download(params[:url], :preview_url)
+      results = query(file: file, limit: limit)
     elsif params[:image_url].present?
-      url = Sources::Strategies.find(params[:image_url]).image_url
-      results = query(url: url, limit: limit)
+      file = download(params[:image_url], :image_url)
+      results = query(file: file, limit: limit)
     elsif params[:post_id].present?
       url = Post.find(params[:post_id]).preview_file_url
       results = query(url: url, limit: limit)
@@ -32,6 +39,8 @@ class IqdbProxy
     high_similarity_matches, low_similarity_matches = matches.partition { |match| match["score"] >= high_similarity }
 
     [high_similarity_matches, low_similarity_matches, matches]
+  ensure
+    file.try(:close)
   end
 
   def self.query(params)
