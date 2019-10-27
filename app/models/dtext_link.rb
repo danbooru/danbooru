@@ -3,7 +3,10 @@ class DtextLink < ApplicationRecord
   enum link_type: [:wiki_link, :external_link]
 
   before_validation :normalize_link_target
-  validates :link_target, uniqueness: { scope: [:model_type, :model_id] }
+  # validates :link_target, uniqueness: { scope: [:model_type, :model_id] }
+
+  scope :wiki_page, -> { where(model_type: "WikiPage") }
+  scope :forum_post, -> { where(model_type: "ForumPost") }
 
   def self.new_from_dtext(dtext)
     links = []
@@ -21,7 +24,7 @@ class DtextLink < ApplicationRecord
 
   def self.model_matches(params)
     return all if params.blank?
-    where(model_id: WikiPage.search(params).reorder(nil))
+    where(model_type: "WikiPage", model_id: WikiPage.search(params).reorder(nil))
   end
 
   def self.linked_wiki_exists(exists = true)
@@ -63,5 +66,9 @@ class DtextLink < ApplicationRecord
     if wiki_link?
       self.link_target = WikiPage.normalize_title(link_target)
     end
+
+    # postgres will raise an error if the link is more than 2712 bytes long
+    # because it can't index values that take up more than 1/3 of an 8kb page.
+    self.link_target = self.link_target.truncate(2048, omission: "")
   end
 end

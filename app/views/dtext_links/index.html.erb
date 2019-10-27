@@ -1,15 +1,8 @@
 <div id="c-dtext-links">
   <div id="a-index">
     <%= search_form_for(dtext_links_path) do |f| %>
-      <%= f.simple_fields_for :model do |fa| %>
-        <%= fa.input :title, label: "Wiki", hint: "Use * for wildcard", input_html: { value: params.dig(:search, :model, :title), "data-autocomplete": "wiki-page" } %>
-      <% end %>
       <%= f.input :link_target_ilike, label: "Link", hint: "Use * for wildcard", input_html: { value: params[:search][:link_target_ilike], data: { autocomplete: "wiki-page" } } %>
-      <%= f.simple_fields_for :model do |fm| %>
-        <%= fm.simple_fields_for :tag do |ft| %>
-          <%= ft.input :category, label: "Wiki Type", collection: TagCategory.canonical_mapping.to_a, include_blank: true, selected: params.dig(:search, :model, :tag, :category) %>
-        <% end %>
-      <% end %>
+      <%= f.input :model_type, label: "Page Type", collection: [["Wiki Page", "WikiPage"], ["Forum Post", "ForumPost"]], include_blank: true, selected: params[:search][:model_type] %>
       <%= f.input :link_type, label: "Link Type", collection: [["Wiki", "0"], ["External", "1"]], include_blank: true, selected: params[:search][:link_type] %>
       <%= f.input :linked_wiki_exists, label: "Wiki Exists?", collection: ["Yes", "No"], include_blank: true, selected: params[:search][:linked_wiki_exists] %>
       <%= f.input :linked_tag_exists, label: "Tag Exists?", collection: ["Yes", "No"], include_blank: true, selected: params[:search][:linked_tag_exists] %>
@@ -19,7 +12,7 @@
     <table class="striped autofit">
       <thead>
         <tr>
-          <th>Wiki</th>
+          <th>Page</th>
           <th>Link</th>
           <th>Type</th>
         </tr>
@@ -27,10 +20,17 @@
       <tbody>
         <% @dtext_links.each do |dtext_link| %>
           <tr>
-            <td class="category-<%= Tag.category_for(dtext_link.model.title) %>">
-              <%= link_to(dtext_link.model.title, dtext_link.model) %>
-              <%= link_to("»", dtext_links_path(search: { model: { title: dtext_link.model.title }})) %>
-            </td>
+            <% if dtext_link.model_type == "WikiPage" %>
+              <td class="category-<%= Tag.category_for(dtext_link.model.title) %>">
+                <%= link_to(dtext_link.model.title, dtext_link.model) %>
+                <%= link_to("»", dtext_links_path(search: { model_type: "WikiPage", model: { title: dtext_link.model.title }})) %>
+              </td>
+            <% elsif dtext_link.model_type == "ForumPost" %>
+              <td>
+                <%= link_to("forum ##{dtext_link.model_id}", dtext_link.model) %>
+              </td>
+            <% end %>
+
             <td class="col-expand">
               <% if dtext_link.external_link? %>
                 <%= external_link_to(dtext_link.link_target) %>

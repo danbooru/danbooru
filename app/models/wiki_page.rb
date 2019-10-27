@@ -77,7 +77,7 @@ class WikiPage < ApplicationRecord
       end
 
       if params[:linked_to].present?
-        q = q.where(id: DtextLink.wiki_link.where(link_target: params[:linked_to]).select(:model_id))
+        q = q.where(id: DtextLink.wiki_page.wiki_link.where(link_target: params[:linked_to]).select(:model_id))
       end
 
       if params[:hide_deleted].to_s.truthy?

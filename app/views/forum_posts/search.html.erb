@@ -6,6 +6,7 @@
       <%= f.input :topic_title_matches, label: "Title" %>
       <%= f.input :body_matches, label: "Body" %>
       <%= f.input :creator_name, label: "Creator", input_html: { "data-autocomplete": "user" } %>
+      <%= f.input :linked_to, label: "Tag", hint: "Find posts mentioning a tag", input_html: { "data-autocomplete": "tag" } %>
       <%= f.input :topic_category_id, label: "Category", collection: ForumTopic::CATEGORIES.invert.to_a, include_blank: true %>
       <%= f.submit "Search" %>
     <% end %>

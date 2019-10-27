@@ -5,11 +5,14 @@ class ForumPost < ApplicationRecord
   belongs_to_creator
   belongs_to_updater
   belongs_to :topic, :class_name => "ForumTopic"
+  has_many :dtext_links, as: :model, dependent: :destroy
   has_many :votes, class_name: "ForumPostVote"
   has_one :tag_alias
   has_one :tag_implication
   has_one :bulk_update_request
+
   before_validation :initialize_is_deleted, :on => :create
+  before_save :update_dtext_links, if: :dtext_links_changed?
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
   after_destroy :update_topic_updated_at_on_destroy
@@ -49,6 +52,10 @@ class ForumPost < ApplicationRecord
       q = q.permitted
       q = q.search_attributes(params, :creator, :updater, :topic_id, :is_deleted, :body)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :text_index)
+
+      if params[:linked_to].present?
+        q = q.where(id: DtextLink.forum_post.wiki_link.where(link_target: params[:linked_to]).select(:model_id))
+      end
 
       if params[:topic_title_matches].present?
         q = q.topic_title_matches(params[:topic_title_matches])
@@ -139,6 +146,14 @@ class ForumPost < ApplicationRecord
   def undelete!
     update(is_deleted: false)
     update_topic_updated_at_on_undelete
+  end
+
+  def dtext_links_changed?
+    body_changed? && DText.dtext_links_differ?(body, body_was)
+  end
+
+  def update_dtext_links
+    self.dtext_links = DtextLink.new_from_dtext(body)
   end
 
   def update_topic_updated_at_on_delete

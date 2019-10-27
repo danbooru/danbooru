@@ -7,17 +7,28 @@ require_relative "../../config/environment"
 #   wiki_page.save!(touch: false, validate: false)
 # end
 
-def reindex
+def reindex_wiki_pages
   WikiPage.find_in_batches(batch_size: 500) do |wiki_pages|
     WikiPage.transaction do
       wiki_pages.each do |wiki_page|
         DtextLink.new_from_dtext(wiki_page.body).each do |link|
           link.model = wiki_page
-          link.save!(touch: false, validate: false)
+          link.save!
         end
       end
     end
   end
 end
 
-reindex
+def reindex_forum_posts
+  ForumPost.find_in_batches(batch_size: 500) do |forum_posts|
+    ForumPost.transaction do
+      forum_posts.each do |forum_post|
+        DtextLink.new_from_dtext(forum_post.body).each do |link|
+          link.model = forum_post
+          link.save!
+        end
+      end
+    end
+  end
+end
