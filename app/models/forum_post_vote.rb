@@ -8,9 +8,15 @@ class ForumPostVote < ApplicationRecord
   scope :by, ->(user_id) {where(creator_id: user_id)}
   scope :excluding_user, ->(user_id) {where("creator_id <> ?", user_id)}
 
+  def self.forum_post_matches(params)
+    return all if params.blank?
+    where(forum_post_id: ForumPost.search(params).reorder(nil).select(:id))
+  end
+
   def self.search(params)
     q = super
     q = q.search_attributes(params, :creator, :forum_post_id, :score)
+    q = q.forum_post_matches(params[:forum_post])
     q.apply_default_order(params)
   end
 

@@ -44,7 +44,9 @@
               <div><%= time_ago_in_words_tagged(vote.created_at) %></div>
             </td>
             <td>
-              <%= link_to "unvote", comment_comment_votes_path(vote.comment), remote: true, method: :delete %>
+              <% if vote.user == CurrentUser.user %>
+                <%= link_to "unvote", comment_comment_votes_path(vote.comment), remote: true, method: :delete %>
+              <% end %>
             </td>
           </tr>
         <% end %>
