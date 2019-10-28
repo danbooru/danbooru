@@ -5,7 +5,9 @@ class DText
   MENTION_REGEXP = /(?<=^| )@\S+/
 
   def self.format_text(text, data: nil, **options)
+    return nil if text.nil?
     data = preprocess([text]) if data.nil?
+    text = parse_embedded_tag_request_text(text)
     html = DTextRagel.parse(text, **options)
     html = postprocess(html, *data)
     html
@@ -14,6 +16,7 @@ class DText
   end
 
   def self.preprocess(dtext_messages)
+    dtext_messages = dtext_messages.map { |message| parse_embedded_tag_request_text(message) }
     names = dtext_messages.map { |message| parse_wiki_titles(message) }.flatten.uniq
     wiki_pages = WikiPage.where(title: names)
     tags = Tag.where(name: names)
@@ -55,6 +58,54 @@ class DText
   def self.quote(message, creator_name)
     stripped_body = DText.strip_blocks(message, "quote")
     "[quote]\n#{creator_name} said:\n\n#{stripped_body}\n[/quote]\n\n"
+  end
+
+  def self.parse_embedded_tag_request_text(text)
+    [TagAlias, TagImplication, BulkUpdateRequest].each do |tag_request|
+      text = text.gsub(tag_request.embedded_pattern) do |match|
+        begin
+          obj = tag_request.find($~[:id])
+          tag_request_message(obj) || match
+
+        rescue ActiveRecord::RecordNotFound
+          match
+        end
+      end
+    end
+
+    text
+  end
+
+  def self.tag_request_message(obj)
+    if obj.is_a?(TagRelationship)
+      if obj.is_approved?
+        "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] has been approved."
+      elsif obj.is_retired?
+        "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] has been retired."
+      elsif obj.is_deleted?
+        "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] has been rejected."
+      elsif obj.is_pending?
+        "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] is pending approval."
+      elsif obj.is_errored?
+        "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] (#{relationship} failed during processing."
+      else # should never happen
+        "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] has an unknown status."
+      end
+    elsif obj.is_a?(BulkUpdateRequest)
+      if obj.script.size < 700
+        embedded_script = obj.script_with_links
+      else
+        embedded_script = "[expand]#{obj.script_with_links}[/expand]"
+      end
+
+      if obj.is_approved?
+        "The bulk update request ##{obj.id} is active.\n\n#{embedded_script}"
+      elsif obj.is_pending?
+        "The \"bulk update request ##{obj.id}\":/bulk_update_requests/#{obj.id} is pending approval.\n\n#{embedded_script}"
+      elsif obj.is_rejected?
+        "The bulk update request ##{obj.id} has been rejected.\n\n#{embedded_script}"
+      end
+    end
   end
 
   def self.parse_mentions(text)

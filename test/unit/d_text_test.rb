@@ -40,6 +40,16 @@ class DTextTest < ActiveSupport::TestCase
     end
 
     context "#format_text" do
+      setup do
+        CurrentUser.user = create(:user)
+        CurrentUser.ip_addr = "127.0.0.1"
+      end
+
+      teardown do
+        CurrentUser.user = nil
+        CurrentUser.ip_addr = nil
+      end
+
       should "add tag types to wiki links" do
         create(:tag, name: "bkub", category: Tag.categories.artist, post_count: 42)
         assert_match(/tag-type-#{Tag.categories.artist}/, DText.format_text("[[bkub]]"))
@@ -54,6 +64,16 @@ class DTextTest < ActiveSupport::TestCase
         assert_match(/dtext-tag-empty/, DText.format_text("[[empty tag]]"))
 
         refute_match(/dtext-tag-does-not-exist/, DText.format_text("[[help:nothing]]"))
+      end
+
+      should "parse [ta:<id>], [ti:<id>], [bur:<id>] pseudo tags" do
+        @bur = create(:bulk_update_request)
+        @ti = create(:tag_implication)
+        @ta = create(:tag_alias)
+
+        assert_match(/bulk update request/, DText.format_text("[bur:#{@bur.id}]"))
+        assert_match(/implication ##{@ti.id}/, DText.format_text("[ti:#{@ti.id}]"))
+        assert_match(/alias ##{@ta.id}/, DText.format_text("[ta:#{@ta.id}]"))
       end
     end
 
