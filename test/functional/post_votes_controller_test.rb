@@ -9,9 +9,18 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "index action" do
+      should "work" do
+        as(@user) { create(:post_vote, post_id: @post.id, user_id: @user.id) }
+        get post_votes_path
+
+        assert_response :success
+      end
+    end
+
     context "create action" do
       should "not allow anonymous users to vote" do
-        post post_votes_path(post_id: @post.id), params: {:score => "up", :format => "js"}
+        post post_post_votes_path(post_id: @post.id), params: {:score => "up", :format => "js"}
         assert_response 403
         assert_equal(0, @post.reload.score)
       end
@@ -19,20 +28,20 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
       should "not allow banned users to vote" do
         @banned = create(:user)
         @ban = create(:ban, user: @banned)
-        post_auth post_votes_path(post_id: @post.id), @banned, params: {:score => "up", :format => "js"}
+        post_auth post_post_votes_path(post_id: @post.id), @banned, params: {:score => "up", :format => "js"}
         assert_response 403
         assert_equal(0, @post.reload.score)
       end
 
       should "not allow members to vote" do
         @member = create(:member_user)
-        post_auth post_votes_path(post_id: @post.id), @member, params: {:score => "up", :format => "js"}
+        post_auth post_post_votes_path(post_id: @post.id), @member, params: {:score => "up", :format => "js"}
         assert_response 403
         assert_equal(0, @post.reload.score)
       end
 
       should "increment a post's score if the score is positive" do
-        post_auth post_votes_path(post_id: @post.id), @user, params: {:score => "up", :format => "js"}
+        post_auth post_post_votes_path(post_id: @post.id), @user, params: {:score => "up", :format => "js"}
         assert_response :success
         @post.reload
         assert_equal(1, @post.score)
@@ -47,7 +56,7 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
 
         should "fail silently on an error" do
           assert_nothing_raised do
-            post_auth post_votes_path(post_id: @post.id), @user, params: {:score => "up", :format => "js"}
+            post_auth post_post_votes_path(post_id: @post.id), @user, params: {:score => "up", :format => "js"}
           end
         end
       end

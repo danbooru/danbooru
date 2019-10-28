@@ -19,7 +19,7 @@
       <span>
         <span id="score-for-post-<%= post.id %>"><%= post.score %></span>
         <% if CurrentUser.is_voter? %>
-          (vote <%= link_to(content_tag("i", nil, class: "far fa-thumbs-up"), post_votes_path(:score => "up", :post_id => post.id), :remote => true, :method => :post) %>/<%= link_to(content_tag("i", nil, class: "far fa-thumbs-down"), post_votes_path(:score => "down", :post_id => post.id), :remote => true, :method => :post) %>)
+          (vote <%= link_to(content_tag("i", nil, class: "far fa-thumbs-up"), post_post_votes_path(:score => "up", :post_id => post.id), :remote => true, :method => :post) %>/<%= link_to(content_tag("i", nil, class: "far fa-thumbs-down"), post_post_votes_path(:score => "down", :post_id => post.id), :remote => true, :method => :post) %>)
         <% end %>
       </span>
     </span>

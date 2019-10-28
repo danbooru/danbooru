@@ -202,14 +202,15 @@ Rails.application.routes.draw do
     end
   end
   resources :post_replacements, :only => [:index, :new, :create, :update]
-    resources :posts, :only => [:index, :show, :update] do
+  resources :post_votes, only: [:index]
+  resources :posts, only: [:index, :show, :update] do
     resources :events, :only => [:index], :controller => "post_events"
     resources :replacements, :only => [:index, :new, :create], :controller => "post_replacements"
     resource :artist_commentary, :only => [:index, :show] do
       collection { put :create_or_update }
       member { put :revert }
     end
-    resource :votes, :controller => "post_votes", :only => [:create, :destroy]
+    resource :votes, controller: "post_votes", only: [:create, :destroy], as: "post_votes"
     collection do
       get :random
     end
