@@ -12,7 +12,7 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       should "work" do
         as(@user) { create(:post_vote, post_id: @post.id, user_id: @user.id) }
-        get post_votes_path
+        get_auth post_votes_path, @user
 
         assert_response :success
       end

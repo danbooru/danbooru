@@ -17,7 +17,7 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
     context "#create.json" do
       should "create a vote" do
         assert_difference("CommentVote.count", 1) do
-          post_auth comment_votes_path(comment_id: @comment.id, score: "down"), @user, as: :json
+          post_auth comment_comment_votes_path(comment_id: @comment.id, score: "down"), @user, as: :json
           assert_response :success
 
           assert_equal(@comment.id, response.parsed_body["id"])
@@ -28,7 +28,7 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
       should "fail silently on errors" do
         create(:comment_vote, comment: @comment, score: -1)
         assert_difference("CommentVote.count", 0) do
-          post_auth comment_votes_path(comment_id: @comment.id, score: "down", format: "json"), @user
+          post_auth comment_comment_votes_path(comment_id: @comment.id, score: "down", format: "json"), @user
           assert_response 422
 
           comment = JSON.parse(@response.body)
@@ -41,7 +41,7 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
     context "#create.js" do
       should "create a vote" do
         assert_difference("CommentVote.count", 1) do
-          post_auth comment_votes_path(comment_id: @comment.id, format: "json", score: "down"), @user
+          post_auth comment_comment_votes_path(comment_id: @comment.id, format: "json", score: "down"), @user
           assert_response :success
         end
       end
@@ -49,7 +49,7 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
       should "fail on errors" do
         create(:comment_vote, :comment => @comment, :score => -1)
         assert_difference("CommentVote.count", 0) do
-          post_auth comment_votes_path(comment_id: @comment.id, :score => "down", format: "js"), @user
+          post_auth comment_comment_votes_path(comment_id: @comment.id, :score => "down", format: "js"), @user
           assert_response 422
         end
       end
