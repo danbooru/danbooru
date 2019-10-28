@@ -149,20 +149,13 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(artist_path(@artist.id))
       end
 
-      should "not touch the updater_id and updated_at fields when nothing is changed" do
+      should "not touch the updated_at fields when nothing is changed" do
         old_timestamp = @wiki_page.updated_at
-        old_updater_id = @wiki_page.updater_id
 
-        travel(1.minute) do
-          as(@another_user) do
-            @artist.update(notes: "testing")
-          end
-        end
+        travel(1.minute)
+        as(@another_user) { @artist.update(notes: "testing") }
 
-        @artist.reload
-        @wiki_page = @artist.wiki_page
-        assert_equal(old_timestamp.to_i, @wiki_page.updated_at.to_i)
-        assert_equal(old_updater_id, @wiki_page.updater_id)
+        assert_equal(old_timestamp.to_i, @artist.reload.wiki_page.updated_at.to_i)
       end
 
       context "when renaming an artist" do

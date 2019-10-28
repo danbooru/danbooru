@@ -154,24 +154,16 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         @wiki_page.reload
         assert_equal(true, @wiki_page.is_deleted?)
       end
-
-      should "record the deleter" do
-        delete_auth wiki_page_path(@wiki_page), @mod
-        @wiki_page.reload
-        assert_equal(@mod.id, @wiki_page.updater_id)
-      end
     end
 
     context "revert action" do
       setup do
         as_user do
-          @wiki_page = create(:wiki_page, :body => "1")
-        end
-        travel(1.day) do
-          @wiki_page.update(:body => "1 2")
-        end
-        travel(2.days) do
-          @wiki_page.update(:body => "1 2 3")
+          @wiki_page = create(:wiki_page, body: "1")
+          travel(1.day)
+          @wiki_page.update(body: "1 2")
+          travel(2.days)
+          @wiki_page.update(body: "1 2 3")
         end
       end
 

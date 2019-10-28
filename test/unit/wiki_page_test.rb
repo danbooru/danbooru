@@ -101,16 +101,6 @@ class WikiPageTest < ActiveSupport::TestCase
         assert_equal("hot_potato", @wiki_page.title)
       end
 
-      should "differentiate between updater and creator" do
-        another_user = FactoryBot.create(:user)
-        CurrentUser.scoped(another_user, "127.0.0.1") do
-          @wiki_page.title = "yyy"
-          @wiki_page.save
-        end
-        version = WikiPageVersion.last
-        assert_not_equal(@wiki_page.creator_id, version.updater_id)
-      end
-
       should "update its dtext links" do
         @wiki_page.update!(body: "[[long hair]]")
         assert_equal(1, @wiki_page.dtext_links.size)
