@@ -132,7 +132,6 @@ Rails.application.routes.draw do
     resource :order, :only => [:edit], :controller => "favorite_group_orders"
   end
   resources :forum_posts do
-    resource :votes, controller: "forum_post_votes"
     member do
       post :undelete
     end
@@ -140,6 +139,7 @@ Rails.application.routes.draw do
       get :search
     end
   end
+  resources :forum_post_votes, only: [:index, :create, :destroy]
   resources :forum_topics do
     member do
       post :undelete

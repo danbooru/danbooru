@@ -1,3 +1,3 @@
 Danbooru.notice("Unvoted");
-var code = <%= raw render(partial: "forum_post_votes/list", locals: {forum_post: @forum_post, votes: @forum_post.votes}).to_json %>;
-$("#forum-post-votes-for-<%= @forum_post.id %>").html(code);
+var code = <%= raw render(partial: "forum_post_votes/list", locals: {forum_post: @forum_post_vote.forum_post, votes: @forum_post_vote.forum_post.votes}).to_json %>;
+$("#forum-post-votes-for-<%= @forum_post_vote.forum_post_id %>").html(code);

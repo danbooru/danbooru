@@ -8,6 +8,12 @@ class ForumPostVote < ApplicationRecord
   scope :by, ->(user_id) {where(creator_id: user_id)}
   scope :excluding_user, ->(user_id) {where("creator_id <> ?", user_id)}
 
+  def self.search(params)
+    q = super
+    q = q.search_attributes(params, :creator, :forum_post_id, :score)
+    q.apply_default_order(params)
+  end
+
   def up?
     score == 1
   end
