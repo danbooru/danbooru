@@ -1,23 +1,25 @@
 <%= simple_form_for(@bulk_update_request) do |f| %>
   <%= error_messages_for("bulk_update_request") %>
 
-  <% if @bulk_update_request.new_record? %>
-    <%= f.input :title, :as => :string %>
-  <% end %>
+  <p>
+    Request aliases or implications using the format shown below. An alias makes the first tag a
+    synonym for the second tag. An implication makes the first tag automatically add the second tag.
+    A mass update replaces the first tag with the second tag without making it a permanent alias.
+  </p>
 
-  <div class="input">
-    <label class="text optional" for="bulk_update_request_script">Script</label>
-    <%= text_area :bulk_update_request, :script, :size => "50x10" %>
-    <p><a href="#" id="script-help-link">Help</a></p>
-    <ul class="hint" id="script-help" title="Bulk Update Request Help">
-      <li>unalias aaa -> bbb</li>
-      <li>unimply aaa -> bbb</li>
-      <li>alias aaa -> bbb</li>
-      <li>imply aaa -> bbb</li>
-      <li>update aaa -> bbb</li>
-      <li>category tag_name -> category_name</li>
-    </ul>
-  </div>
+  <p>
+    <% if @bulk_update_request.new_record? && @bulk_update_request.forum_topic.present? %>
+      This request will be attached to
+      <%= link_to "topic ##{@bulk_update_request.forum_topic_id}: #{@bulk_update_request.forum_topic.title}" %>.
+    <% elsif @bulk_update_request.new_record? && @bulk_update_request.forum_topic.blank? %>
+      This request will create a new forum topic. To attach this request to an existing topic, find
+      the forum topic and click "Request alias/implication" at the top of the page.
+
+      <%= f.input :title, label: "Forum Title", as: :string %>
+    <% end %>
+  </p>
+
+  <%= f.input :script, label: "Request", as: :text, placeholder: bur_script_example, input_html: { size: "50x15" } %>
 
   <% if @bulk_update_request.new_record? %>
     <div class="input">
@@ -35,25 +37,11 @@
     </div>
   <% end %>
 
-  <% if @bulk_update_request.new_record? %>
-    <%= f.input :forum_topic_id, :hint => " (optional)" %>
-  <% elsif @bulk_update_request.persisted? && CurrentUser.is_admin? %>
+  <% if @bulk_update_request.persisted? && CurrentUser.is_admin? %>
     <%= f.input :forum_topic_id %>
     <%= f.input :forum_post_id %>
   <% end %>
 
-  <%= f.button :submit, :value => "Submit" %>
+  <%= f.submit value: "Submit" %>
   <%= dtext_preview_button "bulk_update_request", "reason" %>
-<% end %>
-
-<%= content_for(:html_header) do %>
-  <script>
-    $(function() {
-      $("#script-help").hide();
-      $("#script-help-link").click(function() {
-        $("#script-help").dialog({width: "30em"});
-        return false;
-      });
-    });
-  </script>
 <% end %>

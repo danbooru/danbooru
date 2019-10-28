@@ -202,7 +202,7 @@ class TagImplication < TagRelationship
       ForumUpdater.new(
         forum_topic, 
         forum_post: post, 
-        expected_title: TagImplicationRequest.topic_title(antecedent_name, consequent_name),
+        expected_title: "Tag implication: #{antecedent_name} -> #{consequent_name}",
         skip_update: !TagRelationship::SUPPORT_HARD_CODED
       )
     end

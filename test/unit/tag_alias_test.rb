@@ -204,7 +204,7 @@ class TagAliasTest < ActiveSupport::TestCase
       setup do
         @admin = FactoryBot.create(:admin_user)
         CurrentUser.scoped(@admin) do
-          @topic = FactoryBot.create(:forum_topic, :title => TagAliasRequest.topic_title("aaa", "bbb"))
+          @topic = FactoryBot.create(:forum_topic, :title => "Tag alias: aaa -> bbb")
           @post = FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => TagAliasRequest.command_string("aaa", "bbb"))
           @alias = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic, :forum_post => @post, :status => "pending")
         end

@@ -23,7 +23,7 @@ class TagAlias < TagRelationship
         ForumUpdater.new(
           forum_topic, 
           forum_post: post,
-          expected_title: TagAliasRequest.topic_title(antecedent_name, consequent_name),
+          expected_title: "Tag alias: #{antecedent_name} -> #{consequent_name}",
           skip_update: !TagRelationship::SUPPORT_HARD_CODED
         )
       end

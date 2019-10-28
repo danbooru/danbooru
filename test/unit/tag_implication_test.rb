@@ -264,7 +264,7 @@ class TagImplicationTest < ActiveSupport::TestCase
     context "with an associated forum topic" do
       setup do
         @admin = FactoryBot.create(:admin_user)
-        @topic = FactoryBot.create(:forum_topic, :title => TagImplicationRequest.topic_title("aaa", "bbb"))
+        @topic = FactoryBot.create(:forum_topic, :title => "Tag implication: aaa -> bbb")
         @post = FactoryBot.create(:forum_post, topic_id: @topic.id, :body => TagImplicationRequest.command_string("aaa", "bbb"))
         @implication = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic, :forum_post => @post, :status => "pending")
       end

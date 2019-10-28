@@ -1,7 +1,6 @@
 <% content_for(:secondary_links) do %>
   <%= subnav_link_to "Listing", tag_implications_path %>
   <%= subnav_link_to "MetaSearch", meta_searches_tags_path %>
-  <%= subnav_link_to "Request implication", new_tag_implication_request_path %>
-  <%= subnav_link_to "Request bulk update", new_bulk_update_request_path %>
+  <%= subnav_link_to "Request implication", new_bulk_update_request_path %>
   <%= subnav_link_to "Help", wiki_pages_path(:title => "help:tag_implications") %>
 <% end %>

@@ -4,10 +4,13 @@
   
   <% if CurrentUser.is_member? %>
     <%= subnav_link_to "New", new_forum_topic_path %>
-    <%= subnav_link_to "Request alias", new_tag_alias_request_path %>
-    <%= subnav_link_to "Request implication", new_tag_implication_request_path %>
-    <%= subnav_link_to "Request BUR", new_bulk_update_request_path %>
     <%= subnav_link_to "Mark all as read", mark_all_as_read_forum_topics_path, :method => :post, :"data-shortcut" => "shift+r" %>
+
+    <% if @forum_topic %>
+      <%= subnav_link_to "Request alias/implication", new_bulk_update_request_path(bulk_update_request: { forum_topic_id: @forum_topic.id }) %>
+    <% else %>
+      <%= subnav_link_to "Request alias/implication", new_bulk_update_request_path %>
+    <% end %>
   <% end %>
   
   <%= subnav_link_to "Search", search_forum_posts_path %>

@@ -5,7 +5,7 @@ class BulkUpdateRequestsController < ApplicationController
   before_action :load_bulk_update_request, :except => [:new, :create, :index]
 
   def new
-    @bulk_update_request = BulkUpdateRequest.new
+    @bulk_update_request = BulkUpdateRequest.new(bur_params(:create))
     respond_with(@bulk_update_request)
   end
 
@@ -57,6 +57,6 @@ class BulkUpdateRequestsController < ApplicationController
     permitted_params += %i[title reason forum_topic_id] if context == :create
     permitted_params += %i[forum_topic_id forum_post_id] if context == :update && CurrentUser.is_admin?
 
-    params.require(:bulk_update_request).permit(permitted_params)
+    params.fetch(:bulk_update_request, {}).permit(permitted_params)
   end
 end
