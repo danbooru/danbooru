@@ -1,8 +1,13 @@
 class CommentVotesController < ApplicationController
-  respond_to :js, :json, :xml
   before_action :member_only
   skip_before_action :api_check
+  respond_to :js, :json, :xml, :html
   rescue_with CommentVote::Error, ActiveRecord::RecordInvalid, status: 422
+
+  def index
+    @comment_votes = CommentVote.includes(:user, comment: [:creator, :post]).paginated_search(params)
+    respond_with(@comment_votes)
+  end
 
   def create
     @comment = Comment.find(params[:comment_id])

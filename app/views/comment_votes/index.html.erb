@@ -1,0 +1,56 @@
+<div id="c-comment-votes">
+  <div id="a-index">
+    <%= search_form_for(comment_votes_path) do |f| %>
+      <%= f.input :user_name, label: "Voter", input_html: { value: params[:search][:user_name], "data-autocomplete": "user" } %>
+      <%= f.simple_fields_for :comment do |fc| %>
+        <%= fc.input :creator_name, label: "Commenter", input_html: { value: params.dig(:search, :comment, :creator_name), "data-autocomplete": "user" } %>
+        <%= fc.input :post_tags_match, label: "Tags", input_html: { value: params.dig(:search, :comment, :post_tags_match), "data-autocomplete": "tag-query" } %>
+      <% end %>
+      <%= f.input :score, collection: [["+1", "1"], ["-1", "-1"]], include_blank: true, selected: params[:search][:score] %>
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <table class="striped autofit">
+      <thead>
+        <tr>
+          <th>Post</th>
+          <th>Comment</th>
+          <th>Score</th>
+          <th>Commenter</th>
+          <th>Voter</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @comment_votes.each do |vote| %>
+          <tr>
+            <td>
+              <%= PostPresenter.preview(vote.comment.post, show_deleted: true) %>
+            </td>
+            <td class="col-expand">
+              <div class="prose">
+                <%= format_text(vote.comment.body) %>
+              </div>
+            </td>
+            <td><%= link_to sprintf("%+d", vote.score), comment_votes_path(search: { score: vote.score }) %></td>
+            <td>
+              <%= link_to_user vote.comment.creator %>
+              <%= link_to "»", comment_votes_path(search: { comment: { creator_name: vote.comment.creator_name }}) %>
+              <div><%= time_ago_in_words_tagged(vote.comment.created_at) %></div>
+            </td>
+            <td>
+              <%= link_to_user vote.user %>
+              <%= link_to "»", comment_votes_path(search: { user_name: vote.user.name }) %>
+              <div><%= time_ago_in_words_tagged(vote.created_at) %></div>
+            </td>
+            <td>
+              <%= link_to "unvote", comment_comment_votes_path(vote.comment), remote: true, method: :delete %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+
+    <%= numbered_paginator(@comment_votes) %>
+  </div>
+</div>

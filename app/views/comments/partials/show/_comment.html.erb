@@ -39,13 +39,13 @@
               <li><%= link_to "Edit", edit_comment_path(comment.id), :id => "edit_comment_link_#{comment.id}", :class => "edit_comment_link" %></li>
             <% end %>
             <li class="comment-vote-up-link">
-              <%= link_to "Vote up", comment_votes_path(comment_id: comment.id, score: "up"), method: :post, remote: true %>
+              <%= link_to "Vote up", comment_comment_votes_path(comment_id: comment.id, score: "up"), method: :post, remote: true %>
             </li>
             <li class="comment-vote-down-link">
-              <%= link_to "Vote down", comment_votes_path(comment_id: comment.id, score: "down"), method: :post, remote: true %>
+              <%= link_to "Vote down", comment_comment_votes_path(comment_id: comment.id, score: "down"), method: :post, remote: true %>
             </li>
             <li class="comment-unvote-link">
-              <%= link_to "Unvote", comment_votes_path(comment_id: comment.id), method: :delete, remote: true %>
+              <%= link_to "Unvote", comment_comment_votes_path(comment_id: comment.id), method: :delete, remote: true %>
             </li>
             <% if CurrentUser.is_moderator? %>
               <li>|</li>
