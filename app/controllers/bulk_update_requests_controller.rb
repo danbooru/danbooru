@@ -42,7 +42,7 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def index
-    @bulk_update_requests = BulkUpdateRequest.paginated_search(params)
+    @bulk_update_requests = BulkUpdateRequest.includes(:user, :approver, :forum_topic, forum_post: [:votes]).paginated_search(params)
     respond_with(@bulk_update_requests)
   end
 
