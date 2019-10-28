@@ -774,13 +774,17 @@ class Tag < ApplicationRecord
             end
 
           when "upvote"
-            if CurrentUser.user.is_moderator?
-              q[:upvote] = User.name_to_id(g2)
+            if CurrentUser.user.is_admin?
+              q[:upvote] = User.find_by_name(g2)
+            elsif CurrentUser.user.is_voter?
+              q[:upvote] = CurrentUser.user
             end
 
           when "downvote"
-            if CurrentUser.user.is_moderator?
-              q[:downvote] = User.name_to_id(g2)
+            if CurrentUser.user.is_admin?
+              q[:downvote] = User.find_by_name(g2)
+            elsif CurrentUser.user.is_voter?
+              q[:downvote] = CurrentUser.user
             end
 
           when *COUNT_METATAGS

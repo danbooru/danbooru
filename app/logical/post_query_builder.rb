@@ -473,14 +473,12 @@ class PostQueryBuilder
     end
 
     if q[:upvote].present?
-      user_id = q[:upvote]
-      post_ids = PostVote.where(:user_id => user_id).where("score > 0").limit(400).pluck(:post_id)
+      post_ids = PostVote.where(user: q[:upvote]).where("score > 0").select(:post_id)
       relation = relation.where("posts.id": post_ids)
     end
 
     if q[:downvote].present?
-      user_id = q[:downvote]
-      post_ids = PostVote.where(:user_id => user_id).where("score < 0").limit(400).pluck(:post_id)
+      post_ids = PostVote.where(user: q[:downvote]).where("score < 0").select(:post_id)
       relation = relation.where("posts.id": post_ids)
     end
 

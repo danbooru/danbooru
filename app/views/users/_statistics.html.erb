@@ -85,6 +85,15 @@
         </td>
       </tr>
 
+      <% if CurrentUser.user == user || CurrentUser.user.is_admin? %>
+        <tr>
+          <th>Post Votes</th>
+          <td>
+            <%= link_to user.post_votes.count, post_votes_path(search: { user_name: user.name }) %>
+          </td>
+        </tr>
+      <% end %>
+
       <tr>
         <th>Favorite Groups</th>
         <td><%= presenter.favorite_group_count(self) %></td>
