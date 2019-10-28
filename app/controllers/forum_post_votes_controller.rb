@@ -3,7 +3,7 @@ class ForumPostVotesController < ApplicationController
   before_action :member_only, only: [:create, :destroy]
 
   def index
-    @forum_post_votes = ForumPostVote.includes(creator: [], forum_post: [:topic]).paginated_search(params)
+    @forum_post_votes = ForumPostVote.includes(creator: [], forum_post: [:topic]).paginated_search(params, count_pages: true)
     respond_with(@forum_post_votes)
   end
 

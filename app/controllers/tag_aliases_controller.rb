@@ -22,7 +22,7 @@ class TagAliasesController < ApplicationController
   end
 
   def index
-    @tag_aliases = TagAlias.includes(:antecedent_tag, :consequent_tag, :approver).paginated_search(params)
+    @tag_aliases = TagAlias.includes(:antecedent_tag, :consequent_tag, :approver).paginated_search(params, count_pages: true)
     respond_with(@tag_aliases)
   end
 

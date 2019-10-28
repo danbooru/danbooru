@@ -5,7 +5,7 @@ class CommentVotesController < ApplicationController
   rescue_with CommentVote::Error, ActiveRecord::RecordInvalid, status: 422
 
   def index
-    @comment_votes = CommentVote.includes(:user, comment: [:creator, :post]).paginated_search(params)
+    @comment_votes = CommentVote.includes(:user, comment: [:creator, :post]).paginated_search(params, count_pages: true)
     respond_with(@comment_votes)
   end
 
