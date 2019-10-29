@@ -11,6 +11,7 @@
     <% if @bulk_update_request.new_record? && @bulk_update_request.forum_topic.present? %>
       This request will be attached to
       <%= link_to "topic ##{@bulk_update_request.forum_topic_id}: #{@bulk_update_request.forum_topic.title}" %>.
+      <%= f.input :forum_topic_id, as: :hidden, input_html: { value: params.dig(:bulk_update_request, :forum_topic_id) } %>
     <% elsif @bulk_update_request.new_record? && @bulk_update_request.forum_topic.blank? %>
       This request will create a new forum topic. To attach this request to an existing topic, find
       the forum topic and click "Request alias/implication" at the top of the page.
