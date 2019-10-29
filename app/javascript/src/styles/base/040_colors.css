@@ -3,6 +3,7 @@
 
   --text-color: hsl(0, 0%, 15%);
   --muted-text-color: hsl(0, 0%, 55%);
+  --header-color: hsl(0, 0%, 15%);
 
   --link-color: hsl(213, 100%, 50%);
   --link-hover-color: hsl(213, 100%, 75%);
@@ -220,6 +221,7 @@ body[data-user-theme="dark"] {
   --grey-3:   #393a4d; /* hsluv(265, 15, 25.00); */
   --grey-4:   #9596a8; /* hsluv(265, 15, 62.50); */
   --grey-5:   #c9c9d2; /* hsluv(265, 15, 81.25); */
+  --grey-6:   #e4e4e8; /* hsluv(265, 15, 90.625); */
   --red-0:    #652828; /* hsluv(12, 50, 25); */
   --red-3:    #af4a4b; /* hsluv(12, 50, 45); */
   --red-1:    #f07a7b; /* hsluv(12, 80, 65); */
@@ -263,6 +265,7 @@ body[data-user-theme="dark"] {
   /* main text colors */
   --text-color: var(--grey-5);
   --muted-text-color: var(--grey-4);
+  --header-color: var(--grey-6);
 
   --link-color: var(--blue-1);
   --link-hover-color: var(--blue-2);
