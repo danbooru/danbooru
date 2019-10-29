@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/evazion/dtext_rb.git
-  revision: f7e398393e6149d2c3d122cbb7659039792391a1
+  revision: 13fb1630ee28236fe3174c6c16181d6721e98085
   specs:
-    dtext_rb (1.10.1)
+    dtext_rb (1.10.2)
       nokogiri (~> 1.8)
 
 GIT
