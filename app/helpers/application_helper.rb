@@ -57,7 +57,12 @@ module ApplicationHelper
   end
 
   def humanized_duration(from, to)
-    duration = distance_of_time_in_words(from, to)
+    if to - from > 10.years
+      duration = "forever"
+    else
+      duration = distance_of_time_in_words(from, to)
+    end
+
     datetime = from.iso8601 + "/" + to.iso8601
     title = "#{from.strftime("%Y-%m-%d %H:%M")} to #{to.strftime("%Y-%m-%d %H:%M")}"
 
