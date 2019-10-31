@@ -89,7 +89,7 @@ PostTooltip.initialize = function () {
   $(document).on("mouseleave.danbooru.postTooltip", PostTooltip.POST_SELECTOR, function (event) {
     let qtip = $(event.target).qtip("api");
 
-    if (qtip.cache.request && qtip.cache.request.state() === "pending") {
+    if (qtip && qtip.cache && qtip.cache.request && qtip.cache.request.state() === "pending") {
       qtip.cache.request.abort();
     }
   });
