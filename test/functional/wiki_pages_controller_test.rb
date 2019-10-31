@@ -92,6 +92,11 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         get_auth new_wiki_page_path, @mod, params: { wiki_page: { title: "test" }}
         assert_response :success
       end
+
+      should "render without a title" do
+        get_auth new_wiki_page_path, @mod
+        assert_response :success
+      end
     end
 
     context "edit action" do

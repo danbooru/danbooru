@@ -166,7 +166,7 @@ class WikiPage < ApplicationRecord
   end
 
   def self.is_meta_wiki?(title)
-    title.starts_with?(*META_WIKIS)
+    title.present? && title.starts_with?(*META_WIKIS)
   end
 
   def is_meta_wiki?
