@@ -7,11 +7,10 @@
     <table class="striped autofit">
       <thead>
         <tr>
-          <th>User</th>
-          <th>Banner</th>
-          <th>Banned</th>
+          <th>Banned User</th>
           <th>Duration</th>
           <th>Reason</th>
+          <th>Banner</th>
           <th></th>
         </tr>
       </thead>
@@ -22,16 +21,16 @@
               <%= link_to_user(ban.user) %>
               <%= link_to "»", bans_path(search: search_params.merge(user_name: ban.user.name)) %>
             </td>
-            <td>
-              <%= link_to_user(ban.banner) %>
-              <%= link_to "»", bans_path(search: search_params.merge(banner_name: ban.banner.name)) %>
-            </td>
-            <td><%= time_ago_in_words_tagged(ban.created_at) %></td>
             <td><%= humanized_duration(ban.created_at, ban.expires_at) %></td>
             <td class="col-expand">
               <div class="prose">
                 <%= format_text ban.reason %>
               </div>
+            </td>
+            <td>
+              <%= link_to_user ban.banner %>
+              <%= link_to "»", bans_path(search: { banner_name: ban.banner.name }) %>
+              <div><%= time_ago_in_words_tagged(ban.created_at) %></div>
             </td>
             <td>
               <% if CurrentUser.is_moderator? %>
