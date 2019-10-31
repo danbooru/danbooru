@@ -43,7 +43,6 @@ gem 'redis'
 gem 'request_store'
 gem 'builder'
 # gem 'did_you_mean' # github.com/yuki24/did_you_mean/issues/117
-gem 'term-ansicolor', require: "term/ansicolor"
 gem 'puma'
 
 # needed for looser jpeg header compat
