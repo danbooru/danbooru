@@ -3,7 +3,7 @@
   <%= subnav_link_to "Gallery", gallery_pools_path %>
   <%= subnav_link_to "Listing", pools_path %>
   <%= subnav_link_to "New", new_pool_path %>
-  <%= subnav_link_to "Help", wiki_pages_path(:search => {:title => "help:pools"}) %>
+  <%= subnav_link_to "Help", wiki_page_path("help:pools") %>
   <% if @pool && !@pool.new_record? %>
     <li>|</li>
     <%= subnav_link_to "Show", pool_path(@pool) %>

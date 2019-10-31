@@ -3,7 +3,7 @@
   <% if CurrentUser.is_member? %>
     <%= subnav_link_to "New", new_favorite_group_path %>
   <% end %>
-  <%= subnav_link_to "Help", wiki_pages_path(:title => "help:favorite_groups") %>
+  <%= subnav_link_to "Help", wiki_page_path("help:favorite_groups") %>
 
   <% if @favorite_group && !@favorite_group.new_record? %>
     <li>|</li>

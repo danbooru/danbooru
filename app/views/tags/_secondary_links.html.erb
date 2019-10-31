@@ -3,8 +3,8 @@
   <%= subnav_link_to "Listing", tags_path %>
   <%= subnav_link_to "MetaSearch", meta_searches_tags_path %>
   <%= subnav_link_to "Related tags", related_tag_path %>
-  <%= subnav_link_to "Cheatsheet", wiki_pages_path(:search => {:title => "help:cheatsheet"}) %>
-  <%= subnav_link_to "Help", wiki_pages_path(:search => {:title => "help:tags"}) %>
+  <%= subnav_link_to "Cheatsheet", wiki_page_path("help:cheatsheet") %>
+  <%= subnav_link_to "Help", wiki_pages_path("help:tags") %>
   <% if @tag %>
     <li>|</li>
     <%= subnav_link_to "Posts (#{@tag.post_count})", posts_path(:tags => @tag.name) %>

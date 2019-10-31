@@ -4,5 +4,5 @@
   <%= subnav_link_to "Listing", artist_commentaries_path %>
   <%= subnav_link_to "Recent changes", artist_commentary_versions_path %>
   <%= subnav_link_to "Translation requests", artist_commentaries_path(:search => {:post_tags_match => "commentary_request"}) %>
-  <%= subnav_link_to "Help", wiki_pages_path(:title => "help:artist_commentary") %>
+  <%= subnav_link_to "Help", wiki_page_path("help:artist_commentary") %>
 <% end %>

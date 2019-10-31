@@ -14,7 +14,7 @@
   <% end %>
   
   <%= subnav_link_to "Search", search_forum_posts_path %>
-  <%= subnav_link_to "Help", wiki_pages_path(:title => "help:forum") %>
+  <%= subnav_link_to "Help", wiki_page_path("help:forum") %>
   <% if CurrentUser.is_member? && @forum_topic && !@forum_topic.new_record? %>
     <li>|</li>
     <%= subnav_link_to "Reply", new_forum_post_path(:topic_id => @forum_topic.id) %>

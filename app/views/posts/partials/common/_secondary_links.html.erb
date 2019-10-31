@@ -14,5 +14,5 @@
   <% if CurrentUser.can_approve_posts? %>
     <%= subnav_link_to "Moderate", moderator_post_queue_path %>
   <% end %>
-  <%= subnav_link_to "Help", wiki_pages_path(:title => "help:posts") %>
+  <%= subnav_link_to "Help", wiki_page_path("help:posts") %>
 <% end %>

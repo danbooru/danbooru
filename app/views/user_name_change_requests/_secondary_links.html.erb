@@ -1,5 +1,5 @@
 <% content_for(:secondary_links) do %>
   <%= subnav_link_to "Listing", user_name_change_requests_path %>
   <%= subnav_link_to "New", new_user_name_change_request_path %>
-  <%= subnav_link_to "Help", wiki_pages_path(:search => {:title => "help:user_name_change_requests"}) %>
+  <%= subnav_link_to "Help", wiki_page_path("help:user_name_change_requests") %>
 <% end %>

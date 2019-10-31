@@ -6,5 +6,5 @@
   Posts with score -3 or lower are marked red.
   Posts with score 3 or higher are marked green. 
 </p>
-<p>Posts with the <%= link_to_wiki(*Danbooru.config.modqueue_quality_warning_tags, last_word_connector: ", or ") %> tags are marked in yellow.</p>
-<p>Posts with the <%= link_to_wiki(*Danbooru.config.modqueue_sample_warning_tags, last_word_connector: ", or ") %> tags are marked in light red.</p>
+<p>Posts with the <%= link_to_wikis(*Danbooru.config.modqueue_quality_warning_tags) %> tags are marked in yellow.</p>
+<p>Posts with the <%= link_to_wikis(*Danbooru.config.modqueue_sample_warning_tags) %> tags are marked in light red.</p>
