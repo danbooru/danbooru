@@ -113,8 +113,10 @@ class TagSetPresenter < Presenter
     unless name_only
       if category == Tag.categories.artist
         html << %{<a class="wiki-link" href="/artists/show_or_new?name=#{u(name)}">?</a> }
+      elsif name =~ /\A\d+\z/
+        html << %{<a class="wiki-link" href="/wiki_pages/~#{u(name)}">?</a> }
       else
-        html << %{<a class="wiki-link" href="/wiki_pages/show_or_new?title=#{u(name)}">?</a> }
+        html << %{<a class="wiki-link" href="/wiki_pages/#{u(name)}">?</a> }
       end
 
       if show_extra_links && current_query.present?

@@ -25,6 +25,8 @@ class TagNameValidator < ActiveModel::EachValidator
       record.errors[attribute] << "'#{value}' cannot begin with '#{$1}:'"
     when /\A(#{Tag.categories.regexp}):(.+)\z/i
       record.errors[attribute] << "'#{value}' cannot begin with '#{$1}:'"
+    when "new", "search"
+      record.errors[attribute] << "'#{value}' is a reserved name and cannot be used"
     when /\A(.+)_\(cosplay\)\z/i
       tag_name = TagAlias.to_aliased([$1]).first
       tag = Tag.find_by_name(tag_name)

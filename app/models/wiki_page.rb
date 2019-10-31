@@ -23,6 +23,14 @@ class WikiPage < ApplicationRecord
   api_attributes including: [:category_name]
 
   module SearchMethods
+    def find_by_id_or_title(id)
+      if id =~ /\A\d+\z/
+        [find_by_id(id), :id]
+      else
+        [find_by_title(normalize_title(id)), :title]
+      end
+    end
+
     def titled(title)
       where(title: normalize_title(title))
     end
@@ -138,7 +146,7 @@ class WikiPage < ApplicationRecord
   end
 
   def self.normalize_title(title)
-    title.downcase.gsub(/[[:space:]]+/, "_").gsub(/__/, "_").gsub(/\A_|_\z/, "")
+    title.downcase.delete_prefix("~").gsub(/[[:space:]]+/, "_").gsub(/__/, "_").gsub(/\A_|_\z/, "")
   end
 
   def normalize_title
@@ -234,5 +242,13 @@ class WikiPage < ApplicationRecord
 
   def visible?
     artist.blank? || !artist.is_banned? || CurrentUser.is_builder?
+  end
+
+  def to_param
+    if title =~ /\A\d+\z/
+      "~#{title}"
+    else
+      title
+    end
   end
 end

@@ -103,13 +103,14 @@ module ApplicationHelper
     link_to search, posts_path(tags: search)
   end
 
-  def link_to_wiki(text, title)
-    link_to text, wiki_page_path(title)
+  def link_to_wiki(text, title = text, **options)
+    title = "~#{title}" if title =~ /\A\d+\z/
+    link_to text, wiki_page_path(title), class: "wiki-link", **options
   end
 
   def link_to_wikis(*wiki_titles, last_word_connector: ", or", **options)
     links = wiki_titles.map do |title|
-      link_to title.tr("_", " "), wiki_page_path(title)
+      link_to_wiki title.tr("_", " "), title
     end
 
     to_sentence(links, **options)

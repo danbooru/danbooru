@@ -695,7 +695,7 @@ class PostTest < ActiveSupport::TestCase
 
         context "that already exists" do
           setup do
-            %W(___ ~foo _foo foo_ foo__bar foo*bar foo,bar foo\abar café 東方).each do |tag|
+            %W(___ ~foo _foo foo_ foo__bar foo*bar foo,bar foo\abar café 東方 new search).each do |tag|
               build(:tag, name: tag).save(validate: false)
             end
           end
@@ -710,6 +710,8 @@ class PostTest < ActiveSupport::TestCase
           assert_invalid_tag("foo\abar")
           assert_invalid_tag("café")
           assert_invalid_tag("東方")
+          assert_invalid_tag("new")
+          assert_invalid_tag("search")
         end
       end
 

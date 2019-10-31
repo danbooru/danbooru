@@ -11,7 +11,7 @@ class WikiPagesController < ApplicationController
   end
 
   def edit
-    @wiki_page = WikiPage.find(params[:id])
+    @wiki_page, _ = WikiPage.find_by_id_or_title(params[:id])
     respond_with(@wiki_page)
   end
 
@@ -30,18 +30,16 @@ class WikiPagesController < ApplicationController
   end
 
   def show
-    if params[:id] =~ /\A\d+\z/
-      @wiki_page = WikiPage.find(params[:id])
-    else
-      @wiki_page = WikiPage.titled(params[:id]).first
-    end
+    @wiki_page, found_by = WikiPage.find_by_id_or_title(params[:id])
 
-    if @wiki_page.present?
-      respond_with(@wiki_page)
-    elsif request.format.html?
+    if request.format.html? && @wiki_page.blank? && found_by == :title
       redirect_to show_or_new_wiki_pages_path(title: params[:id])
-    else
+    elsif request.format.html? && @wiki_page.present? && found_by == :id
+      redirect_to @wiki_page
+    elsif @wiki_page.blank?
       raise ActiveRecord::RecordNotFound
+    else
+      respond_with(@wiki_page)
     end
   end
 
@@ -51,19 +49,19 @@ class WikiPagesController < ApplicationController
   end
 
   def update
-    @wiki_page = WikiPage.find(params[:id])
+    @wiki_page, _ = WikiPage.find_by_id_or_title(params[:id])
     @wiki_page.update(wiki_page_params(:update))
     respond_with(@wiki_page)
   end
 
   def destroy
-    @wiki_page = WikiPage.find(params[:id])
+    @wiki_page, _ = WikiPage.find_by_id_or_title(params[:id])
     @wiki_page.update(is_deleted: true)
     respond_with(@wiki_page)
   end
 
   def revert
-    @wiki_page = WikiPage.find(params[:id])
+    @wiki_page, _ = WikiPage.find_by_id_or_title(params[:id])
     @version = @wiki_page.versions.find(params[:version_id])
     @wiki_page.revert_to!(@version)
     flash[:notice] = "Page was reverted"

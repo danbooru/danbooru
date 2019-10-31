@@ -40,13 +40,29 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      should "render" do
-        get wiki_page_path(@wiki_page)
+      should "redirect to the title for an id" do
+        get wiki_page_path(@wiki_page.id)
+        assert_redirected_to wiki_page_path(@wiki_page.title)
+
+        get wiki_page_path(@wiki_page.id), as: :json
         assert_response :success
       end
 
+      should "distinguish between an id and a title" do
+        as(@user) { @wiki_page.update(title: "2019") }
+
+        get wiki_page_path("~2019")
+        assert_response :success
+
+        get wiki_page_path(@wiki_page.id)
+        assert_redirected_to wiki_page_path("~2019")
+
+        get wiki_page_path("2019")
+        assert_response 404
+      end
+
       should "render for a title" do
-        get wiki_page_path(:id => @wiki_page.title)
+        get wiki_page_path(@wiki_page.title)
         assert_response :success
       end
 
@@ -64,8 +80,9 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         as_user do
           @wiki_page.update(title: "-aaa")
         end
-        get wiki_page_path(:id => @wiki_page.id)
-        assert_response :success
+
+        get wiki_page_path(@wiki_page.id)
+        assert_redirected_to wiki_page_path(@wiki_page.title)
       end
     end
 
