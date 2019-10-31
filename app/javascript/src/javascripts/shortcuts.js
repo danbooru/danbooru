@@ -5,6 +5,8 @@ let Shortcuts = {};
 Shortcuts.initialize = function() {
   Utility.keydown("s", "scroll_down", Shortcuts.nav_scroll_down);
   Utility.keydown("w", "scroll_up", Shortcuts.nav_scroll_up);
+  Utility.keydown("ctrl+return", "submit_form", Shortcuts.submit_form, 'input[type="text"], textarea');
+
   Shortcuts.initialize_data_shortcuts();
 }
 
@@ -40,6 +42,11 @@ Shortcuts.initialize_data_shortcuts = function() {
       }
     });
   });
+};
+
+Shortcuts.submit_form = function(event) {
+  $(event.target).parents("form").find('input[type="submit"]').click();
+  event.preventDefault();
 };
 
 Shortcuts.nav_scroll_down = function() {

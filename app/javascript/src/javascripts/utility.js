@@ -67,9 +67,9 @@ Utility.dialog = function(title, html) {
   });
 }
 
-Utility.keydown = function(keys, namespace, handler) {
+Utility.keydown = function(keys, namespace, handler, selector = document) {
   if (CurrentUser.data("enable-post-navigation")) {
-    $(document).on("keydown.danbooru." + namespace, null, keys, handler);
+    $(selector).on("keydown.danbooru." + namespace, null, keys, handler);
   }
 };
 
