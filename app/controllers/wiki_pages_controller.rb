@@ -17,16 +17,11 @@ class WikiPagesController < ApplicationController
 
   def index
     @wiki_pages = WikiPage.paginated_search(params)
-    respond_with(@wiki_pages) do |format|
-      format.html do
-        if params[:page].nil? || params[:page].to_i == 1
-          if @wiki_pages.length == 1
-            redirect_to(wiki_page_path(@wiki_pages.first))
-          elsif @wiki_pages.length == 0 && params[:search][:title].present? && params[:search][:title] !~ /\*/
-            redirect_to(wiki_pages_path(:search => {:title => "*#{params[:search][:title]}*"}))
-          end
-        end
-      end
+
+    if params[:redirect].to_s.truthy? && @wiki_pages.one?
+      redirect_to @wiki_pages.first
+    else
+      respond_with(@wiki_pages)
     end
   end
 

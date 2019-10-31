@@ -22,12 +22,14 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
 
       should "list all wiki_pages (with search)" do
         get wiki_pages_path, params: {:search => {:title => "abc"}}
-        assert_redirected_to(wiki_page_path(@wiki_page_abc))
+        assert_response :success
+        assert_select "tr td:first-child", text: "abc"
       end
 
       should "list wiki_pages without tags with order=post_count" do
         get wiki_pages_path, params: {:search => {:title => "abc", :order => "post_count"}}
-        assert_redirected_to(wiki_page_path(@wiki_page_abc))
+        assert_response :success
+        assert_select "tr td:first-child", text: "abc"
       end
     end
 

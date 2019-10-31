@@ -164,7 +164,8 @@ module ApplicationHelper
   def quick_search_form_for(attribute, url, name, autocomplete: nil, &block)
     tag.li do
       search_form_for(url, classes: "quick-search-form one-line-form") do |f|
-        f.input attribute, label: false, placeholder: "Search #{name}", input_html: { id: nil, "data-autocomplete": autocomplete }
+        out  = tag.input type: :hidden, name: :redirect, value: "1"
+        out += f.input attribute, label: false, placeholder: "Search #{name}", input_html: { id: nil, "data-autocomplete": autocomplete }
       end
     end
   end
