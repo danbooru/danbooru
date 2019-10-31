@@ -293,11 +293,7 @@ Rails.application.routes.draw do
     end
   end
   resource :user_upgrade, :only => [:new, :create, :show]
-  resources :user_feedbacks do
-    collection do
-      get :search
-    end
-  end
+  resources :user_feedbacks
   resources :user_name_change_requests, only: [:new, :create, :show, :index]
   resources :wiki_pages do
     member do

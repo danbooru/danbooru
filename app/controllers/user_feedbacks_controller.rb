@@ -20,7 +20,7 @@ class UserFeedbacksController < ApplicationController
   end
 
   def index
-    @user_feedbacks = UserFeedback.visible.paginated_search(params, count_pages: true)
+    @user_feedbacks = UserFeedback.visible.includes(:user, :creator).paginated_search(params, count_pages: true)
     respond_with(@user_feedbacks)
   end
 

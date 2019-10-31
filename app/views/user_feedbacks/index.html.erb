@@ -2,27 +2,44 @@
   <div id="a-index">
     <h1>User Feedback</h1>
 
-    <table class="striped" width="100%">
+    <%= search_form_for(user_feedbacks_path) do |f| %>
+      <%= f.input :user_name, input_html: { value: params.dig(:search, :user_name), "data-autocomplete": "user" } %>
+      <%= f.input :creator_name, input_html: { value: params.dig(:search, :creator_name), "data-autocomplete": "user" } %>
+      <%= f.input :body_matches, label: "Message", input_html: { value: params.dig(:search, :body_matches) } %>
+      <%= f.input :category, collection: %w[positive negative neutral], include_blank: true, selected: params.dig(:search, :category) %>
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <table class="striped autofit">
       <thead>
         <tr>
-          <th width="15%">User</th>
-          <th width="15%">Creator</th>
-          <th width="15%">When</th>
-          <th width="45%">Message</th>
+          <th>User</th>
+          <th>Message</th>
+          <th>Category</th>
+          <th>Creator</th>
           <th></th>
         </tr>
       </thead>
       <tbody>
         <% @user_feedbacks.each do |feedback| %>
           <tr class="feedback-category-<%= feedback.category %>">
-            <td><%= link_to_user feedback.user %></td>
-            <td><%= link_to_user feedback.creator %></td>
-            <td><%= compact_time(feedback.created_at) %></td>
             <td>
+              <%= link_to_user feedback.user %>
+              <%= link_to "»", user_feedbacks_path(search: { user_name: feedback.user.name }) %>
+            </td>
+            <td class="col-expand">
               <div class="prose">
                 <%= format_text(feedback.body) %>
               </div>
               <%= render "application/update_notice", record: feedback, interval: 0.minutes %>
+            </td>
+            <td>
+              <%= link_to feedback.category.capitalize, user_feedbacks_path(search: { category: feedback.category }) %>
+            </td>
+            <td>
+              <%= link_to_user feedback.creator %>
+              <%= link_to "»", user_feedbacks_path(search: { creator_name: feedback.creator.name }) %>
+              <div><%= time_ago_in_words_tagged(feedback.created_at) %></div>
             </td>
             <td>
               <% if feedback.editable_by?(CurrentUser.user) %>
