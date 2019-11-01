@@ -131,7 +131,7 @@ markdown_link = '[' url >mark_a1 %mark_a2 :>> '](' nonrparen+ >mark_b1 %mark_b2 
 html_link = '<a'i space+ 'href="'i (url | internal_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
 
 basic_wiki_link = alnum* >mark_a1 %mark_a2 '[[' (nonbracket nonpipebracket*) >mark_b1 %mark_b2 ']]' alnum* >mark_c1 %mark_c2;
-aliased_wiki_link = alnum* >mark_a1 %mark_a2 '[[' nonpipebracket+ >mark_b1 %mark_b2 '|' nonpipebracket+ >mark_c1 %mark_c2 ']]' alnum* >mark_d1 %mark_d2;
+aliased_wiki_link = alnum* >mark_a1 %mark_a2 '[[' nonpipebracket+ >mark_b1 %mark_b2 '|' nonpipebracket* >mark_c1 %mark_c2 ']]' alnum* >mark_d1 %mark_d2;
 
 post_link = '{{' noncurly+ >mark_a1 %mark_a2 '}}';
 
@@ -944,6 +944,17 @@ static inline void append_wiki_link(StateMachine * sm, const char * tag_segment,
 
   if (g_regex_match_simple("^[0-9]+$", normalized_tag->str, 0, 0)) {
     g_string_prepend(normalized_tag, "~");
+  }
+  
+  /* handle pipe trick: [[Kaga (Kantai Collection)|]] -> [[kaga_(kantai_collection)|Kaga]] */
+  if (title_string->len == 0) {
+    g_string_append_len(title_string, tag_segment, tag_len);
+
+    /* strip qualifier from tag: "kaga (kantai collection)" -> "kaga" */
+    g_autoptr(GRegex) qualifier_regex = g_regex_new("[ _]\\([^)]+?\\)$", 0, 0, NULL);
+    g_autofree gchar* stripped_string = g_regex_replace_literal(qualifier_regex, title_string->str, title_string->len, 0, "", 0, NULL);
+
+    g_string_assign(title_string, stripped_string);
   }
 
   g_string_prepend_len(title_string, prefix_segment, prefix_len);
