@@ -921,7 +921,11 @@ static inline void append_wiki_link(StateMachine * sm, const char * tag, const s
   g_autofree gchar* lowercased_tag = g_utf8_strdown(tag, tag_len);
   g_autoptr(GString) normalized_tag = g_string_new(g_strdelimit(lowercased_tag, " ", '_'));
 
-  append(sm, "<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/show_or_new?title=");
+  if (g_regex_match_simple("^[0-9]+$", normalized_tag->str, 0, 0)) {
+    g_string_prepend(normalized_tag, "~");
+  }
+
+  append(sm, "<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/");
   append_segment_uri_escaped(sm, normalized_tag->str, normalized_tag->str + normalized_tag->len - 1);
   append(sm, "\">");
   append_segment_html_escaped(sm, title, title + title_len - 1);
