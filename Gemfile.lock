@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/evazion/dtext_rb.git
-  revision: 13fb1630ee28236fe3174c6c16181d6721e98085
+  revision: aeefb66951acbc352b6c550eb79701496c88a6fd
   specs:
-    dtext_rb (1.10.2)
+    dtext_rb (1.10.3)
       nokogiri (~> 1.8)
 
 GIT
@@ -237,9 +237,9 @@ GEM
     net-ssh (5.2.0)
     newrelic_rpm (6.7.0.359)
     nio4r (2.5.2)
-    nokogiri (1.10.4)
+    nokogiri (1.10.5)
       mini_portile2 (~> 2.4.0)
-    nokogiri (1.10.4-x64-mingw32)
+    nokogiri (1.10.5-x64-mingw32)
       mini_portile2 (~> 2.4.0)
     nokogumbo (2.0.1)
       nokogiri (~> 1.8, >= 1.8.4)

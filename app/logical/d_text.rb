@@ -28,7 +28,7 @@ class DText
     fragment = Nokogiri::HTML.fragment(html)
 
     fragment.css("a.dtext-wiki-link").each do |node|
-      name = node["href"][%r!\A/wiki_pages/show_or_new\?title=(.*)\z!i, 1]
+      name = node["href"][%r!\A/wiki_pages/(.*)\z!i, 1]
       name = CGI.unescape(name)
       name = WikiPage.normalize_title(name)
       wiki = wiki_pages.find { |wiki| wiki.title == name }
@@ -123,7 +123,7 @@ class DText
     fragment = Nokogiri::HTML.fragment(html)
 
     titles = fragment.css("a.dtext-wiki-link").map do |node|
-      title = node["href"][%r!\A/wiki_pages/show_or_new\?title=(.*)\z!i, 1]
+      title = node["href"][%r!\A/wiki_pages/(.*)\z!i, 1]
       title = CGI.unescape(title)
       title = WikiPage.normalize_title(title)
       title
