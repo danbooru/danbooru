@@ -29,6 +29,10 @@ typedef struct StateMachine {
   const char * a2;
   const char * b1;
   const char * b2;
+  const char * c1;
+  const char * c2;
+  const char * d1;
+  const char * d2;
   bool f_inline;
   bool f_mentions;
   bool list_mode;

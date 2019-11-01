@@ -85,6 +85,22 @@ action mark_b2 {
   sm->b2 = sm->p;
 }
 
+action mark_c1 {
+  sm->c1 = sm->p;
+}
+
+action mark_c2 {
+  sm->c2 = sm->p;
+}
+
+action mark_d1 {
+  sm->d1 = sm->p;
+}
+
+action mark_d2 {
+  sm->d2 = sm->p;
+}
+
 newline = '\r\n' | '\n';
 
 nonnewline = any - (newline | '\r');
@@ -114,8 +130,8 @@ bracketed_textile_link = '"' nonquote+ >mark_a1 '"' >mark_a2 ':[' (url | interna
 markdown_link = '[' url >mark_a1 %mark_a2 :>> '](' nonrparen+ >mark_b1 %mark_b2 ')';
 html_link = '<a'i space+ 'href="'i (url | internal_url) >mark_a1 %mark_a2 :>> '">' nonnewline+ >mark_b1 %mark_b2 :>> '</a>'i;
 
-basic_wiki_link = '[[' (nonbracket nonpipebracket*) >mark_a1 %mark_a2 ']]';
-aliased_wiki_link = '[[' nonpipebracket+ >mark_a1 %mark_a2 '|' nonpipebracket+ >mark_b1 %mark_b2 ']]';
+basic_wiki_link = alnum* >mark_a1 %mark_a2 '[[' (nonbracket nonpipebracket*) >mark_b1 %mark_b2 ']]' alnum* >mark_c1 %mark_c2;
+aliased_wiki_link = alnum* >mark_a1 %mark_a2 '[[' nonpipebracket+ >mark_b1 %mark_b2 '|' nonpipebracket+ >mark_c1 %mark_c2 ']]' alnum* >mark_d1 %mark_d2;
 
 post_link = '{{' noncurly+ >mark_a1 %mark_a2 '}}';
 
@@ -218,11 +234,11 @@ inline := |*
   };
 
   basic_wiki_link => {
-    append_wiki_link(sm, sm->a1, sm->a2 - sm->a1, sm->a1, sm->a2 - sm->a1);
+    append_wiki_link(sm, sm->b1, sm->b2 - sm->b1, sm->b1, sm->b2 - sm->b1, sm->a1, sm->a2 - sm->a1, sm->c1, sm->c2 - sm->c1);
   };
 
   aliased_wiki_link => {
-    append_wiki_link(sm, sm->a1, sm->a2 - sm->a1, sm->b1, sm->b2 - sm->b1);
+    append_wiki_link(sm, sm->b1, sm->b2 - sm->b1, sm->c1, sm->c2 - sm->c1, sm->a1, sm->a2 - sm->a1, sm->d1, sm->d2 - sm->d1);
   };
 
   basic_textile_link => {
@@ -917,18 +933,22 @@ static inline bool append_named_url(StateMachine * sm, const char * url_start, c
   return true;
 }
 
-static inline void append_wiki_link(StateMachine * sm, const char * tag, const size_t tag_len, const char * title, const size_t title_len) {
-  g_autofree gchar* lowercased_tag = g_utf8_strdown(tag, tag_len);
+static inline void append_wiki_link(StateMachine * sm, const char * tag_segment, const size_t tag_len, const char * title_segment, const size_t title_len, const char * prefix_segment, const size_t prefix_len, const char * suffix_segment, const size_t suffix_len) {
+  g_autofree gchar* lowercased_tag = g_utf8_strdown(tag_segment, tag_len);
   g_autoptr(GString) normalized_tag = g_string_new(g_strdelimit(lowercased_tag, " ", '_'));
+  g_autoptr(GString) title_string = g_string_new_len(title_segment, title_len);
 
   if (g_regex_match_simple("^[0-9]+$", normalized_tag->str, 0, 0)) {
     g_string_prepend(normalized_tag, "~");
   }
 
+  g_string_prepend_len(title_string, prefix_segment, prefix_len);
+  g_string_append_len(title_string, suffix_segment, suffix_len);
+
   append(sm, "<a class=\"dtext-link dtext-wiki-link\" href=\"/wiki_pages/");
   append_segment_uri_escaped(sm, normalized_tag->str, normalized_tag->str + normalized_tag->len - 1);
   append(sm, "\">");
-  append_segment_html_escaped(sm, title, title + title_len - 1);
+  append_segment_html_escaped(sm, title_string->str, title_string->str + title_string->len - 1);
   append(sm, "</a>");
 }
 
@@ -1141,6 +1161,10 @@ StateMachine* init_machine(const char * src, size_t len, bool f_inline, bool f_m
   sm->a2 = NULL;
   sm->b1 = NULL;
   sm->b2 = NULL;
+  sm->c1 = NULL;
+  sm->c2 = NULL;
+  sm->d1 = NULL;
+  sm->d2 = NULL;
   sm->f_inline = f_inline;
   sm->f_mentions = f_mentions;
   sm->stack = g_array_sized_new(FALSE, TRUE, sizeof(int), 16);
