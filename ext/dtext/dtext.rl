@@ -222,6 +222,10 @@ inline := |*
   'seiga #'i id            => { append_id_link(sm, "seiga", "seiga", "https://seiga.nicovideo.jp/seiga/im"); };
   'twitter #'i id          => { append_id_link(sm, "twitter", "twitter", "https://twitter.com/i/web/status/"); };
 
+  'yandere #'i id => { append_id_link(sm, "yandere", "yandere", "https://yande.re/post/show/"); };
+  'sankaku #'i id => { append_id_link(sm, "sankaku", "sankaku", "https://chan.sankakucomplex.com/post/show/"); };
+  'gelbooru #'i id => { append_id_link(sm, "gelbooru", "gelbooru", "https://gelbooru.com/index.php?page=post&s=view&id="); };
+
   'topic #'i id '/p'i page => { append_paged_link(sm, "topic #", "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/", "?page="); };
   'pixiv #'i id '/p'i page => { append_paged_link(sm, "pixiv #", "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"https://www.pixiv.net/artworks/", "#"); };
 
