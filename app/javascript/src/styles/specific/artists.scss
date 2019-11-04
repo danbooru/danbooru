@@ -7,4 +7,10 @@ div#c-artists, div#excerpt {
   .recent-posts h2 {
     margin: 1em 0 0.5em;
   }
+
+  div#a-index {
+    td {
+      height: 2.25em; /* should match .artist-other-name line-height */
+    }
+  }
 }

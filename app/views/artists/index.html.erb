@@ -1,27 +1,55 @@
 <div id="c-artists">
   <div id="a-index">
     <%= render "search" %>
-    <table class="striped" width="100%">
+
+    <table class="striped autofit">
       <thead>
         <tr>
-          <th width="45%">Primary Name</th>
-          <th width="45%">Secondary Names</th>
-          <th width="10%">Status</th>
+          <th>Name</th>
+          <th>Other Names</th>
+          <th>Status</th>
+          <th>Updated</th>
+          <th></th>
         </tr>
       </thead>
       <tbody>
         <% @artists.each do |artist| %>
-          <% if artist.visible? %>
-            <%= content_tag(:tr, :id => "artist-#{artist.id}") do %>
-              <td>
-                <%= link_to h(artist.name), artist_path(artist) %>
-                <% if !artist.group_name.blank? %>
-                  (group: <%= link_to(artist.group_name, artist_path(artist)) %>)
-                <% end %>
-              </td>
-              <td><%= artist.other_names_string %></td>
-              <td><%= artist.status %></td>
-            <% end %>
+          <%= tag.tr id: "artist-#{artist.id}" do %>
+            <td>
+              <%= link_to artist.name, artist, class: "tag-type-#{Tag.categories.artist}" %>
+              <span class="post-count"><%= artist.tag.try(:post_count) || 0 %></span>
+              <% if !artist.group_name.blank? %>
+                (group: <%= link_to artist.group_name, artist %>)
+              <% end %>
+            </td>
+            <td class="col-expand">
+              <% artist.other_names.each do |name| %>
+                <%= link_to name, artists_path(search: { any_name_matches: name }), class: "artist-other-name" %>
+              <% end %>
+            </td>
+            <td>
+              <% if !artist.is_active? %>
+                <%= link_to "Deleted", artists_path(search: { is_active: false }) %>
+              <% end %>
+
+              <% if artist.is_banned? %>
+                <%= link_to "Banned", artists_path(search: { is_banned: true }) %>
+              <% end %>
+            </td>
+            <td>
+              <%= time_ago_in_words_tagged(artist.updated_at) %>
+            </td>
+            <td>
+              <% if artist.editable_by?(CurrentUser.user) %>
+                <%= link_to "Edit", edit_artist_path(artist) %>
+              <% end %>
+
+              <% if artist.is_active? && artist.deletable_by?(CurrentUser.user) %>
+                | <%= link_to "Delete", artist_path(artist, artist: { is_active: false }), method: :put, remote: true %>
+              <% elsif !artist.is_active? && artist.deletable_by?(CurrentUser.user) %>
+                | <%= link_to "Undelete", artist_path(artist, artist: { is_active: true }), method: :put, remote: true %>
+              <% end %>
+            </td>
           <% end %>
         <% end %>
       </tbody>

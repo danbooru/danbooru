@@ -38,6 +38,8 @@ class ArtistsController < ApplicationController
 
   def index
     @artists = Artist.includes(:urls).paginated_search(params)
+    @artists = @artists.includes(:tag) if request.format.html?
+    @artists = @artists.includes(:urls) if !request.format.html?
 
     if params[:redirect].to_s.truthy? && @artists.one? && @artists.first.name == Artist.normalize_name(params[:search][:any_name_or_url_matches])
       redirect_to @artists.first
