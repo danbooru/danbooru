@@ -37,6 +37,9 @@ class ArtistsController < ApplicationController
   end
 
   def index
+    # XXX
+    params[:search][:name] = params.delete(:name) if params[:name]
+
     @artists = Artist.includes(:urls).paginated_search(params)
     @artists = @artists.includes(:tag) if request.format.html?
     @artists = @artists.includes(:urls) if !request.format.html?
@@ -98,12 +101,6 @@ private
 
   def load_artist
     @artist = Artist.find(params[:id])
-  end
-
-  def search_params
-    sp = params.fetch(:search, {})
-    sp[:name] = params[:name] if params[:name]
-    sp.permit!
   end
 
   def artist_params(context = nil)
