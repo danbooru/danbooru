@@ -37,14 +37,12 @@ class ArtistsController < ApplicationController
   end
 
   def index
-    @artists = Artist.includes(:urls).search(search_params).paginate(params[:page], :limit => params[:limit], :search_count => params[:search])
-    respond_with(@artists) do |format|
-      format.xml do
-        render :xml => @artists.to_xml(:include => [:urls], :root => "artists")
-      end
-      format.json do
-        render :json => @artists.to_json(:include => [:urls])
-      end
+    @artists = Artist.includes(:urls).paginated_search(params)
+
+    if params[:redirect].to_s.truthy? && @artists.one? && @artists.first.name == Artist.normalize_name(params[:search][:any_name_or_url_matches])
+      redirect_to @artists.first
+    else
+      respond_with @artists
     end
   end
 

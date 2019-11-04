@@ -18,7 +18,12 @@ class PoolsController < ApplicationController
 
   def index
     @pools = Pool.includes(:creator).paginated_search(params, count_pages: true)
-    respond_with(@pools)
+
+    if params[:redirect].to_s.truthy? && @pools.one? && Pool.normalize_name_for_search(@pools.first.name) == Pool.normalize_name_for_search(params[:search][:name_matches])
+      redirect_to @pools.first
+    else
+      respond_with @pools
+    end
   end
 
   def gallery

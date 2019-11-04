@@ -28,9 +28,14 @@ class UsersController < ApplicationController
     if params[:name].present?
       @user = User.find_by_name!(params[:name])
       redirect_to user_path(@user)
+      return
+    end
+
+    @users = User.paginated_search(params)
+    if params[:redirect].to_s.truthy? && @users.one? && User.normalize_name(@users.first.name) == User.normalize_name(params[:search][:name_matches])
+      redirect_to @users.first
     else
-      @users = User.paginated_search(params)
-      respond_with(@users)
+      respond_with @users
     end
   end
 
