@@ -15,15 +15,7 @@ class ArtistsController < ApplicationController
   end
 
   def banned
-    @artists = Artist.where("is_banned = ?", true).order("name")
-    respond_with(@artists) do |format|
-      format.xml do
-        render :xml => @artists.to_xml(:include => [:urls], :root => "artists")
-      end
-      format.json do
-        render :json => @artists.to_json(:include => [:urls])
-      end
-    end
+    redirect_to artists_path(search: { is_banned: "true", order: "updated_at" })
   end
 
   def ban

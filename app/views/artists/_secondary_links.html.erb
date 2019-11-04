@@ -1,7 +1,7 @@
 <% content_for(:secondary_links) do %>
   <%= quick_search_form_for(:any_name_or_url_matches, artists_path, "artists", autocomplete: "artist") %>
   <%= subnav_link_to "Listing", artists_path %>
-  <%= subnav_link_to "Banned", banned_artists_path %>
+  <%= subnav_link_to "Banned", artists_path(search: { is_banned: "true", order: "updated_at" }) %>
   <% if CurrentUser.is_member? %>
     <%= subnav_link_to "New", new_artist_path %>
   <% end %>
