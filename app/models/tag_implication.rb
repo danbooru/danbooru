@@ -13,8 +13,6 @@ class TagImplication < TagRelationship
   validate :antecedent_is_not_aliased
   validate :consequent_is_not_aliased
   validate :wiki_pages_present, on: :create, unless: :skip_secondary_validations
-  scope :old, ->{where("created_at between ? and ?", 2.months.ago, 1.month.ago)}
-  scope :pending, ->{where(status: "pending")}
 
   module DescendantMethods
     extend ActiveSupport::Concern
