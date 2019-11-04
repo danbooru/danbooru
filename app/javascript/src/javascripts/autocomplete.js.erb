@@ -421,7 +421,7 @@ Autocomplete.user_source = function(term, resp, prefix) {
       resp($.map(data, function(user) {
         return {
           type: "user",
-          label: user.name.replace(/_/, " "),
+          label: user.name.replace(/_/g, " "),
           value: prefix + user.name,
           level: user.level_string
         };
