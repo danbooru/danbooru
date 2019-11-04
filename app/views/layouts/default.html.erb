@@ -8,25 +8,9 @@
   <% unless CurrentUser.disable_responsive_mode? %>
     <meta name="viewport" content="width=device-width,initial-scale=1">
   <% end %>
-  <meta name="current-user-name" content="<%= CurrentUser.name %>">
-  <meta name="current-user-id" content="<%= CurrentUser.id %>">
-  <meta name="current-user-can-approve-posts" content="<%= CurrentUser.can_approve_posts? %>">
-  <meta name="user-comment-threshold" content="<%= CurrentUser.comment_threshold %>">
   <% if CurrentUser.user.blacklisted_tags.present? %>
     <meta name="blacklisted-tags" content="<%= CurrentUser.user.blacklisted_tags.gsub(/(?:\r|\n)+/, ",") %>">
   <% end %>
-  <% if flash[:notice] =~ /error/i %>
-    <meta name="errors" content="true">
-  <% end %>
-  <meta name="enable-js-navigation" content="<%= CurrentUser.user.enable_post_navigation %>">
-  <meta name="new-post-navigation-layout" content="<%= CurrentUser.user.new_post_navigation_layout %>">
-  <meta name="default-image-size" content="<%= CurrentUser.user.default_image_size %>">
-  <meta name="enable-auto-complete" content="<%= CurrentUser.user.enable_auto_complete %>">
-  <meta name="style-usernames" content="<%= CurrentUser.user.style_usernames? %>">
-  <meta name="last-forum-read-at" content="<%= CurrentUser.user.last_forum_read_at %>">
-  <meta name="disable-labeled-saved-searches" content="<%= CurrentUser.disable_categorized_saved_searches? %>">
-  <meta name="disable-post-tooltips" content="<%= CurrentUser.disable_post_tooltips? %>">
-  <%= tag.meta name: "disable-mobile-gestures", content: CurrentUser.disable_mobile_gestures? %>
   <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <%= javascript_pack_tag "application" %>
