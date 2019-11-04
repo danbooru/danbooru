@@ -19,7 +19,11 @@
         <p><%= wiki_page_other_names_list(@wiki_page) %></p>
       <% end %>
 
-      <%= format_text(@wiki_page.body) %>
+      <% if @wiki_page.new_record? %>
+        <p>This wiki page does not exist. <%= link_to "Create new wiki page", new_wiki_page_path(wiki_page: { title: @wiki_page.title }) %>.</p>
+      <% else %>
+        <%= format_text(@wiki_page.body) %>
+      <% end %>
 
       <% if @wiki_page.artist %>
         <p><%= link_to "View artist", @wiki_page.artist %></p>

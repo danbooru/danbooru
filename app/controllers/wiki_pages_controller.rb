@@ -33,7 +33,8 @@ class WikiPagesController < ApplicationController
     @wiki_page, found_by = WikiPage.find_by_id_or_title(params[:id])
 
     if request.format.html? && @wiki_page.blank? && found_by == :title
-      redirect_to show_or_new_wiki_pages_path(title: params[:id])
+      @wiki_page = WikiPage.new(title: params[:id])
+      respond_with @wiki_page, status: 404
     elsif request.format.html? && @wiki_page.present? && found_by == :id
       redirect_to @wiki_page
     elsif @wiki_page.blank?
@@ -69,15 +70,10 @@ class WikiPagesController < ApplicationController
   end
 
   def show_or_new
-    @wiki_page = WikiPage.find_by_title(params[:title])
-
     if params[:title].blank?
       redirect_to new_wiki_page_path(wiki_page_params(:create))
-    elsif @wiki_page.present?
-      redirect_to wiki_page_path(@wiki_page)
     else
-      @wiki_page = WikiPage.new(:title => params[:title])
-      respond_with(@wiki_page)
+      redirect_to wiki_page_path(params[:title])
     end
   end
 

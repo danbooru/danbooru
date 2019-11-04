@@ -66,9 +66,11 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should "redirect html requests for a nonexistent title" do
+      should "show the 'does not exist' page for a nonexistent title" do
         get wiki_page_path("what")
-        assert_redirected_to(show_or_new_wiki_pages_path(title: "what"))
+
+        assert_response 404
+        assert_select "#wiki-page-body", text: /This wiki page does not exist/
       end
 
       should "return 404 to api requests for a nonexistent title" do
@@ -98,9 +100,9 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to(@wiki_page)
       end
 
-      should "render when given a nonexistent title" do
+      should "redirect when given a nonexistent title" do
         get show_or_new_wiki_pages_path, params: { title: "what" }
-        assert_response :success
+        assert_redirected_to wiki_page_path("what")
       end
     end
 
