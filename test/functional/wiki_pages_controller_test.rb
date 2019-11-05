@@ -86,6 +86,19 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         get wiki_page_path(@wiki_page.id)
         assert_redirected_to wiki_page_path(@wiki_page.title)
       end
+
+      should "work for a title containing dots" do
+        as(@user) { create(:wiki_page, title: "...") }
+
+        get wiki_page_path("...")
+        assert_response :success
+
+        get wiki_page_path("....json")
+        assert_response :success
+
+        get wiki_page_path("....xml")
+        assert_response :success
+      end
     end
 
     context "show_or_new action" do

@@ -295,14 +295,10 @@ Rails.application.routes.draw do
   resource :user_upgrade, :only => [:new, :create, :show]
   resources :user_feedbacks
   resources :user_name_change_requests, only: [:new, :create, :show, :index]
-  resources :wiki_pages do
-    member do
-      put :revert
-    end
-    collection do
-      get :search
-      get :show_or_new
-    end
+  resources :wiki_pages, id: /.+?(?=\.json|\.xml|\.html)|.+/ do
+    put :revert, on: :member
+    get :search, on: :collection
+    get :show_or_new, on: :collection
   end
   resources :wiki_page_versions, :only => [:index, :show, :diff] do
     collection do
