@@ -50,10 +50,10 @@ module ApplicationHelper
     end
   end
 
-  def time_tag(content, time)
+  def time_tag(content, time, **options)
     datetime = time.strftime("%Y-%m-%dT%H:%M%:z")
 
-    content_tag(:time, content || datetime, :datetime => datetime, :title => time.to_formatted_s)
+    tag.time content || datetime, datetime: datetime, title: time.to_formatted_s, **options
   end
 
   def humanized_duration(from, to)
@@ -71,11 +71,24 @@ module ApplicationHelper
 
   def time_ago_in_words_tagged(time, compact: false)
     if time.past?
-      text = time_ago_in_words(time) + " ago"
-      text = text.gsub(/almost|about|over/, "").strip if compact
-      raw time_tag(text, time)
+      if compact
+        text = time_ago_in_words(time)
+        text = text.gsub(/almost|about|over/, "").strip
+        text = text.gsub(/less than a/, "<1")
+        text = text.gsub(/ minutes?/, "m")
+        text = text.gsub(/ hours?/, "h")
+        text = text.gsub(/ days?/, "d")
+        text = text.gsub(/ months?/, "mo")
+        text = text.gsub(/ years?/, "y")
+        klass = "compact-timestamp"
+      else
+        text = time_ago_in_words(time) + " ago"
+        klass = ""
+      end
+
+      time_tag(text, time, class: klass)
     else
-      raw time_tag("in " + distance_of_time_in_words(Time.now, time), time)
+      time_tag("in " + distance_of_time_in_words(Time.now, time), time)
     end
   end
 

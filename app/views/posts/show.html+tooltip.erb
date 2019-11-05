@@ -4,11 +4,9 @@
       <%= link_to_user @post.uploader %>
     <% end %>
 
-    <%= link_to time_ago_in_words_tagged(@post.created_at, compact: true), posts_path(tags: "date:#{@post.created_at.strftime("%Y-%m-%d")}"), class: "post-tooltip-date post-tooltip-info" %>
-
     <span class="post-tooltip-favorites post-tooltip-info">
       <span><%= @post.fav_count %></span>
-      <i class="far fa-star fa-xs"></i>
+      <i class="far fa-heart fa-xs"></i>
     </span>
 
     <span class="post-tooltip-score post-tooltip-info">
@@ -21,6 +19,10 @@
         <span><%= @post.comments.count %></span>
         <i class="far fa-comments fa-xs"></i>
       </span>
+    <% end %>
+
+    <%= link_to posts_path(tags: "date:#{@post.created_at.strftime("%Y-%m-%d")}"), class: "post-tooltip-date post-tooltip-info" do %>
+      <%= time_ago_in_words_tagged(@post.created_at, compact: true) %> ago
     <% end %>
   </span>
 
