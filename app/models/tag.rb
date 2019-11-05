@@ -91,12 +91,19 @@ class Tag < ApplicationRecord
     extend ActiveSupport::Concern
 
     module ClassMethods
+      # Lock the tags first in alphabetical order to avoid deadlocks under concurrent updates.
+      #
+      # https://stackoverflow.com/questions/44660368/postgres-update-with-order-by-how-to-do-it
+      # https://www.postgresql.org/message-id/flat/freemail.20070030161126.43285%40fm10.freemail.hu
+      # https://www.postgresql.org/message-id/flat/CAKOSWNkb3Zy_YFQzwyRw3MRrU10LrMj04%2BHdByfQu6M1S5B7mg%40mail.gmail.com#9dc514507357472bdf22d3109d9c7957
       def increment_post_counts(tag_names)
-        Tag.where(:name => tag_names).update_all("post_count = post_count + 1")
+        Tag.where(name: tag_names).order(:name).lock("FOR UPDATE").pluck(1)
+        Tag.where(name: tag_names).update_all("post_count = post_count + 1")
       end
 
       def decrement_post_counts(tag_names)
-        Tag.where(:name => tag_names).update_all("post_count = post_count - 1")
+        Tag.where(name: tag_names).order(:name).lock("FOR UPDATE").pluck(1)
+        Tag.where(name: tag_names).update_all("post_count = post_count - 1")
       end
 
       def regenerate_post_counts!
