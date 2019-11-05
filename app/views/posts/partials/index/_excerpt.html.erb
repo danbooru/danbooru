@@ -32,7 +32,7 @@
         <%= wiki_page_alias_and_implication_list(wiki_page) %>
 
         <p class="links">
-          <%= link_to "View wiki", wiki_page_path(wiki_page.id) %>
+          <%= link_to_wiki "View wiki", wiki_page.title %>
         </p>
       </div>
     <% end %>
