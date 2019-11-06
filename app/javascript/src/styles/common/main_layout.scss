@@ -43,6 +43,7 @@ footer#page-footer {
   #content {
     flex: 1;
     padding-left: 1em;
+    min-width: 0;
   }
 
   @media (max-width: 660px) {
