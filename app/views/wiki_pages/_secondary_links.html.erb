@@ -14,7 +14,7 @@
     <%= subnav_link_to "Posts (#{@wiki_page.tag.try(:post_count) || 0})", posts_path(:tags => @wiki_page.title) %>
     <%= subnav_link_to "History", wiki_page_versions_path(:search => {:wiki_page_id => @wiki_page.id}) %>
     <% if CurrentUser.is_member? %>
-      <%= subnav_link_to "Edit", edit_wiki_page_path(@wiki_page), "data-shortcut": "e" %>
+      <%= subnav_link_to "Edit", edit_wiki_page_path(@wiki_page.id), "data-shortcut": "e" %>
     <% end %>
     <% if CurrentUser.is_builder? && !@wiki_page.is_deleted? %>
       <%= subnav_link_to "Delete", wiki_page_path(@wiki_page), :remote => true, :method => :delete, :"data-shortcut" => "shift+d", :"data-confirm" => "Are you sure you want to delete this wiki page?" %>
