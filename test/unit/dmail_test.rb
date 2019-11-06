@@ -153,9 +153,9 @@ class DmailTest < ActiveSupport::TestCase
     end
 
     should "send an email if the user wants it" do
-      user = FactoryBot.create(:user, :receive_email_notifications => true)
+      user = create(:user, receive_email_notifications: true)
       assert_difference("ActionMailer::Base.deliveries.size", 1) do
-        FactoryBot.create(:dmail, :to => user, :owner => user)
+        create(:dmail, to: user, owner: user, body: "test [[tagme]]")
       end
     end
 

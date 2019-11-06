@@ -28,7 +28,8 @@ class DText
     fragment = Nokogiri::HTML.fragment(html)
 
     fragment.css("a.dtext-wiki-link").each do |node|
-      name = node["href"][%r!\A/wiki_pages/(.*)\z!i, 1]
+      path = Addressable::URI.parse(node["href"]).path
+      name = path[%r!\A/wiki_pages/(.*)\z!i, 1]
       name = CGI.unescape(name)
       name = WikiPage.normalize_title(name)
       wiki = wiki_pages.find { |wiki| wiki.title == name }

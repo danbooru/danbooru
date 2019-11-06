@@ -55,6 +55,11 @@ class DTextTest < ActiveSupport::TestCase
         assert_match(/tag-type-#{Tag.categories.artist}/, DText.format_text("[[bkub]]"))
       end
 
+      should "parse wiki links correctly with the base_url option" do
+        create(:tag, name: "bkub", category: Tag.categories.artist, post_count: 42)
+        assert_match(/tag-type-#{Tag.categories.artist}/, DText.format_text("[[bkub]]", base_url: "http://www.example.com"))
+      end
+
       should "mark links to nonexistent tags or wikis" do
         create(:tag, name: "no_wiki", post_count: 42)
         create(:tag, name: "empty_tag", post_count: 0)
