@@ -39,9 +39,9 @@
         <tr>
           <th>Ban reason</th>
           <td>
-            <div class="prose">
-              <%= format_text presenter.ban_reason %>
-            </div>
+            <span class="prose">
+              <%= format_text presenter.ban_reason, inline: true %>
+            </span>
           </td>
         </tr>
       <% end %>
