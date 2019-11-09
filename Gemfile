@@ -25,7 +25,6 @@ gem 'twitter'
 gem 'aws-sdk', '~> 2'
 gem 'responders'
 gem 'dtext_rb', git: "https://github.com/evazion/dtext_rb.git", require: "dtext"
-gem 'cityhash'
 gem 'memoist'
 gem 'daemons'
 gem 'oauth2'
