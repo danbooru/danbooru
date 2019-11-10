@@ -10,5 +10,5 @@
     <% end %>
     <div id="<%= preview_id %>" class="dtext-preview prose"></div>
   </div>
-   <span class="hint">All text is formatted using <%= link_to_wiki "DText", "help:dtext" %></span>
+  <span class="hint"><%= link_to "Formatting help", dtext_help_path, remote: true, method: :get %>.</span>
 </div>

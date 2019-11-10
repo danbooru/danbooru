@@ -9,6 +9,10 @@ class StaticController < ApplicationController
   def error
   end
 
+  def dtext_help
+    redirect_to wiki_page_path("help:dtext") unless request.format.js?
+  end
+
   def site_map
   end
 
@@ -17,5 +21,5 @@ class StaticController < ApplicationController
     @post_set = PostSets::Popular.new(Date.yesterday.to_s, "week", limit: 200)
     @posts = @post_set.posts
     render layout: false
-  end  
+  end
 end

@@ -135,3 +135,19 @@ div.dtext-preview {
     margin-left: 1em;
   }
 }
+
+div#dtext-help {
+  td {
+    > *, div.spoiler p {
+      margin: 0;
+    }
+
+    h1, h6 {
+      padding: 0;
+    }
+  }
+
+  #dtext-help-footnote {
+    margin: 1em 0 0 0;
+  }
+}

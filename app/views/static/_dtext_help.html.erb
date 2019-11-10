@@ -1,0 +1,96 @@
+<div id="dtext-help" class="prose">
+  <table class="striped" width="100%">
+    <thead>
+      <tr>
+        <th width="50%">What you type</th>
+        <th width="50%">What you get</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>[b]bold[/b]</td>
+        <td><b>bold</b></td>
+      </tr>
+      <tr>
+        <td>[i]italics[/i]</td>
+        <td><i>italics</i></td>
+      </tr>
+      <tr>
+        <td>[u]underline[/u]</td>
+        <td><u>underline</u></td>
+      </tr>
+      <tr>
+        <td>[s]strikethrough[/s]</td>
+        <td><s>strikethrough</s></td>
+      </tr>
+      <tr>
+        <td>[tn]note[/tn]</td>
+        <td><%= format_text "[tn]note[/tn]" %></td>
+      </tr>
+      <tr>
+        <td>[spoilers]ssh![/spoilers]</td>
+        <td><%= format_text " [spoilers]ssh![/spoilers]" %></td>
+      </tr>
+      <tr>
+        <td>&lt;<%= root_url.chomp("/") %>&gt;</td>
+        <td><%= format_text root_url.chomp("/") %></td>
+      </tr>
+      <tr>
+        <td>"<%= Danbooru.config.app_name %>":[<%= root_url.chomp("/") %>]</td>
+        <td><%= format_text "\"#{Danbooru.config.app_name}\":[#{root_url.chomp("/")}]" %></td>
+      </tr>
+      <tr>
+        <td>[[Kantai Collection]]</td>
+        <td><%= format_text "[[Kantai Collection]]" %></td>
+      </tr>
+      <tr>
+        <td>[[Kantai Collection|Kancolle]]</td>
+        <td><%= format_text "[[Kantai Collection|Kancolle]]" %></td>
+      </tr>
+      <tr>
+        <td>[[Kaga (Kantai Collection)|]]</td>
+        <td><%= format_text "[[Kaga (Kantai Collection)|]]" %></td>
+      </tr>
+      <tr>
+        <td>{{kantai_collection comic}}</td>
+        <td><%= format_text "{{kantai_collection comic}}" %></td>
+      </tr>
+      <tr>
+        <td>@user</td>
+        <td><%= format_text "@user" %></td>
+      </tr>
+      <tr>
+        <td>post #1</td>
+        <td><%= format_text "post #1" %></td>
+      </tr>
+      <tr>
+        <td>topic #1</td>
+        <td><%= format_text "topic #1" %></td>
+      </tr>
+      <tr>
+        <td>
+          * one<br>
+          * two<br>
+          * three<br>
+        </td>
+        <td><%= format_text "* one\n* two\n* three" %></td>
+      </tr>
+      <tr>
+        <td>h1. Big header</td>
+        <td><%= format_text "h1. Big header" %></td>
+      </tr>
+      <tr>
+        <td>h6. Small header</td>
+        <td><%= format_text "h6. Small header" %></td>
+      </tr>
+      <tr>
+        <td>[quote]Somebody said: hi![/quote]</td>
+        <td><%= format_text "[quote]Somebody said: hi![/quote]" %></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p id="dtext-help-footnote" class="fineprint">
+    See <%= link_to_wiki "help:dtext" %> for more formatting help.
+  </p>
+</div>
