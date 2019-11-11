@@ -43,6 +43,8 @@ gem 'request_store'
 gem 'builder'
 # gem 'did_you_mean' # github.com/yuki24/did_you_mean/issues/117
 gem 'puma'
+gem 'scenic'
+gem 'ipaddress'
 
 # needed for looser jpeg header compat
 gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888888888/ruby-imagespec.git", :branch => "exif-fixes"

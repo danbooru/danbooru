@@ -109,7 +109,7 @@ module ApplicationHelper
   end
 
   def link_to_ip(ip)
-    link_to ip, moderator_ip_addrs_path(:search => {:ip_addr => ip})
+    link_to ip, ip_addresses_path(search: { ip_addr: ip, group_by: "user" })
   end
 
   def link_to_search(search)

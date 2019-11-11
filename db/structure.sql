@@ -2154,6 +2154,69 @@ ALTER SEQUENCE public.forum_topics_id_seq OWNED BY public.forum_topics.id;
 
 
 --
+-- Name: ip_addresses; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.ip_addresses AS
+ SELECT 'ArtistVersion'::text AS model_type,
+    artist_versions.id AS model_id,
+    artist_versions.updater_id AS user_id,
+    artist_versions.updater_ip_addr AS ip_addr,
+    artist_versions.created_at
+   FROM public.artist_versions
+UNION ALL
+ SELECT 'ArtistCommentaryVersion'::text AS model_type,
+    artist_commentary_versions.id AS model_id,
+    artist_commentary_versions.updater_id AS user_id,
+    artist_commentary_versions.updater_ip_addr AS ip_addr,
+    artist_commentary_versions.created_at
+   FROM public.artist_commentary_versions
+UNION ALL
+ SELECT 'Comment'::text AS model_type,
+    comments.id AS model_id,
+    comments.creator_id AS user_id,
+    comments.creator_ip_addr AS ip_addr,
+    comments.created_at
+   FROM public.comments
+UNION ALL
+ SELECT 'Dmail'::text AS model_type,
+    dmails.id AS model_id,
+    dmails.from_id AS user_id,
+    dmails.creator_ip_addr AS ip_addr,
+    dmails.created_at
+   FROM public.dmails
+UNION ALL
+ SELECT 'NoteVersion'::text AS model_type,
+    note_versions.id AS model_id,
+    note_versions.updater_id AS user_id,
+    note_versions.updater_ip_addr AS ip_addr,
+    note_versions.created_at
+   FROM public.note_versions
+UNION ALL
+ SELECT 'Post'::text AS model_type,
+    posts.id AS model_id,
+    posts.uploader_id AS user_id,
+    posts.uploader_ip_addr AS ip_addr,
+    posts.created_at
+   FROM public.posts
+UNION ALL
+ SELECT 'User'::text AS model_type,
+    users.id AS model_id,
+    users.id AS user_id,
+    users.last_ip_addr AS ip_addr,
+    users.created_at
+   FROM public.users
+  WHERE (users.last_ip_addr IS NOT NULL)
+UNION ALL
+ SELECT 'WikiPageVersion'::text AS model_type,
+    wiki_page_versions.id AS model_id,
+    wiki_page_versions.updater_id AS user_id,
+    wiki_page_versions.updater_ip_addr AS ip_addr,
+    wiki_page_versions.created_at
+   FROM public.wiki_page_versions;
+
+
+--
 -- Name: ip_bans; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -7407,6 +7470,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190923071044'),
 ('20190926000912'),
 ('20191023191749'),
-('20191024194544');
+('20191024194544'),
+('20191111004329');
 
 

@@ -10,6 +10,16 @@
         <th>Join Date</th>
         <td><%= presenter.join_date %></td>
       </tr>
+      <% if CurrentUser.is_moderator? %>
+        <tr>
+          <th>Last IP</th>
+          <td>
+            <%= link_to user.last_ip_addr, ip_addresses_path(search: { ip_addr: user.last_ip_addr }) %>
+            (<%= link_to "users", ip_addresses_path(search: { ip_addr: user.last_ip_addr, group_by: "user" }) %>,
+            <%= link_to "IPs", ip_addresses_path(search: { user_id: user.id, group_by: "ip_addr" }) %>)
+          </td>
+        </tr>
+      <% end %>
 
       <tr>
         <th>Inviter</th>

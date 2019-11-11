@@ -1,0 +1,30 @@
+<table class="striped autofit">
+  <thead>
+    <tr>
+      <th>Source</th>
+      <th>ID</th>
+      <th>IP Address</th>
+      <th>User</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @ip_addresses.each do |ip| %>
+      <tr>
+        <td><%= link_to ip.model_type.underscore.humanize, ip_addresses_path(search: { model_type: ip.model_type }) %></td>
+        <td><%= link_to "##{ip.model_id}", ip.model %></td>
+        <td>
+          <%= link_to ip.ip_addr, ip_addresses_path(search: { ip_addr: ip.ip_addr }) %>
+          <%= link_to "»", ip_addresses_path(search: { ip_addr: ip.ip_addr, group_by: "user" }) %>
+        </td>
+        <td>
+          <%= link_to_user ip.user %>
+          <%= link_to "»", ip_addresses_path(search: { user_id: ip.user_id, group_by: "ip_addr" }) %>
+        </td>
+        <td><%= time_ago_in_words_tagged ip.created_at %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= numbered_paginator(@ip_addresses) %>

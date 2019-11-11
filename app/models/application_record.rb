@@ -50,6 +50,11 @@ class ApplicationRecord < ActiveRecord::Base
         where.not("#{qualified_column_for(attr)} ~ ?", "(?e)" + value)
       end
 
+      def where_inet_matches(attr, value)
+        ip = IPAddress.parse(value)
+        where("#{qualified_column_for(attr)} <<= ?", ip.to_string)
+      end
+
       def where_array_includes_any(attr, values)
         where("#{qualified_column_for(attr)} && ARRAY[?]", values)
       end
@@ -76,6 +81,14 @@ class ApplicationRecord < ActiveRecord::Base
           where(attribute => false)
         else
           raise ArgumentError, "value must be truthy or falsy"
+        end
+      end
+
+      def search_inet_attribute(attr, params)
+        if params[attr].present?
+          where_inet_matches(attr, params[attr])
+        else
+          all
         end
       end
 
@@ -130,6 +143,8 @@ class ApplicationRecord < ActiveRecord::Base
           search_boolean_attribute(name, params)
         when :integer, :datetime
           numeric_attribute_matches(name, params[name])
+        when :inet
+          search_inet_attribute(name, params)
         else
           raise NotImplementedError, "unhandled attribute type"
         end

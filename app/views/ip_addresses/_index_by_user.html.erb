@@ -1,0 +1,19 @@
+<table class="striped autofit">
+  <thead>
+    <tr>
+      <th>User</th>
+      <th>Uses</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @ip_addresses.each do |ip| %>
+      <tr>
+        <td>
+          <%= link_to_user ip.user %>
+          <%= link_to "»", ip_addresses_path(search: { user_id: ip.user_id, group_by: "ip_addr" }) %>
+        </td>
+        <td><%= link_to ip.count_all, ip_addresses_path(search: { user_id: ip.user_id, ip_addr: params[:search][:ip_addr] }) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

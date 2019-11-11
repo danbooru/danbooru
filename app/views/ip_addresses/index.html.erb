@@ -1,0 +1,21 @@
+<div id="c-ip-addresses">
+  <div id="a-index">
+    <%= search_form_for(ip_addresses_path) do |f| %>
+      <%= f.input :user_id, label: "User ID", input_html: { value: params[:search][:user_id] }, hint: "Separate with spaces" %>
+      <%= f.input :user_name, label: "User Name", input_html: { "data-autocomplete": "user", value: params[:search][:user_name] }, hint: "Use * for wildcard" %>
+      <%= f.input :ip_addr, label: "IP Address", input_html: { value: params[:search][:ip_addr] } %>
+      <%= f.input :created_at, label: "Date", input_html: { value: params[:search][:created_at] } %>
+      <%= f.input :model_type, label: "Source", collection: IpAddress.model_types, include_blank: true, selected: params[:search][:model_type] %>
+      <%= f.input :group_by, label: "Group By", collection: [["User", "user"], ["IP Address", "ip_addr"]], include_blank: true, selected: params[:search][:group_by] %>
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <% if params[:search][:group_by] == "user" %>
+      <%= render "index_by_user" %>
+    <% elsif params[:search][:group_by] == "ip_addr" %>
+      <%= render "index_by_ip_addr" %>
+    <% elsif @ip_addresses.present? %>
+      <%= render "index" %>
+    <% end %>
+  </div>
+</div>
