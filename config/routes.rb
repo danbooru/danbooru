@@ -81,7 +81,7 @@ Rails.application.routes.draw do
     end
   end
   resources :artist_urls, only: [:index, :update]
-  resources :artist_versions, :only => [:index] do
+  resources :artist_versions, :only => [:index, :show] do
     collection do
       get :search
     end
@@ -180,7 +180,7 @@ Rails.application.routes.draw do
       put :revert
     end
   end
-  resources :note_versions, :only => [:index]
+  resources :note_versions, :only => [:index, :show]
   resource :note_previews, :only => [:show]
   resources :pools do
     member do
@@ -243,7 +243,7 @@ Rails.application.routes.draw do
       put :revert
     end
   end
-  resources :artist_commentary_versions, :only => [:index]
+  resources :artist_commentary_versions, :only => [:index, :show]
   resource :related_tag, :only => [:show, :update]
   get "reports/uploads" => "reports#uploads"
   get "reports/upload_tags" => "reports#upload_tags"
