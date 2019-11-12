@@ -7,6 +7,10 @@
       <%= f.input :created_at, label: "Date", input_html: { value: params[:search][:created_at] } %>
       <%= f.input :model_type, label: "Source", collection: IpAddress.model_types, include_blank: true, selected: params[:search][:model_type] %>
       <%= f.input :group_by, label: "Group By", collection: [["User", "user"], ["IP Address", "ip_addr"]], include_blank: true, selected: params[:search][:group_by] %>
+      <% if params[:search][:group_by] == "ip_addr" %>
+        <%= f.input :ipv4_masklen, label: "IPv4 Subnet", collection: [["/32", 32], ["/24", 24], ["/16", 16], ["/8", 8]], include_blank: false, selected: params[:search][:ipv4_masklen], hint: "Lower to group together IPs with the same prefix."  %>
+        <%= f.input :ipv6_masklen, label: "IPv6 Subnet", collection: [["/128", 128], ["/80", 80], ["/64", 64], ["/48", 48]], include_blank: false, selected: params[:search][:ipv6_masklen] %>
+      <% end %>
       <%= f.submit "Search" %>
     <% end %>
 

@@ -9,10 +9,10 @@
     <% @ip_addresses.each do |ip| %>
       <tr>
         <td>
-          <%= link_to ip.ip_addr, ip_addresses_path(search: { ip_addr: ip.ip_addr }) %>
-          <%= link_to "»", ip_addresses_path(search: { ip_addr: ip.ip_addr, group_by: "user" }) %>
+          <%= link_to ip.to_s, ip_addresses_path(search: { ip_addr: ip.to_s }) %>
+          <%= link_to "»", ip_addresses_path(search: { ip_addr: ip.to_s, group_by: "user" }) %>
         </td>
-        <td><%= link_to ip.count_all, ip_addresses_path(search: { ip_addr: ip.ip_addr }) %></td>
+        <td><%= link_to ip.count_all, ip_addresses_path(search: { ip_addr: ip.to_s }) %></td>
       </tr>
     <% end %>
   </tbody>
