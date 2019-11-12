@@ -4764,6 +4764,13 @@ CREATE UNIQUE INDEX index_artist_commentaries_on_post_id ON public.artist_commen
 
 
 --
+-- Name: index_artist_commentary_versions_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_artist_commentary_versions_on_created_at ON public.artist_commentary_versions USING btree (created_at);
+
+
+--
 -- Name: index_artist_commentary_versions_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4930,6 +4937,12 @@ CREATE INDEX index_comment_votes_on_created_at ON public.comment_votes USING btr
 
 CREATE INDEX index_comment_votes_on_user_id ON public.comment_votes USING btree (user_id);
 
+
+--
+-- Name: index_comments_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_comments_on_created_at ON public.comments USING btree (created_at);
 
 --
 -- Name: index_comments_on_body_index; Type: INDEX; Schema: public; Owner: -
@@ -6932,6 +6945,12 @@ CREATE INDEX index_posts_on_tags_index ON public.posts USING gin (tag_index);
 
 CREATE INDEX index_posts_on_uploader_id ON public.posts USING btree (uploader_id);
 
+--
+-- Name: index_posts_on_uploader_ip_addr; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_uploader_ip_addr ON public.posts USING btree (uploader_ip_addr);
+
 
 --
 -- Name: index_saved_searches_on_labels; Type: INDEX; Schema: public; Owner: -
@@ -7127,6 +7146,13 @@ CREATE INDEX index_user_name_change_requests_on_original_name ON public.user_nam
 --
 
 CREATE INDEX index_user_name_change_requests_on_user_id ON public.user_name_change_requests USING btree (user_id);
+
+
+--
+-- Name: index_users_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_created_at ON public.users USING btree (created_at);
 
 
 --
