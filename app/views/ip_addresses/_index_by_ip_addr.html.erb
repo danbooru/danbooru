@@ -1,3 +1,7 @@
+<p>
+  <%= link_to "Find all users associated with the top 10 IP addresses", ip_addresses_path(search: { ip_addr: @ip_addresses.map(&:to_s).take(10).join(" "), group_by: "user" }) %>
+</p>
+
 <table class="striped autofit">
   <thead>
     <tr>

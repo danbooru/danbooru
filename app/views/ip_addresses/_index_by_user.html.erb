@@ -1,3 +1,7 @@
+<p>
+  <%= link_to "Find all IP addresses associated with these users", ip_addresses_path(search: { user_id: @ip_addresses.map(&:user_id).join(" "), group_by: "ip_addr" }) %>
+</p>
+
 <table class="striped autofit">
   <thead>
     <tr>

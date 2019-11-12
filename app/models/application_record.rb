@@ -51,8 +51,13 @@ class ApplicationRecord < ActiveRecord::Base
       end
 
       def where_inet_matches(attr, value)
-        ip = IPAddress.parse(value)
-        where("#{qualified_column_for(attr)} <<= ?", ip.to_string)
+        if value.match?(/[, ]/)
+          ips = value.split(/[, ]+/).map { |ip| IPAddress.parse(ip).to_string }
+          where("#{qualified_column_for(attr)} = ANY(ARRAY[?]::inet[])", ips)
+        else
+          ip = IPAddress.parse(value)
+          where("#{qualified_column_for(attr)} <<= ?", ip.to_string)
+        end
       end
 
       def where_array_includes_any(attr, values)

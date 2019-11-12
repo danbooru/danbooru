@@ -371,8 +371,8 @@ class Tag < ApplicationRecord
       when /\A>(.+)/
         return [:gt, parse_cast($1, type)]
 
-      when /,/
-        return [:in, range.split(/,/).map {|x| parse_cast(x, type)}]
+      when /[, ]/
+        return [:in, range.split(/[, ]+/).map {|x| parse_cast(x, type)}]
 
       else
         return [:eq, parse_cast(range, type)]
