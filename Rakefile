@@ -52,7 +52,7 @@ file "bin/cdtext.exe" => "ext/dtext/dtext.c" do
 end
 
 file "ext/dtext/dtext.c" => Dir["ext/dtext/dtext.{rl,h}", "Rakefile"] do
-  sh "ragel -G1 -C ext/dtext/dtext.rl -o ext/dtext/dtext.c"
+  sh "ragel -G1 ext/dtext/dtext.rl -o ext/dtext/dtext.c"
 end
 
 task test_inline_ragel: :compile do
