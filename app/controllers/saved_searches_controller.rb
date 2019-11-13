@@ -7,7 +7,7 @@ class SavedSearchesController < ApplicationController
   end
 
   def labels
-    @labels = SavedSearch.search_labels(CurrentUser.id, params[:search])
+    @labels = SavedSearch.search_labels(CurrentUser.id, params[:search]).take(params[:limit].to_i || 10)
     respond_with(@labels)
   end
 

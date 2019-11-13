@@ -11,6 +11,7 @@ Autocomplete.ORDER_METATAGS = <%= Tag::ORDER_METATAGS.to_json.html_safe %>;
 Autocomplete.TAG_PREFIXES = "-|~|" + Object.keys(Autocomplete.TAG_CATEGORIES).map(category => category + ":").join("|");
 Autocomplete.METATAGS_REGEX = Autocomplete.METATAGS.concat(Object.keys(Autocomplete.TAG_CATEGORIES)).join("|");
 Autocomplete.TERM_REGEX = new RegExp(`([-~]*)(?:(${Autocomplete.METATAGS_REGEX}):)?(\\S*)$`, "i");
+Autocomplete.MAX_RESULTS = 10;
 
 Autocomplete.initialize_all = function() {
   if (CurrentUser.data("enable-auto-complete")) {
@@ -288,7 +289,7 @@ Autocomplete.static_metatag_source = function(term, metatag) {
   var sub_metatags = this.static_metatags[metatag];
 
   var matches = sub_metatags.filter(sub_metatag => sub_metatag.startsWith(term.toLowerCase()));
-  matches = matches.map(sub_metatag => `${metatag}:${sub_metatag}`).sort().slice(0, 10);
+  matches = matches.map(sub_metatag => `${metatag}:${sub_metatag}`).sort().slice(0, Autocomplete.MAX_RESULTS);
 
   return matches;
 }
@@ -300,6 +301,7 @@ Autocomplete.tag_source = async function(term) {
 
   let tags = await $.getJSON("/tags/autocomplete", {
     "search[name_matches]": term,
+    "limit": Autocomplete.MAX_RESULTS,
     "expiry": 7
   });
 
@@ -322,7 +324,7 @@ Autocomplete.artist_source = async function(term) {
     "search[name_like]": term.trim().replace(/\s+/g, "_") + "*",
     "search[is_active]": true,
     "search[order]": "post_count",
-    "limit": 10,
+    "limit": Autocomplete.MAX_RESULTS,
     "expiry": 7
   });
 
@@ -341,7 +343,7 @@ Autocomplete.wiki_source = async function(term) {
     "search[title]": term + "*",
     "search[hide_deleted]": "Yes",
     "search[order]": "post_count",
-    "limit": 10,
+    "limit": Autocomplete.MAX_RESULTS,
     "expiry": 7
   });
 
@@ -360,7 +362,7 @@ Autocomplete.user_source = async function(term, prefix = "") {
     "search[order]": "post_upload_count",
     "search[current_user_first]": "true",
     "search[name_matches]": term + "*",
-    "limit": 10
+    "limit": Autocomplete.MAX_RESULTS
   });
 
   return users.map(function(user) {
@@ -378,7 +380,7 @@ Autocomplete.pool_source = async function(term, prefix = "") {
     "search[name_matches]": term,
     "search[is_deleted]": false,
     "search[order]": "post_count",
-    "limit": 10
+    "limit": Autocomplete.MAX_RESULTS
   });
 
   return pools.map(function(pool) {
@@ -395,7 +397,7 @@ Autocomplete.pool_source = async function(term, prefix = "") {
 Autocomplete.favorite_group_source = async function(term, prefix = "") {
   let favgroups = await $.getJSON("/favorite_groups", {
     "search[name_matches]": term,
-    "limit": 10
+    "limit": Autocomplete.MAX_RESULTS
   });
 
   return favgroups.map(function(favgroup) {
@@ -410,7 +412,7 @@ Autocomplete.favorite_group_source = async function(term, prefix = "") {
 Autocomplete.saved_search_source = async function(term, prefix = "") {
   let labels = await $.getJSON("/saved_searches/labels", {
     "search[label]": term + "*",
-    "limit": 10
+    "limit": Autocomplete.MAX_RESULTS
   });
 
   return labels.map(function(label) {

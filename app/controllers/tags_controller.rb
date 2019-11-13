@@ -18,7 +18,7 @@ class TagsController < ApplicationController
       # limit rollout
       @tags = TagAutocomplete.search(params[:search][:name_matches])
     else
-      @tags = Tag.names_matches_with_aliases(params[:search][:name_matches])
+      @tags = Tag.names_matches_with_aliases(params[:search][:name_matches], limit: params[:limit])
     end
 
     # XXX
