@@ -166,7 +166,7 @@ open_u = '[u]'i | '<u>'i;
 
 close_spoilers = ('[/spoiler'i 's'i? ']') | ('</spoiler'i 's'i? '>');
 close_nodtext = '[/nodtext]'i | '</nodtext>'i;
-close_quote = '[/quote]'i | '<quote>'i | '</blockquote>'i;
+close_quote = '[/quote]'i | '</quote>'i | '</blockquote>'i;
 close_expand = '[/expand]'i | '</expand>'i;
 close_code = '[/code]'i | '</code>'i;
 close_table = '[/table]'i | '</table>'i;
@@ -175,7 +175,7 @@ close_tbody = '[/tbody]'i | '</tbody>'i;
 close_tr = '[/tr]'i | '</tr>'i;
 close_th = '[/th]'i | '</th>'i;
 close_td = '[/td]'i | '</td>'i;
-close_tn = '[/tn]'i | '<tn>'i;
+close_tn = '[/tn]'i | '</tn>'i;
 close_b = '[/b]'i | '</b>'i | '</strong>'i;
 close_i = '[/i]'i | '</i>'i | '</em>'i;
 close_s = '[/s]'i | '</s>'i;

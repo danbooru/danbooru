@@ -178,15 +178,18 @@ class DTextTest < Minitest::Test
   end
 
   def test_inline_tn
-    assert_parse('<p>foo <span class="tn">bar</span></p>', "foo [tn]bar[/tn]")
+    assert_parse('<p>foo <span class="tn">bar</span> baz</p>', "foo [tn]bar[/tn] baz")
+    assert_parse('<p>foo <span class="tn">bar</span> baz</p>', "foo <tn>bar</tn> baz")
   end
 
   def test_block_tn
     assert_parse('<p class="tn">bar</p>', "[tn]bar[/tn]")
+    assert_parse('<p class="tn">bar</p>', "<tn>bar</tn>")
   end
 
   def test_quote_blocks
     assert_parse('<blockquote><p>test</p></blockquote>', "[quote]\ntest\n[/quote]")
+    assert_parse('<blockquote><p>test</p></blockquote>', "<quote>\ntest\n</quote>")
   end
 
   def test_quote_blocks_with_list
