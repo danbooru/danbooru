@@ -26,6 +26,12 @@ Autocomplete.initialize_all = function() {
         this._super();
       },
       _renderItem: Autocomplete.render_item,
+      search: function(value, event) {
+        if ($(this).data("ui-autocomplete")) {
+          $(this).data("ui-autocomplete").menu.bindings = $();
+        }
+        this._super(value, event);
+      },
     });
 
     this.initialize_tag_autocomplete();
@@ -40,9 +46,6 @@ Autocomplete.initialize_all = function() {
 
 Autocomplete.initialize_mention_autocomplete = function($fields) {
   $fields.autocomplete({
-    search: function() {
-      $(this).data("ui-autocomplete").menu.bindings = $();
-    },
     select: function(event, ui) {
       Autocomplete.insert_completion(this, ui.item.value);
       return false;
@@ -78,11 +81,6 @@ Autocomplete.initialize_tag_autocomplete = function() {
   var $fields_single = $('[data-autocomplete="tag"]');
 
   $fields_multiple.autocomplete({
-    search: function() {
-      if ($(this).data("ui-autocomplete")) {
-        $(this).data("ui-autocomplete").menu.bindings = $();
-      }
-    },
     select: function(event, ui) {
       // Prevent Upload.initialize_enter_on_tags from running if the
       // Enter key is used to select a tag from the autocomplete menu.
@@ -145,9 +143,6 @@ Autocomplete.initialize_tag_autocomplete = function() {
   });
 
   $fields_single.autocomplete({
-    search: function() {
-      $(this).data("ui-autocomplete").menu.bindings = $();
-    },
     source: function(req, resp) {
       Autocomplete.normal_source(req.term, resp);
     }
@@ -156,9 +151,6 @@ Autocomplete.initialize_tag_autocomplete = function() {
 
 Autocomplete.initialize_artist_autocomplete = function($fields) {
   $fields.autocomplete({
-    search: function() {
-      $(this).data("ui-autocomplete").menu.bindings = $();
-    },
     source: function(req, resp) {
       $.ajax({
         url: "/artists.json",
@@ -187,9 +179,6 @@ Autocomplete.initialize_artist_autocomplete = function($fields) {
 
 Autocomplete.initialize_pool_autocomplete = function($fields) {
   $fields.autocomplete({
-    search: function() {
-      $(this).data("ui-autocomplete").menu.bindings = $();
-    },
     source: function(req, resp) {
       Autocomplete.pool_source(req.term, resp);
     },
@@ -198,9 +187,6 @@ Autocomplete.initialize_pool_autocomplete = function($fields) {
 
 Autocomplete.initialize_user_autocomplete = function($fields) {
   $fields.autocomplete({
-    search: function() {
-      $(this).data("ui-autocomplete").menu.bindings = $();
-    },
     source: function(req, resp) {
       Autocomplete.user_source(req.term, resp, "");
     },
@@ -209,9 +195,6 @@ Autocomplete.initialize_user_autocomplete = function($fields) {
 
 Autocomplete.initialize_wiki_autocomplete = function($fields) {
   $fields.autocomplete({
-    search: function() {
-      $(this).data("ui-autocomplete").menu.bindings = $();
-    },
     source: function(req, resp) {
       $.ajax({
         url: "/wiki_pages.json",
@@ -240,9 +223,6 @@ Autocomplete.initialize_wiki_autocomplete = function($fields) {
 
 Autocomplete.initialize_saved_search_autocomplete = function($fields) {
   $fields.autocomplete({
-    search: function() {
-      $(this).data("ui-autocomplete").menu.bindings = $();
-    },
     source: function(req, resp) {
       Autocomplete.saved_search_source(req.term, resp);
     },
