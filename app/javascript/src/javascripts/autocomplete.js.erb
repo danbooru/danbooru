@@ -36,13 +36,23 @@ Autocomplete.initialize_all = function() {
 
     this.initialize_tag_autocomplete();
     this.initialize_mention_autocomplete($(".autocomplete-mentions textarea"));
-    this.initialize_artist_autocomplete($('[data-autocomplete="artist"]'));
-    this.initialize_pool_autocomplete($('[data-autocomplete="pool"]'));
-    this.initialize_user_autocomplete($('[data-autocomplete="user"]'));
-    this.initialize_wiki_autocomplete($('[data-autocomplete="wiki-page"]'));
-    this.initialize_saved_search_autocomplete($('[data-autocomplete="saved-search-label"]'));
+    this.initialize_fields($('[data-autocomplete="tag"]'), Autocomplete.tag_source);
+    this.initialize_fields($('[data-autocomplete="artist"]'), Autocomplete.artist_source);
+    this.initialize_fields($('[data-autocomplete="pool"]'), Autocomplete.pool_source);
+    this.initialize_fields($('[data-autocomplete="user"]'), Autocomplete.user_source);
+    this.initialize_fields($('[data-autocomplete="wiki-page"]'), Autocomplete.wiki_source);
+    this.initialize_fields($('[data-autocomplete="saved-search-label"]'), Autocomplete.saved_search_source);
   }
 }
+
+Autocomplete.initialize_fields = function($fields, autocomplete) {
+  $fields.autocomplete({
+    source: async function(request, respond) {
+      let results = await autocomplete(request.term);
+      respond(results);
+    },
+  });
+};
 
 Autocomplete.initialize_mention_autocomplete = function($fields) {
   $fields.autocomplete({
@@ -50,7 +60,7 @@ Autocomplete.initialize_mention_autocomplete = function($fields) {
       Autocomplete.insert_completion(this, ui.item.value);
       return false;
     },
-    source: function(req, resp) {
+    source: async function(req, resp) {
       var cursor = this.element.get(0).selectionStart;
       var name = null;
 
@@ -70,7 +80,8 @@ Autocomplete.initialize_mention_autocomplete = function($fields) {
       }
 
       if (name) {
-        Autocomplete.user_source(name, resp, "@");
+        let results = await Autocomplete.user_source(name, "@");
+        resp(results);
       }
     }
   });
@@ -78,7 +89,6 @@ Autocomplete.initialize_mention_autocomplete = function($fields) {
 
 Autocomplete.initialize_tag_autocomplete = function() {
   var $fields_multiple = $('[data-autocomplete="tag-query"], [data-autocomplete="tag-edit"]');
-  var $fields_single = $('[data-autocomplete="tag"]');
 
   $fields_multiple.autocomplete({
     select: function(event, ui) {
@@ -91,10 +101,11 @@ Autocomplete.initialize_tag_autocomplete = function() {
       Autocomplete.insert_completion(this, ui.item.value);
       return false;
     },
-    source: function(req, resp) {
+    source: async function(req, resp) {
       var query = Autocomplete.parse_query(req.term, this.element.get(0).selectionStart);
       var metatag = query.metatag;
       var term = query.term;
+      var results = [];
 
       switch (metatag) {
       case "order":
@@ -105,8 +116,8 @@ Autocomplete.initialize_tag_autocomplete = function() {
       case "parent":
       case "filetype":
       case "disapproval":
-        Autocomplete.static_metatag_source(term, resp, metatag);
-        return;
+        results = Autocomplete.static_metatag_source(term, metatag);
+        break;
       case "user":
       case "approver":
       case "commenter":
@@ -120,143 +131,27 @@ Autocomplete.initialize_tag_autocomplete = function() {
       case "flagger":
       case "upvote":
       case "downvote":
-        Autocomplete.user_source(term, resp, metatag + ":");
+        results = await Autocomplete.user_source(term, metatag + ":");
         break;
       case "pool":
       case "ordpool":
-        Autocomplete.pool_source(term, resp, metatag);
+        results = await Autocomplete.pool_source(term, metatag + ":");
         break;
       case "favgroup":
-        Autocomplete.favorite_group_source(term, resp, metatag);
+        results = await Autocomplete.favorite_group_source(term, metatag + ":");
         break;
       case "search":
-        Autocomplete.saved_search_source(term, resp, "search:");
+        results = await Autocomplete.saved_search_source(term, metatag + ":");
         break;
       case "tag":
-        Autocomplete.normal_source(term, resp);
+        results = await Autocomplete.tag_source(term);
         break;
       default:
-        resp([]);
+        results = [];
         break;
       }
-    }
-  });
 
-  $fields_single.autocomplete({
-    source: function(req, resp) {
-      Autocomplete.normal_source(req.term, resp);
-    }
-  });
-}
-
-Autocomplete.initialize_artist_autocomplete = function($fields) {
-  $fields.autocomplete({
-    source: function(req, resp) {
-      $.ajax({
-        url: "/artists.json",
-        data: {
-          "search[name_like]": req.term.trim().replace(/\s+/g, "_") + "*",
-          "search[is_active]": true,
-          "search[order]": "post_count",
-          "limit": 10,
-          "expiry": 7
-        },
-        method: "get",
-        success: function(data) {
-          resp($.map(data, function(artist) {
-            return {
-              type: "tag",
-              label: artist.name.replace(/_/g, " "),
-              value: artist.name,
-              category: Autocomplete.TAG_CATEGORIES.artist,
-            };
-          }));
-        }
-      });
-    }
-  });
-};
-
-Autocomplete.initialize_pool_autocomplete = function($fields) {
-  $fields.autocomplete({
-    source: function(req, resp) {
-      Autocomplete.pool_source(req.term, resp);
-    },
-  });
-};
-
-Autocomplete.initialize_user_autocomplete = function($fields) {
-  $fields.autocomplete({
-    source: function(req, resp) {
-      Autocomplete.user_source(req.term, resp, "");
-    },
-  });
-};
-
-Autocomplete.initialize_wiki_autocomplete = function($fields) {
-  $fields.autocomplete({
-    source: function(req, resp) {
-      $.ajax({
-        url: "/wiki_pages.json",
-        data: {
-          "search[title]": req.term + "*",
-          "search[hide_deleted]": "Yes",
-          "search[order]": "post_count",
-          "limit": 10,
-          "expiry": 7
-        },
-        method: "get",
-        success: function(data) {
-          resp($.map(data, function(wiki_page) {
-            return {
-              type: "tag",
-              label: wiki_page.title.replace(/_/g, " "),
-              value: wiki_page.title,
-              category: wiki_page.category_name
-            };
-          }));
-        }
-      });
-    }
-  });
-};
-
-Autocomplete.initialize_saved_search_autocomplete = function($fields) {
-  $fields.autocomplete({
-    source: function(req, resp) {
-      Autocomplete.saved_search_source(req.term, resp);
-    },
-  });
-};
-
-Autocomplete.normal_source = function(term, resp) {
-  if (term === "") {
-    resp([]);
-    return;
-  }
-
-  return $.ajax({
-    url: "/tags/autocomplete.json",
-    data: {
-      "search[name_matches]": term,
-      "expiry": 7
-    },
-    method: "get",
-    success: function(data) {
-      var d = $.map(data, function(tag) {
-        return {
-          type: "tag",
-          label: tag.name.replace(/_/g, " "),
-          antecedent: tag.antecedent_name,
-          value: tag.name,
-          category: tag.category,
-          source: tag.source,
-          weight: tag.weight,
-          post_count: tag.post_count
-        };
-      });
-
-      resp(d);
+      resp(results);
     }
   });
 }
@@ -389,91 +284,141 @@ Autocomplete.static_metatags = {
   ]
 }
 
-Autocomplete.static_metatag_source = function(term, resp, metatag) {
+Autocomplete.static_metatag_source = function(term, metatag) {
   var sub_metatags = this.static_metatags[metatag];
 
   var matches = sub_metatags.filter(sub_metatag => sub_metatag.startsWith(term.toLowerCase()));
   matches = matches.map(sub_metatag => `${metatag}:${sub_metatag}`).sort().slice(0, 10);
 
-  resp(matches);
+  return matches;
 }
 
-Autocomplete.user_source = function(term, resp, prefix) {
-  return $.ajax({
-    url: "/users.json",
-    data: {
-      "search[order]": "post_upload_count",
-      "search[current_user_first]": "true",
-      "search[name_matches]": term + "*",
-      "limit": 10
-    },
-    method: "get",
-    success: function(data) {
-      resp($.map(data, function(user) {
-        return {
-          type: "user",
-          label: user.name.replace(/_/g, " "),
-          value: prefix + user.name,
-          level: user.level_string
-        };
-      }));
-    }
+Autocomplete.tag_source = async function(term) {
+  if (term === "") {
+    return [];
+  }
+
+  let tags = await $.getJSON("/tags/autocomplete", {
+    "search[name_matches]": term,
+    "expiry": 7
+  });
+
+  return tags.map(function(tag) {
+    return {
+      type: "tag",
+      label: tag.name.replace(/_/g, " "),
+      antecedent: tag.antecedent_name,
+      value: tag.name,
+      category: tag.category,
+      source: tag.source,
+      weight: tag.weight,
+      post_count: tag.post_count
+    };
   });
 }
 
-Autocomplete.pool_source = function(term, resp, metatag) {
-  return $.ajax({
-    url: "/pools.json",
-    data: {
-      "search[order]": "post_count",
-      "search[name_matches]": term,
-      "search[is_deleted]": false,
-      "limit": 10
-    },
-    method: "get",
-    success: function(data) {
-      resp($.map(data, function(pool) {
-        return {
-          type: "pool",
-          label: pool.name.replace(/_/g, " "),
-          value: (metatag ? (metatag + ":" + pool.name) : pool.name),
-          post_count: pool.post_count,
-          category: pool.category
-        };
-      }));
-    }
+Autocomplete.artist_source = async function(term) {
+  let artists = await $.getJSON("/artists", {
+    "search[name_like]": term.trim().replace(/\s+/g, "_") + "*",
+    "search[is_active]": true,
+    "search[order]": "post_count",
+    "limit": 10,
+    "expiry": 7
   });
-}
 
-Autocomplete.favorite_group_source = function(term, resp, metatag) {
-  return $.ajax({
-    url: "/favorite_groups.json",
-    data: {
-      "search[name_matches]": term,
-      "limit": 10
-    },
-    method: "get",
-    success: function(data) {
-      resp($.map(data, function(favgroup) {
-        return {
-          label: favgroup.name.replace(/_/g, " "),
-          value: metatag + ":" + favgroup.name,
-          post_count: favgroup.post_count
-        };
-      }));
-    }
+  return artists.map(function(artist) {
+    return {
+      type: "tag",
+      label: artist.name.replace(/_/g, " "),
+      value: artist.name,
+      category: Autocomplete.TAG_CATEGORIES.artist,
+    };
   });
-}
+};
 
-Autocomplete.saved_search_source = async function(term, resp, prefix = "") {
-  let labels = await $.getJSON("/saved_searches/labels", { "search[label]": term + "*", "limit": 10 });
+Autocomplete.wiki_source = async function(term) {
+  let wiki_pages = await $.getJSON("/wiki_pages", {
+    "search[title]": term + "*",
+    "search[hide_deleted]": "Yes",
+    "search[order]": "post_count",
+    "limit": 10,
+    "expiry": 7
+  });
 
-  resp(labels.map(function(label) {
+  return wiki_pages.map(function(wiki_page) {
+    return {
+      type: "tag",
+      label: wiki_page.title.replace(/_/g, " "),
+      value: wiki_page.title,
+      category: wiki_page.category_name
+    };
+  });
+};
+
+Autocomplete.user_source = async function(term, prefix = "") {
+  let users = await $.getJSON("/users", {
+    "search[order]": "post_upload_count",
+    "search[current_user_first]": "true",
+    "search[name_matches]": term + "*",
+    "limit": 10
+  });
+
+  return users.map(function(user) {
+    return {
+      type: "user",
+      label: user.name.replace(/_/g, " "),
+      value: prefix + user.name,
+      level: user.level_string
+    };
+  });
+};
+
+Autocomplete.pool_source = async function(term, prefix = "") {
+  let pools = await $.getJSON("/pools", {
+    "search[name_matches]": term,
+    "search[is_deleted]": false,
+    "search[order]": "post_count",
+    "limit": 10
+  });
+
+  return pools.map(function(pool) {
+    return {
+      type: "pool",
+      label: pool.name.replace(/_/g, " "),
+      value: prefix + pool.name,
+      post_count: pool.post_count,
+      category: pool.category
+    };
+  });
+};
+
+Autocomplete.favorite_group_source = async function(term, prefix = "") {
+  let favgroups = await $.getJSON("/favorite_groups", {
+    "search[name_matches]": term,
+    "limit": 10
+  });
+
+  return favgroups.map(function(favgroup) {
+    return {
+      label: favgroup.name.replace(/_/g, " "),
+      value: prefix + favgroup.name,
+      post_count: favgroup.post_count
+    };
+  });
+};
+
+Autocomplete.saved_search_source = async function(term, prefix = "") {
+  let labels = await $.getJSON("/saved_searches/labels", {
+    "search[label]": term + "*",
+    "limit": 10
+  });
+
+  return labels.map(function(label) {
     return {
       label: label.replace(/_/g, " "),
       value: prefix + label,
     };
-  }));
+  });
 }
 
 $(document).ready(function() {
