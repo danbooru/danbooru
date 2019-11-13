@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/evazion/dtext_rb.git
-  revision: aeefb66951acbc352b6c550eb79701496c88a6fd
+  revision: 4eee6805fdb2f180eecb1079274c1b0e8483e00e
   specs:
-    dtext_rb (1.10.3)
+    dtext_rb (1.10.4)
       nokogiri (~> 1.8)
 
 GIT
@@ -149,8 +149,8 @@ GEM
     faraday (0.17.0)
       multipart-post (>= 1.2, < 3)
     ffaker (2.13.0)
-    ffi (1.11.1)
-    ffi (1.11.1-x64-mingw32)
+    ffi (1.11.2)
+    ffi (1.11.2-x64-mingw32)
     flamegraph (0.9.5)
     get_process_mem (0.2.5)
       ffi (~> 1.0)
@@ -199,7 +199,7 @@ GEM
       nokogiri (~> 1.6)
       ntlm-http (~> 0.1, >= 0.1.1)
       webrobots (>= 0.0.9, < 0.2)
-    memoist (0.16.0)
+    memoist (0.16.1)
     memoizable (0.4.2)
       thread_safe (~> 0.3, >= 0.3.1)
     memory_profiler (0.9.14)
@@ -264,7 +264,7 @@ GEM
     pry-rails (0.3.9)
       pry (>= 0.10.4)
     public_suffix (4.0.1)
-    puma (4.2.1)
+    puma (4.3.0)
       nio4r (~> 2.0)
     rack (2.0.7)
     rack-contrib (2.1.0)
@@ -304,7 +304,7 @@ GEM
       rake (>= 0.8.7)
       thor (>= 0.20.3, < 2.0)
     raindrops (0.19.0)
-    rake (13.0.0)
+    rake (13.0.1)
     rakismet (1.5.4)
     rb-fsevent (0.10.3)
     rb-inotify (0.10.0)
