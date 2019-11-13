@@ -6,7 +6,7 @@
 
     <%= simple_form_for(@saved_search) do |f| %>
       <%= f.input :query, :as => :string %>
-      <%= f.input :label_string, :label => "Labels", :hint => "A list of tags to help categorize this search. Space delimited." %>
+      <%= f.input :label_string, label: "Labels", hint: "A list of tags to help categorize this search. Space delimited.", input_html: { "data-autocomplete": "saved-search-label" } %>
       <%= f.button :submit, :value => "Submit" %>
     <% end %>
   </div>

@@ -3,7 +3,6 @@ import Utility from './utility'
 import Hammer from 'hammerjs'
 import Cookie from './cookie'
 import Note from './notes'
-import SavedSearch from './saved_searches'
 
 let Post = {};
 
@@ -549,22 +548,6 @@ Post.approve = function(post_id) {
 }
 
 Post.initialize_saved_searches = function() {
-  $("#new_saved_search #saved_search_label_string").autocomplete({
-    search: function() {
-      $(this).data("ui-autocomplete").menu.bindings = $();
-    },
-    source: function(req, resp) {
-      SavedSearch.labels(req.term).then(function(labels) {
-        resp(labels.map(function(label) {
-          return {
-            label: label.replace(/_/g, " "),
-            value: label
-          };
-        }));
-      });
-    }
-  });
-
   $("#save-search-dialog").dialog({
     width: 700,
     modal: true,

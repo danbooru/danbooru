@@ -1,5 +1,4 @@
 import CurrentUser from './current_user'
-import SavedSearch from './saved_searches'
 
 let Autocomplete = {};
 
@@ -35,6 +34,7 @@ Autocomplete.initialize_all = function() {
     this.initialize_pool_autocomplete($('[data-autocomplete="pool"]'));
     this.initialize_user_autocomplete($('[data-autocomplete="user"]'));
     this.initialize_wiki_autocomplete($('[data-autocomplete="wiki-page"]'));
+    this.initialize_saved_search_autocomplete($('[data-autocomplete="saved-search-label"]'));
   }
 }
 
@@ -132,7 +132,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
         Autocomplete.favorite_group_source(term, resp, metatag);
         break;
       case "search":
-        Autocomplete.saved_search_source(term, resp);
+        Autocomplete.saved_search_source(term, resp, "search:");
         break;
       case "tag":
         Autocomplete.normal_source(term, resp);
@@ -235,6 +235,17 @@ Autocomplete.initialize_wiki_autocomplete = function($fields) {
         }
       });
     }
+  });
+};
+
+Autocomplete.initialize_saved_search_autocomplete = function($fields) {
+  $fields.autocomplete({
+    search: function() {
+      $(this).data("ui-autocomplete").menu.bindings = $();
+    },
+    source: function(req, resp) {
+      Autocomplete.saved_search_source(req.term, resp);
+    },
   });
 };
 
@@ -474,15 +485,15 @@ Autocomplete.favorite_group_source = function(term, resp, metatag) {
   });
 }
 
-Autocomplete.saved_search_source = function(term, resp) {
-  return SavedSearch.labels(term).then(function(labels) {
-    resp(labels.map(function(label) {
-      return {
-        label: label.replace(/_/g, " "),
-        value: "search:" + label,
-      };
-    }));
-  });
+Autocomplete.saved_search_source = async function(term, resp, prefix = "") {
+  let labels = await $.getJSON("/saved_searches/labels", { "search[label]": term + "*", "limit": 10 });
+
+  resp(labels.map(function(label) {
+    return {
+      label: label.replace(/_/g, " "),
+      value: prefix + label,
+    };
+  }));
 }
 
 $(document).ready(function() {
