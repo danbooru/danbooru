@@ -7,6 +7,7 @@
     <tr>
       <th>IP Address</th>
       <th>Uses</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -17,6 +18,7 @@
           <%= link_to "»", ip_addresses_path(search: { ip_addr: ip.to_s, group_by: "user" }) %>
         </td>
         <td><%= link_to ip.count_all, ip_addresses_path(search: { ip_addr: ip.to_s }) %></td>
+        <td><%= link_to "IP info", "https://ipinfo.io/#{ip.ip_addr}" %></td>
       </tr>
     <% end %>
   </tbody>

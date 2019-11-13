@@ -154,10 +154,11 @@
         <li><%= link_to("Janitor Trials", janitor_trials_path) %></li>
 
         <% if CurrentUser.is_member? %>
-          <li><%= link_to("User Name Change  Requests", user_name_change_requests_path) %></li>
+          <li><%= link_to("User Name Change Requests", user_name_change_requests_path) %></li>
         <% end %>
 
         <% if CurrentUser.is_moderator? %>
+          <li><%= link_to("IP Addresses", ip_addresses_path) %></li>
           <li><%= link_to("IP Bans", ip_bans_path) %></li>
         <% end %>
 

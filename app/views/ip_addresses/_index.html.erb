@@ -6,6 +6,7 @@
       <th>IP Address</th>
       <th>User</th>
       <th>Date</th>
+      <th></th>
     </tr>
   </thead>
   <tbody>
@@ -22,6 +23,7 @@
           <%= link_to "»", ip_addresses_path(search: { user_id: ip.user_id, group_by: "ip_addr" }) %>
         </td>
         <td><%= time_ago_in_words_tagged ip.created_at %></td>
+        <td><%= link_to "IP info", "https://ipinfo.io/#{ip.ip_addr}" %></td>
       </tr>
     <% end %>
   </tbody>
