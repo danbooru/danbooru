@@ -33,7 +33,8 @@ CREATE FUNCTION public.favorites_insert_trigger() RETURNS trigger
       begin
         if (NEW.user_id % 100 = 0) then
           insert into favorites_0 values (NEW.*);
-                elsif (NEW.user_id % 100 = 1) then
+    
+        elsif (NEW.user_id % 100 = 1) then
           insert into favorites_1 values (NEW.*);
 
         elsif (NEW.user_id % 100 = 2) then
@@ -397,7 +398,7 @@ ALTER TEXT SEARCH CONFIGURATION public.danbooru
 
 SET default_tablespace = '';
 
-SET default_with_oids = false;
+SET default_table_access_method = heap;
 
 --
 -- Name: api_keys; Type: TABLE; Schema: public; Owner: -
@@ -2154,6 +2155,139 @@ ALTER SEQUENCE public.forum_topics_id_seq OWNED BY public.forum_topics.id;
 
 
 --
+-- Name: note_versions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.note_versions (
+    id integer NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    x integer NOT NULL,
+    y integer NOT NULL,
+    width integer NOT NULL,
+    height integer NOT NULL,
+    body text NOT NULL,
+    updater_ip_addr inet NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    note_id integer NOT NULL,
+    post_id integer NOT NULL,
+    updater_id integer,
+    version integer DEFAULT 0 NOT NULL
+);
+
+
+--
+-- Name: posts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.posts (
+    id integer NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    uploader_id integer,
+    score integer DEFAULT 0 NOT NULL,
+    source text DEFAULT ''::text NOT NULL,
+    md5 text NOT NULL,
+    last_comment_bumped_at timestamp without time zone,
+    rating character(1) DEFAULT 'q'::bpchar NOT NULL,
+    image_width integer,
+    image_height integer,
+    uploader_ip_addr inet NOT NULL,
+    tag_string text DEFAULT ''::text NOT NULL,
+    is_note_locked boolean DEFAULT false NOT NULL,
+    fav_count integer DEFAULT 0 NOT NULL,
+    file_ext text DEFAULT ''::text NOT NULL,
+    last_noted_at timestamp without time zone,
+    is_rating_locked boolean DEFAULT false NOT NULL,
+    parent_id integer,
+    has_children boolean DEFAULT false NOT NULL,
+    approver_id integer,
+    tag_index tsvector,
+    tag_count_general integer DEFAULT 0 NOT NULL,
+    tag_count_artist integer DEFAULT 0 NOT NULL,
+    tag_count_character integer DEFAULT 0 NOT NULL,
+    tag_count_copyright integer DEFAULT 0 NOT NULL,
+    file_size integer,
+    is_status_locked boolean DEFAULT false NOT NULL,
+    fav_string text DEFAULT ''::text NOT NULL,
+    pool_string text DEFAULT ''::text NOT NULL,
+    up_score integer DEFAULT 0 NOT NULL,
+    down_score integer DEFAULT 0 NOT NULL,
+    is_pending boolean DEFAULT false NOT NULL,
+    is_flagged boolean DEFAULT false NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL,
+    tag_count integer DEFAULT 0 NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    is_banned boolean DEFAULT false NOT NULL,
+    pixiv_id integer,
+    last_commented_at timestamp without time zone,
+    has_active_children boolean DEFAULT false NOT NULL,
+    bit_flags bigint DEFAULT 0 NOT NULL,
+    tag_count_meta integer DEFAULT 0 NOT NULL,
+    keeper_data text
+);
+ALTER TABLE ONLY public.posts ALTER COLUMN tag_index SET STATISTICS 2000;
+
+
+--
+-- Name: users; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.users (
+    id integer NOT NULL,
+    name text NOT NULL,
+    password_hash text NOT NULL,
+    level integer DEFAULT 20 NOT NULL,
+    email text DEFAULT ''::text,
+    recent_tags text DEFAULT ''::text NOT NULL,
+    inviter_id integer,
+    created_at timestamp without time zone NOT NULL,
+    last_logged_in_at timestamp without time zone DEFAULT now(),
+    last_forum_read_at timestamp without time zone DEFAULT '1960-01-01 00:00:00'::timestamp without time zone,
+    base_upload_limit integer,
+    comment_threshold integer DEFAULT 0 NOT NULL,
+    updated_at timestamp without time zone,
+    email_verification_key character varying(255),
+    default_image_size character varying(255) DEFAULT 'large'::character varying NOT NULL,
+    favorite_tags text,
+    blacklisted_tags text DEFAULT 'spoilers
+guro
+scat
+furry -rating:s'::text,
+    time_zone character varying(255) DEFAULT 'Eastern Time (US & Canada)'::character varying NOT NULL,
+    post_update_count integer DEFAULT 0 NOT NULL,
+    note_update_count integer DEFAULT 0 NOT NULL,
+    favorite_count integer DEFAULT 0 NOT NULL,
+    post_upload_count integer DEFAULT 0 NOT NULL,
+    bcrypt_password_hash text,
+    per_page integer DEFAULT 20 NOT NULL,
+    custom_style text,
+    bit_prefs bigint DEFAULT 0 NOT NULL,
+    last_ip_addr inet,
+    unread_dmail_count integer DEFAULT 0 NOT NULL,
+    theme integer DEFAULT 0 NOT NULL
+);
+
+
+--
+-- Name: wiki_page_versions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.wiki_page_versions (
+    id integer NOT NULL,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    title text NOT NULL,
+    body text NOT NULL,
+    updater_id integer,
+    updater_ip_addr inet NOT NULL,
+    wiki_page_id integer NOT NULL,
+    is_locked boolean DEFAULT false NOT NULL,
+    other_names text[] DEFAULT '{}'::text[] NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL
+);
+
+
+--
 -- Name: ip_addresses; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -2347,28 +2481,6 @@ CREATE SEQUENCE public.news_updates_id_seq
 --
 
 ALTER SEQUENCE public.news_updates_id_seq OWNED BY public.news_updates.id;
-
-
---
--- Name: note_versions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.note_versions (
-    id integer NOT NULL,
-    note_id integer NOT NULL,
-    post_id integer NOT NULL,
-    updater_id integer NOT NULL,
-    updater_ip_addr inet NOT NULL,
-    x integer NOT NULL,
-    y integer NOT NULL,
-    width integer NOT NULL,
-    height integer NOT NULL,
-    is_active boolean DEFAULT true NOT NULL,
-    body text NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    version integer DEFAULT 0 NOT NULL
-);
 
 
 --
@@ -2708,57 +2820,6 @@ CREATE SEQUENCE public.post_votes_id_seq
 --
 
 ALTER SEQUENCE public.post_votes_id_seq OWNED BY public.post_votes.id;
-
-
---
--- Name: posts; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.posts (
-    id integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    up_score integer DEFAULT 0 NOT NULL,
-    down_score integer DEFAULT 0 NOT NULL,
-    score integer DEFAULT 0 NOT NULL,
-    source character varying DEFAULT ''::character varying NOT NULL,
-    md5 character varying NOT NULL,
-    rating character(1) DEFAULT 'q'::bpchar NOT NULL,
-    is_note_locked boolean DEFAULT false NOT NULL,
-    is_rating_locked boolean DEFAULT false NOT NULL,
-    is_status_locked boolean DEFAULT false NOT NULL,
-    is_pending boolean DEFAULT false NOT NULL,
-    is_flagged boolean DEFAULT false NOT NULL,
-    is_deleted boolean DEFAULT false NOT NULL,
-    uploader_id integer NOT NULL,
-    uploader_ip_addr inet NOT NULL,
-    approver_id integer,
-    fav_string text DEFAULT ''::text NOT NULL,
-    pool_string text DEFAULT ''::text NOT NULL,
-    last_noted_at timestamp without time zone,
-    last_comment_bumped_at timestamp without time zone,
-    fav_count integer DEFAULT 0 NOT NULL,
-    tag_string text DEFAULT ''::text NOT NULL,
-    tag_index tsvector,
-    tag_count integer DEFAULT 0 NOT NULL,
-    tag_count_general integer DEFAULT 0 NOT NULL,
-    tag_count_artist integer DEFAULT 0 NOT NULL,
-    tag_count_character integer DEFAULT 0 NOT NULL,
-    tag_count_copyright integer DEFAULT 0 NOT NULL,
-    file_ext character varying NOT NULL,
-    file_size integer NOT NULL,
-    image_width integer NOT NULL,
-    image_height integer NOT NULL,
-    parent_id integer,
-    has_children boolean DEFAULT false NOT NULL,
-    is_banned boolean DEFAULT false NOT NULL,
-    pixiv_id integer,
-    last_commented_at timestamp without time zone,
-    has_active_children boolean DEFAULT false,
-    bit_flags bigint DEFAULT 0 NOT NULL,
-    tag_count_meta integer DEFAULT 0 NOT NULL,
-    keeper_data text
-);
 
 
 --
@@ -3167,46 +3228,6 @@ ALTER SEQUENCE public.user_password_reset_nonces_id_seq OWNED BY public.user_pas
 
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.users (
-    id integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    name character varying NOT NULL,
-    password_hash character varying NOT NULL,
-    email character varying,
-    email_verification_key character varying,
-    inviter_id integer,
-    level integer DEFAULT 20 NOT NULL,
-    base_upload_limit integer DEFAULT 10 NOT NULL,
-    last_logged_in_at timestamp without time zone,
-    last_forum_read_at timestamp without time zone,
-    recent_tags text,
-    post_upload_count integer DEFAULT 0 NOT NULL,
-    post_update_count integer DEFAULT 0 NOT NULL,
-    note_update_count integer DEFAULT 0 NOT NULL,
-    favorite_count integer DEFAULT 0 NOT NULL,
-    comment_threshold integer DEFAULT '-1'::integer NOT NULL,
-    default_image_size character varying DEFAULT 'large'::character varying NOT NULL,
-    favorite_tags text,
-    blacklisted_tags text DEFAULT 'spoilers
-guro
-scat
-furry -rating:s'::text,
-    time_zone character varying DEFAULT 'Eastern Time (US & Canada)'::character varying NOT NULL,
-    bcrypt_password_hash text,
-    per_page integer DEFAULT 20 NOT NULL,
-    custom_style text,
-    bit_prefs bigint DEFAULT 0 NOT NULL,
-    last_ip_addr inet,
-    unread_dmail_count integer DEFAULT 0 NOT NULL,
-    theme integer DEFAULT 0 NOT NULL
-);
-
-
---
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -3223,25 +3244,6 @@ CREATE SEQUENCE public.users_id_seq
 --
 
 ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
-
-
---
--- Name: wiki_page_versions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.wiki_page_versions (
-    id integer NOT NULL,
-    wiki_page_id integer NOT NULL,
-    updater_id integer NOT NULL,
-    updater_ip_addr inet NOT NULL,
-    title character varying NOT NULL,
-    body text NOT NULL,
-    is_locked boolean NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
-    other_names text[] DEFAULT '{}'::text[] NOT NULL,
-    is_deleted boolean DEFAULT false NOT NULL
-);
 
 
 --
