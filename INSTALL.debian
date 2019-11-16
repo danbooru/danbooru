@@ -134,9 +134,6 @@ curl -L -s $GITHUB_INSTALL_SCRIPTS/nginx.danbooru.conf -o /etc/nginx/sites-enabl
 sed -i -e "s/__hostname__/$HOSTNAME/g" /etc/nginx/sites-enabled/danbooru.conf
 /etc/init.d/nginx restart
 
-# Setup logrotate
-curl -L -s $GITHUB_INSTALL_SCRIPTS/danbooru_logrotate_conf -o /etc/logrotate.d/danbooru.conf
-
 # Setup danbooru account
 echo "* Enter a new password for the danbooru account"
 passwd danbooru

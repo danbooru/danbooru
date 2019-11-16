@@ -1,5 +1,0 @@
-/var/www/danbooru2/shared/log/*.log {
-  daily
-  rotate 3
-  copytruncate
-}
