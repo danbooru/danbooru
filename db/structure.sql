@@ -2171,7 +2171,7 @@ CREATE TABLE public.note_versions (
     is_active boolean DEFAULT true NOT NULL,
     note_id integer NOT NULL,
     post_id integer NOT NULL,
-    updater_id integer,
+    updater_id integer NOT NULL,
     version integer DEFAULT 0 NOT NULL
 );
 
@@ -2183,10 +2183,10 @@ CREATE TABLE public.note_versions (
 CREATE TABLE public.posts (
     id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    uploader_id integer,
+    uploader_id integer NOT NULL,
     score integer DEFAULT 0 NOT NULL,
-    source text DEFAULT ''::text NOT NULL,
-    md5 text NOT NULL,
+    source character varying DEFAULT ''::character varying NOT NULL,
+    md5 character varying NOT NULL,
     last_comment_bumped_at timestamp without time zone,
     rating character(1) DEFAULT 'q'::bpchar NOT NULL,
     image_width integer,
@@ -2195,7 +2195,7 @@ CREATE TABLE public.posts (
     tag_string text DEFAULT ''::text NOT NULL,
     is_note_locked boolean DEFAULT false NOT NULL,
     fav_count integer DEFAULT 0 NOT NULL,
-    file_ext text DEFAULT ''::text NOT NULL,
+    file_ext character varying NOT NULL,
     last_noted_at timestamp without time zone,
     is_rating_locked boolean DEFAULT false NOT NULL,
     parent_id integer,
@@ -2206,7 +2206,7 @@ CREATE TABLE public.posts (
     tag_count_artist integer DEFAULT 0 NOT NULL,
     tag_count_character integer DEFAULT 0 NOT NULL,
     tag_count_copyright integer DEFAULT 0 NOT NULL,
-    file_size integer,
+    file_size integer NOT NULL,
     is_status_locked boolean DEFAULT false NOT NULL,
     fav_string text DEFAULT ''::text NOT NULL,
     pool_string text DEFAULT ''::text NOT NULL,
@@ -2220,7 +2220,7 @@ CREATE TABLE public.posts (
     is_banned boolean DEFAULT false NOT NULL,
     pixiv_id integer,
     last_commented_at timestamp without time zone,
-    has_active_children boolean DEFAULT false NOT NULL,
+    has_active_children boolean DEFAULT false,
     bit_flags bigint DEFAULT 0 NOT NULL,
     tag_count_meta integer DEFAULT 0 NOT NULL,
     keeper_data text
@@ -2234,10 +2234,10 @@ ALTER TABLE ONLY public.posts ALTER COLUMN tag_index SET STATISTICS 2000;
 
 CREATE TABLE public.users (
     id integer NOT NULL,
-    name text NOT NULL,
-    password_hash text NOT NULL,
+    name character varying NOT NULL,
+    password_hash character varying NOT NULL,
     level integer DEFAULT 20 NOT NULL,
-    email text DEFAULT ''::text,
+    email character varying,
     recent_tags text DEFAULT ''::text NOT NULL,
     inviter_id integer,
     created_at timestamp without time zone NOT NULL,
@@ -2246,14 +2246,14 @@ CREATE TABLE public.users (
     base_upload_limit integer,
     comment_threshold integer DEFAULT 0 NOT NULL,
     updated_at timestamp without time zone,
-    email_verification_key character varying(255),
-    default_image_size character varying(255) DEFAULT 'large'::character varying NOT NULL,
+    email_verification_key character varying,
+    default_image_size character varying DEFAULT 'large'::character varying NOT NULL,
     favorite_tags text,
     blacklisted_tags text DEFAULT 'spoilers
 guro
 scat
 furry -rating:s'::text,
-    time_zone character varying(255) DEFAULT 'Eastern Time (US & Canada)'::character varying NOT NULL,
+    time_zone character varying DEFAULT 'Eastern Time (US & Canada)'::character varying NOT NULL,
     post_update_count integer DEFAULT 0 NOT NULL,
     note_update_count integer DEFAULT 0 NOT NULL,
     favorite_count integer DEFAULT 0 NOT NULL,
@@ -2276,12 +2276,12 @@ CREATE TABLE public.wiki_page_versions (
     id integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    title text NOT NULL,
+    title character varying NOT NULL,
     body text NOT NULL,
-    updater_id integer,
+    updater_id integer NOT NULL,
     updater_ip_addr inet NOT NULL,
     wiki_page_id integer NOT NULL,
-    is_locked boolean DEFAULT false NOT NULL,
+    is_locked boolean NOT NULL,
     other_names text[] DEFAULT '{}'::text[] NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL
 );
