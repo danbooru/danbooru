@@ -6520,6 +6520,13 @@ CREATE INDEX index_forum_posts_on_topic_id ON public.forum_posts USING btree (to
 
 
 --
+-- Name: index_forum_posts_on_updated_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_forum_posts_on_updated_at ON public.forum_posts USING btree (updated_at);
+
+
+--
 -- Name: index_forum_subscriptions_on_forum_topic_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6586,7 +6593,7 @@ CREATE INDEX index_forum_topics_on_updated_at ON public.forum_topics USING btree
 -- Name: index_ip_bans_on_ip_addr; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_ip_bans_on_ip_addr ON public.ip_bans USING btree (ip_addr);
+CREATE INDEX index_ip_bans_on_ip_addr ON public.ip_bans USING btree (ip_addr);
 
 
 --
@@ -6594,6 +6601,20 @@ CREATE UNIQUE INDEX index_ip_bans_on_ip_addr ON public.ip_bans USING btree (ip_a
 --
 
 CREATE INDEX index_janitor_trials_on_user_id ON public.janitor_trials USING btree (user_id);
+
+
+--
+-- Name: index_mod_actions_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_mod_actions_on_created_at ON public.mod_actions USING btree (created_at);
+
+
+--
+-- Name: index_mod_actions_on_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_mod_actions_on_creator_id ON public.mod_actions USING btree (creator_id);
 
 
 --
@@ -6692,13 +6713,6 @@ CREATE INDEX index_pools_on_is_deleted ON public.pools USING btree (is_deleted);
 --
 
 CREATE INDEX index_pools_on_lower_name ON public.pools USING btree (lower((name)::text));
-
-
---
--- Name: index_pools_on_name; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_pools_on_name ON public.pools USING btree (name);
 
 
 --
@@ -6828,6 +6842,13 @@ CREATE INDEX index_post_replacements_on_post_id ON public.post_replacements USIN
 
 
 --
+-- Name: index_post_votes_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_votes_on_created_at ON public.post_votes USING btree (created_at);
+
+
+--
 -- Name: index_post_votes_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6839,6 +6860,13 @@ CREATE INDEX index_post_votes_on_post_id ON public.post_votes USING btree (post_
 --
 
 CREATE INDEX index_post_votes_on_user_id ON public.post_votes USING btree (user_id);
+
+
+--
+-- Name: index_posts_on_approver_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_approver_id ON public.posts USING btree (approver_id) WHERE (approver_id IS NOT NULL);
 
 
 --
@@ -6915,7 +6943,7 @@ CREATE INDEX index_posts_on_mpixels ON public.posts USING btree (((((image_width
 -- Name: index_posts_on_parent_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_posts_on_parent_id ON public.posts USING btree (parent_id);
+CREATE INDEX index_posts_on_parent_id ON public.posts USING btree (parent_id) WHERE (parent_id IS NOT NULL);
 
 
 --
@@ -6943,7 +6971,8 @@ CREATE INDEX index_posts_on_tags_index ON public.posts USING gin (tag_index);
 -- Name: index_posts_on_uploader_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_posts_on_uploader_id ON public.posts USING btree (uploader_id);
+CREATE INDEX index_posts_on_uploader_id ON public.posts USING btree (uploader_id) WHERE (uploader_id IS NOT NULL);
+
 
 --
 -- Name: index_posts_on_uploader_ip_addr; Type: INDEX; Schema: public; Owner: -
@@ -7072,6 +7101,13 @@ CREATE INDEX index_tags_on_name_trgm ON public.tags USING gin (name public.gin_t
 
 
 --
+-- Name: index_tags_on_post_count; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_tags_on_post_count ON public.tags USING btree (post_count);
+
+
+--
 -- Name: index_token_buckets_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7159,7 +7195,14 @@ CREATE INDEX index_users_on_created_at ON public.users USING btree (created_at);
 -- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_users_on_email ON public.users USING btree (email);
+CREATE INDEX index_users_on_email ON public.users USING btree (email) WHERE (email IS NOT NULL);
+
+
+--
+-- Name: index_users_on_inviter_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_inviter_id ON public.users USING btree (inviter_id) WHERE (inviter_id IS NOT NULL);
 
 
 --
@@ -7188,6 +7231,13 @@ CREATE INDEX index_users_on_name_trgm ON public.users USING gin (name public.gin
 --
 
 CREATE INDEX index_wiki_page_versions_on_created_at ON public.wiki_page_versions USING btree (created_at);
+
+
+--
+-- Name: index_wiki_page_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_wiki_page_versions_on_updater_id ON public.wiki_page_versions USING btree (updater_id);
 
 
 --
@@ -7497,6 +7547,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20190926000912'),
 ('20191023191749'),
 ('20191024194544'),
-('20191111004329');
+('20191111004329'),
+('20191111024520'),
+('20191116001441');
 
 
