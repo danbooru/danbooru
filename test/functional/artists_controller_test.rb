@@ -71,7 +71,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
     should "get the banned page" do
       get banned_artists_path
-      assert_response :success
+      assert_redirected_to artists_path(search: { is_banned: true, order: "updated_at" })
     end
 
     should "ban an artist" do
