@@ -2235,18 +2235,14 @@ ALTER TABLE ONLY public.posts ALTER COLUMN tag_index SET STATISTICS 2000;
 CREATE TABLE public.users (
     id integer NOT NULL,
     name character varying NOT NULL,
-    password_hash character varying NOT NULL,
     level integer DEFAULT 20 NOT NULL,
     email character varying,
-    recent_tags text DEFAULT ''::text NOT NULL,
     inviter_id integer,
     created_at timestamp without time zone NOT NULL,
     last_logged_in_at timestamp without time zone DEFAULT now(),
     last_forum_read_at timestamp without time zone DEFAULT '1960-01-01 00:00:00'::timestamp without time zone,
-    base_upload_limit integer,
     comment_threshold integer DEFAULT 0 NOT NULL,
     updated_at timestamp without time zone,
-    email_verification_key character varying,
     default_image_size character varying DEFAULT 'large'::character varying NOT NULL,
     favorite_tags text,
     blacklisted_tags text DEFAULT 'spoilers
@@ -7552,6 +7548,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20191111004329'),
 ('20191111024520'),
 ('20191116001441'),
-('20191116021759');
+('20191116021759'),
+('20191116224228');
 
 

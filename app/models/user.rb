@@ -167,7 +167,6 @@ class User < ApplicationRecord
     end
 
     def encrypt_password_on_create
-      self.password_hash = ""
       self.bcrypt_password_hash = User.bcrypt(password)
     end
 
@@ -581,7 +580,7 @@ class User < ApplicationRecord
         attributes += BOOLEAN_ATTRIBUTES
         attributes += [
           :updated_at, :email, :last_logged_in_at, :last_forum_read_at,
-          :recent_tags, :comment_threshold, :default_image_size,
+          :comment_threshold, :default_image_size,
           :favorite_tags, :blacklisted_tags, :time_zone, :per_page,
           :custom_style, :favorite_count, :api_regen_multiplier,
           :api_burst_limit, :remaining_api_limit, :statement_timeout,

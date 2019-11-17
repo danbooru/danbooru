@@ -65,7 +65,6 @@ module Danbooru
       # user.can_upload_free = false
       # user.is_super_voter = false
       #
-      # user.base_upload_limit = 10
       # user.comment_threshold = -1
       # user.blacklisted_tags = ["spoilers", "guro", "scat", "furry -rating:s"].join("\n")
       # user.default_image_size = "large"
