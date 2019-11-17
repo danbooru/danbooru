@@ -105,8 +105,8 @@ module TagAutocomplete
       .where("tag_aliases.antecedent_name LIKE ? ESCAPE E'\\\\'", wildcard_name.to_escaped_for_sql_like)
       .active
       .where("tags.name NOT LIKE ? ESCAPE E'\\\\'", wildcard_name.to_escaped_for_sql_like)
-      .where("tag_aliases.post_count > 0")
-      .order("tag_aliases.post_count desc")
+      .where("tags.post_count > 0")
+      .order("tags.post_count desc")
       .limit(n)
       .pluck(:name, :post_count, :category, :antecedent_name)
       .map {|row| Result.new(*row, :alias)}
