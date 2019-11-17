@@ -2989,43 +2989,6 @@ ALTER SEQUENCE public.tag_implications_id_seq OWNED BY public.tag_implications.i
 
 
 --
--- Name: tag_subscriptions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.tag_subscriptions (
-    id integer NOT NULL,
-    creator_id integer NOT NULL,
-    name character varying NOT NULL,
-    tag_query text NOT NULL,
-    post_ids text NOT NULL,
-    is_public boolean DEFAULT true NOT NULL,
-    last_accessed_at timestamp without time zone,
-    is_opted_in boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: tag_subscriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.tag_subscriptions_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: tag_subscriptions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.tag_subscriptions_id_seq OWNED BY public.tag_subscriptions.id;
-
-
---
 -- Name: tags; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4278,13 +4241,6 @@ ALTER TABLE ONLY public.tag_implications ALTER COLUMN id SET DEFAULT nextval('pu
 
 
 --
--- Name: tag_subscriptions id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.tag_subscriptions ALTER COLUMN id SET DEFAULT nextval('public.tag_subscriptions_id_seq'::regclass);
-
-
---
 -- Name: tags id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4666,14 +4622,6 @@ ALTER TABLE ONLY public.tag_aliases
 
 ALTER TABLE ONLY public.tag_implications
     ADD CONSTRAINT tag_implications_pkey PRIMARY KEY (id);
-
-
---
--- Name: tag_subscriptions tag_subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.tag_subscriptions
-    ADD CONSTRAINT tag_subscriptions_pkey PRIMARY KEY (id);
 
 
 --
@@ -7057,20 +7005,6 @@ CREATE INDEX index_tag_implications_on_forum_post_id ON public.tag_implications 
 
 
 --
--- Name: index_tag_subscriptions_on_creator_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_tag_subscriptions_on_creator_id ON public.tag_subscriptions USING btree (creator_id);
-
-
---
--- Name: index_tag_subscriptions_on_name; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_tag_subscriptions_on_name ON public.tag_subscriptions USING btree (name);
-
-
---
 -- Name: index_tags_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7549,6 +7483,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20191111024520'),
 ('20191116001441'),
 ('20191116021759'),
-('20191116224228');
+('20191116224228'),
+('20191117074642');
 
 
