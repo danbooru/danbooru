@@ -162,15 +162,6 @@ Rails.application.routes.draw do
       get :check, to: redirect {|path_params, req| "/iqdb_queries?#{req.query_string}"}
     end
   end
-  resources :janitor_trials do
-    collection do
-      get :test
-    end
-    member do
-      put :promote
-      put :demote
-    end
-  end
   resources :mod_actions
   resources :news_updates
   resources :notes do

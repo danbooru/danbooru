@@ -13,15 +13,9 @@ module ApproverPruner
       CurrentUser.scoped(User.system, "127.0.0.1") do
         next if user.is_admin?
 
-        janitor_trial = JanitorTrial.where(user_id: user.id).first
+        user.update!(can_approve_posts: false)
+        user.feedback.create(category: "neutral", body: "Lost approval privileges")
 
-        if janitor_trial && user.can_approve_posts?
-          janitor_trial.demote!
-        else
-          user.can_approve_posts = false
-          user.save
-        end
- 
         Dmail.create_automated(
           :to_id => user.id,
           :title => "Approver inactivity",

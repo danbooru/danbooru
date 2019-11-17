@@ -2380,40 +2380,6 @@ ALTER SEQUENCE public.ip_bans_id_seq OWNED BY public.ip_bans.id;
 
 
 --
--- Name: janitor_trials; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.janitor_trials (
-    id integer NOT NULL,
-    creator_id integer NOT NULL,
-    user_id integer NOT NULL,
-    original_level integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    status character varying DEFAULT 'active'::character varying NOT NULL
-);
-
-
---
--- Name: janitor_trials_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.janitor_trials_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: janitor_trials_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.janitor_trials_id_seq OWNED BY public.janitor_trials.id;
-
-
---
 -- Name: mod_actions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4115,13 +4081,6 @@ ALTER TABLE ONLY public.ip_bans ALTER COLUMN id SET DEFAULT nextval('public.ip_b
 
 
 --
--- Name: janitor_trials id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.janitor_trials ALTER COLUMN id SET DEFAULT nextval('public.janitor_trials_id_seq'::regclass);
-
-
---
 -- Name: mod_actions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4478,14 +4437,6 @@ ALTER TABLE ONLY public.forum_topics
 
 ALTER TABLE ONLY public.ip_bans
     ADD CONSTRAINT ip_bans_pkey PRIMARY KEY (id);
-
-
---
--- Name: janitor_trials janitor_trials_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.janitor_trials
-    ADD CONSTRAINT janitor_trials_pkey PRIMARY KEY (id);
 
 
 --
@@ -6543,13 +6494,6 @@ CREATE INDEX index_ip_bans_on_ip_addr ON public.ip_bans USING btree (ip_addr);
 
 
 --
--- Name: index_janitor_trials_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_janitor_trials_on_user_id ON public.janitor_trials USING btree (user_id);
-
-
---
 -- Name: index_mod_actions_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7484,6 +7428,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20191116001441'),
 ('20191116021759'),
 ('20191116224228'),
-('20191117074642');
+('20191117074642'),
+('20191117080647');
 
 
