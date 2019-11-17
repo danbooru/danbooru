@@ -64,7 +64,7 @@ class TagAlias < TagRelationship
         update_posts
         forum_updater.update(approval_message(approver), "APPROVED") if update_topic
         rename_wiki_and_artist
-        update(status: "active", post_count: consequent_tag.post_count)
+        update(status: "active")
       end
     rescue Exception => e
       if tries < 5
@@ -181,10 +181,6 @@ class TagAlias < TagRelationship
     if antecedent_tag.post_count < 50
       errors[:base] << "The #{antecedent_name} tag must have at least 50 posts for an alias to be created"
     end
-  end
-
-  def self.update_cached_post_counts_for_all
-    execute_sql("UPDATE tag_aliases SET post_count = tags.post_count FROM tags WHERE tags.name = tag_aliases.consequent_name")
   end
 
   def create_mod_action

@@ -2887,7 +2887,6 @@ CREATE TABLE public.tag_aliases (
     status text DEFAULT 'pending'::text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    post_count integer DEFAULT 0 NOT NULL,
     approver_id integer,
     forum_post_id integer
 );
@@ -6902,13 +6901,6 @@ CREATE INDEX index_tag_aliases_on_forum_post_id ON public.tag_aliases USING btre
 
 
 --
--- Name: index_tag_aliases_on_post_count; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_tag_aliases_on_post_count ON public.tag_aliases USING btree (post_count);
-
-
---
 -- Name: index_tag_implications_on_antecedent_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7404,6 +7396,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20191116224228'),
 ('20191117074642'),
 ('20191117080647'),
-('20191117081229');
+('20191117081229'),
+('20191117200404');
 
 

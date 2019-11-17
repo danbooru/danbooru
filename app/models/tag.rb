@@ -895,7 +895,7 @@ class Tag < ApplicationRecord
       q
     end
 
-    def names_matches_with_aliases(name, limit: 10)
+    def names_matches_with_aliases(name, limit)
       name = normalize_name(name)
       wildcard_name = name + '*'
 
@@ -907,8 +907,8 @@ class Tag < ApplicationRecord
         .where("tag_aliases.antecedent_name LIKE ? ESCAPE E'\\\\'", wildcard_name.to_escaped_for_sql_like)
         .active
         .where("tags.name NOT LIKE ? ESCAPE E'\\\\'", wildcard_name.to_escaped_for_sql_like)
-        .where("tag_aliases.post_count > 0")
-        .order("tag_aliases.post_count desc")
+        .where("tags.post_count > 0")
+        .order("tags.post_count desc")
         .limit(limit * 2) # Get extra records in case some duplicates get filtered out.
 
       sql_query = "((#{query1.to_sql}) UNION ALL (#{query2.to_sql})) AS unioned_query"
