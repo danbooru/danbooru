@@ -35,7 +35,6 @@ class TagRelationship < ApplicationRecord
 
   def initialize_creator
     self.creator_id = CurrentUser.user.id
-    self.creator_ip_addr = CurrentUser.ip_addr
   end
 
   def normalize_names

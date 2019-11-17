@@ -3,7 +3,7 @@ class PostAppeal < ApplicationRecord
 
   belongs_to :creator, :class_name => "User"
   belongs_to :post
-  validates_presence_of :reason, :creator_ip_addr
+  validates_presence_of :reason
   validate :validate_post_is_inactive
   validate :validate_creator_is_not_limited
   before_validation :initialize_creator, :on => :create
@@ -60,7 +60,6 @@ class PostAppeal < ApplicationRecord
 
   def initialize_creator
     self.creator_id = CurrentUser.id
-    self.creator_ip_addr = CurrentUser.ip_addr
   end
 
   def appeal_count_for_creator

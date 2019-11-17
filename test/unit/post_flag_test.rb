@@ -140,7 +140,6 @@ class PostFlagTest < ActiveSupport::TestCase
           PostFlag.create(:post => @post, :reason => "aaa", :is_resolved => false)
         end
         assert_equal(@alice.id, @post_flag.creator_id)
-        assert_equal(IPAddr.new("127.0.0.1"), @post_flag.creator_ip_addr)
       end
     end
 

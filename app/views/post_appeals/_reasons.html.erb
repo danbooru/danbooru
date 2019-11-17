@@ -2,13 +2,7 @@
   <% appeals.each do |appeal| %>
     <li class="post-appeal-reason">
       <span class="prose"><%= format_text(appeal.reason, inline: true) %></span>
-
       - <%= link_to_user(appeal.creator) %>
-
-      <% if CurrentUser.is_moderator? %>
-        (<%= link_to_ip(appeal.creator_ip_addr) %>)
-      <% end %>
-
       - <%= time_ago_in_words_tagged(appeal.created_at) %>
     </li>
   <% end %>

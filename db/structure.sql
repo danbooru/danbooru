@@ -2580,7 +2580,6 @@ CREATE TABLE public.post_appeals (
     id integer NOT NULL,
     post_id integer NOT NULL,
     creator_id integer NOT NULL,
-    creator_ip_addr inet,
     reason text,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -2680,7 +2679,6 @@ CREATE TABLE public.post_flags (
     id integer NOT NULL,
     post_id integer NOT NULL,
     creator_id integer NOT NULL,
-    creator_ip_addr inet NOT NULL,
     reason text,
     is_resolved boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
@@ -2885,7 +2883,6 @@ CREATE TABLE public.tag_aliases (
     antecedent_name character varying NOT NULL,
     consequent_name character varying NOT NULL,
     creator_id integer NOT NULL,
-    creator_ip_addr inet NOT NULL,
     forum_topic_id integer,
     status text DEFAULT 'pending'::text NOT NULL,
     created_at timestamp without time zone NOT NULL,
@@ -2925,7 +2922,6 @@ CREATE TABLE public.tag_implications (
     consequent_name character varying NOT NULL,
     descendant_names text[] DEFAULT '{}'::text[] NOT NULL,
     creator_id integer NOT NULL,
-    creator_ip_addr inet NOT NULL,
     forum_topic_id integer,
     status text DEFAULT 'pending'::text NOT NULL,
     created_at timestamp without time zone NOT NULL,
@@ -3063,8 +3059,7 @@ CREATE TABLE public.user_feedback (
     category character varying NOT NULL,
     body text NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    creator_ip_addr inet
+    updated_at timestamp without time zone NOT NULL
 );
 
 
@@ -6641,13 +6636,6 @@ CREATE INDEX index_post_appeals_on_creator_id ON public.post_appeals USING btree
 
 
 --
--- Name: index_post_appeals_on_creator_ip_addr; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_post_appeals_on_creator_ip_addr ON public.post_appeals USING btree (creator_ip_addr);
-
-
---
 -- Name: index_post_appeals_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6694,13 +6682,6 @@ CREATE INDEX index_post_disapprovals_on_user_id ON public.post_disapprovals USIN
 --
 
 CREATE INDEX index_post_flags_on_creator_id ON public.post_flags USING btree (creator_id);
-
-
---
--- Name: index_post_flags_on_creator_ip_addr; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_post_flags_on_creator_ip_addr ON public.post_flags USING btree (creator_ip_addr);
 
 
 --
@@ -7030,13 +7011,6 @@ CREATE INDEX index_user_feedback_on_created_at ON public.user_feedback USING btr
 --
 
 CREATE INDEX index_user_feedback_on_creator_id ON public.user_feedback USING btree (creator_id);
-
-
---
--- Name: index_user_feedback_on_creator_ip_addr; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_user_feedback_on_creator_ip_addr ON public.user_feedback USING btree (creator_ip_addr);
 
 
 --
@@ -7429,6 +7403,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20191116021759'),
 ('20191116224228'),
 ('20191117074642'),
-('20191117080647');
+('20191117080647'),
+('20191117081229');
 
 
