@@ -1,0 +1,20 @@
+/* These are fallback fonts intended for use in notes. */
+
+/* https://fontlibrary.org/en/font/comic-relief */
+@font-face {
+  font-family: "Comic Sans MS";
+  font-weight: normal;
+  font-display: swap;
+  src:
+    local("Comic Sans MS"),
+    url("../../../../../node_modules/typopro-web/web/TypoPRO-ComicRelief/TypoPRO-ComicRelief-Regular.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Comic Sans MS";
+  font-weight: bold;
+  font-display: swap;
+  src:
+    local("Comic Sans MS"),
+    url("../../../../../node_modules/typopro-web/web/TypoPRO-ComicRelief/TypoPRO-ComicRelief-Bold.woff") format("woff");
+}

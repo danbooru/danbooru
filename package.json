@@ -15,6 +15,7 @@
     "script-loader": "^0.7.2",
     "spark-md5": "^3.0.0",
     "stupid-table-plugin": "^1.1.3",
+    "typopro-web": "^4.2.2",
     "webpack-cli": "^3.3.0"
   },
   "devDependencies": {
