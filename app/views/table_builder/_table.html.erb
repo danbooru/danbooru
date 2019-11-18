@@ -1,0 +1,21 @@
+<%= tag.table table.html_attributes do %>
+  <thead>
+    <tr>
+      <% table.columns.each do |column| %>
+        <th><%= column.name %></th>
+      <% end %>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% table.items.each do |item| %>
+      <%= tag.tr table.row_attributes(item) do %>
+        <% table.columns.each do |column| %>
+          <%= tag.td column.html_attributes do %>
+            <%= column.value(item) %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </tbody>
+<% end %>

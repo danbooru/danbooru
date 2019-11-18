@@ -197,6 +197,11 @@ module ApplicationHelper
     simple_form_for(:search, method: method, url: url, defaults: defaults, html: html_options, &block)
   end
 
+  def table_for(*options, &block)
+    table = TableBuilder.new(*options, &block)
+    render "table_builder/table", table: table
+  end
+
   def body_attributes(user = CurrentUser.user)
     attributes = %i[id name level level_string theme] + User::BOOLEAN_ATTRIBUTES.map(&:to_sym)
     attributes += User::Roles.map { |role| :"is_#{role}?" }
