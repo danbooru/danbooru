@@ -38,6 +38,13 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "show action" do
+      should "work for xml responses" do
+        get artist_path(@masao.id), as: :xml
+        assert_response :success
+      end
+    end
+
     should "get the new page" do
       get_auth new_artist_path, @user
       assert_response :success

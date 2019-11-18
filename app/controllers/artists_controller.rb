@@ -46,7 +46,7 @@ class ArtistsController < ApplicationController
   def show
     @artist = Artist.find(params[:id])
     @post_set = PostSets::Artist.new(@artist)
-    respond_with(@artist, methods: [:domains], include: [:urls])
+    respond_with(@artist)
   end
 
   def create
