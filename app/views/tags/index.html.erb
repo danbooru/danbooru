@@ -1,32 +1,20 @@
 <div id="c-tags">
   <div id="a-index" class="fixed-width-container">
     <%= render "search" %>
-    <table class="striped autofit">
-      <thead>
-        <tr>
-          <th>Count</th>
-          <th>Name</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @tags.each do |tag| %>
-          <tr>
-            <td><%= tag.post_count %></td>
-            <td class="category-<%= tag.category %> col-expand">
-              <%= link_to_wiki "?", tag.name %>
-              <%= link_to(tag.name, posts_path(:tags => tag.name)) %>
-            </td>
-            <td>
-              <%= link_to_if tag.editable_by?(CurrentUser.user), "edit", edit_tag_path(tag) %> |
-              <%= link_to "history", post_versions_path(search: { changed_tags: tag.name }) %> |
-              <%= link_to "related", related_tag_path(search: { query: tag.name }) %> |
-              <%= link_to "similar", tags_path(search: { fuzzy_name_matches: tag.name, order: :similarity }) %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+
+    <%= table_for @tags, class: "striped autofit" do |t| %>
+      <% t.column :post_count, name: "Count" %>
+      <% t.column :name, class: "col-expand" do |tag| %>
+        <%= link_to_wiki "?", tag.name, class: "tag-type-#{tag.category}" %>
+        <%= link_to tag.name, posts_path(tags: tag.name), class: "tag-type-#{tag.category}" %>
+      <% end %>
+      <% t.column do |tag| %>
+        <%= link_to_if tag.editable_by?(CurrentUser.user), "Edit", edit_tag_path(tag) %> |
+        <%= link_to "History", post_versions_path(search: { changed_tags: tag.name }) %> |
+        <%= link_to "Related", related_tag_path(search: { query: tag.name }) %> |
+        <%= link_to "Similar", tags_path(search: { fuzzy_name_matches: tag.name, order: :similarity }) %>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@tags) %>
   </div>
