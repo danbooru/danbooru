@@ -2,36 +2,26 @@
   <div id="a-index">
     <h1>Notes</h1>
 
-    <table width="100%" class="striped autofit">
-      <thead>
-        <tr>
-          <th>Post</th>
-          <th>Note</th>
-          <th>Created by</th>
-          <th>Created at</th>
-          <th>Body</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @notes.each do |note| %>
-          <tr>
-            <td><%= link_to note.post_id, post_path(note.post_id) %></td>
-            <td>
-              <%= link_to "#{note.id}.#{note.version}", post_path(note.post_id, anchor: "note-#{note.id}") %>
-              <%= link_to "»", note_versions_path(search: {note_id: note.id}) %>
-            </td>
-            <td><%= link_to_user note.creator %></td>
-            <td><%= compact_time(note.created_at) %></td>
-            <td class="col-expand">
-              <%= h(note.body) %>
-              <% unless note.is_active? %>
-                <span class="inactive">(deleted)</span>
-              <% end %>
-            </td>
-          </tr>
+    <%= table_for @notes, class: "striped autofit" do |t| %>
+      <% t.column "Post" do |note| %>
+        <%= link_to note.post_id, note.post %>
+      <% end %>
+      <% t.column "Note" do |note| %>
+        <%= link_to "#{note.id}.#{note.version}", post_path(note.post_id, anchor: "note-#{note.id}") %>
+        <%= link_to "»", note_versions_path(search: { note_id: note.id }) %>
+      <% end %>
+      <% t.column "Body", class: "col-expand" do |note| %>
+        <%= note.body %>
+        <% unless note.is_active? %>
+          <span class="inactive">(deleted)</span>
         <% end %>
-      </tbody>
-    </table>
+      <% end %>
+      <% t.column "Created" do |note| %>
+        <%= link_to_user note.creator %>
+        <%= link_to "»", notes_path(search: { creator_name: note.creator.name }) %>
+        <div><%= time_ago_in_words_tagged(note.created_at) %></div>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@notes) %>
   </div>
