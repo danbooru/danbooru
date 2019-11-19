@@ -10,6 +10,7 @@ class SessionLoaderTest < ActiveSupport::TestCase
       @request.stubs(:cookie_jar).returns({})
       @request.stubs(:parameters).returns({})
       @request.stubs(:session).returns({})
+      SessionLoader.any_instance.stubs(:initialize_session_cookies)
     end
 
     teardown do
