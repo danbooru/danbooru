@@ -2222,8 +2222,7 @@ CREATE TABLE public.posts (
     last_commented_at timestamp without time zone,
     has_active_children boolean DEFAULT false,
     bit_flags bigint DEFAULT 0 NOT NULL,
-    tag_count_meta integer DEFAULT 0 NOT NULL,
-    keeper_data text
+    tag_count_meta integer DEFAULT 0 NOT NULL
 );
 ALTER TABLE ONLY public.posts ALTER COLUMN tag_index SET STATISTICS 2000;
 
@@ -7397,6 +7396,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20191117074642'),
 ('20191117080647'),
 ('20191117081229'),
-('20191117200404');
+('20191117200404'),
+('20191119061018');
 
 
