@@ -41,6 +41,11 @@ module Danbooru
       ForumTopic.where(title: "Upload Feedback Thread").first
     end
 
+    # The ID of the "Curated" pool. If present, this pool will be updated daily with curated posts.
+    def curated_pool_id
+      nil
+    end
+
     def source_code_url
       "https://github.com/r888888888/danbooru"
     end

@@ -21,6 +21,7 @@ module DanbooruMaintenance
     TagChangeRequestPruner.warn_all
     TagChangeRequestPruner.reject_all
     Ban.prune!
+    CuratedPoolUpdater.update_pool!
 
     ActiveRecord::Base.connection.execute("vacuum analyze") unless Rails.env.test?
   rescue Exception => exception
