@@ -37,6 +37,10 @@ div#note-container {
       font-size: 0.8em;
     }
 
+    a[rel*="external"] {
+      word-break: initial;
+    }
+
     .tn {
       font-size: 0.8em;
       color: var(--note-tn-color);
