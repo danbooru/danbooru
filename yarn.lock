@@ -8410,6 +8410,41 @@ typedarray@^0.0.6:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
 
+typeface-anton@^0.0.72:
+  version "0.0.72"
+  resolved "https://registry.yarnpkg.com/typeface-anton/-/typeface-anton-0.0.72.tgz#f30d21979fd90e13ef50630027f09575b57cadb4"
+  integrity sha512-erWLoPnR9O0Y1UtvTW8eUIPfihmQBR6MLPyhvkqaOvK7VjOyS2ofJxbriRnjX1OjtvPtYh5lH6bnPFddrkP1OA==
+
+typeface-archivo-narrow@^0.0.72:
+  version "0.0.72"
+  resolved "https://registry.yarnpkg.com/typeface-archivo-narrow/-/typeface-archivo-narrow-0.0.72.tgz#3515626191b3fa80872d0672c7c20d281ab8e521"
+  integrity sha512-BHA/EgBhQTLAO1gCGYc4hNyCSxXqCEzLARtXblm/uF3eTfKWuu5IgVwC8VReWt1AABySVulH0XCrIa4T4A7N1A==
+
+typeface-indie-flower@^0.0.72:
+  version "0.0.72"
+  resolved "https://registry.yarnpkg.com/typeface-indie-flower/-/typeface-indie-flower-0.0.72.tgz#80b18841d9c789b262e6f7ff6950a4472e565f60"
+  integrity sha512-BwdRkMP4icqG9nSPQ/k1fyEEs06V0/97yJKrOBrGu77Ge6tGCtqvBV+2ke9ASMGxKOUyufZoPZ0zscE3ZxvSvw==
+
+typeface-lora@^0.0.72:
+  version "0.0.72"
+  resolved "https://registry.yarnpkg.com/typeface-lora/-/typeface-lora-0.0.72.tgz#850c211ef51167d8b71b610c93a9b1ca0f17863c"
+  integrity sha512-6Q029hpZAJOU2K0V3JM0xColUa/u/0xpzgN5nv1aKe019lNYp9u+6u+BF3zK7n+gwGAjrz75qdFxhM34fheSAA==
+
+typeface-petit-formal-script@^0.0.72:
+  version "0.0.72"
+  resolved "https://registry.yarnpkg.com/typeface-petit-formal-script/-/typeface-petit-formal-script-0.0.72.tgz#aa9361a5a919ca8403dca24dc115770b17ed0fd3"
+  integrity sha512-1gxpzetKTvVZvbvpYMPpd110VHi3gbwVvTBa+YydyFnv4iVgSBGwvYrnz6QlNQ/u08+N32CFvaSAVFjtb6CLlw==
+
+typeface-rokkitt@^0.0.72:
+  version "0.0.72"
+  resolved "https://registry.yarnpkg.com/typeface-rokkitt/-/typeface-rokkitt-0.0.72.tgz#4391f2f9f277e6a175766041ead3d0ff097863dd"
+  integrity sha512-x2nX6CHmfWqU5RSQ/oSHt+h0xtwGwTf0vtgOuhcexNgh1+k0pG3f9epW7bOUybghezXKJqVNO64KYua5g95URQ==
+
+typeface-unifrakturmaguntia@^0.0.72:
+  version "0.0.72"
+  resolved "https://registry.yarnpkg.com/typeface-unifrakturmaguntia/-/typeface-unifrakturmaguntia-0.0.72.tgz#2c314a0ebf54d522c9ceb84fa338bbf3b698b6d4"
+  integrity sha512-+arjO+M5PK9CEMtJm7KWCxZS4NIhxHx04iBuTKiU95JyB9xD4YBpfU5Y3NYqUPvUj3YnNJbPvq9B9Ayt0JE8ug==
+
 typopro-web@^4.2.2:
   version "4.2.2"
   resolved "https://registry.yarnpkg.com/typopro-web/-/typopro-web-4.2.2.tgz#31cc5823ae80e7afe899fc98e2e2054508f840e9"
