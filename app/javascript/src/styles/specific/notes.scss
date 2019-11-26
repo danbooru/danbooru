@@ -9,7 +9,7 @@ div#note-container {
     color: var(--note-body-text-color);
     min-width: 140px;
     min-height: 1em;
-    line-height: normal;
+    line-height: 1.25;
     cursor: pointer;
     padding: 4px;
     z-index: 150;
@@ -18,7 +18,7 @@ div#note-container {
 
   div.note-body, div.note-box.embedded div.note-box-inner-border {
     h1, h2, h3, h4, h5, h6, a, span, div, blockquote, br, p, ul, li, ol, em, strong, small, big, b, i, font, u, s, code, center {
-      line-height: normal;
+      line-height: 1.25;
     }
 
     > :last-child {
@@ -79,7 +79,7 @@ div#note-container {
     height: 100px;
     cursor: move;
     background: var(--note-box-background);
-    line-height: normal;
+    line-height: 1.25;
 
     div.note-box-inner-border {
       border: var(--note-box-inner-border);
