@@ -92,14 +92,16 @@
     <% end %>
 
     <div class="section">
-      <% if params[:user_id] %>
+      <% if true %>
+        <p>Account upgrades are temporarily disabled. Upgrades will be available again after December 1st.</p>
+      <% elsif params[:user_id] %>
         <p>You are gifting this account upgrade to <%= link_to user.pretty_name, user_path(params[:user_id]) %>.</p>
       <% else %>
         <p>You can also upgrade someone else's account for the same price. The easiest way is to go to their profile page and look for a "Gift Upgrade" link.</p>
       <% end %>
     </div>
 
-    <% if Danbooru.config.stripe_publishable_key %>
+    <% if false %>
       <% if CurrentUser.is_anonymous? %>
         <p><%= link_to "Sign up", new_user_path %> or <%= link_to "login", new_session_path(url: new_user_upgrade_path) %> first to upgrade your account.</p>
       <% elsif CurrentUser.safe_mode? %>
