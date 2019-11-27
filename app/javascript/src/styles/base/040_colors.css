@@ -177,7 +177,6 @@
   --dtext-blockquote-background: #EEE;
   --dtext-code-background: #EEE;
   --dtext-expand-border: 1px inset #666;
-  --dtext-spoiler-color: black;
   --dtext-spoiler-background-color: black;
   --dtext-spoiler-hover-color: white;
 
@@ -312,7 +311,6 @@ body[data-user-theme="dark"] {
   --dtext-blockquote-border: 1px solid var(--grey-4);
   --dtext-code-background: var(--grey-2);
   --dtext-expand-border: 1px inset var(--grey-4);
-  --dtext-spoiler-color: black;
   --dtext-spoiler-background-color: black;
   --dtext-spoiler-hover-color: var(--text-color);
 

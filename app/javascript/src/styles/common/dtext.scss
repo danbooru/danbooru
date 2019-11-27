@@ -113,13 +113,16 @@ div.prose {
     text-decoration: dotted underline;
   }
 
-  .spoiler, .spoiler * {
-    color: var(--dtext-spoiler-color);
-    background: var(--dtext-spoiler-background-color);
+  .spoiler:not(:hover), .spoiler:not(:hover) * {
+    color: transparent !important;
   }
 
-  .spoiler:hover, .spoiler:hover * {
+  .spoiler:hover {
     color: var(--dtext-spoiler-hover-color);
+  }
+
+  .spoiler {
+    background: var(--dtext-spoiler-background-color);
   }
 }
 
