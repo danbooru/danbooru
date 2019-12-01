@@ -9,6 +9,7 @@ let Post = {};
 Post.pending_update_count = 0;
 Post.SWIPE_THRESHOLD = 60;
 Post.SWIPE_VELOCITY = 0.6;
+Post.MAX_RECOMMENDATIONS = 27; // 3 rows of 9 posts at 1920x1080.
 
 Post.initialize_all = function() {
 
@@ -433,9 +434,7 @@ Post.initialize_post_sections = function() {
       $("#comments").hide();
       $("#edit").hide();
       $("#recommended").show();
-      $.get("/recommended_posts", {context: "post", post_id: Utility.meta("post-id")}, function(data) {
-        $("#recommended").html(data);
-      });
+      $.get("/recommended_posts.js", { post_id: Utility.meta("post-id"), max_recommendations: Post.MAX_RECOMMENDATIONS });
     } else {
       $("#edit").hide();
       $("#comments").hide();
