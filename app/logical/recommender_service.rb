@@ -48,6 +48,7 @@ module RecommenderService
   def search(params)
     if params[:user_id].present?
       user = User.find(params[:user_id])
+      raise User::PrivilegeError if user.hide_favorites?
       max_recommendations = params.fetch(:max_recommendations, user.favorite_count + 500).to_i.clamp(0, 50000)
       recs = RecommenderService.recommend_for_user(params[:user_id], max_recommendations)
     elsif params[:post_id].present?
