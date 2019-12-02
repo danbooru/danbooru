@@ -1,3 +1,0 @@
-<section class="recommended-posts user-disable-cropped-<%= Danbooru.config.enable_image_cropping && CurrentUser.user.disable_cropped_thumbnails? %>">
-  <%= PostSets::Recommended.new(@posts).presenter.post_previews_html(self) %>
-</section>

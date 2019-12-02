@@ -1,0 +1,20 @@
+<div id="c-recommended-posts">
+  <div id="a-index">
+    <h1>Recommended Posts</h1>
+
+    <%= search_form_for(recommended_posts_path) do |f| %>
+      <%= f.input :user_name, label: "User", input_html: { value: params[:search][:user_name], "data-autocomplete": "user" } %>
+      <%= f.input :post_id, label: "Post", input_html: { value: params[:search][:post_id] } %>
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render partial: "index" %>
+  </div>
+</div>
+
+<%= render "posts/partials/common/secondary_links" %>
+
+<% content_for(:page_title) do %>
+  Recommended Posts - <%= Danbooru.config.app_name %>
+<% end %>

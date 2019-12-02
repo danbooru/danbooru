@@ -1,0 +1,9 @@
+<section class="recommended-posts user-disable-cropped-<%= Danbooru.config.enable_image_cropping && CurrentUser.user.disable_cropped_thumbnails? %>">
+  <% if @recs.empty? %>
+    No recommendations found.
+  <% end %>
+
+  <% @recs.each do |rec| %>
+    <%= PostPresenter.preview(rec[:post], recommended: 100*rec[:score]) %>
+  <% end %>
+</section>

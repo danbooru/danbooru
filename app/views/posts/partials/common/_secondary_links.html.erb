@@ -3,7 +3,7 @@
   <%= subnav_link_to "Upload", new_upload_path %>
   <%= subnav_link_to "Hot", posts_path(:tags => "order:rank", :d => "1") %>
   <% if RecommenderService.available_for_user?(CurrentUser.user) %>
-    <%= subnav_link_to "Recommended", recommended_posts_path(user_id: CurrentUser.id) %>
+    <%= subnav_link_to "Recommended", recommended_posts_path(search: { user_name: CurrentUser.name }) %>
   <% end %>
   <% unless CurrentUser.is_anonymous? %>
     <%= subnav_link_to "Favorites", posts_path(tags: "ordfav:#{CurrentUser.user.name}") %>

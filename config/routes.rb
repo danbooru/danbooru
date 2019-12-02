@@ -241,7 +241,7 @@ Rails.application.routes.draw do
   get "reports/upload_tags" => "reports#upload_tags"
   get "reports/down_voting_post" => "reports#down_voting_post"
   post "reports/down_voting_post_create" => "reports#down_voting_post_create"
-  resource :recommended_posts, only: [:show]
+  resources :recommended_posts, only: [:index]
   resources :saved_searches, :except => [:show] do
     collection do
       get :labels

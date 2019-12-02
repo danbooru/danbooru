@@ -434,7 +434,7 @@ Post.initialize_post_sections = function() {
       $("#comments").hide();
       $("#edit").hide();
       $("#recommended").show();
-      $.get("/recommended_posts.js", { post_id: Utility.meta("post-id"), max_recommendations: Post.MAX_RECOMMENDATIONS });
+      $.get("/recommended_posts.js", { search: { post_id: Utility.meta("post-id") }, limit: Post.MAX_RECOMMENDATIONS });
     } else {
       $("#edit").hide();
       $("#comments").hide();

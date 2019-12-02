@@ -17,27 +17,27 @@ module RecommenderService
     enabled? && user.favorite_count > MIN_USER_FAVS
   end
 
-  def recommend_for_user(user_id, limit = 50)
-    body, status = HttpartyCache.get("#{Danbooru.config.recommender_server}/recommend/#{user_id}", params: { limit: limit }, expiry: CACHE_LIFETIME)
+  def recommend_for_user(user, limit = 50)
+    body, status = HttpartyCache.get("#{Danbooru.config.recommender_server}/recommend/#{user.id}", params: { limit: limit }, expiry: CACHE_LIFETIME)
     return [] if status != 200
 
-    process_recs(body, uploader_id: user_id, favoriter_id: user_id)
+    process_recs(body, uploader: user, favoriter: user)
   end
 
-  def recommend_for_post(post_id, limit = 50)
-    body, status = HttpartyCache.get("#{Danbooru.config.recommender_server}/similar/#{post_id}", params: { limit: limit }, expiry: CACHE_LIFETIME)
+  def recommend_for_post(post, limit = 50)
+    body, status = HttpartyCache.get("#{Danbooru.config.recommender_server}/similar/#{post.id}", params: { limit: limit }, expiry: CACHE_LIFETIME)
     return [] if status != 200
 
-    process_recs(body, post_id: post_id)
+    process_recs(body, post: post)
   end
 
-  def process_recs(recs, post_id: nil, uploader_id: nil, favoriter_id: nil)
+  def process_recs(recs, uploader: nil, favoriter: nil)
     recs = JSON.parse(recs)
 
     posts = Post.where(id: recs.map(&:first))
-    posts = posts.where.not(id: post_id) if post_id
-    posts = posts.where.not(uploader_id: uploader_id) if uploader_id
-    posts = posts.where.not(id: Favorite.where(user_id: favoriter_id).select(:post_id)) if favoriter_id
+    posts = posts.where.not(id: post.id) if post
+    posts = posts.where.not(uploader_id: uploader.id) if uploader
+    posts = posts.where.not(id: favoriter.favorites.select(:post_id)) if favoriter
 
     id_to_score = recs.to_h
     recs = posts.map { |post| { score: id_to_score[post.id], post: post } }
@@ -46,14 +46,21 @@ module RecommenderService
   end
 
   def search(params)
-    if params[:user_id].present?
+    if params[:user_name].present?
+      user = User.find_by_name(params[:user_name])
+    elsif params[:user_id].present?
       user = User.find(params[:user_id])
+    elsif params[:post_id].present?
+      post = Post.find(params[:post_id])
+    end
+
+    if user.present?
       raise User::PrivilegeError if user.hide_favorites?
       max_recommendations = params.fetch(:max_recommendations, user.favorite_count + 500).to_i.clamp(0, 50000)
-      recs = RecommenderService.recommend_for_user(params[:user_id], max_recommendations)
-    elsif params[:post_id].present?
-      max_recommendations = params.fetch(:max_recommendations, 50).to_i.clamp(0, 200)
-      recs = RecommenderService.recommend_for_post(params[:post_id], max_recommendations)
+      recs = RecommenderService.recommend_for_user(user, max_recommendations)
+    elsif post.present?
+      max_recommendations = params.fetch(:max_recommendations, 100).to_i.clamp(0, 1000)
+      recs = RecommenderService.recommend_for_post(post, max_recommendations)
     else
       recs = []
     end
