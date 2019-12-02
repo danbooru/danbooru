@@ -366,6 +366,11 @@ div#c-posts {
       margin-top: 0.5em;
     }
 
+    #recommended.loading-recommended-posts {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
     #pool-nav, #search-seq-nav, #favgroup-nav {
       li {
         position: relative;

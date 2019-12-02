@@ -9,7 +9,7 @@ let Post = {};
 Post.pending_update_count = 0;
 Post.SWIPE_THRESHOLD = 60;
 Post.SWIPE_VELOCITY = 0.6;
-Post.MAX_RECOMMENDATIONS = 27; // 3 rows of 9 posts at 1920x1080.
+Post.MAX_RECOMMENDATIONS = 45; // 3 rows of 9 posts at 1920x1080.
 
 Post.initialize_all = function() {
 
@@ -30,6 +30,7 @@ Post.initialize_all = function() {
     this.initialize_post_sections();
     this.initialize_post_image_resize_links();
     this.initialize_post_image_resize_to_window_link();
+    this.initialize_recommended();
 
     if (CurrentUser.data("always-resize-images") || (Utility.meta("viewport") && (window.screen.width <= 660))) {
       $("#image-resize-to-window-link").click();
@@ -581,6 +582,17 @@ Post.initialize_saved_searches = function() {
     e.preventDefault();
   });
 }
+
+Post.initialize_recommended = function() {
+  $(document).on("click.danbooru", ".post-preview .more-recommended-posts", async function (event) {
+    event.preventDefault();
+
+    let post_id = $(this).parents(".post-preview").data("id");
+    $("#recommended").addClass("loading-recommended-posts");
+    await $.get("/recommended_posts.js", { search: { post_id: post_id }, limit: Post.MAX_RECOMMENDATIONS });
+    $("#recommended").removeClass("loading-recommended-posts");
+  });
+};
 
 Post.update_tag_count = function(event) {
   let string = "0 tags";

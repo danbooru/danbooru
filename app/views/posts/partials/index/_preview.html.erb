@@ -32,4 +32,20 @@
       <%= link_to "#{similarity}%", iqdb_queries_path(post_id: post.id) %> similarity
     </p>
   <% end -%>
+
+  <% if recommended -%>
+    <p class="desc recommended">
+      <%= link_to recommended_posts_path(search: { post_id: post.id }), class: "more-recommended-posts", "data-post-id": post.id do %>
+        <%= post.fav_count %>
+
+        <% if post.favorited_by?(CurrentUser.id) %>
+          <i class="fas fa-heart fa-xs"></i>
+        <% else %>
+          <i class="far fa-heart fa-xs"></i>
+        <% end %>
+
+        <br>more »
+      <% end %>
+    </p>
+  <% end -%>
 <% end -%>

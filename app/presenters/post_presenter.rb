@@ -86,13 +86,19 @@ class PostPresenter < Presenter
       locals[:size] = nil
     end
 
+    if options[:recommended]
+      locals[:recommended] = options[:recommended].round(1)
+    else
+      locals[:recommended] = nil
+    end
+
     ApplicationController.render(partial: "posts/partials/index/preview", locals: locals)
   end
 
-  def self.preview_class(post, highlight_score: nil, pool: nil, size: nil, similarity: nil, compact: nil, **options)
+  def self.preview_class(post, highlight_score: nil, pool: nil, size: nil, similarity: nil, recommended: nil, compact: nil, **options)
     klass = ["post-preview"]
     # klass << " large-cropped" if post.has_cropped? && options[:show_cropped]
-    klass << "captioned" if pool || size || similarity
+    klass << "captioned" if pool || size || similarity || recommended
     klass << "post-status-pending" if post.is_pending?
     klass << "post-status-flagged" if post.is_flagged?
     klass << "post-status-deleted" if post.is_deleted?
