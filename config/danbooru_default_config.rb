@@ -630,14 +630,14 @@ module Danbooru
       "https://#{hostname}"
     end
 
-    # Cloudflare data
-    def cloudflare_email
+    # Cloudflare API token. Used to purge URLs from Cloudflare's cache when a
+    # post is replaced. The token must have 'zone.cache_purge' permissions.
+    # https://support.cloudflare.com/hc/en-us/articles/200167836-Managing-API-Tokens-and-Keys
+    def cloudflare_api_token
     end
 
+    # The Cloudflare zone ID. This is the domain that cached URLs will be purged from.
     def cloudflare_zone
-    end
-
-    def cloudflare_key
     end
 
     def recommender_server

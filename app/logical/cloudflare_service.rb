@@ -1,12 +1,12 @@
 # donmai.us specific
 
 class CloudflareService
-  def key
-    Danbooru.config.cloudflare_key
+  def enabled?
+    api_token.present? && zone.present?
   end
 
-  def email
-    Danbooru.config.cloudflare_email
+  def api_token
+    Danbooru.config.cloudflare_api_token
   end
 
   def zone
@@ -15,8 +15,7 @@ class CloudflareService
 
   def options
     Danbooru.config.httparty_options.deep_merge(headers: {
-      "X-Auth-Email" => email,
-      "X-Auth-Key" => key,
+      "Authorization" => "Bearer #{api_token}",
       "Content-Type" => "application/json",
       "User-Agent" => "#{Danbooru.config.app_name}/#{Rails.application.config.x.git_hash}"
     })
@@ -32,6 +31,8 @@ class CloudflareService
   end
 
   def delete(md5, ext)
+    return unless enabled?
+
     url = "https://api.cloudflare.com/client/v4/zones/#{zone}/purge_cache"
     files = ["#{md5}.#{ext}", "preview/#{md5}.jpg", "sample/sample-#{md5}.jpg"].map do |name|
       ["danbooru", "safebooru", "raikou1", "raikou2", "raikou3", "raikou4"].map do |subdomain|
