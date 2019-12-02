@@ -1,4 +1,4 @@
-# https://github.com/r888888888/danbooru/issues/4144
+# https://github.com/danbooru/danbooru/issues/4144
 #
 # API requests must send a user agent and must use gzip compression, otherwise
 # 403 errors will be returned.

@@ -1,9 +1,9 @@
 #!/bin/bash
 
-# Run: curl -L -s https://raw.githubusercontent.com/r888888888/danbooru/master/INSTALL.debian -o install.sh ; chmod +x install.sh ; ./install.sh
+# Run: curl -L -s https://raw.githubusercontent.com/danbooru/danbooru/master/INSTALL.debian -o install.sh ; chmod +x install.sh ; ./install.sh
 
 export RUBY_VERSION=2.6.3
-export GITHUB_INSTALL_SCRIPTS=https://raw.githubusercontent.com/r888888888/danbooru/master/script/install
+export GITHUB_INSTALL_SCRIPTS=https://raw.githubusercontent.com/danbooru/danbooru/master/script/install
 export VIPS_VERSION=8.7.0
 
 if [[ "$(whoami)" != "root" ]] ; then
@@ -156,7 +156,7 @@ curl -L -s $GITHUB_INSTALL_SCRIPTS/database.yml.templ -o /var/www/danbooru2/shar
 curl -L -s $GITHUB_INSTALL_SCRIPTS/danbooru_local_config.rb.templ -o /var/www/danbooru2/shared/config/danbooru_local_config.rb
 
 echo "* Almost done! You are now ready to deploy Danbooru onto this server."
-echo "* Log into Github and fork https://github.com/r888888888/danbooru into"
+echo "* Log into Github and fork https://github.com/danbooru/danbooru into"
 echo "* your own repository. Clone your fork onto your local development"
 echo "* machine and modify the following files:"
 echo "*"
