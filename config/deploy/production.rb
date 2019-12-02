@@ -1,5 +1,6 @@
 set :user, "danbooru"
 set :rails_env, "production"
+set :delayed_job_workers, 12
 append :linked_files, ".env.production"
 
 server "kagamihara", :roles => %w(web app cron), :primary => true
