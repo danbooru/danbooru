@@ -17,27 +17,28 @@ module RecommenderService
     enabled? && user.favorite_count > MIN_USER_FAVS
   end
 
-  def recommend_for_user(user, limit = 50)
+  def recommend_for_user(user, tags: nil, limit: 50)
     body, status = HttpartyCache.get("#{Danbooru.config.recommender_server}/recommend/#{user.id}", params: { limit: limit }, expiry: CACHE_LIFETIME)
     return [] if status != 200
 
-    process_recs(body, uploader: user, favoriter: user)
+    process_recs(body, tags: tags, uploader: user, favoriter: user)
   end
 
-  def recommend_for_post(post, limit = 50)
+  def recommend_for_post(post, tags: nil, limit: 50)
     body, status = HttpartyCache.get("#{Danbooru.config.recommender_server}/similar/#{post.id}", params: { limit: limit }, expiry: CACHE_LIFETIME)
     return [] if status != 200
 
-    process_recs(body, post: post)
+    process_recs(body, post: post, tags: tags)
   end
 
-  def process_recs(recs, uploader: nil, favoriter: nil)
+  def process_recs(recs, post: nil, uploader: nil, favoriter: nil, tags: nil)
     recs = JSON.parse(recs)
 
     posts = Post.where(id: recs.map(&:first))
     posts = posts.where.not(id: post.id) if post
     posts = posts.where.not(uploader_id: uploader.id) if uploader
     posts = posts.where.not(id: favoriter.favorites.select(:post_id)) if favoriter
+    posts = posts.where(id: Post.tag_match(tags).reorder(nil).select(:id)) if tags.present?
 
     id_to_score = recs.to_h
     recs = posts.map { |post| { score: id_to_score[post.id], post: post } }
@@ -57,10 +58,10 @@ module RecommenderService
     if user.present?
       raise User::PrivilegeError if user.hide_favorites?
       max_recommendations = params.fetch(:max_recommendations, user.favorite_count + 500).to_i.clamp(0, 50000)
-      recs = RecommenderService.recommend_for_user(user, max_recommendations)
+      recs = RecommenderService.recommend_for_user(user, tags: params[:post_tags_match], limit: max_recommendations)
     elsif post.present?
       max_recommendations = params.fetch(:max_recommendations, 100).to_i.clamp(0, 1000)
-      recs = RecommenderService.recommend_for_post(post, max_recommendations)
+      recs = RecommenderService.recommend_for_post(post, tags: params[:post_tags_match], limit: max_recommendations)
     else
       recs = []
     end
