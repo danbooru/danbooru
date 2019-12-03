@@ -13,7 +13,7 @@ div#note-container {
     cursor: pointer;
     padding: 4px;
     z-index: 150;
-    overflow: auto;
+    overflow: hidden;
   }
 
   div.note-body, div.note-box.embedded div.note-box-inner-border {
