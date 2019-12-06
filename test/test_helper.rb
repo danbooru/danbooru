@@ -12,6 +12,7 @@ require File.expand_path('../../config/environment', __FILE__)
 require 'rails/test_help'
 require 'cache'
 require 'webmock/minitest'
+require 'mocha/minitest'
 
 Dir[File.expand_path(File.dirname(__FILE__) + "/factories/*.rb")].each {|file| require file}
 Dir[File.expand_path(File.dirname(__FILE__) + "/test_helpers/*.rb")].each {|file| require file}
