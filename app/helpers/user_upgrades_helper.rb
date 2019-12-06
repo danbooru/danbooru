@@ -8,7 +8,7 @@ module UserUpgradesHelper
         <script
           src="https://checkout.stripe.com/checkout.js" class="stripe-button"
           data-key="#{Danbooru.config.stripe_publishable_key}"
-          data-name="#{Danbooru.config.app_name}"
+          data-name="#{Danbooru.config.canonical_app_name}"
           data-description="#{desc}"
           data-label="#{desc}"
           data-amount="#{cost}">

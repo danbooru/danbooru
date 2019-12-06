@@ -9,6 +9,10 @@ module Danbooru
       end
     end
 
+    def canonical_app_name
+      "Danbooru"
+    end
+
     def description
       "Find good anime art fast"
     end
@@ -451,7 +455,7 @@ module Danbooru
     # services will fail if you don't set a valid User-Agent.
     def http_headers
       {
-        "User-Agent" => "#{Danbooru.config.app_name}/#{Rails.application.config.x.git_hash}",
+        "User-Agent" => "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}",
       }
     end
 

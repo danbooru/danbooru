@@ -17,7 +17,7 @@ class CloudflareService
     Danbooru.config.httparty_options.deep_merge(headers: {
       "Authorization" => "Bearer #{api_token}",
       "Content-Type" => "application/json",
-      "User-Agent" => "#{Danbooru.config.app_name}/#{Rails.application.config.x.git_hash}"
+      "User-Agent" => "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}"
     })
   end
 
