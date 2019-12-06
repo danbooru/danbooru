@@ -398,8 +398,6 @@ ALTER TEXT SEARCH CONFIGURATION public.danbooru
 
 SET default_tablespace = '';
 
-SET default_table_access_method = heap;
-
 --
 -- Name: api_keys; Type: TABLE; Schema: public; Owner: -
 --
