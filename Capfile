@@ -17,3 +17,6 @@ require 'new_relic/recipes'
 
 # Load custom tasks from `lib/capistrano/tasks` if you have any defined
 Dir.glob('lib/capistrano/tasks/*.rake').each { |r| import r }
+
+# workaround for https://github.com/capistrano/rails/issues/235
+Rake::Task["deploy:assets:backup_manifest"].clear_actions
