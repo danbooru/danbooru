@@ -3,13 +3,13 @@
     <% if flash[:success] %>
       <h1>Congratulations!</h1>
 
-      <% if params[:user_id] %>
-        <p><%= user.name %> is now a <%= user.level_string %> level account. Thanks for supporting the site!</p>
+      <% if user != CurrentUser.user %>
+        <p><%= user.name %> is now a <%= user.level_string %> user. Thanks for supporting the site!</p>
       <% else %>
-        <p>You are now a <%= user.level_string %> level account. Thanks for supporting the site!</p>
+        <p>You are now a <%= user.level_string %> user. Thanks for supporting the site!</p>
       <% end %>
 
-      <p><%= link_to "Return to posts", posts_path %> </p>
+      <p><%= link_to "Go back to #{Danbooru.config.canonical_app_name}", "https://danbooru.donmai.us" %> to start using your new account.</p>
     <% elsif flash[:error] %>
       <h1>An error occurred!</h1>
       <p><%= flash[:error] %></p>
