@@ -13,11 +13,11 @@ class RecommendedPostsControllerTest < ActionDispatch::IntegrationTest
     context "post context" do
       setup do
         RecommenderService.stubs(:available_for_post?).returns(true)
-        RecommenderService.stubs(:recommend_for_post).returns([@post])
+        RecommenderService.stubs(:recommend_for_post).returns([{ post: @post, score: 1.0 }])
       end
 
       should "render" do
-        get_auth recommended_posts_path, @user, xhr: true, params: {context: "post", post_id: @post.id}
+        get_auth recommended_posts_path(search: { post_id: @post.id }), @user
         assert_response :success
         assert_select ".recommended-posts"
         assert_select ".recommended-posts #post_#{@post.id}"
@@ -27,11 +27,11 @@ class RecommendedPostsControllerTest < ActionDispatch::IntegrationTest
     context "user context" do
       setup do
         RecommenderService.stubs(:available_for_user?).returns(true)
-        RecommenderService.stubs(:recommend_for_user).returns([@post])
+        RecommenderService.stubs(:recommend_for_user).returns([{ post: @post, score: 1.0 }])
       end
-      
+
       should "render" do
-        get_auth recommended_posts_path, @user, params: {context: "user"}
+        get_auth recommended_posts_path(search: { user_id: @user.id }), @user
         assert_response :success
         assert_select ".recommended-posts"
         assert_select ".recommended-posts #post_#{@post.id}"
