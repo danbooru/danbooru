@@ -6,7 +6,7 @@ class SqsService
   end
 
   def enabled?
-    Danbooru.config.aws_sqs_enabled? && credentials.set? && url.present?
+    Danbooru.config.aws_credentials.set? && url.present?
   end
 
   def send_message(string, options = {})
@@ -21,17 +21,9 @@ class SqsService
   end
 
 private
-
-  def credentials
-    @credentials ||= Aws::Credentials.new(
-      Danbooru.config.aws_access_key_id,
-      Danbooru.config.aws_secret_access_key
-    )
-  end
-
   def sqs
     @sqs ||= Aws::SQS::Client.new(
-      credentials: credentials,
+      credentials: Danbooru.config.aws_credentials,
       region: Danbooru.config.aws_sqs_region
     )
   end

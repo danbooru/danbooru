@@ -437,7 +437,7 @@ module Danbooru
 
     def stripe_secret_key
     end
-    
+
     def stripe_publishable_key
     end
 
@@ -541,18 +541,7 @@ module Danbooru
     end
 
     # iqdbs options - see https://github.com/r888888888/iqdbs
-    def iqdbs_auth_key
-    end
-
     def iqdbs_server
-    end
-
-    # google api options
-    def google_api_project
-    end
-
-    def google_api_json_key_path
-      "/var/www/danbooru2/shared/config/google-key.json"
     end
 
     # AWS config options
@@ -576,25 +565,6 @@ module Danbooru
 
     def aws_ses_options
       # {:smtp_server_name => "smtp server", :user_name => "user name", :ses_smtp_user_name => "smtp user name", :ses_smtp_password => "smtp password"}
-    end
-
-    def aws_s3_enabled?
-      false
-    end
-
-    # Used for backing up images to S3. Must be changed to your own S3 bucket.
-    def aws_s3_bucket_name
-      "danbooru"
-    end
-
-    def aws_sqs_enabled?
-      false
-    end
-
-    def aws_sqs_reltagcalc_url
-    end
-
-    def aws_sqs_post_versions_url
     end
 
     def aws_sqs_region
@@ -621,7 +591,7 @@ module Danbooru
     def enable_image_cropping
       true
     end
-    
+
     # Akismet API key. Used for Dmail spam detection. http://akismet.com/signup/
     def rakismet_key
     end
@@ -641,9 +611,6 @@ module Danbooru
     end
 
     def recommender_server
-    end
-
-    def recommender_key
     end
 
     def redis_url
