@@ -134,7 +134,7 @@ class TagImplication < TagRelationship
       tries = 0
 
       begin
-        CurrentUser.scoped(approver) do
+        CurrentUser.scoped(User.system) do
           update(status: "processing")
           update_posts
           update(status: "active")
@@ -159,9 +159,7 @@ class TagImplication < TagRelationship
       Post.without_timeout do
         Post.raw_tag_match(antecedent_name).where("true /* TagImplication#update_posts */").find_each do |post|
           fixed_tags = "#{post.tag_string} #{descendant_names_string}".strip
-          CurrentUser.scoped(creator, "127.0.0.1") do
-            post.update(tag_string: fixed_tags)
-          end
+          post.update(tag_string: fixed_tags)
         end
       end
     end

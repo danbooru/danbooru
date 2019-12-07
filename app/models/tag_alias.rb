@@ -56,15 +56,15 @@ class TagAlias < TagRelationship
     tries = 0
 
     begin
-      CurrentUser.scoped(approver) do
-        update(status: "processing")
+      CurrentUser.scoped(User.system) do
+        update!(status: "processing")
         move_aliases_and_implications
         move_saved_searches
         ensure_category_consistency
         update_posts
         forum_updater.update(approval_message(approver), "APPROVED") if update_topic
         rename_wiki_and_artist
-        update(status: "active")
+        update!(status: "active")
       end
     rescue Exception => e
       if tries < 5
@@ -141,9 +141,7 @@ class TagAlias < TagRelationship
       Post.raw_tag_match(antecedent_name).find_each do |post|
         escaped_antecedent_name = Regexp.escape(antecedent_name)
         fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_antecedent_name}(?:\Z| )/, " #{consequent_name} ").strip
-        CurrentUser.scoped(creator, "127.0.0.1") do
-          post.update(tag_string: fixed_tags)
-        end
+        post.update(tag_string: fixed_tags)
       end
     end
   end
@@ -152,9 +150,7 @@ class TagAlias < TagRelationship
     antecedent_wiki = WikiPage.titled(antecedent_name).first
     if antecedent_wiki.present? 
       if WikiPage.titled(consequent_name).blank?
-        CurrentUser.scoped(creator, "127.0.0.1") do
-          antecedent_wiki.update(title: consequent_name, skip_secondary_validations: true)
-        end
+        antecedent_wiki.update!(title: consequent_name, skip_secondary_validations: true)
       else
         forum_updater.update(conflict_message)
       end
@@ -162,9 +158,7 @@ class TagAlias < TagRelationship
 
     if antecedent_tag.category == Tag.categories.artist
       if antecedent_tag.artist.present? && consequent_tag.artist.blank?
-        CurrentUser.scoped(creator, "127.0.0.1") do
-          antecedent_tag.artist.update!(name: consequent_name)
-        end
+        antecedent_tag.artist.update!(name: consequent_name)
       end
     end
   end

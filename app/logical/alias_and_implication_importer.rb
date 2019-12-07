@@ -156,7 +156,7 @@ private
           tag_implication.reject!(update_topic: false)
 
         when :mass_update
-          TagBatchChangeJob.perform_later(token[1], token[2], CurrentUser.user, CurrentUser.ip_addr)
+          TagBatchChangeJob.perform_later(token[1], token[2], User.system, "127.0.0.1")
 
         when :change_category
           tag = Tag.find_by_name(token[1])
