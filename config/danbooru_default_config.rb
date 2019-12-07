@@ -381,6 +381,16 @@ module Danbooru
       nil
     end
 
+    # DeviantArt login cookies. Login to DeviantArt and extract these from the browser.
+    # https://github.com/danbooru/danbooru/issues/4219
+    def deviantart_cookies
+      {
+        userinfo: "XXX",
+        auth_secure: "XXX",
+        auth: "XXX"
+      }.to_json
+    end
+
     def pixiv_login
       nil
     end
