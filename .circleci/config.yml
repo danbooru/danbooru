@@ -11,7 +11,7 @@ defaults: &defaults
 jobs:
   build:
     <<: *defaults
-    parallelism: 5
+    parallelism: 4
     steps:
       - checkout
       - setup_remote_docker:
