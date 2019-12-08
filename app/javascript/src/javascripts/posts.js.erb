@@ -10,6 +10,8 @@ Post.pending_update_count = 0;
 Post.SWIPE_THRESHOLD = 60;
 Post.SWIPE_VELOCITY = 0.6;
 Post.MAX_RECOMMENDATIONS = 45; // 3 rows of 9 posts at 1920x1080.
+Post.LOW_TAG_COUNT = 10;
+Post.HIGH_TAG_COUNT = 20;
 
 Post.initialize_all = function() {
 
@@ -605,13 +607,18 @@ Post.update_tag_count = function(event) {
       string = (count === 1) ? (count + " tag") : (count + " tags")
     }
   }
+
   $("#tags-container .count").html(string);
-  let klass = "smile";
-  if (count < 25) {
+  let klass = "";
+
+  if (count < Post.LOW_TAG_COUNT) {
     klass = "frown";
-  } else if (count < 35) {
+  } else if (count >= Post.LOW_TAG_COUNT && count < Post.HIGH_TAG_COUNT) {
     klass = "meh";
+  } else {
+    klass = "smile";
   }
+
   $("#tags-container .options #face").removeClass().addClass(`far fa-${klass}`);
 }
 
