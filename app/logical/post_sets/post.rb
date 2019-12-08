@@ -146,8 +146,8 @@ module PostSets
 
     def hide_from_crawler?
       return true if current_page > 1
-      return true if !is_empty_tag? && !is_simple_tag?
-      false
+      return false if is_empty_tag? || is_simple_tag? || tag_string == "order:rank"
+      true
     end
 
     def is_single_tag?
