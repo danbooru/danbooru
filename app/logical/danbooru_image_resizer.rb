@@ -5,8 +5,13 @@ module DanbooruImageResizer
   SRGB_PROFILE = "#{Rails.root}/config/sRGB.icm"
 
   # http://jcupitt.github.io/libvips/API/current/libvips-resample.html#vips-thumbnail
-  THUMBNAIL_OPTIONS = { size: :down, linear: false, auto_rotate: false, export_profile: SRGB_PROFILE, import_profile: SRGB_PROFILE }
-  CROP_OPTIONS = { linear: false, auto_rotate: false, export_profile: SRGB_PROFILE, import_profile: SRGB_PROFILE, crop: :attention }
+  if Vips.at_least_libvips?(8, 8)
+    THUMBNAIL_OPTIONS = { size: :down, linear: false, no_rotate: true, export_profile: SRGB_PROFILE, import_profile: SRGB_PROFILE }
+    CROP_OPTIONS = { linear: false, no_rotate: true, export_profile: SRGB_PROFILE, import_profile: SRGB_PROFILE, crop: :attention }
+  else
+    THUMBNAIL_OPTIONS = { size: :down, linear: false, auto_rotate: false, export_profile: SRGB_PROFILE, import_profile: SRGB_PROFILE }
+    CROP_OPTIONS = { linear: false, auto_rotate: false, export_profile: SRGB_PROFILE, import_profile: SRGB_PROFILE, crop: :attention }
+  end
 
   # http://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegsave
   JPEG_OPTIONS = { background: 255, strip: true, interlace: true, optimize_coding: true }
