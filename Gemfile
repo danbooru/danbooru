@@ -46,6 +46,8 @@ gem 'builder'
 gem 'puma'
 gem 'scenic'
 gem 'ipaddress'
+gem 'fog-core'
+gem 'fog-backblaze', require: 'fog/backblaze'
 
 # needed for looser jpeg header compat
 gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888888888/ruby-imagespec.git", :branch => "exif-fixes"
