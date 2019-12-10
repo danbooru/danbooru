@@ -109,17 +109,16 @@ class Tag < ApplicationRecord
       def regenerate_post_counts!
         sql = <<~SQL
           UPDATE tags
-          SET post_count = true_count
+          SET post_count = COALESCE(true_count, 0)
           FROM (
             SELECT tag, COUNT(*) AS true_count
             FROM posts, unnest(string_to_array(tag_string, ' ')) AS tag
             GROUP BY tag
-          ) true_counts, tags AS old_tags
+          ) true_counts
           WHERE
-            tags.name = tag
-            AND tags.post_count != true_count
-            AND old_tags.id = tags.id
-          RETURNING tags.*, old_tags.post_count AS old_post_count
+            (tags.name = tag AND tags.post_count != true_count)
+            OR tags.post_count < 0
+          RETURNING tags.*
         SQL
 
         updated_tags = Tag.find_by_sql(sql)
