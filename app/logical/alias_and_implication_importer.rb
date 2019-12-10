@@ -155,7 +155,7 @@ private
           TagBatchChangeJob.perform_later(token[1], token[2], User.system, "127.0.0.1")
 
         when :change_category
-          tag = Tag.find_by_name(token[1])
+          tag = Tag.find_or_create_by_name(token[1])
           tag.category = Tag.categories.value_for(token[2])
           tag.save
 
