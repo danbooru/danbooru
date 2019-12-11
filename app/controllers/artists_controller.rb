@@ -15,7 +15,7 @@ class ArtistsController < ApplicationController
   end
 
   def banned
-    redirect_to artists_path(search: { is_banned: "true", order: "updated_at" })
+    redirect_to artists_path(search: { is_banned: "true", order: "updated_at" }, format: request.format.symbol)
   end
 
   def ban

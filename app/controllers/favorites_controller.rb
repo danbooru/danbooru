@@ -7,11 +7,11 @@ class FavoritesController < ApplicationController
   def index
     if params[:user_id].present?
       user = User.find(params[:user_id])
-      redirect_to posts_path(tags: "ordfav:#{user.name}")
+      redirect_to posts_path(tags: "ordfav:#{user.name}", format: request.format.symbol)
     elsif CurrentUser.is_member?
-      redirect_to posts_path(tags: "ordfav:#{CurrentUser.name}")
+      redirect_to posts_path(tags: "ordfav:#{CurrentUser.name}", format: request.format.symbol)
     else
-      redirect_to posts_path
+      redirect_to posts_path(format: request.format.symbol)
     end
   end
 
