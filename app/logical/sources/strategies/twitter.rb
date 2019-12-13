@@ -16,7 +16,7 @@ module Sources::Strategies
     RESERVED_USERNAMES = %w[home i intent search]
 
     def self.enabled?
-      TwitterService.new.enabled?
+      Danbooru.config.twitter_api_key.present? && Danbooru.config.twitter_api_secret.present?
     end
 
     # https://twitter.com/i/web/status/943446161586733056
@@ -49,12 +49,20 @@ module Sources::Strategies
       if url =~ IMAGE_URL
         ["https://pbs.twimg.com/media/#{$~[:file_name]}.#{$~[:file_ext]}:orig"]
       elsif api_response.present?
-        service.image_urls(api_response)
+        api_response.dig(:extended_entities, :media).to_a.map do |media|
+          if media[:type] == "photo"
+            media[:media_url_https] + ":orig"
+          elsif media[:type].in?(["video", "animated_gif"])
+            variants = media.dig(:video_info, :variants)
+            videos = variants.select { |variant| variant[:content_type] == "video/mp4" }
+            video = videos.max_by { |video| video[:bitrate].to_i }
+            video[:url]
+          end
+        end
       else
         [url]
       end
     end
-    memoize :image_urls
 
     def preview_urls
       image_urls.map do |x|
@@ -73,9 +81,8 @@ module Sources::Strategies
     end
 
     def intent_url
-      return nil if api_response.blank?
-
-      user_id = api_response.attrs[:user][:id_str]
+      user_id = api_response.dig(:user, :id_str)
+      return nil if user_id.blank?
       "https://twitter.com/intent/user?user_id=#{user_id}"
     end
 
@@ -87,7 +94,7 @@ module Sources::Strategies
       if artist_name_from_url.present?
         artist_name_from_url
       elsif api_response.present?
-        api_response.attrs[:user][:screen_name]
+        api_response.dig(:user, :screen_name)
       else
         ""
       end
@@ -98,8 +105,7 @@ module Sources::Strategies
     end
 
     def artist_commentary_desc
-      return "" if api_response.blank?
-      api_response.attrs[:full_text]
+      api_response[:full_text].to_s
     end
 
     def normalizable_for_artist_finder?
@@ -111,22 +117,19 @@ module Sources::Strategies
     end
 
     def tags
-      return [] if api_response.blank?
-
-      api_response.attrs[:entities][:hashtags].map do |text:, indices:|
-        [text, "https://twitter.com/hashtag/#{text}"]
+      api_response.dig(:entities, :hashtags).to_a.map do |hashtag|
+        [hashtag[:text], "https://twitter.com/hashtag/#{hashtag[:text]}"]
       end
     end
-    memoize :tags
 
     def dtext_artist_commentary_desc
       return "" if artist_commentary_desc.blank?
 
-      url_replacements = api_response.urls.map do |obj|
-        [obj.url.to_s, obj.expanded_url.to_s]
+      url_replacements = api_response.dig(:entities, :urls).to_a.map do |obj|
+        [obj[:url], obj[:expanded_url]]
       end
-      url_replacements += api_response.media.map do |obj|
-        [obj.url.to_s, ""]
+      url_replacements += api_response.dig(:extended_entities, :media).to_a.map do |obj|
+        [obj[:url], ""]
       end
       url_replacements = url_replacements.to_h
 
@@ -137,30 +140,26 @@ module Sources::Strategies
       desc = desc.gsub(%r!@([a-zA-Z0-9_]+)!, '"@\\1":[https://twitter.com/\\1]')
       desc.strip
     end
-    memoize :dtext_artist_commentary_desc
 
   public
 
-    def service
-      TwitterService.new
+    def api_client
+      TwitterApiClient.new(Danbooru.config.twitter_api_key, Danbooru.config.twitter_api_secret)
     end
-    memoize :service
 
     def api_response
-      return {} if !service.enabled?
-      service.status(status_id, tweet_mode: "extended")
-    rescue ::Twitter::Error::NotFound
-      {}
+      return {} if !self.class.enabled?
+      api_client.status(status_id)
     end
-    memoize :api_response
 
     def status_id
       [url, referer_url].map {|x| self.class.status_id_from_url(x)}.compact.first
     end
-    memoize :status_id
 
     def artist_name_from_url
       [url, referer_url].map {|x| self.class.artist_name_from_url(x)}.compact.first
     end
+
+    memoize :api_response
   end
 end

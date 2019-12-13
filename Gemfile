@@ -21,7 +21,6 @@ gem 'capistrano-rbenv'
 gem 'streamio-ffmpeg'
 gem 'rubyzip', :require => "zip"
 gem 'stripe'
-gem 'twitter'
 gem 'aws-sdk-sqs', '~> 1'
 gem 'responders'
 gem 'dtext_rb', git: "https://github.com/evazion/dtext_rb.git", require: "dtext"
@@ -45,6 +44,7 @@ gem 'builder'
 gem 'puma'
 gem 'scenic'
 gem 'ipaddress'
+gem 'http'
 
 # needed for looser jpeg header compat
 gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888888888/ruby-imagespec.git", :branch => "exif-fixes"

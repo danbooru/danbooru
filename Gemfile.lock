@@ -94,7 +94,6 @@ GEM
     bcrypt (3.1.13)
     bootsnap (1.4.5)
       msgpack (~> 1.0)
-    buftok (0.2.0)
     builder (3.2.3)
     byebug (11.0.1)
     capistrano (3.11.2)
@@ -144,7 +143,6 @@ GEM
     dotenv-rails (2.7.5)
       dotenv (= 2.7.5)
       railties (>= 3.2, < 6.1)
-    equalizer (0.0.11)
     erubi (1.9.0)
     factory_bot (5.1.1)
       activesupport (>= 4.2.0)
@@ -153,21 +151,25 @@ GEM
     ffaker (2.13.0)
     ffi (1.11.3)
     ffi (1.11.3-x64-mingw32)
+    ffi-compiler (1.0.1)
+      ffi (>= 1.0.0)
+      rake
     flamegraph (0.9.5)
     get_process_mem (0.2.5)
       ffi (~> 1.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
     hashdiff (1.0.0)
-    http (3.3.0)
+    http (4.2.0)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
       http-form_data (~> 2.0)
-      http_parser.rb (~> 0.6.0)
+      http-parser (~> 1.2.0)
     http-cookie (1.0.3)
       domain_name (~> 0.5)
     http-form_data (2.1.1)
-    http_parser.rb (0.6.0)
+    http-parser (1.2.1)
+      ffi-compiler (>= 1.0, < 2.0)
     httparty (0.17.1)
       mime-types (~> 3.0)
       multi_xml (>= 0.5.2)
@@ -202,8 +204,6 @@ GEM
       ntlm-http (~> 0.1, >= 0.1.1)
       webrobots (>= 0.0.9, < 0.2)
     memoist (0.16.2)
-    memoizable (0.4.2)
-      thread_safe (~> 0.3, >= 0.3.1)
     memory_profiler (0.9.14)
     meta_request (0.7.2)
       rack-contrib (>= 1.1, < 3)
@@ -226,7 +226,6 @@ GEM
     multi_xml (0.6.0)
     multipart-post (2.1.1)
     mustermann (1.0.3)
-    naught (1.1.0)
     net-http-digest_auth (1.4.1)
     net-http-persistent (3.1.0)
       connection_pool (~> 2.2)
@@ -339,7 +338,6 @@ GEM
     simple_form (5.0.1)
       actionpack (>= 5.0)
       activemodel (>= 5.0)
-    simple_oauth (0.3.1)
     simplecov (0.17.1)
       docile (~> 1.1)
       json (>= 1.8, < 3)
@@ -368,17 +366,6 @@ GEM
     thor (0.20.3)
     thread_safe (0.3.6)
     tilt (2.0.10)
-    twitter (6.2.0)
-      addressable (~> 2.3)
-      buftok (~> 0.2.0)
-      equalizer (~> 0.0.11)
-      http (~> 3.0)
-      http-form_data (~> 2.0)
-      http_parser.rb (~> 0.6.0)
-      memoizable (~> 0.4.0)
-      multipart-post (~> 2.0)
-      naught (~> 1.0)
-      simple_oauth (~> 0.3.0)
     tzinfo (1.2.5)
       thread_safe (~> 0.1)
     unf (0.1.4)
@@ -436,6 +423,7 @@ DEPENDENCIES
   factory_bot
   ffaker
   flamegraph
+  http
   httparty
   ipaddress
   jquery-rails
@@ -479,7 +467,6 @@ DEPENDENCIES
   statistics2
   streamio-ffmpeg
   stripe
-  twitter
   unicorn
   unicorn-worker-killer
   webmock

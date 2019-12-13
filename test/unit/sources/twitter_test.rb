@@ -46,27 +46,6 @@ module Sources
       end
     end
 
-    context "A twitter summary card" do
-      setup do
-        @site = Sources::Strategies.find("https://twitter.com/NatGeo/status/932700115936178177")
-      end
-
-      should "get the image url" do
-        assert_equal("https://pmdvod.nationalgeographic.com/NG_Video/205/302/smpost_1510342850295.jpg", @site.image_url)
-      end
-    end
-
-    context "A twitter summary card from twitter" do
-      setup do
-        @site = Sources::Strategies.find("https://twitter.com/masayasuf/status/870734961778630656/photo/1")
-      end
-
-      should "get the image url" do
-        skip "Find another url, the masayasuf tweet no longer exists"
-        assert_equal("https://pbs.twimg.com/media/DBV40M2UIAAHYlt.jpg:orig", @site.image_url)
-      end
-    end
-
     context "A twitter summary card from twitter with a :large image" do
       setup do
         @site = Sources::Strategies.find("https://twitter.com/aranobu/status/817736083567820800")
@@ -267,6 +246,17 @@ module Sources
 
         assert_equal(site.site_name, "Twitter")
         assert_equal("https://pbs.twimg.com/media/C8p-gPhVoAMZupS.png:orig", site.image_url)
+      end
+    end
+
+    context "A tweet from a suspended user" do
+      should "not fail" do
+        site = Sources::Strategies.find("https://twitter.com/tanso_panz/status/1192429800717029377")
+
+        assert_equal(site.site_name, "Twitter")
+        assert_equal("tanso_panz", site.artist_name)
+        assert_equal("https://twitter.com/tanso_panz", site.profile_url)
+        assert_nil(site.image_url)
       end
     end
   end
