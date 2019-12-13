@@ -26,7 +26,7 @@ module Danbooru
     config.load_defaults 5.2
     config.active_record.schema_format = :sql
     config.encoding = "utf-8"
-    config.filter_parameters += [:password]
+    config.filter_parameters += [:password, :password_hash, :api_key]
     #config.assets.enabled = true
     #config.assets.version = '1.0'
     config.autoload_paths += %W(#{config.root}/app/presenters #{config.root}/app/logical #{config.root}/app/mailers)
