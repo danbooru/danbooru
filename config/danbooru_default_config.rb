@@ -204,12 +204,6 @@ module Danbooru
       # ~/.ssh_config or in the ssh_options param (ref: http://net-ssh.github.io/net-ssh/Net/SSH.html#method-c-start)
       # StorageManager::SFTP.new("i1.example.com", "i2.example.com", base_dir: "/mnt/backup", hierarchical: false, ssh_options: {})
 
-      # Store files in an S3 bucket. The bucket must already exist and be
-      # writable by you. Configure your S3 settings in aws_region and
-      # aws_credentials below, or in the s3_options param (ref:
-      # https://docs.aws.amazon.com/sdkforruby/api/Aws/S3/Client.html#initialize-instance_method)
-      # StorageManager::S3.new("my_s3_bucket", base_url: "https://my_s3_bucket.s3.amazonaws.com/", s3_options: {})
-
       # Select the storage method based on the post's id and type (preview, large, or original).
       # StorageManager::Hybrid.new do |id, md5, file_ext, type|
       #   ssh_options = { user: "danbooru" }
@@ -237,12 +231,6 @@ module Danbooru
       # Backup files to /mnt/backup on a remote system. Configure SSH settings
       # in ~/.ssh_config or in the ssh_options param (ref: http://net-ssh.github.io/net-ssh/Net/SSH.html#method-c-start)
       # StorageManager::SFTP.new("www.example.com", base_dir: "/mnt/backup", ssh_options: {})
-
-      # Backup files to an S3 bucket. The bucket must already exist and be
-      # writable by you. Configure your S3 settings in aws_region and
-      # aws_credentials below, or in the s3_options param (ref:
-      # https://docs.aws.amazon.com/sdkforruby/api/Aws/S3/Client.html#initialize-instance_method)
-      # StorageManager::S3.new("my_s3_bucket_name", s3_options: {})
     end
 
 #TAG CONFIGURATION

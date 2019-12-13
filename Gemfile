@@ -22,7 +22,6 @@ gem 'streamio-ffmpeg'
 gem 'rubyzip', :require => "zip"
 gem 'stripe'
 gem 'twitter'
-gem 'aws-sdk-s3', '~> 1'
 gem 'aws-sdk-sqs', '~> 1'
 gem 'responders'
 gem 'dtext_rb', git: "https://github.com/evazion/dtext_rb.git", require: "dtext"
