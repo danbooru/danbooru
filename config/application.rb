@@ -32,9 +32,15 @@ module Danbooru
     config.autoload_paths += %W(#{config.root}/app/presenters #{config.root}/app/logical #{config.root}/app/mailers)
     config.plugins = [:all]
     config.time_zone = 'Eastern Time (US & Canada)'
-    config.action_mailer.delivery_method = :smtp
-    config.action_mailer.smtp_settings = {:enable_starttls_auto => false}
-    config.action_mailer.perform_deliveries = true
+
+    if Danbooru.config.mail_delivery_method.to_sym == :smtp
+      config.action_mailer.delivery_method = :smtp
+      config.action_mailer.smtp_settings = Danbooru.config.mail_settings
+    elsif Danbooru.config.mail_delivery_method.to_sym == :sendmail
+      config.action_mailer.delivery_method = :sendmail
+      config.action_mailer.sendmail_settings = Danbooru.config.mail_settings
+    end
+
     config.log_tags = [->(req) {"PID:#{Process.pid}"}]
     config.action_controller.action_on_unpermitted_parameters = :raise
     config.force_ssl = true

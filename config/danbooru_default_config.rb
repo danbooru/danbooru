@@ -159,6 +159,22 @@ module Danbooru
       1.week.ago
     end
 
+    # https://guides.rubyonrails.org/action_mailer_basics.html#action-mailer-configuration
+    # https://guides.rubyonrails.org/configuring.html#configuring-action-mailer
+    def mail_delivery_method
+      # :smtp
+      :sendmail
+    end
+
+    def mail_settings
+      {
+        # address: "example.com",
+        # user_name: "user",
+        # password: "pass",
+        # authentication: :login
+      }
+    end
+
     # Permanently redirect all HTTP requests to HTTPS.
     #
     # https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security
@@ -559,14 +575,6 @@ module Danbooru
     end
 
     def aws_secret_access_key
-    end
-
-    def aws_ses_enabled?
-      false
-    end
-
-    def aws_ses_options
-      # {:smtp_server_name => "smtp server", :user_name => "user name", :ses_smtp_user_name => "smtp user name", :ses_smtp_password => "smtp password"}
     end
 
     def aws_sqs_region
