@@ -23,7 +23,7 @@ module Danbooru
     config.app_generators.scaffold_controller :responders_controller
 
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 5.2
+    config.load_defaults 6.0
     config.active_record.schema_format = :sql
     config.encoding = "utf-8"
     config.filter_parameters += [:password, :password_hash, :api_key]
