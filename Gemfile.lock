@@ -153,7 +153,6 @@ GEM
       railties (>= 3.2, < 6.1)
     equalizer (0.0.11)
     erubi (1.9.0)
-    excon (0.70.0)
     factory_bot (5.1.1)
       activesupport (>= 4.2.0)
     faraday (0.17.1)
@@ -162,14 +161,6 @@ GEM
     ffi (1.11.3)
     ffi (1.11.3-x64-mingw32)
     flamegraph (0.9.5)
-    fog-backblaze (0.3.0)
-      fog-core (>= 1.40, < 3)
-    fog-core (2.1.2)
-      builder
-      excon (~> 0.58)
-      formatador (~> 0.2)
-      mime-types
-    formatador (0.2.5)
     get_process_mem (0.2.5)
       ffi (~> 1.0)
     globalid (0.4.2)
@@ -453,8 +444,6 @@ DEPENDENCIES
   factory_bot
   ffaker
   flamegraph
-  fog-backblaze
-  fog-core
   httparty
   ipaddress
   jquery-rails
