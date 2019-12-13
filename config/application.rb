@@ -33,6 +33,9 @@ module Danbooru
     config.plugins = [:all]
     config.time_zone = 'Eastern Time (US & Canada)'
 
+    raise "Danbooru.config.secret_key_base not configured" if Danbooru.config.secret_key_base.blank?
+    config.secret_key_base = Danbooru.config.secret_key_base
+
     if Danbooru.config.mail_delivery_method.to_sym == :smtp
       config.action_mailer.delivery_method = :smtp
       config.action_mailer.smtp_settings = Danbooru.config.mail_settings
