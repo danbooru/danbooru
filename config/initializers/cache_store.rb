@@ -8,8 +8,8 @@ Rails.application.configure do
         url: Danbooru.config.redis_url,
         namespace: nil,
         connect_timeout:   30, # default: 20 seconds
-        write_timeout:    0.2, # default: 1 second
-        read_timeout:     0.2, # default: 1 second
+        write_timeout:    0.5, # default: 1 second
+        read_timeout:     0.5, # default: 1 second
         reconnect_attempts: 0, # default: 0
         error_handler: ->(method:, returning:, exception:) {
           DanbooruLogger.log(exception, method: method, returning: returning)
