@@ -44,6 +44,7 @@ $base_font_family: Verdana, Helvetica, sans-serif;
   text-rendering: auto;
   -webkit-font-smoothing: antialiased;
 
+  /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
   font-family: "Font Awesome 5 Free";
   font-weight: 900;
   content: $content;
