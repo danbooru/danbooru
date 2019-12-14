@@ -1,3 +1,5 @@
+require 'resolv'
+
 module Downloads
   class File
     include ActiveModel::Validations
@@ -101,7 +103,7 @@ module Downloads
   # https://www.rubydoc.info/github/jnunemaker/httparty/HTTParty/ConnectionAdapter
   class ValidatingConnectionAdapter < HTTParty::ConnectionAdapter
     def self.call(uri, options)
-      ip_addr = IPAddr.new(Resolv.getaddress(uri.hostname))
+      ip_addr = IPAddr.new(::Resolv.getaddress(uri.hostname))
 
       if Danbooru.config.banned_ip_for_download?(ip_addr)
         raise Downloads::File::Error, "Downloads from #{ip_addr} are not allowed"
