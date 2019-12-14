@@ -2,28 +2,17 @@
   <div id="a-new">
     <section>
       <h1>Sign in</h1>
-      <%= form_tag(session_path, :class => "simple_form") do %>
-        <%= hidden_field_tag "url", params[:url] %>
 
-        <div class="input">
-          <label for="name">Name</label>
-          <%= text_field_tag :name %>
-        </div>
-
-        <div class="input">
-          <label for="password">Password</label>
-          <%= password_field_tag :password %>
-        </div>
-
-        <p class="fineprint">
-          New to <%= Danbooru.config.app_name %>? <%= link_to "Create a new account", new_user_path %>.
-        </p>
-
-        <div class="input">
-          <%= submit_tag "Submit", :data => { :disable_with => "Signing in..." } %>
-        </div>
+      <%= simple_form_for(:session, url: session_path) do |f| %>
+        <%= f.input :url, as: :hidden, input_html: { value: params[:url] } %>
+        <%= f.input :name %>
+        <%= f.input :password, input_html: { autocomplete: "password" } %>
+        <%= f.submit "Login" %>
       <% end %>
-    </section>
+
+      <p class="fineprint">
+        New to <%= Danbooru.config.app_name %>? <%= link_to "Create a new account", new_user_path %>.
+      </p>
   </div>
 </div>
 
