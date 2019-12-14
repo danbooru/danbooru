@@ -59,7 +59,6 @@ Rails.application.routes.draw do
       resource :count_fixes, only: [:new, :create]
       resource :email_notification, :only => [:show, :destroy]
       resource :password_reset, :only => [:new, :create, :edit, :update]
-      resource :login_reminder, :only => [:new, :create]
       resource :deletion, :only => [:show, :destroy]
       resource :email_change, :only => [:new, :create]
       resource :dmail_filter, :only => [:edit, :update]
