@@ -101,7 +101,7 @@
 
     <% if Danbooru.config.stripe_publishable_key %>
       <% if CurrentUser.is_anonymous? %>
-        <p><%= link_to "Sign up", new_user_path %> or <%= link_to "login", new_session_path(url: new_user_upgrade_path) %> first to upgrade your account.</p>
+        <p><%= link_to "Sign up", new_user_path %> or <%= link_to "login", login_path(url: new_user_upgrade_path) %> first to upgrade your account.</p>
       <% elsif CurrentUser.safe_mode? %>
         <%= render "stripe_payment" %>
       <% else %>

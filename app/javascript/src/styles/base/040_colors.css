@@ -161,7 +161,7 @@
   --bulk-update-request-approved-color: green;
   --bulk-update-request-failed-color: red;
 
-  --sign-in-link-color: #E00;
+  --login-link-color: #E00;
   --footer-border: 1px solid #EEE;
 
   --jquery-ui-widget-content-background: var(--body-background-color);
@@ -434,7 +434,7 @@ body[data-user-theme="dark"] {
   --wiki-page-versions-diff-ins-background: var(--green-0);
 
   --low-post-count-color: var(--red-1);
-  --sign-in-link-color: var(--red-1);
+  --login-link-color: var(--red-1);
   --new-artist-color: var(--red-1);
   --remove-favorite-button: var(--red-1);
   --fetch-source-data-border: 1px solid var(--grey-4);

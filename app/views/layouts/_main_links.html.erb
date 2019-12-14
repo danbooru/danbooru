@@ -1,6 +1,6 @@
 <menu id="main-menu" class="main">
   <% if CurrentUser.is_anonymous? %>
-    <%= nav_link_to("Sign in", new_session_path) %>
+    <%= nav_link_to("Login", login_path) %>
   <% else %>
     <%= nav_link_to("My Account #{CurrentUser.dmail_count}", profile_path) %>
   <% end %>

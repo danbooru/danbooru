@@ -1,7 +1,7 @@
 <div id="c-sessions">
   <div id="a-new">
     <section>
-      <h1>Sign in</h1>
+      <h1>Login</h1>
 
       <%= simple_form_for(:session, url: session_path) do |f| %>
         <%= f.input :url, as: :hidden, input_html: { value: params[:url] } %>
@@ -17,7 +17,7 @@
 </div>
 
 <% content_for(:page_title) do %>
- Sign in - <%= Danbooru.config.app_name %>
+ Login - <%= Danbooru.config.app_name %>
 <% end %>
 
 <%= render "secondary_links" %>

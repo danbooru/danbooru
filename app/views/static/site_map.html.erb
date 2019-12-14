@@ -118,7 +118,7 @@
       <ul>
         <li><h1>Profile</h1></li>
         <% if CurrentUser.is_anonymous? %>
-          <li><%= link_to "Sign in", new_session_path %></li>
+          <li><%= link_to "Login", login_path %></li>
           <li><%= link_to "Sign up", new_user_path %></li>
         <% else %>
           <li><%= link_to "Profile", profile_path %></li>

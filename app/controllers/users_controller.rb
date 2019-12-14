@@ -17,7 +17,7 @@ class UsersController < ApplicationController
     @user = CurrentUser.user
 
     if @user.is_anonymous?
-      redirect_to new_session_path
+      redirect_to login_path(url: settings_path)
     else
       params[:action] = "edit"
       respond_with(@user, template: "users/edit")
@@ -54,7 +54,7 @@ class UsersController < ApplicationController
       params[:action] = "show"
       respond_with(@user, methods: @user.full_attributes, template: "users/show")
     elsif request.format.html?
-      redirect_to new_session_path
+      redirect_to login_path(url: profile_path)
     else
       raise ActiveRecord::RecordNotFound
     end

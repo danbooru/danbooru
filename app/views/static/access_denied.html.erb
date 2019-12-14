@@ -4,7 +4,7 @@
   You do not have permission to visit this page.
 
   <% if CurrentUser.is_anonymous? %>
-    Try <%= link_to "logging in", new_session_path(url: request.fullpath) %> or
+    Try <%= link_to "logging in", login_path(url: request.fullpath) %> or
     <%= link_to "signing up", new_user_path %>.
   <% end %>
 </p>

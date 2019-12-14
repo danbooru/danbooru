@@ -385,6 +385,8 @@ Rails.application.routes.draw do
   get "/user/show/:id" => redirect("/users/%{id}")
   get "/user/login" => redirect("/sessions/new")
   get "/user_record" => redirect {|params, req| "/user_feedbacks?search[user_id]=#{req.params[:user_id]}"}
+  get "/login", to: "sessions#new", as: :login
+  get "/logout", to: "sessions#sign_out", as: :logout
   get "/profile", to: "users#profile", as: :profile
   get "/settings", to: "users#settings", as: :settings
 
