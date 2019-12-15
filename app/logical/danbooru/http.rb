@@ -3,7 +3,7 @@ module Danbooru
     attr_accessor :cache, :http
 
     class << self
-      delegate :get, :post, :cache, :auth, :basic_auth, :headers, to: :new
+      delegate :get, :post, :delete, :cache, :auth, :basic_auth, :headers, to: :new
     end
 
     def get(url, **options)
@@ -12,6 +12,10 @@ module Danbooru
 
     def post(url, **options)
       request(:post, url, **options)
+    end
+
+    def delete(url, **options)
+      request(:delete, url, **options)
     end
 
     def cache(expiry)
@@ -41,7 +45,7 @@ module Danbooru
     end
 
     def cached_request(method, url, **options)
-      key = Cache.hash({ method: method, url: url, **options }.to_json)
+      key = Cache.hash({ method: method, url: url, headers: http.default_options.headers.to_h, **options }.to_json)
 
       cached_response = Cache.get(key, @cache) do
         response = raw_request(method, url, **options)
