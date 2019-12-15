@@ -18,22 +18,20 @@ module RecommenderService
   end
 
   def recommend_for_user(user, tags: nil, limit: 50)
-    body, status = HttpartyCache.get("#{Danbooru.config.recommender_server}/recommend/#{user.id}", params: { limit: limit }, expiry: CACHE_LIFETIME)
-    return [] if status != 200
+    response = Danbooru::Http.cache(CACHE_LIFETIME).get("#{Danbooru.config.recommender_server}/recommend/#{user.id}", params: { limit: limit })
+    return [] if rsponse.status != 200
 
-    process_recs(body, tags: tags, uploader: user, favoriter: user)
+    process_recs(response.parse, tags: tags, uploader: user, favoriter: user)
   end
 
   def recommend_for_post(post, tags: nil, limit: 50)
-    body, status = HttpartyCache.get("#{Danbooru.config.recommender_server}/similar/#{post.id}", params: { limit: limit }, expiry: CACHE_LIFETIME)
-    return [] if status != 200
+    response = Danbooru::Http.cache(CACHE_LIFETIME).get("#{Danbooru.config.recommender_server}/similar/#{post.id}", params: { limit: limit })
+    return [] if response.status != 200
 
-    process_recs(body, post: post, tags: tags)
+    process_recs(response.parse, post: post, tags: tags)
   end
 
   def process_recs(recs, post: nil, uploader: nil, favoriter: nil, tags: nil)
-    recs = JSON.parse(recs)
-
     posts = Post.where(id: recs.map(&:first))
     posts = posts.where.not(id: post.id) if post
     posts = posts.where.not(uploader_id: uploader.id) if uploader
