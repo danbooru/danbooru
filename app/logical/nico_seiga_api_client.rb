@@ -65,24 +65,19 @@ class NicoSeigaApiClient
   end
 
   def illust_xml
-    uri = "#{BASE_URL}/illust/info?id=#{illust_id}"
-    body, code = HttpartyCache.get(uri)
-    if code == 200
-      Hash.from_xml(body)
-    else
-      raise "nico seiga api call failed (code=#{code}, body=#{body})"
-    end
+    get("#{BASE_URL}/illust/info?id=#{illust_id}")
   end
-  memoize :illust_xml
 
   def artist_xml
-    uri = "#{BASE_URL}/user/info?id=#{user_id}"
-    body, code = HttpartyCache.get(uri)
-    if code == 200
-      Hash.from_xml(body)
-    else
-      raise "nico seiga api call failed (code=#{code}, body=#{body})"
-    end
+    get("#{BASE_URL}/user/info?id=#{user_id}")
   end
-  memoize :artist_xml
+
+  def get(url)
+    response = Danbooru::Http.cache(1.minute).get(url)
+    raise "nico seiga api call failed (code=#{response.code}, body=#{response.body.to_s})" if response.code != 200
+
+    Hash.from_xml(response.to_s)
+  end
+
+  memoize :artist_xml, :illust_xml
 end

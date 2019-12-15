@@ -166,17 +166,13 @@ module Sources::Strategies
       return {} unless self.class.enabled?
       return {} unless blog_name.present? && post_id.present?
 
-      body, code = HttpartyCache.get("/#{blog_name}/posts",
+      response = Danbooru::Http.cache(1.minute).get(
+        "https://api.tumblr.com/v2/blog/#{blog_name}/posts",
         params: { id: post_id, api_key: Danbooru.config.tumblr_consumer_key },
-        base_uri: "https://api.tumblr.com/v2/blog/"
       )
 
-      if code == 200
-        return JSON.parse(body, symbolize_names: true)
-      else
-        Rails.logger.debug("TumblrApiClient call failed (code=#{code}, body=#{body}, blog_name=#{blog_name}, post_id=#{post_id})")
-        return {}
-      end
+      return {} if response.code != 200
+      response.parse.with_indifferent_access
     end
     memoize :api_response
 

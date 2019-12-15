@@ -101,8 +101,8 @@ module Sources
           return {}
         end
 
-        body, code = HttpartyCache.get("/post.json", base_uri: "https://#{site_name}", params: params)
-        post = JSON.parse(body, symbolize_names: true).first
+        response = Danbooru::Http.cache(1.minute).get("https://#{site_name}/post.json", params: params)
+        post = response.parse.first&.with_indifferent_access
         post || {}
       end
       memoize :api_response

@@ -38,23 +38,23 @@ class NicoSeigaMangaApiClient
     body = NicoSeigaApiClient.agent.get(uri).body
     Hash.from_xml(body)
   end
-  memoize :theme_data_xml
 
   def theme_info_xml
     uri = "#{BASE_URL}/theme/info?id=#{theme_id}"
     body = NicoSeigaApiClient.agent.get(uri).body
     Hash.from_xml(body)
   end
-  memoize :theme_info_xml
 
   def artist_xml
-    uri = "#{BASE_URL}/user/info?id=#{user_id}"
-    body, code = HttpartyCache.get(uri)
-    if code == 200
-      Hash.from_xml(body)
-    else
-      raise "nico seiga api call failed (code=#{code}, body=#{body})"
-    end
+    get("#{BASE_URL}/user/info?id=#{user_id}")
   end
-  memoize :artist_xml
+
+  def get(url)
+    response = Danbooru::Http.cache(1.minute).get(url)
+    raise "nico seiga api call failed (code=#{response.code}, body=#{response.body.to_s})" if response.code != 200
+
+    Hash.from_xml(response.to_s)
+  end
+
+  memoize :theme_data_xml, :theme_info_xml, :artist_xml
 end

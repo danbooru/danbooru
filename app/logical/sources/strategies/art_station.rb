@@ -110,10 +110,10 @@ module Sources::Strategies
     def api_response
       return {} unless project_id.present?
 
-      resp, code = HttpartyCache.get("https://www.artstation.com/projects/#{project_id}.json")
-      return {} if code != 200
+      resp = Danbooru::Http.cache(1.minute).get("https://www.artstation.com/projects/#{project_id}.json")
+      return {} if resp.code != 200
 
-      JSON.parse(resp, symbolize_names: true)
+      resp.parse.with_indifferent_access
     end
     memoize :api_response
 
