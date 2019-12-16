@@ -1,3 +1,11 @@
+# https://marmaladica.tumblr.com/post/188237914346/saved
+# https://66.media.tumblr.com/2c6f55531618b4335c67e29157f5c1fc/tumblr_pz4a44xdVj1ssucdno1_1280.png
+# https://66.media.tumblr.com/11700cab20d65d5a6acc470e284dbd3a/tumblr_pz4a44xdVj1ssucdno2_1280.png
+#
+# https://emlan.tumblr.com/post/189469423572/kuro-attempts-to-buy-a-racy-book-at-comiket-but
+# https://66.media.tumblr.com/168dabd09d5ad69eb5fedcf94c45c31a/3dbfaec9b9e0c2e3-72/s640x960/bf33a1324f3f36d2dc64f011bfeab4867da62bc8.png
+# https://66.media.tumblr.com/5a2c3fe25c977e2281392752ab971c90/3dbfaec9b9e0c2e3-92/s500x750/4f92bbaaf95c0b4e7970e62b1d2e1415859dd659.png
+
 module Sources::Strategies
   class Tumblr < Base
     SIZES = %w[1280 640 540 500h 500 400 250 100]
@@ -7,7 +15,12 @@ module Sources::Strategies
     MD5 = %r{(?<md5>[0-9a-f]{32})}i
     FILENAME = %r{(?<filename>(tumblr_(inline_)?)?[a-z0-9]+(_r[0-9]+)?)}i
     EXT = %r{(?<ext>\w+)}
-    IMAGE = %r!\Ahttps?://#{DOMAIN}/(?<dir>#{MD5}/)?#{FILENAME}_(?<size>\w+)\.#{EXT}\z!i
+
+    # old: https://66.media.tumblr.com/2c6f55531618b4335c67e29157f5c1fc/tumblr_pz4a44xdVj1ssucdno1_1280.png
+    # new: https://66.media.tumblr.com/168dabd09d5ad69eb5fedcf94c45c31a/3dbfaec9b9e0c2e3-72/s640x960/bf33a1324f3f36d2dc64f011bfeab4867da62bc8.png
+    OLD_IMAGE = %r!\Ahttps?://#{DOMAIN}/(?<dir>#{MD5}/)?#{FILENAME}_(?<size>\w+)\.#{EXT}\z!i
+
+    IMAGE = %r!\Ahttps?://#{DOMAIN}/!i
     VIDEO = %r!\Ahttps?://(?:vtt|ve\.media)\.tumblr\.com/!i
     POST = %r!\Ahttps?://(?<blog_name>[^.]+)\.tumblr\.com/(?:post|image)/(?<post_id>\d+)!i
 
@@ -138,7 +151,7 @@ module Sources::Strategies
     # http://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg
     # => https://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg
     def find_largest(url, sizes: SIZES)
-      return url unless url =~ IMAGE
+      return url unless url =~ OLD_IMAGE
 
       candidates = sizes.map do |size|
         "https://media.tumblr.com/#{$~[:dir]}#{$~[:filename]}_#{size}.#{$~[:ext]}"

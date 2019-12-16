@@ -125,7 +125,7 @@ module Sources
           assert_equal(%w[
             https://media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_orwwptNBCE1wsfqepo1_1280.png
             https://media.tumblr.com/7c4d2c6843466f92c3dd0516e749ec35/tumblr_orwwptNBCE1wsfqepo2_1280.jpg
-            https://media.tumblr.com/d2ed224f135b0c81f812df81a0a8692d/tumblr_orwwptNBCE1wsfqepo3_1280.gif
+            https://media.tumblr.com/d2ed224f135b0c81f812df81a0a8692d/tumblr_orwwptNBCE1wsfqepo3_640.gif
             https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_inline_os3134mABB1v11u29_1280.png
             https://media.tumblr.com/34ed9d0ff4a21625981372291cb53040/tumblr_nv3hwpsZQY1uft51jo1_1280.gif
           ], site.image_urls)
@@ -215,6 +215,19 @@ module Sources
 
       should "get the canonical url" do
         assert_equal("https://noizave.tumblr.com/post/171237880542", @site.canonical_url)
+      end
+    end
+
+    context "A Tumblr post with new image URLs" do
+      should "return the correct image url" do
+        page_url = "https://emlan.tumblr.com/post/189469423572/kuro-attempts-to-buy-a-racy-book-at-comiket-but"
+        image1_url = "https://66.media.tumblr.com/168dabd09d5ad69eb5fedcf94c45c31a/3dbfaec9b9e0c2e3-72/s640x960/bf33a1324f3f36d2dc64f011bfeab4867da62bc8.png"
+        image2_url = "https://66.media.tumblr.com/5a2c3fe25c977e2281392752ab971c90/3dbfaec9b9e0c2e3-92/s540x810/cd270c29db06b5e7fdcee63114fe3eb2c9c0d590.png"
+        strategy = Sources::Strategies.find(image2_url, page_url)
+
+        assert_equal([image1_url, image2_url], strategy.image_urls)
+        assert_equal(image2_url, strategy.image_url)
+        assert_equal("https://emlan.tumblr.com/post/189469423572", strategy.canonical_url)
       end
     end
 
