@@ -1,0 +1,55 @@
+<div id="c-static">
+  <div id="a-search-timeout" class="fixed-width-container">
+    <h1>Search Timeout</h1>
+
+    <p>Your search took too long to execute and was cancelled.</p>
+
+    <h6>Why did this happen?</h6>
+
+    <p>
+      Some kinds of searches are slower than others. If your search is too slow
+      it may be cancelled. Usually this happens when your search is too
+      complex, or when there aren't many recent posts matching your search.
+    </p>
+
+    <% if params[:controller] == "posts" && params[:action] == "index" && params[:tags].present? %>
+      <h6>What can I do?</h6>
+
+      <p>Try changing your search:</p>
+
+      <p>
+        <table class="striped">
+          <tr>
+            <td><%= link_to "#{params[:tags]} age:<1month", posts_url(tags: "#{params[:tags]} age:<1month") %></td>
+            <td>Search recent posts only.</td>
+          </tr>
+          <tr>
+            <td><%= link_to "#{params[:tags]} order:score", posts_url(tags: "#{params[:tags]} order:score") %></td>
+            <td>Order by score instead of by date.</td>
+          </tr>
+          <tr>
+            <td><%= link_to "#{params[:tags]} limit:5", posts_url(tags: "#{params[:tags]} limit:5") %></td>
+            <td>Show fewer posts per page.</td>
+          </tr>
+        </table>
+      </p>
+    <% end %>
+
+    <% if !CurrentUser.is_gold? %>
+      <h6>Search limits</h6>
+
+      <p>
+        Members are limited to searches that take up to 3 seconds long. You can
+        <%= link_to "upgrade your account", new_user_upgrade_path %> to increase
+        your search limit. Gold users can do searches that take up to 6 seconds
+        long, and Platinum users can go up to 9 seconds.
+      </p>
+    <% end %>
+
+    <%= link_to "Go back", :back, rel: "prev" %>
+  </div>
+</div>
+
+<% content_for(:page_title) do %>
+  Search Timeout - <%= Danbooru.config.app_name %>
+<% end %>
