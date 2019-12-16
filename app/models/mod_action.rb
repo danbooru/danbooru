@@ -54,29 +54,26 @@ class ModAction < ApplicationRecord
     other: 2000
   }
 
+  def self.permitted(user)
+    if user.is_moderator?
+      all
+    else
+      where.not(category: [:ip_ban_create, :ip_ban_delete])
+    end
+  end
+
   def self.search(params)
     q = super
 
+    q = q.permitted(CurrentUser.user)
     q = q.search_attributes(params, :creator, :category, :description)
     q = q.text_attribute_matches(:description, params[:description_matches])
 
     q.apply_default_order(params)
   end
 
-  def filtered_description
-    if (ip_ban_create? || ip_ban_delete?) && !CurrentUser.user.is_moderator?
-      description.gsub(/(created|deleted) ip ban for .*/, "\\1 ip ban")
-    else
-      description
-    end
-  end
-
   def category_id
     self.class.categories[category]
-  end
-
-  def serializable_hash(*args)
-    super(*args).merge("description" => filtered_description)
   end
 
   def self.log(desc, cat = :other)
