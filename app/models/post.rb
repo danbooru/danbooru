@@ -1095,16 +1095,16 @@ class Post < ApplicationRecord
       # quantities being off by a few hundred doesn't matter much
       if Danbooru.config.estimate_post_counts
         if tags == ""
-          return (Post.maximum(:id) * (2200402.0 / 2232212)).floor
+          return (Post.maximum(:id).to_i * (2200402.0 / 2232212)).floor
 
         elsif tags =~ /^rating:s(?:afe)?$/
-          return (Post.maximum(:id) * (1648652.0 / 2200402)).floor
+          return (Post.maximum(:id).to_i * (1648652.0 / 2200402)).floor
 
         elsif tags =~ /^rating:q(?:uestionable)?$/
-          return (Post.maximum(:id) * (350101.0 / 2200402)).floor
+          return (Post.maximum(:id).to_i * (350101.0 / 2200402)).floor
 
         elsif tags =~ /^rating:e(?:xplicit)?$/
-          return (Post.maximum(:id) * (201650.0 / 2200402)).floor
+          return (Post.maximum(:id).to_i * (201650.0 / 2200402)).floor
 
         end
       end
