@@ -164,14 +164,9 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_equal("xyz", @wiki_page.body)
       end
 
-      should "not rename a wiki page with a non-empty tag" do
-        put_auth wiki_page_path(@wiki_page), @user, params: {:wiki_page => {:title => "bar"}}
-        assert_equal("foo", @wiki_page.reload.title)
-      end
-
-      should "rename a wiki page with a non-empty tag if secondary validations are skipped" do
-        put_auth wiki_page_path(@wiki_page), @mod, params: {:wiki_page => {:title => "bar", :skip_secondary_validations => "1"}}
-        assert_equal("bar", @wiki_page.reload.title)
+      should "warn about renaming a wiki page with a non-empty tag" do
+        put_auth wiki_page_path(@wiki_page), @mod, params: { wiki_page: { title: "bar" }}
+        assert_match(/still has 42 posts/, flash[:notice])
       end
 
       should "not allow non-Builders to delete wiki pages" do

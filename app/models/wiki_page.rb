@@ -13,7 +13,6 @@ class WikiPage < ApplicationRecord
   validate :validate_rename
   validate :validate_not_locked
 
-  attr_accessor :skip_secondary_validations
   array_attribute :other_names
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, -> {where(:is_active => true)}, :foreign_key => "name", :primary_key => "title"
@@ -62,6 +61,10 @@ class WikiPage < ApplicationRecord
       where(title: Tag.search(params).select(:name).reorder(nil))
     end
 
+    def linked_to(title)
+      where(id: DtextLink.wiki_page.wiki_link.where(link_target: title).select(:model_id))
+    end
+
     def default_order
       order(updated_at: :desc)
     end
@@ -85,7 +88,7 @@ class WikiPage < ApplicationRecord
       end
 
       if params[:linked_to].present?
-        q = q.where(id: DtextLink.wiki_page.wiki_link.where(link_target: params[:linked_to]).select(:model_id))
+        q = q.linked_to(params[:linked_to])
       end
 
       if params[:hide_deleted].to_s.truthy?
@@ -121,11 +124,17 @@ class WikiPage < ApplicationRecord
   end
 
   def validate_rename
-    return if !will_save_change_to_title? || skip_secondary_validations
+    return unless title_changed?
 
     tag_was = Tag.find_by_name(Tag.normalize_name(title_was))
     if tag_was.present? && tag_was.post_count > 0
-      errors.add(:title, "cannot be changed: '#{tag_was.name}' still has #{tag_was.post_count} posts. Move the posts and update any wikis linking to this page first.")
+      warnings[:base] << %Q!Warning: {{#{title_was}}} still has #{tag_was.post_count} #{"post".pluralize(tag_was.post_count)}. Be sure to move the posts!
+    end
+
+    broken_wikis = WikiPage.linked_to(title_was)
+    if broken_wikis.count > 0
+      broken_wiki_search = Rails.application.routes.url_helpers.wiki_pages_path(search: { linked_to: title_was })
+      warnings[:base] << %Q!Warning: [[#{title_was}]] is still linked from "#{broken_wikis.count} #{"other wiki page".pluralize(broken_wikis.count)}":[#{broken_wiki_search}]. Update #{broken_wikis.count > 1 ? "these wikis" : "this wiki"} to link to [[#{title}]] instead!
     end
   end
 
@@ -159,10 +168,6 @@ class WikiPage < ApplicationRecord
 
   def self.normalize_other_name(name)
     name.unicode_normalize(:nfkc).gsub(/[[:space:]]+/, " ").strip.tr(" ", "_")
-  end
-
-  def skip_secondary_validations=(value)
-    @skip_secondary_validations = value.to_s.truthy?
   end
 
   def category_name

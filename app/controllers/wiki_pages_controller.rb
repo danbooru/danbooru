@@ -52,6 +52,8 @@ class WikiPagesController < ApplicationController
   def update
     @wiki_page, _ = WikiPage.find_by_id_or_title(params[:id])
     @wiki_page.update(wiki_page_params(:update))
+    flash[:notice] = @wiki_page.warnings.full_messages.join(".\n \n") if @wiki_page.warnings.any?
+
     respond_with(@wiki_page)
   end
 
@@ -87,7 +89,7 @@ class WikiPagesController < ApplicationController
   end
 
   def wiki_page_params(context)
-    permitted_params = %i[body other_names other_names_string skip_secondary_validations]
+    permitted_params = %i[body other_names other_names_string]
     permitted_params += %i[is_locked is_deleted] if CurrentUser.is_builder?
     permitted_params += %i[title] if context == :create || CurrentUser.is_builder?
 

@@ -20,10 +20,6 @@
       <%= f.input :is_locked, :label => "Locked" %>
     <% end %>
 
-    <% if @wiki_page.errors[:title].present?  %>
-      <%= f.input :skip_secondary_validations, as: :boolean, label: "Force rename", hint: "Ignore the renaming requirements" %>
-    <% end %>
-
     <%= f.submit "Submit" %>
     <%= dtext_preview_button "wiki_page", "body" %>
   <% end %>
