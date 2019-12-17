@@ -19,7 +19,7 @@ module RecommenderService
 
   def recommend_for_user(user, tags: nil, limit: 50)
     response = Danbooru::Http.cache(CACHE_LIFETIME).get("#{Danbooru.config.recommender_server}/recommend/#{user.id}", params: { limit: limit })
-    return [] if rsponse.status != 200
+    return [] if response.status != 200
 
     process_recs(response.parse, tags: tags, uploader: user, favoriter: user)
   end
