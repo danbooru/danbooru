@@ -1,10 +1,8 @@
 <%= simple_form_for(@artist) do |f| %>
   <% if @artist.new_record? %>
     <%= f.input :name, as: :string, input_html: { data: { autocomplete: "tag" } } %>
-  <% elsif CurrentUser.user.is_builder? %>
-    <%= f.input :name, as: :string, input_html: { data: { autocomplete: "tag" } }, hint: "Change to rename this artist entry and its wiki page" %>
   <% else %>
-    <p><%= @artist.name %></p>
+    <%= f.input :name, as: :string, input_html: { data: { autocomplete: "tag" } }, hint: "Change to rename this artist entry and its wiki page" %>
   <% end %>
 
   <%= f.input :other_names_string, label: "Other names", as: :text, input_html: { size: "50x1" }, hint: '<b style="color: red;">NEW</b> Separate names with spaces, not commas. Use underscores for spaces inside names.'.html_safe %>

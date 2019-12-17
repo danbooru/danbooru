@@ -15,7 +15,7 @@
       <%= subnav_link_to "Edit", edit_artist_path(@artist), :"data-shortcut" => "e" %>
     <% end %>
     <%= subnav_link_to "History", artist_versions_path(:search => {:artist_id => @artist.id}) %>
-    <% if @artist.deletable_by?(CurrentUser.user) %>
+    <% if CurrentUser.is_member? %>
       <% if @artist.is_active? %>
         <%= subnav_link_to "Delete", artist_path(@artist), method: :delete, "data-shortcut": "shift+d", "data-confirm": "Are you sure you want to delete this artist?" %>
       <% else %>
@@ -25,7 +25,6 @@
     <% if CurrentUser.is_admin? %>
       <% if @artist.is_banned? %>
         <%= subnav_link_to "Unban", unban_artist_path(@artist), :method => :put, :data => {:confirm => "Are you sure you want to unban this artist?"} %>
-
       <% else %>
         <%= subnav_link_to "Ban", ban_artist_path(@artist), :method => :put, :data => {:confirm => "Are you sure you want to ban this artist?"} %>
       <% end %>

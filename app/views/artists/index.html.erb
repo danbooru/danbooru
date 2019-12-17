@@ -40,14 +40,14 @@
               <%= time_ago_in_words_tagged(artist.updated_at) %>
             </td>
             <td>
-              <% if artist.editable_by?(CurrentUser.user) %>
+              <% if CurrentUser.is_member? %>
                 <%= link_to "Edit", edit_artist_path(artist) %>
-              <% end %>
 
-              <% if artist.is_active? && artist.deletable_by?(CurrentUser.user) %>
-                | <%= link_to "Delete", artist_path(artist, artist: { is_active: false }), method: :put, remote: true %>
-              <% elsif !artist.is_active? && artist.deletable_by?(CurrentUser.user) %>
-                | <%= link_to "Undelete", artist_path(artist, artist: { is_active: true }), method: :put, remote: true %>
+                <% if artist.is_active? %>
+                  | <%= link_to "Delete", artist_path(artist, artist: { is_active: false }), method: :put, remote: true %>
+                <% else %>
+                  | <%= link_to "Undelete", artist_path(artist, artist: { is_active: true }), method: :put, remote: true %>
+                <% end %>
               <% end %>
             </td>
           <% end %>
