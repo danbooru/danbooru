@@ -1,7 +1,6 @@
 class WikiPagesController < ApplicationController
   respond_to :html, :xml, :json, :js
   before_action :member_only, :except => [:index, :search, :show, :show_or_new]
-  before_action :builder_only, :only => [:destroy]
   before_action :normalize_search_params, :only => [:index]
   layout "sidebar"
 
@@ -89,9 +88,8 @@ class WikiPagesController < ApplicationController
   end
 
   def wiki_page_params(context)
-    permitted_params = %i[body other_names other_names_string]
-    permitted_params += %i[is_locked is_deleted] if CurrentUser.is_builder?
-    permitted_params += %i[title] if context == :create || CurrentUser.is_builder?
+    permitted_params = %i[title body other_names other_names_string is_deleted]
+    permitted_params += %i[is_locked] if CurrentUser.is_builder?
 
     params.fetch(:wiki_page, {}).permit(permitted_params)
   end

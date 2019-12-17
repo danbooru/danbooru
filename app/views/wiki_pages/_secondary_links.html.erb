@@ -15,11 +15,12 @@
     <%= subnav_link_to "History", wiki_page_versions_path(:search => {:wiki_page_id => @wiki_page.id}) %>
     <% if CurrentUser.is_member? %>
       <%= subnav_link_to "Edit", edit_wiki_page_path(@wiki_page.id), "data-shortcut": "e" %>
-    <% end %>
-    <% if CurrentUser.is_builder? && @wiki_page.is_deleted? %>
-      <%= subnav_link_to "Undelete", wiki_page_path(@wiki_page.id), remote: true, method: :put, "data-params": "wiki_page[is_deleted]=false", "data-shortcut": "shift+d" %>
-    <% elsif CurrentUser.is_builder? && !@wiki_page.is_deleted? %>
-      <%= subnav_link_to "Delete", wiki_page_path(@wiki_page.id), remote: true, method: :put, "data-params": "wiki_page[is_deleted]=true", "data-shortcut": "shift+d" %>
+
+      <% if @wiki_page.is_deleted? %>
+        <%= subnav_link_to "Undelete", wiki_page_path(@wiki_page.id), remote: true, method: :put, "data-params": "wiki_page[is_deleted]=false", "data-shortcut": "shift+d" %>
+      <% else %>
+        <%= subnav_link_to "Delete", wiki_page_path(@wiki_page.id), remote: true, method: :put, "data-params": "wiki_page[is_deleted]=true", "data-shortcut": "shift+d" %>
+      <% end %>
     <% end %>
   <% elsif @wiki_page_version %>
     <li>|</li>

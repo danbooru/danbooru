@@ -168,11 +168,6 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         put_auth wiki_page_path(@wiki_page), @mod, params: { wiki_page: { title: "bar" }}
         assert_match(/still has 42 posts/, flash[:notice])
       end
-
-      should "not allow non-Builders to delete wiki pages" do
-        put_auth wiki_page_path(@wiki_page), @user, params: {wiki_page: { is_deleted: true }}
-        assert_equal(false, @wiki_page.reload.is_deleted?)
-      end
     end
 
     context "destroy action" do
