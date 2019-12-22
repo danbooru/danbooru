@@ -1,7 +1,6 @@
 module TagRelationshipRetirementService
-  THRESHOLD = 2.year
-
-  extend self
+  module_function
+  THRESHOLD = 2.years
 
   def forum_topic_title
     return "Retired tag aliases & implications"

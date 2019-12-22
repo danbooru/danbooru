@@ -9,7 +9,7 @@ module RelatedTagCalculator
     tags = frequent_tags_for_search(tag_query, search_sample_size: search_sample_size, category: category).limit(tag_sample_size)
     tags = tags.sort_by do |tag|
       # cosine distance(tag1, tag2) = 1 - {{tag1 tag2}} / sqrt({{tag1}} * {{tag2}})
-      1 - tag.overlap_count / (Math.sqrt(tag.post_count * search_count.to_f))
+      1 - tag.overlap_count / Math.sqrt(tag.post_count * search_count.to_f)
     end
 
     tags

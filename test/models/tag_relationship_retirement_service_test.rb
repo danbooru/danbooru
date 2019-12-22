@@ -68,8 +68,7 @@ class TagRelationshipRetirementServiceTest < ActiveSupport::TestCase
     end
 
     should "return false if a recent post exists" do
-      refute(subject.is_unused?("bbb"))      
+      refute(subject.is_unused?("bbb"))
     end
   end
 end
-

@@ -54,7 +54,7 @@ module PaginationHelper
     else
       html << numbered_paginator_item(1, records.current_page)
       html << numbered_paginator_item("...", records.current_page)
-      if records.size > 0
+      if records.present?
         right_window = records.current_page + window
       else
         right_window = records.current_page
@@ -62,13 +62,13 @@ module PaginationHelper
       (records.current_page - window).upto(right_window) do |page|
         html << numbered_paginator_item(page, records.current_page)
       end
-      if records.size > 0
+      if records.present?
         html << numbered_paginator_item("...", records.current_page)
         html << numbered_paginator_final_item(records.total_pages, records.current_page)
       end
     end
 
-    if records.current_page < records.total_pages && records.size > 0
+    if records.current_page < records.total_pages && records.present?
       html << "<li class='arrow'>" + link_to(content_tag(:i, nil, class: "fas fa-chevron-right"), nav_params_for(records.current_page + 1), rel: "next", id: "paginator-next", "data-shortcut": "d right") + "</li>"
     else
       html << "<li class='arrow'><span>" + content_tag(:i, nil, class: "fas fa-chevron-right") + "</span></li>"
@@ -93,7 +93,7 @@ module PaginationHelper
     if page == "..."
       html << "<li class='more'>"
       html << content_tag(:i, nil, class: "fas fa-ellipsis-h")
-      html << "</li>"      
+      html << "</li>"
     elsif page == current_page
       html << "<li class='current-page'>"
       html << '<span>' + page.to_s + '</span>'

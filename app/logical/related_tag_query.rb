@@ -68,7 +68,7 @@ class RelatedTagQuery
     }
   end
 
-protected
+  protected
 
   def tags_with_categories(list_of_tag_names)
     Tag.categories_for(list_of_tag_names).to_a

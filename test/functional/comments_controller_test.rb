@@ -185,7 +185,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    context "create action"do
+    context "create action" do
       should "create a comment" do
         assert_difference("Comment.count", 1) do
           post_auth comments_path, @user, params: {comment: FactoryBot.attributes_for(:comment, post_id: @post.id)}

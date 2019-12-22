@@ -94,9 +94,7 @@ class Ban < ApplicationRecord
     @duration = dur
   end
 
-  def duration
-    @duration
-  end
+  attr_reader :duration
 
   def humanized_duration
     ApplicationController.helpers.distance_of_time_in_words(created_at, expires_at)

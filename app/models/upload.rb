@@ -1,7 +1,7 @@
 require "tmpdir"
 
 class Upload < ApplicationRecord
-  class Error < Exception ; end
+  class Error < Exception; end
 
   class FileValidator < ActiveModel::Validator
     def validate(record)
@@ -54,7 +54,6 @@ class Upload < ApplicationRecord
     end
   end
 
-
   attr_accessor :as_pending, :replaced_post, :file
   belongs_to :uploader, :class_name => "User"
   belongs_to :post, optional: true
@@ -64,7 +63,7 @@ class Upload < ApplicationRecord
   validate :uploader_is_not_limited, on: :create
   # validates :source, format: { with: /\Ahttps?/ }, if: ->(record) {record.file.blank?}, on: :create
   validates :rating, inclusion: { in: %w(q e s) }, allow_nil: true
-  validates :md5, confirmation: true, if: -> (rec) { rec.md5_confirmation.present? }
+  validates :md5, confirmation: true, if: ->(rec) { rec.md5_confirmation.present? }
   validates_with FileValidator, on: :file
   serialize :context, JSON
 

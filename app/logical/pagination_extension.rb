@@ -1,5 +1,5 @@
 module PaginationExtension
-  class PaginationError < Exception ; end
+  class PaginationError < Exception; end
 
   attr_accessor :current_page, :records_per_page, :paginator_count, :paginator_mode
 

@@ -23,15 +23,15 @@ class ForumPost < ApplicationRecord
   before_destroy :validate_topic_is_unlocked
   after_save :delete_topic_if_original_post
   after_update(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |rec|
-    ModAction.log("#{CurrentUser.name} updated forum ##{rec.id}",:forum_post_update)
+    ModAction.log("#{CurrentUser.name} updated forum ##{rec.id}", :forum_post_update)
   end
   after_destroy(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |rec|
-    ModAction.log("#{CurrentUser.name} deleted forum ##{rec.id}",:forum_post_delete)
+    ModAction.log("#{CurrentUser.name} deleted forum ##{rec.id}", :forum_post_delete)
   end
   mentionable(
-    :message_field => :body, 
+    :message_field => :body,
     :title => ->(user_name) {%{#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})}},
-    :body => ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[/forum_topics/#{topic_id}?page=#{forum_topic_page}]):\n\n[quote]\n#{DText.excerpt(body, "@"+user_name)}\n[/quote]\n}},
+    :body => ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[/forum_topics/#{topic_id}?page=#{forum_topic_page}]):\n\n[quote]\n#{DText.excerpt(body, "@" + user_name)}\n[/quote]\n}}
   )
 
   module SearchMethods
@@ -173,11 +173,11 @@ class ForumPost < ApplicationRecord
     max = ForumPost.where(:topic_id => topic.id, :is_deleted => false).order("updated_at desc").first
     if max
       ForumTopic.where(:id => topic.id).update_all(["response_count = response_count - 1, updated_at = ?, updater_id = ?", max.updated_at, max.updater_id])
-      topic.response_count -= 1
     else
       ForumTopic.where(:id => topic.id).update_all("response_count = response_count - 1")
-      topic.response_count -= 1
     end
+
+    topic.response_count -= 1
   end
 
   def initialize_is_deleted
@@ -189,7 +189,7 @@ class ForumPost < ApplicationRecord
   end
 
   def forum_topic_page
-    ((ForumPost.where("topic_id = ? and created_at <= ?", topic_id, created_at).count) / Danbooru.config.posts_per_page.to_f).ceil
+    (ForumPost.where("topic_id = ? and created_at <= ?", topic_id, created_at).count / Danbooru.config.posts_per_page.to_f).ceil
   end
 
   def is_original_post?(original_post_id = nil)

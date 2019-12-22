@@ -1,5 +1,5 @@
 class WikiPage < ApplicationRecord
-  class RevertError < Exception ; end
+  class RevertError < Exception; end
 
   META_WIKIS = ["list_of_", "tag_group:", "pool_group:", "howto:", "about:", "help:", "template:"]
 
@@ -128,13 +128,13 @@ class WikiPage < ApplicationRecord
 
     tag_was = Tag.find_by_name(Tag.normalize_name(title_was))
     if tag_was.present? && tag_was.post_count > 0
-      warnings[:base] << %Q!Warning: {{#{title_was}}} still has #{tag_was.post_count} #{"post".pluralize(tag_was.post_count)}. Be sure to move the posts!
+      warnings[:base] << %!Warning: {{#{title_was}}} still has #{tag_was.post_count} #{"post".pluralize(tag_was.post_count)}. Be sure to move the posts!
     end
 
     broken_wikis = WikiPage.linked_to(title_was)
     if broken_wikis.count > 0
       broken_wiki_search = Rails.application.routes.url_helpers.wiki_pages_path(search: { linked_to: title_was })
-      warnings[:base] << %Q!Warning: [[#{title_was}]] is still linked from "#{broken_wikis.count} #{"other wiki page".pluralize(broken_wikis.count)}":[#{broken_wiki_search}]. Update #{broken_wikis.count > 1 ? "these wikis" : "this wiki"} to link to [[#{title}]] instead!
+      warnings[:base] << %!Warning: [[#{title_was}]] is still linked from "#{broken_wikis.count} #{"other wiki page".pluralize(broken_wikis.count)}":[#{broken_wiki_search}]. Update #{(broken_wikis.count > 1) ? "these wikis" : "this wiki"} to link to [[#{title}]] instead!
     end
   end
 

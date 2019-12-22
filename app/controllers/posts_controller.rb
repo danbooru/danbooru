@@ -58,7 +58,7 @@ class PostsController < ApplicationController
     if @post.visible?
       @post.revert_to!(@version)
     end
-    
+
     respond_with(@post) do |format|
       format.js
     end
@@ -68,7 +68,7 @@ class PostsController < ApplicationController
     @post = Post.find(params[:id])
     @other_post = Post.find(params[:other_post_id].to_i)
     @post.copy_notes_to(@other_post)
-    
+
     if @post.errors.any?
       @error_message = @post.errors.full_messages.join("; ")
       render :json => {:success => false, :reason => @error_message}.to_json, :status => 400
@@ -91,7 +91,7 @@ class PostsController < ApplicationController
     respond_with_post_after_update(@post)
   end
 
-private
+  private
 
   def tag_query
     params[:tags] || (params[:post] && params[:post][:tags])
@@ -109,7 +109,7 @@ private
           render :template => "static/error", :status => 500
         else
           response_params = {:q => params[:tags_query], :pool_id => params[:pool_id], :favgroup_id => params[:favgroup_id]}
-          response_params.reject!{|key, value| value.blank?}
+          response_params.reject! {|key, value| value.blank?}
           redirect_to post_path(post, response_params)
         end
       end

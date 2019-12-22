@@ -64,7 +64,7 @@ module Moderator
           end
         end
 
-        context "for notes"do
+        context "for notes" do
           setup do
             as(@user) do
               @post = create(:post)

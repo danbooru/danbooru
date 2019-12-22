@@ -1,5 +1,5 @@
 class StorageManager::Local < StorageManager
-  DEFAULT_PERMISSIONS = 0644
+  DEFAULT_PERMISSIONS = 0o644
 
   def store(io, dest_path)
     temp_path = dest_path + "-" + SecureRandom.uuid + ".tmp"

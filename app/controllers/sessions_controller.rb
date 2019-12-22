@@ -28,6 +28,6 @@ class SessionsController < ApplicationController
   end
 
   def sign_out
-    destroy()
+    destroy
   end
 end

@@ -51,9 +51,9 @@ class UserPresenter
     slots_tooltip = "Next free slot: #{template.time_ago_in_words(user.next_free_upload_slot)}"
     limit_tooltip = <<-EOS.strip_heredoc
       Base: #{user.base_upload_limit}
-      Del. Rate: #{"%.2f" % user.adjusted_deletion_confidence}
-      Multiplier: (1 - (#{"%.2f" % user.adjusted_deletion_confidence} / 15)) = #{user.upload_limit_multiplier}
-      Upload Limit: #{user.base_upload_limit} * #{"%.2f" % user.upload_limit_multiplier} = #{user.max_upload_limit}
+      Del. Rate: #{format("%.2f", user.adjusted_deletion_confidence)}
+      Multiplier: (1 - (#{format("%.2f", user.adjusted_deletion_confidence)} / 15)) = #{user.upload_limit_multiplier}
+      Upload Limit: #{user.base_upload_limit} * #{format("%.2f", user.upload_limit_multiplier)} = #{user.max_upload_limit}
     EOS
 
     %{<abbr title="#{slots_tooltip}">#{user.used_upload_slots}</abbr> / <abbr title="#{limit_tooltip}">#{user.max_upload_limit}</abbr>}.html_safe
@@ -164,7 +164,7 @@ class UserPresenter
       []
     end
   end
-  
+
   def previous_names(template)
     user.user_name_change_requests.map { |req| template.link_to req.original_name, req }.join(", ").html_safe
   end

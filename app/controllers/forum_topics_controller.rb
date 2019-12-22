@@ -93,13 +93,12 @@ class ForumTopicsController < ApplicationController
 
   def unsubscribe
     subscription = ForumSubscription.where(:forum_topic_id => @forum_topic.id, :user_id => CurrentUser.user.id).first
-    if subscription
-      subscription.destroy
-    end
+    subscription&.destroy
     respond_with(@forum_topic)
   end
 
-private
+  private
+
   def normalize_search
     if params[:title_matches]
       params[:search] ||= {}

@@ -33,5 +33,4 @@ class PostReplacement < ApplicationRecord
     tags = tags.map { |tag| "-#{tag}" }
     tags.join(" ")
   end
-
 end

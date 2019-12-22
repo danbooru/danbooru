@@ -5,7 +5,7 @@ app_path = "/var/www/danbooru2/current"
 worker_processes 20
 
 timeout 180
-#listen "127.0.0.1:9000", :tcp_nopush => true
+# listen "127.0.0.1:9000", :tcp_nopush => true
 listen "/tmp/.unicorn.sock", :backlog => 512
 
 # Spawn unicorn master worker for user apps (group: apps)
@@ -41,7 +41,7 @@ run_once = true
 before_fork do |server, worker|
   # the following is highly recomended for Rails + "preload_app true"
   # as there's no need for the master process to hold a connection
-  defined?(ActiveRecord::Base) and ActiveRecord::Base.connection.disconnect!
+  defined?(ActiveRecord::Base) && ActiveRecord::Base.connection.disconnect!
 
   # Occasionally, it may be necessary to run non-idempotent code in the
   # master before forking.  Keep in mind the above disconnect! example

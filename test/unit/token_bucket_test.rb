@@ -24,7 +24,7 @@ class TokenBucketTest < ActiveSupport::TestCase
     should "work" do
       @user.token_bucket.consume!
       assert_operator(@user.token_bucket.token_count, :<, 1)
-      @user.reload     
+      @user.reload
       assert_operator(@user.token_bucket.token_count, :<, 1)
     end
   end

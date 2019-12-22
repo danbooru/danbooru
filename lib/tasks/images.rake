@@ -16,7 +16,7 @@ namespace :images do
     upload.generate_resizes(post.file_path)
     post.distribute_files
   end
-    
+
   desc "Generate thumbnail-sized images of posts"
   task :generate_preview => :environment do
     width = 150
@@ -33,7 +33,7 @@ namespace :images do
       end
     end
   end
-  
+
   desc "Generate large-sized images of posts"
   task :generate_large => :environment do
     post_id = ENV["id"]
@@ -51,4 +51,3 @@ namespace :images do
     end
   end
 end
-

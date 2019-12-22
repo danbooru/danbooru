@@ -93,7 +93,7 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
           original_title: "  foo\u00A0\t\n",
           original_description: " foo\u00A0\t\n",
           translated_title: "  foo\u00A0\t\n",
-          translated_description: "  foo\u00A0\n",
+          translated_description: "  foo\u00A0\n"
         )
 
         assert_equal("foo", @artcomm.original_title)

@@ -120,7 +120,7 @@ class AliasAndImplicationImporter
     end
   end
 
-private
+  private
 
   def parse(tokens, approver)
     ActiveRecord::Base.transaction do

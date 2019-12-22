@@ -130,8 +130,6 @@ module Sources
       end
       memoize :tags
 
-    public
-
       def api_client
         if illust_id
           NicoSeigaApiClient.new(illust_id: illust_id)

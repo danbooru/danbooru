@@ -8,14 +8,14 @@ if ENV["SIMPLECOV"]
   end
 end
 
-require File.expand_path('../../config/environment', __FILE__)
+require File.expand_path('../config/environment', __dir__)
 require 'rails/test_help'
 require 'cache'
 require 'webmock/minitest'
 require 'mocha/minitest'
 
-Dir[File.expand_path(File.dirname(__FILE__) + "/factories/*.rb")].each {|file| require file}
-Dir[File.expand_path(File.dirname(__FILE__) + "/test_helpers/*.rb")].each {|file| require file}
+Dir[File.expand_path(File.dirname(__FILE__) + "/factories/*.rb")].sort.each {|file| require file}
+Dir[File.expand_path(File.dirname(__FILE__) + "/test_helpers/*.rb")].sort.each {|file| require file}
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|

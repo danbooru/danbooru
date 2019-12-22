@@ -46,11 +46,11 @@ class SavedSearch < ApplicationRecord
   concerning :Labels do
     class_methods do
       def normalize_label(label)
-        label.
-          to_s.
-          strip.
-          downcase.
-          gsub(/[[:space:]]/, "_")
+        label
+          .to_s
+          .strip
+          .downcase
+          .gsub(/[[:space:]]/, "_")
       end
 
       def search_labels(user_id, params)
@@ -67,17 +67,15 @@ class SavedSearch < ApplicationRecord
       end
 
       def labels_for(user_id)
-        SavedSearch.
-          where(user_id: user_id).
-          order("label").
-          pluck(Arel.sql("distinct unnest(labels) as label"))
+        SavedSearch
+          .where(user_id: user_id)
+          .order("label")
+          .pluck(Arel.sql("distinct unnest(labels) as label"))
       end
     end
 
     def normalize_labels
-      self.labels = labels.
-        map {|x| SavedSearch.normalize_label(x)}.
-        reject {|x| x.blank?}
+      self.labels = labels.map {|x| SavedSearch.normalize_label(x)}.reject(&:blank?)
     end
 
     def label_string
@@ -137,13 +135,13 @@ class SavedSearch < ApplicationRecord
   concerning :Queries do
     class_methods do
       def queries_for(user_id, label: nil, options: {})
-        SavedSearch.
-          where(user_id: user_id).
-          labeled(label).
-          pluck(:query).
-          map {|x| Tag.normalize_query(x, sort: true)}.
-          sort.
-          uniq
+        SavedSearch
+          .where(user_id: user_id)
+          .labeled(label)
+          .pluck(:query)
+          .map {|x| Tag.normalize_query(x, sort: true)}
+          .sort
+          .uniq
       end
     end
 
@@ -156,7 +154,7 @@ class SavedSearch < ApplicationRecord
     end
   end
 
-  attr_accessor :disable_labels
+  attr_reader :disable_labels
   belongs_to :user
   validates :query, presence: true
   validate :validate_count

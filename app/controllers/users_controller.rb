@@ -99,7 +99,7 @@ class UsersController < ApplicationController
   private
 
   def check_privilege(user)
-    raise User::PrivilegeError unless (user.id == CurrentUser.id || CurrentUser.is_admin?)
+    raise User::PrivilegeError unless user.id == CurrentUser.id || CurrentUser.is_admin?
   end
 
   def user_params(context)

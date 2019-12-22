@@ -1,7 +1,7 @@
-# This is a collection of strategies for extracting information about a 
-# resource. At a minimum it tries to extract the artist name and a canonical 
-# URL to download the image from. But it can also be used to normalize a URL 
-# for use with the artist finder. 
+# This is a collection of strategies for extracting information about a
+# resource. At a minimum it tries to extract the artist name and a canonical
+# URL to download the image from. But it can also be used to normalize a URL
+# for use with the artist finder.
 #
 # Design Principles
 #
@@ -24,11 +24,11 @@ module Sources
         true
       end
 
-      # * <tt>url</tt> - Should point to a resource suitable for 
-      #   downloading. This may sometimes point to the binary file. 
+      # * <tt>url</tt> - Should point to a resource suitable for
+      #   downloading. This may sometimes point to the binary file.
       #   It may also point to the artist's profile page, in cases
       #   where this class is being used to normalize artist urls.
-      #   Implementations should be smart enough to detect this and 
+      #   Implementations should be smart enough to detect this and
       #   behave accordingly.
       # * <tt>referer_url</tt> - Sometimes the HTML page cannot be
       #   determined from <tt>url</tt>. You should generally pass in a
@@ -63,9 +63,9 @@ module Sources
         nil
       end
 
-      # Whatever <tt>url</tt> is, this method should return the direct links 
-      # to the canonical binary files. It should not be an HTML page. It should 
-      # be a list of JPEG, PNG, GIF, WEBM, MP4, ZIP, etc. It is what the 
+      # Whatever <tt>url</tt> is, this method should return the direct links
+      # to the canonical binary files. It should not be an HTML page. It should
+      # be a list of JPEG, PNG, GIF, WEBM, MP4, ZIP, etc. It is what the
       # downloader will fetch and save to disk.
       def image_urls
         raise NotImplementedError
@@ -269,7 +269,7 @@ module Sources
             :tag_name => tag_name,
             :other_names => other_names,
             :profile_url => profile_url,
-            :profile_urls => profile_urls,
+            :profile_urls => profile_urls
           },
           :artists => artists.as_json(include: :sorted_urls),
           :image_url => image_url,
@@ -284,17 +284,15 @@ module Sources
             :title => artist_commentary_title,
             :description => artist_commentary_desc,
             :dtext_title => dtext_artist_commentary_title,
-            :dtext_description => dtext_artist_commentary_desc,
+            :dtext_description => dtext_artist_commentary_desc
           },
-          :api_response => api_response.to_h,
+          :api_response => api_response.to_h
         }
       end
 
-      def to_json
+      def to_json(*_args)
         to_h.to_json
       end
-
-    protected
 
       def http_exists?(url, headers)
         res = HTTParty.head(url, Danbooru.config.httparty_options.deep_merge(headers: headers))
@@ -306,7 +304,7 @@ module Sources
       def self.to_dtext(text)
         text = text.to_s
         text = Rails::Html::FullSanitizer.new.sanitize(text, encode_special_chars: false)
-        text = CGI::unescapeHTML(text)
+        text = CGI.unescapeHTML(text)
         text
       end
     end

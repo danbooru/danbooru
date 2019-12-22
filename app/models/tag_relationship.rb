@@ -16,13 +16,13 @@ class TagRelationship < ApplicationRecord
   has_one :antecedent_wiki, through: :antecedent_tag, source: :wiki_page
   has_one :consequent_wiki, through: :consequent_tag, source: :wiki_page
 
-  scope :active, ->{approved}
-  scope :approved, ->{where(status: %w[active processing queued])}
-  scope :deleted, ->{where(status: "deleted")}
-  scope :expired, ->{where("created_at < ?", EXPIRY.days.ago)}
-  scope :old, ->{where("created_at >= ? and created_at < ?", EXPIRY.days.ago, EXPIRY_WARNING.days.ago)}
-  scope :pending, ->{where(status: "pending")}
-  scope :retired, ->{where(status: "retired")}
+  scope :active, -> {approved}
+  scope :approved, -> {where(status: %w[active processing queued])}
+  scope :deleted, -> {where(status: "deleted")}
+  scope :expired, -> {where("created_at < ?", EXPIRY.days.ago)}
+  scope :old, -> {where("created_at >= ? and created_at < ?", EXPIRY.days.ago, EXPIRY_WARNING.days.ago)}
+  scope :pending, -> {where(status: "pending")}
+  scope :retired, -> {where(status: "retired")}
 
   before_validation :initialize_creator, :on => :create
   before_validation :normalize_names

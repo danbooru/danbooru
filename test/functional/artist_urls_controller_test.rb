@@ -12,7 +12,7 @@ class ArtistUrlsControllerTest < ActionDispatch::IntegrationTest
         @artist = FactoryBot.create(:artist, name: "bkub", url_string: "-http://bkub.com")
 
         get artist_urls_path(search: {
-          artist: { name: "bkub", },
+          artist: { name: "bkub" },
           url_matches: "*bkub*",
           is_active: "false",
           order: "created_at"

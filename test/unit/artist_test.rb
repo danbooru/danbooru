@@ -39,7 +39,7 @@ class ArtistTest < ActiveSupport::TestCase
       @artist = Artist.create(name: "blah", url_string: "-http://monet.com\nhttp://monet.com")
       assert_equal(1, @artist.urls.count)
       assert_equal(["-http://monet.com"], @artist.urls.map(&:to_s))
-      refute(@artist.urls[0].is_active?)      
+      refute(@artist.urls[0].is_active?)
     end
 
     should "allow deactivating a url" do
@@ -237,7 +237,7 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding pixiv artists" do
       setup do
-        FactoryBot.create(:artist, :name => "masao",:url_string => "http://www.pixiv.net/member.php?id=32777")
+        FactoryBot.create(:artist, :name => "masao", :url_string => "http://www.pixiv.net/member.php?id=32777")
         FactoryBot.create(:artist, :name => "bkub", :url_string => "http://www.pixiv.net/member.php?id=9948")
         FactoryBot.create(:artist, :name => "ryuura", :url_string => "http://www.pixiv.net/member.php?id=8678371")
       end
@@ -297,7 +297,7 @@ class ArtistTest < ActiveSupport::TestCase
       setup do
         skip "Twitter key is not set" unless Danbooru.config.twitter_api_key
         FactoryBot.create(:artist, :name => "hammer_(sunset_beach)", :url_string => "http://twitter.com/hamaororon")
-        FactoryBot.create(:artist, :name => "haruyama_kazunori",  :url_string => "https://twitter.com/kazuharoom")
+        FactoryBot.create(:artist, :name => "haruyama_kazunori", :url_string => "https://twitter.com/kazuharoom")
       end
 
       should "find the correct artist for twitter.com sources" do

@@ -3,7 +3,7 @@
 # API requests must send a user agent and must use gzip compression, otherwise
 # 403 errors will be returned.
 
-class DeviantArtApiClient < Struct.new(:deviation_id)
+DeviantArtApiClient = Struct.new(:deviation_id) do
   extend Memoist
 
   def extended_fetch

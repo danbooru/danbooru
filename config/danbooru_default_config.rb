@@ -1,4 +1,6 @@
 module Danbooru
+  module_function
+
   class Configuration
     # A secret key used to encrypt session cookies, among other things. If this
     # token is changed, existing login sessions will become invalid. If this
@@ -136,7 +138,7 @@ module Danbooru
 
     # Return true if the given tag shouldn't count against the user's tag search limit.
     def is_unlimited_tag?(tag)
-      !!(tag =~ /\A(-?status:deleted|rating:s.*|limit:.+)\z/i)
+      tag.match?(/\A(-?status:deleted|rating:s.*|limit:.+)\z/i)
     end
 
     # After this many pages, the paginator will switch to sequential mode.
@@ -195,8 +197,8 @@ module Danbooru
         hsts: {
           expires: 1.year,
           preload: true,
-          subdomains: false,
-        },
+          subdomains: false
+        }
       }
     end
 
@@ -224,7 +226,7 @@ module Danbooru
       # base_url - where to serve files from (default: http://#{hostname}/data)
       # hierarchical: false - store files in a single directory
       # hierarchical: true - store files in a hierarchical directory structure, based on the MD5 hash
-      StorageManager::Local.new(base_url: "#{CurrentUser.root_url}/data", base_dir: "#{Rails.root}/public/data", hierarchical: false)
+      StorageManager::Local.new(base_url: "#{CurrentUser.root_url}/data", base_dir: Rails.root.join("/public/data"), hierarchical: false)
 
       # Store files on one or more remote host(s). Configure SSH settings in
       # ~/.ssh_config or in the ssh_options param (ref: http://net-ssh.github.io/net-ssh/Net/SSH.html#method-c-start)
@@ -259,9 +261,9 @@ module Danbooru
       # StorageManager::SFTP.new("www.example.com", base_dir: "/mnt/backup", ssh_options: {})
     end
 
-#TAG CONFIGURATION
+    # TAG CONFIGURATION
 
-    #Full tag configuration info for all tags
+    # Full tag configuration info for all tags
     def full_tag_config_info
       @full_tag_category_mapping ||= {
         "general" => {
@@ -322,24 +324,24 @@ module Danbooru
       }
     end
 
-#TAG ORDERS
+    # TAG ORDERS
 
-    #Sets the order of the split tag header list (presenters/tag_set_presenter.rb)
+    # Sets the order of the split tag header list (presenters/tag_set_presenter.rb)
     def split_tag_header_list
-      @split_tag_header_list ||= ["copyright","character","artist","general","meta"]
+      @split_tag_header_list ||= ["copyright", "character", "artist", "general", "meta"]
     end
 
-    #Sets the order of the categorized tag string (presenters/post_presenter.rb)
+    # Sets the order of the categorized tag string (presenters/post_presenter.rb)
     def categorized_tag_list
-      @categorized_tag_list ||= ["copyright","character","artist","meta","general"]
+      @categorized_tag_list ||= ["copyright", "character", "artist", "meta", "general"]
     end
 
-    #Sets the order of the related tag buttons (javascripts/related_tag.js)
+    # Sets the order of the related tag buttons (javascripts/related_tag.js)
     def related_tag_button_list
-      @related_tag_button_list ||= ["general","artist","character","copyright"]
+      @related_tag_button_list ||= ["general", "artist", "character", "copyright"]
     end
 
-#END TAG
+    # END TAG
 
     # Any custom code you want to insert into the default layout without
     # having to modify the templates.
@@ -377,7 +379,7 @@ module Danbooru
     end
 
     def can_user_see_post?(user, post)
-     if is_user_restricted?(user) && is_post_restricted?(post)
+      if is_user_restricted?(user) && is_post_restricted?(post)
         false
       else
         true
@@ -479,7 +481,7 @@ module Danbooru
     # services will fail if you don't set a valid User-Agent.
     def http_headers
       {
-        "User-Agent" => "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}",
+        "User-Agent" => "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}"
       }
     end
 
@@ -487,7 +489,7 @@ module Danbooru
       # proxy example:
       # {http_proxyaddr: "", http_proxyport: "", http_proxyuser: nil, http_proxypass: nil}
       {
-        headers: Danbooru.config.http_headers,
+        headers: Danbooru.config.http_headers
       }
     end
 
@@ -646,17 +648,11 @@ module Danbooru
     def method_missing(method, *args)
       var = ENV["DANBOORU_#{method.to_s.upcase.chomp("?")}"]
 
-      if var.present?
-        var
-      else
-        custom_configuration.send(method, *args)
-      end
+      var.presence || custom_configuration.send(method, *args)
     end
   end
 
   def config
-    @configuration ||= EnvironmentConfiguration.new
+    @config ||= EnvironmentConfiguration.new
   end
-
-  module_function :config
 end

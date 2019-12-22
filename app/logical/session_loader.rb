@@ -1,5 +1,5 @@
 class SessionLoader
-  class AuthenticationFailure < Exception ; end
+  class AuthenticationFailure < Exception; end
 
   attr_reader :session, :cookies, :request, :params
 
@@ -37,7 +37,7 @@ class SessionLoader
     request.authorization.present? || params[:login].present? || params[:api_key].present? || params[:password_hash].present?
   end
 
-private
+  private
 
   def set_statement_timeout
     timeout = CurrentUser.user.statement_timeout

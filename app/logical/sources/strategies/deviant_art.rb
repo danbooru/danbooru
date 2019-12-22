@@ -57,8 +57,6 @@ module Sources
       PATH_PROFILE = %r{\Ahttps?://(www\.)?deviantart\.com/#{ARTIST}/?\z}i
       SUBDOMAIN_PROFILE = %r{\Ahttps?://#{ARTIST}\.deviantart\.com/?\z}i
 
-      attr_accessor :api_client
-
       def domains
         ["deviantart.net", "deviantart.com"]
       end
@@ -210,8 +208,6 @@ module Sources
           end
         end.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
       end
-
-    public
 
       def self.deviation_id_from_url(url)
         if url =~ ASSET

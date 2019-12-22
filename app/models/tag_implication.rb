@@ -144,7 +144,7 @@ class TagImplication < TagRelationship
       rescue Exception => e
         if tries < 5
           tries += 1
-          sleep 2 ** tries
+          sleep 2**tries
           retry
         end
 
@@ -170,22 +170,22 @@ class TagImplication < TagRelationship
     end
 
     def create_mod_action
-      implication = %Q("tag implication ##{id}":[#{Rails.application.routes.url_helpers.tag_implication_path(self)}]: [[#{antecedent_name}]] -> [[#{consequent_name}]])
+      implication = %("tag implication ##{id}":[#{Rails.application.routes.url_helpers.tag_implication_path(self)}]: [[#{antecedent_name}]] -> [[#{consequent_name}]])
 
       if saved_change_to_id?
-        ModAction.log("created #{status} #{implication}",:tag_implication_create)
+        ModAction.log("created #{status} #{implication}", :tag_implication_create)
       else
         # format the changes hash more nicely.
         change_desc = saved_changes.except(:updated_at).map do |attribute, values|
           old, new = values[0], values[1]
           if old.nil?
-            %Q(set #{attribute} to "#{new}")
+            %(set #{attribute} to "#{new}")
           else
-            %Q(changed #{attribute} from "#{old}" to "#{new}")
+            %(changed #{attribute} from "#{old}" to "#{new}")
           end
         end.join(", ")
 
-        ModAction.log("updated #{implication}\n#{change_desc}",:tag_implication_update)
+        ModAction.log("updated #{implication}\n#{change_desc}", :tag_implication_update)
       end
     end
 
@@ -196,8 +196,8 @@ class TagImplication < TagRelationship
         nil
       end
       ForumUpdater.new(
-        forum_topic, 
-        forum_post: post, 
+        forum_topic,
+        forum_post: post,
         expected_title: "Tag implication: #{antecedent_name} -> #{consequent_name}",
         skip_update: !TagRelationship::SUPPORT_HARD_CODED
       )

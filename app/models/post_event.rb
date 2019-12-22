@@ -58,7 +58,7 @@ class PostEvent
       "created_at": nil,
       "reason": nil,
       "is_resolved": nil,
-      "type": nil,
+      "type": nil
     }
   end
 

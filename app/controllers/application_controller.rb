@@ -16,13 +16,13 @@ class ApplicationController < ActionController::Base
 
   rescue_from Exception, :with => :rescue_exception
 
-  protected
-
   def self.rescue_with(*klasses, status: 500)
-    rescue_from *klasses do |exception|
+    rescue_from(*klasses) do |exception|
       render_error_page(status, exception)
     end
   end
+
+  protected
 
   def enable_cors
     response.headers["Access-Control-Allow-Origin"] = "*"
@@ -61,7 +61,7 @@ class ApplicationController < ActionController::Base
     when ActionController::RoutingError
       render_error_page(405, exception)
     when ActionController::UnknownFormat, ActionView::MissingTemplate
-      render_error_page(406, exception, message: "#{request.format.to_s} is not a supported format for this page")
+      render_error_page(406, exception, message: "#{request.format} is not a supported format for this page")
     when PaginationExtension::PaginationError
       render_error_page(410, exception, template: "static/pagination_error", message: "You cannot go beyond page #{Danbooru.config.max_numbered_pages}.")
     when Post::SearchError
@@ -80,7 +80,7 @@ class ApplicationController < ActionController::Base
   def render_error_page(status, exception, message: exception.message, template: "static/error", format: request.format.symbol)
     @exception = exception
     @expected = status < 500
-    @message = message.encode("utf-8", { invalid: :replace, undef: :replace })
+    @message = message.encode("utf-8", invalid: :replace, undef: :replace)
     @backtrace = Rails.backtrace_cleaner.clean(@exception.backtrace)
     format = :html unless format.in?(%i[html json xml js atom])
 

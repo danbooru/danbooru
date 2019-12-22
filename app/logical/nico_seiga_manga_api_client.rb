@@ -51,7 +51,7 @@ class NicoSeigaMangaApiClient
 
   def get(url)
     response = Danbooru::Http.cache(1.minute).get(url)
-    raise "nico seiga api call failed (code=#{response.code}, body=#{response.body.to_s})" if response.code != 200
+    raise "nico seiga api call failed (code=#{response.code}, body=#{response.body})" if response.code != 200
 
     Hash.from_xml(response.to_s)
   end

@@ -59,6 +59,5 @@ class APNGInspectorTest < ActiveSupport::TestCase
       assert_equal(false, apng.animated?)
       assert_equal(true, apng.corrupted?)
     end
-
   end
 end

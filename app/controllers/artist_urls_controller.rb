@@ -5,7 +5,7 @@ class ArtistUrlsController < ApplicationController
   def index
     @artist_urls = ArtistUrl.includes(:artist).paginated_search(params)
     respond_with(@artist_urls) do |format|
-      format.json { render json: @artist_urls.to_json(include: "artist",) }
+      format.json { render json: @artist_urls.to_json(include: "artist") }
       format.xml { render xml: @artist_urls.to_xml(include: "artist", root: "artist-urls") }
     end
   end
@@ -16,7 +16,7 @@ class ArtistUrlsController < ApplicationController
     respond_with(@artist_url)
   end
 
-private
+  private
 
   def artist_url_params
     permitted_params = %i[is_active]

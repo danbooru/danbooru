@@ -5,7 +5,7 @@ class CreateKeyValues < ActiveRecord::Migration[4.2]
       t.text :value
       t.timestamps
     end
-    
+
     add_index :key_values, :key, :unique => true
   end
 end

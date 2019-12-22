@@ -120,9 +120,11 @@ module Sources
       def tags
         links = page&.search("div#view-tag a") || []
 
-        links.select do |node|
+        search_links = links.select do |node|
           node["href"] =~ /search\.php/
-        end.map do |node|
+        end
+
+        search_links.map do |node|
           [node.inner_text, "https://nijie.info" + node.attr("href")]
         end
       end
@@ -130,8 +132,6 @@ module Sources
       def tag_name
         "nijie" + artist_id.to_s
       end
-
-    public
 
       def self.to_dtext(text)
         text = text.to_s.gsub(/\r\n|\r/, "<br>")
@@ -196,7 +196,7 @@ module Sources
               form['password'] = Danbooru.config.nijie_password
             end.click_button
           end
-          session = mech.cookie_jar.cookies.select{|c| c.name == "NIJIEIJIEID"}.first
+          session = mech.cookie_jar.cookies.select {|c| c.name == "NIJIEIJIEID"}.first
           Cache.put("nijie-session", session.value, 1.day) if session
         end
 
@@ -207,7 +207,6 @@ module Sources
         mech.cookie_jar.add(cookie)
 
         mech
-
       rescue Mechanize::ResponseCodeError => x
         if x.response_code.to_i == 429
           sleep(5)

@@ -1,8 +1,8 @@
 class CreatePostApprovals < ActiveRecord::Migration[4.2]
   def change
     create_table :post_approvals do |t|
-    	t.integer :user_id, null: false
-    	t.integer :post_id, null: false
+      t.integer :user_id, null: false
+      t.integer :post_id, null: false
       t.timestamps null: false
     end
 

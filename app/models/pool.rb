@@ -1,5 +1,5 @@
 class Pool < ApplicationRecord
-  class RevertError < Exception ; end
+  class RevertError < Exception; end
   POOL_ORDER_LIMIT = 1000
 
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
@@ -188,11 +188,11 @@ class Pool < ApplicationRecord
   end
 
   def create_mod_action_for_delete
-    ModAction.log("deleted pool ##{id} (name: #{name})",:pool_delete)
+    ModAction.log("deleted pool ##{id} (name: #{name})", :pool_delete)
   end
 
   def create_mod_action_for_undelete
-    ModAction.log("undeleted pool ##{id} (name: #{name})",:pool_undelete)
+    ModAction.log("undeleted pool ##{id} (name: #{name})", :pool_undelete)
   end
 
   def add!(post)

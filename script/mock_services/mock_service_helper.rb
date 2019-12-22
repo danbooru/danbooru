@@ -3,11 +3,11 @@ require 'timeout'
 require 'httparty'
 
 module MockServiceHelper
-  extend self
+  module_function
 
   DANBOORU_PORT = 3000
 
-  def fetch_post_ids()
+  def fetch_post_ids
     begin
       s = TCPSocket.new("localhost", DANBOORU_PORT)
       s.close

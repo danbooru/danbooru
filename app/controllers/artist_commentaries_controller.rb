@@ -34,7 +34,7 @@ class ArtistCommentariesController < ApplicationController
     @artist_commentary.revert_to!(@version)
   end
 
-private
+  private
 
   def commentary_params
     params.fetch(:artist_commentary, {}).except(:post_id).permit(%i[

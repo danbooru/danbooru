@@ -23,8 +23,8 @@ class PixivApiClient
     VistaPro Sculptris Comi\ Po! modo DAZ\ Studio 3D-Coat
   ]
 
-  class Error < Exception ; end
-  class BadIDError < Error ; end
+  class Error < Exception; end
+  class BadIDError < Error; end
 
   class WorkResponse
     attr_reader :json, :pages, :name, :moniker, :user_id, :page_count, :tags
@@ -93,7 +93,7 @@ class PixivApiClient
     end
 
     def pages
-      # ex: 
+      # ex:
       # https://i.pximg.net/c/150x150_80/novel-cover-master/img/2017/07/27/23/14/17/8465454_80685d10e6df4d7d53ad347ddc18a36b_master1200.jpg (6096b)
       # =>
       # https://i.pximg.net/novel-cover-original/img/2017/07/27/23/14/17/8465454_80685d10e6df4d7d53ad347ddc18a36b.jpg (532129b)
@@ -101,7 +101,8 @@ class PixivApiClient
     end
     memoize :pages
 
-  public
+    public
+
     PXIMG = %r!\Ahttps?://i\.pximg\.net/c/\d+x\d+_\d+/novel-cover-master/img/(?<timestamp>\d+/\d+/\d+/\d+/\d+/\d+)/(?<filename>\d+_[a-f0-9]+)_master\d+\.(?<ext>jpg|jpeg|png|gif)!i
 
     def find_original(x)
@@ -123,7 +124,7 @@ class PixivApiClient
     def name
       json["body"]["user"]["name"]
     end
-    
+
     def user_id
       json["body"]["user"]["userId"]
     end
@@ -177,11 +178,10 @@ class PixivApiClient
     elsif json["status"] == "failure" && json.dig("errors", "system", "message") =~ /対象のイラストは見つかりませんでした。/
       raise BadIDError.new("Pixiv ##{illust_id} not found: work was deleted, made private, or ID is invalid.")
     else
-      raise Error.new("Pixiv API call failed (status=#{response.code} body=#{response.body.to_s})")
+      raise Error.new("Pixiv API call failed (status=#{response.code} body=#{response.body})")
     end
-
   rescue JSON::ParserError
-    raise Error.new("Pixiv API call failed (status=#{response.code} body=#{response.body.to_s})")
+    raise Error.new("Pixiv API call failed (status=#{response.code} body=#{response.body})")
   end
 
   def fanbox(fanbox_id)
@@ -228,14 +228,14 @@ class PixivApiClient
       headers = {
         "Referer": "http://www.pixiv.net",
         "X-Client-Time": client_time,
-        "X-Client-Hash": client_hash,
+        "X-Client-Hash": client_hash
       }
       params = {
         username: Danbooru.config.pixiv_login,
         password: Danbooru.config.pixiv_password,
         grant_type: "password",
         client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET,
+        client_secret: CLIENT_SECRET
       }
       url = "https://oauth.secure.pixiv.net/auth/token"
 

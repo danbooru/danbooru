@@ -7,7 +7,7 @@ Post.where("image_width > 850").find_each do |post|
     next
   end
 
-  if !File.exists?(post.file_path)
+  if !File.exist?(post.file_path)
     puts "NOT FOUND: #{post.id}"
     next
   end
@@ -19,7 +19,7 @@ Post.where("image_width > 850").find_each do |post|
 
   resize = false
 
-  if !File.exists?(post.large_file_path)
+  if !File.exist?(post.large_file_path)
     puts "LARGE NOT FOUND: #{post.id}"
     resize = true
   end

@@ -25,7 +25,7 @@ class PostPrunerTest < ActiveSupport::TestCase
 
   def teardown
     super
-    
+
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
   end

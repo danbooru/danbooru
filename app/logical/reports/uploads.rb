@@ -14,7 +14,7 @@ module Reports
       else
         @max_date = Date.today
       end
-      
+
       @queries = queries.to_s.split(/,\s*/).join(",")
     end
 

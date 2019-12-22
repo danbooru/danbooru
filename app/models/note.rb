@@ -1,5 +1,5 @@
 class Note < ApplicationRecord
-  class RevertError < Exception ; end
+  class RevertError < Exception; end
 
   attr_accessor :html_id
   belongs_to :post

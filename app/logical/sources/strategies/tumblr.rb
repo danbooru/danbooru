@@ -131,8 +131,6 @@ module Sources::Strategies
       DText.from_html(artist_commentary_desc).strip
     end
 
-  public
-
     # Look for the biggest available version on media.tumblr.com. A bigger
     # version may or may not exist.
     #
@@ -181,7 +179,7 @@ module Sources::Strategies
 
       response = Danbooru::Http.cache(1.minute).get(
         "https://api.tumblr.com/v2/blog/#{blog_name}/posts",
-        params: { id: post_id, api_key: Danbooru.config.tumblr_consumer_key },
+        params: { id: post_id, api_key: Danbooru.config.tumblr_consumer_key }
       )
 
       return {} if response.code != 200

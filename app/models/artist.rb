@@ -1,6 +1,6 @@
 class Artist < ApplicationRecord
   extend Memoist
-  class RevertError < Exception ; end
+  class RevertError < Exception; end
 
   attr_accessor :url_string_changed
   array_attribute :other_names
@@ -140,7 +140,7 @@ class Artist < ApplicationRecord
         "youtube.com/c", # https://www.youtube.com/c/serafleurArt
         "youtube.com/channel", # https://www.youtube.com/channel/UCfrCa2Y6VulwHD3eNd3HBRA
         "youtube.com/user", # https://www.youtube.com/user/148nasuka
-        "youtu.be", # http://youtu.be/gibeLKKRT-0
+        "youtu.be" # http://youtu.be/gibeLKKRT-0
       ]
 
       SITE_BLACKLIST_REGEXP = Regexp.union(SITE_BLACKLIST.map do |domain|
@@ -213,13 +213,13 @@ class Artist < ApplicationRecord
 
     def domains
       Cache.get("artist-domains-#{id}", 1.day) do
-        Post.raw_tag_match(name).pluck(:source).map do |x| 
-          begin
-            map_domain(Addressable::URI.parse(x).domain)
-          rescue Addressable::URI::InvalidURIError
-            nil
-          end
-        end.compact.inject(Hash.new(0)) {|h, x| h[x] += 1; h}.sort {|a, b| b[1] <=> a[1]}
+        domains = Post.raw_tag_match(name).pluck(:source).map do |x|
+          map_domain(Addressable::URI.parse(x).domain)
+        rescue Addressable::URI::InvalidURIError
+          nil
+        end
+
+        domains.compact.inject(Hash.new(0)) {|h, x| h[x] += 1; h}.sort {|a, b| b[1] <=> a[1]}
       end
     end
   end
@@ -248,7 +248,7 @@ class Artist < ApplicationRecord
   end
 
   module VersionMethods
-    def create_version(force=false)
+    def create_version(force = false)
       if saved_change_to_name? || url_string_changed || saved_change_to_is_active? || saved_change_to_is_banned? || saved_change_to_other_names? || saved_change_to_group_name? || saved_change_to_notes? || force
         if merge_version?
           merge_version
@@ -401,7 +401,7 @@ class Artist < ApplicationRecord
       Post.transaction do
         CurrentUser.without_safe_mode do
           ti = TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").first
-          ti.destroy if ti
+          ti&.destroy
 
           Post.tag_match(name).where("true /* Artist.unban */").each do |post|
             post.unban!
@@ -410,7 +410,7 @@ class Artist < ApplicationRecord
           end
 
           update_column(:is_banned, false)
-          ModAction.log("unbanned artist ##{id}",:artist_unban)
+          ModAction.log("unbanned artist ##{id}", :artist_unban)
         end
       end
     end
@@ -429,7 +429,7 @@ class Artist < ApplicationRecord
           end
 
           update_column(:is_banned, true)
-          ModAction.log("banned artist ##{id}",:artist_ban)
+          ModAction.log("banned artist ##{id}", :artist_ban)
         end
       end
     end

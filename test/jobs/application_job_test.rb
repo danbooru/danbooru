@@ -1,7 +1,8 @@
 require 'test_helper'
 
 class TestJob < ApplicationJob
-  def perform(record); end
+  def perform(record)
+  end
 end
 
 class ApplicationJobTest < ActiveJob::TestCase

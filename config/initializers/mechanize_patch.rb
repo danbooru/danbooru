@@ -31,7 +31,7 @@ if Rails.env.test?
       referer   = current_page,
       redirects = 0
     )
-      action      = "#{method.to_s.upcase} #{uri.to_s}"
+      action      = "#{method.to_s.upcase} #{uri}"
       retry_count = 0
 
       begin
@@ -43,13 +43,13 @@ if Rails.env.test?
         # Pass on the error if we've tried too many times.
         if retry_count >= MAX_RESET_RETRIES
           print "R"
-          #puts "**** WARN: Mechanize retried connection reset #{MAX_RESET_RETRIES} times and never succeeded: #{action}"
+          # puts "**** WARN: Mechanize retried connection reset #{MAX_RESET_RETRIES} times and never succeeded: #{action}"
           raise
         end
 
         # Otherwise, shutdown the persistent HTTP connection and try again.
         print "R"
-        #puts "**** WARN: Mechanize retrying connection reset error: #{action}"
+        # puts "**** WARN: Mechanize retrying connection reset error: #{action}"
         retry_count += 1
         self.http.shutdown
         retry
@@ -58,7 +58,7 @@ if Rails.env.test?
 
     # Alias so #fetch actually uses our new #fetch_with_retry to wrap the
     # old one aliased as #fetch_without_retry.
-    alias_method :fetch_without_retry, :fetch
-    alias_method :fetch, :fetch_with_retry
+    alias fetch_without_retry fetch
+    alias fetch fetch_with_retry
   end
 end

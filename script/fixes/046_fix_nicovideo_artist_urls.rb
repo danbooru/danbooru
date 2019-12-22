@@ -6,6 +6,6 @@ ArtistUrl.without_timeout do
   ArtistUrl.where("normalized_url like ?", "\%nicovideo\%").find_each do |url|
     before = url.normalized_url
     url.normalize
-    puts "#{before} -> #{url.normalized_url}" if before != url.normalized_url unless ArtistUrl.where(normalized_url: url.normalized_url).exists?
+    puts "#{before} -> #{url.normalized_url}" unless ArtistUrl.where(normalized_url: url.normalized_url).exists? || before == url.normalized_url
   end
 end

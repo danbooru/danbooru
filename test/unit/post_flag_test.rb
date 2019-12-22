@@ -38,7 +38,7 @@ class PostFlagTest < ActiveSupport::TestCase
       should "not be able to flag a post more than twice" do
         assert_difference(-> { PostFlag.count }, 1) do
           as(@bob) do
-            @post_flag = PostFlag.create(post: @post, reason: "aaa", is_resolved: false) 
+            @post_flag = PostFlag.create(post: @post, reason: "aaa", is_resolved: false)
           end
         end
 

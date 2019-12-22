@@ -5,7 +5,7 @@ class PixivWebAgent
   COMIC_SESSION_COOKIE_KEY = "_pixiv-comic_session"
 
   def self.phpsessid(agent)
-    agent.cookies.select do |cookie| cookie.name == SESSION_COOKIE_KEY end.first.try(:value)
+    agent.cookies.select { |cookie| cookie.name == SESSION_COOKIE_KEY }.first.try(:value)
   end
 
   def self.build

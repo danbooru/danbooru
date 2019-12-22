@@ -1,5 +1,5 @@
 class PoolVersion < ApplicationRecord
-  class Error < Exception ; end
+  class Error < Exception; end
 
   belongs_to :pool
   belongs_to_updater

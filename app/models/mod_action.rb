@@ -4,17 +4,17 @@ class ModAction < ApplicationRecord
 
   api_attributes including: [:category_id]
 
-  #####DIVISIONS#####
-  #Groups:     0-999
-  #Individual: 1000-1999
-  #####Actions#####
-  #Create:   0
-  #Update:   1
-  #Delete:   2
-  #Undelete: 3
-  #Ban:      4
-  #Unban:    5
-  #Misc:     6-19
+  # ####DIVISIONS#####
+  # Groups:     0-999
+  # Individual: 1000-1999
+  # ####Actions#####
+  # Create:   0
+  # Update:   1
+  # Delete:   2
+  # Undelete: 3
+  # Ban:      4
+  # Unban:    5
+  # Misc:     6-19
   enum category: {
     user_delete: 2,
     user_ban: 4,
@@ -77,7 +77,7 @@ class ModAction < ApplicationRecord
   end
 
   def self.log(desc, cat = :other)
-    create(:description => desc,:category => categories[cat])
+    create(:description => desc, :category => categories[cat])
   end
 
   def initialize_creator

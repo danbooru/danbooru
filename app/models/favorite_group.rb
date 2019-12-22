@@ -31,7 +31,7 @@ class FavoriteGroup < ApplicationRecord
       where("name ilike ? escape E'\\\\'", name.to_escaped_for_sql_like)
     end
 
-    def hide_private(user,params)
+    def hide_private(user, params)
       if user.hide_favorites?
         where("is_public = true")
       elsif params[:is_public].present?
@@ -51,14 +51,14 @@ class FavoriteGroup < ApplicationRecord
 
       if params[:creator_id].present?
         user = User.find(params[:creator_id])
-        q = q.hide_private(user,params)
+        q = q.hide_private(user, params)
         q = q.where("creator_id = ?", user.id)
       elsif params[:creator_name].present?
         user = User.find_by_name(params[:creator_name])
-        q = q.hide_private(user,params)
+        q = q.hide_private(user, params)
         q = q.where("creator_id = ?", user.id)
       else
-        q = q.hide_private(CurrentUser.user,params)
+        q = q.hide_private(CurrentUser.user, params)
         q = q.where("creator_id = ?", CurrentUser.user.id)
       end
 
@@ -130,13 +130,11 @@ class FavoriteGroup < ApplicationRecord
     offset = options[:offset] || 0
     limit = options[:limit] || Danbooru.config.posts_per_page
     slice = post_id_array.slice(offset, limit)
-    if slice && slice.any?
+    if slice&.any?
       slice.map do |id|
-        begin
-          Post.find(id)
-        rescue ActiveRecord::RecordNotFound
-          # swallow
-        end
+        Post.find(id)
+      rescue ActiveRecord::RecordNotFound
+        # swallow
       end.compact
     else
       []

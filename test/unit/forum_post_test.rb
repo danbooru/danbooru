@@ -89,7 +89,7 @@ class ForumPostTest < ActiveSupport::TestCase
         setup do
           CurrentUser.user = FactoryBot.create(:moderator_user)
         end
-        
+
         should "update the topic's updated_at timestamp" do
           @topic.reload
           assert_equal(@posts[-1].updated_at.to_i, @topic.updated_at.to_i)
@@ -147,7 +147,7 @@ class ForumPostTest < ActiveSupport::TestCase
       3.times do
         posts << FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => rand(100_000))
       end
-      
+
       # updating the original post
       travel(1.second) do
         posts.first.update(body: "xxx")

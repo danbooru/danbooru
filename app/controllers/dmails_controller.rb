@@ -60,7 +60,7 @@ class DmailsController < ApplicationController
     @dmail.update_column(:is_spam, false)
   end
 
-private
+  private
 
   def check_privilege(dmail)
     if !dmail.visible_to?(CurrentUser.user, params[:key])

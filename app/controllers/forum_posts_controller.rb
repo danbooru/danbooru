@@ -4,10 +4,10 @@ class ForumPostsController < ApplicationController
   before_action :load_post, :only => [:edit, :show, :update, :destroy, :undelete]
   before_action :check_min_level, :only => [:edit, :show, :update, :destroy, :undelete]
   skip_before_action :api_check
-  
+
   def new
     if params[:topic_id]
-      @forum_topic = ForumTopic.find(params[:topic_id]) 
+      @forum_topic = ForumTopic.find(params[:topic_id])
       raise User::PrivilegeError.new unless @forum_topic.visible?(CurrentUser.user)
     end
     if params[:post_id]
@@ -66,7 +66,8 @@ class ForumPostsController < ApplicationController
     respond_with(@forum_post)
   end
 
-private
+  private
+
   def load_post
     @forum_post = ForumPost.find(params[:id])
     @forum_topic = @forum_post.topic

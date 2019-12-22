@@ -19,7 +19,7 @@ class CloudflareServiceTest < ActiveSupport::TestCase
 
     should "make calls to cloudflare's api" do
       subject.delete("md5", "png")
-      assert_requested(:delete,  "https://api.cloudflare.com/client/v4/zones/123/purge_cache", times: 1) do |req|
+      assert_requested(:delete, "https://api.cloudflare.com/client/v4/zones/123/purge_cache", times: 1) do |req|
         req.body =~ /danbooru\.donmai\.us/ && req.body =~ /safebooru\.donmai\.us/ && req.body =~ /sample/ && req.body =~ /preview/
       end
     end

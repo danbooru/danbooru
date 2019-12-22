@@ -3,7 +3,7 @@ require 'resolv'
 module Downloads
   class File
     include ActiveModel::Validations
-    class Error < Exception ; end
+    class Error < Exception; end
 
     RETRIABLE_ERRORS = [Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EIO, Errno::EHOSTUNREACH, Errno::ECONNREFUSED, Timeout::Error, IOError]
 
@@ -12,7 +12,7 @@ module Downloads
 
     validate :validate_url
 
-    def initialize(url, referer=nil)
+    def initialize(url, referer = nil)
       @url = Addressable::URI.parse(url) rescue nil
       @referer = referer
       validate!
@@ -59,7 +59,7 @@ module Downloads
       else
         raise Error.new("HTTP error code: #{res.code} #{res.message}")
       end
-    end # def
+    end
 
     # Prevent Cloudflare from potentially mangling the image. See issue #3528.
     def uncached_url
@@ -87,7 +87,7 @@ module Downloads
         timeout: 10,
         stream_body: true,
         headers: strategy.headers,
-        connection_adapter: ValidatingConnectionAdapter,
+        connection_adapter: ValidatingConnectionAdapter
       }.deep_merge(Danbooru.config.httparty_options)
     end
 

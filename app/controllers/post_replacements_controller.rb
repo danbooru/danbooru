@@ -23,13 +23,14 @@ class PostReplacementsController < ApplicationController
   end
 
   def index
-    params[:search][:post_id] = params.delete(:post_id) if params.has_key?(:post_id)
+    params[:search][:post_id] = params.delete(:post_id) if params.key?(:post_id)
     @post_replacements = PostReplacement.paginated_search(params)
 
     respond_with(@post_replacements)
   end
 
-private
+  private
+
   def create_params
     params.require(:post_replacement).permit(:replacement_url, :replacement_file, :final_source, :tags)
   end

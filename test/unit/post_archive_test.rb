@@ -62,7 +62,7 @@ class PostArchiveTest < ActiveSupport::TestCase
 
       should "also create a version" do
         assert_equal(1, @post.versions.size)
-        @version = @post.versions.sort_by(&:id).last
+        @version = @post.versions.max_by(&:id)
         assert_equal("aaa bbb ccc", @version.tags)
         assert_equal(@post.rating, @version.rating)
         assert_equal(@post.parent_id, @version.parent_id)
@@ -109,7 +109,7 @@ class PostArchiveTest < ActiveSupport::TestCase
 
       should "also create a version" do
         assert_equal(2, @post.versions.size)
-        @version = @post.versions.sort_by(&:id).last
+        @version = @post.versions.max_by(&:id)
         assert_equal("bbb ccc xxx", @version.tags)
         assert_equal("q", @version.rating)
         assert_equal("", @version.source)
@@ -127,14 +127,14 @@ class PostArchiveTest < ActiveSupport::TestCase
       should "should create a version if the rating changes" do
         assert_difference("@post.versions.size", 1) do
           @post.update(rating: "s")
-          assert_equal("s", @post.versions.sort_by(&:id).last.rating)
+          assert_equal("s", @post.versions.max_by(&:id).rating)
         end
       end
 
       should "should create a version if the source changes" do
         assert_difference("@post.versions.size", 1) do
           @post.update(source: "blah")
-          assert_equal("blah", @post.versions.sort_by(&:id).last.source)
+          assert_equal("blah", @post.versions.max_by(&:id).source)
         end
       end
 
@@ -142,14 +142,14 @@ class PostArchiveTest < ActiveSupport::TestCase
         assert_difference("@post.versions.size", 1) do
           @parent = FactoryBot.create(:post)
           @post.update(parent_id: @parent.id)
-          assert_equal(@parent.id, @post.versions.sort_by(&:id).last.parent_id)
+          assert_equal(@parent.id, @post.versions.max_by(&:id).parent_id)
         end
       end
 
       should "should create a version if the tags change" do
         assert_difference("@post.versions.size", 1) do
           @post.update(tag_string: "blah")
-          assert_equal("blah", @post.versions.sort_by(&:id).last.tags)
+          assert_equal("blah", @post.versions.max_by(&:id).tags)
         end
       end
     end

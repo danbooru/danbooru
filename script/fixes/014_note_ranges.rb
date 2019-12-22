@@ -22,7 +22,7 @@ Post.where("created_at >= '2013-02-01'").select("id, score, up_score, down_score
   revised_score = post.up_score + post.down_score + fav_count
   puts "#{post.id}: #{post.score} -> #{revised_score}" if post.score != revised_score
   post.update_column(:score, revised_score)
-end ; true
+end; true
 
 Post.where("is_deleted = true and created_at >= '2013-02-01'").find_each do |post|
   if post.flags.empty?

@@ -299,7 +299,7 @@ class PostQueryBuilder
     if q[:flagger_ids_neg]
       q[:flagger_ids_neg].each do |flagger_id|
         if CurrentUser.can_view_flagger?(flagger_id)
-          post_ids = PostFlag.unscoped.search({:creator_id => flagger_id, :category => "normal"}).reorder("").select {|flag| flag.not_uploaded_by?(CurrentUser.id)}.map {|flag| flag.post_id}.uniq
+          post_ids = PostFlag.unscoped.search(:creator_id => flagger_id, :category => "normal").reorder("").select {|flag| flag.not_uploaded_by?(CurrentUser.id)}.map {|flag| flag.post_id}.uniq
           if post_ids.any?
             relation = relation.where.not("posts.id": post_ids)
           end
@@ -310,11 +310,11 @@ class PostQueryBuilder
     if q[:flagger_ids]
       q[:flagger_ids].each do |flagger_id|
         if flagger_id == "any"
-          relation = relation.where('EXISTS (' + PostFlag.unscoped.search({:category => "normal"}).where('post_id = posts.id').reorder('').select('1').to_sql + ')')
+          relation = relation.where('EXISTS (' + PostFlag.unscoped.search(:category => "normal").where('post_id = posts.id').reorder('').select('1').to_sql + ')')
         elsif flagger_id == "none"
-          relation = relation.where('NOT EXISTS (' + PostFlag.unscoped.search({:category => "normal"}).where('post_id = posts.id').reorder('').select('1').to_sql + ')')
+          relation = relation.where('NOT EXISTS (' + PostFlag.unscoped.search(:category => "normal").where('post_id = posts.id').reorder('').select('1').to_sql + ')')
         elsif CurrentUser.can_view_flagger?(flagger_id)
-          post_ids = PostFlag.unscoped.search({:creator_id => flagger_id, :category => "normal"}).reorder("").select {|flag| flag.not_uploaded_by?(CurrentUser.id)}.map {|flag| flag.post_id}.uniq
+          post_ids = PostFlag.unscoped.search(:creator_id => flagger_id, :category => "normal").reorder("").select {|flag| flag.not_uploaded_by?(CurrentUser.id)}.map {|flag| flag.post_id}.uniq
           relation = relation.where("posts.id": post_ids)
         end
       end
@@ -322,7 +322,7 @@ class PostQueryBuilder
 
     if q[:appealer_ids_neg]
       q[:appealer_ids_neg].each do |appealer_id|
-        relation = relation.where.not("posts.id":  PostAppeal.unscoped.where(creator_id: appealer_id).select(:post_id).distinct)
+        relation = relation.where.not("posts.id": PostAppeal.unscoped.where(creator_id: appealer_id).select(:post_id).distinct)
       end
     end
 

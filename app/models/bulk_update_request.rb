@@ -1,5 +1,6 @@
 class BulkUpdateRequest < ApplicationRecord
-  attr_accessor :reason, :skip_secondary_validations
+  attr_accessor :reason
+  attr_reader :skip_secondary_validations
 
   belongs_to :user
   belongs_to :forum_topic, optional: true
@@ -65,8 +66,8 @@ class BulkUpdateRequest < ApplicationRecord
           nil
         end
         ForumUpdater.new(
-          forum_topic, 
-          forum_post: post, 
+          forum_topic,
+          forum_post: post,
           expected_title: title,
           skip_update: !TagRelationship::SUPPORT_HARD_CODED
         )
@@ -81,11 +82,10 @@ class BulkUpdateRequest < ApplicationRecord
           forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.", "APPROVED")
         end
       end
-
     rescue AliasAndImplicationImporter::Error => x
       self.approver = approver
       CurrentUser.scoped(approver) do
-        forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has failed: #{x.to_s}", "FAILED")
+        forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has failed: #{x}", "FAILED")
       end
     end
 
@@ -129,11 +129,9 @@ class BulkUpdateRequest < ApplicationRecord
     end
 
     def validate_script
-      begin
-        AliasAndImplicationImporter.new(script, forum_topic_id, "1", skip_secondary_validations).validate!
-      rescue RuntimeError => e
-        errors[:base] << e.message
-      end
+      AliasAndImplicationImporter.new(script, forum_topic_id, "1", skip_secondary_validations).validate!
+    rescue RuntimeError => e
+      errors[:base] << e.message
     end
   end
 

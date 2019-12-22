@@ -173,12 +173,12 @@ class PostPresenter < Presenter
   end
 
   def has_nav_links?(template)
-    has_sequential_navigation?(template.params) || @post.pools.undeleted.any? || @post.favorite_groups(active_id=template.params[:favgroup_id]).any?
+    has_sequential_navigation?(template.params) || @post.pools.undeleted.any? || @post.favorite_groups(active_id = template.params[:favgroup_id]).any?
   end
 
   def has_sequential_navigation?(params)
     return false if Tag.has_metatag?(params[:q], :order, :ordfav, :ordpool)
     return false if params[:pool_id].present? || params[:favgroup_id].present?
-    return CurrentUser.user.enable_sequential_post_navigation 
+    return CurrentUser.user.enable_sequential_post_navigation
   end
 end

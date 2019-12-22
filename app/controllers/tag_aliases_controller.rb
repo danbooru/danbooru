@@ -40,7 +40,7 @@ class TagAliasesController < ApplicationController
     respond_with(@tag_alias, :location => tag_alias_path(@tag_alias))
   end
 
-private
+  private
 
   def tag_alias_params
     params.require(:tag_alias).permit(%i[antecedent_name consequent_name forum_topic_id skip_secondary_validations])

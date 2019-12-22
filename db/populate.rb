@@ -2,14 +2,14 @@ require 'set'
 
 CurrentUser.ip_addr = "127.0.0.1"
 Delayed::Worker.delay_jobs = false
-$used_names = Set.new([""])
+used_names = Set.new([""])
 
 def rand_string(n, unique = false)
   string = ""
 
   n = rand(n) + 1
 
-  while $used_names.include?(string)
+  while used_names.include?(string)
     consonants = "bcdfghjklmnpqrstvwxz".scan(/./)
     vowels = "aeiouy".scan(/./)
     string = ""
@@ -20,7 +20,7 @@ def rand_string(n, unique = false)
     return string unless unique
   end
 
-  $used_names.add(string)
+  used_names.add(string)
   string
 end
 
@@ -47,36 +47,35 @@ if User.count == 0
     )
 
     CurrentUser.user = user
-    User::Levels.constants.reject{ |x| x == :ADMIN }.each do |level|
+    User::Levels.constants.reject { |x| x == :ADMIN }.each do |level|
       newuser = User.create(
-      :name => level.to_s.downcase,
-      :password => "password1",
-      :password_confirmation => "password1"
+        name: level.to_s.downcase,
+        password: "password1",
+        password_confirmation: "password1"
       )
-      newuser.promote_to!(User::Levels.const_get(level), {:is_upgrade => true, :skip_dmail => true})
+      newuser.promote_to!(User::Levels.const_get(level), :is_upgrade => true, :skip_dmail => true)
     end
 
     newuser = User.create(
       :name => "banned",
       :password => "password1",
       :password_confirmation => "password1"
-      )
+    )
     Ban.create(:user_id => newuser.id, :reason => "from the start", :duration => 99999)
 
     newuser = User.create(
       :name => "uploader",
       :password => "password1",
       :password_confirmation => "password1"
-      )
-    newuser.promote_to!(User::Levels::BUILDER, {:can_upload_free => true, :is_upgrade => true, :skip_dmail => true})
+    )
+    newuser.promote_to!(User::Levels::BUILDER, :can_upload_free => true, :is_upgrade => true, :skip_dmail => true)
 
     newuser = User.create(
       :name => "approver",
       :password => "password1",
       :password_confirmation => "password1"
-      )
-    newuser.promote_to!(User::Levels::BUILDER, {:can_approve_posts => true, :is_upgrade => true, :skip_dmail => true})
-
+    )
+    newuser.promote_to!(User::Levels::BUILDER, :can_approve_posts => true, :is_upgrade => true, :skip_dmail => true)
   end
 
   0.upto(10) do |i|
@@ -86,7 +85,7 @@ if User.count == 0
       :password_confirmation => "password1"
     )
   end
-  $used_names = Set.new([""])
+  used_names = Set.new([""])
 else
   puts "Skipping users"
   user = User.find_by_name("albert")
@@ -101,7 +100,7 @@ if Upload.count == 0
   1.upto(50) do |i|
     color1 = rand(4096).to_s(16)
     color2 = rand(4096).to_s(16)
-    width = rand(2000) + 100
+    width = rand(100..2099)
     height = (width * (rand(0.5) + 1)).to_i
     url = "http://ipsumimage.appspot.com/#{width}x#{height},#{color1}"
     tags = rand(1_000_000_000).to_s.scan(/../).join(" ")
@@ -144,7 +143,7 @@ if Artist.count == 0
   20.times do |i|
     Artist.create(:name => rand_string(9, true))
   end
-  $used_names = Set.new([""])
+  used_names = Set.new([""])
 else
   puts "Skipping artists"
 end
@@ -155,7 +154,7 @@ if TagAlias.count == 0
   20.times do |i|
     TagAlias.create(:antecedent_name => rand_string(9, true), :consequent_name => rand_string(9, true))
   end
-  $used_names = Set.new([""])
+  used_names = Set.new([""])
 else
   puts "Skipping tag aliases"
 end
@@ -166,7 +165,7 @@ if TagImplication.count == 0
   20.times do |i|
     TagImplication.create(:antecedent_name => rand_string(9, true), :consequent_name => rand_string(9, true))
   end
-  $used_names = Set.new([""])
+  used_names = Set.new([""])
 else
   puts "Skipping tag implications"
 end
@@ -180,7 +179,7 @@ if Pool.count == 0
       pool.add!(Post.order("random()").first)
     end
   end
-  $used_names = Set.new([""])
+  used_names = Set.new([""])
 end
 
 if Favorite.count == 0

@@ -10,7 +10,7 @@ class WikiPagesController < ApplicationController
   end
 
   def edit
-    @wiki_page, _ = WikiPage.find_by_id_or_title(params[:id])
+    @wiki_page, _found_by = WikiPage.find_by_id_or_title(params[:id])
     respond_with(@wiki_page)
   end
 
@@ -49,7 +49,7 @@ class WikiPagesController < ApplicationController
   end
 
   def update
-    @wiki_page, _ = WikiPage.find_by_id_or_title(params[:id])
+    @wiki_page, _found_by = WikiPage.find_by_id_or_title(params[:id])
     @wiki_page.update(wiki_page_params(:update))
     flash[:notice] = @wiki_page.warnings.full_messages.join(".\n \n") if @wiki_page.warnings.any?
 
@@ -57,13 +57,13 @@ class WikiPagesController < ApplicationController
   end
 
   def destroy
-    @wiki_page, _ = WikiPage.find_by_id_or_title(params[:id])
+    @wiki_page, _found_by = WikiPage.find_by_id_or_title(params[:id])
     @wiki_page.update(is_deleted: true)
     respond_with(@wiki_page)
   end
 
   def revert
-    @wiki_page, _ = WikiPage.find_by_id_or_title(params[:id])
+    @wiki_page, _found_by = WikiPage.find_by_id_or_title(params[:id])
     @version = @wiki_page.versions.find(params[:version_id])
     @wiki_page.revert_to!(@version)
     flash[:notice] = "Page was reverted"

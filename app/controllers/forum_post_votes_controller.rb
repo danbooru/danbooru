@@ -19,7 +19,7 @@ class ForumPostVotesController < ApplicationController
     respond_with(@forum_post_vote)
   end
 
-private
+  private
 
   def forum_post_vote_params
     params.fetch(:forum_post_vote, {}).permit(:score)

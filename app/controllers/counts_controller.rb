@@ -3,8 +3,8 @@ class CountsController < ApplicationController
 
   def posts
     @count = Post.fast_count(
-      params[:tags], 
-      timeout: CurrentUser.statement_timeout, 
+      params[:tags],
+      timeout: CurrentUser.statement_timeout,
       raise_on_timeout: true,
       skip_cache: params[:skip_cache]
     )

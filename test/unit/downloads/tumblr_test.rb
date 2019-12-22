@@ -4,7 +4,7 @@ module Downloads
   class TumblrTest < ActiveSupport::TestCase
     # Currently there's no way to obtain the raw version of these images,
     # so we have to change the tests to validate against the 1280 version
-    
+
     context "a download for a tumblr 500 sample" do
       should "instead download the 1280 version" do
         skip "Tumblr keys are not set" unless Danbooru.config.tumblr_consumer_key

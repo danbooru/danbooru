@@ -5,7 +5,7 @@ class Admin::DashboardsControllerTest < ActionDispatch::IntegrationTest
     setup do
       @admin = create(:admin_user)
     end
-    
+
     context "show action" do
       should "render" do
         get_auth admin_dashboard_path, @admin

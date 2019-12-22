@@ -64,13 +64,10 @@ class DText
   def self.parse_embedded_tag_request_text(text)
     [TagAlias, TagImplication, BulkUpdateRequest].each do |tag_request|
       text = text.gsub(tag_request.embedded_pattern) do |match|
-        begin
-          obj = tag_request.find($~[:id])
-          tag_request_message(obj) || match
-
-        rescue ActiveRecord::RecordNotFound
-          match
-        end
+        obj = tag_request.find($~[:id])
+        tag_request_message(obj) || match
+      rescue ActiveRecord::RecordNotFound
+        match
       end
     end
 
@@ -143,7 +140,7 @@ class DText
 
   def self.dtext_links_differ?(a, b)
     Set.new(parse_wiki_titles(a)) != Set.new(parse_wiki_titles(b)) ||
-    Set.new(parse_external_links(a)) != Set.new(parse_external_links(b))
+      Set.new(parse_external_links(a)) != Set.new(parse_external_links(b))
   end
 
   def self.strip_blocks(string, tag)

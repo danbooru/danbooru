@@ -95,7 +95,7 @@ class UploadService
       upload = preprocessor.finish!(upload)
       raise Error, upload.status if upload.is_errored?
       md5_changed = upload.md5 != post.md5
-      
+
       replacement.replacement_url = find_replacement_url(replacement, upload)
 
       if md5_changed

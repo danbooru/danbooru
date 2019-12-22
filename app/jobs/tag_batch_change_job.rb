@@ -1,5 +1,5 @@
 class TagBatchChangeJob < ApplicationJob
-  class Error < Exception ; end
+  class Error < Exception; end
 
   queue_as :default
 

@@ -10,7 +10,7 @@ Tag.transaction do
   total = empty_gentags.count
 
   empty_gentags.find_each.with_index do |tag, i|
-    STDERR.puts %{validating "#{tag.name}" (#{i}/#{total})} if i % 1000 == 0
+    warn %{validating "#{tag.name}" (#{i}/#{total})} if i % 1000 == 0
 
     if tag.invalid?(:create)
       # puts ({ name: tag.name, id: tag.id }).to_json

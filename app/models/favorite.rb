@@ -1,5 +1,5 @@
 class Favorite < ApplicationRecord
-  class Error < Exception ; end
+  class Error < Exception; end
 
   belongs_to :post
   belongs_to :user
@@ -34,7 +34,7 @@ class Favorite < ApplicationRecord
       return unless Favorite.for_user(user.id).where(:user_id => user.id, :post_id => post_id).exists?
       Favorite.for_user(user.id).where(post_id: post_id).delete_all
       Post.where(:id => post_id).update_all("fav_count = fav_count - 1")
-      post.delete_user_from_fav_string(user.id) if post
+      post&.delete_user_from_fav_string(user.id)
       User.where(:id => user.id).update_all("favorite_count = favorite_count - 1")
       user.favorite_count -= 1
       post.fav_count -= 1 if post

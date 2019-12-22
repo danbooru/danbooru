@@ -105,7 +105,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       setup do
         Danbooru.config.stubs(:enable_recaptcha?).returns(false)
       end
-      
+
       should "render" do
         get new_user_path
         assert_response :success
@@ -121,7 +121,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       context "with sockpuppet validation enabled" do
         setup do
-          Danbooru.config.unstub(:enable_sock_puppet_validation?)          
+          Danbooru.config.unstub(:enable_sock_puppet_validation?)
           @user.update(last_ip_addr: "127.0.0.1")
         end
 

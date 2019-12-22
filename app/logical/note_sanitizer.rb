@@ -10,7 +10,7 @@ module NoteSanitizer
     "span" => %w(class),
     "div" => %w(class align),
     "p" => %w(class align),
-    "font" => %w(color size),
+    "font" => %w(color size)
   }
 
   ALLOWED_PROPERTIES = %w(
@@ -61,7 +61,7 @@ module NoteSanitizer
       :elements => ALLOWED_ELEMENTS,
       :attributes => ALLOWED_ATTRIBUTES,
       :add_attributes => {
-        "a" => { "rel" => "external noreferrer nofollow" },
+        "a" => { "rel" => "external noreferrer nofollow" }
       },
       :protocols => {
         "a" => {
@@ -73,9 +73,9 @@ module NoteSanitizer
         allow_hacks: false,
         at_rules: [],
         protocols: [],
-        properties: ALLOWED_PROPERTIES,
+        properties: ALLOWED_PROPERTIES
       },
-      :transformers => method(:relativize_links),
+      :transformers => method(:relativize_links)
     )
   end
 

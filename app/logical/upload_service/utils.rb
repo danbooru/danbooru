@@ -1,6 +1,6 @@
 class UploadService
   module Utils
-    extend self
+    module_function
     class CorruptFileError < RuntimeError; end
 
     def file_header_to_file_ext(file)
@@ -93,7 +93,7 @@ class UploadService
 
     def generate_video_crop_for(video, width)
       vp = Tempfile.new(["video-preview", ".jpg"], binmode: true)
-      video.screenshot(vp.path, {:seek_time => 0, :resolution => "#{video.width}x#{video.height}"})
+      video.screenshot(vp.path, :seek_time => 0, :resolution => "#{video.width}x#{video.height}")
       crop = DanbooruImageResizer.crop(vp, width, width, 85)
       vp.close
       return crop
@@ -108,7 +108,7 @@ class UploadService
       end
 
       output_file = Tempfile.new(["video-preview", ".jpg"], binmode: true)
-      video.screenshot(output_file.path, {:seek_time => 0, :resolution => "#{width}x#{height}"})
+      video.screenshot(output_file.path, :seek_time => 0, :resolution => "#{width}x#{height}")
       output_file
     end
 
@@ -140,8 +140,8 @@ class UploadService
       end
     end
 
-    # these methods are only really used during upload processing even 
-    # though logically they belong on upload. post can rely on the 
+    # these methods are only really used during upload processing even
+    # though logically they belong on upload. post can rely on the
     # automatic tag that's added.
     def is_animated_gif?(upload, file)
       return false if upload.file_ext != "gif"
@@ -179,7 +179,7 @@ class UploadService
 
     def get_file_for_upload(upload, file: nil)
       return file if file.present?
-      raise RuntimeError, "No file or source URL provided" if upload.source_url.blank?
+      raise "No file or source URL provided" if upload.source_url.blank?
 
       attempts = 0
 
@@ -190,8 +190,7 @@ class UploadService
         if !DanbooruImageResizer.validate_shell(file)
           raise CorruptFileError.new("File is corrupted")
         end
-
-      rescue
+      rescue StandardError
         if attempts == 3
           raise
         end
@@ -201,7 +200,7 @@ class UploadService
       end
 
       if download.data[:ugoira_frame_data].present?
-        upload.context = { 
+        upload.context = {
           "ugoira" => {
             "frame_data" => download.data[:ugoira_frame_data],
             "content_type" => "image/jpeg"

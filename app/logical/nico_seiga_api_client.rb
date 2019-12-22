@@ -21,7 +21,7 @@ class NicoSeigaApiClient
           form["password"] = Danbooru.config.nico_seiga_password
         end.click_button
       end
-      session = mech.cookie_jar.cookies.select{|c| c.name == "user_session"}.first
+      session = mech.cookie_jar.cookies.select {|c| c.name == "user_session"}.first
       if session
         Cache.put("nico-seiga-session", session.value, 1.week)
       else
@@ -74,7 +74,7 @@ class NicoSeigaApiClient
 
   def get(url)
     response = Danbooru::Http.cache(1.minute).get(url)
-    raise "nico seiga api call failed (code=#{response.code}, body=#{response.body.to_s})" if response.code != 200
+    raise "nico seiga api call failed (code=#{response.code}, body=#{response.body})" if response.code != 200
 
     Hash.from_xml(response.to_s)
   end

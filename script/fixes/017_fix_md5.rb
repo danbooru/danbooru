@@ -16,6 +16,6 @@ Post.where("id in (?)", Pool.find(203).post_id_array).find_each do |post|
     FileUtils.mv(post.real_preview_file_path, post.real_preview_file_path.sub(post.md5, correct_md5))
     FileUtils.mv(post.ssd_preview_file_path, post.ssd_preview_file_path.sub(post.md5, correct_md5))
   end
-  
+
   FileUtils.mv(post.file_path, post.file_path.sub(post.md5, correct_md5))
 end

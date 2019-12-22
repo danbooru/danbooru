@@ -54,7 +54,6 @@ class UploadService
       @upload.save!
       @post = create_post_from_upload(@upload)
       return @upload
-
     rescue Exception => x
       @upload.update(status: "error: #{x.class} - #{x.message}", backtrace: x.backtrace.join("\n"))
       @upload

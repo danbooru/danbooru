@@ -85,8 +85,6 @@ module Sources::Strategies
       end.strip
     end
 
-  public
-
     def api_response
       [url, referer_url].each do |x|
         if client = PawooApiClient.new.get(x)

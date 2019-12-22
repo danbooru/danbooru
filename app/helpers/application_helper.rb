@@ -8,7 +8,7 @@ module ApplicationHelper
 
   def wordbreakify(string)
     lines = string.scan(/.{1,10}/)
-    wordbreaked_string = lines.map{|str| h(str)}.join("<wbr>")
+    wordbreaked_string = lines.map {|str| h(str)}.join("<wbr>")
     raw(wordbreaked_string)
   end
 
@@ -43,7 +43,7 @@ module ApplicationHelper
   def error_messages_for(instance_name)
     instance = instance_variable_get("@#{instance_name}")
 
-    if instance && instance.errors.any?
+    if instance&.errors&.any?
       %{<div class="error-messages ui-state-error ui-corner-all"><strong>Error</strong>: #{instance.__send__(:errors).full_messages.join(", ")}</div>}.html_safe
     else
       ""
@@ -133,11 +133,11 @@ module ApplicationHelper
     return "anonymous" if user.blank?
 
     user_class = "user-#{user.level_string.downcase}"
-    user_class = user_class + " user-post-approver" if user.can_approve_posts?
-    user_class = user_class + " user-post-uploader" if user.can_upload_free?
-    user_class = user_class + " user-super-voter" if user.is_super_voter?
-    user_class = user_class + " user-banned" if user.is_banned?
-    user_class = user_class + " with-style" if CurrentUser.user.style_usernames?
+    user_class += " user-post-approver" if user.can_approve_posts?
+    user_class += " user-post-uploader" if user.can_upload_free?
+    user_class += " user-super-voter" if user.is_super_voter?
+    user_class += " user-banned" if user.is_banned?
+    user_class += " with-style" if CurrentUser.user.style_usernames?
     if options[:raw_name]
       name = user.name
     else
@@ -252,14 +252,12 @@ module ApplicationHelper
     CurrentUser.can_approve_posts? && (cookies[:moderated].blank? || Time.at(cookies[:moderated].to_i) < 72.hours.ago)
   end
 
-protected
+  protected
+
   def nav_link_match(controller, url)
     url =~ case controller
     when "sessions", "users", "maintenance/user/password_resets", "admin/users"
       /^\/(session|users)/
-
-    when "forum_posts"
-      /^\/forum_topics/
 
     when "comments"
       /^\/comments/

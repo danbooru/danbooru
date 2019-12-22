@@ -23,7 +23,7 @@ class DmailTest < ActiveSupport::TestCase
       end
 
       should "not validate" do
-        assert_difference("Dmail.count", 2)do
+        assert_difference("Dmail.count", 2) do
           Dmail.create_split(from: @spammer, to: @recipient, title: "spam", body: "wonderful spam")
           assert(@recipient.dmails.last.is_spam?)
         end
@@ -70,7 +70,7 @@ class DmailTest < ActiveSupport::TestCase
           @dmail = FactoryBot.create(:dmail, :owner => @recipient, :body => "banned word here", :to => @recipient)
         end
 
-        assert_equal(false, !!@recipient.dmail_filter.filtered?(@dmail))
+        assert_equal(false, @recipient.dmail_filter.filtered?(@dmail))
         assert_equal(false, @dmail.is_read?)
         assert_equal(true, @recipient.has_mail?)
       end

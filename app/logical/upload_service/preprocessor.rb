@@ -62,7 +62,6 @@ class UploadService
       CurrentUser.as(uploader_id) do
         start!
       end
-
     rescue ActiveRecord::RecordNotUnique
       return
     end
@@ -106,9 +105,9 @@ class UploadService
     end
 
     def finish!(upload = nil)
-      pred = upload || self.predecessor()
+      pred = upload || self.predecessor
 
-      # regardless of who initialized the upload, credit should 
+      # regardless of who initialized the upload, credit should
       # goto whoever submitted the form
       pred.initialize_attributes
 
@@ -124,5 +123,4 @@ class UploadService
       return pred
     end
   end
-
 end

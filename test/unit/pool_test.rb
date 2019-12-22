@@ -1,5 +1,3 @@
-# encoding: utf-8
-
 require 'test_helper'
 
 class PoolTest < ActiveSupport::TestCase

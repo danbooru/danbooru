@@ -32,7 +32,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    context "preprocess action" do      
+    context "preprocess action" do
       should "prefer the file over the source when preprocessing" do
         file = Rack::Test::UploadedFile.new("#{Rails.root}/test/files/test.jpg", "image/jpeg")
         post_auth preprocess_uploads_path, @user, params: {:upload => {:source => "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", :file => file}}
@@ -154,7 +154,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
             source_matches: @upload.source,
             rating: @upload.rating,
             status: @upload.status,
-            server: @upload.server,
+            server: @upload.server
           }
 
           get uploads_path, params: { search: search_params }
@@ -192,13 +192,13 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           end
 
           should "update the predecessor" do
-            assert_difference(->{ Post.count }, 1) do
-              assert_difference(->{ Upload.count }, 0) do
+            assert_difference(-> { Post.count }, 1) do
+              assert_difference(-> { Upload.count }, 0) do
                 post_auth uploads_path, @user, params: {:upload => {:tag_string => "aaa", :rating => "q", :source => @source, :referer_url => @ref}}
               end
             end
             post = Post.last
-            assert_match(/aaa/, post.tag_string)            
+            assert_match(/aaa/, post.tag_string)
           end
         end
 
@@ -212,13 +212,13 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           end
 
           should "update the predecessor" do
-            assert_difference(->{ Post.count }, 1) do
-              assert_difference(->{ Upload.count }, 0) do
+            assert_difference(-> { Post.count }, 1) do
+              assert_difference(-> { Upload.count }, 0) do
                 post_auth uploads_path, @user, params: {:upload => {:tag_string => "aaa", :rating => "q", :source => @source, :referer_url => @ref}}
               end
             end
             post = Post.last
-            assert_match(/aaa/, post.tag_string)            
+            assert_match(/aaa/, post.tag_string)
           end
         end
       end

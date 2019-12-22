@@ -85,7 +85,7 @@ class PostVersion < ApplicationRecord
       :removed_tags => removed_tags,
       :obsolete_added_tags => added_tags - latest_tags,
       :obsolete_removed_tags => removed_tags & latest_tags,
-      :unchanged_tags => new_tags & old_tags,
+      :unchanged_tags => new_tags & old_tags
     }
   end
 

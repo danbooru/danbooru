@@ -213,7 +213,7 @@ module Sources
       should "get the tags" do
         tags = [
           %w[foo https://twitter.com/hashtag/foo],
-          %w[ホワイトデー https://twitter.com/hashtag/ホワイトデー],
+          %w[ホワイトデー https://twitter.com/hashtag/ホワイトデー]
         ]
 
         assert_equal(tags, @site.tags)

@@ -1,5 +1,5 @@
 class PostArchive < ApplicationRecord
-  class RevertError < Exception ; end
+  class RevertError < Exception; end
   extend Memoist
 
   belongs_to :post
@@ -102,7 +102,7 @@ class PostArchive < ApplicationRecord
   end
 
   def visible?
-    post && post.visible?
+    post&.visible?
   end
 
   def diff(version = nil)
@@ -135,10 +135,10 @@ class PostArchive < ApplicationRecord
       :removed_tags => removed_tags,
       :obsolete_added_tags => added_tags - latest_tags,
       :obsolete_removed_tags => removed_tags & latest_tags,
-      :unchanged_tags => new_tags & old_tags,
+      :unchanged_tags => new_tags & old_tags
     }
   end
-  
+
   def changes
     delta = {
       :added_tags => added_tags,

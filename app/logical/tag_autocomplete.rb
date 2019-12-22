@@ -1,10 +1,10 @@
 module TagAutocomplete
-  extend self
+  module_function
 
   PREFIX_BOUNDARIES = "(_/:;-"
   LIMIT = 10
 
-  class Result < Struct.new(:name, :post_count, :category, :antecedent_name, :source)
+  Result = Struct.new(:name, :post_count, :category, :antecedent_name, :source) do
     include ActiveModel::Serializers::JSON
     include ActiveModel::Serializers::Xml
 
@@ -28,7 +28,7 @@ module TagAutocomplete
     candidates = count_sort(
       query,
       search_exact(query, 8) +
-      search_prefix(query, 4) + 
+      search_prefix(query, 4) +
       search_correct(query, 2) +
       search_aliases(query, 3)
     )
@@ -40,7 +40,7 @@ module TagAutocomplete
     end.reverse.slice(0, LIMIT)
   end
 
-  def search_exact(query, n=4)
+  def search_exact(query, n = 4)
     Tag
       .where("name like ? escape e'\\\\'", query.to_escaped_for_sql_like + "%")
       .where("post_count > 0")
@@ -50,7 +50,7 @@ module TagAutocomplete
       .map {|row| Result.new(*row, nil, :exact)}
   end
 
-  def search_correct(query, n=2)
+  def search_correct(query, n = 2)
     if query.size <= 3
       return []
     end
@@ -66,7 +66,7 @@ module TagAutocomplete
       .map {|row| Result.new(*row, nil, :correct)}
   end
 
-  def search_prefix(query, n=3)
+  def search_prefix(query, n = 3)
     if query.size >= 5
       return []
     end
@@ -97,7 +97,7 @@ module TagAutocomplete
       .map {|row| Result.new(*row, nil, :prefix)}
   end
 
-  def search_aliases(query, n=10)
+  def search_aliases(query, n = 10)
     wildcard_name = query + "*"
     TagAlias
       .select("tags.name, tags.post_count, tags.category, tag_aliases.antecedent_name")
@@ -112,4 +112,3 @@ module TagAutocomplete
       .map {|row| Result.new(*row, :alias)}
   end
 end
-

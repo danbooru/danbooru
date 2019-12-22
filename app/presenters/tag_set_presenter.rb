@@ -1,8 +1,7 @@
-=begin rdoc
-  A tag set represents a set of tags that are displayed together.
-  This class makes it easy to fetch the categories for all the
-  tags in one call instead of fetching them sequentially.
-=end
+# rdoc
+#   A tag set represents a set of tags that are displayed together.
+#   This class makes it easy to fetch the categories for all the
+#   tags in one call instead of fetching them sequentially.
 
 class TagSetPresenter < Presenter
   extend Memoist
@@ -77,7 +76,7 @@ class TagSetPresenter < Presenter
     artists = "drawn by #{artists}" if artists.present?
 
     strings = "#{characters} #{copyrights} #{artists}"
-    strings.blank? ? default : strings
+    strings.presence || default
   end
 
   private
@@ -133,7 +132,7 @@ class TagSetPresenter < Presenter
       if count >= 10_000
         post_count = "#{count / 1_000}k"
       elsif count >= 1_000
-        post_count = "%.1fk" % (count / 1_000.0)
+        post_count = format("%.1fk", (count / 1_000.0))
       else
         post_count = count
       end

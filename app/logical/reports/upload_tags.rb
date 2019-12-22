@@ -47,6 +47,5 @@ module Reports
     def removed_tags
       removed_tags_array.join(' ')
     end
-
   end
 end

@@ -59,9 +59,9 @@ module Sources
         should "capture the frame data" do
           assert_equal(2, @site.ugoira_frame_data.size)
           if @site.ugoira_frame_data[0]["file"]
-            assert_equal([{"file"=>"000000.jpg", "delay"=>125}, {"file"=>"000001.jpg", "delay"=>125}], @site.ugoira_frame_data)
+            assert_equal([{"file" => "000000.jpg", "delay" => 125}, {"file" => "000001.jpg", "delay" => 125}], @site.ugoira_frame_data)
           else
-            assert_equal([{"delay_msec"=>125}, {"delay_msec"=>125}], @site.ugoira_frame_data)
+            assert_equal([{"delay_msec" => 125}, {"delay_msec" => 125}], @site.ugoira_frame_data)
           end
         end
       end
@@ -171,7 +171,7 @@ module Sources
 
         should "get the full size image url" do
           assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.image_url)
-        end        
+        end
 
         should "get the full size image url for the canonical url" do
           assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.canonical_url)
@@ -223,7 +223,7 @@ module Sources
             "mutsu_(kantai_collection)" => "陸奥",
             "fate/grand_order" => "Fate/GrandOrder",
             "fate" => "",
-            "foo" => "",
+            "foo" => ""
           }
 
           tags.each do |tag, other_names|

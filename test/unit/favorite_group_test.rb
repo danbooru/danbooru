@@ -35,7 +35,7 @@ class FavoriteTest < ActiveSupport::TestCase
 
       should "return the fav group" do
         assert_equal(@fav_group.id, FavoriteGroup.for_post(1).first.try(:id))
-      end      
+      end
     end
 
     context "when the id is in the middle" do
@@ -57,7 +57,7 @@ class FavoriteTest < ActiveSupport::TestCase
 
       should "return the fav group" do
         assert_equal(@fav_group.id, FavoriteGroup.for_post(1).first.try(:id))
-      end  
+      end
     end
   end
 
@@ -68,7 +68,7 @@ class FavoriteTest < ActiveSupport::TestCase
     end
 
     should "remove it from all favorite groups" do
-      assert_equal("#{@post.id}", @fav_group.post_ids)
+      assert_equal(@post.id.to_s, @fav_group.post_ids)
       @post.expunge!
       @fav_group.reload
       assert_equal("", @fav_group.post_ids)

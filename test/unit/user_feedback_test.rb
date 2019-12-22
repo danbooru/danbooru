@@ -28,7 +28,7 @@ class UserFeedbackTest < ActiveSupport::TestCase
         assert_equal(dmail, user.dmails.last.body)
       end
     end
-    
+
     should "not validate if the creator is the user" do
       gold_user = FactoryBot.create(:gold_user)
       CurrentUser.user = gold_user

@@ -4,7 +4,7 @@ class Presenter
   end
 
   def self.u(s)
-    URI.escape(s)
+    CGI.escape(s)
   end
 
   def h(s)

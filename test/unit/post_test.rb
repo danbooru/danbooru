@@ -301,7 +301,7 @@ class PostTest < ActiveSupport::TestCase
         end
       end
     end
-    
+
     context "Deleting a post with" do
       context "a parent" do
         should "not reassign favorites to the parent by default" do
@@ -716,7 +716,6 @@ class PostTest < ActiveSupport::TestCase
       end
 
       context "tagged with a metatag" do
-
         context "for typing a tag" do
           setup do
             @post = FactoryBot.create(:post, tag_string: "char:hoge")
@@ -828,14 +827,14 @@ class PostTest < ActiveSupport::TestCase
 
           should "add the post to the favgroup" do
             assert_equal(1, @favgroup.reload.post_count)
-            assert_equal(true, !!@favgroup.contains?(@post.id))
+            assert_equal(true, @favgroup.contains?(@post.id))
           end
 
           should "remove the post from the favgroup" do
             @post.update(:tag_string => "-favgroup:#{@favgroup.id}")
 
             assert_equal(0, @favgroup.reload.post_count)
-            assert_equal(false, !!@favgroup.contains?(@post.id))
+            assert_equal(false, @favgroup.contains?(@post.id))
           end
         end
 
@@ -1814,7 +1813,7 @@ class PostTest < ActiveSupport::TestCase
     setup do
       mock_pool_archive_service!
     end
-    
+
     should "return posts for the age:<1minute tag" do
       post = FactoryBot.create(:post)
       assert_tag_match([post], "age:<1minute")
@@ -2261,7 +2260,7 @@ class PostTest < ActiveSupport::TestCase
       context "labeled" do
         should "work" do
           SavedSearch.expects(:post_ids_for).with(CurrentUser.id, label: "zzz").returns([@post1.id])
-          assert_tag_match([@post1], "search:zzz")          
+          assert_tag_match([@post1], "search:zzz")
         end
       end
 
@@ -2275,7 +2274,7 @@ class PostTest < ActiveSupport::TestCase
       context "all" do
         should "work" do
           SavedSearch.expects(:post_ids_for).with(CurrentUser.id).returns([@post1.id, @post2.id])
-          assert_tag_match([@post2, @post1], "search:all")          
+          assert_tag_match([@post2, @post1], "search:all")
         end
       end
     end
@@ -2348,9 +2347,9 @@ class PostTest < ActiveSupport::TestCase
           fav_count: n,
           file_size: 1.megabyte * n,
           # posts[0] is portrait, posts[1] is landscape. posts[1].mpixels > posts[0].mpixels.
-          image_height: 100*n*n,
-          image_width: 100*(3-n)*n,
-          tag_string: tags[n-1],
+          image_height: 100 * n * n,
+          image_width: 100 * (3 - n) * n,
+          tag_string: tags[n - 1]
         )
 
         FactoryBot.create(:artist_commentary, post: p)
@@ -2480,7 +2479,7 @@ class PostTest < ActiveSupport::TestCase
         FactoryBot.create(:super_voter, user: @user)
         @post = FactoryBot.create(:post)
       end
-      
+
       should "account for magnitude" do
         CurrentUser.scoped(@user, "127.0.0.1") do
           assert_nothing_raised {@post.vote!("up")}

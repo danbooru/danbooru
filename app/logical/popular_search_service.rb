@@ -22,9 +22,9 @@ class PopularSearchService
     JSON.parse(fetch_data.to_s).map {|x| x[0]}
   end
 
-  def fetch_data()
+  def fetch_data
     return [] unless self.class.enabled?
-    
+
     dates = date.strftime("%Y-%m-%d")
 
     data = Cache.get("ps-day-#{dates}", 1.minute) do
@@ -54,8 +54,7 @@ class PopularSearchService
     end
 
     data
-
-  rescue => e
+  rescue StandardError => e
     DanbooruLogger.log(e)
     return []
   end

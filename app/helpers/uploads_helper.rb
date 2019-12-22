@@ -7,11 +7,11 @@ module UploadsHelper
 
     when /\Aerror: /
       search_params = params[:search].permit!
-      link_to(upload.sanitized_status, uploads_path(search: search_params.merge({ status: upload.sanitized_status })))
+      link_to(upload.sanitized_status, uploads_path(search: search_params.merge(status: upload.sanitized_status)))
 
     else
       search_params = params[:search].permit!
-      link_to(upload.status, uploads_path(search: search_params.merge({ status: upload.status })))
+      link_to(upload.status, uploads_path(search: search_params.merge(status: upload.status)))
     end
   end
 end

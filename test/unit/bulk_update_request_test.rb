@@ -64,11 +64,11 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
     context "on approval" do
       setup do
         @post = create(:post, tag_string: "foo aaa")
-        @script = %q(
+        @script = '
           create alias foo -> bar
           create implication bar -> baz
           mass update aaa -> bbb
-        )
+        '
 
         @bur = FactoryBot.create(:bulk_update_request, :script => @script)
         @bur.approve!(@admin)

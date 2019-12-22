@@ -78,7 +78,7 @@ module PostSets
     end
 
     def hidden_posts
-      posts.select { |p| !p.visible? }
+      posts.reject { |p| p.visible? }
     end
 
     def banned_posts
@@ -122,17 +122,17 @@ module PostSets
 
     def posts
       @posts ||= begin
-        @post_count = get_post_count()
+        @post_count = get_post_count
 
         if is_random?
-          temp = get_random_posts()
+          temp = get_random_posts
         elsif raw
           temp = ::Post.raw_tag_match(tag_string).order("posts.id DESC").where("true /* PostSets::Post#posts:1 */").paginate(page, :count => post_count, :limit => per_page)
         else
           temp = ::Post.tag_match(tag_string).where("true /* PostSets::Post#posts:2 */").paginate(page, :count => post_count, :limit => per_page)
         end
 
-        # XXX HACK: uploader_name is needed in api responses and in data-uploader attribs (visible to mods only).
+        # HACK: uploader_name is needed in api responses and in data-uploader attribs (visible to mods only).
         temp = temp.includes(:uploader) if !is_random? && (format.to_sym != :html || CurrentUser.is_moderator?)
 
         temp.each # hack to force rails to eager load
@@ -159,11 +159,11 @@ module PostSets
     end
 
     def is_empty_tag?
-      tag_array.size == 0
+      tag_array.empty?
     end
 
     def is_pattern_search?
-      is_single_tag? && tag_string =~ /\*/ && !tag_array.any? {|x| x =~ /^-?source:.+/}
+      is_single_tag? && tag_string =~ /\*/ && tag_array.none? {|x| x =~ /^-?source:.+/}
     end
 
     def current_page

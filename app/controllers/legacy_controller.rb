@@ -33,7 +33,8 @@ class LegacyController < ApplicationController
     render :plain => "this resource is no longer available", :status => 410
   end
 
-private
+  private
+
   def tag_query
     params[:tags] || (params[:post] && params[:post][:tags])
   end

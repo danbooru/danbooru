@@ -6,7 +6,7 @@ class PawooApiClient
   STATUS1 = %r!\Ahttps?://pawoo\.net/web/statuses/(\d+)!
   STATUS2 = %r!\Ahttps?://pawoo\.net/@.+?/([^/]+)!
 
-  class MissingConfigurationError < Exception ; end
+  class MissingConfigurationError < Exception; end
 
   class Account
     attr_reader :json

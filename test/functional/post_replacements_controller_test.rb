@@ -16,7 +16,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           format: :json,
           post_id: @post.id,
           post_replacement: {
-            replacement_url: "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg",
+            replacement_url: "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"
           }
         }
 
@@ -42,7 +42,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           id: @post_replacement.id,
           post_replacement: {
             file_size_was: 23,
-            file_size: 42,
+            file_size: 42
           }
         }
 

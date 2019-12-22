@@ -1,35 +1,33 @@
-=begin
-
-Generalizes the hybrid storage manager to be more declarative in 
-syntax. Matches are executed in order of appearance so the first
-matching manager is returned. You should always add at least one
-manager with no constraints as a default case.
-
+#
+# Generalizes the hybrid storage manager to be more declarative in
+# syntax. Matches are executed in order of appearance so the first
+# matching manager is returned. You should always add at least one
+# manager with no constraints as a default case.
+#
 ### Example
-
-  StorageManager::Match.new do |matcher|
-    matcher.add_manager(type: :crop) do
-      StorageManager::SFTP.new("raikou3.donmai.us", base_url: "https://raikou3.donmai.us", hierarchical: true, base_dir: "/var/www/raikou3")
-    end
-
-    matcher.add_manager(id: 1..850_000) do
-      StorageManager::SFTP.new("raikou1.donmai.us", base_url: "https://raikou1.donmai.us", hierarchical: true, base_dir: "/var/www/raikou1")
-    end
-
-    matcher.add_manager(id: 850_001..2_000_000) do
-      StorageManager::SFTP.new("raikou2.donmai.us", base_url: "https://raikou2.donmai.us", hierarchical: true, base_dir: "/var/www/raikou2")
-    end
-
-    matcher.add_manager(id: 1..3_000_000, type: [:large, :original]) do
-      StorageManager::SFTP.new(*Danbooru.config.all_server_hosts, base_url: "https://hijiribe.donmai.us/data")
-    end
-
-    matcher.add_manager({}) do
-      StorageManager::SFTP.new(*Danbooru.config.all_server_hosts, base_url: "#{CurrentUser.root_url}/data")
-    end
-  end
-
-=end
+#
+#   StorageManager::Match.new do |matcher|
+#     matcher.add_manager(type: :crop) do
+#       StorageManager::SFTP.new("raikou3.donmai.us", base_url: "https://raikou3.donmai.us", hierarchical: true, base_dir: "/var/www/raikou3")
+#     end
+#
+#     matcher.add_manager(id: 1..850_000) do
+#       StorageManager::SFTP.new("raikou1.donmai.us", base_url: "https://raikou1.donmai.us", hierarchical: true, base_dir: "/var/www/raikou1")
+#     end
+#
+#     matcher.add_manager(id: 850_001..2_000_000) do
+#       StorageManager::SFTP.new("raikou2.donmai.us", base_url: "https://raikou2.donmai.us", hierarchical: true, base_dir: "/var/www/raikou2")
+#     end
+#
+#     matcher.add_manager(id: 1..3_000_000, type: [:large, :original]) do
+#       StorageManager::SFTP.new(*Danbooru.config.all_server_hosts, base_url: "https://hijiribe.donmai.us/data")
+#     end
+#
+#     matcher.add_manager({}) do
+#       StorageManager::SFTP.new(*Danbooru.config.all_server_hosts, base_url: "#{CurrentUser.root_url}/data")
+#     end
+#   end
+#
 
 class StorageManager::Match < StorageManager
   def initialize
@@ -56,7 +54,7 @@ class StorageManager::Match < StorageManager
       end
 
       if params[:type] && constraints[:type]
-        if constraints[:type].respond_to?(:include?) 
+        if constraints[:type].respond_to?(:include?)
           if !constraints[:type].include?(params[:type])
             match = false
           end
@@ -109,4 +107,3 @@ class StorageManager::Match < StorageManager
     end
   end
 end
-

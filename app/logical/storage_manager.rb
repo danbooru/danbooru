@@ -45,7 +45,7 @@ class StorageManager
   end
 
   def open_file(post, type)
-    open(file_path(post.md5, post.file_ext, type))
+    self.open(file_path(post.md5, post.file_ext, type))
   end
 
   def file_url(post, type, tagged_filenames: false)

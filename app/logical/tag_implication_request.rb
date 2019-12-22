@@ -1,5 +1,5 @@
 class TagImplicationRequest
-  def self.command_string(antecedent_name, consequent_name, id=nil)
+  def self.command_string(antecedent_name, consequent_name, id = nil)
     if id
       return "[ti:#{id}]"
     end

@@ -39,14 +39,14 @@ class DanbooruLogger
     ::NewRelic::Agent.add_custom_attributes(attributes)
   end
 
-  private
+  private_class_method
 
   # flatten_hash({ foo: { bar: { baz: 42 } } })
   # => { "foo.bar.baz" => 42 }
   def self.flatten_hash(hash)
     hash.each_with_object({}) do |(k, v), h|
       if v.is_a?(Hash)
-        flatten_hash(v).map do|h_k, h_v|
+        flatten_hash(v).map do |h_k, h_v|
           h["#{k}.#{h_k}"] = h_v
         end
       else

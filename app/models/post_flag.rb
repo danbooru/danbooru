@@ -1,5 +1,5 @@
 class PostFlag < ApplicationRecord
-  class Error < Exception ; end
+  class Error < Exception; end
 
   module Reasons
     UNAPPROVED = "Unapproved in three days"

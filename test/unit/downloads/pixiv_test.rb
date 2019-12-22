@@ -109,7 +109,6 @@ module Downloads
           assert_not_rewritten(@file_url)
           assert_downloaded(@file_size, @file_url)
         end
-
       end
 
       context "downloading a background image" do
@@ -157,9 +156,9 @@ module Downloads
       should "capture the data" do
         assert_equal(2, @download.data[:ugoira_frame_data].size)
         if @download.data[:ugoira_frame_data][0]["file"]
-          assert_equal([{"file"=>"000000.jpg", "delay"=>125}, {"file"=>"000001.jpg", "delay"=>125}], @download.data[:ugoira_frame_data])
+          assert_equal([{"file" => "000000.jpg", "delay" => 125}, {"file" => "000001.jpg", "delay" => 125}], @download.data[:ugoira_frame_data])
         else
-          assert_equal([{"delay_msec"=>125}, {"delay_msec"=>125}], @download.data[:ugoira_frame_data])
+          assert_equal([{"delay_msec" => 125}, {"delay_msec" => 125}], @download.data[:ugoira_frame_data])
         end
       end
     end

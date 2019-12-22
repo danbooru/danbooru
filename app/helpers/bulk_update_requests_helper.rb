@@ -94,7 +94,7 @@ module BulkUpdateRequestsHelper
         "#{btag}remove implication " + link_to(arg1, posts_path(:tags => arg1)) + " (#{arg1_count}) -&gt; " + link_to(arg2, posts_path(:tags => arg2)) + " (#{arg2_count})#{etag}"
 
       when :mass_update
-        "#{btag}mass update " + link_to(arg1, posts_path(:tags => arg1)) + " -&gt; " + link_to(arg2, posts_path(:tags => arg2)) + "#{etag}"
+        "#{btag}mass update " + link_to(arg1, posts_path(:tags => arg1)) + " -&gt; " + link_to(arg2, posts_path(:tags => arg2)) + etag.to_s
 
       when :change_category
         arg1_count = Tag.find_by_name(arg1).try(:post_count).to_i

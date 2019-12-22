@@ -1,5 +1,5 @@
 module DanbooruImageResizer
-  extend self
+  module_function
 
   # Taken from ArgyllCMS 2.0.0 (see also: https://ninedegreesbelow.com/photography/srgb-profile-comparison.html)
   SRGB_PROFILE = "#{Rails.root}/config/sRGB.icm"
@@ -46,7 +46,6 @@ module DanbooruImageResizer
     end
 
     return true
-
   ensure
     temp.close
     temp.unlink

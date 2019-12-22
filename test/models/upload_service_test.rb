@@ -20,7 +20,7 @@ class UploadServiceTest < ActiveSupport::TestCase
     context "#get_file_for_upload" do
       context "for a non-source site" do
         setup do
-          @source = "https://upload.wikimedia.org/wikipedia/commons/c/c5/Moraine_Lake_17092005.jpg"          
+          @source = "https://upload.wikimedia.org/wikipedia/commons/c/c5/Moraine_Lake_17092005.jpg"
           @upload = Upload.new
           @upload.source = @source
         end
@@ -163,7 +163,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
       end
 
-      context "for an image" do 
+      context "for an image" do
         setup do
           @file = File.open("test/files/test.jpg", "rb")
           @upload = Upload.new(file_ext: "jpg")
@@ -211,7 +211,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         setup do
           context = UGOIRA_CONTEXT
           @file = File.open("test/fixtures/ugoira.zip", "rb")
-          @upload = mock()
+          @upload = mock
           @upload.stubs(:is_video?).returns(false)
           @upload.stubs(:is_ugoira?).returns(true)
           @upload.stubs(:context).returns(context)
@@ -243,7 +243,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         context "for an mp4" do
           setup do
             @file = File.open("test/files/test-300x300.mp4", "rb")
-            @upload = mock()
+            @upload = mock
             @upload.stubs(:is_video?).returns(true)
             @upload.stubs(:is_ugoira?).returns(false)
           end
@@ -266,7 +266,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         context "for a webm" do
           setup do
             @file = File.open("test/files/test-512x512.webm", "rb")
-            @upload = mock()
+            @upload = mock
             @upload.stubs(:is_video?).returns(true)
             @upload.stubs(:is_ugoira?).returns(false)
           end
@@ -293,7 +293,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         setup do
-          @upload = mock()
+          @upload = mock
           @upload.stubs(:is_video?).returns(false)
           @upload.stubs(:is_ugoira?).returns(false)
           @upload.stubs(:is_image?).returns(true)
@@ -414,8 +414,8 @@ class UploadServiceTest < ActiveSupport::TestCase
           assert_equal(9800, @upload.file_size)
           assert_equal("png", @upload.file_ext)
           assert_equal("f5fe24f3a3a13885285f6627e04feec9", @upload.md5)
-          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "png", :original)))
-          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "png", :preview)))
+          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "png", :original)))
+          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "png", :preview)))
         end
       end
 
@@ -436,8 +436,8 @@ class UploadServiceTest < ActiveSupport::TestCase
           assert_equal(294591, @upload.file_size)
           assert_equal("jpg", @upload.file_ext)
           assert_equal("3cb1ef624714c15dbb2d6e7b1d57faef", @upload.md5)
-          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
-          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :preview)))
+          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :preview)))
         end
       end
 
@@ -459,8 +459,8 @@ class UploadServiceTest < ActiveSupport::TestCase
           assert_equal(2804, @upload.file_size)
           assert_equal("zip", @upload.file_ext)
           assert_equal("cad1da177ef309bf40a117c17b8eecf5", @upload.md5)
-          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "zip", :original)))
-          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "zip", :large)))
+          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "zip", :original)))
+          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "zip", :large)))
         end
       end
 
@@ -480,9 +480,9 @@ class UploadServiceTest < ActiveSupport::TestCase
           assert_equal(181309, @upload.file_size)
           assert_equal("jpg", @upload.file_ext)
           assert_equal("93f4dd66ef1eb11a89e56d31f9adc8d0", @upload.md5)
-          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
-          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :large)))
-          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :preview)))
+          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :large)))
+          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :preview)))
         end
       end
 
@@ -499,8 +499,8 @@ class UploadServiceTest < ActiveSupport::TestCase
           assert_equal("mp4", @upload.file_ext)
           assert_operator(@upload.file_size, :>, 0)
           assert_not_nil(@upload.source)
-          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "mp4", :original)))
-          assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "mp4", :preview)))
+          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "mp4", :original)))
+          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "mp4", :preview)))
         end
       end
 
@@ -509,7 +509,7 @@ class UploadServiceTest < ActiveSupport::TestCase
           @source = "https://raikou1.donmai.us/93/f4/93f4dd66ef1eb11a89e56d31f9adc8d0.jpg"
           HTTParty.stubs(:get).raises(Net::ReadTimeout)
         end
-        
+
         should "leave the upload in an error state" do
           @service = subject.new(source: @source)
           @upload = @service.start!
@@ -536,7 +536,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       should "overwrite the attributes" do
         @service = subject.new(source: @source, rating: 'e')
-        @upload = @service.start!        
+        @upload = @service.start!
         @service.finish!
         @upload.reload
         assert_equal('e', @upload.rating)
@@ -558,7 +558,7 @@ class UploadServiceTest < ActiveSupport::TestCase
           @post.stubs(:queue_delete_files)
           @replacement = FactoryBot.create(:post_replacement, post: @post, replacement_url: "", replacement_file: @new_file)
         end
-      end      
+      end
 
       subject { UploadService::Replacer.new(post: @post, replacement: @replacement) }
 
@@ -614,7 +614,7 @@ class UploadServiceTest < ActiveSupport::TestCase
           assert_equal(28086, @post.file_size)
           assert_equal("jpg", @post.file_ext)
           assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", @post.md5)
-          assert(File.exists?(@post.file.path))
+          assert(File.exist?(@post.file.path))
         end
       end
 
@@ -856,7 +856,7 @@ class UploadServiceTest < ActiveSupport::TestCase
             assert_equal("cad1da177ef309bf40a117c17b8eecf5", Digest::MD5.file(@post.file).hexdigest)
 
             assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @post.source)
-            assert_equal([{"delay"=>125, "file"=>"000000.jpg"}, {"delay"=>125,"file"=>"000001.jpg"}], @post.pixiv_ugoira_frame_data.data)
+            assert_equal([{"delay" => 125, "file" => "000000.jpg"}, {"delay" => 125, "file" => "000001.jpg"}], @post.pixiv_ugoira_frame_data.data)
           rescue Net::OpenTimeout
             skip "Remote connection to Pixiv failed"
           end
@@ -870,7 +870,7 @@ class UploadServiceTest < ActiveSupport::TestCase
             @post.unstub(:queue_delete_files)
 
             # this is called thrice to delete the file for 62247364
-            FileUtils.expects(:rm_f).times(3) 
+            FileUtils.expects(:rm_f).times(3)
 
             as_user do
               @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
@@ -1018,7 +1018,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
     context "that is too large" do
       setup do
-        Danbooru.config.stubs(:max_image_resolution).returns(31*31)
+        Danbooru.config.stubs(:max_image_resolution).returns(31 * 31)
       end
 
       should "should fail validation" do
@@ -1068,7 +1068,6 @@ class UploadServiceTest < ActiveSupport::TestCase
           assert_equal("error: ActiveRecord::RecordInvalid - Validation failed: Md5 duplicate: #{@post.id}", @predecessor.status)
         end
       end
-
     end
 
     context "with no predecessor" do
@@ -1178,7 +1177,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       should "record the canonical source" do
         post = subject.new({}).create_post_from_upload(@upload)
         assert_equal(@ref, post.source)
-      end 
+      end
     end
 
     context "for a pixiv ugoira" do
@@ -1213,7 +1212,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       should "create a commentary record" do
         assert_difference(-> { ArtistCommentary.count }) do
-          subject.new({include_artist_commentary: true, artist_commentary_title: "blah", artist_commentary_desc: "blah"}).create_post_from_upload(@upload)
+          subject.new(include_artist_commentary: true, artist_commentary_title: "blah", artist_commentary_desc: "blah").create_post_from_upload(@upload)
         end
       end
 
@@ -1223,7 +1222,6 @@ class UploadServiceTest < ActiveSupport::TestCase
         assert_not_nil(post.id)
       end
     end
-
   end
 
   context "Upload#prune!" do
@@ -1239,31 +1237,31 @@ class UploadServiceTest < ActiveSupport::TestCase
 
     should "delete unused files after deleting the upload" do
       @upload = as(@user) { UploadService::Preprocessor.new(file: upload_file("test/files/test.jpg")).start! }
-      assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+      assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
 
       @upload.destroy!
-      refute(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+      refute(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
     end
 
     should "not delete files that are still in use by a post" do
       @upload = as(@user) { UploadService.new(file: upload_file("test/files/test.jpg")).start! }
-      assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+      assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
 
       @upload.destroy!
-      assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+      assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
     end
 
     should "not delete files if they're still in use by another upload" do
       @upload1 = as(@user) { UploadService::Preprocessor.new(file: upload_file("test/files/test.jpg")).start! }
       @upload2 = as(@user) { UploadService::Preprocessor.new(file: upload_file("test/files/test.jpg")).start! }
       assert_equal(@upload1.md5, @upload2.md5)
-      assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload1.md5, "jpg", :original)))
+      assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload1.md5, "jpg", :original)))
 
       @upload1.destroy!
-      assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload1.md5, "jpg", :original)))
+      assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload1.md5, "jpg", :original)))
 
       @upload2.destroy!
-      refute(File.exists?(Danbooru.config.storage_manager.file_path(@upload2.md5, "jpg", :original)))
+      refute(File.exist?(Danbooru.config.storage_manager.file_path(@upload2.md5, "jpg", :original)))
     end
 
     should "not delete files that were replaced after upload and are still pending deletion" do
@@ -1276,11 +1274,11 @@ class UploadServiceTest < ActiveSupport::TestCase
       # after replacement the uploaded file is no longer in use, but it shouldn't be
       # deleted yet. it should only be deleted by the replacer after the grace period.
       @upload.destroy!
-      assert(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+      assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
 
       travel (PostReplacement::DELETION_GRACE_PERIOD + 1).days
       perform_enqueued_jobs
-      refute(File.exists?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+      refute(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
     end
 
     should "work on uploads without a file" do

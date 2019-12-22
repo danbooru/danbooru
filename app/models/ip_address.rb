@@ -36,7 +36,7 @@ class IpAddress < ApplicationRecord
 
   def to_s
     # include the subnet mask only when the IP denotes a subnet.
-    ip_addr.size > 1 ? ip_addr.to_string : ip_addr.to_s
+    (ip_addr.size > 1) ? ip_addr.to_string : ip_addr.to_s
   end
 
   def readonly?

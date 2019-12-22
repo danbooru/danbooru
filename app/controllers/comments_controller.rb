@@ -72,7 +72,8 @@ class CommentsController < ApplicationController
     respond_with(@comment)
   end
 
-private
+  private
+
   def index_for_post
     @post = Post.find(params[:post_id])
     @comments = @post.comments

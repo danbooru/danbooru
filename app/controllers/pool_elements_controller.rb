@@ -27,7 +27,8 @@ class PoolElementsController < ApplicationController
     @pools
   end
 
-private
+  private
+
   def append_pool_to_session(pool)
     recent_pool_ids = session[:recent_pool_ids].to_s.scan(/\d+/)
     recent_pool_ids << pool.id.to_s

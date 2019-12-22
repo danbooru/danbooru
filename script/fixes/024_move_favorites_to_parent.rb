@@ -9,7 +9,7 @@ CurrentUser.ip_addr = "127.0.0.1"
 
 CurrentUser.without_safe_mode do
   sample_tags = %w(pixiv_manga_sample pixiv_thumbnail deviantart_thumbnail thumbnail nico_nico_thumbnail twitpic_thumbnail tumblr_sample imageboard_sample nijie_sample)
-  Post.tag_match(sample_tags.map{|tag| "~" + tag}.join(" ")).where("is_deleted = true and parent_id is not null and fav_count > 0").find_each do |post|
+  Post.tag_match(sample_tags.map {|tag| "~" + tag}.join(" ")).where("is_deleted = true and parent_id is not null and fav_count > 0").find_each do |post|
     if (post.parent.tag_array & sample_tags).any?
       next
     else

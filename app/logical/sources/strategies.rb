@@ -10,11 +10,11 @@ module Sources
         Strategies::ArtStation,
         Strategies::Nijie,
         Strategies::Pawoo,
-        Strategies::Moebooru,
+        Strategies::Moebooru
       ]
     end
 
-    def self.find(url, referer=nil, default: Strategies::Null)
+    def self.find(url, referer = nil, default: Strategies::Null)
       strategy = all.map { |strategy| strategy.new(url, referer) }.detect(&:match?)
       strategy || default&.new(url, referer)
     end

@@ -23,7 +23,7 @@ module PostsHelper
 
   def missed_post_search_count_js
     return nil unless post_search_counts_enabled?
-    
+
     if params[:ms] == "1" && @post_set.post_count == 0 && @post_set.is_single_tag?
       session_id = session.id
       verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.reportbooru_key, serializer: JSON, digest: "SHA256")
@@ -34,7 +34,7 @@ module PostsHelper
 
   def post_search_count_js
     return nil unless post_search_counts_enabled?
-    
+
     if params[:action] == "index" && params[:page].nil?
       tags = Tag.scan_query(params[:tags]).sort.join(" ")
 
@@ -68,7 +68,7 @@ module PostsHelper
   end
 
   def post_favlist(post)
-    post.favorited_users.reverse_each.map{|user| link_to_user(user)}.join(", ").html_safe
+    post.favorited_users.reverse_each.map {|user| link_to_user(user)}.join(", ").html_safe
   end
 
   def has_parent_message(post, parent_post_set)
@@ -81,7 +81,7 @@ module PostsHelper
     sibling_count = parent_post_set.children.count - 1
     if sibling_count > 0
       html << " and has "
-      text = sibling_count == 1 ? "a sibling" : "#{sibling_count} siblings"
+      text = (sibling_count == 1) ? "a sibling" : "#{sibling_count} siblings"
       html << link_to(text, posts_path(:tags => "parent:#{post.parent_id}"))
     end
 
@@ -96,7 +96,7 @@ module PostsHelper
     html = ""
 
     html << "This post has "
-    text = children_post_set.children.count == 1 ? "a child" : "#{children_post_set.children.count} children"
+    text = (children_post_set.children.count == 1) ? "a child" : "#{children_post_set.children.count} children"
     html << link_to(text, posts_path(:tags => "parent:#{post.id}"))
 
     html << " (#{link_to_wiki "learn more", "help:post_relationships"}) "
@@ -111,9 +111,9 @@ module PostsHelper
   end
 
   def is_pool_selected?(pool)
-    return false if params.has_key?(:q)
-    return false if params.has_key?(:favgroup_id)
-    return false if !params.has_key?(:pool_id)
+    return false if params.key?(:q)
+    return false if params.key?(:favgroup_id)
+    return false if !params.key?(:pool_id)
     return params[:pool_id].to_i == pool.id
   end
 

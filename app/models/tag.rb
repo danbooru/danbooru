@@ -40,9 +40,9 @@ class Tag < ApplicationRecord
     random
     custom
   ] +
-  COUNT_METATAGS +
-  COUNT_METATAG_SYNONYMS.flat_map { |str| [str, "#{str}_asc"] } +
-  TagCategory.short_name_list.flat_map { |str| ["#{str}tags", "#{str}tags_asc"] }
+    COUNT_METATAGS +
+    COUNT_METATAG_SYNONYMS.flat_map { |str| [str, "#{str}_asc"] } +
+    TagCategory.short_name_list.flat_map { |str| ["#{str}tags", "#{str}tags_asc"] }
 
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :artist, :foreign_key => "name", :primary_key => "name"
@@ -130,7 +130,7 @@ class Tag < ApplicationRecord
   module CategoryMethods
     module ClassMethods
       def categories
-        @category_mapping ||= CategoryMapping.new
+        @categories ||= CategoryMapping.new
       end
 
       def select_category_for(tag_name)
@@ -170,11 +170,11 @@ class Tag < ApplicationRecord
     end
 
     def update_category_post_counts
-      Post.with_timeout(30_000, nil, {:tags => name}) do
+      Post.with_timeout(30_000, nil, :tags => name) do
         Post.raw_tag_match(name).where("true /* Tag#update_category_post_counts */").find_each do |post|
           post.reload
           post.set_tag_counts(false)
-          args = TagCategory.categories.map {|x| ["tag_count_#{x}",post.send("tag_count_#{x}")]}.to_h.update(:tag_count => post.tag_count)
+          args = TagCategory.categories.map {|x| ["tag_count_#{x}", post.send("tag_count_#{x}")]}.to_h.update(:tag_count => post.tag_count)
           Post.where(:id => post.id).update_all(args)
         end
       end
@@ -314,11 +314,7 @@ class Tag < ApplicationRecord
         object.to_f
 
       when :date, :datetime
-        begin
-          Time.zone.parse(object)
-        rescue Exception
-          nil
-        end
+        Time.zone.parse(object) rescue nil
 
       when :age
         DurationParser.parse(object).ago
@@ -327,7 +323,7 @@ class Tag < ApplicationRecord
         object =~ /\A(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)\Z/i
 
         if $1 && $2.to_f != 0.0
-         ($1.to_f / $2.to_f).round(2)
+          ($1.to_f / $2.to_f).round(2)
         else
           object.to_f.round(2)
         end
@@ -750,7 +746,7 @@ class Tag < ApplicationRecord
           when "order"
             g2 = g2.downcase
 
-            order, suffix, _ = g2.partition(/_(asc|desc)\z/i)
+            order, suffix, _tail = g2.partition(/_(asc|desc)\z/i)
             if order.in?(COUNT_METATAG_SYNONYMS)
               g2 = order.singularize + "_count" + suffix
             end
@@ -898,10 +894,14 @@ class Tag < ApplicationRecord
       name = normalize_name(name)
       wildcard_name = name + '*'
 
-      query1 = Tag.select("tags.name, tags.post_count, tags.category, null AS antecedent_name")
+      query1 =
+        Tag
+        .select("tags.name, tags.post_count, tags.category, null AS antecedent_name")
         .search(:name_matches => wildcard_name, :order => "count").limit(limit)
 
-      query2 = TagAlias.select("tags.name, tags.post_count, tags.category, tag_aliases.antecedent_name")
+      query2 =
+        TagAlias
+        .select("tags.name, tags.post_count, tags.category, tag_aliases.antecedent_name")
         .joins("INNER JOIN tags ON tags.name = tag_aliases.consequent_name")
         .where("tag_aliases.antecedent_name LIKE ? ESCAPE E'\\\\'", wildcard_name.to_escaped_for_sql_like)
         .active
@@ -922,7 +922,7 @@ class Tag < ApplicationRecord
   end
 
   def self.convert_cosplay_tags(tags)
-    cosplay_tags,other_tags = tags.partition {|tag| tag.match(/\A(.+)_\(cosplay\)\Z/) }
+    cosplay_tags, other_tags = tags.partition {|tag| tag.match(/\A(.+)_\(cosplay\)\Z/) }
     cosplay_tags.grep(/\A(.+)_\(cosplay\)\Z/) { "#{TagAlias.to_aliased([$1]).first}_(cosplay)" } + other_tags
   end
 

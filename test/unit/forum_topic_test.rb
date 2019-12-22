@@ -49,7 +49,7 @@ class ForumTopicTest < ActiveSupport::TestCase
           context "that postdates the topic" do
             setup do
               FactoryBot.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 2.days.from_now)
-            end            
+            end
 
             should "return true" do
               assert_equal(true, @topic.read_by?(@user))
@@ -78,7 +78,7 @@ class ForumTopicTest < ActiveSupport::TestCase
 
           context "that postdates the topic" do
             setup do
-              FactoryBot.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 1.days.from_now)
+              FactoryBot.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 1.day.from_now)
             end
 
             should "return true" do
@@ -128,7 +128,7 @@ class ForumTopicTest < ActiveSupport::TestCase
       should "create a matching forum post" do
         assert_difference(["ForumTopic.count", "ForumPost.count"], 1) do
           @topic = FactoryBot.create(:forum_topic, :title => "abc", :original_post_attributes => {:body => "abc"})
-       end
+        end
       end
     end
 

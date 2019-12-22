@@ -8,7 +8,7 @@ class ForumTopic < ApplicationRecord
   MIN_LEVELS = {
     None: 0,
     Moderator: User::Levels::MODERATOR,
-    Admin: User::Levels::ADMIN,
+    Admin: User::Levels::ADMIN
   }
 
   belongs_to_creator
@@ -25,7 +25,7 @@ class ForumTopic < ApplicationRecord
   accepts_nested_attributes_for :original_post
   after_update :update_orignal_post
   after_save(:if => ->(rec) {rec.is_locked? && rec.saved_change_to_is_locked?}) do |rec|
-    ModAction.log("locked forum topic ##{id} (title: #{title})",:forum_topic_lock)
+    ModAction.log("locked forum topic ##{id} (title: #{title})", :forum_topic_lock)
   end
 
   module CategoryMethods
@@ -97,7 +97,7 @@ class ForumTopic < ApplicationRecord
 
     def mark_as_read!(user = CurrentUser.user)
       return if user.is_anonymous?
-      
+
       match = ForumTopicVisit.where(:user_id => user.id, :forum_topic_id => id).first
       if match
         match.update_attribute(:last_read_at, updated_at)
@@ -105,10 +105,15 @@ class ForumTopic < ApplicationRecord
         ForumTopicVisit.create(:user_id => user.id, :forum_topic_id => id, :last_read_at => updated_at)
       end
 
-      has_unread_topics = ForumTopic.permitted.active.where("forum_topics.updated_at >= ?", user.last_forum_read_at)
-      .joins("left join forum_topic_visits on (forum_topic_visits.forum_topic_id = forum_topics.id and forum_topic_visits.user_id = #{user.id})")
-      .where("(forum_topic_visits.id is null or forum_topic_visits.last_read_at < forum_topics.updated_at)")
-      .exists?
+      has_unread_topics =
+        ForumTopic
+        .permitted
+        .active
+        .where("forum_topics.updated_at >= ?", user.last_forum_read_at)
+        .joins("left join forum_topic_visits on (forum_topic_visits.forum_topic_id = forum_topics.id and forum_topic_visits.user_id = #{user.id})")
+        .where("(forum_topic_visits.id is null or forum_topic_visits.last_read_at < forum_topics.updated_at)")
+        .exists?
+
       unless has_unread_topics
         user.update_attribute(:last_forum_read_at, Time.now)
         ForumTopicVisit.prune!(user)
@@ -136,11 +141,11 @@ class ForumTopic < ApplicationRecord
   end
 
   def create_mod_action_for_delete
-    ModAction.log("deleted forum topic ##{id} (title: #{title})",:forum_topic_delete)
+    ModAction.log("deleted forum topic ##{id} (title: #{title})", :forum_topic_delete)
   end
 
   def create_mod_action_for_undelete
-    ModAction.log("undeleted forum topic ##{id} (title: #{title})",:forum_topic_undelete)
+    ModAction.log("undeleted forum topic ##{id} (title: #{title})", :forum_topic_undelete)
   end
 
   def initialize_is_deleted
@@ -170,8 +175,6 @@ class ForumTopic < ApplicationRecord
   end
 
   def update_orignal_post
-    if original_post
-      original_post.update_columns(:updater_id => CurrentUser.id, :updated_at => Time.now)
-    end
+    original_post&.update_columns(:updater_id => CurrentUser.id, :updated_at => Time.now)
   end
 end

@@ -10,7 +10,7 @@ module Downloads
       end
 
       teardown do
-        ENV["SKIP_CLOUDFLARE_CHECK"] = nil        
+        ENV["SKIP_CLOUDFLARE_CHECK"] = nil
       end
 
       context "for a banned IP" do
@@ -59,7 +59,7 @@ module Downloads
 
           HTTParty.expects(:get).twice.multiple_yields(chunk, bomb).then.multiple_yields(chunk, chunk).returns(resp)
           @download.stubs(:is_cloudflare?).returns(false)
-          tempfile, _ = @download.download!
+          tempfile, _strategy = @download.download!
 
           assert_equal("aa", tempfile.read)
         end
@@ -78,7 +78,7 @@ module Downloads
 
       should "correctly save the file when following 302 redirects" do
         download = Downloads::File.new("https://yande.re/post/show/578014")
-        file, strategy  = download.download!(url: download.preview_url)
+        file, strategy = download.download!(url: download.preview_url)
         assert_equal(19134, file.size)
       end
     end

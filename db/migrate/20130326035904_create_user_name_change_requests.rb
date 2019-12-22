@@ -10,7 +10,7 @@ class CreateUserNameChangeRequests < ActiveRecord::Migration[4.2]
       t.text :rejection_reason
       t.timestamps
     end
-    
+
     add_index :user_name_change_requests, :user_id
     add_index :user_name_change_requests, :original_name
   end

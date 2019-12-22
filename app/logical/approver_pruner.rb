@@ -1,5 +1,5 @@
 module ApproverPruner
-  extend self
+  module_function
 
   def inactive_approvers
     User.where("bit_prefs & ? > 0", User.flag_value_for("can_approve_posts")).select do |user|

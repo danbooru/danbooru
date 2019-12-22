@@ -6,7 +6,7 @@ class FixLastNotedAtIndexOnPosts < ActiveRecord::Migration[4.2]
 
       remove_index :posts, column: :last_noted_at
       add_index :posts, :last_noted_at, order: "DESC NULLS LAST"
-      
+
       execute "analyze posts"
     end
   end

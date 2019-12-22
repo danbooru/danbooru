@@ -18,7 +18,8 @@ module Moderator
       end
     end
 
-  private
+    private
+
     def search_by_ip_addr(ip_addrs)
       sums = Hash.new {|h, k| h[k] = 0}
 

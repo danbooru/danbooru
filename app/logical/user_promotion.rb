@@ -18,22 +18,22 @@ class UserPromotion
 
     user.level = new_level
 
-    if options.has_key?(:can_approve_posts)
+    if options.key?(:can_approve_posts)
       user.can_approve_posts = options[:can_approve_posts]
     end
 
-    if options.has_key?(:can_upload_free)
+    if options.key?(:can_upload_free)
       user.can_upload_free = options[:can_upload_free]
     end
 
-    if options.has_key?(:no_feedback)
+    if options.key?(:no_feedback)
       user.no_feedback = options[:no_feedback]
     end
 
-    if options.has_key?(:no_flagging)
+    if options.key?(:no_flagging)
       user.no_flagging = options[:no_flagging]
     end
-    
+
     user.inviter_id = promoter.id
 
     create_user_feedback unless options[:is_upgrade]
@@ -43,23 +43,23 @@ class UserPromotion
     user.save
   end
 
-private
-  
+  private
+
   def create_mod_actions
     if old_can_approve_posts != user.can_approve_posts?
-      ModAction.log("\"#{promoter.name}\":/users/#{promoter.id} changed approval privileges for \"#{user.name}\":/users/#{user.id} from #{old_can_approve_posts} to [b]#{user.can_approve_posts?}[/b]",:user_approval_privilege)
+      ModAction.log("\"#{promoter.name}\":/users/#{promoter.id} changed approval privileges for \"#{user.name}\":/users/#{user.id} from #{old_can_approve_posts} to [b]#{user.can_approve_posts?}[/b]", :user_approval_privilege)
     end
 
     if old_can_upload_free != user.can_upload_free?
-      ModAction.log("\"#{promoter.name}\":/users/#{promoter.id} changed unlimited upload privileges for \"#{user.name}\":/users/#{user.id} from #{old_can_upload_free} to [b]#{user.can_upload_free?}[/b]",:user_upload_privilege)
+      ModAction.log("\"#{promoter.name}\":/users/#{promoter.id} changed unlimited upload privileges for \"#{user.name}\":/users/#{user.id} from #{old_can_upload_free} to [b]#{user.can_upload_free?}[/b]", :user_upload_privilege)
     end
 
     if old_no_flagging != user.no_flagging?
-      ModAction.log("\"#{promoter.name}\":/users/#{promoter.id} changed banned from flagging for \"#{user.name}\":/users/#{user.id} from #{old_no_flagging} to [b]#{user.no_flagging?}[/b]",:user_approval_privilege)
+      ModAction.log("\"#{promoter.name}\":/users/#{promoter.id} changed banned from flagging for \"#{user.name}\":/users/#{user.id} from #{old_no_flagging} to [b]#{user.no_flagging?}[/b]", :user_approval_privilege)
     end
 
     if old_no_feedback != user.no_feedback?
-      ModAction.log("\"#{promoter.name}\":/users/#{promoter.id} changed banned from feedback for \"#{user.name}\":/users/#{user.id} from #{old_no_feedback} to [b]#{user.no_feedback?}[/b]",:user_approval_privilege)
+      ModAction.log("\"#{promoter.name}\":/users/#{promoter.id} changed banned from feedback for \"#{user.name}\":/users/#{user.id} from #{old_no_feedback} to [b]#{user.no_feedback?}[/b]", :user_approval_privilege)
     end
 
     if user.level_changed?
@@ -75,7 +75,7 @@ private
     # can't promote/demote moderators
     raise User::PrivilegeError if user.is_moderator?
 
-    # can't promote to admin      
+    # can't promote to admin
     raise User::PrivilegeError if new_level.to_i >= User::Levels::ADMIN
   end
 
@@ -108,11 +108,11 @@ private
       messages << "You gained the ability to give user feedback."
     end
 
-   if user.no_flagging? && !old_no_flagging
+    if user.no_flagging? && !old_no_flagging
       messages << "You lost the ability to flag posts."
     elsif !user.no_flagging? && old_no_flagging
       messages << "You gained the ability to flag posts."
-    end
+     end
 
     messages.join("\n")
   end

@@ -1,10 +1,10 @@
 class CreatePostReplacements < ActiveRecord::Migration[4.2]
   def change
     create_table :post_replacements do |t|
-    	t.integer :post_id, null: false
-    	t.integer :creator_id, null: false
-    	t.text :original_url, null: false
-    	t.text :replacement_url, null: false
+      t.integer :post_id, null: false
+      t.integer :creator_id, null: false
+      t.text :original_url, null: false
+      t.text :replacement_url, null: false
       t.timestamps null: false
     end
 

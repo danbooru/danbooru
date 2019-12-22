@@ -24,7 +24,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
             post_id: @note.post_id,
             post_tags_match: @note.post.tag_array.first,
             creator_name: @note.creator.name,
-            creator_id: @note.creator_id,
+            creator_id: @note.creator_id
           }
         }
 

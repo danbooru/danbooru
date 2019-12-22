@@ -1,5 +1,4 @@
 Rails.application.routes.draw do
-
   namespace :admin do
     resources :users, :only => [:edit, :update]
     resource  :alias_and_implication_import, :only => [:new, :create]
@@ -155,7 +154,7 @@ Rails.application.routes.draw do
   end
   resources :ip_bans
   resources :ip_addresses, only: [:index]
-  resource :iqdb_queries, :only => [:show, :create]  do
+  resource :iqdb_queries, :only => [:show, :create] do
     collection do
       get :preview
       get :check, to: redirect {|path_params, req| "/iqdb_queries?#{req.query_string}"}
@@ -183,7 +182,7 @@ Rails.application.routes.draw do
     end
     resource :order, :only => [:edit], :controller => "pool_orders"
   end
-  resource  :pool_element, :only => [:create, :destroy] do
+  resource :pool_element, :only => [:create, :destroy] do
     collection do
       get :all_select
     end
@@ -303,12 +302,12 @@ Rails.application.routes.draw do
   resources :fposts, :controller => "forum_posts"
 
   # legacy aliases
-  get "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}&search[name]=#{CGI::escape(req.params[:name].to_s)}"}
+  get "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}&search[name]=#{CGI.escape(req.params[:name].to_s)}"}
   get "/artist/index.xml", :controller => "legacy", :action => "artists", :format => "xml"
   get "/artist/index.json", :controller => "legacy", :action => "artists", :format => "json"
   get "/artist/index" => redirect {|params, req| "/artists?page=#{req.params[:page]}"}
   get "/artist/show/:id" => redirect("/artists/%{id}")
-  get "/artist/show" => redirect {|params, req| "/artists?name=#{CGI::escape(req.params[:name].to_s)}"}
+  get "/artist/show" => redirect {|params, req| "/artists?name=#{CGI.escape(req.params[:name].to_s)}"}
   get "/artist/history/:id" => redirect("/artist_versions?search[artist_id]=%{id}")
   get "/artist/recent_changes" => redirect("/artist_versions")
 
@@ -318,7 +317,7 @@ Rails.application.routes.draw do
   get "/comment/new" => redirect("/comments")
   get("/comment/search" => redirect do |params, req|
     if req.params[:query] =~ /^user:(.+)/i
-      "/comments?group_by=comment&search[creator_name]=#{CGI::escape($1)}"
+      "/comments?group_by=comment&search[creator_name]=#{CGI.escape($1)}"
     else
       "/comments/search"
     end
@@ -333,7 +332,7 @@ Rails.application.routes.draw do
   get "/forum/show/:id" => redirect {|params, req| "/forum_posts/#{req.params[:id]}?page=#{req.params[:page]}"}
   get "/forum/search" => redirect("/forum_posts/search")
 
-  get "/help/:title" => redirect {|params, req| ("/wiki_pages?title=#{CGI::escape('help:' + req.params[:title])}")}
+  get "/help/:title" => redirect {|params, req| "/wiki_pages?title=#{CGI.escape('help:' + req.params[:title])}"}
 
   get "/note" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
   get "/note/index" => redirect {|params, req| "/notes?page=#{req.params[:page]}"}
@@ -348,12 +347,12 @@ Rails.application.routes.draw do
   get "/post/index.xml", :controller => "legacy", :action => "posts", :format => "xml"
   get "/post/index.json", :controller => "legacy", :action => "posts", :format => "json"
   get "/post/piclens", :controller => "legacy", :action => "unavailable"
-  get "/post/index" => redirect {|params, req| "/posts?tags=#{CGI::escape(req.params[:tags].to_s)}&page=#{req.params[:page]}"}
-  get "/post" => redirect {|params, req| "/posts?tags=#{CGI::escape(req.params[:tags].to_s)}&page=#{req.params[:page]}"}
+  get "/post/index" => redirect {|params, req| "/posts?tags=#{CGI.escape(req.params[:tags].to_s)}&page=#{req.params[:page]}"}
+  get "/post" => redirect {|params, req| "/posts?tags=#{CGI.escape(req.params[:tags].to_s)}&page=#{req.params[:page]}"}
   get "/post/upload" => redirect("/uploads/new")
   get "/post/moderate" => redirect("/moderator/post/queue")
-  get "/post/atom" => redirect {|params, req| "/posts.atom?tags=#{CGI::escape(req.params[:tags].to_s)}"}
-  get "/post/atom.feed" => redirect {|params, req| "/posts.atom?tags=#{CGI::escape(req.params[:tags].to_s)}"}
+  get "/post/atom" => redirect {|params, req| "/posts.atom?tags=#{CGI.escape(req.params[:tags].to_s)}"}
+  get "/post/atom.feed" => redirect {|params, req| "/posts.atom?tags=#{CGI.escape(req.params[:tags].to_s)}"}
   get "/post/popular_by_day" => redirect("/explore/posts/popular")
   get "/post/popular_by_week" => redirect("/explore/posts/popular")
   get "/post/popular_by_month" => redirect("/explore/posts/popular")
@@ -372,10 +371,10 @@ Rails.application.routes.draw do
 
   get "/tag/index.xml", :controller => "legacy", :action => "tags", :format => "xml"
   get "/tag/index.json", :controller => "legacy", :action => "tags", :format => "json"
-  get "/tag" => redirect {|params, req| "/tags?page=#{req.params[:page]}&search[name_matches]=#{CGI::escape(req.params[:name].to_s)}&search[order]=#{req.params[:order]}&search[category]=#{req.params[:type]}"}
-  get "/tag/index" => redirect {|params, req| "/tags?page=#{req.params[:page]}&search[name_matches]=#{CGI::escape(req.params[:name].to_s)}&search[order]=#{req.params[:order]}"}
+  get "/tag" => redirect {|params, req| "/tags?page=#{req.params[:page]}&search[name_matches]=#{CGI.escape(req.params[:name].to_s)}&search[order]=#{req.params[:order]}&search[category]=#{req.params[:type]}"}
+  get "/tag/index" => redirect {|params, req| "/tags?page=#{req.params[:page]}&search[name_matches]=#{CGI.escape(req.params[:name].to_s)}&search[order]=#{req.params[:order]}"}
 
-  get "/tag_implication" => redirect {|params, req| "/tag_implications?search[name_matches]=#{CGI::escape(req.params[:query].to_s)}"}
+  get "/tag_implication" => redirect {|params, req| "/tag_implications?search[name_matches]=#{CGI.escape(req.params[:query].to_s)}"}
 
   get "/user/index.xml", :controller => "legacy", :action => "users", :format => "xml"
   get "/user/index.json", :controller => "legacy", :action => "users", :format => "json"
@@ -392,7 +391,7 @@ Rails.application.routes.draw do
   get "/wiki" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
   get "/wiki/index" => redirect {|params, req| "/wiki_pages?page=#{req.params[:page]}"}
   get "/wiki/rename" => redirect("/wiki_pages")
-  get "/wiki/show" => redirect {|params, req| "/wiki_pages?title=#{CGI::escape(req.params[:title].to_s)}"}
+  get "/wiki/show" => redirect {|params, req| "/wiki_pages?title=#{CGI.escape(req.params[:title].to_s)}"}
   get "/wiki/recent_changes" => redirect {|params, req| "/wiki_page_versions?search[updater_id]=#{req.params[:user_id]}"}
   get "/wiki/history/:title" => redirect("/wiki_page_versions?title=%{title}")
 

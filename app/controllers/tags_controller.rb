@@ -37,7 +37,8 @@ class TagsController < ApplicationController
     respond_with(@tag)
   end
 
-private
+  private
+
   def check_privilege(tag)
     raise User::PrivilegeError unless tag.editable_by?(CurrentUser.user)
   end

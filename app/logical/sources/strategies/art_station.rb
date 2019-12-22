@@ -27,7 +27,7 @@ module Sources::Strategies
 
     ASSET = %r!\Ahttps?://cdn\w*\.artstation\.com/p/assets/images/images/\d+/\d+/\d+/(?:medium|small|large)/!i
 
-    attr_reader :json, :image_urls
+    attr_reader :json
 
     def domains
       ["artstation.com"]
@@ -38,13 +38,11 @@ module Sources::Strategies
     end
 
     def image_urls
-      image_urls_sub
-        .map { |asset| original_asset_url(asset) }
+      @image_urls ||= image_urls_sub.map { |asset| original_asset_url(asset) }
     end
-    memoize :image_urls
 
     def page_url
-      return nil unless project_id.present?
+      return nil if project_id.blank?
 
       if artist_name.present?
         "https://#{artist_name}.artstation.com/projects/#{project_id}"
@@ -54,7 +52,7 @@ module Sources::Strategies
     end
 
     def profile_url
-      return nil unless artist_name.present?
+      return nil if artist_name.blank?
       "https://www.artstation.com/#{artist_name}"
     end
 
@@ -84,14 +82,13 @@ module Sources::Strategies
       profile_url.present? && url == profile_url
     end
 
-  public
-
     def image_urls_sub
       if url.match?(ASSET)
         return [url]
       end
 
-      api_response[:assets].to_a
+      api_response[:assets]
+        .to_a
         .select { |asset| asset[:asset_type] == "image" }
         .map { |asset| asset[:image_url] }
     end
@@ -100,7 +97,7 @@ module Sources::Strategies
     # purposes
 
     def artist_name_from_url
-      urls.map { |url| url[PROJECT, :artist_name] || url[ARTIST, :artist_name]  }.compact.first
+      urls.map { |url| url[PROJECT, :artist_name] || url[ARTIST, :artist_name] }.compact.first
     end
 
     def project_id
@@ -108,7 +105,7 @@ module Sources::Strategies
     end
 
     def api_response
-      return {} unless project_id.present?
+      return {} if project_id.blank?
 
       resp = Danbooru::Http.cache(1.minute).get("https://www.artstation.com/projects/#{project_id}.json")
       return {} if resp.code != 200

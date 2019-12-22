@@ -1,5 +1,5 @@
 class PostAppeal < ApplicationRecord
-  class Error < Exception ; end
+  class Error < Exception; end
 
   belongs_to :creator, :class_name => "User"
   belongs_to :post

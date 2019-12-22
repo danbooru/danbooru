@@ -4,8 +4,8 @@ require File.expand_path(File.join(File.dirname(__FILE__), '..', '..', 'config',
 
 ActiveRecord::Base.connection.execute("set statement_timeout = 0")
 0.upto(1585206 / 1000) do |i|
-  puts "updating posts #{i * 1000} to #{(i+1) * 1000}"
-  ActiveRecord::Base.connection.execute("update posts set last_commented_at = (select c.created_at from comments c where c.post_id = posts.id order by c.id desc limit 1) where posts.id between #{i * 1000} and #{(i+1) * 1000}")
+  puts "updating posts #{i * 1000} to #{(i + 1) * 1000}"
+  ActiveRecord::Base.connection.execute("update posts set last_commented_at = (select c.created_at from comments c where c.post_id = posts.id order by c.id desc limit 1) where posts.id between #{i * 1000} and #{(i + 1) * 1000}")
 end
 
 TagImplication.find_each do |ti|
@@ -13,7 +13,7 @@ TagImplication.find_each do |ti|
   if ta
     puts "testing alias #{ta.antecedent_name} -> #{ta.consequent_name}"
     existing_ti = TagImplication.where("antecedent_name = ? AND consequent_name = ?", ta.consequent_name, ti.consequent_name).first
-    existing_ti.destroy if existing_ti
+    existing_ti&.destroy
 
     if ta.consequent_name == ti.consequent_name
       puts "  deleting implication #{ti.antecedent_name} -> #{ti.consequent_name}"

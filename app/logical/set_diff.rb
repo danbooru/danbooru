@@ -30,6 +30,6 @@ class SetDiff
     distance = ->(other) { ::DidYouMean::Levenshtein.distance(string, other) }
     max_distance = string.size * max_dissimilarity
 
-    candidates.select { |candidate| distance[candidate] <= max_distance }.sort_by(&distance).first
+    candidates.select { |candidate| distance[candidate] <= max_distance }.min_by(&distance)
   end
 end

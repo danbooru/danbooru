@@ -1,5 +1,4 @@
 class PoolArchive < ApplicationRecord
-
   belongs_to :updater, :class_name => "User"
 
   def self.enabled?

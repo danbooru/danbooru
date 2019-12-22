@@ -21,10 +21,10 @@ class ArtistCommentariesControllerTest < ActionDispatch::IntegrationTest
         params = {
           search: {
             text_matches: @commentary1.original_title,
-            post_id: @commentary1.post_id, 
+            post_id: @commentary1.post_id,
             original_present: "yes",
             translated_present: "yes",
-            post_tags_match: @commentary1.post.tag_array.first,
+            post_tags_match: @commentary1.post.tag_array.first
           }
         }
 
@@ -48,7 +48,7 @@ class ArtistCommentariesControllerTest < ActionDispatch::IntegrationTest
         params = {
           artist_commentary: {
             original_title: "foo",
-            post_id: FactoryBot.create(:post).id,
+            post_id: FactoryBot.create(:post).id
           },
           format: "js"
         }
@@ -63,7 +63,7 @@ class ArtistCommentariesControllerTest < ActionDispatch::IntegrationTest
         params = {
           artist_commentary: {
             post_id: @commentary1.post_id,
-            original_title: "foo",
+            original_title: "foo"
           },
           format: "js"
         }

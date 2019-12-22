@@ -20,7 +20,8 @@ class SqsService
     )
   end
 
-private
+  private
+
   def sqs
     @sqs ||= Aws::SQS::Client.new(
       credentials: Danbooru.config.aws_credentials,

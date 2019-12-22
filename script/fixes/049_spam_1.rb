@@ -13,7 +13,7 @@ BAD_TITLES = ["My collection", "hi", "My private videos", "My video", "hey", "My
 spammers = Set.new(Dmail.where("dmails.from_id >= ? and dmails.created_at >= ? and is_spam = ?", MIN_USER_ID, MIN_DATE, true).joins("join users on users.id = dmails.from_id").where("users.name ~ '^[a-z0-9]+[0-9]{3,}$'").pluck("users.id").map(&:to_i).uniq)
 new_spammers = Set.new
 
-User.without_timeout do 
+User.without_timeout do
   Dmail.where("created_at >= ? and is_spam = ?", MIN_DATE, false).find_each do |dmail|
     from_name = dmail.from_name
     if dmail.from_id >= MIN_USER_ID && from_name =~ NAME_REGEXP

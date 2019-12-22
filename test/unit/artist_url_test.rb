@@ -121,7 +121,7 @@ class ArtistUrlTest < ActiveSupport::TestCase
 
     should "normalize deviant art artist urls" do
       url = FactoryBot.create(:artist_url, :url => "https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484")
-      assert_equal("http://www.deviantart.com/aeror404/", url.normalized_url)      
+      assert_equal("http://www.deviantart.com/aeror404/", url.normalized_url)
     end
 
     should "normalize nico seiga artist urls" do

@@ -24,7 +24,7 @@ class PostViewCountServiceTest < ActiveSupport::TestCase
     setup do
       subject.stubs(:fetch_rank).returns([[@post.id, 1]])
     end
-    
+
     should "return the posts" do
       posts = subject.popular_posts
       assert_equal(@post.id, posts[0].id)

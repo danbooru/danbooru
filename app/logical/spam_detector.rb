@@ -20,7 +20,7 @@ class SpamDetector
   # rakismet raises an exception if the api key or url aren't configured
   def self.working?
     Rakismet.validate_key
-  rescue
+  rescue StandardError
     false
   end
 
@@ -61,7 +61,7 @@ class SpamDetector
     end
 
     is_spam
-  rescue => exception
+  rescue StandardError => exception
     DanbooruLogger.log(exception)
     false
   end

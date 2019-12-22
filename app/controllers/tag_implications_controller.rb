@@ -40,7 +40,7 @@ class TagImplicationsController < ApplicationController
     respond_with(@tag_implication, :location => tag_implication_path(@tag_implication))
   end
 
-private
+  private
 
   def tag_implication_params
     params.require(:tag_implication).permit(%i[antecedent_name consequent_name forum_topic_id skip_secondary_validations])

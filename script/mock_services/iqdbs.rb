@@ -5,7 +5,7 @@ require_relative './mock_service_helper'
 set :port, 3002
 
 configure do
-  POST_IDS = MockServiceHelper.fetch_post_ids()
+  POST_IDS = MockServiceHelper.fetch_post_ids
 end
 
 get '/similar' do

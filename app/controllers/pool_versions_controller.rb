@@ -22,7 +22,7 @@ class PoolVersionsController < ApplicationController
     end
   end
 
-private
+  private
 
   def set_timeout
     PoolArchive.connection.execute("SET statement_timeout = #{CurrentUser.user.statement_timeout}")

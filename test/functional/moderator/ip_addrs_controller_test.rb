@@ -6,7 +6,7 @@ module Moderator
       setup do
         PoolArchive.delete_all
         PostArchive.delete_all
-        
+
         travel_to(1.month.ago) do
           @user = create(:moderator_user)
         end

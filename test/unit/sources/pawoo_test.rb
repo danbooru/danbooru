@@ -2,7 +2,7 @@ require 'test_helper'
 
 module Sources
   class PawooTest < ActiveSupport::TestCase
-    context "The source site for a https://pawoo.net/web/status/$id url"  do
+    context "The source site for a https://pawoo.net/web/status/$id url" do
       setup do
         skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
         @site = Sources::Strategies.find("https://pawoo.net/web/statuses/1202176")
@@ -31,7 +31,7 @@ module Sources
       end
     end
 
-    context "The source site for a https://pawoo.net/$user/$id url"  do
+    context "The source site for a https://pawoo.net/$user/$id url" do
       setup do
         skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
         @site = Sources::Strategies.find("https://pawoo.net/@evazion/19451018")
@@ -82,7 +82,7 @@ module Sources
       end
     end
 
-    context "The source site for a https://img.pawoo.net/ url"  do
+    context "The source site for a https://img.pawoo.net/ url" do
       setup do
         skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
         @url = "https://img.pawoo.net/media_attachments/files/001/298/028/original/55a6fd252778454b.mp4"

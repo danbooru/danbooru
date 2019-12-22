@@ -35,11 +35,11 @@ module Sources
       end
 
       should "get the tags" do
-        assert(@site_1.tags.size > 0)
+        assert_not(@site_1.tags.empty?)
         first_tag = @site_1.tags.first
         assert_equal(["アニメ", "https://seiga.nicovideo.jp/tag/%E3%82%A2%E3%83%8B%E3%83%A1"], first_tag)
 
-        assert(@site_2.tags.size > 0)
+        assert_not(@site_2.tags.empty?)
         first_tag = @site_2.tags.first
         assert_equal(["アニメ", "https://seiga.nicovideo.jp/tag/%E3%82%A2%E3%83%8B%E3%83%A1"], first_tag)
       end

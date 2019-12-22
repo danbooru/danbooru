@@ -1,5 +1,5 @@
 module TagChangeNoticeService
-  extend self
+  module_function
 
   def get_forum_topic_id(tag)
     Cache.get("tcn:#{tag}")

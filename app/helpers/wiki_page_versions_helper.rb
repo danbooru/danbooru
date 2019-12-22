@@ -8,7 +8,7 @@ module WikiPageVersionsHelper
     status = []
     status += ["Renamed"] if cur.title != prev.title
     status += ["Deleted"] if cur.is_deleted? && !prev.is_deleted?
-    status += ["Undeleted"] if  !cur.is_deleted? && prev.is_deleted?
+    status += ["Undeleted"] if !cur.is_deleted? && prev.is_deleted?
     status.join(" ")
   end
 
@@ -27,15 +27,15 @@ module WikiPageVersionsHelper
     cbo = Diff::LCS::ContextDiffCallbacks.new
     diffs = thisarr.diff(otharr, cbo)
 
-    escape_html = ->(str) {str.gsub(/&/,'&amp;').gsub(/</,'&lt;').gsub(/>/,'&gt;')}
+    escape_html = ->(str) {str.gsub(/&/, '&amp;').gsub(/</, '&lt;').gsub(/>/, '&gt;')}
 
     output = thisarr
     output.each { |q| q.replace(escape_html[q]) }
 
     diffs.reverse_each do |hunk|
-      newchange = hunk.max{|a,b| a.old_position <=> b.old_position}
+      newchange = hunk.max {|a, b| a.old_position <=> b.old_position}
       newstart = newchange.old_position
-      oldstart = hunk.min{|a,b| a.old_position <=> b.old_position}.old_position
+      oldstart = hunk.min {|a, b| a.old_position <=> b.old_position}.old_position
 
       if newchange.action == '+'
         output.insert(newstart, '</ins>')
@@ -50,7 +50,7 @@ module WikiPageVersionsHelper
           if chg.new_element.match(/^\r?\n$/)
             output.insert(chg.old_position, '<br>')
           else
-            output.insert(chg.old_position, "#{escape_html[chg.new_element]}")
+            output.insert(chg.old_position, (escape_html[chg.new_element]).to_s)
           end
         end
       end
@@ -60,7 +60,7 @@ module WikiPageVersionsHelper
       end
 
       if hunk[0].action == '-'
-        output.insert((newstart == oldstart || newchange.action != '+') ? newstart+1 : newstart, '</del>')
+        output.insert((newstart == oldstart || newchange.action != '+') ? newstart + 1 : newstart, '</del>')
         output.insert(oldstart, '<del>')
       end
     end
