@@ -1,7 +1,7 @@
 class UserFeedbacksController < ApplicationController
-  before_action :gold_only, :only => [:new, :edit, :create, :update, :destroy]
-  before_action :check_no_feedback, only: [:new, :edit, :create, :update, :destroy]
-  respond_to :html, :xml, :json
+  before_action :gold_only, :only => [:new, :edit, :create, :update]
+  before_action :check_no_feedback, only: [:new, :edit, :create, :update]
+  respond_to :html, :xml, :json, :js
 
   def new
     @user_feedback = UserFeedback.new(user_feedback_params(:create))
@@ -20,7 +20,7 @@ class UserFeedbacksController < ApplicationController
   end
 
   def index
-    @user_feedbacks = UserFeedback.visible.includes(:user, :creator).paginated_search(params, count_pages: true)
+    @user_feedbacks = UserFeedback.includes(:user, :creator).paginated_search(params, count_pages: true)
     respond_with(@user_feedbacks)
   end
 
@@ -32,14 +32,7 @@ class UserFeedbacksController < ApplicationController
   def update
     @user_feedback = UserFeedback.visible.find(params[:id])
     check_privilege(@user_feedback)
-    @user_feedback.update(user_feedback_params(:update))
-    respond_with(@user_feedback)
-  end
-
-  def destroy
-    @user_feedback = UserFeedback.visible.find(params[:id])
-    check_privilege(@user_feedback)
-    @user_feedback.destroy
+    @user_feedback.update(user_feedback_params(:update, @user_feedback))
     respond_with(@user_feedback)
   end
 
@@ -55,9 +48,10 @@ class UserFeedbacksController < ApplicationController
     end
   end
 
-  def user_feedback_params(context)
+  def user_feedback_params(context, user_feedback = nil)
     permitted_params = %i[body category]
     permitted_params += %i[user_id user_name] if context == :create
+    permitted_params += %i[is_deleted] if context == :update && user_feedback.deletable_by?(CurrentUser.user)
 
     params.fetch(:user_feedback, {}).permit(permitted_params)
   end

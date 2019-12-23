@@ -283,7 +283,7 @@ Rails.application.routes.draw do
     end
   end
   resource :user_upgrade, :only => [:new, :create, :show]
-  resources :user_feedbacks
+  resources :user_feedbacks, except: [:destroy]
   resources :user_name_change_requests, only: [:new, :create, :show, :index]
   resources :wiki_pages, id: /.+?(?=\.json|\.xml|\.html)|.+/ do
     put :revert, on: :member

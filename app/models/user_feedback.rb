@@ -15,26 +15,14 @@ class UserFeedback < ApplicationRecord
     ModAction.log(%{#{CurrentUser.name} deleted user feedback for "#{rec.user.name}":/users/#{rec.user_id}}, :user_feedback_delete)
   end
 
+  scope :positive, -> { where(category: "positive") }
+  scope :neutral,  -> { where(category: "neutral") }
+  scope :negative, -> { where(category: "negative") }
+  scope :undeleted, -> { where(is_deleted: false) }
+
   module SearchMethods
-    def positive
-      where("category = ?", "positive")
-    end
-
-    def neutral
-      where("category = ?", "neutral")
-    end
-
-    def negative
-      where("category = ?", "negative")
-    end
-
     def visible(viewer = CurrentUser.user)
-      if viewer.is_admin?
-        all
-      else
-        # joins(:user).merge(User.undeleted).or(where("body !~ 'Name changed from [^\s:]+ to [^\s:]+'"))
-        joins(:user).where.not("users.name ~ 'user_[0-9]+~*' AND user_feedback.body ~ 'Name changed from [^\s:]+ to [^\s:]+'")
-      end
+      viewer.is_moderator? ? all : undeleted
     end
 
     def default_order
@@ -44,7 +32,8 @@ class UserFeedback < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :user, :creator, :category, :body)
+      q = q.visible
+      q = q.search_attributes(params, :user, :creator, :category, :body, :is_deleted)
       q = q.text_attribute_matches(:body, params[:body_matches])
 
       q.apply_default_order(params)
@@ -84,7 +73,11 @@ class UserFeedback < ApplicationRecord
     end
   end
 
+  def deletable_by?(deleter)
+    deleter.is_moderator? && deleter != user
+  end
+
   def editable_by?(editor)
-    (editor.is_moderator? && editor != user) || creator == editor
+    (editor.is_moderator? && editor != user) || (creator == editor && !is_deleted?)
   end
 end

@@ -3055,7 +3055,8 @@ CREATE TABLE public.user_feedback (
     category character varying NOT NULL,
     body text NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL
 );
 
 
@@ -7395,6 +7396,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20191117080647'),
 ('20191117081229'),
 ('20191117200404'),
-('20191119061018');
+('20191119061018'),
+('20191223032633');
 
 
