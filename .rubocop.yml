@@ -1,0 +1,89 @@
+require:
+  - rubocop-rails
+
+AllCops:
+  TargetRubyVersion: 2.6.5
+  Exclude:
+    - "bin/*"
+    - "node_modules/**/*"
+
+Bundler/OrderedGems:
+  Enabled: false
+
+Layout/CaseIndentation:
+  EnforcedStyle: end
+
+Layout/EmptyLineAfterGuardClause:
+  Enabled: false
+
+Layout/EndAlignment:
+  EnforcedStyleAlignWith: variable
+
+Layout/FirstArrayElementIndentation:
+  EnforcedStyle: consistent
+
+Layout/FirstHashElementIndentation:
+  EnforcedStyle: consistent
+
+Layout/LineLength:
+  Enabled: false
+
+Layout/MultilineOperationIndentation:
+  EnforcedStyle: indented
+
+Layout/SpaceInsideBlockBraces:
+  Enabled: false
+
+Layout/SpaceInsideHashLiteralBraces:
+  Enabled: false
+
+Naming/MethodParameterName:
+  Enabled: false
+
+Style/AsciiComments:
+  Enabled: false
+
+Style/BracesAroundHashParameters:
+  EnforcedStyle: context_dependent
+
+Style/CommentAnnotation:
+  Enabled: false
+
+Style/Documentation:
+  Enabled: false
+
+Style/EmptyElse:
+  EnforcedStyle: empty
+
+Style/EmptyMethod:
+  EnforcedStyle: expanded
+
+Style/FormatStringToken:
+  Enabled: false
+
+Style/FloatDivision:
+  Enabled: false
+
+Style/FrozenStringLiteralComment:
+  Enabled: false
+
+Style/HashSyntax:
+  Enabled: false
+
+Style/IfUnlessModifier:
+  Enabled: false
+
+Style/StringLiterals:
+  Enabled: false
+
+Style/StringLiteralsInInterpolation:
+  Enabled: false
+
+Style/SymbolArray:
+  MinSize: 10
+
+Style/TernaryParentheses:
+  EnforcedStyle: require_parentheses_when_complex
+
+Style/WordArray:
+  MinSize: 10
