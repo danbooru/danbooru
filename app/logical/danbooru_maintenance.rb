@@ -2,9 +2,6 @@ module DanbooruMaintenance
   module_function
 
   def hourly
-    UploadErrorChecker.new.check!
-  rescue Exception => exception
-    rescue_exception(exception)
   end
 
   def daily
