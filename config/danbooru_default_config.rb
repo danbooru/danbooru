@@ -638,6 +638,12 @@ module Danbooru
     def redis_url
       "redis://localhost:6379"
     end
+
+    def is_promotion?
+      Time.use_zone("UTC") do
+        Time.zone.now.in?(Time.zone.parse("2019-12-25")..Time.zone.parse("2019-12-28"))
+      end
+    end
   end
 
   class EnvironmentConfiguration

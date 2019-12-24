@@ -3,7 +3,17 @@
     <h1>Upgrade Account</h1>
 
     <% unless params[:user_id] %>
-      <p class="copy">Want more searching power? Upgrade your account and become a power user of the best database of anime artwork on the internet.</p>
+      <p class="copy">
+        Want more searching power? Upgrade your account and
+        become a power user of the best database of anime artwork on the
+        internet.
+      </p>
+
+      <% if Danbooru.config.is_promotion? %>
+        <p>
+          <h6>Danbooru Winter Sale! Gold and Platinum upgrades are 25% off from now until December 28th.</h6>
+        </p>
+      <% end %>
 
       <div id="feature-comparison">
         <table>
@@ -24,10 +34,16 @@
               <td>Cost</td>
               <td>Free</td>
               <td>
+                <% if Danbooru.config.is_promotion? %>
+                  <s>$20</s>
+                <% end %>
                 <%= cents_to_usd(UserUpgrade.gold_price) %>
                 <div class="fineprint">One time fee</div>
               </td>
               <td>
+                <% if Danbooru.config.is_promotion? %>
+                  <s>$40</s>
+                <% end %>
                 <%= cents_to_usd(UserUpgrade.platinum_price) %>
                 <div class="fineprint">One time fee</div>
               </td>
