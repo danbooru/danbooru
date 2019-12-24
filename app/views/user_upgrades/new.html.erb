@@ -23,8 +23,14 @@
             <tr>
               <td>Cost</td>
               <td>Free</td>
-              <td>$20<div class="fineprint">One time fee</div></td>
-              <td>$40<div class="fineprint">One time fee</div></td>
+              <td>
+                <%= cents_to_usd(UserUpgrade.gold_price) %>
+                <div class="fineprint">One time fee</div>
+              </td>
+              <td>
+                <%= cents_to_usd(UserUpgrade.platinum_price) %>
+                <div class="fineprint">One time fee</div>
+              </td>
             </tr>
             <tr>
               <td>Tag Limit</td>
