@@ -34,12 +34,10 @@
     <% if post.is_status_locked? %>
       <li id="post-option-status-locked">Status locked</li>
     <% else %>
-      <% unless CurrentUser.no_flagging? %>
-        <% if !post.is_deleted? && !post.is_pending? && !post.is_flagged? %>
-          <li id="post-option-flag"><%= link_to "Flag", new_post_flag_path(post_flag: { post_id: post.id }), remote: true %></li>
-        <% elsif post.is_flagged? || post.is_deleted? %>
-          <li id="post-option-appeal"><%= link_to "Appeal", new_post_appeal_path(post_appeal: { post_id: post.id }), remote: true %></li>
-        <% end %>
+      <% if !post.is_deleted? && !post.is_pending? && !post.is_flagged? %>
+        <li id="post-option-flag"><%= link_to "Flag", new_post_flag_path(post_flag: { post_id: post.id }), remote: true %></li>
+      <% elsif post.is_flagged? || post.is_deleted? %>
+        <li id="post-option-appeal"><%= link_to "Appeal", new_post_appeal_path(post_appeal: { post_id: post.id }), remote: true %></li>
       <% end %>
 
       <% if CurrentUser.can_approve_posts? %>

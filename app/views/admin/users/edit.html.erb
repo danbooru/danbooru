@@ -6,8 +6,6 @@
       <%= f.input :level, collection: User.level_hash.to_a, selected: @user.level %>
       <%= f.input :can_upload_free, label: "Unrestricted Uploads", as: :boolean, selected: @user.can_upload_free %>
       <%= f.input :can_approve_posts, label: "Approve Posts", as: :boolean, selected: @user.can_approve_posts %>
-      <%= f.input :no_flagging, label: "Banned From Flagging", as: :boolean, selected: @user.no_flagging %>
-      <%= f.input :no_feedback, label: "Banned From Giving Feedback", as: :boolean, selected: @user.no_feedback %>
       <%= f.submit "Update" %>
     <% end %>
   </div>
