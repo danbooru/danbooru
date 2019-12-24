@@ -1,5 +1,6 @@
 module PostsHelper
   def post_search_counts_enabled?
+    return false
     Danbooru.config.enable_post_search_counts && Danbooru.config.reportbooru_server.present? && Danbooru.config.reportbooru_key.present?
   end
 
@@ -51,7 +52,6 @@ module PostsHelper
   end
 
   def post_view_count_js
-    return nil
     return nil unless post_search_counts_enabled?
 
     msg = "#{params[:id]},#{session.id}"
