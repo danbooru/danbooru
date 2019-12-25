@@ -99,7 +99,7 @@
   <div id="page">
     <% if Danbooru.config.is_promotion? && cookies[:hide_promotion_notice].blank? %>
       <div class="notice notice-info notice-large" id="promotion-notice">
-        Danbooru Winter Sale! 25% off Gold and free 6-tag searches for Members!
+        <%= link_to "Danbooru Winter Sale!", forum_topic_path(16501) %> 25% off Gold and free 6-tag searches for Members!
 
         (<%= link_to "close", "#", id: "hide-promotion-notice" %>)
       </div>
