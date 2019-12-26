@@ -150,7 +150,7 @@ class TagAlias < TagRelationship
     antecedent_wiki = WikiPage.titled(antecedent_name).first
     if antecedent_wiki.present?
       if WikiPage.titled(consequent_name).blank?
-        antecedent_wiki.update!(title: consequent_name, skip_secondary_validations: true)
+        antecedent_wiki.update!(title: consequent_name)
       else
         forum_updater.update(conflict_message)
       end

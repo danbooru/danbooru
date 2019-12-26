@@ -160,6 +160,16 @@ class TagAliasTest < ActiveSupport::TestCase
       end
     end
 
+    should "move existing wikis" do
+      wiki = create(:wiki_page, title: "aaa")
+      ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
+
+      ta.approve!(approver: @admin)
+      perform_enqueued_jobs
+
+      assert_equal("bbb", wiki.reload.title)
+    end
+
     should "move existing aliases" do
       ta1 = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :status => "pending")
       ta2 = FactoryBot.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc", :status => "pending")
