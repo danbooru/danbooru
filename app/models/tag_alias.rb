@@ -136,16 +136,6 @@ class TagAlias < TagRelationship
     end
   end
 
-  def update_posts
-    Post.without_timeout do
-      Post.raw_tag_match(antecedent_name).find_each do |post|
-        escaped_antecedent_name = Regexp.escape(antecedent_name)
-        fixed_tags = post.tag_string.sub(/(?:\A| )#{escaped_antecedent_name}(?:\Z| )/, " #{consequent_name} ").strip
-        post.update(tag_string: fixed_tags)
-      end
-    end
-  end
-
   def rename_wiki_and_artist
     antecedent_wiki = WikiPage.titled(antecedent_name).first
     if antecedent_wiki.present?

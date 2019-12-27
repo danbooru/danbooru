@@ -215,6 +215,16 @@ class TagRelationship < ApplicationRecord
     Post.fast_count(antecedent_name, skip_cache: true)
   end
 
+  def update_posts
+    Post.without_timeout do
+      Post.raw_tag_match(antecedent_name).find_each do |post|
+        post.with_lock do
+          post.save!
+        end
+      end
+    end
+  end
+
   def update_notice
     TagChangeNoticeService.update_cache(
       [antecedent_name, consequent_name],

@@ -155,15 +155,6 @@ class TagImplication < TagRelationship
       end
     end
 
-    def update_posts
-      Post.without_timeout do
-        Post.raw_tag_match(antecedent_name).where("true /* TagImplication#update_posts */").find_each do |post|
-          fixed_tags = "#{post.tag_string} #{descendant_names_string}".strip
-          post.update(tag_string: fixed_tags)
-        end
-      end
-    end
-
     def approve!(approver: CurrentUser.user, update_topic: true)
       update(approver: approver, status: "queued")
       ProcessTagImplicationJob.perform_later(self, update_topic: update_topic)
