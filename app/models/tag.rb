@@ -106,23 +106,43 @@ class Tag < ApplicationRecord
         Tag.where(name: tag_names).update_all("post_count = post_count - 1")
       end
 
-      def regenerate_post_counts!
-        sql = <<~SQL
+      # fix tags where the post count is non-zero but the tag isn't present on any posts.
+      def regenerate_nonexistent_post_counts!
+        Tag.find_by_sql(<<~SQL)
           UPDATE tags
-          SET post_count = COALESCE(true_count, 0)
+          SET post_count = 0
+          WHERE
+            post_count != 0
+            AND name NOT IN (
+              SELECT DISTINCT tag
+              FROM posts, unnest(string_to_array(tag_string, ' ')) AS tag
+              GROUP BY tag
+            )
+          RETURNING tags.*
+        SQL
+      end
+
+      # fix tags where the stored post count doesn't match the true post count.
+      def regenerate_incorrect_post_counts!
+        Tag.find_by_sql(<<~SQL)
+          UPDATE tags
+          SET post_count = true_count
           FROM (
             SELECT tag, COUNT(*) AS true_count
             FROM posts, unnest(string_to_array(tag_string, ' ')) AS tag
             GROUP BY tag
           ) true_counts
           WHERE
-            (tags.name = tag AND tags.post_count != true_count)
-            OR tags.post_count < 0
+            tags.name = tag AND tags.post_count != true_count
           RETURNING tags.*
         SQL
+      end
 
-        updated_tags = Tag.find_by_sql(sql)
-        updated_tags
+      def regenerate_post_counts!
+        tags = []
+        tags += regenerate_incorrect_post_counts!
+        tags += regenerate_nonexistent_post_counts!
+        tags
       end
     end
   end

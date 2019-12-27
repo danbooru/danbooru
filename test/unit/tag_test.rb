@@ -278,11 +278,14 @@ class TagTest < ActiveSupport::TestCase
     should "be fixed" do
       tag1 = FactoryBot.create(:tag, name: "touhou", post_count: -10)
       tag2 = FactoryBot.create(:tag, name: "bkub", post_count: 10)
+      tag3 = FactoryBot.create(:tag, name: "chen", post_count: 10)
       post = FactoryBot.create(:post, tag_string: "touhou bkub")
 
-      Tag.regenerate_post_counts!
+      tags = Tag.regenerate_post_counts!
+      assert_equal(3, tags.size)
       assert_equal(1, tag1.reload.post_count)
       assert_equal(1, tag2.reload.post_count)
+      assert_equal(0, tag3.reload.post_count)
     end
   end
 end
