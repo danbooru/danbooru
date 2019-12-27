@@ -1,7 +1,7 @@
 class TagBatchChangeJob < ApplicationJob
   class Error < Exception; end
 
-  queue_as :default
+  queue_as :bulk_update
 
   def perform(antecedent, consequent, updater, updater_ip_addr)
     raise Error.new("antecedent is missing") if antecedent.blank?
