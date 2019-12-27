@@ -51,7 +51,8 @@ class Pool < ApplicationRecord
 
     def post_tags_match(query)
       posts = Post.tag_match(query).select(:id).reorder(nil)
-      joins("CROSS JOIN unnest(post_ids) AS post_id").group(:id).where("post_id IN (?)", posts)
+      pools = Pool.joins("CROSS JOIN unnest(post_ids) AS post_id").group(:id).where("post_id IN (?)", posts)
+      where(id: pools)
     end
 
     def default_order

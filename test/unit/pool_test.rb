@@ -87,6 +87,10 @@ class PoolTest < ActiveSupport::TestCase
       assert_equal([@pool2.id, @pool1.id], Pool.search(post_tags_match: "bkub").pluck(:id))
       assert_equal([@pool2.id, @pool1.id], Pool.search(post_tags_match: "fumimi").pluck(:id))
       assert_equal([@pool2.id], Pool.search(post_tags_match: "bkub fumimi").pluck(:id))
+
+      assert_equal(2, Pool.search(post_tags_match: "bkub").count)
+      assert_equal(2, Pool.search(post_tags_match: "fumimi").count)
+      assert_equal(1, Pool.search(post_tags_match: "bkub fumimi").count)
     end
   end
 
