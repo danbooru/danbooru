@@ -5,33 +5,26 @@ module DanbooruMaintenance
   end
 
   def daily
-    ActiveRecord::Base.connection.execute("set statement_timeout = 0")
-    PostPruner.new.prune!
-    Upload.prune!
-    Delayed::Job.where('created_at < ?', 45.days.ago).delete_all
-    PostDisapproval.prune!
-    ForumSubscription.process_all!
-    PostDisapproval.dmail_messages!
-    regenerate_post_counts!
-    SuperVoter.init!
-    TokenBucket.prune!
-    TagChangeRequestPruner.warn_all
-    TagChangeRequestPruner.reject_all
-    Ban.prune!
-    CuratedPoolUpdater.update_pool!
-
-    ActiveRecord::Base.connection.execute("vacuum analyze") unless Rails.env.test?
-  rescue Exception => exception
-    rescue_exception(exception)
+    safely { PostPruner.new.prune! }
+    safely { Upload.prune! }
+    safely { Delayed::Job.where('created_at < ?', 45.days.ago).delete_all }
+    safely { PostDisapproval.prune! }
+    safely { ForumSubscription.process_all! }
+    safely { PostDisapproval.dmail_messages! }
+    safely { regenerate_post_counts! }
+    safely { SuperVoter.init! }
+    safely { TokenBucket.prune! }
+    safely { TagChangeRequestPruner.warn_all }
+    safely { TagChangeRequestPruner.reject_all }
+    safely { Ban.prune! }
+    safely { CuratedPoolUpdater.update_pool! }
+    safely { ActiveRecord::Base.connection.execute("vacuum analyze") unless Rails.env.test? }
   end
 
   def weekly
-    ActiveRecord::Base.connection.execute("set statement_timeout = 0")
-    UserPasswordResetNonce.prune!
-    ApproverPruner.prune!
-    TagRelationshipRetirementService.find_and_retire!
-  rescue Exception => exception
-    rescue_exception(exception)
+    safely { UserPasswordResetNonce.prune! }
+    safely { ApproverPruner.prune! }
+    safely { TagRelationshipRetirementService.find_and_retire! }
   end
 
   def regenerate_post_counts!
@@ -41,8 +34,10 @@ module DanbooruMaintenance
     end
   end
 
-  def rescue_exception(exception)
+  def safely(&block)
+    ActiveRecord::Base.connection.execute("set statement_timeout = 0")
+    yield
+  rescue StandardError => exception
     DanbooruLogger.log(exception)
-    raise exception
   end
 end
