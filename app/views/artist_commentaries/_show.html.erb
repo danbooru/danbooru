@@ -13,28 +13,23 @@
 
 <% if artist_commentary.original_present? %>
   <%= tag.section id: "original-artist-commentary", style: ("display: none" if artist_commentary.translated_present?) do %>
-    <h3><%= artist_commentary.original_title %></h3>
-    <div class="prose">
-      <%= format_text(artist_commentary.original_description, :disable_mentions => true) %>
-    </div>
+    <%= format_commentary_title(artist_commentary.original_title) %>
+    <%= format_commentary_description(artist_commentary.original_description) %>
   <% end %>
 <% end %>
 
 <% if artist_commentary.translated_present? %>
   <section id="translated-artist-commentary">
-    <h3>
-      <% if artist_commentary.translated_title.present? %>
-        <%= artist_commentary.translated_title %>
-      <% else %>
-        <span class="inactive"><%= artist_commentary.original_title %></span>
-      <% end %>
-    </h3>
-    <div class="prose">
-      <% if artist_commentary.translated_description.present? %>
-        <%= format_text(artist_commentary.translated_description, :disable_mentions => true) %>
-      <% else %>
-        <span class="inactive"><%= format_text(artist_commentary.original_description, :disable_mentions => true) %></span>
-      <% end %>
-    </div>
+    <% if artist_commentary.translated_title.present? %>
+      <%= format_commentary_title(artist_commentary.translated_title) %>
+    <% else %>
+      <%= format_commentary_title(artist_commentary.original_title, classes: "inactive") %>
+    <% end %>
+
+    <% if artist_commentary.translated_description.present? %>
+      <%= format_commentary_description(artist_commentary.translated_description) %>
+    <% else %>
+      <%= format_commentary_description(artist_commentary.original_description, classes: "inactive") %>
+    <% end %>
   </section>
 <% end %>

@@ -25,7 +25,7 @@ kbd.key {
 }
 
 /* used for "(deleted)" messages */
-span.inactive {
+div.inactive, span.inactive {
   color: var(--muted-text-color);
 }
 

@@ -20,16 +20,12 @@
         <tr>
           <td><%= link_to commentary_version.post_id, post_path(commentary_version.post_id) %></td>
           <td>
-            <h3><%= h(commentary_version.original_title) %></h3>
-            <div class="prose">
-              <%= format_text(commentary_version.original_description, :disable_mentions => true) %>
-            </div>
+            <%= format_commentary_title(commentary_version.original_title) %>
+            <%= format_commentary_description(commentary_version.original_description) %>
           </td>
           <td>
-            <h3><%= h(commentary_version.translated_title) %></h3>
-            <div class="prose">
-              <%= format_text(commentary_version.translated_description, :disable_mentions => true) %>
-            </div>
+            <%= format_commentary_title(commentary_version.translated_title) %>
+            <%= format_commentary_description(commentary_version.translated_description) %>
           </td>
           <% if CurrentUser.is_moderator? %>
             <td>

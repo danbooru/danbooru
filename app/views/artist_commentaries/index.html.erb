@@ -17,16 +17,12 @@
           <tr>
             <td><%= PostPresenter.preview(commentary.post, :tags => "status:any") %></td>
             <td>
-              <h3><%= h(commentary.original_title) %></h3>
-              <div class="prose">
-                <%= format_text(commentary.original_description, :disable_mentions => true) %>
-              </div>
+              <%= format_commentary_title(commentary.original_title) %>
+              <%= format_commentary_description(commentary.original_description) %>
             </td>
             <td>
-              <h3><%= h(commentary.translated_title) %></h3>
-              <div class="prose">
-                <%= format_text(commentary.translated_description, :disable_mentions => true) %>
-              </div>
+              <%= format_commentary_title(commentary.translated_title) %>
+              <%= format_commentary_description(commentary.translated_description) %>
             </td>
           </tr>
         <% end %>
