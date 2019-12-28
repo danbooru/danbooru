@@ -21,20 +21,14 @@ Dtext.initialize_expandables = function() {
   });
 }
 
-Dtext.call_preview = function(e, $button, $input, $preview) {
+Dtext.call_preview = async function(e, $button, $input, $preview) {
   $button.val("Edit");
   $input.hide();
   $preview.text("Loading...").fadeIn("fast");
-  $.ajax({
-    type: "post",
-    url: "/dtext_preview",
-    data: {
-      body: $input.val()
-    },
-    success: function(data) {
-      $preview.html(data).fadeIn("fast");
-    }
-  });
+
+  let inline = $input.is("input");
+  let html = await $.post("/dtext_preview", { body: $input.val(), inline: inline });
+  $preview.html(html).fadeIn("fast");
 }
 
 Dtext.call_edit = function(e, $button, $input, $preview) {

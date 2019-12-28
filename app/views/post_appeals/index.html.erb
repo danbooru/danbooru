@@ -20,9 +20,9 @@
           <tr>
             <td><%= PostPresenter.preview(post_appeal.post, :tags => "status:any") %></td>
             <td>
-              <div class="prose">
-                <%= format_text post_appeal.reason %>
-              </div>
+              <span class="prose">
+                <%= format_text post_appeal.reason, inline: true %>
+              </span>
             </td>
             <td>
               <%= link_to post_appeal.post.appeals.size, post_appeals_path(search: { post_id: post_appeal.post_id }) %>

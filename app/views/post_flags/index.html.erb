@@ -21,9 +21,9 @@
           <tr class="resolved-<%= post_flag.is_resolved? %>">
             <td><%= PostPresenter.preview(post_flag.post, :tags => "status:any") %></td>
             <td>
-              <div class="prose">
-                <%= format_text post_flag.reason %>
-              </div>
+              <span class="prose">
+                <%= format_text post_flag.reason, inline: true %>
+              </span>
             </td>
             <td>
               <%= link_to post_flag.post.flags.size, post_flags_path(search: { post_id: post_flag.post_id }) %>
