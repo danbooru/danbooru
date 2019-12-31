@@ -266,3 +266,12 @@
     url("../../../../../node_modules/typeface-unifrakturmaguntia/files/unifrakturmaguntia-latin-400.woff2") format("woff2"),
     url("../../../../../node_modules/typeface-unifrakturmaguntia/files/unifrakturmaguntia-latin-400.woff") format("woff");
 }
+
+/* https://www.dafont.com/anarchy2.font */
+@font-face {
+  font-family: "Scary";
+  font-display: swap;
+  src:
+    local("Anarchy"),
+    url("../../../../../public/fonts/Anarchy.ttf") format("truetype");
+}
