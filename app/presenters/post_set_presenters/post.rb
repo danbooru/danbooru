@@ -35,7 +35,7 @@ module PostSetPresenters
       if PopularSearchService.enabled?
         PopularSearchService.new(Date.today).tags
       else
-        Tag.trending
+        frequent_tags
       end
     end
 
