@@ -505,8 +505,6 @@ class User < ApplicationRecord
         Danbooru.config.base_tag_query_limit * 2
       elsif is_gold?
         Danbooru.config.base_tag_query_limit
-      elsif is_member? && Danbooru.config.is_promotion?
-        Danbooru.config.base_tag_query_limit
       else
         2
       end

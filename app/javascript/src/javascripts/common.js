@@ -8,13 +8,6 @@ $(function() {
     e.preventDefault();
   });
 
-  $("#hide-promotion-notice").on("click.danbooru", function(e) {
-    $("#promotion-notice").hide();
-    Cookie.put('hide_promotion_notice', '1', 7);
-    Cookie.put('hide_upgrade_account_notice', '1', 7);
-    e.preventDefault();
-  });
-
   $("#hide-dmail-notice").on("click.danbooru", function(e) {
     var $dmail_notice = $("#dmail-notice");
     $dmail_notice.hide();
