@@ -9,10 +9,6 @@
           <th>Name</th>
           <th>Posts</th>
           <th>Deleted</th>
-          <% if CurrentUser.is_moderator? %>
-            <th><abbr title="3+ Score Binomial Confidence Interval">5+ SBCI</abbr></th>
-            <th><abbr title="6+ Score Binomial Confidence Interval">10+ SBCI</abbr></th>
-          <% end %>
           <th>Notes</th>
           <th>Edits</th>
           <th>Level</th>
@@ -35,10 +31,6 @@
             </td>
             <td><%= link_to user.posts.count, posts_path(:tags => "user:#{user.name}") %></td>
             <td><%= user.posts.deleted.count %></td>
-            <% if CurrentUser.is_moderator? %>
-              <td><%= number_to_percentage Reports::UserPromotions.confidence_interval_for(user, 3), :precision => 0 %></td>
-              <td><%= number_to_percentage Reports::UserPromotions.confidence_interval_for(user, 6), :precision => 0 %></td>
-            <% end %>
             <td><%= link_to user.note_versions.count, note_versions_path(:search => {:updater_id => user.id}) %></td>
             <td><%= link_to user.post_update_count, post_versions_path(:search => {:updater_id => user.id}) %></td>
             <td><%= user.level_string %></td>
