@@ -1,18 +1,24 @@
-<%= tag.table table.html_attributes do %>
+<%= tag.table table.table_attributes do %>
   <thead>
     <tr>
       <% table.columns.each do |column| %>
-        <th><%= column.name %></th>
+        <%= tag.th column.header_attributes do %>
+          <% if column.is_html_safe %>
+            <%= column.name.html_safe %>
+          <% else %>
+            <%= column.name %>
+          <% end %>
+        <% end %>
       <% end %>
     </tr>
   </thead>
 
   <tbody>
-    <% table.items.each do |item| %>
-      <%= tag.tr table.row_attributes(item) do %>
-        <% table.columns.each do |column| %>
-          <%= tag.td column.html_attributes do %>
-            <%= column.value(item) %>
+    <% table.items.each_with_index do |item, i| %>
+      <%= tag.tr table.all_row_attributes(item, i) do %>
+        <% table.columns.each_with_index do |column, j| %>
+          <%= tag.td column.body_attributes do %>
+            <%= column.value(item, i, j) %>
           <% end %>
         <% end %>
       <% end %>

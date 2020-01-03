@@ -2,28 +2,23 @@
   <div id="a-index">
     <h1>Name Change Requests</h1>
 
-    <table class="striped" width="100%">
-      <thead>
-        <tr>
-          <th>User</th>
-          <th>Old Name</th>
-          <th>New Name</th>
-          <th>Date</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @change_requests.each do |change_request| %>
-          <tr>
-            <td><%= link_to_user change_request.user %></td>
-            <td><%= change_request.original_name %></td>
-            <td><%= change_request.desired_name %></td>
-            <td><%= compact_time change_request.created_at %></td>
-            <td><%= link_to "view", user_name_change_request_path(change_request) %></td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <%= table_for @change_requests, {class: "striped", width: "100%"} do |t| %>
+      <% t.column "User" do |change_request| %>
+        <%= link_to_user change_request.user %>
+      <% end %>
+      <% t.column "Old Name" do |change_request| %>
+        <%= change_request.original_name %>
+      <% end %>
+      <% t.column "New Name" do |change_request| %>
+        <%= change_request.desired_name %>
+      <% end %>
+      <% t.column "Date" do |change_request| %>
+        <%= compact_time change_request.created_at %>
+      <% end %>
+      <% t.column "" do |change_request| %>
+        <%= link_to "view", user_name_change_request_path(change_request) %>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@change_requests) %>
   </div>

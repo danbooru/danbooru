@@ -1,29 +1,20 @@
 <div id="c-forum-posts">
   <div id="a-index">
-    <table width="100%" class="striped">
-      <thead>
-        <tr>
-          <th>Topic</th>
-          <th>Excerpt</th>
-          <th>Creator</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @forum_posts.each do |forum_post| %>
-          <% if CurrentUser.is_moderator? || !forum_post.is_deleted? %>
-            <tr id="forum-post-<%= forum_post.id %>" data-topic-is-deleted="<%= forum_post.topic.is_deleted? %>" data-is-deleted="<%= forum_post.is_deleted? %>">
-              <td class="forum-post-topic-title"><%= link_to forum_post.topic.title, forum_topic_path(forum_post.topic) %></td>
-              <td class="forum-post-excerpt">
-                <%= link_to truncate(forum_post.body, :length => 50), forum_post_path(forum_post) %>
-              </td>
-              <td><%= link_to_user forum_post.creator %></td>
-              <td><%= time_ago_in_words_tagged forum_post.created_at %></td>
-            </tr>
-          <% end %>
-        <% end %>
-      </tbody>
-    </table>
+
+    <%= table_for @forum_posts, {class: "striped", width: "100%"}, {"data-is-deleted": ["%s", "item.is_deleted?"], "data-topic-is-deleted": ["%s", "item.topic.is_deleted?"]} do |t| %>
+      <% t.column "Topic", nil, {class: "forum-post-topic-title"} do |forum_post| %>
+        <%= link_to forum_post.topic.title, forum_topic_path(forum_post.topic) %>
+      <% end %>
+      <% t.column "Excerpt", nil, {class: "forum-post-excerpt"} do |forum_post| %>
+        <%= link_to truncate(forum_post.body, :length => 50), forum_post_path(forum_post) %>
+      <% end %>
+      <% t.column "Creator" do |forum_post| %>
+        <%= link_to_user forum_post.creator %>
+      <% end %>
+      <% t.column "Date" do |forum_post| %>
+        <%= time_ago_in_words_tagged forum_post.created_at %>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@forum_posts) %>
   </div>

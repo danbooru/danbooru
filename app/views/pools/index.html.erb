@@ -1,37 +1,22 @@
 <div id="c-pools">
   <div id="a-index">
     <%= render "search", :path => pools_path %>
-    <table class="striped" width="100%">
-      <thead>
-        <tr>
-          <th width="5%"></th>
-          <th width="60%">Name</th>
-          <th width="10%">Count</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @pools.each do |pool| %>
-          <%= content_tag(:tr, :id => "pool-#{pool.id}", :class => "pool-category-#{pool.category}") do %>
-            <td>
 
-            </td>
-            <td>
-              <%= link_to pool.pretty_name, pool_path(pool) %>
-              <% if pool.is_deleted? %>
-                <span class="inactive">(deleted)</span>
-              <% end %>
-
-              <% if pool.last_page > 1 %>
-                <%= link_to "page #{pool.last_page}", pool_path(pool, :page => pool.last_page), :class => "last-page" %>
-              <% end %>
-            </td>
-            <td>
-              <%= pool.post_count %>
-            </td>
-          <% end %>
+    <%= table_for @pools, {class: "striped", width: "100%"} do |t| %>
+      <% t.column nil, {width: "5%"} %>
+      <% t.column "Name", {width: "60%"} do |pool| %>
+        <span class="pool-category-<%= pool.category %>"><%= link_to pool.pretty_name, pool_path(pool) %></span>
+        <% if pool.is_deleted? %>
+          <span class="inactive">(deleted)</span>
         <% end %>
-      </tbody>
-    </table>
+        <% if pool.last_page > 1 %>
+          <%= link_to "page #{pool.last_page}", pool_path(pool, :page => pool.last_page), :class => "last-page" %>
+        <% end %>
+      <% end %>
+      <% t.column "Count", {width: "10%"} do |pool| %>
+        <%= pool.post_count %>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@pools) %>
   </div>

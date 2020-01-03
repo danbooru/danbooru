@@ -13,57 +13,41 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <table class="striped autofit">
-      <thead>
-        <tr>
-          <th>User</th>
-          <th>Message</th>
-          <% if CurrentUser.is_moderator? %>
-            <th>Status</th>
-          <% end %>
-          <th>Category</th>
-          <th>Creator</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @user_feedbacks.each do |feedback| %>
-          <tr class="feedback-category-<%= feedback.category %>">
-            <td>
-              <%= link_to_user feedback.user %>
-              <%= link_to "»", user_feedbacks_path(search: { user_name: feedback.user.name }) %>
-            </td>
-            <td class="col-expand">
-              <div class="prose">
-                <%= format_text(feedback.body) %>
-              </div>
-              <%= render "application/update_notice", record: feedback, interval: 0.minutes %>
-            </td>
-            <% if CurrentUser.is_moderator? %>
-              <td><%= "deleted" if feedback.is_deleted? %></td>
-            <% end %>
-            <td>
-              <%= link_to feedback.category.capitalize, user_feedbacks_path(search: { category: feedback.category }) %>
-            </td>
-            <td>
-              <%= link_to_user feedback.creator %>
-              <%= link_to "»", user_feedbacks_path(search: { creator_name: feedback.creator.name }) %>
-              <div><%= time_ago_in_words_tagged(feedback.created_at) %></div>
-            </td>
-            <td>
-              <% if feedback.editable_by?(CurrentUser.user) %>
-                <%= link_to "edit", edit_user_feedback_path(feedback) %>
-                <% if feedback.deletable_by?(CurrentUser.user) && !feedback.is_deleted? %>
-                  | <%= link_to "delete", user_feedback_path(feedback), method: :put, remote: true, "data-params": "user_feedback[is_deleted]=true", "data-confirm": "Are you sure you want to delete this user feedback?" %>
-                <% elsif feedback.deletable_by?(CurrentUser.user) && feedback.is_deleted? %>
-                  | <%= link_to "undelete", user_feedback_path(feedback), method: :put, remote: true, "data-params": "user_feedback[is_deleted]=false" %>
-                <% end %>
-              <% end %>
-            </td>
-          </tr>
+    <%= table_for @user_feedbacks, {class: "striped autofit"}, {class: ["feedback-category-%s", "item.category"]} do |t| %>
+      <% t.column "User" do |feedback| %>
+        <%= link_to_user feedback.user %>
+        <%= link_to "»", user_feedbacks_path(search: { user_name: feedback.user.name }) %>
+      <% end %>
+      <% t.column "Message", nil, {class: "col-expand"} do |feedback| %>
+        <div class="prose">
+          <%= format_text(feedback.body) %>
+        </div>
+        <%= render "application/update_notice", record: feedback, interval: 0.minutes %>
+      <% end %>
+      <% if CurrentUser.is_moderator? %>
+        <% t.column "Status" do |feedback| %>
+          <%= "deleted" if feedback.is_deleted? %>
         <% end %>
-      </tbody>
-    </table>
+      <% end %>
+      <% t.column "Category" do |feedback| %>
+        <%= link_to feedback.category.capitalize, user_feedbacks_path(search: { category: feedback.category }) %>
+      <% end %>
+      <% t.column "Creator" do |feedback| %>
+        <%= link_to_user feedback.creator %>
+        <%= link_to "»", user_feedbacks_path(search: { creator_name: feedback.creator.name }) %>
+        <div><%= time_ago_in_words_tagged(feedback.created_at) %></div>
+      <% end %>
+      <% t.column "" do |feedback| %>
+        <% if feedback.editable_by?(CurrentUser.user) %>
+          <%= link_to "edit", edit_user_feedback_path(feedback) %>
+          <% if feedback.deletable_by?(CurrentUser.user) && !feedback.is_deleted? %>
+            | <%= link_to "delete", user_feedback_path(feedback), method: :put, remote: true, "data-params": "user_feedback[is_deleted]=true", "data-confirm": "Are you sure you want to delete this user feedback?" %>
+          <% elsif feedback.deletable_by?(CurrentUser.user) && feedback.is_deleted? %>
+            | <%= link_to "undelete", user_feedback_path(feedback), method: :put, remote: true, "data-params": "user_feedback[is_deleted]=false" %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@user_feedbacks) %>
   </div>

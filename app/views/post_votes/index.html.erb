@@ -8,46 +8,32 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <table class="striped autofit">
-      <thead>
-        <tr>
-          <th>Post</th>
-          <th>Tags</th>
-          <th>Score</th>
-          <th>Uploader</th>
-          <th>Voter</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @post_votes.each do |vote| %>
-          <tr>
-            <td>
-              <%= PostPresenter.preview(vote.post, show_deleted: true) %>
-            </td>
-            <td class="col-expand">
-              <%= TagSetPresenter.new(vote.post.tag_array).inline_tag_list_html %>
-            </td>
-            <td><%= link_to sprintf("%+d", vote.score), post_votes_path(search: { score: vote.score }) %></td>
-            <td>
-              <%= link_to_user vote.post.uploader %>
-              <%= link_to "»", post_votes_path(search: { post_tags_match: "user:#{vote.post.uploader.name}" }) %>
-              <div><%= time_ago_in_words_tagged(vote.post.created_at) %></div>
-            </td>
-            <td>
-              <%= link_to_user vote.user %>
-              <%= link_to "»", post_votes_path(search: { user_name: vote.user.name }) %>
-              <div><%= time_ago_in_words_tagged(vote.created_at) %></div>
-            </td>
-            <td>
-              <% if vote.user == CurrentUser.user %>
-                <%= link_to "unvote", post_post_votes_path(vote.post), remote: true, method: :delete %>
-              <% end %>
-            </td>
-          </tr>
+    <%= table_for @post_votes, {class: "striped autofit"} do |t| %>
+      <% t.column "Post" do |vote| %>
+        <%= PostPresenter.preview(vote.post, show_deleted: true) %>
+      <% end %>
+      <% t.column "Tags", nil, {class: "col-expand"} do |vote| %>
+        <%= TagSetPresenter.new(vote.post.tag_array).inline_tag_list_html %>
+      <% end %>
+      <% t.column "Score" do |vote| %>
+        <%= link_to sprintf("%+d", vote.score), post_votes_path(search: { score: vote.score }) %>
+      <% end %>
+      <% t.column "Uploader" do |vote| %>
+        <%= link_to_user vote.user %>
+        <%= link_to "»", post_votes_path(search: { user_name: vote.user.name }) %>
+        <div><%= time_ago_in_words_tagged(vote.created_at) %></div>
+      <% end %>
+      <% t.column "Voter" do |vote| %>
+        <%= link_to_user vote.user %>
+        <%= link_to "»", post_votes_path(search: { user_name: vote.user.name }) %>
+        <div><%= time_ago_in_words_tagged(vote.created_at) %></div>
+      <% end %>
+      <% t.column "" do |vote| %>
+        <% if vote.user == CurrentUser.user %>
+          <%= link_to "unvote", post_post_votes_path(vote.post), remote: true, method: :delete %>
         <% end %>
-      </tbody>
-    </table>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@post_votes) %>
   </div>

@@ -13,41 +13,27 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <table class="striped autofit" width="100%">
-      <thead>
-        <tr>
-          <th>Post</th>
-          <th>Message</th>
-          <th>Reason</th>
-          <th>Created</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @post_disapprovals.each do |post_disapproval| %>
-          <tr>
-            <td>
-              <%= link_to "post ##{post_disapproval.post_id}", post_path(post_disapproval.post_id) %>
-              <%= link_to "»", moderator_post_disapprovals_path(search: params[:search].merge(post_id: post_disapproval.post_id)) %>
-            </td>
-            <td class="col-expand">
-              <div class="prose">
-                <%= format_text(post_disapproval.message) %>
-              </div>
-            </td>
-            <td>
-              <%= link_to post_disapproval.reason.humanize, moderator_post_disapprovals_path(search: params[:search].merge(reason: post_disapproval.reason)) %>
-            </td>
-            <td>
-              <%= link_to_user post_disapproval.user %>
-              <%= link_to "»", moderator_post_disapprovals_path(search: params[:search].merge(creator_name: post_disapproval.user&.name)) %>
-              <p>
-                <%= compact_time(post_disapproval.updated_at) %>
-              </p>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <%= table_for @post_disapprovals, {class: "striped autofit", width: "100%"} do |t| %>
+      <% t.column "Post" do |post_disapproval| %>
+        <%= link_to "post ##{post_disapproval.post_id}", post_path(post_disapproval.post_id) %>
+        <%= link_to "»", moderator_post_disapprovals_path(search: params[:search].merge(post_id: post_disapproval.post_id)) %>
+      <% end %>
+      <% t.column "Message", nil, {class: "col-expand"} do |post_disapproval| %>
+        <div class="prose">
+          <%= format_text(post_disapproval.message) %>
+        </div>
+      <% end %>
+      <% t.column "Reason" do |post_disapproval| %>
+        <%= link_to post_disapproval.reason.humanize, moderator_post_disapprovals_path(search: params[:search].merge(reason: post_disapproval.reason)) %>
+      <% end %>
+      <% t.column "Created" do |post_disapproval| %>
+        <%= link_to_user post_disapproval.user %>
+        <%= link_to "»", moderator_post_disapprovals_path(search: params[:search].merge(creator_name: post_disapproval.user&.name)) %>
+        <p>
+          <%= compact_time(post_disapproval.updated_at) %>
+        </p>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@post_disapprovals) %>
   </div>

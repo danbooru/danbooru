@@ -33,7 +33,7 @@ PostVersion.undo_selected = async function () {
   let selected_rows = $("td .post-version-select-checkbox:checked").parents("tr");
 
   for (let row of selected_rows) {
-    let id = $(row).data("post-version-id");
+    let id = $(row).data("id");
     await $.ajax(`/post_versions/${id}/undo.json`, { method: "PUT" });
 
     updated++;

@@ -4,44 +4,31 @@
 
     <%= render "search" %>
 
-    <table class="striped autofit">
-      <thead>
-        <tr>
-          <th>Banned User</th>
-          <th>Duration</th>
-          <th>Reason</th>
-          <th>Banner</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @bans.each do |ban| %>
-          <tr id="ban-<%= ban.id %>" data-expired="<%= ban.expired? %>">
-            <td>
-              <%= link_to_user(ban.user) %>
-              <%= link_to "»", bans_path(search: search_params.merge(user_name: ban.user.name)) %>
-            </td>
-            <td><%= humanized_duration(ban.created_at, ban.expires_at) %></td>
-            <td class="col-expand">
-              <div class="prose">
-                <%= format_text ban.reason %>
-              </div>
-            </td>
-            <td>
-              <%= link_to_user ban.banner %>
-              <%= link_to "»", bans_path(search: { banner_name: ban.banner.name }) %>
-              <div><%= time_ago_in_words_tagged(ban.created_at) %></div>
-            </td>
-            <td>
-              <% if CurrentUser.is_moderator? %>
-                <%= link_to "Edit", edit_ban_path(ban) %>
-                | <%= link_to "Delete", ban_path(ban), :method => :delete, :remote => true %>
-              <% end %>
-            </td>
-          </tr>
+    <%= table_for @bans, {class: "striped autofit"}, {"data-expired": ["%s", "item.expired?"]} do |t| %>
+      <% t.column "Banned User" do |ban| %>
+        <%= link_to_user(ban.user) %>
+        <%= link_to "»", bans_path(search: search_params.merge(user_name: ban.user.name)) %>
+      <% end %>
+      <% t.column "Duration" do |ban| %>
+        <%= humanized_duration(ban.created_at, ban.expires_at) %>
+      <% end %>
+      <% t.column "Reason", nil, {class: "col-expand"} do |ban| %>
+        <div class="prose">
+          <%= format_text ban.reason %>
+        </div>
+      <% end %>
+      <% t.column "Banner" do |ban| %>
+        <%= link_to_user ban.banner %>
+        <%= link_to "»", bans_path(search: { banner_name: ban.banner.name }) %>
+        <div><%= time_ago_in_words_tagged(ban.created_at) %></div>
+      <% end %>
+      <% t.column "" do |ban| %>
+        <% if CurrentUser.is_moderator? %>
+          <%= link_to "Edit", edit_ban_path(ban) %>
+          | <%= link_to "Delete", ban_path(ban), :method => :delete, :remote => true %>
         <% end %>
-      </tbody>
-    </table>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@bans) %>
   </div>

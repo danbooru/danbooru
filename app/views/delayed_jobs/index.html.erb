@@ -2,55 +2,41 @@
   <div id="a-index">
     <h1>Delayed Jobs</h1>
 
-    <table class="striped autofit">
-      <thead>
-        <tr>
-          <th>Queue</th>
-          <th>Name</th>
-          <% if CurrentUser.is_admin? %>
-            <th>Handler</th>
-          <% end %>
-          <th>Attempts</th>
-          <th>Last error</th>
-          <th>Failed at</th>
-          <th>Run at</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @delayed_jobs.each do |job| %>
-          <tr>
-            <td><%= job.queue %></td>
-            <td><%= raw print_name(job) %></td>
-            <% if CurrentUser.is_admin? %>
-              <td class="col-expand"><%= raw print_handler(job) %></td>
-            <% end %>
-            <td><%= job.attempts %></td>
-            <td class="col-expand">
-              <% if job.last_error %>
-                <%= job.last_error.split(/\n/)[0] %>
-                <%= job.last_error.split(/\n/)[1..-1].grep(/releases/).join("\n") %>
-              <% end %>
-            </td>
-            <td><%= time_ago_in_words_tagged(job.failed_at) if job.failed_at %></td>
-            <td><%= time_ago_in_words_tagged(job.run_at) %></td>
-            <td>
-              <% if CurrentUser.is_admin? %>
-                <% if job.locked_at? %>
-                  Running
-                <% elsif job.failed? %>
-                  <%= link_to "Retry", retry_delayed_job_path(job), method: :put, remote: true %> |
-                  <%= link_to "Delete", delayed_job_path(job), method: :delete, remote: true %>
-                <% else %>
-                  <%= link_to "Run", run_delayed_job_path(job), method: :put, remote: true %> |
-                  <%= link_to "Cancel", cancel_delayed_job_path(job), method: :put, remote: true %>
-                <% end %>
-              <% end %>
-            </td>
-          </tr>
+    <%= table_for @delayed_jobs, {class: "striped autofit"} do |t| %>
+      <% t.column :queue %>
+      <% t.column "Name" do |job| %>
+        <%= raw print_name(job) %>
+      <% end %>
+      <% t.column "Handler", nil, {class: "col-expand"} do |job| %>
+        <%= raw print_handler(job) %>
+      <% end %>
+      <% t.column :attempts %>
+      <% t.column "Last error", nil, {class: "col-expand"} do |job| %>
+        <% if job.last_error %>
+          <%= job.last_error.split(/\n/)[0] %>
+          <%= job.last_error.split(/\n/)[1..-1].grep(/releases/).join("\n") %>
         <% end %>
-      </tbody>
-    </table>
+      <% end %>
+      <% t.column "Failed at" do |job| %>
+        <%= time_ago_in_words_tagged(job.failed_at) if job.failed_at %>
+      <% end %>
+      <% t.column "Run at" do |job| %>
+        <%= time_ago_in_words_tagged(job.run_at) %>
+      <% end %>
+      <% t.column "" do |job| %>
+        <% if CurrentUser.is_admin? %>
+          <% if job.locked_at? %>
+            Running
+          <% elsif job.failed? %>
+            <%= link_to "Retry", retry_delayed_job_path(job), method: :put, remote: true %> |
+            <%= link_to "Delete", delayed_job_path(job), method: :delete, remote: true %>
+          <% else %>
+            <%= link_to "Run", run_delayed_job_path(job), method: :put, remote: true %> |
+            <%= link_to "Cancel", cancel_delayed_job_path(job), method: :put, remote: true %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@delayed_jobs) %>
   </div>

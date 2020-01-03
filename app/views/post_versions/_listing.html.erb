@@ -3,58 +3,41 @@
     <%= PostPresenter.preview(@post_versions.first.post, show_deleted: true) %>
   <% end %>
 
-  <table id="post-versions-table" class="striped autofit">
-    <thead>
-      <tr>
-        <% if CurrentUser.user.is_builder? %>
-          <th class="post-version-select-column">
-            <label><input type="checkbox" id="post-version-select-all-checkbox" class="post-version-select-checkbox"></label>
-          </th>
+    <%= table_for @post_versions, {id: "post-versions-table", class: "striped autofit"} do |t| %>
+      <% if CurrentUser.user.is_builder? %>
+        <% t.column "<label><input type=\"checkbox\" id=\"post-version-select-all-checkbox\" class=\"post-version-select-checkbox\"></label>", {class: "post-version-select-column"}, nil, true do |post_version| %>
+          <input type="checkbox" class="post-version-select-checkbox" <%= "disabled" unless post_version.can_undo?(CurrentUser.user) %>>
         <% end %>
-        <% if post_version_listing == :standard %>
-          <th>Post</th>
-        <% end %>
-        <th>Version</th>
-        <th>Tags</th>
-        <th>Updated</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @post_versions.each do |post_version| %>
-        <tr id="post-version-<%= post_version.id %>" data-post-version-id="<%= post_version.id %>">
-          <% if CurrentUser.user.is_builder? %>
-            <td class="post-version-select-column">
-              <input type="checkbox" class="post-version-select-checkbox" <%= "disabled" unless post_version.can_undo?(CurrentUser.user) %>>
-            </td>
-          <% end %>
-          <% if post_version_listing == :standard %>
-            <td><%= PostPresenter.preview(post_version.post, show_deleted: true) %></td>
-          <% end %>
-          <td>
-            <%= link_to "#{post_version.post_id}.#{post_version.version}", post_versions_path(search: { post_id: post_version.post_id }, anchor: "post-version-#{post_version.id}") %>
-          </td>
-          <td class="col-expand"><%= post_version_diff(post_version) %></td>
-          <td>
-            <%= link_to_user post_version.updater %>
-            <%= link_to "»", post_versions_path(search: params[:search].merge({ updater_name: post_version.updater&.name })) %>
-            <div>
-              <%= compact_time(post_version.updated_at) %>
-              <% if CurrentUser.is_moderator? %>
-                (<%= link_to_ip post_version.updater_ip_addr %>)
-              <% end %>
-            </div>
-          </td>
-          <td>
-            <% if post_version.can_undo?(CurrentUser.user) %>
-              <%= link_to "Undo", undo_post_version_path(post_version), method: :put, remote: true, class: "post-version-undo-link" %>
-            <% end %>
-            <% if post_version_listing == :revert && post_version.can_revert_to?(CurrentUser.user) %>
-              | <%= link_to "Revert to", revert_post_path(post_version.post_id, version_id: post_version.id), method: :put, remote: true %>
-            <% end %>
-          </td>
-        </tr>
       <% end %>
-    </tbody>
-  </table>
+      <% if post_version_listing == :standard %>
+        <% t.column "Post" do |post_version| %>
+          <%= PostPresenter.preview(post_version.post, show_deleted: true) %>
+        <% end %>
+      <% end %>
+      <% t.column "Version" do |post_version| %>
+        <%= link_to "#{post_version.post_id}.#{post_version.version}", post_versions_path(search: { post_id: post_version.post_id }, anchor: "post-version-#{post_version.id}") %>
+      <% end %>
+      <% t.column "Tags", {class: "col-expand"} do |post_version| %>
+        <%= post_version_diff(post_version) %>
+      <% end %>
+      <% t.column "Updated" do |post_version| %>
+        <%= link_to_user post_version.updater %>
+        <%= link_to "»", post_versions_path(search: params[:search].merge({ updater_name: post_version.updater&.name })) %>
+        <div>
+          <%= compact_time(post_version.updated_at) %>
+          <% if CurrentUser.is_moderator? %>
+            (<%= link_to_ip post_version.updater_ip_addr %>)
+          <% end %>
+        </div>
+      <% end %>
+      <% t.column "" do |post_version| %>
+        <% if post_version.can_undo?(CurrentUser.user) %>
+          <%= link_to "Undo", undo_post_version_path(post_version), method: :put, remote: true, class: "post-version-undo-link" %>
+        <% end %>
+        <% if post_version_listing == :revert && post_version.can_revert_to?(CurrentUser.user) %>
+          | <%= link_to "Revert to", revert_post_path(post_version.post_id, version_id: post_version.id), method: :put, remote: true %>
+        <% end %>
+      <% end %>
+    <% end %>
+
 </div>

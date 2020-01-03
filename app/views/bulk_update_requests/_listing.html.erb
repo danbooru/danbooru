@@ -1,49 +1,35 @@
-<table class="striped" width="100%">
-  <thead>
-    <tr>
-      <th>Request</th>
-      <th>Votes</th>
-      <th>Status</th>
-      <th>Created</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% bulk_update_requests.each do |request| %>
-      <tr id="request-<%= request.id %>">
-        <td>
-          <% if request.forum_post.present? %>
-            <p><%= link_to "Topic ##{request.forum_topic_id}: #{request.forum_topic.title}", forum_topic_path(request.forum_topic_id, page: request.forum_post.forum_topic_page, anchor: "forum_post_#{request.forum_post_id}") %></p>
-          <% elsif request.forum_topic.present? %>
-            <p><%= link_to "Topic ##{request.forum_topic_id}: #{request.forum_topic.title}", request.forum_topic %></p>
-          <% end %>
+<%= table_for bulk_update_requests, {class: "striped", width: "100%"} do |t| %>
+  <% t.column "Request" do |request| %>
+      <% if request.forum_post.present? %>
+        <p><%= link_to "Topic ##{request.forum_topic_id}: #{request.forum_topic.title}", forum_topic_path(request.forum_topic_id, page: request.forum_post.forum_topic_page, anchor: "forum_post_#{request.forum_post_id}") %></p>
+      <% elsif request.forum_topic.present? %>
+        <p><%= link_to "Topic ##{request.forum_topic_id}: #{request.forum_topic.title}", request.forum_topic %></p>
+      <% end %>
 
-          <%= script_with_line_breaks(request.script) %>
-        </td>
-        <td>
-          <% if request.forum_post.present? %>
-            <%= link_to forum_post_votes_path(search: { forum_post_id: request.forum_post_id }) do %>
-              +<%= request.forum_post.votes.select(&:up?).count %> /
-              -<%= request.forum_post.votes.select(&:down?).count %>
-            <% end %>
-          <% end %>
-        </td>
-        <td id="request-status-for-<%= request.id %>">
-          <%= request.status %>
-          <% if request.is_approved? %>
-            <br>by <%= link_to_user request.approver %>
-          <% end %>
-        </td>
-        <td>
-          <%= link_to_user request.user %>
-          <%= link_to "»", bulk_update_requests_path(search: { user_name: request.user.name }) %>
-          <div><%= time_ago_in_words_tagged(request.created_at) %></div>
-        </td>
-        <td>
-          <%= link_to "Show", bulk_update_request_path(request) %> |
-          <%= render "bulk_update_requests/bur_edit_links", bur: request %>
-        </td>
-      </tr>
+      <%= script_with_line_breaks(request.script) %>
+  <% end %>
+  <% t.column "Votes" do |request| %>
+    <% if request.forum_post.present? %>
+      <%= link_to forum_post_votes_path(search: { forum_post_id: request.forum_post_id }) do %>
+        +<%= request.forum_post.votes.select(&:up?).count %> /
+        -<%= request.forum_post.votes.select(&:down?).count %>
+      <% end %>
     <% end %>
-  </tbody>
-</table>
+  <% end %>
+  <% t.column "Status" do |request| %>
+    <%= request.status %>
+    <% if request.is_approved? %>
+      <br>by <%= link_to_user request.approver %>
+    <% end %>
+  <% end %>
+  <% t.column "Created" do |request| %>
+    <%= link_to_user request.user %>
+    <%= link_to "»", bulk_update_requests_path(search: { user_name: request.user.name }) %>
+    <div><%= time_ago_in_words_tagged(request.created_at) %></div>
+  <% end %>
+  <% t.column "" do |request| %>
+    <%= link_to "Show", bulk_update_request_path(request) %> |
+    <%= render "bulk_update_requests/bur_edit_links", bur: request %>
+  <% end %>
+<% end %>
+
