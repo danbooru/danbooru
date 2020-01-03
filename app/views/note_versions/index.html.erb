@@ -2,10 +2,11 @@
   <div id="a-index">
     <h1>Note Changes</h1>
 
-    <%= render "standard_listing" %>
+    <%= render "listing" %>
 
     <%= numbered_paginator(@note_versions) %>
 
-    <%= render "notes/secondary_links" %>
   </div>
 </div>
+
+<%= render "notes/secondary_links" %>
