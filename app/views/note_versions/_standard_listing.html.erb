@@ -1,4 +1,4 @@
-<div id="p-standard-listing">
+<div id="p-<%= note_versions_listing_type %>-listing">
 
     <%= table_for @note_versions, {class: "striped autofit", width: "100%"} do |t| %>
       <% t.column %>
@@ -34,6 +34,11 @@
       <% end %>
       <% t.column "Date", {width: "10%"} do |note_version| %>
         <%= compact_time note_version.updated_at %>
+      <% end %>
+      <% if note_versions_listing_type == :revert %>
+        <% t.column "", {width: "7%"} do |note_version| %>
+          <%= link_to "Revert to", revert_note_path(note_version.note_id, :version_id => note_version.id), :remote => true, :method => :put, :data => {:confirm => "Are you sure you want to revert to this version?"} %>
+        <% end %>
       <% end %>
     <% end %>
 

@@ -1,11 +1,17 @@
-<div id="p-standard-listing">
+<div id="p-<%= artist_commentary_versions_listing_type %>-listing">
 
   <%= table_for @commentary_versions, {class: "striped autofit", width: "100%"} do |t| %>
     <% t.column "Post", {width: "5%"} do |commentary_version| %>
-      <%= PostPresenter.preview(commentary_version.post, :tags => "status:any") %>
+      <% if artist_commentary_versions_listing_type == :revert %>
+        <%= link_to commentary_version.post_id, post_path(commentary_version.post_id) %>
+      <% else %>
+        <%= PostPresenter.preview(commentary_version.post, :tags => "status:any") %>
+      <% end %>
     <% end %>
-    <% t.column "Version" do |commentary_version| %>
-      <%= link_to "#{commentary_version.post_id}.#{commentary_version.id}»", artist_commentary_versions_path(search: {post_id: commentary_version.post_id}) %>
+    <% if artist_commentary_versions_listing_type == :standard %>
+      <% t.column "Version" do |commentary_version| %>
+        <%= link_to "#{commentary_version.post_id}.#{commentary_version.id}»", artist_commentary_versions_path(search: {post_id: commentary_version.post_id}) %>
+      <% end %>
     <% end %>
     <% t.column "Original" do |commentary_version| %>
       <%= format_commentary_title(commentary_version.original_title) %>
@@ -25,6 +31,11 @@
     <% end %>
     <% t.column "Date", {width: "10%"} do |commentary_version| %>
       <%= compact_time commentary_version.updated_at %>
+    <% end %>
+    <% if artist_commentary_versions_listing_type == :revert %>
+      <% t.column "", {width: "7%"} do |commentary_version| %>
+        <%= link_to "Revert to", revert_artist_commentary_path(commentary_version.post_id, :version_id => commentary_version.id), :remote => true, :method => :put, :data => {:confirm => "Are you sure you want to revert to this version?"} %>
+      <% end %>
     <% end %>
   <% end %>
 

@@ -1,4 +1,4 @@
-<div id="p-standard-listing">
+<div id="p-<%= pool_versions_listing_type %>-listing">
 
     <%= table_for @pool_versions, {class: "striped autofit", width: "100%"} do |t| %>
       <% t.column "Pool" do |pool_version| %>
@@ -27,6 +27,11 @@
       <% end %>
       <% t.column "Date" do |pool_version| %>
         <%= compact_time pool_version.updated_at %>
+      <% end %>
+      <% if pool_versions_listing_type == :revert %>
+        <% t.column "" do |pool_version| %>
+          <%= link_to "Revert to", revert_pool_path(pool_version.pool_id, :version_id => pool_version.id), :method => :put, :remote => true %>
+        <% end %>
       <% end %>
     <% end %>
 

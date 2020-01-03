@@ -2,11 +2,7 @@
   <div id="a-index">
     <h1>Note Changes</h1>
 
-    <% if params.dig(:search, :post_id).present? || params.dig(:search, :note_id).present? %>
-      <%= render "revert_listing" %>
-    <% else %>
-      <%= render "standard_listing" %>
-    <% end %>
+    <%= render "standard_listing" %>
 
     <%= numbered_paginator(@note_versions) %>
 
