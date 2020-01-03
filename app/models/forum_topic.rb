@@ -80,6 +80,10 @@ class ForumTopic < ApplicationRecord
         q = q.apply_default_order(params)
       end
 
+      unless params[:is_deleted].present?
+        q = q.active
+      end
+
       q
     end
   end
