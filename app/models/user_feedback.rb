@@ -42,7 +42,7 @@ class UserFeedback < ApplicationRecord
 
   module ApiMethods
     def html_data_attributes
-      [:user_id, :creator_id]
+      [:user_id, :creator_id, :category]
     end
   end
 

@@ -148,7 +148,7 @@ class Dmail < ApplicationRecord
 
   module ApiMethods
     def html_data_attributes
-      [:owner_id, :from_id, :to_id]
+      [:owner_id, :from_id, :to_id, :is_read?]
     end
   end
 

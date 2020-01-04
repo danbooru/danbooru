@@ -23,13 +23,12 @@ class TableBuilder
     end
   end
 
-  attr_reader :columns, :table_attributes, :row_attributes, :items
+  attr_reader :columns, :table_attributes, :items
 
-  def initialize(items, table_attributes=nil, row_attributes=nil)
+  def initialize(items, table_attributes=nil)
     @items = items
     @columns = []
     @table_attributes = table_attributes
-    @row_attributes = row_attributes
     yield self if block_given?
   end
 
@@ -50,17 +49,6 @@ class TableBuilder
       class_attributes = {}
     end
 
-    if !row_attributes.nil?
-      mapped_row_attributes = row_attributes.clone
-      mapped_row_attributes.clone.each do |key, value|
-        if value.kind_of?(Array)
-          mapped_row_attributes[key] = value[0] % value.slice(1,value.length).map {|param| eval(param)}
-        end
-      end
-    else
-      mapped_row_attributes = {}
-    end
-
-    standard_attributes.merge(class_attributes).merge(mapped_row_attributes)
+    standard_attributes.merge(class_attributes)
   end
 end

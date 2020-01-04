@@ -1,5 +1,5 @@
 div#c-dmails {
-  tr.read-false {
+  tr[data-is-read="false"] {
     font-weight: bold;
   }
 }

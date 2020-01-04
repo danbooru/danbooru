@@ -1,9 +1,9 @@
 div#c-user-feedbacks, div#c-moderator-dashboards div#col2 {
-  .feedback-category-positive {
+  [data-category="positive"] {
     background: var(--success-background-color);
   }
 
-  .feedback-category-negative {
+  [data-category="negative"] {
     background: var(--error-background-color);
   }
 }

@@ -10,7 +10,7 @@
 
     <%= render "search" %>
 
-    <%= table_for @dmails, {class: "striped", width: "100%"}, {class: ["read-%s", "item.is_read?"]} do |t| %>
+    <%= table_for @dmails, {class: "striped", width: "100%"} do |t| %>
       <% t.column "Date" do |dmail| %>
         <%= compact_time(dmail.created_at) %>
       <% end %>
