@@ -94,13 +94,24 @@ class PostFlag < ApplicationRecord
     end
   end
 
-  def api_attributes
-    attributes = super + [:category]
-    attributes -= [:creator_id] unless CurrentUser.can_view_flagger_on_post?(self)
-    attributes
+  module ApiMethods
+    def api_attributes
+      attributes = super + [:category]
+      attributes -= [:creator_id] unless CurrentUser.can_view_flagger_on_post?(self)
+      attributes
+    end
+
+    def html_data_attributes
+      attributes = [:post_id]
+      if CurrentUser.can_view_flagger_on_post?(self)
+        attributes += [:creator_id]
+      end
+      attributes
+    end
   end
 
   extend SearchMethods
+  include ApiMethods
 
   def category
     case reason

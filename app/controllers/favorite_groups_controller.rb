@@ -8,7 +8,7 @@ class FavoriteGroupsController < ApplicationController
   end
 
   def show
-    @favorite_group = FavoriteGroup.find(params[:id])
+    @current_item = @favorite_group = FavoriteGroup.find(params[:id])
     check_read_privilege(@favorite_group)
     @post_set = PostSets::FavoriteGroup.new(@favorite_group, params[:page])
     respond_with(@favorite_group)

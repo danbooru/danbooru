@@ -33,7 +33,14 @@ class PoolArchive < ApplicationRecord
     end
   end
 
+  module ApiMethods
+    def html_data_attributes
+      [:pool_id, :updater_id, :version]
+    end
+  end
+
   extend SearchMethods
+  include ApiMethods
 
   def self.sqs_service
     SqsService.new(Danbooru.config.aws_sqs_archives_url)

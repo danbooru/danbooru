@@ -73,7 +73,14 @@ class ForumPost < ApplicationRecord
     end
   end
 
+  module ApiMethods
+    def html_data_attributes
+      [:topic_id, :creator_id, :updater_id, :is_deleted?, [:topic, :is_deleted?]]
+    end
+  end
+
   extend SearchMethods
+  include ApiMethods
 
   def self.new_reply(params)
     if params[:topic_id]

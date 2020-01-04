@@ -37,4 +37,12 @@ class PostApproval < ApplicationRecord
     q = q.search_attributes(params, :user, :post)
     q.apply_default_order(params)
   end
+
+  module ApiMethods
+    def html_data_attributes
+      [:post_id, :user_id]
+    end
+  end
+
+  include ApiMethods
 end

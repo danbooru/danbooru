@@ -3,7 +3,7 @@ class TagAliasesController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def show
-    @tag_alias = TagAlias.find(params[:id])
+    @current_item = @tag_alias = TagAlias.find(params[:id])
     respond_with(@tag_alias)
   end
 

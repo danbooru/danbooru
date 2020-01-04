@@ -146,9 +146,16 @@ class Dmail < ApplicationRecord
     end
   end
 
+  module ApiMethods
+    def html_data_attributes
+      [:owner_id, :from_id, :to_id]
+    end
+  end
+
   include AddressMethods
   include FactoryMethods
   extend SearchMethods
+  include ApiMethods
 
   def validate_sender_is_not_banned
     if from.try(:is_banned?)

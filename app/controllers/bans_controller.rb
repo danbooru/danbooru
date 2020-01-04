@@ -19,7 +19,7 @@ class BansController < ApplicationController
   end
 
   def show
-    @ban = Ban.find(params[:id])
+    @current_item = @ban = Ban.find(params[:id])
     respond_with(@ban)
   end
 

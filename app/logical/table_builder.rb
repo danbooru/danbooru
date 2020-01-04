@@ -43,6 +43,13 @@ class TableBuilder
     else
       standard_attributes = {}
     end
+
+    if item.html_data_attributes.length > 0
+      class_attributes = ApplicationController.helpers.data_attributes_for(item, "data", item.html_data_attributes)
+    else
+      class_attributes = {}
+    end
+
     if !row_attributes.nil?
       mapped_row_attributes = row_attributes.clone
       mapped_row_attributes.clone.each do |key, value|
@@ -53,6 +60,7 @@ class TableBuilder
     else
       mapped_row_attributes = {}
     end
-    standard_attributes.merge(mapped_row_attributes)
+
+    standard_attributes.merge(class_attributes).merge(mapped_row_attributes)
   end
 end

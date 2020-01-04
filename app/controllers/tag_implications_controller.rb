@@ -3,7 +3,7 @@ class TagImplicationsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def show
-    @tag_implication = TagImplication.find(params[:id])
+    @current_item = @tag_implication = TagImplication.find(params[:id])
     respond_with(@tag_implication)
   end
 

@@ -19,7 +19,7 @@ class PostsController < ApplicationController
   end
 
   def show
-    @post = Post.find(params[:id])
+    @current_item = @post = Post.find(params[:id])
 
     @comments = @post.comments
     @comments = @comments.includes(:creator)

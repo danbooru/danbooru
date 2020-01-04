@@ -75,7 +75,7 @@
   <%= yield :html_header %>
   <%= raw Danbooru.config.custom_html_header_content %>
 </head>
-<%= tag.body **body_attributes(CurrentUser.user) do %>
+<%= tag.body **body_attributes(CurrentUser.user, (defined?(@current_item) ? @current_item : nil)) do %>
   <%= render "news_updates/listing" %>
 
   <header id="top">

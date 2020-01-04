@@ -115,7 +115,14 @@ class WikiPage < ApplicationRecord
     end
   end
 
+  module ApiMethods
+    def html_data_attributes
+      [:category_name, [:artist, :id]]
+    end
+  end
+
   extend SearchMethods
+  include ApiMethods
 
   def validate_not_locked
     if is_locked? && !CurrentUser.is_builder?

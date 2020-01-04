@@ -83,4 +83,12 @@ class ModAction < ApplicationRecord
   def initialize_creator
     self.creator_id = CurrentUser.id
   end
+
+  module ApiMethods
+    def html_data_attributes
+      [:category_id, :creator_id]
+    end
+  end
+
+  include ApiMethods
 end
