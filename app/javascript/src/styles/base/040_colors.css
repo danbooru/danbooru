@@ -214,7 +214,7 @@
 }
 
 /* variables that aren't defined in the dark theme fall back to the :root theme */
-body[data-user-theme="dark"] {
+body[data-current-user-theme="dark"] {
   --grey-1:   #1f202c; /* hsluv(265, 15, 12.50); */
   --grey-2:   #2c2c3c; /* hsluv(265, 15, 18.75); */
   --grey-3:   #393a4d; /* hsluv(265, 15, 25.00); */
