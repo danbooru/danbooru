@@ -1,6 +1,6 @@
 <div id="c-post-versions">
   <div id="a-index">
-    <% if post_version_listing == :revert && @post_versions.present? %>
+    <% if post_versions_listing_type == :revert && @post_versions.present? %>
       <h1>Tag History: <%= link_to "Post ##{params.dig(:search, :post_id)}", @post_versions[0].post %></h1>
     <% else %>
       <h1>Tag History</h1>

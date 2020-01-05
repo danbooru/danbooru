@@ -1,4 +1,8 @@
 module NoteVersionsHelper
+  def note_versions_listing_type
+    (params.dig(:search, :post_id).present? || params.dig(:search, :note_id).present?) && CurrentUser.is_member? ? :revert : :standard
+  end
+
   def note_version_body_diff_info(note_version)
     previous = note_version.previous
     if previous.nil?

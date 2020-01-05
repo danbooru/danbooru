@@ -202,10 +202,13 @@ module ApplicationHelper
     render "table_builder/table", table: table
   end
 
-  def body_attributes(user = CurrentUser.user)
-    attributes = %i[id name level level_string theme] + User::BOOLEAN_ATTRIBUTES.map(&:to_sym)
-    attributes += User::Roles.map { |role| :"is_#{role}?" }
-
+  def body_attributes(user = CurrentUser.user, current_item = nil)
+    user_attributes = %i[id name level level_string theme] + User::BOOLEAN_ATTRIBUTES.map(&:to_sym)
+    user_attributes += User::Roles.map { |role| :"is_#{role}?" }
+    mapped_user_attributes = data_attributes_for(user, "current-user", user_attributes)
+    model_attributes = (!current_item.nil? ? (!current_item.id.nil? ? [:id] : [] ) + current_item.html_data_attributes : [])
+    mapped_model_attributes = (!current_item.nil? ? data_attributes_for(current_item, current_item.model_name.singular.dasherize, model_attributes) : {} )
+    all_mapped_attributes = mapped_user_attributes.merge(mapped_model_attributes)
     controller_param = params[:controller].parameterize.dasherize
     action_param = params[:action].parameterize.dasherize
 
@@ -216,17 +219,34 @@ module ApplicationHelper
         controller: controller_param,
         action: action_param,
         layout: controller.class.send(:_layout),
-        **data_attributes_for(user, "user", attributes)
+        **all_mapped_attributes
       }
     }
   end
 
   def data_attributes_for(record, prefix, attributes)
     attributes.map do |attr|
-      name = attr.to_s.dasherize.delete("?")
-      value = record.send(attr)
-
-      [:"#{prefix}-#{name}", value]
+      if attr.kind_of?(Array)
+        name = attr.map {|sym| sym.to_s.dasherize.delete("?")}.join('-')
+        value = record
+        attr.each do |sym|
+          value = value.send(sym)
+          if value.nil?
+            break
+          end
+        end
+      else
+        name = attr.to_s.dasherize.delete("?")
+        value = record.send(attr)
+      end
+      if value.nil?
+        value = "null"
+      end
+      if prefix.length == 0
+        [:"#{name}", value]
+      else
+        [:"#{prefix}-#{name}", value]
+      end
     end.to_h
   end
 

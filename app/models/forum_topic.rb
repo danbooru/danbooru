@@ -80,6 +80,10 @@ class ForumTopic < ApplicationRecord
         q = q.apply_default_order(params)
       end
 
+      unless params[:is_deleted].present?
+        q = q.active
+      end
+
       q
     end
   end
@@ -127,10 +131,17 @@ class ForumTopic < ApplicationRecord
     end
   end
 
+  module ApiMethods
+    def html_data_attributes
+      [:creator_id, :updater_id, :category_id]
+    end
+  end
+
   extend SearchMethods
   include CategoryMethods
   include VisitMethods
   include SubscriptionMethods
+  include ApiMethods
 
   def editable_by?(user)
     (creator_id == user.id || user.is_moderator?) && visible?(user)

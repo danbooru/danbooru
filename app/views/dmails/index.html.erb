@@ -10,42 +10,31 @@
 
     <%= render "search" %>
 
-    <table class="striped" width="100%">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>From</th>
-          <th>To</th>
-          <th>Subject</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @dmails.each do |dmail| %>
-          <tr class="read-<%= dmail.is_read? %>">
-            <td><%= compact_time(dmail.created_at) %></td>
-            <td>
-              <% if dmail.filtered? %>
-                <%= link_to "[filtered]", user_path(dmail.from) %>
-              <% else %>
-                <%= link_to_user dmail.from %>
-              <% end %>
-            </td>
-            <td><%= link_to_user dmail.to %></td>
-            <td>
-              <% if dmail.filtered? %>
-                <%= link_to "[filtered]", dmail_path(dmail) %>
-              <% else %>
-                <%= link_to dmail.title, dmail_path(dmail) %>
-              <% end %>
-            </td>
-            <td>
-              <%= link_to "delete", dmail_path(dmail), :method => :delete, :data => {:confirm => "Are you sure you want to delete this Dmail?"} %>
-            </td>
-          </tr>
+    <%= table_for @dmails, {class: "striped", width: "100%"} do |t| %>
+      <% t.column "Date" do |dmail| %>
+        <%= compact_time(dmail.created_at) %>
+      <% end %>
+      <% t.column "From" do |dmail| %>
+        <% if dmail.filtered? %>
+          <%= link_to "[filtered]", user_path(dmail.from) %>
+        <% else %>
+          <%= link_to_user dmail.from %>
         <% end %>
-      </tbody>
-    </table>
+      <% end %>
+      <% t.column "To" do |dmail| %>
+        <%= link_to_user dmail.from %>
+      <% end %>
+      <% t.column "Subject" do |dmail| %>
+        <% if dmail.filtered? %>
+          <%= link_to "[filtered]", dmail_path(dmail) %>
+        <% else %>
+          <%= link_to dmail.title, dmail_path(dmail) %>
+        <% end %>
+      <% end %>
+      <% t.column "" do |dmail| %>
+        <%= link_to "delete", dmail_path(dmail), :method => :delete, :data => {:confirm => "Are you sure you want to delete this Dmail?"} %>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@dmails) %>
   </div>

@@ -4,34 +4,19 @@
 
     <%= render "search" %>
 
-    <table class="striped autofit">
-      <thead>
-        <tr>
-          <th>Category</th>
-          <th>Message</th>
-          <th>Created</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @mod_actions.each do |mod_action| %>
-          <tr>
-            <td>
-              <%= link_to mod_action.category.humanize, mod_actions_path(search: { category: mod_action.category_id }) %>
-            </td>
-            <td class="col-expand">
-              <div class="prose">
-                <%= format_text(mod_action.description) %>
-              </div>
-            </td>
-            <td>
-              <%= link_to_user mod_action.creator %>
-              <%= link_to "»", mod_actions_path(search: { creator_name: mod_action.creator.name }) %>
-              <div><%= time_ago_in_words_tagged(mod_action.created_at) %></div>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <%= table_for @mod_actions, {class: "striped autofit"} do |t| %>
+      <% t.column "Category" do |mod_action| %>
+        <%= link_to mod_action.category.humanize, mod_actions_path(search: { category: mod_action.category_id }) %>
+      <% end %>
+      <% t.column "Message", nil, {class: "col-expand"} do |mod_action| %>
+        <%= format_text(mod_action.description) %>
+      <% end %>
+      <% t.column "Created" do |mod_action| %>
+        <%= link_to_user mod_action.creator %>
+        <%= link_to "»", mod_actions_path(search: { creator_name: mod_action.creator.name }) %>
+        <div><%= time_ago_in_words_tagged(mod_action.created_at) %></div>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@mod_actions) %>
   </div>

@@ -37,7 +37,7 @@ class PoolsController < ApplicationController
   def show
     limit = params[:limit].presence || CurrentUser.user.per_page
 
-    @pool = Pool.find(params[:id])
+    @current_item = @pool = Pool.find(params[:id])
     @posts = @pool.posts.paginate(params[:page], limit: limit, count: @pool.post_count)
     respond_with(@pool)
   end

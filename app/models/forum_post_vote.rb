@@ -53,4 +53,12 @@ class ForumPostVote < ApplicationRecord
       raise
     end
   end
+
+  module ApiMethods
+    def html_data_attributes
+      [:forum_post_id, :creator_id]
+    end
+  end
+
+  include ApiMethods
 end

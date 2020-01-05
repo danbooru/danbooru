@@ -1,33 +1,18 @@
 <div id="c-favorite-groups">
   <div id="a-index">
-    <table class="striped" width="100%">
-      <thead>
-        <tr>
-          <th width="5%"></th>
-          <th width="60%">Name</th>
-          <th width="10%">Count</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @favorite_groups.each do |favgroup| %>
-          <%= content_tag(:tr, :id => "favorite-group-#{favgroup.id}") do %>
-            <td>
 
-            </td>
-            <td>
-              <%= link_to favgroup.pretty_name, favorite_group_path(favgroup) %>
-
-              <% if favgroup.post_count > CurrentUser.user.per_page %>
-                <%= link_to "page #{favgroup.last_page}", favorite_group_path(favgroup, :page => favgroup.last_page), :class => "last-page" %>
-              <% end %>
-            </td>
-            <td>
-              <%= favgroup.post_count %>
-            </td>
-          <% end %>
+    <%= table_for @favorite_groups, {class: "striped", width: "100%"} do |t| %>
+      <% t.column nil, {width: "5%"} %>
+      <% t.column "Name", {width: "60%"} do |favgroup| %>
+        <%= link_to favgroup.pretty_name, favorite_group_path(favgroup) %>
+        <% if favgroup.post_count > CurrentUser.user.per_page %>
+          <%= link_to "page #{favgroup.last_page}", favorite_group_path(favgroup, :page => favgroup.last_page), :class => "last-page" %>
         <% end %>
-      </tbody>
-    </table>
+      <% end %>
+      <% t.column "Count", {width: "10%"} do |favgroup| %>
+        <%= favgroup.post_count %>
+      <% end %>
+    <% end %>
 
     <%= render "secondary_links" %>
   </div>

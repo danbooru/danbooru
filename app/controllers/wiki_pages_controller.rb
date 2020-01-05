@@ -30,7 +30,7 @@ class WikiPagesController < ApplicationController
 
   def show
     @wiki_page, found_by = WikiPage.find_by_id_or_title(params[:id])
-
+    @current_item = @wiki_page
     if request.format.html? && @wiki_page.blank? && found_by == :title
       @wiki_page = WikiPage.new(title: params[:id])
       respond_with @wiki_page, status: 404

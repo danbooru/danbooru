@@ -2,58 +2,43 @@
   <div id="a-index">
     <%= render "search" %>
 
-    <table class="striped autofit">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Other Names</th>
-          <th>Status</th>
-          <th>Updated</th>
-          <th></th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @artists.each do |artist| %>
-          <%= tag.tr id: "artist-#{artist.id}" do %>
-            <td>
-              <%= link_to artist.name, artist, class: "tag-type-#{Tag.categories.artist}" %>
-              <span class="post-count"><%= artist.tag.try(:post_count) || 0 %></span>
-              <% if !artist.group_name.blank? %>
-                (group: <%= link_to artist.group_name, artist %>)
-              <% end %>
-            </td>
-            <td class="col-expand">
-              <% artist.other_names.each do |name| %>
-                <%= link_to name, artists_path(search: { any_name_matches: name }), class: "artist-other-name" %>
-              <% end %>
-            </td>
-            <td>
-              <% if !artist.is_active? %>
-                <%= link_to "Deleted", artists_path(search: { is_active: false }) %>
-              <% end %>
+    <%= table_for @artists, {class: "striped autofit"} do |t| %>
+      <% t.column "Name" do |artist| %>
+        <%= link_to artist.name, artist, class: "tag-type-#{Tag.categories.artist}" %>
+        <span class="post-count"><%= artist.tag.try(:post_count) || 0 %></span>
+        <% if !artist.group_name.blank? %>
+          (group: <%= link_to artist.group_name, artist %>)
+        <% end %>
+      <% end %>
+      <% t.column "Other Names", nil, {class: "col-expand"} do |artist| %>
+        <% artist.other_names.each do |name| %>
+          <%= link_to name, artists_path(search: { any_name_matches: name }), class: "artist-other-name" %>
+        <% end %>
+      <% end %>
+      <% t.column "Status" do |artist| %>
+        <% if !artist.is_active? %>
+          <%= link_to "Deleted", artists_path(search: { is_active: false }) %>
+        <% end %>
 
-              <% if artist.is_banned? %>
-                <%= link_to "Banned", artists_path(search: { is_banned: true }) %>
-              <% end %>
-            </td>
-            <td>
-              <%= time_ago_in_words_tagged(artist.updated_at) %>
-            </td>
-            <td>
-              <% if CurrentUser.is_member? %>
-                <%= link_to "Edit", edit_artist_path(artist) %>
+        <% if artist.is_banned? %>
+          <%= link_to "Banned", artists_path(search: { is_banned: true }) %>
+        <% end %>
+      <% end %>
+      <% t.column "Updated" do |artist| %>
+        <%= time_ago_in_words_tagged(artist.updated_at) %>
+      <% end %>
+      <% t.column "" do |artist| %>
+        <% if CurrentUser.is_member? %>
+          <%= link_to "Edit", edit_artist_path(artist) %>
 
-                <% if artist.is_active? %>
-                  | <%= link_to "Delete", artist_path(artist, artist: { is_active: false }), method: :put, remote: true %>
-                <% else %>
-                  | <%= link_to "Undelete", artist_path(artist, artist: { is_active: true }), method: :put, remote: true %>
-                <% end %>
-              <% end %>
-            </td>
+          <% if artist.is_active? %>
+            | <%= link_to "Delete", artist_path(artist, artist: { is_active: false }), method: :put, remote: true %>
+          <% else %>
+            | <%= link_to "Undelete", artist_path(artist, artist: { is_active: true }), method: :put, remote: true %>
           <% end %>
         <% end %>
-      </tbody>
-    </table>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@artists) %>
   </div>

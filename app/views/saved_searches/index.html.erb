@@ -14,44 +14,33 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <table class="striped autofit" width="100%">
-      <thead>
-        <tr>
-          <th data-sort="string">Query</th>
-          <th data-sort="string">Labels</th>
-          <th>Posts</th>
-          <th>Refreshed</th>
-          <th>Created</th>
-          <th class="links"></th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <% @saved_searches.each do |ss| %>
-          <tr id="saved-search-<%= ss.id %>">
-            <td class="col-expand"><%= link_to ss.query, posts_path(tags: ss.query) %></td>
-            <td>
-              <% ss.labels.each do |label| %>
-                <%= link_to label, posts_path(:tags => "search:#{label}") %>
-              <% end %>          
-            </td>
-            <td><%= ss.cached_size if ss.cached_size > 0 %></td>
-            <td>
-              <% if ss.refreshed_at.present? %>
-                <%= time_ago_in_words_tagged ss.refreshed_at %>
-              <% else %>
-                &gt;<%= SavedSearch::REDIS_EXPIRY.inspect %> ago
-              <% end %>
-            </td>
-            <td><%= time_ago_in_words_tagged ss.created_at %></td>
-            <td class="links">
-              <%= link_to "edit", edit_saved_search_path(ss) %>
-                | <%= link_to "delete", saved_search_path(ss), :method => :delete, :remote => true %>
-            </td>
-          </tr>
+    <%= table_for @saved_searches, {class: "striped autofit", width: "100%"} do |t| %>
+      <% t.column "Query", {"data-sort": "string"}, {class: "col-expand"} do |ss| %>
+        <%= link_to ss.query, posts_path(tags: ss.query) %>
+      <% end %>
+      <% t.column "Labels", {"data-sort": "string"} do |ss| %>
+        <% ss.labels.each do |label| %>
+          <%= link_to label, posts_path(:tags => "search:#{label}") %>
         <% end %>
-      </tbody>
-    </table>
+      <% end %>
+      <% t.column "Posts" do |ss| %>
+        <%= ss.cached_size if ss.cached_size > 0 %>
+      <% end %>
+      <% t.column "Refreshed" do |ss| %>
+        <% if ss.refreshed_at.present? %>
+          <%= time_ago_in_words_tagged ss.refreshed_at %>
+        <% else %>
+          &gt;<%= SavedSearch::REDIS_EXPIRY.inspect %> ago
+        <% end %>
+      <% end %>
+      <% t.column "Created" do |ss| %>
+        <%= time_ago_in_words_tagged ss.created_at %>
+      <% end %>
+      <% t.column "", {class: "links"}, {class: "links"} do |ss| %>
+        <%= link_to "edit", edit_saved_search_path(ss) %>
+          | <%= link_to "delete", saved_search_path(ss), :method => :delete, :remote => true %>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@saved_searches) %>
   </div>

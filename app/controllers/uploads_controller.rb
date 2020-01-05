@@ -29,7 +29,7 @@ class UploadsController < ApplicationController
   end
 
   def show
-    @upload = Upload.find(params[:id])
+    @current_item = @upload = Upload.find(params[:id])
     respond_with(@upload) do |format|
       format.html do
         if @upload.is_completed? && @upload.post_id

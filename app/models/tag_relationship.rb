@@ -197,6 +197,12 @@ class TagRelationship < ApplicationRecord
     end
   end
 
+  module ApiMethods
+    def html_data_attributes
+      [:creator_id, :approver_id, :forum_topic_id, :forum_post_id]
+    end
+  end
+
   concerning :EmbeddedText do
     class_methods do
       def embedded_pattern
@@ -234,4 +240,5 @@ class TagRelationship < ApplicationRecord
 
   extend SearchMethods
   include MessageMethods
+  include ApiMethods
 end

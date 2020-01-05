@@ -1,47 +1,37 @@
-<table width="100%" class="striped">
-  <thead>
-    <tr>
-      <th>Title</th>
-      <th>Creator</th>
-      <th class="updater">Updated by</th>
-      <th class="updated-at">Updated at</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% forum_topics.each do |topic| %>
-      <% if CurrentUser.user.level >= topic.min_level %>
-        <tr class="forum-topic-row forum-topic-category-<%= topic.category_id %>">
-          <td>
-            <% if topic.is_sticky? %>
-              <span class="sticky">Sticky:</span>
-            <% end %>
-
-            <% unless topic.read_by?(CurrentUser.user) %>
-              <span class="new">NEW</span>
-            <% end %>
-
-            <%= link_to topic.title, forum_topic_path(topic), class: "forum-post-link" %>
-
-            <% if topic.response_count > Danbooru.config.posts_per_page %>
-              <%= link_to "page #{topic.last_page}", forum_topic_path(topic, :page => topic.last_page), :class => "last-page" %>
-            <% end %>
-
-            <% if topic.is_locked? %>
-              <span class="locked-topic">(locked)</span>
-            <% end %>
-
-            <% if topic.min_level > 0 %>
-              <span class="level-topic">(<%= User.level_string(topic.min_level).downcase %> only)</span>
-            <% end %>
-          </td>
-          <td><%= link_to_user topic.creator %></td>
-          <td class="updater"><%= link_to_user topic.updater %></td>
-          <td class="updated-at"><%= compact_time topic.updated_at %></td>
-        </tr>
-      <% end %>
+<%= table_for forum_topics, {class: "striped", width: "100%"} do |t| %>
+  <% t.column "Title" do |topic| %>
+    <% if topic.is_sticky? %>
+      <span class="sticky">Sticky:</span>
     <% end %>
-  </tbody>
-</table>
+
+    <% unless topic.read_by?(CurrentUser.user) %>
+      <span class="new">NEW</span>
+    <% end %>
+
+    <%= link_to topic.title, forum_topic_path(topic), class: "forum-post-link" %>
+
+    <% if topic.response_count > Danbooru.config.posts_per_page %>
+      <%= link_to "page #{topic.last_page}", forum_topic_path(topic, :page => topic.last_page), :class => "last-page" %>
+    <% end %>
+
+    <% if topic.is_locked? %>
+      <span class="locked-topic">(locked)</span>
+    <% end %>
+
+    <% if topic.min_level > 0 %>
+      <span class="level-topic">(<%= User.level_string(topic.min_level).downcase %> only)</span>
+    <% end %>
+  <% end %>
+  <% t.column "Creator" do |topic| %>
+    <%= link_to_user topic.creator %>
+  <% end %>
+  <% t.column "Updated by", {class: "updater"} do |topic| %>
+    <%= link_to_user topic.updater %>
+  <% end %>
+  <% t.column "Updated at", {class: "updated-at"} do |topic| %>
+    <%= compact_time topic.updated_at %>
+  <% end %>
+<% end %>
 
 <% content_for(:html_header) do %>
 <style>

@@ -1,5 +1,5 @@
 module PostVersionsHelper
-  def post_version_listing
+  def post_versions_listing_type
     params.dig(:search, :post_id).present? ? :revert : :standard
   end
 

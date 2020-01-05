@@ -43,7 +43,7 @@ class ArtistsController < ApplicationController
   end
 
   def show
-    @artist = Artist.find(params[:id])
+    @current_item = @artist = Artist.find(params[:id])
     @post_set = PostSets::Artist.new(@artist)
     respond_with(@artist)
   end

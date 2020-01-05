@@ -1,7 +1,7 @@
 let CurrentUser = {};
 
 CurrentUser.data = function(key) {
-  return $("body").data(`user-${key}`);
+  return $("body").data(`current-user-${key}`);
 };
 
 CurrentUser.update = function(settings) {

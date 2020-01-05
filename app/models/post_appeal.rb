@@ -36,7 +36,14 @@ class PostAppeal < ApplicationRecord
     end
   end
 
+  module ApiMethods
+    def html_data_attributes
+      [:post_id, :creator_id]
+    end
+  end
+
   extend SearchMethods
+  include ApiMethods
 
   def resolved?
     post.present? && !post.is_deleted? && !post.is_flagged?

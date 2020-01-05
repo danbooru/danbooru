@@ -614,6 +614,10 @@ class User < ApplicationRecord
       }.to_json
     end
 
+    def html_data_attributes
+      [:inviter_id]
+    end
+
     def api_token
       api_key.try(:key)
     end

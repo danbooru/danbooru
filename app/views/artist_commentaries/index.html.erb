@@ -4,30 +4,19 @@
 
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <table width="100%" class="striped">
-      <thead>
-        <tr>
-          <th width="1%">Post</th>
-          <th>Original</th>
-          <th>Translated</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @commentaries.each do |commentary| %>
-          <tr>
-            <td><%= PostPresenter.preview(commentary.post, :tags => "status:any") %></td>
-            <td>
-              <%= format_commentary_title(commentary.original_title) %>
-              <%= format_commentary_description(commentary.original_description) %>
-            </td>
-            <td>
-              <%= format_commentary_title(commentary.translated_title) %>
-              <%= format_commentary_description(commentary.translated_description) %>
-            </td>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <%= table_for @commentaries, {class: "striped", width: "100%"} do |t| %>
+      <% t.column "Post", {width: "1%"} do |commentary| %>
+        <%= PostPresenter.preview(commentary.post, :tags => "status:any") %>
+      <% end %>
+      <% t.column "Original" do |commentary| %>
+          <%= format_commentary_title(commentary.original_title) %>
+          <%= format_commentary_description(commentary.original_description) %>
+      <% end %>
+      <% t.column "Translated" do |commentary| %>
+        <%= format_commentary_title(commentary.translated_title) %>
+        <%= format_commentary_description(commentary.translated_description) %>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@commentaries) %>
   </div>

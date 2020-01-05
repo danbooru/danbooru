@@ -3,7 +3,7 @@ class TagsController < ApplicationController
   respond_to :html, :xml, :json
 
   def edit
-    @tag = Tag.find(params[:id])
+    @current_item = @tag = Tag.find(params[:id])
     check_privilege(@tag)
     respond_with(@tag)
   end
@@ -26,7 +26,7 @@ class TagsController < ApplicationController
   end
 
   def show
-    @tag = Tag.find(params[:id])
+    @current_item = @tag = Tag.find(params[:id])
     respond_with(@tag)
   end
 

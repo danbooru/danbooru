@@ -280,6 +280,10 @@ class ApplicationRecord < ActiveRecord::Base
       self.class.api_attributes
     end
 
+    def html_data_attributes
+      []
+    end
+
     def serializable_hash(options = {})
       options ||= {}
       options[:only] ||= []

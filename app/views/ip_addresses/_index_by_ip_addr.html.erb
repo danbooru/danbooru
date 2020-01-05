@@ -2,24 +2,15 @@
   <%= link_to "Find all users associated with the top 10 IP addresses", ip_addresses_path(search: { ip_addr: @ip_addresses.map(&:to_s).take(10).join(" "), group_by: "user" }) %>
 </p>
 
-<table class="striped autofit">
-  <thead>
-    <tr>
-      <th>IP Address</th>
-      <th>Uses</th>
-      <th></th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @ip_addresses.each do |ip| %>
-      <tr>
-        <td>
-          <%= link_to ip.to_s, ip_addresses_path(search: { ip_addr: ip.to_s }) %>
-          <%= link_to "»", ip_addresses_path(search: { ip_addr: ip.to_s, group_by: "user" }) %>
-        </td>
-        <td><%= link_to ip.count_all, ip_addresses_path(search: { ip_addr: ip.to_s }) %></td>
-        <td><%= link_to "IP info", "https://ipinfo.io/#{ip.ip_addr}" %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+<%= table_for @ip_addresses, {class: "striped autofit"} do |t| %>
+  <% t.column "IP Address" do |ip| %>
+    <%= link_to ip.to_s, ip_addresses_path(search: { ip_addr: ip.to_s }) %>
+    <%= link_to "»", ip_addresses_path(search: { ip_addr: ip.to_s, group_by: "user" }) %>
+  <% end %>
+  <% t.column "Uses" do |ip| %>
+    <%= link_to ip.count_all, ip_addresses_path(search: { ip_addr: ip.to_s }) %>
+  <% end %>
+  <% t.column "" do |ip| %>
+    <%= link_to "IP info", "https://ipinfo.io/#{ip.ip_addr}" %>
+  <% end %>
+<% end %>

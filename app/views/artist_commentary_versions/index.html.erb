@@ -4,11 +4,7 @@
 
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <% if params.dig(:search, :post_id).present? %>
-      <%= render "revert_listing" %>
-    <% else %>
-      <%= render "standard_listing" %>
-    <% end %>
+    <%= render "listing" %>
 
     <%= numbered_paginator(@commentary_versions) %>
 

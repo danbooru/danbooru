@@ -2,11 +2,7 @@
   <div id="a-index">
     <h1>Pool History</h1>
 
-    <% if params.dig(:search, :pool_id).present? %>
-      <%= render "revert_listing" %>
-    <% else %>
-      <%= render "standard_listing" %>
-    <% end %>
+    <%= render "listing" %>
 
     <%= numbered_paginator(@pool_versions) %>
   </div>

@@ -75,8 +75,15 @@ class PostArchive < ApplicationRecord
     end
   end
 
+  module ApiMethods
+    def html_data_attributes
+      [:post_id, :updater_id, :version]
+    end
+  end
+
   extend SearchMethods
   include ArchiveServiceMethods
+  include ApiMethods
 
   def tag_array
     tags.split

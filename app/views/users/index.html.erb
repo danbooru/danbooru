@@ -2,43 +2,37 @@
   <div id="a-index">
     <h1>Users</h1>
 
-    <table width="100%" class="striped">
-      <thead>
-        <tr>
-          <th></th>
-          <th>Name</th>
-          <th>Posts</th>
-          <th>Deleted</th>
-          <th>Notes</th>
-          <th>Edits</th>
-          <th>Level</th>
-          <th>Joined</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @users.each do |user| %>
-          <tr>
-            <td>
-              <% if CurrentUser.is_admin? %>
-                <%= link_to "Edit", edit_admin_user_path(user) %>
-              <% end %>
-            </td>
-            <td>
-              <%= link_to_user user %>
-              <% if user.inviter %>
-                &larr; <%= link_to_user user.inviter %>
-              <% end %>
-            </td>
-            <td><%= link_to user.posts.count, posts_path(:tags => "user:#{user.name}") %></td>
-            <td><%= user.posts.deleted.count %></td>
-            <td><%= link_to user.note_versions.count, note_versions_path(:search => {:updater_id => user.id}) %></td>
-            <td><%= link_to user.post_update_count, post_versions_path(:search => {:updater_id => user.id}) %></td>
-            <td><%= user.level_string %></td>
-            <td><%= compact_time user.created_at %></td>
-          </tr>
+    <%= table_for @users, {class: "striped", width: "100%"} do |t| %>
+      <% t.column "" do |user| %>
+        <% if CurrentUser.is_admin? %>
+          <%= link_to "Edit", edit_admin_user_path(user) %>
         <% end %>
-      </tbody>
-    </table>
+      <% end %>
+      <% t.column "Name" do |user| %>
+        <%= link_to_user user %>
+        <% if user.inviter %>
+          &larr; <%= link_to_user user.inviter %>
+        <% end %>
+      <% end %>
+      <% t.column "Posts" do |user| %>
+        <%= link_to user.posts.count, posts_path(:tags => "user:#{user.name}") %>
+      <% end %>
+      <% t.column "Deleted" do |user| %>
+        <%= user.posts.deleted.count %>
+      <% end %>
+      <% t.column "Notes" do |user| %>
+        <%= link_to user.note_versions.count, note_versions_path(:search => {:updater_id => user.id}) %>
+      <% end %>
+      <% t.column "Edits" do |user| %>
+        <%= link_to user.post_update_count, post_versions_path(:search => {:updater_id => user.id}) %>
+      <% end %>
+      <% t.column "Level" do |user| %>
+        <%= user.level_string %>
+      <% end %>
+      <% t.column "Joined" do |user| %>
+        <%= compact_time user.created_at %>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@users) %>
 

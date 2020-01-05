@@ -65,11 +65,22 @@ class ForumPost < ApplicationRecord
         q = q.joins(:topic).where("forum_topics.category_id = ?", params[:topic_category_id].to_i)
       end
 
+      unless params[:is_deleted].present?
+        q = q.active
+      end
+
       q.apply_default_order(params)
     end
   end
 
+  module ApiMethods
+    def html_data_attributes
+      [:topic_id, :creator_id, :updater_id, :is_deleted?, [:topic, :is_deleted?]]
+    end
+  end
+
   extend SearchMethods
+  include ApiMethods
 
   def self.new_reply(params)
     if params[:topic_id]

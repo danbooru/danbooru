@@ -1,47 +1,39 @@
 <div id="p-page-listing">
   <%= form_tag(diff_wiki_page_versions_path, :method => :get) do %>
-    <table width="100%" class="striped">
-      <thead>
-        <tr>
-          <th width="3%"></th>
-          <th width="2%"></th>
-          <th width="2%"></th>
-          <th>Title</th>
-          <th width="5%">Status</th>
-          <th width="26%">Last edited</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @wiki_page_versions.each_with_index do |wiki_page_version, i| %>
-          <tr>
-            <td>
-              <% if i < @wiki_page_versions.length - 1 %>
-                <%= link_to "diff", diff_wiki_page_versions_path(:otherpage => wiki_page_version.id, :thispage => @wiki_page_versions[i + 1].id) %>
-              <% else %>
-                diff
-              <% end %>
-            </td>
-            <td><%= radio_button_tag "thispage", wiki_page_version.id, (i == 1) %></td>
-            <td><%= radio_button_tag "otherpage", wiki_page_version.id, (i == 0) %></td>
 
-            <td class="category-<%= wiki_page_version.category_name %>">
-              <%= link_to "?", wiki_page_path(wiki_page_version.wiki_page_id) %>
-              <%= link_to wiki_page_version.title, wiki_page_version %>
-            </td>
-            <td><%= wiki_page_version_status_diff(wiki_page_version) %></td>
-            <td>
-              <%= compact_time(wiki_page_version.updated_at) %>
-              by
-              <%= link_to_user wiki_page_version.updater %>
-              <% if CurrentUser.is_moderator? %>
-                (<%= link_to_ip wiki_page_version.updater_ip_addr %>)
-              <% end %>
-              <%= link_to "»", wiki_page_versions_path(search: { updater_id: wiki_page_version.updater.id }) %>
-            </td>
-          </tr>
+    <%= table_for @wiki_page_versions, {class: "striped", width: "100%"} do |t| %>
+      <% t.column "", {width: "3%"} do |wiki_page_version, i| %>
+        <% if i < @wiki_page_versions.length - 1 %>
+          <%= link_to "diff", diff_wiki_page_versions_path(:otherpage => wiki_page_version.id, :thispage => @wiki_page_versions[i + 1].id) %>
+        <% else %>
+          diff
         <% end %>
-      </tbody>
-    </table>
+      <% end %>
+      <% t.column "", {width: "2%"} do |wiki_page_version, i| %>
+        <%= radio_button_tag "thispage", wiki_page_version.id, (i == 1) %>
+      <% end %>
+      <% t.column "", {width: "2%"} do |wiki_page_version, i| %>
+        <%= radio_button_tag "otherpage", wiki_page_version.id, (i == 0) %>
+      <% end %>
+      <% t.column "Title" do |wiki_page_version| %>
+        <span class="category-<%= wiki_page_version.category_name %>">
+          <%= link_to "?", wiki_page_path(wiki_page_version.wiki_page_id) %>
+          <%= link_to wiki_page_version.title, wiki_page_version %>
+        </span>
+      <% end %>
+      <% t.column "Status", {width: "5%"} do |wiki_page_version| %>
+        <%= wiki_page_version_status_diff(wiki_page_version) %>
+      <% end %>
+      <% t.column "Last edited", {width: "26%"} do |wiki_page_version| %>
+        <%= compact_time(wiki_page_version.updated_at) %>
+        by
+        <%= link_to_user wiki_page_version.updater %>
+        <% if CurrentUser.is_moderator? %>
+          (<%= link_to_ip wiki_page_version.updater_ip_addr %>)
+        <% end %>
+        <%= link_to "»", wiki_page_versions_path(search: { updater_id: wiki_page_version.updater.id }) %>
+      <% end %>
+    <% end %>
 
     <%= submit_tag "Diff" %>
   <% end %>
