@@ -205,9 +205,9 @@ module ApplicationHelper
   def body_attributes(user = CurrentUser.user, current_item = nil)
     user_attributes = %i[id name level level_string theme] + User::BOOLEAN_ATTRIBUTES.map(&:to_sym)
     user_attributes += User::Roles.map { |role| :"is_#{role}?" }
-    mapped_user_attributes = data_attributes_for(user, "user", user_attributes)
+    mapped_user_attributes = data_attributes_for(user, "current-user", user_attributes)
     model_attributes = (!current_item.nil? ? (!current_item.id.nil? ? [:id] : [] ) + current_item.html_data_attributes : [])
-    mapped_model_attributes = (!current_item.nil? ? data_attributes_for(current_item, "show", model_attributes) : {} )
+    mapped_model_attributes = (!current_item.nil? ? data_attributes_for(current_item, current_item.model_name.singular.dasherize, model_attributes) : {} )
     all_mapped_attributes = mapped_user_attributes.merge(mapped_model_attributes)
     controller_param = params[:controller].parameterize.dasherize
     action_param = params[:action].parameterize.dasherize

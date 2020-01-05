@@ -519,7 +519,7 @@ class Artist < ApplicationRecord
 
   module ApiMethods
     def html_data_attributes
-      [:creator_id, [:wiki_page, :id]]
+      [:creator_id]
     end
   end
 
