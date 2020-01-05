@@ -259,5 +259,20 @@ module Sources
         assert_nil(site.image_url)
       end
     end
+
+    context "A tweet with hashtags" do
+      should "ignore common suffixes when translating hashtags" do
+        as(create(:user)) do
+          create(:tag, name: "nishizumi_miho", post_count: 1)
+          create(:wiki_page, title: "nishizumi_miho", other_names: "西住みほ")
+        end
+
+        site = Sources::Strategies.find("https://twitter.com/kasaishin100/status/1186658635226607616")
+
+        assert_includes(site.tags.map(&:first), "西住みほ生誕祭2019")
+        assert_includes(site.normalized_tags, "西住みほ")
+        assert_includes(site.translated_tags.map(&:name), "nishizumi_miho")
+      end
+    end
   end
 end
