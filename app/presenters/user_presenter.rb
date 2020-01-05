@@ -97,6 +97,7 @@ class UserPresenter
 
   def commented_posts_count(template)
     count = CurrentUser.without_safe_mode { Post.fast_count("commenter:#{user.name}") }
+    count = "?" if count.nil?
     template.link_to(count, template.posts_path(:tags => "commenter:#{user.name} order:comment_bumped"))
   end
 
@@ -110,6 +111,7 @@ class UserPresenter
 
   def noted_posts_count(template)
     count = CurrentUser.without_safe_mode { Post.fast_count("noteupdater:#{user.name}") }
+    count = "?" if count.nil?
     template.link_to(count, template.posts_path(:tags => "noteupdater:#{user.name} order:note"))
   end
 
