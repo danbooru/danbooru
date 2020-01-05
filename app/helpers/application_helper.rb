@@ -203,12 +203,14 @@ module ApplicationHelper
   end
 
   def body_attributes(user = CurrentUser.user, current_item = nil)
-    user_attributes = %i[id name level level_string theme] + User::BOOLEAN_ATTRIBUTES.map(&:to_sym)
-    user_attributes += User::Roles.map { |role| :"is_#{role}?" }
-    mapped_user_attributes = data_attributes_for(user, "current-user", user_attributes)
-    model_attributes = (!current_item.nil? ? (!current_item.id.nil? ? [:id] : [] ) + current_item.html_data_attributes : [])
-    mapped_model_attributes = (!current_item.nil? ? data_attributes_for(current_item, current_item.model_name.singular.dasherize, model_attributes) : {} )
-    all_mapped_attributes = mapped_user_attributes.merge(mapped_model_attributes)
+    current_user_data_attributes = data_attributes_for(user, "current-user", current_user_attributes)
+
+    if current_item.present?
+      model_name = current_item.model_name.singular.dasherize
+      model_attributes = current_item.html_data_attributes + [:id]
+      current_item_data_attributes = data_attributes_for(current_item, model_name, model_attributes)
+    end
+
     controller_param = params[:controller].parameterize.dasherize
     action_param = params[:action].parameterize.dasherize
 
@@ -219,9 +221,20 @@ module ApplicationHelper
         controller: controller_param,
         action: action_param,
         layout: controller.class.send(:_layout),
-        **all_mapped_attributes
+        **current_user_data_attributes,
+        **current_item_data_attributes.to_h
       }
     }
+  end
+
+  def current_user_attributes
+    %i[
+      id name level level_string theme always_resize_images can_upload_free
+      can_approve_posts disable_categorized_saved_searches
+      disable_mobile_gestures disable_post_tooltips enable_auto_complete
+      enable_post_navigation enable_safe_mode hide_deleted_posts
+      show_deleted_children style_usernames
+    ] + User::Roles.map { |role| :"is_#{role}?" }
   end
 
   def data_attributes_for(record, prefix, attributes)
