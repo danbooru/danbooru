@@ -15,6 +15,20 @@ module Sources::Strategies
     # https://developer.twitter.com/en/docs/developer-utilities/configuration/api-reference/get-help-configuration
     RESERVED_USERNAMES = %w[home i intent search]
 
+    # List of hashtag suffixes attached to tag other names
+    # Ex: 西住みほ生誕祭2019 should be checked as 西住みほ
+    # The regexes will not match if there is nothing preceding
+    # the pattern to avoid creating empty strings.
+    COMMON_TAG_REGEXES = [
+      /(?<!\A)生誕祭(?:\d+)?\z/,
+      /(?<!\A)版もうひとつの深夜の真剣お絵描き60分一本勝負(?:_\d+)?\z/,
+      /(?<!\A)版深夜の真剣お絵描き60分一本勝負(?:_\d+)?\z/,
+      /(?<!\A)深夜の真剣お絵描き60分一本勝負(?:_\d+)?\z/,
+      /(?<!\A)版深夜のお絵描き60分一本勝負(?:_\d+)?\z/,
+      /(?<!\A)版真剣お絵描き60分一本勝(?:_\d+)?\z/,
+      /(?<!\A)版お絵描き60分一本勝負(?:_\d+)?\z/
+    ]
+
     def self.enabled?
       Danbooru.config.twitter_api_key.present? && Danbooru.config.twitter_api_secret.present?
     end
@@ -120,6 +134,15 @@ module Sources::Strategies
       api_response.dig(:entities, :hashtags).to_a.map do |hashtag|
         [hashtag[:text], "https://twitter.com/hashtag/#{hashtag[:text]}"]
       end
+    end
+
+    def normalize_tag(tag)
+      COMMON_TAG_REGEXES.each do |rg|
+        if tag.match(rg)
+          return tag.gsub(rg,"")
+        end
+      end
+      tag
     end
 
     def dtext_artist_commentary_desc
