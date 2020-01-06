@@ -3,11 +3,7 @@
     <tr>
       <% table.columns.each do |column| %>
         <%= tag.th column.header_attributes do %>
-          <% if column.is_html_safe %>
-            <%= column.name.html_safe %>
-          <% else %>
-            <%= column.name %>
-          <% end %>
+          <%= column.name %>
         <% end %>
       <% end %>
     </tr>

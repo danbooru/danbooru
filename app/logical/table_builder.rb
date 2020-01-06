@@ -1,13 +1,12 @@
 class TableBuilder
   class Column
-    attr_reader :attribute, :name, :block, :header_attributes, :body_attributes, :is_html_safe
+    attr_reader :attribute, :name, :block, :header_attributes, :body_attributes
 
-    def initialize(attribute = nil, header_attributes=nil, body_attributes=nil, is_html_safe=false, &block)
+    def initialize(attribute = nil, header_attributes=nil, body_attributes=nil, &block)
       @attribute = attribute
       @header_attributes = header_attributes
       @body_attributes = body_attributes
       @name = attribute.kind_of?(String) ? attribute : attribute.to_s.titleize
-      @is_html_safe = is_html_safe
       @block = block
     end
 
