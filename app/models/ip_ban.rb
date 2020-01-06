@@ -42,12 +42,4 @@ class IpBan < ApplicationRecord
     str += "/" + ip_addr.prefix.to_s if has_subnet?
     str
   end
-
-  module ApiMethods
-    def html_data_attributes
-      [:creator_id]
-    end
-  end
-
-  include ApiMethods
 end

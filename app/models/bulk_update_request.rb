@@ -135,16 +135,9 @@ class BulkUpdateRequest < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def html_data_attributes
-      [:user_id, :approver_id, :forum_topic_id, :forum_post_id]
-    end
-  end
-
   extend SearchMethods
   include ApprovalMethods
   include ValidationMethods
-  include ApiMethods
 
   concerning :EmbeddedText do
     class_methods do

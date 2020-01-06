@@ -69,10 +69,6 @@ class Tag < ApplicationRecord
         "ambiguous" => false
       }.to_json
     end
-
-    def html_data_attributes
-      [:category]
-    end
   end
 
   class CategoryMapping

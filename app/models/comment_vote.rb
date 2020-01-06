@@ -51,12 +51,4 @@ class CommentVote < ApplicationRecord
   def initialize_user
     self.user_id = CurrentUser.user.id
   end
-
-  module ApiMethods
-    def html_data_attributes
-      [:comment_id, :user_id]
-    end
-  end
-
-  include ApiMethods
 end

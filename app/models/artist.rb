@@ -517,12 +517,6 @@ class Artist < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def html_data_attributes
-      [:creator_id]
-    end
-  end
-
   include UrlMethods
   include NameMethods
   include VersionMethods
@@ -531,7 +525,6 @@ class Artist < ApplicationRecord
   include TagMethods
   include BanMethods
   extend SearchMethods
-  include ApiMethods
 
   def status
     if is_banned? && is_active?

@@ -157,12 +157,4 @@ class Note < ApplicationRecord
       end
     end
   end
-
-  module ApiMethods
-    def html_data_attributes
-      [:post_id, :creator_id, :version]
-    end
-  end
-
-  include ApiMethods
 end

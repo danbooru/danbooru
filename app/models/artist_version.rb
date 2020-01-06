@@ -23,14 +23,7 @@ class ArtistVersion < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def html_data_attributes
-      [:artist_id, :updater_id]
-    end
-  end
-
   extend SearchMethods
-  include ApiMethods
 
   def previous
     ArtistVersion.where("artist_id = ? and created_at < ?", artist_id, created_at).order("created_at desc").first

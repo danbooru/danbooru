@@ -75,7 +75,7 @@ class ForumPost < ApplicationRecord
 
   module ApiMethods
     def html_data_attributes
-      [:topic_id, :creator_id, :updater_id, :is_deleted?, [:topic, :is_deleted?]]
+      super + [[:topic, :is_deleted?]]
     end
   end
 

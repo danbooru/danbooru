@@ -42,12 +42,4 @@ class IpAddress < ApplicationRecord
   def readonly?
     true
   end
-
-  module ApiMethods
-    def html_data_attributes
-      [:user_id]
-    end
-  end
-
-  include ApiMethods
 end

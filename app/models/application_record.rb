@@ -281,7 +281,11 @@ class ApplicationRecord < ActiveRecord::Base
     end
 
     def html_data_attributes
-      []
+      data_attributes = self.class.columns.select do |column|
+        column.type.in?([:integer, :boolean]) && !column.array?
+      end.map(&:name).map(&:to_sym)
+
+      api_attributes & data_attributes
     end
 
     def serializable_hash(options = {})

@@ -171,12 +171,4 @@ class SavedSearch < ApplicationRecord
   def disable_labels=(value)
     CurrentUser.update(disable_categorized_saved_searches: true) if value.to_s.truthy?
   end
-
-  module ApiMethods
-    def html_data_attributes
-      [:user_id]
-    end
-  end
-
-  include ApiMethods
 end

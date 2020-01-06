@@ -117,7 +117,7 @@ class WikiPage < ApplicationRecord
 
   module ApiMethods
     def html_data_attributes
-      [:category_name]
+      super + [:category_name]
     end
   end
 

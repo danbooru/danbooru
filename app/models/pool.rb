@@ -95,14 +95,7 @@ class Pool < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def html_data_attributes
-      [:creator_id]
-    end
-  end
-
   extend SearchMethods
-  include ApiMethods
 
   def self.name_to_id(name)
     if name =~ /^\d+$/

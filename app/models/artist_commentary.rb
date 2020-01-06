@@ -139,13 +139,6 @@ class ArtistCommentary < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def html_data_attributes
-      [:post_id]
-    end
-  end
-
   extend SearchMethods
   include VersionMethods
-  include ApiMethods
 end

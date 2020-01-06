@@ -46,7 +46,7 @@ class Ban < ApplicationRecord
 
   module ApiMethods
     def html_data_attributes
-      [:user_id, :banner_id, :expired?]
+      super + [:expired?]
     end
   end
 

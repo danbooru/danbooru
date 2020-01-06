@@ -17,14 +17,7 @@ class WikiPageVersion < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def html_data_attributes
-      [:wiki_page_id, :updater_id]
-    end
-  end
-
   extend SearchMethods
-  include ApiMethods
 
   def pretty_title
     title.tr("_", " ")

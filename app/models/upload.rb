@@ -228,19 +228,12 @@ class Upload < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def html_data_attributes
-      [:post_id, :uploader_id]
-    end
-  end
-
   include FileMethods
   include StatusMethods
   include UploaderMethods
   include VideoMethods
   extend SearchMethods
   include SourceMethods
-  include ApiMethods
 
   def uploader_is_not_limited
     if !uploader.can_upload?

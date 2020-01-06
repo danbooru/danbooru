@@ -15,12 +15,4 @@ class NoteVersion < ApplicationRecord
   def previous
     NoteVersion.where("note_id = ? and updated_at < ?", note_id, updated_at).order("updated_at desc").first
   end
-
-  module ApiMethods
-    def html_data_attributes
-      [:note_id, :post_id, :updater_id, :version]
-    end
-  end
-
-  include ApiMethods
 end

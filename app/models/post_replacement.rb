@@ -28,14 +28,6 @@ class PostReplacement < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def html_data_attributes
-      [:post_id, :creator_id]
-    end
-  end
-
-  include ApiMethods
-
   def suggested_tags_for_removal
     tags = post.tag_array.select { |tag| Danbooru.config.remove_tag_after_replacement?(tag) }
     tags = tags.map { |tag| "-#{tag}" }

@@ -67,12 +67,4 @@ class PostDisapproval < ApplicationRecord
       end
     end
   end
-
-  module ApiMethods
-    def html_data_attributes
-      [:post_id, :user_id]
-    end
-  end
-
-  include ApiMethods
 end

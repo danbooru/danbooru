@@ -18,14 +18,6 @@ class UserNameChangeRequest < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def html_data_attributes
-      [:user_id]
-    end
-  end
-
-  include ApiMethods
-
   def update_name!
     user.update!(name: desired_name)
   end

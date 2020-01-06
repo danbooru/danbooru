@@ -207,7 +207,7 @@ module ApplicationHelper
 
     if current_item.present?
       model_name = current_item.model_name.singular.dasherize
-      model_attributes = current_item.html_data_attributes + [:id]
+      model_attributes = current_item.html_data_attributes
       current_item_data_attributes = data_attributes_for(current_item, model_name, model_attributes)
     end
 

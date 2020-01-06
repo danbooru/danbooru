@@ -100,14 +100,6 @@ class PostFlag < ApplicationRecord
       attributes -= [:creator_id] unless CurrentUser.can_view_flagger_on_post?(self)
       attributes
     end
-
-    def html_data_attributes
-      attributes = [:post_id]
-      if CurrentUser.can_view_flagger_on_post?(self)
-        attributes += [:creator_id]
-      end
-      attributes
-    end
   end
 
   extend SearchMethods
