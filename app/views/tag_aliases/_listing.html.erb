@@ -1,4 +1,4 @@
-<%= table_for tag_aliases, {class: "striped", width: "100%"} do |t| %>
+<%= table_for tag_aliases, width: "100%" do |t| %>
   <% t.column "From", {width: "25%"} do |tag_alias| %>
     <span class="category-<%= tag_alias.antecedent_tag.try(:category) %>"><%= link_to tag_alias.antecedent_name, posts_path(:tags => tag_alias.antecedent_name) %> <span class="count"><%= tag_alias.antecedent_tag.post_count rescue 0 %></span></span>
   <% end %>

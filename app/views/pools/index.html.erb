@@ -2,7 +2,7 @@
   <div id="a-index">
     <%= render "search", :path => pools_path %>
 
-    <%= table_for @pools, {class: "striped", width: "100%"} do |t| %>
+    <%= table_for @pools, width: "100%" do |t| %>
       <% t.column nil, {width: "5%"} %>
       <% t.column "Name", {width: "60%"} do |pool| %>
         <span class="pool-category-<%= pool.category %>"><%= link_to pool.pretty_name, pool_path(pool) %></span>

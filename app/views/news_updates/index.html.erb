@@ -2,7 +2,7 @@
   <div id="a-index">
     <h1>News Updates</h1>
 
-    <%= table_for @news_updates, {class: "striped", width: "100%"} do |t| %>
+    <%= table_for @news_updates, width: "100%" do |t| %>
       <% t.column "Creator" do |news_update| %>
         <%= link_to_user news_update.creator %>
       <% end %>

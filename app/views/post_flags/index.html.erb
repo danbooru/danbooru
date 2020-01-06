@@ -4,7 +4,7 @@
     <%= render "search" %>
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <%= table_for @post_flags, {class: "striped", width: "100%"} do |t| %>
+    <%= table_for @post_flags, width: "100%" do |t| %>
       <% t.column "Post", {width: "1%"} do |post_flag| %>
         <%= PostPresenter.preview(post_flag.post, :tags => "status:any") %>
       <% end %>

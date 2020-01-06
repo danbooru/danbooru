@@ -1,4 +1,4 @@
-<%= table_for bulk_update_requests, {class: "striped", width: "100%"} do |t| %>
+<%= table_for bulk_update_requests, width: "100%" do |t| %>
   <% t.column "Request" do |request| %>
       <% if request.forum_post.present? %>
         <p><%= link_to "Topic ##{request.forum_topic_id}: #{request.forum_topic.title}", forum_topic_path(request.forum_topic_id, page: request.forum_post.forum_topic_page, anchor: "forum_post_#{request.forum_post_id}") %></p>

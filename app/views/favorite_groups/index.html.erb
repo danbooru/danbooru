@@ -1,7 +1,7 @@
 <div id="c-favorite-groups">
   <div id="a-index">
 
-    <%= table_for @favorite_groups, {class: "striped", width: "100%"} do |t| %>
+    <%= table_for @favorite_groups, width: "100%" do |t| %>
       <% t.column nil, {width: "5%"} %>
       <% t.column "Name", {width: "60%"} do |favgroup| %>
         <%= link_to favgroup.pretty_name, favorite_group_path(favgroup) %>

@@ -2,7 +2,7 @@
   <div id="a-index">
     <h1>Name Change Requests</h1>
 
-    <%= table_for @change_requests, {class: "striped", width: "100%"} do |t| %>
+    <%= table_for @change_requests, width: "100%" do |t| %>
       <% t.column "User" do |change_request| %>
         <%= link_to_user change_request.user %>
       <% end %>

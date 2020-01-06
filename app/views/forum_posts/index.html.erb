@@ -1,7 +1,7 @@
 <div id="c-forum-posts">
   <div id="a-index">
 
-    <%= table_for @forum_posts, {class: "striped", width: "100%"} do |t| %>
+    <%= table_for @forum_posts, width: "100%" do |t| %>
       <% t.column "Topic", nil, {class: "forum-post-topic-title"} do |forum_post| %>
         <%= link_to forum_post.topic.title, forum_topic_path(forum_post.topic) %>
       <% end %>

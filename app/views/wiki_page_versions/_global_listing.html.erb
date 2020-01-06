@@ -1,6 +1,6 @@
 <div id="p-global-listing">
 
-  <%= table_for @wiki_page_versions, {class: "striped", width: "100%"} do |t| %>
+  <%= table_for @wiki_page_versions, width: "100%" do |t| %>
     <% t.column "", {width: "3%"} do |wiki_page_version| %>
       <%= link_to_if wiki_page_version.previous.present?, "diff", diff_wiki_page_versions_path(otherpage: wiki_page_version.previous.try(:id), thispage: wiki_page_version.id) %>
     <% end %>

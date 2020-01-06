@@ -1,4 +1,4 @@
-<%= table_for forum_topics, {class: "striped", width: "100%"} do |t| %>
+<%= table_for forum_topics, width: "100%" do |t| %>
   <% t.column "Title" do |topic| %>
     <% if topic.is_sticky? %>
       <span class="sticky">Sticky:</span>

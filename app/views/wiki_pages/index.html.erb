@@ -3,7 +3,7 @@
 <% content_for(:content) do %>
   <h1>Wiki</h1>
 
-  <%= table_for @wiki_pages, {class: "striped", width: "100%"} do |t| %>
+  <%= table_for @wiki_pages, width: "100%" do |t| %>
     <% t.column "Title" do |wiki_page| %>
       <span class="category-<%= wiki_page.category_name %>"><%= link_to_wiki wiki_page.title %></span>
     <% end %>

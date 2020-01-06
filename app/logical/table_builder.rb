@@ -24,10 +24,10 @@ class TableBuilder
 
   attr_reader :columns, :table_attributes, :items
 
-  def initialize(items, table_attributes=nil)
+  def initialize(items, **table_attributes)
     @items = items
     @columns = []
-    @table_attributes = table_attributes
+    @table_attributes = { class: "striped", **table_attributes }
     yield self if block_given?
   end
 

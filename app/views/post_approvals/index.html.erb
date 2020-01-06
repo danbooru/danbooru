@@ -9,7 +9,7 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <%= table_for @post_approvals, {class: "striped", width: "100%"} do |t| %>
+    <%= table_for @post_approvals, width: "100%" do |t| %>
       <% t.column "Post", {width: "1%"} do |post_approval| %>
         <%= PostPresenter.preview(post_approval.post, :tags => "status:any") %>
       <% end %>

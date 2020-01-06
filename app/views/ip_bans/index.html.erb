@@ -2,7 +2,7 @@
   <div id="a-index">
     <h1>IP Bans</h1>
 
-    <%= table_for @ip_bans, {class: "striped", width: "100%"} do |t| %>
+    <%= table_for @ip_bans, width: "100%" do |t| %>
       <% t.column "IP Address" do |ip_ban| %>
         <%= link_to_ip ip_ban.subnetted_ip %>
       <% end %>
