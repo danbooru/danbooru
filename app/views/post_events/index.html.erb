@@ -2,36 +2,22 @@
   <div id="a-index">
     <h1>Post Events</h1>
 
-    <table width="100%" class="striped autofit">
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>User</th>
-          <th>Description</th>
-          <th>Resolved?</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @events.each do |event| %>
-          <tr class="resolved-<%= event.is_resolved %>">
-            <td><%= event.type_name %></td>
-            <td>
-              <% if event.is_creator_visible? %>
-                <%= link_to_user event.creator %>
-              <% else %>
-                <i>hidden</i>
-              <% end %>
-              <br><%= time_ago_in_words_tagged event.created_at %>
-            </td>
-            <td class="col-expand">
-              <div class="prose">
-                <%= format_text event.reason %>
-              </div>
-            </td>
-            <td><%= event.is_resolved %></td>
-          </tr>
+    <%= table_for @events, class: "striped autofit", width: "100%" do |t| %>
+      <% t.column :type_name, nil, { name: "Type" } %>
+      <% t.column "User" do |event| %>
+        <% if event.is_creator_visible? %>
+          <%= link_to_user event.creator %>
+        <% else %>
+          <i>hidden</i>
         <% end %>
-      </tbody>
-    </table>
+        <br><%= time_ago_in_words_tagged event.created_at %>
+      <% end %>
+      <% t.column "Description", {}, { class: "col-expand" } do |event| %>
+        <div class="prose">
+          <%= format_text event.reason %>
+        </div>
+      <% end %>
+      <% t.column :is_resolved, {}, name: "Resolved" %>
+    <% end %>
   </div>
 </div>

@@ -36,18 +36,11 @@ class TableBuilder
   end
 
   def all_row_attributes(item, i)
-    if !item.id.nil?
-      standard_attributes = { id: "#{item.model_name.singular.dasherize}-#{item.id}", "data-id": item.id }
-    else
-      standard_attributes = {}
-    end
+    return {} if !item.is_a?(ApplicationRecord)
 
-    if item.html_data_attributes.length > 0
-      class_attributes = ApplicationController.helpers.data_attributes_for(item, "data", item.html_data_attributes)
-    else
-      class_attributes = {}
-    end
-
-    standard_attributes.merge(class_attributes)
+    {
+      id: "#{item.model_name.singular.dasherize}-#{item.id}",
+      **ApplicationController.helpers.data_attributes_for(item, "data", item.html_data_attributes)
+    }
   end
 end
