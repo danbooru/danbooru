@@ -19,9 +19,9 @@
         <%= link_to sprintf("%+d", vote.score), post_votes_path(search: { score: vote.score }) %>
       <% end %>
       <% t.column "Uploader" do |vote| %>
-        <%= link_to_user vote.user %>
-        <%= link_to "»", post_votes_path(search: { user_name: vote.user.name }) %>
-        <div><%= time_ago_in_words_tagged(vote.created_at) %></div>
+        <%= link_to_user vote.post.uploader %>
+        <%= link_to "»", post_votes_path(search: { post_tags_match: "user:#{vote.post.uploader.name}" }) %>
+        <div><%= time_ago_in_words_tagged(vote.post.created_at) %></div>
       <% end %>
       <% t.column "Voter" do |vote| %>
         <%= link_to_user vote.user %>
