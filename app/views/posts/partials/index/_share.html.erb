@@ -1,6 +1,5 @@
-<% if Danbooru.config.addthis_key %>
-
-<div class="addthis_toolbox addthis_default_style addthis_32x32_style">
+<div class="addthis_toolbox addthis_default_style addthis_32x32_style"
+     addthis:title="Find more art about <%= @post_set.humanized_tag_string %> on <%= Danbooru.config.app_name %>">
   <a class="addthis_button_twitter"></a>
   <a class="addthis_button_facebook"></a>
   <a class="addthis_button_reddit"></a>
@@ -8,24 +7,4 @@
   <a class="addthis_button_compact"></a>
 </div>
 
-<script type="text/javascript">
-  window.addthis_config = {"data_track_addressbar": false, "pubid": "<%= Danbooru.config.addthis_key %>"};
-  <% if params[:tags].present? %>
-	  window.addthis_share = {
-	    "url":"<%= j posts_url(tags: params[:tags]) %>",
-	    "title": "Find more art about <%= escape_javascript @post_set.humanized_tag_string %> on <%= Danbooru.config.app_name %>"
-	  };
-	<% else %>
-    window.addthis_share = {
-      "url":"<%= j posts_url %>",
-      "title": "Find good anime art fast on <%= Danbooru.config.app_name %>"
-    };
-  <% end %>
-  $(function() {
-  	addthis.init();
-  });
-</script>
-
-<script type="text/javascript" src="https://s7.addthis.com/js/300/addthis_widget.js#async=1"></script>
-
-<% end %>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=<%= Danbooru.config.addthis_key %>" async="async"></script>
