@@ -4,26 +4,18 @@
 
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <table class="striped">
-      <thead>
-        <tr>
-        <th width="10%">Post ID</th>
-        <th width="45%">Tags added by uploader</th>
-        <th width="45%">Tags changed by other users</th>
-        </tr>
-        </thead>
-      <tbody>
-        <% @upload_reports.each do |upload_report| %>
-          <tr>
-            <td><%= PostPresenter.preview(upload_report.becomes(Post), show_deleted: true, tags: "user:#{upload_report.uploader.name}") %></td>
-            <td>
-              <%= TagSetPresenter.new(upload_report.uploader_tags_array).inline_tag_list_html %>
-            </td>
-            <td><%= diff_to_current(upload_report) %>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <%= table_for @upload_reports do |t| %>
+      <% t.column "Post ID", width: "10%" do |upload_report| %>
+        <%= PostPresenter.preview(upload_report.becomes(Post), show_deleted: true, tags: "user:#{upload_report.uploader.name}") %>
+      <% end %>
+      <% t.column "Tags added by uploader", width: "45%" do |upload_report| %>
+        <%= TagSetPresenter.new(upload_report.uploader_tags_array).inline_tag_list_html %>
+      <% end %>
+      <% t.column "Tags added by uploader", width: "45%" do |upload_report| %>
+        <%= diff_to_current(upload_report) %>
+      <% end %>
+    <% end %>
+
     <%= numbered_paginator(@upload_reports) %>
     </div>
 </div>
