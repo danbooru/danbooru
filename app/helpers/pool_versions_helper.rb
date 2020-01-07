@@ -18,4 +18,9 @@ module PoolVersionsHelper
     status += ["Deactivated"] if !cur.is_active? && prev.is_active?
     status.join(" ")
   end
+
+  def pool_page_diff(pool_version, other_version)
+    pattern = Regexp.new('(?:<.+?>)|(?:\w+)|(?:[ \t]+)|(?:\r?\n)|(?:.+?)')
+    DiffBuilder.new(other_version.description, pool_version.description, pattern).build
+  end
 end
