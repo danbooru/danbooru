@@ -65,10 +65,6 @@ class ForumPost < ApplicationRecord
         q = q.joins(:topic).where("forum_topics.category_id = ?", params[:topic_category_id].to_i)
       end
 
-      unless params[:is_deleted].present?
-        q = q.active
-      end
-
       q.apply_default_order(params)
     end
   end
