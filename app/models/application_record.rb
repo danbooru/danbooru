@@ -294,6 +294,8 @@ class ApplicationRecord < ActiveRecord::Base
       options[:include] ||= []
       options[:methods] ||= []
 
+      options[:only] = options[:only].map(&:to_sym)
+
       attributes, methods = api_attributes.partition { |attr| has_attribute?(attr) }
       methods += options[:methods]
       includes = options[:include]

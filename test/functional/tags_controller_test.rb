@@ -49,6 +49,13 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
         get autocomplete_tags_path, params: { search: { name_matches: "t" }, format: :json }
         assert_response :success
       end
+
+      should "respect the only param" do
+        get autocomplete_tags_path, params: { search: { name_matches: "t", only: "name" }, format: :json }
+
+        assert_response :success
+        assert_equal "touhou", response.parsed_body.first["name"]
+      end
     end
 
     context "show action" do
