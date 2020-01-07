@@ -9,26 +9,13 @@
     <% end %>
 
     <% if params.dig(:search, :query).present? %>
-      <section>
-        <table class="striped">
-          <thead>
-            <tr>
-              <th>Name</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% @query.tags_for_html.each do |tag, category| %>
-              <tr>
-                <td class="category-<%= category %>">
-                  <%= link_to_wiki "?", tag %>
-                  <%= link_to(tag, posts_path(:tags => tag)) %>
-                </td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </section>
-     <% end %>
+      <%= table_for @query.tags do |t| %>
+        <% t.column "Name" do |tag| %>
+          <%= link_to_wiki "?", tag.name, class: "tag-type-#{tag.category}" %>
+          <%= link_to tag.name, posts_path(tags: tag.name), class: "tag-type-#{tag.category}" %>
+        <% end %>
+      <% end %>
+    <% end %>
   </div>
 </div>
 

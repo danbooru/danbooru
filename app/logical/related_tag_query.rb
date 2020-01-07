@@ -18,11 +18,11 @@ class RelatedTagQuery
     if query =~ /\*/
       pattern_matching_tags
     elsif category.present?
-      RelatedTagCalculator.frequent_tags_for_search(query, category: Tag.categories.value_for(category)).take(25).pluck(:name)
+      RelatedTagCalculator.frequent_tags_for_search(query, category: Tag.categories.value_for(category)).take(25)
     elsif query.present?
-      RelatedTagCalculator.similar_tags_for_search(query).take(25).map(&:name)
+      RelatedTagCalculator.similar_tags_for_search(query).take(25)
     else
-      []
+      Tag.none
     end
   end
 
@@ -54,15 +54,11 @@ class RelatedTagQuery
     other_wikis
   end
 
-  def tags_for_html
-    tags_with_categories(tags)
-  end
-
   def serializable_hash(**options)
     {
       query: query,
       category: category,
-      tags: tags_with_categories(tags),
+      tags: tags_with_categories(tags.map(&:name)),
       wiki_page_tags: tags_with_categories(wiki_page_tags),
       other_wikis: other_wiki_pages.map { |wiki| [wiki.title, tags_with_categories(wiki.tags)] }.to_h
     }
@@ -75,7 +71,7 @@ class RelatedTagQuery
   end
 
   def pattern_matching_tags
-    Tag.name_matches(query).where("post_count > 0").order("post_count desc").limit(50).sort_by {|x| x.name}.map(&:name)
+    Tag.nonempty.name_matches(query).order("post_count desc, name asc").limit(50)
   end
 
   def wiki_page
