@@ -14,7 +14,7 @@
           <%= link_to "»", note_versions_path(search: {note_id: note_version.note_id}) %>
         <% end %>
       <% end %>
-      <% t.column "Body", nil, {class: "col-expand"} do |note_version| %>
+      <% t.column "Body", td: {class: "col-expand"} do |note_version| %>
         <%= h(note_version.body) %>
         <% unless note_version.is_active? %>
           <span class="inactive">(deleted)</span>

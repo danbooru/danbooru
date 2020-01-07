@@ -18,7 +18,7 @@
         <%= link_to_user feedback.user %>
         <%= link_to "»", user_feedbacks_path(search: { user_name: feedback.user.name }) %>
       <% end %>
-      <% t.column "Message", nil, {class: "col-expand"} do |feedback| %>
+      <% t.column "Message", td: {class: "col-expand"} do |feedback| %>
         <div class="prose">
           <%= format_text(feedback.body) %>
         </div>
@@ -37,7 +37,7 @@
         <%= link_to "»", user_feedbacks_path(search: { creator_name: feedback.creator.name }) %>
         <div><%= time_ago_in_words_tagged(feedback.created_at) %></div>
       <% end %>
-      <% t.column "" do |feedback| %>
+      <% t.column do |feedback| %>
         <% if feedback.editable_by?(CurrentUser.user) %>
           <%= link_to "edit", edit_user_feedback_path(feedback) %>
           <% if feedback.deletable_by?(CurrentUser.user) && !feedback.is_deleted? %>

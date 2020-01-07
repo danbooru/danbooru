@@ -18,7 +18,7 @@
         <%= link_to "post ##{post_disapproval.post_id}", post_path(post_disapproval.post_id) %>
         <%= link_to "»", moderator_post_disapprovals_path(search: params[:search].merge(post_id: post_disapproval.post_id)) %>
       <% end %>
-      <% t.column "Message", nil, {class: "col-expand"} do |post_disapproval| %>
+      <% t.column "Message", td: {class: "col-expand"} do |post_disapproval| %>
         <div class="prose">
           <%= format_text(post_disapproval.message) %>
         </div>

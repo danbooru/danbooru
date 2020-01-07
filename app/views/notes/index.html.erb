@@ -10,7 +10,7 @@
         <%= link_to "#{note.id}.#{note.version}", post_path(note.post_id, anchor: "note-#{note.id}") %>
         <%= link_to "»", note_versions_path(search: { note_id: note.id }) %>
       <% end %>
-      <% t.column "Body", class: "col-expand" do |note| %>
+      <% t.column "Body", td: { class: "col-expand" } do |note| %>
         <%= note.body %>
         <% unless note.is_active? %>
           <span class="inactive">(deleted)</span>

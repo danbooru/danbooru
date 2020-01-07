@@ -12,7 +12,7 @@
       <% t.column "Post" do |vote| %>
         <%= PostPresenter.preview(vote.post, show_deleted: true) %>
       <% end %>
-      <% t.column "Tags", nil, {class: "col-expand"} do |vote| %>
+      <% t.column "Tags", td: {class: "col-expand"} do |vote| %>
         <%= TagSetPresenter.new(vote.post.tag_array).inline_tag_list_html %>
       <% end %>
       <% t.column "Score" do |vote| %>
@@ -28,7 +28,7 @@
         <%= link_to "»", post_votes_path(search: { user_name: vote.user.name }) %>
         <div><%= time_ago_in_words_tagged(vote.created_at) %></div>
       <% end %>
-      <% t.column "" do |vote| %>
+      <% t.column do |vote| %>
         <% if vote.user == CurrentUser.user %>
           <%= link_to "unvote", post_post_votes_path(vote.post), remote: true, method: :delete %>
         <% end %>

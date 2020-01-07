@@ -10,7 +10,7 @@
           (group: <%= link_to artist.group_name, artist %>)
         <% end %>
       <% end %>
-      <% t.column "Other Names", nil, {class: "col-expand"} do |artist| %>
+      <% t.column "Other Names", td: {class: "col-expand"} do |artist| %>
         <% artist.other_names.each do |name| %>
           <%= link_to name, artists_path(search: { any_name_matches: name }), class: "artist-other-name" %>
         <% end %>
@@ -27,7 +27,7 @@
       <% t.column "Updated" do |artist| %>
         <%= time_ago_in_words_tagged(artist.updated_at) %>
       <% end %>
-      <% t.column "" do |artist| %>
+      <% t.column do |artist| %>
         <% if CurrentUser.is_member? %>
           <%= link_to "Edit", edit_artist_path(artist) %>
 

@@ -10,7 +10,7 @@
         <%= link_to_user ip_ban.creator %>
       <% end %>
       <% t.column :reason %>
-      <% t.column "" do |ip_ban| %>
+      <% t.column do |ip_ban| %>
         <%= link_to "Unban", ip_ban_path(ip_ban), :remote => true, :method => :delete, :data => {:confirm => "Do your really want to unban #{ip_ban.ip_addr}?"} %>
       <% end %>
     <% end %>

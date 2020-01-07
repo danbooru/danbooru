@@ -3,8 +3,8 @@
     <%= render "search" %>
 
     <%= table_for @tags, {class: "striped autofit"} do |t| %>
-      <% t.column :post_count, nil, {name: "Count"} %>
-      <% t.column "Name", nil, {class: "col-expand"} do |tag| %>
+      <% t.column :post_count, name: "Count" %>
+      <% t.column "Name", td: {class: "col-expand"} do |tag| %>
         <%= link_to_wiki "?", tag.name, class: "tag-type-#{tag.category}" %>
         <%= link_to tag.name, posts_path(tags: tag.name), class: "tag-type-#{tag.category}" %>
       <% end %>

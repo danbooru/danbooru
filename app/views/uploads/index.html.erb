@@ -7,7 +7,7 @@
       <% t.column "Upload" do |upload| %>
         <%= PostPresenter.preview(upload.post, tags: "user:#{upload.uploader.name}", show_deleted: true) %>
       <% end %>
-      <% t.column "Info", nil, {class: "col-expand upload-info"} do |upload| %>
+      <% t.column "Info", td: {class: "col-expand upload-info"} do |upload| %>
         <span class="info">
           <strong>Upload</strong>
           <%= link_to "##{upload.id}", upload %>
@@ -54,7 +54,7 @@
         <%= link_to "»", uploads_path(search: params[:search].merge(uploader_name: upload.uploader.name)) %>
         <br><%= time_ago_in_words_tagged  upload.created_at %>
       <% end %>
-      <% t.column "Status", nil, {class: "col-normal"} do |upload| %>
+      <% t.column "Status", td: {class: "col-normal"} do |upload| %>
         <%= render_status(upload) %>
       <% end %>
     <% end %>

@@ -8,7 +8,7 @@
       <% t.column "Category" do |mod_action| %>
         <%= link_to mod_action.category.humanize, mod_actions_path(search: { category: mod_action.category_id }) %>
       <% end %>
-      <% t.column "Message", nil, {class: "col-expand"} do |mod_action| %>
+      <% t.column "Message", td: {class: "col-expand"} do |mod_action| %>
         <%= format_text(mod_action.description) %>
       <% end %>
       <% t.column "Created" do |mod_action| %>

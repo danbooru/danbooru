@@ -31,7 +31,7 @@
           <%= link_to dmail.title, dmail_path(dmail) %>
         <% end %>
       <% end %>
-      <% t.column "" do |dmail| %>
+      <% t.column do |dmail| %>
         <%= link_to "delete", dmail_path(dmail), :method => :delete, :data => {:confirm => "Are you sure you want to delete this Dmail?"} %>
       <% end %>
     <% end %>

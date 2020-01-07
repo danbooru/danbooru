@@ -14,7 +14,7 @@
       <% t.column "Post" do |vote| %>
         <%= PostPresenter.preview(vote.comment.post, show_deleted: true) %>
       <% end %>
-      <% t.column "Comment", nil, {class: "col-expand"} do |vote| %>
+      <% t.column "Comment", td: {class: "col-expand"} do |vote| %>
         <div class="prose">
           <%= format_text(vote.comment.body) %>
         </div>
@@ -32,7 +32,7 @@
         <%= link_to "»", comment_votes_path(search: { user_name: vote.user.name }) %>
         <div><%= time_ago_in_words_tagged(vote.created_at) %></div>
       <% end %>
-      <% t.column "" do |vote| %>
+      <% t.column do |vote| %>
         <% if vote.user == CurrentUser.user %>
           <%= link_to "unvote", comment_comment_votes_path(vote.comment), remote: true, method: :delete %>
         <% end %>

@@ -16,7 +16,7 @@
   <% t.column "Status", {width: "5%"} do |tag_alias| %>
     <span id="tag-alias-status-for-<%= tag_alias.id %>"><%= tag_alias.status %></span>
   <% end %>
-  <% t.column "", {width: "15%"} do |tag_alias| %>
+  <% t.column width: "15%" do |tag_alias| %>
     <%= link_to "Show", tag_alias_path(tag_alias) %>
 
     <% if tag_alias.is_pending? && tag_alias.editable_by?(CurrentUser.user) %>

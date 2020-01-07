@@ -7,7 +7,7 @@
         <%= link_to_user news_update.creator %>
       <% end %>
       <% t.column :message %>
-      <% t.column "" do |news_update| %>
+      <% t.column do |news_update| %>
         <%= link_to "Edit", edit_news_update_path(news_update) %>
         | <%= link_to "Delete", news_update_path(news_update), :method => :delete %>
       <% end %>

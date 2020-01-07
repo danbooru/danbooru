@@ -2,17 +2,17 @@
   <%= form_tag(diff_wiki_page_versions_path, :method => :get) do %>
 
     <%= table_for @wiki_page_versions, width: "100%" do |t| %>
-      <% t.column "", {width: "3%"} do |wiki_page_version, i| %>
+      <% t.column width: "3%" do |wiki_page_version, i| %>
         <% if i < @wiki_page_versions.length - 1 %>
           <%= link_to "diff", diff_wiki_page_versions_path(:otherpage => wiki_page_version.id, :thispage => @wiki_page_versions[i + 1].id) %>
         <% else %>
           diff
         <% end %>
       <% end %>
-      <% t.column "", {width: "2%"} do |wiki_page_version, i| %>
+      <% t.column width: "2%" do |wiki_page_version, i| %>
         <%= radio_button_tag "thispage", wiki_page_version.id, (i == 1) %>
       <% end %>
-      <% t.column "", {width: "2%"} do |wiki_page_version, i| %>
+      <% t.column width: "2%" do |wiki_page_version, i| %>
         <%= radio_button_tag "otherpage", wiki_page_version.id, (i == 0) %>
       <% end %>
       <% t.column "Title" do |wiki_page_version| %>

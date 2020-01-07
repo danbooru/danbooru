@@ -16,7 +16,7 @@
   <% t.column "Date" do |ip| %>
     <%= time_ago_in_words_tagged ip.created_at %>
   <% end %>
-  <% t.column "" do |ip| %>
+  <% t.column do |ip| %>
     <%= link_to "IP info", "https://ipinfo.io/#{ip.ip_addr}" %>
   <% end %>
 <% end %>

@@ -7,11 +7,11 @@
       <% t.column "Name" do |job| %>
         <%= raw print_name(job) %>
       <% end %>
-      <% t.column "Handler", nil, {class: "col-expand"} do |job| %>
+      <% t.column "Handler", td: {class: "col-expand"} do |job| %>
         <%= raw print_handler(job) %>
       <% end %>
       <% t.column :attempts %>
-      <% t.column "Last error", nil, {class: "col-expand"} do |job| %>
+      <% t.column "Last error", td: {class: "col-expand"} do |job| %>
         <% if job.last_error %>
           <%= job.last_error.split(/\n/)[0] %>
           <%= job.last_error.split(/\n/)[1..-1].grep(/releases/).join("\n") %>
@@ -23,7 +23,7 @@
       <% t.column "Run at" do |job| %>
         <%= time_ago_in_words_tagged(job.run_at) %>
       <% end %>
-      <% t.column "" do |job| %>
+      <% t.column do |job| %>
         <% if CurrentUser.is_admin? %>
           <% if job.locked_at? %>
             Running

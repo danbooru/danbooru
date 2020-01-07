@@ -20,7 +20,7 @@
           <%= artist_version_other_names_diff(artist_version) %>
         <% end %>
       <% end %>
-      <% t.column "URLs", nil, {class: "col-expand"} do |artist_version| %>
+      <% t.column "URLs", td: {class: "col-expand"} do |artist_version| %>
         <%= artist_version_urls_diff(artist_version) if artist_version.visible? %>
       <% end %>
       <% t.column "Updated" do |artist_version| %>
@@ -34,7 +34,7 @@
         </p>
       <% end %>
       <% if artist_versions_listing_type == :revert %>
-        <% t.column "" do |artist_version| %>
+        <% t.column do |artist_version| %>
           <td><%= link_to "Revert to", revert_artist_path(artist_version.artist_id, version_id: artist_version.id), method: :put, "data-confirm": "Are you sure you want to revert to this version?" %></td>
         <% end %>
       <% end %>

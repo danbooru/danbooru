@@ -21,7 +21,7 @@
         <% end %>
       <% end %>
 
-      <% t.column "Link", {}, class: "col-expand" do |dtext_link| %>
+      <% t.column "Link", td: { class: "col-expand" } do |dtext_link| %>
         <% if dtext_link.external_link? %>
           <%= external_link_to(dtext_link.link_target) %>
         <% elsif dtext_link.wiki_link? %>
