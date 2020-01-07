@@ -9,42 +9,32 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <table class="striped autofit">
-      <thead>
-        <tr>
-          <th>Page</th>
-          <th>Link</th>
-          <th>Type</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @dtext_links.each do |dtext_link| %>
-          <tr>
-            <% if dtext_link.model_type == "WikiPage" %>
-              <td class="category-<%= Tag.category_for(dtext_link.model.title) %>">
-                <%= link_to(dtext_link.model.title, dtext_link.model) %>
-                <%= link_to("»", dtext_links_path(search: { model_type: "WikiPage", model: { title: dtext_link.model.title }})) %>
-              </td>
-            <% elsif dtext_link.model_type == "ForumPost" %>
-              <td>
-                <%= link_to("forum ##{dtext_link.model_id}", dtext_link.model) %>
-              </td>
-            <% end %>
-
-            <td class="col-expand">
-              <% if dtext_link.external_link? %>
-                <%= external_link_to(dtext_link.link_target) %>
-              <% elsif dtext_link.wiki_link? %>
-                <%= link_to_wiki dtext_link.link_target, class: "tag-type-#{Tag.category_for(dtext_link.link_target)}" %>
-              <% end %>
-
-              <%= link_to("»", dtext_links_path(search: { link_target: dtext_link.link_target })) %>
-            </td>
-            <td><%= dtext_link.link_type.delete_suffix("_link").capitalize %></td>
-          </tr>
+    <%= table_for @dtext_links, class: "striped autofit" do |t| %>
+      <% t.column "Page" do |dtext_link| %>
+        <% if dtext_link.model_type == "WikiPage" %>
+          <span class="category-<%= Tag.category_for(dtext_link.model.title) %>">
+            <%= link_to(dtext_link.model.title, dtext_link.model) %>
+            <%= link_to("»", dtext_links_path(search: { model_type: "WikiPage", model: { title: dtext_link.model.title }})) %>
+          </span>
+        <% elsif dtext_link.model_type == "ForumPost" %>
+          <%= link_to("forum ##{dtext_link.model_id}", dtext_link.model) %>
         <% end %>
-      </tbody>
-    </table>
+      <% end %>
+
+      <% t.column "Link", {}, class: "col-expand" do |dtext_link| %>
+        <% if dtext_link.external_link? %>
+          <%= external_link_to(dtext_link.link_target) %>
+        <% elsif dtext_link.wiki_link? %>
+          <%= link_to_wiki dtext_link.link_target, class: "tag-type-#{Tag.category_for(dtext_link.link_target)}" %>
+        <% end %>
+
+        <%= link_to("»", dtext_links_path(search: { link_target: dtext_link.link_target })) %>
+      <% end %>
+
+      <% t.column "Type" do |dtext_link| %>
+        <%= dtext_link.link_type.delete_suffix("_link").capitalize %>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@dtext_links) %>
   </div>
