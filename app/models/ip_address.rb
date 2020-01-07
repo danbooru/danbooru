@@ -42,4 +42,8 @@ class IpAddress < ApplicationRecord
   def readonly?
     true
   end
+
+  def html_data_attributes
+    super & attributes.keys.map(&:to_sym)
+  end
 end
