@@ -1,7 +1,6 @@
 <% content_for(:secondary_links) do %>
   <%= quick_search_form_for(:name_matches, tags_path, "tags", autocomplete: "tag") %>
   <%= subnav_link_to "Listing", tags_path %>
-  <%= subnav_link_to "MetaSearch", meta_searches_tags_path %>
   <%= subnav_link_to "Related tags", related_tag_path %>
   <%= subnav_link_to "Cheatsheet", wiki_page_path("help:cheatsheet") %>
   <%= subnav_link_to "Help", wiki_page_path("help:tags") %>

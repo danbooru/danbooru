@@ -304,7 +304,7 @@ module ApplicationHelper
     when "artists", "artist_versions"
       /^\/artist/
 
-    when "tags", "meta_searches"
+    when "tags"
       /^\/tags/
 
     when "pools", "pool_versions"
