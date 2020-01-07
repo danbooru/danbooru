@@ -237,8 +237,6 @@ Rails.application.routes.draw do
   resource :related_tag, :only => [:show, :update]
   get "reports/uploads" => "reports#uploads"
   get "reports/upload_tags" => "reports#upload_tags"
-  get "reports/down_voting_post" => "reports#down_voting_post"
-  post "reports/down_voting_post_create" => "reports#down_voting_post_create"
   resources :recommended_posts, only: [:index]
   resources :saved_searches, :except => [:show] do
     collection do
