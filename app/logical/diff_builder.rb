@@ -32,10 +32,10 @@ class DiffBuilder
         case chg.action
         when '-'
           oldstart = chg.old_position
-          output[chg.old_position] = '<br>' if chg.old_element.match(/^\r?\n$/)
+          output[chg.old_position] = '<span class="paragraph-mark">¶</span><br>' if chg.old_element.match(/^\r?\n$/)
         when '+'
           if chg.new_element.match(/^\r?\n$/)
-            output.insert(chg.old_position, '<br>')
+            output.insert(chg.old_position, '<span class="paragraph-mark">¶</span><br>')
           else
             output.insert(chg.old_position, (escape_html[chg.new_element]).to_s)
           end
@@ -52,6 +52,6 @@ class DiffBuilder
       end
     end
 
-    output.join.gsub(/\r?\n/, '<br>').html_safe
+    output.join.gsub(/\r?\n/, '<span class="paragraph-mark">¶</span><br>').html_safe
   end
 end

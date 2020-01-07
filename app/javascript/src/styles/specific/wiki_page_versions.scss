@@ -9,6 +9,10 @@ div#c-wiki-page-versions {
       background: var(--wiki-page-versions-diff-ins-background);
       text-decoration: none;
     }
+
+    span.paragraph-mark {
+      opacity: 0.25;
+    }
   }
 
   #a-index {
