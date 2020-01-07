@@ -11,32 +11,27 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <table class="striped" width="100%">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Artist Name</th>
-          <th>URL</th>
-          <th>Normalized URL</th>
-          <th>Active?</th>
-          <th>Created</th>
-          <th>Updated</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% @artist_urls.each do |artist_url| %>
-          <tr>
-            <%= tag.td artist_url.id %>
-            <%= tag.td link_to(artist_url.artist.name, artist_url.artist) %>
-            <%= tag.td external_link_to(artist_url.url.to_s) %>
-            <%= tag.td external_link_to(artist_url.normalized_url) %>
-            <%= tag.td artist_url.is_active.to_s %>
-            <%= tag.td compact_time(artist_url.created_at) %>
-            <%= tag.td compact_time(artist_url.updated_at) %>
-          </tr>
-        <% end %>
-      </tbody>
-    </table>
+    <%= table_for @artist_urls, width: "100%" do |t| %>
+      <% t.column :id %>
+      <% t.column "Artist Name" do |artist_url| %>
+        <%= link_to(artist_url.artist.name, artist_url.artist) %>
+      <% end %>
+      <% t.column "URL" do |artist_url| %>
+        <%= external_link_to(artist_url.url.to_s) %>
+      <% end %>
+      <% t.column "Normalized URL" do |artist_url| %>
+        <%= external_link_to(artist_url.normalized_url) %>
+      <% end %>
+      <% t.column "Active?" do |artist_url| %>
+        <%= artist_url.is_active.to_s %>
+      <% end %>
+      <% t.column "Created" do |artist_url| %>
+        <%= compact_time(artist_url.created_at) %>
+      <% end %>
+      <% t.column "Updated" do |artist_url| %>
+        <%= compact_time(artist_url.updated_at) %>
+      <% end %>
+    <% end %>
 
     <%= numbered_paginator(@artist_urls) %>
   </div>
