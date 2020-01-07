@@ -191,6 +191,9 @@ Rails.application.routes.draw do
     member do
       get :diff
     end
+    collection do
+      get :search
+    end
   end
   resources :post_replacements, :only => [:index, :new, :create, :update]
   resources :post_votes, only: [:index]
