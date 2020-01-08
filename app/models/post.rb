@@ -1794,11 +1794,11 @@ class Post < ApplicationRecord
   has_bit_flags BOOLEAN_ATTRIBUTES
 
   def safeblocked?
-    CurrentUser.safe_mode? && (rating != "s" || has_tag?("toddlercon|toddler|diaper|tentacle|rape|bestiality|beastiality|lolita|loli|nude|shota|pussy|penis"))
+    CurrentUser.safe_mode? && (rating != "s" || Danbooru.config.safe_mode_restricted_tags.any? { |tag| tag.in?(tag_array) })
   end
 
   def levelblocked?
-    !Danbooru.config.can_user_see_post?(CurrentUser.user, self)
+    !CurrentUser.is_gold? && Danbooru.config.restricted_tags.any? { |tag| tag.in?(tag_array) }
   end
 
   def banblocked?
@@ -1806,10 +1806,7 @@ class Post < ApplicationRecord
   end
 
   def visible?
-    return false if safeblocked?
-    return false if levelblocked?
-    return false if banblocked?
-    return true
+    !safeblocked? && !levelblocked? && !banblocked?
   end
 
   def reload(options = nil)

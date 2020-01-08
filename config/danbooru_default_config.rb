@@ -350,20 +350,14 @@ module Danbooru
       20
     end
 
-    def is_post_restricted?(post)
-      false
+    # Tags that are not visible in safe mode.
+    def safe_mode_restricted_tags
+      restricted_tags + %w[censored condom nipples nude penis pussy sexually_suggestive]
     end
 
-    def is_user_restricted?(user)
-      !user.is_gold?
-    end
-
-    def can_user_see_post?(user, post)
-      if is_user_restricted?(user) && is_post_restricted?(post)
-        false
-      else
-        true
-      end
+    # Tags that are only visible to Gold+ users.
+    def restricted_tags
+      []
     end
 
     def max_appeals_per_day
