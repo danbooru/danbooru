@@ -1,4 +1,3 @@
-import Cookie from './cookie'
 import CurrentUser from './current_user'
 import Favorite from './favorites'
 import Post from './posts.js.erb'
@@ -27,13 +26,13 @@ PostModeMenu.show_notice = function(i) {
 
 PostModeMenu.change_tag_script = function(e) {
   if ($("#mode-box select").val() === "tag-script") {
-    var old_tag_script_id = Cookie.get("current_tag_script_id") || "1";
+    var old_tag_script_id = localStorage.getItem("current_tag_script_id") || "1";
 
     var new_tag_script_id = String.fromCharCode(e.which);
-    var new_tag_script = Cookie.get("tag-script-" + new_tag_script_id);
+    var new_tag_script = localStorage.getItem("tag-script-" + new_tag_script_id);
 
     $("#tag-script-field").val(new_tag_script);
-    Cookie.put("current_tag_script_id", new_tag_script_id);
+    localStorage.setItem("current_tag_script_id", new_tag_script_id);
     if (old_tag_script_id !== new_tag_script_id) {
       PostModeMenu.show_notice(new_tag_script_id);
     }
@@ -43,11 +42,12 @@ PostModeMenu.change_tag_script = function(e) {
 }
 
 PostModeMenu.initialize_selector = function() {
-  if (Cookie.get("mode") === "") {
-    Cookie.put("mode", "view");
+  let mode = localStorage.getItem("mode");
+  if (mode === null) {
+    localStorage.setItem("mode", "view");
     $("#mode-box select").val("view");
   } else {
-    $("#mode-box select").val(Cookie.get("mode"));
+    $("#mode-box select").val(mode);
   }
 
   $("#mode-box select").on("change.danbooru", function(e) {
@@ -102,8 +102,8 @@ PostModeMenu.initialize_tag_script_field = function() {
     var script = $(this).val();
 
     if (script) {
-      var current_script_id = Cookie.get("current_tag_script_id");
-      Cookie.put("tag-script-" + current_script_id, script);
+      var current_script_id = localStorage.getItem("current_tag_script_id");
+      localStorage.setItem("tag-script-" + current_script_id, script);
     } else {
       $("#mode-box select").val("view");
       PostModeMenu.change();
@@ -120,15 +120,15 @@ PostModeMenu.change = function() {
   var $body = $(document.body);
   $body.removeClass((i, classNames) => classNames.split(/ /).filter(name => /^mode-/.test(name)).join(" "));
   $body.addClass("mode-" + s);
-  Cookie.put("mode", s, 1);
+  localStorage.setItem("mode", s, 1);
 
   if (s === "tag-script") {
-    var current_script_id = Cookie.get("current_tag_script_id");
+    var current_script_id = localStorage.getItem("current_tag_script_id");
     if (!current_script_id) {
       current_script_id = "1";
-      Cookie.put("current_tag_script_id", current_script_id);
+      localStorage.setItem("current_tag_script_id", current_script_id);
     }
-    var script = Cookie.get("tag-script-" + current_script_id);
+    var script = localStorage.getItem("tag-script-" + current_script_id);
 
     $("#tag-script-field").val(script).show();
     PostModeMenu.show_notice(current_script_id);
@@ -173,8 +173,8 @@ PostModeMenu.click = function(e) {
   } else if (s === 'ban') {
     Post.ban(post_id);
   } else if (s === "tag-script") {
-    var current_script_id = Cookie.get("current_tag_script_id");
-    var tag_script = Cookie.get("tag-script-" + current_script_id);
+    var current_script_id = localStorage.getItem("current_tag_script_id");
+    var tag_script = localStorage.getItem("tag-script-" + current_script_id);
     Post.tag(post_id, tag_script);
   } else {
     return;
