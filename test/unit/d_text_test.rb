@@ -80,6 +80,23 @@ class DTextTest < ActiveSupport::TestCase
         assert_match(/implication ##{@ti.id}/, DText.format_text("[ti:#{@ti.id}]"))
         assert_match(/alias ##{@ta.id}/, DText.format_text("[ta:#{@ta.id}]"))
       end
+
+      should "link artist tags to the artist page instead of the wiki page" do
+        tag = create(:tag, name: "m&m", category: Tag.categories.artist)
+        artist = create(:artist, name: "m&m")
+
+        assert_equal(
+          '<p><a class="dtext-link dtext-wiki-link tag-type-1" href="/artists/show_or_new?name=m%26m">m&amp;m</a></p>',
+          DText.format_text("[[m&m]]")
+        )
+      end
+
+      should "not link general tags to artist pages" do
+        tag = create(:tag, name: "cat")
+        artist = create(:artist, name: "cat", is_active: false)
+
+        assert_match(%r!/wiki_pages/cat!, DText.format_text("[[cat]]"))
+      end
     end
 
     context "#parse_wiki_titles" do

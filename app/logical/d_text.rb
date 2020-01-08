@@ -37,8 +37,8 @@ class DText
       tag = tags.find { |tag| tag.name == name }
       artist = artists.find { |artist| artist.name == name }
 
-      if (tag.present? && tag.category == Tag.categories.artist) || artist.present?
-        node["href"] = "/artists/show_or_new?name=#{name}"
+      if tag.present? && tag.category == Tag.categories.artist
+        node["href"] = "/artists/show_or_new?name=#{CGI.escape(name)}"
 
         if artist.blank?
           node["class"] += " dtext-artist-does-not-exist"
