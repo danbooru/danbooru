@@ -53,10 +53,6 @@ module Danbooru
       "DanbooruBot"
     end
 
-    def upload_feedback_topic
-      ForumTopic.where(title: "Upload Feedback Thread").first
-    end
-
     # The ID of the "Curated" pool. If present, this pool will be updated daily with curated posts.
     def curated_pool_id
       nil
@@ -190,13 +186,6 @@ module Danbooru
     # The name of the server the app is hosted on.
     def server_host
       Socket.gethostname
-    end
-
-    # Names of all Danbooru servers which serve out of the same common database.
-    # Used in conjunction with load balancing to distribute files from one server to
-    # the others. This should match whatever gethostname returns on the other servers.
-    def all_server_hosts
-      [server_host]
     end
 
     # The method to use for storing image files.
