@@ -5,9 +5,15 @@ module ApproverPruner
   MINIMUM_APPROVALS = 30
 
   def inactive_approvers
-    approvals = PostApproval.where("created_at >= ?", APPROVAL_PERIOD.ago)
-    approvers = User.where("bit_prefs & ? > 0", User.flag_value_for("can_approve_posts")).where("level < ?", User::Levels::MODERATOR)
-    approvers.where(id: approvals.group(:user_id).having("count(*) < ?", MINIMUM_APPROVALS).select(:user_id))
+    approvers = User.where("bit_prefs & ? > 0", User.flag_value_for("can_approve_posts"))
+    approvers = approvers.where("level < ?", User::Levels::MODERATOR)
+
+    recently_promoted_approvers = UserFeedback.where("created_at >= ?", APPROVAL_PERIOD.ago).where_like(:body, "*You gained the ability to approve posts*").select(:user_id)
+    approvers = approvers.where.not(id: recently_promoted_approvers)
+
+    approvers.select do |approver|
+      approver.post_approvals.where("created_at >= ?", APPROVAL_PERIOD.ago).count < MINIMUM_APPROVALS
+    end
   end
 
   def prune!
