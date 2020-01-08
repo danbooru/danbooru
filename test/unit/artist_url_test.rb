@@ -155,6 +155,12 @@ class ArtistUrlTest < ActiveSupport::TestCase
       assert_equal("http://www.pixiv.net/fanbox/creator/3113804/", url.normalized_url)
     end
 
+    should "normalize pixiv.net/user/123 urls" do
+      url = create(:artist_url, url: "https://www.pixiv.net/en/users/123")
+      assert_equal("https://www.pixiv.net/en/users/123", url.url)
+      assert_equal("http://www.pixiv.net/member.php?id=123/", url.normalized_url)
+    end
+
     should "normalize twitter urls" do
       url = FactoryBot.create(:artist_url, :url => "https://twitter.com/aoimanabu/status/892370963630743552")
       assert_equal("https://twitter.com/aoimanabu/status/892370963630743552", url.url)
