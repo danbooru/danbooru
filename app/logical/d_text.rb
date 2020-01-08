@@ -20,11 +20,12 @@ class DText
     names = dtext_messages.map { |message| parse_wiki_titles(message) }.flatten.uniq
     wiki_pages = WikiPage.where(title: names)
     tags = Tag.where(name: names)
+    artists = Artist.where(name: names)
 
-    [wiki_pages, tags]
+    [wiki_pages, tags, artists]
   end
 
-  def self.postprocess(html, wiki_pages, tags)
+  def self.postprocess(html, wiki_pages, tags, artists)
     fragment = Nokogiri::HTML.fragment(html)
 
     fragment.css("a.dtext-wiki-link").each do |node|
@@ -34,22 +35,34 @@ class DText
       name = WikiPage.normalize_title(name)
       wiki = wiki_pages.find { |wiki| wiki.title == name }
       tag = tags.find { |tag| tag.name == name }
+      artist = artists.find { |artist| artist.name == name }
 
-      if wiki.blank?
-        node["class"] += " dtext-wiki-does-not-exist"
-        node["title"] = "This wiki page does not exist"
-      end
+      if (tag.present? && tag.category == Tag.categories.artist) || artist.present?
+        node["href"] = "/artists/show_or_new?name=#{name}"
 
-      if WikiPage.is_meta_wiki?(name)
-        # skip (meta wikis aren't expected to have a tag)
-      elsif tag.blank?
-        node["class"] += " dtext-tag-does-not-exist"
-        node["title"] = "This wiki page does not have a tag"
-      elsif tag.post_count <= 0
-        node["class"] += " dtext-tag-empty"
-        node["title"] = "This wiki page does not have a tag"
+        if artist.blank?
+          node["class"] += " dtext-artist-does-not-exist"
+          node["title"] = "This artist page does not exist"
+        end
+
+        node["class"] += " tag-type-#{Tag.categories.artist}"
       else
-        node["class"] += " tag-type-#{tag.category}"
+        if wiki.blank?
+          node["class"] += " dtext-wiki-does-not-exist"
+          node["title"] = "This wiki page does not exist"
+        end
+
+        if WikiPage.is_meta_wiki?(name)
+          # skip (meta wikis aren't expected to have a tag)
+        elsif tag.blank?
+          node["class"] += " dtext-tag-does-not-exist"
+          node["title"] = "This wiki page does not have a tag"
+        elsif tag.post_count <= 0
+          node["class"] += " dtext-tag-empty"
+          node["title"] = "This wiki page does not have a tag"
+        else
+          node["class"] += " tag-type-#{tag.category}"
+        end
       end
     end
 
