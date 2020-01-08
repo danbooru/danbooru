@@ -28,7 +28,8 @@ PostModeMenu.change_tag_script = function(e) {
   if ($("#mode-box select").val() === "tag-script") {
     var old_tag_script_id = localStorage.getItem("current_tag_script_id") || "1";
 
-    var new_tag_script_id = String.fromCharCode(e.which);
+    var keycode = e.which >= 96 ? e.which - 48 : e.which;
+    var new_tag_script_id = String.fromCharCode(keycode);
     var new_tag_script = localStorage.getItem("tag-script-" + new_tag_script_id);
 
     $("#tag-script-field").val(new_tag_script);
