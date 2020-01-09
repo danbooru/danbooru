@@ -1,4 +1,4 @@
-div#c-wiki-page-versions {
+div#c-pool-versions {
   #a-diff {
     del {
       background: var(--wiki-page-versions-diff-del-background);
@@ -12,12 +12,6 @@ div#c-wiki-page-versions {
 
     span.paragraph-mark {
       opacity: 0.25;
-    }
-  }
-
-  #a-index {
-    table {
-      margin-bottom: 1em;
     }
   }
 }

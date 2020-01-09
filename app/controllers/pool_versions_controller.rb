@@ -12,6 +12,9 @@ class PoolVersionsController < ApplicationController
     respond_with(@pool_versions)
   end
 
+  def search
+  end
+
   def diff
     @pool_version = PoolArchive.find(params[:id])
 
