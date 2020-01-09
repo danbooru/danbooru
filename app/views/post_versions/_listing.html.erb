@@ -25,9 +25,6 @@
         <%= link_to "»", post_versions_path(search: params[:search].merge({ updater_name: post_version.updater&.name })) %>
         <div>
           <%= compact_time(post_version.updated_at) %>
-          <% if CurrentUser.is_moderator? %>
-            (<%= link_to_ip post_version.updater_ip_addr %>)
-          <% end %>
         </div>
       <% end %>
       <% t.column do |post_version| %>

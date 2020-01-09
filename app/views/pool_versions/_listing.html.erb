@@ -23,11 +23,6 @@
           <%= link_to "»", pool_versions_path(search: { updater_id: pool_version.updater_id }) %>
         <% end %>
       <% end %>
-      <% if CurrentUser.is_moderator? %>
-        <% t.column "IP Address" do |pool_version| %>
-          <%= link_to_ip pool_version.updater_ip_addr %>
-        <% end %>
-      <% end %>
       <% t.column "Date" do |pool_version| %>
         <%= compact_time pool_version.updated_at %>
       <% end %>

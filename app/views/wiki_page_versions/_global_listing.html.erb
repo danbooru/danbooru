@@ -18,9 +18,6 @@
       <%= compact_time(wiki_page_version.updated_at) %>
       by
       <%= link_to_user wiki_page_version.updater %>
-      <% if CurrentUser.is_moderator? %>
-        (<%= link_to_ip wiki_page_version.updater_ip_addr %>)
-      <% end %>
       <%= link_to "»", wiki_page_versions_path(search: { updater_id: wiki_page_version.updater.id }) %>
     <% end %>
   <% end %>
