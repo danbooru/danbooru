@@ -1481,10 +1481,6 @@ class Post < ApplicationRecord
       hash
     end
 
-    def html_data_attributes
-      [:uploader_id, :approver_id]
-    end
-
     def status
       if is_pending?
         "pending"
