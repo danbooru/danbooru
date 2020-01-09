@@ -57,7 +57,7 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
 
       context "with search conditions" do
         should "list all matching forum posts" do
-          get forum_posts_path, params: {:search => {:body_matches => "xxx"}}
+          get forum_posts_path, params: { search: { body_matches: "xxx", topic_title_matches: "my forum topic" }}
           assert_response :success
           assert_select "#forum-post-#{@forum_post.id}"
         end

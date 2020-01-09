@@ -48,7 +48,7 @@ class ForumTopic < ApplicationRecord
 
   module SearchMethods
     def active
-      where("is_deleted = false")
+      where(is_deleted: false)
     end
 
     def permitted
