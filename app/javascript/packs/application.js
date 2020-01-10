@@ -4,7 +4,7 @@ function importAll(r) {
   r.keys().forEach(r);
 }
 
-require('jquery-ujs');
+require('@rails/ujs').start();
 require('hammerjs');
 require('stupid-table-plugin');
 require('jquery-hotkeys');
