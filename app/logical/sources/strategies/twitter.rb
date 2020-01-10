@@ -21,6 +21,7 @@ module Sources::Strategies
     # the pattern to avoid creating empty strings.
     COMMON_TAG_REGEXES = [
       /(?<!\A)生誕祭(?:\d*)\z/,
+      /(?<!\A)誕生祭(?:\d*)\z/,
       /(?<!\A)版もうひとつの深夜の真剣お絵描き60分一本勝負(?:_\d+)?\z/,
       /(?<!\A)版深夜の真剣お絵描き60分一本勝負(?:_\d+)?\z/,
       /(?<!\A)深夜の真剣お絵描き60分一本勝負(?:_\d+)?\z/,
