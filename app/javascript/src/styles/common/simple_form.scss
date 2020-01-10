@@ -3,15 +3,27 @@
 form.simple_form {
   margin: 0 0 1em 0;
 
+  fieldset.inline-fieldset {
+    > label {
+      display: block;
+      font-weight: bold;
+    }
+
+    div.input {
+      display: inline;
+      margin-right: 2em;
+    }
+  }
+
   div.input.boolean {
     label {
       display: inline;
+      font-weight: normal;
       vertical-align: middle;
-      margin-left: 0.5em;
+    }
 
-      input {
-        margin-right: 0.25em;
-      }
+    input {
+      margin-right: 0.25em;
     }
   }
 
@@ -45,17 +57,12 @@ form.simple_form {
       line-height: 1.5em;
     }
 
-    fieldset {
-      border: none;
-      display: inline;
-      margin: 0;
-      padding: 0;
-
-      label {
+    &.radio_buttons {
+      span.radio label {
         font-weight: normal;
-        width: auto;
-        margin-right: 2em;
         display: inline;
+        margin: 0 2em 0 0.25em;
+        vertical-align: middle;
       }
     }
   }
