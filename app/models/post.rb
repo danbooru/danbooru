@@ -589,6 +589,7 @@ class Post < ApplicationRecord
     end
 
     def merge_old_changes
+      reset_tag_array_cache
       @removed_tags = []
 
       if old_tag_string
