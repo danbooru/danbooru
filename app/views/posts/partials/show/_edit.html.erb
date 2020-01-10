@@ -6,7 +6,7 @@
 
 <%= render "sources/info" %>
 
-<%= simple_form_for(post, html: { id: "form" }) do |f| %>
+<%= simple_form_for(post, html: { id: "form", autocomplete: "off" }) do |f| %>
   <%= hidden_field_tag :tags_query, params[:q] %>
   <%= hidden_field_tag :pool_id, params[:pool_id] %>
   <%= hidden_field_tag :favgroup_id, params[:favgroup_id] %>
