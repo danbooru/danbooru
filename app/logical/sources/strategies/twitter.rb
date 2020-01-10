@@ -139,8 +139,9 @@ module Sources::Strategies
 
     def normalize_tag(tag)
       COMMON_TAG_REGEXES.each do |rg|
-        if tag.match(rg)
-          return tag.gsub(rg,"")
+        norm_tag = tag.gsub(rg,"")
+        if norm_tag != tag
+          return norm_tag
         end
       end
       tag
