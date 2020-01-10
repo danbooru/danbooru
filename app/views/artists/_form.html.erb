@@ -1,4 +1,4 @@
-<%= simple_form_for(@artist) do |f| %>
+<%= edit_form_for(@artist) do |f| %>
   <% if @artist.new_record? %>
     <%= f.input :name, as: :string, input_html: { data: { autocomplete: "tag" } } %>
   <% else %>

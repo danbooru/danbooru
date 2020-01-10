@@ -17,7 +17,7 @@
       </div>
     </div>
 
-    <%= simple_form_for @dmail_filter, :url => maintenance_user_dmail_filter_path(:dmail_id => @dmail.id), :method => :put do |f| %>
+    <%= edit_form_for @dmail_filter, :url => maintenance_user_dmail_filter_path(:dmail_id => @dmail.id) do |f| %>
       <div class="input text optional field_with_hint">
         <label class="text" for="dmail_filter_words">Banned Words</label>
         <%= text_area_tag "dmail_filter[words]", @dmail_filter.words, :id => "dmail_filter_words", :class => "text", :style => "height: 10em;" %>

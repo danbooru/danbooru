@@ -2,7 +2,7 @@
   <div id="a-edit">
     <h1>Tag: <%= @tag.name %></h1>
 
-    <%= simple_form_for(@tag) do |f| %>
+    <%= edit_form_for(@tag) do |f| %>
       <% if @tag.is_locked? %>
         <p>This tag is category locked</p>
       <% else %>

@@ -4,7 +4,7 @@
 
     <%= error_messages_for "favorite_group" %>
 
-    <%= simple_form_for(@favorite_group) do |f| %>
+    <%= edit_form_for(@favorite_group) do |f| %>
       <%= f.input :name, :as => :string, :required => true %>
       <%= f.input :post_ids, :label => "Posts" %>
       <%= f.button :submit, "Submit" %>

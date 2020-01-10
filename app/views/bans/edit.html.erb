@@ -2,7 +2,7 @@
   <div id="a-edit">
     <h1>Edit Ban</h1>
 
-    <%= simple_form_for(@ban) do |f| %>
+    <%= edit_form_for(@ban) do |f| %>
       <%= error_messages_for("ban") %>
 
       <%= f.input :duration, :hint => "in days" %>

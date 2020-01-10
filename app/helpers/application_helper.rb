@@ -197,6 +197,11 @@ module ApplicationHelper
     simple_form_for(:search, method: method, url: url, defaults: defaults, html: html_options, &block)
   end
 
+  def edit_form_for(model, **options, &block)
+    options[:html] = { autocomplete: "off", **options[:html].to_h }
+    simple_form_for(model, **options, &block)
+  end
+
   def table_for(*options, &block)
     table = TableBuilder.new(*options, &block)
     render "table_builder/table", table: table

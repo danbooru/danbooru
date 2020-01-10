@@ -4,7 +4,7 @@
 
     <%= error_messages_for :tag_implication %>
 
-    <%= simple_form_for(@tag_implication) do |f| %>
+    <%= edit_form_for(@tag_implication) do |f| %>
       <%= f.input :antecedent_name, :label => "From" %>
       <%= f.input :consequent_name, :label => "To" %>
       <%= f.input :forum_topic_id, :label => "Forum" %>
