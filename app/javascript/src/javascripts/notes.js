@@ -386,7 +386,7 @@ let Note = {
       let $textarea = $('<textarea></textarea>');
       $textarea.css({
         width: "97%",
-        height: "92%",
+        height: "85%",
         resize: "none",
       });
 
@@ -395,11 +395,13 @@ let Note = {
       }
 
       let $dialog = $('<div></div>');
+      let note_title = (id === 'x' ? 'Creating new note' : 'Editing note #' + id);
+      $dialog.append('<span><b>' + note_title + ' (<a href="/wiki_pages/help:notes">view help</a>)</b></span>');
       $dialog.append($textarea);
       $dialog.data("id", id);
       $dialog.dialog({
         width: 360,
-        height: 210,
+        height: 240,
         position: {
           my: "right",
           at: "right-20",
@@ -408,7 +410,6 @@ let Note = {
         classes: {
           "ui-dialog": "note-edit-dialog",
         },
-        title: "Edit note",
         buttons: {
           "Save": Note.Edit.save,
           "Preview": Note.Edit.preview,
@@ -420,7 +421,6 @@ let Note = {
       $dialog.data("uiDialog")._title = function(title) {
         title.html(this.options.title); // Allow unescaped html in dialog title
       }
-      $dialog.dialog("option", "title", 'Edit note #' + id + ' (<a href="/wiki_pages/help:notes">view help</a>)');
 
       $dialog.on("dialogclose.danbooru", function() {
         Note.editing = false;
