@@ -34,12 +34,6 @@ module Danbooru
       Socket.gethostname
     end
 
-    # The list of all domain names this site is accessible under.
-    # Example: %w[danbooru.donmai.us sonohara.donmai.us hijiribe.donmai.us safebooru.donmai.us]
-    def hostnames
-      [hostname]
-    end
-
     # Contact email address of the admin.
     def contact_email
       "webmaster@#{server_host}"
