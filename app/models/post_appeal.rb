@@ -1,6 +1,8 @@
 class PostAppeal < ApplicationRecord
   class Error < Exception; end
 
+  MAX_APPEALS_PER_DAY = 1
+
   belongs_to :creator, :class_name => "User"
   belongs_to :post
   validates_presence_of :reason
@@ -47,8 +49,8 @@ class PostAppeal < ApplicationRecord
   end
 
   def validate_creator_is_not_limited
-    if appeal_count_for_creator >= Danbooru.config.max_appeals_per_day
-      errors[:creator] << "can appeal at most #{Danbooru.config.max_appeals_per_day} post a day"
+    if appeal_count_for_creator >= MAX_APPEALS_PER_DAY
+      errors[:creator] << "can appeal at most #{MAX_APPEALS_PER_DAY} post a day"
     end
   end
 

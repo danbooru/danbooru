@@ -76,7 +76,7 @@ class Upload < ApplicationRecord
   def initialize_attributes
     self.uploader_id = CurrentUser.id
     self.uploader_ip_addr = CurrentUser.ip_addr
-    self.server = Danbooru.config.server_host
+    self.server = Socket.gethostname
   end
 
   def self.prune!(date = 1.day.ago)

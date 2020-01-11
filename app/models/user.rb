@@ -244,7 +244,8 @@ class User < ApplicationRecord
       end
 
       def sha1(pass)
-        Digest::SHA1.hexdigest("#{Danbooru.config.password_salt}--#{pass}--")
+        salt = "choujin-steiner"
+        Digest::SHA1.hexdigest("#{salt}--#{pass}--")
       end
     end
   end

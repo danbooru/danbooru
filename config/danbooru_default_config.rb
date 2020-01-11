@@ -36,7 +36,7 @@ module Danbooru
 
     # Contact email address of the admin.
     def contact_email
-      "webmaster@#{server_host}"
+      "webmaster@#{hostname}"
     end
 
     # System actions, such as sending automated dmails, will be performed with
@@ -64,11 +64,6 @@ module Danbooru
       "#{source_code_url}/issues"
     end
 
-    # This is a salt used to make dictionary attacks on account passwords harder.
-    def password_salt
-      "choujin-steiner"
-    end
-
     # Set the default level, permissions, and other settings for new users here.
     def customize_new_user(user)
       # user.level = User::Levels::MEMBER
@@ -92,15 +87,6 @@ module Danbooru
     # Large resize image width. Set to nil to disable.
     def large_image_width
       850
-    end
-
-    def large_image_prefix
-      "sample-"
-    end
-
-    # When calculating statistics based on the posts table, gather this many posts to sample from.
-    def post_sample_size
-      300
     end
 
     # After a post receives this many comments, new comments will no longer bump the post in comment/index.
@@ -175,11 +161,6 @@ module Danbooru
         # password: "pass",
         # authentication: :login
       }
-    end
-
-    # The name of the server the app is hosted on.
-    def server_host
-      Socket.gethostname
     end
 
     # The method to use for storing image files.
@@ -343,10 +324,6 @@ module Danbooru
       []
     end
 
-    def max_appeals_per_day
-      1
-    end
-
     # Counting every post is typically expensive because it involves a sequential scan on
     # potentially millions of rows. If this method returns a value, then blank searches
     # will return that number for the fast_count call instead.
@@ -403,10 +380,6 @@ module Danbooru
       nil
     end
 
-    def enable_dimension_autotagging
-      true
-    end
-
     # Should return true if the given tag should be suggested for removal in the post replacement dialog box.
     def remove_tag_after_replacement?(tag)
       tag =~ /\A(?:replaceme|.*_sample|resized|upscaled|downscaled|md5_mismatch|jpeg_artifacts|corrupted_image|source_request|non-web_source)\z/i
@@ -453,11 +426,6 @@ module Danbooru
     # you should override this
     def email_key
       "zDMSATq0W3hmA5p3rKTgD"
-    end
-
-    # impose additional requirements to create tag aliases and implications
-    def strict_tag_requirements
-      true
     end
 
     # For downloads, if the host matches any of these IPs, block it

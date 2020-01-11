@@ -168,8 +168,6 @@ class UploadService
     end
 
     def automatic_tags(upload, file)
-      return "" unless Danbooru.config.enable_dimension_autotagging
-
       tags = []
       tags << "video_with_sound" if is_video_with_audio?(upload, file)
       tags << "animated_gif" if is_animated_gif?(upload, file)

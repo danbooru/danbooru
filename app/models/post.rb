@@ -671,8 +671,6 @@ class Post < ApplicationRecord
     end
 
     def add_automatic_tags(tags)
-      return tags if !Danbooru.config.enable_dimension_autotagging
-
       tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize flash webm mp4)
 
       if has_dimensions?
