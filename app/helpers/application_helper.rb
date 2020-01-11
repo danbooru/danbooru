@@ -199,6 +199,7 @@ module ApplicationHelper
 
   def edit_form_for(model, **options, &block)
     options[:html] = { autocomplete: "off", **options[:html].to_h }
+    options[:authenticity_token] = true if options[:remote] == true
     simple_form_for(model, **options, &block)
   end
 

@@ -1,4 +1,5 @@
 import Utility from "./utility";
+import Rails from "@rails/ujs";
 
 let ArtistCommentary = {};
 
@@ -34,7 +35,8 @@ ArtistCommentary.initialize_edit_commentary_dialog = function() {
     width: 700,
     buttons: {
       "Submit": function() {
-        $("#add-commentary-dialog #edit-commentary").submit();
+        let form = $("#add-commentary-dialog #edit-commentary").get(0);
+        Rails.fire(form, "submit");
         $(this).dialog("close");
       },
       "Cancel": function() {
