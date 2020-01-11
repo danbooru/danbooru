@@ -8,7 +8,7 @@ class PoolVersionsController < ApplicationController
       @pool = Pool.find(params[:search][:pool_id])
     end
 
-    @pool_versions = PoolArchive.paginated_search(params)
+    @pool_versions = PoolArchive.paginated_search(params).includes(:updater, :pool)
     respond_with(@pool_versions)
   end
 

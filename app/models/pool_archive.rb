@@ -1,5 +1,6 @@
 class PoolArchive < ApplicationRecord
   belongs_to :updater, :class_name => "User"
+  belongs_to :pool
 
   def self.enabled?
     Danbooru.config.aws_sqs_archives_url.present?
@@ -108,14 +109,6 @@ class PoolArchive < ApplicationRecord
 
   def previous
     PoolArchive.where("pool_id = ? and version < ?", pool_id, version).order("version desc").first
-  end
-
-  def pool
-    Pool.find(pool_id)
-  end
-
-  def updater
-    User.find(updater_id)
   end
 
   def pretty_name
