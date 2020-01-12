@@ -1,5 +1,5 @@
 module PostSets
-  class SearchError < Exception
+  class SearchError < StandardError
   end
 
   class WikiPage < PostSets::Post

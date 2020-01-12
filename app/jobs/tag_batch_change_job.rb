@@ -1,5 +1,5 @@
 class TagBatchChangeJob < ApplicationJob
-  class Error < Exception; end
+  class Error < StandardError; end
 
   queue_as :bulk_update
 

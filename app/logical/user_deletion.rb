@@ -1,5 +1,5 @@
 class UserDeletion
-  class ValidationError < Exception; end
+  class ValidationError < StandardError; end
 
   attr_reader :user, :password
 

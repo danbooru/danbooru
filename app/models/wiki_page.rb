@@ -1,5 +1,5 @@
 class WikiPage < ApplicationRecord
-  class RevertError < Exception; end
+  class RevertError < StandardError; end
 
   META_WIKIS = ["list_of_", "tag_group:", "pool_group:", "howto:", "about:", "help:", "template:"]
 

@@ -1,6 +1,6 @@
 class Artist < ApplicationRecord
   extend Memoist
-  class RevertError < Exception; end
+  class RevertError < StandardError; end
 
   attr_accessor :url_string_changed
   array_attribute :other_names

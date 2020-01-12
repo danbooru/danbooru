@@ -3,7 +3,7 @@ require 'resolv'
 module Downloads
   class File
     include ActiveModel::Validations
-    class Error < Exception; end
+    class Error < StandardError; end
 
     RETRIABLE_ERRORS = [Errno::ECONNRESET, Errno::ETIMEDOUT, Errno::EIO, Errno::EHOSTUNREACH, Errno::ECONNREFUSED, Timeout::Error, IOError]
 

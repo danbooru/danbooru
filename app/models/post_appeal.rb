@@ -1,5 +1,5 @@
 class PostAppeal < ApplicationRecord
-  class Error < Exception; end
+  class Error < StandardError; end
 
   MAX_APPEALS_PER_DAY = 1
 

@@ -1,5 +1,5 @@
 class SessionLoader
-  class AuthenticationFailure < Exception; end
+  class AuthenticationFailure < StandardError; end
 
   attr_reader :session, :cookies, :request, :params
 

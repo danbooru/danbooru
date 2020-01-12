@@ -1,12 +1,12 @@
 require 'danbooru/has_bit_flags'
 
 class Post < ApplicationRecord
-  class ApprovalError < Exception; end
-  class DisapprovalError < Exception; end
-  class RevertError < Exception; end
-  class SearchError < Exception; end
-  class DeletionError < Exception; end
-  class TimeoutError < Exception; end
+  class ApprovalError < StandardError; end
+  class DisapprovalError < StandardError; end
+  class RevertError < StandardError; end
+  class SearchError < StandardError; end
+  class DeletionError < StandardError; end
+  class TimeoutError < StandardError; end
 
   # Tags to copy when copying notes.
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation]

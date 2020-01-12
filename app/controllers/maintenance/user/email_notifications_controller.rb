@@ -1,7 +1,7 @@
 module Maintenance
   module User
     class EmailNotificationsController < ApplicationController
-      class VerificationError < Exception; end
+      class VerificationError < StandardError; end
 
       before_action :validate_sig, :only => [:destroy]
       rescue_from VerificationError, :with => :render_403

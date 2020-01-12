@@ -1,7 +1,7 @@
 require "tmpdir"
 
 class Upload < ApplicationRecord
-  class Error < Exception; end
+  class Error < StandardError; end
 
   class FileValidator < ActiveModel::Validator
     def validate(record)

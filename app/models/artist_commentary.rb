@@ -1,5 +1,5 @@
 class ArtistCommentary < ApplicationRecord
-  class RevertError < Exception; end
+  class RevertError < StandardError; end
 
   attr_accessor :remove_commentary_tag, :remove_commentary_request_tag, :remove_commentary_check_tag, :remove_partial_commentary_tag
   attr_accessor :add_commentary_tag, :add_commentary_request_tag, :add_commentary_check_tag, :add_partial_commentary_tag

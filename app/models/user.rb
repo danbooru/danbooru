@@ -2,8 +2,8 @@ require 'digest/sha1'
 require 'danbooru/has_bit_flags'
 
 class User < ApplicationRecord
-  class Error < Exception; end
-  class PrivilegeError < Exception; end
+  class Error < StandardError; end
+  class PrivilegeError < StandardError; end
 
   module Levels
     ANONYMOUS = 0

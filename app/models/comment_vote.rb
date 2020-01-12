@@ -1,5 +1,5 @@
 class CommentVote < ApplicationRecord
-  class Error < Exception; end
+  class Error < StandardError; end
 
   belongs_to :comment
   belongs_to :user
