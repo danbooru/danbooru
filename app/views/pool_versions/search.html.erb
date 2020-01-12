@@ -9,7 +9,6 @@
       <%= f.input :is_new, label: "New?", collection: [["Yes", true], ["No", false]], include_blank: true %>
       <%= f.input :name_changed, label: "Name changed?", collection: [["Yes", true], ["No", false]], include_blank: true %>
       <%= f.input :description_changed, label: "Description changed?", collection: [["Yes", true], ["No", false]], include_blank: true %>
-      <%= f.input :is_active, label: "Active?", collection: [["Yes", true], ["No", false]], include_blank: true %>
       <%= f.input :is_banned, label: "Deleted?", collection: [["Yes", true], ["No", false]], include_blank: true %>
       <%= f.submit "Search" %>
     <% end %>
