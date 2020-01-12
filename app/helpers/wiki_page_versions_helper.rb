@@ -1,4 +1,8 @@
 module WikiPageVersionsHelper
+  def wiki_page_versions_listing_type
+    params.dig(:search, :wiki_page_id).present? ? :page : :global
+  end
+
   def wiki_page_version_status_diff(wiki_page_version)
     cur = wiki_page_version
     prev = wiki_page_version.previous
