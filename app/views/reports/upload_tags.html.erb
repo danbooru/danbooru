@@ -12,7 +12,7 @@
         <%= TagSetPresenter.new(upload_report.uploader_tags_array).inline_tag_list_html %>
       <% end %>
       <% t.column "Tags added by uploader", width: "45%" do |upload_report| %>
-        <%= diff_to_current(upload_report) %>
+        <%= render "reports/tag_diff_list", added_tags: upload_report.added_tags_array, removed_tags: upload_report.removed_tags_array %>
       <% end %>
     <% end %>
 

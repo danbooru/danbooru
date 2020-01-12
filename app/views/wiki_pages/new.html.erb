@@ -19,8 +19,8 @@
     <%= dtext_preview_button "wiki_page", "body" %>
   <% end %>
 
-  <%= wiki_page_alias_and_implication_list(@wiki_page)%>
-  <%= wiki_page_post_previews(@wiki_page) %>
+  <%= render "tag_relationships/alias_and_implication_list", tag: @wiki_page.tag %>
+  <%= render "wiki_pages/posts", wiki_page: @wiki_page %>
 <% end %>
 
 <%= render "secondary_links" %>

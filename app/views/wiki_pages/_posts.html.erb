@@ -1,0 +1,7 @@
+<% if wiki_page.tag.present? && wiki_page.tag.post_count > 0 %>
+  <div id="wiki-page-posts">
+    <h2>Posts (<%= link_to "view all", posts_path(tags: wiki_page.title) %>)</h2>
+
+    <%= wiki_page.post_set.presenter.post_previews_html(self) %>
+  </div>
+<% end %>

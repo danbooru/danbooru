@@ -29,13 +29,13 @@
         <p><%= link_to "View artist", @wiki_page.artist %></p>
       <% end %>
 
-      <%= wiki_page_alias_and_implication_list(@wiki_page) %>
+      <%= render "tag_relationships/alias_and_implication_list", tag: @wiki_page.tag %>
     <% else %>
       <p>This artist has requested removal of their information.</p>
     <% end %>
   </div>
 
-  <%= wiki_page_post_previews(@wiki_page) %>
+  <%= render "wiki_pages/posts", wiki_page: @wiki_page %>
 <% end %>
 
 <% content_for(:page_title) do %>
