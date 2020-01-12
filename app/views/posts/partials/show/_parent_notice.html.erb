@@ -1,0 +1,14 @@
+This post belongs to a <%= link_to "parent", posts_path(tags: "parent:#{parent.id}") %> <% "(deleted)" if parent.is_deleted? %>
+
+<% children.length.tap do |children_count| %>
+  <% if children_count > 1 %>
+    and has <%= link_to pluralize(children_count - 1, "sibling"), posts_path(tags: "parent:#{parent.id}") %>
+  <% end %>
+<% end %>
+
+(<%= link_to_wiki "learn more", "help:post_relationships" %>)
+<%= link_to "« hide", "#", id: "has-parent-relationship-preview-link" %>
+
+<div id="has-parent-relationship-preview">
+  <%= post_previews_html([parent, *children], tags: "parent:#{parent.id}", show_deleted: true) %>
+</div>

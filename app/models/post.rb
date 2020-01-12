@@ -1239,10 +1239,6 @@ class Post < ApplicationRecord
       end
     end
 
-    def parent_exists?
-      Post.exists?(parent_id)
-    end
-
     def has_visible_children?
       return true if has_active_children?
       return true if has_children? && CurrentUser.user.show_deleted_children?

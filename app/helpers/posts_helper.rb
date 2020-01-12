@@ -1,4 +1,10 @@
 module PostsHelper
+  def post_previews_html(posts, **options)
+    posts.map do |post|
+      PostPresenter.preview(post, **options)
+    end.join("").html_safe
+  end
+
   def post_search_counts_enabled?
     Danbooru.config.enable_post_search_counts && Danbooru.config.reportbooru_server.present? && Danbooru.config.reportbooru_key.present?
   end
@@ -61,45 +67,6 @@ module PostsHelper
 
   def post_favlist(post)
     post.favorited_users.reverse_each.map {|user| link_to_user(user)}.join(", ").html_safe
-  end
-
-  def has_parent_message(post, parent_post_set)
-    html = ""
-
-    html << "This post belongs to a "
-    html << link_to("parent", posts_path(:tags => "parent:#{post.parent_id}"))
-    html << " (deleted)" if parent_post_set.parent.first.is_deleted?
-
-    sibling_count = parent_post_set.children.count - 1
-    if sibling_count > 0
-      html << " and has "
-      text = (sibling_count == 1) ? "a sibling" : "#{sibling_count} siblings"
-      html << link_to(text, posts_path(:tags => "parent:#{post.parent_id}"))
-    end
-
-    html << " (#{link_to_wiki "learn more", "help:post_relationships"}) "
-
-    html << link_to("&laquo; hide".html_safe, "#", :id => "has-parent-relationship-preview-link")
-
-    html.html_safe
-  end
-
-  def has_children_message(post, children_post_set)
-    html = ""
-
-    html << "This post has "
-    text = (children_post_set.children.count == 1) ? "a child" : "#{children_post_set.children.count} children"
-    html << link_to(text, posts_path(:tags => "parent:#{post.id}"))
-
-    html << " (#{link_to_wiki "learn more", "help:post_relationships"}) "
-
-    html << link_to("&laquo; hide".html_safe, "#", :id => "has-children-relationship-preview-link")
-
-    html.html_safe
-  end
-
-  def pool_link(pool)
-    render("posts/partials/show/pool_link", post: @post, pool: pool)
   end
 
   def is_pool_selected?(pool)
