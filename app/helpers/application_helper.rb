@@ -1,9 +1,9 @@
 require 'dtext'
 
 module ApplicationHelper
-  def diff_list_html(new, old, latest)
+  def diff_list_html(new, old, latest, ul_class: ["diff-list"], li_class: [])
     diff = SetDiff.new(new, old, latest)
-    render "diff_list", diff: diff
+    render "diff_list", diff: diff, ul_class: ul_class, li_class: li_class
   end
 
   def wordbreakify(string)

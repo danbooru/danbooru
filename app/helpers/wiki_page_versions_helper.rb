@@ -12,9 +12,12 @@ module WikiPageVersionsHelper
     status.join(" ")
   end
 
-  def wiki_other_names_diff(thispage, otherpage)
-    pattern = Regexp.new('\S+|\s+')
-    DiffBuilder.new("#{thispage.other_names}\n\n", "#{otherpage.other_names}\n\n", pattern).build
+  def wiki_other_names_diff(new_version, old_version)
+    new_names = new_version.other_names
+    old_names = old_version.other_names
+    latest_names = new_version.wiki_page.other_names
+
+    diff_list_html(new_names, old_names, latest_names, ul_class: ["wiki-other-names-diff-list list-inline"], li_class: ["wiki-other-name"])
   end
 
   def wiki_body_diff(thispage, otherpage)

@@ -6,9 +6,8 @@
   <% if @thispage.visible? %>
     <p>Showing differences between <%= compact_time @thispage.updated_at %> (<%= link_to_user @thispage.updater %>) and <%= compact_time @otherpage.updated_at %> (<%= link_to_user @otherpage.updater %>)</p>
 
-    <div>
-      <%= wiki_other_names_diff(@thispage, @otherpage) %>
-    </div>
+    <%= wiki_other_names_diff(@thispage, @otherpage) %>
+
     <div>
       <%= wiki_body_diff(@thispage, @otherpage) %>
     </div>
