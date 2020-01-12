@@ -19,10 +19,4 @@ class PoolElementsController < ApplicationController
     @pool.remove!(@post)
     respond_with(@pool, :location => post_path(@post))
   end
-
-  def all_select
-    @pools = Pool.undeleted.order("name").select("id, name")
-    @pools.each # hack to force rails to eager load
-    @pools
-  end
 end
