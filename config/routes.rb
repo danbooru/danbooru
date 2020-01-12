@@ -182,7 +182,7 @@ Rails.application.routes.draw do
     end
     resource :order, :only => [:edit], :controller => "pool_orders"
   end
-  resource :pool_element, :only => [:create, :destroy]
+  resource :pool_element, :only => [:create]
   resources :pool_versions, :only => [:index] do
     member do
       get :diff

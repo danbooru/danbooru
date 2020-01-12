@@ -31,27 +31,5 @@ class PoolElementsControllerTest < ActionDispatch::IntegrationTest
         assert_equal([@post.id], @pool.post_ids)
       end
     end
-
-    context "destroy action" do
-      setup do
-        as_user { @pool.add!(@post) }
-      end
-
-      should "remove a post from a pool" do
-        delete_auth pool_element_path, @user, params: {:pool_id => @pool.id, :post_id => @post.id, :format => "json"}
-        @pool.reload
-        assert_equal([], @pool.post_ids)
-      end
-
-      should "do nothing if the post is not a member of the pool" do
-        @pool.reload
-        as_user do
-          @pool.remove!(@post)
-        end
-        delete_auth pool_element_path, @user, params: {:pool_id => @pool.id, :post_id => @post.id, :format => "json"}
-        @pool.reload
-        assert_equal([], @pool.post_ids)
-      end
-    end
   end
 end

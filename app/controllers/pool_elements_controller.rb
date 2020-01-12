@@ -12,11 +12,4 @@ class PoolElementsController < ApplicationController
       @error = "That pool does not exist"
     end
   end
-
-  def destroy
-    @pool = Pool.find(params[:pool_id])
-    @post = Post.find(params[:post_id])
-    @pool.remove!(@post)
-    respond_with(@pool, :location => post_path(@post))
-  end
 end
