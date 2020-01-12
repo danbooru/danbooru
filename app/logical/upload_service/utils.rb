@@ -1,6 +1,7 @@
 class UploadService
   module Utils
     module_function
+
     class CorruptFileError < RuntimeError; end
 
     def file_header_to_file_ext(file)

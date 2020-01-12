@@ -371,7 +371,7 @@ class Artist < ApplicationRecord
       elsif wiki_page.nil?
         # if there are any notes, we need to create a new wiki page
         if @notes.present?
-          wp = create_wiki_page(body: @notes, title: name)
+          create_wiki_page(body: @notes, title: name)
         end
       elsif (!@notes.nil? && (wiki_page.body != @notes)) || wiki_page.title != name
         # if anything changed, we need to update the wiki page
@@ -402,10 +402,10 @@ class Artist < ApplicationRecord
     def unban!
       Post.transaction do
         CurrentUser.without_safe_mode do
-          ti = TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").first
+          ti = TagImplication.find_by(antecedent_name: name, consequent_name: "banned_artist")
           ti&.destroy
 
-          Post.tag_match(name).where("true /* Artist.unban */").each do |post|
+          Post.tag_match(name).find_each do |post|
             post.unban!
             fixed_tags = post.tag_string.sub(/(?:\A| )banned_artist(?:\Z| )/, " ").strip
             post.update(tag_string: fixed_tags)
@@ -420,9 +420,7 @@ class Artist < ApplicationRecord
     def ban!
       Post.transaction do
         CurrentUser.without_safe_mode do
-          Post.tag_match(name).where("true /* Artist.ban */").each do |post|
-            post.ban!
-          end
+          Post.tag_match(name).each(&:ban!)
 
           # potential race condition but unlikely
           unless TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").exists?

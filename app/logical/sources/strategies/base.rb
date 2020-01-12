@@ -240,11 +240,6 @@ module Sources
         self.class.to_dtext(artist_commentary_desc)
       end
 
-      # A strategy may return extra data unrelated to the file
-      def data
-        return {}
-      end
-
       # A search query that should return any posts that were previously
       # uploaded from the same source. These may be duplicates, or they may be
       # other posts from the same gallery.

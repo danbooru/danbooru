@@ -9,7 +9,7 @@ class TableBuilder
       @block = block
 
       @name = name || attribute
-      @name = @name.to_s.titleize unless @name.kind_of?(String)
+      @name = @name.to_s.titleize unless @name.is_a?(String)
 
       if @name.present?
         column_class = "#{@name.parameterize.dasherize}-column"
@@ -22,7 +22,7 @@ class TableBuilder
       if block.present?
         block.call(item, i, j, self)
         nil
-      elsif attribute.kind_of?(Symbol)
+      elsif attribute.is_a?(Symbol)
         item.send(attribute)
       else
         ""

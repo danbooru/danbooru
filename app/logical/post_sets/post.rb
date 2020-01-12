@@ -78,11 +78,11 @@ module PostSets
     end
 
     def hidden_posts
-      posts.reject { |p| p.visible? }
+      posts.reject(&:visible?)
     end
 
     def banned_posts
-      posts.select { |p| p.banblocked? }
+      posts.select(&:banblocked?)
     end
 
     def censored_posts

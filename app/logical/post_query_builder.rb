@@ -40,9 +40,7 @@ class PostQueryBuilder
   end
 
   def escape_string_for_tsquery(array)
-    array.map do |token|
-      token.to_escaped_for_tsquery
-    end
+    array.map(&:to_escaped_for_tsquery)
   end
 
   def add_tag_string_search_relation(tags, relation)
@@ -314,7 +312,7 @@ class PostQueryBuilder
         elsif flagger_id == "none"
           relation = relation.where('NOT EXISTS (' + PostFlag.unscoped.search(:category => "normal").where('post_id = posts.id').reorder('').select('1').to_sql + ')')
         elsif CurrentUser.can_view_flagger?(flagger_id)
-          post_ids = PostFlag.unscoped.search(:creator_id => flagger_id, :category => "normal").reorder("").select {|flag| flag.not_uploaded_by?(CurrentUser.id)}.map {|flag| flag.post_id}.uniq
+          post_ids = PostFlag.unscoped.search(creator_id: flagger_id, category: "normal").reorder("").select {|flag| flag.not_uploaded_by?(CurrentUser.id)}.map(&:post_id).uniq
           relation = relation.where("posts.id": post_ids)
         end
       end
