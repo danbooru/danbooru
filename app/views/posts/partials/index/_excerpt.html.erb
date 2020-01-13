@@ -28,7 +28,7 @@
           <p><%= wiki_page_other_names_list(wiki_page) %></p>
         <% end %>
 
-        <%= format_text(wiki_page.presenter.excerpt) %>
+        <%= format_text(wiki_page.body) %>
         <%= render "tag_relationships/alias_and_implication_list", tag: wiki_page.tag %>
 
         <p class="links">

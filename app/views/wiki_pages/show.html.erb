@@ -43,7 +43,7 @@
 <% end %>
 
 <% content_for(:html_header) do %>
-  <meta name="description" content="<%= strip_dtext(@wiki_page.presenter.excerpt) %>"></meta>
+  <%= tag.meta name: "description", content: wiki_page_excerpt(@wiki_page) %>
 <% end %>
 
 <%= render "secondary_links" %>
