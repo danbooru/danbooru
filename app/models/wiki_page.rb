@@ -237,10 +237,6 @@ class WikiPage < ApplicationRecord
     self.dtext_links = DtextLink.new_from_dtext(body)
   end
 
-  def presenter
-    @presenter ||= WikiPagePresenter.new(self)
-  end
-
   def tags
     titles = DText.parse_wiki_titles(body).uniq
     tags = Tag.nonempty.where(name: titles).pluck(:name)
