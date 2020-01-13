@@ -19,6 +19,7 @@ class StaticController < ApplicationController
   def sitemap
     @popular_search_service = PopularSearchService.new(Date.yesterday)
     @posts = Post.where("created_at > ?", 1.week.ago).order(score: :desc).limit(200)
+    @posts = @posts.select(&:visible?)
     render layout: false
   end
 end
