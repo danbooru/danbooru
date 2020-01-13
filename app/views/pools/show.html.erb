@@ -18,9 +18,7 @@
       <% if @pool.post_count == 0 %>
         <%= render "post_sets/blank" %>
       <% else %>
-        <% @posts.each do |post| %>
-          <%= PostPresenter.preview(post, pool_id: @pool.id) %>
-        <% end %>
+        <%= post_previews_html(@posts, pool_id: @pool.id) %>
 
         <%= numbered_paginator(@posts) %>
       <% end %>

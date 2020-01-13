@@ -31,7 +31,7 @@ class PoolsController < ApplicationController
     search = search_params.presence || ActionController::Parameters.new(category: "series")
 
     @pools = Pool.search(search).paginate(params[:page], limit: limit, search_count: params[:search])
-    @post_set = PostSets::PoolGallery.new(@pools)
+    respond_with(@pools)
   end
 
   def show

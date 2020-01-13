@@ -273,8 +273,8 @@ class Pool < ApplicationRecord
     post_ids[n]
   end
 
-  def cover_post_id
-    post_ids.first
+  def cover_post
+    post_count > 0 ? Post.find(post_ids.first) : nil
   end
 
   def create_version(updater: CurrentUser.user, updater_ip_addr: CurrentUser.ip_addr)
