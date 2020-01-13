@@ -3,13 +3,13 @@
     <%= table_for @note_versions, {class: "striped autofit", width: "100%"} do |t| %>
       <% t.column "Post", width: "5%" do |note_version| %>
         <%= link_to note_version.post_id, post_path(note_version.post_id) %>
-        <% if params.dig(:search, :note_id).present? %>
+        <% if !params.dig(:search, :post_id).present? %>
           <%= link_to "»", note_versions_path(search: {post_id: note_version.post_id}) %>
         <% end %>
       <% end %>
       <% t.column "Note", width: "5%" do |note_version| %>
         <%= link_to "#{note_version.note_id}.#{note_version.version}", post_path(note_version.post_id, anchor: "note-#{note_version.note_id}") %>
-        <% if params.dig(:search, :post_id).present? %>
+        <% if !params.dig(:search, :note_id).present? %>
           <%= link_to "»", note_versions_path(search: {note_id: note_version.note_id}) %>
         <% end %>
       <% end %>
