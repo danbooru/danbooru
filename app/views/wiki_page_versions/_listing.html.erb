@@ -1,15 +1,15 @@
 <div id="p-<%= wiki_page_versions_listing_type %>-listing">
   <%= form_tag(diff_wiki_page_versions_path, :method => :get) do %>
     <%= table_for @wiki_page_versions, width: "100%" do |t| %>
-      <% t.column width: "3%" do |wiki_page_version, i| %>
+      <% t.column column: "diff", width: "3%" do |wiki_page_version, i| %>
         <%= link_to_if wiki_page_version.previous.present?, "diff", diff_wiki_page_versions_path(otherpage: wiki_page_version.previous.try(:id), thispage: wiki_page_version.id) %>
       <% end %>
 
       <% if wiki_page_versions_listing_type == :page %>
-        <% t.column width: "2%" do |wiki_page_version, i| %>
+        <% t.column column: "this-page", width: "2%" do |wiki_page_version, i| %>
           <%= radio_button_tag "thispage", wiki_page_version.id, (i == 1) %>
         <% end %>
-        <% t.column width: "2%" do |wiki_page_version, i| %>
+        <% t.column column: "other-page", width: "2%" do |wiki_page_version, i| %>
           <%= radio_button_tag "otherpage", wiki_page_version.id, (i == 0) %>
         <% end %>
       <% end %>

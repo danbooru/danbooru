@@ -1,7 +1,7 @@
 <div id="p-<%= pool_versions_listing_type %>-listing">
 
     <%= table_for @pool_versions, {class: "striped autofit", width: "100%"} do |t| %>
-      <% t.column th: {width: "3%"} do |pool_version| %>
+      <% t.column column: "diff", width: "3%" do |pool_version| %>
         <%= link_to_if pool_version.previous.present?, "diff", diff_pool_version_path(pool_version.id) %>
       <% end %>
       <% t.column "Pool" do |pool_version| %>
@@ -27,7 +27,7 @@
         <%= compact_time pool_version.updated_at %>
       <% end %>
       <% if pool_versions_listing_type == :revert %>
-        <% t.column do |pool_version| %>
+        <% t.column column: "control" do |pool_version| %>
           <%= link_to "Revert to", revert_pool_path(pool_version.pool_id, :version_id => pool_version.id), :method => :put, :remote => true %>
         <% end %>
       <% end %>

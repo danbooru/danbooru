@@ -28,7 +28,7 @@
       <%= compact_time commentary_version.updated_at %>
     <% end %>
     <% if artist_commentary_versions_listing_type == :revert %>
-      <% t.column width: "7%" do |commentary_version| %>
+      <% t.column column: "control", width: "7%" do |commentary_version| %>
         <%= link_to "Revert to", revert_artist_commentary_path(commentary_version.post_id, :version_id => commentary_version.id), :remote => true, :method => :put, :data => {:confirm => "Are you sure you want to revert to this version?"} %>
       <% end %>
     <% end %>
