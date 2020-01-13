@@ -21,10 +21,10 @@
           <%= link_to "»", wiki_page_versions_path(search: { wiki_page_id: wiki_page_version.wiki_page_id }) %>
         </span>
       <% end %>
-      <% t.column "Status", {width: "5%"} do |wiki_page_version| %>
+      <% t.column "Status", width: "5%" do |wiki_page_version| %>
         <%= wiki_page_version_status_diff(wiki_page_version) %>
       <% end %>
-      <% t.column "Last edited", {width: "26%"} do |wiki_page_version| %>
+      <% t.column "Last edited", width: "26%" do |wiki_page_version| %>
         <%= compact_time(wiki_page_version.updated_at) %>
         by
         <%= link_to_user wiki_page_version.updater %>

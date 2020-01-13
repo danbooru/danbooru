@@ -1,7 +1,7 @@
 <div id="p-<%= artist_commentary_versions_listing_type %>-listing">
 
   <%= table_for @commentary_versions, {class: "striped autofit", width: "100%"} do |t| %>
-    <% t.column "Post", {width: "5%"} do |commentary_version| %>
+    <% t.column "Post", width: "5%" do |commentary_version| %>
       <% if artist_commentary_versions_listing_type == :revert %>
         <%= link_to commentary_version.post_id, post_path(commentary_version.post_id) %>
       <% else %>
@@ -21,10 +21,10 @@
       <%= format_commentary_title(commentary_version.translated_title) %>
       <%= format_commentary_description(commentary_version.translated_description) %>
     <% end %>
-    <% t.column "Edited by", {width: "10%"} do |commentary_version| %>
+    <% t.column "Edited by", width: "10%" do |commentary_version| %>
       <%= link_to_user commentary_version.updater %>
     <% end %>
-    <% t.column "Date", {width: "10%"} do |commentary_version| %>
+    <% t.column "Date", width: "10%" do |commentary_version| %>
       <%= compact_time commentary_version.updated_at %>
     <% end %>
     <% if artist_commentary_versions_listing_type == :revert %>

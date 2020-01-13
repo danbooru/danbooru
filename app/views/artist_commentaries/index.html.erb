@@ -5,7 +5,7 @@
     <%= render "posts/partials/common/inline_blacklist" %>
 
     <%= table_for @commentaries, width: "100%" do |t| %>
-      <% t.column "Post", {width: "1%"} do |commentary| %>
+      <% t.column "Post", width: "1%" do |commentary| %>
         <%= PostPresenter.preview(commentary.post, :tags => "status:any") %>
       <% end %>
       <% t.column "Original" do |commentary| %>
