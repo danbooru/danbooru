@@ -49,7 +49,6 @@ Rails.application.routes.draw do
         get :viewed
         get :searches
         get :missed_searches
-        get :intro
       end
     end
   end
@@ -399,8 +398,6 @@ Rails.application.routes.draw do
   get "/static/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
   get "/static/contact" => "static#contact", :as => "contact"
   get "/static/dtext_help" => "static#dtext_help", :as => "dtext_help"
-
-  get "/intro" => redirect("/explore/posts/intro")
 
   root :to => "posts#index"
 

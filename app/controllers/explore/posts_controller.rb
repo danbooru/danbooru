@@ -26,11 +26,6 @@ module Explore
       @search_service = MissedSearchService.new
     end
 
-    def intro
-      @presenter = IntroPresenter.new
-      render :layout => "blank"
-    end
-
     private
 
     def set_date
