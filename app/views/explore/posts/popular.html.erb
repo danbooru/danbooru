@@ -1,12 +1,26 @@
 <div id="c-explore-posts">
   <div id="a-popular">
-    <h1>Popular: <%= @post_set.presenter.range_text %></h1>
+    <h1>
+      Popular:
 
-    <%= @post_set.presenter.nav_links(self) %>
+      <% if @scale == "day" %>
+        <%= @date.strftime("%B %d, %Y") %>
+      <% elsif @scale == "week" %>
+        <%= @date.strftime("Week of %B %d, %Y") %>
+      <% elsif @scale == "month" %>
+        <%= @date.strftime("%B %Y") %>
+      <% end %>
+    </h1>
+
+    <p id="popular-nav-links">
+      <%= render "explore/posts/nav_links", date: @date, selected_scale: @scale, scale: "day" %>
+      <%= render "explore/posts/nav_links", date: @date, selected_scale: @scale, scale: "week" %>
+      <%= render "explore/posts/nav_links", date: @date, selected_scale: @scale, scale: "month" %>
+    </p>
 
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <%= @post_set.presenter.post_previews_html(self) %>
+    <%= post_previews_html(@posts) %>
   </div>
 </div>
 
@@ -17,5 +31,5 @@
 <% end %>
 
 <% content_for(:html_header) do %>
-  <meta name="description" content="The most popular posts per day">
+  <meta name="description" content="The most popular posts per <%= @scale %>">
 <% end %>
