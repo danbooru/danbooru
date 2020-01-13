@@ -237,10 +237,6 @@ class WikiPage < ApplicationRecord
     self.dtext_links = DtextLink.new_from_dtext(body)
   end
 
-  def post_set
-    @post_set ||= PostSets::WikiPage.new(title, 1, 4)
-  end
-
   def presenter
     @presenter ||= WikiPagePresenter.new(self)
   end
