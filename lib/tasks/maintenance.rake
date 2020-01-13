@@ -15,4 +15,9 @@ namespace :maintenance do
   task weekly: :environment do
     DanbooruMaintenance.weekly
   end
+
+  desc "Run monthly maintenance jobs"
+  task monthly: :environment do
+    DanbooruMaintenance.monthly
+  end
 end
