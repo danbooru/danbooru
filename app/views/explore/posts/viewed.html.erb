@@ -1,10 +1,10 @@
 <div id="c-explore-posts">
   <div id="a-viewed">
-    <h1>Most Viewed - <%= @post_set.presenter.date %></h1>
+    <h1>Most Viewed - <%= @date %></h1>
 
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <%= @post_set.presenter.post_previews_html(self) %>
+    <%= post_previews_html(@posts) %>
 
     <div class="paginator">
       <menu>

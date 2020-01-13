@@ -5,7 +5,7 @@ class PostViewCountService
 
   def initialize
     if !PostViewCountService.enabled?
-      raise NotImplementedError.new("the Reportbooru service isn't configured. Missed searches are not available.")
+      raise NotImplementedError.new("the Reportbooru service isn't configured. Post views are not available.")
     end
   end
 

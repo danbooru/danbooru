@@ -10,8 +10,7 @@ module Explore
     end
 
     def viewed
-      @post_set = PostSets::MostViewed.new(@date.to_s)
-      @posts = @post_set.posts
+      @posts = PostViewCountService.new.popular_posts(@date)
       respond_with(@posts)
     end
 
