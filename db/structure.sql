@@ -3021,7 +3021,13 @@ CREATE TABLE public.uploads (
     artist_commentary_title text,
     include_artist_commentary boolean,
     context text,
-    referer_url text
+    referer_url text,
+    translated_commentary_title text,
+    translated_commentary_desc text,
+    add_commentary_tag boolean,
+    add_commentary_request_tag boolean,
+    add_commentary_check_tag boolean,
+    add_partial_commentary_tag boolean
 );
 
 
@@ -7397,6 +7403,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20191117081229'),
 ('20191117200404'),
 ('20191119061018'),
-('20191223032633');
+('20191223032633'),
+('20200114204550');
 
 
