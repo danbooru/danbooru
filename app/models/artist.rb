@@ -109,6 +109,7 @@ class Artist < ApplicationRecord
         "pixiv.cc", # http://pixiv.cc/0123456789/
         "pixiv.net", # https://www.pixiv.net/member.php?id=10442390
         "pixiv.net/stacc", # https://www.pixiv.net/stacc/aaaninja2013
+        "pixiv.net/fanbox/creator", # https://www.pixiv.net/fanbox/creator/310630
         "pixiv.net/users", # https://www.pixiv.net/users/555603
         "pixiv.net/en/users", # https://www.pixiv.net/en/users/555603
         "i.pximg.net",
