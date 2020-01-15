@@ -21,15 +21,7 @@ class FavoriteGroupsController < ApplicationController
 
   def create
     @favorite_group = FavoriteGroup.create(favgroup_params)
-    respond_with(@favorite_group) do |format|
-      format.html do
-        if @favorite_group.errors.any?
-          render :action => "new"
-        else
-          redirect_to favorite_groups_path
-        end
-      end
-    end
+    respond_with(@favorite_group)
   end
 
   def edit
