@@ -1,15 +1,13 @@
-require 'ostruct'
-
 class FavoriteGroup < ApplicationRecord
   validates_uniqueness_of :name, :case_sensitive => false, :scope => :creator_id
   validates_format_of :name, :with => /\A[^,]+\Z/, :message => "cannot have commas"
   belongs_to_creator
-  before_validation :normalize_post_ids
   before_validation :normalize_name
   before_validation :strip_name
   validate :creator_can_create_favorite_groups, :on => :create
   validate :validate_number_of_posts
-  before_save :update_post_count
+
+  array_attribute :post_ids, parse: /\d+/, cast: :to_i
 
   module SearchMethods
     def for_creator(user_id)
@@ -17,8 +15,7 @@ class FavoriteGroup < ApplicationRecord
     end
 
     def for_post(post_id)
-      regexp = "(^#{post_id}$|^#{post_id} | #{post_id}$| #{post_id} )"
-      where("favorite_groups.post_ids ~ ?", regexp)
+      where_array_includes_any(:post_ids, [post_id])
     end
 
     def named(name)
@@ -47,7 +44,7 @@ class FavoriteGroup < ApplicationRecord
 
     def search(params)
       q = super
-      q = q.search_attributes(params, :name, :is_public, :post_count)
+      q = q.search_attributes(params, :name, :is_public, :post_ids)
 
       if params[:creator_id].present?
         user = User.find(params[:creator_id])
@@ -91,13 +88,9 @@ class FavoriteGroup < ApplicationRecord
   end
 
   def validate_number_of_posts
-    if post_id_array.size > 10_000
-      self.errors.add(:base, "Favorite groups can have up to 10,000 posts each")
+    if post_count > 10_000
+      errors[:base] << "Favorite groups can have up to 10,000 posts each"
     end
-  end
-
-  def normalize_post_ids
-    self.post_ids = post_ids.scan(/\d+/).uniq.join(" ")
   end
 
   def self.normalize_name(name)
@@ -126,94 +119,49 @@ class FavoriteGroup < ApplicationRecord
     name.tr("_", " ")
   end
 
-  def posts(options = {})
-    offset = options[:offset] || 0
-    limit = options[:limit] || Danbooru.config.posts_per_page
-    slice = post_id_array.slice(offset, limit)
-    if slice&.any?
-      slice.map do |id|
-        Post.find(id)
-      rescue ActiveRecord::RecordNotFound
-        # swallow
-      end.compact
-    else
-      []
-    end
+  def posts
+    favgroup_posts = FavoriteGroup.where(id: id).joins("CROSS JOIN unnest(favorite_groups.post_ids) WITH ORDINALITY AS row(post_id, favgroup_index)").select(:post_id, :favgroup_index)
+    posts = Post.joins("JOIN (#{favgroup_posts.to_sql}) favgroup_posts ON favgroup_posts.post_id = posts.id").order("favgroup_posts.favgroup_index ASC")
   end
 
-  def post_id_array
-    @post_id_array ||= post_ids.scan(/\d+/).map(&:to_i)
-  end
-
-  def post_id_array=(array)
-    self.post_ids = array.join(" ")
-    clear_post_id_array
-  end
-
-  def post_id_array_was
-    @post_id_array_was ||= post_ids_was.scan(/\d+/).map(&:to_i)
-  end
-
-  def clear_post_id_array
-    @post_id_array = nil
-    @post_id_array_was = nil
-  end
-
-  def update_post_count
-    normalize_post_ids
-    clear_post_id_array
-    self.post_count = post_id_array.size
-  end
-
-  def add!(post_id)
+  def add!(post)
     with_lock do
-      post_id = post_id.id if post_id.is_a?(Post)
-      return if contains?(post_id)
-
-      clear_post_id_array
-      update(post_ids: add_number_to_string(post_id, post_ids))
+      return if contains?(post.id)
+      update!(post_ids: post_ids + [post.id])
     end
   end
 
-  def remove!(post_id)
+  def remove!(post)
     with_lock do
-      post_id = post_id.id if post_id.is_a?(Post)
-      return unless contains?(post_id)
-
-      clear_post_id_array
-      update(post_ids: remove_number_from_string(post_id, post_ids))
+      return unless contains?(post.id)
+      update!(post_ids: post_ids - [post.id])
     end
   end
 
-  def add_number_to_string(number, string)
-    "#{string} #{number}"
+  def post_count
+    post_ids.size
   end
 
-  def remove_number_from_string(number, string)
-    string.gsub(/(?:\A| )#{number}(?:\Z| )/, " ")
+  def first_post?(post_id)
+    post_id == post_ids.first
   end
 
-  def neighbors(post)
-    @neighbor_posts ||= begin
-      post_ids =~ /\A#{post.id} (\d+)|(\d+) #{post.id} (\d+)|(\d+) #{post.id}\Z/
-
-      if $2 && $3
-        OpenStruct.new(:previous => $2.to_i, :next => $3.to_i)
-      elsif $1
-        OpenStruct.new(:next => $1.to_i)
-      elsif $4
-        OpenStruct.new(:previous => $4.to_i)
-      else
-        OpenStruct.new
-      end
-    end
+  def last_post?(post_id)
+    post_id == post_ids.last
   end
 
-  def reload(options = {})
-    super
-    @neighbor_posts = nil
-    clear_post_id_array
-    self
+  def previous_post_id(post_id)
+    return nil if first_post?(post_id) || !contains?(post_id)
+
+    n = post_ids.index(post_id) - 1
+    post_ids[n]
+  end
+
+  def next_post_id(post_id)
+    return nil if last_post?(post_id) || !contains?(post_id)
+
+    n = post_ids.index(post_id) + 1
+    post_ids[n]
   end
 
   def last_page
@@ -221,7 +169,7 @@ class FavoriteGroup < ApplicationRecord
   end
 
   def contains?(post_id)
-    post_ids =~ /(?:\A| )#{post_id}(?:\Z| )/
+    post_ids.include?(post_id)
   end
 
   def editable_by?(user)

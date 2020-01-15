@@ -450,24 +450,12 @@ class PostQueryBuilder
       relation = relation.joins("JOIN (#{pool_posts.to_sql}) pool_posts ON pool_posts.post_id = posts.id").order("pool_posts.pool_index ASC")
     end
 
-    if q[:favgroups_neg].present?
-      q[:favgroups_neg].each do |favgroup_rec|
-        favgroup_id = favgroup_rec.to_i
-        favgroup = FavoriteGroup.where("favorite_groups.id = ?", favgroup_id).first
-        if favgroup
-          relation = relation.where.not("posts.id": favgroup.post_id_array)
-        end
-      end
+    q[:favgroups_neg].to_a.each do |favgroup|
+      relation = relation.where.not("posts.id": favgroup.post_ids)
     end
 
-    if q[:favgroups].present?
-      q[:favgroups].each do |favgroup_rec|
-        favgroup_id = favgroup_rec.to_i
-        favgroup = FavoriteGroup.where("favorite_groups.id = ?", favgroup_id).first
-        if favgroup
-          relation = relation.where("posts.id": favgroup.post_id_array)
-        end
-      end
+    q[:favgroups].to_a.each do |favgroup|
+      relation = relation.where("posts.id": favgroup.post_ids)
     end
 
     if q[:upvote].present?

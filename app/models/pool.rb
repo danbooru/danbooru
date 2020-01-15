@@ -34,15 +34,6 @@ class Pool < ApplicationRecord
       where("pools.category = ?", "collection")
     end
 
-    def series_first
-      order(Arel.sql("(case pools.category when 'series' then 0 else 1 end), pools.name"))
-    end
-
-    def selected_first(current_pool_id)
-      return all if current_pool_id.blank?
-      reorder(Arel.sql("(case pools.id when #{current_pool_id.to_i} then 0 else 1 end), pools.name"))
-    end
-
     def name_matches(name)
       name = normalize_name_for_search(name)
       name = "*#{name}*" unless name =~ /\*/

@@ -602,7 +602,7 @@ class Tag < ApplicationRecord
             end
 
             q[:favgroups_neg] ||= []
-            q[:favgroups_neg] << favgroup_id
+            q[:favgroups_neg] << favgroup
 
           when "favgroup"
             favgroup_id = FavoriteGroup.name_to_id(g2)
@@ -613,7 +613,7 @@ class Tag < ApplicationRecord
             end
 
             q[:favgroups] ||= []
-            q[:favgroups] << favgroup_id
+            q[:favgroups] << favgroup
 
           when "-fav"
             favuser = User.find_by_name(g2)

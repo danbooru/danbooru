@@ -173,7 +173,7 @@ class PostPresenter < Presenter
   end
 
   def has_nav_links?(template)
-    has_sequential_navigation?(template.params) || @post.pools.undeleted.any? || @post.favorite_groups(active_id = template.params[:favgroup_id]).any?
+    has_sequential_navigation?(template.params) || @post.pools.undeleted.any? || CurrentUser.favorite_groups.for_post(@post.id).any?
   end
 
   def has_sequential_navigation?(params)

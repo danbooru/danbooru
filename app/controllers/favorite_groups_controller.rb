@@ -8,9 +8,12 @@ class FavoriteGroupsController < ApplicationController
   end
 
   def show
+    limit = params[:limit].presence || CurrentUser.user.per_page
+
     @current_item = @favorite_group = FavoriteGroup.find(params[:id])
     check_read_privilege(@favorite_group)
-    @post_set = PostSets::FavoriteGroup.new(@favorite_group, params[:page])
+    @posts = @favorite_group.posts.paginate(params[:page], limit: limit, count: @favorite_group.post_count)
+
     respond_with(@favorite_group)
   end
 
@@ -52,7 +55,7 @@ class FavoriteGroupsController < ApplicationController
     @favorite_group = FavoriteGroup.find(params[:id])
     check_write_privilege(@favorite_group)
     @post = Post.find(params[:post_id])
-    @favorite_group.add!(@post.id)
+    @favorite_group.add!(@post)
   end
 
   private
@@ -66,6 +69,6 @@ class FavoriteGroupsController < ApplicationController
   end
 
   def favgroup_params
-    params.fetch(:favorite_group, {}).permit(%i[name post_ids is_public], post_id_array: [])
+    params.fetch(:favorite_group, {}).permit(%i[name post_ids post_ids_string is_public], post_ids: [])
   end
 end

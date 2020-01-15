@@ -1,4 +1,4 @@
-<%= content_tag :li, id: "nav-link-for-pool-#{pool.id}", class: "pool-category-#{pool.category} pool-selected-#{selected}" do -%>
+<%= tag.li id: "nav-link-for-pool-#{pool.id}", class: "pool-category-#{pool.category}", "data-selected": selected do -%>
   <% if !pool.first_post?(post.id) && pool.post_ids.first -%>
     <%= link_to("&laquo;".html_safe, post_path(pool.post_ids.first, pool_id: pool.id), class: "first", title: "to page 1") %>
   <% else -%>

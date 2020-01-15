@@ -921,8 +921,7 @@ CREATE TABLE public.favorite_groups (
     id integer NOT NULL,
     name text NOT NULL,
     creator_id integer NOT NULL,
-    post_ids text DEFAULT ''::text NOT NULL,
-    post_count integer DEFAULT 0 NOT NULL,
+    post_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     is_public boolean DEFAULT false NOT NULL
@@ -4976,6 +4975,13 @@ CREATE INDEX index_favorite_groups_on_lower_name ON public.favorite_groups USING
 
 
 --
+-- Name: index_favorite_groups_on_post_ids; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_favorite_groups_on_post_ids ON public.favorite_groups USING gin (post_ids);
+
+
+--
 -- Name: index_favorites_0_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7400,6 +7406,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20191117200404'),
 ('20191119061018'),
 ('20191223032633'),
-('20200114204550');
+('20200114204550'),
+('20200115010442');
 
 

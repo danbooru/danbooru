@@ -822,19 +822,19 @@ class Post < ApplicationRecord
 
         when /^-favgroup:(\d+)$/i
           favgroup = FavoriteGroup.where("id = ?", $1.to_i).for_creator(CurrentUser.user.id).first
-          favgroup&.remove!(id)
+          favgroup&.remove!(self)
 
         when /^-favgroup:(.+)$/i
           favgroup = FavoriteGroup.named($1).for_creator(CurrentUser.user.id).first
-          favgroup&.remove!(id)
+          favgroup&.remove!(self)
 
         when /^favgroup:(\d+)$/i
           favgroup = FavoriteGroup.where("id = ?", $1.to_i).for_creator(CurrentUser.user.id).first
-          favgroup&.add!(id)
+          favgroup&.add!(self)
 
         when /^favgroup:(.+)$/i
           favgroup = FavoriteGroup.named($1).for_creator(CurrentUser.user.id).first
-          favgroup&.add!(id)
+          favgroup&.add!(self)
 
         end
       end
@@ -962,21 +962,8 @@ class Post < ApplicationRecord
       ordered_users
     end
 
-    def favorite_groups(active_id = nil)
-      @favorite_groups ||= begin
-        groups = []
-
-        if active_id.present?
-          active_group = FavoriteGroup.where(:id => active_id.to_i).first
-          groups << active_group if active_group&.contains?(self.id)
-        end
-
-        groups += CurrentUser.user.favorite_groups.select do |favgroup|
-          favgroup.contains?(self.id)
-        end
-
-        groups.uniq
-      end
+    def favorite_groups
+      FavoriteGroup.for_post(id)
     end
 
     def remove_from_favorites
@@ -988,7 +975,7 @@ class Post < ApplicationRecord
 
     def remove_from_fav_groups
       FavoriteGroup.for_post(id).find_each do |favgroup|
-        favgroup.remove!(id)
+        favgroup.remove!(self)
       end
     end
   end
@@ -1008,7 +995,7 @@ class Post < ApplicationRecord
 
   module PoolMethods
     def pools
-      Pool.where("pools.post_ids && array[?]", id).series_first
+      Pool.where("pools.post_ids && array[?]", id)
     end
 
     def has_active_pools?
@@ -1804,7 +1791,6 @@ class Post < ApplicationRecord
     super
     reset_tag_array_cache
     @pools = nil
-    @favorite_groups = nil
     @tag_categories = nil
     @typed_tags = nil
     self
