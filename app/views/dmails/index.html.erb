@@ -22,7 +22,7 @@
         <% end %>
       <% end %>
       <% t.column "To" do |dmail| %>
-        <%= link_to_user dmail.from %>
+        <%= link_to_user dmail.to %>
       <% end %>
       <% t.column "Subject" do |dmail| %>
         <% if dmail.filtered? %>
