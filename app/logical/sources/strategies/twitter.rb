@@ -80,8 +80,10 @@ module Sources::Strategies
     end
 
     def preview_urls
-      image_urls.map do |x|
-        x.sub(%r!\.(jpg|jpeg|png|gif)(?::orig)?\z!i, '.\1:small')
+      return image_urls if api_response.blank?
+
+      api_response.dig(:extended_entities, :media).to_a.map do |media|
+        media[:media_url_https] + ":small"
       end
     end
 
