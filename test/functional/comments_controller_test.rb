@@ -220,6 +220,18 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(false, @comment.reload.is_deleted)
         assert_redirected_to(@comment)
       end
+
+      should "not allow undeleting comments deleted by a moderator" do
+        @comment = create(:comment, post: @post)
+
+        delete_auth comment_path(@comment.id), @mod
+        assert_redirected_to @comment
+        assert(@comment.reload.is_deleted?)
+
+        post_auth undelete_comment_path(@comment.id), @user
+        assert_response 403
+        assert(@comment.reload.is_deleted?)
+      end
     end
   end
 end
