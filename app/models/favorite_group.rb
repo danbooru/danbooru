@@ -6,6 +6,7 @@ class FavoriteGroup < ApplicationRecord
   before_validation :strip_name
   validate :creator_can_create_favorite_groups, :on => :create
   validate :validate_number_of_posts
+  validate :validate_posts
 
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
 
@@ -93,6 +94,21 @@ class FavoriteGroup < ApplicationRecord
     end
   end
 
+  def validate_posts
+    added_post_ids = post_ids - post_ids_was
+    existing_post_ids = Post.where(id: added_post_ids).pluck(:id)
+    nonexisting_post_ids = added_post_ids - existing_post_ids
+
+    if nonexisting_post_ids.present?
+      errors[:base] << "Cannot add invalid post(s) to favgroup: #{nonexisting_post_ids.to_sentence}"
+    end
+
+    duplicate_post_ids = post_ids.group_by(&:itself).transform_values(&:size).select { |id, count| count > 1 }.keys
+    if duplicate_post_ids.present?
+      errors[:base] << "Favgroup already contains post #{duplicate_post_ids.to_sentence}"
+    end
+  end
+
   def self.normalize_name(name)
     name.gsub(/[[:space:]]+/, "_")
   end
@@ -126,14 +142,12 @@ class FavoriteGroup < ApplicationRecord
 
   def add!(post)
     with_lock do
-      return if contains?(post.id)
       update!(post_ids: post_ids + [post.id])
     end
   end
 
   def remove!(post)
     with_lock do
-      return unless contains?(post.id)
       update!(post_ids: post_ids - [post.id])
     end
   end
