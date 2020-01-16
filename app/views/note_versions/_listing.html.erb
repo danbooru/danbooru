@@ -24,11 +24,6 @@
       <% t.column "Position", {width: "5%"} do |note_version| %>
         <%= note_version_position_diff(note_version) %>
       <% end %>
-      <% if CurrentUser.is_moderator? %>
-        <% t.column "IP Address", {width: "10%"} do |note_version| %>
-          <%= link_to_ip note_version.updater_ip_addr %>
-        <% end %>
-      <% end %>
       <% t.column "Edited By", {width: "10%"} do |note_version| %>
         <%= link_to_user note_version.updater %>
       <% end %>

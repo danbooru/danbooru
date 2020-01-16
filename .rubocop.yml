@@ -37,6 +37,9 @@ Layout/SpaceInsideBlockBraces:
 Layout/SpaceInsideHashLiteralBraces:
   Enabled: false
 
+Lint/InheritException:
+  EnforcedStyle: standard_error
+
 Naming/MethodParameterName:
   Enabled: false
 

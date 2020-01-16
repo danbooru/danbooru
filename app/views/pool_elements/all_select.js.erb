@@ -1,2 +1,0 @@
-$("#pool-name-container").html(<%= raw select_tag("pool_id", options_for_select(@pools.map {|x| [x.name, x.id]})).to_json %>);
-$("#pool-name-hint").hide();

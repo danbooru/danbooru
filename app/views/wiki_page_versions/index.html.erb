@@ -3,11 +3,7 @@
 <% content_for(:content) do %>
   <h1>Wiki Page History</h1>
 
-  <% if params.dig(:search, :wiki_page_id).present? %>
-    <%= render "page_listing" %>
-  <% else %>
-    <%= render "global_listing" %>
-  <% end %>
+  <%= render "listing" %>
 
   <%= numbered_paginator(@wiki_page_versions) %>
 <% end %>

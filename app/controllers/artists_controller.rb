@@ -44,7 +44,6 @@ class ArtistsController < ApplicationController
 
   def show
     @current_item = @artist = Artist.find(params[:id])
-    @post_set = PostSets::Artist.new(@artist)
     respond_with(@artist)
   end
 
@@ -80,7 +79,6 @@ class ArtistsController < ApplicationController
       redirect_to artist_path(@artist)
     else
       @artist = Artist.new(name: params[:name])
-      @post_set = PostSets::Artist.new(@artist)
       respond_with(@artist)
     end
   end

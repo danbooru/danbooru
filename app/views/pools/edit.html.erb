@@ -1,6 +1,6 @@
 <div id="c-pools">
   <div id="a-edit">
-    <%= simple_form_for(@pool) do |f| %>
+    <%= edit_form_for(@pool) do |f| %>
       <h1>Edit Pool: <%= @pool.pretty_name %></h1>
 
       <%= error_messages_for "pool" %>
@@ -10,7 +10,6 @@
       <%= dtext_preview_button "pool", "description" %>
       <%= f.input :post_ids_string, as: :text, label: "Posts" %>
       <%= f.input :category, :collection => ["series", "collection"], :include_blank => false %>
-      <%= f.input :is_active %>
       <%= f.button :submit %>
     <% end %>
   </div>

@@ -51,24 +51,6 @@ class PostFlagTest < ActiveSupport::TestCase
         assert_equal(["have already flagged this post"], @post_flag.errors[:creator_id])
       end
 
-      should "not be able to target a single uploader" do
-        travel_to(2.weeks.ago) do
-          as(@alice) do
-            @posts = FactoryBot.create_list(:post, 10, uploader: @alice)
-          end
-        end
-
-        as(@bob) do
-          travel_to(1.week.ago) do
-            @flags = @posts.map {|x| PostFlag.create(reason: "bad #{x.id}", post: x)}
-          end
-
-          @bad_flag = PostFlag.create(post: @post, reason: "bad #{@post.id}")
-        end
-
-        assert_equal(["You cannot flag posts uploaded by this user"], @bad_flag.errors.full_messages)
-      end
-
       should "not be able to flag more than 10 posts in 24 hours" do
         as(@bob) do
           @post_flag = PostFlag.new(post: @post, reason: "aaa", is_resolved: false)

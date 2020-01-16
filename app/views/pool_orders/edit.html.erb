@@ -2,7 +2,7 @@
   <div id="a-edit">
     <h1>Order Pool: <%= @pool.pretty_name %></h1>
 
-    <%= simple_form_for(@pool, format: :js, html: { id: "ordering-form" }) do |f| %>
+    <%= edit_form_for(@pool, format: :js, html: { id: "ordering-form" }) do |f| %>
       <% if @pool.post_count <= Pool::POOL_ORDER_LIMIT %>
         <p>Drag and drop the list below to determine ordering.</p>
 

@@ -21,11 +21,6 @@
       <%= format_commentary_title(commentary_version.translated_title) %>
       <%= format_commentary_description(commentary_version.translated_description) %>
     <% end %>
-    <% if CurrentUser.is_moderator? %>
-      <% t.column "IP Address", {width: "10%"} do |commentary_version| %>
-        <%= link_to_ip commentary_version.updater_ip_addr %>
-      <% end %>
-    <% end %>
     <% t.column "Edited by", {width: "10%"} do |commentary_version| %>
       <%= link_to_user commentary_version.updater %>
     <% end %>

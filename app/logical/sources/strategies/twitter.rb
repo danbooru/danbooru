@@ -21,6 +21,7 @@ module Sources::Strategies
     # the pattern to avoid creating empty strings.
     COMMON_TAG_REGEXES = [
       /(?<!\A)生誕祭(?:\d*)\z/,
+      /(?<!\A)誕生祭(?:\d*)\z/,
       /(?<!\A)版もうひとつの深夜の真剣お絵描き60分一本勝負(?:_\d+)?\z/,
       /(?<!\A)版深夜の真剣お絵描き60分一本勝負(?:_\d+)?\z/,
       /(?<!\A)深夜の真剣お絵描き60分一本勝負(?:_\d+)?\z/,
@@ -79,8 +80,10 @@ module Sources::Strategies
     end
 
     def preview_urls
-      image_urls.map do |x|
-        x.sub(%r!\.(jpg|jpeg|png|gif)(?::orig)?\z!i, '.\1:small')
+      return image_urls if api_response.blank?
+
+      api_response.dig(:extended_entities, :media).to_a.map do |media|
+        media[:media_url_https] + ":small"
       end
     end
 
@@ -138,8 +141,9 @@ module Sources::Strategies
 
     def normalize_tag(tag)
       COMMON_TAG_REGEXES.each do |rg|
-        if tag.match(rg)
-          return tag.gsub(rg,"")
+        norm_tag = tag.gsub(rg, "")
+        if norm_tag != tag
+          return norm_tag
         end
       end
       tag

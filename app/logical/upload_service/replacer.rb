@@ -1,7 +1,7 @@
 class UploadService
   class Replacer
     extend Memoist
-    class Error < Exception; end
+    class Error < StandardError; end
 
     attr_reader :post, :replacement
 

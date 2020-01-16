@@ -23,8 +23,11 @@ module DanbooruMaintenance
 
   def weekly
     safely { UserPasswordResetNonce.prune! }
-    safely { ApproverPruner.prune! }
     safely { TagRelationshipRetirementService.find_and_retire! }
+  end
+
+  def monthly
+    safely { ApproverPruner.prune! }
   end
 
   def regenerate_post_counts!

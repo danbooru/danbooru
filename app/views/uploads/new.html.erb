@@ -17,7 +17,7 @@
 
       <div id="client-errors" class="error-messages ui-state-error ui-corner-all" style="display:none"></div>
 
-      <%= simple_form_for(@upload, html: { id: "form" }) do |f| %>
+      <%= edit_form_for(@upload, html: { id: "form" }) do |f| %>
         <%= f.input :md5_confirmation, as: :hidden %>
         <%= f.input :referer_url, as: :hidden, input_html: { value: params[:ref] } %>
 

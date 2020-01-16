@@ -1,12 +1,22 @@
-<p>Select a favorite group to add this post to:</p>
+<% if CurrentUser.favorite_groups.empty? %>
+  <p>Add this post to a new a favorite group (<%= link_to_wiki "help:favorite_groups" %>):</p>
 
-<% CurrentUser.favorite_groups.each_with_index do |favgroup, i| %>
-  <div>
-    <%= i + 1 %>.
-    <%= link_to favgroup.name,
-      add_post_favorite_group_path(favgroup, :post_id => post.id, :format => :js),
-      :id => "add-to-favgroup-#{i + 1}", :class => "add-to-favgroup",
-      :method => :put, :remote => true,
-      :"data-shortcut" => (i + 1) % 10, :"data-shortcut-when" => ":visible" %>
-  </div>
+  <%= edit_form_for(FavoriteGroup.new, html: { class: "one-line-form" }) do |f| %>
+    <%= f.input :name, as: :string, required: true, input_html: { style: "width: 20em" } %>
+    <%= f.input :post_ids, as: :hidden, input_html: { value: post.id } %>
+    <%= f.submit "Create" %>
+  <% end %>
+<% else %>
+  <p>Select a favorite group to add this post to (<%= link_to_wiki "help:favorite_groups" %>):</p>
+
+  <% CurrentUser.favorite_groups.each_with_index do |favgroup, i| %>
+    <div>
+      <%= i + 1 %>.
+      <%= link_to favgroup.name,
+        add_post_favorite_group_path(favgroup, post_id: post.id, format: :js),
+        id: "add-to-favgroup-#{i + 1}", class: "add-to-favgroup", method: :put,
+        remote: true, "data-shortcut": (i + 1) % 10, "data-shortcut-when": ":visible"
+      %>
+    </div>
+  <% end %>
 <% end %>

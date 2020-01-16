@@ -1,5 +1,5 @@
 class Pool < ApplicationRecord
-  class RevertError < Exception; end
+  class RevertError < StandardError; end
   POOL_ORDER_LIMIT = 1000
 
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
@@ -62,7 +62,7 @@ class Pool < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :creator, :is_active, :is_deleted, :name, :description, :post_ids)
+      q = q.search_attributes(params, :creator, :is_deleted, :name, :description, :post_ids)
       q = q.text_attribute_matches(:description, params[:description_matches])
 
       if params[:post_tags_match]
@@ -273,8 +273,8 @@ class Pool < ApplicationRecord
     post_ids[n]
   end
 
-  def cover_post_id
-    post_ids.first
+  def cover_post
+    post_count > 0 ? Post.find(post_ids.first) : nil
   end
 
   def create_version(updater: CurrentUser.user, updater_ip_addr: CurrentUser.ip_addr)

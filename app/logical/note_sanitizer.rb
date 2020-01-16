@@ -84,7 +84,7 @@ module NoteSanitizer
 
     url = Addressable::URI.heuristic_parse(node["href"]).normalize
 
-    if url.authority.in?(Danbooru.config.hostnames)
+    if url.authority == Danbooru.config.hostname
       url.site = nil
       node["href"] = url.to_s
     end

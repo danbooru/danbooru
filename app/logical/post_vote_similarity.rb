@@ -11,8 +11,8 @@ class PostVoteSimilarity
       @score = score
     end
 
-    def <=>(rhs)
-      score <=> rhs.score
+    def <=>(other)
+      score <=> other.score
     end
   end
 

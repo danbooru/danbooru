@@ -20,5 +20,11 @@ class WikiPageVersionsController < ApplicationController
 
     @thispage = WikiPageVersion.find(params[:thispage])
     @otherpage = WikiPageVersion.find(params[:otherpage])
+
+    if @thispage.id < @otherpage.id
+      @thispage, @otherpage = @otherpage, @thispage
+    end
+
+    respond_with([@thispage, @otherpage])
   end
 end

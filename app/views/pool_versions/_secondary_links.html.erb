@@ -1,0 +1,5 @@
+<% content_for(:secondary_links) do %>
+  <%= quick_search_form_for(:name_matches, pool_versions_path, "pools", autocomplete: "pool") %>
+  <%= subnav_link_to "Listing", pool_versions_path %>
+  <%= subnav_link_to "Search", search_pool_versions_path %>
+<% end %>

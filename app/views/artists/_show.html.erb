@@ -12,15 +12,17 @@
 
     <%= yield %>
 
-    <div class="recent-posts">
-      <h2>Recent Posts</h2>
+    <% if @artist.tag.present? && @artist.tag.post_count > 0 %>
+      <div class="recent-posts">
+        <h2>Recent Posts <%= link_to "»", posts_path(tags: @artist.name) %></h2>
 
-      <%= render "posts/partials/common/inline_blacklist" %>
+        <%= render "posts/partials/common/inline_blacklist" %>
 
-      <div>
-        <%= @post_set.presenter.post_previews_html(self) %>
+        <div>
+          <%= post_previews_html(@artist.tag.posts.limit(8), tags: @artist.name) %>
+        </div>
       </div>
-    </div>
+    <% end %>
   </div>
 </div>
 

@@ -10,90 +10,36 @@
   </div>
 </form>
 
-<%= form_tag(create_or_update_artist_commentaries_path(:format => :js), :remote => true, :id => "edit-commentary", :class => "simple_form", :method => :put) do %>
-  <%= hidden_field :artist_commentary, :post_id, :value => post.id %>
+<%= edit_form_for(artist_commentary, url: create_or_update_artist_commentaries_path(format: :js), remote: true, method: :put, html: { id: "edit-commentary" }) do |f| %>
+  <%= f.input :post_id, as: :hidden, input_html: { value: post.id } %>
 
-  <div class="input">
-    <label for="artist_commentary_original_title">Original title</label>
-    <%= text_field :artist_commentary, :original_title, :value => post.artist_commentary.try(:original_title) %>
-  </div>
+  <%= f.input :original_title, as: :string, input_html: { value: artist_commentary.try(:original_title) } %>
+  <%= f.input :original_description, input_html: { size: "40x6", value: artist_commentary.try(:original_description) } %>
 
-  <div class="input">
-    <label for="artist_commentary_original_description">Original description</label>
-    <%= text_area :artist_commentary, :original_description, :size => "40x6", :value => post.artist_commentary.try(:original_description) %>
-  </div>
-
-  <div class="input">
-    <label for="artist_commentary_translated_title">Translated title</label>
-    <%= text_field :artist_commentary, :translated_title, :value => post.artist_commentary.try(:translated_title) %>
-  </div>
-
-  <div class="input">
-    <label for="artist_commentary_translated_description">Translated description</label>
-    <%= text_area :artist_commentary, :translated_description, :size => "40x6", :value => post.artist_commentary.try(:translated_description) %>
-  </div>
+  <%= f.input :translated_title, as: :string, input_html: { value: artist_commentary.try(:translated_title) } %>
+  <%= f.input :translated_description, input_html: { size: "40x6", value: artist_commentary.try(:translated_description) } %>
 
   <% if post.has_tag?("commentary") %>
-    <div class="input">
-      <label>
-        <%= check_box :artist_commentary, :remove_commentary_tag %>
-        Remove <em>commentary</em> tag
-      </label>
-    </div>
+    <%= f.input :remove_commentary_tag, as: :boolean %>
   <% else %>
-    <div class="input">
-      <label>
-        <%= check_box :artist_commentary, :add_commentary_tag %>
-        Add <em>commentary</em> tag
-      </label>
-    </div>
+    <%= f.input :add_commentary_tag, as: :boolean %>
   <% end %>
 
   <% if post.has_tag?("commentary_request") %>
-    <div class="input">
-      <label>
-        <%= check_box :artist_commentary, :remove_commentary_request_tag %>
-        Remove <em>commentary_request</em> tag
-      </label>
-    </div>
+    <%= f.input :remove_commentary_request_tag, as: :boolean %>
   <% else %>
-    <div class="input">
-      <label>
-        <%= check_box :artist_commentary, :add_commentary_request_tag %>
-        Add <em>commentary_request</em> tag
-      </label>
-    </div>  
+    <%= f.input :add_commentary_request_tag, as: :boolean %>
   <% end %>
 
   <% if post.has_tag?("check_commentary") %>
-    <div class="input">
-      <label>
-        <%= check_box :artist_commentary, :remove_commentary_check_tag %>
-        Remove <em>check_commentary</em> tag
-      </label>
-    </div>
+    <%= f.input :remove_commentary_check_tag, as: :boolean %>
   <% else %>
-    <div class="input">
-      <label>
-        <%= check_box :artist_commentary, :add_commentary_check_tag %>
-        Add <em>check_commentary</em> tag
-      </label>
-    </div>  
+    <%= f.input :add_commentary_check_tag, as: :boolean %>
   <% end %>
 
   <% if post.has_tag?("partial_commentary") %>
-    <div class="input">
-      <label>
-        <%= check_box :artist_commentary, :remove_partial_commentary_tag %>
-        Remove <em>partial_commentary</em> tag
-      </label>
-    </div>
+    <%= f.input :remove_partial_commentary_tag, as: :boolean %>
   <% else %>
-    <div class="input">
-      <label>
-        <%= check_box :artist_commentary, :add_partial_commentary_tag %>
-        Add <em>partial_commentary</em> tag
-      </label>
-    </div>  
+    <%= f.input :add_partial_commentary_tag, as: :boolean %>
   <% end %>
 <% end %>

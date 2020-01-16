@@ -1,5 +1,5 @@
 class PostVote < ApplicationRecord
-  class Error < Exception; end
+  class Error < StandardError; end
 
   belongs_to :post
   belongs_to :user

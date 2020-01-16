@@ -914,6 +914,10 @@ class Tag < ApplicationRecord
     return false
   end
 
+  def posts
+    Post.tag_match(name)
+  end
+
   include ApiMethods
   include CountMethods
   include CategoryMethods

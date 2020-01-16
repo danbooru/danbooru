@@ -27,8 +27,11 @@ class PostsController < ApplicationController
     @comments = @comments.visible(CurrentUser.user)
 
     include_deleted = @post.is_deleted? || (@post.parent_id.present? && @post.parent.is_deleted?) || CurrentUser.user.show_deleted_children?
-    @parent_post_set = PostSets::PostRelationship.new(@post.parent_id, :include_deleted => include_deleted)
-    @children_post_set = PostSets::PostRelationship.new(@post.id, :include_deleted => include_deleted)
+    @sibling_posts = @post.parent.present? ? @post.parent.children : Post.none
+    @sibling_posts = @sibling_posts.undeleted unless include_deleted
+
+    @child_posts = @post.children
+    @child_posts = @child_posts.undeleted unless include_deleted
 
     respond_with(@post) do |format|
       format.html.tooltip { render layout: false }

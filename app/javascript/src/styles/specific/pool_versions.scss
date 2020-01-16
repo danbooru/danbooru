@@ -1,0 +1,17 @@
+div#c-pool-versions {
+  #a-diff {
+    del {
+      background: var(--wiki-page-versions-diff-del-background);
+      text-decoration: none;
+    }
+
+    ins {
+      background: var(--wiki-page-versions-diff-ins-background);
+      text-decoration: none;
+    }
+
+    span.paragraph-mark {
+      opacity: 0.25;
+    }
+  }
+}

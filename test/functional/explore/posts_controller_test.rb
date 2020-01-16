@@ -30,13 +30,6 @@ module Explore
           assert_response :success
         end
       end
-
-      context "#intro" do
-        should "render" do
-          get intro_explore_posts_path
-          assert_response :success
-        end
-      end
     end
   end
 end

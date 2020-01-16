@@ -6,7 +6,6 @@ class PostAppealTest < ActiveSupport::TestCase
       @alice = FactoryBot.create(:user)
       CurrentUser.user = @alice
       CurrentUser.ip_addr = "127.0.0.1"
-      Danbooru.config.stubs(:max_appeals_per_day).returns(5)
     end
 
     teardown do
@@ -28,16 +27,16 @@ class PostAppealTest < ActiveSupport::TestCase
           @post_appeal = PostAppeal.create(:post => @post, :reason => "aaa")
         end
 
-        assert_equal(["You have already appealed this post"], @post_appeal.errors.full_messages)
+        assert_includes(@post_appeal.errors.full_messages, "You have already appealed this post")
       end
 
-      should "not be able to appeal more than 5 posts in 24 hours" do
+      should "not be able to appeal more than 1 post in 24 hours" do
         @post_appeal = PostAppeal.new(:post => @post, :reason => "aaa")
-        @post_appeal.expects(:appeal_count_for_creator).returns(5)
+        @post_appeal.expects(:appeal_count_for_creator).returns(1)
         assert_difference("PostAppeal.count", 0) do
           @post_appeal.save
         end
-        assert_equal(["You can appeal at most 5 post a day"], @post_appeal.errors.full_messages)
+        assert_equal(["You can appeal at most 1 post a day"], @post_appeal.errors.full_messages)
       end
 
       should "not be able to appeal an active post" do

@@ -1,9 +1,9 @@
 require 'dtext'
 
 module ApplicationHelper
-  def diff_list_html(new, old, latest)
+  def diff_list_html(new, old, latest, ul_class: ["diff-list"], li_class: [])
     diff = SetDiff.new(new, old, latest)
-    render "diff_list", diff: diff
+    render "diff_list", diff: diff, ul_class: ul_class, li_class: li_class
   end
 
   def wordbreakify(string)
@@ -121,7 +121,7 @@ module ApplicationHelper
     link_to text, wiki_page_path(title), class: "wiki-link", **options
   end
 
-  def link_to_wikis(*wiki_titles, last_word_connector: ", or", **options)
+  def link_to_wikis(*wiki_titles, **options)
     links = wiki_titles.map do |title|
       link_to_wiki title.tr("_", " "), title
     end
@@ -197,6 +197,12 @@ module ApplicationHelper
     simple_form_for(:search, method: method, url: url, defaults: defaults, html: html_options, &block)
   end
 
+  def edit_form_for(model, **options, &block)
+    options[:html] = { autocomplete: "off", **options[:html].to_h }
+    options[:authenticity_token] = true if options[:remote] == true
+    simple_form_for(model, **options, &block)
+  end
+
   def table_for(*options, &block)
     table = TableBuilder.new(*options, &block)
     render "table_builder/table", table: table
@@ -239,7 +245,7 @@ module ApplicationHelper
 
   def data_attributes_for(record, prefix, attributes)
     attributes.map do |attr|
-      if attr.kind_of?(Array)
+      if attr.is_a?(Array)
         name = attr.map {|sym| sym.to_s.dasherize.delete("?")}.join('-')
         value = record
         attr.each do |sym|
@@ -255,7 +261,7 @@ module ApplicationHelper
       if value.nil?
         value = "null"
       end
-      if prefix.length == 0
+      if prefix.blank?
         [:"#{name}", value]
       else
         [:"#{prefix}-#{name}", value]

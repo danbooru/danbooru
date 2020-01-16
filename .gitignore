@@ -4,8 +4,8 @@ config/database.yml
 config/danbooru_local_config.rb
 config/deploy/*.rb
 config/newrelic.yml
-log/*.log
-tmp/*
+log/
+tmp/
 public/data
 coverage
 .gitconfig

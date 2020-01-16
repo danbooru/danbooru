@@ -32,6 +32,7 @@ module Sources
 
       should "get the correct urls" do
         assert_equal("https://video.twimg.com/ext_tw_video/859073467769126913/pu/vid/1280x720/cPGgVROXHy3yrK6u.mp4", @site.image_url)
+        assert_equal(["https://pbs.twimg.com/ext_tw_video_thumb/859073467769126913/pu/img/VKHGdXPsqKASBTvm.jpg:small"], @site.preview_urls)
         assert_equal("https://twitter.com/CincinnatiZoo/status/859073537713328129", @site.canonical_url)
       end
     end
@@ -43,6 +44,10 @@ module Sources
 
       should "get the image url" do
         assert_equal("https://video.twimg.com/tweet_video/C-1Tns7WsAAqvqn.mp4", @site.image_url)
+      end
+
+      should "get the preview urls" do
+        assert_equal(["https://pbs.twimg.com/tweet_video_thumb/C-1Tns7WsAAqvqn.jpg:small"], @site.preview_urls)
       end
     end
 

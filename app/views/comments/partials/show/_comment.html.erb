@@ -53,13 +53,6 @@
           <li class="comment-unvote-link">
             <%= link_to "Unvote", comment_comment_votes_path(comment_id: comment.id), method: :delete, remote: true %>
           </li>
-          <% if CurrentUser.is_moderator? %>
-            <li>|</li>
-            <li>
-              <strong>IP</strong>
-              <span><%= link_to_ip comment.creator_ip_addr %></span>
-            </li>
-          <% end %>
         </menu>
         <% if comment.editable_by?(CurrentUser.user) %>
           <%= render "comments/form", comment: comment, hidden: true %>

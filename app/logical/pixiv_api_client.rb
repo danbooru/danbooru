@@ -23,7 +23,7 @@ class PixivApiClient
     VistaPro Sculptris Comi\ Po! modo DAZ\ Studio 3D-Coat
   ]
 
-  class Error < Exception; end
+  class Error < StandardError; end
   class BadIDError < Error; end
 
   class WorkResponse

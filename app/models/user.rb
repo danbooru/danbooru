@@ -2,8 +2,8 @@ require 'digest/sha1'
 require 'danbooru/has_bit_flags'
 
 class User < ApplicationRecord
-  class Error < Exception; end
-  class PrivilegeError < Exception; end
+  class Error < StandardError; end
+  class PrivilegeError < StandardError; end
 
   module Levels
     ANONYMOUS = 0
@@ -244,7 +244,8 @@ class User < ApplicationRecord
       end
 
       def sha1(pass)
-        Digest::SHA1.hexdigest("#{Danbooru.config.password_salt}--#{pass}--")
+        salt = "choujin-steiner"
+        Digest::SHA1.hexdigest("#{salt}--#{pass}--")
       end
     end
   end
@@ -478,9 +479,15 @@ class User < ApplicationRecord
     end
 
     def adjusted_deletion_confidence
-      [deletion_confidence(60), 15].min
+      [deletion_confidence(60.days.ago), 15].min
     end
     memoize :adjusted_deletion_confidence
+
+    def deletion_confidence(date)
+      deletions = posts.deleted.where("created_at >= ?", date).count
+      total = posts.where("created_at >= ?", date).count
+      DanbooruMath.ci_lower_bound(deletions, total)
+    end
 
     def base_upload_limit
       if created_at >= 1.month.ago
@@ -773,12 +780,6 @@ class User < ApplicationRecord
     end
   end
 
-  module StatisticsMethods
-    def deletion_confidence(days = 30)
-      Reports::UserPromotions.deletion_confidence_interval_for(self, days)
-    end
-  end
-
   concerning :SockPuppetMethods do
     def validate_sock_puppets
       if User.where(last_ip_addr: CurrentUser.ip_addr).where("created_at > ?", 1.day.ago).exists?
@@ -798,7 +799,6 @@ class User < ApplicationRecord
   include ApiMethods
   include CountMethods
   extend SearchMethods
-  include StatisticsMethods
 
   def as_current(&block)
     CurrentUser.as(self, &block)

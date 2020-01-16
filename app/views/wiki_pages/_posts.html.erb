@@ -1,0 +1,7 @@
+<% if wiki_page.tag.present? && wiki_page.tag.post_count > 0 %>
+  <div id="wiki-page-posts">
+    <h2>Recent Posts <%= link_to "»", posts_path(tags: wiki_page.title) %></h2>
+
+    <%= post_previews_html(wiki_page.tag.posts.limit(8), tags: wiki_page.title) %>
+  </div>
+<% end %>

@@ -4,12 +4,11 @@
 
     <p style="font-weight: bold;">Before creating a pool, read the <%= link_to "pool guidelines", wiki_page_path(:id => "howto:pools") %>.</p>
 
-    <%= simple_form_for(@pool) do |f| %>
+    <%= edit_form_for(@pool) do |f| %>
       <%= f.input :name, :as => :string, :required => true %>
       <%= dtext_field "pool", "description" %>
       <%= f.input :post_ids_string, as: :text, label: "Posts" %>
       <%= f.input :category, :collection => ["series", "collection"], :include_blank => true, :selected => "", :required => true %>
-      <%= f.input :is_active %>
       <%= f.button :submit, "Submit" %>
       <%= dtext_preview_button "pool", "description" %>
     <% end %>

@@ -1,12 +1,12 @@
 require 'danbooru/has_bit_flags'
 
 class Post < ApplicationRecord
-  class ApprovalError < Exception; end
-  class DisapprovalError < Exception; end
-  class RevertError < Exception; end
-  class SearchError < Exception; end
-  class DeletionError < Exception; end
-  class TimeoutError < Exception; end
+  class ApprovalError < StandardError; end
+  class DisapprovalError < StandardError; end
+  class RevertError < StandardError; end
+  class SearchError < StandardError; end
+  class DeletionError < StandardError; end
+  class TimeoutError < StandardError; end
 
   # Tags to copy when copying notes.
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation]
@@ -589,6 +589,7 @@ class Post < ApplicationRecord
     end
 
     def merge_old_changes
+      reset_tag_array_cache
       @removed_tags = []
 
       if old_tag_string
@@ -635,7 +636,7 @@ class Post < ApplicationRecord
     def normalize_tags
       normalized_tags = Tag.scan_tags(tag_string)
       normalized_tags = apply_casesensitive_metatags(normalized_tags)
-      normalized_tags = normalized_tags.map {|tag| tag.downcase}
+      normalized_tags = normalized_tags.map(&:downcase)
       normalized_tags = filter_metatags(normalized_tags)
       normalized_tags = remove_negated_tags(normalized_tags)
       normalized_tags = TagAlias.to_aliased(normalized_tags)
@@ -670,8 +671,6 @@ class Post < ApplicationRecord
     end
 
     def add_automatic_tags(tags)
-      return tags if !Danbooru.config.enable_dimension_autotagging
-
       tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize flash webm mp4)
 
       if has_dimensions?
@@ -1240,10 +1239,6 @@ class Post < ApplicationRecord
       end
     end
 
-    def parent_exists?
-      Post.exists?(parent_id)
-    end
-
     def has_visible_children?
       return true if has_active_children?
       return true if has_children? && CurrentUser.user.show_deleted_children?
@@ -1257,7 +1252,7 @@ class Post < ApplicationRecord
 
     def children_ids
       if has_children?
-        children.map {|p| p.id}.join(' ')
+        children.map(&:id).join(' ')
       end
     end
   end
@@ -1336,7 +1331,7 @@ class Post < ApplicationRecord
 
       self.is_deleted = false
       self.approver_id = CurrentUser.id
-      flags.each {|x| x.resolve!}
+      flags.each(&:resolve!)
       save
       ModAction.log("undeleted post ##{id}", :post_undelete)
     end
@@ -1479,10 +1474,6 @@ class Post < ApplicationRecord
       end
 
       hash
-    end
-
-    def html_data_attributes
-      [:uploader_id, :approver_id]
     end
 
     def status

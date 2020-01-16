@@ -28,14 +28,11 @@
         <%= link_to "»", artist_versions_path(search: { updater_name: artist_version.updater.name }) %>
         <p>
           <%= compact_time(artist_version.updated_at) %>
-          <% if CurrentUser.is_moderator? %>
-            (<%= link_to_ip artist_version.updater_ip_addr %>)
-          <% end %>
         </p>
       <% end %>
       <% if artist_versions_listing_type == :revert %>
         <% t.column do |artist_version| %>
-          <td><%= link_to "Revert to", revert_artist_path(artist_version.artist_id, version_id: artist_version.id), method: :put, "data-confirm": "Are you sure you want to revert to this version?" %></td>
+          <%= link_to "Revert to", revert_artist_path(artist_version.artist_id, version_id: artist_version.id), method: :put, "data-confirm": "Are you sure you want to revert to this version?" %>
         <% end %>
       <% end %>
     <% end %>

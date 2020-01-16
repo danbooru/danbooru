@@ -1,0 +1,18 @@
+<div id="c-pool-versions">
+  <div id="a-search">
+    <h1>Search Changes</h1>
+
+    <%= search_form_for(pool_versions_path) do |f| %>
+      <%= f.input :updater_name, label: "Updater", input_html: { value: params.dig(:search, :updater_name), "data-autocomplete": "user" } %>
+      <%= f.input :name_matches, label: "Pool", input_html: { value: params.dig(:search, :name_matches), "data-autocomplete": "pool" } %>
+      <%= f.input :category, label: "Category", collection: [["Series", "series"], ["Collection", "collection"]], include_blank: true %>
+      <%= f.input :is_new, label: "New?", collection: [["Yes", true], ["No", false]], include_blank: true %>
+      <%= f.input :name_changed, label: "Name changed?", collection: [["Yes", true], ["No", false]], include_blank: true %>
+      <%= f.input :description_changed, label: "Description changed?", collection: [["Yes", true], ["No", false]], include_blank: true %>
+      <%= f.input :is_deleted, label: "Deleted?", collection: [["Yes", true], ["No", false]], include_blank: true %>
+      <%= f.submit "Search" %>
+    <% end %>
+  </div>
+</div>
+
+<%= render "secondary_links" %>

@@ -4,7 +4,7 @@ function importAll(r) {
   r.keys().forEach(r);
 }
 
-require('jquery-ujs');
+require('@rails/ujs').start();
 require('hammerjs');
 require('stupid-table-plugin');
 require('jquery-hotkeys');
@@ -12,6 +12,7 @@ require('jquery-hotkeys');
 // should start looking for nodejs replacements
 importAll(require.context('../vendor', true, /\.js$/));
 
+require("jquery-ui/ui/effects/effect-shake");
 require("jquery-ui/ui/widgets/autocomplete");
 require("jquery-ui/ui/widgets/button");
 require("jquery-ui/ui/widgets/dialog");

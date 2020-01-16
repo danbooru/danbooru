@@ -1,6 +1,6 @@
 <div id="save-search-dialog" title="Save Search" style="display: none;">
 
-  <%= simple_form_for(SavedSearch.new, remote: true) do |f| %>
+  <%= edit_form_for(SavedSearch.new, remote: true) do |f| %>
     <%= f.input :query, as: :string, input_html: { value: params[:tags], data: { autocomplete: "tag-query" } } %>
     <%= f.input :label_string, label: "Labels", hint: "A list of tags to help categorize this search. Space delimited.", input_html: { "data-autocomplete": "saved-search-label" } %>
     <%= f.input :disable_labels, label: "Don't show this dialog again", as: :boolean %>

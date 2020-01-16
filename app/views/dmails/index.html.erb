@@ -10,7 +10,7 @@
 
     <%= render "search" %>
 
-    <%= table_for @dmails, width: "100%" do |t| %>
+    <%= table_for @dmails, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "Date" do |dmail| %>
         <%= compact_time(dmail.created_at) %>
       <% end %>
@@ -22,9 +22,9 @@
         <% end %>
       <% end %>
       <% t.column "To" do |dmail| %>
-        <%= link_to_user dmail.from %>
+        <%= link_to_user dmail.to %>
       <% end %>
-      <% t.column "Subject" do |dmail| %>
+      <% t.column "Subject", td: { class: "col-expand" } do |dmail| %>
         <% if dmail.filtered? %>
           <%= link_to "[filtered]", dmail_path(dmail) %>
         <% else %>

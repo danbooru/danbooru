@@ -1,10 +1,5 @@
 class ReportsController < ApplicationController
-  before_action :member_only, :except => [:upload_tags]
-  respond_to :html, :xml, :json, only: [:upload_tags]
-
-  def uploads
-    @report = Reports::Uploads.new(params[:min_date], params[:max_date], params[:queries])
-  end
+  respond_to :html, :xml, :json
 
   def upload_tags
     @user = User.find(params[:user_id])

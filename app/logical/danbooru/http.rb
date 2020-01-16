@@ -1,6 +1,6 @@
 module Danbooru
   class Http
-    attr_accessor :cache, :http
+    attr_writer :cache, :http
 
     class << self
       delegate :get, :post, :delete, :cache, :auth, :basic_auth, :headers, to: :new

@@ -13,7 +13,7 @@
       <% end %>
     </ul>
 
-    <%= simple_form_for(@favorite_group, :format => :js, :html => {:id => "ordering-form"}) do |f| %>
+    <%= edit_form_for(@favorite_group, :format => :js, :html => {:id => "ordering-form"}) do |f| %>
       <%= submit_tag "Save" %>
     <% end %>
   </div>

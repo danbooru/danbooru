@@ -1,4 +1,5 @@
 import CurrentUser from "./current_user";
+import Rails from '@rails/ujs';
 
 let Utility = {};
 
@@ -54,7 +55,8 @@ Utility.dialog = function(title, html) {
     },
     buttons: {
       "Submit": function() {
-        $dialog.find("form").submit();
+        let form = $dialog.find("form").get(0);
+        Rails.fire(form, "submit");
       },
       "Cancel": function() {
         $dialog.dialog("close");

@@ -1,5 +1,5 @@
 class WikiPage < ApplicationRecord
-  class RevertError < Exception; end
+  class RevertError < StandardError; end
 
   META_WIKIS = ["list_of_", "tag_group:", "pool_group:", "howto:", "about:", "help:", "template:"]
 
@@ -235,14 +235,6 @@ class WikiPage < ApplicationRecord
 
   def update_dtext_links
     self.dtext_links = DtextLink.new_from_dtext(body)
-  end
-
-  def post_set
-    @post_set ||= PostSets::WikiPage.new(title, 1, 4)
-  end
-
-  def presenter
-    @presenter ||= WikiPagePresenter.new(self)
   end
 
   def tags

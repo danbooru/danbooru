@@ -17,10 +17,6 @@ get '/reports/user_similarity' do
   # todo
 end
 
-get '/reports/uploads' do
-  # todo
-end
-
 post '/post_views' do
   # todo
 end

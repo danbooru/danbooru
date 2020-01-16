@@ -5,7 +5,9 @@
     <%= render "posts/partials/common/inline_blacklist" %>
 
     <section>
-      <%= @post_set.presenter.post_previews_html(self) %>
+      <% @pools.each do |pool| %>
+        <%= PostPresenter.preview(pool.cover_post, link_target: pool, pool: pool, show_deleted: true) %>
+      <% end %>
 
       <%= numbered_paginator(@pools) %>
     </section>

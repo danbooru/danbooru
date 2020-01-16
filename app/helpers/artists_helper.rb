@@ -1,8 +1,4 @@
 module ArtistsHelper
-  def artist_alias_and_implication_list(artist)
-    alias_and_implication_list(artist.tag)
-  end
-
   def link_to_artist(name)
     artist = Artist.find_by_name(name)
 

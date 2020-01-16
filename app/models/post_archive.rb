@@ -1,5 +1,5 @@
 class PostArchive < ApplicationRecord
-  class RevertError < Exception; end
+  class RevertError < StandardError; end
   extend Memoist
 
   belongs_to :post

@@ -49,7 +49,6 @@ Rails.application.routes.draw do
         get :viewed
         get :searches
         get :missed_searches
-        get :intro
       end
     end
   end
@@ -182,14 +181,13 @@ Rails.application.routes.draw do
     end
     resource :order, :only => [:edit], :controller => "pool_orders"
   end
-  resource :pool_element, :only => [:create, :destroy] do
-    collection do
-      get :all_select
-    end
-  end
+  resource :pool_element, :only => [:create]
   resources :pool_versions, :only => [:index] do
     member do
       get :diff
+    end
+    collection do
+      get :search
     end
   end
   resources :post_replacements, :only => [:index, :new, :create, :update]
@@ -400,8 +398,6 @@ Rails.application.routes.draw do
   get "/static/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
   get "/static/contact" => "static#contact", :as => "contact"
   get "/static/dtext_help" => "static#dtext_help", :as => "dtext_help"
-
-  get "/intro" => redirect("/explore/posts/intro")
 
   root :to => "posts#index"
 

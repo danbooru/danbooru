@@ -141,7 +141,7 @@
   </div>
 
   <div id="add-commentary-dialog" title="Add artist commentary" style="display: none;">
-    <%= render "artist_commentaries/form", :post => @post %>
+    <%= render "artist_commentaries/form", post: @post, artist_commentary: @post.artist_commentary || ArtistCommentary.new(post: @post) %>
   </div>
 
   <div id="add-to-favgroup-dialog" title="Add to favorite group" style="display: none;">

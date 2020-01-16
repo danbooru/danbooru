@@ -3,7 +3,6 @@
   <%= f.input :description_matches, label: "Description", input_html: { value: params.dig(:search, :description_matches) } %>
   <%= f.input :post_tags_match, label: "Post tags", input_html: { value: params.dig(:search, :post_tags_match), "data-autocomplete": "tag-query" } %>
   <%= f.input :creator_name, label: "Creator", input_html: { value: params.dig(:search, :creator_name), "data-autocomplete": "user" } %>
-  <%= f.input :is_active, label: "Status", as: :select, collection: [%w[Active true], %w[Inactive false]], include_blank: true, selected: params.dig(:search, :is_active) %>
   <%= f.input :category, collection: %w[series collection], include_blank: true, selected: params[:search][:category] %>
   <%= f.input :order, collection: [%w[Last\ updated updated_at], %w[Name name], %w[Recently\ created created_at], %w[Post\ count post_count]], include_blank: true, selected: params.dig(:search, :order) %>
   <%= f.submit "Search" %>

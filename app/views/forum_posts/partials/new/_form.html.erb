@@ -1,6 +1,6 @@
 <%= error_messages_for("forum_post") %>
 
-<%= simple_form_for(forum_post) do |f| %>
+<%= edit_form_for(forum_post) do |f| %>
   <% if @forum_topic %>
     <%= f.input :topic_id, :as => :hidden %>
   <% else %>

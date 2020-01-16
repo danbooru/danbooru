@@ -3,14 +3,13 @@ class StorageManager
 
   DEFAULT_BASE_DIR = "#{Rails.root}/public/data"
 
-  attr_reader :base_url, :base_dir, :hierarchical, :tagged_filenames, :large_image_prefix, :original_subdir
+  attr_reader :base_url, :base_dir, :hierarchical, :tagged_filenames, :original_subdir
 
-  def initialize(base_url: default_base_url, base_dir: DEFAULT_BASE_DIR, hierarchical: false, tagged_filenames: Danbooru.config.enable_seo_post_urls, large_image_prefix: Danbooru.config.large_image_prefix, original_subdir: "")
+  def initialize(base_url: default_base_url, base_dir: DEFAULT_BASE_DIR, hierarchical: false, tagged_filenames: Danbooru.config.enable_seo_post_urls, original_subdir: "")
     @base_url = base_url.chomp("/")
     @base_dir = base_dir
     @hierarchical = hierarchical
     @tagged_filenames = tagged_filenames
-    @large_image_prefix = large_image_prefix
     @original_subdir = original_subdir
   end
 
@@ -99,7 +98,7 @@ class StorageManager
     when :crop
       "#{md5}.jpg"
     when :large
-      "#{large_image_prefix}#{md5}.#{large_file_ext}"
+      "sample-#{md5}.#{large_file_ext}"
     when :original
       "#{md5}.#{file_ext}"
     end

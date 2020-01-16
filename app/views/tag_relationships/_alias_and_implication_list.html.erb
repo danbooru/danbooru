@@ -1,0 +1,42 @@
+<% if tag.present? %>
+  <% if tag.antecedent_alias %>
+    <p class="fineprint">
+      This tag has been aliased to <%= link_to_wiki(tag.antecedent_alias.consequent_name) %>
+      (<%= link_to_wiki "learn more", "help:tag_aliases" %>).
+    </p>
+  <% end %>
+
+  <% if tag.consequent_aliases.present? %>
+    <p class="fineprint">
+      The following tags are aliased to this tag:
+      <%= to_sentence(tag.consequent_aliases.map { |ta| link_to_wiki ta.antecedent_name }) %>
+      (<%= link_to_wiki "learn more", "help:tag_aliases" %>).
+    </p>
+  <% end %>
+
+  <% TagImplication.automatic_tags_for([tag.name]).tap do |automatic_tags| %>
+    <% if automatic_tags.present? %>
+      <p class="fineprint">
+        This tag automatically adds
+        <%= to_sentence(automatic_tags.map { |tag| link_to_wiki tag }) %>
+        (<%= link_to_wiki "learn more", "help:autotags" %>).
+      </p>
+    <% end %>
+  <% end %>
+
+  <% if tag.antecedent_implications.present? %>
+    <p class="fineprint">
+      This tag implicates
+      <%= to_sentence(tag.antecedent_implications.map { |ti| link_to_wiki ti.consequent_name }) %>
+      (<%= link_to_wiki "learn more", "help:tag_implications" %>).
+    </p>
+  <% end %>
+
+  <% if tag.consequent_implications.present? %>
+    <p class="fineprint">
+      The following tags implicate this tag:
+      <%= to_sentence(tag.consequent_implications.map { |ti| link_to_wiki ti.antecedent_name }) %>
+      (<%= link_to_wiki "learn more", "help:tag_implications" %>).
+    </p>
+  <% end %>
+<% end %>

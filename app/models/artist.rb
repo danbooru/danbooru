@@ -1,6 +1,6 @@
 class Artist < ApplicationRecord
   extend Memoist
-  class RevertError < Exception; end
+  class RevertError < StandardError; end
 
   attr_accessor :url_string_changed
   array_attribute :other_names
@@ -109,6 +109,9 @@ class Artist < ApplicationRecord
         "pixiv.cc", # http://pixiv.cc/0123456789/
         "pixiv.net", # https://www.pixiv.net/member.php?id=10442390
         "pixiv.net/stacc", # https://www.pixiv.net/stacc/aaaninja2013
+        "pixiv.net/fanbox/creator", # https://www.pixiv.net/fanbox/creator/310630
+        "pixiv.net/users", # https://www.pixiv.net/users/555603
+        "pixiv.net/en/users", # https://www.pixiv.net/en/users/555603
         "i.pximg.net",
         "plurk.com", # http://www.plurk.com/a1amorea1a1
         "privatter.net",
@@ -369,7 +372,7 @@ class Artist < ApplicationRecord
       elsif wiki_page.nil?
         # if there are any notes, we need to create a new wiki page
         if @notes.present?
-          wp = create_wiki_page(body: @notes, title: name)
+          create_wiki_page(body: @notes, title: name)
         end
       elsif (!@notes.nil? && (wiki_page.body != @notes)) || wiki_page.title != name
         # if anything changed, we need to update the wiki page
@@ -400,10 +403,10 @@ class Artist < ApplicationRecord
     def unban!
       Post.transaction do
         CurrentUser.without_safe_mode do
-          ti = TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").first
+          ti = TagImplication.find_by(antecedent_name: name, consequent_name: "banned_artist")
           ti&.destroy
 
-          Post.tag_match(name).where("true /* Artist.unban */").each do |post|
+          Post.tag_match(name).find_each do |post|
             post.unban!
             fixed_tags = post.tag_string.sub(/(?:\A| )banned_artist(?:\Z| )/, " ").strip
             post.update(tag_string: fixed_tags)
@@ -418,9 +421,7 @@ class Artist < ApplicationRecord
     def ban!
       Post.transaction do
         CurrentUser.without_safe_mode do
-          Post.tag_match(name).where("true /* Artist.ban */").each do |post|
-            post.ban!
-          end
+          Post.tag_match(name).each(&:ban!)
 
           # potential race condition but unlikely
           unless TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").exists?

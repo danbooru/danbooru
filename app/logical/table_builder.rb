@@ -9,14 +9,20 @@ class TableBuilder
       @block = block
 
       @name = name || attribute
-      @name = @name.to_s.titleize unless @name.kind_of?(String)
+      @name = @name.to_s.titleize unless @name.is_a?(String)
+
+      if @name.present?
+        column_class = "#{@name.parameterize.dasherize}-column"
+        @header_attributes[:class] = "#{column_class} #{@header_attributes[:class]}".strip
+        @body_attributes[:class] = "#{column_class} #{@body_attributes[:class]}".strip
+      end
     end
 
     def value(item, i, j)
       if block.present?
         block.call(item, i, j, self)
         nil
-      elsif attribute.kind_of?(Symbol)
+      elsif attribute.is_a?(Symbol)
         item.send(attribute)
       else
         ""
@@ -30,6 +36,11 @@ class TableBuilder
     @items = items
     @columns = []
     @table_attributes = { class: "striped", **table_attributes }
+
+    if items.respond_to?(:model_name)
+      @table_attributes[:id] ||= "#{items.model_name.plural.dasherize}-table"
+    end
+
     yield self if block_given?
   end
 

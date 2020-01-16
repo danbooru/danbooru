@@ -1,5 +1,6 @@
 class PoolArchive < ApplicationRecord
   belongs_to :updater, :class_name => "User"
+  belongs_to :pool
 
   def self.enabled?
     Danbooru.config.aws_sqs_archives_url.present?
@@ -21,12 +22,32 @@ class PoolArchive < ApplicationRecord
       where_array_includes_any(:added_post_ids, [post_id]).or(where_array_includes_any(:removed_post_ids, [post_id]))
     end
 
+    def name_matches(name)
+      name = normalize_name_for_search(name)
+      name = "*#{name}*" unless name =~ /\*/
+      where_ilike(:name, name)
+    end
+
     def search(params)
       q = super
-      q = q.search_attributes(params, :pool_id, :post_ids, :added_post_ids, :removed_post_ids, :updater, :description, :description_changed, :name, :name_changed, :version, :is_active, :is_deleted, :category)
+      q = q.search_attributes(params, :pool_id, :post_ids, :added_post_ids, :removed_post_ids, :updater_id, :description, :description_changed, :name, :name_changed, :version, :is_active, :is_deleted, :category)
 
       if params[:post_id]
         q = q.for_post_id(params[:post_id].to_i)
+      end
+
+      if params[:name_matches].present?
+        q = q.name_matches(params[:name_matches])
+      end
+
+      if params[:updater_name].present?
+        q = q.where(updater_id: User.name_to_id(params[:updater_name]))
+      end
+
+      if params[:is_new].to_s.truthy?
+        q = q.where(version: 1)
+      elsif params[:is_new].to_s.falsy?
+        q = q.where("version != 1")
       end
 
       q.apply_default_order(params)
@@ -61,6 +82,14 @@ class PoolArchive < ApplicationRecord
     sqs_service.send_message(msg, message_group_id: "pool:#{pool.id}")
   end
 
+  def self.normalize_name(name)
+    name.gsub(/[_[:space:]]+/, "_").gsub(/\A_|_\z/, "")
+  end
+
+  def self.normalize_name_for_search(name)
+    normalize_name(name).mb_chars.downcase
+  end
+
   def build_diff(other = previous)
     diff = {}
 
@@ -80,14 +109,6 @@ class PoolArchive < ApplicationRecord
 
   def previous
     PoolArchive.where("pool_id = ? and version < ?", pool_id, version).order("version desc").first
-  end
-
-  def pool
-    Pool.find(pool_id)
-  end
-
-  def updater
-    User.find(updater_id)
   end
 
   def pretty_name

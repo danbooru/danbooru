@@ -31,7 +31,7 @@ class PoolsController < ApplicationController
     search = search_params.presence || ActionController::Parameters.new(category: "series")
 
     @pools = Pool.search(search).paginate(params[:page], limit: limit, search_count: params[:search])
-    @post_set = PostSets::PoolGallery.new(@pools)
+    respond_with(@pools)
   end
 
   def show
@@ -95,7 +95,7 @@ class PoolsController < ApplicationController
   private
 
   def pool_params
-    permitted_params = %i[name description category is_active post_ids post_ids_string]
+    permitted_params = %i[name description category post_ids post_ids_string]
     params.require(:pool).permit(*permitted_params, post_ids: [])
   end
 end

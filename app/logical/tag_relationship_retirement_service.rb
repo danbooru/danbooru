@@ -1,5 +1,6 @@
 module TagRelationshipRetirementService
   module_function
+
   THRESHOLD = 2.years
 
   def forum_topic_title

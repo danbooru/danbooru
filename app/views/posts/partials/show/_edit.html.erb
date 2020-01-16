@@ -6,69 +6,40 @@
 
 <%= render "sources/info" %>
 
-<%= form_for(post, :html => {:class => "simple_form", :id => "form"}) do |f| %>
+<%= edit_form_for(post, html: { id: "form" }) do |f| %>
   <%= hidden_field_tag :tags_query, params[:q] %>
   <%= hidden_field_tag :pool_id, params[:pool_id] %>
   <%= hidden_field_tag :favgroup_id, params[:favgroup_id] %>
-  <%= f.hidden_field :old_tag_string, :value => post.tag_string %>
-  <%= f.hidden_field :old_parent_id, :value => post.parent_id %>
-  <%= f.hidden_field :old_source, :value => post.source %>
-  <%= f.hidden_field :old_rating, :value => post.rating %>
+  <%= f.input :old_tag_string, as: :hidden, input_html: { value: post.tag_string } %>
+  <%= f.input :old_parent_id, as: :hidden, input_html: { value: post.parent_id } %>
+  <%= f.input :old_source, as: :hidden, input_html: { value: post.source } %>
+  <%= f.input :old_rating, as: :hidden, input_html: { value: post.rating } %>
 
-  <div class="input">
-    <% if post.is_rating_locked? %>
-      This post is rating locked.
-    <% else %>
-      <%= f.label :blank, "Rating" %>
-
-      <fieldset class="ratings">
-        <%= f.radio_button :rating, :e %>
-        <%= f.label :rating_e, "Explicit" %>
-
-        <%= f.radio_button :rating, :q %>
-        <%= f.label :rating_q, "Questionable" %>
-
-        <%= f.radio_button :rating, :s %>
-        <%= f.label :rating_s, "Safe" %>
-      </fieldset>
-    <% end %>
-  </div>
-
-  <% unless post.is_note_locked? %>
-    <div class="input">
-      <%= f.label :has_embedded_notes, "Embed notes" %>
-      <%= f.check_box :has_embedded_notes %>
-    </div>
+  <% if post.is_rating_locked? %>
+    This post is rating locked.
+  <% else %>
+    <%= f.input :rating, collection: [["Explicit", "e"], ["Questionable", "q"], ["Safe", "s"]], as: :radio_buttons, boolean_style: :inline %>
   <% end %>
+
+  <fieldset class="inline-fieldset">
+    <label>Notes</label>
+    <%= f.input :has_embedded_notes, label: "Embed notes", as: :boolean, boolean_style: :inline, disabled: post.is_note_locked? %>
+  </fieldset>
 
   <% if CurrentUser.is_builder? %>
-    <div class="input">
-      <%= f.label :blank, "Lock" %>
+    <fieldset class="inline-fieldset">
+      <label>Lock</label>
 
-      <fieldset class="locks">
-        <%= f.check_box :is_note_locked %>
-        <%= f.label :is_note_locked, "Notes" %>
-
-        <%= f.check_box :is_rating_locked %>
-        <%= f.label :is_rating_locked, "Rating" %>
-
-        <% if CurrentUser.is_admin? %>
-          <%= f.check_box :is_status_locked %>
-          <%= f.label :is_status_locked, "Status" %>
-        <% end %>
-      </fieldset>
-    </div>
+      <%= f.input :is_rating_locked, label: "Rating", as: :boolean, boolean_style: :inline  %>
+      <%= f.input :is_note_locked, label: "Notes", as: :boolean, boolean_style: :inline  %>
+      <% if CurrentUser.is_admin? %>
+        <%= f.input :is_status_locked, label: "Status", as: :boolean, boolean_style: :inline  %>
+      <% end %>
+    </fieldset>
   <% end %>
 
-  <div class="input">
-    <%= f.label :parent_id, "Parent" %>
-    <%= f.text_field :parent_id, size: 60 %>
-  </div>
-
-  <div class="input">
-    <%= f.label :source %>
-    <%= f.text_field :source, size: 60 %>
-  </div>
+  <%= f.input :parent_id, label: "Parent", input_html: { size: 60 }, as: :string %>
+  <%= f.input :source, input_html: { size: 60 } %>
 
   <div class="input fixed-width-container" id="tags-container">
     <div class="header">
@@ -82,13 +53,14 @@
     </div>
 
     <div>
-      <%= f.text_area :tag_string, :size => "60x5", :spellcheck => false, :"data-autocomplete" => "tag-edit", :"data-shortcut" => "e", :value => post.presenter.split_tag_list_text + " " %>
+      <%= f.input :tag_string, label: false, input_html: { size: "60x5", spellcheck: false, "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.presenter.split_tag_list_text + " " } %>
     </div>
+
     <%= render "related_tags/buttons" %>
   </div>
   
   <div class="input">
-    <%= submit_tag "Submit", :class => "ui-button ui-widget ui-corner-all" %>
+    <%= f.submit "Submit" %>
   </div>
 
   <%= render "related_tags/container" %>

@@ -55,17 +55,15 @@
   </div>
 <% end %>
 
-<% if post.parent_id && post.parent_exists? %>
+<% if post.parent.present? %>
   <div class="notice notice-small post-notice post-notice-child">
-    <%= has_parent_message(post, @parent_post_set) %>
-    <div id="has-parent-relationship-preview"><%= @parent_post_set.presenter.post_previews_html(self) %></div>
+    <%= render "posts/partials/show/parent_notice", parent: post.parent, children: @sibling_posts.to_a %>
   </div>
 <% end %>
 
 <% if post.has_visible_children? %>
   <div class="notice notice-small post-notice post-notice-parent">
-    <%= has_children_message(post, @children_post_set) %>
-    <div id="has-children-relationship-preview"><%= @children_post_set.presenter.post_previews_html(self) %></div>
+    <%= render "posts/partials/show/child_notice", parent: post, children: @child_posts.to_a %>
   </div>
 <% end %>
 

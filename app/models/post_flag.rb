@@ -1,5 +1,5 @@
 class PostFlag < ApplicationRecord
-  class Error < Exception; end
+  class Error < StandardError; end
 
   module Reasons
     UNAPPROVED = "Unapproved in three days"
@@ -8,7 +8,6 @@ class PostFlag < ApplicationRecord
   end
 
   COOLDOWN_PERIOD = 3.days
-  CREATION_THRESHOLD = 10 # in 30 days
 
   belongs_to_creator :class_name => "User"
   belongs_to :post
@@ -124,14 +123,6 @@ class PostFlag < ApplicationRecord
 
   def validate_creator_is_not_limited
     return if is_deletion
-
-    if creator_id != User.system.id && creator.post_flags.where("created_at > ?", 30.days.ago).count >= CREATION_THRESHOLD
-      report = Reports::PostFlags.new(user_id: post.uploader_id, date_range: 90.days.ago)
-
-      if report.attackers.include?(creator_id)
-        errors[:creator] << "cannot flag posts uploaded by this user"
-      end
-    end
 
     if CurrentUser.can_approve_posts?
       # do nothing
