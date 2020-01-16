@@ -64,8 +64,7 @@ class UploadsController < ApplicationController
       file source tag_string rating status parent_id artist_commentary_title
       artist_commentary_desc include_artist_commentary referer_url
       md5_confirmation as_pending translated_commentary_title
-      translated_commentary_desc add_commentary_tag add_commentary_request_tag
-      add_commentary_check_tag add_partial_commentary_tag
+      translated_commentary_desc
     ]
 
     params.require(:upload).permit(permitted_params)

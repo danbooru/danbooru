@@ -3022,12 +3022,8 @@ CREATE TABLE public.uploads (
     include_artist_commentary boolean,
     context text,
     referer_url text,
-    translated_commentary_title text,
-    translated_commentary_desc text,
-    add_commentary_tag boolean,
-    add_commentary_request_tag boolean,
-    add_commentary_check_tag boolean,
-    add_partial_commentary_tag boolean
+    translated_commentary_title text DEFAULT ''::text NOT NULL,
+    translated_commentary_desc text DEFAULT ''::text NOT NULL
 );
 
 

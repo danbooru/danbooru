@@ -49,8 +49,6 @@
             <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { size: 60, value: params[:artist_commentary_title] } %>
             <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { size: "60x5", value: params[:artist_commentary_desc] } %>
             <%= f.input :include_artist_commentary, as: :boolean, label: "Include Commentary", input_html: { checked: params[:include_artist_commentary].present? } %>
-            <%= f.input :add_commentary_tag, as: :boolean, label: "Add commentary tag", input_html: { checked: params[:add_commentary_tag].present? } %>
-            <%= f.input :add_commentary_request_tag, as: :boolean, label: "Add commentary request tag", input_html: { checked: params[:add_commentary_request_tag].present? } %>
           </div>
         </div>
 
@@ -61,8 +59,6 @@
           <div class="commentary-translation" style="display: none;">
             <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { size: 60, value: params[:translated_commentary_title] } %>
             <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { size: "60x5", value: params[:translated_commentary_desc] } %>
-            <%= f.input :add_commentary_check_tag, as: :boolean, label: "Add commentary check tag", input_html: { checked: params[:add_commentary_check_tag].present? } %>
-            <%= f.input :add_partial_commentary_tag, as: :boolean, label: "Add partial commentary tag", input_html: { checked: params[:add_partial_commentary_tag].present? } %>
           </div>
         </div>
 

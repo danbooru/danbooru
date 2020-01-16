@@ -111,11 +111,6 @@ class UploadService
       if !upload.uploader.can_upload_free? || upload.upload_as_pending?
         p.is_pending = true
       end
-
-      p.add_tag("commentary") if upload.add_commentary_tag
-      p.add_tag("commentary_request") if upload.add_commentary_request_tag
-      p.add_tag("commentary_check") if upload.add_commentary_check_tag
-      p.add_tag("partial_commentary") if upload.add_partial_commentary_tag
     end
   end
 end
