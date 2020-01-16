@@ -124,7 +124,7 @@ class Comment < ApplicationRecord
   end
 
   def editable_by?(user)
-    creator_id == user.id || user.is_moderator?
+    updater_id == user.id || user.is_moderator?
   end
 
   def voted_by?(user)
