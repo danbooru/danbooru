@@ -31,7 +31,7 @@ module Danbooru
     # config.assets.version = '1.0'
     config.autoload_paths += %W(#{config.root}/app/presenters #{config.root}/app/logical #{config.root}/app/mailers)
     config.plugins = [:all]
-    config.time_zone = 'Eastern Time (US & Canada)'
+    config.time_zone = 'Berlin'
 
     raise "Danbooru.config.secret_key_base not configured" if Danbooru.config.secret_key_base.blank?
     config.secret_key_base = Danbooru.config.secret_key_base
