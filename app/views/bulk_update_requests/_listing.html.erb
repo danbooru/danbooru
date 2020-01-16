@@ -27,7 +27,7 @@
     <%= link_to "»", bulk_update_requests_path(search: { user_name: request.user.name }) %>
     <div><%= time_ago_in_words_tagged(request.created_at) %></div>
   <% end %>
-  <% t.column do |request| %>
+  <% t.column column: "control" do |request| %>
     <%= link_to "Show", bulk_update_request_path(request) %> |
     <%= render "bulk_update_requests/bur_edit_links", bur: request %>
   <% end %>

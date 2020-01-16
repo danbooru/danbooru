@@ -28,7 +28,7 @@
         <%= link_to "»", post_votes_path(search: { user_name: vote.user.name }) %>
         <div><%= time_ago_in_words_tagged(vote.created_at) %></div>
       <% end %>
-      <% t.column do |vote| %>
+      <% t.column column: "control" do |vote| %>
         <% if vote.user == CurrentUser.user %>
           <%= link_to "unvote", post_post_votes_path(vote.post), remote: true, method: :delete %>
         <% end %>

@@ -15,7 +15,7 @@
       <% t.column "Date" do |change_request| %>
         <%= compact_time change_request.created_at %>
       <% end %>
-      <% t.column do |change_request| %>
+      <% t.column column: "control" do |change_request| %>
         <%= link_to "view", user_name_change_request_path(change_request) %>
       <% end %>
     <% end %>

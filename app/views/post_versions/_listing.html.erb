@@ -5,7 +5,7 @@
 
     <%= table_for @post_versions, {id: "post-versions-table", class: "striped autofit"} do |t| %>
       <% if CurrentUser.user.is_builder? %>
-        <% t.column tag.label(tag.input type: :checkbox, id: "post-version-select-all-checkbox", class: "post-version-select-checkbox"), th: { class: "post-version-select-column" }, td: { class: "post-version-select-column" } do |post_version| %>
+        <% t.column tag.label(tag.input type: :checkbox, id: "post-version-select-all-checkbox", class: "post-version-select-checkbox"), column: "post-version-select" do |post_version| %>
           <input type="checkbox" class="post-version-select-checkbox" <%= "disabled" unless post_version.can_undo?(CurrentUser.user) %>>
         <% end %>
       <% end %>

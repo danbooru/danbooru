@@ -27,7 +27,7 @@
       <% t.column "Updated" do |artist| %>
         <%= time_ago_in_words_tagged(artist.updated_at) %>
       <% end %>
-      <% t.column do |artist| %>
+      <% t.column column: "control" do |artist| %>
         <% if CurrentUser.is_member? %>
           <%= link_to "Edit", edit_artist_path(artist) %>
 

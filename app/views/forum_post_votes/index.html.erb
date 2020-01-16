@@ -31,7 +31,7 @@
         <%= link_to "»", forum_post_votes_path(search: { creator_name: forum_post_vote.creator.name }) %>
         <div><%= time_ago_in_words_tagged(forum_post_vote.created_at) %></div>
       <% end %>
-      <% t.column do |forum_post_vote| %>
+      <% t.column column: "control" do |forum_post_vote| %>
         <% if forum_post_vote.creator == CurrentUser.user %>
           <%= link_to "unvote", forum_post_vote_path(forum_post_vote, format: "js"), remote: true, method: :delete %>
         <% end %>

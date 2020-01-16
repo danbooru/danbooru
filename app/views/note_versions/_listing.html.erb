@@ -1,16 +1,15 @@
 <div id="p-<%= note_versions_listing_type %>-listing">
 
     <%= table_for @note_versions, {class: "striped autofit", width: "100%"} do |t| %>
-      <% t.column %>
-      <% t.column "Post", {width: "5%"} do |note_version| %>
+      <% t.column "Post", width: "5%" do |note_version| %>
         <%= link_to note_version.post_id, post_path(note_version.post_id) %>
-        <% if params.dig(:search, :note_id).present? %>
+        <% if !params.dig(:search, :post_id).present? %>
           <%= link_to "»", note_versions_path(search: {post_id: note_version.post_id}) %>
         <% end %>
       <% end %>
-      <% t.column "Note", {width: "5%"} do |note_version| %>
+      <% t.column "Note", width: "5%" do |note_version| %>
         <%= link_to "#{note_version.note_id}.#{note_version.version}", post_path(note_version.post_id, anchor: "note-#{note_version.note_id}") %>
-        <% if params.dig(:search, :post_id).present? %>
+        <% if !params.dig(:search, :note_id).present? %>
           <%= link_to "»", note_versions_path(search: {note_id: note_version.note_id}) %>
         <% end %>
       <% end %>
@@ -21,17 +20,17 @@
         <% end %>
         <%= note_version_body_diff_info(note_version) %>
       <% end %>
-      <% t.column "Position", {width: "5%"} do |note_version| %>
+      <% t.column "Position", width: "5%" do |note_version| %>
         <%= note_version_position_diff(note_version) %>
       <% end %>
-      <% t.column "Edited By", {width: "10%"} do |note_version| %>
+      <% t.column "Edited By", width: "10%" do |note_version| %>
         <%= link_to_user note_version.updater %>
       <% end %>
-      <% t.column "Date", {width: "10%"} do |note_version| %>
+      <% t.column "Date", width: "10%" do |note_version| %>
         <%= compact_time note_version.updated_at %>
       <% end %>
       <% if note_versions_listing_type == :revert %>
-        <% t.column "", {width: "7%"} do |note_version| %>
+        <% t.column column: "control", width: "7%" do |note_version| %>
           <%= link_to "Revert to", revert_note_path(note_version.note_id, :version_id => note_version.id), :remote => true, :method => :put, :data => {:confirm => "Are you sure you want to revert to this version?"} %>
         <% end %>
       <% end %>

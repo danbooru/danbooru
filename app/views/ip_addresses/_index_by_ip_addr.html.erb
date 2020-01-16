@@ -10,7 +10,7 @@
   <% t.column "Uses" do |ip| %>
     <%= link_to ip.count_all, ip_addresses_path(search: { ip_addr: ip.to_s }) %>
   <% end %>
-  <% t.column "" do |ip| %>
+  <% t.column column: "ip-info" do |ip| %>
     <%= link_to "IP info", "https://ipinfo.io/#{ip.ip_addr}" %>
   <% end %>
 <% end %>

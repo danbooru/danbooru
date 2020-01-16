@@ -8,7 +8,7 @@
         <%= link_to_wiki "?", tag.name, class: "tag-type-#{tag.category}" %>
         <%= link_to tag.name, posts_path(tags: tag.name), class: "tag-type-#{tag.category}" %>
       <% end %>
-      <% t.column do |tag| %>
+      <% t.column column: "control" do |tag| %>
         <%= link_to_if tag.editable_by?(CurrentUser.user), "Edit", edit_tag_path(tag) %> |
         <%= link_to "History", post_versions_path(search: { changed_tags: tag.name }) %> |
         <%= link_to "Related", related_tag_path(search: { query: tag.name }) %> |
