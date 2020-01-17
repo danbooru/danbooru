@@ -1,5 +1,5 @@
 module PostSets
-  class Post < PostSets::Base
+  class Post
     MAX_PER_PAGE = 200
     attr_reader :tag_array, :page, :raw, :random, :post_count, :format
 
