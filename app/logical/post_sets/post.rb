@@ -20,10 +20,6 @@ module PostSets
       tag_array.slice(0, 25).join(" ").tr("_", " ")
     end
 
-    def unordered_tag_array
-      tag_array.reject {|tag| tag =~ /\Aorder:/i }
-    end
-
     def has_blank_wiki?
       tag.present? && !wiki_page.present?
     end
@@ -69,10 +65,6 @@ module PostSets
       ::FavoriteGroup.find_by_name(favgroup_name)
     end
 
-    def has_deleted?
-      tag_string !~ /status/ && ::Post.tag_match("#{tag_string} status:deleted").where("true /* PostSets::Post#has_deleted */").exists?
-    end
-
     def has_explicit?
       posts.any? {|x| x.rating == "e"}
     end
@@ -99,10 +91,6 @@ module PostSets
 
     def is_random?
       random || Tag.has_metatag?(tag_array, :order) == "random"
-    end
-
-    def use_sequential_paginator?
-      unknown_post_count? && !CurrentUser.is_gold?
     end
 
     def get_post_count
