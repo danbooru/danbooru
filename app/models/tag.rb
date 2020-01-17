@@ -594,23 +594,15 @@ class Tag < ApplicationRecord
             q[:ordpool] = pool_id
 
           when "-favgroup"
-            favgroup_id = FavoriteGroup.name_to_id(g2)
-            favgroup = FavoriteGroup.find(favgroup_id)
-
-            if !favgroup.viewable_by?(CurrentUser.user)
-              raise User::PrivilegeError.new
-            end
+            favgroup = FavoriteGroup.find_by_name_or_id!(g2, CurrentUser.user)
+            raise User::PrivilegeError unless favgroup.viewable_by?(CurrentUser.user)
 
             q[:favgroups_neg] ||= []
             q[:favgroups_neg] << favgroup
 
           when "favgroup"
-            favgroup_id = FavoriteGroup.name_to_id(g2)
-            favgroup = FavoriteGroup.find(favgroup_id)
-
-            if !favgroup.viewable_by?(CurrentUser.user)
-              raise User::PrivilegeError.new
-            end
+            favgroup = FavoriteGroup.find_by_name_or_id!(g2, CurrentUser.user)
+            raise User::PrivilegeError unless favgroup.viewable_by?(CurrentUser.user)
 
             q[:favgroups] ||= []
             q[:favgroups] << favgroup

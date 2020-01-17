@@ -52,7 +52,7 @@ module PostSets
       name = Tag.has_metatag?(tag_array, :favgroup)
       return nil unless is_single_tag? && name.present?
 
-      @favgroup ||= FavoriteGroup.find_by_name(name)
+      @favgroup ||= FavoriteGroup.find_by_name_or_id(name, CurrentUser.user)
     end
 
     def has_explicit?

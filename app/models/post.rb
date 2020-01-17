@@ -820,20 +820,14 @@ class Post < ApplicationRecord
             post.update!(parent_id: id)
           end
 
-        when /^-favgroup:(\d+)$/i
-          favgroup = FavoriteGroup.where("id = ?", $1.to_i).for_creator(CurrentUser.user.id).first
-          favgroup&.remove!(self)
-
         when /^-favgroup:(.+)$/i
-          favgroup = FavoriteGroup.named($1).for_creator(CurrentUser.user.id).first
+          favgroup = FavoriteGroup.find_by_name_or_id!($1, CurrentUser.user)
+          raise User::PrivilegeError unless favgroup.editable_by?(CurrentUser.user)
           favgroup&.remove!(self)
-
-        when /^favgroup:(\d+)$/i
-          favgroup = FavoriteGroup.where("id = ?", $1.to_i).for_creator(CurrentUser.user.id).first
-          favgroup&.add!(self)
 
         when /^favgroup:(.+)$/i
-          favgroup = FavoriteGroup.named($1).for_creator(CurrentUser.user.id).first
+          favgroup = FavoriteGroup.find_by_name_or_id!($1, CurrentUser.user)
+          raise User::PrivilegeError unless favgroup.editable_by?(CurrentUser.user)
           favgroup&.add!(self)
 
         end

@@ -11,22 +11,14 @@ class FavoriteGroup < ApplicationRecord
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
 
   module SearchMethods
-    def for_creator(user_id)
-      where("favorite_groups.creator_id = ?", user_id)
-    end
-
     def for_post(post_id)
       where_array_includes_any(:post_ids, [post_id])
     end
 
-    def named(name)
-      where("lower(name) = ?", name.to_s.mb_chars.downcase.strip)
-    end
-
     def name_matches(name)
-      name = name.tr(" ", "_")
+      name = normalize_name(name)
       name = "*#{name}*" unless name =~ /\*/
-      where("name ilike ? escape E'\\\\'", name.to_escaped_for_sql_like)
+      where_ilike(:name, name)
     end
 
     def hide_private(user, params)
@@ -70,14 +62,6 @@ class FavoriteGroup < ApplicationRecord
 
   extend SearchMethods
 
-  def self.name_to_id(name)
-    if name =~ /^\d+$/
-      name.to_i
-    else
-      select_value_sql("SELECT id FROM favorite_groups WHERE lower(name) = ? AND creator_id = ?", name.to_s.mb_chars.downcase.tr(" ", "_"), CurrentUser.user.id).to_i
-    end
-  end
-
   def creator_can_create_favorite_groups
     if creator.favorite_group_count >= creator.favorite_group_limit
       error = "You can only keep up to #{creator.favorite_group_limit} favorite groups."
@@ -117,14 +101,16 @@ class FavoriteGroup < ApplicationRecord
     self.name = FavoriteGroup.normalize_name(name)
   end
 
-  def self.find_by_name(name)
-    if name =~ /^\d+$/
-      where("id = ?", name.to_i).first
-    elsif name
-      where("lower(name) = ?", normalize_name(name).mb_chars.downcase).first
+  def self.find_by_name_or_id(name, user)
+    if name =~ /\A\d+\z/
+      find_by(id: name)
     else
-      nil
+      user.favorite_groups.where_iequals(:name, normalize_name(name)).first
     end
+  end
+
+  def self.find_by_name_or_id!(name, user)
+    find_by_name_or_id(name, user) or raise ActiveRecord::RecordNotFound
   end
 
   def strip_name
