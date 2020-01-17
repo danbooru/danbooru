@@ -65,10 +65,6 @@ class UploadService
     return @post.warnings.full_messages
   end
 
-  def include_artist_commentary?
-    params[:include_artist_commentary].to_s.truthy?
-  end
-
   def create_post_from_upload(upload)
     @post = convert_to_post(upload)
     @post.save!
@@ -81,10 +77,12 @@ class UploadService
       )
     end
 
-    if include_artist_commentary?
+    if upload.include_artist_commentary
       @post.create_artist_commentary(
-        :original_title => params[:artist_commentary_title],
-        :original_description => params[:artist_commentary_desc]
+        :original_title => upload.artist_commentary_title,
+        :original_description => upload.artist_commentary_desc,
+        :translated_title => upload.translated_commentary_title,
+        :translated_description => upload.translated_commentary_desc
       )
     end
 
