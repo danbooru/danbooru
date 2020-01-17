@@ -451,11 +451,11 @@ class PostQueryBuilder
     end
 
     q[:favgroups_neg].to_a.each do |favgroup|
-      relation = relation.where.not("posts.id": favgroup.post_ids)
+      relation = relation.where.not(id: FavoriteGroup.where(id: favgroup.id).select("unnest(post_ids)"))
     end
 
     q[:favgroups].to_a.each do |favgroup|
-      relation = relation.where("posts.id": favgroup.post_ids)
+      relation = relation.where(id: FavoriteGroup.where(id: favgroup.id).select("unnest(post_ids)"))
     end
 
     if q[:upvote].present?
