@@ -41,28 +41,18 @@ module PostSets
       tag.artist
     end
 
-    def pool_name
-      @pool_name ||= Tag.has_metatag?(tag_array, :ordpool, :pool)
-    end
-
-    def has_pool?
-      is_single_tag? && pool_name && pool
-    end
-
     def pool
-      ::Pool.find_by_name(pool_name)
-    end
+      name = Tag.has_metatag?(tag_array, :ordpool, :pool)
+      return nil unless is_single_tag? && name.present?
 
-    def favgroup_name
-      @favgroup_name ||= Tag.has_metatag?(tag_array, :favgroup)
-    end
-
-    def has_favgroup?
-      is_single_tag? && favgroup_name && favgroup
+      @pool ||= Pool.find_by_name(name)
     end
 
     def favgroup
-      ::FavoriteGroup.find_by_name(favgroup_name)
+      name = Tag.has_metatag?(tag_array, :favgroup)
+      return nil unless is_single_tag? && name.present?
+
+      @favgroup ||= FavoriteGroup.find_by_name(name)
     end
 
     def has_explicit?

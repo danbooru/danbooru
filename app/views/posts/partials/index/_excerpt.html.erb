@@ -36,7 +36,7 @@
         </p>
       </div>
     <% end %>
-  <% elsif post_set.has_pool? %>
+  <% elsif post_set.pool.present? %>
     <% post_set.pool.tap do |pool| %>
       <h4>
         <%= pool.pretty_category %>:
@@ -54,7 +54,7 @@
         <%= link_to "View pool", pool_path(post_set.pool.id) %>
       </p>
     <% end %>
-  <% elsif post_set.has_favgroup? %>
+  <% elsif post_set.favgroup.present? %>
     <h4>
       Favorite Group:
       <%= link_to post_set.favgroup.pretty_name, favorite_group_path(post_set.favgroup) %>
