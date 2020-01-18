@@ -17,6 +17,7 @@ module DanbooruMaintenance
     safely { TagChangeRequestPruner.warn_all }
     safely { TagChangeRequestPruner.reject_all }
     safely { Ban.prune! }
+    safely { ModerationReport.prune! }
     safely { CuratedPoolUpdater.update_pool! }
     safely { ActiveRecord::Base.connection.execute("vacuum analyze") unless Rails.env.test? }
   end

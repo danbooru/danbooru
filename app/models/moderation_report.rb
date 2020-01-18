@@ -54,4 +54,8 @@ class ModerationReport < ApplicationRecord
 
     q.apply_default_order(params)
   end
+
+  def self.prune!
+    where("created_at < ?", 1.week.ago).delete_all
+  end
 end
