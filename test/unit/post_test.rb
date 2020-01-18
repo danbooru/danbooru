@@ -1706,7 +1706,7 @@ class PostTest < ActiveSupport::TestCase
         @parent = FactoryBot.create(:post)
         @child = FactoryBot.create(:post, parent: @parent)
 
-        @user1 = FactoryBot.create(:user, enable_privacy_mode: true)
+        @user1 = FactoryBot.create(:user, enable_private_favorites: true)
         @gold1 = FactoryBot.create(:gold_user)
         @supervoter1 = FactoryBot.create(:user, is_super_voter: true)
 

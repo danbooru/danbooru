@@ -3,6 +3,7 @@ class FavoriteGroupsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def index
+    params[:search][:creator_id] ||= params[:user_id]
     @favorite_groups = FavoriteGroup.paginated_search(params)
     respond_with(@favorite_groups)
   end

@@ -21,14 +21,8 @@ class FavoriteGroup < ApplicationRecord
       where_ilike(:name, name)
     end
 
-    def hide_private(user, params)
-      if user.hide_favorites?
-        where("is_public = true")
-      elsif params[:is_public].present?
-        where("is_public = ?", params[:is_public])
-      else
-        all
-      end
+    def visible(user)
+      where(is_public: true).or(where(creator_id: user.id))
     end
 
     def default_order
@@ -37,20 +31,8 @@ class FavoriteGroup < ApplicationRecord
 
     def search(params)
       q = super
-      q = q.search_attributes(params, :name, :is_public, :post_ids)
-
-      if params[:creator_id].present?
-        user = User.find(params[:creator_id])
-        q = q.hide_private(user, params)
-        q = q.where("creator_id = ?", user.id)
-      elsif params[:creator_name].present?
-        user = User.find_by_name(params[:creator_name])
-        q = q.hide_private(user, params)
-        q = q.where("creator_id = ?", user.id)
-      else
-        q = q.hide_private(CurrentUser.user, params)
-        q = q.where("creator_id = ?", CurrentUser.user.id)
-      end
+      q = q.visible(CurrentUser.user)
+      q = q.search_attributes(params, :name, :is_public, :post_ids, :creator)
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
@@ -177,6 +159,6 @@ class FavoriteGroup < ApplicationRecord
   end
 
   def viewable_by?(user)
-    creator_id == user.id || !creator.hide_favorites? || is_public
+    creator_id == user.id || is_public
   end
 end

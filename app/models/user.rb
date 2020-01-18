@@ -40,7 +40,7 @@ class User < ApplicationRecord
     always_resize_images
     enable_post_navigation
     new_post_navigation_layout
-    enable_privacy_mode
+    enable_private_favorites
     enable_sequential_post_navigation
     hide_deleted_posts
     style_usernames
@@ -653,7 +653,7 @@ class User < ApplicationRecord
     end
 
     def favorite_group_count
-      favorite_groups.count
+      favorite_groups.visible(CurrentUser.user).count
     end
 
     def appeal_count
@@ -792,7 +792,7 @@ class User < ApplicationRecord
   end
 
   def hide_favorites?
-    !CurrentUser.is_admin? && enable_privacy_mode? && CurrentUser.user.id != id
+    !CurrentUser.is_admin? && enable_private_favorites? && CurrentUser.user.id != id
   end
 
   def initialize_attributes

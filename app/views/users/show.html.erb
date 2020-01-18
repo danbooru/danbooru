@@ -4,10 +4,8 @@
 
     <%= render "statistics", presenter: @user.presenter, user: @user %>
 
-    <% if !CurrentUser.is_admin? && !@user.enable_privacy_mode? || CurrentUser.id == @user.id %>
-      <%= render "posts/partials/common/inline_blacklist" %>
-      <%= render "post_summary", presenter: @user.presenter, user: @user %>
-    <% end %>
+    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render "post_summary", presenter: @user.presenter, user: @user %>
   </div>
 </div>
 

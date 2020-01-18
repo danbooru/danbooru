@@ -109,7 +109,7 @@ class UsersController < ApplicationController
       time_zone per_page custom_style theme
 
       receive_email_notifications always_resize_images enable_post_navigation
-      new_post_navigation_layout enable_privacy_mode
+      new_post_navigation_layout enable_private_favorites
       enable_sequential_post_navigation hide_deleted_posts style_usernames
       enable_auto_complete show_deleted_children
       disable_categorized_saved_searches disable_tagged_filenames

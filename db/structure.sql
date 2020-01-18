@@ -924,7 +924,7 @@ CREATE TABLE public.favorite_groups (
     post_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    is_public boolean DEFAULT false NOT NULL
+    is_public boolean DEFAULT true NOT NULL
 );
 
 
@@ -4968,6 +4968,13 @@ CREATE INDEX index_favorite_groups_on_creator_id ON public.favorite_groups USING
 
 
 --
+-- Name: index_favorite_groups_on_is_public; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_favorite_groups_on_is_public ON public.favorite_groups USING btree (is_public);
+
+
+--
 -- Name: index_favorite_groups_on_lower_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7407,6 +7414,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20191119061018'),
 ('20191223032633'),
 ('20200114204550'),
-('20200115010442');
+('20200115010442'),
+('20200118015014');
 
 
