@@ -32,6 +32,9 @@
             <li><%= link_to "Edit", edit_forum_post_path(forum_post.id), :id => "edit_forum_post_link_#{forum_post.id}", :class => "edit_forum_post_link" %></li>
           <% end %>
         <% end %>
+        <% if forum_post.reportable_by?(CurrentUser.user) %>
+          <li><%= link_to "Report forum", new_moderation_report_path(moderation_report: { model_type: "ForumPost", model_id: forum_post.id }), remote: true %></li>
+        <% end %>
         <% if forum_post.votable? %>
           <ul class="votes" id="forum-post-votes-for-<%= forum_post.id %>">
             <%= render "forum_post_votes/list", votes: forum_post.votes, forum_post: forum_post %>

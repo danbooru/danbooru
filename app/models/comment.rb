@@ -7,6 +7,7 @@ class Comment < ApplicationRecord
   belongs_to :post
   belongs_to_creator
   belongs_to_updater
+  has_many :moderation_reports, as: :model
   has_many :votes, :class_name => "CommentVote", :dependent => :destroy
   after_create :update_last_commented_at_on_create
   after_update(:if => ->(rec) {(!rec.is_deleted? || !rec.saved_change_to_is_deleted?) && CurrentUser.id != rec.creator_id}) do |rec|
@@ -125,6 +126,10 @@ class Comment < ApplicationRecord
 
   def editable_by?(user)
     updater_id == user.id || user.is_moderator?
+  end
+
+  def reportable_by?(user)
+    user.is_builder? && creator_id != user.id && !creator.is_moderator?
   end
 
   def voted_by?(user)

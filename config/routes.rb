@@ -160,6 +160,7 @@ Rails.application.routes.draw do
     end
   end
   resources :mod_actions
+  resources :moderation_reports, only: [:new, :create, :index]
   resources :news_updates
   resources :notes do
     collection do
