@@ -42,7 +42,7 @@ class ForumPostsController < ApplicationController
   end
 
   def create
-    @forum_post = ForumPost.create(forum_post_params(:create))
+    @forum_post = ForumPost.create(forum_post_params(:create).merge(creator: CurrentUser.user))
     page = @forum_post.topic.last_page if @forum_post.topic.last_page > 1
     respond_with(@forum_post, :location => forum_topic_path(@forum_post.topic, :page => page))
   end

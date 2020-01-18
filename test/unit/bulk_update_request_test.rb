@@ -37,7 +37,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
     context "#update_notice" do
       setup do
-        @forum_topic = FactoryBot.create(:forum_topic)
+        @forum_topic = create(:forum_topic, creator: @admin)
       end
 
       should "update the cache" do
@@ -70,7 +70,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           mass update aaa -> bbb
         '
 
-        @bur = FactoryBot.create(:bulk_update_request, :script => @script)
+        @bur = create(:bulk_update_request, script: @script, user: @admin)
         @bur.approve!(@admin)
 
         assert_enqueued_jobs(3)
@@ -111,7 +111,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
     context "that has an invalid alias" do
       setup do
-        @alias1 = FactoryBot.create(:tag_alias)
+        @alias1 = create(:tag_alias, creator: @admin)
         @req = FactoryBot.build(:bulk_update_request, :script => "create alias bbb -> aaa")
       end
 
@@ -172,8 +172,8 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
     context "with an associated forum topic" do
       setup do
-        @topic = FactoryBot.create(:forum_topic, :title => "[bulk] hoge")
-        @post = FactoryBot.create(:forum_post, :topic_id => @topic.id)
+        @topic = create(:forum_topic, title: "[bulk] hoge", creator: @admin)
+        @post = create(:forum_post, topic: @topic, creator: @admin)
         @req = FactoryBot.create(:bulk_update_request, :script => "create alias AAA -> BBB", :forum_topic_id => @topic.id, :forum_post_id => @post.id, :title => "[bulk] hoge")
       end
 

@@ -2,7 +2,7 @@ class ForumPost < ApplicationRecord
   include Mentionable
 
   attr_readonly :topic_id
-  belongs_to_creator
+  belongs_to :creator, class_name: "User"
   belongs_to_updater
   belongs_to :topic, :class_name => "ForumTopic"
   has_many :dtext_links, as: :model, dependent: :destroy
@@ -113,7 +113,7 @@ class ForumPost < ApplicationRecord
   end
 
   def validate_topic_is_unlocked
-    return if CurrentUser.is_moderator?
+    return if creator.is_moderator?
     return if topic.nil?
 
     if topic.is_locked?
@@ -139,7 +139,7 @@ class ForumPost < ApplicationRecord
   def update_topic_updated_at_on_create
     if topic
       # need to do this to bypass the topic's original post from getting touched
-      ForumTopic.where(:id => topic.id).update_all(["updater_id = ?, response_count = response_count + 1, updated_at = ?", CurrentUser.id, Time.now])
+      ForumTopic.where(:id => topic.id).update_all(["updater_id = ?, response_count = response_count + 1, updated_at = ?", creator.id, Time.now])
       topic.response_count += 1
     end
   end

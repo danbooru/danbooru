@@ -12,54 +12,37 @@ class PostFlagTest < ActiveSupport::TestCase
     end
 
     context "a basic user" do
-      setup do
-        travel_to(2.weeks.ago) do
-          @bob = create(:user)
-        end
-      end
-
       should "not be able to flag more than 1 post in 24 hours" do
-        @post_flag = PostFlag.new(post: @post, reason: "aaa", is_resolved: false)
+        @bob = create(:user, created_at: 2.weeks.ago)
+        @post_flag = build(:post_flag, creator: @bob)
         @post_flag.expects(:flag_count_for_creator).returns(1)
-        assert_difference("PostFlag.count", 0) do
-          as(@bob) { @post_flag.save }
-        end
+
+        assert_equal(false, @post_flag.valid?)
         assert_equal(["You can flag 1 post a day"], @post_flag.errors.full_messages)
       end
     end
 
     context "a gold user" do
       setup do
-        travel_to(2.weeks.ago) do
-          @bob = create(:gold_user)
-        end
+        @bob = create(:gold_user, created_at: 1.month.ago)
       end
 
       should "not be able to flag a post more than twice" do
-        assert_difference(-> { PostFlag.count }, 1) do
-          as(@bob) do
-            @post_flag = PostFlag.create(post: @post, reason: "aaa", is_resolved: false)
-          end
-        end
+        @post_flag = create(:post_flag, post: @post, creator: @bob)
+        @post_flag = build(:post_flag, post: @post, creator: @bob)
 
-        assert_difference(-> { PostFlag.count }, 0) do
-          as(@bob) do
-            @post_flag = PostFlag.create(post: @post, reason: "aaa", is_resolved: false)
-          end
-        end
-
+        assert_equal(false, @post_flag.valid?)
         assert_equal(["have already flagged this post"], @post_flag.errors[:creator_id])
       end
 
       should "not be able to flag more than 10 posts in 24 hours" do
-        as(@bob) do
-          @post_flag = PostFlag.new(post: @post, reason: "aaa", is_resolved: false)
-          @post_flag.expects(:flag_count_for_creator).returns(10)
+        @post_flag = build(:post_flag, post: @post, creator: @bob)
+        @post_flag.expects(:flag_count_for_creator).returns(10)
 
-          assert_difference(-> { PostFlag.count }, 0) do
-            @post_flag.save
-          end
+        assert_difference(-> { PostFlag.count }, 0) do
+          @post_flag.save
         end
+
         assert_equal(["You can flag 10 posts a day"], @post_flag.errors.full_messages)
       end
 
@@ -68,11 +51,8 @@ class PostFlagTest < ActiveSupport::TestCase
           @post.update(is_deleted: true)
         end
 
-        assert_difference(-> { PostFlag.count }, 0) do
-          as(@bob) do
-            @post_flag = PostFlag.create(post: @post, reason: "aaa", is_resolved: false)
-          end
-        end
+        @post_flag = build(:post_flag, post: @post, creator: @bob)
+        @post_flag.save
         assert_equal(["Post is deleted"], @post_flag.errors.full_messages)
       end
 
@@ -80,9 +60,7 @@ class PostFlagTest < ActiveSupport::TestCase
         as(@alice) do
           @post.update(is_pending: true)
         end
-        as(@bob) do
-          @flag = @post.flags.create(reason: "test")
-        end
+        @flag = @post.flags.create(reason: "test", creator: @bob)
 
         assert_equal(["Post is pending and cannot be flagged"], @flag.errors.full_messages)
       end
@@ -94,49 +72,35 @@ class PostFlagTest < ActiveSupport::TestCase
           @users = FactoryBot.create_list(:user, 2)
         end
 
-        as(@users.first) do
-          @flag1 = PostFlag.create(post: @post, reason: "something")
-        end
+        @flag1 = create(:post_flag, post: @post, reason: "something", creator: @users.first)
 
         as(@mod) do
           @post.approve!
         end
 
         travel_to(PostFlag::COOLDOWN_PERIOD.from_now - 1.minute) do
-          as(@users.second) do
-            @flag2 = PostFlag.create(post: @post, reason: "something")
-          end
+          @flag2 = build(:post_flag, post: @post, reason: "something", creator: @users.second)
+          assert_equal(false, @flag2.valid?)
           assert_match(/cannot be flagged more than once/, @flag2.errors[:post].join)
         end
 
         travel_to(PostFlag::COOLDOWN_PERIOD.from_now + 1.minute) do
-          as(@users.second) do
-            @flag3 = PostFlag.create(post: @post, reason: "something")
-          end
+          @flag3 = create(:post_flag, post: @post, reason: "something", creator: @users.second)
           assert(@flag3.errors.empty?)
         end
       end
 
       should "initialize its creator" do
-        @post_flag = as(@alice) do
-          PostFlag.create(:post => @post, :reason => "aaa", :is_resolved => false)
-        end
+        @post_flag = create(:post_flag, creator: @alice)
         assert_equal(@alice.id, @post_flag.creator_id)
       end
     end
 
     context "a moderator user" do
-      setup do
-        travel_to(2.weeks.ago) do
-          @dave = create(:moderator_user)
-        end
-      end
-
       should "not be able to view flags on their own uploads" do
+        @dave = create(:moderator_user, created_at: 1.month.ago)
         @modpost = create(:post, :tag_string => "mmm", :uploader => @dave)
-        as(@alice) do
-          @flag1 = PostFlag.create(:post => @modpost, :reason => "aaa", :is_resolved => false)
-        end
+        @flag1 = create(:post_flag, post: @modpost, creator: @alice)
 
         assert_equal(false, @dave.can_view_flagger_on_post?(@flag1))
 

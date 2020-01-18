@@ -7,8 +7,9 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
       @other_user = create(:user)
       @mod = create(:moderator_user)
 
-      as_user do
-        @forum_topic = create(:forum_topic, :title => "my forum topic", :original_post_attributes => {:body => "xxx"})
+      as(@user) do
+        @forum_topic = create(:forum_topic, creator: @user, title: "my forum topic")
+        @forum_post = create(:forum_post, creator: @user, topic: @forum_topic, body: "xxx")
       end
     end
 
@@ -28,9 +29,7 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         @gold_user = create(:gold_user)
 
         # An open topic should bump...
-        as(@gold_user) do
-          @open_topic = create(:forum_topic)
-        end
+        @open_topic = as(@gold_user) { create(:forum_topic, creator: @gold_user) }
         @gold_user.reload
         as(@gold_user) do
           assert(@gold_user.has_forum_been_updated?)
@@ -47,9 +46,7 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         end
 
         # Then adding an unread private topic should not bump.
-        as(@mod) do
-          create(:forum_post, :topic_id => @forum_topic.id)
-        end
+        as(@mod) { create(:forum_post, topic: @forum_topic, creator: @mod) }
         @gold_user.reload
         as(@gold_user) do
           assert_equal(false, @gold_user.has_forum_been_updated?)
@@ -91,8 +88,10 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         as_user do
-          @topic1 = create(:forum_topic, :is_sticky => true, :original_post_attributes => {:body => "xxx"})
-          @topic2 = create(:forum_topic, :original_post_attributes => {:body => "xxx"})
+          @topic1 = create(:forum_topic, is_sticky: true, creator: @user)
+          @topic2 = create(:forum_topic, creator: @user)
+          @post1 = create(:forum_post, topic: @topic1, creator: @user, body: "xxx")
+          @post2 = create(:forum_post, topic: @topic2, creator: @user, body: "xxx")
         end
       end
 
@@ -158,7 +157,7 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a new forum topic and post" do
         assert_difference(["ForumPost.count", "ForumTopic.count"], 1) do
-          post_auth forum_topics_path, @user, params: {:forum_topic => {:title => "bababa", :original_post_attributes => {:body => "xaxaxa"}}}
+          post_auth forum_topics_path, @user, params: { forum_topic: { title: "bababa", original_post_attributes: { body: "xaxaxa" }}}
         end
 
         forum_topic = ForumTopic.last

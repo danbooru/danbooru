@@ -268,8 +268,8 @@ class Post < ApplicationRecord
       !is_status_locked? && (is_pending? || is_flagged? || is_deleted?) && uploader != user && !approved_by?(user)
     end
 
-    def flag!(reason, options = {})
-      flag = flags.create(:reason => reason, :is_resolved => false, :is_deletion => options[:is_deletion])
+    def flag!(reason, is_deletion: false)
+      flag = flags.create(reason: reason, is_resolved: false, is_deletion: is_deletion, creator: CurrentUser.user)
 
       if flag.errors.any?
         raise PostFlag::Error.new(flag.errors.full_messages.join("; "))
@@ -746,7 +746,7 @@ class Post < ApplicationRecord
         when /^newpool:(.+)$/i
           pool = Pool.find_by_name($1)
           if pool.nil?
-            pool = Pool.create(:name => $1, :description => "This pool was automatically generated")
+            pool = Pool.create(name: $1, creator: CurrentUser.user, description: "This pool was automatically generated")
           end
         end
       end

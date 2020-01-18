@@ -7,7 +7,7 @@ class TagRelationship < ApplicationRecord
 
   attr_accessor :skip_secondary_validations
 
-  belongs_to_creator
+  belongs_to :creator, class_name: "User"
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :forum_post, optional: true
   belongs_to :forum_topic, optional: true
@@ -24,7 +24,6 @@ class TagRelationship < ApplicationRecord
   scope :pending, -> {where(status: "pending")}
   scope :retired, -> {where(status: "retired")}
 
-  before_validation :initialize_creator, :on => :create
   before_validation :normalize_names
   validates_format_of :status, :with => /\A(active|deleted|pending|processing|queued|retired|error: .*)\Z/
   validates_presence_of :antecedent_name, :consequent_name
@@ -32,10 +31,6 @@ class TagRelationship < ApplicationRecord
   validates :forum_topic, presence: { message: "must exist" }, if: -> { forum_topic_id.present? }
   validate :antecedent_and_consequent_are_different
   after_save :update_notice
-
-  def initialize_creator
-    self.creator_id = CurrentUser.user.id
-  end
 
   def normalize_names
     self.antecedent_name = antecedent_name.mb_chars.downcase.tr(" ", "_")

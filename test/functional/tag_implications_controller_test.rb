@@ -4,15 +4,10 @@ class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
   context "The tag implications controller" do
     setup do
       @user = create(:admin_user)
+      @tag_implication = create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb")
     end
 
     context "edit action" do
-      setup do
-        as_admin do
-          @tag_implication = create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
-        end
-      end
-
       should "render" do
         get_auth tag_implication_path(@tag_implication), @user
         assert_response :success
@@ -20,12 +15,6 @@ class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "update action" do
-      setup do
-        as_admin do
-          @tag_implication = create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
-        end
-      end
-
       context "for a pending implication" do
         setup do
           as_admin do
@@ -60,12 +49,6 @@ class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
-      setup do
-        as_user do
-          @tag_implication = create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
-        end
-      end
-
       should "list all tag implications" do
         get tag_implications_path
         assert_response :success
@@ -78,12 +61,6 @@ class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "destroy action" do
-      setup do
-        as_user do
-          @tag_implication = create(:tag_implication)
-        end
-      end
-
       should "mark the implication as deleted" do
         assert_difference("TagImplication.count", 0) do
           delete_auth tag_implication_path(@tag_implication), @user

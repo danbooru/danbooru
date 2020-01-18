@@ -5,7 +5,7 @@ class Comment < ApplicationRecord
   validate :validate_comment_is_not_spam, on: :create
   validates_presence_of :body, :message => "has no content"
   belongs_to :post
-  belongs_to_creator
+  belongs_to :creator, class_name: "User"
   belongs_to_updater
   has_many :moderation_reports, as: :model
   has_many :votes, :class_name => "CommentVote", :dependent => :destroy

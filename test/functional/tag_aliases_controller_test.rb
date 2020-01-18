@@ -4,15 +4,10 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
   context "The tag aliases controller" do
     setup do
       @user = create(:admin_user)
+      @tag_alias = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
     end
 
     context "edit action" do
-      setup do
-        as_admin do
-          @tag_alias = create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
-        end
-      end
-
       should "render" do
         get_auth edit_tag_alias_path(@tag_alias), @user
         assert_response :success
@@ -20,12 +15,6 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "update action" do
-      setup do
-        as_admin do
-          @tag_alias = create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
-        end
-      end
-
       context "for a pending alias" do
         setup do
           as_admin do
@@ -63,12 +52,6 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
-      setup do
-        as_admin do
-          @tag_alias = create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
-        end
-      end
-
       should "list all tag alias" do
         get_auth tag_aliases_path, @user
         assert_response :success
@@ -81,12 +64,6 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "destroy action" do
-      setup do
-        as_admin do
-          @tag_alias = create(:tag_alias)
-        end
-      end
-
       should "mark the alias as deleted" do
         assert_difference("TagAlias.count", 0) do
           delete_auth tag_alias_path(@tag_alias), @user

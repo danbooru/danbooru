@@ -11,7 +11,7 @@ class ForumTopic < ApplicationRecord
     Admin: User::Levels::ADMIN
   }
 
-  belongs_to_creator
+  belongs_to :creator, class_name: "User"
   belongs_to_updater
   has_many :posts, -> {order("forum_posts.id asc")}, :class_name => "ForumPost", :foreign_key => "topic_id", :dependent => :destroy
   has_many :moderation_reports, through: :posts
@@ -180,7 +180,7 @@ class ForumTopic < ApplicationRecord
   end
 
   def update_orignal_post
-    original_post&.update_columns(:updater_id => CurrentUser.id, :updated_at => Time.now)
+    original_post&.update_columns(:updater_id => updater.id, :updated_at => Time.now)
   end
 
   def viewable_moderation_reports

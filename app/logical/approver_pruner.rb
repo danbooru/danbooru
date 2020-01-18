@@ -20,7 +20,7 @@ module ApproverPruner
     inactive_approvers.each do |user|
       CurrentUser.scoped(User.system, "127.0.0.1") do
         user.update!(can_approve_posts: false)
-        user.feedback.create(category: "neutral", body: "Lost approval privileges")
+        user.feedback.create(category: "neutral", body: "Lost approval privileges", creator: User.system)
 
         Dmail.create_automated(
           to_id: user.id,

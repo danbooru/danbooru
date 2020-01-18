@@ -1,7 +1,7 @@
 class UserFeedback < ApplicationRecord
   self.table_name = "user_feedback"
   belongs_to :user
-  belongs_to_creator
+  belongs_to :creator, class_name: "User"
   attr_accessor :disable_dmail_notification
   validates_presence_of :body, :category
   validates_inclusion_of :category, :in => %w(positive negative neutral)

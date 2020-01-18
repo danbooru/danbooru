@@ -9,7 +9,7 @@ class PostFlag < ApplicationRecord
 
   COOLDOWN_PERIOD = 3.days
 
-  belongs_to_creator :class_name => "User"
+  belongs_to :creator, class_name: "User"
   belongs_to :post
   validates_presence_of :reason
   validate :validate_creator_is_not_limited, on: :create
@@ -124,7 +124,7 @@ class PostFlag < ApplicationRecord
   def validate_creator_is_not_limited
     return if is_deletion
 
-    if CurrentUser.can_approve_posts?
+    if creator.can_approve_posts?
       # do nothing
     elsif creator.created_at > 1.week.ago
       errors[:creator] << "cannot flag within the first week of sign up"

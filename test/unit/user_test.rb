@@ -88,9 +88,7 @@ class UserTest < ActiveSupport::TestCase
       @user.update_column(:created_at, 1.year.ago)
       assert(@user.can_comment?)
       assert(!@user.is_comment_limited?)
-      Danbooru.config.member_comment_limit.times do
-        FactoryBot.create(:comment)
-      end
+      create_list(:comment, Danbooru.config.member_comment_limit, creator: @user)
       assert(@user.is_comment_limited?)
     end
 

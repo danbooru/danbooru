@@ -24,7 +24,7 @@ class FavoriteGroupsController < ApplicationController
   end
 
   def create
-    @favorite_group = FavoriteGroup.create(favgroup_params)
+    @favorite_group = CurrentUser.favorite_groups.create(favgroup_params)
     respond_with(@favorite_group)
   end
 

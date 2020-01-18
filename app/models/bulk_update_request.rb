@@ -15,7 +15,7 @@ class BulkUpdateRequest < ApplicationRecord
   validate :validate_script, :on => :create
   before_validation :initialize_attributes, :on => :create
   before_validation :normalize_text
-  after_create :create_forum_topic
+  before_create :create_forum_topic
   after_save :update_notice
 
   scope :pending_first, -> { order(Arel.sql("(case status when 'pending' then 0 when 'approved' then 1 else 2 end)")) }
@@ -94,12 +94,9 @@ class BulkUpdateRequest < ApplicationRecord
     end
 
     def create_forum_topic
-      if forum_topic_id
-        forum_post = forum_topic.posts.create(body: reason_with_link)
-        update(forum_post_id: forum_post.id)
-      else
-        forum_topic = ForumTopic.create(title: title, category_id: 1, original_post_attributes: {body: reason_with_link})
-        update(forum_topic_id: forum_topic.id, forum_post_id: forum_topic.posts.first.id)
+      CurrentUser.as(user) do
+        self.forum_topic = ForumTopic.create(title: title, category_id: 1, creator: user) unless forum_topic.present?
+        self.forum_post = forum_topic.posts.create(body: reason_with_link, creator: user) unless forum_post.present?
       end
     end
 

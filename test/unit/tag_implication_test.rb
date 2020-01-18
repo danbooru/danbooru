@@ -6,7 +6,6 @@ class TagImplicationTest < ActiveSupport::TestCase
       user = FactoryBot.create(:admin_user)
       CurrentUser.user = user
       CurrentUser.ip_addr = "127.0.0.1"
-      @user = FactoryBot.create(:user)
     end
 
     teardown do
@@ -104,7 +103,7 @@ class TagImplicationTest < ActiveSupport::TestCase
     end
 
     should "populate the creator information" do
-      ti = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
+      ti = create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", creator: CurrentUser.user)
       assert_equal(CurrentUser.user.id, ti.creator_id)
     end
 
@@ -263,7 +262,6 @@ class TagImplicationTest < ActiveSupport::TestCase
 
     context "with an associated forum topic" do
       setup do
-        @admin = FactoryBot.create(:admin_user)
         @topic = FactoryBot.create(:forum_topic, :title => "Tag implication: aaa -> bbb")
         @post = FactoryBot.create(:forum_post, topic_id: @topic.id, :body => TagImplicationRequest.command_string("aaa", "bbb"))
         @implication = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic, :forum_post => @post, :status => "pending")

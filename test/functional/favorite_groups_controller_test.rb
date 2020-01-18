@@ -4,9 +4,7 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
   context "The favorite groups controller" do
     setup do
       @user = create(:user)
-      as_user do
-        @favgroup = create(:favorite_group)
-      end
+      @favgroup = create(:favorite_group, creator: @user)
     end
 
     context "index action" do

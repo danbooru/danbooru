@@ -8,7 +8,7 @@ module Moderator
         CurrentUser.user = @user
         CurrentUser.ip_addr = "127.0.0.1"
         Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
-        @comment = FactoryBot.create(:comment)
+        @comment = create(:comment, creator: @user, creator_ip_addr: "127.0.0.1")
         PoolArchive.stubs(:enabled?).returns(false)
         PostArchive.stubs(:enabled?).returns(false)
         @user.reload

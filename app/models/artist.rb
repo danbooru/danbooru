@@ -13,7 +13,7 @@ class Artist < ApplicationRecord
   after_save :clear_url_string_changed
   validate :validate_tag_category
   validates :name, tag_name: true, uniqueness: true
-  belongs_to_creator
+  belongs_to :creator, class_name: "User"
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
   has_many :urls, :dependent => :destroy, :class_name => "ArtistUrl", :autosave => true
   has_many :versions, -> {order("artist_versions.id ASC")}, :class_name => "ArtistVersion"
@@ -418,15 +418,15 @@ class Artist < ApplicationRecord
       end
     end
 
-    def ban!
+    def ban!(banner: CurrentUser.user)
       Post.transaction do
         CurrentUser.without_safe_mode do
           Post.tag_match(name).each(&:ban!)
 
           # potential race condition but unlikely
           unless TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").exists?
-            tag_implication = TagImplication.create!(:antecedent_name => name, :consequent_name => "banned_artist", :skip_secondary_validations => true)
-            tag_implication.approve!(approver: CurrentUser.user)
+            tag_implication = TagImplication.create!(antecedent_name: name, consequent_name: "banned_artist", skip_secondary_validations: true, creator: banner)
+            tag_implication.approve!(approver: banner)
           end
 
           update_column(:is_banned, true)

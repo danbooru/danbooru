@@ -23,14 +23,8 @@ class TagRelationshipRetirementServiceTest < ActiveSupport::TestCase
     setup do
       subject.stubs(:is_unused?).returns(true)
 
-      @user = FactoryBot.create(:user)
-      as_user do
-        @new_alias = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
-
-        travel_to(3.years.ago) do
-          @old_alias = FactoryBot.create(:tag_alias, antecedent_name: "ccc", consequent_name: "ddd")
-        end
-      end
+      @new_alias = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
+      @old_alias = create(:tag_alias, antecedent_name: "ccc", consequent_name: "ddd", created_at: 3.years.ago)
     end
 
     should "find old tag relationships" do
@@ -50,17 +44,11 @@ class TagRelationshipRetirementServiceTest < ActiveSupport::TestCase
     subject { TagRelationshipRetirementService }
 
     setup do
-      @user = FactoryBot.create(:user)
+      @new_alias = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
+      @new_post = create(:post, tag_string: "bbb")
 
-      as_user do
-        @new_alias = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
-        @new_post = FactoryBot.create(:post, tag_string: "bbb")
-
-        travel_to(3.years.ago) do
-          @old_alias = FactoryBot.create(:tag_alias, antecedent_name: "ccc", consequent_name: "ddd")
-          @old_post = FactoryBot.create(:post, tag_string: "ddd")
-        end
-      end
+      @old_alias = create(:tag_alias, antecedent_name: "ccc", consequent_name: "ddd", created_at: 3.years.ago)
+      @old_post = create(:post, tag_string: "ddd", created_at: 3.years.ago)
     end
 
     should "return true if no recent post exists" do

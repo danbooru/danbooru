@@ -108,7 +108,7 @@ class TagAliasTest < ActiveSupport::TestCase
     end
 
     should "populate the creator information" do
-      ta = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+      ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", creator: CurrentUser.user)
       assert_equal(CurrentUser.user.id, ta.creator_id)
     end
 

@@ -2,22 +2,10 @@ require 'test_helper'
 
 class PostEventTest < ActiveSupport::TestCase
   def setup
-    super
-
-    travel_to(2.weeks.ago) do
-      CurrentUser.user = FactoryBot.create(:user)
-      CurrentUser.ip_addr = "127.0.0.1"
-    end
-
-    @post = FactoryBot.create(:post)
-    @post_flag = PostFlag.create(:post => @post, :reason => "aaa", :is_resolved => false)
-    @post_appeal = PostAppeal.create(:post => @post, :reason => "aaa")
-  end
-
-  def teardown
-    super
-    CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
+    @user = create(:user, created_at: 2.weeks.ago)
+    @post = create(:post)
+    @post_flag = create(:post_flag, creator: @user, post: @post)
+    @post_appeal = create(:post_appeal, creator: @user, post: @post)
   end
 
   context "PostEvent.find_for_post" do

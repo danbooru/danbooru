@@ -169,7 +169,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
       context "with only deleted comments" do
         setup do
-          as(@user) { create(:comment, post: @post, is_deleted: true) }
+          as(@user) { create(:comment, creator: @user, post: @post, is_deleted: true) }
         end
 
         should "not show deleted comments to regular members" do
@@ -194,7 +194,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
       context "with only downvoted comments" do
         should "not show thresholded comments" do
-          comment = as(@user) { create(:comment, post: @post, score: -10) }
+          comment = as(@user) { create(:comment, creator: @user, post: @post, score: -10) }
           get_auth post_path(@post), @user, params: { id: @post.id }
 
           assert_response :success
@@ -206,9 +206,9 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
       context "with a mix of comments" do
         should "not show deleted or thresholded comments " do
-          as(@user) { create(:comment, post: @post, do_not_bump_post: true, body: "good") }
-          as(@user) { create(:comment, post: @post, do_not_bump_post: true, body: "bad", score: -10) }
-          as(@user) { create(:comment, post: @post, do_not_bump_post: true, body: "ugly", is_deleted: true) }
+          as(@user) { create(:comment, creator: @user, post: @post, do_not_bump_post: true, body: "good") }
+          as(@user) { create(:comment, creator: @user, post: @post, do_not_bump_post: true, body: "bad", score: -10) }
+          as(@user) { create(:comment, creator: @user, post: @post, do_not_bump_post: true, body: "ugly", is_deleted: true) }
 
           get_auth post_path(@post), @user, params: { id: @post.id }
 

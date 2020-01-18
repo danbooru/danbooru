@@ -43,7 +43,11 @@ class ForumTopicsController < ApplicationController
   end
 
   def create
-    @forum_topic = ForumTopic.create(forum_topic_params(:create))
+    @forum_topic = ForumTopic.new(forum_topic_params(:create))
+    @forum_topic.creator = CurrentUser.user
+    @forum_topic.original_post.creator = CurrentUser.user
+    @forum_topic.save
+
     respond_with(@forum_topic)
   end
 

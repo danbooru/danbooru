@@ -18,7 +18,7 @@ class ArtistsController < ApplicationController
   end
 
   def ban
-    @artist.ban!
+    @artist.ban!(banner: CurrentUser.user)
     redirect_to(artist_path(@artist), :notice => "Artist was banned")
   end
 
@@ -48,7 +48,7 @@ class ArtistsController < ApplicationController
   end
 
   def create
-    @artist = Artist.create(artist_params)
+    @artist = Artist.create(artist_params.merge(creator: CurrentUser.user))
     respond_with(@artist)
   end
 

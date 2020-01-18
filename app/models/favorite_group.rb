@@ -1,7 +1,7 @@
 class FavoriteGroup < ApplicationRecord
   validates_uniqueness_of :name, :case_sensitive => false, :scope => :creator_id
   validates_format_of :name, :with => /\A[^,]+\Z/, :message => "cannot have commas"
-  belongs_to_creator
+  belongs_to :creator, class_name: "User"
   before_validation :normalize_name
   before_validation :strip_name
   validate :creator_can_create_favorite_groups, :on => :create
@@ -45,9 +45,9 @@ class FavoriteGroup < ApplicationRecord
   extend SearchMethods
 
   def creator_can_create_favorite_groups
-    if creator.favorite_group_count >= creator.favorite_group_limit
+    if creator.favorite_groups.count >= creator.favorite_group_limit
       error = "You can only keep up to #{creator.favorite_group_limit} favorite groups."
-      if !CurrentUser.user.is_platinum?
+      if !creator.is_platinum?
         error += " Upgrade your account to create more."
       end
       self.errors.add(:base, error)

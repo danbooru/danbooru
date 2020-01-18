@@ -19,7 +19,7 @@ class NotesController < ApplicationController
   end
 
   def create
-    @note = Note.create(note_params(:create))
+    @note = Note.create(note_params(:create).merge(creator: CurrentUser.user))
     respond_with(@note) do |fmt|
       fmt.json do
         if @note.errors.any?

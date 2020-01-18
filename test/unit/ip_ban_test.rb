@@ -1,16 +1,6 @@
 require 'test_helper'
 
 class IpBanTest < ActiveSupport::TestCase
-  setup do
-    CurrentUser.user = FactoryBot.create(:mod_user)
-    CurrentUser.ip_addr = "127.0.0.1"
-  end
-
-  teardown do
-    CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
-  end
-
   should "be able to ban a user" do
     ip_ban = create(:ip_ban, ip_addr: "1.2.3.4")
 

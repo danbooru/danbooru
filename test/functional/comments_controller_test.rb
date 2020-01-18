@@ -188,7 +188,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a comment" do
         assert_difference("Comment.count", 1) do
-          post_auth comments_path, @user, params: {comment: FactoryBot.attributes_for(:comment, post_id: @post.id)}
+          post_auth comments_path, @user, params: { comment: { post_id: @post.id, body: "blah" } }
         end
         comment = Comment.last
         assert_redirected_to post_path(comment.post)
@@ -196,7 +196,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow commenting on nonexistent posts" do
         assert_difference("Comment.count", 0) do
-          post_auth comments_path, @user, params: {comment: FactoryBot.attributes_for(:comment, post_id: -1)}
+          post_auth comments_path, @user, params: { comment: { post_id: -1, body: "blah" } }
         end
         assert_redirected_to comments_path
       end

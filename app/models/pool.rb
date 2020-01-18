@@ -3,7 +3,7 @@ class Pool < ApplicationRecord
   POOL_ORDER_LIMIT = 1000
 
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
-  belongs_to_creator
+  belongs_to :creator, class_name: "User"
 
   validates_uniqueness_of :name, case_sensitive: false, if: :name_changed?
   validate :validate_name, if: :name_changed?

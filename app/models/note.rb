@@ -3,7 +3,7 @@ class Note < ApplicationRecord
 
   attr_accessor :html_id
   belongs_to :post
-  belongs_to_creator
+  belongs_to :creator, class_name: "User"
   has_many :versions, -> {order("note_versions.id ASC")}, :class_name => "NoteVersion", :dependent => :destroy
   validates_presence_of :x, :y, :width, :height, :body
   validate :note_within_image
@@ -129,8 +129,9 @@ class Note < ApplicationRecord
     save!
   end
 
-  def copy_to(new_post)
+  def copy_to(new_post, creator: CurrentUser.user)
     new_note = dup
+    new_note.creator = creator
     new_note.post_id = new_post.id
     new_note.version = 0
 

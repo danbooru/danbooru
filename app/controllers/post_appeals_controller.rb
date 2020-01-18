@@ -13,7 +13,7 @@ class PostAppealsController < ApplicationController
   end
 
   def create
-    @post_appeal = PostAppeal.create(post_appeal_params)
+    @post_appeal = PostAppeal.create(post_appeal_params.merge(creator: CurrentUser.user))
     respond_with(@post_appeal)
   end
 

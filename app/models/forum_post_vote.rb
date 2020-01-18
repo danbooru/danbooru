@@ -1,5 +1,5 @@
 class ForumPostVote < ApplicationRecord
-  belongs_to_creator
+  belongs_to :creator, class_name: "User"
   belongs_to :forum_post
   validates :creator_id, uniqueness: {scope: :forum_post_id}
   validates :score, inclusion: {in: [-1, 0, 1]}

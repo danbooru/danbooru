@@ -33,7 +33,7 @@ class CommentsController < ApplicationController
   end
 
   def create
-    @comment = Comment.create(comment_params(:create))
+    @comment = Comment.create(comment_params(:create).merge(creator: CurrentUser.user, creator_ip_addr: CurrentUser.ip_addr))
     flash[:notice] = @comment.valid? ? "Comment posted" : @comment.errors.full_messages.join("; ")
     respond_with(@comment) do |format|
       format.html do

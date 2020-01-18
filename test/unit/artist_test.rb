@@ -30,27 +30,27 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "parse inactive urls" do
-      @artist = Artist.create(name: "blah", url_string: "-http://monet.com")
+      @artist = create(:artist, name: "blah", url_string: "-http://monet.com")
       assert_equal(["-http://monet.com"], @artist.urls.map(&:to_s))
       refute(@artist.urls[0].is_active?)
     end
 
     should "not allow duplicate active+inactive urls" do
-      @artist = Artist.create(name: "blah", url_string: "-http://monet.com\nhttp://monet.com")
+      @artist = create(:artist, name: "blah", url_string: "-http://monet.com\nhttp://monet.com")
       assert_equal(1, @artist.urls.count)
       assert_equal(["-http://monet.com"], @artist.urls.map(&:to_s))
       refute(@artist.urls[0].is_active?)
     end
 
     should "allow deactivating a url" do
-      @artist = Artist.create(name: "blah", url_string: "http://monet.com")
+      @artist = create(:artist, name: "blah", url_string: "http://monet.com")
       @artist.update(url_string: "-http://monet.com")
       assert_equal(1, @artist.urls.count)
       refute(@artist.urls[0].is_active?)
     end
 
     should "allow activating a url" do
-      @artist = Artist.create(name: "blah", url_string: "-http://monet.com")
+      @artist = create(:artist, name: "blah", url_string: "-http://monet.com")
       @artist.update(url_string: "http://monet.com")
       assert_equal(1, @artist.urls.count)
       assert(@artist.urls[0].is_active?)
@@ -69,7 +69,7 @@ class ArtistTest < ActiveSupport::TestCase
         @post = FactoryBot.create(:post, :tag_string => "aaa")
         @artist = FactoryBot.create(:artist, :name => "aaa")
         @admin = FactoryBot.create(:admin_user)
-        CurrentUser.scoped(@admin) { @artist.ban! }
+        @artist.ban!(banner: @admin)
         @post.reload
       end
 
@@ -542,7 +542,7 @@ class ArtistTest < ActiveSupport::TestCase
     context "#new_with_defaults" do
       should "fetch the defaults from the given source" do
         source = "https://i.pximg.net/img-original/img/2018/01/28/23/56/50/67014762_p0.jpg"
-        artist = Artist.new_with_defaults(source: source)
+        artist = Artist.new_with_defaults(source: source, creator: create(:user))
 
         assert_equal("niceandcool", artist.name)
         assert_equal("nice_and_cool", artist.other_names_string)

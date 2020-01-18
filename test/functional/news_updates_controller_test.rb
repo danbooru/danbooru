@@ -5,7 +5,7 @@ class NewsUpdatesControllerTest < ActionDispatch::IntegrationTest
     setup do
       @admin = create(:admin_user)
       as(@admin) do
-        @news_update = create(:news_update)
+        @news_update = create(:news_update, creator: @admin)
       end
     end
 

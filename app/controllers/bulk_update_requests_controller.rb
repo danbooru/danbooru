@@ -10,7 +10,7 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def create
-    @bulk_update_request = BulkUpdateRequest.create(bur_params(:create))
+    @bulk_update_request = BulkUpdateRequest.create(bur_params(:create).merge(user: CurrentUser.user))
     respond_with(@bulk_update_request, :location => bulk_update_requests_path)
   end
 

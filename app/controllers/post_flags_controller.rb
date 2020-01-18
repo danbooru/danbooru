@@ -13,7 +13,7 @@ class PostFlagsController < ApplicationController
   end
 
   def create
-    @post_flag = PostFlag.create(post_flag_params)
+    @post_flag = PostFlag.create(post_flag_params.merge(creator: CurrentUser.user))
     respond_with(@post_flag)
   end
 

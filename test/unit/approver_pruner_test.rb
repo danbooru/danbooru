@@ -8,6 +8,8 @@ class ApproverPrunerTest < ActiveSupport::TestCase
 
     should "demote inactive approvers" do
       assert_equal([@approver.id], ApproverPruner.inactive_approvers.map(&:id))
+      assert_nothing_raised { ApproverPruner.prune! }
+      assert_equal(false, @approver.reload.can_approve_posts)
     end
 
     should "not demote active approvers" do

@@ -43,7 +43,7 @@ class PoolsController < ApplicationController
   end
 
   def create
-    @pool = Pool.create(pool_params)
+    @pool = Pool.create(pool_params.merge(creator: CurrentUser.user))
     flash[:notice] = @pool.valid? ? "Pool created" : @pool.errors.full_messages.join("; ")
     respond_with(@pool)
   end

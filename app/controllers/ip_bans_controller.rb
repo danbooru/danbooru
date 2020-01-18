@@ -7,7 +7,7 @@ class IpBansController < ApplicationController
   end
 
   def create
-    @ip_ban = IpBan.create(ip_ban_params)
+    @ip_ban = CurrentUser.ip_bans.create(ip_ban_params)
     respond_with(@ip_ban, :location => ip_bans_path)
   end
 

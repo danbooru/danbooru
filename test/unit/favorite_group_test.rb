@@ -2,15 +2,7 @@ require 'test_helper'
 
 class FavoriteTest < ActiveSupport::TestCase
   def setup
-    @user = create(:user)
-    CurrentUser.user = @user
-    CurrentUser.ip_addr = "127.0.0.1"
-    @fav_group = create(:favorite_group, creator: @user, name: "blah")
-  end
-
-  def teardown
-    CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
+    @fav_group = create(:favorite_group)
   end
 
   context "searching by post id" do

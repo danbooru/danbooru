@@ -24,7 +24,7 @@ class UserFeedbacksController < ApplicationController
   end
 
   def create
-    @user_feedback = UserFeedback.create(user_feedback_params(:create))
+    @user_feedback = UserFeedback.create(user_feedback_params(:create).merge(creator: CurrentUser.user))
     respond_with(@user_feedback)
   end
 

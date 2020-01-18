@@ -2030,7 +2030,7 @@ class PostTest < ActiveSupport::TestCase
     should "return posts for the commenter:<name> metatag" do
       users = FactoryBot.create_list(:user, 2, created_at: 2.weeks.ago)
       posts = FactoryBot.create_list(:post, 2)
-      comms = users.zip(posts).map { |u, p| as(u) { FactoryBot.create(:comment, post: p) } }
+      comms = users.zip(posts).map { |u, p| as(u) { FactoryBot.create(:comment, creator: u, post: p) } }
 
       assert_tag_match([posts[0]], "commenter:#{users[0].name}")
       assert_tag_match([posts[1]], "commenter:#{users[1].name}")
@@ -2038,8 +2038,8 @@ class PostTest < ActiveSupport::TestCase
 
     should "return posts for the commenter:<any|none> metatag" do
       posts = FactoryBot.create_list(:post, 2)
-      FactoryBot.create(:comment, post: posts[0], is_deleted: false)
-      FactoryBot.create(:comment, post: posts[1], is_deleted: true)
+      create(:comment, creator: create(:user, created_at: 2.weeks.ago), post: posts[0], is_deleted: false)
+      create(:comment, creator: create(:user, created_at: 2.weeks.ago), post: posts[1], is_deleted: true)
 
       assert_tag_match([posts[0]], "commenter:any")
       assert_tag_match([posts[1]], "commenter:none")
@@ -2143,7 +2143,7 @@ class PostTest < ActiveSupport::TestCase
       pending = FactoryBot.create(:post, is_pending: true)
       disapproved = FactoryBot.create(:post, is_pending: true)
 
-      FactoryBot.create(:post_flag, post: flagged)
+      create(:post_flag, post: flagged, creator: create(:user, created_at: 2.weeks.ago))
       FactoryBot.create(:post_disapproval, post: disapproved, reason: "disinterest")
 
       assert_tag_match([pending, flagged], "status:unmoderated")
@@ -2352,9 +2352,10 @@ class PostTest < ActiveSupport::TestCase
           tag_string: tags[n - 1]
         )
 
-        FactoryBot.create(:artist_commentary, post: p)
-        FactoryBot.create(:comment, post: p, do_not_bump_post: false)
-        FactoryBot.create(:note, post: p)
+        u = create(:user, created_at: 2.weeks.ago)
+        create(:artist_commentary, post: p)
+        create(:comment, post: p, creator: u, do_not_bump_post: false)
+        create(:note, post: p, creator: u)
         p
       end
 
@@ -2406,11 +2407,12 @@ class PostTest < ActiveSupport::TestCase
       post1 = FactoryBot.create(:post)
       post2 = FactoryBot.create(:post)
       post3 = FactoryBot.create(:post)
+      user = create(:gold_user)
 
-      CurrentUser.scoped(FactoryBot.create(:gold_user), "127.0.0.1") do
-        comment1 = FactoryBot.create(:comment, :post => post1)
-        comment2 = FactoryBot.create(:comment, :post => post2, :do_not_bump_post => true)
-        comment3 = FactoryBot.create(:comment, :post => post3)
+      as(user) do
+        comment1 = create(:comment, creator: user, post: post1)
+        comment2 = create(:comment, creator: user, post: post2, do_not_bump_post: true)
+        comment3 = create(:comment, creator: user, post: post3)
       end
 
       assert_tag_match([post3, post1, post2], "order:comment_bumped")
@@ -2749,11 +2751,10 @@ class PostTest < ActiveSupport::TestCase
         @src = FactoryBot.create(:post, image_width: 100, image_height: 100, tag_string: "translated partially_translated", has_embedded_notes: true)
         @dst = FactoryBot.create(:post, image_width: 200, image_height: 200, tag_string: "translation_request")
 
-        @src.notes.create(x: 10, y: 10, width: 10, height: 10, body: "test")
-        @src.notes.create(x: 10, y: 10, width: 10, height: 10, body: "deleted", is_active: false)
-        @src.reload
+        create(:note, post: @src, x: 10, y: 10, width: 10, height: 10, body: "test")
+        create(:note, post: @src, x: 10, y: 10, width: 10, height: 10, body: "deleted", is_active: false)
 
-        @src.copy_notes_to(@dst)
+        @src.reload.copy_notes_to(@dst)
       end
 
       should "copy notes and tags" do

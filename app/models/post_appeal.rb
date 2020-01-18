@@ -8,7 +8,6 @@ class PostAppeal < ApplicationRecord
   validates_presence_of :reason
   validate :validate_post_is_inactive
   validate :validate_creator_is_not_limited
-  before_validation :initialize_creator, :on => :create
   validates_uniqueness_of :creator_id, :scope => :post_id, :message => "have already appealed this post"
 
   api_attributes including: [:is_resolved]
@@ -58,10 +57,6 @@ class PostAppeal < ApplicationRecord
     if resolved?
       errors[:post] << "is active"
     end
-  end
-
-  def initialize_creator
-    self.creator_id = CurrentUser.id
   end
 
   def appeal_count_for_creator

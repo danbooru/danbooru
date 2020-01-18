@@ -1,10 +1,10 @@
 class IpBan < ApplicationRecord
-  belongs_to_creator
+  belongs_to :creator, class_name: "User"
   validate :validate_ip_addr
   validates_presence_of :reason
   validates_uniqueness_of :ip_addr
-  after_create  { ModAction.log("#{CurrentUser.name} created ip ban for #{ip_addr}", :ip_ban_create) }
-  after_destroy { ModAction.log("#{CurrentUser.name} deleted ip ban for #{ip_addr}", :ip_ban_delete) }
+  after_create  { ModAction.log("#{creator.name} created ip ban for #{ip_addr}", :ip_ban_create) }
+  after_destroy { ModAction.log("#{creator.name} deleted ip ban for #{ip_addr}", :ip_ban_delete) }
 
   def self.is_banned?(ip_addr)
     where("ip_addr >>= ?", ip_addr).exists?

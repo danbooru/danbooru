@@ -24,7 +24,7 @@ class NewsUpdatesController < ApplicationController
   end
 
   def create
-    @news_update = NewsUpdate.create(news_update_params)
+    @news_update = NewsUpdate.create(news_update_params.merge(creator: CurrentUser.user))
     respond_with(@news_update, :location => news_updates_path)
   end
 

@@ -86,6 +86,7 @@ class User < ApplicationRecord
   before_update :encrypt_password_on_update
   before_create :promote_to_admin_if_first_user
   before_create :customize_new_user
+  has_many :artists, foreign_key: :creator_id
   has_many :artist_versions, foreign_key: :updater_id
   has_many :artist_commentary_versions, foreign_key: :updater_id
   has_many :comments, foreign_key: :creator_id
@@ -94,6 +95,7 @@ class User < ApplicationRecord
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   has_many :forum_post_votes, dependent: :destroy, foreign_key: :creator_id
   has_many :moderation_reports, as: :model
+  has_many :pools, foreign_key: :creator_id
   has_many :posts, :foreign_key => "uploader_id"
   has_many :post_appeals, foreign_key: :creator_id
   has_many :post_approvals, :dependent => :destroy
@@ -108,6 +110,7 @@ class User < ApplicationRecord
   has_one :dmail_filter
   has_one :super_voter
   has_one :token_bucket
+  has_many :notes, foreign_key: :creator_id
   has_many :note_versions, :foreign_key => "updater_id"
   has_many :dmails, -> {order("dmails.id desc")}, :foreign_key => "owner_id"
   has_many :saved_searches
@@ -115,6 +118,9 @@ class User < ApplicationRecord
   has_many :user_name_change_requests, -> {visible.order("user_name_change_requests.created_at desc")}
   has_many :favorite_groups, -> {order(name: :asc)}, foreign_key: :creator_id
   has_many :favorites, ->(rec) {where("user_id % 100 = #{rec.id % 100} and user_id = #{rec.id}").order("id desc")}
+  has_many :ip_bans, foreign_key: :creator_id
+  has_many :tag_aliases, foreign_key: :creator_id
+  has_many :tag_implications, foreign_key: :creator_id
   belongs_to :inviter, class_name: "User", optional: true
   accepts_nested_attributes_for :dmail_filter
 
