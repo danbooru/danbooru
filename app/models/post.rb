@@ -1811,4 +1811,11 @@ class Post < ApplicationRecord
 
     save
   end
+
+  def moderation_reports
+    @moderation_reports ||= begin
+      comments_with_reports = comments.joins(:moderation_reports).includes(:moderation_reports).distinct
+      comments_with_reports.reduce([]) {|arr,comment| arr + comment.moderation_reports}
+    end
+  end
 end

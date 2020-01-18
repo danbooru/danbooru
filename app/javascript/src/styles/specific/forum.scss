@@ -1,5 +1,14 @@
 div.list-of-forum-posts {
+  div.moderation-forums-notice {
+    font-weight: bold;
+    color: red;
+  }
+
   article.forum-post {
+    &[data-is-reported="true"] {
+      border: solid red;
+    }
+
     a.voted {
       font-weight: bold;
     }

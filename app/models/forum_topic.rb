@@ -181,4 +181,9 @@ class ForumTopic < ApplicationRecord
   def update_orignal_post
     original_post&.update_columns(:updater_id => CurrentUser.id, :updated_at => Time.now)
   end
+
+  def moderation_reports
+    posts_with_reports = posts.joins(:moderation_reports).includes(:moderation_reports).distinct
+    posts_with_reports.reduce([]) {|arr,post| arr + post.moderation_reports}
+  end
 end
