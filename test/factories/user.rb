@@ -35,12 +35,12 @@ FactoryBot.define do
 
     factory(:contributor_user) do
       level {32}
-      bit_prefs {User.flag_value_for("can_upload_free")}
+      can_upload_free {true}
     end
 
     factory(:contrib_user) do
       level {32}
-      bit_prefs {User.flag_value_for("can_upload_free")}
+      can_upload_free {true}
     end
 
     factory(:moderator_user) do

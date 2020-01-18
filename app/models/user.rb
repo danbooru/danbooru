@@ -730,33 +730,12 @@ class User < ApplicationRecord
         q = q.where("level <= ?", params[:max_level].to_i)
       end
 
-      bitprefs_length = BOOLEAN_ATTRIBUTES.length
-      bitprefs_include = nil
-      bitprefs_exclude = nil
-
-      [:can_approve_posts, :can_upload_free, :is_super_voter].each do |x|
-        if params[x].present?
-          attr_idx = BOOLEAN_ATTRIBUTES.index(x.to_s)
-          if params[x].to_s.truthy?
-            bitprefs_include ||= "0" * bitprefs_length
-            bitprefs_include[attr_idx] = '1'
-          elsif params[x].to_s.falsy?
-            bitprefs_exclude ||= "0" * bitprefs_length
-            bitprefs_exclude[attr_idx] = '1'
-          end
+      %w[can_approve_posts can_upload_free is_super_voter].each do |flag|
+        if params[flag].to_s.truthy?
+          q = q.bit_prefs_match(flag, true)
+        elsif params[flag].to_s.falsy?
+          q = q.bit_prefs_match(flag, false)
         end
-      end
-
-      if bitprefs_include
-        bitprefs_include.reverse!
-        q = q.where("bit_prefs::bit(:len) & :bits::bit(:len) = :bits::bit(:len)",
-                    :len => bitprefs_length, :bits => bitprefs_include)
-      end
-
-      if bitprefs_exclude
-        bitprefs_exclude.reverse!
-        q = q.where("bit_prefs::bit(:len) & :bits::bit(:len) = 0::bit(:len)",
-                    :len => bitprefs_length, :bits => bitprefs_exclude)
       end
 
       if params[:current_user_first].to_s.truthy? && !CurrentUser.is_anonymous?

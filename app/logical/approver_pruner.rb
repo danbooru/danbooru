@@ -5,7 +5,7 @@ module ApproverPruner
   MINIMUM_APPROVALS = 30
 
   def inactive_approvers
-    approvers = User.where("bit_prefs & ? > 0", User.flag_value_for("can_approve_posts"))
+    approvers = User.bit_prefs_match(:can_approve_posts, true)
     approvers = approvers.where("level < ?", User::Levels::MODERATOR)
 
     recently_promoted_approvers = UserFeedback.where("created_at >= ?", APPROVAL_PERIOD.ago).where_like(:body, "*You gained the ability to approve posts*").select(:user_id)
