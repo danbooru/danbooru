@@ -20,7 +20,7 @@
       </div>
     <% end %>
 
-    <%= render "forum_posts/listing", forum_posts: @forum_posts, original_forum_post_id: @forum_topic.original_post.id, dtext_data: DText.preprocess(@forum_posts.map(&:body)), moderation_reports: @forum_topic.viewable_moderation_reports %>
+    <%= render "forum_posts/listing", forum_posts: @forum_posts, original_forum_post_id: @forum_topic.original_post&.id, dtext_data: DText.preprocess(@forum_posts.map(&:body)), moderation_reports: @forum_topic.viewable_moderation_reports %>
 
     <% if CurrentUser.is_member? %>
       <% if CurrentUser.is_moderator? || !@forum_topic.is_locked? %>

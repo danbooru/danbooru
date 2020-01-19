@@ -37,7 +37,6 @@ class ForumTopicsController < ApplicationController
     end
     @forum_posts = ForumPost.search(:topic_id => @forum_topic.id).reorder("forum_posts.id").paginate(params[:page])
     @forum_posts = @forum_posts.reverse_order.includes(:creator).load if request.format.atom?
-    @original_forum_post_id = @forum_topic.original_post.id
     respond_with(@forum_topic)
   end
 
