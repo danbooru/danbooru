@@ -59,7 +59,6 @@ Rails.application.routes.draw do
       resource :password_reset, :only => [:new, :create, :edit, :update]
       resource :deletion, :only => [:show, :destroy]
       resource :email_change, :only => [:new, :create]
-      resource :dmail_filter, :only => [:edit, :update]
       resource :api_key, :only => [:show, :view, :update, :destroy] do
         post :view
       end

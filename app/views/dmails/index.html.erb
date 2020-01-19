@@ -15,21 +15,13 @@
         <%= compact_time(dmail.created_at) %>
       <% end %>
       <% t.column "From" do |dmail| %>
-        <% if dmail.filtered? %>
-          <%= link_to "[filtered]", user_path(dmail.from) %>
-        <% else %>
-          <%= link_to_user dmail.from %>
-        <% end %>
+        <%= link_to_user dmail.from %>
       <% end %>
       <% t.column "To" do |dmail| %>
         <%= link_to_user dmail.to %>
       <% end %>
       <% t.column "Subject", td: { class: "col-expand" } do |dmail| %>
-        <% if dmail.filtered? %>
-          <%= link_to "[filtered]", dmail_path(dmail) %>
-        <% else %>
-          <%= link_to dmail.title, dmail_path(dmail) %>
-        <% end %>
+        <%= link_to dmail.title, dmail_path(dmail) %>
       <% end %>
       <% t.column do |dmail| %>
         <%= link_to "delete", dmail_path(dmail), :method => :delete, :data => {:confirm => "Are you sure you want to delete this Dmail?"} %>

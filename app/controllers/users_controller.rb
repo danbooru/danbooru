@@ -118,7 +118,6 @@ class UsersController < ApplicationController
       enable_recommended_posts opt_out_tracking
     ]
 
-    permitted_params += [dmail_filter_attributes: %i[id words]]
     permitted_params << :name if context == :create
     permitted_params << :level if CurrentUser.is_admin?
 

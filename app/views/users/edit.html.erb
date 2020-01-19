@@ -65,13 +65,6 @@
         <%= f.input :disable_responsive_mode, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false, :hint => "Disable alternative layout for mobile and tablet" %>
         <%= f.input :opt_out_tracking, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false, :hint => "Opt out of tracking" %>
 
-        <div class="input text optional field_with_hint">
-          <label class="text optional" for="user_dmail_filter_attributes_words">Dmail filter</label>
-          <%= hidden_field_tag "user[dmail_filter_attributes][id]", @user.dmail_filter.try(:id) %>
-          <%= text_field_tag "user[dmail_filter_attributes][words]", @user.dmail_filter.try(:words), :id => "user_dmail_filter_attributes_words", :class => "text optional", :size => 40 %>
-          <span class="hint">A list of banned words (space delimited). Any dmail you receive with a banned word will automatically be deleted.</span>
-        </div>
-
         <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :rows => 5, :data => { :autocomplete => "tag-query" } } %>
         <%= f.input :custom_style, :label => "Custom <a href='https://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "CSS rules to apply to the whole site.", :input_html => {:size => "40x5"} %>
       </fieldset>

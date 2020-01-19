@@ -14,7 +14,6 @@ class Dmail < ApplicationRecord
   belongs_to :from, :class_name => "User"
 
   after_initialize :initialize_attributes, if: :new_record?
-  before_create :auto_read_if_filtered
   after_create :update_recipient
   after_commit :send_email, on: :create
 
@@ -183,16 +182,6 @@ class Dmail < ApplicationRecord
 
   def is_recipient?
     owner == to
-  end
-
-  def filtered?
-    CurrentUser.dmail_filter.try(:filtered?, self)
-  end
-
-  def auto_read_if_filtered
-    if is_recipient? && to.dmail_filter.try(:filtered?, self)
-      self.is_read = true
-    end
   end
 
   def update_recipient

@@ -107,7 +107,6 @@ class User < ApplicationRecord
   has_one :recent_ban, -> {order("bans.id desc")}, :class_name => "Ban"
 
   has_one :api_key
-  has_one :dmail_filter
   has_one :super_voter
   has_one :token_bucket
   has_many :notes, foreign_key: :creator_id
@@ -122,7 +121,6 @@ class User < ApplicationRecord
   has_many :tag_aliases, foreign_key: :creator_id
   has_many :tag_implications, foreign_key: :creator_id
   belongs_to :inviter, class_name: "User", optional: true
-  accepts_nested_attributes_for :dmail_filter
 
   enum theme: { light: 0, dark: 100 }, _suffix: true
 

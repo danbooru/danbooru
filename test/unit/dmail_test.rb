@@ -43,49 +43,6 @@ class DmailTest < ActiveSupport::TestCase
       end
     end
 
-    context "filter" do
-      setup do
-        @recipient = FactoryBot.create(:user)
-        @recipient.create_dmail_filter(:words => "banned")
-        @dmail = FactoryBot.build(:dmail, :title => "xxx", :owner => @recipient, :body => "banned word here", :to => @recipient, :from => @user)
-      end
-
-      should "detect banned words" do
-        assert(@recipient.dmail_filter.filtered?(@dmail))
-      end
-
-      should "autoread if it has a banned word" do
-        @dmail.save
-        assert_equal(true, @dmail.is_read?)
-      end
-
-      should "not update the recipient's has_mail if filtered" do
-        @dmail.save
-        @recipient.reload
-        assert_equal(false, @recipient.has_mail?)
-      end
-
-      should "be ignored when sender is a moderator" do
-        CurrentUser.scoped(FactoryBot.create(:moderator_user), "127.0.0.1") do
-          @dmail = FactoryBot.create(:dmail, :owner => @recipient, :body => "banned word here", :to => @recipient)
-        end
-
-        assert_equal(false, @recipient.dmail_filter.filtered?(@dmail))
-        assert_equal(false, @dmail.is_read?)
-        assert_equal(true, @recipient.has_mail?)
-      end
-
-      context "that is empty" do
-        setup do
-          @recipient.dmail_filter.update(words: "   ")
-        end
-
-        should "not filter everything" do
-          assert(!@recipient.dmail_filter.filtered?(@dmail))
-        end
-      end
-    end
-
     context "from a banned user" do
       setup do
         @user.update_attribute(:is_banned, true)

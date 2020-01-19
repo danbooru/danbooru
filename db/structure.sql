@@ -808,38 +808,6 @@ ALTER SEQUENCE public.delayed_jobs_id_seq OWNED BY public.delayed_jobs.id;
 
 
 --
--- Name: dmail_filters; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.dmail_filters (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    words text NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: dmail_filters_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.dmail_filters_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: dmail_filters_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.dmail_filters_id_seq OWNED BY public.dmail_filters.id;
-
-
---
 -- Name: dmails; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3331,13 +3299,6 @@ ALTER TABLE ONLY public.delayed_jobs ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- Name: dmail_filters id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.dmail_filters ALTER COLUMN id SET DEFAULT nextval('public.dmail_filters_id_seq'::regclass);
-
-
---
 -- Name: dmails id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4386,14 +4347,6 @@ ALTER TABLE ONLY public.delayed_jobs
 
 
 --
--- Name: dmail_filters dmail_filters_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.dmail_filters
-    ADD CONSTRAINT dmail_filters_pkey PRIMARY KEY (id);
-
-
---
 -- Name: dmails dmails_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4930,13 +4883,6 @@ CREATE INDEX index_delayed_jobs_on_locked_by ON public.delayed_jobs USING btree 
 --
 
 CREATE INDEX index_delayed_jobs_on_run_at ON public.delayed_jobs USING btree (run_at);
-
-
---
--- Name: index_dmail_filters_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_dmail_filters_on_user_id ON public.dmail_filters USING btree (user_id);
 
 
 --
@@ -7479,6 +7425,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200114204550'),
 ('20200115010442'),
 ('20200117220602'),
-('20200118015014');
+('20200118015014'),
+('20200119184442');
 
 
