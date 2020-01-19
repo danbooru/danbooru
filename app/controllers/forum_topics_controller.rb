@@ -4,8 +4,8 @@ class ForumTopicsController < ApplicationController
   before_action :member_only, :except => [:index, :show]
   before_action :moderator_only, :only => [:new_merge, :create_merge]
   before_action :normalize_search, :only => :index
-  before_action :load_topic, :only => [:edit, :show, :update, :destroy, :undelete, :new_merge, :create_merge, :subscribe, :unsubscribe]
-  before_action :check_min_level, :only => [:show, :edit, :update, :new_merge, :create_merge, :destroy, :undelete, :subscribe, :unsubscribe]
+  before_action :load_topic, :only => [:edit, :show, :update, :destroy, :undelete, :new_merge, :create_merge]
+  before_action :check_min_level, :only => [:show, :edit, :update, :new_merge, :create_merge, :destroy, :undelete]
   skip_before_action :api_check
 
   def new
@@ -86,20 +86,6 @@ class ForumTopicsController < ApplicationController
     @merged_topic = ForumTopic.find(params[:merged_id])
     @forum_topic.merge(@merged_topic)
     redirect_to forum_topic_path(@merged_topic)
-  end
-
-  def subscribe
-    subscription = ForumSubscription.where(:forum_topic_id => @forum_topic.id, :user_id => CurrentUser.user.id).first
-    unless subscription
-      ForumSubscription.create(:forum_topic_id => @forum_topic.id, :user_id => CurrentUser.user.id, :last_read_at => @forum_topic.updated_at)
-    end
-    respond_with(@forum_topic)
-  end
-
-  def unsubscribe
-    subscription = ForumSubscription.where(:forum_topic_id => @forum_topic.id, :user_id => CurrentUser.user.id).first
-    subscription&.destroy
-    respond_with(@forum_topic)
   end
 
   private

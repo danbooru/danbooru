@@ -142,8 +142,6 @@ Rails.application.routes.draw do
       post :undelete
       get :new_merge
       post :create_merge
-      post :subscribe
-      post :unsubscribe
     end
     collection do
       post :mark_all_as_read

@@ -16,7 +16,6 @@ class ForumTopic < ApplicationRecord
   has_many :posts, -> {order("forum_posts.id asc")}, :class_name => "ForumPost", :foreign_key => "topic_id", :dependent => :destroy
   has_many :moderation_reports, through: :posts
   has_one :original_post, -> {order("forum_posts.id asc")}, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
-  has_many :subscriptions, :class_name => "ForumSubscription"
   before_validation :initialize_is_deleted, :on => :create
   validates_presence_of :title
   validates_associated :original_post
@@ -126,16 +125,9 @@ class ForumTopic < ApplicationRecord
     end
   end
 
-  module SubscriptionMethods
-    def user_subscription(user)
-      subscriptions.where(:user_id => user.id).first
-    end
-  end
-
   extend SearchMethods
   include CategoryMethods
   include VisitMethods
-  include SubscriptionMethods
 
   def editable_by?(user)
     (creator_id == user.id || user.is_moderator?) && visible?(user)

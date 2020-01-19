@@ -2015,38 +2015,6 @@ ALTER SEQUENCE public.forum_posts_id_seq OWNED BY public.forum_posts.id;
 
 
 --
--- Name: forum_subscriptions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.forum_subscriptions (
-    id integer NOT NULL,
-    user_id integer,
-    forum_topic_id integer,
-    last_read_at timestamp without time zone,
-    delete_key character varying
-);
-
-
---
--- Name: forum_subscriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.forum_subscriptions_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: forum_subscriptions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.forum_subscriptions_id_seq OWNED BY public.forum_subscriptions.id;
-
-
---
 -- Name: forum_topic_visits; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4041,13 +4009,6 @@ ALTER TABLE ONLY public.forum_posts ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
--- Name: forum_subscriptions id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.forum_subscriptions ALTER COLUMN id SET DEFAULT nextval('public.forum_subscriptions_id_seq'::regclass);
-
-
---
 -- Name: forum_topic_visits id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4392,14 +4353,6 @@ ALTER TABLE ONLY public.forum_post_votes
 
 ALTER TABLE ONLY public.forum_posts
     ADD CONSTRAINT forum_posts_pkey PRIMARY KEY (id);
-
-
---
--- Name: forum_subscriptions forum_subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.forum_subscriptions
-    ADD CONSTRAINT forum_subscriptions_pkey PRIMARY KEY (id);
 
 
 --
@@ -6426,20 +6379,6 @@ CREATE INDEX index_forum_posts_on_updated_at ON public.forum_posts USING btree (
 
 
 --
--- Name: index_forum_subscriptions_on_forum_topic_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_forum_subscriptions_on_forum_topic_id ON public.forum_subscriptions USING btree (forum_topic_id);
-
-
---
--- Name: index_forum_subscriptions_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_forum_subscriptions_on_user_id ON public.forum_subscriptions USING btree (user_id);
-
-
---
 -- Name: index_forum_topic_visits_on_forum_topic_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7426,6 +7365,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200115010442'),
 ('20200117220602'),
 ('20200118015014'),
-('20200119184442');
+('20200119184442'),
+('20200119193110');
 
 
