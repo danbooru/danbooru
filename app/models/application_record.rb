@@ -174,6 +174,12 @@ class ApplicationRecord < ActiveRecord::Base
           where_regex(attr, params[:"#{attr}_regex"])
         elsif params[:"#{attr}_not_regex"].present?
           where_not_regex(attr, params[:"#{attr}_not_regex"])
+        elsif params[:"#{attr}_array"].present?
+          where(attr => params[:"#{attr}_array"])
+        elsif params[:"#{attr}_comma"].present?
+          where(attr => params[:"#{attr}_comma"].split(','))
+        elsif params[:"#{attr}_space"].present?
+          where(attr => params[:"#{attr}_space"].split(' '))
         else
           all
         end
@@ -218,6 +224,10 @@ class ApplicationRecord < ActiveRecord::Base
           items = items.map(&:to_i) if type == :integer
 
           relation = relation.where_array_includes_all(name, items)
+        elsif params[:"#{name}_include_any_array"]
+          relation = relation.where_array_includes_any(name, params[:"#{name}_include_any_array"])
+        elsif params[:"#{name}_include_all_array"]
+          relation = relation.where_array_includes_all(name, params[:"#{name}_include_all_array"])
         end
 
         if params[:"#{name.to_s.singularize}_count"]
