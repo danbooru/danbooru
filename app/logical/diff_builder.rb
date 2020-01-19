@@ -12,7 +12,7 @@ class DiffBuilder
     otharr = that_text.scan(pattern)
 
     cbo = Diff::LCS::ContextDiffCallbacks.new
-    diffs = thisarr.diff(otharr, cbo)
+    diffs = otharr.diff(thisarr, cbo)
 
     escape_html = ->(str) {str.gsub(/&/, '&amp;').gsub(/</, '&lt;').gsub(/>/, '&gt;')}
 

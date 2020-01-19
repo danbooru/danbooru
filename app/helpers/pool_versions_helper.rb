@@ -21,6 +21,6 @@ module PoolVersionsHelper
 
   def pool_page_diff(pool_version, other_version)
     pattern = Regexp.new('(?:<.+?>)|(?:\w+)|(?:[ \t]+)|(?:\r?\n)|(?:.+?)')
-    DiffBuilder.new(other_version.description, pool_version.description, pattern).build
+    DiffBuilder.new(pool_version.description, other_version.description, pattern).build
   end
 end
