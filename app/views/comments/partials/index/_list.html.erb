@@ -3,10 +3,10 @@
     <%= render "comments/partials/index/header", :post => post %>
   <% end %>
 
-  <% if CurrentUser.is_moderator? && post.moderation_reports.any? %>
+  <% if CurrentUser.is_moderator? && post.moderation_reports.present? %>
     <div class="row moderation-comments-notice">
       <span class="info" id="moderation-comments-notice-for-<%= post.id %>">
-        This post has comments reported for moderation! (<%= post.moderation_reports.count %> <%= (post.moderation_reports.count == 1 ? "report" : "reports") %>)
+        This post has comments reported for moderation! (<%= post.moderation_reports.length %> <%= (post.moderation_reports.length == 1 ? "report" : "reports") %>)
       </span>
     </div>
   <% end %>

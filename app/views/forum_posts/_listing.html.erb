@@ -4,10 +4,10 @@
 <%- # moderation_reports %>
 
 <div class="list-of-forum-posts list-of-messages">
-  <% if CurrentUser.is_moderator? && moderation_reports.any? %>
+  <% if CurrentUser.is_moderator? && moderation_reports.present? %>
     <div class="row moderation-forums-notice">
       <span class="info" id="moderation-forums-notice-for-topic">
-        This topic has forum posts reported for moderation! (<%= moderation_reports.count %> <%= (moderation_reports.count == 1 ? "report" : "reports") %>)
+        This topic has forum posts reported for moderation! (<%= moderation_reports.length %> <%= (moderation_reports.length == 1 ? "report" : "reports") %>)
       </span>
     </div>
   <% end %>
