@@ -92,7 +92,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "redirect anonymous users to the sign in page" do
         get profile_path
-        assert_redirected_to new_session_path
+        assert_redirected_to login_path(url: "/profile")
       end
 
       should "return 404 for anonymous api calls" do
@@ -150,7 +150,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "redirect anonymous users to the sign in page" do
         get settings_path
-        assert_redirected_to new_session_path
+        assert_redirected_to login_path(url: "/settings")
       end
     end
 

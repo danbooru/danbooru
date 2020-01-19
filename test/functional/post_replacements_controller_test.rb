@@ -16,7 +16,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           format: :json,
           post_id: @post.id,
           post_replacement: {
-            replacement_url: "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"
+            replacement_url: "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"
           }
         }
 
@@ -29,7 +29,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         perform_enqueued_jobs
 
         assert_response :success
-        assert_equal("https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", @post.source)
+        assert_equal("https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", @post.source)
         assert_equal("d34e4cf0a437a5d65f8e82b7bcd02606", @post.md5)
         assert_equal("d34e4cf0a437a5d65f8e82b7bcd02606", Digest::MD5.file(@post.file(:original)).hexdigest)
       end

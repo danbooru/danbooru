@@ -36,7 +36,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       context "for a corrupt jpeg" do
         setup do
-          @source = "https://raikou1.donmai.us/93/f4/93f4dd66ef1eb11a89e56d31f9adc8d0.jpg"
+          @source = "https://cdn.donmai.us/original/93/f4/93f4dd66ef1eb11a89e56d31f9adc8d0.jpg"
           @mock_upload = mock("upload")
           @mock_upload.stubs(:source_url).returns(@source)
           @mock_upload.stubs(:referer_url).returns(nil)
@@ -466,7 +466,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       context "for null" do
         setup do
-          @source = "https://raikou1.donmai.us/93/f4/93f4dd66ef1eb11a89e56d31f9adc8d0.jpg"
+          @source = "https://cdn.donmai.us/original/93/f4/93f4dd66ef1eb11a89e56d31f9adc8d0.jpg"
         end
 
         should "download the file" do
@@ -488,7 +488,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       context "for a video" do
         setup do
-          @source = "https://raikou2.donmai.us/b7/cb/b7cb80092be273771510952812380fa2.mp4"
+          @source = "https://cdn.donmai.us/original/b7/cb/b7cb80092be273771510952812380fa2.mp4"
         end
 
         should "work for a video" do
@@ -506,7 +506,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       context "on timeout errors" do
         setup do
-          @source = "https://raikou1.donmai.us/93/f4/93f4dd66ef1eb11a89e56d31f9adc8d0.jpg"
+          @source = "https://cdn.donmai.us/original/93/f4/93f4dd66ef1eb11a89e56d31f9adc8d0.jpg"
           HTTParty.stubs(:get).raises(Net::ReadTimeout)
         end
 
@@ -666,14 +666,14 @@ class UploadServiceTest < ActiveSupport::TestCase
 
     context "for a source replacement" do
       setup do
-        @new_url = "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"
+        @new_url = "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"
         @new_md5 = "d34e4cf0a437a5d65f8e82b7bcd02606"
         travel_to(1.month.ago) do
           @user = FactoryBot.create(:user)
         end
         as_user do
           @post_md5 = "710fd9cba4ef37260f9152ffa9d154d8"
-          @post = FactoryBot.create(:post, source: "https://raikou1.donmai.us/71/0f/#{@post_md5}.png", file_ext: "png", md5: @post_md5, uploader_ip_addr: "127.0.0.2")
+          @post = FactoryBot.create(:post, source: "https://cdn.donmai.us/original/71/0f/#{@post_md5}.png", file_ext: "png", md5: @post_md5, uploader_ip_addr: "127.0.0.2")
           @post.stubs(:queue_delete_files)
           @replacement = FactoryBot.create(:post_replacement, post: @post, replacement_url: @new_url)
         end
@@ -707,8 +707,8 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       context "a post when given a final_source" do
         should "change the source to the final_source" do
-          replacement_url = "https://raikou1.donmai.us/fd/b4/fdb47f79fb8da82e66eeb1d84a1cae8d.jpg"
-          final_source = "https://raikou1.donmai.us/71/0f/710fd9cba4ef37260f9152ffa9d154d8.png"
+          replacement_url = "https://cdn.donmai.us/original/fd/b4/fdb47f79fb8da82e66eeb1d84a1cae8d.jpg"
+          final_source = "https://cdn.donmai.us/original/71/0f/710fd9cba4ef37260f9152ffa9d154d8.png"
 
           as_user { @post.replace!(replacement_url: replacement_url, final_source: final_source) }
 
@@ -731,9 +731,9 @@ class UploadServiceTest < ActiveSupport::TestCase
         setup do
           @user = travel_to(1.month.ago) { FactoryBot.create(:user) }
           as_user do
-            @post = FactoryBot.create(:post, source: "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg")
+            @post = FactoryBot.create(:post, source: "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg")
             @post.stubs(:queue_delete_files)
-            @post.replace!(replacement_url: "https://raikou1.donmai.us/fd/b4/fdb47f79fb8da82e66eeb1d84a1cae8d.jpg", tags: "-tag1 tag2")
+            @post.replace!(replacement_url: "https://cdn.donmai.us/original/fd/b4/fdb47f79fb8da82e66eeb1d84a1cae8d.jpg", tags: "-tag1 tag2")
           end
 
           @replacement = @post.replacements.last
@@ -751,7 +751,7 @@ class UploadServiceTest < ActiveSupport::TestCase
           assert_equal("jpg", @post.file_ext)
           assert_equal("d34e4cf0a437a5d65f8e82b7bcd02606", @post.md5)
           assert_equal("d34e4cf0a437a5d65f8e82b7bcd02606", Digest::MD5.file(@post.file).hexdigest)
-          assert_equal("https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", @post.source)
+          assert_equal("https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", @post.source)
         end
       end
 
@@ -916,7 +916,7 @@ class UploadServiceTest < ActiveSupport::TestCase
               assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post2.md5)
 
               @post2.reload
-              @post2.replace!(replacement_url: "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg")
+              @post2.replace!(replacement_url: "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg")
               assert_equal("d34e4cf0a437a5d65f8e82b7bcd02606", @post2.md5)
               Upload.destroy_all
               @post1.reload
@@ -948,7 +948,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
           as_user do
             @post.update(image_width: 160, image_height: 164)
-            @note = @post.notes.create(x: 80, y: 82, width: 80, height: 82, body: "test")
+            @note = @post.notes.create(x: 80, y: 82, width: 80, height: 82, body: "test", creator: @post.uploader)
             @note.reload
           end
         end
@@ -980,7 +980,7 @@ class UploadServiceTest < ActiveSupport::TestCase
     subject { UploadService }
 
     setup do
-      @source = "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"
+      @source = "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"
       CurrentUser.user = travel_to(1.month.ago) do
         FactoryBot.create(:user)
       end
@@ -1094,8 +1094,8 @@ class UploadServiceTest < ActiveSupport::TestCase
 
     context "with a source containing unicode characters" do
       should "upload successfully" do
-        source1 = "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg?one=東方&two=a%20b"
-        source2 = "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg?one=%E6%9D%B1%E6%96%B9&two=a%20b"
+        source1 = "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg?one=東方&two=a%20b"
+        source2 = "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg?one=%E6%9D%B1%E6%96%B9&two=a%20b"
         service = subject.new(source: source1, rating: "s")
 
         assert_nothing_raised { @upload = service.start! }
