@@ -812,4 +812,8 @@ class User < ApplicationRecord
   def presenter
     @presenter ||= UserPresenter.new(self)
   end
+
+  def viewable_moderation_reports
+    !is_moderator? && CurrentUser.is_moderator? ? moderation_reports : []
+  end
 end

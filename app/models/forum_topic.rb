@@ -14,6 +14,7 @@ class ForumTopic < ApplicationRecord
   belongs_to_creator
   belongs_to_updater
   has_many :posts, -> {order("forum_posts.id asc")}, :class_name => "ForumPost", :foreign_key => "topic_id", :dependent => :destroy
+  has_many :moderation_reports, through: :posts
   has_one :original_post, -> {order("forum_posts.id asc")}, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
   has_many :subscriptions, :class_name => "ForumSubscription"
   before_validation :initialize_is_deleted, :on => :create
@@ -182,8 +183,7 @@ class ForumTopic < ApplicationRecord
     original_post&.update_columns(:updater_id => CurrentUser.id, :updated_at => Time.now)
   end
 
-  def moderation_reports
-    posts_with_reports = posts.joins(:moderation_reports).includes(:moderation_reports).distinct
-    posts_with_reports.reduce([]) {|arr,post| arr + post.moderation_reports}
+  def viewable_moderation_reports
+    CurrentUser.is_moderator? ? moderation_reports : []
   end
 end

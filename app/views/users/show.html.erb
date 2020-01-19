@@ -2,7 +2,7 @@
   <div id="a-show">
     <h1><%= link_to_user @user %></h1>
 
-  <% if !@user.is_moderator? && CurrentUser.is_moderator? && @user.moderation_reports.present? %>
+  <% if @user.viewable_moderation_reports.present? %>
     <div class="moderation-users-notice">
       <span class="info" id="moderation-users-notice-for-<%= @user.id %>">
         This user has been reported for moderation! (<%= @user.moderation_reports.length %> <%= (@user.moderation_reports.length == 1 ? "report" : "reports") %>)
