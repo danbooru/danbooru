@@ -36,7 +36,6 @@
         <% else %>
           <%= subnav_link_to "Sticky", forum_topic_path(@forum_topic, :forum_topic => {:is_sticky => true}), :method => :put, :data => {:confirm => "Are you sure you want to sticky this forum topic?"} %>
         <% end %>
-        <%= subnav_link_to "Merge", new_merge_forum_topic_path(@forum_topic) %>
       <% end %>
     <% end %>
   <% end %>

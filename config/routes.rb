@@ -140,8 +140,6 @@ Rails.application.routes.draw do
   resources :forum_topics do
     member do
       post :undelete
-      get :new_merge
-      post :create_merge
     end
     collection do
       post :mark_all_as_read

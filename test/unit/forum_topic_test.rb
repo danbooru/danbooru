@@ -111,19 +111,6 @@ class ForumTopicTest < ActiveSupport::TestCase
       end
     end
 
-    context "#merge" do
-      setup do
-        @topic2 = create(:forum_topic, title: "yyy", creator: @user)
-        FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => "xxx")
-        FactoryBot.create(:forum_post, :topic_id => @topic2.id, :body => "xxx")
-      end
-
-      should "merge all the posts in one topic into the other" do
-        @topic.merge(@topic2)
-        assert_equal(2, @topic2.posts.count)
-      end
-    end
-
     context "constructed with nested attributes for its original post" do
       should "create a matching forum post" do
         assert_difference(["ForumTopic.count", "ForumPost.count"], 1) do
