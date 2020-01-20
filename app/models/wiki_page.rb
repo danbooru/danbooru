@@ -72,11 +72,11 @@ class WikiPage < ApplicationRecord
     def search(params = {})
       q = super
 
-      q = q.search_attributes(params, :is_locked, :is_deleted, :body)
+      q = q.search_attributes(params, :is_locked, :is_deleted, :body, :title, :other_names)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index, ts_config: "danbooru")
 
-      if params[:title].present?
-        q = q.where_like(:title, normalize_title(params[:title]))
+      if params[:title_normalize].present?
+        q = q.where_like(:title, normalize_title(params[:title_normalize]))
       end
 
       if params[:other_names_match].present?

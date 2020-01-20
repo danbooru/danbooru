@@ -119,18 +119,10 @@ class TagRelationship < ApplicationRecord
 
     def search(params)
       q = super
-      q = q.search_attributes(params, :creator, :approver, :forum_topic_id, :forum_post_id)
+      q = q.search_attributes(params, :creator, :approver, :forum_topic_id, :forum_post_id, :antecedent_name, :consequent_name)
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
-      end
-
-      if params[:antecedent_name].present?
-        q = q.where(antecedent_name: params[:antecedent_name].split)
-      end
-
-      if params[:consequent_name].present?
-        q = q.where(consequent_name: params[:consequent_name].split)
       end
 
       if params[:status].present?
