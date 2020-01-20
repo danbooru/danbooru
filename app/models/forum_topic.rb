@@ -14,8 +14,10 @@ class ForumTopic < ApplicationRecord
   belongs_to :creator, class_name: "User"
   belongs_to_updater
   has_many :posts, -> {order("forum_posts.id asc")}, :class_name => "ForumPost", :foreign_key => "topic_id", :dependent => :destroy
+  has_many :forum_topic_visits
   has_many :moderation_reports, through: :posts
   has_one :original_post, -> {order("forum_posts.id asc")}, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
+
   before_validation :initialize_is_deleted, :on => :create
   validates_presence_of :title
   validates_associated :original_post
@@ -55,6 +57,11 @@ class ForumTopic < ApplicationRecord
       where("min_level <= ?", CurrentUser.level)
     end
 
+    def read_by_user(user)
+      return none if user.last_forum_read_at.nil? || user.last_forum_read_at < '2000-01-01'
+      merge(user.visited_forum_topics.where("forum_topic_visits.last_read_at >= forum_topics.updated_at OR ? >= forum_topics.updated_at", user.last_forum_read_at))
+    end
+
     def sticky_first
       order(is_sticky: :desc, updated_at: :desc)
     end
@@ -89,16 +96,6 @@ class ForumTopic < ApplicationRecord
   end
 
   module VisitMethods
-    def read_by?(user = nil)
-      user ||= CurrentUser.user
-
-      if user.last_forum_read_at && updated_at <= user.last_forum_read_at
-        return true
-      end
-
-      ForumTopicVisit.where("user_id = ? and forum_topic_id = ? and last_read_at >= ?", user.id, id, updated_at).exists?
-    end
-
     def mark_as_read!(user = CurrentUser.user)
       return if user.is_anonymous?
 

@@ -4,7 +4,7 @@
       <span class="sticky">Sticky:</span>
     <% end %>
 
-    <% unless topic.read_by?(CurrentUser.user) %>
+    <% if CurrentUser.is_member? && new_forum_topic?(topic, read_forum_topics) %>
       <span class="new">NEW</span>
     <% end %>
 

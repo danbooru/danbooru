@@ -15,7 +15,7 @@ class ForumTopicTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
-    context "#read_by?" do
+    context "read_by_user" do
       context "with a populated @user.last_forum_read_at" do
         setup do
           @user.update_attribute(:last_forum_read_at, Time.now)
@@ -26,8 +26,8 @@ class ForumTopicTest < ActiveSupport::TestCase
             @topic.update_column(:updated_at, 1.day.from_now)
           end
 
-          should "return false" do
-            assert_equal(false, @topic.read_by?(@user))
+          should "return nothing" do
+            assert_equal([], ForumTopic.read_by_user(@user).map(&:id))
           end
         end
 
@@ -41,8 +41,8 @@ class ForumTopicTest < ActiveSupport::TestCase
               FactoryBot.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 16.hours.from_now)
             end
 
-            should "return false" do
-              assert_equal(false, @topic.read_by?(@user))
+            should "return nothing" do
+              assert_equal([], ForumTopic.read_by_user(@user).map(&:id))
             end
           end
 
@@ -51,8 +51,8 @@ class ForumTopicTest < ActiveSupport::TestCase
               FactoryBot.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 2.days.from_now)
             end
 
-            should "return true" do
-              assert_equal(true, @topic.read_by?(@user))
+            should "return the topic" do
+              assert_equal([@topic.id], ForumTopic.read_by_user(@user).map(&:id))
             end
           end
         end
@@ -60,8 +60,8 @@ class ForumTopicTest < ActiveSupport::TestCase
 
       context "with a blank @user.last_forum_read_at" do
         context "and no visits" do
-          should "return false" do
-            assert_equal(false, @topic.read_by?(@user))
+          should "return nothing" do
+            assert_equal([], ForumTopic.read_by_user(@user).map(&:id))
           end
         end
 
@@ -71,8 +71,8 @@ class ForumTopicTest < ActiveSupport::TestCase
               FactoryBot.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 1.day.ago)
             end
 
-            should "return false" do
-              assert_equal(false, @topic.read_by?(@user))
+            should "return nothing" do
+              assert_equal([], ForumTopic.read_by_user(@user).map(&:id))
             end
           end
 
@@ -81,8 +81,8 @@ class ForumTopicTest < ActiveSupport::TestCase
               FactoryBot.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 1.day.from_now)
             end
 
-            should "return true" do
-              assert_equal(true, @topic.read_by?(@user))
+            should "return nothing" do
+              assert_equal([], ForumTopic.read_by_user(@user).map(&:id))
             end
           end
         end
