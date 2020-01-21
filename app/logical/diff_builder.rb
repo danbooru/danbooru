@@ -16,7 +16,7 @@ class DiffBuilder
 
     escape_html = ->(str) {str.gsub(/&/, '&amp;').gsub(/</, '&lt;').gsub(/>/, '&gt;')}
 
-    output = thisarr
+    output = otharr
     output.each { |q| q.replace(escape_html[q]) }
 
     diffs.reverse_each do |hunk|
