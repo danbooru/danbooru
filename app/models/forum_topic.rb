@@ -59,7 +59,11 @@ class ForumTopic < ApplicationRecord
 
     def read_by_user(user)
       return none if user.last_forum_read_at.nil? || user.last_forum_read_at < '2000-01-01'
-      merge(user.visited_forum_topics.where("forum_topic_visits.last_read_at >= forum_topics.updated_at OR ? >= forum_topics.updated_at", user.last_forum_read_at))
+
+      read_topics = user.visited_forum_topics.where("forum_topic_visits.last_read_at >= forum_topics.updated_at")
+      old_topics = where("? >= forum_topics.updated_at", user.last_forum_read_at)
+
+      where(id: read_topics).or(where(id: old_topics))
     end
 
     def sticky_first
