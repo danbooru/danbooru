@@ -10,6 +10,10 @@ class ModerationReport < ApplicationRecord
   scope :forum_post, -> { where(model_type: "ForumPost") }
   scope :recent, -> { where("moderation_reports.created_at >= ?", 1.week.ago) }
 
+  def self.enabled?
+    !Rails.env.production?
+  end
+
   def forum_topic_title
     "Reports requiring moderation"
   end

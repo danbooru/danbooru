@@ -129,7 +129,7 @@ class Comment < ApplicationRecord
   end
 
   def reportable_by?(user)
-    user.is_builder? && creator_id != user.id && !creator.is_moderator?
+    ModerationReport.enabled? && user.is_builder? && creator_id != user.id && !creator.is_moderator?
   end
 
   def voted_by?(user)

@@ -799,7 +799,7 @@ class User < ApplicationRecord
   end
 
   def reportable_by?(user)
-    user.is_builder? && id != user.id && !is_moderator?
+    ModerationReport.enabled? && user.is_builder? && id != user.id && !is_moderator?
   end
 
   def hide_favorites?
