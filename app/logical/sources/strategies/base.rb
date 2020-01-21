@@ -269,6 +269,8 @@ module Sources
           :artists => artists.as_json(include: :sorted_urls),
           :image_url => image_url,
           :image_urls => image_urls,
+          :preview_url => preview_url,
+          :preview_urls => preview_urls,
           :page_url => page_url,
           :canonical_url => canonical_url,
           :normalized_for_artist_finder_url => normalize_for_artist_finder,
