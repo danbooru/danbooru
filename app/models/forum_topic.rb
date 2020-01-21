@@ -184,6 +184,6 @@ class ForumTopic < ApplicationRecord
   end
 
   def viewable_moderation_reports
-    CurrentUser.is_moderator? ? moderation_reports : []
+    CurrentUser.is_moderator? ? moderation_reports.recent : []
   end
 end

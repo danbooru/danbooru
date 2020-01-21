@@ -5,7 +5,7 @@
   <% if @user.viewable_moderation_reports.present? %>
     <div class="moderation-users-notice">
       <span class="info" id="moderation-users-notice-for-<%= @user.id %>">
-        This user has been reported for moderation! (<%= @user.moderation_reports.length %> <%= (@user.moderation_reports.length == 1 ? "report" : "reports") %>)
+        This user has been reported for moderation! (<%= pluralize(@user.viewable_moderation_reports.length, "report") %>)
       </span>
     </div>
   <% end %>

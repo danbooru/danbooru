@@ -17,7 +17,6 @@ class ModerationReportsController < ApplicationController
   def create
     check_privilege
     @moderation_report = ModerationReport.create(moderation_report_params)
-    @moderation_report.create_forum_post!
     respond_with(@moderation_report)
   end
 

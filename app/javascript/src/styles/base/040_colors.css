@@ -67,6 +67,9 @@
   --forum-vote-meh-color: goldenrod;
   --forum-vote-down-color: red;
 
+  --moderation-report-text-color: red;
+  --moderation-report-border: 2px solid red;
+
   --comment-sticky-background-color: var(--subnav-menu-background-color);
 
   --post-tooltip-background-color: var(--body-background-color);
@@ -332,6 +335,9 @@ body[data-current-user-theme="dark"] {
   --forum-vote-up-color: var(--green-1);
   --forum-vote-meh-color: var(--yellow-1);
   --forum-vote-down-color: var(--red-1);
+
+  --moderation-report-text-color: var(--red-1);
+  --moderation-report-border: 2px solid var(--red-1);
 
   --jquery-ui-widget-content-text-color: var(--text-color);
   --jquery-ui-widget-content-background: var(--grey-2);

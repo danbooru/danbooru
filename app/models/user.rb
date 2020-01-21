@@ -814,6 +814,6 @@ class User < ApplicationRecord
   end
 
   def viewable_moderation_reports
-    !is_moderator? && CurrentUser.is_moderator? ? moderation_reports : []
+    CurrentUser.is_moderator? ? moderation_reports.recent : []
   end
 end

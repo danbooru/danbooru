@@ -3,7 +3,7 @@ div#c-users {
     div.moderation-users-notice {
       margin: 1em 0;
       font-weight: bold;
-      color: red;
+      color: var(--moderation-report-text-color);
     }
 
     div.box {

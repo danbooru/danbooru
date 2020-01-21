@@ -6,7 +6,7 @@
   <% if post.viewable_moderation_reports.present? %>
     <div class="row moderation-comments-notice">
       <span class="info" id="moderation-comments-notice-for-<%= post.id %>">
-        This post has comments reported for moderation! (<%= post.moderation_reports.length %> <%= (post.moderation_reports.length == 1 ? "report" : "reports") %>)
+        This post has comments reported for moderation! (<%= pluralize(post.viewable_moderation_reports.length, "report") %>)
       </span>
     </div>
   <% end %>

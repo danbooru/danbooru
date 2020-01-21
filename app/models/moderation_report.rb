@@ -2,9 +2,13 @@ class ModerationReport < ApplicationRecord
   belongs_to :model, polymorphic: true
   belongs_to_creator
 
+  validates :reason, presence: true
+  after_create :create_forum_post!
+
   scope :user, -> { where(model_type: "User") }
   scope :comment, -> { where(model_type: "Comment") }
   scope :forum_post, -> { where(model_type: "ForumPost") }
+  scope :recent, -> { where("moderation_reports.created_at >= ?", 1.week.ago) }
 
   def forum_topic_title
     "Reports requiring moderation"
@@ -53,9 +57,5 @@ class ModerationReport < ApplicationRecord
     q = q.search_attributes(params, :model_type, :model_id, :creator_id)
 
     q.apply_default_order(params)
-  end
-
-  def self.prune!
-    where("created_at < ?", 1.week.ago).delete_all
   end
 end
