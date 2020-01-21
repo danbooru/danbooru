@@ -1,6 +1,6 @@
 class ModerationReport < ApplicationRecord
   belongs_to :model, polymorphic: true
-  belongs_to_creator
+  belongs_to :creator, class_name: "User"
 
   validates :reason, presence: true
   after_create :create_forum_post!
@@ -21,8 +21,9 @@ class ModerationReport < ApplicationRecord
   def forum_topic
     topic = ForumTopic.find_by_title(forum_topic_title)
     if topic.nil?
-      topic = CurrentUser.as_system do
-        ForumTopic.create(title: forum_topic_title, category_id: 0, min_level: User::Levels::MODERATOR, original_post_attributes: {body: forum_topic_body})
+      CurrentUser.as_system do
+        topic = ForumTopic.create!(creator: User.system, title: forum_topic_title, category_id: 0, min_level: User::Levels::MODERATOR)
+        forum_post = ForumPost.create!(creator: User.system, body: forum_topic_body, topic: topic)
       end
     end
     topic

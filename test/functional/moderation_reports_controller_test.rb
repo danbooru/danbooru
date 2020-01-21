@@ -10,7 +10,7 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
       end
 
       @user.as_current do
-        @comment = create(:comment)
+        @comment = create(:comment, creator: @user)
       end
     end
 
@@ -29,9 +29,7 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        @builder.as_current do
-          create(:moderation_report, model: @comment)
-        end
+        create(:moderation_report, model: @comment, creator: @builder)
       end
 
       should "render the access denied page" do
