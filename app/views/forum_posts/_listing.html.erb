@@ -1,9 +1,18 @@
 <%- # forum_post %>
 <%- # original_forum_post_id %>
 <%- # dtext_data %>
+<%- # moderation_reports %>
 
 <div class="list-of-forum-posts list-of-messages">
+  <% if moderation_reports.present? %>
+    <div class="row moderation-forums-notice">
+      <span class="info" id="moderation-forums-notice-for-topic">
+        This topic has forum posts reported for moderation! (<%= pluralize(moderation_reports.length, "report") %>)
+      </span>
+    </div>
+  <% end %>
+
   <% forum_posts.each do |forum_post| %>
-    <%= render "forum_posts/forum_post", forum_post: forum_post, original_forum_post_id: original_forum_post_id, dtext_data: dtext_data %>
+    <%= render "forum_posts/forum_post", forum_post: forum_post, original_forum_post_id: original_forum_post_id, dtext_data: dtext_data, moderation_reports: moderation_reports %>
   <% end %>
 </div>

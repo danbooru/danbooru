@@ -93,6 +93,7 @@ class User < ApplicationRecord
   has_many :wiki_page_versions, foreign_key: :updater_id
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   has_many :forum_post_votes, dependent: :destroy, foreign_key: :creator_id
+  has_many :moderation_reports, as: :model
   has_many :posts, :foreign_key => "uploader_id"
   has_many :post_appeals, foreign_key: :creator_id
   has_many :post_approvals, :dependent => :destroy
@@ -791,6 +792,10 @@ class User < ApplicationRecord
     end
   end
 
+  def reportable_by?(user)
+    user.is_builder? && id != user.id && !is_moderator?
+  end
+
   def hide_favorites?
     !CurrentUser.is_admin? && enable_private_favorites? && CurrentUser.user.id != id
   end
@@ -806,5 +811,9 @@ class User < ApplicationRecord
 
   def presenter
     @presenter ||= UserPresenter.new(self)
+  end
+
+  def viewable_moderation_reports
+    CurrentUser.is_moderator? ? moderation_reports.recent : []
   end
 end

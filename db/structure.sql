@@ -2409,6 +2409,40 @@ ALTER SEQUENCE public.mod_actions_id_seq OWNED BY public.mod_actions.id;
 
 
 --
+-- Name: moderation_reports; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.moderation_reports (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    model_type character varying NOT NULL,
+    model_id bigint NOT NULL,
+    creator_id integer NOT NULL,
+    reason text NOT NULL
+);
+
+
+--
+-- Name: moderation_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.moderation_reports_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: moderation_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.moderation_reports_id_seq OWNED BY public.moderation_reports.id;
+
+
+--
 -- Name: news_updates; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4081,6 +4115,13 @@ ALTER TABLE ONLY public.mod_actions ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: moderation_reports id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.moderation_reports ALTER COLUMN id SET DEFAULT nextval('public.moderation_reports_id_seq'::regclass);
+
+
+--
 -- Name: news_updates id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4438,6 +4479,14 @@ ALTER TABLE ONLY public.ip_bans
 
 ALTER TABLE ONLY public.mod_actions
     ADD CONSTRAINT mod_actions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: moderation_reports moderation_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.moderation_reports
+    ADD CONSTRAINT moderation_reports_pkey PRIMARY KEY (id);
 
 
 --
@@ -6515,6 +6564,20 @@ CREATE INDEX index_mod_actions_on_creator_id ON public.mod_actions USING btree (
 
 
 --
+-- Name: index_moderation_reports_on_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_moderation_reports_on_creator_id ON public.moderation_reports USING btree (creator_id);
+
+
+--
+-- Name: index_moderation_reports_on_model_type_and_model_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_moderation_reports_on_model_type_and_model_id ON public.moderation_reports USING btree (model_type, model_id);
+
+
+--
 -- Name: index_news_updates_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7415,6 +7478,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20191223032633'),
 ('20200114204550'),
 ('20200115010442'),
+('20200117220602'),
 ('20200118015014');
 
 

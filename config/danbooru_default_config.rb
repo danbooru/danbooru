@@ -305,6 +305,10 @@ module Danbooru
       "help:appeal_notice"
     end
 
+    def report_notice_wiki_page
+      "help:report_notice"
+    end
+
     def replacement_notice_wiki_page
       "help:replacement_notice"
     end

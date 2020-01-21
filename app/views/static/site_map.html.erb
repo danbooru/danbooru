@@ -155,6 +155,7 @@
         <% end %>
 
         <% if CurrentUser.is_moderator? %>
+          <li><%= link_to("Moderation Reports", moderation_reports_path) %></li>
           <li><%= link_to("IP Addresses", ip_addresses_path) %></li>
           <li><%= link_to("IP Bans", ip_bans_path) %></li>
         <% end %>

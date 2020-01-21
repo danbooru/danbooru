@@ -6,6 +6,7 @@ class ForumPost < ApplicationRecord
   belongs_to_updater
   belongs_to :topic, :class_name => "ForumTopic"
   has_many :dtext_links, as: :model, dependent: :destroy
+  has_many :moderation_reports, as: :model
   has_many :votes, class_name: "ForumPostVote"
   has_one :tag_alias
   has_one :tag_implication
@@ -91,6 +92,10 @@ class ForumPost < ApplicationRecord
 
   def tag_change_request
     bulk_update_request || tag_alias || tag_implication
+  end
+
+  def reportable_by?(user)
+    user.is_builder? && creator_id != user.id && !creator.is_moderator?
   end
 
   def votable?
