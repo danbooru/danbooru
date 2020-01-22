@@ -340,7 +340,7 @@ Autocomplete.artist_source = async function(term) {
 
 Autocomplete.wiki_source = async function(term) {
   let wiki_pages = await $.getJSON("/wiki_pages", {
-    "search[title]": term + "*",
+    "search[title_normalize]": term + "*",
     "search[hide_deleted]": "Yes",
     "search[order]": "post_count",
     "limit": Autocomplete.MAX_RESULTS,
