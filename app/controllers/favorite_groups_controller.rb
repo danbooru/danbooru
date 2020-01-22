@@ -47,9 +47,9 @@ class FavoriteGroupsController < ApplicationController
   def destroy
     @favorite_group = FavoriteGroup.find(params[:id])
     check_write_privilege(@favorite_group)
-    @favorite_group.destroy
-    flash[:notice] = "Favorite group deleted"
-    redirect_to favorite_groups_path
+    @favorite_group.destroy!
+    flash[:notice] = "Favorite group deleted" if request.format.html?
+    respond_with(@favorite_group, location: favorite_groups_path(search: { creator_name: CurrentUser.name }))
   end
 
   def add_post

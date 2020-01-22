@@ -25,10 +25,6 @@ class FavoriteGroup < ApplicationRecord
       where(is_public: true).or(where(creator_id: user.id))
     end
 
-    def default_order
-      order(name: :asc)
-    end
-
     def search(params)
       q = super
       q = q.visible(CurrentUser.user)
@@ -36,6 +32,17 @@ class FavoriteGroup < ApplicationRecord
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
+      end
+
+      case params[:order]
+      when "name"
+        q = q.order(name: :asc, id: :desc)
+      when "created_at"
+        q = q.order(id: :desc)
+      when "post_count"
+        q = q.order(Arel.sql("cardinality(post_ids) desc")).order(id: :desc)
+      else
+        q = q.apply_default_order(params)
       end
 
       q.apply_default_order(params)

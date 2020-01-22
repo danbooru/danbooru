@@ -9,7 +9,7 @@
     <% end %>
 
     <% if CurrentUser.user.favorite_groups.for_post(post.id).present? %>
-      <%= render "posts/partials/show/favorite_groups", post: post, favgroups: CurrentUser.user.favorite_groups.for_post(post.id) %>
+      <%= render "posts/partials/show/favorite_groups", post: post, favgroups: CurrentUser.user.favorite_groups.for_post(post.id).order(name: :asc) %>
     <% end %>
   </div>
 <% end %>

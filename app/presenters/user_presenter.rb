@@ -88,7 +88,7 @@ class UserPresenter
   end
 
   def favorite_group_count(template)
-    template.link_to(user.favorite_group_count, template.user_favorite_groups_path(user.id))
+    template.link_to(user.favorite_group_count, template.favorite_groups_path(search: { creator_name: user.name }))
   end
 
   def comment_count(template)

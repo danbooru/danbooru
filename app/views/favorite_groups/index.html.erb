@@ -1,15 +1,35 @@
 <div id="c-favorite-groups">
   <div id="a-index">
+    <%= search_form_for(favorite_groups_path) do |f| %>
+      <%= f.input :name_matches, label: "Name", input_html: { value: params.dig(:search, :name_matches) } %>
+      <%= f.input :creator_name, label: "Creator", input_html: { value: params.dig(:search, :creator_name), "data-autocomplete": "user" } %>
+      <%= f.input :order, collection: [%w[Created created_at], %w[Updated updated_at], %w[Name name], %w[Post\ count post_count]], include_blank: true, selected: params.dig(:search, :order) %>
+      <%= f.submit "Search" %>
+    <% end %>
 
-    <%= table_for @favorite_groups, width: "100%" do |t| %>
+    <%= table_for @favorite_groups.includes(:creator), width: "100%" do |t| %>
       <% t.column "Name", {width: "60%"} do |favgroup| %>
         <%= link_to favgroup.pretty_name, favorite_group_path(favgroup) %>
         <% if favgroup.post_count > CurrentUser.user.per_page %>
           <%= link_to "page #{favgroup.last_page}", favorite_group_path(favgroup, :page => favgroup.last_page), :class => "last-page" %>
         <% end %>
       <% end %>
-      <% t.column "Count", {width: "10%"} do |favgroup| %>
-        <%= favgroup.post_count %>
+      <% t.column :post_count %>
+      <% t.column "Creator" do |favgroup| %>
+        <%= link_to_user favgroup.creator %>
+        <%= link_to "»", favorite_groups_path(search: { creator_name: favgroup.creator.name }) %>
+      <% end %>
+      <% t.column "Created" do |favgroup| %>
+        <%= time_ago_in_words_tagged(favgroup.created_at) %>
+      <% end %>
+      <% t.column "Updated" do |favgroup| %>
+        <%= time_ago_in_words_tagged(favgroup.updated_at) %>
+      <% end %>
+      <% t.column column: "control" do |favgroup| %>
+        <% if favgroup.editable_by?(CurrentUser.user) %>
+          <%= link_to "Edit", edit_favorite_group_path(favgroup) %> |
+          <%= link_to "Delete", favorite_group_path(favgroup), method: :delete, remote: true, "data-confirm": "Are you sure you want to delete this favgroup? This cannot be undone." %>
+        <% end %>
       <% end %>
     <% end %>
 
