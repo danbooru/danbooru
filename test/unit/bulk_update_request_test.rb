@@ -104,9 +104,11 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
     end
 
     should "create a forum topic" do
-      assert_difference("ForumTopic.count", 1) do
-        BulkUpdateRequest.create(:title => "abc", :reason => "zzz", :script => "create alias aaa -> bbb", :skip_secondary_validations => true)
-      end
+      bur = create(:bulk_update_request, reason: "zzz", script: "create alias aaa -> bbb")
+
+      assert_equal(true, bur.forum_post.present?)
+      assert_match(/\[bur:#{bur.id}\]/, bur.forum_post.body)
+      assert_match(/zzz/, bur.forum_post.body)
     end
 
     context "that has an invalid alias" do
