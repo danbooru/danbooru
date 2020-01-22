@@ -17,7 +17,11 @@ class ApplicationRecord < ActiveRecord::Base
   concerning :SearchMethods do
     class_methods do
       def qualified_column_for(attr)
-        "#{table_name}.#{column_for_attribute(attr).name}"
+        if attr.is_a?(Symbol)
+          "#{table_name}.#{column_for_attribute(attr).name}"
+        else
+          attr.to_s
+        end
       end
 
       def where_like(attr, value)

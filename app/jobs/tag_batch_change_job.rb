@@ -51,7 +51,7 @@ class TagBatchChangeJob < ApplicationJob
     query = normalized_antecedent
     adds = normalized_consequent
     arel = query.inject(User.none) do |scope, x|
-      scope.or(User.where("blacklisted_tags like ?", "%" + x.to_escaped_for_sql_like + "%"))
+      scope.or(User.where_like(:blacklisted_tags, "*#{x}*"))
     end
 
     arel.find_each do |user|

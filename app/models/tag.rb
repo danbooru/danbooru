@@ -810,7 +810,7 @@ class Tag < ApplicationRecord
     end
 
     def name_matches(name)
-      where("tags.name LIKE ? ESCAPE E'\\\\'", normalize_name(name).to_escaped_for_sql_like)
+      where_like(:name, normalize_name(name))
     end
 
     def search(params)
@@ -876,9 +876,9 @@ class Tag < ApplicationRecord
         TagAlias
         .select("tags.name, tags.post_count, tags.category, tag_aliases.antecedent_name")
         .joins("INNER JOIN tags ON tags.name = tag_aliases.consequent_name")
-        .where("tag_aliases.antecedent_name LIKE ? ESCAPE E'\\\\'", wildcard_name.to_escaped_for_sql_like)
+        .where_like(:antecedent_name, wildcard_name)
         .active
-        .where("tags.name NOT LIKE ? ESCAPE E'\\\\'", wildcard_name.to_escaped_for_sql_like)
+        .where_not_like("tags.name", wildcard_name)
         .where("tags.post_count > 0")
         .order("tags.post_count desc")
         .limit(limit * 2) # Get extra records in case some duplicates get filtered out.

@@ -17,14 +17,6 @@ class Ban < ApplicationRecord
     exists?(["user_id = ? AND expires_at > ?", user.id, Time.now])
   end
 
-  def self.reason_matches(query)
-    if query =~ /\*/
-      where("lower(bans.reason) LIKE ?", query.mb_chars.downcase.to_escaped_for_sql_like)
-    else
-      where("bans.reason @@ plainto_tsquery(?)", query)
-    end
-  end
-
   def self.search(params)
     q = super
 

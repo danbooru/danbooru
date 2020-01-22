@@ -203,7 +203,7 @@ class Upload < ApplicationRecord
       q = q.search_attributes(params, :uploader, :post, :source, :rating, :parent_id, :server, :md5, :server, :file_ext, :file_size, :image_width, :image_height, :referer_url)
 
       if params[:source_matches].present?
-        q = q.where("uploads.source LIKE ? ESCAPE E'\\\\'", params[:source_matches].to_escaped_for_sql_like)
+        q = q.where_like(:source, params[:source_matches])
       end
 
       if params[:has_post].to_s.truthy?
@@ -213,15 +213,15 @@ class Upload < ApplicationRecord
       end
 
       if params[:status].present?
-        q = q.where("uploads.status LIKE ? ESCAPE E'\\\\'", params[:status].to_escaped_for_sql_like)
+        q = q.where_like(:status, params[:status])
       end
 
       if params[:backtrace].present?
-        q = q.where("uploads.backtrace LIKE ? ESCAPE E'\\\\'", params[:backtrace].to_escaped_for_sql_like)
+        q = q.where_like(:backtrace, params[:backtrace])
       end
 
       if params[:tag_string].present?
-        q = q.where("uploads.tag_string LIKE ? ESCAPE E'\\\\'", params[:tag_string].to_escaped_for_sql_like)
+        q = q.where_like(:tag_string, params[:tag_string])
       end
 
       q.apply_default_order(params)

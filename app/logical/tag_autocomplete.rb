@@ -42,7 +42,7 @@ module TagAutocomplete
 
   def search_exact(query, n = 4)
     Tag
-      .where("name like ? escape e'\\\\'", query.to_escaped_for_sql_like + "%")
+      .where_like(:name, query + "*")
       .where("post_count > 0")
       .order("post_count desc")
       .limit(n)
@@ -58,7 +58,7 @@ module TagAutocomplete
     Tag
       .where("name % ?", query)
       .where("abs(length(name) - ?) <= 3", query.size)
-      .where("name like ? escape E'\\\\'", query[0].to_escaped_for_sql_like + '%')
+      .where_like(:name, query[0] + "*")
       .where("post_count > 0")
       .order(Arel.sql("similarity(name, #{Tag.connection.quote(query)}) DESC"))
       .limit(n)
@@ -102,9 +102,9 @@ module TagAutocomplete
     TagAlias
       .select("tags.name, tags.post_count, tags.category, tag_aliases.antecedent_name")
       .joins("INNER JOIN tags ON tags.name = tag_aliases.consequent_name")
-      .where("tag_aliases.antecedent_name LIKE ? ESCAPE E'\\\\'", wildcard_name.to_escaped_for_sql_like)
+      .where_like(:antecedent_name, wildcard_name)
       .active
-      .where("tags.name NOT LIKE ? ESCAPE E'\\\\'", wildcard_name.to_escaped_for_sql_like)
+      .where_not_like("tags.name", wildcard_name)
       .where("tags.post_count > 0")
       .order("tags.post_count desc")
       .limit(n)

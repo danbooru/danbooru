@@ -43,14 +43,14 @@ class WikiPage < ApplicationRecord
     end
 
     def other_names_include(name)
-      name = normalize_other_name(name).downcase
-      subquery = WikiPage.from("unnest(other_names) AS other_name").where("lower(other_name) = ?", name)
+      name = normalize_other_name(name)
+      subquery = WikiPage.from("unnest(other_names) AS other_name").where_iequals("other_name", name)
       where(id: subquery)
     end
 
     def other_names_match(name)
       if name =~ /\*/
-        subquery = WikiPage.from("unnest(other_names) AS other_name").where("other_name ILIKE ?", name.to_escaped_for_sql_like)
+        subquery = WikiPage.from("unnest(other_names) AS other_name").where_ilike("other_name", name)
         where(id: subquery)
       else
         other_names_include(name)

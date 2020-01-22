@@ -438,11 +438,11 @@ class Artist < ApplicationRecord
 
   module SearchMethods
     def any_other_name_matches(regex)
-      where(id: Artist.from("unnest(other_names) AS other_name").where("other_name ~ ?", regex))
+      where(id: Artist.from("unnest(other_names) AS other_name").where_regex("other_name", regex))
     end
 
     def any_other_name_like(name)
-      where(id: Artist.from("unnest(other_names) AS other_name").where("other_name LIKE ?", name.to_escaped_for_sql_like))
+      where(id: Artist.from("unnest(other_names) AS other_name").where_like("other_name", name))
     end
 
     def any_name_matches(query)
