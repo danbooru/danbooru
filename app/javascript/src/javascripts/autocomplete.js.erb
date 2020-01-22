@@ -42,6 +42,7 @@ Autocomplete.initialize_all = function() {
     this.initialize_fields($('[data-autocomplete="pool"]'), Autocomplete.pool_source);
     this.initialize_fields($('[data-autocomplete="user"]'), Autocomplete.user_source);
     this.initialize_fields($('[data-autocomplete="wiki-page"]'), Autocomplete.wiki_source);
+    this.initialize_fields($('[data-autocomplete="favorite-group"]'), Autocomplete.favorite_group_source);
     this.initialize_fields($('[data-autocomplete="saved-search-label"]'), Autocomplete.saved_search_source);
   }
 }
@@ -139,7 +140,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
         results = await Autocomplete.pool_source(term, metatag + ":");
         break;
       case "favgroup":
-        results = await Autocomplete.favorite_group_source(term, metatag + ":");
+        results = await Autocomplete.favorite_group_source(term, metatag + ":", CurrentUser.data("id"));
         break;
       case "search":
         results = await Autocomplete.saved_search_source(term, metatag + ":");
@@ -394,8 +395,9 @@ Autocomplete.pool_source = async function(term, prefix = "") {
   });
 };
 
-Autocomplete.favorite_group_source = async function(term, prefix = "") {
+Autocomplete.favorite_group_source = async function(term, prefix = "", creator_id = null) {
   let favgroups = await $.getJSON("/favorite_groups", {
+    "search[creator_id]": creator_id,
     "search[name_matches]": term,
     "limit": Autocomplete.MAX_RESULTS
   });
