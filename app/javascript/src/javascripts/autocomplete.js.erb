@@ -118,6 +118,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
       case "parent":
       case "filetype":
       case "disapproval":
+      case "embedded":
         results = Autocomplete.static_metatag_source(term, metatag);
         break;
       case "user":
@@ -271,6 +272,9 @@ Autocomplete.static_metatags = {
   ],
   locked: [
     "rating", "note", "status"
+  ],
+  embedded: [
+    "true", "false"
   ],
   child: [
     "any", "none"

@@ -440,6 +440,12 @@ class PostQueryBuilder
       relation = relation.where("posts.is_status_locked = FALSE")
     end
 
+    if q[:embedded] == "true"
+      relation = relation.bit_flags_match(:has_embedded_notes, true)
+    elsif q[:embedded] == "false"
+      relation = relation.bit_flags_match(:has_embedded_notes, false)
+    end
+
     relation = add_tag_string_search_relation(q[:tags], relation)
 
     if q[:ordpool].present?
