@@ -128,6 +128,52 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
           assert_select "a.forum-post-link", count: 0, text: @topic2.title
         end
       end
+
+      context "when listing topics" do
+        should "always show topics as read for anonymous users" do
+          get forum_topics_path
+          assert_select "span.new", count: 0
+        end
+
+        should "show topics as read after viewing them" do
+          get_auth forum_topics_path, @user
+          assert_response :success
+          assert_select "span.new", count: 3
+
+          get_auth forum_topic_path(@forum_topic.id), @user
+          assert_response :success
+
+          get_auth forum_topics_path, @user
+          assert_response :success
+          assert_select "span.new", count: 2
+        end
+
+        should "show topics as read after marking all as read" do
+          get_auth forum_topics_path, @user
+          assert_response :success
+          assert_select "span.new", count: 3
+
+          post_auth mark_all_as_read_forum_topics_path, @user
+          assert_response 302
+
+          get_auth forum_topics_path, @user
+          assert_response :success
+          assert_select "span.new", count: 0
+        end
+
+        should "show topics on page 2 as read after marking all as read" do
+          get_auth forum_topics_path(page: 2, limit: 1), @user
+          assert_response :success
+          assert_select "span.new", count: 1
+
+          post_auth mark_all_as_read_forum_topics_path, @user
+          assert_response 302
+
+          get_auth forum_topics_path(page: 2, limit: 1), @user
+          assert_response :success
+          assert_select "span.new", count: 0
+        end
+      end
     end
 
     context "edit action" do

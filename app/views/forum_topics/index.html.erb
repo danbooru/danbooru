@@ -11,7 +11,7 @@
       <%= ForumTopic::CATEGORIES.map {|id, name| link_to_unless_current(name, forum_topics_path(:search => {:category_id => id}))}.join(", ").html_safe %>
     </p>
 
-    <%= render "listing", forum_topics: @forum_topics, read_forum_topics: @read_forum_topics %>
+    <%= render "listing", forum_topics: @forum_topics %>
 
     <%= numbered_paginator(@forum_topics) %>
   </div>

@@ -24,9 +24,8 @@ class ForumTopicsController < ApplicationController
     params[:limit] ||= 40
 
     @forum_topics = ForumTopic.paginated_search(params)
-    @read_forum_topics = @forum_topics.read_by_user(CurrentUser.user)
 
-    @forum_topics = @forum_topics.includes(:creator, :updater).load if request.format.html?
+    @forum_topics = @forum_topics.includes(:creator, :updater, :forum_topic_visit_by_current_user).load if request.format.html?
     @forum_topics = @forum_topics.includes(:creator, :original_post).load if request.format.atom?
 
     respond_with(@forum_topics)
