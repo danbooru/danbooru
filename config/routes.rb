@@ -144,8 +144,8 @@ Rails.application.routes.draw do
     collection do
       post :mark_all_as_read
     end
-    resource :visit, :controller => "forum_topic_visits"
   end
+  resources :forum_topic_visits, only: [:index]
   resources :ip_bans
   resources :ip_addresses, only: [:index]
   resource :iqdb_queries, :only => [:show, :create] do
