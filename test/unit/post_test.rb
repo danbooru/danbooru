@@ -387,9 +387,7 @@ class PostTest < ActiveSupport::TestCase
         p1 = FactoryBot.create(:post)
         c1 = FactoryBot.create(:post, :parent_id => p1.id)
         c1.delete!("test")
-        CurrentUser.scoped(new_user, "127.0.0.1") do
-          c1.undelete!
-        end
+        c1.approve!(new_user)
         p1.reload
         assert_equal(new_user.id, c1.approver_id)
       end
@@ -398,7 +396,7 @@ class PostTest < ActiveSupport::TestCase
         p1 = FactoryBot.create(:post)
         c1 = FactoryBot.create(:post, :parent_id => p1.id)
         c1.delete!("test")
-        c1.undelete!
+        c1.approve!
         p1.reload
         assert_not_nil(c1.parent_id)
         assert(p1.has_children?, "Parent should have children")
@@ -418,8 +416,8 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "not allow undeletion" do
-          @post.undelete!
-          assert_equal(["Is status locked ; cannot undelete post"], @post.errors.full_messages)
+          approval = @post.approve!
+          assert_equal(["Post is locked and cannot be approved"], approval.errors.full_messages)
           assert_equal(true, @post.is_deleted?)
         end
       end
@@ -436,9 +434,10 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "not be permitted" do
-            assert_raises(::Post::ApprovalError) do
-              @post.undelete!
-            end
+            approval = @post.approve!
+
+            assert_equal(false, approval.valid?)
+            assert_equal(["You have previously approved this post and cannot approve it again"], approval.errors.full_messages)
           end
         end
 
@@ -448,21 +447,22 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "not be permitted" do
-            assert_raises(::Post::ApprovalError) do
-              @post.undelete!
-            end
+            approval = @post.approve!
+
+            assert_equal(false, approval.valid?)
+            assert_equal(["You cannot approve a post you uploaded"], approval.errors.full_messages)
           end
         end
       end
 
       context "when undeleted" do
         should "be undeleted" do
-          @post.undelete!
+          @post.approve!
           assert_equal(false, @post.reload.is_deleted?)
         end
 
         should "create a mod action" do
-          @post.undelete!
+          @post.approve!
           assert_equal("undeleted post ##{@post.id}", ModAction.last.description)
           assert_equal("post_undelete", ModAction.last.category)
         end

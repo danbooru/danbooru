@@ -1297,27 +1297,6 @@ class Post < ApplicationRecord
       end
     end
 
-    def undelete!
-      if is_status_locked?
-        self.errors.add(:is_status_locked, "; cannot undelete post")
-        return false
-      end
-
-      if !CurrentUser.is_admin?
-        if approved_by?(CurrentUser.user)
-          raise ApprovalError.new("You have previously approved this post and cannot undelete it")
-        elsif uploader_id == CurrentUser.id
-          raise ApprovalError.new("You cannot undelete a post you uploaded")
-        end
-      end
-
-      self.is_deleted = false
-      self.approver_id = CurrentUser.id
-      flags.each(&:resolve!)
-      save
-      ModAction.log("undeleted post ##{id}", :post_undelete)
-    end
-
     def replace!(params)
       transaction do
         replacement = replacements.create(params)
