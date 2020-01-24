@@ -67,6 +67,15 @@
       </tr>
 
       <tr>
+        <th>New Upload Limit</th>
+        <td>
+          <%= link_to user.new_upload_limit.used_upload_slots, posts_path(tags: "user:#{user.name} status:pending") %>
+          /
+          <%= tag.abbr user.new_upload_limit.upload_slots, title: "Next level: #{user.new_upload_limit.approvals_on_current_level} / #{user.new_upload_limit.approvals_for_next_level} approvals" %>
+        </td>
+      </tr>
+
+      <tr>
         <th>Uploads</th>
         <td>
           <%= presenter.upload_count(self) %>

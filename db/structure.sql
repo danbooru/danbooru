@@ -2192,7 +2192,8 @@ furry -rating:s'::text,
     bit_prefs bigint DEFAULT 0 NOT NULL,
     last_ip_addr inet,
     unread_dmail_count integer DEFAULT 0 NOT NULL,
-    theme integer DEFAULT 0 NOT NULL
+    theme integer DEFAULT 0 NOT NULL,
+    upload_points integer DEFAULT 1000 NOT NULL
 );
 
 
@@ -7366,6 +7367,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200117220602'),
 ('20200118015014'),
 ('20200119184442'),
-('20200119193110');
+('20200119193110'),
+('20200123184743');
 
 

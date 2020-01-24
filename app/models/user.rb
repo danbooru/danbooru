@@ -468,6 +468,10 @@ class User < ApplicationRecord
       (is_moderator? && flag.not_uploaded_by?(id)) || flag.creator_id == id
     end
 
+    def new_upload_limit
+      @new_upload_limit ||= UploadLimit.new(self)
+    end
+
     def upload_limit
       [max_upload_limit - used_upload_slots, 0].max
     end

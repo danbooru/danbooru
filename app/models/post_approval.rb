@@ -26,10 +26,13 @@ class PostApproval < ApplicationRecord
   end
 
   def approve_post
-    ModAction.log("undeleted post ##{post_id}", :post_undelete) if post.is_deleted
+    is_undeletion = post.is_deleted
 
     post.flags.each(&:resolve!)
     post.update(approver: user, is_flagged: false, is_pending: false, is_deleted: false)
+    ModAction.log("undeleted post ##{post_id}", :post_undelete) if is_undeletion
+
+    post.uploader.new_upload_limit.update_limit!(post, incremental: !is_undeletion)
   end
 
   def self.search(params)
