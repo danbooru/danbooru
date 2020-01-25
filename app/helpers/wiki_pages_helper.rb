@@ -1,7 +1,7 @@
 module WikiPagesHelper
   def wiki_page_excerpt(wiki_page)
     text = strip_dtext(wiki_page.body).split(/\r\n|\r|\n/).first
-    truncate(text, length: 160)
+    text.truncate(160)
   end
 
   def wiki_page_other_names_list(wiki_page)

@@ -160,10 +160,6 @@ class PostPresenter < Presenter
     PostPresenter.preview(@post)
   end
 
-  def humanized_tag_string
-    @post.tag_string.split(/ /).slice(0, 25).join(", ").tr("_", " ")
-  end
-
   def humanized_essential_tag_string
     @humanized_essential_tag_string ||= tag_set_presenter.humanized_essential_tag_string(default: "##{@post.id}")
   end

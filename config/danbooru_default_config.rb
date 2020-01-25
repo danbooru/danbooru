@@ -25,10 +25,6 @@ module Danbooru
       "Danbooru"
     end
 
-    def description
-      "Find good anime art fast"
-    end
-
     # The canonical hostname of the site.
     def hostname
       Socket.gethostname

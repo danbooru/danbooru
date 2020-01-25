@@ -269,23 +269,31 @@ module ApplicationHelper
     end.to_h
   end
 
-  def page_title(title = nil)
+  def page_title(title = nil, suffix: "| #{Danbooru.config.app_name}")
     if title.present?
-      content_for(:page_title) { "#{title} | #{Danbooru.config.app_name}" }
+      content_for(:page_title) { "#{title} #{suffix}".strip }
     elsif content_for(:page_title).present?
       content_for(:page_title)
     elsif params[:action] == "index"
-      "#{params[:controller].titleize} | #{Danbooru.config.app_name}"
+      "#{params[:controller].titleize} #{suffix}"
     elsif params[:action] == "show"
-      "#{params[:controller].singularize.titleize} | #{Danbooru.config.app_name}"
+      "#{params[:controller].singularize.titleize} #{suffix}"
     elsif params[:action] == "new"
-      "New #{params[:controller].singularize.titleize} | #{Danbooru.config.app_name}"
+      "New #{params[:controller].singularize.titleize} #{suffix}"
     elsif params[:action] == "edit"
-      "Edit #{params[:controller].singularize.titleize} | #{Danbooru.config.app_name}"
+      "Edit #{params[:controller].singularize.titleize} #{suffix}"
     elsif params[:action] == "search"
-      "Search #{params[:controller].titleize} | #{Danbooru.config.app_name}"
+      "Search #{params[:controller].titleize} #{suffix}"
     else
       "#{Danbooru.config.app_name}/#{params[:controller]}"
+    end
+  end
+
+  def meta_description(description = nil)
+    if description.present?
+      content_for(:meta_description) { description }
+    elsif content_for(:meta_description).present?
+      content_for(:meta_description)
     end
   end
 

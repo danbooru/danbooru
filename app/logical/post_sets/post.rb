@@ -17,7 +17,7 @@ module PostSets
     end
 
     def humanized_tag_string
-      tag_array.slice(0, 25).join(" ").tr("_", " ")
+      tag_array.map { |tag| tag.tr("_", " ").titleize }.to_sentence
     end
 
     def has_blank_wiki?

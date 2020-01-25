@@ -48,7 +48,7 @@
     "@context": "http://schema.org",
     "@type": "WebSite",
     "name": "<%= Danbooru.config.app_name %>",
-    "alternateName": "<%= Danbooru.config.description %>",
+    "alternateName": "Anime Image Board",
     "url" : "<%= root_url %>"
   }
   </script>
@@ -76,6 +76,11 @@
   </script>
   <%= tag.meta name: "twitter:title", content: page_title %>
   <%= tag.meta name: "og:title", content: page_title %>
+  <% if meta_description.present? %>
+    <%= tag.meta name: "description", content: meta_description %>
+    <%= tag.meta name: "og:description", content: meta_description %>
+    <%= tag.meta name: "twitter:description", content: meta_description %>
+  <% end %>
   <%= yield :html_header %>
   <%= raw Danbooru.config.custom_html_header_content %>
 </head>
