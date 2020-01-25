@@ -272,20 +272,18 @@ module ApplicationHelper
   def page_title(title = nil)
     if title.present?
       content_for(:page_title) { "#{title} | #{Danbooru.config.app_name}" }
-    elsif title.blank? && !title.nil?
-      content_for(:page_title) { Danbooru.config.app_name }
     elsif content_for(:page_title).present?
       content_for(:page_title)
     elsif params[:action] == "index"
-      "#{params[:controller].titleize} - #{Danbooru.config.app_name}"
+      "#{params[:controller].titleize} | #{Danbooru.config.app_name}"
     elsif params[:action] == "show"
-      "#{params[:controller].singularize.titleize} - #{Danbooru.config.app_name}"
+      "#{params[:controller].singularize.titleize} | #{Danbooru.config.app_name}"
     elsif params[:action] == "new"
-      "New #{params[:controller].singularize.titleize} - #{Danbooru.config.app_name}"
+      "New #{params[:controller].singularize.titleize} | #{Danbooru.config.app_name}"
     elsif params[:action] == "edit"
-      "Edit #{params[:controller].singularize.titleize} - #{Danbooru.config.app_name}"
+      "Edit #{params[:controller].singularize.titleize} | #{Danbooru.config.app_name}"
     elsif params[:action] == "search"
-      "Search #{params[:controller].titleize} - #{Danbooru.config.app_name}"
+      "Search #{params[:controller].titleize} | #{Danbooru.config.app_name}"
     else
       "#{Danbooru.config.app_name}/#{params[:controller]}"
     end

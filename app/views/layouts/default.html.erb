@@ -74,6 +74,8 @@
 
     window.addthis_config = { ui_click: true };
   </script>
+  <%= tag.meta name: "twitter:title", content: page_title %>
+  <%= tag.meta name: "og:title", content: page_title %>
   <%= yield :html_header %>
   <%= raw Danbooru.config.custom_html_header_content %>
 </head>
