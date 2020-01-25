@@ -1,5 +1,5 @@
 <% content_for(:secondary_links) do %>
-  <%= quick_search_form_for(:name_matches, users_path, "users", autocomplete: "user") %>
+  <%= quick_search_form_for(:name_matches, users_path, "users", autocomplete: "user", redirect: true) %>
   <%= subnav_link_to "Listing", users_path %>
   <%= subnav_link_to "Search", search_users_path %>
 

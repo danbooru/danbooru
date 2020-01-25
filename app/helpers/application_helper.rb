@@ -179,11 +179,11 @@ module ApplicationHelper
     tag.input value: "Preview", type: "button", class: "dtext-preview-button", "data-input-id": input_id, "data-preview-id": preview_id
   end
 
-  def quick_search_form_for(attribute, url, name, autocomplete: nil, &block)
+  def quick_search_form_for(attribute, url, name, autocomplete: nil, redirect: false, &block)
     tag.li do
       search_form_for(url, classes: "quick-search-form one-line-form") do |f|
         out  = f.input attribute, label: false, placeholder: "Search #{name}", input_html: { id: nil, "data-autocomplete": autocomplete }
-        out += tag.input type: :hidden, name: :redirect, value: 1
+        out += tag.input type: :hidden, name: :redirect, value: redirect
         out += capture { yield f } if block_given?
         out
       end
