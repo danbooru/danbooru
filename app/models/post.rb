@@ -276,18 +276,6 @@ class Post < ApplicationRecord
       end
     end
 
-    def appeal!(reason)
-      if is_status_locked?
-        raise PostAppeal::Error.new("Post is locked and cannot be appealed")
-      end
-
-      appeal = appeals.create(:reason => reason)
-
-      if appeal.errors.any?
-        raise PostAppeal::Error.new(appeal.errors.full_messages.join("; "))
-      end
-    end
-
     def approve!(approver = CurrentUser.user)
       approvals.create(user: approver)
     end

@@ -127,14 +127,10 @@ module Moderator
         end
 
         context "for appeals" do
-          setup do
-            as(@user) do
-              @post = create(:post, :is_deleted => true)
-              @post.appeal!("blah")
-            end
-          end
-
           should "render" do
+            @post = create(:post, is_deleted: true)
+            @appeal = create(:post_appeal, post: @post)
+
             get_auth moderator_dashboard_path, @admin
             assert_response :success
           end

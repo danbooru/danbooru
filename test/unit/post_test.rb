@@ -482,9 +482,7 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "be appealed" do
-        assert_difference("PostAppeal.count", 1) do
-          @post.appeal!("xxx")
-        end
+        create(:post_appeal, post: @post)
         assert(@post.is_deleted?, "Post should still be deleted")
         assert_equal(1, @post.appeals.count)
       end
@@ -561,9 +559,10 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "not allow new appeals" do
-        assert_raises(PostAppeal::Error) do
-          @post.appeal!("wrong")
-        end
+        @appeal = build(:post_appeal, post: @post)
+
+        assert_equal(false, @appeal.valid?)
+        assert_equal(["Post is active"], @appeal.errors.full_messages)
       end
 
       should "not allow approval" do
