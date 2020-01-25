@@ -17,11 +17,7 @@ class WikiPagesController < ApplicationController
   def index
     @wiki_pages = WikiPage.paginated_search(params)
 
-    if params[:redirect].to_s.truthy? && @wiki_pages.one? && @wiki_pages.first.title == WikiPage.normalize_title(params[:search][:title])
-      redirect_to @wiki_pages.first
-    else
-      respond_with(@wiki_pages)
-    end
+    respond_with(@wiki_pages)
   end
 
   def search
@@ -79,6 +75,14 @@ class WikiPagesController < ApplicationController
   end
 
   private
+
+  def item_matches_params(wiki_page)
+    if params[:search][:title]
+      wiki_page.title == WikiPage.normalize_title(params[:search][:title])
+    else
+      true
+    end
+  end
 
   def normalize_search_params
     if params[:title]
