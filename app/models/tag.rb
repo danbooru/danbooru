@@ -17,7 +17,7 @@ class Tag < ApplicationRecord
     -locked locked width height mpixels ratio score favcount filesize source
     -source id -id date age order limit -status status tagcount parent -parent
     child pixiv_id pixiv search upvote downvote filetype -filetype flagger
-    -flagger appealer -appealer disapproval -disapproval
+    -flagger appealer -appealer disapproval -disapproval embedded
   ] + TagCategory.short_name_list.map {|x| "#{x}tags"} + COUNT_METATAGS + COUNT_METATAG_SYNONYMS
 
   SUBQUERY_METATAGS = %w[commenter comm noter noteupdater artcomm flagger -flagger appealer -appealer]
@@ -738,6 +738,9 @@ class Tag < ApplicationRecord
 
           when "status"
             q[:status] = g2.downcase
+
+          when "embedded"
+            q[:embedded] = g2.downcase
 
           when "filetype"
             q[:filetype] = g2.downcase

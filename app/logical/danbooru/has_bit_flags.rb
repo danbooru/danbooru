@@ -32,7 +32,7 @@ module Danbooru
           bits = attributes.length
           bit_index = bits - attributes.index(flag.to_s) - 1
 
-          where(sanitize_sql(["get_bit(bit_prefs::bit(?), ?) = ?", bits, bit_index, value]))
+          where(sanitize_sql(["get_bit(#{field}::bit(?), ?) = ?", bits, bit_index, value]))
         end
       end
     end
