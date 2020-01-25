@@ -206,6 +206,10 @@ class Tag < ApplicationRecord
   end
 
   concerning :NameMethods do
+    def pretty_name
+      name.tr("_", " ")
+    end
+
     def unqualified_name
       name.gsub(/_\(.*\)\z/, "").tr("_", " ")
     end

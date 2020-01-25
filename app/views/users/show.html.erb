@@ -1,3 +1,6 @@
+<% page_title "@#{@user.pretty_name}" %>
+<%= render "secondary_links" %>
+
 <div id="c-users">
   <div id="a-show">
     <h1><%= link_to_user @user %></h1>
@@ -16,12 +19,6 @@
     <%= render "post_summary", presenter: @user.presenter, user: @user %>
   </div>
 </div>
-
-<%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  User - <%= @user.presenter.name %> - <%= Danbooru.config.app_name %>
-<% end %>
 
 <% content_for(:html_header, auto_discovery_link_tag(:atom, comments_url(:atom, search: { post_tags_match: "user:#{@user.name}" }), title: "Comments on #{@user.name}'s uploads")) %>
 <% content_for(:html_header, auto_discovery_link_tag(:atom, comments_url(:atom, search: { post_tags_match: "commenter:#{@user.name}" }), title: "Comments on posts commented on by #{@user.name}")) %>

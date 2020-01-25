@@ -1,3 +1,6 @@
+<% page_title "Pool Gallery" %>
+<%= render "secondary_links" %>
+
 <div id="c-pools">
   <div id="a-gallery">
     <%= render "search", :path => gallery_pools_path %>
@@ -13,9 +16,3 @@
     </section>
   </div>
 </div>
-
-<%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Pool Gallery - <%= Danbooru.config.app_name %>
-<% end %>

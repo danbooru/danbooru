@@ -1,3 +1,6 @@
+<% page_title "Account Upgrade" %>
+<%= render "users/secondary_links" %>
+
 <div id="c-user-upgrades">
   <div id="a-new" class="fixed-width-container">
     <h1>Upgrade Account</h1>
@@ -116,12 +119,6 @@
     <% end %>
   </div>
 </div>
-
-<%= render "users/secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Upgrade - <%= Danbooru.config.app_name %>
-<% end %>
 
 <% content_for(:html_header) do %>
   <script>

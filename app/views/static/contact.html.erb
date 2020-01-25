@@ -1,3 +1,5 @@
+<% page_title "Contact" %>
+
 <div id="c-static">
   <div id="a-contact">
     <h1>Contact</h1>
@@ -5,9 +7,5 @@
     <h2>Questions &amp; Comments</h2>
 
     <p>You can reach the administrator of this site at <%= mail_to Danbooru.config.contact_email, nil, :encode => :hex %>.</p>
-
-    <% content_for(:page_title) do %>
-      Contact - <%= Danbooru.config.app_name %>
-    <% end %>
   </div>
 </div>

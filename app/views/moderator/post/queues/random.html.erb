@@ -1,3 +1,5 @@
+<% page_title "Mod Queue" %>
+
 <div id="c-moderator-post-queues">
   <div id="a-random">
     <div>
@@ -23,10 +25,6 @@
 
 <%= render "post_disapprovals/detailed_rejection_dialog" %>
 <%= render "posts/partials/common/secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Mod Queue - <%= Danbooru.config.app_name %>
-<% end %>
 
 <% content_for(:html_header) do %>
   <meta name="random-mode" content="1">

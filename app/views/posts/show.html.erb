@@ -1,3 +1,6 @@
+<% page_title @post.presenter.humanized_essential_tag_string %>
+<%= render "posts/partials/common/secondary_links" %>
+
 <% content_for(:sidebar) do %>
   <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:q], :tags_dom_id => "tags" %>
 
@@ -151,10 +154,6 @@
 
 <%= post_view_count_js %>
 
-<% content_for(:page_title) do %>
-  <%= @post.presenter.humanized_essential_tag_string %> - <%= Danbooru.config.app_name %>
-<% end %>
-
 <% content_for(:html_header) do %>
   <%= tag.meta name: "description", content: "View this #{@post.image_width}x#{@post.image_height} #{number_to_human_size(@post.file_size)} image" %>
   <meta name="post-id" content="<%= @post.id %>">
@@ -201,5 +200,3 @@
     window._paq.push(["setCustomVariable", 3, "blocked", <%= @post.levelblocked? %>, "page"]);
   </script>
 <% end %>
-
-<%= render "posts/partials/common/secondary_links" %>

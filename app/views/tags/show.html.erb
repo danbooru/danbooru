@@ -1,3 +1,6 @@
+<% page_title "Tag: #{@tag.pretty_name.titleize}" %>
+<%= render "secondary_links" %>
+
 <div id="c-tags">
   <div id="a-show">
     <h1>Tag: <%= @tag.name %></h1>
@@ -8,9 +11,3 @@
     </ul>
   </div>
 </div>
-
-<%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Tag - <%= @tag.name %> - <%= Danbooru.config.app_name %>
-<% end %>

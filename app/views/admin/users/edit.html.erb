@@ -1,3 +1,6 @@
+<% page_title "Edit User: #{@user.pretty_name}" %>
+<%= render "users/secondary_links" %>
+
 <div id="c-admin-users">
   <div id="a-edit">
     <h1>Edit User: <%= @user.name %></h1>
@@ -10,9 +13,3 @@
     <% end %>
   </div>
 </div>
-
-<%= render "users/secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Edit User - <%= Danbooru.config.app_name %>
-<% end %>

@@ -1,3 +1,6 @@
+<% page_title "Wiki Comparison: #{@thispage.pretty_title.titleize}" %>
+
+<%= render "wiki_pages/secondary_links" %>
 <%= render "wiki_pages/sidebar" %>
 
 <% content_for(:content) do %>
@@ -14,10 +17,4 @@
   <% else %>
     <p>The artist requested removal of this page.</p>
   <% end %>
-<% end %>
-
-<%= render "wiki_pages/secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Wiki Page Versions Comparison - <%= @thispage.pretty_title %> - <%= Danbooru.config.app_name %>
 <% end %>

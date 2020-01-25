@@ -1,3 +1,6 @@
+<% page_title "Reset Password" %>
+<%= render "sessions/secondary_links" %>
+
 <div id="c-maintenance-user-password-resets">
   <div id="a-edit">
     <h1>Reset Password</h1>
@@ -14,9 +17,3 @@
     <% end %>
   </div>
 </div>
-
-<%= render "sessions/secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Reset Password - <%= Danbooru.config.app_name %>
-<% end %>

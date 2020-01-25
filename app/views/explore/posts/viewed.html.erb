@@ -1,3 +1,6 @@
+<% page_title "Most Viewed" %>
+<%= render "posts/partials/common/secondary_links" %>
+
 <div id="c-explore-posts">
   <div id="a-viewed">
     <h1>Most Viewed - <%= @date %></h1>
@@ -14,12 +17,6 @@
     </div>
   </div>
 </div>
-
-<%= render "posts/partials/common/secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Most Viewed - <%= Danbooru.config.app_name %>
-<% end %>
 
 <% content_for(:html_header) do %>
   <meta name="description" content="The most viewed posts per day">

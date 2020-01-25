@@ -1,3 +1,6 @@
+<% page_title "Popular Posts" %>
+<%= render "posts/partials/common/secondary_links" %>
+
 <div id="c-explore-posts">
   <div id="a-popular">
     <h1>
@@ -23,12 +26,6 @@
     <%= post_previews_html(@posts) %>
   </div>
 </div>
-
-<%= render "posts/partials/common/secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Popular - <%= Danbooru.config.app_name %>
-<% end %>
 
 <% content_for(:html_header) do %>
   <meta name="description" content="The most popular posts per <%= @scale %>">

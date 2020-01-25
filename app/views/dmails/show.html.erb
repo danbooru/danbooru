@@ -1,3 +1,6 @@
+<% page_title "Message: #{@dmail.title}" %>
+<%= render "secondary_links" %>
+
 <div id="c-dmails">
   <div id="a-show">
     <div class="dmail">
@@ -38,9 +41,3 @@
     </div>
   </div>
 </div>
-
-<%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Message - <%= @dmail.title %> - <%= Danbooru.config.app_name %>
-<% end %>

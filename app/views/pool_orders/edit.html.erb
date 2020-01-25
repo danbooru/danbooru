@@ -1,3 +1,6 @@
+<% page_title "Order Pool" %>
+<%= render "pools/secondary_links" %>
+
 <div id="c-pool-orders">
   <div id="a-edit">
     <h1>Order Pool: <%= @pool.pretty_name %></h1>
@@ -25,9 +28,3 @@
     <% end %>
   </div>
 </div>
-
-<%= render "pools/secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Order Pool - <%= Danbooru.config.app_name %>
-<% end %>

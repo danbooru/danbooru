@@ -1,3 +1,5 @@
+<% page_Title "Mod Queue" %>
+
 <div id="c-moderator-post-queues">
   <div id="a-show">
     <div>
@@ -36,7 +38,3 @@
 
 <%= render "post_disapprovals/detailed_rejection_dialog" %>
 <%= render "posts/partials/common/secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Mod Queue - <%= Danbooru.config.app_name %>
-<% end %>

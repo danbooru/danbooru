@@ -1,3 +1,5 @@
+<% page_title @forum_topic.title %>
+
 <div id="c-forum-topics">
   <div id="a-show">
     <h1>
@@ -37,10 +39,6 @@
 </div>
 
 <%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  <%= @forum_topic.title %> - Forum - <%= Danbooru.config.app_name %>
-<% end %>
 
 <% content_for(:html_header) do %>
   <%= auto_discovery_link_tag(:atom, {format: :atom}, {title: @forum_topic.title}) %>

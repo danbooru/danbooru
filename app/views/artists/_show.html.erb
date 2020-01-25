@@ -1,3 +1,6 @@
+<% page_title "#{@artist.pretty_name.titleize} | Artist Profile" %>
+<%= render "secondary_links" %>
+
 <div id="c-artists">
   <div id="a-show">
     <h1>Artist: <%= link_to @artist.pretty_name, posts_path(:tags => @artist.name), :class => "tag-type-#{@artist.category_name}" %></h1>
@@ -25,9 +28,3 @@
     <% end %>
   </div>
 </div>
-
-<%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Artist - <%= @artist.name %> - <%= Danbooru.config.app_name %>
-<% end %>

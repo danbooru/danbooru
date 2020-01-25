@@ -1,3 +1,6 @@
+<% page_title "#{@pool.pretty_name.titleize} | Pool" %>
+<%= render "secondary_links" %>
+
 <div id="c-pools">
   <div id="a-show">
     <h1>
@@ -25,12 +28,6 @@
     </section>
   </div>
 </div>
-
-<%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Pool - <%= @pool.pretty_name %> - <%= Danbooru.config.app_name %>
-<% end %>
 
 <% content_for(:html_header) do %>
   <meta name="description" content="<%= strip_dtext(@pool.description) %>">

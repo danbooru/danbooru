@@ -269,8 +269,12 @@ module ApplicationHelper
     end.to_h
   end
 
-  def page_title
-    if content_for(:page_title).present?
+  def page_title(title = nil)
+    if title.present?
+      content_for(:page_title) { "#{title} | #{Danbooru.config.app_name}" }
+    elsif title.blank? && !title.nil?
+      content_for(:page_title) { Danbooru.config.app_name }
+    elsif content_for(:page_title).present?
       content_for(:page_title)
     elsif params[:action] == "index"
       "#{params[:controller].titleize} - #{Danbooru.config.app_name}"

@@ -1,3 +1,6 @@
+<% page_title "Favgroup: #{@favorite_group.pretty_name.titleize}" %>
+<%= render "secondary_links" %>
+
 <div id="c-favorite-groups">
   <div id="a-show">
     <h1>
@@ -22,9 +25,3 @@
     </section>
   </div>
 </div>
-
-<%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Favorite Group - <%= @favorite_group.pretty_name %> - <%= Danbooru.config.app_name %>
-<% end %>

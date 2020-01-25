@@ -1,3 +1,6 @@
+<% page_title "Related tags" %>
+<%= render "tags/secondary_links" %>
+
 <div id="c-related-tags">
   <div id="a-show">
     <h1>Related tags</h1>
@@ -18,9 +21,3 @@
     <% end %>
   </div>
 </div>
-
-<%= render "tags/secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Related tags - <%= Danbooru.config.app_name %>
-<% end %>

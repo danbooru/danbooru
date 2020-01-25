@@ -1,11 +1,9 @@
+<% page_title "Error: #{@message}" %>
+
 <h1>Error</h1>
 <p><%= @message %></p>
 
 <% unless @expected %>
   <h6>Details</h6>
   <%= render "static/backtrace", exception: @exception, backtrace: @backtrace %>
-<% end %>
-
-<% content_for(:page_title) do %>
-  Error - <%= @message %> - <%= Danbooru.config.app_name %>
 <% end %>

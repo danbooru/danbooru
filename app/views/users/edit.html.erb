@@ -1,3 +1,6 @@
+<% page_title "Settings" %>
+<%= render "secondary_links" %>
+
 <div id="c-users">
   <div id="a-edit">
     <h1>Settings</h1>
@@ -74,10 +77,6 @@
   </div>
 </div>
 
-<% content_for(:page_title) do %>
-  Settings - <%= Danbooru.config.app_name %>
-<% end %>
-
 <% content_for(:html_header) do %>
   <script type="text/javascript">
     $(function() {
@@ -93,5 +92,3 @@
     });
   </script>
 <% end %>
-
-<%= render "secondary_links" %>

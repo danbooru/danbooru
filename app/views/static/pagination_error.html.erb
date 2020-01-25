@@ -1,3 +1,5 @@
+<% page_title "Page Limit Exceeded" %>
+
 <h1>Search Error</h1>
 
 <p>
@@ -11,7 +13,3 @@
 </p>
 
 <%= link_to "Go back", :back, rel: "prev" %>
-
-<% content_for(:page_title) do %>
-  Search Error - <%= Danbooru.config.app_name %>
-<% end %>

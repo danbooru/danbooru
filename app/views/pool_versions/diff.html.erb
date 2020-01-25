@@ -1,3 +1,6 @@
+<% page_title "Pool Comparison: #{@pool_version.pretty_name.titleize}" %>
+<%= render "secondary_links" %>
+
 <div id="c-pool-versions">
   <div id="a-diff">
     <h1>Pool Version Comparison: <%= @pool_version.name %></h1>
@@ -31,9 +34,3 @@
     <% end %>
   </div>
 </div>
-
-<%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Pool Version Comparison - <%= @pool_version.name %> - <%= Danbooru.config.app_name %>
-<% end %>

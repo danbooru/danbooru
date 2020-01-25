@@ -1,12 +1,9 @@
+<% page_title "New Message" %>
+<%= render "secondary_links" %>
+
 <div id="c-dmails">
   <div id="a-new">
     <h1>New Message</h1>
     <%= render "form", :dmail => @dmail %>
   </div>
 </div>
-
-<%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  New Message - <%= Danbooru.config.app_name %>
-<% end %>
