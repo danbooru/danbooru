@@ -22,6 +22,28 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  private
+
+  def respond_with(*options, &block)
+    if params[:action] == "index" && is_redirect?(options[0])
+      redirect_to_show(options[0])
+    else
+      super(*options, &block)
+    end
+  end
+
+  def redirect_to_show(items)
+    redirect_to send("#{controller_path.singularize}_path", items.first, format: request.format.symbol)
+  end
+
+  def is_redirect?(items)
+    action_methods.include?("show") && params[:redirect].to_s.truthy? && items.one? && item_matches_params(items.first)
+  end
+
+  def item_matches_params(*)
+    true
+  end
+
   protected
 
   def enable_cors

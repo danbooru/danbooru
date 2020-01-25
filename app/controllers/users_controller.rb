@@ -32,11 +32,7 @@ class UsersController < ApplicationController
     end
 
     @users = User.paginated_search(params)
-    if params[:redirect].to_s.truthy? && @users.one? && User.normalize_name(@users.first.name) == User.normalize_name(params[:search][:name_matches])
-      redirect_to @users.first
-    else
-      respond_with @users
-    end
+    respond_with(@users)
   end
 
   def search
@@ -97,6 +93,14 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def item_matches_params(user)
+    if params[:search][:name_matches]
+      User.normalize_name(user.name) == User.normalize_name(params[:search][:name_matches])
+    else
+      true
+    end
+  end
 
   def check_privilege(user)
     raise User::PrivilegeError unless user.id == CurrentUser.id || CurrentUser.is_admin?

@@ -35,11 +35,7 @@ class ArtistsController < ApplicationController
     @artists = @artists.includes(:tag) if request.format.html?
     @artists = @artists.includes(:urls) if !request.format.html?
 
-    if params[:redirect].to_s.truthy? && @artists.one? && @artists.first.name == Artist.normalize_name(params[:search][:any_name_or_url_matches])
-      redirect_to @artists.first
-    else
-      respond_with @artists
-    end
+    respond_with(@artists)
   end
 
   def show
@@ -84,6 +80,14 @@ class ArtistsController < ApplicationController
   end
 
   private
+
+  def item_matches_params(artist)
+    if params[:search][:any_name_or_url_matches]
+      artist.name == Artist.normalize_name(params[:search][:any_name_or_url_matches])
+    else
+      true
+    end
+  end
 
   def load_artist
     @artist = Artist.find(params[:id])
