@@ -25,19 +25,10 @@
   <% t.column "Creator" do |topic| %>
     <%= link_to_user topic.creator %>
   <% end %>
-  <% t.column "Updated by", th: { class: "updater" }, td: { class: "updater" } do |topic| %>
+  <% t.column "Updated by" do |topic| %>
     <%= link_to_user topic.updater %>
   <% end %>
-  <% t.column "Updated at", th: { class: "updated-at" }, td: { class: "updated-at" } do |topic| %>
+  <% t.column "Updated at" do |topic| %>
     <%= compact_time topic.updated_at %>
   <% end %>
-<% end %>
-
-<% content_for(:html_header) do %>
-<style>
-  @media screen and (max-width: 660px) {
-    .updater { display: none; }
-    .updated-at { display: none; }
-  }
-</style>
 <% end %>

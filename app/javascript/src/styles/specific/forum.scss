@@ -55,8 +55,16 @@ div#c-forum-topics {
     font-weight: bold;
   }
 
-  #a-index table tr td:last-child {
-    white-space: nowrap;
+  #a-index {
+    .updated-at-column {
+      white-space: nowrap;
+    }
+
+    .updated-by-column, .updated-at-column {
+      @media screen and (max-width: 660px) {
+        display: none;
+      }
+    }
   }
 }
 
