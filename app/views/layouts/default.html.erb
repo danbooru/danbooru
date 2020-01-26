@@ -60,18 +60,6 @@
     window.Danbooru.notice = Danbooru.Utility.notice;
     window.Danbooru.error = Danbooru.Utility.error;
 
-    window._paq = window._paq || [];
-    <% if CurrentUser.is_member? && !CurrentUser.opt_out_tracking? %>
-      window._paq.push(["setUserId", '<%= CurrentUser.id %>']);
-    <% end %>
-    window._paq.push(["setDomains", "*.donmai.us"]);
-    <% if !CurrentUser.opt_out_tracking? %>
-      window._paq.push(["setCustomVariable", 1, "level", <%= CurrentUser.level %>, "visit"]);
-      window._paq.push(["setCustomVariable", 2, "age", <%= ((Time.now - CurrentUser.created_at) / 1.year).to_i %>, "visit"]);
-      window._paq.push(["setCustomVariable", 3, "postUpdateCount", <%= CurrentUser.post_update_count.to_i / 100 %>, "visit"]);
-      window._paq.push(["setCustomVariable", 4, "favoriteCount", <%= CurrentUser.favorite_count.to_i / 100 %>, "visit"]);
-    <% end %>
-
     window.addthis_config = { ui_click: true };
   </script>
   <%= tag.meta name: "twitter:title", content: page_title %>
