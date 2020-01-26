@@ -1,4 +1,5 @@
 <% page_title "#{@wiki_page.pretty_title.titleize} Wiki" %>
+<% meta_description DText.excerpt(@wiki_page.body) %>
 
 <%= render "secondary_links" %>
 <%= render "sidebar" %>
@@ -39,8 +40,4 @@
   </div>
 
   <%= render "wiki_pages/posts", wiki_page: @wiki_page %>
-<% end %>
-
-<% content_for(:html_header) do %>
-  <%= tag.meta name: "description", content: wiki_page_excerpt(@wiki_page) %>
 <% end %>

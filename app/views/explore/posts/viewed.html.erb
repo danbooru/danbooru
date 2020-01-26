@@ -1,4 +1,6 @@
 <% page_title "Most Viewed" %>
+<% meta_description "The most viewed posts per #{@scale}" %>
+
 <%= render "posts/partials/common/secondary_links" %>
 
 <div id="c-explore-posts">
@@ -17,7 +19,3 @@
     </div>
   </div>
 </div>
-
-<% content_for(:html_header) do %>
-  <meta name="description" content="The most viewed posts per day">
-<% end %>

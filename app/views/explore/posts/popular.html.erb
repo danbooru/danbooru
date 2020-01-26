@@ -1,4 +1,6 @@
 <% page_title "Popular Posts" %>
+<% meta_description "The most popular posts per #{@scale}" %>
+
 <%= render "posts/partials/common/secondary_links" %>
 
 <div id="c-explore-posts">
@@ -26,7 +28,3 @@
     <%= post_previews_html(@posts) %>
   </div>
 </div>
-
-<% content_for(:html_header) do %>
-  <meta name="description" content="The most popular posts per <%= @scale %>">
-<% end %>

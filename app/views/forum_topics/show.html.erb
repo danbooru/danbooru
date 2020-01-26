@@ -1,4 +1,5 @@
 <% page_title @forum_topic.title %>
+<% meta_description(DText.excerpt(@forum_topic.original_post&.body)) %>
 
 <div id="c-forum-topics">
   <div id="a-show">

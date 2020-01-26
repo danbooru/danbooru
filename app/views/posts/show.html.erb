@@ -1,4 +1,6 @@
 <% page_title @post.presenter.humanized_essential_tag_string %>
+<% meta_description "View this #{@post.image_width}x#{@post.image_height} #{number_to_human_size(@post.file_size)} image" %>
+
 <%= render "posts/partials/common/secondary_links" %>
 
 <% content_for(:sidebar) do %>
@@ -155,7 +157,6 @@
 <%= post_view_count_js %>
 
 <% content_for(:html_header) do %>
-  <%= tag.meta name: "description", content: "View this #{@post.image_width}x#{@post.image_height} #{number_to_human_size(@post.file_size)} image" %>
   <meta name="post-id" content="<%= @post.id %>">
   <meta name="post-has-embedded-notes" content="<%= @post.has_embedded_notes? %>">
   <meta name="always-resize-images" content="<%= CurrentUser.user.always_resize_images? %>">
@@ -174,7 +175,6 @@
   <% if @post.twitter_card_supported? %>
     <meta name="twitter:card" content="summary_large_image">
     <%= tag.meta name: "twitter:site", content: Danbooru.config.twitter_site %>
-    <%= tag.meta name: "twitter:description", content: "View this #{@post.image_width}x#{@post.image_height} #{number_to_human_size(@post.file_size)} image" %>
 
     <% if @post.visible? %>
       <%= tag.meta name: "twitter:image", content: @post.open_graph_image_url %>

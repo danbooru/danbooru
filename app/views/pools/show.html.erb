@@ -1,4 +1,6 @@
-<% page_title "#{@pool.pretty_name.titleize} | Pool" %>
+<% page_title @pool.pretty_name %>
+<% meta_description("#{number_with_delimiter(@pool.post_count)} pages. #{DText.excerpt(@pool.description)}") %>
+
 <%= render "secondary_links" %>
 
 <div id="c-pools">
@@ -28,7 +30,3 @@
     </section>
   </div>
 </div>
-
-<% content_for(:html_header) do %>
-  <meta name="description" content="<%= strip_dtext(@pool.description) %>">
-<% end %>

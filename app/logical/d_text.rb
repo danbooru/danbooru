@@ -262,9 +262,13 @@ class DText
   end
 
   # extract the first paragraph `needle` occurs in.
-  def self.excerpt(dtext, needle)
+  def self.extract_mention(dtext, needle)
     dtext = dtext.gsub(/\r\n|\r|\n/, "\n")
     excerpt = ActionController::Base.helpers.excerpt(dtext, needle, separator: "\n\n", radius: 1, omission: "")
     excerpt
+  end
+
+  def self.excerpt(text, length: 160)
+    strip_dtext(text).split(/\r\n|\r|\n/).first.to_s.truncate(length)
   end
 end
