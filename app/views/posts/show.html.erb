@@ -1,6 +1,7 @@
 <% page_title @post.presenter.humanized_essential_tag_string %>
 <% meta_description "View this #{@post.image_width}x#{@post.image_height} #{number_to_human_size(@post.file_size)} image" %>
 
+<% atom_feed_tag "Comments for post ##{@post.id}", comments_url(:atom, search: { post_id: @post.id }) %>
 <%= render "posts/partials/common/secondary_links" %>
 
 <% content_for(:sidebar) do %>
@@ -187,6 +188,4 @@
 
   <%= tag.meta name: "og:type", content: "website" %>
   <%= tag.meta name: "og:site", content: Danbooru.config.app_name %>
-
-  <%= auto_discovery_link_tag(:atom, comments_url(:atom, search: { post_id: @post.id }), title: "Comments for post ##{@post.id}") %>
 <% end %>

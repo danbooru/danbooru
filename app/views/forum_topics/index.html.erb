@@ -1,4 +1,6 @@
 <% page_title "Forum" %>
+
+<% atom_feed_tag "Forum Topics", forum_topics_url(:atom, search: params.fetch(:search, {}).permit!) %>
 <%= render "secondary_links" %>
 
 <div id="c-forum-topics">
@@ -19,5 +21,3 @@
     <%= numbered_paginator(@forum_topics) %>
   </div>
 </div>
-
-<% content_for(:html_header, auto_discovery_link_tag(:atom, forum_topics_url(:atom), title: "Forum Topics")) %>

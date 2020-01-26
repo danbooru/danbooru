@@ -1,6 +1,9 @@
 <% page_title @forum_topic.title %>
 <% meta_description(DText.excerpt(@forum_topic.original_post&.body)) %>
 
+<% atom_feed_tag(@forum_topic.title, forum_topic_url(@forum_topic.id, format: :atom)) %>
+<%= render "secondary_links" %>
+
 <div id="c-forum-topics">
   <div id="a-show">
     <h1>
@@ -39,11 +42,7 @@
   </div>
 </div>
 
-<%= render "secondary_links" %>
-
 <% content_for(:html_header) do %>
-  <%= auto_discovery_link_tag(:atom, {format: :atom}, {title: @forum_topic.title}) %>
-
   <script>
     $(function() {
       $("#new-response-link").click(function(e) {

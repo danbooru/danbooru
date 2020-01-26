@@ -5,7 +5,6 @@
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
   <link rel="top" title="<%= Danbooru.config.app_name %>" href="/">
   <%= csrf_meta_tag %>
-  <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
   <%= raw Danbooru.config.custom_html_header_content %>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <%= javascript_pack_tag "application" %>

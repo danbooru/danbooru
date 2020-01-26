@@ -1,9 +1,13 @@
 <% if @post_set.is_empty_tag? %>
   <% page_title("#{Danbooru.config.app_name}: Anime Image Board", suffix: nil) %>
   <% meta_description("#{Danbooru.config.canonical_app_name} is the original anime image 'booru. Find over 3.75 million anime pictures categorized by over 100 million tags.") %>
+
+  <% atom_feed_tag "Posts", posts_url(format: :atom) %>
 <% else %>
   <% page_title("#{@post_set.humanized_tag_string} Art") %>
   <% meta_description("See over #{number_with_delimiter(@post_set.post_count)} #{@post_set.humanized_tag_string} images on #{Danbooru.config.app_name}. #{DText.excerpt(@post_set.wiki_page&.body)}") %>
+
+  <% atom_feed_tag "Posts: #{@post_set.tag_string}", posts_url(tags: @post_set.tag_string, format: :atom) %>
 <% end %>
 
 <%= tag.link href: posts_path(format: "atom", tags: params[:tags]), rel: "alternate", title: "ATOM", type: "application/atom+xml" %>

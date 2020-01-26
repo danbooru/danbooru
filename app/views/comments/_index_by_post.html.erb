@@ -1,5 +1,3 @@
-<% meta_description "See comments on #{Danbooru.config.app_name}." %>
-
 <div id="p-index-by-post">
   <% if !CurrentUser.user.is_builder? %>
     <div style="margin-bottom: 1em;">
@@ -24,5 +22,3 @@
 </div>
 
 <%= numbered_paginator(@posts) %>
-
-<% content_for(:html_header, auto_discovery_link_tag(:atom, comments_url(:atom, search: { do_not_bump_post: true }), title: "Comments")) %>
