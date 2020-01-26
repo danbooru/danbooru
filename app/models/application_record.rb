@@ -72,6 +72,14 @@ class ApplicationRecord < ActiveRecord::Base
         where("#{qualified_column_for(attr)} @> ARRAY[?]", values)
       end
 
+      def where_array_includes_any_lower(attr, values)
+        where("lower(#{qualified_column_for(attr)}::text)::text[] && ARRAY[?]", values)
+      end
+
+      def where_array_includes_all_lower(attr, values)
+        where("lower(#{qualified_column_for(attr)}::text)::text[] @> ARRAY[?]", values)
+      end
+
       def where_array_count(attr, value)
         relation = all
         qualified_column = "cardinality(#{qualified_column_for(attr)})"
@@ -232,6 +240,20 @@ class ApplicationRecord < ActiveRecord::Base
           relation = relation.where_array_includes_any(name, params[:"#{name}_include_any_array"])
         elsif params[:"#{name}_include_all_array"]
           relation = relation.where_array_includes_all(name, params[:"#{name}_include_all_array"])
+        elsif params[:"#{name}_include_any_lower"]
+          items = params[:"#{name}_include_any_lower"].to_s.scan(/[^[:space:]]+/)
+          items = items.map(&:to_i) if type == :integer
+
+          relation = relation.where_array_includes_any_lower(name, items)
+        elsif params[:"#{name}_include_all_lower"]
+          items = params[:"#{name}_include_all_lower"].to_s.scan(/[^[:space:]]+/)
+          items = items.map(&:to_i) if type == :integer
+
+          relation = relation.where_array_includes_all_lower(name, items)
+        elsif params[:"#{name}_include_any_lower_array"]
+          relation = relation.where_array_includes_any_lower(name, params[:"#{name}_include_any_lower_array"])
+        elsif params[:"#{name}_include_all_lower_array"]
+          relation = relation.where_array_includes_all_lower(name, params[:"#{name}_include_all_lower_array"])
         end
 
         if params[:"#{name.to_s.singularize}_count"]
