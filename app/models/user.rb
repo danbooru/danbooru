@@ -33,6 +33,8 @@ class User < ApplicationRecord
   # - enable_recent_searches (enabled by 499)
   # - disable_cropped_thumbnails (enabled by 22)
   # - has_saved_searches
+  # - opt_out_tracking
+  # - enable_recommended_posts
   BOOLEAN_ATTRIBUTES = %w(
     is_banned
     has_mail

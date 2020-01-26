@@ -66,7 +66,6 @@
         <%= f.input :disable_post_tooltips, :as => :select, :hint => "Disable advanced tooltips when hovering over thumbnails", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
         <%= f.input :disable_cropped_thumbnails, :as => :select, :hint => "Disable cropped (square) thumbnails on mobile", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
         <%= f.input :disable_responsive_mode, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false, :hint => "Disable alternative layout for mobile and tablet" %>
-        <%= f.input :opt_out_tracking, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false, :hint => "Opt out of tracking" %>
 
         <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :rows => 5, :data => { :autocomplete => "tag-query" } } %>
         <%= f.input :custom_style, :label => "Custom <a href='https://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "CSS rules to apply to the whole site.", :input_html => {:size => "40x5"} %>
