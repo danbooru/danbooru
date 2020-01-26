@@ -80,6 +80,10 @@ class ApplicationRecord < ActiveRecord::Base
         where("lower(#{qualified_column_for(attr)}::text)::text[] @> ARRAY[?]", values)
       end
 
+      def where_text_includes_lower(attr, values)
+        where("lower(#{qualified_column_for(attr)}) IN (?)", values)
+      end
+
       def where_array_count(attr, value)
         relation = all
         qualified_column = "cardinality(#{qualified_column_for(attr)})"
@@ -192,6 +196,12 @@ class ApplicationRecord < ActiveRecord::Base
           where(attr => params[:"#{attr}_comma"].split(','))
         elsif params[:"#{attr}_space"].present?
           where(attr => params[:"#{attr}_space"].split(' '))
+        elsif params[:"#{attr}_lower_array"].present?
+          where_text_includes_lower(attr, params[:"#{attr}_lower_array"])
+        elsif params[:"#{attr}_lower_comma"].present?
+          where_text_includes_lower(attr, params[:"#{attr}_lower_comma"].split(','))
+        elsif params[:"#{attr}_lower_space"].present?
+          where_text_includes_lower(attr, params[:"#{attr}_lower_space"].split(' '))
         else
           all
         end
