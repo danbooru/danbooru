@@ -440,9 +440,9 @@ class PostQueryBuilder
       relation = relation.where("posts.is_status_locked = FALSE")
     end
 
-    if q[:embedded] == "true"
+    if q[:embedded].to_s.truthy?
       relation = relation.bit_flags_match(:has_embedded_notes, true)
-    elsif q[:embedded] == "false"
+    elsif q[:embedded].to_s.falsy?
       relation = relation.bit_flags_match(:has_embedded_notes, false)
     end
 
