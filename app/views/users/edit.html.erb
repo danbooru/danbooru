@@ -75,19 +75,3 @@
     <% end %>
   </div>
 </div>
-
-<% content_for(:html_header) do %>
-  <script type="text/javascript">
-    $(function() {
-      $("#advanced-settings-section").hide();
-      $("#edit-options a").on("click", function(e) {
-        var $target = $(e.target);
-        $("h2 a").removeClass("active");
-        $("#basic-settings-section,#advanced-settings-section").hide();
-        $target.addClass("active")
-        $($target.attr("href") + "-section").show();
-        e.preventDefault();
-      });
-    });
-  </script>
-<% end %>

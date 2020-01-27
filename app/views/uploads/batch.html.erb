@@ -35,15 +35,3 @@
     <% end %>
   </div>
 </div>
-
-<% content_for(:html_header) do %>
-  <script type="text/javascript">
-    $(function() {
-      $("#link").click(function() {
-        $(".upload-preview > a").each(function(i, v) {
-          window.open(v.href);
-        });
-      });
-    })
-  </script>
-<% end %>

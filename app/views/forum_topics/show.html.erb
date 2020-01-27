@@ -41,15 +41,3 @@
     <%= numbered_paginator(@forum_posts) %>
   </div>
 </div>
-
-<% content_for(:html_header) do %>
-  <script>
-    $(function() {
-      $("#new-response-link").click(function(e) {
-        $("#topic-response").show();
-        document.body.scrollIntoView(false);
-        e.preventDefault();
-      })
-    });
-  </script>
-<% end %>

@@ -35,15 +35,3 @@
     <% end %>
   </p>
 </div>
-
-<% content_for(:html_header) do %>
-  <script type="text/javascript">
-    $(function() {
-      Danbooru.Ugoira.create_player(
-        <%= raw @post.pixiv_ugoira_frame_data.content_type.to_json %>, 
-        <%= raw @post.pixiv_ugoira_frame_data.data.to_json %>,
-        "<%= @post.file_url %>"
-      );      
-    });
-  </script>
-<% end %>

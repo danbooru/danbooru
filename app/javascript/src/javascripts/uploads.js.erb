@@ -42,6 +42,8 @@ Upload.initialize_all = function() {
       Upload.toggle_translation();
       e.preventDefault();
     });
+
+    $(document).on("click.danbooru", "#c-uploads #a-batch #link", Upload.batch_open_all);
   }
 
   if ($("#c-uploads #a-new").length) {
@@ -207,6 +209,10 @@ Upload.initialize_dropzone = function() {
       });
     }
   });
+};
+
+Upload.batch_open_all = function() {
+  $(".upload-preview > a").each((_i, link) => window.open(link.href));
 };
 
 $(function() {
