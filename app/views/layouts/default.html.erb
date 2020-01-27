@@ -61,13 +61,21 @@
 
     window.addthis_config = { ui_click: true };
   </script>
-  <%= tag.meta name: "twitter:title", content: page_title %>
-  <%= tag.meta name: "og:title", content: page_title %>
-  <% if meta_description.present? %>
-    <%= tag.meta name: "description", content: meta_description %>
-    <%= tag.meta name: "og:description", content: meta_description %>
+
+  <%= tag.meta name: "description", content: meta_description %>
+
+  <%= tag.meta property: "og:type", content: "website" %>
+  <%= tag.meta property: "og:site_name", content: Danbooru.config.app_name %>
+  <%= tag.meta property: "og:title", content: page_title %>
+  <%= tag.meta property: "og:description", content: meta_description %>
+  <%= tag.meta property: "og:url", content: request.original_url %>
+
+  <% if Danbooru.config.twitter_site.present? %>
+    <%= tag.meta name: "twitter:site", content: Danbooru.config.twitter_site %>
+    <%= tag.meta name: "twitter:title", content: page_title %>
     <%= tag.meta name: "twitter:description", content: meta_description %>
   <% end %>
+
   <%= yield :html_header %>
   <%= raw Danbooru.config.custom_html_header_content %>
 </head>
