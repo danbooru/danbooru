@@ -73,15 +73,15 @@ class ApplicationRecord < ActiveRecord::Base
       end
 
       def where_array_includes_any_lower(attr, values)
-        where("lower(#{qualified_column_for(attr)}::text)::text[] && ARRAY[?]", values)
+        where("lower(#{qualified_column_for(attr)}::text)::text[] && ARRAY[?]", values.map(&:downcase))
       end
 
       def where_array_includes_all_lower(attr, values)
-        where("lower(#{qualified_column_for(attr)}::text)::text[] @> ARRAY[?]", values)
+        where("lower(#{qualified_column_for(attr)}::text)::text[] @> ARRAY[?]", values.map(&:downcase))
       end
 
       def where_text_includes_lower(attr, values)
-        where("lower(#{qualified_column_for(attr)}) IN (?)", values)
+        where("lower(#{qualified_column_for(attr)}) IN (?)", values.map(&:downcase))
       end
 
       def where_array_count(attr, value)
