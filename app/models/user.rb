@@ -827,7 +827,7 @@ class User < ApplicationRecord
     @presenter ||= UserPresenter.new(self)
   end
 
-  def viewable_moderation_reports
-    CurrentUser.is_moderator? ? moderation_reports.recent : []
+  def dtext_shortlink
+    "<@#{name}>"
   end
 end

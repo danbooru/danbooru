@@ -3,9 +3,13 @@ class ModerationReport < ApplicationRecord
   belongs_to :creator, class_name: "User"
 
   validates :reason, presence: true
+  validates :model_type, inclusion: { in: %w[Comment Dmail ForumPost User] }
+  validates :creator, uniqueness: { scope: [:model_type, :model_id], message: "have already reported this message." }
+
   after_create :create_forum_post!
 
   scope :user, -> { where(model_type: "User") }
+  scope :dmail, -> { where(model_type: "Dmail") }
   scope :comment, -> { where(model_type: "Comment") }
   scope :forum_post, -> { where(model_type: "ForumPost") }
   scope :recent, -> { where("moderation_reports.created_at >= ?", 1.week.ago) }
@@ -35,14 +39,7 @@ class ModerationReport < ApplicationRecord
 
   def forum_post_message
     messages = ["[b]Submitted by:[/b] @#{creator.name}"]
-    case model_type
-    when "User"
-      messages << "[b]Submitted against:[/b] @#{model.name}"
-    when "Comment"
-      messages << "[b]Submitted against[/b]: comment ##{model_id}"
-    when "ForumPost"
-      messages << "[b]Submitted against[/b]: forum ##{model_id}"
-    end
+    messages << "[b]Submitted against:[/b] #{model.dtext_shortlink}"
     messages << ""
     messages << "[quote]"
     messages << "[b]Reason:[/b]"
@@ -55,6 +52,10 @@ class ModerationReport < ApplicationRecord
   def create_forum_post!
     updater = ForumUpdater.new(forum_topic)
     updater.update(forum_post_message)
+  end
+
+  def self.visible(user = CurrentUser.user)
+    user.is_moderator? ? all : none
   end
 
   def self.search(params)

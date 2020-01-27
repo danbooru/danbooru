@@ -198,4 +198,8 @@ class Dmail < ApplicationRecord
   def visible_to?(user, key)
     owner_id == user.id || (user.is_moderator? && key == self.key)
   end
+
+  def reportable_by?(user)
+    is_recipient? && !is_automated? && !from.is_moderator?
+  end
 end

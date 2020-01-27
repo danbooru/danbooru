@@ -4,19 +4,22 @@ class ModerationReportsController < ApplicationController
   before_action :moderator_only, only: [:index]
 
   def new
-    check_privilege
     @moderation_report = ModerationReport.new(moderation_report_params)
+    check_privilege(@moderation_report)
     respond_with(@moderation_report)
   end
 
   def index
-    @moderation_reports = ModerationReport.paginated_search(params).includes(:creator, :model)
+    @moderation_reports = ModerationReport.paginated_search(params, count_pages: true).includes(:creator, :model)
     respond_with(@moderation_reports)
   end
 
   def create
-    check_privilege
-    @moderation_report = ModerationReport.create(moderation_report_params.merge(creator: CurrentUser.user))
+    @moderation_report = ModerationReport.new(moderation_report_params.merge(creator: CurrentUser.user))
+    check_privilege(@moderation_report)
+    @moderation_report.save
+
+    flash.now[:notice] = @moderation_report.valid? ? "Report submitted" : @moderation_report.errors.full_messages.join("; ")
     respond_with(@moderation_report)
   end
 
@@ -30,16 +33,8 @@ class ModerationReportsController < ApplicationController
     params.fetch(:moderation_report, {}).fetch(:model_id)
   end
 
-  def check_privilege
-    case model_type
-    when "User"
-      return if User.find(model_id).reportable_by?(CurrentUser.user)
-    when "Comment"
-      return if Comment.find(model_id).reportable_by?(CurrentUser.user)
-    when "ForumPost"
-      return if ForumPost.find(model_id).reportable_by?(CurrentUser.user)
-    end
-    raise User::PrivilegeError
+  def check_privilege(moderation_report)
+    raise User::PrivilegeError unless moderation_report.model.reportable_by?(CurrentUser.user)
   end
 
   def moderation_report_params

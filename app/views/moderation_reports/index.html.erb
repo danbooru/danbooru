@@ -5,10 +5,10 @@
       <% t.column "Reported", width: "10%" do |report| %>
         <% if report.model_type == "User" %>
           <%= link_to_user report.model %>
-        <% elsif report.model_type == "Comment" %>
-          <%= link_to "comment ##{report.model_id}", comment_path(report.model_id) %>
-        <% elsif report.model_type == "ForumPost" %>
-          <%= link_to "forum ##{report.model_id}", forum_post_path(report.model_id) %>
+        <% elsif report.model_type == "Dmail" %>
+          <%= link_to report.model.dtext_shortlink, dmail_path(report.model, key: report.model.key) %>
+        <% else %>
+          <%= link_to report.model.dtext_shortlink, report.model %>
         <% end %>
       <% end %>
       <% t.column "Reason" do |report| %>

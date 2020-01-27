@@ -95,7 +95,7 @@ class ForumPost < ApplicationRecord
   end
 
   def reportable_by?(user)
-    ModerationReport.enabled? && user.is_builder? && creator_id != user.id && !creator.is_moderator?
+    creator_id != user.id && !creator.is_moderator?
   end
 
   def votable?
@@ -222,5 +222,9 @@ class ForumPost < ApplicationRecord
     dup.tap do |x|
       x.body = x.quoted_response
     end
+  end
+
+  def dtext_shortlink
+    "forum ##{id}"
   end
 end

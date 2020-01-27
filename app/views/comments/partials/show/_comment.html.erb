@@ -57,7 +57,7 @@
             <%= link_to "Unvote", comment_comment_votes_path(comment_id: comment.id), method: :delete, remote: true %>
           </li>
           <% if comment.reportable_by?(CurrentUser.user) %>
-            <li><%= link_to "Report comment", new_moderation_report_path(moderation_report: { model_type: "Comment", model_id: comment.id }), remote: true %></li>
+            <li><%= link_to "Report", new_moderation_report_path(moderation_report: { model_type: "Comment", model_id: comment.id }), remote: true %></li>
           <% end %>
         </menu>
         <% if comment.editable_by?(CurrentUser.user) %>
