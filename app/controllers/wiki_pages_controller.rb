@@ -77,8 +77,8 @@ class WikiPagesController < ApplicationController
   private
 
   def item_matches_params(wiki_page)
-    if params[:search][:title]
-      wiki_page.title == WikiPage.normalize_title(params[:search][:title])
+    if params[:search][:title_normalize]
+      wiki_page.title == WikiPage.normalize_title(params[:search][:title_normalize])
     else
       true
     end
