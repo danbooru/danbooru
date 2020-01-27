@@ -45,7 +45,7 @@ class FavoriteGroup < ApplicationRecord
         q = q.apply_default_order(params)
       end
 
-      q.apply_default_order(params)
+      q
     end
   end
 
