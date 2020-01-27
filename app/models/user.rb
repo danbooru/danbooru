@@ -574,7 +574,9 @@ class User < ApplicationRecord
     end
 
     def statement_timeout
-      if is_platinum?
+      if Rails.env.development?
+        60_000
+      elsif is_platinum?
         9_000
       elsif is_gold?
         6_000
