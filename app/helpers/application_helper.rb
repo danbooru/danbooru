@@ -163,6 +163,12 @@ module ApplicationHelper
     html.html_safe
   end
 
+  def embed_wiki(title, **options)
+    wiki = WikiPage.find_by(title: title)
+    text = format_text(wiki&.body)
+    tag.div(text, class: "prose", **options)
+  end
+
   def dtext_field(object, name, options = {})
     options[:name] ||= name.capitalize
     options[:input_id] ||= "#{object}_#{name}"

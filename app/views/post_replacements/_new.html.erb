@@ -1,7 +1,5 @@
 <div class="replace-image-dialog-body">
-  <div class="prose">
-    <%= format_text(WikiPage.titled(Danbooru.config.replacement_notice_wiki_page).first.try(&:body)) %>
-  </div>
+  <%= embed_wiki("help:replacement_notice") %>
 
   <%= edit_form_for(post_replacement, url: post_replacements_path(post_id: post_replacement.post_id), method: :post, remote: true) do |f| %>
     <%= f.input :replacement_file, label: "File", as: :file %>

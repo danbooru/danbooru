@@ -3,9 +3,7 @@
     <h1>Upload</h1>
 
     <% if CurrentUser.can_upload? %>
-      <div id="upload-guide-notice" class="prose">
-        <%= format_text(@upload_notice_wiki.try(&:body)) %>
-      </div>
+      <%= embed_wiki("help:upload_notice", id: "upload-guide-notice") %>
 
       <% unless CurrentUser.can_upload_free? %>
         <p>Upload limit: <strong><%= CurrentUser.user.presenter.upload_limit(self) %></strong>.</p>

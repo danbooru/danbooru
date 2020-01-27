@@ -1,7 +1,5 @@
 <div class="report-dialog-body">
-  <div class="prose">
-    <%= format_text(WikiPage.titled(Danbooru.config.report_notice_wiki_page).first.try(&:body)) %>
-  </div>
+  <%= embed_wiki("help:report_notice") %>
 
   <%# XXX dtext_field expects there to be a `moderation_report` instance variable. %>
   <% @moderation_report = moderation_report %>
