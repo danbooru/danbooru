@@ -1,0 +1,23 @@
+Sitemap: <%= root_url %>sitemap.xml
+
+User-agent: *
+Disallow: /
+
+<% if Rails.env.production? && Danbooru.config.hostname == request.host %>
+Allow: /artists
+Allow: /artist_commentaries
+Allow: /comments
+Allow: /explore
+Allow: /forum_posts
+Allow: /forum_topics
+Allow: /notes
+Allow: /pools
+Allow: /posts
+Allow: /sessions
+Allow: /static
+Allow: /tags
+Allow: /uploads
+Allow: /user_upgrades
+Allow: /users
+Allow: /wiki_pages
+<% end %>

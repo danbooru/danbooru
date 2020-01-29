@@ -232,6 +232,7 @@ Rails.application.routes.draw do
   get "reports/uploads" => "reports#uploads"
   get "reports/upload_tags" => "reports#upload_tags"
   resources :recommended_posts, only: [:index]
+  resources :robots, only: [:index]
   resources :saved_searches, :except => [:show] do
     collection do
       get :labels
