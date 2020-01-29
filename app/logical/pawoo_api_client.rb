@@ -50,6 +50,10 @@ class PawooApiClient
     def commentary
       nil
     end
+
+    def to_h
+      json
+    end
   end
 
   class Status
@@ -96,6 +100,10 @@ class PawooApiClient
       commentary << "<p>#{json["spoiler_text"]}</p>" if json["spoiler_text"].present?
       commentary << json["content"]
       commentary
+    end
+
+    def to_h
+      json
     end
   end
 
