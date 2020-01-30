@@ -18,25 +18,21 @@
   </h1>
 
   <div id="wiki-page-body" class="prose">
-    <% if @wiki_page.visible? %>
-      <% if @wiki_page.other_names.present? %>
-        <p><%= wiki_page_other_names_list(@wiki_page) %></p>
-      <% end %>
-
-      <% if @wiki_page.new_record? %>
-        <p>This wiki page does not exist. <%= link_to "Create new wiki page", new_wiki_page_path(wiki_page: { title: @wiki_page.title }) %>.</p>
-      <% else %>
-        <%= format_text(@wiki_page.body) %>
-      <% end %>
-
-      <% if @wiki_page.artist %>
-        <p><%= link_to "View artist", @wiki_page.artist %></p>
-      <% end %>
-
-      <%= render "tag_relationships/alias_and_implication_list", tag: @wiki_page.tag %>
-    <% else %>
-      <p>This artist has requested removal of their information.</p>
+    <% if @wiki_page.other_names.present? %>
+      <p><%= wiki_page_other_names_list(@wiki_page) %></p>
     <% end %>
+
+    <% if @wiki_page.new_record? %>
+      <p>This wiki page does not exist. <%= link_to "Create new wiki page", new_wiki_page_path(wiki_page: { title: @wiki_page.title }) %>.</p>
+    <% else %>
+      <%= format_text(@wiki_page.body) %>
+    <% end %>
+
+    <% if @wiki_page.artist %>
+      <p><%= link_to "View artist", @wiki_page.artist %></p>
+    <% end %>
+
+    <%= render "tag_relationships/alias_and_implication_list", tag: @wiki_page.tag %>
   </div>
 
   <%= render "wiki_pages/posts", wiki_page: @wiki_page %>

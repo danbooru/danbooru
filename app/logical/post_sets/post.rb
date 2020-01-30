@@ -26,7 +26,7 @@ module PostSets
 
     def wiki_page
       return nil unless tag.present? && tag.wiki_page.present?
-      return nil unless !tag.wiki_page.is_deleted? && tag.wiki_page.visible?
+      return nil unless !tag.wiki_page.is_deleted?
       tag.wiki_page
     end
 
@@ -37,7 +37,7 @@ module PostSets
 
     def artist
       return nil unless tag.present? && tag.category == Tag.categories.artist
-      return nil unless tag.artist.present? && tag.artist.is_active? && tag.artist.visible?
+      return nil unless tag.artist.present? && tag.artist.is_active?
       tag.artist
     end
 

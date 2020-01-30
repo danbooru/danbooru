@@ -244,10 +244,6 @@ class WikiPage < ApplicationRecord
     TagAlias.to_aliased(titles & tags)
   end
 
-  def visible?
-    artist.blank? || !artist.is_banned? || CurrentUser.is_builder?
-  end
-
   def to_param
     if title =~ /\A\d+\z/
       "~#{title}"

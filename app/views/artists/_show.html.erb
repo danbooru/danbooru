@@ -5,7 +5,7 @@
   <div id="a-show">
     <h1>Artist: <%= link_to @artist.pretty_name, posts_path(:tags => @artist.name), :class => "tag-type-#{@artist.category_name}" %></h1>
 
-    <% if @artist.notes.present? && @artist.visible? %>
+    <% if @artist.notes.present? %>
       <div class="prose">
         <%= format_text(@artist.notes, :disable_mentions => true) %>
       </div>

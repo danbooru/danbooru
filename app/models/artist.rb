@@ -538,8 +538,4 @@ class Artist < ApplicationRecord
       "Deleted"
     end
   end
-
-  def visible?
-    !is_banned? || CurrentUser.is_gold?
-  end
 end

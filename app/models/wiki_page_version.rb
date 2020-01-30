@@ -3,7 +3,6 @@ class WikiPageVersion < ApplicationRecord
   belongs_to :wiki_page
   belongs_to_updater
   belongs_to :artist, optional: true
-  delegate :visible?, :to => :wiki_page
 
   module SearchMethods
     def search(params)

@@ -3,23 +3,21 @@
 <div id="excerpt" style="display: none;">
   <% if post_set.artist.present? %>
     <% post_set.artist.tap do |artist| %>
-      <% if artist.visible? %>
-        <% unless artist.notes.blank? %>
-          <div class="prose">
-            <%= format_text(artist.notes) %>
-          </div>
-        <% end %>
-
-        <div>
-          <%= render "artists/summary", artist: artist %>
-          <%= render "tag_relationships/alias_and_implication_list", tag: artist.tag %>
-
-          <p class="links">
-            <%= link_to "View wiki", artist.wiki_page %> |
-            <%= link_to "View artist", artist_path(artist.id) %>
-          </p>
+      <% unless artist.notes.blank? %>
+        <div class="prose">
+          <%= format_text(artist.notes) %>
         </div>
       <% end %>
+
+      <div>
+        <%= render "artists/summary", artist: artist %>
+        <%= render "tag_relationships/alias_and_implication_list", tag: artist.tag %>
+
+        <p class="links">
+          <%= link_to "View wiki", artist.wiki_page %> |
+          <%= link_to "View artist", artist_path(artist.id) %>
+        </p>
+      </div>
     <% end %>
   <% elsif post_set.wiki_page.present? %>
     <% post_set.wiki_page.tap do |wiki_page| %>

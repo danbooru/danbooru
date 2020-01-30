@@ -3,11 +3,7 @@
 <% content_for(:content) do %>
   <h1>Edit Wiki</h1>
 
-  <% if @wiki_page.visible? %>
-    <%= render "form" %>
-  <% else %>
-    <p>The artist requested removal of this page.</p>
-  <% end %>
+  <%= render "form" %>
 <% end %>
 
 <%= render "secondary_links" %>

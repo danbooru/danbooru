@@ -4,7 +4,6 @@ class ArtistVersion < ApplicationRecord
 
   belongs_to_updater
   belongs_to :artist
-  delegate :visible?, :to => :artist
 
   module SearchMethods
     def search(params)
