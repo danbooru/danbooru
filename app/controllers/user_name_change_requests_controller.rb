@@ -14,7 +14,7 @@ class UserNameChangeRequestsController < ApplicationController
   end
 
   def show
-    @current_item = @change_request = UserNameChangeRequest.find(params[:id])
+    @change_request = UserNameChangeRequest.find(params[:id])
     check_privileges!(@change_request)
     respond_with(@change_request)
   end

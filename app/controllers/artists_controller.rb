@@ -39,7 +39,7 @@ class ArtistsController < ApplicationController
   end
 
   def show
-    @current_item = @artist = Artist.find(params[:id])
+    @artist = Artist.find(params[:id])
     respond_with(@artist)
   end
 

@@ -39,7 +39,7 @@ class UsersController < ApplicationController
   end
 
   def show
-    @current_item = @user = User.find(params[:id])
+    @user = User.find(params[:id])
     respond_with(@user, methods: @user.full_attributes)
   end
 

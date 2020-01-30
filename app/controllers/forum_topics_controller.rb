@@ -32,7 +32,6 @@ class ForumTopicsController < ApplicationController
   end
 
   def show
-    @current_item = @forum_topic
     if request.format == Mime::Type.lookup("text/html")
       @forum_topic.mark_as_read!(CurrentUser.user)
     end

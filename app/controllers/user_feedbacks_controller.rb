@@ -14,7 +14,7 @@ class UserFeedbacksController < ApplicationController
   end
 
   def show
-    @current_item = @user_feedback = UserFeedback.visible.find(params[:id])
+    @user_feedback = UserFeedback.visible.find(params[:id])
     respond_with(@user_feedback)
   end
 

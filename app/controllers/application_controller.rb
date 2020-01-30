@@ -24,11 +24,13 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def respond_with(*options, &block)
-    if params[:action] == "index" && is_redirect?(options[0])
-      redirect_to_show(options[0])
+  def respond_with(subject, *options, &block)
+    @current_item = subject
+
+    if params[:action] == "index" && is_redirect?(subject)
+      redirect_to_show(subject)
     else
-      super(*options, &block)
+      super
     end
   end
 

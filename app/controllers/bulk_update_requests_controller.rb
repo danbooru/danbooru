@@ -15,7 +15,7 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def show
-    @current_item = @bulk_update_request = BulkUpdateRequest.find(params[:id])
+    @bulk_update_request = BulkUpdateRequest.find(params[:id])
     respond_with(@bulk_update_request)
   end
 
