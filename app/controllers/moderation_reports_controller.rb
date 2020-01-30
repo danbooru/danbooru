@@ -1,6 +1,6 @@
 class ModerationReportsController < ApplicationController
   respond_to :html, :xml, :json, :js
-  before_action :builder_only, only: [:new, :create]
+  before_action :member_only, only: [:new, :create]
   before_action :moderator_only, only: [:index]
 
   def new
