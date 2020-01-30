@@ -2,8 +2,17 @@
 <html>
 <head>
   <title><%= page_title %></title>
+
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="top" title="<%= Danbooru.config.app_name %>" href="/">
+
+  <% if @current_item.try(:prev_page) %>
+    <%= tag.link rel: "prev", href: url_for(nav_params_for(@current_item.prev_page)) %>
+  <% end %>
+
+  <% if @current_item.try(:next_page) %>
+    <%= tag.link rel: "next", href: url_for(nav_params_for(@current_item.next_page)) %>
+  <% end %>
+
   <%= csrf_meta_tag %>
   <% unless CurrentUser.disable_responsive_mode? %>
     <meta name="viewport" content="width=device-width,initial-scale=1">

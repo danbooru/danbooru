@@ -13,20 +13,6 @@ module PostsHelper
     params[:tags] =~ /order:rank/ || params[:action] =~ /searches|viewed/
   end
 
-  def next_page_url
-    current_page = (params[:page] || 1).to_i
-    url_for(nav_params_for(current_page + 1)).html_safe
-  end
-
-  def prev_page_url
-    current_page = (params[:page] || 1).to_i
-    if current_page >= 2
-      url_for(nav_params_for(current_page - 1)).html_safe
-    else
-      nil
-    end
-  end
-
   def missed_post_search_count_js
     return unless post_search_counts_enabled?
     return unless params[:ms] == "1" && @post_set.post_count == 0 && @post_set.is_single_tag?
