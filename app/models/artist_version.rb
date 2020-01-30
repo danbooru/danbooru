@@ -11,7 +11,6 @@ class ArtistVersion < ApplicationRecord
 
       q = q.search_attributes(params, :updater, :is_active, :is_banned, :artist_id, :name, :group_name)
 
-      params[:order] ||= params.delete(:sort)
       if params[:order] == "name"
         q = q.order("artist_versions.name").default_order
       else

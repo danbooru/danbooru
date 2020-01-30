@@ -853,7 +853,6 @@ class Tag < ApplicationRecord
         q = q.joins("LEFT JOIN artists ON tags.name = artists.name").where("artists.name IS NULL OR artists.is_active = false")
       end
 
-      params[:order] ||= params.delete(:sort)
       case params[:order]
       when "name"
         q = q.order("name")

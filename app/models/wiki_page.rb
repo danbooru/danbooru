@@ -101,7 +101,6 @@ class WikiPage < ApplicationRecord
         q = q.where("other_names is null or other_names = '{}'")
       end
 
-      params[:order] ||= params.delete(:sort)
       case params[:order]
       when "title"
         q = q.order("title")

@@ -70,7 +70,6 @@ class Pool < ApplicationRecord
         q = q.collection
       end
 
-      params[:order] ||= params.delete(:sort)
       case params[:order]
       when "name"
         q = q.order("pools.name")
