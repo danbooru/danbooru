@@ -14,7 +14,7 @@ class Dmail < ApplicationRecord
   belongs_to :from, :class_name => "User"
 
   after_initialize :initialize_attributes, if: :new_record?
-  after_create :update_recipient
+  after_save :update_unread_dmail_count
   after_commit :send_email, on: :create
 
   api_attributes including: [:key]
@@ -152,6 +152,10 @@ class Dmail < ApplicationRecord
   include FactoryMethods
   extend SearchMethods
 
+  def self.mark_all_as_read
+    unread.update(is_read: true)
+  end
+
   def validate_sender_is_not_banned
     if from.try(:is_banned?)
       errors[:base] << "Sender is banned and cannot send messages"
@@ -168,13 +172,6 @@ class Dmail < ApplicationRecord
     end
   end
 
-  def mark_as_read!
-    update_column(:is_read, true)
-    owner.dmails.unread.count.tap do |unread_count|
-      owner.update(has_mail: (unread_count > 0), unread_dmail_count: unread_count)
-    end
-  end
-
   def is_automated?
     from == User.system
   end
@@ -187,9 +184,12 @@ class Dmail < ApplicationRecord
     owner == to
   end
 
-  def update_recipient
-    if is_recipient? && !is_deleted? && !is_read?
-      to.update(has_mail: true, unread_dmail_count: to.dmails.unread.count)
+  def update_unread_dmail_count
+    return unless saved_change_to_id? || saved_change_to_is_read? || saved_change_to_is_deleted?
+
+    owner.with_lock do
+      unread_count = owner.dmails.active.unread.count
+      owner.update!(unread_dmail_count: unread_count)
     end
   end
 

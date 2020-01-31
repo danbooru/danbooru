@@ -118,7 +118,7 @@
       <%= render "users/ban_notice" %>
     <% end %>
 
-    <% if CurrentUser.has_mail? && CurrentUser.dmails.unread.first.present? && (cookies[:hide_dmail_notice].blank? || cookies[:hide_dmail_notice].to_i < CurrentUser.dmails.unread.first.id) %>
+    <% if params[:controller] != "dmails" && has_unread_dmails?(CurrentUser.user) %>
       <%= render "users/dmail_notice" %>
     <% end %>
 

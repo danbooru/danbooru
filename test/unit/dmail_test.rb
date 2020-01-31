@@ -123,28 +123,14 @@ class DmailTest < ActiveSupport::TestCase
       end
     end
 
-    should "be marked as read after the user reads it" do
-      dmail = FactoryBot.create(:dmail, :owner => @user)
-      assert(!dmail.is_read?)
-      dmail.mark_as_read!
-      assert(dmail.is_read?)
-    end
-
     should "notify the recipient he has mail" do
-      recipient = FactoryBot.create(:user)
+      recipient = create(:user)
+
       Dmail.create_split(title: "hello", body: "hello", to_id: recipient.id)
-      dmail = Dmail.where(owner_id: recipient.id).last
-      recipient.reload
-      assert(recipient.has_mail?)
-      assert_equal(1, recipient.unread_dmail_count)
+      assert_equal(1, recipient.reload.unread_dmail_count)
 
-      CurrentUser.scoped(recipient) do
-        dmail.mark_as_read!
-      end
-
-      recipient.reload
-      refute(recipient.has_mail?)
-      assert_equal(0, recipient.unread_dmail_count)
+      recipient.dmails.unread.last.update!(is_read: true)
+      assert_equal(0, recipient.reload.unread_dmail_count)
     end
 
     context "that is automated" do

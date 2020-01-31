@@ -3,7 +3,7 @@ require 'test_helper'
 class DmailsControllerTest < ActionDispatch::IntegrationTest
   context "The dmails controller" do
     setup do
-      @user = create(:user)
+      @user = create(:user, unread_dmail_count: 1)
       @unrelated_user = create(:user)
       as_user do
         @dmail = create(:dmail, :owner => @user)
@@ -78,6 +78,22 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
         get_auth dmail_path(@dmail), @unrelated_user
         assert_response(403)
       end
+
+      should "mark dmails as read" do
+        assert_equal(false, @dmail.is_read)
+        get_auth dmail_path(@dmail), @dmail.owner
+
+        assert_response :success
+        assert_equal(true, @dmail.reload.is_read)
+      end
+
+      should "not mark dmails as read in the api" do
+        assert_equal(false, @dmail.is_read)
+        get_auth dmail_path(@dmail, format: :json), @dmail.owner
+
+        assert_response :success
+        assert_equal(false, @dmail.reload.is_read)
+      end
     end
 
     context "create action" do
@@ -107,6 +123,51 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response 403
         assert_equal(false, @dmail.reload.is_deleted)
+      end
+
+      should "update user's unread_dmail_count when marking dmails as read or unread" do
+        put_auth dmail_path(@dmail), @user, params: { dmail: { is_read: true } }
+        assert_equal(true, @dmail.reload.is_read)
+        assert_equal(0, @user.reload.unread_dmail_count)
+
+        put_auth dmail_path(@dmail), @user, params: { dmail: { is_read: false } }
+        assert_equal(false, @dmail.reload.is_read)
+        assert_equal(1, @user.reload.unread_dmail_count)
+      end
+    end
+
+    context "mark all as read action" do
+      setup do
+        @sender = create(:user)
+        @recipient = create(:user)
+
+        as(@sender) do
+          @dmail1 = Dmail.create_split(title: "test1", body: "test", to: @recipient)
+          @dmail2 = Dmail.create_split(title: "test2", body: "test", to: @recipient)
+          @dmail3 = Dmail.create_split(title: "test3", body: "test", to: @recipient, is_read: true)
+          @dmail4 = Dmail.create_split(title: "test4", body: "test", to: @recipient, is_deleted: true)
+        end
+      end
+
+      should "mark all unread, undeleted dmails as read" do
+        assert_equal(4, @recipient.dmails.count)
+        assert_equal(2, @recipient.dmails.active.unread.count)
+        assert_equal(2, @recipient.reload.unread_dmail_count)
+        post_auth mark_all_as_read_dmails_path(format: :js), @recipient
+
+        assert_response :success
+        assert_equal(0, @recipient.reload.unread_dmail_count)
+        assert_equal(true, [@dmail1, @dmail2, @dmail3, @dmail4].all?(&:is_read))
+      end
+    end
+
+    context "when a user has unread dmails" do
+      should "show the unread dmail notice" do
+        get_auth posts_path, @user
+
+        assert_response :success
+        assert_select "#dmail-notice", 1
+        assert_select "#nav-my-account-link", text: "My Account (1)"
       end
     end
   end

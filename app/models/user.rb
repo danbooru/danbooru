@@ -35,6 +35,7 @@ class User < ApplicationRecord
   # - has_saved_searches
   # - opt_out_tracking
   # - enable_recommended_posts
+  # - has_mail
   BOOLEAN_ATTRIBUTES = %w(
     is_banned
     has_mail
@@ -796,14 +797,6 @@ class User < ApplicationRecord
 
   def as_current(&block)
     CurrentUser.as(self, &block)
-  end
-
-  def dmail_count
-    if has_mail?
-      "(#{unread_dmail_count})"
-    else
-      ""
-    end
   end
 
   def reportable_by?(user)

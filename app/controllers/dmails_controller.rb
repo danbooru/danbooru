@@ -22,7 +22,7 @@ class DmailsController < ApplicationController
   def show
     @dmail = Dmail.find(params[:id])
     check_privilege(@dmail)
-    @dmail.mark_as_read!
+    @dmail.update!(is_read: true) if request.format.html?
     respond_with(@dmail)
   end
 
@@ -41,10 +41,8 @@ class DmailsController < ApplicationController
   end
 
   def mark_all_as_read
-    Dmail.visible.unread.each do |x|
-      x.update_column(:is_read, true)
-    end
-    CurrentUser.user.update(has_mail: false, unread_dmail_count: 0)
+    @dmails = CurrentUser.user.dmails.mark_all_as_read
+    respond_with(@dmails)
   end
 
   private
