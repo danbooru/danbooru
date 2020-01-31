@@ -1,6 +1,6 @@
 class DmailsController < ApplicationController
   respond_to :html, :xml, :js, :json
-  before_action :member_only, except: [:index, :show, :update, :destroy, :mark_all_as_read]
+  before_action :member_only, except: [:index, :show, :update, :mark_all_as_read]
 
   def new
     if params[:respond_to_id]
@@ -18,7 +18,8 @@ class DmailsController < ApplicationController
     if params[:folder] && params[:set_default_folder]
       cookies.permanent[:dmail_folder] = params[:folder]
     end
-    @dmails = Dmail.active.visible.paginated_search(params, count_pages: true)
+
+    @dmails = Dmail.visible.paginated_search(params, defaults: { is_spam: false, is_deleted: false }, count_pages: true)
     respond_with(@dmails)
   end
 
@@ -41,14 +42,6 @@ class DmailsController < ApplicationController
     flash[:notice] = "Dmail updated"
 
     respond_with(@dmail)
-  end
-
-  def destroy
-    @dmail = Dmail.find(params[:id])
-    check_privilege(@dmail)
-    @dmail.mark_as_read!
-    @dmail.destroy
-    redirect_to dmails_path, :notice => "Message destroyed"
   end
 
   def mark_all_as_read

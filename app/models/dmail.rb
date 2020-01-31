@@ -136,8 +136,6 @@ class Dmail < ApplicationRecord
       q = q.text_attribute_matches(:title, params[:title_matches])
       q = q.text_attribute_matches(:body, params[:message_matches], index_column: :message_index)
 
-      params[:is_spam] = false unless params[:is_spam].present?
-
       q = q.read if params[:read].to_s.truthy?
       q = q.unread if params[:read].to_s.falsy?
 

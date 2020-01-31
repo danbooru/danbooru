@@ -4,6 +4,7 @@
   <%= subnav_link_to "Received", received_dmails_path(set_default_folder: true) %>
   <%= subnav_link_to "Sent", sent_dmails_path(set_default_folder: true) %>
   <%= subnav_link_to "Spam", spam_dmails_path %>
+  <%= subnav_link_to "Deleted", dmails_path(search: { is_deleted: true }) %>
   <li>|</li>
   <%= subnav_link_to "New", new_dmail_path %>
   <%= subnav_link_to "Mark all as read", {:controller => "dmails", :action => "mark_all_as_read"}, :method => :post, :remote => true %></li>

@@ -94,18 +94,19 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    context "destroy action" do
+    context "update action" do
       should "allow deletion if the dmail is owned by the current user" do
-        assert_difference("Dmail.count", -1) do
-          delete_auth dmail_path(@dmail), @user
-          assert_redirected_to dmails_path
-        end
+        put_auth dmail_path(@dmail), @user, params: { dmail: { is_deleted: true } }
+
+        assert_redirected_to dmail_path(@dmail)
+        assert_equal(true, @dmail.reload.is_deleted)
       end
 
       should "not allow deletion if the dmail is not owned by the current user" do
-        assert_difference("Dmail.count", 0) do
-          delete_auth dmail_path(@dmail), @unrelated_user
-        end
+        put_auth dmail_path(@dmail), @unrelated_user, params: { dmail: { is_deleted: true } }
+
+        assert_response 403
+        assert_equal(false, @dmail.reload.is_deleted)
       end
     end
   end

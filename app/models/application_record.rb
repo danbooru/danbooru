@@ -7,8 +7,10 @@ class ApplicationRecord < ActiveRecord::Base
         extending(PaginationExtension).paginate(*options)
       end
 
-      def paginated_search(params, count_pages: params[:search].present?)
+      def paginated_search(params, defaults: {}, count_pages: params[:search].present?)
         search_params = params.fetch(:search, {}).permit!
+        search_params = defaults.merge(search_params).with_indifferent_access
+
         search(search_params).paginate(params[:page], limit: params[:limit], search_count: count_pages)
       end
     end
@@ -93,7 +95,7 @@ class ApplicationRecord < ActiveRecord::Base
       end
 
       def search_boolean_attribute(attribute, params)
-        return all unless params[attribute]
+        return all unless params.key?(attribute)
 
         value = params[attribute].to_s
         if value.truthy?

@@ -110,7 +110,7 @@ Rails.application.routes.draw do
       put :cancel
     end
   end
-  resources :dmails, :only => [:new, :create, :update, :index, :show, :destroy] do
+  resources :dmails, :only => [:new, :create, :update, :index, :show] do
     collection do
       post :mark_all_as_read
     end
