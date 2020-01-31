@@ -25,6 +25,16 @@ class UploadLimitTest < ActiveSupport::TestCase
         @post.approve!(@approver)
         assert_equal(1010, @user.reload.upload_points)
       end
+
+      should "not increase the uploader's upload points beyond the maximum" do
+        @user.update!(upload_points: UploadLimit::MAXIMUM_POINTS)
+
+        @post = create(:post, uploader: @user, is_pending: true, created_at: 7.days.ago)
+        assert_equal(UploadLimit::MAXIMUM_POINTS, @user.reload.upload_points)
+
+        @post.approve!(@approver)
+        assert_equal(UploadLimit::MAXIMUM_POINTS, @user.reload.upload_points)
+      end
     end
 
     context "an approved post that is deleted" do

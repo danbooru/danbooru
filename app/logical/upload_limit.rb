@@ -43,6 +43,7 @@ class UploadLimit
     user.with_lock do
       if incremental
         user.upload_points += UploadLimit.upload_value(user.upload_points, post.is_deleted)
+        user.upload_points = user.upload_points.clamp(0, MAXIMUM_POINTS)
         user.save!
       else
         user.update!(upload_points: UploadLimit.points_for_user(user))
