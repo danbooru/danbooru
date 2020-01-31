@@ -1,7 +1,6 @@
 class DmailsController < ApplicationController
-  respond_to :html, :xml, :json
-  before_action :member_only, except: [:index, :show, :destroy, :mark_all_as_read]
-  before_action :gold_only, only: [:ham, :spam]
+  respond_to :html, :xml, :js, :json
+  before_action :member_only, except: [:index, :show, :update, :destroy, :mark_all_as_read]
 
   def new
     if params[:respond_to_id]
@@ -9,7 +8,7 @@ class DmailsController < ApplicationController
       check_privilege(parent)
       @dmail = parent.build_response(:forward => params[:forward])
     else
-      @dmail = Dmail.new(create_params)
+      @dmail = Dmail.new(dmail_params(:create))
     end
 
     respond_with(@dmail)
@@ -31,7 +30,16 @@ class DmailsController < ApplicationController
   end
 
   def create
-    @dmail = Dmail.create_split(create_params)
+    @dmail = Dmail.create_split(dmail_params(:create))
+    respond_with(@dmail)
+  end
+
+  def update
+    @dmail = Dmail.find(params[:id])
+    check_privilege(@dmail)
+    @dmail.update(dmail_params(:update))
+    flash[:notice] = "Dmail updated"
+
     respond_with(@dmail)
   end
 
@@ -50,16 +58,6 @@ class DmailsController < ApplicationController
     CurrentUser.user.update(has_mail: false, unread_dmail_count: 0)
   end
 
-  def spam
-    @dmail = Dmail.find(params[:id])
-    @dmail.update_column(:is_spam, true)
-  end
-
-  def ham
-    @dmail = Dmail.find(params[:id])
-    @dmail.update_column(:is_spam, false)
-  end
-
   private
 
   def check_privilege(dmail)
@@ -68,7 +66,10 @@ class DmailsController < ApplicationController
     end
   end
 
-  def create_params
-    params.fetch(:dmail, {}).permit(:title, :body, :to_name, :to_id)
+  def dmail_params(context)
+    permitted_params = %i[title body to_name to_id] if context == :create
+    permitted_params = %i[is_spam is_read is_deleted] if context == :update
+
+    params.fetch(:dmail, {}).permit(permitted_params)
   end
 end
