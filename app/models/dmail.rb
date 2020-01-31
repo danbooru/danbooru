@@ -19,6 +19,15 @@ class Dmail < ApplicationRecord
 
   api_attributes including: [:key]
 
+  scope :active, -> { where(is_deleted: false) }
+  scope :deleted, -> { where(is_deleted: true) }
+  scope :read, -> { where(is_read: true) }
+  scope :unread, -> { where(is_read: false) }
+  scope :spam, -> { where(is_spam: true) }
+  scope :visible, -> { where(owner: CurrentUser.user) }
+  scope :sent, -> { where("dmails.owner_id = dmails.from_id") }
+  scope :received, -> { where("dmails.owner_id = dmails.to_id") }
+
   concerning :SpamMethods do
     class_methods do
       def is_spammer?(user)
@@ -109,24 +118,21 @@ class Dmail < ApplicationRecord
       where("dmails.from_id = ? AND dmails.owner_id != ?", user.id, user.id)
     end
 
-    def active
-      where("is_deleted = ?", false)
-    end
-
-    def deleted
-      where("is_deleted = ?", true)
-    end
-
-    def read
-      where(is_read: true)
-    end
-
-    def unread
-      where("is_read = false and is_deleted = false")
-    end
-
-    def visible
-      where("owner_id = ?", CurrentUser.id)
+    def folder_matches(folder)
+      case folder
+      when "received"
+        active.received
+      when "unread"
+        active.received.unread
+      when "sent"
+        active.sent
+      when "spam"
+        active.spam
+      when "deleted"
+        deleted
+      else
+        all
+      end
     end
 
     def search(params)
@@ -135,6 +141,8 @@ class Dmail < ApplicationRecord
       q = q.search_attributes(params, :to, :from, :is_spam, :is_read, :is_deleted, :title, :body)
       q = q.text_attribute_matches(:title, params[:title_matches])
       q = q.text_attribute_matches(:body, params[:message_matches], index_column: :message_index)
+
+      q = q.folder_matches(params[:folder])
 
       q = q.read if params[:read].to_s.truthy?
       q = q.unread if params[:read].to_s.falsy?

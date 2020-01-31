@@ -15,11 +15,7 @@ class DmailsController < ApplicationController
   end
 
   def index
-    if params[:folder] && params[:set_default_folder]
-      cookies.permanent[:dmail_folder] = params[:folder]
-    end
-
-    @dmails = Dmail.visible.paginated_search(params, defaults: { is_spam: false, is_deleted: false }, count_pages: true)
+    @dmails = Dmail.visible.paginated_search(params, defaults: { folder: "received" }, count_pages: true)
     respond_with(@dmails)
   end
 
