@@ -144,9 +144,6 @@ class Dmail < ApplicationRecord
 
       q = q.folder_matches(params[:folder])
 
-      q = q.read if params[:read].to_s.truthy?
-      q = q.unread if params[:read].to_s.falsy?
-
       q.apply_default_order(params)
     end
   end
