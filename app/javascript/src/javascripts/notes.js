@@ -9,17 +9,6 @@ let Note = {
       var $inner_border = $('<div/>');
       $inner_border.addClass("note-box-inner-border");
 
-      var opacity = 0;
-      if (Note.embed) {
-        opacity = 0.95
-      } else {
-        opacity = 0.5
-      }
-
-      $inner_border.css({
-        opacity: opacity,
-      });
-
       var $note_box = $('<div/>');
       $note_box.addClass("note-box");
 
@@ -125,12 +114,14 @@ let Note = {
               $this.resizable("enable");
               $this.draggable("enable");
             }
+            $note_box.addClass("hovering");
           } else if (e.type === "mouseout") {
             Note.Body.hide($note_box_inner.data("id"));
             if (Note.editing) {
               $this.resizable("disable");
               $this.draggable("disable");
             }
+            $note_box.removeClass("hovering");
           }
 
           e.stopPropagation();
@@ -378,10 +369,7 @@ let Note = {
 
       $(".note-box").resizable("disable");
       $(".note-box").draggable("disable");
-
-      if (Note.embed) {
-        $(".note-box").css("opacity", "0.5");
-      }
+      $(".note-box").addClass("editing");
 
       let $textarea = $('<textarea></textarea>');
       $textarea.css({
@@ -426,10 +414,7 @@ let Note = {
         Note.editing = false;
         $(".note-box").resizable("enable");
         $(".note-box").draggable("enable");
-
-        if (Note.embed) {
-          $(".note-box").css("opacity", "0.95");
-        }
+        $(".note-box").removeClass("editing");
       });
 
       $textarea.selectEnd();

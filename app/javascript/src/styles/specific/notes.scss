@@ -80,6 +80,7 @@ div#note-container {
     cursor: move;
     background: var(--note-box-background);
     line-height: 1.25;
+    opacity: 0.5;
 
     div.note-box-inner-border {
       border: var(--note-box-inner-border);
@@ -92,6 +93,28 @@ div#note-container {
 
     &.embedded {
       color: var(--note-body-text-color);
+      border: 1px solid transparent;
+      opacity: 1;
+
+      &.hovering {
+        border: var(--note-box-border);
+
+        &.editing {
+          opacity: 1;
+        }
+
+        div.ui-resizable-handle {
+          display: block;
+        }
+
+        div.note-box-inner-border {
+          border: var(--note-box-inner-border);
+        }
+      }
+
+      &.editing {
+        opacity: 0.4;
+      }
 
       div.bg {
         height: 100%;
@@ -100,10 +123,15 @@ div#note-container {
         vertical-align: middle;
       }
 
+      div.ui-resizable-handle {
+        display: none;
+      }
+
       div.note-box-inner-border {
         text-align: center;
         display: table-cell;
         vertical-align: middle;
+        border: 1px solid transparent;
       }
     }
 
