@@ -95,15 +95,16 @@ let Note = {
           var $this = $(this);
           var $note_box_inner = $(e.currentTarget);
 
+          const note_id = $note_box_inner.data("id");
           if (e.type === "mouseover") {
-            Note.Body.show($note_box_inner.data("id"));
+            Note.Body.show(note_id);
             if (Note.editing) {
               $this.resizable("enable");
               $this.draggable("enable");
             }
             $note_box.addClass("hovering");
           } else if (e.type === "mouseout") {
-            Note.Body.hide($note_box_inner.data("id"));
+            Note.Body.hide(note_id);
             if (Note.editing) {
               $this.resizable("disable");
               $this.draggable("disable");
@@ -114,10 +115,74 @@ let Note = {
           e.stopPropagation();
         }
       );
+
+      $note_box.on(
+        "click.danbooru",
+        function (event) {
+          const note_id = $note_box.data("id");
+          $(".note-box").removeClass("movable");
+          if (note_id === Note.move_id) {
+            Note.move_id = null;
+          } else {
+            Note.move_id = note_id;
+            $note_box.addClass("movable");
+          }
+        }
+      );
     },
 
     find: function(id) {
       return $("#note-container div.note-box[data-id=" + id + "]");
+    },
+
+    key_nudge: function(event) {
+      if (!Note.move_id) {
+        return;
+      }
+      const $note_box = Note.Box.find(Note.move_id);
+      if ($note_box.length === 0) {
+        return;
+      }
+      let computed_style = window.getComputedStyle($note_box[0]);
+      let current_top = parseFloat(computed_style.top);
+      let current_left = parseFloat(computed_style.left);
+      switch (event.originalEvent.key) {
+      case "ArrowUp":
+        current_top--;
+        break;
+      case "ArrowDown":
+        current_top++;
+        break;
+      case "ArrowLeft":
+        current_left--;
+        break;
+      case "ArrowRight":
+        current_left++;
+        break;
+      default:
+        // do nothing
+      }
+      let position = Note.Box.get_min_max_position($note_box, current_top, current_left);
+      $note_box.css(position);
+      $note_box.find(".note-box-inner-border").addClass("unsaved");
+      event.preventDefault();
+    },
+
+    get_min_max_position: function($note_box, current_top = null, current_left = null, current_height = null, current_width = null) {
+      const computed_style = window.getComputedStyle($note_box[0]);
+      current_top = (current_top === null ? parseFloat(computed_style.top) : current_top);
+      current_left = (current_left === null ? parseFloat(computed_style.left) : current_left);
+      current_height = current_height || $note_box.height();
+      current_width = current_width || $note_box.width();
+      const $image = $("#image");
+      const image_height = $image.height();
+      const image_width = $image.width();
+      current_top = Math.min(Math.max(current_top, 0), image_height - current_height - 2);
+      current_left = Math.min(Math.max(current_left, 0), image_width - current_width - 2);
+      return {
+        top: current_top,
+        left: current_left,
+      };
     },
 
     show_highlighted: function($note_box) {
@@ -697,9 +762,9 @@ let Note = {
   dragging: false,
   editing: false,
   base_font_size: null,
+  move_id: null,
   timeouts: [],
   pending: {},
-
   add: function(container, id, x, y, w, h, original_body, sanitized_body) {
     var $note_box = Note.Box.create(id);
     var $note_body = Note.Body.create(id);
@@ -798,6 +863,7 @@ let Note = {
     this.initialize_shortcuts();
     this.initialize_highlight();
     $(document).on("hashchange.danbooru.note", this.initialize_highlight);
+    Utility.keydown("up down left right", "nudge_note", Note.Box.key_nudge);
   },
 
   initialize_shortcuts: function() {

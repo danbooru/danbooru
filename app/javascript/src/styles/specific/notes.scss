@@ -99,7 +99,8 @@ div#note-container {
       &.hovering {
         border: var(--note-box-border);
 
-        &.editing {
+        &.editing,
+        &.movable {
           opacity: 1;
         }
 
@@ -112,8 +113,16 @@ div#note-container {
         }
       }
 
-      &.editing {
+      &.editing,
+      &.movable {
         opacity: 0.4;
+      }
+
+      &.movable {
+        div.note-box-inner-border,
+        div.note-box-inner-border.unsaved {
+          border: var(--movable-note-box-inner-border);
+        }
       }
 
       div.ui-resizable-handle {
@@ -125,6 +134,10 @@ div#note-container {
         display: table-cell;
         vertical-align: middle;
         border: 1px solid transparent;
+      }
+
+      div.note-box-inner-border.unsaved {
+        border: var(--unsaved-note-box-inner-border);
       }
     }
 
