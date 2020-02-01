@@ -168,6 +168,44 @@ let Note = {
       event.preventDefault();
     },
 
+    key_resize: function (event) {
+      if (!Note.move_id) {
+        return;
+      }
+      const $note_box = Note.Box.find(Note.move_id);
+      if ($note_box.length === 0) {
+        return;
+      }
+      let current_height = $note_box.height();
+      let current_width = $note_box.width();
+      switch (event.originalEvent.key) {
+      case "ArrowUp":
+        current_height--;
+        break;
+      case "ArrowDown":
+        current_height++;
+        break;
+      case "ArrowLeft":
+        current_width--;
+        break;
+      case "ArrowRight":
+        current_width++;
+        break;
+      default:
+        // do nothing
+      }
+      const position = Note.Box.get_min_max_position($note_box, null, null, current_height, current_width);
+      $note_box.css({
+        top: position.top,
+        left: position.left,
+        height: current_height,
+        width: current_width,
+      });
+      Note.Box.resize_inner_border($note_box);
+      $note_box.find(".note-box-inner-border").addClass("unsaved");
+      event.preventDefault();
+    },
+
     get_min_max_position: function($note_box, current_top = null, current_left = null, current_height = null, current_width = null) {
       const computed_style = window.getComputedStyle($note_box[0]);
       current_top = (current_top === null ? parseFloat(computed_style.top) : current_top);
@@ -864,6 +902,7 @@ let Note = {
     this.initialize_highlight();
     $(document).on("hashchange.danbooru.note", this.initialize_highlight);
     Utility.keydown("up down left right", "nudge_note", Note.Box.key_nudge);
+    Utility.keydown("shift+up shift+down shift+left shift+right", "resize_note", Note.Box.key_resize);
   },
 
   initialize_shortcuts: function() {
