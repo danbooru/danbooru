@@ -3,6 +3,7 @@ import Utility from './utility'
 
 let Note = {
   HIDE_DELAY: 250,
+  NORMALIZE_ATTRIBUTES: ['letter-spacing', 'line-height', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom', 'padding-left', 'padding-right', 'padding-top', 'padding-bottom'],
 
   Box: {
     create: function(id) {
@@ -195,6 +196,9 @@ let Note = {
       if (was_visible) {
         container.style.display = 'block';
       }
+      const $image = $("#image");
+      const percentage = 100 * ($image.width() / parseFloat($image.data('large-width')));
+      $(container).css('font-size', percentage + '%');
     },
 
     toggle_all: function() {
@@ -314,7 +318,11 @@ let Note = {
     set_text: function($note_body, $note_box, text) {
       Note.Body.display_text($note_body, text);
       if (Note.embed) {
-        Note.Body.display_text($note_box.children("div.note-box-inner-border"), text);
+        const $note_inner_box = $note_box.find("div.note-box-inner-border");
+        Note.Body.display_text($note_inner_box, text);
+        $note_inner_box.css("font-size", Note.base_font_size + "px");
+        Note.normalize_sizes($note_inner_box.children(), Note.base_font_size);
+        $note_inner_box.css("font-size", "");
       }
       Note.Body.resize($note_body);
       Note.Body.bound_position($note_body);
@@ -710,6 +718,7 @@ let Note = {
   id: "x",
   dragging: false,
   editing: false,
+  base_font_size: null,
   timeouts: [],
   pending: {},
 
@@ -749,6 +758,26 @@ let Note = {
     Note.id += "x";
   },
 
+  normalize_sizes: function ($note_elements, parent_font_size) {
+    if ($note_elements.length === 0) {
+      return;
+    }
+    $note_elements.each(function(i, element) {
+      const $element = $(element);
+      const computed_styles = window.getComputedStyle(element);
+      const font_size = parseFloat(computed_styles.fontSize);
+      Note.NORMALIZE_ATTRIBUTES.forEach(function(attribute) {
+        const original_size = parseFloat(computed_styles[attribute]) || 0;
+        const relative_em = original_size / font_size;
+        $element.css(attribute, relative_em + "em");
+      });
+      const font_percentage = 100 * (font_size / parent_font_size);
+      $element.css("font-size", font_percentage + "%");
+      $element.attr("size", "");
+      Note.normalize_sizes($element.children(), font_size);
+    });
+  },
+
   clear_timeouts: function() {
     Note.timeouts.forEach(clearTimeout);
     Note.timeouts = [];
@@ -769,10 +798,13 @@ let Note = {
         $article.html()
       );
     });
-    $("#note-container").append(fragment);
+    const $note_container = $("#note-container");
+    $note_container.append(fragment);
     if (Note.embed) {
+      Note.base_font_size = parseFloat(window.getComputedStyle($note_container[0]).fontSize);
       $.each($(".note-box"), function(i, note_box) {
         Note.Box.resize_inner_border($(note_box));
+        Note.normalize_sizes($("div.note-box-inner-border", note_box).children(), Note.base_font_size);
       });
     }
   },
