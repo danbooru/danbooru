@@ -65,12 +65,6 @@ let Note = {
           Note.dragging = true;
           Note.clear_timeouts();
           Note.Body.hide_all();
-          if (Note.embed) {
-            var $bg = $note_box_inner.find("div.bg")
-            if ($bg.length) {
-              $bg.hide();
-            }
-          }
           e.stopPropagation();
         }
       );
@@ -87,14 +81,6 @@ let Note = {
         "dragstop.danbooru resizestop.danbooru",
         function(e) {
           Note.dragging = false;
-          if (Note.embed) {
-            var $note_box_inner = $(e.currentTarget);
-            var $bg = $note_box_inner.find("div.bg")
-            if ($bg.length) {
-              $bg.show();
-              Note.Box.resize_inner_border($note_box_inner.closest(".note-box"));
-            }
-          }
           e.stopPropagation();
         }
       );
@@ -156,14 +142,6 @@ let Note = {
 
       if ($inner_border.height() >= $note_box.height() - 2) {
         $note_box.height($inner_border.height() + 2);
-      }
-
-      if (Note.embed) {
-        var $bg = $inner_border.find("div.bg");
-        if ($bg.length) {
-          $bg.height($inner_border.height());
-          $bg.width($inner_border.width());
-        }
       }
     },
 
