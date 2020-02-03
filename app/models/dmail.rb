@@ -191,4 +191,8 @@ class Dmail < ApplicationRecord
   def reportable_by?(user)
     is_recipient? && !is_automated? && !from.is_moderator?
   end
+
+  def dtext_shortlink(key: false, **options)
+    key ? "dmail ##{id}/#{key}" : "dmail ##{id}"
+  end
 end

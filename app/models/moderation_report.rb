@@ -39,15 +39,16 @@ class ModerationReport < ApplicationRecord
   end
 
   def forum_post_message
-    messages = ["[b]Submitted by:[/b] @#{creator.name}"]
-    messages << "[b]Submitted against:[/b] #{model.dtext_shortlink}"
-    messages << ""
-    messages << "[quote]"
-    messages << "[b]Reason:[/b]"
-    messages << ""
-    messages << reason
-    messages << "[/quote]"
-    messages.join("\n")
+    <<~EOS
+      [b]Report[/b] modreport ##{id}
+      [b]Submitted by[/b] <@#{creator.name}>
+      [b]Submitted against[/b] #{model.dtext_shortlink(key: true)} by <@#{reported_user.name}>
+      [b]Reason[/b] #{reason}
+
+      [quote]
+      #{model.body}
+      [/quote]
+    EOS
   end
 
   def create_forum_post!

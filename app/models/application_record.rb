@@ -424,7 +424,7 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   concerning :DtextMethods do
-    def dtext_shortlink
+    def dtext_shortlink(**options)
       "#{self.class.name.underscore.tr("_", " ")} ##{id}"
     end
   end

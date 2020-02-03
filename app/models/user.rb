@@ -820,7 +820,7 @@ class User < ApplicationRecord
     @presenter ||= UserPresenter.new(self)
   end
 
-  def dtext_shortlink
+  def dtext_shortlink(**options)
     "<@#{name}>"
   end
 end
