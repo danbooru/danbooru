@@ -5,7 +5,7 @@ class DmailsController < ApplicationController
   def new
     if params[:respond_to_id]
       parent = Dmail.find(params[:respond_to_id])
-      check_privilege(parent)
+      check_show_privilege(parent)
       @dmail = parent.build_response(:forward => params[:forward])
     else
       @dmail = Dmail.new(dmail_params(:create))
@@ -21,7 +21,7 @@ class DmailsController < ApplicationController
 
   def show
     @dmail = Dmail.find(params[:id])
-    check_privilege(@dmail)
+    check_show_privilege(@dmail)
 
     if request.format.html? && @dmail.owner == CurrentUser.user
       @dmail.update!(is_read: true)
@@ -37,7 +37,7 @@ class DmailsController < ApplicationController
 
   def update
     @dmail = Dmail.find(params[:id])
-    check_privilege(@dmail)
+    check_update_privilege(@dmail)
     @dmail.update(dmail_params(:update))
     flash[:notice] = "Dmail updated"
 
@@ -51,10 +51,12 @@ class DmailsController < ApplicationController
 
   private
 
-  def check_privilege(dmail)
-    if !dmail.visible_to?(CurrentUser.user, params[:key])
-      raise User::PrivilegeError
-    end
+  def check_show_privilege(dmail)
+    raise User::PrivilegeError unless dmail.visible_to?(CurrentUser.user, params[:key])
+  end
+
+  def check_update_privilege(dmail)
+    raise User::PrivilegeError unless dmail.owner == CurrentUser.user
   end
 
   def dmail_params(context)

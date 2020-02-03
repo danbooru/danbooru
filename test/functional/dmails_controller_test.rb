@@ -143,6 +143,13 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(false, @dmail.reload.is_deleted)
       end
 
+      should "not allow updating if the dmail is not owned by the current user even with a dmail key" do
+        put_auth dmail_path(@dmail), @unrelated_user, params: { dmail: { is_deleted: true }, key: @dmail.key }
+
+        assert_response 403
+        assert_equal(false, @dmail.reload.is_deleted)
+      end
+
       should "update user's unread_dmail_count when marking dmails as read or unread" do
         put_auth dmail_path(@dmail), @user, params: { dmail: { is_read: true } }
         assert_equal(true, @dmail.reload.is_read)
