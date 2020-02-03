@@ -1,10 +1,6 @@
 require 'digest/sha1'
 
 class Dmail < ApplicationRecord
-  # if a person sends spam to more than 10 users within a 24 hour window, automatically ban them for 3 days.
-  AUTOBAN_THRESHOLD = 10
-  AUTOBAN_WINDOW = 24.hours
-  AUTOBAN_DURATION = 3
 
   validates_presence_of :title, :body, on: :create
   validate :validate_sender_is_not_banned, on: :create
@@ -12,8 +8,10 @@ class Dmail < ApplicationRecord
   belongs_to :owner, :class_name => "User"
   belongs_to :to, :class_name => "User"
   belongs_to :from, :class_name => "User"
+  has_many :moderation_reports, as: :model
 
   after_initialize :initialize_attributes, if: :new_record?
+  before_create :autoreport_spam
   after_save :update_unread_dmail_count
   after_commit :send_email, on: :create
 
@@ -26,29 +24,6 @@ class Dmail < ApplicationRecord
   scope :visible, -> { where(owner: CurrentUser.user) }
   scope :sent, -> { where("dmails.owner_id = dmails.from_id") }
   scope :received, -> { where("dmails.owner_id = dmails.to_id") }
-
-  concerning :SpamMethods do
-    class_methods do
-      def is_spammer?(user)
-        return false if user.is_gold?
-
-        spammed_users = sent_by(user).where(is_spam: true).where("created_at > ?", AUTOBAN_WINDOW.ago).distinct.count(:to_id)
-        spammed_users >= AUTOBAN_THRESHOLD
-      end
-
-      def ban_spammer(spammer)
-        spammer.bans.create! do |ban|
-          ban.banner = User.system
-          ban.reason = "Spambot."
-          ban.duration = AUTOBAN_DURATION
-        end
-      end
-    end
-
-    def spam?
-      SpamDetector.new(self).spam?
-    end
-  end
 
   module AddressMethods
     def to_name=(name)
@@ -72,7 +47,6 @@ class Dmail < ApplicationRecord
           # recipient's copy
           copy = Dmail.new(params)
           copy.owner_id = copy.to_id
-          copy.is_spam = copy.spam?
           copy.save unless copy.to_id == copy.from_id
 
           # sender's copy
@@ -80,8 +54,6 @@ class Dmail < ApplicationRecord
           copy.owner_id = copy.from_id
           copy.is_read = true
           copy.save
-
-          Dmail.ban_spammer(copy.from) if Dmail.is_spammer?(copy.from)
         end
 
         copy
@@ -198,6 +170,13 @@ class Dmail < ApplicationRecord
 
   def is_recipient?
     owner == to
+  end
+
+  def autoreport_spam
+    if is_recipient? && SpamDetector.new(self).spam?
+      self.is_deleted = true
+      moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
+    end
   end
 
   def update_unread_dmail_count

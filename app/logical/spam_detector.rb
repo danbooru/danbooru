@@ -4,6 +4,12 @@
 class SpamDetector
   include Rakismet::Model
 
+  # if a person receives more than 10 automatic spam reports within a 1 hour
+  # window, automatically ban them forever.
+  AUTOBAN_THRESHOLD = 10
+  AUTOBAN_WINDOW = 1.hours
+  AUTOBAN_DURATION = 999999
+
   attr_accessor :record, :user, :user_ip, :content, :comment_type
   rakismet_attrs author: proc { user.name },
                  author_email: proc { user.email },
@@ -22,6 +28,23 @@ class SpamDetector
     Rakismet.validate_key
   rescue StandardError
     false
+  end
+
+  def self.is_spammer?(user)
+    return false if user.is_gold?
+
+    automatic_reports = ModerationReport.where("created_at > ?", AUTOBAN_WINDOW.ago).where(creator: User.system)
+
+    dmail_reports = automatic_reports.where(model: Dmail.sent_by(user))
+    comment_reports = automatic_reports.where(model: user.comments)
+    forum_post_reports = automatic_reports.where(model: user.forum_posts)
+
+    report_count = dmail_reports.or(comment_reports).or(forum_post_reports).count
+    report_count >= AUTOBAN_THRESHOLD
+  end
+
+  def self.ban_spammer!(spammer)
+    spammer.bans.create!(banner: User.system, reason: "Spambot.", duration: AUTOBAN_DURATION)
   end
 
   def initialize(record, user_ip: nil)

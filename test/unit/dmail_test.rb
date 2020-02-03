@@ -15,31 +15,16 @@ class DmailTest < ActiveSupport::TestCase
       CurrentUser.user = nil
     end
 
-    context "spam" do
-      setup do
-        Dmail.any_instance.stubs(:spam?).returns(true)
-        @spammer = create(:user)
+    context "that is spam" do
+      should "be automatically reported and deleted" do
         @recipient = create(:user)
-      end
+        @spammer = create(:user, created_at: 2.weeks.ago, email: "akismet-guaranteed-spam@example.com")
 
-      should "not validate" do
-        assert_difference("Dmail.count", 2) do
-          Dmail.create_split(from: @spammer, to: @recipient, title: "spam", body: "wonderful spam")
-          assert(@recipient.dmails.last.is_spam?)
-        end
-      end
+        SpamDetector.stubs(:enabled?).returns(true)
+        dmail = create(:dmail, owner: @recipient, from: @spammer, to: @recipient, creator_ip_addr: "127.0.0.1")
 
-      should "autoban spammers after sending spam to N distinct users" do
-        users = create_list(:user, Dmail::AUTOBAN_THRESHOLD)
-        users.each do |user|
-          Dmail.create_split(from: @spammer, to: user, title: "spam", body: "wonderful spam")
-        end
-
-        assert_equal(true, Dmail.is_spammer?(@spammer))
-        assert_equal(true, @spammer.reload.is_banned)
-        assert_equal(1, @spammer.bans.count)
-        assert_match(/Spambot./, @spammer.bans.last.reason)
-        assert_match(/Spambot./, @spammer.feedback.last.body)
+        assert_equal(1, dmail.moderation_reports.count)
+        assert_equal(true, dmail.reload.is_deleted?)
       end
     end
 

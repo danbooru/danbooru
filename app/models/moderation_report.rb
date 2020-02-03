@@ -7,6 +7,7 @@ class ModerationReport < ApplicationRecord
   validates :creator, uniqueness: { scope: [:model_type, :model_id], message: "have already reported this message." }
 
   after_create :create_forum_post!
+  after_create :autoban_reported_user
 
   scope :user, -> { where(model_type: "User") }
   scope :dmail, -> { where(model_type: "Dmail") }
@@ -52,6 +53,23 @@ class ModerationReport < ApplicationRecord
   def create_forum_post!
     updater = ForumUpdater.new(forum_topic)
     updater.update(forum_post_message)
+  end
+
+  def autoban_reported_user
+    if SpamDetector.is_spammer?(reported_user)
+      SpamDetector.ban_spammer!(reported_user)
+    end
+  end
+
+  def reported_user
+    case model
+    when Comment, ForumPost
+      model.creator
+    when Dmail
+      model.from
+    else
+      raise NotImplementedError
+    end
   end
 
   def self.visible(user = CurrentUser.user)

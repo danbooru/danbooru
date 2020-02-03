@@ -14,12 +14,12 @@ class ForumPost < ApplicationRecord
 
   before_validation :initialize_is_deleted, :on => :create
   before_save :update_dtext_links, if: :dtext_links_changed?
+  before_create :autoreport_spam
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
   after_destroy :update_topic_updated_at_on_destroy
   validates_presence_of :body
   validate :validate_topic_is_unlocked
-  validate :validate_post_is_not_spam, on: :create
   validate :topic_is_not_restricted, :on => :create
   before_destroy :validate_topic_is_unlocked
   after_save :delete_topic_if_original_post
@@ -108,8 +108,10 @@ class ForumPost < ApplicationRecord
     votes.where(creator_id: user.id, score: score).exists?
   end
 
-  def validate_post_is_not_spam
-    errors[:base] << "Failed to create forum post" if SpamDetector.new(self, user_ip: CurrentUser.ip_addr).spam?
+  def autoreport_spam
+    if SpamDetector.new(self, user_ip: CurrentUser.ip_addr).spam?
+      moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
+    end
   end
 
   def validate_topic_is_unlocked

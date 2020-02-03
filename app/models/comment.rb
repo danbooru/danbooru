@@ -2,13 +2,14 @@ class Comment < ApplicationRecord
   include Mentionable
 
   validate :validate_creator_is_not_limited, :on => :create
-  validate :validate_comment_is_not_spam, on: :create
   validates_presence_of :body, :message => "has no content"
   belongs_to :post
   belongs_to :creator, class_name: "User"
   belongs_to_updater
   has_many :moderation_reports, as: :model
   has_many :votes, :class_name => "CommentVote", :dependent => :destroy
+
+  before_create :autoreport_spam
   after_create :update_last_commented_at_on_create
   after_update(:if => ->(rec) {(!rec.is_deleted? || !rec.saved_change_to_is_deleted?) && CurrentUser.id != rec.creator_id}) do |rec|
     ModAction.log("comment ##{rec.id} updated by #{CurrentUser.name}", :comment_update)
@@ -97,8 +98,10 @@ class Comment < ApplicationRecord
     end
   end
 
-  def validate_comment_is_not_spam
-    errors[:base] << "Failed to create comment" if SpamDetector.new(self).spam?
+  def autoreport_spam
+    if SpamDetector.new(self).spam?
+      moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
+    end
   end
 
   def update_last_commented_at_on_create
