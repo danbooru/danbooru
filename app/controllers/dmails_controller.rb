@@ -22,7 +22,11 @@ class DmailsController < ApplicationController
   def show
     @dmail = Dmail.find(params[:id])
     check_privilege(@dmail)
-    @dmail.update!(is_read: true) if request.format.html?
+
+    if request.format.html? && @dmail.owner == CurrentUser.user
+      @dmail.update!(is_read: true)
+    end
+
     respond_with(@dmail)
   end
 

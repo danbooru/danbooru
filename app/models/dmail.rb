@@ -148,6 +148,25 @@ class Dmail < ApplicationRecord
     end
   end
 
+  concerning :AuthorizationMethods do
+    def verifier
+      @verifier ||= Danbooru::MessageVerifier.new(:dmail_link)
+    end
+
+    def key
+      verifier.generate(id)
+    end
+
+    def valid_key?(key)
+      decoded_id = verifier.verified(key)
+      id == decoded_id
+    end
+
+    def visible_to?(user, key)
+      owner_id == user.id || valid_key?(key)
+    end
+  end
+
   include AddressMethods
   include FactoryMethods
   extend SearchMethods
@@ -191,15 +210,6 @@ class Dmail < ApplicationRecord
       unread_count = owner.dmails.active.unread.count
       owner.update!(unread_dmail_count: unread_count)
     end
-  end
-
-  def key
-    verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.email_key, serializer: JSON, digest: "SHA256")
-    verifier.generate("#{title} #{body}")
-  end
-
-  def visible_to?(user, key)
-    owner_id == user.id || (user.is_moderator? && key == self.key)
   end
 
   def reportable_by?(user)

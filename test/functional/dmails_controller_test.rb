@@ -79,6 +79,16 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
         assert_response(403)
       end
 
+      should "show dmails not owned by the current user when given a valid key" do
+        get_auth dmail_path(@dmail, key: @dmail.key), @unrelated_user
+        assert_response :success
+      end
+
+      should "not show dmails not owned by the current user when given an invalid key" do
+        get_auth dmail_path(@dmail, key: @dmail.key + "blah"), @unrelated_user
+        assert_response 403
+      end
+
       should "mark dmails as read" do
         assert_equal(false, @dmail.is_read)
         get_auth dmail_path(@dmail), @dmail.owner
@@ -90,6 +100,14 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
       should "not mark dmails as read in the api" do
         assert_equal(false, @dmail.is_read)
         get_auth dmail_path(@dmail, format: :json), @dmail.owner
+
+        assert_response :success
+        assert_equal(false, @dmail.reload.is_read)
+      end
+
+      should "not mark dmails as read when viewing dmails owned by another user" do
+        assert_equal(false, @dmail.is_read)
+        get_auth dmail_path(@dmail, key: @dmail.key), @unrelated_user
 
         assert_response :success
         assert_equal(false, @dmail.reload.is_read)

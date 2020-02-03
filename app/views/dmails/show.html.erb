@@ -27,7 +27,7 @@
       <p>
         <%= link_to "Respond", new_dmail_path(:respond_to_id => @dmail) %>
         | <%= link_to "Forward", new_dmail_path(:respond_to_id => @dmail, :forward => true) %>
-        | <%= link_to "Permalink", dmail_path(@dmail, :key => @dmail.key), :title => "Use this URL to privately share with a moderator" %>
+        | <%= link_to "Share", dmail_path(@dmail, key: @dmail.key), title: "Anyone with this link will be able to view this dmail." %>
         <% if @dmail.is_spam? %>
           | <%= link_to "Not spam", dmail_path(@dmail, format: :js), remote: :true, method: :put, "data-params": "dmail[is_spam]=false" %>
         <% else %>
