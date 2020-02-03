@@ -23,7 +23,6 @@ class Dmail < ApplicationRecord
   scope :deleted, -> { where(is_deleted: true) }
   scope :read, -> { where(is_read: true) }
   scope :unread, -> { where(is_read: false) }
-  scope :spam, -> { where(is_spam: true) }
   scope :visible, -> { where(owner: CurrentUser.user) }
   scope :sent, -> { where("dmails.owner_id = dmails.from_id") }
   scope :received, -> { where("dmails.owner_id = dmails.to_id") }
@@ -126,8 +125,6 @@ class Dmail < ApplicationRecord
         active.received.unread
       when "sent"
         active.sent
-      when "spam"
-        active.spam
       when "deleted"
         deleted
       else
@@ -138,7 +135,7 @@ class Dmail < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :to, :from, :is_spam, :is_read, :is_deleted, :title, :body)
+      q = q.search_attributes(params, :to, :from, :is_read, :is_deleted, :title, :body)
       q = q.text_attribute_matches(:title, params[:title_matches])
       q = q.text_attribute_matches(:body, params[:message_matches], index_column: :message_index)
 
@@ -186,7 +183,7 @@ class Dmail < ApplicationRecord
   end
 
   def send_email
-    if is_recipient? && !is_spam? && to.receive_email_notifications? && to.email =~ /@/
+    if is_recipient? && !is_deleted? && to.receive_email_notifications? && to.email =~ /@/
       UserMailer.dmail_notice(self).deliver_now
     end
   end

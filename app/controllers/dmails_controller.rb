@@ -61,7 +61,7 @@ class DmailsController < ApplicationController
 
   def dmail_params(context)
     permitted_params = %i[title body to_name to_id] if context == :create
-    permitted_params = %i[is_spam is_read is_deleted] if context == :update
+    permitted_params = %i[is_read is_deleted] if context == :update
 
     params.fetch(:dmail, {}).permit(permitted_params)
   end
