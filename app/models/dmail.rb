@@ -189,7 +189,7 @@ class Dmail < ApplicationRecord
   end
 
   def reportable_by?(user)
-    is_recipient? && !is_automated? && !from.is_moderator?
+    owner == user && is_recipient? && !is_automated? && !from.is_moderator?
   end
 
   def dtext_shortlink(key: false, **options)

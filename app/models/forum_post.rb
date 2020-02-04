@@ -95,7 +95,7 @@ class ForumPost < ApplicationRecord
   end
 
   def reportable_by?(user)
-    creator_id != user.id && !creator.is_moderator?
+    visible?(user) && creator_id != user.id && !creator.is_moderator?
   end
 
   def votable?
