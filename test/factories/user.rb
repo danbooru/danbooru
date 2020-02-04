@@ -1,5 +1,5 @@
 FactoryBot.define do
-  factory(:user, aliases: [:creator, :updater, :uploader]) do
+  factory(:user, aliases: [:creator, :updater]) do
     sequence :name do |n|
       "user#{n}"
     end
@@ -57,6 +57,10 @@ FactoryBot.define do
     factory(:admin_user) do
       level {50}
       can_approve_posts {true}
+    end
+
+    factory(:uploader) do
+      created_at { 2.weeks.ago }
     end
   end
 end

@@ -3,7 +3,7 @@ require 'test_helper'
 class UploadLimitTest < ActiveSupport::TestCase
   context "Upload limits:" do
     setup do
-      @user = create(:user, upload_points: 1000)
+      @user = create(:user, upload_points: 1000, created_at: 2.weeks.ago)
       @approver = create(:moderator_user)
     end
 

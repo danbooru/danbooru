@@ -361,7 +361,6 @@ GEM
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
     stackprof (0.2.15)
-    statistics2 (0.54)
     streamio-ffmpeg (3.0.2)
       multi_json (~> 1.8)
     stripe (5.14.0)
@@ -466,7 +465,6 @@ DEPENDENCIES
   simplecov
   sinatra
   stackprof
-  statistics2
   streamio-ffmpeg
   stripe
   unicorn

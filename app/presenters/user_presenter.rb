@@ -43,22 +43,6 @@ class UserPresenter
     Post.tag_match("search:#{category}").limit(10)
   end
 
-  def upload_limit(template)
-    if user.can_upload_free?
-      return "none"
-    end
-
-    slots_tooltip = "Next free slot: #{template.time_ago_in_words(user.next_free_upload_slot)}"
-    limit_tooltip = <<-EOS.strip_heredoc
-      Base: #{user.base_upload_limit}
-      Del. Rate: #{format("%.2f", user.adjusted_deletion_confidence)}
-      Multiplier: (1 - (#{format("%.2f", user.adjusted_deletion_confidence)} / 15)) = #{user.upload_limit_multiplier}
-      Upload Limit: #{user.base_upload_limit} * #{format("%.2f", user.upload_limit_multiplier)} = #{user.max_upload_limit}
-    EOS
-
-    %{<abbr title="#{slots_tooltip}">#{user.used_upload_slots}</abbr> / <abbr title="#{limit_tooltip}">#{user.max_upload_limit}</abbr>}.html_safe
-  end
-
   def uploads
     Post.tag_match("user:#{user.name}").limit(6)
   end

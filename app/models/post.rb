@@ -27,6 +27,7 @@ class Post < ApplicationRecord
   validate :has_enough_tags
   validate :post_is_not_its_own_parent
   validate :updater_can_change_rating
+  validate :uploader_is_not_limited, on: :create
   before_save :update_tag_post_counts
   before_save :set_tag_counts
   before_create :autoban
@@ -1280,7 +1281,7 @@ class Post < ApplicationRecord
         give_favorites_to_parent(options) if options[:move_favorites]
 
         is_automatic = (reason == "Unapproved in three days")
-        uploader.new_upload_limit.update_limit!(self, incremental: is_automatic)
+        uploader.upload_limit.update_limit!(self, incremental: is_automatic)
 
         unless options[:without_mod_action]
           ModAction.log("deleted post ##{id}, reason: #{reason}", :post_delete)
@@ -1646,6 +1647,10 @@ class Post < ApplicationRecord
           errors.add(:rating, "is locked and cannot be changed. Unlock the post first.")
         end
       end
+    end
+
+    def uploader_is_not_limited
+      errors[:uploader] << uploader.upload_limit.limit_reason if uploader.upload_limit.limited?
     end
 
     def added_tags_are_valid

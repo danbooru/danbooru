@@ -48,24 +48,6 @@ class UserTest < ActiveSupport::TestCase
       end
     end
 
-    should "limit post uploads" do
-      assert(!@user.can_upload?)
-      @user.update_column(:created_at, 15.days.ago)
-      assert(@user.can_upload?)
-      assert_equal(10, @user.upload_limit)
-
-      9.times do
-        FactoryBot.create(:post, :uploader => @user, :is_pending => true)
-      end
-
-      @user = User.find(@user.id)
-      assert_equal(1, @user.upload_limit)
-      assert(@user.can_upload?)
-      FactoryBot.create(:post, :uploader => @user, :is_pending => true)
-      @user = User.find(@user.id)
-      assert(!@user.can_upload?)
-    end
-
     should "limit comment votes" do
       Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
       Danbooru.config.stubs(:member_comment_limit).returns(10)

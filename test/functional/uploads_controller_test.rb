@@ -223,6 +223,22 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "when the uploader is limited" do
+        should "not allow uploading" do
+          @member = create(:user, created_at: 2.weeks.ago, upload_points: 0)
+          create_list(:post, @member.upload_limit.upload_slots, uploader: @member, is_pending: true)
+
+          assert_no_difference("Post.count") do
+            file = Rack::Test::UploadedFile.new("#{Rails.root}/test/files/test.jpg", "image/jpeg")
+            post_auth uploads_path, @member, params: { upload: { file: file, tag_string: "aaa", rating: "q" }}
+          end
+
+          @upload = Upload.last
+          assert_redirected_to @upload
+          assert_match(/have reached your upload limit/, @upload.status)
+        end
+      end
+
       should "create a new upload" do
         assert_difference("Upload.count", 1) do
           file = Rack::Test::UploadedFile.new("#{Rails.root}/test/files/test.jpg", "image/jpeg")

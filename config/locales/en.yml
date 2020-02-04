@@ -43,6 +43,8 @@ en:
         approver: "You"
         approver_id: "You"
         updater_id: "You"
+        uploader: "You"
+        uploader_id: "You"
       post_flag:
         creator: "You"
         creator_id: "You"

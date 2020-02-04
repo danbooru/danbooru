@@ -60,7 +60,6 @@ class Upload < ApplicationRecord
 
   before_validation :initialize_attributes, on: :create
   before_validation :assign_rating_from_tags
-  validate :uploader_is_not_limited, on: :create
   # validates :source, format: { with: /\Ahttps?/ }, if: ->(record) {record.file.blank?}, on: :create
   validates :rating, inclusion: { in: %w(q e s) }, allow_nil: true
   validates :md5, confirmation: true, if: ->(rec) { rec.md5_confirmation.present? }
@@ -234,12 +233,6 @@ class Upload < ApplicationRecord
   include VideoMethods
   extend SearchMethods
   include SourceMethods
-
-  def uploader_is_not_limited
-    if !uploader.can_upload?
-      errors.add(:uploader, uploader.upload_limited_reason)
-    end
-  end
 
   def assign_rating_from_tags
     if rating = Tag.has_metatag?(tag_string, :rating)

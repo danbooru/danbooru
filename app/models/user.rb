@@ -417,26 +417,6 @@ class User < ApplicationRecord
       end
     end
 
-    def can_upload?
-      if can_upload_free?
-        true
-      elsif is_admin?
-        true
-      elsif created_at > 1.week.ago
-        false
-      else
-        upload_limit > 0
-      end
-    end
-
-    def upload_limited_reason
-      if created_at > 1.week.ago
-        "cannot upload during your first week of registration"
-      else
-        "have reached your upload limit for the day"
-      end
-    end
-
     def can_comment?
       if is_gold?
         true
@@ -469,38 +449,8 @@ class User < ApplicationRecord
       (is_moderator? && flag.not_uploaded_by?(id)) || flag.creator_id == id
     end
 
-    def new_upload_limit
-      @new_upload_limit ||= UploadLimit.new(self)
-    end
-
     def upload_limit
-      [max_upload_limit - used_upload_slots, 0].max
-    end
-
-    def used_upload_slots
-      uploaded_count = posts.where("created_at >= ?", 23.hours.ago).count
-      uploaded_comic_count = posts.tag_match("comic").where("created_at >= ?", 23.hours.ago).count / 3
-      uploaded_count - uploaded_comic_count
-    end
-    memoize :used_upload_slots
-
-    def max_upload_limit
-      [(base_upload_limit * upload_limit_multiplier).ceil, 10].max
-    end
-
-    def upload_limit_multiplier
-      (1 - (adjusted_deletion_confidence / 15.0))
-    end
-
-    def adjusted_deletion_confidence
-      [deletion_confidence(60.days.ago), 15].min
-    end
-    memoize :adjusted_deletion_confidence
-
-    def deletion_confidence(date)
-      deletions = posts.deleted.where("created_at >= ?", date).count
-      total = posts.where("created_at >= ?", date).count
-      DanbooruMath.ci_lower_bound(deletions, total)
+      @upload_limit ||= UploadLimit.new(self)
     end
 
     def base_upload_limit
@@ -624,7 +574,6 @@ class User < ApplicationRecord
         forum_post_count comment_count favorite_group_count
         appeal_count flag_count positive_feedback_count
         neutral_feedback_count negative_feedback_count upload_limit
-        max_upload_limit
       ]
     end
 
