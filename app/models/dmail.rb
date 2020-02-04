@@ -193,6 +193,6 @@ class Dmail < ApplicationRecord
   end
 
   def dtext_shortlink(key: false, **options)
-    key ? "dmail ##{id}/#{key}" : "dmail ##{id}"
+    key ? "dmail ##{id}/#{self.key}" : "dmail ##{id}"
   end
 end
