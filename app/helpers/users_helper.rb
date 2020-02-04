@@ -4,7 +4,7 @@ module UsersHelper
   end
 
   def has_unread_dmails?(user)
-    user.unread_dmail_count > 0 && (cookies[:hide_dmail_notice].to_i < latest_unread_dmail(user).id)
+    user.unread_dmail_count > 0 && latest_unread_dmail(user).present? && (cookies[:hide_dmail_notice].to_i < latest_unread_dmail(user).id)
   end
 
   def latest_unread_dmail(user)
