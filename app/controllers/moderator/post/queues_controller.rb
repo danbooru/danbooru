@@ -18,7 +18,7 @@ module Moderator
           @posts = ::Post.includes(:disapprovals, :uploader).order("posts.id asc").pending_or_flagged.available_for_moderation(search_params[:hidden]).tag_match(search_params[:tags]).paginate(params[:page], :limit => per_page)
           @posts.each # hack to force rails to eager load
         end
-        respond_with(@posts)
+        #respond_with(@posts)
       end
 
       def random
