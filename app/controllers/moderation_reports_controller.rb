@@ -14,6 +14,10 @@ class ModerationReportsController < ApplicationController
     respond_with(@moderation_reports)
   end
 
+  def show
+    redirect_to moderation_reports_path(search: { id: params[:id] })
+  end
+
   def create
     @moderation_report = ModerationReport.new(moderation_report_params.merge(creator: CurrentUser.user))
     check_privilege(@moderation_report)
