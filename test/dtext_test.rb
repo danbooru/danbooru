@@ -406,6 +406,8 @@ class DTextTest < Minitest::Test
     assert_parse_id_link("dtext-mod-action-id-link", "/mod_actions/1234", "mod action #1234")
     assert_parse_id_link("dtext-user-feedback-id-link", "/user_feedbacks/1234", "feedback #1234")
     assert_parse_id_link("dtext-wiki-page-id-link", "/wiki_pages/1234", "wiki #1234")
+    assert_parse_id_link("dtext-moderation-report-id-link", "/moderation_reports/1234", "modreport #1234")
+    assert_parse_id_link("dtext-dmail-id-link", "/dmails/1234", "dmail #1234")
 
     assert_parse_id_link("dtext-github-id-link", "https://github.com/r888888888/danbooru/issues/1234", "issue #1234")
     assert_parse_id_link("dtext-artstation-id-link", "https://www.artstation.com/artwork/A1", "artstation #A1")
@@ -420,6 +422,10 @@ class DTextTest < Minitest::Test
     assert_parse_id_link("dtext-yandere-id-link", "https://yande.re/post/show/1234", "yandere #1234")
     assert_parse_id_link("dtext-sankaku-id-link", "https://chan.sankakucomplex.com/post/show/1234", "sankaku #1234")
     assert_parse_id_link("dtext-gelbooru-id-link", "https://gelbooru.com/index.php?page=post&s=view&id=1234", "gelbooru #1234")
+  end
+
+  def test_dmail_key_id_link
+    assert_parse(%{<p><a class="dtext-link dtext-id-link dtext-dmail-id-link" href="/dmails/1234?key=abc%3D%3D--DEF123">dmail #1234</a></p>}, "dmail #1234/abc==--DEF123")
   end
 
   def test_boundary_exploit

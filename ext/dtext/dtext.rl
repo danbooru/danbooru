@@ -138,6 +138,7 @@ post_link = '{{' noncurly+ >mark_a1 %mark_a2 '}}';
 id = digit+ >mark_a1 %mark_a2;
 alnum_id = alnum+ >mark_a1 %mark_a2;
 page = digit+ >mark_b1 %mark_b2;
+dmail_key = (alnum | '=' | '-')+ >mark_b1 %mark_b2;
 
 ws = ' ' | '\t';
 nonperiod = graph - ('.' | '"');
@@ -201,6 +202,7 @@ inline := |*
   'forum #'i id       => { append_id_link(sm, "forum", "forum-post", "/forum_posts/"); };
   'topic #'i id       => { append_id_link(sm, "topic", "forum-topic", "/forum_topics/"); };
   'comment #'i id     => { append_id_link(sm, "comment", "comment", "/comments/"); };
+  'dmail #'i id       => { append_id_link(sm, "dmail", "dmail", "/dmails/"); };
   'pool #'i id        => { append_id_link(sm, "pool", "pool", "/pools/"); };
   'user #'i id        => { append_id_link(sm, "user", "user", "/users/"); };
   'artist #'i id      => { append_id_link(sm, "artist", "artist", "/artists/"); };
@@ -210,6 +212,7 @@ inline := |*
   'implication #'i id => { append_id_link(sm, "implication", "tag-implication", "/tag_implications/"); };
   'favgroup #'i id    => { append_id_link(sm, "favgroup", "favorite-group", "/favorite_groups/"); };
   'mod action #'i id  => { append_id_link(sm, "mod action", "mod-action", "/mod_actions/"); };
+  'modreport #'i id   => { append_id_link(sm, "modreport", "moderation-report", "/moderation_reports/"); };
   'feedback #'i id    => { append_id_link(sm, "feedback", "user-feedback", "/user_feedbacks/"); };
   'wiki #'i id        => { append_id_link(sm, "wiki", "wiki-page", "/wiki_pages/"); };
 
@@ -225,6 +228,8 @@ inline := |*
   'yandere #'i id => { append_id_link(sm, "yandere", "yandere", "https://yande.re/post/show/"); };
   'sankaku #'i id => { append_id_link(sm, "sankaku", "sankaku", "https://chan.sankakucomplex.com/post/show/"); };
   'gelbooru #'i id => { append_id_link(sm, "gelbooru", "gelbooru", "https://gelbooru.com/index.php?page=post&s=view&id="); };
+
+  'dmail #'i id '/' dmail_key => { append_dmail_key_link(sm); };
 
   'topic #'i id '/p'i page => { append_paged_link(sm, "topic #", "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/", "?page="); };
   'pixiv #'i id '/p'i page => { append_paged_link(sm, "pixiv #", "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"https://www.pixiv.net/artworks/", "#"); };
@@ -977,6 +982,17 @@ static inline void append_paged_link(StateMachine * sm, const char * title, cons
   append_segment(sm, sm->a1, sm->a2 - 1);
   append(sm, "/p");
   append_segment(sm, sm->b1, sm->b2 - 1);
+  append(sm, "</a>");
+}
+
+static inline void append_dmail_key_link(StateMachine * sm) {
+  append(sm, "<a class=\"dtext-link dtext-id-link dtext-dmail-id-link\" href=\"/dmails/");
+  append_segment(sm, sm->a1, sm->a2 - 1);
+  append(sm, "?key=");
+  append_segment_uri_escaped(sm, sm->b1, sm->b2 - 1);
+  append(sm, "\">");
+  append(sm, "dmail #");
+  append_segment(sm, sm->a1, sm->a2 - 1);
   append(sm, "</a>");
 }
 
