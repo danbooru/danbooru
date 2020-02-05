@@ -453,24 +453,6 @@ class User < ApplicationRecord
       @upload_limit ||= UploadLimit.new(self)
     end
 
-    def base_upload_limit
-      if created_at >= 1.month.ago
-        10
-      elsif created_at >= 2.months.ago
-        20
-      elsif created_at >= 3.months.ago
-        30
-      elsif created_at >= 4.months.ago
-        40
-      else
-        50
-      end
-    end
-
-    def next_free_upload_slot
-      (posts.where("created_at >= ?", 23.hours.ago).first.try(:created_at) || 23.hours.ago) + 23.hours
-    end
-
     def tag_query_limit
       if is_platinum?
         Danbooru.config.base_tag_query_limit * 2
@@ -544,7 +526,7 @@ class User < ApplicationRecord
   module ApiMethods
     def api_attributes
       attributes = %i[
-        id created_at name inviter_id level base_upload_limit
+        id created_at name inviter_id level
         post_upload_count post_update_count note_update_count is_banned
         can_approve_posts can_upload_free is_super_voter level_string
       ]
@@ -559,7 +541,7 @@ class User < ApplicationRecord
           api_burst_limit remaining_api_limit statement_timeout
           favorite_group_limit favorite_limit tag_query_limit
           can_comment_vote? can_remove_from_pools? is_comment_limited?
-          can_comment? can_upload? max_saved_searches theme
+          can_comment? max_saved_searches theme
         ]
       end
 
@@ -573,7 +555,7 @@ class User < ApplicationRecord
         artist_commentary_version_count pool_version_count
         forum_post_count comment_count favorite_group_count
         appeal_count flag_count positive_feedback_count
-        neutral_feedback_count negative_feedback_count upload_limit
+        neutral_feedback_count negative_feedback_count
       ]
     end
 
