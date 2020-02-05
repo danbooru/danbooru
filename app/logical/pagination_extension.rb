@@ -104,7 +104,7 @@ module PaginationExtension
 
   # taken from kaminari (https://github.com/amatsuda/kaminari)
   def total_count
-    @paginator_count ||= except(:offset, :limit, :order).reorder(nil).count
+    @paginator_count ||= unscoped.from(except(:offset, :limit, :order).reorder(nil)).count
   rescue ActiveRecord::StatementInvalid => e
     if e.to_s =~ /statement timeout/
       1_000_000
