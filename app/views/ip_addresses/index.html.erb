@@ -21,5 +21,7 @@
     <% elsif @ip_addresses.present? %>
       <%= render "index" %>
     <% end %>
+
+    <%= numbered_paginator(@ip_addresses) %>
   </div>
 </div>
