@@ -1,4 +1,4 @@
-<div class="notice notice-info notice-large" id="dmail-notice" data-id="<%= latest_unread_dmail(CurrentUser.user) %>">
+<div class="notice notice-info notice-large" id="dmail-notice" data-id="<%= latest_unread_dmail(CurrentUser.user).id %>">
   <h2>You have <%= link_to "unread mail", dmails_path(search: { folder: "received" }) %>.</h2>
   <div><%= link_to "Close this", "#", id: "hide-dmail-notice" %></div>
 </div>
