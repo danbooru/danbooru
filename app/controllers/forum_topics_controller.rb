@@ -36,7 +36,8 @@ class ForumTopicsController < ApplicationController
       @forum_topic.mark_as_read!(CurrentUser.user)
     end
     @forum_posts = ForumPost.search(:topic_id => @forum_topic.id).reorder("forum_posts.id").paginate(params[:page])
-    @forum_posts = @forum_posts.reverse_order.includes(:creator).load if request.format.atom?
+    @forum_posts = @forum_posts.includes(:creator, :bulk_update_request)
+    @forum_posts = @forum_posts.reverse_order.load if request.format.atom?
     respond_with(@forum_topic)
   end
 

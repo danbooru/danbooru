@@ -90,18 +90,12 @@ class ForumPost < ApplicationRecord
     end
   end
 
-  def tag_change_request
-    bulk_update_request || tag_alias || tag_implication
-  end
-
   def reportable_by?(user)
     visible?(user) && creator_id != user.id && !creator.is_moderator?
   end
 
   def votable?
-    TagAlias.where(forum_post_id: id).exists? ||
-      TagImplication.where(forum_post_id: id).exists? ||
-      BulkUpdateRequest.where(forum_post_id: id).exists?
+    bulk_update_request.present? && bulk_update_request.is_pending?
   end
 
   def voted?(user, score)

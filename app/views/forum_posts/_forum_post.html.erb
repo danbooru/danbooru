@@ -40,7 +40,7 @@
         <% if forum_post.reportable_by?(CurrentUser.user) %>
           <li><%= link_to "Report", new_moderation_report_path(moderation_report: { model_type: "ForumPost", model_id: forum_post.id }), remote: true, title: "Report this forum post to the moderators" %></li>
         <% end %>
-        <% if forum_post.votable? %>
+        <% if forum_post.bulk_update_request.present? %>
           <ul class="votes" id="forum-post-votes-for-<%= forum_post.id %>">
             <%= render "forum_post_votes/list", votes: forum_post.votes, forum_post: forum_post %>
           </ul>
