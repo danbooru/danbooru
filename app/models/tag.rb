@@ -158,6 +158,8 @@ class Tag < ApplicationRecord
       end
 
       def category_for(tag_name, options = {})
+        return Tag.categories.general if tag_name.blank?
+
         if options[:disable_caching]
           select_category_for(tag_name)
         else
