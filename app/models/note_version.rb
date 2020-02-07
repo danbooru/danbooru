@@ -18,4 +18,30 @@ class NoteVersion < ApplicationRecord
     end
     @previous.first
   end
+
+  def self.status_fields
+    {
+      body: "Body",
+      was_moved: "Moved",
+      was_resized: "Resized",
+      was_deleted: "Deleted",
+      was_undeleted: "Undeleted",
+    }
+  end
+
+  def was_moved
+    x != previous.x || y != previous.y
+  end
+
+  def was_resized
+    width != previous.width || height != previous.height
+  end
+
+  def was_deleted
+    !is_active && previous.is_active
+  end
+
+  def was_undeleted
+    is_active && !previous.is_active
+  end
 end

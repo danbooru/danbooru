@@ -1,35 +1,39 @@
-<div id="p-<%= note_versions_listing_type %>-listing">
+<div id="p-<%= listing_type(:post_id, :note_id) %>-listing">
 
     <%= table_for @note_versions, {class: "striped autofit", width: "100%"} do |t| %>
       <% t.column "Post", width: "5%" do |note_version| %>
         <%= link_to note_version.post_id, post_path(note_version.post_id) %>
         <% if !params.dig(:search, :post_id).present? %>
-          <%= link_to "»", note_versions_path(search: {post_id: note_version.post_id}) %>
+          <%= link_to "»", note_versions_path(search: {post_id: note_version.post_id}, anchor: "note-version-#{note_version.id}") %>
         <% end %>
       <% end %>
       <% t.column "Note", width: "5%" do |note_version| %>
         <%= link_to "#{note_version.note_id}.#{note_version.version}", post_path(note_version.post_id, anchor: "note-#{note_version.note_id}") %>
         <% if !params.dig(:search, :note_id).present? %>
-          <%= link_to "»", note_versions_path(search: {note_id: note_version.note_id}) %>
+          <%= link_to "»", note_versions_path(search: {note_id: note_version.note_id}, anchor: "note-version-#{note_version.id}") %>
         <% end %>
       <% end %>
-      <% t.column "Body", td: {class: "col-expand"} do |note_version| %>
-        <%= h(note_version.body) %>
-        <% unless note_version.is_active? %>
-          <span class="inactive">(deleted)</span>
-        <% end %>
-        <%= note_version_body_diff_info(note_version) %>
+      <% t.column "Body", td: {class: "col-expand diff-body"} do |note_version| %>
+        <%= diff_body_html(note_version, note_version.previous, :body) %>
       <% end %>
-      <% t.column "Position", width: "5%" do |note_version| %>
+      <% t.column "Position (X,Y)", width: "5%", column: "position" do |note_version| %>
         <%= note_version_position_diff(note_version) %>
       <% end %>
-      <% t.column "Edited By", width: "10%" do |note_version| %>
+      <% t.column "Size (WxH)", width: "5%", column: "size"  do |note_version| %>
+        <%= note_version_size_diff(note_version) %>
+      <% end %>
+      <% t.column "Changes", width: "3%" do |note_version| %>
+        <%= status_diff_html(note_version) %>
+      <% end %>
+      <% t.column "Updated", width: "10%" do |note_version| %>
+        <div>
+          <%= compact_time note_version.updated_at %>
+        </div>
+        by
         <%= link_to_user note_version.updater %>
+        <%= link_to "»", note_versions_path(search: params[:search].merge({ updater_id: note_version.updater_id })) %>
       <% end %>
-      <% t.column "Date", width: "10%" do |note_version| %>
-        <%= compact_time note_version.updated_at %>
-      <% end %>
-      <% if note_versions_listing_type == :revert %>
+      <% if listing_type(:post_id, :note_id) == :revert %>
         <% t.column column: "control", width: "7%" do |note_version| %>
           <%= link_to "Revert to", revert_note_path(note_version.note_id, :version_id => note_version.id), :remote => true, :method => :put, :data => {:confirm => "Are you sure you want to revert to this version?"} %>
         <% end %>
