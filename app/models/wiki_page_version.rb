@@ -23,7 +23,10 @@ class WikiPageVersion < ApplicationRecord
   end
 
   def previous
-    WikiPageVersion.where("wiki_page_id = ? and id < ?", wiki_page_id, id).order("id desc").first
+    @previous ||= begin
+      WikiPageVersion.where("wiki_page_id = ? and id < ?", wiki_page_id, id).order("id desc").limit(1).to_a
+    end
+    @previous.first
   end
 
   def category_name

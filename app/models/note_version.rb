@@ -13,6 +13,9 @@ class NoteVersion < ApplicationRecord
   end
 
   def previous
-    NoteVersion.where("note_id = ? and updated_at < ?", note_id, updated_at).order("updated_at desc").first
+    @previous ||= begin
+      NoteVersion.where("note_id = ? and updated_at < ?", note_id, updated_at).order("updated_at desc").limit(1).to_a
+    end
+    @previous.first
   end
 end

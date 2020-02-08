@@ -24,6 +24,9 @@ class ArtistVersion < ApplicationRecord
   extend SearchMethods
 
   def previous
-    ArtistVersion.where("artist_id = ? and created_at < ?", artist_id, created_at).order("created_at desc").first
+    @previous ||= begin
+      ArtistVersion.where("artist_id = ? and created_at < ?", artist_id, created_at).order("created_at desc").limit(1).to_a
+    end
+    @previous.first
   end
 end

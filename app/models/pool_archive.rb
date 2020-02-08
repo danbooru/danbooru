@@ -108,7 +108,10 @@ class PoolArchive < ApplicationRecord
   end
 
   def previous
-    PoolArchive.where("pool_id = ? and version < ?", pool_id, version).order("version desc").first
+    @previous ||= begin
+      PoolArchive.where("pool_id = ? and version < ?", pool_id, version).order("version desc").limit(1).to_a
+    end
+    @previous.first
   end
 
   def pretty_name
