@@ -114,6 +114,37 @@ class PoolArchive < ApplicationRecord
     @previous.first
   end
 
+  def self.status_fields
+    {
+      name: "Renamed",
+      description: "Description",
+      was_deleted: "Deleted",
+      was_undeleted: "Undeleted",
+      was_activated: "Activated",
+      was_deactivated: "Deactivated",
+    }
+  end
+
+  def was_deleted
+    is_deleted && !previous.is_deleted
+  end
+
+  def was_undeleted
+    !is_deleted && previous.is_deleted
+  end
+
+  def was_activated
+    is_active && !previous.is_active
+  end
+
+  def was_deactivated
+    !is_active && previous.is_active
+  end
+
+  def text_field_changed
+    previous.present? && (name_changed || description_changed)
+  end
+
   def pretty_name
     name.tr("_", " ")
   end
