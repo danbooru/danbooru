@@ -14,4 +14,17 @@ class ArtistCommentaryVersion < ApplicationRecord
     end
     @previous.first
   end
+
+  def self.status_fields
+    {
+      original_title: "OrigTitle",
+      original_description: "OrigDesc",
+      translated_title: "TransTitle",
+      translated_description: "TransDesc",
+    }
+  end
+
+  def unchanged_empty?(field)
+    self[field].strip.empty? && (previous.nil? || previous[field].strip.empty?)
+  end
 end
