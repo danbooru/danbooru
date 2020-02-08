@@ -108,6 +108,15 @@ class PostArchive < ApplicationRecord
     post&.visible?
   end
 
+  def self.status_fields
+    {
+      tags: "Tags",
+      rating: "Rating",
+      parent_id: "Parent",
+      source: "Source",
+    }
+  end
+
   def diff(version = nil)
     if post.nil?
       latest_tags = tag_array
