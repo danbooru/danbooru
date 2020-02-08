@@ -1,11 +1,11 @@
-<div id="p-<%= wiki_page_versions_listing_type %>-listing">
+<div id="p-<%= listing_type(:wiki_page_id, member_check: false, types: [:page, :global]) %>-listing">
   <%= form_tag(diff_wiki_page_versions_path, :method => :get) do %>
     <%= table_for @wiki_page_versions, width: "100%" do |t| %>
       <% t.column column: "diff", width: "3%" do |wiki_page_version, i| %>
         <%= link_to_if wiki_page_version.previous.present?, "diff", diff_wiki_page_versions_path(otherpage: wiki_page_version.previous.try(:id), thispage: wiki_page_version.id) %>
       <% end %>
 
-      <% if wiki_page_versions_listing_type == :page %>
+      <% if listing_type(:wiki_page_id, member_check: false, types: [:page, :global]) == :page %>
         <% t.column column: "this-page", width: "2%" do |wiki_page_version, i| %>
           <%= radio_button_tag "thispage", wiki_page_version.id, (i == 1) %>
         <% end %>
@@ -21,10 +21,10 @@
           <%= link_to "»", wiki_page_versions_path(search: { wiki_page_id: wiki_page_version.wiki_page_id }) %>
         </span>
       <% end %>
-      <% t.column "Status", width: "5%" do |wiki_page_version| %>
-        <%= wiki_page_version_status_diff(wiki_page_version) %>
+      <% t.column "Changes", width: "5%" do |wiki_page_version| %>
+        <%= status_diff_html(wiki_page_version) %>
       <% end %>
-      <% t.column "Last edited", width: "26%" do |wiki_page_version| %>
+      <% t.column "Updated", width: "26%" do |wiki_page_version| %>
         <%= compact_time(wiki_page_version.updated_at) %>
         by
         <%= link_to_user wiki_page_version.updater %>
@@ -32,7 +32,7 @@
       <% end %>
     <% end %>
 
-    <% if wiki_page_versions_listing_type == :page %>
+    <% if listing_type(:wiki_page_id, member_check: false, types: [:page, :global]) == :page %>
       <%= submit_tag "Diff" %>
     <% end %>
   <% end %>

@@ -29,6 +29,28 @@ class WikiPageVersion < ApplicationRecord
     @previous.first
   end
 
+  def self.status_fields
+    {
+      body: "Body",
+      other_names_changed: "OtherNames",
+      title: "Renamed",
+      was_deleted: "Deleted",
+      was_undeleted: "Undeleted",
+    }
+  end
+
+  def other_names_changed
+    ((other_names - previous.other_names) | (previous.other_names - other_names)).length > 0
+  end
+
+  def was_deleted
+    is_deleted && !previous.is_deleted
+  end
+
+  def was_undeleted
+    !is_deleted && previous.is_deleted
+  end
+
   def category_name
     Tag.category_for(title)
   end
