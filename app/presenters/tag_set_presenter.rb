@@ -107,7 +107,7 @@ class TagSetPresenter < Presenter
     count = tag.post_count
     category = tag.category
 
-    html = %{<li class="category-#{tag.category}">}
+    html = %{<li class="tag-type-#{tag.category}">}
 
     unless name_only
       if category == Tag.categories.artist

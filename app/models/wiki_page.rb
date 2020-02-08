@@ -38,10 +38,6 @@ class WikiPage < ApplicationRecord
       where("is_deleted = false")
     end
 
-    def recent
-      order("updated_at DESC").limit(25)
-    end
-
     def other_names_include(name)
       name = normalize_other_name(name)
       subquery = WikiPage.from("unnest(other_names) AS other_name").where_iequals("other_name", name)
@@ -177,7 +173,7 @@ class WikiPage < ApplicationRecord
   end
 
   def category_name
-    Tag.category_for(title)
+    tag&.category
   end
 
   def pretty_title

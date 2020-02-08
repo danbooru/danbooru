@@ -3,6 +3,7 @@ class WikiPageVersion < ApplicationRecord
   belongs_to :wiki_page
   belongs_to_updater
   belongs_to :artist, optional: true
+  belongs_to :tag, primary_key: :name, foreign_key: :title, optional: true
 
   module SearchMethods
     def search(params)
@@ -49,10 +50,6 @@ class WikiPageVersion < ApplicationRecord
 
   def was_undeleted
     !is_deleted && previous.is_deleted
-  end
-
-  def category_name
-    Tag.category_for(title)
   end
 
   def self.available_includes

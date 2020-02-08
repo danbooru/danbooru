@@ -1,5 +1,7 @@
 class DtextLink < ApplicationRecord
   belongs_to :model, polymorphic: true
+  belongs_to :linked_wiki, primary_key: :title, foreign_key: :link_target, class_name: "WikiPage", optional: true
+
   enum link_type: [:wiki_link, :external_link]
 
   before_validation :normalize_link_target

@@ -1,6 +1,6 @@
 <div id="p-<%= listing_type(:wiki_page_id, member_check: false, types: [:page, :global]) %>-listing">
   <%= form_tag(diff_wiki_page_versions_path, :method => :get) do %>
-    <%= table_for @wiki_page_versions, width: "100%" do |t| %>
+    <%= table_for @wiki_page_versions.includes(:updater, :tag), width: "100%" do |t| %>
       <% t.column column: "diff", width: "3%" do |wiki_page_version, i| %>
         <%= link_to_if wiki_page_version.previous.present?, "diff", diff_wiki_page_versions_path(otherpage: wiki_page_version.previous.try(:id), thispage: wiki_page_version.id) %>
       <% end %>
@@ -15,7 +15,7 @@
       <% end %>
 
       <% t.column "Title" do |wiki_page_version| %>
-        <span class="category-<%= wiki_page_version.category_name %>">
+        <span class="<%= tag_class(wiki_page_version.tag) %>">
           <%= link_to "?", wiki_page_path(wiki_page_version.wiki_page_id) %>
           <%= link_to wiki_page_version.title, wiki_page_version %>
           <%= link_to "»", wiki_page_versions_path(search: { wiki_page_id: wiki_page_version.wiki_page_id }) %>

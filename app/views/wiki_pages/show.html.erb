@@ -6,7 +6,7 @@
 
 <% content_for(:content) do %>
   <h1 id="wiki-page-title">
-    <%= link_to @wiki_page.pretty_title, posts_path(:tags => @wiki_page.title), :class => "tag-type-#{@wiki_page.category_name}" %>
+    <%= link_to @wiki_page.pretty_title, posts_path(tags: @wiki_page.title), class: tag_class(@wiki_page.tag) %>
 
     <% if @wiki_page.is_locked? %>
       (locked)

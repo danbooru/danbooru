@@ -12,7 +12,7 @@
     <%= table_for @dtext_links, class: "striped autofit" do |t| %>
       <% t.column "Page" do |dtext_link| %>
         <% if dtext_link.model_type == "WikiPage" %>
-          <span class="category-<%= Tag.category_for(dtext_link.model.title) %>">
+          <span class="<%= tag_class(dtext_link.model.tag) %>">
             <%= link_to(dtext_link.model.title, dtext_link.model) %>
             <%= link_to("»", dtext_links_path(search: { model_type: "WikiPage", model: { title: dtext_link.model.title }})) %>
           </span>
@@ -25,7 +25,7 @@
         <% if dtext_link.external_link? %>
           <%= external_link_to(dtext_link.link_target) %>
         <% elsif dtext_link.wiki_link? %>
-          <%= link_to_wiki dtext_link.link_target, class: "tag-type-#{Tag.category_for(dtext_link.link_target)}" %>
+          <%= link_to_wiki dtext_link.link_target, class: tag_class(dtext_link.linked_wiki&.tag) %>
         <% end %>
 
         <%= link_to("»", dtext_links_path(search: { link_target: dtext_link.link_target })) %>

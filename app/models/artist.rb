@@ -354,10 +354,6 @@ class Artist < ApplicationRecord
   end
 
   module TagMethods
-    def category_name
-      Tag.category_for(name)
-    end
-
     def validate_tag_category
       return unless is_active? && name_changed?
 

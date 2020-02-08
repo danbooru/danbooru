@@ -7,8 +7,8 @@
     <%= table_for @tags, {class: "striped autofit"} do |t| %>
       <% t.column :post_count, name: "Count" %>
       <% t.column "Name", td: {class: "col-expand"} do |tag| %>
-        <%= link_to_wiki "?", tag.name, class: "tag-type-#{tag.category}" %>
-        <%= link_to tag.name, posts_path(tags: tag.name), class: "tag-type-#{tag.category}" %>
+        <%= link_to_wiki "?", tag.name, class: tag_class(tag) %>
+        <%= link_to tag.name, posts_path(tags: tag.name), class: tag_class(tag) %>
       <% end %>
       <% t.column column: "control" do |tag| %>
         <%= link_to_if tag.editable_by?(CurrentUser.user), "Edit", edit_tag_path(tag) %> |
