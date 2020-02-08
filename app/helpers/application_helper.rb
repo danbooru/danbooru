@@ -1,9 +1,36 @@
 require 'dtext'
 
 module ApplicationHelper
+  def listing_type(*fields, member_check: true, types: [:revert, :standard])
+    (fields.reduce(false) { |acc, field| acc || params.dig(:search, field).present? } && (!member_check || CurrentUser.is_member?) ? types[0] : types[1])
+  end
+
   def diff_list_html(new, old, latest, ul_class: ["diff-list"], li_class: [])
     diff = SetDiff.new(new, old, latest)
     render "diff_list", diff: diff, ul_class: ul_class, li_class: li_class
+  end
+
+  def diff_body_html(record, previous, field)
+    return h(record[field]).gsub(/\r?\n/, '<span class="paragraph-mark">¶</span><br>').html_safe if previous.blank?
+
+    pattern = Regexp.new('(?:<.+?>)|(?:\w+)|(?:[ \t]+)|(?:\r?\n)|(?:.+?)')
+    DiffBuilder.new(record[field], previous[field], pattern).build
+  end
+
+  def status_diff_html(record)
+    previous = record.previous
+
+    return "New" if previous.blank?
+
+    statuses = []
+    record.class.status_fields.each do |field, status|
+      if record.has_attribute?(field)
+        statuses += [status] if record[field] != previous[field]
+      else
+        statuses += [status] if record.send(field)
+      end
+    end
+    statuses.join("<br>").html_safe
   end
 
   def wordbreakify(string)
