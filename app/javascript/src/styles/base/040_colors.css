@@ -159,8 +159,6 @@
 
   --error-message-color: #A00;
 
-  --new-artist-color: #A00;
-
   --bulk-update-request-approved-color: green;
   --bulk-update-request-failed-color: red;
 
@@ -441,7 +439,6 @@ body[data-current-user-theme="dark"] {
 
   --low-post-count-color: var(--red-1);
   --login-link-color: var(--red-1);
-  --new-artist-color: var(--red-1);
   --remove-favorite-button: var(--red-1);
   --fetch-source-data-border: 1px solid var(--grey-4);
   --quick-search-form-background: var(--grey-1);

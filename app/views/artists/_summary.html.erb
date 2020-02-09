@@ -3,13 +3,26 @@
   <li><strong>Status</strong> <%= artist.status %></li>
 
   <% if artist.other_names.present? %>
-    <li><strong>Other Names</strong> <%= link_to_artists(artist.other_names) %></li>
+    <li>
+      <strong>Other Names</strong>
+      <% artist.other_names.map do |other_name| %>
+        <%= link_to other_name, artists_path(search: { any_name_matches: other_name }), class: "artist-other-name" %>
+      <% end %>
+    </li>
   <% end %>
   <% if artist.group_name.present? %>
-    <li><strong>Group</strong> <%= link_to_artist(artist.group_name) %></li>
+    <li>
+      <strong>Group</strong>
+      <%= link_to artist.group_name, artists_path(search: { group_name: artist.group_name }) %>
+    </li>
   <% end %>
   <% if artist.members.present? %>
-    <li><strong>Members</strong> <%= link_to_artists(artist.members.map(&:name)) %></li>
+    <li>
+      <strong>Members</strong>
+      <% artist.members.each do |member_name| %>
+        <%= link_to member_name, artists_path(search: { name: member_name }) %>
+      <% end %>
+    </li>
   <% end %>
   <% if artist.domains.any? %>
     <li><strong>Domains</strong></li>
