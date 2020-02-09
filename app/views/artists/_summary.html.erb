@@ -24,14 +24,6 @@
       <% end %>
     </li>
   <% end %>
-  <% if artist.domains.any? %>
-    <li><strong>Domains</strong></li>
-    <ul class="list-bulleted">
-      <% artist.domains.each do |url, count| %>
-        <li><%= url %>: <%= count %></li>
-      <% end %>
-    </ul>
-  <% end %>
   <% if artist.urls.present? %>
     <li><strong>URLs</strong></li>
     <ul>

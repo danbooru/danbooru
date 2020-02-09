@@ -170,10 +170,6 @@ class Artist < ApplicationRecord
       end
     end
 
-    included do
-      memoize :domains
-    end
-
     def sorted_urls
       urls.sort {|a, b| a.priority <=> b.priority}
     end
@@ -199,31 +195,6 @@ class Artist < ApplicationRecord
 
     def clear_url_string_changed
       self.url_string_changed = false
-    end
-
-    def map_domain(x)
-      case x
-      when "pximg.net"
-        "pixiv.net"
-
-      when "deviantart.net"
-        "deviantart.com"
-
-      else
-        x
-      end
-    end
-
-    def domains
-      Cache.get("artist-domains-#{id}", 1.day) do
-        domains = Post.raw_tag_match(name).pluck(:source).map do |x|
-          map_domain(Addressable::URI.parse(x).domain)
-        rescue Addressable::URI::InvalidURIError
-          nil
-        end
-
-        domains.compact.inject(Hash.new(0)) {|h, x| h[x] += 1; h}.sort {|a, b| b[1] <=> a[1]}
-      end
     end
   end
 
