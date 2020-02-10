@@ -1,23 +1,21 @@
-<div id="p-<%= artist_versions_listing_type %>-listing">
+<div id="p-<%= listing_type(:artist_id) %>-listing">
 
     <%= table_for @artist_versions, {class: "striped autofit", width: "100%"} do |t| %>
       <% t.column "Name" do |artist_version| %>
         <%= link_to artist_version.name, artist_path(artist_version.artist_id) %>
-        <%= link_to "»", artist_versions_path(search: {artist_id: artist_version.artist_id}) %>
-
-        <% if !artist_version.is_active? %>
-          (deleted)
-        <% end %>
-
-        <% if artist_version.group_name.present? %>
-          <p>(group: <%= artist_version.group_name %>)</p>
-        <% end %>
+        <%= link_to "»", artist_versions_path(search: {artist_id: artist_version.artist_id}, anchor: "artist-version-#{artist_version.id}") %>
       <% end %>
       <% t.column "Other Names" do |artist_version| %>
+        <% if artist_version.group_name.present? %>
+          <p><b>Group:</b><br>&ensp;<%= artist_version.group_name %></p>
+        <% end %>
         <%= artist_version_other_names_diff(artist_version) %>
       <% end %>
       <% t.column "URLs", td: {class: "col-expand"} do |artist_version| %>
         <%= artist_version_urls_diff(artist_version) %>
+      <% end %>
+      <% t.column "Changes" do |artist_version| %>
+        <%= status_diff_html(artist_version) %>
       <% end %>
       <% t.column "Updated" do |artist_version| %>
         <%= link_to_user artist_version.updater %>
@@ -26,7 +24,7 @@
           <%= compact_time(artist_version.updated_at) %>
         </p>
       <% end %>
-      <% if artist_versions_listing_type == :revert %>
+      <% if listing_type(:artist_id) == :revert %>
         <% t.column column: "control" do |artist_version| %>
           <%= link_to "Revert to", revert_artist_path(artist_version.artist_id, version_id: artist_version.id), method: :put, "data-confirm": "Are you sure you want to revert to this version?" %>
         <% end %>

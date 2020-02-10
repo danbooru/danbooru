@@ -1,33 +1,60 @@
-<div id="p-<%= artist_commentary_versions_listing_type %>-listing">
+<div id="p-<%= listing_type(:post_id) %>-listing">
 
-  <%= table_for @commentary_versions, {class: "striped autofit", width: "100%"} do |t| %>
-    <% t.column "Post", width: "5%" do |commentary_version| %>
-      <% if artist_commentary_versions_listing_type == :revert %>
-        <%= link_to commentary_version.post_id, post_path(commentary_version.post_id) %>
-      <% else %>
-        <%= PostPresenter.preview(commentary_version.post, :tags => "status:any") %>
+  <% if listing_type(:post_id) == :revert %>
+    <%= PostPresenter.preview(@commentary_versions.first.post, show_deleted: true) %>
+  <% end %>
+
+  <%= table_for @commentary_versions, {class: "striped", width: "100%"} do |t| %>
+    <% if listing_type(:post_id) == :standard %>
+      <% t.column "Post", width: "1%" do |commentary_version| %>
+          <%= PostPresenter.preview(commentary_version.post, :tags => "status:any") %>
       <% end %>
     <% end %>
-    <% if artist_commentary_versions_listing_type == :standard %>
-      <% t.column "Version" do |commentary_version| %>
-        <%= link_to "#{commentary_version.post_id}.#{commentary_version.id}»", artist_commentary_versions_path(search: {post_id: commentary_version.post_id}) %>
+    <% if listing_type(:post_id) == :standard %>
+      <% t.column "Version", width: "3%" do |commentary_version| %>
+        <%= link_to "#{commentary_version.post_id}.#{commentary_version.id}»", artist_commentary_versions_path(search: {post_id: commentary_version.post_id}, anchor: "artist-commentary-version-#{commentary_version.id}") %>
       <% end %>
     <% end %>
-    <% t.column "Original" do |commentary_version| %>
-      <%= format_commentary_title(commentary_version.original_title) %>
-      <%= format_commentary_description(commentary_version.original_description) %>
+    <% t.column "Original", width: "40%", td: {class: "diff-body"} do |commentary_version| %>
+      <% if !commentary_version.unchanged_empty?(:original_title) %>
+        <b>Title:</b>
+        <div class="commentary-body-section">
+          <%= diff_body_html(commentary_version, commentary_version.previous, :original_title) %>
+        </div>
+      <% end %>
+      <% if !commentary_version.unchanged_empty?(:original_description) %>
+        <b>Description:</b>
+        <div class="commentary-body-section">
+          <%= diff_body_html(commentary_version, commentary_version.previous, :original_description) %>
+        </div>
+      <% end %>
     <% end %>
-    <% t.column "Translated" do |commentary_version| %>
-      <%= format_commentary_title(commentary_version.translated_title) %>
-      <%= format_commentary_description(commentary_version.translated_description) %>
+    <% t.column "Translated", width: "40%", td: {class: "diff-body"} do |commentary_version| %>
+      <% if !commentary_version.unchanged_empty?(:translated_title) %>
+        <b>Title:</b>
+        <div class="commentary-body-section">
+          <%= diff_body_html(commentary_version, commentary_version.previous, :translated_title) %>
+        </div>
+      <% end %>
+      <% if !commentary_version.unchanged_empty?(:translated_description) %>
+        <b>Description:</b>
+        <div class="commentary-body-section">
+          <%= diff_body_html(commentary_version, commentary_version.previous, :translated_description) %>
+        </div>
+      <% end %>
     <% end %>
-    <% t.column "Edited by", width: "10%" do |commentary_version| %>
+    <% t.column "Changes", width: "3%" do |commentary_version| %>
+      <%= status_diff_html(commentary_version) %>
+    <% end %>
+    <% t.column "Updated", width: "10%" do |commentary_version| %>
+      <div>
+        <%= compact_time commentary_version.updated_at %>
+      </div>
+      by
       <%= link_to_user commentary_version.updater %>
+      <%= link_to "»", artist_commentary_versions_path(search: params[:search].merge({ updater_id: commentary_version.updater_id })) %>
     <% end %>
-    <% t.column "Date", width: "10%" do |commentary_version| %>
-      <%= compact_time commentary_version.updated_at %>
-    <% end %>
-    <% if artist_commentary_versions_listing_type == :revert %>
+    <% if listing_type(:post_id) == :revert %>
       <% t.column column: "control", width: "7%" do |commentary_version| %>
         <%= link_to "Revert to", revert_artist_commentary_path(commentary_version.post_id, :version_id => commentary_version.id), :remote => true, :method => :put, :data => {:confirm => "Are you sure you want to revert to this version?"} %>
       <% end %>

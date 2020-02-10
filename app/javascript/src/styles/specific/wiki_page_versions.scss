@@ -1,21 +1,17 @@
 div#c-wiki-page-versions {
   #a-diff {
-    del, .wiki-other-names-diff-list .removed {
+    ul.wiki-other-names-diff-list li.removed {
       background: var(--wiki-page-versions-diff-del-background);
       text-decoration: none;
     }
 
-    ins, .wiki-other-names-diff-list .added {
+    ul.wiki-other-names-diff-list li.added {
       background: var(--wiki-page-versions-diff-ins-background);
       text-decoration: none;
     }
 
-    .wiki-other-names-diff-list .obsolete {
+    ul.wiki-other-names-diff-list li.obsolete {
       text-decoration: dotted underline;
-    }
-
-    span.paragraph-mark {
-      opacity: 0.25;
     }
   }
 

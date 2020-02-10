@@ -1,0 +1,15 @@
+div#c-artist-commentary-versions {
+  #a-index {
+    div.commentary-body-section {
+      padding: 0.5em;
+      margin-bottom: 0.5em;
+      border: var(--footer-border);
+    }
+
+    td.original-column,
+    td.translated-column {
+      padding-top: 0.5em;
+      vertical-align: top;
+    }
+  }
+}

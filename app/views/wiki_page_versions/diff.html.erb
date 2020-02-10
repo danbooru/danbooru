@@ -10,7 +10,7 @@
 
   <%= wiki_other_names_diff(@thispage, @otherpage) %>
 
-  <div>
-    <%= wiki_body_diff(@thispage, @otherpage) %>
+  <div class="diff-body">
+    <%= diff_body_html(@thispage, @otherpage, :body) %>
   </div>
 <% end %>

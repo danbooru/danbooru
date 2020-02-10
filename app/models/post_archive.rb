@@ -92,17 +92,29 @@ class PostArchive < ApplicationRecord
   end
 
   def previous
-    # HACK: if all the post versions for this post have already been preloaded,
-    # we can use that to avoid a SQL query.
-    if association(:post).loaded? && post && post.association(:versions).loaded?
-      post.versions.sort_by(&:version).reverse.find { |v| v.version < version }
-    else
-      PostArchive.where("post_id = ? and version < ?", post_id, version).order("version desc").first
+    @previous ||= begin
+      # HACK: if all the post versions for this post have already been preloaded,
+      # we can use that to avoid a SQL query.
+      if association(:post).loaded? && post && post.association(:versions).loaded?
+        ver = [post.versions.sort_by(&:version).reverse.find { |v| v.version < version }]
+      else
+        ver = PostArchive.where("post_id = ? and version < ?", post_id, version).order("version desc").limit(1).to_a
+      end
     end
+    @previous.first
   end
 
   def visible?
     post&.visible?
+  end
+
+  def self.status_fields
+    {
+      tags: "Tags",
+      rating: "Rating",
+      parent_id: "Parent",
+      source: "Source",
+    }
   end
 
   def diff(version = nil)

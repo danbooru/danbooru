@@ -24,6 +24,46 @@ class ArtistVersion < ApplicationRecord
   extend SearchMethods
 
   def previous
-    ArtistVersion.where("artist_id = ? and created_at < ?", artist_id, created_at).order("created_at desc").first
+    @previous ||= begin
+      ArtistVersion.where("artist_id = ? and created_at < ?", artist_id, created_at).order("created_at desc").limit(1).to_a
+    end
+    @previous.first
+  end
+
+  def self.status_fields
+    {
+      name: "Renamed",
+      urls_changed: "URLs",
+      other_names_changed: "OtherNames",
+      group_name: "GroupName",
+      was_deleted: "Deleted",
+      was_undeleted: "Undeleted",
+      was_banned: "Banned",
+      was_unbanned: "Unbanned",
+    }
+  end
+
+  def other_names_changed
+    ((other_names - previous.other_names) | (previous.other_names - other_names)).length > 0
+  end
+
+  def urls_changed
+    ((urls - previous.urls) | (previous.urls - urls)).length > 0
+  end
+
+  def was_deleted
+    !is_active && previous.is_active
+  end
+
+  def was_undeleted
+    is_active && !previous.is_active
+  end
+
+  def was_banned
+    is_banned && !previous.is_banned
+  end
+
+  def was_unbanned
+    !is_banned && previous.is_banned
   end
 end

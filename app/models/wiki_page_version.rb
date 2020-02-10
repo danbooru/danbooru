@@ -23,7 +23,32 @@ class WikiPageVersion < ApplicationRecord
   end
 
   def previous
-    WikiPageVersion.where("wiki_page_id = ? and id < ?", wiki_page_id, id).order("id desc").first
+    @previous ||= begin
+      WikiPageVersion.where("wiki_page_id = ? and id < ?", wiki_page_id, id).order("id desc").limit(1).to_a
+    end
+    @previous.first
+  end
+
+  def self.status_fields
+    {
+      body: "Body",
+      other_names_changed: "OtherNames",
+      title: "Renamed",
+      was_deleted: "Deleted",
+      was_undeleted: "Undeleted",
+    }
+  end
+
+  def other_names_changed
+    ((other_names - previous.other_names) | (previous.other_names - other_names)).length > 0
+  end
+
+  def was_deleted
+    is_deleted && !previous.is_deleted
+  end
+
+  def was_undeleted
+    !is_deleted && previous.is_deleted
   end
 
   def category_name
