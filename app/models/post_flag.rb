@@ -155,7 +155,7 @@ class PostFlag < ApplicationRecord
   end
 
   def uploader_id
-    @uploader_id ||= Post.find(post_id).uploader_id
+    post.uploader_id
   end
 
   def not_uploaded_by?(userid)
