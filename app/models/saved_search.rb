@@ -171,4 +171,8 @@ class SavedSearch < ApplicationRecord
   def disable_labels=(value)
     CurrentUser.update(disable_categorized_saved_searches: true) if value.to_s.truthy?
   end
+
+  def self.available_includes
+    [:user]
+  end
 end

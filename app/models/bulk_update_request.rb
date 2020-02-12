@@ -216,4 +216,8 @@ class BulkUpdateRequest < ApplicationRecord
       forum_topic_id
     )
   end
+
+  def self.available_includes
+    [:user, :forum_topic, :forum_post, :approver]
+  end
 end

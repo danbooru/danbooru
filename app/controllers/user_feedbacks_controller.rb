@@ -19,7 +19,7 @@ class UserFeedbacksController < ApplicationController
   end
 
   def index
-    @user_feedbacks = UserFeedback.includes(:user, :creator).paginated_search(params, count_pages: true)
+    @user_feedbacks = UserFeedback.paginated_search(params, count_pages: true).includes(model_includes(params))
     respond_with(@user_feedbacks)
   end
 
@@ -36,6 +36,14 @@ class UserFeedbacksController < ApplicationController
   end
 
   private
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      []
+    else
+      [:user, :creator]
+    end
+  end
 
   def check_privilege(user_feedback)
     raise User::PrivilegeError unless user_feedback.editable_by?(CurrentUser.user)

@@ -40,4 +40,8 @@ class PostApproval < ApplicationRecord
     q = q.search_attributes(params, :user, :post)
     q.apply_default_order(params)
   end
+
+  def self.available_includes
+    [:user, :post]
+  end
 end

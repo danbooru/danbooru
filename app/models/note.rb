@@ -158,4 +158,8 @@ class Note < ApplicationRecord
       end
     end
   end
+
+  def self.available_includes
+    [:creator, :post]
+  end
 end

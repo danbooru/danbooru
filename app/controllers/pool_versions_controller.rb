@@ -8,7 +8,7 @@ class PoolVersionsController < ApplicationController
       @pool = Pool.find(params[:search][:pool_id])
     end
 
-    @pool_versions = PoolArchive.paginated_search(params).includes(:updater, :pool)
+    @pool_versions = PoolArchive.paginated_search(params).includes(model_includes(params))
     respond_with(@pool_versions)
   end
 
@@ -26,6 +26,18 @@ class PoolVersionsController < ApplicationController
   end
 
   private
+
+  def model_name
+    "PoolArchive"
+  end
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      []
+    else
+      [:updater, :pool]
+    end
+  end
 
   def set_timeout
     PoolArchive.connection.execute("SET statement_timeout = #{CurrentUser.user.statement_timeout}")

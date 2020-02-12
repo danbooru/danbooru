@@ -3,7 +3,7 @@ class ForumPostVotesController < ApplicationController
   before_action :member_only, only: [:create, :destroy]
 
   def index
-    @forum_post_votes = ForumPostVote.includes(creator: [], forum_post: [:topic]).paginated_search(params, count_pages: true)
+    @forum_post_votes = ForumPostVote.paginated_search(params, count_pages: true).includes(model_includes(params))
     respond_with(@forum_post_votes)
   end
 
@@ -20,6 +20,14 @@ class ForumPostVotesController < ApplicationController
   end
 
   private
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      []
+    else
+      [:creator, {forum_post: [:topic]}]
+    end
+  end
 
   def forum_post_vote_params
     params.fetch(:forum_post_vote, {}).permit(:score)

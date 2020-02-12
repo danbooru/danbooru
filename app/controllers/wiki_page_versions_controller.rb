@@ -3,7 +3,7 @@ class WikiPageVersionsController < ApplicationController
   layout "sidebar"
 
   def index
-    @wiki_page_versions = WikiPageVersion.paginated_search(params)
+    @wiki_page_versions = WikiPageVersion.paginated_search(params).includes(model_includes(params))
     respond_with(@wiki_page_versions)
   end
 
@@ -26,5 +26,15 @@ class WikiPageVersionsController < ApplicationController
     end
 
     respond_with([@thispage, @otherpage])
+  end
+
+  private
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      []
+    else
+      [:updater]
+    end
   end
 end

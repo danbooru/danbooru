@@ -754,4 +754,8 @@ class User < ApplicationRecord
   def dtext_shortlink(**options)
     "<@#{name}>"
   end
+
+  def self.available_includes
+    [:inviter]
+  end
 end

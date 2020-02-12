@@ -5,7 +5,7 @@ class PostVotesController < ApplicationController
   rescue_with PostVote::Error, status: 422
 
   def index
-    @post_votes = PostVote.includes(:user, post: [:uploader]).paginated_search(params, count_pages: true)
+    @post_votes = PostVote.paginated_search(params, count_pages: true).includes(model_includes(params))
     respond_with(@post_votes)
   end
 
@@ -21,5 +21,15 @@ class PostVotesController < ApplicationController
     @post.unvote!
 
     respond_with(@post)
+  end
+
+  private
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      []
+    else
+      [:user, {post: [:uploader]}]
+    end
   end
 end

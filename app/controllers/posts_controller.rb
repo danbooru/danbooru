@@ -11,7 +11,7 @@ class PostsController < ApplicationController
       end
     else
       @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], raw: params[:raw], random: params[:random], format: params[:format])
-      @posts = @post_set.posts
+      @posts = @post_set.posts = @post_set.posts.includes(model_includes(params)) if !@post_set.is_random?
       respond_with(@posts) do |format|
         format.atom
       end
@@ -95,6 +95,14 @@ class PostsController < ApplicationController
   end
 
   private
+
+  def default_includes(params)
+    if ["json", "xml", "atom"].include?(params[:format])
+      [:uploader]
+    else
+      (CurrentUser.user.is_moderator? ? [:uploader] : [])
+    end
+  end
 
   def tag_query
     params[:tags] || (params[:post] && params[:post][:tags])

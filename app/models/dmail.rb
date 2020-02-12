@@ -195,4 +195,10 @@ class Dmail < ApplicationRecord
   def dtext_shortlink(key: false, **options)
     key ? "dmail ##{id}/#{self.key}" : "dmail ##{id}"
   end
+
+  def self.available_includes
+    includes_array = [:owner, :to, :from]
+    includes_array << :moderation_reports if CurrentUser.is_moderator?
+    includes_array
+  end
 end

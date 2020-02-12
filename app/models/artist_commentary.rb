@@ -144,4 +144,8 @@ class ArtistCommentary < ApplicationRecord
 
   extend SearchMethods
   include VersionMethods
+
+  def self.available_includes
+    [:post]
+  end
 end

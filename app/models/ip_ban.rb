@@ -42,4 +42,8 @@ class IpBan < ApplicationRecord
     str += "/" + ip_addr.prefix.to_s if has_subnet?
     str
   end
+
+  def self.available_includes
+    [:creator]
+  end
 end

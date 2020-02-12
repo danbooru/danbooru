@@ -23,10 +23,7 @@ class ForumTopicsController < ApplicationController
     params[:search][:order] ||= "sticky" if request.format == Mime::Type.lookup("text/html")
     params[:limit] ||= 40
 
-    @forum_topics = ForumTopic.paginated_search(params)
-
-    @forum_topics = @forum_topics.includes(:creator, :updater, :forum_topic_visit_by_current_user).load if request.format.html?
-    @forum_topics = @forum_topics.includes(:creator, :original_post).load if request.format.atom?
+    @forum_topics = ForumTopic.paginated_search(params).includes(model_includes(params))
 
     respond_with(@forum_topics)
   end
@@ -79,6 +76,16 @@ class ForumTopicsController < ApplicationController
   end
 
   private
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      []
+    elsif params[:format] == "atom"
+      [:creator, :original_post]
+    else
+      [:creator, :updater, :forum_topic_visit_by_current_user]
+    end
+  end
 
   def normalize_search
     if params[:title_matches]

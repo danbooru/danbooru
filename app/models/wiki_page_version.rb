@@ -54,4 +54,8 @@ class WikiPageVersion < ApplicationRecord
   def category_name
     Tag.category_for(title)
   end
+
+  def self.available_includes
+    [:updater, :wiki_page, :artist]
+  end
 end

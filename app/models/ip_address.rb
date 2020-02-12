@@ -49,4 +49,8 @@ class IpAddress < ApplicationRecord
   def html_data_attributes
     super & attributes.keys.map(&:to_sym)
   end
+
+  def self.available_includes
+    [:user, :model]
+  end
 end

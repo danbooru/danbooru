@@ -177,4 +177,10 @@ class ForumTopic < ApplicationRecord
   def update_orignal_post
     original_post&.update_columns(:updater_id => updater.id, :updated_at => Time.now)
   end
+
+  def self.available_includes
+    includes_array = [:creator, :updater, :original_post]
+    includes_array << :moderation_reports if CurrentUser.is_moderator?
+    includes_array
+  end
 end

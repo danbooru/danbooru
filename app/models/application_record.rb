@@ -322,6 +322,26 @@ class ApplicationRecord < ActiveRecord::Base
         @api_attributes += including
         @api_attributes
       end
+
+      def available_includes
+        []
+      end
+
+      def multiple_includes
+        reflections.reject { |k,v| v.macro != :has_many }.keys.map(&:to_sym)
+      end
+
+      def associated_models(name)
+        if reflections[name].options[:polymorphic]
+          associated_models = reflections[name].active_record.try(:model_types) || []
+        else
+          associated_models = [reflections[name].class_name]
+        end
+      end
+    end
+
+    def available_includes
+      self.class.available_includes
     end
 
     def api_attributes
@@ -338,25 +358,24 @@ class ApplicationRecord < ActiveRecord::Base
 
     def serializable_hash(options = {})
       options ||= {}
-      options[:only] ||= []
-      options[:include] ||= []
-      options[:methods] ||= []
+      if options[:only] && options[:only].is_a?(String)
+        options.delete(:methods)
+        options.delete(:include)
+        options.merge!(ParameterBuilder.serial_parameters(options[:only], self))
+      else
+        options[:methods] ||= []
+        attributes, methods = api_attributes.partition { |attr| has_attribute?(attr) }
+        methods += options[:methods]
+        options[:only] ||= attributes + methods
 
-      options[:only] = options[:only].map(&:to_sym)
-
-      attributes, methods = api_attributes.partition { |attr| has_attribute?(attr) }
-      methods += options[:methods]
-      includes = options[:include]
-
-      if options[:only].present?
         attributes &= options[:only]
         methods &= options[:only]
-        includes &= options[:only]
-      end
 
-      options[:only] = attributes
-      options[:methods] = methods
-      options[:include] = includes
+        options[:only] = attributes
+        options[:methods] = methods
+
+        options.delete(:methods) if options[:methods].empty?
+      end
 
       hash = super(options)
       hash.transform_keys { |key| key.delete("?") }

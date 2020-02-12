@@ -10,7 +10,7 @@ class ModerationReportsController < ApplicationController
   end
 
   def index
-    @moderation_reports = ModerationReport.paginated_search(params, count_pages: true).includes(:creator, :model)
+    @moderation_reports = ModerationReport.paginated_search(params, count_pages: true).includes(model_includes(params))
     respond_with(@moderation_reports)
   end
 
@@ -28,6 +28,14 @@ class ModerationReportsController < ApplicationController
   end
 
   private
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      []
+    else
+      [:creator, :model]
+    end
+  end
 
   def model_type
     params.fetch(:moderation_report, {}).fetch(:model_type)

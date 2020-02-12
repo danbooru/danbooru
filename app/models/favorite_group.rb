@@ -168,4 +168,8 @@ class FavoriteGroup < ApplicationRecord
   def viewable_by?(user)
     creator_id == user.id || is_public
   end
+
+  def self.available_includes
+    [:creator]
+  end
 end

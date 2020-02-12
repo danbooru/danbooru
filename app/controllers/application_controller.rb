@@ -34,6 +34,25 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def model_includes(params, model = nil)
+    if params[:only] && ["json", "xml"].include?(params[:format])
+      includes_array = ParameterBuilder.includes_parameters(params[:only], model_name)
+    elsif params[:action] == "index"
+      includes_array = default_includes(params)
+    else
+      includes_array = []
+    end
+    includes_array
+  end
+
+  def default_includes(*)
+    []
+  end
+
+  def model_name
+    controller_name.classify
+  end
+
   def redirect_to_show(items)
     redirect_to send("#{controller_path.singularize}_path", items.first, format: request.format.symbol)
   end

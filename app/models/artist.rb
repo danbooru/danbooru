@@ -508,4 +508,8 @@ class Artist < ApplicationRecord
       "Deleted"
     end
   end
+
+  def self.available_includes
+    [:creator, :members, :urls, :wiki_page, :tag_alias, :tag]
+  end
 end

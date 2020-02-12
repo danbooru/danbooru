@@ -223,4 +223,10 @@ class ForumPost < ApplicationRecord
   def dtext_shortlink
     "forum ##{id}"
   end
+
+  def self.available_includes
+    includes_array = [:creator, :updater, :topic, :dtext_links, :votes, :tag_alias, :tag_implication, :bulk_update_request]
+    includes_array << :moderation_reports if CurrentUser.is_moderator?
+    includes_array
+  end
 end

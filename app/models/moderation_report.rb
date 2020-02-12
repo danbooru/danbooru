@@ -19,6 +19,10 @@ class ModerationReport < ApplicationRecord
     !Rails.env.production?
   end
 
+  def self.model_types
+    %w[User Dmail Comment ForumPost]
+  end
+
   def forum_topic_title
     "Reports requiring moderation"
   end
@@ -82,5 +86,9 @@ class ModerationReport < ApplicationRecord
     q = q.search_attributes(params, :model_type, :model_id, :creator_id)
 
     q.apply_default_order(params)
+  end
+
+  def self.available_includes
+    [:creator, :model]
   end
 end

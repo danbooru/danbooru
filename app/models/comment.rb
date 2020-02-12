@@ -174,4 +174,10 @@ class Comment < ApplicationRecord
   def quoted_response
     DText.quote(body, creator.name)
   end
+
+  def self.available_includes
+    includes_array = [:post, :creator, :updater]
+    includes_array << :moderation_reports if CurrentUser.is_moderator?
+    includes_array
+  end
 end

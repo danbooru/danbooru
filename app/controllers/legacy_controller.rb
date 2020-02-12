@@ -3,6 +3,7 @@ class LegacyController < ApplicationController
 
   def posts
     @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], format: "json")
+    @post_set.posts = @post_set.posts.includes(:uploader)
     @posts = @post_set.posts.map(&:legacy_attributes)
 
     respond_with(@posts) do |format|
