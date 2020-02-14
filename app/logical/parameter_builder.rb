@@ -52,7 +52,6 @@ class ParameterBuilder
     # Attributes and/or methods may be included in the final pass, but not includes
     seen_objects << model_name
     only_array.each do |item|
-      binding.pry
       match = item.match(/(\w+)\[(.+?)\]$/)
       item = (match || [])[1] || item
       item_sym = item.to_sym
