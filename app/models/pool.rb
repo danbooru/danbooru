@@ -312,4 +312,8 @@ class Pool < ApplicationRecord
       errors[:base] << "You cannot removes posts from pools within the first week of sign up"
     end
   end
+
+  def self.available_includes
+    [:creator]
+  end
 end

@@ -24,7 +24,7 @@ class ForumPostsController < ApplicationController
   end
 
   def index
-    @forum_posts = ForumPost.paginated_search(params).includes(:topic)
+    @forum_posts = ForumPost.paginated_search(params).includes(model_includes(params))
     respond_with(@forum_posts)
   end
 
@@ -67,6 +67,14 @@ class ForumPostsController < ApplicationController
   end
 
   private
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      []
+    else
+      [:topic, :creator]
+    end
+  end
 
   def load_post
     @forum_post = ForumPost.find(params[:id])

@@ -3,10 +3,10 @@ class ArtistUrlsController < ApplicationController
   before_action :member_only, except: [:index]
 
   def index
-    @artist_urls = ArtistUrl.includes(:artist).paginated_search(params)
+    @artist_urls = ArtistUrl.paginated_search(params).includes(model_includes(params))
     respond_with(@artist_urls) do |format|
-      format.json { render json: @artist_urls.to_json(include: "artist") }
-      format.xml { render xml: @artist_urls.to_xml(include: "artist", root: "artist-urls") }
+      format.json { render json: @artist_urls.to_json(format_params) }
+      format.xml { render xml: @artist_urls.to_xml(format_params) }
     end
   end
 
@@ -17,6 +17,27 @@ class ArtistUrlsController < ApplicationController
   end
 
   private
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      [{artist: [:urls]}]
+    else
+      [:artist]
+    end
+  end
+
+  def format_params
+    param_hash = {}
+    if params[:only]
+      param_hash[:only] = params[:only]
+    else
+      param_hash[:include] = [:artist]
+    end
+    if request.format.symbol == :xml
+      param_hash[:root] = "artist-urls"
+    end
+    param_hash
+  end
 
   def artist_url_params
     permitted_params = %i[is_active]

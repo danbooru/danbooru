@@ -155,10 +155,16 @@ class PostFlag < ApplicationRecord
   end
 
   def uploader_id
-    @uploader_id ||= Post.find(post_id).uploader_id
+    post.uploader_id
   end
 
   def not_uploaded_by?(userid)
     uploader_id != userid
+  end
+
+  def self.available_includes
+    includes_array = [:post]
+    includes_array << :creator if CurrentUser.user.is_moderator?
+    includes_array
   end
 end

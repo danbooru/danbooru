@@ -247,4 +247,8 @@ class Upload < ApplicationRecord
   def upload_as_pending?
     as_pending.to_s.truthy?
   end
+
+  def self.available_includes
+    [:uploader, :post]
+  end
 end

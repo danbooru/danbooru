@@ -148,4 +148,8 @@ class PoolArchive < ApplicationRecord
   def pretty_name
     name.tr("_", " ")
   end
+
+  def self.available_includes
+    [:updater, :pool]
+  end
 end

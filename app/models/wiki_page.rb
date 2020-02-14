@@ -250,4 +250,8 @@ class WikiPage < ApplicationRecord
       title
     end
   end
+
+  def self.available_includes
+    [:tag, :artist, :dtext_links]
+  end
 end

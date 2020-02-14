@@ -219,6 +219,10 @@ class TagRelationship < ApplicationRecord
     )
   end
 
+  def self.available_includes
+    [:creator, :approver, :forum_post, :forum_topic, :antecedent_tag, :consequent_tag, :antecedent_wiki, :consequent_wiki]
+  end
+
   extend SearchMethods
   include MessageMethods
 end

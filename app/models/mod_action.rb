@@ -83,4 +83,8 @@ class ModAction < ApplicationRecord
   def initialize_creator
     self.creator_id = CurrentUser.id
   end
+
+  def self.available_includes
+    [:creator]
+  end
 end

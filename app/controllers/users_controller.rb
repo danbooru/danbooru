@@ -31,7 +31,7 @@ class UsersController < ApplicationController
       return
     end
 
-    @users = User.paginated_search(params)
+    @users = User.paginated_search(params).includes(model_includes(params))
     respond_with(@users)
   end
 
@@ -93,6 +93,14 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      []
+    else
+      [:inviter]
+    end
+  end
 
   def item_matches_params(user)
     if params[:search][:name_matches]

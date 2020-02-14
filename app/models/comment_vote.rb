@@ -51,4 +51,8 @@ class CommentVote < ApplicationRecord
   def initialize_user
     self.user_id = CurrentUser.user.id
   end
+
+  def self.available_includes
+    [:comment, :user]
+  end
 end

@@ -53,4 +53,8 @@ class ForumPostVote < ApplicationRecord
       raise
     end
   end
+
+  def self.available_includes
+    [:creator]
+  end
 end

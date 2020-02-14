@@ -44,4 +44,8 @@ class NoteVersion < ApplicationRecord
   def was_undeleted
     is_active && !previous.is_active
   end
+
+  def self.available_includes
+    [:updater, :note, :post]
+  end
 end

@@ -68,4 +68,8 @@ class PostVote < ApplicationRecord
       1
     end
   end
+
+  def self.available_includes
+    [:user, :post]
+  end
 end

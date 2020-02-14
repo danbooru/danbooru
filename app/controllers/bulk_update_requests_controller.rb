@@ -15,7 +15,6 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def show
-    @bulk_update_request = BulkUpdateRequest.find(params[:id])
     respond_with(@bulk_update_request)
   end
 
@@ -42,11 +41,19 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def index
-    @bulk_update_requests = BulkUpdateRequest.includes(:user, :approver, :forum_topic, forum_post: [:votes]).paginated_search(params, count_pages: true)
+    @bulk_update_requests = BulkUpdateRequest.paginated_search(params, count_pages: true).includes(model_includes(params))
     respond_with(@bulk_update_requests)
   end
 
   private
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      []
+    else
+      [:user, :approver, :forum_topic, {forum_post: [:votes]}]
+    end
+  end
 
   def load_bulk_update_request
     @bulk_update_request = BulkUpdateRequest.find(params[:id])

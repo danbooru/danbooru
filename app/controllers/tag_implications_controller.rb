@@ -22,7 +22,7 @@ class TagImplicationsController < ApplicationController
   end
 
   def index
-    @tag_implications = TagImplication.includes(:antecedent_tag, :consequent_tag, :approver).paginated_search(params, count_pages: true)
+    @tag_implications = TagImplication.paginated_search(params, count_pages: true).includes(model_includes(params))
     respond_with(@tag_implications)
   end
 
@@ -41,6 +41,14 @@ class TagImplicationsController < ApplicationController
   end
 
   private
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      []
+    else
+      [:antecedent_tag, :consequent_tag, :approver]
+    end
+  end
 
   def tag_implication_params
     params.require(:tag_implication).permit(%i[antecedent_name consequent_name forum_topic_id skip_secondary_validations])

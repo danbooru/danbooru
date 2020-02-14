@@ -67,4 +67,8 @@ class PostDisapproval < ApplicationRecord
       end
     end
   end
+
+  def self.available_includes
+    [:user, :post]
+  end
 end

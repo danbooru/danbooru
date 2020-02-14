@@ -27,4 +27,8 @@ class ArtistCommentaryVersion < ApplicationRecord
   def unchanged_empty?(field)
     self[field].strip.empty? && (previous.nil? || previous[field].strip.empty?)
   end
+
+  def self.available_includes
+    [:post, :updater]
+  end
 end

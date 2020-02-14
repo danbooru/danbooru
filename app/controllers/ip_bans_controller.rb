@@ -12,7 +12,7 @@ class IpBansController < ApplicationController
   end
 
   def index
-    @ip_bans = IpBan.includes(:creator).paginated_search(params, count_pages: true)
+    @ip_bans = IpBan.paginated_search(params, count_pages: true).includes(model_includes(params))
     respond_with(@ip_bans)
   end
 
@@ -23,6 +23,14 @@ class IpBansController < ApplicationController
   end
 
   private
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      []
+    else
+      [:creator]
+    end
+  end
 
   def ip_ban_params
     params.fetch(:ip_ban, {}).permit(%i[ip_addr reason])

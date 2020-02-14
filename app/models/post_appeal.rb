@@ -62,4 +62,8 @@ class PostAppeal < ApplicationRecord
   def appeal_count_for_creator
     creator.post_appeals.recent.count
   end
+
+  def self.available_includes
+    [:creator, :post]
+  end
 end

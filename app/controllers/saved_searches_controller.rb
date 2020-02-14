@@ -2,7 +2,7 @@ class SavedSearchesController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def index
-    @saved_searches = saved_searches.paginated_search(params, count_pages: true)
+    @saved_searches = saved_searches.paginated_search(params, count_pages: true).includes(model_includes(params))
     respond_with(@saved_searches)
   end
 

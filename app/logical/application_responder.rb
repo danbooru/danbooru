@@ -17,7 +17,7 @@ class ApplicationResponder < ActionController::Responder
       options[:root] ||= resource.table_name.dasherize if resource.respond_to?(:table_name)
     end
 
-    options[:only] ||= params["only"].scan(/\w+/) if params["only"]
+    options[:only] ||= params["only"] if params["only"]
 
     super
   end

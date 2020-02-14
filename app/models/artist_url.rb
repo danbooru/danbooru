@@ -126,4 +126,8 @@ class ArtistUrl < ApplicationRecord
   rescue Addressable::URI::InvalidURIError => error
     errors[:url] << "'#{uri}' is malformed: #{error}"
   end
+
+  def self.available_includes
+    [:artist]
+  end
 end

@@ -115,4 +115,8 @@ class Ban < ApplicationRecord
   def create_unban_mod_action
     ModAction.log(%{Unbanned <@#{user_name}>}, :user_unban)
   end
+
+  def self.available_includes
+    [:user, :banner]
+  end
 end

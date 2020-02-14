@@ -31,10 +31,7 @@ class ArtistsController < ApplicationController
     # XXX
     params[:search][:name] = params.delete(:name) if params[:name]
 
-    @artists = Artist.includes(:urls).paginated_search(params)
-    @artists = @artists.includes(:tag) if request.format.html?
-    @artists = @artists.includes(:urls) if !request.format.html?
-
+    @artists = Artist.paginated_search(params).includes(model_includes(params))
     respond_with(@artists)
   end
 
@@ -80,6 +77,14 @@ class ArtistsController < ApplicationController
   end
 
   private
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      [:urls]
+    else
+      [:urls, :tag]
+    end
+  end
 
   def item_matches_params(artist)
     if params[:search][:any_name_or_url_matches]

@@ -3,7 +3,7 @@ class ArtistCommentariesController < ApplicationController
   before_action :member_only, only: [:create_or_update, :revert]
 
   def index
-    @commentaries = ArtistCommentary.paginated_search(params)
+    @commentaries = ArtistCommentary.paginated_search(params).includes(model_includes(params))
     respond_with(@commentaries)
   end
 
@@ -35,6 +35,14 @@ class ArtistCommentariesController < ApplicationController
   end
 
   private
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      []
+    else
+      [{post: [:uploader]}]
+    end
+  end
 
   def commentary_params
     params.fetch(:artist_commentary, {}).except(:post_id).permit(%i[

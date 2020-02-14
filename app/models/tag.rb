@@ -918,6 +918,10 @@ class Tag < ApplicationRecord
     Post.tag_match(name)
   end
 
+  def self.available_includes
+    [:wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications]
+  end
+
   include ApiMethods
   include CountMethods
   include CategoryMethods

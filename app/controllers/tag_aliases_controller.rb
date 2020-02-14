@@ -22,7 +22,7 @@ class TagAliasesController < ApplicationController
   end
 
   def index
-    @tag_aliases = TagAlias.includes(:antecedent_tag, :consequent_tag, :approver).paginated_search(params, count_pages: true)
+    @tag_aliases = TagAlias.paginated_search(params, count_pages: true).includes(model_includes(params))
     respond_with(@tag_aliases)
   end
 
@@ -41,6 +41,14 @@ class TagAliasesController < ApplicationController
   end
 
   private
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      []
+    else
+      [:antecedent_tag, :consequent_tag, :approver]
+    end
+  end
 
   def tag_alias_params
     params.require(:tag_alias).permit(%i[antecedent_name consequent_name forum_topic_id skip_secondary_validations])

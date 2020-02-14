@@ -1,5 +1,5 @@
 class CommentsController < ApplicationController
-  respond_to :html, :xml, :json
+  respond_to :html, :xml, :json, :atom
   respond_to :js, only: [:new, :destroy, :undelete]
   before_action :member_only, :except => [:index, :search, :show]
   skip_before_action :api_check
@@ -74,6 +74,18 @@ class CommentsController < ApplicationController
 
   private
 
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      [:creator, :updater]
+    elsif params[:format] == "atom"
+      [:creator, :post]
+    else
+      includes_array = [:creator, :updater, {post: [:uploader]}]
+      includes_array << :votes if CurrentUser.is_member?
+      includes_array
+    end
+  end
+
   def index_for_post
     @post = Post.find(params[:post_id])
     @comments = @post.comments
@@ -90,12 +102,8 @@ class CommentsController < ApplicationController
   end
 
   def index_by_comment
-    @comments = Comment.includes(:creator, :updater).paginated_search(params)
-    respond_with(@comments) do |format|
-      format.atom do
-        @comments = @comments.includes(:post, :creator).load
-      end
-    end
+    @comments = Comment.paginated_search(params).includes(model_includes(params))
+    respond_with(@comments)
   end
 
   def check_privilege(comment)

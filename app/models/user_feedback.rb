@@ -85,4 +85,8 @@ class UserFeedback < ApplicationRecord
   def editable_by?(editor)
     (editor.is_moderator? && editor != user) || (creator == editor && !is_deleted?)
   end
+
+  def self.available_includes
+    [:creator, :user]
+  end
 end

@@ -66,4 +66,8 @@ class ArtistVersion < ApplicationRecord
   def was_unbanned
     !is_banned && previous.is_banned
   end
+
+  def self.available_includes
+    [:updater, :artist]
+  end
 end

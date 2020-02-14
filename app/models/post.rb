@@ -1787,4 +1787,11 @@ class Post < ApplicationRecord
 
     save
   end
+
+  def self.available_includes
+    includes_array = [:uploader, :updater, :approver, :parent, :upload, :artist_commentary, :flags, :appeals, :notes, :comments, :children, :approvals, :replacements]
+    includes_array << :moderation_reports if CurrentUser.is_moderator?
+    includes_array << :disapprovals if CurrentUser.user.is_approver?
+    includes_array
+  end
 end

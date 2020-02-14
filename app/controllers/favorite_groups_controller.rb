@@ -4,7 +4,7 @@ class FavoriteGroupsController < ApplicationController
 
   def index
     params[:search][:creator_id] ||= params[:user_id]
-    @favorite_groups = FavoriteGroup.paginated_search(params)
+    @favorite_groups = FavoriteGroup.paginated_search(params).includes(model_includes(params))
     respond_with(@favorite_groups)
   end
 
@@ -60,6 +60,14 @@ class FavoriteGroupsController < ApplicationController
   end
 
   private
+
+  def default_includes(params)
+    if ["json", "xml"].include?(params[:format])
+      []
+    else
+      [:creator]
+    end
+  end
 
   def check_write_privilege(favgroup)
     raise User::PrivilegeError unless favgroup.editable_by?(CurrentUser.user)

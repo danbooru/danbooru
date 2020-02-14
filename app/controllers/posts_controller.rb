@@ -11,7 +11,7 @@ class PostsController < ApplicationController
       end
     else
       @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], raw: params[:raw], random: params[:random], format: params[:format])
-      @posts = @post_set.posts
+      @posts = @post_set.posts = @post_set.posts.includes(model_includes(params)) if !@post_set.is_random?
       respond_with(@posts) do |format|
         format.atom
       end
@@ -21,17 +21,19 @@ class PostsController < ApplicationController
   def show
     @post = Post.find(params[:id])
 
-    @comments = @post.comments
-    @comments = @comments.includes(:creator)
-    @comments = @comments.includes(:votes) if CurrentUser.is_member?
-    @comments = @comments.visible(CurrentUser.user)
+    if request.format == Mime::Type.lookup("text/html")
+      @comments = @post.comments
+      @comments = @comments.includes(:creator)
+      @comments = @comments.includes(:votes) if CurrentUser.is_member?
+      @comments = @comments.visible(CurrentUser.user)
 
-    include_deleted = @post.is_deleted? || (@post.parent_id.present? && @post.parent.is_deleted?) || CurrentUser.user.show_deleted_children?
-    @sibling_posts = @post.parent.present? ? @post.parent.children : Post.none
-    @sibling_posts = @sibling_posts.undeleted unless include_deleted
+      include_deleted = @post.is_deleted? || (@post.parent_id.present? && @post.parent.is_deleted?) || CurrentUser.user.show_deleted_children?
+      @sibling_posts = @post.parent.present? ? @post.parent.children : Post.none
+      @sibling_posts = @sibling_posts.undeleted unless include_deleted
 
-    @child_posts = @post.children
-    @child_posts = @child_posts.undeleted unless include_deleted
+      @child_posts = @post.children
+      @child_posts = @child_posts.undeleted unless include_deleted
+    end
 
     respond_with(@post) do |format|
       format.html.tooltip { render layout: false }
@@ -95,6 +97,14 @@ class PostsController < ApplicationController
   end
 
   private
+
+  def default_includes(params)
+    if ["json", "xml", "atom"].include?(params[:format])
+      [:uploader]
+    else
+      (CurrentUser.user.is_moderator? ? [:uploader] : [])
+    end
+  end
 
   def tag_query
     params[:tags] || (params[:post] && params[:post][:tags])
