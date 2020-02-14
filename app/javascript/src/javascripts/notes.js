@@ -601,7 +601,7 @@ let Note = {
       }
 
       let $dialog = $('<div></div>');
-      let note_title = (id === 'x' ? 'Creating new note' : 'Editing note #' + id);
+      let note_title = (typeof id === 'string' && id.startsWith('x') ? 'Creating new note' : 'Editing note #' + id);
       $dialog.append('<span><b>' + note_title + ' (<a href="/wiki_pages/help:notes">view help</a>)</b></span>');
       $dialog.append($textarea);
       $dialog.data("id", id);
