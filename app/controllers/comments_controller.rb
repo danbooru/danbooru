@@ -7,9 +7,9 @@ class CommentsController < ApplicationController
   def index
     params[:group_by] ||= "comment" if params[:search].present?
 
-    if params[:group_by] == "comment" || request.format == Mime::Type.lookup("application/atom+xml")
+    if params[:group_by] == "comment" || request.format.atom?
       index_by_comment
-    elsif request.format == Mime::Type.lookup("text/javascript")
+    elsif request.format.js?
       index_for_post
     else
       index_by_post

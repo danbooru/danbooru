@@ -20,7 +20,7 @@ class ForumTopicsController < ApplicationController
 
   def index
     params[:search] ||= {}
-    params[:search][:order] ||= "sticky" if request.format == Mime::Type.lookup("text/html")
+    params[:search][:order] ||= "sticky" if request.format.html?
     params[:limit] ||= 40
 
     @forum_topics = ForumTopic.paginated_search(params).includes(model_includes(params))
@@ -29,7 +29,7 @@ class ForumTopicsController < ApplicationController
   end
 
   def show
-    if request.format == Mime::Type.lookup("text/html")
+    if request.format.html?
       @forum_topic.mark_as_read!(CurrentUser.user)
     end
     @forum_posts = ForumPost.search(:topic_id => @forum_topic.id).reorder("forum_posts.id").paginate(params[:page])

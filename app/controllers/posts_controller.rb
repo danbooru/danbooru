@@ -21,7 +21,7 @@ class PostsController < ApplicationController
   def show
     @post = Post.find(params[:id])
 
-    if request.format == Mime::Type.lookup("text/html")
+    if request.format.html?
       @comments = @post.comments
       @comments = @comments.includes(:creator)
       @comments = @comments.includes(:votes) if CurrentUser.is_member?
