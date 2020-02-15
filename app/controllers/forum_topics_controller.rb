@@ -23,7 +23,13 @@ class ForumTopicsController < ApplicationController
     params[:search][:order] ||= "sticky" if request.format.html?
     params[:limit] ||= 40
 
-    @forum_topics = ForumTopic.paginated_search(params).includes(model_includes(params))
+    @forum_topics = ForumTopic.paginated_search(params)
+
+    if request.format.atom?
+      @forum_topics = @forum_topics.includes(:creator, :original_post)
+    elsif request.format.html?
+      @forum_topics = @forum_topics.includes(:creator, :updater, :forum_topic_visit_by_current_user)
+    end
 
     respond_with(@forum_topics)
   end
@@ -32,9 +38,15 @@ class ForumTopicsController < ApplicationController
     if request.format.html?
       @forum_topic.mark_as_read!(CurrentUser.user)
     end
+
     @forum_posts = ForumPost.search(:topic_id => @forum_topic.id).reorder("forum_posts.id").paginate(params[:page])
-    @forum_posts = @forum_posts.includes(:creator, :bulk_update_request)
-    @forum_posts = @forum_posts.reverse_order.load if request.format.atom?
+
+    if request.format.atom?
+      @forum_posts = @forum_posts.reverse_order.load
+    elsif request.format.html?
+      @forum_posts = @forum_posts.includes(:creator, :bulk_update_request)
+    end
+
     respond_with(@forum_topic)
   end
 
@@ -76,16 +88,6 @@ class ForumTopicsController < ApplicationController
   end
 
   private
-
-  def default_includes(params)
-    if ["json", "xml"].include?(params[:format])
-      []
-    elsif params[:format] == "atom"
-      [:creator, :original_post]
-    else
-      [:creator, :updater, :forum_topic_visit_by_current_user]
-    end
-  end
 
   def normalize_search
     if params[:title_matches]

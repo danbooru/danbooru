@@ -15,7 +15,7 @@ class WikiPagesController < ApplicationController
   end
 
   def index
-    @wiki_pages = WikiPage.paginated_search(params).includes(model_includes(params))
+    @wiki_pages = WikiPage.paginated_search(params)
 
     respond_with(@wiki_pages)
   end

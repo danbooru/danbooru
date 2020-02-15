@@ -17,7 +17,8 @@ class PoolsController < ApplicationController
   end
 
   def index
-    @pools = Pool.paginated_search(params, count_pages: true).includes(model_includes(params))
+    @pools = Pool.paginated_search(params, count_pages: true)
+    @pools = @pools.includes(:creator) if request.format.html?
 
     respond_with(@pools)
   end
@@ -89,10 +90,6 @@ class PoolsController < ApplicationController
   end
 
   private
-
-  def default_includes(params)
-    [:creator]
-  end
 
   def item_matches_params(pool)
     if params[:search][:name_matches]

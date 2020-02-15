@@ -3,7 +3,9 @@ class ArtistUrlsController < ApplicationController
   before_action :member_only, except: [:index]
 
   def index
-    @artist_urls = ArtistUrl.paginated_search(params).includes(model_includes(params))
+    @artist_urls = ArtistUrl.paginated_search(params)
+    @artist_urls = @artist_urls.includes(:artist) if request.format.html?
+
     respond_with(@artist_urls)
   end
 
@@ -14,14 +16,6 @@ class ArtistUrlsController < ApplicationController
   end
 
   private
-
-  def default_includes(params)
-    if ["json", "xml"].include?(params[:format])
-      []
-    else
-      [:artist]
-    end
-  end
 
   def artist_url_params
     permitted_params = %i[is_active]

@@ -12,7 +12,9 @@ module Moderator
       end
 
       def index
-        @post_disapprovals = PostDisapproval.paginated_search(params).includes(model_includes(params))
+        @post_disapprovals = PostDisapproval.paginated_search(params)
+        @post_disapprovals = @post_disapprovals.includes(:user) if request.format.html?
+
         respond_with(@post_disapprovals)
       end
 
@@ -20,14 +22,6 @@ module Moderator
 
       def model_name
         "PostDisapproval"
-      end
-
-      def default_includes(params)
-        if ["json", "xml"].include?(params[:format])
-          []
-        else
-          [:user]
-        end
       end
 
       def post_disapproval_params

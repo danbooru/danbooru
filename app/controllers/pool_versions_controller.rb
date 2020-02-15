@@ -4,7 +4,9 @@ class PoolVersionsController < ApplicationController
   around_action :set_timeout
 
   def index
-    @pool_versions = PoolArchive.paginated_search(params).includes(model_includes(params))
+    @pool_versions = PoolArchive.paginated_search(params)
+    @pool_versions = @pool_versions.includes(:updater, :pool) if request.format.html?
+
     respond_with(@pool_versions)
   end
 
@@ -25,14 +27,6 @@ class PoolVersionsController < ApplicationController
 
   def model_name
     "PoolArchive"
-  end
-
-  def default_includes(params)
-    if ["json", "xml"].include?(params[:format])
-      []
-    else
-      [:updater, :pool]
-    end
   end
 
   def set_timeout

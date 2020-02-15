@@ -74,18 +74,6 @@ class CommentsController < ApplicationController
 
   private
 
-  def default_includes(params)
-    if ["json", "xml"].include?(params[:format])
-      []
-    elsif params[:format] == "atom"
-      [:creator, :post]
-    else
-      includes_array = [:creator, :updater, {post: [:uploader]}]
-      includes_array << :votes if CurrentUser.is_member?
-      includes_array
-    end
-  end
-
   def index_for_post
     @post = Post.find(params[:post_id])
     @comments = @post.comments
@@ -95,14 +83,24 @@ class CommentsController < ApplicationController
   def index_by_post
     @posts = Post.where("last_comment_bumped_at IS NOT NULL").tag_match(params[:tags]).reorder("last_comment_bumped_at DESC NULLS LAST").paginate(params[:page], :limit => 5, :search_count => params[:search])
 
-    @posts = @posts.includes(comments: [:creator])
-    @posts = @posts.includes(comments: [:votes]) if CurrentUser.is_member?
+    if request.format.html?
+      @posts = @posts.includes(comments: [:creator])
+      @posts = @posts.includes(comments: [:votes]) if CurrentUser.is_member?
+    end
 
     respond_with(@posts)
   end
 
   def index_by_comment
-    @comments = Comment.paginated_search(params).includes(model_includes(params))
+    @comments = Comment.paginated_search(params)
+
+    if request.format.atom?
+      @comments = @comments.includes(:creator, :post)
+    elsif request.format.html?
+      @comments = @comments.includes(:creator, :updater, post: :uploader)
+      @comments = @comments.includes(:votes) if CurrentUser.is_member?
+    end
+
     respond_with(@comments)
   end
 

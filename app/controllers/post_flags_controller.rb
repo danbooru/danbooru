@@ -8,7 +8,14 @@ class PostFlagsController < ApplicationController
   end
 
   def index
-    @post_flags = PostFlag.paginated_search(params).includes(model_includes(params))
+    @post_flags = PostFlag.paginated_search(params)
+
+    if request.format.html?
+      @post_flags = @post_flags.includes(:creator, post: [:flags, :uploader, :approver])
+    else
+      @post_flags = @post_flags.includes(:post)
+    end
+
     respond_with(@post_flags)
   end
 
@@ -25,16 +32,6 @@ class PostFlagsController < ApplicationController
   end
 
   private
-
-  def default_includes(params)
-    if ["json", "xml"].include?(params[:format])
-      [:post]
-    else
-      includes_array = [{post: [:flags, :uploader, :approver]}]
-      includes_array << :creator if CurrentUser.is_moderator?
-      includes_array
-    end
-  end
 
   def post_flag_params
     params.fetch(:post_flag, {}).permit(%i[post_id reason])

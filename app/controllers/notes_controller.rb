@@ -6,7 +6,9 @@ class NotesController < ApplicationController
   end
 
   def index
-    @notes = Note.paginated_search(params).includes(model_includes(params))
+    @notes = Note.paginated_search(params)
+    @notes = @notes.includes(:creator, :post) if request.format.html?
+
     respond_with(@notes)
   end
 
@@ -58,14 +60,6 @@ class NotesController < ApplicationController
   end
 
   private
-
-  def default_includes(params)
-    if ["json", "xml"].include?(params[:format])
-      []
-    else
-      [:creator, :post]
-    end
-  end
 
   def note_params(context)
     permitted_params = %i[x y width height body]

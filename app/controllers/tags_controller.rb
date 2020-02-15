@@ -9,7 +9,7 @@ class TagsController < ApplicationController
   end
 
   def index
-    @tags = Tag.paginated_search(params).includes(model_includes(params))
+    @tags = Tag.paginated_search(params)
     respond_with(@tags)
   end
 

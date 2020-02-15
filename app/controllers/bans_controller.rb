@@ -12,7 +12,9 @@ class BansController < ApplicationController
   end
 
   def index
-    @bans = Ban.paginated_search(params, count_pages: true).includes(model_includes(params))
+    @bans = Ban.paginated_search(params, count_pages: true)
+    @bans = @bans.includes(:user, :banner) if request.format.html?
+
     respond_with(@bans)
   end
 
@@ -47,14 +49,6 @@ class BansController < ApplicationController
   end
 
   private
-
-  def default_includes(params)
-    if ["json", "xml"].include?(params[:format])
-      []
-    else
-      [:user, :banner]
-    end
-  end
 
   def ban_params(context)
     permitted_params = %i[reason duration expires_at]

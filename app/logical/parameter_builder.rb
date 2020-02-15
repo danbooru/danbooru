@@ -40,6 +40,8 @@ class ParameterBuilder
   end
 
   def self.includes_parameters(only_string, model_name)
+    return [] if only_string.blank?
+
     only_array = split_only_string(only_string)
     get_includes_array(only_array, model_name)
   end

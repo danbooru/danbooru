@@ -6,7 +6,14 @@ class PostVersionsController < ApplicationController
   respond_to :js, only: [:undo]
 
   def index
-    @post_versions = PostArchive.paginated_search(params).includes(model_includes(params))
+    @post_versions = PostArchive.paginated_search(params)
+
+    if request.format.html?
+      @post_versions = @post_versions.includes(:updater, post: [:uploader, :versions])
+    else
+      @post_versions = @post_versions.includes(post: :versions)
+    end
+
     respond_with(@post_versions)
   end
 
@@ -24,14 +31,6 @@ class PostVersionsController < ApplicationController
 
   def model_name
     "PostArchive"
-  end
-
-  def default_includes(params)
-    if ["json", "xml"].include?(params[:format])
-      [:updater, {post: [:versions]}]
-    else
-      [:updater, {post: [:uploader, :versions]}]
-    end
   end
 
   def set_timeout

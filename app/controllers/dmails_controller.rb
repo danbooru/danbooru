@@ -15,7 +15,9 @@ class DmailsController < ApplicationController
   end
 
   def index
-    @dmails = Dmail.visible.paginated_search(params, defaults: { folder: "received" }, count_pages: true).includes(model_includes(params))
+    @dmails = Dmail.visible.paginated_search(params, defaults: { folder: "received" }, count_pages: true)
+    @dmails = @dmails.includes(:owner, :to, :from) if request.format.html?
+
     respond_with(@dmails)
   end
 
@@ -50,14 +52,6 @@ class DmailsController < ApplicationController
   end
 
   private
-
-  def default_includes(params)
-    if ["json", "xml"].include?(params[:format])
-      []
-    else
-      [:owner, :to, :from]
-    end
-  end
 
   def check_show_privilege(dmail)
     raise User::PrivilegeError unless dmail.visible_to?(CurrentUser.user, params[:key])

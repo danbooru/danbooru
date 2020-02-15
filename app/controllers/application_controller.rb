@@ -25,28 +25,18 @@ class ApplicationController < ActionController::Base
   private
 
   def respond_with(subject, *options, &block)
-    @current_item = subject
-
     if params[:action] == "index" && is_redirect?(subject)
       redirect_to_show(subject)
-    else
-      super
+      return
     end
-  end
 
-  def model_includes(params, model = nil)
-    if params[:only] && ["json", "xml"].include?(params[:format])
-      includes_array = ParameterBuilder.includes_parameters(params[:only], model_name)
-    elsif params[:action] == "index"
-      includes_array = default_includes(params)
-    else
-      includes_array = []
+    if request.format.json? || request.format.xml?
+      associations = ParameterBuilder.includes_parameters(params[:only], model_name)
+      subject = subject.includes(associations)
     end
-    includes_array
-  end
 
-  def default_includes(*)
-    []
+    @current_item = subject
+    super
   end
 
   def model_name

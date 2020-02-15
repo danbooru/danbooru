@@ -24,20 +24,13 @@ class PostReplacementsController < ApplicationController
 
   def index
     params[:search][:post_id] = params.delete(:post_id) if params.key?(:post_id)
-    @post_replacements = PostReplacement.paginated_search(params).includes(model_includes(params))
+    @post_replacements = PostReplacement.paginated_search(params)
+    @post_replacements = @post_replacements.includes(:creator, post: :uploader) if request.format.html?
 
     respond_with(@post_replacements)
   end
 
   private
-
-  def default_includes(params)
-    if ["json", "xml"].include?(params[:format])
-      []
-    else
-      [:creator, {post: [:uploader]}]
-    end
-  end
 
   def create_params
     params.require(:post_replacement).permit(:replacement_url, :replacement_file, :final_source, :tags)

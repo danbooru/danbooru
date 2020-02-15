@@ -8,7 +8,14 @@ class PostAppealsController < ApplicationController
   end
 
   def index
-    @post_appeals = PostAppeal.paginated_search(params).includes(model_includes(params))
+    @post_appeals = PostAppeal.paginated_search(params)
+
+    if request.format.html?
+      @post_appeals = @post_appeals.includes(:creator, post: [:appeals, :uploader, :approver])
+    else
+      @post_appeals = @post_appeals.includes(:post)
+    end
+
     respond_with(@post_appeals)
   end
 
@@ -25,14 +32,6 @@ class PostAppealsController < ApplicationController
   end
 
   private
-
-  def default_includes(params)
-    if ["json", "xml"].include?(params[:format])
-      [:post]
-    else
-      [:creator, {post: [:appeals, :uploader, :approver]}]
-    end
-  end
 
   def post_appeal_params
     params.fetch(:post_appeal, {}).permit(%i[post_id reason])
