@@ -20,7 +20,6 @@ Rails.application.routes.draw do
         end
       end
       resource :approval, :only => [:create]
-      resources :disapprovals, :only => [:create, :index]
       resources :posts, :only => [:delete, :undelete, :expunge, :confirm_delete] do
         member do
           get :confirm_delete
@@ -206,6 +205,7 @@ Rails.application.routes.draw do
   resources :post_appeals
   resources :post_flags
   resources :post_approvals, only: [:index]
+  resources :post_disapprovals, only: [:create, :index]
   resources :post_versions, :only => [:index, :search] do
     member do
       put :undo

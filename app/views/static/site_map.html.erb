@@ -24,7 +24,7 @@
         <li><%= link_to("Changes", post_versions_path) %></li>
         <li><%= link_to("Approvals", post_approvals_path) %></li>
         <% if CurrentUser.is_approver? %>
-          <li><%= link_to("Disapprovals", moderator_post_disapprovals_path) %></li>
+          <li><%= link_to("Disapprovals", post_disapprovals_path) %></li>
         <% end %>
         <li><%= link_to("Appeals", post_appeals_path) %></li>
         <li><%= link_to("Flags", post_flags_path) %></li>

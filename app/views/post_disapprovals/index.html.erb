@@ -1,8 +1,8 @@
-<div id="c-moderator-post-disapprovals">
+<div id="c-post-disapprovals">
   <div id="a-index">
     <h1>Disapprovals</h1>
 
-    <%= search_form_for(moderator_post_disapprovals_path) do |f| %>
+    <%= search_form_for(post_disapprovals_path) do |f| %>
       <%= f.input :user_name, label: "Creator", input_html: { value: params[:search][:user_name] } %>
       <%= f.input :post_id, label: "Post ID", input_html: { value: params[:search][:post_id] } %>
       <%= f.input :post_tags_match, label: "Tags", input_html: { value: params[:search][:post_tags_match], data: { autocomplete: "tag-query" } } %>
@@ -16,7 +16,7 @@
     <%= table_for @post_disapprovals, {class: "striped autofit", width: "100%"} do |t| %>
       <% t.column "Post" do |post_disapproval| %>
         <%= link_to "post ##{post_disapproval.post_id}", post_path(post_disapproval.post_id) %>
-        <%= link_to "»", moderator_post_disapprovals_path(search: params[:search].merge(post_id: post_disapproval.post_id)) %>
+        <%= link_to "»", post_disapprovals_path(search: params[:search].merge(post_id: post_disapproval.post_id)) %>
       <% end %>
       <% t.column "Message", td: {class: "col-expand"} do |post_disapproval| %>
         <div class="prose">
@@ -24,11 +24,11 @@
         </div>
       <% end %>
       <% t.column "Reason" do |post_disapproval| %>
-        <%= link_to post_disapproval.reason.humanize, moderator_post_disapprovals_path(search: params[:search].merge(reason: post_disapproval.reason)) %>
+        <%= link_to post_disapproval.reason.humanize, post_disapprovals_path(search: params[:search].merge(reason: post_disapproval.reason)) %>
       <% end %>
       <% t.column "Created" do |post_disapproval| %>
         <%= link_to_user post_disapproval.user %>
-        <%= link_to "»", moderator_post_disapprovals_path(search: params[:search].merge(creator_name: post_disapproval.user&.name)) %>
+        <%= link_to "»", post_disapprovals_path(search: params[:search].merge(creator_name: post_disapproval.user&.name)) %>
         <p>
           <%= compact_time(post_disapproval.updated_at) %>
         </p>
