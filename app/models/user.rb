@@ -107,7 +107,7 @@ class User < ApplicationRecord
   has_many :post_disapprovals, :dependent => :destroy
   has_many :post_flags, foreign_key: :creator_id
   has_many :post_votes
-  has_many :post_versions, class_name: "PostArchive", foreign_key: :updater_id
+  has_many :post_versions, foreign_key: :updater_id
   has_many :bans, -> {order("bans.id desc")}
   has_one :recent_ban, -> {order("bans.id desc")}, :class_name => "Ban"
 
@@ -587,8 +587,8 @@ class User < ApplicationRecord
     end
 
     def pool_version_count
-      return nil unless PoolArchive.enabled?
-      PoolArchive.for_user(id).count
+      return nil unless PoolVersion.enabled?
+      PoolVersion.for_user(id).count
     end
 
     def forum_post_count

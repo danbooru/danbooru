@@ -10,7 +10,7 @@ class PoolTest < ActiveSupport::TestCase
     CurrentUser.ip_addr = "127.0.0.1"
 
     mock_pool_archive_service!
-    PoolArchive.sqs_service.stubs(:merge?).returns(false)
+    PoolVersion.sqs_service.stubs(:merge?).returns(false)
     start_pool_archive_transaction
   end
 
@@ -114,7 +114,7 @@ class PoolTest < ActiveSupport::TestCase
 
   context "Reverting a pool" do
     setup do
-      PoolArchive.stubs(:enabled?).returns(true)
+      PoolVersion.stubs(:enabled?).returns(true)
 
       @pool = FactoryBot.create(:pool)
       @p1 = FactoryBot.create(:post)

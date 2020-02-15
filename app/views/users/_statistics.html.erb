@@ -148,7 +148,7 @@
         <td><%= presenter.artist_commentary_version_count(self) %></td>
       </tr>
 
-      <% if PoolArchive.enabled? %>
+      <% if PoolVersion.enabled? %>
         <tr>
           <th>Pool Changes</th>
           <td><%= presenter.pool_version_count(self) %></td>

@@ -1,4 +1,4 @@
-class PostArchive < ApplicationRecord
+class PostVersion < ApplicationRecord
   class RevertError < StandardError; end
   extend Memoist
 
@@ -10,7 +10,6 @@ class PostArchive < ApplicationRecord
   end
 
   establish_connection (ENV["ARCHIVE_DATABASE_URL"] || "archive_#{Rails.env}".to_sym) if enabled?
-  self.table_name = "post_versions"
 
   def self.check_for_retry(msg)
     if msg =~ /can't get socket descriptor/ && msg =~ /post_versions/
@@ -98,7 +97,7 @@ class PostArchive < ApplicationRecord
       if association(:post).loaded? && post && post.association(:versions).loaded?
         ver = [post.versions.sort_by(&:version).reverse.find { |v| v.version < version }]
       else
-        ver = PostArchive.where("post_id = ? and version < ?", post_id, version).order("version desc").limit(1).to_a
+        ver = PostVersion.where("post_id = ? and version < ?", post_id, version).order("version desc").limit(1).to_a
       end
     end
     @previous.first

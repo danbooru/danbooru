@@ -1,7 +1,7 @@
 require 'test_helper'
 
-class PostArchiveTest < ActiveSupport::TestCase
-  include PoolArchiveTestHelper
+class PostVersionTest < ActiveSupport::TestCase
+  include PoolVersionTestHelper
 
   context "A post" do
     setup do
@@ -19,7 +19,7 @@ class PostArchiveTest < ActiveSupport::TestCase
 
     context "#undo" do
       setup do
-        PostArchive.sqs_service.stubs(:merge?).returns(false)
+        PostVersion.sqs_service.stubs(:merge?).returns(false)
         @post = FactoryBot.create(:post, :tag_string => "1")
         @post.update(tag_string: "1 2")
         @post.update(tag_string: "2 3")
@@ -36,7 +36,7 @@ class PostArchiveTest < ActiveSupport::TestCase
 
     context "that has multiple versions: " do
       setup do
-        PostArchive.sqs_service.stubs(:merge?).returns(false)
+        PostVersion.sqs_service.stubs(:merge?).returns(false)
         @post = FactoryBot.create(:post, :tag_string => "1")
         @post.update(tag_string: "1 2")
         @post.update(tag_string: "2 3")
@@ -44,7 +44,7 @@ class PostArchiveTest < ActiveSupport::TestCase
 
       context "a version record" do
         setup do
-          @version = PostArchive.last
+          @version = PostVersion.last
         end
 
         should "know its previous version" do
@@ -102,7 +102,7 @@ class PostArchiveTest < ActiveSupport::TestCase
 
     context "that has been updated" do
       setup do
-        PostArchive.sqs_service.stubs(:merge?).returns(false)
+        PostVersion.sqs_service.stubs(:merge?).returns(false)
         @post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
         @post.update(tag_string: "bbb ccc xxx", source: "")
       end

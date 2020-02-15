@@ -1265,7 +1265,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "that has been updated" do
         should "create a new version if it's the first version" do
-          assert_difference("PostArchive.count", 1) do
+          assert_difference("PostVersion.count", 1) do
             post = FactoryBot.create(:post)
           end
         end
@@ -1273,7 +1273,7 @@ class PostTest < ActiveSupport::TestCase
         should "create a new version if it's been over an hour since the last update" do
           post = FactoryBot.create(:post)
           travel(6.hours) do
-            assert_difference("PostArchive.count", 1) do
+            assert_difference("PostVersion.count", 1) do
               post.update(tag_string: "zzz")
             end
           end
@@ -1281,14 +1281,14 @@ class PostTest < ActiveSupport::TestCase
 
         should "merge with the previous version if the updater is the same user and it's been less than an hour" do
           post = FactoryBot.create(:post)
-          assert_difference("PostArchive.count", 0) do
+          assert_difference("PostVersion.count", 0) do
             post.update(tag_string: "zzz")
           end
           assert_equal("zzz", post.versions.last.tags)
         end
 
         should "increment the updater's post_update_count" do
-          PostArchive.sqs_service.stubs(:merge?).returns(false)
+          PostVersion.sqs_service.stubs(:merge?).returns(false)
           post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
 
           # XXX in the test environment the update count gets bumped twice: and
@@ -2697,7 +2697,7 @@ class PostTest < ActiveSupport::TestCase
 
     context "a post that has been updated" do
       setup do
-        PostArchive.sqs_service.stubs(:merge?).returns(false)
+        PostVersion.sqs_service.stubs(:merge?).returns(false)
         @post = FactoryBot.create(:post, :rating => "q", :tag_string => "aaa", :source => "")
         @post.reload
         @post.update(:tag_string => "aaa bbb ccc ddd")

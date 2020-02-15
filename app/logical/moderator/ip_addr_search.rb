@@ -32,8 +32,8 @@ module Moderator
       add_row(sums, Upload.where(uploader_ip_addr: ip_addrs).group(:uploader).count)
       add_row(sums, Hash[User.where(last_ip_addr: ip_addrs).collect { |user| [user, 1] }])
 
-      add_row_id(sums, PoolArchive.where(updater_ip_addr: ip_addrs).group(:updater_id).count) if PoolArchive.enabled?
-      add_row_id(sums, PostArchive.where(updater_ip_addr: ip_addrs).group(:updater_id).count) if PostArchive.enabled?
+      add_row_id(sums, PoolVersion.where(updater_ip_addr: ip_addrs).group(:updater_id).count) if PoolVersion.enabled?
+      add_row_id(sums, PostVersion.where(updater_ip_addr: ip_addrs).group(:updater_id).count) if PostVersion.enabled?
 
       sums
     end
@@ -50,8 +50,8 @@ module Moderator
       add_row(sums, ArtistCommentaryVersion.where(updater: users).group(:updater_ip_addr).count)
       add_row(sums, ArtistVersion.where(updater: users).group(:updater_ip_addr).count)
       add_row(sums, NoteVersion.where(updater: users).group(:updater_ip_addr).count)
-      add_row(sums, PoolArchive.where(updater_id: users.map(&:id)).group(:updater_ip_addr).count) if PoolArchive.enabled?
-      add_row(sums, PostArchive.where(updater_id: users.map(&:id)).group(:updater_ip_addr).count) if PostArchive.enabled?
+      add_row(sums, PoolVersion.where(updater_id: users.map(&:id)).group(:updater_ip_addr).count) if PoolVersion.enabled?
+      add_row(sums, PostVersion.where(updater_id: users.map(&:id)).group(:updater_ip_addr).count) if PostVersion.enabled?
       add_row(sums, WikiPageVersion.where(updater: users).group(:updater_ip_addr).count)
       add_row(sums, Comment.where(creator: users).group(:creator_ip_addr).count)
       add_row(sums, Dmail.where(from: users).group(:creator_ip_addr).count)

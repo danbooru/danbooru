@@ -262,7 +262,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
     context "revert action" do
       setup do
-        PostArchive.sqs_service.stubs(:merge?).returns(false)
+        PostVersion.sqs_service.stubs(:merge?).returns(false)
         as_user do
           @post.update(tag_string: "zzz")
         end

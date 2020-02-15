@@ -4,7 +4,7 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
   context "The pools controller" do
     setup do
       mock_pool_archive_service!
-      PoolArchive.sqs_service.stubs(:merge?).returns(false)
+      PoolVersion.sqs_service.stubs(:merge?).returns(false)
       start_pool_archive_transaction
 
       travel_to(1.month.ago) do

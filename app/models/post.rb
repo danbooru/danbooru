@@ -59,8 +59,8 @@ class Post < ApplicationRecord
 
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :view_count
 
-  if PostArchive.enabled?
-    has_many :versions, -> { Rails.env.test? ? order("post_versions.updated_at ASC, post_versions.id ASC") : order("post_versions.updated_at ASC") }, :class_name => "PostArchive", :dependent => :destroy
+  if PostVersion.enabled?
+    has_many :versions, -> { Rails.env.test? ? order("post_versions.updated_at ASC, post_versions.id ASC") : order("post_versions.updated_at ASC") }, class_name: "PostVersion", dependent: :destroy
   end
 
   module FileMethods
@@ -1307,7 +1307,7 @@ class Post < ApplicationRecord
 
     def create_new_version
       User.where(id: CurrentUser.id).update_all("post_update_count = post_update_count + 1")
-      PostArchive.queue(self) if PostArchive.enabled?
+      PostVersion.queue(self) if PostVersion.enabled?
     end
 
     def revert_to(target)

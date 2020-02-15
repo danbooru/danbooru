@@ -69,7 +69,7 @@
         <li><%= link_to_wiki "Help", "help:pools" %></li>
         <li><%= link_to("Listing", pools_path) %></li>
         <li><%= link_to("Gallery", gallery_pools_path) %></li>
-        <% if PoolArchive.enabled? %>
+        <% if PoolVersion.enabled? %>
           <li><%= link_to("Changes", pool_versions_path) %></li>
         <% end %>
       </ul>

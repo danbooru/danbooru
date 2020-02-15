@@ -1,4 +1,4 @@
-class PoolArchive < ApplicationRecord
+class PoolVersion < ApplicationRecord
   belongs_to :updater, :class_name => "User"
   belongs_to :pool
 
@@ -7,7 +7,6 @@ class PoolArchive < ApplicationRecord
   end
 
   establish_connection (ENV["ARCHIVE_DATABASE_URL"] || "archive_#{Rails.env}".to_sym) if enabled?
-  self.table_name = "pool_versions"
 
   module SearchMethods
     def default_order
@@ -109,7 +108,7 @@ class PoolArchive < ApplicationRecord
 
   def previous
     @previous ||= begin
-      PoolArchive.where("pool_id = ? and version < ?", pool_id, version).order("version desc").limit(1).to_a
+      PoolVersion.where("pool_id = ? and version < ?", pool_id, version).order("version desc").limit(1).to_a
     end
     @previous.first
   end

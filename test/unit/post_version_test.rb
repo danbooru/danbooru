@@ -17,7 +17,7 @@ class PostVersionTest < ActiveSupport::TestCase
 
     context "that has multiple versions: " do
       setup do
-        PostArchive.sqs_service.stubs(:merge?).returns(false)
+        PostVersion.sqs_service.stubs(:merge?).returns(false)
         @post = FactoryBot.create(:post, :tag_string => "1")
         @post.update(tag_string: "1 2")
         @post.update(tag_string: "2 3")
@@ -25,7 +25,7 @@ class PostVersionTest < ActiveSupport::TestCase
 
       context "a version record" do
         setup do
-          @version = PostArchive.last
+          @version = PostVersion.last
         end
 
         should "know its previous version" do
@@ -67,7 +67,7 @@ class PostVersionTest < ActiveSupport::TestCase
 
     context "that has been updated" do
       setup do
-        PostArchive.sqs_service.stubs(:merge?).returns(false)
+        PostVersion.sqs_service.stubs(:merge?).returns(false)
         travel_to(1.minute.ago) do
           @post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
         end

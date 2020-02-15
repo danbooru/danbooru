@@ -4,9 +4,6 @@ module Moderator
   class IpAddrsControllerTest < ActionDispatch::IntegrationTest
     context "The ip addrs controller" do
       setup do
-        PoolArchive.delete_all
-        PostArchive.delete_all
-
         @user = create(:moderator_user, created_at: 1.month.ago)
         as(@user) { create(:comment, creator: @user) }
       end
