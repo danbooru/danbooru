@@ -266,12 +266,8 @@ class PostArchive < ApplicationRecord
     post&.visible? && user.is_member?
   end
 
-  def updater_name
-    updater&.name
-  end
-
   def api_attributes
-    super + [:obsolete_added_tags, :obsolete_removed_tags, :unchanged_tags, :updater_name]
+    super + [:obsolete_added_tags, :obsolete_removed_tags, :unchanged_tags]
   end
 
   def self.available_includes

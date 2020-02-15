@@ -11,8 +11,6 @@ class Note < ApplicationRecord
   after_save :create_version
   validate :post_must_not_be_note_locked
 
-  api_attributes including: [:creator_name]
-
   module SearchMethods
     def active
       where("is_active = TRUE")
@@ -26,10 +24,6 @@ class Note < ApplicationRecord
 
       q.apply_default_order(params)
     end
-  end
-
-  def creator_name
-    creator.name
   end
 
   extend SearchMethods

@@ -76,7 +76,7 @@ class CommentsController < ApplicationController
 
   def default_includes(params)
     if ["json", "xml"].include?(params[:format])
-      [:creator, :updater]
+      []
     elsif params[:format] == "atom"
       [:creator, :post]
     else

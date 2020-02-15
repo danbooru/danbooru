@@ -80,7 +80,7 @@ class ArtistsController < ApplicationController
 
   def default_includes(params)
     if ["json", "xml"].include?(params[:format])
-      [:urls]
+      []
     else
       [:urls, :tag]
     end

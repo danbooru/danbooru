@@ -971,10 +971,6 @@ class Post < ApplicationRecord
         self.uploader_ip_addr = CurrentUser.ip_addr
       end
     end
-
-    def uploader_name
-      uploader.name
-    end
   end
 
   module PoolMethods
@@ -1220,12 +1216,6 @@ class Post < ApplicationRecord
     def has_visible_children
       has_visible_children?
     end
-
-    def children_ids
-      if has_children?
-        children.map(&:id).join(' ')
-      end
-    end
   end
 
   module DeletionMethods
@@ -1382,22 +1372,11 @@ class Post < ApplicationRecord
   module ApiMethods
     def api_attributes
       attributes = super
-      attributes += [:uploader_name, :has_large, :has_visible_children, :children_ids, :is_favorited?] + TagCategory.categories.map {|x| "tag_string_#{x}".to_sym}
+      attributes += [:has_large, :has_visible_children, :is_favorited?] + TagCategory.categories.map {|x| "tag_string_#{x}".to_sym}
       attributes += [:file_url, :large_file_url, :preview_file_url] if visible?
       attributes -= [:md5, :file_ext] if !visible?
       attributes -= [:fav_string] if !CurrentUser.is_moderator?
       attributes
-    end
-
-    def associated_attributes
-      [:pixiv_ugoira_frame_data]
-    end
-
-    def as_json(options = {})
-      options ||= {}
-      options[:include] ||= []
-      options[:include] += associated_attributes
-      super(options)
     end
 
     def legacy_attributes

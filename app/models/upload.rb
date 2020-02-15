@@ -70,8 +70,6 @@ class Upload < ApplicationRecord
 
   scope :preprocessed, -> { where(status: "preprocessed") }
 
-  api_attributes including: [:uploader_name]
-
   def initialize_attributes
     self.uploader_id = CurrentUser.id
     self.uploader_ip_addr = CurrentUser.ip_addr
@@ -175,12 +173,6 @@ class Upload < ApplicationRecord
     end
   end
 
-  module UploaderMethods
-    def uploader_name
-      uploader.name
-    end
-  end
-
   module VideoMethods
     def video
       @video ||= FFMPEG::Movie.new(file.path)
@@ -229,7 +221,6 @@ class Upload < ApplicationRecord
 
   include FileMethods
   include StatusMethods
-  include UploaderMethods
   include VideoMethods
   extend SearchMethods
   include SourceMethods

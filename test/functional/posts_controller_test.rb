@@ -241,7 +241,6 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_nil(response.parsed_body["md5"])
           assert_nil(response.parsed_body["file_url"])
           assert_nil(response.parsed_body["fav_string"])
-          assert_equal(@post.uploader_name, response.parsed_body["uploader_name"])
         end
       end
     end

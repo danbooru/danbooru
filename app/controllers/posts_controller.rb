@@ -100,7 +100,7 @@ class PostsController < ApplicationController
 
   def default_includes(params)
     if ["json", "xml", "atom"].include?(params[:format])
-      [:uploader]
+      []
     else
       (CurrentUser.user.is_moderator? ? [:uploader] : [])
     end

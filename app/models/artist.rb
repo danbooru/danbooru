@@ -4,7 +4,6 @@ class Artist < ApplicationRecord
 
   attr_accessor :url_string_changed
   array_attribute :other_names
-  api_attributes including: [:urls]
 
   before_validation :normalize_name
   before_validation :normalize_other_names

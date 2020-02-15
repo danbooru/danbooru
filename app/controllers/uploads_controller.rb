@@ -60,7 +60,7 @@ class UploadsController < ApplicationController
 
   def default_includes(params)
     if ["json", "xml"].include?(params[:format])
-      [:uploader]
+      []
     else
       [:uploader, {post: [:uploader]}]
     end

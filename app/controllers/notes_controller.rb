@@ -61,7 +61,7 @@ class NotesController < ApplicationController
 
   def default_includes(params)
     if ["json", "xml"].include?(params[:format])
-      [:creator]
+      []
     else
       [:creator, :post]
     end
