@@ -37,7 +37,7 @@ class ForumPost < ApplicationRecord
 
   module SearchMethods
     def topic_title_matches(title)
-      joins(:topic).merge(ForumTopic.search(title_matches: title))
+      where(topic_id: ForumTopic.search(title_matches: title).select(:id))
     end
 
     def active
@@ -45,7 +45,7 @@ class ForumPost < ApplicationRecord
     end
 
     def permitted
-      joins(:topic).where("forum_topics.min_level <= ?", CurrentUser.level)
+      where(topic_id: ForumTopic.permitted)
     end
 
     def search(params)
@@ -63,7 +63,7 @@ class ForumPost < ApplicationRecord
       end
 
       if params[:topic_category_id].present?
-        q = q.joins(:topic).where("forum_topics.category_id = ?", params[:topic_category_id].to_i)
+        q = q.where(topic_id: ForumTopic.where(category_id: params[:topic_category_id]))
       end
 
       q.apply_default_order(params)
