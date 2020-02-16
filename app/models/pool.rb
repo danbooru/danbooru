@@ -87,14 +87,6 @@ class Pool < ApplicationRecord
 
   extend SearchMethods
 
-  def self.name_to_id(name)
-    if name =~ /^\d+$/
-      name.to_i
-    else
-      select_value_sql("SELECT id FROM pools WHERE lower(name) = ?", name.downcase.tr(" ", "_")).to_i
-    end
-  end
-
   def self.normalize_name(name)
     name.gsub(/[_[:space:]]+/, "_").gsub(/\A_|_\z/, "")
   end

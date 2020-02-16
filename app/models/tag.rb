@@ -154,7 +154,7 @@ class Tag < ApplicationRecord
       end
 
       def select_category_for(tag_name)
-        select_value_sql("SELECT category FROM tags WHERE name = ?", tag_name).to_i
+        Tag.where(name: tag_name).pick(:category).to_i
       end
 
       def category_for(tag_name, options = {})
@@ -596,8 +596,7 @@ class Tag < ApplicationRecord
             q[:pool] << g2
 
           when "ordpool"
-            pool_id = Pool.name_to_id(g2)
-            q[:ordpool] = pool_id
+            q[:ordpool] = g2
 
           when "-favgroup"
             favgroup = FavoriteGroup.find_by_name_or_id!(g2, CurrentUser.user)

@@ -33,13 +33,10 @@ class NoteTest < ActiveSupport::TestCase
       end
 
       context "when the note is deleted the post" do
-        setup do
-          @note.toggle!(:is_active)
-        end
-
         should "null out its last_noted_at_field" do
-          @post.reload
-          assert_nil(@post.last_noted_at)
+          assert_not_nil(@post.reload.last_noted_at)
+          @note.update!(is_active: false)
+          assert_nil(@post.reload.last_noted_at)
         end
       end
     end
@@ -127,10 +124,9 @@ class NoteTest < ActiveSupport::TestCase
       end
 
       should "update the post's last_noted_at field" do
-        assert_nil(@post.last_noted_at)
-        @note.update(x: 500)
-        @post.reload
-        assert_equal(@post.last_noted_at.to_i, @note.updated_at.to_i)
+        assert_equal(@post.reload.last_noted_at.to_i, @note.updated_at.to_i)
+        assert_changes("@post.reload.last_noted_at") { @note.update(x: 500) }
+        assert_equal(@post.reload.last_noted_at.to_i, @note.reload.updated_at.to_i)
       end
 
       should "create a version" do

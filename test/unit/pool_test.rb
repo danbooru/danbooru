@@ -20,36 +20,6 @@ class PoolTest < ActiveSupport::TestCase
     CurrentUser.ip_addr = nil
   end
 
-  context "A name" do
-    setup do
-      @pool = FactoryBot.create(:pool, :name => "xxx")
-    end
-
-    should "be mapped to a pool id" do
-      assert_equal(@pool.id, Pool.name_to_id("xxx"))
-    end
-  end
-
-  context "A multibyte character name" do
-    setup do
-      @mb_pool = FactoryBot.create(:pool, :name => "àáâãäå")
-    end
-
-    should "be mapped to a pool id" do
-      assert_equal(@mb_pool.id, Pool.name_to_id("àáâãäå"))
-    end
-  end
-
-  context "An id number" do
-    setup do
-      @pool = FactoryBot.create(:pool)
-    end
-
-    should "be mapped to a pool id" do
-      assert_equal(@pool.id, Pool.name_to_id(@pool.id.to_s))
-    end
-  end
-
   context "Searching pools" do
     should "find pools by name" do
       @pool = FactoryBot.create(:pool, name: "Test Pool")
