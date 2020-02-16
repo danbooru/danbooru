@@ -24,7 +24,7 @@
       <% end %>
       <% t.column "Commenter" do |vote| %>
         <%= link_to_user vote.comment.creator %>
-        <%= link_to "»", comment_votes_path(search: { comment: { creator_name: vote.comment.creator_name }}) %>
+        <%= link_to "»", comment_votes_path(search: { comment: { creator_name: vote.comment.creator.name }}) %>
         <div><%= time_ago_in_words_tagged(vote.comment.created_at) %></div>
       <% end %>
       <% t.column "Voter" do |vote| %>
