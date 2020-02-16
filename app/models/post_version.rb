@@ -81,10 +81,6 @@ class PostVersion < ApplicationRecord
     tags.split
   end
 
-  def presenter
-    PostVersionPresenter.new(self)
-  end
-
   def reload
     flush_cache
     super
