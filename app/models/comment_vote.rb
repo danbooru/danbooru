@@ -11,8 +11,13 @@ class CommentVote < ApplicationRecord
   validates_inclusion_of :score, :in => [-1, 1], :message => "must be 1 or -1"
 
   def self.visible(user = CurrentUser.user)
-    return all if user.is_admin?
-    where(user: user)
+    if user.is_admin?
+      all
+    elsif user.is_member?
+      where(user: user)
+    else
+      none
+    end
   end
 
   def self.comment_matches(params)
@@ -22,7 +27,6 @@ class CommentVote < ApplicationRecord
 
   def self.search(params)
     q = super
-    q = q.visible
     q = q.search_attributes(params, :comment_id, :user, :score)
     q = q.comment_matches(params[:comment])
     q.apply_default_order(params)
