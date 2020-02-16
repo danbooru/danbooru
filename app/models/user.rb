@@ -540,7 +540,7 @@ class User < ApplicationRecord
           custom_style favorite_count api_regen_multiplier
           api_burst_limit remaining_api_limit statement_timeout
           favorite_group_limit favorite_limit tag_query_limit
-          can_comment_vote? can_remove_from_pools? is_comment_limited?
+          can_remove_from_pools? is_comment_limited?
           can_comment? max_saved_searches theme
         ]
       end
