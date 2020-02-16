@@ -30,7 +30,7 @@ class ApplicationController < ActionController::Base
       return
     end
 
-    if request.format.json? || request.format.xml?
+    if subject.respond_to?(:includes) && (request.format.json? || request.format.xml?)
       associations = ParameterBuilder.includes_parameters(params[:only], model_name)
       subject = subject.includes(associations)
     end
