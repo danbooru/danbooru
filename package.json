@@ -30,7 +30,7 @@
     "eslint-loader": "^3.0.0",
     "eslint-plugin-ignore-erb": "^0.1.1",
     "stylelint": "^13.0.0",
-    "stylelint-config-standard": "^19.0.0",
+    "stylelint-config-standard": "^20.0.0",
     "webpack-dev-server": "^3.8.0"
   },
   "browserslist": [
