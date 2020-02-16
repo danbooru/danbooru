@@ -11,7 +11,7 @@ class PostsController < ApplicationController
       end
     else
       @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], raw: params[:raw], random: params[:random], format: params[:format])
-      @posts = @post_set.posts = @post_set.posts.includes(:uploader) if !@post_set.is_random? && CurrentUser.is_moderator?
+      @posts = @post_set.posts
       respond_with(@posts) do |format|
         format.atom
       end

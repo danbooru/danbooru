@@ -112,10 +112,6 @@ module PostSets
       end
     end
 
-    def posts=(set_posts)
-      @posts = set_posts
-    end
-
     def unknown_post_count?
       post_count == Danbooru.config.blank_tag_search_fast_count
     end

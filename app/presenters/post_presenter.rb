@@ -134,10 +134,6 @@ class PostPresenter < Presenter
       "data-is-favorited" => post.favorited_by?(CurrentUser.user.id)
     }
 
-    if CurrentUser.is_moderator?
-      attributes["data-uploader"] = post.uploader.name
-    end
-
     if post.visible?
       attributes["data-md5"] = post.md5
       attributes["data-file-url"] = post.file_url

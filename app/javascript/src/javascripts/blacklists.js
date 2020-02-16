@@ -152,9 +152,6 @@ Blacklist.post_match = function(post, entry) {
   var tags = String($post.attr("data-tags")).match(/\S+/g) || [];
   tags = tags.concat(String($post.attr("data-pools")).match(/\S+/g) || []);
   tags.push("rating:" + $post.data("rating"));
-  if ($post.attr("data-uploader")) {
-    tags.push("user:" + $post.attr("data-uploader").toLowerCase());
-  }
   tags.push("uploaderid:" + $post.attr("data-uploader-id"));
   $.each(String($post.data("flags")).match(/\S+/g) || [], function(i, v) {
     tags.push("status:" + v);
