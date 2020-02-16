@@ -19,7 +19,7 @@ module PostSetPresenters
     end
 
     def not_shown(post, options)
-      !options[:show_deleted] && post.is_deleted? && @post_set.tag_string !~ /status:(?:all|any|deleted|banned)/ && !@post_set.raw
+      CurrentUser.hide_deleted_posts && !options[:show_deleted] && post.is_deleted? && @post_set.tag_string !~ /status:(?:all|any|deleted|banned)/ && !@post_set.raw
     end
 
     def none_shown(options)
