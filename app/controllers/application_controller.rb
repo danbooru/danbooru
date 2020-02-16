@@ -154,11 +154,15 @@ class ApplicationController < ActionController::Base
     render_error_page(status, error)
   end
 
+  def role_only!(role)
+    raise User::PrivilegeError if !CurrentUser.send("is_#{role}?")
+    raise User::PrivilegeError if !request.get? && CurrentUser.user.is_banned?
+    raise User::PrivilegeError if !request.get? && IpBan.is_banned?(CurrentUser.ip_addr)
+  end
+
   User::Roles.each do |role|
     define_method("#{role}_only") do
-      if !CurrentUser.user.send("is_#{role}?") || CurrentUser.user.is_banned? || IpBan.is_banned?(CurrentUser.ip_addr)
-        raise User::PrivilegeError
-      end
+      role_only!(role)
     end
   end
 
