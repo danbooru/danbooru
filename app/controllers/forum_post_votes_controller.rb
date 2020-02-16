@@ -3,14 +3,14 @@ class ForumPostVotesController < ApplicationController
   before_action :member_only, only: [:create, :destroy]
 
   def index
-    @forum_post_votes = ForumPostVote.paginated_search(params, count_pages: true)
+    @forum_post_votes = ForumPostVote.visible.paginated_search(params, count_pages: true)
     @forum_post_votes = @forum_post_votes.includes(:creator, forum_post: [:creator, :topic]) if request.format.html?
 
     respond_with(@forum_post_votes)
   end
 
   def create
-    @forum_post = ForumPost.find(params[:forum_post_id])
+    @forum_post = ForumPost.permitted.find(params[:forum_post_id])
     @forum_post_vote = @forum_post.votes.create(forum_post_vote_params.merge(creator: CurrentUser.user))
     respond_with(@forum_post_vote)
   end

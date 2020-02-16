@@ -3,10 +3,12 @@ class ForumPostVote < ApplicationRecord
   belongs_to :forum_post
   validates :creator_id, uniqueness: {scope: :forum_post_id}
   validates :score, inclusion: {in: [-1, 0, 1]}
+
   scope :up, -> {where(score: 1)}
   scope :down, -> {where(score: -1)}
   scope :by, ->(user_id) {where(creator_id: user_id)}
   scope :excluding_user, ->(user_id) {where("creator_id <> ?", user_id)}
+  scope :visible, -> { where(forum_post: ForumPost.permitted) }
 
   def self.forum_post_matches(params)
     return all if params.blank?
