@@ -177,8 +177,9 @@ Autocomplete.parse_query = function(text, caret) {
 // Update the input field with the item currently focused in the
 // autocomplete menu, then position the caret just after the inserted completion.
 Autocomplete.insert_completion = function(input, completion) {
-  var before_caret_text = input.value.substring(0, input.selectionStart).trim();
-  var after_caret_text = input.value.substring(input.selectionStart).trim();
+  // Trim all whitespace (tabs, spaces) except for line returns
+  var before_caret_text = input.value.substring(0, input.selectionStart).replace(/^[ \t]+|[ \t]+$/gm, "");
+  var after_caret_text = input.value.substring(input.selectionStart).replace(/^[ \t]+|[ \t]+$/gm, "");
 
   var regexp = new RegExp("(" + Autocomplete.TAG_PREFIXES + ")?\\S+$", "g");
   before_caret_text = before_caret_text.replace(regexp, "$1") + completion + " ";
