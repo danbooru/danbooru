@@ -594,7 +594,6 @@ ALTER SEQUENCE public.artist_versions_id_seq OWNED BY public.artist_versions.id;
 CREATE TABLE public.artists (
     id integer NOT NULL,
     name character varying NOT NULL,
-    creator_id integer NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
     other_names text[] DEFAULT '{}'::text[] NOT NULL,
@@ -2437,7 +2436,6 @@ ALTER SEQUENCE public.note_versions_id_seq OWNED BY public.note_versions.id;
 
 CREATE TABLE public.notes (
     id integer NOT NULL,
-    creator_id integer NOT NULL,
     post_id integer NOT NULL,
     x integer NOT NULL,
     y integer NOT NULL,
@@ -2509,7 +2507,6 @@ ALTER SEQUENCE public.pixiv_ugoira_frame_data_id_seq OWNED BY public.pixiv_ugoir
 CREATE TABLE public.pools (
     id integer NOT NULL,
     name character varying,
-    creator_id integer NOT NULL,
     description text,
     is_active boolean DEFAULT true NOT NULL,
     post_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
@@ -6513,13 +6510,6 @@ CREATE INDEX index_notes_on_body_index ON public.notes USING gin (body_index);
 
 
 --
--- Name: index_notes_on_creator_id_and_post_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_notes_on_creator_id_and_post_id ON public.notes USING btree (creator_id, post_id);
-
-
---
 -- Name: index_notes_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6538,13 +6528,6 @@ CREATE UNIQUE INDEX index_pixiv_ugoira_frame_data_on_post_id ON public.pixiv_ugo
 --
 
 CREATE INDEX index_pools_on_category ON public.pools USING btree (category);
-
-
---
--- Name: index_pools_on_creator_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_pools_on_creator_id ON public.pools USING btree (creator_id);
 
 
 --
@@ -7368,6 +7351,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200118015014'),
 ('20200119184442'),
 ('20200119193110'),
-('20200123184743');
+('20200123184743'),
+('20200217044719');
 
 

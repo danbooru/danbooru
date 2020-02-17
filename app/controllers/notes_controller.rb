@@ -7,7 +7,7 @@ class NotesController < ApplicationController
 
   def index
     @notes = Note.paginated_search(params)
-    @notes = @notes.includes(:creator, :post) if request.format.html?
+    @notes = @notes.includes(:post) if request.format.html?
 
     respond_with(@notes)
   end
@@ -20,7 +20,7 @@ class NotesController < ApplicationController
   end
 
   def create
-    @note = Note.create(note_params(:create).merge(creator: CurrentUser.user))
+    @note = Note.create(note_params(:create))
     respond_with(@note) do |fmt|
       fmt.json do
         if @note.errors.any?

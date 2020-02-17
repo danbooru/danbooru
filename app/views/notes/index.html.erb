@@ -19,8 +19,6 @@
         <% end %>
       <% end %>
       <% t.column "Created" do |note| %>
-        <%= link_to_user note.creator %>
-        <%= link_to "»", notes_path(search: { creator_name: note.creator.name }) %>
         <div><%= time_ago_in_words_tagged(note.created_at) %></div>
       <% end %>
     <% end %>

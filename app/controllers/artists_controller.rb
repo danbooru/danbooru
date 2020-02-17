@@ -44,7 +44,7 @@ class ArtistsController < ApplicationController
   end
 
   def create
-    @artist = Artist.create(artist_params.merge(creator: CurrentUser.user))
+    @artist = Artist.create(artist_params)
     respond_with(@artist)
   end
 

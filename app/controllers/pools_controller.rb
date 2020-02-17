@@ -18,7 +18,6 @@ class PoolsController < ApplicationController
 
   def index
     @pools = Pool.paginated_search(params, count_pages: true)
-    @pools = @pools.includes(:creator) if request.format.html?
 
     respond_with(@pools)
   end
@@ -40,7 +39,7 @@ class PoolsController < ApplicationController
   end
 
   def create
-    @pool = Pool.create(pool_params.merge(creator: CurrentUser.user))
+    @pool = Pool.create(pool_params)
     flash[:notice] = @pool.valid? ? "Pool created" : @pool.errors.full_messages.join("; ")
     respond_with(@pool)
   end

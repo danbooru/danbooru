@@ -3,7 +3,6 @@ class Pool < ApplicationRecord
   POOL_ORDER_LIMIT = 1000
 
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
-  belongs_to :creator, class_name: "User"
 
   validates_uniqueness_of :name, case_sensitive: false, if: :name_changed?
   validate :validate_name, if: :name_changed?
@@ -53,7 +52,7 @@ class Pool < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :creator, :is_deleted, :name, :description, :post_ids)
+      q = q.search_attributes(params, :is_deleted, :name, :description, :post_ids)
       q = q.text_attribute_matches(:description, params[:description_matches])
 
       if params[:post_tags_match]
@@ -299,9 +298,5 @@ class Pool < ApplicationRecord
     if removed.any? && !CurrentUser.user.can_remove_from_pools?
       errors[:base] << "You cannot removes posts from pools within the first week of sign up"
     end
-  end
-
-  def self.available_includes
-    [:creator]
   end
 end

@@ -11,7 +11,6 @@ class Artist < ApplicationRecord
   after_save :clear_url_string_changed
   validate :validate_tag_category
   validates :name, tag_name: true, uniqueness: true
-  belongs_to :creator, class_name: "User"
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
   has_many :urls, :dependent => :destroy, :class_name => "ArtistUrl", :autosave => true
   has_many :versions, -> {order("artist_versions.id ASC")}, :class_name => "ArtistVersion"
@@ -386,7 +385,7 @@ class Artist < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :is_active, :is_banned, :creator, :name, :group_name, :other_names)
+      q = q.search_attributes(params, :is_active, :is_banned, :name, :group_name, :other_names)
 
       if params[:any_other_name_like]
         q = q.any_other_name_like(params[:any_other_name_like])
@@ -446,6 +445,6 @@ class Artist < ApplicationRecord
   end
 
   def self.available_includes
-    [:creator, :members, :urls, :wiki_page, :tag_alias, :tag]
+    [:members, :urls, :wiki_page, :tag_alias, :tag]
   end
 end

@@ -524,7 +524,7 @@ class ArtistTest < ActiveSupport::TestCase
     context "#new_with_defaults" do
       should "fetch the defaults from the given source" do
         source = "https://i.pximg.net/img-original/img/2018/01/28/23/56/50/67014762_p0.jpg"
-        artist = Artist.new_with_defaults(source: source, creator: create(:user))
+        artist = Artist.new_with_defaults(source: source)
 
         assert_equal("niceandcool", artist.name)
         assert_equal("nice_and_cool", artist.other_names_string)

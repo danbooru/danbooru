@@ -3,7 +3,6 @@ class Note < ApplicationRecord
 
   attr_accessor :html_id
   belongs_to :post
-  belongs_to :creator, class_name: "User"
   has_many :versions, -> {order("note_versions.id ASC")}, :class_name => "NoteVersion", :dependent => :destroy
   validates_presence_of :x, :y, :width, :height, :body
   validate :note_within_image
@@ -19,7 +18,7 @@ class Note < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :creator, :post, :is_active, :x, :y, :width, :height, :body, :version)
+      q = q.search_attributes(params, :post, :is_active, :x, :y, :width, :height, :body, :version)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index)
 
       q.apply_default_order(params)
@@ -123,9 +122,8 @@ class Note < ApplicationRecord
     save!
   end
 
-  def copy_to(new_post, creator: CurrentUser.user)
+  def copy_to(new_post)
     new_note = dup
-    new_note.creator = creator
     new_note.post_id = new_post.id
     new_note.version = 0
 
@@ -154,6 +152,6 @@ class Note < ApplicationRecord
   end
 
   def self.available_includes
-    [:creator, :post]
+    [:post]
   end
 end
