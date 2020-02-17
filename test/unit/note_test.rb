@@ -58,12 +58,6 @@ class NoteTest < ActiveSupport::TestCase
         assert_equal(["Note must be inside the image"], @note.errors.full_messages)
       end
 
-      should "not validate if the post does not exist" do
-        @note = FactoryBot.build(:note, :x => 500, :y => 500, :post_id => -1)
-        @note.save
-        assert_equal(["Post must exist"], @note.errors.full_messages)
-      end
-
       should "not validate if the body is blank" do
         @note = FactoryBot.build(:note, body: "   ", :post => @post)
 

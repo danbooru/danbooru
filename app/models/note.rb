@@ -8,7 +8,7 @@ class Note < ApplicationRecord
   validate :note_within_image
   after_save :update_post
   after_save :create_version
-  validate :post_must_not_be_note_locked
+  validate :validate_post_is_not_locked
 
   module SearchMethods
     def active
@@ -27,10 +27,8 @@ class Note < ApplicationRecord
 
   extend SearchMethods
 
-  def post_must_not_be_note_locked
-    if is_locked?
-      errors.add :post, "is note locked"
-    end
+  def validate_post_is_not_locked
+    errors[:post] << "is note locked" if post.is_note_locked?
   end
 
   def note_within_image
@@ -38,10 +36,6 @@ class Note < ApplicationRecord
     if x < 0 || y < 0 || (x > post.image_width) || (y > post.image_height) || width < 0 || height < 0 || (x + width > post.image_width) || (y + height > post.image_height)
       self.errors.add(:note, "must be inside the image")
     end
-  end
-
-  def is_locked?
-    Post.exists?(["id = ? AND is_note_locked = ?", post_id, true])
   end
 
   def rescale!(x_scale, y_scale)
