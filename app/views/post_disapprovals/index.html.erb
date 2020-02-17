@@ -27,8 +27,11 @@
         <%= link_to post_disapproval.reason.humanize, post_disapprovals_path(search: params[:search].merge(reason: post_disapproval.reason)) %>
       <% end %>
       <% t.column "Created" do |post_disapproval| %>
-        <%= link_to_user post_disapproval.user %>
-        <%= link_to "»", post_disapprovals_path(search: params[:search].merge(creator_name: post_disapproval.user&.name)) %>
+        <% if post_disapproval.can_view_creator?(CurrentUser.user) %>
+          <%= link_to_user post_disapproval.user %>
+          <%= link_to "»", post_disapprovals_path(search: params[:search].merge(creator_name: post_disapproval.user&.name)) %>
+        <% end %>
+
         <p>
           <%= compact_time(post_disapproval.updated_at) %>
         </p>

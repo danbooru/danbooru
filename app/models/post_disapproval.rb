@@ -39,12 +39,6 @@ class PostDisapproval < ApplicationRecord
     end
   end
 
-  def create_downvote
-    if %w(breaks_rules poor_quality).include?(reason)
-      PostVote.create(:score => -1, :post_id => post_id)
-    end
-  end
-
   concerning :SearchMethods do
     class_methods do
       def search(params)
@@ -70,5 +64,15 @@ class PostDisapproval < ApplicationRecord
 
   def self.available_includes
     [:user, :post]
+  end
+
+  def can_view_creator?(user)
+    user.is_moderator? || user_id == user.id
+  end
+
+  def api_attributes
+    attributes = super
+    attributes -= [:creator_id] unless can_view_creator?(CurrentUser.user)
+    attributes
   end
 end

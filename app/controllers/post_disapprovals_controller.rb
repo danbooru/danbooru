@@ -1,5 +1,5 @@
 class PostDisapprovalsController < ApplicationController
-  before_action :approver_only
+  before_action :approver_only, only: [:create]
   skip_before_action :api_check
   respond_to :js, :html, :json, :xml
 
