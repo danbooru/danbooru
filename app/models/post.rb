@@ -59,6 +59,16 @@ class Post < ApplicationRecord
 
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :view_count
 
+  scope :pending, -> { where(is_pending: true) }
+  scope :flagged, -> { where(is_flagged: true) }
+  scope :pending_or_flagged, -> { pending.or(flagged) }
+
+  scope :undeleted, -> { where(is_deleted: false) }
+  scope :unflagged, -> { where(is_flagged: false) }
+  scope :deleted, -> { where(is_deleted: true) }
+  scope :has_notes, -> { where.not(last_noted_at: nil) }
+  scope :for_user, ->(user_id) { where(uploader_id: user_id) }
+
   if PostVersion.enabled?
     has_many :versions, -> { Rails.env.test? ? order("post_versions.updated_at ASC, post_versions.id ASC") : order("post_versions.updated_at ASC") }, class_name: "PostVersion", dependent: :destroy
   end
@@ -1518,34 +1528,6 @@ class Post < ApplicationRecord
       end
 
       from(relation.arel.as("posts"))
-    end
-
-    def pending
-      where(is_pending: true)
-    end
-
-    def flagged
-      where(is_flagged: true)
-    end
-
-    def pending_or_flagged
-      pending.or(flagged)
-    end
-
-    def undeleted
-      where("is_deleted = ?", false)
-    end
-
-    def deleted
-      where("is_deleted = ?", true)
-    end
-
-    def has_notes
-      where("last_noted_at is not null")
-    end
-
-    def for_user(user_id)
-      where("uploader_id = ?", user_id)
     end
 
     def available_for_moderation(hidden = false, user = CurrentUser.user)

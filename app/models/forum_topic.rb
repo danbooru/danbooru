@@ -31,6 +31,8 @@ class ForumTopic < ApplicationRecord
     ModAction.log("locked forum topic ##{id} (title: #{title})", :forum_topic_lock)
   end
 
+  scope :active, -> { where(is_deleted: false) }
+
   module CategoryMethods
     extend ActiveSupport::Concern
 
@@ -50,10 +52,6 @@ class ForumTopic < ApplicationRecord
   end
 
   module SearchMethods
-    def active
-      where(is_deleted: false)
-    end
-
     def permitted
       where("min_level <= ?", CurrentUser.level)
     end

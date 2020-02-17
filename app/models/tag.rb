@@ -58,6 +58,9 @@ class Tag < ApplicationRecord
   before_save :update_category_cache, if: :category_changed?
   before_save :update_category_post_counts, if: :category_changed?
 
+  scope :empty, -> { where("tags.post_count <= 0") }
+  scope :nonempty, -> { where("tags.post_count > 0") }
+
   module ApiMethods
     def to_legacy_json
       return {
@@ -797,14 +800,6 @@ class Tag < ApplicationRecord
   end
 
   module SearchMethods
-    def empty
-      where("tags.post_count <= 0")
-    end
-
-    def nonempty
-      where("tags.post_count > 0")
-    end
-
     # ref: https://www.postgresql.org/docs/current/static/pgtrgm.html#idm46428634524336
     def order_similarity(name)
       # trunc(3 * sim) reduces the similarity score from a range of 0.0 -> 1.0 to just 0, 1, or 2.

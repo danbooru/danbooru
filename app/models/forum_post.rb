@@ -35,13 +35,11 @@ class ForumPost < ApplicationRecord
     :body => ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[/forum_topics/#{topic_id}?page=#{forum_topic_page}]):\n\n[quote]\n#{DText.extract_mention(body, "@" + user_name)}\n[/quote]\n}}
   )
 
+  scope :active, -> { where(is_deleted: false) }
+
   module SearchMethods
     def topic_title_matches(title)
       where(topic_id: ForumTopic.search(title_matches: title).select(:id))
-    end
-
-    def active
-      where("forum_posts.is_deleted = false")
     end
 
     def permitted

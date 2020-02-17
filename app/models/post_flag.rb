@@ -21,6 +21,10 @@ class PostFlag < ApplicationRecord
   scope :by_users, -> { where.not(creator: User.system) }
   scope :by_system, -> { where(creator: User.system) }
   scope :in_cooldown, -> { by_users.where("created_at >= ?", COOLDOWN_PERIOD.ago) }
+  scope :resolved, -> { where(is_resolved: true) }
+  scope :unresolved, -> { where(is_resolved: false) }
+  scope :recent, -> { where("post_flags.created_at >= ?", 1.day.ago) }
+  scope :old, -> { where("post_flags.created_at <= ?", 3.days.ago) }
 
   module SearchMethods
     def duplicate
@@ -29,22 +33,6 @@ class PostFlag < ApplicationRecord
 
     def not_duplicate
       where("to_tsvector('english', post_flags.reason) @@ to_tsquery('!dup & !duplicate & !sample & !smaller')")
-    end
-
-    def resolved
-      where("is_resolved = ?", true)
-    end
-
-    def unresolved
-      where("is_resolved = ?", false)
-    end
-
-    def recent
-      where("created_at >= ?", 1.day.ago)
-    end
-
-    def old
-      where("created_at <= ?", 3.days.ago)
     end
 
     def search(params)

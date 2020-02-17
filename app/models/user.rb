@@ -129,6 +129,12 @@ class User < ApplicationRecord
 
   enum theme: { light: 0, dark: 100 }, _suffix: true
 
+  # UserDeletion#rename renames deleted users to `user_<1234>~`. Tildes
+  # are appended if the username is taken.
+  scope :deleted, -> { where("name ~ 'user_[0-9]+~*'") }
+  scope :undeleted, -> { where("name !~ 'user_[0-9]+~*'") }
+  scope :admins, -> { where(level: Levels::ADMIN) }
+
   module BanMethods
     def validate_ip_addr_is_not_banned
       if IpBan.is_banned?(CurrentUser.ip_addr)
@@ -635,20 +641,6 @@ class User < ApplicationRecord
   end
 
   module SearchMethods
-    def admins
-      where("level = ?", Levels::ADMIN)
-    end
-
-    # UserDeletion#rename renames deleted users to `user_<1234>~`. Tildes
-    # are appended if the username is taken.
-    def deleted
-      where("name ~ 'user_[0-9]+~*'")
-    end
-
-    def undeleted
-      where("name !~ 'user_[0-9]+~*'")
-    end
-
     def with_email(email)
       if email.blank?
         where("FALSE")

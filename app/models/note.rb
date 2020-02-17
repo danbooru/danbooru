@@ -10,11 +10,9 @@ class Note < ApplicationRecord
   after_save :create_version
   validate :validate_post_is_not_locked
 
-  module SearchMethods
-    def active
-      where("is_active = TRUE")
-    end
+  scope :active, -> { where(is_active: true) }
 
+  module SearchMethods
     def search(params)
       q = super
 

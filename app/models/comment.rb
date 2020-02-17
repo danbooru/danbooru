@@ -24,15 +24,10 @@ class Comment < ApplicationRecord
     :body => ->(user_name) {"@#{creator.name} mentioned you in a \"comment\":/posts/#{post_id}#comment-#{id} on post ##{post_id}:\n\n[quote]\n#{DText.extract_mention(body, "@" + user_name)}\n[/quote]\n"}
   )
 
+  scope :deleted, -> { where(is_deleted: true) }
+  scope :undeleted, -> { where(is_deleted: false) }
+
   module SearchMethods
-    def deleted
-      where("comments.is_deleted = true")
-    end
-
-    def undeleted
-      where("comments.is_deleted = false")
-    end
-
     def search(params)
       q = super
 

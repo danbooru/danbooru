@@ -68,7 +68,9 @@ class Upload < ApplicationRecord
 
   after_destroy_commit :delete_files
 
+  scope :pending, -> { where(status: "pending") }
   scope :preprocessed, -> { where(status: "preprocessed") }
+  scope :uploaded_by, ->(user_id) { where(uploader_id: user_id) }
 
   def initialize_attributes
     self.uploader_id = CurrentUser.id
@@ -180,14 +182,6 @@ class Upload < ApplicationRecord
   end
 
   module SearchMethods
-    def uploaded_by(user_id)
-      where("uploader_id = ?", user_id)
-    end
-
-    def pending
-      where(:status => "pending")
-    end
-
     def search(params)
       q = super
 

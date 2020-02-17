@@ -16,23 +16,12 @@ class Pool < ApplicationRecord
 
   api_attributes including: [:post_count]
 
+  scope :deleted, -> { where(is_deleted: true) }
+  scope :undeleted, -> { where(is_deleted: false) }
+  scope :series, -> { where(category: "series") }
+  scope :collection, -> { where(category: "collection") }
+
   module SearchMethods
-    def deleted
-      where("pools.is_deleted = true")
-    end
-
-    def undeleted
-      where("pools.is_deleted = false")
-    end
-
-    def series
-      where("pools.category = ?", "series")
-    end
-
-    def collection
-      where("pools.category = ?", "collection")
-    end
-
     def name_matches(name)
       name = normalize_name_for_search(name)
       name = "*#{name}*" unless name =~ /\*/

@@ -21,6 +21,8 @@ class WikiPage < ApplicationRecord
 
   api_attributes including: [:category_name]
 
+  scope :active, -> { where(is_deleted: false) }
+
   module SearchMethods
     def find_by_id_or_title(id)
       if id =~ /\A\d+\z/
@@ -32,10 +34,6 @@ class WikiPage < ApplicationRecord
 
     def titled(title)
       where(title: normalize_title(title))
-    end
-
-    def active
-      where("is_deleted = false")
     end
 
     def other_names_include(name)
