@@ -13,28 +13,6 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
-    context "#estimate_update_count" do
-      setup do
-        FactoryBot.create(:post, tag_string: "aaa")
-        FactoryBot.create(:post, tag_string: "bbb")
-        FactoryBot.create(:post, tag_string: "ccc")
-        FactoryBot.create(:post, tag_string: "ddd")
-        FactoryBot.create(:post, tag_string: "eee")
-
-        @script = "create alias aaa -> 000\n" +
-          "create implication bbb -> 111\n" +
-          "remove alias ccc -> 222\n" +
-          "remove implication ddd -> 333\n" +
-          "mass update eee -> 444\n"
-      end
-
-      subject { BulkUpdateRequest.new(script: @script) }
-
-      should "return the correct count" do
-        assert_equal(3, subject.estimate_update_count)
-      end
-    end
-
     context "#update_notice" do
       setup do
         @forum_topic = create(:forum_topic, creator: @admin)

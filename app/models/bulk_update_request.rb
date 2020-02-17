@@ -206,10 +206,6 @@ class BulkUpdateRequest < ApplicationRecord
     status == "rejected"
   end
 
-  def estimate_update_count
-    AliasAndImplicationImporter.new(script, nil).estimate_update_count
-  end
-
   def update_notice
     TagChangeNoticeService.update_cache(
       AliasAndImplicationImporter.new(script, nil).affected_tags,

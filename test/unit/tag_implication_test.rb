@@ -53,17 +53,6 @@ class TagImplicationTest < ActiveSupport::TestCase
       end
     end
 
-    context "#estimate_update_count" do
-      setup do
-        FactoryBot.create(:post, tag_string: "aaa bbb ccc")
-        @implication = FactoryBot.create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
-      end
-
-      should "get the right count" do
-        assert_equal(1, @implication.estimate_update_count)
-      end
-    end
-
     context "#update_notice" do
       setup do
         @forum_topic = FactoryBot.create(:forum_topic)

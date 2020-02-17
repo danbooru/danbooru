@@ -198,10 +198,6 @@ class TagRelationship < ApplicationRecord
     end
   end
 
-  def estimate_update_count
-    Post.fast_count(antecedent_name, skip_cache: true)
-  end
-
   def update_posts
     Post.without_timeout do
       Post.raw_tag_match(antecedent_name).find_each do |post|

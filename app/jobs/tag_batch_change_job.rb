@@ -20,12 +20,6 @@ class TagBatchChangeJob < ApplicationJob
     end
   end
 
-  def self.estimate_update_count(antecedent, consequent)
-    CurrentUser.without_safe_mode do
-      Post.tag_match(antecedent).count
-    end
-  end
-
   def migrate_posts(normalized_antecedent, normalized_consequent)
     ::Post.tag_match(normalized_antecedent.join(" ")).find_each do |post|
       post.with_lock do

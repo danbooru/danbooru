@@ -57,17 +57,6 @@ class TagAliasTest < ActiveSupport::TestCase
       end
     end
 
-    context "#estimate_update_count" do
-      setup do
-        FactoryBot.create(:post, tag_string: "aaa bbb ccc")
-        @alias = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
-      end
-
-      should "get the right count" do
-        assert_equal(1, @alias.estimate_update_count)
-      end
-    end
-
     context "#update_notice" do
       setup do
         @forum_topic = FactoryBot.create(:forum_topic)
