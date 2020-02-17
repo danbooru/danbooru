@@ -137,20 +137,6 @@ class Note < ApplicationRecord
     new_note.save
   end
 
-  def self.undo_changes_by_user(vandal_id)
-    transaction do
-      note_ids = NoteVersion.where(:updater_id => vandal_id).select("note_id").distinct.map(&:note_id)
-      NoteVersion.where(["updater_id = ?", vandal_id]).delete_all
-      note_ids.each do |note_id|
-        note = Note.find(note_id)
-        most_recent = note.versions.last
-        if most_recent
-          note.revert_to!(most_recent)
-        end
-      end
-    end
-  end
-
   def self.available_includes
     [:post]
   end

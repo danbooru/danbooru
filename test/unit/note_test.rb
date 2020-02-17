@@ -163,32 +163,6 @@ class NoteTest < ActiveSupport::TestCase
       end
     end
 
-    context "when notes have been vandalized by one user" do
-      setup do
-        @vandal = FactoryBot.create(:user)
-        @note = FactoryBot.create(:note, :x => 5, :y => 5)
-        CurrentUser.scoped(@vandal, "127.0.0.1") do
-          @note.update(x: 10, y: 10)
-        end
-      end
-
-      context "the act of undoing all changes by that user" do
-        should "revert any affected notes" do
-          assert_equal(2, NoteVersion.count)
-          assert_equal([1, 2], @note.versions.map(&:version))
-          assert_equal([@user.id, @vandal.id], @note.versions.map(&:updater_id))
-          travel(1.day) do
-            Note.undo_changes_by_user(@vandal.id)
-          end
-          @note.reload
-          assert_equal([1, 3], @note.versions.map(&:version))
-          assert_equal([@user.id, @user.id], @note.versions.map(&:updater_id))
-          assert_equal(5, @note.x)
-          assert_equal(5, @note.y)
-        end
-      end
-    end
-
     context "searching for a note" do
       setup do
         @note = FactoryBot.create(:note, :body => "aaa")
