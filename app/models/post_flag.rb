@@ -4,7 +4,6 @@ class PostFlag < ApplicationRecord
   module Reasons
     UNAPPROVED = "Unapproved in three days"
     REJECTED = "Unapproved in three days after returning to moderation queue%"
-    BANNED = "Artist requested removal"
   end
 
   COOLDOWN_PERIOD = 3.days
@@ -27,14 +26,6 @@ class PostFlag < ApplicationRecord
   scope :old, -> { where("post_flags.created_at <= ?", 3.days.ago) }
 
   module SearchMethods
-    def duplicate
-      where("to_tsvector('english', post_flags.reason) @@ to_tsquery('dup | duplicate | sample | smaller')")
-    end
-
-    def not_duplicate
-      where("to_tsvector('english', post_flags.reason) @@ to_tsquery('!dup & !duplicate & !sample & !smaller')")
-    end
-
     def search(params)
       q = super
 
@@ -64,17 +55,13 @@ class PostFlag < ApplicationRecord
 
       case params[:category]
       when "normal"
-        q = q.where("reason NOT IN (?) AND reason NOT LIKE ?", [Reasons::UNAPPROVED, Reasons::BANNED], Reasons::REJECTED)
+        q = q.where("reason NOT IN (?) AND reason NOT LIKE ?", [Reasons::UNAPPROVED], Reasons::REJECTED)
       when "unapproved"
         q = q.where(reason: Reasons::UNAPPROVED)
-      when "banned"
-        q = q.where(reason: Reasons::BANNED)
       when "rejected"
         q = q.where("reason LIKE ?", Reasons::REJECTED)
       when "deleted"
         q = q.where("reason = ? OR reason LIKE ?", Reasons::UNAPPROVED, Reasons::REJECTED)
-      when "duplicate"
-        q = q.duplicate
       end
 
       q.apply_default_order(params)
@@ -98,8 +85,6 @@ class PostFlag < ApplicationRecord
       :unapproved
     when /#{Reasons::REJECTED.gsub("%", ".*")}/
       :rejected
-    when Reasons::BANNED
-      :banned
     else
       :normal
     end
