@@ -6,10 +6,12 @@ class ArtistsController < ApplicationController
 
   def new
     @artist = Artist.new_with_defaults(artist_params(:new))
+    @artist.build_wiki_page if @artist.wiki_page.nil?
     respond_with(@artist)
   end
 
   def edit
+    @artist.build_wiki_page if @artist.wiki_page.nil?
     respond_with(@artist)
   end
 
@@ -93,6 +95,7 @@ class ArtistsController < ApplicationController
 
   def artist_params(context = nil)
     permitted_params = %i[name other_names other_names_string group_name url_string notes is_active]
+    permitted_params << { wiki_page_attributes: %i[id body] }
     permitted_params << :source if context == :new
 
     params.fetch(:artist, {}).permit(permitted_params)

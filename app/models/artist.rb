@@ -8,7 +8,6 @@ class Artist < ApplicationRecord
   before_validation :normalize_name
   before_validation :normalize_other_names
   after_save :create_version
-  after_save :update_wiki
   after_save :clear_url_string_changed
   validate :validate_tag_category
   validates :name, tag_name: true, uniqueness: true
@@ -19,7 +18,8 @@ class Artist < ApplicationRecord
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :tag_alias, :foreign_key => "antecedent_name", :primary_key => "name"
   belongs_to :tag, foreign_key: "name", primary_key: "name", default: -> { Tag.new(name: name, category: Tag.categories.artist) }
-  attribute :notes, :string
+
+  accepts_nested_attributes_for :wiki_page, update_only: true, reject_if: :all_blank
 
   scope :active, -> { where(is_active: true) }
   scope :deleted, -> { where(is_active: false) }
@@ -222,7 +222,7 @@ class Artist < ApplicationRecord
 
   module VersionMethods
     def create_version(force = false)
-      if saved_change_to_name? || url_string_changed || saved_change_to_is_active? || saved_change_to_is_banned? || saved_change_to_other_names? || saved_change_to_group_name? || saved_change_to_notes? || force
+      if saved_change_to_name? || url_string_changed || saved_change_to_is_active? || saved_change_to_is_banned? || saved_change_to_other_names? || saved_change_to_group_name? || force
         if merge_version?
           merge_version
         else
@@ -292,64 +292,6 @@ class Artist < ApplicationRecord
       artist.normalize_name
       artist.normalize_other_names
       artist
-    end
-  end
-
-  module NoteMethods
-    extend ActiveSupport::Concern
-
-    def notes
-      @notes || wiki_page.try(:body)
-    end
-
-    def notes=(text)
-      if notes != text
-        notes_will_change!
-        @notes = text
-      end
-    end
-
-    def reload(options = nil)
-      flush_cache
-
-      if instance_variable_defined?(:@notes)
-        remove_instance_variable(:@notes)
-      end
-
-      super
-    end
-
-    def notes_changed?
-      attribute_changed?("notes")
-    end
-
-    def notes_will_change!
-      attribute_will_change!("notes")
-    end
-
-    def update_wiki
-      if persisted? && saved_change_to_name? && attribute_before_last_save("name").present? && WikiPage.titled(attribute_before_last_save("name")).exists?
-        # we're renaming the artist, so rename the corresponding wiki page
-        old_page = WikiPage.titled(name_before_last_save).first
-
-        if wiki_page.present?
-          # a wiki page with the new name already exists, so update the content
-          wiki_page.update(body: "#{wiki_page.body}\n\n#{@notes}")
-        else
-          # a wiki page doesn't already exist for the new name, so rename the old one
-          old_page.update(title: name, body: @notes)
-        end
-      elsif wiki_page.nil?
-        # if there are any notes, we need to create a new wiki page
-        if @notes.present?
-          create_wiki_page(body: @notes, title: name)
-        end
-      elsif (!@notes.nil? && (wiki_page.body != @notes)) || wiki_page.title != name
-        # if anything changed, we need to update the wiki page
-        wiki_page.body = @notes unless @notes.nil?
-        wiki_page.title = name
-        wiki_page.save
-      end
     end
   end
 
@@ -487,7 +429,6 @@ class Artist < ApplicationRecord
   include NameMethods
   include VersionMethods
   extend FactoryMethods
-  include NoteMethods
   include TagMethods
   include BanMethods
   extend SearchMethods

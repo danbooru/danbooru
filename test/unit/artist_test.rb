@@ -104,24 +104,6 @@ class ArtistTest < ActiveSupport::TestCase
       end
     end
 
-    should "create a new wiki page to store any note information" do
-      artist = nil
-      assert_difference("WikiPage.count") do
-        artist = FactoryBot.create(:artist, :name => "aaa", :notes => "testing")
-      end
-      assert_equal("testing", artist.notes)
-      assert_equal("testing", artist.wiki_page.body)
-      assert_equal(artist.name, artist.wiki_page.title)
-    end
-
-    should "update the wiki page when notes are assigned" do
-      artist = FactoryBot.create(:artist, :name => "aaa", :notes => "testing")
-      artist.update_attribute(:notes, "kokoko")
-      artist.reload
-      assert_equal("kokoko", artist.notes)
-      assert_equal("kokoko", artist.wiki_page.body)
-    end
-
     should "normalize its name" do
       artist = FactoryBot.create(:artist, :name => "  AAA BBB  ")
       assert_equal("aaa_bbb", artist.name)

@@ -1,15 +1,13 @@
 <%= edit_form_for(@artist) do |f| %>
-  <% if @artist.new_record? %>
-    <%= f.input :name, as: :string, input_html: { data: { autocomplete: "tag" } } %>
-  <% else %>
-    <%= f.input :name, as: :string, input_html: { data: { autocomplete: "tag" } }, hint: "Change to rename this artist entry and its wiki page" %>
-  <% end %>
+  <%= f.input :name, as: :string, input_html: { "data-autocomplete": "tag" } %>
 
   <%= f.input :other_names_string, label: "Other names", as: :text, input_html: { size: "50x1" }, hint: '<b style="color: red;">NEW</b> Separate names with spaces, not commas. Use underscores for spaces inside names.'.html_safe %>
   <%= f.input :group_name %>
-  <%= f.input :url_string, :label => "URLs", :as => :text, :input_html => {:size => "50x5", :value => params.dig(:artist, :url_string) || @artist.urls.join("\n")}, :hint => "You can prefix a URL with - to mark it as dead." %>
+  <%= f.input :url_string, :label => "URLs", :as => :text, :input_html => {:size => "50x15", :value => params.dig(:artist, :url_string) || @artist.urls.join("\n")}, :hint => "You can prefix a URL with - to mark it as dead." %>
 
-  <%= dtext_field "artist", "notes" %>
+  <%= f.simple_fields_for :wiki_page do |fw| %>
+    <%= fw.input :body, label: "Wiki", input_html: { size: "50x15" } %>
+  <% end %>
+
   <%= f.button :submit, "Submit" %>
-  <%= dtext_preview_button "artist", "notes" %>
 <% end %>
