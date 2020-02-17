@@ -163,8 +163,6 @@ class PostFlag < ApplicationRecord
   end
 
   def self.available_includes
-    includes_array = [:post]
-    includes_array << :creator if CurrentUser.user.is_moderator?
-    includes_array
+    [:post]
   end
 end
