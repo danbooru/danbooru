@@ -236,8 +236,8 @@ module ApplicationHelper
     simple_form_for(model, **options, &block)
   end
 
-  def table_for(*options, &block)
-    table = TableBuilder.new(*options, &block)
+  def table_for(*args, **options, &block)
+    table = TableBuilder.new(*args, **options, &block)
     render "table_builder/table", table: table
   end
 

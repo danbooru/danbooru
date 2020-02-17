@@ -3,8 +3,8 @@ class ApplicationRecord < ActiveRecord::Base
 
   concerning :PaginationMethods do
     class_methods do
-      def paginate(*options)
-        extending(PaginationExtension).paginate(*options)
+      def paginate(*args, **options)
+        extending(PaginationExtension).paginate(*args, **options)
       end
 
       def paginated_search(params, defaults: {}, count_pages: params[:search].present?)
@@ -413,9 +413,9 @@ class ApplicationRecord < ActiveRecord::Base
 
   concerning :UserMethods do
     class_methods do
-      def belongs_to_updater(options = {})
+      def belongs_to_updater(**options)
         class_eval do
-          belongs_to :updater, options.merge(class_name: "User")
+          belongs_to :updater, class_name: "User", **options
           before_validation do |rec|
             rec.updater_id = CurrentUser.id
             rec.updater_ip_addr = CurrentUser.ip_addr if rec.respond_to?(:updater_ip_addr=)
