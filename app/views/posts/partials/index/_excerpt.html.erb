@@ -3,9 +3,9 @@
 <div id="excerpt" style="display: none;">
   <% if post_set.artist.present? %>
     <% post_set.artist.tap do |artist| %>
-      <% unless artist.notes.blank? %>
+      <% unless artist.wiki_page.blank? %>
         <div class="prose">
-          <%= format_text(artist.notes) %>
+          <%= format_text(artist.wiki_page.body) %>
         </div>
       <% end %>
 
