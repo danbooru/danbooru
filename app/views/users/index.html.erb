@@ -15,13 +15,13 @@
         <% end %>
       <% end %>
       <% t.column "Posts" do |user| %>
-        <%= link_to user.posts.count, posts_path(:tags => "user:#{user.name}") %>
+        <%= link_to user.post_upload_count, posts_path(:tags => "user:#{user.name}") %>
       <% end %>
       <% t.column "Deleted" do |user| %>
         <%= user.posts.deleted.count %>
       <% end %>
       <% t.column "Notes" do |user| %>
-        <%= link_to user.note_versions.count, note_versions_path(:search => {:updater_id => user.id}) %>
+        <%= link_to user.note_update_count, note_versions_path(:search => {:updater_id => user.id}) %>
       <% end %>
       <% t.column "Edits" do |user| %>
         <%= link_to user.post_update_count, post_versions_path(:search => {:updater_id => user.id}) %>
