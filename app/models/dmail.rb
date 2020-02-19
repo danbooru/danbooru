@@ -21,7 +21,6 @@ class Dmail < ApplicationRecord
   scope :deleted, -> { where(is_deleted: true) }
   scope :read, -> { where(is_read: true) }
   scope :unread, -> { where(is_read: false) }
-  scope :visible, -> { where(owner: CurrentUser.user) }
   scope :sent, -> { where("dmails.owner_id = dmails.from_id") }
   scope :received, -> { where("dmails.owner_id = dmails.to_id") }
 
@@ -85,6 +84,10 @@ class Dmail < ApplicationRecord
   end
 
   module SearchMethods
+    def visible(user)
+      where(owner: user)
+    end
+
     def sent_by(user)
       where("dmails.from_id = ? AND dmails.owner_id != ?", user.id, user.id)
     end

@@ -26,14 +26,12 @@ class PostVote < ApplicationRecord
     positive.where(user_id: user_id).pluck(:post_id)
   end
 
-  def self.visible(user = CurrentUser.user)
-    return all if user.is_admin?
-    where(user: user)
+  def self.visible(user)
+    user.is_admin? ? all : where(user: user)
   end
 
   def self.search(params)
     q = super
-    q = q.visible
     q = q.search_attributes(params, :post, :user, :score)
     q.apply_default_order(params)
   end

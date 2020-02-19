@@ -4,7 +4,7 @@ class FavoriteGroupsController < ApplicationController
 
   def index
     params[:search][:creator_id] ||= params[:user_id]
-    @favorite_groups = FavoriteGroup.paginated_search(params)
+    @favorite_groups = FavoriteGroup.visible(CurrentUser.user).paginated_search(params)
     @favorite_groups = @favorite_groups.includes(:creator) if request.format.html?
 
     respond_with(@favorite_groups)

@@ -1,6 +1,10 @@
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
+  include Mentionable
+  extend HasBitFlags
+  extend Searchable
+
   concerning :PaginationMethods do
     class_methods do
       def paginate(*args, **options)
@@ -16,9 +20,15 @@ class ApplicationRecord < ActiveRecord::Base
     end
   end
 
-  module ApiMethods
-    extend ActiveSupport::Concern
+  concerning :PrivilegeMethods do
+    class_methods do
+      def visible(user)
+        all
+      end
+    end
+  end
 
+  concerning :ApiMethods do
     class_methods do
       def api_attributes(*attributes, including: [])
         return @api_attributes if @api_attributes
@@ -175,9 +185,4 @@ class ApplicationRecord < ActiveRecord::Base
   def warnings
     @warnings ||= ActiveModel::Errors.new(self)
   end
-
-  include ApiMethods
-  include Mentionable
-  extend HasBitFlags
-  extend Searchable
 end

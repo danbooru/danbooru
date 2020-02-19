@@ -117,7 +117,7 @@ class User < ApplicationRecord
   has_many :dmails, -> {order("dmails.id desc")}, :foreign_key => "owner_id"
   has_many :saved_searches
   has_many :forum_posts, -> {order("forum_posts.created_at, forum_posts.id")}, :foreign_key => "creator_id"
-  has_many :user_name_change_requests, -> {visible.order("user_name_change_requests.created_at desc")}
+  has_many :user_name_change_requests, -> {order("user_name_change_requests.created_at desc")}
   has_many :favorite_groups, -> {order(name: :asc)}, foreign_key: :creator_id
   has_many :favorites, ->(rec) {where("user_id % 100 = #{rec.id % 100} and user_id = #{rec.id}").order("id desc")}
   has_many :ip_bans, foreign_key: :creator_id
@@ -403,7 +403,7 @@ class User < ApplicationRecord
   module ForumMethods
     def has_forum_been_updated?
       return false unless is_gold?
-      max_updated_at = ForumTopic.permitted.active.maximum(:updated_at)
+      max_updated_at = ForumTopic.visible(self).active.maximum(:updated_at)
       return false if max_updated_at.nil?
       return true if last_forum_read_at.nil?
       return max_updated_at > last_forum_read_at

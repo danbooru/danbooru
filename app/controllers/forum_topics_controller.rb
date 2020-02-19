@@ -23,7 +23,7 @@ class ForumTopicsController < ApplicationController
     params[:search][:order] ||= "sticky" if request.format.html?
     params[:limit] ||= 40
 
-    @forum_topics = ForumTopic.paginated_search(params)
+    @forum_topics = ForumTopic.visible(CurrentUser.user).paginated_search(params)
 
     if request.format.atom?
       @forum_topics = @forum_topics.includes(:creator, :original_post)

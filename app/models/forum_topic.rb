@@ -52,8 +52,8 @@ class ForumTopic < ApplicationRecord
   end
 
   module SearchMethods
-    def permitted
-      where("min_level <= ?", CurrentUser.level)
+    def visible(user)
+      where("min_level <= ?", user.level)
     end
 
     def read_by_user(user)
@@ -79,7 +79,6 @@ class ForumTopic < ApplicationRecord
 
     def search(params)
       q = super
-      q = q.permitted
       q = q.search_attributes(params, :creator, :updater, :is_sticky, :is_locked, :is_deleted, :category_id, :title, :response_count)
       q = q.text_attribute_matches(:title, params[:title_matches], index_column: :text_index)
 
@@ -113,7 +112,7 @@ class ForumTopic < ApplicationRecord
         ForumTopicVisit.create(:user_id => user.id, :forum_topic_id => id, :last_read_at => updated_at)
       end
 
-      unread_topics = ForumTopic.permitted.active.unread_by_user(user)
+      unread_topics = ForumTopic.visible(user).active.unread_by_user(user)
 
       if !unread_topics.exists?
         user.update!(last_forum_read_at: Time.zone.now)

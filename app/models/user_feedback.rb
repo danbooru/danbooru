@@ -21,7 +21,7 @@ class UserFeedback < ApplicationRecord
   scope :undeleted, -> { where(is_deleted: false) }
 
   module SearchMethods
-    def visible(viewer = CurrentUser.user)
+    def visible(viewer)
       viewer.is_moderator? ? all : undeleted
     end
 
@@ -32,7 +32,6 @@ class UserFeedback < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.visible
       q = q.search_attributes(params, :user, :creator, :category, :body, :is_deleted)
       q = q.text_attribute_matches(:body, params[:body_matches])
 

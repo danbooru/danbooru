@@ -15,7 +15,7 @@ class DmailsController < ApplicationController
   end
 
   def index
-    @dmails = Dmail.visible.paginated_search(params, count_pages: true)
+    @dmails = Dmail.visible(CurrentUser.user).paginated_search(params, count_pages: true)
     @dmails = @dmails.includes(:owner, :to, :from) if request.format.html?
 
     respond_with(@dmails)

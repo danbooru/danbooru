@@ -27,7 +27,6 @@ class FavoriteGroup < ApplicationRecord
 
     def search(params)
       q = super
-      q = q.visible(CurrentUser.user)
       q = q.search_attributes(params, :name, :is_public, :post_ids, :creator)
 
       if params[:name_matches].present?

@@ -142,6 +142,7 @@ class Comment < ApplicationRecord
     select { |comment| comment.visibility(user) == :hidden }
   end
 
+  # XXX rename
   def self.visible(user)
     select { |comment| comment.visibility(user) == :visible }
   end

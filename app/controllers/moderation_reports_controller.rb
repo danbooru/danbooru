@@ -10,7 +10,7 @@ class ModerationReportsController < ApplicationController
   end
 
   def index
-    @moderation_reports = ModerationReport.paginated_search(params, count_pages: true)
+    @moderation_reports = ModerationReport.visible(CurrentUser.user).paginated_search(params, count_pages: true)
     @moderation_reports = @moderation_reports.includes(:creator, :model) if request.format.html?
 
     respond_with(@moderation_reports)

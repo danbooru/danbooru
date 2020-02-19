@@ -54,7 +54,7 @@ class ModAction < ApplicationRecord
     other: 2000
   }
 
-  def self.permitted(user)
+  def self.visible(user)
     if user.is_moderator?
       all
     else
@@ -65,7 +65,6 @@ class ModAction < ApplicationRecord
   def self.search(params)
     q = super
 
-    q = q.permitted(CurrentUser.user)
     q = q.search_attributes(params, :creator, :category, :description)
     q = q.text_attribute_matches(:description, params[:description_matches])
 

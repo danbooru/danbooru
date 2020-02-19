@@ -5,7 +5,7 @@ class PostVotesController < ApplicationController
   rescue_with PostVote::Error, status: 422
 
   def index
-    @post_votes = PostVote.paginated_search(params, count_pages: true)
+    @post_votes = PostVote.visible(CurrentUser.user).paginated_search(params, count_pages: true)
     @post_votes = @post_votes.includes(:user, post: :uploader) if request.format.html?
 
     respond_with(@post_votes)

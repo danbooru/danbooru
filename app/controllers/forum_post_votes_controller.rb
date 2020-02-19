@@ -3,7 +3,7 @@ class ForumPostVotesController < ApplicationController
   before_action :member_only, only: [:create, :destroy]
 
   def index
-    @forum_post_votes = ForumPostVote.visible.paginated_search(params, count_pages: true)
+    @forum_post_votes = ForumPostVote.visible(CurrentUser.user).paginated_search(params, count_pages: true)
     @forum_post_votes = @forum_post_votes.includes(:creator, forum_post: [:creator, :topic]) if request.format.html?
 
     respond_with(@forum_post_votes)

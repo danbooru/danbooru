@@ -10,7 +10,7 @@ class CommentVote < ApplicationRecord
   validate :validate_comment_can_be_down_voted
   validates_inclusion_of :score, :in => [-1, 1], :message => "must be 1 or -1"
 
-  def self.visible(user = CurrentUser.user)
+  def self.visible(user)
     if user.is_admin?
       all
     elsif user.is_member?

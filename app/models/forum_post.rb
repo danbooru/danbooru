@@ -40,13 +40,12 @@ class ForumPost < ApplicationRecord
       where(topic_id: ForumTopic.search(title_matches: title).select(:id))
     end
 
-    def permitted
-      where(topic_id: ForumTopic.permitted)
+    def visible(user)
+      where(topic_id: ForumTopic.visible(user))
     end
 
     def search(params)
       q = super
-      q = q.permitted
       q = q.search_attributes(params, :creator, :updater, :topic_id, :is_deleted, :body)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :text_index)
 

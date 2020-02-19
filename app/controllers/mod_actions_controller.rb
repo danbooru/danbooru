@@ -2,7 +2,7 @@ class ModActionsController < ApplicationController
   respond_to :html, :xml, :json
 
   def index
-    @mod_actions = ModAction.paginated_search(params)
+    @mod_actions = ModAction.visible(CurrentUser.user).paginated_search(params)
     @mod_actions = @mod_actions.includes(:creator) if request.format.html?
 
     respond_with(@mod_actions)

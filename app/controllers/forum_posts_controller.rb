@@ -24,7 +24,7 @@ class ForumPostsController < ApplicationController
   end
 
   def index
-    @forum_posts = ForumPost.paginated_search(params)
+    @forum_posts = ForumPost.visible(CurrentUser.user).paginated_search(params)
     @forum_posts = @forum_posts.includes(:topic, :creator) if request.format.html?
 
     respond_with(@forum_posts)
