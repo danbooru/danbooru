@@ -14,13 +14,13 @@
 
   <span class="iqdb-posts-high-similarity">
     <% @high_similarity_matches.each do |match| %>
-      <%= PostPresenter.preview(match["post"], tags: "status:any", similarity: match["score"], size: true) %>
+      <%= PostPresenter.preview(match["post"], show_deleted: true, similarity: match["score"], size: true) %>
     <% end %>
   </span>
 
   <span class="iqdb-posts-low-similarity" style="display: none">
     <% @low_similarity_matches.each do |match| %>
-      <%= PostPresenter.preview(match["post"], tags: "status:any", similarity: match["score"], size: true) %>
+      <%= PostPresenter.preview(match["post"], show_deleted: true, similarity: match["score"], size: true) %>
     <% end %>
   </span>
 </div>
