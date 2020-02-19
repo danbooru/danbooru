@@ -3,7 +3,6 @@ class PostDisapproval < ApplicationRecord
 
   belongs_to :post
   belongs_to :user
-  after_initialize :initialize_attributes, if: :new_record?
   validates_uniqueness_of :post_id, :scope => [:user_id], :message => "have already hidden this post"
   validates_inclusion_of :reason, :in => %w(legacy breaks_rules poor_quality disinterest)
 
@@ -12,10 +11,6 @@ class PostDisapproval < ApplicationRecord
   scope :breaks_rules, -> {where(:reason => "breaks_rules")}
   scope :poor_quality, -> {where(:reason => "poor_quality")}
   scope :disinterest, -> {where(:reason => ["disinterest", "legacy"])}
-
-  def initialize_attributes
-    self.user_id ||= CurrentUser.user.id
-  end
 
   def self.prune!
     PostDisapproval.where("post_id in (select _.post_id from post_disapprovals _ where _.created_at < ?)", DELETION_THRESHOLD.ago).delete_all
