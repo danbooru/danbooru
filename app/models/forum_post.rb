@@ -1,6 +1,4 @@
 class ForumPost < ApplicationRecord
-  include Mentionable
-
   attr_readonly :topic_id
   belongs_to :creator, class_name: "User"
   belongs_to_updater

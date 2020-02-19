@@ -1,5 +1,3 @@
-require 'danbooru/has_bit_flags'
-
 class Post < ApplicationRecord
   class ApprovalError < StandardError; end
   class DisapprovalError < StandardError; end
@@ -1694,13 +1692,8 @@ class Post < ApplicationRecord
   include PixivMethods
   include IqdbMethods
   include ValidationMethods
-  include Danbooru::HasBitFlags
 
-  BOOLEAN_ATTRIBUTES = %w(
-    has_embedded_notes
-    has_cropped
-  )
-  has_bit_flags BOOLEAN_ATTRIBUTES
+  has_bit_flags ["has_embedded_notes", "has_cropped"]
 
   def safeblocked?
     CurrentUser.safe_mode? && (rating != "s" || Danbooru.config.safe_mode_restricted_tags.any? { |tag| tag.in?(tag_array) })

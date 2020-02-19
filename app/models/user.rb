@@ -1,5 +1,4 @@
 require 'digest/sha1'
-require 'danbooru/has_bit_flags'
 
 class User < ApplicationRecord
   class Error < StandardError; end
@@ -67,7 +66,6 @@ class User < ApplicationRecord
     no_feedback
   )
 
-  include Danbooru::HasBitFlags
   has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
 
   attr_accessor :password, :old_password
