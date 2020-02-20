@@ -136,7 +136,6 @@
   --post-mode-menu-remove-fav-background: #FFA;
   --post-mode-menu-vote-up-background: #AFA;
   --post-mode-menu-vote-down-background: #FAA;
-  --post-mode-menu-approve-background: #48C;
   --post-mode-menu-translation-background: #5CD;
 
   --tag-count-color: var(--muted-text-color);
@@ -379,7 +378,6 @@ body[data-current-user-theme="dark"] {
   --post-mode-menu-remove-fav-background: var(--yellow-0);
   --post-mode-menu-vote-up-background: var(--red-0);
   --post-mode-menu-vote-down-background: var(--red-0);
-  --post-mode-menu-approve-background: var(--aqua-0);
   --post-mode-menu-translation-background: var(--blue-0);
 
   --post-notice-border: 1px solid var(--grey-3);

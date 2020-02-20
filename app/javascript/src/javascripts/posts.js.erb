@@ -521,23 +521,6 @@ Post.update = function(post_id, params) {
   });
 }
 
-Post.approve = function(post_id) {
-  $.post(
-    "/post_approvals.json",
-    {"post_id": post_id}
-  ).fail(function(data) {
-    var message = $.map(data.responseJSON.errors, function(msg, attr) { return msg; }).join("; ");
-    Utility.error("Error: " + message);
-  }).done(function(data) {
-    var $post = $("#post_" + post_id);
-    if ($post.length) {
-      $post.data("flags", $post.data("flags").replace(/pending/, ""));
-      $post.removeClass("post-status-pending");
-      Utility.notice("Approved post #" + post_id);
-    }
-  });
-}
-
 Post.initialize_saved_searches = function() {
   $("#save-search-dialog").dialog({
     width: 700,
