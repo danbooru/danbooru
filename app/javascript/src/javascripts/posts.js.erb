@@ -529,22 +529,6 @@ Post.update = function(post_id, params) {
   });
 }
 
-Post.ban = function(post_id) {
-  $.ajax({
-    type: "POST",
-    url: "/moderator/post/posts/" + post_id + "/ban.js",
-    data: {
-      commit: "Ban"
-    },
-    success: function(data) {
-      $("#post_" + post_id).remove();
-    },
-    error: function(data) {
-      Utility.error(`There was an error updating <a href="/posts/${post_id}">post #${post_id}</a>`);
-    }
-  });
-}
-
 Post.approve = function(post_id) {
   $.post(
     "/moderator/post/approval.json",

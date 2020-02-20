@@ -165,14 +165,8 @@ PostModeMenu.click = function(e) {
     Post.vote("down", post_id);
   } else if (s === 'vote-up') {
     Post.vote("up", post_id);
-  } else if (s === 'lock-rating') {
-    Post.update(post_id, {"post[is_rating_locked]": "1"});
-  } else if (s === 'lock-note') {
-    Post.update(post_id, {"post[is_note_locked]": "1"});
   } else if (s === 'approve') {
     Post.approve(post_id);
-  } else if (s === 'ban') {
-    Post.ban(post_id);
   } else if (s === "tag-script") {
     var current_script_id = localStorage.getItem("current_tag_script_id");
     var tag_script = localStorage.getItem("tag-script-" + current_script_id);

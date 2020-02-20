@@ -136,11 +136,8 @@
   --post-mode-menu-remove-fav-background: #FFA;
   --post-mode-menu-vote-up-background: #AFA;
   --post-mode-menu-vote-down-background: #FAA;
-  --post-mode-menu-lock-rating-background: #AA3;
-  --post-mode-menu-lock-note-background: #3AA;
   --post-mode-menu-approve-background: #48C;
   --post-mode-menu-translation-background: #5CD;
-  --post-mode-menu-ban-background: #F33;
 
   --tag-count-color: var(--muted-text-color);
   --low-post-count-color: red;
@@ -382,11 +379,8 @@ body[data-current-user-theme="dark"] {
   --post-mode-menu-remove-fav-background: var(--yellow-0);
   --post-mode-menu-vote-up-background: var(--red-0);
   --post-mode-menu-vote-down-background: var(--red-0);
-  --post-mode-menu-lock-rating-background: var(--purple-0);
-  --post-mode-menu-lock-note-background: var(--purple-0);
   --post-mode-menu-approve-background: var(--aqua-0);
   --post-mode-menu-translation-background: var(--blue-0);
-  --post-mode-menu-ban-background: var(--red-1);
 
   --post-notice-border: 1px solid var(--grey-3);
   --post-search-notice-background: var(--grey-3);
