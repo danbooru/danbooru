@@ -19,12 +19,11 @@ Rails.application.routes.draw do
           get :random
         end
       end
-      resources :posts, :only => [:delete, :undelete, :expunge, :confirm_delete] do
+      resources :posts, :only => [:delete, :expunge, :confirm_delete] do
         member do
           get :confirm_delete
           post :expunge
           post :delete
-          post :undelete
           get :confirm_move_favorites
           post :move_favorites
           get :confirm_ban

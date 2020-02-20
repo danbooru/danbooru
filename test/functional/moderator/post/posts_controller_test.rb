@@ -35,20 +35,6 @@ module Moderator
           end
         end
 
-        context "undelete action" do
-          should "render" do
-            as_user do
-              @post.update(is_deleted: true)
-            end
-            assert_difference(-> { PostApproval.count }, 1) do
-              post_auth undelete_moderator_post_post_path(@post), @admin, params: {:format => "js"}
-            end
-
-            assert_response :success
-            assert(!@post.reload.is_deleted?)
-          end
-        end
-
         context "confirm_move_favorites action" do
           should "render" do
             get_auth confirm_ban_moderator_post_post_path(@post), @admin

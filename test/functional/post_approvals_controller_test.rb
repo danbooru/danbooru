@@ -7,12 +7,24 @@ class PostApprovalsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
-      should "render" do
-        @post = create(:post, is_pending: true)
-        post_auth post_approvals_path(post_id: @post.id, format: :js), @approver
+      context "for a pending post" do
+        should "approve the post" do
+          @post = create(:post, is_pending: true)
+          post_auth post_approvals_path(post_id: @post.id, format: :js), @approver
 
-        assert_response :success
-        assert(!@post.reload.is_pending?)
+          assert_response :success
+          assert(!@post.reload.is_pending?)
+        end
+      end
+
+      context "for a deleted post" do
+        should "undelete the post" do
+          @post = create(:post, is_deleted: true)
+          post_auth post_approvals_path(post_id: @post.id, format: :js), @approver
+
+          assert_response :success
+          assert(!@post.reload.is_deleted?)
+        end
       end
     end
 

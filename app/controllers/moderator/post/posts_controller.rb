@@ -1,7 +1,7 @@
 module Moderator
   module Post
     class PostsController < ApplicationController
-      before_action :approver_only, :only => [:delete, :undelete, :move_favorites, :ban, :unban, :confirm_delete, :confirm_move_favorites, :confirm_ban]
+      before_action :approver_only, :only => [:delete, :move_favorites, :ban, :unban, :confirm_delete, :confirm_move_favorites, :confirm_ban]
       before_action :admin_only, :only => [:expunge]
       skip_before_action :api_check
 
@@ -17,11 +17,6 @@ module Moderator
           @post.delete!(params[:reason], :move_favorites => params[:move_favorites].present?)
         end
         redirect_to(post_path(@post))
-      end
-
-      def undelete
-        @post = ::Post.find(params[:id])
-        @post.approve!
       end
 
       def confirm_move_favorites
