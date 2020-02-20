@@ -1,5 +1,4 @@
 import CurrentUser from './current_user'
-import Favorite from './favorites'
 import Post from './posts.js.erb'
 import Utility from './utility'
 
@@ -156,15 +155,15 @@ PostModeMenu.click = function(e) {
   var post_id = $(e.target).closest("article").data("id");
 
   if (s === "add-fav") {
-    Favorite.create(post_id);
+    Post.tag(post_id, "fav:me");
   } else if (s === "remove-fav") {
-    Favorite.destroy(post_id);
+    Post.tag(post_id, "-fav:me");
   } else if (s === "edit") {
     PostModeMenu.open_edit(post_id);
   } else if (s === 'vote-down') {
-    Post.vote("down", post_id);
+    Post.tag(post_id, "downvote:me");
   } else if (s === 'vote-up') {
-    Post.vote("up", post_id);
+    Post.tag(post_id, "upvote:me");
   } else if (s === 'approve') {
     Post.approve(post_id);
   } else if (s === "tag-script") {
