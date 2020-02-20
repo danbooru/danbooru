@@ -523,7 +523,7 @@ Post.update = function(post_id, params) {
 
 Post.approve = function(post_id) {
   $.post(
-    "/moderator/post/approval.json",
+    "/post_approvals.json",
     {"post_id": post_id}
   ).fail(function(data) {
     var message = $.map(data.responseJSON.errors, function(msg, attr) { return msg; }).join("; ");

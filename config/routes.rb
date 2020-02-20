@@ -19,7 +19,6 @@ Rails.application.routes.draw do
           get :random
         end
       end
-      resource :approval, :only => [:create]
       resources :posts, :only => [:delete, :undelete, :expunge, :confirm_delete] do
         member do
           get :confirm_delete
@@ -204,7 +203,7 @@ Rails.application.routes.draw do
   end
   resources :post_appeals
   resources :post_flags
-  resources :post_approvals, only: [:index]
+  resources :post_approvals, only: [:create, :index]
   resources :post_disapprovals, only: [:create, :show, :index]
   resources :post_versions, :only => [:index, :search] do
     member do

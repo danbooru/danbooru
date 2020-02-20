@@ -62,5 +62,10 @@ FactoryBot.define do
     factory(:uploader) do
       created_at { 2.weeks.ago }
     end
+
+    factory(:approver) do
+      level {32}
+      can_approve_posts {true}
+    end
   end
 end
