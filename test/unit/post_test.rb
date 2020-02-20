@@ -998,6 +998,64 @@ class PostTest < ActiveSupport::TestCase
           end
         end
 
+        context "for status:active" do
+          should "approve the post if the user has permission" do
+            as(create(:approver)) do
+              @post.update!(is_pending: true)
+              @post.update(tag_string: "aaa status:active")
+            end
+
+            assert_equal(false, @post.reload.is_pending?)
+          end
+
+          should "not approve the post if the user is doesn't have permission" do
+            assert_raises(User::PrivilegeError) do
+              @post.update!(is_pending: true)
+              @post.update(tag_string: "aaa status:active")
+            end
+
+            assert_equal(true, @post.reload.is_pending?)
+          end
+        end
+
+        context "for status:banned" do
+          should "ban the post if the user has permission" do
+            as(create(:approver)) do
+              @post.update(tag_string: "aaa status:banned")
+            end
+
+            assert_equal(true, @post.reload.is_banned?)
+          end
+
+          should "not ban the post if the user doesn't have permission" do
+            assert_raises(User::PrivilegeError) do
+              @post.update(tag_string: "aaa status:banned")
+            end
+
+            assert_equal(false, @post.reload.is_banned?)
+          end
+        end
+
+        context "for -status:banned" do
+          should "unban the post if the user has permission" do
+            as(create(:approver)) do
+              @post.update!(is_banned: true)
+              @post.update(tag_string: "aaa -status:banned")
+            end
+
+            assert_equal(false, @post.reload.is_banned?)
+          end
+
+          should "not unban the post if the user doesn't have permission" do
+            assert_raises(User::PrivilegeError) do
+              @post.update!(is_banned: true)
+              @post.update(tag_string: "aaa status:banned")
+            end
+
+            assert_equal(true, @post.reload.is_banned?)
+          end
+        end
+
         context "for a source" do
           should "set the source with source:foo_bar_baz" do
             @post.update(:tag_string => "source:foo_bar_baz")
