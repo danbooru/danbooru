@@ -191,14 +191,6 @@ class TagImplication < TagRelationship
   include ValidationMethods
   include ApprovalMethods
 
-  concerning :EmbeddedText do
-    class_methods do
-      def embedded_pattern
-        /\[ti:(?<id>\d+)\]/m
-      end
-    end
-  end
-
   def reload(options = {})
     flush_cache
     super

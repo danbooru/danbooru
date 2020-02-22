@@ -177,14 +177,6 @@ class TagRelationship < ApplicationRecord
     end
   end
 
-  concerning :EmbeddedText do
-    class_methods do
-      def embedded_pattern
-        raise NotImplementedError
-      end
-    end
-  end
-
   def antecedent_and_consequent_are_different
     if antecedent_name == consequent_name
       errors[:base] << "Cannot alias or implicate a tag to itself"

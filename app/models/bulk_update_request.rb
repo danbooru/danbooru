@@ -137,14 +137,6 @@ class BulkUpdateRequest < ApplicationRecord
   include ApprovalMethods
   include ValidationMethods
 
-  concerning :EmbeddedText do
-    class_methods do
-      def embedded_pattern
-        /\[bur:(?<id>\d+)\]/m
-      end
-    end
-  end
-
   def editable?(user)
     user_id == user.id || user.is_builder?
   end

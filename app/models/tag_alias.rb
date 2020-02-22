@@ -33,14 +33,6 @@ class TagAlias < TagRelationship
   include ApprovalMethods
   include ForumMethods
 
-  concerning :EmbeddedText do
-    class_methods do
-      def embedded_pattern
-        /\[ta:(?<id>\d+)\]/m
-      end
-    end
-  end
-
   def self.to_aliased(names)
     names = Array(names).map(&:to_s)
     return [] if names.empty?

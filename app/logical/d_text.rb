@@ -7,7 +7,7 @@ class DText
   def self.format_text(text, data: nil, **options)
     return nil if text.nil?
     data = preprocess([text]) if data.nil?
-    text = parse_embedded_tag_request_text(text)
+    text = parse_embedded_tag_request(text)
     html = DTextRagel.parse(text, **options)
     html = postprocess(html, *data)
     html
@@ -16,7 +16,7 @@ class DText
   end
 
   def self.preprocess(dtext_messages)
-    dtext_messages = dtext_messages.map { |message| parse_embedded_tag_request_text(message) }
+    dtext_messages = dtext_messages.map { |message| parse_embedded_tag_request(message) }
     names = dtext_messages.map { |message| parse_wiki_titles(message) }.flatten.uniq
     wiki_pages = WikiPage.where(title: names)
     tags = Tag.where(name: names)
@@ -74,17 +74,18 @@ class DText
     "[quote]\n#{creator_name} said:\n\n#{stripped_body}\n[/quote]\n\n"
   end
 
-  def self.parse_embedded_tag_request_text(text)
-    [TagAlias, TagImplication, BulkUpdateRequest].each do |tag_request|
-      text = text.gsub(tag_request.embedded_pattern) do |match|
-        obj = tag_request.find($~[:id])
-        tag_request_message(obj) || match
-      rescue ActiveRecord::RecordNotFound
-        match
-      end
-    end
-
+  def self.parse_embedded_tag_request(text)
+    text = parse_embedded_tag_request_type(text, TagAlias, /\[ta:(?<id>\d+)\]/m)
+    text = parse_embedded_tag_request_type(text, TagImplication, /\[ti:(?<id>\d+)\]/m)
+    text = parse_embedded_tag_request_type(text, BulkUpdateRequest, /\[bur:(?<id>\d+)\]/m)
     text
+  end
+
+  def self.parse_embedded_tag_request_type(text, tag_request, pattern)
+    text.gsub(pattern) do |match|
+      obj = tag_request.find_by_id($~[:id])
+      tag_request_message(obj) || match
+    end
   end
 
   def self.tag_request_message(obj)
