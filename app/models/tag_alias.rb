@@ -3,7 +3,6 @@ class TagAlias < TagRelationship
   validates_uniqueness_of :antecedent_name, scope: :status, conditions: -> { active }
   validate :absence_of_transitive_relation
   validate :wiki_pages_present, on: :create, unless: :skip_secondary_validations
-  validate :mininum_antecedent_count, on: :create, unless: :skip_secondary_validations
 
   module ApprovalMethods
     def approve!(approver: CurrentUser.user, update_topic: true)
@@ -140,12 +139,6 @@ class TagAlias < TagRelationship
       errors[:base] << conflict_message
     elsif antecedent_wiki.blank? && consequent_wiki.blank?
       errors[:base] << "The #{consequent_name} tag needs a corresponding wiki page"
-    end
-  end
-
-  def mininum_antecedent_count
-    if antecedent_tag.post_count < 50
-      errors[:base] << "The #{antecedent_name} tag must have at least 50 posts for an alias to be created"
     end
   end
 
