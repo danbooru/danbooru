@@ -1,23 +1,9 @@
 class TagAliasesController < ApplicationController
-  before_action :admin_only, :only => [:approve, :new, :create]
+  before_action :admin_only, only: [:destroy]
   respond_to :html, :xml, :json, :js
 
   def show
     @tag_alias = TagAlias.find(params[:id])
-    respond_with(@tag_alias)
-  end
-
-  def edit
-    @tag_alias = TagAlias.find(params[:id])
-  end
-
-  def update
-    @tag_alias = TagAlias.find(params[:id])
-
-    if @tag_alias.is_pending? && @tag_alias.editable_by?(CurrentUser.user)
-      @tag_alias.update(tag_alias_params)
-    end
-
     respond_with(@tag_alias)
   end
 
@@ -30,16 +16,9 @@ class TagAliasesController < ApplicationController
 
   def destroy
     @tag_alias = TagAlias.find(params[:id])
-    raise User::PrivilegeError unless @tag_alias.deletable_by?(CurrentUser.user)
-
     @tag_alias.reject!
-    respond_with(@tag_alias, location: tag_aliases_path, notice: "Tag alias was deleted")
-  end
 
-  def approve
-    @tag_alias = TagAlias.find(params[:id])
-    @tag_alias.approve!(approver: CurrentUser.user)
-    respond_with(@tag_alias, :location => tag_alias_path(@tag_alias))
+    respond_with(@tag_alias, location: tag_aliases_path, notice: "Tag alias was deleted")
   end
 
   private

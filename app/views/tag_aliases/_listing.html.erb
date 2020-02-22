@@ -21,16 +21,8 @@
   <% t.column column: "control", width: "15%" do |tag_alias| %>
     <%= link_to "Show", tag_alias_path(tag_alias) %>
 
-    <% if tag_alias.is_pending? && tag_alias.editable_by?(CurrentUser.user) %>
-      | <%= link_to "Edit", edit_tag_alias_path(tag_alias) %>
-    <% end %>
-
     <% if tag_alias.deletable_by?(CurrentUser.user) %>
       | <%= link_to "Delete", tag_alias_path(tag_alias), :remote => true, :method => :delete, :data => {:confirm => "Are you sure you want to delete this alias?"} %>
-    <% end %>
-
-    <% if CurrentUser.user.is_admin? && tag_alias.is_pending? %>
-      | <%= link_to "Approve", approve_tag_alias_path(tag_alias), :remote => true, :method => :post %>
     <% end %>
   <% end %>
 <% end %>

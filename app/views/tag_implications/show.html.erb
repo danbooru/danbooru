@@ -19,10 +19,6 @@
         </li>
       <% end %>
       <li><strong>Status</strong>: <%= @tag_implication.status %></li>
-
-      <% if CurrentUser.is_admin? && @tag_implication.is_pending? %>
-        <li><strong>Commands</strong> <%= link_to "Approve", approve_tag_implication_path(@tag_implication), :method => :post %></li>
-      <% end %>
     </ul>
   </div>
 </div>

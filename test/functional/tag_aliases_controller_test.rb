@@ -7,50 +7,6 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
       @tag_alias = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
     end
 
-    context "edit action" do
-      should "render" do
-        get_auth edit_tag_alias_path(@tag_alias), @user
-        assert_response :success
-      end
-    end
-
-    context "update action" do
-      context "for a pending alias" do
-        setup do
-          as_admin do
-            @tag_alias.update(status: "pending")
-          end
-        end
-
-        should "succeed" do
-          put_auth tag_alias_path(@tag_alias), @user, params: {:tag_alias => {:antecedent_name => "xxx"}}
-          @tag_alias.reload
-          assert_equal("xxx", @tag_alias.antecedent_name)
-        end
-
-        should "not allow changing the status" do
-          put_auth tag_alias_path(@tag_alias), @user, params: {:tag_alias => {:status => "active"}}
-          @tag_alias.reload
-          assert_equal("pending", @tag_alias.status)
-        end
-
-        # TODO: Broken in shoulda-matchers 2.8.0. Need to upgrade to 3.1.1.
-        # should_eventually permit(:antecedent_name, :consequent_name, :forum_topic_id).for(:update)
-      end
-
-      context "for an approved alias" do
-        setup do
-          @tag_alias.update_attribute(:status, "approved")
-        end
-
-        should "fail" do
-          put_auth tag_alias_path(@tag_alias), @user, params: {:tag_alias => {:antecedent_name => "xxx"}}
-          @tag_alias.reload
-          assert_equal("aaa", @tag_alias.antecedent_name)
-        end
-      end
-    end
-
     context "index action" do
       should "list all tag alias" do
         get_auth tag_aliases_path, @user

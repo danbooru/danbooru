@@ -366,10 +366,10 @@ module ApplicationHelper
     when "moderator/dashboards"
       /^\/moderator/
 
-    when "tag_aliases", "tag_alias_requests"
+    when "tag_aliases"
       /^\/tag_aliases/
 
-    when "tag_implications", "tag_implication_requests"
+    when "tag_implications",
       /^\/tag_implications/
 
     when "wiki_pages", "wiki_page_versions"

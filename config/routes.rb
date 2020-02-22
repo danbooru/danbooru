@@ -241,16 +241,8 @@ Rails.application.routes.draw do
       get :autocomplete
     end
   end
-  resources :tag_aliases do
-    member do
-      post :approve
-    end
-  end
-  resources :tag_implications do
-    member do
-      post :approve
-    end
-  end
+  resources :tag_aliases, only: [:show, :index, :destroy]
+  resources :tag_implications, only: [:show, :index, :destroy]
   resources :uploads do
     collection do
       post :preprocess

@@ -7,47 +7,6 @@ class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
       @tag_implication = create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb")
     end
 
-    context "edit action" do
-      should "render" do
-        get_auth tag_implication_path(@tag_implication), @user
-        assert_response :success
-      end
-    end
-
-    context "update action" do
-      context "for a pending implication" do
-        setup do
-          as_admin do
-            @tag_implication.update(status: "pending")
-          end
-        end
-
-        should "succeed" do
-          put_auth tag_implication_path(@tag_implication), @user, params: {:tag_implication => {:antecedent_name => "xxx"}}
-          @tag_implication.reload
-          assert_equal("xxx", @tag_implication.antecedent_name)
-        end
-
-        should "not allow changing the status" do
-          put_auth tag_implication_path(@tag_implication), @user, params: {:tag_implication => {:status => "active"}}
-          @tag_implication.reload
-          assert_equal("pending", @tag_implication.status)
-        end
-      end
-
-      context "for an approved implication" do
-        setup do
-          @tag_implication.update_attribute(:status, "approved")
-        end
-
-        should "fail" do
-          put_auth tag_implication_path(@tag_implication), @user, params: {:tag_implication => {:antecedent_name => "xxx"}}
-          @tag_implication.reload
-          assert_equal("aaa", @tag_implication.antecedent_name)
-        end
-      end
-    end
-
     context "index action" do
       should "list all tag implications" do
         get tag_implications_path

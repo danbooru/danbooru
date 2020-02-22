@@ -66,14 +66,7 @@ class TagRelationship < ApplicationRecord
   end
 
   def deletable_by?(user)
-    return true if user.is_admin?
-    return true if is_pending? && user.is_builder?
-    return true if is_pending? && user.id == creator_id
-    return false
-  end
-
-  def editable_by?(user)
-    deletable_by?(user)
+    user.is_admin?
   end
 
   def reject!(update_topic: true)
