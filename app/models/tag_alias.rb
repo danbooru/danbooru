@@ -53,33 +53,23 @@ class TagAlias < TagRelationship
       raise errors.full_messages.join("; ")
     end
 
-    tries = 0
-
-    begin
-      CurrentUser.scoped(User.system) do
-        update!(status: "processing")
-        move_aliases_and_implications
-        move_saved_searches
-        ensure_category_consistency
-        update_posts
-        forum_updater.update(approval_message(approver), "APPROVED") if update_topic
-        rename_wiki_and_artist
-        update!(status: "active")
-      end
-    rescue Exception => e
-      if tries < 5
-        tries += 1
-        sleep 2**tries
-        retry
-      end
-
-      CurrentUser.scoped(approver) do
-        forum_updater.update(failure_message(e), "FAILED") if update_topic
-        update(status: "error: #{e}")
-      end
-
-      DanbooruLogger.log(e, tag_alias_id: id, antecedent_name: antecedent_name, consequent_name: consequent_name)
+    CurrentUser.scoped(User.system) do
+      update!(status: "processing")
+      move_aliases_and_implications
+      move_saved_searches
+      ensure_category_consistency
+      update_posts
+      forum_updater.update(approval_message(approver), "APPROVED") if update_topic
+      rename_wiki_and_artist
+      update!(status: "active")
     end
+  rescue Exception => e
+    CurrentUser.scoped(approver) do
+      forum_updater.update(failure_message(e), "FAILED") if update_topic
+      update(status: "error: #{e}")
+    end
+
+    DanbooruLogger.log(e, tag_alias_id: id, antecedent_name: antecedent_name, consequent_name: consequent_name)
   end
 
   def absence_of_transitive_relation

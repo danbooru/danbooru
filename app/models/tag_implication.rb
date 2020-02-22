@@ -131,28 +131,18 @@ class TagImplication < TagRelationship
         raise errors.full_messages.join("; ")
       end
 
-      tries = 0
-
-      begin
-        CurrentUser.scoped(User.system) do
-          update(status: "processing")
-          update_posts
-          update(status: "active")
-          update_descendant_names_for_parents
-          forum_updater.update(approval_message(approver), "APPROVED") if update_topic
-        end
-      rescue Exception => e
-        if tries < 5
-          tries += 1
-          sleep 2**tries
-          retry
-        end
-
-        forum_updater.update(failure_message(e), "FAILED") if update_topic
-        update(status: "error: #{e}")
-
-        DanbooruLogger.log(e, tag_implication_id: id, antecedent_name: antecedent_name, consequent_name: consequent_name)
+      CurrentUser.scoped(User.system) do
+        update(status: "processing")
+        update_posts
+        update(status: "active")
+        update_descendant_names_for_parents
+        forum_updater.update(approval_message(approver), "APPROVED") if update_topic
       end
+    rescue Exception => e
+      forum_updater.update(failure_message(e), "FAILED") if update_topic
+      update(status: "error: #{e}")
+
+      DanbooruLogger.log(e, tag_implication_id: id, antecedent_name: antecedent_name, consequent_name: consequent_name)
     end
 
     def approve!(approver: CurrentUser.user, update_topic: true)
