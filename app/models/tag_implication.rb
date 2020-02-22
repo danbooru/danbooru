@@ -1,7 +1,8 @@
 class TagImplication < TagRelationship
-  extend Memoist
-
   array_attribute :descendant_names
+
+  has_many :child_implications, class_name: "TagImplication", primary_key: :consequent_name, foreign_key: :antecedent_name
+  has_many :parent_implications, class_name: "TagImplication", primary_key: :antecedent_name, foreign_key: :consequent_name
 
   before_save :update_descendant_names
   after_save :update_descendant_names_for_parents
@@ -16,7 +17,6 @@ class TagImplication < TagRelationship
 
   module DescendantMethods
     extend ActiveSupport::Concern
-    extend Memoist
 
     module ClassMethods
       # assumes names are normalized
@@ -43,33 +43,22 @@ class TagImplication < TagRelationship
         end
       end.sort.uniq
     end
-    memoize :descendants
 
     def update_descendant_names
       self.descendant_names = descendants
     end
 
     def update_descendant_names!
-      flush_cache
       update_descendant_names
       update_attribute(:descendant_names, descendant_names)
     end
 
     def update_descendant_names_for_parents
-      parents.each do |parent|
+      parent_implications.each do |parent|
         parent.update_descendant_names!
         parent.update_descendant_names_for_parents
       end
     end
-  end
-
-  module ParentMethods
-    extend Memoist
-
-    def parents
-      self.class.where("consequent_name = ?", antecedent_name)
-    end
-    memoize :parents
   end
 
   module ValidationMethods
@@ -124,8 +113,6 @@ class TagImplication < TagRelationship
   end
 
   module ApprovalMethods
-    extend Memoist
-
     def process!(update_topic: true)
       unless valid?
         raise errors.full_messages.join("; ")
@@ -183,16 +170,9 @@ class TagImplication < TagRelationship
         skip_update: !TagRelationship::SUPPORT_HARD_CODED
       )
     end
-    memoize :forum_updater
   end
 
   include DescendantMethods
-  include ParentMethods
   include ValidationMethods
   include ApprovalMethods
-
-  def reload(options = {})
-    flush_cache
-    super
-  end
 end
