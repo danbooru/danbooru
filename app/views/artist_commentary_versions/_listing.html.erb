@@ -1,6 +1,6 @@
 <div id="p-<%= listing_type(:post_id) %>-listing">
 
-  <% if listing_type(:post_id) == :revert %>
+  <% if listing_type(:post_id) == :revert && @commentary_versions.present? %>
     <%= PostPresenter.preview(@commentary_versions.first.post, show_deleted: true) %>
   <% end %>
 
