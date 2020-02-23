@@ -37,6 +37,7 @@ class Tag < ApplicationRecord
     filesize filesize_asc
     tagcount tagcount_asc
     rank
+    curated
     random
     custom
   ] +

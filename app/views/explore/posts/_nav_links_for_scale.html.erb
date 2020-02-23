@@ -1,0 +1,17 @@
+<%# path, date, selected_scale, scale %>
+
+<span class="period">
+  <% if selected_scale == scale %>
+    <%= link_to "« prev", send(path, date: prev_date_for_scale(date, scale), scale: scale), id: "paginator-prev", rel: "prev", "data-shortcut": "a left" %>
+  <% else %>
+    <%= link_to "« prev", send(path, date: prev_date_for_scale(date, scale), scale: scale) %>
+  <% end %>
+
+  <%= link_to scale.capitalize, send(path, date: date, scale: scale), class: "desc" %>
+
+  <% if selected_scale == scale %>
+    <%= link_to "next »", send(path, date: next_date_for_scale(date, scale), scale: scale), id: "paginator-next", rel: "next", "data-shortcut": "d right" %>
+  <% else %>
+    <%= link_to "next »", send(path, date: next_date_for_scale(date, scale), scale: scale) %>
+  <% end %>
+</span>

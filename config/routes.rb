@@ -43,6 +43,7 @@ Rails.application.routes.draw do
     resources :posts, :only => [] do
       collection do
         get :popular
+        get :curated
         get :viewed
         get :searches
         get :missed_searches
