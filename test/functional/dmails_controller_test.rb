@@ -166,12 +166,10 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
         @sender = create(:user)
         @recipient = create(:user)
 
-        as(@sender) do
-          @dmail1 = Dmail.create_split(title: "test1", body: "test", to: @recipient)
-          @dmail2 = Dmail.create_split(title: "test2", body: "test", to: @recipient)
-          @dmail3 = Dmail.create_split(title: "test3", body: "test", to: @recipient, is_read: true)
-          @dmail4 = Dmail.create_split(title: "test4", body: "test", to: @recipient, is_deleted: true)
-        end
+        @dmail1 = create(:dmail, from: @sender, owner: @recipient, to: @recipient)
+        @dmail2 = create(:dmail, from: @sender, owner: @recipient, to: @recipient)
+        @dmail3 = create(:dmail, from: @sender, owner: @recipient, to: @recipient, is_read: true)
+        @dmail4 = create(:dmail, from: @sender, owner: @recipient, to: @recipient, is_deleted: true)
       end
 
       should "mark all unread, undeleted dmails as read" do
@@ -182,7 +180,7 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_equal(0, @recipient.reload.unread_dmail_count)
-        assert_equal(true, [@dmail1, @dmail2, @dmail3, @dmail4].all?(&:is_read))
+        assert_equal(true, [@dmail1, @dmail2, @dmail3, @dmail4].map(&:reload).all?(&:is_read))
       end
     end
 

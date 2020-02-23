@@ -33,7 +33,7 @@ class DmailsController < ApplicationController
   end
 
   def create
-    @dmail = Dmail.create_split(dmail_params(:create))
+    @dmail = Dmail.create_split(from: CurrentUser.user, creator_ip_addr: CurrentUser.ip_addr, **dmail_params(:create))
     respond_with(@dmail)
   end
 

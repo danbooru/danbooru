@@ -10,7 +10,6 @@ class Dmail < ApplicationRecord
   belongs_to :from, :class_name => "User"
   has_many :moderation_reports, as: :model
 
-  after_initialize :initialize_attributes, if: :new_record?
   before_create :autoreport_spam
   after_save :update_unread_dmail_count
   after_commit :send_email, on: :create
@@ -27,11 +26,6 @@ class Dmail < ApplicationRecord
   module AddressMethods
     def to_name=(name)
       self.to = User.find_by_name(name)
-    end
-
-    def initialize_attributes
-      self.from_id ||= CurrentUser.id
-      self.creator_ip_addr ||= CurrentUser.ip_addr
     end
   end
 
@@ -59,12 +53,10 @@ class Dmail < ApplicationRecord
       end
 
       def create_automated(params)
-        CurrentUser.as_system do
-          dmail = Dmail.new(from: User.system, **params)
-          dmail.owner = dmail.to
-          dmail.save
-          dmail
-        end
+        dmail = Dmail.new(from: User.system, creator_ip_addr: "127.0.0.1", **params)
+        dmail.owner = dmail.to
+        dmail.save
+        dmail
       end
     end
 

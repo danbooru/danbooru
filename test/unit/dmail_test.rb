@@ -29,14 +29,11 @@ class DmailTest < ActiveSupport::TestCase
     end
 
     context "from a banned user" do
-      setup do
-        @user.update_attribute(:is_banned, true)
-      end
-
       should "not validate" do
-        dmail = FactoryBot.build(:dmail, :title => "xxx", :owner => @user)
-        dmail.save
-        assert_equal(1, dmail.errors.size)
+        user = create(:banned_user)
+        dmail = build(:dmail, owner: user, from: user)
+
+        assert_equal(false, dmail.valid?)
         assert_equal(["Sender is banned and cannot send messages"], dmail.errors.full_messages)
       end
     end
@@ -85,13 +82,8 @@ class DmailTest < ActiveSupport::TestCase
     should "create a copy for each user" do
       @new_user = FactoryBot.create(:user)
       assert_difference("Dmail.count", 2) do
-        Dmail.create_split(:to_id => @new_user.id, :title => "foo", :body => "foo")
+        Dmail.create_split(from: CurrentUser.user, creator_ip_addr: "127.0.0.1", to_id: @new_user.id, title: "foo", body: "foo")
       end
-    end
-
-    should "record the creator's ip addr" do
-      dmail = FactoryBot.create(:dmail, owner: @user)
-      assert_equal(CurrentUser.ip_addr, dmail.creator_ip_addr.to_s)
     end
 
     should "send an email if the user wants it" do
@@ -104,14 +96,14 @@ class DmailTest < ActiveSupport::TestCase
     should "create only one message for a split response" do
       user = FactoryBot.create(:user, :receive_email_notifications => true)
       assert_difference("ActionMailer::Base.deliveries.size", 1) do
-        Dmail.create_split(:to_id => user.id, :title => "foo", :body => "foo")
+        Dmail.create_split(from: CurrentUser.user, creator_ip_addr: "127.0.0.1", to_id: user.id, title: "foo", body: "foo")
       end
     end
 
     should "notify the recipient he has mail" do
       recipient = create(:user)
 
-      Dmail.create_split(title: "hello", body: "hello", to_id: recipient.id)
+      create(:dmail, owner: recipient, to: recipient)
       assert_equal(1, recipient.reload.unread_dmail_count)
 
       recipient.dmails.unread.last.update!(is_read: true)
