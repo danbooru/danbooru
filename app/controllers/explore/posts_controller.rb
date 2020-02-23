@@ -6,7 +6,7 @@ module Explore
       @date, @scale, @min_date, @max_date = parse_date(params)
 
       limit = params.fetch(:limit, CurrentUser.user.per_page)
-      @posts = popular_posts(@min_date, @max_date).paginate(params[:page], limit: limit)
+      @posts = popular_posts(@min_date, @max_date).paginate(params[:page], limit: limit, search_count: false)
 
       respond_with(@posts)
     end
@@ -15,7 +15,7 @@ module Explore
       @date, @scale, @min_date, @max_date = parse_date(params)
 
       limit = params.fetch(:limit, CurrentUser.user.per_page)
-      @posts = curated_posts(@min_date, @max_date).paginate(params[:page], limit: limit)
+      @posts = curated_posts(@min_date, @max_date).paginate(params[:page], limit: limit, search_count: false)
 
       respond_with(@posts)
     end
