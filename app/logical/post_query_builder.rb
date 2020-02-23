@@ -355,7 +355,7 @@ class PostQueryBuilder
         elsif noter_id == "none"
           relation = relation.where("posts.last_noted_at is null")
         else
-          relation = relation.where("posts.id": Note.unscoped.where(creator_id: noter_id).select("post_id").distinct)
+          relation = relation.where("posts.id": NoteVersion.unscoped.where(version: 1, updater_id: noter_id).select(:post_id).distinct)
         end
       end
     end
