@@ -10,13 +10,6 @@ class DanbooruMaintenanceTest < ActiveSupport::TestCase
       assert_nothing_raised { DanbooruMaintenance.daily }
     end
 
-    should "update the curated pool" do
-      pool = as(@admin) { create(:pool, name: "curated") }
-      Danbooru.config.stubs(:curated_pool_id).returns(pool.id)
-
-      assert_nothing_raised { DanbooruMaintenance.daily }
-    end
-
     should "prune expired posts" do
       @pending = FactoryBot.create(:post, is_pending: true, created_at: 4.days.ago)
       @flagged = FactoryBot.create(:post, is_flagged: true, created_at: 4.days.ago)

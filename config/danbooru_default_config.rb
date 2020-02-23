@@ -43,11 +43,6 @@ module Danbooru
       "DanbooruBot"
     end
 
-    # The ID of the "Curated" pool. If present, this pool will be updated daily with curated posts.
-    def curated_pool_id
-      nil
-    end
-
     def source_code_url
       "https://github.com/danbooru/danbooru"
     end
