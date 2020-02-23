@@ -816,6 +816,14 @@ class Tag < ApplicationRecord
       where_like(:name, normalize_name(name))
     end
 
+    def alias_matches(name)
+      where(name: TagAlias.active.where_ilike(:antecedent_name, normalize_name(name)).select(:consequent_name))
+    end
+
+    def name_or_alias_matches(name)
+      name_matches(name).or(alias_matches(name))
+    end
+
     def search(params)
       q = super
 
@@ -831,6 +839,10 @@ class Tag < ApplicationRecord
 
       if params[:name_normalize].present?
         q = q.where("tags.name": normalize_name(params[:name_normalize]).split(","))
+      end
+
+      if params[:name_or_alias_matches].present?
+        q = q.name_or_alias_matches(params[:name_or_alias_matches])
       end
 
       if params[:hide_empty].blank? || params[:hide_empty].to_s.truthy?

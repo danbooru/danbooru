@@ -9,6 +9,13 @@
       <% t.column "Name", td: {class: "col-expand"} do |tag| %>
         <%= link_to_wiki "?", tag.name, class: tag_class(tag) %>
         <%= link_to tag.name, posts_path(tags: tag.name), class: tag_class(tag) %>
+
+        <% pattern = params.dig(:search, :name_or_alias_matches).to_s %>
+        <% tag_alias = tag.consequent_aliases.find { |tag_alias| tag_alias.antecedent_name.ilike?(pattern) } %>
+
+        <% if tag_alias.present? %>
+          ← <%= link_to tag_alias.antecedent_name, tag_alias, class: "fineprint" %>
+        <% end %>
       <% end %>
       <% t.column column: "control" do |tag| %>
         <%= link_to_if tag.editable_by?(CurrentUser.user), "Edit", edit_tag_path(tag) %> |

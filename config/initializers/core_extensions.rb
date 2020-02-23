@@ -31,6 +31,11 @@ module Danbooru
       def falsy?
         self.match?(/\A(false|f|no|n|off|0)\z/i)
       end
+
+      def ilike?(pattern)
+        pattern = Regexp.escape(pattern).gsub(/\\\*/, ".*")
+        match?(/\A#{pattern}\z/i)
+      end
     end
   end
 end
