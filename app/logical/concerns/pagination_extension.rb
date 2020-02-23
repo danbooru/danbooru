@@ -3,6 +3,13 @@ module PaginationExtension
 
   attr_accessor :current_page, :records_per_page, :paginator_count, :paginator_mode
 
+  def paginated_search(params, defaults: {}, count_pages: params[:search].present?)
+    search_params = params.fetch(:search, {}).permit!
+    search_params = defaults.merge(search_params).with_indifferent_access
+
+    search(search_params).paginate(params[:page], limit: params[:limit], search_count: count_pages)
+  end
+
   def paginate(page, limit: nil, count: nil, search_count: nil)
     @records_per_page = limit || Danbooru.config.posts_per_page
     @records_per_page = @records_per_page.to_i.clamp(1, 1000)
