@@ -4,7 +4,7 @@ module PopularPostsHelper
     when "day"
       date + 1.day
     when "week"
-      date + 1.day
+      date + 1.week
     when "month"
       1.month.since(date)
     end

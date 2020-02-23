@@ -11,7 +11,7 @@
       <% if @scale == "day" %>
         <%= @date.strftime("%B %d, %Y") %>
       <% elsif @scale == "week" %>
-        <%= @date.strftime("Week of %B %d, %Y") %>
+        <%= @min_date.strftime("%B %d, %Y") %> - <%= @max_date.strftime("%B %d, %Y") %>
       <% elsif @scale == "month" %>
         <%= @date.strftime("%B %Y") %>
       <% end %>
