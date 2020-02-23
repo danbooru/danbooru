@@ -174,9 +174,11 @@ let Note = {
       if (was_visible) {
         container.style.display = 'block';
       }
-      const $image = $("#image");
-      const percentage = 100 * ($image.width() / parseFloat($image.data('large-width')));
-      $(container).css('font-size', percentage + '%');
+      if (Note.embed) {
+        const $image = $("#image");
+        const percentage = 100 * ($image.width() / parseFloat($image.data('large-width')));
+        $(container).css('font-size', percentage + '%');
+      }
     },
 
     toggle_all: function() {
