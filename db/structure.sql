@@ -2883,7 +2883,6 @@ CREATE TABLE public.tag_implications (
     id integer NOT NULL,
     antecedent_name character varying NOT NULL,
     consequent_name character varying NOT NULL,
-    descendant_names text[] DEFAULT '{}'::text[] NOT NULL,
     creator_id integer NOT NULL,
     forum_topic_id integer,
     status text DEFAULT 'pending'::text NOT NULL,
@@ -7352,6 +7351,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200119184442'),
 ('20200119193110'),
 ('20200123184743'),
-('20200217044719');
+('20200217044719'),
+('20200223042415');
 
 

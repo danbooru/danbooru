@@ -643,7 +643,7 @@ class Post < ApplicationRecord
       normalized_tags = remove_invalid_tags(normalized_tags)
       normalized_tags = Tag.convert_cosplay_tags(normalized_tags)
       normalized_tags += Tag.create_for_list(TagImplication.automatic_tags_for(normalized_tags))
-      normalized_tags = TagImplication.with_descendants(normalized_tags)
+      normalized_tags += TagImplication.tags_implied_by(normalized_tags).map(&:name)
       normalized_tags = normalized_tags.compact.uniq.sort
       normalized_tags = Tag.create_for_list(normalized_tags)
       set_tag_string(normalized_tags.join(" "))
