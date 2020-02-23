@@ -9,7 +9,6 @@ class Post < ApplicationRecord
   # Tags to copy when copying notes.
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation]
 
-  before_validation :initialize_uploader, :on => :create
   before_validation :merge_old_changes
   before_validation :normalize_tags
   before_validation :strip_source
@@ -984,15 +983,6 @@ class Post < ApplicationRecord
     end
   end
 
-  module UploaderMethods
-    def initialize_uploader
-      if uploader_id.blank?
-        self.uploader_id = CurrentUser.id
-        self.uploader_ip_addr = CurrentUser.ip_addr
-      end
-    end
-  end
-
   module PoolMethods
     def pools
       Pool.where("pools.post_ids && array[?]", id)
@@ -1691,7 +1681,6 @@ class Post < ApplicationRecord
   include PresenterMethods
   include TagMethods
   include FavoriteMethods
-  include UploaderMethods
   include PoolMethods
   include VoteMethods
   extend CountMethods

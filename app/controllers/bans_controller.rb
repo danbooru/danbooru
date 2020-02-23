@@ -24,7 +24,7 @@ class BansController < ApplicationController
   end
 
   def create
-    @ban = Ban.create(ban_params(:create))
+    @ban = Ban.create(banner: CurrentUser.user, **ban_params(:create))
 
     if @ban.errors.any?
       render :action => "new"

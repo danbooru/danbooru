@@ -3,7 +3,6 @@ class CommentVote < ApplicationRecord
 
   belongs_to :comment
   belongs_to :user
-  before_validation :initialize_user, :on => :create
   validates_presence_of :score
   validates_uniqueness_of :user_id, :scope => :comment_id, :message => "have already voted for this comment"
   validate :validate_user_can_vote
@@ -50,10 +49,6 @@ class CommentVote < ApplicationRecord
 
   def is_negative?
     score == -1
-  end
-
-  def initialize_user
-    self.user_id = CurrentUser.user.id
   end
 
   def self.available_includes

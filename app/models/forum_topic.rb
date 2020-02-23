@@ -19,7 +19,6 @@ class ForumTopic < ApplicationRecord
   has_many :moderation_reports, through: :posts
   has_one :original_post, -> {order("forum_posts.id asc")}, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
 
-  before_validation :initialize_is_deleted, :on => :create
   validates_presence_of :title
   validates_associated :original_post
   validates_inclusion_of :category_id, :in => CATEGORIES.keys
@@ -149,10 +148,6 @@ class ForumTopic < ApplicationRecord
 
   def create_mod_action_for_undelete
     ModAction.log("undeleted forum topic ##{id} (title: #{title})", :forum_topic_undelete)
-  end
-
-  def initialize_is_deleted
-    self.is_deleted = false if is_deleted.nil?
   end
 
   def page_for(post_id)

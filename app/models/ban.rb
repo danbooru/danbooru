@@ -8,7 +8,6 @@ class Ban < ApplicationRecord
   belongs_to :banner, :class_name => "User"
   validate :user_is_inferior
   validates_presence_of :reason, :duration
-  before_validation :initialize_banner_id, :on => :create
 
   scope :unexpired, -> { where("bans.expires_at > ?", Time.now) }
   scope :expired, -> { where("bans.expires_at <= ?", Time.now) }
@@ -48,10 +47,6 @@ class Ban < ApplicationRecord
     expired.includes(:user).find_each do |ban|
       ban.user.unban! if ban.user.ban_expired?
     end
-  end
-
-  def initialize_banner_id
-    self.banner_id = CurrentUser.id if self.banner_id.blank?
   end
 
   def user_is_inferior

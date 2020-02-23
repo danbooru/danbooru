@@ -729,7 +729,6 @@ class User < ApplicationRecord
   end
 
   def initialize_attributes
-    self.last_ip_addr ||= CurrentUser.ip_addr
     self.enable_post_navigation = true
     self.new_post_navigation_layout = true
     self.enable_sequential_post_navigation = true

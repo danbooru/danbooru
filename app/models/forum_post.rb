@@ -10,7 +10,6 @@ class ForumPost < ApplicationRecord
   has_one :tag_implication
   has_one :bulk_update_request
 
-  before_validation :initialize_is_deleted, :on => :create
   before_save :update_dtext_links, if: :dtext_links_changed?
   before_create :autoreport_spam
   after_create :update_topic_updated_at_on_create
@@ -181,10 +180,6 @@ class ForumPost < ApplicationRecord
     end
 
     topic.response_count -= 1
-  end
-
-  def initialize_is_deleted
-    self.is_deleted = false if is_deleted.nil?
   end
 
   def quoted_response

@@ -48,9 +48,9 @@ class Comment < ApplicationRecord
   end
 
   module VoteMethods
-    def vote!(val)
+    def vote!(val, voter = CurrentUser.user)
       numerical_score = (val == "up") ? 1 : -1
-      vote = votes.create!(:score => numerical_score)
+      vote = votes.create!(user: voter, score: numerical_score)
 
       if vote.is_positive?
         update_column(:score, score + 1)

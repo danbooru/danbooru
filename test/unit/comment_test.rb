@@ -115,12 +115,6 @@ class CommentTest < ActiveSupport::TestCase
         end
       end
 
-      should "be created" do
-        comment = FactoryBot.build(:comment)
-        comment.save
-        assert(comment.errors.empty?, comment.errors.full_messages.join(", "))
-      end
-
       should "not validate if the post does not exist" do
         comment = FactoryBot.build(:comment, :post_id => -1)
 

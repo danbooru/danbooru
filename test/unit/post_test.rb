@@ -2066,7 +2066,7 @@ class PostTest < ActiveSupport::TestCase
     end
 
     should "return posts for the user:<name> metatag" do
-      users = FactoryBot.create_list(:user, 2)
+      users = FactoryBot.create_list(:user, 2, created_at: 2.weeks.ago)
       posts = users.map { |u| FactoryBot.create(:post, uploader: u) }
 
       assert_tag_match([posts[0]], "user:#{users[0].name}")
@@ -2105,7 +2105,9 @@ class PostTest < ActiveSupport::TestCase
     should "return posts for the noter:<name> metatag" do
       users = FactoryBot.create_list(:user, 2)
       posts = FactoryBot.create_list(:post, 2)
-      notes = users.zip(posts).map { |u, p| FactoryBot.create(:note, creator: u, post: p) }
+      notes = users.zip(posts).map do |u, p|
+        as(u) { create(:note, post: p) }
+      end
 
       assert_tag_match([posts[0]], "noter:#{users[0].name}")
       assert_tag_match([posts[1]], "noter:#{users[1].name}")
@@ -2201,7 +2203,7 @@ class PostTest < ActiveSupport::TestCase
       disapproved = FactoryBot.create(:post, is_pending: true)
 
       create(:post_flag, post: flagged, creator: create(:user, created_at: 2.weeks.ago))
-      FactoryBot.create(:post_disapproval, post: disapproved, reason: "disinterest")
+      create(:post_disapproval, user: CurrentUser.user, post: disapproved, reason: "disinterest")
 
       assert_tag_match([pending, flagged], "status:unmoderated")
     end
@@ -2380,7 +2382,7 @@ class PostTest < ActiveSupport::TestCase
       CurrentUser.scoped(FactoryBot.create(:mod_user)) do
         pending     = FactoryBot.create(:post, is_pending: true)
         disapproved = FactoryBot.create(:post, is_pending: true)
-        disapproval = FactoryBot.create(:post_disapproval, post: disapproved, reason: "disinterest")
+        disapproval = FactoryBot.create(:post_disapproval, user: CurrentUser.user, post: disapproved, reason: "disinterest")
 
         assert_tag_match([pending],     "disapproval:none")
         assert_tag_match([disapproved], "disapproval:any")
@@ -2412,7 +2414,7 @@ class PostTest < ActiveSupport::TestCase
         u = create(:user, created_at: 2.weeks.ago)
         create(:artist_commentary, post: p)
         create(:comment, post: p, creator: u, do_not_bump_post: false)
-        create(:note, post: p, creator: u)
+        create(:note, post: p)
         p
       end
 

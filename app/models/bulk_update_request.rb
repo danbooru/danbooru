@@ -13,7 +13,6 @@ class BulkUpdateRequest < ApplicationRecord
   validate :script_formatted_correctly
   validate :forum_topic_id_not_invalid
   validate :validate_script, :on => :create
-  before_validation :initialize_attributes, :on => :create
   before_validation :normalize_text
   after_create :create_forum_topic
   after_save :update_notice
@@ -171,11 +170,6 @@ class BulkUpdateRequest < ApplicationRecord
       end
     end
     lines.join("\n")
-  end
-
-  def initialize_attributes
-    self.user_id = CurrentUser.user.id unless self.user_id
-    self.status = "pending"
   end
 
   def normalize_text

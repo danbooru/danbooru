@@ -1,6 +1,5 @@
 class ModAction < ApplicationRecord
   belongs_to :creator, :class_name => "User"
-  before_validation :initialize_creator, :on => :create
 
   api_attributes including: [:category_id]
 
@@ -75,12 +74,8 @@ class ModAction < ApplicationRecord
     self.class.categories[category]
   end
 
-  def self.log(desc, cat = :other)
-    create(:description => desc, :category => categories[cat])
-  end
-
-  def initialize_creator
-    self.creator_id = CurrentUser.id
+  def self.log(desc, cat = :other, user = CurrentUser.user)
+    create(creator: user, description: desc, category: categories[cat])
   end
 
   def self.available_includes

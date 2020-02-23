@@ -59,7 +59,7 @@ class UsersController < ApplicationController
   end
 
   def create
-    @user = User.new(user_params(:create))
+    @user = User.new(last_ip_addr: CurrentUser.ip_addr, **user_params(:create))
     if !Danbooru.config.enable_recaptcha? || verify_recaptcha(model: @user)
       @user.save
       if @user.errors.empty?
