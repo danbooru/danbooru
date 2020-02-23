@@ -2808,37 +2808,6 @@ CREATE TABLE public.schema_migrations (
 
 
 --
--- Name: super_voters; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.super_voters (
-    id integer NOT NULL,
-    user_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: super_voters_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.super_voters_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: super_voters_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.super_voters_id_seq OWNED BY public.super_voters.id;
-
-
---
 -- Name: tag_aliases; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4132,13 +4101,6 @@ ALTER TABLE ONLY public.saved_searches ALTER COLUMN id SET DEFAULT nextval('publ
 
 
 --
--- Name: super_voters id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.super_voters ALTER COLUMN id SET DEFAULT nextval('public.super_voters_id_seq'::regclass);
-
-
---
 -- Name: tag_aliases id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4494,14 +4456,6 @@ ALTER TABLE ONLY public.posts
 
 ALTER TABLE ONLY public.saved_searches
     ADD CONSTRAINT saved_searches_pkey PRIMARY KEY (id);
-
-
---
--- Name: super_voters super_voters_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.super_voters
-    ADD CONSTRAINT super_voters_pkey PRIMARY KEY (id);
 
 
 --
@@ -7352,6 +7306,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200119193110'),
 ('20200123184743'),
 ('20200217044719'),
-('20200223042415');
+('20200223042415'),
+('20200223234015');
 
 

@@ -1765,12 +1765,9 @@ class PostTest < ActiveSupport::TestCase
 
         @user1 = FactoryBot.create(:user, enable_private_favorites: true)
         @gold1 = FactoryBot.create(:gold_user)
-        @supervoter1 = FactoryBot.create(:user, is_super_voter: true)
 
         @child.add_favorite!(@user1)
         @child.add_favorite!(@gold1)
-        @child.add_favorite!(@supervoter1)
-        @parent.add_favorite!(@supervoter1)
 
         @child.give_favorites_to_parent
         @child.reload
@@ -1789,7 +1786,6 @@ class PostTest < ActiveSupport::TestCase
 
       should "create a vote for each user who can vote" do
         assert(@parent.votes.where(user: @gold1).exists?)
-        assert(@parent.votes.where(user: @supervoter1).exists?)
         assert_equal(4, @parent.score)
       end
     end
@@ -2534,24 +2530,6 @@ class PostTest < ActiveSupport::TestCase
   end
 
   context "Voting:" do
-    context "with a super voter" do
-      setup do
-        @user = FactoryBot.create(:user)
-        FactoryBot.create(:super_voter, user: @user)
-        @post = FactoryBot.create(:post)
-      end
-
-      should "account for magnitude" do
-        CurrentUser.scoped(@user, "127.0.0.1") do
-          assert_nothing_raised {@post.vote!("up")}
-          assert_raises(PostVote::Error) {@post.vote!("up")}
-          @post.reload
-          assert_equal(1, PostVote.count)
-          assert_equal(SuperVoter::MAGNITUDE, @post.score)
-        end
-      end
-    end
-
     should "not allow members to vote" do
       @user = FactoryBot.create(:user)
       @post = FactoryBot.create(:post)

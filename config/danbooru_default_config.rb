@@ -60,7 +60,6 @@ module Danbooru
       # user.level = User::Levels::MEMBER
       # user.can_approve_posts = false
       # user.can_upload_free = false
-      # user.is_super_voter = false
       #
       # user.comment_threshold = -1
       # user.blacklisted_tags = ["spoilers", "guro", "scat", "furry -rating:s"].join("\n")

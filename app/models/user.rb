@@ -18,8 +18,7 @@ class User < ApplicationRecord
   Roles = Levels.constants.map(&:downcase) + [
     :banned,
     :approver,
-    :voter,
-    :super_voter
+    :voter
   ]
 
   # candidates for removal:
@@ -35,6 +34,7 @@ class User < ApplicationRecord
   # - opt_out_tracking
   # - enable_recommended_posts
   # - has_mail
+  # - is_super_voter
   BOOLEAN_ATTRIBUTES = %w(
     is_banned
     has_mail
@@ -110,7 +110,6 @@ class User < ApplicationRecord
   has_one :recent_ban, -> {order("bans.id desc")}, :class_name => "Ban"
 
   has_one :api_key
-  has_one :super_voter
   has_one :token_bucket
   has_many :notes, foreign_key: :creator_id
   has_many :note_versions, :foreign_key => "updater_id"
@@ -329,7 +328,6 @@ class User < ApplicationRecord
         self.level = Levels::ADMIN
         self.can_approve_posts = true
         self.can_upload_free = true
-        self.is_super_voter = true
       end
     end
 
@@ -374,7 +372,7 @@ class User < ApplicationRecord
     end
 
     def is_voter?
-      is_gold? || is_super_voter?
+      is_gold?
     end
 
     def is_approver?
@@ -532,7 +530,7 @@ class User < ApplicationRecord
       attributes = %i[
         id created_at name inviter_id level
         post_upload_count post_update_count note_update_count is_banned
-        can_approve_posts can_upload_free is_super_voter level_string
+        can_approve_posts can_upload_free level_string
       ]
 
       if id == CurrentUser.user.id
@@ -667,7 +665,7 @@ class User < ApplicationRecord
         q = q.where("level <= ?", params[:max_level].to_i)
       end
 
-      %w[can_approve_posts can_upload_free is_super_voter].each do |flag|
+      %w[can_approve_posts can_upload_free].each do |flag|
         if params[flag].to_s.truthy?
           q = q.bit_prefs_match(flag, true)
         elsif params[flag].to_s.falsy?

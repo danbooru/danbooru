@@ -10,7 +10,6 @@
 
       <%= f.input :can_upload_free, label: "Unrestricted uploads?", collection: [%w[Yes true], %w[No false]], include_blank: true, selected: params[:search][:can_upload_free] %>
       <%= f.input :can_approve_posts, label: "Approver?", collection: [%w[Yes true], %w[No false]], include_blank: true, selected: params[:search][:can_approve_posts] %>
-      <%= f.input :is_super_voter, label: "Super voter?", collection: [%w[Yes true], %w[No false]], include_blank: true, selected: params[:search][:is_super_voter] %>
 
       <%= f.input :order, collection: [["Join date", "date"], ["Name", "name"], ["Upload count", "post_upload_count"], ["Note count", "note_count"], ["Post update count", "post_update_count"]], selected: params[:search][:order] %>
       <%= f.submit "Search" %>

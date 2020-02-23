@@ -11,7 +11,6 @@ module DanbooruMaintenance
     safely { PostDisapproval.prune! }
     safely { PostDisapproval.dmail_messages! }
     safely { regenerate_post_counts! }
-    safely { SuperVoter.init! }
     safely { TokenBucket.prune! }
     safely { TagChangeRequestPruner.warn_all }
     safely { TagChangeRequestPruner.reject_all }

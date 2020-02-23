@@ -7,24 +7,12 @@ class PostVote < ApplicationRecord
 
   after_initialize :initialize_attributes, if: :new_record?
   validates_presence_of :score
-  validates_inclusion_of :score, :in => [SuperVoter::MAGNITUDE, 1, -1, -SuperVoter::MAGNITUDE]
+  validates_inclusion_of :score, in: [1, -1]
   after_create :update_post_on_create
   after_destroy :update_post_on_destroy
 
   scope :positive, -> { where("post_votes.score > 0") }
   scope :negative, -> { where("post_votes.score < 0") }
-
-  def self.positive_user_ids
-    positive.group(:user_id).having("count(*) > 100").pluck(:user_id)
-  end
-
-  def self.negative_post_ids(user_id)
-    negative.where(user_id: user_id).pluck(:post_id)
-  end
-
-  def self.positive_post_ids(user_id)
-    positive.where(user_id: user_id).pluck(:post_id)
-  end
 
   def self.visible(user)
     user.is_admin? ? all : where(user: user)
@@ -40,9 +28,9 @@ class PostVote < ApplicationRecord
     self.user_id ||= CurrentUser.user.id
 
     if vote == "up"
-      self.score = magnitude
+      self.score = 1
     elsif vote == "down"
-      self.score = -magnitude
+      self.score = -1
     end
   end
 
@@ -59,14 +47,6 @@ class PostVote < ApplicationRecord
       Post.where(:id => post_id).update_all("score = score - #{score}, up_score = up_score - #{score}")
     else
       Post.where(:id => post_id).update_all("score = score - #{score}, down_score = down_score - #{score}")
-    end
-  end
-
-  def magnitude
-    if user.is_super_voter?
-      SuperVoter::MAGNITUDE
-    else
-      1
     end
   end
 

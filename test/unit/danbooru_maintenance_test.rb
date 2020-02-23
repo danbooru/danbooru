@@ -2,10 +2,6 @@ require 'test_helper'
 
 class DanbooruMaintenanceTest < ActiveSupport::TestCase
   context "daily maintenance" do
-    setup do
-      @admin = create(:admin_user) # for SuperVoter.init!
-    end
-
     should "work" do
       assert_nothing_raised { DanbooruMaintenance.daily }
     end
