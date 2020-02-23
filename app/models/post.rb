@@ -1755,6 +1755,6 @@ class Post < ApplicationRecord
   end
 
   def self.available_includes
-    [:uploader, :updater, :approver, :parent, :upload, :artist_commentary, :flags, :appeals, :notes, :comments, :children, :approvals, :replacements]
+    [:uploader, :updater, :approver, :parent, :upload, :artist_commentary, :flags, :appeals, :notes, :comments, :children, :approvals, :replacements, :pixiv_ugoira_frame_data]
   end
 end
