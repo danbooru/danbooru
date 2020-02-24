@@ -117,6 +117,7 @@
   --note-box-background: transparent;
   --note-box-inner-border: 1px solid black;
   --unsaved-note-box-inner-border: 1px solid red;
+  --movable-note-box-inner-border: 1px solid green;
   --note-preview-border: 1px solid red;
   --note-preview-background: white;
   --note-highlight-color: blue;
