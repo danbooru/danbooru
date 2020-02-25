@@ -8,13 +8,13 @@ class UserFeedbacksController < ApplicationController
   end
 
   def edit
-    @user_feedback = UserFeedback.visible.find(params[:id])
+    @user_feedback = UserFeedback.visible(CurrentUser.user).find(params[:id])
     check_privilege(@user_feedback)
     respond_with(@user_feedback)
   end
 
   def show
-    @user_feedback = UserFeedback.visible.find(params[:id])
+    @user_feedback = UserFeedback.visible(CurrentUser.user).find(params[:id])
     respond_with(@user_feedback)
   end
 
@@ -31,7 +31,7 @@ class UserFeedbacksController < ApplicationController
   end
 
   def update
-    @user_feedback = UserFeedback.visible.find(params[:id])
+    @user_feedback = UserFeedback.visible(CurrentUser.user).find(params[:id])
     check_privilege(@user_feedback)
     @user_feedback.update(user_feedback_params(:update, @user_feedback))
     respond_with(@user_feedback)
