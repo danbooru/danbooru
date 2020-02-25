@@ -3,7 +3,28 @@ class Favorite < ApplicationRecord
 
   belongs_to :post
   belongs_to :user
+
   scope :for_user, ->(user_id) {where("user_id % 100 = #{user_id.to_i % 100} and user_id = #{user_id.to_i}")}
+  scope :public_favorites, -> { where(user: User.bit_prefs_match(:enable_private_favorites, false)) }
+
+  def self.visible(user)
+    user.is_admin? ? all : for_user(user.id).or(public_favorites)
+  end
+
+  def self.search(params)
+    q = super
+    q = q.search_attributes(params, :post)
+
+    if params[:user_id].present?
+      q = q.for_user(params[:user_id])
+    end
+
+    q.order(post_id: :desc)
+  end
+
+  def self.available_includes
+    [:post, :user]
+  end
 
   def self.add(post:, user:)
     Favorite.transaction do

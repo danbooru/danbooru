@@ -5,7 +5,10 @@ class FavoritesController < ApplicationController
   rescue_with Favorite::Error, status: 422
 
   def index
-    if params[:user_id].present?
+    if !request.format.html?
+      @favorites = Favorite.visible(CurrentUser.user).paginated_search(params)
+      respond_with(@favorites)
+    elsif params[:user_id].present?
       user = User.find(params[:user_id])
       redirect_to posts_path(tags: "ordfav:#{user.name}", format: request.format.symbol)
     elsif CurrentUser.is_member?
