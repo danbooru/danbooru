@@ -313,6 +313,7 @@ let Note = {
           max_x: width,
           max_y: height,
           norm_coord: old_coord,
+          degrees: 0,
         }
       }
       const costheta = Math.round(match[1] * 1000) / 1000;
@@ -339,13 +340,16 @@ let Note = {
       const norm_coord = new_coord.map((coord)=>{
         return [coord[0] - min_x, coord[1] - min_y];
       });
+      const radians_per_degree = 0.017453292519943295;
+      const degrees = Math.asin(sintheta) / radians_per_degree;
       return {
         min_x: min_x,
         min_y: min_y,
         max_x: max_x,
         max_y: max_y,
         norm_coord: norm_coord,
-      }
+        degrees: degrees,
+      };
     },
 
     show_highlighted: function($note_box) {
@@ -437,9 +441,12 @@ let Note = {
       const box_data = Note.Box.get_bounding_box($note_box);
       // Select the lowest box corner to the farthest left
       let selected_corner = box_data.norm_coord.reduce(function (selected, coord) {return (selected[1] > coord[1]) || (selected[1] === coord[1] && selected[0] < coord[0]) ? selected : coord;});
+      let normalized_degrees = box_data.degrees % 90.0;
+      // Align to the left or right body corner depending upon the box angle
+      let body_corner = $note_box.position().left - (normalized_degrees > 0.0 && normalized_degrees <= 45.0 ? $note_body.width() : 0);
       $note_body.css({
         top: $note_box.position().top + selected_corner[1] + 5,
-        left: $note_box.position().left + selected_corner[0],
+        left: body_corner + selected_corner[0],
       });
       Note.Body.bound_position($note_body);
     },
