@@ -10,9 +10,6 @@
         <option value="remove-fav">Unfavorite</option>
         <option value="vote-up">Vote up</option>
         <option value="vote-down">Vote down</option>
-        <% if CurrentUser.can_approve_posts? %>
-          <option value="approve">Approve</option>
-        <% end %>
       </select>
     </form>
     <input id="tag-script-field" data-autocomplete="tag-edit" placeholder="Enter tag script" style="display: none; margin-top: 0.5em;">
