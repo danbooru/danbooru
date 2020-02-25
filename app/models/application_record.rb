@@ -4,7 +4,21 @@ class ApplicationRecord < ActiveRecord::Base
   include Mentionable
   extend HasBitFlags
   extend Searchable
-  extend PaginationExtension
+
+  concerning :PaginationMethods do
+    class_methods do
+      def paginate(*args, **options)
+        extending(PaginationExtension).paginate(*args, **options)
+      end
+
+      def paginated_search(params, defaults: {}, count_pages: params[:search].present?)
+        search_params = params.fetch(:search, {}).permit!
+        search_params = defaults.merge(search_params).with_indifferent_access
+
+        search(search_params).paginate(params[:page], limit: params[:limit], search_count: count_pages)
+      end
+    end
+  end
 
   concerning :PrivilegeMethods do
     class_methods do
