@@ -10,7 +10,7 @@ class ForumPostVotesController < ApplicationController
   end
 
   def create
-    @forum_post = ForumPost.permitted.find(params[:forum_post_id])
+    @forum_post = ForumPost.visible(CurrentUser.user).find(params[:forum_post_id])
     @forum_post_vote = @forum_post.votes.create(forum_post_vote_params.merge(creator: CurrentUser.user))
     respond_with(@forum_post_vote)
   end
