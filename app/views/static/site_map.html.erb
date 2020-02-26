@@ -162,7 +162,6 @@
 
         <% if CurrentUser.is_admin? %>
           <li><%= link_to("News Updates", news_updates_path) %></li>
-          <li><%= link_to("Alias & Implication Import", new_admin_alias_and_implication_import_path) %></li>
           <li><%= link_to("Admin Dashboard", admin_dashboard_path) %></li>
         <% end %>
       </ul>
