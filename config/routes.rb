@@ -12,7 +12,6 @@ Rails.application.routes.draw do
       end
     end
     resources :invitations, :only => [:new, :create, :index]
-    resource :tag, :only => [:edit, :update]
     namespace :post do
       resource :queue, :only => [:show] do
         member do

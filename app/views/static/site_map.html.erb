@@ -16,9 +16,6 @@
         <% if CurrentUser.can_approve_posts? %>
           <li><%= link_to("Moderate", moderator_post_queue_path) %></li>
         <% end %>
-        <% if CurrentUser.is_moderator? %>
-          <li><%= link_to("Mass Edit", edit_moderator_tag_path) %></li>
-        <% end %>
       </ul>
       <ul>
         <li><h1>Post Events</h1></li>
