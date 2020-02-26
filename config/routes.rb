@@ -10,7 +10,6 @@ Rails.application.routes.draw do
         get :search
       end
     end
-    resources :invitations, :only => [:new, :create, :index]
     namespace :post do
       resource :queue, :only => [:show] do
         member do
@@ -30,7 +29,6 @@ Rails.application.routes.draw do
         end
       end
     end
-    resources :invitations, :only => [:new, :create, :index, :show]
     resources :ip_addrs, :only => [:index, :search] do
       collection do
         get :search
@@ -275,11 +273,6 @@ Rails.application.routes.draw do
       get :diff
     end
   end
-
-  # aliases
-  resources :wpages, :controller => "wiki_pages"
-  resources :ftopics, :controller => "forum_topics"
-  resources :fposts, :controller => "forum_posts"
 
   # legacy aliases
   get "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}&search[name]=#{CGI.escape(req.params[:name].to_s)}"}
