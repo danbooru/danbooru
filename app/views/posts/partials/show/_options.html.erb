@@ -58,7 +58,7 @@
         <% if post.is_banned? %>
           <li id="post-option-unban"><%= link_to "Unban", unban_moderator_post_post_path(post), method: :post, "data-confirm": "Are you sure you want to unban this post?" %></li>
         <% else %>
-          <li id="post-option-ban"><%= link_to "Ban", confirm_ban_moderator_post_post_path(post) %></li>
+          <li id="post-option-ban"><%= link_to "Ban", ban_moderator_post_post_path(post), method: :post, "data-confirm": "Are you sure you want to ban this post?" %></li>
         <% end %>
 
         <% if CurrentUser.is_admin? %>

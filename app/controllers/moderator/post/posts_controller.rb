@@ -1,11 +1,11 @@
 module Moderator
   module Post
     class PostsController < ApplicationController
-      before_action :approver_only, :only => [:delete, :move_favorites, :ban, :unban, :confirm_delete, :confirm_move_favorites, :confirm_ban]
+      before_action :approver_only, :only => [:delete, :move_favorites, :ban, :unban, :confirm_delete, :confirm_move_favorites]
       before_action :admin_only, :only => [:expunge]
       skip_before_action :api_check
 
-      respond_to :html, :json, :xml
+      respond_to :html, :json, :xml, :js
 
       def confirm_delete
         @post = ::Post.find(params[:id])
@@ -36,29 +36,20 @@ module Moderator
         @post.expunge!
       end
 
-      def confirm_ban
-        @post = ::Post.find(params[:id])
-      end
-
       def ban
         @post = ::Post.find(params[:id])
-        if params[:commit] == "Ban"
-          @post.ban!
-        end
+        @post.ban!
+        flash[:notice] = "Post was banned"
 
-        respond_to do |fmt|
-          fmt.html do
-            redirect_to(post_path(@post), :notice => "Post was banned")
-          end
-
-          fmt.js
-        end
+        respond_with(@post)
       end
 
       def unban
         @post = ::Post.find(params[:id])
         @post.unban!
-        redirect_to(post_path(@post), :notice => "Post was unbanned")
+        flash[:notice] = "Post was banned"
+
+        respond_with(@post)
       end
     end
   end
