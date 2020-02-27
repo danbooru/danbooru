@@ -30,4 +30,19 @@ module ApproverPruner
       end
     end
   end
+
+  def dmail_inactive_approvers!
+    days_until_next_month = (Date.current.next_month.beginning_of_month - Date.current).to_i
+    return unless days_until_next_month <= 21
+
+    inactive_approvers.each do |user|
+      Dmail.create_automated(to: user, title: "You will lose approval privileges soon", body: <<~BODY)
+        You've approved fewer than #{MINIMUM_APPROVALS} posts in the past
+        #{APPROVAL_PERIOD.inspect}. You will lose your approval privileges in
+        #{days_until_next_month} #{"day".pluralize(days_until_next_month)}
+        unless you have approved at least #{MINIMUM_APPROVALS} posts by the end
+        of the month.
+      BODY
+    end
+  end
 end

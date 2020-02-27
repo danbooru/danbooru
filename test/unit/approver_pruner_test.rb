@@ -27,5 +27,13 @@ class ApproverPrunerTest < ActiveSupport::TestCase
 
       assert_not_includes(ApproverPruner.inactive_approvers.map(&:id), @user.id)
     end
+
+    should "dmail inactive approvers" do
+      travel_to(Date.parse("2020-01-20")) do
+        ApproverPruner.dmail_inactive_approvers!
+      end
+
+      assert_equal("You will lose approval privileges soon", @approver.dmails.received.last.title)
+    end
   end
 end

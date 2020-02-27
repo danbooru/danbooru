@@ -21,6 +21,7 @@ module DanbooruMaintenance
   def weekly
     safely { UserPasswordResetNonce.prune! }
     safely { TagRelationshipRetirementService.find_and_retire! }
+    safely { ApproverPruner.dmail_inactive_approvers! }
   end
 
   def monthly
