@@ -361,9 +361,6 @@ Post.resize_image_to_window = function($img) {
   var sidebar_width = 0;
   var client_width = 0;
 
-  var isVideo = $img.prop("tagName") === "VIDEO";
-  var width = isVideo ? $img.prop("width") : $img.prop('naturalWidth');
-  var height = isVideo ? $img.prop("height") : $img.prop('naturalHeight');
   if (($img.data("scale-factor") === 1) || ($img.data("scale-factor") === undefined)) {
     if ($(window).width() > 660) {
       sidebar_width = $("#sidebar").width() || 0;
@@ -373,6 +370,9 @@ Post.resize_image_to_window = function($img) {
     }
 
     if ($img.width() > client_width) {
+      var isVideo = $img.prop("tagName") === "VIDEO";
+      var width = isVideo ? $img.prop("width") : $img.data("original-width");
+      var height = isVideo ? $img.prop("height") : $img.data("original-height");
       var ratio = client_width / width;
       $img.data("scale-factor", ratio);
       $img.css("width", width * ratio);
@@ -381,8 +381,8 @@ Post.resize_image_to_window = function($img) {
     }
   } else {
     $img.data("scale-factor", 1);
-    $img.width(width);
-    $img.height(height);
+    $img.width($img.data("original-width"));
+    $img.height($img.data("original-height"));
     Post.resize_ugoira_controls();
   }
 
