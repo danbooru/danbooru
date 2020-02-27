@@ -4,7 +4,6 @@ class PostDisapprovalsController < ApplicationController
   respond_to :js, :html, :json, :xml
 
   def create
-    cookies.permanent[:moderated] = Time.now.to_i
     @post_disapproval = PostDisapproval.create(user: CurrentUser.user, **post_disapproval_params)
     respond_with(@post_disapproval)
   end

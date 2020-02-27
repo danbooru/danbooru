@@ -1,5 +1,0 @@
-<% if show_moderation_notice? %>
-  <div class="notice notice-info notice-large" id="mod-notice">
-    <span>You haven't moderated any posts in awhile. Consider checking out the <%= link_to "queue", random_moderator_post_queue_path(:return_to => request.original_url) %>.</span>
-  </div>
-<% end %>

@@ -18,13 +18,6 @@ module Moderator
             assert_response :success
           end
         end
-
-        context "random action" do
-          should "render" do
-            get_auth moderator_post_queue_path, @admin
-            assert_response :success
-          end
-        end
       end
     end
   end

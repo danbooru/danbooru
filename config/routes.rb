@@ -11,11 +11,7 @@ Rails.application.routes.draw do
       end
     end
     namespace :post do
-      resource :queue, :only => [:show] do
-        member do
-          get :random
-        end
-      end
+      resource :queue, only: [:show]
       resources :posts, :only => [:delete, :expunge, :confirm_delete] do
         member do
           get :confirm_delete

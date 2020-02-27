@@ -3,7 +3,6 @@ class PostApprovalsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def create
-    cookies.permanent[:moderated] = Time.now.to_i
     post = Post.find(params[:post_id])
     @approval = post.approve!
     respond_with(@approval)

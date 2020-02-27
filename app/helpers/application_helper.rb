@@ -333,10 +333,6 @@ module ApplicationHelper
     content_for(:html_header, auto_discovery_link_tag(:atom, url, title: title))
   end
 
-  def show_moderation_notice?
-    CurrentUser.can_approve_posts? && (cookies[:moderated].blank? || Time.at(cookies[:moderated].to_i) < 72.hours.ago)
-  end
-
   protected
 
   def nav_link_match(controller, url)
