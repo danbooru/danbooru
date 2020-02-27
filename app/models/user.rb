@@ -614,15 +614,15 @@ class User < ApplicationRecord
     end
 
     def positive_feedback_count
-      feedback.positive.count
+      feedback.undeleted.positive.count
     end
 
     def neutral_feedback_count
-      feedback.neutral.count
+      feedback.undeleted.neutral.count
     end
 
     def negative_feedback_count
-      feedback.negative.count
+      feedback.undeleted.negative.count
     end
 
     def refresh_counts!
