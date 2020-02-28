@@ -1,15 +1,17 @@
 <%= table_for tag_implications, width: "100%" do |t| %>
   <% t.column "From", width: "25%" do |tag_implication| %>
     <%= link_to tag_implication.antecedent_name, posts_path(tags: tag_implication.antecedent_name), class: tag_class(tag_implication.antecedent_tag) %>
+    <%= link_to "»", tag_implications_path(search: { implied_from: tag_implication.antecedent_name }) %>
     <span class="count"><%= tag_implication.antecedent_tag&.post_count.to_i %></span>
   <% end %>
   <% t.column "To", width: "25%" do |tag_implication| %>
     <%= link_to tag_implication.consequent_name, posts_path(tags: tag_implication.consequent_name), class: tag_class(tag_implication.consequent_tag) %>
+    <%= link_to "»", tag_implications_path(search: { implied_to: tag_implication.consequent_name }) %>
     <span class="count"><%= tag_implication.consequent_tag&.post_count.to_i %></span>
   <% end %>
-  <% t.column "Reference", width: "10%" do |tag_implication| %>
+  <% t.column "Topic", width: "10%" do |tag_implication| %>
     <% if tag_implication.forum_topic_id %>
-      <%= link_to tag_implication.forum_topic_id, forum_topic_path(tag_implication.forum_topic_id) %>
+      <%= link_to "topic ##{tag_implication.forum_topic_id}", forum_topic_path(tag_implication.forum_topic_id) %>
     <% end %>
   <% end %>
   <% t.column "Approver", width: "15%" do |tag_implication| %>

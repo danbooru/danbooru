@@ -48,6 +48,24 @@ class TagImplication < TagRelationship
     end
   end
 
+  concerning :SearchMethods do
+    class_methods do
+      def search(params)
+        q = super
+
+        if params[:implied_from].present?
+          q = q.where(id: ancestors_of(params[:implied_from]).select(:id))
+        end
+
+        if params[:implied_to].present?
+          q = q.where(id: descendants_of(params[:implied_to]).select(:id))
+        end
+
+        q
+      end
+    end
+  end
+
   module ValidationMethods
     def absence_of_circular_relation
       return if is_rejected?
