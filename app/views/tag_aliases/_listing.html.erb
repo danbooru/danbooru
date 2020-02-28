@@ -9,9 +9,9 @@
     <%= link_to "»", tag_aliases_path(search: { consequent_name_ilike: tag_alias.consequent_name }) %>
     <span class="count"><%= tag_alias.consequent_tag&.post_count.to_i %></span>
   <% end %>
-  <% t.column "Reference", width: "10%" do |tag_alias| %>
+  <% t.column "Topic", width: "10%" do |tag_alias| %>
     <% if tag_alias.forum_topic_id %>
-      <%= link_to tag_alias.forum_topic_id, forum_topic_path(tag_alias.forum_topic_id) %>
+      <%= link_to "topic ##{tag_alias.forum_topic_id}", forum_topic_path(tag_alias.forum_topic_id) %>
     <% end %>
   <% end %>
   <% t.column "Approver", width: "15%" do |tag_alias| %>
