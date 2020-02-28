@@ -356,7 +356,7 @@ module ApplicationHelper
     when "artists", "artist_versions"
       /^\/artist/
 
-    when "tags"
+    when "tags", "tag_aliases", "tag_implications"
       /^\/tags/
 
     when "pools", "pool_versions"
@@ -364,12 +364,6 @@ module ApplicationHelper
 
     when "moderator/dashboards"
       /^\/moderator/
-
-    when "tag_aliases"
-      /^\/tag_aliases/
-
-    when "tag_implications",
-      /^\/tag_implications/
 
     when "wiki_pages", "wiki_page_versions"
       /^\/wiki_pages/
