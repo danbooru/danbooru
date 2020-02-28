@@ -98,11 +98,7 @@ class TagRelationship < ApplicationRecord
 
     def pending_first
       # unknown statuses return null and are sorted first
-      order(Arel.sql("array_position(array['queued', 'processing', 'pending', 'active', 'deleted', 'retired'], status::text) NULLS FIRST, antecedent_name, consequent_name"))
-    end
-
-    def default_order
-      pending_first
+      order(Arel.sql("array_position(array['queued', 'processing', 'pending', 'active', 'deleted', 'retired'], status::text) NULLS FIRST, id DESC"))
     end
 
     def search(params)
@@ -124,8 +120,7 @@ class TagRelationship < ApplicationRecord
         q = q.joins(:consequent_tag).where("tags.category": params[:category].split)
       end
 
-      params[:order] ||= "status"
-      case params[:order].downcase
+      case params[:order].to_s.downcase
       when "created_at"
         q = q.order("created_at desc")
       when "updated_at"
@@ -134,6 +129,8 @@ class TagRelationship < ApplicationRecord
         q = q.order("antecedent_name asc, consequent_name asc")
       when "tag_count"
         q = q.joins(:consequent_tag).order("tags.post_count desc, antecedent_name asc, consequent_name asc")
+      when "status"
+        q = q.pending_first
       else
         q = q.apply_default_order(params)
       end
