@@ -470,55 +470,31 @@ Post.resize_ugoira_controls = function() {
   $("#seek-slider").css("width", width - 81);
 }
 
-Post.notice_update = function(x) {
-  if (x === "inc") {
-    Post.pending_update_count += 1;
-    Utility.notice("Updating posts (" + Post.pending_update_count + " pending)...", true);
+Post.show_pending_update_notice = function() {
+  if (Post.pending_update_count === 0) {
+    Utility.notice("Posts updated");
   } else {
-    Post.pending_update_count -= 1;
-
-    if (Post.pending_update_count < 1) {
-      Utility.notice("Posts updated");
-    } else {
-      Utility.notice("Updating posts (" + Post.pending_update_count + " pending)...", true);
-    }
-  }
-}
-
-Post.update_data = function(data) {
-  var $post = $("#post_" + data.id);
-  $post.attr("data-tags", data.tag_string);
-  $post.data("rating", data.rating);
-  $post.removeClass("post-status-has-parent post-status-has-children");
-  if (data.parent_id) {
-    $post.addClass("post-status-has-parent");
-  }
-  if (data.has_visible_children) {
-    $post.addClass("post-status-has-children");
+    Utility.notice(`Updating posts (${Post.pending_update_count} pending)...`, true);
   }
 }
 
 Post.tag = function(post_id, tags) {
   const tag_string = (Array.isArray(tags) ? tags.join(" ") : String(tags));
-  Post.update(post_id, { "post[old_tag_string]": "", "post[tag_string]": tag_string });
+  Post.update(post_id, "tag-script", { post: { old_tag_string: "", tag_string: tag_string }});
 }
 
-Post.update = function(post_id, params) {
-  Post.notice_update("inc");
+Post.update = async function(post_id, mode, params) {
+  try {
+    Post.pending_update_count += 1;
+    Post.show_pending_update_notice()
 
-  $.ajax({
-    type: "PUT",
-    url: "/posts/" + post_id + ".json",
-    data: params,
-    success: function(data) {
-      Post.notice_update("dec");
-      Post.update_data(data);
-    },
-    error: function(data) {
-      Post.notice_update("dec");
-      Utility.error(`There was an error updating <a href="/posts/${post_id}">post #${post_id}</a>`);
-    }
-  });
+    await $.ajax({ type: "PUT", url: `/posts/${post_id}.js?mode=${mode}`, data: params });
+
+    Post.pending_update_count -= 1;
+    Post.show_pending_update_notice();
+  } catch(err) {
+    Post.pending_update_count -= 1;
+  }
 }
 
 Post.initialize_saved_searches = function() {

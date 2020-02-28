@@ -1,11 +1,9 @@
 <div id="quick-edit-div" style="display: none;">
   <h1>Edit</h1>
 
-  <%= form_tag("/posts", :class => "simple_form", :method => :put, :id => "quick-edit-form") do %>
-    <div class="input">
-      <%= text_area_tag "post[tag_string]", "", :data => { :autocomplete => "tag-edit" } %>
-      <%= submit_tag "Submit" %>
-      <%= submit_tag "Cancel" %>
-    </div>
+  <%= edit_form_for(:post, html: { id: "quick-edit-form" }) do |f| %>
+    <%= f.input :tag_string, label: "Tags", as: :text, input_html: { "data-autocomplete": "tag-edit" } %>
+    <%= f.submit "Submit", data: { disable_with: false } %>
+    <%= f.button :button, "Cancel", name: :cancel, type: :button %>
   <% end %>
 </div>
