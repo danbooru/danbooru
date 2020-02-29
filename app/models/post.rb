@@ -273,7 +273,7 @@ class Post < ApplicationRecord
 
   module ApprovalMethods
     def is_approvable?(user = CurrentUser.user)
-      !is_status_locked? && (is_pending? || is_flagged? || is_deleted?) && uploader != user && !approved_by?(user)
+      !is_status_locked? && (is_pending? || is_flagged? || is_deleted?) && uploader != user
     end
 
     def flag!(reason, is_deletion: false)
@@ -286,10 +286,6 @@ class Post < ApplicationRecord
 
     def approve!(approver = CurrentUser.user)
       approvals.create(user: approver)
-    end
-
-    def approved_by?(user)
-      approver == user || approvals.where(user: user).exists?
     end
 
     def disapproved_by?(user)
@@ -989,7 +985,7 @@ class Post < ApplicationRecord
     end
 
     def has_active_pools?
-      !pools.undeleted.empty?
+      pools.undeleted.present?
     end
 
     def belongs_to_pool?(pool)

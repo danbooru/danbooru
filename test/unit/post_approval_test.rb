@@ -22,10 +22,6 @@ class PostApprovalTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
-    should "allow approval" do
-      assert_equal(false, @post.approved_by?(@approver))
-    end
-
     context "That is approved" do
       should "create a postapproval record" do
         assert_difference("PostApproval.count") do
