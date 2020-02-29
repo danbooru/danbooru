@@ -1,39 +1,33 @@
-<% page_title "Mod Queue" %>
+<% page_title "Moderation Queue" %>
 
-<div id="c-modqueue">
-  <div id="a-index">
-    <div>
-      <h1>Moderation Queue</h1>
+<% content_for(:top_content) do %>
+  <h1>Moderation Queue</h1>
 
-      <%= search_form_for(modqueue_index_path) do |f| %>
-        <%= f.input :tags, input_html: { value: params.dig(:search, :tags), "data-autocomplete": "tag-query" } %>
-        <%= f.submit "Search" %>
+  <div id="moderation-guideline" class="fixed-width-container">
+    <h2>Deletion Guidelines</h2>
+
+    <%= render "desc" %>
+
+    <p>
+      <% if params.dig(:search, :hidden) %>
+        <%= link_to "View pending posts", modqueue_index_path(search: { tags: params.dig(:search, :tags), hidden: nil }) %>.
+      <% else %>
+        <%= link_to "View hidden posts", modqueue_index_path(search: { tags: params.dig(:search, :tags), hidden: true, }) %>.
       <% end %>
-
-      <div id="moderation-guideline" class="fixed-width-container">
-        <h2>Deletion Guidelines</h2>
-
-        <%= render "desc" %>
-
-        <p>
-          <% if params.dig(:search, :hidden) %>
-            <%= link_to "View pending posts", modqueue_index_path(search: { tags: params.dig(:search, :tags), hidden: nil }) %>.
-          <% else %>
-            <%= link_to "View hidden posts", modqueue_index_path(search: { tags: params.dig(:search, :tags), hidden: true, }) %>.
-          <% end %>
-        </p>
-      </div>
-
-      <%= render "posts/partials/common/inline_blacklist" %>
-
-      <% @posts.each do |post| %>
-        <%= render "post", post: post %>
-      <% end %>
-    </div>
-
-    <%= numbered_paginator(@posts) %>
+    </p>
   </div>
-</div>
+<% end %>
 
+<% content_for(:content) do %>
+  <h2>Posts</h2>
+
+  <% @posts.each do |post| %>
+    <%= render "post", post: post %>
+  <% end %>
+
+  <%= numbered_paginator(@posts) %>
+<% end %>
+
+<%= render "modqueue/sidebar" %>
 <%= render "post_disapprovals/detailed_rejection_dialog" %>
 <%= render "posts/partials/common/secondary_links" %>

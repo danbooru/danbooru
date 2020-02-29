@@ -13,14 +13,14 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
   end
 
   context "RelatedTagCalculator" do
-    context "#frequent_tags_for_posts" do
+    context "#frequent_tags_for_post_array" do
       should "calculate the most frequent tags for a set of posts" do
         create(:post, tag_string: "aaa bbb ccc ddd")
         create(:post, tag_string: "aaa bbb ccc")
         create(:post, tag_string: "aaa bbb")
         posts = Post.tag_match("aaa")
 
-        assert_equal(%w[aaa bbb ccc ddd], RelatedTagCalculator.frequent_tags_for_posts(posts))
+        assert_equal(%w[aaa bbb ccc ddd], RelatedTagCalculator.frequent_tags_for_post_array(posts))
       end
     end
 

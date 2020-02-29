@@ -44,7 +44,7 @@ module PostSetPresenters
     end
 
     def frequent_tags
-      RelatedTagCalculator.frequent_tags_for_posts(post_set.posts).take(MAX_TAGS)
+      RelatedTagCalculator.frequent_tags_for_post_array(post_set.posts).take(MAX_TAGS)
     end
 
     def pattern_tags
