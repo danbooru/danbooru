@@ -266,31 +266,27 @@ class PostQueryBuilder
       end
     end
 
-    if q[:disapproval]
-      q[:disapproval].each do |disapproval|
-        disapprovals = CurrentUser.user.post_disapprovals.select(:post_id)
-
-        if disapproval.in?(%w[none false])
-          relation = relation.where.not("posts.id": disapprovals)
-        elsif disapproval.in?(%w[any all true])
-          relation = relation.where("posts.id": disapprovals)
+    if q[:disapproved]
+      q[:disapproved].each do |disapproved|
+        if disapproved == CurrentUser.name
+          disapprovals = CurrentUser.user.post_disapprovals.select(:post_id)
         else
-          relation = relation.where("posts.id": disapprovals.where(reason: disapproval))
+          disapprovals = PostDisapproval.where(reason: disapproved)
         end
+
+        relation = relation.where("posts.id": disapprovals.select(:post_id))
       end
     end
 
-    if q[:disapproval_neg]
-      q[:disapproval_neg].each do |disapproval|
-        disapprovals = CurrentUser.user.post_disapprovals.select(:post_id)
-
-        if disapproval.in?(%w[none false])
-          relation = relation.where("posts.id": disapprovals)
-        elsif disapproval.in?(%w[any all true])
-          relation = relation.where.not("posts.id": disapprovals)
+    if q[:disapproved_neg]
+      q[:disapproved_neg].each do |disapproved|
+        if disapproved == CurrentUser.name
+          disapprovals = CurrentUser.user.post_disapprovals.select(:post_id)
         else
-          relation = relation.where.not("posts.id": disapprovals.where(reason: disapproval))
+          disapprovals = PostDisapproval.where(reason: disapproved)
         end
+
+        relation = relation.where.not("posts.id": disapprovals.select(:post_id))
       end
     end
 

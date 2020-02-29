@@ -2374,21 +2374,19 @@ class PostTest < ActiveSupport::TestCase
       end
     end
 
-    should "return posts for a disapproval:<type> metatag" do
+    should "return posts for a disapproved:<type> metatag" do
       CurrentUser.scoped(FactoryBot.create(:mod_user)) do
         pending     = FactoryBot.create(:post, is_pending: true)
         disapproved = FactoryBot.create(:post, is_pending: true)
         disapproval = FactoryBot.create(:post_disapproval, user: CurrentUser.user, post: disapproved, reason: "disinterest")
 
-        assert_tag_match([pending],     "disapproval:none")
-        assert_tag_match([disapproved], "disapproval:any")
-        assert_tag_match([disapproved], "disapproval:disinterest")
-        assert_tag_match([],            "disapproval:breaks_rules")
+        assert_tag_match([disapproved], "disapproved:#{CurrentUser.name}")
+        assert_tag_match([disapproved], "disapproved:disinterest")
+        assert_tag_match([],            "disapproved:breaks_rules")
 
-        assert_tag_match([disapproved],          "-disapproval:none")
-        assert_tag_match([pending],              "-disapproval:any")
-        assert_tag_match([pending],              "-disapproval:disinterest")
-        assert_tag_match([disapproved, pending], "-disapproval:breaks_rules")
+        assert_tag_match([pending],              "-disapproved:#{CurrentUser.name}")
+        assert_tag_match([pending],              "-disapproved:disinterest")
+        assert_tag_match([disapproved, pending], "-disapproved:breaks_rules")
       end
     end
 

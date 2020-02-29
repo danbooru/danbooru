@@ -17,7 +17,7 @@ class Tag < ApplicationRecord
     -locked locked width height mpixels ratio score favcount filesize source
     -source id -id date age order limit -status status tagcount parent -parent
     child pixiv_id pixiv search upvote downvote filetype -filetype flagger
-    -flagger appealer -appealer disapproval -disapproval embedded
+    -flagger appealer -appealer disapproved -disapproved embedded
   ] + TagCategory.short_name_list.map {|x| "#{x}tags"} + COUNT_METATAGS + COUNT_METATAG_SYNONYMS
 
   SUBQUERY_METATAGS = %w[commenter comm noter noteupdater artcomm flagger -flagger appealer -appealer]
@@ -583,13 +583,13 @@ class Tag < ApplicationRecord
             user_id = User.name_to_id(g2)
             q[:artcomm_ids] << user_id unless user_id.blank?
 
-          when "disapproval"
-            q[:disapproval] ||= []
-            q[:disapproval] << g2
+          when "disapproved"
+            q[:disapproved] ||= []
+            q[:disapproved] << g2
 
-          when "-disapproval"
-            q[:disapproval_neg] ||= []
-            q[:disapproval_neg] << g2
+          when "-disapproved"
+            q[:disapproved_neg] ||= []
+            q[:disapproved_neg] << g2
 
           when "-pool"
             q[:pool_neg] ||= []
