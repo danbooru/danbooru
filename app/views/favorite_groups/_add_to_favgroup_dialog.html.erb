@@ -1,4 +1,4 @@
-<% if CurrentUser.favorite_groups.empty? %>
+<% if !CurrentUser.favorite_groups.present? %>
   <p>Add this post to a new a favorite group (<%= link_to_wiki "help:favorite_groups" %>):</p>
 
   <%= edit_form_for(FavoriteGroup.new, html: { class: "one-line-form" }) do |f| %>
