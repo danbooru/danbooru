@@ -14,7 +14,7 @@
         <li><%= link_to("Most Viewed", viewed_explore_posts_path) %></li>
         <li><%= link_to("Votes", post_votes_path) %></li>
         <% if CurrentUser.can_approve_posts? %>
-          <li><%= link_to("Moderate", moderator_post_queue_path) %></li>
+          <li><%= link_to("Modqueue", modqueue_index_path) %></li>
         <% end %>
       </ul>
       <ul>

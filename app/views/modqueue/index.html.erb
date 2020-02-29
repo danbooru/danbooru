@@ -1,11 +1,11 @@
 <% page_title "Mod Queue" %>
 
-<div id="c-moderator-post-queues">
-  <div id="a-show">
+<div id="c-modqueue">
+  <div id="a-index">
     <div>
       <h1>Moderation Queue</h1>
 
-      <%= search_form_for(moderator_post_queue_path) do |f| %>
+      <%= search_form_for(modqueue_index_path) do |f| %>
         <%= f.input :tags, input_html: { value: params.dig(:search, :tags), "data-autocomplete": "tag-query" } %>
         <%= f.submit "Search" %>
       <% end %>
@@ -17,9 +17,9 @@
 
         <p>
           <% if params.dig(:search, :hidden) %>
-            <%= link_to "View pending posts", moderator_post_queue_path(search: { tags: params.dig(:search, :tags), hidden: nil }) %>.
+            <%= link_to "View pending posts", modqueue_index_path(search: { tags: params.dig(:search, :tags), hidden: nil }) %>.
           <% else %>
-            <%= link_to "View hidden posts", moderator_post_queue_path(search: { tags: params.dig(:search, :tags), hidden: true, }) %>.
+            <%= link_to "View hidden posts", modqueue_index_path(search: { tags: params.dig(:search, :tags), hidden: true, }) %>.
           <% end %>
         </p>
       </div>

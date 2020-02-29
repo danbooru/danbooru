@@ -12,7 +12,7 @@
   <% end %>
   <%= subnav_link_to "Changes", post_versions_path %>
   <% if CurrentUser.can_approve_posts? %>
-    <%= subnav_link_to "Moderate", moderator_post_queue_path %>
+    <%= subnav_link_to "Modqueue", modqueue_index_path %>
   <% end %>
   <%= subnav_link_to "Help", wiki_page_path("help:posts") %>
 <% end %>

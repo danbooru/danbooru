@@ -3,8 +3,8 @@
 <% else %>
   if ($("#c-posts #a-show").length) {
     location.reload();
-  } else if ($("#c-moderator-post-queues").length) {
-    $("#c-moderator-post-queues #post-<%= @post_disapproval.post.id %>").hide();
+  } else if ($("#c-modqueue").length) {
+    $("#c-modqueue #post-<%= @post_disapproval.post.id %>").hide();
     Danbooru.notice("Post was hidden");
   }
 <% end %>

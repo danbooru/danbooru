@@ -11,7 +11,6 @@ Rails.application.routes.draw do
       end
     end
     namespace :post do
-      resource :queue, only: [:show]
       resources :posts, :only => [:delete, :expunge, :confirm_delete] do
         member do
           get :confirm_delete
@@ -142,6 +141,7 @@ Rails.application.routes.draw do
   end
   resources :mod_actions
   resources :moderation_reports, only: [:new, :create, :index, :show]
+  resources :modqueue, only: [:index]
   resources :news_updates
   resources :notes do
     collection do
