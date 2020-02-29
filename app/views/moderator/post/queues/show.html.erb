@@ -7,7 +7,6 @@
 
       <%= search_form_for(moderator_post_queue_path) do |f| %>
         <%= f.input :tags, input_html: { value: params.dig(:search, :tags), "data-autocomplete": "tag-query" } %>
-        <%= f.input :per_page, label: "Posts", collection: %w[25 50 100 200], selected: cookies[:mq_per_page] %>
         <%= f.submit "Search" %>
       <% end %>
 
