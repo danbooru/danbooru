@@ -131,7 +131,7 @@ let Note = {
       $note_box.on(
         "mouseover.danbooru mouseout.danbooru",
         function(e) {
-          if (Note.dragging) {
+          if (Note.dragging || Utility.test_max_width(660)) {
             return;
           }
 
@@ -163,12 +163,21 @@ let Note = {
         "click.danbooru",
         function (event) {
           const note_id = $note_box.data("id");
-          $(".note-box").removeClass("movable");
-          if (note_id === Note.move_id) {
-            Note.move_id = null;
+          if (!Utility.test_max_width(660)) {
+            $(".note-box").removeClass("movable");
+            if (note_id === Note.move_id) {
+              Note.move_id = null;
+            } else {
+              Note.move_id = note_id;
+              $note_box.addClass("movable");
+            }
+          } else if ($note_box.hasClass("viewing")) {
+            Note.Body.hide(note_id);
+            $note_box.removeClass("viewing");
           } else {
-            Note.move_id = note_id;
-            $note_box.addClass("movable");
+            $(".note-box").removeClass("viewing");
+            Note.Body.show(note_id);
+            $note_box.addClass("viewing");
           }
         }
       );
