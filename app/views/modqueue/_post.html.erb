@@ -1,37 +1,79 @@
 <%= content_tag(:div, { id: "post-#{post.id}", class: ["post", "mod-queue-preview", "column-container", *PostPresenter.preview_class(post, highlight_score: true)].join(" ") }.merge(PostPresenter.data_attributes(post))) do %>
   <aside class="column column-shrink">
-    <%= link_to(image_tag(post.preview_file_url), post_path(post), :target => "_blank") %>
+    <%= PostPresenter.preview(post, size: true) %>
   </aside>
 
   <section class="column column-expand">
-    <ul>
-      <li>
-        <%= render "modqueue/quick_mod", post: post %>
-      </li>
-      <li><strong>Rating</strong>: <%= post.pretty_rating %></li>
-      <li><strong>Score</strong>: <%= post.score %></li>
-      <li>
-        <strong>Size:</strong>
-        <%= number_to_human_size(post.file_size) %>
-        <% if post.has_dimensions? %>
-          (<%= post.image_width %>x<%= post.image_height %>)
-        <% end %>
-      </li>
-      <li><strong>Uploader</strong>: <%= link_to_user(post.uploader) %> <%= time_ago_in_words_tagged(post.created_at) %></li>
+    <div class="row quick-mod-row">
+      <%= render "modqueue/quick_mod", post: post %>
+      <%= render "post_disapprovals/compact_counts", disapprovals: post.disapprovals, post: post %>
+    </div>
+
+    <div class="row">
+      <span class="info">
+        <strong>Date</strong>
+        <%= compact_time(post.created_at) %>
+      </span>
+
+      <span class="info">
+        <strong>User</strong>
+        <%= link_to_user(post.uploader) %>
+        <%= link_to "»", modqueue_index_path(search: { tags: "user:#{post.uploader.name}" }) %>
+      </span>
+
+      <span class="info">
+        <strong>Rating</strong>
+        <%= post.pretty_rating %>
+      </span>
+
+      <span class="info">
+        <strong>Score</strong>
+        <span>
+          <span id="score-for-post-<%= post.id %>"><%= post.score %></span>
+          <% if CurrentUser.is_voter? %>
+            (vote <%= link_to tag.i(class: "far fa-thumbs-up"), post_post_votes_path(score: "up", post_id: post.id), remote: true, method: :post %>/<%= link_to tag.i(class: "far fa-thumbs-down"), post_post_votes_path(score: "down", post_id: post.id), remote: true, method: :post %>)
+          <% end %>
+        </span>
+      </span>
+    </div>
+
+    <div class="row">
+      <span class="info">
+        <strong>Source</strong>
+        <%= post_source_tag(post) %>
+      </span>
+    </div>
+
+    <% if post.has_active_pools? %>
+      <div class="row">
+        <span class="info">
+          <strong>Pools</strong>
+          <%= render "pools/inline_list", pools: post.pools.undeleted %>
+        </span>
+      </div>
+    <% end %>
+
+    <div class="row list-of-tags">
+      <span class="info">
+        <strong>Tags</strong>
+        <%= post.presenter.inline_tag_list_html %>
+      </span>
+    </div>
+
+    <div class="row post-flags-row">
       <% if post.is_flagged? %>
-        <li><strong>Flagged</strong>: <%= render "post_flags/reasons", flags: post.flags %></li>
+        <span class="info">
+          <strong>Flagged</strong>
+          <%= render "post_flags/reasons", flags: post.flags %>
+        </span>
       <% end %>
+
       <% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
-        <li><strong>Appeals</strong>: <%= render "post_appeals/reasons", appeals: post.appeals %></li>
+        <span class="info">
+          <strong>Appeals</strong>
+          <%= render "post_appeals/reasons", appeals: post.appeals %>
+        </span>
       <% end %>
-      <li>
-        <strong>Hidden</strong>: <%= render "post_disapprovals/compact_counts", :disapprovals => post.disapprovals, :post => post %>
-      </li>
-      <li class="mod-queue-post-source"><strong>Source</strong>: <%= post_source_tag(post) %></li>
-      <% if post.has_active_pools? %>
-        <li><strong>Pools</strong>: <%= render "pools/inline_list", pools: post.pools.undeleted %></li>
-      <% end %>
-      <li><strong>Tags</strong>: <%= post.presenter.inline_tag_list_html %></li>
-    </ul>
+    </div>
   </section>
 <% end %>
