@@ -26,15 +26,9 @@ div#c-modqueue {
       }
     }
 
-    <% Danbooru.config.modqueue_quality_warning_tags.each do |tag| %>
-      &[data-tags~="<%= tag %>"] {
-        background-color: var(--modqueue-quality-warning-color);
-      }
-    <% end %>
-
-    <% Danbooru.config.modqueue_sample_warning_tags.each do |tag| %>
-      &[data-tags~="<%= tag %>"] {
-        background-color: var(--modqueue-sample-warning-color);
+    <% Danbooru.config.modqueue_warning_tags.each do |tag| %>
+      li[data-tag-name="<%= tag %>"] {
+        background-color: var(--modqueue-tag-warning-color);
       }
     <% end %>
   }

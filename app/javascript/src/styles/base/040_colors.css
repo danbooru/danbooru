@@ -52,8 +52,7 @@
   --preview-icon-color: white;
   --preview-icon-background: rgba(0, 0, 0, 0.5);
 
-  --modqueue-sample-warning-color: var(--error-background-color);
-  --modqueue-quality-warning-color: var(--warning-background-color);
+  --modqueue-tag-warning-color: var(--error-background-color);
 
   --uploads-dropzone-background: #EEE;
   --uploads-dropzone-progress-bar-foreground-color: var(--link-color);
@@ -339,8 +338,7 @@ body[data-current-user-theme="dark"] {
   --keyboard-shortcut-color: var(--text-color);
   --keyboard-shortcut-background-color: var(--grey-2);
 
-  --modqueue-sample-warning-color: var(--error-background-color);
-  --modqueue-quality-warning-color: var(--warning-background-color);
+  --modqueue-tag-warning-color: var(--error-background-color);
 
   --news-updates-background: var(--grey-3);
   --news-updates-border: 2px solid var(--grey-4);

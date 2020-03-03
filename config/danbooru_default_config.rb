@@ -359,14 +359,10 @@ module Danbooru
       tag =~ /\A(?:replaceme|.*_sample|resized|upscaled|downscaled|md5_mismatch|jpeg_artifacts|corrupted_image|source_request|non-web_source)\z/i
     end
 
-    # Posts with these tags will be highlighted yellow in the modqueue.
-    def modqueue_quality_warning_tags
-      %w[hard_translated self_upload nude_filter third-party_edit screencap]
-    end
-
-    # Posts with these tags will be highlighted red in the modqueue.
-    def modqueue_sample_warning_tags
-      %w[duplicate image_sample md5_mismatch resized upscaled downscaled]
+    # Posts with these tags will be highlighted in the modqueue.
+    def modqueue_warning_tags
+      %w[hard_translated self_upload nude_filter third-party_edit screencap
+      duplicate image_sample md5_mismatch resized upscaled downscaled]
     end
 
     def stripe_secret_key
