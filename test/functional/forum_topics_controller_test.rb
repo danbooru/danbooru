@@ -211,6 +211,15 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "update action" do
+      should "allow mods to lock forum topics" do
+        put_auth forum_topic_path(@forum_topic), @mod, params: { forum_topic: { is_locked: true }}
+
+        assert_redirected_to forum_topic_path(@forum_topic)
+        assert_equal(true, @forum_topic.reload.is_locked)
+      end
+    end
+
     context "destroy action" do
       setup do
         as_user do

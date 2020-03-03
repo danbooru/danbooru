@@ -104,21 +104,20 @@ class ForumPostTest < ActiveSupport::TestCase
 
     context "belonging to a locked topic" do
       setup do
-        @post = FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => "zzz")
-        @topic.update_attribute(:is_locked, true)
-        @post.reload
+        @post = create(:forum_post, topic: @topic, body: "zzz")
+        @topic.update(is_locked: true)
       end
 
       should "not be updateable" do
         @post.update(body: "xxx")
-        @post.reload
-        assert_equal("zzz", @post.body)
+        assert_equal(true, @post.invalid?)
+        assert_equal("zzz", @post.reload.body)
       end
 
       should "not be deletable" do
-        assert_difference("ForumPost.count", 0) do
-          @post.destroy
-        end
+        @post.delete!
+        assert_equal(true, @post.invalid?)
+        assert_equal(false, @post.reload.is_deleted)
       end
     end
 
