@@ -11,7 +11,7 @@ class ApplicationRecord < ActiveRecord::Base
         extending(PaginationExtension).paginate(*args, **options)
       end
 
-      def paginated_search(params, defaults: {}, count_pages: params[:search].present?)
+      def paginated_search(params, count_pages: params[:search].present?, **defaults)
         search_params = params.fetch(:search, {}).permit!
         search_params = defaults.merge(search_params).with_indifferent_access
 

@@ -38,6 +38,7 @@ class Tag < ApplicationRecord
     tagcount tagcount_asc
     rank
     curated
+    modqueue
     random
     custom
   ] +

@@ -493,7 +493,17 @@ class PostQueryBuilder
       relation = relation.where("posts.image_width IS NOT NULL and posts.image_height IS NOT NULL")
     end
 
-    case q[:order]
+    if q[:order] == "custom" && q[:post_id].present? && q[:post_id][0] == :in
+      relation = relation.find_ordered(q[:post_id][1])
+    else
+      relation = PostQueryBuilder.search_order(relation, q[:order])
+    end
+
+    relation
+  end
+
+  def self.search_order(relation, order)
+    case order.to_s
     when "id", "id_asc"
       relation = relation.order("posts.id ASC")
 
@@ -602,10 +612,11 @@ class PostQueryBuilder
         .select("posts.*, COUNT(*) AS contributor_fav_count")
         .order("contributor_fav_count DESC, posts.fav_count DESC, posts.id DESC")
 
-    when "custom"
-      if q[:post_id].present? && q[:post_id][0] == :in
-        relation = relation.find_ordered(q[:post_id][1])
-      end
+    when "modqueue", "modqueue_desc"
+      relation = relation.left_outer_joins(:flags).order("GREATEST(posts.created_at, post_flags.created_at) DESC, posts.id DESC")
+
+    when "modqueue_asc"
+      relation = relation.left_outer_joins(:flags).order("GREATEST(posts.created_at, post_flags.created_at) ASC, posts.id ASC")
 
     else
       relation = relation.order("posts.id DESC")

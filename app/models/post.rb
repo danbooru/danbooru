@@ -1546,6 +1546,30 @@ class Post < ApplicationRecord
     def tag_match(query)
       PostQueryBuilder.new(query).build
     end
+
+    def search(params)
+      q = super
+
+      q = q.search_attributes(params,
+        :approver, :uploader, :rating, :source, :pixiv_id, :fav_count, :score, :up_score,
+        :down_score, :md5, :file_ext, :file_size, :image_width, :image_height, :tag_count,
+        :parent, :has_children, :has_active_children, :is_note_locked, :is_rating_locked,
+        :is_status_locked, :is_pending, :is_flagged, :is_deleted, :is_banned,
+        :last_comment_bumped_at, :last_commented_at, :last_noted_at
+      )
+
+      if params[:tags].present?
+        q = q.tag_match(params[:tags])
+      end
+
+      if params[:order].present?
+        q = PostQueryBuilder.search_order(q, params[:order])
+      else
+        q = q.apply_default_order(params)
+      end
+
+      q
+    end
   end
 
   module PixivMethods
