@@ -92,6 +92,11 @@
     }
   }
 
+  img#image {
+    max-width: 100%;
+    height: auto;
+  }
+
   .user-disable-cropped-false {
     article.post-preview {
       width: 33.3%;

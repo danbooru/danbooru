@@ -5,8 +5,6 @@ let Note = {
   HIDE_DELAY: 250,
   NORMALIZE_ATTRIBUTES: ['letter-spacing', 'line-height', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom', 'padding-left', 'padding-right', 'padding-top', 'padding-bottom'],
   COPY_ATTRIBUTES: ['background-color', 'border-radius', 'transform'],
-  BOX_ONLY_ATTRIBUTES: ['transform'],
-  INNER_ONLY_ATTRIBUTES: ['background-color'],
   permitted_style_values: function(attribute, $attribute_child) {
     if ($attribute_child.length === 0) {
       return "";
@@ -79,35 +77,33 @@ let Note = {
     },
 
     copy_style_attributes: function($note_box) {
-      const $note_inner_box = $note_box.find("div.note-box-inner-border");
-      const $attribute_child = $note_inner_box.find('.note-box-attributes');
+      const $attribute_child = $note_box.find('.note-box-attributes');
       let has_rotation = false;
       Note.COPY_ATTRIBUTES.forEach((attribute)=>{
         const attribute_value = Note.permitted_style_values(attribute, $attribute_child);
-        if (Note.BOX_ONLY_ATTRIBUTES.includes(attribute)) {
-          $note_box.css(attribute, attribute_value);
-        } else if (Note.INNER_ONLY_ATTRIBUTES.includes(attribute)) {
-          $note_inner_box.css(attribute, attribute_value);
-        } else {
-          $note_box.css(attribute, attribute_value);
-          $note_inner_box.css(attribute, attribute_value);
-        }
+        $note_box.css(attribute, attribute_value);
         if (attribute === "transform" && attribute_value.startsWith("rotate")) {
           has_rotation = true;
         }
       });
       if (has_rotation) {
-        const current_left = parseFloat($note_box.css("left"));
-        const current_top = parseFloat($note_box.css("top"));
+        const current_left = Math.round(parseFloat($note_box.css("left")));
+        const current_top = Math.round(parseFloat($note_box.css("top")));
         const position = Note.Box.get_min_max_position($note_box);
         // Checks for the scenario where the user sets invalid box values through the API
         // or by adjusting the box dimensions through the browser's dev console before saving
-        if (current_left !== position.left || current_top !== position.top) {
-          $note_box.css(position);
-          $note_inner_box.addClass("out-of-bounds");
+        if (current_left !== position.norm_left || current_top !== position.norm_top) {
+          $note_box.css({
+            top: position.percent_top,
+            left: position.percent_left,
+          });
+          $note_box.addClass("out-of-bounds");
         } else {
-          $note_inner_box.removeClass("out-of-bounds");
+          $note_box.removeClass("out-of-bounds");
         }
+        $note_box.data('has_rotation', true);
+      } else {
+        $note_box.data('has_rotation', false);
       }
     },
 
@@ -116,18 +112,10 @@ let Note = {
         "dragstart.danbooru resizestart.danbooru",
         function(e) {
           var $note_box_inner = $(e.currentTarget);
-          $note_box_inner.find(".note-box-inner-border").addClass("unsaved");
+          $note_box_inner.addClass("unsaved");
           Note.dragging = true;
           Note.clear_timeouts();
           Note.Body.hide_all();
-          e.stopPropagation();
-        }
-      );
-
-      $note_box.on("resize.danbooru",
-        function(e) {
-          var $note_box_inner = $(e.currentTarget);
-          Note.Box.resize_inner_border($note_box_inner);
           e.stopPropagation();
         }
       );
@@ -188,6 +176,8 @@ let Note = {
       $note_box.on("mousedown.danbooru", function(event) {
         Note.drag_id = $note_box.data('id');
       });
+
+      $note_box.on("mouseup.danbooru.drag", Note.Box.drag_stop);
     },
 
     find: function(id) {
@@ -196,9 +186,22 @@ let Note = {
 
     drag_stop: function(event) {
       if (Note.drag_id !== null) {
+        const $image = $("#image");
         const $note_box = Note.Box.find(Note.drag_id);
-        const position = Note.Box.get_min_max_position($note_box);
-        $note_box.css(position);
+        const dimensions = {
+          top: (100 * ($note_box.position().top / $image.height())) + '%',
+          left: (100 * ($note_box.position().left / $image.width())) + '%',
+          height: (100 * ($note_box.height() / $image.height())) + '%',
+          width: (100 * ($note_box.width() / $image.width())) + '%',
+        };
+        if (Note.embed && $note_box.data('has_rotation')) {
+          const position = Note.Box.get_min_max_position($note_box);
+          Object.assign(dimensions, {
+            top: position.percentage_top,
+            left: position.percentage_left,
+          });
+        }
+        $note_box.css(dimensions);
         Note.drag_id = null;
       }
     },
@@ -212,8 +215,8 @@ let Note = {
         return;
       }
       let computed_style = window.getComputedStyle($note_box[0]);
-      let current_top = parseFloat(computed_style.top);
-      let current_left = parseFloat(computed_style.left);
+      let current_top = Math.round(parseFloat(computed_style.top));
+      let current_left = Math.round(parseFloat(computed_style.left));
       switch (event.originalEvent.key) {
       case "ArrowUp":
         current_top--;
@@ -231,8 +234,11 @@ let Note = {
         // do nothing
       }
       let position = Note.Box.get_min_max_position($note_box, current_top, current_left);
-      $note_box.css(position);
-      $note_box.find(".note-box-inner-border").addClass("unsaved");
+      $note_box.css({
+        top: position.percent_top,
+        left: position.percent_left,
+      });
+      $note_box.addClass("unsaved");
       event.preventDefault();
     },
 
@@ -245,8 +251,8 @@ let Note = {
         return;
       }
       let computed_style = window.getComputedStyle($note_box[0]);
-      let current_top = parseFloat(computed_style.top);
-      let current_left = parseFloat(computed_style.left);
+      let current_top = Math.round(parseFloat(computed_style.top));
+      let current_left = Math.round(parseFloat(computed_style.left));
       let current_height = $note_box.height();
       let current_width = $note_box.width();
       switch (event.originalEvent.key) {
@@ -266,14 +272,13 @@ let Note = {
         // do nothing
       }
       const position = Note.Box.get_min_max_position($note_box, null, null, current_height, current_width);
-      if (current_top === position.top && current_left === position.left) {
+      if (current_top === position.norm_top && current_left === position.norm_left) {
         $note_box.css({
           height: current_height,
           width: current_width,
         });
       }
-      Note.Box.resize_inner_border($note_box);
-      $note_box.find(".note-box-inner-border").addClass("unsaved");
+      $note_box.addClass("unsaved");
       event.preventDefault();
     },
 
@@ -295,8 +300,10 @@ let Note = {
         $note_box.css('transform', 'none');
       }
       return {
-        top: Math.round(current_top),
-        left: Math.round(current_left),
+        norm_top: Math.round(current_top),
+        norm_left: Math.round(current_left),
+        percent_top: (100 * (current_top / $image.height())) + '%',
+        percent_left: (100 * (current_left / $image.width())) + '%',
       };
     },
 
@@ -380,36 +387,31 @@ let Note = {
     scale: function($note_box) {
       var $image = $("#image");
       var ratio = $image.width() / parseFloat($image.data("original-width"));
-      var MIN_SIZE = 5;
+      var x_percent = 100 * ratio * ($note_box.data('x') / $image.width());
+      var y_percent = 100 * ratio * ($note_box.data('y') / $image.height());
+      var height_percent = 100 * ratio * ($note_box.data('height') / $image.height());
+      var width_percent = 100 * ratio * ($note_box.data('width') / $image.width());
       $note_box.css({
-        top: Math.ceil(parseFloat($note_box.data("y")) * ratio),
-        left: Math.ceil(parseFloat($note_box.data("x")) * ratio),
-        width: Math.max(MIN_SIZE, Math.ceil(parseFloat($note_box.data("width")) * ratio)),
-        height: Math.max(MIN_SIZE, Math.ceil(parseFloat($note_box.data("height")) * ratio))
+        top: y_percent + '%',
+        left: x_percent + '%',
+        width: width_percent + '%',
+        height: height_percent + '%',
       });
-      Note.Box.resize_inner_border($note_box);
     },
 
     scale_all: function() {
-      var container = document.getElementById('note-container');
-      if (container === null) {
+      const $container = $('#note-container');
+      if ($container.length === 0) {
         return;
       }
-      // Hide notes while rescaling, to prevent unnecessary reflowing
-      var was_visible = container.style.display !== 'none';
-      if (was_visible) {
-        container.style.display = 'none';
-      }
-      $(".note-box").each(function(i, v) {
-        Note.Box.scale($(v));
-      });
-      if (was_visible) {
-        container.style.display = 'block';
-      }
+      let $image = $("#image");
+      $container.height($image.height());
+      $container.width($image.width());
       if (Note.embed) {
-        const $image = $("#image");
-        const percentage = 100 * ($image.width() / parseFloat($image.data('large-width')));
-        $(container).css('font-size', percentage + '%');
+        let large_width = parseFloat($image.data('large-width'));
+        let ratio = $image.width() / large_width;
+        let font_percentage = ratio * 100;
+        $container.css('font-size', font_percentage + '%');
       }
     },
 
@@ -438,16 +440,23 @@ let Note = {
 
     initialize: function($note_body) {
       var $note_box = Note.Box.find($note_body.data("id"));
-      const box_data = Note.Box.get_bounding_box($note_box);
-      // Select the lowest box corner to the farthest left
-      let selected_corner = box_data.norm_coord.reduce(function (selected, coord) {return (selected[1] > coord[1]) || (selected[1] === coord[1] && selected[0] < coord[0]) ? selected : coord;});
-      let normalized_degrees = box_data.degrees % 90.0;
-      // Align to the left or right body corner depending upon the box angle
-      let body_corner = $note_box.position().left - (normalized_degrees > 0.0 && normalized_degrees <= 45.0 ? $note_body.width() : 0);
-      $note_body.css({
-        top: $note_box.position().top + selected_corner[1] + 5,
-        left: body_corner + selected_corner[0],
-      });
+      if (Note.embed && $note_box.data('has_rotation')) {
+        const box_data = Note.Box.get_bounding_box($note_box);
+        // Select the lowest box corner to the farthest left
+        let selected_corner = box_data.norm_coord.reduce(function (selected, coord) {return (selected[1] > coord[1]) || (selected[1] === coord[1] && selected[0] < coord[0]) ? selected : coord;});
+        let normalized_degrees = box_data.degrees % 90.0;
+        // Align to the left or right body corner depending upon the box angle
+        let body_corner = $note_box.position().left - (normalized_degrees > 0.0 && normalized_degrees <= 45.0 ? $note_body.width() : 0);
+        $note_body.css({
+          top: $note_box.position().top + selected_corner[1] + 5,
+          left: body_corner + selected_corner[0],
+        });
+      } else {
+        $note_body.css({
+          top: $note_box.position().top + $note_box.height() + 5,
+          left: $note_box.position().left,
+        });
+      }
       Note.Body.bound_position($note_body);
     },
 
@@ -538,8 +547,10 @@ let Note = {
       if (Note.embed) {
         const $note_inner_box = $note_box.find("div.note-box-inner-border");
         Note.Body.display_text($note_inner_box, text);
+        // Reset the font size so that the normalization calculations will be correct
         $note_inner_box.css("font-size", Note.base_font_size + "px");
         Note.normalize_sizes($note_inner_box.children(), Note.base_font_size);
+        // Clear the font size so that the fonts will be scaled to the current value
         $note_inner_box.css("font-size", "");
         Note.Box.copy_style_attributes($note_box);
       }
@@ -655,10 +666,10 @@ let Note = {
 
       var hash = {
         note: {
-          x: $note_box.position().left / ratio,
-          y: $note_box.position().top / ratio,
-          width: $note_box.width() / ratio,
-          height: $note_box.height() / ratio,
+          x: Math.round($note_box.position().left / ratio),
+          y: Math.round($note_box.position().top / ratio),
+          width: Math.round($note_box.width() / ratio),
+          height: Math.round($note_box.height() / ratio),
           body: $note_body.data("original-body"),
         }
       }
@@ -683,10 +694,10 @@ let Note = {
         $note_box = Note.Box.find(data.html_id);
         $note_body.data("id", String(data.id)).attr("data-id", data.id);
         $note_box.data("id", String(data.id)).attr("data-id", data.id);
-        $note_box.find(".note-box-inner-border").removeClass("unsaved");
+        $note_box.removeClass("unsaved");
       } else {
         $note_box = Note.Box.find(data.id);
-        $note_box.find(".note-box-inner-border").removeClass("unsaved");
+        $note_box.removeClass("unsaved");
       }
     },
 
@@ -730,7 +741,7 @@ let Note = {
       var $note_body = Note.Body.find(id);
       var text = $textarea.val();
       var $note_box = Note.Box.find(id);
-      $note_box.find(".note-box-inner-border").addClass("unsaved");
+      $note_box.addClass("unsaved");
       Note.Body.set_text($note_body, $note_box, "Loading...");
       $.get("/note_previews.json", {body: text}).then(function(data) {
         Note.Body.set_text($note_body, $note_box, data.body);
@@ -972,11 +983,10 @@ let Note = {
       height: h
     });
     Note.Box.update_data_attributes($note_box);
-    $note_box.find(".note-box-inner-border").addClass("unsaved");
+    $note_box.addClass("unsaved");
     $note_body.html("<em>Click to edit</em>");
     $("#note-container").append($note_box);
     $("#note-container").append($note_body);
-    Note.Box.resize_inner_border($note_box);
     Note.id += "x";
   },
 
@@ -1026,12 +1036,12 @@ let Note = {
       Note.base_font_size = parseFloat(window.getComputedStyle($note_container[0]).fontSize);
       $.each($(".note-box"), function(i, note_box) {
         const $note_box = $(note_box);
-        Note.Box.resize_inner_border($note_box);
         Note.normalize_sizes($("div.note-box-inner-border", note_box).children(), Note.base_font_size);
         // Accounting for transformation values calculations which aren't correct immediately on page load
         setTimeout(()=>{Note.Box.copy_style_attributes($note_box);}, 100);
       });
     }
+    Note.Box.scale_all();
   },
 
   initialize_all: function() {
@@ -1040,9 +1050,6 @@ let Note = {
     }
 
     Note.embed = (Utility.meta("post-has-embedded-notes") === "true");
-    if (Note.embed) {
-      $(document).on("mouseup.danbooru.drag", Note.Box.drag_stop);
-    }
     Note.load_all();
 
     this.initialize_shortcuts();
@@ -1050,6 +1057,7 @@ let Note = {
     $(document).on("hashchange.danbooru.note", this.initialize_highlight);
     Utility.keydown("up down left right", "nudge_note", Note.Box.key_nudge);
     Utility.keydown("shift+up shift+down shift+left shift+right", "resize_note", Note.Box.key_resize);
+    $(window).on("resize.danbooru.note_scale", Note.Box.scale_all);
   },
 
   initialize_shortcuts: function() {
