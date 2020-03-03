@@ -54,8 +54,6 @@
 
   --modqueue-sample-warning-color: var(--error-background-color);
   --modqueue-quality-warning-color: var(--warning-background-color);
-  --modqueue-positive-score-background-color: var(--success-background-color);
-  --modqueue-negative-score-background-color: var(--error-background-color);
 
   --uploads-dropzone-background: #EEE;
   --uploads-dropzone-progress-bar-foreground-color: var(--link-color);
@@ -343,8 +341,6 @@ body[data-current-user-theme="dark"] {
 
   --modqueue-sample-warning-color: var(--error-background-color);
   --modqueue-quality-warning-color: var(--warning-background-color);
-  --modqueue-positive-score-background-color: var(--success-background-color);
-  --modqueue-negative-score-background-color: var(--error-background-color);
 
   --news-updates-background: var(--grey-3);
   --news-updates-border: 2px solid var(--grey-4);

@@ -1,4 +1,4 @@
-<%= content_tag(:div, { id: "post-#{post.id}", class: ["post", "mod-queue-preview", "column-container", *PostPresenter.preview_class(post, highlight_score: true)].join(" ") }.merge(PostPresenter.data_attributes(post))) do %>
+<%= content_tag(:div, { id: "post-#{post.id}", class: ["post", "mod-queue-preview", "column-container", *PostPresenter.preview_class(post)].join(" ") }.merge(PostPresenter.data_attributes(post))) do %>
   <aside class="column column-shrink">
     <%= PostPresenter.preview(post, size: true) %>
   </aside>
