@@ -6,8 +6,8 @@ class PostDisapproval < ApplicationRecord
   validates_uniqueness_of :post_id, :scope => [:user_id], :message => "have already hidden this post"
   validates_inclusion_of :reason, :in => %w(legacy breaks_rules poor_quality disinterest)
 
-  scope :with_message, -> {where("message is not null and message <> ''")}
-  scope :without_message, -> {where("message is null or message = ''")}
+  scope :with_message, -> { where.not(message: nil) }
+  scope :without_message, -> { where(message: nil) }
   scope :breaks_rules, -> {where(:reason => "breaks_rules")}
   scope :poor_quality, -> {where(:reason => "poor_quality")}
   scope :disinterest, -> {where(:reason => ["disinterest", "legacy"])}
@@ -59,6 +59,11 @@ class PostDisapproval < ApplicationRecord
 
   def self.available_includes
     [:user, :post]
+  end
+
+  def message=(message)
+    message = nil if message.blank?
+    super(message)
   end
 
   def can_view_creator?(user)
