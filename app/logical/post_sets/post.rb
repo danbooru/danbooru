@@ -3,13 +3,13 @@ module PostSets
     MAX_PER_PAGE = 200
     attr_reader :tag_array, :page, :raw, :random, :post_count, :format
 
-    def initialize(tags, page = 1, per_page = nil, options = {})
+    def initialize(tags, page = 1, per_page = nil, raw: false, random: false, format: "html")
       @tag_array = Tag.scan_query(tags)
       @page = page
       @per_page = per_page
-      @raw = options[:raw].present?
-      @random = options[:random].present?
-      @format = options[:format] || "html"
+      @raw = raw.to_s.truthy?
+      @random = random.to_s.truthy?
+      @format = format.to_s
     end
 
     def tag_string
