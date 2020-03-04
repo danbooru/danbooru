@@ -39,7 +39,7 @@ module Sources
         end
 
         should "get all the image urls" do
-          assert_equal(["https://i-f.pximg.net/img-original/img/2015/03/14/17/53/32/49270482_p0.jpg", "https://i-f.pximg.net/img-original/img/2015/03/14/17/53/32/49270482_p1.jpg"], @image_urls)
+          assert_equal(["https://i.pximg.net/img-original/img/2015/03/14/17/53/32/49270482_p0.jpg", "https://i.pximg.net/img-original/img/2015/03/14/17/53/32/49270482_p1.jpg"], @image_urls)
         end
       end
 
@@ -49,7 +49,7 @@ module Sources
         end
 
         should "get the file url" do
-          assert_equal("https://i-f.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @site.file_url)
+          assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @site.file_url)
         end
 
         should "get the preview url" do
@@ -89,12 +89,12 @@ module Sources
         should "work" do
           @site = Sources::Strategies.find("https://www.pixiv.net/en/artworks/64476642")
 
-          assert_equal("https://i-f.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.image_url)
-          assert_equal("https://i-f.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.canonical_url)
+          assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.image_url)
+          assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.canonical_url)
           assert_equal("https://www.pixiv.net/artworks/64476642", @site.page_url)
 
           @site = Sources::Strategies.find("https://www.pixiv.net/artworks/64476642")
-          assert_equal("https://i-f.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.image_url)
+          assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.image_url)
           assert_equal("https://www.pixiv.net/artworks/64476642", @site.page_url)
         end
       end
@@ -113,7 +113,7 @@ module Sources
         end
 
         should "get the full size image url" do
-          assert_equal("https://i-f.pximg.net/img-original/img/2017/11/21/05/12/37/65981735_p0.jpg", @site.image_url)
+          assert_equal("https://i.pximg.net/img-original/img/2017/11/21/05/12/37/65981735_p0.jpg", @site.image_url)
         end
 
         should "get the preview size image url" do
@@ -156,7 +156,7 @@ module Sources
         end
 
         should "get the full size image url" do
-          assert_equal("https://i-f.pximg.net/img-original/img/2014/10/29/09/27/19/46785915_p0.jpg", @site.image_url)
+          assert_equal("https://i.pximg.net/img-original/img/2014/10/29/09/27/19/46785915_p0.jpg", @site.image_url)
         end
       end
 
@@ -170,11 +170,11 @@ module Sources
         end
 
         should "get the full size image url" do
-          assert_equal("https://i-f.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.image_url)
+          assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.image_url)
         end
 
         should "get the full size image url for the canonical url" do
-          assert_equal("https://i-f.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.canonical_url)
+          assert_equal("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg", @site.canonical_url)
         end
       end
 
@@ -285,7 +285,7 @@ module Sources
         should "not translate '1000users入り' to '1'" do
           FactoryBot.create(:tag, name: "1", post_count: 1)
           source = get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=60665428")
-          tags = %w[Fate/GrandOrder グランブルーファンタジー 手袋 1000users入り]
+          tags = %w[1000users入り Fate/GrandOrder アルジュナ(Fate) アルトリア・ペンドラゴン イシュタル(Fate) グランブルーファンタジー マシュ・キリエライト マーリン(Fate) 両儀式 手袋]
 
           assert_equal(tags.sort, source.tags.map(&:first).sort)
           assert_equal(["fate/grand_order"], source.translated_tags.map(&:name))
