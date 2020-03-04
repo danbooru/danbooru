@@ -21,6 +21,7 @@ class PostFlagsController < ApplicationController
 
   def create
     @post_flag = PostFlag.create(post_flag_params.merge(creator: CurrentUser.user))
+    flash[:notice] = @post_flag.errors.none? ? "Post flagged" : @post_flag.errors.full_messages.join("; ")
     respond_with(@post_flag)
   end
 

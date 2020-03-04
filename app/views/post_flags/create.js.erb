@@ -1,8 +1,1 @@
-var errors = <%= @post_flag.errors.full_messages.to_json.html_safe %>;
-if (errors.length > 0) {
-  Danbooru.error(errors.join("; "));
-} else {
-  Danbooru.notice("Post flagged");
-  $("a#approve").show();
-  $("a#disapprove").show();
-}
+location.reload();
