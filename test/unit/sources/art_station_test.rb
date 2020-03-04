@@ -8,7 +8,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://cdna.artstation.com/p/assets/images/images/000/705/368/large/jey-rain-one1.jpg", @site.image_url.sub(/\?\d+/, ""))
+        assert_equal("https://cdn.artstation.com/p/assets/images/images/000/705/368/4k/jey-rain-one1.jpg", @site.image_url.sub(/\?\d+/, ""))
       end
 
       should "get the canonical url" do
@@ -39,7 +39,7 @@ module Sources
       end
 
       should "get the image url" do
-        url = "https://cdna.artstation.com/p/assets/images/images/006/066/534/large/yinan-cui-reika.jpg?1495781565"
+        url = "https://cdn.artstation.com/p/assets/images/images/006/066/534/4k/yinan-cui-reika.jpg?1495781565"
         assert_equal(url, @site.image_url)
       end
 
@@ -72,7 +72,7 @@ module Sources
       end
 
       should "get the image url" do
-        url = "https://cdna.artstation.com/p/assets/images/images/000/144/922/large/cassio-yoshiyaki-cody2backup2-yoshiyaki.jpg?1406314198"
+        url = "https://cdn.artstation.com/p/assets/images/images/000/144/922/4k/cassio-yoshiyaki-cody2backup2-yoshiyaki.jpg?1406314198"
         assert_equal(url, @site.image_url)
       end
 
@@ -82,7 +82,7 @@ module Sources
       end
     end
 
-    context "The source site for a http://cdna.artstation.com/p/assets/... url" do
+    context "The source site for a http://cdn.artstation.com/p/assets/... url" do
       setup do
         @url = "https://cdna.artstation.com/p/assets/images/images/006/029/978/large/amama-l-z.jpg"
         @ref = "https://www.artstation.com/artwork/4BWW2"
@@ -92,7 +92,7 @@ module Sources
         should "work" do
           site = Sources::Strategies.find(@url, @ref)
 
-          assert_equal(@url, site.image_url)
+          assert_equal("https://cdn.artstation.com/p/assets/images/images/006/029/978/4k/amama-l-z.jpg", site.image_url)
           assert_equal("https://amama.artstation.com/projects/4BWW2", site.page_url)
           assert_equal("https://amama.artstation.com/projects/4BWW2", site.canonical_url)
           assert_equal("https://www.artstation.com/amama", site.profile_url)
@@ -105,11 +105,22 @@ module Sources
         should "work" do
           site = Sources::Strategies.find(@url)
 
-          assert_equal(@url, site.image_url)
+          assert_equal("https://cdn.artstation.com/p/assets/images/images/006/029/978/4k/amama-l-z.jpg", site.image_url)
           assert_nil(site.page_url)
           assert_nil(site.profile_url)
           assert_nil(site.artist_name)
           assert_equal([], site.tags)
+          assert_nothing_raised { site.to_h }
+        end
+      end
+    end
+
+    context "A 4k asset url" do
+      context "without a referer" do
+        should "work" do
+          site = Sources::Strategies.find("https://cdna.artstation.com/p/assets/images/images/007/253/680/4k/ina-wong-demon-girl-done-ttd-comp.jpg?1504793833")
+
+          assert_equal("https://cdn.artstation.com/p/assets/images/images/007/253/680/4k/ina-wong-demon-girl-done-ttd-comp.jpg?1504793833", site.image_url)
           assert_nothing_raised { site.to_h }
         end
       end
@@ -121,7 +132,7 @@ module Sources
       end
 
       should "get only image urls, not video urls" do
-        urls = %w[https://cdnb.artstation.com/p/assets/images/images/006/037/253/large/astri-lohne-sjursen-eva.jpg?1495573664]
+        urls = %w[https://cdn.artstation.com/p/assets/images/images/006/037/253/4k/astri-lohne-sjursen-eva.jpg?1495573664]
         assert_equal(urls, @site.image_urls)
       end
     end

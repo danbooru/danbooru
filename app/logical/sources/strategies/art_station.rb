@@ -14,6 +14,7 @@
 #
 # * https://cdna.artstation.com/p/assets/images/images/005/804/224/large/titapa-khemakavat-sa-dui-srevere.jpg?1493887236
 # * https://cdnb.artstation.com/p/assets/images/images/014/410/217/smaller_square/bart-osz-bartosz1812041.jpg?1543866276
+# * https://cdna.artstation.com/p/assets/images/images/007/253/680/4k/ina-wong-demon-girl-done-ttd-comp.jpg?1504793833
 
 module Sources::Strategies
   class ArtStation < Base
@@ -25,7 +26,7 @@ module Sources::Strategies
     ARTIST3 = %r{\Ahttps?://www\.artstation\.com/(?<artist_name>[a-z0-9-]+)/?\z}i
     ARTIST = Regexp.union(ARTIST1, ARTIST2, ARTIST3)
 
-    ASSET = %r!\Ahttps?://cdn\w*\.artstation\.com/p/assets/images/images/\d+/\d+/\d+/(?:medium|small|large)/!i
+    ASSET = %r!\Ahttps?://cdn\w*\.artstation\.com/p/assets/images/images/(?<id>\d+/\d+/\d+)/(?<size>[^/]+)/(?<filename>.+)\z!i
 
     attr_reader :json
 
@@ -38,7 +39,7 @@ module Sources::Strategies
     end
 
     def image_urls
-      @image_urls ||= image_urls_sub.map { |asset| original_asset_url(asset) }
+      @image_urls ||= image_urls_sub.map { |asset| largest_asset_url(asset) }
     end
 
     def page_url
@@ -114,27 +115,17 @@ module Sources::Strategies
     end
     memoize :api_response
 
-    # Returns the original representation of the asset, if it exists. Otherwise
-    # return the url.
-    def original_asset_url(x)
-      if x =~ ASSET
-        # example: https://cdnb3.artstation.com/p/assets/images/images/003/716/071/large/aoi-ogata-hate-city.jpg?1476754974
-        original_url = x.sub(%r!/(?:medium|small|large)/!, "/original/")
+    def largest_asset_url(url)
+      return url unless url =~ ASSET
 
-        if http_exists?(original_url, headers)
-          return original_url
-        end
+      urls = [
+        "https://cdn.artstation.com/p/assets/images/images/#{$~[:id]}/original/#{$~[:filename]}",
+        "https://cdn.artstation.com/p/assets/images/images/#{$~[:id]}/4k/#{$~[:filename]}",
+        "https://cdn.artstation.com/p/assets/images/images/#{$~[:id]}/large/#{$~[:filename]}",
+      ]
 
-        if x =~ /medium|small/
-          large_url = x.sub(%r!/(?:medium|small)/!, "/large/")
-
-          if http_exists?(large_url, headers)
-            return large_url
-          end
-        end
-      end
-
-      return x
+      largest_url = urls.find { |url| http_exists?(url, headers) }
+      largest_url || url
     end
   end
 end
