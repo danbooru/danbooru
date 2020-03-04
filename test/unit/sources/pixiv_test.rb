@@ -74,6 +74,15 @@ module Sources
         end
       end
 
+      context "A https://tc-pximg01.techorus-cdn.com/img-original/img/* source" do
+        should "get the metadata" do
+          @site = Sources::Strategies.find("https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png")
+
+          assert_equal("https://i.pximg.net/img-original/img/2017/09/18/03/18/24/65015428_p4.png", @site.image_url)
+          assert_equal("赤井さしみ", @site.artist_name)
+        end
+      end
+
       context "A https://www.pixiv.net/fanbox/creator/*/post/* source" do
         should "work" do
           @site = Sources::Strategies.find("http://www.pixiv.net/fanbox/creator/554149/post/82555")
@@ -309,6 +318,8 @@ module Sources
           assert_illust_id(46324488, "https://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=46324488&page=0")
           assert_illust_id(46324488, "https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png")
           assert_illust_id(46324488, "https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg")
+
+          assert_illust_id(65015428, "https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png")
 
           assert_illust_id(46785915, "https://i.pximg.net/c/250x250_80_a2/img-master/img/2014/10/29/09/27/19/46785915_p0_square1200.jpg")
           assert_illust_id(79584713, "https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png")

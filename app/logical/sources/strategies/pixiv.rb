@@ -6,6 +6,8 @@
 # * https://i.pximg.net/c/250x250_80_a2/img-master/img/2014/10/29/09/27/19/46785915_p0_square1200.jpg
 # * https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg
 #
+# * https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png
+#
 # * https://www.pixiv.net/member_illust.php?mode=medium&illust_id=46324488
 # * https://www.pixiv.net/member_illust.php?mode=manga&illust_id=46324488
 # * https://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=46324488&page=0
@@ -90,6 +92,11 @@ module Sources
 
       def domains
         ["pixiv.net", "pximg.net"]
+      end
+
+      def match?
+        return false if parsed_url.nil?
+        parsed_url.domain.in?(domains) || parsed_url.host == "tc-pximg01.techorus-cdn.com"
       end
 
       def site_name
@@ -296,12 +303,13 @@ module Sources
           # https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png
           # https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg
           # https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png
+          # https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png
           #
           # but not:
           #
           # https://i.pximg.net/novel-cover-original/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42.jpg
           # https://img-sketch.pixiv.net/uploads/medium/file/4463372/8906921629213362989.jpg
-          elsif url.host =~ %r!\A(?:[^.]+\.pximg\.net|i\d+\.pixiv\.net)\z!i &&
+          elsif url.host =~ %r!\A(?:[^.]+\.pximg\.net|i\d+\.pixiv\.net|tc-pximg01\.techorus-cdn\.com)\z!i &&
                 url.path =~ %r!\A(/c/\w+)?/img-[a-z-]+/img/#{DATE}/(?<illust_id>\d+)(?:_\w+)?\.(?:jpg|jpeg|png|gif|zip)!i
             return $~[:illust_id].to_i
           end
