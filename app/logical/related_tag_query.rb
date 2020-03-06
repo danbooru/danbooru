@@ -2,12 +2,13 @@ class RelatedTagQuery
   include ActiveModel::Serializers::JSON
   include ActiveModel::Serializers::Xml
 
-  attr_reader :query, :category, :user
+  attr_reader :query, :category, :user, :limit
 
-  def initialize(query: nil, category: nil, user: nil)
+  def initialize(query: nil, category: nil, user: nil, limit: nil)
     @user = user
     @query = TagAlias.to_aliased(query.to_s.downcase.strip).join(" ")
     @category = category
+    @limit = (limit =~ /^\d+/ ? limit.to_i : 25)
   end
 
   def pretty_name
@@ -18,9 +19,9 @@ class RelatedTagQuery
     if query =~ /\*/
       pattern_matching_tags
     elsif category.present?
-      RelatedTagCalculator.frequent_tags_for_search(query, category: Tag.categories.value_for(category)).take(25)
+      RelatedTagCalculator.frequent_tags_for_search(query, category: Tag.categories.value_for(category)).take(limit)
     elsif query.present?
-      RelatedTagCalculator.similar_tags_for_search(query).take(25)
+      RelatedTagCalculator.similar_tags_for_search(query).take(limit)
     else
       Tag.none
     end
@@ -99,7 +100,7 @@ class RelatedTagQuery
   end
 
   def pattern_matching_tags
-    Tag.nonempty.name_matches(query).order("post_count desc, name asc").limit(50)
+    Tag.nonempty.name_matches(query).order("post_count desc, name asc").limit(limit)
   end
 
   def wiki_page
