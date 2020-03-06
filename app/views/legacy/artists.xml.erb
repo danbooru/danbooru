@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <artists type="array">
   <% @artists.each do |artist| %>
-    <artist group_name="<%= artist.group_name %>" other_names="<%= artist.other_names %>" urls="<%= artist.urls.map {|x| x.url}.join(" ") %>" is_active="<%= artist.is_active? %>" name="<%= artist.name %>" updater_id="0" id="<%= artist.id %>" version="0"/>
+    <artist group_name="<%= artist.group_name %>" other_names="<%= artist.other_names %>" urls="<%= artist.urls.map {|x| x.url}.join(" ") %>" is_active="<%= !artist.is_deleted? %>" name="<%= artist.name %>" updater_id="0" id="<%= artist.id %>" version="0"/>
   <% end %>
 </artists>

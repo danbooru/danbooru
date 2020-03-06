@@ -37,7 +37,7 @@ module PostSets
 
     def artist
       return nil unless tag.present? && tag.category == Tag.categories.artist
-      return nil unless tag.artist.present? && tag.artist.is_active?
+      return nil unless tag.artist.present? && !tag.artist.is_deleted?
       tag.artist
     end
 

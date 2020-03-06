@@ -55,7 +55,7 @@ class ArtistsController < ApplicationController
   end
 
   def destroy
-    @artist.update_attribute(:is_active, false)
+    @artist.update_attribute(:is_deleted, true)
     redirect_to(artist_path(@artist), :notice => "Artist deleted")
   end
 
@@ -94,7 +94,7 @@ class ArtistsController < ApplicationController
   end
 
   def artist_params(context = nil)
-    permitted_params = %i[name other_names other_names_string group_name url_string notes is_active]
+    permitted_params = %i[name other_names other_names_string group_name url_string notes is_deleted]
     permitted_params << { wiki_page_attributes: %i[id body] }
     permitted_params << :source if context == :new
 

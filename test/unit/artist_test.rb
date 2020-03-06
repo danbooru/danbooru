@@ -191,7 +191,7 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "hide deleted artists" do
-      FactoryBot.create(:artist, :name => "warhol", :url_string => "http://warhol.com/a/image.jpg", :is_active => false)
+      create(:artist, name: "warhol", url_string: "http://warhol.com/a/image.jpg", is_deleted: true)
       assert_artist_not_found("http://warhol.com/a/image.jpg")
     end
 
@@ -512,7 +512,7 @@ class ArtistTest < ActiveSupport::TestCase
     context "that is deleted" do
       setup do
         @artist = create(:artist, url_string: "https://google.com")
-        @artist.update_attribute(:is_active, false)
+        @artist.update_attribute(:is_deleted, true)
         @artist.reload
       end
 

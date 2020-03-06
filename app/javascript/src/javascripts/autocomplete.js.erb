@@ -328,7 +328,7 @@ Autocomplete.tag_source = async function(term) {
 Autocomplete.artist_source = async function(term) {
   let artists = await $.getJSON("/artists", {
     "search[name_like]": term.trim().replace(/\s+/g, "_") + "*",
-    "search[is_active]": true,
+    "search[is_deleted]": false,
     "search[order]": "post_count",
     "limit": Autocomplete.MAX_RESULTS,
     "expiry": 7

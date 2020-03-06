@@ -127,7 +127,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
     should "create an artist" do
       attributes = FactoryBot.attributes_for(:artist)
       assert_difference("Artist.count", 1) do
-        attributes.delete(:is_active)
+        attributes.delete(:is_deleted)
         post_auth artists_path, @user, params: {artist: attributes}
       end
       artist = Artist.find_by_name(attributes[:name])
@@ -171,14 +171,14 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
       delete_auth artist_path(@artist.id), @builder
       assert_redirected_to(artist_path(@artist.id))
       @artist.reload
-      assert_equal(false, @artist.is_active)
+      assert_equal(true, @artist.is_deleted)
     end
 
     should "undelete an artist" do
       @builder = create(:builder_user)
-      put_auth artist_path(@artist.id), @builder, params: {artist: {is_active: true}}
+      put_auth artist_path(@artist.id), @builder, params: {artist: {is_deleted: false}}
       assert_redirected_to(artist_path(@artist.id))
-      assert_equal(true, @artist.reload.is_active)
+      assert_equal(false, @artist.reload.is_deleted)
     end
 
     context "reverting an artist" do

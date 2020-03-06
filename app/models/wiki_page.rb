@@ -15,7 +15,7 @@ class WikiPage < ApplicationRecord
 
   array_attribute :other_names
   has_one :tag, :foreign_key => "name", :primary_key => "title"
-  has_one :artist, -> {where(:is_active => true)}, :foreign_key => "name", :primary_key => "title"
+  has_one :artist, -> { active }, foreign_key: "name", primary_key: "title"
   has_many :versions, -> {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
   has_many :dtext_links, as: :model, dependent: :destroy
 

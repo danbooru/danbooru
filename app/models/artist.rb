@@ -20,8 +20,8 @@ class Artist < ApplicationRecord
 
   accepts_nested_attributes_for :wiki_page, update_only: true, reject_if: :all_blank
 
-  scope :active, -> { where(is_active: true) }
-  scope :deleted, -> { where(is_active: false) }
+  scope :active, -> { where(is_deleted: false) }
+  scope :deleted, -> { where(is_deleted: true) }
   scope :banned, -> { where(is_banned: true) }
   scope :unbanned, -> { where(is_banned: false) }
 
@@ -158,7 +158,7 @@ class Artist < ApplicationRecord
         while artists.empty? && url.size > 10
           u = url.sub(/\/+$/, "") + "/"
           u = u.to_escaped_for_sql_like.gsub(/\*/, '%') + '%'
-          artists += Artist.joins(:urls).where(["artists.is_active = TRUE AND artist_urls.normalized_url LIKE ? ESCAPE E'\\\\'", u]).limit(10).order("artists.name").all
+          artists += Artist.joins(:urls).where(["artists.is_deleted = FALSE AND artist_urls.normalized_url LIKE ? ESCAPE E'\\\\'", u]).limit(10).order("artists.name").all
           url = File.dirname(url) + "/"
 
           break if url =~ SITE_BLACKLIST_REGEXP
@@ -221,7 +221,7 @@ class Artist < ApplicationRecord
 
   module VersionMethods
     def create_version(force = false)
-      if saved_change_to_name? || url_string_changed || saved_change_to_is_active? || saved_change_to_is_banned? || saved_change_to_other_names? || saved_change_to_group_name? || force
+      if saved_change_to_name? || url_string_changed || saved_change_to_is_deleted? || saved_change_to_is_banned? || saved_change_to_other_names? || saved_change_to_group_name? || force
         if merge_version?
           merge_version
         else
@@ -237,7 +237,7 @@ class Artist < ApplicationRecord
         :updater_id => CurrentUser.id,
         :updater_ip_addr => CurrentUser.ip_addr,
         :urls => url_array,
-        :is_active => is_active,
+        :is_deleted => is_deleted,
         :is_banned => is_banned,
         :other_names => other_names,
         :group_name => group_name
@@ -246,7 +246,7 @@ class Artist < ApplicationRecord
 
     def merge_version
       prev = versions.last
-      prev.update(name: name, urls: url_array, is_active: is_active, is_banned: is_banned, other_names: other_names, group_name: group_name)
+      prev.update(name: name, urls: url_array, is_deleted: is_deleted, is_banned: is_banned, other_names: other_names, group_name: group_name)
     end
 
     def merge_version?
@@ -261,7 +261,7 @@ class Artist < ApplicationRecord
 
       self.name = version.name
       self.url_string = version.urls.join("\n")
-      self.is_active = version.is_active
+      self.is_deleted = version.is_deleted
       self.other_names = version.other_names
       self.group_name = version.group_name
       save
@@ -296,7 +296,7 @@ class Artist < ApplicationRecord
 
   module TagMethods
     def validate_tag_category
-      return unless is_active? && name_changed?
+      return unless !is_deleted? && name_changed?
 
       if tag.category_name == "General"
         tag.update(category: Tag.categories.artist)
@@ -385,7 +385,7 @@ class Artist < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :is_active, :is_banned, :name, :group_name, :other_names)
+      q = q.search_attributes(params, :is_deleted, :is_banned, :name, :group_name, :other_names)
 
       if params[:any_other_name_like]
         q = q.any_other_name_like(params[:any_other_name_like])
@@ -433,14 +433,14 @@ class Artist < ApplicationRecord
   extend SearchMethods
 
   def status
-    if is_banned? && is_active?
+    if is_banned? && !is_deleted?
       "Banned"
     elsif is_banned?
       "Banned Deleted"
-    elsif is_active?
-      "Active"
-    else
+    elsif is_deleted?
       "Deleted"
+    else
+      "Active"
     end
   end
 

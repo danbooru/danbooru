@@ -52,11 +52,11 @@ class ArtistVersion < ApplicationRecord
   end
 
   def was_deleted
-    !is_active && previous.is_active
+    is_deleted && !previous.is_deleted
   end
 
   def was_undeleted
-    is_active && !previous.is_active
+    !is_deleted && previous.is_deleted
   end
 
   def was_banned

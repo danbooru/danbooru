@@ -594,7 +594,7 @@ ALTER SEQUENCE public.artist_versions_id_seq OWNED BY public.artist_versions.id;
 CREATE TABLE public.artists (
     id integer NOT NULL,
     name character varying NOT NULL,
-    is_active boolean DEFAULT true NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
     other_names text[] DEFAULT '{}'::text[] NOT NULL,
     group_name character varying DEFAULT ''::character varying NOT NULL,
@@ -7307,6 +7307,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200123184743'),
 ('20200217044719'),
 ('20200223042415'),
-('20200223234015');
+('20200223234015'),
+('20200306202253');
 
 
