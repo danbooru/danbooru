@@ -26,6 +26,14 @@ class RelatedTagQuery
     end
   end
 
+  def tags_overlap
+    if query =~ /\*/
+      {}
+    else
+      tags.map { |v| [v.name, v.overlap_count] }.to_h
+    end
+  end
+
   # Returns the top 20 most frequently added tags within the last 20 edits made by the user in the last hour.
   def recent_tags(since: 1.hour.ago, max_edits: 20, max_tags: 20)
     return [] unless user.present? && PostVersion.enabled?
@@ -78,6 +86,7 @@ class RelatedTagQuery
       query: query,
       category: category,
       tags: tags_with_categories(tags.map(&:name)),
+      tags_overlap: tags_overlap,
       wiki_page_tags: tags_with_categories(wiki_page_tags),
       other_wikis: other_wiki_pages.map { |wiki| [wiki.title, tags_with_categories(wiki.tags)] }.to_h
     }
