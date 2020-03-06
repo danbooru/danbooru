@@ -19,8 +19,8 @@
   <% if artist.members.present? %>
     <li>
       <strong>Members</strong>
-      <% artist.members.each do |member_name| %>
-        <%= link_to member_name, artists_path(search: { name: member_name }) %>
+      <% artist.members.each do |member| %>
+        <%= link_to member.name, artists_path(search: { name: member.name }) %>
       <% end %>
     </li>
   <% end %>
