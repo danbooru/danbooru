@@ -61,14 +61,14 @@ class CommentsController < ApplicationController
   def destroy
     @comment = Comment.find(params[:id])
     check_privilege(@comment)
-    @comment.delete!
+    @comment.update(is_deleted: true)
     respond_with(@comment)
   end
 
   def undelete
     @comment = Comment.find(params[:id])
     check_privilege(@comment)
-    @comment.undelete!
+    @comment.update(is_deleted: false)
     respond_with(@comment)
   end
 

@@ -16,14 +16,13 @@ class Comment < ApplicationRecord
   after_save(:if => ->(rec) {rec.is_deleted? && rec.saved_change_to_is_deleted? && CurrentUser.id != rec.creator_id}) do |rec|
     ModAction.log("comment ##{rec.id} deleted by #{CurrentUser.name}", :comment_delete)
   end
+
+  deletable
   mentionable(
     :message_field => :body,
     :title => ->(user_name) {"#{creator.name} mentioned you in a comment on post ##{post_id}"},
     :body => ->(user_name) {"@#{creator.name} mentioned you in a \"comment\":/posts/#{post_id}#comment-#{id} on post ##{post_id}:\n\n[quote]\n#{DText.extract_mention(body, "@" + user_name)}\n[/quote]\n"}
   )
-
-  scope :deleted, -> { where(is_deleted: true) }
-  scope :undeleted, -> { where(is_deleted: false) }
 
   module SearchMethods
     def search(params)
@@ -145,14 +144,6 @@ class Comment < ApplicationRecord
   # XXX rename
   def self.visible(user)
     select { |comment| comment.visibility(user) == :visible }
-  end
-
-  def delete!
-    update(is_deleted: true)
-  end
-
-  def undelete!
-    update(is_deleted: false)
   end
 
   def quoted_response

@@ -15,9 +15,8 @@ class Pool < ApplicationRecord
   after_create :synchronize!
 
   api_attributes including: [:post_count]
+  deletable
 
-  scope :deleted, -> { where(is_deleted: true) }
-  scope :undeleted, -> { where(is_deleted: false) }
   scope :series, -> { where(category: "series") }
   scope :collection, -> { where(category: "collection") }
 

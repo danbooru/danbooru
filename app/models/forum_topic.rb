@@ -30,7 +30,7 @@ class ForumTopic < ApplicationRecord
     ModAction.log("locked forum topic ##{id} (title: #{title})", :forum_topic_lock)
   end
 
-  scope :active, -> { where(is_deleted: false) }
+  deletable
 
   module CategoryMethods
     extend ActiveSupport::Concern
@@ -156,14 +156,6 @@ class ForumTopic < ApplicationRecord
 
   def last_page
     (response_count / Danbooru.config.posts_per_page.to_f).ceil
-  end
-
-  def delete!
-    update(is_deleted: true)
-  end
-
-  def undelete!
-    update(is_deleted: false)
   end
 
   def update_orignal_post

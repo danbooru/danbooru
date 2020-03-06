@@ -1,5 +1,6 @@
 class UserFeedback < ApplicationRecord
   self.table_name = "user_feedback"
+
   belongs_to :user
   belongs_to :creator, class_name: "User"
   attr_accessor :disable_dmail_notification
@@ -15,10 +16,11 @@ class UserFeedback < ApplicationRecord
     ModAction.log(%{#{CurrentUser.name} deleted user feedback for "#{rec.user.name}":/users/#{rec.user_id}}, :user_feedback_delete)
   end
 
+  deletable
+
   scope :positive, -> { where(category: "positive") }
   scope :neutral,  -> { where(category: "neutral") }
   scope :negative, -> { where(category: "negative") }
-  scope :undeleted, -> { where(is_deleted: false) }
 
   module SearchMethods
     def visible(viewer)

@@ -15,9 +15,8 @@ class Dmail < ApplicationRecord
   after_commit :send_email, on: :create
 
   api_attributes including: [:key]
+  deletable
 
-  scope :active, -> { where(is_deleted: false) }
-  scope :deleted, -> { where(is_deleted: true) }
   scope :read, -> { where(is_read: true) }
   scope :unread, -> { where(is_read: false) }
   scope :sent, -> { where("dmails.owner_id = dmails.from_id") }

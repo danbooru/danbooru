@@ -20,8 +20,7 @@ class WikiPage < ApplicationRecord
   has_many :dtext_links, as: :model, dependent: :destroy
 
   api_attributes including: [:category_name]
-
-  scope :active, -> { where(is_deleted: false) }
+  deletable
 
   module SearchMethods
     def find_by_id_or_title(id)

@@ -25,13 +25,13 @@ class ForumPost < ApplicationRecord
   after_destroy(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |rec|
     ModAction.log("#{CurrentUser.name} deleted forum ##{rec.id}", :forum_post_delete)
   end
+
+  deletable
   mentionable(
     :message_field => :body,
     :title => ->(user_name) {%{#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})}},
     :body => ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[/forum_topics/#{topic_id}?page=#{forum_topic_page}]):\n\n[quote]\n#{DText.extract_mention(body, "@" + user_name)}\n[/quote]\n}}
   )
-
-  scope :active, -> { where(is_deleted: false) }
 
   module SearchMethods
     def topic_title_matches(title)

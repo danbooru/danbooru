@@ -1,6 +1,7 @@
 class ApplicationRecord < ActiveRecord::Base
   self.abstract_class = true
 
+  include Deletable
   include Mentionable
   extend HasBitFlags
   extend Searchable

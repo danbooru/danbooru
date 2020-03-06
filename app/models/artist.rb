@@ -4,6 +4,7 @@ class Artist < ApplicationRecord
 
   attr_accessor :url_string_changed
   array_attribute :other_names
+  deletable
 
   before_validation :normalize_name
   before_validation :normalize_other_names
@@ -20,8 +21,6 @@ class Artist < ApplicationRecord
 
   accepts_nested_attributes_for :wiki_page, update_only: true, reject_if: :all_blank
 
-  scope :active, -> { where(is_deleted: false) }
-  scope :deleted, -> { where(is_deleted: true) }
   scope :banned, -> { where(is_banned: true) }
   scope :unbanned, -> { where(is_banned: false) }
 

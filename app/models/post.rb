@@ -9,6 +9,8 @@ class Post < ApplicationRecord
   # Tags to copy when copying notes.
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation]
 
+  deletable
+
   before_validation :merge_old_changes
   before_validation :normalize_tags
   before_validation :strip_source
@@ -60,9 +62,7 @@ class Post < ApplicationRecord
   scope :flagged, -> { where(is_flagged: true) }
   scope :pending_or_flagged, -> { pending.or(flagged) }
 
-  scope :undeleted, -> { where(is_deleted: false) }
   scope :unflagged, -> { where(is_flagged: false) }
-  scope :deleted, -> { where(is_deleted: true) }
   scope :has_notes, -> { where.not(last_noted_at: nil) }
   scope :for_user, ->(user_id) { where(uploader_id: user_id) }
 
