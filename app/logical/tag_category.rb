@@ -71,6 +71,10 @@ class TagCategory
     def short_name_regex
       @@short_name_regex ||= short_name_list.join("|")
     end
+
+    def category_ids_regex
+      @@category_ids_regex ||= "[#{category_ids.join("")}]"
+    end
   end
 
   extend Mappings
