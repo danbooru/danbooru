@@ -852,15 +852,15 @@ class Tag < ApplicationRecord
       end
 
       if params[:has_wiki].to_s.truthy?
-        q = q.joins(:wiki_page).where("wiki_pages.is_deleted = false")
+        q = q.joins(:wiki_page).merge(WikiPage.undeleted)
       elsif params[:has_wiki].to_s.falsy?
-        q = q.joins("LEFT JOIN wiki_pages ON tags.name = wiki_pages.title").where("wiki_pages.title IS NULL OR wiki_pages.is_deleted = true")
+        q = q.left_outer_joins(:wiki_page).where("wiki_pages.title IS NULL OR wiki_pages.is_deleted = TRUE")
       end
 
       if params[:has_artist].to_s.truthy?
-        q = q.joins("INNER JOIN artists ON tags.name = artists.name").where("artists.is_active = true")
+        q = q.joins(:artist).merge(Artist.undeleted)
       elsif params[:has_artist].to_s.falsy?
-        q = q.joins("LEFT JOIN artists ON tags.name = artists.name").where("artists.name IS NULL OR artists.is_active = false")
+        q = q.left_outer_joins(:artist).where("artists.name IS NULL OR artists.is_deleted = TRUE")
       end
 
       case params[:order]
