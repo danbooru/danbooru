@@ -2,12 +2,13 @@ class RelatedTagQuery
   include ActiveModel::Serializers::JSON
   include ActiveModel::Serializers::Xml
 
-  attr_reader :query, :category, :user, :limit
+  attr_reader :query, :category, :type, :user, :limit
 
-  def initialize(query: nil, category: nil, user: nil, limit: nil)
+  def initialize(query: nil, category: nil, type: nil, user: nil, limit: nil)
     @user = user
     @query = TagAlias.to_aliased(query.to_s.downcase.strip).join(" ")
     @category = category
+    @type = type
     @limit = (limit =~ /^\d+/ ? limit.to_i : 25)
   end
 
@@ -16,23 +17,37 @@ class RelatedTagQuery
   end
 
   def tags
-    if query =~ /\*/
-      pattern_matching_tags
+    if type == "frequent"
+      frequent_tags
+    elsif type == "similar"
+      similar_tags
+    elsif type == "like"
+      pattern_matching_tags("*#{query}*")
+    elsif query =~ /\*/
+      pattern_matching_tags(query)
     elsif category.present?
-      RelatedTagCalculator.frequent_tags_for_search(query, category: Tag.categories.value_for(category)).take(limit)
+      frequent_tags
     elsif query.present?
-      RelatedTagCalculator.similar_tags_for_search(query).take(limit)
+      similar_tags
     else
       Tag.none
     end
   end
 
   def tags_overlap
-    if query =~ /\*/
+    if type == "like" || query =~ /\*/
       {}
     else
       tags.map { |v| [v.name, v.overlap_count] }.to_h
     end
+  end
+
+  def frequent_tags
+    @frequent_tags ||= RelatedTagCalculator.frequent_tags_for_search(query, category: category_of).take(limit)
+  end
+
+  def similar_tags
+    @similar_tags ||= RelatedTagCalculator.similar_tags_for_search(query, category: category_of).take(limit)
   end
 
   # Returns the top 20 most frequently added tags within the last 20 edits made by the user in the last hour.
@@ -99,8 +114,15 @@ class RelatedTagQuery
     Tag.categories_for(list_of_tag_names).to_a
   end
 
-  def pattern_matching_tags
-    Tag.nonempty.name_matches(query).order("post_count desc, name asc").limit(limit)
+  def category_of
+    (category.present? ? Tag.categories.value_for(category) : nil)
+  end
+
+  def pattern_matching_tags(tag_query)
+    tags = Tag.nonempty.name_matches(tag_query)
+    tags = tags.where(category: Tag.categories.value_for(category)) if category.present?
+    tags = tags.order("post_count desc, name asc").limit(limit)
+    tags
   end
 
   def wiki_page
