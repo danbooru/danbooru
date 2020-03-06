@@ -404,9 +404,9 @@ class Artist < ApplicationRecord
       end
 
       if params[:has_tag].to_s.truthy?
-        q = q.joins(:tag).where("tags.post_count > 0")
+        q = q.where(name: Tag.nonempty.select(:name))
       elsif params[:has_tag].to_s.falsy?
-        q = q.includes(:tag).where("tags.name IS NULL OR tags.post_count <= 0").references(:tags)
+        q = q.where.not(name: Tag.nonempty.select(:name))
       end
 
       case params[:order]
@@ -415,7 +415,7 @@ class Artist < ApplicationRecord
       when "updated_at"
         q = q.order("artists.updated_at desc")
       when "post_count"
-        q = q.includes(:tag).order("tags.post_count desc nulls last").order("artists.name").references(:tags)
+        q = q.left_outer_joins(:tag).order("tags.post_count desc nulls last").order("artists.name")
       else
         q = q.apply_default_order(params)
       end
