@@ -118,23 +118,27 @@ Blacklist.apply = function() {
   var count = 0
 
   $.each(this.posts(), function(i, post) {
-    var post_count = 0;
-    $.each(Blacklist.entries, function(j, entry) {
-      if (Blacklist.post_match(post, entry)) {
-        entry.hits += 1;
-        count += 1;
-        post_count += 1;
-      }
-    });
-    if (post_count > 0) {
-      Blacklist.post_hide(post);
-    } else {
-      Blacklist.post_unhide(post);
-    }
+    count += Blacklist.apply_post(post);
   });
 
   return count;
 }
+
+Blacklist.apply_post = function(post) {
+  var post_count = 0;
+  $.each(Blacklist.entries, function(j, entry) {
+    if (Blacklist.post_match(post, entry)) {
+      entry.hits += 1;
+      post_count += 1;
+    }
+  });
+  if (post_count > 0) {
+    Blacklist.post_hide(post);
+  } else {
+    Blacklist.post_unhide(post);
+  }
+  return post_count;
+};
 
 Blacklist.posts = function() {
   return $(".post-preview, #image-container, #c-comments .post, .mod-queue-preview.post-preview");
