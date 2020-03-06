@@ -42,12 +42,44 @@ class RelatedTagQuery
     end
   end
 
+  def sample_count
+    if type == "frequent"
+      frequent_count
+    elsif type == "similar"
+      similar_count
+    elsif type == "like" || query =~ /\*/
+      0
+    elsif category.present?
+      frequent_count
+    elsif query.present?
+      similar_count
+    else
+      0
+    end
+  end
+
+  def frequent_tags_query
+    @frequent_tags_query ||= RelatedTagCalculator.frequent_tags_for_search(query, category: category_of).take(limit)
+  end
+
   def frequent_tags
-    @frequent_tags ||= RelatedTagCalculator.frequent_tags_for_search(query, category: category_of).take(limit)
+    frequent_tags_query[0]
+  end
+
+  def frequent_count
+    frequent_tags_query[1]
+  end
+
+  def similar_tags_query
+    @similar_tags_query ||= RelatedTagCalculator.similar_tags_for_search(query, category: category_of).take(limit)
   end
 
   def similar_tags
-    @similar_tags ||= RelatedTagCalculator.similar_tags_for_search(query, category: category_of).take(limit)
+    similar_tags_query[0]
+  end
+
+  def similar_count
+    similar_tags_query[1]
   end
 
   # Returns the top 20 most frequently added tags within the last 20 edits made by the user in the last hour.
@@ -101,6 +133,7 @@ class RelatedTagQuery
     {
       query: query,
       category: category,
+      sample_count: sample_count,
       tags: tags_with_categories(tags.map(&:name)),
       tags_overlap: tags_overlap,
       wiki_page_tags: tags_with_categories(wiki_page_tags),
