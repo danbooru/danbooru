@@ -89,27 +89,25 @@ RelatedTag.current_tag = function() {
 }
 
 RelatedTag.update_selected = function(e) {
-  var current_tags = $("#upload_tag_string,#post_tag_string").val().toLowerCase().match(/\S+/g) || [];
+  var current_tags = RelatedTag.current_tags();
   var $all_tags = $(".related-tags a.search-tag");
   $all_tags.removeClass("selected");
-
   $all_tags.each(function(i, tag) {
-    if (current_tags.indexOf(tag.textContent.replace(/ /g, "_")) > -1) {
+    if (current_tags.includes(tag.textContent.replace(/ /g, "_"))) {
       $(tag).addClass("selected");
     }
   });
 }
 
-RelatedTag.tags_include = function(name) {
-  var current = $("#upload_tag_string,#post_tag_string").val().toLowerCase().match(/\S+/g) || [];
-  return $.inArray(name.toLowerCase(), current) > -1;
+RelatedTag.current_tags = function() {
+  return Utility.regexp_split($("#upload_tag_string,#post_tag_string").val().toLowerCase());
 }
 
 RelatedTag.toggle_tag = function(e) {
   var $field = $("#upload_tag_string,#post_tag_string");
   var tag = $(e.target).html().replace(/ /g, "_").replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;/g, "&");
 
-  if (RelatedTag.tags_include(tag)) {
+  if (RelatedTag.current_tags().includes(tag)) {
     var escaped_tag = Utility.regexp_escape(tag);
     $field.val($field.val().replace(new RegExp("(^|\\s)" + escaped_tag + "($|\\s)", "gi"), "$1$2"));
   } else {

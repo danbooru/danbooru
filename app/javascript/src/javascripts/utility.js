@@ -108,6 +108,10 @@ Utility.regexp_escape = function(string) {
   return string.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
 }
 
+Utility.regexp_split = function(string) {
+  return [...new Set(String(string === null || string === undefined ? "" : string).match(/\S+/g))];
+}
+
 $.fn.selectEnd = function() {
   return this.each(function() {
     this.focus();

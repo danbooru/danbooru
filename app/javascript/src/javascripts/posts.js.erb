@@ -550,8 +550,8 @@ Post.update_tag_count = function(event) {
   let count = 0;
 
   if (event) {
-    let tags = [...new Set($(event.target).val().match(/\S+/g))];
-    if (tags) {
+    let tags = Utility.regexp_split($(event.target).val());
+    if (tags.length) {
       count = tags.length;
       string = (count === 1) ? (count + " tag") : (count + " tags")
     }
