@@ -4665,6 +4665,20 @@ CREATE INDEX index_artists_on_group_name_trgm ON public.artists USING gin (group
 
 
 --
+-- Name: index_artists_on_is_banned; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_artists_on_is_banned ON public.artists USING btree (is_banned);
+
+
+--
+-- Name: index_artists_on_is_deleted; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_artists_on_is_deleted ON public.artists USING btree (is_deleted);
+
+
+--
 -- Name: index_artists_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7308,6 +7322,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200217044719'),
 ('20200223042415'),
 ('20200223234015'),
-('20200306202253');
+('20200306202253'),
+('20200307021204');
 
 
