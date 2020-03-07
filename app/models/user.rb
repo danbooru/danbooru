@@ -58,7 +58,7 @@ class User < ApplicationRecord
     disable_cropped_thumbnails
     disable_mobile_gestures
     enable_safe_mode
-    disable_responsive_mode
+    enable_desktop_mode
     disable_post_tooltips
     enable_recommended_posts
     opt_out_tracking

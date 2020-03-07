@@ -23,7 +23,7 @@ $(function() {
 
   $("#desktop-version-link a").on("click.danbooru", async function(e) {
     e.preventDefault();
-    await CurrentUser.update({ disable_responsive_mode: true });
+    await CurrentUser.update({ enable_desktop_mode: true });
     location.reload();
   });
 });

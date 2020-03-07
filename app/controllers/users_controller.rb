@@ -120,7 +120,7 @@ class UsersController < ApplicationController
       enable_auto_complete show_deleted_children
       disable_categorized_saved_searches disable_tagged_filenames
       disable_cropped_thumbnails disable_mobile_gestures
-      enable_safe_mode disable_responsive_mode disable_post_tooltips
+      enable_safe_mode enable_desktop_mode disable_post_tooltips
     ]
 
     permitted_params << :name if context == :create

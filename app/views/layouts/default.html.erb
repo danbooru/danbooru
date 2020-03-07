@@ -14,7 +14,7 @@
   <% end %>
 
   <%= csrf_meta_tag %>
-  <% unless CurrentUser.disable_responsive_mode? %>
+  <% unless CurrentUser.enable_desktop_mode? %>
     <meta name="viewport" content="width=device-width,initial-scale=1">
   <% end %>
   <% if CurrentUser.user.blacklisted_tags.present? %>
