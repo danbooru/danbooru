@@ -1033,20 +1033,36 @@ class PostQueryBuilder
         return q
       end
 
-      def parse_tag(tag, output)
-        if tag[0] == "-" && tag.size > 1
-          output[:exclude] << tag[1..-1].mb_chars.downcase
+      def parse_tag_operator(tag)
+        tag = Tag.normalize_name(tag)
 
-        elsif tag[0] == "~" && tag.size > 1
-          output[:include] << tag[1..-1].mb_chars.downcase
-
-        elsif tag =~ /\*/
-          matches = Tag.name_matches(tag).select("name").limit(Danbooru.config.tag_query_limit).order("post_count DESC").map(&:name)
-          matches = ["~no_matches~"] if matches.empty?
-          output[:include] += matches
-
+        if tag.starts_with?("-")
+          ["-", tag.delete_prefix("-")]
+        elsif tag.starts_with?("~")
+          ["~", tag.delete_prefix("~")]
         else
-          output[:related] << tag.mb_chars.downcase
+          [nil, tag]
+        end
+      end
+
+      def parse_tag(tag, output)
+        operator, tag = parse_tag_operator(tag)
+
+        if tag.include?("*")
+          tags = Tag.wildcard_matches(tag)
+
+          if operator == "-"
+            output[:exclude] += tags
+          else
+            tags = ["~no_matches~"] if tags.empty? # force empty results if wildcard found no matches.
+            output[:include] += tags
+          end
+        elsif operator == "-"
+          output[:exclude] << tag
+        elsif operator == "~"
+          output[:include] << tag
+        else
+          output[:related] << tag
         end
       end
 

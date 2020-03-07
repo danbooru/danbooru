@@ -48,7 +48,7 @@ module PostSetPresenters
     end
 
     def pattern_tags
-      Tag.name_matches(post_set.tag_string).order(post_count: :desc).limit(MAX_TAGS).pluck(:name)
+      Tag.wildcard_matches(post_set.tag_string)
     end
 
     def saved_search_tags

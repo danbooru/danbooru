@@ -1962,6 +1962,18 @@ class PostTest < ActiveSupport::TestCase
       assert_tag_match([post2], "a* bbb")
     end
 
+    should "return posts for a negated pattern" do
+      post1 = create(:post, tag_string: "aaa")
+      post2 = create(:post, tag_string: "aaab bbb")
+      post3 = create(:post, tag_string: "bbb ccc")
+
+      assert_tag_match([post3], "-a*")
+      assert_tag_match([post3], "bbb -a*")
+      assert_tag_match([post3], "~bbb -a*")
+      assert_tag_match([post1], "a* -*b")
+      assert_tag_match([post2], "-*c -a*a")
+    end
+
     should "return posts for the id:<N> metatag" do
       posts = FactoryBot.create_list(:post, 3)
 

@@ -279,6 +279,10 @@ class Tag < ApplicationRecord
       name_matches(name).or(alias_matches(name))
     end
 
+    def wildcard_matches(tag, limit: 25)
+      nonempty.name_matches(tag).order(post_count: :desc, name: :asc).limit(limit).pluck(:name)
+    end
+
     def search(params)
       q = super
 
