@@ -34,7 +34,7 @@ Blacklist.parse_entries = function() {
   var entries = (Utility.meta("blacklisted-tags") || "nozomiisthebestlovelive").replace(/(rating:[qes])\w+/ig, "$1").toLowerCase().split(/,/);
   entries = entries.filter(e => e.trim() !== "");
 
-  $.each(entries, function(i, tags) {
+  entries.forEach(function(tags) {
     var entry = Blacklist.parse_entry(tags);
     Blacklist.entries.push(entry);
   });
@@ -59,7 +59,7 @@ Blacklist.toggle_entry = function(e) {
 }
 
 Blacklist.update_sidebar = function() {
-  $.each(this.entries, function(i, entry) {
+  Blacklist.entries.forEach(function(entry) {
     if (entry.hits === 0) {
       return;
     }
@@ -127,13 +127,13 @@ Blacklist.initialize_disable_all_blacklists = function() {
 }
 
 Blacklist.apply = function() {
-  $.each(this.entries, function(i, entry) {
+  Blacklist.entries.forEach(function(entry) {
     entry.hits = 0;
   });
 
   var count = 0
 
-  $.each(this.posts(), function(i, post) {
+  Blacklist.posts().each(function(i, post) {
     count += Blacklist.apply_post(post);
   });
 
@@ -142,7 +142,7 @@ Blacklist.apply = function() {
 
 Blacklist.apply_post = function(post) {
   var post_count = 0;
-  $.each(Blacklist.entries, function(j, entry) {
+  Blacklist.entries.forEach(function(entry) {
     if (Blacklist.post_match(post, entry)) {
       entry.hits += 1;
       post_count += 1;
