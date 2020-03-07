@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ArtistTest < ActiveSupport::TestCase
   def assert_artist_found(expected_name, source_url)
-    artists = Artist.find_artists(source_url).to_a
+    artists = ArtistFinder.find_artists(source_url).to_a
 
     assert_equal(1, artists.size)
     assert_equal(expected_name, artists.first.name, "Testing URL: #{source_url}")
@@ -11,7 +11,7 @@ class ArtistTest < ActiveSupport::TestCase
   end
 
   def assert_artist_not_found(source_url)
-    artists = Artist.find_artists(source_url).to_a
+    artists = ArtistFinder.find_artists(source_url).to_a
     assert_equal(0, artists.size, "Testing URL: #{source_url}")
   rescue Net::OpenTimeout
     skip "Remote connection failed for #{source_url}"
