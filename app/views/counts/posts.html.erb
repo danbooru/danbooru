@@ -1,3 +1,6 @@
+<% page_title "Post Counts" %>
+<%= render "posts/partials/common/secondary_links" %>
+
 <div id="c-counts">
   <div id="a-posts">
     Post count for <%= link_to params[:tags].present? ? params[:tags] : "/posts", posts_path(:tags => params[:tags]) %>:
@@ -8,9 +11,3 @@
     <% end %>
   </div>
 </div>
-
-<% content_for(:page_title) do %>
-  Post Counts - <%= Danbooru.config.app_name %>
-<% end %>
-
-<%= render "posts/partials/common/secondary_links" %>

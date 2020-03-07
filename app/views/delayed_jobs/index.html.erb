@@ -23,7 +23,7 @@
       <% t.column "Run at" do |job| %>
         <%= time_ago_in_words_tagged(job.run_at) %>
       <% end %>
-      <% t.column do |job| %>
+      <% t.column column: "control" do |job| %>
         <% if CurrentUser.is_admin? %>
           <% if job.locked_at? %>
             Running

@@ -3,41 +3,30 @@ class Note < ApplicationRecord
 
   attr_accessor :html_id
   belongs_to :post
-  belongs_to_creator
   has_many :versions, -> {order("note_versions.id ASC")}, :class_name => "NoteVersion", :dependent => :destroy
   validates_presence_of :x, :y, :width, :height, :body
   validate :note_within_image
   after_save :update_post
   after_save :create_version
-  validate :post_must_not_be_note_locked
+  validate :validate_post_is_not_locked
 
-  api_attributes including: [:creator_name]
+  scope :active, -> { where(is_active: true) }
 
   module SearchMethods
-    def active
-      where("is_active = TRUE")
-    end
-
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :creator, :post, :is_active, :x, :y, :width, :height, :body, :version)
+      q = q.search_attributes(params, :post, :is_active, :x, :y, :width, :height, :body, :version)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index)
 
       q.apply_default_order(params)
     end
   end
 
-  def creator_name
-    creator.name
-  end
-
   extend SearchMethods
 
-  def post_must_not_be_note_locked
-    if is_locked?
-      errors.add :post, "is note locked"
-    end
+  def validate_post_is_not_locked
+    errors[:post] << "is note locked" if post.is_note_locked?
   end
 
   def note_within_image
@@ -45,10 +34,6 @@ class Note < ApplicationRecord
     if x < 0 || y < 0 || (x > post.image_width) || (y > post.image_height) || width < 0 || height < 0 || (x + width > post.image_width) || (y + height > post.image_height)
       self.errors.add(:note, "must be inside the image")
     end
-  end
-
-  def is_locked?
-    Post.exists?(["id = ? AND is_note_locked = ?", post_id, true])
   end
 
   def rescale!(x_scale, y_scale)
@@ -61,10 +46,10 @@ class Note < ApplicationRecord
 
   def update_post
     if self.saved_changes?
-      if Note.where(:is_active => true, :post_id => post_id).exists?
-        execute_sql("UPDATE posts SET last_noted_at = ? WHERE id = ?", updated_at, post_id)
+      if post.notes.active.exists?
+        post.update_columns(last_noted_at: updated_at)
       else
-        execute_sql("UPDATE posts SET last_noted_at = NULL WHERE id = ?", post_id)
+        post.update_columns(last_noted_at: nil)
       end
     end
   end
@@ -144,17 +129,7 @@ class Note < ApplicationRecord
     new_note.save
   end
 
-  def self.undo_changes_by_user(vandal_id)
-    transaction do
-      note_ids = NoteVersion.where(:updater_id => vandal_id).select("note_id").distinct.map(&:note_id)
-      NoteVersion.where(["updater_id = ?", vandal_id]).delete_all
-      note_ids.each do |note_id|
-        note = Note.find(note_id)
-        most_recent = note.versions.last
-        if most_recent
-          note.revert_to!(most_recent)
-        end
-      end
-    end
+  def self.available_includes
+    [:post]
   end
 end

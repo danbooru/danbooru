@@ -316,10 +316,6 @@ div#c-posts {
   }
 
   div#a-show {
-    .active, .pool-selected-true {
-      font-weight: bold;
-    }
-
     #post-info-source {
       word-break: break-all;
     }
@@ -376,6 +372,10 @@ div#c-posts {
         position: relative;
         text-align: center;
         padding: 0 5.5em;
+
+        &[data-selected="true"] {
+          font-weight: bold;
+        }
 
         .prev {
           position: absolute;
@@ -473,7 +473,7 @@ div#c-explore-posts {
     margin: 0 0.5em;
   }
 
-  #popular-nav-links {
+  .date-nav-links {
     text-align: center;
   }
 

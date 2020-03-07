@@ -1,14 +1,16 @@
-<% if @post_set.is_single_tag? %>
-  <% "#{@post_set.humanized_tag_string.titleize} - #{Danbooru.config.app_name}".tap do |title| %>
-    <%= tag.meta name: "og:title", content: title %>
-    <%= tag.meta name: "twitter:title", content: title %>
-  <% end %>
+<% if @post_set.is_empty_tag? %>
+  <% page_title("#{Danbooru.config.app_name}: Anime Image Board", suffix: nil) %>
+  <% meta_description("#{Danbooru.config.canonical_app_name} is the original anime image 'booru. Find over 3.75 million anime pictures categorized by over 100 million tags.") %>
+
+  <% atom_feed_tag "Posts", posts_url(format: :atom) %>
 <% else %>
-  <% "#{@post_set.humanized_tag_string} - #{Danbooru.config.app_name}".tap do |title| %>
-    <%= tag.meta name: "og:title", content: title %>
-    <%= tag.meta name: "twitter:title", content: title %>
-  <% end %>
+  <% page_title("#{@post_set.humanized_tag_string} Art") %>
+  <% meta_description("See over #{number_with_delimiter(@post_set.post_count)} #{@post_set.humanized_tag_string} images on #{Danbooru.config.app_name}. #{DText.excerpt(@post_set.wiki_page&.body)}") %>
+
+  <% atom_feed_tag "Posts: #{@post_set.tag_string}", posts_url(tags: @post_set.tag_string, format: :atom) %>
 <% end %>
+
+<%= missed_post_search_count_js %>
 
 <% if @post_set.hide_from_crawler? %>
   <meta name="robots" content="nofollow,noindex">
@@ -19,23 +21,6 @@
 <% end %>
 
 <%= tag.meta name: "canonical", content: posts_url(tags: params[:tags], host: Danbooru.config.hostname, protocol: "https") %>
-
-<% if @post_set.is_single_tag? %>
-  <% "Find #{@post_set.post_count} images of #{@post_set.humanized_tag_string.titleize} on #{Danbooru.config.app_name}".tap do |desc| %>
-    <%= tag.meta name: "description", content: desc %>
-    <%= tag.meta name: "og:description", content: desc %>
-    <%= tag.meta name: "twitter:description", content: desc %>
-  <% end %>
-<% else %>
-  <% Danbooru.config.description.tap do |desc| %>
-    <%= tag.meta name: "description", content: desc %>
-    <%= tag.meta name: "og:description", content: desc %>
-    <%= tag.meta name: "twitter:description", content: desc %>
-  <% end %>
-<% end %>
-
-<%= tag.meta name: "og:type", content: "website" %>
-<%= tag.meta name: "og:site", content: Danbooru.config.app_name %>
 
 <% if @post_set.best_post.present? %>
   <%= tag.meta name: "twitter:image", content: @post_set.best_post.open_graph_image_url %>

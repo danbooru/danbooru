@@ -25,6 +25,7 @@ class PostReplacementsController < ApplicationController
   def index
     params[:search][:post_id] = params.delete(:post_id) if params.key?(:post_id)
     @post_replacements = PostReplacement.paginated_search(params)
+    @post_replacements = @post_replacements.includes(:creator, post: :uploader) if request.format.html?
 
     respond_with(@post_replacements)
   end

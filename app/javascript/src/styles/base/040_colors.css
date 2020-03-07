@@ -52,10 +52,7 @@
   --preview-icon-color: white;
   --preview-icon-background: rgba(0, 0, 0, 0.5);
 
-  --modqueue-sample-warning-color: var(--error-background-color);
-  --modqueue-quality-warning-color: var(--warning-background-color);
-  --modqueue-positive-score-background-color: var(--success-background-color);
-  --modqueue-negative-score-background-color: var(--error-background-color);
+  --modqueue-tag-warning-color: var(--error-background-color);
 
   --uploads-dropzone-background: #EEE;
   --uploads-dropzone-progress-bar-foreground-color: var(--link-color);
@@ -66,6 +63,9 @@
   --forum-vote-up-color: green;
   --forum-vote-meh-color: goldenrod;
   --forum-vote-down-color: red;
+
+  --moderation-report-text-color: red;
+  --moderation-report-border: 2px solid red;
 
   --comment-sticky-background-color: var(--subnav-menu-background-color);
 
@@ -114,6 +114,7 @@
   --note-box-background: transparent;
   --note-box-inner-border: 1px solid black;
   --unsaved-note-box-inner-border: 1px solid red;
+  --movable-note-box-inner-border: 1px solid green;
   --note-preview-border: 1px solid red;
   --note-preview-background: white;
   --note-highlight-color: blue;
@@ -133,11 +134,7 @@
   --post-mode-menu-remove-fav-background: #FFA;
   --post-mode-menu-vote-up-background: #AFA;
   --post-mode-menu-vote-down-background: #FAA;
-  --post-mode-menu-lock-rating-background: #AA3;
-  --post-mode-menu-lock-note-background: #3AA;
-  --post-mode-menu-approve-background: #48C;
   --post-mode-menu-translation-background: #5CD;
-  --post-mode-menu-ban-background: #F33;
 
   --tag-count-color: var(--muted-text-color);
   --low-post-count-color: red;
@@ -155,8 +152,6 @@
   --keyboard-shortcut-background-color: #333;
 
   --error-message-color: #A00;
-
-  --new-artist-color: #A00;
 
   --bulk-update-request-approved-color: green;
   --bulk-update-request-failed-color: red;
@@ -333,6 +328,9 @@ body[data-current-user-theme="dark"] {
   --forum-vote-meh-color: var(--yellow-1);
   --forum-vote-down-color: var(--red-1);
 
+  --moderation-report-text-color: var(--red-1);
+  --moderation-report-border: 2px solid var(--red-1);
+
   --jquery-ui-widget-content-text-color: var(--text-color);
   --jquery-ui-widget-content-background: var(--grey-2);
   --jquery-ui-dialog-box-shadow: 0 0 8px var(--grey-1);
@@ -340,10 +338,7 @@ body[data-current-user-theme="dark"] {
   --keyboard-shortcut-color: var(--text-color);
   --keyboard-shortcut-background-color: var(--grey-2);
 
-  --modqueue-sample-warning-color: var(--error-background-color);
-  --modqueue-quality-warning-color: var(--warning-background-color);
-  --modqueue-positive-score-background-color: var(--success-background-color);
-  --modqueue-negative-score-background-color: var(--error-background-color);
+  --modqueue-tag-warning-color: var(--error-background-color);
 
   --news-updates-background: var(--grey-3);
   --news-updates-border: 2px solid var(--grey-4);
@@ -378,11 +373,7 @@ body[data-current-user-theme="dark"] {
   --post-mode-menu-remove-fav-background: var(--yellow-0);
   --post-mode-menu-vote-up-background: var(--red-0);
   --post-mode-menu-vote-down-background: var(--red-0);
-  --post-mode-menu-lock-rating-background: var(--purple-0);
-  --post-mode-menu-lock-note-background: var(--purple-0);
-  --post-mode-menu-approve-background: var(--aqua-0);
   --post-mode-menu-translation-background: var(--blue-0);
-  --post-mode-menu-ban-background: var(--red-1);
 
   --post-notice-border: 1px solid var(--grey-3);
   --post-search-notice-background: var(--grey-3);
@@ -435,7 +426,6 @@ body[data-current-user-theme="dark"] {
 
   --low-post-count-color: var(--red-1);
   --login-link-color: var(--red-1);
-  --new-artist-color: var(--red-1);
   --remove-favorite-button: var(--red-1);
   --fetch-source-data-border: 1px solid var(--grey-4);
   --quick-search-form-background: var(--grey-1);

@@ -1,3 +1,6 @@
+<% page_title "Missed Searches" %>
+<%= render "posts/partials/common/secondary_links" %>
+
 <div id="c-explore-posts">
   <div id="a-missed-searches">
     <h1>Missed Searches</h1>
@@ -13,7 +16,7 @@
       </thead>
       <tbody>
         <% @search_service.each_search do |tags, count| %>
-          <tr class="category-<%= Tag.category_for(tags) %>">
+          <tr class="tag-type-<%= Tag.category_for(tags) %>">
             <td><%= link_to tags, posts_path(:tags => tags) %></td>
             <td>
               <% unless WikiPage.titled(tags).exists? %>
@@ -27,9 +30,3 @@
     </table>
   </div>
 </div>
-
-<%= render "posts/partials/common/secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Missed Searches - <%= Danbooru.config.app_name %>
-<% end %>

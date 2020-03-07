@@ -20,6 +20,12 @@ ForumPost.initialize_edit_links = function() {
     $("#edit_forum_topic_" + forum_topic_id).fadeToggle("fast");
     e.preventDefault();
   });
+
+  $(document).on("click.danbooru", "#c-forum-topics #a-show #new-response-link", function (e) {
+    $("#topic-response").show();
+    document.body.scrollIntoView(false);
+    e.preventDefault();
+  });
 }
 
 $(document).ready(function() {

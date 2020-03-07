@@ -1,3 +1,5 @@
+<% meta_description "Search thousands of anime & hentai artists on #{Danbooru.config.app_name}." %>
+
 <div id="c-artists">
   <div id="a-index">
     <%= render "search" %>
@@ -16,8 +18,8 @@
         <% end %>
       <% end %>
       <% t.column "Status" do |artist| %>
-        <% if !artist.is_active? %>
-          <%= link_to "Deleted", artists_path(search: { is_active: false }) %>
+        <% if artist.is_deleted? %>
+          <%= link_to "Deleted", artists_path(search: { is_deleted: true }) %>
         <% end %>
 
         <% if artist.is_banned? %>
@@ -27,14 +29,14 @@
       <% t.column "Updated" do |artist| %>
         <%= time_ago_in_words_tagged(artist.updated_at) %>
       <% end %>
-      <% t.column do |artist| %>
+      <% t.column column: "control" do |artist| %>
         <% if CurrentUser.is_member? %>
           <%= link_to "Edit", edit_artist_path(artist) %>
 
-          <% if artist.is_active? %>
-            | <%= link_to "Delete", artist_path(artist, artist: { is_active: false }), method: :put, remote: true %>
+          <% if artist.is_deleted? %>
+            | <%= link_to "Undelete", artist_path(artist, artist: { is_deleted: false }), method: :put, remote: true %>
           <% else %>
-            | <%= link_to "Undelete", artist_path(artist, artist: { is_active: true }), method: :put, remote: true %>
+            | <%= link_to "Delete", artist_path(artist, artist: { is_deleted: true }), method: :put, remote: true %>
           <% end %>
         <% end %>
       <% end %>

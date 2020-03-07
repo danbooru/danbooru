@@ -1,21 +1,24 @@
+<% page_title "@#{@user.pretty_name}" %>
+<%= render "secondary_links" %>
+
 <div id="c-users">
   <div id="a-show">
     <h1><%= link_to_user @user %></h1>
 
+  <% if @user.moderation_reports.visible.recent.present? %>
+    <div class="moderation-users-notice">
+      <span class="info" id="moderation-users-notice-for-<%= @user.id %>">
+        This user has been reported for moderation! (<%= pluralize(@user.moderation_reports.visible.recent.length, "report") %>)
+      </span>
+    </div>
+  <% end %>
+
     <%= render "statistics", presenter: @user.presenter, user: @user %>
 
-    <% if !CurrentUser.is_admin? && !@user.enable_privacy_mode? || CurrentUser.id == @user.id %>
-      <%= render "posts/partials/common/inline_blacklist" %>
-      <%= render "post_summary", presenter: @user.presenter, user: @user %>
-    <% end %>
+    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= render "post_summary", presenter: @user.presenter, user: @user %>
   </div>
 </div>
 
-<%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  User - <%= @user.presenter.name %> - <%= Danbooru.config.app_name %>
-<% end %>
-
-<% content_for(:html_header, auto_discovery_link_tag(:atom, comments_url(:atom, search: { post_tags_match: "user:#{@user.name}" }), title: "Comments on #{@user.name}'s uploads")) %>
-<% content_for(:html_header, auto_discovery_link_tag(:atom, comments_url(:atom, search: { post_tags_match: "commenter:#{@user.name}" }), title: "Comments on posts commented on by #{@user.name}")) %>
+<% atom_feed_tag "Comments on #{@user.pretty_name}'s uploads", comments_url(:atom, search: { post_tags_match: "user:#{@user.name}" }) %>
+<% atom_feed_tag "Comments on posts commented on by #{@user.pretty_name}", comments_url(:atom, search: { post_tags_match: "commenter:#{@user.name}" }) %>

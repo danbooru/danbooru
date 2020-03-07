@@ -22,10 +22,6 @@ class PostApprovalTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
-    should "allow approval" do
-      assert_equal(false, @post.approved_by?(@approver))
-    end
-
     context "That is approved" do
       should "create a postapproval record" do
         assert_difference("PostApproval.count") do
@@ -35,8 +31,8 @@ class PostApprovalTest < ActiveSupport::TestCase
 
       context "that is then flagged" do
         setup do
-          @user2 = FactoryBot.create(:user)
-          @user3 = FactoryBot.create(:user)
+          @user2 = create(:user, created_at: 2.weeks.ago)
+          @user3 = create(:user, created_at: 2.weeks.ago)
           @approver2 = FactoryBot.create(:user)
           @approver2.can_approve_posts = true
           @approver2.save

@@ -6,7 +6,7 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
       @user = create(:user)
       @critic = create(:gold_user)
       @mod = create(:moderator_user)
-      @user_feedback = as(@critic) { create(:user_feedback, user: @user) }
+      @user_feedback = create(:user_feedback, user: @user, creator: @critic)
     end
 
     context "new action" do

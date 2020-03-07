@@ -33,13 +33,10 @@ class NoteTest < ActiveSupport::TestCase
       end
 
       context "when the note is deleted the post" do
-        setup do
-          @note.toggle!(:is_active)
-        end
-
         should "null out its last_noted_at_field" do
-          @post.reload
-          assert_nil(@post.last_noted_at)
+          assert_not_nil(@post.reload.last_noted_at)
+          @note.update!(is_active: false)
+          assert_nil(@post.reload.last_noted_at)
         end
       end
     end
@@ -59,12 +56,6 @@ class NoteTest < ActiveSupport::TestCase
         @note = FactoryBot.build(:note, :x => 500, :y => 500, :height => 501, :width => 500, :post => @post)
         @note.save
         assert_equal(["Note must be inside the image"], @note.errors.full_messages)
-      end
-
-      should "not validate if the post does not exist" do
-        @note = FactoryBot.build(:note, :x => 500, :y => 500, :post_id => -1)
-        @note.save
-        assert_equal(["Post must exist"], @note.errors.full_messages)
       end
 
       should "not validate if the body is blank" do
@@ -127,10 +118,9 @@ class NoteTest < ActiveSupport::TestCase
       end
 
       should "update the post's last_noted_at field" do
-        assert_nil(@post.last_noted_at)
-        @note.update(x: 500)
-        @post.reload
-        assert_equal(@post.last_noted_at.to_i, @note.updated_at.to_i)
+        assert_equal(@post.reload.last_noted_at.to_i, @note.updated_at.to_i)
+        assert_changes("@post.reload.last_noted_at") { @note.update(x: 500) }
+        assert_equal(@post.reload.last_noted_at.to_i, @note.reload.updated_at.to_i)
       end
 
       should "create a version" do
@@ -163,32 +153,6 @@ class NoteTest < ActiveSupport::TestCase
           assert_no_difference("@note.versions.count") do
             @note.save
           end
-        end
-      end
-    end
-
-    context "when notes have been vandalized by one user" do
-      setup do
-        @vandal = FactoryBot.create(:user)
-        @note = FactoryBot.create(:note, :x => 5, :y => 5)
-        CurrentUser.scoped(@vandal, "127.0.0.1") do
-          @note.update(x: 10, y: 10)
-        end
-      end
-
-      context "the act of undoing all changes by that user" do
-        should "revert any affected notes" do
-          assert_equal(2, NoteVersion.count)
-          assert_equal([1, 2], @note.versions.map(&:version))
-          assert_equal([@user.id, @vandal.id], @note.versions.map(&:updater_id))
-          travel(1.day) do
-            Note.undo_changes_by_user(@vandal.id)
-          end
-          @note.reload
-          assert_equal([1, 3], @note.versions.map(&:version))
-          assert_equal([@user.id, @user.id], @note.versions.map(&:updater_id))
-          assert_equal(5, @note.x)
-          assert_equal(5, @note.y)
         end
       end
     end

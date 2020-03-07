@@ -33,4 +33,8 @@ class PostReplacement < ApplicationRecord
     tags = tags.map { |tag| "-#{tag}" }
     tags.join(" ")
   end
+
+  def self.available_includes
+    [:creator, :post]
+  end
 end

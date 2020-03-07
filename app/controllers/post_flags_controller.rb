@@ -8,12 +8,20 @@ class PostFlagsController < ApplicationController
   end
 
   def index
-    @post_flags = PostFlag.paginated_search(params).includes(:creator, post: [:flags, :uploader, :approver])
+    @post_flags = PostFlag.paginated_search(params)
+
+    if request.format.html?
+      @post_flags = @post_flags.includes(:creator, post: [:flags, :uploader, :approver])
+    else
+      @post_flags = @post_flags.includes(:post)
+    end
+
     respond_with(@post_flags)
   end
 
   def create
-    @post_flag = PostFlag.create(post_flag_params)
+    @post_flag = PostFlag.create(post_flag_params.merge(creator: CurrentUser.user))
+    flash[:notice] = @post_flag.errors.none? ? "Post flagged" : @post_flag.errors.full_messages.join("; ")
     respond_with(@post_flag)
   end
 

@@ -95,7 +95,7 @@ class PostPresenter < Presenter
     ApplicationController.render(partial: "posts/partials/index/preview", locals: locals)
   end
 
-  def self.preview_class(post, highlight_score: nil, pool: nil, size: nil, similarity: nil, recommended: nil, compact: nil, **options)
+  def self.preview_class(post, pool: nil, size: nil, similarity: nil, recommended: nil, compact: nil, **options)
     klass = ["post-preview"]
     # klass << " large-cropped" if post.has_cropped? && options[:show_cropped]
     klass << "captioned" if pool || size || similarity || recommended
@@ -104,8 +104,6 @@ class PostPresenter < Presenter
     klass << "post-status-deleted" if post.is_deleted?
     klass << "post-status-has-parent" if post.parent_id
     klass << "post-status-has-children" if post.has_visible_children?
-    klass << "post-pos-score" if highlight_score && post.score >= 3
-    klass << "post-neg-score" if highlight_score && post.score <= -3
     klass << "post-preview-compact" if compact
     klass
   end
@@ -134,10 +132,6 @@ class PostPresenter < Presenter
       "data-is-favorited" => post.favorited_by?(CurrentUser.user.id)
     }
 
-    if CurrentUser.is_moderator?
-      attributes["data-uploader"] = post.uploader.name
-    end
-
     if post.visible?
       attributes["data-md5"] = post.md5
       attributes["data-file-url"] = post.file_url
@@ -160,10 +154,6 @@ class PostPresenter < Presenter
     PostPresenter.preview(@post)
   end
 
-  def humanized_tag_string
-    @post.tag_string.split(/ /).slice(0, 25).join(", ").tr("_", " ")
-  end
-
   def humanized_essential_tag_string
     @humanized_essential_tag_string ||= tag_set_presenter.humanized_essential_tag_string(default: "##{@post.id}")
   end
@@ -173,7 +163,7 @@ class PostPresenter < Presenter
   end
 
   def has_nav_links?(template)
-    has_sequential_navigation?(template.params) || @post.pools.undeleted.any? || @post.favorite_groups(active_id = template.params[:favgroup_id]).any?
+    has_sequential_navigation?(template.params) || @post.pools.undeleted.any? || CurrentUser.favorite_groups.for_post(@post.id).any?
   end
 
   def has_sequential_navigation?(params)

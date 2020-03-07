@@ -1,7 +1,5 @@
 <div class="flag-dialog-body">
-  <div class="prose">
-    <%= format_text(WikiPage.titled(Danbooru.config.flag_notice_wiki_page).first.try(&:body)) %>
-  </div>
+  <%= embed_wiki("help:flag_notice") %>
 
   <%# XXX dtext_field expects there to be a `post_flag` instance variable. %>
   <% @post_flag = post_flag %>

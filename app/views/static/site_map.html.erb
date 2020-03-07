@@ -1,3 +1,5 @@
+<% page_title "Site Map" %>
+
 <div id="c-static">
   <div id="a-site-map" class="fixed-width-container">
     <section>
@@ -8,13 +10,11 @@
         <li><%= link_to("Upload", new_upload_path) %></li>
         <li><%= link_to("Upload Listing", uploads_path) %></li>
         <li><%= link_to("Popular", popular_explore_posts_path) %></li>
+        <li><%= link_to("Curated", curated_explore_posts_path) %></li>
         <li><%= link_to("Most Viewed", viewed_explore_posts_path) %></li>
         <li><%= link_to("Votes", post_votes_path) %></li>
         <% if CurrentUser.can_approve_posts? %>
-          <li><%= link_to("Moderate", moderator_post_queue_path) %></li>
-        <% end %>
-        <% if CurrentUser.is_moderator? %>
-          <li><%= link_to("Mass Edit", edit_moderator_tag_path) %></li>
+          <li><%= link_to("Modqueue", modqueue_index_path) %></li>
         <% end %>
       </ul>
       <ul>
@@ -22,7 +22,7 @@
         <li><%= link_to("Changes", post_versions_path) %></li>
         <li><%= link_to("Approvals", post_approvals_path) %></li>
         <% if CurrentUser.is_approver? %>
-          <li><%= link_to("Disapprovals", moderator_post_disapprovals_path) %></li>
+          <li><%= link_to("Disapprovals", post_disapprovals_path) %></li>
         <% end %>
         <li><%= link_to("Appeals", post_appeals_path) %></li>
         <li><%= link_to("Flags", post_flags_path) %></li>
@@ -67,7 +67,7 @@
         <li><%= link_to_wiki "Help", "help:pools" %></li>
         <li><%= link_to("Listing", pools_path) %></li>
         <li><%= link_to("Gallery", gallery_pools_path) %></li>
-        <% if PoolArchive.enabled? %>
+        <% if PoolVersion.enabled? %>
           <li><%= link_to("Changes", pool_versions_path) %></li>
         <% end %>
       </ul>
@@ -125,7 +125,7 @@
             <li><%= link_to "Change name", new_user_name_change_request_path %></li>
           <% end %>
           <li><%= link_to "Delete account", maintenance_user_deletion_path %></li>
-          <li><%= link_to "Dmails", dmails_path %></li>
+          <li><%= link_to "Dmails", dmails_path(search: { folder: "received" }) %></li>
           <li><%= link_to "Favorites", favorites_path %></li>
           <li><%= link_to "Favorite groups", favorite_groups_path %></li>
           <li><%= link_to "Saved searches", saved_searches_path %></li>
@@ -155,20 +155,16 @@
         <% end %>
 
         <% if CurrentUser.is_moderator? %>
+          <li><%= link_to("Moderation Reports", moderation_reports_path) %></li>
           <li><%= link_to("IP Addresses", ip_addresses_path) %></li>
           <li><%= link_to("IP Bans", ip_bans_path) %></li>
         <% end %>
 
         <% if CurrentUser.is_admin? %>
           <li><%= link_to("News Updates", news_updates_path) %></li>
-          <li><%= link_to("Alias & Implication Import", new_admin_alias_and_implication_import_path) %></li>
           <li><%= link_to("Admin Dashboard", admin_dashboard_path) %></li>
         <% end %>
       </ul>
     </section>
   </div>
 </div>
-
-<% content_for(:page_title) do %>
-  Site Map - <%= Danbooru.config.app_name %>
-<% end %>

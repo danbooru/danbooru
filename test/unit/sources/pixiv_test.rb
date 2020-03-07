@@ -74,6 +74,15 @@ module Sources
         end
       end
 
+      context "A https://tc-pximg01.techorus-cdn.com/img-original/img/* source" do
+        should "get the metadata" do
+          @site = Sources::Strategies.find("https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png")
+
+          assert_equal("https://i.pximg.net/img-original/img/2017/09/18/03/18/24/65015428_p4.png", @site.image_url)
+          assert_equal("赤井さしみ", @site.artist_name)
+        end
+      end
+
       context "A https://www.pixiv.net/fanbox/creator/*/post/* source" do
         should "work" do
           @site = Sources::Strategies.find("http://www.pixiv.net/fanbox/creator/554149/post/82555")
@@ -285,7 +294,7 @@ module Sources
         should "not translate '1000users入り' to '1'" do
           FactoryBot.create(:tag, name: "1", post_count: 1)
           source = get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=60665428")
-          tags = %w[Fate/GrandOrder グランブルーファンタジー 手袋 1000users入り]
+          tags = %w[1000users入り Fate/GrandOrder アルジュナ(Fate) アルトリア・ペンドラゴン イシュタル(Fate) グランブルーファンタジー マシュ・キリエライト マーリン(Fate) 両儀式 手袋]
 
           assert_equal(tags.sort, source.tags.map(&:first).sort)
           assert_equal(["fate/grand_order"], source.translated_tags.map(&:name))
@@ -310,7 +319,10 @@ module Sources
           assert_illust_id(46324488, "https://i.pximg.net/img-original/img/2014/10/03/18/10/20/46324488_p0.png")
           assert_illust_id(46324488, "https://i.pximg.net/img-master/img/2014/10/03/18/10/20/46324488_p0_master1200.jpg")
 
+          assert_illust_id(65015428, "https://tc-pximg01.techorus-cdn.com/img-original/img/2017/09/18/03/18/24/65015428_p4.png")
+
           assert_illust_id(46785915, "https://i.pximg.net/c/250x250_80_a2/img-master/img/2014/10/29/09/27/19/46785915_p0_square1200.jpg")
+          assert_illust_id(79584713, "https://i-f.pximg.net/img-original/img/2020/02/19/00/40/18/79584713_p0.png")
 
           assert_illust_id(46323924, "http://i1.pixiv.net/img-zip-ugoira/img/2014/10/03/17/29/16/46323924_ugoira1920x1080.zip")
           assert_illust_id(46304396, "http://i1.pixiv.net/img-original/img/2014/10/02/13/51/23/46304396_p0.png")

@@ -60,6 +60,30 @@ module PaginationExtension
     end
   end
 
+  def prev_page
+    return nil if is_first_page?
+
+    if paginator_mode == :numbered
+      current_page - 1
+    elsif paginator_mode == :sequential_before
+      "a#{records.first.id}"
+    elsif paginator_mode == :sequential_after
+      "b#{records.last.id}"
+    end
+  end
+
+  def next_page
+    return nil if is_last_page?
+
+    if paginator_mode == :numbered
+      current_page + 1
+    elsif paginator_mode == :sequential_before
+      "b#{records.last.id}"
+    elsif paginator_mode == :sequential_after
+      "a#{records.first.id}"
+    end
+  end
+
   # XXX Hack: in sequential pagination we fetch one more record than we
   # need so that we can tell when we're on the first or last page. Here
   # we override a rails internal method to discard that extra record. See
@@ -80,10 +104,10 @@ module PaginationExtension
 
   # taken from kaminari (https://github.com/amatsuda/kaminari)
   def total_count
-    @paginator_count ||= except(:offset, :limit, :order).reorder(nil).count
+    @paginator_count ||= unscoped.from(except(:offset, :limit, :order).reorder(nil)).count
   rescue ActiveRecord::StatementInvalid => e
     if e.to_s =~ /statement timeout/
-      1_000_000
+      @paginator_count ||= 1_000_000
     else
       raise
     end

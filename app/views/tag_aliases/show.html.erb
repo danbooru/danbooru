@@ -19,12 +19,8 @@
         </li>
       <% end %>
       <li><strong>Status</strong> <%= @tag_alias.status %></li>
-
-      <% if CurrentUser.is_admin? && @tag_alias.is_pending? %>
-        <li><strong>Commands</strong> <%= link_to "Approve", approve_tag_alias_path(@tag_alias), :method => :post %></li>
-      <% end %>
     </ul>
   </div>
 </div>
 
-<%= render "secondary_links" %>
+<%= render "tags/secondary_links" %>

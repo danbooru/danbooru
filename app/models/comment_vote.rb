@@ -3,16 +3,20 @@ class CommentVote < ApplicationRecord
 
   belongs_to :comment
   belongs_to :user
-  before_validation :initialize_user, :on => :create
   validates_presence_of :score
   validates_uniqueness_of :user_id, :scope => :comment_id, :message => "have already voted for this comment"
   validate :validate_user_can_vote
   validate :validate_comment_can_be_down_voted
   validates_inclusion_of :score, :in => [-1, 1], :message => "must be 1 or -1"
 
-  def self.visible(user = CurrentUser.user)
-    return all if user.is_admin?
-    where(user: user)
+  def self.visible(user)
+    if user.is_admin?
+      all
+    elsif user.is_member?
+      where(user: user)
+    else
+      none
+    end
   end
 
   def self.comment_matches(params)
@@ -22,7 +26,6 @@ class CommentVote < ApplicationRecord
 
   def self.search(params)
     q = super
-    q = q.visible
     q = q.search_attributes(params, :comment_id, :user, :score)
     q = q.comment_matches(params[:comment])
     q.apply_default_order(params)
@@ -48,7 +51,7 @@ class CommentVote < ApplicationRecord
     score == -1
   end
 
-  def initialize_user
-    self.user_id = CurrentUser.user.id
+  def self.available_includes
+    [:comment, :user]
   end
 end

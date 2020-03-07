@@ -50,6 +50,10 @@ class PawooApiClient
     def commentary
       nil
     end
+
+    def to_h
+      json
+    end
   end
 
   class Status
@@ -97,15 +101,34 @@ class PawooApiClient
       commentary << json["content"]
       commentary
     end
+
+    def to_h
+      json
+    end
   end
 
   def get(url)
     if id = Status.is_match?(url)
-      return Status.new(JSON.parse(access_token.get("/api/v1/statuses/#{id}").body))
+      begin
+        data = JSON.parse(access_token.get("/api/v1/statuses/#{id}").body)
+      rescue
+        data = {
+          "account" => {},
+          "media_attachments" => [],
+          "tags" => [],
+          "content" => "",
+        }
+      end
+      return Status.new(data)
     end
 
     if id = Account.is_match?(url)
-      return Account.new(JSON.parse(access_token.get("/api/v1/accounts/#{id}").body))
+      begin
+        data = JSON.parse(access_token.get("/api/v1/accounts/#{id}").body)
+      rescue
+        data = {}
+      end
+      return Account.new(data)
     end
   end
 

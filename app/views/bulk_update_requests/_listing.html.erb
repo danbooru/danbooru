@@ -1,12 +1,16 @@
+<% dtext_data = DText.preprocess(bulk_update_requests.map(&:script_with_links)) %>
+
 <%= table_for bulk_update_requests, width: "100%" do |t| %>
   <% t.column "Request" do |request| %>
       <% if request.forum_post.present? %>
-        <p><%= link_to "Topic ##{request.forum_topic_id}: #{request.forum_topic.title}", forum_topic_path(request.forum_topic_id, page: request.forum_post.forum_topic_page, anchor: "forum_post_#{request.forum_post_id}") %></p>
+        <p><%= link_to "Topic ##{request.forum_topic_id}: #{request.forum_topic.title}", request.forum_post %></p>
       <% elsif request.forum_topic.present? %>
         <p><%= link_to "Topic ##{request.forum_topic_id}: #{request.forum_topic.title}", request.forum_topic %></p>
       <% end %>
 
-      <%= script_with_line_breaks(request.script) %>
+      <div class="prose">
+        <%= format_text(request.script_with_links, data: dtext_data) %>
+      </div>
   <% end %>
   <% t.column "Votes" do |request| %>
     <% if request.forum_post.present? %>
@@ -27,7 +31,7 @@
     <%= link_to "»", bulk_update_requests_path(search: { user_name: request.user.name }) %>
     <div><%= time_ago_in_words_tagged(request.created_at) %></div>
   <% end %>
-  <% t.column do |request| %>
+  <% t.column column: "control" do |request| %>
     <%= link_to "Show", bulk_update_request_path(request) %> |
     <%= render "bulk_update_requests/bur_edit_links", bur: request %>
   <% end %>

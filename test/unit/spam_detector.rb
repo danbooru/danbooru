@@ -16,7 +16,6 @@ class SpamDetectorTest < ActiveSupport::TestCase
 
         dmail = @user.dmails.last
         assert(SpamDetector.new(dmail).spam?)
-        assert(dmail.is_spam?)
       end
 
       should "not detect gold users as spammers" do
@@ -24,7 +23,6 @@ class SpamDetectorTest < ActiveSupport::TestCase
 
         dmail = @spammer.dmails.last
         refute(SpamDetector.new(dmail).spam?)
-        refute(dmail.is_spam?)
       end
 
       should "not detect old users as spammers" do
@@ -33,19 +31,26 @@ class SpamDetectorTest < ActiveSupport::TestCase
 
         dmail = @spammer.dmails.last
         refute(SpamDetector.new(dmail).spam?)
-        refute(dmail.is_spam?)
       end
 
-      should "log a message when spam is detected" do
-        Rails.logger.expects(:info)
+      should "generate a moderation report when spam is detected" do
         Dmail.create_split(from: @spammer, to: @user, title: "spam", body: "wonderful spam", creator_ip_addr: "127.0.0.1")
+        assert_equal(1, @user.dmails.last.moderation_reports.count)
       end
 
       should "pass messages through if akismet is down" do
-        Rakismet.expects(:akismet_call).raises(StandardError)
+        Rakismet.stubs(:akismet_call).raises(StandardError)
         dmail = create(:dmail, from: @spammer, to: @user, owner: @user, title: "spam", body: "wonderful spam", creator_ip_addr: "127.0.0.1")
 
         refute(SpamDetector.new(dmail).spam?)
+      end
+
+      should "autoban the user if they send too many spam dmails" do
+        count = SpamDetector::AUTOBAN_THRESHOLD
+        dmails = create_list(:dmail, count, from: @spammer, to: @user, owner: @user, creator_ip_addr: "127.0.0.1")
+
+        assert_equal(count, ModerationReport.where(model: Dmail.sent_by(@spammer)).count)
+        assert_equal(true, @spammer.reload.is_banned?)
       end
     end
 
@@ -54,45 +59,41 @@ class SpamDetectorTest < ActiveSupport::TestCase
         @forum_topic = as(@user) { create(:forum_topic) }
       end
 
-      should "detect spam" do
+      should "generate a moderation report when spam is detected" do
         as(@spammer) do
-          forum_post = build(:forum_post, topic: @forum_topic)
-          forum_post.validate
+          forum_post = create(:forum_post, creator: @spammer, topic: @forum_topic)
 
           assert(SpamDetector.new(forum_post, user_ip: "127.0.0.1").spam?)
-          assert(forum_post.invalid?)
-          assert_equal(["Failed to create forum post"], forum_post.errors.full_messages)
+          assert_equal(1, forum_post.moderation_reports.count)
         end
       end
 
       should "not detect gold users as spammers" do
         as(@user) do
-          forum_post = create(:forum_post, topic: @forum_topic)
+          forum_post = create(:forum_post, creator: @user, topic: @forum_topic)
 
           refute(SpamDetector.new(forum_post).spam?)
-          assert(forum_post.valid?)
+          assert_equal(0, forum_post.moderation_reports.count)
         end
       end
     end
 
     context "for comments" do
-      should "detect spam" do
+      should "generate a moderation report when spam is detected" do
         as(@spammer) do
-          comment = build(:comment)
-          comment.validate
+          comment = create(:comment, creator: @spammer)
 
           assert(SpamDetector.new(comment).spam?)
-          assert(comment.invalid?)
-          assert_equal(["Failed to create comment"], comment.errors.full_messages)
+          assert_equal(1, comment.moderation_reports.count)
         end
       end
 
       should "not detect gold users as spammers" do
         as(@user) do
-          comment = create(:comment)
+          comment = create(:comment, creator: @user)
 
           refute(SpamDetector.new(comment).spam?)
-          assert(comment.valid?)
+          assert_equal(0, comment.moderation_reports.count)
         end
       end
     end

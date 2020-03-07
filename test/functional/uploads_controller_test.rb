@@ -35,7 +35,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
     context "preprocess action" do
       should "prefer the file over the source when preprocessing" do
         file = Rack::Test::UploadedFile.new("#{Rails.root}/test/files/test.jpg", "image/jpeg")
-        post_auth preprocess_uploads_path, @user, params: {:upload => {:source => "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", :file => file}}
+        post_auth preprocess_uploads_path, @user, params: {:upload => {:source => "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", :file => file}}
         assert_response :success
         perform_enqueued_jobs
         assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", Upload.last.md5)
@@ -51,18 +51,18 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       context "with a url" do
         should "preprocess" do
           assert_difference(-> { Upload.count }) do
-            get_auth new_upload_path, @user, params: {:url => "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"}
+            get_auth new_upload_path, @user, params: {:url => "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"}
             perform_enqueued_jobs
             assert_response :success
           end
         end
 
         should "prefer the file" do
-          get_auth new_upload_path, @user, params: {url: "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"}
+          get_auth new_upload_path, @user, params: {url: "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"}
           perform_enqueued_jobs
           file = Rack::Test::UploadedFile.new("#{Rails.root}/test/files/test.jpg", "image/jpeg")
           assert_difference(-> { Post.count }) do
-            post_auth uploads_path, @user, params: {upload: {file: file, tag_string: "aaa", rating: "q", source: "https://raikou1.donmai.us/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"}}
+            post_auth uploads_path, @user, params: {upload: {file: file, tag_string: "aaa", rating: "q", source: "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"}}
           end
           post = Post.last
           assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", post.md5)
@@ -220,6 +220,22 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
             post = Post.last
             assert_match(/aaa/, post.tag_string)
           end
+        end
+      end
+
+      context "when the uploader is limited" do
+        should "not allow uploading" do
+          @member = create(:user, created_at: 2.weeks.ago, upload_points: 0)
+          create_list(:post, @member.upload_limit.upload_slots, uploader: @member, is_pending: true)
+
+          assert_no_difference("Post.count") do
+            file = Rack::Test::UploadedFile.new("#{Rails.root}/test/files/test.jpg", "image/jpeg")
+            post_auth uploads_path, @member, params: { upload: { file: file, tag_string: "aaa", rating: "q" }}
+          end
+
+          @upload = Upload.last
+          assert_redirected_to @upload
+          assert_match(/have reached your upload limit/, @upload.status)
         end
       end
 

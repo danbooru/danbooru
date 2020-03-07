@@ -12,9 +12,8 @@ div.list-of-messages {
     }
 
     div.author {
-      flex-basis: 12em;
+      width: 12em;
       margin-right: 1em;
-      min-width: 0;
 
       a.message-timestamp {
         font-style: italic;
@@ -40,6 +39,7 @@ div.list-of-messages {
 
       div.author {
         margin: 0 0 1em;
+        width: auto;
 
         h4 {
           display: inline;

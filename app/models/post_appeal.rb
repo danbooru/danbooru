@@ -8,24 +8,13 @@ class PostAppeal < ApplicationRecord
   validates_presence_of :reason
   validate :validate_post_is_inactive
   validate :validate_creator_is_not_limited
-  before_validation :initialize_creator, :on => :create
   validates_uniqueness_of :creator_id, :scope => :post_id, :message => "have already appealed this post"
 
-  api_attributes including: [:is_resolved]
+  scope :resolved, -> { where(post: Post.undeleted.unflagged) }
+  scope :unresolved, -> { where(post: Post.deleted.or(Post.flagged)) }
+  scope :recent, -> { where("post_appeals.created_at >= ?", 1.day.ago) }
 
   module SearchMethods
-    def resolved
-      joins(:post).where("posts.is_deleted = false and posts.is_flagged = false")
-    end
-
-    def unresolved
-      joins(:post).where("posts.is_deleted = true or posts.is_flagged = true")
-    end
-
-    def recent
-      where("created_at >= ?", 1.day.ago)
-    end
-
     def search(params)
       q = super
       q = q.search_attributes(params, :creator, :post, :reason)
@@ -60,11 +49,11 @@ class PostAppeal < ApplicationRecord
     end
   end
 
-  def initialize_creator
-    self.creator_id = CurrentUser.id
-  end
-
   def appeal_count_for_creator
     creator.post_appeals.recent.count
+  end
+
+  def self.available_includes
+    [:creator, :post]
   end
 end

@@ -36,7 +36,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     context "show action" do
       setup do
         # flesh out profile to get more test coverage of user presenter.
-        @user = create(:banned_user, can_approve_posts: true, is_super_voter: true)
+        @user = create(:banned_user, can_approve_posts: true, created_at: 2.weeks.ago)
         as_user do
           create(:saved_search, user: @user)
           create(:post, uploader: @user, tag_string: "fav:#{@user.name}")
@@ -71,7 +71,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         xml = Hash.from_xml(response.body)
 
         assert_response :success
-        assert_equal(false, xml["user"]["can_upload"])
+        assert_equal(false, xml["user"]["enable_safe_mode"])
       end
     end
 
@@ -92,7 +92,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "redirect anonymous users to the sign in page" do
         get profile_path
-        assert_redirected_to new_session_path
+        assert_redirected_to login_path(url: "/profile")
       end
 
       should "return 404 for anonymous api calls" do
@@ -150,7 +150,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "redirect anonymous users to the sign in page" do
         get settings_path
-        assert_redirected_to new_session_path
+        assert_redirected_to login_path(url: "/settings")
       end
     end
 

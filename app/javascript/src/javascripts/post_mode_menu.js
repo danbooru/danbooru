@@ -1,5 +1,4 @@
 import CurrentUser from './current_user'
-import Favorite from './favorites'
 import Post from './posts.js.erb'
 import Utility from './utility'
 
@@ -58,36 +57,21 @@ PostModeMenu.initialize_selector = function() {
 }
 
 PostModeMenu.initialize_preview_link = function() {
-  $(".post-preview a").on("click.danbooru", PostModeMenu.click);
+  $(document).on("click.danbooru", ".post-preview a", PostModeMenu.click);
 }
 
 PostModeMenu.initialize_edit_form = function() {
   $("#quick-edit-div").hide();
-  $("#quick-edit-form input[value=Cancel]").on("click.danbooru", function(e) {
+
+  $(document).on("click.danbooru", "#quick-edit-form button[name=cancel]", function(e) {
     PostModeMenu.close_edit_form();
     e.preventDefault();
   });
 
-  $("#quick-edit-form").on("submit.danbooru", function(e) {
-    $.ajax({
-      type: "put",
-      url: $("#quick-edit-form").attr("action"),
-      data: {
-        post: {
-          tag_string: $("#post_tag_string").val()
-        }
-      },
-      complete: function() {
-        $.rails.enableFormElements($("#quick-edit-form"));
-      },
-      success: function(data) {
-        Post.update_data(data);
-        Utility.notice("Post #" + data.id + " updated");
-        PostModeMenu.close_edit_form();
-      }
-    });
-
+  $(document).on("click.danbooru", "#quick-edit-form input[type=submit]", async function(e) {
     e.preventDefault();
+    let post_id = $("#quick-edit-form").data("post-id");
+    await Post.update(post_id, "quick-edit", { post: { tag_string: $("#post_tag_string").val() }});
   });
 }
 
@@ -141,7 +125,7 @@ PostModeMenu.change = function() {
 PostModeMenu.open_edit = function(post_id) {
   var $post = $("#post_" + post_id);
   $("#quick-edit-div").slideDown("fast");
-  $("#quick-edit-form").attr("action", "/posts/" + post_id + ".json");
+  $("#quick-edit-form").attr("data-post-id", post_id);
   $("#post_tag_string").val($post.data("tags") + " ").focus().selectEnd();
 
   /* Set height of tag edit box to fit content. */
@@ -156,23 +140,15 @@ PostModeMenu.click = function(e) {
   var post_id = $(e.target).closest("article").data("id");
 
   if (s === "add-fav") {
-    Favorite.create(post_id);
+    Post.tag(post_id, "fav:me");
   } else if (s === "remove-fav") {
-    Favorite.destroy(post_id);
+    Post.tag(post_id, "-fav:me");
   } else if (s === "edit") {
     PostModeMenu.open_edit(post_id);
   } else if (s === 'vote-down') {
-    Post.vote("down", post_id);
+    Post.tag(post_id, "downvote:me");
   } else if (s === 'vote-up') {
-    Post.vote("up", post_id);
-  } else if (s === 'lock-rating') {
-    Post.update(post_id, {"post[is_rating_locked]": "1"});
-  } else if (s === 'lock-note') {
-    Post.update(post_id, {"post[is_note_locked]": "1"});
-  } else if (s === 'approve') {
-    Post.approve(post_id);
-  } else if (s === 'ban') {
-    Post.ban(post_id);
+    Post.tag(post_id, "upvote:me");
   } else if (s === "tag-script") {
     var current_script_id = localStorage.getItem("current_tag_script_id");
     var tag_script = localStorage.getItem("tag-script-" + current_script_id);

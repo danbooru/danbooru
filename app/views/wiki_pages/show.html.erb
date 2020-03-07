@@ -1,8 +1,12 @@
+<% page_title "#{@wiki_page.pretty_title.titleize} Wiki" %>
+<% meta_description DText.excerpt(@wiki_page.body) %>
+
+<%= render "secondary_links" %>
 <%= render "sidebar" %>
 
 <% content_for(:content) do %>
   <h1 id="wiki-page-title">
-    <%= link_to @wiki_page.pretty_title, posts_path(:tags => @wiki_page.title), :class => "tag-type-#{@wiki_page.category_name}" %>
+    <%= link_to @wiki_page.pretty_title, posts_path(tags: @wiki_page.title), class: tag_class(@wiki_page.tag) %>
 
     <% if @wiki_page.is_locked? %>
       (locked)
@@ -14,36 +18,22 @@
   </h1>
 
   <div id="wiki-page-body" class="prose">
-    <% if @wiki_page.visible? %>
-      <% if @wiki_page.other_names.present? %>
-        <p><%= wiki_page_other_names_list(@wiki_page) %></p>
-      <% end %>
-
-      <% if @wiki_page.new_record? %>
-        <p>This wiki page does not exist. <%= link_to "Create new wiki page", new_wiki_page_path(wiki_page: { title: @wiki_page.title }) %>.</p>
-      <% else %>
-        <%= format_text(@wiki_page.body) %>
-      <% end %>
-
-      <% if @wiki_page.artist %>
-        <p><%= link_to "View artist", @wiki_page.artist %></p>
-      <% end %>
-
-      <%= render "tag_relationships/alias_and_implication_list", tag: @wiki_page.tag %>
-    <% else %>
-      <p>This artist has requested removal of their information.</p>
+    <% if @wiki_page.other_names.present? %>
+      <p><%= wiki_page_other_names_list(@wiki_page) %></p>
     <% end %>
+
+    <% if @wiki_page.new_record? %>
+      <p>This wiki page does not exist. <%= link_to "Create new wiki page", new_wiki_page_path(wiki_page: { title: @wiki_page.title }) %>.</p>
+    <% else %>
+      <%= format_text(@wiki_page.body) %>
+    <% end %>
+
+    <% if @wiki_page.artist %>
+      <p><%= link_to "View artist", @wiki_page.artist %></p>
+    <% end %>
+
+    <%= render "tag_relationships/alias_and_implication_list", tag: @wiki_page.tag %>
   </div>
 
   <%= render "wiki_pages/posts", wiki_page: @wiki_page %>
 <% end %>
-
-<% content_for(:page_title) do %>
-  Wiki - <%= @wiki_page.pretty_title %> - <%= Danbooru.config.app_name %>
-<% end %>
-
-<% content_for(:html_header) do %>
-  <%= tag.meta name: "description", content: wiki_page_excerpt(@wiki_page) %>
-<% end %>
-
-<%= render "secondary_links" %>

@@ -2,37 +2,40 @@
 <ul>
   <li><strong>Status</strong> <%= artist.status %></li>
 
-  <% if !artist.is_banned? || CurrentUser.is_member? %>
-    <% if artist.other_names.present? %>
-      <li><strong>Other Names</strong> <%= link_to_artists(artist.other_names) %></li>
-    <% end %>
-    <% if artist.group_name.present? %>
-      <li><strong>Group</strong> <%= link_to_artist(artist.group_name) %></li>
-    <% end %>
-    <% if artist.members.present? %>
-      <li><strong>Members</strong> <%= link_to_artists(artist.members.map(&:name)) %></li>
-    <% end %>
-    <% if artist.domains.any? %>
-      <li><strong>Domains</strong></li>
-      <ul class="list-bulleted">
-        <% artist.domains.each do |url, count| %>
-          <li><%= url %>: <%= count %></li>
-        <% end %>
-      </ul>
-    <% end %>
-    <% if artist.urls.present? %>
-      <li><strong>URLs</strong></li>
-      <ul>
-        <% artist.urls.each do |url| %>
-          <li>
-            <% if url.is_active? %>
-              <%= link_to h(url.to_s), h(url) %>
-            <% else %>
-              <del><%= h(url.url) %></del>
-            <% end %>
-          </li>
-        <% end %>
-      </ul>
-    <% end %>
+  <% if artist.other_names.present? %>
+    <li>
+      <strong>Other Names</strong>
+      <% artist.other_names.map do |other_name| %>
+        <%= link_to other_name, artists_path(search: { any_name_matches: other_name }), class: "artist-other-name" %>
+      <% end %>
+    </li>
+  <% end %>
+  <% if artist.group_name.present? %>
+    <li>
+      <strong>Group</strong>
+      <%= link_to artist.group_name, artists_path(search: { group_name: artist.group_name }) %>
+    </li>
+  <% end %>
+  <% if artist.members.present? %>
+    <li>
+      <strong>Members</strong>
+      <% artist.members.each do |member| %>
+        <%= link_to member.name, artists_path(search: { name: member.name }) %>
+      <% end %>
+    </li>
+  <% end %>
+  <% if artist.urls.present? %>
+    <li><strong>URLs</strong></li>
+    <ul class="list-bulleted">
+      <% artist.urls.each do |url| %>
+        <li>
+          <% if url.is_active? %>
+            <%= link_to h(url.to_s), h(url) %>
+          <% else %>
+            <del><%= h(url.url) %></del>
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
   <% end %>
 </ul>

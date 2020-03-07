@@ -1,13 +1,21 @@
 <% content_for(:layout) do %>
   <div id="c-<%= params[:controller].parameterize.dasherize %>">
-    <div id="a-<%= params[:action].parameterize.dasherize %>" class="sidebar-container">
-      <aside id="sidebar">
-        <%= yield :sidebar %>
-      </aside>
+    <div id="a-<%= params[:action].parameterize.dasherize %>">
+      <% if content_for(:top_content).present? %>
+        <section id="top-content">
+          <%= yield :top_content %>
+        </section>
+      <% end %>
 
-      <section id="content">
-        <%= yield :content %>
-      </section>
+      <div class="sidebar-container">
+        <aside id="sidebar">
+          <%= yield :sidebar %>
+        </aside>
+
+        <section id="content">
+          <%= yield :content %>
+        </section>
+      </div>
     </div>
   </div>
 <% end %>

@@ -22,6 +22,39 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  private
+
+  def respond_with(subject, *options, &block)
+    if params[:action] == "index" && is_redirect?(subject)
+      redirect_to_show(subject)
+      return
+    end
+
+    if subject.respond_to?(:includes) && (request.format.json? || request.format.xml?)
+      associations = ParameterBuilder.includes_parameters(params[:only], model_name)
+      subject = subject.includes(associations)
+    end
+
+    @current_item = subject
+    super
+  end
+
+  def model_name
+    controller_name.classify
+  end
+
+  def redirect_to_show(items)
+    redirect_to send("#{controller_path.singularize}_path", items.first, format: request.format.symbol)
+  end
+
+  def is_redirect?(items)
+    action_methods.include?("show") && params[:redirect].to_s.truthy? && items.one? && item_matches_params(items.first)
+  end
+
+  def item_matches_params(*)
+    true
+  end
+
   protected
 
   def enable_cors
@@ -121,11 +154,15 @@ class ApplicationController < ActionController::Base
     render_error_page(status, error)
   end
 
+  def role_only!(role)
+    raise User::PrivilegeError if !CurrentUser.send("is_#{role}?")
+    raise User::PrivilegeError if !request.get? && CurrentUser.user.is_banned?
+    raise User::PrivilegeError if !request.get? && IpBan.is_banned?(CurrentUser.ip_addr)
+  end
+
   User::Roles.each do |role|
     define_method("#{role}_only") do
-      if !CurrentUser.user.send("is_#{role}?") || CurrentUser.user.is_banned? || IpBan.is_banned?(CurrentUser.ip_addr)
-        raise User::PrivilegeError
-      end
+      role_only!(role)
     end
   end
 

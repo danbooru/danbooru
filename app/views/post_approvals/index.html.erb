@@ -10,10 +10,10 @@
     <% end %>
 
     <%= table_for @post_approvals, width: "100%" do |t| %>
-      <% t.column "Post", {width: "1%"} do |post_approval| %>
-        <%= PostPresenter.preview(post_approval.post, :tags => "status:any") %>
+      <% t.column "Post", width: "1%" do |post_approval| %>
+        <%= PostPresenter.preview(post_approval.post, show_deleted: true) %>
       <% end %>
-      <% t.column "Approver", {width: "15%"} do |post_approval| %>
+      <% t.column "Approver", width: "15%" do |post_approval| %>
         <%= link_to_user post_approval.user %>
         <%= link_to "»", post_approvals_path(search: params[:search].merge(user_name: post_approval.user.name)) %>
         <br><%= time_ago_in_words_tagged  post_approval.created_at %>

@@ -29,7 +29,7 @@ module Danbooru
     config.filter_parameters += [:password, :password_confirmation, :password_hash, :api_key]
     # config.assets.enabled = true
     # config.assets.version = '1.0'
-    config.autoload_paths += %W(#{config.root}/app/presenters #{config.root}/app/logical #{config.root}/app/mailers)
+    config.autoload_paths += %W(#{config.root}/app/presenters #{config.root}/app/logical/concerns #{config.root}/app/logical #{config.root}/app/mailers)
     config.plugins = [:all]
     config.time_zone = 'Berlin'
 

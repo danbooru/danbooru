@@ -3,9 +3,9 @@ import CurrentUser from './current_user'
 let Autocomplete = {};
 
 /* eslint-disable */
-Autocomplete.METATAGS = <%= Tag::METATAGS.to_json.html_safe %>;
+Autocomplete.METATAGS = <%= PostQueryBuilder::METATAGS.to_json.html_safe %>;
 Autocomplete.TAG_CATEGORIES = <%= TagCategory.mapping.to_json.html_safe %>;
-Autocomplete.ORDER_METATAGS = <%= Tag::ORDER_METATAGS.to_json.html_safe %>;
+Autocomplete.ORDER_METATAGS = <%= PostQueryBuilder::ORDER_METATAGS.to_json.html_safe %>;
 /* eslint-enable */
 
 Autocomplete.TAG_PREFIXES = "-|~|" + Object.keys(Autocomplete.TAG_CATEGORIES).map(category => category + ":").join("|");
@@ -42,6 +42,7 @@ Autocomplete.initialize_all = function() {
     this.initialize_fields($('[data-autocomplete="pool"]'), Autocomplete.pool_source);
     this.initialize_fields($('[data-autocomplete="user"]'), Autocomplete.user_source);
     this.initialize_fields($('[data-autocomplete="wiki-page"]'), Autocomplete.wiki_source);
+    this.initialize_fields($('[data-autocomplete="favorite-group"]'), Autocomplete.favorite_group_source);
     this.initialize_fields($('[data-autocomplete="saved-search-label"]'), Autocomplete.saved_search_source);
   }
 }
@@ -116,7 +117,8 @@ Autocomplete.initialize_tag_autocomplete = function() {
       case "child":
       case "parent":
       case "filetype":
-      case "disapproval":
+      case "disapproved":
+      case "embedded":
         results = Autocomplete.static_metatag_source(term, metatag);
         break;
       case "user":
@@ -139,7 +141,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
         results = await Autocomplete.pool_source(term, metatag + ":");
         break;
       case "favgroup":
-        results = await Autocomplete.favorite_group_source(term, metatag + ":");
+        results = await Autocomplete.favorite_group_source(term, metatag + ":", CurrentUser.data("id"));
         break;
       case "search":
         results = await Autocomplete.saved_search_source(term, metatag + ":");
@@ -175,8 +177,9 @@ Autocomplete.parse_query = function(text, caret) {
 // Update the input field with the item currently focused in the
 // autocomplete menu, then position the caret just after the inserted completion.
 Autocomplete.insert_completion = function(input, completion) {
-  var before_caret_text = input.value.substring(0, input.selectionStart).trim();
-  var after_caret_text = input.value.substring(input.selectionStart).trim();
+  // Trim all whitespace (tabs, spaces) except for line returns
+  var before_caret_text = input.value.substring(0, input.selectionStart).replace(/^[ \t]+|[ \t]+$/gm, "");
+  var after_caret_text = input.value.substring(input.selectionStart).replace(/^[ \t]+|[ \t]+$/gm, "");
 
   var regexp = new RegExp("(" + Autocomplete.TAG_PREFIXES + ")?\\S+$", "g");
   before_caret_text = before_caret_text.replace(regexp, "$1") + completion + " ";
@@ -271,6 +274,9 @@ Autocomplete.static_metatags = {
   locked: [
     "rating", "note", "status"
   ],
+  embedded: [
+    "true", "false"
+  ],
   child: [
     "any", "none"
   ],
@@ -280,8 +286,8 @@ Autocomplete.static_metatags = {
   filetype: [
     "jpg", "png", "gif", "swf", "zip", "webm", "mp4"
   ],
-  disapproval: [
-    "any", "none", "disinterest", "poor_quality", "breaks_rules"
+  disapproved: [
+    "disinterest", "poor_quality", "breaks_rules"
   ]
 }
 
@@ -322,7 +328,7 @@ Autocomplete.tag_source = async function(term) {
 Autocomplete.artist_source = async function(term) {
   let artists = await $.getJSON("/artists", {
     "search[name_like]": term.trim().replace(/\s+/g, "_") + "*",
-    "search[is_active]": true,
+    "search[is_deleted]": false,
     "search[order]": "post_count",
     "limit": Autocomplete.MAX_RESULTS,
     "expiry": 7
@@ -340,7 +346,7 @@ Autocomplete.artist_source = async function(term) {
 
 Autocomplete.wiki_source = async function(term) {
   let wiki_pages = await $.getJSON("/wiki_pages", {
-    "search[title]": term + "*",
+    "search[title_normalize]": term + "*",
     "search[hide_deleted]": "Yes",
     "search[order]": "post_count",
     "limit": Autocomplete.MAX_RESULTS,
@@ -394,8 +400,9 @@ Autocomplete.pool_source = async function(term, prefix = "") {
   });
 };
 
-Autocomplete.favorite_group_source = async function(term, prefix = "") {
+Autocomplete.favorite_group_source = async function(term, prefix = "", creator_id = null) {
   let favgroups = await $.getJSON("/favorite_groups", {
+    "search[creator_id]": creator_id,
     "search[name_matches]": term,
     "limit": Autocomplete.MAX_RESULTS
   });

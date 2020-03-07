@@ -4,9 +4,7 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
   context "The favorite groups controller" do
     setup do
       @user = create(:user)
-      as_user do
-        @favgroup = create(:favorite_group)
-      end
+      @favgroup = create(:favorite_group, creator: @user)
     end
 
     context "index action" do
@@ -33,7 +31,7 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "render" do
         post_auth favorite_groups_path, @user, params: { favorite_group: FactoryBot.attributes_for(:favorite_group) }
-        assert_redirected_to favorite_groups_path
+        assert_redirected_to favorite_group_path(FavoriteGroup.last)
       end
     end
 
@@ -47,11 +45,11 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
     context "update action" do
       should "update posts" do
         @posts = create_list(:post, 2)
-        put_auth favorite_group_path(@favgroup), @user, params: { favorite_group: { name: "foo", post_id_array: @posts.map(&:id) } }
+        put_auth favorite_group_path(@favgroup), @user, params: { favorite_group: { name: "foo", post_ids: @posts.map(&:id).join(" ") } }
 
         assert_redirected_to @favgroup
         assert_equal("foo", @favgroup.reload.name)
-        assert_equal(@posts.map(&:id), @favgroup.post_id_array)
+        assert_equal(@posts.map(&:id), @favgroup.post_ids)
       end
     end
 
@@ -71,7 +69,7 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
         put_auth add_post_favorite_group_path(@favgroup), @user, params: {post_id: @post.id, format: "js"}
         assert_response :success
         @favgroup.reload
-        assert_equal([@post.id], @favgroup.post_id_array)
+        assert_equal([@post.id], @favgroup.post_ids)
       end
     end
   end

@@ -7,12 +7,6 @@ class TagBatchChangeJobTest < ActiveJob::TestCase
       @post = create(:post, :tag_string => "aaa")
     end
 
-    context "#estimate_update_count" do
-      should "find the correct count" do
-        assert_equal(1, TagBatchChangeJob.estimate_update_count("aaa", "bbb"))
-      end
-    end
-
     should "execute" do
       TagBatchChangeJob.perform_now("aaa", "bbb", @user, "127.0.0.1")
       assert_equal("bbb", @post.reload.tag_string)

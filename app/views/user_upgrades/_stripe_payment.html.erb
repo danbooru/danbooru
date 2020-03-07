@@ -8,14 +8,3 @@
     <%= stripe_button("Upgrade Gold to Platinum", UserUpgrade.upgrade_price, user) %>
   <% end %>
 </div>
-
-<% content_for(:html_header) do %>
-  <script>
-    $(function() {
-      $(".stripe").submit(function(e) {
-        window._paq = window._paq || [];
-        window._paq.push(['trackEvent', 'accounts', 'clickedAccountUpgrade']);
-      });
-    });
-  </script>
-<% end %>

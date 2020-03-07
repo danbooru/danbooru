@@ -1,4 +1,4 @@
-<%# locals: comment, context, dtext_data %>
+<%# locals: comment, context, dtext_data, moderation_reports %>
 
 <% if CurrentUser.is_moderator? || (params[:search] && params[:search][:is_deleted] =~ /t/) || !comment.is_deleted? %>
   <a name="comment-<%= comment.id %>"></a>
@@ -12,6 +12,9 @@
            data-is-deleted="<%= comment.is_deleted? %>"
            data-is-sticky="<%= comment.is_sticky? %>"
            data-below-threshold="<%= comment.score < CurrentUser.user.comment_threshold %>"
+           <% if CurrentUser.is_moderator? %>
+            data-is-reported="<%= moderation_reports.pluck(:model_id).include?(comment.id) %>"
+           <% end %>
            data-is-voted="<%= comment.voted_by?(CurrentUser.user) %>">
     <div class="author">
       <h4>
@@ -53,6 +56,9 @@
           <li class="comment-unvote-link">
             <%= link_to "Unvote", comment_comment_votes_path(comment_id: comment.id), method: :delete, remote: true %>
           </li>
+          <% if comment.reportable_by?(CurrentUser.user) %>
+            <li><%= link_to "Report", new_moderation_report_path(moderation_report: { model_type: "Comment", model_id: comment.id }), remote: true %></li>
+          <% end %>
         </menu>
         <% if comment.editable_by?(CurrentUser.user) %>
           <%= render "comments/form", comment: comment, hidden: true %>

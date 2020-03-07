@@ -22,7 +22,7 @@ class ForumUpdater
   end
 
   def create_response(body)
-    forum_topic.posts.create(body: body, skip_mention_notifications: true)
+    forum_topic.posts.create(body: body, skip_mention_notifications: true, creator: User.system)
   end
 
   def update_title(title_tag)

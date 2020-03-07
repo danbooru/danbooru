@@ -6,9 +6,9 @@
     <%= render "posts/partials/common/inline_blacklist" %>
 
     <ul id="sortable">
-      <% @favorite_group.posts(:limit => 1_000).each do |post| %>
-        <li class="ui-state-default" id="favorite_group[post_id_array]_<%= post.id %>">
-          <%= PostPresenter.preview(post).presence || "Hidden: Post ##{post.id}" %>
+      <% @favorite_group.posts.limit(1_000).each do |post| %>
+        <li class="ui-state-default" id="favorite_group[post_ids]_<%= post.id %>">
+          <%= PostPresenter.preview(post, show_deleted: true).presence || "Hidden: Post ##{post.id}" %>
         </li>
       <% end %>
     </ul>
@@ -20,7 +20,3 @@
 </div>
 
 <%= render "favorite_groups/secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Order Favorite Group - <%= Danbooru.config.app_name %>
-<% end %>

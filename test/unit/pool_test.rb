@@ -10,7 +10,7 @@ class PoolTest < ActiveSupport::TestCase
     CurrentUser.ip_addr = "127.0.0.1"
 
     mock_pool_archive_service!
-    PoolArchive.sqs_service.stubs(:merge?).returns(false)
+    PoolVersion.sqs_service.stubs(:merge?).returns(false)
     start_pool_archive_transaction
   end
 
@@ -18,36 +18,6 @@ class PoolTest < ActiveSupport::TestCase
     rollback_pool_archive_transaction
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
-  end
-
-  context "A name" do
-    setup do
-      @pool = FactoryBot.create(:pool, :name => "xxx")
-    end
-
-    should "be mapped to a pool id" do
-      assert_equal(@pool.id, Pool.name_to_id("xxx"))
-    end
-  end
-
-  context "A multibyte character name" do
-    setup do
-      @mb_pool = FactoryBot.create(:pool, :name => "àáâãäå")
-    end
-
-    should "be mapped to a pool id" do
-      assert_equal(@mb_pool.id, Pool.name_to_id("àáâãäå"))
-    end
-  end
-
-  context "An id number" do
-    setup do
-      @pool = FactoryBot.create(:pool)
-    end
-
-    should "be mapped to a pool id" do
-      assert_equal(@pool.id, Pool.name_to_id(@pool.id.to_s))
-    end
   end
 
   context "Searching pools" do
@@ -114,7 +84,7 @@ class PoolTest < ActiveSupport::TestCase
 
   context "Reverting a pool" do
     setup do
-      PoolArchive.stubs(:enabled?).returns(true)
+      PoolVersion.stubs(:enabled?).returns(true)
 
       @pool = FactoryBot.create(:pool)
       @p1 = FactoryBot.create(:post)

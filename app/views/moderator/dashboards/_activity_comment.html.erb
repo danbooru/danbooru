@@ -2,7 +2,8 @@
   <caption>Comment Activity</caption>
   <thead>
     <tr>
-      <th>Comment</th>
+      <th>ID</th>
+      <th>Body</th>
       <th>User</th>
       <th>Votes</th>
       <th>Score</th>
@@ -11,11 +12,14 @@
   <tbody>
     <% @dashboard.comments.each do |activity| %>
       <tr>
+        <td><%= link_to activity.comment.dtext_shortlink, activity.comment %></td>
         <td>
-          <%= link_to activity.comment.body, post_path(activity.comment.post_id) %>
-          <% if activity.comment.is_deleted? %>
-            <span class="inactive">(deleted)</span>
-          <% end %>
+          <div class="prose">
+            <%= format_text(activity.comment.body) %>
+            <% if activity.comment.is_deleted? %>
+              <span class="inactive">(deleted)</span>
+            <% end %>
+          </div>
         </td>
         <td><%= mod_link_to_user(activity.comment.creator, :negative) %></td>
         <td><%= activity.count %></td>

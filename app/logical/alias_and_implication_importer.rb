@@ -58,13 +58,13 @@ class AliasAndImplicationImporter
     tokens.map do |token|
       case token[0]
       when :create_alias
-        tag_alias = TagAlias.new(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2], :skip_secondary_validations => skip_secondary_validations)
+        tag_alias = TagAlias.new(creator: User.system, forum_topic_id: forum_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
         unless tag_alias.valid?
           raise Error, "Error: #{tag_alias.errors.full_messages.join("; ")} (create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name})"
         end
 
       when :create_implication
-        tag_implication = TagImplication.new(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2], :skip_secondary_validations => skip_secondary_validations)
+        tag_implication = TagImplication.new(creator: User.system, forum_topic_id: forum_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
         unless tag_implication.valid?
           raise Error, "Error: #{tag_implication.errors.full_messages.join("; ")} (create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name})"
         end
@@ -78,24 +78,6 @@ class AliasAndImplicationImporter
     end
   end
 
-  def estimate_update_count
-    tokens = self.class.tokenize(text)
-    tokens.map do |token|
-      case token[0]
-      when :create_alias
-        TagAlias.new(antecedent_name: token[1], consequent_name: token[2]).estimate_update_count
-      when :create_implication
-        TagImplication.new(antecedent_name: token[1], consequent_name: token[2]).estimate_update_count
-      when :mass_update
-        TagBatchChangeJob.estimate_update_count(token[1], token[2])
-      when :change_category
-        Tag.find_by_name(token[1]).try(:post_count) || 0
-      else
-        0
-      end
-    end.sum
-  end
-
   def affected_tags
     tokens = self.class.tokenize(text)
     tokens.inject([]) do |all, token|
@@ -106,8 +88,8 @@ class AliasAndImplicationImporter
         all
 
       when :mass_update
-        all += Tag.scan_tags(token[1])
-        all += Tag.scan_tags(token[2])
+        all += PostQueryBuilder.scan_query(token[1])
+        all += PostQueryBuilder.scan_query(token[2])
         all
 
       when :change_category
@@ -127,7 +109,7 @@ class AliasAndImplicationImporter
       tokens.map do |token|
         case token[0]
         when :create_alias
-          tag_alias = TagAlias.create(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2], :skip_secondary_validations => skip_secondary_validations)
+          tag_alias = TagAlias.create(creator: approver, forum_topic_id: forum_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
           unless tag_alias.valid?
             raise Error, "Error: #{tag_alias.errors.full_messages.join("; ")} (create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name})"
           end
@@ -135,7 +117,7 @@ class AliasAndImplicationImporter
           tag_alias.approve!(approver: approver, update_topic: false)
 
         when :create_implication
-          tag_implication = TagImplication.create(:forum_topic_id => forum_id, :status => "pending", :antecedent_name => token[1], :consequent_name => token[2], :skip_secondary_validations => skip_secondary_validations)
+          tag_implication = TagImplication.create(creator: approver, forum_topic_id: forum_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
           unless tag_implication.valid?
             raise Error, "Error: #{tag_implication.errors.full_messages.join("; ")} (create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name})"
           end

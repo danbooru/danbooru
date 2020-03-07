@@ -19,12 +19,8 @@ module PostSets
       end
 
       context "a set for page 2" do
-        setup do
-          @set = PostSets::Post.new("", 2)
-          ::Post.stubs(:records_per_page).returns(1)
-        end
-
         should "return the second element" do
+          @set = PostSets::Post.new("", 2, 1)
           assert_equal(@post_2.id, @set.posts.first.id)
         end
       end

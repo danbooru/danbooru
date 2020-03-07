@@ -76,6 +76,7 @@ module Sources
 
       should "get the urls" do
         assert_equal("https://pbs.twimg.com/media/B7jfc1JCcAEyeJh.png:orig", @site.image_url)
+        assert_equal("https://pbs.twimg.com/media/B7jfc1JCcAEyeJh.png:small", @site.preview_url)
         assert_equal("https://twitter.com/Strangestone/status/556440271961858051", @site.page_url)
         assert_equal("https://twitter.com/Strangestone/status/556440271961858051", @site.canonical_url)
       end
@@ -108,8 +109,9 @@ module Sources
         assert_equal("nounproject", @site.artist_name)
       end
 
-      should "get the image url" do
+      should "get the image urls" do
         assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig", @site.image_url)
+        assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:small", @site.preview_url)
       end
 
       should "get the canonical url" do
@@ -136,12 +138,10 @@ module Sources
         @site = Sources::Strategies.find("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:large", "https://twitter.com/nounproject/status/540944400767922176")
       end
 
-      should "get the artist name" do
+      should "get the source data" do
         assert_equal("nounproject", @site.artist_name)
-      end
-
-      should "get the image url" do
         assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig", @site.image_url)
+        assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:small", @site.preview_url)
       end
     end
 
@@ -153,6 +153,8 @@ module Sources
       should "work" do
         assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig", @site.image_url)
         assert_equal(["https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"], @site.image_urls)
+        assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:small", @site.preview_url)
+        assert_equal(["https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:small"], @site.preview_urls)
         assert(@site.artist_name.blank?)
         assert(@site.profile_url.blank?)
         assert(@site.artists.empty?)
@@ -171,6 +173,8 @@ module Sources
       should "work" do
         assert_equal("https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:orig", @site.image_url)
         assert_equal(["https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:orig"], @site.image_urls)
+        assert_equal("https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:small", @site.preview_url)
+        assert_equal(["https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:small"], @site.preview_urls)
         assert_equal("https://pbs.twimg.com/media/EBGp2YdUYAA19Uj.jpg:orig", @site.canonical_url)
       end
 

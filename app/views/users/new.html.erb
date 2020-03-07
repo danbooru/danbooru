@@ -1,3 +1,8 @@
+<% page_title "Sign up" %>
+<% meta_description "Create a new account for free on #{Danbooru.config.app_name}." %>
+
+<%= render "secondary_links" %>
+
 <div id="c-users">
   <div id="a-new" class="fixed-width-container">
     <h1>Sign Up</h1>
@@ -23,9 +28,3 @@
     </div>
   </div>
 </div>
-
-<%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Sign up - <%= Danbooru.config.app_name %>
-<% end %>

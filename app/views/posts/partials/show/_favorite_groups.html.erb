@@ -1,25 +1,34 @@
 <div id="favgroup-nav">
   <ul>
-    <% post.favorite_groups(active_id=params[:favgroup_id]).each do |favgroup| %>
-      <li>
-        <% klass = "active" if favgroup.id == params[:favgroup_id].to_i %>
+    <% favgroups = favgroups.sort_by { |favgroup| [(favgroup.id == params[:favgroup_id].to_i) ? 0 : 1, favgroup.name] } %>
+    <% favgroups.each do |favgroup| %>
+      <% selected = favgroup.id == params[:favgroup_id].to_i %>
 
-        <% if favgroup.neighbors(post).previous %>
-          <%= link_to("&lsaquo;&thinsp;prev".html_safe, post_path(favgroup.neighbors(post).previous, :favgroup_id => favgroup.id), :rel => "prev", :class => "prev #{klass}") %>
-        <% else %>
-          <span class="prev">&lsaquo;&thinsp;prev</span>
-        <% end %>
-
-        <span class="favgroup-name <%= klass %>">
-          <%= link_to("Favorite group: #{favgroup.pretty_name}", favorite_group_path(favgroup)) %>
+      <%= tag.li id: "nav-link-for-favgroup-#{favgroup.id}", "data-selected": selected do %>
+        <span class="first">
+          <%= link_to_unless favgroup.first_post?(post.id), "«", post_path(favgroup.post_ids.first, favgroup_id: favgroup.id) %>
         </span>
 
-        <% if favgroup.neighbors(post).next %>
-          <%= link_to("next&thinsp;&rsaquo;".html_safe, post_path(favgroup.neighbors(post).next, :favgroup_id => favgroup.id), :rel => "next", :class => "next #{klass}") %>
-        <% else %>
-          <span class="next">next&thinsp;&rsaquo;</span>
+        <% favgroup.previous_post_id(post.id).tap do |previous_post_id| %>
+          <span class="prev">
+            <%= link_to_if previous_post_id, "‹ prev", post_path(previous_post_id.to_i, favgroup_id: favgroup.id), rel: ("prev" if selected) %>
+          </span>
         <% end %>
-      </li>
+
+        <span class="favgroup-name">
+          <%= link_to "Favorite group: #{favgroup.pretty_name}", favgroup %>
+        </span>
+
+        <% favgroup.next_post_id(post.id).tap do |next_post_id| %>
+          <span class="next">
+            <%= link_to_if next_post_id, "next ›", post_path(next_post_id.to_i, favgroup_id: favgroup.id), rel: ("next" if selected) %>
+          </span>
+        <% end %>
+
+        <span class="last">
+          <%= link_to_unless favgroup.last_post?(post.id), "»", post_path(favgroup.post_ids.last, favgroup_id: favgroup.id) %>
+        </span>
+      <% end %>
     <% end %>
   </ul>
 </div>

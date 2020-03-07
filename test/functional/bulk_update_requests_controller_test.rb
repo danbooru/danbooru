@@ -5,6 +5,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
     setup do
       @user = create(:user)
       @admin = create(:admin_user)
+      @bulk_update_request = create(:bulk_update_request, user: @user)
     end
 
     context "#new" do
@@ -23,12 +24,6 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "#update" do
-      setup do
-        as_user do
-          @bulk_update_request = create(:bulk_update_request)
-        end
-      end
-
       should "still handle enabled secondary validations correctly" do
         put_auth bulk_update_request_path(@bulk_update_request.id), @user, params: {bulk_update_request: {script: "create alias zzz -> 222", skip_secondary_validations: "0"}}
         @bulk_update_request.reload
@@ -43,12 +38,6 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "#index" do
-      setup do
-        as_user do
-          @bulk_update_request = create(:bulk_update_request)
-        end
-      end
-
       should "render" do
         get bulk_update_requests_path
         assert_response :success
@@ -56,12 +45,6 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "#destroy" do
-      setup do
-        as_user do
-          @bulk_update_request = create(:bulk_update_request)
-        end
-      end
-
       context "for the creator" do
         should "succeed" do
           delete_auth bulk_update_request_path(@bulk_update_request), @user
@@ -92,12 +75,6 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "#approve" do
-      setup do
-        as_user do
-          @bulk_update_request = create(:bulk_update_request)
-        end
-      end
-
       context "for a member" do
         should "fail" do
           post_auth approve_bulk_update_request_path(@bulk_update_request), @user

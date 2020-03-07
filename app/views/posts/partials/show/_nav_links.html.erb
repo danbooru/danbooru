@@ -5,11 +5,11 @@
     <% end %>
 
     <% if post.pools.undeleted.present? %>
-      <%= render "posts/partials/show/pool_list", post: post, pools: post.pools.undeleted.selected_first(params[:pool_id]) %>
+      <%= render "posts/partials/show/pool_list", post: post, pools: post.pools.undeleted %>
     <% end %>
 
-    <% if post.favorite_groups(active_id=params[:favgroup_id]).any? %>
-      <%= render "posts/partials/show/favorite_groups", :post => post %>
+    <% if CurrentUser.user.favorite_groups.for_post(post.id).present? %>
+      <%= render "posts/partials/show/favorite_groups", post: post, favgroups: CurrentUser.user.favorite_groups.for_post(post.id).order(name: :asc) %>
     <% end %>
   </div>
 <% end %>

@@ -594,8 +594,7 @@ ALTER SEQUENCE public.artist_versions_id_seq OWNED BY public.artist_versions.id;
 CREATE TABLE public.artists (
     id integer NOT NULL,
     name character varying NOT NULL,
-    creator_id integer NOT NULL,
-    is_active boolean DEFAULT true NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL,
     is_banned boolean DEFAULT false NOT NULL,
     other_names text[] DEFAULT '{}'::text[] NOT NULL,
     group_name character varying DEFAULT ''::character varying NOT NULL,
@@ -808,38 +807,6 @@ ALTER SEQUENCE public.delayed_jobs_id_seq OWNED BY public.delayed_jobs.id;
 
 
 --
--- Name: dmail_filters; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.dmail_filters (
-    id integer NOT NULL,
-    user_id integer NOT NULL,
-    words text NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: dmail_filters_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.dmail_filters_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: dmail_filters_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.dmail_filters_id_seq OWNED BY public.dmail_filters.id;
-
-
---
 -- Name: dmails; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -921,11 +888,10 @@ CREATE TABLE public.favorite_groups (
     id integer NOT NULL,
     name text NOT NULL,
     creator_id integer NOT NULL,
-    post_ids text DEFAULT ''::text NOT NULL,
-    post_count integer DEFAULT 0 NOT NULL,
+    post_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    is_public boolean DEFAULT false NOT NULL
+    is_public boolean DEFAULT true NOT NULL
 );
 
 
@@ -2048,38 +2014,6 @@ ALTER SEQUENCE public.forum_posts_id_seq OWNED BY public.forum_posts.id;
 
 
 --
--- Name: forum_subscriptions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.forum_subscriptions (
-    id integer NOT NULL,
-    user_id integer,
-    forum_topic_id integer,
-    last_read_at timestamp without time zone,
-    delete_key character varying
-);
-
-
---
--- Name: forum_subscriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.forum_subscriptions_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: forum_subscriptions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.forum_subscriptions_id_seq OWNED BY public.forum_subscriptions.id;
-
-
---
 -- Name: forum_topic_visits; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2257,7 +2191,8 @@ furry -rating:s'::text,
     bit_prefs bigint DEFAULT 0 NOT NULL,
     last_ip_addr inet,
     unread_dmail_count integer DEFAULT 0 NOT NULL,
-    theme integer DEFAULT 0 NOT NULL
+    theme integer DEFAULT 0 NOT NULL,
+    upload_points integer DEFAULT 1000 NOT NULL
 );
 
 
@@ -2410,6 +2345,40 @@ ALTER SEQUENCE public.mod_actions_id_seq OWNED BY public.mod_actions.id;
 
 
 --
+-- Name: moderation_reports; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.moderation_reports (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    model_type character varying NOT NULL,
+    model_id bigint NOT NULL,
+    creator_id integer NOT NULL,
+    reason text NOT NULL
+);
+
+
+--
+-- Name: moderation_reports_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.moderation_reports_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: moderation_reports_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.moderation_reports_id_seq OWNED BY public.moderation_reports.id;
+
+
+--
 -- Name: news_updates; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2467,7 +2436,6 @@ ALTER SEQUENCE public.note_versions_id_seq OWNED BY public.note_versions.id;
 
 CREATE TABLE public.notes (
     id integer NOT NULL,
-    creator_id integer NOT NULL,
     post_id integer NOT NULL,
     x integer NOT NULL,
     y integer NOT NULL,
@@ -2539,7 +2507,6 @@ ALTER SEQUENCE public.pixiv_ugoira_frame_data_id_seq OWNED BY public.pixiv_ugoir
 CREATE TABLE public.pools (
     id integer NOT NULL,
     name character varying,
-    creator_id integer NOT NULL,
     description text,
     is_active boolean DEFAULT true NOT NULL,
     post_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
@@ -2841,37 +2808,6 @@ CREATE TABLE public.schema_migrations (
 
 
 --
--- Name: super_voters; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.super_voters (
-    id integer NOT NULL,
-    user_id integer,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: super_voters_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.super_voters_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: super_voters_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.super_voters_id_seq OWNED BY public.super_voters.id;
-
-
---
 -- Name: tag_aliases; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2916,7 +2852,6 @@ CREATE TABLE public.tag_implications (
     id integer NOT NULL,
     antecedent_name character varying NOT NULL,
     consequent_name character varying NOT NULL,
-    descendant_names text[] DEFAULT '{}'::text[] NOT NULL,
     creator_id integer NOT NULL,
     forum_topic_id integer,
     status text DEFAULT 'pending'::text NOT NULL,
@@ -3021,7 +2956,9 @@ CREATE TABLE public.uploads (
     artist_commentary_title text,
     include_artist_commentary boolean,
     context text,
-    referer_url text
+    referer_url text,
+    translated_commentary_title text DEFAULT ''::text NOT NULL,
+    translated_commentary_desc text DEFAULT ''::text NOT NULL
 );
 
 
@@ -3293,13 +3230,6 @@ ALTER TABLE ONLY public.comments ALTER COLUMN id SET DEFAULT nextval('public.com
 --
 
 ALTER TABLE ONLY public.delayed_jobs ALTER COLUMN id SET DEFAULT nextval('public.delayed_jobs_id_seq'::regclass);
-
-
---
--- Name: dmail_filters id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.dmail_filters ALTER COLUMN id SET DEFAULT nextval('public.dmail_filters_id_seq'::regclass);
 
 
 --
@@ -4045,13 +3975,6 @@ ALTER TABLE ONLY public.forum_posts ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
--- Name: forum_subscriptions id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.forum_subscriptions ALTER COLUMN id SET DEFAULT nextval('public.forum_subscriptions_id_seq'::regclass);
-
-
---
 -- Name: forum_topic_visits id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4077,6 +4000,13 @@ ALTER TABLE ONLY public.ip_bans ALTER COLUMN id SET DEFAULT nextval('public.ip_b
 --
 
 ALTER TABLE ONLY public.mod_actions ALTER COLUMN id SET DEFAULT nextval('public.mod_actions_id_seq'::regclass);
+
+
+--
+-- Name: moderation_reports id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.moderation_reports ALTER COLUMN id SET DEFAULT nextval('public.moderation_reports_id_seq'::regclass);
 
 
 --
@@ -4168,13 +4098,6 @@ ALTER TABLE ONLY public.posts ALTER COLUMN id SET DEFAULT nextval('public.posts_
 --
 
 ALTER TABLE ONLY public.saved_searches ALTER COLUMN id SET DEFAULT nextval('public.saved_searches_id_seq'::regclass);
-
-
---
--- Name: super_voters id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.super_voters ALTER COLUMN id SET DEFAULT nextval('public.super_voters_id_seq'::regclass);
 
 
 --
@@ -4344,14 +4267,6 @@ ALTER TABLE ONLY public.delayed_jobs
 
 
 --
--- Name: dmail_filters dmail_filters_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.dmail_filters
-    ADD CONSTRAINT dmail_filters_pkey PRIMARY KEY (id);
-
-
---
 -- Name: dmails dmails_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4400,14 +4315,6 @@ ALTER TABLE ONLY public.forum_posts
 
 
 --
--- Name: forum_subscriptions forum_subscriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.forum_subscriptions
-    ADD CONSTRAINT forum_subscriptions_pkey PRIMARY KEY (id);
-
-
---
 -- Name: forum_topic_visits forum_topic_visits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4437,6 +4344,14 @@ ALTER TABLE ONLY public.ip_bans
 
 ALTER TABLE ONLY public.mod_actions
     ADD CONSTRAINT mod_actions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: moderation_reports moderation_reports_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.moderation_reports
+    ADD CONSTRAINT moderation_reports_pkey PRIMARY KEY (id);
 
 
 --
@@ -4541,14 +4456,6 @@ ALTER TABLE ONLY public.posts
 
 ALTER TABLE ONLY public.saved_searches
     ADD CONSTRAINT saved_searches_pkey PRIMARY KEY (id);
-
-
---
--- Name: super_voters super_voters_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.super_voters
-    ADD CONSTRAINT super_voters_pkey PRIMARY KEY (id);
 
 
 --
@@ -4758,6 +4665,20 @@ CREATE INDEX index_artists_on_group_name_trgm ON public.artists USING gin (group
 
 
 --
+-- Name: index_artists_on_is_banned; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_artists_on_is_banned ON public.artists USING btree (is_banned);
+
+
+--
+-- Name: index_artists_on_is_deleted; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_artists_on_is_deleted ON public.artists USING btree (is_deleted);
+
+
+--
 -- Name: index_artists_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4883,13 +4804,6 @@ CREATE INDEX index_delayed_jobs_on_run_at ON public.delayed_jobs USING btree (ru
 
 
 --
--- Name: index_dmail_filters_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_dmail_filters_on_user_id ON public.dmail_filters USING btree (user_id);
-
-
---
 -- Name: index_dmails_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4967,10 +4881,24 @@ CREATE INDEX index_favorite_groups_on_creator_id ON public.favorite_groups USING
 
 
 --
+-- Name: index_favorite_groups_on_is_public; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_favorite_groups_on_is_public ON public.favorite_groups USING btree (is_public);
+
+
+--
 -- Name: index_favorite_groups_on_lower_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_favorite_groups_on_lower_name ON public.favorite_groups USING btree (lower(name));
+
+
+--
+-- Name: index_favorite_groups_on_post_ids; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_favorite_groups_on_post_ids ON public.favorite_groups USING gin (post_ids);
 
 
 --
@@ -6416,20 +6344,6 @@ CREATE INDEX index_forum_posts_on_updated_at ON public.forum_posts USING btree (
 
 
 --
--- Name: index_forum_subscriptions_on_forum_topic_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_forum_subscriptions_on_forum_topic_id ON public.forum_subscriptions USING btree (forum_topic_id);
-
-
---
--- Name: index_forum_subscriptions_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_forum_subscriptions_on_user_id ON public.forum_subscriptions USING btree (user_id);
-
-
---
 -- Name: index_forum_topic_visits_on_forum_topic_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6500,6 +6414,20 @@ CREATE INDEX index_mod_actions_on_creator_id ON public.mod_actions USING btree (
 
 
 --
+-- Name: index_moderation_reports_on_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_moderation_reports_on_creator_id ON public.moderation_reports USING btree (creator_id);
+
+
+--
+-- Name: index_moderation_reports_on_model_type_and_model_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_moderation_reports_on_model_type_and_model_id ON public.moderation_reports USING btree (model_type, model_id);
+
+
+--
 -- Name: index_news_updates_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6549,13 +6477,6 @@ CREATE INDEX index_notes_on_body_index ON public.notes USING gin (body_index);
 
 
 --
--- Name: index_notes_on_creator_id_and_post_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_notes_on_creator_id_and_post_id ON public.notes USING btree (creator_id, post_id);
-
-
---
 -- Name: index_notes_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6574,13 +6495,6 @@ CREATE UNIQUE INDEX index_pixiv_ugoira_frame_data_on_post_id ON public.pixiv_ugo
 --
 
 CREATE INDEX index_pools_on_category ON public.pools USING btree (category);
-
-
---
--- Name: index_pools_on_creator_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_pools_on_creator_id ON public.pools USING btree (creator_id);
 
 
 --
@@ -7397,6 +7311,18 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20191117081229'),
 ('20191117200404'),
 ('20191119061018'),
-('20191223032633');
+('20191223032633'),
+('20200114204550'),
+('20200115010442'),
+('20200117220602'),
+('20200118015014'),
+('20200119184442'),
+('20200119193110'),
+('20200123184743'),
+('20200217044719'),
+('20200223042415'),
+('20200223234015'),
+('20200306202253'),
+('20200307021204');
 
 

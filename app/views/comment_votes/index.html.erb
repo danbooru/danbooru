@@ -24,7 +24,7 @@
       <% end %>
       <% t.column "Commenter" do |vote| %>
         <%= link_to_user vote.comment.creator %>
-        <%= link_to "»", comment_votes_path(search: { comment: { creator_name: vote.comment.creator_name }}) %>
+        <%= link_to "»", comment_votes_path(search: { comment: { creator_name: vote.comment.creator.name }}) %>
         <div><%= time_ago_in_words_tagged(vote.comment.created_at) %></div>
       <% end %>
       <% t.column "Voter" do |vote| %>
@@ -32,7 +32,7 @@
         <%= link_to "»", comment_votes_path(search: { user_name: vote.user.name }) %>
         <div><%= time_ago_in_words_tagged(vote.created_at) %></div>
       <% end %>
-      <% t.column do |vote| %>
+      <% t.column column: "control" do |vote| %>
         <% if vote.user == CurrentUser.user %>
           <%= link_to "unvote", comment_comment_votes_path(vote.comment), remote: true, method: :delete %>
         <% end %>

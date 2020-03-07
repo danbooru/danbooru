@@ -7,86 +7,12 @@ class ForumTopicTest < ActiveSupport::TestCase
       @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
-      @topic = FactoryBot.create(:forum_topic, :title => "xxx")
+      @topic = create(:forum_topic, title: "xxx", creator: @user)
     end
 
     teardown do
       CurrentUser.user = nil
       CurrentUser.ip_addr = nil
-    end
-
-    context "#read_by?" do
-      context "with a populated @user.last_forum_read_at" do
-        setup do
-          @user.update_attribute(:last_forum_read_at, Time.now)
-        end
-
-        context "and no visits for a topic" do
-          setup do
-            @topic.update_column(:updated_at, 1.day.from_now)
-          end
-
-          should "return false" do
-            assert_equal(false, @topic.read_by?(@user))
-          end
-        end
-
-        context "and a visit for a topic" do
-          setup do
-            @topic.update_column(:updated_at, 1.day.from_now)
-          end
-
-          context "that predates the topic" do
-            setup do
-              FactoryBot.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 16.hours.from_now)
-            end
-
-            should "return false" do
-              assert_equal(false, @topic.read_by?(@user))
-            end
-          end
-
-          context "that postdates the topic" do
-            setup do
-              FactoryBot.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 2.days.from_now)
-            end
-
-            should "return true" do
-              assert_equal(true, @topic.read_by?(@user))
-            end
-          end
-        end
-      end
-
-      context "with a blank @user.last_forum_read_at" do
-        context "and no visits" do
-          should "return false" do
-            assert_equal(false, @topic.read_by?(@user))
-          end
-        end
-
-        context "and a visit" do
-          context "that predates the topic" do
-            setup do
-              FactoryBot.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 1.day.ago)
-            end
-
-            should "return false" do
-              assert_equal(false, @topic.read_by?(@user))
-            end
-          end
-
-          context "that postdates the topic" do
-            setup do
-              FactoryBot.create(:forum_topic_visit, user: @user, forum_topic: @topic, last_read_at: 1.day.from_now)
-            end
-
-            should "return true" do
-              assert_equal(true, @topic.read_by?(@user))
-            end
-          end
-        end
-      end
     end
 
     context "#mark_as_read!" do
@@ -111,23 +37,10 @@ class ForumTopicTest < ActiveSupport::TestCase
       end
     end
 
-    context "#merge" do
-      setup do
-        @topic2 = FactoryBot.create(:forum_topic, :title => "yyy")
-        FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => "xxx")
-        FactoryBot.create(:forum_post, :topic_id => @topic2.id, :body => "xxx")
-      end
-
-      should "merge all the posts in one topic into the other" do
-        @topic.merge(@topic2)
-        assert_equal(2, @topic2.posts.count)
-      end
-    end
-
     context "constructed with nested attributes for its original post" do
       should "create a matching forum post" do
         assert_difference(["ForumTopic.count", "ForumPost.count"], 1) do
-          @topic = FactoryBot.create(:forum_topic, :title => "abc", :original_post_attributes => {:body => "abc"})
+          @topic = create(:forum_topic, title: "abc", original_post_attributes: { body: "abc", creator: @user })
         end
       end
     end

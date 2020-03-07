@@ -3,14 +3,20 @@ class FavoriteGroupsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def index
-    @favorite_groups = FavoriteGroup.paginated_search(params)
+    params[:search][:creator_id] ||= params[:user_id]
+    @favorite_groups = FavoriteGroup.visible(CurrentUser.user).paginated_search(params)
+    @favorite_groups = @favorite_groups.includes(:creator) if request.format.html?
+
     respond_with(@favorite_groups)
   end
 
   def show
-    @current_item = @favorite_group = FavoriteGroup.find(params[:id])
+    limit = params[:limit].presence || CurrentUser.user.per_page
+
+    @favorite_group = FavoriteGroup.find(params[:id])
     check_read_privilege(@favorite_group)
-    @post_set = PostSets::FavoriteGroup.new(@favorite_group, params[:page])
+    @posts = @favorite_group.posts.paginate(params[:page], limit: limit, count: @favorite_group.post_count)
+
     respond_with(@favorite_group)
   end
 
@@ -20,7 +26,7 @@ class FavoriteGroupsController < ApplicationController
   end
 
   def create
-    @favorite_group = FavoriteGroup.create(favgroup_params)
+    @favorite_group = CurrentUser.favorite_groups.create(favgroup_params)
     respond_with(@favorite_group)
   end
 
@@ -43,16 +49,16 @@ class FavoriteGroupsController < ApplicationController
   def destroy
     @favorite_group = FavoriteGroup.find(params[:id])
     check_write_privilege(@favorite_group)
-    @favorite_group.destroy
-    flash[:notice] = "Favorite group deleted"
-    redirect_to favorite_groups_path
+    @favorite_group.destroy!
+    flash[:notice] = "Favorite group deleted" if request.format.html?
+    respond_with(@favorite_group, location: favorite_groups_path(search: { creator_name: CurrentUser.name }))
   end
 
   def add_post
     @favorite_group = FavoriteGroup.find(params[:id])
     check_write_privilege(@favorite_group)
     @post = Post.find(params[:post_id])
-    @favorite_group.add!(@post.id)
+    @favorite_group.add!(@post)
   end
 
   private
@@ -66,6 +72,6 @@ class FavoriteGroupsController < ApplicationController
   end
 
   def favgroup_params
-    params.fetch(:favorite_group, {}).permit(%i[name post_ids is_public], post_id_array: [])
+    params.fetch(:favorite_group, {}).permit(%i[name post_ids post_ids_string is_public], post_ids: [])
   end
 end

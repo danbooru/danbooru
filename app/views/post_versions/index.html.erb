@@ -1,6 +1,6 @@
 <div id="c-post-versions">
   <div id="a-index">
-    <% if post_versions_listing_type == :revert && @post_versions.present? %>
+    <% if listing_type(:post_id) == :revert && @post_versions.present? %>
       <h1>Tag History: <%= link_to "Post ##{params.dig(:search, :post_id)}", @post_versions[0].post %></h1>
     <% else %>
       <h1>Tag History</h1>
@@ -17,7 +17,7 @@
     <% end %>
 
     <%= render "posts/partials/common/inline_blacklist" %>
-    <p class="fineprint">Recent updates may not have been processed yet. The most recently processed version was <%= time_ago_in_words_tagged(PostArchive.maximum(:updated_at)) %>.</p>
+    <p class="fineprint">Recent updates may not have been processed yet. The most recently processed version was <%= time_ago_in_words_tagged(PostVersion.maximum(:updated_at)) %>.</p>
 
     <% if @post_versions.length == 0 %>
       <%= render "post_sets/blank" %>

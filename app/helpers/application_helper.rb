@@ -1,9 +1,36 @@
 require 'dtext'
 
 module ApplicationHelper
+  def listing_type(*fields, member_check: true, types: [:revert, :standard])
+    (fields.reduce(false) { |acc, field| acc || params.dig(:search, field).present? } && (!member_check || CurrentUser.is_member?) ? types[0] : types[1])
+  end
+
   def diff_list_html(new, old, latest, ul_class: ["diff-list"], li_class: [])
     diff = SetDiff.new(new, old, latest)
     render "diff_list", diff: diff, ul_class: ul_class, li_class: li_class
+  end
+
+  def diff_body_html(record, previous, field)
+    return h(record[field]).gsub(/\r?\n/, '<span class="paragraph-mark">¶</span><br>').html_safe if previous.blank?
+
+    pattern = Regexp.new('(?:<.+?>)|(?:\w+)|(?:[ \t]+)|(?:\r?\n)|(?:.+?)')
+    DiffBuilder.new(record[field], previous[field], pattern).build
+  end
+
+  def status_diff_html(record)
+    previous = record.previous
+
+    return "New" if previous.blank?
+
+    statuses = []
+    record.class.status_fields.each do |field, status|
+      if record.has_attribute?(field)
+        statuses += [status] if record[field] != previous[field]
+      else
+        statuses += [status] if record.send(field)
+      end
+    end
+    statuses.join("<br>").html_safe
   end
 
   def wordbreakify(string)
@@ -135,7 +162,6 @@ module ApplicationHelper
     user_class = "user-#{user.level_string.downcase}"
     user_class += " user-post-approver" if user.can_approve_posts?
     user_class += " user-post-uploader" if user.can_upload_free?
-    user_class += " user-super-voter" if user.is_super_voter?
     user_class += " user-banned" if user.is_banned?
     user_class += " with-style" if CurrentUser.user.style_usernames?
     if options[:raw_name]
@@ -163,6 +189,12 @@ module ApplicationHelper
     html.html_safe
   end
 
+  def embed_wiki(title, **options)
+    wiki = WikiPage.find_by(title: title)
+    text = format_text(wiki&.body)
+    tag.div(text, class: "prose", **options)
+  end
+
   def dtext_field(object, name, options = {})
     options[:name] ||= name.capitalize
     options[:input_id] ||= "#{object}_#{name}"
@@ -179,11 +211,11 @@ module ApplicationHelper
     tag.input value: "Preview", type: "button", class: "dtext-preview-button", "data-input-id": input_id, "data-preview-id": preview_id
   end
 
-  def quick_search_form_for(attribute, url, name, autocomplete: nil, &block)
+  def quick_search_form_for(attribute, url, name, autocomplete: nil, redirect: false, &block)
     tag.li do
       search_form_for(url, classes: "quick-search-form one-line-form") do |f|
         out  = f.input attribute, label: false, placeholder: "Search #{name}", input_html: { id: nil, "data-autocomplete": autocomplete }
-        out += tag.input type: :hidden, name: :redirect, value: 1
+        out += tag.input type: :hidden, name: :redirect, value: redirect
         out += capture { yield f } if block_given?
         out
       end
@@ -203,15 +235,15 @@ module ApplicationHelper
     simple_form_for(model, **options, &block)
   end
 
-  def table_for(*options, &block)
-    table = TableBuilder.new(*options, &block)
+  def table_for(*args, **options, &block)
+    table = TableBuilder.new(*args, **options, &block)
     render "table_builder/table", table: table
   end
 
-  def body_attributes(user = CurrentUser.user, current_item = nil)
+  def body_attributes(user, params, current_item = nil)
     current_user_data_attributes = data_attributes_for(user, "current-user", current_user_attributes)
 
-    if current_item.present?
+    if current_item.present? && current_item.respond_to?(:html_data_attributes) && current_item.respond_to?(:model_name)
       model_name = current_item.model_name.singular.dasherize
       model_attributes = current_item.html_data_attributes
       current_item_data_attributes = data_attributes_for(current_item, model_name, model_attributes)
@@ -269,26 +301,36 @@ module ApplicationHelper
     end.to_h
   end
 
-  def page_title
-    if content_for(:page_title).present?
+  def page_title(title = nil, suffix: "| #{Danbooru.config.app_name}")
+    if title.present?
+      content_for(:page_title) { "#{title} #{suffix}".strip }
+    elsif content_for(:page_title).present?
       content_for(:page_title)
     elsif params[:action] == "index"
-      "#{params[:controller].titleize} - #{Danbooru.config.app_name}"
+      "#{params[:controller].titleize} #{suffix}"
     elsif params[:action] == "show"
-      "#{params[:controller].singularize.titleize} - #{Danbooru.config.app_name}"
+      "#{params[:controller].singularize.titleize} #{suffix}"
     elsif params[:action] == "new"
-      "New #{params[:controller].singularize.titleize} - #{Danbooru.config.app_name}"
+      "New #{params[:controller].singularize.titleize} #{suffix}"
     elsif params[:action] == "edit"
-      "Edit #{params[:controller].singularize.titleize} - #{Danbooru.config.app_name}"
+      "Edit #{params[:controller].singularize.titleize} #{suffix}"
     elsif params[:action] == "search"
-      "Search #{params[:controller].titleize} - #{Danbooru.config.app_name}"
+      "Search #{params[:controller].titleize} #{suffix}"
     else
       "#{Danbooru.config.app_name}/#{params[:controller]}"
     end
   end
 
-  def show_moderation_notice?
-    CurrentUser.can_approve_posts? && (cookies[:moderated].blank? || Time.at(cookies[:moderated].to_i) < 72.hours.ago)
+  def meta_description(description = nil)
+    if description.present?
+      content_for(:meta_description) { description }
+    elsif content_for(:meta_description).present?
+      content_for(:meta_description)
+    end
+  end
+
+  def atom_feed_tag(title, url = {})
+    content_for(:html_header, auto_discovery_link_tag(:atom, url, title: title))
   end
 
   protected
@@ -310,7 +352,7 @@ module ApplicationHelper
     when "artists", "artist_versions"
       /^\/artist/
 
-    when "tags"
+    when "tags", "tag_aliases", "tag_implications"
       /^\/tags/
 
     when "pools", "pool_versions"
@@ -318,12 +360,6 @@ module ApplicationHelper
 
     when "moderator/dashboards"
       /^\/moderator/
-
-    when "tag_aliases", "tag_alias_requests"
-      /^\/tag_aliases/
-
-    when "tag_implications", "tag_implication_requests"
-      /^\/tag_implications/
 
     when "wiki_pages", "wiki_page_versions"
       /^\/wiki_pages/

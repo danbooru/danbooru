@@ -2,8 +2,9 @@ class TableBuilder
   class Column
     attr_reader :attribute, :name, :block, :header_attributes, :body_attributes
 
-    def initialize(attribute = nil, th: {}, td: {}, width: nil, name: nil, &block)
+    def initialize(attribute = nil, column: nil, th: {}, td: {}, width: nil, name: nil, &block)
       @attribute = attribute
+      @column = column
       @header_attributes = { width: width, **th }
       @body_attributes = td
       @block = block
@@ -11,8 +12,12 @@ class TableBuilder
       @name = name || attribute
       @name = @name.to_s.titleize unless @name.is_a?(String)
 
-      if @name.present?
-        column_class = "#{@name.parameterize.dasherize}-column"
+      if @name.present? || @column.present?
+        if @column.present?
+          column_class = "#{@column}-column"
+        else
+          column_class = "#{@name.parameterize.dasherize}-column"
+        end
         @header_attributes[:class] = "#{column_class} #{@header_attributes[:class]}".strip
         @body_attributes[:class] = "#{column_class} #{@body_attributes[:class]}".strip
       end
@@ -44,8 +49,8 @@ class TableBuilder
     yield self if block_given?
   end
 
-  def column(*options, &block)
-    @columns << Column.new(*options, &block)
+  def column(*args, **options, &block)
+    @columns << Column.new(*args, **options, &block)
   end
 
   def all_row_attributes(item, i)

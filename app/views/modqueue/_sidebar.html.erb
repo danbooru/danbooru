@@ -1,0 +1,55 @@
+<% content_for(:sidebar) do %>
+  <h2>Search</h2>
+
+  <%= search_form_for(modqueue_index_path, classes: "one-line-form") do |f| %>
+    <%= f.input :tags, label: false, input_html: { placeholder: "Tags", value: params.dig(:search, :tags), "data-autocomplete": "tag-query" } %>
+    <%= f.input :order, label: false, collection: [["Newest", "modqueue"], ["Oldest", "modqueue_asc"], ["Score (Highest)", "score"], ["Score (Lowest)", "score_asc"]], selected: params[:search][:order] %>
+    <%= f.button :button, name: nil, id: "search-box-submit" do %>
+      <i class="fas fa-search"></i>
+    <% end %>
+  <% end %>
+
+  <%= render "posts/partials/index/blacklist" %>
+
+  <p id="modqueue-sidebar-status" class="sidebar-section">
+    <h6>Status</h6>
+    <ul>
+      <li>
+        <%= link_to "status:pending", modqueue_index_path(search: { tags: "status:pending" }) %>
+        <span class="post-count"><%= @pending_post_count %></span>
+      </li>
+      <li>
+        <%= link_to "status:flagged", modqueue_index_path(search: { tags: "status:flagged" }) %>
+        <span class="post-count"><%= @flagged_post_count %></span>
+      </li>
+
+      <% @disapproval_reasons.each do |reason, count| %>
+        <li>
+          <%= link_to "disapproved:#{reason}", modqueue_index_path(search: { tags: "disapproved:#{reason}" }) %>
+          <span class="post-count"><%= count %></span>
+        </li>
+      <% end %>
+    </ul>
+  </p>
+
+  <p id="modqueue-sidebar-uploaders" class="sidebar-section">
+    <h6>Uploaders</h6>
+    <ul>
+      <% @uploaders.each do |uploader, count| %>
+        <li>
+          <%= link_to_user uploader %>
+          <%= link_to "»", modqueue_index_path(search: { tags: "user:#{uploader.name}" }) %>
+          <span class="post-count"><%= count %></span>
+        </li>
+      <% end %>
+    </ul>
+  </p>
+
+  <p id="modqueue-sidebar-tags" class="sidebar-section">
+    <h6>Tags</h6>
+
+    <%= render "tag_list", tags: @artist_tags %>
+    <%= render "tag_list", tags: @copyright_tags %>
+    <%= render "tag_list", tags: @character_tags %>
+  </p>
+<% end %>

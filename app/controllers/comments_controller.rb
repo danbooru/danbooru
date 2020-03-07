@@ -1,5 +1,5 @@
 class CommentsController < ApplicationController
-  respond_to :html, :xml, :json
+  respond_to :html, :xml, :json, :atom
   respond_to :js, only: [:new, :destroy, :undelete]
   before_action :member_only, :except => [:index, :search, :show]
   skip_before_action :api_check
@@ -7,9 +7,9 @@ class CommentsController < ApplicationController
   def index
     params[:group_by] ||= "comment" if params[:search].present?
 
-    if params[:group_by] == "comment" || request.format == Mime::Type.lookup("application/atom+xml")
+    if params[:group_by] == "comment" || request.format.atom?
       index_by_comment
-    elsif request.format == Mime::Type.lookup("text/javascript")
+    elsif request.format.js?
       index_for_post
     else
       index_by_post
@@ -33,7 +33,7 @@ class CommentsController < ApplicationController
   end
 
   def create
-    @comment = Comment.create(comment_params(:create))
+    @comment = Comment.create(comment_params(:create).merge(creator: CurrentUser.user, creator_ip_addr: CurrentUser.ip_addr))
     flash[:notice] = @comment.valid? ? "Comment posted" : @comment.errors.full_messages.join("; ")
     respond_with(@comment) do |format|
       format.html do
@@ -61,14 +61,14 @@ class CommentsController < ApplicationController
   def destroy
     @comment = Comment.find(params[:id])
     check_privilege(@comment)
-    @comment.delete!
+    @comment.update(is_deleted: true)
     respond_with(@comment)
   end
 
   def undelete
     @comment = Comment.find(params[:id])
     check_privilege(@comment)
-    @comment.undelete!
+    @comment.update(is_deleted: false)
     respond_with(@comment)
   end
 
@@ -83,19 +83,25 @@ class CommentsController < ApplicationController
   def index_by_post
     @posts = Post.where("last_comment_bumped_at IS NOT NULL").tag_match(params[:tags]).reorder("last_comment_bumped_at DESC NULLS LAST").paginate(params[:page], :limit => 5, :search_count => params[:search])
 
-    @posts = @posts.includes(comments: [:creator])
-    @posts = @posts.includes(comments: [:votes]) if CurrentUser.is_member?
+    if request.format.html?
+      @posts = @posts.includes(comments: [:creator])
+      @posts = @posts.includes(comments: [:votes]) if CurrentUser.is_member?
+    end
 
     respond_with(@posts)
   end
 
   def index_by_comment
-    @comments = Comment.includes(:creator, :updater).paginated_search(params)
-    respond_with(@comments) do |format|
-      format.atom do
-        @comments = @comments.includes(:post, :creator).load
-      end
+    @comments = Comment.paginated_search(params)
+
+    if request.format.atom?
+      @comments = @comments.includes(:creator, :post)
+    elsif request.format.html?
+      @comments = @comments.includes(:creator, :updater, post: :uploader)
+      @comments = @comments.includes(:votes) if CurrentUser.is_member?
     end
+
+    respond_with(@comments)
   end
 
   def check_privilege(comment)

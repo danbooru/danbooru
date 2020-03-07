@@ -14,7 +14,6 @@ gem 'ruby-vips'
 gem 'net-sftp'
 gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt', :require => "bcrypt"
-gem 'statistics2'
 gem 'capistrano', '~> 3.10'
 gem 'capistrano-rails'
 gem 'capistrano-rbenv'
@@ -45,6 +44,7 @@ gem 'puma'
 gem 'scenic'
 gem 'ipaddress'
 gem 'http'
+gem 'activerecord-hierarchical_query'
 
 # needed for successful deploy
 gem 'bcrypt_pbkdf'

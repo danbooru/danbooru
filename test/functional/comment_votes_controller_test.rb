@@ -26,7 +26,7 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "fail silently on errors" do
-        create(:comment_vote, comment: @comment, score: -1)
+        create(:comment_vote, user: @user, comment: @comment, score: -1)
         assert_difference("CommentVote.count", 0) do
           post_auth comment_comment_votes_path(comment_id: @comment.id, score: "down", format: "json"), @user
           assert_response 422
@@ -47,7 +47,7 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "fail on errors" do
-        create(:comment_vote, :comment => @comment, :score => -1)
+        create(:comment_vote, user: @user, comment: @comment, score: -1)
         assert_difference("CommentVote.count", 0) do
           post_auth comment_comment_votes_path(comment_id: @comment.id, :score => "down", format: "js"), @user
           assert_response 422

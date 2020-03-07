@@ -4,11 +4,13 @@ class WikiPageVersionsController < ApplicationController
 
   def index
     @wiki_page_versions = WikiPageVersion.paginated_search(params)
+    @wiki_page_versions = @wiki_page_versions.includes(:updater) if request.format.html?
+
     respond_with(@wiki_page_versions)
   end
 
   def show
-    @current_item = @wiki_page_version = WikiPageVersion.find(params[:id])
+    @wiki_page_version = WikiPageVersion.find(params[:id])
     respond_with(@wiki_page_version)
   end
 

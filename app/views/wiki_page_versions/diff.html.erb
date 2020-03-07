@@ -1,23 +1,16 @@
+<% page_title "Wiki Comparison: #{@thispage.pretty_title.titleize}" %>
+
+<%= render "wiki_pages/secondary_links" %>
 <%= render "wiki_pages/sidebar" %>
 
 <% content_for(:content) do %>
   <h1>Wiki Page: <%= @thispage.title %></h1>
 
-  <% if @thispage.visible? %>
-    <p>Showing differences between <%= compact_time @thispage.updated_at %> (<%= link_to_user @thispage.updater %>) and <%= compact_time @otherpage.updated_at %> (<%= link_to_user @otherpage.updater %>)</p>
+  <p>Showing differences between <%= compact_time @thispage.updated_at %> (<%= link_to_user @thispage.updater %>) and <%= compact_time @otherpage.updated_at %> (<%= link_to_user @otherpage.updater %>)</p>
 
-    <%= wiki_other_names_diff(@thispage, @otherpage) %>
+  <%= wiki_other_names_diff(@thispage, @otherpage) %>
 
-    <div>
-      <%= wiki_body_diff(@thispage, @otherpage) %>
-    </div>
-  <% else %>
-    <p>The artist requested removal of this page.</p>
-  <% end %>
-<% end %>
-
-<%= render "wiki_pages/secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Wiki Page Versions Comparison - <%= @thispage.pretty_title %> - <%= Danbooru.config.app_name %>
+  <div class="diff-body">
+    <%= diff_body_html(@thispage, @otherpage, :body) %>
+  </div>
 <% end %>

@@ -1,3 +1,6 @@
+<% page_title "Batch Upload" %>
+<%= render "uploads/secondary_links" %>
+
 <div id="c-uploads">
   <div id="a-batch">
     <h1>Batch Upload</h1>
@@ -32,21 +35,3 @@
     <% end %>
   </div>
 </div>
-
-<% content_for(:page_title) do %>
-  Batch Upload - <%= Danbooru.config.app_name %>
-<% end %>
-
-<% content_for(:html_header) do %>
-  <script type="text/javascript">
-    $(function() {
-      $("#link").click(function() {
-        $(".upload-preview > a").each(function(i, v) {
-          window.open(v.href);
-        });
-      });
-    })
-  </script>
-<% end %>
-
-<%= render "uploads/secondary_links" %>

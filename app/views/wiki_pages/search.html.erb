@@ -1,7 +1,7 @@
 <div id="c-wiki-pages">
   <div id="a-search">
     <%= search_form_for(wiki_pages_path) do |f| %>
-      <%= f.input :title, hint: "Use * for wildcard searches", input_html: { "data-autocomplete": "wiki-page" } %>
+      <%= f.input :title_normalize, label: "Title", hint: "Use * for wildcard searches", input_html: { "data-autocomplete": "wiki-page" } %>
       <%= f.input :other_names_match, label: "Other names", hint: "Use * for wildcard searches" %>
       <%= f.input :body_matches, label: "Body" %>
       <%= f.input :other_names_present, as: :select %>

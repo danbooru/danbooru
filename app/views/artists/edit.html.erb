@@ -2,11 +2,7 @@
   <div id="a-edit">
     <h1>Edit Artist</h1>
 
-    <% if @artist.is_banned? %>
-      <p>The artist requested removal of this page.</p>
-    <% else %>
-      <%= render "form" %>
-    <% end %>
+    <%= render "form" %>
   </div>
 </div>
 

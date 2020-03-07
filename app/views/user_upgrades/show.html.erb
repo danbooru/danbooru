@@ -1,3 +1,6 @@
+<% page_title "Account Upgraded" %>
+<%= render "users/secondary_links" %>
+
 <div id="c-user-upgrades">
   <div id="a-show">
     <% if flash[:success] %>
@@ -17,9 +20,3 @@
     <% end %>
   </div>
 </div>
-
-<%= render "users/secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Upgrade - <%= Danbooru.config.app_name %>
-<% end %>

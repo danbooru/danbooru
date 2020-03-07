@@ -32,31 +32,11 @@ class UserPresenter
       permissions << "unrestricted uploads"
     end
 
-    if user.is_super_voter?
-      permissions << "super voter"
-    end
-
     permissions.join(", ")
   end
 
   def posts_for_saved_search_category(category)
     Post.tag_match("search:#{category}").limit(10)
-  end
-
-  def upload_limit(template)
-    if user.can_upload_free?
-      return "none"
-    end
-
-    slots_tooltip = "Next free slot: #{template.time_ago_in_words(user.next_free_upload_slot)}"
-    limit_tooltip = <<-EOS.strip_heredoc
-      Base: #{user.base_upload_limit}
-      Del. Rate: #{format("%.2f", user.adjusted_deletion_confidence)}
-      Multiplier: (1 - (#{format("%.2f", user.adjusted_deletion_confidence)} / 15)) = #{user.upload_limit_multiplier}
-      Upload Limit: #{user.base_upload_limit} * #{format("%.2f", user.upload_limit_multiplier)} = #{user.max_upload_limit}
-    EOS
-
-    %{<abbr title="#{slots_tooltip}">#{user.used_upload_slots}</abbr> / <abbr title="#{limit_tooltip}">#{user.max_upload_limit}</abbr>}.html_safe
   end
 
   def uploads
@@ -88,7 +68,7 @@ class UserPresenter
   end
 
   def favorite_group_count(template)
-    template.link_to(user.favorite_group_count, template.favorite_groups_path(:search => {:creator_id => user.id}))
+    template.link_to(user.favorite_group_count, template.favorite_groups_path(search: { creator_name: user.name }))
   end
 
   def comment_count(template)
@@ -132,7 +112,7 @@ class UserPresenter
   end
 
   def pool_version_count(template)
-    if PoolArchive.enabled?
+    if PoolVersion.enabled?
       template.link_to(user.pool_version_count, template.pool_versions_path(:search => {:updater_id => user.id}))
     else
       "N/A"
@@ -168,6 +148,8 @@ class UserPresenter
   end
 
   def previous_names(template)
-    user.user_name_change_requests.map { |req| template.link_to req.original_name, req }.join(", ").html_safe
+    user.user_name_change_requests.visible(CurrentUser.user).map do |req|
+      template.link_to req.original_name, req
+    end.join(", ").html_safe
   end
 end

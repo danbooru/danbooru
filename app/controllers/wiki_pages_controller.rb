@@ -17,11 +17,7 @@ class WikiPagesController < ApplicationController
   def index
     @wiki_pages = WikiPage.paginated_search(params)
 
-    if params[:redirect].to_s.truthy? && @wiki_pages.one? && @wiki_pages.first.title == WikiPage.normalize_title(params[:search][:title])
-      redirect_to @wiki_pages.first
-    else
-      respond_with(@wiki_pages)
-    end
+    respond_with(@wiki_pages)
   end
 
   def search
@@ -30,7 +26,6 @@ class WikiPagesController < ApplicationController
 
   def show
     @wiki_page, found_by = WikiPage.find_by_id_or_title(params[:id])
-    @current_item = @wiki_page
     if request.format.html? && @wiki_page.blank? && found_by == :title
       @wiki_page = WikiPage.new(title: params[:id])
       respond_with @wiki_page, status: 404
@@ -79,6 +74,14 @@ class WikiPagesController < ApplicationController
   end
 
   private
+
+  def item_matches_params(wiki_page)
+    if params[:search][:title_normalize]
+      wiki_page.title == WikiPage.normalize_title(params[:search][:title_normalize])
+    else
+      true
+    end
+  end
 
   def normalize_search_params
     if params[:title]

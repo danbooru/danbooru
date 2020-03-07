@@ -1,3 +1,9 @@
+<% page_title @post.presenter.humanized_essential_tag_string %>
+<% meta_description "View this #{@post.image_width}x#{@post.image_height} #{number_to_human_size(@post.file_size)} image" %>
+
+<% atom_feed_tag "Comments for post ##{@post.id}", comments_url(:atom, search: { post_id: @post.id }) %>
+<%= render "posts/partials/common/secondary_links" %>
+
 <% content_for(:sidebar) do %>
   <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:q], :tags_dom_id => "tags" %>
 
@@ -151,33 +157,18 @@
 
 <%= post_view_count_js %>
 
-<% content_for(:page_title) do %>
-  <%= @post.presenter.humanized_essential_tag_string %> - <%= Danbooru.config.app_name %>
-<% end %>
-
 <% content_for(:html_header) do %>
-  <%= tag.meta name: "description", content: "View this #{@post.image_width}x#{@post.image_height} #{number_to_human_size(@post.file_size)} image" %>
   <meta name="post-id" content="<%= @post.id %>">
   <meta name="post-has-embedded-notes" content="<%= @post.has_embedded_notes? %>">
-  <meta name="always-resize-images" content="<%= CurrentUser.user.always_resize_images? %>">
-  <%= tag.meta name: "og:title", content: "#{@post.presenter.humanized_essential_tag_string} - #{Danbooru.config.app_name}" %>
 
   <% if @post.visible? %>
     <%= tag.meta name: "og:image", content: @post.open_graph_image_url %>
   <% end %>
 
-  <% if Danbooru.config.enable_post_search_counts %>
-    <meta name="report-server" content="<%= Danbooru.config.reportbooru_server %>">
-  <% end %>
-
   <%= tag.meta name: "canonical", content: post_url(@post, host: Danbooru.config.hostname, protocol: "https") %>
 
-  <%# Twitter properties %>
   <% if @post.twitter_card_supported? %>
     <meta name="twitter:card" content="summary_large_image">
-    <%= tag.meta name: "twitter:site", content: Danbooru.config.twitter_site %>
-    <%= tag.meta name: "twitter:title", content: "#{@post.presenter.humanized_essential_tag_string} - #{Danbooru.config.app_name}" %>
-    <%= tag.meta name: "twitter:description", content: "View this #{@post.image_width}x#{@post.image_height} #{number_to_human_size(@post.file_size)} image" %>
 
     <% if @post.visible? %>
       <%= tag.meta name: "twitter:image", content: @post.open_graph_image_url %>
@@ -187,19 +178,4 @@
   <% if @post.rating == "e" %>
     <meta name="rating" content="adult">
   <% end %>
-
-  <%= tag.meta name: "og:type", content: "website" %>
-  <%= tag.meta name: "og:site", content: Danbooru.config.app_name %>
-
-  <%= auto_discovery_link_tag(:atom, comments_url(:atom, search: { post_id: @post.id }), title: "Comments for post ##{@post.id}") %>
-
-  <script>
-    window._paq = window._paq || [];
-    window._paq.push(["setCustomVariable", 1, "rating", '<%= j @post.rating %>', "page"]);
-    window._paq.push(["setCustomVariable", 2, "fileSize", <%= @post.file_size.to_i / 100.kilobytes %>, "page"]);
-    window._paq.push(["setCustomVariable", 3, "sourceDomain", '<%= j @post.source_domain %>', "page"]);
-    window._paq.push(["setCustomVariable", 3, "blocked", <%= @post.levelblocked? %>, "page"]);
-  </script>
 <% end %>
-
-<%= render "posts/partials/common/secondary_links" %>

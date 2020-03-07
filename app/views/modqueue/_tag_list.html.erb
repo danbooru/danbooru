@@ -1,0 +1,10 @@
+<ul>
+  <% tags.each do |tag| %>
+    <li>
+      <%= link_to "?", wiki_page_path(tag.name), class: tag_class(tag) %>
+      <%= link_to tag.pretty_name, posts_path(tags: tag.name), class: tag_class(tag) %>
+      <%= link_to "»", modqueue_index_path(search: { tags: tag.name }), class: tag_class(tag) %>
+      <span class="post-count"><%= tag.overlap_count %></span>
+    </li>
+  <% end %>
+</ul>

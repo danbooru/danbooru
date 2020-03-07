@@ -1,26 +1,23 @@
 class ForumPost < ApplicationRecord
-  include Mentionable
-
   attr_readonly :topic_id
-  belongs_to_creator
+  belongs_to :creator, class_name: "User"
   belongs_to_updater
   belongs_to :topic, :class_name => "ForumTopic"
   has_many :dtext_links, as: :model, dependent: :destroy
+  has_many :moderation_reports, as: :model
   has_many :votes, class_name: "ForumPostVote"
   has_one :tag_alias
   has_one :tag_implication
   has_one :bulk_update_request
 
-  before_validation :initialize_is_deleted, :on => :create
   before_save :update_dtext_links, if: :dtext_links_changed?
+  before_create :autoreport_spam
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
   after_destroy :update_topic_updated_at_on_destroy
   validates_presence_of :body
   validate :validate_topic_is_unlocked
-  validate :validate_post_is_not_spam, on: :create
   validate :topic_is_not_restricted, :on => :create
-  before_destroy :validate_topic_is_unlocked
   after_save :delete_topic_if_original_post
   after_update(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |rec|
     ModAction.log("#{CurrentUser.name} updated forum ##{rec.id}", :forum_post_update)
@@ -28,28 +25,25 @@ class ForumPost < ApplicationRecord
   after_destroy(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |rec|
     ModAction.log("#{CurrentUser.name} deleted forum ##{rec.id}", :forum_post_delete)
   end
+
+  deletable
   mentionable(
     :message_field => :body,
     :title => ->(user_name) {%{#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})}},
-    :body => ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[/forum_topics/#{topic_id}?page=#{forum_topic_page}]):\n\n[quote]\n#{DText.excerpt(body, "@" + user_name)}\n[/quote]\n}}
+    :body => ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[/forum_topics/#{topic_id}?page=#{forum_topic_page}]):\n\n[quote]\n#{DText.extract_mention(body, "@" + user_name)}\n[/quote]\n}}
   )
 
   module SearchMethods
     def topic_title_matches(title)
-      joins(:topic).merge(ForumTopic.search(title_matches: title))
+      where(topic_id: ForumTopic.search(title_matches: title).select(:id))
     end
 
-    def active
-      where("forum_posts.is_deleted = false")
-    end
-
-    def permitted
-      joins(:topic).where("forum_topics.min_level <= ?", CurrentUser.level)
+    def visible(user)
+      where(topic_id: ForumTopic.visible(user))
     end
 
     def search(params)
       q = super
-      q = q.permitted
       q = q.search_attributes(params, :creator, :updater, :topic_id, :is_deleted, :body)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :text_index)
 
@@ -62,7 +56,7 @@ class ForumPost < ApplicationRecord
       end
 
       if params[:topic_category_id].present?
-        q = q.joins(:topic).where("forum_topics.category_id = ?", params[:topic_category_id].to_i)
+        q = q.where(topic_id: ForumTopic.where(category_id: params[:topic_category_id]))
       end
 
       q.apply_default_order(params)
@@ -89,31 +83,27 @@ class ForumPost < ApplicationRecord
     end
   end
 
-  def tag_change_request
-    bulk_update_request || tag_alias || tag_implication
+  def reportable_by?(user)
+    visible?(user) && creator_id != user.id && !creator.is_moderator?
   end
 
   def votable?
-    TagAlias.where(forum_post_id: id).exists? ||
-      TagImplication.where(forum_post_id: id).exists? ||
-      BulkUpdateRequest.where(forum_post_id: id).exists?
+    bulk_update_request.present? && bulk_update_request.is_pending?
   end
 
   def voted?(user, score)
     votes.where(creator_id: user.id, score: score).exists?
   end
 
-  def validate_post_is_not_spam
-    errors[:base] << "Failed to create forum post" if SpamDetector.new(self, user_ip: CurrentUser.ip_addr).spam?
+  def autoreport_spam
+    if SpamDetector.new(self, user_ip: CurrentUser.ip_addr).spam?
+      moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
+    end
   end
 
   def validate_topic_is_unlocked
-    return if CurrentUser.is_moderator?
-    return if topic.nil?
-
-    if topic.is_locked?
+    if topic.is_locked? && !updater.is_moderator?
       errors[:topic] << "is locked"
-      throw :abort
     end
   end
 
@@ -134,7 +124,7 @@ class ForumPost < ApplicationRecord
   def update_topic_updated_at_on_create
     if topic
       # need to do this to bypass the topic's original post from getting touched
-      ForumTopic.where(:id => topic.id).update_all(["updater_id = ?, response_count = response_count + 1, updated_at = ?", CurrentUser.id, Time.now])
+      ForumTopic.where(:id => topic.id).update_all(["updater_id = ?, response_count = response_count + 1, updated_at = ?", creator.id, Time.now])
       topic.response_count += 1
     end
   end
@@ -187,10 +177,6 @@ class ForumPost < ApplicationRecord
     topic.response_count -= 1
   end
 
-  def initialize_is_deleted
-    self.is_deleted = false if is_deleted.nil?
-  end
-
   def quoted_response
     DText.quote(body, creator.name)
   end
@@ -217,5 +203,13 @@ class ForumPost < ApplicationRecord
     dup.tap do |x|
       x.body = x.quoted_response
     end
+  end
+
+  def dtext_shortlink
+    "forum ##{id}"
+  end
+
+  def self.available_includes
+    [:creator, :updater, :topic, :dtext_links, :votes, :tag_alias, :tag_implication, :bulk_update_request]
   end
 end

@@ -15,86 +15,25 @@ class DmailTest < ActiveSupport::TestCase
       CurrentUser.user = nil
     end
 
-    context "spam" do
-      setup do
-        Dmail.any_instance.stubs(:spam?).returns(true)
-        @spammer = create(:user)
+    context "that is spam" do
+      should "be automatically reported and deleted" do
         @recipient = create(:user)
-      end
+        @spammer = create(:user, created_at: 2.weeks.ago, email: "akismet-guaranteed-spam@example.com")
 
-      should "not validate" do
-        assert_difference("Dmail.count", 2) do
-          Dmail.create_split(from: @spammer, to: @recipient, title: "spam", body: "wonderful spam")
-          assert(@recipient.dmails.last.is_spam?)
-        end
-      end
+        SpamDetector.stubs(:enabled?).returns(true)
+        dmail = create(:dmail, owner: @recipient, from: @spammer, to: @recipient, creator_ip_addr: "127.0.0.1")
 
-      should "autoban spammers after sending spam to N distinct users" do
-        users = create_list(:user, Dmail::AUTOBAN_THRESHOLD)
-        users.each do |user|
-          Dmail.create_split(from: @spammer, to: user, title: "spam", body: "wonderful spam")
-        end
-
-        assert_equal(true, Dmail.is_spammer?(@spammer))
-        assert_equal(true, @spammer.reload.is_banned)
-        assert_equal(1, @spammer.bans.count)
-        assert_match(/Spambot./, @spammer.bans.last.reason)
-        assert_match(/Spambot./, @spammer.feedback.last.body)
-      end
-    end
-
-    context "filter" do
-      setup do
-        @recipient = FactoryBot.create(:user)
-        @recipient.create_dmail_filter(:words => "banned")
-        @dmail = FactoryBot.build(:dmail, :title => "xxx", :owner => @recipient, :body => "banned word here", :to => @recipient, :from => @user)
-      end
-
-      should "detect banned words" do
-        assert(@recipient.dmail_filter.filtered?(@dmail))
-      end
-
-      should "autoread if it has a banned word" do
-        @dmail.save
-        assert_equal(true, @dmail.is_read?)
-      end
-
-      should "not update the recipient's has_mail if filtered" do
-        @dmail.save
-        @recipient.reload
-        assert_equal(false, @recipient.has_mail?)
-      end
-
-      should "be ignored when sender is a moderator" do
-        CurrentUser.scoped(FactoryBot.create(:moderator_user), "127.0.0.1") do
-          @dmail = FactoryBot.create(:dmail, :owner => @recipient, :body => "banned word here", :to => @recipient)
-        end
-
-        assert_equal(false, @recipient.dmail_filter.filtered?(@dmail))
-        assert_equal(false, @dmail.is_read?)
-        assert_equal(true, @recipient.has_mail?)
-      end
-
-      context "that is empty" do
-        setup do
-          @recipient.dmail_filter.update(words: "   ")
-        end
-
-        should "not filter everything" do
-          assert(!@recipient.dmail_filter.filtered?(@dmail))
-        end
+        assert_equal(1, dmail.moderation_reports.count)
+        assert_equal(true, dmail.reload.is_deleted?)
       end
     end
 
     context "from a banned user" do
-      setup do
-        @user.update_attribute(:is_banned, true)
-      end
-
       should "not validate" do
-        dmail = FactoryBot.build(:dmail, :title => "xxx", :owner => @user)
-        dmail.save
-        assert_equal(1, dmail.errors.size)
+        user = create(:banned_user)
+        dmail = build(:dmail, owner: user, from: user)
+
+        assert_equal(false, dmail.valid?)
         assert_equal(["Sender is banned and cannot send messages"], dmail.errors.full_messages)
       end
     end
@@ -143,13 +82,8 @@ class DmailTest < ActiveSupport::TestCase
     should "create a copy for each user" do
       @new_user = FactoryBot.create(:user)
       assert_difference("Dmail.count", 2) do
-        Dmail.create_split(:to_id => @new_user.id, :title => "foo", :body => "foo")
+        Dmail.create_split(from: CurrentUser.user, creator_ip_addr: "127.0.0.1", to_id: @new_user.id, title: "foo", body: "foo")
       end
-    end
-
-    should "record the creator's ip addr" do
-      dmail = FactoryBot.create(:dmail, owner: @user)
-      assert_equal(CurrentUser.ip_addr, dmail.creator_ip_addr.to_s)
     end
 
     should "send an email if the user wants it" do
@@ -162,32 +96,18 @@ class DmailTest < ActiveSupport::TestCase
     should "create only one message for a split response" do
       user = FactoryBot.create(:user, :receive_email_notifications => true)
       assert_difference("ActionMailer::Base.deliveries.size", 1) do
-        Dmail.create_split(:to_id => user.id, :title => "foo", :body => "foo")
+        Dmail.create_split(from: CurrentUser.user, creator_ip_addr: "127.0.0.1", to_id: user.id, title: "foo", body: "foo")
       end
-    end
-
-    should "be marked as read after the user reads it" do
-      dmail = FactoryBot.create(:dmail, :owner => @user)
-      assert(!dmail.is_read?)
-      dmail.mark_as_read!
-      assert(dmail.is_read?)
     end
 
     should "notify the recipient he has mail" do
-      recipient = FactoryBot.create(:user)
-      Dmail.create_split(title: "hello", body: "hello", to_id: recipient.id)
-      dmail = Dmail.where(owner_id: recipient.id).last
-      recipient.reload
-      assert(recipient.has_mail?)
-      assert_equal(1, recipient.unread_dmail_count)
+      recipient = create(:user)
 
-      CurrentUser.scoped(recipient) do
-        dmail.mark_as_read!
-      end
+      create(:dmail, owner: recipient, to: recipient)
+      assert_equal(1, recipient.reload.unread_dmail_count)
 
-      recipient.reload
-      refute(recipient.has_mail?)
-      assert_equal(0, recipient.unread_dmail_count)
+      recipient.dmails.unread.last.update!(is_read: true)
+      assert_equal(0, recipient.reload.unread_dmail_count)
     end
 
     context "that is automated" do

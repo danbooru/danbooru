@@ -2,10 +2,9 @@ class ForumTopicsController < ApplicationController
   respond_to :html, :xml, :json
   respond_to :atom, only: [:index, :show]
   before_action :member_only, :except => [:index, :show]
-  before_action :moderator_only, :only => [:new_merge, :create_merge]
   before_action :normalize_search, :only => :index
-  before_action :load_topic, :only => [:edit, :show, :update, :destroy, :undelete, :new_merge, :create_merge, :subscribe, :unsubscribe]
-  before_action :check_min_level, :only => [:show, :edit, :update, :new_merge, :create_merge, :destroy, :undelete, :subscribe, :unsubscribe]
+  before_action :load_topic, :only => [:edit, :show, :update, :destroy, :undelete]
+  before_action :check_min_level, :only => [:show, :edit, :update, :destroy, :undelete]
   skip_before_action :api_check
 
   def new
@@ -21,29 +20,42 @@ class ForumTopicsController < ApplicationController
 
   def index
     params[:search] ||= {}
-    params[:search][:order] ||= "sticky" if request.format == Mime::Type.lookup("text/html")
+    params[:search][:order] ||= "sticky" if request.format.html?
     params[:limit] ||= 40
 
-    @forum_topics = ForumTopic.paginated_search(params)
-    @forum_topics = @forum_topics.includes(:creator, :updater).load if request.format.html?
-    @forum_topics = @forum_topics.includes(:creator, :original_post).load if request.format.atom?
+    @forum_topics = ForumTopic.visible(CurrentUser.user).paginated_search(params)
+
+    if request.format.atom?
+      @forum_topics = @forum_topics.includes(:creator, :original_post)
+    elsif request.format.html?
+      @forum_topics = @forum_topics.includes(:creator, :updater, :forum_topic_visit_by_current_user)
+    end
 
     respond_with(@forum_topics)
   end
 
   def show
-    @current_item = @forum_topic
-    if request.format == Mime::Type.lookup("text/html")
+    if request.format.html?
       @forum_topic.mark_as_read!(CurrentUser.user)
     end
+
     @forum_posts = ForumPost.search(:topic_id => @forum_topic.id).reorder("forum_posts.id").paginate(params[:page])
-    @forum_posts = @forum_posts.reverse_order.includes(:creator).load if request.format.atom?
-    @original_forum_post_id = @forum_topic.original_post.id
+
+    if request.format.atom?
+      @forum_posts = @forum_posts.reverse_order.load
+    elsif request.format.html?
+      @forum_posts = @forum_posts.includes(:creator, :bulk_update_request)
+    end
+
     respond_with(@forum_topic)
   end
 
   def create
-    @forum_topic = ForumTopic.create(forum_topic_params(:create))
+    @forum_topic = ForumTopic.new(forum_topic_params(:create))
+    @forum_topic.creator = CurrentUser.user
+    @forum_topic.original_post.creator = CurrentUser.user
+    @forum_topic.save
+
     respond_with(@forum_topic)
   end
 
@@ -55,7 +67,7 @@ class ForumTopicsController < ApplicationController
 
   def destroy
     check_privilege(@forum_topic)
-    @forum_topic.delete!
+    @forum_topic.update(is_deleted: true)
     @forum_topic.create_mod_action_for_delete
     flash[:notice] = "Topic deleted"
     respond_with(@forum_topic)
@@ -63,7 +75,7 @@ class ForumTopicsController < ApplicationController
 
   def undelete
     check_privilege(@forum_topic)
-    @forum_topic.undelete!
+    @forum_topic.update(is_deleted: false)
     @forum_topic.create_mod_action_for_undelete
     flash[:notice] = "Topic undeleted"
     respond_with(@forum_topic)
@@ -73,29 +85,6 @@ class ForumTopicsController < ApplicationController
     CurrentUser.user.update_attribute(:last_forum_read_at, Time.now)
     ForumTopicVisit.prune!(CurrentUser.user)
     redirect_to forum_topics_path, :notice => "All topics marked as read"
-  end
-
-  def new_merge
-  end
-
-  def create_merge
-    @merged_topic = ForumTopic.find(params[:merged_id])
-    @forum_topic.merge(@merged_topic)
-    redirect_to forum_topic_path(@merged_topic)
-  end
-
-  def subscribe
-    subscription = ForumSubscription.where(:forum_topic_id => @forum_topic.id, :user_id => CurrentUser.user.id).first
-    unless subscription
-      ForumSubscription.create(:forum_topic_id => @forum_topic.id, :user_id => CurrentUser.user.id, :last_read_at => @forum_topic.updated_at)
-    end
-    respond_with(@forum_topic)
-  end
-
-  def unsubscribe
-    subscription = ForumSubscription.where(:forum_topic_id => @forum_topic.id, :user_id => CurrentUser.user.id).first
-    subscription&.destroy
-    respond_with(@forum_topic)
   end
 
   private

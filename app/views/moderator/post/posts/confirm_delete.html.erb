@@ -1,7 +1,7 @@
 <h1>Delete Post</h1>
 
 <div>
-  <%= PostPresenter.preview(@post, :tags => "status:any") %>
+  <%= PostPresenter.preview(@post, show_deleted: true) %>
 </div>
 
 <%= form_tag(delete_moderator_post_post_path, :style => "clear: both;", :class => "simple_form") do %>

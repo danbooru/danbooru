@@ -10,12 +10,11 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def create
-    @bulk_update_request = BulkUpdateRequest.create(bur_params(:create))
+    @bulk_update_request = BulkUpdateRequest.create(bur_params(:create).merge(user: CurrentUser.user))
     respond_with(@bulk_update_request, :location => bulk_update_requests_path)
   end
 
   def show
-    @current_item = @bulk_update_request = BulkUpdateRequest.find(params[:id])
     respond_with(@bulk_update_request)
   end
 
@@ -42,7 +41,8 @@ class BulkUpdateRequestsController < ApplicationController
   end
 
   def index
-    @bulk_update_requests = BulkUpdateRequest.includes(:user, :approver, :forum_topic, forum_post: [:votes]).paginated_search(params, count_pages: true)
+    @bulk_update_requests = BulkUpdateRequest.paginated_search(params, count_pages: true)
+    @bulk_update_requests = @bulk_update_requests.includes(:user, :approver, :forum_topic, forum_post: [:votes]) if request.format.html?
     respond_with(@bulk_update_requests)
   end
 

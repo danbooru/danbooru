@@ -7,12 +7,14 @@ class IpBansController < ApplicationController
   end
 
   def create
-    @ip_ban = IpBan.create(ip_ban_params)
+    @ip_ban = CurrentUser.ip_bans.create(ip_ban_params)
     respond_with(@ip_ban, :location => ip_bans_path)
   end
 
   def index
-    @ip_bans = IpBan.includes(:creator).paginated_search(params, count_pages: true)
+    @ip_bans = IpBan.paginated_search(params, count_pages: true)
+    @ip_bans = @ip_bans.includes(:creator) if request.format.html?
+
     respond_with(@ip_bans)
   end
 

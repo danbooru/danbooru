@@ -1,5 +1,6 @@
 <div id="pool-nav">
   <ul>
+    <% pools = pools.sort_by { |pool| [is_pool_selected?(pool) ? 0 : 1, pool.is_series? ? 0 : 1, pool.name] } %>
     <% pools.each do |pool| %>
       <%= render "posts/partials/show/pool_list_item", pool: pool, post: post, selected: is_pool_selected?(pool) %>
     <% end %>

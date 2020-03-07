@@ -32,18 +32,16 @@ class UsersController < ApplicationController
     end
 
     @users = User.paginated_search(params)
-    if params[:redirect].to_s.truthy? && @users.one? && User.normalize_name(@users.first.name) == User.normalize_name(params[:search][:name_matches])
-      redirect_to @users.first
-    else
-      respond_with @users
-    end
+    @users = @users.includes(:inviter) if request.format.html?
+
+    respond_with(@users)
   end
 
   def search
   end
 
   def show
-    @current_item = @user = User.find(params[:id])
+    @user = User.find(params[:id])
     respond_with(@user, methods: @user.full_attributes)
   end
 
@@ -61,7 +59,7 @@ class UsersController < ApplicationController
   end
 
   def create
-    @user = User.new(user_params(:create))
+    @user = User.new(last_ip_addr: CurrentUser.ip_addr, **user_params(:create))
     if !Danbooru.config.enable_recaptcha? || verify_recaptcha(model: @user)
       @user.save
       if @user.errors.empty?
@@ -98,6 +96,14 @@ class UsersController < ApplicationController
 
   private
 
+  def item_matches_params(user)
+    if params[:search][:name_matches]
+      User.normalize_name(user.name) == User.normalize_name(params[:search][:name_matches])
+    else
+      true
+    end
+  end
+
   def check_privilege(user)
     raise User::PrivilegeError unless user.id == CurrentUser.id || CurrentUser.is_admin?
   end
@@ -109,16 +115,14 @@ class UsersController < ApplicationController
       time_zone per_page custom_style theme
 
       receive_email_notifications always_resize_images enable_post_navigation
-      new_post_navigation_layout enable_privacy_mode
+      new_post_navigation_layout enable_private_favorites
       enable_sequential_post_navigation hide_deleted_posts style_usernames
       enable_auto_complete show_deleted_children
       disable_categorized_saved_searches disable_tagged_filenames
       disable_cropped_thumbnails disable_mobile_gestures
-      enable_safe_mode disable_responsive_mode disable_post_tooltips
-      enable_recommended_posts opt_out_tracking
+      enable_safe_mode enable_desktop_mode disable_post_tooltips
     ]
 
-    permitted_params += [dmail_filter_attributes: %i[id words]]
     permitted_params << :name if context == :create
     permitted_params << :level if CurrentUser.is_admin?
 

@@ -13,7 +13,6 @@ class BulkUpdateRequest < ApplicationRecord
   validate :script_formatted_correctly
   validate :forum_topic_id_not_invalid
   validate :validate_script, :on => :create
-  before_validation :initialize_attributes, :on => :create
   before_validation :normalize_text
   after_create :create_forum_topic
   after_save :update_notice
@@ -94,12 +93,10 @@ class BulkUpdateRequest < ApplicationRecord
     end
 
     def create_forum_topic
-      if forum_topic_id
-        forum_post = forum_topic.posts.create(body: reason_with_link)
-        update(forum_post_id: forum_post.id)
-      else
-        forum_topic = ForumTopic.create(title: title, category_id: 1, original_post_attributes: {body: reason_with_link})
-        update(forum_topic_id: forum_topic.id, forum_post_id: forum_topic.posts.first.id)
+      CurrentUser.as(user) do
+        self.forum_topic = ForumTopic.create(title: title, category_id: 1, creator: user) unless forum_topic.present?
+        self.forum_post = forum_topic.posts.create(body: reason_with_link, creator: user) unless forum_post.present?
+        save
       end
     end
 
@@ -139,14 +136,6 @@ class BulkUpdateRequest < ApplicationRecord
   include ApprovalMethods
   include ValidationMethods
 
-  concerning :EmbeddedText do
-    class_methods do
-      def embedded_pattern
-        /\[bur:(?<id>\d+)\]/m
-      end
-    end
-  end
-
   def editable?(user)
     user_id == user.id || user.is_builder?
   end
@@ -183,11 +172,6 @@ class BulkUpdateRequest < ApplicationRecord
     lines.join("\n")
   end
 
-  def initialize_attributes
-    self.user_id = CurrentUser.user.id unless self.user_id
-    self.status = "pending"
-  end
-
   def normalize_text
     self.script = script.downcase
   end
@@ -208,14 +192,14 @@ class BulkUpdateRequest < ApplicationRecord
     status == "rejected"
   end
 
-  def estimate_update_count
-    AliasAndImplicationImporter.new(script, nil).estimate_update_count
-  end
-
   def update_notice
     TagChangeNoticeService.update_cache(
       AliasAndImplicationImporter.new(script, nil).affected_tags,
       forum_topic_id
     )
+  end
+
+  def self.available_includes
+    [:user, :forum_topic, :forum_post, :approver]
   end
 end

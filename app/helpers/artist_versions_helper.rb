@@ -1,8 +1,4 @@
 module ArtistVersionsHelper
-  def artist_versions_listing_type
-    (params.dig(:search, :artist_id).present? && CurrentUser.is_member?) ? :revert : :standard
-  end
-
   def artist_version_other_names_diff(artist_version)
     new_names = artist_version.other_names
     old_names = artist_version.previous.try(:other_names)

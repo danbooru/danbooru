@@ -6,7 +6,6 @@
       <%= f.hidden_field :group_by, value: "note" %>
 
       <%= f.input :body_matches, label: "Body" %>
-      <%= f.input :creator_name, label: "Author", input_html: { data: { autocomplete: "user" } } %>
       <%= f.input :post_tags_match, label: "Tags", input_html: { data: { autocomplete: "tag-query" } } %>
       <%= f.submit "Search" %>
     <% end %>

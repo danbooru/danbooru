@@ -63,7 +63,9 @@
 
       <tr>
         <th>Upload Limit</th>
-        <td><%= presenter.upload_limit(self) %> (<%= link_to_wiki "help", "about:upload_limits" %>)</td>
+        <td>
+          <%= render "users/upload_limit", user: user %>
+        </td>
       </tr>
 
       <tr>
@@ -146,7 +148,7 @@
         <td><%= presenter.artist_commentary_version_count(self) %></td>
       </tr>
 
-      <% if PoolArchive.enabled? %>
+      <% if PoolVersion.enabled? %>
         <tr>
           <th>Pool Changes</th>
           <td><%= presenter.pool_version_count(self) %></td>

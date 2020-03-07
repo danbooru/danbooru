@@ -8,28 +8,30 @@ class UserFeedbacksController < ApplicationController
   end
 
   def edit
-    @user_feedback = UserFeedback.visible.find(params[:id])
+    @user_feedback = UserFeedback.visible(CurrentUser.user).find(params[:id])
     check_privilege(@user_feedback)
     respond_with(@user_feedback)
   end
 
   def show
-    @current_item = @user_feedback = UserFeedback.visible.find(params[:id])
+    @user_feedback = UserFeedback.visible(CurrentUser.user).find(params[:id])
     respond_with(@user_feedback)
   end
 
   def index
-    @user_feedbacks = UserFeedback.includes(:user, :creator).paginated_search(params, count_pages: true)
+    @user_feedbacks = UserFeedback.visible(CurrentUser.user).paginated_search(params, count_pages: true)
+    @user_feedbacks = @user_feedbacks.includes(:user, :creator) if request.format.html?
+
     respond_with(@user_feedbacks)
   end
 
   def create
-    @user_feedback = UserFeedback.create(user_feedback_params(:create))
+    @user_feedback = UserFeedback.create(user_feedback_params(:create).merge(creator: CurrentUser.user))
     respond_with(@user_feedback)
   end
 
   def update
-    @user_feedback = UserFeedback.visible.find(params[:id])
+    @user_feedback = UserFeedback.visible(CurrentUser.user).find(params[:id])
     check_privilege(@user_feedback)
     @user_feedback.update(user_feedback_params(:update, @user_feedback))
     respond_with(@user_feedback)

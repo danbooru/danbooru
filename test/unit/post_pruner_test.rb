@@ -2,32 +2,15 @@ require 'test_helper'
 
 class PostPrunerTest < ActiveSupport::TestCase
   def setup
-    super
-
-    @user = FactoryBot.create(:admin_user)
-    CurrentUser.user = @user
-    CurrentUser.ip_addr = "127.0.0.1"
-
-    travel_to(2.weeks.ago) do
-      @flagger = FactoryBot.create(:gold_user)
-    end
     @old_post = FactoryBot.create(:post, :created_at => 5.days.ago, :is_pending => true)
     @unresolved_flagged_post = FactoryBot.create(:post, :is_flagged => true)
     @resolved_flagged_post = FactoryBot.create(:post, :is_flagged => true)
 
-    CurrentUser.scoped(@flagger, "127.0.0.2") do
-      @unresolved_post_flag = FactoryBot.create(:post_flag, :created_at => 5.days.ago, :is_resolved => false, :post_id => @unresolved_flagged_post.id)
-      @resolved_post_flag = FactoryBot.create(:post_flag, :created_at => 5.days.ago, :is_resolved => true, :post_id => @resolved_flagged_post.id)
-    end
+    @flagger = create(:gold_user, created_at: 2.weeks.ago)
+    @unresolved_post_flag = create(:post_flag, creator: @flagger, created_at: 5.days.ago, is_resolved: false, post: @unresolved_flagged_post)
+    @resolved_post_flag = create(:post_flag, creator: @flagger, created_at: 5.days.ago, is_resolved: true, post: @resolved_flagged_post)
 
     PostPruner.new.prune!
-  end
-
-  def teardown
-    super
-
-    CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
   end
 
   should "prune old pending posts" do

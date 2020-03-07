@@ -7,7 +7,7 @@ class TagRelationship < ApplicationRecord
 
   attr_accessor :skip_secondary_validations
 
-  belongs_to_creator
+  belongs_to :creator, class_name: "User"
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :forum_post, optional: true
   belongs_to :forum_topic, optional: true
@@ -24,7 +24,6 @@ class TagRelationship < ApplicationRecord
   scope :pending, -> {where(status: "pending")}
   scope :retired, -> {where(status: "retired")}
 
-  before_validation :initialize_creator, :on => :create
   before_validation :normalize_names
   validates_format_of :status, :with => /\A(active|deleted|pending|processing|queued|retired|error: .*)\Z/
   validates_presence_of :antecedent_name, :consequent_name
@@ -32,10 +31,6 @@ class TagRelationship < ApplicationRecord
   validates :forum_topic, presence: { message: "must exist" }, if: -> { forum_topic_id.present? }
   validate :antecedent_and_consequent_are_different
   after_save :update_notice
-
-  def initialize_creator
-    self.creator_id = CurrentUser.user.id
-  end
 
   def normalize_names
     self.antecedent_name = antecedent_name.mb_chars.downcase.tr(" ", "_")
@@ -71,14 +66,7 @@ class TagRelationship < ApplicationRecord
   end
 
   def deletable_by?(user)
-    return true if user.is_admin?
-    return true if is_pending? && user.is_builder?
-    return true if is_pending? && user.id == creator_id
-    return false
-  end
-
-  def editable_by?(user)
-    deletable_by?(user)
+    user.is_admin?
   end
 
   def reject!(update_topic: true)
@@ -90,7 +78,7 @@ class TagRelationship < ApplicationRecord
 
   module SearchMethods
     def name_matches(name)
-      where("(antecedent_name like ? escape E'\\\\' or consequent_name like ? escape E'\\\\')", name.mb_chars.downcase.to_escaped_for_sql_like, name.mb_chars.downcase.to_escaped_for_sql_like)
+      where_ilike(:antecedent_name, name).or(where_ilike(:consequent_name, name))
     end
 
     def status_matches(status)
@@ -110,27 +98,15 @@ class TagRelationship < ApplicationRecord
 
     def pending_first
       # unknown statuses return null and are sorted first
-      order(Arel.sql("array_position(array['queued', 'processing', 'pending', 'active', 'deleted', 'retired'], status::text) NULLS FIRST, antecedent_name, consequent_name"))
-    end
-
-    def default_order
-      pending_first
+      order(Arel.sql("array_position(array['queued', 'processing', 'pending', 'active', 'deleted', 'retired'], status::text) NULLS FIRST, id DESC"))
     end
 
     def search(params)
       q = super
-      q = q.search_attributes(params, :creator, :approver, :forum_topic_id, :forum_post_id)
+      q = q.search_attributes(params, :creator, :approver, :forum_topic_id, :forum_post_id, :antecedent_name, :consequent_name)
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
-      end
-
-      if params[:antecedent_name].present?
-        q = q.where(antecedent_name: params[:antecedent_name].split)
-      end
-
-      if params[:consequent_name].present?
-        q = q.where(consequent_name: params[:consequent_name].split)
       end
 
       if params[:status].present?
@@ -144,8 +120,7 @@ class TagRelationship < ApplicationRecord
         q = q.joins(:consequent_tag).where("tags.category": params[:category].split)
       end
 
-      params[:order] ||= "status"
-      case params[:order].downcase
+      case params[:order].to_s.downcase
       when "created_at"
         q = q.order("created_at desc")
       when "updated_at"
@@ -154,6 +129,8 @@ class TagRelationship < ApplicationRecord
         q = q.order("antecedent_name asc, consequent_name asc")
       when "tag_count"
         q = q.joins(:consequent_tag).order("tags.post_count desc, antecedent_name asc, consequent_name asc")
+      when "status"
+        q = q.pending_first
       else
         q = q.apply_default_order(params)
       end
@@ -197,22 +174,10 @@ class TagRelationship < ApplicationRecord
     end
   end
 
-  concerning :EmbeddedText do
-    class_methods do
-      def embedded_pattern
-        raise NotImplementedError
-      end
-    end
-  end
-
   def antecedent_and_consequent_are_different
     if antecedent_name == consequent_name
       errors[:base] << "Cannot alias or implicate a tag to itself"
     end
-  end
-
-  def estimate_update_count
-    Post.fast_count(antecedent_name, skip_cache: true)
   end
 
   def update_posts
@@ -230,6 +195,10 @@ class TagRelationship < ApplicationRecord
       [antecedent_name, consequent_name],
       forum_topic_id
     )
+  end
+
+  def self.available_includes
+    [:creator, :approver, :forum_post, :forum_topic, :antecedent_tag, :consequent_tag, :antecedent_wiki, :consequent_wiki]
   end
 
   extend SearchMethods

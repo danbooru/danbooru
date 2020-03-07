@@ -3,6 +3,7 @@ import Utility from './utility'
 import Hammer from 'hammerjs'
 import Cookie from './cookie'
 import Note from './notes'
+import Ugoira from './ugoira'
 import Rails from '@rails/ujs'
 
 let Post = {};
@@ -34,6 +35,7 @@ Post.initialize_all = function() {
     this.initialize_post_image_resize_links();
     this.initialize_post_image_resize_to_window_link();
     this.initialize_recommended();
+    this.initialize_ugoira_player();
 
     if (CurrentUser.data("always-resize-images") || (Utility.meta("viewport") && (window.screen.width <= 660))) {
       $("#image-resize-to-window-link").click();
@@ -193,7 +195,7 @@ Post.nav_prev = function(e) {
   } else if ($(".paginator a[rel~=prev]").length) {
     location.href = $("a[rel~=prev]").attr("href");
   } else {
-    href = $("#pool-nav li.pool-selected-true a[rel~=prev], #favgroup-nav a.active[rel~=prev]").attr("href");
+    href = $("#pool-nav li[data-selected=true] a[rel=prev], #favgroup-nav li[data-selected=true] a[rel=prev]").attr("href");
     if (href) {
       location.href = href;
     }
@@ -211,7 +213,7 @@ Post.nav_next = function(e) {
   } else if ($(".paginator a[rel~=next]").length) {
     location.href = $(".paginator a[rel~=next]").attr("href");
   } else {
-    href = $("#pool-nav li.pool-selected-true a[rel~=next], #favgroup-nav a.active[rel~=next]").attr("href");
+    href = $("#pool-nav li[data-selected=true] a[rel=next], #favgroup-nav li[data-selected=true] a[rel=next]").attr("href");
     if (href) {
       location.href = href;
     }
@@ -451,6 +453,16 @@ Post.initialize_post_sections = function() {
   });
 }
 
+Post.initialize_ugoira_player = function() {
+  if ($("#ugoira-controls").length) {
+    let content_type = $("#image").data("ugoira-content-type");
+    let frames = $("#image").data("ugoira-frames");
+    let file_url = $("#image-container").data("file-url");
+
+    Ugoira.create_player(content_type, frames, file_url);
+  }
+};
+
 Post.resize_ugoira_controls = function() {
   var $img = $("#image");
   var width = Math.max($img.width(), 350);
@@ -458,96 +470,31 @@ Post.resize_ugoira_controls = function() {
   $("#seek-slider").css("width", width - 81);
 }
 
-Post.notice_update = function(x) {
-  if (x === "inc") {
-    Post.pending_update_count += 1;
-    Utility.notice("Updating posts (" + Post.pending_update_count + " pending)...", true);
+Post.show_pending_update_notice = function() {
+  if (Post.pending_update_count === 0) {
+    Utility.notice("Posts updated");
   } else {
-    Post.pending_update_count -= 1;
-
-    if (Post.pending_update_count < 1) {
-      Utility.notice("Posts updated");
-    } else {
-      Utility.notice("Updating posts (" + Post.pending_update_count + " pending)...", true);
-    }
+    Utility.notice(`Updating posts (${Post.pending_update_count} pending)...`, true);
   }
-}
-
-Post.update_data = function(data) {
-  var $post = $("#post_" + data.id);
-  $post.attr("data-tags", data.tag_string);
-  $post.data("rating", data.rating);
-  $post.removeClass("post-status-has-parent post-status-has-children");
-  if (data.parent_id) {
-    $post.addClass("post-status-has-parent");
-  }
-  if (data.has_visible_children) {
-    $post.addClass("post-status-has-children");
-  }
-}
-
-Post.vote = function(score, id) {
-  Utility.notice("Voting...");
-
-  $.post("/posts/" + id + "/votes.js", {
-    score: score
-  });
 }
 
 Post.tag = function(post_id, tags) {
   const tag_string = (Array.isArray(tags) ? tags.join(" ") : String(tags));
-  Post.update(post_id, { "post[old_tag_string]": "", "post[tag_string]": tag_string });
+  Post.update(post_id, "tag-script", { post: { old_tag_string: "", tag_string: tag_string }});
 }
 
-Post.update = function(post_id, params) {
-  Post.notice_update("inc");
+Post.update = async function(post_id, mode, params) {
+  try {
+    Post.pending_update_count += 1;
+    Post.show_pending_update_notice()
 
-  $.ajax({
-    type: "PUT",
-    url: "/posts/" + post_id + ".json",
-    data: params,
-    success: function(data) {
-      Post.notice_update("dec");
-      Post.update_data(data);
-    },
-    error: function(data) {
-      Post.notice_update("dec");
-      Utility.error(`There was an error updating <a href="/posts/${post_id}">post #${post_id}</a>`);
-    }
-  });
-}
+    await $.ajax({ type: "PUT", url: `/posts/${post_id}.js?mode=${mode}`, data: params });
 
-Post.ban = function(post_id) {
-  $.ajax({
-    type: "POST",
-    url: "/moderator/post/posts/" + post_id + "/ban.js",
-    data: {
-      commit: "Ban"
-    },
-    success: function(data) {
-      $("#post_" + post_id).remove();
-    },
-    error: function(data) {
-      Utility.error(`There was an error updating <a href="/posts/${post_id}">post #${post_id}</a>`);
-    }
-  });
-}
-
-Post.approve = function(post_id) {
-  $.post(
-    "/moderator/post/approval.json",
-    {"post_id": post_id}
-  ).fail(function(data) {
-    var message = $.map(data.responseJSON.errors, function(msg, attr) { return msg; }).join("; ");
-    Utility.error("Error: " + message);
-  }).done(function(data) {
-    var $post = $("#post_" + post_id);
-    if ($post.length) {
-      $post.data("flags", $post.data("flags").replace(/pending/, ""));
-      $post.removeClass("post-status-pending");
-      Utility.notice("Approved post #" + post_id);
-    }
-  });
+    Post.pending_update_count -= 1;
+    Post.show_pending_update_notice();
+  } catch(err) {
+    Post.pending_update_count -= 1;
+  }
 }
 
 Post.initialize_saved_searches = function() {

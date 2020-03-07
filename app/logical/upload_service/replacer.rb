@@ -120,9 +120,7 @@ class UploadService
       update_ugoira_frame_data(post, upload)
 
       if md5_changed
-        CurrentUser.as(User.system) do
-          post.comments.create!(body: comment_replacement_message(post, replacement), do_not_bump_post: true)
-        end
+        Comment.create!(post: post, creator: User.system, body: comment_replacement_message(post, replacement), do_not_bump_post: true, creator_ip_addr: "127.0.0.1")
       else
         purge_cached_urls(post)
       end

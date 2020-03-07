@@ -1,3 +1,8 @@
+<% page_title "Login" %>
+<% meta_description "Login to #{Danbooru.config.app_name}" %>
+
+<%= render "sessions/secondary_links" %>
+
 <div id="c-sessions">
   <div id="a-new">
     <section>
@@ -15,9 +20,3 @@
       </p>
   </div>
 </div>
-
-<% content_for(:page_title) do %>
- Login - <%= Danbooru.config.app_name %>
-<% end %>
-
-<%= render "secondary_links" %>

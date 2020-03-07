@@ -1,6 +1,5 @@
 class ModAction < ApplicationRecord
   belongs_to :creator, :class_name => "User"
-  before_validation :initialize_creator, :on => :create
 
   api_attributes including: [:category_id]
 
@@ -54,7 +53,7 @@ class ModAction < ApplicationRecord
     other: 2000
   }
 
-  def self.permitted(user)
+  def self.visible(user)
     if user.is_moderator?
       all
     else
@@ -65,7 +64,6 @@ class ModAction < ApplicationRecord
   def self.search(params)
     q = super
 
-    q = q.permitted(CurrentUser.user)
     q = q.search_attributes(params, :creator, :category, :description)
     q = q.text_attribute_matches(:description, params[:description_matches])
 
@@ -76,11 +74,11 @@ class ModAction < ApplicationRecord
     self.class.categories[category]
   end
 
-  def self.log(desc, cat = :other)
-    create(:description => desc, :category => categories[cat])
+  def self.log(desc, cat = :other, user = CurrentUser.user)
+    create(creator: user, description: desc, category: categories[cat])
   end
 
-  def initialize_creator
-    self.creator_id = CurrentUser.id
+  def self.available_includes
+    [:creator]
   end
 end

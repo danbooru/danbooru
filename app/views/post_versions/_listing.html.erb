@@ -1,15 +1,15 @@
-<div id="p-<%= post_versions_listing_type %>-listing">
-  <% if post_versions_listing_type == :revert %>
+<div id="p-<%= listing_type(:post_id) %>-listing">
+  <% if listing_type(:post_id) == :revert %>
     <%= PostPresenter.preview(@post_versions.first.post, show_deleted: true) %>
   <% end %>
 
     <%= table_for @post_versions, {id: "post-versions-table", class: "striped autofit"} do |t| %>
       <% if CurrentUser.user.is_builder? %>
-        <% t.column tag.label(tag.input type: :checkbox, id: "post-version-select-all-checkbox", class: "post-version-select-checkbox"), th: { class: "post-version-select-column" }, td: { class: "post-version-select-column" } do |post_version| %>
+        <% t.column tag.label(tag.input type: :checkbox, id: "post-version-select-all-checkbox", class: "post-version-select-checkbox"), column: "post-version-select" do |post_version| %>
           <input type="checkbox" class="post-version-select-checkbox" <%= "disabled" unless post_version.can_undo?(CurrentUser.user) %>>
         <% end %>
       <% end %>
-      <% if post_versions_listing_type == :standard %>
+      <% if listing_type(:post_id) == :standard %>
         <% t.column "Post" do |post_version| %>
           <%= PostPresenter.preview(post_version.post, show_deleted: true) %>
         <% end %>
@@ -19,6 +19,9 @@
       <% end %>
       <% t.column "Tags", td: {class: "col-expand"} do |post_version| %>
         <%= post_version_diff(post_version) %>
+      <% end %>
+      <% t.column "Changes" do |post_version| %>
+        <%= status_diff_html(post_version) %>
       <% end %>
       <% t.column "Updated" do |post_version| %>
         <%= link_to_user post_version.updater %>
@@ -31,7 +34,7 @@
         <% if post_version.can_undo?(CurrentUser.user) %>
           <%= link_to "Undo", undo_post_version_path(post_version), method: :put, remote: true, class: "post-version-undo-link" %>
         <% end %>
-        <% if post_versions_listing_type == :revert && post_version.can_revert_to?(CurrentUser.user) %>
+        <% if listing_type(:post_id) == :revert && post_version.can_revert_to?(CurrentUser.user) %>
           | <%= link_to "Revert to", revert_post_path(post_version.post_id, version_id: post_version.id), method: :put, remote: true %>
         <% end %>
       <% end %>

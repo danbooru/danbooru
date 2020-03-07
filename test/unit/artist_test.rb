@@ -2,7 +2,7 @@ require 'test_helper'
 
 class ArtistTest < ActiveSupport::TestCase
   def assert_artist_found(expected_name, source_url)
-    artists = Artist.find_artists(source_url).to_a
+    artists = ArtistFinder.find_artists(source_url).to_a
 
     assert_equal(1, artists.size)
     assert_equal(expected_name, artists.first.name, "Testing URL: #{source_url}")
@@ -11,7 +11,7 @@ class ArtistTest < ActiveSupport::TestCase
   end
 
   def assert_artist_not_found(source_url)
-    artists = Artist.find_artists(source_url).to_a
+    artists = ArtistFinder.find_artists(source_url).to_a
     assert_equal(0, artists.size, "Testing URL: #{source_url}")
   rescue Net::OpenTimeout
     skip "Remote connection failed for #{source_url}"
@@ -30,27 +30,27 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "parse inactive urls" do
-      @artist = Artist.create(name: "blah", url_string: "-http://monet.com")
+      @artist = create(:artist, name: "blah", url_string: "-http://monet.com")
       assert_equal(["-http://monet.com"], @artist.urls.map(&:to_s))
       refute(@artist.urls[0].is_active?)
     end
 
     should "not allow duplicate active+inactive urls" do
-      @artist = Artist.create(name: "blah", url_string: "-http://monet.com\nhttp://monet.com")
+      @artist = create(:artist, name: "blah", url_string: "-http://monet.com\nhttp://monet.com")
       assert_equal(1, @artist.urls.count)
       assert_equal(["-http://monet.com"], @artist.urls.map(&:to_s))
       refute(@artist.urls[0].is_active?)
     end
 
     should "allow deactivating a url" do
-      @artist = Artist.create(name: "blah", url_string: "http://monet.com")
+      @artist = create(:artist, name: "blah", url_string: "http://monet.com")
       @artist.update(url_string: "-http://monet.com")
       assert_equal(1, @artist.urls.count)
       refute(@artist.urls[0].is_active?)
     end
 
     should "allow activating a url" do
-      @artist = Artist.create(name: "blah", url_string: "-http://monet.com")
+      @artist = create(:artist, name: "blah", url_string: "-http://monet.com")
       @artist.update(url_string: "http://monet.com")
       assert_equal(1, @artist.urls.count)
       assert(@artist.urls[0].is_active?)
@@ -69,7 +69,7 @@ class ArtistTest < ActiveSupport::TestCase
         @post = FactoryBot.create(:post, :tag_string => "aaa")
         @artist = FactoryBot.create(:artist, :name => "aaa")
         @admin = FactoryBot.create(:admin_user)
-        CurrentUser.scoped(@admin) { @artist.ban! }
+        @artist.ban!(banner: @admin)
         @post.reload
       end
 
@@ -102,24 +102,6 @@ class ArtistTest < ActiveSupport::TestCase
         ta = TagImplication.where(:antecedent_name => "aaa", :consequent_name => "banned_artist").first
         assert_equal(@admin.id, ta.approver.id)
       end
-    end
-
-    should "create a new wiki page to store any note information" do
-      artist = nil
-      assert_difference("WikiPage.count") do
-        artist = FactoryBot.create(:artist, :name => "aaa", :notes => "testing")
-      end
-      assert_equal("testing", artist.notes)
-      assert_equal("testing", artist.wiki_page.body)
-      assert_equal(artist.name, artist.wiki_page.title)
-    end
-
-    should "update the wiki page when notes are assigned" do
-      artist = FactoryBot.create(:artist, :name => "aaa", :notes => "testing")
-      artist.update_attribute(:notes, "kokoko")
-      artist.reload
-      assert_equal("kokoko", artist.notes)
-      assert_equal("kokoko", artist.wiki_page.body)
     end
 
     should "normalize its name" do
@@ -209,7 +191,7 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "hide deleted artists" do
-      FactoryBot.create(:artist, :name => "warhol", :url_string => "http://warhol.com/a/image.jpg", :is_active => false)
+      create(:artist, name: "warhol", url_string: "http://warhol.com/a/image.jpg", is_deleted: true)
       assert_artist_not_found("http://warhol.com/a/image.jpg")
     end
 
@@ -530,7 +512,7 @@ class ArtistTest < ActiveSupport::TestCase
     context "that is deleted" do
       setup do
         @artist = create(:artist, url_string: "https://google.com")
-        @artist.update_attribute(:is_active, false)
+        @artist.update_attribute(:is_deleted, true)
         @artist.reload
       end
 

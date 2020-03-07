@@ -1,5 +1,5 @@
 <% content_for(:secondary_links) do %>
-  <%= quick_search_form_for(:any_name_or_url_matches, artists_path, "artists", autocomplete: "artist") %>
+  <%= quick_search_form_for(:any_name_or_url_matches, artists_path, "artists", autocomplete: "artist", redirect: true) %>
   <%= subnav_link_to "Listing", artists_path %>
   <%= subnav_link_to "Banned", artists_path(search: { is_banned: "true", order: "updated_at" }) %>
   <% if CurrentUser.is_member? %>
@@ -16,10 +16,10 @@
     <% end %>
     <%= subnav_link_to "History", artist_versions_path(:search => {:artist_id => @artist.id}) %>
     <% if CurrentUser.is_member? %>
-      <% if @artist.is_active? %>
-        <%= subnav_link_to "Delete", artist_path(@artist), method: :delete, "data-shortcut": "shift+d", "data-confirm": "Are you sure you want to delete this artist?" %>
+      <% if @artist.is_deleted? %>
+        <%= subnav_link_to "Undelete", artist_path(@artist, format: "js"), method: :put, data: {confirm: "Are you sure you want to undelete this artist?", params: "artist[is_deleted]=false"}, remote: true %>
       <% else %>
-        <%= subnav_link_to "Undelete", artist_path(@artist, format: "js"), method: :put, data: {confirm: "Are you sure you want to undelete this artist?", params: "artist[is_active]=true"}, remote: true %>
+        <%= subnav_link_to "Delete", artist_path(@artist), method: :delete, "data-shortcut": "shift+d", "data-confirm": "Are you sure you want to delete this artist?" %>
       <% end %>
     <% end %>
     <% if CurrentUser.is_admin? %>

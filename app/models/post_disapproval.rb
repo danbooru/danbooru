@@ -3,19 +3,14 @@ class PostDisapproval < ApplicationRecord
 
   belongs_to :post
   belongs_to :user
-  after_initialize :initialize_attributes, if: :new_record?
   validates_uniqueness_of :post_id, :scope => [:user_id], :message => "have already hidden this post"
   validates_inclusion_of :reason, :in => %w(legacy breaks_rules poor_quality disinterest)
 
-  scope :with_message, -> {where("message is not null and message <> ''")}
-  scope :without_message, -> {where("message is null or message = ''")}
+  scope :with_message, -> { where.not(message: nil) }
+  scope :without_message, -> { where(message: nil) }
   scope :breaks_rules, -> {where(:reason => "breaks_rules")}
   scope :poor_quality, -> {where(:reason => "poor_quality")}
   scope :disinterest, -> {where(:reason => ["disinterest", "legacy"])}
-
-  def initialize_attributes
-    self.user_id ||= CurrentUser.user.id
-  end
 
   def self.prune!
     PostDisapproval.where("post_id in (select _.post_id from post_disapprovals _ where _.created_at < ?)", DELETION_THRESHOLD.ago).delete_all
@@ -39,12 +34,6 @@ class PostDisapproval < ApplicationRecord
     end
   end
 
-  def create_downvote
-    if %w(breaks_rules poor_quality).include?(reason)
-      PostVote.create(:score => -1, :post_id => post_id)
-    end
-  end
-
   concerning :SearchMethods do
     class_methods do
       def search(params)
@@ -63,8 +52,27 @@ class PostDisapproval < ApplicationRecord
           q = q.apply_default_order(params)
         end
 
-        q.apply_default_order(params)
+        q
       end
     end
+  end
+
+  def self.available_includes
+    [:user, :post]
+  end
+
+  def message=(message)
+    message = nil if message.blank?
+    super(message)
+  end
+
+  def can_view_creator?(user)
+    user.is_moderator? || user_id == user.id
+  end
+
+  def api_attributes
+    attributes = super
+    attributes -= [:creator_id] unless can_view_creator?(CurrentUser.user)
+    attributes
   end
 end

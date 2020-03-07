@@ -1,7 +1,7 @@
 <% TagCategory.css_mapping.each do |category,cssmap| %>
-  .category-<%= category %> a,
+  .tag-type-<%= category %> a,
   a.tag-type-<%= category %>,
-  .ui-widget-content .category-<%= category %> a,
+  .ui-widget-content .tag-type-<%= category %> a,
   .ui-widget-content a.tag-type-<%= category %> {
     color: <%= cssmap["color"] %>;
 
@@ -34,11 +34,6 @@
     }
   }
 <% end %>
-
-.category-banned a, a.tag-type-banned, .ui-state-active a.tag-type-banned {
-  color: black;
-  background-color: red;
-}
 
 a.search-tag {
   word-break: break-word;

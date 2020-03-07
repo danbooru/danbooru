@@ -3,9 +3,9 @@ module Moderator
     module Queries
       class Tag < ::Struct.new(:user, :count)
         def self.all(min_date, max_level)
-          return [] unless PostArchive.enabled?
+          return [] unless PostVersion.enabled?
 
-          records = PostArchive.where("updated_at > ?", min_date).group(:updater).count.map do |user, count|
+          records = PostVersion.where("updated_at > ?", min_date).group(:updater).count.map do |user, count|
             new(user, count)
           end
 

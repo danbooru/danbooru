@@ -4,12 +4,11 @@ class PostFlag < ApplicationRecord
   module Reasons
     UNAPPROVED = "Unapproved in three days"
     REJECTED = "Unapproved in three days after returning to moderation queue%"
-    BANNED = "Artist requested removal"
   end
 
   COOLDOWN_PERIOD = 3.days
 
-  belongs_to_creator :class_name => "User"
+  belongs_to :creator, class_name: "User"
   belongs_to :post
   validates_presence_of :reason
   validate :validate_creator_is_not_limited, on: :create
@@ -21,32 +20,12 @@ class PostFlag < ApplicationRecord
   scope :by_users, -> { where.not(creator: User.system) }
   scope :by_system, -> { where(creator: User.system) }
   scope :in_cooldown, -> { by_users.where("created_at >= ?", COOLDOWN_PERIOD.ago) }
+  scope :resolved, -> { where(is_resolved: true) }
+  scope :unresolved, -> { where(is_resolved: false) }
+  scope :recent, -> { where("post_flags.created_at >= ?", 1.day.ago) }
+  scope :old, -> { where("post_flags.created_at <= ?", 3.days.ago) }
 
   module SearchMethods
-    def duplicate
-      where("to_tsvector('english', post_flags.reason) @@ to_tsquery('dup | duplicate | sample | smaller')")
-    end
-
-    def not_duplicate
-      where("to_tsvector('english', post_flags.reason) @@ to_tsquery('!dup & !duplicate & !sample & !smaller')")
-    end
-
-    def resolved
-      where("is_resolved = ?", true)
-    end
-
-    def unresolved
-      where("is_resolved = ?", false)
-    end
-
-    def recent
-      where("created_at >= ?", 1.day.ago)
-    end
-
-    def old
-      where("created_at <= ?", 3.days.ago)
-    end
-
     def search(params)
       q = super
 
@@ -76,17 +55,13 @@ class PostFlag < ApplicationRecord
 
       case params[:category]
       when "normal"
-        q = q.where("reason NOT IN (?) AND reason NOT LIKE ?", [Reasons::UNAPPROVED, Reasons::BANNED], Reasons::REJECTED)
+        q = q.where("reason NOT IN (?) AND reason NOT LIKE ?", [Reasons::UNAPPROVED], Reasons::REJECTED)
       when "unapproved"
         q = q.where(reason: Reasons::UNAPPROVED)
-      when "banned"
-        q = q.where(reason: Reasons::BANNED)
       when "rejected"
         q = q.where("reason LIKE ?", Reasons::REJECTED)
       when "deleted"
         q = q.where("reason = ? OR reason LIKE ?", Reasons::UNAPPROVED, Reasons::REJECTED)
-      when "duplicate"
-        q = q.duplicate
       end
 
       q.apply_default_order(params)
@@ -110,8 +85,6 @@ class PostFlag < ApplicationRecord
       :unapproved
     when /#{Reasons::REJECTED.gsub("%", ".*")}/
       :rejected
-    when Reasons::BANNED
-      :banned
     else
       :normal
     end
@@ -124,7 +97,7 @@ class PostFlag < ApplicationRecord
   def validate_creator_is_not_limited
     return if is_deletion
 
-    if CurrentUser.can_approve_posts?
+    if creator.can_approve_posts?
       # do nothing
     elsif creator.created_at > 1.week.ago
       errors[:creator] << "cannot flag within the first week of sign up"
@@ -155,10 +128,14 @@ class PostFlag < ApplicationRecord
   end
 
   def uploader_id
-    @uploader_id ||= Post.find(post_id).uploader_id
+    post.uploader_id
   end
 
   def not_uploaded_by?(userid)
     uploader_id != userid
+  end
+
+  def self.available_includes
+    [:post]
   end
 end

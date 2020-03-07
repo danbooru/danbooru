@@ -1,5 +1,7 @@
 class DtextLink < ApplicationRecord
   belongs_to :model, polymorphic: true
+  belongs_to :linked_wiki, primary_key: :title, foreign_key: :link_target, class_name: "WikiPage", optional: true
+
   enum link_type: [:wiki_link, :external_link]
 
   before_validation :normalize_link_target
@@ -7,6 +9,10 @@ class DtextLink < ApplicationRecord
 
   scope :wiki_page, -> { where(model_type: "WikiPage") }
   scope :forum_post, -> { where(model_type: "ForumPost") }
+
+  def self.model_types
+    %w[WikiPage ForumPost]
+  end
 
   def self.new_from_dtext(dtext)
     links = []
@@ -70,5 +76,9 @@ class DtextLink < ApplicationRecord
     # postgres will raise an error if the link is more than 2712 bytes long
     # because it can't index values that take up more than 1/3 of an 8kb page.
     self.link_target = self.link_target.truncate(2048, omission: "")
+  end
+
+  def self.available_includes
+    [:model]
   end
 end

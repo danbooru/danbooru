@@ -1,13 +1,13 @@
 class Comment < ApplicationRecord
-  include Mentionable
-
   validate :validate_creator_is_not_limited, :on => :create
-  validate :validate_comment_is_not_spam, on: :create
   validates_presence_of :body, :message => "has no content"
   belongs_to :post
-  belongs_to_creator
+  belongs_to :creator, class_name: "User"
   belongs_to_updater
+  has_many :moderation_reports, as: :model
   has_many :votes, :class_name => "CommentVote", :dependent => :destroy
+
+  before_create :autoreport_spam
   after_create :update_last_commented_at_on_create
   after_update(:if => ->(rec) {(!rec.is_deleted? || !rec.saved_change_to_is_deleted?) && CurrentUser.id != rec.creator_id}) do |rec|
     ModAction.log("comment ##{rec.id} updated by #{CurrentUser.name}", :comment_update)
@@ -16,23 +16,15 @@ class Comment < ApplicationRecord
   after_save(:if => ->(rec) {rec.is_deleted? && rec.saved_change_to_is_deleted? && CurrentUser.id != rec.creator_id}) do |rec|
     ModAction.log("comment ##{rec.id} deleted by #{CurrentUser.name}", :comment_delete)
   end
+
+  deletable
   mentionable(
     :message_field => :body,
     :title => ->(user_name) {"#{creator.name} mentioned you in a comment on post ##{post_id}"},
-    :body => ->(user_name) {"@#{creator.name} mentioned you in a \"comment\":/posts/#{post_id}#comment-#{id} on post ##{post_id}:\n\n[quote]\n#{DText.excerpt(body, "@" + user_name)}\n[/quote]\n"}
+    :body => ->(user_name) {"@#{creator.name} mentioned you in a \"comment\":/posts/#{post_id}#comment-#{id} on post ##{post_id}:\n\n[quote]\n#{DText.extract_mention(body, "@" + user_name)}\n[/quote]\n"}
   )
 
-  api_attributes including: [:creator_name, :updater_name]
-
   module SearchMethods
-    def deleted
-      where("comments.is_deleted = true")
-    end
-
-    def undeleted
-      where("comments.is_deleted = false")
-    end
-
     def search(params)
       q = super
 
@@ -55,9 +47,9 @@ class Comment < ApplicationRecord
   end
 
   module VoteMethods
-    def vote!(val)
+    def vote!(val, voter = CurrentUser.user)
       numerical_score = (val == "up") ? 1 : -1
-      vote = votes.create!(:score => numerical_score)
+      vote = votes.create!(user: voter, score: numerical_score)
 
       if vote.is_positive?
         update_column(:score, score + 1)
@@ -96,8 +88,10 @@ class Comment < ApplicationRecord
     end
   end
 
-  def validate_comment_is_not_spam
-    errors[:base] << "Failed to create comment" if SpamDetector.new(self).spam?
+  def autoreport_spam
+    if SpamDetector.new(self).spam?
+      moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
+    end
   end
 
   def update_last_commented_at_on_create
@@ -124,7 +118,11 @@ class Comment < ApplicationRecord
   end
 
   def editable_by?(user)
-    creator_id == user.id || user.is_moderator?
+    updater_id == user.id || user.is_moderator?
+  end
+
+  def reportable_by?(user)
+    creator_id != user.id && !creator.is_moderator?
   end
 
   def voted_by?(user)
@@ -143,27 +141,16 @@ class Comment < ApplicationRecord
     select { |comment| comment.visibility(user) == :hidden }
   end
 
+  # XXX rename
   def self.visible(user)
     select { |comment| comment.visibility(user) == :visible }
   end
 
-  def creator_name
-    creator.name
-  end
-
-  def updater_name
-    updater.name
-  end
-
-  def delete!
-    update(is_deleted: true)
-  end
-
-  def undelete!
-    update(is_deleted: false)
-  end
-
   def quoted_response
     DText.quote(body, creator.name)
+  end
+
+  def self.available_includes
+    [:post, :creator, :updater]
   end
 end

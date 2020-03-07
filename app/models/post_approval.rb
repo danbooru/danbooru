@@ -20,21 +20,28 @@ class PostApproval < ApplicationRecord
       errors.add(:base, "You cannot approve a post you uploaded")
     end
 
-    if post.approved_by?(user)
+    if post.approver == user || post.approvals.where(user: user).exists?
       errors.add(:base, "You have previously approved this post and cannot approve it again")
     end
   end
 
   def approve_post
-    ModAction.log("undeleted post ##{post_id}", :post_undelete) if post.is_deleted
+    is_undeletion = post.is_deleted
 
     post.flags.each(&:resolve!)
     post.update(approver: user, is_flagged: false, is_pending: false, is_deleted: false)
+    ModAction.log("undeleted post ##{post_id}", :post_undelete) if is_undeletion
+
+    post.uploader.upload_limit.update_limit!(post, incremental: !is_undeletion)
   end
 
   def self.search(params)
     q = super
     q = q.search_attributes(params, :user, :post)
     q.apply_default_order(params)
+  end
+
+  def self.available_includes
+    [:user, :post]
   end
 end

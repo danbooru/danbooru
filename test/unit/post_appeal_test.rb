@@ -3,14 +3,7 @@ require 'test_helper'
 class PostAppealTest < ActiveSupport::TestCase
   context "In all cases" do
     setup do
-      @alice = FactoryBot.create(:user)
-      CurrentUser.user = @alice
-      CurrentUser.ip_addr = "127.0.0.1"
-    end
-
-    teardown do
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
+      @alice = create(:user)
     end
 
     context "a user" do
@@ -19,37 +12,27 @@ class PostAppealTest < ActiveSupport::TestCase
       end
 
       should "not be able to appeal a post more than twice" do
-        assert_difference("PostAppeal.count", 1) do
-          @post_appeal = PostAppeal.create(:post => @post, :reason => "aaa")
-        end
+        @post_appeal = create(:post_appeal, post: @post, creator: @alice)
+        @post_appeal = build(:post_appeal, post: @post, creator: @alice)
 
-        assert_difference("PostAppeal.count", 0) do
-          @post_appeal = PostAppeal.create(:post => @post, :reason => "aaa")
-        end
-
+        assert_equal(false, @post_appeal.valid?)
         assert_includes(@post_appeal.errors.full_messages, "You have already appealed this post")
       end
 
       should "not be able to appeal more than 1 post in 24 hours" do
-        @post_appeal = PostAppeal.new(:post => @post, :reason => "aaa")
-        @post_appeal.expects(:appeal_count_for_creator).returns(1)
-        assert_difference("PostAppeal.count", 0) do
-          @post_appeal.save
-        end
+        @post_appeal = create(:post_appeal, post: @post, creator: @alice)
+        @post_appeal = build(:post_appeal, post: create(:post, is_deleted: true), creator: @alice)
+
+        assert_equal(false, @post_appeal.valid?)
         assert_equal(["You can appeal at most 1 post a day"], @post_appeal.errors.full_messages)
       end
 
       should "not be able to appeal an active post" do
         @post.update_attribute(:is_deleted, false)
-        assert_difference("PostAppeal.count", 0) do
-          @post_appeal = PostAppeal.create(:post => @post, :reason => "aaa")
-        end
-        assert_equal(["Post is active"], @post_appeal.errors.full_messages)
-      end
+        @post_appeal = build(:post_appeal, post: @post, creator: @alice)
 
-      should "initialize its creator" do
-        @post_appeal = PostAppeal.create(:post => @post, :reason => "aaa")
-        assert_equal(@alice.id, @post_appeal.creator_id)
+        assert_equal(false, @post_appeal.valid?)
+        assert_equal(["Post is active"], @post_appeal.errors.full_messages)
       end
     end
   end

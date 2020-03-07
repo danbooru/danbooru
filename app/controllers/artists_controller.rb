@@ -6,10 +6,12 @@ class ArtistsController < ApplicationController
 
   def new
     @artist = Artist.new_with_defaults(artist_params(:new))
+    @artist.build_wiki_page if @artist.wiki_page.nil?
     respond_with(@artist)
   end
 
   def edit
+    @artist.build_wiki_page if @artist.wiki_page.nil?
     respond_with(@artist)
   end
 
@@ -18,7 +20,7 @@ class ArtistsController < ApplicationController
   end
 
   def ban
-    @artist.ban!
+    @artist.ban!(banner: CurrentUser.user)
     redirect_to(artist_path(@artist), :notice => "Artist was banned")
   end
 
@@ -30,20 +32,14 @@ class ArtistsController < ApplicationController
   def index
     # XXX
     params[:search][:name] = params.delete(:name) if params[:name]
+    @artists = Artist.paginated_search(params)
+    @artists = @artists.includes(:urls, :tag) if request.format.html?
 
-    @artists = Artist.includes(:urls).paginated_search(params)
-    @artists = @artists.includes(:tag) if request.format.html?
-    @artists = @artists.includes(:urls) if !request.format.html?
-
-    if params[:redirect].to_s.truthy? && @artists.one? && @artists.first.name == Artist.normalize_name(params[:search][:any_name_or_url_matches])
-      redirect_to @artists.first
-    else
-      respond_with @artists
-    end
+    respond_with(@artists)
   end
 
   def show
-    @current_item = @artist = Artist.find(params[:id])
+    @artist = Artist.find(params[:id])
     respond_with(@artist)
   end
 
@@ -59,7 +55,7 @@ class ArtistsController < ApplicationController
   end
 
   def destroy
-    @artist.update_attribute(:is_active, false)
+    @artist.update_attribute(:is_deleted, true)
     redirect_to(artist_path(@artist), :notice => "Artist deleted")
   end
 
@@ -85,12 +81,21 @@ class ArtistsController < ApplicationController
 
   private
 
+  def item_matches_params(artist)
+    if params[:search][:any_name_or_url_matches]
+      artist.name == Artist.normalize_name(params[:search][:any_name_or_url_matches])
+    else
+      true
+    end
+  end
+
   def load_artist
     @artist = Artist.find(params[:id])
   end
 
   def artist_params(context = nil)
-    permitted_params = %i[name other_names other_names_string group_name url_string notes is_active]
+    permitted_params = %i[name other_names other_names_string group_name url_string notes is_deleted]
+    permitted_params << { wiki_page_attributes: %i[id body] }
     permitted_params << :source if context == :new
 
     params.fetch(:artist, {}).permit(permitted_params)

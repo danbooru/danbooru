@@ -1,35 +1,16 @@
-<div id="c-explore-posts">
-  <div id="a-popular">
-    <h1>
-      Popular:
-
-      <% if @scale == "day" %>
-        <%= @date.strftime("%B %d, %Y") %>
-      <% elsif @scale == "week" %>
-        <%= @date.strftime("Week of %B %d, %Y") %>
-      <% elsif @scale == "month" %>
-        <%= @date.strftime("%B %Y") %>
-      <% end %>
-    </h1>
-
-    <p id="popular-nav-links">
-      <%= render "explore/posts/nav_links", date: @date, selected_scale: @scale, scale: "day" %>
-      <%= render "explore/posts/nav_links", date: @date, selected_scale: @scale, scale: "week" %>
-      <%= render "explore/posts/nav_links", date: @date, selected_scale: @scale, scale: "month" %>
-    </p>
-
-    <%= render "posts/partials/common/inline_blacklist" %>
-
-    <%= post_previews_html(@posts) %>
-  </div>
-</div>
+<% page_title "Popular Posts" %>
+<% meta_description "The most popular posts of #{date_range_description(@date, @scale, @min_date, @max_date)}" %>
 
 <%= render "posts/partials/common/secondary_links" %>
 
-<% content_for(:page_title) do %>
-  Popular - <%= Danbooru.config.app_name %>
-<% end %>
+<div id="c-explore-posts">
+  <div id="a-popular">
+    <h1>Popular: <%= date_range_description(@date, @scale, @min_date, @max_date) %></h1>
 
-<% content_for(:html_header) do %>
-  <meta name="description" content="The most popular posts per <%= @scale %>">
-<% end %>
+    <%= render "explore/posts/nav_links", path: :popular_explore_posts_path, date: @date, scale: @scale %>
+    <%= render "posts/partials/common/inline_blacklist" %>
+
+    <%= post_previews_html(@posts) %>
+    <%= numbered_paginator(@posts) %>
+  </div>
+</div>

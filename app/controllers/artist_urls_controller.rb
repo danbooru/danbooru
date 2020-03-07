@@ -3,11 +3,10 @@ class ArtistUrlsController < ApplicationController
   before_action :member_only, except: [:index]
 
   def index
-    @artist_urls = ArtistUrl.includes(:artist).paginated_search(params)
-    respond_with(@artist_urls) do |format|
-      format.json { render json: @artist_urls.to_json(include: "artist") }
-      format.xml { render xml: @artist_urls.to_xml(include: "artist", root: "artist-urls") }
-    end
+    @artist_urls = ArtistUrl.paginated_search(params)
+    @artist_urls = @artist_urls.includes(:artist) if request.format.html?
+
+    respond_with(@artist_urls)
   end
 
   def update

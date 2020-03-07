@@ -13,18 +13,18 @@ class BansController < ApplicationController
 
   def index
     @bans = Ban.paginated_search(params, count_pages: true)
-    respond_with(@bans) do |fmt|
-      fmt.html { @bans = @bans.includes(:user, :banner) }
-    end
+    @bans = @bans.includes(:user, :banner) if request.format.html?
+
+    respond_with(@bans)
   end
 
   def show
-    @current_item = @ban = Ban.find(params[:id])
+    @ban = Ban.find(params[:id])
     respond_with(@ban)
   end
 
   def create
-    @ban = Ban.create(ban_params(:create))
+    @ban = Ban.create(banner: CurrentUser.user, **ban_params(:create))
 
     if @ban.errors.any?
       render :action => "new"

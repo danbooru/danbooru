@@ -1,7 +1,8 @@
 class UserFeedback < ApplicationRecord
   self.table_name = "user_feedback"
+
   belongs_to :user
-  belongs_to_creator
+  belongs_to :creator, class_name: "User"
   attr_accessor :disable_dmail_notification
   validates_presence_of :body, :category
   validates_inclusion_of :category, :in => %w(positive negative neutral)
@@ -15,13 +16,14 @@ class UserFeedback < ApplicationRecord
     ModAction.log(%{#{CurrentUser.name} deleted user feedback for "#{rec.user.name}":/users/#{rec.user_id}}, :user_feedback_delete)
   end
 
+  deletable
+
   scope :positive, -> { where(category: "positive") }
   scope :neutral,  -> { where(category: "neutral") }
   scope :negative, -> { where(category: "negative") }
-  scope :undeleted, -> { where(is_deleted: false) }
 
   module SearchMethods
-    def visible(viewer = CurrentUser.user)
+    def visible(viewer)
       viewer.is_moderator? ? all : undeleted
     end
 
@@ -32,7 +34,6 @@ class UserFeedback < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.visible
       q = q.search_attributes(params, :user, :creator, :category, :body, :is_deleted)
       q = q.text_attribute_matches(:body, params[:body_matches])
 
@@ -84,5 +85,9 @@ class UserFeedback < ApplicationRecord
 
   def editable_by?(editor)
     (editor.is_moderator? && editor != user) || (creator == editor && !is_deleted?)
+  end
+
+  def self.available_includes
+    [:creator, :user]
   end
 end

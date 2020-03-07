@@ -4,16 +4,8 @@ module Moderator
   class IpAddrsControllerTest < ActionDispatch::IntegrationTest
     context "The ip addrs controller" do
       setup do
-        PoolArchive.delete_all
-        PostArchive.delete_all
-
-        travel_to(1.month.ago) do
-          @user = create(:moderator_user)
-        end
-
-        as_user do
-          create(:comment)
-        end
+        @user = create(:moderator_user, created_at: 1.month.ago)
+        as(@user) { create(:comment, creator: @user) }
       end
 
       should "find by ip addr" do

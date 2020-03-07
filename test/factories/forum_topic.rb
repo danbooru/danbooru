@@ -1,5 +1,6 @@
 FactoryBot.define do
   factory(:forum_topic) do
+    creator
     title {FFaker::Lorem.words.join(" ")}
     is_sticky {false}
     is_locked {false}

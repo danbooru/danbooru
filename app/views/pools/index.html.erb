@@ -1,9 +1,14 @@
+<% page_title "Pools" %>
+<% meta_description "See thousands of translated anime & hentai comics, galleries, doujins, and more on #{Danbooru.config.app_name}." %>
+
+<%= render "secondary_links" %>
+
 <div id="c-pools">
   <div id="a-index">
     <%= render "search", :path => pools_path %>
 
     <%= table_for @pools, width: "100%" do |t| %>
-      <% t.column "Name", {width: "60%"} do |pool| %>
+      <% t.column "Name", width: "60%" do |pool| %>
         <span class="pool-category-<%= pool.category %>"><%= link_to pool.pretty_name, pool_path(pool) %></span>
         <% if pool.is_deleted? %>
           <span class="inactive">(deleted)</span>
@@ -12,7 +17,7 @@
           <%= link_to "page #{pool.last_page}", pool_path(pool, :page => pool.last_page), :class => "last-page" %>
         <% end %>
       <% end %>
-      <% t.column "Count", {width: "10%"} do |pool| %>
+      <% t.column "Count", width: "10%" do |pool| %>
         <%= pool.post_count %>
       <% end %>
     <% end %>
@@ -20,9 +25,3 @@
     <%= numbered_paginator(@pools) %>
   </div>
 </div>
-
-<%= render "secondary_links" %>
-
-<% content_for(:html_header) do %>
-  <meta name="description" content="Pools are groups of posts with something in common. The most common use of pools is for posts that are part of a series (such as a comic, or a group of images released by an artist).">
-<% end %>

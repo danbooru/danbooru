@@ -42,7 +42,7 @@
 
       <% if CurrentUser.can_approve_posts? %>
         <% if post.is_deleted? %>
-          <li id="post-option-undelete"><%= link_to "Undelete", undelete_moderator_post_post_path(post_id: post.id), remote: true, method: :post, "data-confirm": "Are you sure you want to undelete this post?" %></li>
+          <li id="post-option-undelete"><%= link_to "Undelete", post_approvals_path(post_id: post.id), remote: true, method: :post, "data-confirm": "Are you sure you want to undelete this post?" %></li>
           <% if post.fav_count > 0 && post.parent_id %>
             <li id="post-option-move-favorites"><%= link_to "Move favorites", confirm_move_favorites_moderator_post_post_path(post_id: post.id) %></li>
           <% end %>
@@ -51,14 +51,14 @@
         <% end %>
 
         <% if post.is_approvable? && !post.is_deleted? %>
-          <li id="post-option-approve"><%= link_to "Approve", moderator_post_approval_path(post_id: post.id), remote: true, method: :post, id: "approve", "data-shortcut": "shift+o", "data-confirm": "Are you sure you want to approve this post?" %></li>
-          <li id="post-option-disapprove"><%= link_to "Hide from queue", moderator_post_disapprovals_path(post_disapproval: { post_id: post.id, reason: "disinterest" }), remote: true, method: :post, id: "disapprove" %></li>
+          <li id="post-option-approve"><%= link_to "Approve", post_approvals_path(post_id: post.id), remote: true, method: :post, id: "approve", "data-shortcut": "shift+o", "data-confirm": "Are you sure you want to approve this post?" %></li>
+          <li id="post-option-disapprove"><%= link_to "Hide from queue", post_disapprovals_path(post_disapproval: { post_id: post.id, reason: "disinterest" }), remote: true, method: :post, id: "disapprove" %></li>
         <% end %>
 
         <% if post.is_banned? %>
           <li id="post-option-unban"><%= link_to "Unban", unban_moderator_post_post_path(post), method: :post, "data-confirm": "Are you sure you want to unban this post?" %></li>
         <% else %>
-          <li id="post-option-ban"><%= link_to "Ban", confirm_ban_moderator_post_post_path(post) %></li>
+          <li id="post-option-ban"><%= link_to "Ban", ban_moderator_post_post_path(post), method: :post, "data-confirm": "Are you sure you want to ban this post?" %></li>
         <% end %>
 
         <% if CurrentUser.is_admin? %>

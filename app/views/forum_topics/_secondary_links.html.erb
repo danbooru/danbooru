@@ -18,11 +18,6 @@
   <% if CurrentUser.is_member? && @forum_topic && !@forum_topic.new_record? %>
     <li>|</li>
     <%= subnav_link_to "Reply", new_forum_post_path(:topic_id => @forum_topic.id) %>
-    <% if @forum_topic.user_subscription(CurrentUser.user) %>
-      <%= subnav_link_to "Unsubscribe", unsubscribe_forum_topic_path(@forum_topic), :method => :post %>
-    <% else %>
-      <%= subnav_link_to "Subscribe", subscribe_forum_topic_path(@forum_topic), :method => :post, :data => {:confirm => "Are you sure you want to receive email notifications for this forum topic?"} %>
-    <% end %>
     <% if !@forum_topic.new_record? && @forum_topic.editable_by?(CurrentUser.user) %>
       <%= subnav_link_to "Edit", edit_forum_topic_path(@forum_topic), "data-shortcut": "e" %>
       <% if CurrentUser.is_moderator? %>
@@ -41,7 +36,6 @@
         <% else %>
           <%= subnav_link_to "Sticky", forum_topic_path(@forum_topic, :forum_topic => {:is_sticky => true}), :method => :put, :data => {:confirm => "Are you sure you want to sticky this forum topic?"} %>
         <% end %>
-        <%= subnav_link_to "Merge", new_merge_forum_topic_path(@forum_topic) %>
       <% end %>
     <% end %>
   <% end %>

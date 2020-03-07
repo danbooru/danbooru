@@ -2,18 +2,7 @@ require 'test_helper'
 
 class DanbooruMaintenanceTest < ActiveSupport::TestCase
   context "daily maintenance" do
-    setup do
-      @admin = create(:admin_user) # for SuperVoter.init!
-    end
-
     should "work" do
-      assert_nothing_raised { DanbooruMaintenance.daily }
-    end
-
-    should "update the curated pool" do
-      pool = as(@admin) { create(:pool, name: "curated") }
-      Danbooru.config.stubs(:curated_pool_id).returns(pool.id)
-
       assert_nothing_raised { DanbooruMaintenance.daily }
     end
 

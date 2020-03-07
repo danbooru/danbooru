@@ -1,6 +1,6 @@
 class PostsController < ApplicationController
   before_action :member_only, :except => [:show, :show_seq, :index, :home, :random]
-  respond_to :html, :xml, :json
+  respond_to :html, :xml, :json, :js
   layout "sidebar"
 
   def index
@@ -19,19 +19,21 @@ class PostsController < ApplicationController
   end
 
   def show
-    @current_item = @post = Post.find(params[:id])
+    @post = Post.find(params[:id])
 
-    @comments = @post.comments
-    @comments = @comments.includes(:creator)
-    @comments = @comments.includes(:votes) if CurrentUser.is_member?
-    @comments = @comments.visible(CurrentUser.user)
+    if request.format.html?
+      @comments = @post.comments
+      @comments = @comments.includes(:creator)
+      @comments = @comments.includes(:votes) if CurrentUser.is_member?
+      @comments = @comments.visible(CurrentUser.user)
 
-    include_deleted = @post.is_deleted? || (@post.parent_id.present? && @post.parent.is_deleted?) || CurrentUser.user.show_deleted_children?
-    @sibling_posts = @post.parent.present? ? @post.parent.children : Post.none
-    @sibling_posts = @sibling_posts.undeleted unless include_deleted
+      include_deleted = @post.is_deleted? || (@post.parent_id.present? && @post.parent.is_deleted?) || CurrentUser.user.show_deleted_children?
+      @sibling_posts = @post.parent.present? ? @post.parent.children : Post.none
+      @sibling_posts = @sibling_posts.undeleted unless include_deleted
 
-    @child_posts = @post.children
-    @child_posts = @child_posts.undeleted unless include_deleted
+      @child_posts = @post.children
+      @child_posts = @child_posts.undeleted unless include_deleted
+    end
 
     respond_with(@post) do |format|
       format.html.tooltip { render layout: false }

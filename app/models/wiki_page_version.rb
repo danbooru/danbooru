@@ -3,7 +3,7 @@ class WikiPageVersion < ApplicationRecord
   belongs_to :wiki_page
   belongs_to_updater
   belongs_to :artist, optional: true
-  delegate :visible?, :to => :wiki_page
+  belongs_to :tag, primary_key: :name, foreign_key: :title, optional: true
 
   module SearchMethods
     def search(params)
@@ -24,10 +24,35 @@ class WikiPageVersion < ApplicationRecord
   end
 
   def previous
-    WikiPageVersion.where("wiki_page_id = ? and id < ?", wiki_page_id, id).order("id desc").first
+    @previous ||= begin
+      WikiPageVersion.where("wiki_page_id = ? and id < ?", wiki_page_id, id).order("id desc").limit(1).to_a
+    end
+    @previous.first
   end
 
-  def category_name
-    Tag.category_for(title)
+  def self.status_fields
+    {
+      body: "Body",
+      other_names_changed: "OtherNames",
+      title: "Renamed",
+      was_deleted: "Deleted",
+      was_undeleted: "Undeleted",
+    }
+  end
+
+  def other_names_changed
+    ((other_names - previous.other_names) | (previous.other_names - other_names)).length > 0
+  end
+
+  def was_deleted
+    is_deleted && !previous.is_deleted
+  end
+
+  def was_undeleted
+    !is_deleted && previous.is_deleted
+  end
+
+  def self.available_includes
+    [:updater, :wiki_page, :artist]
   end
 end

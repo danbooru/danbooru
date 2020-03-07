@@ -1,3 +1,6 @@
+<% page_title "Feedback: @#{@user_feedback.user.name}" %>
+<%= render "secondary_links" %>
+
 <div id="c-user-feedbacks">
   <div id="a-show">
     <h1>User Feedback For <%= link_to_user @user_feedback.user %></h1>
@@ -19,9 +22,3 @@
     <% end %>
   </div>
 </div>
-
-<%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Feedback - <%= @user_feedback.user.name %> - <%= Danbooru.config.app_name %>
-<% end %>

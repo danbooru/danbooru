@@ -8,21 +8,12 @@ class Ban < ApplicationRecord
   belongs_to :banner, :class_name => "User"
   validate :user_is_inferior
   validates_presence_of :reason, :duration
-  before_validation :initialize_banner_id, :on => :create
 
   scope :unexpired, -> { where("bans.expires_at > ?", Time.now) }
   scope :expired, -> { where("bans.expires_at <= ?", Time.now) }
 
   def self.is_banned?(user)
     exists?(["user_id = ? AND expires_at > ?", user.id, Time.now])
-  end
-
-  def self.reason_matches(query)
-    if query =~ /\*/
-      where("lower(bans.reason) LIKE ?", query.mb_chars.downcase.to_escaped_for_sql_like)
-    else
-      where("bans.reason @@ plainto_tsquery(?)", query)
-    end
   end
 
   def self.search(params)
@@ -56,10 +47,6 @@ class Ban < ApplicationRecord
     expired.includes(:user).find_each do |ban|
       ban.user.unban! if ban.user.ban_expired?
     end
-  end
-
-  def initialize_banner_id
-    self.banner_id = CurrentUser.id if self.banner_id.blank?
   end
 
   def user_is_inferior
@@ -122,5 +109,9 @@ class Ban < ApplicationRecord
 
   def create_unban_mod_action
     ModAction.log(%{Unbanned <@#{user_name}>}, :user_unban)
+  end
+
+  def self.available_includes
+    [:user, :banner]
   end
 end

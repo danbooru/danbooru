@@ -1,65 +1,35 @@
 @import "../base/000_vars.scss";
 
-div#c-moderator-post-queues {
+div#c-modqueue {
   div.post {
     padding: 1em;
-    margin-bottom: 4em;
     overflow: hidden;
 
-    &.post-pos-score {
-      background: var(--modqueue-positive-score-background-color);
-    }
-
-    &.post-neg-score {
-      background: var(--modqueue-negative-score-background-color);
-    }
-
     aside.column {
-      text-align: center;
-      margin-bottom: 1em;
-
       @media (min-width: 660px) {
-        flex-basis: 220px;
-        text-align: right;
-        padding-right: 2em;
+        padding-right: 1em;
       }
     }
 
-    .quick-mod {
-      margin-bottom: 0.5em;
+    section.column {
+      span.info {
+        margin-right: 1.5em;
+      }
 
-      @media (min-width: 660px) {
-        font-size: $h2_size;
-        font-weight: bold;
+      .quick-mod {
+        display: inline-block;
+        margin-bottom: 1em;
+      }
+
+      .post-flags-row {
+        margin-top: 1em;
       }
     }
 
-    .mod-queue-post-source {
-      word-break: break-all;
-    }
-
-    <% Danbooru.config.modqueue_quality_warning_tags.each do |tag| %>
-      &[data-tags~="<%= tag %>"] {
-        background-color: var(--modqueue-quality-warning-color);
+    <% Danbooru.config.modqueue_warning_tags.each do |tag| %>
+      li[data-tag-name="<%= tag %>"] {
+        background-color: var(--modqueue-tag-warning-color);
       }
     <% end %>
-
-    <% Danbooru.config.modqueue_sample_warning_tags.each do |tag| %>
-      &[data-tags~="<%= tag %>"] {
-        background-color: var(--modqueue-sample-warning-color);
-      }
-    <% end %>
-
-    &[data-tags~=animated], &[data-file-ext=swf], &[data-file-ext=webm], &[data-file-ext=zip], &[data-file-ext=mp4] {
-      aside:before {
-        @include animated-icon;
-      }
-    }
-
-    &[data-has-sound=true] {
-      aside:before {
-        @include sound-icon;
-      }
-    }
   }
 }

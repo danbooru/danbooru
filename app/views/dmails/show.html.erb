@@ -1,3 +1,6 @@
+<% page_title "Message: #{@dmail.title}" %>
+<%= render "secondary_links" %>
+
 <div id="c-dmails">
   <div id="a-show">
     <div class="dmail">
@@ -21,27 +24,16 @@
         <% end %>
       </div>
 
-      <p>
-        <%= link_to "Respond", new_dmail_path(:respond_to_id => @dmail) %>
-        | <%= link_to "Forward", new_dmail_path(:respond_to_id => @dmail, :forward => true) %>
-        | <%= link_to "Filter messages like these", edit_maintenance_user_dmail_filter_path(:dmail_id => @dmail.id) %>
-        | <%= link_to "Permalink", dmail_path(@dmail, :key => @dmail.key), :title => "Use this URL to privately share with a moderator" %>
-        <% if CurrentUser.is_gold? %>
-          <span id="spam-links">
-            <% if @dmail.is_spam? %>
-              | <%= link_to "Not spam", ham_dmail_path(@dmail), remote: :true, method: :post %>
-            <% else %>
-              | <%= link_to "Mark as spam", spam_dmail_path(@dmail), remote: :true, method: :post %>
-            <% end %>
-          </span>
-        <% end %>
-      </p>
+      <% if CurrentUser.user == @dmail.owner %>
+        <p>
+          <%= link_to "Respond", new_dmail_path(:respond_to_id => @dmail) %>
+          | <%= link_to "Forward", new_dmail_path(:respond_to_id => @dmail, :forward => true) %>
+          | <%= link_to "Share", dmail_path(@dmail, key: @dmail.key), title: "Anyone with this link will be able to view this dmail." %>
+          <% if @dmail.reportable_by?(CurrentUser.user) %>
+            | <%= link_to "Report", new_moderation_report_path(moderation_report: { model_type: "Dmail", model_id: @dmail.id }), remote: true, title: "Report this dmail to the moderators" %>
+          <% end %>
+        </p>
+      <% end %>
     </div>
   </div>
 </div>
-
-<%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Message - <%= @dmail.title %> - <%= Danbooru.config.app_name %>
-<% end %>

@@ -3,7 +3,6 @@ class TagAlias < TagRelationship
   validates_uniqueness_of :antecedent_name, scope: :status, conditions: -> { active }
   validate :absence_of_transitive_relation
   validate :wiki_pages_present, on: :create, unless: :skip_secondary_validations
-  validate :mininum_antecedent_count, on: :create, unless: :skip_secondary_validations
 
   module ApprovalMethods
     def approve!(approver: CurrentUser.user, update_topic: true)
@@ -33,14 +32,6 @@ class TagAlias < TagRelationship
   include ApprovalMethods
   include ForumMethods
 
-  concerning :EmbeddedText do
-    class_methods do
-      def embedded_pattern
-        /\[ta:(?<id>\d+)\]/m
-      end
-    end
-  end
-
   def self.to_aliased(names)
     names = Array(names).map(&:to_s)
     return [] if names.empty?
@@ -53,33 +44,23 @@ class TagAlias < TagRelationship
       raise errors.full_messages.join("; ")
     end
 
-    tries = 0
-
-    begin
-      CurrentUser.scoped(User.system) do
-        update!(status: "processing")
-        move_aliases_and_implications
-        move_saved_searches
-        ensure_category_consistency
-        update_posts
-        forum_updater.update(approval_message(approver), "APPROVED") if update_topic
-        rename_wiki_and_artist
-        update!(status: "active")
-      end
-    rescue Exception => e
-      if tries < 5
-        tries += 1
-        sleep 2**tries
-        retry
-      end
-
-      CurrentUser.scoped(approver) do
-        forum_updater.update(failure_message(e), "FAILED") if update_topic
-        update(status: "error: #{e}")
-      end
-
-      DanbooruLogger.log(e, tag_alias_id: id, antecedent_name: antecedent_name, consequent_name: consequent_name)
+    CurrentUser.scoped(User.system) do
+      update!(status: "processing")
+      move_aliases_and_implications
+      move_saved_searches
+      ensure_category_consistency
+      update_posts
+      forum_updater.update(approval_message(approver), "APPROVED") if update_topic
+      rename_wiki_and_artist
+      update!(status: "active")
     end
+  rescue Exception => e
+    CurrentUser.scoped(approver) do
+      forum_updater.update(failure_message(e), "FAILED") if update_topic
+      update(status: "error: #{e}")
+    end
+
+    DanbooruLogger.log(e, tag_alias_id: id, antecedent_name: antecedent_name, consequent_name: consequent_name)
   end
 
   def absence_of_transitive_relation
@@ -158,12 +139,6 @@ class TagAlias < TagRelationship
       errors[:base] << conflict_message
     elsif antecedent_wiki.blank? && consequent_wiki.blank?
       errors[:base] << "The #{consequent_name} tag needs a corresponding wiki page"
-    end
-  end
-
-  def mininum_antecedent_count
-    if antecedent_tag.post_count < 50
-      errors[:base] << "The #{antecedent_name} tag must have at least 50 posts for an alias to be created"
     end
   end
 

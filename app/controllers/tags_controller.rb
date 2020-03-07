@@ -3,13 +3,14 @@ class TagsController < ApplicationController
   respond_to :html, :xml, :json
 
   def edit
-    @current_item = @tag = Tag.find(params[:id])
+    @tag = Tag.find(params[:id])
     check_privilege(@tag)
     respond_with(@tag)
   end
 
   def index
-    @tags = Tag.paginated_search(params)
+    @tags = Tag.paginated_search(params, hide_empty: true)
+    @tags = @tags.includes(:consequent_aliases) if request.format.html?
     respond_with(@tags)
   end
 
@@ -26,7 +27,7 @@ class TagsController < ApplicationController
   end
 
   def show
-    @current_item = @tag = Tag.find(params[:id])
+    @tag = Tag.find(params[:id])
     respond_with(@tag)
   end
 

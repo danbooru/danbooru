@@ -1,3 +1,6 @@
+<% page_title "Related tags" %>
+<%= render "tags/secondary_links" %>
+
 <div id="c-related-tags">
   <div id="a-show">
     <h1>Related tags</h1>
@@ -11,16 +14,10 @@
     <% if params.dig(:search, :query).present? %>
       <%= table_for @query.tags do |t| %>
         <% t.column "Name" do |tag| %>
-          <%= link_to_wiki "?", tag.name, class: "tag-type-#{tag.category}" %>
-          <%= link_to tag.name, posts_path(tags: tag.name), class: "tag-type-#{tag.category}" %>
+          <%= link_to_wiki "?", tag.name, class: tag_class(tag) %>
+          <%= link_to tag.name, posts_path(tags: tag.name), class: tag_class(tag) %>
         <% end %>
       <% end %>
     <% end %>
   </div>
 </div>
-
-<%= render "tags/secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Related tags - <%= Danbooru.config.app_name %>
-<% end %>

@@ -1,0 +1,27 @@
+<div id="c-moderation-reports">
+  <div id="a-index">
+    <h1>Moderation reports</h1>
+    <%= table_for @moderation_reports, width: "100%" do |t| %>
+      <% t.column "Reported", width: "10%" do |report| %>
+        <% if report.model_type == "User" %>
+          <%= link_to_user report.model %>
+        <% elsif report.model_type == "Dmail" %>
+          <%= link_to report.model.dtext_shortlink, dmail_path(report.model, key: report.model.key) %>
+        <% else %>
+          <%= link_to report.model.dtext_shortlink, report.model %>
+        <% end %>
+      <% end %>
+      <% t.column "Reason" do |report| %>
+        <span class="prose">
+          <%= format_text report.reason, inline: true %>
+        </span>
+      <% end %>
+      <% t.column "Creator", width: "10%" do |report| %>
+        <%= compact_time report.created_at %>
+        <br> by <%= link_to_user report.creator %>
+      <% end %>
+    <% end %>
+
+    <%= numbered_paginator(@moderation_reports) %>
+  </div>
+</div>

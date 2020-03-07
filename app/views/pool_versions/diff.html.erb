@@ -1,10 +1,13 @@
+<% page_title "Pool Comparison: #{@pool_version.pretty_name}" %>
+<%= render "secondary_links" %>
+
 <div id="c-pool-versions">
   <div id="a-diff">
     <h1>Pool Version Comparison: <%= @pool_version.name %></h1>
 
     <% if @other_version.present? %>
       <p>Showing differences between <%= compact_time @pool_version.updated_at %> (<%= link_to_user @pool_version.updater %>) and <%= compact_time @other_version.updated_at %> (<%= link_to_user @other_version.updater %>)</p>
-      <div>
+      <div class="diff-body">
         <h2>Name:</h2>
         <p>
           <% if @pool_version.name != @other_version.name %>
@@ -18,11 +21,11 @@
         <h2>Posts:</h2>
         <p><%= render "pool_versions/diff", diff: @pool_version.build_diff(@other_version) %></p>
       </div>
-      <div>
+      <div class="diff-body">
         <h2>Description:</h2>
         <p>
           <% if @pool_version.description != @other_version.description %>
-            <%= pool_page_diff(@pool_version, @other_version) %>
+            <%= diff_body_html(@pool_version, @other_version, :description) %>
           <% else %>
             <i>Unchanged.</i>
           <% end %>
@@ -31,9 +34,3 @@
     <% end %>
   </div>
 </div>
-
-<%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Pool Version Comparison - <%= @pool_version.name %> - <%= Danbooru.config.app_name %>
-<% end %>

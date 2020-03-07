@@ -1,5 +1,5 @@
 <% content_for(:secondary_links) do %>
-  <%= quick_search_form_for(:name_matches, pools_path, "pools", autocomplete: "pool") %>
+  <%= quick_search_form_for(:name_matches, pools_path, "pools", autocomplete: "pool", redirect: true) %>
   <%= subnav_link_to "Gallery", gallery_pools_path %>
   <%= subnav_link_to "Listing", pools_path %>
   <%= subnav_link_to "New", new_pool_path %>
@@ -18,7 +18,7 @@
         <%= subnav_link_to "Delete", pool_path(@pool), :method => :delete, :"data-shortcut" => "shift+d", :"data-confirm" => "Are you sure you want to delete this pool?", :remote => true %>
       <% end %>
     <% end %>
-    <% if PoolArchive.enabled? %>
+    <% if PoolVersion.enabled? %>
       <%= subnav_link_to "History", pool_versions_path(:search => {:pool_id => @pool.id}) %>
     <% end %>
     <% if CurrentUser.is_member? %>

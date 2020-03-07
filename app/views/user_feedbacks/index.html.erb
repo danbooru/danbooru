@@ -37,7 +37,7 @@
         <%= link_to "»", user_feedbacks_path(search: { creator_name: feedback.creator.name }) %>
         <div><%= time_ago_in_words_tagged(feedback.created_at) %></div>
       <% end %>
-      <% t.column do |feedback| %>
+      <% t.column column: "control" do |feedback| %>
         <% if feedback.editable_by?(CurrentUser.user) %>
           <%= link_to "edit", edit_user_feedback_path(feedback) %>
           <% if feedback.deletable_by?(CurrentUser.user) && !feedback.is_deleted? %>

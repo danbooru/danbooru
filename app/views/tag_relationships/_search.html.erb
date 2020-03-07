@@ -1,14 +1,15 @@
 <%# url %>
 
 <%= search_form_for(url) do |f| %>
-  <%= f.input :name_matches, label: "Name", input_html: { value: params[:search][:name_matches], data: { autocomplete: "tag" } } %>
-  <%= f.input :status, label: "Status", collection: %w[Approved Active Pending Deleted Retired Processing Queued], include_blank: true, selected: params[:search][:status] %>
+  <%= f.input :antecedent_name_ilike, label: "From", input_html: { value: params[:search][:antecedent_name_ilike], data: { autocomplete: "tag" } } %>
+  <%= f.input :consequent_name_ilike, label: "To", input_html: { value: params[:search][:consequent_name_ilike], data: { autocomplete: "tag" } } %>
   <%= f.simple_fields_for :antecedent_tag do |fa| %>
     <%= fa.input :category, label: "From Category", collection: TagCategory.canonical_mapping.to_a, include_blank: true, selected: params.dig(:search, :antecedent_tag, :category) %>
   <% end %>
   <%= f.simple_fields_for :consequent_tag do |fa| %>
     <%= fa.input :category, label: "To Category", collection: TagCategory.canonical_mapping.to_a, include_blank: true, selected: params.dig(:search, :consequent_tag, :category) %>
   <% end %>
-  <%= f.input :order, label: "Order", collection: [%w[Status status], %w[Recently\ created created_at], %w[Recently\ updated updated_at], %w[Name name], %w[Tag\ count tag_count]], selected: params[:search][:order] %>
+  <%= f.input :status, label: "Status", collection: %w[Approved Active Pending Deleted Retired Processing Queued], include_blank: true, selected: params[:search][:status] %>
+  <%= f.input :order, label: "Order", collection: [%w[Created created_at], %w[Updated updated_at], %w[Name name], %w[Tag\ count tag_count], %w[Status status]], include_blank: true, selected: params[:search][:order] %>
   <%= f.submit "Search" %>
 <% end %>

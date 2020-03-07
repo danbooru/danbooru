@@ -1,8 +1,7 @@
 <%= search_form_for(artists_path) do |f| %>
   <%= f.input :any_name_matches, label: "Name", hint: "Use * for wildcard", input_html: { value: params[:search][:any_name_matches], data: { autocomplete: "artist" }} %>
   <%= f.input :url_matches, label: "URL", as: "string", input_html: { value: params[:search][:url_matches] } %>
-  <%= f.input :creator_name, label: "Creator", input_html: { value: params[:search][:creator_name], data: { autocomplete: "user" } } %>
-  <%= f.input :is_active, label: "Active?", collection: [["Yes", true], ["No", false]], include_blank: true, selected: params[:search][:is_active] %>
+  <%= f.input :is_deleted, label: "Deleted?", collection: [["Yes", true], ["No", false]], include_blank: true, selected: params[:search][:is_deleted] %>
   <%= f.input :is_banned, label: "Banned?", collection: [["Yes", true], ["No", false]], include_blank: true, selected: params[:search][:is_banned] %>
   <%= f.input :has_tag, label: "Has tag?", collection: [["Yes", true], ["No", false]], include_blank: true, selected: params[:search][:has_tag] %>
   <%= f.input :order, collection: [["Recently created", "created_at"], ["Last updated", "updated_at"], ["Name", "name"], ["Post count", "post_count"]], selected: params[:search][:order] %>

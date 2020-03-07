@@ -1,7 +1,9 @@
-<footer id="page-footer">
-  Running <%= Danbooru.config.app_name %> 
+<footer id="page-footer" class="text-small">
+  <span class="page-footer-app-name"><%= Danbooru.config.app_name %></span>
   <% if Rails.application.config.x.git_hash %>
-    (<%= link_to Rails.application.config.x.git_hash.first(9), Danbooru.config.commit_url(Rails.application.config.x.git_hash) %>)
+    <span class="desktop-only page-footer-git-hash">
+      (<%= link_to Rails.application.config.x.git_hash.first(9), Danbooru.config.commit_url(Rails.application.config.x.git_hash) %>)
+    </span>
   <% end %>
   &ndash; <%= link_to "Rules", terms_of_service_path %>
   &ndash; <%= link_to "Contact", contact_path %>
@@ -13,7 +15,7 @@
   <% if CurrentUser.is_member? %>
     <span id="desktop-version-link" class="mobile-only">
       &ndash;
-      <%= link_to "Disable responsive mode", edit_user_path(CurrentUser.id) %>
+      <%= link_to "Desktop mode", edit_user_path(CurrentUser.id) %>
     </span>
   <% end %>
 </footer>

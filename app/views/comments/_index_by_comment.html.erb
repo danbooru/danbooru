@@ -8,7 +8,7 @@
               <%= link_to(image_tag(comment.post.preview_file_url), post_path(comment.post)) %>
             <% end %>
           </div>
-          <%= render partial: "comments/partials/show/comment", collection: [comment], locals: { context: :index_by_comment, dtext_data: DText.preprocess(@comments.map(&:body)) } %>
+          <%= render partial: "comments/partials/show/comment", collection: [comment], locals: { context: :index_by_comment, dtext_data: DText.preprocess(@comments.map(&:body)), moderation_reports: [] } %>
         <% end %>
       <% end %>
     <% end %>
@@ -16,5 +16,3 @@
 </div>
 
 <%= numbered_paginator(@comments) %>
-
-<% content_for(:html_header, auto_discovery_link_tag(:atom, comments_url(format: "atom"), title: "Comments")) %>

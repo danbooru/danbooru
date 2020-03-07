@@ -3,7 +3,7 @@ require 'test_helper'
 class DmailsControllerTest < ActionDispatch::IntegrationTest
   context "The dmails controller" do
     setup do
-      @user = create(:user)
+      @user = create(:user, unread_dmail_count: 1)
       @unrelated_user = create(:user)
       as_user do
         @dmail = create(:dmail, :owner => @user)
@@ -78,6 +78,40 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
         get_auth dmail_path(@dmail), @unrelated_user
         assert_response(403)
       end
+
+      should "show dmails not owned by the current user when given a valid key" do
+        get_auth dmail_path(@dmail, key: @dmail.key), @unrelated_user
+        assert_response :success
+      end
+
+      should "not show dmails not owned by the current user when given an invalid key" do
+        get_auth dmail_path(@dmail, key: @dmail.key + "blah"), @unrelated_user
+        assert_response 403
+      end
+
+      should "mark dmails as read" do
+        assert_equal(false, @dmail.is_read)
+        get_auth dmail_path(@dmail), @dmail.owner
+
+        assert_response :success
+        assert_equal(true, @dmail.reload.is_read)
+      end
+
+      should "not mark dmails as read in the api" do
+        assert_equal(false, @dmail.is_read)
+        get_auth dmail_path(@dmail, format: :json), @dmail.owner
+
+        assert_response :success
+        assert_equal(false, @dmail.reload.is_read)
+      end
+
+      should "not mark dmails as read when viewing dmails owned by another user" do
+        assert_equal(false, @dmail.is_read)
+        get_auth dmail_path(@dmail, key: @dmail.key), @unrelated_user
+
+        assert_response :success
+        assert_equal(false, @dmail.reload.is_read)
+      end
     end
 
     context "create action" do
@@ -94,18 +128,78 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    context "destroy action" do
+    context "update action" do
       should "allow deletion if the dmail is owned by the current user" do
-        assert_difference("Dmail.count", -1) do
-          delete_auth dmail_path(@dmail), @user
-          assert_redirected_to dmails_path
-        end
+        put_auth dmail_path(@dmail), @user, params: { dmail: { is_deleted: true } }
+
+        assert_redirected_to dmail_path(@dmail)
+        assert_equal(true, @dmail.reload.is_deleted)
       end
 
       should "not allow deletion if the dmail is not owned by the current user" do
-        assert_difference("Dmail.count", 0) do
-          delete_auth dmail_path(@dmail), @unrelated_user
-        end
+        put_auth dmail_path(@dmail), @unrelated_user, params: { dmail: { is_deleted: true } }
+
+        assert_response 403
+        assert_equal(false, @dmail.reload.is_deleted)
+      end
+
+      should "not allow updating if the dmail is not owned by the current user even with a dmail key" do
+        put_auth dmail_path(@dmail), @unrelated_user, params: { dmail: { is_deleted: true }, key: @dmail.key }
+
+        assert_response 403
+        assert_equal(false, @dmail.reload.is_deleted)
+      end
+
+      should "update user's unread_dmail_count when marking dmails as read or unread" do
+        put_auth dmail_path(@dmail), @user, params: { dmail: { is_read: true } }
+        assert_equal(true, @dmail.reload.is_read)
+        assert_equal(0, @user.reload.unread_dmail_count)
+
+        put_auth dmail_path(@dmail), @user, params: { dmail: { is_read: false } }
+        assert_equal(false, @dmail.reload.is_read)
+        assert_equal(1, @user.reload.unread_dmail_count)
+      end
+    end
+
+    context "mark all as read action" do
+      setup do
+        @sender = create(:user)
+        @recipient = create(:user)
+
+        @dmail1 = create(:dmail, from: @sender, owner: @recipient, to: @recipient)
+        @dmail2 = create(:dmail, from: @sender, owner: @recipient, to: @recipient)
+        @dmail3 = create(:dmail, from: @sender, owner: @recipient, to: @recipient, is_read: true)
+        @dmail4 = create(:dmail, from: @sender, owner: @recipient, to: @recipient, is_deleted: true)
+      end
+
+      should "mark all unread, undeleted dmails as read" do
+        assert_equal(4, @recipient.dmails.count)
+        assert_equal(2, @recipient.dmails.active.unread.count)
+        assert_equal(2, @recipient.reload.unread_dmail_count)
+        post_auth mark_all_as_read_dmails_path(format: :js), @recipient
+
+        assert_response :success
+        assert_equal(0, @recipient.reload.unread_dmail_count)
+        assert_equal(true, [@dmail1, @dmail2, @dmail3, @dmail4].map(&:reload).all?(&:is_read))
+      end
+    end
+
+    context "when a user has unread dmails" do
+      should "show the unread dmail notice" do
+        get_auth posts_path, @user
+
+        assert_response :success
+        assert_select "#dmail-notice", 1
+        assert_select "#nav-my-account-link", text: "My Account (1)"
+      end
+
+      should "not show the unread dmail notice after closing it" do
+        cookies[:hide_dmail_notice] = @user.dmails.active.unread.first.id
+        get_auth posts_path, @user
+
+        assert_response :success
+        assert_select "#dmail-notice", 0
+        assert_select "#nav-my-account-link", text: "My Account (1)"
       end
     end
   end

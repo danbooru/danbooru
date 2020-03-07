@@ -17,7 +17,11 @@ module RelatedTagCalculator
 
   def self.frequent_tags_for_search(tag_query, search_sample_size: 1000, category: nil)
     sample_posts = Post.tag_match(tag_query).reorder(:md5).limit(search_sample_size)
-    tag_counts = Post.from(sample_posts).with_unflattened_tags.group("tag").select("tag, COUNT(*) AS overlap_count")
+    frequent_tags_for_post_relation(sample_posts, category: category)
+  end
+
+  def self.frequent_tags_for_post_relation(posts, category: nil)
+    tag_counts = Post.from(posts).with_unflattened_tags.group("tag").select("tag, COUNT(*) AS overlap_count")
 
     tags = Tag.from(tag_counts).joins("JOIN tags ON tags.name = tag")
     tags = tags.select("tags.*, overlap_count")
@@ -27,7 +31,7 @@ module RelatedTagCalculator
     tags
   end
 
-  def self.frequent_tags_for_posts(posts)
+  def self.frequent_tags_for_post_array(posts)
     tags_with_counts = posts.flat_map(&:tag_array).group_by(&:itself).transform_values(&:size)
     tags_with_counts.sort_by { |tag_name, count| [-count, tag_name] }.map(&:first)
   end

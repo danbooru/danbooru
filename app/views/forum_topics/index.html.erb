@@ -1,3 +1,8 @@
+<% page_title "Forum" %>
+
+<% atom_feed_tag "Forum Topics", forum_topics_url(:atom, search: params.fetch(:search, {}).permit!) %>
+<%= render "secondary_links" %>
+
 <div id="c-forum-topics">
   <div id="a-index">
     <h1>Forum</h1>
@@ -11,16 +16,8 @@
       <%= ForumTopic::CATEGORIES.map {|id, name| link_to_unless_current(name, forum_topics_path(:search => {:category_id => id}))}.join(", ").html_safe %>
     </p>
 
-    <%= render "listing", :forum_topics => @forum_topics %>
+    <%= render "listing", forum_topics: @forum_topics %>
 
     <%= numbered_paginator(@forum_topics) %>
   </div>
 </div>
-
-<%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Forum - <%= Danbooru.config.app_name %>
-<% end %>
-
-<% content_for(:html_header, auto_discovery_link_tag(:atom, forum_topics_url(:atom), title: "Forum Topics")) %>

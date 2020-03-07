@@ -2,76 +2,57 @@ require 'test_helper'
 
 class FavoriteTest < ActiveSupport::TestCase
   def setup
-    super
-    @user = FactoryBot.create(:user)
-    CurrentUser.user = @user
-    CurrentUser.ip_addr = "127.0.0.1"
-    @fav_group = FactoryBot.create(:favorite_group, creator: @user, name: "blah")
-  end
-
-  def teardown
-    super
-    CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
+    @fav_group = create(:favorite_group)
   end
 
   context "searching by post id" do
-    context "when the id is the only one" do
-      setup do
-        @fav_group.post_ids = "1"
-        @fav_group.save
-      end
+    should "return the fav group" do
+      posts = create_list(:post, 3)
 
-      should "return the fav group" do
-        assert_equal(@fav_group.id, FavoriteGroup.for_post(1).first.try(:id))
-      end
-    end
+      @fav_group.add!(posts[0])
+      assert_equal(@fav_group.id, FavoriteGroup.for_post(posts[0].id).first.id)
 
-    context "when the id is in the beginning" do
-      setup do
-        @fav_group.post_ids = "1 2"
-        @fav_group.save
-      end
+      @fav_group.add!(posts[1])
+      assert_equal(@fav_group.id, FavoriteGroup.for_post(posts[1].id).first.id)
 
-      should "return the fav group" do
-        assert_equal(@fav_group.id, FavoriteGroup.for_post(1).first.try(:id))
-      end
-    end
-
-    context "when the id is in the middle" do
-      setup do
-        @fav_group.post_ids = "3 1 2"
-        @fav_group.save
-      end
-
-      should "return the fav group" do
-        assert_equal(@fav_group.id, FavoriteGroup.for_post(1).first.try(:id))
-      end
-    end
-
-    context "when the id is in the end" do
-      setup do
-        @fav_group.post_ids = "2 1"
-        @fav_group.save
-      end
-
-      should "return the fav group" do
-        assert_equal(@fav_group.id, FavoriteGroup.for_post(1).first.try(:id))
-      end
+      @fav_group.add!(posts[2])
+      assert_equal(@fav_group.id, FavoriteGroup.for_post(posts[2].id).first.id)
     end
   end
 
   context "expunging a post" do
-    setup do
+    should "remove it from all favorite groups" do
       @post = FactoryBot.create(:post)
+
       @fav_group.add!(@post)
+      assert_equal([@post.id], @fav_group.post_ids)
+
+      @post.expunge!
+      assert_equal([], @fav_group.reload.post_ids)
+    end
+  end
+
+  context "adding a post to a favgroup" do
+    should "not allow adding duplicate posts" do
+      post = create(:post)
+
+      @fav_group.add!(post)
+      assert(@fav_group.valid?)
+      assert_equal([post.id], @fav_group.reload.post_ids)
+
+      assert_raise(ActiveRecord::RecordInvalid) { @fav_group.add!(post) }
+      assert_equal([post.id], @fav_group.reload.post_ids)
+
+      @fav_group.reload.update(post_ids: [post.id, post.id])
+      refute(@fav_group.valid?)
+      assert_equal([post.id], @fav_group.reload.post_ids)
     end
 
-    should "remove it from all favorite groups" do
-      assert_equal(@post.id.to_s, @fav_group.post_ids)
-      @post.expunge!
-      @fav_group.reload
-      assert_equal("", @fav_group.post_ids)
+    should "not allow adding nonexistent posts" do
+      @fav_group.update(post_ids: [0])
+
+      refute(@fav_group.valid?)
+      assert_equal([], @fav_group.reload.post_ids)
     end
   end
 end

@@ -1,3 +1,5 @@
+<% page_title "Similar Images Search" %>
+
 <div id="c-iqdb-queries">
   <div id="a-check">
     <h1>Similar Images Search</h1>
@@ -15,8 +17,3 @@
     <%= render "iqdb_queries/matches" %>
   </div>
 </div>
-
-<% content_for(:page_title) do %>
-  Similar Images Search - <%= Danbooru.config.app_name %>
-<% end %>
-

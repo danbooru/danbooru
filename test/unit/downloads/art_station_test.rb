@@ -10,7 +10,7 @@ module Downloads
 
       should "download the large image instead" do
         file, strategy = @download.download!
-        assert_equal(517_706, ::File.size(file.path))
+        assert_equal(1_550_269, ::File.size(file.path))
       end
     end
 
@@ -22,7 +22,7 @@ module Downloads
 
       should "not try to download the original" do
         file, strategy = @download.download!
-        assert_equal(449_047, ::File.size(file.path))
+        assert_equal(382_837, ::File.size(file.path))
       end
     end
 
@@ -32,11 +32,11 @@ module Downloads
       end
 
       should "return the original file, not the polished file" do
-        assert_downloaded(517_706, @asset) # polished size: 502_052
+        assert_downloaded(1_550_269, @asset)
       end
 
       should "return the original filesize, not the polished filesize" do
-        assert_equal(517_706, Downloads::File.new(@asset).size)
+        assert_equal(1_550_269, Downloads::File.new(@asset).size)
       end
     end
 
@@ -49,7 +49,7 @@ module Downloads
       should "download the original image instead" do
         file, strategy = @download.download!
 
-        assert_equal(237_651, ::File.size(file.path))
+        assert_equal(218_603, ::File.size(file.path))
       end
     end
   end

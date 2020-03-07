@@ -25,10 +25,6 @@ module Danbooru
       "Danbooru"
     end
 
-    def description
-      "Find good anime art fast"
-    end
-
     # The canonical hostname of the site.
     def hostname
       Socket.gethostname
@@ -45,11 +41,6 @@ module Danbooru
     # Run `rake db:seed` to create this account if it doesn't already exist in your install.
     def system_user
       "DanbooruBot"
-    end
-
-    # The ID of the "Curated" pool. If present, this pool will be updated daily with curated posts.
-    def curated_pool_id
-      nil
     end
 
     def source_code_url
@@ -69,7 +60,6 @@ module Danbooru
       # user.level = User::Levels::MEMBER
       # user.can_approve_posts = false
       # user.can_upload_free = false
-      # user.is_super_voter = false
       #
       # user.comment_threshold = -1
       # user.blacklisted_tags = ["spoilers", "guro", "scat", "furry -rating:s"].join("\n")
@@ -293,22 +283,6 @@ module Danbooru
       nil
     end
 
-    def upload_notice_wiki_page
-      "help:upload_notice"
-    end
-
-    def flag_notice_wiki_page
-      "help:flag_notice"
-    end
-
-    def appeal_notice_wiki_page
-      "help:appeal_notice"
-    end
-
-    def replacement_notice_wiki_page
-      "help:replacement_notice"
-    end
-
     # The number of posts displayed per page.
     def posts_per_page
       20
@@ -385,14 +359,10 @@ module Danbooru
       tag =~ /\A(?:replaceme|.*_sample|resized|upscaled|downscaled|md5_mismatch|jpeg_artifacts|corrupted_image|source_request|non-web_source)\z/i
     end
 
-    # Posts with these tags will be highlighted yellow in the modqueue.
-    def modqueue_quality_warning_tags
-      %w[hard_translated self_upload nude_filter third-party_edit screencap]
-    end
-
-    # Posts with these tags will be highlighted red in the modqueue.
-    def modqueue_sample_warning_tags
-      %w[duplicate image_sample md5_mismatch resized upscaled downscaled]
+    # Posts with these tags will be highlighted in the modqueue.
+    def modqueue_warning_tags
+      %w[hard_translated self_upload nude_filter third-party_edit screencap
+      duplicate image_sample md5_mismatch resized upscaled downscaled]
     end
 
     def stripe_secret_key

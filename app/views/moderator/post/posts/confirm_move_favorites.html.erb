@@ -1,7 +1,7 @@
 <h1>Move Favorites to Parent</h1>
 
 <div>
-  <%= PostPresenter.preview(@post, :tags => "status:any") %>
+  <%= PostPresenter.preview(@post, show_deleted: true) %>
 </div>
 
 <p style="clear: both;">This will move all the post's favorites to its parent post. Are you sure?</p>

@@ -14,8 +14,11 @@ class ArtistCommentary < ApplicationRecord
   module SearchMethods
     def text_matches(query)
       query = "*#{query}*" unless query =~ /\*/
-      escaped_query = query.to_escaped_for_sql_like
-      where("original_title ILIKE ? ESCAPE E'\\\\' OR original_description ILIKE ? ESCAPE E'\\\\' OR translated_title ILIKE ? ESCAPE E'\\\\' OR translated_description ILIKE ? ESCAPE E'\\\\'", escaped_query, escaped_query, escaped_query, escaped_query)
+
+      where_ilike(:original_title, query)
+        .or(where_ilike(:original_description, query))
+        .or(where_ilike(:translated_title, query))
+        .or(where_ilike(:translated_description, query))
     end
 
     def deleted
@@ -141,4 +144,8 @@ class ArtistCommentary < ApplicationRecord
 
   extend SearchMethods
   include VersionMethods
+
+  def self.available_includes
+    [:post]
+  end
 end

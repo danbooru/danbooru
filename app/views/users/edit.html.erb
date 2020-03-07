@@ -1,3 +1,6 @@
+<% page_title "Settings" %>
+<%= render "secondary_links" %>
+
 <div id="c-users">
   <div id="a-edit">
     <h1>Settings</h1>
@@ -57,20 +60,12 @@
         <%= f.input :show_deleted_children, :as => :select, :label => "Show deleted children", :hint => "Show thumbnail borders on parent posts even if the children are deleted", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
         <%= f.input :enable_auto_complete, :as => :select, :hint => "Enable tag autocomplete in the search box", :collection => [["Yes", "true"], ["No", "false"]], :include_blank => false %>
         <%= f.input :disable_categorized_saved_searches, :hint => "Don't show dialog box when creating a new saved search", :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
-        <%= f.input :enable_privacy_mode, :as => :select, :hint => "Make your favorites private", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
+        <%= f.input :enable_private_favorites, :as => :select, :hint => "Make your favorites private", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
         <%= f.input :disable_tagged_filenames, :as => :select, :hint => "Don't include tags in image filenames", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
         <%= f.input :disable_mobile_gestures, :as => :select, :hint => "Disable swipe left / swipe right gestures on mobile", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
         <%= f.input :disable_post_tooltips, :as => :select, :hint => "Disable advanced tooltips when hovering over thumbnails", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
         <%= f.input :disable_cropped_thumbnails, :as => :select, :hint => "Disable cropped (square) thumbnails on mobile", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
-        <%= f.input :disable_responsive_mode, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false, :hint => "Disable alternative layout for mobile and tablet" %>
-        <%= f.input :opt_out_tracking, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false, :hint => "Opt out of tracking" %>
-
-        <div class="input text optional field_with_hint">
-          <label class="text optional" for="user_dmail_filter_attributes_words">Dmail filter</label>
-          <%= hidden_field_tag "user[dmail_filter_attributes][id]", @user.dmail_filter.try(:id) %>
-          <%= text_field_tag "user[dmail_filter_attributes][words]", @user.dmail_filter.try(:words), :id => "user_dmail_filter_attributes_words", :class => "text optional", :size => 40 %>
-          <span class="hint">A list of banned words (space delimited). Any dmail you receive with a banned word will automatically be deleted.</span>
-        </div>
+        <%= f.input :enable_desktop_mode, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false, :hint => "Use the desktop layout on mobile" %>
 
         <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :rows => 5, :data => { :autocomplete => "tag-query" } } %>
         <%= f.input :custom_style, :label => "Custom <a href='https://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "CSS rules to apply to the whole site.", :input_html => {:size => "40x5"} %>
@@ -80,25 +75,3 @@
     <% end %>
   </div>
 </div>
-
-<% content_for(:page_title) do %>
-  Settings - <%= Danbooru.config.app_name %>
-<% end %>
-
-<% content_for(:html_header) do %>
-  <script type="text/javascript">
-    $(function() {
-      $("#advanced-settings-section").hide();
-      $("#edit-options a").on("click", function(e) {
-        var $target = $(e.target);
-        $("h2 a").removeClass("active");
-        $("#basic-settings-section,#advanced-settings-section").hide();
-        $target.addClass("active")
-        $($target.attr("href") + "-section").show();
-        e.preventDefault();
-      });
-    });
-  </script>
-<% end %>
-
-<%= render "secondary_links" %>

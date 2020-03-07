@@ -1,15 +1,15 @@
 module PostSets
-  class Post < PostSets::Base
+  class Post
     MAX_PER_PAGE = 200
     attr_reader :tag_array, :page, :raw, :random, :post_count, :format
 
-    def initialize(tags, page = 1, per_page = nil, options = {})
-      @tag_array = Tag.scan_query(tags)
+    def initialize(tags, page = 1, per_page = nil, raw: false, random: false, format: "html")
+      @tag_array = PostQueryBuilder.scan_query(tags)
       @page = page
       @per_page = per_page
-      @raw = options[:raw].present?
-      @random = options[:random].present?
-      @format = options[:format] || "html"
+      @raw = raw.to_s.truthy?
+      @random = random.to_s.truthy?
+      @format = format.to_s
     end
 
     def tag_string
@@ -17,11 +17,7 @@ module PostSets
     end
 
     def humanized_tag_string
-      tag_array.slice(0, 25).join(" ").tr("_", " ")
-    end
-
-    def unordered_tag_array
-      tag_array.reject {|tag| tag =~ /\Aorder:/i }
+      tag_array.map { |tag| tag.tr("_", " ").titleize }.to_sentence
     end
 
     def has_blank_wiki?
@@ -30,7 +26,7 @@ module PostSets
 
     def wiki_page
       return nil unless tag.present? && tag.wiki_page.present?
-      return nil unless !tag.wiki_page.is_deleted? && tag.wiki_page.visible?
+      return nil unless !tag.wiki_page.is_deleted?
       tag.wiki_page
     end
 
@@ -41,36 +37,22 @@ module PostSets
 
     def artist
       return nil unless tag.present? && tag.category == Tag.categories.artist
-      return nil unless tag.artist.present? && tag.artist.is_active? && tag.artist.visible?
+      return nil unless tag.artist.present? && !tag.artist.is_deleted?
       tag.artist
     end
 
-    def pool_name
-      @pool_name ||= Tag.has_metatag?(tag_array, :ordpool, :pool)
-    end
-
-    def has_pool?
-      is_single_tag? && pool_name && pool
-    end
-
     def pool
-      ::Pool.find_by_name(pool_name)
-    end
+      name = Tag.has_metatag?(tag_array, :ordpool, :pool)
+      return nil unless is_single_tag? && name.present?
 
-    def favgroup_name
-      @favgroup_name ||= Tag.has_metatag?(tag_array, :favgroup)
-    end
-
-    def has_favgroup?
-      is_single_tag? && favgroup_name && favgroup
+      @pool ||= Pool.find_by_name(name)
     end
 
     def favgroup
-      ::FavoriteGroup.find_by_name(favgroup_name)
-    end
+      name = Tag.has_metatag?(tag_array, :favgroup)
+      return nil unless is_single_tag? && name.present?
 
-    def has_deleted?
-      tag_string !~ /status/ && ::Post.tag_match("#{tag_string} status:deleted").where("true /* PostSets::Post#has_deleted */").exists?
+      @favgroup ||= FavoriteGroup.find_by_name_or_id(name, CurrentUser.user)
     end
 
     def has_explicit?
@@ -101,10 +83,6 @@ module PostSets
       random || Tag.has_metatag?(tag_array, :order) == "random"
     end
 
-    def use_sequential_paginator?
-      unknown_post_count? && !CurrentUser.is_gold?
-    end
-
     def get_post_count
       if %w(json atom xml).include?(format.downcase)
         # no need to get counts for formats that don't use a paginator
@@ -131,12 +109,6 @@ module PostSets
         else
           temp = ::Post.tag_match(tag_string).where("true /* PostSets::Post#posts:2 */").paginate(page, :count => post_count, :limit => per_page)
         end
-
-        # HACK: uploader_name is needed in api responses and in data-uploader attribs (visible to mods only).
-        temp = temp.includes(:uploader) if !is_random? && (format.to_sym != :html || CurrentUser.is_moderator?)
-
-        temp.each # hack to force rails to eager load
-        temp
       end
     end
 

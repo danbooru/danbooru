@@ -5,7 +5,6 @@ class UploadsController < ApplicationController
 
   def new
     @source = Sources::Strategies.find(params[:url], params[:ref]) if params[:url].present?
-    @upload_notice_wiki = WikiPage.titled(Danbooru.config.upload_notice_wiki_page).first
     @upload, @remote_size = UploadService::ControllerHelper.prepare(
       url: params[:url], ref: params[:ref]
     )
@@ -24,12 +23,14 @@ class UploadsController < ApplicationController
   end
 
   def index
-    @uploads = Upload.paginated_search(params, count_pages: true).includes(:post, :uploader)
+    @uploads = Upload.paginated_search(params, count_pages: true)
+    @uploads = @uploads.includes(:uploader, post: :uploader) if request.format.html?
+
     respond_with(@uploads)
   end
 
   def show
-    @current_item = @upload = Upload.find(params[:id])
+    @upload = Upload.find(params[:id])
     respond_with(@upload) do |format|
       format.html do
         if @upload.is_completed? && @upload.post_id
@@ -63,7 +64,8 @@ class UploadsController < ApplicationController
     permitted_params = %i[
       file source tag_string rating status parent_id artist_commentary_title
       artist_commentary_desc include_artist_commentary referer_url
-      md5_confirmation as_pending
+      md5_confirmation as_pending translated_commentary_title
+      translated_commentary_desc
     ]
 
     params.require(:upload).permit(permitted_params)

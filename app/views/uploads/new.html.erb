@@ -2,13 +2,13 @@
   <div id="a-new">
     <h1>Upload</h1>
 
-    <% if CurrentUser.can_upload? %>
-      <div id="upload-guide-notice" class="prose">
-        <%= format_text(@upload_notice_wiki.try(&:body)) %>
-      </div>
+    <% if !CurrentUser.user.upload_limit.limited? %>
+      <%= embed_wiki("help:upload_notice", id: "upload-guide-notice") %>
 
       <% unless CurrentUser.can_upload_free? %>
-        <p>Upload limit: <strong><%= CurrentUser.user.presenter.upload_limit(self) %></strong>.</p>
+        <p id="upload-limit">
+          Upload Limit: <%= render "users/upload_limit", user: CurrentUser.user %>
+        </p>
       <% end %>
 
       <%= render "image" %>
@@ -46,9 +46,19 @@
           <a href="#" id="toggle-artist-commentary">show »</a>
 
           <div class="artist-commentary" style="display: none;">
-            <%= f.input :artist_commentary_title, as: :string, label: "Title", input_html: { size: 60, value: params[:artist_commentary_title] } %>
-            <%= f.input :artist_commentary_desc, as: :text, label: "Description", input_html: { size: "60x5", value: params[:artist_commentary_desc] } %>
+            <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { size: 60, value: params[:artist_commentary_title] } %>
+            <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { size: "60x5", value: params[:artist_commentary_desc] } %>
             <%= f.input :include_artist_commentary, as: :boolean, label: "Include Commentary", input_html: { checked: params[:include_artist_commentary].present? } %>
+          </div>
+        </div>
+
+        <div class="input upload_commentary_translation_container" style="display: none;">
+          <strong>Translation</strong>
+          <a href="#" id="toggle-commentary-translation">show »</a>
+
+          <div class="commentary-translation" style="display: none;">
+            <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { size: 60, value: params[:translated_commentary_title] } %>
+            <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { size: "60x5", value: params[:translated_commentary_desc] } %>
           </div>
         </div>
 
@@ -72,7 +82,7 @@
         <%= render "related_tags/container" %>
       <% end %>
     <% else %>
-      <h2 style="margin-bottom: 1em;">You <%= CurrentUser.user.upload_limited_reason %></h2>
+      <h2 style="margin-bottom: 1em;">You <%= CurrentUser.user.upload_limit.limit_reason %></h2>
     <% end %>
   </div>
 </div>

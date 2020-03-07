@@ -14,17 +14,6 @@ class ForumPostTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
-    context "#votable?" do
-      setup do
-        @post = FactoryBot.build(:forum_post, :topic_id => @topic.id, :body => "[[aaa]] -> [[bbb]]")
-        @tag_alias = FactoryBot.create(:tag_alias, forum_post: @post)
-      end
-
-      should "be true for a post associated with a tag alias" do
-        assert(@post.votable?)
-      end
-    end
-
     context "that mentions a user" do
       context "in a quote block" do
         setup do
@@ -53,7 +42,7 @@ class ForumPostTest < ActiveSupport::TestCase
       context "outside a quote block" do
         setup do
           @user2 = FactoryBot.create(:user)
-          @post = FactoryBot.build(:forum_post, :topic_id => @topic.id, :body => "Hey @#{@user2.name} check this out!")
+          @post = build(:forum_post, creator: @user, topic: @topic, body: "Hey @#{@user2.name} check this out!")
         end
 
         should "create a dmail" do
@@ -63,7 +52,7 @@ class ForumPostTest < ActiveSupport::TestCase
 
           dmail = Dmail.last
           assert_equal(<<-EOS.strip_heredoc, dmail.body)
-            @#{CurrentUser.name} mentioned you in topic ##{@topic.id} (\"#{@topic.title}\":[/forum_topics/#{@topic.id}?page=1]):
+            @#{@user.name} mentioned you in topic ##{@topic.id} (\"#{@topic.title}\":[/forum_topics/#{@topic.id}?page=1]):
 
             [quote]
             Hey @#{@user2.name} check this out!
@@ -115,21 +104,20 @@ class ForumPostTest < ActiveSupport::TestCase
 
     context "belonging to a locked topic" do
       setup do
-        @post = FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => "zzz")
-        @topic.update_attribute(:is_locked, true)
-        @post.reload
+        @post = create(:forum_post, topic: @topic, body: "zzz")
+        @topic.update(is_locked: true)
       end
 
       should "not be updateable" do
         @post.update(body: "xxx")
-        @post.reload
-        assert_equal("zzz", @post.body)
+        assert_equal(true, @post.invalid?)
+        assert_equal("zzz", @post.reload.body)
       end
 
       should "not be deletable" do
-        assert_difference("ForumPost.count", 0) do
-          @post.destroy
-        end
+        @post.delete!
+        assert_equal(true, @post.invalid?)
+        assert_equal(false, @post.reload.is_deleted)
       end
     end
 
@@ -169,7 +157,7 @@ class ForumPostTest < ActiveSupport::TestCase
     end
 
     should "initialize its creator" do
-      post = FactoryBot.create(:forum_post, :topic_id => @topic.id)
+      post = create(:forum_post, topic: @topic, creator: @user)
       assert_equal(@user.id, post.creator_id)
     end
 

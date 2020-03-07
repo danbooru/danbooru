@@ -96,10 +96,6 @@ class UserPromotion
   end
 
   def create_user_feedback
-    user.feedback.create(
-      :category => "neutral",
-      :body => build_messages,
-      :disable_dmail_notification => true
-    )
+    UserFeedback.create(user: user, creator: promoter, category: "neutral", body: build_messages, disable_dmail_notification: true)
   end
 end

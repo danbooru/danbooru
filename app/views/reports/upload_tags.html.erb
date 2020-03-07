@@ -1,3 +1,5 @@
+<% page_title "Upload Tags: #{@user.pretty_name}" %>
+
 <div id="c-reports">
   <div id="a-upload-tags">
     <h1>Upload tag changes report for <%= @user.pretty_name %></h1>
@@ -19,8 +21,3 @@
     <%= numbered_paginator(@upload_reports) %>
     </div>
 </div>
-
-
-<% content_for(:page_title) do %>
-  Upload tag changes for <%= @user.pretty_name %> - <%= Danbooru.config.app_name %>
-<% end %>

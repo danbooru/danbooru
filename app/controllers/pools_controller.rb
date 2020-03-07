@@ -17,13 +17,9 @@ class PoolsController < ApplicationController
   end
 
   def index
-    @pools = Pool.includes(:creator).paginated_search(params, count_pages: true)
+    @pools = Pool.paginated_search(params, count_pages: true)
 
-    if params[:redirect].to_s.truthy? && @pools.one? && Pool.normalize_name_for_search(@pools.first.name) == Pool.normalize_name_for_search(params[:search][:name_matches])
-      redirect_to @pools.first
-    else
-      respond_with @pools
-    end
+    respond_with(@pools)
   end
 
   def gallery
@@ -37,7 +33,7 @@ class PoolsController < ApplicationController
   def show
     limit = params[:limit].presence || CurrentUser.user.per_page
 
-    @current_item = @pool = Pool.find(params[:id])
+    @pool = Pool.find(params[:id])
     @posts = @pool.posts.paginate(params[:page], limit: limit, count: @pool.post_count)
     respond_with(@pool)
   end
@@ -93,6 +89,14 @@ class PoolsController < ApplicationController
   end
 
   private
+
+  def item_matches_params(pool)
+    if params[:search][:name_matches]
+      Pool.normalize_name_for_search(pool.name) == Pool.normalize_name_for_search(params[:search][:name_matches])
+    else
+      true
+    end
+  end
 
   def pool_params
     permitted_params = %i[name description category post_ids post_ids_string]

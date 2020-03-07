@@ -4,11 +4,11 @@ module PoolArchiveTestHelper
       def send_message(msg, *options)
         _, json = msg.split(/\n/)
         json = JSON.parse(json)
-        prev = PoolArchive.where(pool_id: json["pool_id"]).order("id desc").first
+        prev = PoolVersion.where(pool_id: json["pool_id"]).order("id desc").first
         if merge?(prev, json)
           prev.update_columns(json)
         else
-          PoolArchive.create(json)
+          PoolVersion.create(json)
         end
       end
 
@@ -17,14 +17,14 @@ module PoolArchiveTestHelper
       end
     end
 
-    PoolArchive.stubs(:sqs_service).returns(mock_sqs_service.new)
+    PoolVersion.stubs(:sqs_service).returns(mock_sqs_service.new)
   end
 
   def start_pool_archive_transaction
-    PoolArchive.connection.begin_transaction joinable: false
+    PoolVersion.connection.begin_transaction joinable: false
   end
 
   def rollback_pool_archive_transaction
-    PoolArchive.connection.rollback_transaction
+    PoolVersion.connection.rollback_transaction
   end
 end

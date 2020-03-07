@@ -48,6 +48,7 @@ module Sources::Strategies
         return "https://pawoo.net/@#{$1}"
       end
 
+      return url if api_response.profile_url.blank?
       api_response.profile_url
     end
 

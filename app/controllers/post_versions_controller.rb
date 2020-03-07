@@ -6,7 +6,14 @@ class PostVersionsController < ApplicationController
   respond_to :js, only: [:undo]
 
   def index
-    @post_versions = PostArchive.includes(:updater, post: [:versions]).paginated_search(params)
+    @post_versions = PostVersion.paginated_search(params)
+
+    if request.format.html?
+      @post_versions = @post_versions.includes(:updater, post: [:uploader, :versions])
+    else
+      @post_versions = @post_versions.includes(post: :versions)
+    end
+
     respond_with(@post_versions)
   end
 
@@ -14,7 +21,7 @@ class PostVersionsController < ApplicationController
   end
 
   def undo
-    @post_version = PostArchive.find(params[:id])
+    @post_version = PostVersion.find(params[:id])
     @post_version.undo!
 
     respond_with(@post_version)
@@ -23,14 +30,14 @@ class PostVersionsController < ApplicationController
   private
 
   def set_timeout
-    PostArchive.connection.execute("SET statement_timeout = #{CurrentUser.user.statement_timeout}")
+    PostVersion.connection.execute("SET statement_timeout = #{CurrentUser.user.statement_timeout}")
     yield
   ensure
-    PostArchive.connection.execute("SET statement_timeout = 0")
+    PostVersion.connection.execute("SET statement_timeout = 0")
   end
 
   def check_availabililty
-    if !PostArchive.enabled?
+    if !PostVersion.enabled?
       raise NotImplementedError.new("Archive service is not configured. Post versions are not saved.")
     end
   end

@@ -1,0 +1,13 @@
+body.a-index {
+  div#p-revert-listing {
+    display: flex;
+
+    table.striped {
+      flex: 1; 
+    }
+  }
+
+  div#p-revert-listing  > article.post-preview {
+    margin-top: 2em;
+  }
+}

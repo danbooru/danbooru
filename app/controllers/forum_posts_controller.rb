@@ -24,7 +24,9 @@ class ForumPostsController < ApplicationController
   end
 
   def index
-    @forum_posts = ForumPost.paginated_search(params).includes(:topic)
+    @forum_posts = ForumPost.visible(CurrentUser.user).paginated_search(params)
+    @forum_posts = @forum_posts.includes(:topic, :creator) if request.format.html?
+
     respond_with(@forum_posts)
   end
 
@@ -42,7 +44,7 @@ class ForumPostsController < ApplicationController
   end
 
   def create
-    @forum_post = ForumPost.create(forum_post_params(:create))
+    @forum_post = ForumPost.create(forum_post_params(:create).merge(creator: CurrentUser.user))
     page = @forum_post.topic.last_page if @forum_post.topic.last_page > 1
     respond_with(@forum_post, :location => forum_topic_path(@forum_post.topic, :page => page))
   end

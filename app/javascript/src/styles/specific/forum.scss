@@ -1,5 +1,14 @@
 div.list-of-forum-posts {
+  div.moderation-forums-notice {
+    font-weight: bold;
+    color: var(--moderation-report-text-color);
+  }
+
   article.forum-post {
+    &[data-is-reported="true"] {
+      border: var(--moderation-report-border);
+    }
+
     a.voted {
       font-weight: bold;
     }
@@ -46,8 +55,16 @@ div#c-forum-topics {
     font-weight: bold;
   }
 
-  #a-index table tr td:last-child {
-    white-space: nowrap;
+  #a-index {
+    .updated-at-column {
+      white-space: nowrap;
+    }
+
+    .updated-by-column, .updated-at-column {
+      @media screen and (max-width: 660px) {
+        display: none;
+      }
+    }
   }
 }
 

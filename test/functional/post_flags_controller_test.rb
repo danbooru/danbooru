@@ -3,9 +3,7 @@ require 'test_helper'
 class PostFlagsControllerTest < ActionDispatch::IntegrationTest
   context "The post flags controller" do
     setup do
-      travel_to(2.weeks.ago) do
-        @user = create(:user)
-      end
+      @user = create(:user, created_at: 2.weeks.ago)
     end
 
     context "new action" do
@@ -17,10 +15,7 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        @user.as_current do
-          @post = create(:post)
-          @post_flag = create(:post_flag, :post => @post)
-        end
+        @post_flag = create(:post_flag, creator: @user)
       end
 
       should "render" do

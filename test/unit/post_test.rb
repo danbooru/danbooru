@@ -39,7 +39,7 @@ class PostTest < ActiveSupport::TestCase
         @upload = UploadService.new(FactoryBot.attributes_for(:jpg_upload)).start!
         @post = @upload.post
         Favorite.add(post: @post, user: @user)
-        create(:favorite_group).add!(@post.id)
+        create(:favorite_group, post_ids: [@post.id])
       end
 
       should "delete the files" do
@@ -387,9 +387,7 @@ class PostTest < ActiveSupport::TestCase
         p1 = FactoryBot.create(:post)
         c1 = FactoryBot.create(:post, :parent_id => p1.id)
         c1.delete!("test")
-        CurrentUser.scoped(new_user, "127.0.0.1") do
-          c1.undelete!
-        end
+        c1.approve!(new_user)
         p1.reload
         assert_equal(new_user.id, c1.approver_id)
       end
@@ -398,7 +396,7 @@ class PostTest < ActiveSupport::TestCase
         p1 = FactoryBot.create(:post)
         c1 = FactoryBot.create(:post, :parent_id => p1.id)
         c1.delete!("test")
-        c1.undelete!
+        c1.approve!
         p1.reload
         assert_not_nil(c1.parent_id)
         assert(p1.has_children?, "Parent should have children")
@@ -418,8 +416,8 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "not allow undeletion" do
-          @post.undelete!
-          assert_equal(["Is status locked ; cannot undelete post"], @post.errors.full_messages)
+          approval = @post.approve!
+          assert_equal(["Post is locked and cannot be approved"], approval.errors.full_messages)
           assert_equal(true, @post.is_deleted?)
         end
       end
@@ -436,9 +434,10 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "not be permitted" do
-            assert_raises(::Post::ApprovalError) do
-              @post.undelete!
-            end
+            approval = @post.approve!
+
+            assert_equal(false, approval.valid?)
+            assert_equal(["You have previously approved this post and cannot approve it again"], approval.errors.full_messages)
           end
         end
 
@@ -448,21 +447,22 @@ class PostTest < ActiveSupport::TestCase
           end
 
           should "not be permitted" do
-            assert_raises(::Post::ApprovalError) do
-              @post.undelete!
-            end
+            approval = @post.approve!
+
+            assert_equal(false, approval.valid?)
+            assert_equal(["You cannot approve a post you uploaded"], approval.errors.full_messages)
           end
         end
       end
 
       context "when undeleted" do
         should "be undeleted" do
-          @post.undelete!
+          @post.approve!
           assert_equal(false, @post.reload.is_deleted?)
         end
 
         should "create a mod action" do
-          @post.undelete!
+          @post.approve!
           assert_equal("undeleted post ##{@post.id}", ModAction.last.description)
           assert_equal("post_undelete", ModAction.last.category)
         end
@@ -482,9 +482,7 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "be appealed" do
-        assert_difference("PostAppeal.count", 1) do
-          @post.appeal!("xxx")
-        end
+        create(:post_appeal, post: @post)
         assert(@post.is_deleted?, "Post should still be deleted")
         assert_equal(1, @post.appeals.count)
       end
@@ -561,9 +559,10 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "not allow new appeals" do
-        assert_raises(PostAppeal::Error) do
-          @post.appeal!("wrong")
-        end
+        @appeal = build(:post_appeal, post: @post)
+
+        assert_equal(false, @appeal.valid?)
+        assert_equal(["Post is active"], @appeal.errors.full_messages)
       end
 
       should "not allow approval" do
@@ -999,6 +998,64 @@ class PostTest < ActiveSupport::TestCase
           end
         end
 
+        context "for status:active" do
+          should "approve the post if the user has permission" do
+            as(create(:approver)) do
+              @post.update!(is_pending: true)
+              @post.update(tag_string: "aaa status:active")
+            end
+
+            assert_equal(false, @post.reload.is_pending?)
+          end
+
+          should "not approve the post if the user is doesn't have permission" do
+            assert_raises(User::PrivilegeError) do
+              @post.update!(is_pending: true)
+              @post.update(tag_string: "aaa status:active")
+            end
+
+            assert_equal(true, @post.reload.is_pending?)
+          end
+        end
+
+        context "for status:banned" do
+          should "ban the post if the user has permission" do
+            as(create(:approver)) do
+              @post.update(tag_string: "aaa status:banned")
+            end
+
+            assert_equal(true, @post.reload.is_banned?)
+          end
+
+          should "not ban the post if the user doesn't have permission" do
+            assert_raises(User::PrivilegeError) do
+              @post.update(tag_string: "aaa status:banned")
+            end
+
+            assert_equal(false, @post.reload.is_banned?)
+          end
+        end
+
+        context "for -status:banned" do
+          should "unban the post if the user has permission" do
+            as(create(:approver)) do
+              @post.update!(is_banned: true)
+              @post.update(tag_string: "aaa -status:banned")
+            end
+
+            assert_equal(false, @post.reload.is_banned?)
+          end
+
+          should "not unban the post if the user doesn't have permission" do
+            assert_raises(User::PrivilegeError) do
+              @post.update!(is_banned: true)
+              @post.update(tag_string: "aaa status:banned")
+            end
+
+            assert_equal(true, @post.reload.is_banned?)
+          end
+        end
+
         context "for a source" do
           should "set the source with source:foo_bar_baz" do
             @post.update(:tag_string => "source:foo_bar_baz")
@@ -1266,7 +1323,7 @@ class PostTest < ActiveSupport::TestCase
 
       context "that has been updated" do
         should "create a new version if it's the first version" do
-          assert_difference("PostArchive.count", 1) do
+          assert_difference("PostVersion.count", 1) do
             post = FactoryBot.create(:post)
           end
         end
@@ -1274,7 +1331,7 @@ class PostTest < ActiveSupport::TestCase
         should "create a new version if it's been over an hour since the last update" do
           post = FactoryBot.create(:post)
           travel(6.hours) do
-            assert_difference("PostArchive.count", 1) do
+            assert_difference("PostVersion.count", 1) do
               post.update(tag_string: "zzz")
             end
           end
@@ -1282,14 +1339,14 @@ class PostTest < ActiveSupport::TestCase
 
         should "merge with the previous version if the updater is the same user and it's been less than an hour" do
           post = FactoryBot.create(:post)
-          assert_difference("PostArchive.count", 0) do
+          assert_difference("PostVersion.count", 0) do
             post.update(tag_string: "zzz")
           end
           assert_equal("zzz", post.versions.last.tags)
         end
 
         should "increment the updater's post_update_count" do
-          PostArchive.sqs_service.stubs(:merge?).returns(false)
+          PostVersion.sqs_service.stubs(:merge?).returns(false)
           post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
 
           # XXX in the test environment the update count gets bumped twice: and
@@ -1373,7 +1430,7 @@ class PostTest < ActiveSupport::TestCase
 
           # final should be <aaa>, <bbb>, <ddd>, <eee>
           final_post = Post.find(post.id)
-          assert_equal(%w(aaa bbb ddd eee), Tag.scan_tags(final_post.tag_string).sort)
+          assert_equal(%w(aaa bbb ddd eee), PostQueryBuilder.scan_query(final_post.tag_string).sort)
         end
 
         should "merge any tag changes that were made after loading the initial set of tags part 2" do
@@ -1396,7 +1453,7 @@ class PostTest < ActiveSupport::TestCase
 
           # final should be <aaa>, <bbb>, <ddd>, <eee>
           final_post = Post.find(post.id)
-          assert_equal(%w(aaa bbb ddd eee), Tag.scan_tags(final_post.tag_string).sort)
+          assert_equal(%w(aaa bbb ddd eee), PostQueryBuilder.scan_query(final_post.tag_string).sort)
         end
 
         should "merge any parent, source, and rating changes that were made after loading the initial set" do
@@ -1706,14 +1763,11 @@ class PostTest < ActiveSupport::TestCase
         @parent = FactoryBot.create(:post)
         @child = FactoryBot.create(:post, parent: @parent)
 
-        @user1 = FactoryBot.create(:user, enable_privacy_mode: true)
+        @user1 = FactoryBot.create(:user, enable_private_favorites: true)
         @gold1 = FactoryBot.create(:gold_user)
-        @supervoter1 = FactoryBot.create(:user, is_super_voter: true)
 
         @child.add_favorite!(@user1)
         @child.add_favorite!(@gold1)
-        @child.add_favorite!(@supervoter1)
-        @parent.add_favorite!(@supervoter1)
 
         @child.give_favorites_to_parent
         @child.reload
@@ -1732,7 +1786,6 @@ class PostTest < ActiveSupport::TestCase
 
       should "create a vote for each user who can vote" do
         assert(@parent.votes.where(user: @gold1).exists?)
-        assert(@parent.votes.where(user: @supervoter1).exists?)
         assert_equal(4, @parent.score)
       end
     end
@@ -1909,6 +1962,18 @@ class PostTest < ActiveSupport::TestCase
       assert_tag_match([post2], "a* bbb")
     end
 
+    should "return posts for a negated pattern" do
+      post1 = create(:post, tag_string: "aaa")
+      post2 = create(:post, tag_string: "aaab bbb")
+      post3 = create(:post, tag_string: "bbb ccc")
+
+      assert_tag_match([post3], "-a*")
+      assert_tag_match([post3], "bbb -a*")
+      assert_tag_match([post3], "~bbb -a*")
+      assert_tag_match([post1], "a* -*b")
+      assert_tag_match([post2], "-*c -a*a")
+    end
+
     should "return posts for the id:<N> metatag" do
       posts = FactoryBot.create_list(:post, 3)
 
@@ -2009,7 +2074,7 @@ class PostTest < ActiveSupport::TestCase
     end
 
     should "return posts for the user:<name> metatag" do
-      users = FactoryBot.create_list(:user, 2)
+      users = FactoryBot.create_list(:user, 2, created_at: 2.weeks.ago)
       posts = users.map { |u| FactoryBot.create(:post, uploader: u) }
 
       assert_tag_match([posts[0]], "user:#{users[0].name}")
@@ -2030,7 +2095,7 @@ class PostTest < ActiveSupport::TestCase
     should "return posts for the commenter:<name> metatag" do
       users = FactoryBot.create_list(:user, 2, created_at: 2.weeks.ago)
       posts = FactoryBot.create_list(:post, 2)
-      comms = users.zip(posts).map { |u, p| as(u) { FactoryBot.create(:comment, post: p) } }
+      comms = users.zip(posts).map { |u, p| as(u) { FactoryBot.create(:comment, creator: u, post: p) } }
 
       assert_tag_match([posts[0]], "commenter:#{users[0].name}")
       assert_tag_match([posts[1]], "commenter:#{users[1].name}")
@@ -2038,8 +2103,8 @@ class PostTest < ActiveSupport::TestCase
 
     should "return posts for the commenter:<any|none> metatag" do
       posts = FactoryBot.create_list(:post, 2)
-      FactoryBot.create(:comment, post: posts[0], is_deleted: false)
-      FactoryBot.create(:comment, post: posts[1], is_deleted: true)
+      create(:comment, creator: create(:user, created_at: 2.weeks.ago), post: posts[0], is_deleted: false)
+      create(:comment, creator: create(:user, created_at: 2.weeks.ago), post: posts[1], is_deleted: true)
 
       assert_tag_match([posts[0]], "commenter:any")
       assert_tag_match([posts[1]], "commenter:none")
@@ -2048,7 +2113,9 @@ class PostTest < ActiveSupport::TestCase
     should "return posts for the noter:<name> metatag" do
       users = FactoryBot.create_list(:user, 2)
       posts = FactoryBot.create_list(:post, 2)
-      notes = users.zip(posts).map { |u, p| FactoryBot.create(:note, creator: u, post: p) }
+      notes = users.zip(posts).map do |u, p|
+        as(u) { create(:note, post: p) }
+      end
 
       assert_tag_match([posts[0]], "noter:#{users[0].name}")
       assert_tag_match([posts[1]], "noter:#{users[1].name}")
@@ -2143,8 +2210,8 @@ class PostTest < ActiveSupport::TestCase
       pending = FactoryBot.create(:post, is_pending: true)
       disapproved = FactoryBot.create(:post, is_pending: true)
 
-      FactoryBot.create(:post_flag, post: flagged)
-      FactoryBot.create(:post_disapproval, post: disapproved, reason: "disinterest")
+      create(:post_flag, post: flagged, creator: create(:user, created_at: 2.weeks.ago))
+      create(:post_disapproval, user: CurrentUser.user, post: disapproved, reason: "disinterest")
 
       assert_tag_match([pending, flagged], "status:unmoderated")
     end
@@ -2319,21 +2386,19 @@ class PostTest < ActiveSupport::TestCase
       end
     end
 
-    should "return posts for a disapproval:<type> metatag" do
+    should "return posts for a disapproved:<type> metatag" do
       CurrentUser.scoped(FactoryBot.create(:mod_user)) do
         pending     = FactoryBot.create(:post, is_pending: true)
         disapproved = FactoryBot.create(:post, is_pending: true)
-        disapproval = FactoryBot.create(:post_disapproval, post: disapproved, reason: "disinterest")
+        disapproval = FactoryBot.create(:post_disapproval, user: CurrentUser.user, post: disapproved, reason: "disinterest")
 
-        assert_tag_match([pending],     "disapproval:none")
-        assert_tag_match([disapproved], "disapproval:any")
-        assert_tag_match([disapproved], "disapproval:disinterest")
-        assert_tag_match([],            "disapproval:breaks_rules")
+        assert_tag_match([disapproved], "disapproved:#{CurrentUser.name}")
+        assert_tag_match([disapproved], "disapproved:disinterest")
+        assert_tag_match([],            "disapproved:breaks_rules")
 
-        assert_tag_match([disapproved],          "-disapproval:none")
-        assert_tag_match([pending],              "-disapproval:any")
-        assert_tag_match([pending],              "-disapproval:disinterest")
-        assert_tag_match([disapproved, pending], "-disapproval:breaks_rules")
+        assert_tag_match([pending],              "-disapproved:#{CurrentUser.name}")
+        assert_tag_match([pending],              "-disapproved:disinterest")
+        assert_tag_match([disapproved, pending], "-disapproved:breaks_rules")
       end
     end
 
@@ -2352,9 +2417,10 @@ class PostTest < ActiveSupport::TestCase
           tag_string: tags[n - 1]
         )
 
-        FactoryBot.create(:artist_commentary, post: p)
-        FactoryBot.create(:comment, post: p, do_not_bump_post: false)
-        FactoryBot.create(:note, post: p)
+        u = create(:user, created_at: 2.weeks.ago)
+        create(:artist_commentary, post: p)
+        create(:comment, post: p, creator: u, do_not_bump_post: false)
+        create(:note, post: p)
         p
       end
 
@@ -2406,11 +2472,12 @@ class PostTest < ActiveSupport::TestCase
       post1 = FactoryBot.create(:post)
       post2 = FactoryBot.create(:post)
       post3 = FactoryBot.create(:post)
+      user = create(:gold_user)
 
-      CurrentUser.scoped(FactoryBot.create(:gold_user), "127.0.0.1") do
-        comment1 = FactoryBot.create(:comment, :post => post1)
-        comment2 = FactoryBot.create(:comment, :post => post2, :do_not_bump_post => true)
-        comment3 = FactoryBot.create(:comment, :post => post3)
+      as(user) do
+        comment1 = create(:comment, creator: user, post: post1)
+        comment2 = create(:comment, creator: user, post: post2, do_not_bump_post: true)
+        comment3 = create(:comment, creator: user, post: post3)
       end
 
       assert_tag_match([post3, post1, post2], "order:comment_bumped")
@@ -2473,24 +2540,6 @@ class PostTest < ActiveSupport::TestCase
   end
 
   context "Voting:" do
-    context "with a super voter" do
-      setup do
-        @user = FactoryBot.create(:user)
-        FactoryBot.create(:super_voter, user: @user)
-        @post = FactoryBot.create(:post)
-      end
-
-      should "account for magnitude" do
-        CurrentUser.scoped(@user, "127.0.0.1") do
-          assert_nothing_raised {@post.vote!("up")}
-          assert_raises(PostVote::Error) {@post.vote!("up")}
-          @post.reload
-          assert_equal(1, PostVote.count)
-          assert_equal(SuperVoter::MAGNITUDE, @post.score)
-        end
-      end
-    end
-
     should "not allow members to vote" do
       @user = FactoryBot.create(:user)
       @post = FactoryBot.create(:post)
@@ -2696,7 +2745,7 @@ class PostTest < ActiveSupport::TestCase
 
     context "a post that has been updated" do
       setup do
-        PostArchive.sqs_service.stubs(:merge?).returns(false)
+        PostVersion.sqs_service.stubs(:merge?).returns(false)
         @post = FactoryBot.create(:post, :rating => "q", :tag_string => "aaa", :source => "")
         @post.reload
         @post.update(:tag_string => "aaa bbb ccc ddd")
@@ -2737,9 +2786,9 @@ class PostTest < ActiveSupport::TestCase
     should "generate the correct urls for animated gifs" do
       @post = FactoryBot.build(:post, md5: "deadbeef", file_ext: "gif", tag_string: "animated_gif")
 
-      assert_equal("https://#{Socket.gethostname}/data/preview/deadbeef.jpg", @post.preview_file_url)
-      assert_equal("https://#{Socket.gethostname}/data/deadbeef.gif", @post.large_file_url)
-      assert_equal("https://#{Socket.gethostname}/data/deadbeef.gif", @post.file_url)
+      assert_equal("https://localhost/data/preview/deadbeef.jpg", @post.preview_file_url)
+      assert_equal("https://localhost/data/deadbeef.gif", @post.large_file_url)
+      assert_equal("https://localhost/data/deadbeef.gif", @post.file_url)
     end
   end
 
@@ -2749,11 +2798,10 @@ class PostTest < ActiveSupport::TestCase
         @src = FactoryBot.create(:post, image_width: 100, image_height: 100, tag_string: "translated partially_translated", has_embedded_notes: true)
         @dst = FactoryBot.create(:post, image_width: 200, image_height: 200, tag_string: "translation_request")
 
-        @src.notes.create(x: 10, y: 10, width: 10, height: 10, body: "test")
-        @src.notes.create(x: 10, y: 10, width: 10, height: 10, body: "deleted", is_active: false)
-        @src.reload
+        create(:note, post: @src, x: 10, y: 10, width: 10, height: 10, body: "test")
+        create(:note, post: @src, x: 10, y: 10, width: 10, height: 10, body: "deleted", is_active: false)
 
-        @src.copy_notes_to(@dst)
+        @src.reload.copy_notes_to(@dst)
       end
 
       should "copy notes and tags" do

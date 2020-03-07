@@ -1,5 +1,10 @@
 <% if forum_post.visible?(CurrentUser.user, ActiveModel::Type::Boolean.new.cast(params.dig(:search, :is_deleted))) %>
-  <article class="forum-post message" id="forum_post_<%= forum_post.id %>" data-forum-post-id="<%= forum_post.id %>" data-creator="<%= forum_post.creator.name %>">
+  <article class="forum-post message" id="forum_post_<%= forum_post.id %>" 
+           data-forum-post-id="<%= forum_post.id %>"
+           <% if CurrentUser.is_moderator? %>
+            data-is-reported="<%= moderation_reports.pluck(:model_id).include?(forum_post.id) %>"
+           <% end %>
+           data-creator="<%= forum_post.creator.name %>">
     <div class="author">
       <h4>
         <%= link_to_user forum_post.creator %>
@@ -32,7 +37,10 @@
             <li><%= link_to "Edit", edit_forum_post_path(forum_post.id), :id => "edit_forum_post_link_#{forum_post.id}", :class => "edit_forum_post_link" %></li>
           <% end %>
         <% end %>
-        <% if forum_post.votable? %>
+        <% if forum_post.reportable_by?(CurrentUser.user) %>
+          <li><%= link_to "Report", new_moderation_report_path(moderation_report: { model_type: "ForumPost", model_id: forum_post.id }), remote: true, title: "Report this forum post to the moderators" %></li>
+        <% end %>
+        <% if forum_post.bulk_update_request.present? %>
           <ul class="votes" id="forum-post-votes-for-<%= forum_post.id %>">
             <%= render "forum_post_votes/list", votes: forum_post.votes, forum_post: forum_post %>
           </ul>

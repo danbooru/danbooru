@@ -1,9 +1,13 @@
+<% page_title "Favgroup: #{@favorite_group.pretty_name}" %>
+<%= render "secondary_links" %>
+
 <div id="c-favorite-groups">
   <div id="a-show">
     <h1>
       Favorite Group:
       <%= link_to @favorite_group.pretty_name, posts_path(:tags => "favgroup:#{@favorite_group.id}") %>
     </h1>
+
     Creator: <%= link_to_user @favorite_group.creator %>
     <br>
     <br>
@@ -11,15 +15,13 @@
     <%= render "posts/partials/common/inline_blacklist" %>
 
     <section>
-      <%= @post_set.presenter.post_previews_html(self) %>
+      <% if @favorite_group.post_count == 0 %>
+        <%= render "post_sets/blank" %>
+      <% else %>
+        <%= post_previews_html(@posts, favgroup_id: @favorite_group.id) %>
 
-      <%= numbered_paginator(@post_set) %>
+        <%= numbered_paginator(@posts) %>
+      <% end %>
     </section>
   </div>
 </div>
-
-<%= render "secondary_links" %>
-
-<% content_for(:page_title) do %>
-  Favorite Group - <%= @favorite_group.pretty_name %> - <%= Danbooru.config.app_name %>
-<% end %>

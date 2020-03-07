@@ -9,21 +9,19 @@ module DanbooruMaintenance
     safely { Upload.prune! }
     safely { Delayed::Job.where('created_at < ?', 45.days.ago).delete_all }
     safely { PostDisapproval.prune! }
-    safely { ForumSubscription.process_all! }
     safely { PostDisapproval.dmail_messages! }
     safely { regenerate_post_counts! }
-    safely { SuperVoter.init! }
     safely { TokenBucket.prune! }
     safely { TagChangeRequestPruner.warn_all }
     safely { TagChangeRequestPruner.reject_all }
     safely { Ban.prune! }
-    safely { CuratedPoolUpdater.update_pool! }
     safely { ActiveRecord::Base.connection.execute("vacuum analyze") unless Rails.env.test? }
   end
 
   def weekly
     safely { UserPasswordResetNonce.prune! }
     safely { TagRelationshipRetirementService.find_and_retire! }
+    safely { ApproverPruner.dmail_inactive_approvers! }
   end
 
   def monthly

@@ -1,5 +1,4 @@
 require 'digest/sha1'
-require 'danbooru/has_bit_flags'
 
 class User < ApplicationRecord
   class Error < StandardError; end
@@ -19,8 +18,7 @@ class User < ApplicationRecord
   Roles = Levels.constants.map(&:downcase) + [
     :banned,
     :approver,
-    :voter,
-    :super_voter
+    :voter
   ]
 
   # candidates for removal:
@@ -33,6 +31,10 @@ class User < ApplicationRecord
   # - enable_recent_searches (enabled by 499)
   # - disable_cropped_thumbnails (enabled by 22)
   # - has_saved_searches
+  # - opt_out_tracking
+  # - enable_recommended_posts
+  # - has_mail
+  # - is_super_voter
   BOOLEAN_ATTRIBUTES = %w(
     is_banned
     has_mail
@@ -40,7 +42,7 @@ class User < ApplicationRecord
     always_resize_images
     enable_post_navigation
     new_post_navigation_layout
-    enable_privacy_mode
+    enable_private_favorites
     enable_sequential_post_navigation
     hide_deleted_posts
     style_usernames
@@ -56,7 +58,7 @@ class User < ApplicationRecord
     disable_cropped_thumbnails
     disable_mobile_gestures
     enable_safe_mode
-    disable_responsive_mode
+    enable_desktop_mode
     disable_post_tooltips
     enable_recommended_posts
     opt_out_tracking
@@ -64,7 +66,6 @@ class User < ApplicationRecord
     no_feedback
   )
 
-  include Danbooru::HasBitFlags
   has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
 
   attr_accessor :password, :old_password
@@ -86,6 +87,7 @@ class User < ApplicationRecord
   before_update :encrypt_password_on_update
   before_create :promote_to_admin_if_first_user
   before_create :customize_new_user
+  has_many :artists, foreign_key: :creator_id
   has_many :artist_versions, foreign_key: :updater_id
   has_many :artist_commentary_versions, foreign_key: :updater_id
   has_many :comments, foreign_key: :creator_id
@@ -93,31 +95,42 @@ class User < ApplicationRecord
   has_many :wiki_page_versions, foreign_key: :updater_id
   has_many :feedback, :class_name => "UserFeedback", :dependent => :destroy
   has_many :forum_post_votes, dependent: :destroy, foreign_key: :creator_id
+  has_many :forum_topic_visits, dependent: :destroy
+  has_many :visited_forum_topics, through: :forum_topic_visits, source: :forum_topic
+  has_many :moderation_reports, as: :model
+  has_many :pools, foreign_key: :creator_id
   has_many :posts, :foreign_key => "uploader_id"
   has_many :post_appeals, foreign_key: :creator_id
   has_many :post_approvals, :dependent => :destroy
   has_many :post_disapprovals, :dependent => :destroy
   has_many :post_flags, foreign_key: :creator_id
   has_many :post_votes
-  has_many :post_versions, class_name: "PostArchive", foreign_key: :updater_id
+  has_many :post_versions, foreign_key: :updater_id
   has_many :bans, -> {order("bans.id desc")}
   has_one :recent_ban, -> {order("bans.id desc")}, :class_name => "Ban"
 
   has_one :api_key
-  has_one :dmail_filter
-  has_one :super_voter
   has_one :token_bucket
+  has_many :notes, foreign_key: :creator_id
   has_many :note_versions, :foreign_key => "updater_id"
   has_many :dmails, -> {order("dmails.id desc")}, :foreign_key => "owner_id"
   has_many :saved_searches
   has_many :forum_posts, -> {order("forum_posts.created_at, forum_posts.id")}, :foreign_key => "creator_id"
-  has_many :user_name_change_requests, -> {visible.order("user_name_change_requests.created_at desc")}
+  has_many :user_name_change_requests, -> {order("user_name_change_requests.created_at desc")}
   has_many :favorite_groups, -> {order(name: :asc)}, foreign_key: :creator_id
   has_many :favorites, ->(rec) {where("user_id % 100 = #{rec.id % 100} and user_id = #{rec.id}").order("id desc")}
+  has_many :ip_bans, foreign_key: :creator_id
+  has_many :tag_aliases, foreign_key: :creator_id
+  has_many :tag_implications, foreign_key: :creator_id
   belongs_to :inviter, class_name: "User", optional: true
-  accepts_nested_attributes_for :dmail_filter
 
   enum theme: { light: 0, dark: 100 }, _suffix: true
+
+  # UserDeletion#rename renames deleted users to `user_<1234>~`. Tildes
+  # are appended if the username is taken.
+  scope :deleted, -> { where("name ~ 'user_[0-9]+~*'") }
+  scope :undeleted, -> { where("name !~ 'user_[0-9]+~*'") }
+  scope :admins, -> { where(level: Levels::ADMIN) }
 
   module BanMethods
     def validate_ip_addr_is_not_banned
@@ -315,7 +328,6 @@ class User < ApplicationRecord
         self.level = Levels::ADMIN
         self.can_approve_posts = true
         self.can_upload_free = true
-        self.is_super_voter = true
       end
     end
 
@@ -360,7 +372,7 @@ class User < ApplicationRecord
     end
 
     def is_voter?
-      is_gold? || is_super_voter?
+      is_gold?
     end
 
     def is_approver?
@@ -389,7 +401,7 @@ class User < ApplicationRecord
   module ForumMethods
     def has_forum_been_updated?
       return false unless is_gold?
-      max_updated_at = ForumTopic.permitted.active.maximum(:updated_at)
+      max_updated_at = ForumTopic.visible(self).active.maximum(:updated_at)
       return false if max_updated_at.nil?
       return true if last_forum_read_at.nil?
       return max_updated_at > last_forum_read_at
@@ -404,26 +416,6 @@ class User < ApplicationRecord
         1_000
       else
         250
-      end
-    end
-
-    def can_upload?
-      if can_upload_free?
-        true
-      elsif is_admin?
-        true
-      elsif created_at > 1.week.ago
-        false
-      else
-        upload_limit > 0
-      end
-    end
-
-    def upload_limited_reason
-      if created_at > 1.week.ago
-        "cannot upload during your first week of registration"
-      else
-        "have reached your upload limit for the day"
       end
     end
 
@@ -460,51 +452,7 @@ class User < ApplicationRecord
     end
 
     def upload_limit
-      [max_upload_limit - used_upload_slots, 0].max
-    end
-
-    def used_upload_slots
-      uploaded_count = posts.where("created_at >= ?", 23.hours.ago).count
-      uploaded_comic_count = posts.tag_match("comic").where("created_at >= ?", 23.hours.ago).count / 3
-      uploaded_count - uploaded_comic_count
-    end
-    memoize :used_upload_slots
-
-    def max_upload_limit
-      [(base_upload_limit * upload_limit_multiplier).ceil, 10].max
-    end
-
-    def upload_limit_multiplier
-      (1 - (adjusted_deletion_confidence / 15.0))
-    end
-
-    def adjusted_deletion_confidence
-      [deletion_confidence(60.days.ago), 15].min
-    end
-    memoize :adjusted_deletion_confidence
-
-    def deletion_confidence(date)
-      deletions = posts.deleted.where("created_at >= ?", date).count
-      total = posts.where("created_at >= ?", date).count
-      DanbooruMath.ci_lower_bound(deletions, total)
-    end
-
-    def base_upload_limit
-      if created_at >= 1.month.ago
-        10
-      elsif created_at >= 2.months.ago
-        20
-      elsif created_at >= 3.months.ago
-        30
-      elsif created_at >= 4.months.ago
-        40
-      else
-        50
-      end
-    end
-
-    def next_free_upload_slot
-      (posts.where("created_at >= ?", 23.hours.ago).first.try(:created_at) || 23.hours.ago) + 23.hours
+      @upload_limit ||= UploadLimit.new(self)
     end
 
     def tag_query_limit
@@ -565,7 +513,9 @@ class User < ApplicationRecord
     end
 
     def statement_timeout
-      if is_platinum?
+      if Rails.env.development?
+        60_000
+      elsif is_platinum?
         9_000
       elsif is_gold?
         6_000
@@ -578,9 +528,9 @@ class User < ApplicationRecord
   module ApiMethods
     def api_attributes
       attributes = %i[
-        id created_at name inviter_id level base_upload_limit
+        id created_at name inviter_id level
         post_upload_count post_update_count note_update_count is_banned
-        can_approve_posts can_upload_free is_super_voter level_string
+        can_approve_posts can_upload_free level_string
       ]
 
       if id == CurrentUser.user.id
@@ -592,8 +542,8 @@ class User < ApplicationRecord
           custom_style favorite_count api_regen_multiplier
           api_burst_limit remaining_api_limit statement_timeout
           favorite_group_limit favorite_limit tag_query_limit
-          can_comment_vote? can_remove_from_pools? is_comment_limited?
-          can_comment? can_upload? max_saved_searches theme
+          can_remove_from_pools? is_comment_limited?
+          can_comment? max_saved_searches theme
         ]
       end
 
@@ -607,8 +557,7 @@ class User < ApplicationRecord
         artist_commentary_version_count pool_version_count
         forum_post_count comment_count favorite_group_count
         appeal_count flag_count positive_feedback_count
-        neutral_feedback_count negative_feedback_count upload_limit
-        max_upload_limit
+        neutral_feedback_count negative_feedback_count
       ]
     end
 
@@ -640,8 +589,8 @@ class User < ApplicationRecord
     end
 
     def pool_version_count
-      return nil unless PoolArchive.enabled?
-      PoolArchive.for_user(id).count
+      return nil unless PoolVersion.enabled?
+      PoolVersion.for_user(id).count
     end
 
     def forum_post_count
@@ -653,7 +602,7 @@ class User < ApplicationRecord
     end
 
     def favorite_group_count
-      favorite_groups.count
+      favorite_groups.visible(CurrentUser.user).count
     end
 
     def appeal_count
@@ -665,15 +614,15 @@ class User < ApplicationRecord
     end
 
     def positive_feedback_count
-      feedback.positive.count
+      feedback.undeleted.positive.count
     end
 
     def neutral_feedback_count
-      feedback.neutral.count
+      feedback.undeleted.neutral.count
     end
 
     def negative_feedback_count
-      feedback.negative.count
+      feedback.undeleted.negative.count
     end
 
     def refresh_counts!
@@ -688,20 +637,6 @@ class User < ApplicationRecord
   end
 
   module SearchMethods
-    def admins
-      where("level = ?", Levels::ADMIN)
-    end
-
-    # UserDeletion#rename renames deleted users to `user_<1234>~`. Tildes
-    # are appended if the username is taken.
-    def deleted
-      where("name ~ 'user_[0-9]+~*'")
-    end
-
-    def undeleted
-      where("name !~ 'user_[0-9]+~*'")
-    end
-
     def with_email(email)
       if email.blank?
         where("FALSE")
@@ -730,33 +665,12 @@ class User < ApplicationRecord
         q = q.where("level <= ?", params[:max_level].to_i)
       end
 
-      bitprefs_length = BOOLEAN_ATTRIBUTES.length
-      bitprefs_include = nil
-      bitprefs_exclude = nil
-
-      [:can_approve_posts, :can_upload_free, :is_super_voter].each do |x|
-        if params[x].present?
-          attr_idx = BOOLEAN_ATTRIBUTES.index(x.to_s)
-          if params[x].to_s.truthy?
-            bitprefs_include ||= "0" * bitprefs_length
-            bitprefs_include[attr_idx] = '1'
-          elsif params[x].to_s.falsy?
-            bitprefs_exclude ||= "0" * bitprefs_length
-            bitprefs_exclude[attr_idx] = '1'
-          end
+      %w[can_approve_posts can_upload_free].each do |flag|
+        if params[flag].to_s.truthy?
+          q = q.bit_prefs_match(flag, true)
+        elsif params[flag].to_s.falsy?
+          q = q.bit_prefs_match(flag, false)
         end
-      end
-
-      if bitprefs_include
-        bitprefs_include.reverse!
-        q = q.where("bit_prefs::bit(:len) & :bits::bit(:len) = :bits::bit(:len)",
-                    :len => bitprefs_length, :bits => bitprefs_include)
-      end
-
-      if bitprefs_exclude
-        bitprefs_exclude.reverse!
-        q = q.where("bit_prefs::bit(:len) & :bits::bit(:len) = 0::bit(:len)",
-                    :len => bitprefs_length, :bits => bitprefs_exclude)
       end
 
       if params[:current_user_first].to_s.truthy? && !CurrentUser.is_anonymous?
@@ -804,20 +718,15 @@ class User < ApplicationRecord
     CurrentUser.as(self, &block)
   end
 
-  def dmail_count
-    if has_mail?
-      "(#{unread_dmail_count})"
-    else
-      ""
-    end
+  def reportable_by?(user)
+    ModerationReport.enabled? && user.is_builder? && id != user.id && !is_moderator?
   end
 
   def hide_favorites?
-    !CurrentUser.is_admin? && enable_privacy_mode? && CurrentUser.user.id != id
+    !CurrentUser.is_admin? && enable_private_favorites? && CurrentUser.user.id != id
   end
 
   def initialize_attributes
-    self.last_ip_addr ||= CurrentUser.ip_addr
     self.enable_post_navigation = true
     self.new_post_navigation_layout = true
     self.enable_sequential_post_navigation = true
@@ -827,5 +736,13 @@ class User < ApplicationRecord
 
   def presenter
     @presenter ||= UserPresenter.new(self)
+  end
+
+  def dtext_shortlink(**options)
+    "<@#{name}>"
+  end
+
+  def self.available_includes
+    [:inviter]
   end
 end

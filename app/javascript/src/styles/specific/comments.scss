@@ -1,6 +1,12 @@
 @import "../base/000_vars.scss";
 
 div.comments-for-post {
+  div.moderation-comments-notice {
+    margin: 1em 0;
+    font-weight: bold;
+    color: var(--moderation-report-text-color);
+  }
+
   div.hidden-comments-notice {
     margin: 1em 0;
   }
@@ -11,6 +17,10 @@ div.comments-for-post {
 
       &[data-is-sticky="true"] {
         background: var(--comment-sticky-background-color);
+      }
+
+      &[data-is-reported="true"] {
+        border: var(--moderation-report-border);
       }
 
       &[data-is-voted="true"] {

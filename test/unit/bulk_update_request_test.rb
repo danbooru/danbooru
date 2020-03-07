@@ -13,31 +13,9 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
-    context "#estimate_update_count" do
-      setup do
-        FactoryBot.create(:post, tag_string: "aaa")
-        FactoryBot.create(:post, tag_string: "bbb")
-        FactoryBot.create(:post, tag_string: "ccc")
-        FactoryBot.create(:post, tag_string: "ddd")
-        FactoryBot.create(:post, tag_string: "eee")
-
-        @script = "create alias aaa -> 000\n" +
-          "create implication bbb -> 111\n" +
-          "remove alias ccc -> 222\n" +
-          "remove implication ddd -> 333\n" +
-          "mass update eee -> 444\n"
-      end
-
-      subject { BulkUpdateRequest.new(script: @script) }
-
-      should "return the correct count" do
-        assert_equal(3, subject.estimate_update_count)
-      end
-    end
-
     context "#update_notice" do
       setup do
-        @forum_topic = FactoryBot.create(:forum_topic)
+        @forum_topic = create(:forum_topic, creator: @admin)
       end
 
       should "update the cache" do
@@ -70,7 +48,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           mass update aaa -> bbb
         '
 
-        @bur = FactoryBot.create(:bulk_update_request, :script => @script)
+        @bur = create(:bulk_update_request, script: @script, user: @admin)
         @bur.approve!(@admin)
 
         assert_enqueued_jobs(3)
@@ -104,14 +82,16 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
     end
 
     should "create a forum topic" do
-      assert_difference("ForumTopic.count", 1) do
-        BulkUpdateRequest.create(:title => "abc", :reason => "zzz", :script => "create alias aaa -> bbb", :skip_secondary_validations => true)
-      end
+      bur = create(:bulk_update_request, reason: "zzz", script: "create alias aaa -> bbb")
+
+      assert_equal(true, bur.forum_post.present?)
+      assert_match(/\[bur:#{bur.id}\]/, bur.forum_post.body)
+      assert_match(/zzz/, bur.forum_post.body)
     end
 
     context "that has an invalid alias" do
       setup do
-        @alias1 = FactoryBot.create(:tag_alias)
+        @alias1 = create(:tag_alias, creator: @admin)
         @req = FactoryBot.build(:bulk_update_request, :script => "create alias bbb -> aaa")
       end
 
@@ -172,13 +152,13 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
     context "with an associated forum topic" do
       setup do
-        @topic = FactoryBot.create(:forum_topic, :title => "[bulk] hoge")
-        @post = FactoryBot.create(:forum_post, :topic_id => @topic.id)
+        @topic = create(:forum_topic, title: "[bulk] hoge", creator: @admin)
+        @post = create(:forum_post, topic: @topic, creator: @admin)
         @req = FactoryBot.create(:bulk_update_request, :script => "create alias AAA -> BBB", :forum_topic_id => @topic.id, :forum_post_id => @post.id, :title => "[bulk] hoge")
       end
 
       should "gracefully handle validation errors during approval" do
-        @req.stubs(:update).raises(AliasAndImplicationImporter::Error.new("blah"))
+        @req.stubs(:update!).raises(AliasAndImplicationImporter::Error.new("blah"))
         assert_difference("ForumPost.count", 1) do
           @req.approve!(@admin)
         end

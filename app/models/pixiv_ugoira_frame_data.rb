@@ -1,6 +1,18 @@
 class PixivUgoiraFrameData < ApplicationRecord
+  belongs_to :post
+
   serialize :data
   before_validation :normalize_data, on: :create
+
+  def self.available_includes
+    [:post]
+  end
+
+  def self.search(params)
+    q = super
+    q = q.search_attributes(params, :post, :data, :content_type)
+    q.apply_default_order(params)
+  end
 
   def normalize_data
     return if data.nil?

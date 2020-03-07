@@ -72,7 +72,7 @@ class CommentTest < ActiveSupport::TestCase
 
           dmail = Dmail.last
           assert_equal(<<-EOS.strip_heredoc, dmail.body)
-            @#{CurrentUser.name} mentioned you in a \"comment\":/posts/#{@comment.post_id}#comment-#{@comment.id} on post ##{@comment.post_id}:
+            @#{@comment.creator.name} mentioned you in a \"comment\":/posts/#{@comment.post_id}#comment-#{@comment.id} on post ##{@comment.post_id}:
 
             [quote]
             Hey @#{@user2.name} check this out!
@@ -113,12 +113,6 @@ class CommentTest < ActiveSupport::TestCase
         should "nullify the last_commented_at field" do
           assert_nil(@post.last_commented_at)
         end
-      end
-
-      should "be created" do
-        comment = FactoryBot.build(:comment)
-        comment.save
-        assert(comment.errors.empty?, comment.errors.full_messages.join(", "))
       end
 
       should "not validate if the post does not exist" do
@@ -195,7 +189,7 @@ class CommentTest < ActiveSupport::TestCase
       should "not allow upvotes by the creator" do
         user = FactoryBot.create(:user)
         post = FactoryBot.create(:post)
-        c1 = FactoryBot.create(:comment, :post => post)
+        c1 = create(:comment, post: post, creator: CurrentUser.user)
 
         exception = assert_raises(ActiveRecord::RecordInvalid) { c1.vote!("up") }
         assert_equal("Validation failed: You cannot upvote your own comments", exception.message)

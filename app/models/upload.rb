@@ -60,7 +60,6 @@ class Upload < ApplicationRecord
 
   before_validation :initialize_attributes, on: :create
   before_validation :assign_rating_from_tags
-  validate :uploader_is_not_limited, on: :create
   # validates :source, format: { with: /\Ahttps?/ }, if: ->(record) {record.file.blank?}, on: :create
   validates :rating, inclusion: { in: %w(q e s) }, allow_nil: true
   validates :md5, confirmation: true, if: ->(rec) { rec.md5_confirmation.present? }
@@ -69,9 +68,9 @@ class Upload < ApplicationRecord
 
   after_destroy_commit :delete_files
 
+  scope :pending, -> { where(status: "pending") }
   scope :preprocessed, -> { where(status: "preprocessed") }
-
-  api_attributes including: [:uploader_name]
+  scope :uploaded_by, ->(user_id) { where(uploader_id: user_id) }
 
   def initialize_attributes
     self.uploader_id = CurrentUser.id
@@ -176,12 +175,6 @@ class Upload < ApplicationRecord
     end
   end
 
-  module UploaderMethods
-    def uploader_name
-      uploader.name
-    end
-  end
-
   module VideoMethods
     def video
       @video ||= FFMPEG::Movie.new(file.path)
@@ -189,21 +182,13 @@ class Upload < ApplicationRecord
   end
 
   module SearchMethods
-    def uploaded_by(user_id)
-      where("uploader_id = ?", user_id)
-    end
-
-    def pending
-      where(:status => "pending")
-    end
-
     def search(params)
       q = super
 
       q = q.search_attributes(params, :uploader, :post, :source, :rating, :parent_id, :server, :md5, :server, :file_ext, :file_size, :image_width, :image_height, :referer_url)
 
       if params[:source_matches].present?
-        q = q.where("uploads.source LIKE ? ESCAPE E'\\\\'", params[:source_matches].to_escaped_for_sql_like)
+        q = q.where_like(:source, params[:source_matches])
       end
 
       if params[:has_post].to_s.truthy?
@@ -213,15 +198,15 @@ class Upload < ApplicationRecord
       end
 
       if params[:status].present?
-        q = q.where("uploads.status LIKE ? ESCAPE E'\\\\'", params[:status].to_escaped_for_sql_like)
+        q = q.where_like(:status, params[:status])
       end
 
       if params[:backtrace].present?
-        q = q.where("uploads.backtrace LIKE ? ESCAPE E'\\\\'", params[:backtrace].to_escaped_for_sql_like)
+        q = q.where_like(:backtrace, params[:backtrace])
       end
 
       if params[:tag_string].present?
-        q = q.where("uploads.tag_string LIKE ? ESCAPE E'\\\\'", params[:tag_string].to_escaped_for_sql_like)
+        q = q.where_like(:tag_string, params[:tag_string])
       end
 
       q.apply_default_order(params)
@@ -230,16 +215,9 @@ class Upload < ApplicationRecord
 
   include FileMethods
   include StatusMethods
-  include UploaderMethods
   include VideoMethods
   extend SearchMethods
   include SourceMethods
-
-  def uploader_is_not_limited
-    if !uploader.can_upload?
-      errors.add(:uploader, uploader.upload_limited_reason)
-    end
-  end
 
   def assign_rating_from_tags
     if rating = Tag.has_metatag?(tag_string, :rating)
@@ -253,5 +231,9 @@ class Upload < ApplicationRecord
 
   def upload_as_pending?
     as_pending.to_s.truthy?
+  end
+
+  def self.available_includes
+    [:uploader, :post]
   end
 end

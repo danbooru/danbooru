@@ -188,7 +188,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a comment" do
         assert_difference("Comment.count", 1) do
-          post_auth comments_path, @user, params: {comment: FactoryBot.attributes_for(:comment, post_id: @post.id)}
+          post_auth comments_path, @user, params: { comment: { post_id: @post.id, body: "blah" } }
         end
         comment = Comment.last
         assert_redirected_to post_path(comment.post)
@@ -196,7 +196,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow commenting on nonexistent posts" do
         assert_difference("Comment.count", 0) do
-          post_auth comments_path, @user, params: {comment: FactoryBot.attributes_for(:comment, post_id: -1)}
+          post_auth comments_path, @user, params: { comment: { post_id: -1, body: "blah" } }
         end
         assert_redirected_to comments_path
       end
@@ -219,6 +219,18 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
         assert_equal(false, @comment.reload.is_deleted)
         assert_redirected_to(@comment)
+      end
+
+      should "not allow undeleting comments deleted by a moderator" do
+        @comment = create(:comment, post: @post)
+
+        delete_auth comment_path(@comment.id), @mod
+        assert_redirected_to @comment
+        assert(@comment.reload.is_deleted?)
+
+        post_auth undelete_comment_path(@comment.id), @user
+        assert_response 403
+        assert(@comment.reload.is_deleted?)
       end
     end
   end

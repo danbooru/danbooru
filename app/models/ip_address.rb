@@ -7,9 +7,12 @@ class IpAddress < ApplicationRecord
     %w[Post User Comment Dmail ArtistVersion ArtistCommentaryVersion NoteVersion WikiPageVersion]
   end
 
+  def self.visible(user)
+    CurrentUser.is_admin? ? all : where.not(model_type: "Dmail")
+  end
+
   def self.search(params)
     q = super
-    q = q.where.not(model_type: "Dmail") unless CurrentUser.is_admin?
     q = q.search_attributes(params, :user, :model_type, :model_id, :ip_addr)
     q.order(created_at: :desc)
   end
@@ -45,5 +48,9 @@ class IpAddress < ApplicationRecord
 
   def html_data_attributes
     super & attributes.keys.map(&:to_sym)
+  end
+
+  def self.available_includes
+    [:user, :model]
   end
 end

@@ -2,16 +2,24 @@
 <html>
 <head>
   <title><%= page_title %></title>
+
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-  <link rel="top" title="<%= Danbooru.config.app_name %>" href="/">
+
+  <% if @current_item.try(:prev_page) %>
+    <%= tag.link rel: "prev", href: url_for(nav_params_for(@current_item.prev_page)) %>
+  <% end %>
+
+  <% if @current_item.try(:next_page) %>
+    <%= tag.link rel: "next", href: url_for(nav_params_for(@current_item.next_page)) %>
+  <% end %>
+
   <%= csrf_meta_tag %>
-  <% unless CurrentUser.disable_responsive_mode? %>
+  <% unless CurrentUser.enable_desktop_mode? %>
     <meta name="viewport" content="width=device-width,initial-scale=1">
   <% end %>
   <% if CurrentUser.user.blacklisted_tags.present? %>
     <meta name="blacklisted-tags" content="<%= CurrentUser.user.blacklisted_tags.gsub(/(?:\r|\n)+/, ",") %>">
   <% end %>
-  <%= auto_discovery_link_tag :atom, posts_path(:format => "atom", :tags => params[:tags]) %>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <%= javascript_pack_tag "application" %>
   <%= stylesheet_pack_tag "application" %>
@@ -48,7 +56,7 @@
     "@context": "http://schema.org",
     "@type": "WebSite",
     "name": "<%= Danbooru.config.app_name %>",
-    "alternateName": "<%= Danbooru.config.description %>",
+    "alternateName": "Anime Image Board",
     "url" : "<%= root_url %>"
   }
   </script>
@@ -60,24 +68,27 @@
     window.Danbooru.notice = Danbooru.Utility.notice;
     window.Danbooru.error = Danbooru.Utility.error;
 
-    window._paq = window._paq || [];
-    <% if CurrentUser.is_member? && !CurrentUser.opt_out_tracking? %>
-      window._paq.push(["setUserId", '<%= CurrentUser.id %>']);
-    <% end %>
-    window._paq.push(["setDomains", "*.donmai.us"]);
-    <% if !CurrentUser.opt_out_tracking? %>
-      window._paq.push(["setCustomVariable", 1, "level", <%= CurrentUser.level %>, "visit"]);
-      window._paq.push(["setCustomVariable", 2, "age", <%= ((Time.now - CurrentUser.created_at) / 1.year).to_i %>, "visit"]);
-      window._paq.push(["setCustomVariable", 3, "postUpdateCount", <%= CurrentUser.post_update_count.to_i / 100 %>, "visit"]);
-      window._paq.push(["setCustomVariable", 4, "favoriteCount", <%= CurrentUser.favorite_count.to_i / 100 %>, "visit"]);
-    <% end %>
-
     window.addthis_config = { ui_click: true };
   </script>
+
+  <%= tag.meta name: "description", content: meta_description %>
+
+  <%= tag.meta property: "og:type", content: "website" %>
+  <%= tag.meta property: "og:site_name", content: Danbooru.config.app_name %>
+  <%= tag.meta property: "og:title", content: page_title %>
+  <%= tag.meta property: "og:description", content: meta_description %>
+  <%= tag.meta property: "og:url", content: request.original_url %>
+
+  <% if Danbooru.config.twitter_site.present? %>
+    <%= tag.meta name: "twitter:site", content: Danbooru.config.twitter_site %>
+    <%= tag.meta name: "twitter:title", content: page_title %>
+    <%= tag.meta name: "twitter:description", content: meta_description %>
+  <% end %>
+
   <%= yield :html_header %>
   <%= raw Danbooru.config.custom_html_header_content %>
 </head>
-<%= tag.body **body_attributes(CurrentUser.user, @current_item) do %>
+<%= tag.body **body_attributes(CurrentUser.user, params, @current_item) do %>
   <%= render "news_updates/listing" %>
 
   <header id="top">
@@ -107,12 +118,8 @@
       <%= render "users/ban_notice" %>
     <% end %>
 
-    <% if CurrentUser.has_mail? && CurrentUser.dmails.unread.first.present? && (cookies[:hide_dmail_notice].blank? || cookies[:hide_dmail_notice].to_i < CurrentUser.dmails.unread.first.id) %>
+    <% if params[:controller] != "dmails" && has_unread_dmails?(CurrentUser.user) %>
       <%= render "users/dmail_notice" %>
-    <% end %>
-
-    <% if CurrentUser.user.can_approve_posts? %>
-      <%= render "moderator/post/queues/notice" %>
     <% end %>
 
     <div class="notice notice-info" id="notice" style="<%= "display: none;" unless flash[:notice] %>">

@@ -10,16 +10,6 @@
         <option value="remove-fav">Unfavorite</option>
         <option value="vote-up">Vote up</option>
         <option value="vote-down">Vote down</option>
-        <% if CurrentUser.is_builder? %>
-          <option value="lock-rating">Lock rating</option>
-          <option value="lock-note">Lock notes</option>
-        <% end %>
-        <% if CurrentUser.can_approve_posts? %>
-          <option value="approve">Approve</option>
-        <% end %>
-        <% if CurrentUser.is_admin? %>
-          <option value="ban">Ban</option>
-        <% end %>
       </select>
     </form>
     <input id="tag-script-field" data-autocomplete="tag-edit" placeholder="Enter tag script" style="display: none; margin-top: 0.5em;">

@@ -1,10 +1,6 @@
 require 'digest/sha1'
 
 class Dmail < ApplicationRecord
-  # if a person sends spam to more than 10 users within a 24 hour window, automatically ban them for 3 days.
-  AUTOBAN_THRESHOLD = 10
-  AUTOBAN_WINDOW = 24.hours
-  AUTOBAN_DURATION = 3
 
   validates_presence_of :title, :body, on: :create
   validate :validate_sender_is_not_banned, on: :create
@@ -12,45 +8,23 @@ class Dmail < ApplicationRecord
   belongs_to :owner, :class_name => "User"
   belongs_to :to, :class_name => "User"
   belongs_to :from, :class_name => "User"
+  has_many :moderation_reports, as: :model
 
-  after_initialize :initialize_attributes, if: :new_record?
-  before_create :auto_read_if_filtered
-  after_create :update_recipient
+  before_create :autoreport_spam
+  after_save :update_unread_dmail_count
   after_commit :send_email, on: :create
 
   api_attributes including: [:key]
+  deletable
 
-  concerning :SpamMethods do
-    class_methods do
-      def is_spammer?(user)
-        return false if user.is_gold?
-
-        spammed_users = sent_by(user).where(is_spam: true).where("created_at > ?", AUTOBAN_WINDOW.ago).distinct.count(:to_id)
-        spammed_users >= AUTOBAN_THRESHOLD
-      end
-
-      def ban_spammer(spammer)
-        spammer.bans.create! do |ban|
-          ban.banner = User.system
-          ban.reason = "Spambot."
-          ban.duration = AUTOBAN_DURATION
-        end
-      end
-    end
-
-    def spam?
-      SpamDetector.new(self).spam?
-    end
-  end
+  scope :read, -> { where(is_read: true) }
+  scope :unread, -> { where(is_read: false) }
+  scope :sent, -> { where("dmails.owner_id = dmails.from_id") }
+  scope :received, -> { where("dmails.owner_id = dmails.to_id") }
 
   module AddressMethods
     def to_name=(name)
       self.to = User.find_by_name(name)
-    end
-
-    def initialize_attributes
-      self.from_id ||= CurrentUser.id
-      self.creator_ip_addr ||= CurrentUser.ip_addr
     end
   end
 
@@ -65,7 +39,6 @@ class Dmail < ApplicationRecord
           # recipient's copy
           copy = Dmail.new(params)
           copy.owner_id = copy.to_id
-          copy.is_spam = copy.spam?
           copy.save unless copy.to_id == copy.from_id
 
           # sender's copy
@@ -73,20 +46,16 @@ class Dmail < ApplicationRecord
           copy.owner_id = copy.from_id
           copy.is_read = true
           copy.save
-
-          Dmail.ban_spammer(copy.from) if Dmail.is_spammer?(copy.from)
         end
 
         copy
       end
 
       def create_automated(params)
-        CurrentUser.as_system do
-          dmail = Dmail.new(from: User.system, **params)
-          dmail.owner = dmail.to
-          dmail.save
-          dmail
-        end
+        dmail = Dmail.new(from: User.system, creator_ip_addr: "127.0.0.1", **params)
+        dmail.owner = dmail.to
+        dmail.save
+        dmail
       end
     end
 
@@ -106,49 +75,68 @@ class Dmail < ApplicationRecord
   end
 
   module SearchMethods
+    def visible(user)
+      where(owner: user)
+    end
+
     def sent_by(user)
       where("dmails.from_id = ? AND dmails.owner_id != ?", user.id, user.id)
     end
 
-    def active
-      where("is_deleted = ?", false)
-    end
-
-    def deleted
-      where("is_deleted = ?", true)
-    end
-
-    def read
-      where(is_read: true)
-    end
-
-    def unread
-      where("is_read = false and is_deleted = false")
-    end
-
-    def visible
-      where("owner_id = ?", CurrentUser.id)
+    def folder_matches(folder)
+      case folder
+      when "received"
+        active.received
+      when "unread"
+        active.received.unread
+      when "sent"
+        active.sent
+      when "deleted"
+        deleted
+      else
+        all
+      end
     end
 
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :to, :from, :is_spam, :is_read, :is_deleted, :title, :body)
+      q = q.search_attributes(params, :to, :from, :is_read, :is_deleted, :title, :body)
       q = q.text_attribute_matches(:title, params[:title_matches])
       q = q.text_attribute_matches(:body, params[:message_matches], index_column: :message_index)
 
-      params[:is_spam] = false unless params[:is_spam].present?
-
-      q = q.read if params[:read].to_s.truthy?
-      q = q.unread if params[:read].to_s.falsy?
+      q = q.folder_matches(params[:folder])
 
       q.apply_default_order(params)
+    end
+  end
+
+  concerning :AuthorizationMethods do
+    def verifier
+      @verifier ||= Danbooru::MessageVerifier.new(:dmail_link)
+    end
+
+    def key
+      verifier.generate(id)
+    end
+
+    def valid_key?(key)
+      decoded_id = verifier.verified(key)
+      id == decoded_id
+    end
+
+    def visible_to?(user, key)
+      owner_id == user.id || valid_key?(key)
     end
   end
 
   include AddressMethods
   include FactoryMethods
   extend SearchMethods
+
+  def self.mark_all_as_read
+    unread.update(is_read: true)
+  end
 
   def validate_sender_is_not_banned
     if from.try(:is_banned?)
@@ -161,15 +149,8 @@ class Dmail < ApplicationRecord
   end
 
   def send_email
-    if is_recipient? && !is_spam? && to.receive_email_notifications? && to.email =~ /@/
+    if is_recipient? && !is_deleted? && to.receive_email_notifications? && to.email =~ /@/
       UserMailer.dmail_notice(self).deliver_now
-    end
-  end
-
-  def mark_as_read!
-    update_column(:is_read, true)
-    owner.dmails.unread.count.tap do |unread_count|
-      owner.update(has_mail: (unread_count > 0), unread_dmail_count: unread_count)
     end
   end
 
@@ -185,28 +166,31 @@ class Dmail < ApplicationRecord
     owner == to
   end
 
-  def filtered?
-    CurrentUser.dmail_filter.try(:filtered?, self)
-  end
-
-  def auto_read_if_filtered
-    if is_recipient? && to.dmail_filter.try(:filtered?, self)
-      self.is_read = true
+  def autoreport_spam
+    if is_recipient? && SpamDetector.new(self).spam?
+      self.is_deleted = true
+      moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
     end
   end
 
-  def update_recipient
-    if is_recipient? && !is_deleted? && !is_read?
-      to.update(has_mail: true, unread_dmail_count: to.dmails.unread.count)
+  def update_unread_dmail_count
+    return unless saved_change_to_id? || saved_change_to_is_read? || saved_change_to_is_deleted?
+
+    owner.with_lock do
+      unread_count = owner.dmails.active.unread.count
+      owner.update!(unread_dmail_count: unread_count)
     end
   end
 
-  def key
-    verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.email_key, serializer: JSON, digest: "SHA256")
-    verifier.generate("#{title} #{body}")
+  def reportable_by?(user)
+    owner == user && is_recipient? && !is_automated? && !from.is_moderator?
   end
 
-  def visible_to?(user, key)
-    owner_id == user.id || (user.is_moderator? && key == self.key)
+  def dtext_shortlink(key: false, **options)
+    key ? "dmail ##{id}/#{self.key}" : "dmail ##{id}"
+  end
+
+  def self.available_includes
+    [:owner, :to, :from]
   end
 end

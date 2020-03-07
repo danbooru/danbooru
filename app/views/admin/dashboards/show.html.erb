@@ -1,3 +1,5 @@
+<% page_title "Admin Dashboard" %>
+
 <div id="c-admin-dashboards">
   <div id="a-show">
     <h1>Admin Dashboard</h1>
@@ -19,11 +21,7 @@
 
     <div class="section">
       <h2>Forum Topics</h2>
-      <%= render "forum_topics/listing", :forum_topics => @dashboard.forum_topics %>
+      <%= render "forum_topics/listing", forum_topics: @dashboard.forum_topics, read_forum_topics: @dashboard.forum_topics.read_by_user(CurrentUser.user) %>
     </div>
   </div>
 </div>
-
-<% content_for(:page_title) do %>
-  Admin Dashboard - <%= Danbooru.config.app_name %>
-<% end %>

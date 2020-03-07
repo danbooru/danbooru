@@ -19,7 +19,7 @@
             <% else %>
               (<ul id="source-info-translated-artists">
                 <% @source.artists.each do |artist| %>
-                  <li><%= link_to artist.name, artist_path(artist), class: "tag-type-#{artist.category_name}" %></li>
+                  <li><%= link_to artist.name, artist_path(artist), class: tag_class(artist.tag) %></li>
                 <% end %>
               </ul>)
             <% end %>

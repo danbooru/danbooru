@@ -1,7 +1,5 @@
 <div class="appeal-dialog-body">
-  <div class="prose">
-    <%= format_text(WikiPage.titled(Danbooru.config.appeal_notice_wiki_page).first.try(&:body)) %>
-  </div>
+  <%= embed_wiki("help:appeal_notice") %>
 
   <%# XXX dtext_field expects there to be a `post_appeal` instance variable. %>
   <% @post_appeal = post_appeal %>

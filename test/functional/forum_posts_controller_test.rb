@@ -6,10 +6,8 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
       @user = create(:user)
       @other_user = create(:user)
       @mod = create(:moderator_user)
-      as_user do
-        @forum_topic = create(:forum_topic, :title => "my forum topic")
-        @forum_post = create(:forum_post, :topic_id => @forum_topic.id, :body => "alias xxx -> yyy")
-      end
+      @forum_topic = as(@user) { create(:forum_topic, title: "my forum topic", creator: @user) }
+      @forum_post = as(@user) { create(:forum_post, creator: @user, topic: @forum_topic, body: "alias xxx -> yyy") }
     end
 
     context "with votes" do
@@ -78,10 +76,8 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
       context "with private topics" do
         setup do
           as(@mod) do
-            @mod_topic = create(:mod_up_forum_topic)
-            @mod_posts = 2.times.map do
-              create(:forum_post, :topic_id => @mod_topic.id)
-            end
+            @mod_topic = create(:mod_up_forum_topic, creator: @mod)
+            @mod_posts = create_list(:forum_post, 2, topic: @mod_topic, creator: @mod)
           end
           @mod_post_ids = ([@forum_post] + @mod_posts).map(&:id).reverse
         end

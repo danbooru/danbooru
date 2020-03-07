@@ -12,14 +12,22 @@ class DiffBuilder
     otharr = that_text.scan(pattern)
 
     cbo = Diff::LCS::ContextDiffCallbacks.new
-    diffs = thisarr.diff(otharr, cbo)
+    diffs = otharr.diff(thisarr, cbo)
 
     escape_html = ->(str) {str.gsub(/&/, '&amp;').gsub(/</, '&lt;').gsub(/>/, '&gt;')}
 
-    output = thisarr
+    output = otharr
     output.each { |q| q.replace(escape_html[q]) }
 
     diffs.reverse_each do |hunk|
+      old_cr = hunk[0].try(:old_element)
+      new_cr = hunk[1].try(:new_element)
+      if old_cr && new_cr && old_cr.match?(/^\r?\n$/) && new_cr.match?(/^\r?\n$/)
+        hunk_position = hunk[0].old_position
+        output[hunk_position] = '<del><span class="paragraph-mark">¶</span></del><ins><span class="paragraph-mark">¶</span></ins><br>'
+        next
+      end
+
       newchange = hunk.max {|a, b| a.old_position <=> b.old_position}
       newstart = newchange.old_position
       oldstart = hunk.min {|a, b| a.old_position <=> b.old_position}.old_position

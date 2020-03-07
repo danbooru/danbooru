@@ -1,0 +1,14 @@
+var post_id = <%= @post.id %>;
+var $post = $(`#post_${post_id}`);
+
+<% if @post.valid? %>
+  $post.replaceWith("<%= j PostPresenter.preview(@post, show_deleted: true) %>");
+<% else %>
+  Danbooru.error(`Post #${post_id}: <%= j @post.errors.full_messages.join("; ") %>`);
+<% end %>
+
+<% if @post.valid? && params[:mode] == "quick-edit" %>
+  Danbooru.PostModeMenu.close_edit_form();
+<% end %>
+
+$(document).trigger("danbooru:post-preview-updated", <%= raw @post.to_json %>);
