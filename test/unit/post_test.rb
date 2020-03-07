@@ -1430,7 +1430,7 @@ class PostTest < ActiveSupport::TestCase
 
           # final should be <aaa>, <bbb>, <ddd>, <eee>
           final_post = Post.find(post.id)
-          assert_equal(%w(aaa bbb ddd eee), Tag.scan_tags(final_post.tag_string).sort)
+          assert_equal(%w(aaa bbb ddd eee), PostQueryBuilder.scan_query(final_post.tag_string).sort)
         end
 
         should "merge any tag changes that were made after loading the initial set of tags part 2" do
@@ -1453,7 +1453,7 @@ class PostTest < ActiveSupport::TestCase
 
           # final should be <aaa>, <bbb>, <ddd>, <eee>
           final_post = Post.find(post.id)
-          assert_equal(%w(aaa bbb ddd eee), Tag.scan_tags(final_post.tag_string).sort)
+          assert_equal(%w(aaa bbb ddd eee), PostQueryBuilder.scan_query(final_post.tag_string).sort)
         end
 
         should "merge any parent, source, and rating changes that were made after loading the initial set" do

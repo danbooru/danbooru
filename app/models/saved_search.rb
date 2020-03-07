@@ -139,18 +139,18 @@ class SavedSearch < ApplicationRecord
           .where(user_id: user_id)
           .labeled(label)
           .pluck(:query)
-          .map {|x| Tag.normalize_query(x, sort: true)}
+          .map {|x| PostQueryBuilder.normalize_query(x, sort: true)}
           .sort
           .uniq
       end
     end
 
     def normalized_query
-      Tag.normalize_query(query, sort: true)
+      PostQueryBuilder.normalize_query(query, sort: true)
     end
 
     def normalize_query
-      self.query = Tag.normalize_query(query, sort: false)
+      self.query = PostQueryBuilder.normalize_query(query, sort: false)
     end
   end
 

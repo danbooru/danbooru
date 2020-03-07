@@ -25,7 +25,7 @@ module PostsHelper
     return unless post_search_counts_enabled?
     return unless params[:action] == "index" && params[:page].nil? && params[:tags].present?
 
-    tags = Tag.scan_query(params[:tags]).sort.join(" ")
+    tags = PostQueryBuilder.scan_query(params[:tags]).sort.join(" ")
     sig = generate_reportbooru_signature("ps-#{tags}")
     render "posts/partials/index/search_count", sig: sig
   end
@@ -63,7 +63,7 @@ module PostsHelper
   end
 
   def show_tag_change_notice?
-    Tag.scan_query(params[:tags]).size == 1 && TagChangeNoticeService.get_forum_topic_id(params[:tags])
+    PostQueryBuilder.scan_query(params[:tags]).size == 1 && TagChangeNoticeService.get_forum_topic_id(params[:tags])
   end
 
   private

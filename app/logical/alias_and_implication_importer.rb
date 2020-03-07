@@ -88,8 +88,8 @@ class AliasAndImplicationImporter
         all
 
       when :mass_update
-        all += Tag.scan_tags(token[1])
-        all += Tag.scan_tags(token[2])
+        all += PostQueryBuilder.scan_query(token[1])
+        all += PostQueryBuilder.scan_query(token[2])
         all
 
       when :change_category
