@@ -41,16 +41,17 @@ Blacklist.parse_entries = function() {
 }
 
 Blacklist.toggle_entry = function(e) {
-  var tags = $(e.target).text();
+  var $link = $(e.target);
+  var tags = $link.text();
   var match = $.grep(Blacklist.entries, function(entry, i) {
     return entry.tags === tags;
   })[0];
   if (match) {
     match.disabled = !match.disabled;
     if (match.disabled) {
-      Blacklist.post_hide(e.target);
+      $link.addClass("blacklisted-inactive");
     } else {
-      Blacklist.post_unhide(e.target);
+      $link.removeClass("blacklisted-inactive");
     }
   }
   Blacklist.apply();
@@ -183,7 +184,7 @@ Blacklist.post_match = function(post, entry) {
 
 Blacklist.post_hide = function(post) {
   var $post = $(post);
-  $post.addClass("blacklisted").addClass("blacklisted-active");
+  $post.addClass("blacklisted blacklisted-active");
 
   var $video = $post.find("video").get(0);
   if ($video) {
