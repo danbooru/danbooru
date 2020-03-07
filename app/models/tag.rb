@@ -847,8 +847,8 @@ class Tag < ApplicationRecord
         q = q.name_or_alias_matches(params[:name_or_alias_matches])
       end
 
-      if params[:hide_empty].blank? || params[:hide_empty].to_s.truthy?
-        q = q.where("post_count > 0")
+      if params[:hide_empty].to_s.truthy?
+        q = q.nonempty
       end
 
       if params[:has_wiki].to_s.truthy?

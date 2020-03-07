@@ -9,7 +9,7 @@ class TagsController < ApplicationController
   end
 
   def index
-    @tags = Tag.paginated_search(params)
+    @tags = Tag.paginated_search(params, hide_empty: true)
     @tags = @tags.includes(:consequent_aliases) if request.format.html?
     respond_with(@tags)
   end
