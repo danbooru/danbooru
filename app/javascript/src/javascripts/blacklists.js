@@ -84,28 +84,44 @@ Blacklist.update_sidebar = function() {
   $("#blacklist-box").show();
 }
 
+Blacklist.disable_all = function() {
+  Blacklist.entries.forEach(function(entry) {
+    entry.disabled = true;
+  });
+  // There is no need to process the blacklist when disabling
+  Blacklist.posts().removeClass("blacklisted-active");
+  $("#disable-all-blacklists").hide();
+  $("#re-enable-all-blacklists").show();
+  $("#blacklist-list a").addClass("blacklisted-inactive");
+}
+
+Blacklist.enable_all = function() {
+  Blacklist.entries.forEach(function(entry) {
+    entry.disabled = false;
+  });
+  Blacklist.apply();
+  $("#disable-all-blacklists").show();
+  $("#re-enable-all-blacklists").hide();
+  $("#blacklist-list a").removeClass("blacklisted-inactive");
+}
+
 Blacklist.initialize_disable_all_blacklists = function() {
   if (Cookie.get("dab") === "1") {
-    $("#re-enable-all-blacklists").show();
-    $("#blacklist-list a:not(.blacklisted-active)").click();
-    Blacklist.apply();
+    Blacklist.disable_all();
   } else {
+    // The blacklist has already been processed by this point
     $("#disable-all-blacklists").show()
   }
 
   $("#disable-all-blacklists").on("click.danbooru", function(e) {
-    $("#disable-all-blacklists").hide();
-    $("#re-enable-all-blacklists").show();
     Cookie.put("dab", "1");
-    $("#blacklist-list a:not(.blacklisted-active)").click();
+    Blacklist.disable_all();
     e.preventDefault();
   });
 
   $("#re-enable-all-blacklists").on("click.danbooru", function(e) {
-    $("#disable-all-blacklists").show();
-    $("#re-enable-all-blacklists").hide();
     Cookie.put("dab", "0");
-    $("#blacklist-list a.blacklisted-active").click();
+    Blacklist.enable_all();
     e.preventDefault();
   });
 }
