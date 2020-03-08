@@ -22,13 +22,16 @@
       <span class="level-topic">(<%= User.level_string(topic.min_level).downcase %> only)</span>
     <% end %>
   <% end %>
-  <% t.column "Creator" do |topic| %>
+  <% t.column "BURs", width: "20%" do |topic| %>
+    <%= bulk_update_request_counts(topic) %>
+  <% end %>
+  <% t.column "Creator", width: "8%" do |topic| %>
     <%= link_to_user topic.creator %>
   <% end %>
-  <% t.column "Updated by" do |topic| %>
+  <% t.column "Updated by", width: "8%" do |topic| %>
     <%= link_to_user topic.updater %>
   <% end %>
-  <% t.column "Updated at" do |topic| %>
+  <% t.column "Updated at", width: "8%" do |topic| %>
     <%= compact_time topic.updated_at %>
   <% end %>
 <% end %>

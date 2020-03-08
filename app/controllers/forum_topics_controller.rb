@@ -28,7 +28,7 @@ class ForumTopicsController < ApplicationController
     if request.format.atom?
       @forum_topics = @forum_topics.includes(:creator, :original_post)
     elsif request.format.html?
-      @forum_topics = @forum_topics.includes(:creator, :updater, :forum_topic_visit_by_current_user)
+      @forum_topics = @forum_topics.includes(:creator, :updater, :forum_topic_visit_by_current_user, :bulk_update_requests)
     end
 
     respond_with(@forum_topics)

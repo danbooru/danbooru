@@ -18,6 +18,7 @@ class ForumTopic < ApplicationRecord
   has_one :forum_topic_visit_by_current_user, -> { where(user_id: CurrentUser.id) }, class_name: "ForumTopicVisit"
   has_many :moderation_reports, through: :posts
   has_one :original_post, -> {order("forum_posts.id asc")}, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
+  has_many :bulk_update_requests, :foreign_key => "forum_topic_id"
 
   validates_presence_of :title
   validates_associated :original_post
@@ -160,6 +161,18 @@ class ForumTopic < ApplicationRecord
 
   def update_orignal_post
     original_post&.update_columns(:updater_id => updater.id, :updated_at => Time.now)
+  end
+
+  def pending_bur_count
+    bulk_update_requests.select {|request| request.status == "pending"}.size
+  end
+
+  def approved_bur_count
+    bulk_update_requests.select {|request| request.status == "approved"}.size
+  end
+
+  def rejected_bur_count
+    bulk_update_requests.select {|request| request.status == "rejected"}.size
   end
 
   def self.available_includes
