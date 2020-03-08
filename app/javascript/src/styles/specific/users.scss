@@ -49,5 +49,9 @@ div#c-users {
     .active {
       color: var(--text-color);
     }
+
+    #advanced-settings-section {
+      display: none;
+    }
   }
 }
