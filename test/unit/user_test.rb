@@ -221,12 +221,6 @@ class UserTest < ActiveSupport::TestCase
         assert_equal(["Password is too short (minimum is 5 characters)"], @user.errors.full_messages)
       end
 
-      should "should be reset" do
-        @user = FactoryBot.create(:user)
-        new_pass = @user.reset_password
-        assert(User.authenticate(@user.name, new_pass), "Authentication should have succeeded")
-      end
-
       should "not change the password if the password and old password are blank" do
         @user = FactoryBot.create(:user, :password => "67890")
         @user.update(password: "", old_password: "")

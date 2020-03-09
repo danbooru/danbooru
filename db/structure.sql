@@ -3050,38 +3050,6 @@ ALTER SEQUENCE public.user_name_change_requests_id_seq OWNED BY public.user_name
 
 
 --
--- Name: user_password_reset_nonces; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.user_password_reset_nonces (
-    id integer NOT NULL,
-    key character varying NOT NULL,
-    email character varying NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: user_password_reset_nonces_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.user_password_reset_nonces_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: user_password_reset_nonces_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.user_password_reset_nonces_id_seq OWNED BY public.user_password_reset_nonces.id;
-
-
---
 -- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -4143,13 +4111,6 @@ ALTER TABLE ONLY public.user_name_change_requests ALTER COLUMN id SET DEFAULT ne
 
 
 --
--- Name: user_password_reset_nonces id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_password_reset_nonces ALTER COLUMN id SET DEFAULT nextval('public.user_password_reset_nonces_id_seq'::regclass);
-
-
---
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4504,14 +4465,6 @@ ALTER TABLE ONLY public.user_feedback
 
 ALTER TABLE ONLY public.user_name_change_requests
     ADD CONSTRAINT user_name_change_requests_pkey PRIMARY KEY (id);
-
-
---
--- Name: user_password_reset_nonces user_password_reset_nonces_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.user_password_reset_nonces
-    ADD CONSTRAINT user_password_reset_nonces_pkey PRIMARY KEY (id);
 
 
 --
@@ -7323,6 +7276,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200223042415'),
 ('20200223234015'),
 ('20200306202253'),
-('20200307021204');
+('20200307021204'),
+('20200309035334');
 
 

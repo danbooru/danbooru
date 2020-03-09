@@ -26,6 +26,6 @@ class PasswordsController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(%i[old_password password password_confirmation])
+    params.require(:user).permit(%i[signed_user_id old_password password password_confirmation])
   end
 end

@@ -16,6 +16,8 @@ class SessionLoader
 
     if has_api_authentication?
       load_session_for_api
+    elsif params[:signed_user_id]
+      load_param_user(params[:signed_user_id])
     elsif session[:user_id]
       load_session_user
     elsif cookie_password_hash_valid?
@@ -77,6 +79,11 @@ class SessionLoader
     if CurrentUser.user.nil?
       raise AuthenticationFailure.new
     end
+  end
+
+  def load_param_user(signed_user_id)
+    session[:user_id] = Danbooru::MessageVerifier.new(:login).verify(signed_user_id)
+    load_session_user
   end
 
   def load_session_user

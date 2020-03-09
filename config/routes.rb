@@ -45,7 +45,6 @@ Rails.application.routes.draw do
     namespace :user do
       resource :count_fixes, only: [:new, :create]
       resource :email_notification, :only => [:show, :destroy]
-      resource :password_reset, :only => [:new, :create, :edit, :update]
       resource :deletion, :only => [:show, :destroy]
       resource :email_change, :only => [:new, :create]
       resource :api_key, :only => [:show, :view, :update, :destroy] do
@@ -153,6 +152,7 @@ Rails.application.routes.draw do
   end
   resources :note_versions, :only => [:index, :show]
   resource :note_previews, :only => [:show]
+  resource :password_reset, only: [:create, :show]
   resources :pixiv_ugoira_frame_data, only: [:index]
   resources :pools do
     member do

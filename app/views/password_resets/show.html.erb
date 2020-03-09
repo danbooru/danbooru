@@ -1,0 +1,22 @@
+<% page_title "Reset Password" %>
+<%= render "sessions/secondary_links" %>
+
+<div id="c-password-resets">
+  <div id="a-show">
+    <h1>Reset Password</h1>
+
+    <p>
+      Enter your username below to reset your password. You will be sent an
+      email containing a link to reset your password.
+    </p>
+
+    <p>
+      If your account doesn't have a valid email address, then your password can't be reset.
+    </p>
+
+    <%= edit_form_for(:user, url: password_reset_path, action: :post) do |f| %>
+      <%= f.input :name, label: "Username", input_html: { "data-autocomplete": "user" } %>
+      <%= f.submit "Submit" %>
+    <% end %>
+  </div>
+</div>

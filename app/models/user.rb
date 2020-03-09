@@ -68,7 +68,7 @@ class User < ApplicationRecord
 
   has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
 
-  attr_accessor :password, :old_password
+  attr_accessor :password, :old_password, :signed_user_id
 
   after_initialize :initialize_attributes, if: :new_record?
   validates :name, user_name: true, on: :create
@@ -185,35 +185,14 @@ class User < ApplicationRecord
 
     def encrypt_password_on_update
       return if password.blank?
-      return if old_password.blank?
 
-      if bcrypt_password == User.sha1(old_password)
+      if signed_user_id.present? && id == Danbooru::MessageVerifier.new(:login).verify(signed_user_id)
         self.bcrypt_password_hash = User.bcrypt(password)
-        return true
+      elsif old_password.present? && bcrypt_password == User.sha1(old_password)
+        self.bcrypt_password_hash = User.bcrypt(password)
       else
         errors[:old_password] << "is incorrect"
-        return false
       end
-    end
-
-    def reset_password
-      consonants = "bcdfghjklmnpqrstvqxyz"
-      vowels = "aeiou"
-      pass = ""
-
-      6.times do
-        pass << consonants[rand(21), 1]
-        pass << vowels[rand(5), 1]
-      end
-
-      pass << rand(100).to_s
-      update_column(:bcrypt_password_hash, User.bcrypt(pass))
-      pass
-    end
-
-    def reset_password_and_deliver_notice
-      new_password = reset_password
-      Maintenance::User::PasswordResetMailer.confirmation(self, new_password).deliver_now
     end
   end
 
@@ -637,14 +616,6 @@ class User < ApplicationRecord
   end
 
   module SearchMethods
-    def with_email(email)
-      if email.blank?
-        where("FALSE")
-      else
-        where("email = ?", email)
-      end
-    end
-
     def search(params)
       q = super
 
