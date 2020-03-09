@@ -144,7 +144,7 @@ module Searchable
     when :inet
       search_inet_attribute(name, params)
     else
-      raise NotImplementedError, "unhandled attribute type"
+      raise NotImplementedError, "unhandled attribute type: #{name}"
     end
   end
 
