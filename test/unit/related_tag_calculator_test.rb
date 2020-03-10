@@ -30,7 +30,7 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
         create(:post, tag_string: "aaa bbb ccc")
         create(:post, tag_string: "aaa bbb")
 
-        assert_equal(%w[aaa bbb ccc ddd], RelatedTagCalculator.frequent_tags_for_search("aaa")[0].pluck(:name))
+        assert_equal(%w[aaa bbb ccc ddd], RelatedTagCalculator.frequent_tags_for_search("aaa").pluck(:name))
       end
 
       should "calculate the most frequent tags for a multiple tag search" do
@@ -38,7 +38,7 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
         create(:post, tag_string: "aaa bbb ccc ddd")
         create(:post, tag_string: "aaa eee fff")
 
-        assert_equal(%w[aaa bbb ccc ddd], RelatedTagCalculator.frequent_tags_for_search("aaa bbb")[0].pluck(:name))
+        assert_equal(%w[aaa bbb ccc ddd], RelatedTagCalculator.frequent_tags_for_search("aaa bbb").pluck(:name))
       end
 
       should "calculate the most frequent tags with a category constraint" do
@@ -46,8 +46,8 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
         create(:post, tag_string: "aaa bbb art:ccc")
         create(:post, tag_string: "aaa bbb")
 
-        assert_equal(%w[aaa bbb], RelatedTagCalculator.frequent_tags_for_search("aaa", category: Tag.categories.general)[0].pluck(:name))
-        assert_equal(%w[ccc], RelatedTagCalculator.frequent_tags_for_search("aaa", category: Tag.categories.artist)[0].pluck(:name))
+        assert_equal(%w[aaa bbb], RelatedTagCalculator.frequent_tags_for_search("aaa", category: Tag.categories.general).pluck(:name))
+        assert_equal(%w[ccc], RelatedTagCalculator.frequent_tags_for_search("aaa", category: Tag.categories.artist).pluck(:name))
       end
     end
 
@@ -57,9 +57,9 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
         create(:post, tag_string: "1girl solo", rating: "q")
         create(:post, tag_string: "1girl 1boy", rating: "q")
 
-        assert_equal(%w[1girl solo 1boy], RelatedTagCalculator.similar_tags_for_search("1girl")[0].pluck(:name))
-        assert_equal(%w[1girl 1boy solo], RelatedTagCalculator.similar_tags_for_search("rating:q")[0].pluck(:name))
-        assert_equal(%w[solo 1girl], RelatedTagCalculator.similar_tags_for_search("solo")[0].pluck(:name))
+        assert_equal(%w[1girl solo 1boy], RelatedTagCalculator.similar_tags_for_search("1girl").pluck(:name))
+        assert_equal(%w[1girl 1boy solo], RelatedTagCalculator.similar_tags_for_search("rating:q").pluck(:name))
+        assert_equal(%w[solo 1girl], RelatedTagCalculator.similar_tags_for_search("solo").pluck(:name))
       end
 
       should "calculate the similar tags for an aliased tag" do
@@ -67,7 +67,7 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
         create(:post, tag_string: "bunny dog")
         create(:post, tag_string: "bunny cat")
 
-        assert_equal(%w[bunny cat dog], RelatedTagCalculator.similar_tags_for_search("rabbit")[0].pluck(:name))
+        assert_equal(%w[bunny cat dog], RelatedTagCalculator.similar_tags_for_search("rabbit").pluck(:name))
       end
     end
   end
