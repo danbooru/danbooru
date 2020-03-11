@@ -12,8 +12,8 @@ module DanbooruMaintenance
     safely { PostDisapproval.dmail_messages! }
     safely { regenerate_post_counts! }
     safely { TokenBucket.prune! }
-    safely { TagChangeRequestPruner.warn_all }
-    safely { TagChangeRequestPruner.reject_all }
+    safely { BulkUpdateRequestPruner.warn_old }
+    safely { BulkUpdateRequestPruner.reject_expired }
     safely { Ban.prune! }
     safely { ActiveRecord::Base.connection.execute("vacuum analyze") unless Rails.env.test? }
   end
