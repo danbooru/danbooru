@@ -881,6 +881,41 @@ ALTER SEQUENCE public.dtext_links_id_seq OWNED BY public.dtext_links.id;
 
 
 --
+-- Name: email_addresses; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.email_addresses (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    user_id bigint NOT NULL,
+    address character varying NOT NULL,
+    normalized_address character varying NOT NULL,
+    is_verified boolean DEFAULT false NOT NULL,
+    is_deliverable boolean DEFAULT true NOT NULL
+);
+
+
+--
+-- Name: email_addresses_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.email_addresses_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: email_addresses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.email_addresses_id_seq OWNED BY public.email_addresses.id;
+
+
+--
 -- Name: favorite_groups; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3215,6 +3250,13 @@ ALTER TABLE ONLY public.dtext_links ALTER COLUMN id SET DEFAULT nextval('public.
 
 
 --
+-- Name: email_addresses id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_addresses ALTER COLUMN id SET DEFAULT nextval('public.email_addresses_id_seq'::regclass);
+
+
+--
 -- Name: favorite_groups id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4244,6 +4286,14 @@ ALTER TABLE ONLY public.dtext_links
 
 
 --
+-- Name: email_addresses email_addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.email_addresses
+    ADD CONSTRAINT email_addresses_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: favorite_groups favorite_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4824,6 +4874,41 @@ CREATE INDEX index_dtext_links_on_link_type ON public.dtext_links USING btree (l
 --
 
 CREATE INDEX index_dtext_links_on_model_type_and_model_id ON public.dtext_links USING btree (model_type, model_id);
+
+
+--
+-- Name: index_email_addresses_on_address; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_addresses_on_address ON public.email_addresses USING btree (address);
+
+
+--
+-- Name: index_email_addresses_on_address_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_addresses_on_address_trgm ON public.email_addresses USING gin (address public.gin_trgm_ops);
+
+
+--
+-- Name: index_email_addresses_on_normalized_address; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_addresses_on_normalized_address ON public.email_addresses USING btree (normalized_address);
+
+
+--
+-- Name: index_email_addresses_on_normalized_address_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_addresses_on_normalized_address_trgm ON public.email_addresses USING gin (normalized_address public.gin_trgm_ops);
+
+
+--
+-- Name: index_email_addresses_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_email_addresses_on_user_id ON public.email_addresses USING btree (user_id);
 
 
 --
@@ -7277,6 +7362,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200223234015'),
 ('20200306202253'),
 ('20200307021204'),
-('20200309035334');
+('20200309035334'),
+('20200309043653');
 
 

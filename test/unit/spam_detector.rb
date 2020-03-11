@@ -7,7 +7,7 @@ class SpamDetectorTest < ActiveSupport::TestCase
       SpamDetector.stubs(:enabled?).returns(true)
 
       @user = create(:gold_user, created_at: 1.month.ago)
-      @spammer = create(:user, created_at: 2.weeks.ago, email: "akismet-guaranteed-spam@example.com")
+      @spammer = create(:user, created_at: 2.weeks.ago, email_address: build(:email_address, address: "akismet-guaranteed-spam@example.com"))
     end
 
     context "for dmails" do

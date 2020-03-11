@@ -29,7 +29,7 @@ class UserDeletion
   end
 
   def clear_user_settings
-    user.email = nil
+    user.email_address = nil
     user.last_logged_in_at = nil
     user.last_forum_read_at = nil
     user.favorite_tags = ''

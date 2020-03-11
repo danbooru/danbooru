@@ -4,6 +4,7 @@ class UsersController < ApplicationController
 
   def new
     @user = User.new
+    @user.email_address = EmailAddress.new
     respond_with(@user)
   end
 
@@ -110,7 +111,7 @@ class UsersController < ApplicationController
 
   def user_params(context)
     permitted_params = %i[
-      password old_password password_confirmation email
+      password old_password password_confirmation
       comment_threshold default_image_size favorite_tags blacklisted_tags
       time_zone per_page custom_style theme
 
@@ -123,7 +124,10 @@ class UsersController < ApplicationController
       enable_safe_mode enable_desktop_mode disable_post_tooltips
     ]
 
-    permitted_params << :name if context == :create
+    if context == :create
+      permitted_params += [:name, { email_address_attributes: [:address] }]
+    end
+
     permitted_params << :level if CurrentUser.is_admin?
 
     params.require(:user).permit(permitted_params)

@@ -27,13 +27,13 @@ class UserDeletionTest < ActiveSupport::TestCase
 
   context "a valid user deletion" do
     setup do
-      @user = create(:user, email: "ted@danbooru.com")
+      @user = create(:user, email_address: build(:email_address))
       @deletion = UserDeletion.new(@user, "password")
     end
 
     should "blank out the email" do
       @deletion.delete!
-      assert_nil(@user.reload.email)
+      assert_nil(@user.reload.email_address)
     end
 
     should "rename the user" do

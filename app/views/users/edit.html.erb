@@ -25,7 +25,13 @@
         <div class="input">
           <label>Email</label>
           <p>
-            <%= CurrentUser.user.email.presence || "<em>blank</em>".html_safe %> – <%= link_to "Change your email", new_maintenance_user_email_change_path %>
+            <% if @user.email_address.present? %>
+              <%= @user.email_address.address %>
+            <% else %>
+              <em>blank</em>
+            <% end %>
+
+            - <%= link_to "Change your email", new_maintenance_user_email_change_path %>
           </p>
         </div>
 

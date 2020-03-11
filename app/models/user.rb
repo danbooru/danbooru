@@ -72,7 +72,6 @@ class User < ApplicationRecord
 
   after_initialize :initialize_attributes, if: :new_record?
   validates :name, user_name: true, on: :create
-  validates_uniqueness_of :email, :case_sensitive => false, :if => ->(rec) { rec.email.present? && rec.saved_change_to_email? }
   validates_length_of :password, :minimum => 5, :if => ->(rec) { rec.new_record? || rec.password.present?}
   validates_inclusion_of :default_image_size, :in => %w(large original)
   validates_inclusion_of :per_page, in: (1..PostSets::Post::MAX_PER_PAGE)
@@ -82,7 +81,6 @@ class User < ApplicationRecord
   validate :validate_sock_puppets, :on => :create, :if => -> { Danbooru.config.enable_sock_puppet_validation? }
   before_validation :normalize_blacklisted_tags
   before_validation :set_per_page
-  before_validation :normalize_email
   before_create :encrypt_password_on_create
   before_update :encrypt_password_on_update
   before_create :promote_to_admin_if_first_user
@@ -111,6 +109,7 @@ class User < ApplicationRecord
 
   has_one :api_key
   has_one :token_bucket
+  has_one :email_address, dependent: :destroy
   has_many :notes, foreign_key: :creator_id
   has_many :note_versions, :foreign_key => "updater_id"
   has_many :dmails, -> {order("dmails.id desc")}, :foreign_key => "owner_id"
@@ -124,6 +123,7 @@ class User < ApplicationRecord
   has_many :tag_implications, foreign_key: :creator_id
   belongs_to :inviter, class_name: "User", optional: true
 
+  accepts_nested_attributes_for :email_address, reject_if: :all_blank, allow_destroy: true
   enum theme: { light: 0, dark: 100 }, _suffix: true
 
   # UserDeletion#rename renames deleted users to `user_<1234>~`. Tildes
@@ -366,8 +366,12 @@ class User < ApplicationRecord
   end
 
   module EmailMethods
-    def normalize_email
-      self.email = nil if email.blank?
+    def email_with_name
+      "#{name} <#{email_address.address}>"
+    end
+
+    def can_receive_email?
+      email_address.present? && email_address.is_verified? && email_address.is_deliverable?
     end
   end
 
@@ -515,7 +519,7 @@ class User < ApplicationRecord
       if id == CurrentUser.user.id
         attributes += BOOLEAN_ATTRIBUTES
         attributes += %i[
-          updated_at email last_logged_in_at last_forum_read_at
+          updated_at last_logged_in_at last_forum_read_at
           comment_threshold default_image_size
           favorite_tags blacklisted_tags time_zone per_page
           custom_style favorite_count api_regen_multiplier

@@ -18,7 +18,7 @@ class DmailTest < ActiveSupport::TestCase
     context "that is spam" do
       should "be automatically reported and deleted" do
         @recipient = create(:user)
-        @spammer = create(:user, created_at: 2.weeks.ago, email: "akismet-guaranteed-spam@example.com")
+        @spammer = create(:user, created_at: 2.weeks.ago, email_address: build(:email_address, address: "akismet-guaranteed-spam@example.com"))
 
         SpamDetector.stubs(:enabled?).returns(true)
         dmail = create(:dmail, owner: @recipient, from: @spammer, to: @recipient, creator_ip_addr: "127.0.0.1")
@@ -87,14 +87,14 @@ class DmailTest < ActiveSupport::TestCase
     end
 
     should "send an email if the user wants it" do
-      user = create(:user, receive_email_notifications: true)
+      user = create(:user, receive_email_notifications: true, email_address: build(:email_address))
       assert_difference("ActionMailer::Base.deliveries.size", 1) do
         create(:dmail, to: user, owner: user, body: "test [[tagme]]")
       end
     end
 
     should "create only one message for a split response" do
-      user = FactoryBot.create(:user, :receive_email_notifications => true)
+      user = create(:user, receive_email_notifications: true, email_address: build(:email_address))
       assert_difference("ActionMailer::Base.deliveries.size", 1) do
         Dmail.create_split(from: CurrentUser.user, creator_ip_addr: "127.0.0.1", to_id: user.id, title: "foo", body: "foo")
       end

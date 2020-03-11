@@ -8,11 +8,10 @@ class UserEmailChange
   end
 
   def process
-    if User.authenticate(user.name, password).nil?
-      user.errors[:base] << "Password was incorrect"
+    if User.authenticate(user.name, password)
+      user.update(email_address_attributes: { address: new_email })
     else
-      user.email = new_email
-      user.save
+      user.errors[:base] << "Password was incorrect"
     end
   end
 end

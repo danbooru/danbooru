@@ -4,7 +4,6 @@ FactoryBot.define do
       "user#{n}"
     end
     password {"password"}
-    email {FFaker::Internet.email}
     default_image_size {"large"}
     level {20}
     created_at {Time.now}

@@ -15,7 +15,9 @@
     <div id="p3">
       <%= edit_form_for(@user, html: { id: "signup-form" }) do |f| %>
         <%= f.input :name, as: :string %>
-        <%= f.input :email, required: false, as: :email, hint: "Optional" %>
+        <%= f.simple_fields_for :email_address do |fe| %>
+          <%= fe.input :address, label: "Email", required: false, as: :email, hint: "Optional" %>
+        <% end %>
         <%= f.input :password %>
         <%= f.input :password_confirmation %>
 

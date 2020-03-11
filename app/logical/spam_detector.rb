@@ -12,7 +12,7 @@ class SpamDetector
 
   attr_accessor :record, :user, :user_ip, :content, :comment_type
   rakismet_attrs author: proc { user.name },
-                 author_email: proc { user.email },
+                 author_email: proc { user.email_address&.address },
                  blog_lang: "en",
                  blog_charset: "UTF-8",
                  comment_type: :comment_type,
