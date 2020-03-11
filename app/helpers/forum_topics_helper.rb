@@ -11,11 +11,13 @@ module ForumTopicsHelper
     !read_forum_topics.map(&:id).include?(topic.id)
   end
 
-  def bulk_update_request_counts(topic)
-    requests = []
-    requests << %(<span class="topic-pending-burs">Pending: #{topic.pending_bur_count}</span>) if topic.pending_bur_count.positive?
-    requests << %(<span class="topic-approved-burs">Approved: #{topic.approved_bur_count}</span>) if topic.approved_bur_count.positive?
-    requests << %(<span class="topic-rejected-burs">Rejected: #{topic.rejected_bur_count}</span>) if topic.rejected_bur_count.positive?
-    requests.join(" | ").html_safe
+  def forum_topic_status(topic)
+    if topic.bulk_update_requests.any?(&:is_pending?)
+      :pending
+    elsif topic.category_name == "Tags" && topic.bulk_update_requests.all?(&:is_approved?)
+      :approved
+    elsif topic.category_name == "Tags" && topic.bulk_update_requests.all?(&:is_rejected?)
+      :rejected
+    end
   end
 end

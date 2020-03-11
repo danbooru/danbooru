@@ -163,16 +163,8 @@ class ForumTopic < ApplicationRecord
     original_post&.update_columns(:updater_id => updater.id, :updated_at => Time.now)
   end
 
-  def pending_bur_count
-    bulk_update_requests.select {|request| request.status == "pending"}.size
-  end
-
-  def approved_bur_count
-    bulk_update_requests.select {|request| request.status == "approved"}.size
-  end
-
-  def rejected_bur_count
-    bulk_update_requests.select {|request| request.status == "rejected"}.size
+  def pretty_title
+    title.gsub(/\A\[APPROVED\]|\[REJECTED\]/, "")
   end
 
   def self.available_includes

@@ -57,6 +57,18 @@ div#c-forum-topics {
     &.new {
       color: var(--forum-topic-status-new-color);
     }
+
+    &.pending {
+      color: var(--forum-topic-status-pending-color);
+    }
+
+    &.approved {
+      color: var(--forum-topic-status-approved-color);
+    }
+
+    &.rejected {
+      color: var(--forum-topic-status-rejected-color);
+    }
   }
 
   #a-index {
