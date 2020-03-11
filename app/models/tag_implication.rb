@@ -120,7 +120,7 @@ class TagImplication < TagRelationship
   end
 
   module ApprovalMethods
-    def process!(update_topic: true)
+    def process!
       unless valid?
         raise errors.full_messages.join("; ")
       end
@@ -129,18 +129,15 @@ class TagImplication < TagRelationship
         update(status: "processing")
         update_posts
         update(status: "active")
-        forum_updater.update(approval_message(approver), "APPROVED") if update_topic
       end
     rescue Exception => e
-      forum_updater.update(failure_message(e), "FAILED") if update_topic
       update(status: "error: #{e}")
-
       DanbooruLogger.log(e, tag_implication_id: id, antecedent_name: antecedent_name, consequent_name: consequent_name)
     end
 
-    def approve!(approver: CurrentUser.user, update_topic: true)
+    def approve!(approver: CurrentUser.user)
       update(approver: approver, status: "queued")
-      ProcessTagImplicationJob.perform_later(self, update_topic: update_topic)
+      ProcessTagImplicationJob.perform_later(self)
     end
 
     def create_mod_action
@@ -161,20 +158,6 @@ class TagImplication < TagRelationship
 
         ModAction.log("updated #{implication}\n#{change_desc}", :tag_implication_update)
       end
-    end
-
-    def forum_updater
-      post = if forum_topic
-        forum_post || forum_topic.posts.where("body like ?", TagImplicationRequest.command_string(antecedent_name, consequent_name, id) + "%").last
-      else
-        nil
-      end
-      ForumUpdater.new(
-        forum_topic,
-        forum_post: post,
-        expected_title: "Tag implication: #{antecedent_name} -> #{consequent_name}",
-        skip_update: !TagRelationship::SUPPORT_HARD_CODED
-      )
     end
   end
 

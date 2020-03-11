@@ -5,32 +5,13 @@ class TagAlias < TagRelationship
   validate :wiki_pages_present, on: :create, unless: :skip_secondary_validations
 
   module ApprovalMethods
-    def approve!(approver: CurrentUser.user, update_topic: true)
+    def approve!(approver: CurrentUser.user)
       update(approver: approver, status: "queued")
-      ProcessTagAliasJob.perform_later(self, update_topic: update_topic)
-    end
-  end
-
-  module ForumMethods
-    def forum_updater
-      @forum_updater ||= begin
-        post = if forum_topic
-          forum_post || forum_topic.posts.where("body like ?", TagAliasRequest.command_string(antecedent_name, consequent_name, id) + "%").last
-        else
-          nil
-        end
-        ForumUpdater.new(
-          forum_topic,
-          forum_post: post,
-          expected_title: "Tag alias: #{antecedent_name} -> #{consequent_name}",
-          skip_update: !TagRelationship::SUPPORT_HARD_CODED
-        )
-      end
+      ProcessTagAliasJob.perform_later(self)
     end
   end
 
   include ApprovalMethods
-  include ForumMethods
 
   def self.to_aliased(names)
     names = Array(names).map(&:to_s)
@@ -39,7 +20,7 @@ class TagAlias < TagRelationship
     names.map { |name| aliases[name] || name }
   end
 
-  def process!(update_topic: true)
+  def process!
     unless valid?
       raise errors.full_messages.join("; ")
     end
@@ -50,13 +31,11 @@ class TagAlias < TagRelationship
       move_saved_searches
       ensure_category_consistency
       update_posts
-      forum_updater.update(approval_message(approver), "APPROVED") if update_topic
       rename_wiki_and_artist
       update!(status: "active")
     end
   rescue Exception => e
     CurrentUser.scoped(approver) do
-      forum_updater.update(failure_message(e), "FAILED") if update_topic
       update(status: "error: #{e}")
     end
 
@@ -122,8 +101,6 @@ class TagAlias < TagRelationship
     if antecedent_wiki.present?
       if WikiPage.titled(consequent_name).blank?
         antecedent_wiki.update!(title: consequent_name)
-      else
-        forum_updater.update(conflict_message)
       end
     end
 
@@ -136,7 +113,7 @@ class TagAlias < TagRelationship
 
   def wiki_pages_present
     if antecedent_wiki.present? && consequent_wiki.present?
-      errors[:base] << conflict_message
+      errors[:base] << "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] has conflicting wiki pages. [[#{consequent_name}]] should be updated to include information from [[#{antecedent_name}]] if necessary."
     elsif antecedent_wiki.blank? && consequent_wiki.blank?
       errors[:base] << "The #{consequent_name} tag needs a corresponding wiki page"
     end

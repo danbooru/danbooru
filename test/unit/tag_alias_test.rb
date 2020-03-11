@@ -92,7 +92,7 @@ class TagAliasTest < ActiveSupport::TestCase
         ti = FactoryBot.build(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", skip_secondary_validations: false)
 
         assert(ti.invalid?)
-        assert_includes(ti.errors[:base], "The tag alias [[aaa]] -> [[bbb]]  has conflicting wiki pages. [[bbb]] should be updated to include information from [[aaa]] if necessary.")
+        assert_includes(ti.errors[:base], "The tag alias [[aaa]] -> [[bbb]] has conflicting wiki pages. [[bbb]] should be updated to include information from [[aaa]] if necessary.")
       end
     end
 
@@ -197,67 +197,6 @@ class TagAliasTest < ActiveSupport::TestCase
       perform_enqueued_jobs
 
       assert_equal(1, tag2.reload.category)
-    end
-
-    context "with an associated forum topic" do
-      setup do
-        @admin = FactoryBot.create(:admin_user)
-        CurrentUser.scoped(@admin) do
-          @topic = FactoryBot.create(:forum_topic, :title => "Tag alias: aaa -> bbb")
-          @post = FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => TagAliasRequest.command_string("aaa", "bbb"))
-          @alias = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic, :forum_post => @post, :status => "pending")
-        end
-      end
-
-      context "and conflicting wiki pages" do
-        setup do
-          CurrentUser.scoped(@admin) do
-            @wiki1 = FactoryBot.create(:wiki_page, :title => "aaa")
-            @wiki2 = FactoryBot.create(:wiki_page, :title => "bbb")
-            @alias.approve!(approver: @admin)
-            perform_enqueued_jobs
-          end
-        end
-
-        should "update the forum topic when approved" do
-          assert_equal("[APPROVED] Tag alias: aaa -> bbb", @topic.reload.title)
-          assert_match(/The tag alias .* been approved/m, @topic.posts.second.body)
-        end
-
-        should "warn about conflicting wiki pages when approved" do
-          assert_match(/has conflicting wiki pages/m, @topic.posts.third.body)
-        end
-      end
-
-      should "update the topic when processed" do
-        assert_difference("ForumPost.count") do
-          @alias.approve!(approver: @admin)
-          perform_enqueued_jobs
-        end
-      end
-
-      should "update the parent post" do
-        previous = @post.body
-        @alias.approve!(approver: @admin)
-        perform_enqueued_jobs
-        assert_not_equal(previous, @post.reload.body)
-      end
-
-      should "update the topic when rejected" do
-        assert_difference("ForumPost.count") do
-          @alias.reject!
-        end
-      end
-
-      should "update the topic when failed" do
-        @alias.stubs(:sleep).returns(true)
-        @alias.stubs(:update_posts).raises(Exception, "oh no")
-        @alias.process!
-
-        assert_equal("[FAILED] Tag alias: aaa -> bbb", @topic.reload.title)
-        assert_match(/error: oh no/, @alias.status)
-        assert_match(/The tag alias .* failed during processing/, @topic.posts.last.body)
-      end
     end
   end
 end

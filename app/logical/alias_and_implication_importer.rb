@@ -114,24 +114,24 @@ class AliasAndImplicationImporter
             raise Error, "Error: #{tag_alias.errors.full_messages.join("; ")} (create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name})"
           end
           tag_alias.rename_wiki_and_artist if rename_aliased_pages?
-          tag_alias.approve!(approver: approver, update_topic: false)
+          tag_alias.approve!(approver: approver)
 
         when :create_implication
           tag_implication = TagImplication.create(creator: approver, forum_topic_id: forum_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
           unless tag_implication.valid?
             raise Error, "Error: #{tag_implication.errors.full_messages.join("; ")} (create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name})"
           end
-          tag_implication.approve!(approver: approver, update_topic: false)
+          tag_implication.approve!(approver: approver)
 
         when :remove_alias
           tag_alias = TagAlias.active.find_by(antecedent_name: token[1], consequent_name: token[2])
           raise Error, "Alias for #{token[1]} not found" if tag_alias.nil?
-          tag_alias.reject!(update_topic: false)
+          tag_alias.reject!
 
         when :remove_implication
           tag_implication = TagImplication.active.find_by(antecedent_name: token[1], consequent_name: token[2])
           raise Error, "Implication for #{token[1]} not found" if tag_implication.nil?
-          tag_implication.reject!(update_topic: false)
+          tag_implication.reject!
 
         when :mass_update
           TagBatchChangeJob.perform_later(token[1], token[2], User.system, "127.0.0.1")

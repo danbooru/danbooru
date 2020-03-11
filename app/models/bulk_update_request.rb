@@ -67,8 +67,7 @@ class BulkUpdateRequest < ApplicationRecord
         ForumUpdater.new(
           forum_topic,
           forum_post: post,
-          expected_title: title,
-          skip_update: !TagRelationship::SUPPORT_HARD_CODED
+          expected_title: title
         )
       end
     end
@@ -86,10 +85,6 @@ class BulkUpdateRequest < ApplicationRecord
       CurrentUser.scoped(approver) do
         forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has failed: #{x}", "FAILED")
       end
-    end
-
-    def date_timestamp
-      Time.now.strftime("%Y-%m-%d")
     end
 
     def create_forum_topic

@@ -181,33 +181,5 @@ class TagImplicationTest < ActiveSupport::TestCase
         assert_equal([], TagImplication.tags_implied_by("d").map(&:name))
       end
     end
-
-    context "with an associated forum topic" do
-      setup do
-        @topic = FactoryBot.create(:forum_topic, :title => "Tag implication: aaa -> bbb")
-        @post = FactoryBot.create(:forum_post, topic_id: @topic.id, :body => TagImplicationRequest.command_string("aaa", "bbb"))
-        @implication = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic, :forum_post => @post, :status => "pending")
-      end
-
-      should "update the topic when processed" do
-        assert_difference("ForumPost.count") do
-          @implication.approve!
-          perform_enqueued_jobs
-        end
-
-        assert_match(/The tag implication .* has been approved/, @post.reload.body)
-        assert_equal("[APPROVED] Tag implication: aaa -> bbb", @topic.reload.title)
-      end
-
-      should "update the topic when rejected" do
-        assert_difference("ForumPost.count") do
-          @implication.reject!
-        end
-        @post.reload
-        @topic.reload
-        assert_match(/The tag implication .* has been rejected/, @post.body)
-        assert_equal("[REJECTED] Tag implication: aaa -> bbb", @topic.title)
-      end
-    end
   end
 end

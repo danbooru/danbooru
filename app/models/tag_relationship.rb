@@ -1,7 +1,6 @@
 class TagRelationship < ApplicationRecord
   self.abstract_class = true
 
-  SUPPORT_HARD_CODED = true
   EXPIRY = 60
   EXPIRY_WARNING = 55
 
@@ -69,11 +68,8 @@ class TagRelationship < ApplicationRecord
     user.is_admin?
   end
 
-  def reject!(update_topic: true)
-    transaction do
-      update!(status: "deleted")
-      forum_updater.update(reject_message(CurrentUser.user), "REJECTED") if update_topic
-    end
+  def reject!
+    update!(status: "deleted")
   end
 
   module SearchMethods
@@ -145,32 +141,8 @@ class TagRelationship < ApplicationRecord
       self.class.name.underscore.tr("_", " ")
     end
 
-    def approval_message(approver)
-      "The #{relationship} [[#{antecedent_name}]] -> [[#{consequent_name}]] #{forum_link} has been approved by @#{approver.name}."
-    end
-
-    def failure_message(e = nil)
-      "The #{relationship} [[#{antecedent_name}]] -> [[#{consequent_name}]] #{forum_link} failed during processing. Reason: #{e}"
-    end
-
-    def reject_message(rejector)
-      "The #{relationship} [[#{antecedent_name}]] -> [[#{consequent_name}]] #{forum_link} has been rejected by @#{rejector.name}."
-    end
-
     def retirement_message
-      "The #{relationship} [[#{antecedent_name}]] -> [[#{consequent_name}]] #{forum_link} has been retired."
-    end
-
-    def conflict_message
-      "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] #{forum_link} has conflicting wiki pages. [[#{consequent_name}]] should be updated to include information from [[#{antecedent_name}]] if necessary."
-    end
-
-    def date_timestamp
-      Time.now.strftime("%Y-%m-%d")
-    end
-
-    def forum_link
-      "(forum ##{forum_post.id})" if forum_post.present?
+      "The #{relationship} [[#{antecedent_name}]] -> [[#{consequent_name}]] has been retired."
     end
   end
 
