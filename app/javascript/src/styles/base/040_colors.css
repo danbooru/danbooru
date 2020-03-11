@@ -58,11 +58,10 @@
   --uploads-dropzone-progress-bar-foreground-color: var(--link-color);
   --uploads-dropzone-progress-bar-background-color: var(--link-hover-color);
 
-  --forum-new-topic-color: red;
-  --forum-level-restricted-topic-color: #F66;
   --forum-vote-up-color: green;
   --forum-vote-meh-color: goldenrod;
   --forum-vote-down-color: red;
+  --forum-topic-status-new-color: red;
 
   --moderation-report-text-color: red;
   --moderation-report-border: 2px solid red;
@@ -322,11 +321,10 @@ body[data-current-user-theme="dark"] {
   --form-button-active-border: 1px solid var(--grey-5);
   --form-button-active-color: white;
 
-  --forum-new-topic-color: var(--red-1);
-  --forum-level-restricted-topic-color: var(--red-1);
   --forum-vote-up-color: var(--green-1);
   --forum-vote-meh-color: var(--yellow-1);
   --forum-vote-down-color: var(--red-1);
+  --forum-topic-status-new-color: var(--red-1);
 
   --moderation-report-text-color: var(--red-1);
   --moderation-report-border: 2px solid var(--red-1);
