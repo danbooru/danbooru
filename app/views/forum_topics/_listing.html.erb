@@ -24,10 +24,6 @@
       </span>
     <% end %>
 
-    <% if !topic.is_read? %>
-      <span class="topic-status label new">New</span>
-    <% end %>
-
     <% status = forum_topic_status(topic) %>
     <% if status.present? %>
       <span class="topic-status label <%= status %>"><%= status %></span>

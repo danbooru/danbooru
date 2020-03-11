@@ -167,6 +167,10 @@ class ForumTopic < ApplicationRecord
     title.gsub(/\A\[APPROVED\]|\[REJECTED\]/, "")
   end
 
+  def html_data_attributes
+    super + [:is_read?]
+  end
+
   def self.available_includes
     [:creator, :updater, :original_post]
   end

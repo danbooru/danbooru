@@ -45,8 +45,11 @@ div#c-forum-topics {
     vertical-align: bottom;
 
     &.label {
-      font-size: 0.8em;
+      font-size: 0.7em;
       text-transform: uppercase;
+      border-radius: 3px;
+      padding: 3px;
+      color: white;
     }
 
     &.icon {
@@ -54,26 +57,22 @@ div#c-forum-topics {
       font-size: 1em;
     }
 
-    &.new {
-      color: var(--forum-topic-status-new-color);
-    }
-
     &.pending {
-      color: var(--forum-topic-status-pending-color);
+      background-color: var(--forum-topic-status-pending-color);
     }
 
     &.approved {
-      color: var(--forum-topic-status-approved-color);
+      background-color: var(--forum-topic-status-approved-color);
     }
 
     &.rejected {
-      color: var(--forum-topic-status-rejected-color);
+      background-color: var(--forum-topic-status-rejected-color);
     }
   }
 
   #a-index {
-    td {
-      line-height: 1.5em;
+    tr[data-is-read="false"] .forum-post-link {
+      font-weight: bold;
     }
 
     .updated-at-column {
