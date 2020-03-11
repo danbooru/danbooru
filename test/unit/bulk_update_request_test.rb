@@ -164,7 +164,6 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         end
 
         assert_equal("pending", @req.reload.status)
-        assert_match(/\[FAILED\]/, @topic.reload.title)
       end
 
       should "leave the BUR pending if there is an unexpected error during approval" do
@@ -188,9 +187,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @req.approve!(@admin)
         end
 
-        @topic.reload
-        @post.reload
-        assert_match(/\[APPROVED\]/, @topic.title)
+        assert_match(/approved/, @post.reload.body)
       end
 
       should "update the topic when rejected" do
@@ -200,9 +197,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @req.reject!(@admin)
         end
 
-        @topic.reload
-        @post.reload
-        assert_match(/\[REJECTED\]/, @topic.title)
+        assert_match(/rejected/, @post.reload.body)
       end
 
       should "reference the rejector in the automated message" do

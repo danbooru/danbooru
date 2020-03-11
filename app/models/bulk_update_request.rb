@@ -64,11 +64,7 @@ class BulkUpdateRequest < ApplicationRecord
         else
           nil
         end
-        ForumUpdater.new(
-          forum_topic,
-          forum_post: post,
-          expected_title: title
-        )
+        ForumUpdater.new(forum_topic, forum_post: post)
       end
     end
 
@@ -77,13 +73,13 @@ class BulkUpdateRequest < ApplicationRecord
         CurrentUser.scoped(approver) do
           AliasAndImplicationImporter.new(script, forum_topic_id, "1", true).process!
           update!(status: "approved", approver: approver, skip_secondary_validations: true)
-          forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.", "APPROVED")
+          forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.")
         end
       end
     rescue AliasAndImplicationImporter::Error => x
       self.approver = approver
       CurrentUser.scoped(approver) do
-        forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has failed: #{x}", "FAILED")
+        forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has failed: #{x}")
       end
     end
 
@@ -98,7 +94,7 @@ class BulkUpdateRequest < ApplicationRecord
     def reject!(rejector = User.system)
       transaction do
         update(status: "rejected")
-        forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been rejected by @#{rejector.name}.", "REJECTED")
+        forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been rejected by @#{rejector.name}.")
       end
     end
 
