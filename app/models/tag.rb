@@ -42,7 +42,7 @@ class Tag < ApplicationRecord
 
     def value_for(string)
       norm_string = string.to_s.downcase
-      if norm_string =~ /#{TagCategory.category_ids_regex}/
+      if norm_string =~ /\A#{TagCategory.category_ids_regex}\z/
         norm_string.to_i
       elsif TagCategory.mapping[string.to_s.downcase]
         TagCategory.mapping[string.to_s.downcase]
