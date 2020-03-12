@@ -14,9 +14,9 @@ module ForumTopicsHelper
   def forum_topic_status(topic)
     if topic.bulk_update_requests.any?(&:is_pending?)
       :pending
-    elsif topic.category_name == "Tags" && topic.bulk_update_requests.all?(&:is_approved?)
+    elsif topic.category_name == "Tags" && topic.bulk_update_requests.present? && topic.bulk_update_requests.all?(&:is_approved?)
       :approved
-    elsif topic.category_name == "Tags" && topic.bulk_update_requests.all?(&:is_rejected?)
+    elsif topic.category_name == "Tags" && topic.bulk_update_requests.present? && topic.bulk_update_requests.all?(&:is_rejected?)
       :rejected
     end
   end
