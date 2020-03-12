@@ -136,6 +136,7 @@ class ForumTopic < ApplicationRecord
   # XXX forum_topic_visit_by_current_user is a hack to reduce queries on the forum index.
   def is_read?
     return true if CurrentUser.is_anonymous?
+    return true if new_record?
 
     topic_last_read_at = forum_topic_visit_by_current_user&.last_read_at || "2000-01-01".to_time
     forum_last_read_at = CurrentUser.last_forum_read_at || "2000-01-01".to_time
