@@ -7,8 +7,10 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
       @spammer = create(:user, created_at: 2.weeks.ago)
       @mod = create(:moderator_user, created_at: 2.weeks.ago)
 
-      @spammer.as_current do
+      as(@spammer) do
         @comment = create(:comment, creator: @spammer)
+        @forum_topic = create(:forum_topic, creator: @spammer)
+        @forum_post = create(:forum_post, topic: @forum_topic, creator: @spammer)
       end
     end
 
@@ -50,9 +52,16 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
-      should "create a new moderation report" do
+      should "create a new moderation report on a comment" do
         assert_difference("ModerationReport.count", 1) do
           post_auth moderation_reports_path, @user, params: {:format => "js", :moderation_report => {:model_id => @comment.id, :model_type => "Comment", :reason => "xxx"}}
+          assert_response :success
+        end
+      end
+
+      should "create a new moderation report on a forum post" do
+        assert_difference("ModerationReport.count", 1) do
+          post_auth moderation_reports_path, @user, params: { format: "js", moderation_report: { model_id: @forum_post.id, model_type: "ForumPost", reason: "xxx" }}
           assert_response :success
         end
       end
