@@ -27,6 +27,9 @@
           <p>
             <% if @user.email_address.present? %>
               <%= @user.email_address.address %>
+              <% if !@user.email_address.is_verified %>
+                <em>(unverified)</em>
+              <% end %>
             <% else %>
               <em>blank</em>
             <% end %>

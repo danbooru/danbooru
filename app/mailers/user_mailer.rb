@@ -11,4 +11,9 @@ class UserMailer < ApplicationMailer
     @user = user
     mail to: @user.email_with_name, subject: "#{Danbooru.config.app_name} password reset request"
   end
+
+  def email_change_confirmation(user)
+    @user = user
+    mail to: @user.email_with_name, subject: "Confirm your email address"
+  end
 end

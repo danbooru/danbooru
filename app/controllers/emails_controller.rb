@@ -21,11 +21,21 @@ class EmailsController < ApplicationController
 
     if @user.errors.none?
       flash[:notice] = "Email updated"
+      UserMailer.email_change_confirmation(@user).deliver_later
       respond_with(@user, location: settings_url)
     else
       flash[:notice] = @user.errors.full_messages.join("; ")
       respond_with(@user)
     end
+  end
+
+  def verify
+    email_id = Danbooru::MessageVerifier.new(:email_verification_key).verify(params[:email_verification_key])
+    @email_address = EmailAddress.find(email_id)
+    @email_address.update!(is_verified: true)
+
+    flash[:notice] = "Email address verified"
+    redirect_to @email_address.user
   end
 
   private

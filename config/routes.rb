@@ -245,7 +245,9 @@ Rails.application.routes.draw do
   end
   resources :users do
     resources :favorite_groups, controller: "favorite_groups", only: [:index], as: "favorite_groups"
-    resource :email, only: [:edit, :update]
+    resource :email, only: [:edit, :update] do
+      get :verify
+    end
     resource :password, only: [:edit, :update]
     resource :api_key, :only => [:show, :view, :update, :destroy], :controller => "maintenance/user/api_keys" do
       post :view

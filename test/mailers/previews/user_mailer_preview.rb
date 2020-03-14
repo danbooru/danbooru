@@ -8,4 +8,9 @@ class UserMailerPreview < ActionMailer::Preview
     user = User.find(params[:id])
     UserMailer.password_reset(user)
   end
+
+  def email_change_confirmation
+    user = User.find(params[:id])
+    UserMailer.email_change_confirmation(user)
+  end
 end
