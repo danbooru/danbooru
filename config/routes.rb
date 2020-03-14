@@ -46,7 +46,6 @@ Rails.application.routes.draw do
       resource :count_fixes, only: [:new, :create]
       resource :email_notification, :only => [:show, :destroy]
       resource :deletion, :only => [:show, :destroy]
-      resource :email_change, :only => [:new, :create]
       resource :api_key, :only => [:show, :view, :update, :destroy] do
         post :view
       end
@@ -246,6 +245,7 @@ Rails.application.routes.draw do
   end
   resources :users do
     resources :favorite_groups, controller: "favorite_groups", only: [:index], as: "favorite_groups"
+    resource :email, only: [:edit, :update]
     resource :password, only: [:edit, :update]
     resource :api_key, :only => [:show, :view, :update, :destroy], :controller => "maintenance/user/api_keys" do
       post :view

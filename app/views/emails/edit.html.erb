@@ -1,0 +1,15 @@
+<% page_title "Change Email" %>
+
+<div id="c-emails">
+  <div id="a-edit">
+    <h1>Change Email</h1>
+
+    <p>You must confirm your password in order to change your email address.</p>
+
+    <%= edit_form_for(@user, url: user_email_path(@user)) do |f| %>
+      <%= f.input :password %>
+      <%= f.input :email %>
+      <%= f.submit "Save" %>
+    <% end %>
+  </div>
+</div>
