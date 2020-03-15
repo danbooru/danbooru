@@ -6,9 +6,6 @@ class DmailTest < ActiveSupport::TestCase
       @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "1.2.3.4"
-      ActionMailer::Base.delivery_method = :test
-      ActionMailer::Base.perform_deliveries = true
-      ActionMailer::Base.deliveries = []
     end
 
     teardown do
@@ -83,20 +80,6 @@ class DmailTest < ActiveSupport::TestCase
       @new_user = FactoryBot.create(:user)
       assert_difference("Dmail.count", 2) do
         Dmail.create_split(from: CurrentUser.user, creator_ip_addr: "127.0.0.1", to_id: @new_user.id, title: "foo", body: "foo")
-      end
-    end
-
-    should "send an email if the user wants it" do
-      user = create(:user, receive_email_notifications: true, email_address: build(:email_address))
-      assert_difference("ActionMailer::Base.deliveries.size", 1) do
-        create(:dmail, to: user, owner: user, body: "test [[tagme]]")
-      end
-    end
-
-    should "create only one message for a split response" do
-      user = create(:user, receive_email_notifications: true, email_address: build(:email_address))
-      assert_difference("ActionMailer::Base.deliveries.size", 1) do
-        Dmail.create_split(from: CurrentUser.user, creator_ip_addr: "127.0.0.1", to_id: user.id, title: "foo", body: "foo")
       end
     end
 

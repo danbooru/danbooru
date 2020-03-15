@@ -126,6 +126,14 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to dmail_path(Dmail.last)
         end
       end
+
+      should "send an email if the recipient has email notifications turned on" do
+        recipient = create(:user, receive_email_notifications: true, email_address: build(:email_address))
+        post_auth dmails_path, @user, params: { dmail: { to_name: recipient.name, title: "test", body: "test" }}
+
+        assert_redirected_to Dmail.last
+        assert_enqueued_emails 1
+      end
     end
 
     context "update action" do

@@ -149,7 +149,7 @@ class Dmail < ApplicationRecord
 
   def send_email
     if is_recipient? && !is_deleted? && to.receive_email_notifications? && to.can_receive_email?
-      UserMailer.dmail_notice(self).deliver_now
+      UserMailer.dmail_notice(self).deliver_later
     end
   end
 
