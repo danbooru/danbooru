@@ -15,5 +15,9 @@ module Danbooru
     def verify(*args, **options)
       verifier.verify(*args, purpose: purpose, **options)
     end
+
+    def verified(*args, **options)
+      verifier.verified(*args, purpose: purpose, **options)
+    end
   end
 end

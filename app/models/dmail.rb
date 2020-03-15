@@ -121,7 +121,7 @@ class Dmail < ApplicationRecord
     end
 
     def valid_key?(key)
-      id == verifier.verify(key)
+      id == verifier.verified(key)
     end
 
     def visible_to?(user, key)
