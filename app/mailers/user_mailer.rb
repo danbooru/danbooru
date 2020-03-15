@@ -16,4 +16,9 @@ class UserMailer < ApplicationMailer
     @user = user
     mail to: @user.email_with_name, subject: "Confirm your email address"
   end
+
+  def welcome_user(user)
+    @user = user
+    mail to: @user.email_with_name, subject: "Welcome to #{Danbooru.config.app_name}! Confirm your email address"
+  end
 end

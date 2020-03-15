@@ -65,6 +65,7 @@ class UsersController < ApplicationController
       @user.save
       if @user.errors.empty?
         session[:user_id] = @user.id
+        UserMailer.welcome_user(@user).deliver_later
       else
         flash[:notice] = "Sign up failed: #{@user.errors.full_messages.join("; ")}"
       end

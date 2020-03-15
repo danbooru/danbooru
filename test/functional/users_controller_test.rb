@@ -119,6 +119,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to User.last
         assert_equal("xxx", User.last.name)
+        assert_no_emails
       end
 
       should "create a user with a valid email" do
@@ -128,6 +129,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to User.last
         assert_equal("xxx", User.last.name)
         assert_equal("test@gmail.com", User.last.email_address.address)
+        assert_enqueued_email_with UserMailer, :welcome_user, args: [User.last]
       end
 
       should "not create a user with an invalid email" do
@@ -135,7 +137,9 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         assert_no_difference("User.count") do
           post users_path, params: { user: user_params }
+
           assert_response :success
+          assert_no_emails
         end
       end
 
