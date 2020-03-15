@@ -117,10 +117,6 @@ class Comment < ApplicationRecord
     end
   end
 
-  def editable_by?(user)
-    updater_id == user.id || user.is_moderator?
-  end
-
   def reportable_by?(user)
     creator_id != user.id && !creator.is_moderator?
   end

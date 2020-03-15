@@ -31,7 +31,7 @@
       </div>
       <%= render "application/update_notice", record: comment %>
       
-      <% if CurrentUser.is_member? %>
+      <% if policy(comment).create? %>
         <menu>
           <% if context == :index_by_comment %>
             <li><%= link_to "Reply", new_comment_path(id: comment, comment: { post_id: comment.post_id }), class: "reply-link" %></li>
@@ -39,7 +39,7 @@
             <li><%= link_to "Reply", new_comment_path(id: comment, comment: { post_id: comment.post_id }), class: "reply-link", remote: true %></li>
           <% end %>
 
-          <% if comment.editable_by?(CurrentUser.user) %>
+          <% if policy(comment).update? %>
             <% if comment.is_deleted? %>
               <li><%= link_to "Undelete", undelete_comment_path(comment.id), method: :post, remote: true %></li>
             <% else %>
@@ -60,7 +60,7 @@
             <li><%= link_to "Report", new_moderation_report_path(moderation_report: { model_type: "Comment", model_id: comment.id }), remote: true %></li>
           <% end %>
         </menu>
-        <% if comment.editable_by?(CurrentUser.user) %>
+        <% if policy(comment).update? %>
           <%= render "comments/form", comment: comment, hidden: true %>
         <% end %>
       <% end %>
