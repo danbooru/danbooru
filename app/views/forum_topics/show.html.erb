@@ -28,14 +28,12 @@
 
     <%= render "forum_posts/listing", forum_posts: @forum_posts, original_forum_post_id: @forum_topic.original_post&.id, dtext_data: DText.preprocess(@forum_posts.map(&:body)), moderation_reports: @forum_topic.moderation_reports.visible.recent %>
 
-    <% if CurrentUser.is_member? %>
-      <% if CurrentUser.is_moderator? || !@forum_topic.is_locked? %>
-        <p><%= link_to "Post reply", new_forum_post_path(topic_id: @forum_topic.id), id: "new-response-link" %></p>
+    <% if policy(ForumPost.new(topic: @forum_topic)).create? %>
+      <p><%= link_to "Post reply", new_forum_post_path(topic_id: @forum_topic.id), id: "new-response-link" %></p>
 
-        <div style="display: none;" id="topic-response">
-          <%= render "forum_posts/partials/new/form", :forum_post => ForumPost.new(:topic_id => @forum_topic.id) %>
-        </div>
-      <% end %>
+      <div style="display: none;" id="topic-response">
+        <%= render "forum_posts/partials/new/form", forum_post: ForumPost.new(topic_id: @forum_topic.id) %>
+      </div>
     <% end %>
 
     <%= numbered_paginator(@forum_posts) %>

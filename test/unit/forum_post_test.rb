@@ -102,25 +102,6 @@ class ForumPostTest < ActiveSupport::TestCase
       end
     end
 
-    context "belonging to a locked topic" do
-      setup do
-        @post = create(:forum_post, topic: @topic, body: "zzz")
-        @topic.update(is_locked: true)
-      end
-
-      should "not be updateable" do
-        @post.update(body: "xxx")
-        assert_equal(true, @post.invalid?)
-        assert_equal("zzz", @post.reload.body)
-      end
-
-      should "not be deletable" do
-        @post.delete!
-        assert_equal(true, @post.invalid?)
-        assert_equal(false, @post.reload.is_deleted)
-      end
-    end
-
     should "update the topic when created" do
       @original_topic_updated_at = @topic.updated_at
       travel(1.second) do

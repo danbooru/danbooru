@@ -13,11 +13,11 @@ class ForumTopic < ApplicationRecord
 
   belongs_to :creator, class_name: "User"
   belongs_to_updater
-  has_many :posts, -> {order("forum_posts.id asc")}, :class_name => "ForumPost", :foreign_key => "topic_id", :dependent => :destroy
+  has_many :forum_posts, foreign_key: "topic_id", dependent: :destroy, inverse_of: :topic
   has_many :forum_topic_visits
   has_one :forum_topic_visit_by_current_user, -> { where(user_id: CurrentUser.id) }, class_name: "ForumTopicVisit"
-  has_many :moderation_reports, through: :posts
-  has_one :original_post, -> {order("forum_posts.id asc")}, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
+  has_many :moderation_reports, through: :forum_posts
+  has_one :original_post, -> { order(id: :asc) }, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
   has_many :bulk_update_requests, :foreign_key => "forum_topic_id"
 
   validates_presence_of :title
@@ -147,14 +147,6 @@ class ForumTopic < ApplicationRecord
   include CategoryMethods
   include VisitMethods
 
-  def editable_by?(user)
-    (creator_id == user.id || user.is_moderator?) && visible?(user)
-  end
-
-  def visible?(user)
-    user.level >= min_level
-  end
-
   # XXX forum_topic_visit_by_current_user is a hack to reduce queries on the forum index.
   def is_read?
     return true if CurrentUser.is_anonymous?
@@ -179,7 +171,7 @@ class ForumTopic < ApplicationRecord
   end
 
   def page_for(post_id)
-    (posts.where("id < ?", post_id).count / Danbooru.config.posts_per_page.to_f).ceil
+    (forum_posts.where("id < ?", post_id).count / Danbooru.config.posts_per_page.to_f).ceil
   end
 
   def last_page

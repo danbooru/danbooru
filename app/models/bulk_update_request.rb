@@ -63,7 +63,7 @@ class BulkUpdateRequest < ApplicationRecord
     def forum_updater
       @forum_updater ||= begin
         post = if forum_topic
-          forum_post || forum_topic.posts.first
+          forum_post || forum_topic.forum_posts.first
         else
           nil
         end
@@ -89,7 +89,7 @@ class BulkUpdateRequest < ApplicationRecord
     def create_forum_topic
       CurrentUser.as(user) do
         self.forum_topic = ForumTopic.create(title: title, category_id: 1, creator: user) unless forum_topic.present?
-        self.forum_post = forum_topic.posts.create(body: reason_with_link, creator: user) unless forum_post.present?
+        self.forum_post = forum_topic.forum_posts.create(body: reason_with_link, creator: user) unless forum_post.present?
         save
       end
     end

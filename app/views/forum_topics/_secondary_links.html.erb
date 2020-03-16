@@ -18,9 +18,9 @@
   <% if CurrentUser.is_member? && @forum_topic && !@forum_topic.new_record? %>
     <li>|</li>
     <%= subnav_link_to "Reply", new_forum_post_path(:topic_id => @forum_topic.id) %>
-    <% if !@forum_topic.new_record? && @forum_topic.editable_by?(CurrentUser.user) %>
+    <% if !@forum_topic.new_record? && policy(@forum_topic).update? %>
       <%= subnav_link_to "Edit", edit_forum_topic_path(@forum_topic), "data-shortcut": "e" %>
-      <% if CurrentUser.is_moderator? %>
+      <% if policy(@forum_topic).destroy? # XXX %>
         <% if @forum_topic.is_deleted? %>
           <%= subnav_link_to "Undelete", undelete_forum_topic_path(@forum_topic), :method => :post %>
         <% else %>
