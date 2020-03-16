@@ -1,5 +1,9 @@
 <%= table_for forum_topics, width: "100%" do |t| %>
   <% t.column "Title" do |topic| %>
+    <% if !topic.is_read? %>
+      <span class="topic-status label new">New</span>
+    <% end %>
+
     <% if topic.is_sticky? %>
       <span class="topic-status icon stickied">
         <i class="fas fa-thumbtack" title="Stickied"></i>
@@ -24,9 +28,7 @@
       </span>
     <% end %>
 
-    <% status = forum_topic_status(topic) %>
-    <% if status.present? %>
-      <span class="topic-status label <%= status %>"><%= status %></span>
+    <% if forum_topic_status(topic).present? %>
       <%= link_to topic.pretty_title, forum_topic_path(topic), class: "forum-post-link" %>
     <% else %>
       <%= link_to topic.title, forum_topic_path(topic), class: "forum-post-link" %>
@@ -35,6 +37,10 @@
     <% if topic.response_count > Danbooru.config.posts_per_page %>
       <%= link_to "page #{topic.last_page}", forum_topic_path(topic, :page => topic.last_page), :class => "last-page" %>
     <% end %>
+  <% end %>
+  <% t.column "Status", width: "1%" do |topic| %>
+    <% status = forum_topic_status(topic) %>
+    <span class="topic-status label <%= status %>"><%= status %></span>
   <% end %>
   <% t.column "Creator", width: "8%" do |topic| %>
     <%= link_to_user topic.creator %>

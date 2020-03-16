@@ -40,6 +40,15 @@ div.list-of-forum-posts {
 }
 
 div#c-forum-topics {
+  td.status-column {
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  td.creator-column, td.updated-by-column {
+    white-space: nowrap;
+  }
+
   span.topic-status {
     margin-right: 0.25em;
     vertical-align: bottom;
@@ -48,13 +57,17 @@ div#c-forum-topics {
       font-size: 0.7em;
       text-transform: uppercase;
       border-radius: 3px;
-      padding: 3px;
+      padding: 4px;
       color: white;
     }
 
     &.icon {
       color: var(--muted-text-color);
       font-size: 1em;
+    }
+
+    &.new {
+      background-color: var(--forum-topic-status-new-color);
     }
 
     &.pending {
@@ -71,15 +84,11 @@ div#c-forum-topics {
   }
 
   #a-index {
-    tr[data-is-read="false"] .forum-post-link {
-      font-weight: bold;
-    }
-
     .updated-at-column {
       white-space: nowrap;
     }
 
-    .updated-by-column, .updated-at-column {
+    .creator-column, .updated-by-column, .updated-at-column {
       @media screen and (max-width: 660px) {
         display: none;
       }
