@@ -19,6 +19,9 @@ class BulkUpdateRequest < ApplicationRecord
 
   scope :pending_first, -> { order(Arel.sql("(case status when 'pending' then 0 when 'approved' then 1 else 2 end)")) }
   scope :pending, -> {where(status: "pending")}
+  scope :approved, -> { where(status: "approved") }
+  scope :rejected, -> { where(status: "rejected") }
+  scope :has_topic, -> { where.not(forum_topic: nil) }
   scope :expired, -> {where("created_at < ?", TagRelationship::EXPIRY.days.ago)}
   scope :old, -> {where("created_at between ? and ?", TagRelationship::EXPIRY.days.ago, TagRelationship::EXPIRY_WARNING.days.ago)}
 

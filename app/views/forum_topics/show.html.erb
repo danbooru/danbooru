@@ -9,7 +9,7 @@
     <h1>
       <%= @forum_topic.title %>
 
-      <% if @forum_topic.min_level >= User::Levels::MODERATOR %>
+      <% if @forum_topic.is_private? %>
         <span class="level-topic">(<%= User.level_string(@forum_topic.min_level).downcase %>+ only)</span>
       <% end %>
 

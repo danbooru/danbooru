@@ -33,6 +33,12 @@ class ForumTopic < ApplicationRecord
 
   deletable
 
+  scope :public_only, -> { where(min_level: MIN_LEVELS[:None]) }
+  scope :private_only, -> { where.not(min_level: MIN_LEVELS[:None]) }
+  scope :pending, -> { where(id: BulkUpdateRequest.has_topic.pending.select(:forum_topic_id)) }
+  scope :approved, -> { where(category_id: 1).where(id: BulkUpdateRequest.approved.has_topic.select(:forum_topic_id)).where.not(id: BulkUpdateRequest.has_topic.pending.or(BulkUpdateRequest.has_topic.rejected).select(:forum_topic_id)) }
+  scope :rejected, -> { where(category_id: 1).where(id: BulkUpdateRequest.rejected.has_topic.select(:forum_topic_id)).where.not(id: BulkUpdateRequest.has_topic.pending.or(BulkUpdateRequest.has_topic.approved).select(:forum_topic_id)) }
+
   module CategoryMethods
     extend ActiveSupport::Concern
 
@@ -82,8 +88,24 @@ class ForumTopic < ApplicationRecord
       q = q.search_attributes(params, :creator, :updater, :is_sticky, :is_locked, :is_deleted, :category_id, :title, :response_count)
       q = q.text_attribute_matches(:title, params[:title_matches], index_column: :text_index)
 
-      if params[:mod_only].present?
-        q = q.where("min_level >= ?", MIN_LEVELS[:Moderator])
+      if params[:is_private].to_s.truthy?
+        q = q.private_only
+      elsif params[:is_private].to_s.falsy?
+        q = q.public_only
+      end
+
+      if params[:status] == "pending"
+        q = q.pending
+      elsif params[:status] == "approved"
+        q = q.approved
+      elsif params[:status] == "rejected"
+        q = q.rejected
+      end
+
+      if params[:is_read].to_s.truthy?
+        q = q.read_by_user(CurrentUser.user)
+      elsif params[:is_read].to_s.falsy?
+        q = q.unread_by_user(CurrentUser.user)
       end
 
       case params[:order]
@@ -142,6 +164,10 @@ class ForumTopic < ApplicationRecord
     forum_last_read_at = CurrentUser.last_forum_read_at || "2000-01-01".to_time
 
     (topic_last_read_at >= updated_at) || (forum_last_read_at >= updated_at)
+  end
+
+  def is_private?
+    min_level > MIN_LEVELS[:None]
   end
 
   def create_mod_action_for_delete
