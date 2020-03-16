@@ -349,8 +349,11 @@ class Tag < ApplicationRecord
 
       query1 =
         Tag
+        .nonempty
         .select("tags.name, tags.post_count, tags.category, null AS antecedent_name")
-        .search(:name_matches => wildcard_name, :order => "count").limit(limit)
+        .name_matches(wildcard_name)
+        .order(post_count: :desc)
+        .limit(limit)
 
       query2 =
         TagAlias
