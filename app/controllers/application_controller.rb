@@ -8,6 +8,7 @@ class ApplicationController < ActionController::Base
   before_action :set_current_user
   before_action :normalize_search
   before_action :api_check
+  before_action :ip_ban_check
   before_action :set_variant
   before_action :enable_cors
   before_action :cause_error
@@ -154,10 +155,13 @@ class ApplicationController < ActionController::Base
     render_error_page(status, error)
   end
 
+  def ip_ban_check
+    raise User::PrivilegeError if !request.get? && IpBan.is_banned?(CurrentUser.ip_addr)
+  end
+
   def role_only!(role)
     raise User::PrivilegeError if !CurrentUser.send("is_#{role}?")
     raise User::PrivilegeError if !request.get? && CurrentUser.user.is_banned?
-    raise User::PrivilegeError if !request.get? && IpBan.is_banned?(CurrentUser.ip_addr)
   end
 
   User::Roles.each do |role|

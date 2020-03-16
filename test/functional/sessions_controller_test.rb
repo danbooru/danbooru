@@ -16,10 +16,18 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a new session" do
         post session_path, params: {:name => @user.name, :password => "password"}
+
         assert_redirected_to posts_path
-        @user.reload
         assert_equal(@user.id, session[:user_id])
-        assert_not_nil(@user.last_ip_addr)
+        assert_not_nil(@user.reload.last_ip_addr)
+      end
+
+      should "not allow IP banned users to create a new session" do
+        create(:ip_ban, ip_addr: "1.2.3.4")
+        post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
+
+        assert_response 403
+        assert_not_equal(@user.id, session[:user_id])
       end
     end
 
