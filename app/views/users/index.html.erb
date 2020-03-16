@@ -4,7 +4,7 @@
 
     <%= table_for @users, width: "100%" do |t| %>
       <% t.column column: "control" do |user| %>
-        <% if CurrentUser.is_admin? %>
+        <% if policy(CurrentUser.user).promote? %>
           <%= link_to "Edit", edit_admin_user_path(user) %>
         <% end %>
       <% end %>
