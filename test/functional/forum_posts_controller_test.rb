@@ -13,7 +13,7 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
     context "with votes" do
       setup do
         as_user do
-          @tag_alias = create(:tag_alias, forum_post: @forum_post, status: "pending")
+          @bulk_update_request = create(:bulk_update_request, forum_post: @forum_post)
           @vote = create(:forum_post_vote, forum_post: @forum_post, score: 1)
           @forum_post.reload
         end
@@ -29,10 +29,10 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
         assert_select "li.vote-score-up"
       end
 
-      context "after the alias is rejected" do
+      context "after the BUR is rejected" do
         setup do
           as(@mod) do
-            @tag_alias.reject!
+            @bulk_update_request.reject!
           end
           get_auth forum_topic_path(@forum_topic), @mod
         end
