@@ -5,43 +5,63 @@ module ApplicationHelper
     (fields.reduce(false) { |acc, field| acc || params.dig(:search, field).present? } && (!member_check || CurrentUser.is_member?) ? types[0] : types[1])
   end
 
-  def diff_list_html(new, old, latest, ul_class: ["diff-list"], li_class: [])
-    diff = SetDiff.new(new, old, latest)
+  def diff_list_html(this_list, other_list, ul_class: ["diff-list"], li_class: [])
+    diff = SetDiff.new(this_list, other_list)
     render "diff_list", diff: diff, ul_class: ul_class, li_class: li_class
   end
 
-  def diff_name_html(this_name, prev_name)
+  def diff_name_html(this_name, other_name)
     pattern = Regexp.new('.')
-    DiffBuilder.new(this_name, prev_name, pattern).build
+    DiffBuilder.new(this_name, other_name, pattern).build
   end
 
-  def diff_body_html(record, previous, field)
-    return h(record[field]).gsub(/\r?\n/, '<span class="paragraph-mark">¶</span><br>').html_safe if previous.blank?
+  def diff_body_html(record, other, field)
+    if record.blank? || other.blank?
+      diff_record = other.presence || record
+      return h(diff_record[field]).gsub(/\r?\n/, '<span class="paragraph-mark">¶</span><br>').html_safe
+    end
 
     pattern = Regexp.new('(?:<.+?>)|(?:\w+)|(?:[ \t]+)|(?:\r?\n)|(?:.+?)')
-    DiffBuilder.new(record[field], previous[field], pattern).build
+    DiffBuilder.new(record[field], other[field], pattern).build
   end
 
-  def status_diff_html(record)
-    previous = record.previous
+  def status_diff_html(record, type)
+    other = record.send(type)
 
-    return "New" if previous.blank?
+    if other.blank?
+      return type == "previous" ? "New" : ""
+    end
 
     statuses = []
     record.class.status_fields.each do |field, status|
       if record.has_attribute?(field)
-        statuses += [status] if record[field] != previous[field]
+        statuses += [status] if record[field] != other[field]
       else
-        statuses += [status] if record.send(field)
+        statuses += [status] if record.send(field, type)
       end
     end
-    statuses.join("<br>").html_safe
+
+    altered = record.updater_id != other.updater_id
+
+    %(<div class="version-statuses" data-altered="#{altered}">#{statuses.join("<br>")}</div>).html_safe
   end
 
   def wordbreakify(string)
     lines = string.scan(/.{1,10}/)
     wordbreaked_string = lines.map {|str| h(str)}.join("<wbr>")
     raw(wordbreaked_string)
+  end
+
+  def version_type_links(params)
+    html = []
+    %w[previous subsequent current].each do |type|
+      if type == params[:type]
+        html << %(<span>#{type}</span>)
+      else
+        html << tag.li(link_to(type, params.except(:controller, :action).merge(type: type).permit!))
+      end
+    end
+    html.join(" | ").html_safe
   end
 
   def nav_link_to(text, url, **options)

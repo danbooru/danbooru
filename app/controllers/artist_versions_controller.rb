@@ -2,6 +2,7 @@ class ArtistVersionsController < ApplicationController
   respond_to :html, :xml, :json
 
   def index
+    set_version_comparison
     @artist_versions = ArtistVersion.paginated_search(params)
     @artist_versions = @artist_versions.includes(:updater, artist: :urls) if request.format.html?
 

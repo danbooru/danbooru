@@ -6,6 +6,8 @@
       <h1>Post History</h1>
     <% end %>
 
+    <%= render "versions/types" %>
+
     <%= search_form_for(post_versions_path, classes: "inline-form") do |f| %>
       <%= f.input :post_id, label: "Post", input_html: { value: params.dig(:search, :post_id) } %>
       <%= f.input :updater_name, label: "Updater", input_html: { "data-autocomplete": "user", value: params.dig(:search, :updater_name) } %>

@@ -1,45 +1,38 @@
 module PostVersionsHelper
-  def post_version_diff(post_version)
-    previous = post_version.previous
-    post = post_version.post
+  def post_version_diff(post_version, type)
+    other = post_version.send(type)
 
-    if post.nil?
-      latest_tags = post_version.tag_array
+    this_tags = post_version.tag_array
+    this_tags << "rating:#{post_version.rating}" if post_version.rating.present?
+    this_tags << "parent:#{post_version.parent_id}" if post_version.parent_id.present?
+    this_tags << "source:#{post_version.source}" if post_version.source.present?
+
+    other_tags = other.present? ? other.tag_array : []
+    if other.present?
+      other_tags << "rating:#{other.rating}" if other.rating.present?
+      other_tags << "parent:#{other.parent_id}" if other.parent_id.present?
+      other_tags << "source:#{other.source}" if other.source.present?
+    elsif type == "subsequent"
+      other_tags = this_tags
+    end
+
+    if type == "previous"
+      added_tags = this_tags - other_tags
+      removed_tags = other_tags - this_tags
     else
-      latest_tags = post.tag_array
-      latest_tags << "rating:#{post.rating}" if post.rating.present?
-      latest_tags << "parent:#{post.parent_id}" if post.parent_id.present?
-      latest_tags << "source:#{post.source}" if post.source.present?
+      added_tags = other_tags - this_tags
+      removed_tags = this_tags - other_tags
     end
-
-    new_tags = post_version.tag_array
-    new_tags << "rating:#{post_version.rating}" if post_version.rating.present?
-    new_tags << "parent:#{post_version.parent_id}" if post_version.parent_id.present?
-    new_tags << "source:#{post_version.source}" if post_version.source.present?
-
-    old_tags = previous.present? ? previous.tag_array : []
-    if previous.present?
-      old_tags << "rating:#{previous.rating}" if previous.rating.present?
-      old_tags << "parent:#{previous.parent_id}" if previous.parent_id.present?
-      old_tags << "source:#{previous.source}" if previous.source.present?
-    end
-
-    added_tags = new_tags - old_tags
-    removed_tags = old_tags - new_tags
-    obsolete_added_tags = added_tags - latest_tags,
-    obsolete_removed_tags = removed_tags & latest_tags,
-    unchanged_tags = new_tags & old_tags
+    unchanged_tags = this_tags & other_tags
 
     html = '<span class="diff-list">'
 
     added_tags.each do |tag|
-      prefix = obsolete_added_tags.include?(tag) ? '+<ins class="obsolete">' : '<ins>+'
-      html << prefix + link_to(wordbreakify(tag), posts_path(:tags => tag)) + '</ins>'
+      html << '<ins>+' + link_to(wordbreakify(tag), posts_path(:tags => tag)) + '</ins>'
       html << " "
     end
     removed_tags.each do |tag|
-      prefix = obsolete_removed_tags.include?(tag) ? '-<del class="obsolete">' : '<del>-'
-      html << prefix + link_to(wordbreakify(tag), posts_path(:tags => tag)) + '</del>'
+      html << '<del>-' + link_to(wordbreakify(tag), posts_path(:tags => tag)) + '</del>'
       html << " "
     end
     unchanged_tags.each do |tag|

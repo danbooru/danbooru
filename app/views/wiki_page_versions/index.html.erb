@@ -3,6 +3,8 @@
 <% content_for(:content) do %>
   <h1>Wiki Page History</h1>
 
+  <%= render "versions/types" %>
+
   <%= render "listing" %>
 
   <%= numbered_paginator(@wiki_page_versions) %>

@@ -30,6 +30,20 @@ class ArtistVersion < ApplicationRecord
     @previous.first
   end
 
+  def subsequent
+    @subsequent ||= begin
+      ArtistVersion.where("artist_id = ? and created_at > ?", artist_id, created_at).order("created_at asc").limit(1).to_a
+    end
+    @subsequent.first
+  end
+
+  def current
+    @previous ||= begin
+      ArtistVersion.where("artist_id = ?", artist_id).order("created_at desc").limit(1).to_a
+    end
+    @previous.first
+  end
+
   def self.status_fields
     {
       name: "Renamed",
@@ -43,28 +57,50 @@ class ArtistVersion < ApplicationRecord
     }
   end
 
-  def other_names_changed
-    ((other_names - previous.other_names) | (previous.other_names - other_names)).length > 0
+  def other_names_changed(type)
+    other = self.send(type)
+    ((other_names - other.other_names) | (other.other_names - other_names)).length.positive?
   end
 
-  def urls_changed
-    ((urls - previous.urls) | (previous.urls - urls)).length > 0
+  def urls_changed(type)
+    other = self.send(type)
+    ((urls - other.urls) | (other.urls - urls)).length.positive?
   end
 
-  def was_deleted
-    is_deleted && !previous.is_deleted
+  def was_deleted(type)
+    other = self.send(type)
+    if type == "previous"
+      is_deleted && !other.is_deleted
+    else
+      !is_deleted && other.is_deleted
+    end
   end
 
-  def was_undeleted
-    !is_deleted && previous.is_deleted
+  def was_undeleted(type)
+    other = self.send(type)
+    if type == "previous"
+      !is_deleted && other.is_deleted
+    else
+      is_deleted && !other.is_deleted
+    end
   end
 
-  def was_banned
-    is_banned && !previous.is_banned
+  def was_banned(type)
+    other = self.send(type)
+    if type == "previous"
+      is_banned && !other.is_banned
+    else
+      !is_banned && other.is_banned
+    end
   end
 
-  def was_unbanned
-    !is_banned && previous.is_banned
+  def was_unbanned(type)
+    other = self.send(type)
+    if type == "previous"
+      !is_banned && other.is_banned
+    else
+      is_banned && !other.is_banned
+    end
   end
 
   def self.available_includes

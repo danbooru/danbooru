@@ -18,10 +18,10 @@
         <%= link_to "#{post_version.post_id}.#{post_version.version}", post_versions_path(search: { post_id: post_version.post_id }, anchor: "post-version-#{post_version.id}") %>
       <% end %>
       <% t.column "Tags", td: {class: "col-expand"} do |post_version| %>
-        <%= post_version_diff(post_version) %>
+        <%= post_version_diff(post_version, params[:type]) %>
       <% end %>
       <% t.column "Changes" do |post_version| %>
-        <%= status_diff_html(post_version) %>
+        <%= status_diff_html(post_version, params[:type]) %>
       <% end %>
       <% t.column "Updated" do |post_version| %>
         <%= link_to_user post_version.updater %>

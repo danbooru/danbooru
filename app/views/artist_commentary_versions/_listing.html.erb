@@ -19,13 +19,13 @@
       <% if !commentary_version.unchanged_empty?(:original_title) %>
         <b>Title:</b>
         <div class="commentary-body-section">
-          <%= diff_body_html(commentary_version, commentary_version.previous, :original_title) %>
+          <%= commentary_version_field_diff(commentary_version, params[:type], :original_title) %>
         </div>
       <% end %>
       <% if !commentary_version.unchanged_empty?(:original_description) %>
         <b>Description:</b>
         <div class="commentary-body-section">
-          <%= diff_body_html(commentary_version, commentary_version.previous, :original_description) %>
+          <%= commentary_version_field_diff(commentary_version, params[:type], :original_description) %>
         </div>
       <% end %>
     <% end %>
@@ -33,18 +33,18 @@
       <% if !commentary_version.unchanged_empty?(:translated_title) %>
         <b>Title:</b>
         <div class="commentary-body-section">
-          <%= diff_body_html(commentary_version, commentary_version.previous, :translated_title) %>
+          <%= commentary_version_field_diff(commentary_version, params[:type], :translated_title) %>
         </div>
       <% end %>
       <% if !commentary_version.unchanged_empty?(:translated_description) %>
         <b>Description:</b>
         <div class="commentary-body-section">
-          <%= diff_body_html(commentary_version, commentary_version.previous, :translated_description) %>
+          <%= commentary_version_field_diff(commentary_version, params[:type], :translated_description) %>
         </div>
       <% end %>
     <% end %>
     <% t.column "Changes", width: "3%" do |commentary_version| %>
-      <%= status_diff_html(commentary_version) %>
+      <%= status_diff_html(commentary_version, params[:type]) %>
     <% end %>
     <% t.column "Updated", width: "10%" do |commentary_version| %>
       <div>

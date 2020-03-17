@@ -2,11 +2,11 @@
 
 <%= tag.ul class: [*ul_class] do %>
   <% diff.added.each do |item| %>
-    <%= tag.li item, class: ["added", ("obsolete" if item.in?(diff.obsolete_added)), *li_class] %>
+    <%= tag.li item, class: ["added", *li_class] %>
   <% end %>
 
   <% diff.removed.each do |item| %>
-    <%= tag.li item, class: ["removed", ("obsolete" if item.in?(diff.obsolete_removed)), *li_class] %>
+    <%= tag.li item, class: ["removed", *li_class] %>
   <% end %>
 
   <% diff.changed.each do |old, new| %>

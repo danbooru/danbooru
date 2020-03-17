@@ -96,6 +96,20 @@ class PoolVersion < ApplicationRecord
     @previous.first
   end
 
+  def subsequent
+    @subsequent ||= begin
+      PoolVersion.where("pool_id = ? and version > ?", pool_id, version).order("version asc").limit(1).to_a
+    end
+    @subsequent.first
+  end
+
+  def current
+    @current ||= begin
+      PoolVersion.where("pool_id = ?", pool_id).order("version desc").limit(1).to_a
+    end
+    @current.first
+  end
+
   def self.status_fields
     {
       posts_changed: "Posts",
@@ -108,24 +122,45 @@ class PoolVersion < ApplicationRecord
     }
   end
 
-  def posts_changed
-    ((post_ids - previous.post_ids) | (previous.post_ids - post_ids)).length > 0
+  def posts_changed(type)
+    other = self.send(type)
+    ((post_ids - other.post_ids) | (other.post_ids - post_ids)).length.positive?
   end
 
-  def was_deleted
-    is_deleted && !previous.is_deleted
+  def was_deleted(type)
+    other = self.send(type)
+    if type == "previous"
+      is_deleted && !other.is_deleted
+    else
+      !is_deleted && other.is_deleted
+    end
   end
 
-  def was_undeleted
-    !is_deleted && previous.is_deleted
+  def was_undeleted(type)
+    other = self.send(type)
+    if type == "previous"
+      !is_deleted && other.is_deleted
+    else
+      is_deleted && !other.is_deleted
+    end
   end
 
-  def was_activated
-    is_active && !previous.is_active
+  def was_activated(type)
+    other = self.send(type)
+    if type == "previous"
+      is_active && !other.is_active
+    else
+      !is_active && other.is_active
+    end
   end
 
-  def was_deactivated
-    !is_active && previous.is_active
+  def was_deactivated(type)
+    other = self.send(type)
+    if type == "previous"
+      !is_active && other.is_active
+    else
+      is_active && !other.is_active
+    end
   end
 
   def pretty_name

@@ -99,6 +99,20 @@ class PostVersion < ApplicationRecord
     @previous.first
   end
 
+  def subsequent
+    @subsequent ||= begin
+      PostVersion.where("post_id = ? and version > ?", post_id, version).order("version asc").limit(1).to_a
+    end
+    @subsequent.first
+  end
+
+  def current
+    @current ||= begin
+      PostVersion.where("post_id = ?", post_id).order("version desc").limit(1).to_a
+    end
+    @current.first
+  end
+
   def visible?
     post&.visible?
   end

@@ -88,8 +88,6 @@
 
   --diff-list-added-color: green;
   --diff-list-removed-color: red;
-  --diff-list-obsolete-added-color: darkGreen;
-  --diff-list-obsolete-removed-color: darkRed;
 
   --wiki-page-versions-diff-del-background: #FCC;
   --wiki-page-versions-diff-ins-background: #CFC;
@@ -301,8 +299,6 @@ body[data-current-user-theme="dark"] {
 
   --diff-list-added-color: var(--green-1);
   --diff-list-removed-color: var(--red-1);
-  --diff-list-obsolete-added-color: var(--green-3);
-  --diff-list-obsolete-removed-color: var(--red-3);
 
   --dtext-blockquote-background: var(--grey-3);
   --dtext-blockquote-border: 1px solid var(--grey-4);
