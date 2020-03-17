@@ -73,7 +73,7 @@
         <td>
           <%= presenter.upload_count(self) %>
           <% if presenter.has_uploads? %>
-            (<%= link_to "tag changes report", reports_upload_tags_path(user_id: user.id) %>)
+            (<%= link_to "tag changes report", post_versions_path(search: { updater_id: user.id, version: 1 }, type: "current") %>)
           <% end %>
           <% if CurrentUser.is_moderator? %>
             [<%= link_to "sample", posts_path(:tags => "user:#{user.name} order:random limit:300") %>]
@@ -130,7 +130,10 @@
 
       <tr>
         <th>Note Changes</th>
-        <td><%= presenter.note_version_count(self) %> in <%= presenter.noted_posts_count(self) %> posts</td>
+        <td>
+          <%= presenter.note_version_count(self) %> in <%= presenter.noted_posts_count(self) %> posts
+          (<%= link_to "note changes report", note_versions_path(search: { updater_id: user.id, version: 1 }, type: "current") %>)
+        </td>
       </tr>
 
       <tr>
