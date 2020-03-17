@@ -23,7 +23,7 @@
   <% t.column column: "control", width: "15%" do |tag_implication| %>
     <%= link_to "Show", tag_implication_path(tag_implication) %>
 
-    <% if tag_implication.deletable_by?(CurrentUser.user) %>
+    <% if policy(tag_implication).destroy? %>
       | <%= link_to "Delete", tag_implication_path(tag_implication), :remote => true, :method => :delete, :data => {:confirm => "Are you sure you want to delete this implication?"} %>
     <% end %>
   <% end %>
