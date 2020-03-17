@@ -38,7 +38,7 @@
     </div>
   <% end %>
 
-  <% if @bulk_update_request.persisted? && CurrentUser.is_admin? %>
+  <% if @bulk_update_request.persisted? && policy(@bulk_update_request).can_update_forum? %>
     <%= f.input :forum_topic_id %>
     <%= f.input :forum_post_id %>
   <% end %>
