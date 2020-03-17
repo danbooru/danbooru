@@ -1,6 +1,6 @@
 <% content_for(:secondary_links) do %>
-  <% if CurrentUser.is_gold? %>
-    <% if @user_feedback %>
+  <% if policy(UserFeedback.new).create? %>
+    <% if @user_feedback.present? && policy(@user_feedback).create? %>
       <%= subnav_link_to "New", new_user_feedback_path(:user_feedback => {:user_id => @user_feedback.user_id}) %>
     <% elsif params[:search] && params[:search][:user_id] %>
       <%= subnav_link_to "New", new_user_feedback_path(:user_feedback => {:user_id => params[:search][:user_id]}) %>

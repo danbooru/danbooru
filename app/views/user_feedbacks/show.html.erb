@@ -17,7 +17,7 @@
       </li>
     </ul>
 
-    <% if @user_feedback.editable_by?(CurrentUser.user) %>
+    <% if policy(@user_feedback).update? %>
       <p><%= link_to "Edit", edit_user_feedback_path(@user_feedback) %></p>
     <% end %>
   </div>

@@ -17,25 +17,5 @@ class UserFeedbackTest < ActiveSupport::TestCase
         assert_equal(dmail, user.dmails.last.body)
       end
     end
-
-    should "not validate if the creator is the user" do
-      user = FactoryBot.create(:gold_user)
-      feedback = build(:user_feedback, creator: user, user: user)
-      feedback.save
-      assert_equal(["You cannot submit feedback for yourself"], feedback.errors.full_messages)
-    end
-
-    should "not validate if the creator is not gold" do
-      user = FactoryBot.create(:user)
-      gold = FactoryBot.create(:gold_user)
-      member = FactoryBot.create(:user)
-
-      feedback = FactoryBot.create(:user_feedback, creator: gold, user: user)
-      assert(feedback.errors.empty?)
-
-      feedback = build(:user_feedback, creator: member, user: user)
-      feedback.save
-      assert_equal(["You must be gold"], feedback.errors.full_messages)
-    end
   end
 end
