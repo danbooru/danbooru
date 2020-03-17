@@ -11,50 +11,11 @@ class WikiPageTest < ActiveSupport::TestCase
   end
 
   context "A wiki page" do
-    context "that is locked" do
-      should "not be editable by a member" do
-        CurrentUser.user = FactoryBot.create(:moderator_user)
-        @wiki_page = FactoryBot.create(:wiki_page, :is_locked => true)
-        CurrentUser.user = FactoryBot.create(:user)
-        @wiki_page.update(body: "hello")
-        assert_equal(["Is locked and cannot be updated"], @wiki_page.errors.full_messages)
-      end
-
-      should "be editable by a moderator" do
-        CurrentUser.user = FactoryBot.create(:moderator_user)
-        @wiki_page = FactoryBot.create(:wiki_page, :is_locked => true)
-        CurrentUser.user = FactoryBot.create(:moderator_user)
-        @wiki_page.update(body: "hello")
-        assert_equal([], @wiki_page.errors.full_messages)
-      end
-    end
-
-    context "updated by a moderator" do
-      setup do
-        @user = FactoryBot.create(:moderator_user)
-        CurrentUser.user = @user
-        @wiki_page = FactoryBot.create(:wiki_page)
-      end
-
-      should "allow the is_locked attribute to be updated" do
-        @wiki_page.update(is_locked: true)
-        @wiki_page.reload
-        assert_equal(true, @wiki_page.is_locked?)
-      end
-    end
-
     context "updated by a regular user" do
       setup do
         @user = FactoryBot.create(:user)
         CurrentUser.user = @user
         @wiki_page = FactoryBot.create(:wiki_page, :title => "HOT POTATO", :other_names => "foo*bar baz")
-      end
-
-      should "not allow the is_locked attribute to be updated" do
-        @wiki_page.update(is_locked: true)
-        assert_equal(["Is locked and cannot be updated"], @wiki_page.errors.full_messages)
-        @wiki_page.reload
-        assert_equal(false, @wiki_page.is_locked?)
       end
 
       should "normalize its title" do

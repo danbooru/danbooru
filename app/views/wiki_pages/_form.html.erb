@@ -7,7 +7,7 @@
 
     <%= dtext_field "wiki_page", "body" %>
 
-    <% if CurrentUser.is_builder? %>
+    <% if policy(@wiki_page).can_edit_locked? %>
       <%= f.input :is_locked, label: "Locked", hint: "Locked wikis can only be edited by Builders." %>
     <% end %>
 
