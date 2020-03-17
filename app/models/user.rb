@@ -322,6 +322,10 @@ class User < ApplicationRecord
       User.level_string(value || level)
     end
 
+    def is_deleted?
+      name.match?(/\Auser_[0-9]+~*\z/)
+    end
+
     def is_anonymous?
       level == Levels::ANONYMOUS
     end
