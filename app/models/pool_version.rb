@@ -89,23 +89,6 @@ class PoolVersion < ApplicationRecord
     normalize_name(name).mb_chars.downcase
   end
 
-  def build_diff(other = previous)
-    diff = {}
-
-    if other.nil?
-      diff[:added_post_ids] = added_post_ids
-      diff[:removed_post_ids] = removed_post_ids
-      diff[:added_desc] = description
-    else
-      diff[:added_post_ids] = post_ids - other.post_ids
-      diff[:removed_post_ids] = other.post_ids - post_ids
-      diff[:added_desc] = description
-      diff[:removed_desc] = other.description
-    end
-
-    diff
-  end
-
   def previous
     @previous ||= begin
       PoolVersion.where("pool_id = ? and version < ?", pool_id, version).order("version desc").limit(1).to_a
@@ -115,6 +98,7 @@ class PoolVersion < ApplicationRecord
 
   def self.status_fields
     {
+      posts_changed: "Posts",
       name: "Renamed",
       description: "Description",
       was_deleted: "Deleted",
@@ -122,6 +106,10 @@ class PoolVersion < ApplicationRecord
       was_activated: "Activated",
       was_deactivated: "Deactivated",
     }
+  end
+
+  def posts_changed
+    ((post_ids - previous.post_ids) | (previous.post_ids - post_ids)).length > 0
   end
 
   def was_deleted
@@ -138,10 +126,6 @@ class PoolVersion < ApplicationRecord
 
   def was_deactivated
     !is_active && previous.is_active
-  end
-
-  def text_field_changed
-    previous.present? && (name_changed || description_changed)
   end
 
   def pretty_name

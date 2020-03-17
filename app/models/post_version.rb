@@ -112,40 +112,6 @@ class PostVersion < ApplicationRecord
     }
   end
 
-  def diff(version = nil)
-    if post.nil?
-      latest_tags = tag_array
-    else
-      latest_tags = post.tag_array
-      latest_tags << "rating:#{post.rating}" if post.rating.present?
-      latest_tags << "parent:#{post.parent_id}" if post.parent_id.present?
-      latest_tags << "source:#{post.source}" if post.source.present?
-    end
-
-    new_tags = tag_array
-    new_tags << "rating:#{rating}" if rating.present?
-    new_tags << "parent:#{parent_id}" if parent_id.present?
-    new_tags << "source:#{source}" if source.present?
-
-    old_tags = version.present? ? version.tag_array : []
-    if version.present?
-      old_tags << "rating:#{version.rating}" if version.rating.present?
-      old_tags << "parent:#{version.parent_id}" if version.parent_id.present?
-      old_tags << "source:#{version.source}" if version.source.present?
-    end
-
-    added_tags = new_tags - old_tags
-    removed_tags = old_tags - new_tags
-
-    return {
-      :added_tags => added_tags,
-      :removed_tags => removed_tags,
-      :obsolete_added_tags => added_tags - latest_tags,
-      :obsolete_removed_tags => removed_tags & latest_tags,
-      :unchanged_tags => new_tags & old_tags
-    }
-  end
-
   def changes
     delta = {
       :added_tags => added_tags,

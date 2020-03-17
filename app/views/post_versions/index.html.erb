@@ -1,9 +1,9 @@
 <div id="c-post-versions">
   <div id="a-index">
     <% if listing_type(:post_id) == :revert && @post_versions.present? %>
-      <h1>Tag History: <%= link_to "Post ##{params.dig(:search, :post_id)}", @post_versions[0].post %></h1>
+      <h1>Post History: <%= link_to "Post ##{params.dig(:search, :post_id)}", @post_versions[0].post %></h1>
     <% else %>
-      <h1>Tag History</h1>
+      <h1>Post History</h1>
     <% end %>
 
     <%= search_form_for(post_versions_path, classes: "inline-form") do |f| %>

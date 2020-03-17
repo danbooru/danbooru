@@ -10,6 +10,11 @@ module ApplicationHelper
     render "diff_list", diff: diff, ul_class: ul_class, li_class: li_class
   end
 
+  def diff_name_html(this_name, prev_name)
+    pattern = Regexp.new('.')
+    DiffBuilder.new(this_name, prev_name, pattern).build
+  end
+
   def diff_body_html(record, previous, field)
     return h(record[field]).gsub(/\r?\n/, '<span class="paragraph-mark">¶</span><br>').html_safe if previous.blank?
 
