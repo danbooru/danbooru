@@ -122,7 +122,7 @@ class TagTest < ActiveSupport::TestCase
       assert_equal([:lt, 3], PostQueryBuilder.parse_query("id:<3")[:post_id])
       assert_equal([:lt, 3], PostQueryBuilder.parse_query("ID:<3")[:post_id])
 
-      assert_equal(["acb"], PostQueryBuilder.parse_query("a*b")[:tags][:include])
+      assert_equal(["~no_matches~"], PostQueryBuilder.parse_query("a*b")[:tags][:include])
     end
 
     should "parse single tags correctly" do
