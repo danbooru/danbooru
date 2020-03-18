@@ -114,8 +114,16 @@ class BulkUpdateRequest < ApplicationRecord
     end
 
     def forum_topic_id_not_invalid
-      if forum_topic_id && !forum_topic
-        errors[:base] << "Forum topic ID is invalid"
+      if forum_topic_id
+        if !forum_topic
+          errors[:base] << "Forum topic ID is invalid"
+        elsif !forum_topic.visible?(CurrentUser.user)
+          errors[:base] << "Forum topic is private"
+        elsif forum_topic.is_locked
+          errors[:base] << "Forum topic is locked"
+        elsif forum_topic.is_deleted
+          errors[:base] << "Forum topic is deleted"
+        end
       end
     end
 
