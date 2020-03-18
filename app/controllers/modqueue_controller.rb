@@ -1,9 +1,9 @@
 class ModqueueController < ApplicationController
   respond_to :html, :json, :xml
-  before_action :approver_only
   layout "sidebar"
 
   def index
+    authorize :modqueue
     @posts = Post.includes(:appeals, :disapprovals, :uploader, flags: [:creator]).pending_or_flagged.available_for_moderation(search_params[:hidden])
     @posts = @posts.paginated_search(params, order: "modqueue", count_pages: true)
 
