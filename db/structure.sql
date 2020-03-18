@@ -558,7 +558,7 @@ CREATE TABLE public.artist_versions (
     name character varying NOT NULL,
     updater_id integer NOT NULL,
     updater_ip_addr inet NOT NULL,
-    is_active boolean DEFAULT true NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL,
     other_names text[] DEFAULT '{}'::text[] NOT NULL,
     group_name character varying DEFAULT ''::character varying NOT NULL,
     urls text[] DEFAULT '{}'::text[] NOT NULL,
@@ -6771,6 +6771,13 @@ CREATE INDEX index_posts_on_parent_id ON public.posts USING btree (parent_id) WH
 --
 
 CREATE INDEX index_posts_on_pixiv_id ON public.posts USING btree (pixiv_id) WHERE (pixiv_id IS NOT NULL);
+
+
+--
+-- Name: index_posts_on_source; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_source ON public.posts USING btree (lower((source)::text));
 
 
 --
