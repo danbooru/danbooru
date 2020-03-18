@@ -81,10 +81,6 @@ class ForumPost < ApplicationRecord
     end
   end
 
-  def reportable_by?(user)
-    visible?(user) && creator_id != user.id && !creator.is_moderator?
-  end
-
   def votable?
     bulk_update_request.present? && bulk_update_request.is_pending?
   end
@@ -97,10 +93,6 @@ class ForumPost < ApplicationRecord
     if SpamDetector.new(self, user_ip: CurrentUser.ip_addr).spam?
       moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
     end
-  end
-
-  def visible?(user, show_deleted_posts = false)
-    user.is_moderator? || (user.level >= topic.min_level && (show_deleted_posts || !is_deleted?))
   end
 
   def update_topic_updated_at_on_create

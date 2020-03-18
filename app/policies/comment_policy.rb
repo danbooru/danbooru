@@ -3,6 +3,10 @@ class CommentPolicy < ApplicationPolicy
     unbanned? && (user.is_moderator? || record.updater_id == user.id)
   end
 
+  def reportable?
+    unbanned? && record.creator_id != user.id && !record.creator.is_moderator?
+  end
+
   def can_sticky_comment?
     user.is_moderator?
   end

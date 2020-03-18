@@ -37,7 +37,7 @@
           <%= link_to "Delete", dmail_path(dmail, format: :js), remote: true, method: :put, "data-params": "dmail[is_deleted]=true", "data-confirm": "Are you sure you want to delete this dmail?" %>
         <% end %>
 
-        <% if dmail.reportable_by?(CurrentUser.user) %>
+        <% if policy(dmail).reportable? %>
           | <%= link_to "Report", new_moderation_report_path(moderation_report: { model_type: "Dmail", model_id: dmail.id }), remote: true, title: "Report this dmail to the moderators" %>
         <% end %>
       <% end %>

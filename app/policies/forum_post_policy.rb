@@ -19,6 +19,10 @@ class ForumPostPolicy < ApplicationPolicy
     unbanned? && show? && user.is_moderator?
   end
 
+  def reportable?
+    unbanned? && show? && record.creator_id != user.id && !record.creator.is_moderator?
+  end
+
   def show_deleted?
     !record.is_deleted? || user.is_moderator?
   end

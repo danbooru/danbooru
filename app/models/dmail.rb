@@ -169,10 +169,6 @@ class Dmail < ApplicationRecord
     end
   end
 
-  def reportable_by?(user)
-    owner == user && is_recipient? && !is_automated? && !from.is_moderator?
-  end
-
   def dtext_shortlink(key: false, **options)
     key ? "dmail ##{id}/#{self.key}" : "dmail ##{id}"
   end

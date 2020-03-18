@@ -19,6 +19,10 @@ class DmailPolicy < ApplicationPolicy
     user.is_member? && (record.owner_id == user.id || record.valid_key?(request.params[:key]))
   end
 
+  def reportable?
+    unbanned? && record.owner_id == user.id && record.is_recipient? && !record.is_automated? && !record.from.is_moderator?
+  end
+
   def permitted_attributes_for_create
     [:title, :body, :to_name, :to_id]
   end

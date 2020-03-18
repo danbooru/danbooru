@@ -117,10 +117,6 @@ class Comment < ApplicationRecord
     end
   end
 
-  def reportable_by?(user)
-    creator_id != user.id && !creator.is_moderator?
-  end
-
   def voted_by?(user)
     return false if user.is_anonymous?
     user.id.in?(votes.map(&:user_id))

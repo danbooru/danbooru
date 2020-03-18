@@ -697,10 +697,6 @@ class User < ApplicationRecord
     CurrentUser.as(self, &block)
   end
 
-  def reportable_by?(user)
-    ModerationReport.enabled? && user.is_builder? && id != user.id && !is_moderator?
-  end
-
   def hide_favorites?
     !CurrentUser.is_admin? && enable_private_favorites? && CurrentUser.user.id != id
   end
