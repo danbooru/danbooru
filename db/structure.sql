@@ -669,8 +669,7 @@ CREATE TABLE public.bulk_update_requests (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     approver_id integer,
-    forum_post_id integer,
-    title text
+    forum_post_id integer
 );
 
 
@@ -7370,6 +7369,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200306202253'),
 ('20200307021204'),
 ('20200309035334'),
-('20200309043653');
+('20200309043653'),
+('20200318224633');
 
 
