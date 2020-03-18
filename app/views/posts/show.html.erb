@@ -56,7 +56,7 @@
     <%= render "posts/partials/show/embedded", post: @post %>
   <% end -%>
 
-  <% if CurrentUser.is_member? %>
+  <% if policy(Favorite).create? %>
     <%= content_tag(:div, class: "fav-buttons fav-buttons-#{@post.is_favorited?}") do %>
       <%= form_tag(favorites_path(post_id: @post.id), method: "post", id: "add-fav-button", "data-remote": true) do %>
         <%= button_tag tag.i(class: "far fa-heart"), class: "ui-button ui-widget ui-corner-all", "data-disable-with": tag.i(class: "fas fa-spinner fa-spin") %>
