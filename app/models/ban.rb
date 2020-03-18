@@ -6,7 +6,6 @@ class Ban < ApplicationRecord
   after_destroy :create_unban_mod_action
   belongs_to :user
   belongs_to :banner, :class_name => "User"
-  validate :user_is_inferior
   validates_presence_of :reason, :duration
 
   scope :unexpired, -> { where("bans.expires_at > ?", Time.now) }
@@ -49,25 +48,6 @@ class Ban < ApplicationRecord
     end
   end
 
-  def user_is_inferior
-    if user
-      if user.is_admin?
-        errors[:base] << "You can never ban an admin."
-        false
-      elsif user.is_moderator? && banner.is_admin?
-        true
-      elsif user.is_moderator?
-        errors[:base] << "Only admins can ban moderators."
-        false
-      elsif banner.is_admin? || banner.is_moderator?
-        true
-      else
-        errors[:base] << "No one else can ban."
-        false
-      end
-    end
-  end
-
   def update_user_on_create
     user.update!(is_banned: true)
   end
@@ -96,7 +76,7 @@ class Ban < ApplicationRecord
   end
 
   def expired?
-    expires_at < Time.now
+    persisted? && expires_at < Time.now
   end
 
   def create_feedback
