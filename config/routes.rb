@@ -245,7 +245,7 @@ Rails.application.routes.draw do
   end
   resources :users do
     resources :favorite_groups, controller: "favorite_groups", only: [:index], as: "favorite_groups"
-    resource :email, only: [:edit, :update] do
+    resource :email, only: [:show, :edit, :update] do
       get :verify
     end
     resource :password, only: [:edit, :update]

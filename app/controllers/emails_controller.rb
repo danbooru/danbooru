@@ -2,6 +2,13 @@ class EmailsController < ApplicationController
   before_action :member_only
   respond_to :html, :xml, :json
 
+  def show
+    @user = User.find(params[:user_id])
+    check_privilege(@user)
+
+    respond_with(@user.email_address)
+  end
+
   def edit
     @user = User.find(params[:user_id])
     check_privilege(@user)

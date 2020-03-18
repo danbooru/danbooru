@@ -6,6 +6,13 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
       @user = create(:user, email_address: build(:email_address, { address: "bob@ogres.net", is_verified: false }))
     end
 
+    context "#show" do
+      should "render" do
+        get_auth user_email_path(@user), @user, as: :json
+        assert_response :success
+      end
+    end
+
     context "#edit" do
       should "render" do
         get_auth edit_user_email_path(@user), @user
