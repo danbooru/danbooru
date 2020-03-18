@@ -81,10 +81,6 @@ class ForumPost < ApplicationRecord
     end
   end
 
-  def votable?
-    bulk_update_request.present? && bulk_update_request.is_pending?
-  end
-
   def voted?(user, score)
     votes.where(creator_id: user.id, score: score).exists?
   end

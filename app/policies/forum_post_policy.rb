@@ -19,6 +19,10 @@ class ForumPostPolicy < ApplicationPolicy
     unbanned? && show? && user.is_moderator?
   end
 
+  def votable?
+    unbanned? && show? && record.bulk_update_request.present? && record.bulk_update_request.is_pending?
+  end
+
   def reportable?
     unbanned? && show? && record.creator_id != user.id && !record.creator.is_moderator?
   end
