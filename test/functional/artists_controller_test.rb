@@ -39,100 +39,115 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "show action" do
+      should "work for html responses" do
+        get artist_path(@masao.id)
+        assert_response :success
+      end
+
       should "work for xml responses" do
         get artist_path(@masao.id), as: :xml
         assert_response :success
       end
-    end
 
-    should "get the new page" do
-      get_auth new_artist_path, @user
-      assert_response :success
-    end
-
-    should "get the show_or_new page for an existing artist" do
-      get_auth show_or_new_artists_path(name: "masao"), @user
-      assert_redirected_to(@masao)
-    end
-
-    should "get the show_or_new page for a nonexisting artist" do
-      get_auth show_or_new_artists_path(name: "nobody"), @user
-      assert_response :success
-    end
-
-    should "get the edit page" do
-      get_auth edit_artist_path(@artist.id), @user
-      assert_response :success
-    end
-
-    should "get the show page" do
-      get artist_path(@artist.id)
-      assert_response :success
-    end
-
-    should "get the show page for a negated tag" do
-      @artist.update(name: "-aaa")
-      get artist_path(@artist.id)
-      assert_response :success
-    end
-
-    should "get the banned page" do
-      get banned_artists_path
-      assert_redirected_to artists_path(search: { is_banned: true, order: "updated_at" })
-    end
-
-    should "ban an artist" do
-      put_auth ban_artist_path(@artist.id), @admin
-      assert_redirected_to(@artist)
-      @artist.reload
-      assert_equal(true, @artist.is_banned?)
-      assert_equal(true, TagImplication.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
-    end
-
-    should "unban an artist" do
-      as_admin do
-        @artist.ban!
-      end
-
-      put_auth unban_artist_path(@artist.id), @admin
-      assert_redirected_to(@artist)
-      @artist.reload
-      assert_equal(false, @artist.is_banned?)
-      assert_equal(false, TagImplication.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
-    end
-
-    should "get the index page" do
-      get artists_path
-      assert_response :success
-    end
-
-    context "when searching the index page" do
-      should "find artists by name" do
-        get artists_path(name: "masao", format: "json")
-        assert_artist_found("masao")
-      end
-
-      should "find artists by image URL" do
-        get artists_path(search: { url_matches: "http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_m.jpg" }, format: "json")
-        assert_artist_found("masao")
-      end
-
-      should "find artists by page URL" do
-        url = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939"
-        get artists_path(search: { url_matches: url }, format: "json")
-        assert_artist_found("masao")
+      should "get the show page for a negated tag" do
+        @artist.update(name: "-aaa")
+        get artist_path(@artist.id)
+        assert_response :success
       end
     end
 
-    should "create an artist" do
-      attributes = FactoryBot.attributes_for(:artist)
-      assert_difference("Artist.count", 1) do
-        attributes.delete(:is_deleted)
-        post_auth artists_path, @user, params: {artist: attributes}
+    context "new action" do
+      should "render" do
+        get_auth new_artist_path, @user
+        assert_response :success
       end
-      artist = Artist.find_by_name(attributes[:name])
-      assert_not_nil(artist)
-      assert_redirected_to(artist_path(artist.id))
+    end
+
+    context "show_or_new action" do
+      should "get the show_or_new page for an existing artist" do
+        get_auth show_or_new_artists_path(name: "masao"), @user
+        assert_redirected_to(@masao)
+      end
+
+      should "get the show_or_new page for a nonexisting artist" do
+        get_auth show_or_new_artists_path(name: "nobody"), @user
+        assert_response :success
+      end
+    end
+
+    context "edit action" do
+      should "render" do
+        get_auth edit_artist_path(@artist.id), @user
+        assert_response :success
+      end
+    end
+
+    context "banned action" do
+      should "redirect to a banned search" do
+        get banned_artists_path
+        assert_response :redirect
+      end
+    end
+
+    context "ban action" do
+      should "ban an artist" do
+        put_auth ban_artist_path(@artist.id), @admin
+        assert_redirected_to(@artist)
+        assert_equal(true, @artist.reload.is_banned?)
+        assert_equal(true, TagImplication.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
+      end
+
+      should "not allow non-admins to ban artists" do
+        put_auth ban_artist_path(@artist.id), @user
+        assert_response 403
+        assert_equal(false, @artist.reload.is_banned?)
+      end
+    end
+
+    context "unban action" do
+      should "unban an artist" do
+        @artist.ban!(banner: @admin)
+        put_auth unban_artist_path(@artist.id), @admin
+
+        assert_redirected_to(@artist)
+        assert_equal(false, @artist.reload.is_banned?)
+        assert_equal(false, TagImplication.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
+      end
+    end
+
+    context "index action" do
+      should "get the index page" do
+        get artists_path
+        assert_response :success
+      end
+
+      context "when searching the index page" do
+        should "find artists by name" do
+          get artists_path(name: "masao", format: "json")
+          assert_artist_found("masao")
+        end
+
+        should "find artists by image URL" do
+          get artists_path(search: { url_matches: "http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_m.jpg" }, format: "json")
+          assert_artist_found("masao")
+        end
+
+        should "find artists by page URL" do
+          url = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939"
+          get artists_path(search: { url_matches: url }, format: "json")
+          assert_artist_found("masao")
+        end
+      end
+    end
+
+    context "create action" do
+      should "create an artist" do
+        assert_difference("Artist.count", 1) do
+          post_auth artists_path, @user, params: { artist: { name: "test" }}
+          assert_response :redirect
+          assert_equal("test", Artist.last.name)
+        end
+      end
     end
 
     context "with an artist that has a wiki page" do
@@ -166,22 +181,23 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    should "delete an artist" do
-      @builder = create(:builder_user)
-      delete_auth artist_path(@artist.id), @builder
-      assert_redirected_to(artist_path(@artist.id))
-      @artist.reload
-      assert_equal(true, @artist.is_deleted)
+    context "destroy action" do
+      should "delete an artist" do
+        delete_auth artist_path(@artist.id), create(:builder_user)
+        assert_redirected_to(artist_path(@artist.id))
+        assert_equal(true, @artist.reload.is_deleted)
+      end
     end
 
-    should "undelete an artist" do
-      @builder = create(:builder_user)
-      put_auth artist_path(@artist.id), @builder, params: {artist: {is_deleted: false}}
-      assert_redirected_to(artist_path(@artist.id))
-      assert_equal(false, @artist.reload.is_deleted)
+    context "update action" do
+      should "undelete an artist" do
+        put_auth artist_path(@artist.id), create(:builder_user), params: {artist: {is_deleted: false}}
+        assert_redirected_to(artist_path(@artist.id))
+        assert_equal(false, @artist.reload.is_deleted)
+      end
     end
 
-    context "reverting an artist" do
+    context "revert action" do
       should "work" do
         as_user do
           @artist.update(name: "xyz")
@@ -196,9 +212,8 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
           @artist2 = create(:artist)
         end
         put_auth artist_path(@artist.id), @user, params: {version_id: @artist2.versions.first.id}
-        @artist.reload
-        assert_not_equal(@artist.name, @artist2.name)
         assert_redirected_to(artist_path(@artist.id))
+        assert_not_equal(@artist.reload.name, @artist2.name)
       end
     end
 
