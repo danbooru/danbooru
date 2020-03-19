@@ -28,10 +28,6 @@
       <%= format_text(@wiki_page.body) %>
     <% end %>
 
-    <% if @wiki_page.artist %>
-      <p><%= link_to "View artist", @wiki_page.artist %></p>
-    <% end %>
-
     <%= render "tag_relationships/alias_and_implication_list", tag: @wiki_page.tag %>
   </div>
 

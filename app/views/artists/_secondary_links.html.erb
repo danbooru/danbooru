@@ -14,7 +14,13 @@
     <% if CurrentUser.is_member? %>
       <%= subnav_link_to "Edit", edit_artist_path(@artist), :"data-shortcut" => "e" %>
     <% end %>
-    <%= subnav_link_to "History", artist_versions_path(:search => {:artist_id => @artist.id}) %>
+    <%= tag.li(tag.span("History (", style: "font-weight:bold")) %>
+    <%= subnav_link_to "Artist", artist_versions_path(:search => {:artist_id => @artist.id}) %>
+    <% if @artist.wiki_page.present? && @artist.wiki_page.id.present? %>
+      <%= tag.li("|") %>
+      <%= subnav_link_to "Wiki", wiki_page_versions_path(:search => {:wiki_page_id => @artist.wiki_page.id}) %>
+    <% end %>
+    <%= tag.li(tag.span(")", style: "font-weight:bold")) %>
     <% if CurrentUser.is_member? %>
       <% if @artist.is_deleted? %>
         <%= subnav_link_to "Undelete", artist_path(@artist, format: "js"), method: :put, data: {confirm: "Are you sure you want to undelete this artist?", params: "artist[is_deleted]=false"}, remote: true %>

@@ -29,6 +29,8 @@ class WikiPagesController < ApplicationController
     if request.format.html? && @wiki_page.blank? && found_by == :title
       @wiki_page = WikiPage.new(title: params[:id])
       respond_with @wiki_page, status: 404
+    elsif request.format.html? && @wiki_page.present? && @wiki_page.artist.present?
+      redirect_to(artist_path(@wiki_page.artist))
     elsif request.format.html? && @wiki_page.present? && found_by == :id
       redirect_to @wiki_page
     elsif @wiki_page.blank?
