@@ -1,26 +1,27 @@
 class NotesController < ApplicationController
   respond_to :html, :xml, :json, :js
-  before_action :member_only, :except => [:index, :show, :search]
 
   def search
   end
 
   def index
-    @notes = Note.paginated_search(params)
+    @notes = authorize Note.paginated_search(params)
     @notes = @notes.includes(:post) if request.format.html?
 
     respond_with(@notes)
   end
 
   def show
-    @note = Note.find(params[:id])
+    @note = authorize Note.find(params[:id])
     respond_with(@note) do |format|
       format.html { redirect_to(post_path(@note.post, anchor: "note-#{@note.id}")) }
     end
   end
 
   def create
-    @note = Note.create(note_params(:create))
+    @note = authorize Note.new(permitted_attributes(Note))
+    @note.save
+
     respond_with(@note) do |fmt|
       fmt.json do
         if @note.errors.any?
@@ -33,8 +34,8 @@ class NotesController < ApplicationController
   end
 
   def update
-    @note = Note.find(params[:id])
-    @note.update(note_params(:update))
+    @note = authorize Note.find(params[:id])
+    @note.update(permitted_attributes(@note))
     respond_with(@note) do |format|
       format.json do
         if @note.errors.any?
@@ -47,24 +48,15 @@ class NotesController < ApplicationController
   end
 
   def destroy
-    @note = Note.find(params[:id])
+    @note = authorize Note.find(params[:id])
     @note.update(is_active: false)
     respond_with(@note)
   end
 
   def revert
-    @note = Note.find(params[:id])
+    @note = authorize Note.find(params[:id])
     @version = @note.versions.find(params[:version_id])
     @note.revert_to!(@version)
     respond_with(@note)
-  end
-
-  private
-
-  def note_params(context)
-    permitted_params = %i[x y width height body]
-    permitted_params += %i[post_id html_id] if context == :create
-
-    params.require(:note).permit(permitted_params)
   end
 end
