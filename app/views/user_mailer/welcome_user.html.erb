@@ -8,7 +8,7 @@
     </p>
 
     <p>
-      <%= link_to "Verify email address", verify_user_email_url(@user, email_verification_key: Danbooru::MessageVerifier.new(:email_verification_key).generate(@user.email_address.id)) %>
+      <%= link_to "Verify email address", email_verification_url(@user) %>
     </p>
 
     <p>
