@@ -9,5 +9,15 @@
     <%= fw.input :body, label: "Wiki", input_html: { size: "50x15" } %>
   <% end %>
 
+  <% if @artist.wiki_page.id.present? %>
+    <div class="input">
+      <label class="checkbox optional" for="artist_rename_wiki">
+        <%= check_box "artist", "rename_wiki" %>
+        Rename wiki
+      </label>
+      <p class="hint">Check when renaming the artist to also rename the wiki.</p>
+    </div>
+  <% end %>
+
   <%= f.button :submit, "Submit" %>
 <% end %>

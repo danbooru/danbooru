@@ -50,6 +50,10 @@ class ArtistsController < ApplicationController
 
   def update
     if params[:artist][:wiki_page_attributes] && params[:artist][:wiki_page_attributes][:id] && params[:artist][:name] && params[:artist][:name] != @artist.name
+      if params[:artist][:rename_wiki].to_s.truthy?
+        @wiki_page = WikiPage.find(params[:artist][:wiki_page_attributes][:id])
+        @wiki_page.update(wiki_params)
+      end
       params[:artist] = params[:artist].except(:wiki_page_attributes)
     end
     @artist.update(artist_params)
@@ -97,10 +101,18 @@ class ArtistsController < ApplicationController
   end
 
   def artist_params(context = nil)
+    params[:artist] = params[:artist].except(:rename_wiki)
     permitted_params = %i[name other_names other_names_string group_name url_string notes is_deleted]
     permitted_params << { wiki_page_attributes: %i[id body] }
     permitted_params << :source if context == :new
 
     params.fetch(:artist, {}).permit(permitted_params)
+  end
+
+  def wiki_params
+    permitted_params = %i[title body]
+    sub_params = params[:artist][:wiki_page_attributes].except(:id)
+    sub_params[:title] = params[:artist][:name]
+    sub_params.permit(permitted_params)
   end
 end

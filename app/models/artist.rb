@@ -2,7 +2,7 @@ class Artist < ApplicationRecord
   extend Memoist
   class RevertError < StandardError; end
 
-  attr_accessor :url_string_changed
+  attr_accessor :url_string_changed, :rename_wiki
   array_attribute :other_names
   deletable
 
