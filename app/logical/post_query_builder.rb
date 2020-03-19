@@ -842,14 +842,14 @@ class PostQueryBuilder
 
             when "-favgroup"
               favgroup = FavoriteGroup.find_by_name_or_id!(g2, CurrentUser.user)
-              raise User::PrivilegeError unless favgroup.viewable_by?(CurrentUser.user)
+              raise User::PrivilegeError unless Pundit.policy!([CurrentUser.user, nil], favgroup).show?
 
               q[:favgroups_neg] ||= []
               q[:favgroups_neg] << favgroup
 
             when "favgroup"
               favgroup = FavoriteGroup.find_by_name_or_id!(g2, CurrentUser.user)
-              raise User::PrivilegeError unless favgroup.viewable_by?(CurrentUser.user)
+              raise User::PrivilegeError unless Pundit.policy!([CurrentUser.user, nil], favgroup).show?
 
               q[:favgroups] ||= []
               q[:favgroups] << favgroup

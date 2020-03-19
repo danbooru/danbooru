@@ -827,12 +827,12 @@ class Post < ApplicationRecord
 
         when /^-favgroup:(.+)$/i
           favgroup = FavoriteGroup.find_by_name_or_id!($1, CurrentUser.user)
-          raise User::PrivilegeError unless favgroup.editable_by?(CurrentUser.user)
+          raise User::PrivilegeError unless Pundit.policy!([CurrentUser.user, nil], favgroup).update?
           favgroup&.remove!(self)
 
         when /^favgroup:(.+)$/i
           favgroup = FavoriteGroup.find_by_name_or_id!($1, CurrentUser.user)
-          raise User::PrivilegeError unless favgroup.editable_by?(CurrentUser.user)
+          raise User::PrivilegeError unless Pundit.policy!([CurrentUser.user, nil], favgroup).update?
           favgroup&.add!(self)
 
         end

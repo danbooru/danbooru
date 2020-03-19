@@ -160,14 +160,6 @@ class FavoriteGroup < ApplicationRecord
     post_ids.include?(post_id)
   end
 
-  def editable_by?(user)
-    creator_id == user.id
-  end
-
-  def viewable_by?(user)
-    creator_id == user.id || is_public
-  end
-
   def self.available_includes
     [:creator]
   end
