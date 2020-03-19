@@ -63,7 +63,7 @@ Rails.application.routes.draw do
       get :banned
     end
   end
-  resources :artist_urls, only: [:index, :update]
+  resources :artist_urls, only: [:index]
   resources :artist_versions, :only => [:index, :show] do
     collection do
       get :search
