@@ -49,6 +49,9 @@ class ArtistsController < ApplicationController
   end
 
   def update
+    if params[:artist][:wiki_page_attributes] && params[:artist][:wiki_page_attributes][:id] && params[:artist][:name] && params[:artist][:name] != @artist.name
+      params[:artist] = params[:artist].except(:wiki_page_attributes)
+    end
     @artist.update(artist_params)
     flash[:notice] = @artist.valid? ? "Artist updated" : @artist.errors.full_messages.join("; ")
     respond_with(@artist)
