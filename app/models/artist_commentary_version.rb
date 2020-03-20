@@ -15,6 +15,20 @@ class ArtistCommentaryVersion < ApplicationRecord
     @previous.first
   end
 
+  def subsequent
+    @subsequent ||= begin
+      ArtistCommentaryVersion.where("post_id = ? and updated_at > ?", post_id, updated_at).order("updated_at asc").limit(1).to_a
+    end
+    @subsequent.first
+  end
+
+  def current
+    @current ||= begin
+      ArtistCommentaryVersion.where("post_id = ?", post_id).order("updated_at desc").limit(1).to_a
+    end
+    @current.first
+  end
+
   def self.status_fields
     {
       original_title: "OrigTitle",

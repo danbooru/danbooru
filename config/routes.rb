@@ -216,8 +216,6 @@ Rails.application.routes.draw do
   end
   resources :artist_commentary_versions, :only => [:index, :show]
   resource :related_tag, :only => [:show, :update]
-  get "reports/uploads" => "reports#uploads"
-  get "reports/upload_tags" => "reports#upload_tags"
   resources :recommended_posts, only: [:index]
   resources :robots, only: [:index]
   resources :saved_searches, :except => [:show] do

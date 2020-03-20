@@ -1,17 +1,66 @@
 module ArtistVersionsHelper
-  def artist_version_other_names_diff(artist_version)
-    new_names = artist_version.other_names
-    old_names = artist_version.previous.try(:other_names)
-    latest_names = artist_version.artist.other_names
+  def artist_version_other_names_diff(artist_version, type)
+    other = artist_version.send(type)
+    this_names = artist_version.other_names
+    if other.present?
+      other_names = other.other_names
+    elsif type == "subsequent"
+      other_names = this_names
+    else
+      other_names = []
+    end
 
-    diff_list_html(new_names, old_names, latest_names)
+    if type == "previous"
+      diff_list_html(this_names, other_names)
+    else
+      diff_list_html(other_names, this_names)
+    end
   end
 
-  def artist_version_urls_diff(artist_version)
-    new_urls = artist_version.urls
-    old_urls = artist_version.previous.try(:urls)
-    latest_urls = artist_version.artist.urls.map(&:to_s)
+  def artist_version_urls_diff(artist_version, type)
+    other = artist_version.send(type)
+    this_urls = artist_version.urls
+    if other.present?
+      other_urls = other.urls
+    elsif type == "subsequent"
+      other_urls = this_urls
+    else
+      other_urls = []
+    end
 
-    diff_list_html(new_urls, old_urls, latest_urls)
+    if type == "previous"
+      diff_list_html(this_urls, other_urls)
+    else
+      diff_list_html(other_urls, this_urls)
+    end
+  end
+
+  def artist_version_name_diff(artist_version, type)
+    other = artist_version.send(type)
+    if other.present? && (artist_version.name != other.name)
+      if type == "previous"
+        name_diff = diff_name_html(artist_version.name, other.name)
+      else
+        name_diff = diff_name_html(other.name, artist_version.name)
+      end
+      %(<br><br><b>Rename:</b><br>&ensp;#{name_diff}</p>).html_safe
+    else
+      ""
+    end
+  end
+
+  def artist_version_group_name_diff(artist_version, type)
+    other = artist_version.send(type)
+    if artist_version.group_name.present? || (other.present? && other.group_name.present?)
+      other_group_name = (other.present? ? other.group_name : artist_version.group_name)
+      if type == "previous"
+        group_name_diff = diff_name_html(artist_version.group_name, other_group_name)
+      else
+        group_name_diff = diff_name_html(other_group_name, artist_version.group_name)
+      end
+      %(<b>Group:</b><br>&ensp;#{group_name_diff}<br><br>).html_safe
+    else
+      ""
+    end
   end
 end

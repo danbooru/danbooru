@@ -1,14 +1,12 @@
 class SetDiff
-  attr_reader :additions, :removals, :added, :removed, :obsolete_added, :obsolete_removed, :changed, :unchanged
+  attr_reader :additions, :removals, :added, :removed, :changed, :unchanged
 
-  def initialize(new, old, latest)
-    new, old, latest = new.to_a, old.to_a, latest.to_a
+  def initialize(this_list, other_list)
+    this, other = this_list.to_a, other_list.to_a
 
-    @additions = new - old
-    @removals = old - new
-    @unchanged = new & old
-    @obsolete_added = additions - latest
-    @obsolete_removed = removals & latest
+    @additions = this - other
+    @removals = other - this
+    @unchanged = this & other
     @added, @removed, @changed = changes(additions, removals)
   end
 
