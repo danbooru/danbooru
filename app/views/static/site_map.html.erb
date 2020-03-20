@@ -13,7 +13,7 @@
         <li><%= link_to("Curated", curated_explore_posts_path) %></li>
         <li><%= link_to("Most Viewed", viewed_explore_posts_path) %></li>
         <li><%= link_to("Votes", post_votes_path) %></li>
-        <% if CurrentUser.can_approve_posts? %>
+        <% if policy(PostApproval).create? %>
           <li><%= link_to("Modqueue", modqueue_index_path) %></li>
         <% end %>
       </ul>
@@ -21,9 +21,7 @@
         <li><h1>Post Events</h1></li>
         <li><%= link_to("Changes", post_versions_path) %></li>
         <li><%= link_to("Approvals", post_approvals_path) %></li>
-        <% if CurrentUser.is_approver? %>
-          <li><%= link_to("Disapprovals", post_disapprovals_path) %></li>
-        <% end %>
+        <li><%= link_to("Disapprovals", post_disapprovals_path) %></li>
         <li><%= link_to("Appeals", post_appeals_path) %></li>
         <li><%= link_to("Flags", post_flags_path) %></li>
         <li><%= link_to("Replacements", post_replacements_path) %></li>
@@ -154,8 +152,11 @@
           <li><%= link_to("User Name Change Requests", user_name_change_requests_path) %></li>
         <% end %>
 
-        <% if CurrentUser.is_moderator? %>
+        <% if policy(ModerationReport).index? %>
           <li><%= link_to("Moderation Reports", moderation_reports_path) %></li>
+        <% end %>
+
+        <% if policy(IpAddress).index? %>
           <li><%= link_to("IP Addresses", ip_addresses_path) %></li>
         <% end %>
 
@@ -163,8 +164,11 @@
           <li><%= link_to("IP Bans", ip_bans_path) %></li>
         <% end %>
 
-        <% if CurrentUser.is_admin? %>
+        <% if policy(NewsUpdate).index? %>
           <li><%= link_to("News Updates", news_updates_path) %></li>
+        <% end %>
+
+        <% if CurrentUser.is_admin? %>
           <li><%= link_to("Admin Dashboard", admin_dashboard_path) %></li>
         <% end %>
       </ul>
