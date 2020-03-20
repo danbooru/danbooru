@@ -165,17 +165,6 @@ class ApplicationController < ActionController::Base
     raise User::PrivilegeError if !request.get? && IpBan.is_banned?(CurrentUser.ip_addr)
   end
 
-  def role_only!(role)
-    raise User::PrivilegeError if !CurrentUser.send("is_#{role}?")
-    raise User::PrivilegeError if !request.get? && CurrentUser.user.is_banned?
-  end
-
-  User::Roles.each do |role|
-    define_method("#{role}_only") do
-      role_only!(role)
-    end
-  end
-
   def pundit_user
     [CurrentUser.user, request]
   end
