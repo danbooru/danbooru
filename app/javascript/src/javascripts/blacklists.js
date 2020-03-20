@@ -60,7 +60,7 @@ Blacklist.toggle_entry = function(e) {
 
 Blacklist.update_sidebar = function() {
   Blacklist.entries.forEach(function(entry) {
-    if (entry.hits === 0) {
+    if (entry.hits.length === 0) {
       return;
     }
 
@@ -72,7 +72,8 @@ Blacklist.update_sidebar = function() {
     link.attr("href", `/posts?tags=${encodeURIComponent(entry.tags)}`);
     link.attr("title", entry.tags);
     link.on("click.danbooru", Blacklist.toggle_entry);
-    count.html(entry.hits);
+    let unique_hits = new Set(entry.hits).size;
+    count.html(unique_hits);
     count.addClass("count");
     item.append(link);
     item.append(" ");
@@ -128,7 +129,7 @@ Blacklist.initialize_disable_all_blacklists = function() {
 
 Blacklist.apply = function() {
   Blacklist.entries.forEach(function(entry) {
-    entry.hits = 0;
+    entry.hits = [];
   });
 
   var count = 0
@@ -144,7 +145,8 @@ Blacklist.apply_post = function(post) {
   var post_count = 0;
   Blacklist.entries.forEach(function(entry) {
     if (Blacklist.post_match(post, entry)) {
-      entry.hits += 1;
+      let post_id = $(post).data('id');
+      entry.hits.push(post_id);
       post_count += 1;
     }
   });
