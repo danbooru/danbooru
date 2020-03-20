@@ -44,6 +44,13 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "#show" do
+      should "render" do
+        get bulk_update_request_path(@bulk_update_request)
+        assert_response :success
+      end
+    end
+
     context "#destroy" do
       context "for the creator" do
         should "succeed" do
