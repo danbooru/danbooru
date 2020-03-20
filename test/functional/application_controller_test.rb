@@ -208,7 +208,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
 
     should "support the only parameter" do
       create(:post)
-      get posts_path, as: :json, params: { only: "id,rating score" }
+      get posts_path, as: :json, params: { only: "id,rating,score" }
 
       assert_response :success
       assert_equal(%w[id rating score].sort, response.parsed_body.first.keys.sort)
