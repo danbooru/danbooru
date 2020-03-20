@@ -23,6 +23,26 @@ class PostPolicy < ApplicationPolicy
     update?
   end
 
+  def move_favorites?
+    user.is_approver? && record.fav_count > 0 && record.parent_id.present?
+  end
+
+  def delete?
+    user.is_approver? && !record.is_deleted?
+  end
+
+  def ban?
+    user.is_approver? && !record.is_banned?
+  end
+
+  def unban?
+    user.is_approver? && record.is_banned?
+  end
+
+  def expunge?
+    user.is_admin?
+  end
+
   def visible?
     record.visible?
   end
