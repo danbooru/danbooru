@@ -10,7 +10,7 @@
   <%= render "posts/partials/index/blacklist" %>
 
   <section id="tag-list">
-    <%= @post.presenter.split_tag_list_html(current_query: params[:q], show_extra_links: CurrentUser.user.is_gold?) %>
+    <%= @post.presenter.split_tag_list_html(current_query: params[:q], show_extra_links: policy(@post).show_extra_links?) %>
   </section>
 
   <section id="post-information">
@@ -108,7 +108,7 @@
       <li><a href="#recommended">Recommended</a></li>
     <% end %>
 
-    <% if CurrentUser.is_member? && @post.visible? %>
+    <% if policy(@post).update? %>
       <li><a href="#edit" id="post-edit-link" data-shortcut="e">Edit</a></li>
     <% end %>
   </menu>
@@ -134,22 +134,26 @@
     <% end %>
   </section>
 
-  <% if CurrentUser.is_member? && @post.visible? %>
+  <% if policy(@post).update? %>
     <section id="edit" style="display: none;">
       <%= render "posts/partials/show/edit", :post => @post %>
     </section>
   <% end %>
 <% end %>
 
-<% if CurrentUser.is_member? %>
+<% if policy(Pool).create? %>
   <div id="add-to-pool-dialog" title="Add to pool" style="display: none;">
     <%= render "pool_elements/new" %>
   </div>
+<% end %>
 
+<% if policy(ArtistCommentary).create_or_update? %>
   <div id="add-commentary-dialog" title="Add artist commentary" style="display: none;">
     <%= render "artist_commentaries/form", post: @post, artist_commentary: @post.artist_commentary || ArtistCommentary.new(post: @post) %>
   </div>
+<% end %>
 
+<% if policy(FavoriteGroup).create? %>
   <div id="add-to-favgroup-dialog" title="Add to favorite group" style="display: none;">
     <%= render "favorite_groups/add_to_favgroup_dialog", :post => @post %>
   </div>
@@ -161,7 +165,7 @@
   <meta name="post-id" content="<%= @post.id %>">
   <meta name="post-has-embedded-notes" content="<%= @post.has_embedded_notes? %>">
 
-  <% if @post.visible? %>
+  <% if policy(@post).visible? %>
     <%= tag.meta name: "og:image", content: @post.open_graph_image_url %>
   <% end %>
 
@@ -170,7 +174,7 @@
   <% if @post.twitter_card_supported? %>
     <meta name="twitter:card" content="summary_large_image">
 
-    <% if @post.visible? %>
+    <% if policy(@post).visible? %>
       <%= tag.meta name: "twitter:image", content: @post.open_graph_image_url %>
     <% end %>
   <% end %>

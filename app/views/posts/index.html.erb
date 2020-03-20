@@ -7,7 +7,7 @@
 
   <section id="tag-box">
     <h1>Tags</h1>
-    <%= @post_set.presenter.tag_list_html(current_query: params[:tags], show_extra_links: CurrentUser.user.is_gold?) %>
+    <%= @post_set.presenter.tag_list_html(current_query: params[:tags], show_extra_links: policy(Post).show_extra_links?) %>
   </section>
 
   <% if Danbooru.config.addthis_key.present? %>

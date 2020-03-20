@@ -5,13 +5,17 @@
   <% if RecommenderService.available_for_user?(CurrentUser.user) %>
     <%= subnav_link_to "Recommended", recommended_posts_path(search: { user_name: CurrentUser.name }) %>
   <% end %>
-  <% unless CurrentUser.is_anonymous? %>
+  <% if policy(Favorite).create? %>
     <%= subnav_link_to "Favorites", posts_path(tags: "ordfav:#{CurrentUser.user.name}") %>
+  <% end %>
+  <% if policy(FavoriteGroup).create? %>
     <%= subnav_link_to "Fav groups", favorite_groups_path(search: { creator_name: CurrentUser.name }) %>
+  <% end %>
+  <% if policy(SavedSearch).create? %>
     <%= subnav_link_to "Saved searches", posts_path(tags: "search:all") %>
   <% end %>
   <%= subnav_link_to "Changes", post_versions_path %>
-  <% if CurrentUser.can_approve_posts? %>
+  <% if policy(PostApproval).create? %>
     <%= subnav_link_to "Modqueue", modqueue_index_path %>
   <% end %>
   <%= subnav_link_to "Help", wiki_page_path("help:posts") %>
