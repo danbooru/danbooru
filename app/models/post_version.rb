@@ -233,14 +233,6 @@ class PostVersion < ApplicationRecord
     post.save!
   end
 
-  def can_undo?(user)
-    version > 1 && post&.visible? && user.is_member?
-  end
-
-  def can_revert_to?(user)
-    post&.visible? && user.is_member?
-  end
-
   def api_attributes
     super + [:obsolete_added_tags, :obsolete_removed_tags, :unchanged_tags]
   end
