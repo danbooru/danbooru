@@ -112,11 +112,10 @@
   --note-body-background: #FFE;
   --note-body-text-color: var(--text-color);
   --note-body-border: 1px solid black;
-  --note-box-border: 1px solid white;
-  --note-box-background: transparent;
-  --note-box-inner-border: 1px solid black;
-  --unsaved-note-box-inner-border: 1px solid red;
-  --movable-note-box-inner-border: 1px solid green;
+  --note-box-border: 1px solid black;
+  --note-box-shadow: 0 0 0 1px white;
+  --unsaved-note-box-border: 1px solid red;
+  --movable-note-box-border: 1px solid green;
   --note-preview-border: 1px solid red;
   --note-preview-background: white;
   --note-highlight-color: blue;

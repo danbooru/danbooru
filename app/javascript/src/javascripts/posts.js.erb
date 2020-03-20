@@ -33,13 +33,8 @@ Post.initialize_all = function() {
     this.initialize_favlist();
     this.initialize_post_sections();
     this.initialize_post_image_resize_links();
-    this.initialize_post_image_resize_to_window_link();
     this.initialize_recommended();
     this.initialize_ugoira_player();
-
-    if (CurrentUser.data("always-resize-images") || (Utility.meta("viewport") && (window.screen.width <= 660))) {
-      $("#image-resize-to-window-link").click();
-    }
   }
 
   if ($("#c-posts #a-show, #c-uploads #a-new").length) {
@@ -307,7 +302,7 @@ Post.initialize_favlist = function() {
 
 Post.expand_image = function(e) {
   if (Utility.test_max_width(660)) {
-    // just do the default behavior
+    // Do the default behavior (navigate to image)
     return;
   }
 
@@ -321,79 +316,50 @@ Post.expand_image = function(e) {
   $image.on("load.danbooru", function() {
     $image.css("animation", "sharpen 0.5s forwards");
     $notice.hide();
+    $("#post-option-view-large").show();
   });
   $notice.children().eq(0).hide();
   $notice.children().eq(1).show(); // Loading message
   Note.Box.scale_all();
-  $image.data("scale-factor", 1);
+  e.preventDefault();
+}
+
+Post.view_large = function(e) {
+  if (Utility.test_max_width(660)) {
+    // Do the default behavior (navigate to image)
+    return;
+  }
+
+  var $image = $("#image");
+  var $notice = $("#image-resize-notice");
+  $image.attr("src", $("#image-container").data("large-file-url"));
+  $image.css("filter", "blur(8px)");
+  $image.width($image.data("large-width"));
+  $image.height($image.data("large-height"));
+  $notice.children().eq(0).show();
+  $notice.children().eq(1).hide(); // Loading message
+  $image.on("load.danbooru", function() {
+    $image.css("animation", "sharpen 0.5s forwards");
+    $notice.show();
+    $("#post-option-view-large").hide();
+  });
+  Note.Box.scale_all();
   e.preventDefault();
 }
 
 Post.initialize_post_image_resize_links = function() {
   $("#image-resize-link").on("click.danbooru", Post.expand_image);
+  $("#image-view-large-link").on("click.danbooru", Post.view_large);
 
   if ($("#image-resize-notice").length) {
     Utility.keydown("v", "resize", function(e) {
       if ($("#image-resize-notice").is(":visible")) {
         $("#image-resize-link").click();
       } else {
-        var $image = $("#image");
-        var $notice = $("#image-resize-notice");
-        $image.attr("src", $("#image-container").data("large-file-url"));
-        $image.css("filter", "blur(8px)");
-        $image.width($image.data("large-width"));
-        $image.height($image.data("large-height"));
-        $notice.children().eq(0).show();
-        $notice.children().eq(1).hide(); // Loading message
-        $image.on("load.danbooru", function() {
-          $image.css("animation", "sharpen 0.5s forwards");
-          $notice.show();
-        });
-        Note.Box.scale_all();
-        $image.data("scale-factor", 1);
-        e.preventDefault();
+        $("#image-view-large-link").click();
       }
     });
   }
-}
-
-Post.resize_image_to_window = function($img) {
-  var sidebar_width = 0;
-  var client_width = 0;
-
-  if (($img.data("scale-factor") === 1) || ($img.data("scale-factor") === undefined)) {
-    if ($(window).width() > 660) {
-      sidebar_width = $("#sidebar").width() || 0;
-      client_width = $(window).width() - sidebar_width - 75;
-    } else {
-      client_width = $(window).width() - 2;
-    }
-
-    if ($img.width() > client_width) {
-      var isVideo = $img.prop("tagName") === "VIDEO";
-      var width = isVideo ? $img.prop("width") : $img.data("original-width");
-      var height = isVideo ? $img.prop("height") : $img.data("original-height");
-      var ratio = client_width / width;
-      $img.data("scale-factor", ratio);
-      $img.css("width", width * ratio);
-      $img.css("height", height * ratio);
-      Post.resize_ugoira_controls();
-    }
-  } else {
-    $img.data("scale-factor", 1);
-    $img.width($img.data("original-width"));
-    $img.height($img.data("original-height"));
-    Post.resize_ugoira_controls();
-  }
-
-  Note.Box.scale_all();
-}
-
-Post.initialize_post_image_resize_to_window_link = function() {
-  $("#image-resize-to-window-link").on("click.danbooru", function(e) {
-    Post.resize_image_to_window($("#image"));
-    e.preventDefault();
-  });
 }
 
 Post.initialize_excerpt = function() {
@@ -460,6 +426,7 @@ Post.initialize_ugoira_player = function() {
     let file_url = $("#image-container").data("file-url");
 
     Ugoira.create_player(content_type, frames, file_url);
+    $(window).on("resize.danbooru.ugoira_scale", Post.resize_ugoira_controls);
   }
 };
 

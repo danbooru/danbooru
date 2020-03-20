@@ -61,7 +61,6 @@
         </div>
 
         <%= f.input :style_usernames, :as => :select, :label => "Colored usernames", :hint => "Color users according to their user level", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
-        <%= f.input :always_resize_images, :as => :select, :include_blank => false, :label => "Fit images to window", :hint => "Make images fit screen width by default", :collection => [["Yes", "true"], ["No", "false"]] %>
         <%= f.input :enable_post_navigation, :as => :select, :include_blank => false, :label => "Enable keyboard shortcuts", :hint => "Enable keyboard shortcuts", :collection => [["Yes", "true"], ["No", "false"]] %>
         <%= f.input :enable_sequential_post_navigation, :as => :select, :label => "Enable post navigation", :hint => "Show prev/next links when viewing a post", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
         <%= f.input :new_post_navigation_layout, :as => :select, :label => "Navigation bar position", :include_blank => false, :collection => [["Below", "true"], ["Above", "false"]], :hint => "When browsing pools or posts, place navigation links above or below the image" %>

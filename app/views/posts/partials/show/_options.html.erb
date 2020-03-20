@@ -1,7 +1,9 @@
 <ul>
-  <li id="post-option-resize-to-window">
-    <%= link_to "Resize to window", "#", id: "image-resize-to-window-link" %>
-  </li>
+  <% if post.visible? && post.has_large? && !post.is_ugoira? %>
+    <li id="post-option-view-large" style="<%= CurrentUser.default_image_size == "original" ? "" : "display: none;" %>">
+      <%= link_to "View large", post.tagged_large_file_url, id: "image-view-large-link" %>
+    </li>
+  <% end %>
   <li id="post-option-find-similar">
     <%= link_to "Find similar", iqdb_queries_path(post_id: post.id) %>
   </li>
