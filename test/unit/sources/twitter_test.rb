@@ -26,14 +26,17 @@ module Sources
     end
 
     context "A video" do
-      setup do
-        @site = Sources::Strategies.find("https://twitter.com/CincinnatiZoo/status/859073537713328129")
-      end
-
       should "get the correct urls" do
+        @site = Sources::Strategies.find("https://twitter.com/CincinnatiZoo/status/859073537713328129")
         assert_equal("https://video.twimg.com/ext_tw_video/859073467769126913/pu/vid/1280x720/cPGgVROXHy3yrK6u.mp4", @site.image_url)
         assert_equal(["https://pbs.twimg.com/ext_tw_video_thumb/859073467769126913/pu/img/VKHGdXPsqKASBTvm.jpg:small"], @site.preview_urls)
         assert_equal("https://twitter.com/CincinnatiZoo/status/859073537713328129", @site.canonical_url)
+      end
+
+      should "work when given a video thumbnail" do
+        # https://twitter.com/Kekeflipnote/status/1241038667898118144
+        @site = Sources::Strategies.find("https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:small")
+        assert_equal("https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:orig", @site.image_url)
       end
     end
 
