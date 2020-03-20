@@ -658,10 +658,10 @@ class PostQueryBuilder
         .order("contributor_fav_count DESC, posts.fav_count DESC, posts.id DESC")
 
     when "modqueue", "modqueue_desc"
-      relation = relation.left_outer_joins(:flags).order("GREATEST(posts.created_at, post_flags.created_at) DESC, posts.id DESC")
+      relation = relation.left_outer_joins(:flags).order(Arel.sql("GREATEST(posts.created_at, post_flags.created_at) DESC, posts.id DESC"))
 
     when "modqueue_asc"
-      relation = relation.left_outer_joins(:flags).order("GREATEST(posts.created_at, post_flags.created_at) ASC, posts.id ASC")
+      relation = relation.left_outer_joins(:flags).order(Arel.sql("GREATEST(posts.created_at, post_flags.created_at) ASC, posts.id ASC"))
 
     else
       relation = relation.order("posts.id DESC")
