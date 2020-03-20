@@ -939,7 +939,7 @@ class Post < ApplicationRecord
 
     def add_favorite!(user)
       Favorite.add(post: self, user: user)
-      vote!("up", user) if user.is_voter?
+      vote!("up", user) if Pundit.policy!([user, nil], PostVote).create?
     rescue PostVote::Error
     end
 
@@ -949,7 +949,7 @@ class Post < ApplicationRecord
 
     def remove_favorite!(user)
       Favorite.remove(post: self, user: user)
-      unvote!(user) if user.is_voter?
+      unvote!(user) if Pundit.policy!([user, nil], PostVote).create?
     rescue PostVote::Error
     end
 
@@ -1031,7 +1031,7 @@ class Post < ApplicationRecord
     end
 
     def vote!(vote, voter = CurrentUser.user)
-      unless voter.is_voter?
+      unless Pundit.policy!([voter, nil], PostVote).create?
         raise PostVote::Error.new("You do not have permission to vote")
       end
 

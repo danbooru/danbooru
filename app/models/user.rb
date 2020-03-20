@@ -17,8 +17,7 @@ class User < ApplicationRecord
   # Used for `before_action :<role>_only`. Must have a corresponding `is_<role>?` method.
   Roles = Levels.constants.map(&:downcase) + [
     :banned,
-    :approver,
-    :voter
+    :approver
   ]
 
   # candidates for removal:
@@ -352,10 +351,6 @@ class User < ApplicationRecord
 
     def is_admin?
       level >= Levels::ADMIN
-    end
-
-    def is_voter?
-      is_gold?
     end
 
     def is_approver?

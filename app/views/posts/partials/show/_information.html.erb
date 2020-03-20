@@ -19,7 +19,7 @@
   <li id="post-info-source">Source: <%= post_source_tag(post) %></li>
   <li id="post-info-rating">Rating: <%= post.pretty_rating %></li>
   <li id="post-info-score">Score: <span id="score-for-post-<%= post.id %>"><%= post.score %></span>
-    <% if CurrentUser.is_voter? %>
+    <% if policy(PostVote).create? %>
       <%= tag.span id: "vote-links-for-post-#{post.id}", style: ("display: none;" if !@post.can_be_voted_by?(CurrentUser.user)) do %>
         (vote
         <%= link_to tag.i(class: "far fa-thumbs-up"), post_post_votes_path(post_id: post.id, score: "up"), remote: true, method: :post %>

@@ -499,14 +499,14 @@ class PostQueryBuilder
       relation = relation.where(id: FavoriteGroup.where(id: favgroup.id).select("unnest(post_ids)"))
     end
 
-    if q[:upvote].present?
-      post_ids = PostVote.where(user: q[:upvote]).where("score > 0").select(:post_id)
-      relation = relation.where("posts.id": post_ids)
+    q[:upvoter].to_a.each do |voter|
+      votes = PostVote.positive.visible(CurrentUser.user).where(user: voter).where("post_id = posts.id").select("1")
+      relation = relation.where("EXISTS (#{votes.to_sql})")
     end
 
-    if q[:downvote].present?
-      post_ids = PostVote.where(user: q[:downvote]).where("score < 0").select(:post_id)
-      relation = relation.where("posts.id": post_ids)
+    q[:downvoter].to_a.each do |voter|
+      votes = PostVote.negative.visible(CurrentUser.user).where(user: voter).where("post_id = posts.id").select("1")
+      relation = relation.where("EXISTS (#{votes.to_sql})")
     end
 
     if q[:ordfav].present?
@@ -994,18 +994,14 @@ class PostQueryBuilder
               end
 
             when "upvote"
-              if CurrentUser.user.is_admin?
-                q[:upvote] = User.find_by_name(g2)
-              elsif CurrentUser.user.is_voter?
-                q[:upvote] = CurrentUser.user
-              end
+              user = User.find_by_name(g2)
+              q[:upvoter] ||= []
+              q[:upvoter] << user unless user.blank?
 
             when "downvote"
-              if CurrentUser.user.is_admin?
-                q[:downvote] = User.find_by_name(g2)
-              elsif CurrentUser.user.is_voter?
-                q[:downvote] = CurrentUser.user
-              end
+              user = User.find_by_name(g2)
+              q[:downvoter] ||= []
+              q[:downvoter] << user unless user.blank?
 
             when *COUNT_METATAGS
               q[g1.to_sym] = parse_helper(g2)
