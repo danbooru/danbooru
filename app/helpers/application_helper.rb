@@ -203,6 +203,7 @@ module ApplicationHelper
     options[:preview_id] ||= "dtext-preview"
     options[:classes] ||= ""
     options[:type] ||= "text"
+    options[:expanded_quote] ||= false
 
     render "dtext/form", options
   end

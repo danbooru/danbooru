@@ -1,10 +1,10 @@
-<%# name, input_id, input_name, preview_id, value, type %>
+<%# name, input_id, input_name, preview_id, value, type, expanded_quote %>
 <div class="input text optional <%= classes %>">
   <label class="text optional" for="<%= input_id %>"><%= name %></label>
 
   <div class="dtext-previewable">
     <% if type == "text" %>
-      <textarea id="<%= input_id %>" class="text optional" rows="20" name="<%= input_name %>" cols="30"><%= value %></textarea>
+      <textarea id="<%= input_id %>" class="text optional" rows="20" name="<%= input_name %>" data-expanded-quote="<%= expanded_quote %>" cols="30"><%= value %></textarea>
     <% else %>
       <input type="text" id="<%= input_id %>" class="text optional" name="<%= input_name %>" value="<%= value %>">
     <% end %>

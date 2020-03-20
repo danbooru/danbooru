@@ -6,6 +6,11 @@ class DText
 
   def self.format_text(text, data: nil, **options)
     return nil if text.nil?
+    expanded_quote = options[:expanded_quote]
+    if expanded_quote
+      text = embed_expanded_quote(text)
+    end
+    options = options.except(:expanded_quote)
     data = preprocess([text]) if data.nil?
     text = parse_embedded_tag_request(text)
     html = DTextRagel.parse(text, **options)
@@ -72,6 +77,19 @@ class DText
   def self.quote(message, creator_name)
     stripped_body = DText.strip_blocks(message, "quote")
     "[quote]\n#{creator_name} said:\n\n#{stripped_body}\n[/quote]\n\n"
+  end
+
+  def self.embed_expanded_quote(message)
+    expanded_regex = /(.*?)\[quote\]\s+([^\r\n]+) said:\s+(.*)\[\/quote\]\s+(.*)/m
+    outer_match = message.match(expanded_regex)
+    if outer_match
+      inner_match = outer_match[3].match(expanded_regex)
+      if inner_match
+        inner_message = "#{inner_match[1]}\n[expand=#{inner_match[2]} said:]\n#{inner_match[3]}[/expand]\n#{inner_match[4]}"
+        message = "#{outer_match[1]}\n[quote]\n#{outer_match[2]} said:\n#{inner_message}\n[/quote]\n#{outer_match[4]}"
+      end
+    end
+    message
   end
 
   def self.parse_embedded_tag_request(text)

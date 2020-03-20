@@ -27,7 +27,8 @@ Dtext.call_preview = async function(e, $button, $input, $preview) {
   $preview.text("Loading...").fadeIn("fast");
 
   let inline = $input.is("input");
-  let html = await $.post("/dtext_preview", { body: $input.val(), inline: inline });
+  let expanded_quote = $input.data("expanded-quote");
+  let html = await $.post("/dtext_preview", { body: $input.val(), inline: inline, expanded_quote: expanded_quote });
   $preview.html(html).fadeIn("fast");
 }
 
