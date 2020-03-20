@@ -1,4 +1,5 @@
 class BulkUpdateRequest < ApplicationRecord
+  attr_accessor :title
   attr_accessor :reason
   attr_reader :skip_secondary_validations
 
@@ -33,8 +34,7 @@ class BulkUpdateRequest < ApplicationRecord
     def search(params = {})
       q = super
 
-      q = q.search_attributes(params, :user, :approver, :forum_topic_id, :forum_post_id, :title, :script)
-      q = q.text_attribute_matches(:title, params[:title_matches])
+      q = q.search_attributes(params, :user, :approver, :forum_topic_id, :forum_post_id, :script)
       q = q.text_attribute_matches(:script, params[:script_matches])
 
       if params[:status].present?
@@ -114,8 +114,16 @@ class BulkUpdateRequest < ApplicationRecord
     end
 
     def forum_topic_id_not_invalid
-      if forum_topic_id && !forum_topic
-        errors[:base] << "Forum topic ID is invalid"
+      if forum_topic_id
+        if !forum_topic
+          errors[:base] << "Forum topic ID is invalid"
+        elsif !forum_topic.visible?(CurrentUser.user)
+          errors[:base] << "Forum topic is private"
+        elsif forum_topic.is_locked
+          errors[:base] << "Forum topic is locked"
+        elsif forum_topic.is_deleted
+          errors[:base] << "Forum topic is deleted"
+        end
       end
     end
 
