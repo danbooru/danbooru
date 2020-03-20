@@ -430,14 +430,6 @@ class User < ApplicationRecord
       created_at <= 1.week.ago
     end
 
-    def can_view_flagger?(flagger_id)
-      is_moderator? || flagger_id == id
-    end
-
-    def can_view_flagger_on_post?(flag)
-      (is_moderator? && flag.not_uploaded_by?(id)) || flag.creator_id == id
-    end
-
     def upload_limit
       @upload_limit ||= UploadLimit.new(self)
     end

@@ -48,7 +48,7 @@ class PostEvent
       true
     when PostFlag
       flag = event
-      user.can_view_flagger_on_post?(flag)
+      Pundit.policy!([user, nil], flag).can_view_flagger?
     end
   end
 
