@@ -1,0 +1,2 @@
+class CommentVotePolicy < ApplicationPolicy
+end

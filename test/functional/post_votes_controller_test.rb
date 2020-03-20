@@ -4,9 +4,7 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
   context "The post vote controller" do
     setup do
       @user = create(:gold_user)
-      @user.as_current do
-        @post = create(:post)
-      end
+      @post = create(:post)
     end
 
     context "index action" do
@@ -48,16 +46,23 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "for a post that has already been voted on" do
-        setup do
-          @user.as_current do
-            @post.vote!("up")
+        should "not create another vote" do
+          @post.vote!("up", @user)
+          assert_no_difference("PostVote.count") do
+            post_auth post_post_votes_path(post_id: @post.id), @user, params: { score: "up", format: "js" }
+            assert_response 422
           end
         end
+      end
+    end
 
-        should "fail silently on an error" do
-          assert_nothing_raised do
-            post_auth post_post_votes_path(post_id: @post.id), @user, params: {:score => "up", :format => "js"}
-          end
+    context "destroy action" do
+      should "remove a vote" do
+        as(@user) { create(:post_vote, post_id: @post.id, user_id: @user.id) }
+
+        assert_difference("PostVote.count", -1) do
+          delete_auth post_post_votes_path(post_id: @post.id), @user, as: :javascript
+          assert_redirected_to @post
         end
       end
     end

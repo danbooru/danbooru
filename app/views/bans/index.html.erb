@@ -23,7 +23,7 @@
         <div><%= time_ago_in_words_tagged(ban.created_at) %></div>
       <% end %>
       <% t.column column: "control" do |ban| %>
-        <% if CurrentUser.is_moderator? %>
+        <% if policy(ban).update? %>
           <%= link_to "Edit", edit_ban_path(ban) %>
           | <%= link_to "Delete", ban_path(ban), :method => :delete, :remote => true %>
         <% end %>

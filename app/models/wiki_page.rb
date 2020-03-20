@@ -11,7 +11,6 @@ class WikiPage < ApplicationRecord
   validates_presence_of :title
   validates_presence_of :body, :unless => -> { is_deleted? || other_names.present? }
   validate :validate_rename
-  validate :validate_not_locked
 
   array_attribute :other_names
   has_one :tag, :foreign_key => "name", :primary_key => "title"
@@ -115,12 +114,6 @@ class WikiPage < ApplicationRecord
 
   extend SearchMethods
   include ApiMethods
-
-  def validate_not_locked
-    if is_locked? && !CurrentUser.is_builder?
-      errors.add(:is_locked, "and cannot be updated")
-    end
-  end
 
   def validate_rename
     return unless title_changed?

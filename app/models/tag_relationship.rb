@@ -64,10 +64,6 @@ class TagRelationship < ApplicationRecord
     status =~ /\Aerror:/
   end
 
-  def deletable_by?(user)
-    user.is_admin?
-  end
-
   def reject!
     update!(status: "deleted")
   end

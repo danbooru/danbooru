@@ -186,14 +186,12 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "changing the level" do
-        setup do
-          @cuser = create(:user)
-        end
-
         should "not work" do
+          @cuser = create(:user)
           put_auth user_path(@user), @cuser, params: {:user => {:level => 40}}
-          @user.reload
-          assert_equal(20, @user.level)
+
+          assert_response 403
+          assert_equal(20, @user.reload.level)
         end
       end
 

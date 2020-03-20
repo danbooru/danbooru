@@ -4,9 +4,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
   context "The notes controller" do
     setup do
       @user = create(:user)
-      as_user do
-        @note = create(:note, body: "000")
-      end
+      @note = as(@user) { create(:note, body: "000") }
     end
 
     context "index action" do
@@ -22,9 +20,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
             body_matches: "000",
             is_active: true,
             post_id: @note.post_id,
-            post_tags_match: @note.post.tag_array.first,
-            creator_name: @note.creator.name,
-            creator_id: @note.creator_id
+            post_tags_match: @note.post.tag_array.first
           }
         }
 
@@ -43,10 +39,9 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "create a note" do
         assert_difference("Note.count", 1) do
-          as_user do
-            @post = create(:post)
-          end
+          @post = create(:post)
           post_auth notes_path, @user, params: {:note => {:x => 0, :y => 0, :width => 10, :height => 10, :body => "abc", :post_id => @post.id}, :format => :json}
+          assert_response :success
         end
       end
     end
@@ -54,14 +49,14 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     context "update action" do
       should "update a note" do
         put_auth note_path(@note), @user, params: {:note => {:body => "xyz"}}
+        assert_redirected_to @note
         assert_equal("xyz", @note.reload.body)
       end
 
       should "not allow changing the post id to another post" do
-        as(@admin) do
-          @other = create(:post)
-        end
+        @other = create(:post)
         put_auth note_path(@note), @user, params: {:format => "json", :id => @note.id, :note => {:post_id => @other.id}}
+        assert_response 403
         assert_not_equal(@other.id, @note.reload.post_id)
       end
     end
@@ -69,6 +64,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     context "destroy action" do
       should "destroy a note" do
         delete_auth note_path(@note), @user
+        assert_redirected_to @note
         assert_equal(false, @note.reload.is_active?)
       end
     end
@@ -87,6 +83,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
 
       should "revert to a previous version" do
         put_auth revert_note_path(@note), @user, params: {:version_id => @note.versions.first.id}
+        assert_redirected_to @note
         assert_equal("000", @note.reload.body)
       end
 

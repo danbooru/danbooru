@@ -10,9 +10,9 @@ class BulkUpdateRequest < ApplicationRecord
 
   validates_presence_of :script
   validates_presence_of :title, if: ->(rec) {rec.forum_topic_id.blank?}
+  validates_presence_of :forum_topic, if: ->(rec) {rec.forum_topic_id.present?}
   validates_inclusion_of :status, :in => %w(pending approved rejected)
   validate :script_formatted_correctly
-  validate :forum_topic_id_not_invalid
   validate :validate_script, :on => :create
   before_validation :normalize_text
   after_create :create_forum_topic
@@ -63,7 +63,7 @@ class BulkUpdateRequest < ApplicationRecord
     def forum_updater
       @forum_updater ||= begin
         post = if forum_topic
-          forum_post || forum_topic.posts.first
+          forum_post || forum_topic.forum_posts.first
         else
           nil
         end
@@ -89,7 +89,7 @@ class BulkUpdateRequest < ApplicationRecord
     def create_forum_topic
       CurrentUser.as(user) do
         self.forum_topic = ForumTopic.create(title: title, category_id: 1, creator: user) unless forum_topic.present?
-        self.forum_post = forum_topic.posts.create(body: reason_with_link, creator: user) unless forum_post.present?
+        self.forum_post = forum_topic.forum_posts.create(body: reason_with_link, creator: user) unless forum_post.present?
         save
       end
     end
@@ -113,20 +113,6 @@ class BulkUpdateRequest < ApplicationRecord
       errors[:base] << e.message
     end
 
-    def forum_topic_id_not_invalid
-      if forum_topic_id
-        if !forum_topic
-          errors[:base] << "Forum topic ID is invalid"
-        elsif !forum_topic.visible?(CurrentUser.user)
-          errors[:base] << "Forum topic is private"
-        elsif forum_topic.is_locked
-          errors[:base] << "Forum topic is locked"
-        elsif forum_topic.is_deleted
-          errors[:base] << "Forum topic is deleted"
-        end
-      end
-    end
-
     def validate_script
       AliasAndImplicationImporter.new(script, forum_topic_id, "1", skip_secondary_validations).validate!
     rescue RuntimeError => e
@@ -137,18 +123,6 @@ class BulkUpdateRequest < ApplicationRecord
   extend SearchMethods
   include ApprovalMethods
   include ValidationMethods
-
-  def editable?(user)
-    user_id == user.id || user.is_builder?
-  end
-
-  def approvable?(user)
-    !is_approved? && user.is_admin?
-  end
-
-  def rejectable?(user)
-    is_pending? && editable?(user)
-  end
 
   def reason_with_link
     "[bur:#{id}]\n\nReason: #{reason}"

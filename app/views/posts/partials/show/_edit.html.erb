@@ -26,13 +26,17 @@
     <%= f.input :has_embedded_notes, label: "Embed notes", as: :boolean, boolean_style: :inline, disabled: post.is_note_locked? %>
   </fieldset>
 
-  <% if CurrentUser.is_builder? %>
+  <% if policy(post).can_lock_rating? || policy(post).can_lock_notes? || policy(post).can_lock_status? %>
     <fieldset class="inline-fieldset">
       <label>Lock</label>
 
-      <%= f.input :is_rating_locked, label: "Rating", as: :boolean, boolean_style: :inline  %>
-      <%= f.input :is_note_locked, label: "Notes", as: :boolean, boolean_style: :inline  %>
-      <% if CurrentUser.is_admin? %>
+      <% if policy(post).can_lock_rating? %>
+        <%= f.input :is_rating_locked, label: "Rating", as: :boolean, boolean_style: :inline  %>
+      <% end %>
+      <% if policy(post).can_lock_notes? %>
+        <%= f.input :is_note_locked, label: "Notes", as: :boolean, boolean_style: :inline  %>
+      <% end %>
+      <% if policy(post).can_lock_status? %>
         <%= f.input :is_status_locked, label: "Status", as: :boolean, boolean_style: :inline  %>
       <% end %>
     </fieldset>

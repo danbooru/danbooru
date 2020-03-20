@@ -26,42 +26,47 @@ class PostFlag < ApplicationRecord
   scope :old, -> { where("post_flags.created_at <= ?", 3.days.ago) }
 
   module SearchMethods
+    def creator_matches(creator, searcher)
+      policy = Pundit.policy!([searcher, nil], PostFlag.new(creator: creator))
+
+      if policy.can_view_flagger?
+        where(creator: creator).where.not(post: searcher.posts)
+      else
+        none
+      end
+    end
+
+    def category_matches(category)
+      case category
+      when "normal"
+        where("reason NOT IN (?) AND reason NOT LIKE ?", [Reasons::UNAPPROVED], Reasons::REJECTED)
+      when "unapproved"
+        where(reason: Reasons::UNAPPROVED)
+      when "rejected"
+        where("reason LIKE ?", Reasons::REJECTED)
+      when "deleted"
+        where("reason = ? OR reason LIKE ?", Reasons::UNAPPROVED, Reasons::REJECTED)
+      else
+        none
+      end
+    end
+
     def search(params)
       q = super
 
       q = q.search_attributes(params, :post, :is_resolved, :reason)
       q = q.text_attribute_matches(:reason, params[:reason_matches])
 
-      # XXX
       if params[:creator_id].present?
-        if CurrentUser.can_view_flagger?(params[:creator_id].to_i)
-          q = q.where.not(post_id: CurrentUser.user.posts)
-          q = q.where("creator_id = ?", params[:creator_id].to_i)
-        else
-          q = q.none
-        end
+        flagger = User.find(params[:creator_id])
+        q = q.creator_matches(flagger, CurrentUser.user)
+      elsif params[:creator_name].present?
+        flagger = User.find_by_name(params[:creator_name])
+        q = q.creator_matches(flagger, CurrentUser.user)
       end
 
-      # XXX
-      if params[:creator_name].present?
-        flagger_id = User.name_to_id(params[:creator_name].strip)
-        if flagger_id && CurrentUser.can_view_flagger?(flagger_id)
-          q = q.where.not(post_id: CurrentUser.user.posts)
-          q = q.where("creator_id = ?", flagger_id)
-        else
-          q = q.none
-        end
-      end
-
-      case params[:category]
-      when "normal"
-        q = q.where("reason NOT IN (?) AND reason NOT LIKE ?", [Reasons::UNAPPROVED], Reasons::REJECTED)
-      when "unapproved"
-        q = q.where(reason: Reasons::UNAPPROVED)
-      when "rejected"
-        q = q.where("reason LIKE ?", Reasons::REJECTED)
-      when "deleted"
-        q = q.where("reason = ? OR reason LIKE ?", Reasons::UNAPPROVED, Reasons::REJECTED)
+      if params[:category]
+        q = q.category_matches(params[:category])
       end
 
       q.apply_default_order(params)
@@ -71,7 +76,7 @@ class PostFlag < ApplicationRecord
   module ApiMethods
     def api_attributes
       attributes = super + [:category]
-      attributes -= [:creator_id] unless CurrentUser.can_view_flagger_on_post?(self)
+      attributes -= [:creator_id] unless Pundit.policy!([CurrentUser.user, nil], self).can_view_flagger?
       attributes
     end
   end
@@ -129,10 +134,6 @@ class PostFlag < ApplicationRecord
 
   def uploader_id
     post.uploader_id
-  end
-
-  def not_uploaded_by?(userid)
-    uploader_id != userid
   end
 
   def self.available_includes

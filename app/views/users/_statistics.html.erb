@@ -10,7 +10,7 @@
         <th>Join Date</th>
         <td><%= presenter.join_date %></td>
       </tr>
-      <% if CurrentUser.is_moderator? %>
+      <% if policy(IpAddress).show? %>
         <tr>
           <th>Last IP</th>
           <td>

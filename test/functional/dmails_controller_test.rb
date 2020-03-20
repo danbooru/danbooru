@@ -22,9 +22,8 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "with a respond_to_id" do
-        should "check privileges" do
-          @user2 = create(:user)
-          get_auth new_dmail_path, @user2, params: {:respond_to_id => @dmail.id}
+        should "not allow users to quote dmails belonging to unrelated users " do
+          get_auth new_dmail_path, @unrelated_user, params: {:respond_to_id => @dmail.id}
           assert_response 403
         end
 
@@ -133,6 +132,16 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to Dmail.last
         assert_enqueued_emails 1
+      end
+
+      should "not allow banned users to send dmails" do
+        create(:ban, user: @user)
+        @user.reload
+
+        assert_difference("Dmail.count", 0) do
+          post_auth dmails_path, @user, params: { dmail: { to_id: @unrelated_user.id, title: "abc", body: "abc" }}
+          assert_response 403
+        end
       end
     end
 

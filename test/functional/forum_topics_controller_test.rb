@@ -95,9 +95,12 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      should "list all forum topics" do
+      should "list public forum topics for members" do
         get forum_topics_path
+
         assert_response :success
+        assert_select "a.forum-post-link", count: 1, text: @topic1.title
+        assert_select "a.forum-post-link", count: 1, text: @topic2.title
       end
 
       should "not list stickied topics first for JSON responses" do
@@ -109,6 +112,26 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
       should "render for atom feed" do
         get forum_topics_path, params: {:format => :atom}
         assert_response :success
+      end
+
+      context "with private topics" do
+        should "not show private topics to unprivileged users" do
+          as(@user) { @topic2.update!(min_level: User::Levels::MODERATOR) }
+          get forum_topics_path
+
+          assert_response :success
+          assert_select "a.forum-post-link", count: 1, text: @topic1.title
+          assert_select "a.forum-post-link", count: 0, text: @topic2.title
+        end
+
+        should "show private topics to privileged users" do
+          as(@user) { @topic2.update!(min_level: User::Levels::MODERATOR) }
+          get_auth forum_topics_path, @mod
+
+          assert_response :success
+          assert_select "a.forum-post-link", count: 1, text: @topic1.title
+          assert_select "a.forum-post-link", count: 1, text: @topic2.title
+        end
       end
 
       context "with search conditions" do
@@ -216,6 +239,29 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to forum_topic_path(@forum_topic)
         assert_equal(true, @forum_topic.reload.is_locked)
+      end
+
+      should "allow users to update their own topics" do
+        put_auth forum_topic_path(@forum_topic), @user, params: { forum_topic: { title: "test" }}
+
+        assert_redirected_to forum_topic_path(@forum_topic)
+        assert_equal("test", @forum_topic.reload.title)
+      end
+
+      should "not allow users to update locked topics" do
+        as(@mod) { @forum_topic.update!(is_locked: true) }
+        put_auth forum_topic_path(@forum_topic), @user, params: { forum_topic: { title: "test" }}
+
+        assert_response 403
+        assert_not_equal("test", @forum_topic.reload.title)
+      end
+
+      should "allow mods to update locked topics" do
+        as(@mod) { @forum_topic.update!(is_locked: true) }
+        put_auth forum_topic_path(@forum_topic), @mod, params: { forum_topic: { title: "test" }}
+
+        assert_redirected_to forum_topic_path(@forum_topic)
+        assert_equal("test", @forum_topic.reload.title)
       end
     end
 

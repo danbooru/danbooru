@@ -4,7 +4,7 @@
       <% if CurrentUser.is_moderator? || (params[:search] && params[:search][:is_deleted] =~ /t/) || !comment.is_deleted? %>
         <%= content_tag(:div, { id: "post_#{comment.post.id}", class: ["post", *PostPresenter.preview_class(comment.post)].join(" ") }.merge(PostPresenter.data_attributes(comment.post))) do %>
           <div class="preview">
-            <% if comment.post.visible? %>
+            <% if policy(comment.post).visible? %>
               <%= link_to(image_tag(comment.post.preview_file_url), post_path(comment.post)) %>
             <% end %>
           </div>

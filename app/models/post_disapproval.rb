@@ -66,13 +66,9 @@ class PostDisapproval < ApplicationRecord
     super(message)
   end
 
-  def can_view_creator?(user)
-    user.is_moderator? || user_id == user.id
-  end
-
   def api_attributes
     attributes = super
-    attributes -= [:creator_id] unless can_view_creator?(CurrentUser.user)
+    attributes -= [:creator_id] unless Pundit.policy!([CurrentUser.user, nil], self).can_view_creator?
     attributes
   end
 end

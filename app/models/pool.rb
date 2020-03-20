@@ -147,12 +147,8 @@ class Pool < ApplicationRecord
     post_ids.find_index(post_id).to_i + 1
   end
 
-  def deletable_by?(user)
-    user.is_builder?
-  end
-
   def updater_can_edit_deleted
-    if is_deleted? && !deletable_by?(CurrentUser.user)
+    if is_deleted? && !Pundit.policy!([CurrentUser.user, nil], self).update?
       errors[:base] << "You cannot update pools that are deleted"
     end
   end

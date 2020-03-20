@@ -36,7 +36,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { tags: "bkub" }
           assert_response :success
 
-          artist.update(is_banned: false, is_active: false)
+          artist.update(is_banned: false, is_deleted: true)
           get posts_path, params: { tags: "bkub" }
           assert_response :success
 
@@ -258,6 +258,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         put_auth post_path(@post), @user, params: {:post => {:last_noted_at => 1.minute.ago}}
         assert_nil(@post.reload.last_noted_at)
       end
+
+      should "not allow unprivileged users to update restricted posts" do
+        as(@user) { @post.update!(is_banned: true) }
+        put_auth post_path(@post), @user, params: { post: { tag_string: "blah" }}
+        assert_response 403
+        assert_not_equal("blah", @post.reload.tag_string)
+      end
     end
 
     context "revert action" do
@@ -286,6 +293,42 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         @post.reload
         assert_not_equal(@post.tag_string, @post2.tag_string)
         assert_response :missing
+      end
+    end
+
+    context "copy_notes action" do
+      setup do
+        as(@user) do
+          @src = create(:post, image_width: 100, image_height: 100, tag_string: "translated partially_translated", has_embedded_notes: true)
+          @dst = create(:post, image_width: 200, image_height: 200, tag_string: "translation_request")
+          create(:note, post: @src, x: 10, y: 10, width: 10, height: 10, body: "test")
+          create(:note, post: @src, x: 10, y: 10, width: 10, height: 10, body: "deleted", is_active: false)
+        end
+      end
+
+      should "copy notes and tags" do
+        put_auth copy_notes_post_path(@src), @user, params: { other_post_id: @dst.id }
+        assert_response :success
+
+        assert_equal(1, @dst.reload.notes.active.length)
+        assert_equal(true, @dst.has_embedded_notes)
+        assert_equal("lowres partially_translated translated", @dst.tag_string)
+      end
+
+      should "rescale notes" do
+        put_auth copy_notes_post_path(@src), @user, params: { other_post_id: @dst.id }
+        assert_response :success
+
+        note = @dst.notes.active.first
+        assert_equal([20, 20, 20, 20], [note.x, note.y, note.width, note.height])
+      end
+    end
+
+    context "mark_as_translated action" do
+      should "mark the post as translated" do
+        put_auth mark_as_translated_post_path(@post), @user, params: { post: { check_translation: false, partially_translated: false }}
+        assert_redirected_to @post
+        assert(@post.reload.has_tag?("translated"))
       end
     end
   end

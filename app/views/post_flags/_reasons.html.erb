@@ -3,7 +3,7 @@
     <li class="post-flag-reason">
       <span class="prose"><%= format_text(flag.reason, inline: true) %></span>
 
-      <% if CurrentUser.can_view_flagger_on_post?(flag) %>
+      <% if policy(flag).can_view_flagger? %>
         - <%= link_to_user(flag.creator) %>
       <% end %>
 

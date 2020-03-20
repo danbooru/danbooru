@@ -24,7 +24,7 @@
         <%= time_ago_in_words_tagged(job.run_at) %>
       <% end %>
       <% t.column column: "control" do |job| %>
-        <% if CurrentUser.is_admin? %>
+        <% if policy(job).update? %>
           <% if job.locked_at? %>
             Running
           <% elsif job.failed? %>

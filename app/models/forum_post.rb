@@ -2,7 +2,7 @@ class ForumPost < ApplicationRecord
   attr_readonly :topic_id
   belongs_to :creator, class_name: "User"
   belongs_to_updater
-  belongs_to :topic, :class_name => "ForumTopic"
+  belongs_to :topic, class_name: "ForumTopic", inverse_of: :forum_posts
   has_many :dtext_links, as: :model, dependent: :destroy
   has_many :moderation_reports, as: :model
   has_many :votes, class_name: "ForumPostVote"
@@ -16,8 +16,6 @@ class ForumPost < ApplicationRecord
   after_update :update_topic_updated_at_on_update_for_original_posts
   after_destroy :update_topic_updated_at_on_destroy
   validates_presence_of :body
-  validate :validate_topic_is_unlocked
-  validate :topic_is_not_restricted, :on => :create
   after_save :delete_topic_if_original_post
   after_update(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |rec|
     ModAction.log("#{CurrentUser.name} updated forum ##{rec.id}", :forum_post_update)
@@ -83,14 +81,6 @@ class ForumPost < ApplicationRecord
     end
   end
 
-  def reportable_by?(user)
-    visible?(user) && creator_id != user.id && !creator.is_moderator?
-  end
-
-  def votable?
-    bulk_update_request.present? && bulk_update_request.is_pending?
-  end
-
   def voted?(user, score)
     votes.where(creator_id: user.id, score: score).exists?
   end
@@ -99,26 +89,6 @@ class ForumPost < ApplicationRecord
     if SpamDetector.new(self, user_ip: CurrentUser.ip_addr).spam?
       moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
     end
-  end
-
-  def validate_topic_is_unlocked
-    if topic.is_locked? && !updater.is_moderator?
-      errors[:topic] << "is locked"
-    end
-  end
-
-  def topic_is_not_restricted
-    if topic && !topic.visible?(creator)
-      errors[:topic] << "is restricted"
-    end
-  end
-
-  def editable_by?(user)
-    (creator_id == user.id || user.is_moderator?) && visible?(user)
-  end
-
-  def visible?(user, show_deleted_posts = false)
-    user.is_moderator? || (topic.visible?(user) && (show_deleted_posts || !is_deleted?))
   end
 
   def update_topic_updated_at_on_create

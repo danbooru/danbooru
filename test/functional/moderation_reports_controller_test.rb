@@ -8,6 +8,7 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
       @mod = create(:moderator_user, created_at: 2.weeks.ago)
 
       as(@spammer) do
+        @dmail = create(:dmail, from: @spammer, owner: @user, to: @user)
         @comment = create(:comment, creator: @spammer)
         @forum_topic = create(:forum_topic, creator: @spammer)
         @forum_post = create(:forum_post, topic: @forum_topic, creator: @spammer)
@@ -15,10 +16,9 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "new action" do
-      should "render the access denied page" do
-        get_auth new_moderation_report_path, User.anonymous
+      should "render the access denied page for anonymous users" do
+        get new_moderation_report_path
         assert_response 403
-        assert_select "h1", /Access Denied/
       end
 
       should "render" do
@@ -32,13 +32,12 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
         create(:moderation_report, model: @comment, creator: @user)
       end
 
-      should "render the access denied page" do
+      should "render the access denied page for members" do
         get_auth moderation_reports_path, @user
         assert_response 403
-        assert_select "h1", /Access Denied/
       end
 
-      should "render" do
+      should "render for mods" do
         get_auth moderation_reports_path, @mod
         assert_response :success
       end
@@ -48,6 +47,14 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
           get_auth moderation_reports_path, @mod, params: {:search => {:model_id => @comment.id}}
           assert_response :success
         end
+      end
+    end
+
+    context "show action" do
+      should "redirect" do
+        @report = create(:moderation_report, model: @comment, creator: @user)
+        get_auth moderation_report_path(@report), @mod
+        assert_redirected_to moderation_reports_path(search: { id: @report.id })
       end
     end
 
@@ -62,6 +69,13 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
       should "create a new moderation report on a forum post" do
         assert_difference("ModerationReport.count", 1) do
           post_auth moderation_reports_path, @user, params: { format: "js", moderation_report: { model_id: @forum_post.id, model_type: "ForumPost", reason: "xxx" }}
+          assert_response :success
+        end
+      end
+
+      should "create a new moderation report on a dmail" do
+        assert_difference("ModerationReport.count", 1) do
+          post_auth moderation_reports_path, @user, params: { format: "js", moderation_report: { model_id: @dmail.id, model_type: "Dmail", reason: "xxx" }}
           assert_response :success
         end
       end

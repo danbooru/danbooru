@@ -17,8 +17,7 @@ class User < ApplicationRecord
   # Used for `before_action :<role>_only`. Must have a corresponding `is_<role>?` method.
   Roles = Levels.constants.map(&:downcase) + [
     :banned,
-    :approver,
-    :voter
+    :approver
   ]
 
   # candidates for removal:
@@ -322,6 +321,10 @@ class User < ApplicationRecord
       User.level_string(value || level)
     end
 
+    def is_deleted?
+      name.match?(/\Auser_[0-9]+~*\z/)
+    end
+
     def is_anonymous?
       level == Levels::ANONYMOUS
     end
@@ -348,10 +351,6 @@ class User < ApplicationRecord
 
     def is_admin?
       level >= Levels::ADMIN
-    end
-
-    def is_voter?
-      is_gold?
     end
 
     def is_approver?
@@ -424,14 +423,6 @@ class User < ApplicationRecord
 
     def can_remove_from_pools?
       created_at <= 1.week.ago
-    end
-
-    def can_view_flagger?(flagger_id)
-      is_moderator? || flagger_id == id
-    end
-
-    def can_view_flagger_on_post?(flag)
-      (is_moderator? && flag.not_uploaded_by?(id)) || flag.creator_id == id
     end
 
     def upload_limit
@@ -691,10 +682,6 @@ class User < ApplicationRecord
 
   def as_current(&block)
     CurrentUser.as(self, &block)
-  end
-
-  def reportable_by?(user)
-    ModerationReport.enabled? && user.is_builder? && id != user.id && !is_moderator?
   end
 
   def hide_favorites?

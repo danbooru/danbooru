@@ -335,27 +335,21 @@ class PostQueryBuilder
       end
     end
 
-    if q[:flagger_ids_neg]
-      q[:flagger_ids_neg].each do |flagger_id|
-        if CurrentUser.can_view_flagger?(flagger_id)
-          post_ids = PostFlag.unscoped.search(:creator_id => flagger_id, :category => "normal").reorder("").select {|flag| flag.not_uploaded_by?(CurrentUser.id)}.map {|flag| flag.post_id}.uniq
-          if post_ids.any?
-            relation = relation.where.not("posts.id": post_ids)
-          end
-        end
-      end
+    q[:flaggers_neg].to_a.each do |flagger|
+      flags = PostFlag.unscoped.creator_matches(flagger, CurrentUser.user).where("post_id = posts.id").select("1")
+      relation = relation.where("NOT EXISTS (#{flags.to_sql})")
     end
 
-    if q[:flagger_ids]
-      q[:flagger_ids].each do |flagger_id|
-        if flagger_id == "any"
-          relation = relation.where('EXISTS (' + PostFlag.unscoped.search(:category => "normal").where('post_id = posts.id').reorder('').select('1').to_sql + ')')
-        elsif flagger_id == "none"
-          relation = relation.where('NOT EXISTS (' + PostFlag.unscoped.search(:category => "normal").where('post_id = posts.id').reorder('').select('1').to_sql + ')')
-        elsif CurrentUser.can_view_flagger?(flagger_id)
-          post_ids = PostFlag.unscoped.search(creator_id: flagger_id, category: "normal").reorder("").select {|flag| flag.not_uploaded_by?(CurrentUser.id)}.map(&:post_id).uniq
-          relation = relation.where("posts.id": post_ids)
-        end
+    q[:flaggers].to_a.each do |flagger|
+      if flagger == "any"
+        flags = PostFlag.unscoped.category_matches("normal").where("post_id = posts.id").select("1")
+        relation = relation.where("EXISTS (#{flags.to_sql})")
+      elsif flagger == "none"
+        flags = PostFlag.unscoped.category_matches("normal").where("post_id = posts.id").select("1")
+        relation = relation.where("NOT EXISTS (#{flags.to_sql})")
+      else
+        flags = PostFlag.unscoped.creator_matches(flagger, CurrentUser.user).where("post_id = posts.id").select("1")
+        relation = relation.where("EXISTS (#{flags.to_sql})")
       end
     end
 
@@ -505,14 +499,14 @@ class PostQueryBuilder
       relation = relation.where(id: FavoriteGroup.where(id: favgroup.id).select("unnest(post_ids)"))
     end
 
-    if q[:upvote].present?
-      post_ids = PostVote.where(user: q[:upvote]).where("score > 0").select(:post_id)
-      relation = relation.where("posts.id": post_ids)
+    q[:upvoter].to_a.each do |voter|
+      votes = PostVote.positive.visible(CurrentUser.user).where(user: voter).where("post_id = posts.id").select("1")
+      relation = relation.where("EXISTS (#{votes.to_sql})")
     end
 
-    if q[:downvote].present?
-      post_ids = PostVote.where(user: q[:downvote]).where("score < 0").select(:post_id)
-      relation = relation.where("posts.id": post_ids)
+    q[:downvoter].to_a.each do |voter|
+      votes = PostVote.negative.visible(CurrentUser.user).where(user: voter).where("post_id = posts.id").select("1")
+      relation = relation.where("EXISTS (#{votes.to_sql})")
     end
 
     if q[:ordfav].present?
@@ -738,28 +732,29 @@ class PostQueryBuilder
               end
 
             when "flagger"
-              q[:flagger_ids] ||= []
-
               if g2 == "none"
-                q[:flagger_ids] << "none"
+                q[:flaggers] ||= []
+                q[:flaggers] << "none"
               elsif g2 == "any"
-                q[:flagger_ids] << "any"
+                q[:flaggers] ||= []
+                q[:flaggers] << "any"
               else
-                user_id = User.name_to_id(g2)
-                q[:flagger_ids] << user_id unless user_id.blank?
+                user = User.find_by_name(g2)
+                q[:flaggers] ||= []
+                q[:flaggers] << user unless user.blank?
               end
 
             when "-flagger"
               if g2 == "none"
-                q[:flagger_ids] ||= []
-                q[:flagger_ids] << "any"
+                q[:flaggers] ||= []
+                q[:flaggers] << "any"
               elsif g2 == "any"
-                q[:flagger_ids] ||= []
-                q[:flagger_ids] << "none"
+                q[:flaggers] ||= []
+                q[:flaggers] << "none"
               else
-                q[:flagger_ids_neg] ||= []
-                user_id = User.name_to_id(g2)
-                q[:flagger_ids_neg] << user_id unless user_id.blank?
+                user = User.find_by_name(g2)
+                q[:flaggers_neg] ||= []
+                q[:flaggers_neg] << user unless user.blank?
               end
 
             when "appealer"
@@ -842,14 +837,14 @@ class PostQueryBuilder
 
             when "-favgroup"
               favgroup = FavoriteGroup.find_by_name_or_id!(g2, CurrentUser.user)
-              raise User::PrivilegeError unless favgroup.viewable_by?(CurrentUser.user)
+              raise User::PrivilegeError unless Pundit.policy!([CurrentUser.user, nil], favgroup).show?
 
               q[:favgroups_neg] ||= []
               q[:favgroups_neg] << favgroup
 
             when "favgroup"
               favgroup = FavoriteGroup.find_by_name_or_id!(g2, CurrentUser.user)
-              raise User::PrivilegeError unless favgroup.viewable_by?(CurrentUser.user)
+              raise User::PrivilegeError unless Pundit.policy!([CurrentUser.user, nil], favgroup).show?
 
               q[:favgroups] ||= []
               q[:favgroups] << favgroup
@@ -999,18 +994,14 @@ class PostQueryBuilder
               end
 
             when "upvote"
-              if CurrentUser.user.is_admin?
-                q[:upvote] = User.find_by_name(g2)
-              elsif CurrentUser.user.is_voter?
-                q[:upvote] = CurrentUser.user
-              end
+              user = User.find_by_name(g2)
+              q[:upvoter] ||= []
+              q[:upvoter] << user unless user.blank?
 
             when "downvote"
-              if CurrentUser.user.is_admin?
-                q[:downvote] = User.find_by_name(g2)
-              elsif CurrentUser.user.is_voter?
-                q[:downvote] = CurrentUser.user
-              end
+              user = User.find_by_name(g2)
+              q[:downvoter] ||= []
+              q[:downvoter] << user unless user.blank?
 
             when *COUNT_METATAGS
               q[g1.to_sym] = parse_helper(g2)

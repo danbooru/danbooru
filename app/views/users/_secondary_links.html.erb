@@ -22,13 +22,16 @@
       <% if !@user.is_platinum? %>
         <%= subnav_link_to "Gift upgrade", new_user_upgrade_path(:user_id => @user.id) %>
       <% end %>
-      <% if @user.reportable_by?(CurrentUser.user) %>
+      <% if policy(@user).reportable? %>
         <%= subnav_link_to "Report user", new_moderation_report_path(moderation_report: { model_type: "User", model_id: @user.id }), remote: true %>
       <% end %>
     <% end %>
 
-    <% if CurrentUser.user.is_moderator? %>
+    <% if policy(CurrentUser.user).promote? %>
       <%= subnav_link_to "Promote", edit_admin_user_path(@user) %>
+    <% end %>
+
+    <% if policy(Ban.new(user: @user)).create? %>
       <% if @user.is_banned? && @user.recent_ban.present? %>
         <%= subnav_link_to "Unban", ban_path(@user.recent_ban) %>
       <% else %>

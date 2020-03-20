@@ -2792,31 +2792,6 @@ class PostTest < ActiveSupport::TestCase
     end
   end
 
-  context "Notes:" do
-    context "#copy_notes_to" do
-      setup do
-        @src = FactoryBot.create(:post, image_width: 100, image_height: 100, tag_string: "translated partially_translated", has_embedded_notes: true)
-        @dst = FactoryBot.create(:post, image_width: 200, image_height: 200, tag_string: "translation_request")
-
-        create(:note, post: @src, x: 10, y: 10, width: 10, height: 10, body: "test")
-        create(:note, post: @src, x: 10, y: 10, width: 10, height: 10, body: "deleted", is_active: false)
-
-        @src.reload.copy_notes_to(@dst)
-      end
-
-      should "copy notes and tags" do
-        assert_equal(1, @dst.notes.active.length)
-        assert_equal(true, @dst.has_embedded_notes)
-        assert_equal("lowres partially_translated translated", @dst.tag_string)
-      end
-
-      should "rescale notes" do
-        note = @dst.notes.active.first
-        assert_equal([20, 20, 20, 20], [note.x, note.y, note.width, note.height])
-      end
-    end
-  end
-
   context "#replace!" do
     subject { @post.replace!(tags: "something", replacement_url: "https://danbooru.donmai.us/images/download-preview.png") }
 

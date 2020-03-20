@@ -2,15 +2,17 @@
   <%= quick_search_form_for(:body_matches, forum_posts_path, "forum posts") %>
   <%= subnav_link_to "Listing", forum_topics_path %>
   
-  <% if CurrentUser.is_member? %>
+  <% if policy(ForumTopic).create? %>
     <%= subnav_link_to "New", new_forum_topic_path %>
+  <% end %>
+  <% if policy(ForumTopic).mark_all_as_read? %>
     <%= subnav_link_to "Mark all as read", mark_all_as_read_forum_topics_path, :method => :post, :"data-shortcut" => "shift+r" %>
+  <% end %>
 
-    <% if @forum_topic %>
-      <%= subnav_link_to "Request alias/implication", new_bulk_update_request_path(bulk_update_request: { forum_topic_id: @forum_topic.id }) %>
-    <% else %>
-      <%= subnav_link_to "Request alias/implication", new_bulk_update_request_path %>
-    <% end %>
+  <% if @forum_topic && policy(BulkUpdateRequest.new(forum_topic: @forum_topic)).create? %>
+    <%= subnav_link_to "Request alias/implication", new_bulk_update_request_path(bulk_update_request: { forum_topic_id: @forum_topic.id }) %>
+  <% else %>
+    <%= subnav_link_to "Request alias/implication", new_bulk_update_request_path %>
   <% end %>
   
   <%= subnav_link_to "Search", search_forum_posts_path %>
@@ -18,9 +20,9 @@
   <% if CurrentUser.is_member? && @forum_topic && !@forum_topic.new_record? %>
     <li>|</li>
     <%= subnav_link_to "Reply", new_forum_post_path(:topic_id => @forum_topic.id) %>
-    <% if !@forum_topic.new_record? && @forum_topic.editable_by?(CurrentUser.user) %>
+    <% if !@forum_topic.new_record? && policy(@forum_topic).update? %>
       <%= subnav_link_to "Edit", edit_forum_topic_path(@forum_topic), "data-shortcut": "e" %>
-      <% if CurrentUser.is_moderator? %>
+      <% if policy(@forum_topic).destroy? # XXX %>
         <% if @forum_topic.is_deleted? %>
           <%= subnav_link_to "Undelete", undelete_forum_topic_path(@forum_topic), :method => :post %>
         <% else %>

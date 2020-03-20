@@ -23,7 +23,7 @@
   <% t.column column: "control", width: "15%" do |tag_alias| %>
     <%= link_to "Show", tag_alias_path(tag_alias) %>
 
-    <% if tag_alias.deletable_by?(CurrentUser.user) %>
+    <% if policy(tag_alias).destroy? %>
       | <%= link_to "Delete", tag_alias_path(tag_alias), :remote => true, :method => :delete, :data => {:confirm => "Are you sure you want to delete this alias?"} %>
     <% end %>
   <% end %>

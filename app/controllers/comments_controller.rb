@@ -1,7 +1,6 @@
 class CommentsController < ApplicationController
   respond_to :html, :xml, :json, :atom
   respond_to :js, only: [:new, :destroy, :undelete]
-  before_action :member_only, :except => [:index, :search, :show]
   skip_before_action :api_check
 
   def index
@@ -20,20 +19,25 @@ class CommentsController < ApplicationController
   end
 
   def new
-    @comment = Comment.new(comment_params(:create))
-    @comment.body = Comment.find(params[:id]).quoted_response if params[:id]
+    if params[:id]
+      quoted_comment = Comment.find(params[:id])
+      @comment = authorize Comment.new(post_id: quoted_comment.post_id, body: quoted_comment.quoted_response)
+    else
+      @comment = authorize Comment.new(permitted_attributes(Comment))
+    end
+
     respond_with(@comment)
   end
 
   def update
-    @comment = Comment.find(params[:id])
-    check_privilege(@comment)
-    @comment.update(comment_params(:update))
+    @comment = authorize Comment.find(params[:id])
+    @comment.update(permitted_attributes(@comment))
     respond_with(@comment, :location => post_path(@comment.post_id))
   end
 
   def create
-    @comment = Comment.create(comment_params(:create).merge(creator: CurrentUser.user, creator_ip_addr: CurrentUser.ip_addr))
+    @comment = authorize Comment.new(creator: CurrentUser.user, creator_ip_addr: CurrentUser.ip_addr)
+    @comment.update(permitted_attributes(@comment))
     flash[:notice] = @comment.valid? ? "Comment posted" : @comment.errors.full_messages.join("; ")
     respond_with(@comment) do |format|
       format.html do
@@ -43,13 +47,12 @@ class CommentsController < ApplicationController
   end
 
   def edit
-    @comment = Comment.find(params[:id])
-    check_privilege(@comment)
+    @comment = authorize Comment.find(params[:id])
     respond_with(@comment)
   end
 
   def show
-    @comment = Comment.find(params[:id])
+    @comment = authorize Comment.find(params[:id])
 
     respond_with(@comment) do |format|
       format.html do
@@ -59,15 +62,13 @@ class CommentsController < ApplicationController
   end
 
   def destroy
-    @comment = Comment.find(params[:id])
-    check_privilege(@comment)
+    @comment = authorize Comment.find(params[:id])
     @comment.update(is_deleted: true)
     respond_with(@comment)
   end
 
   def undelete
-    @comment = Comment.find(params[:id])
-    check_privilege(@comment)
+    @comment = authorize Comment.find(params[:id])
     @comment.update(is_deleted: false)
     respond_with(@comment)
   end
@@ -102,20 +103,5 @@ class CommentsController < ApplicationController
     end
 
     respond_with(@comments)
-  end
-
-  def check_privilege(comment)
-    if !comment.editable_by?(CurrentUser.user)
-      raise User::PrivilegeError
-    end
-  end
-
-  def comment_params(context)
-    permitted_params = %i[body post_id]
-    permitted_params += %i[do_not_bump_post] if context == :create
-    permitted_params += %i[is_deleted] if context == :update
-    permitted_params += %i[is_sticky] if CurrentUser.is_moderator?
-
-    params.fetch(:comment, {}).permit(permitted_params)
   end
 end

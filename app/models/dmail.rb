@@ -1,9 +1,7 @@
 require 'digest/sha1'
 
 class Dmail < ApplicationRecord
-
   validates_presence_of :title, :body, on: :create
-  validate :validate_sender_is_not_banned, on: :create
 
   belongs_to :owner, :class_name => "User"
   belongs_to :to, :class_name => "User"
@@ -123,10 +121,6 @@ class Dmail < ApplicationRecord
     def valid_key?(key)
       id == verifier.verified(key)
     end
-
-    def visible_to?(user, key)
-      owner_id == user.id || valid_key?(key)
-    end
   end
 
   include AddressMethods
@@ -135,12 +129,6 @@ class Dmail < ApplicationRecord
 
   def self.mark_all_as_read
     unread.update(is_read: true)
-  end
-
-  def validate_sender_is_not_banned
-    if from.try(:is_banned?)
-      errors[:base] << "Sender is banned and cannot send messages"
-    end
   end
 
   def quoted_body
@@ -179,10 +167,6 @@ class Dmail < ApplicationRecord
       unread_count = owner.dmails.active.unread.count
       owner.update!(unread_dmail_count: unread_count)
     end
-  end
-
-  def reportable_by?(user)
-    owner == user && is_recipient? && !is_automated? && !from.is_moderator?
   end
 
   def dtext_shortlink(key: false, **options)

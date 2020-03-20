@@ -26,6 +26,14 @@ class PostApprovalsControllerTest < ActionDispatch::IntegrationTest
           assert(!@post.reload.is_deleted?)
         end
       end
+
+      should "not allow non-approvers to approve posts" do
+        @post = create(:post, is_pending: true)
+        post_auth post_approvals_path(post_id: @post.id, format: :js), create(:user)
+
+        assert_response 403
+        assert_equal(true, @post.reload.is_pending?)
+      end
     end
 
     context "index action" do

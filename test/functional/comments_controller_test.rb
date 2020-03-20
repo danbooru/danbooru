@@ -151,6 +151,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
 
         should "fail if updater is not a moderator" do
           put_auth comment_path(@comment.id), @user, params: {comment: {is_sticky: true}}
+          assert_response 403
           assert_equal(false, @comment.reload.is_sticky)
         end
       end
@@ -169,18 +170,27 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow changing do_not_bump_post or post_id" do
-        as_user do
-          @another_post = create(:post)
-        end
-        put_auth comment_path(@comment.id), @comment.creator, params: {do_not_bump_post: true, post_id: @another_post.id}
+        @another_post = as(@user) { create(:post) }
+
+        put_auth comment_path(@comment.id), @comment.creator, params: { do_not_bump_post: true }
+        assert_response 403
         assert_equal(false, @comment.reload.do_not_bump_post)
-        assert_equal(@post.id, @comment.post_id)
+
+        put_auth comment_path(@comment.id), @comment.creator, params: { post_id: @another_post.id }
+        assert_response 403
+        assert_equal(@post.id, @comment.reload.post_id)
       end
     end
 
     context "new action" do
-      should "redirect" do
+      should "work" do
         get_auth new_comment_path, @user
+        assert_response :success
+      end
+
+      should "work when quoting a post" do
+        @comment = create(:comment)
+        get_auth new_comment_path(id: @comment.id), @user, as: :javascript
         assert_response :success
       end
     end

@@ -243,6 +243,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_difference("Upload.count", 1) do
           file = Rack::Test::UploadedFile.new("#{Rails.root}/test/files/test.jpg", "image/jpeg")
           post_auth uploads_path, @user, params: {:upload => {:file => file, :tag_string => "aaa", :rating => "q", :source => "aaa"}}
+          assert_redirected_to Upload.last
         end
       end
     end

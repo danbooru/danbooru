@@ -37,7 +37,7 @@ module Moderator
 
         context "confirm_move_favorites action" do
           should "render" do
-            get_auth confirm_ban_moderator_post_post_path(@post), @admin
+            get_auth confirm_move_favorites_moderator_post_post_path(@post), @admin
             assert_response :success
           end
         end
@@ -78,18 +78,11 @@ module Moderator
           end
         end
 
-        context "confirm_ban action" do
-          should "render" do
-            get_auth confirm_ban_moderator_post_post_path(@post), @admin
-            assert_response :success
-          end
-        end
-
         context "ban action" do
           should "render" do
-            post_auth ban_moderator_post_post_path(@post), @admin, params: { commit: "Ban", format: "js" }
+            post_auth ban_moderator_post_post_path(@post), @admin
 
-            assert_response :success
+            assert_redirected_to @post
             assert_equal(true, @post.reload.is_banned?)
           end
         end
@@ -97,7 +90,7 @@ module Moderator
         context "unban action" do
           should "render" do
             @post.ban!
-            post_auth unban_moderator_post_post_path(@post), @admin, params: { format: "js" }
+            post_auth unban_moderator_post_post_path(@post), @admin
 
             assert_redirected_to(@post)
             assert_equal(false, @post.reload.is_banned?)

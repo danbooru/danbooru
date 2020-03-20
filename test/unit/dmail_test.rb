@@ -25,16 +25,6 @@ class DmailTest < ActiveSupport::TestCase
       end
     end
 
-    context "from a banned user" do
-      should "not validate" do
-        user = create(:banned_user)
-        dmail = build(:dmail, owner: user, from: user)
-
-        assert_equal(false, dmail.valid?)
-        assert_equal(["Sender is banned and cannot send messages"], dmail.errors.full_messages)
-      end
-    end
-
     context "search" do
       should "return results based on title contents" do
         dmail = FactoryBot.create(:dmail, :title => "xxx", :owner => @user)

@@ -1,4 +1,6 @@
 class ApplicationController < ActionController::Base
+  include Pundit
+
   class ApiLimitError < StandardError; end
 
   self.responder = ApplicationResponder
@@ -92,7 +94,7 @@ class ApplicationController < ActionController::Base
       render_error_page(401, exception, template: "sessions/new")
     when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest
       render_error_page(403, exception)
-    when User::PrivilegeError
+    when User::PrivilegeError, Pundit::NotAuthorizedError
       render_error_page(403, exception, template: "static/access_denied", message: "Access denied")
     when ActiveRecord::RecordNotFound
       render_error_page(404, exception, message: "That record was not found.")
@@ -163,15 +165,12 @@ class ApplicationController < ActionController::Base
     raise User::PrivilegeError if !request.get? && IpBan.is_banned?(CurrentUser.ip_addr)
   end
 
-  def role_only!(role)
-    raise User::PrivilegeError if !CurrentUser.send("is_#{role}?")
-    raise User::PrivilegeError if !request.get? && CurrentUser.user.is_banned?
+  def pundit_user
+    [CurrentUser.user, request]
   end
 
-  User::Roles.each do |role|
-    define_method("#{role}_only") do
-      role_only!(role)
-    end
+  def pundit_params_for(record)
+    params.fetch(PolicyFinder.new(record).param_key, {})
   end
 
   # Remove blank `search` params from the url.

@@ -1,7 +1,7 @@
 <%= error_messages_for("forum_post") %>
 
 <%= edit_form_for(forum_post) do |f| %>
-  <% if @forum_topic %>
+  <% if forum_post.topic_id.present? %>
     <%= f.input :topic_id, :as => :hidden %>
   <% else %>
     <%= f.input :topic_id, :label => "Topic ID" %>

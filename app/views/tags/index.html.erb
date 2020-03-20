@@ -16,7 +16,9 @@
         <% end %>
       <% end %>
       <% t.column column: "control" do |tag| %>
-        <%= link_to_if tag.editable_by?(CurrentUser.user), "Edit", edit_tag_path(tag) %> |
+        <% if policy(tag).update? %>
+          <%= link_to "Edit", edit_tag_path(tag) %> |
+        <% end %>
         <%= link_to "History", post_versions_path(search: { changed_tags: tag.name }) %> |
         <%= link_to "Related", related_tag_path(search: { query: tag.name }) %> |
         <%= link_to "Similar", tags_path(search: { fuzzy_name_matches: tag.name, order: :similarity }) %>

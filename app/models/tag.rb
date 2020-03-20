@@ -210,7 +210,7 @@ class Tag < ApplicationRecord
             # next few lines if the category is changed.
             tag.update_category_cache
 
-            if tag.editable_by?(creator)
+            if Pundit.policy!([creator, nil], tag).can_change_category?
               tag.update(category: category_id)
             end
           end
@@ -380,13 +380,6 @@ class Tag < ApplicationRecord
   def self.convert_cosplay_tags(tags)
     cosplay_tags, other_tags = tags.partition {|tag| tag.match(/\A(.+)_\(cosplay\)\Z/) }
     cosplay_tags.grep(/\A(.+)_\(cosplay\)\Z/) { "#{TagAlias.to_aliased([$1]).first}_(cosplay)" } + other_tags
-  end
-
-  def editable_by?(user)
-    return true if user.is_admin?
-    return true if !is_locked? && user.is_builder? && post_count < 1_000
-    return true if !is_locked? && user.is_member? && post_count < 50
-    return false
   end
 
   def posts

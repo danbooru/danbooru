@@ -28,7 +28,7 @@
     <% end %>
   </div>
 
-  <% if CurrentUser.is_member? %>
+  <% if policy(Comment).create? %>
     <div class="new-comment">
       <p><%= link_to "Post comment", new_comment_path(comment: { post_id: post.id }), :class => "expand-comment-response" %></p>
       <%= render "comments/form", comment: post.comments.new, hidden: true %>
