@@ -5,7 +5,7 @@ module Sources::Strategies
 
     # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg
     # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb?format=jpg&name=900x900
-    BASE_IMAGE_URL = %r!\Ahttps?://pbs\.twimg\.com/media!i
+    BASE_IMAGE_URL = %r!\Ahttps?://pbs\.twimg\.com/(?<media_type>media|tweet_video_thumb)!i
     FILENAME1 = %r!(?<file_name>[a-zA-Z0-9_-]+)\.(?<file_ext>\w+)!i
     FILENAME2 = %r!(?<file_name>[a-zA-Z0-9_-]+)\?.*format=(?<file_ext>\w+)!i
     IMAGE_URL = %r!#{BASE_IMAGE_URL}/#{Regexp.union(FILENAME1, FILENAME2)}!i
@@ -62,7 +62,7 @@ module Sources::Strategies
 
     def image_urls
       if url =~ IMAGE_URL
-        ["https://pbs.twimg.com/media/#{$~[:file_name]}.#{$~[:file_ext]}:orig"]
+        ["https://pbs.twimg.com/#{$~[:media_type]}/#{$~[:file_name]}.#{$~[:file_ext]}:orig"]
       elsif api_response.present?
         api_response.dig(:extended_entities, :media).to_a.map do |media|
           if media[:type] == "photo"
