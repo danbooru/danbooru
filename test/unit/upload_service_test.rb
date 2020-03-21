@@ -948,7 +948,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
           as_user do
             @post.update(image_width: 160, image_height: 164)
-            @note = @post.notes.create(x: 80, y: 82, width: 80, height: 82, body: "test", creator: @post.uploader)
+            @note = @post.notes.create(x: 80, y: 82, width: 80, height: 82, body: "test")
             @note.reload
           end
         end
@@ -1212,7 +1212,14 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       should "create a commentary record" do
         assert_difference(-> { ArtistCommentary.count }) do
-          subject.new(include_artist_commentary: true, artist_commentary_title: "blah", artist_commentary_desc: "blah").create_post_from_upload(@upload)
+          @upload.update!(
+            include_artist_commentary: true,
+            artist_commentary_title: "blah",
+            artist_commentary_desc: "blah",
+            translated_commentary_title: "blah",
+            translated_commentary_desc: "blah"
+          )
+          UploadService.new({}).create_post_from_upload(@upload)
         end
       end
 
@@ -1285,7 +1292,6 @@ class UploadServiceTest < ActiveSupport::TestCase
       @upload = as(@user) { UploadService.new(source: "http://14903gf0vm3g134yjq3n535yn3n.com/does_not_exist.jpg").start! }
 
       assert(@upload.is_errored?)
-      assert_nil(@upload.md5)
       assert_difference("Upload.count", -1) { @upload.destroy! }
     end
   end

@@ -100,22 +100,15 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
 
     context "revert action" do
       setup do
-        as_user do
-          @post_2 = create(:post)
-          @pool = create(:pool, post_ids: [@post.id])
-        end
-        CurrentUser.scoped(@user, "1.2.3.4") do
-          @pool.update(post_ids: [@post.id, @post_2.id])
-        end
+        @post_2 = as(@user) { create(:post) }
+        @pool = as(@user) { create(:pool, post_ids: [@post.id]) }
+        as(@mod) { @pool.update!(post_ids: [@post.id, @post_2.id]) }
       end
 
       should "revert to a previous version" do
-        @pool.reload
-        version = @pool.versions.first
-        assert_equal([@post.id], version.post_ids)
-        put_auth revert_pool_path(@pool), @mod, params: {:version_id => version.id}
-        @pool.reload
-        assert_equal([@post.id], @pool.post_ids)
+        put_auth revert_pool_path(@pool), @mod, params: { version_id: @pool.versions.first.id }
+        assert_redirected_to @pool
+        assert_equal([@post.id], @pool.reload.post_ids)
       end
 
       should "not allow reverting to a previous version of another pool" do

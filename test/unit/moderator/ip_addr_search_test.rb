@@ -4,24 +4,12 @@ module Moderator
   class IpAddrSearchTest < ActiveSupport::TestCase
     context "an ip addr search" do
       setup do
-        @user = FactoryBot.create(:user)
-        CurrentUser.user = @user
-        CurrentUser.ip_addr = "127.0.0.1"
-        Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
-        @comment = create(:comment, creator: @user, creator_ip_addr: "127.0.0.1")
-        PoolVersion.stubs(:enabled?).returns(false)
-        PostVersion.stubs(:enabled?).returns(false)
-        @user.reload
-      end
-
-      teardown do
-        CurrentUser.user = nil
-        CurrentUser.ip_addr = nil
+        @user = create(:user, last_ip_addr: "127.0.0.1")
       end
 
       should "find by ip addr" do
         @search = IpAddrSearch.new(:ip_addr => "127.0.0.1")
-        assert_equal({@user => 1, @comment.post.uploader => 1}, @search.execute)
+        assert_equal({@user => 1}, @search.execute)
       end
 
       should "find by user id" do

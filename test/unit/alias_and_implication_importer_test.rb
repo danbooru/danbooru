@@ -88,14 +88,14 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
     end
 
     should "rename an aliased tag's artist entry and wiki page" do
-      tag1 = FactoryBot.create(:tag, :name => "aaa", :category => 1)
-      tag2 = FactoryBot.create(:tag, :name => "bbb")
-      artist = FactoryBot.create(:artist, :name => "aaa", :notes => "testing")
+      tag1 = create(:tag, name: "aaa", category: 1)
+      tag2 = create(:tag, name: "bbb")
+      wiki = create(:wiki_page, title: "aaa")
+      artist = create(:artist, name: "aaa")
       @importer = AliasAndImplicationImporter.new("create alias aaa -> bbb", "", "1")
       @importer.process!
-      artist.reload
-      assert_equal("bbb", artist.name)
-      assert_equal("testing", artist.notes)
+      assert_equal("bbb", artist.reload.name)
+      assert_equal("bbb", wiki.reload.title)
     end
 
     context "remove alias and remove implication commands" do

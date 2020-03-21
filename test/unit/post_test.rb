@@ -1770,13 +1770,15 @@ class PostTest < ActiveSupport::TestCase
         assert_equal("", @child.fav_string)
         assert_equal([], @child.favorites.pluck(:user_id))
 
-        assert_equal(3, @parent.fav_count)
-        assert_equal(3, @parent.favorites.count)
+        assert_equal(2, @parent.fav_count)
+        assert_equal(2, @parent.favorites.count)
+        assert_equal("fav:#{@user1.id} fav:#{@gold1.id}", @parent.fav_string)
+        assert_equal([@user1.id, @gold1.id], @parent.favorites.pluck(:user_id))
       end
 
       should "create a vote for each user who can vote" do
         assert(@parent.votes.where(user: @gold1).exists?)
-        assert_equal(4, @parent.score)
+        assert_equal(1, @parent.score)
       end
     end
   end

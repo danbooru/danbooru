@@ -3,7 +3,7 @@ require 'test_helper'
 class PostApprovalTest < ActiveSupport::TestCase
   context "a pending post" do
     setup do
-      @user = FactoryBot.create(:user)
+      @user = FactoryBot.create(:user, created_at: 2.weeks.ago)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
 

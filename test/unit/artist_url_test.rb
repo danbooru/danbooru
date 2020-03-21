@@ -191,12 +191,12 @@ class ArtistUrlTest < ActiveSupport::TestCase
       subject { ArtistUrl }
 
       should "work" do
-        @bkub = create(:artist, name: "bkub", url_string: "https://bkub.com")
-        @masao = create(:artist, name: "masao", url_string: "-https://masao.com")
+        @bkub = create(:artist, name: "bkub", is_deleted: false, url_string: "https://bkub.com")
+        @masao = create(:artist, name: "masao", is_deleted: true, url_string: "-https://masao.com")
         @bkub_url = @bkub.urls.first
         @masao_url = @masao.urls.first
 
-        assert_search_equals([@bkub_url], is_deleted: false)
+        assert_search_equals([@bkub_url], is_active: true)
         assert_search_equals([@bkub_url], artist: { name: "bkub" })
 
         assert_search_equals([@bkub_url], url_matches: "*bkub*")

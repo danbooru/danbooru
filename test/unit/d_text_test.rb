@@ -93,7 +93,7 @@ class DTextTest < ActiveSupport::TestCase
 
       should "not link general tags to artist pages" do
         tag = create(:tag, name: "cat")
-        artist = create(:artist, name: "cat", is_active: false)
+        artist = create(:artist, name: "cat", is_deleted: true)
 
         assert_match(%r!/wiki_pages/cat!, DText.format_text("[[cat]]"))
       end

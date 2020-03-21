@@ -37,8 +37,8 @@ class PoolVersionsControllerTest < ActionDispatch::IntegrationTest
 
     context "diff action" do
       should "render" do
-        @post = create(:post)
-        @pool = as (@user) { create(:pool) }
+        @post = as(@user) { create(:post) }
+        @pool = as(@user) { create(:pool) }
         as (@user) { @pool.update(name: "blah", description: "desc", post_ids: [@post.id]) }
 
         get diff_pool_version_path(@pool.versions.last.id)

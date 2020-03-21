@@ -1,6 +1,5 @@
 FactoryBot.define do
   factory(:post) do
-    created_at { 2.weeks.ago }
     sequence :md5 do |n|
       n.to_s
     end

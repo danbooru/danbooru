@@ -52,12 +52,10 @@ class UserTest < ActiveSupport::TestCase
       Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
       Danbooru.config.stubs(:member_comment_limit).returns(10)
       assert(@user.can_comment_vote?)
-      10.times do
-        comment = FactoryBot.create(:comment)
-        FactoryBot.create(:comment_vote, :comment_id => comment.id, :score => -1)
-      end
 
+      create_list(:comment_vote, 10, user: @user, score: -1)
       assert(!@user.can_comment_vote?)
+
       CommentVote.update_all("created_at = '1990-01-01'")
       assert(@user.can_comment_vote?)
     end
