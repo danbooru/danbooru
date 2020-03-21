@@ -24,7 +24,7 @@ class PostVersionsController < ApplicationController
     @post_version = authorize PostVersion.find(params[:id])
     @post_version.undo!
 
-    respond_with(@post_version)
+    respond_with(@post_version, location: post_versions_path(search: { post_id: @post_version.post_id }))
   end
 
   private

@@ -31,7 +31,7 @@
         </div>
       <% end %>
       <% t.column do |post_version| %>
-        <% if policy(post_version).can_undo? %>
+        <% if policy(post_version).undo? %>
           <%= link_to "Undo", undo_post_version_path(post_version), method: :put, remote: true, class: "post-version-undo-link" %>
         <% end %>
         <% if listing_type(:post_id) == :revert && policy(post_version.post).revert? %>

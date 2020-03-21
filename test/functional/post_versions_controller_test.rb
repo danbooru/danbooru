@@ -5,7 +5,7 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
     @user = create(:user)
 
     as(@user) do
-      @post = create(:post, tag_string: "tagme", rating: "s")
+      @post = create(:post, tag_string: "tagme", rating: "s", source: "blah")
       travel(2.hours) { @post.update(tag_string: "1 2", source: "xxx") }
       travel(4.hours) { @post.update(tag_string: "2 3", rating: "e") }
       @post2 = create(:post)
@@ -45,10 +45,11 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
 
     context "undo action" do
       should "undo the edit" do
-        put_auth undo_post_version_path(@post.versions.first), @user
-        assert_response :success
-        assert_equal("s", @post.reload.rating)
-        assert_equal("tagme", @post.reload.tag_string)
+        put_auth undo_post_version_path(@post.versions.second), @user
+        assert_response :redirect
+        assert_equal("e", @post.reload.rating)
+        assert_equal("3 tagme", @post.tag_string)
+        assert_equal("blah", @post.source)
       end
 
       should "not allow non-members to undo edits" do
