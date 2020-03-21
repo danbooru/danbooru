@@ -9,7 +9,11 @@ class PostVersion < ApplicationRecord
     Rails.env.test? || Danbooru.config.aws_sqs_archives_url.present?
   end
 
-  establish_connection (ENV["ARCHIVE_DATABASE_URL"] || "archive_#{Rails.env}".to_sym) if enabled?
+  def self.database_url
+    ENV["ARCHIVE_DATABASE_URL"] || "archive_#{Rails.env}".to_sym
+  end
+
+  establish_connection database_url if enabled?
 
   def self.check_for_retry(msg)
     if msg =~ /can't get socket descriptor/ && msg =~ /post_versions/

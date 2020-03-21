@@ -23,7 +23,6 @@ class PostTest < ActiveSupport::TestCase
     end
     CurrentUser.user = @user
     CurrentUser.ip_addr = "127.0.0.1"
-    mock_pool_archive_service!
   end
 
   def teardown
@@ -838,15 +837,6 @@ class PostTest < ActiveSupport::TestCase
         end
 
         context "for a pool" do
-          setup do
-            mock_pool_archive_service!
-            start_pool_archive_transaction
-          end
-
-          teardown do
-            rollback_pool_archive_transaction
-          end
-
           context "on creation" do
             setup do
               @pool = FactoryBot.create(:pool)
@@ -1863,10 +1853,6 @@ class PostTest < ActiveSupport::TestCase
   end
 
   context "Searching:" do
-    setup do
-      mock_pool_archive_service!
-    end
-
     should "return posts for the age:<1minute tag" do
       post = FactoryBot.create(:post)
       assert_tag_match([post], "age:<1minute")

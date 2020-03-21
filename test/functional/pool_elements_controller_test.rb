@@ -3,18 +3,12 @@ require 'test_helper'
 class PoolElementsControllerTest < ActionDispatch::IntegrationTest
   context "The pools posts controller" do
     setup do
-      mock_pool_archive_service!
-      start_pool_archive_transaction
       @user = travel_to(1.month.ago) {create(:user)}
       @mod = create(:moderator_user)
       as_user do
         @post = create(:post)
         @pool = create(:pool, :name => "abc")
       end
-    end
-
-    teardown do
-      rollback_pool_archive_transaction
     end
 
     context "create action" do

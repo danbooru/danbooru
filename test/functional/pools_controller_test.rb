@@ -3,10 +3,6 @@ require 'test_helper'
 class PoolsControllerTest < ActionDispatch::IntegrationTest
   context "The pools controller" do
     setup do
-      mock_pool_archive_service!
-      PoolVersion.sqs_service.stubs(:merge?).returns(false)
-      start_pool_archive_transaction
-
       travel_to(1.month.ago) do
         @user = create(:user)
         @mod = create(:moderator_user)
@@ -15,10 +11,6 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
         @post = create(:post)
         @pool = create(:pool)
       end
-    end
-
-    teardown do
-      rollback_pool_archive_transaction
     end
 
     context "index action" do

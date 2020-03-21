@@ -8,14 +8,9 @@ class PoolTest < ActiveSupport::TestCase
     end
 
     CurrentUser.ip_addr = "127.0.0.1"
-
-    mock_pool_archive_service!
-    PoolVersion.sqs_service.stubs(:merge?).returns(false)
-    start_pool_archive_transaction
   end
 
   teardown do
-    rollback_pool_archive_transaction
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
   end

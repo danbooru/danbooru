@@ -57,13 +57,16 @@ end
 class ActiveSupport::TestCase
   include ActiveJob::TestHelper
   include FactoryBot::Syntax::Methods
-  include PostArchiveTestHelper
-  include PoolArchiveTestHelper
+  extend PostArchiveTestHelper
+  extend PoolArchiveTestHelper
   include ReportbooruHelper
   include DownloadTestHelper
   include IqdbTestHelper
   include UploadTestHelper
   include TestHelpers
+
+  mock_post_version_service!
+  mock_pool_version_service!
 
   setup do
     Socket.stubs(:gethostname).returns("www.example.com")
@@ -84,9 +87,12 @@ class ActiveSupport::TestCase
 end
 
 class ActionDispatch::IntegrationTest
-  include PostArchiveTestHelper
-  include PoolArchiveTestHelper
   include TestHelpers
+  extend PostArchiveTestHelper
+  extend PoolArchiveTestHelper
+
+  mock_post_version_service!
+  mock_pool_version_service!
 
   def method_authenticated(method_name, url, user, options)
     post session_path, params: { name: user.name, password: user.password }

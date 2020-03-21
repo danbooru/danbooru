@@ -1,54 +1,42 @@
 module PostArchiveTestHelper
-  def setup
-    super
+  def mock_post_version_service!
+    setup do
+      PostVersion.stubs(:sqs_service).returns(MockPostSqsService.new)
+      PostVersion.establish_connection(PostVersion.database_url)
+      PostVersion.connection.begin_transaction joinable: false
+    end
 
-    mock_post_archive_service!
-    start_post_archive_transaction
+    teardown do
+      PostVersion.connection.rollback_transaction
+    end
   end
 
-  def teardown
-    super
-
-    rollback_post_archive_transaction
-  end
-
-  def mock_post_archive_service!
-    mock_sqs_service = Class.new do
-      def send_message(msg, *options)
-        _, json = msg.split(/\n/)
-        json = JSON.parse(json)
-        json.delete("created_at")
-        json["version"] = 1 + PostVersion.where(post_id: json["post_id"]).count
-        prev = PostVersion.where(post_id: json["post_id"]).order("id desc").first
-        if prev
-          json["added_tags"] = json["tags"].scan(/\S+/) - prev.tags.scan(/\S+/)
-          json["removed_tags"] = prev.tags.scan(/\S+/) - json["tags"].scan(/\S+/)
-        else
-          json["added_tags"] = json["tags"].scan(/\S+/)
-        end
-        json["parent_changed"] = (prev.nil? || json.key?("parent_id") && prev.parent_id != json["parent_id"])
-        json["source_changed"] = (prev.nil? || json.key?("source") && prev.source != json["source"])
-        json["rating_changed"] = (prev.nil? || json.key?("rating") && prev.rating != json["rating"])
-        if merge?(prev, json)
-          prev.update_columns(json)
-        else
-          PostVersion.create(json)
-        end
+  class MockPostSqsService
+    def send_message(msg, *options)
+      _, json = msg.split(/\n/)
+      json = JSON.parse(json)
+      json.delete("created_at")
+      json["version"] = 1 + PostVersion.where(post_id: json["post_id"]).count
+      prev = PostVersion.where(post_id: json["post_id"]).order("id desc").first
+      if prev
+        json["added_tags"] = json["tags"].scan(/\S+/) - prev.tags.scan(/\S+/)
+        json["removed_tags"] = prev.tags.scan(/\S+/) - json["tags"].scan(/\S+/)
+      else
+        json["added_tags"] = json["tags"].scan(/\S+/)
       end
-
-      def merge?(prev, json)
-        prev && (prev.updater_id == json["updater_id"]) && (prev.updated_at >= 1.hour.ago)
+      json["parent_changed"] = (prev.nil? || json.key?("parent_id") && prev.parent_id != json["parent_id"])
+      json["source_changed"] = (prev.nil? || json.key?("source") && prev.source != json["source"])
+      json["rating_changed"] = (prev.nil? || json.key?("rating") && prev.rating != json["rating"])
+      if merge?(prev, json)
+        prev.update_columns(json)
+      else
+        # XXX change this to `create!` and fix tests that don't set current user.
+        PostVersion.create(json)
       end
     end
 
-    PostVersion.stubs(:sqs_service).returns(mock_sqs_service.new)
-  end
-
-  def start_post_archive_transaction
-    PostVersion.connection.begin_transaction joinable: false
-  end
-
-  def rollback_post_archive_transaction
-    PostVersion.connection.rollback_transaction
+    def merge?(prev, json)
+      prev && (prev.updater_id == json["updater_id"]) && (prev.updated_at >= 1.hour.ago)
+    end
   end
 end
