@@ -5,7 +5,7 @@ module BulkUpdateRequestPruner
     BulkUpdateRequest.old.pending.find_each do |bulk_update_request|
       if bulk_update_request.forum_topic
         body = "This bulk update request is pending automatic rejection in 5 days."
-        unless bulk_update_request.forum_topic.posts.where(creator_id: User.system.id, body: body).exists?
+        unless bulk_update_request.forum_topic.forum_posts.where(creator_id: User.system.id, body: body).exists?
           bulk_update_request.forum_updater.update(body)
         end
       end
