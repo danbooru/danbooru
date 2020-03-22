@@ -91,7 +91,8 @@ else
   user = User.find_by_name("albert")
 end
 
-CurrentUser.as_admin
+CurrentUser.user = User.admins.first
+CurrentUser.ip_addr = "127.0.0.1"
 
 if Upload.count == 0
   ENV["SKIP_CLOUDFLARE_CHECK"] = "true"

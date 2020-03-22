@@ -680,10 +680,6 @@ class User < ApplicationRecord
   include CountMethods
   extend SearchMethods
 
-  def as_current(&block)
-    CurrentUser.as(self, &block)
-  end
-
   def hide_favorites?
     !CurrentUser.is_admin? && enable_private_favorites? && CurrentUser.user.id != id
   end

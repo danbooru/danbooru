@@ -33,10 +33,6 @@ module TestHelpers
     CurrentUser.as(@user, &block)
   end
 
-  def as_admin(&block)
-    CurrentUser.as_admin(&block)
-  end
-
   def load_pixiv_tokens!
     if ENV["DANBOORU_PERSIST_PIXIV_SESSION"] && Cache.get("pixiv-papi-access-token")
       Cache.put("pixiv-papi-access-token", Thread.current[:pixiv_papi_access_token])
