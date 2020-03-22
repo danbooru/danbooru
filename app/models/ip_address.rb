@@ -8,7 +8,7 @@ class IpAddress < ApplicationRecord
   end
 
   def self.visible(user)
-    CurrentUser.is_admin? ? all : where.not(model_type: "Dmail")
+    user.is_admin? ? all : where.not(model_type: "Dmail")
   end
 
   def self.search(params)
