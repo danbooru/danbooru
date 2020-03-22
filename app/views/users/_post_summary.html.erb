@@ -11,7 +11,7 @@
   </div>
 <% end %>
 
-<% if presenter.has_favorites? && !user.hide_favorites? %>
+<% if presenter.has_favorites? && policy(user).can_see_favorites? %>
   <div class="box user-favorites">
     <h2>
       <%= link_to "Favorites", posts_path(tags: "ordfav:#{user.name}") %>

@@ -673,10 +673,6 @@ class User < ApplicationRecord
   include CountMethods
   extend SearchMethods
 
-  def hide_favorites?
-    !CurrentUser.is_admin? && enable_private_favorites? && CurrentUser.user.id != id
-  end
-
   def initialize_attributes
     self.enable_post_navigation = true
     self.new_post_navigation_layout = true

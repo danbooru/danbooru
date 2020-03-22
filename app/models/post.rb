@@ -956,7 +956,9 @@ class Post < ApplicationRecord
     # users who favorited this post, ordered by users who favorited it first
     def favorited_users
       favorited_user_ids = fav_string.scan(/\d+/).map(&:to_i)
-      visible_users = User.find(favorited_user_ids).reject(&:hide_favorites?)
+      visible_users = User.find(favorited_user_ids).select do |user|
+        Pundit.policy!([CurrentUser.user, nil], user).can_see_favorites?
+      end
       ordered_users = visible_users.index_by(&:id).slice(*favorited_user_ids).values
       ordered_users
     end

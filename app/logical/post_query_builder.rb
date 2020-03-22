@@ -852,31 +852,30 @@ class PostQueryBuilder
             when "-fav"
               favuser = User.find_by_name(g2)
 
-              if favuser.hide_favorites?
-                raise User::PrivilegeError.new
+              if favuser.nil? || !Pundit.policy!([CurrentUser.user, nil], favuser).can_see_favorites?
+                raise User::PrivilegeError
               end
 
-              q[:tags][:exclude] << "fav:#{User.name_to_id(g2)}"
+              q[:tags][:exclude] << "fav:#{favuser.id}"
 
             when "fav"
               favuser = User.find_by_name(g2)
 
-              if favuser.hide_favorites?
-                raise User::PrivilegeError.new
+              if favuser.nil? || !Pundit.policy!([CurrentUser.user, nil], favuser).can_see_favorites?
+                raise User::PrivilegeError
               end
 
-              q[:tags][:related] << "fav:#{User.name_to_id(g2)}"
+              q[:tags][:related] << "fav:#{favuser.id}"
 
             when "ordfav"
-              user_id = User.name_to_id(g2)
-              favuser = User.find(user_id)
+              favuser = User.find_by_name(g2)
 
-              if favuser.hide_favorites?
+              if favuser.nil? || !Pundit.policy!([CurrentUser.user, nil], favuser).can_see_favorites?
                 raise User::PrivilegeError.new
               end
 
-              q[:tags][:related] << "fav:#{user_id}"
-              q[:ordfav] = user_id
+              q[:tags][:related] << "fav:#{favuser.id}"
+              q[:ordfav] = favuser.id
 
             when "search"
               q[:saved_searches] ||= []
