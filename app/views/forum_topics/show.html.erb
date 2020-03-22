@@ -26,7 +26,7 @@
       </div>
     <% end %>
 
-    <%= render "forum_posts/listing", forum_posts: @forum_posts, original_forum_post_id: @forum_topic.original_post&.id, dtext_data: DText.preprocess(@forum_posts.map(&:body)), moderation_reports: @forum_topic.moderation_reports.visible.recent %>
+    <%= render "forum_posts/listing", forum_posts: @forum_posts, original_forum_post_id: @forum_topic.original_post&.id, dtext_data: DText.preprocess(@forum_posts.map(&:body)), moderation_reports: @forum_topic.moderation_reports.visible(CurrentUser.user).recent %>
 
     <% if policy(ForumPost.new(topic: @forum_topic)).create? %>
       <p><%= link_to "Post reply", new_forum_post_path(topic_id: @forum_topic.id), id: "new-response-link" %></p>

@@ -1,5 +1,5 @@
 $("#threshold-comments-notice-for-<%= @post.id %>").hide();
 
 var current_comment_section = $("div.comments-for-post[data-post-id=<%= @post.id %>] div.list-of-comments");
-current_comment_section.html("<%= j(render(partial: 'comments/partials/show/comment', collection: @comments, locals: { context: :index_for_post, dtext_data: DText.preprocess(@comments.map(&:body)), moderation_reports: @post.moderation_reports.visible.recent })) %>");
+current_comment_section.html("<%= j(render(partial: 'comments/partials/show/comment', collection: @comments, locals: { context: :index_for_post, dtext_data: DText.preprocess(@comments.map(&:body)), moderation_reports: @post.moderation_reports.visible(CurrentUser.user).recent })) %>");
 $(window).trigger("danbooru:index_for_post", [<%= @post.id %>]);

@@ -5,10 +5,10 @@
   <div id="a-show">
     <h1><%= link_to_user @user %></h1>
 
-  <% if @user.moderation_reports.visible.recent.present? %>
+  <% if @user.moderation_reports.visible(CurrentUser.user).recent.present? %>
     <div class="moderation-users-notice">
       <span class="info" id="moderation-users-notice-for-<%= @user.id %>">
-        This user has been reported for moderation! (<%= pluralize(@user.moderation_reports.visible.recent.length, "report") %>)
+        This user has been reported for moderation! (<%= pluralize(@user.moderation_reports.visible(CurrentUser.user).recent.length, "report") %>)
       </span>
     </div>
   <% end %>

@@ -77,7 +77,7 @@ class ModerationReport < ApplicationRecord
     end
   end
 
-  def self.visible(user = CurrentUser.user)
+  def self.visible(user)
     user.is_moderator? ? all : none
   end
 
