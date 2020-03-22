@@ -133,10 +133,6 @@ module Danbooru
       40000
     end
 
-    def member_comment_time_threshold
-      1.week.ago
-    end
-
     # https://guides.rubyonrails.org/action_mailer_basics.html#action-mailer-configuration
     # https://guides.rubyonrails.org/configuring.html#configuring-action-mailer
     def mail_delivery_method

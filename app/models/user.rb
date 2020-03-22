@@ -394,14 +394,6 @@ class User < ApplicationRecord
       end
     end
 
-    def can_comment?
-      if is_gold?
-        true
-      else
-        created_at <= Danbooru.config.member_comment_time_threshold
-      end
-    end
-
     def is_comment_limited?
       if is_gold?
         false
@@ -506,7 +498,7 @@ class User < ApplicationRecord
           api_burst_limit remaining_api_limit statement_timeout
           favorite_group_limit favorite_limit tag_query_limit
           is_comment_limited?
-          can_comment? max_saved_searches theme
+          max_saved_searches theme
         ]
       end
 

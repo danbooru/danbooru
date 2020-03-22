@@ -40,7 +40,6 @@ class UserTest < ActiveSupport::TestCase
     end
 
     should "limit comment votes" do
-      Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
       Danbooru.config.stubs(:member_comment_limit).returns(10)
       assert(@user.can_comment_vote?)
 
@@ -49,18 +48,6 @@ class UserTest < ActiveSupport::TestCase
 
       CommentVote.update_all("created_at = '1990-01-01'")
       assert(@user.can_comment_vote?)
-    end
-
-    should "limit comments" do
-      assert(!@user.can_comment?)
-      @user.update_column(:level, User::Levels::GOLD)
-      assert(@user.can_comment?)
-      @user.update_column(:level, User::Levels::MEMBER)
-      @user.update_column(:created_at, 1.year.ago)
-      assert(@user.can_comment?)
-      assert(!@user.is_comment_limited?)
-      create_list(:comment, Danbooru.config.member_comment_limit, creator: @user)
-      assert(@user.is_comment_limited?)
     end
 
     should "authenticate" do

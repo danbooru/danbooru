@@ -83,8 +83,6 @@ class Comment < ApplicationRecord
   def validate_creator_is_not_limited
     if creator.is_comment_limited? && !do_not_bump_post?
       errors.add(:base, "You can only post #{Danbooru.config.member_comment_limit} comments per hour")
-    elsif !creator.can_comment?
-      errors.add(:base, "You can not post comments within 1 week of sign up")
     end
   end
 

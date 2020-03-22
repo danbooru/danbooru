@@ -5,7 +5,6 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
     setup do
       CurrentUser.user = @user = create(:user)
       CurrentUser.ip_addr = "127.0.0.1"
-      Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
       @comment = create(:comment)
     end
 

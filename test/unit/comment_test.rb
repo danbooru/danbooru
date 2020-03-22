@@ -17,7 +17,6 @@ class CommentTest < ActiveSupport::TestCase
       setup do
         @post = FactoryBot.create(:post)
         Danbooru.config.stubs(:member_comment_limit).returns(100)
-        Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
       end
 
       context "added in an edit" do
@@ -82,24 +81,9 @@ class CommentTest < ActiveSupport::TestCase
       end
     end
 
-    context "created by a limited user" do
-      setup do
-        Danbooru.config.stubs(:member_comment_limit).returns(5)
-        Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.ago)
-      end
-
-      should "fail creation" do
-        post = FactoryBot.create(:post)
-        comment = FactoryBot.build(:comment, post: post)
-        comment.save
-        assert_equal(["You can not post comments within 1 week of sign up"], comment.errors.full_messages)
-      end
-    end
-
     context "created by an unlimited user" do
       setup do
         Danbooru.config.stubs(:member_comment_limit).returns(100)
-        Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
       end
 
       context "that is then deleted" do

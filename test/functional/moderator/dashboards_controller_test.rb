@@ -8,7 +8,6 @@ module Moderator
           @user = create(:gold_user)
         end
         @admin = create(:admin_user)
-        Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
       end
 
       context "show action" do
