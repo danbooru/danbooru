@@ -39,15 +39,6 @@ class UserTest < ActiveSupport::TestCase
       end
     end
 
-    should "not validate if the originating ip address is banned" do
-      CurrentUser.scoped(User.anonymous, "1.2.3.4") do
-        create(:ip_ban, ip_addr: '1.2.3.4')
-        user = build(:user, last_ip_addr: '1.2.3.4')
-        refute(user.valid?)
-        assert_equal("IP address is banned", user.errors.full_messages.join)
-      end
-    end
-
     should "limit comment votes" do
       Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
       Danbooru.config.stubs(:member_comment_limit).returns(10)

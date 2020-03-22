@@ -76,7 +76,6 @@ class User < ApplicationRecord
   validates_inclusion_of :per_page, in: (1..PostSets::Post::MAX_PER_PAGE)
   validates_confirmation_of :password
   validates_presence_of :comment_threshold
-  validate :validate_ip_addr_is_not_banned, :on => :create
   validate :validate_sock_puppets, :on => :create, :if => -> { Danbooru.config.enable_sock_puppet_validation? }
   before_validation :normalize_blacklisted_tags
   before_validation :set_per_page
@@ -132,12 +131,6 @@ class User < ApplicationRecord
   scope :admins, -> { where(level: Levels::ADMIN) }
 
   module BanMethods
-    def validate_ip_addr_is_not_banned
-      if IpBan.is_banned?(CurrentUser.ip_addr)
-        errors[:base] << "IP address is banned"
-      end
-    end
-
     def unban!
       self.is_banned = false
       save
