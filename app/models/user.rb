@@ -414,10 +414,6 @@ class User < ApplicationRecord
       CommentVote.where("user_id = ? and created_at > ?", id, 1.hour.ago).count < 10
     end
 
-    def can_remove_from_pools?
-      created_at <= 1.week.ago
-    end
-
     def upload_limit
       @upload_limit ||= UploadLimit.new(self)
     end
@@ -509,7 +505,7 @@ class User < ApplicationRecord
           custom_style favorite_count api_regen_multiplier
           api_burst_limit remaining_api_limit statement_timeout
           favorite_group_limit favorite_limit tag_query_limit
-          can_remove_from_pools? is_comment_limited?
+          is_comment_limited?
           can_comment? max_saved_searches theme
         ]
       end

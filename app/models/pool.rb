@@ -7,7 +7,6 @@ class Pool < ApplicationRecord
   validates_uniqueness_of :name, case_sensitive: false, if: :name_changed?
   validate :validate_name, if: :name_changed?
   validates_inclusion_of :category, :in => %w(series collection)
-  validate :updater_can_remove_posts
   validate :updater_can_edit_deleted
   before_validation :normalize_post_ids
   before_validation :normalize_name
@@ -173,7 +172,6 @@ class Pool < ApplicationRecord
 
   def remove!(post)
     return unless contains?(post.id)
-    return unless CurrentUser.user.can_remove_from_pools?
 
     with_lock do
       reload
@@ -274,13 +272,6 @@ class Pool < ApplicationRecord
       errors[:name] << "cannot be blank"
     when /\A[0-9]+\z/
       errors[:name] << "cannot contain only digits"
-    end
-  end
-
-  def updater_can_remove_posts
-    removed = post_ids_was - post_ids
-    if removed.any? && !CurrentUser.user.can_remove_from_pools?
-      errors[:base] << "You cannot removes posts from pools within the first week of sign up"
     end
   end
 end
