@@ -402,10 +402,6 @@ class User < ApplicationRecord
       end
     end
 
-    def can_comment_vote?
-      CommentVote.where("user_id = ? and created_at > ?", id, 1.hour.ago).count < 10
-    end
-
     def upload_limit
       @upload_limit ||= UploadLimit.new(self)
     end

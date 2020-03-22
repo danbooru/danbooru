@@ -5,7 +5,6 @@ class CommentVote < ApplicationRecord
   belongs_to :user
   validates_presence_of :score
   validates_uniqueness_of :user_id, :scope => :comment_id, :message => "have already voted for this comment"
-  validate :validate_user_can_vote
   validate :validate_comment_can_be_down_voted
   validates_inclusion_of :score, :in => [-1, 1], :message => "must be 1 or -1"
 
@@ -29,12 +28,6 @@ class CommentVote < ApplicationRecord
     q = q.search_attributes(params, :comment_id, :user, :score)
     q = q.comment_matches(params[:comment])
     q.apply_default_order(params)
-  end
-
-  def validate_user_can_vote
-    if !user.can_comment_vote?
-      errors.add :base, "You cannot vote on more than 10 comments per hour"
-    end
   end
 
   def validate_comment_can_be_down_voted

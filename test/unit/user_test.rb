@@ -39,17 +39,6 @@ class UserTest < ActiveSupport::TestCase
       end
     end
 
-    should "limit comment votes" do
-      Danbooru.config.stubs(:member_comment_limit).returns(10)
-      assert(@user.can_comment_vote?)
-
-      create_list(:comment_vote, 10, user: @user, score: -1)
-      assert(!@user.can_comment_vote?)
-
-      CommentVote.update_all("created_at = '1990-01-01'")
-      assert(@user.can_comment_vote?)
-    end
-
     should "authenticate" do
       assert(User.authenticate(@user.name, "password"), "Authentication should have succeeded")
       assert(!User.authenticate(@user.name, "password2"), "Authentication should not have succeeded")
