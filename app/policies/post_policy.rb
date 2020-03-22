@@ -81,7 +81,7 @@ class PostPolicy < ApplicationPolicy
       :tag_string, :old_tag_string, :parent_id, :old_parent_id,
       :source, :old_source, :rating, :old_rating, :has_embedded_notes,
       (:is_rating_locked if can_lock_rating?),
-      (:is_noted_locked if can_lock_notes?),
+      (:is_note_locked if can_lock_notes?),
       (:is_status_locked if can_lock_status?),
     ].compact
   end
