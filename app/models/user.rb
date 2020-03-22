@@ -78,7 +78,6 @@ class User < ApplicationRecord
   validates_presence_of :comment_threshold
   validate :validate_sock_puppets, :on => :create, :if => -> { Danbooru.config.enable_sock_puppet_validation? }
   before_validation :normalize_blacklisted_tags
-  before_validation :set_per_page
   before_create :encrypt_password_on_create
   before_update :encrypt_password_on_update
   before_create :promote_to_admin_if_first_user
@@ -348,12 +347,6 @@ class User < ApplicationRecord
 
     def is_approver?
       can_approve_posts?
-    end
-
-    def set_per_page
-      if per_page.nil? || !is_gold?
-        self.per_page = Danbooru.config.posts_per_page
-      end
     end
   end
 
