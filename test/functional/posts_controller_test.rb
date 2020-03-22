@@ -157,6 +157,52 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      context "with everything" do
+        setup do
+          @admin = create(:admin_user, can_approve_posts: true)
+          @builder = create(:builder_user, can_approve_posts: true)
+
+          as(@user) do
+            @pool = create(:pool)
+            @pool.add!(@post)
+
+            @favgroup = create(:favorite_group)
+            @favgroup.add!(@post)
+
+            @comment = create(:comment, post: @post, creator: @admin)
+            create(:comment_vote, comment: @comment, user: @user)
+
+            create(:note, post: @post)
+            create(:artist_commentary, post: @post)
+            create(:post_flag, post: @post, creator: @user)
+            create(:post_appeal, post: @post, creator: @user)
+            create(:post_vote, post: @post, user: @user)
+            create(:favorite, post: @post, user: @user)
+            create(:moderation_report, model: @comment, creator: @builder)
+          end
+        end
+
+        should "render for an anonymous user" do
+          get post_path(@post)
+          assert_response :success
+        end
+
+        should "render for a member" do
+          get_auth post_path(@post), @user
+          assert_response :success
+        end
+
+        should "render for a builder" do
+          get_auth post_path(@post), @builder
+          assert_response :success
+        end
+
+        should "render for an admin" do
+          get_auth post_path(@post), @admin
+          assert_response :success
+        end
+      end
+
       context "with pools" do
         should "render the pool list" do
           as(@user) { @post.update(tag_string: "newpool:comic") }
