@@ -130,7 +130,7 @@ Rails.application.routes.draw do
   end
   resources :forum_topic_visits, only: [:index]
   resources :ip_bans
-  resources :ip_addresses, only: [:index]
+  resources :ip_addresses, only: [:show, :index], id: /.+?(?=\.json|\.xml|\.html)|.+/
   resource :iqdb_queries, :only => [:show, :create] do
     collection do
       get :preview

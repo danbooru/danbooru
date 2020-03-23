@@ -16,8 +16,9 @@
           <td>
             <% if user.last_ip_addr.present? %>
               <%= link_to user.last_ip_addr, ip_addresses_path(search: { ip_addr: user.last_ip_addr }) %>
-              (<%= link_to "users", ip_addresses_path(search: { ip_addr: user.last_ip_addr, group_by: "user" }) %>,
-              <%= link_to "IPs", ip_addresses_path(search: { user_id: user.id, group_by: "ip_addr" }) %>)
+              (<%= link_to "info", ip_address_path(user.last_ip_addr) %>,
+               <%= link_to "users", ip_addresses_path(search: { ip_addr: user.last_ip_addr, group_by: "user" }) %>,
+               <%= link_to "IPs", ip_addresses_path(search: { user_id: user.id, group_by: "ip_addr" }) %>)
             <% else %>
               <em>unknown</em>
               (<%= link_to "IPs", ip_addresses_path(search: { user_id: user.id, group_by: "ip_addr" }) %>)
