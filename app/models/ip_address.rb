@@ -37,6 +37,10 @@ class IpAddress < ApplicationRecord
     group(:user_id).select("user_id, COUNT(*) AS count_all").reorder("count_all DESC, user_id")
   end
 
+  def lookup
+    @lookup ||= IpLookup.new(ip_addr)
+  end
+
   def to_s
     # include the subnet mask only when the IP denotes a subnet.
     (ip_addr.size > 1) ? ip_addr.to_string : ip_addr.to_s

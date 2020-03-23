@@ -513,6 +513,12 @@ module Danbooru
       "https://#{hostname}"
     end
 
+    # API key for https://ipregistry.co. Used for looking up IP address
+    # information and for detecting proxies during signup.
+    def ip_registry_api_key
+      nil
+    end
+
     # Cloudflare API token. Used to purge URLs from Cloudflare's cache when a
     # post is replaced. The token must have 'zone.cache_purge' permissions.
     # https://support.cloudflare.com/hc/en-us/articles/200167836-Managing-API-Tokens-and-Keys
