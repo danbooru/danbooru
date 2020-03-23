@@ -3,7 +3,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.11.2",
     "@rails/ujs": "^6.0.2-1",
-    "@rails/webpacker": "^4.0.0",
+    "@rails/webpacker": "^5.0.0",
     "debug-loader": "^0.0.1",
     "dropzone": "^5.5.1",
     "expose-loader": "^0.7.5",
