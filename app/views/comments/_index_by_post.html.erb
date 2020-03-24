@@ -1,10 +1,4 @@
 <div id="p-index-by-post">
-  <% if !CurrentUser.user.is_builder? %>
-    <div style="margin-bottom: 1em;">
-      <h2>Before commenting, read the <%= link_to_wiki "how to comment guide", "howto:comment" %>.</h2>
-    </div>
-  <% end %>
-
   <% if @posts.blank? %>
     <%= render "post_sets/blank" %>
   <% end %>

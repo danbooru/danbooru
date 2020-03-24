@@ -4,7 +4,7 @@
   <% if comment.new_record? %>
     <%= f.hidden_field :post_id %>
   <% end %>
-  <%= dtext_field "comment", "body", :classes => "autocomplete-mentions", :value => comment.body, :input_id => "comment_body_for_#{comment.id}", :preview_id => "dtext-preview-for-#{comment.id}" %>
+  <%= dtext_field "comment", "body", classes: "autocomplete-mentions", value: comment.body, input_id: "comment_body_for_#{comment.id}", preview_id: "dtext-preview-for-#{comment.id}", hint: link_to_wiki("Comment rules", "howto:comment").html_safe %>
   <%= f.button :submit, "Submit" %>
   <%= dtext_preview_button "comment", "body", :input_id => "comment_body_for_#{comment.id}", :preview_id => "dtext-preview-for-#{comment.id}" %>
   <% if comment.new_record? %>

@@ -120,9 +120,6 @@
   <% end %>
 
   <section id="comments">
-    <% if !CurrentUser.user.is_builder? %>
-      <h2>Before commenting, read the <%= link_to_wiki "how to comment guide", "howto:comment" %>.</h2>
-    <% end %>
     <%= render "comments/partials/index/list", comments: @comments, post: @post, page: :post %>
   </section>
 
