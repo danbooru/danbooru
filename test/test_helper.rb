@@ -69,7 +69,6 @@ class ActiveSupport::TestCase
     mock_popular_search_service!
     mock_missed_search_service!
     WebMock.allow_net_connect!
-    Danbooru.config.stubs(:enable_sock_puppet_validation?).returns(false)
 
     storage_manager = StorageManager::Local.new(base_dir: "#{Rails.root}/public/data/test")
     Danbooru.config.stubs(:storage_manager).returns(storage_manager)
@@ -114,7 +113,6 @@ class ActionDispatch::IntegrationTest
   def setup
     super
     Socket.stubs(:gethostname).returns("www.example.com")
-    Danbooru.config.stubs(:enable_sock_puppet_validation?).returns(false)
 
     ActionDispatch::IntegrationTest.register_encoder :xml, response_parser: ->(body) { Nokogiri.XML(body) }
   end

@@ -170,14 +170,11 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "with sockpuppet validation enabled" do
-        setup do
-          Danbooru.config.unstub(:enable_sock_puppet_validation?)
-          @user.update(last_ip_addr: "127.0.0.1")
-        end
-
         should "not allow registering multiple accounts with the same IP" do
           assert_difference("User.count", 0) do
+            @user.update(last_ip_addr: "127.0.0.1")
             post users_path, params: {:user => {:name => "dupe", :password => "xxxxx1", :password_confirmation => "xxxxx1"}}
+            assert_response 403
           end
         end
       end

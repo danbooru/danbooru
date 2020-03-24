@@ -443,11 +443,6 @@ module Danbooru
       false
     end
 
-    # disable this for tests
-    def enable_sock_puppet_validation?
-      true
-    end
-
     # Enables recording of popular searches, missed searches, and post view
     # counts. Requires Reportbooru to be configured and running - see below.
     def enable_post_search_counts
