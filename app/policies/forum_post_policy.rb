@@ -1,4 +1,8 @@
 class ForumPostPolicy < ApplicationPolicy
+  def index?
+    true
+  end
+
   def show?
     user.level >= record.topic.min_level
   end
