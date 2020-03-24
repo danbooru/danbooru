@@ -4,7 +4,7 @@
   <% if policy(IpAddress).index? %>
     <%= subnav_link_to "IP Addresses", ip_addresses_path %>
   <% end %>
-  <%= subnav_link_to "Bans", ip_bans_path %>
+  <%= subnav_link_to "Bans", bans_path %>
   <%= subnav_link_to "Feedbacks", user_feedbacks_path %>
   <% if policy(IpBan).create? %>
     | <%= subnav_link_to "New", new_ip_ban_path %>
