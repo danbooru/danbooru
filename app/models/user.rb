@@ -355,8 +355,8 @@ class User < ApplicationRecord
       "#{name} <#{email_address.address}>"
     end
 
-    def can_receive_email?
-      email_address.present? && email_address.is_verified? && email_address.is_deliverable?
+    def can_receive_email?(require_verification: true)
+      email_address.present? && email_address.is_deliverable? && (email_address.is_verified? || !require_verification)
     end
   end
 

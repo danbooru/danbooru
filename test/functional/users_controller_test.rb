@@ -119,7 +119,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to User.last
         assert_equal("xxx", User.last.name)
         assert_equal(nil, User.last.email_address)
-        assert_no_emails
+        assert_no_enqueued_emails
       end
 
       should "create a user with a valid email" do
@@ -136,7 +136,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email: "test" }}
 
           assert_response :success
-          assert_no_emails
+          assert_no_enqueued_emails
         end
       end
 
@@ -145,7 +145,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email: "nobody@nothing.donmai.us" } }
 
           assert_response :success
-          assert_no_emails
+          assert_no_enqueued_emails
         end
       end
 
