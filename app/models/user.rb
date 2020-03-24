@@ -67,7 +67,7 @@ class User < ApplicationRecord
 
   has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
 
-  attr_accessor :password, :old_password, :signed_user_id
+  attr_reader :password
 
   after_initialize :initialize_attributes, if: :new_record?
   validates :name, user_name: true, on: :create
@@ -78,8 +78,6 @@ class User < ApplicationRecord
   validates_presence_of :comment_threshold
   validate :validate_sock_puppets, :on => :create, :if => -> { Danbooru.config.enable_sock_puppet_validation? }
   before_validation :normalize_blacklisted_tags
-  before_create :encrypt_password_on_create
-  before_update :encrypt_password_on_update
   before_create :promote_to_admin_if_first_user
   before_create :customize_new_user
   has_many :artists, foreign_key: :creator_id
@@ -170,25 +168,18 @@ class User < ApplicationRecord
       bcrypt_password_hash.slice(20, 100)
     end
 
-    def encrypt_password_on_create
-      self.bcrypt_password_hash = User.bcrypt(password)
-    end
-
-    def encrypt_password_on_update
-      return if password.blank?
-
-      if signed_user_id.present? && id == Danbooru::MessageVerifier.new(:login).verify(signed_user_id)
-        self.bcrypt_password_hash = User.bcrypt(password)
-      elsif old_password.present? && bcrypt_password == User.sha1(old_password)
-        self.bcrypt_password_hash = User.bcrypt(password)
-      else
-        errors[:old_password] << "is incorrect"
-      end
+    def password=(new_password)
+      @password = new_password
+      self.bcrypt_password_hash = User.bcrypt(new_password)
     end
   end
 
   module AuthenticationMethods
     extend ActiveSupport::Concern
+
+    def authenticate_login_key(signed_user_id)
+      signed_user_id.present? && id == Danbooru::MessageVerifier.new(:login).verify(signed_user_id)
+    end
 
     module ClassMethods
       def authenticate(name, pass)

@@ -41,11 +41,7 @@ class UserDeletion
   end
 
   def reset_password
-    random = SecureRandom.hex(16)
-    user.password = random
-    user.password_confirmation = random
-    user.old_password = password
-    user.save!
+    user.update!(password: SecureRandom.hex(16))
   end
 
   def remove_favorites

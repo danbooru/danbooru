@@ -118,6 +118,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to User.last
         assert_equal("xxx", User.last.name)
+        assert_equal(User.last, User.authenticate("xxx", "xxxxx1"))
         assert_equal(nil, User.last.email_address)
         assert_no_enqueued_emails
       end
@@ -127,6 +128,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to User.last
         assert_equal("xxx", User.last.name)
+        assert_equal(User.last, User.authenticate("xxx", "xxxxx1"))
         assert_equal("webmaster@danbooru.donmai.us", User.last.email_address.address)
         assert_enqueued_email_with UserMailer, :welcome_user, args: [User.last]
       end
