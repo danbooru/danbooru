@@ -519,6 +519,13 @@ module Danbooru
       nil
     end
 
+    # A list of email domains that are used for account verification purposes.
+    # If a user signs up from a proxy they will need to verify their account
+    # using an email address from one of the domains on this list.
+    def email_domain_verification_list
+      # ["gmail.com", "outlook.com", "yahoo.com"]
+    end
+
     # API key for Google Maps. Used for embedding maps on IP address lookup pages.
     # Generate at https://console.developers.google.com/apis/credentials
     def google_maps_api_key

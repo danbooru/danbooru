@@ -151,6 +151,24 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      should "mark users signing up from proxies as requiring verification" do
+        skip unless IpLookup.enabled?
+        self.remote_addr = "1.1.1.1"
+        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+        assert_redirected_to User.last
+        assert_equal(true, User.last.requires_verification)
+      end
+
+      should "not mark users signing up from non-proxies as requiring verification" do
+        skip unless IpLookup.enabled?
+        self.remote_addr = "187.37.226.17"
+        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+        assert_redirected_to User.last
+        assert_equal(false, User.last.requires_verification)
+      end
+
       context "with sockpuppet validation enabled" do
         setup do
           Danbooru.config.unstub(:enable_sock_puppet_validation?)

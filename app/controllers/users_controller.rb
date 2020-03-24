@@ -61,6 +61,7 @@ class UsersController < ApplicationController
   def create
     @user = authorize User.new(
       last_ip_addr: CurrentUser.ip_addr,
+      requires_verification: IpLookup.new(CurrentUser.ip_addr).is_proxy?,
       name: params[:user][:name],
       password: params[:user][:password],
       password_confirmation: params[:user][:password_confirmation]

@@ -5,6 +5,10 @@ class IpLookup
 
   attr_reader :ip_addr, :api_key, :cache_duration
 
+  def self.enabled?
+    Danbooru.config.ip_registry_api_key.present?
+  end
+
   def initialize(ip_addr, api_key: Danbooru.config.ip_registry_api_key, cache_duration: 1.day)
     @ip_addr = ip_addr
     @api_key = api_key

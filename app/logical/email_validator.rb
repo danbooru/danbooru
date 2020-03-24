@@ -76,6 +76,11 @@ module EmailValidator
     "#{name}@#{domain}"
   end
 
+  def nondisposable?(address)
+    domain = Mail::Address.new(address).domain
+    domain.in?(Danbooru.config.email_domain_verification_list)
+  end
+
   def undeliverable?(to_address, from_address: Danbooru.config.contact_email, timeout: 3)
     mail_server = mx_domain(to_address, timeout: timeout)
     mail_server.nil? || rcpt_to_failed?(to_address, from_address, mail_server, timeout: timeout)

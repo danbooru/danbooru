@@ -63,6 +63,8 @@ class User < ApplicationRecord
     opt_out_tracking
     no_flagging
     no_feedback
+    requires_verification
+    is_verified
   )
 
   has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
