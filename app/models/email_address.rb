@@ -7,10 +7,17 @@ class EmailAddress < ApplicationRecord
   validates :address, presence: true, confirmation: true, format: { with: EMAIL_REGEX }
   validates :normalized_address, uniqueness: true
   validates :user_id, uniqueness: true
+  validate :validate_deliverable, on: :deliverable
 
   def address=(value)
-    self.normalized_address = EmailNormalizer.normalize(value) || address
+    self.normalized_address = EmailValidator.normalize(value) || address
     super
+  end
+
+  def validate_deliverable
+    if EmailValidator.undeliverable?(address)
+      errors[:address] << "is invalid or does not exist"
+    end
   end
 
   concerning :VerificationMethods do

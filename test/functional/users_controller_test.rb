@@ -114,29 +114,35 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
     context "create action" do
       should "create a user" do
-        user_params = { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }
-        post users_path, params: { user: user_params }
+        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
         assert_redirected_to User.last
         assert_equal("xxx", User.last.name)
+        assert_equal(nil, User.last.email_address)
         assert_no_emails
       end
 
       should "create a user with a valid email" do
-        user_params = { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address_attributes: { address: "test@gmail.com" } }
-        post users_path, params: { user: user_params }
+        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email: "webmaster@danbooru.donmai.us" }}
 
         assert_redirected_to User.last
         assert_equal("xxx", User.last.name)
-        assert_equal("test@gmail.com", User.last.email_address.address)
+        assert_equal("webmaster@danbooru.donmai.us", User.last.email_address.address)
         assert_enqueued_email_with UserMailer, :welcome_user, args: [User.last]
       end
 
       should "not create a user with an invalid email" do
-        user_params = { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email_address_attributes: { address: "test" } }
+        assert_no_difference(["User.count", "EmailAddress.count"]) do
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email: "test" }}
 
-        assert_no_difference("User.count") do
-          post users_path, params: { user: user_params }
+          assert_response :success
+          assert_no_emails
+        end
+      end
+
+      should "not create a user with an undeliverable email address" do
+        assert_no_difference(["User.count", "EmailAddress.count"]) do
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email: "nobody@nothing.donmai.us" } }
 
           assert_response :success
           assert_no_emails

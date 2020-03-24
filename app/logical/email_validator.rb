@@ -1,4 +1,6 @@
-module EmailNormalizer
+require 'resolv'
+
+module EmailValidator
   module_function
 
   IGNORE_DOTS = %w[gmail.com]
@@ -72,5 +74,42 @@ module EmailNormalizer
     name = name.gsub(/-.*\z/, "") if domain.in?(IGNORE_MINUS_ADDRESSING)
 
     "#{name}@#{domain}"
+  end
+
+  def undeliverable?(to_address, from_address: Danbooru.config.contact_email, timeout: 3)
+    mail_server = mx_domain(to_address, timeout: timeout)
+    mail_server.nil? || rcpt_to_failed?(to_address, from_address, mail_server, timeout: timeout)
+  rescue
+    false
+  end
+
+  def rcpt_to_failed?(to_address, from_address, mail_server, timeout: nil)
+    return false unless smtp_enabled?
+
+    from_domain = Mail::Address.new(from_address).domain
+
+    smtp = Net::SMTP.new(mail_server)
+    smtp.read_timeout = timeout
+    smtp.open_timeout = timeout
+
+    smtp.start(from_domain) do |conn|
+      conn.mailfrom(from_address)
+
+      # Net::SMTPFatalError is raised if RCPT TO returns a 5xx error.
+      response = conn.rcptto(to_address) rescue $!
+      return response.is_a?(Net::SMTPFatalError)
+    end
+  end
+
+  def mx_domain(to_address, timeout: nil)
+    domain = Mail::Address.new(to_address).domain
+
+    dns = Resolv::DNS.new
+    dns.timeouts = timeout
+    response = dns.getresource(domain, Resolv::DNS::Resource::IN::MX)
+
+    response.exchange.to_s
+  rescue Resolv::ResolvError
+    nil
   end
 end

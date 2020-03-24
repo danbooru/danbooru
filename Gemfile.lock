@@ -436,6 +436,7 @@ DEPENDENCIES
   ipaddress
   jquery-rails
   listen
+  mail
   mechanize
   memoist
   memory_profiler

@@ -46,6 +46,7 @@ gem 'ipaddress'
 gem 'http'
 gem 'activerecord-hierarchical_query'
 gem 'pundit'
+gem 'mail'
 
 # needed for looser jpeg header compat
 gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888888888/ruby-imagespec.git", :branch => "exif-fixes"

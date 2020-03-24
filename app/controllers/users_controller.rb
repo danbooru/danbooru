@@ -59,22 +59,31 @@ class UsersController < ApplicationController
   end
 
   def create
-    @user = authorize User.new(last_ip_addr: CurrentUser.ip_addr, **permitted_attributes(User))
+    @user = authorize User.new(
+      last_ip_addr: CurrentUser.ip_addr,
+      name: params[:user][:name],
+      password: params[:user][:password],
+      password_confirmation: params[:user][:password_confirmation]
+    )
 
-    if !Danbooru.config.enable_recaptcha? || verify_recaptcha(model: @user)
-      @user.save
-      if @user.errors.empty?
-        session[:user_id] = @user.id
-        UserMailer.welcome_user(@user).deliver_later
-      else
-        flash[:notice] = "Sign up failed: #{@user.errors.full_messages.join("; ")}"
-      end
-      set_current_user
-      respond_with(@user)
-    else
-      flash[:notice] = "Sign up failed"
-      redirect_to new_user_path
+    if params[:user][:email].present?
+      @user.email_address = EmailAddress.new(address: params[:user][:email])
     end
+
+    if Danbooru.config.enable_recaptcha? && !verify_recaptcha(model: @user)
+      flash[:notice] = "Sign up failed"
+    elsif @user.email_address&.invalid?(:deliverable)
+      flash[:notice] = "Sign up failed: email address is invalid or doesn't exist"
+      @user.errors[:base] << @user.email_address.errors.full_messages.join("; ")
+    elsif !@user.save
+      flash[:notice] = "Sign up failed: #{@user.errors.full_messages.join("; ")}"
+    else
+      session[:user_id] = @user.id
+      UserMailer.welcome_user(@user).deliver_later
+      set_current_user
+    end
+
+    respond_with(@user)
   end
 
   def update
