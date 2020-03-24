@@ -122,7 +122,6 @@
           <% if policy(UserNameChangeRequest).create? %>
             <li><%= link_to "Change name", new_user_name_change_request_path %></li>
           <% end %>
-          <li><%= link_to "Delete account", maintenance_user_deletion_path %></li>
           <li><%= link_to "Dmails", dmails_path(search: { folder: "received" }) %></li>
           <li><%= link_to "Favorites", favorites_path %></li>
           <li><%= link_to "Favorite groups", favorite_groups_path %></li>

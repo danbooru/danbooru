@@ -1,19 +1,36 @@
-<% page_title "Delete Account" %>
+<% page_title "Deactivate Account" %>
 
 <div id="c-maintenance-user-deletions">
   <div id="a-show" class="prose">
-    <h1>Delete Account</h1>
+    <h1>Deactivate Account</h1>
 
-    <p>You can delete your account. This will not actually remove your account from the database, but it will do the following things:</p>
+    <p>
+      You can deactivate your <%= Danbooru.config.app_name %> account using
+      the form below. Deactivating your account will do the following things:
+    </p>
 
     <ul>
-      <li>Rename your account to a generic string</li>
-      <li>Scramble your password</li>
-      <li>Remove all your favorites</li>
-      <li>Blank out your settings (including email)</li>
+      <li>Change your name to a generic name</li>
+      <li>Delete your favorites</li>
+      <li>Delete your saved searches</li>
+      <li>Delete your password and email address</li>
+      <li>Delete your account settings</li>
     </ul>
 
-    <p>You must enter your password to delete your account.</p>
+    <p>
+      The following things will <strong>not</strong> be deleted:
+    </p>
+
+    <ul>
+      <li>Posts you've uploaded</li>
+      <li>Comments, forum posts, and private messages</li>
+      <li>Tag edits, wiki edits, translation notes, or any other contributions to the site</li>
+    </ul>
+
+    <p>
+      Enter your password below to deactivate your account. This cannot be
+      undone. Your account cannot be recovered after it is deactivated.
+    </p>
 
     <%= form_tag(maintenance_user_deletion_path, :method => :delete, :class => "simple_form") do %>
       <div class="input">
@@ -22,7 +39,7 @@
       </div>
 
       <div class="input">
-        <%= submit_tag "Submit" %>
+        <%= submit_tag "Deactivate account" %>
       </div>
     <% end %>
   </div>
