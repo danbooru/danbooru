@@ -1,12 +1,11 @@
 class SessionLoader
   class AuthenticationFailure < StandardError; end
 
-  attr_reader :session, :cookies, :request, :params
+  attr_reader :session, :request, :params
 
   def initialize(request)
     @request = request
     @session = request.session
-    @cookies = request.cookie_jar
     @params = request.parameters
   end
 
@@ -20,8 +19,6 @@ class SessionLoader
       load_param_user(params[:signed_user_id])
     elsif session[:user_id]
       load_session_user
-    elsif cookie_password_hash_valid?
-      load_cookie_user
     end
 
     set_statement_timeout
@@ -91,15 +88,6 @@ class SessionLoader
     CurrentUser.user = user if user
   end
 
-  def load_cookie_user
-    CurrentUser.user = User.find_by_name(cookies.signed[:user_name])
-    session[:user_id] = CurrentUser.user.id
-  end
-
-  def cookie_password_hash_valid?
-    cookies[:password_hash] && cookies.signed[:user_name] && User.authenticate_cookie_hash(cookies.signed[:user_name], cookies[:password_hash])
-  end
-
   def update_last_logged_in_at
     return if CurrentUser.is_anonymous?
     return if CurrentUser.last_logged_in_at && CurrentUser.last_logged_in_at > 1.week.ago
@@ -124,9 +112,5 @@ class SessionLoader
   def initialize_session_cookies
     session.options[:expire_after] = 20.years
     session[:started_at] ||= Time.now.utc.to_s
-
-    # clear out legacy login cookies if present
-    cookies.delete(:user_name)
-    cookies.delete(:password_hash)
   end
 end

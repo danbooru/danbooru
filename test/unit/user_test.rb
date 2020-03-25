@@ -151,15 +151,6 @@ class UserTest < ActiveSupport::TestCase
     end
 
     context "password" do
-      should "match the cookie hash" do
-        @user = FactoryBot.create(:user)
-        @user.password = "zugzug5"
-        @user.password_confirmation = "zugzug5"
-        @user.save
-        @user.reload
-        assert(User.authenticate_cookie_hash(@user.name, @user.bcrypt_cookie_password_hash))
-      end
-
       should "match the confirmation" do
         @user = FactoryBot.create(:user)
         @user.old_password = "password"

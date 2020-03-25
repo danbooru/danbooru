@@ -165,10 +165,6 @@ class User < ApplicationRecord
       BCrypt::Password.new(bcrypt_password_hash)
     end
 
-    def bcrypt_cookie_password_hash
-      bcrypt_password_hash.slice(20, 100)
-    end
-
     def password=(new_password)
       @password = new_password
       self.bcrypt_password_hash = User.bcrypt(new_password)
@@ -199,15 +195,6 @@ class User < ApplicationRecord
       def authenticate_hash(name, hash)
         user = find_by_name(name)
         if user && user.bcrypt_password == hash
-          user
-        else
-          nil
-        end
-      end
-
-      def authenticate_cookie_hash(name, hash)
-        user = find_by_name(name)
-        if user && user.bcrypt_cookie_password_hash == hash
           user
         else
           nil

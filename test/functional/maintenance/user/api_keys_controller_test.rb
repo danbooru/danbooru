@@ -23,25 +23,6 @@ module Maintenance
               assert_response :success
             end
 
-            # hard to test this in integrationtest
-            # context "if the user doesn't already have an api key" do
-            #   setup do
-            #     ::User.any_instance.stubs(:api_key).returns(nil)
-            #     cookies[:user_name] = @user.name
-            #     cookies[:password_hash] = @user.bcrypt_cookie_password_hash
-            #   end
-
-            #   should "generate one" do
-            #     ApiKey.expects(:generate!)
-
-            #     assert_difference("ApiKey.count", 1) do
-            #       post view_maintenance_user_api_key_path(user_id: @user.id), params: {user: {password: "password"}}
-            #     end
-
-            #     assert_not_nil(@user.reload.api_key)
-            #   end
-            # end
-
             should "not generate another API key if the user already has one" do
               assert_difference("ApiKey.count", 0) do
                 post_auth view_maintenance_user_api_key_path(user_id: @user.id), @user, params: {user: {password: "password"}}
