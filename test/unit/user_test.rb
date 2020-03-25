@@ -151,56 +151,6 @@ class UserTest < ActiveSupport::TestCase
     end
 
     context "password" do
-      should "match the confirmation" do
-        @user = FactoryBot.create(:user)
-        @user.old_password = "password"
-        @user.password = "zugzug5"
-        @user.password_confirmation = "zugzug5"
-        @user.save
-        @user.reload
-        assert(User.authenticate(@user.name, "zugzug5"), "Authentication should have succeeded")
-      end
-
-      should "fail if the confirmation does not match" do
-        @user = FactoryBot.create(:user)
-        @user.password = "zugzug6"
-        @user.password_confirmation = "zugzug5"
-        @user.save
-        assert_equal(["Password confirmation doesn't match Password"], @user.errors.full_messages)
-      end
-
-      should "not be too short" do
-        @user = FactoryBot.create(:user)
-        @user.password = "x5"
-        @user.password_confirmation = "x5"
-        @user.save
-        assert_equal(["Password is too short (minimum is 5 characters)"], @user.errors.full_messages)
-      end
-
-      should "not change the password if the password and old password are blank" do
-        @user = FactoryBot.create(:user, :password => "67890")
-        @user.update(password: "", old_password: "")
-        assert(@user.bcrypt_password == User.sha1("67890"))
-      end
-
-      should "not change the password if the old password is incorrect" do
-        @user = FactoryBot.create(:user, :password => "67890")
-        @user.update(password: "12345", old_password: "abcdefg")
-        assert(@user.bcrypt_password == User.sha1("67890"))
-      end
-
-      should "not change the password if the old password is blank" do
-        @user = FactoryBot.create(:user, :password => "67890")
-        @user.update(password: "12345", old_password: "")
-        assert(@user.bcrypt_password == User.sha1("67890"))
-      end
-
-      should "change the password if the old password is correct" do
-        @user = FactoryBot.create(:user, :password => "67890")
-        @user.update(password: "12345", old_password: "67890")
-        assert(@user.bcrypt_password == User.sha1("12345"))
-      end
-
       context "in the json representation" do
         setup do
           @user = FactoryBot.create(:user)
