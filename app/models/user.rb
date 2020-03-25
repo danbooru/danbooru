@@ -181,17 +181,6 @@ class User < ApplicationRecord
     def hash_password(password)
       Digest::SHA1.hexdigest("choujin-steiner--#{password}--")
     end
-
-    module ClassMethods
-      def authenticate_hash(name, hash)
-        user = find_by_name(name)
-        if user && user.bcrypt_password == hash
-          user
-        else
-          nil
-        end
-      end
-    end
   end
 
   module LevelMethods

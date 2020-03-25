@@ -42,7 +42,7 @@ class SessionLoader
   end
 
   def has_api_authentication?
-    request.authorization.present? || params[:login].present? || params[:api_key].present? || params[:password_hash].present?
+    request.authorization.present? || params[:login].present? || params[:api_key].present?
   end
 
   private
@@ -57,8 +57,6 @@ class SessionLoader
       authenticate_basic_auth
     elsif params[:login].present? && params[:api_key].present?
       authenticate_api_key(params[:login], params[:api_key])
-    elsif params[:login].present? && params[:password_hash].present?
-      authenticate_legacy_api_key(params[:login], params[:password_hash])
     end
   end
 
@@ -72,14 +70,6 @@ class SessionLoader
   def authenticate_api_key(name, api_key)
     CurrentUser.user = User.find_by_name(name)&.authenticate_api_key(api_key)
     raise AuthenticationFailure unless Currentuser.user.present?
-  end
-
-  def authenticate_legacy_api_key(name, password_hash)
-    CurrentUser.user = User.authenticate_hash(name, password_hash)
-
-    if CurrentUser.user.nil?
-      raise AuthenticationFailure.new
-    end
   end
 
   def load_param_user(signed_user_id)

@@ -95,31 +95,6 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      context "using the password_hash parameter" do
-        should "succeed for password matches" do
-          get edit_user_path(@user), params: { login: @user.name, password_hash: User.sha1("password") }
-          assert_response :success
-        end
-
-        should "fail for password mismatches" do
-          get profile_path, as: :json, params: { login: @user.name }
-          assert_response 401
-
-          get profile_path, as: :json, params: { password_hash: User.sha1("password") }
-          assert_response 401
-
-          get profile_path, as: :json, params: { login: @user.name, password_hash: "bad" }
-          assert_response 401
-        end
-
-        should "succeed for non-GET requests without a CSRF token" do
-          assert_changes -> { @user.reload.enable_safe_mode }, from: false, to: true do
-            put user_path(@user), params: { login: @user.name, password_hash: User.sha1("password"), user: { enable_safe_mode: "true" } }, as: :json
-            assert_response :success
-          end
-        end
-      end
-
       context "with cookie-based authentication" do
         should "not allow non-GET requests without a CSRF token" do
           # get the csrf token from the login page so we can login
