@@ -8,7 +8,7 @@
 
     <%= edit_form_for(@user, url: user_email_path(@user)) do |f| %>
       <%= f.input :password %>
-      <%= f.input :email %>
+      <%= f.input :email, as: :email, input_html: { value: "" } %>
       <%= f.submit "Save" %>
     <% end %>
   </div>

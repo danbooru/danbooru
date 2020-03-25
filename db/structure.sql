@@ -2201,7 +2201,6 @@ CREATE TABLE public.users (
     id integer NOT NULL,
     name character varying NOT NULL,
     level integer DEFAULT 20 NOT NULL,
-    email character varying,
     inviter_id integer,
     created_at timestamp without time zone NOT NULL,
     last_logged_in_at timestamp without time zone DEFAULT now(),
@@ -6990,13 +6989,6 @@ CREATE INDEX index_users_on_created_at ON public.users USING btree (created_at);
 
 
 --
--- Name: index_users_on_email; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_users_on_email ON public.users USING btree (email) WHERE (email IS NOT NULL);
-
-
---
 -- Name: index_users_on_inviter_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7371,6 +7363,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200309035334'),
 ('20200309043653'),
 ('20200318224633'),
-('20200325073456');
+('20200325073456'),
+('20200325074859');
 
 
