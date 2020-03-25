@@ -9,6 +9,15 @@ class SessionLoader
     @params = request.parameters
   end
 
+  def login(name, password)
+    user = User.find_by_name(name)&.authenticate_password(password)
+    return nil unless user
+
+    session[:user_id] = user.id
+    user.update_column(:last_ip_addr, request.remote_ip)
+    user
+  end
+
   def load
     CurrentUser.user = User.anonymous
     CurrentUser.ip_addr = request.remote_ip
@@ -50,8 +59,6 @@ class SessionLoader
       authenticate_api_key(params[:login], params[:api_key])
     elsif params[:login].present? && params[:password_hash].present?
       authenticate_legacy_api_key(params[:login], params[:password_hash])
-    else
-      raise AuthenticationFailure
     end
   end
 
@@ -63,11 +70,8 @@ class SessionLoader
   end
 
   def authenticate_api_key(name, api_key)
-    CurrentUser.user = User.authenticate_api_key(name, api_key)
-
-    if CurrentUser.user.nil?
-      raise AuthenticationFailure.new
-    end
+    CurrentUser.user = User.find_by_name(name)&.authenticate_api_key(api_key)
+    raise AuthenticationFailure unless Currentuser.user.present?
   end
 
   def authenticate_legacy_api_key(name, password_hash)

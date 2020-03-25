@@ -62,7 +62,7 @@ class UserDeletion
   end
 
   def validate
-    if !User.authenticate(user.name, password)
+    if !user.authenticate_password(password)
       raise ValidationError.new("Password is incorrect")
     end
 

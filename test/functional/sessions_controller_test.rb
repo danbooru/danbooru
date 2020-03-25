@@ -3,7 +3,7 @@ require 'test_helper'
 class SessionsControllerTest < ActionDispatch::IntegrationTest
   context "the sessions controller" do
     setup do
-      @user = create(:user)
+      @user = create(:user, password: "password")
     end
 
     context "new action" do
@@ -14,15 +14,27 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
-      should "create a new session" do
-        post session_path, params: {:name => @user.name, :password => "password"}
+      should "log the user in when given the correct password" do
+        post session_path, params: { name: @user.name, password: "password" }
 
         assert_redirected_to posts_path
         assert_equal(@user.id, session[:user_id])
         assert_not_nil(@user.reload.last_ip_addr)
       end
 
-      should "not allow IP banned users to create a new session" do
+      should "not log the user in when given an incorrect password" do
+        post session_path, params: { name: @user.name, password: "wrong"}
+
+        assert_response 401
+        assert_nil(nil, session[:user_id])
+      end
+
+      should "redirect the user when given an url param" do
+        post session_path, params: { name: @user.name, password: "password", url: tags_path }
+        assert_redirected_to tags_path
+      end
+
+      should "not allow IP banned users to login" do
         create(:ip_ban, ip_addr: "1.2.3.4")
         post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
 

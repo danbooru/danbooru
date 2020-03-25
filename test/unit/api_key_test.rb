@@ -18,15 +18,15 @@ class ApiKeyTest < ActiveSupport::TestCase
     end
 
     should "authenticate via api key" do
-      assert_not_nil(User.authenticate_api_key(@user.name, @api_key.key))
+      assert_equal(@user, @user.authenticate_api_key(@api_key.key))
     end
 
     should "not authenticate with the wrong api key" do
-      assert_nil(User.authenticate_api_key(@user.name, "xxx"))
+      assert_equal(false, @user.authenticate_api_key("xxx"))
     end
 
     should "not authenticate with the wrong name" do
-      assert_nil(User.authenticate_api_key("xxx", @api_key.key))
+      assert_equal(false, create(:user).authenticate_api_key(@api_key.key))
     end
 
     should "have the same limits whether or not they have an api key" do

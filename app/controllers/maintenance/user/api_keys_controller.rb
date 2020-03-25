@@ -27,7 +27,7 @@ module Maintenance
       end
 
       def authenticate!
-        if ::User.authenticate(CurrentUser.user.name, params[:user][:password]) == CurrentUser.user
+        if CurrentUser.user.authenticate_password(params[:user][:password])
           @api_key = CurrentUser.user.api_key || ApiKey.generate!(CurrentUser.user)
           @password = params[:user][:password]
         else

@@ -160,38 +160,29 @@ class User < ApplicationRecord
     end
   end
 
-  module PasswordMethods
-    def bcrypt_password
-      BCrypt::Password.new(bcrypt_password_hash)
-    end
-
+  concerning :AuthenticationMethods do
     def password=(new_password)
       @password = new_password
-      self.bcrypt_password_hash = User.bcrypt(new_password)
+      self.bcrypt_password_hash = BCrypt::Password.create(hash_password(new_password))
     end
-  end
-
-  module AuthenticationMethods
-    extend ActiveSupport::Concern
 
     def authenticate_login_key(signed_user_id)
-      signed_user_id.present? && id == Danbooru::MessageVerifier.new(:login).verify(signed_user_id)
+      signed_user_id.present? && id == Danbooru::MessageVerifier.new(:login).verify(signed_user_id) && self
+    end
+
+    def authenticate_api_key(key)
+      api_key.present? && ActiveSupport::SecurityUtils.secure_compare(api_key.key, key) && self
+    end
+
+    def authenticate_password(password)
+      BCrypt::Password.new(bcrypt_password_hash) == hash_password(password) && self
+    end
+
+    def hash_password(password)
+      Digest::SHA1.hexdigest("choujin-steiner--#{password}--")
     end
 
     module ClassMethods
-      def authenticate(name, pass)
-        authenticate_hash(name, sha1(pass))
-      end
-
-      def authenticate_api_key(name, api_key)
-        key = ApiKey.where(:key => api_key).first
-        return nil if key.nil?
-        user = find_by_name(name)
-        return nil if user.nil?
-        return user if key.user_id == user.id
-        nil
-      end
-
       def authenticate_hash(name, hash)
         user = find_by_name(name)
         if user && user.bcrypt_password == hash
@@ -199,15 +190,6 @@ class User < ApplicationRecord
         else
           nil
         end
-      end
-
-      def bcrypt(pass)
-        BCrypt::Password.create(sha1(pass))
-      end
-
-      def sha1(pass)
-        salt = "choujin-steiner"
-        Digest::SHA1.hexdigest("#{salt}--#{pass}--")
       end
     end
   end
@@ -610,8 +592,6 @@ class User < ApplicationRecord
   end
 
   include BanMethods
-  include PasswordMethods
-  include AuthenticationMethods
   include LevelMethods
   include EmailMethods
   include BlacklistMethods

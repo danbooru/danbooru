@@ -39,11 +39,9 @@ class UserTest < ActiveSupport::TestCase
       end
     end
 
-    should "authenticate" do
-      assert(User.authenticate(@user.name, "password"), "Authentication should have succeeded")
-      assert(!User.authenticate(@user.name, "password2"), "Authentication should not have succeeded")
-      assert(User.authenticate_hash(@user.name, User.sha1("password")), "Authentication should have succeeded")
-      assert(!User.authenticate_hash(@user.name, User.sha1("xxx")), "Authentication should not have succeeded")
+    should "authenticate password" do
+      assert_equal(@user, @user.authenticate_password("password"))
+      assert_equal(false, @user.authenticate_password("password2"))
     end
 
     should "normalize its level" do

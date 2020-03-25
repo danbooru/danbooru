@@ -9,9 +9,7 @@ class PasswordsController < ApplicationController
   def update
     @user = authorize User.find(params[:user_id]), policy_class: PasswordPolicy
 
-    if User.authenticate(@user.name, params[:user][:old_password])
-      @user.update(password: params[:user][:password], password_confirmation: params[:user][:password_confirmation])
-    elsif @user.authenticate_login_key(params[:user][:signed_user_id])
+    if @user.authenticate_password(params[:user][:old_password]) || @user.authenticate_login_key(params[:user][:signed_user_id])
       @user.update(password: params[:user][:password], password_confirmation: params[:user][:password_confirmation])
     else
       @user.errors[:base] << "Incorrect password"

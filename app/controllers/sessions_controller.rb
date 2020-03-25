@@ -7,13 +7,12 @@ class SessionsController < ApplicationController
   end
 
   def create
-    session_params = params[:session].presence || params
-    session_creator = SessionCreator.new(session, session_params[:name], session_params[:password], request.remote_ip)
+    name, password, url = params.fetch(:session, params).slice(:name, :password, :url).values
+    user = SessionLoader.new(request).login(name, password)
 
-    if session_creator.authenticate
-      url = session_params[:url]
-      url = posts_path if !url&.start_with?("/")
-      respond_with(session_creator.user, location: url, methods: [:api_token])
+    if user
+      url = posts_path unless url&.start_with?("/")
+      respond_with(user, location: url, methods: [:api_token])
     else
       flash.now[:notice] = "Password was incorrect"
       raise SessionLoader::AuthenticationFailure

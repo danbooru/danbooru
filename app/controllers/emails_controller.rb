@@ -14,7 +14,7 @@ class EmailsController < ApplicationController
   def update
     @user = authorize User.find(params[:user_id]), policy_class: EmailAddressPolicy
 
-    if User.authenticate(@user.name, params[:user][:password])
+    if @user.authenticate_password(params[:user][:password])
       @user.update(email_address_attributes: { address: params[:user][:email] })
     else
       @user.errors[:base] << "Password was incorrect"

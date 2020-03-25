@@ -43,7 +43,7 @@ class UserDeletionTest < ActiveSupport::TestCase
 
     should "reset the password" do
       @deletion.delete!
-      assert_nil(User.authenticate(@user.name, "password"))
+      assert_equal(false, @user.authenticate_password("password"))
     end
 
     should "remove any favorites" do
