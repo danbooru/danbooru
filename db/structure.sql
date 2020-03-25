@@ -486,10 +486,10 @@ CREATE TABLE public.artist_commentary_versions (
     post_id integer NOT NULL,
     updater_id integer NOT NULL,
     updater_ip_addr inet NOT NULL,
-    original_title text,
-    original_description text,
-    translated_title text,
-    translated_description text,
+    original_title text DEFAULT ''::text NOT NULL,
+    original_description text DEFAULT ''::text NOT NULL,
+    translated_title text DEFAULT ''::text NOT NULL,
+    translated_description text DEFAULT ''::text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -7370,6 +7370,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200307021204'),
 ('20200309035334'),
 ('20200309043653'),
-('20200318224633');
+('20200318224633'),
+('20200325073456');
 
 
