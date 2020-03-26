@@ -190,7 +190,7 @@ let Note = {
     },
 
     find: function(id) {
-      return $("#note-container div.note-box[data-id=" + id + "]");
+      return $(".note-container div.note-box[data-id=" + id + "]");
     },
 
     drag_stop: function(event) {
@@ -409,7 +409,7 @@ let Note = {
     },
 
     scale_all: function() {
-      const $container = $('#note-container');
+      const $container = $('.note-container');
       if ($container.length === 0) {
         return;
       }
@@ -425,7 +425,7 @@ let Note = {
     },
 
     toggle_all: function() {
-      var $note_container = $("#note-container");
+      var $note_container = $(".note-container");
       var is_hidden = ($note_container.css('visibility') === 'hidden');
 
       if (is_hidden) {
@@ -493,7 +493,7 @@ let Note = {
     },
 
     find: function(id) {
-      return $("#note-container div.note-body[data-id=" + id + "]");
+      return $(".note-container div.note-body[data-id=" + id + "]");
     },
 
     hide: function(id) {
@@ -502,7 +502,7 @@ let Note = {
     },
 
     hide_all: function() {
-      $("#note-container div.note-body").hide();
+      $(".note-container div.note-body").hide();
     },
 
     resize: function($note_body) {
@@ -854,7 +854,7 @@ let Note = {
         Note.create(x - offset.left, y - offset.top, w, h);
       }
 
-      $("#note-container").css('visibility', 'visible');
+      $(".note-container").css('visibility', 'visible');
       e.stopPropagation();
       e.preventDefault();
     },
@@ -994,8 +994,8 @@ let Note = {
     Note.Box.update_data_attributes($note_box);
     $note_box.addClass("unsaved");
     $note_body.html("<em>Click to edit</em>");
-    $("#note-container").append($note_box);
-    $("#note-container").append($note_body);
+    $(".note-container").append($note_box);
+    $(".note-container").append($note_body);
     Note.id += "x";
   },
 
@@ -1039,7 +1039,7 @@ let Note = {
         $article.html()
       );
     });
-    const $note_container = $("#note-container");
+    const $note_container = $(".note-container");
     $note_container.append(fragment);
     if (Note.embed) {
       Note.base_font_size = parseFloat(window.getComputedStyle($note_container[0]).fontSize);

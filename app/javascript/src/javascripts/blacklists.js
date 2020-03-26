@@ -159,7 +159,7 @@ Blacklist.apply_post = function(post) {
 };
 
 Blacklist.posts = function() {
-  return $(".post-preview, #image-container, #c-comments .post, .mod-queue-preview.post-preview");
+  return $(".post-preview, .image-container, #c-comments .post, .mod-queue-preview.post-preview");
 }
 
 Blacklist.post_match = function(post, entry) {

@@ -61,7 +61,7 @@ Post.initialize_gestures = function() {
   if (!Utility.test_max_width(660)) {
     return;
   }
-  $("#image-container").css({overflow: "visible"});
+  $(".image-container").css({overflow: "visible"});
   var hasPrev = $(".paginator a[rel~=prev]").length;
   var hasNext = $(".paginator a[rel~=next]").length;
 
@@ -332,7 +332,7 @@ Post.view_large = function(e) {
 
   var $image = $("#image");
   var $notice = $("#image-resize-notice");
-  $image.attr("src", $("#image-container").data("large-file-url"));
+  $image.attr("src", $(".image-container").data("large-file-url"));
   $image.css("filter", "blur(8px)");
   $image.width($image.data("large-width"));
   $image.height($image.data("large-height"));
@@ -423,7 +423,7 @@ Post.initialize_ugoira_player = function() {
   if ($("#ugoira-controls").length) {
     let content_type = $("#image").data("ugoira-content-type");
     let frames = $("#image").data("ugoira-frames");
-    let file_url = $("#image-container").data("file-url");
+    let file_url = $(".image-container").data("file-url");
 
     Ugoira.create_player(content_type, frames, file_url);
     $(window).on("resize.danbooru.ugoira_scale", Post.resize_ugoira_controls);

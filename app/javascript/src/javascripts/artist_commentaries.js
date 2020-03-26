@@ -116,8 +116,8 @@ ArtistCommentary.fill_commentary = function(commentary) {
 // If the new description conflicts with the current description, merge them
 // by appending the new description onto the old one.
 ArtistCommentary.merge_commentaries = function(description, commentary) {
-  var post_source = $('#image-container').data().source;
-  var normalized_source = $("#image-container").data().normalizedSource;
+  var post_source = $('.image-container').data().source;
+  var normalized_source = $(".image-container").data().normalizedSource;
 
   if ((commentary.original_description && description) &&
       (commentary.original_description !== description)) {
