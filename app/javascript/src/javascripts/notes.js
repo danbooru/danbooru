@@ -377,22 +377,6 @@ let Note = {
       $note_box[0].scrollIntoView(false);
     },
 
-    resize_inner_border: function($note_box) {
-      var $inner_border = $note_box.find("div.note-box-inner-border");
-      $inner_border.css({
-        height: $note_box.height() - 2,
-        width: $note_box.width() - 2
-      });
-
-      if ($inner_border.width() >= $note_box.width() - 2) {
-        $note_box.width($inner_border.width() + 2);
-      }
-
-      if ($inner_border.height() >= $note_box.height() - 2) {
-        $note_box.height($inner_border.height() + 2);
-      }
-    },
-
     scale: function($note_box) {
       var $image = $("#image");
       var ratio = $image.width() / parseFloat($image.data("original-width"));
@@ -810,7 +794,6 @@ let Note = {
       $("#image").css("cursor", "crosshair");
       Note.TranslationMode.active = true;
       $(document.body).addClass("mode-translation");
-      $("#original-file-link").click();
       $("#image").off("click.danbooru", Note.Box.toggle_all);
       $("#image").on("mousedown.danbooru.note", Note.TranslationMode.Drag.start);
       $(document).on("mouseup.danbooru.note", Note.TranslationMode.Drag.stop);
