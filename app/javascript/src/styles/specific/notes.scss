@@ -2,6 +2,10 @@
   display: inline-block;
   position: relative;
 
+  &.hide-notes .note-box {
+    visibility: hidden;
+  }
+
   div.note-body {
     position: absolute;
     border: var(--note-body-border);

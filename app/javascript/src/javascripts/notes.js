@@ -423,14 +423,7 @@ let Note = {
     },
 
     toggle_all: function() {
-      var $note_container = $(".note-container");
-      var is_hidden = ($note_container.css('visibility') === 'hidden');
-
-      if (is_hidden) {
-        $note_container.css('visibility', 'visible');
-      } else {
-        $note_container.css('visibility', 'hidden');
-      }
+      $(".note-container").toggleClass("hide-notes");
     }
   },
 
@@ -850,7 +843,7 @@ let Note = {
         Note.create(x, y, w, h);
       }
 
-      $(".note-container").css('visibility', 'visible');
+      $(".note-container").removeClass("hide-notes");
       e.stopPropagation();
       e.preventDefault();
     },
