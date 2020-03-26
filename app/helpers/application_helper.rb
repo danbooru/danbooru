@@ -297,7 +297,7 @@ module ApplicationHelper
       can_approve_posts disable_categorized_saved_searches
       disable_mobile_gestures disable_post_tooltips enable_auto_complete
       enable_post_navigation enable_safe_mode hide_deleted_posts
-      show_deleted_children style_usernames
+      show_deleted_children style_usernames default_image_size
     ] + User::Roles.map { |role| :"is_#{role}?" }
   end
 

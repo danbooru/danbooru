@@ -306,22 +306,17 @@ Post.view_original = function(e) {
     return;
   }
 
-  var $link = $(e.target);
   var $image = $("#image");
-  var $notice = $("#image-resize-notice");
-  $image.attr("src", $link.attr("href"));
+  $image.attr("src", $(".image-container").data("file-url"));
   $image.css("filter", "blur(8px)");
   $image.width($image.data("original-width"));
   $image.height($image.data("original-height"));
   $image.on("load.danbooru", function() {
     $image.css("animation", "sharpen 0.5s forwards");
-    $notice.hide();
-    $("#post-option-view-large").show();
   });
-  $notice.children().eq(0).hide();
-  $notice.children().eq(1).show(); // Loading message
   Note.Box.scale_all();
-  e.preventDefault();
+  $("body").attr("data-post-current-image-size", "original");
+  return false;
 }
 
 Post.view_large = function(e) {
@@ -331,20 +326,16 @@ Post.view_large = function(e) {
   }
 
   var $image = $("#image");
-  var $notice = $("#image-resize-notice");
   $image.attr("src", $(".image-container").data("large-file-url"));
   $image.css("filter", "blur(8px)");
   $image.width($image.data("large-width"));
   $image.height($image.data("large-height"));
-  $notice.children().eq(0).show();
-  $notice.children().eq(1).hide(); // Loading message
   $image.on("load.danbooru", function() {
     $image.css("animation", "sharpen 0.5s forwards");
-    $notice.show();
-    $("#post-option-view-large").hide();
   });
   Note.Box.scale_all();
-  e.preventDefault();
+  $("body").attr("data-post-current-image-size", "large");
+  return false;
 }
 
 Post.toggle_fit_window = function(e) {
@@ -355,16 +346,16 @@ Post.toggle_fit_window = function(e) {
 };
 
 Post.initialize_post_image_resize_links = function() {
-  $("#image-resize-link").on("click.danbooru", Post.view_original);
-  $("#image-view-large-link").on("click.danbooru", Post.view_large);
+  $(document).on("click.danbooru", ".image-view-original-link", Post.view_original);
+  $(document).on("click.danbooru", ".image-view-large-link", Post.view_large);
   $(document).on("click.danbooru", ".image-resize-to-window-link", Post.toggle_fit_window);
 
   if ($("#image-resize-notice").length) {
     Utility.keydown("v", "resize", function(e) {
-      if ($("#image-resize-notice").is(":visible")) {
-        $("#image-resize-link").click();
+      if ($("body").attr("data-post-current-image-size") === "large") {
+        Post.view_original();
       } else {
-        $("#image-view-large-link").click();
+        Post.view_large();
       }
     });
   }

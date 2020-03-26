@@ -4,9 +4,12 @@
       <%= link_to "Resize to window", "#", class: "image-resize-to-window-link", "data-shortcut": "z" %>
     </li>
   <% end %>
-  <% if post.visible? && post.has_large? && !post.is_ugoira? %>
-    <li id="post-option-view-large" style="<%= CurrentUser.default_image_size == "original" ? "" : "display: none;" %>">
-      <%= link_to "View large", post.tagged_large_file_url, id: "image-view-large-link" %>
+  <% if policy(post).visible? && post.has_large? && !post.is_ugoira? %>
+    <li id="post-option-view-large">
+      <%= link_to "View smaller", post.tagged_large_file_url, class: "image-view-large-link" %>
+    </li>
+    <li id="post-option-view-original">
+      <%= link_to "View original", post.tagged_file_url, class: "image-view-original-link" %>
     </li>
   <% end %>
   <li id="post-option-find-similar">

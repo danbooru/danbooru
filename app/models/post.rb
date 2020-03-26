@@ -269,6 +269,11 @@ class Post < ApplicationRecord
     def resize_percentage
       100 * large_image_width.to_f / image_width.to_f
     end
+
+    # XXX
+    def current_image_size
+      has_large? && CurrentUser.default_image_size == "large" ? "large" : "original"
+    end
   end
 
   module ApprovalMethods
@@ -1762,6 +1767,10 @@ class Post < ApplicationRecord
     end
 
     save
+  end
+
+  def html_data_attributes
+    super + [:has_large?, :current_image_size]
   end
 
   def self.available_includes

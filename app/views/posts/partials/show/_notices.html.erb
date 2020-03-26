@@ -68,8 +68,7 @@
 <% end %>
 
 <% if policy(post).visible? && post.has_large? && !post.is_ugoira? %>
-  <div class="notice notice-small post-notice post-notice-resized" id="image-resize-notice" style="<%= CurrentUser.default_image_size == "original" ? "display: none;" : "" %>">
-    <span>Resized to <%= number_to_percentage post.resize_percentage.floor, :precision => 0 %> of original (<%= link_to "view original", post.tagged_file_url, :id => "image-resize-link" %>)</span>
-    <span style="display: none;">Loading...</span>
+  <div class="notice notice-small post-notice post-notice-resized" id="image-resize-notice">
+    Resized to <%= number_to_percentage post.resize_percentage.floor, precision: 0 %> of original (<%= link_to "view original", post.tagged_file_url, class: "image-view-original-link" %>)
   </div>
 <% end %>
