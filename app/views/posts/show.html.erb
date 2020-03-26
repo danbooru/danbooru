@@ -50,10 +50,9 @@
 
   <%= render "posts/partials/show/notices", :post => @post %>
 
-  <%= content_tag(:section, { class: "image-container" }.merge(PostPresenter.data_attributes(@post))) do -%>
-    <div class="note-container"></div>
-    <div id="note-preview"></div>
+  <%= content_tag(:section, class: "image-container note-container", **PostPresenter.data_attributes(@post)) do -%>
     <%= render "posts/partials/show/embedded", post: @post %>
+    <div id="note-preview"></div>
   <% end -%>
 
   <% if policy(Favorite).create? %>

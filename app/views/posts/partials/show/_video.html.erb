@@ -1,7 +1,7 @@
 <% if post.is_ugoira? %>
-  <%= content_tag(:video, nil, :id => "image", :width => post.image_width, :height => post.image_height, :autoplay => true, :loop => true, :controls => "controls", :src => post.tagged_large_file_url) %>
+  <%= content_tag(:video, nil, id: "image", class: "fit-width", width: post.image_width, height: post.image_height, autoplay: true, loop: true, controls: "controls", src: post.tagged_large_file_url) %>
   <p><%= link_to "Save this video (right click and save)", post.tagged_large_file_url %></p>
 <% else %>
-  <%= content_tag(:video, nil, :id => "image", :width => post.image_width, :height => post.image_height, :autoplay => true, :loop => true, :controls => "controls", :src => post.tagged_file_url) %>
+  <%= content_tag(:video, nil, id: "image", class: "fit-width", width: post.image_width, height: post.image_height, autoplay: true, loop: true, controls: "controls", src: post.tagged_file_url) %>
   <p><%= link_to "Save this video (right click and save)", post.tagged_file_url %></p>
 <% end %>

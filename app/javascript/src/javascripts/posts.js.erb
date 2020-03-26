@@ -300,7 +300,7 @@ Post.initialize_favlist = function() {
   });
 }
 
-Post.expand_image = function(e) {
+Post.view_original = function(e) {
   if (Utility.test_max_width(660)) {
     // Do the default behavior (navigate to image)
     return;
@@ -347,9 +347,17 @@ Post.view_large = function(e) {
   e.preventDefault();
 }
 
+Post.toggle_fit_window = function(e) {
+  $("#image").toggleClass("fit-width");
+  Note.Box.scale_all();
+  Post.resize_ugoira_controls();
+  e.preventDefault();
+};
+
 Post.initialize_post_image_resize_links = function() {
-  $("#image-resize-link").on("click.danbooru", Post.expand_image);
+  $("#image-resize-link").on("click.danbooru", Post.view_original);
   $("#image-view-large-link").on("click.danbooru", Post.view_large);
+  $(document).on("click.danbooru", ".image-resize-to-window-link", Post.toggle_fit_window);
 
   if ($("#image-resize-notice").length) {
     Utility.keydown("v", "resize", function(e) {

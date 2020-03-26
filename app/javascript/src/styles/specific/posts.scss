@@ -341,12 +341,6 @@ div#c-posts {
       margin: 1em 0 0.5em;
     }
 
-    /* This ensures the image appears above the note container, but beneath any notes. */
-    #image {
-      position: relative;
-      z-index: 50;
-    }
-
     .pool-name, .search-name {
       word-wrap: break-word;
     }

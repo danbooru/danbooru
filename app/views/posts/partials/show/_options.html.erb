@@ -1,4 +1,9 @@
 <ul>
+  <% if policy(post).visible? %>
+    <li id="post-option-resize-to-window">
+      <%= link_to "Resize to window", "#", class: "image-resize-to-window-link", "data-shortcut": "z" %>
+    </li>
+  <% end %>
   <% if post.visible? && post.has_large? && !post.is_ugoira? %>
     <li id="post-option-view-large" style="<%= CurrentUser.default_image_size == "original" ? "" : "display: none;" %>">
       <%= link_to "View large", post.tagged_large_file_url, id: "image-view-large-link" %>

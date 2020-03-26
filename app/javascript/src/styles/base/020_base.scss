@@ -151,6 +151,16 @@ ul.list-inline {
   }
 }
 
+.fit-width {
+  max-width: 100%;
+  height: auto !important;
+}
+
+.fit-height {
+  max-height: 90vh;
+  height: auto !important;
+}
+
 .mobile-only {
   display: none;
   @media (max-width: 660px) { display: initial; }

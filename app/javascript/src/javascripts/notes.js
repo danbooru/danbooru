@@ -414,8 +414,6 @@ let Note = {
         return;
       }
       let $image = $("#image");
-      $container.height($image.height());
-      $container.width($image.width());
       if (Note.embed) {
         let large_width = parseFloat($image.data('large-width'));
         let ratio = $image.width() / large_width;
@@ -843,15 +841,13 @@ let Note = {
     },
 
     create_note: function(e, x, y, w, h) {
-      var offset = $("#image").offset();
-
       if (w > 9 || h > 9) { /* minimum note size: 10px */
         if (w <= 9) {
           w = 10;
         } else if (h <= 9) {
           h = 10;
         }
-        Note.create(x - offset.left, y - offset.top, w, h);
+        Note.create(x, y, w, h);
       }
 
       $(".note-container").css('visibility', 'visible');
@@ -907,18 +903,18 @@ let Note = {
         }
         if (Note.TranslationMode.Drag.dragging) {
           if (Note.TranslationMode.Drag.dragDistanceX >= 0) {
-            Note.TranslationMode.Drag.x = Note.TranslationMode.Drag.dragStartX;
+            Note.TranslationMode.Drag.x = Note.TranslationMode.Drag.dragStartX - offset.left;
             Note.TranslationMode.Drag.w = Note.TranslationMode.Drag.dragDistanceX;
           } else {
-            Note.TranslationMode.Drag.x = Note.TranslationMode.Drag.dragStartX + Note.TranslationMode.Drag.dragDistanceX;
+            Note.TranslationMode.Drag.x = Note.TranslationMode.Drag.dragStartX - offset.left + Note.TranslationMode.Drag.dragDistanceX;
             Note.TranslationMode.Drag.w = -Note.TranslationMode.Drag.dragDistanceX;
           }
 
           if (Note.TranslationMode.Drag.dragDistanceY >= 0) {
-            Note.TranslationMode.Drag.y = Note.TranslationMode.Drag.dragStartY;
+            Note.TranslationMode.Drag.y = Note.TranslationMode.Drag.dragStartY - offset.top;
             Note.TranslationMode.Drag.h = Note.TranslationMode.Drag.dragDistanceY;
           } else {
-            Note.TranslationMode.Drag.y = Note.TranslationMode.Drag.dragStartY + Note.TranslationMode.Drag.dragDistanceY;
+            Note.TranslationMode.Drag.y = Note.TranslationMode.Drag.dragStartY - offset.top + Note.TranslationMode.Drag.dragDistanceY;
             Note.TranslationMode.Drag.h = -Note.TranslationMode.Drag.dragDistanceY;
           }
 
