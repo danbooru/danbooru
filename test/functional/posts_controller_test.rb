@@ -105,6 +105,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path(format: :json), params: { random: "1" }
           assert_response :success
         end
+
+        should "render with multiple posts" do
+          @posts = create_list(:post, 2)
+
+          get posts_path, params: { random: "1" }
+          assert_response :success
+        end
       end
 
       context "with the .atom format" do
