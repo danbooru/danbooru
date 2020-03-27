@@ -2,6 +2,10 @@ require 'test_helper'
 
 class EmailValidatorTest < ActiveSupport::TestCase
   context "EmailValidator" do
+    setup do
+      EmailValidator.stubs(:smtp_enabled?).returns(true)
+    end
+
     context "#undeliverable?" do
       should "return good addresses as deliverable" do
         assert_equal(false, EmailValidator.undeliverable?("webmaster@danbooru.donmai.us"))

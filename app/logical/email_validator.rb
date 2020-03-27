@@ -63,6 +63,10 @@ module EmailValidator
     "gmx.us" => "gmx.net",
   }
 
+  def smtp_enabled?
+    Rails.env.production?
+  end
+
   def normalize(address)
     return nil unless address.count("@") == 1
 
