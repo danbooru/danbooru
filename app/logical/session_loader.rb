@@ -57,6 +57,8 @@ class SessionLoader
       authenticate_basic_auth
     elsif params[:login].present? && params[:api_key].present?
       authenticate_api_key(params[:login], params[:api_key])
+    else
+      raise AuthenticationFailure
     end
   end
 
@@ -68,8 +70,9 @@ class SessionLoader
   end
 
   def authenticate_api_key(name, api_key)
-    CurrentUser.user = User.find_by_name(name)&.authenticate_api_key(api_key)
-    raise AuthenticationFailure unless Currentuser.user.present?
+    user = User.find_by_name(name)&.authenticate_api_key(api_key)
+    raise AuthenticationFailure if user.blank?
+    CurrentUser.user = user
   end
 
   def load_param_user(signed_user_id)
