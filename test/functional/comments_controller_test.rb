@@ -20,6 +20,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       context "grouped by post" do
         should "render all comments for .js" do
+          @comment = as(@user) { create(:comment, post: @post) }
           get comments_path(post_id: @post.id), xhr: true
 
           assert_response :success
@@ -87,6 +88,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "render by comment" do
+        @comment = as(@user) { create(:comment, post: @post) }
         get comments_path(group_by: "comment")
         assert_response :success
       end

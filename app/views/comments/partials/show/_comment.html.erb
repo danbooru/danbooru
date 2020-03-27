@@ -12,7 +12,7 @@
            data-is-deleted="<%= comment.is_deleted? %>"
            data-is-sticky="<%= comment.is_sticky? %>"
            data-below-threshold="<%= comment.score < CurrentUser.user.comment_threshold %>"
-           <% if policy(moderation_reports).show? %>
+           <% if moderation_reports.present? && policy(moderation_reports).show? %>
             data-is-reported="<%= moderation_reports.pluck(:model_id).include?(comment.id) %>"
            <% end %>
            data-is-voted="<%= comment.voted_by?(CurrentUser.user) %>">
