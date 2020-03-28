@@ -23,7 +23,7 @@
 <%= tag.meta name: "canonical", content: posts_url(tags: params[:tags], host: Danbooru.config.hostname, protocol: "https") %>
 
 <% if @post_set.best_post.present? %>
+  <%= tag.meta property: "og:image", content: @post_set.best_post.open_graph_image_url %>
   <%= tag.meta name: "twitter:image", content: @post_set.best_post.open_graph_image_url %>
-  <%= tag.meta name: "og:image", content: @post_set.best_post.open_graph_image_url %>
   <%= tag.meta name: "twitter:card", content: "summary_large_image" %>
 <% end %>

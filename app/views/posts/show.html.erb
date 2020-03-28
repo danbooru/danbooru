@@ -162,7 +162,7 @@
   <meta name="post-has-embedded-notes" content="<%= @post.has_embedded_notes? %>">
 
   <% if policy(@post).visible? %>
-    <%= tag.meta name: "og:image", content: @post.open_graph_image_url %>
+    <%= tag.meta property: "og:image", content: @post.open_graph_image_url %>
   <% end %>
 
   <%= tag.meta name: "canonical", content: post_url(@post, host: Danbooru.config.hostname, protocol: "https") %>
