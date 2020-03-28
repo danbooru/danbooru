@@ -379,11 +379,12 @@ let Note = {
 
     scale: function($note_box) {
       var $image = $("#image");
-      var ratio = $image.width() / parseFloat($image.data("original-width"));
-      var x_percent = 100 * ratio * ($note_box.data('x') / $image.width());
-      var y_percent = 100 * ratio * ($note_box.data('y') / $image.height());
-      var height_percent = 100 * ratio * ($note_box.data('height') / $image.height());
-      var width_percent = 100 * ratio * ($note_box.data('width') / $image.width());
+      var original_width = $image.data("original-width");
+      var original_height = $image.data("original-height");
+      var x_percent = 100 * ($note_box.data('x') / original_width);
+      var y_percent = 100 * ($note_box.data('y') / original_height);
+      var height_percent = 100 * ($note_box.data('height') / original_height);
+      var width_percent = 100 * ($note_box.data('width') / original_width);
       $note_box.css({
         top: y_percent + '%',
         left: x_percent + '%',
