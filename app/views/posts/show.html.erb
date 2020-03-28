@@ -124,9 +124,7 @@
 
   <section id="notes" style="display: none;">
     <% if @post.has_notes? %>
-      <% cache("p/#{@post.id}/n/#{@post.last_noted_at.to_i}") do %>
-        <%= render :partial => "notes/note", :collection => @post.notes.active %>
-      <% end %>
+      <%= render partial: "notes/note", collection: @post.notes.active %>
     <% end %>
   </section>
 
