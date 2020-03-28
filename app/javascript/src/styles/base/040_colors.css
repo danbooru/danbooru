@@ -343,17 +343,11 @@ body[data-current-user-theme="dark"] {
   --news-updates-background: var(--grey-3);
   --news-updates-border: 2px solid var(--grey-4);
 
-  --note-body-background: #FFE;
   --note-body-text-color: var(--grey-1);
-  --note-body-border: 1px solid black;
-  --note-box-border: 1px solid white;
-  --note-box-background: transparent;
-  --note-box-inner-border: 1px solid black;
-  --unsaved-note-box-inner-border: 1px solid var(--red-1);
+  --unsaved-note-box-border: 1px solid var(--red-1);
+  --movable-note-box-border: 1px solid var(--green-1);
   --note-preview-border: 1px solid var(--red-1);
-  --note-preview-background: white;
   --note-highlight-color: var(--blue-1);
-  --note-tn-color: var(--muted-text-color);
 
   --notice-error-background: var(--red-0);
   --notice-error-border: 1px solid var(--grey-4);
