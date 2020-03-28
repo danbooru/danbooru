@@ -19,16 +19,7 @@ Upload.initialize_all = function() {
   }
 
   if ($("#c-uploads").length) {
-    if ($("#image").prop("complete")) {
-      this.initialize_image();
-    } else {
-      $("#image").on("error.danbooru", (e) => {
-        $("#upload-image").hide();
-        $("#scale-link").hide();
-        $("#iqdb-similar").hide();
-      });
-      $("#image").on("load.danbooru", this.initialize_image);
-    }
+    this.initialize_image();
     this.initialize_similar();
     this.initialize_submit();
     $("#similar-button").click();
@@ -93,14 +84,69 @@ Upload.initialize_similar = function() {
   });
 }
 
-Upload.update_scale = function() {
-  var $image = $("#image");
-  var ratio = $image.data("scale-factor");
-  if (ratio < 1) {
-    $("#scale").html("Scaled " + parseInt(100 * ratio) + "% (original: " + $image.data("original-width") + "x" + $image.data("original-height") + ")");
+Upload.initialize_image = function() {
+  let $image = $("#image");
+
+  if ($image.prop("complete")) {
+    Upload.update_scale();
   } else {
-    $("#scale").html("Original: " + $image.data("original-width") + "x" + $image.data("original-height"));
+    $image.on("load.danbooru", Upload.update_scale);
   }
+
+  $(window).on("resize.danbooru", Upload.update_scale);
+  $(document).on("click.danbooru", "#image", Upload.toggle_size);
+  $(document).on("click.danbooru", "#upload-image-view-small", Upload.view_small);
+  $(document).on("click.danbooru", "#upload-image-view-large", Upload.view_large);
+  $(document).on("click.danbooru", "#upload-image-view-full", Upload.view_full);
+}
+
+Upload.no_image_available = function(e) {
+  $("#a-new").addClass("no-image-available");
+}
+
+Upload.view_small = function(e) {
+  $("#image").addClass("fit-width fit-height");
+  $("#a-new").attr("data-image-size", "small");
+  Upload.update_scale();
+  e.preventDefault();
+}
+
+Upload.view_large = function(e) {
+  $("#image").removeClass("fit-height").addClass("fit-width");
+  $("#a-new").attr("data-image-size", "large");
+  Upload.update_scale();
+  e.preventDefault();
+}
+
+Upload.view_full = function(e) {
+  $("#image").removeClass("fit-width fit-height");
+  $("#a-new").attr("data-image-size", "full");
+  Upload.update_scale();
+  e.preventDefault();
+}
+
+Upload.toggle_size = function(e) {
+  let window_aspect_ratio = $(window).width() / $(window).height();
+  let image_aspect_ratio = $("#image").width() / $("#image").height();
+  let image_size = $("#a-new").attr("data-image-size");
+
+  if (image_size === "small" && image_aspect_ratio >= window_aspect_ratio) {
+    Upload.view_full(e);
+  } else if (image_size === "small" && image_aspect_ratio < window_aspect_ratio) {
+    Upload.view_large(e);
+  } else if (image_size === "large") {
+    Upload.view_small(e);
+  } else if (image_size === "full") {
+    Upload.view_small(e);
+  }
+}
+
+Upload.update_scale = function() {
+  let $image = $("#image");
+  let natural_width = $image.get(0).naturalWidth;
+  let natural_height = $image.get(0).naturalHeight;
+  let scale_percentage = Math.round(100 * $image.width() / natural_width);
+  $("#upload-image-metadata-resolution").html(`(${natural_width}x${natural_height}, resized to ${scale_percentage}%)`);
 }
 
 Upload.fetch_data_manual = function(e) {
@@ -113,26 +159,6 @@ Upload.fetch_data_manual = function(e) {
   }
 
   e.preventDefault();
-}
-
-Upload.initialize_image = function() {
-  var $image = $("#image");
-  if (!$image.length) {
-    return;
-  }
-  var width = $image.width();
-  var height = $image.height();
-  if (!width || !height) {
-    // we errored out
-    return;
-  }
-  $("#no-image-available").hide();
-  $image.data("original-width", width);
-  $image.data("original-height", height);
-  Post.resize_image_to_window($image);
-  Post.initialize_post_image_resize_to_window_link();
-  Upload.update_scale();
-  $("#image-resize-to-window-link").on("click.danbooru", Upload.update_scale);
 }
 
 Upload.toggle_commentary = function() {

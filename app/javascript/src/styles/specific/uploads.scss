@@ -1,5 +1,49 @@
 div#c-uploads {
   div#a-new {
+    #no-image-available {
+      display: none;
+    }
+
+    &.no-image-available {
+      #upload-image-metadata, #image, #iqdb-similar {
+        display: none;
+      }
+
+      #no-image-available {
+        display: block !important;
+      }
+    }
+
+    &[data-image-size="small"] {
+      #image {
+        cursor: zoom-in;
+      }
+
+      a#upload-image-view-small {
+        font-weight: bold;
+      }
+    }
+
+    &[data-image-size="large"] {
+      #image {
+        cursor: zoom-out;
+      }
+
+      a#upload-image-view-large {
+        font-weight: bold;
+      }
+    }
+
+    &[data-image-size="full"] {
+      #image {
+        cursor: zoom-out;
+      }
+
+      a#upload-image-view-full {
+        font-weight: bold;
+      }
+    }
+
     .artist-commentary {
       margin-top: 1em;
     }
