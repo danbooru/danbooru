@@ -12,7 +12,9 @@
       <%= f.input :parent_id %>
       <%= f.input :rating %>
       <%= f.input :source_ilike, label: "Source", hint: "Use * for wildcard" %>
+      <%= f.input :tag_matches, hint: "Use * for wildcard" %>
       <%= f.input :version %>
+      <%= f.input :is_new, label: "Include uploads?", collection: [["Yes", nil], ["No", false], ["Only", true]], include_blank: false, hint: "I.e. the 1st versions of posts" %>
       <%= f.input :rating_changed, as: :select %>
       <%= f.input :parent_changed, as: :select %>
       <%= f.input :source_changed, as: :select %>
