@@ -307,7 +307,7 @@ Post.view_original = function(e) {
   }
 
   var $image = $("#image");
-  $image.attr("src", $(".image-container").data("file-url"));
+  $image.attr("src", $(".image-view-original-link").attr("href"));
   $image.css("filter", "blur(8px)");
   $image.width($image.data("original-width"));
   $image.height($image.data("original-height"));
@@ -326,7 +326,7 @@ Post.view_large = function(e) {
   }
 
   var $image = $("#image");
-  $image.attr("src", $(".image-container").data("large-file-url"));
+  $image.attr("src", $(".image-view-large-link").attr("href"));
   $image.css("filter", "blur(8px)");
   $image.width($image.data("large-width"));
   $image.height($image.data("large-height"));
