@@ -680,10 +680,13 @@ let Note = {
         $note_body.data("id", String(data.id)).attr("data-id", data.id);
         $note_box.data("id", String(data.id)).attr("data-id", data.id);
         $note_box.removeClass("unsaved");
+        $note_box.removeClass("movable");
       } else {
         $note_box = Note.Box.find(data.id);
         $note_box.removeClass("unsaved");
+        $note_box.removeClass("movable");
       }
+      Note.move_id = null;
     },
 
     save: function() {
