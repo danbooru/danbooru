@@ -15,7 +15,7 @@
       <%= f.input :removed_tags_include_all, label: "Removed Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :removed_tags_include_all) } %>
       <%= f.input :changed_tags, label: "Changed Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :changed_tags) } %>
       <%= f.submit "Search" %>
-      <%= link_to "Advanced", search_post_versions_path, class: "advanced-search-link" %>
+      <%= link_to "Advanced", search_post_versions_path(params.except(:controller, :action, :index, :commit, :type).permit!), class: "advanced-search-link" %>
     <% end %>
 
     <%= render "posts/partials/common/inline_blacklist" %>
