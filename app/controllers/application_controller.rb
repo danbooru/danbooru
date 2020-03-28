@@ -42,8 +42,8 @@ class ApplicationController < ActionController::Base
     super
   end
 
-  def set_version_comparison
-    params[:type] = %w[previous subsequent current].include?(params[:type]) ? params[:type] : "previous"
+  def set_version_comparison(default_type = "previous")
+    params[:type] = %w[previous subsequent current].include?(params[:type]) ? params[:type] : default_type
   end
 
   def model_name

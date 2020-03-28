@@ -130,6 +130,19 @@ class PostVersion < ApplicationRecord
     }
   end
 
+  def pretty_rating
+    case rating
+    when "q"
+      "Questionable"
+
+    when "e"
+      "Explicit"
+
+    when "s"
+      "Safe"
+    end
+  end
+
   def changes
     delta = {
       :added_tags => added_tags,
