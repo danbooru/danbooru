@@ -12,12 +12,13 @@
     background: var(--note-body-background);
     color: var(--note-body-text-color);
     min-width: 140px;
+    max-width: 0;
     min-height: 1em;
     line-height: 1.25;
     cursor: pointer;
     padding: 4px;
     z-index: 150;
-    overflow: hidden;
+    overflow-wrap: break-word;
   }
 
   div.note-body, div.note-box.embedded div.note-box-inner-border {
