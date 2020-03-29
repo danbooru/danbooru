@@ -13,6 +13,15 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
       CurrentUser.ip_addr = nil
     end
 
+    context "#index" do
+      should "work" do
+        create(:comment_vote, user: @user)
+        get_auth comment_votes_path, @user
+
+        assert_response :success
+      end
+    end
+
     context "#create.json" do
       should "create a vote" do
         assert_difference("CommentVote.count", 1) do
@@ -49,6 +58,26 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
         create(:comment_vote, user: @user, comment: @comment, score: -1)
         assert_difference("CommentVote.count", 0) do
           post_auth comment_comment_votes_path(comment_id: @comment.id, :score => "down", format: "js"), @user
+          assert_response 422
+        end
+      end
+    end
+
+    context "#destroy" do
+      should "allow users to remove their own comment votes" do
+        @vote = create(:comment_vote, user: @user)
+
+        assert_difference("CommentVote.count", -1) do
+          delete_auth comment_comment_votes_path(@vote.comment), @user
+          assert_redirected_to @vote.comment
+        end
+      end
+
+      should "not allow users to remove comment votes by other users" do
+        @vote = create(:comment_vote)
+
+        assert_difference("CommentVote.count", 0) do
+          delete_auth comment_comment_votes_path(@vote.comment), @user
           assert_response 422
         end
       end

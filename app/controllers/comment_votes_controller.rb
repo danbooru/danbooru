@@ -10,13 +10,13 @@ class CommentVotesController < ApplicationController
   end
 
   def create
-    @comment = authorize Comment.find(params[:comment_id])
+    @comment = authorize Comment.find(params[:comment_id]), policy_class: CommentVotePolicy
     @comment_vote = @comment.vote!(params[:score])
     respond_with(@comment)
   end
 
   def destroy
-    @comment = authorize Comment.find(params[:comment_id])
+    @comment = authorize Comment.find(params[:comment_id]), policy_class: CommentVotePolicy
     @comment.unvote!
     respond_with(@comment)
   end
