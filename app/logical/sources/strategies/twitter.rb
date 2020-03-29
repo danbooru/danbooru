@@ -5,10 +5,16 @@ module Sources::Strategies
 
     # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg
     # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb?format=jpg&name=900x900
-    BASE_IMAGE_URL = %r!\Ahttps?://pbs\.twimg\.com/(?<media_type>media|tweet_video_thumb)!i
+    # https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg
+    # https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg
+    # https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg
+    BASE_IMAGE_URL = %r!\Ahttps?://pbs\.twimg\.com/(?<media_type>media|tweet_video_thumb|ext_tw_video_thumb|amplify_video_thumb)!i
     FILENAME1 = %r!(?<file_name>[a-zA-Z0-9_-]+)\.(?<file_ext>\w+)!i
     FILENAME2 = %r!(?<file_name>[a-zA-Z0-9_-]+)\?.*format=(?<file_ext>\w+)!i
-    IMAGE_URL = %r!#{BASE_IMAGE_URL}/#{Regexp.union(FILENAME1, FILENAME2)}!i
+    FILEPATH1 = %r!(?<file_path>\d+/[\w_-]+/img)!i
+    FILEPATH2 = %r!(?<file_path>\d+/img)!i
+    IMAGE_URL1 = %r!#{BASE_IMAGE_URL}/#{Regexp.union(FILENAME1, FILENAME2)}!i
+    IMAGE_URL2 = %r!#{BASE_IMAGE_URL}/#{Regexp.union(FILEPATH1, FILEPATH2)}/#{FILENAME1}!i
 
     # Twitter provides a list but it's inaccurate; some names ('intent') aren't
     # included and other names in the list aren't actually reserved.
@@ -61,8 +67,10 @@ module Sources::Strategies
     end
 
     def image_urls
-      if url =~ IMAGE_URL
+      if url =~ IMAGE_URL1
         ["https://pbs.twimg.com/#{$~[:media_type]}/#{$~[:file_name]}.#{$~[:file_ext]}:orig"]
+      elsif url =~ IMAGE_URL2
+        ["https://pbs.twimg.com/#{$~[:media_type]}/#{$~[:file_path]}/#{$~[:file_name]}.#{$~[:file_ext]}:orig"]
       elsif api_response.present?
         api_response.dig(:extended_entities, :media).to_a.map do |media|
           if media[:type] == "photo"
