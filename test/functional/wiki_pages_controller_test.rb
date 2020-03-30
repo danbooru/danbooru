@@ -140,11 +140,8 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
 
     context "edit action" do
       should "render" do
-        as_user do
-          @wiki_page = create(:wiki_page)
-        end
-
-        get_auth wiki_page_path(@wiki_page), @mod
+        @wiki_page = as(@user) { create(:wiki_page) }
+        get_auth edit_wiki_page_path(@wiki_page), @user
         assert_response :success
       end
     end

@@ -18,6 +18,13 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "show action" do
+      should "work" do
+        get tag_alias_path(@tag_alias)
+        assert_response :success
+      end
+    end
+
     context "destroy action" do
       should "allow admins to delete aliases" do
         delete_auth tag_alias_path(@tag_alias), create(:admin_user)

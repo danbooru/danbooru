@@ -10,7 +10,14 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
 
     context "#new" do
       should "render" do
-        get_auth bulk_update_requests_path, @user
+        get_auth new_bulk_update_request_path, @user
+        assert_response :success
+      end
+    end
+
+    context "#edit" do
+      should "render" do
+        get_auth edit_bulk_update_request_path(@bulk_update_request), @user
         assert_response :success
       end
     end

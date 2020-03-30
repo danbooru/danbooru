@@ -11,7 +11,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
 
     context "edit action" do
       should "render" do
-        get_auth tag_path(@tag), @user, params: {:id => @tag.id}
+        get_auth edit_tag_path(@tag), @user
         assert_response :success
       end
     end

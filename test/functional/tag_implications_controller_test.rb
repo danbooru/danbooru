@@ -18,6 +18,13 @@ class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "show action" do
+      should "work" do
+        get tag_implication_path(@tag_implication)
+        assert_response :success
+      end
+    end
+
     context "destroy action" do
       should "allow admins to delete implications" do
         delete_auth tag_implication_path(@tag_implication), create(:admin_user)

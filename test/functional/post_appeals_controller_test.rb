@@ -13,6 +13,14 @@ class PostAppealsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "show action" do
+      should "render" do
+        @appeal = create(:post_appeal)
+        get post_appeal_path(@appeal)
+        assert_redirected_to post_appeals_path(search: { id: @appeal.id })
+      end
+    end
+
     context "index action" do
       setup do
         as_user do
