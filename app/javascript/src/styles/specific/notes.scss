@@ -12,7 +12,7 @@
     background: var(--note-body-background);
     color: var(--note-body-text-color);
     min-width: 140px;
-    max-width: 0;
+    width: min-content;
     min-height: 1em;
     line-height: 1.25;
     cursor: pointer;
