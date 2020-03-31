@@ -31,6 +31,11 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_select "tr td:first-child", text: "abc"
       end
+
+      should "redirect the legacy title param to the show page" do
+        get wiki_pages_path(title: "abc")
+        assert_redirected_to wiki_pages_path(search: { title_normalize: "abc" }, redirect: true)
+      end
     end
 
     context "search action" do

@@ -1,6 +1,5 @@
 class WikiPagesController < ApplicationController
   respond_to :html, :xml, :json, :js
-  before_action :normalize_search_params, :only => [:index]
   layout "sidebar"
 
   def new
@@ -15,8 +14,12 @@ class WikiPagesController < ApplicationController
   end
 
   def index
-    @wiki_pages = authorize WikiPage.paginated_search(params)
-    respond_with(@wiki_pages)
+    if params[:title].present?
+      redirect_to wiki_pages_path(search: { title_normalize: params[:title] }, redirect: true)
+    else
+      @wiki_pages = authorize WikiPage.paginated_search(params)
+      respond_with(@wiki_pages)
+    end
   end
 
   def search
@@ -88,13 +91,6 @@ class WikiPagesController < ApplicationController
       wiki_page.title == WikiPage.normalize_title(params[:search][:title_normalize])
     else
       true
-    end
-  end
-
-  def normalize_search_params
-    if params[:title]
-      params[:search] ||= {}
-      params[:search][:title] = params.delete(:title)
     end
   end
 end
