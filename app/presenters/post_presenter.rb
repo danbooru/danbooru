@@ -1,4 +1,4 @@
-class PostPresenter < Presenter
+class PostPresenter
   attr_reader :pool, :next_post_in_pool
   delegate :tag_list_html, :split_tag_list_html, :split_tag_list_text, :inline_tag_list_html, to: :tag_set_presenter
 
@@ -148,10 +148,6 @@ class PostPresenter < Presenter
 
   def tag_set_presenter
     @tag_set_presenter ||= TagSetPresenter.new(@post.tag_array)
-  end
-
-  def preview_html
-    PostPresenter.preview(@post)
   end
 
   def humanized_essential_tag_string

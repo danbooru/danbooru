@@ -3,7 +3,7 @@
 #   This class makes it easy to fetch the categories for all the
 #   tags in one call instead of fetching them sequentially.
 
-class TagSetPresenter < Presenter
+class TagSetPresenter
   extend Memoist
   attr_reader :tag_names
 
@@ -145,6 +145,14 @@ class TagSetPresenter < Presenter
 
     html << "</li>"
     html
+  end
+
+  def h(s)
+    CGI.escapeHTML(s)
+  end
+
+  def u(s)
+    CGI.escape(s)
   end
 
   memoize :tags, :tags_by_category, :ordered_tags, :humanized_essential_tag_string
