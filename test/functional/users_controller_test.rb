@@ -33,6 +33,14 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "custom_style action" do
+      should "work" do
+        @user.update!(custom_style: "span { color: red; }")
+        get_auth custom_style_users_path(format: "css"), @user
+        assert_response :success
+      end
+    end
+
     context "show action" do
       setup do
         # flesh out profile to get more test coverage of user presenter.

@@ -24,6 +24,11 @@ class FavoritesControllerTest < ActionDispatch::IntegrationTest
         get favorites_path
         assert_redirected_to posts_path(format: "html")
       end
+
+      should "render for json" do
+        get favorites_path, as: :json
+        assert_response :success
+      end
     end
 
     context "create action" do

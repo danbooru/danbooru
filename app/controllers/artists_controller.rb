@@ -73,7 +73,7 @@ class ArtistsController < ApplicationController
     @artist = Artist.find_by_name(params[:name])
 
     if params[:name].blank?
-      redirect_to new_artist_path(artist_params(:new))
+      redirect_to new_artist_path(permitted_attributes(Artist))
     elsif @artist.present?
       redirect_to artist_path(@artist)
     else

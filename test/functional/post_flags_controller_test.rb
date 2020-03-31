@@ -31,6 +31,11 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render for json" do
+        get post_flags_path, as: :json
+        assert_response :success
+      end
+
       should "hide flagger names from regular users" do
         get_auth post_flags_path, @user
         assert_response :success

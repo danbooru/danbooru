@@ -34,6 +34,11 @@ class PostAppealsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render for json" do
+        get post_appeals_path, as: :json
+        assert_response :success
+      end
+
       context "with search parameters" do
         should "render" do
           get_auth post_appeals_path, @user, params: {:search => {:post_id => @post_appeal.post_id}}

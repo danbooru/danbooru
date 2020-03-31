@@ -58,6 +58,18 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { tags: "bkub" }
           assert_response :success
         end
+
+        should "render for a wildcard tag search" do
+          create(:post, tag_string: "1girl solo")
+          get posts_path(tags: "*girl*")
+          assert_response :success
+        end
+
+        should "render for a search:all search" do
+          create(:saved_search, user: @user)
+          get posts_path(tags: "search:all")
+          assert_response :success
+        end
       end
 
       context "with a multi-tag search" do
@@ -137,6 +149,43 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_select "entry", 0
         end
       end
+
+      context "with deleted posts" do
+        setup do
+          @post.update!(is_deleted: true)
+        end
+
+        should "not show deleted posts normally" do
+          get posts_path
+          assert_response :success
+          assert_select "#post_#{@post.id}", 0
+        end
+
+        should "show deleted posts when searching for status:deleted" do
+          get posts_path(tags: "status:deleted")
+          assert_response :success
+          assert_select "#post_#{@post.id}", 1
+        end
+      end
+
+      context "with restricted posts" do
+        setup do
+          Danbooru.config.stubs(:restricted_tags).returns(["tagme"])
+          as(@user) { @post.update!(tag_string: "tagme") }
+        end
+
+        should "not show restricted posts if user doesn't have permission" do
+          get posts_path
+          assert_response :success
+          assert_select "#post_#{@post.id}", 0
+        end
+
+        should "show restricted posts if user has permission" do
+          get_auth posts_path, create(:gold_user)
+          assert_response :success
+          assert_select "#post_#{@post.id}", 1
+        end
+      end
     end
 
     context "show_seq action" do
@@ -170,6 +219,11 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           @builder = create(:builder_user, can_approve_posts: true)
 
           as(@user) do
+            @post.update!(tag_string: "1girl solo highres blah 2001")
+            Tag.find_by_name("1girl").update(post_count: 20_000)
+            Tag.find_by_name("solo").update(post_count: 2_000)
+            Tag.find_by_name("blah").update(post_count: 1)
+
             @pool = create(:pool)
             @pool.add!(@post)
 
@@ -206,6 +260,11 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
         should "render for an admin" do
           get_auth post_path(@post), @admin
+          assert_response :success
+        end
+
+        should "render for a builder with a search query" do
+          get_auth post_path(@post, q: "tagme"), @builder
           assert_response :success
         end
       end

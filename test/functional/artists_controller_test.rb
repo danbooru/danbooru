@@ -73,6 +73,11 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         get_auth show_or_new_artists_path(name: "nobody"), @user
         assert_response :success
       end
+
+      should "redirect to the new artist page for a blank artist" do
+        get_auth show_or_new_artists_path, @user
+        assert_redirected_to new_artist_path
+      end
     end
 
     context "edit action" do

@@ -129,6 +129,11 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         get show_or_new_wiki_pages_path, params: { title: "what" }
         assert_redirected_to wiki_page_path("what")
       end
+
+      should "redirect when given a blank title" do
+        get show_or_new_wiki_pages_path
+        assert_redirected_to new_wiki_page_path
+      end
     end
 
     context "new action" do
