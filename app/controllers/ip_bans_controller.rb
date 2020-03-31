@@ -24,10 +24,4 @@ class IpBansController < ApplicationController
     @ip_ban.destroy
     respond_with(@ip_ban)
   end
-
-  private
-
-  def search_params
-    params.fetch(:search, {}).permit(%i[ip_addr order])
-  end
 end

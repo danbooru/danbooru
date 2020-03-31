@@ -1,6 +1,5 @@
 class BansController < ApplicationController
   respond_to :html, :xml, :json
-  helper_method :search_params
 
   def new
     @ban = authorize Ban.new(permitted_attributes(Ban))
