@@ -1962,6 +1962,13 @@ class PostTest < ActiveSupport::TestCase
       assert_tag_match([post2], "-*c -a*a")
     end
 
+    should "ignore invalid operator syntax" do
+      assert_nothing_raised do
+        assert_tag_match([], "-")
+        assert_tag_match([], "~")
+      end
+    end
+
     should "return posts for the id:<N> metatag" do
       posts = FactoryBot.create_list(:post, 3)
 

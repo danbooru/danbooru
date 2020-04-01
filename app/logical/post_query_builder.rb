@@ -1038,7 +1038,9 @@ class PostQueryBuilder
       def parse_tag(tag, output)
         operator, tag = parse_tag_operator(tag)
 
-        if tag.include?("*")
+        if tag.blank?
+          # XXX ignore "-", "~" operators without a tag.
+        elsif tag.include?("*")
           tags = Tag.wildcard_matches(tag)
 
           if operator == "-"
