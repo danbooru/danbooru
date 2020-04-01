@@ -4,7 +4,10 @@ class PasswordResetsController < ApplicationController
   def create
     @user = User.find_by_name(params.dig(:user, :name))
 
-    if @user.can_receive_email?(require_verification: false)
+    if @user.blank?
+      flash[:notice] = "That account does not exist"
+      redirect_to password_reset_path
+    elsif @user.can_receive_email?(require_verification: false)
       UserMailer.password_reset(@user).deliver_later
       flash[:notice] = "Password reset email sent. Check your email"
       respond_with(@user, location: new_session_path)

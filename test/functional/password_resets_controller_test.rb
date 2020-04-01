@@ -25,6 +25,12 @@ class PasswordResetsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to @user
         assert_no_enqueued_emails
       end
+
+      should "fail if the user does not exist" do
+        post password_reset_path, params: { user: { name: "qoi23oti" } }
+
+        assert_redirected_to password_reset_path
+      end
     end
   end
 end
