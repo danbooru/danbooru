@@ -38,7 +38,7 @@ module Explore
     private
 
     def parse_date(params)
-      date = params[:date] ? Date.parse(params[:date]) : Time.zone.today
+      date = params[:date].present? ? Date.parse(params[:date]) : Time.zone.today
       scale = params[:scale].in?(["day", "week", "month"]) ? params[:scale] : "day"
       min_date = date.send("beginning_of_#{scale}")
       max_date = date.send("next_#{scale}").send("beginning_of_#{scale}")

@@ -12,6 +12,11 @@ module Explore
           get popular_explore_posts_path
           assert_response :success
         end
+
+         should "work with a blank date" do
+          get popular_explore_posts_path(date: "")
+          assert_response :success
+         end
       end
 
       context "#curated" do
