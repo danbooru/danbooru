@@ -205,6 +205,11 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         get random_posts_path, params: { tags: "aaaa" }
         assert_redirected_to(post_path(@post, tags: "aaaa"))
       end
+
+      should "return a 404 when no random posts can be found" do
+        get random_posts_path, params: { tags: "qoigjegoi" }
+        assert_response 404
+      end
     end
 
     context "show action" do
