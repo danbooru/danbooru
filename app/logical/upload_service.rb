@@ -22,7 +22,7 @@ class UploadService
     preprocessor = Preprocessor.new(params)
 
     if preprocessor.in_progress?
-      UploadServiceDelayedStartJob.set(wait: 5.seconds).perform_later(CurrentUser.user)
+      UploadServiceDelayedStartJob.set(wait: 5.seconds).perform_later(params, CurrentUser.user)
       return preprocessor.predecessor
     end
 
