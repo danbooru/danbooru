@@ -50,7 +50,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
         assert_difference("Ban.count", 1) do
           post_auth bans_path, @mod, params: { ban: { duration: 60, reason: "xxx", user_id: @user.id }}
 
-          assert_response :redirect
+          assert_redirected_to bans_path
           assert_equal(true, @user.reload.is_banned?)
         end
       end

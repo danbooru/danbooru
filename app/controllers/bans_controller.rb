@@ -26,7 +26,7 @@ class BansController < ApplicationController
   def create
     @ban = authorize Ban.new(banner: CurrentUser.user, **permitted_attributes(Ban))
     @ban.save
-    respond_with(@ban)
+    respond_with(@ban, location: bans_path)
   end
 
   def update
