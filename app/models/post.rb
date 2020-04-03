@@ -753,7 +753,7 @@ class Post < ApplicationRecord
     def filter_metatags(tags)
       @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent|-?locked):/i}
       tags = apply_categorization_metatags(tags)
-      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|-fav|child|-child|-favgroup|favgroup|upvote|downvote|status|-status):/i}
+      @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|-fav|child|-child|-favgroup|favgroup|upvote|downvote|status|-status|disapproved):/i}
       apply_pre_metatags
       return tags
     end
@@ -814,6 +814,10 @@ class Post < ApplicationRecord
         when /^-status:banned$/i
           raise User::PrivilegeError unless CurrentUser.is_approver?
           unban!
+
+        when /^disapproved:(.+)$/i
+          raise User::PrivilegeError unless CurrentUser.is_approver?
+          disapprovals.create!(user: CurrentUser.user, reason: $1.downcase)
 
         when /^child:none$/i
           children.each do |post|

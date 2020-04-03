@@ -1046,6 +1046,38 @@ class PostTest < ActiveSupport::TestCase
           end
         end
 
+        context "for disapproved:<reason>" do
+          should "disapprove the post if the user has permission" do
+            @user = create(:approver)
+
+            as(@user) do
+              @post.update!(is_pending: true)
+              @post.update(tag_string: "aaa disapproved:disinterest")
+            end
+
+            assert_equal(@post.id, PostDisapproval.last.post_id)
+            assert_equal(@user.id, PostDisapproval.last.user_id)
+            assert_equal("disinterest", PostDisapproval.last.reason)
+          end
+
+          should "not disapprove the post if the user is doesn't have permission" do
+            assert_raises(User::PrivilegeError) do
+              @post.update!(is_pending: true)
+              @post.update(tag_string: "aaa disapproved:disinterest")
+            end
+
+            assert_equal(0, @post.disapprovals.count)
+          end
+
+          should "not allow disapproving active posts" do
+            assert_raises(User::PrivilegeError) do
+              @post.update(tag_string: "aaa disapproved:disinterest")
+            end
+
+            assert_equal(0, @post.disapprovals.count)
+          end
+        end
+
         context "for a source" do
           should "set the source with source:foo_bar_baz" do
             @post.update(:tag_string => "source:foo_bar_baz")

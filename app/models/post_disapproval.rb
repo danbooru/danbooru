@@ -6,6 +6,7 @@ class PostDisapproval < ApplicationRecord
   belongs_to :user
   validates_uniqueness_of :post_id, :scope => [:user_id], :message => "have already hidden this post"
   validates_inclusion_of :reason, in: REASONS
+  validate :validate_disapproval
 
   scope :with_message, -> { where.not(message: nil) }
   scope :without_message, -> { where(message: nil) }
@@ -60,6 +61,12 @@ class PostDisapproval < ApplicationRecord
 
   def self.available_includes
     [:user, :post]
+  end
+
+  def validate_disapproval
+    if post.status == "active"
+      errors[:post] << "is already active and cannot be disapproved"
+    end
   end
 
   def message=(message)

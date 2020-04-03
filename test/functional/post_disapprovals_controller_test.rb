@@ -29,6 +29,14 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
           assert_response 403
         end
       end
+
+      should "not allow disapproving active posts" do
+        assert_difference("PostDisapproval.count", 0) do
+          @post.update!(is_pending: false)
+          post_auth post_disapprovals_path, @approver, params: { post_disapproval: { post_id: @post.id, reason: "breaks_rules" }, format: "js" }
+          assert_response :success
+        end
+      end
     end
 
     context "index action" do
