@@ -2,5 +2,8 @@
   <%= quick_search_form_for(:body_matches, comments_path, "comments") %>
   <%= subnav_link_to "Listing", comments_path(:group_by => "post") %>
   <%= subnav_link_to "Search", search_comments_path %>
+  <% if policy(CommentVote).can_see_votes? %>
+    <%= subnav_link_to "Votes", comment_votes_path %>
+  <% end %>
   <%= subnav_link_to "Help", wiki_page_path("help:comments") %>
 <% end %>
