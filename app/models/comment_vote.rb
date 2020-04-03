@@ -9,7 +9,7 @@ class CommentVote < ApplicationRecord
   validates_inclusion_of :score, :in => [-1, 1], :message => "must be 1 or -1"
 
   def self.visible(user)
-    if user.is_admin?
+    if user.is_moderator?
       all
     elsif user.is_member?
       where(user: user)
