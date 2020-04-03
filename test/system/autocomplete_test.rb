@@ -45,8 +45,8 @@ class AutocompleteTest < ApplicationSystemTestCase
         assert_metatag_autocomplete_equals(%w[rating note status], "locked")
         assert_metatag_autocomplete_equals(%w[safe questionable explicit], "rating")
         assert_metatag_autocomplete_equals(%w[gif jpg mp4 png swf webm zip], "filetype")
-        assert_metatag_autocomplete_equals(%w[any none disinterest poor_quality breaks_rules], "disapproval")
         assert_metatag_autocomplete_equals(%w[active any banned deleted flagged modqueue pending unmoderated], "status")
+        assert_metatag_autocomplete_equals(PostDisapproval::REASONS, "disapproval")
       end
 
       should "work for username metatags" do

@@ -1,16 +1,17 @@
 class PostDisapproval < ApplicationRecord
   DELETION_THRESHOLD = 1.month
+  REASONS = %w[breaks_rules poor_quality disinterest]
 
   belongs_to :post
   belongs_to :user
   validates_uniqueness_of :post_id, :scope => [:user_id], :message => "have already hidden this post"
-  validates_inclusion_of :reason, :in => %w(legacy breaks_rules poor_quality disinterest)
+  validates_inclusion_of :reason, in: REASONS
 
   scope :with_message, -> { where.not(message: nil) }
   scope :without_message, -> { where(message: nil) }
   scope :breaks_rules, -> {where(:reason => "breaks_rules")}
   scope :poor_quality, -> {where(:reason => "poor_quality")}
-  scope :disinterest, -> {where(:reason => ["disinterest", "legacy"])}
+  scope :disinterest, -> {where(:reason => "disinterest")}
 
   def self.prune!
     PostDisapproval.where("post_id in (select _.post_id from post_disapprovals _ where _.created_at < ?)", DELETION_THRESHOLD.ago).delete_all

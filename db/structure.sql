@@ -2644,7 +2644,7 @@ CREATE TABLE public.post_disapprovals (
     post_id integer NOT NULL,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    reason character varying DEFAULT 'legacy'::character varying,
+    reason character varying NOT NULL,
     message text
 );
 
@@ -7364,6 +7364,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200309043653'),
 ('20200318224633'),
 ('20200325073456'),
-('20200325074859');
+('20200325074859'),
+('20200403210353');
 
 

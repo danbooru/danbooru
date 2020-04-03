@@ -26,7 +26,7 @@ class PostDisapprovalTest < ActiveSupport::TestCase
 
       context "made by alice" do
         setup do
-          @disapproval = PostDisapproval.create(:user => @alice, :post => @post_1)
+          @disapproval = create(:post_disapproval, user: @alice, post: @post_1)
         end
 
         context "when the current user is alice" do
@@ -57,9 +57,7 @@ class PostDisapprovalTest < ActiveSupport::TestCase
         setup do
           @post = FactoryBot.create(:post)
           @user = FactoryBot.create(:user)
-          travel_to(2.months.ago) do
-            @disapproval = PostDisapproval.create(:user => @user, :post => @post)
-          end
+          @disapproval = create(:post_disapproval, user: @user, post: @post, created_at: 2.months.ago)
         end
 
         should "be pruned" do
