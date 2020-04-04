@@ -5,7 +5,7 @@ module Maintenance
       end
 
       def destroy
-        deletion = UserDeletion.new(CurrentUser.user, params[:password])
+        deletion = UserDeletion.new(CurrentUser.user, params.dig(:user, :password))
         deletion.delete!
         session.delete(:user_id)
         redirect_to(posts_path, :notice => "You are now logged out")

@@ -32,15 +32,9 @@
       undone. Your account cannot be recovered after it is deactivated.
     </p>
 
-    <%= form_tag(maintenance_user_deletion_path, :method => :delete, :class => "simple_form") do %>
-      <div class="input">
-        <label>Password</label>
-        <%= password_field_tag :password %>
-      </div>
-
-      <div class="input">
-        <%= submit_tag "Deactivate account" %>
-      </div>
+    <%= edit_form_for(:user, url: maintenance_user_deletion_path, method: :delete) do |f| %>
+      <%= f.input :password %>
+      <%= f.submit "Deactivate account", "data-confirm": "Are you sure you want to deactivate your account? This cannot be undone" %>
     <% end %>
   </div>
 </div>
