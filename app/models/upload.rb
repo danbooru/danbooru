@@ -233,6 +233,10 @@ class Upload < ApplicationRecord
     as_pending.to_s.truthy?
   end
 
+  def has_commentary?
+    artist_commentary_title.present? || artist_commentary_desc.present? || translated_commentary_title.present? || translated_commentary_desc.present?
+  end
+
   def self.available_includes
     [:uploader, :post]
   end

@@ -48,7 +48,6 @@
           <div class="artist-commentary" style="display: none;">
             <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { size: 60, value: params[:artist_commentary_title] } %>
             <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { size: "60x5", value: params[:artist_commentary_desc] } %>
-            <%= f.input :include_artist_commentary, as: :boolean, label: "Include Commentary", input_html: { checked: params[:include_artist_commentary].present? } %>
           </div>
         </div>
 

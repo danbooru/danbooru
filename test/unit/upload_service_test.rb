@@ -1210,14 +1210,25 @@ class UploadServiceTest < ActiveSupport::TestCase
         @upload = FactoryBot.create(:source_upload, file_size: 1000, md5: "12345", file_ext: "jpg", image_width: 100, image_height: 100)
       end
 
-      should "create a commentary record" do
-        assert_difference(-> { ArtistCommentary.count }) do
+      should "create a commentary record if the commentary is present" do
+        assert_difference("ArtistCommentary.count", 1) do
           @upload.update!(
-            include_artist_commentary: true,
             artist_commentary_title: "blah",
             artist_commentary_desc: "blah",
             translated_commentary_title: "blah",
             translated_commentary_desc: "blah"
+          )
+          UploadService.new({}).create_post_from_upload(@upload)
+        end
+      end
+
+      should "not create a commentary record if the commentary is blank" do
+        assert_difference("ArtistCommentary.count", 0) do
+          @upload.update!(
+            artist_commentary_title: "",
+            artist_commentary_desc: "",
+            translated_commentary_title: "",
+            translated_commentary_desc: ""
           )
           UploadService.new({}).create_post_from_upload(@upload)
         end

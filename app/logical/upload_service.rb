@@ -77,7 +77,7 @@ class UploadService
       )
     end
 
-    if upload.include_artist_commentary
+    if upload.has_commentary?
       @post.create_artist_commentary(
         :original_title => upload.artist_commentary_title,
         :original_description => upload.artist_commentary_desc,
