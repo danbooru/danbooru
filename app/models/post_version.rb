@@ -32,6 +32,13 @@ class PostVersion < ApplicationRecord
       end
     end
 
+    def tag_matches(string)
+      tag = string.split(/\S+/)[0]
+      return all if tag.nil?
+      tag = "*#{tag}*" unless tag =~ /\*/
+      where_ilike(:tags, tag)
+    end
+
     def search(params)
       q = super
       q = q.search_attributes(params, :updater_id, :post_id, :tags, :added_tags, :removed_tags, :rating, :rating_changed, :parent_id, :parent_changed, :source, :source_changed, :version)
@@ -40,8 +47,18 @@ class PostVersion < ApplicationRecord
         q = q.changed_tags_include_all(params[:changed_tags].scan(/[^[:space:]]+/))
       end
 
+      if params[:tag_matches]
+        q = q.tag_matches(params[:tag_matches])
+      end
+
       if params[:updater_name].present?
         q = q.where(updater_id: User.name_to_id(params[:updater_name]))
+      end
+
+      if params[:is_new].to_s.truthy?
+        q = q.where(version: 1)
+      elsif params[:is_new].to_s.falsy?
+        q = q.where("version != 1")
       end
 
       q.apply_default_order(params)
@@ -128,6 +145,19 @@ class PostVersion < ApplicationRecord
       parent_id: "Parent",
       source: "Source",
     }
+  end
+
+  def pretty_rating
+    case rating
+    when "q"
+      "Questionable"
+
+    when "e"
+      "Explicit"
+
+    when "s"
+      "Safe"
+    end
   end
 
   def changes

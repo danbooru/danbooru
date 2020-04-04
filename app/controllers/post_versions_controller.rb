@@ -5,7 +5,7 @@ class PostVersionsController < ApplicationController
   respond_to :js, only: [:undo]
 
   def index
-    set_version_comparison
+    set_version_comparison("current")
     @post_versions = authorize PostVersion.paginated_search(params)
 
     if request.format.html?
