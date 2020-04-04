@@ -50,12 +50,7 @@ class UserDeletion
 
   def rename
     name = "user_#{user.id}"
-    n = 0
-    name += "~" while User.where(:name => name).exists? && (n < 10)
-
-    if n == 10
-      raise ValidationError.new("New name could not be found")
-    end
+    name += "~" while User.exists?(name: name)
 
     request = UserNameChangeRequest.new(user: user, desired_name: name, original_name: user.name)
     request.save!(validate: false) # XXX don't validate so that the 1 name change per week rule doesn't interfere
