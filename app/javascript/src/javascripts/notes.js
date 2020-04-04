@@ -4,7 +4,7 @@ import Utility from './utility'
 let Note = {
   HIDE_DELAY: 250,
   NORMALIZE_ATTRIBUTES: ['letter-spacing', 'line-height', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom', 'padding-left', 'padding-right', 'padding-top', 'padding-bottom'],
-  COPY_ATTRIBUTES: ['background-color', 'border-radius', 'transform'],
+  COPY_ATTRIBUTES: ['background-color', 'border-radius', 'transform', 'justify-content', 'align-items'],
   permitted_style_values: function(attribute, $attribute_child) {
     if ($attribute_child.length === 0) {
       return "";
