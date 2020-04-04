@@ -23,7 +23,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <%= javascript_pack_tag "application" %>
   <%= stylesheet_pack_tag "application" %>
-  <% if CurrentUser.user.custom_style.present? %>
+  <% if CurrentUser.user.custom_style.present? && params.fetch(:css, "true").truthy?  %>
     <%= stylesheet_link_tag custom_style_users_path(md5: Digest::MD5.hexdigest(CurrentUser.user.custom_style)), media: "screen" %>
   <% end %>
   <% if Danbooru.config.twitter_site %>
