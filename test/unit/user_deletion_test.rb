@@ -27,7 +27,7 @@ class UserDeletionTest < ActiveSupport::TestCase
 
   context "a valid user deletion" do
     setup do
-      @user = create(:user, email_address: build(:email_address))
+      @user = create(:user, name: "foo", email_address: build(:email_address))
       @deletion = UserDeletion.new(@user, "password")
     end
 
@@ -39,6 +39,15 @@ class UserDeletionTest < ActiveSupport::TestCase
     should "rename the user" do
       @deletion.delete!
       assert_equal("user_#{@user.id}", @user.reload.name)
+    end
+
+    should "generate a user name change request" do
+      assert_difference("UserNameChangeRequest.count") do
+        @deletion.delete!
+      end
+
+      assert_equal("foo", UserNameChangeRequest.last.original_name)
+      assert_equal("user_#{@user.id}", UserNameChangeRequest.last.desired_name)
     end
 
     should "reset the password" do

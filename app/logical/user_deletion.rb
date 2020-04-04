@@ -57,8 +57,8 @@ class UserDeletion
       raise ValidationError.new("New name could not be found")
     end
 
-    user.name = name
-    user.save!
+    request = UserNameChangeRequest.new(user: user, desired_name: name, original_name: user.name)
+    request.save!(validate: false) # XXX don't validate so that the 1 name change per week rule doesn't interfere
   end
 
   def validate
