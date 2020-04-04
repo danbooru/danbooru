@@ -188,7 +188,7 @@
 
       <tr>
         <th>Feedback</th>
-        <td><%= presenter.feedbacks(self) %></td>    </tbody>
+        <td><%= presenter.feedbacks(self) %></td>
       </tr>
       
       <% if CurrentUser.is_moderator? && presenter.previous_names(self).present? %>
@@ -226,5 +226,6 @@
           </td>
         </tr>
       <% end %>
+    </tbody>
   </table>
 </div>
