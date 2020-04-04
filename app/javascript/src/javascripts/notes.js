@@ -528,7 +528,6 @@ let Note = {
     },
 
     set_text: function($note_body, $note_box, text) {
-      Note.Body.display_text($note_body, text);
       if (Note.embed) {
         const $note_inner_box = $note_box.find("div.note-box-inner-border");
         Note.Body.display_text($note_inner_box, text);
@@ -538,6 +537,8 @@ let Note = {
         // Clear the font size so that the fonts will be scaled to the current value
         $note_inner_box.css("font-size", "");
         Note.Box.copy_style_attributes($note_box);
+      } else {
+        Note.Body.display_text($note_body, text);
       }
       Note.Body.resize($note_body);
       Note.Body.bound_position($note_body);
@@ -680,10 +681,13 @@ let Note = {
         $note_body.data("id", String(data.id)).attr("data-id", data.id);
         $note_box.data("id", String(data.id)).attr("data-id", data.id);
         $note_box.removeClass("unsaved");
+        $note_box.removeClass("movable");
       } else {
         $note_box = Note.Box.find(data.id);
         $note_box.removeClass("unsaved");
+        $note_box.removeClass("movable");
       }
+      Note.move_id = null;
     },
 
     save: function() {
@@ -949,9 +953,11 @@ let Note = {
     container.appendChild($note_body[0]);
     $note_body.data("original-body", original_body);
     Note.Box.scale($note_box);
-    Note.Body.display_text($note_body, sanitized_body);
     if (Note.embed) {
       Note.Body.display_text($note_box.children("div.note-box-inner-border"), sanitized_body);
+      Note.Body.display_text($note_body, "Click to edit.");
+    } else {
+      Note.Body.display_text($note_body, sanitized_body);
     }
   },
 
