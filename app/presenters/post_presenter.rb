@@ -51,7 +51,7 @@ class PostPresenter
 
     locals[:preview_url] = post.preview_file_url
 
-    locals[:alt_text] = post.tag_string
+    locals[:alt_text] = "post ##{post.id}"
 
     locals[:has_cropped] = post.has_cropped?
 
