@@ -14,6 +14,7 @@ module NoteSanitizer
   }
 
   ALLOWED_PROPERTIES = %w(
+    align-items
     background background-color
     border border-color border-image border-radius border-style border-width
     border-bottom border-bottom-color border-bottom-left-radius border-bottom-right-radius border-bottom-style border-bottom-width
@@ -29,6 +30,7 @@ module NoteSanitizer
     float
     font font-family font-size font-size-adjust font-style font-variant font-weight
     height width
+    justify-content
     letter-spacing
     line-height
     list-style list-style-position list-style-type
