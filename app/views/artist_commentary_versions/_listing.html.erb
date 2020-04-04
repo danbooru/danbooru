@@ -4,7 +4,7 @@
     <%= PostPresenter.preview(@commentary_versions.first.post, show_deleted: true) %>
   <% end %>
 
-  <%= table_for @commentary_versions, {class: "striped", width: "100%"} do |t| %>
+  <%= table_for @commentary_versions, class: "striped" do |t| %>
     <% if listing_type(:post_id) == :standard %>
       <% t.column "Post", width: "1%" do |commentary_version| %>
           <%= PostPresenter.preview(commentary_version.post, show_deleted: true) %>
