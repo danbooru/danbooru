@@ -38,6 +38,18 @@ module Sources
         @site = Sources::Strategies.find("https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:small")
         assert_equal("https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:orig", @site.image_url)
       end
+
+      should "work when given an external video thumbnail" do
+        # https://twitter.com/chivedips/status/1243850897056133121
+        @site = Sources::Strategies.find("https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg:small")
+        assert_equal("https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg:orig", @site.image_url)
+      end
+
+      should "work when given an amplify video thumbnail" do
+        # https://twitter.com/UNITED_CINEMAS/status/1223138847417978881
+        @site = Sources::Strategies.find("https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg:small")
+        assert_equal("https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg:orig", @site.image_url)
+      end
     end
 
     context "An animated gif" do
