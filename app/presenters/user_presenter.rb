@@ -146,10 +146,4 @@ class UserPresenter
       []
     end
   end
-
-  def previous_names(template)
-    user.user_name_change_requests.visible(CurrentUser.user).map do |req|
-      template.link_to req.original_name, req
-    end.join(", ").html_safe
-  end
 end

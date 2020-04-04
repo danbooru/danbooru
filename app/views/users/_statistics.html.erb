@@ -191,11 +191,19 @@
         <td><%= presenter.feedbacks(self) %></td>
       </tr>
       
-      <% if CurrentUser.is_moderator? && presenter.previous_names(self).present? %>
-        <tr>
-          <th>Previous Names</th>
-          <td><%= presenter.previous_names(self) %></td>
-        </tr>
+      <% if policy(UserNameChangeRequest.new(user: user)).show? %>
+        <% user.user_name_change_requests.visible(CurrentUser.user).tap do |changes| %>
+          <% if changes.present? %>
+            <tr>
+              <th>Previous Names</th>
+              <td>
+                <%= changes.map do |change| %>
+                  <% link_to change.original_name, change %>
+                <% end.join(", ").html_safe %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
       <% end %>
 
       <% if CurrentUser.id == user.id %>

@@ -4,7 +4,7 @@ class UserNameChangeRequestPolicy < ApplicationPolicy
   end
 
   def show?
-    user.is_admin? || (user.is_member? && !record.user.is_deleted?) || (record.user == user)
+    user.is_moderator? || (user.is_member? && !record.user.is_deleted?) || (record.user == user)
   end
 
   def permitted_attributes
