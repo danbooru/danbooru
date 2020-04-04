@@ -6,10 +6,8 @@ class UserDeletionTest < ActiveSupport::TestCase
       should "fail" do
         @user = create(:user)
         @deletion = UserDeletion.new(@user, "wrongpassword")
-
-        assert_raise(UserDeletion::ValidationError) do
-          @deletion.delete!
-        end
+        @deletion.delete!
+        assert_includes(@deletion.errors[:base], "Password is incorrect")
       end
     end
 
@@ -17,10 +15,8 @@ class UserDeletionTest < ActiveSupport::TestCase
       should "fail" do
         @user = create(:admin_user)
         @deletion = UserDeletion.new(@user, "password")
-
-        assert_raise(UserDeletion::ValidationError) do
-          @deletion.delete!
-        end
+        @deletion.delete!
+        assert_includes(@deletion.errors[:base], "Admins cannot delete their account")
       end
     end
   end

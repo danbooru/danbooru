@@ -1,7 +1,8 @@
 class UserDeletion
-  class ValidationError < StandardError; end
+  include ActiveModel::Validations
 
   attr_reader :user, :password
+  validate :validate_deletion
 
   def initialize(user, password)
     @user = user
@@ -9,13 +10,14 @@ class UserDeletion
   end
 
   def delete!
-    validate
+    return false if invalid?
     clear_user_settings
     remove_favorites
     clear_saved_searches
     rename
     reset_password
     create_mod_action
+    user
   end
 
   private
@@ -56,13 +58,13 @@ class UserDeletion
     request.save!(validate: false) # XXX don't validate so that the 1 name change per week rule doesn't interfere
   end
 
-  def validate
+  def validate_deletion
     if !user.authenticate_password(password)
-      raise ValidationError.new("Password is incorrect")
+      errors[:base] << "Password is incorrect"
     end
 
     if user.level >= User::Levels::ADMIN
-      raise ValidationError.new("Admins cannot delete their account")
+      errors[:base] << "Admins cannot delete their account"
     end
   end
 end
