@@ -82,6 +82,16 @@ class Upload < ApplicationRecord
     where("created_at < ?", date).lock.destroy_all
   end
 
+  def self.visible(user)
+    if user.is_admin?
+      all
+    elsif user.is_member?
+      where(uploader: user)
+    else
+      none
+    end
+  end
+
   module FileMethods
     def is_image?
       %w(jpg gif png).include?(file_ext)

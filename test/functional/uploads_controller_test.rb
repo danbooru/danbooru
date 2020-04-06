@@ -157,10 +157,10 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
             server: @upload.server
           }
 
-          get uploads_path, params: { search: search_params }
+          get_auth uploads_path, @user, params: { search: search_params }
           assert_response :success
 
-          get uploads_path(format: :json), params: { search: search_params }
+          get_auth uploads_path(format: :json), @user, params: { search: search_params }
           assert_response :success
           assert_equal(@upload.id, response.parsed_body.first["id"])
         end

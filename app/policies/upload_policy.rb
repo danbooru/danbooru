@@ -1,4 +1,8 @@
 class UploadPolicy < ApplicationPolicy
+  def show?
+    user.is_admin? || record.uploader_id == user.id
+  end
+
   def batch?
     unbanned?
   end
