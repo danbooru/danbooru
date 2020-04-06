@@ -6,5 +6,6 @@ class UserNameValidator < ActiveModel::EachValidator
     rec.errors[attr] << "must be 2 to 100 characters long" if !name.length.between?(2, 100)
     rec.errors[attr] << "cannot have whitespace or colons" if name =~ /[[:space:]]|:/
     rec.errors[attr] << "cannot begin or end with an underscore" if name =~ /\A_|_\z/
+    rec.errors[attr] << "is not allowed" if name =~ Regexp.union(Danbooru.config.user_name_blacklist)
   end
 end

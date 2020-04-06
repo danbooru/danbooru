@@ -91,6 +91,13 @@ class UserTest < ActiveSupport::TestCase
         assert_equal(["Name cannot begin or end with an underscore"], user.errors.full_messages)
       end
 
+      should "not allow blacklisted names" do
+        Danbooru.config.stubs(:user_name_blacklist).returns(["voldemort"])
+        user = build(:user, name: "voldemort42")
+        user.save
+        assert_equal(["Name is not allowed"], user.errors.full_messages)
+      end
+
       should "be updated" do
         @user = FactoryBot.create(:user)
         @user.update_attribute(:name, "danzig")

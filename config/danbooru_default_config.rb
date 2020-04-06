@@ -69,6 +69,11 @@ module Danbooru
       true
     end
 
+    # An array of regexes containing disallowed usernames.
+    def user_name_blacklist
+      []
+    end
+
     # Thumbnail size
     def small_image_width
       150
