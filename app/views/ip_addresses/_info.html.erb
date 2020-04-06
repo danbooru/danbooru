@@ -26,7 +26,7 @@
     <tr>
       <th>IP Banned</th>
       <td>
-        <% if IpBan.is_banned?(ip_address.ip_addr.to_s) %>
+        <% if IpBan.ip_matches(ip_address.ip_addr.to_s).exists? %>
           yes (<%= link_to "info", ip_bans_path(search: { ip_addr: ip_address.to_s }) %>)
         <% else %>
           no

@@ -122,7 +122,9 @@ module ApplicationHelper
   end
 
   def time_ago_in_words_tagged(time, compact: false)
-    if time.past?
+    if time.nil?
+      tag.em(tag.time("unknown"))
+    elsif time.past?
       if compact
         text = time_ago_in_words(time)
         text = text.gsub(/almost|about|over/, "").strip

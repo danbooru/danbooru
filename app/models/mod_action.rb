@@ -48,6 +48,7 @@ class ModAction < ApplicationRecord
     tag_implication_update: 141,
     ip_ban_create: 160,
     ip_ban_delete: 162,
+    ip_ban_undelete: 163,
     mass_update: 1000,
     bulk_revert: 1001, # XXX unused
     other: 2000

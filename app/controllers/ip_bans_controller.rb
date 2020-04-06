@@ -19,9 +19,10 @@ class IpBansController < ApplicationController
     respond_with(@ip_bans)
   end
 
-  def destroy
+  def update
     @ip_ban = authorize IpBan.find(params[:id])
-    @ip_ban.destroy
+    @ip_ban.update(permitted_attributes(@ip_ban))
+
     respond_with(@ip_ban)
   end
 end

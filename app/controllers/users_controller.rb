@@ -59,9 +59,11 @@ class UsersController < ApplicationController
   end
 
   def create
+    requires_verification = IpLookup.new(CurrentUser.ip_addr).is_proxy? || IpBan.hit!(:signup, CurrentUser.ip_addr)
+
     @user = authorize User.new(
       last_ip_addr: CurrentUser.ip_addr,
-      requires_verification: IpLookup.new(CurrentUser.ip_addr).is_proxy?,
+      requires_verification: requires_verification,
       name: params[:user][:name],
       password: params[:user][:password],
       password_confirmation: params[:user][:password_confirmation]

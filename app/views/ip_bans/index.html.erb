@@ -2,16 +2,35 @@
   <div id="a-index">
     <h1>IP Bans</h1>
 
-    <%= table_for @ip_bans, width: "100%" do |t| %>
+    <%= table_for @ip_bans, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "IP Address" do |ip_ban| %>
         <%= link_to_ip ip_ban.subnetted_ip %>
       <% end %>
-      <% t.column "Banner" do |ip_ban| %>
-        <%= link_to_user ip_ban.creator %>
+      <% t.column :reason, td: { class: "col-expand" } %>
+      <% t.column "Status" do |ip_ban| %>
+        <% if ip_ban.is_deleted? %>
+          Deleted
+        <% end %>
       <% end %>
-      <% t.column :reason %>
+      <% t.column "Type" do |ip_ban| %>
+        <%= ip_ban.category.delete_suffix("_ban").capitalize %>
+      <% end %>
+      <% t.column "Last Seen" do |ip_ban| %>
+        <%= time_ago_in_words_tagged ip_ban.last_hit_at %>
+      <% end %>
+      <% t.column :hit_count, name: "Hits" %>
+      <% t.column "Creator" do |ip_ban| %>
+        <%= link_to_user ip_ban.creator %>
+        <%= link_to "»", ip_bans_path(search: { creator_name: ip_ban.creator.name }) %>
+        <div><%= time_ago_in_words_tagged(ip_ban.created_at) %></div>
+      <% end %>
       <% t.column column: "control" do |ip_ban| %>
-        <%= link_to "Unban", ip_ban_path(ip_ban), :remote => true, :method => :delete, :data => {:confirm => "Do your really want to unban #{ip_ban.ip_addr}?"} %>
+        <%= link_to "Details", ip_address_path(ip_ban.ip_addr.to_s) %> |
+        <% if ip_ban.is_deleted? %>
+          <%= link_to "Undelete", ip_ban_path(ip_ban), remote: true, method: :put, "data-params": "ip_ban[is_deleted]=false", "data-confirm": "Are you sure you want to undelete this IP ban?" %>
+        <% else %>
+          <%= link_to "Delete", ip_ban_path(ip_ban), remote: true, method: :put, "data-params": "ip_ban[is_deleted]=true", "data-confirm": "Are you sure you want to remove this IP ban?" %>
+        <% end %>
       <% end %>
     <% end %>
 

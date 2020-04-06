@@ -7,11 +7,11 @@ class IpBanPolicy < ApplicationPolicy
     user.is_moderator?
   end
 
-  def destroy?
+  def update?
     user.is_moderator?
   end
 
   def permitted_attributes
-    [:ip_addr, :reason]
+    [:ip_addr, :reason, :is_deleted, :category]
   end
 end

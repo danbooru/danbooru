@@ -2316,12 +2316,16 @@ UNION ALL
 --
 
 CREATE TABLE public.ip_bans (
-    id integer NOT NULL,
     creator_id integer NOT NULL,
     ip_addr inet NOT NULL,
     reason text NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    id integer NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL,
+    category integer DEFAULT 0 NOT NULL,
+    hit_count integer DEFAULT 0 NOT NULL,
+    last_hit_at timestamp without time zone
 );
 
 
@@ -6429,10 +6433,24 @@ CREATE INDEX index_forum_topics_on_updated_at ON public.forum_topics USING btree
 
 
 --
+-- Name: index_ip_bans_on_category; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_bans_on_category ON public.ip_bans USING btree (category);
+
+
+--
 -- Name: index_ip_bans_on_ip_addr; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_ip_bans_on_ip_addr ON public.ip_bans USING btree (ip_addr);
+
+
+--
+-- Name: index_ip_bans_on_is_deleted; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_bans_on_is_deleted ON public.ip_bans USING btree (is_deleted);
 
 
 --
@@ -7365,6 +7383,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200318224633'),
 ('20200325073456'),
 ('20200325074859'),
-('20200403210353');
+('20200403210353'),
+('20200406054838');
 
 
