@@ -19,6 +19,7 @@
     padding: 4px;
     z-index: 150;
     overflow-wrap: break-word;
+    overflow-y: hidden;
   }
 
   div.note-body, div.note-box.embedded div.note-box-inner-border {
