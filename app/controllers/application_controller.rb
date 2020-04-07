@@ -163,7 +163,7 @@ class ApplicationController < ActionController::Base
   end
 
   def ip_ban_check
-    raise User::PrivilegeError if !request.get? && IpBan.hit!(:normal, CurrentUser.ip_addr)
+    raise User::PrivilegeError if !request.get? && IpBan.hit!(:full, CurrentUser.ip_addr)
   end
 
   def pundit_user

@@ -35,7 +35,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow IP banned users to login" do
-        @ip_ban = create(:ip_ban, category: :normal, ip_addr: "1.2.3.4")
+        @ip_ban = create(:ip_ban, category: :full, ip_addr: "1.2.3.4")
         post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
 
         assert_response 403
@@ -44,8 +44,8 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert(@ip_ban.last_hit_at > 1.minute.ago)
       end
 
-      should "allow signup-restricted IP banned users to login" do
-        @ip_ban = create(:ip_ban, category: :signup, ip_addr: "1.2.3.4")
+      should "allow partial IP banned users to login" do
+        @ip_ban = create(:ip_ban, category: :partial, ip_addr: "1.2.3.4")
         post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
 
         assert_redirected_to posts_path
@@ -55,7 +55,7 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "ignore deleted IP bans when logging in" do
-        @ip_ban = create(:ip_ban, is_deleted: true, category: :normal, ip_addr: "1.2.3.4")
+        @ip_ban = create(:ip_ban, is_deleted: true, category: :full, ip_addr: "1.2.3.4")
         post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
 
         assert_redirected_to posts_path

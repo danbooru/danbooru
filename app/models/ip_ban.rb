@@ -8,8 +8,8 @@ class IpBan < ApplicationRecord
 
   deletable
   enum category: {
-    normal: 0,
-    signup: 100
+    full: 0,
+    partial: 100
   }, _suffix: "ban"
 
   def self.ip_matches(ip_addr)
@@ -50,13 +50,13 @@ class IpBan < ApplicationRecord
       errors[:ip_addr] << "is invalid"
     elsif ip_addr.private? || ip_addr.loopback? || ip_addr.link_local?
       errors[:ip_addr] << "must be a public address"
-    elsif normal_ban? && ip_addr.ipv4? && ip_addr.prefix < 24
+    elsif full_ban? && ip_addr.ipv4? && ip_addr.prefix < 24
       errors[:ip_addr] << "may not have a subnet bigger than /24"
-    elsif signup_ban? && ip_addr.ipv4? && ip_addr.prefix < 8
+    elsif partial_ban? && ip_addr.ipv4? && ip_addr.prefix < 8
       errors[:ip_addr] << "may not have a subnet bigger than /8"
-    elsif normal_ban? && ip_addr.ipv6? && ip_addr.prefix < 64
+    elsif full_ban? && ip_addr.ipv6? && ip_addr.prefix < 64
       errors[:ip_addr] << "may not have a subnet bigger than /64"
-    elsif signup_ban? && ip_addr.ipv6? && ip_addr.prefix < 20
+    elsif partial_ban? && ip_addr.ipv6? && ip_addr.prefix < 20
       errors[:ip_addr] << "may not have a subnet bigger than /20"
     elsif new_record? && IpBan.active.ip_matches(subnetted_ip).exists?
       errors[:ip_addr] << "is already banned"

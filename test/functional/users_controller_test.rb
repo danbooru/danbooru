@@ -168,11 +168,11 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, User.last.requires_verification)
       end
 
-      should "mark users signing up from a signup banned IP as requiring verification" do
+      should "mark users signing up from a partial banned IP as requiring verification" do
         skip unless IpLookup.enabled?
         self.remote_addr = "187.37.226.17"
 
-        @ip_ban = create(:ip_ban, ip_addr: self.remote_addr, category: :signup)
+        @ip_ban = create(:ip_ban, ip_addr: self.remote_addr, category: :partial)
         post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
         assert_redirected_to User.last
