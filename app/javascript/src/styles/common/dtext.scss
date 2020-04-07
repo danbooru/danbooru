@@ -38,6 +38,12 @@ div.prose {
     padding: $h4_padding;
   }
 
+  table {
+    th {
+      white-space: nowrap;
+    }
+  }
+
   ul {
     margin-left: 1em;
     margin-bottom: 1em;
