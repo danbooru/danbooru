@@ -73,6 +73,10 @@ class IpBan < ApplicationRecord
     str
   end
 
+  def ip_addr=(ip_addr)
+    super(ip_addr.strip)
+  end
+
   def self.available_includes
     [:creator]
   end
