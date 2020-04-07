@@ -81,7 +81,6 @@ GEM
       public_suffix (>= 2.0.2, < 5.0)
     airbrussh (1.4.0)
       sshkit (>= 1.6.1, != 1.7.0)
-    awesome_print (1.8.0)
     aws-eventstream (1.0.3)
     aws-partitions (1.294.0)
     aws-sdk-core (3.92.0)
@@ -261,9 +260,6 @@ GEM
     pry-byebug (3.9.0)
       byebug (~> 11.0)
       pry (~> 0.13.0)
-    pry-inline (1.0.6)
-      pry (> 0.10.0, <= 0.13)
-      unicode (~> 0.4.4)
     pry-rails (0.3.9)
       pry (>= 0.10.4)
     public_suffix (4.0.4)
@@ -378,7 +374,6 @@ GEM
       unf_ext
     unf_ext (0.0.7.7)
     unf_ext (0.0.7.7-x64-mingw32)
-    unicode (0.4.4.4)
     unicorn (5.5.4)
       kgio (~> 2.6)
       raindrops (~> 0.7)
@@ -412,7 +407,6 @@ DEPENDENCIES
   activemodel-serializers-xml
   activerecord-hierarchical_query
   addressable
-  awesome_print
   aws-sdk-sqs (~> 1)
   bcrypt
   bootsnap
@@ -450,7 +444,6 @@ DEPENDENCIES
   oauth2
   pg
   pry-byebug
-  pry-inline
   pry-rails
   puma
   pundit
