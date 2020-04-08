@@ -337,7 +337,7 @@ class Post < ApplicationRecord
       end
 
       case source
-      when %r{\Ahttps?://twitter.com/[^/]+/status/(\d+)\z}i
+      when %r{\Ahttps?://(?:mobile\.)?twitter.com/[^/]+/status/(\d+)(?:/(?:photo/\d)?|\?s=\d+)?\z}i
         "https://twitter.com/i/web/status/#{$1}"
 
       when %r{\Ahttps?://lohas\.nicoseiga\.jp/priv/(\d+)\?e=\d+&h=[a-f0-9]+}i,
