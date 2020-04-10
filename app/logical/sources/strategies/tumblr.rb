@@ -46,7 +46,11 @@ module Sources::Strategies
 
       case post[:type]
       when "photo"
-        list += post[:photos].map { |photo| photo[:original_size][:url] }
+        list += post[:photos].map do |photo|
+          sizes = [photo[:original_size]] + photo[:alt_sizes]
+          biggest = sizes.max_by { |x| x[:width] * x[:height] }
+          biggest[:url]
+        end
 
       when "video"
         list += [post[:video_url]]
