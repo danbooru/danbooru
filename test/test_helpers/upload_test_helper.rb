@@ -1,4 +1,8 @@
 module UploadTestHelper
+  def upload_from_file(filepath)
+    UploadService.new(file: upload_file(filepath)).start!
+  end
+
   def upload_file(path)
     file = Tempfile.new(binmode: true)
     IO.copy_stream("#{Rails.root}/#{path}", file.path)

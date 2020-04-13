@@ -35,19 +35,4 @@ module DanbooruImageResizer
 
     output_file
   end
-
-  def validate_shell(file)
-    temp = Tempfile.new("validate")
-    output, status = Open3.capture2e("vips stats #{file.path} #{temp.path}.v")
-
-    # png | jpeg | gif
-    if output =~ /Read Error|Premature end of JPEG file|Failed to read from given file/m
-      return false
-    end
-
-    return true
-  ensure
-    temp.close
-    temp.unlink
-  end
 end

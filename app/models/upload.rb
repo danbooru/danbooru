@@ -6,6 +6,7 @@ class Upload < ApplicationRecord
   class FileValidator < ActiveModel::Validator
     def validate(record)
       validate_file_ext(record)
+      validate_integrity(record)
       validate_md5_uniqueness(record)
       validate_video_duration(record)
       validate_resolution(record)
@@ -14,6 +15,12 @@ class Upload < ApplicationRecord
     def validate_file_ext(record)
       if record.file_ext == "bin"
         record.errors[:file_ext] << "is invalid (only JPEG, PNG, GIF, SWF, MP4, and WebM files are allowed"
+      end
+    end
+
+    def validate_integrity(record)
+      if record.file_ext.in?(["jpg", "gif", "png"]) && UploadService::Utils.corrupt?(record.file.path)
+        record.errors[:file] << "File is corrupted"
       end
     end
 
