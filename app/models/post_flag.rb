@@ -27,6 +27,8 @@ class PostFlag < ApplicationRecord
 
   module SearchMethods
     def creator_matches(creator, searcher)
+      return none if creator.nil?
+
       policy = Pundit.policy!([searcher, nil], PostFlag.new(creator: creator))
 
       if policy.can_view_flagger?

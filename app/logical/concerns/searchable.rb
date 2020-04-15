@@ -1,6 +1,10 @@
 module Searchable
   extend ActiveSupport::Concern
 
+  def negate(kind = :nor)
+    unscoped.where(all.where_clause.invert(kind).ast)
+  end
+
   def where_like(attr, value)
     where("#{qualified_column_for(attr)} LIKE ? ESCAPE E'\\\\'", value.to_escaped_for_sql_like)
   end

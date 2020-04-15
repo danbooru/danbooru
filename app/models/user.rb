@@ -145,9 +145,14 @@ class User < ApplicationRecord
         find_by_name(name).try(:id)
       end
 
-      # XXX downcasing is the wrong way to do case-insensitive comparison for unicode (should use casefolding).
+      # XXX should casefold instead of lowercasing.
+      # XXX using lower(name) instead of ilike so we can use the index.
+      def name_matches(name)
+        where("lower(name) = ?", normalize_name(name)).limit(1)
+      end
+
       def find_by_name(name)
-        where_iequals(:name, normalize_name(name)).first
+        name_matches(name).first
       end
 
       def normalize_name(name)

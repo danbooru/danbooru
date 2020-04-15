@@ -2133,8 +2133,8 @@ class PostTest < ActiveSupport::TestCase
       create(:comment, creator: create(:user, created_at: 2.weeks.ago), post: posts[0], is_deleted: false)
       create(:comment, creator: create(:user, created_at: 2.weeks.ago), post: posts[1], is_deleted: true)
 
-      assert_tag_match([posts[0]], "commenter:any")
-      assert_tag_match([posts[1]], "commenter:none")
+      assert_tag_match(posts.reverse, "commenter:any")
+      assert_tag_match([], "commenter:none")
     end
 
     should "return posts for the noter:<name> metatag" do
@@ -2153,8 +2153,8 @@ class PostTest < ActiveSupport::TestCase
       FactoryBot.create(:note, post: posts[0], is_active: true)
       FactoryBot.create(:note, post: posts[1], is_active: false)
 
-      assert_tag_match([posts[0]], "noter:any")
-      assert_tag_match([posts[1]], "noter:none")
+      assert_tag_match(posts.reverse, "noter:any")
+      assert_tag_match([], "noter:none")
     end
 
     should "return posts for the note_count:<N> metatag" do

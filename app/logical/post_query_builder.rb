@@ -12,12 +12,13 @@ class PostQueryBuilder
   COUNT_METATAG_SYNONYMS = COUNT_METATAGS.map { |str| str.delete_suffix("_count").pluralize }
 
   METATAGS = %w[
-    -user user -approver approver commenter comm noter noteupdater artcomm
-    -pool pool ordpool -favgroup favgroup -fav fav ordfav md5 -rating rating
-    -locked locked width height mpixels ratio score favcount filesize source
-    -source id -id date age order limit -status status tagcount parent -parent
-    child pixiv_id pixiv search upvote downvote filetype -filetype flagger
-    -flagger appealer -appealer disapproved -disapproved embedded
+    -user user -approver approver -commenter commenter comm -noter noter
+    -noteupdater noteupdater artcomm -pool pool ordpool -favgroup favgroup -fav
+    fav ordfav md5 -rating rating -locked locked width height mpixels ratio
+    score favcount filesize source -source id -id date age order limit -status
+    status tagcount parent -parent child pixiv_id pixiv search -upvote upvote
+    -downvote downvote filetype -filetype flagger -flagger appealer -appealer
+    disapproved -disapproved embedded
   ] + TagCategory.short_name_list.map {|x| "#{x}tags"} + COUNT_METATAGS + COUNT_METATAG_SYNONYMS
 
   ORDER_METATAGS = %w[
@@ -86,6 +87,33 @@ class PostQueryBuilder
 
   def escape_string_for_tsquery(array)
     array.map(&:to_escaped_for_tsquery)
+  end
+
+  def add_user_relation(field, username, relation)
+    if username == "any"
+      relation.where.not(field => nil)
+    elsif username == "none"
+      relation.where(field => nil)
+    else
+      relation.where(field => User.name_matches(username))
+    end
+  end
+
+  def add_user_subquery_relation(table, username, relation, field: :creator, &block)
+    subquery = table.where("post_id = posts.id").select(1)
+
+    if username == "any"
+      relation.where("EXISTS (#{subquery.to_sql})")
+    elsif username == "none"
+      relation.where("NOT EXISTS (#{subquery.to_sql})")
+    elsif block.nil?
+      subquery = subquery.where(field => User.name_matches(username))
+      relation.where("EXISTS (#{subquery.to_sql})")
+    else
+      subquery = subquery.merge(block.call(username))
+      return relation.none if subquery.to_sql.blank?
+      relation.where("EXISTS (#{subquery.to_sql})")
+    end
   end
 
   def add_tag_string_search_relation(tags, relation)
@@ -289,26 +317,20 @@ class PostQueryBuilder
       relation = add_saved_search_relation(q[:saved_searches], relation)
     end
 
-    if q[:uploader_id_neg]
-      relation = relation.where.not("posts.uploader_id": q[:uploader_id_neg])
+    q[:user_neg].to_a.each do |username|
+      relation = add_user_relation(:uploader, username, relation).negate
     end
 
-    if q[:uploader_id]
-      relation = relation.where("posts.uploader_id": q[:uploader_id])
+    q[:user].to_a.each do |username|
+      relation = add_user_relation(:uploader, username, relation)
     end
 
-    if q[:approver_id_neg]
-      relation = relation.where.not("posts.approver_id": q[:approver_id_neg])
+    q[:approver_neg].to_a.each do |username|
+      relation = add_user_relation(:approver, username, relation).negate
     end
 
-    if q[:approver_id]
-      if q[:approver_id] == "any"
-        relation = relation.where("posts.approver_id is not null")
-      elsif q[:approver_id] == "none"
-        relation = relation.where("posts.approver_id is null")
-      else
-        relation = relation.where("posts.approver_id": q[:approver_id])
-      end
+    q[:approver].to_a.each do |username|
+      relation = add_user_relation(:approver, username, relation)
     end
 
     if q[:disapproved]
@@ -335,70 +357,50 @@ class PostQueryBuilder
       end
     end
 
-    q[:flaggers_neg].to_a.each do |flagger|
-      flags = PostFlag.unscoped.creator_matches(flagger, CurrentUser.user).where("post_id = posts.id").select("1")
-      relation = relation.where("NOT EXISTS (#{flags.to_sql})")
+    q[:flagger_neg].to_a.each do |flagger|
+      relation = add_user_subquery_relation(PostFlag.unscoped.category_matches("normal"), flagger, relation) do |username|
+        flagger = User.find_by_name(username)
+        PostFlag.unscoped.creator_matches(flagger, CurrentUser.user)
+      end.negate
     end
 
-    q[:flaggers].to_a.each do |flagger|
-      if flagger == "any"
-        flags = PostFlag.unscoped.category_matches("normal").where("post_id = posts.id").select("1")
-        relation = relation.where("EXISTS (#{flags.to_sql})")
-      elsif flagger == "none"
-        flags = PostFlag.unscoped.category_matches("normal").where("post_id = posts.id").select("1")
-        relation = relation.where("NOT EXISTS (#{flags.to_sql})")
-      else
-        flags = PostFlag.unscoped.creator_matches(flagger, CurrentUser.user).where("post_id = posts.id").select("1")
-        relation = relation.where("EXISTS (#{flags.to_sql})")
+    q[:flagger].to_a.each do |flagger|
+      relation = add_user_subquery_relation(PostFlag.unscoped.category_matches("normal"), flagger, relation) do |username|
+        flagger = User.find_by_name(username)
+        PostFlag.unscoped.creator_matches(flagger, CurrentUser.user)
       end
     end
 
-    if q[:appealer_ids_neg]
-      q[:appealer_ids_neg].each do |appealer_id|
-        relation = relation.where.not("posts.id": PostAppeal.unscoped.where(creator_id: appealer_id).select(:post_id).distinct)
-      end
+    q[:appealer_neg].to_a.each do |appealer|
+      relation = add_user_subquery_relation(PostAppeal.unscoped, appealer, relation).negate
     end
 
-    if q[:appealer_ids]
-      q[:appealer_ids].each do |appealer_id|
-        if appealer_id == "any"
-          relation = relation.where('EXISTS (' + PostAppeal.unscoped.where('post_id = posts.id').select('1').to_sql + ')')
-        elsif appealer_id == "none"
-          relation = relation.where('NOT EXISTS (' + PostAppeal.unscoped.where('post_id = posts.id').select('1').to_sql + ')')
-        else
-          relation = relation.where("posts.id": PostAppeal.unscoped.where(creator_id: appealer_id).select(:post_id).distinct)
-        end
-      end
+    q[:appealer].to_a.each do |appealer|
+      relation = add_user_subquery_relation(PostAppeal.unscoped, appealer, relation)
     end
 
-    if q[:commenter_ids]
-      q[:commenter_ids].each do |commenter_id|
-        if commenter_id == "any"
-          relation = relation.where("posts.last_commented_at is not null")
-        elsif commenter_id == "none"
-          relation = relation.where("posts.last_commented_at is null")
-        else
-          relation = relation.where("posts.id": Comment.unscoped.where(creator_id: commenter_id).select(:post_id).distinct)
-        end
-      end
+    q[:commenter_neg].to_a.each do |commenter|
+      relation = add_user_subquery_relation(Comment.unscoped, commenter, relation).negate
     end
 
-    if q[:noter_ids]
-      q[:noter_ids].each do |noter_id|
-        if noter_id == "any"
-          relation = relation.where("posts.last_noted_at is not null")
-        elsif noter_id == "none"
-          relation = relation.where("posts.last_noted_at is null")
-        else
-          relation = relation.where("posts.id": NoteVersion.unscoped.where(version: 1, updater_id: noter_id).select(:post_id).distinct)
-        end
-      end
+    q[:commenter].to_a.each do |commenter|
+      relation = add_user_subquery_relation(Comment.unscoped, commenter, relation)
     end
 
-    if q[:note_updater_ids]
-      q[:note_updater_ids].each do |note_updater_id|
-        relation = relation.where("posts.id": NoteVersion.unscoped.where(updater_id: note_updater_id).select("post_id").distinct)
-      end
+    q[:noter_neg].to_a.each do |noter|
+      relation = add_user_subquery_relation(NoteVersion.unscoped.where(version: 1), noter, relation, field: :updater).negate
+    end
+
+    q[:noter].to_a.each do |noter|
+      relation = add_user_subquery_relation(NoteVersion.unscoped.where(version: 1), noter, relation, field: :updater)
+    end
+
+    q[:note_updater_neg].to_a.each do |note_updater|
+      relation = add_user_subquery_relation(NoteVersion.unscoped, note_updater, relation, field: :updater).negate
+    end
+
+    q[:note_updater].to_a.each do |note_updater|
+      relation = add_user_subquery_relation(NoteVersion.unscoped, note_updater, relation, field: :updater)
     end
 
     if q[:artcomm_ids]
@@ -499,14 +501,20 @@ class PostQueryBuilder
       relation = relation.where(id: FavoriteGroup.where(id: favgroup.id).select("unnest(post_ids)"))
     end
 
-    q[:upvoter].to_a.each do |voter|
-      votes = PostVote.positive.visible(CurrentUser.user).where(user: voter).where("post_id = posts.id").select("1")
-      relation = relation.where("EXISTS (#{votes.to_sql})")
+    q[:upvoter].to_a.each do |upvoter|
+      relation = add_user_subquery_relation(PostVote.positive.visible(CurrentUser.user), upvoter, relation, field: :user)
     end
 
-    q[:downvoter].to_a.each do |voter|
-      votes = PostVote.negative.visible(CurrentUser.user).where(user: voter).where("post_id = posts.id").select("1")
-      relation = relation.where("EXISTS (#{votes.to_sql})")
+    q[:upvoter_neg].to_a.each do |upvoter|
+      relation = add_user_subquery_relation(PostVote.positive.visible(CurrentUser.user), upvoter, relation, field: :user).negate
+    end
+
+    q[:downvoter].to_a.each do |downvoter|
+      relation = add_user_subquery_relation(PostVote.negative.visible(CurrentUser.user), downvoter, relation, field: :user)
+    end
+
+    q[:downvoter_neg].to_a.each do |downvoter|
+      relation = add_user_subquery_relation(PostVote.negative.visible(CurrentUser.user), downvoter, relation, field: :user).negate
     end
 
     if q[:ordfav].present?
@@ -702,114 +710,60 @@ class PostQueryBuilder
             g2 = $2
             case g1
             when "-user"
-              q[:uploader_id_neg] ||= []
-              user_id = User.name_to_id(g2)
-              q[:uploader_id_neg] << user_id unless user_id.blank?
+              q[:user_neg] ||= []
+              q[:user_neg] << g2
 
             when "user"
-              user_id = User.name_to_id(g2)
-              q[:uploader_id] = user_id unless user_id.blank?
+              q[:user] ||= []
+              q[:user] << g2
 
             when "-approver"
-              if g2 == "none"
-                q[:approver_id] = "any"
-              elsif g2 == "any"
-                q[:approver_id] = "none"
-              else
-                q[:approver_id_neg] ||= []
-                user_id = User.name_to_id(g2)
-                q[:approver_id_neg] << user_id unless user_id.blank?
-              end
+              q[:approver_neg] ||= []
+              q[:approver_neg] << g2
 
             when "approver"
-              if g2 == "none"
-                q[:approver_id] = "none"
-              elsif g2 == "any"
-                q[:approver_id] = "any"
-              else
-                user_id = User.name_to_id(g2)
-                q[:approver_id] = user_id unless user_id.blank?
-              end
+              q[:approver] ||= []
+              q[:approver] << g2
 
             when "flagger"
-              if g2 == "none"
-                q[:flaggers] ||= []
-                q[:flaggers] << "none"
-              elsif g2 == "any"
-                q[:flaggers] ||= []
-                q[:flaggers] << "any"
-              else
-                user = User.find_by_name(g2)
-                q[:flaggers] ||= []
-                q[:flaggers] << user unless user.blank?
-              end
+              q[:flagger] ||= []
+              q[:flagger] << g2
 
             when "-flagger"
-              if g2 == "none"
-                q[:flaggers] ||= []
-                q[:flaggers] << "any"
-              elsif g2 == "any"
-                q[:flaggers] ||= []
-                q[:flaggers] << "none"
-              else
-                user = User.find_by_name(g2)
-                q[:flaggers_neg] ||= []
-                q[:flaggers_neg] << user unless user.blank?
-              end
+              q[:flagger_neg] ||= []
+              q[:flagger_neg] << g2
 
             when "appealer"
-              q[:appealer_ids] ||= []
-
-              if g2 == "none"
-                q[:appealer_ids] << "none"
-              elsif g2 == "any"
-                q[:appealer_ids] << "any"
-              else
-                user_id = User.name_to_id(g2)
-                q[:appealer_ids] << user_id unless user_id.blank?
-              end
+              q[:appealer] ||= []
+              q[:appealer] << g2
 
             when "-appealer"
-              if g2 == "none"
-                q[:appealer_ids] ||= []
-                q[:appealer_ids] << "any"
-              elsif g2 == "any"
-                q[:appealer_ids] ||= []
-                q[:appealer_ids] << "none"
-              else
-                q[:appealer_ids_neg] ||= []
-                user_id = User.name_to_id(g2)
-                q[:appealer_ids_neg] << user_id unless user_id.blank?
-              end
+              q[:appealer_neg] ||= []
+              q[:appealer_neg] << g2
 
             when "commenter", "comm"
-              q[:commenter_ids] ||= []
+              q[:commenter] ||= []
+              q[:commenter] << g2
 
-              if g2 == "none"
-                q[:commenter_ids] << "none"
-              elsif g2 == "any"
-                q[:commenter_ids] << "any"
-              else
-                user_id = User.name_to_id(g2)
-                q[:commenter_ids] << user_id unless user_id.blank?
-              end
+            when "-commenter", "-comm"
+              q[:commenter_neg] ||= []
+              q[:commenter_neg] << g2
 
             when "noter"
-              q[:noter_ids] ||= []
+              q[:noter] ||= []
+              q[:noter] << g2
 
-              if g2 == "none"
-                q[:noter_ids] << "none"
-              elsif g2 == "any"
-                q[:noter_ids] << "any"
-              else
-                user_id = User.name_to_id(g2)
-                q[:noter_ids] << user_id unless user_id.blank?
-              end
+            when "-noter"
+              q[:noter_neg] ||= []
+              q[:noter_neg] << g2
 
             when "noteupdater"
-              q[:note_updater_ids] ||= []
-              user_id = User.name_to_id(g2)
-              q[:note_updater_ids] << user_id unless user_id.blank?
+              q[:note_updater] ||= []
+              q[:note_updater] << g2
+
+            when "-noteupdater"
+              q[:note_updater_neg] ||= []
+              q[:note_updater_neg] << g2
 
             when "artcomm"
               q[:artcomm_ids] ||= []
@@ -992,15 +946,21 @@ class PostQueryBuilder
                 q[:pixiv_id] = parse_helper(g2)
               end
 
+            when "-upvote"
+              q[:upvoter_neg] ||= []
+              q[:upvoter_neg] << g2
+
             when "upvote"
-              user = User.find_by_name(g2)
               q[:upvoter] ||= []
-              q[:upvoter] << user unless user.blank?
+              q[:upvoter] << g2
+
+            when "-downvote"
+              q[:downvoter_neg] ||= []
+              q[:downvoter_neg] << g2
 
             when "downvote"
-              user = User.find_by_name(g2)
               q[:downvoter] ||= []
-              q[:downvoter] << user unless user.blank?
+              q[:downvoter] << g2
 
             when *COUNT_METATAGS
               q[g1.to_sym] = parse_helper(g2)
