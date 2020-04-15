@@ -445,20 +445,12 @@ class PostQueryBuilder
       end
     end
 
-    if q[:rating] =~ /^q/
-      relation = relation.where("posts.rating = 'q'")
-    elsif q[:rating] =~ /^s/
-      relation = relation.where("posts.rating = 's'")
-    elsif q[:rating] =~ /^e/
-      relation = relation.where("posts.rating = 'e'")
+    q[:rating].to_a.each do |rating|
+      relation = relation.where(rating: rating.first.downcase)
     end
 
-    if q[:rating_negated] =~ /^q/
-      relation = relation.where("posts.rating <> 'q'")
-    elsif q[:rating_negated] =~ /^s/
-      relation = relation.where("posts.rating <> 's'")
-    elsif q[:rating_negated] =~ /^e/
-      relation = relation.where("posts.rating <> 'e'")
+    q[:rating_neg].to_a.each do |rating|
+      relation = relation.where.not(rating: rating.first.downcase)
     end
 
     if q[:locked] == "rating"
@@ -839,10 +831,12 @@ class PostQueryBuilder
               q[:md5] = g2.downcase.split(/,/)
 
             when "-rating"
-              q[:rating_negated] = g2.downcase
+              q[:rating_neg] ||= []
+              q[:rating_neg] << g2
 
             when "rating"
-              q[:rating] = g2.downcase
+              q[:rating] ||= []
+              q[:rating] << g2
 
             when "-locked"
               q[:locked_negated] = g2.downcase
