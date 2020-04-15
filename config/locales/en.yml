@@ -55,13 +55,9 @@ en:
         creator: "You"
         creator_id: "You"
       post_disapproval:
-        post: "You"
-        post_id: "You"
-      comment:
-        post: "You"
-        post_id: "You"
+        user: "You"
+        user_id: "You"
       comment_vote:
-        comment: "You"
         user_id: "You"
       upload:
         uploader: "You"
