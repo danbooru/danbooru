@@ -9,6 +9,7 @@
 # * https://www.artstation.com/artist/sa-dui
 # * https://www.artstation.com/sa-dui
 # * https://sa-dui.artstation.com/
+# * https://hosi_na.artstation.com
 #
 # Image URLs
 #
@@ -19,11 +20,11 @@
 module Sources::Strategies
   class ArtStation < Base
     PROJECT1 = %r!\Ahttps?://www\.artstation\.com/artwork/(?<project_id>[a-z0-9-]+)/?\z!i
-    PROJECT2 = %r!\Ahttps?://(?<artist_name>[a-z0-9-]+)\.artstation\.com/projects/(?<project_id>[a-z0-9-]+)/?\z!i
+    PROJECT2 = %r!\Ahttps?://(?<artist_name>[\w-]+)\.artstation\.com/projects/(?<project_id>[a-z0-9-]+)/?\z!i
     PROJECT = Regexp.union(PROJECT1, PROJECT2)
-    ARTIST1 = %r{\Ahttps?://(?<artist_name>[a-z0-9-]+)(?<!www)\.artstation\.com/?\z}i
-    ARTIST2 = %r{\Ahttps?://www\.artstation\.com/artist/(?<artist_name>[a-z0-9-]+)/?\z}i
-    ARTIST3 = %r{\Ahttps?://www\.artstation\.com/(?<artist_name>[a-z0-9-]+)/?\z}i
+    ARTIST1 = %r{\Ahttps?://(?<artist_name>[\w-]+)(?<!www)\.artstation\.com/?\z}i
+    ARTIST2 = %r{\Ahttps?://www\.artstation\.com/artist/(?<artist_name>[\w-]+)/?\z}i
+    ARTIST3 = %r{\Ahttps?://www\.artstation\.com/(?<artist_name>[\w-]+)/?\z}i
     ARTIST = Regexp.union(ARTIST1, ARTIST2, ARTIST3)
 
     ASSET = %r!\Ahttps?://cdn\w*\.artstation\.com/p/assets/images/images/(?<id>\d+/\d+/\d+)/(?<size>[^/]+)/(?<filename>.+)\z!i
