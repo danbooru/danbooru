@@ -485,12 +485,14 @@ class PostQueryBuilder
       relation = relation.joins("JOIN (#{pool_posts.to_sql}) pool_posts ON pool_posts.post_id = posts.id").order("pool_posts.pool_index ASC")
     end
 
-    q[:favgroups_neg].to_a.each do |favgroup|
-      relation = relation.where.not(id: FavoriteGroup.where(id: favgroup.id).select("unnest(post_ids)"))
+    q[:favgroup_neg].to_a.each do |favgroup_name|
+      favgroup = FavoriteGroup.visible(CurrentUser.user).name_or_id_matches(favgroup_name, CurrentUser.user)
+      relation = relation.where.not(id: favgroup.select("unnest(post_ids)"))
     end
 
-    q[:favgroups].to_a.each do |favgroup|
-      relation = relation.where(id: FavoriteGroup.where(id: favgroup.id).select("unnest(post_ids)"))
+    q[:favgroup].to_a.each do |favgroup_name|
+      favgroup = FavoriteGroup.visible(CurrentUser.user).name_or_id_matches(favgroup_name, CurrentUser.user)
+      relation = relation.where(id: favgroup.select("unnest(post_ids)"))
     end
 
     q[:upvoter].to_a.each do |upvoter|
@@ -782,18 +784,12 @@ class PostQueryBuilder
               q[:ordpool] = g2
 
             when "-favgroup"
-              favgroup = FavoriteGroup.find_by_name_or_id!(g2, CurrentUser.user)
-              raise User::PrivilegeError unless Pundit.policy!([CurrentUser.user, nil], favgroup).show?
-
-              q[:favgroups_neg] ||= []
-              q[:favgroups_neg] << favgroup
+              q[:favgroup_neg] ||= []
+              q[:favgroup_neg] << g2
 
             when "favgroup"
-              favgroup = FavoriteGroup.find_by_name_or_id!(g2, CurrentUser.user)
-              raise User::PrivilegeError unless Pundit.policy!([CurrentUser.user, nil], favgroup).show?
-
-              q[:favgroups] ||= []
-              q[:favgroups] << favgroup
+              q[:favgroup] ||= []
+              q[:favgroup] << g2
 
             when "-fav"
               favuser = User.find_by_name(g2)

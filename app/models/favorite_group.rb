@@ -89,12 +89,16 @@ class FavoriteGroup < ApplicationRecord
     self.name = FavoriteGroup.normalize_name(name)
   end
 
-  def self.find_by_name_or_id(name, user)
+  def self.name_or_id_matches(name, user)
     if name =~ /\A\d+\z/
-      find_by(id: name)
+      where(id: name)
     else
-      user.favorite_groups.where_iequals(:name, normalize_name(name)).first
+      where(creator: user).where_iequals(:name, normalize_name(name))
     end
+  end
+
+  def self.find_by_name_or_id(name, user)
+    name_or_id_matches(name, user).first
   end
 
   def self.find_by_name_or_id!(name, user)

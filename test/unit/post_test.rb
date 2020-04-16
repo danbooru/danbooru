@@ -2092,12 +2092,35 @@ class PostTest < ActiveSupport::TestCase
     end
 
     should "return posts for the favgroup:<name> metatag" do
-      favgroups = FactoryBot.create_list(:favorite_group, 2, creator: CurrentUser.user)
-      posts = favgroups.map { |g| FactoryBot.create(:post, tag_string: "favgroup:#{g.name}") }
+      post1 = create(:post)
+      post2 = create(:post)
+      post3 = create(:post)
 
-      assert_tag_match([posts[0]], "favgroup:#{favgroups[0].name}")
-      assert_tag_match([posts[1]], "-favgroup:#{favgroups[0].name}")
-      assert_tag_match([], "-favgroup:#{favgroups[0].name} -favgroup:#{favgroups[1].name}")
+      favgroup1 = create(:favorite_group, creator: CurrentUser.user, post_ids: [post1.id])
+      favgroup2 = create(:favorite_group, creator: CurrentUser.user, post_ids: [post2.id])
+      favgroup3 = create(:favorite_group, creator: create(:user), post_ids: [post3.id], is_public: false)
+
+      assert_tag_match([post1], "favgroup:#{favgroup1.id}")
+      assert_tag_match([post2], "favgroup:#{favgroup2.name}")
+      assert_tag_match([], "favgroup:#{favgroup3.name}")
+      assert_tag_match([], "favgroup:dne")
+
+      assert_tag_match([post3, post2], "-favgroup:#{favgroup1.id}")
+      assert_tag_match([post3, post1], "-favgroup:#{favgroup2.name}")
+      assert_tag_match([post3, post2, post1], "-favgroup:#{favgroup3.name}")
+      assert_tag_match([post3, post2, post1], "-favgroup:dne")
+
+      assert_tag_match([post3], "-favgroup:#{favgroup1.name} -favgroup:#{favgroup2.name}")
+
+      as(favgroup3.creator) do
+        assert_tag_match([post1], "favgroup:#{favgroup1.id}")
+        assert_tag_match([post2], "favgroup:#{favgroup2.id}")
+        assert_tag_match([post3], "favgroup:#{favgroup3.id}")
+
+        assert_tag_match([], "favgroup:#{favgroup1.name}")
+        assert_tag_match([], "favgroup:#{favgroup2.name}")
+        assert_tag_match([post3], "favgroup:#{favgroup3.name}")
+      end
     end
 
     should "return posts for the user:<name> metatag" do
