@@ -339,8 +339,8 @@ body[data-current-user-theme="dark"] {
   --jquery-ui-widget-content-background: var(--grey-2);
   --jquery-ui-dialog-box-shadow: 0 0 8px var(--grey-1);
 
-  --keyboard-shortcut-color: var(--text-color);
-  --keyboard-shortcut-background-color: var(--grey-2);
+  --keyboard-shortcut-color: var(--grey-1);
+  --keyboard-shortcut-background-color: var(--grey-5);
 
   --modqueue-tag-warning-color: var(--error-background-color);
 
