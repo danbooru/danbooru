@@ -2016,13 +2016,25 @@ class PostTest < ActiveSupport::TestCase
     end
 
     should "return posts for the fav:<name> metatag" do
-      users = FactoryBot.create_list(:user, 2)
-      posts = users.map do |u|
-        CurrentUser.scoped(u) { FactoryBot.create(:post, tag_string: "fav:#{u.name}") }
-      end
+      user1 = create(:user)
+      user2 = create(:user)
+      user3 = create(:user, enable_private_favorites: true)
+      post1 = as(user1) { create(:post, tag_string: "fav:true") }
+      post2 = as(user2) { create(:post, tag_string: "fav:true") }
+      post3 = as(user3) { create(:post, tag_string: "fav:true") }
 
-      assert_tag_match([posts[0]], "fav:#{users[0].name}")
-      assert_tag_match([posts[1]], "-fav:#{users[0].name}")
+      assert_tag_match([post1], "fav:#{user1.name}")
+      assert_tag_match([post2], "fav:#{user2.name}")
+      assert_tag_match([], "fav:#{user3.name}")
+      assert_tag_match([], "fav:dne")
+
+      assert_tag_match([post3, post2], "-fav:#{user1.name}")
+      assert_tag_match([post3, post2, post1], "-fav:dne")
+
+      as(user3) do
+        assert_tag_match([post3], "fav:#{user3.name}")
+        assert_tag_match([post2, post1], "-fav:#{user3.name}")
+      end
     end
 
     should "return posts for the ordfav:<name> metatag" do

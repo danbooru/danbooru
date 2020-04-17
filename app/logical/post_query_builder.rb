@@ -14,7 +14,7 @@ class PostQueryBuilder
   METATAGS = %w[
     -user user -approver approver -commenter commenter comm -noter noter
     -noteupdater noteupdater artcomm -pool pool ordpool -favgroup favgroup -fav
-    fav ordfav md5 -rating rating -locked locked width height mpixels ratio
+    fav -ordfav ordfav md5 -rating rating -locked locked width height mpixels ratio
     score favcount filesize source -source id -id date age order limit -status
     status tagcount parent -parent child pixiv_id pixiv search -upvote upvote
     -downvote downvote filetype -filetype flagger -flagger appealer -appealer
@@ -475,8 +475,6 @@ class PostQueryBuilder
       relation = relation.bit_flags_match(:has_embedded_notes, false)
     end
 
-    relation = add_tag_string_search_relation(q[:tags], relation)
-
     if q[:ordpool].present?
       pool_name = q[:ordpool]
 
@@ -511,11 +509,39 @@ class PostQueryBuilder
       relation = add_user_subquery_relation(PostVote.negative.visible(CurrentUser.user), downvoter, relation, field: :user).negate
     end
 
-    if q[:ordfav].present?
-      user_id = q[:ordfav].to_i
-      relation = relation.joins("INNER JOIN favorites ON favorites.post_id = posts.id")
-      relation = relation.where("favorites.user_id % 100 = ? and favorites.user_id = ?", user_id % 100, user_id).order("favorites.id DESC")
+    q[:fav_neg].to_a.each do |username|
+      favuser = User.find_by_name(username)
+
+      if favuser.present? && Pundit.policy!([CurrentUser.user, nil], favuser).can_see_favorites?
+        q[:tags][:exclude] << "fav:#{favuser.id}"
+      else
+        relation = relation.all # no-op; excluding a nonexistent user returns everything
+      end
     end
+
+    q[:fav].to_a.each do |username|
+      favuser = User.find_by_name(username)
+
+      if favuser.present? && Pundit.policy!([CurrentUser.user, nil], favuser).can_see_favorites?
+        q[:tags][:related] << "fav:#{favuser.id}"
+      else
+        relation = relation.none
+      end
+    end
+
+    q[:ordfav].to_a.each do |username|
+      favuser = User.find_by_name(username)
+
+      if favuser.present? && Pundit.policy!([CurrentUser.user, nil], favuser).can_see_favorites?
+        q[:tags][:related] << "fav:#{favuser.id}"
+        relation = relation.joins("INNER JOIN favorites ON favorites.post_id = posts.id")
+        relation = relation.where("favorites.user_id % 100 = ? and favorites.user_id = ?", favuser.id % 100, favuser.id).order("favorites.id DESC")
+      else
+        relation = relation.none
+      end
+    end
+
+    relation = add_tag_string_search_relation(q[:tags], relation)
 
     # HACK: if we're using a date: or age: metatag, default to ordering by
     # created_at instead of id so that the query will use the created_at index.
@@ -791,33 +817,17 @@ class PostQueryBuilder
               q[:favgroup] ||= []
               q[:favgroup] << g2
 
-            when "-fav"
-              favuser = User.find_by_name(g2)
-
-              if favuser.nil? || !Pundit.policy!([CurrentUser.user, nil], favuser).can_see_favorites?
-                raise User::PrivilegeError
-              end
-
-              q[:tags][:exclude] << "fav:#{favuser.id}"
+            when "-fav", "-ordfav"
+              q[:fav_neg] ||= []
+              q[:fav_neg] << g2
 
             when "fav"
-              favuser = User.find_by_name(g2)
-
-              if favuser.nil? || !Pundit.policy!([CurrentUser.user, nil], favuser).can_see_favorites?
-                raise User::PrivilegeError
-              end
-
-              q[:tags][:related] << "fav:#{favuser.id}"
+              q[:fav] ||= []
+              q[:fav] << g2
 
             when "ordfav"
-              favuser = User.find_by_name(g2)
-
-              if favuser.nil? || !Pundit.policy!([CurrentUser.user, nil], favuser).can_see_favorites?
-                raise User::PrivilegeError.new
-              end
-
-              q[:tags][:related] << "fav:#{favuser.id}"
-              q[:ordfav] = favuser.id
+              q[:ordfav] ||= []
+              q[:ordfav] << g2
 
             when "search"
               q[:saved_searches] ||= []
