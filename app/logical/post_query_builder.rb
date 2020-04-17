@@ -27,6 +27,7 @@ class PostQueryBuilder
     -ordfav ordfav
     -favgroup favgroup
     -pool pool ordpool
+    -commentary commentary
     -id id
     -rating rating
     -locked locked
@@ -184,6 +185,21 @@ class PostQueryBuilder
     end
 
     relation
+  end
+
+  def commentary_matches(query)
+    case query
+    when "none", "false"
+      Post.where.not(artist_commentary: ArtistCommentary.all).or(Post.where(artist_commentary: ArtistCommentary.deleted))
+    when "any", "true"
+      Post.where(artist_commentary: ArtistCommentary.undeleted)
+    when "translated"
+      Post.where(artist_commentary: ArtistCommentary.translated)
+    when "untranslated"
+      Post.where(artist_commentary: ArtistCommentary.untranslated)
+    else
+      Post.where(artist_commentary: ArtistCommentary.text_matches(query))
+    end
   end
 
   def table_for_metatag(metatag)
@@ -344,6 +360,14 @@ class PostQueryBuilder
       else
         relation = relation.where.not(id: Pool.named(pool_name).select("unnest(post_ids)"))
       end
+    end
+
+    q[:commentary_neg].to_a.each do |query|
+      relation = relation.merge(commentary_matches(query).negate)
+    end
+
+    q[:commentary].to_a.each do |query|
+      relation = relation.merge(commentary_matches(query))
     end
 
     if q[:saved_searches]
@@ -731,8 +755,8 @@ class PostQueryBuilder
     class_methods do
       def scan_query(query, strip_metatags: false)
         tagstr = query.to_s.gsub(/\u3000/, " ").strip
-        list = tagstr.scan(/-?source:".*?"/) || []
-        list += tagstr.gsub(/-?source:".*?"/, "").scan(/[^[:space:]]+/).uniq
+        list = tagstr.scan(/-?(?:source|commentary):".*?"/) || []
+        list += tagstr.gsub(/-?(?:source|commentary):".*?"/, "").scan(/[^[:space:]]+/).uniq
         list = list.map { |tag| tag.sub(/^[-~]/, "") } if strip_metatags
         list
       end
@@ -866,6 +890,14 @@ class PostQueryBuilder
             when "ordfav"
               q[:ordfav] ||= []
               q[:ordfav] << g2
+
+            when "-commentary"
+              q[:commentary_neg] ||= []
+              q[:commentary_neg] << g2.gsub(/\A"(.*)"\Z/, '\1')
+
+            when "commentary"
+              q[:commentary] ||= []
+              q[:commentary] << g2.gsub(/\A"(.*)"\Z/, '\1')
 
             when "search"
               q[:saved_searches] ||= []

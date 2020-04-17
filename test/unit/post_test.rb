@@ -2228,6 +2228,32 @@ class PostTest < ActiveSupport::TestCase
       assert_tag_match([], "commentaryupdater:none")
     end
 
+    should "return posts for the commentary:<query> metatag" do
+      post1 = create(:post)
+      post2 = create(:post)
+      post3 = create(:post)
+      post4 = create(:post)
+
+      artcomm1 = create(:artist_commentary, post: post1, translated_title: "azur lane")
+      artcomm2 = create(:artist_commentary, post: post2, translated_title: "", translated_description: "")
+      artcomm3 = create(:artist_commentary, post: post3, original_title: "", original_description: "", translated_title: "", translated_description: "")
+
+      assert_tag_match([post2, post1], "commentary:true")
+      assert_tag_match([post4, post3], "commentary:false")
+
+      assert_tag_match([post4, post3], "-commentary:true")
+      assert_tag_match([post2, post1], "-commentary:false")
+
+      assert_tag_match([post1], "commentary:translated")
+      assert_tag_match([post4, post3, post2], "-commentary:translated")
+
+      assert_tag_match([post2], "commentary:untranslated")
+      assert_tag_match([post4, post3, post1], "-commentary:untranslated")
+
+      assert_tag_match([post1], 'commentary:"azur lane"')
+      assert_tag_match([post4, post3, post2], '-commentary:"azur lane"')
+    end
+
     should "return posts for the date:<d> metatag" do
       post = FactoryBot.create(:post, created_at: Time.parse("2017-01-01 12:00"))
 
