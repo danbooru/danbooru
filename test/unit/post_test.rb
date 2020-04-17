@@ -2141,6 +2141,7 @@ class PostTest < ActiveSupport::TestCase
 
       assert_tag_match([posts[0]], "user:#{users[0].name}")
       assert_tag_match([posts[1]], "-user:#{users[0].name}")
+      assert_tag_match([posts[1]], "filetype:jpg -user:#{users[0].name}")
     end
 
     should "return posts for the approver:<name> metatag" do

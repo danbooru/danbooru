@@ -123,30 +123,39 @@ class PostQueryBuilder
     array.map(&:to_escaped_for_tsquery)
   end
 
-  def add_user_relation(field, username, relation)
+  def user_matches(field, username)
     if username == "any"
-      relation.where.not(field => nil)
+      Post.where.not(field => nil)
     elsif username == "none"
-      relation.where(field => nil)
+      Post.where(field => nil)
     else
-      relation.where(field => User.name_matches(username))
+      Post.where(field => User.name_matches(username))
     end
   end
 
-  def add_user_subquery_relation(table, username, relation, field: :creator, &block)
-    subquery = table.where("post_id = posts.id").select(1)
+  def user_subquery_matches(subquery, username, field: :creator, &block)
+    subquery = subquery.where("post_id = posts.id").select(1)
 
     if username == "any"
-      relation.where("EXISTS (#{subquery.to_sql})")
+      Post.where("EXISTS (#{subquery.to_sql})")
     elsif username == "none"
-      relation.where("NOT EXISTS (#{subquery.to_sql})")
+      Post.where("NOT EXISTS (#{subquery.to_sql})")
     elsif block.nil?
       subquery = subquery.where(field => User.name_matches(username))
-      relation.where("EXISTS (#{subquery.to_sql})")
+      Post.where("EXISTS (#{subquery.to_sql})")
     else
       subquery = subquery.merge(block.call(username))
-      return relation.none if subquery.to_sql.blank?
-      relation.where("EXISTS (#{subquery.to_sql})")
+      return Post.none if subquery.to_sql.blank?
+      Post.where("EXISTS (#{subquery.to_sql})")
+    end
+  end
+
+  def flagger_matches(username)
+    flags = PostFlag.unscoped.category_matches("normal")
+
+    user_subquery_matches(flags, username) do |username|
+      flagger = User.find_by_name(username)
+      PostFlag.unscoped.creator_matches(flagger, CurrentUser.user)
     end
   end
 
@@ -375,19 +384,19 @@ class PostQueryBuilder
     end
 
     q[:user_neg].to_a.each do |username|
-      relation = add_user_relation(:uploader, username, relation).negate
+      relation = relation.merge(user_matches(:uploader, username).negate)
     end
 
     q[:user].to_a.each do |username|
-      relation = add_user_relation(:uploader, username, relation)
+      relation = relation.merge(user_matches(:uploader, username))
     end
 
     q[:approver_neg].to_a.each do |username|
-      relation = add_user_relation(:approver, username, relation).negate
+      relation = relation.merge(user_matches(:approver, username).negate)
     end
 
     q[:approver].to_a.each do |username|
-      relation = add_user_relation(:approver, username, relation)
+      relation = relation.merge(user_matches(:approver, username))
     end
 
     if q[:disapproved]
@@ -414,58 +423,52 @@ class PostQueryBuilder
       end
     end
 
-    q[:flagger_neg].to_a.each do |flagger|
-      relation = add_user_subquery_relation(PostFlag.unscoped.category_matches("normal"), flagger, relation) do |username|
-        flagger = User.find_by_name(username)
-        PostFlag.unscoped.creator_matches(flagger, CurrentUser.user)
-      end.negate
+    q[:flagger_neg].to_a.each do |username|
+      relation = relation.merge(flagger_matches(username).negate)
     end
 
-    q[:flagger].to_a.each do |flagger|
-      relation = add_user_subquery_relation(PostFlag.unscoped.category_matches("normal"), flagger, relation) do |username|
-        flagger = User.find_by_name(username)
-        PostFlag.unscoped.creator_matches(flagger, CurrentUser.user)
-      end
+    q[:flagger].to_a.each do |username|
+      relation = relation.merge(flagger_matches(username))
     end
 
-    q[:appealer_neg].to_a.each do |appealer|
-      relation = add_user_subquery_relation(PostAppeal.unscoped, appealer, relation).negate
+    q[:appealer_neg].to_a.each do |username|
+      relation = relation.merge(user_subquery_matches(PostAppeal.unscoped, username).negate)
     end
 
-    q[:appealer].to_a.each do |appealer|
-      relation = add_user_subquery_relation(PostAppeal.unscoped, appealer, relation)
+    q[:appealer].to_a.each do |username|
+      relation = relation.merge(user_subquery_matches(PostAppeal.unscoped, username))
     end
 
-    q[:commenter_neg].to_a.each do |commenter|
-      relation = add_user_subquery_relation(Comment.unscoped, commenter, relation).negate
+    q[:commenter_neg].to_a.each do |username|
+      relation = relation.merge(user_subquery_matches(Comment.unscoped, username).negate)
     end
 
-    q[:commenter].to_a.each do |commenter|
-      relation = add_user_subquery_relation(Comment.unscoped, commenter, relation)
+    q[:commenter].to_a.each do |username|
+      relation = relation.merge(user_subquery_matches(Comment.unscoped, username))
     end
 
-    q[:noter_neg].to_a.each do |noter|
-      relation = add_user_subquery_relation(NoteVersion.unscoped.where(version: 1), noter, relation, field: :updater).negate
+    q[:noter_neg].to_a.each do |username|
+      relation = relation.merge(user_subquery_matches(NoteVersion.unscoped.where(version: 1), username, field: :updater).negate)
     end
 
-    q[:noter].to_a.each do |noter|
-      relation = add_user_subquery_relation(NoteVersion.unscoped.where(version: 1), noter, relation, field: :updater)
+    q[:noter].to_a.each do |username|
+      relation = relation.merge(user_subquery_matches(NoteVersion.unscoped.where(version: 1), username, field: :updater))
     end
 
-    q[:note_updater_neg].to_a.each do |note_updater|
-      relation = add_user_subquery_relation(NoteVersion.unscoped, note_updater, relation, field: :updater).negate
+    q[:note_updater_neg].to_a.each do |username|
+      relation = relation.merge(user_subquery_matches(NoteVersion.unscoped, username, field: :updater).negate)
     end
 
-    q[:note_updater].to_a.each do |note_updater|
-      relation = add_user_subquery_relation(NoteVersion.unscoped, note_updater, relation, field: :updater)
+    q[:note_updater].to_a.each do |username|
+      relation = relation.merge(user_subquery_matches(NoteVersion.unscoped, username, field: :updater))
     end
 
     q[:commentary_updater_neg].to_a.each do |username|
-      relation = add_user_subquery_relation(ArtistCommentaryVersion.unscoped, username, relation, field: :updater).negate
+      relation = relation.merge(user_subquery_matches(ArtistCommentaryVersion.unscoped, username, field: :updater).negate)
     end
 
     q[:commentary_updater].to_a.each do |username|
-      relation = add_user_subquery_relation(ArtistCommentaryVersion.unscoped, username, relation, field: :updater)
+      relation = relation.merge(user_subquery_matches(ArtistCommentaryVersion.unscoped, username, field: :updater))
     end
 
     if q[:post_id_negated]
@@ -552,20 +555,20 @@ class PostQueryBuilder
       relation = relation.where(id: favgroup.select("unnest(post_ids)"))
     end
 
-    q[:upvoter].to_a.each do |upvoter|
-      relation = add_user_subquery_relation(PostVote.positive.visible(CurrentUser.user), upvoter, relation, field: :user)
+    q[:upvoter].to_a.each do |username|
+      relation = relation.merge(user_subquery_matches(PostVote.positive.visible(CurrentUser.user), username, field: :user))
     end
 
-    q[:upvoter_neg].to_a.each do |upvoter|
-      relation = add_user_subquery_relation(PostVote.positive.visible(CurrentUser.user), upvoter, relation, field: :user).negate
+    q[:upvoter_neg].to_a.each do |username|
+      relation = relation.merge(user_subquery_matches(PostVote.positive.visible(CurrentUser.user), username, field: :user).negate)
     end
 
-    q[:downvoter].to_a.each do |downvoter|
-      relation = add_user_subquery_relation(PostVote.negative.visible(CurrentUser.user), downvoter, relation, field: :user)
+    q[:downvoter].to_a.each do |username|
+      relation = relation.merge(user_subquery_matches(PostVote.negative.visible(CurrentUser.user), username, field: :user))
     end
 
-    q[:downvoter_neg].to_a.each do |downvoter|
-      relation = add_user_subquery_relation(PostVote.negative.visible(CurrentUser.user), downvoter, relation, field: :user).negate
+    q[:downvoter_neg].to_a.each do |username|
+      relation = relation.merge(user_subquery_matches(PostVote.negative.visible(CurrentUser.user), username, field: :user).negate)
     end
 
     q[:fav_neg].to_a.each do |username|
