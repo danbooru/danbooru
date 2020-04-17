@@ -12,13 +12,46 @@ class PostQueryBuilder
   COUNT_METATAG_SYNONYMS = COUNT_METATAGS.map { |str| str.delete_suffix("_count").pluralize }
 
   METATAGS = %w[
-    -user user -approver approver -commenter commenter comm -noter noter
-    -noteupdater noteupdater artcomm -pool pool ordpool -favgroup favgroup -fav
-    fav -ordfav ordfav md5 -rating rating -locked locked width height mpixels ratio
-    score favcount filesize source -source id -id date age order limit -status
-    status tagcount parent -parent child pixiv_id pixiv search -upvote upvote
-    -downvote downvote filetype -filetype flagger -flagger appealer -appealer
-    disapproved -disapproved embedded
+    -user user
+    -approver approver
+    -commenter commenter comm
+    -noter noter
+    -noteupdater noteupdater
+    -artcomm artcomm
+    -commentaryupdater commentaryupdater
+    -flagger flagger
+    -appealer appealer
+    -upvote upvote
+    -downvote downvote
+    -fav fav
+    -ordfav ordfav
+    -favgroup favgroup
+    -pool pool ordpool
+    -id id
+    -rating rating
+    -locked locked
+    -source source
+    -status status
+    -filetype filetype
+    -disapproved disapproved
+    -parent parent
+    md5
+    width
+    height
+    mpixels
+    ratio
+    score
+    favcount
+    filesize
+    date
+    age
+    order
+    limit
+    tagcount
+    child
+    pixiv_id pixiv
+    search
+    embedded
   ] + TagCategory.short_name_list.map {|x| "#{x}tags"} + COUNT_METATAGS + COUNT_METATAG_SYNONYMS
 
   ORDER_METATAGS = %w[
@@ -403,10 +436,12 @@ class PostQueryBuilder
       relation = add_user_subquery_relation(NoteVersion.unscoped, note_updater, relation, field: :updater)
     end
 
-    if q[:artcomm_ids]
-      q[:artcomm_ids].each do |artcomm_id|
-        relation = relation.where("posts.id": ArtistCommentaryVersion.unscoped.where(updater_id: artcomm_id).select("post_id").distinct)
-      end
+    q[:commentary_updater_neg].to_a.each do |username|
+      relation = add_user_subquery_relation(ArtistCommentaryVersion.unscoped, username, relation, field: :updater).negate
+    end
+
+    q[:commentary_updater].to_a.each do |username|
+      relation = add_user_subquery_relation(ArtistCommentaryVersion.unscoped, username, relation, field: :updater)
     end
 
     if q[:post_id_negated]
@@ -785,10 +820,13 @@ class PostQueryBuilder
               q[:note_updater_neg] ||= []
               q[:note_updater_neg] << g2
 
-            when "artcomm"
-              q[:artcomm_ids] ||= []
-              user_id = User.name_to_id(g2)
-              q[:artcomm_ids] << user_id unless user_id.blank?
+            when "-commentaryupdater", "-artcomm"
+              q[:commentary_updater_neg] ||= []
+              q[:commentary_updater_neg] << g2
+
+            when "commentaryupdater", "artcomm"
+              q[:commentary_updater] ||= []
+              q[:commentary_updater] << g2
 
             when "disapproved"
               q[:disapproved] ||= []

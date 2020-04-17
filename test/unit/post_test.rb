@@ -2206,15 +2206,26 @@ class PostTest < ActiveSupport::TestCase
       assert_tag_match([posts[1]], "deleted_notes:1")
     end
 
-    should "return posts for the artcomm:<name> metatag" do
-      users = FactoryBot.create_list(:user, 2)
-      posts = FactoryBot.create_list(:post, 2)
-      users.zip(posts).map do |u, p|
-        CurrentUser.scoped(u) { FactoryBot.create(:artist_commentary, post: p) }
-      end
+    should "return posts for the commentaryupdater:<name> metatag" do
+      user1 = create(:user)
+      user2 = create(:user)
+      post1 = create(:post)
+      post2 = create(:post)
+      artcomm1 = as(user1) { create(:artist_commentary, post: post1) }
+      artcomm2 = as(user2) { create(:artist_commentary, post: post2) }
 
-      assert_tag_match([posts[0]], "artcomm:#{users[0].name}")
-      assert_tag_match([posts[1]], "artcomm:#{users[1].name}")
+      assert_tag_match([post1], "commentaryupdater:#{user1.name}")
+      assert_tag_match([post2], "commentaryupdater:#{user2.name}")
+      assert_tag_match([post2], "-commentaryupdater:#{user1.name}")
+      assert_tag_match([post1], "-commentaryupdater:#{user2.name}")
+
+      assert_tag_match([post1], "artcomm:#{user1.name}")
+      assert_tag_match([post2], "artcomm:#{user2.name}")
+      assert_tag_match([post2], "-artcomm:#{user1.name}")
+      assert_tag_match([post1], "-artcomm:#{user2.name}")
+
+      assert_tag_match([post2, post1], "commentaryupdater:any")
+      assert_tag_match([], "commentaryupdater:none")
     end
 
     should "return posts for the date:<d> metatag" do
