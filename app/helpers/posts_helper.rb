@@ -42,12 +42,12 @@ module PostsHelper
     verifier.generate("#{value},#{session[:session_id]}")
   end
 
-  def post_source_tag(post)
+  def post_source_tag(source, normalized_source = source)
     # Only allow http:// and https:// links. Disallow javascript: links.
-    if post.source =~ %r!\Ahttps?://!i
-      external_link_to(post.normalized_source, strip: :subdomain) + "&nbsp;".html_safe + link_to("»", post.source, rel: "external noreferrer nofollow")
+    if source =~ %r!\Ahttps?://!i
+      external_link_to(normalized_source, strip: :subdomain) + "&nbsp;".html_safe + link_to("»", source, rel: "external noreferrer nofollow")
     else
-      post.source
+      source
     end
   end
 

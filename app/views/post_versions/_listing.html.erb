@@ -24,7 +24,7 @@
         </div>
         <div><b>Tags:</b> <%= TagSetPresenter.new(post_version.tag_array).inline_tag_list_html %></div>
         <div>
-          <%= post_version_field(post_version, :source) %>
+          <%= post_source_tag(post_version.source) %>
         </div>
       <% end %>
       <% t.column "Edits", td: {class: "col-expand"}, width: "40%" do |post_version| %>
