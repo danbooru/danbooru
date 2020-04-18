@@ -936,7 +936,7 @@ class PostQueryBuilder
               q[:height] = parse_helper(g2)
 
             when "mpixels"
-              q[:mpixels] = parse_helper_fudged(g2, :float)
+              q[:mpixels] = parse_helper(g2, :float)
 
             when "ratio"
               q[:ratio] = parse_helper(g2, :ratio)
@@ -948,7 +948,7 @@ class PostQueryBuilder
               q[:fav_count] = parse_helper(g2)
 
             when "filesize"
-              q[:filesize] = parse_helper_fudged(g2, :filesize)
+              q[:filesize] = parse_helper(g2, :filesize)
 
             when "source"
               q[:source] = g2.gsub(/\A"(.*)"\Z/, '\1')
@@ -1156,22 +1156,13 @@ class PostQueryBuilder
           return [:in, range.split(/[, ]+/).map {|x| parse_cast(x, type)}]
 
         else
-          return [:eq, parse_cast(range, type)]
-
-        end
-      end
-
-      def parse_helper_fudged(range, type)
-        result = parse_helper(range, type)
-        # Don't fudge the filesize when searching filesize:123b or filesize:123.
-        if result[0] == :eq && type == :filesize && range !~ /[km]b?\Z/i
-          result
-        elsif result[0] == :eq
-          new_min = (result[1] * 0.95).to_i
-          new_max = (result[1] * 1.05).to_i
-          [:between, new_min, new_max]
-        else
-          result
+          # add a 5% tolerance for float and filesize values
+          if type == :float || (type == :filesize && range =~ /[km]b?\z/i)
+            value = parse_cast(range, type)
+            [:between, value * 0.95, value * 1.05]
+          else
+            [:eq, parse_cast(range, type)]
+          end
         end
       end
 
