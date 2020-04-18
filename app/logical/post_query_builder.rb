@@ -90,8 +90,13 @@ class PostQueryBuilder
 
     case arr[0]
     when :eq
-      if arr[1].is_a?(Time)
+      case arr[1]
+      when Time
         relation.where("#{field} between ? and ?", arr[1].beginning_of_day, arr[1].end_of_day)
+      when :any
+        relation.where(["#{field} IS NOT NULL"])
+      when :none
+        relation.where(["#{field} IS NULL"])
       else
         relation.where(["#{field} = ?", arr[1]])
       end
@@ -266,6 +271,7 @@ class PostQueryBuilder
     relation = add_range_relation(q[:filesize], "posts.file_size", relation)
     relation = add_range_relation(q[:date], "posts.created_at", relation)
     relation = add_range_relation(q[:age], "posts.created_at", relation)
+    relation = add_range_relation(q[:pixiv_id], "posts.pixiv_id", relation)
     TagCategory.categories.each do |category|
       relation = add_range_relation(q["#{category}_tag_count".to_sym], "posts.tag_count_#{category}", relation)
     end
@@ -495,16 +501,6 @@ class PostQueryBuilder
       relation = relation.where("posts.has_children = FALSE")
     elsif q[:child] == "any"
       relation = relation.where("posts.has_children = TRUE")
-    end
-
-    if q[:pixiv_id]
-      if q[:pixiv_id] == "any"
-        relation = relation.where("posts.pixiv_id IS NOT NULL")
-      elsif q[:pixiv_id] == "none"
-        relation = relation.where("posts.pixiv_id IS NULL")
-      else
-        relation = add_range_relation(q[:pixiv_id], "posts.pixiv_id", relation)
-      end
     end
 
     q[:rating].to_a.each do |rating|
@@ -1013,11 +1009,7 @@ class PostQueryBuilder
               q[:filetype_neg] = g2.downcase
 
             when "pixiv_id", "pixiv"
-              if g2.downcase == "any" || g2.downcase == "none"
-                q[:pixiv_id] = g2.downcase
-              else
-                q[:pixiv_id] = parse_helper(g2)
-              end
+              q[:pixiv_id] = parse_helper(g2)
 
             when "-upvote"
               q[:upvoter_neg] ||= []
@@ -1154,6 +1146,12 @@ class PostQueryBuilder
 
         when /[, ]/
           return [:in, range.split(/[, ]+/).map {|x| parse_cast(x, type)}]
+
+        when "any"
+          return [:eq, :any]
+
+        when "none"
+          return [:eq, :none]
 
         else
           # add a 5% tolerance for float and filesize values
