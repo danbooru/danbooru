@@ -186,6 +186,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([post1], "pool:TEST_A")
       assert_tag_match([post2], "pool:Test_B")
+      assert_tag_match([post2], 'pool:"Test B"')
+      assert_tag_match([post2], "pool:'Test B'")
 
       assert_tag_match([post1], "pool:test_a")
       assert_tag_match([post2], "-pool:test_a")
@@ -481,11 +483,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post1], "md5:abcd")
     end
 
-    should "return posts for a source search" do
-      post1 = create(:post, source: "abcd")
+    should "return posts for a source:<text> search" do
+      post1 = create(:post, source: "abc def")
       post2 = create(:post, source: "abcdefg")
       post3 = create(:post, source: "")
 
+      assert_tag_match([post1], 'source:"abc def"')
+      assert_tag_match([post1], "source:'abc def'")
       assert_tag_match([post2], "source:abcde")
       assert_tag_match([post3, post1], "-source:abcde")
 
@@ -748,9 +752,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     should "not count free tags against the user's search limit" do
       post1 = create(:post, tag_string: "aaa bbb rating:s")
 
-      Danbooru.config.expects(:is_unlimited_tag?).with("rating:s").once.returns(true)
-      Danbooru.config.expects(:is_unlimited_tag?).with(anything).twice.returns(false)
       assert_tag_match([post1], "aaa bbb rating:s")
+      assert_tag_match([post1], "aaa bbb status:active")
+      assert_tag_match([post1], "aaa bbb limit:20")
     end
 
     should "succeed for exclusive tag searches with no other tag" do

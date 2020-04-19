@@ -1,3 +1,5 @@
+require "strscan"
+
 class PostQueryBuilder
   COUNT_METATAGS = %w[
     comment_count deleted_comment_count active_comment_count
@@ -752,16 +754,44 @@ class PostQueryBuilder
 
   concerning :ParseMethods do
     class_methods do
-      def scan_query(query, strip_metatags: false)
-        tagstr = query.to_s.gsub(/\u3000/, " ").strip
-        list = tagstr.scan(/-?(?:source|commentary):".*?"/) || []
-        list += tagstr.gsub(/-?(?:source|commentary):".*?"/, "").scan(/[^[:space:]]+/).uniq
-        list = list.map { |tag| tag.sub(/^[-~]/, "") } if strip_metatags
-        list
+      def scan_query(query)
+        terms = []
+        query = query.gsub(/[[:space:]]/, " ")
+        scanner = StringScanner.new(query)
+
+        until scanner.eos?
+          scanner.skip(/ +/)
+
+          if scanner.scan(/(#{METATAGS.join("|")}):/i)
+            metatag = scanner.captures.first
+
+            if scanner.scan(/"(.+)"/)
+              value = scanner.captures.first
+            elsif scanner.scan(/'(.+)'/)
+              value = scanner.captures.first
+            else
+              value = scanner.scan(/[^ ]*/)
+            end
+
+            terms << OpenStruct.new({ type: :metatag, name: metatag.downcase, value: value })
+          elsif scanner.scan(/[^ ]+/)
+            terms << OpenStruct.new({ type: :tag, value: scanner.matched.downcase })
+          end
+        end
+
+        terms
       end
 
       def split_query(query)
-        scan_query(query)
+        scan_query(query).map do |term|
+          if term.type == :metatag && term.value.include?(" ")
+            "#{term.name}:\"#{term.value}\""
+          elsif term.type == :metatag
+            "#{term.name}:#{term.value}"
+          elsif term.type == :tag
+            term.value
+          end
+        end
       end
 
       def normalize_query(query, normalize_aliases: true, sort: true)
@@ -784,12 +814,13 @@ class PostQueryBuilder
           :exclude => []
         }
 
-        scan_query(query).each do |token|
-          q[:tag_count] += 1 unless Danbooru.config.is_unlimited_tag?(token)
+        scan_query(query).each do |term|
+          q[:tag_count] += 1 unless Danbooru.config.is_unlimited_tag?(term)
 
-          if token =~ /\A(#{METATAGS.join("|")}):(.+)\z/i
-            g1 = $1.downcase
-            g2 = $2
+          if term.type == :metatag
+            g1 = term.name
+            g2 = term.value
+
             case g1
             when "-user"
               q[:user_neg] ||= []
@@ -896,11 +927,11 @@ class PostQueryBuilder
 
             when "-commentary"
               q[:commentary_neg] ||= []
-              q[:commentary_neg] << g2.gsub(/\A"(.*)"\Z/, '\1')
+              q[:commentary_neg] << g2
 
             when "commentary"
               q[:commentary] ||= []
-              q[:commentary] << g2.gsub(/\A"(.*)"\Z/, '\1')
+              q[:commentary] << g2
 
             when "search"
               q[:saved_searches] ||= []
@@ -951,10 +982,10 @@ class PostQueryBuilder
               q[:filesize] = parse_helper(g2, :filesize)
 
             when "source"
-              q[:source] = g2.gsub(/\A"(.*)"\Z/, '\1')
+              q[:source] = g2
 
             when "-source"
-              q[:source_neg] = g2.gsub(/\A"(.*)"\Z/, '\1')
+              q[:source_neg] = g2
 
             when "date"
               q[:date] = parse_helper(g2, :date)
@@ -1041,7 +1072,7 @@ class PostQueryBuilder
             end
 
           else
-            parse_tag(token, q[:tags])
+            parse_tag(term.value, q[:tags])
           end
         end
 

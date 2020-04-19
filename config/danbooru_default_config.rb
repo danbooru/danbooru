@@ -108,8 +108,8 @@ module Danbooru
     end
 
     # Return true if the given tag shouldn't count against the user's tag search limit.
-    def is_unlimited_tag?(tag)
-      tag.match?(/\A(-?status:deleted|rating:s.*|limit:.+)\z/i)
+    def is_unlimited_tag?(term)
+      term.type == :metatag && term.name.in?(%w[status rating limit])
     end
 
     # After this many pages, the paginator will switch to sequential mode.
