@@ -91,17 +91,14 @@ class PostQueryBuilder
     return relation if arr.nil?
 
     case arr[0]
+    when :any
+      relation.where(["#{field} IS NOT NULL"])
+
+    when :none
+      relation.where(["#{field} IS NULL"])
+
     when :eq
-      case arr[1]
-      when Time
-        relation.where("#{field} between ? and ?", arr[1].beginning_of_day, arr[1].end_of_day)
-      when :any
-        relation.where(["#{field} IS NOT NULL"])
-      when :none
-        relation.where(["#{field} IS NULL"])
-      else
-        relation.where(["#{field} = ?", arr[1]])
-      end
+      relation.where(["#{field} = ?", arr[1]])
 
     when :gt
       relation.where(["#{field} > ?", arr[1]])
@@ -1183,16 +1180,19 @@ class PostQueryBuilder
           return [:in, range.split(/[, ]+/).map {|x| parse_cast(x, type)}]
 
         when "any"
-          return [:eq, :any]
+          return [:any]
 
         when "none"
-          return [:eq, :none]
+          return [:none]
 
         else
           # add a 5% tolerance for float and filesize values
           if type == :float || (type == :filesize && range =~ /[km]b?\z/i)
             value = parse_cast(range, type)
             [:between, value * 0.95, value * 1.05]
+          elsif type.in?([:date, :age])
+            value = parse_cast(range, type)
+            [:between, value.beginning_of_day, value.end_of_day]
           else
             [:eq, parse_cast(range, type)]
           end
