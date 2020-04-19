@@ -227,8 +227,17 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([parent], "parent:none")
       assert_tag_match([child], "-parent:none")
+
+      assert_tag_match([child], "parent:any")
+      assert_tag_match([parent], "-parent:any")
+
       assert_tag_match([child, parent], "parent:#{parent.id}")
       assert_tag_match([child], "parent:#{child.id}")
+
+      assert_tag_match([], "-parent:#{parent.id}")
+      assert_tag_match([], "-parent:#{child.id}")
+
+      assert_tag_match([child], "parent:#{parent.id} parent:#{child.id}")
 
       assert_tag_match([child], "child:none")
       assert_tag_match([parent], "child:any")

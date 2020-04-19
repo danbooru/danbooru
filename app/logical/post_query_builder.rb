@@ -200,6 +200,16 @@ class PostQueryBuilder
     relation
   end
 
+  def parent_matches(parent)
+    if parent.downcase == "none"
+      Post.where(parent: nil)
+    elsif parent.downcase == "any"
+      Post.where.not(parent: nil)
+    elsif parent
+      Post.where(id: parent).or(Post.where(parent: parent))
+    end
+  end
+
   def commentary_matches(query)
     case query
     when "none", "false"
@@ -480,20 +490,12 @@ class PostQueryBuilder
       relation = relation.where("posts.id <> ?", q[:post_id_negated])
     end
 
-    if q[:parent] == "none"
-      relation = relation.where("posts.parent_id IS NULL")
-    elsif q[:parent] == "any"
-      relation = relation.where("posts.parent_id IS NOT NULL")
-    elsif q[:parent]
-      relation = relation.where("(posts.id = ? or posts.parent_id = ?)", q[:parent].to_i, q[:parent].to_i)
+    q[:parent].to_a.each do |parent|
+      relation = relation.merge(parent_matches(parent))
     end
 
-    if q[:parent_neg_ids]
-      neg_ids = q[:parent_neg_ids].map(&:to_i)
-      neg_ids.delete(0)
-      if neg_ids.present?
-        relation = relation.where("posts.id not in (?) and (posts.parent_id is null or posts.parent_id not in (?))", neg_ids, neg_ids)
-      end
+    q[:parent_neg].to_a.each do |parent_neg|
+      relation = relation.merge(parent_matches(parent_neg).negate)
     end
 
     if q[:child] == "none"
@@ -997,17 +999,12 @@ class PostQueryBuilder
               q["#{TagCategory.short_name_mapping[$1]}_tag_count".to_sym] = parse_helper(g2)
 
             when "parent"
-              q[:parent] = g2.downcase
+              q[:parent] ||= []
+              q[:parent] << g2
 
             when "-parent"
-              if g2.downcase == "none"
-                q[:parent] = "any"
-              elsif g2.downcase == "any"
-                q[:parent] = "none"
-              else
-                q[:parent_neg_ids] ||= []
-                q[:parent_neg_ids] << g2.downcase
-              end
+              q[:parent_neg] ||= []
+              q[:parent_neg] << g2
 
             when "child"
               q[:child] = g2.downcase
