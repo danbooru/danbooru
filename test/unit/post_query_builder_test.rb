@@ -142,6 +142,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([posts[1], posts[0]], "id:<=#{posts[1].id}")
       assert_tag_match([posts[2], posts[0]], "id:#{posts[0].id},#{posts[2].id}")
       assert_tag_match(posts.reverse, "id:#{posts[0].id}..#{posts[2].id}")
+
+      assert_tag_match([], "id:#{posts[0].id} id:#{posts[2].id}")
+      assert_tag_match([posts[1]], "id:>#{posts[0].id} id:<#{posts[2].id}")
     end
 
     should "return posts for the fav:<name> metatag" do
@@ -412,6 +415,16 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "age:<1w")
       assert_tag_match([post], "age:<1mo")
       assert_tag_match([post], "age:<1y")
+
+      assert_tag_match([post], "age:<=1y")
+      assert_tag_match([post], "age:>0s")
+      assert_tag_match([post], "age:>=0s")
+      assert_tag_match([post], "age:0s..1m")
+
+      assert_tag_match([], "age:>1y")
+      assert_tag_match([], "age:>=1y")
+      assert_tag_match([], "age:1y..2y")
+      assert_tag_match([], "age:>1y age:<1y")
     end
 
     should "return posts for the ratio:<x:y> metatag" do
@@ -490,6 +503,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post2 = create(:post)
 
       assert_tag_match([post1], "md5:abcd")
+      assert_tag_match([post1], "md5:ABCD")
+      assert_tag_match([post1], "md5:123,abcd")
     end
 
     should "return posts for a source:<text> search" do

@@ -87,44 +87,15 @@ class PostQueryBuilder
     @query_string = query_string
   end
 
-  def add_range_relation(arr, field, relation)
-    return relation if arr.nil?
-
-    case arr[0]
-    when :any
-      relation.where(["#{field} IS NOT NULL"])
-
-    when :none
-      relation.where(["#{field} IS NULL"])
-
-    when :eq
-      relation.where(["#{field} = ?", arr[1]])
-
-    when :gt
-      relation.where(["#{field} > ?", arr[1]])
-
-    when :gte
-      relation.where(["#{field} >= ?", arr[1]])
-
-    when :lt
-      relation.where(["#{field} < ?", arr[1]])
-
-    when :lte
-      relation.where(["#{field} <= ?", arr[1]])
-
-    when :in
-      relation.where(["#{field} in (?)", arr[1]])
-
-    when :between
-      relation.where(["#{field} BETWEEN ? AND ?", arr[1], arr[2]])
-
-    else
-      relation
-    end
-  end
-
   def escape_string_for_tsquery(array)
     array.map(&:to_escaped_for_tsquery)
+  end
+
+  def attribute_matches(values, field, type = :integer)
+    values.to_a.reduce(Post.all) do |relation, value|
+      operator, *args = PostQueryBuilder.parse_range(value, type)
+      relation.where_operator(field, operator, *args)
+    end
   end
 
   def user_matches(field, username)
@@ -270,28 +241,27 @@ class PostQueryBuilder
     end
 
     relation = add_joins(q, relation)
-    relation = add_range_relation(q[:post_id], "posts.id", relation)
-    relation = add_range_relation(q[:mpixels], "posts.image_width * posts.image_height / 1000000.0", relation)
-    relation = add_range_relation(q[:ratio], "ROUND(1.0 * posts.image_width / GREATEST(1, posts.image_height), 2)", relation)
-    relation = add_range_relation(q[:width], "posts.image_width", relation)
-    relation = add_range_relation(q[:height], "posts.image_height", relation)
-    relation = add_range_relation(q[:score], "posts.score", relation)
-    relation = add_range_relation(q[:fav_count], "posts.fav_count", relation)
-    relation = add_range_relation(q[:filesize], "posts.file_size", relation)
-    relation = add_range_relation(q[:date], "posts.created_at", relation)
-    relation = add_range_relation(q[:age], "posts.created_at", relation)
-    relation = add_range_relation(q[:pixiv_id], "posts.pixiv_id", relation)
+
+    relation = relation.merge(attribute_matches(q[:id], :id))
+    relation = relation.merge(attribute_matches(q[:md5], :md5, :md5))
+    relation = relation.merge(attribute_matches(q[:mpixels], "posts.image_width * posts.image_height / 1000000.0", :float))
+    relation = relation.merge(attribute_matches(q[:ratio], "ROUND(1.0 * posts.image_width / GREATEST(1, posts.image_height), 2)", :ratio))
+    relation = relation.merge(attribute_matches(q[:width], :image_width))
+    relation = relation.merge(attribute_matches(q[:height], :image_height))
+    relation = relation.merge(attribute_matches(q[:score], :score))
+    relation = relation.merge(attribute_matches(q[:fav_count], :fav_count))
+    relation = relation.merge(attribute_matches(q[:file_size], :file_size, :filesize))
+    relation = relation.merge(attribute_matches(q[:date], :created_at, :date))
+    relation = relation.merge(attribute_matches(q[:age], :created_at, :age))
+    relation = relation.merge(attribute_matches(q[:pixiv_id], :pixiv_id))
+    relation = relation.merge(attribute_matches(q[:post_tag_count], :tag_count))
+
     TagCategory.categories.each do |category|
-      relation = add_range_relation(q["#{category}_tag_count".to_sym], "posts.tag_count_#{category}", relation)
+      relation = relation.merge(attribute_matches(q["#{category}_tag_count".to_sym], "tag_count_#{category}".to_sym))
     end
-    relation = add_range_relation(q[:post_tag_count], "posts.tag_count", relation)
 
     COUNT_METATAGS.each do |column|
-      relation = add_range_relation(q[column.to_sym], "posts.#{column}", relation)
-    end
-
-    if q[:md5]
-      relation = relation.where("posts.md5": q[:md5])
+      relation = relation.merge(attribute_matches(q[column.to_sym], column.to_sym))
     end
 
     if q[:status] == "pending"
@@ -937,7 +907,8 @@ class PostQueryBuilder
               q[:saved_searches] << g2
 
             when "md5"
-              q[:md5] = g2.downcase.split(/,/)
+              q[:md5] ||= []
+              q[:md5] << g2
 
             when "-rating"
               q[:rating_neg] ||= []
@@ -954,31 +925,39 @@ class PostQueryBuilder
               q[:locked] = g2.downcase
 
             when "id"
-              q[:post_id] = parse_helper(g2)
+              q[:id] ||= []
+              q[:id] << g2
 
             when "-id"
               q[:post_id_negated] = g2.to_i
 
             when "width"
-              q[:width] = parse_helper(g2)
+              q[:width] ||= []
+              q[:width] << g2
 
             when "height"
-              q[:height] = parse_helper(g2)
+              q[:height] ||= []
+              q[:height] << g2
 
             when "mpixels"
-              q[:mpixels] = parse_helper(g2, :float)
+              q[:mpixels] ||= []
+              q[:mpixels] << g2
 
             when "ratio"
-              q[:ratio] = parse_helper(g2, :ratio)
+              q[:ratio] ||= []
+              q[:ratio] << g2
 
             when "score"
-              q[:score] = parse_helper(g2)
+              q[:score] ||= []
+              q[:score] << g2
 
             when "favcount"
-              q[:fav_count] = parse_helper(g2)
+              q[:fav_count] ||= []
+              q[:fav_count] << g2
 
             when "filesize"
-              q[:filesize] = parse_helper(g2, :filesize)
+              q[:file_size] ||= []
+              q[:file_size] << g2
 
             when "source"
               q[:source] = g2
@@ -987,16 +966,20 @@ class PostQueryBuilder
               q[:source_neg] = g2
 
             when "date"
-              q[:date] = parse_helper(g2, :date)
+              q[:date] ||= []
+              q[:date] << g2
 
             when "age"
-              q[:age] = reverse_parse_helper(parse_helper(g2, :age))
+              q[:age] ||= []
+              q[:age] << g2
 
             when "tagcount"
-              q[:post_tag_count] = parse_helper(g2)
+              q[:post_tag_count] ||= []
+              q[:post_tag_count] << g2
 
             when /(#{TagCategory.short_name_regex})tags/
-              q["#{TagCategory.short_name_mapping[$1]}_tag_count".to_sym] = parse_helper(g2)
+              q["#{TagCategory.short_name_mapping[$1]}_tag_count".to_sym] ||= []
+              q["#{TagCategory.short_name_mapping[$1]}_tag_count".to_sym] << g2
 
             when "parent"
               q[:parent] ||= []
@@ -1038,7 +1021,8 @@ class PostQueryBuilder
               q[:filetype_neg] = g2.downcase
 
             when "pixiv_id", "pixiv"
-              q[:pixiv_id] = parse_helper(g2)
+              q[:pixiv_id] ||= []
+              q[:pixiv_id] << g2
 
             when "-upvote"
               q[:upvoter_neg] ||= []
@@ -1057,11 +1041,13 @@ class PostQueryBuilder
               q[:downvoter] << g2
 
             when *COUNT_METATAGS
-              q[g1.to_sym] = parse_helper(g2)
+              q[g1.to_sym] ||= []
+              q[g1.to_sym] << g2
 
             when *COUNT_METATAG_SYNONYMS
               g1 = "#{g1.singularize}_count"
-              q[g1.to_sym] = parse_helper(g2)
+              q[g1.to_sym] ||= []
+              q[g1.to_sym] << g2
 
             end
 
@@ -1120,6 +1106,9 @@ class PostQueryBuilder
         when :float
           object.to_f
 
+        when :md5
+          object.to_s.downcase
+
         when :date, :datetime
           Time.zone.parse(object) rescue nil
 
@@ -1154,67 +1143,55 @@ class PostQueryBuilder
         end
       end
 
-      def parse_helper(range, type = :integer)
-        # "1", "0.5", "5.", ".5":
-        # (-?(\d+(\.\d*)?|\d*\.\d+))
-        case range
+      def parse_range(string, type = :integer)
+        range = case string
         when /\A(.+?)\.\.(.+)/
-          return [:between, parse_cast($1, type), parse_cast($2, type)]
-
+          [:between, (parse_cast($1, type)..parse_cast($2, type))]
         when /\A<=(.+)/, /\A\.\.(.+)/
-          return [:lte, parse_cast($1, type)]
-
+          [:lteq, parse_cast($1, type)]
         when /\A<(.+)/
-          return [:lt, parse_cast($1, type)]
-
+          [:lt, parse_cast($1, type)]
         when /\A>=(.+)/, /\A(.+)\.\.\Z/
-          return [:gte, parse_cast($1, type)]
-
+          [:gteq, parse_cast($1, type)]
         when /\A>(.+)/
-          return [:gt, parse_cast($1, type)]
-
+          [:gt, parse_cast($1, type)]
         when /[, ]/
-          return [:in, range.split(/[, ]+/).map {|x| parse_cast(x, type)}]
-
+          [:in, string.split(/[, ]+/).map {|x| parse_cast(x, type)}]
         when "any"
-          return [:any]
-
+          [:not_eq, nil]
         when "none"
-          return [:none]
-
+          [:eq, nil]
         else
           # add a 5% tolerance for float and filesize values
-          if type == :float || (type == :filesize && range =~ /[km]b?\z/i)
-            value = parse_cast(range, type)
-            [:between, value * 0.95, value * 1.05]
+          if type == :float || (type == :filesize && string =~ /[km]b?\z/i)
+            value = parse_cast(string, type)
+            [:between, (value * 0.95..value * 1.05)]
           elsif type.in?([:date, :age])
-            value = parse_cast(range, type)
-            [:between, value.beginning_of_day, value.end_of_day]
+            value = parse_cast(string, type)
+            [:between, (value.beginning_of_day..value.end_of_day)]
           else
-            [:eq, parse_cast(range, type)]
+            [:eq, parse_cast(string, type)]
           end
         end
+
+        range = reverse_range(range) if type == :age
+        range
       end
 
-      def reverse_parse_helper(array)
-        case array[0]
-        when :between
-          [:between, *array[1..-1].reverse]
-
-        when :lte
-          [:gte, *array[1..-1]]
-
-        when :lt
-          [:gt, *array[1..-1]]
-
-        when :gte
-          [:lte, *array[1..-1]]
-
-        when :gt
-          [:lt, *array[1..-1]]
-
+      def reverse_range(range)
+        case range
+        in [:between, range]
+          [:between, (range.end..range.begin)]
+        in [:lteq, value]
+          [:gteq, value]
+        in [:lt, value]
+          [:gt, value]
+        in [:gteq, value]
+          [:lteq, value]
+        in [:gt, value]
+          [:lt, value]
         else
-          array
+          range
         end
       end
     end

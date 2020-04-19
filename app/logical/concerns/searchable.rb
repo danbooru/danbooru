@@ -5,6 +5,18 @@ module Searchable
     unscoped.where(all.where_clause.invert(kind).ast)
   end
 
+  # `operator` is an Arel::Predications method: :eq, :gt, :lt, :between, :in, etc.
+  # https://github.com/rails/rails/blob/master/activerecord/lib/arel/predications.rb
+  def where_operator(field, operator, *args)
+    if field.is_a?(Symbol)
+      attribute = arel_table[field]
+    else
+      attribute = Arel.sql(field)
+    end
+
+    where(attribute.send(operator, *args))
+  end
+
   def where_like(attr, value)
     where("#{qualified_column_for(attr)} LIKE ? ESCAPE E'\\\\'", value.to_escaped_for_sql_like)
   end
@@ -66,11 +78,9 @@ module Searchable
   end
 
   def where_array_count(attr, value)
-    relation = all
     qualified_column = "cardinality(#{qualified_column_for(attr)})"
-    parsed_range = PostQueryBuilder.parse_helper(value, :integer)
-
-    PostQueryBuilder.new(nil).add_range_relation(parsed_range, qualified_column, relation)
+    range = PostQueryBuilder.parse_range(value, :integer)
+    where_operator("cardinality(#{qualified_column_for(attr)})", *range)
   end
 
   def search_boolean_attribute(attribute, params)
@@ -95,14 +105,13 @@ module Searchable
   end
 
   # range: "5", ">5", "<5", ">=5", "<=5", "5..10", "5,6,7"
-  def numeric_attribute_matches(attribute, range)
-    return all unless range.present?
+  def numeric_attribute_matches(attribute, value)
+    return all unless value.present?
 
     column = column_for_attribute(attribute)
     qualified_column = "#{table_name}.#{column.name}"
-    parsed_range = PostQueryBuilder.parse_helper(range, column.type)
-
-    PostQueryBuilder.new(nil).add_range_relation(parsed_range, qualified_column, self)
+    range = PostQueryBuilder.parse_range(value, column.type)
+    where_operator(qualified_column, *range)
   end
 
   def text_attribute_matches(attribute, value, index_column: nil, ts_config: "english")
@@ -256,7 +265,7 @@ module Searchable
 
   def apply_default_order(params)
     if params[:order] == "custom"
-      parse_ids = PostQueryBuilder.parse_helper(params[:id])
+      parse_ids = PostQueryBuilder.parse_range(params[:id])
       if parse_ids[0] == :in
         return find_ordered(parse_ids[1])
       end
