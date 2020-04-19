@@ -760,6 +760,10 @@ class PostQueryBuilder
         list
       end
 
+      def split_query(query)
+        scan_query(query)
+      end
+
       def normalize_query(query, normalize_aliases: true, sort: true)
         tags = scan_query(query.to_s)
         tags = tags.map { |t| Tag.normalize_name(t) }

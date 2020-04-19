@@ -25,7 +25,7 @@ module PostsHelper
     return unless post_search_counts_enabled?
     return unless params[:action] == "index" && params[:page].nil? && params[:tags].present?
 
-    tags = PostQueryBuilder.scan_query(params[:tags]).sort.join(" ")
+    tags = PostQueryBuilder.normalize_query(params[:tags])
     sig = generate_reportbooru_signature("ps-#{tags}")
     render "posts/partials/index/search_count", sig: sig
   end

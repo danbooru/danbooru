@@ -4,7 +4,7 @@ module PostSets
     attr_reader :tag_array, :page, :raw, :random, :post_count, :format
 
     def initialize(tags, page = 1, per_page = nil, raw: false, random: false, format: "html")
-      @tag_array = PostQueryBuilder.scan_query(tags)
+      @tag_array = PostQueryBuilder.split_query(tags)
       @page = page
       @per_page = per_page
       @raw = raw.to_s.truthy?

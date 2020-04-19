@@ -256,7 +256,7 @@ class Tag < ApplicationRecord
     def has_metatag?(tags, *metatags)
       return nil if tags.blank?
 
-      tags = PostQueryBuilder.scan_query(tags.to_str) if tags.respond_to?(:to_str)
+      tags = PostQueryBuilder.split_query(tags.to_str) if tags.respond_to?(:to_str)
       tags.grep(/\A(?:#{metatags.map(&:to_s).join("|")}):(.+)\z/i) { $1 }.first
     end
   end

@@ -527,11 +527,11 @@ class Post < ApplicationRecord
 
   module TagMethods
     def tag_array
-      @tag_array ||= PostQueryBuilder.scan_query(tag_string)
+      @tag_array ||= PostQueryBuilder.split_query(tag_string)
     end
 
     def tag_array_was
-      @tag_array_was ||= PostQueryBuilder.scan_query(tag_string_in_database.presence || tag_string_before_last_save || "")
+      @tag_array_was ||= PostQueryBuilder.split_query(tag_string_in_database.presence || tag_string_before_last_save || "")
     end
 
     def tags
@@ -595,7 +595,7 @@ class Post < ApplicationRecord
         # then try to merge the tag changes together.
         current_tags = tag_array_was
         new_tags = tag_array
-        old_tags = PostQueryBuilder.scan_query(old_tag_string)
+        old_tags = PostQueryBuilder.split_query(old_tag_string)
 
         kept_tags = current_tags & new_tags
         @removed_tags = old_tags - kept_tags
@@ -632,7 +632,7 @@ class Post < ApplicationRecord
     end
 
     def normalize_tags
-      normalized_tags = PostQueryBuilder.scan_query(tag_string)
+      normalized_tags = PostQueryBuilder.split_query(tag_string)
       normalized_tags = apply_casesensitive_metatags(normalized_tags)
       normalized_tags = normalized_tags.map(&:downcase)
       normalized_tags = filter_metatags(normalized_tags)
