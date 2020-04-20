@@ -1,7 +1,7 @@
 module Searchable
   extend ActiveSupport::Concern
 
-  def negate(kind = :nor)
+  def negate(kind = :nand)
     unscoped.where(all.where_clause.invert(kind).ast)
   end
 

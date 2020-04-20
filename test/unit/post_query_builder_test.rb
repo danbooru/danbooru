@@ -452,7 +452,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([flagged], "status:flagged")
       assert_tag_match([deleted], "status:deleted")
       assert_tag_match([banned],  "status:banned")
-      assert_tag_match([], "status:active")
+      assert_tag_match([banned], "status:active")
+      assert_tag_match([banned], "status:active status:banned")
       assert_tag_match(all, "status:any")
       assert_tag_match(all, "status:all")
 
@@ -461,7 +462,10 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match(all - [flagged], "-status:flagged")
       assert_tag_match(all - [deleted], "-status:deleted")
       assert_tag_match(all - [banned],  "-status:banned")
-      assert_tag_match(all, "-status:active")
+      assert_tag_match(all - [banned], "-status:active")
+
+      assert_tag_match([], "status:garbage")
+      assert_tag_match(all, "-status:garbage")
     end
 
     should "return posts for the status:unmoderated metatag" do

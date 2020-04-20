@@ -171,6 +171,29 @@ class PostQueryBuilder
     relation
   end
 
+  def status_matches(status)
+    case status.downcase
+    when "pending"
+      Post.pending
+    when "flagged"
+      Post.flagged
+    when "modqueue"
+      Post.pending_or_flagged
+    when "deleted"
+      Post.deleted
+    when "banned"
+      Post.banned
+    when "active"
+      Post.active
+    when "unmoderated"
+      Post.pending_or_flagged.available_for_moderation
+    when "all", "any"
+      Post.all
+    else
+      Post.none
+    end
+  end
+
   def parent_matches(parent)
     if parent.downcase == "none"
       Post.where(parent: nil)
@@ -220,16 +243,13 @@ class PostQueryBuilder
 
   def hide_deleted_posts?(q)
     return false if CurrentUser.admin_mode?
-    return false if q[:status].in?(%w[deleted active any all])
-    return false if q[:status_neg].in?(%w[deleted active any all])
+    return false if q[:status].to_a.any?(%w[deleted active any all])
+    return false if q[:status_neg].to_a.any?(%w[deleted active any all])
     return CurrentUser.user.hide_deleted_posts?
   end
 
   def build
-    unless query_string.is_a?(Hash)
-      q = PostQueryBuilder.parse_query(query_string)
-    end
-
+    q = PostQueryBuilder.parse_query(query_string)
     relation = Post.all
 
     if q[:tag_count].to_i > Danbooru.config.tag_query_limit
@@ -238,6 +258,10 @@ class PostQueryBuilder
 
     if CurrentUser.safe_mode?
       relation = relation.where("posts.rating = 's'")
+    end
+
+    if hide_deleted_posts?(q)
+      relation = relation.undeleted
     end
 
     relation = add_joins(q, relation)
@@ -264,38 +288,12 @@ class PostQueryBuilder
       relation = relation.merge(attribute_matches(q[column.to_sym], column.to_sym))
     end
 
-    if q[:status] == "pending"
-      relation = relation.where("posts.is_pending = TRUE")
-    elsif q[:status] == "flagged"
-      relation = relation.where("posts.is_flagged = TRUE")
-    elsif q[:status] == "modqueue"
-      relation = relation.where("posts.is_pending = TRUE OR posts.is_flagged = TRUE")
-    elsif q[:status] == "deleted"
-      relation = relation.where("posts.is_deleted = TRUE")
-    elsif q[:status] == "banned"
-      relation = relation.where("posts.is_banned = TRUE")
-    elsif q[:status] == "active"
-      relation = relation.where("posts.is_pending = FALSE AND posts.is_deleted = FALSE AND posts.is_banned = FALSE AND posts.is_flagged = FALSE")
-    elsif q[:status] == "unmoderated"
-      relation = relation.merge(Post.pending_or_flagged.available_for_moderation)
-    elsif q[:status] == "all" || q[:status] == "any"
-      # do nothing
-    elsif q[:status_neg] == "pending"
-      relation = relation.where("posts.is_pending = FALSE")
-    elsif q[:status_neg] == "flagged"
-      relation = relation.where("posts.is_flagged = FALSE")
-    elsif q[:status_neg] == "modqueue"
-      relation = relation.where("posts.is_pending = FALSE AND posts.is_flagged = FALSE")
-    elsif q[:status_neg] == "deleted"
-      relation = relation.where("posts.is_deleted = FALSE")
-    elsif q[:status_neg] == "banned"
-      relation = relation.where("posts.is_banned = FALSE")
-    elsif q[:status_neg] == "active"
-      relation = relation.where("posts.is_pending = TRUE OR posts.is_deleted = TRUE OR posts.is_banned = TRUE OR posts.is_flagged = TRUE")
+    q[:status].to_a.each do |query|
+      relation = relation.merge(status_matches(query))
     end
 
-    if hide_deleted_posts?(q)
-      relation = relation.where("posts.is_deleted = FALSE")
+    q[:status_neg].to_a.each do |query|
+      relation = relation.merge(status_matches(query).negate)
     end
 
     if q[:filetype]
@@ -1006,10 +1004,12 @@ class PostQueryBuilder
               # Do nothing. The controller takes care of it.
 
             when "-status"
-              q[:status_neg] = g2.downcase
+              q[:status_neg] ||= []
+              q[:status_neg] << g2
 
             when "status"
-              q[:status] = g2.downcase
+              q[:status] ||= []
+              q[:status] << g2
 
             when "embedded"
               q[:embedded] = g2.downcase

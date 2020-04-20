@@ -60,6 +60,8 @@ class Post < ApplicationRecord
 
   scope :pending, -> { where(is_pending: true) }
   scope :flagged, -> { where(is_flagged: true) }
+  scope :banned, -> { where(is_banned: true) }
+  scope :active, -> { where(is_pending: false, is_deleted: false, is_flagged: false) }
   scope :pending_or_flagged, -> { pending.or(flagged) }
 
   scope :unflagged, -> { where(is_flagged: false) }
