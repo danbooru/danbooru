@@ -265,7 +265,7 @@ module Searchable
 
   def apply_default_order(params)
     if params[:order] == "custom"
-      parse_ids = PostQueryBuilder.parse_range(params[:id])
+      parse_ids = PostQueryBuilder.parse_range(params[:id], :integer)
       if parse_ids[0] == :in
         return find_ordered(parse_ids[1])
       end

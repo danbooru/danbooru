@@ -496,6 +496,10 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([png], "filetype:png")
       assert_tag_match([jpg], "-filetype:png")
+      assert_tag_match([jpg, png], "filetype:png,jpg")
+      assert_tag_match([], "filetype:png filetype:jpg")
+      assert_tag_match([], "-filetype:png -filetype:jpg")
+      assert_tag_match([], "filetype:garbage")
     end
 
     should "return posts for the tagcount:<n> metatags" do

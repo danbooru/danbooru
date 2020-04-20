@@ -93,7 +93,7 @@ class PostQueryBuilder
 
   def attribute_matches(values, field, type = :integer)
     values.to_a.reduce(Post.all) do |relation, value|
-      operator, *args = PostQueryBuilder.parse_range(value, type)
+      operator, *args = PostQueryBuilder.parse_metatag_value(value, type)
       relation.where_operator(field, operator, *args)
     end
   end
@@ -280,6 +280,9 @@ class PostQueryBuilder
     relation = relation.merge(attribute_matches(q[:pixiv_id], :pixiv_id))
     relation = relation.merge(attribute_matches(q[:post_tag_count], :tag_count))
 
+    relation = relation.merge(attribute_matches(q[:filetype], :file_ext, :enum))
+    relation = relation.merge(attribute_matches(q[:filetype_neg], :file_ext, :enum).negate(:nor)) if q[:filetype_neg].present?
+
     TagCategory.categories.each do |category|
       relation = relation.merge(attribute_matches(q["#{category}_tag_count".to_sym], "tag_count_#{category}".to_sym))
     end
@@ -294,14 +297,6 @@ class PostQueryBuilder
 
     q[:status_neg].to_a.each do |query|
       relation = relation.merge(status_matches(query).negate)
-    end
-
-    if q[:filetype]
-      relation = relation.where("posts.file_ext": q[:filetype])
-    end
-
-    if q[:filetype_neg]
-      relation = relation.where.not("posts.file_ext": q[:filetype_neg])
     end
 
     if q[:source]
@@ -1015,10 +1010,12 @@ class PostQueryBuilder
               q[:embedded] = g2.downcase
 
             when "filetype"
-              q[:filetype] = g2.downcase
+              q[:filetype] ||= []
+              q[:filetype] << g2
 
             when "-filetype"
-              q[:filetype_neg] = g2.downcase
+              q[:filetype_neg] ||= []
+              q[:filetype_neg] << g2
 
             when "pixiv_id", "pixiv"
               q[:pixiv_id] ||= []
@@ -1100,6 +1097,9 @@ class PostQueryBuilder
 
       def parse_cast(object, type)
         case type
+        when :enum
+          object.to_s.downcase
+
         when :integer
           object.to_i
 
@@ -1143,7 +1143,15 @@ class PostQueryBuilder
         end
       end
 
-      def parse_range(string, type = :integer)
+      def parse_metatag_value(string, type)
+        if type == :enum
+          [:in, string.split(/[, ]+/).map { |x| parse_cast(x, type) }]
+        else
+          parse_range(string, type)
+        end
+      end
+
+      def parse_range(string, type)
         range = case string
         when /\A(.+?)\.\.\.(.+)/ # A...B
           lo, hi = [parse_cast($1, type), parse_cast($2, type)].sort
