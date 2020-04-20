@@ -141,8 +141,12 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([posts[2], posts[1]], "id:>=#{posts[1].id}")
       assert_tag_match([posts[1], posts[0]], "id:<=#{posts[1].id}")
       assert_tag_match([posts[2], posts[0]], "id:#{posts[0].id},#{posts[2].id}")
-      assert_tag_match(posts.reverse, "id:#{posts[0].id}..#{posts[2].id}")
-      assert_tag_match(posts.reverse, "id:#{posts[2].id}..#{posts[0].id}")
+
+      assert_tag_match([posts[2], posts[1]], "id:#{posts[1].id}..")
+      assert_tag_match([posts[1], posts[0]], "id:..#{posts[1].id}")
+      assert_tag_match([posts[1], posts[0]], "id:#{posts[0].id}..#{posts[1].id}")
+      assert_tag_match([posts[1], posts[0]], "id:#{posts[1].id}..#{posts[0].id}")
+      assert_tag_match([posts[1], posts[0]], "id:#{posts[0].id}...#{posts[2].id}")
 
       assert_tag_match([], "id:#{posts[0].id} id:#{posts[2].id}")
       assert_tag_match([posts[1]], "id:>#{posts[0].id} id:<#{posts[2].id}")

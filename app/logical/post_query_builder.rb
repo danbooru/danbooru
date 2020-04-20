@@ -1145,6 +1145,9 @@ class PostQueryBuilder
 
       def parse_range(string, type = :integer)
         range = case string
+        when /\A(.+?)\.\.\.(.+)/ # A...B
+          lo, hi = [parse_cast($1, type), parse_cast($2, type)].sort
+          [:between, (lo...hi)]
         when /\A(.+?)\.\.(.+)/
           lo, hi = [parse_cast($1, type), parse_cast($2, type)].sort
           [:between, (lo..hi)]
