@@ -529,11 +529,11 @@ class Post < ApplicationRecord
 
   module TagMethods
     def tag_array
-      @tag_array ||= PostQueryBuilder.split_query(tag_string)
+      @tag_array ||= tag_string.split
     end
 
     def tag_array_was
-      @tag_array_was ||= PostQueryBuilder.split_query(tag_string_in_database.presence || tag_string_before_last_save || "")
+      @tag_array_was ||= (tag_string_in_database.presence || tag_string_before_last_save || "").split
     end
 
     def tags
@@ -595,9 +595,9 @@ class Post < ApplicationRecord
       if old_tag_string
         # If someone else committed changes to this post before we did,
         # then try to merge the tag changes together.
-        current_tags = tag_array_was
-        new_tags = tag_array
-        old_tags = PostQueryBuilder.split_query(old_tag_string)
+        current_tags = tag_string_was.split
+        new_tags = PostQueryBuilder.parse_tag_edit(tag_string)
+        old_tags = old_tag_string.split
 
         kept_tags = current_tags & new_tags
         @removed_tags = old_tags - kept_tags

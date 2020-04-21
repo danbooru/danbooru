@@ -713,7 +713,7 @@ class PostQueryBuilder
         until scanner.eos?
           scanner.skip(/ +/)
 
-          if scanner.scan(/(#{METATAGS.join("|")}):/i)
+          if scanner.scan(/(#{METATAGS.join("|")}):/io)
             metatag = scanner.captures.first
 
             if scanner.scan(/"(.+)"/)
@@ -752,6 +752,10 @@ class PostQueryBuilder
         tags = tags.sort if sort
         tags = tags.uniq
         tags.join(" ")
+      end
+
+      def parse_tag_edit(tag_string)
+        split_query(tag_string)
       end
 
       def parse_query(query, options = {})
