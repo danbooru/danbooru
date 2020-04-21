@@ -63,6 +63,6 @@ module TagRelationshipRetirementService
   end
 
   def is_unused?(name)
-    return !Post.tag_match("status:any #{name}").where("created_at > ?", THRESHOLD.ago).exists?
+    !Post.raw_tag_match(name).where("created_at > ?", THRESHOLD.ago).exists?
   end
 end

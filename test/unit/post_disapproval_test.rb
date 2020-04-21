@@ -20,7 +20,7 @@ class PostDisapprovalTest < ActiveSupport::TestCase
       end
 
       should "not allow blank messages" do
-        @post_disapproval = create(:post_disapproval, message: "")
+        @post_disapproval = create(:post_disapproval, post: @post_1, message: "")
         assert_equal(nil, @post_disapproval.message)
       end
 
@@ -55,7 +55,7 @@ class PostDisapprovalTest < ActiveSupport::TestCase
 
       context "for a post that has been approved" do
         setup do
-          @post = FactoryBot.create(:post)
+          @post = FactoryBot.create(:post, is_pending: true)
           @user = FactoryBot.create(:user)
           @disapproval = create(:post_disapproval, user: @user, post: @post, created_at: 2.months.ago)
         end
@@ -74,7 +74,7 @@ class PostDisapprovalTest < ActiveSupport::TestCase
 
           # 2 uploaders, with 2 uploads each, and 2 disapprovals on each upload.
           @uploaders.each do |uploader|
-            FactoryBot.create_list(:post, 2, uploader: uploader).each do |post|
+            FactoryBot.create_list(:post, 2, is_pending: true, uploader: uploader).each do |post|
               FactoryBot.create(:post_disapproval, post: post, user: @disapprovers[0])
               FactoryBot.create(:post_disapproval, post: post, user: @disapprovers[1])
             end

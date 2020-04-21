@@ -37,7 +37,7 @@ class IpBan < ApplicationRecord
 
   def create_mod_action
     if new_record?
-      ModAction.log("#{CurrentUser.user.name} created ip ban for #{ip_addr}", :ip_ban_create)
+      ModAction.log("#{creator.name} created ip ban for #{ip_addr}", :ip_ban_create)
     elsif is_deleted? == true && is_deleted_was == false
       ModAction.log("#{CurrentUser.user.name} deleted ip ban for #{ip_addr}", :ip_ban_delete)
     elsif is_deleted? == false && is_deleted_was == true

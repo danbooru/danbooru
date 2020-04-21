@@ -17,7 +17,7 @@ class IpBanTest < ActiveSupport::TestCase
   end
 
   context "validation" do
-    setup { create(:ip_ban: ip_addr: "5.6.7.8") }
+    setup { create(:ip_ban, ip_addr: "5.6.7.8") }
     subject { build(:ip_ban) }
 
     should allow_value("1.2.3.4").for(:ip_addr)

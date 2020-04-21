@@ -93,13 +93,13 @@ class TagTest < ActiveSupport::TestCase
 
   context "A tag parser" do
     should "scan a query" do
-      assert_equal(%w(aaa bbb), PostQueryBuilder.scan_query("aaa bbb"))
-      assert_equal(%w(~AAa -BBB* -bbb*), PostQueryBuilder.scan_query("~AAa -BBB* -bbb*"))
+      assert_equal(%w(aaa bbb), PostQueryBuilder.split_query("aaa bbb"))
+      assert_equal(%w(~aaa -bbb* -bbb*), PostQueryBuilder.split_query("~AAa -BBB* -bbb*"))
     end
 
     should "not strip out valid characters when scanning" do
-      assert_equal(%w(aaa bbb), PostQueryBuilder.scan_query("aaa bbb"))
-      assert_equal(%w(favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%), PostQueryBuilder.scan_query("favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%"))
+      assert_equal(%w(aaa bbb), PostQueryBuilder.split_query("aaa bbb"))
+      assert_equal(%w(favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%), PostQueryBuilder.split_query("favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%"))
     end
 
     should "cast values" do
@@ -108,21 +108,6 @@ class TagTest < ActiveSupport::TestCase
       assert_nothing_raised {PostQueryBuilder.parse_cast("2009-01-01", :date)}
       assert_nothing_raised {PostQueryBuilder.parse_cast("1234", :integer)}
       assert_nothing_raised {PostQueryBuilder.parse_cast("1234.56", :float)}
-    end
-
-    should "parse a query" do
-      tag1 = FactoryBot.create(:tag, :name => "abc")
-      tag2 = FactoryBot.create(:tag, :name => "acb")
-
-      assert_equal(["abc"], PostQueryBuilder.parse_query("md5:abc")[:md5])
-      assert_equal([:between, 1, 2], PostQueryBuilder.parse_query("id:1..2")[:post_id])
-      assert_equal([:gte, 1], PostQueryBuilder.parse_query("id:1..")[:post_id])
-      assert_equal([:lte, 2], PostQueryBuilder.parse_query("id:..2")[:post_id])
-      assert_equal([:gt, 2], PostQueryBuilder.parse_query("id:>2")[:post_id])
-      assert_equal([:lt, 3], PostQueryBuilder.parse_query("id:<3")[:post_id])
-      assert_equal([:lt, 3], PostQueryBuilder.parse_query("ID:<3")[:post_id])
-
-      assert_equal(["~no_matches~"], PostQueryBuilder.parse_query("a*b")[:tags][:include])
     end
 
     should "parse single tags correctly" do

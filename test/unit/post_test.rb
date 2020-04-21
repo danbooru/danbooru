@@ -1448,7 +1448,7 @@ class PostTest < ActiveSupport::TestCase
 
           # final should be <aaa>, <bbb>, <ddd>, <eee>
           final_post = Post.find(post.id)
-          assert_equal(%w(aaa bbb ddd eee), PostQueryBuilder.scan_query(final_post.tag_string).sort)
+          assert_equal("aaa bbb ddd eee", final_post.tag_string)
         end
 
         should "merge any tag changes that were made after loading the initial set of tags part 2" do
@@ -1471,7 +1471,7 @@ class PostTest < ActiveSupport::TestCase
 
           # final should be <aaa>, <bbb>, <ddd>, <eee>
           final_post = Post.find(post.id)
-          assert_equal(%w(aaa bbb ddd eee), PostQueryBuilder.scan_query(final_post.tag_string).sort)
+          assert_equal("aaa bbb ddd eee", final_post.tag_string)
         end
 
         should "merge any parent, source, and rating changes that were made after loading the initial set" do
@@ -2033,8 +2033,6 @@ class PostTest < ActiveSupport::TestCase
             post1 = FactoryBot.create(:post, tag_string: "aaa bbb rating:s")
             post2 = FactoryBot.create(:post, tag_string: "aaa bbb rating:e")
 
-            Danbooru.config.expects(:is_unlimited_tag?).with("rating:s").once.returns(true)
-            Danbooru.config.expects(:is_unlimited_tag?).with(anything).twice.returns(false)
             assert_equal(1, Post.fast_count("aaa bbb"))
           end
 
