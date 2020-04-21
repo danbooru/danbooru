@@ -204,6 +204,23 @@ class PostQueryBuilder
     end
   end
 
+  def pool_matches(pool_name)
+    case pool_name.downcase
+    when "none"
+      Post.where.not(id: Pool.select("unnest(post_ids)"))
+    when "any"
+      Post.where(id: Pool.select("unnest(post_ids)"))
+    when "series"
+      Post.where(id: Pool.series.select("unnest(post_ids)"))
+    when "collection"
+      Post.where(id: Pool.collection.select("unnest(post_ids)"))
+    when /\*/
+      Post.where(id: Pool.name_matches(pool_name).select("unnest(post_ids)"))
+    else
+      Post.where(id: Pool.named(pool_name).select("unnest(post_ids)"))
+    end
+  end
+
   def commentary_matches(query)
     case query
     when "none", "false"
@@ -315,38 +332,12 @@ class PostQueryBuilder
       end
     end
 
-    q[:pool].to_a.each do |pool_name|
-      case pool_name
-      when "none"
-        relation = relation.where.not(id: Pool.select("unnest(post_ids)"))
-      when "any"
-        relation = relation.where(id: Pool.select("unnest(post_ids)"))
-      when "series"
-        relation = relation.where(id: Pool.series.select("unnest(post_ids)"))
-      when "collection"
-        relation = relation.where(id: Pool.collection.select("unnest(post_ids)"))
-      when /\*/
-        relation = relation.where(id: Pool.name_matches(pool_name).select("unnest(post_ids)"))
-      else
-        relation = relation.where(id: Pool.named(pool_name).select("unnest(post_ids)"))
-      end
+    q[:pool_neg].to_a.each do |pool_name|
+      relation = relation.merge(pool_matches(pool_name).negate)
     end
 
-    q[:pool_neg].to_a.each do |pool_name|
-      case pool_name
-      when "none"
-        relation = relation.where(id: Pool.select("unnest(post_ids)"))
-      when "any"
-        relation = relation.where.not(id: Pool.select("unnest(post_ids)"))
-      when "series"
-        relation = relation.where.not(id: Pool.series.select("unnest(post_ids)"))
-      when "collection"
-        relation = relation.where.not(id: Pool.collection.select("unnest(post_ids)"))
-      when /\*/
-        relation = relation.where.not(id: Pool.name_matches(pool_name).select("unnest(post_ids)"))
-      else
-        relation = relation.where.not(id: Pool.named(pool_name).select("unnest(post_ids)"))
-      end
+    q[:pool].to_a.each do |pool_name|
+      relation = relation.merge(pool_matches(pool_name))
     end
 
     q[:commentary_neg].to_a.each do |query|
