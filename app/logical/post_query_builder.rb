@@ -38,6 +38,7 @@ class PostQueryBuilder
     -filetype filetype
     -disapproved disapproved
     -parent parent
+    -search search
     md5
     width
     height
@@ -53,7 +54,6 @@ class PostQueryBuilder
     tagcount
     child
     pixiv_id pixiv
-    search
     embedded
   ] + TagCategory.short_name_list.map {|x| "#{x}tags"} + COUNT_METATAGS + COUNT_METATAG_SYNONYMS
 
@@ -156,19 +156,13 @@ class PostQueryBuilder
     relation
   end
 
-  def add_saved_search_relation(saved_searches, relation)
-    saved_searches.each do |saved_search|
-      if saved_search == "all"
-        post_ids = SavedSearch.post_ids_for(CurrentUser.id)
-      else
-        post_ids = SavedSearch.post_ids_for(CurrentUser.id, label: saved_search)
-      end
-
-      post_ids = [0] if post_ids.empty?
-      relation = relation.where("posts.id": post_ids)
+  def saved_search_matches(label)
+    case label.downcase
+    when "all"
+      Post.where(id: SavedSearch.post_ids_for(CurrentUser.id))
+    else
+      Post.where(id: SavedSearch.post_ids_for(CurrentUser.id, label: label))
     end
-
-    relation
   end
 
   def status_matches(status)
@@ -348,8 +342,12 @@ class PostQueryBuilder
       relation = relation.merge(commentary_matches(query))
     end
 
-    if q[:saved_searches]
-      relation = add_saved_search_relation(q[:saved_searches], relation)
+    q[:saved_searches_neg].to_a.each do |query|
+      relation = relation.merge(saved_search_matches(query).negate)
+    end
+
+    q[:saved_searches].to_a.each do |query|
+      relation = relation.merge(saved_search_matches(query))
     end
 
     q[:user_neg].to_a.each do |username|
@@ -885,6 +883,10 @@ class PostQueryBuilder
             when "commentary"
               q[:commentary] ||= []
               q[:commentary] << g2
+
+            when "-search"
+              q[:saved_searches_neg] ||= []
+              q[:saved_searches_neg] << g2
 
             when "search"
               q[:saved_searches] ||= []

@@ -597,34 +597,28 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "pixiv_id:none")
     end
 
-    context "saved searches" do
-      setup do
-        @post1 = create(:post, tag_string: "aaa")
-        @post2 = create(:post, tag_string: "bbb")
-        create(:saved_search, query: "aaa", labels: ["zzz"], user: CurrentUser.user)
-        create(:saved_search, query: "bbb", user: CurrentUser.user)
-      end
+    should "return posts for the search: metatag" do
+      @post1 = create(:post, tag_string: "aaa")
+      @post2 = create(:post, tag_string: "bbb")
+      create(:saved_search, query: "aaa", labels: ["zzz"], user: CurrentUser.user)
+      create(:saved_search, query: "bbb", user: CurrentUser.user)
 
-      context "labeled" do
-        should "work" do
-          SavedSearch.expects(:post_ids_for).with(CurrentUser.id, label: "zzz").returns([@post1.id])
-          assert_tag_match([@post1], "search:zzz")
-        end
-      end
+      Redis.any_instance.stubs(:exists).with("search:aaa").returns(true)
+      Redis.any_instance.stubs(:exists).with("search:bbb").returns(true)
+      Redis.any_instance.stubs(:smembers).with("search:aaa").returns([@post1.id])
+      Redis.any_instance.stubs(:smembers).with("search:bbb").returns([@post2.id])
 
-      context "missing" do
-        should "work" do
-          SavedSearch.expects(:post_ids_for).with(CurrentUser.id, label: "uncategorized").returns([@post2.id])
-          assert_tag_match([@post2], "search:uncategorized")
-        end
-      end
+      assert_tag_match([@post1], "search:zzz")
+      assert_tag_match([@post1], "search:ZZZ")
+      assert_tag_match([@post2, @post1], "search:all")
+      assert_tag_match([@post2, @post1], "search:ALL")
+      assert_tag_match([], "search:does_not_exist")
 
-      context "all" do
-        should "work" do
-          SavedSearch.expects(:post_ids_for).with(CurrentUser.id).returns([@post1.id, @post2.id])
-          assert_tag_match([@post2, @post1], "search:all")
-        end
-      end
+      assert_tag_match([@post2], "-search:zzz")
+      assert_tag_match([@post2], "-search:ZZZ")
+      assert_tag_match([], "-search:all")
+      assert_tag_match([], "-search:ALL")
+      assert_tag_match([@post2, @post1], "-search:does_not_exist")
     end
 
     should "return posts for a rating:<s|q|e> metatag" do

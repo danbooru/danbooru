@@ -14,7 +14,6 @@ class SavedSearch < ApplicationRecord
       memoize :redis
 
       def post_ids_for(user_id, label: nil)
-        label = normalize_label(label) if label
         queries = queries_for(user_id, label: label)
         post_ids = Set.new
         queries.each do |query|
@@ -135,13 +134,10 @@ class SavedSearch < ApplicationRecord
   concerning :Queries do
     class_methods do
       def queries_for(user_id, label: nil, options: {})
-        SavedSearch
-          .where(user_id: user_id)
-          .labeled(label)
-          .pluck(:query)
-          .map {|x| PostQueryBuilder.normalize_query(x, sort: true)}
-          .sort
-          .uniq
+        searches = SavedSearch.where(user_id: user_id)
+        searches = searches.labeled(label) if label.present?
+        queries = searches.pluck(:query).map { |query| PostQueryBuilder.normalize_query(query, sort: true) }
+        queries.sort.uniq
       end
     end
 
@@ -160,7 +156,7 @@ class SavedSearch < ApplicationRecord
   validate :validate_count
   before_validation :normalize_query
   before_validation :normalize_labels
-  scope :labeled, ->(label) { label.present? ? where("labels @> string_to_array(?, '~~~~')", label) : where("true") }
+  scope :labeled, ->(label) { where_array_includes_any_lower(:labels, [normalize_label(label)]) }
 
   def validate_count
     if user.saved_searches.count + 1 > user.max_saved_searches
