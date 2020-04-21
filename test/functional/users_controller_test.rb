@@ -161,7 +161,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       should "mark users signing up from proxies as requiring verification" do
         skip unless IpLookup.enabled?
-        self.remote_addr = "1.1.1.1"
+
+        self.remote_addr = "51.15.128.1"
         post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
         assert_redirected_to User.last

@@ -100,7 +100,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
 
       context "with a disposable email address" do
         should "not mark the user as verified" do
-          Danbooru.config.stubs(:email_domain_verification_list).returns([])
+          Danbooru.config.stubs(:email_domain_verification_list).returns(["gmail.com"])
           @user.email_address.update!(address: "test@mailinator.com")
           get email_verification_url(@user)
 
