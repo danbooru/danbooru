@@ -150,5 +150,15 @@ module Sources
         assert_nothing_raised { site.to_h }
       end
     end
+
+    should "work for artists with underscores in their name" do
+      site = Sources::Strategies.find("https://hosi_na.artstation.com/projects/3oEk3B")
+      assert_equal("hosi_na", site.artist_name)
+    end
+
+    should "work for artists with dashes in their name" do
+      site = Sources::Strategies.find("https://sa-dui.artstation.com/projects/DVERn")
+      assert_equal("sa-dui", site.artist_name)
+    end
   end
 end
