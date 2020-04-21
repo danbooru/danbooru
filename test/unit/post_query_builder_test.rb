@@ -813,4 +813,17 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       end
     end
   end
+
+  context "The normalize_query method" do
+    should "work" do
+      create(:tag_alias, antecedent_name: "gray", consequent_name: "grey")
+
+      assert_equal("foo", PostQueryBuilder.normalize_query("foo"))
+      assert_equal("foo", PostQueryBuilder.normalize_query(" foo "))
+      assert_equal("foo", PostQueryBuilder.normalize_query("FOO"))
+      assert_equal("foo", PostQueryBuilder.normalize_query("foo foo"))
+      assert_equal("grey", PostQueryBuilder.normalize_query("gray"))
+      assert_equal("aaa bbb", PostQueryBuilder.normalize_query("bbb aaa"))
+    end
+  end
 end
