@@ -718,7 +718,7 @@ class PostQueryBuilder
     class_methods do
       def scan_query(query)
         terms = []
-        query = query.gsub(/[[:space:]]/, " ")
+        query = query.to_s.gsub(/[[:space:]]/, " ")
         scanner = StringScanner.new(query)
 
         until scanner.eos?

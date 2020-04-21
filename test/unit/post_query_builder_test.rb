@@ -63,12 +63,21 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post1], "?")
     end
 
+    should "return posts for the empty search" do
+      post1 = create(:post)
+
+      assert_tag_match([post1], "")
+      assert_tag_match([post1], " ")
+      assert_tag_match([post1], nil)
+    end
+
     should "return posts for 1 tag" do
       post1 = create(:post, tag_string: "aaa")
       post2 = create(:post, tag_string: "aaa bbb")
       post3 = create(:post, tag_string: "bbb ccc")
 
       assert_tag_match([post2, post1], "aaa")
+      assert_tag_match([post2, post1], " aaa ")
     end
 
     should "return posts for a 2 tag join" do
@@ -77,6 +86,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post3 = create(:post, tag_string: "bbb ccc")
 
       assert_tag_match([post2], "aaa bbb")
+      assert_tag_match([post2], " aaa bbb ")
     end
 
     should "return posts for a 2 tag union" do
