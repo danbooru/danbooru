@@ -519,11 +519,17 @@ module Danbooru
       nil
     end
 
-    # A list of email domains that are used for account verification purposes.
-    # If a user signs up from a proxy they will need to verify their account
-    # using an email address from one of the domains on this list.
+    # The whitelist of email domains allowed for account verification purposes.
+    # If a user signs up from a proxy, they must verify their account using an
+    # email address from one of the domains on this list before they can do
+    # anything on the site. This is meant to prevent users from using
+    # disposable emails to create sockpuppet accounts.
+    #
+    # If this list is empty or nil, then there are no restrictions on which
+    # email domains can be used to verify accounts.
     def email_domain_verification_list
       # ["gmail.com", "outlook.com", "yahoo.com"]
+      []
     end
 
     # API key for Google Maps. Used for embedding maps on IP address lookup pages.

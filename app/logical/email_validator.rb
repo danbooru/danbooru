@@ -81,8 +81,9 @@ module EmailValidator
   end
 
   def nondisposable?(address)
+    return true if Danbooru.config.email_domain_verification_list.blank?
     domain = Mail::Address.new(address).domain
-    domain.in?(Danbooru.config.email_domain_verification_list)
+    domain.in?(Danbooru.config.email_domain_verification_list.to_a)
   end
 
   def undeliverable?(to_address, from_address: Danbooru.config.contact_email, timeout: 3)
