@@ -159,6 +159,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([posts[1], posts[0]], "id:#{posts[0].id}...#{posts[2].id}")
 
       assert_tag_match([], "id:#{posts[0].id} id:#{posts[2].id}")
+      assert_tag_match([posts[0]], "-id:#{posts[1].id} -id:#{posts[2].id}")
       assert_tag_match([posts[1]], "id:>#{posts[0].id} id:<#{posts[2].id}")
     end
 
@@ -259,6 +260,11 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([child], "child:none")
       assert_tag_match([parent], "child:any")
+      assert_tag_match([], "child:garbage")
+
+      assert_tag_match([parent], "-child:none")
+      assert_tag_match([child], "-child:any")
+      assert_tag_match([child, parent], "-child:garbage")
     end
 
     should "return posts for the favgroup:<name> metatag" do
@@ -311,6 +317,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([posts[1]], "-approver:#{users[0].name}")
       assert_tag_match([posts[1], posts[0]], "approver:any")
       assert_tag_match([posts[2]], "approver:none")
+      assert_tag_match([posts[2]], "approver:NONE")
+      assert_tag_match([], "approver:does_not_exist")
     end
 
     should "return posts for the commenter:<name> metatag" do
@@ -399,6 +407,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([post2, post1], "commentary:true")
       assert_tag_match([post4, post3], "commentary:false")
+
+      assert_tag_match([post2, post1], "commentary:TRUE")
+      assert_tag_match([post4, post3], "commentary:FALSE")
 
       assert_tag_match([post4, post3], "-commentary:true")
       assert_tag_match([post2, post1], "-commentary:false")
@@ -512,6 +523,21 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "filetype:garbage")
     end
 
+    should "return posts for the embedded:<true|false> metatag" do
+      p1 = create(:post, has_embedded_notes: true)
+      p2 = create(:post, has_embedded_notes: false)
+
+      assert_tag_match([p1], "embedded:true")
+      assert_tag_match([p2], "embedded:false")
+
+      assert_tag_match([p2], "-embedded:true")
+      assert_tag_match([p1], "-embedded:false")
+
+      assert_tag_match([], "embedded:false embedded:true")
+      assert_tag_match([], "embedded:garbage")
+      assert_tag_match([p2, p1], "-embedded:garbage")
+    end
+
     should "return posts for the tagcount:<n> metatags" do
       post = create(:post, tag_string: "artist:wokada copyright:vocaloid char:hatsune_miku twintails")
 
@@ -542,6 +568,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post3, post1], "-source:abcde")
 
       assert_tag_match([post3], "source:none")
+      assert_tag_match([post3], "source:NONE")
       assert_tag_match([post2, post1], "-source:none")
     end
 
@@ -649,6 +676,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match(all - [rating_locked], "-locked:rating")
       assert_tag_match(all - [note_locked], "-locked:note")
       assert_tag_match(all - [status_locked], "-locked:status")
+
+      assert_tag_match([rating_locked], "locked:RATING")
+      assert_tag_match([status_locked], "-locked:rating -locked:note")
+      assert_tag_match([], "locked:rating locked:note")
+
+      assert_tag_match([], "locked:garbage")
+      assert_tag_match(all, "-locked:garbage")
     end
 
     should "return posts for a upvote:<user>, downvote:<user> metatag" do
@@ -668,11 +702,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         disapproval = create(:post_disapproval, user: CurrentUser.user, post: disapproved, reason: "disinterest")
 
         assert_tag_match([disapproved], "disapproved:#{CurrentUser.name}")
+        assert_tag_match([disapproved], "disapproved:#{CurrentUser.name.upcase}")
         assert_tag_match([disapproved], "disapproved:disinterest")
-        assert_tag_match([],            "disapproved:breaks_rules")
+        assert_tag_match([disapproved], "disapproved:DISINTEREST")
+        assert_tag_match([], "disapproved:breaks_rules")
 
-        assert_tag_match([pending],              "-disapproved:#{CurrentUser.name}")
-        assert_tag_match([pending],              "-disapproved:disinterest")
+        assert_tag_match([pending], "-disapproved:#{CurrentUser.name}")
+        assert_tag_match([pending], "-disapproved:disinterest")
         assert_tag_match([disapproved, pending], "-disapproved:breaks_rules")
       end
     end

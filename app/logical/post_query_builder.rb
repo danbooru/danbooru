@@ -38,7 +38,9 @@ class PostQueryBuilder
     -filetype filetype
     -disapproved disapproved
     -parent parent
+    -child child
     -search search
+    -embedded embedded
     md5
     width
     height
@@ -52,9 +54,7 @@ class PostQueryBuilder
     order
     limit
     tagcount
-    child
     pixiv_id pixiv
-    embedded
   ] + TagCategory.short_name_list.map {|x| "#{x}tags"} + COUNT_METATAGS + COUNT_METATAG_SYNONYMS
 
   ORDER_METATAGS = %w[
@@ -99,9 +99,10 @@ class PostQueryBuilder
   end
 
   def user_matches(field, username)
-    if username == "any"
+    case username.downcase
+    when "any"
       Post.where.not(field => nil)
-    elsif username == "none"
+    when "none"
       Post.where(field => nil)
     else
       Post.where(field => User.name_matches(username))
@@ -188,13 +189,56 @@ class PostQueryBuilder
     end
   end
 
+  def disapproved_matches(query)
+    if query.downcase.in?(PostDisapproval::REASONS)
+      Post.where(disapprovals: PostDisapproval.where(reason: query.downcase))
+    elsif User.normalize_name(query) == CurrentUser.user.name
+      Post.where(disapprovals: PostDisapproval.where(user: CurrentUser.user))
+    else
+      Post.none
+    end
+  end
+
   def parent_matches(parent)
-    if parent.downcase == "none"
+    case parent.downcase
+    when "none"
       Post.where(parent: nil)
-    elsif parent.downcase == "any"
+    when "any"
       Post.where.not(parent: nil)
-    elsif parent
+    when /\A\d+\z/
       Post.where(id: parent).or(Post.where(parent: parent))
+    else
+      Post.none
+    end
+  end
+
+  def child_matches(child)
+    case child.downcase
+    when "none"
+      Post.where(has_children: false)
+    when "any"
+      Post.where(has_children: true)
+    else
+      Post.none
+    end
+  end
+
+  def source_matches(source)
+    case source.downcase
+    when "none"
+      Post.where_like(:source, "")
+    else
+      Post.where_ilike(:source, source + "*")
+    end
+  end
+
+  def embedded_matches(embedded)
+    if embedded.truthy?
+      Post.bit_flags_match(:has_embedded_notes, true)
+    elsif embedded.falsy?
+      Post.bit_flags_match(:has_embedded_notes, false)
+    else
+      Post.none
     end
   end
 
@@ -215,8 +259,19 @@ class PostQueryBuilder
     end
   end
 
+  def ordpool_matches(pool_name)
+    # XXX unify with Pool#posts
+    pool_posts = Pool.named(pool_name).joins("CROSS JOIN unnest(pools.post_ids) WITH ORDINALITY AS row(post_id, pool_index)").select(:post_id, :pool_index)
+    Post.joins("JOIN (#{pool_posts.to_sql}) pool_posts ON pool_posts.post_id = posts.id").order("pool_posts.pool_index ASC")
+  end
+
+  def favgroup_matches(query)
+    favgroup = FavoriteGroup.visible(CurrentUser.user).name_or_id_matches(query, CurrentUser.user)
+    Post.where(id: favgroup.select("unnest(post_ids)"))
+  end
+
   def commentary_matches(query)
-    case query
+    case query.downcase
     when "none", "false"
       Post.where.not(artist_commentary: ArtistCommentary.all).or(Post.where(artist_commentary: ArtistCommentary.deleted))
     when "any", "true"
@@ -227,6 +282,19 @@ class PostQueryBuilder
       Post.where(artist_commentary: ArtistCommentary.untranslated)
     else
       Post.where(artist_commentary: ArtistCommentary.text_matches(query))
+    end
+  end
+
+  def locked_matches(query)
+    case query.downcase
+    when "rating"
+      Post.where(is_rating_locked: true)
+    when "note", "notes"
+      Post.where(is_note_locked: true)
+    when "status"
+      Post.where(is_status_locked: true)
+    else
+      Post.none
     end
   end
 
@@ -310,20 +378,12 @@ class PostQueryBuilder
       relation = relation.merge(status_matches(query).negate)
     end
 
-    if q[:source]
-      if q[:source] == "none"
-        relation = relation.where_like(:source, '')
-      else
-        relation = relation.where_ilike(:source, q[:source].downcase + "*")
-      end
+    q[:source].to_a.each do |query|
+      relation = relation.merge(source_matches(query))
     end
 
-    if q[:source_neg]
-      if q[:source_neg] == "none"
-        relation = relation.where_not_like(:source, '')
-      else
-        relation = relation.where_not_ilike(:source, q[:source_neg].downcase + "*")
-      end
+    q[:source_neg].to_a.each do |query|
+      relation = relation.merge(source_matches(query).negate)
     end
 
     q[:pool_neg].to_a.each do |pool_name|
@@ -366,28 +426,12 @@ class PostQueryBuilder
       relation = relation.merge(user_matches(:approver, username))
     end
 
-    if q[:disapproved]
-      q[:disapproved].each do |disapproved|
-        if disapproved == CurrentUser.name
-          disapprovals = CurrentUser.user.post_disapprovals.select(:post_id)
-        else
-          disapprovals = PostDisapproval.where(reason: disapproved)
-        end
-
-        relation = relation.where("posts.id": disapprovals.select(:post_id))
-      end
+    q[:disapproved_neg].to_a.each do |query|
+      relation = relation.merge(disapproved_matches(query).negate)
     end
 
-    if q[:disapproved_neg]
-      q[:disapproved_neg].each do |disapproved|
-        if disapproved == CurrentUser.name
-          disapprovals = CurrentUser.user.post_disapprovals.select(:post_id)
-        else
-          disapprovals = PostDisapproval.where(reason: disapproved)
-        end
-
-        relation = relation.where.not("posts.id": disapprovals.select(:post_id))
-      end
+    q[:disapproved].to_a.each do |query|
+      relation = relation.merge(disapproved_matches(query))
     end
 
     q[:flagger_neg].to_a.each do |username|
@@ -438,8 +482,8 @@ class PostQueryBuilder
       relation = relation.merge(user_subquery_matches(ArtistCommentaryVersion.unscoped, username, field: :updater))
     end
 
-    if q[:post_id_negated]
-      relation = relation.where("posts.id <> ?", q[:post_id_negated])
+    q[:id_neg].to_a.each do |id|
+      relation = relation.where.not(id: id)
     end
 
     q[:parent].to_a.each do |parent|
@@ -450,10 +494,12 @@ class PostQueryBuilder
       relation = relation.merge(parent_matches(parent_neg).negate)
     end
 
-    if q[:child] == "none"
-      relation = relation.where("posts.has_children = FALSE")
-    elsif q[:child] == "any"
-      relation = relation.where("posts.has_children = TRUE")
+    q[:child].to_a.each do |child|
+      relation = relation.merge(child_matches(child))
+    end
+
+    q[:child_neg].to_a.each do |child|
+      relation = relation.merge(child_matches(child).negate)
     end
 
     q[:rating].to_a.each do |rating|
@@ -464,44 +510,32 @@ class PostQueryBuilder
       relation = relation.where.not(rating: rating.first.downcase)
     end
 
-    if q[:locked] == "rating"
-      relation = relation.where("posts.is_rating_locked = TRUE")
-    elsif q[:locked] == "note" || q[:locked] == "notes"
-      relation = relation.where("posts.is_note_locked = TRUE")
-    elsif q[:locked] == "status"
-      relation = relation.where("posts.is_status_locked = TRUE")
+    q[:locked].to_a.each do |lock|
+      relation = relation.merge(locked_matches(lock))
     end
 
-    if q[:locked_negated] == "rating"
-      relation = relation.where("posts.is_rating_locked = FALSE")
-    elsif q[:locked_negated] == "note" || q[:locked_negated] == "notes"
-      relation = relation.where("posts.is_note_locked = FALSE")
-    elsif q[:locked_negated] == "status"
-      relation = relation.where("posts.is_status_locked = FALSE")
+    q[:locked_neg].to_a.each do |lock|
+      relation = relation.merge(locked_matches(lock).negate)
     end
 
-    if q[:embedded].to_s.truthy?
-      relation = relation.bit_flags_match(:has_embedded_notes, true)
-    elsif q[:embedded].to_s.falsy?
-      relation = relation.bit_flags_match(:has_embedded_notes, false)
+    q[:embedded].to_a.each do |lock|
+      relation = relation.merge(embedded_matches(lock))
     end
 
-    if q[:ordpool].present?
-      pool_name = q[:ordpool]
+    q[:embedded_neg].to_a.each do |lock|
+      relation = relation.merge(embedded_matches(lock).negate)
+    end
 
-      # XXX unify with Pool#posts
-      pool_posts = Pool.named(pool_name).joins("CROSS JOIN unnest(pools.post_ids) WITH ORDINALITY AS row(post_id, pool_index)").select(:post_id, :pool_index)
-      relation = relation.joins("JOIN (#{pool_posts.to_sql}) pool_posts ON pool_posts.post_id = posts.id").order("pool_posts.pool_index ASC")
+    q[:ordpool].to_a.each do |pool_name|
+      relation = relation.merge(ordpool_matches(pool_name))
     end
 
     q[:favgroup_neg].to_a.each do |favgroup_name|
-      favgroup = FavoriteGroup.visible(CurrentUser.user).name_or_id_matches(favgroup_name, CurrentUser.user)
-      relation = relation.where.not(id: favgroup.select("unnest(post_ids)"))
+      relation = relation.merge(favgroup_matches(favgroup_name).negate)
     end
 
     q[:favgroup].to_a.each do |favgroup_name|
-      favgroup = FavoriteGroup.visible(CurrentUser.user).name_or_id_matches(favgroup_name, CurrentUser.user)
-      relation = relation.where(id: favgroup.select("unnest(post_ids)"))
+      relation = relation.merge(favgroup_matches(favgroup_name))
     end
 
     q[:upvoter].to_a.each do |username|
@@ -858,7 +892,8 @@ class PostQueryBuilder
               q[:pool] << g2
 
             when "ordpool"
-              q[:ordpool] = g2
+              q[:ordpool] ||= []
+              q[:ordpool] << g2
 
             when "-favgroup"
               q[:favgroup_neg] ||= []
@@ -909,17 +944,20 @@ class PostQueryBuilder
               q[:rating] << g2
 
             when "-locked"
-              q[:locked_negated] = g2.downcase
+              q[:locked_neg] ||= []
+              q[:locked_neg] << g2
 
             when "locked"
-              q[:locked] = g2.downcase
+              q[:locked] ||= []
+              q[:locked] << g2
 
             when "id"
               q[:id] ||= []
               q[:id] << g2
 
             when "-id"
-              q[:post_id_negated] = g2.to_i
+              q[:id_neg] ||= []
+              q[:id_neg] << g2
 
             when "width"
               q[:width] ||= []
@@ -950,10 +988,12 @@ class PostQueryBuilder
               q[:file_size] << g2
 
             when "source"
-              q[:source] = g2
+              q[:source] ||= []
+              q[:source] << g2
 
             when "-source"
-              q[:source_neg] = g2
+              q[:source_neg] ||= []
+              q[:source_neg] << g2
 
             when "date"
               q[:date] ||= []
@@ -980,7 +1020,12 @@ class PostQueryBuilder
               q[:parent_neg] << g2
 
             when "child"
-              q[:child] = g2.downcase
+              q[:child] ||= []
+              q[:child] << g2
+
+            when "-child"
+              q[:child_neg] ||= []
+              q[:child_neg] << g2
 
             when "order"
               g2 = g2.downcase
@@ -1004,7 +1049,12 @@ class PostQueryBuilder
               q[:status] << g2
 
             when "embedded"
-              q[:embedded] = g2.downcase
+              q[:embedded] ||= []
+              q[:embedded] << g2
+
+            when "-embedded"
+              q[:embedded_neg] ||= []
+              q[:embedded_neg] << g2
 
             when "filetype"
               q[:filetype] ||= []
