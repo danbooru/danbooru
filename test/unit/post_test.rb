@@ -1983,6 +1983,13 @@ class PostTest < ActiveSupport::TestCase
           Cache.expects(:put).with(Post.count_cache_key("aaa score:42"), 1, 180)
           Post.fast_count("aaa score:42")
         end
+
+        should "work with the hide_deleted_posts option turned on" do
+          user = create(:user, hide_deleted_posts: true)
+          as(user) do
+            assert_equal(1, Post.fast_count("aaa score:42"))
+          end
+        end
       end
 
       context "a blank search" do

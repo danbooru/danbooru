@@ -109,7 +109,7 @@ module Danbooru
 
     # Return true if the given tag shouldn't count against the user's tag search limit.
     def is_unlimited_tag?(term)
-      term.type == :metatag && term.name.in?(%w[status rating limit])
+      term.type == :metatag && term.name.in?(%w[-status status rating limit])
     end
 
     # After this many pages, the paginator will switch to sequential mode.
