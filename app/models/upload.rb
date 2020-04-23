@@ -237,7 +237,7 @@ class Upload < ApplicationRecord
   include SourceMethods
 
   def assign_rating_from_tags
-    if rating = Tag.has_metatag?(tag_string, :rating)
+    if rating = PostQueryBuilder.new(tag_string).find_metatag(:rating)
       self.rating = rating.downcase.first
     end
   end

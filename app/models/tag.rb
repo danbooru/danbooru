@@ -227,40 +227,6 @@ class Tag < ApplicationRecord
     end
   end
 
-  module ParseMethods
-    # true if query is a single "simple" tag (not a metatag, negated tag, or wildcard tag).
-    def is_simple_tag?(query)
-      is_single_tag?(query) && !is_metatag?(query) && !is_negated_tag?(query) && !is_optional_tag?(query) && !is_wildcard_tag?(query)
-    end
-
-    def is_single_tag?(query)
-      PostQueryBuilder.new(query).split_query.size == 1
-    end
-
-    def is_metatag?(tag)
-      has_metatag?(tag, *PostQueryBuilder::METATAGS)
-    end
-
-    def is_negated_tag?(tag)
-      tag.starts_with?("-")
-    end
-
-    def is_optional_tag?(tag)
-      tag.starts_with?("~")
-    end
-
-    def is_wildcard_tag?(tag)
-      tag.include?("*")
-    end
-
-    def has_metatag?(tags, *metatags)
-      return nil if tags.blank?
-
-      tags = PostQueryBuilder.new(tags.to_str).split_query if tags.respond_to?(:to_str)
-      tags.grep(/\A(?:#{metatags.map(&:to_s).join("|")}):(.+)\z/i) { $1 }.first
-    end
-  end
-
   module SearchMethods
     # ref: https://www.postgresql.org/docs/current/static/pgtrgm.html#idm46428634524336
     def order_similarity(name)
@@ -393,6 +359,5 @@ class Tag < ApplicationRecord
   include ApiMethods
   include CountMethods
   include CategoryMethods
-  extend ParseMethods
   extend SearchMethods
 end

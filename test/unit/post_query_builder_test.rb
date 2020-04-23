@@ -850,6 +850,41 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
   end
 
+  context "Parsing:" do
+    should "split a query" do
+      assert_equal(%w(aaa bbb), PostQueryBuilder.new("aaa bbb").split_query)
+      assert_equal(%w(~aaa -bbb* -bbb*), PostQueryBuilder.new("~AAa -BBB* -bbb*").split_query)
+    end
+
+    should "not strip out valid characters when scanning" do
+      assert_equal(%w(aaa bbb), PostQueryBuilder.new("aaa bbb").split_query)
+      assert_equal(%w(favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%), PostQueryBuilder.new("favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%").split_query)
+    end
+
+    should "parse single tags correctly" do
+      assert_equal(true, PostQueryBuilder.new("foo").is_single_tag?)
+      assert_equal(true, PostQueryBuilder.new("-foo").is_single_tag?)
+      assert_equal(true, PostQueryBuilder.new("~foo").is_single_tag?)
+      assert_equal(true, PostQueryBuilder.new("foo*").is_single_tag?)
+      assert_equal(false, PostQueryBuilder.new("fav:1234").is_single_tag?)
+      assert_equal(false, PostQueryBuilder.new("pool:1234").is_single_tag?)
+      assert_equal(false, PostQueryBuilder.new('source:"foo bar baz"').is_single_tag?)
+      assert_equal(false, PostQueryBuilder.new("foo bar").is_single_tag?)
+    end
+
+    should "parse simple tags correctly" do
+      assert_equal(true, PostQueryBuilder.new("foo").is_simple_tag?)
+      assert_equal(false, PostQueryBuilder.new("-foo").is_simple_tag?)
+      assert_equal(false, PostQueryBuilder.new("~foo").is_simple_tag?)
+      assert_equal(false, PostQueryBuilder.new("foo*").is_simple_tag?)
+      assert_equal(false, PostQueryBuilder.new("fav:1234").is_simple_tag?)
+      assert_equal(false, PostQueryBuilder.new("FAV:1234").is_simple_tag?)
+      assert_equal(false, PostQueryBuilder.new("pool:1234").is_simple_tag?)
+      assert_equal(false, PostQueryBuilder.new('source:"foo bar baz"').is_simple_tag?)
+      assert_equal(false, PostQueryBuilder.new("foo bar").is_simple_tag?)
+    end
+  end
+
   context "The normalize_query method" do
     should "work" do
       create(:tag_alias, antecedent_name: "gray", consequent_name: "grey")

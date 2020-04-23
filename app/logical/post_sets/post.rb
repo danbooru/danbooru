@@ -1,10 +1,11 @@
 module PostSets
   class Post
     MAX_PER_PAGE = 200
-    attr_reader :tag_array, :page, :raw, :random, :post_count, :format
+    attr_reader :page, :raw, :random, :post_count, :format, :tag_string, :query
 
     def initialize(tags, page = 1, per_page = nil, raw: false, random: false, format: "html")
-      @tag_array = PostQueryBuilder.new(tags).split_query
+      @query = PostQueryBuilder.new(tags)
+      @tag_string = tags
       @page = page
       @per_page = per_page
       @raw = raw.to_s.truthy?
@@ -12,12 +13,8 @@ module PostSets
       @format = format.to_s
     end
 
-    def tag_string
-      @tag_string ||= tag_array.uniq.join(" ")
-    end
-
     def humanized_tag_string
-      tag_array.map { |tag| tag.tr("_", " ").titleize }.to_sentence
+      query.split_query.map { |tag| tag.tr("_", " ").titleize }.to_sentence
     end
 
     def has_blank_wiki?
@@ -31,8 +28,8 @@ module PostSets
     end
 
     def tag
-      return nil if !is_single_tag?
-      @tag ||= Tag.find_by(name: Tag.normalize_name(tag_string))
+      return nil unless query.is_simple_tag?
+      @tag ||= Tag.find_by(name: query.tags.first.name)
     end
 
     def artist
@@ -42,15 +39,15 @@ module PostSets
     end
 
     def pool
-      name = Tag.has_metatag?(tag_array, :ordpool, :pool)
-      return nil unless is_single_tag? && name.present?
+      return nil unless query.is_metatag?(:pool) || query.is_metatag?(:ordpool)
+      name = query.find_metatag(:pool) || query.find_metatag(:ordpool)
 
       @pool ||= Pool.find_by_name(name)
     end
 
     def favgroup
-      name = Tag.has_metatag?(tag_array, :favgroup)
-      return nil unless is_single_tag? && name.present?
+      return nil unless query.is_metatag?(:favgroup)
+      name = query.find_metatag(:favgroup)
 
       @favgroup ||= FavoriteGroup.visible(CurrentUser.user).find_by_name_or_id(name, CurrentUser.user)
     end
@@ -76,11 +73,11 @@ module PostSets
     end
 
     def per_page
-      (@per_page || Tag.has_metatag?(tag_array, :limit) || CurrentUser.user.per_page).to_i.clamp(0, MAX_PER_PAGE)
+      (@per_page || query.find_metatag(:limit) || CurrentUser.user.per_page).to_i.clamp(0, MAX_PER_PAGE)
     end
 
     def is_random?
-      random || Tag.has_metatag?(tag_array, :order) == "random"
+      random || query.find_metatag(:order) == "random"
     end
 
     def get_post_count
@@ -118,32 +115,12 @@ module PostSets
 
     def hide_from_crawler?
       return true if current_page > 1
-      return false if is_empty_tag? || is_simple_tag? || tag_string == "order:rank"
+      return false if query.is_empty_search? || query.is_simple_tag? || query.is_metatag?(:order, :rank)
       true
-    end
-
-    def is_single_tag?
-      tag_array.size == 1
-    end
-
-    def is_simple_tag?
-      Tag.is_simple_tag?(tag_string)
-    end
-
-    def is_empty_tag?
-      tag_array.empty?
-    end
-
-    def is_pattern_search?
-      is_single_tag? && tag_string =~ /\*/ && tag_array.none? {|x| x =~ /^-?source:.+/}
     end
 
     def current_page
       [page.to_i, 1].max
-    end
-
-    def is_saved_search?
-      tag_string =~ /search:/
     end
 
     def presenter

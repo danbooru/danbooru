@@ -15,7 +15,7 @@ module PostsHelper
 
   def missed_post_search_count_js
     return unless post_search_counts_enabled?
-    return unless params[:ms] == "1" && @post_set.post_count == 0 && @post_set.is_single_tag?
+    return unless params[:ms] == "1" && @post_set.post_count == 0 && @post_set.query.is_single_term?
 
     sig = generate_reportbooru_signature(params[:tags])
     render "posts/partials/index/missed_search_count", sig: sig

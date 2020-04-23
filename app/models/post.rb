@@ -1069,7 +1069,7 @@ class Post < ApplicationRecord
     def fast_count(tags = "", timeout: 1_000, raise_on_timeout: false, skip_cache: false)
       tags = tags.to_s
       tags += " rating:s" if CurrentUser.safe_mode?
-      tags += " -status:deleted" if CurrentUser.hide_deleted_posts? && !Tag.has_metatag?(tags, "status", "-status")
+      tags += " -status:deleted" if CurrentUser.hide_deleted_posts? && !PostQueryBuilder.new(tags).has_metatag?("status", "-status")
       tags = PostQueryBuilder.new(tags).normalize_query
 
       # Optimize some cases. these are just estimates but at these
@@ -1135,7 +1135,7 @@ class Post < ApplicationRecord
     end
 
     def get_count_from_cache(tags)
-      if Tag.is_simple_tag?(tags)
+      if PostQueryBuilder.new(tags).is_simple_tag?
         count = Tag.find_by(name: tags).try(:post_count)
       else
         # this will only have a value for multi-tag searches or single metatag searches

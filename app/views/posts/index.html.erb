@@ -19,7 +19,7 @@
 
   <%= render "posts/partials/index/options" %>
 
-  <%= render "posts/partials/index/related" %>
+  <%= render "posts/partials/index/related", post_set: @post_set %>
 <% end %>
 
 <% content_for(:content) do %>

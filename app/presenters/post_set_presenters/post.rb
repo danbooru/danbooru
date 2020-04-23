@@ -18,13 +18,13 @@ module PostSetPresenters
     end
 
     def related_tags
-      if post_set.is_pattern_search?
-        pattern_tags
-      elsif post_set.is_saved_search?
+      if post_set.query.is_wildcard_search?
+        wildcard_tags
+      elsif post_set.query.is_metatag?(:search)
         saved_search_tags
-      elsif post_set.is_empty_tag? || post_set.tag_string == "order:rank"
+      elsif post_set.query.is_empty_search? || post_set.query.is_metatag?(:order, :rank)
         popular_tags
-      elsif post_set.is_single_tag?
+      elsif post_set.query.is_single_term?
         similar_tags
       else
         frequent_tags
@@ -47,7 +47,7 @@ module PostSetPresenters
       RelatedTagCalculator.frequent_tags_for_post_array(post_set.posts).take(MAX_TAGS)
     end
 
-    def pattern_tags
+    def wildcard_tags
       Tag.wildcard_matches(post_set.tag_string)
     end
 
@@ -56,7 +56,7 @@ module PostSetPresenters
     end
 
     def tag_list_html(**options)
-      tag_set_presenter.tag_list_html(name_only: post_set.is_saved_search?, **options)
+      tag_set_presenter.tag_list_html(name_only: post_set.query.is_metatag?(:search), **options)
     end
   end
 end

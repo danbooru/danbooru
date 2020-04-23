@@ -761,7 +761,7 @@ class PostQueryBuilder
 
           terms << OpenStruct.new({ type: :metatag, name: metatag.downcase, value: value })
         elsif scanner.scan(/[^ ]+/)
-          terms << OpenStruct.new({ type: :tag, value: scanner.matched.downcase })
+          terms << OpenStruct.new({ type: :tag, name: scanner.matched.downcase })
         end
       end
 
@@ -775,7 +775,7 @@ class PostQueryBuilder
         elsif term.type == :metatag
           "#{term.name}:#{term.value}"
         elsif term.type == :tag
-          term.value
+          term.name
         end
       end
     end
@@ -1097,7 +1097,7 @@ class PostQueryBuilder
           end
 
         else
-          parse_tag(term.value, q[:tags])
+          parse_tag(term.name, q[:tags])
         end
       end
 
@@ -1251,6 +1251,53 @@ class PostQueryBuilder
       else
         range
       end
+    end
+  end
+
+  concerning :UtilityMethods do
+    def tags
+      scan_query.select { |term| term.type == :tag }
+    end
+
+    def metatags
+      scan_query.select { |term| term.type == :metatag }
+    end
+
+    def find_metatag(metatag)
+      metatags.find { |term| term.name == metatag.to_s.downcase }.try(:value)
+    end
+
+    def has_metatag?(*metatag_names)
+      metatags.any? { |term| term.name.in?(metatag_names.map(&:to_s).map(&:downcase)) }
+    end
+
+    def is_metatag?(name, value = nil)
+      if value.nil?
+        is_single_term? && has_metatag?(name)
+      else
+        is_single_term? && find_metatag(name) == value.to_s
+      end
+    end
+
+    def is_empty_search?
+      scan_query.size == 0
+    end
+
+    def is_single_term?
+      scan_query.size == 1
+    end
+
+    def is_single_tag?
+      is_single_term? && tags.size == 1
+    end
+
+    def is_simple_tag?
+      tag = tags.first&.name
+      is_single_tag? && !tag.starts_with?("-") && !tag.starts_with?("~") && !tag.include?("*")
+    end
+
+    def is_wildcard_search?
+      is_single_tag? && tags.first.name.include?("*")
     end
   end
 

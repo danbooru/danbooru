@@ -91,49 +91,6 @@ class TagTest < ActiveSupport::TestCase
     end
   end
 
-  context "A tag parser" do
-    should "scan a query" do
-      assert_equal(%w(aaa bbb), PostQueryBuilder.new("aaa bbb").split_query)
-      assert_equal(%w(~aaa -bbb* -bbb*), PostQueryBuilder.new("~AAa -BBB* -bbb*").split_query)
-    end
-
-    should "not strip out valid characters when scanning" do
-      assert_equal(%w(aaa bbb), PostQueryBuilder.new("aaa bbb").split_query)
-      assert_equal(%w(favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%), PostQueryBuilder.new("favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%").split_query)
-    end
-
-    should "cast values" do
-      assert_equal(2048, PostQueryBuilder.parse_cast("2kb", :filesize))
-      assert_equal(2097152, PostQueryBuilder.parse_cast("2m", :filesize))
-      assert_nothing_raised {PostQueryBuilder.parse_cast("2009-01-01", :date)}
-      assert_nothing_raised {PostQueryBuilder.parse_cast("1234", :integer)}
-      assert_nothing_raised {PostQueryBuilder.parse_cast("1234.56", :float)}
-    end
-
-    should "parse single tags correctly" do
-      assert_equal(true, Tag.is_single_tag?("foo"))
-      assert_equal(true, Tag.is_single_tag?("-foo"))
-      assert_equal(true, Tag.is_single_tag?("~foo"))
-      assert_equal(true, Tag.is_single_tag?("foo*"))
-      assert_equal(true, Tag.is_single_tag?("fav:1234"))
-      assert_equal(true, Tag.is_single_tag?("pool:1234"))
-      assert_equal(true, Tag.is_single_tag?('source:"foo bar baz"'))
-      assert_equal(false, Tag.is_single_tag?("foo bar"))
-    end
-
-    should "parse simple tags correctly" do
-      assert_equal(true, Tag.is_simple_tag?("foo"))
-      assert_equal(false, Tag.is_simple_tag?("-foo"))
-      assert_equal(false, Tag.is_simple_tag?("~foo"))
-      assert_equal(false, Tag.is_simple_tag?("foo*"))
-      assert_equal(false, Tag.is_simple_tag?("fav:1234"))
-      assert_equal(false, Tag.is_simple_tag?("FAV:1234"))
-      assert_equal(false, Tag.is_simple_tag?("pool:1234"))
-      assert_equal(false, Tag.is_simple_tag?('source:"foo bar baz"'))
-      assert_equal(false, Tag.is_simple_tag?("foo bar"))
-    end
-  end
-
   context "A tag" do
     should "be found when one exists" do
       tag = FactoryBot.create(:tag)
