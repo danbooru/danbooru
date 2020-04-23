@@ -10,13 +10,6 @@
     <%= @post_set.presenter.tag_list_html(current_query: params[:tags], show_extra_links: policy(Post).show_extra_links?) %>
   </section>
 
-  <% if Danbooru.config.addthis_key.present? %>
-    <section id="post-share">
-      <h1>Share</h1>
-      <%= render "posts/partials/index/share" %>
-    </section>
-  <% end %>
-
   <%= render "posts/partials/index/options" %>
 
   <%= render "posts/partials/index/related", post_set: @post_set %>

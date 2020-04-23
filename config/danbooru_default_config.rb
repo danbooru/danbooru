@@ -435,9 +435,6 @@ module Danbooru
     def twitter_site
     end
 
-    def addthis_key
-    end
-
     # include essential tags in image urls (requires nginx/apache rewrites)
     def enable_seo_post_urls
       false

@@ -18,13 +18,6 @@
     <%= render "posts/partials/show/information", :post => @post %>
   </section>
 
-  <% if Danbooru.config.addthis_key.present? %>
-    <section id="post-share">
-      <h1>Share</h1>
-      <%= render "posts/partials/show/share", post: @post %>
-    </section>
-  <% end %>
-
   <section id="post-options">
     <h1>Options</h1>
     <%= render "posts/partials/show/options", :post => @post %>
