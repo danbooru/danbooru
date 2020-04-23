@@ -234,7 +234,7 @@ class Tag < ApplicationRecord
     end
 
     def is_single_tag?(query)
-      PostQueryBuilder.scan_query(query).size == 1
+      PostQueryBuilder.new(query).split_query.size == 1
     end
 
     def is_metatag?(tag)
@@ -256,7 +256,7 @@ class Tag < ApplicationRecord
     def has_metatag?(tags, *metatags)
       return nil if tags.blank?
 
-      tags = PostQueryBuilder.split_query(tags.to_str) if tags.respond_to?(:to_str)
+      tags = PostQueryBuilder.new(tags.to_str).split_query if tags.respond_to?(:to_str)
       tags.grep(/\A(?:#{metatags.map(&:to_s).join("|")}):(.+)\z/i) { $1 }.first
     end
   end

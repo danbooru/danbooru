@@ -88,8 +88,8 @@ class AliasAndImplicationImporter
         all
 
       when :mass_update
-        all += PostQueryBuilder.split_query(token[1])
-        all += PostQueryBuilder.split_query(token[2])
+        all += PostQueryBuilder.new(token[1]).split_query
+        all += PostQueryBuilder.new(token[2]).parse_tag_edit
         all
 
       when :change_category

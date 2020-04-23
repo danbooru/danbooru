@@ -93,13 +93,13 @@ class TagTest < ActiveSupport::TestCase
 
   context "A tag parser" do
     should "scan a query" do
-      assert_equal(%w(aaa bbb), PostQueryBuilder.split_query("aaa bbb"))
-      assert_equal(%w(~aaa -bbb* -bbb*), PostQueryBuilder.split_query("~AAa -BBB* -bbb*"))
+      assert_equal(%w(aaa bbb), PostQueryBuilder.new("aaa bbb").split_query)
+      assert_equal(%w(~aaa -bbb* -bbb*), PostQueryBuilder.new("~AAa -BBB* -bbb*").split_query)
     end
 
     should "not strip out valid characters when scanning" do
-      assert_equal(%w(aaa bbb), PostQueryBuilder.split_query("aaa bbb"))
-      assert_equal(%w(favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%), PostQueryBuilder.split_query("favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%"))
+      assert_equal(%w(aaa bbb), PostQueryBuilder.new("aaa bbb").split_query)
+      assert_equal(%w(favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%), PostQueryBuilder.new("favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%").split_query)
     end
 
     should "cast values" do

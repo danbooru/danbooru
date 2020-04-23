@@ -6,8 +6,8 @@ class TagBatchChangeJob < ApplicationJob
   def perform(antecedent, consequent, updater, updater_ip_addr)
     raise Error.new("antecedent is missing") if antecedent.blank?
 
-    normalized_antecedent = TagAlias.to_aliased(PostQueryBuilder.split_query(antecedent.mb_chars.downcase))
-    normalized_consequent = TagAlias.to_aliased(PostQueryBuilder.split_query(consequent.mb_chars.downcase))
+    normalized_antecedent = TagAlias.to_aliased(PostQueryBuilder.new(antecedent.mb_chars.downcase).split_query)
+    normalized_consequent = TagAlias.to_aliased(PostQueryBuilder.new(consequent.mb_chars.downcase).parse_tag_edit)
 
     CurrentUser.without_safe_mode do
       CurrentUser.scoped(updater, updater_ip_addr) do
@@ -30,7 +30,7 @@ class TagBatchChangeJob < ApplicationJob
   end
 
   def migrate_saved_searches(normalized_antecedent, normalized_consequent)
-    tags = PostQueryBuilder.split_query(normalized_antecedent.join(" "))
+    tags = PostQueryBuilder.new(normalized_antecedent.join(" ")).split_query
 
     # https://www.postgresql.org/docs/current/static/functions-array.html
     saved_searches = SavedSearch.where("string_to_array(query, ' ') @> ARRAY[?]", tags)
@@ -53,7 +53,7 @@ class TagBatchChangeJob < ApplicationJob
 
       begin
         repl = user.blacklisted_tags.split(/\r\n|\r|\n/).map do |line|
-          list = PostQueryBuilder.split_query(line)
+          list = PostQueryBuilder.new(line).split_query
 
           if (list & query).size != query.size
             next line

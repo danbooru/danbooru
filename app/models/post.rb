@@ -596,7 +596,7 @@ class Post < ApplicationRecord
         # If someone else committed changes to this post before we did,
         # then try to merge the tag changes together.
         current_tags = tag_string_was.split
-        new_tags = PostQueryBuilder.parse_tag_edit(tag_string)
+        new_tags = PostQueryBuilder.new(tag_string).parse_tag_edit
         old_tags = old_tag_string.split
 
         kept_tags = current_tags & new_tags
@@ -634,7 +634,7 @@ class Post < ApplicationRecord
     end
 
     def normalize_tags
-      normalized_tags = PostQueryBuilder.split_query(tag_string)
+      normalized_tags = PostQueryBuilder.new(tag_string).parse_tag_edit
       normalized_tags = apply_casesensitive_metatags(normalized_tags)
       normalized_tags = normalized_tags.map(&:downcase)
       normalized_tags = filter_metatags(normalized_tags)
@@ -1070,7 +1070,7 @@ class Post < ApplicationRecord
       tags = tags.to_s
       tags += " rating:s" if CurrentUser.safe_mode?
       tags += " -status:deleted" if CurrentUser.hide_deleted_posts? && !Tag.has_metatag?(tags, "status", "-status")
-      tags = PostQueryBuilder.normalize_query(tags)
+      tags = PostQueryBuilder.new(tags).normalize_query
 
       # Optimize some cases. these are just estimates but at these
       # quantities being off by a few hundred doesn't matter much

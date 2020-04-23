@@ -136,17 +136,17 @@ class SavedSearch < ApplicationRecord
       def queries_for(user_id, label: nil, options: {})
         searches = SavedSearch.where(user_id: user_id)
         searches = searches.labeled(label) if label.present?
-        queries = searches.pluck(:query).map { |query| PostQueryBuilder.normalize_query(query, sort: true) }
+        queries = searches.pluck(:query).map { |query| PostQueryBuilder.new(query).normalize_query(sort: true) }
         queries.sort.uniq
       end
     end
 
     def normalized_query
-      PostQueryBuilder.normalize_query(query, sort: true)
+      PostQueryBuilder.new(query).normalize_query(sort: true)
     end
 
     def normalize_query
-      self.query = PostQueryBuilder.normalize_query(query, sort: false)
+      self.query = PostQueryBuilder.new(query).normalize_query(sort: false)
     end
   end
 

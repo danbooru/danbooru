@@ -1,6 +1,8 @@
 require "strscan"
 
 class PostQueryBuilder
+  extend Memoist
+
   COUNT_METATAGS = %w[
     comment_count deleted_comment_count active_comment_count
     note_count deleted_note_count active_note_count
@@ -93,7 +95,7 @@ class PostQueryBuilder
 
   def attribute_matches(values, field, type = :integer)
     values.to_a.reduce(Post.all) do |relation, value|
-      operator, *args = PostQueryBuilder.parse_metatag_value(value, type)
+      operator, *args = parse_metatag_value(value, type)
       relation.where_operator(field, operator, *args)
     end
   end
@@ -328,7 +330,7 @@ class PostQueryBuilder
   end
 
   def build
-    q = PostQueryBuilder.parse_query(query_string)
+    q = parse_query
     relation = Post.all
 
     if q[:tag_count].to_i > Danbooru.config.tag_query_limit
@@ -608,13 +610,13 @@ class PostQueryBuilder
     if q[:order] == "custom" && q[:post_id].present? && q[:post_id][0] == :in
       relation = relation.find_ordered(q[:post_id][1])
     else
-      relation = PostQueryBuilder.search_order(relation, q[:order])
+      relation = search_order(relation, q[:order])
     end
 
     relation
   end
 
-  def self.search_order(relation, order)
+  def search_order(relation, order)
     case order.to_s
     when "id", "id_asc"
       relation = relation.order("posts.id ASC")
@@ -738,519 +740,519 @@ class PostQueryBuilder
   end
 
   concerning :ParseMethods do
-    class_methods do
-      def scan_query(query)
-        terms = []
-        query = query.to_s.gsub(/[[:space:]]/, " ")
-        scanner = StringScanner.new(query)
-
-        until scanner.eos?
-          scanner.skip(/ +/)
-
-          if scanner.scan(/(#{METATAGS.join("|")}):/io)
-            metatag = scanner.captures.first
-
-            if scanner.scan(/"(.+)"/)
-              value = scanner.captures.first
-            elsif scanner.scan(/'(.+)'/)
-              value = scanner.captures.first
-            else
-              value = scanner.scan(/[^ ]*/)
-            end
-
-            terms << OpenStruct.new({ type: :metatag, name: metatag.downcase, value: value })
-          elsif scanner.scan(/[^ ]+/)
-            terms << OpenStruct.new({ type: :tag, value: scanner.matched.downcase })
-          end
-        end
-
-        terms
-      end
-
-      def split_query(query)
-        scan_query(query).map do |term|
-          if term.type == :metatag && term.value.include?(" ")
-            "#{term.name}:\"#{term.value}\""
-          elsif term.type == :metatag
-            "#{term.name}:#{term.value}"
-          elsif term.type == :tag
-            term.value
-          end
-        end
-      end
-
-      def normalize_query(query, normalize_aliases: true, sort: true)
-        tags = split_query(query.to_s)
-        tags = tags.map { |t| Tag.normalize_name(t) }
-        tags = TagAlias.to_aliased(tags) if normalize_aliases
-        tags = tags.sort if sort
-        tags = tags.uniq
-        tags.join(" ")
-      end
-
-      def parse_tag_edit(tag_string)
-        split_query(tag_string)
-      end
-
-      def parse_query(query, options = {})
-        q = {}
-
-        q[:tag_count] = 0
-
-        q[:tags] = {
-          :related => [],
-          :include => [],
-          :exclude => []
-        }
-
-        scan_query(query).each do |term|
-          q[:tag_count] += 1 unless Danbooru.config.is_unlimited_tag?(term)
-
-          if term.type == :metatag
-            g1 = term.name
-            g2 = term.value
-
-            case g1
-            when "-user"
-              q[:user_neg] ||= []
-              q[:user_neg] << g2
-
-            when "user"
-              q[:user] ||= []
-              q[:user] << g2
-
-            when "-approver"
-              q[:approver_neg] ||= []
-              q[:approver_neg] << g2
-
-            when "approver"
-              q[:approver] ||= []
-              q[:approver] << g2
-
-            when "flagger"
-              q[:flagger] ||= []
-              q[:flagger] << g2
-
-            when "-flagger"
-              q[:flagger_neg] ||= []
-              q[:flagger_neg] << g2
-
-            when "appealer"
-              q[:appealer] ||= []
-              q[:appealer] << g2
-
-            when "-appealer"
-              q[:appealer_neg] ||= []
-              q[:appealer_neg] << g2
-
-            when "commenter", "comm"
-              q[:commenter] ||= []
-              q[:commenter] << g2
-
-            when "-commenter", "-comm"
-              q[:commenter_neg] ||= []
-              q[:commenter_neg] << g2
-
-            when "noter"
-              q[:noter] ||= []
-              q[:noter] << g2
-
-            when "-noter"
-              q[:noter_neg] ||= []
-              q[:noter_neg] << g2
-
-            when "noteupdater"
-              q[:note_updater] ||= []
-              q[:note_updater] << g2
-
-            when "-noteupdater"
-              q[:note_updater_neg] ||= []
-              q[:note_updater_neg] << g2
-
-            when "-commentaryupdater", "-artcomm"
-              q[:commentary_updater_neg] ||= []
-              q[:commentary_updater_neg] << g2
-
-            when "commentaryupdater", "artcomm"
-              q[:commentary_updater] ||= []
-              q[:commentary_updater] << g2
-
-            when "disapproved"
-              q[:disapproved] ||= []
-              q[:disapproved] << g2
-
-            when "-disapproved"
-              q[:disapproved_neg] ||= []
-              q[:disapproved_neg] << g2
-
-            when "-pool"
-              q[:pool_neg] ||= []
-              q[:pool_neg] << g2
-
-            when "pool"
-              q[:pool] ||= []
-              q[:pool] << g2
-
-            when "ordpool"
-              q[:ordpool] ||= []
-              q[:ordpool] << g2
-
-            when "-favgroup"
-              q[:favgroup_neg] ||= []
-              q[:favgroup_neg] << g2
-
-            when "favgroup"
-              q[:favgroup] ||= []
-              q[:favgroup] << g2
-
-            when "-fav", "-ordfav"
-              q[:fav_neg] ||= []
-              q[:fav_neg] << g2
-
-            when "fav"
-              q[:fav] ||= []
-              q[:fav] << g2
-
-            when "ordfav"
-              q[:ordfav] ||= []
-              q[:ordfav] << g2
-
-            when "-commentary"
-              q[:commentary_neg] ||= []
-              q[:commentary_neg] << g2
-
-            when "commentary"
-              q[:commentary] ||= []
-              q[:commentary] << g2
-
-            when "-search"
-              q[:saved_searches_neg] ||= []
-              q[:saved_searches_neg] << g2
-
-            when "search"
-              q[:saved_searches] ||= []
-              q[:saved_searches] << g2
-
-            when "md5"
-              q[:md5] ||= []
-              q[:md5] << g2
-
-            when "-rating"
-              q[:rating_neg] ||= []
-              q[:rating_neg] << g2
-
-            when "rating"
-              q[:rating] ||= []
-              q[:rating] << g2
-
-            when "-locked"
-              q[:locked_neg] ||= []
-              q[:locked_neg] << g2
-
-            when "locked"
-              q[:locked] ||= []
-              q[:locked] << g2
-
-            when "id"
-              q[:id] ||= []
-              q[:id] << g2
-
-            when "-id"
-              q[:id_neg] ||= []
-              q[:id_neg] << g2
-
-            when "width"
-              q[:width] ||= []
-              q[:width] << g2
-
-            when "height"
-              q[:height] ||= []
-              q[:height] << g2
-
-            when "mpixels"
-              q[:mpixels] ||= []
-              q[:mpixels] << g2
-
-            when "ratio"
-              q[:ratio] ||= []
-              q[:ratio] << g2
-
-            when "score"
-              q[:score] ||= []
-              q[:score] << g2
-
-            when "favcount"
-              q[:fav_count] ||= []
-              q[:fav_count] << g2
-
-            when "filesize"
-              q[:file_size] ||= []
-              q[:file_size] << g2
-
-            when "source"
-              q[:source] ||= []
-              q[:source] << g2
-
-            when "-source"
-              q[:source_neg] ||= []
-              q[:source_neg] << g2
-
-            when "date"
-              q[:date] ||= []
-              q[:date] << g2
-
-            when "age"
-              q[:age] ||= []
-              q[:age] << g2
-
-            when "tagcount"
-              q[:post_tag_count] ||= []
-              q[:post_tag_count] << g2
-
-            when /(#{TagCategory.short_name_regex})tags/
-              q["#{TagCategory.short_name_mapping[$1]}_tag_count".to_sym] ||= []
-              q["#{TagCategory.short_name_mapping[$1]}_tag_count".to_sym] << g2
-
-            when "parent"
-              q[:parent] ||= []
-              q[:parent] << g2
-
-            when "-parent"
-              q[:parent_neg] ||= []
-              q[:parent_neg] << g2
-
-            when "child"
-              q[:child] ||= []
-              q[:child] << g2
-
-            when "-child"
-              q[:child_neg] ||= []
-              q[:child_neg] << g2
-
-            when "order"
-              g2 = g2.downcase
-
-              order, suffix, _tail = g2.partition(/_(asc|desc)\z/i)
-              if order.in?(COUNT_METATAG_SYNONYMS)
-                g2 = order.singularize + "_count" + suffix
-              end
-
-              q[:order] = g2
-
-            when "limit"
-              # Do nothing. The controller takes care of it.
-
-            when "-status"
-              q[:status_neg] ||= []
-              q[:status_neg] << g2
-
-            when "status"
-              q[:status] ||= []
-              q[:status] << g2
-
-            when "embedded"
-              q[:embedded] ||= []
-              q[:embedded] << g2
-
-            when "-embedded"
-              q[:embedded_neg] ||= []
-              q[:embedded_neg] << g2
-
-            when "filetype"
-              q[:filetype] ||= []
-              q[:filetype] << g2
-
-            when "-filetype"
-              q[:filetype_neg] ||= []
-              q[:filetype_neg] << g2
-
-            when "pixiv_id", "pixiv"
-              q[:pixiv_id] ||= []
-              q[:pixiv_id] << g2
-
-            when "-upvote"
-              q[:upvoter_neg] ||= []
-              q[:upvoter_neg] << g2
-
-            when "upvote"
-              q[:upvoter] ||= []
-              q[:upvoter] << g2
-
-            when "-downvote"
-              q[:downvoter_neg] ||= []
-              q[:downvoter_neg] << g2
-
-            when "downvote"
-              q[:downvoter] ||= []
-              q[:downvoter] << g2
-
-            when *COUNT_METATAGS
-              q[g1.to_sym] ||= []
-              q[g1.to_sym] << g2
-
-            when *COUNT_METATAG_SYNONYMS
-              g1 = "#{g1.singularize}_count"
-              q[g1.to_sym] ||= []
-              q[g1.to_sym] << g2
-
-            end
-
+    def scan_query
+      terms = []
+      query = query_string.to_s.gsub(/[[:space:]]/, " ")
+      scanner = StringScanner.new(query)
+
+      until scanner.eos?
+        scanner.skip(/ +/)
+
+        if scanner.scan(/(#{METATAGS.join("|")}):/io)
+          metatag = scanner.captures.first
+
+          if scanner.scan(/"(.+)"/)
+            value = scanner.captures.first
+          elsif scanner.scan(/'(.+)'/)
+            value = scanner.captures.first
           else
-            parse_tag(term.value, q[:tags])
-          end
-        end
-
-        q[:tags][:exclude] = TagAlias.to_aliased(q[:tags][:exclude])
-        q[:tags][:include] = TagAlias.to_aliased(q[:tags][:include])
-        q[:tags][:related] = TagAlias.to_aliased(q[:tags][:related])
-
-        return q
-      end
-
-      def parse_tag_operator(tag)
-        tag = Tag.normalize_name(tag)
-
-        if tag.starts_with?("-")
-          ["-", tag.delete_prefix("-")]
-        elsif tag.starts_with?("~")
-          ["~", tag.delete_prefix("~")]
-        else
-          [nil, tag]
-        end
-      end
-
-      def parse_tag(tag, output)
-        operator, tag = parse_tag_operator(tag)
-
-        if tag.blank?
-          # XXX ignore "-", "~" operators without a tag.
-        elsif tag.include?("*")
-          tags = Tag.wildcard_matches(tag)
-
-          if operator == "-"
-            output[:exclude] += tags
-          else
-            tags = ["~no_matches~"] if tags.empty? # force empty results if wildcard found no matches.
-            output[:include] += tags
-          end
-        elsif operator == "-"
-          output[:exclude] << tag
-        elsif operator == "~"
-          output[:include] << tag
-        else
-          output[:related] << tag
-        end
-      end
-
-      def parse_cast(object, type)
-        case type
-        when :enum
-          object.to_s.downcase
-
-        when :integer
-          object.to_i
-
-        when :float
-          object.to_f
-
-        when :md5
-          object.to_s.downcase
-
-        when :date, :datetime
-          Time.zone.parse(object) rescue nil
-
-        when :age
-          DurationParser.parse(object).ago
-
-        when :ratio
-          object =~ /\A(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)\Z/i
-
-          if $1 && $2.to_f != 0.0
-            ($1.to_f / $2.to_f).round(2)
-          else
-            object.to_f.round(2)
+            value = scanner.scan(/[^ ]*/)
           end
 
-        when :filesize
-          object =~ /\A(\d+(?:\.\d*)?|\d*\.\d+)([kKmM]?)[bB]?\Z/
-
-          size = $1.to_f
-          unit = $2
-
-          conversion_factor = case unit
-          when /m/i
-            1024 * 1024
-          when /k/i
-            1024
-          else
-            1
-          end
-
-          (size * conversion_factor).to_i
+          terms << OpenStruct.new({ type: :metatag, name: metatag.downcase, value: value })
+        elsif scanner.scan(/[^ ]+/)
+          terms << OpenStruct.new({ type: :tag, value: scanner.matched.downcase })
         end
       end
 
-      def parse_metatag_value(string, type)
-        if type == :enum
-          [:in, string.split(/[, ]+/).map { |x| parse_cast(x, type) }]
-        else
-          parse_range(string, type)
-        end
-      end
+      terms
+    end
 
-      def parse_range(string, type)
-        range = case string
-        when /\A(.+?)\.\.\.(.+)/ # A...B
-          lo, hi = [parse_cast($1, type), parse_cast($2, type)].sort
-          [:between, (lo...hi)]
-        when /\A(.+?)\.\.(.+)/
-          lo, hi = [parse_cast($1, type), parse_cast($2, type)].sort
-          [:between, (lo..hi)]
-        when /\A<=(.+)/, /\A\.\.(.+)/
-          [:lteq, parse_cast($1, type)]
-        when /\A<(.+)/
-          [:lt, parse_cast($1, type)]
-        when /\A>=(.+)/, /\A(.+)\.\.\Z/
-          [:gteq, parse_cast($1, type)]
-        when /\A>(.+)/
-          [:gt, parse_cast($1, type)]
-        when /[, ]/
-          [:in, string.split(/[, ]+/).map {|x| parse_cast(x, type)}]
-        when "any"
-          [:not_eq, nil]
-        when "none"
-          [:eq, nil]
-        else
-          # add a 5% tolerance for float and filesize values
-          if type == :float || (type == :filesize && string =~ /[km]b?\z/i)
-            value = parse_cast(string, type)
-            [:between, (value * 0.95..value * 1.05)]
-          elsif type.in?([:date, :age])
-            value = parse_cast(string, type)
-            [:between, (value.beginning_of_day..value.end_of_day)]
-          else
-            [:eq, parse_cast(string, type)]
-          end
-        end
-
-        range = reverse_range(range) if type == :age
-        range
-      end
-
-      def reverse_range(range)
-        case range
-        in [:lteq, value]
-          [:gteq, value]
-        in [:lt, value]
-          [:gt, value]
-        in [:gteq, value]
-          [:lteq, value]
-        in [:gt, value]
-          [:lt, value]
-        else
-          range
+    def split_query
+      scan_query.map do |term|
+        if term.type == :metatag && term.value.include?(" ")
+          "#{term.name}:\"#{term.value}\""
+        elsif term.type == :metatag
+          "#{term.name}:#{term.value}"
+        elsif term.type == :tag
+          term.value
         end
       end
     end
+
+    def normalize_query(normalize_aliases: true, sort: true)
+      tags = split_query
+      tags = tags.map { |t| Tag.normalize_name(t) }
+      tags = TagAlias.to_aliased(tags) if normalize_aliases
+      tags = tags.sort if sort
+      tags = tags.uniq
+      tags.join(" ")
+    end
+
+    def parse_tag_edit
+      split_query
+    end
+
+    def parse_query
+      q = {}
+
+      q[:tag_count] = 0
+
+      q[:tags] = {
+        :related => [],
+        :include => [],
+        :exclude => []
+      }
+
+      scan_query.each do |term|
+        q[:tag_count] += 1 unless Danbooru.config.is_unlimited_tag?(term)
+
+        if term.type == :metatag
+          g1 = term.name
+          g2 = term.value
+
+          case g1
+          when "-user"
+            q[:user_neg] ||= []
+            q[:user_neg] << g2
+
+          when "user"
+            q[:user] ||= []
+            q[:user] << g2
+
+          when "-approver"
+            q[:approver_neg] ||= []
+            q[:approver_neg] << g2
+
+          when "approver"
+            q[:approver] ||= []
+            q[:approver] << g2
+
+          when "flagger"
+            q[:flagger] ||= []
+            q[:flagger] << g2
+
+          when "-flagger"
+            q[:flagger_neg] ||= []
+            q[:flagger_neg] << g2
+
+          when "appealer"
+            q[:appealer] ||= []
+            q[:appealer] << g2
+
+          when "-appealer"
+            q[:appealer_neg] ||= []
+            q[:appealer_neg] << g2
+
+          when "commenter", "comm"
+            q[:commenter] ||= []
+            q[:commenter] << g2
+
+          when "-commenter", "-comm"
+            q[:commenter_neg] ||= []
+            q[:commenter_neg] << g2
+
+          when "noter"
+            q[:noter] ||= []
+            q[:noter] << g2
+
+          when "-noter"
+            q[:noter_neg] ||= []
+            q[:noter_neg] << g2
+
+          when "noteupdater"
+            q[:note_updater] ||= []
+            q[:note_updater] << g2
+
+          when "-noteupdater"
+            q[:note_updater_neg] ||= []
+            q[:note_updater_neg] << g2
+
+          when "-commentaryupdater", "-artcomm"
+            q[:commentary_updater_neg] ||= []
+            q[:commentary_updater_neg] << g2
+
+          when "commentaryupdater", "artcomm"
+            q[:commentary_updater] ||= []
+            q[:commentary_updater] << g2
+
+          when "disapproved"
+            q[:disapproved] ||= []
+            q[:disapproved] << g2
+
+          when "-disapproved"
+            q[:disapproved_neg] ||= []
+            q[:disapproved_neg] << g2
+
+          when "-pool"
+            q[:pool_neg] ||= []
+            q[:pool_neg] << g2
+
+          when "pool"
+            q[:pool] ||= []
+            q[:pool] << g2
+
+          when "ordpool"
+            q[:ordpool] ||= []
+            q[:ordpool] << g2
+
+          when "-favgroup"
+            q[:favgroup_neg] ||= []
+            q[:favgroup_neg] << g2
+
+          when "favgroup"
+            q[:favgroup] ||= []
+            q[:favgroup] << g2
+
+          when "-fav", "-ordfav"
+            q[:fav_neg] ||= []
+            q[:fav_neg] << g2
+
+          when "fav"
+            q[:fav] ||= []
+            q[:fav] << g2
+
+          when "ordfav"
+            q[:ordfav] ||= []
+            q[:ordfav] << g2
+
+          when "-commentary"
+            q[:commentary_neg] ||= []
+            q[:commentary_neg] << g2
+
+          when "commentary"
+            q[:commentary] ||= []
+            q[:commentary] << g2
+
+          when "-search"
+            q[:saved_searches_neg] ||= []
+            q[:saved_searches_neg] << g2
+
+          when "search"
+            q[:saved_searches] ||= []
+            q[:saved_searches] << g2
+
+          when "md5"
+            q[:md5] ||= []
+            q[:md5] << g2
+
+          when "-rating"
+            q[:rating_neg] ||= []
+            q[:rating_neg] << g2
+
+          when "rating"
+            q[:rating] ||= []
+            q[:rating] << g2
+
+          when "-locked"
+            q[:locked_neg] ||= []
+            q[:locked_neg] << g2
+
+          when "locked"
+            q[:locked] ||= []
+            q[:locked] << g2
+
+          when "id"
+            q[:id] ||= []
+            q[:id] << g2
+
+          when "-id"
+            q[:id_neg] ||= []
+            q[:id_neg] << g2
+
+          when "width"
+            q[:width] ||= []
+            q[:width] << g2
+
+          when "height"
+            q[:height] ||= []
+            q[:height] << g2
+
+          when "mpixels"
+            q[:mpixels] ||= []
+            q[:mpixels] << g2
+
+          when "ratio"
+            q[:ratio] ||= []
+            q[:ratio] << g2
+
+          when "score"
+            q[:score] ||= []
+            q[:score] << g2
+
+          when "favcount"
+            q[:fav_count] ||= []
+            q[:fav_count] << g2
+
+          when "filesize"
+            q[:file_size] ||= []
+            q[:file_size] << g2
+
+          when "source"
+            q[:source] ||= []
+            q[:source] << g2
+
+          when "-source"
+            q[:source_neg] ||= []
+            q[:source_neg] << g2
+
+          when "date"
+            q[:date] ||= []
+            q[:date] << g2
+
+          when "age"
+            q[:age] ||= []
+            q[:age] << g2
+
+          when "tagcount"
+            q[:post_tag_count] ||= []
+            q[:post_tag_count] << g2
+
+          when /(#{TagCategory.short_name_regex})tags/
+            q["#{TagCategory.short_name_mapping[$1]}_tag_count".to_sym] ||= []
+            q["#{TagCategory.short_name_mapping[$1]}_tag_count".to_sym] << g2
+
+          when "parent"
+            q[:parent] ||= []
+            q[:parent] << g2
+
+          when "-parent"
+            q[:parent_neg] ||= []
+            q[:parent_neg] << g2
+
+          when "child"
+            q[:child] ||= []
+            q[:child] << g2
+
+          when "-child"
+            q[:child_neg] ||= []
+            q[:child_neg] << g2
+
+          when "order"
+            g2 = g2.downcase
+
+            order, suffix, _tail = g2.partition(/_(asc|desc)\z/i)
+            if order.in?(COUNT_METATAG_SYNONYMS)
+              g2 = order.singularize + "_count" + suffix
+            end
+
+            q[:order] = g2
+
+          when "limit"
+            # Do nothing. The controller takes care of it.
+
+          when "-status"
+            q[:status_neg] ||= []
+            q[:status_neg] << g2
+
+          when "status"
+            q[:status] ||= []
+            q[:status] << g2
+
+          when "embedded"
+            q[:embedded] ||= []
+            q[:embedded] << g2
+
+          when "-embedded"
+            q[:embedded_neg] ||= []
+            q[:embedded_neg] << g2
+
+          when "filetype"
+            q[:filetype] ||= []
+            q[:filetype] << g2
+
+          when "-filetype"
+            q[:filetype_neg] ||= []
+            q[:filetype_neg] << g2
+
+          when "pixiv_id", "pixiv"
+            q[:pixiv_id] ||= []
+            q[:pixiv_id] << g2
+
+          when "-upvote"
+            q[:upvoter_neg] ||= []
+            q[:upvoter_neg] << g2
+
+          when "upvote"
+            q[:upvoter] ||= []
+            q[:upvoter] << g2
+
+          when "-downvote"
+            q[:downvoter_neg] ||= []
+            q[:downvoter_neg] << g2
+
+          when "downvote"
+            q[:downvoter] ||= []
+            q[:downvoter] << g2
+
+          when *COUNT_METATAGS
+            q[g1.to_sym] ||= []
+            q[g1.to_sym] << g2
+
+          when *COUNT_METATAG_SYNONYMS
+            g1 = "#{g1.singularize}_count"
+            q[g1.to_sym] ||= []
+            q[g1.to_sym] << g2
+
+          end
+
+        else
+          parse_tag(term.value, q[:tags])
+        end
+      end
+
+      q[:tags][:exclude] = TagAlias.to_aliased(q[:tags][:exclude])
+      q[:tags][:include] = TagAlias.to_aliased(q[:tags][:include])
+      q[:tags][:related] = TagAlias.to_aliased(q[:tags][:related])
+
+      return q
+    end
+
+    def parse_tag_operator(tag)
+      tag = Tag.normalize_name(tag)
+
+      if tag.starts_with?("-")
+        ["-", tag.delete_prefix("-")]
+      elsif tag.starts_with?("~")
+        ["~", tag.delete_prefix("~")]
+      else
+        [nil, tag]
+      end
+    end
+
+    def parse_tag(tag, output)
+      operator, tag = parse_tag_operator(tag)
+
+      if tag.blank?
+        # XXX ignore "-", "~" operators without a tag.
+      elsif tag.include?("*")
+        tags = Tag.wildcard_matches(tag)
+
+        if operator == "-"
+          output[:exclude] += tags
+        else
+          tags = ["~no_matches~"] if tags.empty? # force empty results if wildcard found no matches.
+          output[:include] += tags
+        end
+      elsif operator == "-"
+        output[:exclude] << tag
+      elsif operator == "~"
+        output[:include] << tag
+      else
+        output[:related] << tag
+      end
+    end
+
+    def parse_cast(object, type)
+      case type
+      when :enum
+        object.to_s.downcase
+
+      when :integer
+        object.to_i
+
+      when :float
+        object.to_f
+
+      when :md5
+        object.to_s.downcase
+
+      when :date, :datetime
+        Time.zone.parse(object) rescue nil
+
+      when :age
+        DurationParser.parse(object).ago
+
+      when :ratio
+        object =~ /\A(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)\Z/i
+
+        if $1 && $2.to_f != 0.0
+          ($1.to_f / $2.to_f).round(2)
+        else
+          object.to_f.round(2)
+        end
+
+      when :filesize
+        object =~ /\A(\d+(?:\.\d*)?|\d*\.\d+)([kKmM]?)[bB]?\Z/
+
+        size = $1.to_f
+        unit = $2
+
+        conversion_factor = case unit
+        when /m/i
+          1024 * 1024
+        when /k/i
+          1024
+        else
+          1
+        end
+
+        (size * conversion_factor).to_i
+      end
+    end
+
+    def parse_metatag_value(string, type)
+      if type == :enum
+        [:in, string.split(/[, ]+/).map { |x| parse_cast(x, type) }]
+      else
+        parse_range(string, type)
+      end
+    end
+
+    def parse_range(string, type)
+      range = case string
+      when /\A(.+?)\.\.\.(.+)/ # A...B
+        lo, hi = [parse_cast($1, type), parse_cast($2, type)].sort
+        [:between, (lo...hi)]
+      when /\A(.+?)\.\.(.+)/
+        lo, hi = [parse_cast($1, type), parse_cast($2, type)].sort
+        [:between, (lo..hi)]
+      when /\A<=(.+)/, /\A\.\.(.+)/
+        [:lteq, parse_cast($1, type)]
+      when /\A<(.+)/
+        [:lt, parse_cast($1, type)]
+      when /\A>=(.+)/, /\A(.+)\.\.\Z/
+        [:gteq, parse_cast($1, type)]
+      when /\A>(.+)/
+        [:gt, parse_cast($1, type)]
+      when /[, ]/
+        [:in, string.split(/[, ]+/).map {|x| parse_cast(x, type)}]
+      when "any"
+        [:not_eq, nil]
+      when "none"
+        [:eq, nil]
+      else
+        # add a 5% tolerance for float and filesize values
+        if type == :float || (type == :filesize && string =~ /[km]b?\z/i)
+          value = parse_cast(string, type)
+          [:between, (value * 0.95..value * 1.05)]
+        elsif type.in?([:date, :age])
+          value = parse_cast(string, type)
+          [:between, (value.beginning_of_day..value.end_of_day)]
+        else
+          [:eq, parse_cast(string, type)]
+        end
+      end
+
+      range = reverse_range(range) if type == :age
+      range
+    end
+
+    def reverse_range(range)
+      case range
+      in [:lteq, value]
+        [:gteq, value]
+      in [:lt, value]
+        [:gt, value]
+      in [:gteq, value]
+        [:lteq, value]
+      in [:gt, value]
+        [:lt, value]
+      else
+        range
+      end
+    end
   end
+
+  memoize :scan_query, :split_query, :parse_query
 end
