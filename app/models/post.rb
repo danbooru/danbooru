@@ -1575,7 +1575,7 @@ class Post < ApplicationRecord
       end
 
       if params[:order].present?
-        q = PostQueryBuilder.search_order(q, params[:order])
+        q = PostQueryBuilder.new(nil).search_order(q, params[:order])
       else
         q = q.apply_default_order(params)
       end

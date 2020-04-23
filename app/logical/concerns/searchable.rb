@@ -79,7 +79,7 @@ module Searchable
 
   def where_array_count(attr, value)
     qualified_column = "cardinality(#{qualified_column_for(attr)})"
-    range = PostQueryBuilder.parse_range(value, :integer)
+    range = PostQueryBuilder.new(nil).parse_range(value, :integer)
     where_operator("cardinality(#{qualified_column_for(attr)})", *range)
   end
 
@@ -110,7 +110,7 @@ module Searchable
 
     column = column_for_attribute(attribute)
     qualified_column = "#{table_name}.#{column.name}"
-    range = PostQueryBuilder.parse_range(value, column.type)
+    range = PostQueryBuilder.new(nil).parse_range(value, column.type)
     where_operator(qualified_column, *range)
   end
 
@@ -265,7 +265,7 @@ module Searchable
 
   def apply_default_order(params)
     if params[:order] == "custom"
-      parse_ids = PostQueryBuilder.parse_range(params[:id], :integer)
+      parse_ids = PostQueryBuilder.new(nil).parse_range(params[:id], :integer)
       if parse_ids[0] == :in
         return find_ordered(parse_ids[1])
       end
