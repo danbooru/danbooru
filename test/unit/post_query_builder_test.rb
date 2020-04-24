@@ -500,15 +500,29 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([pending, flagged], "status:unmoderated")
     end
 
-    should "respect the 'Deleted post filter' option when using the status:banned metatag" do
+    should "respect the 'Deleted post filter' option when using the status: metatag" do
       deleted = create(:post, is_deleted: true, is_banned: true)
       undeleted = create(:post, is_banned: true)
 
       CurrentUser.hide_deleted_posts = true
       assert_tag_match([undeleted], "status:banned")
+      assert_tag_match([undeleted], "status:active")
+      assert_tag_match([deleted], "status:deleted")
+      assert_tag_match([undeleted, deleted], "status:any")
+      assert_tag_match([undeleted, deleted], "status:all")
+
+      assert_tag_match([], "-status:banned")
+      assert_tag_match([deleted], "-status:active")
+      assert_tag_match([undeleted], "-status:deleted")
+      #assert_tag_match([deleted], "-status:any") # XXX Broken
+      #assert_tag_match([deleted], "-status:all")
 
       CurrentUser.hide_deleted_posts = false
       assert_tag_match([undeleted, deleted], "status:banned")
+      assert_tag_match([undeleted], "status:active")
+      assert_tag_match([deleted], "status:deleted")
+      assert_tag_match([undeleted, deleted], "status:any")
+      assert_tag_match([undeleted, deleted], "status:all")
     end
 
     should "return posts for the filetype:<ext> metatag" do

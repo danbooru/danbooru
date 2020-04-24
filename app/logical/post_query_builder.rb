@@ -324,8 +324,8 @@ class PostQueryBuilder
 
   def hide_deleted_posts?(q)
     return false if CurrentUser.admin_mode?
-    return false if q[:status].to_a.any?(%w[deleted active any all])
-    return false if q[:status_neg].to_a.any?(%w[deleted active any all])
+    return false if find_metatag("status").to_s.downcase.in?(%w[deleted active any all])
+    return false if find_metatag("-status").to_s.downcase.in?(%w[deleted active any all])
     return CurrentUser.user.hide_deleted_posts?
   end
 
