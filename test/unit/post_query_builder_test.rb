@@ -809,6 +809,20 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post2, post1, post3], "order:comment_bumped_asc")
     end
 
+    should "return posts for order:custom" do
+      p1 = create(:post)
+      p2 = create(:post)
+      p3 = create(:post)
+
+      as(create(:gold_user)) do
+        assert_tag_match([p2, p1, p3], "id:#{p2.id},#{p1.id},#{p3.id} order:custom")
+        assert_tag_match([], "id:#{p1.id} order:custom")
+        assert_tag_match([], "id:>0 order:custom")
+        assert_tag_match([], "id:1,2 id:2,3 order:custom")
+        assert_tag_match([], "order:custom")
+      end
+    end
+
     should "return posts for a filesize search" do
       post = create(:post, file_size: 1.megabyte)
 

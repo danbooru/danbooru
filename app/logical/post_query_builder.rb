@@ -607,8 +607,8 @@ class PostQueryBuilder
       relation = relation.where("posts.image_width IS NOT NULL and posts.image_height IS NOT NULL")
     end
 
-    if q[:order] == "custom" && q[:post_id].present? && q[:post_id][0] == :in
-      relation = relation.find_ordered(q[:post_id][1])
+    if q[:order] == "custom"
+      relation = search_order_custom(relation, q[:id])
     else
       relation = search_order(relation, q[:order])
     end
@@ -737,6 +737,15 @@ class PostQueryBuilder
     end
 
     relation
+  end
+
+  def search_order_custom(relation, id_metatags)
+    return relation.none unless id_metatags.present? && id_metatags.size == 1
+
+    operator, ids = parse_range(id_metatags.first, :integer)
+    return relation.none unless operator == :in
+
+    relation.find_ordered(ids)
   end
 
   concerning :ParseMethods do
