@@ -15,6 +15,9 @@ class PostQueryBuilder
   # allow e.g. `deleted_comments` as a synonym for `deleted_comment_count`
   COUNT_METATAG_SYNONYMS = COUNT_METATAGS.map { |str| str.delete_suffix("_count").pluralize }
 
+  # gentags, arttags, copytags, chartags, metatags
+  CATEGORY_COUNT_METATAGS = TagCategory.short_name_list.map { |category| "#{category}tags" }
+
   METATAGS = %w[
     -user user
     -approver approver
@@ -57,7 +60,7 @@ class PostQueryBuilder
     limit
     tagcount
     pixiv_id pixiv
-  ] + TagCategory.short_name_list.map {|x| "#{x}tags"} + COUNT_METATAGS + COUNT_METATAG_SYNONYMS
+  ] + COUNT_METATAGS + COUNT_METATAG_SYNONYMS + CATEGORY_COUNT_METATAGS
 
   ORDER_METATAGS = %w[
     id id_desc
@@ -81,7 +84,7 @@ class PostQueryBuilder
   ] +
     COUNT_METATAGS +
     COUNT_METATAG_SYNONYMS.flat_map { |str| [str, "#{str}_asc"] } +
-    TagCategory.short_name_list.flat_map { |str| ["#{str}tags", "#{str}tags_asc"] }
+    CATEGORY_COUNT_METATAGS.flat_map { |str| [str, "#{str}_asc"] }
 
   attr_accessor :query_string
 
@@ -89,15 +92,196 @@ class PostQueryBuilder
     @query_string = query_string
   end
 
-  def escape_string_for_tsquery(array)
-    array.map(&:to_escaped_for_tsquery)
+  def tags_match(tags, relation)
+    tsquery = []
+
+    negated_wildcard_tags, negated_tags = tags.select(&:negated).partition(&:wildcard)
+    optional_wildcard_tags, optional_tags = tags.select(&:optional).partition(&:wildcard)
+    required_wildcard_tags, required_tags = tags.reject(&:negated).reject(&:optional).partition(&:wildcard)
+
+    negated_tags = TagAlias.to_aliased(negated_tags.map(&:name))
+    optional_tags = TagAlias.to_aliased(optional_tags.map(&:name))
+    required_tags = TagAlias.to_aliased(required_tags.map(&:name))
+
+    negated_tags += negated_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name) }
+    optional_tags += optional_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name) }
+    optional_tags += required_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name) }
+
+    tsquery << "!(#{negated_tags.sort.uniq.map(&:to_escaped_for_tsquery).join(" | ")})" if negated_tags.present?
+    tsquery << "(#{optional_tags.sort.uniq.map(&:to_escaped_for_tsquery).join(" | ")})" if optional_tags.present?
+    tsquery << "(#{required_tags.sort.uniq.map(&:to_escaped_for_tsquery).join(" & ")})" if required_tags.present?
+
+    return relation if tsquery.empty?
+    relation.where("posts.tag_index @@ to_tsquery('danbooru', E?)", tsquery.join(" & "))
   end
 
-  def attribute_matches(values, field, type = :integer)
-    values.to_a.reduce(Post.all) do |relation, value|
-      operator, *args = parse_metatag_value(value, type)
-      relation.where_operator(field, operator, *args)
+  def metatags_match(metatags, relation)
+    metatags.each do |metatag|
+      relation = relation.merge(metatag_matches(metatag.name, metatag.value))
     end
+
+    relation
+  end
+
+  def metatag_matches(name, value)
+    case name
+    when "id"
+      attribute_matches(value, :id)
+    when "-id"
+      Post.where.not(id: value.to_i)
+    when "md5"
+      attribute_matches(value, :md5, :md5)
+    when "width"
+      attribute_matches(value, :image_width)
+    when "height"
+      attribute_matches(value, :image_height)
+    when "mpixels"
+      attribute_matches(value, "posts.image_width * posts.image_height / 1000000.0", :float)
+    when "ratio"
+      attribute_matches(value, "ROUND(1.0 * posts.image_width / GREATEST(1, posts.image_height), 2)", :ratio)
+    when "score"
+      attribute_matches(value, :score)
+    when "favcount"
+      attribute_matches(value, :fav_count)
+    when "filesize"
+      attribute_matches(value, :file_size, :filesize)
+    when "filetype"
+      attribute_matches(value, :file_ext, :enum)
+    when "-filetype"
+      attribute_matches(value, :file_ext, :enum).negate(:nor)
+    when "date"
+      attribute_matches(value, :created_at, :date)
+    when "age"
+      attribute_matches(value, :created_at, :age)
+    when "pixiv", "pixiv_id"
+      attribute_matches(value, :pixiv_id)
+    when "tagcount"
+      attribute_matches(value, :tag_count)
+    when "status"
+      status_matches(value)
+    when "-status"
+      status_matches(value).negate
+    when "parent"
+      parent_matches(value)
+    when "-parent"
+      parent_matches(value).negate
+    when "child"
+      child_matches(value)
+    when "-child"
+      child_matches(value).negate
+    when "rating"
+      Post.where(rating: value.first.downcase)
+    when "-rating"
+      Post.where(rating: value.first.downcase)
+    when "locked"
+      locked_matches(value)
+    when "-locked"
+      locked_matches(value).negate
+    when "embedded"
+      embedded_matches(value)
+    when "-embedded"
+      embedded_matches(value).negate
+    when "source"
+      source_matches(value)
+    when "-source"
+      source_matches(value).negate
+    when "disapproved"
+      disapproved_matches(value)
+    when "-disapproved"
+      disapproved_matches(value).negate
+    when "commentary"
+      commentary_matches(value)
+    when "-commentary"
+      commentary_matches(value).negate
+    when "search"
+      saved_search_matches(value)
+    when "-search"
+      saved_search_matches(value).negate
+    when "pool"
+      pool_matches(value)
+    when "-pool"
+      pool_matches(value).negate
+    when "ordpool"
+      ordpool_matches(value)
+    when "favgroup"
+      favgroup_matches(value)
+    when "-favgroup"
+      favgroup_matches(value).negate
+    when "fav"
+      favorites_include(value)
+    when "-fav"
+      favorites_exclude(value)
+    when "ordfav"
+      ordfav_matches(value)
+    when "user"
+      user_matches(:uploader, value)
+    when "-user"
+      user_matches(:uploader, value).negate
+    when "approver"
+      user_matches(:approver, value)
+    when "-approver"
+      user_matches(:approver, value).negate
+    when "flagger"
+      flagger_matches(value)
+    when "-flagger"
+      flagger_matches(value).negate
+    when "appealer"
+      user_subquery_matches(PostAppeal.unscoped, value)
+    when "-appealer"
+      user_subquery_matches(PostAppeal.unscoped, value).negate
+    when "commenter", "comm"
+      user_subquery_matches(Comment.unscoped, value)
+    when "-commenter"
+      user_subquery_matches(Comment.unscoped, value).negate
+    when "commentaryupdater", "artcomm"
+      user_subquery_matches(ArtistCommentaryVersion.unscoped, value, field: :updater)
+    when "-commentaryupdater", "-artcomm"
+      user_subquery_matches(ArtistCommentaryVersion.unscoped, value, field: :updater).negate
+    when "noter"
+      user_subquery_matches(NoteVersion.unscoped.where(version: 1), value, field: :updater)
+    when "-noter"
+      user_subquery_matches(NoteVersion.unscoped.where(version: 1), value, field: :updater).negate
+    when "noteupdater"
+      user_subquery_matches(NoteVersion.unscoped, value, field: :updater).negate
+    when "-noteupdater"
+      user_subquery_matches(NoteVersion.unscoped, value, field: :updater)
+    when "upvoter", "upvote"
+      user_subquery_matches(PostVote.positive.visible(CurrentUser.user), value, field: :user)
+    when "-upvoter", "-upvote"
+      user_subquery_matches(PostVote.positive.visible(CurrentUser.user), value, field: :user).negate
+    when "downvoter", "downvote"
+      user_subquery_matches(PostVote.negative.visible(CurrentUser.user), value, field: :user)
+    when "-downvoter", "-downvote"
+      user_subquery_matches(PostVote.negative.visible(CurrentUser.user), value, field: :user).negate
+    when *CATEGORY_COUNT_METATAGS
+      short_category = name.delete_suffix("tags")
+      category = TagCategory.short_name_mapping[short_category]
+      attribute = "tag_count_#{category}"
+      attribute_matches(value, attribute.to_sym)
+    when *COUNT_METATAGS
+      attribute_matches(value, name.to_sym)
+    when "limit"
+      Post.all
+    when "order"
+      Post.all
+    else
+      raise NotImplementedError, "metatag not implemented"
+    end
+  end
+
+  def tags_include(*tags)
+    query = tags.map(&:to_escaped_for_tsquery).join(" & ")
+    Post.where("posts.tag_index @@ to_tsquery('danbooru', E?)", query)
+  end
+
+  def tags_exclude(*tags)
+    query = tags.map(&:to_escaped_for_tsquery).join(" | ")
+    Post.where("posts.tag_index @@ to_tsquery('danbooru', E?)", "!(#{query})")
+  end
+
+  def attribute_matches(value, field, type = :integer)
+    operator, *args = parse_metatag_value(value, type)
+    Post.where_operator(field, operator, *args)
   end
 
   def user_matches(field, username)
@@ -135,28 +319,6 @@ class PostQueryBuilder
       flagger = User.find_by_name(username)
       PostFlag.unscoped.creator_matches(flagger, CurrentUser.user)
     end
-  end
-
-  def add_tag_string_search_relation(tags, relation)
-    tag_query_sql = []
-
-    if tags[:include].any?
-      tag_query_sql << "(" + escape_string_for_tsquery(tags[:include]).join(" | ") + ")"
-    end
-
-    if tags[:related].any?
-      tag_query_sql << "(" + escape_string_for_tsquery(tags[:related]).join(" & ") + ")"
-    end
-
-    if tags[:exclude].any?
-      tag_query_sql << "!(" + escape_string_for_tsquery(tags[:exclude]).join(" | ") + ")"
-    end
-
-    if tag_query_sql.any?
-      relation = relation.where("posts.tag_index @@ to_tsquery('danbooru', E?)", tag_query_sql.join(" & "))
-    end
-
-    relation
   end
 
   def saved_search_matches(label)
@@ -272,6 +434,31 @@ class PostQueryBuilder
     Post.where(id: favgroup.select("unnest(post_ids)"))
   end
 
+  def favorites_include(username)
+    favuser = User.find_by_name(username)
+
+    if favuser.present? && Pundit.policy!([CurrentUser.user, nil], favuser).can_see_favorites?
+      tags_include("fav:#{favuser.id}")
+    else
+      Post.none
+    end
+  end
+
+  def favorites_exclude(username)
+    favuser = User.find_by_name(username)
+
+    if favuser.present? && Pundit.policy!([CurrentUser.user, nil], favuser).can_see_favorites?
+      tags_exclude("fav:#{favuser.id}")
+    else
+      Post.all
+    end
+  end
+
+  def ordfav_matches(username)
+    user = User.find_by_name(username)
+    favorites_include(username).joins(:favorites).merge(Favorite.for_user(user.id)).order("favorites.id DESC")
+  end
+
   def commentary_matches(query)
     case query.downcase
     when "none", "false"
@@ -308,21 +495,21 @@ class PostQueryBuilder
     end
   end
 
-  def tables_for_query(q)
-    metatags = q.keys
-    metatags << q[:order].remove(/_(asc|desc)\z/i) if q[:order].present?
+  def tables_for_query
+    metatag_names = metatags.map(&:name)
+    metatag_names << find_metatag(:order).remove(/_(asc|desc)\z/i) if has_metatag?(:order)
 
-    tables = metatags.map { |metatag| table_for_metatag(metatag.to_s) }
+    tables = metatag_names.map { |metatag| table_for_metatag(metatag.to_s) }
     tables.compact.uniq
   end
 
-  def add_joins(q, relation)
-    tables = tables_for_query(q)
+  def add_joins(relation)
+    tables = tables_for_query
     relation = relation.with_stats(tables)
     relation
   end
 
-  def hide_deleted_posts?(q)
+  def hide_deleted_posts?
     return false if CurrentUser.admin_mode?
     return false if find_metatag("status").to_s.downcase.in?(%w[deleted active any all])
     return false if find_metatag("-status").to_s.downcase.in?(%w[deleted active any all])
@@ -330,294 +517,35 @@ class PostQueryBuilder
   end
 
   def build
-    q = parse_query
-    relation = Post.all
-
-    if q[:tag_count].to_i > Danbooru.config.tag_query_limit
+    tag_count = terms.count { |term| !Danbooru.config.is_unlimited_tag?(term) }
+    if tag_count > Danbooru.config.tag_query_limit
       raise ::Post::SearchError
     end
 
-    if CurrentUser.safe_mode?
-      relation = relation.where("posts.rating = 's'")
-    end
-
-    if hide_deleted_posts?(q)
-      relation = relation.undeleted
-    end
-
-    relation = add_joins(q, relation)
-
-    relation = relation.merge(attribute_matches(q[:id], :id))
-    relation = relation.merge(attribute_matches(q[:md5], :md5, :md5))
-    relation = relation.merge(attribute_matches(q[:mpixels], "posts.image_width * posts.image_height / 1000000.0", :float))
-    relation = relation.merge(attribute_matches(q[:ratio], "ROUND(1.0 * posts.image_width / GREATEST(1, posts.image_height), 2)", :ratio))
-    relation = relation.merge(attribute_matches(q[:width], :image_width))
-    relation = relation.merge(attribute_matches(q[:height], :image_height))
-    relation = relation.merge(attribute_matches(q[:score], :score))
-    relation = relation.merge(attribute_matches(q[:fav_count], :fav_count))
-    relation = relation.merge(attribute_matches(q[:file_size], :file_size, :filesize))
-    relation = relation.merge(attribute_matches(q[:date], :created_at, :date))
-    relation = relation.merge(attribute_matches(q[:age], :created_at, :age))
-    relation = relation.merge(attribute_matches(q[:pixiv_id], :pixiv_id))
-    relation = relation.merge(attribute_matches(q[:post_tag_count], :tag_count))
-
-    relation = relation.merge(attribute_matches(q[:filetype], :file_ext, :enum))
-    relation = relation.merge(attribute_matches(q[:filetype_neg], :file_ext, :enum).negate(:nor)) if q[:filetype_neg].present?
-
-    TagCategory.categories.each do |category|
-      relation = relation.merge(attribute_matches(q["#{category}_tag_count".to_sym], "tag_count_#{category}".to_sym))
-    end
-
-    COUNT_METATAGS.each do |column|
-      relation = relation.merge(attribute_matches(q[column.to_sym], column.to_sym))
-    end
-
-    q[:status].to_a.each do |query|
-      relation = relation.merge(status_matches(query))
-    end
-
-    q[:status_neg].to_a.each do |query|
-      relation = relation.merge(status_matches(query).negate)
-    end
-
-    q[:source].to_a.each do |query|
-      relation = relation.merge(source_matches(query))
-    end
-
-    q[:source_neg].to_a.each do |query|
-      relation = relation.merge(source_matches(query).negate)
-    end
-
-    q[:pool_neg].to_a.each do |pool_name|
-      relation = relation.merge(pool_matches(pool_name).negate)
-    end
-
-    q[:pool].to_a.each do |pool_name|
-      relation = relation.merge(pool_matches(pool_name))
-    end
-
-    q[:commentary_neg].to_a.each do |query|
-      relation = relation.merge(commentary_matches(query).negate)
-    end
-
-    q[:commentary].to_a.each do |query|
-      relation = relation.merge(commentary_matches(query))
-    end
-
-    q[:saved_searches_neg].to_a.each do |query|
-      relation = relation.merge(saved_search_matches(query).negate)
-    end
-
-    q[:saved_searches].to_a.each do |query|
-      relation = relation.merge(saved_search_matches(query))
-    end
-
-    q[:user_neg].to_a.each do |username|
-      relation = relation.merge(user_matches(:uploader, username).negate)
-    end
-
-    q[:user].to_a.each do |username|
-      relation = relation.merge(user_matches(:uploader, username))
-    end
-
-    q[:approver_neg].to_a.each do |username|
-      relation = relation.merge(user_matches(:approver, username).negate)
-    end
-
-    q[:approver].to_a.each do |username|
-      relation = relation.merge(user_matches(:approver, username))
-    end
-
-    q[:disapproved_neg].to_a.each do |query|
-      relation = relation.merge(disapproved_matches(query).negate)
-    end
-
-    q[:disapproved].to_a.each do |query|
-      relation = relation.merge(disapproved_matches(query))
-    end
-
-    q[:flagger_neg].to_a.each do |username|
-      relation = relation.merge(flagger_matches(username).negate)
-    end
-
-    q[:flagger].to_a.each do |username|
-      relation = relation.merge(flagger_matches(username))
-    end
-
-    q[:appealer_neg].to_a.each do |username|
-      relation = relation.merge(user_subquery_matches(PostAppeal.unscoped, username).negate)
-    end
-
-    q[:appealer].to_a.each do |username|
-      relation = relation.merge(user_subquery_matches(PostAppeal.unscoped, username))
-    end
-
-    q[:commenter_neg].to_a.each do |username|
-      relation = relation.merge(user_subquery_matches(Comment.unscoped, username).negate)
-    end
-
-    q[:commenter].to_a.each do |username|
-      relation = relation.merge(user_subquery_matches(Comment.unscoped, username))
-    end
-
-    q[:noter_neg].to_a.each do |username|
-      relation = relation.merge(user_subquery_matches(NoteVersion.unscoped.where(version: 1), username, field: :updater).negate)
-    end
-
-    q[:noter].to_a.each do |username|
-      relation = relation.merge(user_subquery_matches(NoteVersion.unscoped.where(version: 1), username, field: :updater))
-    end
-
-    q[:note_updater_neg].to_a.each do |username|
-      relation = relation.merge(user_subquery_matches(NoteVersion.unscoped, username, field: :updater).negate)
-    end
-
-    q[:note_updater].to_a.each do |username|
-      relation = relation.merge(user_subquery_matches(NoteVersion.unscoped, username, field: :updater))
-    end
-
-    q[:commentary_updater_neg].to_a.each do |username|
-      relation = relation.merge(user_subquery_matches(ArtistCommentaryVersion.unscoped, username, field: :updater).negate)
-    end
-
-    q[:commentary_updater].to_a.each do |username|
-      relation = relation.merge(user_subquery_matches(ArtistCommentaryVersion.unscoped, username, field: :updater))
-    end
-
-    q[:id_neg].to_a.each do |id|
-      relation = relation.where.not(id: id)
-    end
-
-    q[:parent].to_a.each do |parent|
-      relation = relation.merge(parent_matches(parent))
-    end
-
-    q[:parent_neg].to_a.each do |parent_neg|
-      relation = relation.merge(parent_matches(parent_neg).negate)
-    end
-
-    q[:child].to_a.each do |child|
-      relation = relation.merge(child_matches(child))
-    end
-
-    q[:child_neg].to_a.each do |child|
-      relation = relation.merge(child_matches(child).negate)
-    end
-
-    q[:rating].to_a.each do |rating|
-      relation = relation.where(rating: rating.first.downcase)
-    end
-
-    q[:rating_neg].to_a.each do |rating|
-      relation = relation.where.not(rating: rating.first.downcase)
-    end
-
-    q[:locked].to_a.each do |lock|
-      relation = relation.merge(locked_matches(lock))
-    end
-
-    q[:locked_neg].to_a.each do |lock|
-      relation = relation.merge(locked_matches(lock).negate)
-    end
-
-    q[:embedded].to_a.each do |lock|
-      relation = relation.merge(embedded_matches(lock))
-    end
-
-    q[:embedded_neg].to_a.each do |lock|
-      relation = relation.merge(embedded_matches(lock).negate)
-    end
-
-    q[:ordpool].to_a.each do |pool_name|
-      relation = relation.merge(ordpool_matches(pool_name))
-    end
-
-    q[:favgroup_neg].to_a.each do |favgroup_name|
-      relation = relation.merge(favgroup_matches(favgroup_name).negate)
-    end
-
-    q[:favgroup].to_a.each do |favgroup_name|
-      relation = relation.merge(favgroup_matches(favgroup_name))
-    end
-
-    q[:upvoter].to_a.each do |username|
-      relation = relation.merge(user_subquery_matches(PostVote.positive.visible(CurrentUser.user), username, field: :user))
-    end
-
-    q[:upvoter_neg].to_a.each do |username|
-      relation = relation.merge(user_subquery_matches(PostVote.positive.visible(CurrentUser.user), username, field: :user).negate)
-    end
-
-    q[:downvoter].to_a.each do |username|
-      relation = relation.merge(user_subquery_matches(PostVote.negative.visible(CurrentUser.user), username, field: :user))
-    end
-
-    q[:downvoter_neg].to_a.each do |username|
-      relation = relation.merge(user_subquery_matches(PostVote.negative.visible(CurrentUser.user), username, field: :user).negate)
-    end
-
-    q[:fav_neg].to_a.each do |username|
-      favuser = User.find_by_name(username)
-
-      if favuser.present? && Pundit.policy!([CurrentUser.user, nil], favuser).can_see_favorites?
-        q[:tags][:exclude] << "fav:#{favuser.id}"
-      else
-        relation = relation.all # no-op; excluding a nonexistent user returns everything
-      end
-    end
-
-    q[:fav].to_a.each do |username|
-      favuser = User.find_by_name(username)
-
-      if favuser.present? && Pundit.policy!([CurrentUser.user, nil], favuser).can_see_favorites?
-        q[:tags][:related] << "fav:#{favuser.id}"
-      else
-        relation = relation.none
-      end
-    end
-
-    q[:ordfav].to_a.each do |username|
-      favuser = User.find_by_name(username)
-
-      if favuser.present? && Pundit.policy!([CurrentUser.user, nil], favuser).can_see_favorites?
-        q[:tags][:related] << "fav:#{favuser.id}"
-        relation = relation.joins("INNER JOIN favorites ON favorites.post_id = posts.id")
-        relation = relation.where("favorites.user_id % 100 = ? and favorites.user_id = ?", favuser.id % 100, favuser.id).order("favorites.id DESC")
-      else
-        relation = relation.none
-      end
-    end
-
-    relation = add_tag_string_search_relation(q[:tags], relation)
+    relation = Post.all
+    relation = relation.where(rating: 's') if CurrentUser.safe_mode?
+    relation = relation.undeleted if hide_deleted_posts?
+    relation = add_joins(relation)
+    relation = metatags_match(metatags, relation)
+    relation = tags_match(tags, relation)
 
     # HACK: if we're using a date: or age: metatag, default to ordering by
     # created_at instead of id so that the query will use the created_at index.
-    if q[:date].present? || q[:age].present?
-      case q[:order]
-      when "id", "id_asc"
-        q[:order] = "created_at_asc"
-      when "id_desc", nil
-        q[:order] = "created_at_desc"
-      end
-    end
-
-    if q[:order] == "rank"
-      relation = relation.where("posts.score > 0 and posts.created_at >= ?", 2.days.ago)
-    elsif q[:order] == "landscape" || q[:order] == "portrait"
-      relation = relation.where("posts.image_width IS NOT NULL and posts.image_height IS NOT NULL")
-    end
-
-    if q[:order] == "custom"
-      relation = search_order_custom(relation, q[:id])
+    if has_metatag?(:date, :age) && find_metatag(:order).in?(["id", "id_asc"])
+      relation = search_order(relation, "created_at_asc")
+    elsif has_metatag?(:date, :age) && find_metatag(:order).in?(["id_desc", nil])
+      relation = search_order(relation, "created_at_desc")
+    elsif find_metatag(:order) == "custom"
+      relation = search_order_custom(relation, select_metatags(:id).map(&:value))
     else
-      relation = search_order(relation, q[:order])
+      relation = search_order(relation, find_metatag(:order))
     end
 
     relation
   end
 
   def search_order(relation, order)
-    case order.to_s
+    case order.to_s.downcase
     when "id", "id_asc"
       relation = relation.order("posts.id ASC")
 
@@ -685,9 +613,11 @@ class PostQueryBuilder
       relation = relation.order(Arel.sql("posts.image_width * posts.image_height / 1000000.0 ASC"))
 
     when "portrait"
+      relation = relation.where("posts.image_width IS NOT NULL and posts.image_height IS NOT NULL")
       relation = relation.order(Arel.sql("1.0 * posts.image_width / GREATEST(1, posts.image_height) ASC"))
 
     when "landscape"
+      relation = relation.where("posts.image_width IS NOT NULL and posts.image_height IS NOT NULL")
       relation = relation.order(Arel.sql("1.0 * posts.image_width / GREATEST(1, posts.image_height) DESC"))
 
     when "filesize", "filesize_desc"
@@ -714,6 +644,7 @@ class PostQueryBuilder
       relation = relation.order("posts.tag_count_#{TagCategory.short_name_mapping[$1]} ASC")
 
     when "rank"
+      relation = relation.where("posts.score > 0 and posts.created_at >= ?", 2.days.ago)
       relation = relation.order(Arel.sql("log(3, posts.score) + (extract(epoch from posts.created_at) - extract(epoch from timestamp '2005-05-24')) / 35000 DESC"))
 
     when "curated"
@@ -758,7 +689,7 @@ class PostQueryBuilder
         scanner.skip(/ +/)
 
         if scanner.scan(/(#{METATAGS.join("|")}):/io)
-          metatag = scanner.captures.first
+          metatag = scanner.captures.first.downcase
 
           if scanner.scan(/"(.+)"/)
             value = scanner.captures.first
@@ -768,9 +699,22 @@ class PostQueryBuilder
             value = scanner.scan(/[^ ]*/)
           end
 
-          terms << OpenStruct.new({ type: :metatag, name: metatag.downcase, value: value })
+          if metatag.in?(COUNT_METATAG_SYNONYMS)
+            metatag = metatag.singularize + "_count"
+          elsif metatag == "order"
+            attribute, direction, _tail = value.to_s.downcase.partition(/_(asc|desc)\z/i)
+            if attribute.in?(COUNT_METATAG_SYNONYMS)
+              value = attribute.singularize + "_count" + direction
+            end
+          end
+
+          terms << OpenStruct.new({ type: :metatag, name: metatag, value: value })
+        elsif scanner.scan(/([-~])?([^ ]+)/)
+          operator = scanner.captures.first
+          tag = scanner.captures.second
+          terms << OpenStruct.new(type: :tag, name: tag.downcase, negated: (operator == "-"), optional: (operator == "~"), wildcard: tag.include?("*"))
         elsif scanner.scan(/[^ ]+/)
-          terms << OpenStruct.new({ type: :tag, name: scanner.matched.downcase })
+          terms << OpenStruct.new(type: :tag, name: scanner.matched.downcase)
         end
       end
 
@@ -783,6 +727,10 @@ class PostQueryBuilder
           "#{term.name}:\"#{term.value}\""
         elsif term.type == :metatag
           "#{term.name}:#{term.value}"
+        elsif term.type == :tag && term.negated
+          "-#{term.name}"
+        elsif term.type == :tag && term.optional
+          "~#{term.name}"
         elsif term.type == :tag
           term.name
         end
@@ -800,356 +748,6 @@ class PostQueryBuilder
 
     def parse_tag_edit
       split_query
-    end
-
-    def parse_query
-      q = {}
-
-      q[:tag_count] = 0
-
-      q[:tags] = {
-        :related => [],
-        :include => [],
-        :exclude => []
-      }
-
-      scan_query.each do |term|
-        q[:tag_count] += 1 unless Danbooru.config.is_unlimited_tag?(term)
-
-        if term.type == :metatag
-          g1 = term.name
-          g2 = term.value
-
-          case g1
-          when "-user"
-            q[:user_neg] ||= []
-            q[:user_neg] << g2
-
-          when "user"
-            q[:user] ||= []
-            q[:user] << g2
-
-          when "-approver"
-            q[:approver_neg] ||= []
-            q[:approver_neg] << g2
-
-          when "approver"
-            q[:approver] ||= []
-            q[:approver] << g2
-
-          when "flagger"
-            q[:flagger] ||= []
-            q[:flagger] << g2
-
-          when "-flagger"
-            q[:flagger_neg] ||= []
-            q[:flagger_neg] << g2
-
-          when "appealer"
-            q[:appealer] ||= []
-            q[:appealer] << g2
-
-          when "-appealer"
-            q[:appealer_neg] ||= []
-            q[:appealer_neg] << g2
-
-          when "commenter", "comm"
-            q[:commenter] ||= []
-            q[:commenter] << g2
-
-          when "-commenter", "-comm"
-            q[:commenter_neg] ||= []
-            q[:commenter_neg] << g2
-
-          when "noter"
-            q[:noter] ||= []
-            q[:noter] << g2
-
-          when "-noter"
-            q[:noter_neg] ||= []
-            q[:noter_neg] << g2
-
-          when "noteupdater"
-            q[:note_updater] ||= []
-            q[:note_updater] << g2
-
-          when "-noteupdater"
-            q[:note_updater_neg] ||= []
-            q[:note_updater_neg] << g2
-
-          when "-commentaryupdater", "-artcomm"
-            q[:commentary_updater_neg] ||= []
-            q[:commentary_updater_neg] << g2
-
-          when "commentaryupdater", "artcomm"
-            q[:commentary_updater] ||= []
-            q[:commentary_updater] << g2
-
-          when "disapproved"
-            q[:disapproved] ||= []
-            q[:disapproved] << g2
-
-          when "-disapproved"
-            q[:disapproved_neg] ||= []
-            q[:disapproved_neg] << g2
-
-          when "-pool"
-            q[:pool_neg] ||= []
-            q[:pool_neg] << g2
-
-          when "pool"
-            q[:pool] ||= []
-            q[:pool] << g2
-
-          when "ordpool"
-            q[:ordpool] ||= []
-            q[:ordpool] << g2
-
-          when "-favgroup"
-            q[:favgroup_neg] ||= []
-            q[:favgroup_neg] << g2
-
-          when "favgroup"
-            q[:favgroup] ||= []
-            q[:favgroup] << g2
-
-          when "-fav", "-ordfav"
-            q[:fav_neg] ||= []
-            q[:fav_neg] << g2
-
-          when "fav"
-            q[:fav] ||= []
-            q[:fav] << g2
-
-          when "ordfav"
-            q[:ordfav] ||= []
-            q[:ordfav] << g2
-
-          when "-commentary"
-            q[:commentary_neg] ||= []
-            q[:commentary_neg] << g2
-
-          when "commentary"
-            q[:commentary] ||= []
-            q[:commentary] << g2
-
-          when "-search"
-            q[:saved_searches_neg] ||= []
-            q[:saved_searches_neg] << g2
-
-          when "search"
-            q[:saved_searches] ||= []
-            q[:saved_searches] << g2
-
-          when "md5"
-            q[:md5] ||= []
-            q[:md5] << g2
-
-          when "-rating"
-            q[:rating_neg] ||= []
-            q[:rating_neg] << g2
-
-          when "rating"
-            q[:rating] ||= []
-            q[:rating] << g2
-
-          when "-locked"
-            q[:locked_neg] ||= []
-            q[:locked_neg] << g2
-
-          when "locked"
-            q[:locked] ||= []
-            q[:locked] << g2
-
-          when "id"
-            q[:id] ||= []
-            q[:id] << g2
-
-          when "-id"
-            q[:id_neg] ||= []
-            q[:id_neg] << g2
-
-          when "width"
-            q[:width] ||= []
-            q[:width] << g2
-
-          when "height"
-            q[:height] ||= []
-            q[:height] << g2
-
-          when "mpixels"
-            q[:mpixels] ||= []
-            q[:mpixels] << g2
-
-          when "ratio"
-            q[:ratio] ||= []
-            q[:ratio] << g2
-
-          when "score"
-            q[:score] ||= []
-            q[:score] << g2
-
-          when "favcount"
-            q[:fav_count] ||= []
-            q[:fav_count] << g2
-
-          when "filesize"
-            q[:file_size] ||= []
-            q[:file_size] << g2
-
-          when "source"
-            q[:source] ||= []
-            q[:source] << g2
-
-          when "-source"
-            q[:source_neg] ||= []
-            q[:source_neg] << g2
-
-          when "date"
-            q[:date] ||= []
-            q[:date] << g2
-
-          when "age"
-            q[:age] ||= []
-            q[:age] << g2
-
-          when "tagcount"
-            q[:post_tag_count] ||= []
-            q[:post_tag_count] << g2
-
-          when /(#{TagCategory.short_name_regex})tags/
-            q["#{TagCategory.short_name_mapping[$1]}_tag_count".to_sym] ||= []
-            q["#{TagCategory.short_name_mapping[$1]}_tag_count".to_sym] << g2
-
-          when "parent"
-            q[:parent] ||= []
-            q[:parent] << g2
-
-          when "-parent"
-            q[:parent_neg] ||= []
-            q[:parent_neg] << g2
-
-          when "child"
-            q[:child] ||= []
-            q[:child] << g2
-
-          when "-child"
-            q[:child_neg] ||= []
-            q[:child_neg] << g2
-
-          when "order"
-            g2 = g2.downcase
-
-            order, suffix, _tail = g2.partition(/_(asc|desc)\z/i)
-            if order.in?(COUNT_METATAG_SYNONYMS)
-              g2 = order.singularize + "_count" + suffix
-            end
-
-            q[:order] = g2
-
-          when "limit"
-            # Do nothing. The controller takes care of it.
-
-          when "-status"
-            q[:status_neg] ||= []
-            q[:status_neg] << g2
-
-          when "status"
-            q[:status] ||= []
-            q[:status] << g2
-
-          when "embedded"
-            q[:embedded] ||= []
-            q[:embedded] << g2
-
-          when "-embedded"
-            q[:embedded_neg] ||= []
-            q[:embedded_neg] << g2
-
-          when "filetype"
-            q[:filetype] ||= []
-            q[:filetype] << g2
-
-          when "-filetype"
-            q[:filetype_neg] ||= []
-            q[:filetype_neg] << g2
-
-          when "pixiv_id", "pixiv"
-            q[:pixiv_id] ||= []
-            q[:pixiv_id] << g2
-
-          when "-upvote"
-            q[:upvoter_neg] ||= []
-            q[:upvoter_neg] << g2
-
-          when "upvote"
-            q[:upvoter] ||= []
-            q[:upvoter] << g2
-
-          when "-downvote"
-            q[:downvoter_neg] ||= []
-            q[:downvoter_neg] << g2
-
-          when "downvote"
-            q[:downvoter] ||= []
-            q[:downvoter] << g2
-
-          when *COUNT_METATAGS
-            q[g1.to_sym] ||= []
-            q[g1.to_sym] << g2
-
-          when *COUNT_METATAG_SYNONYMS
-            g1 = "#{g1.singularize}_count"
-            q[g1.to_sym] ||= []
-            q[g1.to_sym] << g2
-
-          end
-
-        else
-          parse_tag(term.name, q[:tags])
-        end
-      end
-
-      q[:tags][:exclude] = TagAlias.to_aliased(q[:tags][:exclude])
-      q[:tags][:include] = TagAlias.to_aliased(q[:tags][:include])
-      q[:tags][:related] = TagAlias.to_aliased(q[:tags][:related])
-
-      return q
-    end
-
-    def parse_tag_operator(tag)
-      tag = Tag.normalize_name(tag)
-
-      if tag.starts_with?("-")
-        ["-", tag.delete_prefix("-")]
-      elsif tag.starts_with?("~")
-        ["~", tag.delete_prefix("~")]
-      else
-        [nil, tag]
-      end
-    end
-
-    def parse_tag(tag, output)
-      operator, tag = parse_tag_operator(tag)
-
-      if tag.blank?
-        # XXX ignore "-", "~" operators without a tag.
-      elsif tag.include?("*")
-        tags = Tag.wildcard_matches(tag)
-
-        if operator == "-"
-          output[:exclude] += tags
-        else
-          tags = ["~no_matches~"] if tags.empty? # force empty results if wildcard found no matches.
-          output[:include] += tags
-        end
-      elsif operator == "-"
-        output[:exclude] << tag
-      elsif operator == "~"
-        output[:include] << tag
-      else
-        output[:related] << tag
-      end
     end
 
     def parse_cast(object, type)
@@ -1264,6 +862,10 @@ class PostQueryBuilder
   end
 
   concerning :UtilityMethods do
+    def terms
+      scan_query
+    end
+
     def tags
       scan_query.select { |term| term.type == :tag }
     end
@@ -1272,8 +874,12 @@ class PostQueryBuilder
       scan_query.select { |term| term.type == :metatag }
     end
 
+    def select_metatags(metatag)
+      metatags.select { |term| term.name == metatag.to_s.downcase }
+    end
+
     def find_metatag(metatag)
-      metatags.find { |term| term.name == metatag.to_s.downcase }.try(:value)
+      select_metatags(metatag).first.try(:value)
     end
 
     def has_metatag?(*metatag_names)
@@ -1301,14 +907,14 @@ class PostQueryBuilder
     end
 
     def is_simple_tag?
-      tag = tags.first&.name
-      is_single_tag? && !tag.starts_with?("-") && !tag.starts_with?("~") && !tag.include?("*")
+      tag = tags.first
+      is_single_tag? && !tag.negated && !tag.optional && !tag.wildcard
     end
 
     def is_wildcard_search?
-      is_single_tag? && tags.first.name.include?("*")
+      is_single_tag? && tags.first.wildcard
     end
   end
 
-  memoize :scan_query, :split_query, :parse_query
+  memoize :scan_query, :split_query
 end
