@@ -48,7 +48,7 @@
     <div class="post-tooltip-pools">
       <% @post.pools.series.undeleted.each do |pool| %>
         <%= link_to pool, class: "pool-category-#{pool.category}" do %>
-          <%= "pool:#{pool.pretty_name} [#{pool.page_number(@post.id)}/#{pool.post_count}]" %>
+          <%= "pool:#{pool.name} [#{pool.page_number(@post.id)}/#{pool.post_count}]" %>
         <% end %>
       <% end %>
     </div>
