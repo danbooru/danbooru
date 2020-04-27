@@ -91,8 +91,10 @@ class TagAlias < TagRelationship
   end
 
   def ensure_category_consistency
-    if antecedent_tag.category != consequent_tag.category && antecedent_tag.category != Tag.categories.general
-      consequent_tag.update_attribute(:category, antecedent_tag.category)
+    if antecedent_tag.category == Tag.categories.general && consequent_tag.category != Tag.categories.general
+      antecedent_tag.update!(category: consequent_tag.category)
+    elsif consequent_tag.category == Tag.categories.general && antecedent_tag.category != Tag.categories.general
+      consequent_tag.update!(category: antecedent_tag.category)
     end
   end
 

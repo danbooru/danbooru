@@ -180,23 +180,40 @@ class TagAliasTest < ActiveSupport::TestCase
       assert_equal("ccc", ti.reload.consequent_name)
     end
 
-    should "not push the antecedent's category to the consequent if the antecedent is general" do
-      tag1 = FactoryBot.create(:tag, :name => "aaa")
-      tag2 = FactoryBot.create(:tag, :name => "bbb", :category => 1)
-      ta = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
-      tag2.reload
-      assert_equal(1, tag2.category)
-    end
-
-    should "push the antecedent's category to the consequent" do
-      tag1 = FactoryBot.create(:tag, :name => "aaa", :category => 1)
-      tag2 = FactoryBot.create(:tag, :name => "bbb", :category => 0)
-      ta = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
+    should "push the consequent's category to the antecedent if the antecedent is general" do
+      tag1 = create(:tag, name: "general", category: 0)
+      tag2 = create(:tag, name: "artist", category: 1)
+      ta = create(:tag_alias, antecedent_name: "general", consequent_name: "artist")
 
       ta.approve!(approver: @admin)
       perform_enqueued_jobs
 
+      assert_equal(1, tag1.reload.category)
       assert_equal(1, tag2.reload.category)
+    end
+
+    should "push the antecedent's category to the consequent if the consequent is general" do
+      tag1 = create(:tag, name: "artist", category: 1)
+      tag2 = create(:tag, name: "general", category: 0)
+      ta = create(:tag_alias, antecedent_name: "artist", consequent_name: "general")
+
+      ta.approve!(approver: @admin)
+      perform_enqueued_jobs
+
+      assert_equal(1, tag1.reload.category)
+      assert_equal(1, tag2.reload.category)
+    end
+
+    should "not change either tag category when neither the antecedent or consequent are general" do
+      tag1 = create(:tag, name: "character", category: 4)
+      tag2 = create(:tag, name: "copyright", category: 3)
+      ta = create(:tag_alias, antecedent_name: "character", consequent_name: "copyright")
+
+      ta.approve!(approver: @admin)
+      perform_enqueued_jobs
+
+      assert_equal(4, tag1.reload.category)
+      assert_equal(3, tag2.reload.category)
     end
   end
 end
