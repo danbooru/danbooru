@@ -943,7 +943,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_equal("foo", PostQueryBuilder.new(" foo ").normalize_query)
       assert_equal("foo", PostQueryBuilder.new("FOO").normalize_query)
       assert_equal("foo", PostQueryBuilder.new("foo foo").normalize_query)
-      assert_equal("grey", PostQueryBuilder.new("gray").normalize_query)
+      assert_equal("gray", PostQueryBuilder.new("gray").normalize_query)
+      assert_equal("grey", PostQueryBuilder.new("gray").normalize_query(normalize_aliases: true))
       assert_equal("aaa bbb", PostQueryBuilder.new("bbb aaa").normalize_query)
     end
   end

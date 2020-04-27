@@ -746,7 +746,7 @@ class PostQueryBuilder
       end
     end
 
-    def normalize_query(normalize_aliases: true, sort: true)
+    def normalize_query(normalize_aliases: false, sort: true)
       tags = split_query
       tags = tags.map { |t| Tag.normalize_name(t) }
       tags = TagAlias.to_aliased(tags) if normalize_aliases
