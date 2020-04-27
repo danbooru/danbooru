@@ -39,8 +39,6 @@
   <%= render "posts/partials/index/posts", :post_set => @post_set %>
 <% end %>
 
-<%= post_search_count_js %>
-
 <div id="saved-searches-nav">
   <%= render "saved_searches/interface" %>
 </div>
@@ -49,6 +47,14 @@
   <%= render "saved_searches/secondary_links" %>
 <% else %>
   <%= render "posts/partials/common/secondary_links" %>
+<% end %>
+
+<% if post_search_counts_enabled? && @post_set.query.is_simple_tag? && @post_set.current_page == 1 %>
+  <% if @post_set.post_count == 0 %>
+    <%= missed_post_search_count_js %>
+  <% else %>
+    <%= post_search_count_js %>
+  <% end %>
 <% end %>
 
 <% content_for(:html_header) do %>

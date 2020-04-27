@@ -10,8 +10,6 @@
   <% atom_feed_tag "Posts: #{@post_set.tag_string}", posts_url(tags: @post_set.tag_string, format: :atom) %>
 <% end %>
 
-<%= missed_post_search_count_js %>
-
 <% if @post_set.hide_from_crawler? %>
   <meta name="robots" content="nofollow,noindex">
 <% end %>

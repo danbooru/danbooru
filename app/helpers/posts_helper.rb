@@ -13,19 +13,14 @@ module PostsHelper
     params[:tags] =~ /order:rank/ || params[:action] =~ /searches|viewed/
   end
 
-  def missed_post_search_count_js
-    return unless post_search_counts_enabled?
-    return unless params[:ms] == "1" && @post_set.post_count == 0 && @post_set.query.is_single_term?
-
-    sig = generate_reportbooru_signature(params[:tags])
+  def missed_post_search_count_js(post_set)
+    tags = post_set.query.normalize_query
+    sig = generate_reportbooru_signature(tags)
     render "posts/partials/index/missed_search_count", sig: sig
   end
 
-  def post_search_count_js
-    return unless post_search_counts_enabled?
-    return unless params[:action] == "index" && params[:page].nil? && params[:tags].present?
-
-    tags = PostQueryBuilder.new(params[:tags]).normalize_query
+  def post_search_count_js(post_set)
+    tags = post_set.query.normalize_query
     sig = generate_reportbooru_signature("ps-#{tags}")
     render "posts/partials/index/search_count", sig: sig
   end
