@@ -143,6 +143,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
         results = await Autocomplete.pool_source(term, metatag + ":");
         break;
       case "favgroup":
+      case "ordfavgroup":
         results = await Autocomplete.favorite_group_source(term, metatag + ":", CurrentUser.data("id"));
         break;
       case "search":

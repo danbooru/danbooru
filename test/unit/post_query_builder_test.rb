@@ -299,6 +299,27 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       end
     end
 
+    should "return posts for the ordfavgroup:<name> metatag" do
+      post1 = create(:post)
+      post2 = create(:post)
+      post3 = create(:post)
+
+      favgroup1 = create(:favorite_group, creator: CurrentUser.user, post_ids: [post1.id, post2.id])
+      favgroup2 = create(:favorite_group, creator: create(:user), post_ids: [post2.id, post3.id], is_public: false)
+
+      assert_tag_match([post1, post2], "ordfavgroup:#{favgroup1.id}")
+      assert_tag_match([post1, post2], "ordfavgroup:#{favgroup1.name}")
+      assert_tag_match([], "ordfavgroup:#{favgroup2.id}")
+      assert_tag_match([], "ordfavgroup:#{favgroup2.name}")
+
+      as(favgroup2.creator) do
+        assert_tag_match([post2, post3], "ordfavgroup:#{favgroup2.id}")
+        assert_tag_match([post2, post3], "ordfavgroup:#{favgroup2.name}")
+        assert_tag_match([post1, post2], "ordfavgroup:#{favgroup1.id}")
+        assert_tag_match([], "ordfavgroup:#{favgroup1.name}")
+      end
+    end
+
     should "return posts for the user:<name> metatag" do
       users = create_list(:user, 2, created_at: 2.weeks.ago)
       posts = users.map { |u| create(:post, uploader: u) }

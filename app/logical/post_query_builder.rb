@@ -32,7 +32,7 @@ class PostQueryBuilder
     -downvote downvote
     -fav fav
     -ordfav ordfav
-    -favgroup favgroup
+    -favgroup favgroup ordfavgroup
     -pool pool ordpool
     -commentary commentary
     -id id
@@ -207,6 +207,8 @@ class PostQueryBuilder
       favgroup_matches(value)
     when "-favgroup"
       favgroup_matches(value).negate
+    when "ordfavgroup"
+      ordfavgroup_matches(value)
     when "fav"
       favorites_include(value)
     when "-fav"
@@ -427,6 +429,13 @@ class PostQueryBuilder
     # XXX unify with Pool#posts
     pool_posts = Pool.named(pool_name).joins("CROSS JOIN unnest(pools.post_ids) WITH ORDINALITY AS row(post_id, pool_index)").select(:post_id, :pool_index)
     Post.joins("JOIN (#{pool_posts.to_sql}) pool_posts ON pool_posts.post_id = posts.id").order("pool_posts.pool_index ASC")
+  end
+
+  def ordfavgroup_matches(query)
+    # XXX unify with FavoriteGroup#posts
+    favgroup = FavoriteGroup.visible(CurrentUser.user).name_or_id_matches(query, CurrentUser.user)
+    favgroup_posts = favgroup.joins("CROSS JOIN unnest(favorite_groups.post_ids) WITH ORDINALITY AS row(post_id, favgroup_index)").select(:post_id, :favgroup_index)
+    Post.joins("JOIN (#{favgroup_posts.to_sql}) favgroup_posts ON favgroup_posts.post_id = posts.id").order("favgroup_posts.favgroup_index ASC")
   end
 
   def favgroup_matches(query)
