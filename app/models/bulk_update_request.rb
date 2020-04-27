@@ -8,15 +8,16 @@ class BulkUpdateRequest < ApplicationRecord
   belongs_to :forum_post, optional: true
   belongs_to :approver, optional: true, class_name: "User"
 
+  before_validation :normalize_text
+  before_validation :update_tags
   validates_presence_of :script
   validates_presence_of :title, if: ->(rec) {rec.forum_topic_id.blank?}
   validates_presence_of :forum_topic, if: ->(rec) {rec.forum_topic_id.present?}
   validates_inclusion_of :status, :in => %w(pending approved rejected)
   validate :script_formatted_correctly
   validate :validate_script, :on => :create
-  before_validation :normalize_text
+
   after_create :create_forum_topic
-  after_save :update_notice
 
   scope :pending_first, -> { order(Arel.sql("(case status when 'pending' then 0 when 'approved' then 1 else 2 end)")) }
   scope :pending, -> {where(status: "pending")}
@@ -34,7 +35,7 @@ class BulkUpdateRequest < ApplicationRecord
     def search(params = {})
       q = super
 
-      q = q.search_attributes(params, :user, :approver, :forum_topic_id, :forum_post_id, :script)
+      q = q.search_attributes(params, :user, :approver, :forum_topic_id, :forum_post_id, :script, :tags)
       q = q.text_attribute_matches(:script, params[:script_matches])
 
       if params[:status].present?
@@ -152,6 +153,10 @@ class BulkUpdateRequest < ApplicationRecord
     self.script = script.downcase
   end
 
+  def update_tags
+    self.tags = AliasAndImplicationImporter.new(script, nil).affected_tags
+  end
+
   def skip_secondary_validations=(v)
     @skip_secondary_validations = v.to_s.truthy?
   end
@@ -166,13 +171,6 @@ class BulkUpdateRequest < ApplicationRecord
 
   def is_rejected?
     status == "rejected"
-  end
-
-  def update_notice
-    TagChangeNoticeService.update_cache(
-      AliasAndImplicationImporter.new(script, nil).affected_tags,
-      forum_topic_id
-    )
   end
 
   def self.available_includes

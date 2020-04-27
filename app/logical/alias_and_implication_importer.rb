@@ -79,27 +79,17 @@ class AliasAndImplicationImporter
   end
 
   def affected_tags
-    tokens = self.class.tokenize(text)
-    tokens.inject([]) do |all, token|
-      case token[0]
+    AliasAndImplicationImporter.tokenize(text).flat_map do |type, *args|
+      case type
       when :create_alias, :remove_alias, :create_implication, :remove_implication
-        all << token[1]
-        all << token[2]
-        all
-
+        [args[0], args[1]]
       when :mass_update
-        all += PostQueryBuilder.new(token[1]).split_query
-        all += PostQueryBuilder.new(token[2]).parse_tag_edit
-        all
-
+        tags = PostQueryBuilder.new(args[0]).tags + PostQueryBuilder.new(args[1]).tags
+        tags.reject(&:negated).reject(&:optional).reject(&:wildcard).map(&:name)
       when :change_category
-        all << token[1]
-        all
-
-      else
-        all
+        args[0]
       end
-    end
+    end.sort.uniq
   end
 
   private

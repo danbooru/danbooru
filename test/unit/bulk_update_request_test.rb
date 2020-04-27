@@ -13,30 +13,22 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
-    context "#update_notice" do
-      setup do
-        @forum_topic = create(:forum_topic, creator: @admin)
-      end
+    should "parse the tags inside the script" do
+      @bur = create(:bulk_update_request, script: %{
+        create alias aaa -> 000
+        create implication bbb -> 111
+        remove alias ccc -> 222
+        remove implication ddd -> 333
+        mass update eee id:1 -fff ~ggg hhh* -> 444 -555
+        category iii -> meta
+      })
 
-      should "update the cache" do
-        @script = "create alias aaa -> 000\n" +
-          "create implication bbb -> 111\n" +
-          "remove alias ccc -> 222\n" +
-          "remove implication ddd -> 333\n" +
-          "mass update eee -> 444\n"
-        FactoryBot.create(:bulk_update_request, script: @script, forum_topic: @forum_topic)
+      assert_equal(%w[000 111 222 333 444 aaa bbb ccc ddd eee iii], @bur.tags)
+    end
 
-        assert_equal(@forum_topic.id, Cache.get("tcn:aaa"))
-        assert_equal(@forum_topic.id, Cache.get("tcn:000"))
-        assert_equal(@forum_topic.id, Cache.get("tcn:bbb"))
-        assert_equal(@forum_topic.id, Cache.get("tcn:111"))
-        assert_equal(@forum_topic.id, Cache.get("tcn:ccc"))
-        assert_equal(@forum_topic.id, Cache.get("tcn:222"))
-        assert_equal(@forum_topic.id, Cache.get("tcn:ddd"))
-        assert_equal(@forum_topic.id, Cache.get("tcn:333"))
-        assert_equal(@forum_topic.id, Cache.get("tcn:eee"))
-        assert_equal(@forum_topic.id, Cache.get("tcn:444"))
-      end
+    should_eventually "parse tags with tag type prefixes inside the script" do
+      @bur = create(:bulk_update_request, script: "mass update aaa -> artist:bbb")
+      assert_equal(%w[aaa bbb], @bur.tags)
     end
 
     context "on approval" do

@@ -62,10 +62,6 @@ module PostsHelper
     return params[:pool_id].to_i == pool.id
   end
 
-  def show_tag_change_notice?
-    CurrentUser.user.is_member? && PostQueryBuilder.new(params[:tags]).split_query.size == 1 && TagChangeNoticeService.get_forum_topic_id(params[:tags])
-  end
-
   private
 
   def nav_params_for(page)

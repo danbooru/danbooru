@@ -70,6 +70,12 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path(tags: "search:all")
           assert_response :success
         end
+
+        should "show a notice for a single tag search with a pending BUR" do
+          create(:bulk_update_request, script: "create alias foo -> bar")
+          get_auth posts_path(tags: "foo"), @user
+          assert_select ".tag-change-notice"
+        end
       end
 
       context "with a multi-tag search" do

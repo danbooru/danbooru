@@ -669,7 +669,8 @@ CREATE TABLE public.bulk_update_requests (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     approver_id integer,
-    forum_post_id integer
+    forum_post_id integer,
+    tags text[] DEFAULT '{}'::text[] NOT NULL
 );
 
 
@@ -4733,6 +4734,13 @@ CREATE INDEX index_bulk_update_requests_on_forum_post_id ON public.bulk_update_r
 
 
 --
+-- Name: index_bulk_update_requests_on_tags; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bulk_update_requests_on_tags ON public.bulk_update_requests USING gin (tags);
+
+
+--
 -- Name: index_comment_votes_on_comment_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7384,6 +7392,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200325073456'),
 ('20200325074859'),
 ('20200403210353'),
-('20200406054838');
+('20200406054838'),
+('20200427190519');
 
 

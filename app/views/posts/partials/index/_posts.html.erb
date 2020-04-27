@@ -19,10 +19,17 @@
     </div>
   <% end %>
 
-  <% if show_tag_change_notice? %>
-    <div class="fineprint tag-change-notice">
-      <p>This tag is the subject of an ongoing discussion. If you have any relevant information, please join the <%= link_to "discussion", forum_topic_path(TagChangeNoticeService.get_forum_topic_id(params[:tags]) || 1) %>.</p>
-    </div>
+  <% if CurrentUser.user.is_member? && post_set.query.is_simple_tag? %>
+    <% cache("tag-change-notice:#{post_set.query.normalize_query}", expires_in: 4.hours) do %>
+      <% if post_set.pending_bulk_update_requests.present? %>
+        <div class="fineprint tag-change-notice">
+          <p>
+            This tag is being discussed in
+            <%= to_sentence post_set.pending_bulk_update_requests.map { |bur| link_to "Topic ##{bur.forum_topic_id}: #{bur.forum_topic.title}", bur.forum_post } %>.
+          </p>
+        </div>
+      <% end %>
+    <% end %>
   <% end %>
 
   <% unless post_set.is_random? %>

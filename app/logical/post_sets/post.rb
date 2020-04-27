@@ -131,5 +131,10 @@ module PostSets
       # be smarter about this in the future
       posts.reject(&:is_deleted).select(&:visible?).max_by(&:fav_count)
     end
+
+    def pending_bulk_update_requests
+      return BulkUpdateRequest.none unless query.is_simple_tag?
+      @pending_bulk_update_requests ||= BulkUpdateRequest.pending.where_array_includes_any(:tags, query.tags.first.name)
+    end
   end
 end
