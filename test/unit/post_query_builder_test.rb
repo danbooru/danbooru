@@ -422,6 +422,11 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([post1], 'commentary:"azur lane"')
       assert_tag_match([post4, post3, post2], '-commentary:"azur lane"')
+
+      assert_tag_match([], "commentary:'true'")
+      assert_tag_match([], "commentary:'false'")
+      assert_tag_match([], "commentary:'translated'")
+      assert_tag_match([], "commentary:'untranslated'")
     end
 
     should "return posts for the date:<d> metatag" do
@@ -579,18 +584,14 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post1], 'source:"abc def"')
       assert_tag_match([post1], "source:'abc def'")
       assert_tag_match([post2], "source:abcde")
+      assert_tag_match([post2], "source:ABCDE")
       assert_tag_match([post3, post1], "-source:abcde")
 
       assert_tag_match([post3], "source:none")
       assert_tag_match([post3], "source:NONE")
       assert_tag_match([post2, post1], "-source:none")
-    end
 
-    should "return posts for a case insensitive source search" do
-      post1 = create(:post, source: "ABCD")
-      post2 = create(:post, source: "1234")
-
-      assert_tag_match([post1], "source:abcd")
+      assert_tag_match([], "source:'none'")
     end
 
     should "return posts for a pixiv source search" do

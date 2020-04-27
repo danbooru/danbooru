@@ -117,13 +117,13 @@ class PostQueryBuilder
 
   def metatags_match(metatags, relation)
     metatags.each do |metatag|
-      relation = relation.merge(metatag_matches(metatag.name, metatag.value))
+      relation = relation.merge(metatag_matches(metatag.name, metatag.value, quoted: metatag.quoted))
     end
 
     relation
   end
 
-  def metatag_matches(name, value)
+  def metatag_matches(name, value, quoted: false)
     case name
     when "id"
       attribute_matches(value, :id)
@@ -182,17 +182,17 @@ class PostQueryBuilder
     when "-embedded"
       embedded_matches(value).negate
     when "source"
-      source_matches(value)
+      source_matches(value, quoted)
     when "-source"
-      source_matches(value).negate
+      source_matches(value, quoted).negate
     when "disapproved"
       disapproved_matches(value)
     when "-disapproved"
       disapproved_matches(value).negate
     when "commentary"
-      commentary_matches(value)
+      commentary_matches(value, quoted)
     when "-commentary"
-      commentary_matches(value).negate
+      commentary_matches(value, quoted).negate
     when "search"
       saved_search_matches(value)
     when "-search"
@@ -387,9 +387,9 @@ class PostQueryBuilder
     end
   end
 
-  def source_matches(source)
+  def source_matches(source, quoted = false)
     case source.downcase
-    when "none"
+    in "none" unless quoted
       Post.where_like(:source, "")
     else
       Post.where_ilike(:source, source + "*")
@@ -459,15 +459,15 @@ class PostQueryBuilder
     favorites_include(username).joins(:favorites).merge(Favorite.for_user(user.id)).order("favorites.id DESC")
   end
 
-  def commentary_matches(query)
+  def commentary_matches(query, quoted = false)
     case query.downcase
-    when "none", "false"
+    in "none" | "false" unless quoted
       Post.where.not(artist_commentary: ArtistCommentary.all).or(Post.where(artist_commentary: ArtistCommentary.deleted))
-    when "any", "true"
+    in "any" | "true" unless quoted
       Post.where(artist_commentary: ArtistCommentary.undeleted)
-    when "translated"
+    in "translated" unless quoted
       Post.where(artist_commentary: ArtistCommentary.translated)
-    when "untranslated"
+    in "untranslated" unless quoted
       Post.where(artist_commentary: ArtistCommentary.untranslated)
     else
       Post.where(artist_commentary: ArtistCommentary.text_matches(query))
@@ -691,12 +691,12 @@ class PostQueryBuilder
         if scanner.scan(/(#{METATAGS.join("|")}):/io)
           metatag = scanner.captures.first.downcase
 
-          if scanner.scan(/"(.+)"/)
+          if scanner.scan(/"(.+)"/) || scanner.scan(/'(.+)'/)
             value = scanner.captures.first
-          elsif scanner.scan(/'(.+)'/)
-            value = scanner.captures.first
+            quoted = true
           else
             value = scanner.scan(/[^ ]*/)
+            quoted = false
           end
 
           if metatag.in?(COUNT_METATAG_SYNONYMS)
@@ -708,7 +708,7 @@ class PostQueryBuilder
             end
           end
 
-          terms << OpenStruct.new({ type: :metatag, name: metatag, value: value })
+          terms << OpenStruct.new({ type: :metatag, name: metatag, value: value, quoted: quoted })
         elsif scanner.scan(/([-~])?([^ ]+)/)
           operator = scanner.captures.first
           tag = scanner.captures.second
