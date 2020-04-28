@@ -256,9 +256,9 @@ class PostQueryBuilder
     when "-noter"
       user_subquery_matches(NoteVersion.unscoped.where(version: 1), value, field: :updater).negate
     when "noteupdater"
-      user_subquery_matches(NoteVersion.unscoped, value, field: :updater).negate
-    when "-noteupdater"
       user_subquery_matches(NoteVersion.unscoped, value, field: :updater)
+    when "-noteupdater"
+      user_subquery_matches(NoteVersion.unscoped, value, field: :updater).negate
     when "upvoter", "upvote"
       user_subquery_matches(PostVote.positive.visible(CurrentUser.user), value, field: :user)
     when "-upvoter", "-upvote"

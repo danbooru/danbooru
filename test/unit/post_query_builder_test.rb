@@ -380,6 +380,18 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "noter:none")
     end
 
+    should "return posts for the noteupdater:<name> metatag" do
+      user1 = create(:user)
+      user2 = create(:user)
+      note1 = as(user1) { create(:note) }
+      note2 = as(user2) { create(:note) }
+
+      assert_tag_match([note1.post], "noteupdater:#{user1.name}")
+      assert_tag_match([note2.post], "noteupdater:#{user2.name}")
+      assert_tag_match([note2.post], "-noteupdater:#{user1.name}")
+      assert_tag_match([note1.post], "-noteupdater:#{user2.name}")
+    end
+
     should "return posts for the note_count:<N> metatag" do
       posts = create_list(:post, 3)
       create(:note, post: posts[0], is_active: true)
