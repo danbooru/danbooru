@@ -53,17 +53,6 @@ class TagImplicationTest < ActiveSupport::TestCase
       end
     end
 
-    context "#update_notice" do
-      setup do
-        @forum_topic = FactoryBot.create(:forum_topic)
-      end
-
-      should "update the cache" do
-        FactoryBot.create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", skip_secondary_validations: true, forum_topic: @forum_topic)
-        assert_equal(@forum_topic.id, Cache.get("tcn:aaa"))
-      end
-    end
-
     context "#reject!" do
       should "not be blocked by alias validations" do
         ti = create(:tag_implication, antecedent_name: "cat", consequent_name: "animal", status: "pending")
