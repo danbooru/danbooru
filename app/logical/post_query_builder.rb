@@ -64,6 +64,7 @@ class PostQueryBuilder
 
   ORDER_METATAGS = %w[
     id id_desc
+    md5 md5_asc
     score score_asc
     favcount favcount_asc
     created_at created_at_asc
@@ -81,6 +82,7 @@ class PostQueryBuilder
     modqueue
     random
     custom
+    none
   ] +
     COUNT_METATAGS +
     COUNT_METATAG_SYNONYMS.flat_map { |str| [str, "#{str}_asc"] } +
@@ -561,6 +563,12 @@ class PostQueryBuilder
     when "id_desc"
       relation = relation.order("posts.id DESC")
 
+    when "md5", "md5_desc"
+      relation = relation.order("posts.md5 DESC")
+
+    when "md5_asc"
+      relation = relation.order("posts.md5 ASC")
+
     when "score", "score_desc"
       relation = relation.order("posts.score DESC, posts.id DESC")
 
@@ -671,6 +679,9 @@ class PostQueryBuilder
 
     when "modqueue_asc"
       relation = relation.left_outer_joins(:flags).order(Arel.sql("GREATEST(posts.created_at, post_flags.created_at) ASC, posts.id ASC"))
+
+    when "none"
+      relation = relation.reorder(nil)
 
     else
       relation = relation.order("posts.id DESC")

@@ -763,6 +763,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         p = create(
           :post,
           score: n,
+          md5: n.to_s,
           fav_count: n,
           file_size: 1.megabyte * n,
           # posts[0] is portrait, posts[1] is landscape. posts[1].mpixels > posts[0].mpixels.
@@ -801,6 +802,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match(posts.reverse, "order:note_count_desc")
       assert_tag_match(posts.reverse, "order:notes")
       assert_tag_match(posts.reverse, "order:notes_desc")
+      assert_tag_match(posts.reverse, "order:md5")
+      assert_tag_match(posts.reverse, "order:md5_desc")
 
       assert_tag_match(posts, "order:id_asc")
       assert_tag_match(posts, "order:score_asc")
@@ -820,6 +823,10 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match(posts, "order:copytags_asc")
       assert_tag_match(posts, "order:note_count_asc")
       assert_tag_match(posts, "order:notes_asc")
+      assert_tag_match(posts, "order:md5_asc")
+
+      # ordering is unpredictable so can't be tested.
+      assert_tag_match([posts.first], "id:#{posts.first.id} order:none")
     end
 
     should "return posts for order:comment_bumped" do
