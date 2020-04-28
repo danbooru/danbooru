@@ -172,7 +172,7 @@ class PostQueryBuilder
     when "rating"
       Post.where(rating: value.first.downcase)
     when "-rating"
-      Post.where(rating: value.first.downcase)
+      Post.where(rating: value.first.downcase).negate
     when "locked"
       locked_matches(value)
     when "-locked"
