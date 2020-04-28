@@ -117,7 +117,7 @@ class PostQueryBuilder
 
   def metatags_match(metatags, relation)
     metatags.each do |metatag|
-      relation = relation.merge(metatag_matches(metatag.name, metatag.value, quoted: metatag.quoted))
+      relation = relation.and(metatag_matches(metatag.name, metatag.value, quoted: metatag.quoted))
     end
 
     relation

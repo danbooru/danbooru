@@ -5,6 +5,15 @@ module Searchable
     unscoped.where(all.where_clause.invert(kind).ast)
   end
 
+  # XXX hacky method to AND two relations together.
+  def and(relation)
+    q = all
+    q = q.where(relation.where_clause.ast) if relation.where_clause.present?
+    q = q.joins(relation.joins_values + q.joins_values) if relation.joins_values.present?
+    q = q.order(relation.order_values) if relation.order_values.present?
+    q
+  end
+
   # `operator` is an Arel::Predications method: :eq, :gt, :lt, :between, :in, etc.
   # https://github.com/rails/rails/blob/master/activerecord/lib/arel/predications.rb
   def where_operator(field, operator, *args)

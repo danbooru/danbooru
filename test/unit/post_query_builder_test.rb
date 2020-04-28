@@ -595,6 +595,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post1], "md5:abcd")
       assert_tag_match([post1], "md5:ABCD")
       assert_tag_match([post1], "md5:123,abcd")
+      assert_tag_match([], "md5:abcd md5:xyz")
     end
 
     should "return posts for a source:<text> search" do
@@ -613,6 +614,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post2, post1], "-source:none")
 
       assert_tag_match([], "source:'none'")
+      assert_tag_match([], "source:none source:abcde")
+      assert_tag_match([], "source:abcde source:xzy")
     end
 
     should "return posts for a pixiv source search" do
@@ -693,6 +696,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([s], "rating:s")
       assert_tag_match([q], "rating:q")
       assert_tag_match([e], "rating:e")
+      assert_tag_match([], "rating:s rating:q")
 
       assert_tag_match(all - [s], "-rating:s")
       assert_tag_match(all - [q], "-rating:q")
@@ -726,8 +730,10 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         upvoted   = create(:post, tag_string: "upvote:self")
         downvoted = create(:post, tag_string: "downvote:self")
 
-        assert_tag_match([upvoted],   "upvote:#{CurrentUser.name}")
+        assert_tag_match([upvoted], "upvote:#{CurrentUser.name}")
         assert_tag_match([downvoted], "downvote:#{CurrentUser.name}")
+        assert_tag_match([], "upvote:nobody upvote:#{CurrentUser.name}")
+        assert_tag_match([], "downvote:nobody downvote:#{CurrentUser.name}")
       end
     end
 
@@ -742,6 +748,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         assert_tag_match([disapproved], "disapproved:disinterest")
         assert_tag_match([disapproved], "disapproved:DISINTEREST")
         assert_tag_match([], "disapproved:breaks_rules")
+        assert_tag_match([], "disapproved:breaks_rules disapproved:disinterest")
 
         assert_tag_match([pending], "-disapproved:#{CurrentUser.name}")
         assert_tag_match([pending], "-disapproved:disinterest")
@@ -887,16 +894,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     should "succeed for exclusive tag searches with no other tag" do
       post1 = create(:post, rating: "s", tag_string: "aaa")
-      assert_nothing_raised do
-        relation = Post.tag_match("-aaa")
-      end
+      assert_tag_match([], "-aaa")
     end
 
     should "succeed for exclusive tag searches combined with a metatag" do
       post1 = create(:post, rating: "s", tag_string: "aaa")
-      assert_nothing_raised do
-        relation = Post.tag_match("-aaa id:>0")
-      end
+      assert_tag_match([], "-aaa id:>0")
+      assert_tag_match([], "-a* rating:s")
     end
   end
 
