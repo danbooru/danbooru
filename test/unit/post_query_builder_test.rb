@@ -450,6 +450,50 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "commentary:'untranslated'")
     end
 
+    should "return posts for the comment:<query> metatag" do
+      post1 = create(:post)
+      post2 = create(:post)
+
+      comment1 = create(:comment, post: post1, body: "petting cats")
+      comment2 = create(:comment, post: post2, body: "walking dogs")
+
+      assert_tag_match([post1], "comment:petting")
+      assert_tag_match([post1], "comment:pet")
+      assert_tag_match([post1], "comment:cats")
+      assert_tag_match([post1], "comment:cat")
+      assert_tag_match([post1], "comment:*at*")
+
+      assert_tag_match([post2], "comment:walk")
+      assert_tag_match([post2], "comment:dog")
+
+      assert_tag_match([post2], "-comment:cat")
+      assert_tag_match([post1], "-comment:dog")
+
+      assert_tag_match([post2, post1], "comment:*ing*")
+    end
+
+    should "return posts for the note:<query> metatag" do
+      post1 = create(:post)
+      post2 = create(:post)
+
+      note1 = create(:note, post: post1, body: "petting cats")
+      note2 = create(:note, post: post2, body: "walking dogs")
+
+      assert_tag_match([post1], "note:petting")
+      assert_tag_match([post1], "note:pet")
+      assert_tag_match([post1], "note:cats")
+      assert_tag_match([post1], "note:cat")
+      assert_tag_match([post1], "note:*at*")
+
+      assert_tag_match([post2], "note:walk")
+      assert_tag_match([post2], "note:dog")
+
+      assert_tag_match([post2], "-note:cat")
+      assert_tag_match([post1], "-note:dog")
+
+      assert_tag_match([post2, post1], "note:*ing*")
+    end
+
     should "return posts for the date:<d> metatag" do
       post = create(:post, created_at: Time.parse("2017-01-01 12:00"))
 

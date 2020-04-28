@@ -34,6 +34,8 @@ class PostQueryBuilder
     -ordfav ordfav
     -favgroup favgroup ordfavgroup
     -pool pool ordpool
+    -note note
+    -comment comment
     -commentary commentary
     -id id
     -rating rating
@@ -195,6 +197,14 @@ class PostQueryBuilder
       commentary_matches(value, quoted)
     when "-commentary"
       commentary_matches(value, quoted).negate
+    when "note"
+      note_matches(value)
+    when "-note"
+      note_matches(value).negate
+    when "comment"
+      comment_matches(value)
+    when "-comment"
+      comment_matches(value).negate
     when "search"
       saved_search_matches(value)
     when "-search"
@@ -468,6 +478,14 @@ class PostQueryBuilder
   def ordfav_matches(username)
     user = User.find_by_name(username)
     favorites_include(username).joins(:favorites).merge(Favorite.for_user(user.id)).order("favorites.id DESC")
+  end
+
+  def note_matches(query)
+    Post.where(notes: Note.search(body_matches: query).reorder(nil))
+  end
+
+  def comment_matches(query)
+    Post.where(comments: Comment.search(body_matches: query).reorder(nil))
   end
 
   def commentary_matches(query, quoted = false)
