@@ -147,7 +147,6 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([posts[2]], "id:>#{posts[1].id}")
       assert_tag_match([posts[0]], "id:<#{posts[1].id}")
 
-      assert_tag_match([posts[2], posts[0]], "-id:#{posts[1].id}")
       assert_tag_match([posts[2], posts[1]], "id:>=#{posts[1].id}")
       assert_tag_match([posts[1], posts[0]], "id:<=#{posts[1].id}")
       assert_tag_match([posts[2], posts[0]], "id:#{posts[0].id},#{posts[2].id}")
@@ -157,6 +156,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([posts[1], posts[0]], "id:#{posts[0].id}..#{posts[1].id}")
       assert_tag_match([posts[1], posts[0]], "id:#{posts[1].id}..#{posts[0].id}")
       assert_tag_match([posts[1], posts[0]], "id:#{posts[0].id}...#{posts[2].id}")
+
+      assert_tag_match([posts[1], posts[0]], "-id:>#{posts[1].id}")
+      assert_tag_match([posts[2], posts[1]], "-id:<#{posts[1].id}")
+      assert_tag_match([posts[0]], "-id:>=#{posts[1].id}")
+      assert_tag_match([posts[2]], "-id:<=#{posts[1].id}")
+      assert_tag_match([posts[0]], "-id:#{posts[1].id}..#{posts[2].id}")
+      assert_tag_match([posts[0]], "-id:#{posts[1].id},#{posts[2].id}")
 
       assert_tag_match([], "id:#{posts[0].id} id:#{posts[2].id}")
       assert_tag_match([posts[0]], "-id:#{posts[1].id} -id:#{posts[2].id}")
@@ -349,6 +355,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([posts[0]], "commenter:#{users[0].name}")
       assert_tag_match([posts[1]], "commenter:#{users[1].name}")
+      assert_tag_match([posts[1]], "-commenter:#{users[0].name}")
+      assert_tag_match([posts[0]], "-commenter:#{users[1].name}")
     end
 
     should "return posts for the commenter:<any|none> metatag" do
@@ -369,6 +377,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([posts[0]], "noter:#{users[0].name}")
       assert_tag_match([posts[1]], "noter:#{users[1].name}")
+      assert_tag_match([posts[1]], "-noter:#{users[0].name}")
+      assert_tag_match([posts[0]], "-noter:#{users[1].name}")
     end
 
     should "return posts for the noter:<any|none> metatag" do
@@ -377,7 +387,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       create(:note, post: posts[1], is_active: false)
 
       assert_tag_match(posts.reverse, "noter:any")
+      assert_tag_match(posts.reverse, "-noter:none")
       assert_tag_match([], "noter:none")
+      assert_tag_match([], "-noter:any")
     end
 
     should "return posts for the noteupdater:<name> metatag" do
@@ -404,6 +416,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([posts[1], posts[0]], "notes:1")
       assert_tag_match([posts[0]], "active_notes:1")
       assert_tag_match([posts[1]], "deleted_notes:1")
+
+      assert_tag_match([posts[2]], "-note_count:1")
     end
 
     should "return posts for the commentaryupdater:<name> metatag" do
@@ -510,6 +524,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post = create(:post, created_at: Time.parse("2017-01-01 12:00"))
 
       assert_tag_match([post], "date:2017-01-01")
+      assert_tag_match([], "-date:2017-01-01")
     end
 
     should "return posts for the age:<n> metatag" do
@@ -534,6 +549,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "age:>=1y")
       assert_tag_match([], "age:1y..2y")
       assert_tag_match([], "age:>1y age:<1y")
+
+      assert_tag_match([post], "-age:>1y")
+      assert_tag_match([], "-age:<1y")
     end
 
     should "return posts for the ratio:<x:y> metatag" do
@@ -541,6 +559,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([post], "ratio:2:1")
       assert_tag_match([post], "ratio:2.0")
+      assert_tag_match([], "-ratio:2.0")
     end
 
     should "return posts for the status:<type> metatag" do
@@ -580,6 +599,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       create(:post_disapproval, user: CurrentUser.user, post: disapproved, reason: "disinterest")
 
       assert_tag_match([pending, flagged], "status:unmoderated")
+      assert_tag_match([disapproved], "-status:unmoderated")
     end
 
     should "respect the 'Deleted post filter' option when using the status: metatag" do
@@ -642,6 +662,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "copytags:1")
       assert_tag_match([post], "chartags:1")
       assert_tag_match([post], "gentags:1")
+
+      assert_tag_match([], "-gentags:1")
+      assert_tag_match([], "-tagcount:4")
     end
 
     should "return posts for the md5:<md5> metatag" do
@@ -652,6 +675,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post1], "md5:ABCD")
       assert_tag_match([post1], "md5:123,abcd")
       assert_tag_match([], "md5:abcd md5:xyz")
+
+      assert_tag_match([post2], "-md5:abcd")
     end
 
     should "return posts for a source:<text> search" do
@@ -790,6 +815,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         assert_tag_match([downvoted], "downvote:#{CurrentUser.name}")
         assert_tag_match([], "upvote:nobody upvote:#{CurrentUser.name}")
         assert_tag_match([], "downvote:nobody downvote:#{CurrentUser.name}")
+
+        assert_tag_match([downvoted], "-upvote:#{CurrentUser.name}")
+        assert_tag_match([upvoted], "-downvote:#{CurrentUser.name}")
       end
     end
 

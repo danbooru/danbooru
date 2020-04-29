@@ -1069,7 +1069,7 @@ class Post < ApplicationRecord
     def fast_count(tags = "", timeout: 1_000, raise_on_timeout: false, skip_cache: false)
       tags = tags.to_s
       tags += " rating:s" if CurrentUser.safe_mode?
-      tags += " -status:deleted" if CurrentUser.hide_deleted_posts? && !PostQueryBuilder.new(tags).has_metatag?("status", "-status")
+      tags += " -status:deleted" if CurrentUser.hide_deleted_posts? && !PostQueryBuilder.new(tags).has_metatag?("status")
       tags = PostQueryBuilder.new(tags).normalize_query
 
       # Optimize some cases. these are just estimates but at these

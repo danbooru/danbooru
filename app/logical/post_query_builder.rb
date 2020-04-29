@@ -19,49 +19,11 @@ class PostQueryBuilder
   CATEGORY_COUNT_METATAGS = TagCategory.short_name_list.map { |category| "#{category}tags" }
 
   METATAGS = %w[
-    -user user
-    -approver approver
-    -commenter commenter comm
-    -noter noter
-    -noteupdater noteupdater
-    -artcomm artcomm
-    -commentaryupdater commentaryupdater
-    -flagger flagger
-    -appealer appealer
-    -upvote upvote
-    -downvote downvote
-    -fav fav
-    -ordfav ordfav
-    -favgroup favgroup ordfavgroup
-    -pool pool ordpool
-    -note note
-    -comment comment
-    -commentary commentary
-    -id id
-    -rating rating
-    -locked locked
-    -source source
-    -status status
-    -filetype filetype
-    -disapproved disapproved
-    -parent parent
-    -child child
-    -search search
-    -embedded embedded
-    md5
-    width
-    height
-    mpixels
-    ratio
-    score
-    favcount
-    filesize
-    date
-    age
-    order
-    limit
-    tagcount
-    pixiv_id pixiv
+    user approver commenter comm noter noteupdater artcomm commentaryupdater
+    flagger appealer upvote downvote fav ordfav favgroup ordfavgroup pool
+    ordpool note comment commentary id rating locked source status filetype
+    disapproved parent child search embedded md5 width height mpixels ratio
+    score favcount filesize date age order limit tagcount pixiv_id pixiv
   ] + COUNT_METATAGS + COUNT_METATAG_SYNONYMS + CATEGORY_COUNT_METATAGS
 
   ORDER_METATAGS = %w[
@@ -121,7 +83,9 @@ class PostQueryBuilder
 
   def metatags_match(metatags, relation)
     metatags.each do |metatag|
-      relation = relation.and(metatag_matches(metatag.name, metatag.value, quoted: metatag.quoted))
+      clause = metatag_matches(metatag.name, metatag.value, quoted: metatag.quoted)
+      clause = clause.negate if metatag.negated
+      relation = relation.and(clause)
     end
 
     relation
@@ -131,8 +95,6 @@ class PostQueryBuilder
     case name
     when "id"
       attribute_matches(value, :id)
-    when "-id"
-      Post.where.not(id: value.to_i)
     when "md5"
       attribute_matches(value, :md5, :md5)
     when "width"
@@ -151,8 +113,6 @@ class PostQueryBuilder
       attribute_matches(value, :file_size, :filesize)
     when "filetype"
       attribute_matches(value, :file_ext, :enum)
-    when "-filetype"
-      attribute_matches(value, :file_ext, :enum).negate(:nor)
     when "date"
       attribute_matches(value, :created_at, :date)
     when "age"
@@ -163,110 +123,60 @@ class PostQueryBuilder
       attribute_matches(value, :tag_count)
     when "status"
       status_matches(value)
-    when "-status"
-      status_matches(value).negate
     when "parent"
       parent_matches(value)
-    when "-parent"
-      parent_matches(value).negate
     when "child"
       child_matches(value)
-    when "-child"
-      child_matches(value).negate
     when "rating"
       Post.where(rating: value.first.downcase)
-    when "-rating"
-      Post.where(rating: value.first.downcase).negate
     when "locked"
       locked_matches(value)
-    when "-locked"
-      locked_matches(value).negate
     when "embedded"
       embedded_matches(value)
-    when "-embedded"
-      embedded_matches(value).negate
     when "source"
       source_matches(value, quoted)
-    when "-source"
-      source_matches(value, quoted).negate
     when "disapproved"
       disapproved_matches(value)
-    when "-disapproved"
-      disapproved_matches(value).negate
     when "commentary"
       commentary_matches(value, quoted)
-    when "-commentary"
-      commentary_matches(value, quoted).negate
     when "note"
       note_matches(value)
-    when "-note"
-      note_matches(value).negate
     when "comment"
       comment_matches(value)
-    when "-comment"
-      comment_matches(value).negate
     when "search"
       saved_search_matches(value)
-    when "-search"
-      saved_search_matches(value).negate
     when "pool"
       pool_matches(value)
-    when "-pool"
-      pool_matches(value).negate
     when "ordpool"
       ordpool_matches(value)
     when "favgroup"
       favgroup_matches(value)
-    when "-favgroup"
-      favgroup_matches(value).negate
     when "ordfavgroup"
       ordfavgroup_matches(value)
     when "fav"
       favorites_include(value)
-    when "-fav"
-      favorites_exclude(value)
     when "ordfav"
       ordfav_matches(value)
     when "user"
       user_matches(:uploader, value)
-    when "-user"
-      user_matches(:uploader, value).negate
     when "approver"
       user_matches(:approver, value)
-    when "-approver"
-      user_matches(:approver, value).negate
     when "flagger"
       flagger_matches(value)
-    when "-flagger"
-      flagger_matches(value).negate
     when "appealer"
       user_subquery_matches(PostAppeal.unscoped, value)
-    when "-appealer"
-      user_subquery_matches(PostAppeal.unscoped, value).negate
     when "commenter", "comm"
       user_subquery_matches(Comment.unscoped, value)
-    when "-commenter"
-      user_subquery_matches(Comment.unscoped, value).negate
     when "commentaryupdater", "artcomm"
       user_subquery_matches(ArtistCommentaryVersion.unscoped, value, field: :updater)
-    when "-commentaryupdater", "-artcomm"
-      user_subquery_matches(ArtistCommentaryVersion.unscoped, value, field: :updater).negate
     when "noter"
       user_subquery_matches(NoteVersion.unscoped.where(version: 1), value, field: :updater)
-    when "-noter"
-      user_subquery_matches(NoteVersion.unscoped.where(version: 1), value, field: :updater).negate
     when "noteupdater"
       user_subquery_matches(NoteVersion.unscoped, value, field: :updater)
-    when "-noteupdater"
-      user_subquery_matches(NoteVersion.unscoped, value, field: :updater).negate
     when "upvoter", "upvote"
       user_subquery_matches(PostVote.positive.visible(CurrentUser.user), value, field: :user)
-    when "-upvoter", "-upvote"
-      user_subquery_matches(PostVote.positive.visible(CurrentUser.user), value, field: :user).negate
     when "downvoter", "downvote"
       user_subquery_matches(PostVote.negative.visible(CurrentUser.user), value, field: :user)
-    when "-downvoter", "-downvote"
-      user_subquery_matches(PostVote.negative.visible(CurrentUser.user), value, field: :user).negate
     when *CATEGORY_COUNT_METATAGS
       short_category = name.delete_suffix("tags")
       category = TagCategory.short_name_mapping[short_category]
@@ -286,11 +196,6 @@ class PostQueryBuilder
   def tags_include(*tags)
     query = tags.map(&:to_escaped_for_tsquery).join(" & ")
     Post.where("posts.tag_index @@ to_tsquery('danbooru', E?)", query)
-  end
-
-  def tags_exclude(*tags)
-    query = tags.map(&:to_escaped_for_tsquery).join(" | ")
-    Post.where("posts.tag_index @@ to_tsquery('danbooru', E?)", "!(#{query})")
   end
 
   def attribute_matches(value, field, type = :integer)
@@ -465,16 +370,6 @@ class PostQueryBuilder
     end
   end
 
-  def favorites_exclude(username)
-    favuser = User.find_by_name(username)
-
-    if favuser.present? && Pundit.policy!([CurrentUser.user, nil], favuser).can_see_favorites?
-      tags_exclude("fav:#{favuser.id}")
-    else
-      Post.all
-    end
-  end
-
   def ordfav_matches(username)
     user = User.find_by_name(username)
     favorites_include(username).joins(:favorites).merge(Favorite.for_user(user.id)).order("favorites.id DESC")
@@ -540,8 +435,7 @@ class PostQueryBuilder
 
   def hide_deleted_posts?
     return false if CurrentUser.admin_mode?
-    return false if find_metatag("status").to_s.downcase.in?(%w[deleted active any all])
-    return false if find_metatag("-status").to_s.downcase.in?(%w[deleted active any all])
+    return false if find_metatag(:status).to_s.downcase.in?(%w[deleted active any all])
     return CurrentUser.user.hide_deleted_posts?
   end
 
@@ -726,8 +620,9 @@ class PostQueryBuilder
       until scanner.eos?
         scanner.skip(/ +/)
 
-        if scanner.scan(/(#{METATAGS.join("|")}):/io)
-          metatag = scanner.captures.first.downcase
+        if scanner.scan(/(-)?(#{METATAGS.join("|")}):/io)
+          operator = scanner.captures.first
+          metatag = scanner.captures.second.downcase
 
           if scanner.scan(/"(.+)"/) || scanner.scan(/'(.+)'/)
             value = scanner.captures.first
@@ -746,7 +641,7 @@ class PostQueryBuilder
             end
           end
 
-          terms << OpenStruct.new({ type: :metatag, name: metatag, value: value, quoted: quoted })
+          terms << OpenStruct.new(type: :metatag, name: metatag, value: value, negated: (operator == "-"), quoted: quoted)
         elsif scanner.scan(/([-~])?([^ ]+)/)
           operator = scanner.captures.first
           tag = scanner.captures.second
