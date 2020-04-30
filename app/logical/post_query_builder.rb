@@ -24,6 +24,7 @@ class PostQueryBuilder
     ordpool note comment commentary id rating locked source status filetype
     disapproved parent child search embedded md5 width height mpixels ratio
     score favcount filesize date age order limit tagcount pixiv_id pixiv
+    unaliased
   ] + COUNT_METATAGS + COUNT_METATAG_SYNONYMS + CATEGORY_COUNT_METATAGS
 
   ORDER_METATAGS = %w[
@@ -157,6 +158,8 @@ class PostQueryBuilder
       favorites_include(value)
     when "ordfav"
       ordfav_matches(value)
+    when "unaliased"
+      unaliased_matches(value)
     when "user"
       user_matches(:uploader, value)
     when "approver"
@@ -196,6 +199,15 @@ class PostQueryBuilder
   def tags_include(*tags)
     query = tags.map(&:to_escaped_for_tsquery).join(" & ")
     Post.where("posts.tag_index @@ to_tsquery('danbooru', E?)", query)
+  end
+
+  def unaliased_matches(tag)
+    # don't let users use unaliased:fav:1 to view private favorites
+    if tag =~ /\Afav:\d+\z/
+      Post.none
+    else
+      tags_include(tag)
+    end
   end
 
   def attribute_matches(value, field, type = :integer)

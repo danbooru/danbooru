@@ -1,14 +1,13 @@
 module PostSets
   class Post
     MAX_PER_PAGE = 200
-    attr_reader :page, :raw, :random, :post_count, :format, :tag_string, :query
+    attr_reader :page, :random, :post_count, :format, :tag_string, :query
 
-    def initialize(tags, page = 1, per_page = nil, raw: false, random: false, format: "html")
+    def initialize(tags, page = 1, per_page = nil, random: false, format: "html")
       @query = PostQueryBuilder.new(tags)
       @tag_string = tags
       @page = page
       @per_page = per_page
-      @raw = raw.to_s.truthy?
       @random = random.to_s.truthy?
       @format = format.to_s
     end
@@ -101,8 +100,6 @@ module PostSets
 
         if is_random?
           temp = get_random_posts
-        elsif raw
-          temp = ::Post.raw_tag_match(tag_string).order("posts.id DESC").where("true /* PostSets::Post#posts:1 */").paginate(page, :count => post_count, :limit => per_page)
         else
           temp = ::Post.tag_match(tag_string).where("true /* PostSets::Post#posts:2 */").paginate(page, :count => post_count, :limit => per_page)
         end

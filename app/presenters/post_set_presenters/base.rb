@@ -11,7 +11,7 @@ module PostSetPresenters
       end
 
       posts.each do |post|
-        html << PostPresenter.preview(post, options.merge(:tags => @post_set.tag_string, :raw => @post_set.raw))
+        html << PostPresenter.preview(post, options.merge(:tags => @post_set.tag_string))
         html << "\n"
       end
 
@@ -19,7 +19,7 @@ module PostSetPresenters
     end
 
     def not_shown(post, options)
-      !options[:show_deleted] && post.is_deleted? && @post_set.tag_string !~ /status:(?:all|any|deleted|banned)/ && !@post_set.raw
+      !options[:show_deleted] && post.is_deleted? && @post_set.tag_string !~ /status:(?:all|any|deleted|banned)/
     end
 
     def none_shown(options)

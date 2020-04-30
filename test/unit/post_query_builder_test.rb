@@ -951,6 +951,19 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "filesize:1048576b")
     end
 
+    should "return posts for an unaliased:<tag> search" do
+      post = create(:post, tag_string: "gray_eyes fav:self")
+      create(:tag_alias, antecedent_name: "gray_eyes", consequent_name: "grey_eyes")
+
+      assert_tag_match([], "gray_eyes")
+      assert_tag_match([post], "-gray_eyes")
+
+      assert_tag_match([post], "unaliased:gray_eyes")
+      assert_tag_match([], "-unaliased:gray_eyes")
+
+      assert_tag_match([], "unaliased:fav:#{CurrentUser.id}")
+    end
+
     should "not perform fuzzy matching for an exact filesize search" do
       post = create(:post, file_size: 1.megabyte)
 
