@@ -1070,7 +1070,7 @@ class Post < ApplicationRecord
       tags = tags.to_s
       tags += " rating:s" if CurrentUser.safe_mode?
       tags += " -status:deleted" if CurrentUser.hide_deleted_posts? && !PostQueryBuilder.new(tags).has_metatag?("status")
-      tags = PostQueryBuilder.new(tags).normalize_query
+      tags = PostQueryBuilder.new(tags).normalize_query(normalize_aliases: true)
 
       # Optimize some cases. these are just estimates but at these
       # quantities being off by a few hundred doesn't matter much
