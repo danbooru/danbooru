@@ -21,48 +21,58 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         should "render for an empty tag" do
           get posts_path, params: { tags: "does_not_exist" }
           assert_response :success
+          assert_select "#show-excerpt-link", count: 0
         end
 
         should "render for an artist tag" do
-          create(:post, tag_string: "artist:bkub")
+          create(:post, tag_string: "artist:bkub", rating: "s")
           get posts_path, params: { tags: "bkub" }
           assert_response :success
+          assert_select "#show-excerpt-link", count: 1, text: "Wiki"
 
           artist = create(:artist, name: "bkub")
           get posts_path, params: { tags: "bkub" }
           assert_response :success
+          assert_select "#show-excerpt-link", count: 1, text: "Artist"
 
           artist.update(is_banned: true)
           get posts_path, params: { tags: "bkub" }
           assert_response :success
+          assert_select "#show-excerpt-link", count: 1, text: "Artist"
 
           artist.update(is_banned: false, is_deleted: true)
           get posts_path, params: { tags: "bkub" }
           assert_response :success
+          assert_select "#show-excerpt-link", count: 1, text: "Wiki"
 
           as_user { create(:wiki_page, title: "bkub") }
           get posts_path, params: { tags: "bkub" }
           assert_response :success
+          assert_select "#show-excerpt-link", count: 1, text: "Wiki"
         end
 
         should "render for a tag with a wiki page" do
-          create(:post, tag_string: "char:fumimi")
+          create(:post, tag_string: "char:fumimi", rating: "s")
           get posts_path, params: { tags: "fumimi" }
           assert_response :success
+          assert_select "#show-excerpt-link", count: 1, text: "Wiki"
 
           as_user { @wiki = create(:wiki_page, title: "fumimi") }
           get posts_path, params: { tags: "fumimi" }
           assert_response :success
+          assert_select "#show-excerpt-link", count: 1, text: "Wiki"
 
           as_user { @wiki.update(is_deleted: true) }
           get posts_path, params: { tags: "bkub" }
           assert_response :success
+          assert_select "#show-excerpt-link", count: 0
         end
 
         should "render for a wildcard tag search" do
           create(:post, tag_string: "1girl solo")
           get posts_path(tags: "*girl*")
           assert_response :success
+          assert_select "#show-excerpt-link", count: 0
         end
 
         should "render for a search:all search" do
@@ -80,9 +90,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
       context "with a multi-tag search" do
         should "render" do
-          create(:post, tag_string: "1girl solo")
+          as(create(:user)) do
+            create(:post, tag_string: "1girl solo")
+            create(:wiki_page, title: "1girl")
+          end
+
           get posts_path, params: {:tags => "1girl solo"}
           assert_response :success
+          assert_select "#show-excerpt-link", count: 0
         end
 
         should "render an error when searching for too many tags" do
@@ -97,6 +112,76 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
           assert_response 410
           assert_select "h1", "Search Error"
+        end
+      end
+
+      context "with a pool: search" do
+        setup do
+          CurrentUser.user = create(:user)
+          CurrentUser.ip_addr = "127.0.0.1"
+        end
+
+        teardown do
+          CurrentUser.user = nil
+          CurrentUser.ip_addr = nil
+        end
+
+        should "render for a pool: search" do
+          pool1 = create(:pool)
+          pool2 = create(:pool)
+          create(:post, tag_string: "solo pool:#{pool1.id}", rating: "s")
+          create(:wiki_page, title: "solo")
+
+          get posts_path(tags: "pool:#{pool1.id}")
+          assert_response :success
+          assert_select "#show-excerpt-link", count: 1, text: "Pool"
+
+          get posts_path(tags: "pool:#{pool1.id} rating:s")
+          assert_response :success
+          assert_select "#show-excerpt-link", count: 1, text: "Pool"
+
+          get posts_path(tags: "pool:#{pool1.id} solo")
+          assert_response :success
+          assert_select "#show-excerpt-link", count: 1, text: "Wiki"
+
+          get posts_path(tags: "pool:#{pool1.id} -pool:#{pool2.id}")
+          assert_response :success
+          assert_select "#show-excerpt-link", count: 0
+        end
+      end
+
+      context "with a favgroup: search" do
+        setup do
+          CurrentUser.user = create(:user)
+          CurrentUser.ip_addr = "127.0.0.1"
+        end
+
+        teardown do
+          CurrentUser.user = nil
+          CurrentUser.ip_addr = nil
+        end
+
+        should "render for a favgroup: search" do
+          wiki = create(:wiki_page, title: "solo")
+          post1 = create(:post, tag_string: "solo", rating: "s")
+          favgroup1 = create(:favorite_group, post_ids: [post1.id])
+          favgroup2 = create(:favorite_group)
+
+          get posts_path(tags: "favgroup:#{favgroup1.id}")
+          assert_response :success
+          assert_select "#show-excerpt-link", count: 1, text: "Favorite Group"
+
+          get posts_path(tags: "favgroup:#{favgroup1.id} rating:s")
+          assert_response :success
+          assert_select "#show-excerpt-link", count: 1, text: "Favorite Group"
+
+          get posts_path(tags: "favgroup:#{favgroup1.id} solo")
+          assert_response :success
+          assert_select "#show-excerpt-link", count: 1, text: "Wiki"
+
+          get posts_path(tags: "favgroup:#{favgroup1.id} -favgroup:#{favgroup2.id}")
+          assert_response :success
+          assert_select "#show-excerpt-link", count: 0
         end
       end
 

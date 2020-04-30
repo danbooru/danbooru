@@ -823,8 +823,8 @@ class PostQueryBuilder
       scan_query.select { |term| term.type == :metatag }
     end
 
-    def select_metatags(metatag)
-      metatags.select { |term| term.name == metatag.to_s.downcase }
+    def select_metatags(*names)
+      metatags.select { |term| term.name.in?(names.map(&:to_s)) }
     end
 
     def find_metatag(metatag)
@@ -833,6 +833,10 @@ class PostQueryBuilder
 
     def has_metatag?(*metatag_names)
       metatags.any? { |term| term.name.in?(metatag_names.map(&:to_s).map(&:downcase)) }
+    end
+
+    def has_single_tag?
+      tags.size == 1 && !tags.first.wildcard
     end
 
     def is_metatag?(name, value = nil)

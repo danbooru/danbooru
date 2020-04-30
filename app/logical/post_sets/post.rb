@@ -27,7 +27,7 @@ module PostSets
     end
 
     def tag
-      return nil unless query.is_simple_tag?
+      return nil unless query.has_single_tag?
       @tag ||= Tag.find_by(name: query.tags.first.name)
     end
 
@@ -38,15 +38,17 @@ module PostSets
     end
 
     def pool
-      return nil unless query.is_metatag?(:pool) || query.is_metatag?(:ordpool)
-      name = query.find_metatag(:pool) || query.find_metatag(:ordpool)
+      pool_names = query.select_metatags(:pool, :ordpool).map(&:value)
+      name = pool_names.first
+      return nil unless pool_names.size == 1
 
       @pool ||= Pool.find_by_name(name)
     end
 
     def favgroup
-      return nil unless query.is_metatag?(:favgroup)
-      name = query.find_metatag(:favgroup)
+      favgroup_names = query.select_metatags(:favgroup, :ordfavgroup).map(&:value)
+      name = favgroup_names.first
+      return nil unless favgroup_names.size == 1
 
       @favgroup ||= FavoriteGroup.visible(CurrentUser.user).find_by_name_or_id(name, CurrentUser.user)
     end
