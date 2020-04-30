@@ -656,10 +656,14 @@ class PostQueryBuilder
 
     def split_query
       scan_query.map do |term|
-        if term.type == :metatag && term.value.include?(" ")
-          "#{term.name}:\"#{term.value}\""
-        elsif term.type == :metatag
+        if term.type == :metatag && !term.negated && !term.quoted
           "#{term.name}:#{term.value}"
+        elsif term.type == :metatag && !term.negated && term.quoted
+          "#{term.name}:\"#{term.value}\""
+        elsif term.type == :metatag && term.negated && !term.quoted
+          "-#{term.name}:#{term.value}"
+        elsif term.type == :metatag && term.negated && term.quoted
+          "-#{term.name}:\"#{term.value}\""
         elsif term.type == :tag && term.negated
           "-#{term.name}"
         elsif term.type == :tag && term.optional
