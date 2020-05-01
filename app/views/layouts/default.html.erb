@@ -4,14 +4,7 @@
   <title><%= page_title %></title>
 
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-
-  <% if @current_item.try(:prev_page) %>
-    <%= tag.link rel: "prev", href: url_for(nav_params_for(@current_item.prev_page)) %>
-  <% end %>
-
-  <% if @current_item.try(:next_page) %>
-    <%= tag.link rel: "next", href: url_for(nav_params_for(@current_item.next_page)) %>
-  <% end %>
+  <%= render "meta_links", collection: @current_item %>
 
   <%= csrf_meta_tag %>
   <% unless CurrentUser.enable_desktop_mode? %>

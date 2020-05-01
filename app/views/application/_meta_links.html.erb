@@ -1,0 +1,11 @@
+<%# collection %>
+
+<% content_for(:html_header) do %>
+  <% if collection.try(:prev_page) %>
+    <%= tag.link rel: "prev", href: url_for(nav_params_for(collection.prev_page)) %>
+  <% end %>
+
+  <% if collection.try(:next_page) %>
+    <%= tag.link rel: "next", href: url_for(nav_params_for(collection.next_page)) %>
+  <% end %>
+<% end %>
