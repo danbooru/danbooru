@@ -10,7 +10,8 @@ module Sources
         Strategies::ArtStation,
         Strategies::Nijie,
         Strategies::Pawoo,
-        Strategies::Moebooru
+        Strategies::Moebooru,
+        Strategies::HentaiFoundry
       ]
     end
 
