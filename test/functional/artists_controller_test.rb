@@ -142,6 +142,12 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
           get artists_path(search: { url_matches: url }, format: "json")
           assert_artist_found("masao")
         end
+
+        should "ignore whitespace when searching by URL" do
+          url = " http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939 "
+          get artists_path(search: { url_matches: url }, format: "json")
+          assert_artist_found("masao")
+        end
       end
     end
 

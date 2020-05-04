@@ -222,6 +222,8 @@ class Artist < ApplicationRecord
     end
 
     def url_matches(query)
+      query = query.strip
+
       if query =~ %r!\A/(.*)/\z!
         where(id: ArtistUrl.where_regex(:url, $1).select(:artist_id))
       elsif query.include?("*")
@@ -234,6 +236,8 @@ class Artist < ApplicationRecord
     end
 
     def any_name_or_url_matches(query)
+      query = query.strip
+
       if query =~ %r!\Ahttps?://!i
         url_matches(query)
       else
