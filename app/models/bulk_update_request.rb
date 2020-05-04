@@ -89,8 +89,9 @@ class BulkUpdateRequest < ApplicationRecord
 
     def create_forum_topic
       CurrentUser.as(user) do
+        body = "[bur:#{id}]\n\n#{reason}"
         self.forum_topic = ForumTopic.create(title: title, category_id: 1, creator: user) unless forum_topic.present?
-        self.forum_post = forum_topic.forum_posts.create(body: reason_with_link, creator: user) unless forum_post.present?
+        self.forum_post = forum_topic.forum_posts.create(body: body, creator: user) unless forum_post.present?
         save
       end
     end
@@ -124,10 +125,6 @@ class BulkUpdateRequest < ApplicationRecord
   extend SearchMethods
   include ApprovalMethods
   include ValidationMethods
-
-  def reason_with_link
-    "[bur:#{id}]\n\nReason: #{reason}"
-  end
 
   def script_with_links
     tokens = AliasAndImplicationImporter.tokenize(script)
