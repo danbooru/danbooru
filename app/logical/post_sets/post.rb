@@ -132,8 +132,8 @@ module PostSets
     end
 
     def pending_bulk_update_requests
-      return BulkUpdateRequest.none unless query.is_simple_tag?
-      @pending_bulk_update_requests ||= BulkUpdateRequest.pending.where_array_includes_any(:tags, query.tags.first.name)
+      return BulkUpdateRequest.none unless tag.present?
+      @pending_bulk_update_requests ||= BulkUpdateRequest.pending.where_array_includes_any(:tags, tag.name)
     end
   end
 end
