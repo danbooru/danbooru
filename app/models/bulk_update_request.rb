@@ -15,7 +15,6 @@ class BulkUpdateRequest < ApplicationRecord
   validates_presence_of :title, if: ->(rec) {rec.forum_topic_id.blank?}
   validates_presence_of :forum_topic, if: ->(rec) {rec.forum_topic_id.present?}
   validates_inclusion_of :status, :in => %w(pending approved rejected)
-  validate :script_formatted_correctly
   validate :validate_script, :on => :create
 
   after_create :create_forum_topic
@@ -110,15 +109,9 @@ class BulkUpdateRequest < ApplicationRecord
   end
 
   module ValidationMethods
-    def script_formatted_correctly
-      AliasAndImplicationImporter.tokenize(script)
-    rescue StandardError => e
-      errors[:base] << e.message
-    end
-
     def validate_script
       AliasAndImplicationImporter.new(script, forum_topic_id, "1", skip_secondary_validations).validate!
-    rescue RuntimeError => e
+    rescue AliasAndImplicationImporter::Error => e
       errors[:base] << e.message
     end
   end

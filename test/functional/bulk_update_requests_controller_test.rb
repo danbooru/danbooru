@@ -30,6 +30,13 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      should "fail for an invalid script" do
+        assert_difference("BulkUpdateRequest.count", 0) do
+          post_auth bulk_update_requests_path, @user, params: { bulk_update_request: attributes_for(:bulk_update_request).merge(script: "create alis gray -> grey") }
+          assert_response :success
+        end
+      end
+
       should "fail for a blank reason" do
         assert_difference("BulkUpdateRequest.count", 0) do
           post_auth bulk_update_requests_path, @user, params: { bulk_update_request: attributes_for(:bulk_update_request).merge(reason: "") }

@@ -73,7 +73,7 @@ class AliasAndImplicationImporter
         # okay
 
       else
-        raise Error, "Unknown token: #{token[0]}"
+        raise NotImplementedError, "Unknown token: #{token[0]}" # should never happen
       end
     end
   end
@@ -90,6 +90,8 @@ class AliasAndImplicationImporter
         args[0]
       end
     end.sort.uniq
+  rescue Error
+    []
   end
 
   private
