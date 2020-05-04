@@ -10,6 +10,7 @@ class BulkUpdateRequest < ApplicationRecord
 
   before_validation :normalize_text
   before_validation :update_tags
+  validates_presence_of :reason, on: :create
   validates_presence_of :script
   validates_presence_of :title, if: ->(rec) {rec.forum_topic_id.blank?}
   validates_presence_of :forum_topic, if: ->(rec) {rec.forum_topic_id.present?}

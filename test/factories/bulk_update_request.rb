@@ -3,6 +3,7 @@ FactoryBot.define do
     user
     title {"xxx"}
     script {"create alias aaa -> bbb"}
+    reason { FFaker::Lorem.sentences.join(" ") }
     skip_secondary_validations {true}
   end
 end

@@ -25,8 +25,15 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
     context "#create" do
       should "succeed" do
         assert_difference("BulkUpdateRequest.count", 1) do
-          post_auth bulk_update_requests_path, @user, params: {bulk_update_request: {skip_secondary_validations: "1", script: "create alias aaa -> bbb", title: "xxx"}}
+          post_auth bulk_update_requests_path, @user, params: { bulk_update_request: attributes_for(:bulk_update_request) }
           assert_response :redirect
+        end
+      end
+
+      should "fail for a blank reason" do
+        assert_difference("BulkUpdateRequest.count", 0) do
+          post_auth bulk_update_requests_path, @user, params: { bulk_update_request: attributes_for(:bulk_update_request).merge(reason: "") }
+          assert_response :success
         end
       end
     end
