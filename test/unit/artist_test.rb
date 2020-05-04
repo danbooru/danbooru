@@ -74,13 +74,17 @@ class ArtistTest < ActiveSupport::TestCase
       end
 
       should "allow unbanning" do
+        assert_equal(true, @artist.reload.is_banned?)
+        assert_equal(true, @post.reload.is_banned?)
+        assert_equal(true, @artist.versions.last.is_banned?)
+
         assert_difference("TagImplication.count", -1) do
           @artist.unban!
         end
-        @post.reload
-        @artist.reload
-        assert(!@artist.is_banned?, "artist should not be banned")
-        assert(!@post.is_banned?, "post should not be banned")
+
+        assert_equal(false, @artist.reload.is_banned?)
+        assert_equal(false, @post.reload.is_banned?)
+        assert_equal(false, @artist.versions.last.is_banned?)
         assert_equal("aaa", @post.tag_string)
       end
 
@@ -101,6 +105,10 @@ class ArtistTest < ActiveSupport::TestCase
       should "set the approver of the banned_artist implication" do
         ta = TagImplication.where(:antecedent_name => "aaa", :consequent_name => "banned_artist").first
         assert_equal(@admin.id, ta.approver.id)
+      end
+
+      should "update the artist history" do
+        assert_equal(true, @artist.versions.last.is_banned?)
       end
     end
 

@@ -111,7 +111,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
     context "unban action" do
       should "unban an artist" do
-        @artist.ban!(banner: @admin)
+        as(@admin) { @artist.ban!(banner: @admin) }
         put_auth unban_artist_path(@artist.id), @admin
 
         assert_redirected_to(@artist)

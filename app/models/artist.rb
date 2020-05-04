@@ -178,7 +178,7 @@ class Artist < ApplicationRecord
             post.update(tag_string: fixed_tags)
           end
 
-          update_column(:is_banned, false)
+          update!(is_banned: false)
           ModAction.log("unbanned artist ##{id}", :artist_unban)
         end
       end
@@ -195,7 +195,7 @@ class Artist < ApplicationRecord
             tag_implication.approve!(approver: banner)
           end
 
-          update_column(:is_banned, true)
+          update!(is_banned: true)
           ModAction.log("banned artist ##{id}", :artist_ban)
         end
       end
