@@ -2,63 +2,12 @@ class UploadService
   module Utils
     module_function
 
-    def file_header_to_file_ext(file)
-      case File.read(file.path, 16)
-      when /^\xff\xd8/n
-        "jpg"
-      when /^GIF87a/, /^GIF89a/
-        "gif"
-      when /^\x89PNG\r\n\x1a\n/n
-        "png"
-      when /^CWS/, /^FWS/, /^ZWS/
-        "swf"
-      when /^\x1a\x45\xdf\xa3/n
-        "webm"
-      when /^....ftyp(?:isom|3gp5|mp42|MSNV|avc1)/
-        "mp4"
-      when /^PK\x03\x04/
-        "zip"
-      else
-        "bin"
-      end
-    end
-
     def corrupt?(filename)
       image = Vips::Image.new_from_file(filename, fail: true)
       image.stats
       false
     rescue Vips::Error
       true
-    end
-
-    def calculate_ugoira_dimensions(source_path)
-      folder = Zip::File.new(source_path)
-      Tempfile.open("ugoira-dim-") do |tempfile|
-        folder.first.extract(tempfile.path) { true }
-        image_size = ImageSpec.new(tempfile.path)
-        return [image_size.width, image_size.height]
-      end
-    end
-
-    def calculate_dimensions(upload, file)
-      if upload.is_video?
-        video = FFMPEG::Movie.new(file.path)
-        yield(video.width, video.height)
-
-      elsif upload.is_ugoira?
-        w, h = calculate_ugoira_dimensions(file.path)
-        yield(w, h)
-
-      elsif upload.is_image? || upload.is_flash?
-        image_size = ImageSpec.new(file.path)
-        yield(image_size.width, image_size.height)
-
-      elsif upload.file_ext == "bin"
-        yield(0, 0)
-
-      else
-        raise ArgumentError, "unhandled file type (#{upload.file_ext})" # should not happen
-      end
     end
 
     def distribute_files(file, record, type, original_post_id: nil)
@@ -120,15 +69,15 @@ class UploadService
     end
 
     def process_file(upload, file, original_post_id: nil)
-      upload.file = file
-      upload.file_ext = Utils.file_header_to_file_ext(file)
-      upload.file_size = file.size
-      upload.md5 = Digest::MD5.file(file.path).hexdigest
+      binding.pry if !file.is_a? Tempfile
+      media_file = MediaFile.open(file)
 
-      Utils.calculate_dimensions(upload, file) do |width, height|
-        upload.image_width = width
-        upload.image_height = height
-      end
+      upload.file = file
+      upload.file_ext = media_file.file_ext.to_s
+      upload.file_size = media_file.file_size
+      upload.md5 = media_file.md5
+      upload.image_width = media_file.width
+      upload.image_height = media_file.height
 
       upload.validate!(:file)
       upload.tag_string = "#{upload.tag_string} #{Utils.automatic_tags(upload, file)}"

@@ -48,7 +48,7 @@ class UploadService
 
       @upload.update(status: "processing")
 
-      @upload.file = Utils.get_file_for_upload(@upload, file: @upload.file)
+      @upload.file = Utils.get_file_for_upload(@upload, file: @upload.file&.tempfile)
       Utils.process_file(upload, @upload.file)
 
       @upload.save!

@@ -90,7 +90,7 @@ class UploadService
       begin
         upload.update(status: "preprocessing")
 
-        file = Utils.get_file_for_upload(upload, file: params[:file])
+        file = Utils.get_file_for_upload(upload, file: params[:file]&.tempfile)
         Utils.process_file(upload, file, original_post_id: original_post_id)
 
         upload.rating = params[:rating]
@@ -116,7 +116,7 @@ class UploadService
       # if a file was uploaded after the preprocessing occurred,
       # then process the file and overwrite whatever the preprocessor
       # did
-      Utils.process_file(pred, pred.file) if pred.file.present?
+      Utils.process_file(pred, pred.file.tempfile) if pred.file.present?
 
       pred.status = "completed"
       pred.save

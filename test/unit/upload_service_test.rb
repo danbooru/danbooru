@@ -77,105 +77,21 @@ class UploadServiceTest < ActiveSupport::TestCase
       end
     end
 
-    context ".calculate_ugoira_dimensions" do
-      context "for a valid ugoira file" do
-        setup do
-          @path = "test/files/valid_ugoira.zip"
-        end
-
-        should "extract the dimensions" do
-          w, h = subject.calculate_ugoira_dimensions(@path)
-          assert_operator(w, :>, 0)
-          assert_operator(h, :>, 0)
-        end
-      end
-
-      context "for an invalid ugoira file" do
-        setup do
-          @path = "test/files/invalid_ugoira.zip"
-        end
-
-        should "raise an error" do
-          assert_raises(ImageSpec::Error) do
-            subject.calculate_ugoira_dimensions(@path)
-          end
-        end
-      end
-    end
-
-    context ".calculate_dimensions" do
-      context "for an ugoira" do
-        setup do
-          @file = File.open("test/files/valid_ugoira.zip", "rb")
-          @upload = Upload.new(file_ext: "zip")
-        end
-
-        teardown do
-          @file.close
-        end
-
-        should "return the dimensions" do
-          subject.expects(:calculate_ugoira_dimensions).once.returns([60, 60])
-          subject.calculate_dimensions(@upload, @file) do |w, h|
-            assert_operator(w, :>, 0)
-            assert_operator(h, :>, 0)
-          end
-        end
-      end
-
-      context "for a video" do
-        setup do
-          @file = File.open("test/files/test-300x300.mp4", "rb")
-          @upload = Upload.new(file_ext: "mp4")
-        end
-
-        teardown do
-          @file.close
-        end
-
-        should "return the dimensions" do
-          subject.calculate_dimensions(@upload, @file) do |w, h|
-            assert_operator(w, :>, 0)
-            assert_operator(h, :>, 0)
-          end
-        end
-      end
-
-      context "for an image" do
-        setup do
-          @file = File.open("test/files/test.jpg", "rb")
-          @upload = Upload.new(file_ext: "jpg")
-        end
-
-        teardown do
-          @file.close
-        end
-
-        should "find the dimensions" do
-          subject.calculate_dimensions(@upload, @file) do |w, h|
-            assert_operator(w, :>, 0)
-            assert_operator(h, :>, 0)
-          end
-        end
-      end
-    end
-
     context ".process_file" do
       setup do
         @upload = FactoryBot.build(:jpg_upload)
-        @file = @upload.file
       end
 
       context "with an original_post_id" do
         should "run" do
           subject.expects(:distribute_files).times(3)
-          subject.process_file(@upload, @file, original_post_id: 12345)
+          subject.process_file(@upload, @upload.file.tempfile, original_post_id: 12345)
         end
       end
 
       should "run" do
         subject.expects(:distribute_files).times(3)
-        subject.process_file(@upload, @file)
+        subject.process_file(@upload, @upload.file.tempfile)
         assert_equal("jpg", @upload.file_ext)
         assert_equal(28086, @upload.file_size)
         assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", @upload.md5)
@@ -188,7 +104,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       context "for an ugoira" do
         setup do
           context = UGOIRA_CONTEXT
-          @file = File.open("test/fixtures/ugoira.zip", "rb")
+          @file = upload_file("test/fixtures/ugoira.zip")
           @upload = mock
           @upload.stubs(:is_video?).returns(false)
           @upload.stubs(:is_ugoira?).returns(true)
@@ -220,7 +136,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         context "for an mp4" do
           setup do
-            @file = File.open("test/files/test-300x300.mp4", "rb")
+            @file = upload_file("test/files/test-300x300.mp4")
             @upload = mock
             @upload.stubs(:is_video?).returns(true)
             @upload.stubs(:is_ugoira?).returns(false)
@@ -243,7 +159,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         context "for a webm" do
           setup do
-            @file = File.open("test/files/test-512x512.webm", "rb")
+            @file = upload_file("test/files/test-512x512.webm")
             @upload = mock
             @upload.stubs(:is_video?).returns(true)
             @upload.stubs(:is_ugoira?).returns(false)
@@ -281,7 +197,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         context "for a jpeg" do
           setup do
-            @file = File.open("test/files/test.jpg", "rb")
+            @file = upload_file("test/files/test.jpg")
           end
 
           should "generate a preview" do
@@ -298,7 +214,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         context "for a png" do
           setup do
-            @file = File.open("test/files/test.png", "rb")
+            @file = upload_file("test/files/test.png")
           end
 
           should "generate a preview" do
@@ -315,7 +231,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         context "for a gif" do
           setup do
-            @file = File.open("test/files/test.png", "rb")
+            @file = upload_file("test/files/test.png")
           end
 
           should "generate a preview" do
