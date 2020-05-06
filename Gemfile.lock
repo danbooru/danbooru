@@ -5,13 +5,6 @@ GIT
     dtext_rb (1.10.5)
       nokogiri (~> 1.8)
 
-GIT
-  remote: https://github.com/r888888888/ruby-imagespec.git
-  revision: 2dab9811f4abb4fbaeea66feb42e388ba545b2d8
-  branch: exif-fixes
-  specs:
-    ruby-imagespec (0.3.1)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -456,7 +449,6 @@ DEPENDENCIES
   request_store
   responders
   retriable
-  ruby-imagespec!
   ruby-vips
   rubyzip
   sanitize
