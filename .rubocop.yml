@@ -2,7 +2,7 @@ require:
   - rubocop-rails
 
 AllCops:
-  TargetRubyVersion: 2.6.5
+  TargetRubyVersion: 2.7.0
   Exclude:
     - "bin/*"
     - "node_modules/**/*"
@@ -45,9 +45,6 @@ Naming/MethodParameterName:
 
 Style/AsciiComments:
   Enabled: false
-
-Style/BracesAroundHashParameters:
-  EnforcedStyle: context_dependent
 
 Style/CommentAnnotation:
   Enabled: false

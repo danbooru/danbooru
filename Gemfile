@@ -60,6 +60,8 @@ group :production do
 end
 
 group :development do
+  gem 'rubocop'
+  gem 'rubocop-rails'
   gem 'sinatra'
   gem 'meta_request'
   gem 'rack-mini-profiler'
