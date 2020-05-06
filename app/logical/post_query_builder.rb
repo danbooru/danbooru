@@ -810,6 +810,89 @@ class PostQueryBuilder
     end
   end
 
+  concerning :CountMethods do
+    def fast_count(timeout: 1_000, raise_on_timeout: false, skip_cache: false)
+      tags = normalize_query(normalize_aliases: true)
+      tags += " rating:s" if CurrentUser.safe_mode?
+      tags += " -status:deleted" if CurrentUser.hide_deleted_posts? && !has_metatag?("status")
+      tags = tags.strip
+
+      # Optimize some cases. these are just estimates but at these
+      # quantities being off by a few hundred doesn't matter much
+      if Danbooru.config.estimate_post_counts
+        if tags == ""
+          return (Post.maximum(:id).to_i * (2200402.0 / 2232212)).floor
+
+        elsif tags =~ /^rating:s(?:afe)?$/
+          return (Post.maximum(:id).to_i * (1648652.0 / 2200402)).floor
+
+        elsif tags =~ /^rating:q(?:uestionable)?$/
+          return (Post.maximum(:id).to_i * (350101.0 / 2200402)).floor
+
+        elsif tags =~ /^rating:e(?:xplicit)?$/
+          return (Post.maximum(:id).to_i * (201650.0 / 2200402)).floor
+
+        end
+      end
+
+      count = nil
+
+      unless skip_cache
+        count = get_count_from_cache(tags)
+      end
+
+      if count.nil?
+        count = fast_count_search(tags, timeout: timeout, raise_on_timeout: raise_on_timeout)
+      end
+
+      count
+    rescue Post::SearchError
+      0
+    end
+
+    def fast_count_search(tags, timeout:, raise_on_timeout:)
+      count = Post.with_timeout(timeout, nil, tags: tags) do
+        Post.tag_match(tags).count
+      end
+
+      if count.nil?
+        # give up
+        if raise_on_timeout
+          raise TimeoutError.new("timed out")
+        end
+
+        count = Danbooru.config.blank_tag_search_fast_count
+      else
+        set_count_in_cache(tags, count)
+      end
+
+      count ? count.to_i : nil
+    rescue PG::ConnectionBad
+      return nil
+    end
+
+    def get_count_from_cache(tags)
+      if PostQueryBuilder.new(tags).is_simple_tag?
+        count = Tag.find_by(name: tags).try(:post_count)
+      else
+        # this will only have a value for multi-tag searches or single metatag searches
+        count = Cache.get(count_cache_key(tags))
+      end
+
+      count.try(:to_i)
+    end
+
+    def set_count_in_cache(tags, count, expiry = nil)
+      expiry ||= count.seconds.clamp(3.minutes, 20.hours).to_i
+
+      Cache.put(count_cache_key(tags), count, expiry)
+    end
+
+    def count_cache_key(tags)
+      "pfc:#{Cache.hash(tags)}"
+    end
+  end
+
   concerning :UtilityMethods do
     def terms
       scan_query

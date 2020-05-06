@@ -9,7 +9,7 @@ class CountsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "render an error during a timeout" do
-        Post.stubs(:fast_count).raises(Post::TimeoutError.new)
+        PostQueryBuilder.any_instance.stubs(:fast_count).raises(Post::TimeoutError.new)
         get posts_counts_path
         assert_response :error
       end

@@ -1,6 +1,6 @@
 module RelatedTagCalculator
   def self.similar_tags_for_search(tag_query, search_sample_size: 1000, tag_sample_size: 250, category: nil)
-    search_count = Post.fast_count(tag_query)
+    search_count = PostQueryBuilder.new(tag_query).fast_count
     return [] if search_count.nil?
 
     search_sample_size = [search_count, search_sample_size].min

@@ -5,6 +5,10 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     assert_equal(posts.map(&:id), Post.tag_match(query).pluck(:id))
   end
 
+  def assert_fast_count(count, query, **options)
+    assert_equal(count, PostQueryBuilder.new(query).fast_count(**options))
+  end
+
   setup do
     CurrentUser.user = create(:user)
     CurrentUser.ip_addr = "127.0.0.1"
@@ -1060,6 +1064,111 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_equal('bbb commentary:"true"', PostQueryBuilder.new("bbb commentary:'true'").normalize_query)
       assert_equal('-commentary:true bbb', PostQueryBuilder.new("bbb -commentary:true").normalize_query)
       assert_equal('-commentary:"true" bbb', PostQueryBuilder.new("bbb -commentary:'true'").normalize_query)
+    end
+  end
+
+  context "#fast_count" do
+    setup do
+      Danbooru.config.stubs(:blank_tag_search_fast_count).returns(nil)
+      Danbooru.config.stubs(:estimate_post_counts).returns(false)
+      create(:tag, name: "grey_skirt", post_count: 100)
+      create(:tag_alias, antecedent_name: "gray_skirt", consequent_name: "grey_skirt")
+      create(:post, tag_string: "aaa", score: 42)
+    end
+
+    context "for a single basic tag" do
+      should "return the post_count from the tags table" do
+        assert_fast_count(100, "grey_skirt")
+      end
+    end
+
+    context "for a aliased tag" do
+      should "return the post count of the consequent tag" do
+        assert_fast_count(100, "gray_skirt")
+      end
+    end
+
+    context "for a single metatag" do
+      should "return the correct cached count" do
+        build(:tag, name: "score:42", post_count: -100).save(validate: false)
+        PostQueryBuilder.new(nil).set_count_in_cache("score:42", 100)
+        assert_fast_count(100, "score:42")
+      end
+
+      should "return the correct cached count for a pool:<id> search" do
+        build(:tag, name: "pool:1234", post_count: -100).save(validate: false)
+        PostQueryBuilder.new(nil).set_count_in_cache("pool:1234", 100)
+        assert_fast_count(100, "pool:1234")
+      end
+    end
+
+    context "for a multi-tag search" do
+      should "return the cached count, if it exists" do
+        PostQueryBuilder.new(nil).set_count_in_cache("aaa score:42", 100)
+        assert_fast_count(100, "aaa score:42")
+      end
+
+      should "return the true count, if not cached" do
+        assert_fast_count(1, "aaa score:42")
+      end
+
+      should "set the expiration time" do
+        Cache.expects(:put).with(PostQueryBuilder.new(nil).count_cache_key("aaa score:42"), 1, 180)
+        PostQueryBuilder.new("aaa score:42").fast_count
+      end
+
+      should "work with the hide_deleted_posts option turned on" do
+        user = create(:user, hide_deleted_posts: true)
+        as(user) do
+          assert_fast_count(1, "aaa score:42")
+        end
+      end
+    end
+
+    context "a blank search" do
+      should "should execute a search" do
+        assert_fast_count(1, "")
+      end
+
+      context "with a primed cache" do
+        should "fetch the value from the cache" do
+          PostQueryBuilder.new(nil).set_count_in_cache("", 100)
+          assert_fast_count(100, "")
+        end
+      end
+
+      should "return 0 for a nonexisting tag" do
+        assert_fast_count(0, "bbb")
+      end
+
+      context "in safe mode" do
+        setup do
+          CurrentUser.stubs(:safe_mode?).returns(true)
+          create(:post, rating: "s")
+        end
+
+        should "work for a blank search" do
+          assert_fast_count(1, "")
+        end
+
+        should "work for a nil search" do
+          assert_fast_count(1, nil)
+        end
+
+        should "not fail for a two tag search by a member" do
+          post1 = create(:post, tag_string: "aaa bbb rating:s")
+          post2 = create(:post, tag_string: "aaa bbb rating:e")
+
+          assert_fast_count(1, "aaa bbb")
+        end
+
+        context "with a primed cache" do
+          should "fetch the value from the cache" do
+            PostQueryBuilder.new(nil).set_count_in_cache("rating:s", 100)
+            assert_fast_count(100, "")
+          end
+        end
+      end
     end
   end
 end

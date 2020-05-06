@@ -86,7 +86,7 @@ module PostSets
         # no need to get counts for formats that don't use a paginator
         return Danbooru.config.blank_tag_search_fast_count
       else
-        ::Post.fast_count(tag_string)
+        query.fast_count
       end
     end
 
