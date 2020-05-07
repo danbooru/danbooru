@@ -53,15 +53,18 @@ class PostQueryBuilder
     COUNT_METATAG_SYNONYMS.flat_map { |str| [str, "#{str}_asc"] } +
     CATEGORY_COUNT_METATAGS.flat_map { |str| [str, "#{str}_asc"] }
 
-  attr_reader :query_string, :current_user, :safe_mode, :hide_deleted_posts
+  attr_reader :query_string, :terms, :current_user, :safe_mode, :hide_deleted_posts
   alias_method :safe_mode?, :safe_mode
   alias_method :hide_deleted_posts?, :hide_deleted_posts
 
-  def initialize(query_string, current_user = User.anonymous, safe_mode: false, hide_deleted_posts: false)
+  def initialize(query_string, current_user = User.anonymous, normalize_aliases: true, normalize_order: true, safe_mode: false, hide_deleted_posts: false)
     @query_string = query_string
     @current_user = current_user
     @safe_mode = safe_mode
     @hide_deleted_posts = hide_deleted_posts
+    @terms = scan_query
+    normalize_aliases! if normalize_aliases
+    normalize_order! if normalize_order
   end
 
   def tags_match(tags, relation)
@@ -71,9 +74,9 @@ class PostQueryBuilder
     optional_wildcard_tags, optional_tags = tags.select(&:optional).partition(&:wildcard)
     required_wildcard_tags, required_tags = tags.reject(&:negated).reject(&:optional).partition(&:wildcard)
 
-    negated_tags = TagAlias.to_aliased(negated_tags.map(&:name))
-    optional_tags = TagAlias.to_aliased(optional_tags.map(&:name))
-    required_tags = TagAlias.to_aliased(required_tags.map(&:name))
+    negated_tags = negated_tags.map(&:name)
+    optional_tags = optional_tags.map(&:name)
+    required_tags = required_tags.map(&:name)
 
     negated_tags += negated_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name) }
     optional_tags += optional_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name) }
@@ -671,7 +674,7 @@ class PostQueryBuilder
     end
 
     def split_query
-      scan_query.map do |term|
+      terms.map do |term|
         if term.type == :metatag && !term.negated && !term.quoted
           "#{term.name}:#{term.value}"
         elsif term.type == :metatag && !term.negated && term.quoted
@@ -690,13 +693,18 @@ class PostQueryBuilder
       end
     end
 
-    def normalize_query(normalize_aliases: false, sort: true)
-      tags = split_query
-      tags = tags.map { |t| Tag.normalize_name(t) }
-      tags = TagAlias.to_aliased(tags) if normalize_aliases
-      tags = tags.sort if sort
-      tags = tags.uniq
-      tags.join(" ")
+    def normalize_aliases!
+      tag_names = tags.map(&:name)
+      tag_aliases = tag_names.zip(TagAlias.to_aliased(tag_names)).to_h
+
+      terms.map! do |term|
+        term.name = tag_aliases[term.name] if term.type == :tag
+        term
+      end
+    end
+
+    def normalize_order!
+      terms.sort_by!(&:to_s).uniq!
     end
 
     def parse_tag_edit
@@ -816,7 +824,7 @@ class PostQueryBuilder
 
   concerning :CountMethods do
     def fast_count(timeout: 1_000, raise_on_timeout: false, skip_cache: false)
-      tags = normalize_query(normalize_aliases: true)
+      tags = to_s
       tags += " rating:s" if safe_mode?
       tags += " -status:deleted" if hide_deleted?
       tags = tags.strip
@@ -876,7 +884,7 @@ class PostQueryBuilder
     end
 
     def get_count_from_cache(tags)
-      if PostQueryBuilder.new(tags).is_simple_tag?
+      if PostQueryBuilder.new(tags, normalize_aliases: false).is_simple_tag?
         count = Tag.find_by(name: tags).try(:post_count)
       else
         # this will only have a value for multi-tag searches or single metatag searches
@@ -898,16 +906,16 @@ class PostQueryBuilder
   end
 
   concerning :UtilityMethods do
-    def terms
-      scan_query
+    def to_s
+      split_query.join(" ")
     end
 
     def tags
-      scan_query.select { |term| term.type == :tag }
+      terms.select { |term| term.type == :tag }
     end
 
     def metatags
-      scan_query.select { |term| term.type == :metatag }
+      terms.select { |term| term.type == :metatag }
     end
 
     def select_metatags(*names)
@@ -935,11 +943,11 @@ class PostQueryBuilder
     end
 
     def is_empty_search?
-      scan_query.size == 0
+      terms.size == 0
     end
 
     def is_single_term?
-      scan_query.size == 1
+      terms.size == 1
     end
 
     def is_single_tag?
@@ -956,5 +964,5 @@ class PostQueryBuilder
     end
   end
 
-  memoize :scan_query, :split_query, :normalize_query
+  memoize :split_query
 end

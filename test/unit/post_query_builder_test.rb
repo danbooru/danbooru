@@ -1018,7 +1018,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
   context "Parsing:" do
     should "split a query" do
       assert_equal(%w(aaa bbb), PostQueryBuilder.new("aaa bbb").split_query)
-      assert_equal(%w(~aaa -bbb* -bbb*), PostQueryBuilder.new("~AAa -BBB* -bbb*").split_query)
+      assert_equal(%w(~aaa -bbb*), PostQueryBuilder.new("~AAa -BBB* -bbb*").split_query)
     end
 
     should "not strip out valid characters when scanning" do
@@ -1054,19 +1054,18 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     should "work" do
       create(:tag_alias, antecedent_name: "gray", consequent_name: "grey")
 
-      assert_equal("foo", PostQueryBuilder.new("foo").normalize_query)
-      assert_equal("foo", PostQueryBuilder.new(" foo ").normalize_query)
-      assert_equal("foo", PostQueryBuilder.new("FOO").normalize_query)
-      assert_equal("foo", PostQueryBuilder.new("foo foo").normalize_query)
-      assert_equal("gray", PostQueryBuilder.new("gray").normalize_query)
-      assert_equal("grey", PostQueryBuilder.new("gray").normalize_query(normalize_aliases: true))
-      assert_equal("aaa bbb", PostQueryBuilder.new("bbb aaa").normalize_query)
-      assert_equal("-aaa bbb", PostQueryBuilder.new("bbb -aaa").normalize_query)
-      assert_equal("~aaa ~bbb", PostQueryBuilder.new("~bbb ~aaa").normalize_query)
-      assert_equal("bbb commentary:true", PostQueryBuilder.new("bbb commentary:true").normalize_query)
-      assert_equal('bbb commentary:"true"', PostQueryBuilder.new("bbb commentary:'true'").normalize_query)
-      assert_equal('-commentary:true bbb', PostQueryBuilder.new("bbb -commentary:true").normalize_query)
-      assert_equal('-commentary:"true" bbb', PostQueryBuilder.new("bbb -commentary:'true'").normalize_query)
+      assert_equal("foo", PostQueryBuilder.new("foo").to_s)
+      assert_equal("foo", PostQueryBuilder.new(" foo ").to_s)
+      assert_equal("foo", PostQueryBuilder.new("FOO").to_s)
+      assert_equal("foo", PostQueryBuilder.new("foo foo").to_s)
+      assert_equal("grey", PostQueryBuilder.new("gray").to_s)
+      assert_equal("aaa bbb", PostQueryBuilder.new("bbb aaa").to_s)
+      assert_equal("-aaa bbb", PostQueryBuilder.new("bbb -aaa").to_s)
+      assert_equal("~aaa ~bbb", PostQueryBuilder.new("~bbb ~aaa").to_s)
+      assert_equal("commentary:true bbb", PostQueryBuilder.new("bbb commentary:true").to_s)
+      assert_equal('commentary:"true" bbb', PostQueryBuilder.new("bbb commentary:'true'").to_s)
+      assert_equal('-commentary:true bbb', PostQueryBuilder.new("bbb -commentary:true").to_s)
+      assert_equal('-commentary:"true" bbb', PostQueryBuilder.new("bbb -commentary:'true'").to_s)
     end
   end
 
@@ -1107,7 +1106,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     context "for a multi-tag search" do
       should "return the cached count, if it exists" do
-        PostQueryBuilder.new(nil).set_count_in_cache("aaa score:42", 100)
+        PostQueryBuilder.new(nil).set_count_in_cache("score:42 aaa", 100)
         assert_fast_count(100, "aaa score:42")
       end
 
@@ -1116,7 +1115,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       end
 
       should "set the expiration time" do
-        Cache.expects(:put).with(PostQueryBuilder.new(nil).count_cache_key("aaa score:42"), 1, 180)
+        Cache.expects(:put).with(PostQueryBuilder.new(nil).count_cache_key("score:42 aaa"), 1, 180)
         PostQueryBuilder.new("aaa score:42").fast_count
       end
 

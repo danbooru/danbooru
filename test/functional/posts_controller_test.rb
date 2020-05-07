@@ -68,6 +68,17 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_select "#show-excerpt-link", count: 0
         end
 
+        should "render for an aliased tag" do
+          create(:tag_alias, antecedent_name: "/lav", consequent_name: "looking_at_viewer")
+          as(@user) { create(:wiki_page, title: "looking_at_viewer") }
+          @post = create(:post, tag_string: "looking_at_viewer", rating: "s")
+
+          get posts_path, params: { tags: "/lav" }
+          assert_response :success
+          assert_select "#post_#{@post.id}", count: 1
+          assert_select "#excerpt .wiki-link[href='/wiki_pages/looking_at_viewer']", count: 1
+        end
+
         should "render for a wildcard tag search" do
           create(:post, tag_string: "1girl solo")
           get posts_path(tags: "*girl*")

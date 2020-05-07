@@ -6,8 +6,8 @@ class TagBatchChangeJob < ApplicationJob
   def perform(antecedent, consequent, updater, updater_ip_addr)
     raise Error.new("antecedent is missing") if antecedent.blank?
 
-    normalized_antecedent = TagAlias.to_aliased(PostQueryBuilder.new(antecedent.mb_chars.downcase).split_query)
-    normalized_consequent = TagAlias.to_aliased(PostQueryBuilder.new(consequent.mb_chars.downcase).parse_tag_edit)
+    normalized_antecedent = PostQueryBuilder.new(antecedent).split_query
+    normalized_consequent = PostQueryBuilder.new(consequent).parse_tag_edit
 
     CurrentUser.scoped(updater, updater_ip_addr) do
       migrate_posts(normalized_antecedent, normalized_consequent)

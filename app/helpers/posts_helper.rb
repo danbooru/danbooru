@@ -13,14 +13,12 @@ module PostsHelper
     params[:tags] =~ /order:rank/ || params[:action] =~ /searches|viewed/
   end
 
-  def missed_post_search_count_js(post_set)
-    tags = post_set.query.normalize_query
+  def missed_post_search_count_js(tags)
     sig = generate_reportbooru_signature(tags)
     render "posts/partials/index/missed_search_count", sig: sig
   end
 
-  def post_search_count_js(post_set)
-    tags = post_set.query.normalize_query
+  def post_search_count_js(tags)
     sig = generate_reportbooru_signature("ps-#{tags}")
     render "posts/partials/index/search_count", sig: sig
   end

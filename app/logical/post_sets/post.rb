@@ -103,7 +103,7 @@ module PostSets
         if is_random?
           temp = get_random_posts
         else
-          temp = ::Post.user_tag_match(tag_string).where("true /* PostSets::Post#posts:2 */").paginate(page, :count => post_count, :limit => per_page)
+          temp = query.build.paginate(page, count: post_count, limit: per_page)
         end
       end
     end

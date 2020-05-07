@@ -604,7 +604,7 @@ class Post < ApplicationRecord
         # If someone else committed changes to this post before we did,
         # then try to merge the tag changes together.
         current_tags = tag_string_was.split
-        new_tags = PostQueryBuilder.new(tag_string).split_query
+        new_tags = PostQueryBuilder.new(tag_string, normalize_aliases: false).parse_tag_edit
         old_tags = old_tag_string.split
 
         kept_tags = current_tags & new_tags
@@ -642,7 +642,7 @@ class Post < ApplicationRecord
     end
 
     def normalize_tags
-      normalized_tags = PostQueryBuilder.new(tag_string).split_query
+      normalized_tags = PostQueryBuilder.new(tag_string, normalize_aliases: false).parse_tag_edit
       normalized_tags = apply_casesensitive_metatags(normalized_tags)
       normalized_tags = normalized_tags.map(&:downcase)
       normalized_tags = filter_metatags(normalized_tags)
