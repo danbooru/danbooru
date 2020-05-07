@@ -47,7 +47,7 @@ class RelatedTagQuery
   end
 
   def similar_tags
-    @similar_tags ||= RelatedTagCalculator.similar_tags_for_search(query, category: category_of).take(limit)
+    @similar_tags ||= RelatedTagCalculator.similar_tags_for_search(query, user, category: category_of).take(limit)
   end
 
   # Returns the top 20 most frequently added tags within the last 20 edits made by the user in the last hour.

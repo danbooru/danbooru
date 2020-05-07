@@ -73,20 +73,6 @@ class CurrentUser
     RequestStore[:safe_mode]
   end
 
-  def self.admin_mode?
-    RequestStore[:admin_mode]
-  end
-
-  def self.without_safe_mode
-    prev = RequestStore[:safe_mode]
-    RequestStore[:safe_mode] = false
-    RequestStore[:admin_mode] = true
-    yield
-  ensure
-    RequestStore[:safe_mode] = prev
-    RequestStore[:admin_mode] = false
-  end
-
   def self.safe_mode=(safe_mode)
     RequestStore[:safe_mode] = safe_mode
   end

@@ -9,19 +9,17 @@ class TagBatchChangeJob < ApplicationJob
     normalized_antecedent = TagAlias.to_aliased(PostQueryBuilder.new(antecedent.mb_chars.downcase).split_query)
     normalized_consequent = TagAlias.to_aliased(PostQueryBuilder.new(consequent.mb_chars.downcase).parse_tag_edit)
 
-    CurrentUser.without_safe_mode do
-      CurrentUser.scoped(updater, updater_ip_addr) do
-        migrate_posts(normalized_antecedent, normalized_consequent)
-        migrate_saved_searches(normalized_antecedent, normalized_consequent)
-        migrate_blacklists(normalized_antecedent, normalized_consequent)
+    CurrentUser.scoped(updater, updater_ip_addr) do
+      migrate_posts(normalized_antecedent, normalized_consequent)
+      migrate_saved_searches(normalized_antecedent, normalized_consequent)
+      migrate_blacklists(normalized_antecedent, normalized_consequent)
 
-        ModAction.log("processed mass update: #{antecedent} -> #{consequent}", :mass_update)
-      end
+      ModAction.log("processed mass update: #{antecedent} -> #{consequent}", :mass_update)
     end
   end
 
   def migrate_posts(normalized_antecedent, normalized_consequent)
-    ::Post.tag_match(normalized_antecedent.join(" ")).find_each do |post|
+    ::Post.system_tag_match(normalized_antecedent.join(" ")).find_each do |post|
       post.with_lock do
         tags = (post.tag_array - normalized_antecedent + normalized_consequent).join(" ")
         post.update(tag_string: tags)

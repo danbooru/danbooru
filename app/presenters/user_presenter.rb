@@ -36,11 +36,11 @@ class UserPresenter
   end
 
   def posts_for_saved_search_category(category)
-    Post.tag_match("search:#{category}").limit(10)
+    Post.user_tag_match("search:#{category}").limit(10)
   end
 
   def uploads
-    Post.tag_match("user:#{user.name}").limit(6)
+    Post.user_tag_match("user:#{user.name}").limit(6)
   end
 
   def has_uploads?
@@ -48,7 +48,7 @@ class UserPresenter
   end
 
   def favorites
-    Post.tag_match("ordfav:#{user.name}").limit(6)
+    Post.user_tag_match("ordfav:#{user.name}").limit(6)
   end
 
   def has_favorites?
@@ -76,7 +76,7 @@ class UserPresenter
   end
 
   def commented_posts_count(template)
-    count = CurrentUser.without_safe_mode { PostQueryBuilder.new("commenter:#{user.name}").fast_count }
+    count = PostQueryBuilder.new("commenter:#{user.name}", User.system).fast_count
     count = "?" if count.nil?
     template.link_to(count, template.posts_path(:tags => "commenter:#{user.name} order:comment_bumped"))
   end
@@ -90,7 +90,7 @@ class UserPresenter
   end
 
   def noted_posts_count(template)
-    count = CurrentUser.without_safe_mode { PostQueryBuilder.new("noteupdater:#{user.name}").fast_count }
+    count = PostQueryBuilder.new("noteupdater:#{user.name}", User.system).fast_count
     count = "?" if count.nil?
     template.link_to(count, template.posts_path(:tags => "noteupdater:#{user.name} order:note"))
   end

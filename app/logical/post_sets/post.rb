@@ -4,7 +4,7 @@ module PostSets
     attr_reader :page, :random, :post_count, :format, :tag_string, :query
 
     def initialize(tags, page = 1, per_page = nil, random: false, format: "html")
-      @query = PostQueryBuilder.new(tags)
+      @query = PostQueryBuilder.new(tags, CurrentUser.user)
       @tag_string = tags
       @page = page
       @per_page = per_page
@@ -92,7 +92,7 @@ module PostSets
 
     def get_random_posts
       per_page.times.inject([]) do |all, x|
-        all << ::Post.tag_match(tag_string).random
+        all << ::Post.user_tag_match(tag_string).random
       end.compact.uniq
     end
 
@@ -103,7 +103,7 @@ module PostSets
         if is_random?
           temp = get_random_posts
         else
-          temp = ::Post.tag_match(tag_string).where("true /* PostSets::Post#posts:2 */").paginate(page, :count => post_count, :limit => per_page)
+          temp = ::Post.user_tag_match(tag_string).where("true /* PostSets::Post#posts:2 */").paginate(page, :count => post_count, :limit => per_page)
         end
       end
     end

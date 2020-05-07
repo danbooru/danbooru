@@ -2,14 +2,7 @@ require 'test_helper'
 
 class RelatedTagCalculatorTest < ActiveSupport::TestCase
   setup do
-    user = FactoryBot.create(:user)
-    CurrentUser.user = user
-    CurrentUser.ip_addr = "127.0.0.1"
-  end
-
-  teardown do
-    CurrentUser.user = nil
-    CurrentUser.ip_addr = nil
+    @user = create(:user)
   end
 
   context "RelatedTagCalculator" do
@@ -18,7 +11,7 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
         create(:post, tag_string: "aaa bbb ccc ddd")
         create(:post, tag_string: "aaa bbb ccc")
         create(:post, tag_string: "aaa bbb")
-        posts = Post.tag_match("aaa")
+        posts = Post.user_tag_match("aaa", @user)
 
         assert_equal(%w[aaa bbb ccc ddd], RelatedTagCalculator.frequent_tags_for_post_array(posts))
       end
@@ -30,7 +23,7 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
         create(:post, tag_string: "aaa bbb ccc")
         create(:post, tag_string: "aaa bbb")
 
-        assert_equal(%w[aaa bbb ccc ddd], RelatedTagCalculator.frequent_tags_for_search("aaa").pluck(:name))
+        assert_equal(%w[aaa bbb ccc ddd], RelatedTagCalculator.frequent_tags_for_search("aaa", @user).pluck(:name))
       end
 
       should "calculate the most frequent tags for a multiple tag search" do
@@ -38,16 +31,16 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
         create(:post, tag_string: "aaa bbb ccc ddd")
         create(:post, tag_string: "aaa eee fff")
 
-        assert_equal(%w[aaa bbb ccc ddd], RelatedTagCalculator.frequent_tags_for_search("aaa bbb").pluck(:name))
+        assert_equal(%w[aaa bbb ccc ddd], RelatedTagCalculator.frequent_tags_for_search("aaa bbb", @user).pluck(:name))
       end
 
       should "calculate the most frequent tags with a category constraint" do
         create(:post, tag_string: "aaa bbb art:ccc copy:ddd")
-        create(:post, tag_string: "aaa bbb art:ccc")
+        create(:post, tag_string: "aaa bbb ccc")
         create(:post, tag_string: "aaa bbb")
 
-        assert_equal(%w[aaa bbb], RelatedTagCalculator.frequent_tags_for_search("aaa", category: Tag.categories.general).pluck(:name))
-        assert_equal(%w[ccc], RelatedTagCalculator.frequent_tags_for_search("aaa", category: Tag.categories.artist).pluck(:name))
+        assert_equal(%w[aaa bbb], RelatedTagCalculator.frequent_tags_for_search("aaa", @user, category: Tag.categories.general).pluck(:name))
+        assert_equal(%w[ccc], RelatedTagCalculator.frequent_tags_for_search("aaa", @user, category: Tag.categories.artist).pluck(:name))
       end
     end
 
@@ -57,9 +50,9 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
         create(:post, tag_string: "1girl solo", rating: "q")
         create(:post, tag_string: "1girl 1boy", rating: "q")
 
-        assert_equal(%w[1girl solo 1boy], RelatedTagCalculator.similar_tags_for_search("1girl").pluck(:name))
-        assert_equal(%w[1girl 1boy solo], RelatedTagCalculator.similar_tags_for_search("rating:q").pluck(:name))
-        assert_equal(%w[solo 1girl], RelatedTagCalculator.similar_tags_for_search("solo").pluck(:name))
+        assert_equal(%w[1girl solo 1boy], RelatedTagCalculator.similar_tags_for_search("1girl", @user).pluck(:name))
+        assert_equal(%w[1girl 1boy solo], RelatedTagCalculator.similar_tags_for_search("rating:q", @user).pluck(:name))
+        assert_equal(%w[solo 1girl], RelatedTagCalculator.similar_tags_for_search("solo", @user).pluck(:name))
       end
 
       should "calculate the similar tags for an aliased tag" do
@@ -67,7 +60,7 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
         create(:post, tag_string: "bunny dog")
         create(:post, tag_string: "bunny cat")
 
-        assert_equal(%w[bunny cat dog], RelatedTagCalculator.similar_tags_for_search("rabbit").pluck(:name))
+        assert_equal(%w[bunny cat dog], RelatedTagCalculator.similar_tags_for_search("rabbit", @user).pluck(:name))
       end
     end
   end

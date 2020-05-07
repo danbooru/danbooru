@@ -248,7 +248,7 @@ module Sources
       end
 
       def related_posts(limit = 5)
-        CurrentUser.as_system { Post.tag_match(related_posts_search_query).paginate(1, limit: limit) }
+        Post.system_tag_match(related_posts_search_query).paginate(1, limit: limit)
       end
       memoize :related_posts
 

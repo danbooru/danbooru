@@ -80,7 +80,7 @@ class PostsController < ApplicationController
   end
 
   def random
-    @post = Post.tag_match(params[:tags]).random
+    @post = Post.user_tag_match(params[:tags]).random
     raise ActiveRecord::RecordNotFound if @post.nil?
     authorize @post
     respond_with(@post) do |format|

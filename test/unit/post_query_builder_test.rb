@@ -2,11 +2,11 @@ require 'test_helper'
 
 class PostQueryBuilderTest < ActiveSupport::TestCase
   def assert_tag_match(posts, query)
-    assert_equal(posts.map(&:id), Post.tag_match(query).pluck(:id))
+    assert_equal(posts.map(&:id), Post.user_tag_match(query).pluck(:id))
   end
 
   def assert_fast_count(count, query, **options)
-    assert_equal(count, PostQueryBuilder.new(query).fast_count(**options))
+    assert_equal(count, PostQueryBuilder.new(query, **options).fast_count)
   end
 
   setup do
@@ -616,6 +616,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([deleted], "status:deleted")
       assert_tag_match([undeleted, deleted], "status:any")
       assert_tag_match([undeleted, deleted], "status:all")
+      assert_tag_match([deleted], "status:banned status:deleted")
 
       assert_tag_match([], "-status:banned")
       assert_tag_match([deleted], "-status:active")
@@ -629,6 +630,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([deleted], "status:deleted")
       assert_tag_match([undeleted, deleted], "status:any")
       assert_tag_match([undeleted, deleted], "status:all")
+
+      assert_fast_count(2, "status:banned")
     end
 
     should "return posts for the filetype:<ext> metatag" do
@@ -988,7 +991,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post1 = create(:post, rating: "s")
 
       assert_raise(::Post::SearchError) do
-        Post.tag_match("a b c rating:s width:10 height:10 user:bob")
+        Post.user_tag_match("a b c rating:s width:10 height:10 user:bob")
       end
     end
 
@@ -1143,29 +1146,28 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       context "in safe mode" do
         setup do
-          CurrentUser.stubs(:safe_mode?).returns(true)
           create(:post, rating: "s")
         end
 
         should "work for a blank search" do
-          assert_fast_count(1, "")
+          assert_fast_count(1, "", safe_mode: true)
         end
 
         should "work for a nil search" do
-          assert_fast_count(1, nil)
+          assert_fast_count(1, nil, safe_mode: true)
         end
 
         should "not fail for a two tag search by a member" do
           post1 = create(:post, tag_string: "aaa bbb rating:s")
           post2 = create(:post, tag_string: "aaa bbb rating:e")
 
-          assert_fast_count(1, "aaa bbb")
+          assert_fast_count(1, "aaa bbb", safe_mode: true)
         end
 
         context "with a primed cache" do
           should "fetch the value from the cache" do
             PostQueryBuilder.new(nil).set_count_in_cache("rating:s", 100)
-            assert_fast_count(100, "")
+            assert_fast_count(100, "", safe_mode: true)
           end
         end
       end

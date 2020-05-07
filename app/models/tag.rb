@@ -349,7 +349,7 @@ class Tag < ApplicationRecord
   end
 
   def posts
-    Post.tag_match(name)
+    Post.system_tag_match(name)
   end
 
   def self.available_includes

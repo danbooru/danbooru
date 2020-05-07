@@ -53,10 +53,15 @@ class PostQueryBuilder
     COUNT_METATAG_SYNONYMS.flat_map { |str| [str, "#{str}_asc"] } +
     CATEGORY_COUNT_METATAGS.flat_map { |str| [str, "#{str}_asc"] }
 
-  attr_accessor :query_string
+  attr_reader :query_string, :current_user, :safe_mode, :hide_deleted_posts
+  alias_method :safe_mode?, :safe_mode
+  alias_method :hide_deleted_posts?, :hide_deleted_posts
 
-  def initialize(query_string)
+  def initialize(query_string, current_user = User.anonymous, safe_mode: false, hide_deleted_posts: false)
     @query_string = query_string
+    @current_user = current_user
+    @safe_mode = safe_mode
+    @hide_deleted_posts = hide_deleted_posts
   end
 
   def tags_match(tags, relation)
@@ -177,9 +182,9 @@ class PostQueryBuilder
     when "noteupdater"
       user_subquery_matches(NoteVersion.unscoped, value, field: :updater)
     when "upvoter", "upvote"
-      user_subquery_matches(PostVote.positive.visible(CurrentUser.user), value, field: :user)
+      user_subquery_matches(PostVote.positive.visible(current_user), value, field: :user)
     when "downvoter", "downvote"
-      user_subquery_matches(PostVote.negative.visible(CurrentUser.user), value, field: :user)
+      user_subquery_matches(PostVote.negative.visible(current_user), value, field: :user)
     when *CATEGORY_COUNT_METATAGS
       short_category = name.delete_suffix("tags")
       category = TagCategory.short_name_mapping[short_category]
@@ -248,16 +253,16 @@ class PostQueryBuilder
 
     user_subquery_matches(flags, username) do |username|
       flagger = User.find_by_name(username)
-      PostFlag.unscoped.creator_matches(flagger, CurrentUser.user)
+      PostFlag.unscoped.creator_matches(flagger, current_user)
     end
   end
 
   def saved_search_matches(label)
     case label.downcase
     when "all"
-      Post.where(id: SavedSearch.post_ids_for(CurrentUser.id))
+      Post.where(id: SavedSearch.post_ids_for(current_user.id))
     else
-      Post.where(id: SavedSearch.post_ids_for(CurrentUser.id, label: label))
+      Post.where(id: SavedSearch.post_ids_for(current_user.id, label: label))
     end
   end
 
@@ -287,8 +292,8 @@ class PostQueryBuilder
   def disapproved_matches(query)
     if query.downcase.in?(PostDisapproval::REASONS)
       Post.where(disapprovals: PostDisapproval.where(reason: query.downcase))
-    elsif User.normalize_name(query) == CurrentUser.user.name
-      Post.where(disapprovals: PostDisapproval.where(user: CurrentUser.user))
+    elsif User.normalize_name(query) == current_user.name
+      Post.where(disapprovals: PostDisapproval.where(user: current_user))
     else
       Post.none
     end
@@ -362,20 +367,20 @@ class PostQueryBuilder
 
   def ordfavgroup_matches(query)
     # XXX unify with FavoriteGroup#posts
-    favgroup = FavoriteGroup.visible(CurrentUser.user).name_or_id_matches(query, CurrentUser.user)
+    favgroup = FavoriteGroup.visible(current_user).name_or_id_matches(query, current_user)
     favgroup_posts = favgroup.joins("CROSS JOIN unnest(favorite_groups.post_ids) WITH ORDINALITY AS row(post_id, favgroup_index)").select(:post_id, :favgroup_index)
     Post.joins("JOIN (#{favgroup_posts.to_sql}) favgroup_posts ON favgroup_posts.post_id = posts.id").order("favgroup_posts.favgroup_index ASC")
   end
 
   def favgroup_matches(query)
-    favgroup = FavoriteGroup.visible(CurrentUser.user).name_or_id_matches(query, CurrentUser.user)
+    favgroup = FavoriteGroup.visible(current_user).name_or_id_matches(query, current_user)
     Post.where(id: favgroup.select("unnest(post_ids)"))
   end
 
   def favorites_include(username)
     favuser = User.find_by_name(username)
 
-    if favuser.present? && Pundit.policy!([CurrentUser.user, nil], favuser).can_see_favorites?
+    if favuser.present? && Pundit.policy!([current_user, nil], favuser).can_see_favorites?
       tags_include("fav:#{favuser.id}")
     else
       Post.none
@@ -445,10 +450,9 @@ class PostQueryBuilder
     relation
   end
 
-  def hide_deleted_posts?
-    return false if CurrentUser.admin_mode?
-    return false if find_metatag(:status).to_s.downcase.in?(%w[deleted active any all])
-    return CurrentUser.user.hide_deleted_posts?
+  def hide_deleted?
+    has_status_metatag = select_metatags(:status).any? { |metatag| metatag.value.downcase.in?(%w[deleted active any all]) }
+    hide_deleted_posts? && !has_status_metatag
   end
 
   def build
@@ -458,8 +462,8 @@ class PostQueryBuilder
     end
 
     relation = Post.all
-    relation = relation.where(rating: 's') if CurrentUser.safe_mode?
-    relation = relation.undeleted if hide_deleted_posts?
+    relation = relation.where(rating: 's') if safe_mode?
+    relation = relation.undeleted if hide_deleted?
     relation = add_joins(relation)
     relation = metatags_match(metatags, relation)
     relation = tags_match(tags, relation)
@@ -813,8 +817,8 @@ class PostQueryBuilder
   concerning :CountMethods do
     def fast_count(timeout: 1_000, raise_on_timeout: false, skip_cache: false)
       tags = normalize_query(normalize_aliases: true)
-      tags += " rating:s" if CurrentUser.safe_mode?
-      tags += " -status:deleted" if CurrentUser.hide_deleted_posts? && !has_metatag?("status")
+      tags += " rating:s" if safe_mode?
+      tags += " -status:deleted" if hide_deleted?
       tags = tags.strip
 
       # Optimize some cases. these are just estimates but at these
@@ -852,7 +856,7 @@ class PostQueryBuilder
 
     def fast_count_search(tags, timeout:, raise_on_timeout:)
       count = Post.with_timeout(timeout, nil, tags: tags) do
-        Post.tag_match(tags).count
+        Post.user_tag_match(tags).count
       end
 
       if count.nil?

@@ -47,11 +47,11 @@ module Explore
     end
 
     def popular_posts(min_date, max_date)
-      Post.where(created_at: min_date..max_date).tag_match("order:score")
+      Post.where(created_at: min_date..max_date).user_tag_match("order:score")
     end
 
     def curated_posts(min_date, max_date)
-      Post.where(created_at: min_date..max_date).tag_match("order:curated")
+      Post.where(created_at: min_date..max_date).user_tag_match("order:curated")
     end
   end
 end

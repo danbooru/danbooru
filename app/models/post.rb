@@ -604,7 +604,7 @@ class Post < ApplicationRecord
         # If someone else committed changes to this post before we did,
         # then try to merge the tag changes together.
         current_tags = tag_string_was.split
-        new_tags = PostQueryBuilder.new(tag_string).parse_tag_edit
+        new_tags = PostQueryBuilder.new(tag_string).split_query
         old_tags = old_tag_string.split
 
         kept_tags = current_tags & new_tags
@@ -642,7 +642,7 @@ class Post < ApplicationRecord
     end
 
     def normalize_tags
-      normalized_tags = PostQueryBuilder.new(tag_string).parse_tag_edit
+      normalized_tags = PostQueryBuilder.new(tag_string).split_query
       normalized_tags = apply_casesensitive_metatags(normalized_tags)
       normalized_tags = normalized_tags.map(&:downcase)
       normalized_tags = filter_metatags(normalized_tags)
@@ -1372,9 +1372,7 @@ class Post < ApplicationRecord
     end
 
     def sample(query, sample_size)
-      CurrentUser.without_safe_mode do
-        tag_match(query).reorder(:md5).limit(sample_size)
-      end
+      user_tag_match(query, safe_mode: false, hide_deleted_posts: false).reorder(:md5).limit(sample_size)
     end
 
     # unflattens the tag_string into one tag per row.
@@ -1472,8 +1470,12 @@ class Post < ApplicationRecord
       where("posts.tag_index @@ to_tsquery('danbooru', E?)", tag.to_escaped_for_tsquery)
     end
 
-    def tag_match(query)
-      PostQueryBuilder.new(query).build
+    def system_tag_match(query)
+      user_tag_match(query, User.system, safe_mode: false, hide_deleted_posts: false)
+    end
+
+    def user_tag_match(query, user = CurrentUser.user, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
+      PostQueryBuilder.new(query, user, safe_mode: safe_mode, hide_deleted_posts: hide_deleted_posts).build
     end
 
     def search(params)
@@ -1488,7 +1490,7 @@ class Post < ApplicationRecord
       )
 
       if params[:tags].present?
-        q = q.tag_match(params[:tags])
+        q = q.user_tag_match(params[:tags])
       end
 
       if params[:order].present?

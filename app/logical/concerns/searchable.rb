@@ -226,7 +226,7 @@ module Searchable
     end
 
     if params[:post_tags_match].present?
-      relation = relation.where(post_id: Post.tag_match(params[:post_tags_match]).reorder(nil))
+      relation = relation.where(post_id: Post.user_tag_match(params[:post_tags_match]).reorder(nil))
     end
 
     relation

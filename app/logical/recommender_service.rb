@@ -36,7 +36,7 @@ module RecommenderService
     posts = posts.where.not(id: post.id) if post
     posts = posts.where.not(uploader_id: uploader.id) if uploader
     posts = posts.where.not(id: favoriter.favorites.select(:post_id)) if favoriter
-    posts = posts.where(id: Post.tag_match(tags).reorder(nil).select(:id)) if tags.present?
+    posts = posts.where(id: Post.user_tag_match(tags).reorder(nil).select(:id)) if tags.present?
 
     id_to_score = recs.to_h
     recs = posts.map { |post| { score: id_to_score[post.id], post: post } }

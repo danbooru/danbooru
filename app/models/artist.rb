@@ -134,10 +134,8 @@ class Artist < ApplicationRecord
       source = params.delete(:source)
 
       if source.blank? && params[:name].present?
-        CurrentUser.without_safe_mode do
-          post = Post.tag_match("source:http* #{params[:name]}").first
-          source = post.try(:source)
-        end
+        post = Post.system_tag_match("source:http* #{params[:name]}").first
+        source = post.try(:source)
       end
 
       if source.present?
@@ -168,36 +166,32 @@ class Artist < ApplicationRecord
   module BanMethods
     def unban!
       Post.transaction do
-        CurrentUser.without_safe_mode do
-          ti = TagImplication.find_by(antecedent_name: name, consequent_name: "banned_artist")
-          ti&.destroy
+        ti = TagImplication.find_by(antecedent_name: name, consequent_name: "banned_artist")
+        ti&.destroy
 
-          Post.tag_match(name).find_each do |post|
-            post.unban!
-            fixed_tags = post.tag_string.sub(/(?:\A| )banned_artist(?:\Z| )/, " ").strip
-            post.update(tag_string: fixed_tags)
-          end
-
-          update!(is_banned: false)
-          ModAction.log("unbanned artist ##{id}", :artist_unban)
+        Post.raw_tag_match(name).find_each do |post|
+          post.unban!
+          fixed_tags = post.tag_string.sub(/(?:\A| )banned_artist(?:\Z| )/, " ").strip
+          post.update(tag_string: fixed_tags)
         end
+
+        update!(is_banned: false)
+        ModAction.log("unbanned artist ##{id}", :artist_unban)
       end
     end
 
     def ban!(banner: CurrentUser.user)
       Post.transaction do
-        CurrentUser.without_safe_mode do
-          Post.tag_match(name).each(&:ban!)
+        Post.raw_tag_match(name).each(&:ban!)
 
-          # potential race condition but unlikely
-          unless TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").exists?
-            tag_implication = TagImplication.create!(antecedent_name: name, consequent_name: "banned_artist", skip_secondary_validations: true, creator: banner)
-            tag_implication.approve!(approver: banner)
-          end
-
-          update!(is_banned: true)
-          ModAction.log("banned artist ##{id}", :artist_ban)
+        # potential race condition but unlikely
+        unless TagImplication.where(:antecedent_name => name, :consequent_name => "banned_artist").exists?
+          tag_implication = TagImplication.create!(antecedent_name: name, consequent_name: "banned_artist", skip_secondary_validations: true, creator: banner)
+          tag_implication.approve!(approver: banner)
         end
+
+        update!(is_banned: true)
+        ModAction.log("banned artist ##{id}", :artist_ban)
       end
     end
   end
