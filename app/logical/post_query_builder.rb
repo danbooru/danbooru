@@ -62,7 +62,11 @@ class PostQueryBuilder
     @current_user = current_user
     @safe_mode = safe_mode
     @hide_deleted_posts = hide_deleted_posts
+
     @terms = scan_query
+    @terms << OpenStruct.new(type: :metatag, name: "rating", value: "s") if safe_mode?
+    @terms << OpenStruct.new(type: :metatag, name: "status", value: "deleted", negated: true) if hide_deleted?
+
     normalize_aliases! if normalize_aliases
     normalize_order! if normalize_order
   end
@@ -465,8 +469,6 @@ class PostQueryBuilder
     end
 
     relation = Post.all
-    relation = relation.where(rating: 's') if safe_mode?
-    relation = relation.undeleted if hide_deleted?
     relation = add_joins(relation)
     relation = metatags_match(metatags, relation)
     relation = tags_match(tags, relation)
@@ -825,9 +827,6 @@ class PostQueryBuilder
   concerning :CountMethods do
     def fast_count(timeout: 1_000, raise_on_timeout: false, skip_cache: false)
       tags = to_s
-      tags += " rating:s" if safe_mode?
-      tags += " -status:deleted" if hide_deleted?
-      tags = tags.strip
 
       # Optimize some cases. these are just estimates but at these
       # quantities being off by a few hundred doesn't matter much
@@ -850,11 +849,11 @@ class PostQueryBuilder
       count = nil
 
       unless skip_cache
-        count = get_count_from_cache(tags)
+        count = get_count_from_cache
       end
 
       if count.nil?
-        count = fast_count_search(tags, timeout: timeout, raise_on_timeout: raise_on_timeout)
+        count = fast_count_search(timeout: timeout, raise_on_timeout: raise_on_timeout)
       end
 
       count
@@ -862,9 +861,9 @@ class PostQueryBuilder
       0
     end
 
-    def fast_count_search(tags, timeout:, raise_on_timeout:)
-      count = Post.with_timeout(timeout, nil, tags: tags) do
-        Post.user_tag_match(tags).count
+    def fast_count_search(timeout:, raise_on_timeout:)
+      count = Post.with_timeout(timeout, nil) do
+        build.count
       end
 
       if count.nil?
@@ -875,7 +874,7 @@ class PostQueryBuilder
 
         count = Danbooru.config.blank_tag_search_fast_count
       else
-        set_count_in_cache(tags, count)
+        set_count_in_cache(count)
       end
 
       count ? count.to_i : nil
@@ -883,25 +882,24 @@ class PostQueryBuilder
       return nil
     end
 
-    def get_count_from_cache(tags)
-      if PostQueryBuilder.new(tags, normalize_aliases: false).is_simple_tag?
-        count = Tag.find_by(name: tags).try(:post_count)
+    def get_count_from_cache
+      if is_simple_tag?
+        count = Tag.find_by(name: tags.first.name).try(:post_count)
       else
         # this will only have a value for multi-tag searches or single metatag searches
-        count = Cache.get(count_cache_key(tags))
+        count = Cache.get(count_cache_key)
       end
 
       count.try(:to_i)
     end
 
-    def set_count_in_cache(tags, count, expiry = nil)
-      expiry ||= count.seconds.clamp(3.minutes, 20.hours).to_i
-
-      Cache.put(count_cache_key(tags), count, expiry)
+    def set_count_in_cache(count)
+      expiry = count.seconds.clamp(3.minutes, 20.hours).to_i
+      Cache.put(count_cache_key, count, expiry)
     end
 
-    def count_cache_key(tags)
-      "pfc:#{Cache.hash(tags)}"
+    def count_cache_key
+      "pfc:#{Cache.hash(to_s)}"
     end
   end
 

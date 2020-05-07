@@ -1093,20 +1093,20 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     context "for a single metatag" do
       should "return the correct cached count" do
         build(:tag, name: "score:42", post_count: -100).save(validate: false)
-        PostQueryBuilder.new(nil).set_count_in_cache("score:42", 100)
+        PostQueryBuilder.new("score:42").set_count_in_cache(100)
         assert_fast_count(100, "score:42")
       end
 
       should "return the correct cached count for a pool:<id> search" do
         build(:tag, name: "pool:1234", post_count: -100).save(validate: false)
-        PostQueryBuilder.new(nil).set_count_in_cache("pool:1234", 100)
+        PostQueryBuilder.new("pool:1234").set_count_in_cache(100)
         assert_fast_count(100, "pool:1234")
       end
     end
 
     context "for a multi-tag search" do
       should "return the cached count, if it exists" do
-        PostQueryBuilder.new(nil).set_count_in_cache("score:42 aaa", 100)
+        PostQueryBuilder.new("score:42 aaa").set_count_in_cache(100)
         assert_fast_count(100, "aaa score:42")
       end
 
@@ -1115,15 +1115,14 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       end
 
       should "set the expiration time" do
-        Cache.expects(:put).with(PostQueryBuilder.new(nil).count_cache_key("score:42 aaa"), 1, 180)
+        Cache.expects(:put).with(PostQueryBuilder.new("score:42 aaa").count_cache_key, 1, 180)
         PostQueryBuilder.new("aaa score:42").fast_count
       end
 
       should "work with the hide_deleted_posts option turned on" do
-        user = create(:user, hide_deleted_posts: true)
-        as(user) do
-          assert_fast_count(1, "aaa score:42")
-        end
+        create(:post, tag_string: "aaa", score: 42, is_deleted: true)
+        assert_fast_count(1, "aaa score:42", hide_deleted_posts: true)
+        assert_fast_count(2, "aaa score:42", hide_deleted_posts: false)
       end
     end
 
@@ -1134,7 +1133,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       context "with a primed cache" do
         should "fetch the value from the cache" do
-          PostQueryBuilder.new(nil).set_count_in_cache("", 100)
+          PostQueryBuilder.new("").set_count_in_cache(100)
           assert_fast_count(100, "")
         end
       end
@@ -1165,7 +1164,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
         context "with a primed cache" do
           should "fetch the value from the cache" do
-            PostQueryBuilder.new(nil).set_count_in_cache("rating:s", 100)
+            PostQueryBuilder.new("rating:s").set_count_in_cache(100)
             assert_fast_count(100, "", safe_mode: true)
           end
         end
