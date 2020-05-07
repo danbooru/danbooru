@@ -69,7 +69,6 @@ class UploadService
     end
 
     def process_file(upload, file, original_post_id: nil)
-      binding.pry if !file.is_a? Tempfile
       media_file = MediaFile.open(file)
 
       upload.file = file
