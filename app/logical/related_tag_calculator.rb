@@ -37,10 +37,18 @@ module RelatedTagCalculator
   end
 
   def self.cached_similar_tags_for_search(post_query, max_tags, search_timeout: 2000, cache_timeout: 8.hours)
-    Cache.get("similar_tags:#{post_query.to_s}", cache_timeout, race_condition_ttl: 60.seconds) do
+    Cache.get(cache_key(post_query), cache_timeout, race_condition_ttl: 60.seconds) do
       ApplicationRecord.with_timeout(search_timeout, []) do
         similar_tags_for_search(post_query).take(max_tags).pluck(:name)
       end
+    end
+  end
+
+  def self.cache_key(post_query)
+    if post_query.is_user_dependent_search?
+      "similar_tags[#{post_query.current_user.id}]:#{post_query.to_s}"
+    else
+      "similar_tags:#{post_query.to_s}"
     end
   end
 end
