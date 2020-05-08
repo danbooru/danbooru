@@ -1153,5 +1153,15 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         end
       end
     end
+
+    context "for a user-dependent metatag" do
+      should "cache the count separately for different users" do
+        @user = create(:user, enable_private_favorites: true)
+        @post = as(@user) { create(:post, tag_string: "fav:#{@user.name}") }
+
+        assert_equal(1, PostQueryBuilder.new("fav:#{@user.name}", @user).fast_count)
+        assert_equal(0, PostQueryBuilder.new("fav:#{@user.name}").fast_count)
+      end
+    end
   end
 end

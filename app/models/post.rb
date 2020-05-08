@@ -1453,7 +1453,7 @@ class Post < ApplicationRecord
       from(relation.arel.as("posts"))
     end
 
-    def available_for_moderation(hidden = false, user = CurrentUser.user)
+    def available_for_moderation(user, hidden: false)
       return none if user.is_anonymous?
 
       approved_posts = user.post_approvals.select(:post_id)

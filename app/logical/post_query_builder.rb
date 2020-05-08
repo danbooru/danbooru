@@ -288,7 +288,7 @@ class PostQueryBuilder
     when "active"
       Post.active
     when "unmoderated"
-      Post.pending_or_flagged.available_for_moderation
+      Post.pending_or_flagged.available_for_moderation(current_user, hidden: false)
     when "all", "any"
       Post.all
     else
@@ -868,7 +868,19 @@ class PostQueryBuilder
     end
 
     def count_cache_key
-      "pfc:#{to_s}"
+      if is_user_dependent_search?
+        "pfc[#{current_user.id.to_i}]:#{to_s}"
+      else
+        "pfc:#{to_s}"
+      end
+    end
+
+    def is_user_dependent_search?
+      metatags.any? do |metatag|
+        metatag.name.in?(%w[upvoter upvote downvoter downvote search flagger fav ordfav favgroup ordfavgroup]) ||
+        metatag.name == "status" && metatag.value == "unmoderated" ||
+        metatag.name == "disapproved" && User.normalize_name(metatag.value) == current_user.name
+      end
     end
   end
 

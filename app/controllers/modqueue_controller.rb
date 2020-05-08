@@ -4,7 +4,7 @@ class ModqueueController < ApplicationController
 
   def index
     authorize :modqueue
-    @posts = Post.includes(:appeals, :disapprovals, :uploader, flags: [:creator]).pending_or_flagged.available_for_moderation(search_params[:hidden])
+    @posts = Post.includes(:appeals, :disapprovals, :uploader, flags: [:creator]).pending_or_flagged.available_for_moderation(CurrentUser.user, hidden: search_params[:hidden])
     @posts = @posts.paginated_search(params, order: "modqueue", count_pages: true)
 
     @modqueue_posts = @posts.except(:offset, :limit, :order)
