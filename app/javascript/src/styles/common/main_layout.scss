@@ -30,6 +30,12 @@ footer#page-footer {
   text-align: center;
   padding: 1em 0 1em;
   border-top: var(--footer-border);
+
+  .social-icon img {
+    vertical-align: bottom;
+    margin: 0 0.1em;
+    height: 16px;
+  }
 }
 
 .sidebar-container {

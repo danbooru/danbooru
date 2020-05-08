@@ -1,5 +1,4 @@
 import Cookie from './cookie'
-import CurrentUser from './current_user'
 
 $(function() {
   $("#hide-upgrade-account-notice").on("click.danbooru", function(e) {
@@ -19,12 +18,6 @@ $(function() {
   $("#close-notice-link").on("click.danbooru", function(e) {
     $('#notice').fadeOut("fast");
     e.preventDefault();
-  });
-
-  $("#desktop-version-link a").on("click.danbooru", async function(e) {
-    e.preventDefault();
-    await CurrentUser.update({ enable_desktop_mode: true });
-    location.reload();
   });
 });
 

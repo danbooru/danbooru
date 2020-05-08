@@ -425,6 +425,11 @@ module Danbooru
       end
     end
 
+    # The url of the Discord server associated with this site.
+    def discord_server_url
+      nil
+    end
+
     # The twitter username associated with this site (username only, don't include the @-sign).
     def twitter_username
       nil
