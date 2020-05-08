@@ -425,7 +425,9 @@ module Danbooru
       end
     end
 
-    def twitter_site
+    # The twitter username associated with this site (username only, don't include the @-sign).
+    def twitter_username
+      nil
     end
 
     # include essential tags in image urls (requires nginx/apache rewrites)
