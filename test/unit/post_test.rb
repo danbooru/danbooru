@@ -136,10 +136,6 @@ class PostTest < ActiveSupport::TestCase
     end
 
     context "Deleting a post" do
-      setup do
-        Danbooru.config.stubs(:blank_tag_search_fast_count).returns(nil)
-      end
-
       context "that is status locked" do
         setup do
           @post = FactoryBot.create(:post, is_status_locked: true)

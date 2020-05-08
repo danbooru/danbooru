@@ -4,7 +4,7 @@
 <div id="c-counts">
   <div id="a-posts">
     Post count for <%= link_to params[:tags].present? ? params[:tags] : "/posts", posts_path(:tags => params[:tags]) %>:
-    <% if @count == (Danbooru.config.blank_tag_search_fast_count || 1_000_000) %>
+    <% if @count.nil? %>
       timed out
     <% else %>
       <%= @count %>

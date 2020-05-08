@@ -299,13 +299,6 @@ module Danbooru
       []
     end
 
-    # Counting every post is typically expensive because it involves a sequential scan on
-    # potentially millions of rows. If this method returns a value, then blank searches
-    # will return that number for the fast_count call instead.
-    def blank_tag_search_fast_count
-      nil
-    end
-
     # DeviantArt login cookies. Login to DeviantArt and extract these from the browser.
     # https://github.com/danbooru/danbooru/issues/4219
     def deviantart_cookies
@@ -437,11 +430,6 @@ module Danbooru
 
     # include essential tags in image urls (requires nginx/apache rewrites)
     def enable_seo_post_urls
-      false
-    end
-
-    # enable some (donmai-specific) optimizations for post counts
-    def estimate_post_counts
       false
     end
 

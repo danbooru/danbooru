@@ -84,7 +84,7 @@ module PostSets
     def get_post_count
       if %w(json atom xml).include?(format.downcase)
         # no need to get counts for formats that don't use a paginator
-        return Danbooru.config.blank_tag_search_fast_count
+        nil
       else
         query.fast_count
       end
@@ -103,13 +103,9 @@ module PostSets
         if is_random?
           temp = get_random_posts
         else
-          temp = query.build.paginate(page, count: post_count, limit: per_page)
+          temp = query.build.paginate(page, count: post_count, search_count: !post_count.nil?, limit: per_page)
         end
       end
-    end
-
-    def unknown_post_count?
-      post_count == Danbooru.config.blank_tag_search_fast_count
     end
 
     def hide_from_crawler?

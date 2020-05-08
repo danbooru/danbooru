@@ -825,81 +825,50 @@ class PostQueryBuilder
   end
 
   concerning :CountMethods do
-    def fast_count(timeout: 1_000, raise_on_timeout: false, skip_cache: false)
-      tags = to_s
-
-      # Optimize some cases. these are just estimates but at these
-      # quantities being off by a few hundred doesn't matter much
-      if Danbooru.config.estimate_post_counts
-        if tags == ""
-          return (Post.maximum(:id).to_i * (2200402.0 / 2232212)).floor
-
-        elsif tags =~ /^rating:s(?:afe)?$/
-          return (Post.maximum(:id).to_i * (1648652.0 / 2200402)).floor
-
-        elsif tags =~ /^rating:q(?:uestionable)?$/
-          return (Post.maximum(:id).to_i * (350101.0 / 2200402)).floor
-
-        elsif tags =~ /^rating:e(?:xplicit)?$/
-          return (Post.maximum(:id).to_i * (201650.0 / 2200402)).floor
-
-        end
-      end
-
+    def fast_count(timeout: 1_000, estimate_count: true, skip_cache: false)
       count = nil
-
-      unless skip_cache
-        count = get_count_from_cache
-      end
-
-      if count.nil?
-        count = fast_count_search(timeout: timeout, raise_on_timeout: raise_on_timeout)
-      end
-
+      count = estimated_count if estimate_count
+      count = cached_count if count.nil? && !skip_cache
+      count = exact_count(timeout) if count.nil?
       count
-    rescue Post::SearchError
-      0
     end
 
-    def fast_count_search(timeout:, raise_on_timeout:)
+    def estimated_count
+      if is_empty_search?
+        estimated_row_count
+      elsif is_simple_tag?
+        Tag.find_by(name: tags.first.name).try(:post_count)
+      elsif is_metatag?(:rating)
+        estimated_row_count
+      end
+    end
+
+    def estimated_row_count
+      ExplainParser.new(build.to_sql).row_count
+    end
+
+    def cached_count
+      Cache.get(count_cache_key)
+    end
+
+    def exact_count(timeout)
       count = Post.with_timeout(timeout, nil) do
         build.count
       end
 
-      if count.nil?
-        # give up
-        if raise_on_timeout
-          raise TimeoutError.new("timed out")
-        end
-
-        count = Danbooru.config.blank_tag_search_fast_count
-      else
-        set_count_in_cache(count)
-      end
-
-      count ? count.to_i : nil
-    rescue PG::ConnectionBad
-      return nil
+      set_cached_count(count) if count.present?
+      count
+    rescue Post::SearchError
+      nil
     end
 
-    def get_count_from_cache
-      if is_simple_tag?
-        count = Tag.find_by(name: tags.first.name).try(:post_count)
-      else
-        # this will only have a value for multi-tag searches or single metatag searches
-        count = Cache.get(count_cache_key)
-      end
-
-      count.try(:to_i)
-    end
-
-    def set_count_in_cache(count)
+    def set_cached_count(count)
       expiry = count.seconds.clamp(3.minutes, 20.hours).to_i
       Cache.put(count_cache_key, count, expiry)
     end
 
     def count_cache_key
-      "pfc:#{Cache.hash(to_s)}"
+      "pfc:#{to_s}"
     end
   end
 

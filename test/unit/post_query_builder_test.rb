@@ -5,8 +5,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     assert_equal(posts.map(&:id), Post.user_tag_match(query).pluck(:id))
   end
 
-  def assert_fast_count(count, query, **options)
-    assert_equal(count, PostQueryBuilder.new(query, **options).fast_count)
+  def assert_fast_count(count, query, query_options = {}, fast_count_options = {})
+    assert_equal(count, PostQueryBuilder.new(query, **query_options).fast_count(**fast_count_options))
   end
 
   setup do
@@ -1071,8 +1071,6 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
   context "#fast_count" do
     setup do
-      Danbooru.config.stubs(:blank_tag_search_fast_count).returns(nil)
-      Danbooru.config.stubs(:estimate_post_counts).returns(false)
       create(:tag, name: "grey_skirt", post_count: 100)
       create(:tag_alias, antecedent_name: "gray_skirt", consequent_name: "grey_skirt")
       create(:post, tag_string: "aaa", score: 42)
@@ -1093,20 +1091,20 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     context "for a single metatag" do
       should "return the correct cached count" do
         build(:tag, name: "score:42", post_count: -100).save(validate: false)
-        PostQueryBuilder.new("score:42").set_count_in_cache(100)
+        PostQueryBuilder.new("score:42").set_cached_count(100)
         assert_fast_count(100, "score:42")
       end
 
       should "return the correct cached count for a pool:<id> search" do
         build(:tag, name: "pool:1234", post_count: -100).save(validate: false)
-        PostQueryBuilder.new("pool:1234").set_count_in_cache(100)
+        PostQueryBuilder.new("pool:1234").set_cached_count(100)
         assert_fast_count(100, "pool:1234")
       end
     end
 
     context "for a multi-tag search" do
       should "return the cached count, if it exists" do
-        PostQueryBuilder.new("score:42 aaa").set_count_in_cache(100)
+        PostQueryBuilder.new("score:42 aaa").set_cached_count(100)
         assert_fast_count(100, "aaa score:42")
       end
 
@@ -1121,21 +1119,15 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       should "work with the hide_deleted_posts option turned on" do
         create(:post, tag_string: "aaa", score: 42, is_deleted: true)
-        assert_fast_count(1, "aaa score:42", hide_deleted_posts: true)
-        assert_fast_count(2, "aaa score:42", hide_deleted_posts: false)
+        assert_fast_count(1, "aaa score:42", { hide_deleted_posts: true })
+        assert_fast_count(2, "aaa score:42", { hide_deleted_posts: false })
       end
     end
 
     context "a blank search" do
       should "should execute a search" do
-        assert_fast_count(1, "")
-      end
-
-      context "with a primed cache" do
-        should "fetch the value from the cache" do
-          PostQueryBuilder.new("").set_count_in_cache(100)
-          assert_fast_count(100, "")
-        end
+        assert_equal(1, PostQueryBuilder.new("").fast_count(estimate_count: false))
+        assert_nothing_raised { PostQueryBuilder.new("").fast_count(estimate_count: true) }
       end
 
       should "return 0 for a nonexisting tag" do
@@ -1143,30 +1135,21 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       end
 
       context "in safe mode" do
-        setup do
-          create(:post, rating: "s")
-        end
-
         should "work for a blank search" do
-          assert_fast_count(1, "", safe_mode: true)
+          assert_equal(2, PostQueryBuilder.new("").fast_count(estimate_count: false))
+          assert_nothing_raised { PostQueryBuilder.new("").fast_count(estimate_count: true) }
         end
 
         should "work for a nil search" do
-          assert_fast_count(1, nil, safe_mode: true)
+          assert_equal(2, PostQueryBuilder.new(nil).fast_count(estimate_count: false))
+          assert_nothing_raised { PostQueryBuilder.new(nil).fast_count(estimate_count: true) }
         end
 
         should "not fail for a two tag search by a member" do
           post1 = create(:post, tag_string: "aaa bbb rating:s")
           post2 = create(:post, tag_string: "aaa bbb rating:e")
 
-          assert_fast_count(1, "aaa bbb", safe_mode: true)
-        end
-
-        context "with a primed cache" do
-          should "fetch the value from the cache" do
-            PostQueryBuilder.new("rating:s").set_count_in_cache(100)
-            assert_fast_count(100, "", safe_mode: true)
-          end
+          assert_fast_count(1, "aaa bbb", { safe_mode: true })
         end
       end
     end
