@@ -2,11 +2,12 @@ class RelatedTagQuery
   include ActiveModel::Serializers::JSON
   include ActiveModel::Serializers::Xml
 
-  attr_reader :query, :category, :type, :user, :limit
+  attr_reader :query, :post_query, :category, :type, :user, :limit
 
-  def initialize(query: nil, category: nil, type: nil, user: nil, limit: nil)
+  def initialize(query:, user: User.anonymous, category: nil, type: nil, limit: nil)
     @user = user
-    @query = TagAlias.to_aliased(query.to_s.downcase.strip).join(" ")
+    @post_query = PostQueryBuilder.new(query, user)
+    @query = @post_query.to_s
     @category = category
     @type = type
     @limit = (limit =~ /^\d+/ ? limit.to_i : 25)
@@ -43,11 +44,11 @@ class RelatedTagQuery
   end
 
   def frequent_tags
-    @frequent_tags ||= RelatedTagCalculator.frequent_tags_for_search(query, category: category_of).take(limit)
+    @frequent_tags ||= RelatedTagCalculator.frequent_tags_for_search(post_query, category: category_of).take(limit)
   end
 
   def similar_tags
-    @similar_tags ||= RelatedTagCalculator.similar_tags_for_search(query, user, category: category_of).take(limit)
+    @similar_tags ||= RelatedTagCalculator.similar_tags_for_search(post_query, category: category_of).take(limit)
   end
 
   # Returns the top 20 most frequently added tags within the last 20 edits made by the user in the last hour.

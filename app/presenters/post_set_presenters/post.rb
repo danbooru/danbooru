@@ -40,7 +40,7 @@ module PostSetPresenters
     end
 
     def similar_tags
-      RelatedTagCalculator.cached_similar_tags_for_search(post_set.tag_string, MAX_TAGS, CurrentUser.user)
+      RelatedTagCalculator.cached_similar_tags_for_search(post_set.query, MAX_TAGS)
     end
 
     def frequent_tags
