@@ -77,6 +77,8 @@
   <%= tag.meta name: "twitter:title", content: page_title %>
   <%= tag.meta name: "twitter:description", content: meta_description %>
 
+  <%= tag.meta name: "git-hash", content: Rails.application.config.x.git_hash %>
+
   <%= yield :html_header %>
   <%= raw Danbooru.config.custom_html_header_content %>
 </head>

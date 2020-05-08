@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
   before_action :api_check
   before_action :ip_ban_check
   before_action :set_variant
-  before_action :enable_cors
+  before_action :add_headers
   before_action :cause_error
   after_action :reset_current_user
   layout "default"
@@ -65,8 +65,9 @@ class ApplicationController < ActionController::Base
 
   protected
 
-  def enable_cors
+  def add_headers
     response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["X-Git-Hash"] = Rails.application.config.x.git_hash
   end
 
   def api_check

@@ -50,7 +50,7 @@ module Danbooru
     if File.exist?("#{config.root}/REVISION")
       config.x.git_hash = File.read("#{config.root}/REVISION").strip
     elsif system("type git > /dev/null && git rev-parse --show-toplevel > /dev/null")
-      config.x.git_hash = `git rev-parse --short HEAD`.strip
+      config.x.git_hash = `git rev-parse HEAD`.strip
     else
       config.x.git_hash = nil
     end
