@@ -244,6 +244,16 @@ module Sources
       end
     end
 
+    context "The source for a non-downloadable animated gif with id<=790677560" do
+      should "return working image url" do
+        @site = Sources::Strategies.find("https://www.deviantart.com/heartgear/art/Silent-Night-579982816")
+
+        # md5: 62caac1863aa264a56d548b4b7607097
+        assert_match(%r!\Ahttps://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/ea95be00-c5aa-4063-bd55-f5a9183912f7/d9lb1ls-7d625444-0003-4123-bf00-274737ca7fdd.gif\?token=!, @site.image_url)
+        assert_downloaded(350_156, @site.image_url)
+      end
+    end
+
     context "The source for an DeviantArt artwork page" do
       setup do
         @site = Sources::Strategies.find("http://noizave.deviantart.com/art/test-post-please-ignore-685436408")

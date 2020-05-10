@@ -86,7 +86,7 @@ module Sources
           [api_download[:src]]
         elsif api_deviation.present?
           src = api_deviation.dig(:content, :src)
-          if deviation_id && deviation_id.to_i <= 790677560 && src =~ /^https:\/\/images-wixmp-/
+          if deviation_id && deviation_id.to_i <= 790677560 && src =~ /^https:\/\/images-wixmp-/ && src !~ /\.gif\?/
             src = src.sub(%r!(/f/[a-f0-9-]+/[a-f0-9-]+)!, '/intermediary\1')
             src = src.sub(%r!/v1/(fit|fill)/.*\z!i, "")
           end
