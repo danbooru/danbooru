@@ -79,11 +79,15 @@ module Sources
       end
 
       def image_urls
+        [image_url]
+      end
+
+      def image_url
         # work is private, deleted, or the url didn't contain a deviation id; use image url as given by user.
         if api_deviation.blank?
-          [url]
+          url
         elsif api_deviation[:is_downloadable]
-          [api_download[:src]]
+          api_download[:src]
         elsif api_deviation.present?
           src = api_deviation.dig(:content, :src)
           if deviation_id && deviation_id.to_i <= 790677560 && src =~ /^https:\/\/images-wixmp-/ && src !~ /\.gif\?/
@@ -92,7 +96,7 @@ module Sources
           end
           src = src.sub(%r!\Ahttps?://orig\d+\.deviantart\.net!i, "http://origin-orig.deviantart.net")
           src = src.gsub(%r!q_\d+,strp!, "q_100")
-          [src]
+          src
         else
           raise "Couldn't find image url" # this should never happen
         end
