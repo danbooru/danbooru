@@ -2,6 +2,11 @@ require 'test_helper'
 
 module Sources
   class DeviantArtTest < ActiveSupport::TestCase
+    def setup
+      super
+      skip "DeviantArt API keys not set" unless Danbooru.config.deviantart_client_id.present?
+    end
+
     context "A page url" do
       setup do
         @site = Sources::Strategies.find("https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484")

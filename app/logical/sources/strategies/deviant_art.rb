@@ -79,45 +79,36 @@ module Sources
       end
 
       def image_urls
-        [image_url]
-      end
-
-      def image_url
         # work is private, deleted, or the url didn't contain a deviation id; use image url as given by user.
         if api_deviation.blank?
-          url
-        elsif api_deviation[:isDownloadable]
-          api_client.download_url
+          [url]
+        elsif api_deviation[:is_downloadable]
+          src = api_download[:src]
+          src.sub!(%r!\Ahttps?://s3\.amazonaws\.com/!i, "https://")
+          src.sub!(/\?.*\z/, "") # strip s3 query params
+          src.sub!(%r!\Ahttps://origin-orig\.deviantart\.net!, "http://origin-orig.deviantart.net") # https://origin-orig.devianart.net doesn't work
+          [src]
+        elsif api_deviation.present?
+          src = api_deviation.dig(:content, :src)
+          if deviation_id && deviation_id.to_i <= 790677560 && src =~ /^https:\/\/images-wixmp-/
+            src = src.sub(%r!(/f/[a-f0-9-]+/[a-f0-9-]+)!, '/intermediary\1')
+            src = src.sub(%r!/v1/(fit|fill)/.*\z!i, "")
+          end
+          src = src.sub(%r!\Ahttps?://orig\d+\.deviantart\.net!i, "http://origin-orig.deviantart.net")
+          src = src.sub(%r!q_\d+!, "q_100")
+          [src]
         else
-          media = api_deviation[:media]
-          token = media[:token].first
-          fullview = media[:types].find { |data| data[:t] == "fullview" && data[:c].present? }
-
-          if fullview.present?
-            op = fullview[:c].gsub('<prettyName>', media[:prettyName])
-            src = "#{media[:baseUri]}/#{op}?token=#{token}"
-          else
-            src = "#{media[:baseUri]}?token=#{token}"
-          end
-
-          if deviation_id && deviation_id.to_i <= 790677560 && src =~ /\Ahttps:\/\/images-wixmp-/i
-            src = src.gsub(%r!(/f/[a-f0-9-]+/[a-f0-9-]+)!, '/intermediary\1')
-            src = src.gsub(%r!/v1/(fit|fill)/.*\z!i, "")
-          end
-
-          src = src.gsub(%r!\Ahttps?://orig\d+\.deviantart\.net!i, "http://origin-orig.deviantart.net")
-          src = src.gsub(%r!q_\d+,strp!, "q_100")
-          src
+          raise "Couldn't find image url" # this should never happen
         end
       end
 
       def page_url
-        if api_deviation[:url].present?
+        if api_deviation.present?
           api_deviation[:url]
-        elsif deviation_id.present?
-          page_url_from_image_url
+        elsif api_url.present?
+          api_url
         else
-          nil
+          ""
         end
       end
 
@@ -134,7 +125,7 @@ module Sources
       end
 
       def profile_url
-        return nil if artist_name.blank?
+        return "" if artist_name.blank?
         "https://www.deviantart.com/#{artist_name.downcase}"
       end
 
@@ -143,20 +134,19 @@ module Sources
       def artist_name
         if artist_name_from_url.present?
           artist_name_from_url
-        elsif api_deviation.dig(:author, :username).present?
+        elsif api_metadata.present?
           api_metadata.dig(:author, :username)
         else
-          nil
+          ""
         end
       end
 
       def artist_commentary_title
-        api_deviation[:title]
+        api_metadata[:title]
       end
 
       def artist_commentary_desc
-        return nil unless api_deviation.dig(:extended, :description).present?
-        api_deviation.dig(:extended, :description)
+        api_metadata[:description]
       end
 
       def normalized_for_artist_finder?
@@ -172,10 +162,12 @@ module Sources
       end
 
       def tags
-        return [] unless api_deviation.dig(:extended, :tags).present?
+        if api_metadata.blank?
+          return []
+        end
 
-        api_deviation.dig(:extended, :tags).map do |tag|
-          [tag[:name], tag[:url]]
+        api_metadata[:tags].map do |tag|
+          [tag[:tag_name], "https://www.deviantart.com/tag/#{tag[:tag_name]}"]
         end
       end
 
@@ -208,6 +200,8 @@ module Sources
           end
         end.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
       end
+
+    public
 
       def self.deviation_id_from_url(url)
         if url =~ ASSET
@@ -251,19 +245,81 @@ module Sources
         self.class.title_from_url(url) || self.class.title_from_url(referer_url)
       end
 
-      def api_client
-        @api_client ||= DeviantArtApiClient.new(deviation_id)
+      def api_url
+        return nil if deviation_id.blank?
+        "https://www.deviantart.com/deviation/#{deviation_id}"
       end
 
-      def api_deviation
-        api_client.extended_fetch_json[:deviation] || {}
+      def page
+        return nil if api_url.blank?
+
+        options = Danbooru.config.httparty_options.deep_merge(
+          format: :plain, 
+          headers: { "Accept-Encoding" => "gzip" }
+        )
+        resp = HTTParty.get(api_url, **options)
+
+        if resp.success?
+          body = Zlib.gunzip(resp.body)
+          Nokogiri::HTML(body)
+        # the work was deleted
+        elsif resp.code == 404
+          nil
+        else
+          raise HTTParty::ResponseError.new(resp)
+        end
       end
+      memoize :page
+
+      # Scrape UUID from <meta property="da:appurl" content="DeviantArt://deviation/12F08C5D-A3A4-338C-2F1A-7E4E268C0E8B">
+      # For hidden or deleted works the UUID will be nil.
+      def uuid
+        return nil if page.nil?
+        meta = page.search('meta[property="da:appurl"]').first
+        return nil if meta.nil?
+
+        appurl = meta["content"]
+        uuid = appurl[%r!\ADeviantArt://deviation/(.*)\z!, 1]
+        uuid
+      end
+      memoize :uuid
+
+      def api_client
+        api_client = DeviantArtApiClient.new(
+          Danbooru.config.deviantart_client_id, 
+          Danbooru.config.deviantart_client_secret, 
+          Danbooru.config.httparty_options
+        )
+        api_client.access_token = Cache.get("da-access-token", 55.minutes) do
+          api_client.access_token.to_hash
+        end
+        api_client
+      end
+      memoize :api_client
+
+      def api_deviation
+        return {} if uuid.nil?
+        api_client.deviation(uuid)
+      end
+      memoize :api_deviation
+
+      def api_metadata
+        return {} if uuid.nil?
+        api_client.metadata(uuid)[:metadata].first
+      end
+      memoize :api_metadata
+
+      def api_download
+        return {} if uuid.nil?
+        api_client.download(uuid)
+      end
+      memoize :api_download
 
       def api_response
         {
-          code: api_client.extended_fetch.code,
-          headers: api_client.extended_fetch.headers.to_h,
-          body: api_client.extended_fetch_json
+          deviation: api_deviation,
+          metadata: api_metadata,
+          download: api_download,
         }
       end
     end
