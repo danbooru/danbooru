@@ -88,7 +88,7 @@ module Sources
           url
         elsif api_deviation[:is_downloadable]
           api_download[:src]
-        elsif api_deviation.present?
+        else
           src = api_deviation.dig(:content, :src)
           if deviation_id && deviation_id.to_i <= 790677560 && src =~ /^https:\/\/images-wixmp-/ && src !~ /\.gif\?/
             src = src.sub(%r!(/f/[a-f0-9-]+/[a-f0-9-]+)!, '/intermediary\1')
@@ -97,8 +97,6 @@ module Sources
           src = src.sub(%r!\Ahttps?://orig\d+\.deviantart\.net!i, "http://origin-orig.deviantart.net")
           src = src.gsub(%r!q_\d+,strp!, "q_100")
           src
-        else
-          raise "Couldn't find image url" # this should never happen
         end
       end
 
