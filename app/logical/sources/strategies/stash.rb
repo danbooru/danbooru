@@ -32,11 +32,11 @@ module Sources
       end
 
       def page_url
-        "https://sta.sh/#{stash_id}"
+        page_url_from_image_url
       end
 
-      def api_url
-        page_url
+      def page_url_from_image_url
+        "https://sta.sh/#{stash_id}"
       end
 
       def self.stash_id_from_url(url)
