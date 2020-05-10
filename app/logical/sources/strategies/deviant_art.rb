@@ -83,11 +83,7 @@ module Sources
         if api_deviation.blank?
           [url]
         elsif api_deviation[:is_downloadable]
-          src = api_download[:src]
-          src.sub!(%r!\Ahttps?://s3\.amazonaws\.com/!i, "https://")
-          src.sub!(/\?.*\z/, "") # strip s3 query params
-          src.sub!(%r!\Ahttps://origin-orig\.deviantart\.net!, "http://origin-orig.deviantart.net") # https://origin-orig.devianart.net doesn't work
-          [src]
+          [api_download[:src]]
         elsif api_deviation.present?
           src = api_deviation.dig(:content, :src)
           if deviation_id && deviation_id.to_i <= 790677560 && src =~ /^https:\/\/images-wixmp-/
