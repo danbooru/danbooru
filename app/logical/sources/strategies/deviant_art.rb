@@ -91,7 +91,7 @@ module Sources
             src = src.sub(%r!/v1/(fit|fill)/.*\z!i, "")
           end
           src = src.sub(%r!\Ahttps?://orig\d+\.deviantart\.net!i, "http://origin-orig.deviantart.net")
-          src = src.sub(%r!q_\d+!, "q_100")
+          src = src.gsub(%r!q_\d+,strp!, "q_100")
           [src]
         else
           raise "Couldn't find image url" # this should never happen
