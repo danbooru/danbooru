@@ -106,7 +106,7 @@ module Sources
         elsif deviation_id.present?
           page_url_from_image_url
         else
-          ""
+          nil
         end
       end
 
@@ -123,7 +123,7 @@ module Sources
       end
 
       def profile_url
-        return "" if artist_name.blank?
+        return nil if artist_name.blank?
         "https://www.deviantart.com/#{artist_name.downcase}"
       end
 
@@ -135,7 +135,7 @@ module Sources
         elsif api_metadata.present?
           api_metadata.dig(:author, :username)
         else
-          ""
+          nil
         end
       end
 
