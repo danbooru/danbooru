@@ -246,20 +246,15 @@ module Sources
       def page
         return nil if page_url_from_image_url.blank?
 
-        options = Danbooru.config.httparty_options.deep_merge(
-          format: :plain, 
-          headers: { "Accept-Encoding" => "gzip" }
-        )
-        resp = HTTParty.get(page_url_from_image_url, **options)
+        resp = Danbooru::Http.cache(1.minute).get(page_url_from_image_url, follow: {max_hops: 1})
 
-        if resp.success?
-          body = Zlib.gunzip(resp.body)
-          Nokogiri::HTML(body)
+        if resp.status.success?
+          Nokogiri::HTML(resp.body.to_s)
         # the work was deleted
         elsif resp.code == 404
           nil
         else
-          raise HTTParty::ResponseError.new(resp)
+          raise "failed to fetch page (got code #{resp.code})"
         end
       end
       memoize :page
@@ -280,8 +275,7 @@ module Sources
       def api_client
         api_client = DeviantArtApiClient.new(
           Danbooru.config.deviantart_client_id, 
-          Danbooru.config.deviantart_client_secret, 
-          Danbooru.config.httparty_options
+          Danbooru.config.deviantart_client_secret
         )
         api_client.access_token = Cache.get("da-access-token", 11.weeks) do
           api_client.access_token.to_hash

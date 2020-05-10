@@ -15,22 +15,22 @@
 
 class DeviantArtApiClient
   class Error < StandardError; end
-  BASE_URL = "https://www.deviantart.com/api/v1/oauth2"
+  BASE_URL = "https://www.deviantart.com/api/v1/oauth2/"
 
-  attr_reader :client_id, :client_secret, :httparty_options
+  attr_reader :client_id, :client_secret
 
-  def initialize(client_id, client_secret, httparty_options = {})
-    @client_id, @client_secret, @httparty_options = client_id, client_secret, httparty_options
+  def initialize(client_id, client_secret)
+    @client_id, @client_secret = client_id, client_secret
   end
 
   # https://www.deviantart.com/developers/http/v1/20160316/deviation_single/bcc296bdf3b5e40636825a942a514816
   def deviation(uuid)
-    request("/deviation/#{uuid}")
+    request("deviation/#{uuid}")
   end
 
   # https://www.deviantart.com/developers/http/v1/20160316/deviation_download/bed6982b88949bdb08b52cd6763fcafd
   def download(uuid, mature_content: "1")
-    request("/deviation/download/#{uuid}", mature_content: mature_content)
+    request("deviation/download/#{uuid}", mature_content: mature_content)
   end
 
   # https://www.deviantart.com/developers/http/v1/20160316/deviation_metadata/7824fc14d6fba6acbacca1cf38c24158
@@ -43,19 +43,15 @@ class DeviantArtApiClient
       ext_stats: ext_stats,
     }
 
-    request("/deviation/metadata", **params)
+    request("deviation/metadata", **params)
   end
 
   def request(url, **params)
-    options = {
-      base_uri: BASE_URL,
-      params: { access_token: access_token.token, **params },
-      headers: { "Accept-Encoding" => "gzip" },
-      format: :plain,
-    }
+    params = { access_token: access_token.token, **params }
 
-    body, code = HTTParty.get(url, **options)
-     JSON.parse(Zlib.gunzip(body), symbolize_names: true)
+    url = URI.join(BASE_URL, url).to_s
+    response = Danbooru::Http.cache(1.minute).get(url, params: params)
+    response.parse.with_indifferent_access
   end
 
   def oauth
