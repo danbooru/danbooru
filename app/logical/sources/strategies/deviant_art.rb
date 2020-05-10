@@ -201,8 +201,6 @@ module Sources
         end.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
       end
 
-    public
-
       def self.deviation_id_from_url(url)
         if url =~ ASSET
           $~[:base36_deviation_id].try(:to_i, 36)
@@ -276,7 +274,7 @@ module Sources
 
       def api_client
         api_client = DeviantArtApiClient.new(
-          Danbooru.config.deviantart_client_id, 
+          Danbooru.config.deviantart_client_id,
           Danbooru.config.deviantart_client_secret
         )
         api_client.access_token = Cache.get("da-access-token", 11.weeks) do
@@ -308,7 +306,7 @@ module Sources
         {
           deviation: api_deviation,
           metadata: api_metadata,
-          download: api_download,
+          download: api_download
         }
       end
     end

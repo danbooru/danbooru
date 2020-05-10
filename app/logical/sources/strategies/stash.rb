@@ -40,15 +40,15 @@ module Sources
       end
 
       def self.stash_id_from_url(url)
-       if url =~ STASH
-         $~[:post_id].downcase
-       else
-         nil
-       end
-     end
+        if url =~ STASH
+          $~[:post_id].downcase
+        else
+          nil
+        end
+      end
 
       def stash_id
-        [url, referer_url].map{ |x| self.class.stash_id_from_url(x) }.compact.first
+        [url, referer_url].map { |x| self.class.stash_id_from_url(x) }.compact.first
       end
     end
   end
