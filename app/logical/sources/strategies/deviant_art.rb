@@ -286,7 +286,7 @@ module Sources
           Danbooru.config.deviantart_client_secret, 
           Danbooru.config.httparty_options
         )
-        api_client.access_token = Cache.get("da-access-token", 55.minutes) do
+        api_client.access_token = Cache.get("da-access-token", 11.weeks) do
           api_client.access_token.to_hash
         end
         api_client
