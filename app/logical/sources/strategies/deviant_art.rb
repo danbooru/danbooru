@@ -88,6 +88,8 @@ module Sources
           url
         elsif api_deviation[:is_downloadable]
           api_download[:src]
+        elsif api_deviation[:flash].present?
+          api_deviation.dig(:flash, :src)
         else
           src = api_deviation.dig(:content, :src)
           if deviation_id && deviation_id.to_i <= 790677560 && src =~ /^https:\/\/images-wixmp-/ && src !~ /\.gif\?/

@@ -254,6 +254,16 @@ module Sources
       end
     end
 
+    context "The source for a non-downloadable flash file" do
+      should "return working image url" do
+        @site = Sources::Strategies.find("https://www.deviantart.com/heartgear/art/SL-40v3-522007633")
+
+        # md5: 6adf1a3d532f898f44cf9948cbc7db7d
+        assert_match(%r!\Ahttps://api-da\.wixmp\.com/_api/download/file\?downloadToken=!, @site.image_url)
+        assert_downloaded(3_496_110, @site.image_url)
+      end
+    end
+
     context "The source for an DeviantArt artwork page" do
       setup do
         @site = Sources::Strategies.find("http://noizave.deviantart.com/art/test-post-please-ignore-685436408")
