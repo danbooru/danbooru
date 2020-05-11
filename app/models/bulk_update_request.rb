@@ -75,7 +75,7 @@ class BulkUpdateRequest < ApplicationRecord
     def approve!(approver)
       transaction do
         CurrentUser.scoped(approver) do
-          AliasAndImplicationImporter.new(script, forum_topic_id, "1", true).process!
+          AliasAndImplicationImporter.new(script, forum_topic_id, true).process!
           update!(status: "approved", approver: approver, skip_secondary_validations: true)
           forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.")
         end
@@ -110,7 +110,7 @@ class BulkUpdateRequest < ApplicationRecord
 
   module ValidationMethods
     def validate_script
-      AliasAndImplicationImporter.new(script, forum_topic_id, "1", skip_secondary_validations).validate!
+      AliasAndImplicationImporter.new(script, forum_topic_id, skip_secondary_validations).validate!
     rescue AliasAndImplicationImporter::Error => e
       errors[:base] << e.message
     end

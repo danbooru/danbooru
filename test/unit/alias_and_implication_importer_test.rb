@@ -92,8 +92,9 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
       tag2 = create(:tag, name: "bbb")
       wiki = create(:wiki_page, title: "aaa")
       artist = create(:artist, name: "aaa")
-      @importer = AliasAndImplicationImporter.new("create alias aaa -> bbb", "", "1")
+      @importer = AliasAndImplicationImporter.new("create alias aaa -> bbb", "")
       @importer.process!
+      perform_enqueued_jobs
       assert_equal("bbb", artist.reload.name)
       assert_equal("bbb", wiki.reload.title)
     end
