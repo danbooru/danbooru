@@ -19,8 +19,7 @@ module Sources
 
         assert_equal("https://sta.sh/0wxs31o7nn2", @site.page_url)
         assert_equal("https://sta.sh/0wxs31o7nn2", @site.canonical_url)
-        assert_equal("http://origin-orig.deviantart.net/0fd2/f/2018/252/9/c/a_pepe_by_noizave-dcmga0s.png", @site.image_url)
-        assert_equal(["http://origin-orig.deviantart.net/0fd2/f/2018/252/9/c/a_pepe_by_noizave-dcmga0s.png"], @site.image_urls)
+        assert_match(%r!\Ahttps://api-da\.wixmp\.com/_api/download/file\?downloadToken=!, @site.image_url)
       end
     end
 
@@ -37,8 +36,7 @@ module Sources
 
           assert_equal("https://sta.sh/0wxs31o7nn2", @site.page_url)
           assert_equal("https://sta.sh/0wxs31o7nn2", @site.canonical_url)
-          assert_equal("http://origin-orig.deviantart.net/0fd2/f/2018/252/9/c/a_pepe_by_noizave-dcmga0s.png", @site.image_url)
-          assert_equal(["http://origin-orig.deviantart.net/0fd2/f/2018/252/9/c/a_pepe_by_noizave-dcmga0s.png"], @site.image_urls)
+          assert_match(%r!\Ahttps://api-da\.wixmp\.com/_api/download/file\?downloadToken=!, @site.image_url)
         end
       end
 
@@ -50,7 +48,7 @@ module Sources
           assert_equal("Deviant Art", @site.site_name)
 
           # this is the wrong page, but there's no way to know the correct sta.sh page without the referer.
-          assert_equal("https://www.deviantart.com/deviation/763305148", @site.page_url)
+          assert_equal("https://www.deviantart.com/noizave/art/A-Pepe-763305148", @site.page_url)
         end
       end
     end
