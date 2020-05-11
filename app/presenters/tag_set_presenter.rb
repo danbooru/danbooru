@@ -110,7 +110,7 @@ class TagSetPresenter
     html = %{<li class="tag-type-#{tag.category}" data-tag-name="#{h(name)}">}
 
     unless name_only
-      if category == Tag.categories.artist
+      if tag.artist?
         html << %{<a class="wiki-link" href="/artists/show_or_new?name=#{u(name)}">?</a> }
       elsif name =~ /\A\d+\z/
         html << %{<a class="wiki-link" href="/wiki_pages/~#{u(name)}">?</a> }
@@ -125,7 +125,7 @@ class TagSetPresenter
     end
 
     humanized_tag = humanize_tags ? name.tr("_", " ") : name
-    itemprop = 'itemprop="author"' if category == Tag.categories.artist
+    itemprop = 'itemprop="author"' if tag.artist?
     html << %{<a class="search-tag" #{itemprop} href="/posts?tags=#{u(name)}">#{h(humanized_tag)}</a> }
 
     unless name_only || tag.new_record?
@@ -137,7 +137,7 @@ class TagSetPresenter
         post_count = count
       end
 
-      is_underused_tag = count <= 1 && category == Tag.categories.general
+      is_underused_tag = count <= 1 && tag.general?
       klass = "post-count#{is_underused_tag ? " low-post-count" : ""}"
 
       html << %{<span class="#{klass}" title="#{count}">#{post_count}</span>}

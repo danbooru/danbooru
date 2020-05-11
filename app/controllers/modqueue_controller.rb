@@ -14,9 +14,9 @@ class ModqueueController < ApplicationController
     @uploaders = @modqueue_posts.group(:uploader).order(count: :desc).limit(20).count
 
     @tags = RelatedTagCalculator.frequent_tags_for_post_relation(@modqueue_posts)
-    @artist_tags = @tags.select { |tag| tag.category == Tag.categories.artist }.sort_by(&:overlap_count).reverse.take(10)
-    @copyright_tags = @tags.select { |tag| tag.category == Tag.categories.copyright }.sort_by(&:overlap_count).reverse.take(10)
-    @character_tags = @tags.select { |tag| tag.category == Tag.categories.character }.sort_by(&:overlap_count).reverse.take(10)
+    @artist_tags = @tags.select(&:artist?).sort_by(&:overlap_count).reverse.take(10)
+    @copyright_tags = @tags.select(&:copyright?).sort_by(&:overlap_count).reverse.take(10)
+    @character_tags = @tags.select(&:character?).sort_by(&:overlap_count).reverse.take(10)
 
     respond_with(@posts)
   end

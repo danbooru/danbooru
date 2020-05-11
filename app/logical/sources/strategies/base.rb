@@ -213,7 +213,7 @@ module Sources
 
       def translated_tags
         translated_tags = normalized_tags.flat_map(&method(:translate_tag)).uniq.sort
-        translated_tags.reject { |tag| tag.category == Tag.categories.artist }
+        translated_tags.reject(&:artist?)
       end
 
       # Given a tag from the source site, should return an array of corresponding Danbooru tags.

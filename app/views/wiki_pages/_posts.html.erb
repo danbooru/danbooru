@@ -1,4 +1,4 @@
-<% if wiki_page.tag.present? && wiki_page.tag.post_count > 0 %>
+<% if wiki_page.tag.present? && !wiki_page.tag.empty? %>
   <div id="wiki-page-posts">
     <h2>Recent Posts <%= link_to "»", posts_path(tags: wiki_page.title) %></h2>
 

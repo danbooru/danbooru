@@ -1566,10 +1566,10 @@ class Post < ApplicationRecord
     end
 
     def added_tags_are_valid
-      new_tags = added_tags.select { |t| t.post_count <= 0 }
-      new_general_tags = new_tags.select { |t| t.category == Tag.categories.general }
-      new_artist_tags = new_tags.select { |t| t.category == Tag.categories.artist }
-      repopulated_tags = new_tags.select { |t| (t.category != Tag.categories.general) && (t.category != Tag.categories.meta) && (t.created_at < 1.hour.ago) }
+      new_tags = added_tags.select(&:empty?)
+      new_general_tags = new_tags.select(&:general?)
+      new_artist_tags = new_tags.select(&:artist?)
+      repopulated_tags = new_tags.select { |t| !t.general? && !t.meta? && (t.created_at < 1.hour.ago) }
 
       if new_general_tags.present?
         n = new_general_tags.size
@@ -1604,7 +1604,7 @@ class Post < ApplicationRecord
       return if !new_record?
       return if source !~ %r!\Ahttps?://!
       return if has_tag?("artist_request") || has_tag?("official_art")
-      return if tags.any? { |t| t.category == Tag.categories.artist }
+      return if tags.any?(&:artist?)
       return if Sources::Strategies.find(source).is_a?(Sources::Strategies::Null)
 
       self.warnings[:base] << "Artist tag is required. \"Create new artist tag\":[/artists/new?artist%5Bsource%5D=#{CGI.escape(source)}]. Ask on the forum if you need naming help"
@@ -1612,7 +1612,7 @@ class Post < ApplicationRecord
 
     def has_copyright_tag
       return if !new_record?
-      return if has_tag?("copyright_request") || tags.any? { |t| t.category == Tag.categories.copyright }
+      return if has_tag?("copyright_request") || tags.any?(&:copyright?)
 
       self.warnings[:base] << "Copyright tag is required. Consider adding [[copyright request]] or [[original]]"
     end
@@ -1620,7 +1620,7 @@ class Post < ApplicationRecord
     def has_enough_tags
       return if !new_record?
 
-      if tags.count { |t| t.category == Tag.categories.general } < 10
+      if tags.count(&:general?) < 10
         self.warnings[:base] << "Uploads must have at least 10 general tags. Read [[howto:tag]] for guidelines on tagging your uploads"
       end
     end

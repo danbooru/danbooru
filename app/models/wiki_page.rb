@@ -119,7 +119,7 @@ class WikiPage < ApplicationRecord
     return unless title_changed?
 
     tag_was = Tag.find_by_name(Tag.normalize_name(title_was))
-    if tag_was.present? && tag_was.post_count > 0
+    if tag_was.present? && !tag_was.empty?
       warnings[:base] << %!Warning: {{#{title_was}}} still has #{tag_was.post_count} #{"post".pluralize(tag_was.post_count)}. Be sure to move the posts!
     end
 

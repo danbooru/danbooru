@@ -91,9 +91,9 @@ class TagAlias < TagRelationship
   end
 
   def ensure_category_consistency
-    if antecedent_tag.category == Tag.categories.general && consequent_tag.category != Tag.categories.general
+    if antecedent_tag.general? && !consequent_tag.general?
       antecedent_tag.update!(category: consequent_tag.category)
-    elsif consequent_tag.category == Tag.categories.general && antecedent_tag.category != Tag.categories.general
+    elsif consequent_tag.general? && !antecedent_tag.general?
       consequent_tag.update!(category: antecedent_tag.category)
     end
   end
@@ -106,7 +106,7 @@ class TagAlias < TagRelationship
       end
     end
 
-    if antecedent_tag.category == Tag.categories.artist
+    if antecedent_tag.artist?
       if antecedent_tag.artist.present? && consequent_tag.artist.blank?
         antecedent_tag.artist.update!(name: consequent_name)
       end

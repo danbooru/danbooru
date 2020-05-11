@@ -52,10 +52,8 @@ class Tag < ApplicationRecord
     end
   end
 
-  module CountMethods
-    extend ActiveSupport::Concern
-
-    module ClassMethods
+  concerning :CountMethods do
+    class_methods do
       # Lock the tags first in alphabetical order to avoid deadlocks under concurrent updates.
       #
       # https://stackoverflow.com/questions/44660368/postgres-update-with-order-by-how-to-do-it
@@ -110,10 +108,14 @@ class Tag < ApplicationRecord
         tags
       end
     end
+
+    def empty?
+      post_count <= 0
+    end
   end
 
-  module CategoryMethods
-    module ClassMethods
+  concerning :CategoryMethods do
+    class_methods do
       def categories
         @categories ||= CategoryMapping.new
       end
@@ -148,8 +150,11 @@ class Tag < ApplicationRecord
       end
     end
 
-    def self.included(m)
-      m.extend(ClassMethods)
+    # define artist?, general?, character?, copyright?, meta?
+    TagCategory.categories.each do |category_name|
+      define_method("#{category_name}?") do
+        category == Tag.categories.send(category_name)
+      end
     end
 
     def category_name
@@ -357,7 +362,5 @@ class Tag < ApplicationRecord
   end
 
   include ApiMethods
-  include CountMethods
-  include CategoryMethods
   extend SearchMethods
 end
