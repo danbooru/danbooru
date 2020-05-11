@@ -105,9 +105,9 @@ class DText
       end
     elsif obj.is_a?(BulkUpdateRequest)
       if obj.script.size < 700
-        embedded_script = obj.script_with_links
+        embedded_script = obj.processor.to_dtext
       else
-        embedded_script = "[expand]#{obj.script_with_links}[/expand]"
+        embedded_script = "[expand]#{obj.processor.to_dtext}[/expand]"
       end
 
       if obj.is_approved?

@@ -75,12 +75,12 @@ class BulkUpdateRequest < ApplicationRecord
     def approve!(approver)
       transaction do
         CurrentUser.scoped(approver) do
-          AliasAndImplicationImporter.new(script, forum_topic_id, true).process!
+          processor.process!(approver)
           update!(status: "approved", approver: approver, skip_secondary_validations: true)
           forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.")
         end
       end
-    rescue AliasAndImplicationImporter::Error => x
+    rescue BulkUpdateRequestProcessor::Error => x
       self.approver = approver
       CurrentUser.scoped(approver) do
         forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has failed: #{x}")
@@ -110,8 +110,8 @@ class BulkUpdateRequest < ApplicationRecord
 
   module ValidationMethods
     def validate_script
-      AliasAndImplicationImporter.new(script, forum_topic_id, skip_secondary_validations).validate!
-    rescue AliasAndImplicationImporter::Error => e
+      processor.validate!
+    rescue BulkUpdateRequestProcessor::Error => e
       errors[:base] << e.message
     end
   end
@@ -120,36 +120,20 @@ class BulkUpdateRequest < ApplicationRecord
   include ApprovalMethods
   include ValidationMethods
 
-  def script_with_links
-    tokens = AliasAndImplicationImporter.tokenize(script)
-    lines = tokens.map do |token|
-      case token[0]
-      when :create_alias, :create_implication, :remove_alias, :remove_implication
-        "#{token[0].to_s.tr("_", " ")} [[#{token[1]}]] -> [[#{token[2]}]]"
-
-      when :mass_update
-        "mass update {{#{token[1]}}} -> #{token[2]}"
-
-      when :change_category
-        "category [[#{token[1]}]] -> #{token[2]}"
-
-      else
-        raise "Unknown token: #{token[0]}"
-      end
-    end
-    lines.join("\n")
-  end
-
   def normalize_text
     self.script = script.downcase
   end
 
   def update_tags
-    self.tags = AliasAndImplicationImporter.new(script, nil).affected_tags
+    self.tags = processor.affected_tags
   end
 
   def skip_secondary_validations=(v)
     @skip_secondary_validations = v.to_s.truthy?
+  end
+
+  def processor
+    @processor ||= BulkUpdateRequestProcessor.new(script, forum_topic_id: forum_topic_id, skip_secondary_validations: skip_secondary_validations)
   end
 
   def is_pending?

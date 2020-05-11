@@ -1,9 +1,9 @@
 require 'test_helper'
 
-class AliasAndImplicationImporterTest < ActiveSupport::TestCase
-  context "The alias and implication importer" do
+class BulkUpdateRequestProcessorTest < ActiveSupport::TestCase
+  context "The bulk update request processor" do
     setup do
-      CurrentUser.user = FactoryBot.create(:admin_user)
+      CurrentUser.user = create(:admin_user)
       CurrentUser.ip_addr = "127.0.0.1"
     end
 
@@ -13,26 +13,23 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
     end
 
     context "category command" do
-      setup do
-        @tag = Tag.find_or_create_by_name("hello")
-        @list = "category hello -> artist\n"
-        @importer = AliasAndImplicationImporter.new(@list, nil)
-      end
+      should "change the tag's category" do
+        @tag = create(:tag, name: "hello")
+        @script = "category hello -> artist\n"
+        @processor = BulkUpdateRequestProcessor.new(@script)
+        @processor.process!(CurrentUser.user)
 
-      should "work" do
-        @importer.process!
-        @tag.reload
-        assert_equal(Tag.categories.value_for("artist"), @tag.category)
+        assert_equal(Tag.categories.value_for("artist"), @tag.reload.category)
       end
     end
 
     context "#affected_tags" do
       setup do
-        FactoryBot.create(:post, tag_string: "aaa")
-        FactoryBot.create(:post, tag_string: "bbb")
-        FactoryBot.create(:post, tag_string: "ccc")
-        FactoryBot.create(:post, tag_string: "ddd")
-        FactoryBot.create(:post, tag_string: "eee")
+        create(:post, tag_string: "aaa")
+        create(:post, tag_string: "bbb")
+        create(:post, tag_string: "ccc")
+        create(:post, tag_string: "ddd")
+        create(:post, tag_string: "eee")
 
         @script = "create alias aaa -> 000\n" +
           "create implication bbb -> 111\n" +
@@ -41,48 +38,41 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
           "mass update eee -> 444\n"
       end
 
-      subject { AliasAndImplicationImporter.new(@script, nil) }
-
       should "return the correct tags" do
-        assert_equal(%w(aaa 000 bbb 111 ccc 222 ddd 333 eee 444), subject.affected_tags)
+        @processor = BulkUpdateRequestProcessor.new(@script)
+        assert_equal(%w(000 111 222 333 444 aaa bbb ccc ddd eee), @processor.affected_tags)
       end
     end
 
     context "given a valid list" do
-      setup do
-        @list = "create alias abc -> def\ncreate implication aaa -> bbb\n"
-        @importer = AliasAndImplicationImporter.new(@list, nil)
-      end
-
       should "process it" do
-        @importer.process!
+        @list = "create alias abc -> def\ncreate implication aaa -> bbb\n"
+        @processor = BulkUpdateRequestProcessor.new(@list)
+        @processor.process!(CurrentUser.user)
+
         assert(TagAlias.exists?(antecedent_name: "abc", consequent_name: "def"))
         assert(TagImplication.exists?(antecedent_name: "aaa", consequent_name: "bbb"))
       end
     end
 
     context "given a list with an invalid command" do
-      setup do
-        @list = "zzzz abc -> def\n"
-        @importer = AliasAndImplicationImporter.new(@list, nil)
-      end
-
       should "throw an exception" do
-        assert_raises(RuntimeError) do
-          @importer.process!
+        @list = "zzzz abc -> def\n"
+        @processor = BulkUpdateRequestProcessor.new(@list)
+
+        assert_raises(BulkUpdateRequestProcessor::Error) do
+          @processor.process!(CurrentUser.user)
         end
       end
     end
 
     context "given a list with a logic error" do
-      setup do
-        @list = "remove alias zzz -> yyy\n"
-        @importer = AliasAndImplicationImporter.new(@list, nil)
-      end
-
       should "throw an exception" do
-        assert_raises(RuntimeError) do
-          @importer.process!
+        @list = "remove alias zzz -> yyy\n"
+        @processor = BulkUpdateRequestProcessor.new(@list)
+
+        assert_raises(BulkUpdateRequestProcessor::Error) do
+          @processor.process!(CurrentUser.user)
         end
       end
     end
@@ -92,26 +82,28 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
       tag2 = create(:tag, name: "bbb")
       wiki = create(:wiki_page, title: "aaa")
       artist = create(:artist, name: "aaa")
-      @importer = AliasAndImplicationImporter.new("create alias aaa -> bbb", "")
-      @importer.process!
+
+      @processor = BulkUpdateRequestProcessor.new("create alias aaa -> bbb")
+      @processor.process!(CurrentUser.user)
       perform_enqueued_jobs
+
       assert_equal("bbb", artist.reload.name)
       assert_equal("bbb", wiki.reload.title)
     end
 
     context "remove alias and remove implication commands" do
       setup do
-        @ta = FactoryBot.create(:tag_alias, antecedent_name: "a", consequent_name: "b", status: "active")
-        @ti = FactoryBot.create(:tag_implication, antecedent_name: "c", consequent_name: "d", status: "active")
+        @ta = create(:tag_alias, antecedent_name: "a", consequent_name: "b", status: "active")
+        @ti = create(:tag_implication, antecedent_name: "c", consequent_name: "d", status: "active")
         @script = %{
           remove alias a -> b
           remove implication c -> d
         }
-        @importer = AliasAndImplicationImporter.new(@script, nil)
+        @processor = BulkUpdateRequestProcessor.new(@script)
       end
 
       should "set aliases and implications as deleted" do
-        @importer.process!
+        @processor.process!(CurrentUser.user)
 
         assert_equal("deleted", @ta.reload.status)
         assert_equal("deleted", @ti.reload.status)
@@ -119,15 +111,15 @@ class AliasAndImplicationImporterTest < ActiveSupport::TestCase
 
       should "create modactions for each removal" do
         assert_difference(-> { ModAction.count }, 2) do
-          @importer.process!
+          @processor.process!(CurrentUser.user)
         end
       end
 
       should "only remove active aliases and implications" do
-        @ta2 = FactoryBot.create(:tag_alias, antecedent_name: "a", consequent_name: "b", status: "pending")
-        @ti2 = FactoryBot.create(:tag_implication, antecedent_name: "c", consequent_name: "d", status: "pending")
+        @ta2 = create(:tag_alias, antecedent_name: "a", consequent_name: "b", status: "pending")
+        @ti2 = create(:tag_implication, antecedent_name: "c", consequent_name: "d", status: "pending")
 
-        @importer.process!
+        @processor.process!(CurrentUser.user)
         assert_equal("pending", @ta2.reload.status)
         assert_equal("pending", @ti2.reload.status)
       end

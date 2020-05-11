@@ -1,65 +1,50 @@
-class AliasAndImplicationImporter
-  class Error < RuntimeError; end
-  attr_accessor :text, :commands, :forum_id, :skip_secondary_validations
+class BulkUpdateRequestProcessor
+  extend Memoist
 
-  def initialize(text, forum_id, skip_secondary_validations = true)
-    @forum_id = forum_id
+  class Error < StandardError; end
+  attr_accessor :text, :forum_topic_id, :skip_secondary_validations
+
+  def initialize(text, forum_topic_id: nil, skip_secondary_validations: true)
+    @forum_topic_id = forum_topic_id
     @text = text
     @skip_secondary_validations = skip_secondary_validations
   end
 
-  def process!(approver = CurrentUser.user)
-    tokens = AliasAndImplicationImporter.tokenize(text)
-    parse(tokens, approver)
-  end
-
-  def validate!
-    tokens = AliasAndImplicationImporter.tokenize(text)
-    validate(tokens)
-  end
-
-  def self.tokenize(text)
+  def tokens
     text.split(/\r\n|\r|\n/).reject(&:blank?).map do |line|
       line = line.gsub(/[[:space:]]+/, " ").strip
 
       if line =~ /^(?:create alias|aliasing|alias) (\S+) -> (\S+)$/i
         [:create_alias, $1, $2]
-
       elsif line =~ /^(?:create implication|implicating|implicate|imply) (\S+) -> (\S+)$/i
         [:create_implication, $1, $2]
-
       elsif line =~ /^(?:remove alias|unaliasing|unalias) (\S+) -> (\S+)$/i
         [:remove_alias, $1, $2]
-
       elsif line =~ /^(?:remove implication|unimplicating|unimplicate|unimply) (\S+) -> (\S+)$/i
         [:remove_implication, $1, $2]
-
       elsif line =~ /^(?:mass update|updating|update|change) (.+?) -> (.*)$/i
         [:mass_update, $1, $2]
-
       elsif line =~ /^category (\S+) -> (#{Tag.categories.regexp})/
         [:change_category, $1, $2]
-
       elsif line.strip.empty?
         # do nothing
-
       else
         raise Error, "Unparseable line: #{line}"
       end
     end
   end
 
-  def validate(tokens)
+  def validate!
     tokens.map do |token|
       case token[0]
       when :create_alias
-        tag_alias = TagAlias.new(creator: User.system, forum_topic_id: forum_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
+        tag_alias = TagAlias.new(creator: User.system, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
         unless tag_alias.valid?
           raise Error, "Error: #{tag_alias.errors.full_messages.join("; ")} (create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name})"
         end
 
       when :create_implication
-        tag_implication = TagImplication.new(creator: User.system, forum_topic_id: forum_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
+        tag_implication = TagImplication.new(creator: User.system, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
         unless tag_implication.valid?
           raise Error, "Error: #{tag_implication.errors.full_messages.join("; ")} (create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name})"
         end
@@ -73,37 +58,19 @@ class AliasAndImplicationImporter
     end
   end
 
-  def affected_tags
-    AliasAndImplicationImporter.tokenize(text).flat_map do |type, *args|
-      case type
-      when :create_alias, :remove_alias, :create_implication, :remove_implication
-        [args[0], args[1]]
-      when :mass_update
-        tags = PostQueryBuilder.new(args[0]).tags + PostQueryBuilder.new(args[1]).tags
-        tags.reject(&:negated).reject(&:optional).reject(&:wildcard).map(&:name)
-      when :change_category
-        args[0]
-      end
-    end.sort.uniq
-  rescue Error
-    []
-  end
-
-  private
-
-  def parse(tokens, approver)
+  def process!(approver)
     ActiveRecord::Base.transaction do
       tokens.map do |token|
         case token[0]
         when :create_alias
-          tag_alias = TagAlias.create(creator: approver, forum_topic_id: forum_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
+          tag_alias = TagAlias.create(creator: approver, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
           unless tag_alias.valid?
             raise Error, "Error: #{tag_alias.errors.full_messages.join("; ")} (create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name})"
           end
           tag_alias.approve!(approver: approver)
 
         when :create_implication
-          tag_implication = TagImplication.create(creator: approver, forum_topic_id: forum_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
+          tag_implication = TagImplication.create(creator: approver, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
           unless tag_implication.valid?
             raise Error, "Error: #{tag_implication.errors.full_messages.join("; ")} (create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name})"
           end
@@ -133,4 +100,37 @@ class AliasAndImplicationImporter
       end
     end
   end
+
+  def affected_tags
+    tokens.flat_map do |type, *args|
+      case type
+      when :create_alias, :remove_alias, :create_implication, :remove_implication
+        [args[0], args[1]]
+      when :mass_update
+        tags = PostQueryBuilder.new(args[0]).tags + PostQueryBuilder.new(args[1]).tags
+        tags.reject(&:negated).reject(&:optional).reject(&:wildcard).map(&:name)
+      when :change_category
+        args[0]
+      end
+    end.sort.uniq
+  rescue Error
+    []
+  end
+
+  def to_dtext
+    tokens.map do |token|
+      case token[0]
+      when :create_alias, :create_implication, :remove_alias, :remove_implication
+        "#{token[0].to_s.tr("_", " ")} [[#{token[1]}]] -> [[#{token[2]}]]"
+      when :mass_update
+        "mass update {{#{token[1]}}} -> #{token[2]}"
+      when :change_category
+        "category [[#{token[1]}]] -> #{token[2]}"
+      else
+        raise "Unknown token: #{token[0]}"
+      end
+    end.join("\n")
+  end
+
+  memoize :tokens
 end

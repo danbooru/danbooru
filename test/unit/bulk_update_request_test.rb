@@ -150,7 +150,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       end
 
       should "gracefully handle validation errors during approval" do
-        @req.stubs(:update!).raises(AliasAndImplicationImporter::Error.new("blah"))
+        @req.stubs(:update!).raises(BulkUpdateRequestProcessor::Error.new("blah"))
         assert_difference("ForumPost.count", 1) do
           @req.approve!(@admin)
         end
