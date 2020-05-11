@@ -1,59 +1,69 @@
-# https://github.com/danbooru/danbooru/issues/4144
+# Authentication is via OAuth2 with the client credentials grant. Register a
+# new app at https://www.deviantart.com/developers/ to obtain a client_id and
+# client_secret. The app doesn't need to be published.
 #
 # API requests must send a user agent and must use gzip compression, otherwise
 # 403 errors will be returned.
+#
+# API calls operate on UUIDs. The deviation ID in the URL is not the UUID. UUIDs
+# are obtained by scraping the HTML page for the <meta property="da:appurl"> element.
+#
+# * https://www.deviantart.com/developers/
+# * https://www.deviantart.com/developers/authentication
+# * https://www.deviantart.com/developers/errors
+# * https://www.deviantart.com/developers/http/v1/20160316
 
-DeviantArtApiClient = Struct.new(:deviation_id) do
-  extend Memoist
+class DeviantArtApiClient
+  class Error < StandardError; end
+  BASE_URL = "https://www.deviantart.com/api/v1/oauth2/"
 
-  def extended_fetch
-    params = { deviationid: deviation_id, type: "art", include_session: false }
-    get("https://www.deviantart.com/_napi/da-deviation/shared_api/deviation/extended_fetch", params: params)
+  attr_reader :client_id, :client_secret
+
+  def initialize(client_id, client_secret)
+    @client_id, @client_secret = client_id, client_secret
   end
 
-  def extended_fetch_json
-    JSON.parse(extended_fetch.body).with_indifferent_access
+  # https://www.deviantart.com/developers/http/v1/20160316/deviation_single/bcc296bdf3b5e40636825a942a514816
+  def deviation(uuid)
+    request("deviation/#{uuid}")
   end
 
-  def download_url
-    url = extended_fetch_json.dig(:deviation, :extended, :download, :url)
-    response = get(url)
-    response.headers[:location]
+  # https://www.deviantart.com/developers/http/v1/20160316/deviation_download/bed6982b88949bdb08b52cd6763fcafd
+  def download(uuid, mature_content: "1")
+    request("deviation/download/#{uuid}", mature_content: mature_content)
   end
 
-  def get(url, retries: 1, **options)
-    response = http.cookies(cookies).get(url, **options)
+  # https://www.deviantart.com/developers/http/v1/20160316/deviation_metadata/7824fc14d6fba6acbacca1cf38c24158
+  def metadata(*uuids, mature_content: "1", ext_submission: "1", ext_camera: "1", ext_stats: "1")
+    params = {
+      deviationids: uuids.flatten,
+      mature_content: mature_content,
+      ext_submission: ext_submission,
+      ext_camera: ext_camera,
+      ext_stats: ext_stats
+    }
 
-    new_cookies = response.cookies.cookies.map { |cookie| { cookie.name => cookie.value } }.reduce(&:merge)
-    new_cookies = new_cookies.slice(:userinfo, :auth, :authsecure)
-    if new_cookies.present?
-      DanbooruLogger.info("DeviantArt: updating cookies", url: url, new_cookies: new_cookies, old_cookies: cookies)
-      self.cookies = new_cookies
-    end
-
-    # If the old auth cookie expired we may get a 404 with a new auth cookie
-    # set. Try again with the new cookie.
-    if response.code == 404 && retries > 0
-      DanbooruLogger.info("DeviantArt: retrying", url: url, cookies: cookies)
-      response = get(url, retries: retries - 1, **options)
-    end
-
-    response
+    request("deviation/metadata", **params)
   end
 
-  def cookies
-    Cache.get("deviantart_cookies", 10.years.to_i) do
-      JSON.parse(Danbooru.config.deviantart_cookies)
-    end
+  def request(url, **params)
+    params = { access_token: access_token.token, **params }
+
+    url = URI.join(BASE_URL, url).to_s
+    response = Danbooru::Http.cache(1.minute).get(url, params: params)
+    response.parse.with_indifferent_access
   end
 
-  def cookies=(new_cookies)
-    Cache.put("deviantart_cookies", new_cookies, 10.years.to_i)
+  def oauth
+    OAuth2::Client.new(client_id, client_secret, site: "https://www.deviantart.com", token_url: "/oauth2/token")
   end
 
-  def http
-    HTTP.use(:auto_inflate).headers(Danbooru.config.http_headers.merge("Accept-Encoding" => "gzip"))
+  def access_token
+    @access_token = oauth.client_credentials.get_token if @access_token.nil? || @access_token.expired?
+    @access_token
   end
 
-  memoize :extended_fetch, :extended_fetch_json, :download_url
+  def access_token=(hash)
+    @access_token = OAuth2::AccessToken.from_hash(oauth, hash)
+  end
 end

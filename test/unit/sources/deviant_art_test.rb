@@ -2,6 +2,11 @@ require 'test_helper'
 
 module Sources
   class DeviantArtTest < ActiveSupport::TestCase
+    def setup
+      super
+      skip "DeviantArt API keys not set" unless Danbooru.config.deviantart_client_id.present?
+    end
+
     context "A page url" do
       setup do
         @site = Sources::Strategies.find("https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484")
@@ -236,6 +241,36 @@ module Sources
           assert_equal([@artist], @site.artists)
           assert_nothing_raised { @site.to_h }
         end
+      end
+    end
+
+    context "The source for a non-downloadable animated gif with id<=790677560" do
+      should "return working image url" do
+        @site = Sources::Strategies.find("https://www.deviantart.com/heartgear/art/Silent-Night-579982816")
+
+        # md5: 62caac1863aa264a56d548b4b7607097
+        assert_match(%r!\Ahttps://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/ea95be00-c5aa-4063-bd55-f5a9183912f7/d9lb1ls-7d625444-0003-4123-bf00-274737ca7fdd.gif\?token=!, @site.image_url)
+        assert_downloaded(350_156, @site.image_url)
+      end
+    end
+
+    context "The source for a non-downloadable flash file" do
+      should "return working image url" do
+        @site = Sources::Strategies.find("https://www.deviantart.com/heartgear/art/SL-40v3-522007633")
+
+        # md5: 6adf1a3d532f898f44cf9948cbc7db7d
+        assert_match(%r!\Ahttps://api-da\.wixmp\.com/_api/download/file\?downloadToken=!, @site.image_url)
+        assert_downloaded(3_496_110, @site.image_url)
+      end
+    end
+
+    context "The source for a non-downloadable video file" do
+      should "return working image url" do
+        @site = Sources::Strategies.find("https://www.deviantart.com/gs-mantis/art/Chen-Goes-Fishing-505847233")
+
+        # md5: 344ac2b9fd5a87982af4b648aa2b2b0d
+        assert_equal("https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/fe046bc7-4d68-4699-96c1-19aa464edff6/d8d6281-91959e92-214f-4b2d-a138-ace09f4b6d09.1080p.8e57939eba634743a9fa41185e398d00.mp4", @site.image_url)
+        assert_downloaded(9_739_947, @site.image_url)
       end
     end
 
