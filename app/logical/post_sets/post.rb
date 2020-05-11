@@ -1,6 +1,8 @@
 module PostSets
   class Post
     MAX_PER_PAGE = 200
+    MAX_SIDEBAR_TAGS = 25
+
     attr_reader :page, :random, :post_count, :format, :tag_string, :query
 
     def initialize(tags, page = 1, per_page = nil, random: false, format: "html")
@@ -118,10 +120,6 @@ module PostSets
       [page.to_i, 1].max
     end
 
-    def presenter
-      @presenter ||= ::PostSetPresenters::Post.new(self)
-    end
-
     def best_post
       # be smarter about this in the future
       posts.reject(&:is_deleted).select(&:visible?).max_by(&:fav_count)
@@ -130,6 +128,76 @@ module PostSets
     def pending_bulk_update_requests
       return BulkUpdateRequest.none unless tag.present?
       @pending_bulk_update_requests ||= BulkUpdateRequest.pending.where_array_includes_any(:tags, tag.name)
+    end
+
+    def post_previews_html(template, show_cropped: true, **options)
+      html = ""
+      if none_shown(options)
+        return template.render("post_sets/blank")
+      end
+
+      posts.each do |post|
+        html << PostPresenter.preview(post, options.merge(:tags => tag_string))
+        html << "\n"
+      end
+
+      html.html_safe
+    end
+
+    def not_shown(post, options)
+      !options[:show_deleted] && post.is_deleted? && tag_string !~ /status:(?:all|any|deleted|banned)/
+    end
+
+    def none_shown(options)
+      posts.reject {|post| not_shown(post, options) }.empty?
+    end
+
+    concerning :TagListMethods do
+      def related_tags
+        if query.is_wildcard_search?
+          wildcard_tags
+        elsif query.is_metatag?(:search)
+          saved_search_tags
+        elsif query.is_empty_search? || query.is_metatag?(:order, :rank)
+          popular_tags
+        elsif query.is_single_term?
+          similar_tags
+        else
+          frequent_tags
+        end
+      end
+
+      def popular_tags
+        if PopularSearchService.enabled?
+          PopularSearchService.new(Date.today).tags
+        else
+          frequent_tags
+        end
+      end
+
+      def similar_tags
+        RelatedTagCalculator.cached_similar_tags_for_search(query, MAX_SIDEBAR_TAGS)
+      end
+
+      def frequent_tags
+        RelatedTagCalculator.frequent_tags_for_post_array(posts).take(MAX_SIDEBAR_TAGS)
+      end
+
+      def wildcard_tags
+        Tag.wildcard_matches(tag_string)
+      end
+
+      def saved_search_tags
+        ["search:all"] + SavedSearch.labels_for(CurrentUser.user.id).map {|x| "search:#{x}"}
+      end
+
+      def tag_set_presenter
+        @tag_set_presenter ||= TagSetPresenter.new(related_tags.take(MAX_SIDEBAR_TAGS))
+      end
+
+      def tag_list_html(**options)
+        tag_set_presenter.tag_list_html(name_only: query.is_metatag?(:search), **options)
+      end
     end
   end
 end

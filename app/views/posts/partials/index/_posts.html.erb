@@ -1,6 +1,6 @@
 <div id="posts" class="user-disable-cropped-<%= Danbooru.config.enable_image_cropping && CurrentUser.user.disable_cropped_thumbnails? %>">
   <div id="posts-container">
-    <%= post_set.presenter.post_previews_html(self) %>
+    <%= post_set.post_previews_html(self) %>
   </div>
 
   <% if post_set.hidden_posts.present? %>
