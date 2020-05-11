@@ -263,7 +263,7 @@ module Sources
       # For hidden or deleted works the UUID will be nil.
       def uuid
         return nil if page.nil?
-        meta = page.search('meta[property="da:appurl"]').first
+        meta = page.at_css('meta[property="da:appurl"]')
         return nil if meta.nil?
 
         appurl = meta["content"]
