@@ -297,7 +297,7 @@ module Sources
       memoize :api_metadata
 
       def api_download
-        return {} if uuid.nil?
+        return {} unless uuid.present? && api_deviation[:is_downloadable]
         api_client.download(uuid)
       end
       memoize :api_download
