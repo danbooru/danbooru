@@ -264,6 +264,16 @@ module Sources
       end
     end
 
+    context "The source for a non-downloadable video file" do
+      should "return working image url" do
+        @site = Sources::Strategies.find("https://www.deviantart.com/gs-mantis/art/Chen-Goes-Fishing-505847233")
+
+        # md5: 344ac2b9fd5a87982af4b648aa2b2b0d
+        assert_equal("https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/fe046bc7-4d68-4699-96c1-19aa464edff6/d8d6281-91959e92-214f-4b2d-a138-ace09f4b6d09.1080p.8e57939eba634743a9fa41185e398d00.mp4", @site.image_url)
+        assert_downloaded(9_739_947, @site.image_url)
+      end
+    end
+
     context "The source for an DeviantArt artwork page" do
       setup do
         @site = Sources::Strategies.find("http://noizave.deviantart.com/art/test-post-please-ignore-685436408")

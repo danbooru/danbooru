@@ -90,6 +90,8 @@ module Sources
           api_download[:src]
         elsif api_deviation[:flash].present?
           api_deviation.dig(:flash, :src)
+        elsif api_deviation[:videos].present?
+          api_deviation[:videos].max_by { |x| x[:filesize] }[:src]
         else
           src = api_deviation.dig(:content, :src)
           if deviation_id && deviation_id.to_i <= 790677560 && src =~ /^https:\/\/images-wixmp-/ && src !~ /\.gif\?/
