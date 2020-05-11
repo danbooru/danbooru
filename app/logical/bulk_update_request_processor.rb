@@ -117,6 +117,22 @@ class BulkUpdateRequestProcessor
     []
   end
 
+  def is_tag_move_allowed?
+    tokens.all? do |type, *args|
+      case type
+      when :create_alias
+        BulkUpdateRequestProcessor.is_tag_move_allowed?(args[0], args[1])
+      when :mass_update
+        lhs = PostQueryBuilder.new(args[0])
+        rhs = PostQueryBuilder.new(args[1])
+
+        lhs.is_simple_tag? && rhs.is_simple_tag? && BulkUpdateRequestProcessor.is_tag_move_allowed?(args[0], args[1])
+      else
+        false
+      end
+    end
+  end
+
   def to_dtext
     tokens.map do |token|
       case token[0]
@@ -130,6 +146,16 @@ class BulkUpdateRequestProcessor
         raise "Unknown token: #{token[0]}"
       end
     end.join("\n")
+  end
+
+  private
+
+  def self.is_tag_move_allowed?(antecedent_name, consequent_name)
+    antecedent_tag = Tag.find_by_name(Tag.normalize_name(antecedent_name))
+    consequent_tag = Tag.find_by_name(Tag.normalize_name(consequent_name))
+
+    (antecedent_tag.blank? || antecedent_tag.empty? || (antecedent_tag.artist? && antecedent_tag.post_count <= 100)) &&
+    (consequent_tag.blank? || consequent_tag.empty? || (consequent_tag.artist? && consequent_tag.post_count <= 100))
   end
 
   memoize :tokens

@@ -4,6 +4,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
   context "BulkUpdateRequestsController" do
     setup do
       @user = create(:user)
+      @builder = create(:builder_user)
       @admin = create(:admin_user)
       @bulk_update_request = create(:bulk_update_request, user: @user)
     end
@@ -118,6 +119,33 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           post_auth approve_bulk_update_request_path(@bulk_update_request), @user
           assert_response 403
           assert_equal("pending", @bulk_update_request.reload.status)
+        end
+      end
+
+      context "for a builder" do
+        should "fail for a large artist move" do
+          create(:tag, name: "artist1", category: Tag.categories.artist, post_count: 1000)
+          @bulk_update_request = create(:bulk_update_request, script: "create alias artist1 -> artist2")
+
+          post_auth approve_bulk_update_request_path(@bulk_update_request), @builder
+
+          assert_response 403
+          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_equal(false, TagAlias.where(antecedent_name: "artist1", consequent_name: "artist2").exists?)
+        end
+
+        should "succeed for a small artist move" do
+          create(:tag, name: "artist1a", category: Tag.categories.artist, post_count: 10)
+          create(:tag, name: "artist1b", category: Tag.categories.general, post_count: 0)
+          create(:tag, name: "artist2a", category: Tag.categories.artist, post_count: 20)
+          @bulk_update_request = create(:bulk_update_request, script: "mass update artist1a -> artist1b\ncreate alias artist2a -> artist2b")
+
+          post_auth approve_bulk_update_request_path(@bulk_update_request), @builder
+
+          assert_redirected_to(bulk_update_requests_path)
+          assert_equal("approved", @bulk_update_request.reload.status)
+          assert_equal(@builder, @bulk_update_request.approver)
+          assert_equal(true, TagAlias.where(antecedent_name: "artist2a", consequent_name: "artist2b").exists?)
         end
       end
 

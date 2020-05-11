@@ -136,6 +136,10 @@ class BulkUpdateRequest < ApplicationRecord
     @processor ||= BulkUpdateRequestProcessor.new(script, forum_topic_id: forum_topic_id, skip_secondary_validations: skip_secondary_validations)
   end
 
+  def is_tag_move_allowed?
+    processor.is_tag_move_allowed?
+  end
+
   def is_pending?
     status == "pending"
   end
