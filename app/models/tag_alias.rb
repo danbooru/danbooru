@@ -116,8 +116,6 @@ class TagAlias < TagRelationship
   def wiki_pages_present
     if antecedent_wiki.present? && consequent_wiki.present?
       errors[:base] << "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] has conflicting wiki pages. [[#{consequent_name}]] should be updated to include information from [[#{antecedent_name}]] if necessary."
-    elsif antecedent_wiki.blank? && consequent_wiki.blank?
-      errors[:base] << "The #{consequent_name} tag needs a corresponding wiki page"
     end
   end
 
