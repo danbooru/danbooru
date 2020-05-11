@@ -46,7 +46,7 @@
 
         <span class="info">
           <strong>Tags</strong>
-          <%= upload.presenter.inline_tag_list_html %>
+          <%= TagSetPresenter.new(upload.tag_string.split).inline_tag_list_html %>
         </span>
       <% end %>
       <% t.column "Uploader" do |upload| %>
