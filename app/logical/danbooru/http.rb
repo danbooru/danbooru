@@ -1,5 +1,7 @@
 module Danbooru
   class Http
+    DEFAULT_TIMEOUT = 3
+
     attr_writer :cache, :http
 
     class << self
@@ -42,6 +44,9 @@ module Danbooru
       else
         raw_request(method, url, **options)
       end
+    rescue HTTP::TimeoutError
+      # return a synthetic http error on connection timeouts
+      ::HTTP::Response.new(status: 522, body: "", version: "1.1")
     end
 
     def cached_request(method, url, **options)
@@ -60,7 +65,7 @@ module Danbooru
     end
 
     def http
-      @http ||= ::HTTP.use(:auto_inflate).headers(Danbooru.config.http_headers).headers("Accept-Encoding" => "gzip")
+      @http ||= ::HTTP.timeout(DEFAULT_TIMEOUT).use(:auto_inflate).headers(Danbooru.config.http_headers).headers("Accept-Encoding" => "gzip")
     end
   end
 end
