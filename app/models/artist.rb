@@ -19,8 +19,6 @@ class Artist < ApplicationRecord
   has_one :tag_alias, :foreign_key => "antecedent_name", :primary_key => "name"
   belongs_to :tag, foreign_key: "name", primary_key: "name", default: -> { Tag.new(name: name, category: Tag.categories.artist) }
 
-  accepts_nested_attributes_for :wiki_page, update_only: true, reject_if: :all_blank
-
   scope :banned, -> { where(is_banned: true) }
   scope :unbanned, -> { where(is_banned: false) }
 

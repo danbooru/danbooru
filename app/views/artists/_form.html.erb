@@ -5,8 +5,14 @@
   <%= f.input :group_name %>
   <%= f.input :url_string, :label => "URLs", :as => :text, :input_html => {:size => "50x15", :value => params.dig(:artist, :url_string) || @artist.urls.join("\n")}, :hint => "You can prefix a URL with - to mark it as dead." %>
 
-  <%= f.simple_fields_for :wiki_page do |fw| %>
-    <%= fw.input :body, label: "Wiki", input_html: { size: "50x15" } %>
+  <% if @artist.wiki_page.present? %>
+    <div class="input">
+      <label>Wiki (<%= link_to "Edit", edit_wiki_page_path(@artist.wiki_page) %>)</label>
+    </div>
+
+    <div class="prose">
+      <%= format_text(@artist.wiki_page.body, disable_mentions: true) %>
+    </div>
   <% end %>
 
   <%= f.button :submit, "Submit" %>

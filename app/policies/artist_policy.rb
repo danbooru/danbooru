@@ -12,7 +12,7 @@ class ArtistPolicy < ApplicationPolicy
   end
 
   def permitted_attributes
-    [:name, :other_names, :other_names_string, :group_name, :url_string, :is_deleted, { wiki_page_attributes: [:id, :body] }]
+    [:name, :other_names, :other_names_string, :group_name, :url_string, :is_deleted]
   end
 
   def permitted_attributes_for_new

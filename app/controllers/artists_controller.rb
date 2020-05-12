@@ -3,13 +3,11 @@ class ArtistsController < ApplicationController
 
   def new
     @artist = authorize Artist.new_with_defaults(permitted_attributes(Artist))
-    @artist.build_wiki_page if @artist.wiki_page.nil?
     respond_with(@artist)
   end
 
   def edit
     @artist = authorize Artist.find(params[:id])
-    @artist.build_wiki_page if @artist.wiki_page.nil?
     respond_with(@artist)
   end
 

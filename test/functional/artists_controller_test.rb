@@ -161,37 +161,6 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    context "with an artist that has a wiki page" do
-      setup do
-        as(@admin) do
-          @artist = create(:artist, name: "aaa", url_string: "http://example.com")
-          @wiki_page = create(:wiki_page, title: "aaa", body: "testing")
-        end
-        @another_user = create(:user)
-      end
-
-      should "update the wiki with the artist" do
-        old_timestamp = @wiki_page.updated_at
-        travel(1.minute) do
-          put_auth artist_path(@artist.id), @user, params: {artist: { wiki_page_attributes: { body: "rex" }, url_string: "http://example.com\nhttp://monet.com"}}
-        end
-        @artist.reload
-        @wiki_page = @artist.wiki_page
-        assert_equal("rex", @artist.wiki_page.body)
-        assert_not_equal(old_timestamp, @wiki_page.updated_at)
-        assert_redirected_to(artist_path(@artist.id))
-      end
-
-      should "not touch the updated_at fields when nothing is changed" do
-        old_timestamp = @wiki_page.updated_at
-
-        travel(1.minute)
-        as(@another_user) { @artist.update(wiki_page_attributes: { body: "testing" }) }
-
-        assert_equal(old_timestamp.to_i, @artist.reload.wiki_page.updated_at.to_i)
-      end
-    end
-
     context "destroy action" do
       should "delete an artist" do
         delete_auth artist_path(@artist.id), create(:builder_user)
