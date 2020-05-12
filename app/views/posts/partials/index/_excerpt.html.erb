@@ -58,11 +58,9 @@
       <%= link_to post_set.favgroup.pretty_name, favorite_group_path(post_set.favgroup) %>
     </h4>
     Creator: <%= link_to_user post_set.favgroup.creator %>
-  <% else %>
-    <% if post_set.tag_string.present? %>
-      <p>There is currently no wiki page for the tag "<%= post_set.tag_string %>". You can <%= link_to "create one", new_wiki_page_path(:wiki_page => {:title => post_set.tag_string}) %>.</p>
+  <% elsif post_set.has_blank_wiki? %>
+    <p>There is currently no wiki page for the tag <%= link_to_wiki post_set.tag.pretty_name %>. You can <%= link_to "create one", new_wiki_page_path(wiki_page: { title: post_set.tag.name }) %>.</p>
 
-      <%= render "tag_relationships/alias_and_implication_list", tag: post_set.tag %>
-    <% end %>
+    <%= render "tag_relationships/alias_and_implication_list", tag: post_set.tag %>
   <% end %>
 </div>

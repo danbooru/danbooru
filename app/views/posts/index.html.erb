@@ -20,15 +20,15 @@
     <li class="active"><a href="#" id="show-posts-link">Posts</a></li>
 
     <% if @post_set.artist.present? %>
-      <li><%= link_to "Artist", artist_path(@post_set.artist), :id => "show-excerpt-link" %></li>
+      <li class="artist-excerpt-link"><%= link_to "Artist", artist_path(@post_set.artist), :id => "show-excerpt-link" %></li>
     <% elsif @post_set.wiki_page.present? %>
-      <li><%= link_to "Wiki", wiki_page_path(@post_set.wiki_page), :id => "show-excerpt-link" %></li>
+      <li class="wiki-excerpt-link"><%= link_to "Wiki", wiki_page_path(@post_set.wiki_page), :id => "show-excerpt-link" %></li>
     <% elsif @post_set.pool.present? %>
-      <li><%= link_to "Pool", pool_path(@post_set.pool), :id => "show-excerpt-link" %></li>
+      <li class="pool-excerpt-link"><%= link_to "Pool", pool_path(@post_set.pool), :id => "show-excerpt-link" %></li>
     <% elsif @post_set.favgroup.present? %>
-      <li><%= link_to "Favorite Group", favorite_group_path(@post_set.favgroup), :id => "show-excerpt-link" %></li>
+      <li class="favgroup-excerpt-link"><%= link_to "Favorite Group", favorite_group_path(@post_set.favgroup), :id => "show-excerpt-link" %></li>
     <% elsif @post_set.has_blank_wiki? %>
-      <li><%= link_to "Wiki", new_wiki_page_path(wiki_page: { title: @post_set.tag_string }), id: "show-excerpt-link" %></li>
+      <li class="blank-wiki-excerpt-link"><%= link_to "Wiki", new_wiki_page_path(wiki_page: { title: @post_set.tag.name }), id: "show-excerpt-link" %></li>
     <% end %>
 
     <li id="searchbox-redirect-link" class="mobile-only"><a href="#search-box">Search &raquo;</a></li>

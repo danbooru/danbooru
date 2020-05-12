@@ -102,13 +102,30 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       context "with a multi-tag search" do
         should "render" do
           as(create(:user)) do
-            create(:post, tag_string: "1girl solo")
+            create(:post, tag_string: "1girl solo", rating: "s")
             create(:wiki_page, title: "1girl")
           end
 
           get posts_path, params: {:tags => "1girl solo"}
           assert_response :success
           assert_select "#show-excerpt-link", count: 0
+        end
+
+        should "show the wiki excerpt if the search has a tag with a wiki" do
+          as(@user) { create(:wiki_page, title: "1girl") }
+          create(:post, tag_string: "1girl rating:s")
+          get posts_path, params: { tags: "1girl rating:s" }
+
+          assert_response :success
+          assert_select "li.wiki-excerpt-link", count: 1
+        end
+
+        should "show the blank wiki excerpt if the search has tag without a wiki" do
+          create(:post, tag_string: "1girl rating:s")
+          get posts_path, params: { tags: "1girl rating:s" }
+
+          assert_response :success
+          assert_select "li.blank-wiki-excerpt-link", count: 1
         end
 
         should "render an error when searching for too many tags" do
