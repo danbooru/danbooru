@@ -95,8 +95,6 @@ CurrentUser.user = User.admins.first
 CurrentUser.ip_addr = "127.0.0.1"
 
 if Upload.count == 0
-  ENV["SKIP_CLOUDFLARE_CHECK"] = "true"
-
   puts "Creating uploads"
   1.upto(50) do |i|
     color1 = rand(4096).to_s(16)

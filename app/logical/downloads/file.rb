@@ -92,8 +92,6 @@ module Downloads
     end
 
     def is_cloudflare?(url)
-      return false if ENV["SKIP_CLOUDFLARE_CHECK"]
-
       ip_addr = IPAddr.new(Resolv.getaddress(url.hostname))
       CloudflareService.new.ips.any? { |subnet| subnet.include?(ip_addr) }
     end
