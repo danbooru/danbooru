@@ -53,22 +53,15 @@ class PostQueryBuilder
     COUNT_METATAG_SYNONYMS.flat_map { |str| [str, "#{str}_asc"] } +
     CATEGORY_COUNT_METATAGS.flat_map { |str| [str, "#{str}_asc"] }
 
-  attr_reader :query_string, :terms, :current_user, :safe_mode, :hide_deleted_posts
+  attr_reader :query_string, :current_user, :safe_mode, :hide_deleted_posts
   alias_method :safe_mode?, :safe_mode
   alias_method :hide_deleted_posts?, :hide_deleted_posts
 
-  def initialize(query_string, current_user = User.anonymous, normalize_aliases: true, normalize_order: true, safe_mode: false, hide_deleted_posts: false)
+  def initialize(query_string, current_user = User.anonymous, safe_mode: false, hide_deleted_posts: false)
     @query_string = query_string
     @current_user = current_user
     @safe_mode = safe_mode
     @hide_deleted_posts = hide_deleted_posts
-
-    @terms = scan_query
-    @terms << OpenStruct.new(type: :metatag, name: "rating", value: "s") if safe_mode?
-    @terms << OpenStruct.new(type: :metatag, name: "status", value: "deleted", negated: true) if hide_deleted?
-
-    normalize_aliases! if normalize_aliases
-    normalize_order! if normalize_order
   end
 
   def tags_match(tags, relation)
@@ -457,11 +450,6 @@ class PostQueryBuilder
     relation
   end
 
-  def hide_deleted?
-    has_status_metatag = select_metatags(:status).any? { |metatag| metatag.value.downcase.in?(%w[deleted active any all]) }
-    hide_deleted_posts? && !has_status_metatag
-  end
-
   def build
     tag_count = terms.count { |term| !Danbooru.config.is_unlimited_tag?(term) }
     if tag_count > Danbooru.config.tag_query_limit
@@ -695,20 +683,6 @@ class PostQueryBuilder
       end
     end
 
-    def normalize_aliases!
-      tag_names = tags.map(&:name)
-      tag_aliases = tag_names.zip(TagAlias.to_aliased(tag_names)).to_h
-
-      terms.map! do |term|
-        term.name = tag_aliases[term.name] if term.type == :tag
-        term
-      end
-    end
-
-    def normalize_order!
-      terms.sort_by!(&:to_s).uniq!
-    end
-
     def parse_tag_edit
       split_query
     end
@@ -884,9 +858,49 @@ class PostQueryBuilder
     end
   end
 
+  concerning :NormalizationMethods do
+    def normalized_query(implicit: true, sort: true)
+      post_query = dup
+      post_query.terms.concat(implicit_metatags) if implicit
+      post_query.normalize_aliases!
+      post_query.normalize_order! if sort
+      post_query
+    end
+
+    def normalize_aliases!
+      tag_names = tags.map(&:name)
+      tag_aliases = tag_names.zip(TagAlias.to_aliased(tag_names)).to_h
+
+      terms.map! do |term|
+        term.name = tag_aliases[term.name] if term.type == :tag
+        term
+      end
+    end
+
+    def normalize_order!
+      terms.sort_by!(&:to_s).uniq!
+    end
+
+    def implicit_metatags
+      metatags = []
+      metatags << OpenStruct.new(type: :metatag, name: "rating", value: "s") if safe_mode?
+      metatags << OpenStruct.new(type: :metatag, name: "status", value: "deleted", negated: true) if hide_deleted?
+      metatags
+    end
+
+    def hide_deleted?
+      has_status_metatag = select_metatags(:status).any? { |metatag| metatag.value.downcase.in?(%w[deleted active any all]) }
+      hide_deleted_posts? && !has_status_metatag
+    end
+  end
+
   concerning :UtilityMethods do
     def to_s
       split_query.join(" ")
+    end
+
+    def terms
+      @terms ||= scan_query
     end
 
     def tags
@@ -943,5 +957,5 @@ class PostQueryBuilder
     end
   end
 
-  memoize :split_query
+  memoize :split_query, :normalized_query
 end

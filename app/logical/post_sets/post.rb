@@ -4,6 +4,7 @@ module PostSets
     MAX_SIDEBAR_TAGS = 25
 
     attr_reader :page, :random, :post_count, :format, :tag_string, :query
+    delegate :normalized_query, to: :query
 
     def initialize(tags, page = 1, per_page = nil, random: false, format: "html")
       @query = PostQueryBuilder.new(tags, CurrentUser.user, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: CurrentUser.hide_deleted_posts?)
@@ -29,8 +30,8 @@ module PostSets
     end
 
     def tag
-      return nil unless query.has_single_tag?
-      @tag ||= Tag.find_by(name: query.tags.first.name)
+      return nil unless normalized_query.has_single_tag?
+      @tag ||= Tag.find_by(name: normalized_query.tags.first.name)
     end
 
     def artist
@@ -40,7 +41,7 @@ module PostSets
     end
 
     def pool
-      pool_names = query.select_metatags(:pool, :ordpool).map(&:value)
+      pool_names = normalized_query.select_metatags(:pool, :ordpool).map(&:value)
       name = pool_names.first
       return nil unless pool_names.size == 1
 
@@ -48,7 +49,7 @@ module PostSets
     end
 
     def favgroup
-      favgroup_names = query.select_metatags(:favgroup, :ordfavgroup).map(&:value)
+      favgroup_names = normalized_query.select_metatags(:favgroup, :ordfavgroup).map(&:value)
       name = favgroup_names.first
       return nil unless favgroup_names.size == 1
 
@@ -88,7 +89,7 @@ module PostSets
         # no need to get counts for formats that don't use a paginator
         nil
       else
-        query.fast_count
+        normalized_query.fast_count
       end
     end
 
@@ -105,7 +106,7 @@ module PostSets
         if is_random?
           temp = get_random_posts
         else
-          temp = query.build.paginate(page, count: post_count, search_count: !post_count.nil?, limit: per_page)
+          temp = normalized_query.build.paginate(page, count: post_count, search_count: !post_count.nil?, limit: per_page)
         end
       end
     end
@@ -176,7 +177,7 @@ module PostSets
       end
 
       def similar_tags
-        RelatedTagCalculator.cached_similar_tags_for_search(query, MAX_SIDEBAR_TAGS)
+        RelatedTagCalculator.cached_similar_tags_for_search(normalized_query(implicit: false), MAX_SIDEBAR_TAGS)
       end
 
       def frequent_tags

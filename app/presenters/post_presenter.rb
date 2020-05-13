@@ -163,7 +163,7 @@ class PostPresenter
   end
 
   def has_sequential_navigation?(params)
-    return false if PostQueryBuilder.new(params[:q], normalize_aliases: false).has_metatag?(:order, :ordfav, :ordpool)
+    return false if PostQueryBuilder.new(params[:q]).has_metatag?(:order, :ordfav, :ordpool)
     return false if params[:pool_id].present? || params[:favgroup_id].present?
     return CurrentUser.user.enable_sequential_post_navigation
   end

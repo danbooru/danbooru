@@ -305,6 +305,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_select "#post_#{@post.id}", 1
         end
       end
+
+      context "in safe mode" do
+        should "not include the rating:s tag in the page title" do
+          get posts_path(tags: "1girl", safe_mode: true)
+          assert_select "title", text: "1girl Art | Safebooru"
+        end
+      end
     end
 
     context "show_seq action" do

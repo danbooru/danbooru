@@ -6,7 +6,7 @@ class RelatedTagQuery
 
   def initialize(query:, user: User.anonymous, category: nil, type: nil, limit: nil)
     @user = user
-    @post_query = PostQueryBuilder.new(query, user)
+    @post_query = PostQueryBuilder.new(query, user).normalized_query
     @query = @post_query.to_s
     @category = category
     @type = type

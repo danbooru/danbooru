@@ -6,7 +6,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
   end
 
   def assert_fast_count(count, query, query_options = {}, fast_count_options = {})
-    assert_equal(count, PostQueryBuilder.new(query, **query_options).fast_count(**fast_count_options))
+    assert_equal(count, PostQueryBuilder.new(query, **query_options).normalized_query.fast_count(**fast_count_options))
   end
 
   setup do
@@ -1018,7 +1018,6 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
   context "Parsing:" do
     should "split a query" do
       assert_equal(%w(aaa bbb), PostQueryBuilder.new("aaa bbb").split_query)
-      assert_equal(%w(~aaa -bbb*), PostQueryBuilder.new("~AAa -BBB* -bbb*").split_query)
     end
 
     should "not strip out valid characters when scanning" do
@@ -1050,22 +1049,22 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
   end
 
-  context "The normalize_query method" do
+  context "The normalized_query method" do
     should "work" do
       create(:tag_alias, antecedent_name: "gray", consequent_name: "grey")
 
-      assert_equal("foo", PostQueryBuilder.new("foo").to_s)
-      assert_equal("foo", PostQueryBuilder.new(" foo ").to_s)
-      assert_equal("foo", PostQueryBuilder.new("FOO").to_s)
-      assert_equal("foo", PostQueryBuilder.new("foo foo").to_s)
-      assert_equal("grey", PostQueryBuilder.new("gray").to_s)
-      assert_equal("aaa bbb", PostQueryBuilder.new("bbb aaa").to_s)
-      assert_equal("-aaa bbb", PostQueryBuilder.new("bbb -aaa").to_s)
-      assert_equal("~aaa ~bbb", PostQueryBuilder.new("~bbb ~aaa").to_s)
-      assert_equal("commentary:true bbb", PostQueryBuilder.new("bbb commentary:true").to_s)
-      assert_equal('commentary:"true" bbb', PostQueryBuilder.new("bbb commentary:'true'").to_s)
-      assert_equal('-commentary:true bbb', PostQueryBuilder.new("bbb -commentary:true").to_s)
-      assert_equal('-commentary:"true" bbb', PostQueryBuilder.new("bbb -commentary:'true'").to_s)
+      assert_equal("foo", PostQueryBuilder.new("foo").normalized_query.to_s)
+      assert_equal("foo", PostQueryBuilder.new(" foo ").normalized_query.to_s)
+      assert_equal("foo", PostQueryBuilder.new("FOO").normalized_query.to_s)
+      assert_equal("foo", PostQueryBuilder.new("foo foo").normalized_query.to_s)
+      assert_equal("grey", PostQueryBuilder.new("gray").normalized_query.to_s)
+      assert_equal("aaa bbb", PostQueryBuilder.new("bbb aaa").normalized_query.to_s)
+      assert_equal("-aaa bbb", PostQueryBuilder.new("bbb -aaa").normalized_query.to_s)
+      assert_equal("~aaa ~bbb", PostQueryBuilder.new("~bbb ~aaa").normalized_query.to_s)
+      assert_equal("commentary:true bbb", PostQueryBuilder.new("bbb commentary:true").normalized_query.to_s)
+      assert_equal('commentary:"true" bbb', PostQueryBuilder.new("bbb commentary:'true'").normalized_query.to_s)
+      assert_equal('-commentary:true bbb', PostQueryBuilder.new("bbb -commentary:true").normalized_query.to_s)
+      assert_equal('-commentary:"true" bbb', PostQueryBuilder.new("bbb -commentary:'true'").normalized_query.to_s)
     end
   end
 
@@ -1114,7 +1113,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       should "set the expiration time" do
         Cache.expects(:put).with(PostQueryBuilder.new("score:42 aaa").count_cache_key, 1, 180)
-        PostQueryBuilder.new("aaa score:42").fast_count
+        assert_fast_count(1, "aaa score:42")
       end
 
       should "work with the hide_deleted_posts option turned on" do
@@ -1126,8 +1125,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     context "a blank search" do
       should "should execute a search" do
-        assert_equal(1, PostQueryBuilder.new("").fast_count(estimate_count: false))
-        assert_nothing_raised { PostQueryBuilder.new("").fast_count(estimate_count: true) }
+        assert_fast_count(1, "", {}, { estimate_count: false })
+        assert_nothing_raised { PostQueryBuilder.new("").normalized_query.fast_count(estimate_count: true) }
       end
 
       should "return 0 for a nonexisting tag" do
@@ -1136,13 +1135,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       context "in safe mode" do
         should "work for a blank search" do
-          assert_equal(2, PostQueryBuilder.new("").fast_count(estimate_count: false))
-          assert_nothing_raised { PostQueryBuilder.new("").fast_count(estimate_count: true) }
+          assert_fast_count(0, "", { safe_mode: true }, { estimate_count: false })
+          assert_nothing_raised { PostQueryBuilder.new("", safe_mode: true).normalized_query.fast_count(estimate_count: true) }
         end
 
         should "work for a nil search" do
-          assert_equal(2, PostQueryBuilder.new(nil).fast_count(estimate_count: false))
-          assert_nothing_raised { PostQueryBuilder.new(nil).fast_count(estimate_count: true) }
+          assert_fast_count(0, nil, { safe_mode: true }, { estimate_count: false })
+          assert_nothing_raised { PostQueryBuilder.new("", safe_mode: true).normalized_query.fast_count(estimate_count: true) }
         end
 
         should "not fail for a two tag search by a member" do

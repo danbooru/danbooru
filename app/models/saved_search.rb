@@ -140,11 +140,11 @@ class SavedSearch < ApplicationRecord
     end
 
     def normalized_query
-      PostQueryBuilder.new(query).to_s
+      PostQueryBuilder.new(query).normalized_query.to_s
     end
 
     def normalize_query
-      self.query = PostQueryBuilder.new(query, normalize_order: false).to_s
+      self.query = PostQueryBuilder.new(query).normalized_query(sort: false).to_s
     end
   end
 
