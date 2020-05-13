@@ -131,26 +131,26 @@ module PostSets
       @pending_bulk_update_requests ||= BulkUpdateRequest.pending.where_array_includes_any(:tags, tag.name)
     end
 
-    def post_previews_html(template, show_cropped: true, **options)
+    def post_previews_html(template)
       html = ""
-      if none_shown(options)
+      if none_shown
         return template.render("post_sets/blank")
       end
 
       posts.each do |post|
-        html << PostPresenter.preview(post, options.merge(:tags => tag_string))
+        html << PostPresenter.preview(post, show_cropped: true, tags: tag_string)
         html << "\n"
       end
 
       html.html_safe
     end
 
-    def not_shown(post, options)
-      !options[:show_deleted] && post.is_deleted? && tag_string !~ /status:(?:all|any|deleted|banned)/
+    def not_shown(post)
+      post.is_deleted? && tag_string !~ /status:(?:all|any|deleted|banned)/
     end
 
-    def none_shown(options)
-      posts.reject {|post| not_shown(post, options) }.empty?
+    def none_shown
+      posts.reject {|post| not_shown(post) }.empty?
     end
 
     concerning :TagListMethods do
