@@ -68,13 +68,6 @@ class TagAliasTest < ActiveSupport::TestCase
     end
 
     context "on secondary validation" do
-      should "warn about missing wiki pages" do
-        ti = FactoryBot.build(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", skip_secondary_validations: false)
-
-        assert(ti.invalid?)
-        assert_includes(ti.errors[:base], "The bbb tag needs a corresponding wiki page")
-      end
-
       should "warn about conflicting wiki pages" do
         FactoryBot.create(:wiki_page, title: "aaa", body: "aaa")
         FactoryBot.create(:wiki_page, title: "bbb", body: "bbb")

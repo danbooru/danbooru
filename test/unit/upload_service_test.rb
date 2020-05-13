@@ -118,10 +118,10 @@ class UploadServiceTest < ActiveSupport::TestCase
           assert_operator(File.size(preview.path), :>, 0)
           assert_operator(File.size(crop.path), :>, 0)
           assert_operator(File.size(sample.path), :>, 0)
-          assert_equal(60, ImageSpec.new(preview.path).width)
-          assert_equal(60, ImageSpec.new(preview.path).height)
-          assert_equal(150, ImageSpec.new(crop.path).width)
-          assert_equal(150, ImageSpec.new(crop.path).height)
+          assert_equal(60, MediaFile.open(preview).width)
+          assert_equal(60, MediaFile.open(preview).height)
+          assert_equal(150, MediaFile.open(crop).width)
+          assert_equal(150, MediaFile.open(crop).height)
           preview.close
           preview.unlink
           sample.close
@@ -146,10 +146,10 @@ class UploadServiceTest < ActiveSupport::TestCase
             preview, crop, sample = subject.generate_resizes(@file, @upload)
             assert_operator(File.size(preview.path), :>, 0)
             assert_operator(File.size(crop.path), :>, 0)
-            assert_equal(150, ImageSpec.new(preview.path).width)
-            assert_equal(150, ImageSpec.new(preview.path).height)
-            assert_equal(150, ImageSpec.new(crop.path).width)
-            assert_equal(150, ImageSpec.new(crop.path).height)
+            assert_equal(150, MediaFile.open(preview).width)
+            assert_equal(150, MediaFile.open(preview).height)
+            assert_equal(150, MediaFile.open(crop).width)
+            assert_equal(150, MediaFile.open(crop).height)
             preview.close
             preview.unlink
             crop.close
@@ -169,10 +169,10 @@ class UploadServiceTest < ActiveSupport::TestCase
             preview, crop, sample = subject.generate_resizes(@file, @upload)
             assert_operator(File.size(preview.path), :>, 0)
             assert_operator(File.size(crop.path), :>, 0)
-            assert_equal(150, ImageSpec.new(preview.path).width)
-            assert_equal(150, ImageSpec.new(preview.path).height)
-            assert_equal(150, ImageSpec.new(crop.path).width)
-            assert_equal(150, ImageSpec.new(crop.path).height)
+            assert_equal(150, MediaFile.open(preview).width)
+            assert_equal(150, MediaFile.open(preview).height)
+            assert_equal(150, MediaFile.open(crop).width)
+            assert_equal(150, MediaFile.open(crop).height)
             preview.close
             preview.unlink
             crop.close

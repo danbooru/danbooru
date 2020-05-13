@@ -7,7 +7,7 @@ class RelatedTagCalculatorTest < ActiveSupport::TestCase
   end
 
   def similar_tags_for_search(tag_search, user = CurrentUser.user, **options)
-    post_query = PostQueryBuilder.new(tag_search, user)
+    post_query = PostQueryBuilder.new(tag_search, user).normalized_query
     RelatedTagCalculator.similar_tags_for_search(post_query, **options).pluck(:name)
   end
 
