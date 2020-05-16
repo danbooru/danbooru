@@ -3,6 +3,7 @@
 # * https://www.artstation.com/artwork/04XA4
 # * https://www.artstation.com/artwork/cody-from-sf
 # * https://sa-dui.artstation.com/projects/DVERn
+# * https://dudeunderscore.artstation.com/projects/NoNmD?album_id=23041
 #
 # Profile URLs:
 #
@@ -20,7 +21,7 @@
 module Sources::Strategies
   class ArtStation < Base
     PROJECT1 = %r!\Ahttps?://www\.artstation\.com/artwork/(?<project_id>[a-z0-9-]+)/?\z!i
-    PROJECT2 = %r!\Ahttps?://(?<artist_name>[\w-]+)\.artstation\.com/projects/(?<project_id>[a-z0-9-]+)/?\z!i
+    PROJECT2 = %r!\Ahttps?://(?<artist_name>[\w-]+)\.artstation\.com/projects/(?<project_id>[a-z0-9-]+)(?:/|\?[\w=-]+)?\z!i
     PROJECT = Regexp.union(PROJECT1, PROJECT2)
     ARTIST1 = %r{\Ahttps?://(?<artist_name>[\w-]+)(?<!www)\.artstation\.com/?\z}i
     ARTIST2 = %r{\Ahttps?://www\.artstation\.com/artist/(?<artist_name>[\w-]+)/?\z}i
@@ -82,6 +83,16 @@ module Sources::Strategies
 
     def normalized_for_artist_finder?
       profile_url.present? && url == profile_url
+    end
+
+    def normalize_for_source
+      return if project_id.blank?
+
+      if artist_name_from_url.present?
+        "https://#{artist_name_from_url}.artstation.com/projects/#{project_id}"
+      else
+        "https://www.artstation.com/artwork/#{project_id}"
+      end
     end
 
     def image_urls_sub

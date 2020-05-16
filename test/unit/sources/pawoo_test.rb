@@ -94,5 +94,23 @@ module Sources
         assert_equal("evazion", @site.artist_name)
       end
     end
+
+    context "normalizing for source" do
+      should "normalize correctly" do
+        source1 = "https://pawoo.net/@evazion/19451018/"
+        source2 = "https://pawoo.net/web/statuses/19451018/favorites"
+
+        assert_equal("https://pawoo.net/@evazion/19451018", Sources::Strategies.normalize_source(source1))
+        assert_equal("https://pawoo.net/web/statuses/19451018", Sources::Strategies.normalize_source(source2))
+      end
+
+      should "avoid normalizing unnormalizable urls" do
+        bad_source1 = "https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png"
+        bad_source2 = "https://pawoo.net/@evazion/media"
+
+        assert_equal(bad_source1, Sources::Strategies.normalize_source(bad_source1))
+        assert_equal(bad_source2, Sources::Strategies.normalize_source(bad_source2))
+      end
+    end
   end
 end

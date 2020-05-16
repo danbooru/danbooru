@@ -259,5 +259,24 @@ module Sources
         end
       end
     end
+
+    context "normalizing for source" do
+      should "normalize correctly" do
+        source1 = "https://octrain1020.tumblr.com/post/190713122589"
+        source2 = "https://octrain1020.tumblr.com/image/190713122589"
+        source3 = "https://octrain1020.tumblr.com/image/190713122589#asd"
+        source4 = "https://superboin.tumblr.com/post/141169066579/photoset_iframe/superboin/tumblr_o45miiAOts1u6rxu8/500/false"
+
+        assert_equal(source1, Sources::Strategies.normalize_source(source1))
+        assert_equal(source1, Sources::Strategies.normalize_source(source2))
+        assert_equal(source1, Sources::Strategies.normalize_source(source3))
+        assert_equal("https://superboin.tumblr.com/post/141169066579", Sources::Strategies.normalize_source(source4))
+      end
+
+      should "avoid normalizing unnormalizable urls" do
+        bad_source = "https://octrain1020.tumblr.com/"
+        assert_equal(bad_source, Sources::Strategies.normalize_source(bad_source))
+      end
+    end
   end
 end

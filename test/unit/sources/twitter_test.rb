@@ -298,5 +298,24 @@ module Sources
         assert_includes(site.translated_tags.map(&:name), "nishizumi_miho")
       end
     end
+
+    context "normalizing for source" do
+      should "normalize correctly" do
+        source1 = "https://twitter.com/i/web/status/1261877313349640194"
+        source2 = "https://twitter.com/BOW999/status/1261877313349640194"
+        source3 = "https://twitter.com/BOW999/status/1261877313349640194/photo/1"
+        source4 = "https://twitter.com/BOW999/status/1261877313349640194?s=19"
+
+        assert_equal(source1, Sources::Strategies.normalize_source(source1))
+        assert_equal(source1, Sources::Strategies.normalize_source(source2))
+        assert_equal(source1, Sources::Strategies.normalize_source(source3))
+        assert_equal(source1, Sources::Strategies.normalize_source(source4))
+      end
+
+      should "normalize twimg twitpic correctly" do
+        source = "https://o.twimg.com/2/proxy.jpg?t=HBgpaHR0cHM6Ly90d2l0cGljLmNvbS9zaG93L2xhcmdlL2R0bnVydS5qcGcUsAkU0ggAFgASAA&s=dnN4DHCdnojC-iCJWdvZ-UZinrlWqAP7k7lmll2fTxs"
+        assert_equal("https://twitpic.com/dtnuru", Sources::Strategies.normalize_source(source))
+      end
+    end
   end
 end

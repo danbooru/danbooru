@@ -1,3 +1,15 @@
+# Image Direct URL
+# * https://lohas.nicoseiga.jp/o/971eb8af9bbcde5c2e51d5ef3a2f62d6d9ff5552/1589933964/3583893
+# * http://lohas.nicoseiga.jp/priv/3521156?e=1382558156&h=f2e089256abd1d453a455ec8f317a6c703e2cedf
+# * http://lohas.nicoseiga.jp/priv/b80f86c0d8591b217e7513a9e175e94e00f3c7a1/1384936074/3583893
+# * http://seiga.nicovideo.jp/image/source?id=3312222
+#
+# Image Page URL
+# * https://seiga.nicovideo.jp/seiga/im3521156
+#
+# Manga Page URL
+# * http://seiga.nicovideo.jp/watch/mg316708
+
 module Sources
   module Strategies
     class NicoSeiga < Base
@@ -77,6 +89,10 @@ module Sources
           if x =~ %r{/watch/mg\d+}
             return x
           end
+
+          if x =~ %r{/image/source\?id=(\d+)}
+            return "http://seiga.nicovideo.jp/seiga/im#{$1}"
+          end
         end
 
         return super
@@ -111,11 +127,19 @@ module Sources
       end
 
       def normalizable_for_artist_finder?
-        url =~ PAGE || url =~ MANGA_PAGE || url =~ PROFILE || url =~ DIRECT1 || url =~ DIRECT2
+        url =~ PAGE || url =~ MANGA_PAGE || url =~ PROFILE || url =~ DIRECT1 || url =~ DIRECT2 || url =~ PAGE2
       end
 
       def normalize_for_artist_finder
         "#{profile_url}/"
+      end
+
+      def normalize_for_source
+        if illust_id.present?
+          "https://seiga.nicovideo.jp/seiga/im#{illust_id}"
+        elsif theme_id.present?
+          "http://seiga.nicovideo.jp/watch/mg#{theme_id}"
+        end
       end
 
       def tag_name

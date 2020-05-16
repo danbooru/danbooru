@@ -43,7 +43,7 @@ module Sources::Strategies
     # https://twitter.com/i/web/status/943446161586733056
     # https://twitter.com/motty08111213/status/943446161586733056
     def self.status_id_from_url(url)
-      if url =~ %r{\Ahttps?://(?:mobile\.)?twitter\.com/(?:i/web|\w+)/status/(\d+)}i
+      if url =~ %r{\Ahttps?://(?:(?:www|mobile)\.)?twitter\.com/(?:i/web|\w+)/status/(\d+)}i
         return $1
       end
 
@@ -143,6 +143,25 @@ module Sources::Strategies
 
     def normalize_for_artist_finder
       profile_url.try(:downcase).presence || url
+    end
+
+    def normalize_for_source
+      status_id = self.class.status_id_from_url(url)
+      if status_id.present?
+        "https://twitter.com/i/web/status/#{status_id}"
+      elsif url =~ %r{\Ahttps?://(?:o|image-proxy-origin)\.twimg\.com/\d/proxy\.jpg\?t=(\w+)&}i
+        str = Base64.decode64($1)
+        source = URI.extract(str, ['http', 'https'])
+        if source.any?
+          source = source[0]
+          if source =~ %r{^https?://twitpic.com/show/large/[a-z0-9]+}i
+            source.gsub!(%r{show/large/}, "")
+            index = source.rindex('.')
+            source = source[0..index - 1]
+          end
+          source
+        end
+      end
     end
 
     def tags

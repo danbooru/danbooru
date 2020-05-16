@@ -213,6 +213,12 @@ module Sources
         illust_id.present? || novel_id.present? || fanbox_id.present? || fanbox_account_id.present?
       end
 
+      def normalize_for_source
+        return if illust_id.blank?
+
+        "https://www.pixiv.net/artworks/#{illust_id}"
+      end
+
       def tag_name
         moniker
       end

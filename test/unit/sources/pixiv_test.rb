@@ -363,5 +363,21 @@ module Sources
         end
       end
     end
+
+    context "normalizing for source" do
+      should "normalize correctly" do
+        source1 = "http://i2.pixiv.net/img12/img/zenze/39749565.png"
+        source2 = "http://i1.pixiv.net/img53/img/themare/39735353_big_p1.jpg"
+        source3 = "http://i1.pixiv.net/c/150x150/img-master/img/2010/11/30/08/39/58/14901720_p0_master1200.jpg"
+        source4 = "http://i1.pixiv.net/img-original/img/2010/11/30/08/39/58/14901720_p0.png"
+        source5 = "http://i2.pixiv.net/img-zip-ugoira/img/2014/08/05/06/01/10/44524589_ugoira1920x1080.zip"
+
+        assert_equal("https://www.pixiv.net/artworks/39749565", Sources::Strategies.normalize_source(source1))
+        assert_equal("https://www.pixiv.net/artworks/39735353", Sources::Strategies.normalize_source(source2))
+        assert_equal("https://www.pixiv.net/artworks/14901720", Sources::Strategies.normalize_source(source3))
+        assert_equal("https://www.pixiv.net/artworks/14901720", Sources::Strategies.normalize_source(source4))
+        assert_equal("https://www.pixiv.net/artworks/44524589", Sources::Strategies.normalize_source(source5))
+      end
+    end
   end
 end
