@@ -69,8 +69,6 @@ class PixivUgoiraConverter
   end
 
   def self.generate_crop(ugoira_file)
-    return nil unless Danbooru.config.enable_image_cropping
-
     file = Tempfile.new(["ugoira-crop", ".zip"], binmode: true)
     zipfile = Zip::File.new(ugoira_file.path)
     zipfile.entries.first.extract(file.path) { true } #  'true' means overwrite the existing tempfile.

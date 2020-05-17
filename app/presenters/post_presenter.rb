@@ -43,7 +43,7 @@ class PostPresenter
 
     locals[:tooltip] = "#{post.tag_string} rating:#{post.rating} score:#{post.score}"
 
-    locals[:cropped_url] = if Danbooru.config.enable_image_cropping && options[:show_cropped] && post.has_cropped? && !CurrentUser.user.disable_cropped_thumbnails?
+    locals[:cropped_url] = if options[:show_cropped] && post.has_cropped? && !CurrentUser.user.disable_cropped_thumbnails?
       post.crop_file_url
     else
       post.preview_file_url

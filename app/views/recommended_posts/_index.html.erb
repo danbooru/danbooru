@@ -1,4 +1,4 @@
-<section class="recommended-posts user-disable-cropped-<%= Danbooru.config.enable_image_cropping && CurrentUser.user.disable_cropped_thumbnails? %>">
+<section class="recommended-posts user-disable-cropped-<%= CurrentUser.user.disable_cropped_thumbnails? %>">
   <% if @recs.empty? %>
     No recommendations found.
   <% end %>

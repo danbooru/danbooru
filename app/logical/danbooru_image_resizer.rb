@@ -27,8 +27,6 @@ module DanbooruImageResizer
   end
 
   def crop(file, width, height, resize_quality = 90)
-    return nil unless Danbooru.config.enable_image_cropping
-
     output_file = Tempfile.new
     resized_image = Vips::Image.thumbnail(file.path, width, height: height, **CROP_OPTIONS)
     resized_image.jpegsave(output_file.path, Q: resize_quality, **JPEG_OPTIONS)
