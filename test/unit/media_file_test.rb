@@ -82,4 +82,47 @@ class MediaFileTest < ActiveSupport::TestCase
   should "determine the correct filesize for a jpeg file" do
     assert_equal(28086, MediaFile.open("test/files/test.jpg").file_size)
   end
+
+  context "#preview" do
+    should "generate a preview image" do
+      assert_equal([150, 101], MediaFile.open("test/files/test.jpg").preview(150, 150).dimensions)
+      assert_equal([113, 150], MediaFile.open("test/files/test.png").preview(150, 150).dimensions)
+      assert_equal([150, 150], MediaFile.open("test/files/test.gif").preview(150, 150).dimensions)
+      assert_equal([150, 150], MediaFile.open("test/files/test-512x512.webm").preview(150, 150).dimensions)
+      assert_equal([150, 150], MediaFile.open("test/files/test-300x300.mp4").preview(150, 150).dimensions)
+    end
+
+    should "be able to fit to width only" do
+      assert_equal([400, 268], MediaFile.open("test/files/test.jpg").preview(400, nil).dimensions)
+    end
+  end
+
+  context "#crop" do
+    should "generate a cropped preview image" do
+      assert_equal([150, 150], MediaFile.open("test/files/test.jpg").crop(150, 150).dimensions)
+      assert_equal([150, 150], MediaFile.open("test/files/test.png").crop(150, 150).dimensions)
+      assert_equal([150, 150], MediaFile.open("test/files/test.gif").crop(150, 150).dimensions)
+      assert_equal([150, 150], MediaFile.open("test/files/test-512x512.webm").crop(150, 150).dimensions)
+      assert_equal([150, 150], MediaFile.open("test/files/test-300x300.mp4").crop(150, 150).dimensions)
+    end
+  end
+
+  context "for a ugoira" do
+    setup do
+      skip unless MediaFile::Ugoira.conversion_enabled?
+      frame_data = JSON.parse(File.read("test/files/ugoira.json"))
+      @ugoira = MediaFile.open("test/files/ugoira.zip", frame_data: frame_data)
+    end
+
+    should "generate a preview" do
+      assert_equal([60, 60], @ugoira.preview(150, 150).dimensions)
+      assert_equal([150, 150], @ugoira.crop(150, 150).dimensions)
+    end
+
+    should "convert to a webm" do
+      webm = @ugoira.convert
+      assert_equal(:webm, webm.file_ext)
+      assert_equal([60, 60], webm.dimensions)
+    end
+  end
 end

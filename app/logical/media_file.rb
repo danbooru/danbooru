@@ -5,20 +5,20 @@ class MediaFile
   # delegate all File methods to `file`.
   delegate *(File.instance_methods - MediaFile.instance_methods), to: :file
 
-  def self.open(file)
+  def self.open(file, **options)
     file = Kernel.open(file, "r", binmode: true) unless file.respond_to?(:read)
 
     case file_ext(file)
     when :jpg, :gif, :png
-      MediaFile::Image.new(file)
+      MediaFile::Image.new(file, **options)
     when :swf
-      MediaFile::Flash.new(file)
+      MediaFile::Flash.new(file, **options)
     when :webm, :mp4
-      MediaFile::Video.new(file)
+      MediaFile::Video.new(file, **options)
     when :zip
-      MediaFile::Ugoira.new(file)
+      MediaFile::Ugoira.new(file, **options)
     else
-      MediaFile.new(file)
+      MediaFile.new(file, **options)
     end
   end
 
@@ -45,7 +45,7 @@ class MediaFile
     end
   end
 
-  def initialize(file)
+  def initialize(file, **options)
     @file = file
   end
 
@@ -71,6 +71,30 @@ class MediaFile
 
   def file_size
     file.size
+  end
+
+  def is_image?
+    file_ext.in?([:jpg, :png, :gif])
+  end
+
+  def is_video?
+    file_ext.in?([:webm, :mp4])
+  end
+
+  def is_ugoira?
+    file_ext == :zip
+  end
+
+  def is_flash?
+    file_ext == :swf
+  end
+
+  def preview(width, height, **options)
+    nil
+  end
+
+  def crop(width, height, **options)
+    nil
   end
 
   memoize :dimensions, :file_ext, :file_size, :md5

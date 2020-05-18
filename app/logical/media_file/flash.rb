@@ -1,7 +1,7 @@
 # Adapted from https://github.com/dim/ruby-imagespec/blob/f2f3ce8bb5b1b411f8658e66a891a095261d94c0/lib/image_spec/parser/swf.rb
 # License: https://github.com/dim/ruby-imagespec/blob/master/LICENSE
 
-class MediaFile::Flash < MediaFile::Image
+class MediaFile::Flash < MediaFile
   def dimensions
     # Read the entire stream into memory because the
     # dimensions aren't stored in a standard location

@@ -15,8 +15,6 @@ class UploadServiceTest < ActiveSupport::TestCase
   }
 
   context "::Utils" do
-    subject { UploadService::Utils }
-
     context "#get_file_for_upload" do
       context "for a non-source site" do
         setup do
@@ -26,10 +24,8 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "work on a jpeg" do
-          file = subject.get_file_for_upload(@upload)
-
+          file = UploadService::Utils.get_file_for_upload(@upload)
           assert_operator(File.size(file.path), :>, 0)
-
           file.close
         end
       end
@@ -43,13 +39,9 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         should "work on an ugoira url" do
           begin
-            file = subject.get_file_for_upload(@upload)
-
+            file = UploadService::Utils.get_file_for_upload(@upload)
             assert_operator(File.size(file.path), :>, 0)
-
             file.close
-          rescue Net::OpenTimeout
-            skip "network problems"
           end
         end
       end
@@ -64,15 +56,12 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "work on an ugoira url" do
-          skip unless PixivUgoiraConverter.enabled?
-          file = subject.get_file_for_upload(@upload)
+          file = UploadService::Utils.get_file_for_upload(@upload)
 
           assert_not_nil(@upload.context["ugoira"])
           assert_operator(File.size(file.path), :>, 0)
 
           file.close
-        rescue Net::OpenTimeout
-          skip "network failure"
         end
       end
     end
@@ -84,197 +73,19 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       context "with an original_post_id" do
         should "run" do
-          subject.expects(:distribute_files).times(3)
-          subject.process_file(@upload, @upload.file.tempfile, original_post_id: 12345)
+          UploadService::Utils.expects(:distribute_files).times(3)
+          UploadService::Utils.process_file(@upload, @upload.file.tempfile, original_post_id: 12345)
         end
       end
 
       should "run" do
-        subject.expects(:distribute_files).times(3)
-        subject.process_file(@upload, @upload.file.tempfile)
+        UploadService::Utils.expects(:distribute_files).times(3)
+        UploadService::Utils.process_file(@upload, @upload.file.tempfile)
         assert_equal("jpg", @upload.file_ext)
         assert_equal(28086, @upload.file_size)
         assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", @upload.md5)
         assert_equal(335, @upload.image_height)
         assert_equal(500, @upload.image_width)
-      end
-    end
-
-    context ".generate_resizes" do
-      context "for an ugoira" do
-        setup do
-          context = UGOIRA_CONTEXT
-          @file = upload_file("test/fixtures/ugoira.zip")
-          @upload = mock
-          @upload.stubs(:is_video?).returns(false)
-          @upload.stubs(:is_ugoira?).returns(true)
-          @upload.stubs(:context).returns(context)
-        end
-
-        should "generate a preview and a video" do
-          skip unless PixivUgoiraConverter.enabled?
-
-          preview, crop, sample = subject.generate_resizes(@file, @upload)
-          assert_operator(File.size(preview.path), :>, 0)
-          assert_operator(File.size(crop.path), :>, 0)
-          assert_operator(File.size(sample.path), :>, 0)
-          assert_equal(60, MediaFile.open(preview).width)
-          assert_equal(60, MediaFile.open(preview).height)
-          assert_equal(150, MediaFile.open(crop).width)
-          assert_equal(150, MediaFile.open(crop).height)
-          preview.close
-          preview.unlink
-          sample.close
-          sample.unlink
-        end
-      end
-
-      context "for a video" do
-        teardown do
-          @file.close
-        end
-
-        context "for an mp4" do
-          setup do
-            @file = upload_file("test/files/test-300x300.mp4")
-            @upload = mock
-            @upload.stubs(:is_video?).returns(true)
-            @upload.stubs(:is_ugoira?).returns(false)
-          end
-
-          should "generate a video" do
-            preview, crop, sample = subject.generate_resizes(@file, @upload)
-            assert_operator(File.size(preview.path), :>, 0)
-            assert_operator(File.size(crop.path), :>, 0)
-            assert_equal(150, MediaFile.open(preview).width)
-            assert_equal(150, MediaFile.open(preview).height)
-            assert_equal(150, MediaFile.open(crop).width)
-            assert_equal(150, MediaFile.open(crop).height)
-            preview.close
-            preview.unlink
-            crop.close
-            crop.unlink
-          end
-        end
-
-        context "for a webm" do
-          setup do
-            @file = upload_file("test/files/test-512x512.webm")
-            @upload = mock
-            @upload.stubs(:is_video?).returns(true)
-            @upload.stubs(:is_ugoira?).returns(false)
-          end
-
-          should "generate a video" do
-            preview, crop, sample = subject.generate_resizes(@file, @upload)
-            assert_operator(File.size(preview.path), :>, 0)
-            assert_operator(File.size(crop.path), :>, 0)
-            assert_equal(150, MediaFile.open(preview).width)
-            assert_equal(150, MediaFile.open(preview).height)
-            assert_equal(150, MediaFile.open(crop).width)
-            assert_equal(150, MediaFile.open(crop).height)
-            preview.close
-            preview.unlink
-            crop.close
-            crop.unlink
-          end
-        end
-      end
-
-      context "for an image" do
-        teardown do
-          @file.close
-        end
-
-        setup do
-          @upload = mock
-          @upload.stubs(:is_video?).returns(false)
-          @upload.stubs(:is_ugoira?).returns(false)
-          @upload.stubs(:is_image?).returns(true)
-          @upload.stubs(:image_width).returns(1200)
-          @upload.stubs(:image_height).returns(200)
-        end
-
-        context "for a jpeg" do
-          setup do
-            @file = upload_file("test/files/test.jpg")
-          end
-
-          should "generate a preview" do
-            preview, crop, sample = subject.generate_resizes(@file, @upload)
-            assert_operator(File.size(preview.path), :>, 0)
-            assert_operator(File.size(crop.path), :>, 0)
-            assert_operator(File.size(sample.path), :>, 0)
-            preview.close
-            preview.unlink
-            sample.close
-            sample.unlink
-          end
-        end
-
-        context "for a png" do
-          setup do
-            @file = upload_file("test/files/test.png")
-          end
-
-          should "generate a preview" do
-            preview, crop, sample = subject.generate_resizes(@file, @upload)
-            assert_operator(File.size(preview.path), :>, 0)
-            assert_operator(File.size(crop.path), :>, 0)
-            assert_operator(File.size(sample.path), :>, 0)
-            preview.close
-            preview.unlink
-            sample.close
-            sample.unlink
-          end
-        end
-
-        context "for a gif" do
-          setup do
-            @file = upload_file("test/files/test.png")
-          end
-
-          should "generate a preview" do
-            preview, crop, sample = subject.generate_resizes(@file, @upload)
-            assert_operator(File.size(preview.path), :>, 0)
-            assert_operator(File.size(crop.path), :>, 0)
-            assert_operator(File.size(sample.path), :>, 0)
-            preview.close
-            preview.unlink
-            sample.close
-            sample.unlink
-          end
-        end
-      end
-    end
-
-    context ".generate_video_preview_for" do
-      context "for an mp4" do
-        setup do
-          @path = "test/files/test-300x300.mp4"
-          @video = FFMPEG::Movie.new(@path)
-        end
-
-        should "generate a video" do
-          sample = subject.generate_video_preview_for(@video, 100, 100)
-          assert_operator(File.size(sample.path), :>, 0)
-          sample.close
-          sample.unlink
-        end
-      end
-
-      context "for a webm" do
-        setup do
-          @path = "test/files/test-512x512.webm"
-          @video = FFMPEG::Movie.new(@path)
-        end
-
-        should "generate a video" do
-          sample = subject.generate_video_preview_for(@video, 100, 100)
-          assert_operator(File.size(sample.path), :>, 0)
-          sample.close
-          sample.unlink
-        end
       end
     end
   end
@@ -302,7 +113,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "download the file" do
-          @service = subject.new(source: @source, referer_url: @ref)
+          @service = UploadService::Preprocessor.new(source: @source, referer_url: @ref)
           @upload = @service.start!
           assert_equal("preprocessed", @upload.status)
           assert_equal(9800, @upload.file_size)
@@ -321,7 +132,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         should "download the file" do
           begin
-            @service = subject.new(source: @source, referer_url: @ref)
+            @service = UploadService::Preprocessor.new(source: @source, referer_url: @ref)
             @upload = @service.start!
           rescue Net::OpenTimeout
             skip "network failure"
@@ -341,9 +152,9 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "download the file" do
-          skip unless PixivUgoiraConverter.enabled?
+          skip unless MediaFile::Ugoira.conversion_enabled?
 
-          @service = subject.new(source: @source)
+          @service = UploadService::Preprocessor.new(source: @source)
           begin
             @upload = @service.start!
           rescue Net::OpenTimeout
@@ -364,7 +175,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "download the file" do
-          @service = subject.new(source: @source)
+          @service = UploadService::Preprocessor.new(source: @source)
           begin
             @upload = @service.start!
           rescue Net::OpenTimeout
@@ -386,7 +197,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "work for a video" do
-          @service = subject.new(source: @source)
+          @service = UploadService::Preprocessor.new(source: @source)
           @upload = @service.start!
           assert_equal("preprocessed", @upload.status)
           assert_not_nil(@upload.md5)
@@ -405,7 +216,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "leave the upload in an error state" do
-          @service = subject.new(source: @source)
+          @service = UploadService::Preprocessor.new(source: @source)
           @upload = @service.start!
           assert_match(/error:/, @upload.status)
         end
@@ -413,7 +224,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       context "for an invalid content type" do
         should "fail" do
-          upload = subject.new(source: "http://www.example.com").start!
+          upload = UploadService::Preprocessor.new(source: "http://www.example.com").start!
           assert_match(/\Aerror:.*File ext is invalid/, upload.status)
         end
       end
@@ -429,7 +240,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       end
 
       should "overwrite the attributes" do
-        @service = subject.new(source: @source, rating: 'e')
+        @service = UploadService::Preprocessor.new(source: @source, rating: 'e')
         @upload = @service.start!
         @service.finish!
         @upload.reload
@@ -737,7 +548,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       context "a post that is replaced by a ugoira" do
         should "save the frame data" do
-          skip "ffmpeg not installed" unless PixivUgoiraConverter.enabled?
+          skip unless MediaFile::Ugoira.conversion_enabled?
           begin
             as_user { @post.replace!(replacement_url: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364") }
             @post.reload
@@ -751,8 +562,6 @@ class UploadServiceTest < ActiveSupport::TestCase
 
             assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @post.source)
             assert_equal([{"delay" => 125, "file" => "000000.jpg"}, {"delay" => 125, "file" => "000001.jpg"}], @post.pixiv_ugoira_frame_data.data)
-          rescue Net::OpenTimeout
-            skip "Remote connection to Pixiv failed"
           end
         end
       end
@@ -760,7 +569,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       context "a post that is replaced to another file then replaced back to the original file" do
         should "not delete the original files" do
           begin
-            skip unless PixivUgoiraConverter.enabled?
+            skip unless MediaFile::Ugoira.conversion_enabled?
             @post.unstub(:queue_delete_files)
 
             # this is called thrice to delete the file for 62247364
@@ -802,7 +611,7 @@ class UploadServiceTest < ActiveSupport::TestCase
           # swap the images between @post1 and @post2.
           begin
             as_user do
-              skip unless PixivUgoiraConverter.enabled?
+              skip unless MediaFile::Ugoira.conversion_enabled?
 
               @post1.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
               @post2.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")

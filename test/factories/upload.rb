@@ -17,7 +17,7 @@ FactoryBot.define do
     factory(:ugoira_upload) do
       file do
         f = Tempfile.new
-        IO.copy_stream("#{Rails.root}/test/fixtures/ugoira.zip", f.path)
+        IO.copy_stream("#{Rails.root}/test/files/ugoira.zip", f.path)
         ActionDispatch::Http::UploadedFile.new(tempfile: f, filename: "ugoira.zip")
       end
     end

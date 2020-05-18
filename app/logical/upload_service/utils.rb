@@ -25,53 +25,25 @@ class UploadService
       source =~ /^https?:\/\//
     end
 
-    def generate_resizes(file, upload)
-      if upload.is_video?
-        video = FFMPEG::Movie.new(file.path)
-        crop_file = generate_video_crop_for(video, Danbooru.config.small_image_width)
-        preview_file = generate_video_preview_for(video, Danbooru.config.small_image_width, Danbooru.config.small_image_width)
+    def generate_resizes(media_file)
+      preview_file = media_file.preview(Danbooru.config.small_image_width, Danbooru.config.small_image_width)
+      crop_file = media_file.crop(Danbooru.config.small_image_width, Danbooru.config.small_image_width)
 
-      elsif upload.is_ugoira?
-        preview_file = PixivUgoiraConverter.generate_preview(file)
-        crop_file = PixivUgoiraConverter.generate_crop(file)
-        sample_file = PixivUgoiraConverter.generate_webm(file, upload.context["ugoira"]["frame_data"])
-
-      elsif upload.is_image?
-        preview_file = DanbooruImageResizer.resize(file, Danbooru.config.small_image_width, Danbooru.config.small_image_width, 85)
-        crop_file = DanbooruImageResizer.crop(file, Danbooru.config.small_image_width, Danbooru.config.small_image_width, 85)
-        if upload.image_width > Danbooru.config.large_image_width
-          sample_file = DanbooruImageResizer.resize(file, Danbooru.config.large_image_width, upload.image_height, 90)
-        end
+      if media_file.is_ugoira?
+        sample_file = media_file.convert
+      elsif media_file.is_image? && media_file.width > Danbooru.config.large_image_width
+        sample_file = media_file.preview(Danbooru.config.large_image_width, nil)
+      else
+        sample_file = nil
       end
 
       [preview_file, crop_file, sample_file]
     end
 
-    def generate_video_crop_for(video, width)
-      vp = Tempfile.new(["video-preview", ".jpg"], binmode: true)
-      video.screenshot(vp.path, :seek_time => 0, :resolution => "#{video.width}x#{video.height}")
-      crop = DanbooruImageResizer.crop(vp, width, width, 85)
-      vp.close
-      return crop
-    end
-
-    def generate_video_preview_for(video, width, height)
-      dimension_ratio = video.width.to_f / video.height
-      if dimension_ratio > 1
-        height = (width / dimension_ratio).to_i
-      else
-        width = (height * dimension_ratio).to_i
-      end
-
-      output_file = Tempfile.new(["video-preview", ".jpg"], binmode: true)
-      video.screenshot(output_file.path, :seek_time => 0, :resolution => "#{width}x#{height}")
-      output_file
-    end
-
     def process_file(upload, file, original_post_id: nil)
-      media_file = MediaFile.open(file)
-
       upload.file = file
+      media_file = upload.media_file
+
       upload.file_ext = media_file.file_ext.to_s
       upload.file_size = media_file.file_size
       upload.md5 = media_file.md5
@@ -81,7 +53,7 @@ class UploadService
       upload.validate!(:file)
       upload.tag_string = "#{upload.tag_string} #{Utils.automatic_tags(upload, file)}"
 
-      preview_file, crop_file, sample_file = Utils.generate_resizes(file, upload)
+      preview_file, crop_file, sample_file = Utils.generate_resizes(media_file)
 
       begin
         Utils.distribute_files(file, upload, :original, original_post_id: original_post_id)

@@ -100,6 +100,10 @@ class Upload < ApplicationRecord
   end
 
   module FileMethods
+    def media_file
+      @media_file ||= MediaFile.open(file, frame_data: context.to_h.dig("ugoira", "frame_data"))
+    end
+
     def is_image?
       %w(jpg gif png).include?(file_ext)
     end
