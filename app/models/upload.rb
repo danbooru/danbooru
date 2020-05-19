@@ -1,5 +1,3 @@
-require "tmpdir"
-
 class Upload < ApplicationRecord
   class Error < StandardError; end
 
@@ -19,8 +17,8 @@ class Upload < ApplicationRecord
     end
 
     def validate_integrity(record)
-      if record.file_ext.in?(["jpg", "gif", "png"]) && UploadService::Utils.corrupt?(record.file.path)
-        record.errors[:file] << "File is corrupted"
+      if record.media_file.is_corrupt?
+        record.errors[:file] << "is corrupted"
       end
     end
 
@@ -55,7 +53,7 @@ class Upload < ApplicationRecord
     end
 
     def validate_video_duration(record)
-      if record.is_video? && record.video.duration > 120
+      if record.media_file.is_video? && record.media_file.duration > 120
         record.errors[:base] << "video must not be longer than 2 minutes"
       end
     end
@@ -99,25 +97,9 @@ class Upload < ApplicationRecord
     end
   end
 
-  module FileMethods
+  concerning :FileMethods do
     def media_file
       @media_file ||= MediaFile.open(file, frame_data: context.to_h.dig("ugoira", "frame_data"))
-    end
-
-    def is_image?
-      %w(jpg gif png).include?(file_ext)
-    end
-
-    def is_flash?
-      %w(swf).include?(file_ext)
-    end
-
-    def is_video?
-      %w(webm mp4).include?(file_ext)
-    end
-
-    def is_ugoira?
-      %w(zip).include?(file_ext)
     end
 
     def delete_files
@@ -136,7 +118,7 @@ class Upload < ApplicationRecord
     end
   end
 
-  module StatusMethods
+  concerning :StatusMethods do
     def is_pending?
       status == "pending"
     end
@@ -178,7 +160,7 @@ class Upload < ApplicationRecord
     end
   end
 
-  module SourceMethods
+  concerning :SourceMethods do
     def source=(source)
       source = source.unicode_normalize(:nfc)
 
@@ -196,13 +178,7 @@ class Upload < ApplicationRecord
     end
   end
 
-  module VideoMethods
-    def video
-      @video ||= FFMPEG::Movie.new(file.path)
-    end
-  end
-
-  module SearchMethods
+  concerning :SearchMethods do
     def search(params)
       q = super
 
@@ -234,20 +210,10 @@ class Upload < ApplicationRecord
     end
   end
 
-  include FileMethods
-  include StatusMethods
-  include VideoMethods
-  extend SearchMethods
-  include SourceMethods
-
   def assign_rating_from_tags
     if rating = PostQueryBuilder.new(tag_string).find_metatag(:rating)
       self.rating = rating.downcase.first
     end
-  end
-
-  def presenter
-    @presenter ||= UploadPresenter.new(self)
   end
 
   def upload_as_pending?

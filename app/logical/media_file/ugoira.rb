@@ -1,5 +1,4 @@
 class MediaFile::Ugoira < MediaFile
-  extend Memoist
   class Error < StandardError; end
   attr_reader :frame_data
 

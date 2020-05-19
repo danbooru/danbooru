@@ -843,7 +843,6 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         upload = upload_from_file(@bad_jpeg_path)
         assert_match(/corrupt/, upload.status)
-        assert_equal(true, UploadService::Utils.corrupt?(@bad_jpeg_path))
       end
 
       should "fail for a corrupted gif" do
@@ -851,7 +850,6 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         upload = upload_from_file(@bad_gif_path)
         assert_match(/corrupt/, upload.status)
-        assert_equal(true, UploadService::Utils.corrupt?(@bad_gif_path))
       end
 
       # https://schaik.com/pngsuite/pngsuite_xxx_png.html
@@ -860,7 +858,6 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         upload = upload_from_file(@bad_png_path)
         assert_match(/corrupt/, upload.status)
-        assert_equal(true, UploadService::Utils.corrupt?(@bad_png_path))
       end
     end
   end

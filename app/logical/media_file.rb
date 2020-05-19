@@ -89,6 +89,22 @@ class MediaFile
     file_ext == :swf
   end
 
+  def is_corrupt?
+    false
+  end
+
+  def is_animated?
+    is_video?
+  end
+
+  def has_audio?
+    false
+  end
+
+  def duration
+    0.0
+  end
+
   def preview(width, height, **options)
     nil
   end
@@ -97,5 +113,5 @@ class MediaFile
     nil
   end
 
-  memoize :dimensions, :file_ext, :file_size, :md5
+  memoize :dimensions, :file_ext, :file_size, :md5, :is_corrupt?, :is_animated?
 end

@@ -20,6 +20,17 @@ class MediaFile::Image < MediaFile
     [0, 0]
   end
 
+  def is_corrupt?
+    image.stats
+    false
+  rescue Vips::Error
+    true
+  end
+
+  def is_animated?
+    is_animated_gif? || is_animated_png?
+  end
+
   # https://github.com/jcupitt/libvips/wiki/HOWTO----Image-shrinking
   # http://jcupitt.github.io/libvips/API/current/Using-vipsthumbnail.md.html
   def preview(width, height)
@@ -39,6 +50,14 @@ class MediaFile::Image < MediaFile
   end
 
   private
+
+  def is_animated_gif?
+    file_ext == :gif && image.get("n-pages") > 1
+  end
+
+  def is_animated_png?
+    file_ext == :png && APNGInspector.new(file.path).inspect!.animated?
+  end
 
   def image
     @image ||= Vips::Image.new_from_file(file.path, fail: true)

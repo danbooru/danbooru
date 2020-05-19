@@ -2,14 +2,6 @@ class UploadService
   module Utils
     module_function
 
-    def corrupt?(filename)
-      image = Vips::Image.new_from_file(filename, fail: true)
-      image.stats
-      false
-    rescue Vips::Error
-      true
-    end
-
     def distribute_files(file, record, type, original_post_id: nil)
       # need to do this for hybrid storage manager
       post = Post.new
@@ -51,7 +43,7 @@ class UploadService
       upload.image_height = media_file.height
 
       upload.validate!(:file)
-      upload.tag_string = "#{upload.tag_string} #{Utils.automatic_tags(upload, file)}"
+      upload.tag_string = "#{upload.tag_string} #{Utils.automatic_tags(media_file)}"
 
       preview_file, crop_file, sample_file = Utils.generate_resizes(media_file)
 
@@ -67,38 +59,11 @@ class UploadService
       end
     end
 
-    # these methods are only really used during upload processing even
-    # though logically they belong on upload. post can rely on the
-    # automatic tag that's added.
-    def is_animated_gif?(upload, file)
-      return false if upload.file_ext != "gif"
-
-      # Check whether the gif has multiple frames by trying to load the second frame.
-      result = Vips::Image.gifload(file.path, page: 1) rescue $ERROR_INFO
-      if result.is_a?(Vips::Image)
-        true
-      elsif result.is_a?(Vips::Error) && result.message =~ /too few frames in GIF file/
-        false
-      else
-        raise result
-      end
-    end
-
-    def is_animated_png?(upload, file)
-      upload.file_ext == "png" && APNGInspector.new(file.path).inspect!.animated?
-    end
-
-    def is_video_with_audio?(upload, file)
-      return false if !upload.is_video? # avoid ffprobe'ing the file if it's not a video (issue #3826)
-      video = FFMPEG::Movie.new(file.path)
-      video.audio_channels.present?
-    end
-
-    def automatic_tags(upload, file)
+    def automatic_tags(media_file)
       tags = []
-      tags << "video_with_sound" if is_video_with_audio?(upload, file)
-      tags << "animated_gif" if is_animated_gif?(upload, file)
-      tags << "animated_png" if is_animated_png?(upload, file)
+      tags << "video_with_sound" if media_file.has_audio?
+      tags << "animated_gif" if media_file.file_ext == :gif && media_file.is_animated?
+      tags << "animated_png" if media_file.file_ext == :png && media_file.is_animated?
       tags.join(" ")
     end
 

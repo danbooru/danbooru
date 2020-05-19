@@ -1,8 +1,10 @@
 class MediaFile::Video < MediaFile
-  extend Memoist
-
   def dimensions
     [video.width, video.height]
+  end
+
+  def duration
+    video.duration
   end
 
   def preview(max_width, max_height)
@@ -11,6 +13,10 @@ class MediaFile::Video < MediaFile
 
   def crop(max_width, max_height)
     preview_frame.crop(max_width, max_height)
+  end
+
+  def has_audio?
+    video.audio_channels.present?
   end
 
   private
