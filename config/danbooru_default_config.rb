@@ -439,6 +439,18 @@ module Danbooru
       nil
     end
 
+    # * Create a new application at https://discord.com/developers/applications
+    # * Add your application's client ID below
+    # * Go to your application's OAuth2 page on Discord and add the redirect
+    #   URL `http://<domain>/oauth/callback`, where <domain> is your website's domain.
+    def discord_client_id
+      nil
+    end
+
+    def discord_client_secret
+      nil
+    end
+
     # The twitter username associated with this site (username only, don't include the @-sign).
     def twitter_username
       nil

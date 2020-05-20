@@ -2350,6 +2350,44 @@ ALTER SEQUENCE public.ip_bans_id_seq OWNED BY public.ip_bans.id;
 
 
 --
+-- Name: linked_accounts; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.linked_accounts (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    account_data_updated_at timestamp without time zone NOT NULL,
+    api_key_updated_at timestamp without time zone NOT NULL,
+    user_id integer NOT NULL,
+    site integer NOT NULL,
+    is_public boolean DEFAULT true NOT NULL,
+    account_id character varying NOT NULL,
+    account_data jsonb NOT NULL,
+    api_key jsonb
+);
+
+
+--
+-- Name: linked_accounts_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.linked_accounts_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: linked_accounts_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.linked_accounts_id_seq OWNED BY public.linked_accounts.id;
+
+
+--
 -- Name: mod_actions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4009,6 +4047,13 @@ ALTER TABLE ONLY public.ip_bans ALTER COLUMN id SET DEFAULT nextval('public.ip_b
 
 
 --
+-- Name: linked_accounts id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.linked_accounts ALTER COLUMN id SET DEFAULT nextval('public.linked_accounts_id_seq'::regclass);
+
+
+--
 -- Name: mod_actions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4350,6 +4395,14 @@ ALTER TABLE ONLY public.forum_topics
 
 ALTER TABLE ONLY public.ip_bans
     ADD CONSTRAINT ip_bans_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: linked_accounts linked_accounts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.linked_accounts
+    ADD CONSTRAINT linked_accounts_pkey PRIMARY KEY (id);
 
 
 --
@@ -6462,6 +6515,76 @@ CREATE INDEX index_ip_bans_on_is_deleted ON public.ip_bans USING btree (is_delet
 
 
 --
+-- Name: index_linked_accounts_on_account_data; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_linked_accounts_on_account_data ON public.linked_accounts USING gin (account_data);
+
+
+--
+-- Name: index_linked_accounts_on_account_data_updated_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_linked_accounts_on_account_data_updated_at ON public.linked_accounts USING btree (account_data_updated_at);
+
+
+--
+-- Name: index_linked_accounts_on_account_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_linked_accounts_on_account_id ON public.linked_accounts USING btree (account_id);
+
+
+--
+-- Name: index_linked_accounts_on_api_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_linked_accounts_on_api_key ON public.linked_accounts USING gin (api_key);
+
+
+--
+-- Name: index_linked_accounts_on_api_key_updated_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_linked_accounts_on_api_key_updated_at ON public.linked_accounts USING btree (api_key_updated_at);
+
+
+--
+-- Name: index_linked_accounts_on_is_public; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_linked_accounts_on_is_public ON public.linked_accounts USING btree (is_public);
+
+
+--
+-- Name: index_linked_accounts_on_site; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_linked_accounts_on_site ON public.linked_accounts USING btree (site);
+
+
+--
+-- Name: index_linked_accounts_on_site_and_account_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_linked_accounts_on_site_and_account_id ON public.linked_accounts USING btree (site, account_id);
+
+
+--
+-- Name: index_linked_accounts_on_site_and_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_linked_accounts_on_site_and_user_id ON public.linked_accounts USING btree (site, user_id);
+
+
+--
+-- Name: index_linked_accounts_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_linked_accounts_on_user_id ON public.linked_accounts USING btree (user_id);
+
+
+--
 -- Name: index_mod_actions_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7393,6 +7516,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200325074859'),
 ('20200403210353'),
 ('20200406054838'),
-('20200427190519');
+('20200427190519'),
+('20200520060951');
 
 

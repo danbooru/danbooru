@@ -38,6 +38,12 @@
           </p>
         </div>
 
+        <div class="input">
+          <label>Linked Accounts</label>
+          <%= render "linked_accounts/inline_listing", linked_accounts: @user.linked_accounts.order(:site) %>
+          <p><%= link_to "Edit accounts", user_linked_accounts_path(@user) %></p>
+        </div>
+
         <%= f.input :theme, collection: User.themes.keys, include_blank: false, hint: "The site's colorscheme (light mode or dark mode)." %>
         <%= f.input :enable_safe_mode, label: "Safe mode", hint: "Show only safe images. Hide questionable and explicit images.", as: :select, include_blank: false, collection: [["Yes", "true"], ["No", "false"]] %>
         

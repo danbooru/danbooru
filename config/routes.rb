@@ -51,7 +51,6 @@ Rails.application.routes.draw do
       end
     end
   end
-
   resources :artists do
     member do
       put :revert
@@ -136,6 +135,9 @@ Rails.application.routes.draw do
       get :preview
       get :check, to: redirect {|path_params, req| "/iqdb_queries?#{req.query_string}"}
     end
+  end
+  resources :linked_accounts, only: [:new, :index, :update, :destroy] do
+    get :callback, on: :collection
   end
   resources :mod_actions
   resources :moderation_reports, only: [:new, :create, :index, :show]
@@ -243,6 +245,7 @@ Rails.application.routes.draw do
   end
   resources :users do
     resources :favorite_groups, controller: "favorite_groups", only: [:index], as: "favorite_groups"
+    resources :linked_accounts, only: [:new, :index, :update, :destroy]
     resource :email, only: [:show, :edit, :update] do
       get :verify
     end

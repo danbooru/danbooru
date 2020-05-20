@@ -14,6 +14,7 @@ class UserDeletion
     clear_user_settings
     remove_favorites
     clear_saved_searches
+    clear_linked_accounts
     rename
     reset_password
     create_mod_action
@@ -28,6 +29,10 @@ class UserDeletion
 
   def clear_saved_searches
     SavedSearch.where(user_id: user.id).destroy_all
+  end
+
+  def clear_linked_accounts
+    user.linked_accounts.destroy_all
   end
 
   def clear_user_settings

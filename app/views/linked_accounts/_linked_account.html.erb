@@ -1,0 +1,46 @@
+<%# linked_account %>
+
+<%= tag.div class: "linked-account", **data_attributes_for(linked_account, "data", linked_account.html_data_attributes) do %>
+  <%= link_to linked_account.site_url, class: "linked-account-media", target: "_blank" do %>
+    <%= tag.img src: linked_account_logo_url(linked_account.site) %>
+  <% end %>
+
+  <div class="linked-account-body">
+    <div class="linked-account-details">
+      <p class="linked-account-site">
+        <%= linked_account.site %>
+      </p>
+
+      <% if linked_account.persisted? %>
+        <div class="linked-account-username">
+          <%= link_to_if linked_account.profile_url.present?, linked_account.user_name, linked_account.profile_url, target: "_blank" %>
+          <i class="linked-account-status-icon fas fa-check-circle"></i>
+        </div>
+
+        <%= edit_form_for(linked_account, namespace: "linked_account_#{linked_account.id}", remote: true, html: { "data-autosubmit": true }) do |f| %>
+          <%= f.input :is_public, label: "Show on profile" %>
+        <% end %>
+      <% else %>
+        <% if linked_account.site == "Discord" %>
+          <p class="linked-account-description">
+            Link to get a role in the <%= link_to "Danbooru Discord", Danbooru.config.discord_server_url %>.
+          </p>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="linked-account-controls">
+      <% if linked_account.persisted? %>
+        <%= link_to linked_account, method: :delete, remote: true, class: "button button-secondary unlink-linked-account", "data-confirm": "Are you sure you want to unlink this account?" do %>
+          <i class="fas fa-unlink"></i>
+          Unlink
+        <% end %>
+      <% else %>
+        <%= link_to new_linked_account_path(site: linked_account.site), remote: true, class: "button button-primary link-linked-account", target: "_blank" do %>
+          <i class="fas fa-link"></i>
+          Link
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

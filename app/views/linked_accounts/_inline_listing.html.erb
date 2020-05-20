@@ -1,0 +1,12 @@
+<ul class="linked-account-inline-list">
+  <% linked_accounts.each do |linked_account| %>
+    <li class="linked-account-inline">
+      <%= tag.img class: "linked-account-media", src: linked_account_logo_url(linked_account.site) %>
+      <%= link_to_if linked_account.profile_url.present?, linked_account.user_name, linked_account.profile_url, class: "linked-account-username", target: "_blank" %>
+
+      <% if policy(linked_account.user).update? %>
+        <%= link_to tag.i(class: "fas fa-cog fa-sm"), user_linked_accounts_path(linked_account.user), class: "linked-account-edit" %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>
