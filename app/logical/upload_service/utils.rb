@@ -24,7 +24,7 @@ class UploadService
       if media_file.is_ugoira?
         sample_file = media_file.convert
       elsif media_file.is_image? && media_file.width > Danbooru.config.large_image_width
-        sample_file = media_file.preview(Danbooru.config.large_image_width, nil)
+        sample_file = media_file.preview(Danbooru.config.large_image_width, media_file.height)
       else
         sample_file = nil
       end
