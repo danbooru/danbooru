@@ -152,9 +152,9 @@ class ApplicationController < ActionController::Base
 
   # allow api clients to force errors for testing purposes.
   def cause_error
-    return unless params[:error].present?
+    return unless params[:cause_error].present?
 
-    status = params[:error].to_i
+    status = params[:cause_error].to_i
     raise ArgumentError, "invalid status code" unless status.in?(400..599)
 
     error = StandardError.new(params[:message])
