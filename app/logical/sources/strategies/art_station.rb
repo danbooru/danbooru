@@ -16,6 +16,8 @@
 # * https://cdna.artstation.com/p/assets/images/images/005/804/224/large/titapa-khemakavat-sa-dui-srevere.jpg?1493887236
 # * https://cdnb.artstation.com/p/assets/images/images/014/410/217/smaller_square/bart-osz-bartosz1812041.jpg?1543866276
 # * https://cdna.artstation.com/p/assets/images/images/007/253/680/4k/ina-wong-demon-girl-done-ttd-comp.jpg?1504793833
+#
+# * https://cdna.artstation.com/p/assets/covers/images/007/262/828/small/monica-kyrie-1.jpg?1504865060
 
 module Sources::Strategies
   class ArtStation < Base
@@ -27,7 +29,7 @@ module Sources::Strategies
     ARTIST3 = %r{\Ahttps?://www\.artstation\.com/(?<artist_name>[\w-]+)/?\z}i
     ARTIST = Regexp.union(ARTIST1, ARTIST2, ARTIST3)
 
-    ASSET = %r!\Ahttps?://cdn\w*\.artstation\.com/p/assets/images/images/(?<id>\d+/\d+/\d+)/(?<size>[^/]+)/(?<filename>.+)\z!i
+    ASSET = %r!\Ahttps?://cdn\w*\.artstation\.com/p/assets/(?<type>images|covers)/images/(?<id>\d+/\d+/\d+)/(?<size>[^/]+)/(?<filename>.+)\z!i
 
     attr_reader :json
 
@@ -40,7 +42,11 @@ module Sources::Strategies
     end
 
     def image_urls
-      @image_urls ||= image_urls_sub.map { |asset| largest_asset_url(asset) }
+      @image_urls ||= image_urls_sub.map { |asset| asset_url(asset, :largest) }
+    end
+
+    def preview_urls
+      @preview_urls ||= image_urls_sub.map { |asset| asset_url(asset, :smallest) }
     end
 
     def page_url
@@ -116,17 +122,26 @@ module Sources::Strategies
     end
     memoize :api_response
 
-    def largest_asset_url(url)
+    def image_url_sizes(type, id, filename)
+      [
+        "https://cdn.artstation.com/p/assets/#{type}/images/#{id}/original/#{filename}",
+        "https://cdn.artstation.com/p/assets/#{type}/images/#{id}/4k/#{filename}",
+        "https://cdn.artstation.com/p/assets/#{type}/images/#{id}/large/#{filename}",
+        "https://cdn.artstation.com/p/assets/#{type}/images/#{id}/medium/#{filename}",
+        "https://cdn.artstation.com/p/assets/#{type}/images/#{id}/small/#{filename}",
+      ]
+    end
+
+    def asset_url(url, size)
       return url unless url =~ ASSET
 
-      urls = [
-        "https://cdn.artstation.com/p/assets/images/images/#{$~[:id]}/original/#{$~[:filename]}",
-        "https://cdn.artstation.com/p/assets/images/images/#{$~[:id]}/4k/#{$~[:filename]}",
-        "https://cdn.artstation.com/p/assets/images/images/#{$~[:id]}/large/#{$~[:filename]}",
-      ]
+      urls = image_url_sizes($~[:type], $~[:id], $~[:filename])
+      if size == :smallest
+        urls = urls.reverse()
+      end
 
-      largest_url = urls.find { |url| http_exists?(url, headers) }
-      largest_url || url
+      chosen_url = urls.find { |url| http_exists?(url, headers) }
+      chosen_url || url
     end
   end
 end
