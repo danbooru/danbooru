@@ -178,36 +178,34 @@ class Upload < ApplicationRecord
     end
   end
 
-  concerning :SearchMethods do
-    def search(params)
-      q = super
+  def self.search(params)
+    q = super
 
-      q = q.search_attributes(params, :uploader, :post, :source, :rating, :parent_id, :server, :md5, :server, :file_ext, :file_size, :image_width, :image_height, :referer_url)
+    q = q.search_attributes(params, :uploader, :post, :source, :rating, :parent_id, :server, :md5, :server, :file_ext, :file_size, :image_width, :image_height, :referer_url)
 
-      if params[:source_matches].present?
-        q = q.where_like(:source, params[:source_matches])
-      end
-
-      if params[:has_post].to_s.truthy?
-        q = q.where.not(post_id: nil)
-      elsif params[:has_post].to_s.falsy?
-        q = q.where(post_id: nil)
-      end
-
-      if params[:status].present?
-        q = q.where_like(:status, params[:status])
-      end
-
-      if params[:backtrace].present?
-        q = q.where_like(:backtrace, params[:backtrace])
-      end
-
-      if params[:tag_string].present?
-        q = q.where_like(:tag_string, params[:tag_string])
-      end
-
-      q.apply_default_order(params)
+    if params[:source_matches].present?
+      q = q.where_like(:source, params[:source_matches])
     end
+
+    if params[:has_post].to_s.truthy?
+      q = q.where.not(post_id: nil)
+    elsif params[:has_post].to_s.falsy?
+      q = q.where(post_id: nil)
+    end
+
+    if params[:status].present?
+      q = q.where_like(:status, params[:status])
+    end
+
+    if params[:backtrace].present?
+      q = q.where_like(:backtrace, params[:backtrace])
+    end
+
+    if params[:tag_string].present?
+      q = q.where_like(:tag_string, params[:tag_string])
+    end
+
+    q.apply_default_order(params)
   end
 
   def assign_rating_from_tags
