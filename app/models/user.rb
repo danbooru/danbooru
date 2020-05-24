@@ -355,7 +355,9 @@ class User < ApplicationRecord
     end
 
     def tag_query_limit
-      if is_platinum?
+      if is_member? && !Rails.env.test?
+        Danbooru.config.base_tag_query_limit * 2
+      elsif is_platinum?
         Danbooru.config.base_tag_query_limit * 2
       elsif is_gold?
         Danbooru.config.base_tag_query_limit
