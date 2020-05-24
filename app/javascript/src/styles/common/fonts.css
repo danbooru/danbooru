@@ -37,6 +37,51 @@
     url("../../../../../node_modules/typopro-web/web/TypoPRO-ComicRelief/TypoPRO-ComicRelief-Bold.woff") format("woff");
 }
 
+/* https://fonts.google.com/specimen/IBM+Plex+Mono */
+@font-face {
+  font-family: "Mono";
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  src:
+    local("IBM Plex Mono"),
+    url("../../../../../node_modules/typeface-ibm-plex-mono/files/ibm-plex-mono-latin-200.woff2") format("woff2"),
+    url("../../../../../node_modules/typeface-ibm-plex-mono/files/ibm-plex-mono-latin-200.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Mono";
+  font-weight: normal;
+  font-style: italic;
+  font-display: swap;
+  src:
+    local("IBM Plex Mono"),
+    url("../../../../../node_modules/typeface-ibm-plex-mono/files/ibm-plex-mono-latin-200italic.woff2") format("woff2"),
+    url("../../../../../node_modules/typeface-ibm-plex-mono/files/ibm-plex-mono-latin-200italic.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Mono";
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+  src:
+    local("IBM Plex Mono"),
+    url("../../../../../node_modules/typeface-ibm-plex-mono/files/ibm-plex-mono-latin-700.woff2") format("woff2"),
+    url("../../../../../node_modules/typeface-ibm-plex-mono/files/ibm-plex-mono-latin-700.woff") format("woff");
+}
+
+@font-face {
+  font-family: "Mono";
+  font-weight: bold;
+  font-style: italic;
+  font-display: swap;
+  src:
+    local("IBM Plex Mono"),
+    url("../../../../../node_modules/typeface-ibm-plex-mono/files/ibm-plex-mono-latin-700italic.woff2") format("woff2"),
+    url("../../../../../node_modules/typeface-ibm-plex-mono/files/ibm-plex-mono-latin-700italic.woff") format("woff");
+}
+
 /* https://fonts.google.com/specimen/Rokkitt */
 @font-face {
   font-family: "Rockwell";
