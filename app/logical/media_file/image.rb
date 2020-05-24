@@ -53,6 +53,9 @@ class MediaFile::Image < MediaFile
 
   def is_animated_gif?
     file_ext == :gif && image.get("n-pages") > 1
+  # older versions of libvips that don't support n-pages will raise an error
+  rescue Vips::Error
+    false
   end
 
   def is_animated_png?
