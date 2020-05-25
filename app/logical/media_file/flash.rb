@@ -54,4 +54,5 @@ class MediaFile::Flash < MediaFile
 
     [width, height]
   end
+  memoize :dimensions
 end
