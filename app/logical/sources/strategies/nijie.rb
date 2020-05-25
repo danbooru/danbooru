@@ -114,7 +114,7 @@ module Sources
       end
 
       def artist_commentary_desc
-        page&.search('meta[property="og:description"]')&.attr("content")&.value
+        page&.search('#illust_text > p')&.text
       end
 
       def tags

@@ -94,6 +94,17 @@ module Sources
       end
     end
 
+    context "For long commentaries that may be truncated" do
+      should "get the full commentary" do
+        site = Sources::Strategies.find("http://nijie.info/view.php?id=266532")
+        title = "ラミアの里"
+        desc = "サークルaskot様より販売されました「ラミアの里 ～ラミアはぁれむで搾られて～」にて前回に引き続きフラウのイラストを担当させて頂きました。\r\n前作を知らなくても問題なく愉しめる内容となっております。体験版もありますので気になりましたら是非ダウンロードしてみて下さい。\r\nDLsite【http://www.dlsite.com/maniax/work/=/product_id/RJ226998.html】"
+
+        assert_equal(title, site.artist_commentary_title)
+        assert_equal(desc, site.artist_commentary_desc)
+      end
+    end
+
     context "The source site for a nijie referer url" do
       setup do
         @site = Sources::Strategies.find("http://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg", "https://nijie.info/view_popup.php?id=213043")
