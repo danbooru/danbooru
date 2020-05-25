@@ -3,7 +3,7 @@
     <%= render "uploads/search" %>
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <%= table_for @uploads, {class: "striped autofit", width: "100%"} do |t| %>
+    <%= table_for @uploads, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "Upload" do |upload| %>
         <%= PostPresenter.preview(upload.post, tags: "user:#{upload.uploader.name}", show_deleted: true) %>
       <% end %>

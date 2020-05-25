@@ -1,4 +1,4 @@
-<%= table_for @ip_addresses, {class: "striped autofit"} do |t| %>
+<%= table_for @ip_addresses, class: "striped autofit" do |t| %>
   <% t.column "IP Address" do |ip| %>
     <%= link_to ip.ip_addr, ip_addresses_path(search: { ip_addr: ip.ip_addr }) %>
     <%= link_to "»", ip_addresses_path(search: { ip_addr: ip.ip_addr, group_by: "user" }) %>

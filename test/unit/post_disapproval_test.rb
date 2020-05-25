@@ -21,7 +21,7 @@ class PostDisapprovalTest < ActiveSupport::TestCase
 
       should "not allow blank messages" do
         @post_disapproval = create(:post_disapproval, post: @post_1, message: "")
-        assert_equal(nil, @post_disapproval.message)
+        assert_nil(@post_disapproval.message)
       end
 
       context "made by alice" do

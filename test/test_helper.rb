@@ -89,25 +89,25 @@ class ActionDispatch::IntegrationTest
   mock_post_version_service!
   mock_pool_version_service!
 
-  def method_authenticated(method_name, url, user, options)
+  def method_authenticated(method_name, url, user, **options)
     post session_path, params: { name: user.name, password: user.password }
-    self.send(method_name, url, options)
+    send(method_name, url, **options)
   end
 
-  def get_auth(url, user, options = {})
-    method_authenticated(:get, url, user, options)
+  def get_auth(url, user, **options)
+    method_authenticated(:get, url, user, **options)
   end
 
-  def post_auth(url, user, options = {})
-    method_authenticated(:post, url, user, options)
+  def post_auth(url, user, **options)
+    method_authenticated(:post, url, user, **options)
   end
 
-  def put_auth(url, user, options = {})
-    method_authenticated(:put, url, user, options)
+  def put_auth(url, user, **options)
+    method_authenticated(:put, url, user, **options)
   end
 
-  def delete_auth(url, user, options = {})
-    method_authenticated(:delete, url, user, options)
+  def delete_auth(url, user, **options)
+    method_authenticated(:delete, url, user, **options)
   end
 
   def setup

@@ -10,7 +10,7 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <%= table_for @post_replacements, {class: "striped autofit", width: "100%"} do |t| %>
+    <%= table_for @post_replacements, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "Post", width: "1%" do |post_replacement| %>
         <%= PostPresenter.preview(post_replacement.post, show_deleted: true) %>
       <% end %>

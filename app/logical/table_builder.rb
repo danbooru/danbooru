@@ -49,8 +49,8 @@ class TableBuilder
     yield self if block_given?
   end
 
-  def column(*args, **options, &block)
-    @columns << Column.new(*args, **options, &block)
+  def column(...)
+    @columns << Column.new(...)
   end
 
   def all_row_attributes(item, i)

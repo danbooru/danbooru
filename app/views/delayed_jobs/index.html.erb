@@ -2,7 +2,7 @@
   <div id="a-index">
     <h1>Delayed Jobs</h1>
 
-    <%= table_for @delayed_jobs, {class: "striped autofit"} do |t| %>
+    <%= table_for @delayed_jobs, class: "striped autofit" do |t| %>
       <% t.column :queue %>
       <% t.column "Name" do |job| %>
         <%= raw print_name(job) %>

@@ -4,7 +4,7 @@
   <div id="a-index">
     <h1>Notes</h1>
 
-    <%= table_for @notes, {class: "striped autofit"} do |t| %>
+    <%= table_for @notes, class: "striped autofit" do |t| %>
       <% t.column "Post" do |note| %>
         <%= link_to note.post_id, note.post %>
       <% end %>

@@ -1,6 +1,6 @@
 <div id="p-<%= listing_type(:artist_id) %>-listing">
 
-    <%= table_for @artist_versions, {class: "striped autofit", width: "100%"} do |t| %>
+    <%= table_for @artist_versions, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "Name", td: {class: "diff-body"} do |artist_version| %>
         <%= link_to artist_version.name, artist_path(artist_version.artist_id) %>
         <%= link_to "»", artist_versions_path(search: {artist_id: artist_version.artist_id}, anchor: "artist-version-#{artist_version.id}") %>

@@ -14,7 +14,7 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <%= table_for @saved_searches, {class: "striped autofit", width: "100%"} do |t| %>
+    <%= table_for @saved_searches, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "Query", th: {"data-sort": "string"}, td: {class: "col-expand"} do |ss| %>
         <%= link_to ss.query, posts_path(tags: ss.query) %>
       <% end %>

@@ -13,7 +13,7 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <%= table_for @user_feedbacks, {class: "striped autofit"} do |t| %>
+    <%= table_for @user_feedbacks, class: "striped autofit" do |t| %>
       <% t.column "User" do |feedback| %>
         <%= link_to_user feedback.user %>
         <%= link_to "»", user_feedbacks_path(search: { user_name: feedback.user.name }) %>

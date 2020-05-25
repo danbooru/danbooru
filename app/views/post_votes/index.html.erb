@@ -8,7 +8,7 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <%= table_for @post_votes, {class: "striped autofit"} do |t| %>
+    <%= table_for @post_votes, class: "striped autofit" do |t| %>
       <% t.column "Post" do |vote| %>
         <%= PostPresenter.preview(vote.post, show_deleted: true) %>
       <% end %>

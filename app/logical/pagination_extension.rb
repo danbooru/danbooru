@@ -13,10 +13,10 @@ module PaginationExtension
       @paginator_count = 1_000_000
     end
 
-    if page =~ /\Ab(\d+)\z/i
+    if page.to_s =~ /\Ab(\d+)\z/i
       @paginator_mode = :sequential_before
       paginate_sequential_before($1, records_per_page)
-    elsif page =~ /\Aa(\d+)\z/i
+    elsif page.to_s =~ /\Aa(\d+)\z/i
       @paginator_mode = :sequential_after
       paginate_sequential_after($1, records_per_page)
     else

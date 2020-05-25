@@ -4,7 +4,7 @@
 
     <%= render "search" %>
 
-    <%= table_for @bans, {class: "striped autofit"} do |t| %>
+    <%= table_for @bans, class: "striped autofit" do |t| %>
       <% t.column "Banned User" do |ban| %>
         <%= link_to_user(ban.user) %>
         <%= link_to "»", bans_path(search: search_params.merge(user_name: ban.user.name)) %>

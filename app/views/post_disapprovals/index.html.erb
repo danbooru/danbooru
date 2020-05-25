@@ -13,7 +13,7 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <%= table_for @post_disapprovals, {class: "striped autofit", width: "100%"} do |t| %>
+    <%= table_for @post_disapprovals, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "Post" do |post_disapproval| %>
         <%= link_to "post ##{post_disapproval.post_id}", post_path(post_disapproval.post_id) %>
         <%= link_to "»", post_disapprovals_path(search: params[:search].merge(post_id: post_disapproval.post_id)) %>

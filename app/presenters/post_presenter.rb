@@ -25,7 +25,7 @@ class PostPresenter
 
     locals[:article_attrs] = {
       "id" => "post_#{post.id}",
-      "class" => preview_class(post, options).join(" ")
+      "class" => preview_class(post, **options).join(" ")
     }.merge(data_attributes(post))
 
     locals[:link_target] = options[:link_target] || post

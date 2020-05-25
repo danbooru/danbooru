@@ -1,8 +1,8 @@
-<%= tag.table table.table_attributes do %>
+<%= tag.table **table.table_attributes do %>
   <thead>
     <tr>
       <% table.columns.each do |column| %>
-        <%= tag.th column.header_attributes do %>
+        <%= tag.th **column.header_attributes do %>
           <%= column.name %>
         <% end %>
       <% end %>
@@ -11,9 +11,9 @@
 
   <tbody>
     <% table.items.each_with_index do |item, i| %>
-      <%= tag.tr table.all_row_attributes(item, i) do %>
+      <%= tag.tr **table.all_row_attributes(item, i) do %>
         <% table.columns.each_with_index do |column, j| %>
-          <%= tag.td column.body_attributes do %>
+          <%= tag.td **column.body_attributes do %>
             <%= column.value(item, i, j) %>
           <% end %>
         <% end %>

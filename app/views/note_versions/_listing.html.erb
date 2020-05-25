@@ -1,6 +1,6 @@
 <div id="p-<%= listing_type(:post_id, :note_id) %>-listing">
 
-    <%= table_for @note_versions, {class: "striped autofit", width: "100%"} do |t| %>
+    <%= table_for @note_versions, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "Post", width: "5%" do |note_version| %>
         <%= link_to note_version.post_id, post_path(note_version.post_id) %>
         <% if !params.dig(:search, :post_id).present? %>

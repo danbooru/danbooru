@@ -1,6 +1,6 @@
 <div id="p-<%= listing_type(:pool_id) %>-listing">
 
-    <%= table_for @pool_versions, {class: "striped autofit", width: "100%"} do |t| %>
+    <%= table_for @pool_versions, class: "striped autofit", width: "100%" do |t| %>
       <% t.column column: "diff", width: "3%" do |pool_version| %>
         <%= link_to_if pool_version_show_diff(pool_version, params[:type]), "diff", diff_pool_version_path(pool_version.id) %>
       <% end %>

@@ -4,7 +4,7 @@
 
     <%= render "search" %>
 
-    <%= table_for @mod_actions, {class: "striped autofit"} do |t| %>
+    <%= table_for @mod_actions, class: "striped autofit" do |t| %>
       <% t.column "Category" do |mod_action| %>
         <%= link_to mod_action.category.humanize, mod_actions_path(search: { category: mod_action.category_id }) %>
       <% end %>
