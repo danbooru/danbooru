@@ -25,7 +25,10 @@ class IqdbProxy
       file = download(params[:url], :preview_url)
       results = query(file: file, limit: limit)
     elsif params[:image_url].present?
-      file = download(params[:image_url], :image_url)
+      file = download(params[:image_url], :url)
+      results = query(file: file, limit: limit)
+    elsif params[:file_url].present?
+      file = download(params[:file_url], :file_url)
       results = query(file: file, limit: limit)
     elsif params[:post_id].present?
       url = Post.find(params[:post_id]).preview_file_url
