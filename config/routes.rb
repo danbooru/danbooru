@@ -367,6 +367,7 @@ Rails.application.routes.draw do
 
   get "/sitemap" => "static#sitemap"
   get "/opensearch" => "static#opensearch", :as => "opensearch"
+  get "/privacy" => "static#privacy_policy", :as => "privacy_policy"
   get "/static/keyboard_shortcuts" => "static#keyboard_shortcuts", :as => "keyboard_shortcuts"
   get "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
   get "/static/site_map" => "static#site_map", :as => "site_map"

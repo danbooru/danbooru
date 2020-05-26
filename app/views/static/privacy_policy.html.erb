@@ -1,0 +1,479 @@
+<% page_title "Privacy Policy" %>
+
+<% @app_name = Danbooru.config.canonical_app_name %>
+<% @canonical_url = Danbooru.config.canonical_url %>
+<% @contact_email = Danbooru.config.contact_email %>
+
+<div id="c-static">
+  <div id="a-privacy-policy" class="prose fixed-width-container">
+    <h1>Privacy Policy</h1>
+
+    <p class="summary">Last updated: July 5, 2020</p>
+
+    <p>This privacy policy describes what information <%= @app_name %>
+    (collectively "we", "us", "our") collects about you when you use our website
+    or services (referred to as our "Site" or "Services"), how we use your
+    information, and what rights you have in relation to your information.</p>
+
+    <p>If there are any terms or conditions in this privacy policy that you do
+    not agree with, please discontinue your use of our Site and our Services.
+    If you have any questions or concerns about this policy, or our practices
+    in regards to your personal information, you may contact us at
+    <%= link_to @contact_email, "mailto:#{@contact_email}" %>.</p>
+
+    <h4>What We Collect</h4>
+
+    <h6>Information You Provide To Us</h6>
+
+    <p class="summary">Summary: We collect information you directly give us.</p>
+
+    <p>We collect information you directly provide to us when you use our
+    Services. What information we collect depends on how you use our Services.
+    The information we may collect includes:</p>
+
+    <ul class="list-bulleted">
+      <li><strong>Account information</strong>.
+        We collect your username, password, and optionally your email address
+        when you create an account with us. We also store your account
+        preferences and settings. You may update your account information at
+        any time, including to change your username or to deactivate your
+        account, as described below.
+      </li>
+
+      <li><strong>Content you submit</strong>.
+        We collect content you submit to the Site. This includes images,
+        videos, or written content you post or upload to the Site, including
+        posts, comments, forum posts, translation notes, wiki pages, pools,
+        artist commentaries, and any other contributions you make to the Site.
+      </li>
+
+      <li><strong>Actions you take</strong>.
+        We collect information about actions you take when using the Site. This
+        includes favoriting or voting on content, flagging or reporting
+        content, sending private messages, saving searches, sending private
+        messages, and viewing forum threads. This also includes any edits or
+        changes you make to any content on the Site.
+      </li>
+
+      <li><strong>Payment information</strong>.
+        We collect information necessary to process your payment if you make a
+        purchase with us. This information includes your credit card number,
+        security code, and expiration date, your email address, your location
+        (such as your country, your postal code, your billing address, and your
+        location at time of purchase), and your IP address. All payment
+        information is securely stored by Stripe. You may find their privacy
+        policy at <%= external_link_to "https://stripe.com/privacy" %>.
+      </li>
+
+      <li>
+        <strong>Other information</strong>.
+        You may choose to provide other information directly to us. For
+        example, we may collect information when you participate in surveys,
+        polls, promotions, giveaways, or other site-sponsored activities, or
+        you request support from us, or you contact us directly by email.
+      </li>
+    </ul>
+
+    <h6>Information We Collect Automatically</h6>
+
+    <p class="summary">Summary: We collect some information about you
+    automatically, including your IP address, information about your computer,
+    and information about your site usage.</p>
+
+    <ul class="list-bulleted">
+      <li><strong>Log and usage data</strong>. We may log information about you
+        when you visit or use our Services. This information may include your
+        IP address, browser type and version, computer or device type, device
+        characteristics such as screen resolution or operating system version,
+        language and timezone preferences, or your geolocation or country
+        information. This may also include information about your usage of the
+        Site, including posts you have viewed, pages you have visited, links
+        you have clicked, and searches you have performed.
+      </li>
+
+      <li><strong>Cookies</strong>. We may receive information from cookies,
+        which are pieces of data your browser stores and sends back to us when
+        making requests, and similar technologies. We use this information to
+        maintain login sessions and to store account settings and preferences.
+      </li>
+    </ul>
+
+    <h6>Information We Collect From Other Sources</h6>
+
+    <p class="summary">Summary: If you choose to link other sites to your
+    <%= @app_name %> account, we will receive profile information about you
+    from those sites.</p>
+
+    <p>We may receive information about you from other sources and combine that
+    information with other information we have about you. For example, we may
+    give you the option to link your <%= @app_name %> account to your accounts
+    on other sites, such as your Google, Twitter, or other accounts. If you
+    choose to link a third-party account to your <%= @app_name %> account, we
+    will collect information about you from that account as described in the
+    section titled <em>How We Handle Linked Accounts</em> below.</p>
+
+    <h4>How We Use Your Information</h4>
+
+    <p class="summary">Summary: We use your information to provide services to
+    you, to operate the Site, and to enforce our Terms of Service.</p>
+
+    <p>We use your information to:</p>
+
+    <ul class="list-bulleted">
+      <li>
+        <strong>Provide services to you</strong>.
+        We may use your information to provide you with our Services, and to
+        provide you with support or customer service.
+      </li>
+
+      <li>
+        <strong>Manage your account</strong>.
+        We may use your information to allow you to login and manage your
+        account, to store your account preferences, to help you recover access
+        to your account, and to send you administrative messages or notices
+        pertaining to you.
+      </li>
+
+      <li>
+        <strong>Protect our Services</strong>.
+        We may use your information to maintain the safe and secure operation
+        of our Services, including to enforce our Terms of Service, to detect
+        and prevent abuse of our Services, to moderate our Services, to block
+        spam, to prevent fraud, and to debug and troubleshoot problems with the
+        Site.
+      </li>
+
+      <li>
+        <strong>Monitor usage of our Services</strong>.
+        We may use your information to maintain and improve our Services,
+        to analyze trends, to monitor site usage and performance, to generate
+        internal reports and analytics, to research and develop new Services,
+        and to provide public reports about usage of the Site, including
+        information about popular searches, popular pages, and post view
+        counts.
+      </li>
+
+      <li>
+        <strong>Facilitate account creation and login</strong>.
+        If you choose to link a third-party account (such as your Google or
+        Twitter account) to your <%= @app_name %> account, we may use the
+        information you allowed us to collect from those third parties to
+        create a new <%= @app_name %> account for you, or to allow you to login
+        to <%= @app_name %> using your third-party account. See the section
+        below titled <em>How We Handle Linked Accounts</em> for
+        further information.
+      </li>
+
+      <li>
+        <strong>Respond to legal requests</strong>.
+        If we receive a subpoena or other legal request, we may need to inspect
+        the data we hold to determine how to respond.
+      </li>
+    </ul>
+
+    <h4>How Information About You Is Shared</h4>
+
+    <p class="summary">Summary: Most activity on <%= @app_name %> is public. We
+    won't share your information with advertisers without your consent. We
+    won't share information about you with third parties, except as required
+    under certain conditions.</p>
+
+    <p>When you use the Site, certain information about you may be shared with
+    other users, with Site moderators or other authorized users, or with the
+    general public. For example:</p>
+
+    <ul class="list-bulleted">
+      <li>
+        Any content you create or submit to the Site will be visible to other
+        users and to the general public, unless stated otherwise. This includes
+        your uploads, comments, forum posts, pools, wiki pages, translation
+        notes, and any other contributions you make to the Site.
+      </li>
+
+      <li>
+        Any edits you make to the Site will be visible to other users and to
+        the general public, unless stated otherwise. This includes your tag
+        edits, pool edits, wiki edits, translation note edits, artist edits,
+        commentary edits, and any other kind of edit, change, or modification
+        you make to any other content on the Site.
+      </li>
+
+      <li>
+        Your other personal activities on the Site, such as your favorites,
+        favorite groups, and saved searches, will normally be visible to other
+        users and to the general public, unless stated otherwise, or you choose
+        to make these things private.
+      </li>
+
+      <li>
+        Certain information, such as your favorites or favorite groups, you may
+        choose to make private. This information may still be visible to Site
+        moderators or to other authorized users in connection with legitimate
+        needs in operating the Site.
+      </li>
+
+      <li>
+        Your username will be publicly associated with any content you create
+        or edit on the Site. The date and time you created or edited the
+        content will also be publicly visible. Moderators may also be able to
+        see the IP address associated with any content you create or edit on
+        the Site.
+      </li>
+
+      <li>
+        When other users view your profile, they will be able to see
+        information about your activities on the Site, such as your username,
+        signup date, uploads, favorites, votes, post edit history, comments,
+        forum posts, Gold or Platinum status.
+      </li>
+
+      <li>
+        When you send another user a private message, the recipient of that
+        message will be able to see the content of your message, your username,
+        and the date and time the message was sent. Recipients may choose to
+        share your message publicly or with other users. Recipients may
+        choose to have private messages forwarded to their email accounts and,
+        as a result, any messages received by those users will be subject to
+        the terms and policies of the user’s email provider.
+      </li>
+
+      <li>
+        We may, at our sole discretion, allow Site moderators or other
+        authorized users to view private messages for legitimate needs in
+        connection with operating the Site, such as to prevent spam or to
+        enforce our Terms of Service.
+      </li>
+
+      <li>
+        We may allow third parties to access, collect, archive, or redistribute
+        information collected from our API or from public data dumps we may
+        provide. This information may be stored by third parties even after it
+        has been removed from <%= @app_name %>.
+      </li>
+    </ul>
+
+    <p>Otherwise, we do not share, sell, or give away your personal information
+    to third parties unless one of the following circumstances applies:</p>
+
+    <ul class="list-bulleted">
+      <li>
+        <strong>With your consent</strong>.
+        We may share your information with your consent or at your direction.
+      </li>
+
+      <li>
+        <strong>With our service providers</strong>.
+        We may share information with vendors, consultants, and other service
+        providers (but not with advertisers or ad partners) who need access to
+        such information to carry out work for us. The partner's use of
+        personal data will be subject to appropriate confidentiality and
+        security measures.
+      </li>
+
+      <li>
+        <strong>Aggregated or anonymized information</strong>.
+        We may share information about you that has been aggregated or anonymized
+        such that it cannot reasonably be used to identify you. For example, we
+        may show the total number of times a post has been visited without
+        identifying who the visitors were, or how many times a tag has been
+        searched without identifying who the searchers were.
+      </li>
+
+      <li>
+        <strong>To enforce our policies and rights</strong>.
+        We may share information if we believe your actions are in violation of
+        our user agreements, rules, or other policies, or to protect the
+        rights, property, and safety of ourselves and others.
+      </li>
+
+      <li>
+        <strong>To comply with the law</strong>.
+        We may share information in response to a request for information if we
+        believe disclosure is in accordance with, or required by, any applicable
+        law, regulation, legal process or governmental request, including, but not
+        limited to, meeting national security or law enforcement requirements. To
+        the extent the law allows it, we will attempt to provide you with prior
+        notice before disclosing your information in response to such a request.
+      </li>
+
+      <li>
+        <strong>In an emergency</strong>.
+        We may share information if we believe it's necessary to prevent imminent
+        and serious bodily harm to a person.
+      </li>
+
+      <li>
+        <strong>Business transfers</strong>. We may share or transfer your
+        information in connection with, or during negotiations of, any merger,
+        sale of company assets, financing, or acquisition of all or a portion
+        of our business to another company.
+      </li>
+    </ul>
+
+    <h6>How We Handle Linked Accounts</h6>
+
+    <p class="summary">Summary: If you link other sites to your <%= @app_name %>
+    account, we will receive profile information about you from those sites. We
+    won't disclose any information about you to those sites.</p>
+
+    <p>We may offer you the ability to sign up or login using third-party
+    social media accounts (such as your Google or Twitter accounts), or to link
+    other third-party accounts to your <%= @app_name %> account. If you choose
+    to do this, we will receive certain profile information about you from the
+    third-party service. The profile information we receive may vary depending
+    on the service concerned, but will often include your username, email
+    address, profile picture, as well as other information included in your
+    public profile.
+
+    <p>We will use the information we receive only for the purposes that are
+    described in this Privacy Policy, or to provide features that are described
+    to you when you link your account. You may unlink third-party accounts
+    from your account at any time, at which point we will delete any
+    information about you we have collected from these services.</p>
+
+    <p>We will not use any information collected about you from third-party
+    services for marketing purposes without your consent. We will not disclose
+    any information about you or your usage of our Site to any third-party
+    websites you have linked your <%= @app_name %> account with. Please note,
+    however, that we do not control, and are not responsible for, the behavior
+    of third-party websites. We recommend that you review their privacy
+    policies to understand how they collect, use and share your personal
+    information, and how you can set your privacy preferences on their sites
+    and apps.</p>
+
+    <h4>Controlling Your Information</h4>
+
+    <h6>Accessing and Changing Your Information</h6>
+
+    <p>If you would like to review or change the information in your account,
+    such as your user name, password, email address, or other settings, you
+    can visit your <%= link_to "account settings", settings_path %> and update
+    your settings.</p>
+
+    <h6>Deleting Your Account</h6>
+
+    <p class="summary">Summary: You may deactivate your account, but we may
+    retain your IP address and your public contributions to the Site.</p>
+
+    <p>If you would like to delete your account, you may request your
+    account to be deactivated <%= link_to "here", maintenance_user_deletion_path %>.</p>
+
+    <p>When your account is deactivated, we will delete your non-public personal
+    information from our active systems, including your email address,
+    password, account preferences, saved searches, and private favorites, and
+    we will disassociate your username from content you have submitted to
+    the Site, including your uploads, votes, comments, forum posts, private
+    messages, translation notes, wiki pages, tag edits, and other public
+    contributions you have made to the Site.</p>
+
+    <p>Please note that content that you have submitted to the Site will not
+    be removed from the Site after deactivating your account. In particular,
+    your uploads will not be removed from the Site, private messages you have
+    sent to other users will not be deleted, your comments and forum posts will
+    still be visible to others unless you delete them before deleting your
+    account. Comments, forum posts, or messages posted by other users
+    mentioning you by name or quoting you will still be visible to others.</p>
+
+    <p>We may retain certain other information about you even after you
+    deactivate your account, including your IP address, your user ID, your past
+    usernames, and other identifiers associated with your account. We may
+    retain this information as required by law or as necessary for legitimate
+    business needs, such as for preventing spam, abuse, or violations of our
+    Terms of Service.</p>
+
+    <h6>Controlling Email Communications</h6>
+
+    <p>If you would like to opt out of receiving emails from the Service, you
+    may unsubscribe by clicking on the unsubscribe link in the emails that we
+    send or by disabling email notifications in your
+    <%= link_to "account settings", settings_path %>. We may still send you
+    emails relating to the use or security of your account, such as when
+    resetting your password.</p>
+
+    <h6>Controlling Cookies</h6>
+
+    <p>Most web browsers are set to accept cookies by default. If you prefer,
+    you can usually choose to set your browser to remove or reject first- and
+    third-party cookies. Please note that if you choose to remove or reject
+    cookies, this could affect the availability and functionality of our
+    Site.</p>
+
+    <h4>Other Information</h4>
+
+    <h6>Minors</h6>
+
+    <p>Persons under the age of 18 are not allowed to create an account or
+    otherwise use our Services. By using our Services, you represent that you
+    are over the age required by the laws of your country to create an account
+    or otherwise use our Services.</p>
+
+    <h6>Data Retention</h6>
+
+    <p class="summary">Summary: We keep your information for as long as
+    necessary to fulfill the purposes outlined in this privacy policy, unless
+    otherwise required by law.</p>
+
+    <p>We store the information we collect for as long as it is necessary for
+    the purpose(s) for which we originally collected it. We may retain certain
+    information for legitimate business purposes or as required by law.</p>
+
+    <p>When we have no ongoing legitimate business need to process your
+    personal information, we will either delete or anonymize it, or, if this is
+    not possible (for example, because your personal information has been
+    stored in backup archives), then we will securely store your personal
+    information and isolate it from any further processing until deletion is
+    possible.</p>
+
+    <h6>International Data Transfers</h6>
+
+    <p class="summary">Summary: We store data in the United States and operate under US law.</p>
+
+    <p>We are based in the United States and we process and store information
+    on servers located in the United States. We may store information on
+    servers and equipment in other countries depending on a variety of factors,
+    including the locations of our users and service providers. By accessing or
+    using the Site or otherwise providing information to us, you consent to
+    the processing, transfer and storage of information in and to the U.S. and
+    other countries, where you may not have the same rights as you do under
+    local law.</p>
+
+    <h6>Information Security</h6>
+
+    <p class="summary">Summary: We take reasonable measures to secure your
+    data. We will promptly notify you of breaches of your personal
+    information.</p>
+
+    <p>We take reasonable measures to protect your personal information from
+    loss, theft, misuse, unauthorized access, disclosure, alteration, or
+    destruction. We also enforce technical and administrative access controls
+    to limit access to non-public personal information by staff members or
+    designated representatives of <%= @app_name %>. However, although we will
+    do our best to protect your personal information, transmission of personal
+    information to and from our Services is at your own risk. You should only
+    access our Services within a secure environment.</p>
+
+    <p>In the event that we become aware of a privacy breach which has resulted
+    or may result in unauthorized access, use or disclosure of your personal
+    information, we will investigate the matter and promptly notify you and the
+    applicable Supervisory Authority of the breach, unless the breach is
+    unlikely to result in a risk to the rights and freedoms of natural
+    persons.</p>
+
+    <h6>Changes to this Policy</h6>
+
+    <p class="summary">Summary: We may update this policy from time to time.</p>
+
+    <p>We may update this Privacy Policy from time to time. The updated policy
+    will be indicated by a new "Last updated" date at the top of this page. If
+    we make material changes to this Privacy Policy, we may, at our discretion,
+    notify you either by prominently posting a notice of such changes or by
+    directly sending you a notification. We encourage you to review this
+    Privacy Policy frequently to stay informed of how we handle your personal
+    information.</p>
+
+    <p>Changes to this Privacy Policy will go into effect as soon as the
+    updated Privacy Policy is accessible. By continuing to use our Services
+    after changes to our Privacy Policy go into effect, you agree to be bound
+    by the revised policy.</p>
+  </div>
+</div>
