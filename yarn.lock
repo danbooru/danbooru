@@ -8804,6 +8804,11 @@ typeface-archivo-narrow@^1.0.0:
   resolved "https://registry.yarnpkg.com/typeface-archivo-narrow/-/typeface-archivo-narrow-1.1.3.tgz#c0855305f14ead3b27f20c541c50a8823d839357"
   integrity sha512-Nqer5J9i1QRtoL9m+g5qW+qxkkWjE4vGvjlnyE1TSJY6f6WuNGxrx4GEtShkiXJ78NdMGYIre+M5+3MnmezjZw==
 
+typeface-ibm-plex-mono@^0.0.61:
+  version "0.0.61"
+  resolved "https://registry.yarnpkg.com/typeface-ibm-plex-mono/-/typeface-ibm-plex-mono-0.0.61.tgz#ee7f12643e2bfee5c5c6915350005d6dfdaa66fd"
+  integrity sha512-4Pzza33ihcW1l9qSs6WmRRb6FxVoDvpoTws55V9rwN7zVqURFh1c/i4qWCmHJ0Dyr0c+pYgQVyb/aAwsRjv2Lg==
+
 typeface-indie-flower@^0.0.72:
   version "0.0.72"
   resolved "https://registry.yarnpkg.com/typeface-indie-flower/-/typeface-indie-flower-0.0.72.tgz#80b18841d9c789b262e6f7ff6950a4472e565f60"
