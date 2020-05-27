@@ -1,6 +1,17 @@
 require 'test_helper'
 
 class UploadsControllerTest < ActionDispatch::IntegrationTest
+  def test_file_upload(file_path, user, **upload_params)
+    file = Rack::Test::UploadedFile.new("#{Rails.root}/#{file_path}")
+
+    assert_difference(["Upload.count", "Post.count"]) do
+      post_auth uploads_path, user, params: { upload: { file: file, **upload_params }}
+      assert_redirected_to Upload.last
+    end
+
+    Upload.last
+  end
+
   context "The uploads controller" do
     setup do
       @user = create(:contributor_user)
@@ -239,11 +250,32 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      should "create a new upload" do
-        assert_difference("Upload.count", 1) do
-          file = Rack::Test::UploadedFile.new("#{Rails.root}/test/files/test.jpg", "image/jpeg")
-          post_auth uploads_path, @user, params: {:upload => {:file => file, :tag_string => "aaa", :rating => "q", :source => "aaa"}}
-          assert_redirected_to Upload.last
+      context "uploading a file from your computer" do
+        should "work for a jpeg file" do
+          upload = test_file_upload("test/files/test.jpg", @user, tag_string: "aaa", rating: "e", source: "aaa")
+
+          assert_equal("jpg", upload.post.file_ext)
+          assert_equal("aaa", upload.post.source)
+          assert_equal(500, upload.post.image_width)
+          assert_equal(335, upload.post.image_height)
+        end
+
+        should "work for a webm file" do
+          upload = test_file_upload("test/files/test-512x512.webm", @user, tag_string: "aaa", rating: "e", source: "aaa")
+
+          assert_equal("webm", upload.post.file_ext)
+          assert_equal("aaa", upload.post.source)
+          assert_equal(512, upload.post.image_width)
+          assert_equal(512, upload.post.image_height)
+        end
+
+        should "work for a flash file" do
+          upload = test_file_upload("test/files/compressed.swf", @user, tag_string: "aaa", rating: "e", source: "aaa")
+
+          assert_equal("swf", upload.post.file_ext)
+          assert_equal("aaa", upload.post.source)
+          assert_equal(607, upload.post.image_width)
+          assert_equal(756, upload.post.image_height)
         end
       end
     end

@@ -36,6 +36,24 @@ class MediaFileTest < ActiveSupport::TestCase
     should "determine the correct dimensions for a flash file" do
       assert_equal([607, 756], MediaFile.open("test/files/compressed.swf").dimensions)
     end
+
+    should "work if called twice" do
+      mf = MediaFile.open("test/files/test.jpg")
+      assert_equal([500, 335], mf.dimensions)
+      assert_equal([500, 335], mf.dimensions)
+
+      mf = MediaFile.open("test/files/test-512x512.webm")
+      assert_equal([512, 512], mf.dimensions)
+      assert_equal([512, 512], mf.dimensions)
+
+      mf = MediaFile.open("test/files/valid_ugoira.zip")
+      assert_equal([60, 60], mf.dimensions)
+      assert_equal([60, 60], mf.dimensions)
+
+      mf = MediaFile.open("test/files/compressed.swf")
+      assert_equal([607, 756], mf.dimensions)
+      assert_equal([607, 756], mf.dimensions)
+    end
   end
 
   context "#file_ext" do
