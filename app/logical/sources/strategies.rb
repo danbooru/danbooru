@@ -12,7 +12,8 @@ module Sources
         Strategies::Nijie,
         Strategies::Pawoo,
         Strategies::Moebooru,
-        Strategies::HentaiFoundry
+        Strategies::HentaiFoundry,
+        Strategies::Weibo
       ]
     end
 

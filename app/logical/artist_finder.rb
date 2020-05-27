@@ -107,6 +107,8 @@ module ArtistFinder
     "ustream.tv/user", # http://www.ustream.tv/user/kazaputi
     "vk.com", # https://vk.com/id425850679
     "weibo.com", # http://www.weibo.com/5536681649
+    "weibo.com/u",
+    "weibo.com/p",
     "wp.com",
     "yande.re",
     "youtube.com",
