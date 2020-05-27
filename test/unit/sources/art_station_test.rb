@@ -11,6 +11,10 @@ module Sources
         assert_equal("https://cdn.artstation.com/p/assets/images/images/000/705/368/4k/jey-rain-one1.jpg", @site.image_url.sub(/\?\d+/, ""))
       end
 
+      should "get the preview url" do
+        assert_equal("https://cdn.artstation.com/p/assets/images/images/000/705/368/small/jey-rain-one1.jpg", @site.preview_url.sub(/\?\d+/, ""))
+      end
+
       should "get the canonical url" do
         assert_equal("https://jeyrain.artstation.com/projects/04XA4", @site.canonical_url)
       end
@@ -41,6 +45,11 @@ module Sources
       should "get the image url" do
         url = "https://cdn.artstation.com/p/assets/images/images/006/066/534/4k/yinan-cui-reika.jpg?1495781565"
         assert_equal(url, @site.image_url)
+      end
+
+      should "get the preview url" do
+        url = "https://cdn.artstation.com/p/assets/images/images/006/066/534/small/yinan-cui-reika.jpg?1495781565"
+        assert_equal(url, @site.preview_url)
       end
 
       should "get the canonical url" do
@@ -74,6 +83,11 @@ module Sources
       should "get the image url" do
         url = "https://cdn.artstation.com/p/assets/images/images/000/144/922/4k/cassio-yoshiyaki-cody2backup2-yoshiyaki.jpg?1406314198"
         assert_equal(url, @site.image_url)
+      end
+
+      should "get the preview url" do
+        url = "https://cdn.artstation.com/p/assets/images/images/000/144/922/small/cassio-yoshiyaki-cody2backup2-yoshiyaki.jpg?1406314198"
+        assert_equal(url, @site.preview_url)
       end
 
       should "get the tags" do
@@ -123,6 +137,16 @@ module Sources
           assert_equal("https://cdn.artstation.com/p/assets/images/images/007/253/680/4k/ina-wong-demon-girl-done-ttd-comp.jpg?1504793833", site.image_url)
           assert_nothing_raised { site.to_h }
         end
+      end
+    end
+
+    context "A cover url" do
+      should "work" do
+        url = "https://cdna.artstation.com/p/assets/covers/images/007/262/828/large/monica-kyrie-1.jpg?1504865060"
+        site = Sources::Strategies.find(url)
+
+        assert_equal("https://cdn.artstation.com/p/assets/covers/images/007/262/828/original/monica-kyrie-1.jpg?1504865060", site.image_url)
+        assert_equal("https://cdn.artstation.com/p/assets/covers/images/007/262/828/small/monica-kyrie-1.jpg?1504865060", site.preview_url)
       end
     end
 
