@@ -85,5 +85,22 @@ module Sources
         assert_equal([@artist], @image.artists)
       end
     end
+
+    context "normalizing for source" do
+      should "normalize correctly" do
+        source1 = "http://pictures.hentai-foundry.com//a/AnimeFlux/219123.jpg"
+        source2 = "http://pictures.hentai-foundry.com/a/AnimeFlux/219123/Mobile-Suit-Equestria-rainbow-run.jpg"
+        source3 = "http://www.hentai-foundry.com/pictures/user/Ganassa/457176/LOL-Swimsuit---Caitlyn-reworked-nude-ver."
+
+        assert_equal("https://www.hentai-foundry.com/pictures/user/AnimeFlux/219123", Sources::Strategies.normalize_source(source1))
+        assert_equal("https://www.hentai-foundry.com/pictures/user/AnimeFlux/219123", Sources::Strategies.normalize_source(source2))
+        assert_equal("https://www.hentai-foundry.com/pictures/user/Ganassa/457176", Sources::Strategies.normalize_source(source3))
+      end
+
+      should "avoid normalizing unnormalizable urls" do
+        bad_source = "https://pictures.hentai-foundry.com/a/AnimeFlux"
+        assert_equal(bad_source, Sources::Strategies.normalize_source(bad_source))
+      end
+    end
   end
 end

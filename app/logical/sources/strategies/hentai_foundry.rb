@@ -5,7 +5,9 @@
 # Page URLs
 #
 # * https://www.hentai-foundry.com/pictures/user/Afrobull/795025/kuroeda
-# * https://www.hentai-foundry.com/pictures/user/Afrobull/795025o
+# * https://www.hentai-foundry.com/pictures/user/Afrobull/795025
+# * http://www.hentai-foundry.com/pic-795025
+# * http://www.hentai-foundry.com/pictures/user/Ganassa/457176/LOL-Swimsuit---Caitlyn-reworked-nude-ver.
 #
 # Preview URLs
 #
@@ -22,9 +24,10 @@ module Sources
   module Strategies
     class HentaiFoundry < Base
       BASE_URL =    %r!\Ahttps?://(?:www\.)?hentai-foundry\.com!i
-      PAGE_URL =    %r!#{BASE_URL}/pictures/user/(?<artist_name>[\w-]+)/(?<illust_id>\d+)(?:/[\w-]*)?(\?[\w=]*)?\z!i
+      PAGE_URL =    %r!#{BASE_URL}/pictures/user/(?<artist_name>[\w-]+)/(?<illust_id>\d+)(?:/[\w.-]*)?(\?[\w=]*)?\z!i
+      OLD_PAGE =    %r!#{BASE_URL}/pic-(?<illust_id>\d+)(?:\.html)?\z!i
       PROFILE_URL = %r!#{BASE_URL}/(?:pictures/)?user/(?<artist_name>[\w-]+)(?:/[a-z]*)?\z!i
-      IMAGE_URL =   %r!\Ahttps?://pictures\.hentai-foundry\.com/\w/(?<artist_name>[\w-]+)/(?<illust_id>\d+)/[\w-]+\.\w+\z!i
+      IMAGE_URL =   %r!\Ahttps?://pictures\.hentai-foundry\.com/+\w/(?<artist_name>[\w-]+)/(?<illust_id>\d+)(?:(?:/[\w.-]+)?\.\w+)?\z!i
 
       def domains
         ["hentai-foundry.com"]
@@ -49,8 +52,13 @@ module Sources
       end
 
       def page_url
-        return nil if illust_id.blank? || artist_name.blank?
-        "https://www.hentai-foundry.com/pictures/user/#{artist_name}/#{illust_id}"
+        return nil if illust_id.blank?
+
+        if artist_name.blank?
+          "https://www.hentai-foundry.com/pic-#{illust_id}"
+        else
+          "https://www.hentai-foundry.com/pictures/user/#{artist_name}/#{illust_id}"
+        end
       end
 
       def page
@@ -104,8 +112,12 @@ module Sources
         url =~ PROFILE_URL
       end
 
+      def normalize_for_source
+        page_url
+      end
+
       def illust_id
-        url[PAGE_URL, :illust_id] || url[IMAGE_URL, :illust_id]
+        url[PAGE_URL, :illust_id] || url[IMAGE_URL, :illust_id] || url[OLD_PAGE, :illust_id]
       end
     end
   end

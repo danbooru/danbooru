@@ -177,6 +177,12 @@ module Sources
         profile_url.presence || url
       end
 
+      # Given a post/image url, this is the normalized url that will be displayed in a post's page in its stead.
+      # This function should never make any network call, even indirectly. Return nil to never normalize.
+      def normalize_for_source
+        nil
+      end
+
       def artists
         ArtistFinder.find_artists(normalize_for_artist_finder.to_s)
       end

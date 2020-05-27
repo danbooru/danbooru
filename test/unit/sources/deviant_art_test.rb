@@ -32,7 +32,7 @@ module Sources
         @artist = create(:artist, name: "nickbeja", url_string: "https://nickbeja.deviantart.com")
 
         assert_equal("https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png", @site.image_url)
-        assert_equal(@site.image_url, @site.canonical_url)
+        assert_equal(@site.page_url, @site.canonical_url)
         assert_equal("nickbeja", @site.artist_name)
         assert_equal("https://www.deviantart.com/nickbeja", @site.profile_url)
         assert_equal("https://www.deviantart.com/nickbeja/art/Mindflayer-Girl01-708675884", @site.page_url_from_image_url)
@@ -360,6 +360,33 @@ module Sources
         @artist = create(:artist, name: "noizave", url_string: "https://deviantart.com/noizave")
 
         assert_equal([@artist], @site.artists)
+      end
+    end
+
+    context "normalizing for source" do
+      should "normalize correctly" do
+        source1 = "http://fc06.deviantart.net/fs71/f/2013/295/d/7/you_are_already_dead__by_mar11co-d6rgm0e.jpg"
+        source2 = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg"
+        source3 = "http://orig12.deviantart.net/9b69/f/2017/023/7/c/illustration___tokyo_encount_oei__by_melisaongmiqin-dawi58s.png"
+        source4 = "http://fc00.deviantart.net/fs71/f/2013/337/3/5/35081351f62b432f84eaeddeb4693caf-d6wlrqs.jpg"
+        source5 = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/76098ac8-04ab-4784-b382-88ca082ba9b1/d9x7lmk-595099de-fe8f-48e5-9841-7254f9b2ab8d.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvNzYwOThhYzgtMDRhYi00Nzg0LWIzODItODhjYTA4MmJhOWIxXC9kOXg3bG1rLTU5NTA5OWRlLWZlOGYtNDhlNS05ODQxLTcyNTRmOWIyYWI4ZC5wbmcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.KFOVXAiF8MTlLb3oM-FlD0nnDvODmjqEhFYN5I2X5Bc"
+        source6 = "https://fav.me/dbc3a48"
+
+        assert_equal("https://www.deviantart.com/mar11co/art/You-Are-Already-Dead-408921710", Sources::Strategies.normalize_source(source1))
+        assert_equal("https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896", Sources::Strategies.normalize_source(source2))
+        assert_equal("https://www.deviantart.com/melisaongmiqin/art/Illustration-Tokyo-Encount-Oei-659256076", Sources::Strategies.normalize_source(source3))
+        assert_equal("https://www.deviantart.com/deviation/417560500", Sources::Strategies.normalize_source(source4))
+        assert_equal("https://www.deviantart.com/deviation/599977532", Sources::Strategies.normalize_source(source5))
+        assert_equal("https://www.deviantart.com/deviation/685436408", Sources::Strategies.normalize_source(source6))
+      end
+
+      should "avoid normalizing unnormalizable urls" do
+        bad_source1 = "http://fc08.deviantart.net/images3/i/2004/088/8/f/Blackrose_for_MuzicFreq.jpg"
+        bad_source2 = "http://prnt00.deviantart.net/9b74/b/2016/101/4/468a9d89f52a835d4f6f1c8caca0dfb2-pnjfbh.jpg"
+        bad_source3 = "https://deviantart.net"
+        assert_equal(bad_source1, Sources::Strategies.normalize_source(bad_source1))
+        assert_equal(bad_source2, Sources::Strategies.normalize_source(bad_source2))
+        assert_equal(bad_source3, Sources::Strategies.normalize_source(bad_source3))
       end
     end
   end

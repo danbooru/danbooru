@@ -5,6 +5,8 @@
 # https://emlan.tumblr.com/post/189469423572/kuro-attempts-to-buy-a-racy-book-at-comiket-but
 # https://66.media.tumblr.com/168dabd09d5ad69eb5fedcf94c45c31a/3dbfaec9b9e0c2e3-72/s640x960/bf33a1324f3f36d2dc64f011bfeab4867da62bc8.png
 # https://66.media.tumblr.com/5a2c3fe25c977e2281392752ab971c90/3dbfaec9b9e0c2e3-92/s500x750/4f92bbaaf95c0b4e7970e62b1d2e1415859dd659.png
+#
+# https://superboin.tumblr.com/post/141169066579/photoset_iframe/superboin/tumblr_o45miiAOts1u6rxu8/500/false
 
 module Sources::Strategies
   class Tumblr < Base
@@ -129,6 +131,12 @@ module Sources::Strategies
     def normalize_tag(tag)
       tag = tag.tr("-", "_")
       super(tag)
+    end
+
+    def normalize_for_source
+      return unless blog_name.present? && post_id.present?
+
+      "https://#{blog_name}.tumblr.com/post/#{post_id}"
     end
 
     def dtext_artist_commentary_desc
