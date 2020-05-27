@@ -32,16 +32,16 @@
 module Sources
   module Strategies
     class Weibo < Base
-      PROFILE_URL_1 = %r{https?://(?:(?:www|m)\.)?weibo\.c(?:om|n)/(?:(?:u|profile)/)?(?<artist_short_id>\d+)\z}i
-      PROFILE_URL_2 = %r{https?://photo\.weibo\.com/(?<artist_short_id>\d+)}i
-      PROFILE_URL_3 = %r{https?://(?:www\.)?weibo\.com/p/(?<artist_long_id>\d+)}i
+      PROFILE_URL_1 = %r{\Ahttps?://(?:(?:www|m)\.)?weibo\.c(?:om|n)/(?:(?:u|profile)/)?(?<artist_short_id>\d+)\z}i
+      PROFILE_URL_2 = %r{\Ahttps?://photo\.weibo\.com/(?<artist_short_id>\d+)}i
+      PROFILE_URL_3 = %r{\Ahttps?://(?:www\.)?weibo\.com/p/(?<artist_long_id>\d+)}i
 
-      PAGE_URL_1    = %r{https?://(?:www\.)?weibo\.com/(?<artist_short_id>\d+)/(?<illust_base62_id>\w+)(?:\?.*)?\z}i
+      PAGE_URL_1    = %r{\Ahttps?://(?:www\.)?weibo\.com/(?<artist_short_id>\d+)/(?<illust_base62_id>\w+)(?:\?.*)?\z}i
       PAGE_URL_2    = %r{#{PROFILE_URL_2}/(?:wbphotos/large/mid|talbum/detail/photo_id)/(?<illust_long_id>\d+)(?:/pid/(?<image_id>\w{32}))?}i
-      PAGE_URL_3    = %r{https?://m\.weibo\.cn/(detail/(?<illust_long_id>\d+)|status/(?<illust_base62_id>\w+))}i
-      PAGE_URL_4    = %r{https?://tw\.weibo\.com/(?:(?<artist_short_id>\d+)|\w+)/(?<illust_long_id>\d+)}i
+      PAGE_URL_3    = %r{\Ahttps?://m\.weibo\.cn/(detail/(?<illust_long_id>\d+)|status/(?<illust_base62_id>\w+))}i
+      PAGE_URL_4    = %r{\Ahttps?://tw\.weibo\.com/(?:(?<artist_short_id>\d+)|\w+)/(?<illust_long_id>\d+)}i
 
-      IMAGE_URL     = %r{https?://\w{3}\.sinaimg\.cn/\w+/(?<image_id>\w{32})\.}i
+      IMAGE_URL     = %r{\Ahttps?://\w{3}\.sinaimg\.cn/\w+/(?<image_id>\w{32})\.}i
 
       def domains
         ["weibo.com", "weibo.cn", "weibocdn.com", "sinaimg.cn"]
@@ -168,6 +168,21 @@ module Sources
         profile_url || url
       end
 
+      def normalize_for_source
+        return url if url =~ PAGE_URL_2
+        artist_id = artist_short_id_from_url
+
+        if artist_id.present?
+          if illust_base62_id.present?
+            "https://www.weibo.com/#{artist_id}/#{illust_base62_id}"
+          elsif illust_long_id.present?
+            "https://photo.weibo.com/#{artist_id}/talbum/detail/photo_id/#{illust_long_id}"
+          end
+        elsif mobile_url.present?
+          mobile_url
+        end
+      end
+
       def self.convert_image_to_large(url)
         url.gsub(%r{.cn/\w+/(\w+)}, '.cn/large/\1')
       end
@@ -181,7 +196,7 @@ module Sources
       end
 
       def artist_short_id_from_url
-        [url, referer_url].compact.map { |x| x[PROFILE_URL_1, :artist_short_id] || x[PROFILE_URL_2, :artist_short_id] || x[PAGE_URL_4, :artist_short_id] }.compact.first
+        [url, referer_url].compact.map { |x| x[PROFILE_URL_1, :artist_short_id] || x[PROFILE_URL_2, :artist_short_id] || x[PAGE_URL_1, :artist_short_id] || x[PAGE_URL_4, :artist_short_id] }.compact.first
       end
 
       def artist_short_id
