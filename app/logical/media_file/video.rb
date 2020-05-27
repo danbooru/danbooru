@@ -31,5 +31,5 @@ class MediaFile::Video < MediaFile
     MediaFile.open(vp.path)
   end
 
-  memoize :video, :preview_frame
+  memoize :video, :preview_frame, :dimensions, :duration, :has_audio?
 end

@@ -63,6 +63,8 @@ class MediaFile::Image < MediaFile
   end
 
   def image
-    @image ||= Vips::Image.new_from_file(file.path, fail: true)
+    Vips::Image.new_from_file(file.path, fail: true)
   end
+
+  memoize :image, :dimensions, :is_corrupt?, :is_animated_gif?, :is_animated_png?
 end

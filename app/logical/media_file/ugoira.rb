@@ -88,5 +88,5 @@ class MediaFile::Ugoira < MediaFile
     MediaFile.open(tempfile)
   end
 
-  memoize :zipfile, :preview_frame
+  memoize :zipfile, :preview_frame, :dimensions
 end

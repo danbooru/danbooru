@@ -113,5 +113,5 @@ class MediaFile
     nil
   end
 
-  memoize :dimensions, :file_ext, :file_size, :md5, :is_corrupt?, :is_animated?
+  memoize :file_ext, :file_size, :md5
 end
