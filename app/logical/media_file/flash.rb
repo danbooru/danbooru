@@ -5,7 +5,7 @@ class MediaFile::Flash < MediaFile
   def dimensions
     # Read the entire stream into memory because the
     # dimensions aren't stored in a standard location
-    contents = file.read.force_encoding("ASCII-8BIT")
+    contents = File.read(file.path, binmode: true).force_encoding("ASCII-8BIT")
 
     # Our 'signature' is the first 3 bytes
     # Either FWS or CWS.  CWS indicates compression
@@ -54,4 +54,5 @@ class MediaFile::Flash < MediaFile
 
     [width, height]
   end
+  memoize :dimensions
 end
