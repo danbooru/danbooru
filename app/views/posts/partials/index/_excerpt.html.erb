@@ -1,7 +1,9 @@
 <%# post_set %>
 
 <div id="excerpt" style="display: none;">
-  <% if post_set.artist.present? %>
+  <% if post_set.artist.present? && post_set.artist.is_banned? && !policy(post_set.artist).can_view_banned? %>
+    <p>The artist requested removal of this page.</p>
+  <% elsif post_set.artist.present? %>
     <% post_set.artist.tap do |artist| %>
       <% unless artist.wiki_page.blank? %>
         <div class="prose">

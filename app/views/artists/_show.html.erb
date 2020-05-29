@@ -5,26 +5,30 @@
   <div id="a-show">
     <h1>Artist: <%= link_to @artist.pretty_name, posts_path(tags: @artist.name), class: tag_class(@artist.tag) %></h1>
 
-    <% if @artist.wiki_page.present? %>
-      <div class="prose">
-        <%= format_text(@artist.wiki_page.body, :disable_mentions => true) %>
-      </div>
-
-      <p><%= link_to "View wiki page", @artist.wiki_page %></p>
-    <% end %>
-
-    <%= yield %>
-
-    <% if @artist.tag.present? && @artist.tag.post_count > 0 %>
-      <div class="recent-posts">
-        <h2>Recent Posts <%= link_to "»", posts_path(tags: @artist.name) %></h2>
-
-        <%= render "posts/partials/common/inline_blacklist" %>
-
-        <div>
-          <%= post_previews_html(@artist.tag.posts.limit(8), tags: @artist.name) %>
+    <% if @artist.is_banned? && !policy(@artist).can_view_banned? %>
+      <p>The artist requested removal of this page.</p>
+    <% else %>
+      <% if @artist.wiki_page.present? %>
+        <div class="prose">
+          <%= format_text(@artist.wiki_page.body, :disable_mentions => true) %>
         </div>
-      </div>
-    <% end %>
+
+        <p><%= link_to "View wiki page", @artist.wiki_page %></p>
+      <% end %>
+
+      <%= yield %>
+
+      <% if @artist.tag.present? && @artist.tag.post_count > 0 %>
+        <div class="recent-posts">
+          <h2>Recent Posts <%= link_to "»", posts_path(tags: @artist.name) %></h2>
+
+          <%= render "posts/partials/common/inline_blacklist" %>
+
+          <div>
+            <%= post_previews_html(@artist.tag.posts.limit(8), tags: @artist.name) %>
+          </div>
+        </div>
+      <% end %>
+    <% end%>
   </div>
 </div>

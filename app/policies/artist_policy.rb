@@ -11,6 +11,10 @@ class ArtistPolicy < ApplicationPolicy
     unbanned?
   end
 
+  def can_view_banned?
+    user.is_member?
+  end
+
   def permitted_attributes
     [:name, :other_names, :other_names_string, :group_name, :url_string, :is_deleted]
   end
