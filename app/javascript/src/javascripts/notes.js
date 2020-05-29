@@ -602,7 +602,7 @@ let Note = {
         resize: "none",
       });
 
-      if ($note_body.html() !== "<em>Click to edit</em>") {
+      if (!$note_body.hasClass("new-note")) {
         $textarea.val($note_body.data("original-body"));
       }
 
@@ -680,6 +680,7 @@ let Note = {
         $note_box = Note.Box.find(data.html_id);
         $note_body.data("id", String(data.id)).attr("data-id", data.id);
         $note_box.data("id", String(data.id)).attr("data-id", data.id);
+        $note_box.removeClass("new-note");
         $note_box.removeClass("unsaved");
         $note_box.removeClass("movable");
       } else {
@@ -955,7 +956,7 @@ let Note = {
     Note.Box.scale($note_box);
     if (Note.embed) {
       Note.Body.display_text($note_box.children("div.note-box-inner-border"), sanitized_body);
-      Note.Body.display_text($note_body, "Click to edit.");
+      Note.Body.display_text($note_body, "<em>Click to edit</em>");
     } else {
       Note.Body.display_text($note_body, sanitized_body);
     }
@@ -971,6 +972,7 @@ let Note = {
       height: h
     });
     Note.Box.update_data_attributes($note_box);
+    $note_box.addClass("new-note");
     $note_box.addClass("unsaved");
     $note_body.html("<em>Click to edit</em>");
     $(".note-container").append($note_box);
