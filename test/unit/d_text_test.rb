@@ -124,5 +124,16 @@ class DTextTest < ActiveSupport::TestCase
         assert_equal(links, DText.parse_external_links(dtext))
       end
     end
+
+    context "#from_html" do
+      should "convert basic html to dtext" do
+        assert_equal("[b]abc[/b] [i]def[/i] [u]ghi[/u]", DText.from_html("<b>abc</b> <i>def</i> <u>ghi</u>"))
+      end
+
+      should "convert links to dtext" do
+        assert_equal('"example":[https://www.example.com]', DText.from_html('<a href="https://www.example.com">example</a>'))
+        assert_equal("<https://www.example.com>", DText.from_html('<a href="https://www.example.com">https://www.example.com</a>'))
+      end
+    end
   end
 end

@@ -240,7 +240,14 @@ class DText
       when "a"
         title = from_html(element.inner_html, inline: true, &block).strip
         url = element["href"]
-        %("#{title}":[#{url}]) if title.present? && url.present?
+
+        if title.blank? || url.blank?
+          ""
+        elsif title == url
+          "<#{url}>"
+        else
+          %("#{title}":[#{url}])
+        end
       when "img"
         alt_text = element.attributes["title"] || element.attributes["alt"] || ""
         src = element["src"]
