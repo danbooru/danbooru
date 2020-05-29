@@ -2,7 +2,7 @@ require "test_helper"
 
 module Sources
   class MoebooruTest < ActiveSupport::TestCase
-    def assert_source_data_equals(url, referer = nil, site_name: nil, image_url: nil, page_url: nil, preview_url: nil, size: nil, tags: [], profile_url: nil)
+    def assert_source_data_equals(url, referer = nil, site_name: nil, image_url: nil, page_url: nil, preview_url: nil, size: nil, tags: [], profile_url: nil, **params)
       site = Sources::Strategies.find(url)
 
       assert_equal(site_name, site.site_name)
@@ -48,9 +48,9 @@ module Sources
           @profile_url = "https://twitter.com/apononori"
           @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: @profile_url }
 
-          assert_source_data_equals(@samp, @data)
-          assert_source_data_equals(@full, @data)
-          assert_source_data_equals(@page, @data)
+          assert_source_data_equals(@samp, **@data)
+          assert_source_data_equals(@full, **@data)
+          assert_source_data_equals(@page, **@data)
         end
       end
 
@@ -65,10 +65,10 @@ module Sources
           @size = 9_118_998
           @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: nil }
 
-          assert_source_data_equals(@samp, @data)
-          assert_source_data_equals(@jpeg, @data)
-          assert_source_data_equals(@full, @data)
-          assert_source_data_equals(@page, @data)
+          assert_source_data_equals(@samp, **@data)
+          assert_source_data_equals(@jpeg, **@data)
+          assert_source_data_equals(@full, **@data)
+          assert_source_data_equals(@page, **@data)
         end
       end
 
@@ -82,9 +82,9 @@ module Sources
           @size = 9_118_998
           @data = { site_name: "yande.re", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: nil }
 
-          assert_source_data_equals(@samp, @data)
-          assert_source_data_equals(@jpeg, @data)
-          assert_source_data_equals(@full, @data)
+          assert_source_data_equals(@samp, **@data)
+          assert_source_data_equals(@jpeg, **@data)
+          assert_source_data_equals(@full, **@data)
         end
       end
     end
@@ -106,10 +106,10 @@ module Sources
           @profile_url = "https://www.pixiv.net/member.php?id=22528152"
 
           @data = { site_name: "konachan.com", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: @profile_url }
-          assert_source_data_equals(@samp, @data)
-          assert_source_data_equals(@jpeg, @data)
-          assert_source_data_equals(@full, @data)
-          assert_source_data_equals(@page, @data)
+          assert_source_data_equals(@samp, **@data)
+          assert_source_data_equals(@jpeg, **@data)
+          assert_source_data_equals(@full, **@data)
+          assert_source_data_equals(@page, **@data)
         end
       end
     end
