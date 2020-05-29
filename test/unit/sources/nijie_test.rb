@@ -89,8 +89,8 @@ module Sources
         title = "ジャージの下は"
         desc = "「リトルウィッチアカデミア」から無自覚サキュバスぶりを発揮するアーシュラ先生です"
 
-        assert_equal(title, @site.artist_commentary_title)
-        assert_equal(desc, @site.artist_commentary_desc)
+        assert_equal(title, @site.dtext_artist_commentary_title)
+        assert_equal(desc, @site.dtext_artist_commentary_desc)
       end
     end
 
@@ -98,10 +98,16 @@ module Sources
       should "get the full commentary" do
         site = Sources::Strategies.find("http://nijie.info/view.php?id=266532")
         title = "ラミアの里"
-        desc = "サークルaskot様より販売されました「ラミアの里 ～ラミアはぁれむで搾られて～」にて前回に引き続きフラウのイラストを担当させて頂きました。\r\n前作を知らなくても問題なく愉しめる内容となっております。体験版もありますので気になりましたら是非ダウンロードしてみて下さい。\r\nDLsite【http://www.dlsite.com/maniax/work/=/product_id/RJ226998.html】"
+        desc = <<~EOS.chomp
+          サークルaskot様より販売されました「ラミアの里 ～ラミアはぁれむで搾られて～」にて前回に引き続きフラウのイラストを担当させて頂きました。
 
-        assert_equal(title, site.artist_commentary_title)
-        assert_equal(desc, site.artist_commentary_desc)
+          前作を知らなくても問題なく愉しめる内容となっております。体験版もありますので気になりましたら是非ダウンロードしてみて下さい。
+
+          DLsite【<http://www.dlsite.com/maniax/work/=/product_id/RJ226998.html>】
+        EOS
+
+        assert_equal(title, site.dtext_artist_commentary_title)
+        assert_equal(desc, site.dtext_artist_commentary_desc)
       end
     end
 
@@ -181,7 +187,9 @@ module Sources
         desc = <<-EOS.strip_heredoc.chomp
           foo [b]bold[/b] [i]italics[/i] [s]strike[/s] red
 
-          http://nijie.info/view.php?id=218944
+
+
+          <http://nijie.info/view.php?id=218944>
         EOS
 
         assert_equal(desc, @site.dtext_artist_commentary_desc)

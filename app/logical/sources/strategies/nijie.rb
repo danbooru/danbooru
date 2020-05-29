@@ -114,7 +114,7 @@ module Sources
       end
 
       def artist_commentary_desc
-        page&.search('#illust_text > p')&.text
+        page&.search('#illust_text > p')&.to_html
       end
 
       def tags
@@ -135,7 +135,14 @@ module Sources
 
       def self.to_dtext(text)
         text = text.to_s.gsub(/\r\n|\r/, "<br>")
-        DText.from_html(text).strip
+
+        dtext = DText.from_html(text) do |element|
+          if element.name == "a" && element["href"]&.start_with?("/jump.php")
+            element["href"] = element.text
+          end
+        end
+
+        dtext.strip
       end
 
       def to_full_image_url(x)
