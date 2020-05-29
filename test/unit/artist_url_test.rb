@@ -134,7 +134,7 @@ class ArtistUrlTest < ActiveSupport::TestCase
 
     should "normalize hentai foundry artist urls" do
       url = FactoryBot.create(:artist_url, :url => "http://pictures.hentai-foundry.com//a/AnimeFlux/219123.jpg")
-      assert_equal("http://pictures.hentai-foundry.com/a/AnimeFlux/219123.jpg/", url.normalized_url)
+      assert_equal("http://www.hentai-foundry.com/user/AnimeFlux/", url.normalized_url)
     end
 
     should "normalize pixiv urls" do
