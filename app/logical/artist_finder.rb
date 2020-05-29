@@ -127,8 +127,6 @@ module ArtistFinder
     url = ArtistUrl.normalize(url)
     artists = []
 
-    # return [] unless Sources::Strategies.find(url).normalized_for_artist_finder?
-
     while artists.empty? && url.size > 10
       u = url.sub(/\/+$/, "") + "/"
       u = u.to_escaped_for_sql_like.gsub(/\*/, '%') + '%'

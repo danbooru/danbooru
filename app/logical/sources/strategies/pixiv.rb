@@ -205,14 +205,6 @@ module Sources
         }
       end
 
-      def normalized_for_artist_finder?
-        url =~ PROFILE || url =~ STACC_PAGE
-      end
-
-      def normalizable_for_artist_finder?
-        illust_id.present? || novel_id.present? || fanbox_id.present? || fanbox_account_id.present?
-      end
-
       def normalize_for_source
         return if illust_id.blank?
 

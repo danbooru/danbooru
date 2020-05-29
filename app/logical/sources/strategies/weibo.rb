@@ -155,19 +155,6 @@ module Sources
         end
       end
 
-      def normalized_for_artist_finder
-        url =~ %r{weibo\.com/(u|p)/\d+\z}i
-      end
-
-      def normalizable_for_artist_finder?
-        artist_short_id_from_url.present? || artist_long_id.present?
-      end
-
-      def normalize_for_artist_finder
-        profile_url = profile_short_url || profile_long_url
-        profile_url || url
-      end
-
       def normalize_for_source
         return url if url =~ PAGE_URL_2
         artist_id = artist_short_id_from_url

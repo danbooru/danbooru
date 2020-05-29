@@ -122,18 +122,6 @@ module Sources
         api_client.desc
       end
 
-      def normalized_for_artist_finder?
-        url =~ PROFILE
-      end
-
-      def normalizable_for_artist_finder?
-        url =~ PAGE || url =~ MANGA_PAGE || url =~ PROFILE || url =~ DIRECT1 || url =~ DIRECT2 || url =~ PAGE2
-      end
-
-      def normalize_for_artist_finder
-        "#{profile_url}/"
-      end
-
       def normalize_for_source
         if illust_id.present?
           "https://seiga.nicovideo.jp/seiga/im#{illust_id}"

@@ -87,10 +87,6 @@ module Sources::Strategies
       end
     end
 
-    def normalized_for_artist_finder?
-      profile_url.present? && url == profile_url
-    end
-
     def normalize_for_source
       return if project_id.blank?
 

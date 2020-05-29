@@ -33,16 +33,7 @@ class ArtistUrl < ApplicationRecord
       # the strategy won't always work for twitter because it looks for a status
       url = url.downcase if url =~ %r!^https?://(?:mobile\.)?twitter\.com!
 
-      begin
-        source = Sources::Strategies.find(url)
-
-        if !source.normalized_for_artist_finder? && source.normalizable_for_artist_finder?
-          url = source.normalize_for_artist_finder
-        end
-      rescue Net::OpenTimeout, PixivApiClient::Error
-        raise if Rails.env.test?
-      end
-
+      url = Sources::Strategies.find(url).normalize_for_artist_finder
       url = url.gsub(/\/+\Z/, "")
       url = url.gsub(%r!^https://!, "http://")
       url + "/"

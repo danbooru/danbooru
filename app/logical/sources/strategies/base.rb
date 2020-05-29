@@ -127,7 +127,7 @@ module Sources
       # A list of all profile urls associated with the artist. These urls will
       # be suggested when creating a new artist.
       def profile_urls
-        [normalize_for_artist_finder]
+        [profile_url].compact
       end
 
       def artist_commentary_title
@@ -149,27 +149,6 @@ module Sources
         Downloads::File.new(image_url).size
       end
       memoize :size
-
-      # Subclasses should return true only if the URL is in its final normalized form.
-      #
-      # Sources::Strategies.find("http://img.pixiv.net/img/evazion").normalized_for_artist_finder?
-      # => true
-      # Sources::Strategies.find("http://i2.pixiv.net/img18/img/evazion/14901720_m.png").normalized_for_artist_finder?
-      # => false
-      def normalized_for_artist_finder?
-        false
-      end
-
-      # Subclasses should return true only if the URL is a valid URL that could
-      # be converted into normalized form.
-      #
-      # Sources::Strategies.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054").normalizable_for_artist_finder?
-      # => true
-      # Sources::Strategies.find("http://dic.pixiv.net/a/THUNDERproject").normalizable_for_artist_finder?
-      # => false
-      def normalizable_for_artist_finder?
-        normalize_for_artist_finder.present?
-      end
 
       # The url to use for artist finding purposes. This will be stored in the
       # artist entry. Normally this will be the profile url.

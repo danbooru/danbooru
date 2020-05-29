@@ -104,14 +104,6 @@ module Sources
         DText.from_html(artist_commentary_desc).gsub(/\A[[:space:]]+|[[:space:]]+\z/, "").gsub(/\n+/, "\n")
       end
 
-      def normalizable_for_artist_finder?
-        artist_name.present?
-      end
-
-      def normalized_for_artist_finder?
-        url =~ PROFILE_URL
-      end
-
       def normalize_for_source
         page_url
       end

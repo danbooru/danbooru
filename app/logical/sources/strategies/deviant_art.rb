@@ -167,18 +167,6 @@ module Sources
         api_metadata[:description]
       end
 
-      def normalized_for_artist_finder?
-        url == normalize_for_artist_finder
-      end
-
-      def normalizable_for_artist_finder?
-        normalize_for_artist_finder.present?
-      end
-
-      def normalize_for_artist_finder
-        profile_url
-      end
-
       def tags
         if api_metadata.blank?
           return []

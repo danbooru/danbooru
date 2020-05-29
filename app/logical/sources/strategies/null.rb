@@ -13,18 +13,6 @@ module Sources
         image_url
       end
 
-      def normalized_for_artist_finder?
-        true
-      end
-
-      def normalizable_for_artist_finder?
-        false
-      end
-
-      def normalize_for_artist_finder
-        url
-      end
-
       def normalize_for_source
         case url
         when %r{\Ahttps?://(?:d3j5vwomefv46c|dn3pm25xmtlyu)\.cloudfront\.net/photos/large/(\d+)\.}i
