@@ -287,18 +287,6 @@ class Artist < ApplicationRecord
   include BanMethods
   extend SearchMethods
 
-  def status
-    if is_banned? && !is_deleted?
-      "Banned"
-    elsif is_banned?
-      "Banned Deleted"
-    elsif is_deleted?
-      "Deleted"
-    else
-      "Active"
-    end
-  end
-
   def self.available_includes
     [:members, :urls, :wiki_page, :tag_alias, :tag]
   end
