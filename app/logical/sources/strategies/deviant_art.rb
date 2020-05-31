@@ -81,13 +81,17 @@ module Sources
         ["deviantart.net", "deviantart.com", "fav.me"]
       end
 
+      def wixmp_hosts
+        ["images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com", "api-da.wixmp.com"]
+      end
+
       def site_name
         "Deviant Art"
       end
 
       def match?
         return false if parsed_url.nil?
-        parsed_url.domain.in?(domains) || parsed_url.host == "images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com"
+        parsed_url.domain.in?(domains) || parsed_url.host.in?(wixmp_hosts)
       end
 
       def image_urls
