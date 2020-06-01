@@ -62,6 +62,8 @@ module ArtistFinder
     "monappy.jp",
     "monappy.jp/u", # https://monappy.jp/u/abara_bone
     "mstdn.jp", # https://mstdn.jp/@oneb
+    "www.newgrounds.com", # https://jessxjess.newgrounds.com/
+    "newgrounds.com/art/view/", # https://www.newgrounds.com/art/view/jessxjess/avatar-korra
     "nicoseiga.jp",
     "nicoseiga.jp/priv", # http://lohas.nicoseiga.jp/priv/2017365fb6cfbdf47ad26c7b6039feb218c5e2d4/1498430264/6820259
     "nicovideo.jp",

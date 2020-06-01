@@ -13,7 +13,8 @@ module Sources
         Strategies::Pawoo,
         Strategies::Moebooru,
         Strategies::HentaiFoundry,
-        Strategies::Weibo
+        Strategies::Weibo,
+        Strategies::Newgrounds
       ]
     end
 
