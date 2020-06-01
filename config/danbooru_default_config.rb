@@ -25,9 +25,14 @@ module Danbooru
       "Danbooru"
     end
 
-    # The canonical hostname of the site.
+    # The canonical hostname for the site, e.g. danbooru.donmai.us.
     def hostname
       Socket.gethostname
+    end
+
+    # The canonical base domain for the site, e.g. donmai.us.
+    def domain
+      hostname
     end
 
     # Contact email address of the admin.
@@ -550,6 +555,11 @@ module Danbooru
 
     def redis_url
       "redis://localhost:6379"
+    end
+
+    # Try to prevent copycat sites from proxying our site and inserting ads or phishing passwords.
+    def enable_antiproxying?
+      Rails.env.production?
     end
   end
 
