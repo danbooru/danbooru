@@ -49,7 +49,7 @@
   <%= render "posts/partials/common/secondary_links" %>
 <% end %>
 
-<% if post_search_counts_enabled? && @post_set.query.is_simple_tag? && @post_set.current_page == 1 %>
+<% if @post_set.query.is_simple_tag? && @post_set.current_page == 1 %>
   <% if @post_set.post_count == 0 %>
     <%= missed_post_search_count_js(@post_set.query.to_s) %>
   <% else %>

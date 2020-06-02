@@ -440,12 +440,6 @@ module Danbooru
       false
     end
 
-    # Enables recording of popular searches, missed searches, and post view
-    # counts. Requires Reportbooru to be configured and running - see below.
-    def enable_post_search_counts
-      false
-    end
-
     # reportbooru options - see https://github.com/r888888888/reportbooru
     def reportbooru_server
     end

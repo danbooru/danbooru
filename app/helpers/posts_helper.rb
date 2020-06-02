@@ -5,8 +5,8 @@ module PostsHelper
     end.join("").html_safe
   end
 
-  def post_search_counts_enabled?
-    Danbooru.config.enable_post_search_counts && Danbooru.config.reportbooru_server.present? && Danbooru.config.reportbooru_key.present?
+  def reportbooru_enabled?
+    Danbooru.config.reportbooru_server.present? && Danbooru.config.reportbooru_key.present?
   end
 
   def discover_mode?
@@ -14,17 +14,21 @@ module PostsHelper
   end
 
   def missed_post_search_count_js(tags)
+    return unless reportbooru_enabled?
+
     sig = generate_reportbooru_signature(tags)
     render "posts/partials/index/missed_search_count", sig: sig
   end
 
   def post_search_count_js(tags)
+    return unless reportbooru_enabled?
+
     sig = generate_reportbooru_signature("ps-#{tags}")
     render "posts/partials/index/search_count", sig: sig
   end
 
   def post_view_count_js
-    return unless post_search_counts_enabled?
+    return unless reportbooru_enabled?
 
     msg = generate_reportbooru_signature(params[:id])
     render "posts/partials/show/view_count", msg: msg
