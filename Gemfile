@@ -42,7 +42,7 @@ gem 'builder'
 # gem 'did_you_mean' # github.com/yuki24/did_you_mean/issues/117
 gem 'puma'
 gem 'scenic'
-gem 'ipaddress'
+gem 'ipaddress_2'
 gem 'http'
 gem 'activerecord-hierarchical_query'
 gem 'pundit'

@@ -95,15 +95,25 @@ module Downloads
       ip_addr = IPAddr.new(Resolv.getaddress(url.hostname))
       CloudflareService.new.ips.any? { |subnet| subnet.include?(ip_addr) }
     end
+
+    def self.banned_ip?(ip)
+      ip = IPAddress.parse(ip.to_s) unless ip.is_a?(IPAddress)
+
+      if ip.ipv4?
+        ip.loopback? || ip.link_local? || ip.multicast? || ip.private?
+      elsif ip.ipv6?
+        ip.loopback? || ip.link_local? || ip.unique_local? || ip.unspecified?
+      end
+    end
   end
 
   # Hook into HTTParty to validate the IP before following redirects.
   # https://www.rubydoc.info/github/jnunemaker/httparty/HTTParty/ConnectionAdapter
   class ValidatingConnectionAdapter < HTTParty::ConnectionAdapter
     def self.call(uri, options)
-      ip_addr = IPAddr.new(::Resolv.getaddress(uri.hostname))
+      ip_addr = IPAddress.parse(::Resolv.getaddress(uri.hostname))
 
-      if Danbooru.config.banned_ip_for_download?(ip_addr)
+      if Downloads::File.banned_ip?(ip_addr)
         raise Downloads::File::Error, "Downloads from #{ip_addr} are not allowed"
       end
 
