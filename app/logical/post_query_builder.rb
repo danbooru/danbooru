@@ -53,6 +53,8 @@ class PostQueryBuilder
     COUNT_METATAG_SYNONYMS.flat_map { |str| [str, "#{str}_asc"] } +
     CATEGORY_COUNT_METATAGS.flat_map { |str| [str, "#{str}_asc"] }
 
+  UNLIMITED_METATAGS = %w[status rating limit]
+
   attr_reader :query_string, :current_user, :safe_mode, :hide_deleted_posts
   alias_method :safe_mode?, :safe_mode
   alias_method :hide_deleted_posts?, :hide_deleted_posts
@@ -450,9 +452,13 @@ class PostQueryBuilder
     relation
   end
 
+  def self.is_unlimited_tag?(term)
+    term.type == :metatag && term.name.in?(UNLIMITED_METATAGS)
+  end
+
   def build
-    tag_count = terms.count { |term| !Danbooru.config.is_unlimited_tag?(term) }
-    if tag_count > Danbooru.config.tag_query_limit
+    tag_count = terms.count { |term| !PostQueryBuilder.is_unlimited_tag?(term) }
+    if tag_count > current_user.tag_query_limit
       raise ::Post::SearchError
     end
 

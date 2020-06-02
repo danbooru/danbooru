@@ -78,12 +78,10 @@ module PostSets
       end
 
       context "a set for the 'a b c' tag query" do
-        setup do
-          @set = PostSets::Post.new("a b c")
-        end
-
         context "for a non-gold user" do
           should "fail" do
+            @set = PostSets::Post.new("a b c", user: create(:user))
+
             assert_raises(::Post::SearchError) do
               @set.posts
             end
@@ -91,11 +89,9 @@ module PostSets
         end
 
         context "for a gold user" do
-          setup do
-            CurrentUser.user = FactoryBot.create(:gold_user)
-          end
-
           should "pass" do
+            @set = PostSets::Post.new("a b c", user: create(:gold_user))
+
             assert_nothing_raised do
               @set.posts
             end

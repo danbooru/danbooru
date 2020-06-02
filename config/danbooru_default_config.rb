@@ -100,19 +100,6 @@ module Danbooru
       6
     end
 
-    def tag_query_limit
-      if CurrentUser.user.present?
-        CurrentUser.user.tag_query_limit
-      else
-        base_tag_query_limit * 2
-      end
-    end
-
-    # Return true if the given tag shouldn't count against the user's tag search limit.
-    def is_unlimited_tag?(term)
-      term.type == :metatag && term.name.in?(%w[status rating limit])
-    end
-
     # After this many pages, the paginator will switch to sequential mode.
     def max_numbered_pages
       1_000
