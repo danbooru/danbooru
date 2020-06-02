@@ -29,7 +29,12 @@ class PostReplacement < ApplicationRecord
   end
 
   def suggested_tags_for_removal
-    tags = post.tag_array.select { |tag| Danbooru.config.remove_tag_after_replacement?(tag) }
+    tags = post.tag_array.select do |tag|
+      Danbooru.config.post_replacement_tag_removals.any? do |pattern|
+        tag.match?(/\A#{pattern}\z/i)
+      end
+    end
+
     tags = tags.map { |tag| "-#{tag}" }
     tags.join(" ")
   end

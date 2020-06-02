@@ -321,9 +321,10 @@ module Danbooru
       nil
     end
 
-    # Should return true if the given tag should be suggested for removal in the post replacement dialog box.
-    def remove_tag_after_replacement?(tag)
-      tag =~ /\A(?:replaceme|.*_sample|resized|upscaled|downscaled|md5_mismatch|jpeg_artifacts|corrupted_image|source_request|non-web_source)\z/i
+    # A list of tags that should be removed when a post is replaced. Regexes allowed.
+    def post_replacement_tag_removals
+      %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
+      jpeg_artifacts corrupted_image source_request non-web_source]
     end
 
     # Posts with these tags will be highlighted in the modqueue.
