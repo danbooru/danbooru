@@ -17,6 +17,7 @@
 
     &.dz-image-preview img {
       margin: 1em 0;
+      object-fit: contain;
     }
 
     .dz-details  {
