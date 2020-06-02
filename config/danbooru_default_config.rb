@@ -52,10 +52,6 @@ module Danbooru
       "https://github.com/danbooru/danbooru"
     end
 
-    def commit_url(hash)
-      "#{source_code_url}/commit/#{hash}"
-    end
-
     def issues_url
       "#{source_code_url}/issues"
     end
@@ -304,16 +300,6 @@ module Danbooru
       []
     end
 
-    # DeviantArt login cookies. Login to DeviantArt and extract these from the browser.
-    # https://github.com/danbooru/danbooru/issues/4219
-    def deviantart_cookies
-      {
-        userinfo: "XXX",
-        auth_secure: "XXX",
-        auth: "XXX"
-      }.to_json
-    end
-
     def pixiv_login
       nil
     end
@@ -342,10 +328,10 @@ module Danbooru
     def deviantart_client_id
       nil
     end
-    
+
     def deviantart_client_secret
       nil
-    end    
+    end
 
     # http://tinysubversions.com/notes/mastodon-bot/
     def pawoo_client_id
@@ -469,11 +455,6 @@ module Danbooru
 
     # iqdbs options - see https://github.com/r888888888/iqdbs
     def iqdbs_server
-    end
-
-    # AWS config options
-    def aws_region
-      "us-east-1"
     end
 
     def aws_credentials
