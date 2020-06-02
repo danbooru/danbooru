@@ -1,7 +1,7 @@
 require 'test_helper'
 
 class UploadsControllerTest < ActionDispatch::IntegrationTest
-  def test_file_upload(file_path, user, **upload_params)
+  def assert_uploaded(file_path, user, **upload_params)
     file = Rack::Test::UploadedFile.new("#{Rails.root}/#{file_path}")
 
     assert_difference(["Upload.count", "Post.count"]) do
@@ -252,7 +252,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "uploading a file from your computer" do
         should "work for a jpeg file" do
-          upload = test_file_upload("test/files/test.jpg", @user, tag_string: "aaa", rating: "e", source: "aaa")
+          upload = assert_uploaded("test/files/test.jpg", @user, tag_string: "aaa", rating: "e", source: "aaa")
 
           assert_equal("jpg", upload.post.file_ext)
           assert_equal("aaa", upload.post.source)
@@ -261,7 +261,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "work for a webm file" do
-          upload = test_file_upload("test/files/test-512x512.webm", @user, tag_string: "aaa", rating: "e", source: "aaa")
+          upload = assert_uploaded("test/files/test-512x512.webm", @user, tag_string: "aaa", rating: "e", source: "aaa")
 
           assert_equal("webm", upload.post.file_ext)
           assert_equal("aaa", upload.post.source)
@@ -270,7 +270,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "work for a flash file" do
-          upload = test_file_upload("test/files/compressed.swf", @user, tag_string: "aaa", rating: "e", source: "aaa")
+          upload = assert_uploaded("test/files/compressed.swf", @user, tag_string: "aaa", rating: "e", source: "aaa")
 
           assert_equal("swf", upload.post.file_ext)
           assert_equal("aaa", upload.post.source)
