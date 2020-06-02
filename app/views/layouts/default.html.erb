@@ -58,6 +58,7 @@
       window.Danbooru = {};
     }
 
+    window.Danbooru.config = <%= [:hostname, :domain, :enable_antiproxying?].map { |opt| [opt, Danbooru.config.send(opt)] }.to_h.to_json.html_safe %>;
     window.Danbooru.notice = Danbooru.Utility.notice;
     window.Danbooru.error = Danbooru.Utility.error;
   </script>

@@ -20,12 +20,8 @@ $(function() {
     e.preventDefault();
   });
 
-  const CANONICAL_DOMAIN = <%= Danbooru.config.domain.to_json.html_safe %>;
-  const CANONICAL_HOSTNAME = <%= Danbooru.config.hostname.to_json.html_safe %>;
-  const ENABLE_ANTIPROXYING = <%= Danbooru.config.enable_antiproxying?.to_json.html_safe %>;
-
-  if (ENABLE_ANTIPROXYING && !location.hostname.endsWith(CANONICAL_DOMAIN)) {
-    location.hostname = CANONICAL_HOSTNAME;
+  if (Danbooru.config["enable_antiproxying?"] && !location.hostname.endsWith(Danbooru.config.domain)) {
+    location.hostname = Danbooru.config.hostname;
   }
 });
 
