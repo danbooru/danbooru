@@ -80,7 +80,6 @@ class User < ApplicationRecord
   validates_presence_of :comment_threshold
   before_validation :normalize_blacklisted_tags
   before_create :promote_to_admin_if_first_user
-  before_create :customize_new_user
   has_many :artists, foreign_key: :creator_id
   has_many :artist_versions, foreign_key: :updater_id
   has_many :artist_commentary_versions, foreign_key: :updater_id
@@ -254,10 +253,6 @@ class User < ApplicationRecord
         self.can_approve_posts = true
         self.can_upload_free = true
       end
-    end
-
-    def customize_new_user
-      Danbooru.config.customize_new_user(self)
     end
 
     def level_string_was

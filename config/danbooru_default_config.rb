@@ -56,20 +56,6 @@ module Danbooru
       "#{source_code_url}/issues"
     end
 
-    # Set the default level, permissions, and other settings for new users here.
-    def customize_new_user(user)
-      # user.level = User::Levels::MEMBER
-      # user.can_approve_posts = false
-      # user.can_upload_free = false
-      #
-      # user.comment_threshold = -1
-      # user.blacklisted_tags = ["spoilers", "guro", "scat", "furry -rating:s"].join("\n")
-      # user.default_image_size = "large"
-      # user.per_page = 20
-      # user.disable_tagged_filenames = false
-      true
-    end
-
     # An array of regexes containing disallowed usernames.
     def user_name_blacklist
       []
