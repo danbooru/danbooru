@@ -83,6 +83,19 @@ module Sources
         resp.headers["Location"]&.gsub(%r{nicoseiga.jp/o/}i, 'nicoseiga.jp/priv/')
       end
 
+      def preview_urls
+        if manga_id.present?
+          image_urls.map do |img|
+            id = image_id_from_url(img)
+            "https://lohas.nicoseiga.jp/thumb/#{id}p"
+          end
+        elsif illust_id.present?
+          ["https://lohas.nicoseiga.jp/thumb/#{illust_id}i"]
+        else
+          []
+        end
+      end
+
       def page_url
         if illust_id.present?
           "https://seiga.nicovideo.jp/seiga/im#{illust_id}"
