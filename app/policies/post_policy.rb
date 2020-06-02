@@ -79,7 +79,8 @@ class PostPolicy < ApplicationPolicy
   def permitted_attributes
     [
       :tag_string, :old_tag_string, :parent_id, :old_parent_id,
-      :source, :old_source, :rating, :old_rating, :has_embedded_notes,
+      :source, :old_source, :rating, :old_rating,
+      :has_embedded_notes, :use_parent_commentary,
       (:is_rating_locked if can_lock_rating?),
       (:is_note_locked if can_lock_notes?),
       (:is_status_locked if can_lock_status?),

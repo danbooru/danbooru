@@ -1,4 +1,10 @@
-<h2>Artist's commentary</h2>
+<%# artist_commentary, from_parent %>
+
+<h2>Artist's commentary
+  <% if from_parent %>
+    <span class="commentary-from-parent">(from parent)</span>
+  <% end %>
+</h2>
 
 <menu id="commentary-sections">
   <% if artist_commentary.original_present? && artist_commentary.translated_present? %>

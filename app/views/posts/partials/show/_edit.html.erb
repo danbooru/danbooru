@@ -24,6 +24,8 @@
   <fieldset class="inline-fieldset">
     <label>Notes</label>
     <%= f.input :has_embedded_notes, label: "Embed notes", as: :boolean, boolean_style: :inline, disabled: post.is_note_locked? %>
+    <label>Commentary</label>
+    <%= f.input :use_parent_commentary, label: "Use parent's", as: :boolean, boolean_style: :inline %>
   </fieldset>
 
   <% if policy(post).can_lock_rating? || policy(post).can_lock_notes? || policy(post).can_lock_status? %>

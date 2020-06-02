@@ -83,9 +83,13 @@
     <% end %>
   </section>
 
-  <% if @post.artist_commentary && @post.artist_commentary.any_field_present? %>
+  <% if @post.use_parent_commentary && @post.parent&.artist_commentary&.any_field_present? %>
+    <div id="artist-commentary" class="child-commentary">
+      <%= render "artist_commentaries/show", :artist_commentary => @post.parent.artist_commentary, :from_parent => true %>
+    </div>
+  <% elsif @post.artist_commentary&.any_field_present? %>
     <div id="artist-commentary">
-      <%= render "artist_commentaries/show", :artist_commentary => @post.artist_commentary %>
+      <%= render "artist_commentaries/show", :artist_commentary => @post.artist_commentary, :from_parent => false %>
     </div>
   <% end %>
 
@@ -135,9 +139,15 @@
 <% end %>
 
 <% if policy(ArtistCommentary).create_or_update? %>
-  <div id="add-commentary-dialog" title="Add artist commentary" style="display: none;">
-    <%= render "artist_commentaries/form", post: @post, artist_commentary: @post.artist_commentary || ArtistCommentary.new(post: @post) %>
-  </div>
+  <% if (@post.use_parent_commentary && @post.parent&.artist_commentary.any_field_present?) %>
+    <div id="add-commentary-dialog" title="Modify artist commentary (parent)" style="display: none;">
+      <%= render "artist_commentaries/form", post: @post.parent, artist_commentary: @post.parent.artist_commentary %>
+    </div>
+  <% else %>
+    <div id="add-commentary-dialog" title="Add artist commentary" style="display: none;">
+      <%= render "artist_commentaries/form", post: @post, artist_commentary: @post.artist_commentary || ArtistCommentary.new(post: @post) %>
+    </div>
+  <% end %>
 <% end %>
 
 <% if policy(FavoriteGroup).create? %>

@@ -1465,7 +1465,7 @@ class Post < ApplicationRecord
   include IqdbMethods
   include ValidationMethods
 
-  has_bit_flags ["has_embedded_notes", "has_cropped"]
+  has_bit_flags ["has_embedded_notes", "has_cropped", "use_parent_commentary"]
 
   def safeblocked?
     CurrentUser.safe_mode? && (rating != "s" || Danbooru.config.safe_mode_restricted_tags.any? { |tag| tag.in?(tag_array) })

@@ -418,6 +418,11 @@ div#c-posts {
       margin-bottom: 0.5em;
       padding: 0.5em;
 
+      .commentary-from-parent {
+        font-size: 80%;
+        color: var(--muted-text-color);
+      }
+
       #original-artist-commentary, #translated-artist-commentary {
         max-height: 20em;
         overflow-y: auto;
