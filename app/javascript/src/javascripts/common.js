@@ -20,8 +20,12 @@ $(function() {
     e.preventDefault();
   });
 
-  if (Danbooru.config["enable_antiproxying?"] && !location.hostname.endsWith(Danbooru.config.domain)) {
-    location.hostname = Danbooru.config.hostname;
+  let enable_antiproxying = $("body").data("config-environment") === "production";
+  let hostname = $("body").data("config-hostname");
+  let domain = $("body").data("config-domain");
+
+  if (enable_antiproxying && !location.hostname.endsWith(domain)) {
+    location.hostname = hostname;
   }
 });
 

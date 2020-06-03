@@ -472,11 +472,6 @@ module Danbooru
     def redis_url
       "redis://localhost:6379"
     end
-
-    # Try to prevent copycat sites from proxying our site and inserting ads or phishing passwords.
-    def enable_antiproxying?
-      Rails.env.production?
-    end
   end
 
   class EnvironmentConfiguration
