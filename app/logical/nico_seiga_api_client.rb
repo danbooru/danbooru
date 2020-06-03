@@ -12,7 +12,10 @@ class NicoSeigaApiClient
       [api_response["id"]]
     elsif @work_type == "manga"
       manga_api_response.map do |x|
-        x["meta"]["source_url"].match(%r{/thumb/(\d+)\w}i).captures[0]
+        case x["meta"]["source_url"]
+        when %r{/thumb/(\d+)\w}i then Regexp.last_match(1)
+        when %r{nicoseiga\.cdn\.nimg\.jp/drm/image/\w+/(\d+)\w}i then Regexp.last_match(1)
+        end
       end
     end
   end
