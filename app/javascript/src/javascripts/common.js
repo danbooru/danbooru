@@ -20,8 +20,8 @@ $(function() {
     e.preventDefault();
   });
 
-  if (Danbooru.config["enable_antiproxying?"] && !location.hostname.endsWith(Danbooru.config.domain)) {
-    location.hostname = Danbooru.config.hostname;
+  if (location.hostname.endsWith("danbooru.me")) {
+    location.hostname = "danbooru.donmai.us";
   }
 });
 

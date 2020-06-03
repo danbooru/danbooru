@@ -272,6 +272,8 @@ module ApplicationHelper
       current_item_data_attributes = data_attributes_for(current_item, model_name, model_attributes)
     end
 
+    config_data_attributes = data_attributes_for(Danbooru.config, "config", [:hostname, :domain])
+
     controller_param = params[:controller].parameterize.dasherize
     action_param = params[:action].parameterize.dasherize
 
@@ -282,8 +284,11 @@ module ApplicationHelper
         controller: controller_param,
         action: action_param,
         layout: controller.class.send(:_layout),
+        "current-user-ip-addr": request.remote_ip,
         **current_user_data_attributes,
-        **current_item_data_attributes.to_h
+        **current_item_data_attributes.to_h,
+        **config_data_attributes,
+        "config-environment": Rails.env,
       }
     }
   end
