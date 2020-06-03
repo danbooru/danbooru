@@ -53,16 +53,6 @@
     "url" : "<%= root_url %>"
   }
   </script>
-  <script>
-    if (typeof window.Danbooru !== "object") {
-      window.Danbooru = {};
-    }
-
-    window.Danbooru.config = <%= [:hostname, :domain, :enable_antiproxying?].map { |opt| [opt, Danbooru.config.send(opt)] }.to_h.to_json.html_safe %>;
-    window.Danbooru.notice = Danbooru.Utility.notice;
-    window.Danbooru.error = Danbooru.Utility.error;
-  </script>
-
   <%= tag.meta name: "description", content: meta_description %>
 
   <%= tag.meta property: "og:type", content: "website" %>
@@ -124,6 +114,16 @@
 
     <%= yield :layout %>
   </div>
+
+  <script type="application/javascript">
+    if (typeof window.Danbooru !== "object") {
+      window.Danbooru = {};
+    }
+
+    window.Danbooru.config = <%= [:hostname, :domain, :enable_antiproxying?].map { |opt| [opt, Danbooru.config.send(opt)] }.to_h.to_json.html_safe %>;
+    window.Danbooru.notice = Danbooru.Utility.notice;
+    window.Danbooru.error = Danbooru.Utility.error;
+  </script>
 
   <%= render "static/footer" %>
 <% end %>
