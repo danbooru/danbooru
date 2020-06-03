@@ -43,7 +43,7 @@
 
         <div class="input upload_artist_commentary_container">
           <strong>Commentary</strong>
-          <a href="#" id="toggle-artist-commentary">show »</a>
+          (<a href="#" id="clear-artist-commentary">clear</a>) <a href="#" id="toggle-artist-commentary">show »</a>
 
           <div class="artist-commentary" style="display: none;">
             <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { size: 60, value: params[:artist_commentary_title] } %>

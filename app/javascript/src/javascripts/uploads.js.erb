@@ -24,6 +24,11 @@ Upload.initialize_all = function() {
     this.initialize_submit();
     $("#similar-button").click();
 
+    $("#clear-artist-commentary").on("click.danbooru", function(e) {
+      Upload.clear_commentary();
+      e.preventDefault();
+    });
+
     $("#toggle-artist-commentary").on("click.danbooru", function(e) {
       Upload.toggle_commentary();
       e.preventDefault();
@@ -160,6 +165,10 @@ Upload.fetch_data_manual = function(e) {
 
   e.preventDefault();
 }
+
+Upload.clear_commentary = function() {
+  $("#upload_artist_commentary_title,#upload_artist_commentary_desc,#upload_translated_commentary_title,#upload_translated_commentary_desc").val("");
+};
 
 Upload.toggle_commentary = function() {
   if ($(".artist-commentary").is(":visible")) {
