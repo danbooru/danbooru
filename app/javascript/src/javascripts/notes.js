@@ -972,6 +972,7 @@ let Note = {
       height: h
     });
     Note.Box.update_data_attributes($note_box);
+    Note.Box.scale($note_box);
     $note_box.addClass("new-note");
     $note_box.addClass("unsaved");
     $note_body.html("<em>Click to edit</em>");
