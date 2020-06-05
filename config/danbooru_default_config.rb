@@ -1,6 +1,4 @@
 module Danbooru
-  module_function
-
   class Configuration
     # A secret key used to encrypt session cookies, among other things. If this
     # token is changed, existing login sessions will become invalid. If this
@@ -469,19 +467,11 @@ module Danbooru
     end
   end
 
-  class EnvironmentConfiguration
-    def custom_configuration
-      @custom_configuration ||= CustomConfiguration.new
-    end
-
+  EnvironmentConfiguration = Struct.new(:config) do
     def method_missing(method, *args)
       var = ENV["DANBOORU_#{method.to_s.upcase.chomp("?")}"]
 
-      var.presence || custom_configuration.send(method, *args)
+      var.presence || config.send(method, *args)
     end
-  end
-
-  def config
-    @config ||= EnvironmentConfiguration.new
   end
 end
