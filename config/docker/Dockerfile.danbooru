@@ -1,0 +1,36 @@
+FROM ubuntu:20.04
+
+WORKDIR /app
+
+# prevent apt-get from asking questions about our timezone or locale.
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN \
+  apt-get update && \
+  apt-get -y install --no-install-recommends \
+    build-essential \
+    ruby \
+    ruby-dev \
+    git \
+    nodejs \
+    yarnpkg \
+    webpack \
+    ffmpeg \
+    mkvtoolnix \
+    libvips-dev \
+    libxml2-dev \
+    postgresql-client \
+    postgresql-server-dev-all
+
+# webpacker expects the binary to be called `yarn`, but debian/ubuntu installs it as `yarnpkg`.
+RUN ln -sf /usr/bin/yarnpkg /usr/bin/yarn
+
+COPY Gemfile Gemfile.lock ./
+RUN gem install bundler && bundle install
+
+COPY package.json yarn.lock ./
+RUN yarn install
+
+COPY . .
+
+CMD sleep 1d
