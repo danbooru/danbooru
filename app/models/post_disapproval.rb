@@ -73,10 +73,4 @@ class PostDisapproval < ApplicationRecord
     message = nil if message.blank?
     super(message)
   end
-
-  def api_attributes
-    attributes = super
-    attributes -= [:creator_id] unless Pundit.policy!([CurrentUser.user, nil], self).can_view_creator?
-    attributes
-  end
 end

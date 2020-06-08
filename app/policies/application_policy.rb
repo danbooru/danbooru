@@ -69,4 +69,8 @@ class ApplicationPolicy
   def permitted_attributes_for_edit
     permitted_attributes_for_update
   end
+
+  def api_attributes
+    record.class.attribute_types.reject { |name, attr| attr.type.in?([:inet, :tsvector]) }.keys.map(&:to_sym)
+  end
 end

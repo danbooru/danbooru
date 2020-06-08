@@ -10,4 +10,10 @@ class PostDisapprovalPolicy < ApplicationPolicy
   def permitted_attributes
     [:post_id, :reason, :message]
   end
+
+  def api_attributes
+    attributes = super
+    attributes -= [:creator_id] unless can_view_creator?
+    attributes
+  end
 end

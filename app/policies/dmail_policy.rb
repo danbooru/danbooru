@@ -30,4 +30,8 @@ class DmailPolicy < ApplicationPolicy
   def permitted_attributes_for_update
     [:is_read, :is_deleted]
   end
+
+  def api_attributes
+    super + [:key]
+  end
 end

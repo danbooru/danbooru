@@ -13,7 +13,6 @@ class Pool < ApplicationRecord
   after_save :create_version
   after_create :synchronize!
 
-  api_attributes including: [:post_count]
   deletable
 
   scope :series, -> { where(category: "series") }

@@ -6,4 +6,8 @@ class PostVersionPolicy < ApplicationPolicy
   def can_mass_undo?
     user.is_builder?
   end
+
+  def api_attributes
+    super + [:obsolete_added_tags, :obsolete_removed_tags, :unchanged_tags]
+  end
 end

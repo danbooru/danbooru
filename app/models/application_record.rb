@@ -31,19 +31,6 @@ class ApplicationRecord < ActiveRecord::Base
 
   concerning :ApiMethods do
     class_methods do
-      def api_attributes(*attributes, including: [])
-        return @api_attributes if @api_attributes
-
-        if attributes.present?
-          @api_attributes = attributes
-        else
-          @api_attributes = attribute_types.reject { |name, attr| attr.type.in?([:inet, :tsvector]) }.keys.map(&:to_sym)
-        end
-
-        @api_attributes += including
-        @api_attributes
-      end
-
       def available_includes
         []
       end
@@ -65,8 +52,9 @@ class ApplicationRecord < ActiveRecord::Base
       self.class.available_includes
     end
 
-    def api_attributes
-      self.class.api_attributes
+    # XXX deprecated, shouldn't expose this as an instance method.
+    def api_attributes(user: CurrentUser.user)
+      Pundit.policy!([user, nil], self).api_attributes
     end
 
     def html_data_attributes

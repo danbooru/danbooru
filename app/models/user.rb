@@ -420,30 +420,6 @@ class User < ApplicationRecord
   end
 
   module ApiMethods
-    def api_attributes
-      attributes = %i[
-        id created_at name inviter_id level
-        post_upload_count post_update_count note_update_count is_banned
-        can_approve_posts can_upload_free level_string
-      ]
-
-      if id == CurrentUser.user.id
-        attributes += BOOLEAN_ATTRIBUTES
-        attributes += %i[
-          updated_at last_logged_in_at last_forum_read_at
-          comment_threshold default_image_size
-          favorite_tags blacklisted_tags time_zone per_page
-          custom_style favorite_count api_regen_multiplier
-          api_burst_limit remaining_api_limit statement_timeout
-          favorite_group_limit favorite_limit tag_query_limit
-          is_comment_limited?
-          max_saved_searches theme
-        ]
-      end
-
-      attributes
-    end
-
     # extra attributes returned for /users/:id.json but not for /users.json.
     def full_attributes
       %i[

@@ -12,7 +12,6 @@ class Dmail < ApplicationRecord
   after_save :update_unread_dmail_count
   after_commit :send_email, on: :create
 
-  api_attributes including: [:key]
   deletable
 
   scope :read, -> { where(is_read: true) }

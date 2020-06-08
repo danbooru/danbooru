@@ -75,16 +75,7 @@ class PostFlag < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def api_attributes
-      attributes = super + [:category]
-      attributes -= [:creator_id] unless Pundit.policy!([CurrentUser.user, nil], self).can_view_flagger?
-      attributes
-    end
-  end
-
   extend SearchMethods
-  include ApiMethods
 
   def category
     case reason

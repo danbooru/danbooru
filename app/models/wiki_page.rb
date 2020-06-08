@@ -18,7 +18,6 @@ class WikiPage < ApplicationRecord
   has_many :versions, -> {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
   has_many :dtext_links, as: :model, dependent: :destroy
 
-  api_attributes including: [:category_name]
   deletable
 
   module SearchMethods

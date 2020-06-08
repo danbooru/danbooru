@@ -1125,15 +1125,6 @@ class Post < ApplicationRecord
   end
 
   module ApiMethods
-    def api_attributes
-      attributes = super
-      attributes += [:has_large, :has_visible_children, :is_favorited?] + TagCategory.categories.map {|x| "tag_string_#{x}".to_sym}
-      attributes += [:file_url, :large_file_url, :preview_file_url] if visible?
-      attributes -= [:md5, :file_ext] if !visible?
-      attributes -= [:fav_string] if !CurrentUser.is_moderator?
-      attributes
-    end
-
     def legacy_attributes
       hash = {
         "has_comments" => last_commented_at.present?,
@@ -1471,16 +1462,16 @@ class Post < ApplicationRecord
     CurrentUser.safe_mode? && (rating != "s" || Danbooru.config.safe_mode_restricted_tags.any? { |tag| tag.in?(tag_array) })
   end
 
-  def levelblocked?
-    !CurrentUser.is_gold? && Danbooru.config.restricted_tags.any? { |tag| tag.in?(tag_array) }
+  def levelblocked?(user = CurrentUser.user)
+    !user.is_gold? && Danbooru.config.restricted_tags.any? { |tag| tag.in?(tag_array) }
   end
 
-  def banblocked?
-    is_banned? && !CurrentUser.is_gold?
+  def banblocked?(user = CurrentUser.user)
+    is_banned? && !user.is_gold?
   end
 
-  def visible?
-    !safeblocked? && !levelblocked? && !banblocked?
+  def visible?(user = CurrentUser.user)
+    !safeblocked? && !levelblocked?(user) && !banblocked?(user)
   end
 
   def reload(options = nil)

@@ -267,10 +267,6 @@ class PostVersion < ApplicationRecord
     post.save!
   end
 
-  def api_attributes
-    super + [:obsolete_added_tags, :obsolete_removed_tags, :unchanged_tags]
-  end
-
   def self.available_includes
     [:updater, :post]
   end

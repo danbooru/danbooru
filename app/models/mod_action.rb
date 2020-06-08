@@ -1,8 +1,6 @@
 class ModAction < ApplicationRecord
   belongs_to :creator, :class_name => "User"
 
-  api_attributes including: [:category_id]
-
   # ####DIVISIONS#####
   # Groups:     0-999
   # Individual: 1000-1999

@@ -10,4 +10,10 @@ class PostFlagPolicy < ApplicationPolicy
   def permitted_attributes
     [:post_id, :reason]
   end
+
+  def api_attributes
+    attributes = super + [:category]
+    attributes -= [:creator_id] unless can_view_flagger?
+    attributes
+  end
 end
