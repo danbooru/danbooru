@@ -85,7 +85,7 @@ class StorageManager
     when :large
       "#{base_dir}/sample/#{subdir}#{file}"
     when :original
-      "#{base_dir}/#{subdir}#{file}"
+      "#{base_dir}/#{original_subdir}#{subdir}#{file}"
     end
   end
 
