@@ -1,7 +1,6 @@
 FROM ubuntu:20.04 AS build
 
 RUN \
-  useradd --create-home danbooru && \
   apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
     build-essential \
@@ -15,12 +14,10 @@ RUN \
     libvips-dev \
     libxml2-dev \
     postgresql-server-dev-all && \
-
     # webpacker expects the binary to be called `yarn`, but debian/ubuntu installs it as `yarnpkg`.
     ln -sf /usr/bin/yarnpkg /usr/bin/yarn
 
-WORKDIR /app
-USER danbooru
+WORKDIR /build
 
 COPY Gemfile Gemfile.lock ./
 RUN BUNDLE_DEPLOYMENT=true bundle install --jobs 4
@@ -39,7 +36,7 @@ RUN rm -rf node_modules log tmp && mkdir log tmp
 FROM ubuntu:20.04
 
 RUN \
-  useradd --create-home danbooru && \
+  useradd --create-home --user-group danbooru && \
   apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
     ruby \
@@ -49,11 +46,10 @@ RUN \
     libxml2 \
     postgresql-client
 
-WORKDIR /app
 USER danbooru
+WORKDIR /home/danbooru/app
+COPY --from=build --chown=danbooru /build .
 
-COPY --from=build /app .
-
-VOLUME ["/app/public/data"]
-ENTRYPOINT ["/app/bin/rails"]
+VOLUME ["/home/danbooru/app/public/data"]
+ENTRYPOINT ["./bin/rails"]
 CMD ["server"]
