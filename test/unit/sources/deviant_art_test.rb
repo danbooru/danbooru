@@ -244,6 +244,25 @@ module Sources
       end
     end
 
+    context "The source for a api-da.wixmp.com image" do
+      setup do
+        @url = "https://api-da.wixmp.com/_api/download/file?downloadToken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImV4cCI6MTU5MDkwMTUzMywiaWF0IjoxNTkwOTAwOTIzLCJqdGkiOiI1ZWQzMzhjNWQ5YjI0Iiwib2JqIjpudWxsLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdLCJwYXlsb2FkIjp7InBhdGgiOiJcL2ZcL2U0NmE0OGViLTNkMGItNDQ5ZS05MGRjLTBhMWIzMWNiMTM2MVwvZGQzcDF4OS1mYjQ3YmM4Zi02NTNlLTQyYTItYmI0ZC1hZmFmOWZjMmI3ODEuanBnIn19.-zo8E2eDmkmDNCK-sMabBajkaGtVYJ2Q20iVrUtt05Q"
+        @ref = "https://www.deviantart.com/akizero1510/art/Ten-miles-of-cherry-blossoms-792268029"
+        @artist = create(:artist, name: "akizero", url_string: "https://akizero1510.deviantart.com")
+      end
+
+      context "with a referer" do
+        should "work" do
+          @site = Sources::Strategies.find(@url, @ref)
+
+          assert_equal(@ref, @site.page_url)
+          assert_equal(@ref, @site.canonical_url)
+          assert_equal([@artist], @site.artists)
+          assert_nothing_raised { @site.to_h }
+        end
+      end
+    end
+
     context "The source for a non-downloadable animated gif with id<=790677560" do
       should "return working image url" do
         @site = Sources::Strategies.find("https://www.deviantart.com/heartgear/art/Silent-Night-579982816")
