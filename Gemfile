@@ -48,6 +48,9 @@ gem 'activerecord-hierarchical_query'
 gem 'pundit'
 gem 'mail'
 
+# locked to 1.10.9 to workaround an incompatibility with nokogumbo 2.0.2.
+gem 'nokogiri', '~> 1.10.9'
+
 group :production, :staging do
   gem 'unicorn', :platforms => :ruby
   gem 'capistrano3-unicorn'
