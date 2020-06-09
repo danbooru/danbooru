@@ -303,7 +303,7 @@ Post.initialize_favlist = function() {
 Post.view_original = function(e) {
   if (Utility.test_max_width(660)) {
     // Do the default behavior (navigate to image)
-    return;
+    return false;
   }
 
   var $image = $("#image");
@@ -322,7 +322,7 @@ Post.view_original = function(e) {
 Post.view_large = function(e) {
   if (Utility.test_max_width(660)) {
     // Do the default behavior (navigate to image)
-    return;
+    return false;
   }
 
   var $image = $("#image");
@@ -458,7 +458,7 @@ Post.update = async function(post_id, mode, params) {
 
     Post.pending_update_count -= 1;
     Post.show_pending_update_notice();
-  } catch(err) {
+  } catch (err) {
     Post.pending_update_count -= 1;
   }
 }

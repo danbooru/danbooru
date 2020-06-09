@@ -1,4 +1,3 @@
-import Post from './posts.js.erb'
 import Shortcuts from './shortcuts.js';
 import Utility from './utility.js';
 import Dropzone from 'dropzone';
@@ -6,7 +5,8 @@ import SparkMD5 from 'spark-md5';
 
 let Upload = {};
 
-Upload.MAX_FILE_SIZE = <%= Danbooru.config.max_file_size.to_json %> / (1024 * 1024);
+Upload.MAX_FILE_SIZE_BYTES = <%= Danbooru.config.max_file_size.to_json %>;
+Upload.MAX_FILE_SIZE = Upload.MAX_FILE_SIZE_BYTES / (1024 * 1024);
 Upload.IQDB_LIMIT = 5;
 Upload.IQDB_MIN_SIMILARITY = 50;
 Upload.IQDB_HIGH_SIMILARITY = 70;
