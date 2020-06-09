@@ -53,7 +53,7 @@ class Upload < ApplicationRecord
     end
 
     def validate_video_duration(record)
-      if record.media_file.is_video? && record.media_file.duration > 120
+      if !record.uploader.is_admin? && record.media_file.is_video? && record.media_file.duration > 120
         record.errors[:base] << "video must not be longer than 2 minutes"
       end
     end

@@ -250,6 +250,20 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for a 2+ minute long video" do
+        should "allow the upload if the user is an admin" do
+          @source = "https://twitter.com/7u_NABY/status/1269599527700295681"
+          post_auth uploads_path, create(:admin_user, created_at: 1.week.ago), params: { upload: { tag_string: "aaa", rating: "q", source: @source }}
+          assert_redirected_to Upload.last
+
+          assert_equal("mp4", Upload.last.file_ext)
+          assert_equal("completed", Upload.last.status)
+          assert_equal(1280, Upload.last.image_width)
+          assert_equal(720, Upload.last.image_height)
+          assert_equal("mp4", Upload.last.post.file_ext)
+        end
+      end
+
       context "uploading a file from your computer" do
         should "work for a jpeg file" do
           upload = assert_uploaded("test/files/test.jpg", @user, tag_string: "aaa", rating: "e", source: "aaa")
