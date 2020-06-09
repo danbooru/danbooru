@@ -1,36 +1,59 @@
-FROM ubuntu:20.04
-
-WORKDIR /app
-
-# prevent apt-get from asking questions about our timezone or locale.
-ARG DEBIAN_FRONTEND=noninteractive
+FROM ubuntu:20.04 AS build
 
 RUN \
+  useradd --create-home danbooru && \
   apt-get update && \
-  apt-get -y install --no-install-recommends \
+  DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
     build-essential \
     ruby \
     ruby-dev \
+    ruby-bundler \
     git \
     nodejs \
     yarnpkg \
     webpack \
-    ffmpeg \
-    mkvtoolnix \
     libvips-dev \
     libxml2-dev \
-    postgresql-client \
-    postgresql-server-dev-all
+    postgresql-server-dev-all && \
 
-# webpacker expects the binary to be called `yarn`, but debian/ubuntu installs it as `yarnpkg`.
-RUN ln -sf /usr/bin/yarnpkg /usr/bin/yarn
+    # webpacker expects the binary to be called `yarn`, but debian/ubuntu installs it as `yarnpkg`.
+    ln -sf /usr/bin/yarnpkg /usr/bin/yarn
+
+WORKDIR /app
+USER danbooru
 
 COPY Gemfile Gemfile.lock ./
-RUN gem install bundler && bundle install
+RUN BUNDLE_DEPLOYMENT=true bundle install --jobs 4
 
 COPY package.json yarn.lock ./
 RUN yarn install
 
 COPY . .
 
-CMD sleep 1d
+ARG DATABASE_URL=postgresql://0.0.0.0
+ARG DANBOORU_SECRET_KEY_BASE=1234
+ARG RAILS_ENV=production
+RUN bin/rails assets:precompile && ln -sf public/packs public/packs-test
+RUN rm -rf node_modules log tmp && mkdir log tmp
+
+FROM ubuntu:20.04
+
+RUN \
+  useradd --create-home danbooru && \
+  apt-get update && \
+  DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
+    ruby \
+    ffmpeg \
+    mkvtoolnix \
+    libvips \
+    libxml2 \
+    postgresql-client
+
+WORKDIR /app
+USER danbooru
+
+COPY --from=build /app .
+
+VOLUME ["/app/public/data"]
+ENTRYPOINT ["/app/bin/rails"]
+CMD ["server"]
