@@ -84,7 +84,7 @@ module Sources
       end
 
       context "A https://www.pixiv.net/fanbox/creator/*/post/* source" do
-        should "work" do
+        should_eventually "work" do
           @site = Sources::Strategies.find("http://www.pixiv.net/fanbox/creator/554149/post/82555")
 
           assert_equal("TYONE(お仕事募集中)", @site.artist_name)
