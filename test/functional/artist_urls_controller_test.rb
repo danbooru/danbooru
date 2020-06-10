@@ -8,6 +8,11 @@ class ArtistUrlsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render for a json request" do
+        get artist_urls_path, as: :json
+        assert_response :success
+      end
+
       should "render for a complex search" do
         @artist = FactoryBot.create(:artist, name: "bkub", url_string: "-http://bkub.com")
 
