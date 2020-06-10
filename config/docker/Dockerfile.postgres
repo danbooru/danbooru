@@ -1,7 +1,5 @@
-FROM postgres:latest
+FROM postgres:12.3
 
-RUN apt-get update && apt-get -y install build-essential git postgresql-server-dev-all
-
-RUN rm -rf /test_parser
 WORKDIR /test_parser
+RUN apt-get update && apt-get -y install --no-install-recommends build-essential ca-certificates git postgresql-server-dev-all
 RUN git clone https://github.com/r888888888/test_parser . && make install

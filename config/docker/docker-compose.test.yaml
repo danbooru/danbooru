@@ -1,7 +1,7 @@
 #
-# Usage: dotenv -f .env.test docker-compose -f config/docker/docker-compose-test.yaml -p danbooru up -d
+# Usage: docker-compose --env-file .env.test -f config/docker/docker-compose-test.yaml -p danbooru run -T danbooru
 #
-# Docker Compose file used to create an instance of danbooru along with a test database to run the test suite.
+# Docker Compose file to create an instance of danbooru along with a test database and run the test suite.
 #
 # https://docs.docker.com/compose/compose-file/
 #
@@ -13,8 +13,8 @@ services:
       context: ../..
       dockerfile: config/docker/Dockerfile.danbooru
     environment:
-      - DATABASE_URL=postgresql://danbooru:danbooru@localhost/danbooru
-      - ARCHIVE_DATABASE_URL=postgresql://danbooru:danbooru@localhost/danbooru
+      - DATABASE_URL=postgresql://danbooru:danbooru@postgres/danbooru
+      - ARCHIVE_DATABASE_URL=postgresql://danbooru:danbooru@postgres/danbooru
       - DANBOORU_SECRET_KEY_BASE=1234
       - DANBOORU_AWS_SQS_ENABLED
       - DANBOORU_TWITTER_API_KEY
@@ -34,9 +34,11 @@ services:
       - DANBOORU_GOOGLE_MAPS_API_KEY
     depends_on:
       - postgres
-    command: /app/config/docker/run-tests.sh
+    user: root
+    entrypoint: ["bash", "-c", "apt-get -y install build-essential ruby-dev zlib1g-dev postgresql-server-dev-all git && config/docker/prepare-tests.sh && bin/rails test"]
   postgres:
     build:
+      context: .
       dockerfile: Dockerfile.postgres
     environment:
       POSTGRES_USER: danbooru

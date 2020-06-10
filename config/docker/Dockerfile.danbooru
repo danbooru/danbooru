@@ -30,7 +30,7 @@ COPY . .
 ARG DATABASE_URL=postgresql://0.0.0.0
 ARG DANBOORU_SECRET_KEY_BASE=1234
 ARG RAILS_ENV=production
-RUN bin/rails assets:precompile && ln -sf public/packs public/packs-test
+RUN bin/rails assets:precompile && ln -sf packs public/packs-test
 RUN rm -rf node_modules log tmp && mkdir log tmp
 
 FROM ubuntu:20.04
