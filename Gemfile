@@ -88,6 +88,7 @@ group :test do
   gem "simplecov", :require => false
   gem "webmock"
   gem "minitest-ci"
+  gem "minitest-reporters"
   gem "mock_redis"
   gem "capybara"
   gem "selenium-webdriver"

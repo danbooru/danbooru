@@ -13,6 +13,9 @@ require 'rails/test_help'
 require 'cache'
 require 'webmock/minitest'
 require 'mocha/minitest'
+require 'minitest/reporters'
+
+Minitest::Reporters.use!(Minitest::Reporters::ProgressReporter.new)
 
 Dir[File.expand_path(File.dirname(__FILE__) + "/factories/*.rb")].sort.each {|file| require file}
 Dir[File.expand_path(File.dirname(__FILE__) + "/test_helpers/*.rb")].sort.each {|file| require file}
