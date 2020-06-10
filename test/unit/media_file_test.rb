@@ -22,14 +22,17 @@ class MediaFileTest < ActiveSupport::TestCase
     end
 
     should "determine the correct dimensions for a webm file" do
+      skip unless MediaFile.videos_enabled?
       assert_equal([512, 512], MediaFile.open("test/files/test-512x512.webm").dimensions)
     end
 
     should "determine the correct dimensions for a mp4 file" do
+      skip unless MediaFile.videos_enabled?
       assert_equal([300, 300], MediaFile.open("test/files/test-300x300.mp4").dimensions)
     end
 
     should "determine the correct dimensions for a ugoira file" do
+      skip unless MediaFile.videos_enabled?
       assert_equal([60, 60], MediaFile.open("test/files/valid_ugoira.zip").dimensions)
     end
 
@@ -42,6 +45,14 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([500, 335], mf.dimensions)
       assert_equal([500, 335], mf.dimensions)
 
+      mf = MediaFile.open("test/files/compressed.swf")
+      assert_equal([607, 756], mf.dimensions)
+      assert_equal([607, 756], mf.dimensions)
+    end
+
+    should "work for a video if called twice" do
+      skip unless MediaFile.videos_enabled?
+
       mf = MediaFile.open("test/files/test-512x512.webm")
       assert_equal([512, 512], mf.dimensions)
       assert_equal([512, 512], mf.dimensions)
@@ -49,10 +60,6 @@ class MediaFileTest < ActiveSupport::TestCase
       mf = MediaFile.open("test/files/valid_ugoira.zip")
       assert_equal([60, 60], mf.dimensions)
       assert_equal([60, 60], mf.dimensions)
-
-      mf = MediaFile.open("test/files/compressed.swf")
-      assert_equal([607, 756], mf.dimensions)
-      assert_equal([607, 756], mf.dimensions)
     end
   end
 
@@ -106,6 +113,10 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([150, 101], MediaFile.open("test/files/test.jpg").preview(150, 150).dimensions)
       assert_equal([113, 150], MediaFile.open("test/files/test.png").preview(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/test.gif").preview(150, 150).dimensions)
+    end
+
+    should "generate a preview image for a video" do
+      skip unless MediaFile.videos_enabled?
       assert_equal([150, 150], MediaFile.open("test/files/test-512x512.webm").preview(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/test-300x300.mp4").preview(150, 150).dimensions)
     end
@@ -120,6 +131,10 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([150, 150], MediaFile.open("test/files/test.jpg").crop(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/test.png").crop(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/test.gif").crop(150, 150).dimensions)
+    end
+
+    should "generate a cropped preview image for a video" do
+      skip unless MediaFile.videos_enabled?
       assert_equal([150, 150], MediaFile.open("test/files/test-512x512.webm").crop(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/test-300x300.mp4").crop(150, 150).dimensions)
     end
@@ -127,7 +142,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
   context "for a ugoira" do
     setup do
-      skip unless MediaFile::Ugoira.conversion_enabled?
+      skip unless MediaFile::Ugoira.videos_enabled?
       frame_data = JSON.parse(File.read("test/files/ugoira.json"))
       @ugoira = MediaFile.open("test/files/ugoira.zip", frame_data: frame_data)
     end

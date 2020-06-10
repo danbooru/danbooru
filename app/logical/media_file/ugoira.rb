@@ -2,10 +2,6 @@ class MediaFile::Ugoira < MediaFile
   class Error < StandardError; end
   attr_reader :frame_data
 
-  def self.conversion_enabled?
-    system("ffmpeg -version > /dev/null") && system("mkvmerge --version > /dev/null")
-  end
-
   def initialize(file, frame_data: {}, **options)
     super(file, **options)
     @frame_data = frame_data
@@ -31,7 +27,7 @@ class MediaFile::Ugoira < MediaFile
 
   # XXX should take width and height and resize image
   def convert
-    raise NotImplementedError, "can't convert ugoira to webm: ffmpeg or mkvmerge not installed" unless self.class.conversion_enabled?
+    raise NotImplementedError, "can't convert ugoira to webm: ffmpeg or mkvmerge not installed" unless self.class.videos_enabled?
 
     Dir.mktmpdir("ugoira-#{md5}") do |tmpdir|
       output_file = Tempfile.new(["ugoira-conversion", ".webm"], binmode: true)

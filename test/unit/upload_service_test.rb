@@ -152,7 +152,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "download the file" do
-          skip unless MediaFile::Ugoira.conversion_enabled?
+          skip unless MediaFile::Ugoira.videos_enabled?
 
           @service = UploadService::Preprocessor.new(source: @source)
           begin
@@ -548,7 +548,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       context "a post that is replaced by a ugoira" do
         should "save the frame data" do
-          skip unless MediaFile::Ugoira.conversion_enabled?
+          skip unless MediaFile::Ugoira.videos_enabled?
           begin
             as_user { @post.replace!(replacement_url: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364") }
             @post.reload
@@ -569,7 +569,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       context "a post that is replaced to another file then replaced back to the original file" do
         should "not delete the original files" do
           begin
-            skip unless MediaFile::Ugoira.conversion_enabled?
+            skip unless MediaFile::Ugoira.videos_enabled?
             @post.unstub(:queue_delete_files)
 
             # this is called thrice to delete the file for 62247364
@@ -611,7 +611,7 @@ class UploadServiceTest < ActiveSupport::TestCase
           # swap the images between @post1 and @post2.
           begin
             as_user do
-              skip unless MediaFile::Ugoira.conversion_enabled?
+              skip unless MediaFile::Ugoira.videos_enabled?
 
               @post1.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
               @post2.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")

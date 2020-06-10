@@ -45,6 +45,10 @@ class MediaFile
     end
   end
 
+  def self.videos_enabled?
+    system("ffmpeg -version > /dev/null") && system("mkvmerge --version > /dev/null")
+  end
+
   def initialize(file, **options)
     @file = file
   end

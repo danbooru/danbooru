@@ -22,6 +22,8 @@ class MediaFile::Video < MediaFile
   private
 
   def video
+    raise NotImplementedError, "can't process videos: ffmpeg or mkvmerge not installed" unless self.class.videos_enabled?
+
     FFMPEG::Movie.new(file.path)
   end
 
