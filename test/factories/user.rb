@@ -1,8 +1,6 @@
 FactoryBot.define do
   factory(:user, aliases: [:creator, :updater]) do
-    sequence :name do |n|
-      "user#{n}"
-    end
+    name { FFaker::Internet.user_name + $PID.to_s }
     password {"password"}
     default_image_size {"large"}
     level {20}
