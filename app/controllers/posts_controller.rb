@@ -104,7 +104,8 @@ class PostsController < ApplicationController
         end
 
         if post.errors.any?
-          @error_message = post.errors.full_messages.join("; ")
+          @message = post.errors.full_messages.join("; ")
+          @expected = true
           render :template => "static/error", :status => 500
         else
           response_params = {:q => params[:tags_query], :pool_id => params[:pool_id], :favgroup_id => params[:favgroup_id]}
