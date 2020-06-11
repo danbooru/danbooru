@@ -2,17 +2,6 @@ require 'test_helper'
 
 module Downloads
   class PixivTest < ActiveSupport::TestCase
-    def setup
-      super
-      Downloads::File.stubs(:is_cloudflare?).returns(false)
-      load_pixiv_tokens!
-    end
-
-    def teardown
-      save_pixiv_tokens!
-      super
-    end
-
     context "in all cases" do
       # Test a new illustration (one uploaded after 2014-09-30). New illustrations
       # must use /img-original/ for full size URLs. Old /imgXX/img/username/ style URLs

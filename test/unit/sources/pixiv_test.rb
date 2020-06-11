@@ -21,16 +21,6 @@ module Sources
       skip "Remote connection to #{source} failed"
     end
 
-    def setup
-      super
-      load_pixiv_tokens!
-    end
-
-    def teardown
-      save_pixiv_tokens!
-      super
-    end
-
     context "in all cases" do
       context "A gallery page" do
         setup do

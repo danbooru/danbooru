@@ -35,22 +35,6 @@ module TestHelpers
   def as_user(&block)
     CurrentUser.as(@user, &block)
   end
-
-  def load_pixiv_tokens!
-    if ENV["DANBOORU_PERSIST_PIXIV_SESSION"] && Cache.get("pixiv-papi-access-token")
-      Cache.put("pixiv-papi-access-token", Thread.current[:pixiv_papi_access_token])
-      Cache.put(PixivWebAgent::SESSION_CACHE_KEY, Thread.current[:pixiv_session_cache_key])
-      Cache.put(PixivWebAgent::COMIC_SESSION_CACHE_KEY, Thread.current[:pixiv_comic_session_cache_key])
-    end
-  end
-
-  def save_pixiv_tokens!
-    if ENV["DANBOORU_PERSIST_PIXIV_SESSION"]
-      Thread.current[:pixiv_papi_access_token] = Cache.get("pixiv-papi-access-token")
-      Thread.current[:pixiv_session_cache_key] = Cache.get(PixivWebAgent::SESSION_CACHE_KEY)
-      Thread.current[:pixiv_comic_session_cache_key] = Cache.get(PixivWebAgent::COMIC_SESSION_CACHE_KEY)
-    end
-  end
 end
 
 class ActiveSupport::TestCase
