@@ -78,7 +78,7 @@ class ActiveSupport::TestCase
     mock_missed_search_service!
     WebMock.allow_net_connect!
 
-    storage_manager = StorageManager::Local.new(base_dir: "#{Rails.root}/public/data/test")
+    storage_manager = StorageManager::Local.new(base_dir: Dir.mktmpdir("uploads-test-storage-"))
     Danbooru.config.stubs(:storage_manager).returns(storage_manager)
     Danbooru.config.stubs(:backup_storage_manager).returns(StorageManager::Null.new)
   end
