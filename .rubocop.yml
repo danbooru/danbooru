@@ -37,6 +37,21 @@ Layout/SpaceInsideBlockBraces:
 Layout/SpaceInsideHashLiteralBraces:
   Enabled: false
 
+Metrics/BlockNesting:
+  Max: 4
+
+Metrics/ClassLength:
+  Max: 500
+
+Metrics/MethodLength:
+  Max: 100
+
+Metrics/ModuleLength:
+  Max: 500
+
+Metrics/ParameterLists:
+  Max: 4
+
 Lint/InheritException:
   EnforcedStyle: standard_error
 

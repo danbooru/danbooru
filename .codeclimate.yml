@@ -1,0 +1,37 @@
+version: 2
+checks:
+  argument-count:
+    config:
+      threshold: 4
+  file-lines:
+    config:
+      threshold: 500
+  method-count:
+    config:
+      threshold: 40
+  method-lines:
+    config:
+      threshold: 100
+plugins:
+  eslint:
+    enabled: true
+    channel: "eslint-6"
+    config:
+      extensions:
+        - .js
+        - .js.erb
+  rubocop:
+    enabled: true
+    channel: "rubocop-0-83"
+  stylelint:
+    enabled: true
+exclude_patterns:
+  - "app/javascript/vendor"
+  - "config/"
+  - "db/"
+  - "lib/"
+  - "log/"
+  - "script/"
+  - "tmp/"
+  - "**/node_modules/"
+  - "**/test/"
