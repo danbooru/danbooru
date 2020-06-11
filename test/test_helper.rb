@@ -67,6 +67,11 @@ class ActiveSupport::TestCase
   mock_post_version_service!
   mock_pool_version_service!
 
+  parallelize
+  parallelize_setup do
+    Rails.application.load_seed
+  end
+
   setup do
     Socket.stubs(:gethostname).returns("www.example.com")
     mock_popular_search_service!

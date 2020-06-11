@@ -11,6 +11,7 @@ jobs:
       DEBIAN_FRONTEND: noninteractive
       DATABASE_URL: postgresql://danbooru:danbooru@postgres/danbooru
       ARCHIVE_DATABASE_URL: postgresql://danbooru:danbooru@postgres/danbooru
+      PARALLEL_WORKERS: 8 # number of parallel tests to run
       DANBOORU_SECRET_KEY_BASE: 1234
       DANBOORU_AWS_SQS_ENABLED: false
       DANBOORU_TWITTER_API_KEY: ${{ secrets.DANBOORU_TWITTER_API_KEY }}
