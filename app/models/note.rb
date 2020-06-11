@@ -30,7 +30,9 @@ class Note < ApplicationRecord
   end
 
   def note_within_image
-    return false unless post.present?
+    return false if post.blank?
+    return false if [x, y, width, height].any?(&:blank?)
+
     if x < 0 || y < 0 || (x > post.image_width) || (y > post.image_height) || width < 0 || height < 0 || (x + width > post.image_width) || (y + height > post.image_height)
       self.errors.add(:note, "must be inside the image")
     end
