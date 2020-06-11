@@ -1,18 +1,13 @@
 ENV["RAILS_ENV"] = "test"
 
 require 'simplecov'
-require File.expand_path('../config/environment', __dir__)
+require_relative "../config/environment"
 require 'rails/test_help'
-require 'cache'
-require 'webmock/minitest'
-require 'mocha/minitest'
-require 'minitest/reporters'
+
+Dir["#{Rails.root}/test/factories/*.rb"].sort.each { |file| require file }
+Dir["#{Rails.root}/test/test_helpers/*.rb"].sort.each { |file| require file }
 
 Minitest::Reporters.use!(Minitest::Reporters::ProgressReporter.new)
-
-Dir[File.expand_path(File.dirname(__FILE__) + "/factories/*.rb")].sort.each {|file| require file}
-Dir[File.expand_path(File.dirname(__FILE__) + "/test_helpers/*.rb")].sort.each {|file| require file}
-
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|
     with.test_framework :minitest
@@ -20,11 +15,7 @@ Shoulda::Matchers.configure do |config|
   end
 end
 
-module TestHelpers
-  def as(user, &block)
-    CurrentUser.as(user, &block)
-  end
-end
+Rails.application.load_seed
 
 class ActiveSupport::TestCase
   include ActiveJob::TestHelper
@@ -35,7 +26,6 @@ class ActiveSupport::TestCase
   include DownloadTestHelper
   include IqdbTestHelper
   include UploadTestHelper
-  include TestHelpers
 
   mock_post_version_service!
   mock_pool_version_service!
@@ -66,15 +56,14 @@ class ActiveSupport::TestCase
     FileUtils.rm_rf(Danbooru.config.storage_manager.base_dir)
     Cache.clear
   end
+
+  def as(user, &block)
+    CurrentUser.as(user, &block)
+  end
 end
 
 class ActionDispatch::IntegrationTest
-  include TestHelpers
-  extend PostArchiveTestHelper
-  extend PoolArchiveTestHelper
-
-  mock_post_version_service!
-  mock_pool_version_service!
+  register_encoder :xml, response_parser: ->(body) { Nokogiri.XML(body) }
 
   def method_authenticated(method_name, url, user, **options)
     post session_path, params: { name: user.name, password: user.password }
@@ -96,18 +85,4 @@ class ActionDispatch::IntegrationTest
   def delete_auth(url, user, **options)
     method_authenticated(:delete, url, user, **options)
   end
-
-  def setup
-    super
-    Socket.stubs(:gethostname).returns("www.example.com")
-
-    ActionDispatch::IntegrationTest.register_encoder :xml, response_parser: ->(body) { Nokogiri.XML(body) }
-  end
-
-  def teardown
-    super
-    Cache.clear
-  end
 end
-
-Rails.application.load_seed

@@ -83,12 +83,12 @@ group :test do
   gem "shoulda-context"
   gem "shoulda-matchers"
   gem "factory_bot"
-  gem "mocha"
+  gem "mocha", require: "mocha/minitest"
   gem "ffaker"
-  gem "simplecov", :require => false
-  gem "webmock"
+  gem "simplecov", require: false
+  gem "webmock", require: "webmock/minitest"
   gem "minitest-ci"
-  gem "minitest-reporters"
+  gem "minitest-reporters", require: "minitest/reporters"
   gem "mock_redis"
   gem "capybara"
   gem "selenium-webdriver"
