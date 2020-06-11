@@ -54,15 +54,15 @@ module Sources
 
     context "An animated gif" do
       setup do
-        @site = Sources::Strategies.find("https://twitter.com/DaniStrawberry1/status/859435334765088769")
+        @site = Sources::Strategies.find("https://twitter.com/i/web/status/1252517866059907073")
       end
 
       should "get the image url" do
-        assert_equal("https://video.twimg.com/tweet_video/C-1Tns7WsAAqvqn.mp4", @site.image_url)
+        assert_equal("https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4", @site.image_url)
       end
 
       should "get the preview urls" do
-        assert_equal(["https://pbs.twimg.com/tweet_video_thumb/C-1Tns7WsAAqvqn.jpg:small"], @site.preview_urls)
+        assert_equal(["https://pbs.twimg.com/tweet_video_thumb/EWHWVrmVcAAp4Vw.jpg:small"], @site.preview_urls)
       end
     end
 
