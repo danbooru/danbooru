@@ -1943,11 +1943,14 @@ class PostTest < ActiveSupport::TestCase
 
   context "URLs:" do
     should "generate the correct urls for animated gifs" do
-      @post = FactoryBot.build(:post, md5: "deadbeef", file_ext: "gif", tag_string: "animated_gif")
+      manager = StorageManager::Local.new(base_url: "https://test.com/data")
+      Danbooru.config.stubs(:storage_manager).returns(manager)
 
-      assert_equal("https://localhost/data/preview/deadbeef.jpg", @post.preview_file_url)
-      assert_equal("https://localhost/data/deadbeef.gif", @post.large_file_url)
-      assert_equal("https://localhost/data/deadbeef.gif", @post.file_url)
+      @post = build(:post, md5: "deadbeef", file_ext: "gif", tag_string: "animated_gif")
+
+      assert_equal("https://test.com/data/preview/deadbeef.jpg", @post.preview_file_url)
+      assert_equal("https://test.com/data/deadbeef.gif", @post.large_file_url)
+      assert_equal("https://test.com/data/deadbeef.gif", @post.file_url)
     end
   end
 
