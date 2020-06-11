@@ -363,10 +363,11 @@ GEM
     simple_form (5.0.2)
       actionpack (>= 5.0)
       activemodel (>= 5.0)
-    simplecov (0.18.5)
+    simplecov (0.17.1)
       docile (~> 1.1)
-      simplecov-html (~> 0.11)
-    simplecov-html (0.12.2)
+      json (>= 1.8, < 3)
+      simplecov-html (~> 0.10.0)
+    simplecov-html (0.10.2)
     sinatra (2.0.8.1)
       mustermann (~> 1.0)
       rack (~> 2.0)
@@ -490,7 +491,7 @@ DEPENDENCIES
   shoulda-context
   shoulda-matchers
   simple_form
-  simplecov
+  simplecov (~> 0.17.0)
   sinatra
   stackprof
   streamio-ffmpeg

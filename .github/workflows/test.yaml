@@ -9,9 +9,15 @@ jobs:
 
     env:
       DEBIAN_FRONTEND: noninteractive
+      PARALLEL_WORKERS: 8 # number of parallel tests to run
+
+      # Code Climate configuration. https://docs.codeclimate.com/docs/finding-your-test-coverage-token
+      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+      GIT_COMMIT_SHA: ${{ github.sha }}
+      GIT_BRANCH: ${{ github.ref }}
+
       DATABASE_URL: postgresql://danbooru:danbooru@postgres/danbooru
       ARCHIVE_DATABASE_URL: postgresql://danbooru:danbooru@postgres/danbooru
-      PARALLEL_WORKERS: 8 # number of parallel tests to run
       DANBOORU_SECRET_KEY_BASE: 1234
       DANBOORU_AWS_SQS_ENABLED: false
       DANBOORU_TWITTER_API_KEY: ${{ secrets.DANBOORU_TWITTER_API_KEY }}
@@ -48,12 +54,23 @@ jobs:
 #    - name: Run tests
 #      run: docker-compose --env-file ~/.env -f config/docker/docker-compose.test.yaml -p danbooru up
     - name: Install OS dependencies
-      run: apt-get update && apt-get -y install build-essential ruby ruby-dev ruby-bundler git nodejs yarnpkg webpack ffmpeg mkvtoolnix libvips-dev libxml2-dev postgresql-server-dev-all && ln -sf /usr/bin/yarnpkg /usr/bin/yarn
+      run: |
+        apt-get update
+        apt-get -y install --no-install-recommends build-essential ruby ruby-dev ruby-bundler git nodejs yarnpkg webpack ffmpeg mkvtoolnix libvips-dev libxml2-dev postgresql-server-dev-all wget
+        ln -sf /usr/bin/yarnpkg /usr/bin/yarn
     - name: Install Ruby dependencies
       run: BUNDLE_DEPLOYMENT=true bundle install --jobs 4
     - name: Install Javascript dependencies
       run: yarn install
     - name: Prepare database
       run: config/docker/prepare-tests.sh
+    # https://docs.codeclimate.com/docs/configuring-test-coverage
+    - name: Prepare test coverage for Code Climate
+      run: |
+        wget https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64
+        chmod +x test-reporter-latest-linux-amd64
+        ./test-reporter-latest-linux-amd64 before-build
     - name: Run tests
       run: bin/rails test
+    - name: Upload test coverage to Code Climate
+      run: ./test-reporter-latest-linux-amd64 after-build
