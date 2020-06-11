@@ -3,6 +3,7 @@ require:
 
 AllCops:
   TargetRubyVersion: 2.7.0
+  NewCops: enable
   Exclude:
     - "bin/*"
     - "node_modules/**/*"
@@ -37,11 +38,17 @@ Layout/SpaceInsideBlockBraces:
 Layout/SpaceInsideHashLiteralBraces:
   Enabled: false
 
+Metrics/AbcSize:
+  Enabled: false
+
 Metrics/BlockNesting:
   Max: 4
 
 Metrics/ClassLength:
   Max: 500
+
+Metrics/CyclomaticComplexity:
+  Max: 10
 
 Metrics/MethodLength:
   Max: 100
@@ -52,11 +59,17 @@ Metrics/ModuleLength:
 Metrics/ParameterLists:
   Max: 4
 
+Metrics/PerceivedComplexity:
+  Enabled: false
+
 Lint/InheritException:
   EnforcedStyle: standard_error
 
 Naming/MethodParameterName:
   Enabled: false
+
+Rails/HttpStatus:
+  EnforcedStyle: numeric
 
 Style/AsciiComments:
   Enabled: false
@@ -86,6 +99,27 @@ Style/HashSyntax:
   Enabled: false
 
 Style/IfUnlessModifier:
+  Enabled: false
+
+Style/MutableConstant:
+  Enabled: false
+
+Style/NumericPredicate:
+  Enabled: false
+
+Style/PercentLiteralDelimiters:
+  PreferredDelimiters:
+    "default": "[]"
+    "%r": "!!"
+
+Style/PerlBackrefs:
+  Enabled: false
+
+Style/RegexpLiteral:
+  EnforcedStyle: mixed
+  AllowInnerSlashes: false
+
+Style/SpecialGlobalVars:
   Enabled: false
 
 Style/StringLiterals:
