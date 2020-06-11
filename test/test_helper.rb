@@ -1,13 +1,6 @@
 ENV["RAILS_ENV"] = "test"
 
-if ENV["SIMPLECOV"]
-  require 'simplecov'
-  SimpleCov.start 'rails' do
-    add_group "Libraries", ["app/logical", "lib"]
-    add_group "Presenters", "app/presenters"
-  end
-end
-
+require 'simplecov'
 require File.expand_path('../config/environment', __dir__)
 require 'rails/test_help'
 require 'cache'
@@ -48,8 +41,14 @@ class ActiveSupport::TestCase
   mock_pool_version_service!
 
   parallelize
-  parallelize_setup do
+  parallelize_setup do |worker|
     Rails.application.load_seed
+
+    SimpleCov.command_name "#{SimpleCov.command_name}-#{worker}"
+  end
+
+  parallelize_teardown do |worker|
+    SimpleCov.result
   end
 
   setup do
