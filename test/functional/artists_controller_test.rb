@@ -31,7 +31,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
     setup do
       @admin = create(:admin_user)
       @user = create(:user)
-      as_user do
+      as(@user) do
         @artist = create(:artist)
         @masao = create(:artist, name: "masao", url_string: "http://www.pixiv.net/member.php?id=32777")
         @artgerm = create(:artist, name: "artgerm", url_string: "http://artgerm.deviantart.com/")
@@ -179,7 +179,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
     context "revert action" do
       should "work" do
-        as_user do
+        as(@user) do
           @artist.update(name: "xyz")
           @artist.update(name: "abc")
         end
@@ -188,9 +188,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow reverting to a previous version of another artist" do
-        as_user do
-          @artist2 = create(:artist)
-        end
+        @artist2 = as(@user) { create(:artist) }
         put_auth artist_path(@artist.id), @user, params: {version_id: @artist2.versions.first.id}
         assert_redirected_to(artist_path(@artist.id))
         assert_not_equal(@artist.reload.name, @artist2.name)

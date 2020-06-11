@@ -5,9 +5,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
     setup do
       Danbooru.config.stubs(:iqdbs_server).returns("https://karasuma.donmai.us")
       @user = create(:user)
-      as_user do
-        @posts = FactoryBot.create_list(:post, 2)
-      end
+      @posts = as(@user) { create_list(:post, 2) }
     end
 
     context "show action" do

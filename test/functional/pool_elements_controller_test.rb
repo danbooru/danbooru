@@ -5,7 +5,7 @@ class PoolElementsControllerTest < ActionDispatch::IntegrationTest
     setup do
       @user = travel_to(1.month.ago) {create(:user)}
       @mod = create(:moderator_user)
-      as_user do
+      as(@user) do
         @post = create(:post)
         @pool = create(:pool, :name => "abc")
       end
@@ -19,7 +19,7 @@ class PoolElementsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "add a post to a pool once and only once" do
-        as_user { @pool.add!(@post) }
+        as(@user) { @pool.add!(@post) }
         post_auth pool_element_path, @user, params: {:pool_id => @pool.id, :post_id => @post.id, :format => "json"}
         assert_response :success
         assert_equal([@post.id], @pool.reload.post_ids)

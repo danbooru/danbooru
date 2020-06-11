@@ -10,7 +10,7 @@ module Moderator
             @user = create(:gold_user)
           end
 
-          as_user do
+          as(@user) do
             @post = create(:post)
           end
         end
@@ -48,7 +48,7 @@ module Moderator
           end
 
           should "render" do
-            as_user do
+            as(@user) do
               @parent = create(:post)
               @child = create(:post, parent: @parent)
             end

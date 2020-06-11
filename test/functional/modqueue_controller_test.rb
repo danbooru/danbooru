@@ -5,9 +5,7 @@ class ModqueueControllerTest < ActionDispatch::IntegrationTest
     setup do
       @admin = create(:admin_user)
       @user = create(:user)
-      as_user do
-        @post = create(:post, :is_pending => true)
-      end
+      @post = as(@user) { create(:post, is_pending: true) }
     end
 
     context "index action" do

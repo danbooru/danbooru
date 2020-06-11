@@ -71,7 +71,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
 
     context "revert action" do
       setup do
-        as_user do
+        as(@user) do
           travel(1.day) do
             @note.update(:body => "111")
           end
@@ -88,7 +88,7 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow reverting to a previous version of another note" do
-        as_user do
+        as(@user) do
           @note2 = create(:note, :body => "note 2")
         end
         put_auth revert_note_path(@note), @user, params: { :version_id => @note2.versions.first.id }

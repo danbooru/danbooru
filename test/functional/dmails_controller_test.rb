@@ -5,9 +5,7 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
     setup do
       @user = create(:user, unread_dmail_count: 1)
       @unrelated_user = create(:user)
-      as_user do
-        @dmail = create(:dmail, :owner => @user)
-      end
+      @dmail = create(:dmail, owner: @user)
     end
 
     teardown do

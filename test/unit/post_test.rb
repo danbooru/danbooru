@@ -1828,7 +1828,7 @@ class PostTest < ActiveSupport::TestCase
     should "not allow members to vote" do
       @user = FactoryBot.create(:user)
       @post = FactoryBot.create(:post)
-      as_user do
+      as(@user) do
         assert_raises(PostVote::Error) { @post.vote!("up") }
       end
     end

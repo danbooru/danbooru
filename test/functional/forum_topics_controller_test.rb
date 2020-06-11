@@ -87,7 +87,7 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        as_user do
+        as(@user) do
           @topic1 = create(:forum_topic, is_sticky: true, creator: @user)
           @topic2 = create(:forum_topic, creator: @user)
           @post1 = create(:forum_post, topic: @topic1, creator: @user, body: "xxx")
@@ -267,8 +267,8 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
 
     context "destroy action" do
       setup do
-        as_user do
-          @post = create(:forum_post, :topic_id => @forum_topic.id)
+        as(@user) do
+          @post = create(:forum_post, topic: @forum_topic)
         end
       end
 

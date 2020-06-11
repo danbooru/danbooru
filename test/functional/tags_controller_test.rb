@@ -4,9 +4,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
   context "The tags controller" do
     setup do
       @user = create(:builder_user)
-      as_user do
-        @tag = create(:tag, name: "touhou", category: Tag.categories.copyright, post_count: 1)
-      end
+      @tag = create(:tag, name: "touhou", category: Tag.categories.copyright, post_count: 1)
     end
 
     context "edit action" do
@@ -92,9 +90,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a tag with >50 posts" do
         setup do
-          as_user do
-            @tag.update(post_count: 100)
-          end
+          @tag.update(post_count: 100)
         end
 
         should "not update the category for a member" do
@@ -114,9 +110,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not change category when the tag is too large to be changed by a builder" do
-        as_user do
-          @tag.update(category: Tag.categories.general, post_count: 1001)
-        end
+        @tag.update(category: Tag.categories.general, post_count: 1001)
         put_auth tag_path(@tag), @user, params: {:tag => {:category => Tag.categories.artist}}
 
         assert_response :forbidden

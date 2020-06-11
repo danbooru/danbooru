@@ -7,7 +7,7 @@ class PostEventsControllerTest < ActionDispatch::IntegrationTest
       @mod = create(:mod_user)
     end
 
-    as_user do
+    as(@user) do
       @post = create(:post)
       @post.flag!("aaa")
       create(:post_appeal, post: @post)

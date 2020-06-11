@@ -31,10 +31,6 @@ module TestHelpers
   def as(user, &block)
     CurrentUser.as(user, &block)
   end
-
-  def as_user(&block)
-    CurrentUser.as(@user, &block)
-  end
 end
 
 class ActiveSupport::TestCase

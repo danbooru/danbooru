@@ -6,9 +6,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       PopularSearchService.stubs(:enabled?).returns(false)
 
       @user = travel_to(1.month.ago) {create(:user)}
-      as_user do
-        @post = create(:post, :tag_string => "aaaa")
-      end
+      @post = as(@user) { create(:post, tag_string: "aaaa") }
     end
 
     context "index action" do
@@ -45,7 +43,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_select "#show-excerpt-link", count: 1, text: "Wiki"
 
-          as_user { create(:wiki_page, title: "bkub") }
+          as(@user) { create(:wiki_page, title: "bkub") }
           get posts_path, params: { tags: "bkub" }
           assert_response :success
           assert_select "#show-excerpt-link", count: 1, text: "Wiki"
@@ -57,12 +55,12 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_select "#show-excerpt-link", count: 1, text: "Wiki"
 
-          as_user { @wiki = create(:wiki_page, title: "fumimi") }
+          @wiki = as(@user) { create(:wiki_page, title: "fumimi") }
           get posts_path, params: { tags: "fumimi" }
           assert_response :success
           assert_select "#show-excerpt-link", count: 1, text: "Wiki"
 
-          as_user { @wiki.update(is_deleted: true) }
+          as(@user) { @wiki.update(is_deleted: true) }
           get posts_path, params: { tags: "bkub" }
           assert_response :success
           assert_select "#show-excerpt-link", count: 0
@@ -520,9 +518,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     context "revert action" do
       setup do
         PostVersion.sqs_service.stubs(:merge?).returns(false)
-        as_user do
-          @post.update(tag_string: "zzz")
-        end
+        as(@user) { @post.update(tag_string: "zzz") }
       end
 
       should "work" do
@@ -535,9 +531,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow reverting to a previous version of another post" do
-        as_user do
-          @post2 = create(:post, :uploader_id => @user.id, :tag_string => "herp")
-        end
+        @post2 = as(@user) { create(:post, uploader_id: @user.id, tag_string: "herp") }
 
         put_auth revert_post_path(@post), @user, params: { :version_id => @post2.versions.first.id }
         @post.reload

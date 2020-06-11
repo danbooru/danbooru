@@ -4,7 +4,7 @@ class WikiPageVersionsControllerTest < ActionDispatch::IntegrationTest
   context "The wiki page versions controller" do
     setup do
       @user = create(:user)
-      as_user do
+      as(@user) do
         @wiki_page = create(:wiki_page)
         @wiki_page.update(:body => "1 2")
         @wiki_page.update(:body => "2 3")

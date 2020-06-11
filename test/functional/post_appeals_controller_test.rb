@@ -23,7 +23,7 @@ class PostAppealsControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        as_user do
+        as(@user) do
           @post = create(:post, :is_deleted => true)
           @post_appeal = create(:post_appeal, :post => @post)
         end
@@ -49,9 +49,7 @@ class PostAppealsControllerTest < ActionDispatch::IntegrationTest
 
     context "create action" do
       setup do
-        as_user do
-          @post = create(:post, :is_deleted => true)
-        end
+        @post = as(@user) { create(:post, is_deleted: true) }
       end
 
       should "create a new appeal" do

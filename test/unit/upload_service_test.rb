@@ -257,7 +257,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         travel_to(1.month.ago) do
           @user = FactoryBot.create(:user)
         end
-        as_user do
+        as(@user) do
           @post = FactoryBot.create(:post, md5: Digest::MD5.hexdigest(@old_file.read))
           @old_md5 = @post.md5
           @post.stubs(:queue_delete_files)
@@ -270,32 +270,32 @@ class UploadServiceTest < ActiveSupport::TestCase
       context "#process!" do
         should "create a new upload" do
           assert_difference(-> { Upload.count }) do
-            as_user { subject.process! }
+            as(@user) { subject.process! }
           end
         end
 
         should "create a comment" do
           assert_difference(-> { @post.comments.count }) do
-            as_user { subject.process! }
+            as(@user) { subject.process! }
             @post.reload
           end
         end
 
         should "not create a new post" do
           assert_difference(-> { Post.count }, 0) do
-            as_user { subject.process! }
+            as(@user) { subject.process! }
           end
         end
 
         should "update the post's MD5" do
           assert_changes(-> { @post.md5 }) do
-            as_user { subject.process! }
+            as(@user) { subject.process! }
             @post.reload
           end
         end
 
         should "preserve the old values" do
-          as_user { subject.process! }
+          as(@user) { subject.process! }
           assert_equal(1500, @replacement.image_width_was)
           assert_equal(1000, @replacement.image_height_was)
           assert_equal(2000, @replacement.file_size_was)
@@ -304,7 +304,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "record the new values" do
-          as_user { subject.process! }
+          as(@user) { subject.process! }
           assert_equal(500, @replacement.image_width)
           assert_equal(335, @replacement.image_height)
           assert_equal(28086, @replacement.file_size)
@@ -313,7 +313,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "correctly update the attributes" do
-          as_user { subject.process! }
+          as(@user) { subject.process! }
           assert_equal(500, @post.image_width)
           assert_equal(335, @post.image_height)
           assert_equal(28086, @post.file_size)
@@ -327,7 +327,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         should "not raise a duplicate error" do
           upload_file("test/files/test.png") do |file|
             assert_nothing_raised do
-              as_user { @post.replace!(replacement_file: file, replacement_url: "") }
+              as(@user) { @post.replace!(replacement_file: file, replacement_url: "") }
             end
           end
         end
@@ -335,7 +335,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         should "not queue a deletion or log a comment" do
           upload_file("test/files/test.png") do |file|
             assert_no_difference(-> { @post.comments.count }) do
-              as_user { @post.replace!(replacement_file: file, replacement_url: "") }
+              as(@user) { @post.replace!(replacement_file: file, replacement_url: "") }
               @post.reload
             end
           end
@@ -351,7 +351,7 @@ class UploadServiceTest < ActiveSupport::TestCase
           @user = FactoryBot.create(:user)
         end
 
-        as_user do
+        as(@user) do
           @post = FactoryBot.create(:post, source: "http://blah", file_ext: "jpg", md5: "something", uploader_ip_addr: "127.0.0.2")
           @post.stubs(:queue_delete_files)
           @replacement = FactoryBot.create(:post_replacement, post: @post, replacement_url: @new_url)
@@ -361,7 +361,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       subject { UploadService::Replacer.new(post: @post, replacement: @replacement) }
 
       should "replace the post" do
-        as_user { subject.process! }
+        as(@user) { subject.process! }
 
         @post.reload
 
@@ -376,7 +376,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         travel_to(1.month.ago) do
           @user = FactoryBot.create(:user)
         end
-        as_user do
+        as(@user) do
           @post_md5 = "710fd9cba4ef37260f9152ffa9d154d8"
           @post = FactoryBot.create(:post, source: "https://cdn.donmai.us/original/71/0f/#{@post_md5}.png", file_ext: "png", md5: @post_md5, uploader_ip_addr: "127.0.0.2")
           @post.stubs(:queue_delete_files)
@@ -388,7 +388,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       context "when replacing with its own source" do
         should "work" do
-          as_user { @post.replace!(replacement_url: @post.source) }
+          as(@user) { @post.replace!(replacement_url: @post.source) }
           assert_equal(@post_md5, @post.md5)
           assert_match(/#{@post_md5}/, @post.file_path)
         end
@@ -397,7 +397,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       context "when an upload with the same MD5 already exists" do
         setup do
           @post.update(md5: @new_md5)
-          as_user do
+          as(@user) do
             @post2 = FactoryBot.create(:post)
             @post2.stubs(:queue_delete_files)
           end
@@ -405,7 +405,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         should "throw an error" do
           assert_raises(UploadService::Replacer::Error) do
-            as_user { @post2.replace!(replacement_url: @new_url) }
+            as(@user) { @post2.replace!(replacement_url: @new_url) }
           end
         end
       end
@@ -415,7 +415,7 @@ class UploadServiceTest < ActiveSupport::TestCase
           replacement_url = "https://cdn.donmai.us/original/fd/b4/fdb47f79fb8da82e66eeb1d84a1cae8d.jpg"
           final_source = "https://cdn.donmai.us/original/71/0f/710fd9cba4ef37260f9152ffa9d154d8.png"
 
-          as_user { @post.replace!(replacement_url: replacement_url, final_source: final_source) }
+          as(@user) { @post.replace!(replacement_url: replacement_url, final_source: final_source) }
 
           assert_equal(final_source, @post.source)
         end
@@ -426,7 +426,7 @@ class UploadServiceTest < ActiveSupport::TestCase
           skip "Twitter key not set" unless Danbooru.config.twitter_api_key
           replacement_url = "https://twitter.com/nounproject/status/540944400767922176"
           image_url = "https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig"
-          as_user { @post.replace!(replacement_url: replacement_url) }
+          as(@user) { @post.replace!(replacement_url: replacement_url) }
 
           assert_equal(replacement_url, @post.replacements.last.replacement_url)
         end
@@ -435,7 +435,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       context "#undo!" do
         setup do
           @user = travel_to(1.month.ago) { FactoryBot.create(:user) }
-          as_user do
+          as(@user) do
             @post = FactoryBot.create(:post, source: "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg")
             @post.stubs(:queue_delete_files)
             @post.replace!(replacement_url: "https://cdn.donmai.us/original/fd/b4/fdb47f79fb8da82e66eeb1d84a1cae8d.jpg", tags: "-tag1 tag2")
@@ -445,7 +445,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "update the attributes" do
-          as_user do
+          as(@user) do
             subject.undo!
           end
 
@@ -463,46 +463,46 @@ class UploadServiceTest < ActiveSupport::TestCase
       context "#process!" do
         should "create a new upload" do
           assert_difference(-> { Upload.count }) do
-            as_user { subject.process! }
+            as(@user) { subject.process! }
           end
         end
 
         should "create a comment" do
           assert_difference(-> { @post.comments.count }) do
-            as_user { subject.process! }
+            as(@user) { subject.process! }
             @post.reload
           end
         end
 
         should "not create a new post" do
           assert_difference(-> { Post.count }, 0) do
-            as_user { subject.process! }
+            as(@user) { subject.process! }
           end
         end
 
         should "update the post's MD5" do
           assert_changes(-> { @post.md5 }) do
-            as_user { subject.process! }
+            as(@user) { subject.process! }
             @post.reload
           end
         end
 
         should "update the post's source" do
           assert_changes(-> { @post.source }, nil, from: @post.source, to: @new_url) do
-            as_user { subject.process! }
+            as(@user) { subject.process! }
             @post.reload
           end
         end
 
         should "not change the post status or uploader" do
           assert_no_changes(-> { {ip_addr: @post.uploader_ip_addr.to_s, uploader: @post.uploader_id, pending: @post.is_pending?} }) do
-            as_user { subject.process! }
+            as(@user) { subject.process! }
             @post.reload
           end
         end
 
         should "leave a system comment" do
-          as_user { subject.process! }
+          as(@user) { subject.process! }
           comment = @post.comments.last
           assert_not_nil(comment)
           assert_equal(User.system.id, comment.creator_id)
@@ -513,7 +513,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       context "a post with a pixiv html source" do
         should "replace with the full size image" do
           begin
-            as_user do
+            as(@user) do
               @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
             end
 
@@ -535,7 +535,7 @@ class UploadServiceTest < ActiveSupport::TestCase
             @post.unstub(:queue_delete_files)
             FileUtils.expects(:rm_f).times(3)
 
-            as_user { @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350") }
+            as(@user) { @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350") }
 
             travel_to((PostReplacement::DELETION_GRACE_PERIOD + 1).days.from_now) do
               perform_enqueued_jobs
@@ -550,7 +550,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         should "save the frame data" do
           skip unless MediaFile::Ugoira.videos_enabled?
           begin
-            as_user { @post.replace!(replacement_url: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364") }
+            as(@user) { @post.replace!(replacement_url: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364") }
             @post.reload
 
             assert_equal(80, @post.image_width)
@@ -575,7 +575,7 @@ class UploadServiceTest < ActiveSupport::TestCase
             # this is called thrice to delete the file for 62247364
             FileUtils.expects(:rm_f).times(3)
 
-            as_user do
+            as(@user) do
               @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
               @post.reload
               @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
@@ -601,7 +601,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       context "two posts that have had their files swapped" do
         setup do
-          as_user do
+          as(@user) do
             @post1 = FactoryBot.create(:post)
             @post2 = FactoryBot.create(:post)
           end
@@ -610,7 +610,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         should "not delete the still active files" do
           # swap the images between @post1 and @post2.
           begin
-            as_user do
+            as(@user) do
               skip unless MediaFile::Ugoira.videos_enabled?
 
               @post1.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
@@ -649,7 +649,7 @@ class UploadServiceTest < ActiveSupport::TestCase
         setup do
           Note.any_instance.stubs(:merge_version?).returns(false)
 
-          as_user do
+          as(@user) do
             @post.update(image_width: 160, image_height: 164)
             @note = @post.notes.create(x: 80, y: 82, width: 80, height: 82, body: "test")
             @note.reload
@@ -662,7 +662,7 @@ class UploadServiceTest < ActiveSupport::TestCase
           begin
             assert_difference(-> { @note.versions.count }) do
               # replacement image is 80x82, so we're downscaling by 50% (160x164 -> 80x82).
-              as_user do
+              as(@user) do
                 @post.replace!(
                   replacement_url: "https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png",
                   final_source: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350"

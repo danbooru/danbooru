@@ -9,7 +9,7 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        as_user do
+        as(@user) do
           @wiki_page_abc = create(:wiki_page, :title => "abc")
           @wiki_page_def = create(:wiki_page, :title => "def")
         end
@@ -47,9 +47,7 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
 
     context "show action" do
       setup do
-        as_user do
-          @wiki_page = create(:wiki_page)
-        end
+        @wiki_page = as(@user) { create(:wiki_page) }
       end
 
       should "redirect to the title for an id" do
@@ -91,9 +89,7 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "render for a negated tag" do
-        as_user do
-          @wiki_page.update(title: "-aaa")
-        end
+        as(@user) { @wiki_page.update(title: "-aaa") }
 
         get wiki_page_path(@wiki_page.id)
         assert_redirected_to wiki_page_path(@wiki_page.title)
@@ -115,9 +111,7 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
 
     context "show_or_new action" do
       setup do
-        as_user do
-          @wiki_page = create(:wiki_page)
-        end
+        @wiki_page = as(@user) { create(:wiki_page) }
       end
 
       should "redirect when given a title" do
@@ -167,7 +161,7 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
 
     context "update action" do
       setup do
-        as_user do
+        as(@user) do
           @tag = create(:tag, name: "foo", post_count: 42)
           @wiki_page = create(:wiki_page, title: "foo")
           @builder = create(:builder_user)
@@ -219,9 +213,7 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
 
     context "destroy action" do
       setup do
-        as_user do
-          @wiki_page = create(:wiki_page)
-        end
+        @wiki_page = as(@user) { create(:wiki_page) }
         @mod = create(:mod_user)
       end
 
@@ -234,7 +226,7 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
 
     context "revert action" do
       setup do
-        as_user do
+        as(@user) do
           @wiki_page = create(:wiki_page, body: "1")
           travel(1.day)
           @wiki_page.update(body: "1 2")
@@ -252,9 +244,7 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow reverting to a previous version of another wiki page" do
-        as_user do
-          @wiki_page_2 = create(:wiki_page)
-        end
+        @wiki_page_2 = as(@user) { create(:wiki_page) }
 
         put_auth revert_wiki_page_path(@wiki_page), @user, params: { :version_id => @wiki_page_2.versions.first.id }
         @wiki_page.reload

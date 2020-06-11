@@ -12,7 +12,7 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
 
     context "with votes" do
       setup do
-        as_user do
+        as(@user) do
           @bulk_update_request = create(:bulk_update_request, forum_post: @forum_post)
           @vote = create(:forum_post_vote, forum_post: @forum_post, score: 1)
           @forum_post.reload

@@ -5,7 +5,7 @@ class ArtistCommentariesControllerTest < ActionDispatch::IntegrationTest
     setup do
       @user = create(:user)
 
-      as_user do
+      as(@user) do
         @commentary1 = create(:artist_commentary)
         @commentary2 = create(:artist_commentary)
       end

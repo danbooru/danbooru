@@ -131,9 +131,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a post that has already been uploaded" do
         setup do
-          as_user do
-            @post = create(:post, :source => "http://google.com/aaa")
-          end
+          @post = as(@user) { create(:post, source: "http://google.com/aaa") }
         end
 
         should "initialize the post" do
@@ -147,7 +145,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        as_user do
+        as(@user) do
           @upload = create(:source_upload, tag_string: "foo bar")
           @upload2 = create(:source_upload, tag_string: "tagme", rating: "e")
         end
@@ -180,9 +178,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
     context "show action" do
       setup do
-        as_user do
-          @upload = create(:jpg_upload)
-        end
+        @upload = as(@user) { create(:jpg_upload) }
       end
 
       should "render" do
@@ -195,7 +191,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       context "when a preprocessed upload already exists" do
         context "for twitter" do
           setup do
-            as_user do
+            as(@user) do
               @ref = "https://twitter.com/onsen_musume_jp/status/865534101918330881"
               @source = "https://pbs.twimg.com/media/DAL-ntWV0AEbhes.jpg:orig"
               @upload = create(:upload, status: "preprocessed", source: @source, referer_url: @ref, image_width: 0, image_height: 0, file_size: 0, md5: "something", file_ext: "jpg")
@@ -217,9 +213,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           setup do
             @ref = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=49270482"
             @source = "https://i.pximg.net/img-original/img/2015/03/14/17/53/32/49270482_p0.jpg"
-            as_user do
-              @upload = create(:upload, status: "preprocessed", source: @source, referer_url: @ref, image_width: 0, image_height: 0, file_size: 0, md5: "something", file_ext: "jpg")
-            end
+            @upload = as(@user) { create(:upload, status: "preprocessed", source: @source, referer_url: @ref, image_width: 0, image_height: 0, file_size: 0, md5: "something", file_ext: "jpg") }
           end
 
           should "update the predecessor" do

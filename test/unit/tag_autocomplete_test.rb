@@ -98,7 +98,7 @@ class TagAutocompleteTest < ActiveSupport::TestCase
         create(:tag, name: "abcdef", post_count: 1),
         create(:tag, name: "zzzzzz", post_count: 1)
       ]
-      as_user do
+      as(@user) do
         @aliases = [
           create(:tag_alias, antecedent_name: "/abc", consequent_name: "abcdef", status: "active")
         ]
