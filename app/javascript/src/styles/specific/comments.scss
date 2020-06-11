@@ -11,6 +11,10 @@ div.comments-for-post {
     margin: 1em 0;
   }
 
+  div.comments-locked-for-post {
+    font-weight: bold;
+  }
+
   div.list-of-comments {
     article.comment {
       flex: 1;

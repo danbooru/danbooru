@@ -1,0 +1,38 @@
+<div id="c-post-locks">
+  <div id="a-index">
+    <h1>Post locks</h1>
+
+    <%= render "posts/partials/common/inline_blacklist" %>
+
+    <%= table_for @post_locks, width: "100%" do |t| %>
+      <% t.column "Post", width: "1%" do |lock| %>
+        <%= PostPresenter.preview(lock.post, show_deleted: true) %>
+      <% end %>
+      <% t.column "Reason" do |lock| %>
+        <span class="prose">
+          <%= format_text lock.reason, inline: true %>
+        </span>
+      <% end %>
+      <% t.column "Locks", width: "5%" do |lock| %>
+        <%= post_lock_all_locks(lock) %>
+      <% end %>
+      <% t.column "Actions", width: "8%" do |lock| %>
+        <%= post_lock_actions(lock) %>
+      <% end %>
+      <% t.column "Expires", width: "5%" do |lock| %>
+        <%= post_lock_expires_status(lock) %>
+      <% end %>
+      <% t.column "Edit level", width: "5%" do |lock| %>
+        <%= User.level_string(lock.min_level) %>
+      <% end %>
+      <% t.column "Creator", width: "15%" do |lock| %>
+        <%= compact_time lock.created_at %>
+        <br> by <%= link_to_user lock.creator %>
+      <% end %>
+    <% end %>
+
+    <%= numbered_paginator(@post_locks) %>
+  </div>
+</div>
+
+<% render "secondary_links" %>

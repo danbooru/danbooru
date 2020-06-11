@@ -8,6 +8,7 @@ class Pool < ApplicationRecord
   validate :validate_name, if: :name_changed?
   validates_inclusion_of :category, :in => %w(series collection)
   validate :updater_can_edit_deleted
+  validate :validate_changed_posts_are_not_locked
   before_validation :normalize_post_ids
   before_validation :normalize_name
   after_save :create_version
@@ -149,6 +150,22 @@ class Pool < ApplicationRecord
     if is_deleted? && !Pundit.policy!([CurrentUser.user, nil], self).update?
       errors[:base] << "You cannot update pools that are deleted"
     end
+  end
+
+  def changed_post_ids
+    post_ids_change&.flatten || []
+  end
+
+  def changed_post_ids_locks
+    changed_post_ids.present? ? PostLock.where(post_id: changed_post_ids).unexpired.bit_flags_match(:pools_lock, true) : []
+  end
+
+  def post_changes_locked_for_user
+    changed_post_ids_locks.present? && !Pundit.policy!([CurrentUser.user, nil], PostLock).lock_pools?
+  end
+
+  def validate_changed_posts_are_not_locked
+    errors[:post_changes] << "have one or more active pool locks" if post_changes_locked_for_user
   end
 
   def create_mod_action_for_delete

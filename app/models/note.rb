@@ -6,9 +6,9 @@ class Note < ApplicationRecord
   has_many :versions, -> {order("note_versions.id ASC")}, :class_name => "NoteVersion", :dependent => :destroy
   validates_presence_of :x, :y, :width, :height, :body
   validate :note_within_image
+  validate :validate_post_is_not_locked
   after_save :update_post
   after_save :create_version
-  validate :validate_post_is_not_locked
 
   scope :active, -> { where(is_active: true) }
 
@@ -26,7 +26,7 @@ class Note < ApplicationRecord
   extend SearchMethods
 
   def validate_post_is_not_locked
-    errors[:post] << "is note locked" if post.is_note_locked?
+    errors[:post] << "has an active notes lock" if post.notes_locked_for_user
   end
 
   def note_within_image

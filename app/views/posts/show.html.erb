@@ -30,6 +30,9 @@
       <li id="post-history-pools"><%= link_to "Pools", pool_versions_path(search: { post_id: @post.id }) %></li>
       <li id="post-history-notes"><%= link_to "Notes", note_versions_path(search: { post_id: @post.id }) %></li>
       <li id="post-history-moderation"><%= link_to "Moderation", post_events_path(@post.id) %></li>
+      <% if policy(PostLock).index? %>
+        <li id="post-history-locks"><%= link_to "Locks", post_locks_path(search: { post_id: @post.id }) %></li>
+      <% end %>
       <li id="post-history-commentary"><%= link_to "Commentary", artist_commentary_versions_path(search: { post_id: @post.id }) %></li>
       <li id="post-history-replacements"><%= link_to "Replacements", post_replacements_path(search: {post_id: @post.id }) %></li>
     </ul>

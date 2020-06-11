@@ -25,7 +25,10 @@ class Post < ApplicationRecord
   validate :has_copyright_tag
   validate :has_enough_tags
   validate :post_is_not_its_own_parent
+  validate :updater_can_change_tags
   validate :updater_can_change_rating
+  validate :updater_can_change_parent
+  validate :updater_can_change_source
   validate :uploader_is_not_limited, on: :create
   before_save :update_tag_post_counts
   before_save :set_tag_counts
@@ -47,6 +50,7 @@ class Post < ApplicationRecord
   has_many :flags, :class_name => "PostFlag", :dependent => :destroy
   has_many :appeals, :class_name => "PostAppeal", :dependent => :destroy
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
+  has_many :locks, :class_name => "PostLock", :dependent => :destroy
   has_many :notes, :dependent => :destroy
   has_many :comments, -> {order("comments.id")}, :dependent => :destroy
   has_many :moderation_reports, through: :comments
@@ -280,7 +284,7 @@ class Post < ApplicationRecord
 
   module ApprovalMethods
     def is_approvable?(user = CurrentUser.user)
-      !is_status_locked? && (is_pending? || is_flagged? || is_deleted?) && uploader != user
+      !status_locked_for_user && (is_pending? || is_flagged? || is_deleted?) && uploader != user
     end
 
     def flag!(reason, is_deletion: false)
@@ -599,30 +603,40 @@ class Post < ApplicationRecord
       end
     end
 
+    def apply_pool_metatag(metatag)
+      return unless updater_can_change_pools
+
+      case metatag
+      when /^-pool:(\d+)$/i
+        pool = Pool.find_by_id($1.to_i)
+        remove_pool!(pool) if pool
+
+      when /^-pool:(.+)$/i
+        pool = Pool.find_by_name($1)
+        remove_pool!(pool) if pool
+
+      when /^pool:(\d+)$/i
+        pool = Pool.find_by_id($1.to_i)
+        add_pool!(pool) if pool
+
+      when /^pool:(.+)$/i
+        pool = Pool.find_by_name($1)
+        add_pool!(pool) if pool
+
+      when /^newpool:(.+)$/i
+        pool = Pool.find_by_name($1)
+        add_pool!(pool) if pool
+
+      end
+    end
+
     def apply_post_metatags
       return unless @post_metatags
 
       @post_metatags.each do |tag|
         case tag
-        when /^-pool:(\d+)$/i
-          pool = Pool.find_by_id($1.to_i)
-          remove_pool!(pool) if pool
-
-        when /^-pool:(.+)$/i
-          pool = Pool.find_by_name($1)
-          remove_pool!(pool) if pool
-
-        when /^pool:(\d+)$/i
-          pool = Pool.find_by_id($1.to_i)
-          add_pool!(pool) if pool
-
-        when /^pool:(.+)$/i
-          pool = Pool.find_by_name($1)
-          add_pool!(pool) if pool
-
-        when /^newpool:(.+)$/i
-          pool = Pool.find_by_name($1)
-          add_pool!(pool) if pool
+        when /^(new|-)?pool:(.+)$/i
+          apply_pool_metatag(tag)
 
         when /^fav:(.+)$/i
           add_favorite!(CurrentUser.user)
@@ -700,14 +714,14 @@ class Post < ApplicationRecord
         when /^rating:([qse])/i
           self.rating = $1
 
-        when /^(-?)locked:notes?$/i
-          self.is_note_locked = ($1 != "-") if CurrentUser.is_builder?
+        when /^(-?)locked:(#{PostLock::TYPE_REGEX})$/i
+          change_lock($2, ($1 != "-"))
 
-        when /^(-?)locked:rating$/i
-          self.is_rating_locked = ($1 != "-") if CurrentUser.is_builder?
+        when /^locked:all$/i
+          change_all_locks(true)
 
-        when /^(-?)locked:status$/i
-          self.is_status_locked = ($1 != "-") if CurrentUser.is_admin?
+        when /^locked:none$/i
+          change_all_locks(false)
 
         end
       end
@@ -893,6 +907,64 @@ class Post < ApplicationRecord
     end
   end
 
+  module LockMethods
+    def active_lock
+      @active_lock ||= begin
+        locks.unexpired.limit(1).to_a
+      end
+      @active_lock.first
+    end
+
+    def invalidate_active_lock
+      @active_lock = nil
+    end
+
+    PostLock::ALL_TYPES.each do |lock_type|
+      define_method("has_active_#{lock_type}_lock") do
+        active_lock.present? && active_lock.send("#{lock_type}_lock")
+      end
+
+      define_method("#{lock_type}_locked_for_user") do
+        send("has_active_#{lock_type}_lock") && !Pundit.policy!([CurrentUser.user, nil], PostLock).send("lock_#{lock_type}?")
+      end
+    end
+
+    def edit_locks?(user = CurrentUser.user)
+      active_lock.blank? || active_lock&.editable_by?(user)
+    end
+
+    def create_or_update_lock(attributes)
+      if PostLock.update_existing_lock?(active_lock, CurrentUser.user)
+        active_lock.update_locks(attributes)
+      else
+        attributes[:reason] ||= "Set with post edit."
+        if active_lock
+          active_lock.carryover_locks(attributes)
+        else
+          new_lock = PostLock.new(creator: CurrentUser.user, post_id: id, **attributes)
+          new_lock.save
+        end
+      end
+
+      invalidate_active_lock
+    end
+
+    def change_lock(value, is_add)
+      raise User::PrivilegeError unless Pundit.policy!([CurrentUser.user, nil], PostLock).set_locks_with_post_edits?
+
+      lock_type = (PostLock::TYPE_MAPPING[value] + "_lock").to_sym
+      raise ::User::PrivilegeError unless Pundit.policy!([CurrentUser.user, nil], PostLock).permitted_locks.include?(lock_type)
+      create_or_update_lock(Hash[lock_type, is_add])
+    end
+
+    def change_all_locks(value)
+      raise User::PrivilegeError unless Pundit.policy!([CurrentUser.user, nil], PostLock).set_locks_with_post_edits?
+
+      attributes = Pundit.policy!([CurrentUser.user, nil], PostLock).permitted_locks.map { |key| Hash[key, value] }.reduce({}, :merge)
+      create_or_update_lock(attributes)
+    end
+  end
+
   module ParentMethods
     # A parent has many children. A child belongs to a parent.
     # A parent cannot have a parent.
@@ -975,11 +1047,6 @@ class Post < ApplicationRecord
 
   module DeletionMethods
     def expunge!
-      if is_status_locked?
-        self.errors.add(:is_status_locked, "; cannot delete post")
-        return false
-      end
-
       transaction do
         Post.without_timeout do
           ModAction.log("permanently deleted post ##{id}", :post_permanent_delete)
@@ -1007,7 +1074,7 @@ class Post < ApplicationRecord
     end
 
     def delete!(reason, options = {})
-      if is_status_locked?
+      if status_locked_for_user
         self.errors.add(:is_status_locked, "; cannot delete post")
         return false
       end
@@ -1364,13 +1431,35 @@ class Post < ApplicationRecord
       end
     end
 
-    def updater_can_change_rating
-      if rating_changed? && is_rating_locked?
-        # Don't forbid changes if the rating lock was just now set in the same update.
-        if !is_rating_locked_changed?
-          errors.add(:rating, "is locked and cannot be changed. Unlock the post first.")
-        end
+    def updater_can_change_tags
+      if tag_string_changed? && tags_locked_for_user
+        errors.add(:tags, "are locked and cannot be changed.")
       end
+    end
+
+    def updater_can_change_rating
+      if rating_changed? && rating_locked_for_user
+        errors.add(:rating, "is locked and cannot be changed.")
+      end
+    end
+
+    def updater_can_change_parent
+      if parent_id_changed? && parent_locked_for_user
+        errors.add(:parent, "ID is locked and cannot be changed.")
+      end
+    end
+
+    def updater_can_change_source
+      if source_changed? && source_locked_for_user
+        errors.add(:source, "is locked and cannot be changed.")
+      end
+    end
+
+    def updater_can_change_pools
+      if pools_locked_for_user
+        warnings[:pools] << "are locked for this post and cannot be added or removed"
+      end
+      !pools_locked_for_user
     end
 
     def uploader_is_not_limited
@@ -1446,6 +1535,7 @@ class Post < ApplicationRecord
   include FavoriteMethods
   include PoolMethods
   include VoteMethods
+  include LockMethods
   include ParentMethods
   include DeletionMethods
   include VersionMethods
@@ -1510,6 +1600,6 @@ class Post < ApplicationRecord
   end
 
   def self.available_includes
-    [:uploader, :updater, :approver, :parent, :upload, :artist_commentary, :flags, :appeals, :notes, :comments, :children, :approvals, :replacements, :pixiv_ugoira_frame_data]
+    [:uploader, :updater, :approver, :parent, :upload, :artist_commentary, :flags, :appeals, :notes, :comments, :children, :approvals, :locks, :replacements, :pixiv_ugoira_frame_data]
   end
 end

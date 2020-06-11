@@ -113,7 +113,7 @@ class PostFlag < ApplicationRecord
 
   def validate_post
     errors[:post] << "is pending and cannot be flagged" if post.is_pending? && !is_deletion
-    errors[:post] << "is locked and cannot be flagged" if post.is_status_locked?
+    errors[:post] << "is locked and cannot be flagged" if post.status_locked_for_user
     errors[:post] << "is deleted" if post.is_deleted?
   end
 

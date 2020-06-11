@@ -1,6 +1,7 @@
 class Comment < ApplicationRecord
   validate :validate_creator_is_not_limited, :on => :create
   validates_presence_of :body, :message => "has no content"
+  validate :validate_post_is_not_locked
   belongs_to :post
   belongs_to :creator, class_name: "User"
   belongs_to_updater
@@ -84,6 +85,11 @@ class Comment < ApplicationRecord
     if creator.is_comment_limited? && !do_not_bump_post?
       errors.add(:base, "You can only post #{Danbooru.config.member_comment_limit} comments per hour")
     end
+  end
+
+  def validate_post_is_not_locked
+    return false if post.blank?
+    errors[:post] << "has an active comments lock" if post.comments_locked_for_user
   end
 
   def autoreport_spam

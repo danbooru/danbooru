@@ -15,39 +15,23 @@
   <%= f.input :old_source, as: :hidden, input_html: { value: post.source } %>
   <%= f.input :old_rating, as: :hidden, input_html: { value: post.rating } %>
 
-  <% if post.is_rating_locked? %>
-    This post is rating locked.
-  <% else %>
-    <%= f.input :rating, collection: [["Explicit", "e"], ["Questionable", "q"], ["Safe", "s"]], as: :radio_buttons, boolean_style: :inline %>
-  <% end %>
+  <%= f.input :rating, label: "Rating" + (post.rating_locked_for_user ? " (locked)" : ""), collection: [["Explicit", "e"], ["Questionable", "q"], ["Safe", "s"]], as: :radio_buttons, boolean_style: :inline, disabled: post.rating_locked_for_user %>
 
   <fieldset class="inline-fieldset">
-    <label>Notes</label>
-    <%= f.input :has_embedded_notes, label: "Embed notes", as: :boolean, boolean_style: :inline, disabled: post.is_note_locked? %>
+    <label>Notes
+      <% if post.notes_locked_for_user %>
+        (locked)
+      <% end %>
+    </label>
+    <%= f.input :has_embedded_notes, label: "Embed notes", as: :boolean, boolean_style: :inline, disabled: post.notes_locked_for_user %>
   </fieldset>
 
-  <% if policy(post).can_lock_rating? || policy(post).can_lock_notes? || policy(post).can_lock_status? %>
-    <fieldset class="inline-fieldset">
-      <label>Lock</label>
-
-      <% if policy(post).can_lock_rating? %>
-        <%= f.input :is_rating_locked, label: "Rating", as: :boolean, boolean_style: :inline  %>
-      <% end %>
-      <% if policy(post).can_lock_notes? %>
-        <%= f.input :is_note_locked, label: "Notes", as: :boolean, boolean_style: :inline  %>
-      <% end %>
-      <% if policy(post).can_lock_status? %>
-        <%= f.input :is_status_locked, label: "Status", as: :boolean, boolean_style: :inline  %>
-      <% end %>
-    </fieldset>
-  <% end %>
-
-  <%= f.input :parent_id, label: "Parent", input_html: { size: 60 }, as: :string %>
-  <%= f.input :source, input_html: { size: 60 } %>
+  <%= f.input :parent_id, label: "Parent" + (post.parent_locked_for_user ? " (locked)" : ""), input_html: { size: 60 }, as: :string, disabled: post.parent_locked_for_user %>
+  <%= f.input :source, label: "Source" + (post.source_locked_for_user ? " (locked)" : ""), input_html: { size: 60 }, disabled: post.source_locked_for_user %>
 
   <div class="input fixed-width-container" id="tags-container">
     <div class="header">
-      <%= f.label :tag_string, "Tags" %>
+      <%= f.label :tag_string, "Tags" + (post.tags_locked_for_user ? " (locked)" : "") %>
 
       <span class="options">
         <i id="face" class="fas"></i>
@@ -57,7 +41,7 @@
     </div>
 
     <div>
-      <%= f.input :tag_string, label: false, input_html: { size: "60x5", spellcheck: false, "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.presenter.split_tag_list_text + " " } %>
+      <%= f.input :tag_string, label: false, input_html: { size: "60x5", spellcheck: false, "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.presenter.split_tag_list_text + " " }, disabled: post.tags_locked_for_user %>
     </div>
 
     <%= render "related_tags/buttons" %>

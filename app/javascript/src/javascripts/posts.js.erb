@@ -3,6 +3,7 @@ import Utility from './utility'
 import Hammer from 'hammerjs'
 import Cookie from './cookie'
 import Note from './notes'
+import PostLock from './post_locks'
 import Ugoira from './ugoira'
 import Rails from '@rails/ujs'
 
@@ -33,6 +34,7 @@ Post.initialize_all = function() {
     this.initialize_favlist();
     this.initialize_post_sections();
     this.initialize_post_image_resize_links();
+    this.initialize_dialog_links();
     this.initialize_recommended();
     this.initialize_ugoira_player();
   }
@@ -359,6 +361,10 @@ Post.initialize_post_image_resize_links = function() {
       }
     });
   }
+}
+
+Post.initialize_dialog_links = function() {
+  $(document).on("click.danbooru", ".select-locks", PostLock.modify_locks);
 }
 
 Post.initialize_excerpt = function() {

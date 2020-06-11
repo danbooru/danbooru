@@ -45,9 +45,8 @@ class PostAppeal < ApplicationRecord
   end
 
   def validate_post_is_inactive
-    if resolved?
-      errors[:post] << "is active"
-    end
+    errors[:post] << "is active" if resolved?
+    errors[:post] << "is locked and cannot be appealed" if post.status_locked_for_user
   end
 
   def appeal_count_for_creator

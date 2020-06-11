@@ -164,6 +164,12 @@ Rails.application.routes.draw do
     resource :order, :only => [:edit], :controller => "pool_orders"
   end
   resource :pool_element, :only => [:create]
+  resources :post_locks, only: [:new, :index, :show] do
+    collection do
+      put :create_or_update
+      get :search
+    end
+  end
   resources :pool_versions, :only => [:index] do
     member do
       get :diff

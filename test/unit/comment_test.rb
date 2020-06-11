@@ -262,5 +262,20 @@ class CommentTest < ActiveSupport::TestCase
       subject { FactoryBot.build(:comment) }
       should_not allow_value(" ").for(:body)
     end
+
+    context "when locked" do
+      setup do
+        @post = FactoryBot.create(:post)
+        CurrentUser.scoped(create(:moderator_user)) do
+          @lock = create(:post_lock, post: @post, comments_lock: true)
+        end
+      end
+
+      should "not allow comments" do
+        assert_raises ActiveRecord::RecordInvalid do
+          @artcomm = FactoryBot.create(:comment, post_id: @post.id, body: "foo baz")
+        end
+      end
+    end
   end
 end

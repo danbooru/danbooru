@@ -1,0 +1,6 @@
+<% content_for(:secondary_links) do %>
+  <%= quick_search_form_for(:reason_matches, post_locks_path, "locks") %>
+  <%= subnav_link_to "Search", search_post_locks_path %>
+  <%= subnav_link_to "Listing", post_locks_path %>
+  <%= subnav_link_to "Help", wiki_page_path("help:post_locks") %>
+<% end %>

@@ -233,6 +233,20 @@ class PoolTest < ActiveSupport::TestCase
       end
     end
 
+    context "by adding a post with a pool lock" do
+      setup do
+        @post = FactoryBot.create(:post)
+        CurrentUser.scoped(create(:builder_user)) do
+          @lock = create(:post_lock, post: @post, pools_lock: true)
+        end
+      end
+
+      should "should fail" do
+        @pool.add!(@post)
+        assert_equal(["Post changes have one or more active pool locks"], @pool.errors.full_messages)
+      end
+    end
+
     should "create new versions for each distinct user" do
       assert_equal(1, @pool.versions.size)
 

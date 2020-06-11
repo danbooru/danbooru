@@ -32,36 +32,42 @@
       <%= render "application/update_notice", record: comment %>
       
       <% if policy(comment).create? %>
-        <menu>
+        <% if comment.post.comments_locked_for_user %>
           <% if context == :index_by_comment %>
-            <li><%= link_to "Reply", new_comment_path(id: comment, comment: { post_id: comment.post_id }), class: "reply-link" %></li>
-          <% else %>
-            <li><%= link_to "Reply", new_comment_path(id: comment, comment: { post_id: comment.post_id }), class: "reply-link", remote: true %></li>
+            <div class="comments-locked-for-post fineprint">Comments are locked on post</div>
           <% end %>
-
-          <% if policy(comment).update? %>
-            <% if comment.is_deleted? %>
-              <li><%= link_to "Undelete", undelete_comment_path(comment.id), method: :post, remote: true %></li>
+        <% else %>
+          <menu>
+            <% if context == :index_by_comment %>
+              <li><%= link_to "Reply", new_comment_path(id: comment, comment: { post_id: comment.post_id }), class: "reply-link" %></li>
             <% else %>
-              <li><%= link_to "Delete", comment_path(comment.id), "data-confirm": "Are you sure you want to delete this comment?", method: :delete, remote: true %></li>
+              <li><%= link_to "Reply", new_comment_path(id: comment, comment: { post_id: comment.post_id }), class: "reply-link", remote: true %></li>
             <% end %>
-            <li><%= link_to "Edit", edit_comment_path(comment.id), id: "edit_comment_link_#{comment.id}", class: "edit_comment_link" %></li>
+
+            <% if policy(comment).update? %>
+              <% if comment.is_deleted? %>
+                <li><%= link_to "Undelete", undelete_comment_path(comment.id), method: :post, remote: true %></li>
+              <% else %>
+                <li><%= link_to "Delete", comment_path(comment.id), "data-confirm": "Are you sure you want to delete this comment?", method: :delete, remote: true %></li>
+              <% end %>
+              <li><%= link_to "Edit", edit_comment_path(comment.id), id: "edit_comment_link_#{comment.id}", class: "edit_comment_link" %></li>
+            <% end %>
+            <li class="comment-vote-up-link">
+              <%= link_to "Vote up", comment_comment_votes_path(comment_id: comment.id, score: "up"), method: :post, remote: true %>
+            </li>
+            <li class="comment-vote-down-link">
+              <%= link_to "Vote down", comment_comment_votes_path(comment_id: comment.id, score: "down"), method: :post, remote: true %>
+            </li>
+            <li class="comment-unvote-link">
+              <%= link_to "Unvote", comment_comment_votes_path(comment_id: comment.id), method: :delete, remote: true %>
+            </li>
+            <% if policy(comment).reportable? %>
+              <li><%= link_to "Report", new_moderation_report_path(moderation_report: { model_type: "Comment", model_id: comment.id }), remote: true %></li>
+            <% end %>
+          </menu>
+          <% if policy(comment).update? %>
+            <%= render "comments/form", comment: comment, hidden: true %>
           <% end %>
-          <li class="comment-vote-up-link">
-            <%= link_to "Vote up", comment_comment_votes_path(comment_id: comment.id, score: "up"), method: :post, remote: true %>
-          </li>
-          <li class="comment-vote-down-link">
-            <%= link_to "Vote down", comment_comment_votes_path(comment_id: comment.id, score: "down"), method: :post, remote: true %>
-          </li>
-          <li class="comment-unvote-link">
-            <%= link_to "Unvote", comment_comment_votes_path(comment_id: comment.id), method: :delete, remote: true %>
-          </li>
-          <% if policy(comment).reportable? %>
-            <li><%= link_to "Report", new_moderation_report_path(moderation_report: { model_type: "Comment", model_id: comment.id }), remote: true %></li>
-          <% end %>
-        </menu>
-        <% if policy(comment).update? %>
-          <%= render "comments/form", comment: comment, hidden: true %>
         <% end %>
       <% end %>
     </div>

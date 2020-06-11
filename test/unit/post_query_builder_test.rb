@@ -792,10 +792,15 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for a locked:<rating|note|status> metatag" do
-      rating_locked = create(:post, is_rating_locked: true)
-      note_locked   = create(:post, is_note_locked: true)
-      status_locked = create(:post, is_status_locked: true)
+      rating_locked = create(:post)
+      note_locked   = create(:post)
+      status_locked = create(:post)
       all = [status_locked, note_locked, rating_locked]
+      CurrentUser.scoped(create(:admin_user)) do
+        create(:post_lock, post: rating_locked, rating_lock: true)
+        create(:post_lock, post: note_locked, notes_lock: true)
+        create(:post_lock, post: status_locked, status_lock: true)
+      end
 
       assert_tag_match([rating_locked], "locked:rating")
       assert_tag_match([note_locked], "locked:note")
@@ -811,6 +816,9 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([], "locked:garbage")
       assert_tag_match(all, "-locked:garbage")
+
+      assert_tag_match(all, "locked:all")
+      assert_tag_match([], "locked:none")
     end
 
     should "return posts for a upvote:<user>, downvote:<user> metatag" do

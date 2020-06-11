@@ -2708,6 +2708,45 @@ ALTER SEQUENCE public.post_flags_id_seq OWNED BY public.post_flags.id;
 
 
 --
+-- Name: post_locks; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.post_locks (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    post_id integer NOT NULL,
+    bit_flags integer DEFAULT 0 NOT NULL,
+    bit_changes integer DEFAULT 0 NOT NULL,
+    duration_set boolean DEFAULT false NOT NULL,
+    reason text NOT NULL,
+    creator_id integer NOT NULL,
+    min_level integer NOT NULL,
+    level_set boolean DEFAULT false NOT NULL,
+    expires_at timestamp without time zone NOT NULL
+);
+
+
+--
+-- Name: post_locks_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.post_locks_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: post_locks_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.post_locks_id_seq OWNED BY public.post_locks.id;
+
+
+--
 -- Name: post_replacements; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4086,6 +4125,13 @@ ALTER TABLE ONLY public.post_flags ALTER COLUMN id SET DEFAULT nextval('public.p
 
 
 --
+-- Name: post_locks id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.post_locks ALTER COLUMN id SET DEFAULT nextval('public.post_locks_id_seq'::regclass);
+
+
+--
 -- Name: post_replacements id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4438,6 +4484,14 @@ ALTER TABLE ONLY public.post_disapprovals
 
 ALTER TABLE ONLY public.post_flags
     ADD CONSTRAINT post_flags_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: post_locks post_locks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.post_locks
+    ADD CONSTRAINT post_locks_pkey PRIMARY KEY (id);
 
 
 --
@@ -6672,6 +6726,20 @@ CREATE INDEX index_post_flags_on_reason_tsvector ON public.post_flags USING gin 
 
 
 --
+-- Name: index_post_locks_on_creator_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_locks_on_creator_id ON public.post_locks USING btree (creator_id);
+
+
+--
+-- Name: index_post_locks_on_post_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_locks_on_post_id ON public.post_locks USING btree (post_id);
+
+
+--
 -- Name: index_post_replacements_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7393,6 +7461,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200325074859'),
 ('20200403210353'),
 ('20200406054838'),
-('20200427190519');
+('20200427190519'),
+('20200607014833');
 
 

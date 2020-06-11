@@ -8,7 +8,7 @@ class PostApproval < ApplicationRecord
   def validate_approval
     post.lock!
 
-    if post.is_status_locked?
+    if post.status_locked_for_user
       errors.add(:post, "is locked and cannot be approved")
     end
 

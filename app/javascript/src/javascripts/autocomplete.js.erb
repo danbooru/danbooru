@@ -6,6 +6,7 @@ let Autocomplete = {};
 Autocomplete.METATAGS = <%= PostQueryBuilder::METATAGS.to_json.html_safe %>;
 Autocomplete.TAG_CATEGORIES = <%= TagCategory.mapping.to_json.html_safe %>;
 Autocomplete.ORDER_METATAGS = <%= PostQueryBuilder::ORDER_METATAGS.to_json.html_safe %>;
+Autocomplete.LOCK_TYPES = <%= PostLock::POST_QUERY_TYPES.to_json.html_safe %>
 Autocomplete.DISAPPROVAL_REASONS = <%= PostDisapproval::REASONS.to_json.html_safe %>;
 /* eslint-enable */
 
@@ -274,9 +275,7 @@ Autocomplete.static_metatags = {
   rating: [
     "safe", "questionable", "explicit"
   ],
-  locked: [
-    "rating", "note", "status"
-  ],
+  locked: Autocomplete.LOCK_TYPES,
   embedded: [
     "true", "false"
   ],

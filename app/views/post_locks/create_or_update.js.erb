@@ -1,5 +1,5 @@
 <% if @has_error %>
   Danbooru.Utility.error("<%= j flash[:error] %>");
 <% else %>
-  location.reload();
+  Danbooru.Utility.notice("Lock submitted");
 <% end %>

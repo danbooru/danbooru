@@ -1,0 +1,56 @@
+<%# XXX dtext_field expects there to be a `post_lock` instance variable. %>
+<% @post_lock = post_lock %>
+
+<div class="post-lock-dialog-body">
+  <%= embed_wiki("help:post_lock_notice") %>
+  <div class="post-lock-current-expiration">
+    <h4>Current expiration</h4>
+    <%= post_lock_current_expiration(@post_lock) %>
+  </div>
+  <div class="post-lock-set-expiration">
+    <h4>Set expiration</h4>
+    <%= post_lock_set_expiration(@post_lock) %>
+  </div>
+
+  <%= edit_form_for(@post_lock, url: create_or_update_post_locks_path(format: :js), remote: true, method: :put) do |f| %>
+    <%= f.hidden_field :post_id %>
+    <% if policy(@post_lock).set_duration? %>
+      <%= f.input :duration, input_html: { size: "10", style: "max-width:unset;width:unset" }, hint: "Days from now. (optional)" %>
+    <% end %>
+    <% if policy(post_lock).moderate? %>
+      <%= f.input :edit_level, include_blank: false, collection: available_min_user_levels, selected: post_lock.min_level, hint: "Restricts edits to the post lock while unexpired." %>
+    <% end %>
+    <h4>Locks</h4>
+    <div class="lock-controls">
+      <span class= "lock-group" data-types="<%= PostLock::ALL_TYPES.join(",") %>">
+        All (
+        <a href="#" class="select-locks" data-operation="on">On</a> |
+        <a href="#" class="select-locks" data-operation="off">Off</a> |
+        <a href="#" class="select-locks" data-operation="invert">Invert</a>
+        )
+      </span>
+      :
+      <span class= "lock-group" data-types="<%= PostLock::POST_TYPES.join(",") %>">
+        Post fields (
+        <a href="#" class="select-locks" data-operation="on">On</a> |
+        <a href="#" class="select-locks" data-operation="off">Off</a> |
+        <a href="#" class="select-locks" data-operation="invert">Invert</a>
+        )
+      </span>
+    </div>
+    <hr>
+    <div class="list-of-post-locks">
+      <% PostLock::ALL_TYPES.each do |flag| %>
+        <% if policy(@post_lock).send("lock_#{flag}?") %>
+          <%= f.input "#{flag}_lock".to_sym, label: flag.titleize, as: :boolean, selected: @post_lock.send("#{flag}_lock"), input_html: { "data-type": "#{flag}" } %>
+        <% end %>
+      <% end %>
+    </div>
+    <%= dtext_field "post_lock", "reason", required: true, preview_id: "dtext-preview-for-post-lock", type: "string" %>
+    <%= dtext_preview_button "post_lock", "reason", preview_id: "dtext-preview-for-post-lock" %>
+
+    <% if !dialog %>
+        <%= f.submit "Submit" %>
+    <% end %>
+  <% end %>
+</div>

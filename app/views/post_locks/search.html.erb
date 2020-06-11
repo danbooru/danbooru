@@ -1,0 +1,24 @@
+<div id="c-post-locks">
+  <div id="a-search">
+    <h1>Search Post Locks</h1>
+
+    <%= search_form_for(post_locks_path) do |f| %>
+      <%= f.input :reason_matches, label: "Reason" %>
+      <%= f.input :post_tags_match, label: "Tags", input_html: { data: { autocomplete: "tag-query" } } %>
+      <%= f.input :creator_name, label: "Creator Name", hint: "Use * for wildcard", input_html: { data: { autocomplete: "user" } } %>
+      <%= f.input :expires, include_blank: true, label: "Expires", collection: ["active", "edited", "removed", "expired"] %>
+      <% PostLock::ALL_LOCKS.each do |type| %>
+        <%= f.input type.to_sym, include_blank: true, collection: ["yes", "no"] %>
+      <% end %>
+      <% PostLock::ALL_CHANGES.each do |type| %>
+        <%= f.input type.to_sym, include_blank: true, collection: ["yes", "no"] %>
+      <% end %>
+      <%= f.input :duration_set, include_blank: true, label: "Duration set?", collection: ["yes", "no"] %>
+      <%= f.input :level_set, include_blank: true, label: "Level set?", collection: ["yes", "no"] %>
+      <%= f.input :order, include_blank: false, collection: [%w[Created id_desc], %w[Expiration expires_at_desc], %w[Post post_id_desc]], selected: params[:search][:order] %>
+      <%= f.submit "Search" %>
+    <% end %>
+  </div>
+</div>
+
+<% render "secondary_links" %>

@@ -89,7 +89,9 @@ class NoteTest < ActiveSupport::TestCase
 
       context "for a note-locked post" do
         setup do
-          @post.update_attribute(:is_note_locked, true)
+          CurrentUser.scoped(create(:builder_user)) do
+            create(:post_lock, post: @post, notes_lock: true)
+          end
         end
 
         should "fail" do
@@ -97,7 +99,7 @@ class NoteTest < ActiveSupport::TestCase
             @note = FactoryBot.build(:note, :post => @post)
             @note.save
           end
-          assert_equal(["Post is note locked"], @note.errors.full_messages)
+          assert_equal(["Post has an active notes lock"], @note.errors.full_messages)
         end
       end
     end
@@ -139,12 +141,14 @@ class NoteTest < ActiveSupport::TestCase
 
       context "for a note-locked post" do
         setup do
-          @post.update_attribute(:is_note_locked, true)
+          CurrentUser.scoped(create(:builder_user)) do
+            create(:post_lock, post: @post, notes_lock: true)
+          end
         end
 
         should "fail" do
           @note.update(x: 500)
-          assert_equal(["Post is note locked"], @note.errors.full_messages)
+          assert_equal(["Post has an active notes lock"], @note.errors.full_messages)
         end
       end
 

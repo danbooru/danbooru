@@ -27,6 +27,9 @@ class ArtistCommentariesController < ApplicationController
     post_id = params[:artist_commentary].delete(:post_id)
     @artist_commentary = authorize ArtistCommentary.find_or_initialize_by(post_id: post_id)
     @artist_commentary.update(permitted_attributes(@artist_commentary))
+
+    @has_error = !@artist_commentary.valid?
+    flash[:error] = @artist_commentary.errors.full_messages.join("; ") if @has_error
     respond_with(@artist_commentary)
   end
 

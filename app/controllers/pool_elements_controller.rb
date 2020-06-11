@@ -8,6 +8,9 @@ class PoolElementsController < ApplicationController
 
     @post = Post.find(params[:post_id])
     @pool.add!(@post)
+
+    @has_error = !@pool.valid?
+    flash[:error] = @pool.errors.full_messages.join("; ") if @has_error
     respond_with(@pool)
   end
 end

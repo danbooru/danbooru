@@ -1,0 +1,26 @@
+div.post-lock-dialog-body {
+  div.post-lock-current-expiration,
+  div.post-lock-set-expiration {
+    display: inline-block;
+    margin-right: 2em;
+    margin-bottom: 1em;
+  }
+
+  div.list-of-post-locks {
+    div.input {
+      display: inline-block;
+      margin-right: 0.5em;
+    }
+  }
+}
+
+div#c-post-locks div#a-new {
+  div.post-lock-dialog-body {
+    width: 800px;
+
+    input#post_lock_reason {
+      width: 800px;
+      max-width: unset;
+    }
+  }
+}

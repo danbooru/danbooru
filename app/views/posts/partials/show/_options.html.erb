@@ -31,10 +31,16 @@
   <% end %>
   <% if policy(post).update? %>
     <li id="post-option-edit"><%= link_to "Edit", "#edit", id: "side-edit-link" %></li>
-    <li id="post-option-add-to-pool"><%= link_to "Add to pool", "#", id: "pool" %></li>
+    <li id="post-option-add-to-pool">
+      <% if post.pools_locked_for_user %>
+        <span id="pool-locked-notice">Pools locked</span>
+      <% else %>
+        <%= link_to "Add to pool", "#", id: "pool" %>
+      <% end %>
+    </li>
     <li id="post-option-add-note">
-      <% if post.is_note_locked? %>
-        <span id="note-locked-notice">Note locked</span>
+      <% if post.notes_locked_for_user %>
+        <span id="note-locked-notice">Notes locked</span>
       <% else %>
         <%= link_to "Add note", "#", id: "translate", "data-shortcut": "n" %>
       <% end %>
@@ -42,13 +48,29 @@
     <% if post.has_notes? %>
       <li id="post-option-copy-notes"><%= link_to "Copy notes", "#", id: "copy-notes" %></li>
     <% end %>
-    <li id="post-option-add-commentary"><%= link_to "Add commentary", "#", id: "add-commentary" %></li>
+    <li id="post-option-add-commentary">
+      <% if post.commentary_locked_for_user %>
+        <span id="commentary-locked-notice">Commentary locked</span>
+      <% else %>
+        <%= link_to "Add commentary", "#", id: "add-commentary" %>
+      <% end %>
+    </li>
   <% end %>
   <% if policy(FavoriteGroup).create? %>
     <li id="post-option-add-fav-group"><%= link_to "Add to fav group", "#", id: "open-favgroup-dialog-link", "data-shortcut": "g" %></li>
   <% end %>
 
-    <% if post.is_status_locked? %>
+  <% if policy(PostLock).create_or_update? %>
+    <li>
+      <% if post.edit_locks? %>
+        <%= link_to "Update locks", new_post_lock_path(post_lock: { post_id: post.id }), remote: true, title: "Lock or unlock one of the post's functions" %>
+      <% else %>
+        <span id="locks-restricted-notice">Locks restricted</span>
+      <% end %>
+    </li>
+  <% end %>
+
+    <% if post.status_locked_for_user %>
       <li id="post-option-status-locked">Status locked</li>
     <% else %>
       <% if (!post.is_deleted? && !post.is_pending? && !post.is_flagged?) && policy(PostFlag).create? %>

@@ -102,5 +102,20 @@ class ArtistCommentaryTest < ActiveSupport::TestCase
         assert_equal("foo", @artcomm.translated_description)
       end
     end
+
+    context "when locked" do
+      setup do
+        @post = FactoryBot.create(:post)
+        CurrentUser.scoped(create(:builder_user)) do
+          @lock = create(:post_lock, post: @post, commentary_lock: true)
+        end
+      end
+
+      should "not allow edits" do
+        assert_raises ActiveRecord::RecordInvalid do
+          @artcomm = FactoryBot.create(:artist_commentary, post_id: @post.id, original_title: "foo", translated_title: "bar")
+        end
+      end
+    end
   end
 end

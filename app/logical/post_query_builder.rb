@@ -418,13 +418,14 @@ class PostQueryBuilder
   end
 
   def locked_matches(query)
-    case query.downcase
-    when "rating"
-      Post.where(is_rating_locked: true)
-    when "note", "notes"
-      Post.where(is_note_locked: true)
-    when "status"
-      Post.where(is_status_locked: true)
+    query = query.downcase
+    type = PostLock::TYPE_MAPPING[query]
+    if type
+      Post.where(locks: PostLock.unexpired.bit_flags_match("#{type}_lock", true))
+    elsif query == "all"
+      Post.where(locks: PostLock.unexpired)
+    elsif query == "none"
+      Post.where.not(locks: PostLock.unexpired)
     else
       Post.none
     end
