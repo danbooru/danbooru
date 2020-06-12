@@ -1,4 +1,4 @@
-[![Maintainability](https://api.codeclimate.com/v1/badges/a51f46fb460a35104d82/maintainability)](https://codeclimate.com/github/danbooru/danbooru/maintainability) [![Test Coverage](https://api.codeclimate.com/v1/badges/a51f46fb460a35104d82/test_coverage)](https://codeclimate.com/github/danbooru/danbooru/test_coverage)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/a51f46fb460a35104d82/test_coverage)](https://codeclimate.com/github/danbooru/danbooru/test_coverage) [![Discord](https://img.shields.io/discord/310432830138089472?label=Discord)](https://discord.gg/eSVKkUF)
 
 ## Installation
 
