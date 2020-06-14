@@ -1,8 +1,8 @@
 require 'test_helper'
 
-class PostViewCountServiceTest < ActiveSupport::TestCase
+class ReportbooruServiceTest < ActiveSupport::TestCase
   def setup
-    @service = PostViewCountService.new(reportbooru_server: "http://localhost:1234")
+    @service = ReportbooruService.new(reportbooru_server: "http://localhost:1234")
     @post = create(:post)
     @date = "2000-01-01"
   end

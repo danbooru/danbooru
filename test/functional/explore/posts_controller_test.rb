@@ -28,8 +28,17 @@ module Explore
         end
       end
 
+      context "#viewed" do
+        should "render" do
+          mock_post_view_rankings(Date.today, [[@post.id, 100]])
+          get viewed_explore_posts_path
+          assert_response :success
+        end
+      end
+
       context "#searches" do
         should "render" do
+          mock_post_search_rankings(Date.today, [["1girl", 100], ["original", 50]])
           get searches_explore_posts_path
           assert_response :success
         end
@@ -37,6 +46,7 @@ module Explore
 
       context "#missed_searches" do
         should "render" do
+          mock_missed_search_rankings([["1girl", 100], ["original", 50]])
           get missed_searches_explore_posts_path
           assert_response :success
         end

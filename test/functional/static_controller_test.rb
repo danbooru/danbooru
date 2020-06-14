@@ -16,6 +16,7 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
   context "sitemap action" do
     should "work" do
       create_list(:post, 3)
+      mock_post_search_rankings(Time.zone.yesterday, [["1girl", 100.0], ["2girls", 50.0]])
       get sitemap_path, as: :xml
       assert_response :success
     end

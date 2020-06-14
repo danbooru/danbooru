@@ -43,8 +43,6 @@ class ActiveSupport::TestCase
 
   setup do
     Socket.stubs(:gethostname).returns("www.example.com")
-    mock_popular_search_service!
-    mock_missed_search_service!
     WebMock.allow_net_connect!
 
     storage_manager = StorageManager::Local.new(base_dir: Dir.mktmpdir("uploads-test-storage-"))

@@ -169,8 +169,8 @@ module PostSets
       end
 
       def popular_tags
-        if PopularSearchService.enabled?
-          PopularSearchService.new(Date.today).tags
+        if reportbooru_service.enabled?
+          reportbooru_service.popular_searches(Date.today, limit: MAX_SIDEBAR_TAGS).map(&:first)
         else
           frequent_tags
         end
@@ -198,6 +198,10 @@ module PostSets
 
       def tag_list_html(**options)
         tag_set_presenter.tag_list_html(name_only: query.is_metatag?(:search), **options)
+      end
+
+      def reportbooru_service
+        @reportbooru_service ||= ReportbooruService.new
       end
     end
   end

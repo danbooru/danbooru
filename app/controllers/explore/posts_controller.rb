@@ -22,23 +22,23 @@ module Explore
 
     def viewed
       @date, @scale, @min_date, @max_date = parse_date(params)
-      @posts = PostViewCountService.new.popular_posts(@date)
+      @posts = ReportbooruService.new.popular_posts(@date)
       respond_with(@posts)
     end
 
     def searches
       @date, @scale, @min_date, @max_date = parse_date(params)
-      @search_service = PopularSearchService.new(@date)
+      @search_service = ReportbooruService.new
     end
 
     def missed_searches
-      @search_service = MissedSearchService.new
+      @search_service = ReportbooruService.new
     end
 
     private
 
     def parse_date(params)
-      date = params[:date].present? ? Date.parse(params[:date]) : Time.zone.today
+      date = params[:date].present? ? Date.parse(params[:date]) : Date.today
       scale = params[:scale].in?(["day", "week", "month"]) ? params[:scale] : "day"
       min_date = date.send("beginning_of_#{scale}")
       max_date = date.send("next_#{scale}").send("beginning_of_#{scale}")

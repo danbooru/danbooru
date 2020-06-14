@@ -3,13 +3,15 @@ require "test_helper"
 class PostsControllerTest < ActionDispatch::IntegrationTest
   context "The posts controller" do
     setup do
-      PopularSearchService.stubs(:enabled?).returns(false)
-
       @user = travel_to(1.month.ago) {create(:user)}
       @post = as(@user) { create(:post, tag_string: "aaaa") }
     end
 
     context "index action" do
+      setup do
+        mock_post_search_rankings(Date.today, [["1girl", 100], ["original", 50]])
+      end
+
       should "render" do
         get posts_path
         assert_response :success

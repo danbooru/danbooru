@@ -16,7 +16,7 @@
    </url>
 
    <% cache("sitemap", :expires_in => 24.hours) do %>
-      <% @popular_search_service.each_search do |tags, count| %>
+      <% @reportbooru_service.post_search_rankings(Date.yesterday) do |tags, count| %>
          <url>
             <loc><%= posts_url(tags: tags) %></loc>
             <lastmod><%= Date.today %></lastmod>
