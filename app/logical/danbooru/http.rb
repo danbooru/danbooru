@@ -1,14 +1,19 @@
 module Danbooru
   class Http
     DEFAULT_TIMEOUT = 3
+    MAX_REDIRECTS = 5
 
     attr_writer :cache, :http
 
     class << self
-      delegate :get, :post, :delete, :cache, :auth, :basic_auth, :headers, to: :new
+      delegate :get, :put, :post, :delete, :cache, :timeout, :auth, :basic_auth, :headers, to: :new
     end
 
     def get(url, **options)
+      request(:get, url, **options)
+    end
+
+    def put(url, **options)
       request(:get, url, **options)
     end
 
@@ -22,6 +27,10 @@ module Danbooru
 
     def cache(expiry)
       dup.tap { |o| o.cache = expiry.to_i }
+    end
+
+    def timeout(*args)
+      dup.tap { |o| o.http = o.http.timeout(*args) }
     end
 
     def auth(*args)
@@ -44,9 +53,11 @@ module Danbooru
       else
         raw_request(method, url, **options)
       end
+    rescue HTTP::Redirector::TooManyRedirectsError
+      ::HTTP::Response.new(status: 598, body: "", version: "1.1")
     rescue HTTP::TimeoutError
       # return a synthetic http error on connection timeouts
-      ::HTTP::Response.new(status: 522, body: "", version: "1.1")
+      ::HTTP::Response.new(status: 599, body: "", version: "1.1")
     end
 
     def cached_request(method, url, **options)
@@ -65,7 +76,12 @@ module Danbooru
     end
 
     def http
-      @http ||= ::HTTP.timeout(DEFAULT_TIMEOUT).use(:auto_inflate).headers(Danbooru.config.http_headers).headers("Accept-Encoding" => "gzip")
+      @http ||= ::HTTP.
+        follow(max_hops: MAX_REDIRECTS).
+        timeout(DEFAULT_TIMEOUT).
+        use(:auto_inflate).
+        headers(Danbooru.config.http_headers).
+        headers("Accept-Encoding" => "gzip")
     end
   end
 end
