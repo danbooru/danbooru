@@ -12,8 +12,9 @@ class IqdbProxy
   end
 
   def download(url, type)
-    download = Downloads::File.new(url)
-    file, strategy = download.download!(url: download.send(type))
+    strategy = Sources::Strategies.find(url)
+    download_url = strategy.send(type)
+    file = strategy.download_file!(download_url)
     file
   end
 
@@ -32,7 +33,7 @@ class IqdbProxy
       file = download(params[:image_url], :url)
       results = query(file: file, limit: limit)
     elsif params[:file_url].present?
-      file = download(params[:file_url], :file_url)
+      file = download(params[:file_url], :image_url)
       results = query(file: file, limit: limit)
     elsif params[:post_id].present?
       url = Post.find(params[:post_id]).preview_file_url

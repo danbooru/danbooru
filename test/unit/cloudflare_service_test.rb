@@ -14,10 +14,4 @@ class CloudflareServiceTest < ActiveSupport::TestCase
       assert_requested(:delete, "https://api.cloudflare.com/client/v4/zones/123/purge_cache", times: 1)
     end
   end
-
-  context "#ips" do
-    should "work" do
-      refute_empty(@cloudflare.ips)
-    end
-  end
 end

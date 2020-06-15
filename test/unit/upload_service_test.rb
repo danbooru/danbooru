@@ -212,7 +212,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       context "on timeout errors" do
         setup do
           @source = "https://cdn.donmai.us/original/93/f4/93f4dd66ef1eb11a89e56d31f9adc8d0.jpg"
-          HTTParty.stubs(:get).raises(Net::ReadTimeout)
+          Danbooru::Http.any_instance.stubs(:get).raises(HTTP::TimeoutError)
         end
 
         should "leave the upload in an error state" do
