@@ -84,7 +84,6 @@ group :test do
   gem "mocha", require: "mocha/minitest"
   gem "ffaker"
   gem "simplecov", "~> 0.17.0", require: false
-  gem "webmock", require: "webmock/minitest"
   gem "minitest-ci"
   gem "minitest-reporters", require: "minitest/reporters"
   gem "mock_redis"

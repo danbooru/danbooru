@@ -43,7 +43,6 @@ class ActiveSupport::TestCase
 
   setup do
     Socket.stubs(:gethostname).returns("www.example.com")
-    WebMock.allow_net_connect!
 
     @temp_dir = Dir.mktmpdir("danbooru-temp-")
     storage_manager = StorageManager::Local.new(base_dir: @temp_dir)
