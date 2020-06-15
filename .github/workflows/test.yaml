@@ -17,6 +17,8 @@ jobs:
     env:
       DEBIAN_FRONTEND: noninteractive
       PARALLEL_WORKERS: 8 # number of parallel tests to run
+      RUBYOPT: -W0 # silence ruby warnings
+      VIPS_WARNING: 0 # silence libvips warnings
 
       # Code Climate configuration. https://docs.codeclimate.com/docs/finding-your-test-coverage-token
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
