@@ -1,16 +1,23 @@
 module Danbooru
   class Http
+    class DownloadError < StandardError; end
+    class FileTooLargeError < StandardError; end
+
     DEFAULT_TIMEOUT = 10
     MAX_REDIRECTS = 5
 
-    attr_writer :cache, :http
+    attr_writer :cache, :max_size, :http
 
     class << self
-      delegate :get, :put, :post, :delete, :cache, :follow, :timeout, :auth, :basic_auth, :headers, to: :new
+      delegate :get, :head, :put, :post, :delete, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :public_only, :download_media, to: :new
     end
 
     def get(url, **options)
       request(:get, url, **options)
+    end
+
+    def head(url, **options)
+      request(:head, url, **options)
     end
 
     def put(url, **options)
@@ -33,6 +40,10 @@ module Danbooru
       dup.tap { |o| o.http = o.http.follow(*args) }
     end
 
+    def max_size(size)
+      dup.tap { |o| o.max_size = size }
+    end
+
     def timeout(*args)
       dup.tap { |o| o.http = o.http.timeout(*args) }
     end
@@ -49,6 +60,46 @@ module Danbooru
       dup.tap { |o| o.http = o.http.headers(*args) }
     end
 
+    # allow requests only to public IPs, not to local or private networks.
+    def public_only
+      dup.tap do |o|
+        o.http = o.http.dup.tap do |http|
+          http.default_options = http.default_options.with_socket_class(ValidatingSocket)
+        end
+      end
+    end
+
+    concerning :DownloadMethods do
+      def download_media(url, no_polish: true, **options)
+        url = Addressable::URI.heuristic_parse(url)
+        response = headers(Referer: url.origin).get(url)
+
+        # prevent Cloudflare Polish from modifying images.
+        if no_polish && response.headers["CF-Polished"].present?
+          url.query_values = url.query_values.to_h.merge(danbooru_no_polish: SecureRandom.uuid)
+          return download_media(url, no_polish: false)
+        end
+
+        file = download_response(response, **options)
+        [response, MediaFile.open(file)]
+      end
+
+      def download_response(response, file: Tempfile.new("danbooru-download-", binmode: true))
+        raise DownloadError, response if response.status != 200
+        raise FileTooLargeError, response if @max_size && response.content_length.to_i > @max_size
+
+        size = 0
+        response.body.each do |chunk|
+          size += chunk.size
+          raise FileTooLargeError if @max_size && size > @max_size
+          file.write(chunk)
+        end
+
+        file.rewind
+        file
+      end
+    end
+
     protected
 
     def request(method, url, **options)
@@ -57,11 +108,12 @@ module Danbooru
       else
         raw_request(method, url, **options)
       end
+    rescue ValidatingSocket::ProhibitedIpError
+      fake_response(597, "")
     rescue HTTP::Redirector::TooManyRedirectsError
-      ::HTTP::Response.new(status: 598, body: "", version: "1.1")
+      fake_response(598, "")
     rescue HTTP::TimeoutError
-      # return a synthetic http error on connection timeouts
-      ::HTTP::Response.new(status: 599, body: "", version: "1.1")
+      fake_response(599, "")
     end
 
     def cached_request(method, url, **options)
@@ -77,6 +129,10 @@ module Danbooru
 
     def raw_request(method, url, **options)
       http.send(method, url, **options)
+    end
+
+    def fake_response(status, body)
+      ::HTTP::Response.new(status: status, version: "1.1", body: ::HTTP::Response::Body.new(body))
     end
 
     def http
