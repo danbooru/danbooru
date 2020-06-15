@@ -1,4 +1,4 @@
-name: Test
+name: Github
 
 # Trigger on pushes to master or pull requests to master, but not both.
 on:
@@ -56,12 +56,6 @@ jobs:
     steps:
     - name: Check out code
       uses: actions/checkout@v2
-#    - name: Save environment
-#      run: env | egrep "DANBOORU|DATABASE_URL" > ~/.env
-#    - name: Install docker-compose
-#      run: sudo apt-get update && sudo apt-get -y install docker-compose
-#    - name: Run tests
-#      run: docker-compose --env-file ~/.env -f config/docker/docker-compose.test.yaml -p danbooru up
     - name: Install OS dependencies
       run: |
         apt-get update
@@ -82,4 +76,4 @@ jobs:
     - name: Run tests
       run: bin/rails test
     - name: Upload test coverage to Code Climate
-      run: ./test-reporter-latest-linux-amd64 after-build
+      run: ./test-reporter-latest-linux-amd64 after-build --debug
