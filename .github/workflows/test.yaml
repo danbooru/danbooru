@@ -1,6 +1,13 @@
 name: Test
 
-on: [push, pull_request]
+# Trigger on pushes to master or pull requests to master, but not both.
+on:
+  push:
+    branches:
+    - master
+  pull_request:
+    branches:
+    - master
 
 jobs:
   test:
