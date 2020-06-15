@@ -2,6 +2,8 @@
 # * https://lohas.nicoseiga.jp/o/971eb8af9bbcde5c2e51d5ef3a2f62d6d9ff5552/1589933964/3583893
 # * http://lohas.nicoseiga.jp/priv/3521156?e=1382558156&h=f2e089256abd1d453a455ec8f317a6c703e2cedf
 # * http://lohas.nicoseiga.jp/priv/b80f86c0d8591b217e7513a9e175e94e00f3c7a1/1384936074/3583893
+# * https://dcdn.cdn.nimg.jp/priv/62a56a7f67d3d3746ae5712db9cac7d465f4a339/1592186183/10466669
+# * https://dcdn.cdn.nimg.jp/nicoseiga/lohas/o/8ba0a9b2ea34e1ef3b5cc50785bd10cd63ec7e4a/1592187477/10466669
 #
 # * http://lohas.nicoseiga.jp/material/5746c5/4459092
 #
@@ -37,6 +39,7 @@ module Sources
   module Strategies
     class NicoSeiga < Base
       DIRECT       = %r{\Ahttps?://lohas\.nicoseiga\.jp/(priv|o)/(?:\w+/\d+/)?(?<image_id>\d+)(?:\?.+)?}i
+      CDN_DIRECT   = %r{\Ahttps?://dcdn\.cdn\.nimg\.jp/.+/\w+/\d+/(?<image_id>\d+)}i
       SOURCE       = %r{\Ahttps?://seiga\.nicovideo\.jp/image/source(?:/|\?id=)(?<image_id>\d+)}i
 
       ILLUST_THUMB = %r{\Ahttps?://lohas\.nicoseiga\.jp/thumb/(?<illust_id>\d+)i}i
@@ -74,13 +77,17 @@ module Sources
         return url if api_client.blank?
 
         img = case url
-        when DIRECT then "https://seiga.nicovideo.jp/image/source/#{image_id_from_url(url)}"
+        when DIRECT || CDN_DIRECT then "https://seiga.nicovideo.jp/image/source/#{image_id_from_url(url)}"
         when SOURCE then url
         else image_urls.first
         end
 
         resp = api_client.get(img)
-        resp.headers["Location"]&.gsub(%r{nicoseiga.jp/o/}i, 'nicoseiga.jp/priv/')
+        if resp.headers["Location"] =~ %r{https?://.+/(\w+/\d+/\d+)\z}i
+          "https://lohas.nicoseiga.jp/priv/#{$1}"
+        else
+          img
+        end
       end
 
       def preview_urls
@@ -161,7 +168,7 @@ module Sources
       end
 
       def image_id_from_url(url)
-        url[DIRECT, :image_id] || url[SOURCE, :image_id] || url[MANGA_THUMB, :image_id]
+        url[DIRECT, :image_id] || url[SOURCE, :image_id] || url[MANGA_THUMB, :image_id] || url[CDN_DIRECT, :image_id]
       end
 
       def illust_id
