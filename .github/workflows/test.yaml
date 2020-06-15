@@ -25,6 +25,9 @@ jobs:
       GIT_COMMIT_SHA: ${{ github.sha }}
       GIT_BRANCH: ${{ github.ref }}
 
+      # https://docs.codecov.io/docs
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+
       DATABASE_URL: postgresql://danbooru:danbooru@postgres/danbooru
       ARCHIVE_DATABASE_URL: postgresql://danbooru:danbooru@postgres/danbooru
       DANBOORU_SECRET_KEY_BASE: 1234
@@ -77,3 +80,5 @@ jobs:
       run: bin/rails test
     - name: Upload test coverage to Code Climate
       run: ./test-reporter-latest-linux-amd64 after-build --debug
+    - name: Upload test coverage to Codecov.io
+      run: bash <(curl -s https://codecov.io/bash)
