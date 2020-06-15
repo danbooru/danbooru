@@ -5,6 +5,7 @@ class SavedSearchesControllerTest < ActionDispatch::IntegrationTest
     setup do
       @user = create(:user)
       @saved_search = create(:saved_search, user: @user)
+      SavedSearch.stubs(:redis).returns(MockRedis.new)
     end
 
     context "index action" do
