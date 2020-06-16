@@ -5,10 +5,8 @@
       <li id="secondary-links-posts-hot"><%= link_to "Hot", posts_path(:tags => "order:rank") %></li>
       <li id="secondary-links-posts-popular"><%= link_to "Popular", popular_explore_posts_path %></li>
       <li id="secondary-links-posts-curated"><%= link_to "Curated", curated_explore_posts_path %></li>
-      <% if ReportbooruService.enabled? %>
-        <li><%= link_to "Searches", searches_explore_posts_path %></li>
-        <li><%= link_to "Viewed", viewed_explore_posts_path %></li>
-      <% end %>
+      <li><%= link_to "Searches", searches_explore_posts_path %></li>
+      <li><%= link_to "Viewed", viewed_explore_posts_path %></li>
     <% end %>
 
     <li><%= link_to "Deleted", posts_path(tags: "#{params[:tags]} status:deleted") %></li>

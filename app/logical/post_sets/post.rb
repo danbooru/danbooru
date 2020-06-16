@@ -160,20 +160,16 @@ module PostSets
         elsif query.is_metatag?(:search)
           saved_search_tags
         elsif query.is_empty_search? || query.is_metatag?(:order, :rank)
-          popular_tags
+          popular_tags.presence || frequent_tags
         elsif query.is_single_term?
-          similar_tags
+          similar_tags.presence || frequent_tags
         else
           frequent_tags
         end
       end
 
       def popular_tags
-        if reportbooru_service.enabled?
-          reportbooru_service.popular_searches(Date.today, limit: MAX_SIDEBAR_TAGS).map(&:first)
-        else
-          frequent_tags
-        end
+        ReportbooruService.new.popular_searches(Date.today, limit: MAX_SIDEBAR_TAGS)
       end
 
       def similar_tags
@@ -198,10 +194,6 @@ module PostSets
 
       def tag_list_html(**options)
         tag_set_presenter.tag_list_html(name_only: query.is_metatag?(:search), **options)
-      end
-
-      def reportbooru_service
-        @reportbooru_service ||= ReportbooruService.new
       end
     end
   end
