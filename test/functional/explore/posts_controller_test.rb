@@ -41,6 +41,7 @@ module Explore
           mock_post_search_rankings(Date.today, [["1girl", 100], ["original", 50]])
           get searches_explore_posts_path
           assert_response :success
+          assert_select "tbody tr", count: 2
         end
       end
 
@@ -49,6 +50,7 @@ module Explore
           mock_missed_search_rankings([["1girl", 100], ["original", 50]])
           get missed_searches_explore_posts_path
           assert_response :success
+          assert_select "tbody tr", count: 2
         end
       end
     end
