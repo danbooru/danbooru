@@ -1,83 +1,104 @@
 class NicoSeigaApiClient
   extend Memoist
-  BASE_URL = "http://seiga.nicovideo.jp/api"
-  attr_reader :illust_id
+  XML_API = "https://seiga.nicovideo.jp/api"
 
-  def self.agent
-    mech = Mechanize.new
-    mech.redirect_ok = false
-    mech.keep_alive = false
+  def initialize(work_id:, type:)
+    @work_id = work_id
+    @work_type = type
+  end
 
-    session = Cache.get("nico-seiga-session")
-    if session
-      cookie = Mechanize::Cookie.new("user_session", session)
-      cookie.domain = ".nicovideo.jp"
-      cookie.path = "/"
-      mech.cookie_jar.add(cookie)
-    else
-      mech.get("https://account.nicovideo.jp/login") do |page|
-        page.form_with(:id => "login_form") do |form|
-          form["mail_tel"] = Danbooru.config.nico_seiga_login
-          form["password"] = Danbooru.config.nico_seiga_password
-        end.click_button
-      end
-      session = mech.cookie_jar.cookies.select {|c| c.name == "user_session"}.first
-      if session
-        Cache.put("nico-seiga-session", session.value, 1.week)
-      else
-        raise "Session not found"
+  def image_ids
+    if @work_type == "illust"
+      [api_response["id"]]
+    elsif @work_type == "manga"
+      manga_api_response.map do |x|
+        case x["meta"]["source_url"]
+        when %r{/thumb/(\d+)\w}i then Regexp.last_match(1)
+        when %r{nicoseiga\.cdn\.nimg\.jp/drm/image/\w+/(\d+)\w}i then Regexp.last_match(1)
+        end
       end
     end
-
-    # This cookie needs to be set to allow viewing of adult works
-    cookie = Mechanize::Cookie.new("skip_fetish_warning", "1")
-    cookie.domain = "seiga.nicovideo.jp"
-    cookie.path = "/"
-    mech.cookie_jar.add(cookie)
-
-    mech.redirect_ok = true
-    mech
-  end
-
-  def initialize(illust_id:, user_id: nil)
-    @illust_id = illust_id
-    @user_id = user_id
-  end
-
-  def image_id
-    illust_xml["response"]["image"]["id"].to_i
-  end
-
-  def user_id
-    @user_id || illust_xml["response"]["image"]["user_id"].to_i
   end
 
   def title
-    illust_xml["response"]["image"]["title"]
+    api_response["title"]
   end
 
-  def desc
-    illust_xml["response"]["image"]["description"]
+  def description
+    api_response["description"]
   end
 
-  def moniker
-    artist_xml["response"]["user"]["nickname"]
+  def tags
+    api_response.dig("tag_list", "tag").to_a.map { |t| t["name"] }.compact
   end
 
-  def illust_xml
-    get("#{BASE_URL}/illust/info?id=#{illust_id}")
+  def user_id
+    api_response["user_id"]
   end
 
-  def artist_xml
-    get("#{BASE_URL}/user/info?id=#{user_id}")
+  def user_name
+    if @work_type == "illust"
+      api_response["nickname"]
+    elsif @work_type == "manga"
+      user_api_response(user_id)["nickname"]
+    end
+  end
+
+  def api_response
+    if @work_type == "illust"
+      resp = get("https://sp.seiga.nicovideo.jp/ajax/seiga/im#{@work_id}")
+      return {} if resp.blank? || resp.code.to_i == 404
+      api_response = JSON.parse(resp)["target_image"]
+
+    elsif @work_type == "manga"
+      resp = Danbooru::Http.cache(1.minute).get("#{XML_API}/theme/info?id=#{@work_id}")
+      return {} if resp.blank? || resp.code.to_i == 404
+      api_response = Hash.from_xml(resp.to_s)["response"]["theme"]
+    end
+
+    api_response || {}
+  rescue JSON::ParserError
+    {}
+  end
+
+  def manga_api_response
+    resp = get("https://ssl.seiga.nicovideo.jp/api/v1/app/manga/episodes/#{@work_id}/frames")
+    return {} if resp.blank? || resp.code.to_i == 404
+    JSON.parse(resp)["data"]["result"]
+  rescue JSON::ParserError
+    {}
+  end
+
+  def user_api_response(user_id)
+    resp = Danbooru::Http.cache(1.minute).get("#{XML_API}/user/info?id=#{user_id}")
+    return {} if resp.blank? || resp.code.to_i == 404
+    Hash.from_xml(resp.to_s)["response"]["user"]
   end
 
   def get(url)
-    response = Danbooru::Http.cache(1.minute).get(url)
-    raise "nico seiga api call failed (code=#{response.code}, body=#{response.body})" if response.code != 200
+    cookie_header = Cache.get("nicoseiga-cookie-header") || regenerate_cookie_header
 
-    Hash.from_xml(response.to_s)
+    resp = Danbooru::Http.headers({Cookie: cookie_header}).cache(1.minute).get(url)
+
+    if resp.headers["Location"] =~ %r{seiga\.nicovideo\.jp/login/}i
+      cookie_header = regenerate_cookie_header
+      resp = Danbooru::Http.headers({Cookie: cookie_header}).cache(1.minute).get(url)
+    end
+
+    resp
   end
 
-  memoize :artist_xml, :illust_xml
+  def regenerate_cookie_header
+    form = {
+      mail_tel: Danbooru.config.nico_seiga_login,
+      password: Danbooru.config.nico_seiga_password
+    }
+    resp = Danbooru::Http.post("https://account.nicovideo.jp/api/v1/login", form: form)
+    cookies = resp.cookies.map { |c| c.name + "=" + c.value }
+    cookies << "accept_fetish_warning=2"
+
+    Cache.put("nicoseiga-cookie-header", cookies.join(";"), 1.week)
+  end
+
+  memoize :api_response, :manga_api_response, :user_api_response
 end
