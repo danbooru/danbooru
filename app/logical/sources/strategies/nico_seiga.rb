@@ -38,7 +38,7 @@
 module Sources
   module Strategies
     class NicoSeiga < Base
-      DIRECT       = %r{\Ahttps?://lohas\.nicoseiga\.jp/(priv|o)/(?:\w+/\d+/)?(?<image_id>\d+)(?:\?.+)?}i
+      DIRECT       = %r{\Ahttps?://lohas\.nicoseiga\.jp/(?:priv|o)/(?:\w+/\d+/)?(?<image_id>\d+)(?:\?.+)?}i
       CDN_DIRECT   = %r{\Ahttps?://dcdn\.cdn\.nimg\.jp/.+/\w+/\d+/(?<image_id>\d+)}i
       SOURCE       = %r{\Ahttps?://seiga\.nicovideo\.jp/image/source(?:/|\?id=)(?<image_id>\d+)}i
 

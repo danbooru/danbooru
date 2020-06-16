@@ -12,19 +12,19 @@ module Sources::Strategies
   class Tumblr < Base
     SIZES = %w[1280 640 540 500h 500 400 250 100]
 
-    BASE_URL = %r!\Ahttps?://(?:[^/]+\.)*tumblr\.com!i
-    DOMAIN = %r{(data|(\d+\.)?media)\.tumblr\.com}
-    MD5 = %r{(?<md5>[0-9a-f]{32})}i
-    FILENAME = %r{(?<filename>(tumblr_(inline_)?)?[a-z0-9]+(_r[0-9]+)?)}i
-    EXT = %r{(?<ext>\w+)}
+    BASE_URL = %r{\Ahttps?://(?:[^/]+\.)*tumblr\.com}i
+    DOMAIN = /(data|(?:\d+\.)?media)\.tumblr\.com/i
+    MD5 = /(?<md5>[0-9a-f]{32})/i
+    FILENAME = /(?<filename>(?:tumblr_(?:inline_)?)?[a-z0-9]+(?:_r[0-9]+)?)/i
+    EXT = /(?<ext>\w+)/
 
     # old: https://66.media.tumblr.com/2c6f55531618b4335c67e29157f5c1fc/tumblr_pz4a44xdVj1ssucdno1_1280.png
     # new: https://66.media.tumblr.com/168dabd09d5ad69eb5fedcf94c45c31a/3dbfaec9b9e0c2e3-72/s640x960/bf33a1324f3f36d2dc64f011bfeab4867da62bc8.png
-    OLD_IMAGE = %r!\Ahttps?://#{DOMAIN}/(?<dir>#{MD5}/)?#{FILENAME}_(?<size>\w+)\.#{EXT}\z!i
+    OLD_IMAGE = %r{\Ahttps?://#{DOMAIN}/(?<dir>#{MD5}/)?#{FILENAME}_(?<size>\w+)\.#{EXT}\z}i
 
-    IMAGE = %r!\Ahttps?://#{DOMAIN}/!i
-    VIDEO = %r!\Ahttps?://(?:vtt|ve\.media)\.tumblr\.com/!i
-    POST = %r!\Ahttps?://(?<blog_name>[^.]+)\.tumblr\.com/(?:post|image)/(?<post_id>\d+)!i
+    IMAGE = %r{\Ahttps?://#{DOMAIN}/}i
+    VIDEO = %r{\Ahttps?://(?:vtt|ve\.media)\.tumblr\.com/}i
+    POST = %r{\Ahttps?://(?<blog_name>[^.]+)\.tumblr\.com/(?:post|image)/(?<post_id>\d+)}i
 
     def self.enabled?
       Danbooru.config.tumblr_consumer_key.present?
@@ -68,7 +68,7 @@ module Sources::Strategies
 
     def preview_urls
       image_urls.map do |x|
-        x.sub(%r!_1280\.(jpg|png|gif|jpeg)\z!, '_250.\1')
+        x.sub(/_1280\.(jpg|png|gif|jpeg)\z/, '_250.\1')
       end
     end
 

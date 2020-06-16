@@ -58,8 +58,8 @@ module Sources
       end
 
       def site_name
-        Addressable::URI.heuristic_parse(url).host
-      rescue Addressable::URI::InvalidURIError => e
+        Addressable::URI.heuristic_parse(url)&.host
+      rescue Addressable::URI::InvalidURIError
         nil
       end
 
@@ -90,9 +90,7 @@ module Sources
       # eventually be assigned as the source for the post, but it does not
       # represent what the downloader will fetch.
       def page_url
-        Rails.logger.warn "Valid page url for (#{url}, #{referer_url}) not found"
-
-        return nil
+        nil
       end
 
       # This will be the url stored in posts. Typically this is the page
@@ -141,7 +139,7 @@ module Sources
       # Subclasses should merge in any required headers needed to access resources
       # on the site.
       def headers
-        return Danbooru.config.http_headers
+        Danbooru.config.http_headers
       end
 
       # Returns the size of the image resource without actually downloading the file.
@@ -189,7 +187,7 @@ module Sources
       end
 
       def normalized_tags
-        tags.map { |tag, url| normalize_tag(tag) }.sort.uniq
+        tags.map { |tag, _url| normalize_tag(tag) }.sort.uniq
       end
 
       def normalize_tag(tag)
@@ -243,7 +241,7 @@ module Sources
       end
 
       def to_h
-        return {
+        {
           :artist => {
             :name => artist_name,
             :tag_name => tag_name,

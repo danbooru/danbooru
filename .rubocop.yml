@@ -119,7 +119,9 @@ Style/NumericPredicate:
 Style/PercentLiteralDelimiters:
   PreferredDelimiters:
     "default": "[]"
-    "%r": "!!"
+
+Style/ParallelAssignment:
+  Enabled: false
 
 Style/PerlBackrefs:
   Enabled: false

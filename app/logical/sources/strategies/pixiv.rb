@@ -50,35 +50,35 @@
 module Sources
   module Strategies
     class Pixiv < Base
-      MONIKER = %r!(?:[a-zA-Z0-9_-]+)!
-      PROFILE = %r!\Ahttps?://www\.pixiv\.net/member\.php\?id=[0-9]+\z!
-      DATE =    %r!(?<date>\d{4}/\d{2}/\d{2}/\d{2}/\d{2}/\d{2})!i
-      EXT =     %r!(?:jpg|jpeg|png|gif)!i
+      MONIKER = /(?:[a-zA-Z0-9_-]+)/
+      PROFILE = %r{\Ahttps?://www\.pixiv\.net/member\.php\?id=[0-9]+\z}
+      DATE =    %r{(?<date>\d{4}/\d{2}/\d{2}/\d{2}/\d{2}/\d{2})}i
+      EXT =     /(?:jpg|jpeg|png|gif)/i
 
-      WEB =     %r!(?:\A(?:https?://)?www\.pixiv\.net)!
-      I12 =     %r!(?:\A(?:https?://)?i[0-9]+\.pixiv\.net)!
-      IMG =     %r!(?:\A(?:https?://)?img[0-9]*\.pixiv\.net)!
-      PXIMG =   %r!(?:\A(?:https?://)?[^.]+\.pximg\.net)!
-      TOUCH =   %r!(?:\A(?:https?://)?touch\.pixiv\.net)!
-      UGOIRA =  %r!#{PXIMG}/img-zip-ugoira/img/#{DATE}/(?<illust_id>\d+)_ugoira1920x1080\.zip\z!i
-      ORIG_IMAGE = %r!#{PXIMG}/img-original/img/#{DATE}/(?<illust_id>\d+)_p(?<page>\d+)\.#{EXT}\z!i
-      STACC_PAGE = %r!\A#{WEB}/stacc/#{MONIKER}/?\z!i
-      NOVEL_PAGE = %r!(?:\Ahttps?://www\.pixiv\.net/novel/show\.php\?id=(\d+))!
-      FANBOX_ACCOUNT = %r!(?:\Ahttps?://www\.pixiv\.net/fanbox/creator/\d+\z)!
-      FANBOX_IMAGE = %r!(?:\Ahttps?://fanbox\.pixiv\.net/images/post/(\d+))!
-      FANBOX_PAGE = %r!(?:\Ahttps?://www\.pixiv\.net/fanbox/creator/\d+/post/(\d+))!
+      WEB =     %r{(?:\A(?:https?://)?www\.pixiv\.net)}
+      I12 =     %r{(?:\A(?:https?://)?i[0-9]+\.pixiv\.net)}
+      IMG =     %r{(?:\A(?:https?://)?img[0-9]*\.pixiv\.net)}
+      PXIMG =   %r{(?:\A(?:https?://)?[^.]+\.pximg\.net)}
+      TOUCH =   %r{(?:\A(?:https?://)?touch\.pixiv\.net)}
+      UGOIRA =  %r{#{PXIMG}/img-zip-ugoira/img/#{DATE}/(?<illust_id>\d+)_ugoira1920x1080\.zip\z}i
+      ORIG_IMAGE = %r{#{PXIMG}/img-original/img/#{DATE}/(?<illust_id>\d+)_p(?<page>\d+)\.#{EXT}\z}i
+      STACC_PAGE = %r{\A#{WEB}/stacc/#{MONIKER}/?\z}i
+      NOVEL_PAGE = %r{(?:\Ahttps?://www\.pixiv\.net/novel/show\.php\?id=(\d+))}
+      FANBOX_ACCOUNT = %r{(?:\Ahttps?://www\.pixiv\.net/fanbox/creator/\d+\z)}
+      FANBOX_IMAGE = %r{(?:\Ahttps?://fanbox\.pixiv\.net/images/post/(\d+))}
+      FANBOX_PAGE = %r{(?:\Ahttps?://www\.pixiv\.net/fanbox/creator/\d+/post/(\d+))}
 
       def self.to_dtext(text)
         if text.nil?
           return nil
         end
 
-        text = text.gsub(%r!https?://www\.pixiv\.net/member_illust\.php\?mode=medium&illust_id=([0-9]+)!i) do |match|
+        text = text.gsub(%r{https?://www\.pixiv\.net/member_illust\.php\?mode=medium&illust_id=([0-9]+)}i) do |_match|
           pixiv_id = $1
           %(pixiv ##{pixiv_id} "»":[/posts?tags=pixiv:#{pixiv_id}])
         end
 
-        text = text.gsub(%r!https?://www\.pixiv\.net/member\.php\?id=([0-9]+)!i) do |match|
+        text = text.gsub(%r{https?://www\.pixiv\.net/member\.php\?id=([0-9]+)}i) do |_match|
           member_id = $1
           profile_url = "https://www.pixiv.net/member.php?id=#{member_id}"
           search_params = {"search[url_matches]" => profile_url}.to_param
@@ -139,13 +139,13 @@ module Sources
           return "https://www.pixiv.net/artworks/#{illust_id}"
         end
 
-        return url
+        url
       rescue PixivApiClient::BadIDError
         nil
       end
 
       def canonical_url
-        return image_url
+        image_url
       end
 
       def profile_url
@@ -200,7 +200,7 @@ module Sources
           }
         end
 
-        return {
+        {
           "Referer" => "https://www.pixiv.net"
         }
       end
@@ -231,7 +231,7 @@ module Sources
         translated_tags = super(tag)
 
         if translated_tags.empty? && tag.include?("/")
-          translated_tags = tag.split("/").flat_map { |tag| super(tag) }
+          translated_tags = tag.split("/").flat_map { |translated_tag| super(translated_tag) }
         end
 
         translated_tags
@@ -257,7 +257,7 @@ module Sources
           return [ugoira_zip_url]
         end
 
-        return metadata.pages
+        metadata.pages
       end
 
       # in order to prevent recursive loops, this method should not make any
@@ -276,11 +276,11 @@ module Sources
             return url.query_values["illust_id"].to_i
 
           # http://www.pixiv.net/en/artworks/46324488
-          elsif url.host == "www.pixiv.net" && url.path =~ %r!\A/(?:en/)?artworks/(?<illust_id>\d+)!i
+          elsif url.host == "www.pixiv.net" && url.path =~ %r{\A/(?:en/)?artworks/(?<illust_id>\d+)}i
             return $~[:illust_id].to_i
 
           # http://www.pixiv.net/i/18557054
-          elsif url.host == "www.pixiv.net" && url.path =~ %r!\A/i/(?<illust_id>\d+)\z!i
+          elsif url.host == "www.pixiv.net" && url.path =~ %r{\A/i/(?<illust_id>\d+)\z}i
             return $~[:illust_id].to_i
 
           # http://img18.pixiv.net/img/evazion/14901720.png
@@ -289,8 +289,8 @@ module Sources
           # http://i2.pixiv.net/img18/img/evazion/14901720_s.png
           # http://i1.pixiv.net/img07/img/pasirism/18557054_p1.png
           # http://i1.pixiv.net/img07/img/pasirism/18557054_big_p1.png
-          elsif url.host =~ %r!\A(?:i\d+|img\d+)\.pixiv\.net\z!i &&
-                url.path =~ %r!\A(?:/img\d+)?/img/#{MONIKER}/(?<illust_id>\d+)(?:_\w+)?\.(?:jpg|jpeg|png|gif|zip)!i
+          elsif url.host =~ /\A(?:i\d+|img\d+)\.pixiv\.net\z/i &&
+              url.path =~ %r{\A(?:/img\d+)?/img/#{MONIKER}/(?<illust_id>\d+)(?:_\w+)?\.(?:jpg|jpeg|png|gif|zip)}i
             return $~[:illust_id].to_i
 
           # http://i1.pixiv.net/img-inf/img/2011/05/01/23/28/04/18557054_64x64.jpg
@@ -307,13 +307,13 @@ module Sources
           #
           # https://i.pximg.net/novel-cover-original/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42.jpg
           # https://img-sketch.pixiv.net/uploads/medium/file/4463372/8906921629213362989.jpg
-          elsif url.host =~ %r!\A(?:[^.]+\.pximg\.net|i\d+\.pixiv\.net|tc-pximg01\.techorus-cdn\.com)\z!i &&
-                url.path =~ %r!\A(/c/\w+)?/img-[a-z-]+/img/#{DATE}/(?<illust_id>\d+)(?:_\w+)?\.(?:jpg|jpeg|png|gif|zip)!i
+          elsif url.host =~ /\A(?:[^.]+\.pximg\.net|i\d+\.pixiv\.net|tc-pximg01\.techorus-cdn\.com)\z/i &&
+              url.path =~ %r{\A(/c/\w+)?/img-[a-z-]+/img/#{DATE}/(?<illust_id>\d+)(?:_\w+)?\.(?:jpg|jpeg|png|gif|zip)}i
             return $~[:illust_id].to_i
           end
         end
 
-        return nil
+        nil
       end
       memoize :illust_id
 
@@ -324,7 +324,7 @@ module Sources
           end
         end
 
-        return nil
+        nil
       end
       memoize :novel_id
 
@@ -339,7 +339,7 @@ module Sources
           end
         end
 
-        return nil
+        nil
       end
       memoize :fanbox_id
 
@@ -350,7 +350,7 @@ module Sources
           end
         end
 
-        return nil
+        nil
       end
       memoize :fanbox_account_id
 
@@ -368,45 +368,39 @@ module Sources
           return PixivApiClient.new.fanbox(fanbox_id)
         end
 
-        return PixivApiClient.new.work(illust_id)
+        PixivApiClient.new.work(illust_id)
       end
       memoize :metadata
 
       def moniker
         # we can sometimes get the moniker from the url
-        if url =~ %r!#{IMG}/img/(#{MONIKER})!i
-          return $1
+        if url =~ %r{#{IMG}/img/(#{MONIKER})}i
+          $1
+        elsif url =~ %r{#{I12}/img[0-9]+/img/(#{MONIKER})}i
+          $1
+        elsif url =~ %r{#{WEB}/stacc/(#{MONIKER})/?$}i
+          $1
+        else
+          metadata.moniker
         end
-
-        if url =~ %r!#{I12}/img[0-9]+/img/(#{MONIKER})!i
-          return $1
-        end
-
-        if url =~ %r!#{WEB}/stacc/(#{MONIKER})/?$!i
-          return $1
-        end
-
-        return metadata.moniker
       rescue PixivApiClient::BadIDError
         nil
       end
       memoize :moniker
 
       def data
-        return {
-          ugoira_frame_data: ugoira_frame_data
-        }
+        { ugoira_frame_data: ugoira_frame_data }
       end
 
       def ugoira_zip_url
         if metadata.pages.is_a?(Hash) && metadata.pages["ugoira600x600"]
-          return metadata.pages["ugoira600x600"].sub("_ugoira600x600.zip", "_ugoira1920x1080.zip")
+          metadata.pages["ugoira600x600"].sub("_ugoira600x600.zip", "_ugoira1920x1080.zip")
         end
       end
       memoize :ugoira_zip_url
 
       def ugoira_frame_data
-        return metadata.json.dig("metadata", "frames")
+        metadata.json.dig("metadata", "frames")
       rescue PixivApiClient::BadIDError
         nil
       end
@@ -415,16 +409,14 @@ module Sources
       def ugoira_content_type
         case metadata.json["image_urls"].to_s
         when /\.jpg/
-          return "image/jpeg"
-
+          "image/jpeg"
         when /\.png/
-          return "image/png"
-
+          "image/png"
         when /\.gif/
-          return "image/gif"
+          "image/gif"
+        else
+          raise Sources::Error, "content type not found for (#{url}, #{referer_url})"
         end
-
-        raise Sources::Error.new("content type not found for (#{url}, #{referer_url})")
       end
       memoize :ugoira_content_type
 
@@ -434,7 +426,7 @@ module Sources
         # http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_p0.jpg
         # http://i1.pixiv.net/c/600x600/img-master/img/2014/09/24/23/25/08/46168376_p0_master1200.jpg
         # http://i1.pixiv.net/img-original/img/2014/09/25/23/09/29/46183440_p0.jpg
-        if url =~ %r!/\d+_p(\d+)(?:_\w+)?\.#{EXT}!i
+        if url =~ %r{/\d+_p(\d+)(?:_\w+)?\.#{EXT}}i
           return $1.to_i
         end
 
@@ -445,7 +437,7 @@ module Sources
           end
         end
 
-        return nil
+        nil
       end
       memoize :manga_page
     end

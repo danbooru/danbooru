@@ -32,10 +32,10 @@
 module Sources
   module Strategies
     class Moebooru < Base
-      BASE_URL = %r!\Ahttps?://(?:[^.]+\.)?(?<domain>yande\.re|konachan\.com)!i
-      POST_URL = %r!#{BASE_URL}/post/show/(?<id>\d+)!i
-      URL_SLUG = %r!/(?:yande\.re%20|Konachan\.com%20-%20)?(?<id>\d+)?.*!i
-      IMAGE_URL = %r!#{BASE_URL}/(?<type>image|jpeg|sample)/(?<md5>\h{32})#{URL_SLUG}?\.(?<ext>jpg|jpeg|png|gif)\z!i
+      BASE_URL = %r{\Ahttps?://(?:[^.]+\.)?(?<domain>yande\.re|konachan\.com)}i
+      POST_URL = %r{#{BASE_URL}/post/show/(?<id>\d+)}i
+      URL_SLUG = %r{/(?:yande\.re%20|Konachan\.com%20-%20)?(?<id>\d+)?.*}i
+      IMAGE_URL = %r{#{BASE_URL}/(?<type>image|jpeg|sample)/(?<md5>\h{32})#{URL_SLUG}?\.(?<ext>jpg|jpeg|png|gif)\z}i
 
       delegate :artist_name, :profile_url, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_strategy, allow_nil: true
 
@@ -63,7 +63,7 @@ module Sources
       end
 
       def preview_urls
-        return image_urls unless post_md5.present?
+        return image_urls if post_md5.blank?
         ["https://#{file_host}/data/preview/#{post_md5[0..1]}/#{post_md5[2..3]}/#{post_md5}.jpg"]
       end
 

@@ -38,7 +38,7 @@ module Sources
 
       PAGE_URL_1    = %r{\Ahttps?://(?:www\.)?weibo\.com/(?<artist_short_id>\d+)/(?<illust_base62_id>\w+)(?:\?.*)?\z}i
       PAGE_URL_2    = %r{#{PROFILE_URL_2}/(?:wbphotos/large/mid|talbum/detail/photo_id)/(?<illust_long_id>\d+)(?:/pid/(?<image_id>\w{32}))?}i
-      PAGE_URL_3    = %r{\Ahttps?://m\.weibo\.cn/(detail/(?<illust_long_id>\d+)|status/(?<illust_base62_id>\w+))}i
+      PAGE_URL_3    = %r{\Ahttps?://m\.weibo\.cn/(?:detail/(?<illust_long_id>\d+)|status/(?<illust_base62_id>\w+))}i
       PAGE_URL_4    = %r{\Ahttps?://tw\.weibo\.com/(?:(?<artist_short_id>\d+)|\w+)/(?<illust_long_id>\d+)}i
 
       IMAGE_URL     = %r{\Ahttps?://\w{3}\.sinaimg\.cn/\w+/(?<image_id>\w{32})\.}i
@@ -203,12 +203,12 @@ module Sources
       end
 
       def api_response
-        return nil if mobile_url.blank?
+        return {} if mobile_url.blank?
 
         resp = Danbooru::Http.cache(1.minute).get(mobile_url)
         json_string = resp.to_s[/var \$render_data = \[(.*)\]\[0\]/m, 1]
 
-        return nil if json_string.blank?
+        return {} if json_string.blank?
 
         JSON.parse(json_string)["status"]
       end

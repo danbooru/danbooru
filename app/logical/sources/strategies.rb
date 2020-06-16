@@ -1,7 +1,7 @@
 module Sources
   module Strategies
     def self.all
-      return [
+      [
         Strategies::Pixiv,
         Strategies::NicoSeiga,
         Strategies::Twitter,

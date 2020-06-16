@@ -28,7 +28,7 @@ module Sources
         when %r{\Ahttp://p\.twpl\.jp/show/(?:large|orig)/([a-z0-9]+)}i
           "http://p.twipple.jp/#{$1}"
 
-        when %r{\Ahttps?://blog(?:(?:-imgs-)?\d*(?:-origin)?)?\.fc2\.com/(?:(?:[^/]/){3}|(?:[^/]/))([^/]+)/(?:file/)?([^\.]+\.[^\?]+)}i
+        when %r{\Ahttps?://blog(?:(?:-imgs-)?\d*(?:-origin)?)?\.fc2\.com/(?:(?:[^/]/){3}|(?:[^/]/))([^/]+)/(?:file/)?([^.]+\.[^?]+)}i
           username = $1
           filename = $2
           "http://#{username}.blog.fc2.com/img/#{filename}/"
@@ -105,7 +105,7 @@ module Sources
         # http://img.toranoana.jp/popup_img18/04/0010/22/87/040010228714-1p.jpg
         # http://img.toranoana.jp/popup_blimg/04/0030/08/30/040030083068-1p.jpg
         # https://ecdnimg.toranoana.jp/ec/img/04/0030/65/34/040030653417-6p.jpg
-        when %r{\Ahttps?://(\w+\.)?toranoana\.jp/(?:popup_(?:bl)?img\d*|ec/img)/\d{2}/\d{4}/\d{2}/\d{2}/(?<work_id>\d+)}i
+        when %r{\Ahttps?://(?:\w+\.)?toranoana\.jp/(?:popup_(?:bl)?img\d*|ec/img)/\d{2}/\d{4}/\d{2}/\d{2}/(?<work_id>\d+)}i
           "https://ec.toranoana.jp/tora_r/ec/item/#{$~[:work_id]}/"
 
         # https://a.hitomi.la/galleries/907838/1.png

@@ -23,11 +23,11 @@
 module Sources
   module Strategies
     class HentaiFoundry < Base
-      BASE_URL =    %r!\Ahttps?://(?:www\.)?hentai-foundry\.com!i
-      PAGE_URL =    %r!#{BASE_URL}/pictures/user/(?<artist_name>[\w-]+)/(?<illust_id>\d+)(?:/[\w.-]*)?(\?[\w=]*)?\z!i
-      OLD_PAGE =    %r!#{BASE_URL}/pic-(?<illust_id>\d+)(?:\.html)?\z!i
-      PROFILE_URL = %r!#{BASE_URL}/(?:pictures/)?user/(?<artist_name>[\w-]+)(?:/[a-z]*)?\z!i
-      IMAGE_URL =   %r!\Ahttps?://pictures\.hentai-foundry\.com/+\w/(?<artist_name>[\w-]+)/(?<illust_id>\d+)(?:(?:/[\w.-]+)?\.\w+)?\z!i
+      BASE_URL =    %r{\Ahttps?://(?:www\.)?hentai-foundry\.com}i
+      PAGE_URL =    %r{#{BASE_URL}/pictures/user/(?<artist_name>[\w-]+)/(?<illust_id>\d+)(?:/[\w.-]*)?(\?[\w=]*)?\z}i
+      OLD_PAGE =    %r{#{BASE_URL}/pic-(?<illust_id>\d+)(?:\.html)?\z}i
+      PROFILE_URL = %r{#{BASE_URL}/(?:pictures/)?user/(?<artist_name>[\w-]+)(?:/[a-z]*)?\z}i
+      IMAGE_URL =   %r{\Ahttps?://pictures\.hentai-foundry\.com/+\w/(?<artist_name>[\w-]+)/(?<illust_id>\d+)(?:(?:/[\w.-]+)?\.\w+)?\z}i
 
       def domains
         ["hentai-foundry.com"]
