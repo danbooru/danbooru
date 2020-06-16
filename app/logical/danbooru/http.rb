@@ -6,7 +6,7 @@ module Danbooru
     attr_writer :cache, :http
 
     class << self
-      delegate :get, :put, :post, :delete, :cache, :timeout, :auth, :basic_auth, :headers, to: :new
+      delegate :get, :put, :post, :delete, :cache, :follow, :timeout, :auth, :basic_auth, :headers, to: :new
     end
 
     def get(url, **options)
@@ -27,6 +27,10 @@ module Danbooru
 
     def cache(expiry)
       dup.tap { |o| o.cache = expiry.to_i }
+    end
+
+    def follow(*args)
+      dup.tap { |o| o.http = o.http.follow(*args) }
     end
 
     def timeout(*args)
@@ -77,7 +81,7 @@ module Danbooru
 
     def http
       @http ||= ::HTTP.
-        follow(max_hops: MAX_REDIRECTS).
+        follow(strict: false, max_hops: MAX_REDIRECTS).
         timeout(DEFAULT_TIMEOUT).
         use(:auto_inflate).
         headers(Danbooru.config.http_headers).

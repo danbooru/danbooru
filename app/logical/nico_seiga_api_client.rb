@@ -2,9 +2,13 @@ class NicoSeigaApiClient
   extend Memoist
   XML_API = "https://seiga.nicovideo.jp/api"
 
-  def initialize(work_id:, type:)
+  attr_reader :http
+
+  # XXX temp disable following redirects.
+  def initialize(work_id:, type:, http: Danbooru::Http.follow(nil))
     @work_id = work_id
     @work_type = type
+    @http = http
   end
 
   def image_ids
@@ -51,7 +55,7 @@ class NicoSeigaApiClient
       api_response = JSON.parse(resp)["target_image"]
 
     elsif @work_type == "manga"
-      resp = Danbooru::Http.cache(1.minute).get("#{XML_API}/theme/info?id=#{@work_id}")
+      resp = http.cache(1.minute).get("#{XML_API}/theme/info?id=#{@work_id}")
       return {} if resp.blank? || resp.code.to_i == 404
       api_response = Hash.from_xml(resp.to_s)["response"]["theme"]
     end
@@ -70,7 +74,7 @@ class NicoSeigaApiClient
   end
 
   def user_api_response(user_id)
-    resp = Danbooru::Http.cache(1.minute).get("#{XML_API}/user/info?id=#{user_id}")
+    resp = http.cache(1.minute).get("#{XML_API}/user/info?id=#{user_id}")
     return {} if resp.blank? || resp.code.to_i == 404
     Hash.from_xml(resp.to_s)["response"]["user"]
   end
@@ -78,11 +82,11 @@ class NicoSeigaApiClient
   def get(url)
     cookie_header = Cache.get("nicoseiga-cookie-header") || regenerate_cookie_header
 
-    resp = Danbooru::Http.headers({Cookie: cookie_header}).cache(1.minute).get(url)
+    resp = http.headers({Cookie: cookie_header}).cache(1.minute).get(url)
 
     if resp.headers["Location"] =~ %r{seiga\.nicovideo\.jp/login/}i
       cookie_header = regenerate_cookie_header
-      resp = Danbooru::Http.headers({Cookie: cookie_header}).cache(1.minute).get(url)
+      resp = http.headers({Cookie: cookie_header}).cache(1.minute).get(url)
     end
 
     resp
@@ -93,7 +97,7 @@ class NicoSeigaApiClient
       mail_tel: Danbooru.config.nico_seiga_login,
       password: Danbooru.config.nico_seiga_password
     }
-    resp = Danbooru::Http.post("https://account.nicovideo.jp/api/v1/login", form: form)
+    resp = http.post("https://account.nicovideo.jp/api/v1/login", form: form)
     cookies = resp.cookies.map { |c| c.name + "=" + c.value }
     cookies << "accept_fetish_warning=2"
 
