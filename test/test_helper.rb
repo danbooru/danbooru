@@ -45,13 +45,14 @@ class ActiveSupport::TestCase
     Socket.stubs(:gethostname).returns("www.example.com")
     WebMock.allow_net_connect!
 
-    storage_manager = StorageManager::Local.new(base_dir: Dir.mktmpdir("uploads-test-storage-"))
+    @temp_dir = Dir.mktmpdir("danbooru-temp-")
+    storage_manager = StorageManager::Local.new(base_dir: @temp_dir)
     Danbooru.config.stubs(:storage_manager).returns(storage_manager)
     Danbooru.config.stubs(:backup_storage_manager).returns(StorageManager::Null.new)
   end
 
   teardown do
-    FileUtils.rm_rf(Danbooru.config.storage_manager.base_dir)
+    FileUtils.rm_rf(@temp_dir)
     Cache.clear
   end
 
