@@ -50,9 +50,12 @@ class IqdbProxy
     file.try(:close)
   end
 
-  def query(params)
+  def query(file: nil, url: nil, limit: 20)
     raise NotImplementedError, "the IQDBs service isn't configured" unless enabled?
-    response = http.post("#{iqdbs_server}/similar", body: params)
+
+    file = HTTP::FormData::File.new(file) if file
+    form = { file: file, url: url, limit: limit }.compact
+    response = http.post("#{iqdbs_server}/similar", form: form)
 
     raise Error, "IQDB error: #{response.status}" if response.status != 200
     raise Error, "IQDB error: #{response.parse["error"]}" if response.parse.is_a?(Hash)
