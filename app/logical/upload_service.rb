@@ -15,7 +15,6 @@ class UploadService
       start!
     end
   rescue ActiveRecord::RecordNotUnique
-    return
   end
 
   def start!
@@ -31,8 +30,8 @@ class UploadService
 
       begin
         create_post_from_upload(@upload)
-      rescue Exception => x
-        @upload.update(status: "error: #{x.class} - #{x.message}", backtrace: x.backtrace.join("\n"))
+      rescue Exception => e
+        @upload.update(status: "error: #{e.class} - #{e.message}", backtrace: e.backtrace.join("\n"))
       end
       return @upload
     end
@@ -53,16 +52,16 @@ class UploadService
 
       @upload.save!
       @post = create_post_from_upload(@upload)
-      return @upload
-    rescue Exception => x
-      @upload.update(status: "error: #{x.class} - #{x.message}", backtrace: x.backtrace.join("\n"))
+      @upload
+    rescue Exception => e
+      @upload.update(status: "error: #{e.class} - #{e.message}", backtrace: e.backtrace.join("\n"))
       @upload
     end
   end
 
   def warnings
     return [] if @post.nil?
-    return @post.warnings.full_messages
+    @post.warnings.full_messages
   end
 
   def create_post_from_upload(upload)

@@ -4,11 +4,11 @@ module TagRelationshipRetirementService
   THRESHOLD = 2.years
 
   def forum_topic_title
-    return "Retired tag aliases & implications"
+    "Retired tag aliases & implications"
   end
 
   def forum_topic_body
-    return "This topic deals with tag relationships created two or more years ago that have not been used since. They will be retired. This topic will be updated as an automated system retires expired relationships."
+    "This topic deals with tag relationships created two or more years ago that have not been used since. They will be retired. This topic will be updated as an automated system retires expired relationships."
   end
 
   def dry_run
@@ -27,7 +27,7 @@ module TagRelationshipRetirementService
         forum_post = ForumPost.create!(creator: User.system, body: forum_topic_body, topic: topic)
       end
     end
-    return topic
+    topic
   end
 
   def find_and_retire!
@@ -50,16 +50,6 @@ module TagRelationshipRetirementService
         yield(rel)
       end
     end
-
-    # model.active.where("created_at < ?", SMALL_THRESHOLD.ago).find_each do |rel|
-    #   if is_underused?(rel.consequent_name)
-    #     yield(rel)
-    #   end
-    # end
-  end
-
-  def is_underused?(name)
-    (Tag.find_by_name(name).try(:post_count) || 0) < COUNT_THRESHOLD
   end
 
   def is_unused?(name)

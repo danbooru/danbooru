@@ -89,7 +89,7 @@ module Searchable
   def where_array_count(attr, value)
     qualified_column = "cardinality(#{qualified_column_for(attr)})"
     range = PostQueryBuilder.new(nil).parse_range(value, :integer)
-    where_operator("cardinality(#{qualified_column_for(attr)})", *range)
+    where_operator(qualified_column, *range)
   end
 
   def search_boolean_attribute(attribute, params)
@@ -170,7 +170,7 @@ module Searchable
     end
   end
 
-  def search_text_attribute(attr, params, **options)
+  def search_text_attribute(attr, params)
     if params[attr].present?
       where(attr => params[attr])
     elsif params[:"#{attr}_eq"].present?
@@ -279,7 +279,8 @@ module Searchable
         return find_ordered(parse_ids[1])
       end
     end
-    return default_order
+
+    default_order
   end
 
   def default_order

@@ -25,8 +25,7 @@ module TagAutocomplete
   def search(query)
     query = Tag.normalize_name(query)
 
-    candidates = count_sort(
-      query,
+    count_sort(
       search_exact(query, 8) +
       search_prefix(query, 4) +
       search_correct(query, 2) +
@@ -34,7 +33,7 @@ module TagAutocomplete
     )
   end
 
-  def count_sort(query, words)
+  def count_sort(words)
     words.uniq(&:name).sort_by do |x|
       x.post_count * x.weight
     end.reverse.slice(0, LIMIT)

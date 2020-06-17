@@ -83,7 +83,7 @@ class UploadService
         }
       end
 
-      return file
+      file
     end
   end
 end

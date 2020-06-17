@@ -13,7 +13,7 @@ class UploadService
         rescue Exception
         end
 
-        return [upload, remote_size]
+        [upload, remote_size]
       end
 
       if file
@@ -21,7 +21,7 @@ class UploadService
         Preprocessor.new(file: file).delayed_start(CurrentUser.id)
       end
 
-      return [upload]
+      [upload]
     end
   end
 end

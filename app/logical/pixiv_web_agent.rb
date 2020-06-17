@@ -58,7 +58,7 @@ class PixivWebAgent
       end
 
       begin
-        mech.get("https://comic.pixiv.net") do |page|
+        mech.get("https://comic.pixiv.net") do
           cookie = mech.cookies.select {|x| x.name == COMIC_SESSION_COOKIE_KEY}.first
           if cookie
             Cache.put(COMIC_SESSION_CACHE_KEY, cookie.value, 1.week)

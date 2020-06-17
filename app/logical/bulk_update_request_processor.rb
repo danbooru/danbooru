@@ -148,8 +148,6 @@ class BulkUpdateRequestProcessor
     end.join("\n")
   end
 
-  private
-
   def self.is_tag_move_allowed?(antecedent_name, consequent_name)
     antecedent_tag = Tag.find_by_name(Tag.normalize_name(antecedent_name))
     consequent_tag = Tag.find_by_name(Tag.normalize_name(consequent_name))

@@ -94,7 +94,7 @@ module PostSets
     end
 
     def get_random_posts
-      per_page.times.inject([]) do |all, x|
+      per_page.times.inject([]) do |all, _|
         all << ::Post.user_tag_match(tag_string).random
       end.compact.uniq
     end
@@ -104,9 +104,9 @@ module PostSets
         @post_count = get_post_count
 
         if is_random?
-          temp = get_random_posts
+          get_random_posts
         else
-          temp = normalized_query.build.paginate(page, count: post_count, search_count: !post_count.nil?, limit: per_page)
+          normalized_query.build.paginate(page, count: post_count, search_count: !post_count.nil?, limit: per_page)
         end
       end
     end

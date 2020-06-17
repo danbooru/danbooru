@@ -46,11 +46,9 @@ class UploadService
 
     def predecessor
       if md5.present?
-        return Upload.where(status: ["preprocessed", "preprocessing"], md5: md5).first
-      end
-
-      if Utils.is_downloadable?(source)
-        return Upload.where(status: ["preprocessed", "preprocessing"], source: source).first
+        Upload.where(status: ["preprocessed", "preprocessing"], md5: md5).first
+      elsif Utils.is_downloadable?(source)
+        Upload.where(status: ["preprocessed", "preprocessing"], source: source).first
       end
     end
 
@@ -63,21 +61,20 @@ class UploadService
         start!
       end
     rescue ActiveRecord::RecordNotUnique
-      return
     end
 
     def start!
       if Utils.is_downloadable?(source)
         if Post.system_tag_match("source:#{canonical_source}").where.not(id: original_post_id).exists?
-          raise ActiveRecord::RecordNotUnique.new("A post with source #{canonical_source} already exists")
+          raise ActiveRecord::RecordNotUnique, "A post with source #{canonical_source} already exists"
         end
 
         if Upload.where(source: source, status: "completed").exists?
-          raise ActiveRecord::RecordNotUnique.new("A completed upload with source #{source} already exists")
+          raise ActiveRecord::RecordNotUnique, "A completed upload with source #{source} already exists"
         end
 
         if Upload.where(source: source).where("status like ?", "error%").exists?
-          raise ActiveRecord::RecordNotUnique.new("An errored upload with source #{source} already exists")
+          raise ActiveRecord::RecordNotUnique, "An errored upload with source #{source} already exists"
         end
       end
 
@@ -95,21 +92,21 @@ class UploadService
         upload.tag_string = params[:tag_string]
         upload.status = "preprocessed"
         upload.save!
-      rescue Exception => x
-        upload.update(file_ext: nil, status: "error: #{x.class} - #{x.message}", backtrace: x.backtrace.join("\n"))
+      rescue Exception => e
+        upload.update(file_ext: nil, status: "error: #{e.class} - #{e.message}", backtrace: e.backtrace.join("\n"))
       end
 
-      return upload
+      upload
     end
 
     def finish!(upload = nil)
-      pred = upload || self.predecessor
+      pred = upload || predecessor
 
       # regardless of who initialized the upload, credit should
       # goto whoever submitted the form
       pred.initialize_attributes
 
-      pred.attributes = self.params
+      pred.attributes = params
 
       # if a file was uploaded after the preprocessing occurred,
       # then process the file and overwrite whatever the preprocessor
@@ -118,7 +115,7 @@ class UploadService
 
       pred.status = "completed"
       pred.save
-      return pred
+      pred
     end
   end
 end

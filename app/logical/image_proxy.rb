@@ -17,10 +17,7 @@ class ImageProxy
     end
 
     response = HTTParty.get(url, Danbooru.config.httparty_options.deep_merge(headers: {"Referer" => fake_referer_for(url)}))
-    if response.success?
-      return response
-    else
-      raise "HTTP error code: #{response.code} #{response.message}"
-    end
+    raise "HTTP error code: #{response.code} #{response.message}" unless response.success?
+    response
   end
 end

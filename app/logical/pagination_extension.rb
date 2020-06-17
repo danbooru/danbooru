@@ -106,10 +106,7 @@ module PaginationExtension
   def total_count
     @paginator_count ||= unscoped.from(except(:offset, :limit, :order).reorder(nil)).count
   rescue ActiveRecord::StatementInvalid => e
-    if e.to_s =~ /statement timeout/
-      @paginator_count ||= 1_000_000
-    else
-      raise
-    end
+    raise unless e.to_s =~ /statement timeout/
+    @paginator_count ||= 1_000_000
   end
 end
