@@ -31,7 +31,7 @@ class ReportbooruService
   def post_view_rankings(date = Date.today, expires_in: 1.minutes)
     return [] unless enabled?
 
-    response = http.get("#{reportbooru_server}/post_views/rank?date=#{date}")
+    response = http.cache(expires_in).get("#{reportbooru_server}/post_views/rank?date=#{date}")
     return [] if response.status != 200
     JSON.parse(response.to_s.force_encoding("utf-8"))
   end
