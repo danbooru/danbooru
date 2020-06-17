@@ -78,7 +78,7 @@ module Sources
           @site = Sources::Strategies.find("http://www.pixiv.net/fanbox/creator/554149/post/82555")
 
           assert_equal("TYONE(お仕事募集中)", @site.artist_name)
-          assert_equal("https://www.pixiv.net/member.php?id=554149", @site.profile_url)
+          assert_equal("https://www.pixiv.net/users/554149", @site.profile_url)
           assert_equal("https://fanbox.pixiv.net/images/post/82555/Lyyeb6dDLcQZmy09nqLZapuS.jpeg", @site.image_url)
           assert_nothing_raised { @site.to_h }
         end
@@ -104,7 +104,7 @@ module Sources
         end
 
         should "get the profile" do
-          assert_equal("https://www.pixiv.net/member.php?id=696859", @site.profile_url)
+          assert_equal("https://www.pixiv.net/users/696859", @site.profile_url)
         end
 
         should "get the artist name" do
@@ -205,7 +205,7 @@ module Sources
         should "convert illust links and member links to dtext" do
           get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=63421642")
 
-          dtext_desc = %(foo 【pixiv #46337015 "»":[/posts?tags=pixiv:46337015]】bar 【pixiv #14901720 "»":[/posts?tags=pixiv:14901720]】\n\nbaz【"user/83739":[https://www.pixiv.net/member.php?id=83739] "»":[/artists?search%5Burl_matches%5D=https%3A%2F%2Fwww.pixiv.net%2Fmember.php%3Fid%3D83739]】)
+          dtext_desc = %(foo 【pixiv #46337015 "»":[/posts?tags=pixiv:46337015]】bar 【pixiv #14901720 "»":[/posts?tags=pixiv:14901720]】\n\nbaz【"user/83739":[https://www.pixiv.net/users/83739] "»":[/artists?search%5Burl_matches%5D=https%3A%2F%2Fwww.pixiv.net%2Fusers%2F83739]】)
           assert_equal(dtext_desc, @site.dtext_artist_commentary_desc)
         end
       end
@@ -293,7 +293,7 @@ module Sources
 
           assert_equal("uroobnad", source.tag_name)
           assert_equal(["uroobnad"], source.other_names)
-          assert_includes(source.profile_urls, "https://www.pixiv.net/member.php?id=696859")
+          assert_includes(source.profile_urls, "https://www.pixiv.net/users/696859")
           assert_includes(source.profile_urls, "https://www.pixiv.net/stacc/uroobnad")
         end
       end
