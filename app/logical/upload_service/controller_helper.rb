@@ -13,7 +13,7 @@ class UploadService
         rescue Exception
         end
 
-        [upload, remote_size]
+        return [upload, remote_size]
       end
 
       if file
