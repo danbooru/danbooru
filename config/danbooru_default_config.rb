@@ -317,13 +317,15 @@ module Danbooru
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
-      jpeg_artifacts corrupted_image source_request non-web_source]
+      jpeg_artifacts corrupted_image missing_image missing_sample missing_thumbnail
+      resolution_mismatch source_larger source_smaller source_request non-web_source]
     end
 
     # Posts with these tags will be highlighted in the modqueue.
     def modqueue_warning_tags
       %w[hard_translated self_upload nude_filter third-party_edit screencap
-      duplicate image_sample md5_mismatch resized upscaled downscaled]
+      duplicate image_sample md5_mismatch resized upscaled downscaled
+      resolution_mismatch source_larger source_smaller]
     end
 
     def stripe_secret_key
