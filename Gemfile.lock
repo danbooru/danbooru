@@ -211,7 +211,7 @@ GEM
     mime-types-data (3.2020.0512)
     mimemagic (0.3.5)
     mini_mime (1.0.2)
-    mini_portile2 (2.4.0)
+    mini_portile2 (2.5.0)
     minitest (5.14.1)
     minitest-ci (3.4.0)
       minitest (>= 5.0.6)
@@ -239,10 +239,9 @@ GEM
     net-ssh (6.1.0)
     newrelic_rpm (6.11.0.365)
     nio4r (2.5.2)
-    nokogiri (1.10.9)
-      mini_portile2 (~> 2.4.0)
-    nokogiri (1.10.9-x64-mingw32)
-      mini_portile2 (~> 2.4.0)
+    nokogiri (1.11.0.rc2)
+      mini_portile2 (~> 2.5.0)
+    nokogiri (1.11.0.rc2-x64-mingw32)
     nokogumbo (2.0.2)
       nokogiri (~> 1.8, >= 1.8.4)
     ntlm-http (0.1.1)
@@ -465,7 +464,7 @@ DEPENDENCIES
   mock_redis
   net-sftp
   newrelic_rpm
-  nokogiri (~> 1.10.9)
+  nokogiri
   oauth2
   pg
   pry-byebug

@@ -2,7 +2,6 @@
 .yarn-integrity
 .gitconfig
 .git/
-.bundle/
 config/database.yml
 config/danbooru_local_config.rb
 config/deploy/*.rb
