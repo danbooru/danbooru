@@ -1,6 +1,6 @@
 module Danbooru
   class Http
-    DEFAULT_TIMEOUT = 3
+    DEFAULT_TIMEOUT = 10
     MAX_REDIRECTS = 5
 
     attr_writer :cache, :http
