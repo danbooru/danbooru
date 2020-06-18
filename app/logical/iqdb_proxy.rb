@@ -55,7 +55,7 @@ class IqdbProxy
 
     file = HTTP::FormData::File.new(file) if file
     form = { file: file, url: url, limit: limit }.compact
-    response = http.post("#{iqdbs_server}/similar", form: form)
+    response = http.timeout(30).post("#{iqdbs_server}/similar", form: form)
 
     raise Error, "IQDB error: #{response.status}" if response.status != 200
     raise Error, "IQDB error: #{response.parse["error"]}" if response.parse.is_a?(Hash)
