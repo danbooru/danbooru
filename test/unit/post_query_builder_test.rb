@@ -757,8 +757,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       create(:saved_search, query: "aaa", labels: ["zzz"], user: CurrentUser.user)
       create(:saved_search, query: "bbb", user: CurrentUser.user)
 
-      Redis.any_instance.stubs(:exists).with("search:aaa").returns(true)
-      Redis.any_instance.stubs(:exists).with("search:bbb").returns(true)
+      Redis.any_instance.stubs(:exists?).with("search:aaa").returns(true)
+      Redis.any_instance.stubs(:exists?).with("search:bbb").returns(true)
       Redis.any_instance.stubs(:smembers).with("search:aaa").returns([@post1.id])
       Redis.any_instance.stubs(:smembers).with("search:bbb").returns([@post2.id])
 

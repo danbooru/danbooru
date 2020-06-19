@@ -115,7 +115,7 @@ class SavedSearch < ApplicationRecord
 
       def populate(query, timeout: 10_000)
         redis_key = "search:#{query}"
-        return if redis.exists(redis_key)
+        return if redis.exists?(redis_key)
 
         post_ids = Post.with_timeout(timeout, [], query: query) do
           Post.system_tag_match(query).limit(QUERY_LIMIT).pluck(:id)
