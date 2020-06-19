@@ -20,29 +20,30 @@ class ReportbooruService
     body.lines.map(&:split).map { [_1, _2.to_i] }
   end
 
-  def post_search_rankings(date = Date.today, expires_in: 1.minutes)
-    return [] unless enabled?
-
-    response = http.cache(expires_in).get("#{reportbooru_server}/post_searches/rank?date=#{date}")
-    return [] if response.status != 200
-    JSON.parse(response.to_s.force_encoding("utf-8"))
+  def post_search_rankings(date, expires_in: 1.minutes)
+    request("#{reportbooru_server}/post_searches/rank?date=#{date}", expires_in)
   end
 
-  def post_view_rankings(date = Date.today, expires_in: 1.minutes)
-    return [] unless enabled?
-
-    response = http.cache(expires_in).get("#{reportbooru_server}/post_views/rank?date=#{date}")
-    return [] if response.status != 200
-    JSON.parse(response.to_s.force_encoding("utf-8"))
+  def post_view_rankings(date, expires_in: 1.minutes)
+    request("#{reportbooru_server}/post_views/rank?date=#{date}", expires_in)
   end
 
-  def popular_searches(date = Date.today, limit: 100)
+  def popular_searches(date, limit: 100)
     ranking = post_search_rankings(date)
     ranking.take(limit).map(&:first)
   end
 
-  def popular_posts(date = Date.today, limit: 100)
+  def popular_posts(date, limit: 100)
     ranking = post_view_rankings(date)
+    ranking = post_view_rankings(date.yesterday) if ranking.blank?
     ranking.take(limit).map { |x| Post.find(x[0]) }
+  end
+
+  def request(url, expires_in)
+    return [] unless enabled?
+
+    response = http.cache(expires_in).get(url)
+    return [] if response.status != 200
+    JSON.parse(response.to_s.force_encoding("utf-8"))
   end
 end

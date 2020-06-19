@@ -28,11 +28,11 @@ module Explore
 
     def searches
       @date, @scale, @min_date, @max_date = parse_date(params)
-      @search_service = ReportbooruService.new
+      @searches = ReportbooruService.new.popular_searches(@date)
     end
 
     def missed_searches
-      @search_service = ReportbooruService.new
+      @missed_searches = ReportbooruService.new.missed_search_rankings
     end
 
     private
