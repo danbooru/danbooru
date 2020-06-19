@@ -18,8 +18,7 @@ class SavedSearch < ApplicationRecord
         post_ids = Set.new
         queries.each do |query|
           redis_key = "search:#{query}"
-          # XXX change to `exists?` (ref: https://github.com-sds/mock_redis/pull/188
-          if redis.exists(redis_key)
+          if redis.exists?(redis_key)
             sub_ids = redis.smembers(redis_key).map(&:to_i)
             post_ids.merge(sub_ids)
           else

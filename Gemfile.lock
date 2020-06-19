@@ -221,7 +221,7 @@ GEM
       minitest (>= 5.0)
       ruby-progressbar
     mocha (1.11.2)
-    mock_redis (0.23.0)
+    mock_redis (0.24.0)
     msgpack (1.3.3)
     msgpack (1.3.3-x64-mingw32)
     multi_json (1.14.1)
