@@ -51,6 +51,18 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_equal(true, response.parse[:slideshow].present?)
       end
 
+      should "track cookies between requests" do
+        http = Danbooru::Http.use(:session)
+
+        resp1 = http.get("https://httpbin.org/cookies/set/abc/1")
+        resp2 = http.get("https://httpbin.org/cookies/set/def/2")
+        resp3 = http.get("https://httpbin.org/cookies")
+        assert_equal({ abc: "1", def: "2" }, resp3.parse["cookies"].symbolize_keys)
+
+        resp4 = http.cookies(def: 3, ghi: 4).get("https://httpbin.org/cookies")
+        assert_equal({ abc: "1", def: "3", ghi: "4" }, resp4.parse["cookies"].symbolize_keys)
+      end
+
       should "cache requests" do
         response1 = Danbooru::Http.cache(1.minute).get("https://httpbin.org/uuid")
         assert_equal(200, response1.status)

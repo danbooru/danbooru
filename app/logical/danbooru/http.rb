@@ -1,6 +1,7 @@
 require "danbooru/http/html_adapter"
 require "danbooru/http/xml_adapter"
 require "danbooru/http/retriable"
+require "danbooru/http/session"
 
 module Danbooru
   class Http
@@ -13,7 +14,7 @@ module Danbooru
     attr_writer :cache, :max_size, :http
 
     class << self
-      delegate :get, :head, :put, :post, :delete, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :public_only, :download_media, to: :new
+      delegate :get, :head, :put, :post, :delete, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :public_only, :download_media, to: :new
     end
 
     def get(url, **options)
@@ -62,6 +63,14 @@ module Danbooru
 
     def headers(*args)
       dup.tap { |o| o.http = o.http.headers(*args) }
+    end
+
+    def cookies(*args)
+      dup.tap { |o| o.http = o.http.cookies(*args) }
+    end
+
+    def use(*args)
+      dup.tap { |o| o.http = o.http.use(*args) }
     end
 
     # allow requests only to public IPs, not to local or private networks.
@@ -143,6 +152,7 @@ module Danbooru
       @http ||=
         ::Danbooru::Http::ApplicationClient.new
         .follow(strict: false, max_hops: MAX_REDIRECTS)
+        .use(:session)
         .timeout(DEFAULT_TIMEOUT)
         .use(:auto_inflate)
         .headers(Danbooru.config.http_headers)
