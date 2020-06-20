@@ -1,3 +1,6 @@
+require "danbooru/http/html_adapter"
+require "danbooru/http/xml_adapter"
+
 module Danbooru
   class Http
     class DownloadError < StandardError; end

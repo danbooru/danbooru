@@ -38,6 +38,19 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         assert_equal(true, response.parse["gzipped"])
       end
 
+      should "automatically parse html responses" do
+        response = Danbooru::Http.get("https://httpbin.org/html")
+        assert_equal(200, response.status)
+        assert_instance_of(Nokogiri::HTML5::Document, response.parse)
+        assert_equal("Herman Melville - Moby-Dick", response.parse.css("h1").text)
+      end
+
+      should "automatically parse xml responses" do
+        response = Danbooru::Http.get("https://httpbin.org/xml")
+        assert_equal(200, response.status)
+        assert_equal(true, response.parse[:slideshow].present?)
+      end
+
       should "cache requests" do
         response1 = Danbooru::Http.cache(1.minute).get("https://httpbin.org/uuid")
         assert_equal(200, response1.status)
