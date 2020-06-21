@@ -21,6 +21,8 @@ module Danbooru
 
         retries = max_retries
         while retriable?(response) && retries > 0 && retry_delay(response) <= max_delay
+          DanbooruLogger.info "Retrying url=#{request.uri} status=#{response.status} retries=#{retries} delay=#{retry_delay(response)}"
+
           retries -= 1
           sleep(retry_delay(response))
           response = yield request

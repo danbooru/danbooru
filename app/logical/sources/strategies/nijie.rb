@@ -180,7 +180,10 @@ module Sources
 
         http = Danbooru::Http.new
         form = { email: Danbooru.config.nijie_login, password: Danbooru.config.nijie_password }
-        response = http.cache(1.hour).post("https://nijie.info/login_int.php", form: form)
+
+        # XXX `retriable` must come after `cache` so that retries don't return cached error responses.
+        response = http.cache(1.hour).use(:retriable).post("https://nijie.info/login_int.php", form: form)
+        DanbooruLogger.info "Nijie login failed (#{url}, #{response.status})" if response.status != 200
         return nil unless response.status == 200
 
         response = http.cookies(R18: 1).cache(1.minute).get(page_url)
