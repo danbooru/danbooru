@@ -22,8 +22,8 @@ module Danbooru
       @http ||=
         ::Danbooru::Http::ApplicationClient.new
         .timeout(DEFAULT_TIMEOUT)
-        .headers(Danbooru.config.http_headers)
         .headers("Accept-Encoding" => "gzip")
+        .headers("User-Agent": "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}")
         .use(:auto_inflate)
         .use(:retriable)
         .use(redirector: { max_redirects: MAX_REDIRECTS })

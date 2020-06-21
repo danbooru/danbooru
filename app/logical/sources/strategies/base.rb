@@ -141,7 +141,7 @@ module Sources
       # Subclasses should merge in any required headers needed to access resources
       # on the site.
       def headers
-        Danbooru.config.http_headers
+        {}
       end
 
       # Returns the size of the image resource without actually downloading the file.

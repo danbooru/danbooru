@@ -122,7 +122,6 @@ GEM
     chronic (0.10.2)
     coderay (1.1.3)
     concurrent-ruby (1.1.6)
-    connection_pool (2.2.3)
     crass (1.0.6)
     daemons (1.3.1)
     delayed_job (4.1.8)
@@ -164,9 +163,6 @@ GEM
     http-form_data (2.3.0)
     http-parser (1.2.1)
       ffi-compiler (>= 1.0, < 2.0)
-    httparty (0.18.1)
-      mime-types (~> 3.0)
-      multi_xml (>= 0.5.2)
     i18n (1.8.3)
       concurrent-ruby (~> 1.0)
     ipaddress_2 (0.13.0)
@@ -188,24 +184,12 @@ GEM
       mini_mime (>= 0.1.1)
     marcel (0.3.3)
       mimemagic (~> 0.3.2)
-    mechanize (2.7.6)
-      domain_name (~> 0.5, >= 0.5.1)
-      http-cookie (~> 1.0)
-      mime-types (>= 1.17.2)
-      net-http-digest_auth (~> 1.1, >= 1.1.1)
-      net-http-persistent (>= 2.5.2)
-      nokogiri (~> 1.6)
-      ntlm-http (~> 0.1, >= 0.1.1)
-      webrobots (>= 0.0.9, < 0.2)
     memoist (0.16.2)
     memory_profiler (0.9.14)
     meta_request (0.7.2)
       rack-contrib (>= 1.1, < 3)
       railties (>= 3.0.0, < 7)
     method_source (1.0.0)
-    mime-types (3.3.1)
-      mime-types-data (~> 3.2015)
-    mime-types-data (3.2020.0512)
     mimemagic (0.3.5)
     mini_mime (1.0.2)
     mini_portile2 (2.5.0)
@@ -224,11 +208,6 @@ GEM
     multi_json (1.14.1)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
-    mustermann (1.1.1)
-      ruby2_keywords (~> 0.0.1)
-    net-http-digest_auth (1.4.1)
-    net-http-persistent (4.0.0)
-      connection_pool (~> 2.2)
     net-scp (3.0.0)
       net-ssh (>= 2.6.5, < 7.0.0)
     net-sftp (3.0.0)
@@ -241,7 +220,6 @@ GEM
     nokogiri (1.11.0.rc2-x64-mingw32)
     nokogumbo (2.0.2)
       nokogiri (~> 1.8, >= 1.8.4)
-    ntlm-http (0.1.1)
     oauth2 (1.4.4)
       faraday (>= 0.8, < 2.0)
       jwt (>= 1.0, < 3.0)
@@ -271,8 +249,6 @@ GEM
       rack (~> 2.0)
     rack-mini-profiler (2.0.2)
       rack (>= 1.2.0)
-    rack-protection (2.0.8.1)
-      rack
     rack-proxy (0.6.5)
       rack
     rack-test (1.1.0)
@@ -339,9 +315,7 @@ GEM
     ruby-progressbar (1.10.1)
     ruby-vips (2.0.17)
       ffi (~> 1.9)
-    ruby2_keywords (0.0.2)
     rubyzip (2.3.0)
-    safe_yaml (1.0.5)
     sanitize (5.2.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.8.0)
@@ -364,11 +338,6 @@ GEM
       json (>= 1.8, < 3)
       simplecov-html (~> 0.10.0)
     simplecov-html (0.10.2)
-    sinatra (2.0.8.1)
-      mustermann (~> 1.0)
-      rack (~> 2.0)
-      rack-protection (= 2.0.8.1)
-      tilt (~> 2.0)
     sprockets (4.0.2)
       concurrent-ruby (~> 1.0)
       rack (> 1, < 3)
@@ -385,7 +354,6 @@ GEM
     stripe (5.22.0)
     thor (1.0.1)
     thread_safe (0.3.6)
-    tilt (2.0.10)
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
     unf (0.1.4)
@@ -404,7 +372,6 @@ GEM
       rack-proxy (>= 0.6.1)
       railties (>= 5.2)
       semantic_range (>= 2.3.0)
-    webrobots (0.1.2)
     websocket-driver (0.7.2)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -442,12 +409,10 @@ DEPENDENCIES
   ffaker
   flamegraph
   http
-  httparty
   ipaddress_2
   jquery-rails
   listen
   mail
-  mechanize
   memoist
   memory_profiler
   meta_request
@@ -484,7 +449,6 @@ DEPENDENCIES
   shoulda-matchers
   simple_form
   simplecov (~> 0.17.0)
-  sinatra
   stackprof
   streamio-ffmpeg
   stripe

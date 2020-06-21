@@ -155,7 +155,6 @@ class PixivApiClient
 
   def api_client
     http.headers(
-      **Danbooru.config.http_headers,
       "Referer": "http://www.pixiv.net",
       "Content-Type": "application/x-www-form-urlencoded",
       "Authorization": "Bearer #{access_token}"
