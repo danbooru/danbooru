@@ -187,8 +187,6 @@ module Sources
         desc = <<-EOS.strip_heredoc.chomp
           foo [b]bold[/b] [i]italics[/i] [s]strike[/s] red
 
-
-
           <http://nijie.info/view.php?id=218944>
         EOS
 
