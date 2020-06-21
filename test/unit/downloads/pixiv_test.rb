@@ -122,17 +122,6 @@ module Downloads
           assert_downloaded(@file_size, @file_url, @ref)
         end
       end
-
-      context "downloading a pixiv fanbox image" do
-        should_eventually "work" do
-          @source = "https://www.pixiv.net/fanbox/creator/12491073/post/82406"
-          @file_url = "https://fanbox.pixiv.net/images/post/82406/D833IKA7FIesJXL8xx39rrG0.jpeg"
-          @file_size = 873_387
-
-          assert_not_rewritten(@file_url, @source)
-          assert_downloaded(@file_size, @file_url, @source)
-        end
-      end
     end
 
     context "An ugoira site for pixiv" do

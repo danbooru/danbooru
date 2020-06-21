@@ -99,50 +99,6 @@ class PixivApiClient
     end
   end
 
-  class FanboxResponse
-    attr_reader :json
-
-    def initialize(json)
-      @json = json
-    end
-
-    def name
-      json["body"]["user"]["name"]
-    end
-
-    def user_id
-      json["body"]["user"]["userId"]
-    end
-
-    def moniker
-      ""
-    end
-
-    def page_count
-      json["body"]["body"]["images"].size
-    end
-
-    def artist_commentary_title
-      json["body"]["title"]
-    end
-
-    def artist_commentary_desc
-      json["body"]["body"]["text"]
-    end
-
-    def tags
-      []
-    end
-
-    def pages
-      if json["body"]["body"]
-        json["body"]["body"]["images"].map {|x| x["originalUrl"]}
-      else
-        []
-      end
-    end
-  end
-
   def work(illust_id)
     headers = Danbooru.config.http_headers.merge(
       "Referer" => "http://www.pixiv.net",
@@ -167,19 +123,6 @@ class PixivApiClient
     end
   rescue JSON::ParserError
     raise Error.new("Pixiv API call failed (status=#{response.code} body=#{response.body})")
-  end
-
-  def fanbox(fanbox_id)
-    url = "https://www.pixiv.net/ajax/fanbox/post?postId=#{fanbox_id.to_i}"
-    resp = agent.get(url)
-    json = JSON.parse(resp.body)
-    if resp.code == "200"
-      FanboxResponse.new(json)
-    elsif json["status"] == "failure"
-      raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
-    end
-  rescue JSON::ParserError
-    raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
   end
 
   def novel(novel_id)
@@ -237,9 +180,4 @@ class PixivApiClient
       access_token
     end
   end
-
-  def agent
-    PixivWebAgent.build
-  end
-  memoize :agent
 end

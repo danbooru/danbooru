@@ -73,17 +73,6 @@ module Sources
         end
       end
 
-      context "A https://www.pixiv.net/fanbox/creator/*/post/* source" do
-        should_eventually "work" do
-          @site = Sources::Strategies.find("http://www.pixiv.net/fanbox/creator/554149/post/82555")
-
-          assert_equal("TYONE(お仕事募集中)", @site.artist_name)
-          assert_equal("https://www.pixiv.net/member.php?id=554149", @site.profile_url)
-          assert_equal("https://fanbox.pixiv.net/images/post/82555/Lyyeb6dDLcQZmy09nqLZapuS.jpeg", @site.image_url)
-          assert_nothing_raised { @site.to_h }
-        end
-      end
-
       context "A https://www.pixiv.net/*/artworks/* source" do
         should "work" do
           @site = Sources::Strategies.find("https://www.pixiv.net/en/artworks/64476642")
