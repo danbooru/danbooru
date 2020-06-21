@@ -32,9 +32,6 @@ if [[ -z "$HOSTNAME" ]] ; then
   exit 1
 fi
 
-echo -n "* Enter the VLAN IP address for this server (ex: 172.16.0.1, enter nothing to skip): "
-read VLAN_IP_ADDR
-
 # Install packages
 echo "* Installing packages..."
 
@@ -51,17 +48,6 @@ apt-get -y install zlib1g-dev libglib2.0-dev
 apt-get -y install $LIBSSL_DEV_PKG build-essential automake libxml2-dev libxslt-dev ncurses-dev sudo libreadline-dev flex bison ragel redis git curl libcurl4-openssl-dev sendmail-bin sendmail nginx ssh coreutils ffmpeg mkvtoolnix
 apt-get -y install libpq-dev postgresql-client
 apt-get -y install liblcms2-dev $LIBJPEG_TURBO_DEV_PKG libexpat1-dev libgif-dev libpng-dev libexif-dev
-
-# vrack specific stuff
-if [ -n "$VLAN_IP_ADDR" ] ; then
-  apt-get -y install vlan
-  modprobe 8021q
-  echo "8021q" >> /etc/modules
-  vconfig add eno2 99
-  ip addr add $VLAN_IP_ADDR/24 dev eno2.99
-  ip link set up eno2.99
-  curl -L -s $GITHUB_INSTALL_SCRIPTS/vrack-cfg.yaml -o /etc/netplan/01-netcfg.yaml
-fi
 
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
