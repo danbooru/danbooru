@@ -5,10 +5,11 @@ class NicoSeigaApiClient
   attr_reader :http
 
   # XXX temp disable following redirects.
-  def initialize(work_id:, type:, http: Danbooru::Http.follow(nil))
+  def initialize(work_id:, type:)
     @work_id = work_id
     @work_type = type
-    @http = http
+    @http = Danbooru::Http.new
+    @http.http.default_options.features.reject! { |name, _| name == :redirector }
   end
 
   def image_ids

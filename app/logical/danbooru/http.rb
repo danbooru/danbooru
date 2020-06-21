@@ -1,5 +1,6 @@
 require "danbooru/http/html_adapter"
 require "danbooru/http/xml_adapter"
+require "danbooru/http/redirector"
 require "danbooru/http/retriable"
 require "danbooru/http/session"
 
@@ -11,10 +12,22 @@ module Danbooru
     DEFAULT_TIMEOUT = 10
     MAX_REDIRECTS = 5
 
-    attr_writer :cache, :max_size, :http
+    attr_accessor :cache, :max_size, :http
 
     class << self
       delegate :get, :head, :put, :post, :delete, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :public_only, :download_media, to: :new
+    end
+
+    def initialize
+      @http ||=
+        ::Danbooru::Http::ApplicationClient.new
+        .timeout(DEFAULT_TIMEOUT)
+        .headers(Danbooru.config.http_headers)
+        .headers("Accept-Encoding" => "gzip")
+        .use(:auto_inflate)
+        .use(:retriable)
+        .use(redirector: { max_redirects: MAX_REDIRECTS })
+        .use(:session)
     end
 
     def get(url, **options)
@@ -146,17 +159,6 @@ module Danbooru
 
     def fake_response(status, body)
       ::HTTP::Response.new(status: status, version: "1.1", body: ::HTTP::Response::Body.new(body))
-    end
-
-    def http
-      @http ||=
-        ::Danbooru::Http::ApplicationClient.new
-        .follow(strict: false, max_hops: MAX_REDIRECTS)
-        .use(:session)
-        .timeout(DEFAULT_TIMEOUT)
-        .use(:auto_inflate)
-        .headers(Danbooru.config.http_headers)
-        .headers("Accept-Encoding" => "gzip")
     end
   end
 end
