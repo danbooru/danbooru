@@ -62,14 +62,37 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         resp4 = http.cookies(def: 3, ghi: 4).get("https://httpbin.org/cookies")
         assert_equal({ abc: "1", def: "3", ghi: "4" }, resp4.parse["cookies"].symbolize_keys)
       end
+    end
 
-      should "cache requests" do
-        response1 = Danbooru::Http.cache(1.minute).get("https://httpbin.org/uuid")
+    context "cache feature" do
+      should "cache multiple requests to the same url" do
+        http = Danbooru::Http.cache(1.hour)
+
+        response1 = http.get("https://httpbin.org/uuid")
         assert_equal(200, response1.status)
 
-        response2 = Danbooru::Http.cache(1.minute).get("https://httpbin.org/uuid")
+        response2 = http.get("https://httpbin.org/uuid")
         assert_equal(200, response2.status)
-        assert_equal(response2.body, response1.body)
+        assert_equal(response2.to_s, response1.to_s)
+      end
+
+      should "cache cookies correctly" do
+        http = Danbooru::Http.cache(1.hour)
+
+        resp1 = http.get("https://httpbin.org/cookies")
+        resp2 = http.get("https://httpbin.org/cookies/set/abc/1")
+        resp3 = http.get("https://httpbin.org/cookies/set/def/2")
+        resp4 = http.get("https://httpbin.org/cookies")
+
+        assert_equal(200, resp1.status)
+        assert_equal(200, resp2.status)
+        assert_equal(200, resp3.status)
+        assert_equal(200, resp4.status)
+
+        assert_equal({}, resp1.parse["cookies"].symbolize_keys)
+        assert_equal({ abc: "1" }, resp2.parse["cookies"].symbolize_keys)
+        assert_equal({ abc: "1", def: "2" }, resp3.parse["cookies"].symbolize_keys)
+        assert_equal({ abc: "1", def: "2" }, resp4.parse["cookies"].symbolize_keys)
       end
     end
 

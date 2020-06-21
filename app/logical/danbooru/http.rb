@@ -1,5 +1,6 @@
 require "danbooru/http/html_adapter"
 require "danbooru/http/xml_adapter"
+require "danbooru/http/cache"
 require "danbooru/http/redirector"
 require "danbooru/http/retriable"
 require "danbooru/http/session"
@@ -12,7 +13,7 @@ module Danbooru
     DEFAULT_TIMEOUT = 10
     MAX_REDIRECTS = 5
 
-    attr_accessor :cache, :max_size, :http
+    attr_accessor :max_size, :http
 
     class << self
       delegate :get, :head, :put, :post, :delete, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :public_only, :download_media, to: :new
@@ -49,10 +50,6 @@ module Danbooru
       request(:delete, url, **options)
     end
 
-    def cache(expiry)
-      dup.tap { |o| o.cache = expiry.to_i }
-    end
-
     def follow(*args)
       dup.tap { |o| o.http = o.http.follow(*args) }
     end
@@ -83,6 +80,10 @@ module Danbooru
 
     def use(*args)
       dup.tap { |o| o.http = o.http.use(*args) }
+    end
+
+    def cache(expires_in)
+      use(cache: { expires_in: expires_in })
     end
 
     # allow requests only to public IPs, not to local or private networks.
@@ -128,32 +129,13 @@ module Danbooru
     protected
 
     def request(method, url, **options)
-      if @cache.present?
-        cached_request(method, url, **options)
-      else
-        raw_request(method, url, **options)
-      end
+      http.send(method, url, **options)
     rescue ValidatingSocket::ProhibitedIpError
       fake_response(597, "")
     rescue HTTP::Redirector::TooManyRedirectsError
       fake_response(598, "")
     rescue HTTP::TimeoutError
       fake_response(599, "")
-    end
-
-    def cached_request(method, url, **options)
-      key = Cache.hash({ method: method, url: url, headers: http.default_options.headers.to_h, **options }.to_json)
-
-      cached_response = Cache.get(key, @cache) do
-        response = raw_request(method, url, **options)
-        { status: response.status, body: response.to_s, headers: response.headers.to_h, version: "1.1" }
-      end
-
-      ::HTTP::Response.new(**cached_response)
-    end
-
-    def raw_request(method, url, **options)
-      http.send(method, url, **options)
     end
 
     def fake_response(status, body)
