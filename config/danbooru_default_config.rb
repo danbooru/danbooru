@@ -376,14 +376,20 @@ module Danbooru
       false
     end
 
-    # reportbooru options - see https://github.com/r888888888/reportbooru
+    # The URL for the Reportbooru server (https://github.com/evazion/reportbooru).
+    # Optional. Used for tracking post views, popular searches, and missed searches.
+    # Set to http://localhost/mock/reportbooru to enable a fake reportbooru
+    # server for development purposes.
     def reportbooru_server
     end
 
     def reportbooru_key
     end
 
-    # iqdbs options - see https://github.com/r888888888/iqdbs
+    # The URL for the IQDBs server (https://github.com/evazion/iqdbs).
+    # Optional. Used for dupe detection and reverse image searches.
+    # Set to http://localhost/mock/iqdbs to enable a fake iqdb server for
+    # development purposes.
     def iqdbs_server
     end
 
@@ -461,6 +467,10 @@ module Danbooru
     def cloudflare_zone
     end
 
+    # The URL for the recommender server (https://github.com/evazion/recommender).
+    # Optional. Used to generate post recommendations.
+    # Set to http://localhost/mock/recommender to enable a fake recommender
+    # server for development purposes.
     def recommender_server
     end
 
