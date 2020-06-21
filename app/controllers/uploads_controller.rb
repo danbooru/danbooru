@@ -21,7 +21,7 @@ class UploadsController < ApplicationController
   def image_proxy
     authorize Upload
     resp = ImageProxy.get_image(params[:url])
-    send_data resp.body, :type => resp.content_type, :disposition => "inline"
+    send_data resp.body, type: resp.mime_type, disposition: "inline"
   end
 
   def index

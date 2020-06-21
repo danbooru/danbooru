@@ -18,6 +18,17 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       mock_iqdb_service!
     end
 
+    context "image proxy action" do
+      should "work" do
+        url = "https://i.pximg.net/img-original/img/2017/11/21/17/06/44/65985331_p0.png"
+        get_auth image_proxy_uploads_path, @user, params: { url: url }
+
+        assert_response :success
+        assert_equal("image/png", response.media_type)
+        assert_equal(15_573, response.body.size)
+      end
+    end
+
     context "batch action" do
       context "for twitter galleries" do
         should "render" do
