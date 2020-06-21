@@ -61,6 +61,35 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
     end
 
+    context "retriable feature" do
+      should "retry immediately if no Retry-After header is sent" do
+        response_429 = ::HTTP::Response.new(status: 429, version: "1.1", body: "")
+        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "")
+        HTTP::Client.any_instance.expects(:perform).times(2).returns(response_429, response_200)
+
+        response = Danbooru::Http.use(:retriable).get("https://httpbin.org/status/429")
+        assert_equal(200, response.status)
+      end
+
+      should "retry if the Retry-After header is an integer" do
+        response_503 = ::HTTP::Response.new(status: 503, version: "1.1", headers: { "Retry-After": "1" }, body: "")
+        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "")
+        HTTP::Client.any_instance.expects(:perform).times(2).returns(response_503, response_200)
+
+        response = Danbooru::Http.use(:retriable).get("https://httpbin.org/status/503")
+        assert_equal(200, response.status)
+      end
+
+      should "retry if the Retry-After header is a date" do
+        response_503 = ::HTTP::Response.new(status: 503, version: "1.1", headers: { "Retry-After": 2.seconds.from_now.httpdate }, body: "")
+        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "")
+        HTTP::Client.any_instance.expects(:perform).times(2).returns(response_503, response_200)
+
+        response = Danbooru::Http.use(:retriable).get("https://httpbin.org/status/503")
+        assert_equal(200, response.status)
+      end
+    end
+
     context "#download method" do
       should "download files" do
         response, file = Danbooru::Http.download_media("https://httpbin.org/bytes/1000")

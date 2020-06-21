@@ -1,5 +1,6 @@
 require "danbooru/http/html_adapter"
 require "danbooru/http/xml_adapter"
+require "danbooru/http/retriable"
 
 module Danbooru
   class Http
@@ -139,12 +140,13 @@ module Danbooru
     end
 
     def http
-      @http ||= ::HTTP.
-        follow(strict: false, max_hops: MAX_REDIRECTS).
-        timeout(DEFAULT_TIMEOUT).
-        use(:auto_inflate).
-        headers(Danbooru.config.http_headers).
-        headers("Accept-Encoding" => "gzip")
+      @http ||=
+        ::Danbooru::Http::ApplicationClient.new
+        .follow(strict: false, max_hops: MAX_REDIRECTS)
+        .timeout(DEFAULT_TIMEOUT)
+        .use(:auto_inflate)
+        .headers(Danbooru.config.http_headers)
+        .headers("Accept-Encoding" => "gzip")
     end
   end
 end
