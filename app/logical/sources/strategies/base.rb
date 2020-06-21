@@ -288,9 +288,8 @@ module Sources
         to_h.to_json
       end
 
-      def http_exists?(url, headers)
-        res = HTTParty.head(url, Danbooru.config.httparty_options.deep_merge(headers: headers))
-        res.success?
+      def http_exists?(url, headers = {})
+        http.headers(headers).head(url).status.success?
       end
 
       # Convert commentary to dtext by stripping html tags. Sites can override

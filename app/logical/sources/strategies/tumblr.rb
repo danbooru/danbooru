@@ -168,7 +168,7 @@ module Sources::Strategies
       end
 
       candidates.find do |candidate|
-        http_exists?(candidate, headers)
+        http_exists?(candidate)
       end
     end
 
