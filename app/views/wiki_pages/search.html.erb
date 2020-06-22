@@ -4,6 +4,8 @@
       <%= f.input :title_normalize, label: "Title", hint: "Use * for wildcard searches", input_html: { "data-autocomplete": "wiki-page" } %>
       <%= f.input :other_names_match, label: "Other names", hint: "Use * for wildcard searches" %>
       <%= f.input :body_matches, label: "Body" %>
+      <%= f.input :linked_to, hint: "Which wikis link to the specified wiki.", input_html: { "data-autocomplete": "wiki-page" } %>
+      <%= f.input :not_linked_to, hint: "Which wikis do not link to the specified wiki.", input_html: { "data-autocomplete": "wiki-page" } %>
       <%= f.input :other_names_present, as: :select %>
       <%= f.input :hide_deleted, as: :select, include_blank: false %>
       <%= f.input :order, collection: [%w[Name title], %w[Date time], %w[Posts post_count]], include_blank: false %>
