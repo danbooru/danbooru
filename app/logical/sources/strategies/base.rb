@@ -39,7 +39,7 @@ module Sources
       def initialize(url, referer_url = nil)
         @url = url.to_s
         @referer_url = referer_url&.to_s
-        @urls = [url, referer_url].select(&:present?)
+        @urls = [@url, @referer_url].select(&:present?)
 
         @parsed_url = Addressable::URI.heuristic_parse(url) rescue nil
         @parsed_referer = Addressable::URI.heuristic_parse(referer_url) rescue nil
@@ -152,6 +152,7 @@ module Sources
 
       # Download the file at the given url, or at the main image url by default.
       def download_file!(download_url = image_url)
+        raise DownloadError, "Download failed: couldn't find download url for #{url}" if download_url.blank?
         response, file = http.download_media(download_url)
         raise DownloadError, "Download failed: #{download_url} returned error #{response.status}" if response.status != 200
         file

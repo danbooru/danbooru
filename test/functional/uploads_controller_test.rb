@@ -1,15 +1,30 @@
 require 'test_helper'
 
 class UploadsControllerTest < ActionDispatch::IntegrationTest
-  def assert_uploaded(file_path, user, **upload_params)
-    file = Rack::Test::UploadedFile.new("#{Rails.root}/#{file_path}")
+  def self.should_upload_successfully(source)
+    should "upload successfully from #{source}" do
+      assert_successful_upload(source, user: create(:user, created_at: 1.month.ago))
+    end
+  end
 
-    assert_difference(["Upload.count", "Post.count"]) do
-      post_auth uploads_path, user, params: { upload: { file: file, **upload_params }}
-      assert_redirected_to Upload.last
+  def assert_successful_upload(source_or_file_path, user: @user, **params)
+    if source_or_file_path =~ %r{\Ahttps?://}i
+      source = { source: source_or_file_path }
+    else
+      file = Rack::Test::UploadedFile.new(Rails.root.join(source_or_file_path))
+      source = { file: file }
     end
 
-    Upload.last
+    assert_difference(["Upload.count"]) do
+      post_auth uploads_path, user, params: { upload: { tag_string: "abc", rating: "e", **source, **params }}
+    end
+
+    upload = Upload.last
+    assert_response :redirect
+    assert_redirected_to upload
+    assert_equal("completed", upload.status)
+    assert_equal(Post.last, upload.post)
+    assert_equal(upload.post.md5, upload.md5)
   end
 
   context "The uploads controller" do
@@ -270,32 +285,59 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "uploading a file from your computer" do
-        should "work for a jpeg file" do
-          upload = assert_uploaded("test/files/test.jpg", @user, tag_string: "aaa", rating: "e", source: "aaa")
+        should_upload_successfully("test/files/test.jpg")
+        should_upload_successfully("test/files/test.png")
+        should_upload_successfully("test/files/test-static-32x32.gif")
+        should_upload_successfully("test/files/test-animated-86x52.gif")
+        should_upload_successfully("test/files/test-300x300.mp4")
+        should_upload_successfully("test/files/test-512x512.webm")
+        should_upload_successfully("test/files/compressed.swf")
+      end
 
-          assert_equal("jpg", upload.post.file_ext)
-          assert_equal("aaa", upload.post.source)
-          assert_equal(500, upload.post.image_width)
-          assert_equal(335, upload.post.image_height)
-        end
+      context "uploading a file from a source" do
+        should_upload_successfully("https://www.artstation.com/artwork/04XA4")
+        should_upload_successfully("https://dantewontdie.artstation.com/projects/YZK5q")
+        should_upload_successfully("https://cdna.artstation.com/p/assets/images/images/006/029/978/large/amama-l-z.jpg")
 
-        should "work for a webm file" do
-          upload = assert_uploaded("test/files/test-512x512.webm", @user, tag_string: "aaa", rating: "e", source: "aaa")
+        should_upload_successfully("https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484")
+        should_upload_successfully("https://noizave.deviantart.com/art/test-no-download-697415967")
+        should_upload_successfully("https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg")
 
-          assert_equal("webm", upload.post.file_ext)
-          assert_equal("aaa", upload.post.source)
-          assert_equal(512, upload.post.image_width)
-          assert_equal(512, upload.post.image_height)
-        end
+        should_upload_successfully("https://www.hentai-foundry.com/pictures/user/Afrobull/795025/kuroeda")
+        should_upload_successfully("https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png")
 
-        should "work for a flash file" do
-          upload = assert_uploaded("test/files/compressed.swf", @user, tag_string: "aaa", rating: "e", source: "aaa")
+        should_upload_successfully("https://yande.re/post/show/482880")
+        should_upload_successfully("https://files.yande.re/image/7ecfdead705d7b956b26b1d37b98d089/yande.re%20482880.jpg")
 
-          assert_equal("swf", upload.post.file_ext)
-          assert_equal("aaa", upload.post.source)
-          assert_equal(607, upload.post.image_width)
-          assert_equal(756, upload.post.image_height)
-        end
+        should_upload_successfully("https://konachan.com/post/show/270916")
+        should_upload_successfully("https://konachan.com/image/ca12cdb79a66d242e95a6f958341bf05/Konachan.com%20-%20270916.png")
+
+        should_upload_successfully("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663")
+        should_upload_successfully("http://seiga.nicovideo.jp/seiga/im4937663")
+        should_upload_successfully("https://seiga.nicovideo.jp/image/source/9146749")
+        should_upload_successfully("https://seiga.nicovideo.jp/watch/mg389884")
+        should_upload_successfully("https://www.nicovideo.jp/watch/sm36465441")
+        should_upload_successfully("https://dic.nicovideo.jp/oekaki/52833.png")
+
+        should_upload_successfully("http://nijie.info/view.php?id=213043")
+        should_upload_successfully("https://nijie.info/view_popup.php?id=213043")
+        should_upload_successfully("https://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg")
+
+        should_upload_successfully("https://pawoo.net/web/statuses/1202176")
+        should_upload_successfully("https://img.pawoo.net/media_attachments/files/000/128/953/original/4c0a06087b03343f.png")
+
+        should_upload_successfully("https://www.pixiv.net/en/artworks/64476642")
+        should_upload_successfully("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg")
+
+        should_upload_successfully("https://noizave.tumblr.com/post/162206271767")
+        should_upload_successfully("https://media.tumblr.com/3bbfcbf075ddf969c996641b264086fd/tumblr_os2buiIOt51wsfqepo1_1280.png")
+
+        should_upload_successfully("https://twitter.com/noizave/status/875768175136317440")
+        should_upload_successfully("https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN?format=jpg&name=medium")
+        should_upload_successfully("https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4")
+
+        should_upload_successfully("https://www.weibo.com/5501756072/J2UNKfbqV")
+        should_upload_successfully("https://wx1.sinaimg.cn/mw690/0060kO5aly1gezsyt5xvhj30ok0sgtc9.jpg")
       end
     end
   end
