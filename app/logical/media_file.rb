@@ -43,6 +43,8 @@ class MediaFile
     else
       :bin
     end
+  rescue EOFError
+    :bin
   end
 
   def self.videos_enabled?
