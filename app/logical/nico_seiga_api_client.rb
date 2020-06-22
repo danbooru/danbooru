@@ -4,12 +4,10 @@ class NicoSeigaApiClient
 
   attr_reader :http
 
-  # XXX temp disable following redirects.
-  def initialize(work_id:, type:)
+  def initialize(work_id:, type:, http: Danbooru::Http.new)
     @work_id = work_id
     @work_type = type
-    @http = Danbooru::Http.new
-    @http.http.default_options.features.reject! { |name, _| name == :redirector }
+    @http = http
   end
 
   def image_ids
@@ -81,28 +79,19 @@ class NicoSeigaApiClient
   end
 
   def get(url)
-    cookie_header = Cache.get("nicoseiga-cookie-header") || regenerate_cookie_header
-
-    resp = http.headers({Cookie: cookie_header}).cache(1.minute).get(url)
-
-    if resp.headers["Location"] =~ %r{seiga\.nicovideo\.jp/login/}i
-      cookie_header = regenerate_cookie_header
-      resp = http.headers({Cookie: cookie_header}).cache(1.minute).get(url)
-    end
-
-    resp
-  end
-
-  def regenerate_cookie_header
     form = {
       mail_tel: Danbooru.config.nico_seiga_login,
       password: Danbooru.config.nico_seiga_password
     }
-    resp = http.post("https://account.nicovideo.jp/api/v1/login", form: form)
-    cookies = resp.cookies.map { |c| c.name + "=" + c.value }
-    cookies << "accept_fetish_warning=2"
 
-    Cache.put("nicoseiga-cookie-header", cookies.join(";"), 1.week)
+    # XXX should fail gracefully instead of raising exception
+    resp = http.cache(1.hour).post("https://account.nicovideo.jp/login/redirector?site=seiga", form: form)
+    raise RuntimeError, "NicoSeiga login failed (status=#{resp.status} url=#{url})" if resp.status != 200
+
+    resp = http.headers(accept_fetish_warning: 2).cache(1.minute).get(url)
+    #raise RuntimeError, "NicoSeiga get failed (status=#{resp.status} url=#{url})" if resp.status != 200
+
+    resp
   end
 
   memoize :api_response, :manga_api_response, :user_api_response

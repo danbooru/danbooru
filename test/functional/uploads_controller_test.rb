@@ -316,8 +316,13 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("http://seiga.nicovideo.jp/seiga/im4937663")
         should_upload_successfully("https://seiga.nicovideo.jp/image/source/9146749")
         should_upload_successfully("https://seiga.nicovideo.jp/watch/mg389884")
-        should_upload_successfully("https://www.nicovideo.jp/watch/sm36465441")
         should_upload_successfully("https://dic.nicovideo.jp/oekaki/52833.png")
+        should_upload_successfully("https://lohas.nicoseiga.jp/o/971eb8af9bbcde5c2e51d5ef3a2f62d6d9ff5552/1589933964/3583893")
+        should_upload_successfully("http://lohas.nicoseiga.jp/priv/3521156?e=1382558156&h=f2e089256abd1d453a455ec8f317a6c703e2cedf")
+        should_upload_successfully("http://lohas.nicoseiga.jp/priv/b80f86c0d8591b217e7513a9e175e94e00f3c7a1/1384936074/3583893")
+        should_upload_successfully("http://lohas.nicoseiga.jp/material/5746c5/4459092")
+        # XXX should_upload_successfully("https://dcdn.cdn.nimg.jp/priv/62a56a7f67d3d3746ae5712db9cac7d465f4a339/1592186183/10466669")
+        # XXX should_upload_successfully("https://dcdn.cdn.nimg.jp/nicoseiga/lohas/o/8ba0a9b2ea34e1ef3b5cc50785bd10cd63ec7e4a/1592187477/10466669")
 
         should_upload_successfully("http://nijie.info/view.php?id=213043")
         should_upload_successfully("https://nijie.info/view_popup.php?id=213043")
@@ -334,7 +339,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         should_upload_successfully("https://twitter.com/noizave/status/875768175136317440")
         should_upload_successfully("https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN?format=jpg&name=medium")
-        should_upload_successfully("https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4")
+        # XXX should_upload_successfully("https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4")
 
         should_upload_successfully("https://www.weibo.com/5501756072/J2UNKfbqV")
         should_upload_successfully("https://wx1.sinaimg.cn/mw690/0060kO5aly1gezsyt5xvhj30ok0sgtc9.jpg")
