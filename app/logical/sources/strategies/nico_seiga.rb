@@ -73,8 +73,7 @@ module Sources
       end
 
       def image_url
-        return if image_urls.blank?
-        return url if api_client.blank?
+        return url if image_urls.blank? || api_client.blank?
 
         img = case url
         when DIRECT || CDN_DIRECT then "https://seiga.nicovideo.jp/image/source/#{image_id_from_url(url)}"
