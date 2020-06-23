@@ -182,7 +182,7 @@ module Sources
         form = { email: Danbooru.config.nijie_login, password: Danbooru.config.nijie_password }
 
         # XXX `retriable` must come after `cache` so that retries don't return cached error responses.
-        response = http.cache(1.hour).use(:retriable).post("https://nijie.info/login_int.php", form: form)
+        response = http.cache(1.hour).use(retriable: { max_retries: 20 }).post("https://nijie.info/login_int.php", form: form)
         DanbooruLogger.info "Nijie login failed (#{url}, #{response.status})" if response.status != 200
         return nil unless response.status == 200
 
