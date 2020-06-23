@@ -7,6 +7,7 @@ require "danbooru/http/session"
 
 module Danbooru
   class Http
+    class DownloadError < StandardError; end
     class FileTooLargeError < StandardError; end
 
     DEFAULT_TIMEOUT = 10
@@ -110,6 +111,7 @@ module Danbooru
       end
 
       def download_response(response, file: Tempfile.new("danbooru-download-", binmode: true))
+        raise DownloadError, "Downloading #{response.uri} failed with code #{response.status}" if response.status != 200
         raise FileTooLargeError, response if @max_size && response.content_length.to_i > @max_size
 
         size = 0
