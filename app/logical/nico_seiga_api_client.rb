@@ -88,7 +88,7 @@ class NicoSeigaApiClient
     resp = http.cache(1.hour).post("https://account.nicovideo.jp/login/redirector?site=seiga", form: form)
     raise RuntimeError, "NicoSeiga login failed (status=#{resp.status} url=#{url})" if resp.status != 200
 
-    resp = http.headers(accept_fetish_warning: 2).cache(1.minute).get(url)
+    resp = http.cache(1.minute).get(url)
     #raise RuntimeError, "NicoSeiga get failed (status=#{resp.status} url=#{url})" if resp.status != 200
 
     resp
