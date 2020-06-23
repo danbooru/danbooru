@@ -339,6 +339,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         should_upload_successfully("https://twitter.com/noizave/status/875768175136317440")
         should_upload_successfully("https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN?format=jpg&name=medium")
+        should_upload_successfully("https://pbs.twimg.com/profile_banners/1225702850002468864/1588597370/1500x500")
         # XXX should_upload_successfully("https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4")
 
         should_upload_successfully("https://www.weibo.com/5501756072/J2UNKfbqV")
