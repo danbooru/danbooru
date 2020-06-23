@@ -33,7 +33,7 @@ class PostVersion < ApplicationRecord
     end
 
     def tag_matches(string)
-      tag = string.split(/\S+/)[0]
+      tag = string.match(/\S+/)[0]
       return all if tag.nil?
       tag = "*#{tag}*" unless tag =~ /\*/
       where_ilike(:tags, tag)
