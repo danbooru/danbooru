@@ -4,11 +4,8 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
   def assert_artist_found(expected_artist, source_url = nil)
     if source_url
       get_auth artists_path(format: "json", search: { url_matches: source_url }), @user
-      if response.body =~ /Net::OpenTimeout/
-        skip "Remote connection to #{source_url} failed"
-        return
-      end
     end
+
     assert_response :success
     json = JSON.parse(response.body)
     assert_equal(1, json.size, "Testing URL: #{source_url}")
@@ -17,10 +14,6 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
   def assert_artist_not_found(source_url)
     get_auth artists_path(format: "json", search: { url_matches: source_url }), @user
-    if response.body =~ /Net::OpenTimeout/
-      skip "Remote connection to #{source_url} failed"
-      return
-    end
 
     assert_response :success
     json = JSON.parse(response.body)

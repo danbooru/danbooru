@@ -3,8 +3,6 @@ module DownloadTestHelper
     strategy = Sources::Strategies.find(source, referer)
     file = strategy.download_file!
     assert_equal(expected_filesize, file.size, "Tested source URL: #{source}")
-  rescue Net::OpenTimeout
-    skip "Remote connection to #{source} failed"
   end
 
   def assert_rewritten(expected_source, test_source, test_referer = nil)

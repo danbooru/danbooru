@@ -15,10 +15,7 @@ module Sources
 
     def get_source(source)
       @site = Sources::Strategies.find(source)
-
       @site
-    rescue Net::OpenTimeout
-      skip "Remote connection to #{source} failed"
     end
 
     context "in all cases" do
