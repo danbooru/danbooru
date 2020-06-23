@@ -11,11 +11,13 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
 
       should "follow redirects" do
+        skip "Skipping test (https://github.com/postmanlabs/httpbin/issues/617)"
         response = Danbooru::Http.get("https://httpbin.org/absolute-redirect/3")
         assert_equal(200, response.status)
       end
 
       should "fail if redirected too many times" do
+        skip "Skipping test (https://github.com/postmanlabs/httpbin/issues/617)"
         response = Danbooru::Http.get("https://httpbin.org/absolute-redirect/10")
         assert_equal(598, response.status)
       end
@@ -134,6 +136,7 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
 
       should "follow redirects when downloading files" do
+        skip "Skipping test (https://github.com/postmanlabs/httpbin/issues/617)"
         response, file = Danbooru::Http.download_media("https://httpbin.org/redirect-to?url=https://httpbin.org/bytes/1000")
 
         assert_equal(200, response.status)
