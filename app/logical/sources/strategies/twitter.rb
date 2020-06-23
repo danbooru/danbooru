@@ -200,7 +200,7 @@ module Sources::Strategies
     end
 
     def api_response
-      return {} unless self.class.enabled?
+      return {} unless self.class.enabled? && status_id.present?
       api_client.status(status_id)
     end
 
