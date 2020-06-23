@@ -54,6 +54,22 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         get artist_path(@artist.id)
         assert_response :success
       end
+
+      should "show active wikis" do
+        as(@user) { create(:wiki_page, title: @artist.name) }
+        get artist_path(@artist.id)
+
+        assert_response :success
+        assert_select ".artist-wiki", count: 1
+      end
+
+      should "not show deleted wikis" do
+        as(@user) { create(:wiki_page, title: @artist.name, is_deleted: true) }
+        get artist_path(@artist.id)
+
+        assert_response :success
+        assert_select ".artist-wiki", count: 0
+      end
     end
 
     context "new action" do
