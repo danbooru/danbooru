@@ -8,7 +8,7 @@
     <% if @artist.is_banned? && !policy(@artist).can_view_banned? %>
       <p>The artist requested removal of this page.</p>
     <% else %>
-      <% if @artist.wiki_page.present? %>
+      <% if @artist.wiki_page.present? && !@artist.wiki_page.is_deleted %>
         <div class="prose">
           <%= format_text(@artist.wiki_page.body, :disable_mentions => true) %>
         </div>
