@@ -6,6 +6,21 @@ class PixivApiClient
   CLIENT_SECRET = "HP3RmkgAmEGro0gn1x9ioawQE8WMfvLXDz3ZqxpK"
   CLIENT_HASH_SALT = "28c1fdd170a5204386cb1313c7077b34f83e4aaf4aa829ce78c231e05b0bae2c"
 
+  # Tools to not include in the tags list. We don't tag digital media, so
+  # including these results in bad translated tags suggestions.
+  TOOLS_BLACKLIST = %w[
+    Photoshop Illustrator Fireworks Flash Painter PaintShopPro pixiv\ Sketch
+    CLIP\ STUDIO\ PAINT IllustStudio ComicStudio RETAS\ STUDIO SAI PhotoStudio
+    Pixia NekoPaint PictBear openCanvas ArtRage Expression Inkscape GIMP
+    CGillust COMICWORKS MS_Paint EDGE AzPainter AzPainter2 AzDrawing
+    PicturePublisher SketchBookPro Processing 4thPaint GraphicsGale mdiapp
+    Paintgraphic AfterEffects drawr CLIP\ PAINT\ Lab FireAlpaca Pixelmator
+    AzDrawing2 MediBang\ Paint Krita ibisPaint Procreate Live2D
+    Lightwave3D Shade Poser STRATA AnimationMaster XSI CARRARA CINEMA4D Maya
+    3dsMax Blender ZBrush Metasequoia Sunny3D Bryce Vue Hexagon\ King SketchUp
+    VistaPro Sculptris Comi\ Po! modo DAZ\ Studio 3D-Coat
+  ]
+
   class Error < StandardError; end
   class BadIDError < Error; end
 
@@ -22,7 +37,7 @@ class PixivApiClient
       @artist_commentary_title = json["title"].to_s
       @artist_commentary_desc = json["caption"].to_s
       @tags = json["tags"].reject {|x| x =~ /^http:/}
-      @tags += json["tools"]
+      @tags += json["tools"] - TOOLS_BLACKLIST
 
       if json["metadata"]
         if json["metadata"]["zip_urls"]

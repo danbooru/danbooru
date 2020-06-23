@@ -238,6 +238,10 @@ module Sources
           assert_includes(@translated_tags, "foo")
         end
 
+        should "not translate tags for digital media" do
+          assert_equal(false, @tags.include?("Photoshop"))
+        end
+
         should "normalize 10users入り tags" do
           assert_includes(@tags, "風景10users入り")
           assert_includes(@translated_tags, "scenery")
@@ -269,7 +273,7 @@ module Sources
         should "not translate '1000users入り' to '1'" do
           FactoryBot.create(:tag, name: "1", post_count: 1)
           source = get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=60665428")
-          tags = %w[1000users入り Fate/GrandOrder アルジュナ(Fate) アルトリア・ペンドラゴン イシュタル(Fate) グランブルーファンタジー マシュ・キリエライト マーリン(Fate) 両儀式 手袋 CLIP\ STUDIO\ PAINT Photoshop]
+          tags = %w[1000users入り Fate/GrandOrder アルジュナ(Fate) アルトリア・ペンドラゴン イシュタル(Fate) グランブルーファンタジー マシュ・キリエライト マーリン(Fate) 両儀式 手袋]
 
           assert_equal(tags.sort, source.tags.map(&:first).sort)
           assert_equal(["fate/grand_order"], source.translated_tags.map(&:name))
