@@ -61,6 +61,8 @@ class ActiveSupport::TestCase
 end
 
 class ActionDispatch::IntegrationTest
+  extend ControllerHelper
+
   register_encoder :xml, response_parser: ->(body) { Nokogiri.XML(body) }
 
   def method_authenticated(method_name, url, user, **options)
