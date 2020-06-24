@@ -169,7 +169,7 @@ module Sources
 
     context "The source for a 'http://ve.media.tumblr.com/*' video post with inline images" do
       setup do
-        @url = "https://ve.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4"
+        @url = "https://va.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4"
         @ref = "https://noizave.tumblr.com/post/162222617101"
       end
 
@@ -177,7 +177,7 @@ module Sources
         should "get the video and inline images" do
           site = Sources::Strategies.find(@url, @ref)
           urls = %w[
-            https://ve.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4
+            https://va.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4
             https://media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os31dclyCR1v11u29_1280.png
           ]
 

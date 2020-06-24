@@ -6,15 +6,11 @@ class ArtistTest < ActiveSupport::TestCase
 
     assert_equal(1, artists.size)
     assert_equal(expected_name, artists.first.name, "Testing URL: #{source_url}")
-  rescue Net::OpenTimeout, PixivApiClient::Error
-    skip "Remote connection failed for #{source_url}"
   end
 
   def assert_artist_not_found(source_url)
     artists = ArtistFinder.find_artists(source_url).to_a
     assert_equal(0, artists.size, "Testing URL: #{source_url}")
-  rescue Net::OpenTimeout
-    skip "Remote connection failed for #{source_url}"
   end
 
   context "An artist" do
@@ -172,15 +168,11 @@ class ArtistTest < ActiveSupport::TestCase
       a2 = FactoryBot.create(:artist, :name => "subway", :url_string => "http://subway.com/x/test.jpg")
       a3 = FactoryBot.create(:artist, :name => "minko", :url_string => "https://minko.com/x/test.jpg")
 
-      begin
-        assert_artist_found("rembrandt", "http://rembrandt.com/x/test.jpg")
-        assert_artist_found("rembrandt", "http://rembrandt.com/x/another.jpg")
-        assert_artist_not_found("http://nonexistent.com/test.jpg")
-        assert_artist_found("minko", "https://minko.com/x/test.jpg")
-        assert_artist_found("minko", "http://minko.com/x/test.jpg")
-      rescue Net::OpenTimeout
-        skip "network failure"
-      end
+      assert_artist_found("rembrandt", "http://rembrandt.com/x/test.jpg")
+      assert_artist_found("rembrandt", "http://rembrandt.com/x/another.jpg")
+      assert_artist_not_found("http://nonexistent.com/test.jpg")
+      assert_artist_found("minko", "https://minko.com/x/test.jpg")
+      assert_artist_found("minko", "http://minko.com/x/test.jpg")
     end
 
     should "be case-insensitive to domains when finding matches by url" do

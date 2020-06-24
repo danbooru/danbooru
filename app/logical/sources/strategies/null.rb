@@ -47,7 +47,7 @@ module Sources
         when %r{\Ahttps?://c(?:s|han|[1-4])\.sankakucomplex\.com/data(?:/sample)?/(?:[a-f0-9]{2}/){2}(?:sample-|preview)?([a-f0-9]{32})}i
           "https://chan.sankakucomplex.com/en/post/show?md5=#{$1}"
 
-        when %r{\Ahttps?://(?:www|s(?:tatic|[1-4]))\.zerochan\.net/.+(?:\.|\/)(\d+)(?:\.(?:jpe?g?))?\z}i
+        when %r{\Ahttps?://(?:www|s(?:tatic|[1-4]))\.zerochan\.net/.+(?:\.|\/)(\d+)(?:\.(?:jpe?g?|png))?\z}i
           "https://www.zerochan.net/#{$1}#full"
 
         when %r{\Ahttps?://static[1-6]?\.minitokyo\.net/(?:downloads|view)/(?:\d{2}/){2}(\d+)}i

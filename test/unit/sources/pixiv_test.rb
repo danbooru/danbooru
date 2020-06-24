@@ -15,10 +15,7 @@ module Sources
 
     def get_source(source)
       @site = Sources::Strategies.find(source)
-
       @site
-    rescue Net::OpenTimeout
-      skip "Remote connection to #{source} failed"
     end
 
     context "in all cases" do
@@ -70,17 +67,6 @@ module Sources
 
           assert_equal("https://i.pximg.net/img-original/img/2017/09/18/03/18/24/65015428_p4.png", @site.image_url)
           assert_equal("赤井さしみ", @site.artist_name)
-        end
-      end
-
-      context "A https://www.pixiv.net/fanbox/creator/*/post/* source" do
-        should_eventually "work" do
-          @site = Sources::Strategies.find("http://www.pixiv.net/fanbox/creator/554149/post/82555")
-
-          assert_equal("TYONE(お仕事募集中)", @site.artist_name)
-          assert_equal("https://www.pixiv.net/users/554149", @site.profile_url)
-          assert_equal("https://fanbox.pixiv.net/images/post/82555/Lyyeb6dDLcQZmy09nqLZapuS.jpeg", @site.image_url)
-          assert_nothing_raised { @site.to_h }
         end
       end
 
@@ -249,6 +235,10 @@ module Sources
           assert_includes(@translated_tags, "foo")
         end
 
+        should "not translate tags for digital media" do
+          assert_equal(false, @tags.include?("Photoshop"))
+        end
+
         should "normalize 10users入り tags" do
           assert_includes(@tags, "風景10users入り")
           assert_includes(@translated_tags, "scenery")
@@ -280,7 +270,7 @@ module Sources
         should "not translate '1000users入り' to '1'" do
           FactoryBot.create(:tag, name: "1", post_count: 1)
           source = get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=60665428")
-          tags = %w[1000users入り Fate/GrandOrder アルジュナ(Fate) アルトリア・ペンドラゴン イシュタル(Fate) グランブルーファンタジー マシュ・キリエライト マーリン(Fate) 両儀式 手袋 CLIP\ STUDIO\ PAINT Photoshop]
+          tags = %w[1000users入り Fate/GrandOrder アルジュナ(Fate) アルトリア・ペンドラゴン イシュタル(Fate) グランブルーファンタジー マシュ・キリエライト マーリン(Fate) 両儀式 手袋]
 
           assert_equal(tags.sort, source.tags.map(&:first).sort)
           assert_equal(["fate/grand_order"], source.translated_tags.map(&:name))

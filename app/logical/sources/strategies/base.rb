@@ -14,6 +14,8 @@
 module Sources
   module Strategies
     class Base
+      class DownloadError < StandardError; end
+
       attr_reader :url, :referer_url, :urls, :parsed_url, :parsed_referer, :parsed_urls
 
       extend Memoist
@@ -35,9 +37,9 @@ module Sources
       #   <tt>referrer_url</tt> so the strategy can discover the HTML
       #   page and other information.
       def initialize(url, referer_url = nil)
-        @url = url
-        @referer_url = referer_url
-        @urls = [url, referer_url].select(&:present?)
+        @url = url.to_s
+        @referer_url = referer_url&.to_s
+        @urls = [@url, @referer_url].select(&:present?)
 
         @parsed_url = Addressable::URI.heuristic_parse(url) rescue nil
         @parsed_referer = Addressable::URI.heuristic_parse(referer_url) rescue nil
@@ -139,14 +141,27 @@ module Sources
       # Subclasses should merge in any required headers needed to access resources
       # on the site.
       def headers
-        Danbooru.config.http_headers
+        {}
       end
 
       # Returns the size of the image resource without actually downloading the file.
       def size
-        Downloads::File.new(image_url).size
+        http.head(image_url).content_length.to_i
       end
       memoize :size
+
+      # Download the file at the given url, or at the main image url by default.
+      def download_file!(download_url = image_url)
+        raise DownloadError, "Download failed: couldn't find download url for #{url}" if download_url.blank?
+        response, file = http.download_media(download_url)
+        raise DownloadError, "Download failed: #{download_url} returned error #{response.status}" if response.status != 200
+        file
+      end
+
+      def http
+        Danbooru::Http.public_only.timeout(30).max_size(Danbooru.config.max_file_size)
+      end
+      memoize :http
 
       # The url to use for artist finding purposes. This will be stored in the
       # artist entry. Normally this will be the profile url.
@@ -274,9 +289,8 @@ module Sources
         to_h.to_json
       end
 
-      def http_exists?(url, headers)
-        res = HTTParty.head(url, Danbooru.config.httparty_options.deep_merge(headers: headers))
-        res.success?
+      def http_exists?(url, headers = {})
+        http.headers(headers).head(url).status.success?
       end
 
       # Convert commentary to dtext by stripping html tags. Sites can override

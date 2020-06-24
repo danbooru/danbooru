@@ -11,14 +11,6 @@ module TagRelationshipRetirementService
     "This topic deals with tag relationships created two or more years ago that have not been used since. They will be retired. This topic will be updated as an automated system retires expired relationships."
   end
 
-  def dry_run
-    [TagAlias, TagImplication].each do |model|
-      each_candidate(model) do |rel|
-        puts "#{rel.relationship} #{rel.antecedent_name} -> #{rel.consequent_name} retired"
-      end
-    end
-  end
-
   def forum_topic
     topic = ForumTopic.where(title: forum_topic_title).first
     if topic.nil?

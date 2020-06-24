@@ -7,7 +7,6 @@ gem "pg"
 gem "delayed_job"
 gem "delayed_job_active_record"
 gem "simple_form"
-gem "mechanize"
 gem "whenever", :require => false
 gem "sanitize"
 gem 'ruby-vips'
@@ -28,7 +27,6 @@ gem 'daemons'
 gem 'oauth2'
 gem 'bootsnap'
 gem 'addressable'
-gem 'httparty'
 gem 'rakismet'
 gem 'recaptcha', require: "recaptcha/rails"
 gem 'activemodel-serializers-xml'
@@ -47,9 +45,7 @@ gem 'http'
 gem 'activerecord-hierarchical_query'
 gem 'pundit'
 gem 'mail'
-
-# locked to 1.10.9 to workaround an incompatibility with nokogumbo 2.0.2.
-gem 'nokogiri', '~> 1.10.9'
+gem 'nokogiri'
 
 group :production, :staging do
   gem 'unicorn', :platforms => :ruby
@@ -65,7 +61,6 @@ end
 group :development do
   gem 'rubocop'
   gem 'rubocop-rails'
-  gem 'sinatra'
   gem 'meta_request'
   gem 'rack-mini-profiler'
   gem 'stackprof'
@@ -86,7 +81,6 @@ group :test do
   gem "mocha", require: "mocha/minitest"
   gem "ffaker"
   gem "simplecov", "~> 0.17.0", require: false
-  gem "webmock", require: "webmock/minitest"
   gem "minitest-ci"
   gem "minitest-reporters", require: "minitest/reporters"
   gem "mock_redis"

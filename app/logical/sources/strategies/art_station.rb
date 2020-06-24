@@ -147,7 +147,7 @@ module Sources::Strategies
         urls = urls.reverse
       end
 
-      chosen_url = urls.find { |url| http_exists?(url, headers) }
+      chosen_url = urls.find { |url| http_exists?(url) }
       chosen_url || url
     end
   end

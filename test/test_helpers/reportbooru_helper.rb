@@ -1,7 +1,7 @@
 module ReportbooruHelper
-  def mock_request(url, method: :get, status: 200, body: nil, http: Danbooru::Http.any_instance)
+  def mock_request(url, method: :get, status: 200, body: nil, http: Danbooru::Http.any_instance, **options)
     response = HTTP::Response.new(status: status, body: body, version: "1.1")
-    http.stubs(method).with(url).returns(response)
+    http.stubs(method).with(url, **options).returns(response)
   end
 
   def mock_post_search_rankings(date = Date.today, rankings)

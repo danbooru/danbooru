@@ -34,7 +34,7 @@ class ModerationReport < ApplicationRecord
   def forum_topic
     topic = ForumTopic.find_by_title(forum_topic_title)
     if topic.nil?
-      CurrentUser.as_system do
+      CurrentUser.scoped(User.system) do
         topic = ForumTopic.create!(creator: User.system, title: forum_topic_title, category_id: 0, min_level: User::Levels::MODERATOR)
         forum_post = ForumPost.create!(creator: User.system, body: forum_topic_body, topic: topic)
       end

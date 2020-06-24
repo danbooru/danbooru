@@ -12,8 +12,9 @@ class IqdbProxy
   end
 
   def download(url, type)
-    download = Downloads::File.new(url)
-    file, strategy = download.download!(url: download.send(type))
+    strategy = Sources::Strategies.find(url)
+    download_url = strategy.send(type)
+    file = strategy.download_file!(download_url)
     file
   end
 
@@ -32,7 +33,7 @@ class IqdbProxy
       file = download(params[:image_url], :url)
       results = query(file: file, limit: limit)
     elsif params[:file_url].present?
-      file = download(params[:file_url], :file_url)
+      file = download(params[:file_url], :image_url)
       results = query(file: file, limit: limit)
     elsif params[:post_id].present?
       url = Post.find(params[:post_id]).preview_file_url
@@ -50,9 +51,12 @@ class IqdbProxy
     file.try(:close)
   end
 
-  def query(params)
+  def query(file: nil, url: nil, limit: 20)
     raise NotImplementedError, "the IQDBs service isn't configured" unless enabled?
-    response = http.post("#{iqdbs_server}/similar", body: params)
+
+    file = HTTP::FormData::File.new(file) if file
+    form = { file: file, url: url, limit: limit }.compact
+    response = http.timeout(30).post("#{iqdbs_server}/similar", form: form)
 
     raise Error, "IQDB error: #{response.status}" if response.status != 200
     raise Error, "IQDB error: #{response.parse["error"]}" if response.parse.is_a?(Hash)

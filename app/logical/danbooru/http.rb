@@ -1,16 +1,41 @@
+require "danbooru/http/html_adapter"
+require "danbooru/http/xml_adapter"
+require "danbooru/http/cache"
+require "danbooru/http/redirector"
+require "danbooru/http/retriable"
+require "danbooru/http/session"
+
 module Danbooru
   class Http
-    DEFAULT_TIMEOUT = 3
+    class DownloadError < StandardError; end
+    class FileTooLargeError < StandardError; end
+
+    DEFAULT_TIMEOUT = 10
     MAX_REDIRECTS = 5
 
-    attr_writer :cache, :http
+    attr_accessor :max_size, :http
 
     class << self
-      delegate :get, :put, :post, :delete, :cache, :follow, :timeout, :auth, :basic_auth, :headers, to: :new
+      delegate :get, :head, :put, :post, :delete, :cache, :follow, :max_size, :timeout, :auth, :basic_auth, :headers, :cookies, :use, :public_only, :download_media, to: :new
+    end
+
+    def initialize
+      @http ||=
+        ::Danbooru::Http::ApplicationClient.new
+        .timeout(DEFAULT_TIMEOUT)
+        .headers("Accept-Encoding" => "gzip")
+        .headers("User-Agent": "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}")
+        .use(:auto_inflate)
+        .use(redirector: { max_redirects: MAX_REDIRECTS })
+        .use(:session)
     end
 
     def get(url, **options)
       request(:get, url, **options)
+    end
+
+    def head(url, **options)
+      request(:head, url, **options)
     end
 
     def put(url, **options)
@@ -25,12 +50,12 @@ module Danbooru
       request(:delete, url, **options)
     end
 
-    def cache(expiry)
-      dup.tap { |o| o.cache = expiry.to_i }
-    end
-
     def follow(*args)
       dup.tap { |o| o.http = o.http.follow(*args) }
+    end
+
+    def max_size(size)
+      dup.tap { |o| o.max_size = size }
     end
 
     def timeout(*args)
@@ -49,43 +74,72 @@ module Danbooru
       dup.tap { |o| o.http = o.http.headers(*args) }
     end
 
+    def cookies(*args)
+      dup.tap { |o| o.http = o.http.cookies(*args) }
+    end
+
+    def use(*args)
+      dup.tap { |o| o.http = o.http.use(*args) }
+    end
+
+    def cache(expires_in)
+      use(cache: { expires_in: expires_in })
+    end
+
+    # allow requests only to public IPs, not to local or private networks.
+    def public_only
+      dup.tap do |o|
+        o.http = o.http.dup.tap do |http|
+          http.default_options = http.default_options.with_socket_class(ValidatingSocket)
+        end
+      end
+    end
+
+    concerning :DownloadMethods do
+      def download_media(url, no_polish: true, **options)
+        url = Addressable::URI.heuristic_parse(url)
+        response = headers(Referer: url.origin).get(url)
+
+        # prevent Cloudflare Polish from modifying images.
+        if no_polish && response.headers["CF-Polished"].present?
+          url.query_values = url.query_values.to_h.merge(danbooru_no_polish: SecureRandom.uuid)
+          return download_media(url, no_polish: false)
+        end
+
+        file = download_response(response, **options)
+        [response, MediaFile.open(file)]
+      end
+
+      def download_response(response, file: Tempfile.new("danbooru-download-", binmode: true))
+        raise DownloadError, "Downloading #{response.uri} failed with code #{response.status}" if response.status != 200
+        raise FileTooLargeError, response if @max_size && response.content_length.to_i > @max_size
+
+        size = 0
+        response.body.each do |chunk|
+          size += chunk.size
+          raise FileTooLargeError if @max_size && size > @max_size
+          file.write(chunk)
+        end
+
+        file.rewind
+        file
+      end
+    end
+
     protected
 
     def request(method, url, **options)
-      if @cache.present?
-        cached_request(method, url, **options)
-      else
-        raw_request(method, url, **options)
-      end
-    rescue HTTP::Redirector::TooManyRedirectsError
-      ::HTTP::Response.new(status: 598, body: "", version: "1.1")
-    rescue HTTP::TimeoutError
-      # return a synthetic http error on connection timeouts
-      ::HTTP::Response.new(status: 599, body: "", version: "1.1")
-    end
-
-    def cached_request(method, url, **options)
-      key = Cache.hash({ method: method, url: url, headers: http.default_options.headers.to_h, **options }.to_json)
-
-      cached_response = Cache.get(key, @cache) do
-        response = raw_request(method, url, **options)
-        { status: response.status, body: response.to_s, headers: response.headers.to_h, version: "1.1" }
-      end
-
-      ::HTTP::Response.new(**cached_response)
-    end
-
-    def raw_request(method, url, **options)
       http.send(method, url, **options)
+    rescue ValidatingSocket::ProhibitedIpError
+      fake_response(597, "")
+    rescue HTTP::Redirector::TooManyRedirectsError
+      fake_response(598, "")
+    rescue HTTP::TimeoutError
+      fake_response(599, "")
     end
 
-    def http
-      @http ||= ::HTTP.
-        follow(strict: false, max_hops: MAX_REDIRECTS).
-        timeout(DEFAULT_TIMEOUT).
-        use(:auto_inflate).
-        headers(Danbooru.config.http_headers).
-        headers("Accept-Encoding" => "gzip")
+    def fake_response(status, body)
+      ::HTTP::Response.new(status: status, version: "1.1", body: ::HTTP::Response::Body.new(body))
     end
   end
 end

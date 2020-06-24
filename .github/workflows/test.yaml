@@ -64,7 +64,7 @@ jobs:
     - name: Install OS dependencies
       run: |
         apt-get update
-        apt-get -y install --no-install-recommends build-essential ruby ruby-dev ruby-bundler git nodejs yarnpkg webpack ffmpeg mkvtoolnix libvips-dev libxml2-dev postgresql-server-dev-all wget
+        apt-get -y install --no-install-recommends build-essential ruby ruby-dev ruby-bundler git nodejs yarnpkg webpack ffmpeg mkvtoolnix libvips-dev libxml2-dev libxslt-dev zlib1g-dev postgresql-server-dev-all wget
         ln -sf /usr/bin/yarnpkg /usr/bin/yarn
 
     - name: Install Ruby dependencies

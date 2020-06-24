@@ -6,7 +6,7 @@ worker_processes 20
 
 timeout 180
 # listen "127.0.0.1:9000", :tcp_nopush => true
-listen "/tmp/.unicorn.sock", :backlog => 512
+listen "/tmp/.unicorn.sock", backlog: 1024
 
 # Spawn unicorn master worker for user apps (group: apps)
 user 'danbooru', 'danbooru'

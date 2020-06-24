@@ -9,15 +9,6 @@ class CloudflareService
     api_token.present? && zone.present?
   end
 
-  def ips(expiry: 24.hours)
-    response = Danbooru::Http.cache(expiry).get("https://api.cloudflare.com/client/v4/ips")
-    return [] if response.code != 200
-
-    result = response.parse["result"]
-    ips = result["ipv4_cidrs"] + result["ipv6_cidrs"]
-    ips.map { |ip| IPAddr.new(ip) }
-  end
-
   def purge_cache(urls)
     return unless enabled?
 

@@ -13,14 +13,20 @@ RUN \
     webpack \
     libvips-dev \
     libxml2-dev \
+    libxslt-dev \
+    zlib1g-dev \
     postgresql-server-dev-all && \
     # webpacker expects the binary to be called `yarn`, but debian/ubuntu installs it as `yarnpkg`.
     ln -sf /usr/bin/yarnpkg /usr/bin/yarn
 
 WORKDIR /build
 
+COPY .bundle .bundle
 COPY Gemfile Gemfile.lock ./
-RUN BUNDLE_DEPLOYMENT=true bundle install --jobs 4
+RUN \
+  bundle config set deployment true --local && \
+  bundle config set path vendor/bundle && \
+  bundle install --jobs 4
 
 COPY package.json yarn.lock ./
 RUN yarn install
@@ -44,6 +50,8 @@ RUN \
     mkvtoolnix \
     libvips \
     libxml2 \
+    libxslt1.1 \
+    zlib1g \
     postgresql-client
 
 USER danbooru

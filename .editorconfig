@@ -1,0 +1,14 @@
+root = true
+
+[**.{js,rb,css,erb,md,json,yml}]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[**.html.erb]
+indent_size = unset
+
+[app/javascript/vendor/**]
+indent_size = unset

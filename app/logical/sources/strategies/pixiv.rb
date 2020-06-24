@@ -64,9 +64,6 @@ module Sources
       ORIG_IMAGE = %r{#{PXIMG}/img-original/img/#{DATE}/(?<illust_id>\d+)_p(?<page>\d+)\.#{EXT}\z}i
       STACC_PAGE = %r{\A#{WEB}/stacc/#{MONIKER}/?\z}i
       NOVEL_PAGE = %r{(?:\Ahttps?://www\.pixiv\.net/novel/show\.php\?id=(\d+))}
-      FANBOX_ACCOUNT = %r{(?:\Ahttps?://www\.pixiv\.net/fanbox/creator/\d+\z)}
-      FANBOX_IMAGE = %r{(?:\Ahttps?://fanbox\.pixiv\.net/images/post/(\d+))}
-      FANBOX_PAGE = %r{(?:\Ahttps?://www\.pixiv\.net/fanbox/creator/\d+/post/(\d+))}
 
       def self.to_dtext(text)
         if text.nil?
@@ -127,14 +124,6 @@ module Sources
           return "https://www.pixiv.net/novel/show.php?id=#{novel_id}&mode=cover"
         end
 
-        if fanbox_id.present?
-          return "https://www.pixiv.net/fanbox/creator/#{metadata.user_id}/post/#{fanbox_id}"
-        end
-
-        if fanbox_account_id.present?
-          return "https://www.pixiv.net/fanbox/creator/#{fanbox_account_id}"
-        end
-
         if illust_id.present?
           return "https://www.pixiv.net/artworks/#{illust_id}"
         end
@@ -192,17 +181,7 @@ module Sources
       end
 
       def headers
-        if fanbox_id.present?
-          # need the session to download fanbox images
-          return {
-            "Referer" => "https://www.pixiv.net/fanbox",
-            "Cookie" => HTTP::Cookie.cookie_value(agent.cookies)
-          }
-        end
-
-        {
-          "Referer" => "https://www.pixiv.net"
-        }
+        { "Referer" => "https://www.pixiv.net" }
       end
 
       def normalize_for_source
@@ -242,10 +221,6 @@ module Sources
       end
 
       def image_urls_sub
-        if url =~ FANBOX_IMAGE
-          return [url]
-        end
-
         # there's too much normalization bullshit we have to deal with
         # raw urls, so just fetch the canonical url from the api every
         # time.
@@ -265,7 +240,7 @@ module Sources
       # even though it makes sense to reference page_url here, it will only look
       # at (url, referer_url).
       def illust_id
-        return nil if novel_id.present? || fanbox_id.present?
+        return nil if novel_id.present?
 
         parsed_urls.each do |url|
           # http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054
@@ -328,44 +303,9 @@ module Sources
       end
       memoize :novel_id
 
-      def fanbox_id
-        [url, referer_url].each do |x|
-          if x =~ FANBOX_PAGE
-            return $1
-          end
-
-          if x =~ FANBOX_IMAGE
-            return $1
-          end
-        end
-
-        nil
-      end
-      memoize :fanbox_id
-
-      def fanbox_account_id
-        [url, referer_url].each do |x|
-          if x =~ FANBOX_ACCOUNT
-            return x
-          end
-        end
-
-        nil
-      end
-      memoize :fanbox_account_id
-
-      def agent
-        PixivWebAgent.build
-      end
-      memoize :agent
-
       def metadata
         if novel_id.present?
           return PixivApiClient.new.novel(novel_id)
-        end
-
-        if fanbox_id.present?
-          return PixivApiClient.new.fanbox(fanbox_id)
         end
 
         PixivApiClient.new.work(illust_id)

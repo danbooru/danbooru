@@ -178,54 +178,21 @@ module Sources
       def page
         return nil if page_url.blank?
 
-        doc = agent.get(page_url)
+        http = Danbooru::Http.new
+        form = { email: Danbooru.config.nijie_login, password: Danbooru.config.nijie_password }
 
-        if doc.search("div#header-login-container").any?
-          # Session cache is invalid, clear it and log in normally.
-          Cache.delete("nijie-session")
-          doc = agent.get(page_url)
-        end
+        # XXX `retriable` must come after `cache` so that retries don't return cached error responses.
+        response = http.cache(1.hour).use(retriable: { max_retries: 20 }).post("https://nijie.info/login_int.php", form: form)
+        DanbooruLogger.info "Nijie login failed (#{url}, #{response.status})" if response.status != 200
+        return nil unless response.status == 200
 
-        doc
-      rescue Mechanize::ResponseCodeError => e
-        return nil if e.response_code.to_i == 404
-        raise
+        response = http.cookies(R18: 1).cache(1.minute).get(page_url)
+        return nil unless response.status == 200
+
+        response&.parse
       end
+
       memoize :page
-
-      def agent
-        mech = Mechanize.new
-
-        session = Cache.get("nijie-session")
-        if session
-          cookie = Mechanize::Cookie.new("NIJIEIJIEID", session)
-          cookie.domain = ".nijie.info"
-          cookie.path = "/"
-          mech.cookie_jar.add(cookie)
-        else
-          mech.get("https://nijie.info/login.php") do |page|
-            page.form_with(:action => "/login_int.php") do |form|
-              form['email'] = Danbooru.config.nijie_login
-              form['password'] = Danbooru.config.nijie_password
-            end.click_button
-          end
-          session = mech.cookie_jar.cookies.select {|c| c.name == "NIJIEIJIEID"}.first
-          Cache.put("nijie-session", session.value, 1.day) if session
-        end
-
-        # This cookie needs to be set to allow viewing of adult works while anonymous
-        cookie = Mechanize::Cookie.new("R18", "1")
-        cookie.domain = ".nijie.info"
-        cookie.path = "/"
-        mech.cookie_jar.add(cookie)
-
-        mech
-      rescue Mechanize::ResponseCodeError => e
-        raise unless e.response_code.to_i == 429
-        sleep(5)
-        retry
-      end
-      memoize :agent
     end
   end
 end

@@ -28,7 +28,7 @@
       <%= format_text(@wiki_page.body) %>
     <% end %>
 
-    <% if @wiki_page.artist %>
+    <% if @wiki_page.artist.present? && !@wiki_page.artist.is_deleted? %>
       <p><%= link_to "View artist", @wiki_page.artist %></p>
     <% end %>
 

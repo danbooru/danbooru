@@ -23,7 +23,7 @@ module Sources::Strategies
     OLD_IMAGE = %r{\Ahttps?://#{DOMAIN}/(?<dir>#{MD5}/)?#{FILENAME}_(?<size>\w+)\.#{EXT}\z}i
 
     IMAGE = %r{\Ahttps?://#{DOMAIN}/}i
-    VIDEO = %r{\Ahttps?://(?:vtt|ve\.media)\.tumblr\.com/}i
+    VIDEO = %r{\Ahttps?://(?:vtt|ve|va\.media)\.tumblr\.com/}i
     POST = %r{\Ahttps?://(?<blog_name>[^.]+)\.tumblr\.com/(?:post|image)/(?<post_id>\d+)}i
 
     def self.enabled?
@@ -168,7 +168,7 @@ module Sources::Strategies
       end
 
       candidates.find do |candidate|
-        http_exists?(candidate, headers)
+        http_exists?(candidate)
       end
     end
 

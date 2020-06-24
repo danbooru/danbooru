@@ -307,6 +307,8 @@ class PostQueryBuilder
       Post.where(parent: nil)
     when "any"
       Post.where.not(parent: nil)
+    when /pending|flagged|modqueue|deleted|banned|active|unmoderated/
+      Post.where.not(parent: nil).where(parent: status_matches(parent))
     when /\A\d+\z/
       Post.where(id: parent).or(Post.where(parent: parent))
     else
@@ -320,6 +322,8 @@ class PostQueryBuilder
       Post.where(has_children: false)
     when "any"
       Post.where(has_children: true)
+    when /pending|flagged|modqueue|deleted|banned|active|unmoderated/
+      Post.where(has_children: true).where(children: status_matches(child))
     else
       Post.none
     end

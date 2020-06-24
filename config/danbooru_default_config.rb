@@ -317,13 +317,15 @@ module Danbooru
     # A list of tags that should be removed when a post is replaced. Regexes allowed.
     def post_replacement_tag_removals
       %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
-      jpeg_artifacts corrupted_image source_request non-web_source]
+      jpeg_artifacts corrupted_image missing_image missing_sample missing_thumbnail
+      resolution_mismatch source_larger source_smaller source_request non-web_source]
     end
 
     # Posts with these tags will be highlighted in the modqueue.
     def modqueue_warning_tags
       %w[hard_translated self_upload nude_filter third-party_edit screencap
-      duplicate image_sample md5_mismatch resized upscaled downscaled]
+      duplicate image_sample md5_mismatch resized upscaled downscaled
+      resolution_mismatch source_larger source_smaller]
     end
 
     def stripe_secret_key
@@ -336,22 +338,6 @@ module Danbooru
     end
 
     def twitter_api_secret
-    end
-
-    # The default headers to be sent with outgoing http requests. Some external
-    # services will fail if you don't set a valid User-Agent.
-    def http_headers
-      {
-        "User-Agent" => "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}"
-      }
-    end
-
-    def httparty_options
-      # proxy example:
-      # {http_proxyaddr: "", http_proxyport: "", http_proxyuser: nil, http_proxypass: nil}
-      {
-        headers: Danbooru.config.http_headers
-      }
     end
 
     # you should override this
@@ -374,14 +360,20 @@ module Danbooru
       false
     end
 
-    # reportbooru options - see https://github.com/r888888888/reportbooru
+    # The URL for the Reportbooru server (https://github.com/evazion/reportbooru).
+    # Optional. Used for tracking post views, popular searches, and missed searches.
+    # Set to http://localhost/mock/reportbooru to enable a fake reportbooru
+    # server for development purposes.
     def reportbooru_server
     end
 
     def reportbooru_key
     end
 
-    # iqdbs options - see https://github.com/r888888888/iqdbs
+    # The URL for the IQDBs server (https://github.com/evazion/iqdbs).
+    # Optional. Used for dupe detection and reverse image searches.
+    # Set to http://localhost/mock/iqdbs to enable a fake iqdb server for
+    # development purposes.
     def iqdbs_server
     end
 
@@ -459,6 +451,10 @@ module Danbooru
     def cloudflare_zone
     end
 
+    # The URL for the recommender server (https://github.com/evazion/recommender).
+    # Optional. Used to generate post recommendations.
+    # Set to http://localhost/mock/recommender to enable a fake recommender
+    # server for development purposes.
     def recommender_server
     end
 

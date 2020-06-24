@@ -73,8 +73,7 @@ module Sources
       end
 
       def image_url
-        return if image_urls.blank?
-        return url if api_client.blank?
+        return url if image_urls.blank? || api_client.blank?
 
         img = case url
         when DIRECT || CDN_DIRECT then "https://seiga.nicovideo.jp/image/source/#{image_id_from_url(url)}"
@@ -83,7 +82,7 @@ module Sources
         end
 
         resp = api_client.get(img)
-        if resp.headers["Location"] =~ %r{https?://.+/(\w+/\d+/\d+)\z}i
+        if resp.uri.to_s =~ %r{https?://.+/(\w+/\d+/\d+)\z}i
           "https://lohas.nicoseiga.jp/priv/#{$1}"
         else
           img
@@ -181,12 +180,12 @@ module Sources
 
       def api_client
         if illust_id.present?
-          NicoSeigaApiClient.new(work_id: illust_id, type: "illust")
+          NicoSeigaApiClient.new(work_id: illust_id, type: "illust", http: http)
         elsif manga_id.present?
-          NicoSeigaApiClient.new(work_id: manga_id, type: "manga")
+          NicoSeigaApiClient.new(work_id: manga_id, type: "manga", http: http)
         elsif image_id.present?
           # We default to illust to attempt getting the api anyway
-          NicoSeigaApiClient.new(work_id: image_id, type: "illust")
+          NicoSeigaApiClient.new(work_id: image_id, type: "illust", http: http)
         end
       end
       memoize :api_client

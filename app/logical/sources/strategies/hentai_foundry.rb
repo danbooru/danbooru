@@ -64,11 +64,10 @@ module Sources
       def page
         return nil if page_url.blank?
 
-        doc = Cache.get("hentai-foundry:#{page_url}", 1.minute) do
-          HTTParty.get("#{page_url}?enterAgree=1").body
-        end
+        response = Danbooru::Http.new.cache(1.minute).get("#{page_url}?enterAgree=1")
+        return nil unless response.status == 200
 
-        Nokogiri::HTML(doc)
+        response.parse
       end
 
       def tags
