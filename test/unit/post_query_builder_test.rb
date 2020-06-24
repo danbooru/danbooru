@@ -277,6 +277,19 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([child, parent], "-child:garbage")
     end
 
+    should "return posts when using the status of the parent/child" do
+      parent_of_deleted = create(:post)
+      deleted = create(:post, is_deleted: true, tag_string: "parent:#{parent_of_deleted.id}")
+      child_of_deleted = create(:post, tag_string: "parent:#{deleted.id}")
+      all = [child_of_deleted, deleted, parent_of_deleted]
+
+      assert_tag_match([child_of_deleted], "parent:deleted")
+      assert_tag_match(all - [child_of_deleted], "-parent:deleted")
+
+      assert_tag_match([parent_of_deleted], "child:deleted")
+      assert_tag_match(all - [parent_of_deleted], "-child:deleted")
+    end
+
     should "return posts for the favgroup:<name> metatag" do
       post1 = create(:post)
       post2 = create(:post)
