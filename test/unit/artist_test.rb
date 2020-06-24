@@ -529,7 +529,7 @@ class ArtistTest < ActiveSupport::TestCase
 
         assert_equal("niceandcool", artist.name)
         assert_equal("nice_and_cool", artist.other_names_string)
-        assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/member.php?id=906442")
+        assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/users/906442")
         assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/stacc/niceandcool")
       end
 
@@ -540,7 +540,7 @@ class ArtistTest < ActiveSupport::TestCase
 
         assert_equal("test_artist", artist.name)
         assert_equal("nice_and_cool niceandcool", artist.other_names_string)
-        assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/member.php?id=906442")
+        assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/users/906442")
         assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/stacc/niceandcool")
       end
     end
