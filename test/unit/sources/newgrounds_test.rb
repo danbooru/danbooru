@@ -60,9 +60,9 @@ module Sources
       end
 
       should "find the right artist" do
-        artist_1 = FactoryBot.create(:artist, name: "natthelich1", url_string: "https://natthelich.newgrounds.com/art")
-        artist_2 = FactoryBot.create(:artist, name: "natthelich2", url_string: "https://www.newgrounds.com/art/view/natthelich/fire-emblem-marth-plus-progress-pic")
-        artist_3 = FactoryBot.create(:artist, name: "bad_artist", url_string: "https://www.newgrounds.com/art")
+        artist_1 = create(:artist, name: "natthelich1", url_string: "https://natthelich.newgrounds.com/art")
+        artist_2 = create(:artist, name: "natthelich2", url_string: "https://www.newgrounds.com/art/view/natthelich/fire-emblem-marth-plus-progress-pic")
+        artist_3 = create(:artist, name: "bad_artist", url_string: "https://www.newgrounds.com/art")
 
         assert_equal([artist_1, artist_2], @image_1.artists)
         assert_equal([artist_1, artist_2], @image_2.artists)
@@ -75,13 +75,13 @@ module Sources
     context "A deleted or not existing picture" do
       setup do
         @fake_1 = Sources::Strategies.find("https://www.newgrounds.com/art/view/ThisUser/DoesNotExist")
-        @artist_1 = FactoryBot.create(:artist, name: "thisuser", url_string: "https://thisuser.newgrounds.com")
+        @artist_1 = create(:artist, name: "thisuser", url_string: "https://thisuser.newgrounds.com")
 
         @fake_2 = Sources::Strategies.find("https://www.newgrounds.com/art/view/natthelich/nopicture")
-        @artist_2 = FactoryBot.create(:artist, name: "natthelich", url_string: "https://natthelich.newgrounds.com")
+        @artist_2 = create(:artist, name: "natthelich", url_string: "https://natthelich.newgrounds.com")
 
         @fake_3 = Sources::Strategies.find("https://www.newgrounds.com/art/view/theolebrave/sensitive-pochaco")
-        @artist_3 = FactoryBot.create(:artist, name: "taffytoad", url_string: "https://taffytoad.newgrounds.com")
+        @artist_3 = create(:artist, name: "taffytoad", url_string: "https://taffytoad.newgrounds.com")
       end
 
       should "still find the artist name" do

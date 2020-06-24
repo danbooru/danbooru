@@ -344,6 +344,10 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         should_upload_successfully("https://www.weibo.com/5501756072/J2UNKfbqV")
         should_upload_successfully("https://wx1.sinaimg.cn/mw690/0060kO5aly1gezsyt5xvhj30ok0sgtc9.jpg")
+
+        should_upload_successfully("https://art.ngfiles.com/images/1254000/1254722_natthelich_pandora.jpg")
+        should_upload_successfully("https://art.ngfiles.com/comments/57000/iu_57615_7115981.jpg")
+        should_upload_successfully("https://www.newgrounds.com/art/view/puddbytes/costanza-at-bat")
       end
     end
   end

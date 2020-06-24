@@ -7,19 +7,18 @@
 # * https://www.newgrounds.com/art/view/puddbytes/costanza-at-bat
 # * https://www.newgrounds.com/art/view/natthelich/fire-emblem-marth-plus-progress-pic (multiple)
 #
-#
 # Profile URLs
 # * https://natthelich.newgrounds.com/
 
 module Sources
   module Strategies
     class Newgrounds < Base
-      IMAGE_URL   = %r{https?://art\.ngfiles\.com/images/\d+/\d+_(?<user_name>[0-9a-z-]+)_(?<illust_title>[0-9a-z-]+)\.\w+}i
-      COMMENT_URL = %r{https?://art\.ngfiles\.com/comments/\d+/\w+\.\w+}i
+      IMAGE_URL   = %r{\Ahttps?://art\.ngfiles\.com/images/\d+/\d+_(?<user_name>[0-9a-z-]+)_(?<illust_title>[0-9a-z-]+)\.\w+}i
+      COMMENT_URL = %r{\Ahttps?://art\.ngfiles\.com/comments/\d+/\w+\.\w+}i
 
-      PAGE_URL    = %r{https?://(?:www\.)?newgrounds\.com/art/view/(?<user_name>[0-9a-z-]+)/(?<illust_title>[0-9a-z-]+)(?:\?.*)?}i
+      PAGE_URL    = %r{\Ahttps?://(?:www\.)?newgrounds\.com/art/view/(?<user_name>[0-9a-z-]+)/(?<illust_title>[0-9a-z-]+)(?:\?.*)?}i
 
-      PROFILE_URL = %r{https?://(?<artist_name>(?!www)[0-9a-z-]+)\.newgrounds\.com(?:/.*)?}i
+      PROFILE_URL = %r{\Ahttps?://(?<artist_name>(?!www)[0-9a-z-]+)\.newgrounds\.com(?:/.*)?}i
 
       def domains
         ["newgrounds.com", "ngfiles.com"]
@@ -50,11 +49,11 @@ module Sources
 
       def page
         return nil if page_url.blank?
-        doc = Danbooru::Http.cache(1.minute).get(page_url)
 
-        return if doc.code == 404
+        response = Danbooru::Http.cache(1.minute).get(page_url)
+        return nil if response.status == 404
 
-        Nokogiri::HTML(doc.body)
+        response.parse
       end
       memoize :page
 
