@@ -10,8 +10,11 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         as(@user) do
-          @wiki_page_abc = create(:wiki_page, :title => "abc")
-          @wiki_page_def = create(:wiki_page, :title => "def")
+          @tagme = create(:wiki_page, title: "tagme")
+          @deleted = create(:wiki_page, title: "deleted", is_deleted: true)
+          @vocaloid = create(:wiki_page, title: "vocaloid")
+          @miku = create(:wiki_page, title: "hatsune_miku", other_names: ["初音ミク"], body: "miku is a [[vocaloid]]")
+          create(:tag, name: "hatsune_miku", category: Tag.categories.character)
         end
       end
 
@@ -20,22 +23,24 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should "list all wiki_pages (with search)" do
-        get wiki_pages_path, params: {:search => {:title => "abc"}}
-        assert_response :success
-        assert_select "tr td:first-child", text: "abc"
-      end
-
-      should "list wiki_pages without tags with order=post_count" do
-        get wiki_pages_path, params: {:search => {:title => "abc", :order => "post_count"}}
-        assert_response :success
-        assert_select "tr td:first-child", text: "abc"
-      end
-
       should "redirect the legacy title param to the show page" do
-        get wiki_pages_path(title: "abc")
-        assert_redirected_to wiki_pages_path(search: { title_normalize: "abc" }, redirect: true)
+        get wiki_pages_path(title: "tagme")
+        assert_redirected_to wiki_pages_path(search: { title_normalize: "tagme" }, redirect: true)
       end
+
+      should respond_to_search(title: "tagme").with { @tagme }
+      should respond_to_search(title: "tagme", order: "post_count").with { @tagme }
+      should respond_to_search(title_normalize: "TAGME  ").with { @tagme }
+
+      should respond_to_search(tag: { category: Tag.categories.character }).with { @miku }
+      should respond_to_search(hide_deleted: "true").with { [@miku, @vocaloid, @tagme] }
+      should respond_to_search(linked_to: "vocaloid").with { @miku }
+      should respond_to_search(not_linked_to: "vocaloid").with { [@vocaloid, @deleted, @tagme] }
+
+      should respond_to_search(other_names_match: "初音ミク").with { @miku }
+      should respond_to_search(other_names_match: "初*").with { @miku }
+      should respond_to_search(other_names_present: "true").with { @miku }
+      should respond_to_search(other_names_present: "false").with { [@vocaloid, @deleted, @tagme] }
     end
 
     context "search action" do
