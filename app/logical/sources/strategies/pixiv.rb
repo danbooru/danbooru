@@ -77,7 +77,7 @@ module Sources
 
         text = text.gsub(%r{https?://www\.pixiv\.net/member\.php\?id=([0-9]+)}i) do |_match|
           member_id = $1
-          profile_url = "https://www.pixiv.net/member.php?id=#{member_id}"
+          profile_url = "https://www.pixiv.net/users/#{member_id}"
           search_params = {"search[url_matches]" => profile_url}.to_param
 
           %("user/#{member_id}":[#{profile_url}] "»":[/artists?#{search_params}])
@@ -144,7 +144,7 @@ module Sources
           end
         end
 
-        "https://www.pixiv.net/member.php?id=#{metadata.user_id}"
+        "https://www.pixiv.net/users/#{metadata.user_id}"
       rescue PixivApiClient::BadIDError
         nil
       end
