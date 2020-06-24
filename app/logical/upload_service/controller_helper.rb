@@ -8,7 +8,7 @@ class UploadService
         UploadPreprocessorDelayedStartJob.perform_later(url, ref, CurrentUser.user)
 
         strategy = Sources::Strategies.find(url, ref)
-        remote_size = strategy.size
+        remote_size = strategy.remote_size
 
         return [upload, remote_size]
       end

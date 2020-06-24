@@ -145,10 +145,13 @@ module Sources
       end
 
       # Returns the size of the image resource without actually downloading the file.
-      def size
-        http.head(image_url).content_length.to_i
+      def remote_size
+        response = http.head(image_url)
+        return nil unless response.status == 200 && response.content_length.present?
+
+        response.content_length.to_i
       end
-      memoize :size
+      memoize :remote_size
 
       # Download the file at the given url, or at the main image url by default.
       def download_file!(download_url = image_url)
@@ -159,7 +162,7 @@ module Sources
       end
 
       def http
-        Danbooru::Http.public_only.timeout(30).max_size(Danbooru.config.max_file_size)
+        Danbooru::Http.headers(headers).public_only.timeout(30).max_size(Danbooru.config.max_file_size)
       end
       memoize :http
 
