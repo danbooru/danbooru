@@ -14,7 +14,7 @@ class ImageProxy
     raise Error, "Proxy not allowed for this url (url=#{url})" unless needs_proxy?(url)
 
     referer = fake_referer_for(url)
-    response = Danbooru::Http.headers(Referer: referer).get(url)
+    response = Danbooru::Http.timeout(30).headers(Referer: referer).get(url)
     raise Error, "Couldn't proxy image (code=#{response.status}, url=#{url})" unless response.status.success?
 
     response
