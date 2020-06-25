@@ -155,7 +155,7 @@ module Sources
 
           # the api_response wasn't available because it's a deleted post.
           elsif post_md5.present?
-            %w[jpg png gif].find { |ext| http_exists?("https://#{site_name}/image/#{post_md5}.#{ext}", headers) }
+            %w[jpg png gif].find { |ext| http_exists?("https://#{site_name}/image/#{post_md5}.#{ext}") }
 
           else
             nil

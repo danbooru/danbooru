@@ -146,7 +146,7 @@ module Sources
 
       # Returns the size of the image resource without actually downloading the file.
       def remote_size
-        response = http.head(image_url)
+        response = http_downloader.head(image_url)
         return nil unless response.status == 200 && response.content_length.present?
 
         response.content_length.to_i
@@ -156,15 +156,22 @@ module Sources
       # Download the file at the given url, or at the main image url by default.
       def download_file!(download_url = image_url)
         raise DownloadError, "Download failed: couldn't find download url for #{url}" if download_url.blank?
-        response, file = http.download_media(download_url)
+        response, file = http_downloader.download_media(download_url)
         raise DownloadError, "Download failed: #{download_url} returned error #{response.status}" if response.status != 200
         file
       end
 
+      # A http client for API requests.
       def http
-        Danbooru::Http.headers(headers).public_only.timeout(30).max_size(Danbooru.config.max_file_size)
+        Danbooru::Http.new.public_only
       end
       memoize :http
+
+      # A http client for downloading files.
+      def http_downloader
+        http.timeout(30).max_size(Danbooru.config.max_file_size).use(:spoof_referrer).use(:unpolish_cloudflare)
+      end
+      memoize :http_downloader
 
       # The url to use for artist finding purposes. This will be stored in the
       # artist entry. Normally this will be the profile url.
@@ -292,8 +299,8 @@ module Sources
         to_h.to_json
       end
 
-      def http_exists?(url, headers = {})
-        http.headers(headers).head(url).status.success?
+      def http_exists?(url)
+        http_downloader.head(url).status.success?
       end
 
       # Convert commentary to dtext by stripping html tags. Sites can override

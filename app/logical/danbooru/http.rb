@@ -5,6 +5,7 @@ require "danbooru/http/redirector"
 require "danbooru/http/retriable"
 require "danbooru/http/session"
 require "danbooru/http/spoof_referrer"
+require "danbooru/http/unpolish_cloudflare"
 
 module Danbooru
   class Http
@@ -26,7 +27,6 @@ module Danbooru
         .timeout(DEFAULT_TIMEOUT)
         .headers("Accept-Encoding" => "gzip")
         .headers("User-Agent": "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}")
-        .use(:spoof_referrer)
         .use(:auto_inflate)
         .use(redirector: { max_redirects: MAX_REDIRECTS })
         .use(:session)
@@ -98,20 +98,9 @@ module Danbooru
     end
 
     concerning :DownloadMethods do
-      def download_media(url, no_polish: true, **options)
+      def download_media(url, file: Tempfile.new("danbooru-download-", binmode: true))
         response = get(url)
 
-        # prevent Cloudflare Polish from modifying images.
-        if no_polish && response.headers["CF-Polished"].present?
-          url.query_values = url.query_values.to_h.merge(danbooru_no_polish: SecureRandom.uuid)
-          return download_media(url, no_polish: false)
-        end
-
-        file = download_response(response, **options)
-        [response, MediaFile.open(file)]
-      end
-
-      def download_response(response, file: Tempfile.new("danbooru-download-", binmode: true))
         raise DownloadError, "Downloading #{response.uri} failed with code #{response.status}" if response.status != 200
         raise FileTooLargeError, response if @max_size && response.content_length.to_i > @max_size
 
@@ -123,7 +112,7 @@ module Danbooru
         end
 
         file.rewind
-        file
+        [response, MediaFile.open(file)]
       end
     end
 

@@ -129,10 +129,20 @@ class DanbooruHttpTest < ActiveSupport::TestCase
 
     context "spoof referrer feature" do
       should "spoof the referer" do
-        response = Danbooru::Http.get("https://httpbin.org/anything")
+        response = Danbooru::Http.use(:spoof_referrer).get("https://httpbin.org/anything")
 
         assert_equal(200, response.status)
         assert_equal("https://httpbin.org", response.parse.dig("headers", "Referer"))
+      end
+    end
+
+    context "unpolish cloudflare feature" do
+      should "return the original image for polished images" do
+        url = "https://cdnb.artstation.com/p/assets/images/images/025/273/307/4k/atey-ghailan-a-sage-keyart-s-ch-04-outlined-1.jpg?1585246642"
+        response = Danbooru::Http.use(:unpolish_cloudflare).get(url)
+
+        assert_equal(200, response.status)
+        assert_equal(720_743, response.content_length)
       end
     end
 
