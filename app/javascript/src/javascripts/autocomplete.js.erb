@@ -38,7 +38,7 @@ Autocomplete.initialize_all = function() {
     });
 
     this.initialize_tag_autocomplete();
-    this.initialize_mention_autocomplete($(".autocomplete-mentions textarea"));
+    this.initialize_mention_autocomplete($("form div.input.dtext textarea"));
     this.initialize_fields($('[data-autocomplete="tag"]'), Autocomplete.tag_source);
     this.initialize_fields($('[data-autocomplete="artist"]'), Autocomplete.artist_source);
     this.initialize_fields($('[data-autocomplete="pool"]'), Autocomplete.pool_source);

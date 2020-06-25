@@ -217,21 +217,8 @@ module ApplicationHelper
     tag.div(text, class: "prose", **options)
   end
 
-  def dtext_field(object, name, options = {})
-    options[:name] ||= name.capitalize
-    options[:input_id] ||= "#{object}_#{name}"
-    options[:input_name] ||= "#{object}[#{name}]"
-    options[:value] ||= instance_variable_get("@#{object}").try(name)
-    options[:preview_id] ||= "dtext-preview"
-    options[:classes] ||= ""
-    options[:hint] ||= ""
-    options[:type] ||= "text"
-
-    render "dtext/form", options
-  end
-
-  def dtext_preview_button(object, name, input_id: "#{object}_#{name}", preview_id: "dtext-preview")
-    tag.input value: "Preview", type: "button", class: "dtext-preview-button", "data-input-id": input_id, "data-preview-id": preview_id
+  def dtext_preview_button(preview_field)
+    tag.input value: "Preview", type: "button", class: "dtext-preview-button", "data-preview-field": preview_field
   end
 
   def quick_search_form_for(attribute, url, name, autocomplete: nil, redirect: false, &block)

@@ -1,11 +1,9 @@
 <div class="flag-dialog-body">
   <%= embed_wiki("help:flag_notice") %>
 
-  <%# XXX dtext_field expects there to be a `post_flag` instance variable. %>
-  <% @post_flag = post_flag %>
-  <%= edit_form_for(@post_flag, format: :js, remote: true) do |f| %>
+  <%= edit_form_for(post_flag, format: :js, remote: true) do |f| %>
     <%= f.hidden_field :post_id %>
-    <%= dtext_field "post_flag", "reason", preview_id: "dtext-preview-for-post-flag", type: "string" %>
-    <%= dtext_preview_button "post_flag", "reason", preview_id: "dtext-preview-for-post-flag" %>
+    <%= f.input :reason, as: :dtext, inline: true %>
+    <%= dtext_preview_button "post_flag_reason" %>
   <% end %>
 </div>

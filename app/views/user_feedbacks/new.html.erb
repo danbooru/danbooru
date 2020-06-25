@@ -16,9 +16,9 @@
     <%= edit_form_for(@user_feedback) do |f| %>
       <%= f.input :user_name, :label => "User", :input_html => { value: @user_feedback.user.try(:name), data: { autocomplete: "user" } } %>
       <%= f.input :category, :collection => ["positive", "neutral", "negative"], :include_blank => false %>
-      <%= dtext_field "user_feedback", "body" %>
+      <%= f.input :body, as: :dtext %>
       <%= f.button :submit, "Submit" %>
-      <%= dtext_preview_button "user_feedback", "body" %>
+      <%= dtext_preview_button "user_feedback_body" %>
     <% end %>
   </div>
 </div>
