@@ -1,3 +1,11 @@
+# frozen_string_literal: true
+#
+# Uncomment this and change the path if necessary to include your own
+# components.
+# See https://github.com/heartcombo/simple_form#custom-components to know
+# more about custom components.
+# Dir[Rails.root.join('lib/components/**/*.rb')].each { |f| require f }
+#
 # Use this setup block to configure all options available in SimpleForm.
 SimpleForm.setup do |config|
   # Wrappers are used by the form builder to generate a
@@ -43,6 +51,7 @@ SimpleForm.setup do |config|
     b.optional :readonly
 
     ## Inputs
+    # b.use :input, class: 'input', error_class: 'is-invalid', valid_class: 'is-valid'
     b.use :label_input
     b.use :hint,  wrap_with: { tag: :span, class: :hint }
     b.use :error, wrap_with: { tag: :span, class: :error }
@@ -77,9 +86,6 @@ SimpleForm.setup do |config|
   # CSS class to add for error notification helper.
   config.error_notification_class = 'error_notification'
 
-  # ID to add for error notification helper.
-  # config.error_notification_id = nil
-
   # Series of attempts to detect a default label method for collection.
   # config.collection_label_methods = [ :to_label, :name, :title, :to_s ]
 
@@ -100,7 +106,7 @@ SimpleForm.setup do |config|
   # config.item_wrapper_class = nil
 
   # How the label text should be generated altogether with the required text.
-  # config.label_text = ->(label, required, explicit_label) { "#{required} #{label}" }
+  # config.label_text = lambda { |label, required, explicit_label| "#{required} #{label}" }
 
   # You can define the class to use on all labels. Default is nil.
   # config.label_class = nil
@@ -121,9 +127,6 @@ SimpleForm.setup do |config|
   # To stop SimpleForm from generating the novalidate option, enabling the HTML5 validations,
   # change this configuration to true.
   config.browser_validations = false
-
-  # Collection of methods to detect if a file type was given.
-  # config.file_methods = [ :mounted_as, :file?, :public_filename ]
 
   # Custom mappings for input types. This should be a hash containing a regexp
   # to match as key, and the input type that will be used when the field name
@@ -165,4 +168,8 @@ SimpleForm.setup do |config|
 
   # Defines which i18n scope will be used in Simple Form.
   # config.i18n_scope = 'simple_form'
+
+  # Defines validation classes to the input_field. By default it's nil.
+  # config.input_field_valid_class = 'is-valid'
+  # config.input_field_error_class = 'is-invalid'
 end
