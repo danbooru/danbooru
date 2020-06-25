@@ -81,7 +81,7 @@ module Sources
         else image_urls.first
         end
 
-        resp = api_client.get(img)
+        resp = api_client.login.head(img)
         if resp.uri.to_s =~ %r{https?://.+/(\w+/\d+/\d+)\z}i
           "https://lohas.nicoseiga.jp/priv/#{$1}"
         else

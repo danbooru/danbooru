@@ -78,7 +78,7 @@ class NicoSeigaApiClient
     Hash.from_xml(resp.to_s)["response"]["user"]
   end
 
-  def get(url)
+  def login
     form = {
       mail_tel: Danbooru.config.nico_seiga_login,
       password: Danbooru.config.nico_seiga_password
@@ -88,7 +88,11 @@ class NicoSeigaApiClient
     resp = http.cache(1.hour).post("https://account.nicovideo.jp/login/redirector?site=seiga", form: form)
     raise RuntimeError, "NicoSeiga login failed (status=#{resp.status} url=#{url})" if resp.status != 200
 
-    resp = http.cache(1.minute).get(url)
+    http
+  end
+
+  def get(url)
+    resp = login.cache(1.minute).get(url)
     #raise RuntimeError, "NicoSeiga get failed (status=#{resp.status} url=#{url})" if resp.status != 200
 
     resp
