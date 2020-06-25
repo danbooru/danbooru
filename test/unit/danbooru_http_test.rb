@@ -127,6 +127,15 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
     end
 
+    context "spoof referrer feature" do
+      should "spoof the referer" do
+        response = Danbooru::Http.get("https://httpbin.org/anything")
+
+        assert_equal(200, response.status)
+        assert_equal("https://httpbin.org", response.parse.dig("headers", "Referer"))
+      end
+    end
+
     context "#download method" do
       should "download files" do
         response, file = Danbooru::Http.download_media("https://httpbin.org/bytes/1000")

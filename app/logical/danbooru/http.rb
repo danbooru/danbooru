@@ -4,6 +4,7 @@ require "danbooru/http/cache"
 require "danbooru/http/redirector"
 require "danbooru/http/retriable"
 require "danbooru/http/session"
+require "danbooru/http/spoof_referrer"
 
 module Danbooru
   class Http
@@ -25,6 +26,7 @@ module Danbooru
         .timeout(DEFAULT_TIMEOUT)
         .headers("Accept-Encoding" => "gzip")
         .headers("User-Agent": "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}")
+        .use(:spoof_referrer)
         .use(:auto_inflate)
         .use(redirector: { max_redirects: MAX_REDIRECTS })
         .use(:session)
@@ -97,8 +99,7 @@ module Danbooru
 
     concerning :DownloadMethods do
       def download_media(url, no_polish: true, **options)
-        url = Addressable::URI.heuristic_parse(url)
-        response = headers(Referer: url.origin).get(url)
+        response = get(url)
 
         # prevent Cloudflare Polish from modifying images.
         if no_polish && response.headers["CF-Polished"].present?
