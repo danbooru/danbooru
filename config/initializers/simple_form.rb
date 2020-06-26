@@ -73,7 +73,13 @@ SimpleForm.setup do |config|
   # Defaults to :nested for bootstrap config.
   #   inline: input + label
   #   nested: label > input
-  config.boolean_style = :nested
+  #
+  # XXX We use inline instead of nested so that 1) the html structure for
+  # checkboxes is the same as the html structure of other input elements and 2)
+  # because if we use the `namespace` option to provide namespaced html IDs on
+  # a form with nested checkboxes, then SimpleForm generates incorrect IDs on
+  # the hidden checkbox inputs.
+  config.boolean_style = :inline
 
   # Default class for buttons
   config.button_class = 'btn'
