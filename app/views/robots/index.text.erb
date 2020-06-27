@@ -4,12 +4,18 @@ User-agent: *
 Disallow: /
 
 <% if Rails.env.production? && Danbooru.config.hostname == request.host %>
+Disallow: /*.atom
+Disallow: /*.json
+Disallow: /*.xml
+
+Allow: /$
 Allow: /artists
 Allow: /artist_commentaries
 Allow: /comments
 Allow: /explore
 Allow: /forum_posts
 Allow: /forum_topics
+Allow: /login
 Allow: /notes
 Allow: /pools
 Allow: /posts
@@ -20,4 +26,22 @@ Allow: /uploads
 Allow: /user_upgrades
 Allow: /users
 Allow: /wiki_pages
+
+<%# Legacy redirects %>
+Allow: /artist
+Allow: /comment
+Allow: /forum
+Allow: /note
+Allow: /pool
+Allow: /post
+Allow: /tag
+Allow: /user
+Allow: /wiki
+
+<%# Images %>
+Allow: /crop
+Allow: /preview
+Allow: /original
+Allow: /sample
+Allow: /data
 <% end %>
