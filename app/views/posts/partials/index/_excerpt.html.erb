@@ -16,8 +16,10 @@
         <%= render "tag_relationships/alias_and_implication_list", tag: artist.tag %>
 
         <p class="links">
-          <%= link_to "View wiki", artist.wiki_page %> |
-          <%= link_to "View artist", artist_path(artist.id) %>
+          <% if artist.wiki_page.present? %>
+            <%= link_to "View wiki", artist.wiki_page, id: "view-wiki-link" %> |
+          <% end %>
+          <%= link_to "View artist", artist, id: "view-artist-link" %>
         </p>
       </div>
     <% end %>
@@ -32,7 +34,7 @@
         <%= render "tag_relationships/alias_and_implication_list", tag: wiki_page.tag %>
 
         <p class="links">
-          <%= link_to_wiki "View wiki", wiki_page.title %>
+          <%= link_to_wiki "View wiki", wiki_page.title, id: "view-wiki-link" %>
         </p>
       </div>
     <% end %>
