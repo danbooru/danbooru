@@ -30,6 +30,7 @@ class ReportbooruService
 
   def popular_searches(date, limit: 100)
     ranking = post_search_rankings(date)
+    ranking = post_search_rankings(date.yesterday) if ranking.blank?
     ranking.take(limit).map(&:first)
   end
 
