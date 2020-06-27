@@ -5,6 +5,9 @@
   <% if policy(Pool).create? %>
     <%= subnav_link_to "New", new_pool_path %>
   <% end %>
+  <% if PoolVersion.enabled? %>
+    <%= subnav_link_to "Recent changes", pool_versions_path %>
+  <% end %>
   <%= subnav_link_to "Help", wiki_page_path("help:pools") %>
   <% if @pool && !@pool.new_record? %>
     <li>|</li>
