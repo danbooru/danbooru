@@ -24,9 +24,8 @@ module PostSets
     end
 
     def wiki_page
-      return nil unless tag.present? && tag.wiki_page.present?
-      return nil unless !tag.wiki_page.is_deleted?
-      tag.wiki_page
+      return nil unless normalized_query.has_single_tag?
+      @wiki_page ||= WikiPage.undeleted.find_by(title: normalized_query.tags.first.name)
     end
 
     def tag

@@ -96,6 +96,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
 
+        should "show the wiki excerpt for a wiki page without a tag" do
+          as(@user) { create(:wiki_page, title: "no_tag") }
+          get posts_path(tags: "no_tag")
+          assert_select "#show-excerpt-link", count: 1
+          assert_select "#excerpt", count: 1
+        end
+
         should "show a notice for a single tag search with a pending BUR" do
           create(:bulk_update_request, script: "create alias foo -> bar")
           get_auth posts_path(tags: "foo"), @user
