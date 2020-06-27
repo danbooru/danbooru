@@ -29,10 +29,12 @@ module Explore
     def searches
       @date, @scale, @min_date, @max_date = parse_date(params)
       @searches = ReportbooruService.new.post_search_rankings(@date)
+      respond_with(@searches)
     end
 
     def missed_searches
       @missed_searches = ReportbooruService.new.missed_search_rankings
+      respond_with(@missed_searches)
     end
 
     private
