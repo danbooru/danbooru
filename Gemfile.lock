@@ -120,6 +120,10 @@ GEM
       xpath (~> 3.2)
     childprocess (3.0.0)
     chronic (0.10.2)
+    codecov (0.1.17)
+      json
+      simplecov
+      url
     coderay (1.1.3)
     concurrent-ruby (1.1.6)
     crass (1.0.6)
@@ -367,6 +371,7 @@ GEM
     unicorn-worker-killer (0.4.4)
       get_process_mem (~> 0)
       unicorn (>= 4, < 6)
+    url (0.3.2)
     webpacker (5.1.1)
       activesupport (>= 5.2)
       rack-proxy (>= 0.6.1)
@@ -399,6 +404,7 @@ DEPENDENCIES
   capistrano-rbenv
   capistrano3-unicorn
   capybara
+  codecov
   daemons
   delayed_job
   delayed_job_active_record
