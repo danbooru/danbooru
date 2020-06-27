@@ -111,7 +111,7 @@ module PostSets
     end
 
     def hide_from_crawler?
-      return true if current_page > 1
+      return true if current_page > 50
       return false if query.is_empty_search? || query.is_simple_tag? || query.is_metatag?(:order, :rank)
       true
     end
