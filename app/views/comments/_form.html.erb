@@ -1,6 +1,6 @@
 <%= error_messages_for :comment %>
 
-<%= edit_form_for(comment, namespace: "post_#{comment.post.id}_comment_#{comment.id || "new"}", html: { style: ("display: none;" if local_assigns[:hidden]), class: "edit_comment" }) do |f| %>
+<%= edit_form_for(comment, namespace: "post_#{comment&.post_id}_comment_#{comment.id || "new"}", html: { style: ("display: none;" if local_assigns[:hidden]), class: "edit_comment" }) do |f| %>
   <% if comment.new_record? %>
     <%= f.hidden_field :post_id %>
   <% end %>
