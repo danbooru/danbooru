@@ -9,7 +9,6 @@ module DanbooruMaintenance
     safely { Upload.prune! }
     safely { Delayed::Job.where('created_at < ?', 45.days.ago).delete_all }
     safely { PostDisapproval.prune! }
-    safely { PostDisapproval.dmail_messages! }
     safely { regenerate_post_counts! }
     safely { TokenBucket.prune! }
     safely { BulkUpdateRequestPruner.warn_old }

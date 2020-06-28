@@ -18,24 +18,6 @@ class PostDisapproval < ApplicationRecord
     PostDisapproval.where("post_id in (select _.post_id from post_disapprovals _ where _.created_at < ?)", DELETION_THRESHOLD.ago).delete_all
   end
 
-  def self.dmail_messages!
-    disapprovals = PostDisapproval.with_message.where("created_at >= ?", 1.day.ago).group_by do |pd|
-      pd.post.uploader
-    end
-
-    disapprovals.each do |uploader, list|
-      message = list.map do |x|
-        "* post ##{x.post_id}: #{x.message}"
-      end.join("\n")
-
-      Dmail.create_automated(
-        :to_id => uploader.id,
-        :title => "Someone has commented on your uploads",
-        :body => message
-      )
-    end
-  end
-
   concerning :SearchMethods do
     class_methods do
       def search(params)
