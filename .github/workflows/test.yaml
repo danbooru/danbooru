@@ -65,14 +65,16 @@ jobs:
           POSTGRES_PASSWORD: danbooru
 
     steps:
-    - name: Check out code
-      uses: actions/checkout@v2
-
     - name: Install OS dependencies
       run: |
         apt-get update
-        apt-get -y install --no-install-recommends build-essential ruby ruby-dev ruby-bundler git nodejs yarnpkg webpack ffmpeg mkvtoolnix libvips-dev libxml2-dev libxslt-dev zlib1g-dev postgresql-server-dev-all wget curl
+        apt-get -y install --no-install-recommends build-essential ruby ruby-dev ruby-bundler git nodejs yarnpkg webpack ffmpeg mkvtoolnix libvips-dev libxml2-dev libxslt-dev zlib1g-dev postgresql-server-dev-all wget curl git
         ln -sf /usr/bin/yarnpkg /usr/bin/yarn
+
+    - name: Check out code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     - name: Install Ruby dependencies
       run: BUNDLE_DEPLOYMENT=true bundle install --jobs 4
