@@ -1,7 +1,8 @@
 <% page_title @post.presenter.humanized_essential_tag_string %>
 <% meta_description "View this #{@post.image_width}x#{@post.image_height} #{number_to_human_size(@post.file_size)} image" %>
-
+<% canonical_url post_url(@post, host: Danbooru.config.hostname) %>
 <% atom_feed_tag "Comments for post ##{@post.id}", comments_url(:atom, search: { post_id: @post.id }) %>
+
 <%= render "posts/partials/common/secondary_links" %>
 
 <% content_for(:sidebar) do %>
@@ -147,8 +148,6 @@
   <% if policy(@post).visible? %>
     <%= tag.meta property: "og:image", content: @post.open_graph_image_url %>
   <% end %>
-
-  <%= tag.meta name: "canonical", content: post_url(@post, host: Danbooru.config.hostname, protocol: "https") %>
 
   <% if @post.twitter_card_supported? %>
     <meta name="twitter:card" content="summary_large_image">

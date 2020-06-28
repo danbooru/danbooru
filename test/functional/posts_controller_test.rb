@@ -1,6 +1,10 @@
 require "test_helper"
 
 class PostsControllerTest < ActionDispatch::IntegrationTest
+  def assert_canonical_url_equals(expected)
+    assert_equal(expected, response.parsed_body.css("link[rel=canonical]").attribute("href").value)
+  end
+
   context "The posts controller" do
     setup do
       @user = travel_to(1.month.ago) {create(:user)}
@@ -10,11 +14,29 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         mock_post_search_rankings(Date.today, [["1girl", 100], ["original", 50]])
+        create_list(:post, 2)
       end
 
-      should "render" do
-        get posts_path
-        assert_response :success
+      context "for an empty search" do
+        should "render the first page" do
+          get root_path
+          assert_response :success
+          assert_canonical_url_equals(root_url(host: Danbooru.config.hostname))
+
+          get posts_path
+          assert_response :success
+          assert_canonical_url_equals(root_url(host: Danbooru.config.hostname))
+
+          get posts_path(page: 1)
+          assert_response :success
+          assert_canonical_url_equals(root_url(host: Danbooru.config.hostname))
+        end
+
+        should "render the second page" do
+          get posts_path(page: 2, limit: 1)
+          assert_response :success
+          assert_canonical_url_equals(posts_url(page: 2, host: Danbooru.config.hostname))
+        end
       end
 
       context "with a single tag search" do
@@ -22,6 +44,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { tags: "does_not_exist" }
           assert_response :success
           assert_select "#show-excerpt-link", count: 0
+          assert_canonical_url_equals(posts_url(tags: "does_not_exist", host: Danbooru.config.hostname))
         end
 
         should "render for an artist tag" do
@@ -261,7 +284,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path(format: :atom)
 
           assert_response :success
-          assert_select "entry", 1
+          assert_select "entry", 3
         end
 
         should "render with tags" do
@@ -272,7 +295,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "hide restricted posts" do
-          @post.update(is_banned: true)
+          Post.update_all(is_banned: true)
           get posts_path(format: :atom)
 
           assert_response :success

@@ -5,6 +5,7 @@
 
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
   <%= render "meta_links", collection: @current_item %>
+  <%= tag.link rel: "canonical", href: canonical_url %>
 
   <%= csrf_meta_tag %>
   <% unless CurrentUser.enable_desktop_mode? %>

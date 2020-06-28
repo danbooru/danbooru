@@ -340,6 +340,19 @@ module ApplicationHelper
     end
   end
 
+  def canonical_url(url = nil)
+    if url.present?
+      content_for(:canonical_url) { url }
+    elsif content_for(:canonical_url).present?
+      content_for(:canonical_url)
+    else
+      request_params = request.params.sort.to_h.with_indifferent_access
+      request_params.delete(:page) if request_params[:page].to_i == 1
+      request_params.delete(:limit)
+      url_for(**request_params, host: Danbooru.config.hostname, only_path: false)
+    end
+  end
+
   def atom_feed_tag(title, url = {})
     content_for(:html_header, auto_discovery_link_tag(:atom, url, title: title))
   end
