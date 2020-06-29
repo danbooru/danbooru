@@ -24,10 +24,18 @@ class ArtistUrlTest < ActiveSupport::TestCase
     end
 
     should "disallow invalid urls" do
-      url = FactoryBot.build(:artist_url, url: "www.example.com")
+      urls = [
+        FactoryBot.build(:artist_url, url: "www.example.com"),
+        FactoryBot.build(:artist_url, url: ":www.example.com"),
+        FactoryBot.build(:artist_url, url: "http://http://www.example.com"),
+      ]
 
-      assert_equal(false, url.valid?)
-      assert_match(/must begin with http/, url.errors.full_messages.join)
+      assert_equal(false, urls[0].valid?)
+      assert_match(/must begin with http/, urls[0].errors.full_messages.join)
+      assert_equal(false, urls[1].valid?)
+      assert_match(/is malformed/, urls[1].errors.full_messages.join)
+      assert_equal(false, urls[2].valid?)
+      assert_match(/that does not contain a dot/, urls[2].errors.full_messages.join)
     end
 
     should "always add a trailing slash when normalized" do
