@@ -120,11 +120,17 @@ module Danbooru
 
     def request(method, url, **options)
       http.send(method, url, **options)
+    rescue OpenSSL::SSL::SSLError
+      fake_response(590, "")
     rescue ValidatingSocket::ProhibitedIpError
-      fake_response(597, "")
+      fake_response(591, "")
     rescue HTTP::Redirector::TooManyRedirectsError
-      fake_response(598, "")
+      fake_response(596, "")
     rescue HTTP::TimeoutError
+      fake_response(597, "")
+    rescue HTTP::ConnectionError
+      fake_response(598, "")
+    rescue HTTP::Error
       fake_response(599, "")
     end
 

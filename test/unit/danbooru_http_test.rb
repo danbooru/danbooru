@@ -19,19 +19,29 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       should "fail if redirected too many times" do
         skip "Skipping test (https://github.com/postmanlabs/httpbin/issues/617)"
         response = Danbooru::Http.get("https://httpbin.org/absolute-redirect/10")
-        assert_equal(598, response.status)
+        assert_equal(596, response.status)
       end
 
       should "fail if the request takes too long to connect" do
         response = Danbooru::Http.timeout(1).get("https://httpbin.org/delay/5")
-        assert_equal(599, response.status)
+        assert_equal(597, response.status)
       end
 
       should "fail if the request takes too long to download" do
-        # XXX should return status 599 instead
+        # XXX should return status 597 instead
         assert_raises(HTTP::TimeoutError) do
           response = Danbooru::Http.timeout(1).get("https://httpbin.org/drip?duration=10&numbytes=10").flush
         end
+      end
+
+      should "return a 5xx error if the domain can't be resolved" do
+        response = Danbooru::Http.get("http://doesnotexist.donmai.us")
+        assert_equal(598, response.status)
+      end
+
+      should "return a 5xx error if the SSL certificate is expired" do
+        response = Danbooru::Http.get("https://expired.badssl.com")
+        assert_equal(590, response.status)
       end
 
       should "automatically decompress gzipped responses" do
