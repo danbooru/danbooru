@@ -954,6 +954,14 @@ class PostTest < ActiveSupport::TestCase
             @post.update(tag_string: "aaa -fav:self")
             assert_equal("", @post.fav_string)
           end
+
+          should "not fail when the fav: metatag is used twice" do
+            @post.update(tag_string: "aaa fav:self fav:me")
+            assert_equal("fav:#{@user.id}", @post.fav_string)
+
+            @post.update(tag_string: "aaa -fav:self -fav:me")
+            assert_equal("", @post.fav_string)
+          end
         end
 
         context "for a child" do

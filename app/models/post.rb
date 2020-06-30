@@ -625,10 +625,10 @@ class Post < ApplicationRecord
           add_pool!(pool) if pool
 
         when /^fav:(.+)$/i
-          add_favorite!(CurrentUser.user)
+          add_favorite(CurrentUser.user)
 
         when /^-fav:(.+)$/i
-          remove_favorite!(CurrentUser.user)
+          remove_favorite(CurrentUser.user)
 
         when /^(up|down)vote:(.+)$/i
           vote!($1)
@@ -790,6 +790,13 @@ class Post < ApplicationRecord
       Favorite.remove(post: self, user: user)
       unvote!(user) if Pundit.policy!([user, nil], PostVote).create?
     rescue PostVote::Error
+    end
+
+    def remove_favorite(user)
+      remove_favorite!(user)
+      true
+    rescue Favorite::Error
+      false
     end
 
     # users who favorited this post, ordered by users who favorited it first
