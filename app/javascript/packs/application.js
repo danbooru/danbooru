@@ -12,6 +12,7 @@ require('jquery-hotkeys');
 // should start looking for nodejs replacements
 importAll(require.context('../vendor', true, /\.js$/));
 
+require('jquery');
 require("jquery-ui/ui/effects/effect-shake");
 require("jquery-ui/ui/widgets/autocomplete");
 require("jquery-ui/ui/widgets/button");
@@ -33,6 +34,7 @@ require("@fortawesome/fontawesome-free/css/regular.css");
 importAll(require.context('../src/javascripts', true, /\.js(\.erb)?$/));
 importAll(require.context('../src/styles', true, /\.s?css(?:\.erb)?$/));
 
+export { default as jQuery } from "jquery";
 export { default as Autocomplete } from '../src/javascripts/autocomplete.js.erb';
 export { default as Blacklist } from '../src/javascripts/blacklists.js';
 export { default as Comment } from '../src/javascripts/comments.js';

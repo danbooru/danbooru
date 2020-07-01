@@ -8,6 +8,7 @@
     "dropzone": "^5.5.1",
     "expose-loader": "^0.7.5",
     "hammerjs": "^2.0.8",
+    "jquery": "3.4.1",
     "jquery-hotkeys": "^0.2.2",
     "jquery-ui": "^1.12.1",
     "rails-erb-loader": "^5.5.0",

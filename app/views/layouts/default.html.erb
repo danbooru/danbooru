@@ -14,7 +14,6 @@
   <% if CurrentUser.user.blacklisted_tags.present? %>
     <meta name="blacklisted-tags" content="<%= CurrentUser.user.blacklisted_tags.gsub(/(?:\r|\n)+/, ",") %>">
   <% end %>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <%= javascript_pack_tag "application" %>
   <%= stylesheet_pack_tag "application" %>
   <% if CurrentUser.user.custom_style.present? && params.fetch(:css, "true").truthy?  %>
@@ -123,6 +122,8 @@
 
     window.Danbooru.notice = Danbooru.Utility.notice;
     window.Danbooru.error = Danbooru.Utility.error;
+    window.$ = Danbooru.jQuery;
+    window.jQuery = Danbooru.jQuery;
   </script>
 
   <%= render "static/footer" %>
