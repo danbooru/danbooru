@@ -1,28 +1,75 @@
-import CurrentUser from './current_user'
-import Utility from './utility'
-
-require('qtip2');
-require('qtip2/dist/jquery.qtip.css');
+import CurrentUser from './current_user';
+import Utility from './utility';
+import { delegate, hideAll } from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
 
 let PostTooltip = {};
 
-PostTooltip.render_tooltip = async function (event, qtip) {
+PostTooltip.POST_SELECTOR = "*:not(.ui-sortable-handle) > article.post-preview img, .dtext-post-id-link";
+PostTooltip.SHOW_DELAY = 500;
+PostTooltip.HIDE_DELAY = 125;
+PostTooltip.DURATION = 250;
+PostTooltip.MAX_WIDTH = 400;
+
+PostTooltip.initialize = function () {
+  if (PostTooltip.disabled()) {
+    return;
+  }
+
+  delegate("body", {
+    allowHTML: true,
+    appendTo: document.body,
+    delay: [PostTooltip.SHOW_DELAY, PostTooltip.HIDE_DELAY],
+    duration: PostTooltip.DURATION,
+    interactive: true,
+    maxWidth: PostTooltip.MAX_WIDTH,
+    target: PostTooltip.POST_SELECTOR,
+    theme: "post-tooltip",
+    touch: false,
+
+    onCreate: PostTooltip.on_create,
+    onShow: PostTooltip.on_show,
+    onHide: PostTooltip.on_hide,
+  });
+
+  $(document).on("click.danbooru.postTooltip", ".post-tooltip-disable", PostTooltip.on_disable_tooltips);
+};
+
+PostTooltip.on_create = function (instance) {
+  let title = instance.reference.getAttribute("title");
+
+  if (title) {
+    instance.reference.setAttribute("data-title", title);
+    instance.reference.setAttribute("title", "");
+  }
+};
+
+PostTooltip.on_show = async function (instance) {
   let post_id = null;
   let preview = false;
+  let $target = $(instance.reference);
+  let $tooltip = $(instance.popper);
 
-  if ($(this).is(".dtext-post-id-link")) {
+  // skip if tooltip has already been rendered.
+  if ($tooltip.has(".post-tooltip-body").length) {
+    return;
+  }
+
+  if ($target.is(".dtext-post-id-link")) {
     preview = true;
-    post_id = /\/posts\/(\d+)/.exec($(this).attr("href"))[1];
+    post_id = /\/posts\/(\d+)/.exec($target.attr("href"))[1];
   } else {
-    post_id = $(this).parents("[data-id]").data("id");
+    post_id = $target.parents("[data-id]").data("id");
   }
 
   try {
-    qtip.cache.request = $.get(`/posts/${post_id}`, { variant: "tooltip", preview: preview });
-    let html = await qtip.cache.request;
+    $tooltip.addClass("post-tooltip-loading");
 
-    qtip.set("content.text", html);
-    qtip.elements.tooltip.removeClass("post-tooltip-loading");
+    instance._request = $.get(`/posts/${post_id}`, { variant: "tooltip", preview: preview });
+    let html = await instance._request;
+    instance.setContent(html);
+
+    $tooltip.removeClass("post-tooltip-loading");
   } catch (error) {
     if (error.status !== 0 && error.statusText !== "abort") {
       Utility.error(`Error displaying tooltip for post #${post_id} (error: ${error.status} ${error.statusText})`);
@@ -30,98 +77,19 @@ PostTooltip.render_tooltip = async function (event, qtip) {
   }
 };
 
-// Hide the tooltip the first time it is shown, while we wait on the ajax call to complete.
-PostTooltip.on_show = function (event, qtip) {
-  if (!qtip.cache.hasBeenShown) {
-    qtip.elements.tooltip.addClass("post-tooltip-loading");
-    qtip.cache.hasBeenShown = true;
+PostTooltip.on_hide = function (instance) {
+  if (instance._request?.state() === "pending") {
+    instance._request.abort();
   }
-};
-
-PostTooltip.POST_SELECTOR = "*:not(.ui-sortable-handle) > .post-preview img, .dtext-post-id-link";
-
-// http://qtip2.com/options
-PostTooltip.QTIP_OPTIONS = {
-  style: {
-    classes: "qtip-light post-tooltip",
-    tip: false
-  },
-  content: PostTooltip.render_tooltip,
-  overwrite: false,
-  position: {
-    viewport: true,
-    my: "bottom left",
-    at: "top left",
-    effect: false,
-    adjust: {
-      y: -2,
-      method: "shift",
-    },
-  },
-  show: {
-    solo: true,
-    delay: 750,
-    effect: false,
-    ready: true,
-    event: "mouseenter",
-  },
-  hide: {
-    delay: 250,
-    fixed: true,
-    effect: false,
-    event: "unfocus click mouseleave",
-  },
-  events: {
-    show: PostTooltip.on_show,
-  },
-};
-
-PostTooltip.initialize = function () {
-  $(document).on("mouseenter.danbooru.postTooltip", PostTooltip.POST_SELECTOR, function (event) {
-    if (PostTooltip.disabled()) {
-      $(this).qtip("disable");
-    } else {
-      $(this).qtip(PostTooltip.QTIP_OPTIONS, event);
-    }
-  });
-
-  // Cancel pending ajax requests when we mouse out of the thumbnail.
-  $(document).on("mouseleave.danbooru.postTooltip", PostTooltip.POST_SELECTOR, function (event) {
-    let qtip = $(event.target).qtip("api");
-
-    if (qtip && qtip.cache && qtip.cache.request && qtip.cache.request.state() === "pending") {
-      qtip.cache.request.abort();
-    }
-  });
-
-  $(document).on("click.danbooru.postTooltip", ".post-tooltip-disable", PostTooltip.on_disable_tooltips);
-
-  // Hide tooltips when pressing keys or clicking thumbnails.
-  $(document).on("keydown.danbooru.postTooltip", PostTooltip.hide);
-  $(document).on("click.danbooru.postTooltip", PostTooltip.POST_SELECTOR, PostTooltip.hide);
-
-  // Disable tooltips on touch devices. https://developer.mozilla.org/en-US/docs/Web/API/Touch_events/Supporting_both_TouchEvent_and_MouseEvent
-  PostTooltip.isTouching = false;
-  $(document).on("touchstart.danbooru.postTooltip", function (event) { PostTooltip.isTouching = true; });
-  $(document).on("touchend.danbooru.postTooltip",   function (event) { PostTooltip.isTouching = false; });
-};
-
-PostTooltip.hide = function (event) {
-  // Hide on any key except control (user may be control-clicking link inside tooltip).
-  if (event.type === "keydown" && event.ctrlKey === true) {
-    return;
-  }
-
-  $(".post-tooltip:visible").qtip("hide");
-};
+}
 
 PostTooltip.disabled = function (event) {
-  return PostTooltip.isTouching || CurrentUser.data("disable-post-tooltips");
+  return CurrentUser.data("disable-post-tooltips");
 };
 
 PostTooltip.on_disable_tooltips = async function (event) {
   event.preventDefault();
-  $(event.target).parents(".qtip").qtip("hide");
+  hideAll();
 
   if (CurrentUser.data("is-anonymous")) {
     Utility.notice('You must <a href="/session/new">login</a> to disable tooltips');

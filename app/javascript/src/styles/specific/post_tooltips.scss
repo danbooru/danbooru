@@ -1,6 +1,5 @@
 $tooltip-line-height: 16px;
-$tooltip-body-height: $tooltip-line-height * 6; // 6 lines high.
-$tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
+$tooltip-body-height: $tooltip-line-height * 4; // 4 lines high.
 
 @mixin thin-scrollbar {
   &::-webkit-scrollbar {
@@ -46,16 +45,20 @@ $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
   }
 }
 
-.post-tooltip {
-  max-width: $tooltip-width;
-  min-width: $tooltip-width;
+.tippy-box[data-theme~="post-tooltip"] {
+  min-width: 200px;
   box-sizing: border-box;
   font-size: 11px;
   line-height: $tooltip-line-height;
-  border-color: var(--post-tooltip-border-color);
-  background-color: var(--post-tooltip-background-color);
 
-  .qtip-content {
+  border: 1px solid var(--post-tooltip-border-color);
+  border-radius: 4px;
+
+  background-color: var(--post-tooltip-background-color);
+  background-clip: padding-box;
+  box-shadow: var(--post-tooltip-box-shadow);
+
+  .tippy-content {
     padding: 0;
 
     > * {
@@ -116,7 +119,43 @@ $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
     }
   }
 
-  &.post-tooltip-loading {
-    visibility: hidden;
+  /* bordered arrow styling; see https://github.com/atomiks/tippyjs/blob/master/src/scss/themes/light-border.scss */
+  &[data-placement^=bottom] {
+    > .tippy-arrow:before {
+      border-bottom-color: var(--post-tooltip-background-color);
+      bottom: 16px;
+    }
+
+    > .tippy-arrow:after {
+      border-bottom-color: var(--post-tooltip-border-color);
+      border-width: 0 7px 7px;
+      top: -8px;
+      left: 1px;
+    }
   }
+
+  &[data-placement^=top] {
+    > .tippy-arrow:before {
+      border-top-color: var(--post-tooltip-background-color);
+    }
+
+    > .tippy-arrow:after {
+      border-top-color: var(--post-tooltip-border-color);
+      border-width: 7px 7px 0;
+      top: 17px;
+      left: 1px;
+    }
+  }
+
+  > .tippy-arrow:after {
+    border-color: transparent;
+    border-style: solid;
+    content: "";
+    position: absolute;
+    z-index: -1;
+  }
+}
+
+div[data-tippy-root].post-tooltip-loading {
+  visibility: hidden !important;
 }

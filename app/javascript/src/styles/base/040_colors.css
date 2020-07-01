@@ -72,7 +72,8 @@
   --comment-sticky-background-color: var(--subnav-menu-background-color);
 
   --post-tooltip-background-color: var(--body-background-color);
-  --post-tooltip-border-color: #767676;
+  --post-tooltip-border-color: hsla(210, 100%, 3%, 0.15);
+  --post-tooltip-box-shadow: 0 4px 14px -2px hsla(210, 100%, 3%, 0.10);
   --post-tooltip-header-background-color: var(--subnav-menu-background-color);
   --post-tooltip-info-color: #555;
   --post-tooltip-scrollbar-background: #999999;
