@@ -1,4 +1,4 @@
-This post has <%= link_to pluralize(children.length, "child"), posts_path(tags: "parent:#{parent.id}") %>
+This post has <%= link_to pluralize(children.length, "child"), posts_path(tags: "parent:#{parent.id}"), rel: "nofollow" %>
 
 (<%= link_to_wiki "learn more", "help:post_relationships" %>)
 <%= link_to("« hide", "#", id: "has-children-relationship-preview-link") %>
