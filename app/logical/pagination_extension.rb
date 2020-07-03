@@ -61,27 +61,35 @@ module PaginationExtension
   end
 
   def prev_page
-    return nil if is_first_page?
-
-    if paginator_mode == :numbered
+    if is_first_page?
+      nil
+    elsif paginator_mode == :numbered
       current_page - 1
-    elsif paginator_mode == :sequential_before
+    elsif paginator_mode == :sequential_before && records.present?
       "a#{records.first.id}"
-    elsif paginator_mode == :sequential_after
+    elsif paginator_mode == :sequential_after && records.present?
       "b#{records.last.id}"
+    else
+      nil
     end
+  rescue ActiveRecord::QueryCanceled
+    nil
   end
 
   def next_page
-    return nil if is_last_page?
-
-    if paginator_mode == :numbered
+    if is_last_page?
+      nil
+    elsif paginator_mode == :numbered
       current_page + 1
-    elsif paginator_mode == :sequential_before
+    elsif paginator_mode == :sequential_before && records.present?
       "b#{records.last.id}"
-    elsif paginator_mode == :sequential_after
+    elsif paginator_mode == :sequential_after && records.present?
       "a#{records.first.id}"
+    else
+      nil
     end
+  rescue ActiveRecord::QueryCanceled
+    nil
   end
 
   # XXX Hack: in sequential pagination we fetch one more record than we

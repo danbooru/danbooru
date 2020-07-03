@@ -380,6 +380,28 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_select "title", text: "1girl Art | Safebooru"
         end
       end
+
+      context "for a search that times out" do
+        context "during numbered pagination" do
+          should "show the search timeout error page" do
+            Post::const_get(:ActiveRecord_Relation).any_instance.stubs(:records).raises(ActiveRecord::QueryCanceled)
+
+            get posts_path(page: "1")
+            assert_response 500
+            assert_select "h1", text: "Search Timeout"
+          end
+        end
+
+        context "during sequential pagination" do
+          should "show the search timeout error page" do
+            Post::const_get(:ActiveRecord_Relation).any_instance.stubs(:records).raises(ActiveRecord::QueryCanceled)
+
+            get posts_path(page: "a0")
+            assert_response 500
+            assert_select "h1", text: "Search Timeout"
+          end
+        end
+      end
     end
 
     context "show_seq action" do

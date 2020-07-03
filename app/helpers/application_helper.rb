@@ -253,7 +253,7 @@ module ApplicationHelper
   def body_attributes(user, params, current_item = nil)
     current_user_data_attributes = data_attributes_for(user, "current-user", current_user_attributes)
 
-    if current_item.present? && current_item.respond_to?(:html_data_attributes) && current_item.respond_to?(:model_name)
+    if !current_item.nil? && current_item.respond_to?(:html_data_attributes) && current_item.respond_to?(:model_name)
       model_name = current_item.model_name.singular.dasherize
       model_attributes = current_item.html_data_attributes
       current_item_data_attributes = data_attributes_for(current_item, model_name, model_attributes)
