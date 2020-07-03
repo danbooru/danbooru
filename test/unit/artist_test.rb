@@ -128,7 +128,8 @@ class ArtistTest < ActiveSupport::TestCase
     should "not allow invalid urls" do
       artist = FactoryBot.build(:artist, :url_string => "blah")
       assert_equal(false, artist.valid?)
-      assert_equal(["'blah' must begin with http:// or https:// "], artist.errors["urls.url"])
+      assert_includes(artist.errors["urls.url"], "'blah' must begin with http:// or https:// ")
+      assert_includes(artist.errors["urls.url"], "'blah' has a hostname '' that does not contain a dot")
     end
 
     should "allow fixing invalid urls" do
