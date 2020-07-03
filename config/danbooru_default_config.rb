@@ -355,6 +355,11 @@ module Danbooru
       nil
     end
 
+    def twitter_url
+      return nil unless Danbooru.config.twitter_username.present?
+      "https://twitter.com/#{Danbooru.config.twitter_username}"
+    end
+
     # include essential tags in image urls (requires nginx/apache rewrites)
     def enable_seo_post_urls
       false

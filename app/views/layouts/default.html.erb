@@ -19,42 +19,12 @@
   <% if CurrentUser.user.custom_style.present? && params.fetch(:css, "true").truthy?  %>
     <%= stylesheet_link_tag custom_style_users_path(md5: Digest::MD5.hexdigest(CurrentUser.user.custom_style)), media: "screen" %>
   <% end %>
-  <% if Danbooru.config.twitter_username.present? %>
-    <script type="application/ld+json">
-      {
-        "@context" : "http://schema.org",
-        "@type" : "Organization",
-        "name" : "<%= Danbooru.config.app_name %>",
-        "url" : "<%= root_url %>",
-        "sameAs" : [
-          "https://twitter.com/<%= Danbooru.config.twitter_username %>"
-        ]
-      }
-    </script>
-  <% end %>
-  <script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "WebSite",
-    "url" : "<%= root_url %>",
-    "potentialAction": [{
-      "@type": "SearchAction",
-      "target": "<%= posts_url %>?tags={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }]
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "WebSite",
-    "name": "<%= Danbooru.config.app_name %>",
-    "alternateName": "Anime Image Board",
-    "url" : "<%= root_url %>"
-  }
-  </script>
-  <%= tag.meta name: "description", content: meta_description %>
 
+  <% if current_page?(root_url) %>
+    <%= json_ld_website_data %>
+  <% end %>
+
+  <%= tag.meta name: "description", content: meta_description %>
   <%= tag.meta property: "og:type", content: "website" %>
   <%= tag.meta property: "og:site_name", content: Danbooru.config.app_name %>
   <%= tag.meta property: "og:title", content: page_title %>

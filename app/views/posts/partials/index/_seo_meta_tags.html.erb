@@ -1,6 +1,6 @@
 <% if @post_set.query.is_empty_search? %>
   <% page_title("#{Danbooru.config.app_name}: Anime Image Board", suffix: nil) %>
-  <% meta_description("#{Danbooru.config.canonical_app_name} is the original anime image 'booru. Find over 3.75 million anime pictures categorized by over 100 million tags.") %>
+  <% meta_description site_description %>
 
   <% atom_feed_tag "Posts", posts_url(format: :atom) %>
 <% else %>
