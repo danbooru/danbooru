@@ -63,4 +63,11 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
       assert_response :success
     end
   end
+
+  context "opensearch action" do
+    should "work" do
+      get opensearch_path, as: :xml
+      assert_response :success
+    end
+  end
 end

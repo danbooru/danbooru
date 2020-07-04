@@ -69,6 +69,7 @@ Rails.application.routes.draw do
       get :search
     end
   end
+  resources :autocomplete, only: [:index]
   resources :bans
   resources :bulk_update_requests do
     member do
@@ -365,6 +366,7 @@ Rails.application.routes.draw do
   get "/wiki/history/:title" => redirect("/wiki_page_versions?title=%{title}")
 
   get "/sitemap" => "static#sitemap"
+  get "/opensearch" => "static#opensearch", :as => "opensearch"
   get "/static/keyboard_shortcuts" => "static#keyboard_shortcuts", :as => "keyboard_shortcuts"
   get "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
   get "/static/site_map" => "static#site_map", :as => "site_map"

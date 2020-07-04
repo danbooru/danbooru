@@ -13,6 +13,9 @@ class StaticController < ApplicationController
     redirect_to wiki_page_path("help:dtext") unless request.format.js?
   end
 
+  def opensearch
+  end
+
   def site_map
   end
 
