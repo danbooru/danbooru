@@ -93,9 +93,21 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should "render for atom feeds" do
-        get comments_path(format: "atom")
-        assert_response :success
+      context "for atom feeds" do
+        should "render" do
+          @comment = as(@user) { create(:comment, post: @post) }
+          get comments_path(format: "atom")
+          assert_response :success
+        end
+
+        should "not show comments on restricted posts" do
+          @post.update!(is_banned: true)
+          @comment = as(@user) { create(:comment, post: @post) }
+
+          get comments_path(format: "atom")
+          assert_response :success
+          assert_equal(0, response.parsed_body.css("entry").size)
+        end
       end
     end
 

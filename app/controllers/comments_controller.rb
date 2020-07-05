@@ -97,6 +97,7 @@ class CommentsController < ApplicationController
 
     if request.format.atom?
       @comments = @comments.includes(:creator, :post)
+      @comments = @comments.select { |comment| comment.post.visible? }
     elsif request.format.html?
       @comments = @comments.includes(:creator, :updater, post: :uploader)
       @comments = @comments.includes(:votes) if CurrentUser.is_member?

@@ -64,6 +64,7 @@ class ActionDispatch::IntegrationTest
   extend ControllerHelper
 
   register_encoder :xml, response_parser: ->(body) { Nokogiri.XML(body) }
+  register_encoder :atom, response_parser: ->(body) { Nokogiri.XML(body) }
   register_encoder :html, response_parser: ->(body) { Nokogiri.HTML5(body) }
 
   def method_authenticated(method_name, url, user, **options)
