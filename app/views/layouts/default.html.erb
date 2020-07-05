@@ -41,6 +41,7 @@
   <%= tag.meta name: "twitter:description", content: meta_description %>
 
   <%= tag.meta name: "git-hash", content: Rails.application.config.x.git_hash %>
+  <%= tag.meta name: "theme-color", content: "hsl(213, 100%, 50%)" %>
 
   <%= yield :html_header %>
   <%= raw Danbooru.config.custom_html_header_content %>
