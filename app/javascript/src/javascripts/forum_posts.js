@@ -7,17 +7,15 @@ ForumPost.initialize_all = function() {
 }
 
 ForumPost.initialize_edit_links = function() {
-  $(".edit_forum_post_link").on("click.danbooru", function(e) {
-    var link_id = $(this).attr("id");
-    var forum_post_id = link_id.match(/^edit_forum_post_link_(\d+)$/)[1];
-    $("#edit_forum_post_" + forum_post_id).fadeToggle("fast");
+  $(document).on("click.danbooru", ".edit_forum_post_link", function(e) {
+    let $form = $(this).parents("article.forum-post").find("form.edit_forum_post");
+    $form.fadeToggle("fast");
     e.preventDefault();
   });
 
-  $(".edit_forum_topic_link").on("click.danbooru", function(e) {
-    var link_id = $(this).attr("id");
-    var forum_topic_id = link_id.match(/^edit_forum_topic_link_(\d+)$/)[1];
-    $("#edit_forum_topic_" + forum_topic_id).fadeToggle("fast");
+  $(document).on("click.danbooru", ".edit_forum_topic_link", function(e) {
+    let $form = $(this).parents("article.forum-post").find("form.edit_forum_topic");
+    $form.fadeToggle("fast");
     e.preventDefault();
   });
 

@@ -1,6 +1,6 @@
 <%= error_messages_for("forum_post") %>
 
-<%= edit_form_for(forum_post) do |f| %>
+<%= edit_form_for(forum_post, namespace: "forum_post_#{forum_post.id}") do |f| %>
   <%= f.input :body, as: :dtext %>
 
   <%= f.button :submit, "Submit" %>
