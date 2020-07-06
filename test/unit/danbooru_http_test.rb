@@ -152,7 +152,7 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         response = Danbooru::Http.use(:unpolish_cloudflare).get(url)
 
         assert_equal(200, response.status)
-        assert_equal(720_743, response.content_length)
+        assert_equal(622_594, response.content_length)
       end
     end
 
