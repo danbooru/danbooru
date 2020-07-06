@@ -1474,7 +1474,8 @@ class Post < ApplicationRecord
   end
 
   def banblocked?(user = CurrentUser.user)
-    is_banned? && !user.is_gold?
+    return false unless is_banned?
+    (has_tag?("paid_reward") && !user.is_approver?) || !user.is_gold?
   end
 
   def visible?(user = CurrentUser.user)

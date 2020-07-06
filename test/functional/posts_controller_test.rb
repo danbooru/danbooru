@@ -374,6 +374,24 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "with banned paid_reward posts" do
+        setup do
+          as(@user) { @post.update!(tag_string: "paid_reward", is_banned: true) }
+        end
+
+        should "show banned paid_rewards to approvers" do
+          get_auth posts_path, create(:approver)
+          assert_response :success
+          assert_select "#post_#{@post.id}", 1
+        end
+
+        should "not show banned paid_rewards to non-approvers" do
+          get_auth posts_path, create(:gold_user)
+          assert_response :success
+          assert_select "#post_#{@post.id}", 0
+        end
+      end
+
       context "in safe mode" do
         should "not include the rating:s tag in the page title" do
           get posts_path(tags: "1girl", safe_mode: true)
