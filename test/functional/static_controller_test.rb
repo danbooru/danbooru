@@ -36,6 +36,13 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  context "privacy_policy action" do
+    should "work" do
+      get privacy_policy_path
+      assert_response :success
+    end
+  end
+
   context "not_found action" do
     should "work" do
       get "/qwoiqogieqg"

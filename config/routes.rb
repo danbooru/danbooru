@@ -367,12 +367,14 @@ Rails.application.routes.draw do
 
   get "/sitemap" => "static#sitemap"
   get "/opensearch" => "static#opensearch", :as => "opensearch"
+  get "/privacy" => "static#privacy_policy", :as => "privacy_policy"
+  get "/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
   get "/static/keyboard_shortcuts" => "static#keyboard_shortcuts", :as => "keyboard_shortcuts"
   get "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
   get "/static/site_map" => "static#site_map", :as => "site_map"
-  get "/static/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
   get "/static/contact" => "static#contact", :as => "contact"
   get "/static/dtext_help" => "static#dtext_help", :as => "dtext_help"
+  get "/static/terms_of_service" => redirect { "/terms_of_service" }
 
   get "/mock/recommender/recommend/:user_id" => "mock_services#recommender_recommend", as: "mock_recommender_recommend"
   get "/mock/recommender/similiar/:post_id" => "mock_services#recommender_similar", as: "mock_recommender_similar"
