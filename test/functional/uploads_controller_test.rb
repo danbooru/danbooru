@@ -25,6 +25,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
     assert_equal("completed", upload.status)
     assert_equal(Post.last, upload.post)
     assert_equal(upload.post.md5, upload.md5)
+    upload
   end
 
   context "The uploads controller" do
@@ -281,6 +282,20 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(1280, Upload.last.image_width)
           assert_equal(720, Upload.last.image_height)
           assert_equal("mp4", Upload.last.post.file_ext)
+        end
+      end
+
+      context "when the upload is tagged banned_artist" do
+        should "autoban the post" do
+          upload = assert_successful_upload("test/files/test.jpg", tag_string: "banned_artist")
+          assert_equal(true, upload.post.is_banned?)
+        end
+      end
+
+      context "when the upload is tagged paid_reward" do
+        should "autoban the post" do
+          upload = assert_successful_upload("test/files/test.jpg", tag_string: "paid_reward")
+          assert_equal(true, upload.post.is_banned?)
         end
       end
 
