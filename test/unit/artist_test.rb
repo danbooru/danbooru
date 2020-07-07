@@ -62,8 +62,8 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "that has been banned" do
       setup do
-        @post = FactoryBot.create(:post, :tag_string => "aaa")
         @artist = FactoryBot.create(:artist, :name => "aaa")
+        @post = FactoryBot.create(:post, :tag_string => "aaa")
         @admin = FactoryBot.create(:admin_user)
         @artist.ban!(banner: @admin)
         @post.reload
@@ -407,9 +407,9 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "search on has_tag and return matches" do
-      post = FactoryBot.create(:post, tag_string: "bkub")
       bkub = FactoryBot.create(:artist, name: "bkub")
       none = FactoryBot.create(:artist, name: "none")
+      post = FactoryBot.create(:post, tag_string: "bkub")
 
       assert_equal(bkub.id, Artist.search(has_tag: "true").first.id)
       assert_equal(none.id, Artist.search(has_tag: "false").first.id)
@@ -443,8 +443,8 @@ class ArtistTest < ActiveSupport::TestCase
         assert(Tag.exists?(name: "bkub", category: Tag.categories.artist))
       end
 
-      should "change the tag to an artist tag if it was a gentag" do
-        tag = FactoryBot.create(:tag, name: "abc", category: Tag.categories.general)
+      should "change the tag to an artist tag if it was an empty gentag" do
+        tag = FactoryBot.create(:tag, name: "abc", category: Tag.categories.general, post_count: 0)
         artist = FactoryBot.create(:artist, name: "abc")
 
         assert_equal(Tag.categories.artist, tag.reload.category)
@@ -461,7 +461,7 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when renaming" do
       should "change the new tag to an artist tag if it was a gentag" do
-        tag = FactoryBot.create(:tag, name: "def", category: Tag.categories.general)
+        tag = FactoryBot.create(:tag, name: "def", category: Tag.categories.general, post_count: 0)
         artist = FactoryBot.create(:artist, name: "abc")
         artist.update(name: "def")
 
