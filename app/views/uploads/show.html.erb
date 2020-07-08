@@ -13,7 +13,7 @@
         <li>
           Size: <%= number_to_human_size(@upload.file_size) %></li>
           <% if @upload.image_width.present? %>
-            (<span itemprop="width"><%= @upload.image_width %></span>x<span itemprop="height"><%= @upload.image_height %></span>)
+            (<%= @upload.image_width %>x<%= @upload.image_height %>)
           <% end %>
         </li>
       <% end %>
