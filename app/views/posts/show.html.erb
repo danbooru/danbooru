@@ -147,6 +147,10 @@
 
   <% if policy(@post).visible? %>
     <%= tag.meta property: "og:image", content: @post.open_graph_image_url %>
+
+    <% if @post.is_video? %>
+      <%= json_ld_video_data(@post) %>
+    <% end %>
   <% end %>
 
   <% if @post.twitter_card_supported? %>
