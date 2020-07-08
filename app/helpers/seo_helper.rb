@@ -25,7 +25,6 @@ module SeoHelper
       "@graph": [
         {
           "@type": "Organization",
-          "@id": root_url(anchor: "organization", host: Danbooru.config.hostname),
           url: root_url(host: Danbooru.config.hostname),
           name: Danbooru.config.app_name,
           logo: "#{root_url(host: Danbooru.config.hostname)}images/danbooru-logo-500x500.png",
@@ -37,9 +36,6 @@ module SeoHelper
           "url": root_url(host: Danbooru.config.hostname),
           "name": Danbooru.config.app_name,
           "description": site_description,
-          "publisher": {
-            "@id": root_url(anchor: "organization", host: Danbooru.config.hostname),
-          },
           "potentialAction": [{
             "@type": "SearchAction",
             "target": "#{posts_url(host: Danbooru.config.hostname)}?tags={search_term_string}",
