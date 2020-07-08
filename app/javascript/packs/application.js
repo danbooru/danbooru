@@ -6,7 +6,6 @@ function importAll(r) {
 
 require('@rails/ujs').start();
 require('hammerjs');
-require('stupid-table-plugin');
 require('jquery-hotkeys');
 
 // should start looking for nodejs replacements
