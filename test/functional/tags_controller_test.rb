@@ -20,6 +20,12 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render for a sitemap" do
+        get tags_path(format: :sitemap)
+        assert_response :success
+        assert_equal(Tag.count, response.parsed_body.css("urlset url loc").size)
+      end
+
       context "with blank search parameters" do
         should "strip the blank parameters with a redirect" do
           get tags_path, params: { search: { name: "touhou", category: "" } }

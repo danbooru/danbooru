@@ -14,11 +14,14 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
   end
 
   context "sitemap action" do
-    should "work" do
-      create_list(:post, 3)
-      mock_post_search_rankings(Time.zone.yesterday, [["1girl", 100.0], ["2girls", 50.0]])
-      get sitemap_path, as: :xml
-      assert_response :success
+    [Artist, ForumTopic, Pool, Post, Tag, User, WikiPage].each do |klass|
+      should "work for #{klass.model_name.plural}" do
+        as(create(:user)) { create_list(klass.model_name.singular.to_sym, 3) }
+        get sitemap_path(sitemap: klass.model_name.plural), as: :xml
+
+        assert_response :success
+        assert_equal(1, response.parsed_body.css("sitemap loc").size)
+      end
     end
   end
 

@@ -114,6 +114,12 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render for a sitemap" do
+        get forum_topics_path(format: :sitemap)
+        assert_response :success
+        assert_equal(ForumTopic.count, response.parsed_body.css("urlset url loc").size)
+      end
+
       context "with private topics" do
         should "not show private topics to unprivileged users" do
           as(@user) { @topic2.update!(min_level: User::Levels::MODERATOR) }

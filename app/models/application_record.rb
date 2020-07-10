@@ -16,7 +16,8 @@ class ApplicationRecord < ActiveRecord::Base
         search_params = params.fetch(:search, {}).permit!
         search_params = defaults.merge(search_params).with_indifferent_access
 
-        search(search_params).paginate(params[:page], limit: params[:limit], search_count: count_pages)
+        max_limit = (params[:format] == "sitemap") ? 10_000 : 1_000
+        search(search_params).paginate(params[:page], limit: params[:limit], max_limit: max_limit, search_count: count_pages)
       end
     end
   end

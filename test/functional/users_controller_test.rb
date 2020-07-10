@@ -12,6 +12,12 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render for a sitemap" do
+        get users_path(format: :sitemap)
+        assert_response :success
+        assert_equal(User.count, response.parsed_body.css("urlset url loc").size)
+      end
+
       should "list all users for /users?name=<name>" do
         get users_path, params: { name: @user.name }
         assert_redirected_to(@user)

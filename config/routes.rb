@@ -365,7 +365,7 @@ Rails.application.routes.draw do
   get "/wiki/recent_changes" => redirect {|params, req| "/wiki_page_versions?search[updater_id]=#{req.params[:user_id]}"}
   get "/wiki/history/:title" => redirect("/wiki_page_versions?title=%{title}")
 
-  get "/sitemap" => "static#sitemap"
+  get "/sitemap" => "static#sitemap_index"
   get "/opensearch" => "static#opensearch", :as => "opensearch"
   get "/privacy" => "static#privacy_policy", :as => "privacy_policy"
   get "/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"

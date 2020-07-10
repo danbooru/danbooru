@@ -135,6 +135,12 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "get the sitemap" do
+        get artists_path(format: :sitemap)
+        assert_response :success
+        assert_equal(Artist.count, response.parsed_body.css("urlset url loc").size)
+      end
+
       context "when searching the index page" do
         should "find artists by name" do
           get artists_path(name: "masao", format: "json")

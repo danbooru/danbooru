@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<%# https://support.google.com/webmasters/answer/178636 %>
+<%# https://support.google.com/webmasters/answer/80471 %>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1">
+  <% @posts.each do |post| %>
+    <url>
+      <loc><%= post_url(post) %></loc>
+      <lastmod><%= post.updated_at.iso8601 %></lastmod>
+      <% if post.visible? %>
+        <% if post.is_image? %>
+          <image:image>
+            <image:loc><%= post.file_url %></image:loc>
+          </image:image>
+        <% elsif post.is_video? %>
+          <video:video>
+            <video:thumbnail_loc><%= post.preview_file_url %></video:thumbnail_loc>
+            <video:content_loc><%= post.file_url %></video:content_loc>
+            <video:publication_date><%= post.created_at.iso8601 %></video:publication_date>
+            <video:title><%= "Post ##{post.id}" %></video:title>
+            <video:description><%= post.tag_string %></video:description>
+            <video:family_friendly><%= post.rating == "s" ? "yes" : "no" %></video:family_friendly>
+          </video:video>
+        <% end %>
+      <% end %>
+    </url>
+  <% end %>
+</urlset>

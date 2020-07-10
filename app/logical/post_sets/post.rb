@@ -76,7 +76,11 @@ module PostSets
     end
 
     def per_page
-      (@per_page || query.find_metatag(:limit) || CurrentUser.user.per_page).to_i.clamp(0, MAX_PER_PAGE)
+      (@per_page || query.find_metatag(:limit) || CurrentUser.user.per_page).to_i.clamp(0, max_per_page)
+    end
+
+    def max_per_page
+      (format == "sitemap") ? 10_000 : MAX_PER_PAGE
     end
 
     def is_random?
@@ -105,7 +109,7 @@ module PostSets
         if is_random?
           get_random_posts
         else
-          normalized_query.build.paginate(page, count: post_count, search_count: !post_count.nil?, limit: per_page).load
+          normalized_query.build.paginate(page, count: post_count, search_count: !post_count.nil?, limit: per_page, max_limit: max_per_page).load
         end
       end
     end

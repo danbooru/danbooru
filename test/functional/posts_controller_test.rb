@@ -337,6 +337,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "with the .sitemap format" do
+        should "render" do
+          get posts_path(format: :sitemap)
+          assert_response :success
+          assert_equal(Post.count, response.parsed_body.css("urlset url loc").size)
+        end
+      end
+
       context "with deleted posts" do
         setup do
           @post.update!(is_deleted: true)

@@ -3,9 +3,9 @@ module PaginationExtension
 
   attr_accessor :current_page, :records_per_page, :paginator_count, :paginator_mode
 
-  def paginate(page, limit: nil, count: nil, search_count: nil)
+  def paginate(page, limit: nil, max_limit: 1000, count: nil, search_count: nil)
     @records_per_page = limit || Danbooru.config.posts_per_page
-    @records_per_page = @records_per_page.to_i.clamp(1, 1000)
+    @records_per_page = @records_per_page.to_i.clamp(1, max_limit)
 
     if count.present?
       @paginator_count = count
