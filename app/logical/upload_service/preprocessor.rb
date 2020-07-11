@@ -64,6 +64,8 @@ class UploadService
     end
 
     def start!
+      raise NotImplementedError, "No login credentials configured for #{strategy.site_name}." unless strategy.class.enabled?
+
       if Utils.is_downloadable?(source)
         if Post.system_tag_match("source:#{canonical_source}").where.not(id: original_post_id).exists?
           raise ActiveRecord::RecordNotUnique, "A post with source #{canonical_source} already exists"

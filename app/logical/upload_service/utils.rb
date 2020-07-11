@@ -72,6 +72,8 @@ class UploadService
       raise "No file or source URL provided" if upload.source_url.blank?
 
       strategy = Sources::Strategies.find(upload.source_url, upload.referer_url)
+      raise NotImplementedError, "No login credentials configured for #{strategy.site_name}." unless strategy.class.enabled?
+
       file = strategy.download_file!
 
       if strategy.data[:ugoira_frame_data].present?

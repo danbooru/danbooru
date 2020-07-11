@@ -65,6 +65,10 @@ module Sources
       STACC_PAGE = %r{\A#{WEB}/stacc/#{MONIKER}/?\z}i
       NOVEL_PAGE = %r{(?:\Ahttps?://www\.pixiv\.net/novel/show\.php\?id=(\d+))}
 
+      def self.enabled?
+        Danbooru.config.pixiv_login.present? && Danbooru.config.pixiv_password.present?
+      end
+
       def self.to_dtext(text)
         if text.nil?
           return nil

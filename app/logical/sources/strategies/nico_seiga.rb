@@ -50,6 +50,10 @@ module Sources
 
       PROFILE_PAGE = %r{\Ahttps?://seiga\.nicovideo\.jp/user/illust/(?<artist_id>\d+)}i
 
+      def self.enabled?
+        Danbooru.config.nico_seiga_login.present? && Danbooru.config.nico_seiga_password.present?
+      end
+
       def domains
         ["nicoseiga.jp", "nicovideo.jp"]
       end
