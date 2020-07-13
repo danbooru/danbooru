@@ -249,9 +249,6 @@ Autocomplete.render_item = function(list, item) {
   } else if (item.type === "user") {
     var level_class = "user-" + item.level.toLowerCase();
     $link.addClass(level_class);
-    if (CurrentUser.data("style-usernames")) {
-      $link.addClass("with-style");
-    }
   } else if (item.type === "pool") {
     $link.addClass("pool-category-" + item.category);
   }

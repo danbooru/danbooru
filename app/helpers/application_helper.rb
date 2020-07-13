@@ -190,7 +190,6 @@ module ApplicationHelper
     user_class += " user-post-approver" if user.can_approve_posts?
     user_class += " user-post-uploader" if user.can_upload_free?
     user_class += " user-banned" if user.is_banned?
-    user_class += " with-style" if CurrentUser.user.style_usernames?
     link_to(user.pretty_name, user_path(user), :class => user_class)
   end
 
