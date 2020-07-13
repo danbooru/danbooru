@@ -307,7 +307,9 @@ inline := |*
       const char* name_start = sm->a1;
       const char* name_end = find_boundary_c(match_end);
 
-      append(sm, "<a href=\"/users?name=");
+      append(sm, "<a class=\"dtext-link dtext-user-mention-link\" data-user-name=\"");
+      append_segment_html_escaped(sm, name_start, name_end);
+      append(sm, "\" href=\"/users?name=");
       append_segment_uri_escaped(sm, name_start, name_end);
       append(sm, "\">");
       append_c(sm, '@');
@@ -322,7 +324,9 @@ inline := |*
 
   delimited_mention => {
     if (sm->f_mentions) {
-      append(sm, "<a href=\"/users?name=");
+      append(sm, "<a class=\"dtext-link dtext-user-mention-link\" data-user-name=\"");
+      append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
+      append(sm, "\" href=\"/users?name=");
       append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
       append(sm, "\">");
       append_c(sm, '@');

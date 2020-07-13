@@ -25,7 +25,7 @@ class DTextTest < Minitest::Test
   def test_relative_urls
     assert_parse('<p><a class="dtext-link dtext-id-link dtext-post-id-link" href="http://danbooru.donmai.us/posts/1234">post #1234</a></p>', "post #1234", base_url: "http://danbooru.donmai.us")
     assert_parse('<p><a class="dtext-link" href="http://danbooru.donmai.us/posts">posts</a></p>', '"posts":/posts', base_url: "http://danbooru.donmai.us")
-    assert_parse('<p><a href="http://danbooru.donmai.us/users?name=evazion">@evazion</a></p>', "@evazion", base_url: "http://danbooru.donmai.us")
+    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="evazion" href="http://danbooru.donmai.us/users?name=evazion">@evazion</a></p>', "@evazion", base_url: "http://danbooru.donmai.us")
   end
 
   def test_args
@@ -35,11 +35,11 @@ class DTextTest < Minitest::Test
   end
 
   def test_mentions
-    assert_parse('<p><a href="/users?name=bob">@bob</a></p>', "@bob")
-    assert_parse('<p>hi <a href="/users?name=bob">@bob</a></p>', "hi @bob")
-    assert_parse('<p>this is not @.@ @_@ <a href="/users?name=bob">@bob</a></p>', "this is not @.@ @_@ @bob")
+    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="bob" href="/users?name=bob">@bob</a></p>', "@bob")
+    assert_parse('<p>hi <a class="dtext-link dtext-user-mention-link" data-user-name="bob" href="/users?name=bob">@bob</a></p>', "hi @bob")
+    assert_parse('<p>this is not @.@ @_@ <a class="dtext-link dtext-user-mention-link" data-user-name="bob" href="/users?name=bob">@bob</a></p>', "this is not @.@ @_@ @bob")
     assert_parse('<p>this is an email@address.com and should not trigger</p>', "this is an email@address.com and should not trigger")
-    assert_parse('<p>multiple <a href="/users?name=bob">@bob</a> <a href="/users?name=anna">@anna</a></p>', "multiple @bob @anna")
+    assert_parse('<p>multiple <a class="dtext-link dtext-user-mention-link" data-user-name="bob" href="/users?name=bob">@bob</a> <a class="dtext-link dtext-user-mention-link" data-user-name="anna" href="/users?name=anna">@anna</a></p>', "multiple @bob @anna")
     assert_equal('<p>hi @bob</p>', DTextRagel.parse("hi @bob", :disable_mentions => true))
   end
 
@@ -429,7 +429,7 @@ class DTextTest < Minitest::Test
   end
 
   def test_boundary_exploit
-    assert_parse('<p><a href="/users?name=mack">@mack</a>&lt;</p>', "@mack<")
+    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="mack" href="/users?name=mack">@mack</a>&lt;</p>', "@mack<")
   end
 
   def test_expand
@@ -457,18 +457,18 @@ class DTextTest < Minitest::Test
   end
 
   def test_utf8_mentions
-    assert_parse('<p><a href="/users?name=葉月">@葉月</a></p>', "@葉月")
-    assert_parse('<p>Hello <a href="/users?name=葉月">@葉月</a> and <a href="/users?name=Alice">@Alice</a></p>', "Hello @葉月 and @Alice")
+    assert_parse('<p><a class="dtext-link dtext-user-mention-link" data-user-name="葉月" href="/users?name=葉月">@葉月</a></p>', "@葉月")
+    assert_parse('<p>Hello <a class="dtext-link dtext-user-mention-link" data-user-name="葉月" href="/users?name=葉月">@葉月</a> and <a class="dtext-link dtext-user-mention-link" data-user-name="Alice" href="/users?name=Alice">@Alice</a></p>', "Hello @葉月 and @Alice")
     assert_parse('<p>Should not parse 葉月@葉月</p>', "Should not parse 葉月@葉月")
   end
 
   def test_mention_boundaries
-    assert_parse('<p>「hi <a href="/users?name=葉月">@葉月</a>」</p>', "「hi @葉月」")
+    assert_parse('<p>「hi <a class="dtext-link dtext-user-mention-link" data-user-name="葉月" href="/users?name=葉月">@葉月</a>」</p>', "「hi @葉月」")
   end
 
   def test_delimited_mentions
     dtext = '(blah <@evazion>).'
-    html = '<p>(blah <a href="/users?name=evazion">@evazion</a>).</p>'
+    html = '<p>(blah <a class="dtext-link dtext-user-mention-link" data-user-name="evazion" href="/users?name=evazion">@evazion</a>).</p>'
     assert_parse(html, dtext)
   end
 
