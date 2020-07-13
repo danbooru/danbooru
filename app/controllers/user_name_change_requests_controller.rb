@@ -19,7 +19,7 @@ class UserNameChangeRequestsController < ApplicationController
   end
 
   def index
-    @change_requests = authorize UserNameChangeRequest.visible(CurrentUser.user).order("id desc").paginate(params[:page], :limit => params[:limit])
+    @change_requests = authorize UserNameChangeRequest.visible(CurrentUser.user).paginated_search(params)
     respond_with(@change_requests)
   end
 end

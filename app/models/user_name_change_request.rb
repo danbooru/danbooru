@@ -18,6 +18,12 @@ class UserNameChangeRequest < ApplicationRecord
     end
   end
 
+  def self.search(params)
+    q = super
+    q = q.search_attributes(params, :user, :original_name, :desired_name)
+    q.apply_default_order(params)
+  end
+
   def update_name!
     user.update!(name: desired_name)
   end
