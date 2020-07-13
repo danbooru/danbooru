@@ -5,7 +5,9 @@
     <ul>
       <li>Date: <%= @upload.created_at %></li>
       <li>Source: <%= @upload.source %></li>
-      <li>Tags: <%= @upload.tag_string %></li>
+      <% if policy(@upload).can_view_tags? %>
+        <li>Tags: <%= @upload.tag_string %></li>
+      <% end %>
       <% if @upload.md5.present? %>
         <li>MD5: <%= @upload.md5 %>
       <% end %>

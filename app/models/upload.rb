@@ -75,6 +75,7 @@ class Upload < ApplicationRecord
 
   scope :pending, -> { where(status: "pending") }
   scope :preprocessed, -> { where(status: "preprocessed") }
+  scope :completed, -> { where(status: "completed") }
   scope :uploaded_by, ->(user_id) { where(uploader_id: user_id) }
 
   def initialize_attributes
@@ -83,17 +84,19 @@ class Upload < ApplicationRecord
     self.server = Socket.gethostname
   end
 
-  def self.prune!(date = 1.day.ago)
-    where("created_at < ?", date).lock.destroy_all
+  def self.prune!
+    completed.where("created_at < ?", 1.hour.ago).lock.destroy_all
+    preprocessed.where("created_at < ?", 1.day.ago).lock.destroy_all
+    where("created_at < ?", 3.days.ago).lock.destroy_all
   end
 
   def self.visible(user)
     if user.is_admin?
       all
     elsif user.is_member?
-      where(uploader: user)
+      completed.or(where(uploader: user))
     else
-      none
+      completed
     end
   end
 
@@ -108,7 +111,7 @@ class Upload < ApplicationRecord
         return
       end
 
-      DanbooruLogger.info("Uploads: Deleting files for upload md5=#{md5}", upload: as_json)
+      DanbooruLogger.info("Uploads: Deleting files for upload md5=#{md5}")
       Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :original)
       Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :large)
       Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :preview)

@@ -44,10 +44,12 @@
           <br>
         <% end %>
 
-        <span class="info">
-          <strong>Tags</strong>
-          <%= TagSetPresenter.new(upload.tag_string.split).inline_tag_list_html %>
-        </span>
+        <% if policy(upload).can_view_tags? %>
+          <span class="info">
+            <strong>Tags</strong>
+            <%= TagSetPresenter.new(upload.tag_string.split).inline_tag_list_html %>
+          </span>
+        <% end %>
       <% end %>
       <% t.column "Uploader" do |upload| %>
         <%= link_to_user upload.uploader %>

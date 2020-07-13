@@ -947,8 +947,9 @@ class UploadServiceTest < ActiveSupport::TestCase
 
     should "delete stale upload records" do
       @upload = as(@user) { UploadService.new(file: upload_file("test/files/test.jpg")).start! }
+      @upload.update!(created_at: 1.month.ago)
 
-      assert_difference("Upload.count", -1) { Upload.prune!(0.seconds.ago) }
+      assert_difference("Upload.count", -1) { Upload.prune! }
     end
 
     should "delete unused files after deleting the upload" do
