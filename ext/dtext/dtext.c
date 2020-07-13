@@ -44,7 +44,7 @@ typedef enum element_t {
 } element_t;
 
 
-#line 818 "ext/dtext/dtext.rl"
+#line 822 "ext/dtext/dtext.rl"
 
 
 
@@ -165,7 +165,7 @@ static const int dtext_en_list = 787;
 static const int dtext_en_main = 687;
 
 
-#line 820 "ext/dtext/dtext.rl"
+#line 824 "ext/dtext/dtext.rl"
 
 
 static inline void dstack_push(StateMachine * sm, element_t element) {
@@ -603,7 +603,7 @@ gboolean parse_helper(StateMachine* sm) {
 		( sm->act) = 0;
 	}
 	
-#line 1248 "ext/dtext/dtext.rl"
+#line 1252 "ext/dtext/dtext.rl"
 	
 	
 #line 610 "ext/dtext/dtext.c"
@@ -15774,9 +15774,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f39:
 		{
-#line 353 "ext/dtext/dtext.rl"
+#line 357 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 353 "ext/dtext/dtext.rl"
+#line 357 "ext/dtext/dtext.rl"
 					dstack_open_inline(sm,  INLINE_B, "<strong>"); }
 			}}
 		
@@ -15784,9 +15784,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f28:
 		{
-#line 354 "ext/dtext/dtext.rl"
+#line 358 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 354 "ext/dtext/dtext.rl"
+#line 358 "ext/dtext/dtext.rl"
 					dstack_close_inline(sm, INLINE_B, "</strong>"); }
 			}}
 		
@@ -15794,9 +15794,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f42:
 		{
-#line 355 "ext/dtext/dtext.rl"
+#line 359 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 355 "ext/dtext/dtext.rl"
+#line 359 "ext/dtext/dtext.rl"
 					dstack_open_inline(sm,  INLINE_I, "<em>"); }
 			}}
 		
@@ -15804,9 +15804,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f29:
 		{
-#line 356 "ext/dtext/dtext.rl"
+#line 360 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 356 "ext/dtext/dtext.rl"
+#line 360 "ext/dtext/dtext.rl"
 					dstack_close_inline(sm, INLINE_I, "</em>"); }
 			}}
 		
@@ -15814,9 +15814,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f45:
 		{
-#line 357 "ext/dtext/dtext.rl"
+#line 361 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 357 "ext/dtext/dtext.rl"
+#line 361 "ext/dtext/dtext.rl"
 					dstack_open_inline(sm,  INLINE_S, "<s>"); }
 			}}
 		
@@ -15824,9 +15824,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f31:
 		{
-#line 358 "ext/dtext/dtext.rl"
+#line 362 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 358 "ext/dtext/dtext.rl"
+#line 362 "ext/dtext/dtext.rl"
 					dstack_close_inline(sm, INLINE_S, "</s>"); }
 			}}
 		
@@ -15834,9 +15834,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f48:
 		{
-#line 359 "ext/dtext/dtext.rl"
+#line 363 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 359 "ext/dtext/dtext.rl"
+#line 363 "ext/dtext/dtext.rl"
 					dstack_open_inline(sm,  INLINE_U, "<u>"); }
 			}}
 		
@@ -15844,9 +15844,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f36:
 		{
-#line 360 "ext/dtext/dtext.rl"
+#line 364 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 360 "ext/dtext/dtext.rl"
+#line 364 "ext/dtext/dtext.rl"
 					dstack_close_inline(sm, INLINE_U, "</u>"); }
 			}}
 		
@@ -15854,9 +15854,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f47:
 		{
-#line 362 "ext/dtext/dtext.rl"
+#line 366 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 362 "ext/dtext/dtext.rl"
+#line 366 "ext/dtext/dtext.rl"
 					
 					dstack_open_inline(sm, INLINE_TN, "<span class=\"tn\">");
 				}
@@ -15866,9 +15866,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f35:
 		{
-#line 366 "ext/dtext/dtext.rl"
+#line 370 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 366 "ext/dtext/dtext.rl"
+#line 370 "ext/dtext/dtext.rl"
 					
 					dstack_close_before_block(sm);
 					
@@ -15884,9 +15884,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f41:
 		{
-#line 376 "ext/dtext/dtext.rl"
+#line 380 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 376 "ext/dtext/dtext.rl"
+#line 380 "ext/dtext/dtext.rl"
 					
 					dstack_open_inline(sm, INLINE_CODE, "<code>");
 					{{
@@ -15911,9 +15911,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f46:
 		{
-#line 381 "ext/dtext/dtext.rl"
+#line 385 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 381 "ext/dtext/dtext.rl"
+#line 385 "ext/dtext/dtext.rl"
 					
 					dstack_open_inline(sm, INLINE_SPOILER, "<span class=\"spoiler\">");
 				}
@@ -15923,9 +15923,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f32:
 		{
-#line 385 "ext/dtext/dtext.rl"
+#line 389 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 385 "ext/dtext/dtext.rl"
+#line 389 "ext/dtext/dtext.rl"
 					
 					g_debug("inline [/spoiler]");
 					dstack_close_before_block(sm);
@@ -15942,9 +15942,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f44:
 		{
-#line 396 "ext/dtext/dtext.rl"
+#line 400 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 396 "ext/dtext/dtext.rl"
+#line 400 "ext/dtext/dtext.rl"
 					
 					dstack_open_inline(sm, INLINE_NODTEXT, "");
 					{{
@@ -15969,9 +15969,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f40:
 		{
-#line 404 "ext/dtext/dtext.rl"
+#line 408 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 404 "ext/dtext/dtext.rl"
+#line 408 "ext/dtext/dtext.rl"
 					
 					g_debug("inline [quote]");
 					dstack_close_before_block(sm);
@@ -15985,9 +15985,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f43:
 		{
-#line 427 "ext/dtext/dtext.rl"
+#line 431 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 427 "ext/dtext/dtext.rl"
+#line 431 "ext/dtext/dtext.rl"
 					
 					g_debug("inline [expand]");
 					dstack_rewind(sm);
@@ -16001,9 +16001,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f30:
 		{
-#line 434 "ext/dtext/dtext.rl"
+#line 438 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 434 "ext/dtext/dtext.rl"
+#line 438 "ext/dtext/dtext.rl"
 					
 					dstack_close_before_block(sm);
 					
@@ -16017,9 +16017,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f34:
 		{
-#line 442 "ext/dtext/dtext.rl"
+#line 446 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 442 "ext/dtext/dtext.rl"
+#line 446 "ext/dtext/dtext.rl"
 					
 					if (dstack_close_block(sm, BLOCK_TH, "</th>")) {
 						{( sm->top)-= 1;sm->cs = ( ((int *)sm->stack->data))[( sm->top)];goto _again;}
@@ -16031,9 +16031,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f33:
 		{
-#line 448 "ext/dtext/dtext.rl"
+#line 452 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 448 "ext/dtext/dtext.rl"
+#line 452 "ext/dtext/dtext.rl"
 					
 					if (dstack_close_block(sm, BLOCK_TD, "</td>")) {
 						{( sm->top)-= 1;sm->cs = ( ((int *)sm->stack->data))[( sm->top)];goto _again;}
@@ -16045,9 +16045,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f92:
 		{
-#line 482 "ext/dtext/dtext.rl"
+#line 486 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 482 "ext/dtext/dtext.rl"
+#line 486 "ext/dtext/dtext.rl"
 					
 					g_debug("inline char: %c", (( (*( ( sm->p))))));
 					append_c_html_escaped(sm, (( (*( ( sm->p))))));
@@ -16100,9 +16100,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f108:
 		{
-#line 411 "ext/dtext/dtext.rl"
+#line 415 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 411 "ext/dtext/dtext.rl"
+#line 415 "ext/dtext/dtext.rl"
 					
 					g_debug("inline [/quote]");
 					dstack_close_before_block(sm);
@@ -16124,9 +16124,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f98:
 		{
-#line 454 "ext/dtext/dtext.rl"
+#line 458 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 454 "ext/dtext/dtext.rl"
+#line 458 "ext/dtext/dtext.rl"
 					
 					g_debug("inline newline2");
 					g_debug("  return");
@@ -16145,9 +16145,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f97:
 		{
-#line 466 "ext/dtext/dtext.rl"
+#line 470 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 466 "ext/dtext/dtext.rl"
+#line 470 "ext/dtext/dtext.rl"
 					
 					g_debug("inline newline");
 					
@@ -16165,9 +16165,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f100:
 		{
-#line 478 "ext/dtext/dtext.rl"
+#line 482 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 478 "ext/dtext/dtext.rl"
+#line 482 "ext/dtext/dtext.rl"
 					
 					append_c(sm, ' ');
 				}
@@ -16177,9 +16177,9 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f101:
 		{
-#line 482 "ext/dtext/dtext.rl"
+#line 486 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 482 "ext/dtext/dtext.rl"
+#line 486 "ext/dtext/dtext.rl"
 					
 					g_debug("inline char: %c", (( (*( ( sm->p))))));
 					append_c_html_escaped(sm, (( (*( ( sm->p))))));
@@ -16223,10 +16223,10 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f21:
 		{
-#line 466 "ext/dtext/dtext.rl"
+#line 470 "ext/dtext/dtext.rl"
 			{( sm->p) = ((( sm->te)))-1;
 				{
-#line 466 "ext/dtext/dtext.rl"
+#line 470 "ext/dtext/dtext.rl"
 					
 					g_debug("inline newline");
 					
@@ -16244,10 +16244,10 @@ gboolean parse_helper(StateMachine* sm) {
 		goto _again;
 		f22:
 		{
-#line 482 "ext/dtext/dtext.rl"
+#line 486 "ext/dtext/dtext.rl"
 			{( sm->p) = ((( sm->te)))-1;
 				{
-#line 482 "ext/dtext/dtext.rl"
+#line 486 "ext/dtext/dtext.rl"
 					
 					g_debug("inline char: %c", (( (*( ( sm->p))))));
 					append_c_html_escaped(sm, (( (*( ( sm->p))))));
@@ -16320,7 +16320,9 @@ gboolean parse_helper(StateMachine* sm) {
 								const char* name_start = sm->a1;
 								const char* name_end = find_boundary_c(match_end);
 								
-								append(sm, "<a href=\"/users?name=");
+								append(sm, "<a class=\"dtext-link dtext-user-mention-link\" data-user-name=\"");
+								append_segment_html_escaped(sm, name_start, name_end);
+								append(sm, "\" href=\"/users?name=");
 								append_segment_uri_escaped(sm, name_start, name_end);
 								append(sm, "\">");
 								append_c(sm, '@');
@@ -16337,7 +16339,7 @@ gboolean parse_helper(StateMachine* sm) {
 					case 76:  {
 						( sm->p) = ((( sm->te)))-1;
 						{
-#line 454 "ext/dtext/dtext.rl"
+#line 458 "ext/dtext/dtext.rl"
 							
 							g_debug("inline newline2");
 							g_debug("  return");
@@ -16355,7 +16357,7 @@ gboolean parse_helper(StateMachine* sm) {
 					case 77:  {
 						( sm->p) = ((( sm->te)))-1;
 						{
-#line 466 "ext/dtext/dtext.rl"
+#line 470 "ext/dtext/dtext.rl"
 							
 							g_debug("inline newline");
 							
@@ -16372,7 +16374,7 @@ gboolean parse_helper(StateMachine* sm) {
 					case 79:  {
 						( sm->p) = ((( sm->te)))-1;
 						{
-#line 482 "ext/dtext/dtext.rl"
+#line 486 "ext/dtext/dtext.rl"
 							
 							g_debug("inline char: %c", (( (*( ( sm->p))))));
 							append_c_html_escaped(sm, (( (*( ( sm->p))))));
@@ -16382,63 +16384,63 @@ gboolean parse_helper(StateMachine* sm) {
 				}}
 		}
 		
-#line 16386 "ext/dtext/dtext.c"
+#line 16388 "ext/dtext/dtext.c"
 		goto _again;
 		f59:
 		{
-#line 489 "ext/dtext/dtext.rl"
+#line 493 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 489 "ext/dtext/dtext.rl"
+#line 493 "ext/dtext/dtext.rl"
 					
 					dstack_rewind(sm);
 					{( sm->top)-= 1;sm->cs = ( ((int *)sm->stack->data))[( sm->top)];goto _again;}
 				}
 			}}
 		
-#line 16399 "ext/dtext/dtext.c"
+#line 16401 "ext/dtext/dtext.c"
 		goto _again;
 		f148:
 		{
-#line 494 "ext/dtext/dtext.rl"
+#line 498 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 494 "ext/dtext/dtext.rl"
+#line 498 "ext/dtext/dtext.rl"
 					
 					append_c_html_escaped(sm, (( (*( ( sm->p))))));
 				}
 			}}
 		
-#line 16411 "ext/dtext/dtext.c"
+#line 16413 "ext/dtext/dtext.c"
 		goto _again;
 		f149:
 		{
-#line 494 "ext/dtext/dtext.rl"
+#line 498 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 494 "ext/dtext/dtext.rl"
+#line 498 "ext/dtext/dtext.rl"
 					
 					append_c_html_escaped(sm, (( (*( ( sm->p))))));
 				}
 			}}
 		
-#line 16423 "ext/dtext/dtext.c"
+#line 16425 "ext/dtext/dtext.c"
 		goto _again;
 		f58:
 		{
-#line 494 "ext/dtext/dtext.rl"
+#line 498 "ext/dtext/dtext.rl"
 			{( sm->p) = ((( sm->te)))-1;
 				{
-#line 494 "ext/dtext/dtext.rl"
+#line 498 "ext/dtext/dtext.rl"
 					
 					append_c_html_escaped(sm, (( (*( ( sm->p))))));
 				}
 			}}
 		
-#line 16436 "ext/dtext/dtext.c"
+#line 16438 "ext/dtext/dtext.c"
 		goto _again;
 		f61:
 		{
-#line 500 "ext/dtext/dtext.rl"
+#line 504 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 500 "ext/dtext/dtext.rl"
+#line 504 "ext/dtext/dtext.rl"
 					
 					if (dstack_check2(sm, BLOCK_NODTEXT)) {
 						g_debug("block dstack check");
@@ -16457,98 +16459,98 @@ gboolean parse_helper(StateMachine* sm) {
 				}
 			}}
 		
-#line 16461 "ext/dtext/dtext.c"
+#line 16463 "ext/dtext/dtext.c"
 		goto _again;
 		f150:
 		{
-#line 517 "ext/dtext/dtext.rl"
+#line 521 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 517 "ext/dtext/dtext.rl"
+#line 521 "ext/dtext/dtext.rl"
 					
 					append_c_html_escaped(sm, (( (*( ( sm->p))))));
 				}
 			}}
 		
-#line 16473 "ext/dtext/dtext.c"
+#line 16475 "ext/dtext/dtext.c"
 		goto _again;
 		f151:
 		{
-#line 517 "ext/dtext/dtext.rl"
+#line 521 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 517 "ext/dtext/dtext.rl"
+#line 521 "ext/dtext/dtext.rl"
 					
 					append_c_html_escaped(sm, (( (*( ( sm->p))))));
 				}
 			}}
 		
-#line 16485 "ext/dtext/dtext.c"
+#line 16487 "ext/dtext/dtext.c"
 		goto _again;
 		f60:
 		{
-#line 517 "ext/dtext/dtext.rl"
+#line 521 "ext/dtext/dtext.rl"
 			{( sm->p) = ((( sm->te)))-1;
 				{
-#line 517 "ext/dtext/dtext.rl"
+#line 521 "ext/dtext/dtext.rl"
 					
 					append_c_html_escaped(sm, (( (*( ( sm->p))))));
 				}
 			}}
 		
-#line 16498 "ext/dtext/dtext.c"
+#line 16500 "ext/dtext/dtext.c"
 		goto _again;
 		f70:
 		{
-#line 523 "ext/dtext/dtext.rl"
+#line 527 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 523 "ext/dtext/dtext.rl"
+#line 527 "ext/dtext/dtext.rl"
 					
 					dstack_open_block(sm, BLOCK_THEAD, "<thead>");
 				}
 			}}
 		
-#line 16510 "ext/dtext/dtext.c"
+#line 16512 "ext/dtext/dtext.c"
 		goto _again;
 		f65:
 		{
-#line 527 "ext/dtext/dtext.rl"
+#line 531 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 527 "ext/dtext/dtext.rl"
+#line 531 "ext/dtext/dtext.rl"
 					
 					dstack_close_block(sm, BLOCK_THEAD, "</thead>");
 				}
 			}}
 		
-#line 16522 "ext/dtext/dtext.c"
+#line 16524 "ext/dtext/dtext.c"
 		goto _again;
 		f67:
 		{
-#line 531 "ext/dtext/dtext.rl"
+#line 535 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 531 "ext/dtext/dtext.rl"
+#line 535 "ext/dtext/dtext.rl"
 					
 					dstack_open_block(sm, BLOCK_TBODY, "<tbody>");
 				}
 			}}
 		
-#line 16534 "ext/dtext/dtext.c"
+#line 16536 "ext/dtext/dtext.c"
 		goto _again;
 		f64:
 		{
-#line 535 "ext/dtext/dtext.rl"
+#line 539 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 535 "ext/dtext/dtext.rl"
+#line 539 "ext/dtext/dtext.rl"
 					
 					dstack_close_block(sm, BLOCK_TBODY, "</tbody>");
 				}
 			}}
 		
-#line 16546 "ext/dtext/dtext.c"
+#line 16548 "ext/dtext/dtext.c"
 		goto _again;
 		f69:
 		{
-#line 539 "ext/dtext/dtext.rl"
+#line 543 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 539 "ext/dtext/dtext.rl"
+#line 543 "ext/dtext/dtext.rl"
 					
 					dstack_open_block(sm, BLOCK_TH, "<th>");
 					{{
@@ -16569,37 +16571,37 @@ gboolean parse_helper(StateMachine* sm) {
 						( ((int *)sm->stack->data))[( sm->top)] = sm->cs; ( sm->top) += 1;sm->cs = 707; goto _again;}}
 			}}
 		
-#line 16573 "ext/dtext/dtext.c"
+#line 16575 "ext/dtext/dtext.c"
 		goto _again;
 		f71:
 		{
-#line 544 "ext/dtext/dtext.rl"
+#line 548 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 544 "ext/dtext/dtext.rl"
+#line 548 "ext/dtext/dtext.rl"
 					
 					dstack_open_block(sm, BLOCK_TR, "<tr>");
 				}
 			}}
 		
-#line 16585 "ext/dtext/dtext.c"
+#line 16587 "ext/dtext/dtext.c"
 		goto _again;
 		f66:
 		{
-#line 548 "ext/dtext/dtext.rl"
+#line 552 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 548 "ext/dtext/dtext.rl"
+#line 552 "ext/dtext/dtext.rl"
 					
 					dstack_close_block(sm, BLOCK_TR, "</tr>");
 				}
 			}}
 		
-#line 16597 "ext/dtext/dtext.c"
+#line 16599 "ext/dtext/dtext.c"
 		goto _again;
 		f68:
 		{
-#line 552 "ext/dtext/dtext.rl"
+#line 556 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 552 "ext/dtext/dtext.rl"
+#line 556 "ext/dtext/dtext.rl"
 					
 					dstack_open_block(sm, BLOCK_TD, "<td>");
 					{{
@@ -16620,13 +16622,13 @@ gboolean parse_helper(StateMachine* sm) {
 						( ((int *)sm->stack->data))[( sm->top)] = sm->cs; ( sm->top) += 1;sm->cs = 707; goto _again;}}
 			}}
 		
-#line 16624 "ext/dtext/dtext.c"
+#line 16626 "ext/dtext/dtext.c"
 		goto _again;
 		f63:
 		{
-#line 557 "ext/dtext/dtext.rl"
+#line 561 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 557 "ext/dtext/dtext.rl"
+#line 561 "ext/dtext/dtext.rl"
 					
 					if (dstack_close_block(sm, BLOCK_TABLE, "</table>")) {
 						{( sm->top)-= 1;sm->cs = ( ((int *)sm->stack->data))[( sm->top)];goto _again;}
@@ -16634,21 +16636,21 @@ gboolean parse_helper(StateMachine* sm) {
 				}
 			}}
 		
-#line 16638 "ext/dtext/dtext.c"
+#line 16640 "ext/dtext/dtext.c"
 		goto _again;
 		f152:
 		{
 #line 1 "-"
 			{( sm->te) = ( sm->p)+1;}}
 		
-#line 16645 "ext/dtext/dtext.c"
+#line 16647 "ext/dtext/dtext.c"
 		goto _again;
 		f153:
 		{
 #line 1 "-"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;}}
 		
-#line 16652 "ext/dtext/dtext.c"
+#line 16654 "ext/dtext/dtext.c"
 		goto _again;
 		f62:
 		{
@@ -16656,13 +16658,13 @@ gboolean parse_helper(StateMachine* sm) {
 			{( sm->p) = ((( sm->te)))-1;
 			}}
 		
-#line 16660 "ext/dtext/dtext.c"
+#line 16662 "ext/dtext/dtext.c"
 		goto _again;
 		f154:
 		{
-#line 608 "ext/dtext/dtext.rl"
+#line 612 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 608 "ext/dtext/dtext.rl"
+#line 612 "ext/dtext/dtext.rl"
 					
 					dstack_rewind(sm);
 					{( sm->p) = ( sm->p) - 1; }
@@ -16670,13 +16672,13 @@ gboolean parse_helper(StateMachine* sm) {
 				}
 			}}
 		
-#line 16674 "ext/dtext/dtext.c"
+#line 16676 "ext/dtext/dtext.c"
 		goto _again;
 		f156:
 		{
-#line 608 "ext/dtext/dtext.rl"
+#line 612 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 608 "ext/dtext/dtext.rl"
+#line 612 "ext/dtext/dtext.rl"
 					
 					dstack_rewind(sm);
 					{( sm->p) = ( sm->p) - 1; }
@@ -16684,14 +16686,14 @@ gboolean parse_helper(StateMachine* sm) {
 				}
 			}}
 		
-#line 16688 "ext/dtext/dtext.c"
+#line 16690 "ext/dtext/dtext.c"
 		goto _again;
 		f74:
 		{
-#line 608 "ext/dtext/dtext.rl"
+#line 612 "ext/dtext/dtext.rl"
 			{( sm->p) = ((( sm->te)))-1;
 				{
-#line 608 "ext/dtext/dtext.rl"
+#line 612 "ext/dtext/dtext.rl"
 					
 					dstack_rewind(sm);
 					{( sm->p) = ( sm->p) - 1; }
@@ -16699,7 +16701,7 @@ gboolean parse_helper(StateMachine* sm) {
 				}
 			}}
 		
-#line 16703 "ext/dtext/dtext.c"
+#line 16705 "ext/dtext/dtext.c"
 		goto _again;
 		f72:
 		{
@@ -16708,7 +16710,7 @@ gboolean parse_helper(StateMachine* sm) {
 					case 95:  {
 						( sm->p) = ((( sm->te)))-1;
 						{
-#line 600 "ext/dtext/dtext.rl"
+#line 604 "ext/dtext/dtext.rl"
 							
 							dstack_close_list(sm);
 							{( sm->p) = (( sm->ts))-1;}
@@ -16724,13 +16726,13 @@ gboolean parse_helper(StateMachine* sm) {
 				}}
 		}
 		
-#line 16728 "ext/dtext/dtext.c"
+#line 16730 "ext/dtext/dtext.c"
 		goto _again;
 		f5:
 		{
-#line 726 "ext/dtext/dtext.rl"
+#line 730 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 726 "ext/dtext/dtext.rl"
+#line 730 "ext/dtext/dtext.rl"
 					
 					g_debug("block [/spoiler]");
 					dstack_close_before_block(sm);
@@ -16741,13 +16743,13 @@ gboolean parse_helper(StateMachine* sm) {
 				}
 			}}
 		
-#line 16745 "ext/dtext/dtext.c"
+#line 16747 "ext/dtext/dtext.c"
 		goto _again;
 		f6:
 		{
-#line 768 "ext/dtext/dtext.rl"
+#line 772 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 768 "ext/dtext/dtext.rl"
+#line 772 "ext/dtext/dtext.rl"
 					
 					dstack_close_before_block(sm);
 					dstack_open_block(sm, BLOCK_TABLE, "<table class=\"striped\">");
@@ -16769,13 +16771,13 @@ gboolean parse_helper(StateMachine* sm) {
 						( ((int *)sm->stack->data))[( sm->top)] = sm->cs; ( sm->top) += 1;sm->cs = 784; goto _again;}}
 			}}
 		
-#line 16773 "ext/dtext/dtext.c"
+#line 16775 "ext/dtext/dtext.c"
 		goto _again;
 		f7:
 		{
-#line 774 "ext/dtext/dtext.rl"
+#line 778 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 774 "ext/dtext/dtext.rl"
+#line 778 "ext/dtext/dtext.rl"
 					
 					dstack_open_block(sm, BLOCK_TN, "<p class=\"tn\">");
 					{{
@@ -16796,13 +16798,13 @@ gboolean parse_helper(StateMachine* sm) {
 						( ((int *)sm->stack->data))[( sm->top)] = sm->cs; ( sm->top) += 1;sm->cs = 707; goto _again;}}
 			}}
 		
-#line 16800 "ext/dtext/dtext.c"
+#line 16802 "ext/dtext/dtext.c"
 		goto _again;
 		f77:
 		{
-#line 806 "ext/dtext/dtext.rl"
+#line 810 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 806 "ext/dtext/dtext.rl"
+#line 810 "ext/dtext/dtext.rl"
 					
 					g_debug("block char: %c", (( (*( ( sm->p))))));
 					{( sm->p) = ( sm->p) - 1; }
@@ -16829,13 +16831,13 @@ gboolean parse_helper(StateMachine* sm) {
 						( ((int *)sm->stack->data))[( sm->top)] = sm->cs; ( sm->top) += 1;sm->cs = 707; goto _again;}}
 			}}
 		
-#line 16833 "ext/dtext/dtext.c"
+#line 16835 "ext/dtext/dtext.c"
 		goto _again;
 		f87:
 		{
-#line 616 "ext/dtext/dtext.rl"
+#line 620 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 616 "ext/dtext/dtext.rl"
+#line 620 "ext/dtext/dtext.rl"
 					
 					char header = *sm->a1;
 					g_autoptr(GString) id_name = g_string_new_len(sm->b1, sm->b2 - sm->b1);
@@ -16908,13 +16910,13 @@ gboolean parse_helper(StateMachine* sm) {
 						( ((int *)sm->stack->data))[( sm->top)] = sm->cs; ( sm->top) += 1;sm->cs = 707; goto _again;}}
 			}}
 		
-#line 16912 "ext/dtext/dtext.c"
+#line 16914 "ext/dtext/dtext.c"
 		goto _again;
 		f88:
 		{
-#line 673 "ext/dtext/dtext.rl"
+#line 677 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 673 "ext/dtext/dtext.rl"
+#line 677 "ext/dtext/dtext.rl"
 					
 					char header = *sm->a1;
 					
@@ -16973,39 +16975,39 @@ gboolean parse_helper(StateMachine* sm) {
 						( ((int *)sm->stack->data))[( sm->top)] = sm->cs; ( sm->top) += 1;sm->cs = 707; goto _again;}}
 			}}
 		
-#line 16977 "ext/dtext/dtext.c"
+#line 16979 "ext/dtext/dtext.c"
 		goto _again;
 		f82:
 		{
-#line 716 "ext/dtext/dtext.rl"
+#line 720 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 716 "ext/dtext/dtext.rl"
+#line 720 "ext/dtext/dtext.rl"
 					
 					dstack_close_before_block(sm);
 					dstack_open_block(sm, BLOCK_QUOTE, "<blockquote>");
 				}
 			}}
 		
-#line 16990 "ext/dtext/dtext.c"
+#line 16992 "ext/dtext/dtext.c"
 		goto _again;
 		f86:
 		{
-#line 721 "ext/dtext/dtext.rl"
+#line 725 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 721 "ext/dtext/dtext.rl"
+#line 725 "ext/dtext/dtext.rl"
 					
 					dstack_close_before_block(sm);
 					dstack_open_block(sm, BLOCK_SPOILER, "<div class=\"spoiler\">");
 				}
 			}}
 		
-#line 17003 "ext/dtext/dtext.c"
+#line 17005 "ext/dtext/dtext.c"
 		goto _again;
 		f83:
 		{
-#line 735 "ext/dtext/dtext.rl"
+#line 739 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 735 "ext/dtext/dtext.rl"
+#line 739 "ext/dtext/dtext.rl"
 					
 					dstack_close_before_block(sm);
 					dstack_open_block(sm, BLOCK_CODE, "<pre>");
@@ -17027,13 +17029,13 @@ gboolean parse_helper(StateMachine* sm) {
 						( ((int *)sm->stack->data))[( sm->top)] = sm->cs; ( sm->top) += 1;sm->cs = 778; goto _again;}}
 			}}
 		
-#line 17031 "ext/dtext/dtext.c"
+#line 17033 "ext/dtext/dtext.c"
 		goto _again;
 		f84:
 		{
-#line 741 "ext/dtext/dtext.rl"
+#line 745 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 741 "ext/dtext/dtext.rl"
+#line 745 "ext/dtext/dtext.rl"
 					
 					dstack_close_before_block(sm);
 					const char* html = "<div class=\"expandable\"><div class=\"expandable-header\">"
@@ -17043,13 +17045,13 @@ gboolean parse_helper(StateMachine* sm) {
 				}
 			}}
 		
-#line 17047 "ext/dtext/dtext.c"
+#line 17049 "ext/dtext/dtext.c"
 		goto _again;
 		f89:
 		{
-#line 749 "ext/dtext/dtext.rl"
+#line 753 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 749 "ext/dtext/dtext.rl"
+#line 753 "ext/dtext/dtext.rl"
 					
 					g_debug("block [expand=]");
 					dstack_close_before_block(sm);
@@ -17063,13 +17065,13 @@ gboolean parse_helper(StateMachine* sm) {
 				}
 			}}
 		
-#line 17067 "ext/dtext/dtext.c"
+#line 17069 "ext/dtext/dtext.c"
 		goto _again;
 		f85:
 		{
-#line 761 "ext/dtext/dtext.rl"
+#line 765 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 761 "ext/dtext/dtext.rl"
+#line 765 "ext/dtext/dtext.rl"
 					
 					dstack_close_before_block(sm);
 					dstack_open_block(sm, BLOCK_NODTEXT, "");
@@ -17092,13 +17094,13 @@ gboolean parse_helper(StateMachine* sm) {
 						( ((int *)sm->stack->data))[( sm->top)] = sm->cs; ( sm->top) += 1;sm->cs = 781; goto _again;}}
 			}}
 		
-#line 17096 "ext/dtext/dtext.c"
+#line 17098 "ext/dtext/dtext.c"
 		goto _again;
 		f80:
 		{
-#line 806 "ext/dtext/dtext.rl"
+#line 810 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 806 "ext/dtext/dtext.rl"
+#line 810 "ext/dtext/dtext.rl"
 					
 					g_debug("block char: %c", (( (*( ( sm->p))))));
 					{( sm->p) = ( sm->p) - 1; }
@@ -17125,14 +17127,14 @@ gboolean parse_helper(StateMachine* sm) {
 						( ((int *)sm->stack->data))[( sm->top)] = sm->cs; ( sm->top) += 1;sm->cs = 707; goto _again;}}
 			}}
 		
-#line 17129 "ext/dtext/dtext.c"
+#line 17131 "ext/dtext/dtext.c"
 		goto _again;
 		f2:
 		{
-#line 806 "ext/dtext/dtext.rl"
+#line 810 "ext/dtext/dtext.rl"
 			{( sm->p) = ((( sm->te)))-1;
 				{
-#line 806 "ext/dtext/dtext.rl"
+#line 810 "ext/dtext/dtext.rl"
 					
 					g_debug("block char: %c", (( (*( ( sm->p))))));
 					{( sm->p) = ( sm->p) - 1; }
@@ -17159,7 +17161,7 @@ gboolean parse_helper(StateMachine* sm) {
 						( ((int *)sm->stack->data))[( sm->top)] = sm->cs; ( sm->top) += 1;sm->cs = 707; goto _again;}}
 			}}
 		
-#line 17163 "ext/dtext/dtext.c"
+#line 17165 "ext/dtext/dtext.c"
 		goto _again;
 		f0:
 		{
@@ -17168,7 +17170,7 @@ gboolean parse_helper(StateMachine* sm) {
 					case 110:  {
 						( sm->p) = ((( sm->te)))-1;
 						{
-#line 789 "ext/dtext/dtext.rl"
+#line 793 "ext/dtext/dtext.rl"
 							
 							g_debug("block newline2");
 							
@@ -17186,7 +17188,7 @@ gboolean parse_helper(StateMachine* sm) {
 					case 111:  {
 						( sm->p) = ((( sm->te)))-1;
 						{
-#line 802 "ext/dtext/dtext.rl"
+#line 806 "ext/dtext/dtext.rl"
 							
 							g_debug("block newline");
 						}
@@ -17195,7 +17197,7 @@ gboolean parse_helper(StateMachine* sm) {
 				}}
 		}
 		
-#line 17199 "ext/dtext/dtext.c"
+#line 17201 "ext/dtext/dtext.c"
 		goto _again;
 		f37:
 		{
@@ -17204,14 +17206,16 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17208 "ext/dtext/dtext.c"
+#line 17210 "ext/dtext/dtext.c"
 		{
-#line 323 "ext/dtext/dtext.rl"
+#line 325 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
-#line 323 "ext/dtext/dtext.rl"
+#line 325 "ext/dtext/dtext.rl"
 					
 					if (sm->f_mentions) {
-						append(sm, "<a href=\"/users?name=");
+						append(sm, "<a class=\"dtext-link dtext-user-mention-link\" data-user-name=\"");
+						append_segment_html_escaped(sm, sm->a1, sm->a2 - 1);
+						append(sm, "\" href=\"/users?name=");
 						append_segment_uri_escaped(sm, sm->a1, sm->a2 - 1);
 						append(sm, "\">");
 						append_c(sm, '@');
@@ -17221,7 +17225,7 @@ gboolean parse_helper(StateMachine* sm) {
 				}
 			}}
 		
-#line 17225 "ext/dtext/dtext.c"
+#line 17229 "ext/dtext/dtext.c"
 		goto _again;
 		f138:
 		{
@@ -17230,7 +17234,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17234 "ext/dtext/dtext.c"
+#line 17238 "ext/dtext/dtext.c"
 		{
 #line 198 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17238,7 +17242,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "post", "post", "/posts/"); }
 			}}
 		
-#line 17242 "ext/dtext/dtext.c"
+#line 17246 "ext/dtext/dtext.c"
 		goto _again;
 		f114:
 		{
@@ -17247,7 +17251,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17251 "ext/dtext/dtext.c"
+#line 17255 "ext/dtext/dtext.c"
 		{
 #line 199 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17255,7 +17259,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "appeal", "post-appeal", "/post_appeals/"); }
 			}}
 		
-#line 17259 "ext/dtext/dtext.c"
+#line 17263 "ext/dtext/dtext.c"
 		goto _again;
 		f125:
 		{
@@ -17264,7 +17268,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17268 "ext/dtext/dtext.c"
+#line 17272 "ext/dtext/dtext.c"
 		{
 #line 200 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17272,7 +17276,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "flag", "post-flag", "/post_flags/"); }
 			}}
 		
-#line 17276 "ext/dtext/dtext.c"
+#line 17280 "ext/dtext/dtext.c"
 		goto _again;
 		f133:
 		{
@@ -17281,7 +17285,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17285 "ext/dtext/dtext.c"
+#line 17289 "ext/dtext/dtext.c"
 		{
 #line 201 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17289,7 +17293,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "note", "note", "/notes/"); }
 			}}
 		
-#line 17293 "ext/dtext/dtext.c"
+#line 17297 "ext/dtext/dtext.c"
 		goto _again;
 		f126:
 		{
@@ -17298,7 +17302,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17302 "ext/dtext/dtext.c"
+#line 17306 "ext/dtext/dtext.c"
 		{
 #line 202 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17306,7 +17310,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "forum", "forum-post", "/forum_posts/"); }
 			}}
 		
-#line 17310 "ext/dtext/dtext.c"
+#line 17314 "ext/dtext/dtext.c"
 		goto _again;
 		f141:
 		{
@@ -17315,7 +17319,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17319 "ext/dtext/dtext.c"
+#line 17323 "ext/dtext/dtext.c"
 		{
 #line 203 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17323,7 +17327,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "topic", "forum-topic", "/forum_topics/"); }
 			}}
 		
-#line 17327 "ext/dtext/dtext.c"
+#line 17331 "ext/dtext/dtext.c"
 		goto _again;
 		f119:
 		{
@@ -17332,7 +17336,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17336 "ext/dtext/dtext.c"
+#line 17340 "ext/dtext/dtext.c"
 		{
 #line 204 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17340,7 +17344,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "comment", "comment", "/comments/"); }
 			}}
 		
-#line 17344 "ext/dtext/dtext.c"
+#line 17348 "ext/dtext/dtext.c"
 		goto _again;
 		f121:
 		{
@@ -17349,7 +17353,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17353 "ext/dtext/dtext.c"
+#line 17357 "ext/dtext/dtext.c"
 		{
 #line 205 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17357,7 +17361,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "dmail", "dmail", "/dmails/"); }
 			}}
 		
-#line 17361 "ext/dtext/dtext.c"
+#line 17365 "ext/dtext/dtext.c"
 		goto _again;
 		f137:
 		{
@@ -17366,7 +17370,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17370 "ext/dtext/dtext.c"
+#line 17374 "ext/dtext/dtext.c"
 		{
 #line 206 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17374,7 +17378,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "pool", "pool", "/pools/"); }
 			}}
 		
-#line 17378 "ext/dtext/dtext.c"
+#line 17382 "ext/dtext/dtext.c"
 		goto _again;
 		f144:
 		{
@@ -17383,7 +17387,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17387 "ext/dtext/dtext.c"
+#line 17391 "ext/dtext/dtext.c"
 		{
 #line 207 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17391,7 +17395,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "user", "user", "/users/"); }
 			}}
 		
-#line 17395 "ext/dtext/dtext.c"
+#line 17399 "ext/dtext/dtext.c"
 		goto _again;
 		f115:
 		{
@@ -17400,7 +17404,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17404 "ext/dtext/dtext.c"
+#line 17408 "ext/dtext/dtext.c"
 		{
 #line 208 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17408,7 +17412,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "artist", "artist", "/artists/"); }
 			}}
 		
-#line 17412 "ext/dtext/dtext.c"
+#line 17416 "ext/dtext/dtext.c"
 		goto _again;
 		f117:
 		{
@@ -17417,7 +17421,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17421 "ext/dtext/dtext.c"
+#line 17425 "ext/dtext/dtext.c"
 		{
 #line 209 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17425,7 +17429,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "ban", "ban", "/bans/"); }
 			}}
 		
-#line 17429 "ext/dtext/dtext.c"
+#line 17433 "ext/dtext/dtext.c"
 		goto _again;
 		f118:
 		{
@@ -17434,7 +17438,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17438 "ext/dtext/dtext.c"
+#line 17442 "ext/dtext/dtext.c"
 		{
 #line 210 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17442,7 +17446,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "BUR", "bulk-update-request", "/bulk_update_requests/"); }
 			}}
 		
-#line 17446 "ext/dtext/dtext.c"
+#line 17450 "ext/dtext/dtext.c"
 		goto _again;
 		f113:
 		{
@@ -17451,7 +17455,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17455 "ext/dtext/dtext.c"
+#line 17459 "ext/dtext/dtext.c"
 		{
 #line 211 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17459,7 +17463,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "alias", "tag-alias", "/tag_aliases/"); }
 			}}
 		
-#line 17463 "ext/dtext/dtext.c"
+#line 17467 "ext/dtext/dtext.c"
 		goto _again;
 		f128:
 		{
@@ -17468,7 +17472,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17472 "ext/dtext/dtext.c"
+#line 17476 "ext/dtext/dtext.c"
 		{
 #line 212 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17476,7 +17480,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "implication", "tag-implication", "/tag_implications/"); }
 			}}
 		
-#line 17480 "ext/dtext/dtext.c"
+#line 17484 "ext/dtext/dtext.c"
 		goto _again;
 		f123:
 		{
@@ -17485,7 +17489,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17489 "ext/dtext/dtext.c"
+#line 17493 "ext/dtext/dtext.c"
 		{
 #line 213 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17493,7 +17497,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "favgroup", "favorite-group", "/favorite_groups/"); }
 			}}
 		
-#line 17497 "ext/dtext/dtext.c"
+#line 17501 "ext/dtext/dtext.c"
 		goto _again;
 		f130:
 		{
@@ -17502,7 +17506,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17506 "ext/dtext/dtext.c"
+#line 17510 "ext/dtext/dtext.c"
 		{
 #line 214 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17510,7 +17514,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "mod action", "mod-action", "/mod_actions/"); }
 			}}
 		
-#line 17514 "ext/dtext/dtext.c"
+#line 17518 "ext/dtext/dtext.c"
 		goto _again;
 		f131:
 		{
@@ -17519,7 +17523,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17523 "ext/dtext/dtext.c"
+#line 17527 "ext/dtext/dtext.c"
 		{
 #line 215 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17527,7 +17531,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "modreport", "moderation-report", "/moderation_reports/"); }
 			}}
 		
-#line 17531 "ext/dtext/dtext.c"
+#line 17535 "ext/dtext/dtext.c"
 		goto _again;
 		f124:
 		{
@@ -17536,7 +17540,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17540 "ext/dtext/dtext.c"
+#line 17544 "ext/dtext/dtext.c"
 		{
 #line 216 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17544,7 +17548,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "feedback", "user-feedback", "/user_feedbacks/"); }
 			}}
 		
-#line 17548 "ext/dtext/dtext.c"
+#line 17552 "ext/dtext/dtext.c"
 		goto _again;
 		f145:
 		{
@@ -17553,7 +17557,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17557 "ext/dtext/dtext.c"
+#line 17561 "ext/dtext/dtext.c"
 		{
 #line 217 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17561,7 +17565,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "wiki", "wiki-page", "/wiki_pages/"); }
 			}}
 		
-#line 17565 "ext/dtext/dtext.c"
+#line 17569 "ext/dtext/dtext.c"
 		goto _again;
 		f129:
 		{
@@ -17570,7 +17574,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17574 "ext/dtext/dtext.c"
+#line 17578 "ext/dtext/dtext.c"
 		{
 #line 219 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17578,7 +17582,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "issue", "github", "https://github.com/r888888888/danbooru/issues/"); }
 			}}
 		
-#line 17582 "ext/dtext/dtext.c"
+#line 17586 "ext/dtext/dtext.c"
 		goto _again;
 		f116:
 		{
@@ -17587,7 +17591,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17591 "ext/dtext/dtext.c"
+#line 17595 "ext/dtext/dtext.c"
 		{
 #line 220 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17595,7 +17599,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "artstation", "artstation", "https://www.artstation.com/artwork/"); }
 			}}
 		
-#line 17599 "ext/dtext/dtext.c"
+#line 17603 "ext/dtext/dtext.c"
 		goto _again;
 		f120:
 		{
@@ -17604,7 +17608,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17608 "ext/dtext/dtext.c"
+#line 17612 "ext/dtext/dtext.c"
 		{
 #line 221 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17612,7 +17616,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "deviantart", "deviantart", "https://www.deviantart.com/deviation/"); }
 			}}
 		
-#line 17616 "ext/dtext/dtext.c"
+#line 17620 "ext/dtext/dtext.c"
 		goto _again;
 		f132:
 		{
@@ -17621,7 +17625,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17625 "ext/dtext/dtext.c"
+#line 17629 "ext/dtext/dtext.c"
 		{
 #line 222 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17629,7 +17633,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "nijie", "nijie", "https://nijie.info/view.php?id="); }
 			}}
 		
-#line 17633 "ext/dtext/dtext.c"
+#line 17637 "ext/dtext/dtext.c"
 		goto _again;
 		f134:
 		{
@@ -17638,7 +17642,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17642 "ext/dtext/dtext.c"
+#line 17646 "ext/dtext/dtext.c"
 		{
 #line 223 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17646,7 +17650,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "pawoo", "pawoo", "https://pawoo.net/web/statuses/"); }
 			}}
 		
-#line 17650 "ext/dtext/dtext.c"
+#line 17654 "ext/dtext/dtext.c"
 		goto _again;
 		f135:
 		{
@@ -17655,7 +17659,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17659 "ext/dtext/dtext.c"
+#line 17663 "ext/dtext/dtext.c"
 		{
 #line 224 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17663,7 +17667,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "pixiv", "pixiv", "https://www.pixiv.net/artworks/"); }
 			}}
 		
-#line 17667 "ext/dtext/dtext.c"
+#line 17671 "ext/dtext/dtext.c"
 		goto _again;
 		f140:
 		{
@@ -17672,7 +17676,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17676 "ext/dtext/dtext.c"
+#line 17680 "ext/dtext/dtext.c"
 		{
 #line 225 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17680,7 +17684,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "seiga", "seiga", "https://seiga.nicovideo.jp/seiga/im"); }
 			}}
 		
-#line 17684 "ext/dtext/dtext.c"
+#line 17688 "ext/dtext/dtext.c"
 		goto _again;
 		f143:
 		{
@@ -17689,7 +17693,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17693 "ext/dtext/dtext.c"
+#line 17697 "ext/dtext/dtext.c"
 		{
 #line 226 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17697,7 +17701,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "twitter", "twitter", "https://twitter.com/i/web/status/"); }
 			}}
 		
-#line 17701 "ext/dtext/dtext.c"
+#line 17705 "ext/dtext/dtext.c"
 		goto _again;
 		f146:
 		{
@@ -17706,7 +17710,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17710 "ext/dtext/dtext.c"
+#line 17714 "ext/dtext/dtext.c"
 		{
 #line 228 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17714,7 +17718,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "yandere", "yandere", "https://yande.re/post/show/"); }
 			}}
 		
-#line 17718 "ext/dtext/dtext.c"
+#line 17722 "ext/dtext/dtext.c"
 		goto _again;
 		f139:
 		{
@@ -17723,7 +17727,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17727 "ext/dtext/dtext.c"
+#line 17731 "ext/dtext/dtext.c"
 		{
 #line 229 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17731,7 +17735,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "sankaku", "sankaku", "https://chan.sankakucomplex.com/post/show/"); }
 			}}
 		
-#line 17735 "ext/dtext/dtext.c"
+#line 17739 "ext/dtext/dtext.c"
 		goto _again;
 		f127:
 		{
@@ -17740,7 +17744,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17744 "ext/dtext/dtext.c"
+#line 17748 "ext/dtext/dtext.c"
 		{
 #line 230 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17748,7 +17752,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_id_link(sm, "gelbooru", "gelbooru", "https://gelbooru.com/index.php?page=post&s=view&id="); }
 			}}
 		
-#line 17752 "ext/dtext/dtext.c"
+#line 17756 "ext/dtext/dtext.c"
 		goto _again;
 		f111:
 		{
@@ -17757,7 +17761,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17761 "ext/dtext/dtext.c"
+#line 17765 "ext/dtext/dtext.c"
 		{
 #line 300 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17773,7 +17777,9 @@ gboolean parse_helper(StateMachine* sm) {
 						const char* name_start = sm->a1;
 						const char* name_end = find_boundary_c(match_end);
 						
-						append(sm, "<a href=\"/users?name=");
+						append(sm, "<a class=\"dtext-link dtext-user-mention-link\" data-user-name=\"");
+						append_segment_html_escaped(sm, name_start, name_end);
+						append(sm, "\" href=\"/users?name=");
 						append_segment_uri_escaped(sm, name_start, name_end);
 						append(sm, "\">");
 						append_c(sm, '@');
@@ -17787,7 +17793,7 @@ gboolean parse_helper(StateMachine* sm) {
 				}
 			}}
 		
-#line 17791 "ext/dtext/dtext.c"
+#line 17797 "ext/dtext/dtext.c"
 		goto _again;
 		f110:
 		{
@@ -17796,7 +17802,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->a2 = sm->p;
 		}
 		
-#line 17800 "ext/dtext/dtext.c"
+#line 17806 "ext/dtext/dtext.c"
 		{
 #line 1 "NONE"
 			{switch( ( sm->act) ) {
@@ -17860,7 +17866,9 @@ gboolean parse_helper(StateMachine* sm) {
 								const char* name_start = sm->a1;
 								const char* name_end = find_boundary_c(match_end);
 								
-								append(sm, "<a href=\"/users?name=");
+								append(sm, "<a class=\"dtext-link dtext-user-mention-link\" data-user-name=\"");
+								append_segment_html_escaped(sm, name_start, name_end);
+								append(sm, "\" href=\"/users?name=");
 								append_segment_uri_escaped(sm, name_start, name_end);
 								append(sm, "\">");
 								append_c(sm, '@');
@@ -17877,7 +17885,7 @@ gboolean parse_helper(StateMachine* sm) {
 					case 76:  {
 						( sm->p) = ((( sm->te)))-1;
 						{
-#line 454 "ext/dtext/dtext.rl"
+#line 458 "ext/dtext/dtext.rl"
 							
 							g_debug("inline newline2");
 							g_debug("  return");
@@ -17895,7 +17903,7 @@ gboolean parse_helper(StateMachine* sm) {
 					case 77:  {
 						( sm->p) = ((( sm->te)))-1;
 						{
-#line 466 "ext/dtext/dtext.rl"
+#line 470 "ext/dtext/dtext.rl"
 							
 							g_debug("inline newline");
 							
@@ -17912,7 +17920,7 @@ gboolean parse_helper(StateMachine* sm) {
 					case 79:  {
 						( sm->p) = ((( sm->te)))-1;
 						{
-#line 482 "ext/dtext/dtext.rl"
+#line 486 "ext/dtext/dtext.rl"
 							
 							g_debug("inline char: %c", (( (*( ( sm->p))))));
 							append_c_html_escaped(sm, (( (*( ( sm->p))))));
@@ -17922,7 +17930,7 @@ gboolean parse_helper(StateMachine* sm) {
 				}}
 		}
 		
-#line 17926 "ext/dtext/dtext.c"
+#line 17934 "ext/dtext/dtext.c"
 		goto _again;
 		f55:
 		{
@@ -17931,7 +17939,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->b2 = sm->p;
 		}
 		
-#line 17935 "ext/dtext/dtext.c"
+#line 17943 "ext/dtext/dtext.c"
 		{
 #line 273 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p)+1;{
@@ -17943,7 +17951,7 @@ gboolean parse_helper(StateMachine* sm) {
 				}
 			}}
 		
-#line 17947 "ext/dtext/dtext.c"
+#line 17955 "ext/dtext/dtext.c"
 		goto _again;
 		f122:
 		{
@@ -17952,7 +17960,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->b2 = sm->p;
 		}
 		
-#line 17956 "ext/dtext/dtext.c"
+#line 17964 "ext/dtext/dtext.c"
 		{
 #line 232 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17960,7 +17968,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_dmail_key_link(sm); }
 			}}
 		
-#line 17964 "ext/dtext/dtext.c"
+#line 17972 "ext/dtext/dtext.c"
 		goto _again;
 		f142:
 		{
@@ -17969,7 +17977,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->b2 = sm->p;
 		}
 		
-#line 17973 "ext/dtext/dtext.c"
+#line 17981 "ext/dtext/dtext.c"
 		{
 #line 234 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17977,7 +17985,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_paged_link(sm, "topic #", "<a class=\"dtext-link dtext-id-link dtext-forum-topic-id-link\" href=\"/forum_topics/", "?page="); }
 			}}
 		
-#line 17981 "ext/dtext/dtext.c"
+#line 17989 "ext/dtext/dtext.c"
 		goto _again;
 		f136:
 		{
@@ -17986,7 +17994,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->b2 = sm->p;
 		}
 		
-#line 17990 "ext/dtext/dtext.c"
+#line 17998 "ext/dtext/dtext.c"
 		{
 #line 235 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -17994,7 +18002,7 @@ gboolean parse_helper(StateMachine* sm) {
 					append_paged_link(sm, "pixiv #", "<a rel=\"external nofollow noreferrer\" class=\"dtext-link dtext-id-link dtext-pixiv-id-link\" href=\"https://www.pixiv.net/artworks/", "#"); }
 			}}
 		
-#line 17998 "ext/dtext/dtext.c"
+#line 18006 "ext/dtext/dtext.c"
 		goto _again;
 		f99:
 		{
@@ -18003,11 +18011,11 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->b2 = sm->p;
 		}
 		
-#line 18007 "ext/dtext/dtext.c"
+#line 18015 "ext/dtext/dtext.c"
 		{
-#line 334 "ext/dtext/dtext.rl"
+#line 338 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 334 "ext/dtext/dtext.rl"
+#line 338 "ext/dtext/dtext.rl"
 					
 					g_debug("inline list");
 					
@@ -18028,7 +18036,7 @@ gboolean parse_helper(StateMachine* sm) {
 					sm->cs = 787;}
 			}}
 		
-#line 18032 "ext/dtext/dtext.c"
+#line 18040 "ext/dtext/dtext.c"
 		goto _again;
 		f157:
 		{
@@ -18037,11 +18045,11 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->b2 = sm->p;
 		}
 		
-#line 18041 "ext/dtext/dtext.c"
+#line 18049 "ext/dtext/dtext.c"
 		{
-#line 567 "ext/dtext/dtext.rl"
+#line 571 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 567 "ext/dtext/dtext.rl"
+#line 571 "ext/dtext/dtext.rl"
 					
 					int prev_nest = sm->list_nest;
 					append_closing_p_if(sm);
@@ -18090,7 +18098,7 @@ gboolean parse_helper(StateMachine* sm) {
 						( ((int *)sm->stack->data))[( sm->top)] = sm->cs; ( sm->top) += 1;sm->cs = 707; goto _again;}}
 			}}
 		
-#line 18094 "ext/dtext/dtext.c"
+#line 18102 "ext/dtext/dtext.c"
 		goto _again;
 		f81:
 		{
@@ -18099,11 +18107,11 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->b2 = sm->p;
 		}
 		
-#line 18103 "ext/dtext/dtext.c"
+#line 18111 "ext/dtext/dtext.c"
 		{
-#line 779 "ext/dtext/dtext.rl"
+#line 783 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
-#line 779 "ext/dtext/dtext.rl"
+#line 783 "ext/dtext/dtext.rl"
 					
 					g_debug("block list");
 					g_debug("  call list");
@@ -18130,7 +18138,7 @@ gboolean parse_helper(StateMachine* sm) {
 						( ((int *)sm->stack->data))[( sm->top)] = sm->cs; ( sm->top) += 1;sm->cs = 787; goto _again;}}
 			}}
 		
-#line 18134 "ext/dtext/dtext.c"
+#line 18142 "ext/dtext/dtext.c"
 		goto _again;
 		f26:
 		{
@@ -18139,14 +18147,14 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->c1 = sm->p;
 		}
 		
-#line 18143 "ext/dtext/dtext.c"
+#line 18151 "ext/dtext/dtext.c"
 		{
 #line 92 "ext/dtext/dtext.rl"
 			
 			sm->c2 = sm->p;
 		}
 		
-#line 18150 "ext/dtext/dtext.c"
+#line 18158 "ext/dtext/dtext.c"
 		goto _again;
 		f104:
 		{
@@ -18155,7 +18163,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->c2 = sm->p;
 		}
 		
-#line 18159 "ext/dtext/dtext.c"
+#line 18167 "ext/dtext/dtext.c"
 		{
 #line 245 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -18165,7 +18173,7 @@ gboolean parse_helper(StateMachine* sm) {
 				}
 			}}
 		
-#line 18169 "ext/dtext/dtext.c"
+#line 18177 "ext/dtext/dtext.c"
 		goto _again;
 		f107:
 		{
@@ -18174,7 +18182,7 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->d2 = sm->p;
 		}
 		
-#line 18178 "ext/dtext/dtext.c"
+#line 18186 "ext/dtext/dtext.c"
 		{
 #line 249 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -18184,141 +18192,141 @@ gboolean parse_helper(StateMachine* sm) {
 				}
 			}}
 		
-#line 18188 "ext/dtext/dtext.c"
+#line 18196 "ext/dtext/dtext.c"
 		goto _again;
 		f51:
 		{
 #line 1 "NONE"
 			{( sm->te) = ( sm->p)+1;}}
 		
-#line 18195 "ext/dtext/dtext.c"
+#line 18203 "ext/dtext/dtext.c"
 		{
 #line 72 "ext/dtext/dtext.rl"
 			
 			sm->a1 = sm->p;
 		}
 		
-#line 18202 "ext/dtext/dtext.c"
+#line 18210 "ext/dtext/dtext.c"
 		goto _again;
 		f56:
 		{
 #line 1 "NONE"
 			{( sm->te) = ( sm->p)+1;}}
 		
-#line 18209 "ext/dtext/dtext.c"
+#line 18217 "ext/dtext/dtext.c"
 		{
 #line 279 "ext/dtext/dtext.rl"
 			{( sm->act) = 50;}}
 		
-#line 18214 "ext/dtext/dtext.c"
+#line 18222 "ext/dtext/dtext.c"
 		goto _again;
 		f112:
 		{
 #line 1 "NONE"
 			{( sm->te) = ( sm->p)+1;}}
 		
-#line 18221 "ext/dtext/dtext.c"
+#line 18229 "ext/dtext/dtext.c"
 		{
 #line 296 "ext/dtext/dtext.rl"
 			{( sm->act) = 52;}}
 		
-#line 18226 "ext/dtext/dtext.c"
+#line 18234 "ext/dtext/dtext.c"
 		goto _again;
 		f50:
 		{
 #line 1 "NONE"
 			{( sm->te) = ( sm->p)+1;}}
 		
-#line 18233 "ext/dtext/dtext.c"
+#line 18241 "ext/dtext/dtext.c"
 		{
 #line 300 "ext/dtext/dtext.rl"
 			{( sm->act) = 53;}}
 		
-#line 18238 "ext/dtext/dtext.c"
+#line 18246 "ext/dtext/dtext.c"
 		goto _again;
 		f20:
 		{
 #line 1 "NONE"
 			{( sm->te) = ( sm->p)+1;}}
 		
-#line 18245 "ext/dtext/dtext.c"
+#line 18253 "ext/dtext/dtext.c"
 		{
-#line 454 "ext/dtext/dtext.rl"
+#line 458 "ext/dtext/dtext.rl"
 			{( sm->act) = 76;}}
 		
-#line 18250 "ext/dtext/dtext.c"
+#line 18258 "ext/dtext/dtext.c"
 		goto _again;
 		f93:
 		{
 #line 1 "NONE"
 			{( sm->te) = ( sm->p)+1;}}
 		
-#line 18257 "ext/dtext/dtext.c"
+#line 18265 "ext/dtext/dtext.c"
 		{
-#line 466 "ext/dtext/dtext.rl"
+#line 470 "ext/dtext/dtext.rl"
 			{( sm->act) = 77;}}
 		
-#line 18262 "ext/dtext/dtext.c"
+#line 18270 "ext/dtext/dtext.c"
 		goto _again;
 		f94:
 		{
 #line 1 "NONE"
 			{( sm->te) = ( sm->p)+1;}}
 		
-#line 18269 "ext/dtext/dtext.c"
+#line 18277 "ext/dtext/dtext.c"
 		{
-#line 482 "ext/dtext/dtext.rl"
+#line 486 "ext/dtext/dtext.rl"
 			{( sm->act) = 79;}}
 		
-#line 18274 "ext/dtext/dtext.c"
+#line 18282 "ext/dtext/dtext.c"
 		goto _again;
 		f73:
 		{
 #line 1 "NONE"
 			{( sm->te) = ( sm->p)+1;}}
 		
-#line 18281 "ext/dtext/dtext.c"
+#line 18289 "ext/dtext/dtext.c"
 		{
-#line 600 "ext/dtext/dtext.rl"
+#line 604 "ext/dtext/dtext.rl"
 			{( sm->act) = 95;}}
 		
-#line 18286 "ext/dtext/dtext.c"
+#line 18294 "ext/dtext/dtext.c"
 		goto _again;
 		f155:
 		{
 #line 1 "NONE"
 			{( sm->te) = ( sm->p)+1;}}
 		
-#line 18293 "ext/dtext/dtext.c"
+#line 18301 "ext/dtext/dtext.c"
 		{
 #line 1 "-"
 			{( sm->act) = 96;}}
 		
-#line 18298 "ext/dtext/dtext.c"
+#line 18306 "ext/dtext/dtext.c"
 		goto _again;
 		f1:
 		{
 #line 1 "NONE"
 			{( sm->te) = ( sm->p)+1;}}
 		
-#line 18305 "ext/dtext/dtext.c"
+#line 18313 "ext/dtext/dtext.c"
 		{
-#line 789 "ext/dtext/dtext.rl"
+#line 793 "ext/dtext/dtext.rl"
 			{( sm->act) = 110;}}
 		
-#line 18310 "ext/dtext/dtext.c"
+#line 18318 "ext/dtext/dtext.c"
 		goto _again;
 		f78:
 		{
 #line 1 "NONE"
 			{( sm->te) = ( sm->p)+1;}}
 		
-#line 18317 "ext/dtext/dtext.c"
+#line 18325 "ext/dtext/dtext.c"
 		{
-#line 802 "ext/dtext/dtext.rl"
+#line 806 "ext/dtext/dtext.rl"
 			{( sm->act) = 111;}}
 		
-#line 18322 "ext/dtext/dtext.c"
+#line 18330 "ext/dtext/dtext.c"
 		goto _again;
 		f103:
 		{
@@ -18327,14 +18335,14 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->c1 = sm->p;
 		}
 		
-#line 18331 "ext/dtext/dtext.c"
+#line 18339 "ext/dtext/dtext.c"
 		{
 #line 92 "ext/dtext/dtext.rl"
 			
 			sm->c2 = sm->p;
 		}
 		
-#line 18338 "ext/dtext/dtext.c"
+#line 18346 "ext/dtext/dtext.c"
 		{
 #line 245 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -18344,7 +18352,7 @@ gboolean parse_helper(StateMachine* sm) {
 				}
 			}}
 		
-#line 18348 "ext/dtext/dtext.c"
+#line 18356 "ext/dtext/dtext.c"
 		goto _again;
 		f105:
 		{
@@ -18353,14 +18361,14 @@ gboolean parse_helper(StateMachine* sm) {
 			sm->d1 = sm->p;
 		}
 		
-#line 18357 "ext/dtext/dtext.c"
+#line 18365 "ext/dtext/dtext.c"
 		{
 #line 100 "ext/dtext/dtext.rl"
 			
 			sm->d2 = sm->p;
 		}
 		
-#line 18364 "ext/dtext/dtext.c"
+#line 18372 "ext/dtext/dtext.c"
 		{
 #line 249 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
@@ -18370,85 +18378,85 @@ gboolean parse_helper(StateMachine* sm) {
 				}
 			}}
 		
-#line 18374 "ext/dtext/dtext.c"
+#line 18382 "ext/dtext/dtext.c"
 		goto _again;
 		f95:
 		{
 #line 1 "NONE"
 			{( sm->te) = ( sm->p)+1;}}
 		
-#line 18381 "ext/dtext/dtext.c"
+#line 18389 "ext/dtext/dtext.c"
 		{
 #line 72 "ext/dtext/dtext.rl"
 			
 			sm->a1 = sm->p;
 		}
 		
-#line 18388 "ext/dtext/dtext.c"
+#line 18396 "ext/dtext/dtext.c"
 		{
 #line 76 "ext/dtext/dtext.rl"
 			
 			sm->a2 = sm->p;
 		}
 		
-#line 18395 "ext/dtext/dtext.c"
+#line 18403 "ext/dtext/dtext.c"
 		goto _again;
 		f109:
 		{
 #line 1 "NONE"
 			{( sm->te) = ( sm->p)+1;}}
 		
-#line 18402 "ext/dtext/dtext.c"
+#line 18410 "ext/dtext/dtext.c"
 		{
 #line 72 "ext/dtext/dtext.rl"
 			
 			sm->a1 = sm->p;
 		}
 		
-#line 18409 "ext/dtext/dtext.c"
+#line 18417 "ext/dtext/dtext.c"
 		{
 #line 300 "ext/dtext/dtext.rl"
 			{( sm->act) = 53;}}
 		
-#line 18414 "ext/dtext/dtext.c"
+#line 18422 "ext/dtext/dtext.c"
 		goto _again;
 		f96:
 		{
 #line 1 "NONE"
 			{( sm->te) = ( sm->p)+1;}}
 		
-#line 18421 "ext/dtext/dtext.c"
+#line 18429 "ext/dtext/dtext.c"
 		{
 #line 72 "ext/dtext/dtext.rl"
 			
 			sm->a1 = sm->p;
 		}
 		
-#line 18428 "ext/dtext/dtext.c"
+#line 18436 "ext/dtext/dtext.c"
 		{
-#line 482 "ext/dtext/dtext.rl"
+#line 486 "ext/dtext/dtext.rl"
 			{( sm->act) = 79;}}
 		
-#line 18433 "ext/dtext/dtext.c"
+#line 18441 "ext/dtext/dtext.c"
 		goto _again;
 		f23:
 		{
 #line 1 "NONE"
 			{( sm->te) = ( sm->p)+1;}}
 		
-#line 18440 "ext/dtext/dtext.c"
+#line 18448 "ext/dtext/dtext.c"
 		{
 #line 84 "ext/dtext/dtext.rl"
 			
 			sm->b2 = sm->p;
 		}
 		
-#line 18447 "ext/dtext/dtext.c"
+#line 18455 "ext/dtext/dtext.c"
 		{
 #line 253 "ext/dtext/dtext.rl"
 			{( sm->act) = 47;}}
 		
-#line 18452 "ext/dtext/dtext.c"
+#line 18460 "ext/dtext/dtext.c"
 		goto _again;
 		
 		_again: {}
@@ -18463,7 +18471,7 @@ gboolean parse_helper(StateMachine* sm) {
 #line 1 "NONE"
 						{( sm->ts) = 0;}}
 					
-#line 18467 "ext/dtext/dtext.c"
+#line 18475 "ext/dtext/dtext.c"
 					
 					break; 
 				}
@@ -18475,7 +18483,7 @@ gboolean parse_helper(StateMachine* sm) {
 		_out: {}
 	}
 	
-#line 1249 "ext/dtext/dtext.rl"
+#line 1253 "ext/dtext/dtext.rl"
 	
 	
 	dstack_close(sm);
