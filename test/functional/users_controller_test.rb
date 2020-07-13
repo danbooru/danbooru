@@ -87,6 +87,34 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_equal(false, xml["user"]["enable_safe_mode"])
       end
+
+      context "for a tooltip" do
+        setup do
+          @banned = create(:banned_user)
+          @admin = create(:admin_user)
+          @member = create(:user)
+          @feedback = create(:user_feedback, user: @member, category: :positive)
+        end
+
+        should "render for a banned user" do
+          get_auth user_path(@banned, variant: "tooltip"), @user
+
+          assert_response :success
+        end
+
+        should "render for a member" do
+          get_auth user_path(@member, variant: "tooltip"), @user
+          assert_response :success
+
+          get_auth user_path(@member, variant: "tooltip"), @admin
+          assert_response :success
+        end
+
+        should "render for an admin" do
+          get_auth user_path(@admin, variant: "tooltip"), @user
+          assert_response :success
+        end
+      end
     end
 
     context "profile action" do

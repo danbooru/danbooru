@@ -129,6 +129,14 @@ table tfoot {
   font-size: 0.9em;
 }
 
+a.link-plain {
+  color: unset;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .fixed-width-container {
   max-width: 70em;
 }

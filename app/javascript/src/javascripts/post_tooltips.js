@@ -24,7 +24,7 @@ PostTooltip.initialize = function () {
     interactive: true,
     maxWidth: PostTooltip.MAX_WIDTH,
     target: PostTooltip.POST_SELECTOR,
-    theme: "post-tooltip",
+    theme: "common-tooltip post-tooltip",
     touch: false,
 
     onCreate: PostTooltip.on_create,
@@ -63,13 +63,13 @@ PostTooltip.on_show = async function (instance) {
   }
 
   try {
-    $tooltip.addClass("post-tooltip-loading");
+    $tooltip.addClass("tooltip-loading");
 
     instance._request = $.get(`/posts/${post_id}`, { variant: "tooltip", preview: preview });
     let html = await instance._request;
     instance.setContent(html);
 
-    $tooltip.removeClass("post-tooltip-loading");
+    $tooltip.removeClass("tooltip-loading");
   } catch (error) {
     if (error.status !== 0 && error.statusText !== "abort") {
       Utility.error(`Error displaying tooltip for post #${post_id} (error: ${error.status} ${error.statusText})`);

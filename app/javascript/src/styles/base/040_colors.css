@@ -2,6 +2,7 @@
   --body-background-color: white;
 
   --text-color: hsl(0, 0%, 15%);
+  --inverse-text-color: white;
   --muted-text-color: hsl(0, 0%, 55%);
   --header-color: hsl(0, 0%, 15%);
 
@@ -81,6 +82,9 @@
   --post-tooltip-scrollbar-thumb-color: #AAAAAA;
   --post-tooltip-scrollbar-track-background: #EEEEEE;
   --post-tooltip-scrollbar-track-border: 0 none white;
+
+  --user-tooltip-positive-feedback-color: orange;
+  --user-tooltip-negative-feedback-color: red;
 
   --preview-current-post-background: rgba(0, 0, 0, 0.1);
 
@@ -201,6 +205,7 @@
   --user-platinum-color: gray;
   --user-gold-color: #00F;
   --user-member-color: var(--link-color);
+  --user-banned-color: black;
 
   --news-updates-background: #EEE;
   --news-updates-border: 2px solid #666;
@@ -261,6 +266,7 @@ body[data-current-user-theme="dark"] {
 
   /* main text colors */
   --text-color: var(--grey-5);
+  --inverse-text-color: white;
   --muted-text-color: var(--grey-4);
   --header-color: var(--grey-6);
 
@@ -283,6 +289,7 @@ body[data-current-user-theme="dark"] {
   --collection-pool-color: var(--general-tag-color);
   --collection-pool-hover-color: var(--general-tag-hover-color);
 
+  --user-banned-color: var(--grey-1);
   --user-member-color: var(--blue-1);
   --user-gold-color: var(--yellow-1);
   --user-platinum-color: var(--grey-4);
@@ -394,6 +401,9 @@ body[data-current-user-theme="dark"] {
   --post-tooltip-scrollbar-thumb-color: var(--grey-5);
   --post-tooltip-scrollbar-track-background: var(--grey-1);
   --post-tooltip-scrollbar-track-border: none;
+
+  --user-tooltip-positive-feedback-color: var(--yellow-1);
+  --user-tooltip-negative-feedback-color: var(--red-1);
 
   --preview-pending-color: var(--blue-1);
   --preview-flagged-color: var(--red-1);

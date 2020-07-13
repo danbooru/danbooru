@@ -121,6 +121,10 @@ module ApplicationHelper
     raw content_tag(:time, duration, datetime: datetime, title: title)
   end
 
+  def humanized_number(number)
+    number_to_human number, units: { thousand: "k", million: "m" }, format: "%n%u"
+  end
+
   def time_ago_in_words_tagged(time, compact: false)
     if time.nil?
       tag.em(tag.time("unknown"))
@@ -162,8 +166,10 @@ module ApplicationHelper
     end
   end
 
-  def link_to_ip(ip)
-    link_to ip, ip_addresses_path(search: { ip_addr: ip, group_by: "user" })
+  def link_to_ip(ip, shorten: false, **options)
+    ip_addr = IPAddr.new(ip.to_s)
+    ip_addr.prefix = 64 if ip_addr.ipv6? && shorten
+    link_to ip_addr.to_s, ip_addresses_path(search: { ip_addr: ip, group_by: "user" }), **options
   end
 
   def link_to_search(search)
@@ -186,11 +192,13 @@ module ApplicationHelper
   def link_to_user(user)
     return "anonymous" if user.blank?
 
-    user_class = "user-#{user.level_string.downcase}"
+    user_class = "user user-#{user.level_string.downcase}"
     user_class += " user-post-approver" if user.can_approve_posts?
     user_class += " user-post-uploader" if user.can_upload_free?
     user_class += " user-banned" if user.is_banned?
-    link_to(user.pretty_name, user_path(user), :class => user_class)
+
+    data = { "user-id": user.id, "user-name": user.name, "user-level": user.level }
+    link_to(user.pretty_name, user_path(user), class: user_class, data: data)
   end
 
   def mod_link_to_user(user, positive_or_negative)
