@@ -499,7 +499,7 @@ class Post < ApplicationRecord
     end
 
     def add_automatic_tags(tags)
-      tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize flash webm mp4)
+      tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize flash)
 
       if has_dimensions?
         if image_width >= 10_000 || image_height >= 10_000
@@ -532,12 +532,8 @@ class Post < ApplicationRecord
         tags << "flash"
       end
 
-      if is_webm?
-        tags << "webm"
-      end
-
-      if is_mp4?
-        tags << "mp4"
+      if is_video?
+        tags << "video"
       end
 
       if is_ugoira?

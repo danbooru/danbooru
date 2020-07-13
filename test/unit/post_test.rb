@@ -1295,18 +1295,18 @@ class PostTest < ActiveSupport::TestCase
 
       context "with a .webm file extension" do
         setup do
-          FactoryBot.create(:tag_implication, antecedent_name: "webm", consequent_name: "animated")
+          FactoryBot.create(:tag_implication, antecedent_name: "video", consequent_name: "animated")
           @post.file_ext = "webm"
           @post.tag_string = ""
           @post.save
         end
 
         should "have the appropriate file type tag added automatically" do
-          assert_match(/webm/, @post.tag_string)
+          assert_match(/video/, @post.tag_string)
         end
 
         should "apply implications after adding the file type tag" do
-          assert(@post.has_tag?("animated"), "expected 'webm' to imply 'animated'")
+          assert(@post.has_tag?("animated"), "expected 'video' to imply 'animated'")
         end
       end
 
