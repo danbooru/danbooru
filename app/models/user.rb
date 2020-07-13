@@ -527,7 +527,7 @@ class User < ApplicationRecord
         q = q.where("level <= ?", params[:max_level].to_i)
       end
 
-      %w[can_approve_posts can_upload_free].each do |flag|
+      %w[can_approve_posts can_upload_free is_banned].each do |flag|
         if params[flag].to_s.truthy?
           q = q.bit_prefs_match(flag, true)
         elsif params[flag].to_s.falsy?
