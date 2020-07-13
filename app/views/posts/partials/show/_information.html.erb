@@ -16,7 +16,7 @@
     </li>
   <% end %>
   <li id="post-info-size">
-    Size: <%= link_to_if policy(post).visible?, number_to_human_size(post.file_size), post.tagged_file_url %>
+    Size: <%= link_to_if policy(post).visible?, "#{number_to_human_size(post.file_size)} .#{post.file_ext}", post.tagged_file_url %>
     <% if post.has_dimensions? %>
       (<%= post.image_width %>x<%= post.image_height %>)
     <% end %>
