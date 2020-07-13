@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/evazion/dtext_rb.git
-  revision: 507e97e0963822c20351c82620c28cc8e23423d5
+  revision: a95bf1d537cbdba4585adb8e123f03f001f56fd7
   specs:
-    dtext_rb (1.10.5)
+    dtext_rb (1.10.6)
       nokogiri (~> 1.8)
 
 GEM
@@ -77,7 +77,7 @@ GEM
     ansi (1.5.0)
     ast (2.4.1)
     aws-eventstream (1.1.0)
-    aws-partitions (1.339.0)
+    aws-partitions (1.341.0)
     aws-sdk-core (3.103.0)
       aws-eventstream (~> 1, >= 1.0.2)
       aws-partitions (~> 1, >= 1.239.0)
@@ -98,14 +98,14 @@ GEM
       i18n
       rake (>= 10.0.0)
       sshkit (>= 1.9.0)
-    capistrano-bundler (1.6.0)
+    capistrano-bundler (2.0.0)
       capistrano (~> 3.1)
     capistrano-deploytags (1.0.7)
       capistrano (>= 3.7.0)
-    capistrano-rails (1.5.0)
+    capistrano-rails (1.6.1)
       capistrano (~> 3.1)
-      capistrano-bundler (~> 1.1)
-    capistrano-rbenv (2.1.6)
+      capistrano-bundler (>= 1.1, < 3)
+    capistrano-rbenv (2.2.0)
       capistrano (~> 3.1)
       sshkit (~> 1.3)
     capistrano3-unicorn (0.2.1)
@@ -120,7 +120,7 @@ GEM
       xpath (~> 3.2)
     childprocess (3.0.0)
     chronic (0.10.2)
-    codecov (0.1.19)
+    codecov (0.2.0)
       colorize
       json
       simplecov
@@ -138,18 +138,17 @@ GEM
     docile (1.3.2)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
-    dotenv (2.7.5)
-    dotenv-rails (2.7.5)
-      dotenv (= 2.7.5)
-      railties (>= 3.2, < 6.1)
+    dotenv (2.7.6)
+    dotenv-rails (2.7.6)
+      dotenv (= 2.7.6)
+      railties (>= 3.2)
     erubi (1.9.0)
-    factory_bot (6.0.2)
+    factory_bot (6.1.0)
       activesupport (>= 5.0.0)
     faraday (1.0.1)
       multipart-post (>= 1.2, < 3)
     ffaker (2.15.0)
     ffi (1.13.1)
-    ffi (1.13.1-x64-mingw32)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
       rake
@@ -193,7 +192,7 @@ GEM
     method_source (1.0.0)
     mimemagic (0.3.5)
     mini_mime (1.0.2)
-    mini_portile2 (2.5.0)
+    mini_portile2 (2.4.0)
     minitest (5.14.1)
     minitest-ci (3.4.0)
       minitest (>= 5.0.6)
@@ -205,8 +204,7 @@ GEM
     mocha (1.11.2)
     mock_redis (0.25.0)
     msgpack (1.3.3)
-    msgpack (1.3.3-x64-mingw32)
-    multi_json (1.14.1)
+    multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
     net-scp (3.0.0)
@@ -216,9 +214,8 @@ GEM
     net-ssh (6.1.0)
     newrelic_rpm (6.11.0.365)
     nio4r (2.5.2)
-    nokogiri (1.11.0.rc2)
-      mini_portile2 (~> 2.5.0)
-    nokogiri (1.11.0.rc2-x64-mingw32)
+    nokogiri (1.10.10)
+      mini_portile2 (~> 2.4.0)
     nokogumbo (2.0.2)
       nokogiri (~> 1.8, >= 1.8.4)
     oauth2 (1.4.4)
@@ -231,7 +228,6 @@ GEM
     parser (2.7.1.4)
       ast (~> 2.4.1)
     pg (1.2.3)
-    pg (1.2.3-x64-mingw32)
     pry (0.13.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -297,7 +293,7 @@ GEM
       actionpack (>= 5.0)
       railties (>= 5.0)
     rexml (3.2.4)
-    rubocop (0.87.1)
+    rubocop (0.88.0)
       parallel (~> 1.10)
       parser (>= 2.7.1.1)
       rainbow (>= 2.2.2, < 4.0)
@@ -358,7 +354,6 @@ GEM
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.7.7)
-    unf_ext (0.0.7.7-x64-mingw32)
     unicode-display_width (1.7.0)
     unicorn (5.5.5)
       kgio (~> 2.6)
@@ -371,7 +366,7 @@ GEM
       rack-proxy (>= 0.6.1)
       railties (>= 5.2)
       semantic_range (>= 2.3.0)
-    websocket-driver (0.7.2)
+    websocket-driver (0.7.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     whenever (1.0.0)
@@ -382,7 +377,6 @@ GEM
 
 PLATFORMS
   ruby
-  x64-mingw32
 
 DEPENDENCIES
   activemodel-serializers-xml
