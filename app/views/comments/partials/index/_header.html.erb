@@ -4,12 +4,10 @@
       <strong>Date</strong>
       <%= compact_time(post.created_at) %>
     </span>
-    <% if policy(post).can_view_uploader? %>
-      <span class="info">
-        <strong>User</strong>
-        <%= link_to_user(post.uploader) %>
-      </span>
-    <% end %>
+    <span class="info">
+      <strong>Uploader</strong>
+      <%= link_to_user(post.uploader) %>
+    </span>
     <span class="info">
       <strong>Rating</strong>
       <%= post.pretty_rating %>

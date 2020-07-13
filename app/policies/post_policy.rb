@@ -47,10 +47,6 @@ class PostPolicy < ApplicationPolicy
     record.visible?(user)
   end
 
-  def can_view_uploader?
-    user.is_approver?
-  end
-
   def can_lock_rating?
     user.is_builder?
   end

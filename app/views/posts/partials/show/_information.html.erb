@@ -1,11 +1,9 @@
 <ul>
   <li id="post-info-id">ID: <%= post.id %></li>
-  <% if policy(post).can_view_uploader? %>
-    <li id="post-info-uploader">
-      Uploader: <%= link_to_user(post.uploader) %>
-      <%= link_to "»", posts_path(tags: "user:#{post.uploader.name}") %>
-    </li>
-  <% end %>
+  <li id="post-info-uploader">
+    Uploader: <%= link_to_user(post.uploader) %>
+    <%= link_to "»", posts_path(tags: "user:#{post.uploader.name}") %>
+  </li>
   <li id="post-info-date">
     Date: <%= link_to time_ago_in_words_tagged(post.created_at), posts_path(tags: "date:#{post.created_at.to_date}") %>
   </li>

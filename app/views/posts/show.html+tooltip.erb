@@ -1,8 +1,6 @@
 <div class="post-tooltip-header">
   <span class="post-tooltip-header-left">
-    <% if policy(@post).can_view_uploader? %>
-      <%= link_to_user @post.uploader %>
-    <% end %>
+    <%= link_to_user @post.uploader %>
 
     <span class="post-tooltip-favorites post-tooltip-info">
       <span><%= @post.fav_count %></span>
