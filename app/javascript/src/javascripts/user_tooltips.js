@@ -25,6 +25,19 @@ UserTooltip.initialize = function () {
     onShow: UserTooltip.on_show,
     onHide: UserTooltip.on_hide,
   });
+
+  delegate("body", {
+    allowHTML: true,
+    interactive: true,
+    theme: "common-tooltip",
+    target: ".user-tooltip-menu-button",
+    placement: "bottom",
+    touch: false,
+    trigger: "click",
+    content: (element) => {
+      return $(element).parents(".user-tooltip").find(".user-tooltip-menu").get(0);
+    }
+  });
 };
 
 UserTooltip.on_show = async function (instance) {

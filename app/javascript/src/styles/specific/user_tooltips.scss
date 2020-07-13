@@ -6,9 +6,9 @@
     margin-bottom: 1em;
     display: grid;
     grid:
-      "avatar header-top"
-      "avatar header-bottom" /
-      32px 1fr;
+      "avatar header-top menu"
+      "avatar header-bottom menu" /
+      32px 1fr 32px;
     column-gap: 0.25em;
 
     .user-tooltip-avatar {
@@ -53,6 +53,31 @@
       grid-area: header-bottom;
       color: var(--muted-text-color);
       font-size: 0.75em;
+    }
+
+    a.user-tooltip-menu-button {
+      color: var(--muted-text-color);
+      grid-area: menu;
+      align-self: center;
+      text-align: center;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      border-radius: 50%;
+
+      &:hover {
+        background-color: var(--subnav-menu-background-color);
+      }
+    }
+
+    > ul.user-tooltip-menu {
+      display: none;
+    }
+
+    ul.user-tooltip-menu {
+      .icon {
+        width: 1.5em;
+      }
     }
   }
 

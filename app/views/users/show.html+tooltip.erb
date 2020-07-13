@@ -43,6 +43,55 @@
         <% end %>
       <% end %>
     </div>
+
+    <a class="user-tooltip-menu-button" href="javascript:void(0)">
+      <i class="fas fa-ellipsis-h"></i>
+    </a>
+
+    <ul class="user-tooltip-menu">
+      <li>
+        <%= link_to new_dmail_path(dmail: { to_id: @user.id }) do %>
+          <i class="icon far fa-envelope"></i>
+          Send Message
+        <% end %>
+      </li>
+
+      <% if !@user.is_platinum? %>
+        <li>
+          <%= link_to new_user_upgrade_path(user_id: @user.id) do %>
+            <i class="icon fas fa-gift"></i>
+            Gift Upgrade
+          <% end %>
+        </li>
+      <% end %>
+
+      <% if policy(UserFeedback.new(user: @user)).create? %>
+        <li>
+          <%= link_to new_user_feedback_path(user_feedback: { user_id: @user.id }) do %>
+            <i class="icon fas fa-file-signature"></i>
+            Give Feedback
+          <% end %>
+        </li>
+      <% end %>
+
+      <% if policy(CurrentUser.user).promote? %>
+        <li>
+          <%= link_to edit_admin_user_path(@user.id) do %>
+            <i class="icon fas fa-user-plus"></i>
+            Promote User
+          <% end %>
+        </li>
+      <% end %>
+
+      <% if policy(Ban.new(user: @user)).create? %>
+        <li>
+          <%= link_to new_ban_path(ban: { user_id: @user.id }) do %>
+            <i class="icon fas fa-user-slash"></i>
+            Ban User
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
   </div>
 
   <ul class="user-tooltip-stats">
