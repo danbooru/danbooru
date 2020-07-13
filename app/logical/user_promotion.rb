@@ -88,11 +88,7 @@ class UserPromotion
   end
 
   def create_dmail
-    Dmail.create_automated(
-      :to_id => user.id,
-      :title => "You have been promoted",
-      :body => build_messages
-    )
+    Dmail.create_automated(to_id: user.id, title: "Your account has been updated", body: build_messages)
   end
 
   def create_user_feedback
