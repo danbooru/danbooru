@@ -165,6 +165,11 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_no_enqueued_emails
       end
 
+      should "not allow logged in users to create a new account" do
+        post_auth users_path, @user, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+        assert_response 403
+      end
+
       should "create a user with a valid email" do
         post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email: "webmaster@danbooru.donmai.us" }}
 
