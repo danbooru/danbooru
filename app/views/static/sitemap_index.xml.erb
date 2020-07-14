@@ -4,7 +4,7 @@
   <% 0.upto(@relation.maximum(:id) / @limit) do |page| %>
     <% lo = page * @limit %>
     <% hi = (page + 1) * @limit %>
-    <% lastmod = @relation.where(id: lo..hi).maximum(:updated_at).iso8601 %>
+    <% lastmod = @relation.where(id: lo..hi).maximum(:updated_at)&.iso8601 %>
     <% if @sitemap == "posts" %>
       <% loc = posts_url(limit: @limit, format: :sitemap, tags: "id:#{lo}..#{hi}") %>
     <% else %>

@@ -129,6 +129,7 @@ module PostSets
 
         context "that has a matching artist" do
           setup do
+            Tag.find_by(name: "a").update!(category: Tag.categories.artist)
             @artist = FactoryBot.create(:artist, :name => "a")
           end
 
