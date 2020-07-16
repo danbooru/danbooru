@@ -49,6 +49,8 @@ PostTooltip.on_show = async function (instance) {
   let $target = $(instance.reference);
   let $tooltip = $(instance.popper);
 
+  hideAll({ exclude: instance });
+
   // skip if tooltip has already been rendered.
   if ($tooltip.has(".post-tooltip-body").length) {
     return;
