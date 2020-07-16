@@ -9,7 +9,6 @@ PostTooltip.POST_SELECTOR = "*:not(.ui-sortable-handle) > .post-preview img, .dt
 PostTooltip.SHOW_DELAY = 500;
 PostTooltip.HIDE_DELAY = 125;
 PostTooltip.DURATION = 250;
-PostTooltip.MAX_WIDTH = 400;
 
 PostTooltip.initialize = function () {
   if (PostTooltip.disabled()) {
@@ -22,7 +21,7 @@ PostTooltip.initialize = function () {
     delay: [PostTooltip.SHOW_DELAY, PostTooltip.HIDE_DELAY],
     duration: PostTooltip.DURATION,
     interactive: true,
-    maxWidth: PostTooltip.MAX_WIDTH,
+    maxWidth: "none",
     target: PostTooltip.POST_SELECTOR,
     theme: "common-tooltip post-tooltip",
     touch: false,
