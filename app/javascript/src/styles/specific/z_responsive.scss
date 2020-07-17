@@ -4,19 +4,11 @@
   div#page {
     margin: 0 0.5rem;
     padding: 0;
-
-    aside#sidebar {
-      font-size: $h3_size;
-    }
   }
 
   header#top {
     position: relative;
     text-align: center;
-
-    h1#app-name-header {
-      display: inline;
-    }
 
     #maintoggle {
       display: block;
@@ -28,7 +20,6 @@
     }
 
     nav#nav {
-      font-size: $h3_size;
       line-height: 2em;
       display: none;
 
@@ -53,7 +44,7 @@
   }
 
   div.paginator {
-    font-size: $h2_size;
+    font-size: var(--text-lg);
     padding: 1em 0 0;
 
     li {

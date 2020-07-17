@@ -177,7 +177,6 @@ module Danbooru
           "category" => 0,
           "short" => "gen",
           "extra" => [],
-          "header" => %{<h1 class="general-tag-list">Tags</h1>},
           "relatedbutton" => "General",
           "css" => {
             "color" => "var(--general-tag-color)",
@@ -188,7 +187,6 @@ module Danbooru
           "category" => 4,
           "short" => "char",
           "extra" => ["ch"],
-          "header" => %{<h2 class="character-tag-list">Characters</h2>},
           "relatedbutton" => "Characters",
           "css" => {
             "color" => "var(--character-tag-color)",
@@ -199,7 +197,6 @@ module Danbooru
           "category" => 3,
           "short" => "copy",
           "extra" => ["co"],
-          "header" => %{<h2 class="copyright-tag-list">Copyrights</h2>},
           "relatedbutton" => "Copyrights",
           "css" => {
             "color" => "var(--copyright-tag-color)",
@@ -210,7 +207,6 @@ module Danbooru
           "category" => 1,
           "short" => "art",
           "extra" => [],
-          "header" => %{<h2 class="artist-tag-list">Artists</h2>},
           "relatedbutton" => "Artists",
           "css" => {
             "color" => "var(--artist-tag-color)",
@@ -221,7 +217,6 @@ module Danbooru
           "category" => 5,
           "short" => "meta",
           "extra" => [],
-          "header" => %{<h2 class="meta-tag-list">Meta</h2>},
           "relatedbutton" => nil,
           "css" => {
             "color" => "var(--meta-tag-color)",

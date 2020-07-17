@@ -25,22 +25,23 @@ dt {
   font-weight: bold;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1, h2, h3, h4, h5, h6, .heading {
   font-family: Tahoma, Verdana, Helvetica, sans-serif;
+  font-weight: bold;
   line-height: 1.5em;
   color: var(--header-color);
 }
 
 h1 {
-  font-size: $h1_size;
+  font-size: var(--text-xxl);
 }
 
 h2 {
-  font-size: $h2_size;
+  font-size: var(--text-lg);
 }
 
 h3, h4, h5, h6 {
-  font-size: $h3_size;
+  font-size: var(--text-md);
 }
 
 fieldset {

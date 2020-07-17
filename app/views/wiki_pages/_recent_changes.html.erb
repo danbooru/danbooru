@@ -1,5 +1,5 @@
 <section>
-  <h1>Recent Changes (<%= link_to "all", wiki_page_versions_path %>)</h1>
+  <h2>Recent Changes (<%= link_to "all", wiki_page_versions_path %>)</h2>
   <ul>
     <% WikiPage.order(updated_at: :desc).includes(:tag).limit(25).each do |page| %>
       <li><%= link_to page.pretty_title, wiki_page_path(page), class: tag_class(page.tag) %></li>

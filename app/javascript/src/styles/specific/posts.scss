@@ -274,10 +274,6 @@ div#c-posts {
     &.post-notice-search { background: var(--post-search-notice-background); }
   }
 
-  aside#sidebar #tag-list h2 {
-    font-size: $h4_size;
-  }
-
   aside#sidebar > section > ul {
     margin-bottom: 1em;
 
@@ -308,7 +304,7 @@ div#c-posts {
   div#a-index {
     menu#post-sections {
       margin-bottom: 0.5em;
-      font-size: $h3_size;
+      font-size: var(--text-lg);
 
       li {
         padding: 0 1em 0.5em 0;
@@ -331,7 +327,7 @@ div#c-posts {
 
     menu#post-sections {
       margin: 0;
-      font-size: $h3_size;
+      font-size: var(--text-lg);
 
       li {
         padding: 0 1em 0 0;

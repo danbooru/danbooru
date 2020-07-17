@@ -15,17 +15,17 @@
   </section>
 
   <section id="post-information">
-    <h1>Information</h1>
+    <h2>Information</h2>
     <%= render "posts/partials/show/information", :post => @post %>
   </section>
 
   <section id="post-options">
-    <h1>Options</h1>
+    <h2>Options</h2>
     <%= render "posts/partials/show/options", :post => @post %>
   </section>
 
   <section id="post-history">
-    <h1>History</h1>
+    <h2>History</h2>
     <ul>
       <li id="post-history-tags"><%= link_to "Tags", post_versions_path(search: { post_id: @post.id }) %></li>
       <li id="post-history-pools"><%= link_to "Pools", pool_versions_path(search: { post_id: @post.id }) %></li>

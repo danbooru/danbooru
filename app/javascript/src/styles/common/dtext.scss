@@ -9,32 +9,32 @@ div.prose {
   }
 
   h1 {
-    font-size: $dtext_h1_size;
+    font-size: var(--text-xl);
     padding: $h1_padding;
   }
 
   h2 {
-    font-size: $dtext_h2_size;
+    font-size: var(--text-xl);
     padding: $h2_padding;
   }
 
   h3 {
-    font-size: $dtext_h3_size;
+    font-size: var(--text-xl);
     padding: $h3_padding;
   }
 
   h4 {
-    font-size: $dtext_h4_size;
+    font-size: var(--text-xl);
     padding: $h4_padding;
   }
 
   h5 {
-    font-size: $dtext_h5_size;
+    font-size: var(--text-lg);
     padding: $h4_padding;
   }
 
   h6 {
-    font-size: $dtext_h6_size;
+    font-size: var(--text-md);
     padding: $h4_padding;
   }
 

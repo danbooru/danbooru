@@ -27,17 +27,9 @@ div#add-to-pool-dialog {
     margin-left: 1em;
     cursor: pointer;
   }
-
-  h1 {
-    font-size: $h3_size;
-  }
 }
 
 div#c-pools {
-  h1 {
-    font-size: $h2_size;
-  }
-
   textarea {
     height: 10em;
   }
@@ -50,10 +42,6 @@ div#c-pools {
 }
 
 div#c-pool-orders, div#c-favorite-group-orders {
-  h1 {
-    font-size: $h2_size;
-  }
-
   div#a-edit {
     ul.ui-sortable {
       list-style-type: none;

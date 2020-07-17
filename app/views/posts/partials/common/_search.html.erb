@@ -1,7 +1,7 @@
 <%# path, tags %>
 
 <section id="search-box">
-  <h1>Search</h1>
+  <h2>Search</h2>
   <%= form_tag(path, method: "get", id: "search-box-form") do %>
     <% if params[:random] %>
       <%= hidden_field_tag :random, params[:random] %>

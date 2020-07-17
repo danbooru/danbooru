@@ -1,5 +1,5 @@
 <div id="quick-edit-div" style="display: none;">
-  <h1>Edit</h1>
+  <h2>Edit</h2>
 
   <%= edit_form_for(:post, html: { id: "quick-edit-form" }) do |f| %>
     <%= f.input :tag_string, label: "Tags", as: :text, input_html: { "data-autocomplete": "tag-edit" } %>
