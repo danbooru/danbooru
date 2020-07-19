@@ -32,29 +32,17 @@ class ForumPost < ApplicationRecord
   )
 
   module SearchMethods
-    def topic_title_matches(title)
-      where(topic_id: ForumTopic.search(title_matches: title).select(:id))
-    end
-
     def visible(user)
       where(topic_id: ForumTopic.visible(user))
     end
 
     def search(params)
       q = super
-      q = q.search_attributes(params, :creator, :updater, :topic_id, :is_deleted, :body)
+      q = q.search_attributes(params, :is_deleted, :body)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :text_index)
 
       if params[:linked_to].present?
         q = q.where(id: DtextLink.forum_post.wiki_link.where(link_target: params[:linked_to]).select(:model_id))
-      end
-
-      if params[:topic_title_matches].present?
-        q = q.topic_title_matches(params[:topic_title_matches])
-      end
-
-      if params[:topic_category_id].present?
-        q = q.where(topic_id: ForumTopic.where(category_id: params[:topic_category_id]))
       end
 
       q.apply_default_order(params)
@@ -177,6 +165,10 @@ class ForumPost < ApplicationRecord
 
   def dtext_shortlink(**options)
     "forum ##{id}"
+  end
+
+  def self.searchable_includes
+    [:creator, :updater, :topic, :dtext_links, :votes, :tag_alias, :tag_implication, :bulk_update_request]
   end
 
   def self.available_includes

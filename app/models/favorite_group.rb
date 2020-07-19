@@ -27,7 +27,7 @@ class FavoriteGroup < ApplicationRecord
 
     def search(params)
       q = super
-      q = q.search_attributes(params, :name, :is_public, :post_ids, :creator)
+      q = q.search_attributes(params, :name, :is_public, :post_ids)
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
@@ -162,6 +162,10 @@ class FavoriteGroup < ApplicationRecord
 
   def contains?(post_id)
     post_ids.include?(post_id)
+  end
+
+  def self.searchable_includes
+    [:creator]
   end
 
   def self.available_includes

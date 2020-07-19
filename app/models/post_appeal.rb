@@ -18,7 +18,7 @@ class PostAppeal < ApplicationRecord
   module SearchMethods
     def search(params)
       q = super
-      q = q.search_attributes(params, :creator, :post, :reason)
+      q = q.search_attributes(params, :reason)
       q = q.text_attribute_matches(:reason, params[:reason_matches])
 
       q = q.resolved if params[:is_resolved].to_s.truthy?
@@ -52,6 +52,10 @@ class PostAppeal < ApplicationRecord
 
   def appeal_count_for_creator
     creator.post_appeals.recent.count
+  end
+
+  def self.searchable_includes
+    [:creator, :post]
   end
 
   def self.available_includes

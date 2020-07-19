@@ -4,7 +4,7 @@ class ArtistCommentaryVersion < ApplicationRecord
 
   def self.search(params)
     q = super
-    q = q.search_attributes(params, :post, :updater, :original_title, :original_description, :translated_title, :translated_description)
+    q = q.search_attributes(params, :original_title, :original_description, :translated_title, :translated_description)
     q.apply_default_order(params)
   end
 
@@ -40,6 +40,10 @@ class ArtistCommentaryVersion < ApplicationRecord
 
   def unchanged_empty?(field)
     self[field].strip.empty? && (previous.nil? || previous[field].strip.empty?)
+  end
+
+  def self.searchable_includes
+    [:post, :updater]
   end
 
   def self.available_includes

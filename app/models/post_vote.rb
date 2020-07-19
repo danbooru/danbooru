@@ -20,7 +20,7 @@ class PostVote < ApplicationRecord
 
   def self.search(params)
     q = super
-    q = q.search_attributes(params, :post, :user, :score)
+    q = q.search_attributes(params, :score)
     q.apply_default_order(params)
   end
 
@@ -48,6 +48,10 @@ class PostVote < ApplicationRecord
     else
       Post.where(:id => post_id).update_all("score = score - #{score}, down_score = down_score - #{score}")
     end
+  end
+
+  def self.searchable_includes
+    [:user, :post]
   end
 
   def self.available_includes

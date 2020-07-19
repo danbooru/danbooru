@@ -18,7 +18,7 @@ class Ban < ApplicationRecord
   def self.search(params)
     q = super
 
-    q = q.search_attributes(params, :banner, :user, :expires_at, :reason)
+    q = q.search_attributes(params, :expires_at, :reason)
     q = q.text_attribute_matches(:reason, params[:reason_matches])
 
     q = q.expired if params[:expired].to_s.truthy?
@@ -89,6 +89,10 @@ class Ban < ApplicationRecord
 
   def create_unban_mod_action
     ModAction.log(%{Unbanned <@#{user_name}>}, :user_unban)
+  end
+
+  def self.searchable_includes
+    [:user, :banner]
   end
 
   def self.available_includes

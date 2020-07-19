@@ -16,7 +16,7 @@ class Note < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :post, :is_active, :x, :y, :width, :height, :body, :version)
+      q = q.search_attributes(params, :is_active, :x, :y, :width, :height, :body, :version)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index)
 
       q.apply_default_order(params)
@@ -127,6 +127,10 @@ class Note < ApplicationRecord
     new_note.height = height * height_ratio
 
     new_note.save
+  end
+
+  def self.searchable_includes
+    [:post]
   end
 
   def self.available_includes

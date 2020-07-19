@@ -9,7 +9,7 @@ class WikiPageVersion < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :updater, :is_locked, :is_deleted, :wiki_page_id)
+      q = q.search_attributes(params, :is_locked, :is_deleted)
       q = q.text_attribute_matches(:title, params[:title])
       q = q.text_attribute_matches(:body, params[:body])
 
@@ -77,7 +77,11 @@ class WikiPageVersion < ApplicationRecord
     end
   end
 
+  def self.searchable_includes
+    [:updater, :wiki_page, :artist, :tag]
+  end
+
   def self.available_includes
-    [:updater, :wiki_page, :artist]
+    [:updater, :wiki_page, :artist, :tag]
   end
 end

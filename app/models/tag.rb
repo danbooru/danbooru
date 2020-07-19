@@ -286,18 +286,6 @@ class Tag < ApplicationRecord
         q = q.nonempty
       end
 
-      if params[:has_wiki].to_s.truthy?
-        q = q.joins(:wiki_page).merge(WikiPage.undeleted)
-      elsif params[:has_wiki].to_s.falsy?
-        q = q.left_outer_joins(:wiki_page).where("wiki_pages.title IS NULL OR wiki_pages.is_deleted = TRUE")
-      end
-
-      if params[:has_artist].to_s.truthy?
-        q = q.joins(:artist).merge(Artist.undeleted)
-      elsif params[:has_artist].to_s.falsy?
-        q = q.left_outer_joins(:artist).where("artists.name IS NULL OR artists.is_deleted = TRUE")
-      end
-
       case params[:order]
       when "name"
         q = q.order("name")
@@ -355,6 +343,14 @@ class Tag < ApplicationRecord
 
   def posts
     Post.system_tag_match(name)
+  end
+
+  def self.model_restriction(table)
+    super.where(table[:post_count].gt(0))
+  end
+
+  def self.searchable_includes
+    [:wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications]
   end
 
   def self.available_includes

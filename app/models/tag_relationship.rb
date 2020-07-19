@@ -94,7 +94,7 @@ class TagRelationship < ApplicationRecord
 
     def search(params)
       q = super
-      q = q.search_attributes(params, :creator, :approver, :forum_topic_id, :forum_post_id, :antecedent_name, :consequent_name)
+      q = q.search_attributes(params, :antecedent_name, :consequent_name)
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
@@ -155,6 +155,14 @@ class TagRelationship < ApplicationRecord
         end
       end
     end
+  end
+
+  def self.model_restriction(table)
+    super.where(table[:status].eq("active"))
+  end
+
+  def self.searchable_includes
+    [:creator, :approver, :forum_post, :forum_topic, :antecedent_tag, :consequent_tag, :antecedent_wiki, :consequent_wiki]
   end
 
   def self.available_includes

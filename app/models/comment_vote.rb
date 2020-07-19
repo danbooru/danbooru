@@ -18,15 +18,9 @@ class CommentVote < ApplicationRecord
     end
   end
 
-  def self.comment_matches(params)
-    return all if params.blank?
-    where(comment_id: Comment.search(params).reorder(nil).select(:id))
-  end
-
   def self.search(params)
     q = super
-    q = q.search_attributes(params, :comment_id, :user, :score)
-    q = q.comment_matches(params[:comment])
+    q = q.search_attributes(params, :score)
     q.apply_default_order(params)
   end
 
@@ -42,6 +36,10 @@ class CommentVote < ApplicationRecord
 
   def is_negative?
     score == -1
+  end
+
+  def self.searchable_includes
+    [:comment, :user]
   end
 
   def self.available_includes

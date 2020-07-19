@@ -32,7 +32,7 @@ class UserFeedback < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :user, :creator, :category, :body, :is_deleted)
+      q = q.search_attributes(params, :category, :body, :is_deleted)
       q = q.text_attribute_matches(:body, params[:body_matches])
 
       q.apply_default_order(params)
@@ -63,6 +63,10 @@ class UserFeedback < ApplicationRecord
   def create_dmail
     body = %{#{disclaimer}@#{creator.name} created a "#{category} record":/user_feedbacks?search[user_id]=#{user_id} for your account:\n\n#{self.body}}
     Dmail.create_automated(:to_id => user_id, :title => "Your user record has been updated", :body => body)
+  end
+
+  def self.searchable_includes
+    [:creator, :user]
   end
 
   def self.available_includes

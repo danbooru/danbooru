@@ -513,7 +513,7 @@ class User < ApplicationRecord
       params = params.dup
       params[:name_matches] = params.delete(:name) if params[:name].present?
 
-      q = q.search_attributes(params, :name, :level, :inviter, :post_upload_count, :post_update_count, :note_update_count, :favorite_count)
+      q = q.search_attributes(params, :name, :level, :post_upload_count, :post_update_count, :note_update_count, :favorite_count)
 
       if params[:name_matches].present?
         q = q.where_ilike(:name, normalize_name(params[:name_matches]))
@@ -580,6 +580,10 @@ class User < ApplicationRecord
 
   def dtext_shortlink(**options)
     "<@#{name}>"
+  end
+
+  def self.searchable_includes
+    [:posts, :note_versions, :artist_commentary_versions, :post_appeals, :post_approvals, :artist_versions, :comments, :wiki_page_versions, :feedback, :forum_posts, :forum_post_votes, :tag_aliases, :tag_implications, :bans, :inviter]
   end
 
   def self.available_includes
