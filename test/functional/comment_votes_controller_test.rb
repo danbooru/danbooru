@@ -3,9 +3,9 @@ require 'test_helper'
 class CommentVotesControllerTest < ActionDispatch::IntegrationTest
   context "A comment votes controller" do
     setup do
-      CurrentUser.user = @user = create(:user)
+      CurrentUser.user = @user = create(:user, name: "cirno")
       CurrentUser.ip_addr = "127.0.0.1"
-      @comment = create(:comment)
+      @comment = create(:comment, creator: @user)
     end
 
     teardown do
@@ -13,12 +13,36 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
       CurrentUser.ip_addr = nil
     end
 
-    context "#index" do
-      should "work" do
-        create(:comment_vote, user: @user)
-        get_auth comment_votes_path, @user
+    context "index action" do
+      setup do
+        @voter = create(:gold_user, name: "rumia")
+        @vote = as (@voter) { create(:comment_vote, comment: @comment, user: @voter) }
+        @negative_vote = create(:comment_vote, comment: @comment, score: -1)
+        @unrelated_vote = create(:comment_vote)
+      end
 
-        assert_response :success
+      context "as a user" do
+        should "render" do
+          get_auth comment_votes_path, @user
+          assert_response :success
+        end
+
+        should respond_to_search({}).with { [] }
+      end
+
+      context "as a moderator" do
+        setup do
+          CurrentUser.user = create(:mod_user)
+        end
+
+        should respond_to_search({}).with { [@unrelated_vote, @negative_vote, @vote] }
+        should respond_to_search(score: -1).with { @negative_vote }
+
+        context "using includes" do
+          should respond_to_search(comment: {creator_name: "cirno"}).with { [@negative_vote, @vote] }
+          should respond_to_search(user_name: "rumia").with { @vote }
+          should respond_to_search(user: {level: User::Levels::GOLD}).with { @vote }
+        end
       end
     end
 

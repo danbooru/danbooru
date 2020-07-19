@@ -1,15 +1,18 @@
 require 'test_helper'
 
 class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
+  def default_search_order(items)
+    ->{ items.each { |val| val.reload }.sort_by(&:updated_at).reverse }
+  end
+
   context "The forum topics controller" do
     setup do
       @user = create(:user)
       @other_user = create(:user)
-      @mod = create(:moderator_user)
+      @mod = create(:moderator_user, name: "okuu")
 
       as(@user) do
-        @forum_topic = create(:forum_topic, creator: @user, title: "my forum topic")
-        @forum_post = create(:forum_post, creator: @user, topic: @forum_topic, body: "xxx")
+        @forum_topic = create(:forum_topic, creator: @user, title: "my forum topic", original_post: build(:forum_post, creator: @user, topic: @forum_topic, body: "xxx"))
       end
     end
 
@@ -88,25 +91,26 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         as(@user) do
-          @topic1 = create(:forum_topic, is_sticky: true, creator: @user)
-          @topic2 = create(:forum_topic, creator: @user)
-          @post1 = create(:forum_post, topic: @topic1, creator: @user, body: "xxx")
-          @post2 = create(:forum_post, topic: @topic2, creator: @user, body: "xxx")
+          @sticky_topic = create(:forum_topic, is_sticky: true, creator: @user, original_post: build(:forum_post))
+          @other_topic = create(:forum_topic, creator: @user, original_post: build(:forum_post))
         end
+        @mod_topic = as(@mod) { create(:forum_topic, creator: @mod, min_level: User::Levels::MODERATOR, original_post: build(:forum_post)) }
+        create(:bulk_update_request, forum_topic: @forum_topic)
+        create(:tag_alias, forum_topic: @other_topic)
       end
 
       should "list public forum topics for members" do
         get forum_topics_path
 
         assert_response :success
-        assert_select "a.forum-post-link", count: 1, text: @topic1.title
-        assert_select "a.forum-post-link", count: 1, text: @topic2.title
+        assert_select "a.forum-post-link", count: 1, text: @sticky_topic.title
+        assert_select "a.forum-post-link", count: 1, text: @other_topic.title
       end
 
       should "not list stickied topics first for JSON responses" do
         get forum_topics_path, params: {format: :json}
         forum_topics = JSON.parse(response.body)
-        assert_equal([@topic2.id, @topic1.id, @forum_topic.id], forum_topics.map {|t| t["id"]})
+        assert_equal(default_search_order([@other_topic, @sticky_topic, @forum_topic]).call.map(&:id), forum_topics.map {|t| t["id"]})
       end
 
       should "render for atom feed" do
@@ -122,39 +126,54 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
 
       context "with private topics" do
         should "not show private topics to unprivileged users" do
-          as(@user) { @topic2.update!(min_level: User::Levels::MODERATOR) }
+          as(@user) { @other_topic.update!(min_level: User::Levels::MODERATOR) }
           get forum_topics_path
 
           assert_response :success
-          assert_select "a.forum-post-link", count: 1, text: @topic1.title
-          assert_select "a.forum-post-link", count: 0, text: @topic2.title
+          assert_select "a.forum-post-link", count: 1, text: @sticky_topic.title
+          assert_select "a.forum-post-link", count: 0, text: @other_topic.title
         end
 
         should "show private topics to privileged users" do
-          as(@user) { @topic2.update!(min_level: User::Levels::MODERATOR) }
+          as(@user) { @other_topic.update!(min_level: User::Levels::MODERATOR) }
           get_auth forum_topics_path, @mod
 
           assert_response :success
-          assert_select "a.forum-post-link", count: 1, text: @topic1.title
-          assert_select "a.forum-post-link", count: 1, text: @topic2.title
+          assert_select "a.forum-post-link", count: 1, text: @sticky_topic.title
+          assert_select "a.forum-post-link", count: 1, text: @other_topic.title
         end
       end
 
       context "with search conditions" do
-        should "list all matching forum topics" do
-          get forum_topics_path, params: {:search => {:title_matches => "forum"}}
-          assert_response :success
-          assert_select "a.forum-post-link", @forum_topic.title
-          assert_select "a.forum-post-link", count: 0, text: @topic1.title
-          assert_select "a.forum-post-link", count: 0, text: @topic2.title
+        context "as a user" do
+          setup do
+            CurrentUser.user = @user
+          end
+
+          should respond_to_search({}).with { default_search_order([@sticky_topic, @other_topic, @forum_topic]) }
+          should respond_to_search(order: "id").with { [@other_topic, @sticky_topic, @forum_topic] }
+          should respond_to_search(title_matches: "forum").with { @forum_topic }
+          should respond_to_search(title_matches: "bababa").with { [] }
+          should respond_to_search(is_sticky: "true").with { @sticky_topic }
+
+          context "using includes" do
+            should respond_to_search(forum_posts: {body_matches: "xxx"}).with { @forum_topic }
+            should respond_to_search(has_bulk_update_requests: "true").with { @forum_topic }
+            should respond_to_search(has_tag_aliases: "true").with { @other_topic }
+            should respond_to_search(creator_name: "okuu").with { [] }
+          end
         end
 
-        should "list nothing for when the search matches nothing" do
-          get forum_topics_path, params: {:search => {:title_matches => "bababa"}}
-          assert_response :success
-          assert_select "a.forum-post-link", count: 0, text: @forum_topic.title
-          assert_select "a.forum-post-link", count: 0, text: @topic1.title
-          assert_select "a.forum-post-link", count: 0, text: @topic2.title
+        context "as a moderator" do
+          setup do
+            CurrentUser.user = @mod
+          end
+
+          should respond_to_search({}).with { default_search_order([@sticky_topic, @other_topic, @mod_topic, @forum_topic]) }
+
+          context "using includes" do
+            should respond_to_search(creator_name: "okuu").with { @mod_topic }
+          end
         end
       end
 

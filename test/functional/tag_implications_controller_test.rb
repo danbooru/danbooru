@@ -7,6 +7,44 @@ class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
+      setup do
+        @user = create(:builder_user, name: "sakuya")
+        as (@user) do
+          @forum_topic = create(:forum_topic, title: "Weapon BUR")
+          @forum_post = create(:forum_post, topic: @forum_topic, body: "because")
+        end
+        @antecedent_tag = create(:copyright_tag, name: "cannon", post_count: 10)
+        @consequent_tag = create(:copyright_tag, name: "weapon", post_count: 1000)
+        @antecedent_wiki = create(:wiki_page, title: "cannon", body: "made of fun")
+        @consequent_wiki = create(:wiki_page, title: "weapon")
+
+        @other_implication = create(:tag_implication, antecedent_name: "cannon", consequent_name: "weapon", creator: @user, status: "pending", forum_topic: @forum_topic, forum_post: @forum_post)
+        @unrelated_implication = create(:tag_implication)
+      end
+
+      should "render" do
+        get tag_implications_path
+        assert_response :success
+      end
+
+      should respond_to_search({}).with { [@unrelated_implication, @other_implication, @tag_implication] }
+      should respond_to_search(antecedent_name: "aaa").with { @tag_implication }
+      should respond_to_search(consequent_name: "bbb").with { @tag_implication }
+      should respond_to_search(status: "pending").with { @other_implication }
+
+      context "using includes" do
+        should respond_to_search(antecedent_tag: {post_count: 10}).with { @other_implication }
+        should respond_to_search(consequent_tag: {category: Tag.categories.copyright}).with { @other_implication }
+        should respond_to_search(has_antecedent_tag: "true").with { @other_implication }
+        should respond_to_search(has_consequent_tag: "false").with { [@unrelated_implication, @tag_implication] }
+        should respond_to_search(antecedent_wiki: {body_matches: "made of fun"}).with { @other_implication }
+        should respond_to_search(has_consequent_wiki: "true").with { @other_implication }
+        should respond_to_search(forum_topic: {title_matches: "Weapon BUR"}).with { @other_implication }
+        should respond_to_search(forum_post: {body: "because"}).with { @other_implication }
+        should respond_to_search(creator_name: "sakuya").with { @other_implication }
+        should respond_to_search(creator: {level: User::Levels::BUILDER}).with { @other_implication }
+      end
+
       should "list all tag implications" do
         get tag_implications_path
         assert_response :success

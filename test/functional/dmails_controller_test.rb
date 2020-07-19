@@ -3,9 +3,9 @@ require 'test_helper'
 class DmailsControllerTest < ActionDispatch::IntegrationTest
   context "The dmails controller" do
     setup do
-      @user = create(:user, unread_dmail_count: 1)
-      @unrelated_user = create(:user)
-      @dmail = create(:dmail, owner: @user)
+      @user = create(:user, id: 999, unread_dmail_count: 1)
+      @unrelated_user = create(:moderator_user, id: 1000, name: "reimu")
+      @dmail = create(:dmail, owner: @user, from: @user)
     end
 
     teardown do
@@ -40,28 +40,41 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
-      should "show dmails owned by the current user by sent" do
-        get_auth dmails_path, @user, params: {:search => {:owner_id => @dmail.owner_id, :folder => "sent"}}
+      setup do
+        CurrentUser.user = @user
+        @received_dmail = create(:dmail, owner: @user, body: "blah", to: @user, from: @unrelated_user, is_read: true)
+        @deleted_dmail = create(:dmail, owner: @user, title: "UMAD", to: @unrelated_user, from: @user, is_deleted: true)
+        @unrelated_dmail = create(:dmail, owner: @unrelated_user, from: @unrelated_user)
+      end
+
+      should "render" do
+        get_auth dmails_path, @user
         assert_response :success
       end
 
-      should "show dmails owned by the current user by received" do
-        get_auth dmails_path, @user, params: {:search => {:owner_id => @dmail.owner_id, :folder => "received"}}
-        assert_response :success
+      should respond_to_search({}).with { [@deleted_dmail, @received_dmail, @dmail] }
+      should respond_to_search(folder: "sent").with { @dmail }
+      should respond_to_search(folder: "received").with { @received_dmail }
+      should respond_to_search(title_matches: "UMAD").with { @deleted_dmail }
+      should respond_to_search(message_matches: "blah").with { @received_dmail }
+      should respond_to_search(is_read: "true").with { @received_dmail }
+      should respond_to_search(is_deleted: "true").with { @deleted_dmail }
+
+      context "using includes" do
+        should respond_to_search(to_id: 1000).with { @deleted_dmail }
+        should respond_to_search(from_id: 999).with { [@deleted_dmail, @dmail] }
+        should respond_to_search(from_name: "reimu").with { @received_dmail }
+        should respond_to_search(from: {level: User::Levels::MODERATOR}).with { @received_dmail }
       end
 
-      should "not show dmails not owned by the current user" do
-        get_auth dmails_path, @user, params: {:search => {:owner_id => @dmail.owner_id}}
-        assert_response :success
-      end
+      context "as a banned user" do
+        setup do
+          as(create(:admin_user)) do
+            create(:ban, user: @user)
+          end
 
-      should "work for banned users" do
-        as(create(:admin_user)) do
-          create(:ban, :user => @user)
+          should respond_to_search({}).with { [@received_dmail, @dmail] }
         end
-        get_auth dmails_path, @dmail.owner, params: {:search => {:owner_id => @dmail.owner_id, :folder => "sent"}}
-
-        assert_response :success
       end
     end
 

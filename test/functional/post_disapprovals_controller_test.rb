@@ -3,9 +3,8 @@ require 'test_helper'
 class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
   context "The post disapprovals controller" do
     setup do
-      @approver = create(:approver)
-      @post = create(:post, is_pending: true)
-      @post_disapproval = create(:post_disapproval, post: @post)
+      @approver = create(:approver, name: "eiki")
+      @post = create(:post, tag_string: "touhou", is_pending: true, uploader: build(:user, name: "marisa", created_at: 2.weeks.ago))
     end
 
     context "create action" do
@@ -40,16 +39,36 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
+      setup do
+        @post_disapproval = create(:post_disapproval, post: @post)
+        @user_disapproval = create(:post_disapproval, user: @approver)
+        @unrelated_disapproval = create(:post_disapproval, message: "bad")
+      end
+
+      should "render" do
+        get post_disapprovals_path
+        assert_response :success
+      end
+
+      should respond_to_search({}).with { [@unrelated_disapproval, @user_disapproval, @post_disapproval] }
+      should respond_to_search(message: "bad").with { @unrelated_disapproval }
+
+      context "using includes" do
+        should respond_to_search(post_tags_match: "touhou").with { @post_disapproval }
+        should respond_to_search(post: {uploader_name: "marisa"}).with { @post_disapproval }
+        should respond_to_search(user_name: "eiki").with { @user_disapproval }
+      end
+
       should "allow mods to see disapprover names" do
         get_auth post_disapprovals_path, create(:mod_user)
         assert_response :success
-        assert_select "tr#post-disapproval-#{@post_disapproval.id} .created-column a.user-member", true
+        assert_select "tr#post-disapproval-#{@post_disapproval.id} .created-column a.user-post-approver", true
       end
 
       should "not allow non-mods to see disapprover names" do
         get post_disapprovals_path
         assert_response :success
-        assert_select "tr#post-disapproval-#{@post_disapproval.id} .created-column a.user-member", false
+        assert_select "tr#post-disapproval-#{@post_disapproval.id} .created-column a.user-post-approver", false
       end
     end
   end

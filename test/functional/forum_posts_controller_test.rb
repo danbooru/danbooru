@@ -3,9 +3,9 @@ require 'test_helper'
 class ForumPostsControllerTest < ActionDispatch::IntegrationTest
   context "The forum posts controller" do
     setup do
-      @user = create(:user)
+      @user = create(:user, id: 999)
       @other_user = create(:user)
-      @mod = create(:moderator_user)
+      @mod = create(:moderator_user, name: "okuu")
       @forum_topic = as(@user) { create(:forum_topic, title: "my forum topic", creator: @user) }
       @forum_post = as(@user) { create(:forum_post, creator: @user, topic: @forum_topic, body: "alias xxx -> yyy") }
     end
@@ -52,64 +52,60 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
-      should "list all forum posts" do
-        get forum_posts_path
-        assert_response :success
+      setup do
+        @admin = create(:admin_user)
+        @other_forum = as(@user) { create(:forum_post, body: "[[test]]", topic: build(:forum_topic, title: "my topic", category_id: 1)) }
+        @mod_forum = as(@mod) { create(:forum_post, creator: @mod, topic: build(:forum_topic, min_level: User::Levels::MODERATOR)) }
+        @admin_forum = as(@admin) { create(:forum_post, creator: @admin, topic: build(:forum_topic, min_level: User::Levels::ADMIN)) }
+        @unrelated_forum = as (@user) { create(:forum_post, is_deleted: true) }
+        as (@user) { create(:forum_post_vote, forum_post: @forum_post) }
+        create(:bulk_update_request, forum_post: @other_forum)
       end
 
-      context "with search conditions" do
-        should "list all matching forum posts" do
-          get forum_posts_path, params: { search: { body_matches: "xxx", topic_title_matches: "my forum topic" }}
-          assert_response :success
-          assert_select "#forum-post-#{@forum_post.id}"
-        end
-
-        should "list nothing for when the search matches nothing" do
-          get forum_posts_path, params: {:search => {:body_matches => "bababa"}}
-          assert_response :success
-          assert_select "#forum-post-#{@forum_post.id}", false
-        end
-
-        should "list by creator id" do
-          get forum_posts_path, params: {:search => {:creator_id => @user.id}}
-          assert_response :success
-          assert_select "#forum-post-#{@forum_post.id}"
-        end
-      end
-
-      context "for posts in private topics" do
+      context "as a user" do
         setup do
-          @admin = create(:admin_user)
-          @mod_post = as(@mod) { create(:forum_post, creator: @mod, topic: build(:forum_topic, min_level: User::Levels::MODERATOR)) }
-          @admin_post = as(@admin) { create(:forum_post, creator: @admin, topic: build(:forum_topic, min_level: User::Levels::ADMIN)) }
+          CurrentUser.user = @user
         end
 
-        should "list only permitted posts for anons" do
-          get forum_posts_path
-
+        should "render" do
+          get_auth comment_votes_path, @user
           assert_response :success
-          assert_select "#forum-post-#{@forum_post.id}"
-          assert_select "#forum-post-#{@mod_post.id}", false
-          assert_select "#forum-post-#{@admin_post.id}", false
         end
 
-        should "list only permitted posts for mods" do
-          get_auth forum_posts_path, @mod
+        should respond_to_search({}).with { [@unrelated_forum, @other_forum, @forum_post] }
+        should respond_to_search(body_matches: "xxx").with { @forum_post }
+        should respond_to_search(body_matches: "bababa").with { [] }
+        should respond_to_search(is_deleted: "true").with { @unrelated_forum }
 
-          assert_response :success
-          assert_select "#forum-post-#{@forum_post.id}"
-          assert_select "#forum-post-#{@mod_post.id}"
-          assert_select "#forum-post-#{@admin_post.id}", false
+        context "using includes" do
+          should respond_to_search(topic: {title_matches: "my forum topic"}).with { @forum_post }
+          should respond_to_search(topic: {category_id: 1}).with { @other_forum }
+          should respond_to_search(has_bulk_update_request: "true").with { @other_forum }
+          should respond_to_search(has_votes: "true").with { @forum_post }
+          should respond_to_search(has_dtext_links: "true").with { @other_forum }
+          should respond_to_search(creator_id: 999).with { @forum_post }
+          should respond_to_search(creator: {name: "okuu"}).with { [] }
+        end
+      end
+
+      context "as a moderator" do
+        setup do
+          CurrentUser.user = @mod
         end
 
-        should "list only permitted posts for admins" do
-          get_auth forum_posts_path, @admin
+        should respond_to_search({}).with { [@unrelated_forum, @mod_forum, @other_forum, @forum_post] }
 
-          assert_response :success
-          assert_select "#forum-post-#{@forum_post.id}"
-          assert_select "#forum-post-#{@mod_post.id}"
-          assert_select "#forum-post-#{@admin_post.id}"
+        context "using includes" do
+          should respond_to_search(creator: {name: "okuu"}).with { @mod_forum }
         end
+      end
+
+      context "as an admin" do
+        setup do
+          CurrentUser.user = @admin
+        end
+
+        should respond_to_search({}).with { [@unrelated_forum, @admin_forum, @mod_forum, @other_forum, @forum_post] }
       end
     end
 

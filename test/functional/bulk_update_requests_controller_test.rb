@@ -3,10 +3,11 @@ require 'test_helper'
 class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
   context "BulkUpdateRequestsController" do
     setup do
-      @user = create(:user)
+      @user = create(:user, id: 999)
       @builder = create(:builder_user)
       @admin = create(:admin_user)
-      @bulk_update_request = create(:bulk_update_request, user: @user)
+      as(@admin) { @forum_topic = create(:forum_topic, id: 100, category_id: 0) }
+      as(@user) { @bulk_update_request = create(:bulk_update_request, user: @user, forum_topic: @forum_topic) }
     end
 
     context "#new" do
@@ -73,9 +74,30 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "#index" do
+      setup do
+        @other_BUR = create(:bulk_update_request, user: @builder, script: "create alias cirno -> 9")
+        @rejected_BUR = create(:bulk_update_request, status: "rejected")
+        @approved_BUR = create(:bulk_update_request, status: "approved", approver: @admin)
+      end
+
       should "render" do
         get bulk_update_requests_path
         assert_response :success
+      end
+
+      should respond_to_search({}).with { [@other_BUR, @bulk_update_request, @approved_BUR, @rejected_BUR] }
+      should respond_to_search(order: "id_desc").with { [@approved_BUR, @rejected_BUR, @other_BUR, @bulk_update_request] }
+      should respond_to_search(status: "pending").with { [@other_BUR, @bulk_update_request] }
+      should respond_to_search(script_matches: "cirno -> 9").with { @other_BUR }
+      should respond_to_search(tags_include_any: "cirno").with { @other_BUR }
+
+      context "using includes" do
+        should respond_to_search(forum_topic_id: 100).with { @bulk_update_request }
+        should respond_to_search(forum_topic: {category_id: 0}).with { @bulk_update_request }
+        should respond_to_search(user_id: 999).with { @bulk_update_request }
+        should respond_to_search(user: {level: User::Levels::BUILDER}).with { @other_BUR }
+        should respond_to_search(has_approver: "true").with { @approved_BUR }
+        should respond_to_search(has_approver: "false").with { [@other_BUR, @bulk_update_request, @rejected_BUR] }
       end
     end
 

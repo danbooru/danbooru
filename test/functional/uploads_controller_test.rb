@@ -30,7 +30,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
   context "The uploads controller" do
     setup do
-      @user = create(:contributor_user)
+      @user = create(:contributor_user, name: "marisa")
       mock_iqdb_service!
     end
 
@@ -173,8 +173,11 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         as(@user) do
-          @upload = create(:source_upload, tag_string: "foo bar")
-          @upload2 = create(:source_upload, tag_string: "tagme", rating: "e")
+          @upload = create(:upload, tag_string: "foo bar", source: "http://example.com/foobar")
+          @post_upload = create(:source_upload, status: "completed", post: build(:post, tag_string: "touhou"), rating: "e")
+        end
+        as(create(:user)) do
+          @upload3 = create(:upload)
         end
       end
 
@@ -183,23 +186,28 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      context "with search parameters" do
-        should "render" do
-          search_params = {
-            uploader_name: @upload.uploader.name,
-            source_matches: @upload.source,
-            rating: @upload.rating,
-            status: @upload.status,
-            server: @upload.server
-          }
-
-          get_auth uploads_path, @user, params: { search: search_params }
-          assert_response :success
-
-          get_auth uploads_path(format: :json), @user, params: { search: search_params }
-          assert_response :success
-          assert_equal(@upload.id, response.parsed_body.first["id"])
+      context "as an uploader" do
+        setup do
+          CurrentUser.user = @user
         end
+
+        should respond_to_search({}).with { [@post_upload, @upload] }
+        should respond_to_search(source: "http://example.com/foobar").with { @upload }
+        should respond_to_search(rating: "e").with { @post_upload }
+        should respond_to_search(tag_string: "*foo*").with { @upload }
+
+        context "using includes" do
+          should respond_to_search(post_tags_match: "touhou").with { @post_upload }
+          should respond_to_search(uploader: {name: "marisa"}).with { [@post_upload, @upload] }
+        end
+      end
+
+      context "as an admin" do
+        setup do
+          CurrentUser.user = create(:admin_user)
+        end
+
+        should respond_to_search({}).with { [@upload3, @post_upload, @upload] }
       end
     end
 
