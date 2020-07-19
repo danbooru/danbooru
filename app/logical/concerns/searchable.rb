@@ -1,6 +1,15 @@
 module Searchable
   extend ActiveSupport::Concern
 
+  def parameter_hash?(params)
+    params.present? && params.respond_to?(:each)
+  end
+
+  def parameter_depth(params)
+    return 0 if params.values.empty?
+    1 + params.values.map { |v| parameter_hash?(v) ? parameter_depth(v) : 1 }.max
+  end
+
   def negate(kind = :nand)
     unscoped.where(all.where_clause.invert(kind).ast)
   end
@@ -139,8 +148,13 @@ module Searchable
   end
 
   def search_attributes(params, *attributes)
+    raise ArgumentError, "max parameter depth of 10 exceeded" if parameter_depth(params) > 10
+
+    # This allows the hash keys to be either strings or symbols
+    indifferent_params = params.try(:with_indifferent_access) || params.try(:to_unsafe_h)
+    raise ArgumentError, "unable to process params" if indifferent_params.nil?
     attributes.reduce(all) do |relation, attribute|
-      relation.search_attribute(attribute, params)
+      relation.search_attribute(attribute, indifferent_params)
     end
   end
 
@@ -156,7 +170,9 @@ module Searchable
     when "User"
       search_user_attribute(name, params)
     when "Post"
-      search_post_id_attribute(params)
+      search_post_attribute(name, params)
+    when "Model"
+      search_polymorphic_attribute(name, params)
     when :string, :text
       search_text_attribute(name, params)
     when :boolean
@@ -166,7 +182,8 @@ module Searchable
     when :inet
       search_inet_attribute(name, params)
     else
-      raise NotImplementedError, "unhandled attribute type: #{name}"
+      raise NotImplementedError, "unhandled attribute type: #{name}" if type.blank?
+      search_includes(name, params, type)
     end
   end
 
@@ -207,26 +224,56 @@ module Searchable
   end
 
   def search_user_attribute(attr, params)
-    if params["#{attr}_id"]
-      search_attribute("#{attr}_id", params)
-    elsif params["#{attr}_name"]
+    if params["#{attr}_name"].present?
       where(attr => User.search(name_matches: params["#{attr}_name"]).reorder(nil))
-    elsif params[attr]
-      where(attr => User.search(params[attr]).reorder(nil))
+    else
+      search_includes(attr, params, "User")
+    end
+  end
+
+  def search_post_attribute(attr, params)
+    if params["#{attr}_tags_match"]
+      where(attr => Post.user_tag_match(params["#{attr}_tags_match"]).reorder(nil))
+    else
+      search_includes(attr, params, "Post")
+    end
+  end
+
+  def search_includes(attr, params, type)
+    model = Kernel.const_get(type)
+    if params["#{attr}_id"].present?
+      search_attribute("#{attr}_id", params)
+    elsif params["has_#{attr}"].to_s.truthy? || params["has_#{attr}"].to_s.falsy?
+      search_has_include(attr, params["has_#{attr}"].to_s.truthy?, model)
+    elsif parameter_hash?(params[attr])
+      where(attr => model.search(params[attr]).reorder(nil))
     else
       all
     end
   end
 
-  def search_post_id_attribute(params)
-    relation = all
+  def search_polymorphic_attribute(attr, params)
+    model_keys = ((model_types || []) & params.keys)
+    # The user can only logically specify one model at a time, so more than that should return no results
+    return none if model_keys.length > 1
 
-    if params[:post_id].present?
-      relation = relation.search_attribute(:post_id, params)
+    relation = all
+    model_specified = false
+    model_key = model_keys[0]
+    if model_keys.length == 1 && parameter_hash?(params[model_key])
+      # Returning none here for the same reason specified above
+      return none if params["#{attr}_type"].present? && params["#{attr}_type"] != model_key
+      model_specified = true
+      model = Kernel.const_get(model_key)
+      relation = relation.where(attr => model.search(params[model_key]))
     end
 
-    if params[:post_tags_match].present?
-      relation = relation.where(post_id: Post.user_tag_match(params[:post_tags_match]).reorder(nil))
+    if params["#{attr}_id"].present?
+      relation = relation.search_attribute("#{attr}_id", params)
+    end
+
+    if params["#{attr}_type"].present? && !model_specified
+      relation = relation.search_attribute("#{attr}_type", params)
     end
 
     relation
@@ -272,6 +319,28 @@ module Searchable
     relation
   end
 
+  def search_has_include(name, exists, model)
+    if column_names.include?("#{name}_id")
+      return exists ? where.not("#{name}_id" => nil) : where("#{name}_id" => nil)
+    end
+
+    association = reflect_on_association(name)
+    primary_key = association.active_record_primary_key
+    foreign_key = association.foreign_key
+    # The belongs_to macro has its primary and foreign keys reversed
+    primary_key, foreign_key = foreign_key, primary_key if association.macro == :belongs_to
+    return all if primary_key.nil? || foreign_key.nil?
+
+    self_table = arel_table
+    model_table = model.arel_table
+    model_exists = model.model_restriction(model_table).where(model_table[foreign_key].eq(self_table[primary_key])).exists
+    if exists
+      attribute_restriction(name).where(model_exists)
+    else
+      attribute_restriction(name).where.not(model_exists)
+    end
+  end
+
   def apply_default_order(params)
     if params[:order] == "custom"
       parse_ids = PostQueryBuilder.new(nil).parse_range(params[:id], :integer)
@@ -299,7 +368,8 @@ module Searchable
     params ||= {}
 
     default_attributes = (attribute_names.map(&:to_sym) & %i[id created_at updated_at])
-    search_attributes(params, *default_attributes)
+    all_attributes = default_attributes + searchable_includes
+    search_attributes(params, *all_attributes)
   end
 
   private

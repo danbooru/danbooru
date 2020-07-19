@@ -93,6 +93,22 @@ class ApplicationRecord < ActiveRecord::Base
     end
   end
 
+  concerning :SearchMethods do
+    class_methods do
+      def searchable_includes
+        []
+      end
+
+      def model_restriction(table)
+        table.project(1)
+      end
+
+      def attribute_restriction(*)
+        all
+      end
+    end
+  end
+
   concerning :ActiveRecordExtensions do
     class_methods do
       def without_timeout
