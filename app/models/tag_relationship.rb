@@ -12,8 +12,8 @@ class TagRelationship < ApplicationRecord
   belongs_to :forum_topic, optional: true
   belongs_to :antecedent_tag, class_name: "Tag", foreign_key: "antecedent_name", primary_key: "name", default: -> { Tag.find_or_create_by_name(antecedent_name) }
   belongs_to :consequent_tag, class_name: "Tag", foreign_key: "consequent_name", primary_key: "name", default: -> { Tag.find_or_create_by_name(consequent_name) }
-  has_one :antecedent_wiki, through: :antecedent_tag, source: :wiki_page
-  has_one :consequent_wiki, through: :consequent_tag, source: :wiki_page
+  belongs_to :antecedent_wiki, class_name: "WikiPage", foreign_key: "antecedent_name", primary_key: "title", optional: true
+  belongs_to :consequent_wiki, class_name: "WikiPage", foreign_key: "antecedent_name", primary_key: "title", optional: true
 
   scope :active, -> {approved}
   scope :approved, -> {where(status: %w[active processing queued])}
