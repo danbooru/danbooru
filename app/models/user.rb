@@ -109,6 +109,7 @@ class User < ApplicationRecord
   has_many :note_versions, :foreign_key => "updater_id"
   has_many :dmails, -> {order("dmails.id desc")}, :foreign_key => "owner_id"
   has_many :saved_searches
+  has_many :forum_topics, :foreign_key => "creator_id"
   has_many :forum_posts, -> {order("forum_posts.created_at, forum_posts.id")}, :foreign_key => "creator_id"
   has_many :user_name_change_requests, -> {order("user_name_change_requests.created_at desc")}
   has_many :favorite_groups, -> {order(name: :asc)}, foreign_key: :creator_id
@@ -583,7 +584,7 @@ class User < ApplicationRecord
   end
 
   def self.searchable_includes
-    [:posts, :note_versions, :artist_commentary_versions, :post_appeals, :post_approvals, :artist_versions, :comments, :wiki_page_versions, :feedback, :forum_posts, :forum_post_votes, :tag_aliases, :tag_implications, :bans, :inviter]
+    [:posts, :note_versions, :artist_commentary_versions, :post_appeals, :post_approvals, :artist_versions, :comments, :wiki_page_versions, :feedback, :forum_topics, :forum_posts, :forum_post_votes, :tag_aliases, :tag_implications, :bans, :inviter]
   end
 
   def self.available_includes

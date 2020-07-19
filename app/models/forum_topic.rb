@@ -19,6 +19,8 @@ class ForumTopic < ApplicationRecord
   has_many :moderation_reports, through: :forum_posts
   has_one :original_post, -> { order(id: :asc) }, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
   has_many :bulk_update_requests, :foreign_key => "forum_topic_id"
+  has_many :tag_aliases, :foreign_key => "forum_topic_id"
+  has_many :tag_implications, :foreign_key => "forum_topic_id"
 
   validates_presence_of :title
   validates_associated :original_post
@@ -191,7 +193,7 @@ class ForumTopic < ApplicationRecord
   end
 
   def self.searchable_includes
-    [:creator, :updater, :forum_posts, :bulk_update_requests]
+    [:creator, :updater, :forum_posts, :bulk_update_requests, :tag_aliases, :tag_implications]
   end
 
   def self.available_includes

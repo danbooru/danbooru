@@ -1,6 +1,7 @@
 class DtextLink < ApplicationRecord
   belongs_to :model, polymorphic: true
   belongs_to :linked_wiki, primary_key: :title, foreign_key: :link_target, class_name: "WikiPage", optional: true
+  belongs_to :linked_tag, primary_key: :name, foreign_key: :link_target, class_name: "Tag", optional: true
 
   enum link_type: [:wiki_link, :external_link]
 
@@ -49,10 +50,10 @@ class DtextLink < ApplicationRecord
   end
 
   def self.searchable_includes
-    [:model, :linked_wiki]
+    [:model, :linked_wiki, :linked_tag]
   end
 
   def self.available_includes
-    [:model, :linked_wiki]
+    [:model, :linked_wiki, :linked_tag]
   end
 end
