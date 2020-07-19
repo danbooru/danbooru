@@ -9,9 +9,9 @@ class WikiPageVersion < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :is_locked, :is_deleted)
-      q = q.text_attribute_matches(:title, params[:title])
-      q = q.text_attribute_matches(:body, params[:body])
+      q = q.search_attributes(params, :title, :body, :other_names, :is_locked, :is_deleted)
+      q = q.text_attribute_matches(:title, params[:title_matches])
+      q = q.text_attribute_matches(:body, params[:body_matches])
 
       q.apply_default_order(params)
     end

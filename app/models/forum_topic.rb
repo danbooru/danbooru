@@ -113,6 +113,8 @@ class ForumTopic < ApplicationRecord
       case params[:order]
       when "sticky"
         q = q.sticky_first
+      when "id"
+        q = q.order(id: :desc)
       else
         q = q.apply_default_order(params)
       end
