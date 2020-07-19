@@ -189,12 +189,12 @@ class WikiPage < ApplicationRecord
 
   def merge_version?
     prev = versions.last
-    prev && prev.updater_id == CurrentUser.user.id && prev.updated_at > 1.hour.ago
+    prev && prev.updater_id == CurrentUser.id && prev.updated_at > 1.hour.ago
   end
 
   def create_new_version
     versions.create(
-      :updater_id => CurrentUser.user.id,
+      :updater_id => CurrentUser.id,
       :updater_ip_addr => CurrentUser.ip_addr,
       :title => title,
       :body => body,
