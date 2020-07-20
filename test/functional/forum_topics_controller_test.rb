@@ -121,7 +121,7 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
       should "render for a sitemap" do
         get forum_topics_path(format: :sitemap)
         assert_response :success
-        assert_equal(ForumTopic.count, response.parsed_body.css("urlset url loc").size)
+        assert_equal(ForumTopic.visible(User.anonymous).count, response.parsed_body.css("urlset url loc").size)
       end
 
       context "with private topics" do
