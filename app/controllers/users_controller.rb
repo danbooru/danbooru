@@ -27,7 +27,7 @@ class UsersController < ApplicationController
   def index
     if params[:name].present?
       @user = User.find_by_name!(params[:name])
-      redirect_to user_path(@user)
+      redirect_to user_path(@user, variant: params[:variant])
       return
     end
 
@@ -42,7 +42,9 @@ class UsersController < ApplicationController
 
   def show
     @user = authorize User.find(params[:id])
-    respond_with(@user, methods: @user.full_attributes)
+    respond_with(@user, methods: @user.full_attributes) do |format|
+      format.html.tooltip { render layout: false }
+    end
   end
 
   def profile

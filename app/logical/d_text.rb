@@ -11,7 +11,7 @@ class DText
     html = DTextRagel.parse(text, **options)
     html = postprocess(html, *data)
     html
-  rescue DTextRagel::Error => e
+  rescue DTextRagel::Error
     ""
   end
 
@@ -135,7 +135,7 @@ class DText
     fragment = Nokogiri::HTML.fragment(html)
 
     titles = fragment.css("a.dtext-wiki-link").map do |node|
-      title = node["href"][%r!\A/wiki_pages/(.*)\z!i, 1]
+      title = node["href"][%r{\A/wiki_pages/(.*)\z}i, 1]
       title = CGI.unescape(title)
       title = WikiPage.normalize_title(title)
       title
@@ -163,7 +163,7 @@ class DText
     string = string.dup
 
     string.gsub!(/\s*\[#{tag}\](?!\])\s*/mi, "\n\n[#{tag}]\n\n")
-    string.gsub!(/\s*\[\/#{tag}\]\s*/mi, "\n\n[/#{tag}]\n\n")
+    string.gsub!(%r{\s*\[/#{tag}\]\s*}mi, "\n\n[/#{tag}]\n\n")
     string.gsub!(/(?:\r?\n){3,}/, "\n\n")
     string.strip!
 
@@ -203,7 +203,7 @@ class DText
       end
     end
 
-    text = text.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
+    text.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
   end
 
   def self.from_html(text, inline: false, &block)

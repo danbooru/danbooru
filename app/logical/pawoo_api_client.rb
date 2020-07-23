@@ -128,15 +128,15 @@ class PawooApiClient
       rescue
         data = {}
       end
-      return Account.new(data)
+      Account.new(data)
     end
   end
 
   private
 
   def fetch_access_token
-    raise MissingConfigurationError.new("missing pawoo client id") if Danbooru.config.pawoo_client_id.nil?
-    raise MissingConfigurationError.new("missing pawoo client secret") if Danbooru.config.pawoo_client_secret.nil?
+    raise MissingConfigurationError, "missing pawoo client id" if Danbooru.config.pawoo_client_id.nil?
+    raise MissingConfigurationError, "missing pawoo client secret" if Danbooru.config.pawoo_client_secret.nil?
 
     Cache.get("pawoo-token") do
       result = client.client_credentials.get_token

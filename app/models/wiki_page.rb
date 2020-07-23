@@ -53,7 +53,11 @@ class WikiPage < ApplicationRecord
     end
 
     def linked_to(title)
-      where(id: DtextLink.wiki_page.wiki_link.where(link_target: title).select(:model_id))
+      where(dtext_links: DtextLink.wiki_page.wiki_link.where(link_target: normalize_title(title)))
+    end
+
+    def not_linked_to(title)
+      where.not(dtext_links: DtextLink.wiki_page.wiki_link.where(link_target: normalize_title(title)))
     end
 
     def default_order
@@ -80,6 +84,10 @@ class WikiPage < ApplicationRecord
 
       if params[:linked_to].present?
         q = q.linked_to(params[:linked_to])
+      end
+
+      if params[:not_linked_to].present?
+        q = q.not_linked_to(params[:not_linked_to])
       end
 
       if params[:hide_deleted].to_s.truthy?
@@ -146,6 +154,7 @@ class WikiPage < ApplicationRecord
   end
 
   def self.normalize_title(title)
+    return if title.blank?
     title.downcase.delete_prefix("~").gsub(/[[:space:]]+/, "_").gsub(/__/, "_").gsub(/\A_|_\z/, "")
   end
 

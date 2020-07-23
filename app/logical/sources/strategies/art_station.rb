@@ -22,15 +22,15 @@
 
 module Sources::Strategies
   class ArtStation < Base
-    PROJECT1 = %r!\Ahttps?://www\.artstation\.com/artwork/(?<project_id>[a-z0-9-]+)/?\z!i
-    PROJECT2 = %r!\Ahttps?://(?<artist_name>[\w-]+)\.artstation\.com/projects/(?<project_id>[a-z0-9-]+)(?:/|\?[\w=-]+)?\z!i
+    PROJECT1 = %r{\Ahttps?://www\.artstation\.com/artwork/(?<project_id>[a-z0-9-]+)/?\z}i
+    PROJECT2 = %r{\Ahttps?://(?<artist_name>[\w-]+)\.artstation\.com/projects/(?<project_id>[a-z0-9-]+)(?:/|\?[\w=-]+)?\z}i
     PROJECT = Regexp.union(PROJECT1, PROJECT2)
     ARTIST1 = %r{\Ahttps?://(?<artist_name>[\w-]+)(?<!www)\.artstation\.com/?\z}i
     ARTIST2 = %r{\Ahttps?://www\.artstation\.com/artist/(?<artist_name>[\w-]+)/?\z}i
     ARTIST3 = %r{\Ahttps?://www\.artstation\.com/(?<artist_name>[\w-]+)/?\z}i
     ARTIST = Regexp.union(ARTIST1, ARTIST2, ARTIST3)
 
-    ASSET = %r!\Ahttps?://cdn\w*\.artstation\.com/p/assets/(?<type>images|covers)/images/(?<id>\d+/\d+/\d+)/(?<size>[^/]+)/(?<filename>.+)\z!i
+    ASSET = %r{\Ahttps?://cdn\w*\.artstation\.com/p/assets/(?<type>images|covers)/images/(?<id>\d+/\d+/\d+)/(?<size>[^/]+)/(?<filename>.+)\z}i
 
     attr_reader :json
 
@@ -144,10 +144,10 @@ module Sources::Strategies
 
       urls = image_url_sizes($~[:type], $~[:id], $~[:filename])
       if size == :smallest
-        urls = urls.reverse()
+        urls = urls.reverse
       end
 
-      chosen_url = urls.find { |url| http_exists?(url, headers) }
+      chosen_url = urls.find { |url| http_exists?(url) }
       chosen_url || url
     end
   end

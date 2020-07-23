@@ -70,7 +70,7 @@ PostModeMenu.initialize_edit_form = function() {
 
   $(document).on("click.danbooru", "#quick-edit-form input[type=submit]", async function(e) {
     e.preventDefault();
-    let post_id = $("#quick-edit-form").data("post-id");
+    let post_id = $("#quick-edit-form").attr("data-post-id");
     await Post.update(post_id, "quick-edit", { post: { tag_string: $("#post_tag_string").val() }});
   });
 }

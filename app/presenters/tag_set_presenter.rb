@@ -125,8 +125,7 @@ class TagSetPresenter
     end
 
     humanized_tag = humanize_tags ? name.tr("_", " ") : name
-    itemprop = 'itemprop="author"' if tag.artist?
-    html << %{<a class="search-tag" #{itemprop} href="/posts?tags=#{u(name)}">#{h(humanized_tag)}</a> }
+    html << %{<a class="search-tag" href="/posts?tags=#{u(name)}">#{h(humanized_tag)}</a> }
 
     unless name_only || tag.new_record?
       if count >= 10_000

@@ -16,7 +16,7 @@ module HasBitFlags
       end
 
       define_method("#{attribute}=") do |val|
-        if val.to_s =~ /t|1|y/
+        if val.to_s =~ /[t1y]/
           send("#{field}=", send(field) | bit_flag)
         else
           send("#{field}=", send(field) & ~bit_flag)

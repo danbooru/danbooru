@@ -16,7 +16,7 @@ class IpLookup
   end
 
   def info
-    return {} unless api_key.present?
+    return {} if api_key.blank?
     response = Danbooru::Http.cache(cache_duration).get("https://api.ipregistry.co/#{ip_addr}?key=#{api_key}")
     return {} if response.status != 200
     json = response.parse.deep_symbolize_keys.with_indifferent_access

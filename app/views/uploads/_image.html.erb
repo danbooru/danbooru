@@ -1,7 +1,7 @@
 <% if params[:url] %>
   <p id="upload-image-metadata">
     <strong>Size</strong>
-    <% if @remote_size %>
+    <% if @remote_size.present? %>
       <span id="upload-image-metadata-filesize"><%= number_to_human_size(@remote_size) %></span>
     <% end %>
     <span id="upload-image-metadata-resolution"></span>

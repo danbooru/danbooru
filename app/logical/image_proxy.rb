@@ -1,4 +1,6 @@
 class ImageProxy
+  class Error < StandardError; end
+
   def self.needs_proxy?(url)
     fake_referer_for(url).present?
   end
@@ -8,19 +10,13 @@ class ImageProxy
   end
 
   def self.get_image(url)
-    if url.blank?
-      raise "Must specify url"
-    end
+    raise Error, "URL not present" unless url.present?
+    raise Error, "Proxy not allowed for this url (url=#{url})" unless needs_proxy?(url)
 
-    if !needs_proxy?(url)
-      raise "Proxy not allowed for this site"
-    end
+    referer = fake_referer_for(url)
+    response = Danbooru::Http.timeout(30).headers(Referer: referer).get(url)
+    raise Error, "Couldn't proxy image (code=#{response.status}, url=#{url})" unless response.status.success?
 
-    response = HTTParty.get(url, Danbooru.config.httparty_options.deep_merge(headers: {"Referer" => fake_referer_for(url)}))
-    if response.success?
-      return response
-    else
-      raise "HTTP error code: #{response.code} #{response.message}"
-    end
+    response
   end
 end

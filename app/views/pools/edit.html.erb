@@ -6,11 +6,11 @@
       <%= error_messages_for "pool" %>
 
       <%= f.input :name, :as => :string, :input_html => { :value => @pool.pretty_name } %>
-      <%= dtext_field "pool", "description" %>
-      <%= dtext_preview_button "pool", "description" %>
+      <%= f.input :description, as: :dtext %>
       <%= f.input :post_ids_string, as: :text, label: "Posts" %>
       <%= f.input :category, :collection => ["series", "collection"], :include_blank => false %>
       <%= f.button :submit %>
+      <%= dtext_preview_button "pool_description" %>
     <% end %>
   </div>
 </div>

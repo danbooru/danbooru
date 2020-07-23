@@ -41,6 +41,13 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_equal @post.versions[1].id, response.parsed_body[0]["id"].to_i
       end
+
+      should "list all versions for search[tag_matches]" do
+        get post_versions_path, as: :json, params: { search: { tag_matches: "tagme" }}
+        assert_response :success
+        assert_equal @post.versions[0].id, response.parsed_body[0]["id"].to_i
+        assert_equal 1, response.parsed_body.length
+      end
     end
 
     context "undo action" do

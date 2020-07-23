@@ -98,6 +98,10 @@ class MediaFileTest < ActiveSupport::TestCase
     should "determine the correct extension for a flash file" do
       assert_equal(:swf, MediaFile.open("test/files/compressed.swf").file_ext)
     end
+
+    should "not fail for empty files" do
+      assert_equal(:bin, MediaFile.open("test/files/test-empty.bin").file_ext)
+    end
   end
 
   should "determine the correct md5 for a jpeg file" do

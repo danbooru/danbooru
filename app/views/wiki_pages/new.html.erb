@@ -14,9 +14,9 @@
   <%= edit_form_for(@wiki_page) do |f| %>
     <%= f.input :title, error: false, input_html: { data: { autocomplete: "tag" } } %>
     <%= f.input :other_names_string, as: :text, input_html: { size: "30x1" }, label: "Other names (#{link_to_wiki "help", "help:translated_tags"})".html_safe, hint: "Names used for this tag on other sites such as Pixiv. Separate with spaces." %>
-    <%= dtext_field "wiki_page", "body" %>
+    <%= f.input :body, as: :dtext %>
     <%= f.submit "Submit" %>
-    <%= dtext_preview_button "wiki_page", "body" %>
+    <%= dtext_preview_button "wiki_page_body" %>
   <% end %>
 
   <%= render "tag_relationships/alias_and_implication_list", tag: @wiki_page.tag %>

@@ -11,8 +11,6 @@ module Mentionable
     # - user_field
     def mentionable(options = {})
       @mentionable_options = options
-
-      message_field = mentionable_option(:message_field)
       after_save :queue_mention_messages
     end
 

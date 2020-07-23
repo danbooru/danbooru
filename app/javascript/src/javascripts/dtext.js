@@ -39,8 +39,11 @@ Dtext.call_edit = function(e, $button, $input, $preview) {
 
 Dtext.click_button = function(e) {
   var $button = $(e.target);
-  var $input = $("#" + $button.data("input-id"));
-  var $preview = $("#" + $button.data("preview-id"));
+  var $form = $button.parents("form");
+  var fieldName = $button.data("preview-field");
+  var $inputContainer = $form.find(`div.input.${fieldName} .dtext-previewable`);
+  var $input = $inputContainer.find("> input, > textarea");
+  var $preview = $inputContainer.find("div.dtext-preview");
 
   if ($button.val().match(/preview/i)) {
     Dtext.call_preview(e, $button, $input, $preview);

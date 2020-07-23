@@ -9,6 +9,7 @@ Autocomplete.ORDER_METATAGS = <%= PostQueryBuilder::ORDER_METATAGS.to_json.html_
 Autocomplete.DISAPPROVAL_REASONS = <%= PostDisapproval::REASONS.to_json.html_safe %>;
 /* eslint-enable */
 
+Autocomplete.MISC_STATUSES = ["deleted", "active", "pending", "flagged", "banned", "modqueue", "unmoderated"];
 Autocomplete.TAG_PREFIXES = "-|~|" + Object.keys(Autocomplete.TAG_CATEGORIES).map(category => category + ":").join("|");
 Autocomplete.METATAGS_REGEX = Autocomplete.METATAGS.concat(Object.keys(Autocomplete.TAG_CATEGORIES)).join("|");
 Autocomplete.TERM_REGEX = new RegExp(`([-~]*)(?:(${Autocomplete.METATAGS_REGEX}):)?(\\S*)$`, "i");
@@ -37,7 +38,7 @@ Autocomplete.initialize_all = function() {
     });
 
     this.initialize_tag_autocomplete();
-    this.initialize_mention_autocomplete($(".autocomplete-mentions textarea"));
+    this.initialize_mention_autocomplete($("form div.input.dtext textarea"));
     this.initialize_fields($('[data-autocomplete="tag"]'), Autocomplete.tag_source);
     this.initialize_fields($('[data-autocomplete="artist"]'), Autocomplete.artist_source);
     this.initialize_fields($('[data-autocomplete="pool"]'), Autocomplete.pool_source);
@@ -248,9 +249,6 @@ Autocomplete.render_item = function(list, item) {
   } else if (item.type === "user") {
     var level_class = "user-" + item.level.toLowerCase();
     $link.addClass(level_class);
-    if (CurrentUser.data("style-usernames")) {
-      $link.addClass("with-style");
-    }
   } else if (item.type === "pool") {
     $link.addClass("pool-category-" + item.category);
   }
@@ -268,9 +266,7 @@ Autocomplete.render_item = function(list, item) {
 
 Autocomplete.static_metatags = {
   order: Autocomplete.ORDER_METATAGS,
-  status: [
-    "any", "deleted", "active", "pending", "flagged", "banned", "modqueue", "unmoderated"
-  ],
+  status: ["any"].concat(Autocomplete.MISC_STATUSES),
   rating: [
     "safe", "questionable", "explicit"
   ],
@@ -280,12 +276,8 @@ Autocomplete.static_metatags = {
   embedded: [
     "true", "false"
   ],
-  child: [
-    "any", "none"
-  ],
-  parent: [
-    "any", "none"
-  ],
+  child: ["any", "none"].concat(Autocomplete.MISC_STATUSES),
+  parent: ["any", "none"].concat(Autocomplete.MISC_STATUSES),
   filetype: [
     "jpg", "png", "gif", "swf", "zip", "webm", "mp4"
   ],

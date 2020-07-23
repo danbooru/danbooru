@@ -1,0 +1,51 @@
+div[data-tippy-root].tooltip-loading {
+  visibility: hidden !important;
+}
+
+.tippy-box[data-theme~="common-tooltip"] {
+  box-sizing: border-box;
+
+  border: 1px solid var(--post-tooltip-border-color);
+  border-radius: 4px;
+
+  color: var(--text-color);
+  background-color: var(--post-tooltip-background-color);
+  background-clip: padding-box;
+  box-shadow: var(--post-tooltip-box-shadow);
+
+  /* bordered arrow styling; see https://github.com/atomiks/tippyjs/blob/master/src/scss/themes/light-border.scss */
+  &[data-placement^=bottom] {
+    > .tippy-arrow:before {
+      border-bottom-color: var(--post-tooltip-background-color);
+      bottom: 16px;
+    }
+
+    > .tippy-arrow:after {
+      border-bottom-color: var(--post-tooltip-border-color);
+      border-width: 0 7px 7px;
+      top: -8px;
+      left: 1px;
+    }
+  }
+
+  &[data-placement^=top] {
+    > .tippy-arrow:before {
+      border-top-color: var(--post-tooltip-background-color);
+    }
+
+    > .tippy-arrow:after {
+      border-top-color: var(--post-tooltip-border-color);
+      border-width: 7px 7px 0;
+      top: 17px;
+      left: 1px;
+    }
+  }
+
+  > .tippy-arrow:after {
+    border-color: transparent;
+    border-style: solid;
+    content: "";
+    position: absolute;
+    z-index: -1;
+  }
+}

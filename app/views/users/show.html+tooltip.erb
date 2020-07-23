@@ -1,0 +1,135 @@
+<div class="user-tooltip">
+  <div class="user-tooltip-header">
+    <i class="fas fa-user-circle user-tooltip-avatar"></i>
+    <div class="user-tooltip-header-top">
+      <span class="user-tooltip-name"><%= link_to_user @user %></span>
+
+      <% if @user.is_banned? %>
+        <%= link_to "Banned", users_path(search: { is_banned: true }), class: "user-tooltip-badge user-tooltip-badge-banned" %>
+      <% elsif @user.is_admin? %>
+        <%= link_to @user.level_string, users_path(search: { level: @user.level }), class: "user-tooltip-badge user-tooltip-badge-#{@user.level_string.downcase}" %>
+      <% elsif @user.is_moderator? %>
+        <%= link_to @user.level_string, users_path(search: { level: @user.level }), class: "user-tooltip-badge user-tooltip-badge-#{@user.level_string.downcase}" %>
+      <% elsif @user.can_approve_posts? %>
+        <%= link_to "Approver", users_path(search: { can_approve_posts: true }), class: "user-tooltip-badge user-tooltip-badge-approver" %>
+      <% elsif @user.can_upload_free? %>
+        <%= link_to "Contributor", users_path(search: { can_upload_free: true }), class: "user-tooltip-badge user-tooltip-badge-contributor" %>
+      <% else %>
+        <%= link_to @user.level_string, users_path(search: { level: @user.level }), class: "user-tooltip-badge user-tooltip-badge-#{@user.level_string.downcase}" %>
+      <% end %>
+
+      <% if @user.positive_feedback_count > 0 %>
+        <%= link_to user_feedbacks_path(search: { user_id: @user.id }), class: "link-plain user-tooltip-badge user-tooltip-badge-positive-feedback" do %>
+          <i class="fas fa-medal"></i>
+          <span><%= @user.positive_feedback_count %>
+        <% end %>
+      <% elsif @user.negative_feedback_count > 0 %>
+        <%= link_to user_feedbacks_path(search: { user_id: @user.id }), class: "link-plain user-tooltip-badge user-tooltip-badge-negative-feedback" do %>
+          <i class="fas fa-times-circle"></i>
+          <span><%= @user.negative_feedback_count %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div class="user-tooltip-header-bottom">
+      <%= time_tag @user.created_at.to_date.iso8601, @user.created_at, class: "user-tooltip-created-at" %>
+      <% if @user.last_ip_addr.present? && policy(IpAddress).show? %>
+        · <%= link_to_ip @user.last_ip_addr, shorten: true, class: "link-plain" %>
+      <% end %>
+
+      <% @user.user_name_change_requests.visible(CurrentUser.user).count.tap do |name_change_count| %>
+        <% if name_change_count > 0 %>
+          · <%= link_to pluralize(name_change_count, "other name"), user_name_change_requests_path(search: { user_id: @user.id }), class: "link-plain" %>
+        <% end %>
+      <% end %>
+    </div>
+
+    <a class="user-tooltip-menu-button" href="javascript:void(0)">
+      <i class="fas fa-ellipsis-h"></i>
+    </a>
+
+    <ul class="user-tooltip-menu">
+      <li>
+        <%= link_to new_dmail_path(dmail: { to_id: @user.id }) do %>
+          <i class="icon far fa-envelope"></i>
+          Send Message
+        <% end %>
+      </li>
+
+      <% if !@user.is_platinum? %>
+        <li>
+          <%= link_to new_user_upgrade_path(user_id: @user.id) do %>
+            <i class="icon fas fa-gift"></i>
+            Gift Upgrade
+          <% end %>
+        </li>
+      <% end %>
+
+      <% if policy(UserFeedback.new(user: @user)).create? %>
+        <li>
+          <%= link_to new_user_feedback_path(user_feedback: { user_id: @user.id }) do %>
+            <i class="icon fas fa-file-signature"></i>
+            Give Feedback
+          <% end %>
+        </li>
+      <% end %>
+
+      <% if policy(CurrentUser.user).promote? %>
+        <li>
+          <%= link_to edit_admin_user_path(@user.id) do %>
+            <i class="icon fas fa-user-plus"></i>
+            Promote User
+          <% end %>
+        </li>
+      <% end %>
+
+      <% if policy(Ban.new(user: @user)).create? %>
+        <li>
+          <%= link_to new_ban_path(ban: { user_id: @user.id }) do %>
+            <i class="icon fas fa-user-slash"></i>
+            Ban User
+          <% end %>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+
+  <ul class="user-tooltip-stats">
+    <li class="user-tooltip-stat-item">
+      <%= link_to posts_path(tags: "user:#{@user.name}"), class: "link-plain" do %>
+        <div class="user-tooltip-stat-value"><%= humanized_number(@user.post_upload_count) %></div>
+        <div class="user-tooltip-stat-name">Uploads</div>
+      <% end %>
+    </li>
+    <li class="user-tooltip-stat-item">
+      <%= link_to post_versions_path(search: { updater_id: @user.id }), class: "link-plain" do %>
+        <div class="user-tooltip-stat-value"><%= humanized_number(@user.post_update_count) %></div>
+        <div class="user-tooltip-stat-name">Tag Edits</div>
+      <% end %>
+    </li>
+    <li class="user-tooltip-stat-item">
+      <%= link_to note_versions_path(search: { updater_id: @user.id }), class: "link-plain" do %>
+        <div class="user-tooltip-stat-value"><%= humanized_number(@user.note_update_count) %></div>
+        <div class="user-tooltip-stat-name">Note Edits</div>
+      <% end %>
+    </li>
+    <li class="user-tooltip-stat-item">
+      <%= link_to posts_path(tags: "ordfav:#{@user.name}"), class: "link-plain" do %>
+        <div class="user-tooltip-stat-value"><%= humanized_number(@user.favorite_count) %></div>
+        <div class="user-tooltip-stat-name">Favorites</div>
+      <% end %>
+    </li>
+    <li class="user-tooltip-stat-item">
+      <%= link_to comments_path(search: { creator_id: @user.id }), class: "link-plain" do %>
+        <div class="user-tooltip-stat-value"><%= humanized_number(@user.comment_count) %></div>
+        <div class="user-tooltip-stat-name">Comments</div>
+      <% end %>
+    </li>
+    <li class="user-tooltip-stat-item">
+      <%= link_to forum_posts_path(search: { creator_id: @user.id }), class: "link-plain" do %>
+        <div class="user-tooltip-stat-value"><%= humanized_number(@user.forum_post_count) %></div>
+        <div class="user-tooltip-stat-name">Forum Posts</div>
+      <% end %>
+    </li>
+  </ul>
+</div>

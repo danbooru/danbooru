@@ -1,8 +1,9 @@
+# some of these settings are overriden in also test/.rubocop.yml
+
 require:
   - rubocop-rails
 
 AllCops:
-  TargetRubyVersion: 2.7.0
   NewCops: enable
   Exclude:
     - "bin/*"
@@ -41,14 +42,22 @@ Layout/SpaceInsideHashLiteralBraces:
 Metrics/AbcSize:
   Enabled: false
 
+Metrics/BlockLength:
+  Max: 50
+  ExcludedMethods:
+    - concerning
+    - context
+    - should
+
 Metrics/BlockNesting:
+  CountBlocks: false
   Max: 4
 
 Metrics/ClassLength:
   Max: 500
 
 Metrics/CyclomaticComplexity:
-  Max: 10
+  Enabled: false
 
 Metrics/MethodLength:
   Max: 100
@@ -60,7 +69,7 @@ Metrics/ParameterLists:
   Max: 4
 
 Metrics/PerceivedComplexity:
-  Enabled: false
+  Max: 20
 
 Lint/InheritException:
   EnforcedStyle: standard_error
@@ -110,7 +119,9 @@ Style/NumericPredicate:
 Style/PercentLiteralDelimiters:
   PreferredDelimiters:
     "default": "[]"
-    "%r": "!!"
+
+Style/ParallelAssignment:
+  Enabled: false
 
 Style/PerlBackrefs:
   Enabled: false

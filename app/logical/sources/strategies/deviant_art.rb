@@ -47,18 +47,18 @@
 module Sources
   module Strategies
     class DeviantArt < Base
-      ASSET_SUBDOMAINS = %r{(?:fc|th|pre|img|orig|origin-orig)\d*}i
+      ASSET_SUBDOMAINS = /(?:fc|th|pre|img|orig|origin-orig)\d*/i
       RESERVED_SUBDOMAINS = %r{\Ahttps?://(?:#{ASSET_SUBDOMAINS}|www)\.}i
       MAIN_DOMAIN = %r{\Ahttps?://(?:www\.)?deviantart.com}i
 
-      TITLE = %r{(?<title>[a-z0-9_-]+?)}i
-      ARTIST = %r{(?<artist>[a-z0-9_-]+?)}i
-      DEVIATION_ID = %r{(?<deviation_id>[0-9]+)}i
+      TITLE = /(?<title>[a-z0-9_-]+?)/i
+      ARTIST = /(?<artist>[a-z0-9_-]+?)/i
+      DEVIATION_ID = /(?<deviation_id>[0-9]+)/i
 
-      DA_FILENAME_1 = %r{[a-f0-9]{32}-d(?<base36_deviation_id>[a-z0-9]+)\.}i
-      DA_FILENAME_2 = %r{#{TITLE}(?:_by_#{ARTIST}(?:-d(?<base36_deviation_id>[a-z0-9]+))?)?\.}i
+      DA_FILENAME_1 = /[a-f0-9]{32}-d(?<base36_deviation_id>[a-z0-9]+)\./i
+      DA_FILENAME_2 = /#{TITLE}(?:_by_#{ARTIST}(?:-d(?<base36_deviation_id>[a-z0-9]+))?)?\./i
       DA_FILENAME = Regexp.union(DA_FILENAME_1, DA_FILENAME_2)
-      WIX_FILENAME  = %r{d(?<base36_deviation_id>[a-z0-9]+)[0-9a-f-]+\.\w+(?:/\w+/\w+/[\w,]+/(?<title>[\w-]+)_by_(?<artist>[\w-]+)_d\w+-\w+\.\w+)?.+}i
+      WIX_FILENAME = %r{d(?<base36_deviation_id>[a-z0-9]+)[0-9a-f-]+\.\w+(?:/\w+/\w+/[\w,]+/(?<title>[\w-]+)_by_(?<artist>[\w-]+)_d\w+-\w+\.\w+)?.+}i
 
       NOT_NORMALIZABLE_ASSET = %r{\Ahttps?://#{ASSET_SUBDOMAINS}\.deviantart\.net/.+/[0-9a-f]{32}(?:-[^d]\w+)?\.}i
 
@@ -75,7 +75,7 @@ module Sources
       PATH_PROFILE = %r{#{MAIN_DOMAIN}/#{ARTIST}/?\z}i
       SUBDOMAIN_PROFILE = %r{\Ahttps?://#{ARTIST}\.deviantart\.com/?\z}i
 
-      FAVME = %r{\Ahttps?://(www\.)?fav\.me/d(?<base36_deviation_id>[a-z0-9]+)\z}i
+      FAVME = %r{\Ahttps?://(?:www\.)?fav\.me/d(?<base36_deviation_id>[a-z0-9]+)\z}i
 
       def domains
         ["deviantart.net", "deviantart.com", "fav.me"]
@@ -110,12 +110,12 @@ module Sources
           api_deviation[:videos].max_by { |x| x[:filesize] }[:src]
         else
           src = api_deviation.dig(:content, :src)
-          if deviation_id && deviation_id.to_i <= 790677560 && src =~ /^https:\/\/images-wixmp-/ && src !~ /\.gif\?/
-            src = src.sub(%r!(/f/[a-f0-9-]+/[a-f0-9-]+)!, '/intermediary\1')
-            src = src.sub(%r!/v1/(fit|fill)/.*\z!i, "")
+          if deviation_id && deviation_id.to_i <= 790_677_560 && src =~ %r{\Ahttps://images-wixmp-} && src !~ /\.gif\?/
+            src = src.sub(%r{(/f/[a-f0-9-]+/[a-f0-9-]+)}, '/intermediary\1')
+            src = src.sub(%r{/v1/(fit|fill)/.*\z}i, "")
           end
-          src = src.sub(%r!\Ahttps?://orig\d+\.deviantart\.net!i, "http://origin-orig.deviantart.net")
-          src = src.gsub(%r!q_\d+,strp!, "q_100")
+          src = src.sub(%r{\Ahttps?://orig\d+\.deviantart\.net}i, "http://origin-orig.deviantart.net")
+          src = src.gsub(/q_\d+,strp/, "q_100")
           src
         end
       end
@@ -191,7 +191,7 @@ module Sources
 
             # <a href="https://sa-dui.deviantart.com/journal/About-Commissions-223178193" data-sigil="thumb" class="thumb lit" ...>
             if element["class"].split.include?("lit")
-              deviation_id = element["href"][%r!-(\d+)\z!, 1].to_i
+              deviation_id = element["href"][/-(\d+)\z/, 1].to_i
               element.content = "deviantart ##{deviation_id}"
             else
               element.content = ""
@@ -199,7 +199,7 @@ module Sources
           end
 
           if element.name == "a" && element["href"].present?
-            element["href"] = element["href"].gsub(%r!\Ahttps?://www\.deviantart\.com/users/outgoing\?!i, "")
+            element["href"] = element["href"].gsub(%r{\Ahttps?://www\.deviantart\.com/users/outgoing\?}i, "")
 
             # href may be missing the `http://` bit (ex: `inprnt.com`, `//inprnt.com`). Add it if missing.
             uri = Addressable::URI.heuristic_parse(element["href"]) rescue nil
@@ -283,7 +283,7 @@ module Sources
         return nil if meta.nil?
 
         appurl = meta["content"]
-        uuid = appurl[%r!\ADeviantArt://deviation/(.*)\z!, 1]
+        uuid = appurl[%r{\ADeviantArt://deviation/(.*)\z}, 1]
         uuid
       end
       memoize :uuid

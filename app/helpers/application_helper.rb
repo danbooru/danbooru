@@ -121,6 +121,10 @@ module ApplicationHelper
     raw content_tag(:time, duration, datetime: datetime, title: title)
   end
 
+  def humanized_number(number)
+    number_to_human number, units: { thousand: "k", million: "m" }, format: "%n%u"
+  end
+
   def time_ago_in_words_tagged(time, compact: false)
     if time.nil?
       tag.em(tag.time("unknown"))
@@ -162,8 +166,10 @@ module ApplicationHelper
     end
   end
 
-  def link_to_ip(ip)
-    link_to ip, ip_addresses_path(search: { ip_addr: ip, group_by: "user" })
+  def link_to_ip(ip, shorten: false, **options)
+    ip_addr = IPAddr.new(ip.to_s)
+    ip_addr.prefix = 64 if ip_addr.ipv6? && shorten
+    link_to ip_addr.to_s, ip_addresses_path(search: { ip_addr: ip, group_by: "user" }), **options
   end
 
   def link_to_search(search)
@@ -186,12 +192,13 @@ module ApplicationHelper
   def link_to_user(user)
     return "anonymous" if user.blank?
 
-    user_class = "user-#{user.level_string.downcase}"
+    user_class = "user user-#{user.level_string.downcase}"
     user_class += " user-post-approver" if user.can_approve_posts?
     user_class += " user-post-uploader" if user.can_upload_free?
     user_class += " user-banned" if user.is_banned?
-    user_class += " with-style" if CurrentUser.user.style_usernames?
-    link_to(user.pretty_name, user_path(user), :class => user_class)
+
+    data = { "user-id": user.id, "user-name": user.name, "user-level": user.level }
+    link_to(user.pretty_name, user_path(user), class: user_class, data: data)
   end
 
   def mod_link_to_user(user, positive_or_negative)
@@ -217,21 +224,8 @@ module ApplicationHelper
     tag.div(text, class: "prose", **options)
   end
 
-  def dtext_field(object, name, options = {})
-    options[:name] ||= name.capitalize
-    options[:input_id] ||= "#{object}_#{name}"
-    options[:input_name] ||= "#{object}[#{name}]"
-    options[:value] ||= instance_variable_get("@#{object}").try(name)
-    options[:preview_id] ||= "dtext-preview"
-    options[:classes] ||= ""
-    options[:hint] ||= ""
-    options[:type] ||= "text"
-
-    render "dtext/form", options
-  end
-
-  def dtext_preview_button(object, name, input_id: "#{object}_#{name}", preview_id: "dtext-preview")
-    tag.input value: "Preview", type: "button", class: "dtext-preview-button", "data-input-id": input_id, "data-preview-id": preview_id
+  def dtext_preview_button(preview_field)
+    tag.input value: "Preview", type: "button", class: "dtext-preview-button", "data-preview-field": preview_field
   end
 
   def quick_search_form_for(attribute, url, name, autocomplete: nil, redirect: false, &block)
@@ -266,7 +260,7 @@ module ApplicationHelper
   def body_attributes(user, params, current_item = nil)
     current_user_data_attributes = data_attributes_for(user, "current-user", current_user_attributes)
 
-    if current_item.present? && current_item.respond_to?(:html_data_attributes) && current_item.respond_to?(:model_name)
+    if !current_item.nil? && current_item.respond_to?(:html_data_attributes) && current_item.respond_to?(:model_name)
       model_name = current_item.model_name.singular.dasherize
       model_attributes = current_item.html_data_attributes
       current_item_data_attributes = data_attributes_for(current_item, model_name, model_attributes)
@@ -350,6 +344,19 @@ module ApplicationHelper
       content_for(:meta_description) { description }
     elsif content_for(:meta_description).present?
       content_for(:meta_description)
+    end
+  end
+
+  def canonical_url(url = nil)
+    if url.present?
+      content_for(:canonical_url) { url }
+    elsif content_for(:canonical_url).present?
+      content_for(:canonical_url)
+    else
+      request_params = request.params.sort.to_h.with_indifferent_access
+      request_params.delete(:page) if request_params[:page].to_i == 1
+      request_params.delete(:limit)
+      url_for(**request_params, host: Danbooru.config.hostname, only_path: false)
     end
   end
 

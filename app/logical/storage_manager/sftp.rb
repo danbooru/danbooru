@@ -21,7 +21,7 @@ class StorageManager::SFTP < StorageManager
     temp_upload_path = dest_path + "-" + SecureRandom.uuid + ".tmp"
     dest_backup_path = dest_path + "-" + SecureRandom.uuid + ".bak"
 
-    each_host do |host, sftp|
+    each_host do |_host, sftp|
       sftp.upload!(file.path, temp_upload_path)
       sftp.setstat!(temp_upload_path, permissions: DEFAULT_PERMISSIONS)
 
@@ -40,7 +40,7 @@ class StorageManager::SFTP < StorageManager
   end
 
   def delete(dest_path)
-    each_host do |host, sftp|
+    each_host do |_host, sftp|
       force { sftp.remove!(dest_path) }
     end
   end

@@ -1,23 +1,25 @@
-a.user-admin.with-style {
-  color: var(--user-admin-color);
-}
+body[data-current-user-style-usernames="true"] {
+  a.user-admin {
+    color: var(--user-admin-color);
+  }
 
-a.user-moderator.with-style {
-  color: var(--user-moderator-color);
-}
+  a.user-moderator {
+    color: var(--user-moderator-color);
+  }
 
-a.user-builder.with-style {
-  color: var(--user-builder-color);
-}
+  a.user-builder {
+    color: var(--user-builder-color);
+  }
 
-a.user-platinum.with-style {
-  color: var(--user-platinum-color);
-}
+  a.user-platinum {
+    color: var(--user-platinum-color);
+  }
 
-a.user-gold.with-style {
-  color: var(--user-gold-color);
-}
+  a.user-gold {
+    color: var(--user-gold-color);
+  }
 
-a.user-member.with-style {
-  color: var(--user-member-color);
+  a.user-member {
+    color: var(--user-member-color);
+  }
 }

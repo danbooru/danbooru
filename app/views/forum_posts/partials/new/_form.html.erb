@@ -6,8 +6,8 @@
   <% else %>
     <%= f.input :topic_id, :label => "Topic ID" %>
   <% end %>
-  <%= dtext_field "forum_post", "body", :classes => "autocomplete-mentions" %>
+  <%= f.input :body, as: :dtext %>
 
   <%= f.button :submit, "Submit" %>
-  <%= dtext_preview_button "forum_post", "body" %>
+  <%= dtext_preview_button "forum_post_body" %>
 <% end %>

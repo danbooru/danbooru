@@ -14,7 +14,7 @@ module Sources
       assert_equal(page_url, site.page_url) if page_url.present?
       assert_equal(tags.sort, site.tags.map(&:first).sort)
       assert_equal(profile_url.to_s, site.profile_url.to_s)
-      assert_equal(size, site.size)
+      assert_equal(size, site.remote_size)
       assert_nothing_raised { site.to_h }
     end
 
@@ -103,7 +103,7 @@ module Sources
             girls_frontline hara_shoutarou hoodie long_hair pantyhose scar skirt
             twintails ump-45_(girls_frontline) ump-9_(girls_frontline)
           ]
-          @profile_url = "https://www.pixiv.net/member.php?id=22528152"
+          @profile_url = "https://www.pixiv.net/users/22528152"
 
           @data = { site_name: "konachan.com", preview_url: @prev, image_url: @full, page_url: @page, size: @size, tags: @tags, profile_url: @profile_url }
           assert_source_data_equals(@samp, **@data)

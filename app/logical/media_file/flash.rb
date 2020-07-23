@@ -42,7 +42,7 @@ class MediaFile::Flash < MediaFile
     signature = contents[0..2]
 
     # SWF version
-    version = contents[3].unpack('C').join.to_i
+    _version = contents[3].unpack('C').join.to_i
 
     # Determine the length of the uncompressed stream
     length = contents[4..7].unpack('V').join.to_i
@@ -50,7 +50,7 @@ class MediaFile::Flash < MediaFile
     # If we do, in fact, have compression
     if signature == 'CWS'
       # Decompress the body of the SWF
-      body = Zlib::Inflate.inflate( contents[8..length] )
+      body = Zlib::Inflate.inflate(contents[8..length])
 
       # And reconstruct the stream contents to the first 8 bytes (header)
       # Plus our decompressed body
@@ -58,10 +58,10 @@ class MediaFile::Flash < MediaFile
     end
 
     # Determine the nbits of our dimensions rectangle
-    nbits = contents.unpack('C'*contents.length)[8] >> 3
+    nbits = contents.unpack('C' * contents.length)[8] >> 3
 
     # Determine how many bits long this entire RECT structure is
-    rectbits = 5 + nbits * 4    # 5 bits for nbits, as well as nbits * number of fields (4)
+    rectbits = 5 + nbits * 4 # 5 bits for nbits, as well as nbits * number of fields (4)
 
     # Determine how many bytes rectbits composes (ceil(rectbits/8))
     rectbytes = (rectbits.to_f / 8).ceil
@@ -70,11 +70,11 @@ class MediaFile::Flash < MediaFile
     rect = contents[8..(8 + rectbytes)].unpack("#{'B8' * rectbytes}").join
 
     # Read in nbits incremenets starting from 5
-    dimensions = Array.new
+    dimensions = []
     4.times do |n|
       s = 5 + (n * nbits)     # Calculate our start index
       e = s + (nbits - 1)     # Calculate our end index
-      dimensions[n] = rect[s..e].to_i(2)    # Read that range (binary) and convert it to an integer
+      dimensions[n] = rect[s..e].to_i(2) # Read that range (binary) and convert it to an integer
     end
 
     # The values we have here are in "twips"

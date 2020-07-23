@@ -3,7 +3,7 @@
 
 <div id="c-explore-posts">
   <div id="a-searches">
-    <h1>Popular Searches - <%= @search_service.date %></h1>
+    <h1>Popular Searches - <%= @date %></h1>
 
     <table class="striped" width="100%">
       <thead>
@@ -13,7 +13,7 @@
         </tr>
       </thead>
       <tbody>
-        <% @search_service.each_search do |tags, count| %>
+        <% @searches.each do |tags, count| %>
           <tr class="tag-type-<%= Tag.category_for(tags) %>">
             <td><%= link_to tags, posts_path(:tags => tags) %></td>
             <td style="text-align: right;"><%= count.to_i %></td>

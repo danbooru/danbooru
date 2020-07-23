@@ -57,7 +57,7 @@ class APNGInspector
         # if we did, file is probably maliciously formed
         # fail gracefully without marking the file as corrupt
         chunks += 1
-        if chunks > 100000
+        if chunks > 100_000
           iend_reached = true
           break
         end
@@ -66,7 +66,8 @@ class APNGInspector
         file.seek(current_pos + chunk_len + 4, IO::SEEK_SET)
       end
     end
-    return iend_reached
+
+    iend_reached
   end
 
   def inspect!
@@ -105,6 +106,7 @@ class APNGInspector
     if framedata.nil? || framedata.length != 4
       return -1
     end
-    return framedata.unpack1("N".freeze)
+
+    framedata.unpack1("N".freeze)
   end
 end

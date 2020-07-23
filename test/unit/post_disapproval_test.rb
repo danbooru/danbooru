@@ -67,33 +67,6 @@ class PostDisapprovalTest < ActiveSupport::TestCase
         end
       end
 
-      context "when sending dmails" do
-        setup do
-          @uploaders = FactoryBot.create_list(:user, 2, created_at: 2.weeks.ago)
-          @disapprovers = FactoryBot.create_list(:mod_user, 2)
-
-          # 2 uploaders, with 2 uploads each, and 2 disapprovals on each upload.
-          @uploaders.each do |uploader|
-            FactoryBot.create_list(:post, 2, is_pending: true, uploader: uploader).each do |post|
-              FactoryBot.create(:post_disapproval, post: post, user: @disapprovers[0])
-              FactoryBot.create(:post_disapproval, post: post, user: @disapprovers[1])
-            end
-          end
-        end
-
-        should "dmail the uploaders" do
-          bot = FactoryBot.create(:user)
-          User.stubs(:system).returns(bot)
-
-          assert_difference(["@uploaders[0].dmails.count", "@uploaders[1].dmails.count"], 1) do
-            PostDisapproval.dmail_messages!
-          end
-
-          assert(@uploaders[0].dmails.exists?(from: bot, to: @uploaders[0]))
-          assert(@uploaders[1].dmails.exists?(from: bot, to: @uploaders[1]))
-        end
-      end
-
       context "#search" do
         should "work" do
           disapproval1 = FactoryBot.create(:post_disapproval, user: @alice, post: @post_1, reason: "breaks_rules")

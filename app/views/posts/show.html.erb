@@ -1,7 +1,8 @@
 <% page_title @post.presenter.humanized_essential_tag_string %>
 <% meta_description "View this #{@post.image_width}x#{@post.image_height} #{number_to_human_size(@post.file_size)} image" %>
-
+<% canonical_url post_url(@post, host: Danbooru.config.hostname) %>
 <% atom_feed_tag "Comments for post ##{@post.id}", comments_url(:atom, search: { post_id: @post.id }) %>
+
 <%= render "posts/partials/common/secondary_links" %>
 
 <% content_for(:sidebar) do %>
@@ -61,25 +62,17 @@
   <% end %>
 
   <section id="mark-as-translated-section" style="display: none;">
-    <%= form_tag(mark_as_translated_post_path(@post), :class => "simple_form", :method => :put) do |f| %>
-      <%= hidden_field_tag :tags_query, params[:q] %>
-      <%= hidden_field_tag :pool_id, params[:pool_id] %>
+    <%= edit_form_for(@post, url: mark_as_translated_post_path(@post), method: :put) do |f| %>
+      <%= f.input :tags_query, as: :hidden, input_html: { id: nil, name: "tags_query", value: params[:q] } %>
+      <%= f.input :pool_id, as: :hidden, input_html: { id: nil, name: "pool_id", value: params[:pool_id] } %>
+      <%= f.input :favgroup_id, as: :hidden, input_html: { id: nil, name: "favgroup_id", value: params[:favgroup_id] } %>
 
-      <fieldset>
-        <label for="post_check_translation">
-          <%= check_box "post", "check_translation", :checked => @post.has_tag?("check_translation") %>
-          Check translation
-        </label>
-
-        <label for="post_partially_translated">
-          <%= check_box "post", "partially_translated", :checked => @post.has_tag?("partially_translated") %>
-          Partially translated
-        </label>
+      <fieldset class="inline-fieldset">
+        <%= f.input :check_translation, as: :boolean, input_html: { checked: @post.has_tag?("check_translation") } %>
+        <%= f.input :partially_translated, as: :boolean, input_html: { checked: @post.has_tag?("partially_translated") } %>
       </fieldset>
 
-      <div class="input">
-        <%= submit_tag "Mark as translated" %>
-      </div>
+      <%= f.submit "Mark as translated" %>
     <% end %>
   </section>
 
@@ -154,9 +147,11 @@
 
   <% if policy(@post).visible? %>
     <%= tag.meta property: "og:image", content: @post.open_graph_image_url %>
-  <% end %>
 
-  <%= tag.meta name: "canonical", content: post_url(@post, host: Danbooru.config.hostname, protocol: "https") %>
+    <% if @post.is_video? %>
+      <%= json_ld_video_data(@post) %>
+    <% end %>
+  <% end %>
 
   <% if @post.twitter_card_supported? %>
     <meta name="twitter:card" content="summary_large_image">

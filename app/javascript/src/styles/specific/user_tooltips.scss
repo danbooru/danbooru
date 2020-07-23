@@ -1,0 +1,103 @@
+.tippy-box[data-theme~="user-tooltip"] {
+  line-height: 1.25em;
+  min-width: 350px;
+
+  .user-tooltip-header {
+    margin-bottom: 1em;
+    display: grid;
+    grid:
+      "avatar header-top menu"
+      "avatar header-bottom menu" /
+      32px 1fr 32px;
+    column-gap: 0.25em;
+
+    .user-tooltip-avatar {
+      font-size: 32px;
+      grid-area: avatar;
+      align-self: center;
+    }
+
+    .user-tooltip-header-top {
+      grid-area: header-top;
+
+      .user-tooltip-badge {
+        color: var(--inverse-text-color);
+        font-size: 0.70em;
+        padding: 2px 4px;
+        margin-right: 0.25em;
+        border-radius: 3px;
+
+        &.user-tooltip-badge-admin { background-color: var(--user-admin-color); }
+        &.user-tooltip-badge-moderator { background-color: var(--user-moderator-color); }
+        &.user-tooltip-badge-approver { background-color: var(--user-builder-color); }
+        &.user-tooltip-badge-contributor { background-color: var(--user-builder-color); }
+        &.user-tooltip-badge-builder { background-color: var(--user-builder-color); }
+        &.user-tooltip-badge-platinum { background-color: var(--user-platinum-color); }
+        &.user-tooltip-badge-gold { background-color: var(--user-gold-color); }
+        &.user-tooltip-badge-member { background-color: var(--user-member-color); }
+        &.user-tooltip-badge-banned { background-color: var(--user-banned-color); }
+
+        &.user-tooltip-badge-positive-feedback {
+          color: var(--user-tooltip-positive-feedback-color);
+          border: 1px solid;
+        }
+
+        &.user-tooltip-badge-negative-feedback {
+          color: var(--user-tooltip-negative-feedback-color);
+          border: 1px solid;
+        }
+      }
+    }
+
+    .user-tooltip-header-bottom {
+      grid-area: header-bottom;
+      color: var(--muted-text-color);
+      font-size: 0.75em;
+    }
+
+    a.user-tooltip-menu-button {
+      color: var(--muted-text-color);
+      grid-area: menu;
+      align-self: center;
+      text-align: center;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      border-radius: 50%;
+
+      &:hover {
+        background-color: var(--subnav-menu-background-color);
+      }
+    }
+
+    > ul.user-tooltip-menu {
+      display: none;
+    }
+
+    ul.user-tooltip-menu {
+      .icon {
+        width: 1.5em;
+      }
+    }
+  }
+
+  .user-tooltip-stats {
+    display: grid;
+    grid: auto / repeat(3, 1fr);
+    column-gap: 1em;
+    row-gap: 0.5em;
+
+    .user-tooltip-stat-item {
+      text-align: center;
+
+      .user-tooltip-stat-value {
+        font-weight: bold;
+      }
+
+      .user-tooltip-stat-name {
+        font-size: 0.90em;
+        color: var(--muted-text-color);
+      }
+    }
+  }
+}

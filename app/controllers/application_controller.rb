@@ -88,6 +88,8 @@ class ApplicationController < ActionController::Base
 
   def rescue_exception(exception)
     case exception
+    when ActionView::Template::Error
+      rescue_exception(exception.cause)
     when ActiveRecord::QueryCanceled
       render_error_page(500, exception, template: "static/search_timeout", message: "The database timed out running your query.")
     when ActionController::BadRequest

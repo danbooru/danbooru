@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory(:tag) do
     name {"#{FFaker::Name.first_name.downcase}#{rand(1000)}"}
-    post_count {0}
+    post_count { 100 }
     category {Tag.categories.general}
 
     factory(:artist_tag) do

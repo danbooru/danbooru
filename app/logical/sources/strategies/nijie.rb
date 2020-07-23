@@ -44,25 +44,25 @@
 module Sources
   module Strategies
     class Nijie < Base
-      BASE_URL = %r!\Ahttps?://(?:[^.]+\.)?nijie\.info!i
-      PAGE_URL = %r!#{BASE_URL}/view(?:_popup)?\.php\?id=(?<illust_id>\d+)!i
-      PROFILE_URL = %r!#{BASE_URL}/members(?:_illust)?\.php\?id=(?<artist_id>\d+)\z!i
+      BASE_URL = %r{\Ahttps?://(?:[^.]+\.)?nijie\.info}i
+      PAGE_URL = %r{#{BASE_URL}/view(?:_popup)?\.php\?id=(?<illust_id>\d+)}i
+      PROFILE_URL = %r{#{BASE_URL}/members(?:_illust)?\.php\?id=(?<artist_id>\d+)\z}i
 
       # https://pic03.nijie.info/nijie_picture/28310_20131101215959.jpg
       # https://pic03.nijie.info/nijie_picture/236014_20170620101426_0.png
       # http://pic.nijie.net/03/nijie_picture/829001_20190620004513_0.mp4
       # https://pic05.nijie.info/nijie_picture/diff/main/559053_20180604023346_1.png
-      FILENAME1 = %r!(?<artist_id>\d+)_(?<timestamp>\d{14})(?:_\d+)?!i
+      FILENAME1 = /(?<artist_id>\d+)_(?<timestamp>\d{14})(?:_\d+)?/i
 
       # https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png
-      FILENAME2 = %r!(?<illust_id>\d+)_\d+_(?<artist_id>\d+)_(?<timestamp>\d{14})!i
+      FILENAME2 = /(?<illust_id>\d+)_\d+_(?<artist_id>\d+)_(?<timestamp>\d{14})/i
 
       # https://pic04.nijie.info/nijie_picture/diff/main/287736_161475_20181112032855_1.png
-      FILENAME3 = %r!(?<illust_id>\d+)_(?<artist_id>\d+)_(?<timestamp>\d{14})_\d+!i
+      FILENAME3 = /(?<illust_id>\d+)_(?<artist_id>\d+)_(?<timestamp>\d{14})_\d+/i
 
-      IMAGE_BASE_URL = %r!\Ahttps?://(?:pic\d+\.nijie\.info|pic\.nijie\.net)!i
-      DIR = %r!(?:\d+/)?(?:__rs_\w+/)?nijie_picture(?:/diff/main)?!
-      IMAGE_URL = %r!#{IMAGE_BASE_URL}/#{DIR}/#{Regexp.union(FILENAME1, FILENAME2, FILENAME3)}\.\w+\z!i
+      IMAGE_BASE_URL = %r{\Ahttps?://(?:pic\d+\.nijie\.info|pic\.nijie\.net)}i
+      DIR = %r{(?:\d+/)?(?:__rs_\w+/)?nijie_picture(?:/diff/main)?}
+      IMAGE_URL = %r{#{IMAGE_BASE_URL}/#{DIR}/#{Regexp.union(FILENAME1, FILENAME2, FILENAME3)}\.\w+\z}i
 
       def domains
         ["nijie.info", "nijie.net"]
@@ -146,7 +146,7 @@ module Sources
       end
 
       def to_full_image_url(x)
-        x.gsub(%r!__rs_\w+/!i, "").gsub(/\Ahttp:/, "https:")
+        x.gsub(%r{__rs_\w+/}i, "").gsub(/\Ahttp:/, "https:")
       end
 
       def to_preview_url(url)
@@ -178,57 +178,21 @@ module Sources
       def page
         return nil if page_url.blank?
 
-        doc = agent.get(page_url)
+        http = Danbooru::Http.new
+        form = { email: Danbooru.config.nijie_login, password: Danbooru.config.nijie_password }
 
-        if doc.search("div#header-login-container").any?
-          # Session cache is invalid, clear it and log in normally.
-          Cache.delete("nijie-session")
-          doc = agent.get(page_url)
-        end
+        # XXX `retriable` must come after `cache` so that retries don't return cached error responses.
+        response = http.cache(1.hour).use(retriable: { max_retries: 20 }).post("https://nijie.info/login_int.php", form: form)
+        DanbooruLogger.info "Nijie login failed (#{url}, #{response.status})" if response.status != 200
+        return nil unless response.status == 200
 
-        return doc
-      rescue Mechanize::ResponseCodeError => e
-        return nil if e.response_code.to_i == 404
-        raise
+        response = http.cookies(R18: 1).cache(1.minute).get(page_url)
+        return nil unless response.status == 200
+
+        response&.parse
       end
+
       memoize :page
-
-      def agent
-        mech = Mechanize.new
-
-        session = Cache.get("nijie-session")
-        if session
-          cookie = Mechanize::Cookie.new("NIJIEIJIEID", session)
-          cookie.domain = ".nijie.info"
-          cookie.path = "/"
-          mech.cookie_jar.add(cookie)
-        else
-          mech.get("https://nijie.info/login.php") do |page|
-            page.form_with(:action => "/login_int.php") do |form|
-              form['email'] = Danbooru.config.nijie_login
-              form['password'] = Danbooru.config.nijie_password
-            end.click_button
-          end
-          session = mech.cookie_jar.cookies.select {|c| c.name == "NIJIEIJIEID"}.first
-          Cache.put("nijie-session", session.value, 1.day) if session
-        end
-
-        # This cookie needs to be set to allow viewing of adult works while anonymous
-        cookie = Mechanize::Cookie.new("R18", "1")
-        cookie.domain = ".nijie.info"
-        cookie.path = "/"
-        mech.cookie_jar.add(cookie)
-
-        mech
-      rescue Mechanize::ResponseCodeError => x
-        if x.response_code.to_i == 429
-          sleep(5)
-          retry
-        else
-          raise
-        end
-      end
-      memoize :agent
     end
   end
 end

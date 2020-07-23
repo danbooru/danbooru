@@ -1,7 +1,7 @@
 module Sources
   module Strategies
     def self.all
-      return [
+      [
         Strategies::Pixiv,
         Strategies::NicoSeiga,
         Strategies::Twitter,
@@ -13,7 +13,8 @@ module Sources
         Strategies::Pawoo,
         Strategies::Moebooru,
         Strategies::HentaiFoundry,
-        Strategies::Weibo
+        Strategies::Weibo,
+        Strategies::Newgrounds
       ]
     end
 

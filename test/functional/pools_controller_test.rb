@@ -23,6 +23,13 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
         get pools_path, params: {:search => {:name_matches => @pool.name}}
         assert_response :success
       end
+
+      should "render for a sitemap" do
+        get pools_path(format: :sitemap)
+        assert_response :success
+        assert_equal(Pool.count, response.parsed_body.css("urlset url loc").size)
+      end
+
     end
 
     context "show action" do

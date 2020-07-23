@@ -1,20 +1,20 @@
 module Sources::Strategies
   class Twitter < Base
-    PAGE = %r!\Ahttps?://(?:mobile\.)?twitter\.com!i
-    PROFILE = %r!\Ahttps?://(?:mobile\.)?twitter.com/(?<username>[a-z0-9_]+)!i
+    PAGE = %r{\Ahttps?://(?:mobile\.)?twitter\.com}i
+    PROFILE = %r{\Ahttps?://(?:mobile\.)?twitter.com/(?<username>[a-z0-9_]+)}i
 
     # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb.jpg
     # https://pbs.twimg.com/media/EBGbJe_U8AA4Ekb?format=jpg&name=900x900
     # https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg
     # https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg
     # https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg
-    BASE_IMAGE_URL = %r!\Ahttps?://pbs\.twimg\.com/(?<media_type>media|tweet_video_thumb|ext_tw_video_thumb|amplify_video_thumb)!i
-    FILENAME1 = %r!(?<file_name>[a-zA-Z0-9_-]+)\.(?<file_ext>\w+)!i
-    FILENAME2 = %r!(?<file_name>[a-zA-Z0-9_-]+)\?.*format=(?<file_ext>\w+)!i
-    FILEPATH1 = %r!(?<file_path>\d+/[\w_-]+/img)!i
-    FILEPATH2 = %r!(?<file_path>\d+/img)!i
-    IMAGE_URL1 = %r!#{BASE_IMAGE_URL}/#{Regexp.union(FILENAME1, FILENAME2)}!i
-    IMAGE_URL2 = %r!#{BASE_IMAGE_URL}/#{Regexp.union(FILEPATH1, FILEPATH2)}/#{FILENAME1}!i
+    BASE_IMAGE_URL = %r{\Ahttps?://pbs\.twimg\.com/(?<media_type>media|tweet_video_thumb|ext_tw_video_thumb|amplify_video_thumb)}i
+    FILENAME1 = /(?<file_name>[a-zA-Z0-9_-]+)\.(?<file_ext>\w+)/i
+    FILENAME2 = /(?<file_name>[a-zA-Z0-9_-]+)\?.*format=(?<file_ext>\w+)/i
+    FILEPATH1 = %r{(?<file_path>\d+/[\w_-]+/img)}i
+    FILEPATH2 = %r{(?<file_path>\d+/img)}i
+    IMAGE_URL1 = %r{#{BASE_IMAGE_URL}/#{Regexp.union(FILENAME1, FILENAME2)}}i
+    IMAGE_URL2 = %r{#{BASE_IMAGE_URL}/#{Regexp.union(FILEPATH1, FILEPATH2)}/#{FILENAME1}}i
 
     # Twitter provides a list but it's inaccurate; some names ('intent') aren't
     # included and other names in the list aren't actually reserved.
@@ -47,7 +47,7 @@ module Sources::Strategies
         return $1
       end
 
-      return nil
+      nil
     end
 
     def self.artist_name_from_url(url)
@@ -78,7 +78,7 @@ module Sources::Strategies
           elsif media[:type].in?(["video", "animated_gif"])
             variants = media.dig(:video_info, :variants)
             videos = variants.select { |variant| variant[:content_type] == "video/mp4" }
-            video = videos.max_by { |video| video[:bitrate].to_i }
+            video = videos.max_by { |v| v[:bitrate].to_i }
             video[:url]
           end
         end
@@ -137,10 +137,6 @@ module Sources::Strategies
       api_response[:full_text].to_s
     end
 
-    def normalizable_for_artist_finder?
-      url =~ PAGE
-    end
-
     def normalize_for_artist_finder
       profile_url.try(:downcase).presence || url
     end
@@ -193,9 +189,9 @@ module Sources::Strategies
 
       desc = artist_commentary_desc.unicode_normalize(:nfkc)
       desc = CGI.unescapeHTML(desc)
-      desc = desc.gsub(%r!https?://t\.co/[a-zA-Z0-9]+!i, url_replacements)
-      desc = desc.gsub(%r!#([^[:space:]]+)!, '"#\\1":[https://twitter.com/hashtag/\\1]')
-      desc = desc.gsub(%r!@([a-zA-Z0-9_]+)!, '"@\\1":[https://twitter.com/\\1]')
+      desc = desc.gsub(%r{https?://t\.co/[a-zA-Z0-9]+}i, url_replacements)
+      desc = desc.gsub(/#([^[:space:]]+)/, '"#\\1":[https://twitter.com/hashtag/\\1]')
+      desc = desc.gsub(/@([a-zA-Z0-9_]+)/, '"@\\1":[https://twitter.com/\\1]')
       desc.strip
     end
 
@@ -204,7 +200,7 @@ module Sources::Strategies
     end
 
     def api_response
-      return {} if !self.class.enabled?
+      return {} unless self.class.enabled? && status_id.present?
       api_client.status(status_id)
     end
 

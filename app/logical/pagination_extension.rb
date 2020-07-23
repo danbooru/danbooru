@@ -3,9 +3,9 @@ module PaginationExtension
 
   attr_accessor :current_page, :records_per_page, :paginator_count, :paginator_mode
 
-  def paginate(page, limit: nil, count: nil, search_count: nil)
+  def paginate(page, limit: nil, max_limit: 1000, count: nil, search_count: nil)
     @records_per_page = limit || Danbooru.config.posts_per_page
-    @records_per_page = @records_per_page.to_i.clamp(1, 1000)
+    @records_per_page = @records_per_page.to_i.clamp(1, max_limit)
 
     if count.present?
       @paginator_count = count
@@ -61,27 +61,35 @@ module PaginationExtension
   end
 
   def prev_page
-    return nil if is_first_page?
-
-    if paginator_mode == :numbered
+    if is_first_page?
+      nil
+    elsif paginator_mode == :numbered
       current_page - 1
-    elsif paginator_mode == :sequential_before
+    elsif paginator_mode == :sequential_before && records.present?
       "a#{records.first.id}"
-    elsif paginator_mode == :sequential_after
+    elsif paginator_mode == :sequential_after && records.present?
       "b#{records.last.id}"
+    else
+      nil
     end
+  rescue ActiveRecord::QueryCanceled
+    nil
   end
 
   def next_page
-    return nil if is_last_page?
-
-    if paginator_mode == :numbered
+    if is_last_page?
+      nil
+    elsif paginator_mode == :numbered
       current_page + 1
-    elsif paginator_mode == :sequential_before
+    elsif paginator_mode == :sequential_before && records.present?
       "b#{records.last.id}"
-    elsif paginator_mode == :sequential_after
+    elsif paginator_mode == :sequential_after && records.present?
       "a#{records.first.id}"
+    else
+      nil
     end
+  rescue ActiveRecord::QueryCanceled
+    nil
   end
 
   # XXX Hack: in sequential pagination we fetch one more record than we
@@ -106,10 +114,7 @@ module PaginationExtension
   def total_count
     @paginator_count ||= unscoped.from(except(:offset, :limit, :order).reorder(nil)).count
   rescue ActiveRecord::StatementInvalid => e
-    if e.to_s =~ /statement timeout/
-      @paginator_count ||= 1_000_000
-    else
-      raise
-    end
+    raise unless e.to_s =~ /statement timeout/
+    @paginator_count ||= 1_000_000
   end
 end

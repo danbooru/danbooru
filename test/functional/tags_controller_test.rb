@@ -20,18 +20,10 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      context "with search parameters" do
-        should "render" do
-          get tags_path, params: {:search => {:name_matches => "touhou"}}
-          assert_response :success
-        end
-
-        should "work for search[fuzzy_name_matches]" do
-          get tags_path, as: :json, params: { search: { fuzzy_name_matches: "touhuo", order: "similarity" }}
-
-          assert_response :success
-          assert_equal "touhou", response.parsed_body.first["name"]
-        end
+      should "render for a sitemap" do
+        get tags_path(format: :sitemap)
+        assert_response :success
+        assert_equal(Tag.count, response.parsed_body.css("urlset url loc").size)
       end
 
       context "with blank search parameters" do
@@ -39,6 +31,32 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
           get tags_path, params: { search: { name: "touhou", category: "" } }
           assert_redirected_to tags_path(search: { name: "touhou" })
         end
+      end
+
+      context "searching" do
+        setup do
+          as(@user) do
+            @miku = create(:tag, name: "hatsune_miku", category: Tag.categories.character)
+            @wokada = create(:tag, name: "wokada", category: Tag.categories.artist)
+            @vocaloid = create(:tag, name: "vocaloid", category: Tag.categories.copyright)
+            @empty = create(:tag, name: "empty", post_count: 0)
+
+            create(:tag_alias, antecedent_name: "miku", consequent_name: "hatsune_miku")
+            create(:wiki_page, title: "hatsune_miku")
+            create(:artist, name: "wokada")
+          end
+        end
+
+        should respond_to_search(name_matches: "hatsune_miku").with { @miku }
+        should respond_to_search(name_normalize: "HATSUNE_MIKU  ").with { @miku }
+        should respond_to_search(name_or_alias_matches: "miku").with { @miku }
+        should respond_to_search(fuzzy_name_matches: "miku_hatsune", order: "similarity").with { @miku }
+        should respond_to_search(name: "empty", hide_empty: "true").with { [] }
+        should respond_to_search(name: "empty", hide_empty: "false").with { [@empty] }
+        should respond_to_search(name: "wokada", has_artist: "true").with { @wokada }
+        should respond_to_search(name: "hatsune_miku", has_artist: "false").with { @miku }
+        should respond_to_search(name: "hatsune_miku", has_wiki: "true").with { @miku }
+        should respond_to_search(name: "vocaloid", has_wiki: "false").with { @vocaloid }
       end
     end
 

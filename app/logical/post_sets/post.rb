@@ -24,9 +24,8 @@ module PostSets
     end
 
     def wiki_page
-      return nil unless tag.present? && tag.wiki_page.present?
-      return nil unless !tag.wiki_page.is_deleted?
-      tag.wiki_page
+      return nil unless normalized_query.has_single_tag?
+      @wiki_page ||= WikiPage.undeleted.find_by(title: normalized_query.tags.first.name)
     end
 
     def tag
@@ -77,7 +76,11 @@ module PostSets
     end
 
     def per_page
-      (@per_page || query.find_metatag(:limit) || CurrentUser.user.per_page).to_i.clamp(0, MAX_PER_PAGE)
+      (@per_page || query.find_metatag(:limit) || CurrentUser.user.per_page).to_i.clamp(0, max_per_page)
+    end
+
+    def max_per_page
+      (format == "sitemap") ? 10_000 : MAX_PER_PAGE
     end
 
     def is_random?
@@ -94,7 +97,7 @@ module PostSets
     end
 
     def get_random_posts
-      per_page.times.inject([]) do |all, x|
+      per_page.times.inject([]) do |all, _|
         all << ::Post.user_tag_match(tag_string).random
       end.compact.uniq
     end
@@ -104,15 +107,15 @@ module PostSets
         @post_count = get_post_count
 
         if is_random?
-          temp = get_random_posts
+          get_random_posts
         else
-          temp = normalized_query.build.paginate(page, count: post_count, search_count: !post_count.nil?, limit: per_page)
+          normalized_query.build.paginate(page, count: post_count, search_count: !post_count.nil?, limit: per_page, max_limit: max_per_page).load
         end
       end
     end
 
     def hide_from_crawler?
-      return true if current_page > 1
+      return true if current_page > 50
       return false if query.is_empty_search? || query.is_simple_tag? || query.is_metatag?(:order, :rank)
       true
     end
@@ -160,20 +163,16 @@ module PostSets
         elsif query.is_metatag?(:search)
           saved_search_tags
         elsif query.is_empty_search? || query.is_metatag?(:order, :rank)
-          popular_tags
+          popular_tags.presence || frequent_tags
         elsif query.is_single_term?
-          similar_tags
+          similar_tags.presence || frequent_tags
         else
           frequent_tags
         end
       end
 
       def popular_tags
-        if PopularSearchService.enabled?
-          PopularSearchService.new(Date.today).tags
-        else
-          frequent_tags
-        end
+        ReportbooruService.new.popular_searches(Date.today, limit: MAX_SIDEBAR_TAGS)
       end
 
       def similar_tags

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <% @tags.each do |tag| %>
+    <url>
+      <loc><%= posts_url(tags: tag.name) %></loc>
+      <lastmod><%= tag.updated_at.iso8601 %></lastmod>
+    </url>
+  <% end %>
+</urlset>

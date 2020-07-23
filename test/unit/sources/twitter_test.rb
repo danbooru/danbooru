@@ -244,6 +244,14 @@ module Sources
       end
     end
 
+    context "A profile banner image" do
+      should "work" do
+        @site = Sources::Strategies.find("https://pbs.twimg.com/profile_banners/1225702850002468864/1588597370/1500x500")
+        assert_equal(@site.image_url, @site.url)
+        assert_nothing_raised { @site.to_h }
+      end
+    end
+
     context "A tweet containing non-normalized Unicode text" do
       should "be normalized to nfkc" do
         site = Sources::Strategies.find("https://twitter.com/aprilarcus/status/367557195186970624")

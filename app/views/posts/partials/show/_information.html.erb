@@ -1,14 +1,11 @@
 <ul>
   <li id="post-info-id">ID: <%= post.id %></li>
-  <% if policy(post).can_view_uploader? %>
-    <li id="post-info-uploader">
-      Uploader: <%= link_to_user(post.uploader) %>
-      <%= link_to "»", posts_path(tags: "user:#{post.uploader.name}") %>
-    </li>
-  <% end %>
+  <li id="post-info-uploader">
+    Uploader: <%= link_to_user(post.uploader) %>
+    <%= link_to "»", posts_path(tags: "user:#{post.uploader.name}") %>
+  </li>
   <li id="post-info-date">
     Date: <%= link_to time_ago_in_words_tagged(post.created_at), posts_path(tags: "date:#{post.created_at.to_date}") %>
-    <meta itemprop="uploadDate" content="<%= post.created_at.iso8601 %>">
   </li>
   <% if post.approver %>
     <li id="post-info-approver">
@@ -17,9 +14,9 @@
     </li>
   <% end %>
   <li id="post-info-size">
-    Size: <%= link_to_if policy(post).visible?, number_to_human_size(post.file_size), post.tagged_file_url %>
+    Size: <%= link_to_if policy(post).visible?, "#{number_to_human_size(post.file_size)} .#{post.file_ext}", post.tagged_file_url %>
     <% if post.has_dimensions? %>
-      (<span itemprop="width"><%= post.image_width %></span>x<span itemprop="height"><%= post.image_height %></span>)
+      (<%= post.image_width %>x<%= post.image_height %>)
     <% end %>
   </li>
   <li id="post-info-source">Source: <%= post_source_tag(post.source, post.normalized_source) %></li>

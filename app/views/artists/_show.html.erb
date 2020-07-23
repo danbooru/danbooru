@@ -8,12 +8,14 @@
     <% if @artist.is_banned? && !policy(@artist).can_view_banned? %>
       <p>The artist requested removal of this page.</p>
     <% else %>
-      <% if @artist.wiki_page.present? %>
-        <div class="prose">
-          <%= format_text(@artist.wiki_page.body, :disable_mentions => true) %>
-        </div>
+      <% if @artist.wiki_page.present? && !@artist.wiki_page.is_deleted? %>
+        <div class="artist-wiki">
+          <div class="prose">
+            <%= format_text(@artist.wiki_page.body, :disable_mentions => true) %>
+          </div>
 
-        <p><%= link_to "View wiki page", @artist.wiki_page %></p>
+          <p><%= link_to "View wiki page", @artist.wiki_page %></p>
+        </div>
       <% end %>
 
       <%= yield %>

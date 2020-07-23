@@ -131,12 +131,9 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
 
         should "download the file" do
-          begin
-            @service = UploadService::Preprocessor.new(source: @source, referer_url: @ref)
-            @upload = @service.start!
-          rescue Net::OpenTimeout
-            skip "network failure"
-          end
+          @service = UploadService::Preprocessor.new(source: @source, referer_url: @ref)
+          @upload = @service.start!
+
           assert_equal("preprocessed", @upload.status)
           assert_equal(294591, @upload.file_size)
           assert_equal("jpg", @upload.file_ext)
@@ -155,11 +152,8 @@ class UploadServiceTest < ActiveSupport::TestCase
           skip unless MediaFile::Ugoira.videos_enabled?
 
           @service = UploadService::Preprocessor.new(source: @source)
-          begin
-            @upload = @service.start!
-          rescue Net::OpenTimeout
-            skip "network problems"
-          end
+          @upload = @service.start!
+
           assert_equal("preprocessed", @upload.status)
           assert_equal(2804, @upload.file_size)
           assert_equal("zip", @upload.file_ext)
@@ -176,11 +170,8 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         should "download the file" do
           @service = UploadService::Preprocessor.new(source: @source)
-          begin
-            @upload = @service.start!
-          rescue Net::OpenTimeout
-            skip "network problems"
-          end
+          @upload = @service.start!
+
           assert_equal("preprocessed", @upload.status)
           assert_equal(181309, @upload.file_size)
           assert_equal("jpg", @upload.file_ext)
@@ -212,7 +203,7 @@ class UploadServiceTest < ActiveSupport::TestCase
       context "on timeout errors" do
         setup do
           @source = "https://cdn.donmai.us/original/93/f4/93f4dd66ef1eb11a89e56d31f9adc8d0.jpg"
-          HTTParty.stubs(:get).raises(Net::ReadTimeout)
+          Danbooru::Http.any_instance.stubs(:get).raises(HTTP::TimeoutError)
         end
 
         should "leave the upload in an error state" do
@@ -512,36 +503,28 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       context "a post with a pixiv html source" do
         should "replace with the full size image" do
-          begin
-            as(@user) do
-              @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
-            end
-
-            assert_equal(80, @post.image_width)
-            assert_equal(82, @post.image_height)
-            assert_equal(16275, @post.file_size)
-            assert_equal("png", @post.file_ext)
-            assert_equal("4ceadc314938bc27f3574053a3e1459a", @post.md5)
-            assert_equal("4ceadc314938bc27f3574053a3e1459a", Digest::MD5.file(@post.file).hexdigest)
-            assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.replacements.last.replacement_url)
-            assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.source)
-          rescue Net::OpenTimeout
-            skip "Remote connection to Pixiv failed"
+          as(@user) do
+            @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
           end
+
+          assert_equal(80, @post.image_width)
+          assert_equal(82, @post.image_height)
+          assert_equal(16275, @post.file_size)
+          assert_equal("png", @post.file_ext)
+          assert_equal("4ceadc314938bc27f3574053a3e1459a", @post.md5)
+          assert_equal("4ceadc314938bc27f3574053a3e1459a", Digest::MD5.file(@post.file).hexdigest)
+          assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.replacements.last.replacement_url)
+          assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.source)
         end
 
         should "delete the old files after thirty days" do
-          begin
-            @post.unstub(:queue_delete_files)
-            FileUtils.expects(:rm_f).times(3)
+          @post.unstub(:queue_delete_files)
+          FileUtils.expects(:rm_f).times(3)
 
-            as(@user) { @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350") }
+          as(@user) { @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350") }
 
-            travel_to((PostReplacement::DELETION_GRACE_PERIOD + 1).days.from_now) do
-              perform_enqueued_jobs
-            end
-          rescue Net::OpenTimeout
-            skip "Remote connection to Pixiv failed"
+          travel_to((PostReplacement::DELETION_GRACE_PERIOD + 1).days.from_now) do
+            perform_enqueued_jobs
           end
         end
       end
@@ -568,34 +551,30 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       context "a post that is replaced to another file then replaced back to the original file" do
         should "not delete the original files" do
-          begin
-            skip unless MediaFile::Ugoira.videos_enabled?
-            @post.unstub(:queue_delete_files)
+          skip unless MediaFile::Ugoira.videos_enabled?
+          @post.unstub(:queue_delete_files)
 
-            # this is called thrice to delete the file for 62247364
-            FileUtils.expects(:rm_f).times(3)
+          # this is called thrice to delete the file for 62247364
+          FileUtils.expects(:rm_f).times(3)
 
-            as(@user) do
-              @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
-              @post.reload
-              @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
-              @post.reload
-              Upload.destroy_all
-              @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
-            end
-
-            assert_nothing_raised { @post.file(:original) }
-            assert_nothing_raised { @post.file(:preview) }
-
-            assert_enqueued_jobs 3, only: DeletePostFilesJob
-            travel PostReplacement::DELETION_GRACE_PERIOD + 1.day
-            assert_raise(Post::DeletionError) { perform_enqueued_jobs }
-
-            assert_nothing_raised { @post.file(:original) }
-            assert_nothing_raised { @post.file(:preview) }
-          rescue Net::OpenTimeout
-            skip "Remote connection to Pixiv failed"
+          as(@user) do
+            @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+            @post.reload
+            @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+            @post.reload
+            Upload.destroy_all
+            @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
           end
+
+          assert_nothing_raised { @post.file(:original) }
+          assert_nothing_raised { @post.file(:preview) }
+
+          assert_enqueued_jobs 3, only: DeletePostFilesJob
+          travel PostReplacement::DELETION_GRACE_PERIOD + 1.day
+          assert_raise(Post::DeletionError) { perform_enqueued_jobs }
+
+          assert_nothing_raised { @post.file(:original) }
+          assert_nothing_raised { @post.file(:preview) }
         end
       end
 
@@ -609,39 +588,35 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         should "not delete the still active files" do
           # swap the images between @post1 and @post2.
-          begin
-            as(@user) do
-              skip unless MediaFile::Ugoira.videos_enabled?
+          as(@user) do
+            skip unless MediaFile::Ugoira.videos_enabled?
 
-              @post1.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
-              @post2.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
-              assert_equal("4ceadc314938bc27f3574053a3e1459a", @post1.md5)
-              assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post2.md5)
+            @post1.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+            @post2.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+            assert_equal("4ceadc314938bc27f3574053a3e1459a", @post1.md5)
+            assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post2.md5)
 
-              @post2.reload
-              @post2.replace!(replacement_url: "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg")
-              assert_equal("d34e4cf0a437a5d65f8e82b7bcd02606", @post2.md5)
-              Upload.destroy_all
-              @post1.reload
-              @post2.reload
+            @post2.reload
+            @post2.replace!(replacement_url: "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg")
+            assert_equal("d34e4cf0a437a5d65f8e82b7bcd02606", @post2.md5)
+            Upload.destroy_all
+            @post1.reload
+            @post2.reload
 
-              @post1.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
-              @post2.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
-              assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post1.md5)
-              assert_equal("4ceadc314938bc27f3574053a3e1459a", @post2.md5)
-            end
-
-            travel_to (PostReplacement::DELETION_GRACE_PERIOD + 1).days.from_now do
-              assert_raise(Post::DeletionError) do
-                perform_enqueued_jobs
-              end
-            end
-
-            assert_nothing_raised { @post1.file(:original) }
-            assert_nothing_raised { @post2.file(:original) }
-          rescue Net::OpenTimeout
-            skip "Remote connection to Pixiv failed"
+            @post1.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+            @post2.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
+            assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post1.md5)
+            assert_equal("4ceadc314938bc27f3574053a3e1459a", @post2.md5)
           end
+
+          travel_to (PostReplacement::DELETION_GRACE_PERIOD + 1).days.from_now do
+            assert_raise(Post::DeletionError) do
+              perform_enqueued_jobs
+            end
+          end
+
+          assert_nothing_raised { @post1.file(:original) }
+          assert_nothing_raised { @post2.file(:original) }
         end
       end
 
@@ -885,12 +860,8 @@ class UploadServiceTest < ActiveSupport::TestCase
       end
 
       should "record the canonical source" do
-        begin
-          post = subject.new({}).create_post_from_upload(@upload)
-          assert_equal(@source, post.source)
-        rescue Net::OpenTimeout
-          skip "network failure"
-        end
+        post = subject.new({}).create_post_from_upload(@upload)
+        assert_equal(@source, post.source)
       end
     end
 
@@ -976,8 +947,9 @@ class UploadServiceTest < ActiveSupport::TestCase
 
     should "delete stale upload records" do
       @upload = as(@user) { UploadService.new(file: upload_file("test/files/test.jpg")).start! }
+      @upload.update!(created_at: 1.month.ago)
 
-      assert_difference("Upload.count", -1) { Upload.prune!(0.seconds.ago) }
+      assert_difference("Upload.count", -1) { Upload.prune! }
     end
 
     should "delete unused files after deleting the upload" do

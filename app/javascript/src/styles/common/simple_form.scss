@@ -39,7 +39,7 @@ form.simple_form {
       padding-left: 1em;
     }
 
-    &.text {
+    &.text, &.dtext {
       .hint {
         padding-left: 0;
         display: block;

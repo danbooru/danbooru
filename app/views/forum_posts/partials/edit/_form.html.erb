@@ -1,8 +1,8 @@
 <%= error_messages_for("forum_post") %>
 
-<%= edit_form_for(forum_post) do |f| %>
-  <%= dtext_field "forum_post", "body", :value => forum_post.body, :classes => "autocomplete-mentions", :input_id => "forum_post_body_for_#{forum_post.id}", :preview_id => "dtext-preview-for-#{forum_post.id}" %>
+<%= edit_form_for(forum_post, namespace: "forum_post_#{forum_post.id}") do |f| %>
+  <%= f.input :body, as: :dtext %>
 
   <%= f.button :submit, "Submit" %>
-  <%= dtext_preview_button "forum_post", "body", :input_id => "forum_post_body_for_#{forum_post.id}", :preview_id => "dtext-preview-for-#{forum_post.id}" %>
+  <%= dtext_preview_button "forum_post_body" %>
 <% end %>

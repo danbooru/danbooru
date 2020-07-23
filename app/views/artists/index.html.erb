@@ -14,7 +14,7 @@
       <% end %>
       <% t.column "Other Names", td: {class: "col-expand"} do |artist| %>
         <% artist.other_names.each do |name| %>
-          <%= link_to name, artists_path(search: { any_name_matches: name }), class: "artist-other-name" %>
+          <%= link_to name, artists_path(search: { any_name_matches: name }), class: "artist-other-name", rel: "nofollow" %>
         <% end %>
       <% end %>
       <% t.column "Status" do |artist| %>
@@ -32,12 +32,6 @@
       <% t.column column: "control" do |artist| %>
         <% if policy(artist).update? %>
           <%= link_to "Edit", edit_artist_path(artist) %>
-
-          <% if artist.is_deleted? %>
-            | <%= link_to "Undelete", artist_path(artist, artist: { is_deleted: false }), method: :put, remote: true %>
-          <% else %>
-            | <%= link_to "Delete", artist_path(artist, artist: { is_deleted: true }), method: :put, remote: true %>
-          <% end %>
         <% end %>
       <% end %>
     <% end %>

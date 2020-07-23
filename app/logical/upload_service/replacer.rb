@@ -62,7 +62,7 @@ class UploadService
     end
 
     def source_strategy(upload)
-      return Sources::Strategies.find(upload.source, upload.referer_url)
+      Sources::Strategies.find(upload.source, upload.referer_url)
     end
 
     def find_replacement_url(repl, upload)
@@ -78,7 +78,7 @@ class UploadService
         return source_strategy(upload).canonical_url
       end
 
-      return upload.source
+      upload.source
     end
 
     def process!

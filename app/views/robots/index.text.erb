@@ -1,15 +1,20 @@
-Sitemap: <%= root_url %>sitemap.xml
-
 User-agent: *
 Disallow: /
+Allow: /$
 
-<% if Rails.env.production? && Danbooru.config.hostname == request.host %>
+<% if !Rails.env.production? || Danbooru.config.hostname == request.host %>
+Disallow: /*.atom
+Disallow: /*.json
+
 Allow: /artists
 Allow: /artist_commentaries
 Allow: /comments
 Allow: /explore
+Allow: /favorite_groups
 Allow: /forum_posts
 Allow: /forum_topics
+Allow: /iqdb_queries
+Allow: /login
 Allow: /notes
 Allow: /pools
 Allow: /posts
@@ -17,7 +22,40 @@ Allow: /sessions
 Allow: /static
 Allow: /tags
 Allow: /uploads
-Allow: /user_upgrades
+Allow: /user_upgrade
 Allow: /users
 Allow: /wiki_pages
+
+<%# Legacy redirects %>
+Allow: /artist
+Allow: /comment
+Allow: /forum
+Allow: /note
+Allow: /pool
+Allow: /post
+Allow: /tag
+Allow: /user
+Allow: /wiki
+
+<%# Images %>
+Allow: /crop
+Allow: /preview
+Allow: /original
+Allow: /sample
+Allow: /data
+Allow: /images
+Allow: /packs
+
+<%# Static %>
+Allow: /terms_of_service
+Allow: /privacy
+Allow: /sitemap.xml
+
+Sitemap: <%= sitemap_url(format: :xml, sitemap: "artists") %>
+Sitemap: <%= sitemap_url(format: :xml, sitemap: "forum_topics") %>
+Sitemap: <%= sitemap_url(format: :xml, sitemap: "pools") %>
+Sitemap: <%= sitemap_url(format: :xml, sitemap: "posts") %>
+Sitemap: <%= sitemap_url(format: :xml, sitemap: "tags") %>
+Sitemap: <%= sitemap_url(format: :xml, sitemap: "users") %>
+Sitemap: <%= sitemap_url(format: :xml, sitemap: "wiki_pages") %>
 <% end %>

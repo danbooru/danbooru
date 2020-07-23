@@ -1,6 +1,6 @@
 class UserPolicy < ApplicationPolicy
   def create?
-    !sockpuppet?
+    user.is_anonymous? && !sockpuppet?
   end
 
   def update?

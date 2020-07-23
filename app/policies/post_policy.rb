@@ -47,10 +47,6 @@ class PostPolicy < ApplicationPolicy
     record.visible?(user)
   end
 
-  def can_view_uploader?
-    user.is_approver?
-  end
-
   def can_lock_rating?
     user.is_builder?
   end
@@ -91,7 +87,7 @@ class PostPolicy < ApplicationPolicy
     attributes += [:has_large, :has_visible_children, :is_favorited?]
     attributes += TagCategory.categories.map {|x| "tag_string_#{x}".to_sym}
     attributes += [:file_url, :large_file_url, :preview_file_url] if visible?
-    attributes -= [:md5, :file_ext] if !visible?
+    attributes -= [:id, :md5, :file_ext] if !visible?
     attributes -= [:fav_string] if !user.is_moderator?
     attributes
   end

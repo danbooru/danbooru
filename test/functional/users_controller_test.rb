@@ -12,6 +12,12 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render for a sitemap" do
+        get users_path(format: :sitemap)
+        assert_response :success
+        assert_equal(User.count, response.parsed_body.css("urlset url loc").size)
+      end
+
       should "list all users for /users?name=<name>" do
         get users_path, params: { name: @user.name }
         assert_redirected_to(@user)
@@ -81,6 +87,34 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_equal(false, xml["user"]["enable_safe_mode"])
       end
+
+      context "for a tooltip" do
+        setup do
+          @banned = create(:banned_user)
+          @admin = create(:admin_user)
+          @member = create(:user)
+          @feedback = create(:user_feedback, user: @member, category: :positive)
+        end
+
+        should "render for a banned user" do
+          get_auth user_path(@banned, variant: "tooltip"), @user
+
+          assert_response :success
+        end
+
+        should "render for a member" do
+          get_auth user_path(@member, variant: "tooltip"), @user
+          assert_response :success
+
+          get_auth user_path(@member, variant: "tooltip"), @admin
+          assert_response :success
+        end
+
+        should "render for an admin" do
+          get_auth user_path(@admin, variant: "tooltip"), @user
+          assert_response :success
+        end
+      end
     end
 
     context "profile action" do
@@ -129,6 +163,11 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
         assert_nil(User.last.email_address)
         assert_no_enqueued_emails
+      end
+
+      should "not allow logged in users to create a new account" do
+        post_auth users_path, @user, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+        assert_response 403
       end
 
       should "create a user with a valid email" do

@@ -24,7 +24,7 @@
 
   <% if @bulk_update_request.new_record? %>
     <div class="input">
-      <%= dtext_field "bulk_update_request", "reason", :name => "Reason" %>
+      <%= f.input :reason, as: :dtext %>
     </div>
   <% end %>
 
@@ -44,5 +44,5 @@
   <% end %>
 
   <%= f.submit value: "Submit" %>
-  <%= dtext_preview_button "bulk_update_request", "reason" %>
+  <%= dtext_preview_button "bulk_update_request_reason" %>
 <% end %>

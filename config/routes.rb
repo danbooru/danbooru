@@ -69,6 +69,7 @@ Rails.application.routes.draw do
       get :search
     end
   end
+  resources :autocomplete, only: [:index]
   resources :bans
   resources :bulk_update_requests do
     member do
@@ -364,13 +365,24 @@ Rails.application.routes.draw do
   get "/wiki/recent_changes" => redirect {|params, req| "/wiki_page_versions?search[updater_id]=#{req.params[:user_id]}"}
   get "/wiki/history/:title" => redirect("/wiki_page_versions?title=%{title}")
 
-  get "/sitemap" => "static#sitemap"
+  get "/sitemap" => "static#sitemap_index"
+  get "/opensearch" => "static#opensearch", :as => "opensearch"
+  get "/privacy" => "static#privacy_policy", :as => "privacy_policy"
+  get "/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
   get "/static/keyboard_shortcuts" => "static#keyboard_shortcuts", :as => "keyboard_shortcuts"
   get "/static/bookmarklet" => "static#bookmarklet", :as => "bookmarklet"
   get "/static/site_map" => "static#site_map", :as => "site_map"
-  get "/static/terms_of_service" => "static#terms_of_service", :as => "terms_of_service"
   get "/static/contact" => "static#contact", :as => "contact"
   get "/static/dtext_help" => "static#dtext_help", :as => "dtext_help"
+  get "/static/terms_of_service" => redirect { "/terms_of_service" }
+
+  get "/mock/recommender/recommend/:user_id" => "mock_services#recommender_recommend", as: "mock_recommender_recommend"
+  get "/mock/recommender/similiar/:post_id" => "mock_services#recommender_similar", as: "mock_recommender_similar"
+  get "/mock/reportbooru/missed_searches" => "mock_services#reportbooru_missed_searches", as: "mock_reportbooru_missed_searches"
+  get "/mock/reportbooru/post_searches/rank" => "mock_services#reportbooru_post_searches", as: "mock_reportbooru_post_searches"
+  get "/mock/reportbooru/post_views/rank" => "mock_services#reportbooru_post_views", as: "mock_reportbooru_post_views"
+  get "/mock/iqdbs/similar" => "mock_services#iqdbs_similar", as: "mock_iqdbs_similar"
+  post "/mock/iqdbs/similar" => "mock_services#iqdbs_similar"
 
   root :to => "posts#index"
 

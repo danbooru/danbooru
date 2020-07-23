@@ -5,6 +5,9 @@
   <% if policy(Pool).create? %>
     <%= subnav_link_to "New", new_pool_path %>
   <% end %>
+  <% if PoolVersion.enabled? %>
+    <%= subnav_link_to "Recent changes", pool_versions_path %>
+  <% end %>
   <%= subnav_link_to "Help", wiki_page_path("help:pools") %>
   <% if @pool && !@pool.new_record? %>
     <li>|</li>
@@ -13,10 +16,12 @@
     <% if policy(@pool).update? %>
       <%= subnav_link_to "Edit", edit_pool_path(@pool), "data-shortcut": "e" %>
     <% end %>
-    <% if policy(@pool).undelete? %>
-      <%= subnav_link_to "Undelete", undelete_pool_path(@pool), :method => :post, :remote => true %>
-    <% elsif policy(@pool).destroy? %>
-      <%= subnav_link_to "Delete", pool_path(@pool), :method => :delete, :"data-shortcut" => "shift+d", :"data-confirm" => "Are you sure you want to delete this pool?", :remote => true %>
+    <% if current_page?(action: :edit) %>
+      <% if policy(@pool).undelete? %>
+        <%= subnav_link_to "Undelete", undelete_pool_path(@pool), :method => :post, :remote => true %>
+      <% elsif policy(@pool).destroy? %>
+        <%= subnav_link_to "Delete", pool_path(@pool), :method => :delete, :"data-shortcut" => "shift+d", :"data-confirm" => "Are you sure you want to delete this pool?", :remote => true %>
+      <% end %>
     <% end %>
     <% if PoolVersion.enabled? %>
       <%= subnav_link_to "History", pool_versions_path(:search => {:pool_id => @pool.id}) %>

@@ -8,10 +8,12 @@ class Artist < ApplicationRecord
 
   before_validation :normalize_name
   before_validation :normalize_other_names
-  after_save :create_version
-  after_save :clear_url_string_changed
   validate :validate_tag_category
   validates :name, tag_name: true, uniqueness: true
+  before_save :update_tag_category
+  after_save :create_version
+  after_save :clear_url_string_changed
+
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
   has_many :urls, :dependent => :destroy, :class_name => "ArtistUrl", :autosave => true
   has_many :versions, -> {order("artist_versions.id ASC")}, :class_name => "ArtistVersion"
@@ -151,12 +153,18 @@ class Artist < ApplicationRecord
 
   module TagMethods
     def validate_tag_category
-      return unless !is_deleted? && name_changed?
+      return unless !is_deleted? && name_changed? && tag.present?
 
-      if tag.category_name == "General"
-        tag.update(category: Tag.categories.artist)
-      elsif tag.category_name != "Artist"
+      if tag.category_name != "Artist" && !tag.empty?
         errors[:base] << "'#{name}' is a #{tag.category_name.downcase} tag; artist entries can only be created for artist tags"
+      end
+    end
+
+    def update_tag_category
+      return unless !is_deleted? && name_changed? && tag.present?
+
+      if tag.category_name != "Artist" && tag.empty?
+        tag.update!(category: Tag.categories.artist)
       end
     end
   end

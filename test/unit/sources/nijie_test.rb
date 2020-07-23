@@ -43,7 +43,7 @@ module Sources
 
       should "get the image url" do
         assert_equal("https://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
-        assert_http_size(132_555, @site.image_url)
+        assert_downloaded(132_555, @site.image_url)
       end
 
       should "get the canonical url" do
@@ -53,7 +53,7 @@ module Sources
       should "get the preview url" do
         assert_equal("https://pic.nijie.net/03/__rs_l170x170/nijie_picture/728995_20170505014820_0.jpg", @site.preview_url)
         assert_equal([@site.preview_url], @site.preview_urls)
-        assert_http_exists(@site.preview_url)
+        assert_downloaded(132_555, @site.preview_url)
       end
 
       should "get the profile" do
@@ -187,8 +187,6 @@ module Sources
         desc = <<-EOS.strip_heredoc.chomp
           foo [b]bold[/b] [i]italics[/i] [s]strike[/s] red
 
-
-
           <http://nijie.info/view.php?id=218944>
         EOS
 
@@ -207,8 +205,8 @@ module Sources
         assert_equal("https://nijie.info/members.php?id=236014", site.profile_url)
         assert_nothing_raised { site.to_h }
 
-        assert_http_size(3619, site.image_url)
-        assert_http_exists(site.preview_url)
+        assert_downloaded(3619, site.image_url)
+        assert_downloaded(3619, site.preview_url)
       end
     end
 

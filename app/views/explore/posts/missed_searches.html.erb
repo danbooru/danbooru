@@ -15,7 +15,7 @@
         </tr>
       </thead>
       <tbody>
-        <% @search_service.each_search do |tags, count| %>
+        <% @missed_searches.each do |tags, count| %>
           <tr class="tag-type-<%= Tag.category_for(tags) %>">
             <td><%= link_to tags, posts_path(:tags => tags) %></td>
             <td>

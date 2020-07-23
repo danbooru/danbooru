@@ -1,6 +1,5 @@
 $tooltip-line-height: 16px;
-$tooltip-body-height: $tooltip-line-height * 6; // 6 lines high.
-$tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
+$tooltip-body-height: $tooltip-line-height * 4; // 4 lines high.
 
 @mixin thin-scrollbar {
   &::-webkit-scrollbar {
@@ -46,16 +45,13 @@ $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
   }
 }
 
-.post-tooltip {
-  max-width: $tooltip-width;
-  min-width: $tooltip-width;
-  box-sizing: border-box;
+.tippy-box[data-theme~="post-tooltip"] {
+  min-width: 20em;
+  max-width: 40em !important;
   font-size: 11px;
   line-height: $tooltip-line-height;
-  border-color: var(--post-tooltip-border-color);
-  background-color: var(--post-tooltip-background-color);
 
-  .qtip-content {
+  .tippy-content {
     padding: 0;
 
     > * {
@@ -85,38 +81,32 @@ $tooltip-width: 164px * 3 - 10; // 3 thumbnails wide.
       .post-tooltip-body-right { flex: 1; }
     }
 
-    .post-tooltip-header {
+    div.post-tooltip-header {
       background-color: var(--post-tooltip-header-background-color);
       display: flex;
       white-space: nowrap;
-      overflow: hidden;
+      align-items: center;
 
-      .post-tooltip-header-left {
-        flex: 1;
+      .post-tooltip-info {
+        margin-right: 0.5em;
+        color: var(--post-tooltip-info-color);
+        font-size: 10px;
+        flex: 0;
       }
 
-      .post-tooltip-header-right {
+      a.user {
+        margin-right: 0.5em;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        min-width: 0;
+        max-width: 11em;
+      }
+
+      .post-tooltip-source {
         flex: 1;
         text-align: right;
       }
-
-      .fa-xs {
-        vertical-align: baseline;
-      }
-
-      .post-tooltip-disable {
-        margin-left: 0.5em;
-      }
     }
-
-    .post-tooltip-info {
-      margin-left: 0.5em;
-      color: var(--post-tooltip-info-color);
-      font-size: 10px;
-    }
-  }
-
-  &.post-tooltip-loading {
-    visibility: hidden;
   }
 }

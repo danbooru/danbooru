@@ -23,12 +23,12 @@
     <% end %>
 
     <% if @wiki_page.new_record? %>
-      <p>This wiki page does not exist. <%= link_to "Create new wiki page", new_wiki_page_path(wiki_page: { title: @wiki_page.title }) %>.</p>
+      <p>This wiki page does not exist. <%= link_to "Create new wiki page", new_wiki_page_path(wiki_page: { title: @wiki_page.title }), rel: "nofollow" %>.</p>
     <% else %>
       <%= format_text(@wiki_page.body) %>
     <% end %>
 
-    <% if @wiki_page.artist %>
+    <% if @wiki_page.artist.present? && !@wiki_page.artist.is_deleted? %>
       <p><%= link_to "View artist", @wiki_page.artist %></p>
     <% end %>
 

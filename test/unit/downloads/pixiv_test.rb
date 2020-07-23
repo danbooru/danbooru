@@ -122,32 +122,17 @@ module Downloads
           assert_downloaded(@file_size, @file_url, @ref)
         end
       end
-
-      context "downloading a pixiv fanbox image" do
-        should_eventually "work" do
-          @source = "https://www.pixiv.net/fanbox/creator/12491073/post/82406"
-          @file_url = "https://fanbox.pixiv.net/images/post/82406/D833IKA7FIesJXL8xx39rrG0.jpeg"
-          @file_size = 873_387
-
-          assert_not_rewritten(@file_url, @source)
-          assert_downloaded(@file_size, @file_url, @source)
-        end
-      end
     end
 
     context "An ugoira site for pixiv" do
-      setup do
-        @download = Downloads::File.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
-        @tempfile, strategy = @download.download!
-        @tempfile.close!
-      end
-
       should "capture the data" do
-        assert_equal(2, @download.data[:ugoira_frame_data].size)
-        if @download.data[:ugoira_frame_data][0]["file"]
+        @strategy = Sources::Strategies.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+
+        assert_equal(2, @strategy.data[:ugoira_frame_data].size)
+        if @strategy.data[:ugoira_frame_data][0]["file"]
           assert_equal([{"file" => "000000.jpg", "delay" => 125}, {"file" => "000001.jpg", "delay" => 125}], @download.data[:ugoira_frame_data])
         else
-          assert_equal([{"delay_msec" => 125}, {"delay_msec" => 125}], @download.data[:ugoira_frame_data])
+          assert_equal([{"delay_msec" => 125}, {"delay_msec" => 125}], @strategy.data[:ugoira_frame_data])
         end
       end
     end

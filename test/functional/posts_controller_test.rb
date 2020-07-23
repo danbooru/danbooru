@@ -1,18 +1,76 @@
 require "test_helper"
 
 class PostsControllerTest < ActionDispatch::IntegrationTest
+  def assert_canonical_url_equals(expected)
+    assert_equal(expected, response.parsed_body.css("link[rel=canonical]").attribute("href").value)
+  end
+
   context "The posts controller" do
     setup do
-      PopularSearchService.stubs(:enabled?).returns(false)
-
       @user = travel_to(1.month.ago) {create(:user)}
       @post = as(@user) { create(:post, tag_string: "aaaa") }
     end
 
     context "index action" do
-      should "render" do
-        get posts_path
-        assert_response :success
+      setup do
+        mock_post_search_rankings(Date.today, [["1girl", 100], ["original", 50]])
+        create_list(:post, 2)
+      end
+
+      context "when using sequential pagination" do
+        should "work with page=a0" do
+          get posts_path(page: "a0")
+          assert_response :success
+          assert_select ".post-preview", count: 3
+          assert_select "#paginator-prev", count: 0
+          assert_select "#paginator-next", count: 1
+        end
+
+        should "work with page=b0" do
+          get posts_path(page: "b0")
+          assert_response :success
+          assert_select ".post-preview", count: 0
+          assert_select "#paginator-prev", count: 0
+          assert_select "#paginator-next", count: 0
+        end
+
+        should "work with page=b100000" do
+          get posts_path(page: "b100000")
+          assert_response :success
+          assert_select ".post-preview", count: 3
+          assert_select "#paginator-prev", count: 1
+          assert_select "#paginator-next", count: 0
+        end
+
+        should "work with page=a100000" do
+          get posts_path(page: "a100000")
+          assert_response :success
+          assert_select ".post-preview", count: 0
+          assert_select "#paginator-prev", count: 0
+          assert_select "#paginator-next", count: 0
+        end
+      end
+
+      context "for an empty search" do
+        should "render the first page" do
+          get root_path
+          assert_response :success
+          assert_canonical_url_equals(root_url(host: Danbooru.config.hostname))
+
+          get posts_path
+          assert_response :success
+          assert_canonical_url_equals(root_url(host: Danbooru.config.hostname))
+
+          get posts_path(page: 1)
+          assert_response :success
+          assert_canonical_url_equals(root_url(host: Danbooru.config.hostname))
+        end
+
+        should "render the second page" do
+          get posts_path(page: 2, limit: 1)
+          assert_response :success
+          assert_canonical_url_equals(posts_url(page: 2, host: Danbooru.config.hostname))
+        end
       end
 
       context "with a single tag search" do
@@ -20,6 +78,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { tags: "does_not_exist" }
           assert_response :success
           assert_select "#show-excerpt-link", count: 0
+          assert_canonical_url_equals(posts_url(tags: "does_not_exist", host: Danbooru.config.hostname))
         end
 
         should "render for an artist tag" do
@@ -32,6 +91,8 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { tags: "bkub" }
           assert_response :success
           assert_select "#show-excerpt-link", count: 1, text: "Artist"
+          assert_select "#view-wiki-link", count: 0
+          assert_select "#view-artist-link", count: 1
 
           artist.update(is_banned: true)
           get posts_path, params: { tags: "bkub" }
@@ -47,6 +108,8 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { tags: "bkub" }
           assert_response :success
           assert_select "#show-excerpt-link", count: 1, text: "Wiki"
+          assert_select "#view-wiki-link", count: 1
+          assert_select "#view-artist-link", count: 0
         end
 
         should "render for a tag with a wiki page" do
@@ -88,6 +151,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           create(:saved_search, user: @user)
           get posts_path(tags: "search:all")
           assert_response :success
+        end
+
+        should "show the wiki excerpt for a wiki page without a tag" do
+          as(@user) { create(:wiki_page, title: "no_tag") }
+          get posts_path(tags: "no_tag")
+          assert_select "#show-excerpt-link", count: 1
+          assert_select "#excerpt", count: 1
         end
 
         should "show a notice for a single tag search with a pending BUR" do
@@ -248,7 +318,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path(format: :atom)
 
           assert_response :success
-          assert_select "entry", 1
+          assert_select "entry", 3
         end
 
         should "render with tags" do
@@ -259,11 +329,19 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "hide restricted posts" do
-          @post.update(is_banned: true)
+          Post.update_all(is_banned: true)
           get posts_path(format: :atom)
 
           assert_response :success
           assert_select "entry", 0
+        end
+      end
+
+      context "with the .sitemap format" do
+        should "render" do
+          get posts_path(format: :sitemap)
+          assert_response :success
+          assert_equal(Post.count, response.parsed_body.css("urlset url loc").size)
         end
       end
 
@@ -304,10 +382,50 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "with banned paid_reward posts" do
+        setup do
+          as(@user) { @post.update!(tag_string: "paid_reward", is_banned: true) }
+        end
+
+        should "show banned paid_rewards to approvers" do
+          get_auth posts_path, create(:approver)
+          assert_response :success
+          assert_select "#post_#{@post.id}", 1
+        end
+
+        should "not show banned paid_rewards to non-approvers" do
+          get_auth posts_path, create(:gold_user)
+          assert_response :success
+          assert_select "#post_#{@post.id}", 0
+        end
+      end
+
       context "in safe mode" do
         should "not include the rating:s tag in the page title" do
           get posts_path(tags: "1girl", safe_mode: true)
           assert_select "title", text: "1girl Art | Safebooru"
+        end
+      end
+
+      context "for a search that times out" do
+        context "during numbered pagination" do
+          should "show the search timeout error page" do
+            Post::const_get(:ActiveRecord_Relation).any_instance.stubs(:records).raises(ActiveRecord::QueryCanceled)
+
+            get posts_path(page: "1")
+            assert_response 500
+            assert_select "h1", text: "Search Timeout"
+          end
+        end
+
+        context "during sequential pagination" do
+          should "show the search timeout error page" do
+            Post::const_get(:ActiveRecord_Relation).any_instance.stubs(:records).raises(ActiveRecord::QueryCanceled)
+
+            get posts_path(page: "a0")
+            assert_response 500
+            assert_select "h1", text: "Search Timeout"
+          end
         end
       end
     end

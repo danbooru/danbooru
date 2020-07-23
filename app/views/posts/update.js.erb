@@ -1,8 +1,5 @@
 <% if @post.valid? %>
   var $post = $("#post_<%= @post.id %>");
-  <% if !CurrentUser.disable_post_tooltips %>
-    $post.find("img").qtip("destroy", true);
-  <% end %>
   var $new_post = $("<%= j PostPresenter.preview(@post, show_deleted: true) %>");
   Danbooru.Blacklist.apply_post($new_post.get(0));
   $("#post_<%= @post.id %>").replaceWith($new_post);

@@ -1,5 +1,3 @@
-require 'resolv-replace'
-
 class PixivApiClient
   extend Memoist
 
@@ -114,66 +112,13 @@ class PixivApiClient
     end
   end
 
-  class FanboxResponse
-    attr_reader :json
-
-    def initialize(json)
-      @json = json
-    end
-
-    def name
-      json["body"]["user"]["name"]
-    end
-
-    def user_id
-      json["body"]["user"]["userId"]
-    end
-
-    def moniker
-      ""
-    end
-
-    def page_count
-      json["body"]["body"]["images"].size
-    end
-
-    def artist_commentary_title
-      json["body"]["title"]
-    end
-
-    def artist_commentary_desc
-      json["body"]["body"]["text"]
-    end
-
-    def tags
-      []
-    end
-
-    def pages
-      if json["body"]["body"]
-        json["body"]["body"]["images"].map {|x| x["originalUrl"]}
-      else
-        []
-      end
-    end
-  end
-
   def work(illust_id)
-    headers = Danbooru.config.http_headers.merge(
-      "Referer" => "http://www.pixiv.net",
-      "Content-Type" => "application/x-www-form-urlencoded",
-      "Authorization" => "Bearer #{access_token}"
-    )
-    params = {
-      "image_sizes" => "large",
-      "include_stats" => "true"
-    }
-
+    params = { image_sizes: "large", include_stats: "true" }
     url = "https://public-api.secure.pixiv.net/v#{API_VERSION}/works/#{illust_id.to_i}.json"
-    response = Danbooru::Http.cache(1.minute).headers(headers).get(url, params: params)
+    response = api_client.cache(1.minute).get(url, params: params)
     json = response.parse
 
-    if response.code == 200
+    if response.status == 200
       WorkResponse.new(json["response"][0])
     elsif json["status"] == "failure" && json.dig("errors", "system", "message") =~ /対象のイラストは見つかりませんでした。/
       raise BadIDError.new("Pixiv ##{illust_id} not found: work was deleted, made private, or ID is invalid.")
@@ -184,32 +129,12 @@ class PixivApiClient
     raise Error.new("Pixiv API call failed (status=#{response.code} body=#{response.body})")
   end
 
-  def fanbox(fanbox_id)
-    url = "https://www.pixiv.net/ajax/fanbox/post?postId=#{fanbox_id.to_i}"
-    resp = agent.get(url)
-    json = JSON.parse(resp.body)
-    if resp.code == "200"
-      FanboxResponse.new(json)
-    elsif json["status"] == "failure"
-      raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
-    end
-  rescue JSON::ParserError
-    raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
-  end
-
   def novel(novel_id)
-    headers = Danbooru.config.http_headers.merge(
-      "Referer" => "http://www.pixiv.net",
-      "Content-Type" => "application/x-www-form-urlencoded",
-      "Authorization" => "Bearer #{access_token}"
-    )
-
     url = "https://public-api.secure.pixiv.net/v#{API_VERSION}/novels/#{novel_id.to_i}.json"
-    resp = HTTParty.get(url, Danbooru.config.httparty_options.deep_merge(headers: headers))
-    body = resp.body.force_encoding("utf-8")
-    json = JSON.parse(body)
+    resp = api_client.cache(1.minute).get(url)
+    json = resp.parse
 
-    if resp.success?
+    if resp.status == 200
       NovelResponse.new(json["response"][0])
     elsif json["status"] == "failure" && json.dig("errors", "system", "message") =~ /対象のイラストは見つかりませんでした。/
       raise Error.new("Pixiv API call failed (status=#{resp.code} body=#{body})")
@@ -219,42 +144,41 @@ class PixivApiClient
   end
 
   def access_token
-    Cache.get("pixiv-papi-access-token", 3000) do
-      access_token = nil
+    # truncate timestamp to 1-hour resolution so that it doesn't break caching.
+    client_time = Time.zone.now.utc.change(min: 0).rfc3339
+    client_hash = Digest::MD5.hexdigest(client_time + CLIENT_HASH_SALT)
 
-      client_time = Time.now.rfc3339
-      client_hash = Digest::MD5.hexdigest(client_time + CLIENT_HASH_SALT)
+    headers = {
+      "Referer": "http://www.pixiv.net",
+      "X-Client-Time": client_time,
+      "X-Client-Hash": client_hash
+    }
 
-      headers = {
-        "Referer": "http://www.pixiv.net",
-        "X-Client-Time": client_time,
-        "X-Client-Hash": client_hash
-      }
-      params = {
-        username: Danbooru.config.pixiv_login,
-        password: Danbooru.config.pixiv_password,
-        grant_type: "password",
-        client_id: CLIENT_ID,
-        client_secret: CLIENT_SECRET
-      }
-      url = "https://oauth.secure.pixiv.net/auth/token"
+    params = {
+      username: Danbooru.config.pixiv_login,
+      password: Danbooru.config.pixiv_password,
+      grant_type: "password",
+      client_id: CLIENT_ID,
+      client_secret: CLIENT_SECRET
+    }
 
-      resp = HTTParty.post(url, Danbooru.config.httparty_options.deep_merge(body: params, headers: headers))
-      body = resp.body.force_encoding("utf-8")
+    resp = http.headers(headers).cache(1.hour).post("https://oauth.secure.pixiv.net/auth/token", form: params)
+    return nil unless resp.status == 200
 
-      if resp.success?
-        json = JSON.parse(body)
-        access_token = json["response"]["access_token"]
-      else
-        raise Error.new("Pixiv API access token call failed (status=#{resp.code} body=#{body})")
-      end
-
-      access_token
-    end
+    resp.parse.dig("response", "access_token")
   end
 
-  def agent
-    PixivWebAgent.build
+  def api_client
+    http.headers(
+      "Referer": "http://www.pixiv.net",
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Authorization": "Bearer #{access_token}"
+    )
   end
-  memoize :agent
+
+  def http
+    Danbooru::Http.new
+  end
+
+  memoize :access_token, :api_client, :http
 end

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <% 0.upto(@relation.maximum(:id) / @limit) do |page| %>
+    <% lo = page * @limit %>
+    <% hi = (page + 1) * @limit %>
+    <% lastmod = @relation.where(id: lo..hi).maximum(:updated_at)&.iso8601 %>
+    <% if @sitemap == "posts" %>
+      <% loc = posts_url(limit: @limit, format: :sitemap, tags: "id:#{lo}..#{hi}") %>
+    <% else %>
+      <% loc = polymorphic_url(@relation.klass, limit: @limit, format: :sitemap, search: { id: "#{lo}..#{hi}", **@search }) %>
+    <% end %>
+
+    <% if lastmod.present? %>
+      <sitemap>
+        <loc><%= loc %></loc>
+        <lastmod><%= lastmod %></lastmod>
+      </sitemap>
+    <% end %>
+  <% end %>
+</sitemapindex>

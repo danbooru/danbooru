@@ -23,11 +23,11 @@
 module Sources
   module Strategies
     class HentaiFoundry < Base
-      BASE_URL =    %r!\Ahttps?://(?:www\.)?hentai-foundry\.com!i
-      PAGE_URL =    %r!#{BASE_URL}/pictures/user/(?<artist_name>[\w-]+)/(?<illust_id>\d+)(?:/[\w.-]*)?(\?[\w=]*)?\z!i
-      OLD_PAGE =    %r!#{BASE_URL}/pic-(?<illust_id>\d+)(?:\.html)?\z!i
-      PROFILE_URL = %r!#{BASE_URL}/(?:pictures/)?user/(?<artist_name>[\w-]+)(?:/[a-z]*)?\z!i
-      IMAGE_URL =   %r!\Ahttps?://pictures\.hentai-foundry\.com/+\w/(?<artist_name>[\w-]+)/(?<illust_id>\d+)(?:(?:/[\w.-]+)?\.\w+)?\z!i
+      BASE_URL =    %r{\Ahttps?://(?:www\.)?hentai-foundry\.com}i
+      PAGE_URL =    %r{#{BASE_URL}/pictures/user/(?<artist_name>[\w-]+)/(?<illust_id>\d+)(?:/[\w.-]*)?(\?[\w=]*)?\z}i
+      OLD_PAGE =    %r{#{BASE_URL}/pic-(?<illust_id>\d+)(?:\.html)?\z}i
+      PROFILE_URL = %r{#{BASE_URL}/(?:pictures/)?user/(?<artist_name>[\w-]+)(?:/[a-z]*)?\z}i
+      IMAGE_URL =   %r{\Ahttps?://pictures\.hentai-foundry\.com/+\w/(?<artist_name>[\w-]+)/(?<illust_id>\d+)(?:(?:/[\w.-]+)?\.\w+)?\z}i
 
       def domains
         ["hentai-foundry.com"]
@@ -64,11 +64,10 @@ module Sources
       def page
         return nil if page_url.blank?
 
-        doc = Cache.get("hentai-foundry:#{page_url}", 1.minute) do
-          HTTParty.get("#{page_url}?enterAgree=1").body
-        end
+        response = Danbooru::Http.new.cache(1.minute).get("#{page_url}?enterAgree=1")
+        return nil unless response.status == 200
 
-        Nokogiri::HTML(doc)
+        response.parse
       end
 
       def tags

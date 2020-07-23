@@ -300,7 +300,7 @@ class Post < ApplicationRecord
     end
 
     def autoban
-      if has_tag?("banned_artist")
+      if has_tag?("banned_artist") || has_tag?("paid_reward")
         self.is_banned = true
       end
     end
@@ -499,7 +499,7 @@ class Post < ApplicationRecord
     end
 
     def add_automatic_tags(tags)
-      tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize flash webm mp4)
+      tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize flash)
 
       if has_dimensions?
         if image_width >= 10_000 || image_height >= 10_000
@@ -532,12 +532,8 @@ class Post < ApplicationRecord
         tags << "flash"
       end
 
-      if is_webm?
-        tags << "webm"
-      end
-
-      if is_mp4?
-        tags << "mp4"
+      if is_video?
+        tags << "video"
       end
 
       if is_ugoira?
@@ -625,10 +621,10 @@ class Post < ApplicationRecord
           add_pool!(pool) if pool
 
         when /^fav:(.+)$/i
-          add_favorite!(CurrentUser.user)
+          add_favorite(CurrentUser.user)
 
         when /^-fav:(.+)$/i
-          remove_favorite!(CurrentUser.user)
+          remove_favorite(CurrentUser.user)
 
         when /^(up|down)vote:(.+)$/i
           vote!($1)
@@ -790,6 +786,13 @@ class Post < ApplicationRecord
       Favorite.remove(post: self, user: user)
       unvote!(user) if Pundit.policy!([user, nil], PostVote).create?
     rescue PostVote::Error
+    end
+
+    def remove_favorite(user)
+      remove_favorite!(user)
+      true
+    rescue Favorite::Error
+      false
     end
 
     # users who favorited this post, ordered by users who favorited it first
@@ -1467,7 +1470,8 @@ class Post < ApplicationRecord
   end
 
   def banblocked?(user = CurrentUser.user)
-    is_banned? && !user.is_gold?
+    return false unless is_banned?
+    (has_tag?("paid_reward") && !user.is_approver?) || !user.is_gold?
   end
 
   def visible?(user = CurrentUser.user)

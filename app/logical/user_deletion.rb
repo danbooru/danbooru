@@ -2,6 +2,7 @@ class UserDeletion
   include ActiveModel::Validations
 
   attr_reader :user, :password
+
   validate :validate_deletion
 
   def initialize(user, password)

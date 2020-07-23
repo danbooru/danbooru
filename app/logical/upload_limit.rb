@@ -2,7 +2,7 @@ class UploadLimit
   extend Memoist
 
   INITIAL_POINTS = 1000
-  MAXIMUM_POINTS = 10000
+  MAXIMUM_POINTS = 10_000
 
   attr_reader :user
 
@@ -75,7 +75,7 @@ class UploadLimit
       points += upload_value(points, is_deleted)
       points = points.clamp(0, MAXIMUM_POINTS)
 
-      #warn "slots: %2d, points: %3d, value: %2d" % [UploadLimit.points_to_level(points) + 5, points, UploadLimit.upload_value(level, is_deleted)]
+      # warn "slots: %2d, points: %3d, value: %2d" % [UploadLimit.points_to_level(points) + 5, points, UploadLimit.upload_value(level, is_deleted)]
     end
 
     points

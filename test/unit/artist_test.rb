@@ -6,15 +6,11 @@ class ArtistTest < ActiveSupport::TestCase
 
     assert_equal(1, artists.size)
     assert_equal(expected_name, artists.first.name, "Testing URL: #{source_url}")
-  rescue Net::OpenTimeout, PixivApiClient::Error
-    skip "Remote connection failed for #{source_url}"
   end
 
   def assert_artist_not_found(source_url)
     artists = ArtistFinder.find_artists(source_url).to_a
     assert_equal(0, artists.size, "Testing URL: #{source_url}")
-  rescue Net::OpenTimeout
-    skip "Remote connection failed for #{source_url}"
   end
 
   context "An artist" do
@@ -66,8 +62,8 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "that has been banned" do
       setup do
-        @post = FactoryBot.create(:post, :tag_string => "aaa")
         @artist = FactoryBot.create(:artist, :name => "aaa")
+        @post = FactoryBot.create(:post, :tag_string => "aaa")
         @admin = FactoryBot.create(:admin_user)
         @artist.ban!(banner: @admin)
         @post.reload
@@ -132,7 +128,8 @@ class ArtistTest < ActiveSupport::TestCase
     should "not allow invalid urls" do
       artist = FactoryBot.build(:artist, :url_string => "blah")
       assert_equal(false, artist.valid?)
-      assert_equal(["'blah' must begin with http:// or https:// "], artist.errors["urls.url"])
+      assert_includes(artist.errors["urls.url"], "'blah' must begin with http:// or https:// ")
+      assert_includes(artist.errors["urls.url"], "'blah' has a hostname '' that does not contain a dot")
     end
 
     should "allow fixing invalid urls" do
@@ -172,15 +169,11 @@ class ArtistTest < ActiveSupport::TestCase
       a2 = FactoryBot.create(:artist, :name => "subway", :url_string => "http://subway.com/x/test.jpg")
       a3 = FactoryBot.create(:artist, :name => "minko", :url_string => "https://minko.com/x/test.jpg")
 
-      begin
-        assert_artist_found("rembrandt", "http://rembrandt.com/x/test.jpg")
-        assert_artist_found("rembrandt", "http://rembrandt.com/x/another.jpg")
-        assert_artist_not_found("http://nonexistent.com/test.jpg")
-        assert_artist_found("minko", "https://minko.com/x/test.jpg")
-        assert_artist_found("minko", "http://minko.com/x/test.jpg")
-      rescue Net::OpenTimeout
-        skip "network failure"
-      end
+      assert_artist_found("rembrandt", "http://rembrandt.com/x/test.jpg")
+      assert_artist_found("rembrandt", "http://rembrandt.com/x/another.jpg")
+      assert_artist_not_found("http://nonexistent.com/test.jpg")
+      assert_artist_found("minko", "https://minko.com/x/test.jpg")
+      assert_artist_found("minko", "http://minko.com/x/test.jpg")
     end
 
     should "be case-insensitive to domains when finding matches by url" do
@@ -414,9 +407,9 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "search on has_tag and return matches" do
-      post = FactoryBot.create(:post, tag_string: "bkub")
       bkub = FactoryBot.create(:artist, name: "bkub")
       none = FactoryBot.create(:artist, name: "none")
+      post = FactoryBot.create(:post, tag_string: "bkub")
 
       assert_equal(bkub.id, Artist.search(has_tag: "true").first.id)
       assert_equal(none.id, Artist.search(has_tag: "false").first.id)
@@ -450,8 +443,8 @@ class ArtistTest < ActiveSupport::TestCase
         assert(Tag.exists?(name: "bkub", category: Tag.categories.artist))
       end
 
-      should "change the tag to an artist tag if it was a gentag" do
-        tag = FactoryBot.create(:tag, name: "abc", category: Tag.categories.general)
+      should "change the tag to an artist tag if it was an empty gentag" do
+        tag = FactoryBot.create(:tag, name: "abc", category: Tag.categories.general, post_count: 0)
         artist = FactoryBot.create(:artist, name: "abc")
 
         assert_equal(Tag.categories.artist, tag.reload.category)
@@ -468,7 +461,7 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when renaming" do
       should "change the new tag to an artist tag if it was a gentag" do
-        tag = FactoryBot.create(:tag, name: "def", category: Tag.categories.general)
+        tag = FactoryBot.create(:tag, name: "def", category: Tag.categories.general, post_count: 0)
         artist = FactoryBot.create(:artist, name: "abc")
         artist.update(name: "def")
 
@@ -537,7 +530,7 @@ class ArtistTest < ActiveSupport::TestCase
 
         assert_equal("niceandcool", artist.name)
         assert_equal("nice_and_cool", artist.other_names_string)
-        assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/member.php?id=906442")
+        assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/users/906442")
         assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/stacc/niceandcool")
       end
 
@@ -548,7 +541,7 @@ class ArtistTest < ActiveSupport::TestCase
 
         assert_equal("test_artist", artist.name)
         assert_equal("nice_and_cool niceandcool", artist.other_names_string)
-        assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/member.php?id=906442")
+        assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/users/906442")
         assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/stacc/niceandcool")
       end
     end

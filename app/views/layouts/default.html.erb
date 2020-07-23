@@ -1,10 +1,13 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="utf-8">
   <title><%= page_title %></title>
 
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
   <%= render "meta_links", collection: @current_item %>
+  <%= tag.link rel: "canonical", href: canonical_url %>
+  <%= tag.link rel: "search", type: "application/opensearchdescription+xml", href: opensearch_url(format: :xml, version: 1), title: "Search posts" %>
 
   <%= csrf_meta_tag %>
   <% unless CurrentUser.enable_desktop_mode? %>
@@ -13,48 +16,17 @@
   <% if CurrentUser.user.blacklisted_tags.present? %>
     <meta name="blacklisted-tags" content="<%= CurrentUser.user.blacklisted_tags.gsub(/(?:\r|\n)+/, ",") %>">
   <% end %>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
   <%= javascript_pack_tag "application" %>
   <%= stylesheet_pack_tag "application" %>
   <% if CurrentUser.user.custom_style.present? && params.fetch(:css, "true").truthy?  %>
     <%= stylesheet_link_tag custom_style_users_path(md5: Digest::MD5.hexdigest(CurrentUser.user.custom_style)), media: "screen" %>
   <% end %>
-  <% if Danbooru.config.twitter_username.present? %>
-    <script type="application/ld+json">
-      {
-        "@context" : "http://schema.org",
-        "@type" : "Organization",
-        "name" : "<%= Danbooru.config.app_name %>",
-        "url" : "<%= root_url %>",
-        "sameAs" : [
-          "https://twitter.com/<%= Danbooru.config.twitter_username %>"
-        ]
-      }
-    </script>
-  <% end %>
-  <script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "WebSite",
-    "url" : "<%= root_url %>",
-    "potentialAction": [{
-      "@type": "SearchAction",
-      "target": "<%= posts_url %>?tags={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }]
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "WebSite",
-    "name": "<%= Danbooru.config.app_name %>",
-    "alternateName": "Anime Image Board",
-    "url" : "<%= root_url %>"
-  }
-  </script>
-  <%= tag.meta name: "description", content: meta_description %>
 
+  <% if current_page?(root_url) %>
+    <%= json_ld_website_data %>
+  <% end %>
+
+  <%= tag.meta name: "description", content: meta_description %>
   <%= tag.meta property: "og:type", content: "website" %>
   <%= tag.meta property: "og:site_name", content: Danbooru.config.app_name %>
   <%= tag.meta property: "og:title", content: page_title %>
@@ -69,6 +41,7 @@
   <%= tag.meta name: "twitter:description", content: meta_description %>
 
   <%= tag.meta name: "git-hash", content: Rails.application.config.x.git_hash %>
+  <%= tag.meta name: "theme-color", content: "hsl(213, 100%, 50%)" %>
 
   <%= yield :html_header %>
   <%= raw Danbooru.config.custom_html_header_content %>
@@ -122,6 +95,8 @@
 
     window.Danbooru.notice = Danbooru.Utility.notice;
     window.Danbooru.error = Danbooru.Utility.error;
+    window.$ = Danbooru.jQuery;
+    window.jQuery = Danbooru.jQuery;
   </script>
 
   <%= render "static/footer" %>

@@ -14,10 +14,14 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
   end
 
   context "sitemap action" do
-    should "work" do
-      create_list(:post, 3)
-      get sitemap_path, as: :xml
-      assert_response :success
+    [Artist, ForumTopic, Pool, Post, Tag, User, WikiPage].each do |klass|
+      should "work for #{klass.model_name.plural}" do
+        as(create(:user)) { create_list(klass.model_name.singular.to_sym, 3) }
+        get sitemap_path(sitemap: klass.model_name.plural), as: :xml
+
+        assert_response :success
+        assert_equal(1, response.parsed_body.css("sitemap loc").size)
+      end
     end
   end
 
@@ -31,6 +35,13 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
   context "terms_of_service action" do
     should "work" do
       get terms_of_service_path
+      assert_response :success
+    end
+  end
+
+  context "privacy_policy action" do
+    should "work" do
+      get privacy_policy_path
       assert_response :success
     end
   end
@@ -59,6 +70,13 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
   context "keyboard_shortcuts action" do
     should "work" do
       get keyboard_shortcuts_path
+      assert_response :success
+    end
+  end
+
+  context "opensearch action" do
+    should "work" do
+      get opensearch_path, as: :xml
       assert_response :success
     end
   end

@@ -4,11 +4,8 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
   def assert_artist_found(expected_artist, source_url = nil)
     if source_url
       get_auth artists_path(format: "json", search: { url_matches: source_url }), @user
-      if response.body =~ /Net::OpenTimeout/
-        skip "Remote connection to #{source_url} failed"
-        return
-      end
     end
+
     assert_response :success
     json = JSON.parse(response.body)
     assert_equal(1, json.size, "Testing URL: #{source_url}")
@@ -17,10 +14,6 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
   def assert_artist_not_found(source_url)
     get_auth artists_path(format: "json", search: { url_matches: source_url }), @user
-    if response.body =~ /Net::OpenTimeout/
-      skip "Remote connection to #{source_url} failed"
-      return
-    end
 
     assert_response :success
     json = JSON.parse(response.body)
@@ -53,6 +46,22 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         @artist.update(name: "-aaa")
         get artist_path(@artist.id)
         assert_response :success
+      end
+
+      should "show active wikis" do
+        as(@user) { create(:wiki_page, title: @artist.name) }
+        get artist_path(@artist.id)
+
+        assert_response :success
+        assert_select ".artist-wiki", count: 1
+      end
+
+      should "not show deleted wikis" do
+        as(@user) { create(:wiki_page, title: @artist.name, is_deleted: true) }
+        get artist_path(@artist.id)
+
+        assert_response :success
+        assert_select ".artist-wiki", count: 0
       end
     end
 
@@ -124,6 +133,12 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
       should "get the index page" do
         get artists_path
         assert_response :success
+      end
+
+      should "get the sitemap" do
+        get artists_path(format: :sitemap)
+        assert_response :success
+        assert_equal(Artist.count, response.parsed_body.css("urlset url loc").size)
       end
 
       context "when searching the index page" do
