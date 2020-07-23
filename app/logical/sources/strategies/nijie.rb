@@ -64,6 +64,10 @@ module Sources
       DIR = %r{(?:\d+/)?(?:__rs_\w+/)?nijie_picture(?:/diff/main)?}
       IMAGE_URL = %r{#{IMAGE_BASE_URL}/#{DIR}/#{Regexp.union(FILENAME1, FILENAME2, FILENAME3)}\.\w+\z}i
 
+      def self.enabled?
+        Danbooru.config.nijie_login.present? && Danbooru.config.nijie_password.present?
+      end
+
       def domains
         ["nijie.info", "nijie.net"]
       end
