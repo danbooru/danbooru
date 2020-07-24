@@ -61,7 +61,7 @@
     <% end %>
   <% end %>
 
-  <section id="mark-as-translated-section" style="display: none;">
+  <section id="mark-as-translated-section">
     <%= edit_form_for(@post, url: mark_as_translated_post_path(@post), method: :put) do |f| %>
       <%= f.input :tags_query, as: :hidden, input_html: { id: nil, name: "tags_query", value: params[:q] } %>
       <%= f.input :pool_id, as: :hidden, input_html: { id: nil, name: "pool_id", value: params[:pool_id] } %>

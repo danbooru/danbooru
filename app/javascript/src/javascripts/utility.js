@@ -3,6 +3,10 @@ import Rails from '@rails/ujs';
 
 let Utility = {};
 
+export function clamp(value, low, high) {
+  return Math.max(low, Math.min(value, high));
+}
+
 Utility.delay = function(milliseconds) {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
 }

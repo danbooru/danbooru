@@ -436,6 +436,14 @@ body[data-post-current-image-size="original"] #image-resize-notice {
   display: none;
 }
 
+body.mode-translation .note-container {
+  cursor: crosshair;
+}
+
+body:not(.mode-translation) div#c-posts div#a-show #mark-as-translated-section {
+  display: none;
+}
+
 div#c-post-versions, div#c-artist-versions {
   div#a-index {
     a {
