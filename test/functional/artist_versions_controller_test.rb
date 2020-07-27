@@ -5,9 +5,9 @@ class ArtistVersionsControllerTest < ActionDispatch::IntegrationTest
     setup do
       @user = create(:gold_user, id: 100)
       @builder = create(:builder_user, name: "danbo")
-      as(@builder) { @artist = create(:artist, name: "masao") }
+      as(@builder) { @artist = create(:artist, name: "masao", url_string: "https://masao.deviantart.com") }
       as(@user) { @artist.update(name: "masao_(deleted)", is_deleted: true) }
-      as(@builder) { @artist.update(name: "masao", is_deleted: false, group_name: "the_best") }
+      as(@builder) { @artist.update(name: "masao", is_deleted: false, group_name: "the_best", url_string: "https://www.deviantart.com/masao") }
     end
 
     context "index action" do
@@ -24,6 +24,7 @@ class ArtistVersionsControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search(name: "masao").with { [@versions[2], @versions[0]] }
       should respond_to_search(name_matches: "(deleted)").with { @versions[1] }
       should respond_to_search(group_name_matches: "the_best").with { @versions[2] }
+      should respond_to_search(urls_include_any: "https://www.deviantart.com/masao").with { @versions[2] }
       should respond_to_search(is_deleted: "true").with { @versions[1] }
 
       context "using includes" do
