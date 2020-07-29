@@ -370,6 +370,7 @@ class Note {
     }
 
     static toggle_all() {
+      Note.Body.hide_all();
       $(".note-container").toggleClass("hide-notes");
     }
   }
