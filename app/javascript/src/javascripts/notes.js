@@ -362,6 +362,8 @@ class Note {
         return;
       }
 
+      Note.Body.hide_all();
+
       let large_width = parseFloat($image.data('large-width'));
       let ratio = $image.width() / large_width;
       let font_percentage = ratio * 100;
