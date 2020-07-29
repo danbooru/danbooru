@@ -217,6 +217,7 @@ class Note {
         left: position.percent_left,
       });
 
+      Note.Body.hide_all();
       $note_box.addClass("unsaved");
       event.preventDefault();
     }
@@ -254,6 +255,7 @@ class Note {
         });
       }
 
+      Note.Body.hide_all();
       $note_box.addClass("unsaved");
       event.preventDefault();
     }
