@@ -15,7 +15,7 @@ class Note {
   // Notes must be at least 10x10 in size so they're big enough to drag and resize.
   static MIN_NOTE_SIZE = 10;
 
-  static notes = [];
+  static notes = new Set();
   static timeouts = [];
 
   id = null;
@@ -657,16 +657,19 @@ class Note {
     }
 
     static async destroy($dialog, note) {
-      if (!confirm("Do you really want to delete this note?")) {
+      if (!note.is_new() && !confirm("Do you really want to delete this note?")) {
         return;
       }
 
       if (!note.is_new()) {
         await $.ajax(`/notes/${note.id}.json`, { type: "DELETE" });
-        note.box.$note_box.remove();
-        note.body.$note_body.remove();
-        $dialog.dialog("close");
       }
+
+      note.box.$note_box.remove();
+      note.body.$note_body.remove();
+      Note.notes.delete(note);
+
+      $dialog.dialog("close");
     }
 
     static history($dialog, note) {
@@ -786,7 +789,7 @@ class Note {
     this.box.place_note(x, y, w, h);
     this.body.display_text(sanitized_body);
 
-    Note.notes.push(this);
+    Note.notes.add(this);
   }
 
   is_new() {
@@ -861,7 +864,7 @@ class Note {
   }
 
   static find(id) {
-    return Note.notes.find(note => note.id === id);
+    return Array.from(Note.notes).find(note => note.id === id);
   }
 
   static load_all() {
