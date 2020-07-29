@@ -95,6 +95,11 @@
     opacity: 0.5;
     z-index: 100;
 
+    /* Raise notes on hover so overlapping embedded notes are readable. */
+    &:hover {
+      z-index: 200;
+    }
+
     &.unsaved {
       border: var(--unsaved-note-box-border);
     }
@@ -108,7 +113,7 @@
       border: 1px solid transparent;
       opacity: 1;
 
-      &.hovering {
+      &:hover {
         border: var(--note-box-border);
         box-shadow: var(--note-box-shadow);
 
@@ -132,7 +137,7 @@
         border: var(--movable-note-box-border);
       }
 
-      &:not(.hovering) div.ui-resizable-handle {
+      &:not(:hover) div.ui-resizable-handle {
         display: none !important;
       }
     }

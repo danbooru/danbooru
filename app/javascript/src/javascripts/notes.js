@@ -86,12 +86,10 @@ class Note {
 
     on_mouseenter() {
       this.note.body.show();
-      this.$note_box.addClass("hovering");
     }
 
     on_mouseleave() {
       this.note.body.hide();
-      this.$note_box.removeClass("hovering");
     }
 
     on_dragstart() {
