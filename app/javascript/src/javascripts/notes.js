@@ -103,6 +103,7 @@ class Note {
     // changes the CSS coordinates to pixels, so we have to convert them back to percentages.
     on_dragstop() {
       this.place_note(this.note.x, this.note.y, this.note.width, this.note.height);
+      this.note.body.show();
     }
 
     // Place the note box using absolute percentage coordinates (floats in the range 0.0..1.0).
