@@ -597,6 +597,7 @@ class Note {
           "ui-dialog": "note-edit-dialog",
         },
         open: () => {
+          Utility.keydown("ctrl+return", "save_note", () => this.save($dialog, note), ".note-edit-dialog textarea");
           $(".note-box").addClass("editing");
         },
         close: () => {
