@@ -64,16 +64,7 @@ class Note {
 
     on_click() {
       if (!Utility.test_max_width(660)) {
-        // Toggle selection status when note is clicked. Enable movement keys when note is selected.
-        if (this.$note_box.hasClass("movable")) {
-          this.$note_box.removeClass("movable");
-          $(document).off("keydown.nudge_note");
-          $(document).off("keydown.resize_note");
-        } else {
-          this.$note_box.addClass("movable");
-          Utility.keydown("up down left right", "nudge_note", this.key_nudge.bind(this));
-          Utility.keydown("shift+up shift+down shift+left shift+right", "resize_note", this.key_resize.bind(this));
-        }
+        this.note.toggle_selected();
       } else if (this.$note_box.hasClass("viewing")) {
         this.note.body.hide();
         this.$note_box.removeClass("viewing");
@@ -844,6 +835,27 @@ class Note {
     return parseFloat(this.$note_container.parent().css("font-size"));
   }
 
+  is_selected() {
+    return this.box.$note_box.hasClass("movable");
+  }
+
+  toggle_selected() {
+    return this.is_selected() ? this.unselect() : this.select();
+  }
+
+  select() {
+    Note.unselect_all();
+    this.box.$note_box.addClass("movable");
+    Utility.keydown("up down left right", "nudge_note", this.box.key_nudge.bind(this.box));
+    Utility.keydown("shift+up shift+down shift+left shift+right", "resize_note", this.box.key_resize.bind(this.box));
+  }
+
+  unselect() {
+    this.box.$note_box.removeClass("movable");
+    $(document).off("keydown.nudge_note");
+    $(document).off("keydown.resize_note");
+  }
+
   normalize_sizes($note_elements, parent_font_size) {
     if ($note_elements.length === 0) {
       return;
@@ -918,6 +930,10 @@ class Note {
       let note = Note.find(note_id);
       note.box.show_highlighted();
     }
+  }
+
+  static unselect_all() {
+    Note.notes.forEach(note => note.unselect());
   }
 }
 
