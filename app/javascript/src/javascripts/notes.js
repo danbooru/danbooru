@@ -569,15 +569,12 @@ class Note {
       }
 
       let $textarea = $('<textarea></textarea>');
+      $textarea.val(note.original_body);
       $textarea.css({
         width: "97%",
         height: "85%",
         resize: "none",
       });
-
-      if (!note.is_new()) {
-        $textarea.val(note.original_body);
-      }
 
       let $dialog = $('<div></div>');
       let note_title = note.is_new() ? 'Creating new note' : `Editing note #${note.id}`;
@@ -598,6 +595,7 @@ class Note {
         },
         open: () => {
           Utility.keydown("ctrl+return", "save_note", () => this.save($dialog, note), ".note-edit-dialog textarea");
+          $(".note-edit-dialog textarea").on("input.danbooru", (e) => this.on_input(note));
           $(".note-box").addClass("editing");
         },
         close: () => {
@@ -613,6 +611,10 @@ class Note {
       });
 
       $textarea.selectEnd();
+    }
+
+    static on_input(note) {
+      note.box.$note_box.addClass("unsaved");
     }
 
     static async save($dialog, note) {
@@ -648,8 +650,6 @@ class Note {
 
     static async preview($dialog, note) {
       let text = $dialog.find("textarea").val();
-
-      note.box.$note_box.addClass("unsaved");
       note.body.preview_text(text);
     }
 
