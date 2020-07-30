@@ -15,6 +15,7 @@ class Note {
   // Notes must be at least 10x10 in size so they're big enough to drag and resize.
   static MIN_NOTE_SIZE = 10;
 
+  static dragging = false;
   static notes = new Set();
   static timeouts = [];
 
@@ -80,7 +81,10 @@ class Note {
     }
 
     on_mouseenter() {
-      this.note.body.show();
+      // Don't show note bodies if we mouseover another note while dragging or resizing.
+      if (!Note.dragging) {
+        this.note.body.show();
+      }
     }
 
     on_mouseleave() {
@@ -90,6 +94,7 @@ class Note {
     on_dragstart() {
       this.$note_box.addClass("unsaved");
       Note.Body.hide_all();
+      Note.dragging = true;
     }
 
     // Reset the note box placement after the box is dragged or resized. Dragging the note
@@ -103,6 +108,7 @@ class Note {
 
       this.place_note(x, y, w, h);
       this.note.body.show();
+      Note.dragging = false;
     }
 
     // Place the note box. The input values are pixel coordinates relative to the full image.
@@ -705,6 +711,7 @@ class Note {
         $(document).on("mouseup.danbooru", Note.TranslationMode.Drag.stop);
         Note.TranslationMode.Drag.dragStartX = e.pageX;
         Note.TranslationMode.Drag.dragStartY = e.pageY;
+        Note.dragging = true;
       }
 
       static drag(e) {
@@ -735,6 +742,7 @@ class Note {
       }
 
       static stop() {
+        Note.dragging = false;
         $(document).off("mousemove.danbooru", Note.TranslationMode.Drag.drag);
         $(document).off("mouseup.danbooru", Note.TranslationMode.Drag.stop);
 
