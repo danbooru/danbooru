@@ -19,6 +19,10 @@ class Note {
   static timeouts = [];
 
   id = null;
+  x = null;
+  y = null;
+  w = null;
+  h = null;
   box = null;
   body = null;
   $note_container = null;
@@ -89,30 +93,36 @@ class Note {
     }
 
     // Reset the note box placement after the box is dragged or resized. Dragging the note
-    // changes the CSS coordinates to pixels, so we have to convert them back to percentages.
+    // changes the CSS coordinates to pixels, so we have to rescale them and convert back
+    // to percentage coordinates.
     on_dragstop() {
-      this.place_note(this.note.x, this.note.y, this.note.width, this.note.height);
+      let x = this.$note_box.position().left / this.note.scale_factor;
+      let y = this.$note_box.position().top / this.note.scale_factor;
+      let w = this.$note_box.width() / this.note.scale_factor;
+      let h = this.$note_box.height() / this.note.scale_factor;
+
+      this.place_note(x, y, w, h);
       this.note.body.show();
     }
 
-    // Place the note box using absolute percentage coordinates (floats in the range 0.0..1.0).
+    // Place the note box. The input values are pixel coordinates relative to the full image.
     place_note(x, y, w, h) {
       if (this.note.embed && this.note.has_rotation) {
         let position = this.get_min_max_position();
-        x = position.norm_left / this.note.image_width;
-        y = position.norm_top / this.note.image_height;
+        x = position.norm_left / this.note.scale_factor;
+        y = position.norm_top / this.note.scale_factor;
       }
 
-      x = clamp(x, 0.0, 1.0);
-      y = clamp(y, 0.0, 1.0);
-      w = clamp(w, Note.MIN_NOTE_SIZE / this.note.post_width, 1.0);
-      h = clamp(h, Note.MIN_NOTE_SIZE / this.note.post_height, 1.0);
+      this.note.w = Math.round(clamp(w, Note.MIN_NOTE_SIZE, this.note.post_width));
+      this.note.h = Math.round(clamp(h, Note.MIN_NOTE_SIZE, this.note.post_height));
+      this.note.x = Math.round(clamp(x, 0, this.note.post_width - this.note.w));
+      this.note.y = Math.round(clamp(y, 0, this.note.post_height - this.note.h));
 
       this.$note_box.css({
-        top: (100 * y) + '%',
-        left: (100 * x) + '%',
-        width: (100 * w) + '%',
-        height: (100 * h) + '%',
+        top: (100 * this.note.y / this.note.post_height) + '%',
+        left: (100 * this.note.x / this.note.post_width) + '%',
+        width: (100 * this.note.w / this.note.post_width) + '%',
+        height: (100 * this.note.h / this.note.post_height) + '%',
       });
     }
 
@@ -179,74 +189,50 @@ class Note {
     }
 
     key_nudge(event) {
-      let $note_box = this.note.box.$note_box;
-
-      let current_top = Math.round($note_box.position().top);
-      let current_left = Math.round($note_box.position().left);
-
       switch (event.originalEvent.key) {
       case "ArrowUp":
-        current_top--;
+        this.note.y--;
         break;
       case "ArrowDown":
-        current_top++;
+        this.note.y++;
         break;
       case "ArrowLeft":
-        current_left--;
+        this.note.x--;
         break;
       case "ArrowRight":
-        current_left++;
+        this.note.x++;
         break;
       default:
         // do nothing
       }
 
-      let position = this.get_min_max_position(current_top, current_left);
-      $note_box.css({
-        top: position.percent_top,
-        left: position.percent_left,
-      });
-
+      this.place_note(this.note.x, this.note.y, this.note.w, this.note.h);
       Note.Body.hide_all();
-      $note_box.addClass("unsaved");
+      this.$note_box.addClass("unsaved");
       event.preventDefault();
     }
 
     key_resize(event) {
-      let $note_box = this.note.box.$note_box;
-
-      let current_top = Math.round($note_box.position().top);
-      let current_left = Math.round($note_box.position().left);
-      let current_height = $note_box.height();
-      let current_width = $note_box.width();
-
       switch (event.originalEvent.key) {
       case "ArrowUp":
-        current_height--;
+        this.note.h--;
         break;
       case "ArrowDown":
-        current_height++;
+        this.note.h++;
         break;
       case "ArrowLeft":
-        current_width--;
+        this.note.w--;
         break;
       case "ArrowRight":
-        current_width++;
+        this.note.w++;
         break;
       default:
         // do nothing
       }
 
-      const position = this.get_min_max_position(null, null, current_height, current_width);
-      if (current_top === position.norm_top && current_left === position.norm_left) {
-        $note_box.css({
-          height: current_height,
-          width: current_width,
-        });
-      }
-
+      this.place_note(this.note.x, this.note.y, this.note.w, this.note.h);
       Note.Body.hide_all();
-      $note_box.addClass("unsaved");
+      this.$note_box.addClass("unsaved");
       event.preventDefault();
     }
 
@@ -617,10 +603,10 @@ class Note {
       let text = $dialog.find("textarea").val();
 
       let params = {
-        x: Math.round(note.x * note.post_width),
-        y: Math.round(note.y * note.post_height),
-        width: Math.round(note.width * note.post_width),
-        height: Math.round(note.height * note.post_height),
+        x: note.x,
+        y: note.y,
+        width: note.w,
+        height: note.h,
         body: text
       };
 
@@ -753,13 +739,13 @@ class Note {
         $(document).off("mouseup.danbooru", Note.TranslationMode.Drag.stop);
 
         if ($("#note-preview").is(":visible")) {
-          let $image = $("#image");
+          let scale_factor = $(".note-container").width() / parseInt($(".note-container").attr("data-width"));
 
           new Note({
-            x: $("#note-preview").position().left / $image.width(),
-            y: $("#note-preview").position().top / $image.height(),
-            w: $("#note-preview").width() / $image.width(),
-            h: $("#note-preview").height() / $image.height(),
+            x: $("#note-preview").position().left / scale_factor,
+            y: $("#note-preview").position().top / scale_factor,
+            w: $("#note-preview").width() / scale_factor,
+            h: $("#note-preview").height() / scale_factor,
           });
 
           $("#note-preview").hide();
@@ -778,6 +764,10 @@ class Note {
     this.post_id = this.$note_container.data("id");
     this.embed = Utility.meta("post-has-embedded-notes") === "true";
     this.original_body = original_body;
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
 
     this.box = new Note.Box(this);
     this.body = new Note.Body(this);
@@ -792,23 +782,9 @@ class Note {
     return this.id === null;
   }
 
-  // The coordinates of the top left corner of the note box, as floats in the
-  // range 0.0 to 1.0. Does not account for note rotation.
-  get x() {
-    return this.box.$note_box.position().left / this.image_width;
-  }
-
-  get y() {
-    return this.box.$note_box.position().top / this.image_height;
-  }
-
-  // The current width and height of the note box, as floats in the range 0.0 to 1.0.
-  get width() {
-    return this.box.$note_box.width() / this.image_width;
-  }
-
-  get height() {
-    return this.box.$note_box.height() / this.image_height;
+  // The ratio of the current image size to the full image size.
+  get scale_factor() {
+    return this.$note_container.width() / this.post_width;
   }
 
   // The width and height of the full-size original image in pixels.
@@ -885,17 +861,15 @@ class Note {
   }
 
   static load_all() {
-    let $image = $(".image-container");
-
     $("#notes article").toArray().forEach(article => {
       var $article = $(article);
 
       new Note({
         id: $article.data("id"),
-        x: $article.data("x") / $image.data("width"),
-        y: $article.data("y") / $image.data("height"),
-        w: $article.data("width") / $image.data("width"),
-        h: $article.data("height") / $image.data("height"),
+        x: $article.data("x"),
+        y: $article.data("y"),
+        w: $article.data("width"),
+        h: $article.data("height"),
         original_body: $article.data("body"),
         sanitized_body: $article.html()
       });
