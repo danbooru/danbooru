@@ -339,7 +339,6 @@ class Note {
 
     // Rescale font sizes of embedded notes when the image is resized.
     static scale_all() {
-      let $image = $("#image");
       let $container = $(".note-container");
 
       if ($container.length === 0) {
@@ -348,8 +347,8 @@ class Note {
 
       Note.Body.hide_all();
 
-      let large_width = parseFloat($image.data('large-width'));
-      let ratio = $image.width() / large_width;
+      let large_width = parseFloat($container.data("large-width"));
+      let ratio = $container.width() / large_width;
       let font_percentage = ratio * 100;
 
       $container.css('font-size', font_percentage + '%');

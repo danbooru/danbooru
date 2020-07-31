@@ -116,6 +116,8 @@ class PostPresenter
       "data-pools" => post.pool_string,
       "data-approver-id" => post.approver_id,
       "data-rating" => post.rating,
+      "data-large-width" => post.large_image_width,
+      "data-large-height" => post.large_image_height,
       "data-width" => post.image_width,
       "data-height" => post.image_height,
       "data-flags" => post.status_flags,

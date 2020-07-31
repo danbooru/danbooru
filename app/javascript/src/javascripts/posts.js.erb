@@ -307,10 +307,11 @@ Post.view_original = function(e = null) {
   }
 
   var $image = $("#image");
+  var $post = $(".image-container");
   $image.attr("src", $(".image-view-original-link").attr("href"));
   $image.css("filter", "blur(8px)");
-  $image.width($image.data("original-width"));
-  $image.height($image.data("original-height"));
+  $image.width($post.data("width"));
+  $image.height($post.data("height"));
   $image.on("load.danbooru", function() {
     $image.css("animation", "sharpen 0.5s forwards");
   });
@@ -326,10 +327,11 @@ Post.view_large = function(e = null) {
   }
 
   var $image = $("#image");
+  var $post = $(".image-container");
   $image.attr("src", $(".image-view-large-link").attr("href"));
   $image.css("filter", "blur(8px)");
-  $image.width($image.data("large-width"));
-  $image.height($image.data("large-height"));
+  $image.width($post.data("large-width"));
+  $image.height($post.data("large-height"));
   $image.on("load.danbooru", function() {
     $image.css("animation", "sharpen 0.5s forwards");
   });
