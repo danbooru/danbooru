@@ -430,10 +430,17 @@ div#c-posts {
   }
 }
 
-body[data-post-current-image-size="large"] .image-view-large-link,
-body[data-post-current-image-size="original"] .image-view-original-link,
+body[data-post-current-image-size="large"] #post-options .image-view-large-link,
+body[data-post-current-image-size="original"] #post-options .image-view-original-link,
 body[data-post-current-image-size="original"] #image-resize-notice {
   display: none;
+}
+
+/* Always show the "Resized to X% of original" notice on mobile when it exists. */
+#image-resize-notice {
+  @media screen and (max-width: 660px) {
+    display: block !important;
+  }
 }
 
 body.mode-translation .note-container {

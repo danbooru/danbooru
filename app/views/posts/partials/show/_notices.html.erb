@@ -67,7 +67,7 @@
   </div>
 <% end %>
 
-<% if policy(post).visible? && post.has_large? && !post.is_ugoira? %>
+<% if policy(post).visible? && post.has_large? && !post.is_ugoira? && post.resize_percentage.floor < 100 %>
   <div class="notice notice-small post-notice post-notice-resized" id="image-resize-notice">
     Resized to <%= number_to_percentage post.resize_percentage.floor, precision: 0 %> of original (<%= link_to "view original", post.tagged_file_url, class: "image-view-original-link" %>)
   </div>

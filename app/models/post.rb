@@ -269,6 +269,7 @@ class Post < ApplicationRecord
     end
 
     def resize_percentage
+      return 100 if image_width.to_i == 0
       100 * large_image_width.to_f / image_width.to_f
     end
 
