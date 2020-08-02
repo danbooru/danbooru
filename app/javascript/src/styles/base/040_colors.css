@@ -145,10 +145,6 @@
   --tag-count-color: var(--muted-text-color);
   --low-post-count-color: red;
 
-  --tag-count-indicator-frown-color: red;
-  --tag-count-indicator-meh-color: darkkhaki;
-  --tag-count-indicator-smile-color: green;
-
   --remove-favorite-button: deeppink;
 
   --ugoira-seek-slider-background: #EEE;
@@ -416,10 +412,6 @@ body[data-current-user-theme="dark"] {
   --selected-related-tag-color: white;
 
   --target-background: var(--blue-0);
-
-  --tag-count-indicator-frown-color: var(--red-1);
-  --tag-count-indicator-meh-color: var(--yellow-1);
-  --tag-count-indicator-smile-color: var(--green-1);
 
   --uploads-dropzone-background: var(--grey-3);
   --uploads-dropzone-progress-bar-foreground-color: var(--link-color);

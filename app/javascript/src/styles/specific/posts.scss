@@ -485,6 +485,33 @@ div#c-posts, div#c-uploads {
   }
 }
 
+/* Container for the tag edit <textarea>, header, and related tags buttons. */
+#tags-container {
+  div.header {
+    line-height: 1.5em;
+
+    label {
+      display: inline-block;
+    }
+
+    i.fa-external-link-alt {
+      font-size: var(--text-xs);
+    }
+
+    span[data-tag-counter] {
+      float: right;
+      color: var(--muted-text-color);
+      font-size: var(--text-sm);
+
+      img {
+        margin-left: 0.5em;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
 div#c-explore-posts {
   a.desc {
     font-weight: bold;

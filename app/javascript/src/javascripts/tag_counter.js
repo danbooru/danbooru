@@ -19,7 +19,7 @@ export default @observer class TagCounter extends Component {
     return (
       <span class="tag-counter">
         <span class="tag-count">{this.tagCount}</span> / {TagCounter.highCount} tags
-        <i class={`far fa-${this.emoji}`}></i>
+        <img src={`/images/${this.iconName}.png`}/>
       </span>
     );
   }
@@ -28,13 +28,13 @@ export default @observer class TagCounter extends Component {
     this.tagCount = Utility.regexp_split($(this.props.tags).val()).length;
   }
 
-  @computed get emoji() {
+  @computed get iconName() {
     if (this.tagCount < TagCounter.lowCount) {
-      return "frown";
+      return "blobglare";
     } else if (this.tagCount >= TagCounter.lowCount && this.tagCount < TagCounter.highCount) {
-      return "meh";
+      return "blobthinkingglare";
     } else {
-      return "smile";
+      return "blobaww";
     }
   }
 
