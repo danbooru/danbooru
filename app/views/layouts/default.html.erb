@@ -68,6 +68,8 @@
   </header>
 
   <div id="page">
+    <%= render "users/verification_notice" %>
+
     <% if !CurrentUser.is_anonymous? && !CurrentUser.is_gold? && cookies[:hide_upgrade_account_notice].blank? && params[:action] != "upgrade_information" %>
       <%= render "users/upgrade_notice" %>
     <% end %>

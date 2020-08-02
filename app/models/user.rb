@@ -267,6 +267,10 @@ class User < ApplicationRecord
       name.match?(/\Auser_[0-9]+~*\z/)
     end
 
+    def is_restricted?
+      requires_verification? && !is_verified?
+    end
+
     def is_anonymous?
       level == Levels::ANONYMOUS
     end
