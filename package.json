@@ -1,6 +1,8 @@
 {
   "license": "MIT",
   "dependencies": {
+    "@babel/plugin-proposal-decorators": "^7.10.5",
+    "@babel/plugin-transform-react-jsx": "^7.10.4",
     "@fortawesome/fontawesome-free": "^5.11.2",
     "@rails/ujs": "^6.0.2-1",
     "@rails/webpacker": "^5.0.0",
@@ -9,6 +11,9 @@
     "jquery": "3.5.1",
     "jquery-hotkeys": "^0.2.2",
     "jquery-ui": "^1.12.1",
+    "mobx": "^5.15.4",
+    "mobx-react": "^6.2.5",
+    "preact": "^10.4.6",
     "rails-erb-loader": "^5.5.0",
     "spark-md5": "^3.0.0",
     "tippy.js": "^6.2.3",

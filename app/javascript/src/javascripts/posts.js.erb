@@ -42,8 +42,6 @@ Post.initialize_all = function() {
   }
 
   var $fields_multiple = $('[data-autocomplete="tag-edit"]');
-  $fields_multiple.on("keypress.danbooru", Post.update_tag_count);
-  $fields_multiple.on("click", Post.update_tag_count);
 
   $(window).on('danbooru:initialize_saved_seraches', () => {
     Post.initialize_saved_searches();
@@ -402,7 +400,6 @@ Post.initialize_post_sections = function() {
       $("#post_tag_string").focus().selectEnd().height($("#post_tag_string")[0].scrollHeight);
       $("#recommended").hide();
       $(document).trigger("danbooru:open-post-edit-tab");
-      Post.update_tag_count({target: $("#post_tag_string")});
     } else if (e.target.hash === "#recommended") {
       $("#comments").hide();
       $("#edit").hide();
@@ -512,32 +509,6 @@ Post.initialize_recommended = function() {
     $("#recommended").removeClass("loading-recommended-posts");
   });
 };
-
-Post.update_tag_count = function(event) {
-  let string = "0 tags";
-  let count = 0;
-
-  if (event) {
-    let tags = Utility.regexp_split($(event.target).val());
-    if (tags.length) {
-      count = tags.length;
-      string = (count === 1) ? (count + " tag") : (count + " tags")
-    }
-  }
-
-  $("#tags-container .count").html(string);
-  let klass = "";
-
-  if (count < Post.LOW_TAG_COUNT) {
-    klass = "frown";
-  } else if (count >= Post.LOW_TAG_COUNT && count < Post.HIGH_TAG_COUNT) {
-    klass = "meh";
-  } else {
-    klass = "smile";
-  }
-
-  $("#tags-container .options #face").removeClass().addClass(`far fa-${klass}`);
-}
 
 $(document).ready(function() {
   Post.initialize_all();
