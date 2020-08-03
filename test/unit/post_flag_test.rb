@@ -53,7 +53,7 @@ class PostFlagTest < ActiveSupport::TestCase
 
         @post_flag = build(:post_flag, post: @post, creator: @bob)
         @post_flag.save
-        assert_equal(["Post is deleted"], @post_flag.errors.full_messages)
+        assert_equal(["Post is deleted and cannot be flagged"], @post_flag.errors.full_messages)
       end
 
       should "not be able to flag a pending post" do

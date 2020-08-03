@@ -12,7 +12,7 @@ class UploadLimitTest < ActiveSupport::TestCase
         @post = create(:post, uploader: @user, is_pending: true, created_at: 7.days.ago)
         assert_equal(1000, @user.reload.upload_points)
 
-        PostPruner.new.prune!
+        PostPruner.prune!
         assert_equal(967, @user.reload.upload_points)
       end
     end

@@ -17,13 +17,19 @@ class PostFlag < ApplicationRecord
   before_save :update_post
   attr_accessor :is_deletion
 
+  enum status: {
+    pending: 0,
+    succeeded: 1,
+    rejected: 2
+  }
+
   scope :by_users, -> { where.not(creator: User.system) }
   scope :by_system, -> { where(creator: User.system) }
   scope :in_cooldown, -> { by_users.where("created_at >= ?", COOLDOWN_PERIOD.ago) }
   scope :resolved, -> { where(is_resolved: true) }
   scope :unresolved, -> { where(is_resolved: false) }
   scope :recent, -> { where("post_flags.created_at >= ?", 1.day.ago) }
-  scope :old, -> { where("post_flags.created_at <= ?", 3.days.ago) }
+  scope :expired, -> { pending.where("post_flags.created_at <= ?", 3.days.ago) }
 
   module SearchMethods
     def creator_matches(creator, searcher)
@@ -56,7 +62,7 @@ class PostFlag < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :post, :is_resolved, :reason)
+      q = q.search_attributes(params, :post, :is_resolved, :reason, :status)
       q = q.text_attribute_matches(:reason, params[:reason_matches])
 
       if params[:creator_id].present?
@@ -113,12 +119,8 @@ class PostFlag < ApplicationRecord
 
   def validate_post
     errors[:post] << "is pending and cannot be flagged" if post.is_pending? && !is_deletion
+    errors[:post] << "is deleted and cannot be flagged" if post.is_deleted? && !is_deletion
     errors[:post] << "is locked and cannot be flagged" if post.is_status_locked?
-    errors[:post] << "is deleted" if post.is_deleted?
-  end
-
-  def resolve!
-    update_column(:is_resolved, true)
   end
 
   def flag_count_for_creator

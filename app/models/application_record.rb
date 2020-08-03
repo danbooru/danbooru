@@ -111,6 +111,10 @@ class ApplicationRecord < ActiveRecord::Base
       ensure
         connection.execute("SET STATEMENT_TIMEOUT = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env == "test"
       end
+
+      def update!(*args)
+        all.each { |record| record.update!(*args) }
+      end
     end
   end
 

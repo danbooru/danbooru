@@ -274,8 +274,10 @@ class PostQueryBuilder
       Post.pending
     when "flagged"
       Post.flagged
+    when "appealed"
+      Post.appealed
     when "modqueue"
-      Post.pending_or_flagged
+      Post.in_modqueue
     when "deleted"
       Post.deleted
     when "banned"
@@ -283,7 +285,7 @@ class PostQueryBuilder
     when "active"
       Post.active
     when "unmoderated"
-      Post.pending_or_flagged.available_for_moderation(current_user, hidden: false)
+      Post.in_modqueue.available_for_moderation(current_user, hidden: false)
     when "all", "any"
       Post.all
     else
@@ -307,7 +309,7 @@ class PostQueryBuilder
       Post.where(parent: nil)
     when "any"
       Post.where.not(parent: nil)
-    when /pending|flagged|modqueue|deleted|banned|active|unmoderated/
+    when "pending", "flagged", "appealed", "modqueue", "deleted", "banned", "active", "unmoderated"
       Post.where.not(parent: nil).where(parent: status_matches(parent))
     when /\A\d+\z/
       Post.where(id: parent).or(Post.where(parent: parent))
@@ -322,7 +324,7 @@ class PostQueryBuilder
       Post.where(has_children: false)
     when "any"
       Post.where(has_children: true)
-    when /pending|flagged|modqueue|deleted|banned|active|unmoderated/
+    when "pending", "flagged", "appealed", "modqueue", "deleted", "banned", "active", "unmoderated"
       Post.where(has_children: true).where(children: status_matches(child))
     else
       Post.none
@@ -606,10 +608,10 @@ class PostQueryBuilder
         .order("contributor_fav_count DESC, posts.fav_count DESC, posts.id DESC")
 
     when "modqueue", "modqueue_desc"
-      relation = relation.left_outer_joins(:flags).order(Arel.sql("GREATEST(posts.created_at, post_flags.created_at) DESC, posts.id DESC"))
+      relation = relation.with_queued_at.order("queued_at DESC, posts.id DESC")
 
     when "modqueue_asc"
-      relation = relation.left_outer_joins(:flags).order(Arel.sql("GREATEST(posts.created_at, post_flags.created_at) ASC, posts.id ASC"))
+      relation = relation.with_queued_at.order("queued_at ASC, posts.id ASC")
 
     when "none"
       relation = relation.reorder(nil)

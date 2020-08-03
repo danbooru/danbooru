@@ -61,8 +61,9 @@ class Post < ApplicationRecord
   scope :pending, -> { where(is_pending: true) }
   scope :flagged, -> { where(is_flagged: true) }
   scope :banned, -> { where(is_banned: true) }
-  scope :active, -> { where(is_pending: false, is_deleted: false, is_flagged: false) }
-  scope :pending_or_flagged, -> { pending.or(flagged) }
+  scope :active, -> { where(is_pending: false, is_deleted: false, is_flagged: false).where.not(id: PostAppeal.pending) }
+  scope :appealed, -> { where(id: PostAppeal.pending.select(:post_id)) }
+  scope :in_modqueue, -> { pending.or(flagged).or(appealed) }
   scope :expired, -> { where("posts.created_at < ?", 3.days.ago) }
 
   scope :unflagged, -> { where(is_flagged: false) }
@@ -281,8 +282,24 @@ class Post < ApplicationRecord
   end
 
   module ApprovalMethods
+    def in_modqueue?
+      is_pending? || is_flagged? || is_appealed?
+    end
+
+    def is_active?
+      !is_deleted? && !in_modqueue?
+    end
+
+    def is_appealed?
+      is_deleted? && appeals.any?(&:pending?)
+    end
+
+    def is_appealable?
+      is_deleted? && !is_appealed?
+    end
+
     def is_approvable?(user = CurrentUser.user)
-      !is_status_locked? && (is_pending? || is_flagged? || is_deleted?) && uploader != user
+      !is_status_locked? && !is_active? && uploader != user
     end
 
     def flag!(reason, is_deletion: false)
@@ -991,7 +1008,10 @@ class Post < ApplicationRecord
       transaction do
         automated = (user == User.system)
 
-        flags.create!(reason: reason, is_deletion: true, creator: user)
+        flags.pending.update!(status: :succeeded)
+        appeals.pending.update!(status: :rejected)
+
+        flags.create!(reason: reason, is_deletion: true, creator: user, status: :succeeded)
         update!(is_deleted: true, is_pending: false, is_flagged: false)
 
         # XXX This must happen *after* the `is_deleted` flag is set to true (issue #3419).
@@ -1221,6 +1241,14 @@ class Post < ApplicationRecord
       relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.is_deleted = FALSE) AS active_pool_count")
       relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.category = 'series') AS series_pool_count")
       relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.category = 'collection') AS collection_pool_count")
+      relation
+    end
+
+    def with_queued_at
+      relation = group(:id)
+      relation = relation.left_outer_joins(:flags, :appeals)
+      relation = relation.select("posts.*")
+      relation = relation.select(Arel.sql("MAX(GREATEST(posts.created_at, post_flags.created_at, post_appeals.created_at)) AS queued_at"))
       relation
     end
 

@@ -43,22 +43,18 @@
     Status:
     <% if post.is_pending? %>
       Pending
-    <% end %>
-
-    <% if post.is_deleted? %>
-      Deleted
-    <% end %>
-
-    <% if post.is_flagged? %>
+    <% elsif post.is_flagged? %>
       Flagged
+    <% elsif post.is_appealed? %>
+      Appealed
+    <% elsif post.is_deleted? %>
+      Deleted
+    <% else %>
+      Active
     <% end %>
 
     <% if post.is_banned? %>
       Banned
-    <% end %>
-
-    <% if !post.is_pending? && !post.is_deleted? && !post.is_banned? %>
-      Active
     <% end %>
   </li>
 </ul>

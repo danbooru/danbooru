@@ -149,7 +149,7 @@ module PostSets
     end
 
     def not_shown(post)
-      post.is_deleted? && tag_string !~ /status:(?:all|any|deleted|banned)/
+      post.is_deleted? && tag_string !~ /status:(?:all|any|deleted|banned|modqueue)/
     end
 
     def none_shown

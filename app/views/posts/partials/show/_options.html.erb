@@ -51,25 +51,24 @@
     <% if post.is_status_locked? %>
       <li id="post-option-status-locked">Status locked</li>
     <% else %>
-      <% if (!post.is_deleted? && !post.is_pending? && !post.is_flagged?) && policy(PostFlag).create? %>
+      <% if post.is_active? && policy(PostFlag).create? %>
         <li id="post-option-flag"><%= link_to "Flag", new_post_flag_path(post_flag: { post_id: post.id }), remote: true %></li>
-      <% elsif (post.is_flagged? || post.is_deleted?) && policy(PostAppeal).create? %>
+      <% elsif post.is_appealable? && policy(PostAppeal).create? %>
         <li id="post-option-appeal"><%= link_to "Appeal", new_post_appeal_path(post_appeal: { post_id: post.id }), remote: true %></li>
       <% end %>
 
       <% if policy(PostApproval).create? %>
-        <% if post.is_deleted? %>
-          <li id="post-option-undelete"><%= link_to "Undelete", post_approvals_path(post_id: post.id), remote: true, method: :post, "data-confirm": "Are you sure you want to undelete this post?" %></li>
-          <% if policy(post).move_favorites? %>
-            <li id="post-option-move-favorites"><%= link_to "Move favorites", confirm_move_favorites_moderator_post_post_path(post_id: post.id) %></li>
-          <% end %>
-        <% elsif policy(post).delete? %>
-          <li id="post-option-delete"><%= link_to "Delete", post, method: :delete, remote: true %></li>
+        <% if post.is_approvable? %>
+          <li id="post-option-approve"><%= link_to (post.is_deleted? ? "Undelete" : "Approve"), post_approvals_path(post_id: post.id), remote: true, method: :post, "data-shortcut": "shift+o", "data-confirm": "Are you sure you want to approve this post?" %></li>
+          <li id="post-option-disapprove"><%= link_to "Hide from queue", post_disapprovals_path(post_disapproval: { post_id: post.id, reason: "disinterest" }), remote: true, method: :post %></li>
         <% end %>
 
-        <% if post.is_approvable? && !post.is_deleted? %>
-          <li id="post-option-approve"><%= link_to "Approve", post_approvals_path(post_id: post.id), remote: true, method: :post, id: "approve", "data-shortcut": "shift+o", "data-confirm": "Are you sure you want to approve this post?" %></li>
-          <li id="post-option-disapprove"><%= link_to "Hide from queue", post_disapprovals_path(post_disapproval: { post_id: post.id, reason: "disinterest" }), remote: true, method: :post, id: "disapprove" %></li>
+        <% if post.is_deleted? && policy(post).move_favorites? %>
+          <li id="post-option-move-favorites"><%= link_to "Move favorites", confirm_move_favorites_moderator_post_post_path(post_id: post.id) %></li>
+        <% end %>
+
+        <% if !post.is_deleted? && policy(post).delete? %>
+          <li id="post-option-delete"><%= link_to "Delete", post, method: :delete, remote: true %></li>
         <% end %>
 
         <% if policy(post).unban? %>

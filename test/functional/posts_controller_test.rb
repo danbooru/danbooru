@@ -483,7 +483,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
             create(:note, post: @post)
             create(:artist_commentary, post: @post)
             create(:post_flag, post: @post, creator: @user)
-            create(:post_appeal, post: @post, creator: @user)
+            #create(:post_appeal, post: @post, creator: @user)
             create(:post_vote, post: @post, user: @user)
             create(:favorite, post: @post, user: @user)
             create(:moderation_report, model: @comment, creator: @builder)
@@ -667,7 +667,6 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_equal(false, @post.is_deleted?)
       end
-
     end
 
     context "revert action" do

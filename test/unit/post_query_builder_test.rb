@@ -584,22 +584,26 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       flagged = create(:post, is_flagged: true)
       deleted = create(:post, is_deleted: true)
       banned  = create(:post, is_banned: true)
-      all = [banned, deleted, flagged, pending]
+      appealed = create(:post, is_deleted: true)
+      appeal = create(:post_appeal, post: appealed)
+      all = [appealed, banned, deleted, flagged, pending]
 
-      assert_tag_match([flagged, pending], "status:modqueue")
+      assert_tag_match([appealed, flagged, pending], "status:modqueue")
       assert_tag_match([pending], "status:pending")
       assert_tag_match([flagged], "status:flagged")
-      assert_tag_match([deleted], "status:deleted")
+      assert_tag_match([appealed], "status:appealed")
+      assert_tag_match([appealed, deleted], "status:deleted")
       assert_tag_match([banned],  "status:banned")
       assert_tag_match([banned], "status:active")
       assert_tag_match([banned], "status:active status:banned")
       assert_tag_match(all, "status:any")
       assert_tag_match(all, "status:all")
 
-      assert_tag_match(all - [flagged, pending], "-status:modqueue")
+      assert_tag_match(all - [flagged, pending, appealed], "-status:modqueue")
       assert_tag_match(all - [pending], "-status:pending")
       assert_tag_match(all - [flagged], "-status:flagged")
-      assert_tag_match(all - [deleted], "-status:deleted")
+      assert_tag_match(all - [appealed], "-status:appealed")
+      assert_tag_match(all - [deleted, appealed], "-status:deleted")
       assert_tag_match(all - [banned],  "-status:banned")
       assert_tag_match(all - [banned], "-status:active")
 
@@ -611,11 +615,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       flagged = create(:post, is_flagged: true)
       pending = create(:post, is_pending: true)
       disapproved = create(:post, is_pending: true)
+      appealed = create(:post, is_deleted: true)
 
       create(:post_flag, post: flagged, creator: create(:user, created_at: 2.weeks.ago))
+      create(:post_appeal, post: appealed)
       create(:post_disapproval, user: CurrentUser.user, post: disapproved, reason: "disinterest")
 
-      assert_tag_match([pending, flagged], "status:unmoderated")
+      assert_tag_match([appealed, pending, flagged], "status:unmoderated")
       assert_tag_match([disapproved], "-status:unmoderated")
     end
 

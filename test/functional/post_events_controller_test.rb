@@ -10,6 +10,7 @@ class PostEventsControllerTest < ActionDispatch::IntegrationTest
     as(@user) do
       @post = create(:post)
       @post.flag!("aaa")
+      @post.update(is_deleted: true)
       create(:post_appeal, post: @post)
       @post.approve!(@mod)
     end

@@ -1,4 +1,4 @@
-<% if post.is_flagged? && !post.is_deleted? && post.flags.any? %>
+<% if post.is_flagged? %>
   <div class="notice notice-small post-notice post-notice-flagged">
     <p>This post was flagged for review (<%= link_to_wiki "learn more", "howto:flag" %>): </p>
 
@@ -30,13 +30,14 @@
   </div>
 <% end %>
 
-<% if post.is_pending? || post.is_flagged? %>
+<% if post.in_modqueue? %>
   <div class="notice notice-small post-notice post-notice-pending">
     <% if post.is_pending? %>
-      This post is pending approval. 
-      (<%= link_to_wiki "learn more", "about:mod_queue" %>)
-    <% else %>
+      This post is pending approval. (<%= link_to_wiki "learn more", "about:mod_queue" %>)
+    <% elsif post.is_flagged? %>
       This post was flagged and is pending approval (<%= link_to_wiki "learn more", "about:mod_queue" %>)
+    <% elsif post.is_appealed? %>
+      This post was appealed and is pending approval (<%= link_to_wiki "learn more", "about:mod_queue" %>)
     <% end %>
 
     <%= render "post_disapprovals/counts", :disapprovals => post.disapprovals, :post => post %>
@@ -48,7 +49,8 @@
   </div>
 <% end %>
 
-<% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
+<% #XXX %>
+<% if post.is_deleted? && post.appeals.any? %>
   <div class="notice notice-small post-notice post-notice-appealed">
     <p>This post was appealed:</p>
     <%= render "post_appeals/reasons", appeals: post.appeals %>

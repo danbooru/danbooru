@@ -32,7 +32,7 @@ class PostAppealTest < ActiveSupport::TestCase
         @post_appeal = build(:post_appeal, post: @post, creator: @alice)
 
         assert_equal(false, @post_appeal.valid?)
-        assert_equal(["Post is active"], @post_appeal.errors.full_messages)
+        assert_equal(["Post cannot be appealed"], @post_appeal.errors.full_messages)
       end
     end
   end

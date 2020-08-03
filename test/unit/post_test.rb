@@ -513,24 +513,23 @@ class PostTest < ActiveSupport::TestCase
     end
 
     context "A status locked post" do
-      setup do
-        @post = FactoryBot.create(:post, is_status_locked: true)
-      end
-
       should "not allow new flags" do
         assert_raises(PostFlag::Error) do
+          @post = create(:post, is_status_locked: true)
           @post.flag!("wrong")
         end
       end
 
       should "not allow new appeals" do
+        @post = create(:post, is_status_locked: true, is_deleted: true)
         @appeal = build(:post_appeal, post: @post)
 
         assert_equal(false, @appeal.valid?)
-        assert_equal(["Post is active"], @appeal.errors.full_messages)
+        assert_equal(["Post cannot be appealed"], @appeal.errors.full_messages)
       end
 
       should "not allow approval" do
+        @post = create(:post, is_status_locked: true, is_pending: true)
         approval = @post.approve!
         assert_includes(approval.errors.full_messages, "Post is locked and cannot be approved")
       end

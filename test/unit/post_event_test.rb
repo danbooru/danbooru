@@ -5,6 +5,7 @@ class PostEventTest < ActiveSupport::TestCase
     @user = create(:user, created_at: 2.weeks.ago)
     @post = create(:post)
     @post_flag = create(:post_flag, creator: @user, post: @post)
+    @post.update(is_deleted: true)
     @post_appeal = create(:post_appeal, creator: @user, post: @post)
   end
 

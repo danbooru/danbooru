@@ -2584,7 +2584,8 @@ CREATE TABLE public.post_appeals (
     creator_id integer NOT NULL,
     reason text,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    status integer DEFAULT 0 NOT NULL
 );
 
 
@@ -2684,7 +2685,8 @@ CREATE TABLE public.post_flags (
     reason text,
     is_resolved boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    status integer DEFAULT 0 NOT NULL
 );
 
 
@@ -6623,6 +6625,13 @@ CREATE INDEX index_post_appeals_on_reason_tsvector ON public.post_appeals USING 
 
 
 --
+-- Name: index_post_appeals_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_appeals_on_status ON public.post_appeals USING btree (status);
+
+
+--
 -- Name: index_post_approvals_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6669,6 +6678,13 @@ CREATE INDEX index_post_flags_on_post_id ON public.post_flags USING btree (post_
 --
 
 CREATE INDEX index_post_flags_on_reason_tsvector ON public.post_flags USING gin (to_tsvector('english'::regconfig, reason));
+
+
+--
+-- Name: index_post_flags_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_flags_on_status ON public.post_flags USING btree (status);
 
 
 --
@@ -7393,6 +7409,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200325074859'),
 ('20200403210353'),
 ('20200406054838'),
-('20200427190519');
+('20200427190519'),
+('20200803022359');
 
 

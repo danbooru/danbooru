@@ -7,7 +7,7 @@ class PostPresenter
       return "<em>none</em>".html_safe
     end
 
-    if !options[:show_deleted] && post.is_deleted? && options[:tags] !~ /status:(?:all|any|deleted|banned)/
+    if !options[:show_deleted] && post.is_deleted? && options[:tags] !~ /status:(?:all|any|deleted|banned|modqueue)/
       return ""
     end
 
