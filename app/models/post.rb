@@ -971,7 +971,7 @@ class Post < ApplicationRecord
 
       transaction do
         Post.without_timeout do
-          ModAction.log("permanently deleted post ##{id}", :post_permanent_delete)
+          ModAction.log("permanently deleted post ##{id} (md5=#{md5})", :post_permanent_delete)
 
           update_children_on_destroy
           decrement_tag_post_counts
