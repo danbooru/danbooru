@@ -61,7 +61,7 @@ class PostsController < ApplicationController
 
     if params[:commit] == "Delete"
       move_favorites = params.dig(:post, :move_favorites).to_s.truthy?
-      @post.delete!(params.dig(:post, :reason), move_favorites: move_favorites)
+      @post.delete!(params.dig(:post, :reason), move_favorites: move_favorites, user: CurrentUser.user)
       flash[:notice] = "Post deleted"
     end
 

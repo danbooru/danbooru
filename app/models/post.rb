@@ -63,6 +63,7 @@ class Post < ApplicationRecord
   scope :banned, -> { where(is_banned: true) }
   scope :active, -> { where(is_pending: false, is_deleted: false, is_flagged: false) }
   scope :pending_or_flagged, -> { pending.or(flagged) }
+  scope :expired, -> { where("posts.created_at < ?", 3.days.ago) }
 
   scope :unflagged, -> { where(is_flagged: false) }
   scope :has_notes, -> { where.not(last_noted_at: nil) }
@@ -950,7 +951,7 @@ class Post < ApplicationRecord
       Post.find(parent_id_before_last_save).update_has_children_flag if parent_id_before_last_save.present?
     end
 
-    def give_favorites_to_parent(options = {})
+    def give_favorites_to_parent
       return if parent.nil?
 
       transaction do
@@ -960,9 +961,7 @@ class Post < ApplicationRecord
         end
       end
 
-      unless options[:without_mod_action]
-        ModAction.log("moved favorites from post ##{id} to post ##{parent.id}", :post_move_favorites)
-      end
+      ModAction.log("moved favorites from post ##{id} to post ##{parent.id}", :post_move_favorites)
     end
 
     def has_visible_children?
@@ -1010,29 +1009,19 @@ class Post < ApplicationRecord
       ModAction.log("unbanned post ##{id}", :post_unban)
     end
 
-    def delete!(reason, options = {})
-      if is_status_locked?
-        self.errors.add(:is_status_locked, "; cannot delete post")
-        return false
-      end
+    def delete!(reason, move_favorites: false, user: CurrentUser.user)
+      transaction do
+        automated = (user == User.system)
 
-      Post.transaction do
-        flag!(reason, is_deletion: true)
-
-        update(
-          is_deleted: true,
-          is_pending: false,
-          is_flagged: false,
-          is_banned: is_banned || options[:ban] || has_tag?("banned_artist")
-        )
+        flags.create!(reason: reason, is_deletion: true, creator: user)
+        update!(is_deleted: true, is_pending: false, is_flagged: false)
 
         # XXX This must happen *after* the `is_deleted` flag is set to true (issue #3419).
-        give_favorites_to_parent(options) if options[:move_favorites]
+        give_favorites_to_parent if move_favorites
 
-        is_automatic = (reason == "Unapproved in three days")
-        uploader.upload_limit.update_limit!(self, incremental: is_automatic)
+        uploader.upload_limit.update_limit!(self, incremental: automated)
 
-        unless options[:without_mod_action]
+        unless automated
           ModAction.log("deleted post ##{id}, reason: #{reason}", :post_delete)
         end
       end
