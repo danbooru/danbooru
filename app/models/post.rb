@@ -920,14 +920,7 @@ class Post < ApplicationRecord
     end
 
     def update_children_on_destroy
-      return unless children.present?
-
-      eldest = children[0]
-      siblings = children[1..-1]
-
-      eldest.update(parent_id: nil)
-      Post.where(id: siblings).find_each { |p| p.update(parent_id: eldest.id) }
-      # Post.where(id: siblings).update(parent_id: eldest.id) # XXX rails 5
+      children.update(parent: nil)
     end
 
     def update_parent_on_save

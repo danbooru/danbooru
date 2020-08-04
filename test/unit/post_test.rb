@@ -254,17 +254,6 @@ class PostTest < ActiveSupport::TestCase
           end
         end
 
-        should "reparent all children to the first child" do
-          @p1.expunge!
-          @c1.reload
-          @c2.reload
-          @c3.reload
-
-          assert_nil(@c1.parent_id)
-          assert_equal(@c1.id, @c2.parent_id)
-          assert_equal(@c1.id, @c3.parent_id)
-        end
-
         should "save a post version record for each child" do
           assert_difference(["@c1.versions.count", "@c2.versions.count", "@c3.versions.count"]) do
             @p1.expunge!
@@ -272,11 +261,6 @@ class PostTest < ActiveSupport::TestCase
             @c2.reload
             @c3.reload
           end
-        end
-
-        should "set the has_children flag on the new parent" do
-          @p1.expunge!
-          assert_equal(true, @c1.reload.has_children?)
         end
       end
     end
