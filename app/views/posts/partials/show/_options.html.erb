@@ -64,7 +64,7 @@
             <li id="post-option-move-favorites"><%= link_to "Move favorites", confirm_move_favorites_moderator_post_post_path(post_id: post.id) %></li>
           <% end %>
         <% elsif policy(post).delete? %>
-          <li id="post-option-delete"><%= link_to "Delete", confirm_delete_moderator_post_post_path(post_id: post.id) %></li>
+          <li id="post-option-delete"><%= link_to "Delete", post, method: :delete, remote: true %></li>
         <% end %>
 
         <% if post.is_approvable? && !post.is_deleted? %>

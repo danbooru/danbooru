@@ -633,6 +633,43 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "destroy action" do
+      setup do
+        @approver = create(:approver)
+      end
+
+      should "delete the post" do
+        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" } }
+
+        assert_redirected_to @post
+        assert_equal(true, @post.reload.is_deleted?)
+        assert_equal("test", @post.flags.last.reason)
+      end
+
+      should "delete the post even if the deleter has flagged the post previously" do
+        create(:post_flag, post: @post, creator: @approver)
+        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" } }
+
+        assert_redirected_to @post
+        assert_equal(true, @post.reload.is_deleted?)
+      end
+
+      should "not delete the post if the user is unauthorized" do
+        delete_auth post_path(@post), @user, params: { commit: "Delete" }
+
+        assert_response 403
+        assert_equal(false, @post.is_deleted?)
+      end
+
+      should "render the delete post dialog for an xhr request" do
+        delete_auth post_path(@post), @approver, xhr: true
+
+        assert_response :success
+        assert_equal(false, @post.is_deleted?)
+      end
+
+    end
+
     context "revert action" do
       setup do
         PostVersion.sqs_service.stubs(:merge?).returns(false)

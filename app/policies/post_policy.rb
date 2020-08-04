@@ -31,6 +31,10 @@ class PostPolicy < ApplicationPolicy
     user.is_approver? && !record.is_deleted?
   end
 
+  def destroy?
+    delete?
+  end
+
   def ban?
     user.is_approver? && !record.is_banned?
   end

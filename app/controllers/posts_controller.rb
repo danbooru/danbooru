@@ -56,6 +56,18 @@ class PostsController < ApplicationController
     respond_with_post_after_update(@post)
   end
 
+  def destroy
+    @post = authorize Post.find(params[:id])
+
+    if params[:commit] == "Delete"
+      move_favorites = params.dig(:post, :move_favorites).to_s.truthy?
+      @post.delete!(params.dig(:post, :reason), move_favorites: move_favorites)
+      flash[:notice] = "Post deleted"
+    end
+
+    respond_with_post_after_update(@post)
+  end
+
   def revert
     @post = authorize Post.find(params[:id])
     @version = @post.versions.find(params[:version_id])
