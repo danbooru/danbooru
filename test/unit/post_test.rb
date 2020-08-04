@@ -569,24 +569,6 @@ class PostTest < ActiveSupport::TestCase
         @post = FactoryBot.create(:post)
       end
 
-      context "as a new user" do
-        setup do
-          @post.update(:tag_string => "aaa bbb ccc ddd tagme")
-          CurrentUser.user = FactoryBot.create(:user)
-        end
-
-        should "not allow you to remove tags" do
-          @post.update(tag_string: "aaa")
-          assert_equal(["You must have an account at least 1 week old to remove tags"], @post.errors.full_messages)
-        end
-
-        should "allow you to remove request tags" do
-          @post.update(tag_string: "aaa bbb ccc ddd")
-          @post.reload
-          assert_equal("aaa bbb ccc ddd", @post.tag_string)
-        end
-      end
-
       context "with a banned artist" do
         setup do
           CurrentUser.scoped(FactoryBot.create(:admin_user)) do

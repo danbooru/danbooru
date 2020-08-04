@@ -377,12 +377,6 @@ class Post < ApplicationRecord
     def update_tag_post_counts
       decrement_tags = tag_array_was - tag_array
 
-      decrement_tags_except_requests = decrement_tags.reject {|tag| tag == "tagme" || tag.end_with?("_request")}
-      if !decrement_tags_except_requests.empty? && !CurrentUser.is_builder? && CurrentUser.created_at > 1.week.ago
-        self.errors.add(:updater_id, "must have an account at least 1 week old to remove tags")
-        return false
-      end
-
       increment_tags = tag_array - tag_array_was
       if increment_tags.any?
         Tag.increment_post_counts(increment_tags)
