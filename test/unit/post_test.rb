@@ -224,18 +224,6 @@ class PostTest < ActiveSupport::TestCase
           assert_equal(false, p1.has_children?)
         end
 
-        should "reassign favorites to the parent" do
-          p1 = FactoryBot.create(:post)
-          c1 = FactoryBot.create(:post, :parent_id => p1.id)
-          user = FactoryBot.create(:user)
-          c1.add_favorite!(user)
-          c1.expunge!
-          p1.reload
-          assert(!Favorite.exists?(:post_id => c1.id, :user_id => user.id))
-          assert(Favorite.exists?(:post_id => p1.id, :user_id => user.id))
-          assert_equal(0, c1.score)
-        end
-
         should "update the parent's has_children flag" do
           p1 = FactoryBot.create(:post)
           c1 = FactoryBot.create(:post, :parent_id => p1.id)

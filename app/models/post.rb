@@ -973,7 +973,6 @@ class Post < ApplicationRecord
         Post.without_timeout do
           ModAction.log("permanently deleted post ##{id}", :post_permanent_delete)
 
-          give_favorites_to_parent
           update_children_on_destroy
           decrement_tag_post_counts
           remove_from_all_pools
