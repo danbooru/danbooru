@@ -1,0 +1,24 @@
+<div id="p-global-listing">
+  <%= table_for linked_accounts, width: "100%" do |t| %>
+    <% t.column "User" do |linked_account| %>
+      <%= link_to_user linked_account.user %>
+    <% end %>
+    <%= t.column :site %>
+    <% t.column "Name" do |linked_account| %>
+      <%= linked_account.user_name %>
+    <% end %>
+    <% t.column "Profile URL" do |linked_account| %>
+      <% if linked_account.profile_url.present? %>
+        <%= link_to linked_account.profile_url, linked_account.profile_url, target: "_blank" %>
+      <% end %>
+    <% end %>
+    <% t.column "Public" do |linked_account| %>
+      <%= linked_account.is_public? %>
+    <% end %>
+    <% t.column "Created" do |linked_account| %>
+      <%= time_ago_in_words_tagged linked_account.created_at %>
+    <% end %>
+  <% end %>
+
+  <%= numbered_paginator(linked_accounts) %>
+</div>

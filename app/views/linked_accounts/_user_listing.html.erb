@@ -1,0 +1,12 @@
+<div id="p-user-listing">
+  <p>
+    Link your accounts to unlock special features. None of your <%=
+    Danbooru.config.app_name %> data will be shared with other sites.
+  </p>
+
+  <div class="linked-account-list">
+    <% LinkedAccount.sites.keys.each do |site| %>
+      <%= render "linked_account", linked_account: user.linked_accounts.find_or_initialize_by(site: site) %>
+    <% end %>
+  </div>
+</div>

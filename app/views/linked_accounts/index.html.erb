@@ -1,0 +1,13 @@
+<div id="c-linked-accounts">
+  <div id="a-index" class="fixed-width-container">
+    <h1>Linked Accounts</h1>
+
+    <% if @user.present? %>
+      <%= render "user_listing", user: @user, linked_accounts: @linked_accounts %>
+    <% else %>
+      <%= render "global_listing", linked_accounts: @linked_accounts %>
+    <% end %>
+
+    <%= render "users/secondary_links" %>
+  </div>
+</div>

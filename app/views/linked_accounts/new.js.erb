@@ -1,0 +1,2 @@
+var url = <%= raw @linked_account.authorization_url(redirect_uri: callback_linked_accounts_url).to_json %>;
+window.open(url, "_blank", "width=640,height=800,noopener=true");

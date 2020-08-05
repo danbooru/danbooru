@@ -9,6 +9,12 @@
   --link-color: hsl(213, 100%, 50%);
   --link-hover-color: hsl(213, 100%, 75%);
 
+  --button-text-color: white;
+  --primary-button-color: var(--link-color);
+  --primary-button-hover-color: var(--link-hover-color);
+  --secondary-button-color: #AAA;
+  --secondary-button-hover-color: #BBB;
+
   --error-background-color: hsl(0, 100%, 95%); /* light red */
   --success-background-color: hsl(120, 100%, 95%); /* light green */
   --warning-background-color: hsl(50, 100%, 93%); /* light yellow */
@@ -209,6 +215,10 @@
   --related-tags-container-background: #EEE;
   --selected-related-tag-background-color: var(--link-color);
   --selected-related-tag-color: white;
+
+  --linked-account-background-color: var(--subnav-menu-background-color);
+  --linked-account-status-icon-color: var(--character-tag-hover-color);
+  --linked-account-border: 1px solid #CCC;
 }
 
 /* variables that aren't defined in the dark theme fall back to the :root theme */
@@ -300,6 +310,12 @@ body[data-current-user-theme="dark"] {
 
   --bulk-update-request-approved-color: var(--green-1);
   --bulk-update-request-failed-color: var(--red-1);
+
+  --button-text-color: white;
+  --primary-button-color: var(--link-color);
+  --primary-button-hover-color: var(--link-hover-color);
+  --secondary-button-color: var(--grey-4);
+  --secondary-button-hover-color: var(--grey-5);
 
   --comment-sticky-background-color: var(--blue-0);
 
@@ -430,4 +446,8 @@ body[data-current-user-theme="dark"] {
   --remove-favorite-button: var(--red-1);
   --fetch-source-data-border: 1px solid var(--grey-4);
   --quick-search-form-background: var(--grey-1);
+
+  --linked-account-background-color: var(--grey-2);
+  --linked-account-status-icon-color: var(--green-2);
+  --linked-account-border: 1px solid var(--grey-3);
 }

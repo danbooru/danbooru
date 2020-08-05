@@ -190,6 +190,15 @@
         <th>Feedback</th>
         <td><%= presenter.feedbacks(self) %></td>
       </tr>
+
+      <% if user.linked_accounts.is_public.order(:site).present? %>
+        <tr>
+          <th>Accounts</th>
+          <td>
+            <%= render "linked_accounts/inline_listing", linked_accounts: user.linked_accounts.is_public.order(:site) %>
+          </td>
+        </tr>
+      <% end %>
       
       <% if policy(UserNameChangeRequest.new(user: user)).show? %>
         <% user.user_name_change_requests.visible(CurrentUser.user).tap do |changes| %>

@@ -1,0 +1,90 @@
+#c-linked-accounts {
+  #a-index {
+    /* XXX */
+    form.simple_form, div.input {
+      margin-bottom: 0;
+    }
+
+    .linked-account-list {
+      display: flex;
+      flex-wrap: wrap;
+
+      .linked-account {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+
+        padding: 1em;
+        margin-bottom: 1em;
+
+        background-color: var(--linked-account-background-color);
+        border: var(--linked-account-border);
+
+        width: 100%;
+        box-sizing: border-box;
+
+        .linked-account-media {
+          margin-bottom: 1em;
+          img { max-width: 96px; }
+        }
+
+        .linked-account-body {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          width: 100%;
+
+          .linked-account-details {
+            flex-grow: 1;
+
+            .linked-account-site {
+              font-weight: bold;
+            }
+
+            .linked-account-status-icon {
+              color: var(--linked-account-status-icon-color);
+            }
+
+            .edit_linked_account {
+              margin-bottom: 1em;
+            }
+
+            .linked-account-description {
+              font-size: 0.85em;
+            }
+          }
+        }
+
+        @media (min-width: 660px) {
+          margin-right: 1em;
+          width: 540px;
+          flex-direction: row;
+          text-align: left;
+
+          .linked-account-media {
+            margin: 0 1em 0 0;
+          }
+
+          .linked-account-body {
+            flex-direction: row;
+          }
+        }
+      }
+    }
+  }
+}
+
+.linked-account-inline {
+  .linked-account-media {
+    width: 1em;
+    height: 1em;
+  }
+
+  .linked-account-edit {
+    color: var(--secondary-button-color);
+
+    &:hover {
+      color: var(--primary-button-color);
+    }
+  }
+}
