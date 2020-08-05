@@ -14,6 +14,7 @@ Post.SWIPE_VELOCITY = 0.6;
 Post.MAX_RECOMMENDATIONS = 45; // 3 rows of 9 posts at 1920x1080.
 Post.LOW_TAG_COUNT = 10;
 Post.HIGH_TAG_COUNT = 20;
+Post.EDIT_DIALOG_WIDTH = 720;
 
 Post.initialize_all = function() {
 
@@ -110,7 +111,7 @@ Post.open_edit_dialog = function() {
   $("#form").appendTo(dialog);
   dialog.dialog({
     title: "Edit tags",
-    width: $(window).width() * 0.6,
+    width: Post.EDIT_DIALOG_WIDTH,
     position: {
       my: "right",
       at: "right-20",
