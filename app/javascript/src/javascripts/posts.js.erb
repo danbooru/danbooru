@@ -104,7 +104,6 @@ Post.open_edit_dialog = function() {
   $("#post-edit-link").parent("li").addClass("active");
 
   var $tag_string = $("#post_tag_string,#upload_tag_string");
-  $("div.input").has($tag_string).prevAll().hide();
   $("#open-edit-dialog").hide();
 
   var dialog = $("<div/>").attr("id", "edit-dialog");

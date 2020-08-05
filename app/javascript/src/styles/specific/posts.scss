@@ -80,8 +80,13 @@ table article.post-preview {
   margin-top: 1em;
 }
 
-#edit-dialog textarea {
-  margin-bottom: 0.25em;
+#edit-dialog {
+  /* Hide everything but the rating and tags fields. */
+  .post_has_embedded_notes_fieldset, .post_lock_fieldset, .post_parent_id,
+  .post_source, #filedropzone, .upload_as_pending, .upload_source_container,
+  .upload_parent_id, .upload_artist_commentary_container {
+    display: none;
+  }
 }
 
 .post-preview {
