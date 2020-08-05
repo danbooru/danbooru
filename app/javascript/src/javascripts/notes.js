@@ -557,7 +557,6 @@ class Note {
       let $textarea = $('<textarea></textarea>');
       $textarea.val(note.original_body);
       $textarea.css({
-        width: "97%",
         height: "85%",
         resize: "none",
       });
