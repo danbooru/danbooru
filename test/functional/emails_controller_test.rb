@@ -34,10 +34,12 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
       context "for a user without an email address" do
         should "render" do
           @user.email_address.destroy!
+          @user.reload_email_address
           get_auth edit_user_email_path(@user), @user
 
           assert_equal false, @user.email_address.present?
           assert_response :success
+          assert_select "h1", text: "Add Email"
         end
       end
 

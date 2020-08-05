@@ -221,8 +221,8 @@ module Sources
     context "A Tumblr post with new image URLs" do
       should "return the correct image url" do
         page_url = "https://emlan.tumblr.com/post/189469423572/kuro-attempts-to-buy-a-racy-book-at-comiket-but"
-        image1_url = "https://66.media.tumblr.com/168dabd09d5ad69eb5fedcf94c45c31a/3dbfaec9b9e0c2e3-72/s640x960/bf33a1324f3f36d2dc64f011bfeab4867da62bc8.png"
-        image2_url = "https://66.media.tumblr.com/5a2c3fe25c977e2281392752ab971c90/3dbfaec9b9e0c2e3-92/s540x810/cd270c29db06b5e7fdcee63114fe3eb2c9c0d590.png"
+        image1_url = "https://64.media.tumblr.com/168dabd09d5ad69eb5fedcf94c45c31a/3dbfaec9b9e0c2e3-72/s640x960/bf33a1324f3f36d2dc64f011bfeab4867da62bc8.png"
+        image2_url = "https://64.media.tumblr.com/5a2c3fe25c977e2281392752ab971c90/3dbfaec9b9e0c2e3-92/s540x810/cd270c29db06b5e7fdcee63114fe3eb2c9c0d590.png"
         strategy = Sources::Strategies.find(image2_url, page_url)
 
         assert_equal([image1_url, image2_url], strategy.image_urls)

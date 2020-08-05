@@ -142,9 +142,11 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "fail" do
-          @post.delete!("test")
-          assert_equal(["Is status locked ; cannot delete post"], @post.errors.full_messages)
-          assert_equal(1, Post.where("id = ?", @post.id).count)
+          assert_raise(ActiveRecord::RecordInvalid) do
+            @post.delete!("test")
+          end
+
+          assert_equal(false, @post.reload.is_deleted?)
         end
       end
 
