@@ -32,6 +32,10 @@ class PostVersion < ApplicationRecord
       end
     end
 
+    def changed_tags_include_any(tags)
+      where_array_includes_any(:added_tags, tags).or(where_array_includes_any(:removed_tags, tags))
+    end
+
     def tag_matches(string)
       tag = string.match(/\S+/)[0]
       return all if tag.nil?
@@ -43,8 +47,12 @@ class PostVersion < ApplicationRecord
       q = super
       q = q.search_attributes(params, :updater_id, :post_id, :tags, :added_tags, :removed_tags, :rating, :rating_changed, :parent_id, :parent_changed, :source, :source_changed, :version)
 
-      if params[:changed_tags]
-        q = q.changed_tags_include_all(params[:changed_tags].scan(/[^[:space:]]+/))
+      if params[:all_changed_tags]
+        q = q.changed_tags_include_all(params[:all_changed_tags].scan(/[^[:space:]]+/))
+      end
+
+      if params[:any_changed_tags]
+        q = q.changed_tags_include_any(params[:any_changed_tags].scan(/[^[:space:]]+/))
       end
 
       if params[:tag_matches]
