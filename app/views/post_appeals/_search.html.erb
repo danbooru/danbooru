@@ -3,6 +3,6 @@
   <%= f.input :post_tags_match, label: "Tags", input_html: { value: params[:search][:post_tags_match], data: { autocomplete: "tag-query" } } %>
   <%= f.input :post_id, label: "Post ID", input_html: { value: params[:search][:post_id] } %>
   <%= f.input :creator_name, label: "Creator", input_html: { value: params[:search][:creator_name], data: { autocomplete: "user" } } %>
-  <%= f.input :is_resolved, label: "Resolved?", collection: [["Yes", true], ["No", false]], include_blank: true, selected: params[:search][:is_resolved] %>
+  <%= f.input :status, collection: PostAppeal.statuses, include_blank: true, selected: params[:search][:status] %>
   <%= f.submit "Search" %>
 <% end %>

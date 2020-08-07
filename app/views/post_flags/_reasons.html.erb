@@ -8,10 +8,6 @@
       <% end %>
 
       - <%= time_ago_in_words_tagged(flag.created_at) %>
-
-      <% if flag.is_resolved? %>
-        <span class="resolved">RESOLVED</span>
-      <% end %>
     </li>
   <% end %>
 </ul>

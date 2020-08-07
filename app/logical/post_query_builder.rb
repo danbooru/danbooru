@@ -6,7 +6,7 @@ class PostQueryBuilder
   COUNT_METATAGS = %w[
     comment_count deleted_comment_count active_comment_count
     note_count deleted_note_count active_note_count
-    flag_count resolved_flag_count unresolved_flag_count
+    flag_count
     child_count deleted_child_count active_child_count
     pool_count deleted_pool_count active_pool_count series_pool_count collection_pool_count
     appeal_count approval_count replacement_count

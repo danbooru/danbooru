@@ -26,8 +26,6 @@ class PostFlag < ApplicationRecord
   scope :by_users, -> { where.not(creator: User.system) }
   scope :by_system, -> { where(creator: User.system) }
   scope :in_cooldown, -> { by_users.where("created_at >= ?", COOLDOWN_PERIOD.ago) }
-  scope :resolved, -> { where(is_resolved: true) }
-  scope :unresolved, -> { where(is_resolved: false) }
   scope :recent, -> { where("post_flags.created_at >= ?", 1.day.ago) }
   scope :expired, -> { pending.where("post_flags.created_at <= ?", 3.days.ago) }
 
@@ -62,7 +60,7 @@ class PostFlag < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :post, :is_resolved, :reason, :status)
+      q = q.search_attributes(params, :post, :reason, :status)
       q = q.text_attribute_matches(:reason, params[:reason_matches])
 
       if params[:creator_id].present?

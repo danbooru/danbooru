@@ -17,8 +17,6 @@ class PostAppeal < ApplicationRecord
     rejected: 2
   }
 
-  scope :resolved, -> { where(post: Post.undeleted.unflagged) }
-  scope :unresolved, -> { where(post: Post.deleted.or(Post.flagged)) }
   scope :recent, -> { where("post_appeals.created_at >= ?", 1.day.ago) }
   scope :expired, -> { pending.where("post_appeals.created_at <= ?", 3.days.ago) }
 
@@ -28,22 +26,11 @@ class PostAppeal < ApplicationRecord
       q = q.search_attributes(params, :creator, :post, :reason, :status)
       q = q.text_attribute_matches(:reason, params[:reason_matches])
 
-      q = q.resolved if params[:is_resolved].to_s.truthy?
-      q = q.unresolved if params[:is_resolved].to_s.falsy?
-
       q.apply_default_order(params)
     end
   end
 
   extend SearchMethods
-
-  def resolved?
-    post.present? && !post.is_deleted? && !post.is_flagged?
-  end
-
-  def is_resolved
-    resolved?
-  end
 
   def validate_creator_is_not_limited
     if appeal_count_for_creator >= MAX_APPEALS_PER_DAY

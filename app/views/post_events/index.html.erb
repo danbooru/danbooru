@@ -4,6 +4,14 @@
 
     <%= table_for @events, class: "striped autofit", width: "100%" do |t| %>
       <% t.column :type_name, name: "Type" %>
+      <% t.column "Description", td: { class: "col-expand" } do |event| %>
+        <div class="prose">
+          <%= format_text event.reason %>
+        </div>
+      <% end %>
+      <% t.column "Status" do |event| %>
+        <%= event.status %>
+      <% end %>
       <% t.column "User" do |event| %>
         <% if event.is_creator_visible? %>
           <%= link_to_user event.creator %>
@@ -12,12 +20,6 @@
         <% end %>
         <br><%= time_ago_in_words_tagged event.created_at %>
       <% end %>
-      <% t.column "Description", td: { class: "col-expand" } do |event| %>
-        <div class="prose">
-          <%= format_text event.reason %>
-        </div>
-      <% end %>
-      <% t.column :is_resolved, name: "Resolved" %>
     <% end %>
   </div>
 </div>

@@ -263,11 +263,6 @@ div#c-posts {
       margin-bottom: 0;
     }
 
-    .resolved {
-      margin-left: 0.5em;
-      font-weight: bold;
-    }
-
     &.post-notice-parent { background: var(--post-parent-notice-background); }
     &.post-notice-child { background: var(--post-child-notice-background); }
     &.post-notice-pending { background: var(--post-pending-notice-background); }

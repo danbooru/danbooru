@@ -3,6 +3,5 @@ FactoryBot.define do
     creator
     post { build(:post, is_flagged: true) }
     reason {"xxx"}
-    is_resolved {false}
   end
 end

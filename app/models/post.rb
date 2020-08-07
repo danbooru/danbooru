@@ -303,7 +303,7 @@ class Post < ApplicationRecord
     end
 
     def flag!(reason, is_deletion: false)
-      flag = flags.create(reason: reason, is_resolved: false, is_deletion: is_deletion, creator: CurrentUser.user)
+      flag = flags.create(reason: reason, is_deletion: is_deletion, creator: CurrentUser.user)
 
       if flag.errors.any?
         raise PostFlag::Error.new(flag.errors.full_messages.join("; "))
@@ -1201,8 +1201,6 @@ class Post < ApplicationRecord
     def with_flag_stats
       relation = left_outer_joins(:flags).group(:id).select("posts.*")
       relation = relation.select("COUNT(post_flags.id) AS flag_count")
-      relation = relation.select("COUNT(post_flags.id) FILTER (WHERE post_flags.is_resolved = TRUE)  AS resolved_flag_count")
-      relation = relation.select("COUNT(post_flags.id) FILTER (WHERE post_flags.is_resolved = FALSE) AS unresolved_flag_count")
       relation
     end
 
