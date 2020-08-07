@@ -4,12 +4,12 @@ module DanbooruMaintenance
   def hourly
     safely { Upload.prune! }
     safely { PostPruner.prune! }
+    safely { regenerate_post_counts! }
   end
 
   def daily
     safely { Delayed::Job.where('created_at < ?', 45.days.ago).delete_all }
     safely { PostDisapproval.prune! }
-    safely { regenerate_post_counts! }
     safely { TokenBucket.prune! }
     safely { BulkUpdateRequestPruner.warn_old }
     safely { BulkUpdateRequestPruner.reject_expired }
