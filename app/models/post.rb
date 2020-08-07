@@ -239,9 +239,9 @@ class Post < ApplicationRecord
 
     def large_image_width
       if has_large?
-        [Danbooru.config.large_image_width, image_width].min
+        [Danbooru.config.large_image_width, image_width.to_i].min
       else
-        image_width
+        image_width.to_i
       end
     end
 
