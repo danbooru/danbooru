@@ -32,7 +32,7 @@ module Moderator
       def unban
         @post = authorize ::Post.find(params[:id])
         @post.unban!
-        flash[:notice] = "Post was banned"
+        flash[:notice] = "Post was unbanned"
 
         respond_with(@post)
       end
