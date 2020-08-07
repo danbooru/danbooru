@@ -103,8 +103,6 @@ class PostFlag < ApplicationRecord
 
     if creator.can_approve_posts?
       # do nothing
-    elsif creator.created_at > 1.week.ago
-      errors[:creator] << "cannot flag within the first week of sign up"
     elsif creator.is_gold? && flag_count_for_creator >= 10
       errors[:creator] << "can flag 10 posts a day"
     elsif !creator.is_gold? && flag_count_for_creator >= 1
