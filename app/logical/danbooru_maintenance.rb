@@ -35,8 +35,12 @@ module DanbooruMaintenance
 
   def safely(&block)
     ActiveRecord::Base.connection.execute("set statement_timeout = 0")
-    yield
+
+    CurrentUser.scoped(User.system, "127.0.0.1") do
+      yield
+    end
   rescue StandardError => exception
     DanbooruLogger.log(exception)
+    raise exception if Rails.env.test?
   end
 end
