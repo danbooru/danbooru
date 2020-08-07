@@ -3,10 +3,10 @@ module DanbooruMaintenance
 
   def hourly
     safely { Upload.prune! }
+    safely { PostPruner.prune! }
   end
 
   def daily
-    safely { PostPruner.prune! }
     safely { Delayed::Job.where('created_at < ?', 45.days.ago).delete_all }
     safely { PostDisapproval.prune! }
     safely { regenerate_post_counts! }

@@ -1,9 +1,9 @@
 require 'test_helper'
 
 class DanbooruMaintenanceTest < ActiveSupport::TestCase
-  context "daily maintenance" do
+  context "hourly maintenance" do
     should "work" do
-      assert_nothing_raised { DanbooruMaintenance.daily }
+      assert_nothing_raised { DanbooruMaintenance.hourly }
     end
 
     should "prune expired posts" do
@@ -14,7 +14,7 @@ class DanbooruMaintenanceTest < ActiveSupport::TestCase
       @flag = create(:post_flag, post: @flagged, created_at: 4.days.ago)
       @appeal = create(:post_appeal, post: @appealed, created_at: 4.days.ago)
 
-      DanbooruMaintenance.daily
+      DanbooruMaintenance.hourly
 
       assert_equal(true, @pending.reload.is_deleted?)
       assert_equal(true, @flagged.reload.is_deleted?)
@@ -22,7 +22,9 @@ class DanbooruMaintenanceTest < ActiveSupport::TestCase
       assert_equal(true, @flag.reload.succeeded?)
       assert_equal(true, @appeal.reload.rejected?)
     end
+  end
 
+  context "hourly maintenance" do
     context "when pruning bans" do
       should "clear the is_banned flag for users who are no longer banned" do
         banner = FactoryBot.create(:admin_user)
