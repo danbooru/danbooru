@@ -149,7 +149,10 @@ module Searchable
     type = column.type || reflect_on_association(name)&.class_name
 
     if column.try(:array?)
-      return search_array_attribute(name, type, params)
+      subtype = type
+      type = :array
+    elsif defined_enums.has_key?(name.to_s)
+      type = :enum
     end
 
     case type
@@ -165,6 +168,10 @@ module Searchable
       numeric_attribute_matches(name, params[name])
     when :inet
       search_inet_attribute(name, params)
+    when :enum
+      search_enum_attribute(name, params)
+    when :array
+      search_array_attribute(name, subtype, params)
     else
       raise NotImplementedError, "unhandled attribute type: #{name}"
     end
@@ -227,6 +234,19 @@ module Searchable
 
     if params[:post_tags_match].present?
       relation = relation.where(post_id: Post.user_tag_match(params[:post_tags_match]).reorder(nil))
+    end
+
+    relation
+  end
+
+  def search_enum_attribute(name, params)
+    relation = all
+
+    if params[name].present?
+      value = params[name].split(/[, ]+/).map(&:downcase)
+      relation = relation.where(name => value)
+    elsif params["#{name}_id"].present?
+      relation = relation.numeric_attribute_matches(name, params["#{name}_id"])
     end
 
     relation
