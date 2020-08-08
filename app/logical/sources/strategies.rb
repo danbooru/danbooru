@@ -3,6 +3,7 @@ module Sources
     def self.all
       [
         Strategies::Pixiv,
+        Strategies::Fanbox,
         Strategies::NicoSeiga,
         Strategies::Twitter,
         Strategies::Stash, # must come before DeviantArt

@@ -326,13 +326,6 @@ module Sources
           assert_illust_id(46323924, "http://i1.pixiv.net/img-zip-ugoira/img/2014/10/03/17/29/16/46323924_ugoira1920x1080.zip")
         end
 
-        should "not misparse ids from fanbox urls" do
-          assert_nil_illust_id("https://fanbox.pixiv.net/images/post/39714/JvjJal8v1yLgc5DPyEI05YpT.png")
-          assert_nil_illust_id("https://pixiv.pximg.net/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg")
-          assert_nil_illust_id("https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg")
-          assert_nil_illust_id("https://pixiv.pximg.net/c/1200x630_90_a2_g5/fanbox/public/images/post/186919/cover/VCI1Mcs2rbmWPg0mmiTisovn.jpeg")
-        end
-
         should "not misparse ids from sketch urls" do
           assert_nil_illust_id("https://img-sketch.pixiv.net/uploads/medium/file/4463372/8906921629213362989.jpg")
           assert_nil_illust_id("https://img-sketch.pximg.net/c!/w=540,f=webp:jpeg/uploads/medium/file/4463372/8906921629213362989.jpg")
