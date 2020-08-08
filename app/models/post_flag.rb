@@ -12,7 +12,7 @@ class PostFlag < ApplicationRecord
   belongs_to :post
   validates :reason, presence: true, length: { in: 1..140 }
   validate :validate_creator_is_not_limited, on: :create
-  validate :validate_post
+  validate :validate_post, on: :create
   validates_uniqueness_of :creator_id, scope: :post_id, on: :create, unless: :is_deletion, message: "have already flagged this post"
   before_save :update_post
   attr_accessor :is_deletion
@@ -26,7 +26,6 @@ class PostFlag < ApplicationRecord
   scope :by_users, -> { where.not(creator: User.system) }
   scope :by_system, -> { where(creator: User.system) }
   scope :in_cooldown, -> { by_users.where("created_at >= ?", COOLDOWN_PERIOD.ago) }
-  scope :recent, -> { where("post_flags.created_at >= ?", 1.day.ago) }
   scope :expired, -> { pending.where("post_flags.created_at <= ?", 3.days.ago) }
 
   module SearchMethods
@@ -97,30 +96,18 @@ class PostFlag < ApplicationRecord
   end
 
   def validate_creator_is_not_limited
-    return if is_deletion
-
-    if creator.can_approve_posts?
-      # do nothing
-    elsif creator.is_gold? && flag_count_for_creator >= 10
-      errors[:creator] << "can flag 10 posts a day"
-    elsif !creator.is_gold? && flag_count_for_creator >= 1
-      errors[:creator] << "can flag 1 post a day"
-    end
-
-    flag = post.flags.in_cooldown.last
-    if flag.present?
-      errors[:post] << "cannot be flagged more than once every #{COOLDOWN_PERIOD.inspect} (last flagged: #{flag.created_at.to_s(:long)})"
-    end
+    errors[:creator] << "have reached your flag limit" if creator.is_flag_limited? && !is_deletion
   end
 
   def validate_post
     errors[:post] << "is pending and cannot be flagged" if post.is_pending? && !is_deletion
     errors[:post] << "is deleted and cannot be flagged" if post.is_deleted? && !is_deletion
     errors[:post] << "is locked and cannot be flagged" if post.is_status_locked?
-  end
 
-  def flag_count_for_creator
-    creator.post_flags.recent.count
+    flag = post.flags.in_cooldown.last
+    if flag.present?
+      errors[:post] << "cannot be flagged more than once every #{COOLDOWN_PERIOD.inspect} (last flagged: #{flag.created_at.to_s(:long)})"
+    end
   end
 
   def uploader_id
