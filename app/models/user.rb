@@ -349,6 +349,11 @@ class User < ApplicationRecord
       end
     end
 
+    def is_appeal_limited?
+      return false if can_upload_free?
+      upload_limit.free_upload_slots < UploadLimit::APPEAL_COST
+    end
+
     def upload_limit
       @upload_limit ||= UploadLimit.new(self)
     end

@@ -1,8 +1,4 @@
 class PostAppeal < ApplicationRecord
-  class Error < StandardError; end
-
-  MAX_APPEALS_PER_DAY = 1
-
   belongs_to :creator, :class_name => "User"
   belongs_to :post
 
@@ -33,17 +29,11 @@ class PostAppeal < ApplicationRecord
   extend SearchMethods
 
   def validate_creator_is_not_limited
-    if appeal_count_for_creator >= MAX_APPEALS_PER_DAY
-      errors[:creator] << "can appeal at most #{MAX_APPEALS_PER_DAY} post a day"
-    end
+    errors[:creator] << "have reached your appeal limit" if creator.is_appeal_limited?
   end
 
   def validate_post_is_appealable
     errors[:post] << "cannot be appealed" if post.is_status_locked? || !post.is_appealable?
-  end
-
-  def appeal_count_for_creator
-    creator.post_appeals.recent.count
   end
 
   def self.available_includes
