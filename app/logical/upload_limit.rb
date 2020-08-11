@@ -30,6 +30,10 @@ class UploadLimit
     end
   end
 
+  def maxed?
+    user.upload_points >= MAXIMUM_POINTS
+  end
+
   def used_upload_slots
     pending = user.posts.pending
     early_deleted = user.posts.deleted.where("created_at >= ?", 3.days.ago)
