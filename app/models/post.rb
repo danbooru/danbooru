@@ -7,7 +7,8 @@ class Post < ApplicationRecord
   class TimeoutError < StandardError; end
 
   # Tags to copy when copying notes.
-  NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation]
+  NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation
+                      annotated partially_annotated check_annotation annotation_request]
 
   deletable
 
