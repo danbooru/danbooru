@@ -1,4 +1,4 @@
-<% if (CurrentUser.can_approve_posts? || post.created_at < 3.days.ago) && disapprovals.length > 0 %>
+<% if (CurrentUser.can_approve_posts? || post.created_at < Danbooru.config.moderation_period.ago) && disapprovals.length > 0 %>
   <p>
     It has been reviewed by <%= pluralize disapprovals.length, "approver" %>. 
 

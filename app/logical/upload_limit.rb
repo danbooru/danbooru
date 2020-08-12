@@ -38,7 +38,7 @@ class UploadLimit
   def used_upload_slots
     pending_count = user.posts.pending.count
     appealed_count = user.post_appeals.pending.count
-    early_deleted_count = user.posts.deleted.where("created_at >= ?", 3.days.ago).count
+    early_deleted_count = user.posts.deleted.where("created_at >= ?", Danbooru.config.moderation_period.ago).count
 
     pending_count + early_deleted_count + (appealed_count * APPEAL_COST)
   end

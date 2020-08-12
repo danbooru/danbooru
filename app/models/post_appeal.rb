@@ -13,8 +13,7 @@ class PostAppeal < ApplicationRecord
     rejected: 2
   }
 
-  scope :recent, -> { where("post_appeals.created_at >= ?", 1.day.ago) }
-  scope :expired, -> { pending.where("post_appeals.created_at <= ?", 3.days.ago) }
+  scope :expired, -> { pending.where("post_appeals.created_at < ?", Danbooru.config.moderation_period.ago) }
 
   module SearchMethods
     def search(params)

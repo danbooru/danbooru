@@ -6,8 +6,6 @@ class PostFlag < ApplicationRecord
     REJECTED = "Unapproved in three days after returning to moderation queue%"
   end
 
-  COOLDOWN_PERIOD = 3.days
-
   belongs_to :creator, class_name: "User"
   belongs_to :post
   validates :reason, presence: true, length: { in: 1..140 }
@@ -25,8 +23,8 @@ class PostFlag < ApplicationRecord
 
   scope :by_users, -> { where.not(creator: User.system) }
   scope :by_system, -> { where(creator: User.system) }
-  scope :in_cooldown, -> { by_users.where("created_at >= ?", COOLDOWN_PERIOD.ago) }
-  scope :expired, -> { pending.where("post_flags.created_at <= ?", 3.days.ago) }
+  scope :in_cooldown, -> { by_users.where("created_at >= ?", Danbooru.config.moderation_period.ago) }
+  scope :expired, -> { pending.where("post_flags.created_at < ?", Danbooru.config.moderation_period.ago) }
 
   module SearchMethods
     def creator_matches(creator, searcher)
@@ -106,7 +104,7 @@ class PostFlag < ApplicationRecord
 
     flag = post.flags.in_cooldown.last
     if !is_deletion && flag.present?
-      errors[:post] << "cannot be flagged more than once every #{COOLDOWN_PERIOD.inspect} (last flagged: #{flag.created_at.to_s(:long)})"
+      errors[:post] << "cannot be flagged more than once every #{Danbooru.config.moderation_period.inspect} (last flagged: #{flag.created_at.to_s(:long)})"
     end
   end
 

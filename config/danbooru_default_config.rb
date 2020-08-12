@@ -110,6 +110,11 @@ module Danbooru
       40000
     end
 
+    # How long pending posts stay in the modqueue before being deleted.
+    def moderation_period
+      3.days
+    end
+
     # https://guides.rubyonrails.org/action_mailer_basics.html#action-mailer-configuration
     # https://guides.rubyonrails.org/configuring.html#configuring-action-mailer
     def mail_delivery_method

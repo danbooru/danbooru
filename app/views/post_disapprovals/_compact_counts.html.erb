@@ -1,4 +1,4 @@
-<% if (CurrentUser.can_approve_posts? || post.created_at < 3.days.ago) && disapprovals.length > 0 %>
+<% if (CurrentUser.can_approve_posts? || post.created_at < Danbooru.config.moderation_period.ago) && disapprovals.length > 0 %>
   <% if disapprovals.map(&:reason).grep("breaks_rules").count > 0 %>
     (breaks rules: <%= disapprovals.map(&:reason).grep("breaks_rules").count %>)
   <% end %>

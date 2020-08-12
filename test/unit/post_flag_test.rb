@@ -71,13 +71,13 @@ class PostFlagTest < ActiveSupport::TestCase
         @flag1 = create(:post_flag, post: @post, creator: @users.first)
         as(@mod) { @post.approve! }
 
-        travel_to(PostFlag::COOLDOWN_PERIOD.from_now - 1.minute) do
+        travel_to(Danbooru.config.moderation_period.from_now - 1.minute) do
           @flag2 = build(:post_flag, post: @post, reason: "something", creator: @users.second)
           assert_equal(false, @flag2.valid?)
           assert_match(/cannot be flagged more than once/, @flag2.errors[:post].join)
         end
 
-        travel_to(PostFlag::COOLDOWN_PERIOD.from_now + 1.minute) do
+        travel_to(Danbooru.config.moderation_period.from_now + 1.minute) do
           @flag3 = create(:post_flag, post: @post, reason: "something", creator: @users.second)
           assert(@flag3.errors.empty?)
         end
