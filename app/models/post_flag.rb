@@ -105,7 +105,7 @@ class PostFlag < ApplicationRecord
     errors[:post] << "is locked and cannot be flagged" if post.is_status_locked?
 
     flag = post.flags.in_cooldown.last
-    if flag.present?
+    if !is_deletion && flag.present?
       errors[:post] << "cannot be flagged more than once every #{COOLDOWN_PERIOD.inspect} (last flagged: #{flag.created_at.to_s(:long)})"
     end
   end
