@@ -292,6 +292,18 @@ module Sources
       end
     end
 
+    context "a post requiring login" do
+      should "not fail" do
+        site = Sources::Strategies.find("https://nijie.info/view.php?id=203688")
+
+        urls = %w[
+          https://pic.nijie.net/01/nijie_picture/676327_20170216212803_0.jpg
+          https://pic.nijie.net/04/nijie_picture/diff/main/676327_20170216212806_0.jpg
+        ]
+        assert_equal(urls, site.image_urls)
+      end
+    end
+
     context "normalizing for source" do
       should "normalize correctly" do
         source1 = "https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png"
