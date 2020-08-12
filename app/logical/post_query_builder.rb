@@ -332,8 +332,9 @@ class PostQueryBuilder
   end
 
   def source_matches(source, quoted = false)
-    case source.downcase
-    in "none" unless quoted
+    if source.empty?
+      Post.where_like(:source, "")
+    elsif source.downcase == "none" && !quoted
       Post.where_like(:source, "")
     else
       Post.where_ilike(:source, source + "*")
@@ -644,14 +645,7 @@ class PostQueryBuilder
         if scanner.scan(/(-)?(#{METATAGS.join("|")}):/io)
           operator = scanner.captures.first
           metatag = scanner.captures.second.downcase
-
-          if scanner.scan(/"(.+)"/) || scanner.scan(/'(.+)'/)
-            value = scanner.captures.first
-            quoted = true
-          else
-            value = scanner.scan(/[^ ]*/)
-            quoted = false
-          end
+          value, quoted = scan_string(scanner)
 
           if metatag.in?(COUNT_METATAG_SYNONYMS)
             metatag = metatag.singularize + "_count"
@@ -675,23 +669,41 @@ class PostQueryBuilder
       terms
     end
 
+    def scan_string(scanner)
+      if scanner.scan(/"((?:\\"|[^"])*)"/)
+        value = scanner.captures.first.gsub(/\\(.)/) { $1 }
+        quoted = true
+      elsif scanner.scan(/'((?:\\'|[^'])*)'/)
+        value = scanner.captures.first.gsub(/\\(.)/) { $1 }
+        quoted = true
+      else
+        value = scanner.scan(/(\\ |[^ ])*/)
+        value = value.gsub(/\\ /) { " " }
+        quoted = false
+      end
+
+      [value, quoted]
+    end
+
     def split_query
       terms.map do |term|
-        if term.type == :metatag && !term.negated && !term.quoted
-          "#{term.name}:#{term.value}"
-        elsif term.type == :metatag && !term.negated && term.quoted
-          "#{term.name}:\"#{term.value}\""
-        elsif term.type == :metatag && term.negated && !term.quoted
-          "-#{term.name}:#{term.value}"
-        elsif term.type == :metatag && term.negated && term.quoted
-          "-#{term.name}:\"#{term.value}\""
-        elsif term.type == :tag && term.negated
-          "-#{term.name}"
-        elsif term.type == :tag && term.optional
-          "~#{term.name}"
-        elsif term.type == :tag
-          term.name
+        type, name, value = term.type, term.name, term.value
+
+        str = ""
+        str += "-" if term.negated
+        str += "~" if term.optional
+
+        if type == :tag
+          str += name
+        elsif type == :metatag && (term.quoted || value.include?(" "))
+          value = value.gsub(/\\/) { '\\\\' }
+          value = value.gsub(/"/) { '\\"' }
+          str += "#{name}:\"#{value}\""
+        elsif type == :metatag
+          str += "#{name}:#{value}"
         end
+
+        str
       end
     end
 

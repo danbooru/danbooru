@@ -9,6 +9,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     assert_equal(count, PostQueryBuilder.new(query, **query_options).normalized_query.fast_count(**fast_count_options))
   end
 
+  def assert_parse_equals(expected, query)
+    assert_equal(expected, PostQueryBuilder.new(query).split_query)
+
+    # parsing, serializing, then parsing again should produce the same result.
+    assert_equal(PostQueryBuilder.new(query).to_s, PostQueryBuilder.new(PostQueryBuilder.new(query).to_s).to_s)
+  end
+
   setup do
     CurrentUser.user = create(:user)
     CurrentUser.ip_addr = "127.0.0.1"
@@ -718,7 +725,11 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([post3], "source:none")
       assert_tag_match([post3], "source:NONE")
+      assert_tag_match([post3], 'source:""')
+      assert_tag_match([post3], "source:''")
       assert_tag_match([post2, post1], "-source:none")
+      assert_tag_match([post2, post1], "-source:''")
+      assert_tag_match([post2, post1], '-source:""')
 
       assert_tag_match([], "source:'none'")
       assert_tag_match([], "source:none source:abcde")
@@ -1065,6 +1076,33 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_equal(false, PostQueryBuilder.new("pool:1234").is_simple_tag?)
       assert_equal(false, PostQueryBuilder.new('source:"foo bar baz"').is_simple_tag?)
       assert_equal(false, PostQueryBuilder.new("foo bar").is_simple_tag?)
+    end
+
+    should "parse quoted metatags correctly" do
+      assert_parse_equals(%w[status:"active" source:"https"], %q(status:'active' source:'https'))
+      assert_parse_equals(%w[source:"https" status:"active"], %q(source:'https' status:'active'))
+      assert_parse_equals(%w[status:"active" source:"https"], %q(status:"active" source:'https'))
+      assert_parse_equals(%w[status:"active" source:"https"], %q(status:'active' source:"https"))
+      assert_parse_equals(%w[status:"active" source:https], %q(status:'active' source:https))
+      assert_parse_equals(%w[status:active source:"https"], %q(status:active source:'https'))
+
+      assert_parse_equals(%w[limit:"5" status:"active" source:"x"], %q(limit:"5" status:"active" source:"x"))
+      assert_parse_equals(%w[source:"" limit:"1" status:"deleted"], %q(source:"" limit:'1' status:'deleted'))
+
+      assert_parse_equals(['source:"bar baz"', 'don\'t_say_"lazy"'], %q(source:"bar baz" don't_say_"lazy"))
+      assert_parse_equals(['source:"bar baz"', 'don\'t_say_"lazy"'], %q(source:"bar baz" don't_say_"lazy"))
+      assert_parse_equals(['source:"bar baz"', 'don\'t_say_"lazy"'], %q(source:'bar baz' don't_say_"lazy"))
+
+      assert_parse_equals([%q(source:"foo")], %q(source:"\f\o\o"))
+      assert_parse_equals([%q(source:"foo")], %q(source:'\f\o\o'))
+      assert_parse_equals([%q(source:foo\bar)], %q(source:foo\bar))
+      assert_parse_equals([%q(source:"foo)], %q(source:"foo))
+      assert_parse_equals([%q(source:'foo)], %q(source:'foo))
+      assert_parse_equals([%q(source:"foo bar")], %q(source:foo\ bar))
+      assert_parse_equals([%q(source:"\"foo bar\\\\")], %q(source:"foo\ bar\\))
+
+      assert_parse_equals(['source:"don\'t_say_\\"lazy\\""', 'don\'t_say_"lazy"'], %q(source:"don't_say_\"lazy\"" don't_say_"lazy"))
+      assert_parse_equals(['source:"don\'t_say_\\"lazy\\""', 'don\'t_say_"lazy"'], %q(source:'don\'t_say_"lazy"' don't_say_"lazy"))
     end
   end
 
