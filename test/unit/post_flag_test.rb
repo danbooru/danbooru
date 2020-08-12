@@ -21,15 +21,15 @@ class PostFlagTest < ActiveSupport::TestCase
         assert_equal(false, @user.is_flag_limited?)
 
         assert_nothing_raised do
-          create_list(:post_flag, 11, creator: @user, status: :pending)
+          create_list(:post_flag, 6, creator: @user, status: :pending)
         end
       end
     end
 
     context "a basic user" do
-      should "be able to flag up to 10 posts" do
+      should "be able to flag up to 5 posts" do
         @user = create(:user)
-        @flags = create_list(:post_flag, 10, creator: @user, status: :pending)
+        @flags = create_list(:post_flag, 5, creator: @user, status: :pending)
         @flag = build(:post_flag, creator: @user, status: :pending)
 
         assert_equal(false, @flag.valid?)
