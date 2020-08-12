@@ -31,6 +31,10 @@ class UploadLimit
     end
   end
 
+  def maxed?
+    user.upload_points >= MAXIMUM_POINTS
+  end
+
   def used_upload_slots
     pending_count = user.posts.pending.count
     appealed_count = user.post_appeals.pending.count
