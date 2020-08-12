@@ -1,6 +1,7 @@
 require "danbooru/http/html_adapter"
 require "danbooru/http/xml_adapter"
 require "danbooru/http/cache"
+require "danbooru/http/logger"
 require "danbooru/http/redirector"
 require "danbooru/http/retriable"
 require "danbooru/http/session"
