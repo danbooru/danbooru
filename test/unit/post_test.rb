@@ -1536,6 +1536,16 @@ class PostTest < ActiveSupport::TestCase
           post = FactoryBot.create(:post, tag_string: "tagme")
           assert_match(/Uploads must have at least \d+ general tags/, post.warnings.full_messages.join)
         end
+
+        should "warn when an upload doesn't have a source" do
+          post = FactoryBot.create(:post, tag_string: "tagme", source: "")
+          assert_match(/A source is required/, post.warnings.full_messages.join)
+        end
+
+        should "not warn when a sourceless upload has an allowed tag" do
+          post = FactoryBot.create(:post, tag_string: "self_upload", source: "")
+          assert_no_match(/A source is required/, post.warnings.full_messages.join)
+        end
       end
     end
   end

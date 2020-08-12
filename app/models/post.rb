@@ -24,6 +24,7 @@ class Post < ApplicationRecord
   validate :has_artist_tag
   validate :has_copyright_tag
   validate :has_enough_tags
+  validate :has_source
   validate :post_is_not_its_own_parent
   validate :updater_can_change_rating
   validate :uploader_is_not_limited, on: :create
@@ -551,6 +552,10 @@ class Post < ApplicationRecord
 
       if !is_png?
         tags -= ["animated_png"]
+      end
+
+      if source.blank? && !(has_tag?("commissioner_upload") || has_tag?("self_upload"))
+        tags << "source_request"
       end
 
       return tags
@@ -1432,6 +1437,14 @@ class Post < ApplicationRecord
       if tags.count(&:general?) < 10
         self.warnings[:base] << "Uploads must have at least 10 general tags. Read [[howto:tag]] for guidelines on tagging your uploads"
       end
+    end
+
+    def has_source
+      return if !new_record?
+      return unless source.blank?
+      return if has_tag?("commissioner_upload") || has_tag?("self_upload")
+
+      self.warnings[:base] << "A source is required. Read [[help:image_source]] for guidelines on sourcing your uploads"
     end
   end
 
