@@ -17,6 +17,14 @@ class UploadLimitTest < ActiveSupport::TestCase
       end
     end
 
+    context "a new post that is deleted within the first 3 days" do
+      should "cost the uploader 5 upload slots" do
+        @post = create(:post, uploader: @user, is_deleted: true, created_at: 1.days.ago)
+
+        assert_equal(5, @user.upload_limit.used_upload_slots)
+      end
+    end
+
     context "a pending post that is approved" do
       should "increase the uploader's upload points" do
         @post = create(:post, uploader: @user, is_pending: true, created_at: 7.days.ago)
