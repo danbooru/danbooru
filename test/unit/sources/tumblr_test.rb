@@ -220,14 +220,13 @@ module Sources
 
     context "A Tumblr post with new image URLs" do
       should "return the correct image url" do
-        page_url = "https://emlan.tumblr.com/post/189469423572/kuro-attempts-to-buy-a-racy-book-at-comiket-but"
-        image1_url = "https://64.media.tumblr.com/168dabd09d5ad69eb5fedcf94c45c31a/3dbfaec9b9e0c2e3-72/s640x960/bf33a1324f3f36d2dc64f011bfeab4867da62bc8.png"
-        image2_url = "https://64.media.tumblr.com/5a2c3fe25c977e2281392752ab971c90/3dbfaec9b9e0c2e3-92/s540x810/cd270c29db06b5e7fdcee63114fe3eb2c9c0d590.png"
-        strategy = Sources::Strategies.find(image2_url, page_url)
+        image_url = "https://64.media.tumblr.com/3dfdab77d913ad1ea59f22407d6ac6f3/b1764aa0f9c378d0-23/s1280x1920/46f4af7ec94456f8fef380ee6311eb81178ce7e9.jpg"
+        page_url = "https://make-do5.tumblr.com/post/619663949657423872"
+        strategy = Sources::Strategies.find(image_url, page_url)
 
-        assert_equal([image1_url, image2_url], strategy.image_urls)
-        assert_equal(image2_url, strategy.image_url)
-        assert_equal("https://emlan.tumblr.com/post/189469423572", strategy.canonical_url)
+        assert_match(%r{/3dfdab77d913ad1ea59f22407d6ac6f3/b1764aa0f9c378d0-23/s\d+x\d+/}i, image_url)
+        assert_equal(page_url, strategy.canonical_url)
+        assert_downloaded(7_428_704, strategy.image_url)
       end
     end
 
