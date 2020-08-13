@@ -361,6 +361,18 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_select "#post_#{@post.id}", 1
         end
+
+        should 'show deleted posts when searching for status:"deleted"' do
+          get posts_path(tags: 'status:"deleted"')
+          assert_response :success
+          assert_select "#post_#{@post.id}", 1
+        end
+
+        should "show deleted posts when searching for -status:active" do
+          get posts_path(tags: "-status:active")
+          assert_response :success
+          assert_select "#post_#{@post.id}", 1
+        end
       end
 
       context "with restricted posts" do

@@ -59,6 +59,12 @@ module PostSets
       posts.any? {|x| x.rating == "e"}
     end
 
+    def shown_posts
+      shown_posts = posts.select(&:visible?)
+      shown_posts = shown_posts.reject(&:is_deleted?) unless show_deleted?
+      shown_posts
+    end
+
     def hidden_posts
       posts.reject(&:visible?)
     end
@@ -136,24 +142,22 @@ module PostSets
 
     def post_previews_html(template)
       html = ""
-      if none_shown
+      if shown_posts.empty?
         return template.render("post_sets/blank")
       end
 
-      posts.each do |post|
-        html << PostPresenter.preview(post, show_cropped: true, tags: tag_string)
+      shown_posts.each do |post|
+        html << PostPresenter.preview(post, show_deleted: show_deleted?, show_cropped: true, tags: tag_string)
         html << "\n"
       end
 
       html.html_safe
     end
 
-    def not_shown(post)
-      post.is_deleted? && tag_string !~ /status:(?:all|any|deleted|banned|modqueue)/
-    end
-
-    def none_shown
-      posts.reject {|post| not_shown(post) }.empty?
+    def show_deleted?
+      query.select_metatags("status").any? do |metatag|
+        metatag.value.in?(%w[all any active unmoderated modqueue deleted appealed])
+      end
     end
 
     concerning :TagListMethods do
