@@ -15,12 +15,6 @@ class PostVersion < ApplicationRecord
 
   establish_connection database_url if enabled?
 
-  def self.check_for_retry(msg)
-    if msg =~ /can't get socket descriptor/ && msg =~ /post_versions/
-      connection.reconnect!
-    end
-  end
-
   module SearchMethods
     def changed_tags_include(tag)
       where_array_includes_all(:added_tags, [tag]).or(where_array_includes_all(:removed_tags, [tag]))
