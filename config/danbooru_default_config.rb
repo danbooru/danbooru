@@ -258,7 +258,7 @@ module Danbooru
 
     # Tags that are not visible in safe mode.
     def safe_mode_restricted_tags
-      restricted_tags + %w[censored condom nipples nude penis pussy sexually_suggestive]
+      restricted_tags + %w[sex_toy condom nipples nude penis pussy sexually_suggestive]
     end
 
     # Tags that are only visible to Gold+ users.
