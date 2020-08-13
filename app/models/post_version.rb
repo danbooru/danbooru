@@ -47,6 +47,10 @@ class PostVersion < ApplicationRecord
       q = super
       q = q.search_attributes(params, :updater_id, :post_id, :tags, :added_tags, :removed_tags, :rating, :rating_changed, :parent_id, :parent_changed, :source, :source_changed, :version)
 
+      if params[:changed_tags]
+        q = q.changed_tags_include_all(params[:changed_tags].scan(/[^[:space:]]+/))
+      end
+
       if params[:all_changed_tags]
         q = q.changed_tags_include_all(params[:all_changed_tags].scan(/[^[:space:]]+/))
       end
