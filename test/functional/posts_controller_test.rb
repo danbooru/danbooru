@@ -373,6 +373,18 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_select "#post_#{@post.id}", 1
         end
+
+        context "with the hide_deleted_posts option enabled" do
+          should "show deleted posts when searching for status:appealed" do
+            @user.update!(hide_deleted_posts: true)
+            create(:post_appeal, post: @post)
+
+            get_auth posts_path(tags: "status:appealed"), @user
+
+            assert_response :success
+            assert_select "#post_#{@post.id}", 1
+          end
+        end
       end
 
       context "with restricted posts" do

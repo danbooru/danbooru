@@ -912,8 +912,9 @@ class PostQueryBuilder
       metatags
     end
 
+    # XXX unify with PostSets::Post#show_deleted?
     def hide_deleted?
-      has_status_metatag = select_metatags(:status).any? { |metatag| metatag.value.downcase.in?(%w[deleted active any all]) }
+      has_status_metatag = select_metatags(:status).any? { |metatag| metatag.value.downcase.in?(%w[deleted active any all unmoderated modqueue appealed]) }
       hide_deleted_posts? && !has_status_metatag
     end
   end
