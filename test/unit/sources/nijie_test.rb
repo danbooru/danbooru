@@ -305,6 +305,32 @@ module Sources
       end
     end
 
+    context "a doujin post" do
+      should "work" do
+        image = "https://pic.nijie.net/01/dojin_main/dojin_sam/20120213044700%E3%82%B3%E3%83%94%E3%83%BC%20%EF%BD%9E%200011%E3%81%AE%E3%82%B3%E3%83%94%E3%83%BC.jpg"
+        page = "https://nijie.info/view.php?id=53023"
+        site = Sources::Strategies.find(image, page)
+
+        images = %w[
+          https://pic.nijie.net/01/dojin_main/20120213044700表紙サンプル.jpg
+          https://pic.nijie.net/01/dojin_main/dojin_sam/20120213044700コピー\ ～\ 0006のコピー.jpg
+          https://pic.nijie.net/01/dojin_main/dojin_sam/20120213044700コピー\ ～\ 0011のコピー.jpg
+        ]
+        tags = [%w[中出し https://nijie.info/search_dojin.php?word=%E4%B8%AD%E5%87%BA%E3%81%97],
+                %w[フェラ https://nijie.info/search_dojin.php?word=%E3%83%95%E3%82%A7%E3%83%A9],
+                %w[TS https://nijie.info/search_dojin.php?word=TS],
+                %w[ほのぼの https://nijie.info/search_dojin.php?word=%E3%81%BB%E3%81%AE%E3%81%BC%E3%81%AE]]
+
+        assert(true, site.doujin?)
+        assert_equal(image, site.image_url)
+        assert_equal(images, site.image_urls)
+        assert_equal("作品情報", site.artist_commentary_title)
+        assert_equal("<p>ある日目がさめると女の子になっていたいつき<br>\nそこへ幼馴染の小梅が現れて…<br>\n2010年コミックマーケット78で販売したコピー本のDL版で<br>\n本編18Pの短編マンガです <br>\n</p>", site.artist_commentary_desc)
+        assert_equal(tags, site.tags)
+        assert_equal("リック・ロガニー", site.artist_name)
+      end
+    end
+
     context "normalizing for source" do
       should "normalize correctly" do
         source1 = "https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png"
