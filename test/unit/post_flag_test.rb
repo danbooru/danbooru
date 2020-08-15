@@ -27,13 +27,29 @@ class PostFlagTest < ActiveSupport::TestCase
     end
 
     context "a basic user" do
-      should "be able to flag up to 5 posts" do
+      should "be able to flag up to 5 posts at once" do
         @user = create(:user)
         @flags = create_list(:post_flag, 5, creator: @user, status: :pending)
         @flag = build(:post_flag, creator: @user, status: :pending)
 
         assert_equal(false, @flag.valid?)
         assert_equal(["have reached your flag limit"], @flag.errors[:creator])
+      end
+
+      should "have early rejected flags count against their flag limit" do
+        @user = create(:user)
+
+        create(:post_flag, creator: @user, status: :pending)
+        assert_equal(1, @user.post_flags.active.count)
+
+        create(:post_flag, creator: @user, status: :rejected)
+        assert_equal(2, @user.post_flags.active.count)
+
+        create(:post_flag, creator: @user, status: :succeeded)
+        assert_equal(2, @user.post_flags.active.count)
+
+        create(:post_flag, creator: @user, status: :rejected, created_at: 4.days.ago)
+        assert_equal(2, @user.post_flags.active.count)
       end
     end
 

@@ -25,6 +25,7 @@ class PostFlag < ApplicationRecord
   scope :by_system, -> { where(creator: User.system) }
   scope :in_cooldown, -> { by_users.where("created_at >= ?", Danbooru.config.moderation_period.ago) }
   scope :expired, -> { pending.where("post_flags.created_at < ?", Danbooru.config.moderation_period.ago) }
+  scope :active, -> { pending.or(rejected.in_cooldown) }
 
   module SearchMethods
     def creator_matches(creator, searcher)

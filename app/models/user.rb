@@ -356,7 +356,7 @@ class User < ApplicationRecord
 
     def is_flag_limited?
       return false if has_unlimited_flags?
-      post_flags.pending.count >= 5
+      post_flags.active.count >= 5
     end
 
     # Flags are unlimited if you're an approver or you have at least 30 flags
