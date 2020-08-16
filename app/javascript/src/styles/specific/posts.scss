@@ -269,7 +269,6 @@ div#c-posts {
     &.post-notice-flagged { background: var(--post-flagged-notice-background); }
     &.post-notice-banned { background: var(--post-banned-notice-background); }
     &.post-notice-deleted { background: var(--post-deleted-notice-background); }
-    &.post-notice-appealed { background: var(--post-appealed-notice-background); }
     &.post-notice-resized { background: var(--post-resized-notice-background); }
     &.post-notice-search { background: var(--post-search-notice-background); }
   }

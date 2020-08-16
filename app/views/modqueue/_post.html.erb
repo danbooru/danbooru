@@ -68,10 +68,10 @@
         </span>
       <% end %>
 
-      <% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
+      <% if post.is_appealed? %>
         <span class="info">
           <strong>Appeals</strong>
-          <%= render "post_appeals/reasons", appeals: post.appeals %>
+          <%= render "post_appeals/reasons", appeal: post.appeals.select(&:pending?).last %>
         </span>
       <% end %>
     </div>

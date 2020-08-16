@@ -12,7 +12,7 @@
   </div>
 <% end %>
 
-<% if post.is_deleted? %>
+<% if post.is_deleted? && !post.is_appealed? %>
   <div class="notice notice-small post-notice post-notice-deleted">
     <% if post.flags.any? %>
       <p>This post was deleted for the following reasons: </p>
@@ -38,6 +38,7 @@
       This post was flagged and is pending approval (<%= link_to_wiki "learn more", "about:mod_queue" %>)
     <% elsif post.is_appealed? %>
       This post was appealed and is pending approval (<%= link_to_wiki "learn more", "about:mod_queue" %>)
+      <%= render "post_appeals/reasons", appeal: post.appeals.select(&:pending?).last %>
     <% end %>
 
     <%= render "post_disapprovals/counts", :disapprovals => post.disapprovals, :post => post %>
@@ -46,14 +47,6 @@
       <%= render "modqueue/quick_mod", post: post %>
       <%= render "post_disapprovals/detailed_rejection_dialog" %>
     <% end %>
-  </div>
-<% end %>
-
-<% #XXX %>
-<% if post.is_deleted? && post.appeals.any? %>
-  <div class="notice notice-small post-notice post-notice-appealed">
-    <p>This post was appealed:</p>
-    <%= render "post_appeals/reasons", appeals: post.appeals %>
   </div>
 <% end %>
 
