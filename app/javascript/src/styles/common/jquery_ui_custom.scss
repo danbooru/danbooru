@@ -1,10 +1,8 @@
-@import "../base/000_vars.scss";
-
 .ui-widget {
-  font-family: $base_font_family;
+  font-family: var(--body-font);
 
   input, select, textarea, button {
-    font-family: $base_font_family;
+    font-family: var(--body-font);
   }
 }
 

@@ -5,15 +5,15 @@
   --text-lg: 1.16667em;
   --text-xl: 1.5em;
   --text-xxl: 2em;
+  --header-font: Tahoma, Verdana, Helvetica, sans-serif;
+  --body-font: Verdana, Helvetica, sans-serif;
+  --monospace-font: 1.2em monospace;
 }
 
 $h1_padding: 0.8em 0 0.25em 0;
 $h2_padding: 0.8em 0 0.25em 0;
 $h3_padding: 0.8em 0 0.25em 0;
 $h4_padding: 0.8em 0 0.25em 0;
-
-/* stylelint-disable-next-line value-keyword-case */
-$base_font_family: Verdana, Helvetica, sans-serif;
 
 @mixin animated-icon {
   content: "►";

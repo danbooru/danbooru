@@ -1,20 +1,13 @@
-@import "../base/000_vars.scss";
-
 body {
   color: var(--text-color);
   background-color: var(--body-background-color);
-  font-family: $base_font_family;
+  font-family: var(--body-font);
   font-size: 87.5%;
   line-height: 1.25em;
 }
 
 abbr[title=required] {
   display: none;
-}
-
-code {
-  font-family: monospace;
-  font-size: 1.2em;
 }
 
 dd {
@@ -26,7 +19,7 @@ dt {
 }
 
 h1, h2, h3, h4, h5, h6, .heading {
-  font-family: Tahoma, Verdana, Helvetica, sans-serif;
+  font-family: var(--header-font);
   font-weight: bold;
   line-height: 1.5em;
   color: var(--header-color);

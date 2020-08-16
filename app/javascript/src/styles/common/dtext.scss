@@ -57,12 +57,14 @@ div.prose {
     list-style-type: disc;
   }
 
+  code, pre {
+    font: var(--monospace-font);
+    background: var(--dtext-code-background);
+  }
+
   pre {
-    font-family: monospace;
-    font-size: 1.2em;
     margin: 0.5em 0;
     padding: 0.5em 1em;
-    background: var(--dtext-code-background);
     white-space: pre-wrap;
   }
 
@@ -71,11 +73,6 @@ div.prose {
     padding: 1em 1em 0.2em;
     border: var(--dtext-blockquote-border);
     background: var(--dtext-blockquote-background);
-  }
-
-  code {
-    font-family: monospace;
-    background: var(--dtext-code-background);
   }
 
   .tn {
