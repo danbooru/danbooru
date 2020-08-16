@@ -10,6 +10,7 @@ class ModqueueController < ApplicationController
 
     @pending_post_count = @modqueue_posts.select(&:is_pending?).count
     @flagged_post_count = @modqueue_posts.select(&:is_flagged?).count
+    @appealed_post_count = @modqueue_posts.select(&:is_appealed?).count
     @disapproval_reasons = PostDisapproval.where(post_id: @modqueue_posts.map(&:id)).where.not(reason: "disinterest").group(:reason).order(count: :desc).distinct.count(:post_id)
     @uploaders = @modqueue_posts.map(&:uploader).tally.sort_by(&:last).reverse.take(20).to_h
 

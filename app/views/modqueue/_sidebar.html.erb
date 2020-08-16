@@ -22,6 +22,10 @@
         <%= link_to "status:flagged", modqueue_index_path(search: { tags: "status:flagged" }) %>
         <span class="post-count"><%= @flagged_post_count %></span>
       </li>
+      <li>
+        <%= link_to "status:appealed", modqueue_index_path(search: { tags: "status:appealed" }) %>
+        <span class="post-count"><%= @appealed_post_count %></span>
+      </li>
 
       <% @disapproval_reasons.each do |reason, count| %>
         <li>
