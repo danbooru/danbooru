@@ -6,10 +6,14 @@ class Ban < ApplicationRecord
   after_destroy :create_unban_mod_action
   belongs_to :user
   belongs_to :banner, :class_name => "User"
+
   validates_presence_of :reason, :duration
+  validate :user, :validate_user_is_bannable, on: :create
 
   scope :unexpired, -> { where("bans.expires_at > ?", Time.now) }
   scope :expired, -> { where("bans.expires_at <= ?", Time.now) }
+
+  attr_reader :duration
 
   def self.is_banned?(user)
     exists?(["user_id = ? AND expires_at > ?", user.id, Time.now])
@@ -48,6 +52,10 @@ class Ban < ApplicationRecord
     end
   end
 
+  def validate_user_is_bannable
+    self.errors[:user] << "is already banned" if user.is_banned?
+  end
+
   def update_user_on_create
     user.update!(is_banned: true)
   end
@@ -68,8 +76,6 @@ class Ban < ApplicationRecord
     self.expires_at = dur.to_i.days.from_now
     @duration = dur
   end
-
-  attr_reader :duration
 
   def humanized_duration
     ApplicationController.helpers.distance_of_time_in_words(created_at, expires_at)
