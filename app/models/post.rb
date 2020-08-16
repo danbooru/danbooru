@@ -63,7 +63,7 @@ class Post < ApplicationRecord
   scope :flagged, -> { where(is_flagged: true) }
   scope :banned, -> { where(is_banned: true) }
   scope :active, -> { where(is_pending: false, is_deleted: false, is_flagged: false).where.not(id: PostAppeal.pending) }
-  scope :appealed, -> { where(id: PostAppeal.pending.select(:post_id)) }
+  scope :appealed, -> { deleted.where(id: PostAppeal.pending.select(:post_id)) }
   scope :in_modqueue, -> { pending.or(flagged).or(appealed) }
   scope :expired, -> { pending.where("posts.created_at < ?", Danbooru.config.moderation_period.ago) }
 

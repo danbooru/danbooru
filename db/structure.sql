@@ -6758,6 +6758,13 @@ CREATE INDEX index_posts_on_image_width ON public.posts USING btree (image_width
 
 
 --
+-- Name: index_posts_on_is_deleted; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_is_deleted ON public.posts USING btree (is_deleted) WHERE (is_deleted = true);
+
+
+--
 -- Name: index_posts_on_is_flagged; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7410,6 +7417,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200403210353'),
 ('20200406054838'),
 ('20200427190519'),
-('20200803022359');
+('20200520060951'),
+('20200803022359'),
+('20200816175151');
 
 
