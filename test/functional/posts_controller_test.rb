@@ -540,6 +540,15 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "a deleted post" do
+        should "render" do
+          @post.delete!("no", user: @user)
+          get post_path(@post)
+
+          assert_response :success
+        end
+      end
+
       context "with pools" do
         should "render the pool list" do
           as(@user) { @post.update(tag_string: "newpool:comic") }

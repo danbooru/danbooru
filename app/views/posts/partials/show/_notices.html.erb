@@ -25,9 +25,9 @@
   </div>
 <% elsif post.is_deleted? %>
   <div class="notice notice-small post-notice post-notice-deleted">
-    <% if post.flags.any? %>
-      <p>This post was deleted for the following reasons: </p>
-      <%= render "post_flags/reasons", flags: post.flags %>
+    <% if post.flags.succeeded.last.present? %>
+      <p>This post was deleted for the following reason: </p>
+      <%= render "post_flags/reasons", flag: post.flags.succeeded.last %>
     <% else %>
       <p>This post was deleted</p>
     <% end %>
