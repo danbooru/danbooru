@@ -3,7 +3,6 @@
 
   <%= edit_form_for(post_appeal, format: :js, remote: true) do |f| %>
     <%= f.hidden_field :post_id %>
-    <%= f.input :reason, as: :dtext, inline: true %>
-    <%= dtext_preview_button "post_appeal_reason" %>
+    <%= f.input :reason, as: :dtext, inline: true, placeholder: "Optional" %>
   <% end %>
 </div>
