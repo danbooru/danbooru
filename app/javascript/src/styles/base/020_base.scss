@@ -56,6 +56,11 @@ input, select, textarea {
   border: var(--form-input-border);
   color: var(--form-input-text-color);
   padding-left: 0.25em;
+  font: var(--body-font);
+}
+
+textarea {
+  font-size: var(--text-sm);
 }
 
 input[type="button"], input[type="submit"], button {
