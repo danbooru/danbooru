@@ -64,7 +64,7 @@
       <% if post.is_flagged? %>
         <span class="info">
           <strong>Flagged</strong>
-          <%= render "post_flags/reasons", flags: post.flags %>
+          <%= render "post_flags/reasons", flag: post.flags.select(&:pending?).last %>
         </span>
       <% end %>
 

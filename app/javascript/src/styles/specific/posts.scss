@@ -266,7 +266,6 @@ div#c-posts {
     &.post-notice-parent { background: var(--post-parent-notice-background); }
     &.post-notice-child { background: var(--post-child-notice-background); }
     &.post-notice-pending { background: var(--post-pending-notice-background); }
-    &.post-notice-flagged { background: var(--post-flagged-notice-background); }
     &.post-notice-banned { background: var(--post-banned-notice-background); }
     &.post-notice-deleted { background: var(--post-deleted-notice-background); }
     &.post-notice-resized { background: var(--post-resized-notice-background); }

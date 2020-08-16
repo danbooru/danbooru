@@ -104,7 +104,6 @@
   --post-parent-notice-background: var(--success-background-color);
   --post-child-notice-background: var(--warning-background-color);
   --post-pending-notice-background: #D8D8FC;
-  --post-flagged-notice-background: var(--error-background-color);
   --post-banned-notice-background: var(--error-background-color);
   --post-deleted-notice-background: var(--error-background-color);
   --post-resized-notice-background: #EED8FC;
@@ -382,7 +381,6 @@ body[data-current-user-theme="dark"] {
   --post-parent-notice-background: var(--green-0);
   --post-resized-notice-background: var(--purple-0);
   --post-pending-notice-background: var(--indigo-0);
-  --post-flagged-notice-background: var(--red-0);
   --post-deleted-notice-background: var(--red-0);
   --post-banned-notice-background: var(--red-0);
 
