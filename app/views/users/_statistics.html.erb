@@ -174,12 +174,12 @@
         <td><%= presenter.comment_count(self) %> in <%= presenter.commented_posts_count(self) %> posts</td>
       </tr>
 
-      <% if CurrentUser.user.id == user.id || CurrentUser.is_moderator? %>
-        <tr>
-          <th>Appeals</th>
-          <td><%= presenter.appeal_count(self) %></td>
-        </tr>
+      <tr>
+        <th>Appeals</th>
+        <td><%= presenter.appeal_count(self) %></td>
+      </tr>
 
+      <% if CurrentUser.user.id == user.id || CurrentUser.is_moderator? %>
         <tr>
           <th>Flags</th>
           <td><%= presenter.flag_count(self) %></td>
