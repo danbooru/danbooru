@@ -59,12 +59,10 @@ class ApplicationRecord < ActiveRecord::Base
       policy.api_attributes
     end
 
-    def html_data_attributes
-      data_attributes = self.class.columns.select do |column|
-        column.type.in?([:integer, :boolean]) && !column.array?
-      end.map(&:name).map(&:to_sym)
-
-      api_attributes & data_attributes
+    # XXX deprecated, shouldn't expose this as an instance method.
+    def html_data_attributes(user: CurrentUser.user)
+      policy = Pundit.policy([user, nil], self) || ApplicationPolicy.new([user, nil], self)
+      policy.html_data_attributes
     end
 
     def serializable_hash(options = {})

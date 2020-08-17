@@ -42,4 +42,8 @@ class ForumPostPolicy < ApplicationPolicy
   def permitted_attributes_for_update
     [:body]
   end
+
+  def html_data_attributes
+    super + [[:topic, :is_deleted?]]
+  end
 end

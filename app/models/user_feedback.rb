@@ -39,14 +39,7 @@ class UserFeedback < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def html_data_attributes
-      super + [:category]
-    end
-  end
-
   extend SearchMethods
-  include ApiMethods
 
   def user_name=(name)
     self.user = User.find_by_name(name)

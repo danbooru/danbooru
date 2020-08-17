@@ -1504,10 +1504,6 @@ class Post < ApplicationRecord
     save
   end
 
-  def html_data_attributes
-    super + [:has_large?, :current_image_size]
-  end
-
   def self.model_restriction(table)
     super.where(table[:is_pending].eq(false)).where(table[:is_flagged].eq(false)).where(table[:is_deleted].eq(false))
   end

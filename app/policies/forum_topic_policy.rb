@@ -37,4 +37,8 @@ class ForumTopicPolicy < ApplicationPolicy
       ([:is_sticky, :is_locked, :min_level] if moderate?)
     ].compact.flatten
   end
+
+  def html_data_attributes
+    super + [:is_read?]
+  end
 end

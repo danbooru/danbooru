@@ -18,4 +18,8 @@ class WikiPagePolicy < ApplicationPolicy
   def api_attributes
     super + [:category_name]
   end
+
+  def html_data_attributes
+    super + [:category_name]
+  end
 end

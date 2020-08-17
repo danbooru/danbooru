@@ -22,4 +22,8 @@ class UserFeedbackPolicy < ApplicationPolicy
   def permitted_attributes_for_update
     [:body, :category, :is_deleted]
   end
+
+  def html_data_attributes
+    super + [:category]
+  end
 end

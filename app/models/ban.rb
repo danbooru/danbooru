@@ -38,14 +38,6 @@ class Ban < ApplicationRecord
     q
   end
 
-  module ApiMethods
-    def html_data_attributes
-      super + [:expired?]
-    end
-  end
-
-  include ApiMethods
-
   def self.prune!
     expired.includes(:user).find_each do |ban|
       ban.user.unban! if ban.user.ban_expired?

@@ -95,4 +95,8 @@ class PostPolicy < ApplicationPolicy
     attributes -= [:fav_string] if !user.is_moderator?
     attributes
   end
+
+  def html_data_attributes
+    super + [:has_large?, :current_image_size]
+  end
 end

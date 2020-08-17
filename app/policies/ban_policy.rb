@@ -15,4 +15,8 @@ class BanPolicy < ApplicationPolicy
   def permitted_attributes_for_update
     [:reason, :duration, :expires_at]
   end
+
+  def html_data_attributes
+    super + [:expired?]
+  end
 end

@@ -50,10 +50,6 @@ class IpAddress < ApplicationRecord
     true
   end
 
-  def html_data_attributes
-    super & attributes.keys.map(&:to_sym)
-  end
-
   def self.searchable_includes
     [:user, :model]
   end

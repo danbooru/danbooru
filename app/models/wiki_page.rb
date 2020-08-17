@@ -105,14 +105,7 @@ class WikiPage < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def html_data_attributes
-      super + [:category_name]
-    end
-  end
-
   extend SearchMethods
-  include ApiMethods
 
   def validate_rename
     return unless title_changed?
