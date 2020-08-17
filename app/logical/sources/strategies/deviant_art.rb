@@ -266,7 +266,7 @@ module Sources
       def page
         return nil if page_url_from_image_url.blank?
 
-        resp = Danbooru::Http.cache(1.minute).get(page_url_from_image_url, follow: {max_hops: 1})
+        resp = http.cache(1.minute).get(page_url_from_image_url, follow: {max_hops: 1})
 
         if resp.status.success?
           Nokogiri::HTML(resp.body.to_s)

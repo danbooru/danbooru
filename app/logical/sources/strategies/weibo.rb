@@ -205,7 +205,7 @@ module Sources
       def api_response
         return {} if mobile_url.blank?
 
-        resp = Danbooru::Http.cache(1.minute).get(mobile_url)
+        resp = http.cache(1.minute).get(mobile_url)
         json_string = resp.to_s[/var \$render_data = \[(.*)\]\[0\]/m, 1]
 
         return {} if json_string.blank?

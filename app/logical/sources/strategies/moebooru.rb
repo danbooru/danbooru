@@ -113,7 +113,7 @@ module Sources
           return {}
         end
 
-        response = Danbooru::Http.cache(1.minute).get("https://#{site_name}/post.json", params: params)
+        response = http.cache(1.minute).get("https://#{site_name}/post.json", params: params)
         post = response.parse.first&.with_indifferent_access
         post || {}
       end

@@ -122,7 +122,7 @@ module Sources::Strategies
     def api_response
       return {} if project_id.blank?
 
-      resp = Danbooru::Http.cache(1.minute).get("https://www.artstation.com/projects/#{project_id}.json")
+      resp = http.cache(1.minute).get("https://www.artstation.com/projects/#{project_id}.json")
       return {} if resp.code != 200
 
       resp.parse.with_indifferent_access

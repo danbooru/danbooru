@@ -50,7 +50,7 @@ module Sources
       def page
         return nil if page_url.blank?
 
-        response = Danbooru::Http.cache(1.minute).get(page_url)
+        response = http.cache(1.minute).get(page_url)
         return nil if response.status == 404
 
         response.parse

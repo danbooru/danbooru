@@ -190,10 +190,10 @@ module Sources
       memoize :page
 
       def client
-        http = Danbooru::Http.new.timeout(60)
+        nijie = http.timeout(60).use(retriable: { max_retries: 20 })
 
         cookie = Cache.get("nijie-session-cookie", 1.week) do
-          login_page = http.use(retriable: { max_retries: 20 }).get("https://nijie.info/login.php").parse
+          login_page = nijie.get("https://nijie.info/login.php").parse
           form = {
             email: Danbooru.config.nijie_login,
             password: Danbooru.config.nijie_password,
@@ -201,14 +201,14 @@ module Sources
             save: "on",
             ticket: ""
           }
-          response = http.use(retriable: { max_retries: 20 }).post("https://nijie.info/login_int.php", form: form)
+          response = nijie.post("https://nijie.info/login_int.php", form: form)
           DanbooruLogger.info "Nijie login failed (#{url}, #{response.status})" if response.status != 200
           return nil unless response.status == 200
 
           response.cookies.select { |c| c.name == "NIJIEIJIEID" }.compact.first
         end
 
-        http.cookies(NIJIEIJIEID: cookie, R18: 1)
+        nijie.cookies(NIJIEIJIEID: cookie, R18: 1)
       end
       memoize :client
     end

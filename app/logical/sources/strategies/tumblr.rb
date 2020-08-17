@@ -28,11 +28,6 @@ module Sources::Strategies
     VIDEO = %r{\Ahttps?://(?:vtt|ve|va\.media)\.tumblr\.com/}i
     POST = %r{\Ahttps?://(?<blog_name>[^.]+)\.tumblr\.com/(?:post|image)/(?<post_id>\d+)}i
 
-    NEW_HEADERS = {
-      "user-agent": Danbooru.config.canonical_app_name,
-      "accept": "text/html"
-    }
-
     def self.enabled?
       Danbooru.config.tumblr_consumer_key.present?
     end
@@ -180,7 +175,7 @@ module Sources::Strategies
         max_size = Integer.sqrt(Danbooru.config.max_image_resolution)
         url = url.gsub(%r{/s\d+x\d+/\w+\.\w+$}i, "/s#{max_size}x#{max_size}/#{$1}")
 
-        resp = Danbooru::Http.cache(1.minute).get(url, headers: NEW_HEADERS).parse
+        resp = http.cache(1.minute).headers(accept: "text/html").get(url).parse
         resp.at("img[src*='/s#{max_size}x#{max_size}/']")["src"]
       else
         url
@@ -204,7 +199,7 @@ module Sources::Strategies
       return {} unless self.class.enabled?
       return {} unless blog_name.present? && post_id.present?
 
-      response = Danbooru::Http.cache(1.minute).get(
+      response = http.cache(1.minute).get(
         "https://api.tumblr.com/v2/blog/#{blog_name}/posts",
         params: { id: post_id, api_key: Danbooru.config.tumblr_consumer_key }
       )
