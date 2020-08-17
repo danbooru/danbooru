@@ -77,6 +77,10 @@ module Sources
 
       FAVME = %r{\Ahttps?://(?:www\.)?fav\.me/d(?<base36_deviation_id>[a-z0-9]+)\z}i
 
+      def self.enabled?
+        Danbooru.config.deviantart_client_id.present? && Danbooru.config.deviantart_client_secret.present?
+      end
+
       def domains
         ["deviantart.net", "deviantart.com", "fav.me"]
       end

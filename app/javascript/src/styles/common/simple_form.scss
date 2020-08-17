@@ -48,7 +48,6 @@ form.simple_form {
 
     textarea {
       width: 70%;
-      font-size: 1.2em;
     }
 
     label {
@@ -107,10 +106,31 @@ form.one-line-form {
 }
 
 div.ui-dialog {
-  div.input {
-    input[type="text"] {
-      width: 100%;
-      max-width: 100%;
+  textarea, input[type="text"] {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  form.simple_form {
+    margin-bottom: 0;
+
+    div.input {
+      margin-bottom: 0.5em;
+    }
+
+    div.input.hidden {
+      display: none;
+    }
+  }
+
+  /* the submit and close buttons */
+  .ui-dialog-buttonpane {
+    margin-top: 0;
+    padding: 1em 1em 1em 0;
+
+    .ui-button {
+      margin: 0 0.25em;
     }
   }
 }

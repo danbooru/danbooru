@@ -9,6 +9,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     assert_equal(count, PostQueryBuilder.new(query, **query_options).normalized_query.fast_count(**fast_count_options))
   end
 
+  def assert_parse_equals(expected, query)
+    assert_equal(expected, PostQueryBuilder.new(query).split_query)
+
+    # parsing, serializing, then parsing again should produce the same result.
+    assert_equal(PostQueryBuilder.new(query).to_s, PostQueryBuilder.new(PostQueryBuilder.new(query).to_s).to_s)
+  end
+
   setup do
     CurrentUser.user = create(:user)
     CurrentUser.ip_addr = "127.0.0.1"
@@ -584,22 +591,26 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       flagged = create(:post, is_flagged: true)
       deleted = create(:post, is_deleted: true)
       banned  = create(:post, is_banned: true)
-      all = [banned, deleted, flagged, pending]
+      appealed = create(:post, is_deleted: true)
+      appeal = create(:post_appeal, post: appealed)
+      all = [appealed, banned, deleted, flagged, pending]
 
-      assert_tag_match([flagged, pending], "status:modqueue")
+      assert_tag_match([appealed, flagged, pending], "status:modqueue")
       assert_tag_match([pending], "status:pending")
       assert_tag_match([flagged], "status:flagged")
-      assert_tag_match([deleted], "status:deleted")
+      assert_tag_match([appealed], "status:appealed")
+      assert_tag_match([appealed, deleted], "status:deleted")
       assert_tag_match([banned],  "status:banned")
       assert_tag_match([banned], "status:active")
       assert_tag_match([banned], "status:active status:banned")
       assert_tag_match(all, "status:any")
       assert_tag_match(all, "status:all")
 
-      assert_tag_match(all - [flagged, pending], "-status:modqueue")
+      assert_tag_match(all - [flagged, pending, appealed], "-status:modqueue")
       assert_tag_match(all - [pending], "-status:pending")
       assert_tag_match(all - [flagged], "-status:flagged")
-      assert_tag_match(all - [deleted], "-status:deleted")
+      assert_tag_match(all - [appealed], "-status:appealed")
+      assert_tag_match(all - [deleted, appealed], "-status:deleted")
       assert_tag_match(all - [banned],  "-status:banned")
       assert_tag_match(all - [banned], "-status:active")
 
@@ -611,11 +622,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       flagged = create(:post, is_flagged: true)
       pending = create(:post, is_pending: true)
       disapproved = create(:post, is_pending: true)
+      appealed = create(:post, is_deleted: true)
 
       create(:post_flag, post: flagged, creator: create(:user, created_at: 2.weeks.ago))
+      create(:post_appeal, post: appealed)
       create(:post_disapproval, user: CurrentUser.user, post: disapproved, reason: "disinterest")
 
-      assert_tag_match([pending, flagged], "status:unmoderated")
+      assert_tag_match([appealed, pending, flagged], "status:unmoderated")
       assert_tag_match([disapproved], "-status:unmoderated")
     end
 
@@ -712,7 +725,11 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([post3], "source:none")
       assert_tag_match([post3], "source:NONE")
+      assert_tag_match([post3], 'source:""')
+      assert_tag_match([post3], "source:''")
       assert_tag_match([post2, post1], "-source:none")
+      assert_tag_match([post2, post1], "-source:''")
+      assert_tag_match([post2, post1], '-source:""')
 
       assert_tag_match([], "source:'none'")
       assert_tag_match([], "source:none source:abcde")
@@ -1059,6 +1076,33 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_equal(false, PostQueryBuilder.new("pool:1234").is_simple_tag?)
       assert_equal(false, PostQueryBuilder.new('source:"foo bar baz"').is_simple_tag?)
       assert_equal(false, PostQueryBuilder.new("foo bar").is_simple_tag?)
+    end
+
+    should "parse quoted metatags correctly" do
+      assert_parse_equals(%w[status:"active" source:"https"], %q(status:'active' source:'https'))
+      assert_parse_equals(%w[source:"https" status:"active"], %q(source:'https' status:'active'))
+      assert_parse_equals(%w[status:"active" source:"https"], %q(status:"active" source:'https'))
+      assert_parse_equals(%w[status:"active" source:"https"], %q(status:'active' source:"https"))
+      assert_parse_equals(%w[status:"active" source:https], %q(status:'active' source:https))
+      assert_parse_equals(%w[status:active source:"https"], %q(status:active source:'https'))
+
+      assert_parse_equals(%w[limit:"5" status:"active" source:"x"], %q(limit:"5" status:"active" source:"x"))
+      assert_parse_equals(%w[source:"" limit:"1" status:"deleted"], %q(source:"" limit:'1' status:'deleted'))
+
+      assert_parse_equals(['source:"bar baz"', 'don\'t_say_"lazy"'], %q(source:"bar baz" don't_say_"lazy"))
+      assert_parse_equals(['source:"bar baz"', 'don\'t_say_"lazy"'], %q(source:"bar baz" don't_say_"lazy"))
+      assert_parse_equals(['source:"bar baz"', 'don\'t_say_"lazy"'], %q(source:'bar baz' don't_say_"lazy"))
+
+      assert_parse_equals([%q(source:"foo")], %q(source:"\f\o\o"))
+      assert_parse_equals([%q(source:"foo")], %q(source:'\f\o\o'))
+      assert_parse_equals([%q(source:foo\bar)], %q(source:foo\bar))
+      assert_parse_equals([%q(source:"foo)], %q(source:"foo))
+      assert_parse_equals([%q(source:'foo)], %q(source:'foo))
+      assert_parse_equals([%q(source:"foo bar")], %q(source:foo\ bar))
+      assert_parse_equals([%q(source:"\"foo bar\\\\")], %q(source:"foo\ bar\\))
+
+      assert_parse_equals(['source:"don\'t_say_\\"lazy\\""', 'don\'t_say_"lazy"'], %q(source:"don't_say_\"lazy\"" don't_say_"lazy"))
+      assert_parse_equals(['source:"don\'t_say_\\"lazy\\""', 'don\'t_say_"lazy"'], %q(source:'don\'t_say_"lazy"' don't_say_"lazy"))
     end
   end
 

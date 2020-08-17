@@ -25,11 +25,6 @@ class TagCategory
       @@short_name_mapping ||= Hash[Danbooru.config.full_tag_config_info.map { |k, v| [v["short"], k] }]
     end
 
-    # Returns a hash mapping for split_tag_list_html (presenters/tag_set_presenter.rb)
-    def header_mapping
-      @@header_mapping ||= Hash[Danbooru.config.full_tag_config_info.map { |k, v| [k, v["header"]] }]
-    end
-
     # Returns a hash mapping for related tag buttons (javascripts/related_tag.js.erb)
     def related_button_mapping
       @@related_button_mapping ||= Hash[Danbooru.config.full_tag_config_info.map { |k, v| [k, v["relatedbutton"]] }]

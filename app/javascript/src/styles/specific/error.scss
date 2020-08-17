@@ -1,6 +1,5 @@
 ul.backtrace {
-  font-family: monospace;
-  font-size: 1.2em;
+  font: var(--monospace-font);
   background: var(--dtext-code-background);
   padding: 1em;
   margin-bottom: 1em;

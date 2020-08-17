@@ -4,6 +4,6 @@
 <p><%= @message %></p>
 
 <% unless @expected %>
-  <h6>Details</h6>
+  <h3>Details</h3>
   <%= render "static/backtrace", exception: @exception, backtrace: @backtrace %>
 <% end %>

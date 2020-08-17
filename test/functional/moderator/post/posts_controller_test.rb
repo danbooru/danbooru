@@ -15,26 +15,6 @@ module Moderator
           end
         end
 
-        context "confirm_delete action" do
-          should "render" do
-            get_auth confirm_delete_moderator_post_post_path(@post), @admin
-            assert_response :success
-          end
-        end
-
-        context "delete action" do
-          should "render" do
-            post_auth delete_moderator_post_post_path(@post), @admin, params: {:reason => "xxx", :format => "js", :commit => "Delete"}
-            assert(@post.reload.is_deleted?)
-          end
-
-          should "work even if the deleter has flagged the post previously" do
-            create(:post_flag, post: @post, creator: @admin)
-            post_auth delete_moderator_post_post_path(@post), @admin, params: {:reason => "xxx", :format => "js", :commit => "Delete"}
-            assert(@post.reload.is_deleted?)
-          end
-        end
-
         context "confirm_move_favorites action" do
           should "render" do
             get_auth confirm_move_favorites_moderator_post_post_path(@post), @admin

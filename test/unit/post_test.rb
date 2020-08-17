@@ -142,9 +142,11 @@ class PostTest < ActiveSupport::TestCase
         end
 
         should "fail" do
-          @post.delete!("test")
-          assert_equal(["Is status locked ; cannot delete post"], @post.errors.full_messages)
-          assert_equal(1, Post.where("id = ?", @post.id).count)
+          assert_raise(ActiveRecord::RecordInvalid) do
+            @post.delete!("test")
+          end
+
+          assert_equal(false, @post.reload.is_deleted?)
         end
       end
 
@@ -224,18 +226,6 @@ class PostTest < ActiveSupport::TestCase
           assert_equal(false, p1.has_children?)
         end
 
-        should "reassign favorites to the parent" do
-          p1 = FactoryBot.create(:post)
-          c1 = FactoryBot.create(:post, :parent_id => p1.id)
-          user = FactoryBot.create(:user)
-          c1.add_favorite!(user)
-          c1.expunge!
-          p1.reload
-          assert(!Favorite.exists?(:post_id => c1.id, :user_id => user.id))
-          assert(Favorite.exists?(:post_id => p1.id, :user_id => user.id))
-          assert_equal(0, c1.score)
-        end
-
         should "update the parent's has_children flag" do
           p1 = FactoryBot.create(:post)
           c1 = FactoryBot.create(:post, :parent_id => p1.id)
@@ -266,17 +256,6 @@ class PostTest < ActiveSupport::TestCase
           end
         end
 
-        should "reparent all children to the first child" do
-          @p1.expunge!
-          @c1.reload
-          @c2.reload
-          @c3.reload
-
-          assert_nil(@c1.parent_id)
-          assert_equal(@c1.id, @c2.parent_id)
-          assert_equal(@c1.id, @c3.parent_id)
-        end
-
         should "save a post version record for each child" do
           assert_difference(["@c1.versions.count", "@c2.versions.count", "@c3.versions.count"]) do
             @p1.expunge!
@@ -284,11 +263,6 @@ class PostTest < ActiveSupport::TestCase
             @c2.reload
             @c3.reload
           end
-        end
-
-        should "set the has_children flag on the new parent" do
-          @p1.expunge!
-          assert_equal(true, @c1.reload.has_children?)
         end
       end
     end
@@ -539,24 +513,23 @@ class PostTest < ActiveSupport::TestCase
     end
 
     context "A status locked post" do
-      setup do
-        @post = FactoryBot.create(:post, is_status_locked: true)
-      end
-
       should "not allow new flags" do
         assert_raises(PostFlag::Error) do
+          @post = create(:post, is_status_locked: true)
           @post.flag!("wrong")
         end
       end
 
       should "not allow new appeals" do
+        @post = create(:post, is_status_locked: true, is_deleted: true)
         @appeal = build(:post_appeal, post: @post)
 
         assert_equal(false, @appeal.valid?)
-        assert_equal(["Post is active"], @appeal.errors.full_messages)
+        assert_equal(["Post cannot be appealed"], @appeal.errors.full_messages)
       end
 
       should "not allow approval" do
+        @post = create(:post, is_status_locked: true, is_pending: true)
         approval = @post.approve!
         assert_includes(approval.errors.full_messages, "Post is locked and cannot be approved")
       end
@@ -567,24 +540,6 @@ class PostTest < ActiveSupport::TestCase
     context "A post" do
       setup do
         @post = FactoryBot.create(:post)
-      end
-
-      context "as a new user" do
-        setup do
-          @post.update(:tag_string => "aaa bbb ccc ddd tagme")
-          CurrentUser.user = FactoryBot.create(:user)
-        end
-
-        should "not allow you to remove tags" do
-          @post.update(tag_string: "aaa")
-          assert_equal(["You must have an account at least 1 week old to remove tags"], @post.errors.full_messages)
-        end
-
-        should "allow you to remove request tags" do
-          @post.update(tag_string: "aaa bbb ccc ddd")
-          @post.reload
-          assert_equal("aaa bbb ccc ddd", @post.tag_string)
-        end
       end
 
       context "with a banned artist" do

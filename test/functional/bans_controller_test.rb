@@ -57,6 +57,7 @@ class BansControllerTest < ActionDispatch::IntegrationTest
     context "create action" do
       should "allow mods to ban members" do
         assert_difference("Ban.count", 1) do
+          @user = create(:user)
           post_auth bans_path, @mod, params: { ban: { duration: 60, reason: "xxx", user_id: @user.id }}
 
           assert_redirected_to bans_path
@@ -85,10 +86,18 @@ class BansControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow regular users to ban anyone" do
         assert_difference("Ban.count", 0) do
+          @user = create(:user)
           post_auth bans_path, @user, params: { ban: { duration: 60, reason: "xxx", user_id: @mod.id }}
 
           assert_response 403
           assert_equal(false, @mod.reload.is_banned?)
+        end
+      end
+
+      should "not allow users to be double banned" do
+        assert_difference("Ban.count", 0) do
+          post_auth bans_path, @mod, params: { ban: { duration: 60, reason: "xxx", user_id: @ban.user.id }}
+          assert_response :success
         end
       end
     end

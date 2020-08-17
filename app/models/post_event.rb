@@ -30,16 +30,24 @@ class PostEvent
     event.try(:reason) || ""
   end
 
-  def is_resolved
-    event.try(:is_resolved) || false
-  end
-
   def creator_id
     event.try(:creator_id) || event.try(:user_id)
   end
 
   def creator
     event.try(:creator) || event.try(:user)
+  end
+
+  def status
+    if event.is_a?(PostApproval)
+      "approved"
+    elsif (event.is_a?(PostAppeal) && event.succeeded?) || (event.is_a?(PostFlag) && event.rejected?)
+      "approved"
+    elsif (event.is_a?(PostAppeal) && event.rejected?) || (event.is_a?(PostFlag) && event.succeeded?)
+      "deleted"
+    else
+      "pending"
+    end
   end
 
   def is_creator_visible?(user = CurrentUser.user)
@@ -57,7 +65,7 @@ class PostEvent
       "creator_id": nil,
       "created_at": nil,
       "reason": nil,
-      "is_resolved": nil,
+      "status": nil,
       "type": nil
     }
   end

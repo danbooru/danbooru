@@ -11,9 +11,9 @@ UserTooltip.DURATION = 250;
 UserTooltip.MAX_WIDTH = 600;
 
 UserTooltip.initialize = function () {
-  delegate("body", {
+  delegate("#page", {
     allowHTML: true,
-    appendTo: document.body,
+    appendTo: document.querySelector("#user-tooltips"),
     delay: [UserTooltip.SHOW_DELAY, UserTooltip.HIDE_DELAY],
     duration: UserTooltip.DURATION,
     interactive: true,
@@ -26,7 +26,7 @@ UserTooltip.initialize = function () {
     onHide: UserTooltip.on_hide,
   });
 
-  delegate("body", {
+  delegate("#user-tooltips", {
     allowHTML: true,
     interactive: true,
     theme: "common-tooltip",

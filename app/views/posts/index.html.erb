@@ -6,7 +6,7 @@
   <%= render "posts/partials/index/blacklist" %>
 
   <section id="tag-box">
-    <h1>Tags</h1>
+    <h2>Tags</h2>
     <%= @post_set.tag_list_html(current_query: params[:tags], show_extra_links: policy(Post).show_extra_links?) %>
   </section>
 

@@ -2,12 +2,12 @@ class PostPresenter
   attr_reader :pool, :next_post_in_pool
   delegate :tag_list_html, :split_tag_list_html, :split_tag_list_text, :inline_tag_list_html, to: :tag_set_presenter
 
-  def self.preview(post, options = {})
+  def self.preview(post, show_deleted: false, tags: "", **options)
     if post.nil?
       return "<em>none</em>".html_safe
     end
 
-    if !options[:show_deleted] && post.is_deleted? && options[:tags] !~ /status:(?:all|any|deleted|banned)/
+    if post.is_deleted? && !show_deleted
       return ""
     end
 
@@ -31,8 +31,8 @@ class PostPresenter
     locals[:link_target] = options[:link_target] || post
 
     locals[:link_params] = {}
-    if options[:tags].present? && !CurrentUser.is_anonymous?
-      locals[:link_params]["q"] = options[:tags]
+    if tags.present? && !CurrentUser.is_anonymous?
+      locals[:link_params]["q"] = tags
     end
     if options[:pool_id]
       locals[:link_params]["pool_id"] = options[:pool_id]
@@ -116,6 +116,8 @@ class PostPresenter
       "data-pools" => post.pool_string,
       "data-approver-id" => post.approver_id,
       "data-rating" => post.rating,
+      "data-large-width" => post.large_image_width,
+      "data-large-height" => post.large_image_height,
       "data-width" => post.image_width,
       "data-height" => post.image_height,
       "data-flags" => post.status_flags,

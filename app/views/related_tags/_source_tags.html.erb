@@ -3,7 +3,7 @@
     <%= render "related_tags/tag_column", tags: source.translated_tags.map(&:name), title: "Translated Tags" %>
 
     <div class="tag-column wide-column artist-related-tags-column">
-      <h6>Artist</h6>
+      <h3>Artist</h3>
 
       <% if source.artists.size == 0 %>
         none

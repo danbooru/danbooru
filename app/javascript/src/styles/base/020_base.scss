@@ -1,20 +1,13 @@
-@import "../base/000_vars.scss";
-
 body {
   color: var(--text-color);
   background-color: var(--body-background-color);
-  font-family: $base_font_family;
+  font-family: var(--body-font);
   font-size: 87.5%;
   line-height: 1.25em;
 }
 
 abbr[title=required] {
   display: none;
-}
-
-code {
-  font-family: monospace;
-  font-size: 1.2em;
 }
 
 dd {
@@ -25,22 +18,23 @@ dt {
   font-weight: bold;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: Tahoma, Verdana, Helvetica, sans-serif;
+h1, h2, h3, h4, h5, h6, .heading {
+  font-family: var(--header-font);
+  font-weight: bold;
   line-height: 1.5em;
   color: var(--header-color);
 }
 
 h1 {
-  font-size: $h1_size;
+  font-size: var(--text-xxl);
 }
 
 h2 {
-  font-size: $h2_size;
+  font-size: var(--text-lg);
 }
 
 h3, h4, h5, h6 {
-  font-size: $h3_size;
+  font-size: var(--text-md);
 }
 
 fieldset {
@@ -62,6 +56,11 @@ input, select, textarea {
   border: var(--form-input-border);
   color: var(--form-input-text-color);
   padding-left: 0.25em;
+  font: var(--body-font);
+}
+
+textarea {
+  font-size: var(--text-sm);
 }
 
 input[type="button"], input[type="submit"], button {

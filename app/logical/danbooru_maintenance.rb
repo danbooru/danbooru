@@ -3,13 +3,14 @@ module DanbooruMaintenance
 
   def hourly
     safely { Upload.prune! }
+    safely { PostPruner.prune! }
+    safely { PostAppealForumUpdater.update_forum! }
+    safely { regenerate_post_counts! }
   end
 
   def daily
-    safely { PostPruner.new.prune! }
     safely { Delayed::Job.where('created_at < ?', 45.days.ago).delete_all }
     safely { PostDisapproval.prune! }
-    safely { regenerate_post_counts! }
     safely { TokenBucket.prune! }
     safely { BulkUpdateRequestPruner.warn_old }
     safely { BulkUpdateRequestPruner.reject_expired }
@@ -35,8 +36,12 @@ module DanbooruMaintenance
 
   def safely(&block)
     ActiveRecord::Base.connection.execute("set statement_timeout = 0")
-    yield
+
+    CurrentUser.scoped(User.system, "127.0.0.1") do
+      yield
+    end
   rescue StandardError => exception
     DanbooruLogger.log(exception)
+    raise exception if Rails.env.test?
   end
 end

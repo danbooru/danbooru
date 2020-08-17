@@ -21,13 +21,13 @@
     <%= f.input :rating, collection: [["Explicit", "e"], ["Questionable", "q"], ["Safe", "s"]], as: :radio_buttons, boolean_style: :inline %>
   <% end %>
 
-  <fieldset class="inline-fieldset">
+  <fieldset class="inline-fieldset post_has_embedded_notes_fieldset">
     <label>Notes</label>
     <%= f.input :has_embedded_notes, label: "Embed notes", as: :boolean, boolean_style: :inline, disabled: post.is_note_locked? %>
   </fieldset>
 
   <% if policy(post).can_lock_rating? || policy(post).can_lock_notes? || policy(post).can_lock_status? %>
-    <fieldset class="inline-fieldset">
+    <fieldset class="inline-fieldset post_lock_fieldset">
       <label>Lock</label>
 
       <% if policy(post).can_lock_rating? %>
@@ -49,11 +49,8 @@
     <div class="header">
       <%= f.label :tag_string, "Tags" %>
 
-      <span class="options">
-        <i id="face" class="fas"></i>
-        <span class="count"></span>
-        <a href="javascript:void(0)"><i id="open-edit-dialog" class="fas fa-arrows-alt" title="detach" data-shortcut="shift+e"></i></a>
-      </span>
+      <span data-tag-counter data-for="#post_tag_string"></span>
+      <a href="javascript:void(0)"><i id="open-edit-dialog" class="fas fa-external-link-alt" title="detach" data-shortcut="shift+e"></i></a>
     </div>
 
     <div>

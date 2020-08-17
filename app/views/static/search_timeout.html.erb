@@ -6,7 +6,7 @@
 
     <p>Your search took too long to execute and was cancelled.</p>
 
-    <h6>Why did this happen?</h6>
+    <h3>Why did this happen?</h3>
 
     <p>
       Some kinds of searches are slower than others. If your search is too slow
@@ -15,7 +15,7 @@
     </p>
 
     <% if params[:controller] == "posts" && params[:action] == "index" && params[:tags].present? %>
-      <h6>What can I do?</h6>
+      <h3>What can I do?</h3>
 
       <p>Try changing your search:</p>
 
@@ -38,7 +38,7 @@
     <% end %>
 
     <% if !CurrentUser.is_gold? %>
-      <h6>Search limits</h6>
+      <h3>Search limits</h3>
 
       <p>
         Members are limited to searches that take up to 3 seconds long. You can

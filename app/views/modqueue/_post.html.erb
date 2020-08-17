@@ -1,6 +1,6 @@
 <%= content_tag(:div, { id: "post-#{post.id}", class: ["post", "mod-queue-preview", "column-container", *PostPresenter.preview_class(post)].join(" ") }.merge(PostPresenter.data_attributes(post))) do %>
   <aside class="column column-shrink">
-    <%= PostPresenter.preview(post, size: true) %>
+    <%= PostPresenter.preview(post, size: true, show_deleted: true) %>
   </aside>
 
   <section class="column column-expand">
@@ -64,14 +64,14 @@
       <% if post.is_flagged? %>
         <span class="info">
           <strong>Flagged</strong>
-          <%= render "post_flags/reasons", flags: post.flags %>
+          <%= render "post_flags/reasons", flag: post.flags.select(&:pending?).last %>
         </span>
       <% end %>
 
-      <% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
+      <% if post.is_appealed? %>
         <span class="info">
           <strong>Appeals</strong>
-          <%= render "post_appeals/reasons", appeals: post.appeals %>
+          <%= render "post_appeals/reasons", appeal: post.appeals.select(&:pending?).last %>
         </span>
       <% end %>
     </div>

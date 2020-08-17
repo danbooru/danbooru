@@ -24,6 +24,10 @@ module Sources::Strategies
     STATUS1 = %r{\A#{HOST}/web/statuses/(?<status_id>\d+)}
     STATUS2 = %r{\A#{NAMED_PROFILE}/(?<status_id>\d+)}
 
+    def self.enabled?
+      Danbooru.config.pawoo_client_id.present? && Danbooru.config.pawoo_client_secret.present?
+    end
+
     def domains
       ["pawoo.net"]
     end

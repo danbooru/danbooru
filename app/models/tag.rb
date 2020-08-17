@@ -11,8 +11,8 @@ class Tag < ApplicationRecord
   validates :name, tag_name: true, on: :name
   validates_inclusion_of :category, in: TagCategory.category_ids
 
-  before_save :update_category_cache, if: :category_changed?
-  before_save :update_category_post_counts, if: :category_changed?
+  after_save :update_category_cache, if: :saved_change_to_category?
+  after_save :update_category_post_counts, if: :saved_change_to_category?
 
   scope :empty, -> { where("tags.post_count <= 0") }
   scope :nonempty, -> { where("tags.post_count > 0") }
@@ -163,12 +163,10 @@ class Tag < ApplicationRecord
     end
 
     def update_category_post_counts
-      Post.with_timeout(30_000, nil, :tags => name) do
-        Post.raw_tag_match(name).where("true /* Tag#update_category_post_counts */").find_each do |post|
-          post.reload
-          post.set_tag_counts(false)
-          args = TagCategory.categories.map {|x| ["tag_count_#{x}", post.send("tag_count_#{x}")]}.to_h.update(:tag_count => post.tag_count)
-          Post.where(:id => post.id).update_all(args)
+      Post.with_timeout(30_000) do
+        Post.raw_tag_match(name).find_each do |post|
+          post.set_tag_counts
+          post.save!
         end
       end
     end

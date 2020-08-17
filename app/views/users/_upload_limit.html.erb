@@ -4,7 +4,11 @@
   none
 <% else %>
   <%= link_to user.upload_limit.used_upload_slots, posts_path(tags: "user:#{user.name} status:pending") %> /
-  <%= tag.abbr user.upload_limit.upload_slots, title: "#{pluralize(user.upload_limit.approvals_for_next_level - user.upload_limit.approvals_on_current_level, "approved post")} needed for next level (progress: #{user.upload_limit.approvals_on_current_level} / #{user.upload_limit.approvals_for_next_level}) " %>
+  <% if user.upload_limit.maxed? %>
+    <%= tag.abbr user.upload_limit.upload_slots, title: "Maximum amount of upload slots reached." %>
+  <% else %>
+    <%= tag.abbr user.upload_limit.upload_slots, title: "#{pluralize(user.upload_limit.approvals_for_next_level - user.upload_limit.approvals_on_current_level, "approved post")} needed for next level (progress: #{user.upload_limit.approvals_on_current_level} / #{user.upload_limit.approvals_for_next_level}) " %>
+  <% end %>
 <% end %>
 
 (<%= link_to_wiki "help", "about:upload_limits" %>)

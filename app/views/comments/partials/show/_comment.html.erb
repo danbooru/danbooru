@@ -17,12 +17,12 @@
            <% end %>
            data-is-voted="<%= comment.voted_by?(CurrentUser.user) %>">
     <div class="author">
-      <h4>
+      <div class="author-name">
         <%= link_to_user comment.creator %>
         <% if comment.is_deleted? %>
           (deleted)
         <% end %>
-      </h4>
+      </div>
       <%= link_to time_ago_in_words_tagged(comment.created_at), post_path(comment.post, anchor: "comment_#{comment.id}"), class: "message-timestamp" %>
     </div>
     <div class="content">

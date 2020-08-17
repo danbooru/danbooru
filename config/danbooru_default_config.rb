@@ -92,7 +92,7 @@ module Danbooru
     # Maximum size of an upload. If you change this, you must also change
     # `client_max_body_size` in your nginx.conf.
     def max_file_size
-      35.megabytes
+      50.megabytes
     end
 
     # Maximum resolution (width * height) of an upload. Default: 441 megapixels (21000x21000 pixels).
@@ -108,6 +108,11 @@ module Danbooru
     # Maximum height of an upload.
     def max_image_height
       40000
+    end
+
+    # How long pending posts stay in the modqueue before being deleted.
+    def moderation_period
+      3.days
     end
 
     # https://guides.rubyonrails.org/action_mailer_basics.html#action-mailer-configuration
@@ -177,7 +182,6 @@ module Danbooru
           "category" => 0,
           "short" => "gen",
           "extra" => [],
-          "header" => %{<h1 class="general-tag-list">Tags</h1>},
           "relatedbutton" => "General",
           "css" => {
             "color" => "var(--general-tag-color)",
@@ -188,7 +192,6 @@ module Danbooru
           "category" => 4,
           "short" => "char",
           "extra" => ["ch"],
-          "header" => %{<h2 class="character-tag-list">Characters</h2>},
           "relatedbutton" => "Characters",
           "css" => {
             "color" => "var(--character-tag-color)",
@@ -199,7 +202,6 @@ module Danbooru
           "category" => 3,
           "short" => "copy",
           "extra" => ["co"],
-          "header" => %{<h2 class="copyright-tag-list">Copyrights</h2>},
           "relatedbutton" => "Copyrights",
           "css" => {
             "color" => "var(--copyright-tag-color)",
@@ -210,7 +212,6 @@ module Danbooru
           "category" => 1,
           "short" => "art",
           "extra" => [],
-          "header" => %{<h2 class="artist-tag-list">Artists</h2>},
           "relatedbutton" => "Artists",
           "css" => {
             "color" => "var(--artist-tag-color)",
@@ -221,7 +222,6 @@ module Danbooru
           "category" => 5,
           "short" => "meta",
           "extra" => [],
-          "header" => %{<h2 class="meta-tag-list">Meta</h2>},
           "relatedbutton" => nil,
           "css" => {
             "color" => "var(--meta-tag-color)",

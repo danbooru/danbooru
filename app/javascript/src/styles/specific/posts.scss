@@ -80,8 +80,13 @@ table article.post-preview {
   margin-top: 1em;
 }
 
-#edit-dialog textarea {
-  margin-bottom: 0.25em;
+#edit-dialog {
+  /* Hide everything but the rating and tags fields. */
+  .post_has_embedded_notes_fieldset, .post_lock_fieldset, .post_parent_id,
+  .post_source, #filedropzone, .upload_as_pending, .upload_source_container,
+  .upload_parent_id, .upload_artist_commentary_container, .upload_commentary_translation_container {
+    display: none;
+  }
 }
 
 .post-preview {
@@ -258,24 +263,13 @@ div#c-posts {
       margin-bottom: 0;
     }
 
-    .resolved {
-      margin-left: 0.5em;
-      font-weight: bold;
-    }
-
     &.post-notice-parent { background: var(--post-parent-notice-background); }
     &.post-notice-child { background: var(--post-child-notice-background); }
     &.post-notice-pending { background: var(--post-pending-notice-background); }
-    &.post-notice-flagged { background: var(--post-flagged-notice-background); }
     &.post-notice-banned { background: var(--post-banned-notice-background); }
     &.post-notice-deleted { background: var(--post-deleted-notice-background); }
-    &.post-notice-appealed { background: var(--post-appealed-notice-background); }
     &.post-notice-resized { background: var(--post-resized-notice-background); }
     &.post-notice-search { background: var(--post-search-notice-background); }
-  }
-
-  aside#sidebar #tag-list h2 {
-    font-size: $h4_size;
   }
 
   aside#sidebar > section > ul {
@@ -308,7 +302,7 @@ div#c-posts {
   div#a-index {
     menu#post-sections {
       margin-bottom: 0.5em;
-      font-size: $h3_size;
+      font-size: var(--text-lg);
 
       li {
         padding: 0 1em 0.5em 0;
@@ -331,7 +325,7 @@ div#c-posts {
 
     menu#post-sections {
       margin: 0;
-      font-size: $h3_size;
+      font-size: var(--text-lg);
 
       li {
         padding: 0 1em 0 0;
@@ -434,9 +428,24 @@ div#c-posts {
   }
 }
 
-body[data-post-current-image-size="large"] .image-view-large-link,
-body[data-post-current-image-size="original"] .image-view-original-link,
+body[data-post-current-image-size="large"] #post-options .image-view-large-link,
+body[data-post-current-image-size="original"] #post-options .image-view-original-link,
 body[data-post-current-image-size="original"] #image-resize-notice {
+  display: none;
+}
+
+/* Always show the "Resized to X% of original" notice on mobile when it exists. */
+#image-resize-notice {
+  @media screen and (max-width: 660px) {
+    display: block !important;
+  }
+}
+
+body.mode-translation .note-container {
+  cursor: crosshair;
+}
+
+body:not(.mode-translation) div#c-posts div#a-show #mark-as-translated-section {
   display: none;
 }
 
@@ -474,6 +483,33 @@ div#c-posts, div#c-uploads {
   }
 }
 
+/* Container for the tag edit <textarea>, header, and related tags buttons. */
+#tags-container {
+  div.header {
+    line-height: 1.5em;
+
+    label {
+      display: inline-block;
+    }
+
+    i.fa-external-link-alt {
+      font-size: var(--text-xs);
+    }
+
+    span[data-tag-counter] {
+      float: right;
+      color: var(--muted-text-color);
+      font-size: var(--text-sm);
+
+      img {
+        margin-left: 0.5em;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+}
+
 div#c-explore-posts {
   a.desc {
     font-weight: bold;
@@ -497,10 +533,6 @@ div#unapprove-dialog {
   p {
     margin-bottom: 1em;
   }
-}
-
-textarea[data-autocomplete="tag-edit"] {
-  font-family: monospace;
 }
 
 #add-commentary-dialog {

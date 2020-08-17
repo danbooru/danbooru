@@ -143,10 +143,13 @@ Upload.toggle_size = function(e) {
 
 Upload.update_scale = function() {
   let $image = $("#image");
-  let natural_width = $image.get(0).naturalWidth;
-  let natural_height = $image.get(0).naturalHeight;
-  let scale_percentage = Math.round(100 * $image.width() / natural_width);
-  $("#upload-image-metadata-resolution").html(`(${natural_width}x${natural_height}, resized to ${scale_percentage}%)`);
+
+  if ($image.length) {
+    let natural_width = $image.get(0).naturalWidth;
+    let natural_height = $image.get(0).naturalHeight;
+    let scale_percentage = Math.round(100 * $image.width() / natural_width);
+    $("#upload-image-metadata-resolution").html(`(${natural_width}x${natural_height}, resized to ${scale_percentage}%)`);
+  }
 }
 
 Upload.fetch_data_manual = function(e) {

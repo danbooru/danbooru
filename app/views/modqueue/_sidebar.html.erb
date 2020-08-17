@@ -12,7 +12,7 @@
   <%= render "posts/partials/index/blacklist" %>
 
   <p id="modqueue-sidebar-status" class="sidebar-section">
-    <h6>Status</h6>
+    <h2>Status</h2>
     <ul>
       <li>
         <%= link_to "status:pending", modqueue_index_path(search: { tags: "status:pending" }) %>
@@ -21,6 +21,10 @@
       <li>
         <%= link_to "status:flagged", modqueue_index_path(search: { tags: "status:flagged" }) %>
         <span class="post-count"><%= @flagged_post_count %></span>
+      </li>
+      <li>
+        <%= link_to "status:appealed", modqueue_index_path(search: { tags: "status:appealed" }) %>
+        <span class="post-count"><%= @appealed_post_count %></span>
       </li>
 
       <% @disapproval_reasons.each do |reason, count| %>
@@ -33,7 +37,7 @@
   </p>
 
   <p id="modqueue-sidebar-uploaders" class="sidebar-section">
-    <h6>Uploaders</h6>
+    <h2>Uploaders</h2>
     <ul>
       <% @uploaders.each do |uploader, count| %>
         <li>
@@ -46,7 +50,7 @@
   </p>
 
   <p id="modqueue-sidebar-tags" class="sidebar-section">
-    <h6>Tags</h6>
+    <h2>Tags</h2>
 
     <%= render "tag_list", tags: @artist_tags %>
     <%= render "tag_list", tags: @copyright_tags %>

@@ -7,7 +7,7 @@
       <%= f.input :updater_name, label: "Updater", input_html: { value: params.dig(:search, :updater_name), "data-autocomplete": "user" } %>
       <%= f.input :added_tags_include_all, label: "Added tags", input_html: { value: params.dig(:search, :added_tags_include_all), "data-autocomplete": "tag-query" } %>
       <%= f.input :removed_tags_include_all, label: "Removed tags", input_html: { value: params.dig(:search, :removed_tags_include_all), "data-autocomplete": "tag-query" } %>
-      <%= f.input :changed_tags, label: "Changed tags", input_html: { value: params.dig(:search, :changed_tags), "data-autocomplete": "tag-query" } %>
+      <%= f.input :changed_tags, label: "Changed Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :changed_tags) }, hint: "Added or removed tags" %>
       <%= f.input :post_id, input_html: { value: params.dig(:search, :post_id) } %>
       <%= f.input :parent_id, input_html: { value: params.dig(:search, :parent_id) } %>
       <%= f.input :rating, input_html: { value: params.dig(:search, :rating) } %>

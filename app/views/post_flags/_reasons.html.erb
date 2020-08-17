@@ -1,17 +1,11 @@
-<ul class="post-flag-reasons list-bulleted">
-  <% flags.each do |flag| %>
-    <li class="post-flag-reason">
-      <span class="prose"><%= format_text(flag.reason, inline: true) %></span>
+<ul class="post-flag-reason list-bulleted">
+  <li>
+    <span class="prose"><%= format_text(flag.reason, inline: true) %></span>
 
-      <% if policy(flag).can_view_flagger? %>
-        - <%= link_to_user(flag.creator) %>
-      <% end %>
-
-      - <%= time_ago_in_words_tagged(flag.created_at) %>
-
-      <% if flag.is_resolved? %>
-        <span class="resolved">RESOLVED</span>
-      <% end %>
-    </li>
-  <% end %>
+    <% if policy(flag).can_view_flagger? %>
+      (<%= link_to_user(flag.creator) %>, <%= time_ago_in_words_tagged(flag.created_at) %>)
+    <% else %>
+      (<%= time_ago_in_words_tagged(flag.created_at) %>)
+    <% end %>
+  </li>
 </ul>

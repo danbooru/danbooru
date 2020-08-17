@@ -5,7 +5,7 @@
   <% if policy(PostFlag).can_search_flagger? %>
     <%= f.input :creator_name, label: "Creator", input_html: { value: params[:search][:creator_name], data: { autocomplete: "user" } } %>
   <% end %>
-  <%= f.input :is_resolved, label: "Resolved?", collection: [["Yes", true], ["No", false]], include_blank: true, selected: params[:search][:is_resolved] %>
   <%= f.input :category, label: "Category", collection: ["normal", "unapproved", "rejected", "deleted"], include_blank: true, selected: params[:search][:category] %>
+  <%= f.input :status, collection: PostFlag.statuses, include_blank: true, selected: params[:search][:status] %>
   <%= f.submit "Search" %>
 <% end %>

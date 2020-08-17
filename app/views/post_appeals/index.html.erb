@@ -16,8 +16,8 @@
       <% t.column "Appeals", width: "1%" do |post_appeal| %>
         <%= link_to post_appeal.post.appeals.size, post_appeals_path(search: { post_id: post_appeal.post_id }) %>
       <% end %>
-      <% t.column "Resolved?", width: "5%" do |post_appeal| %>
-        <%= link_to post_appeal.is_resolved.to_s, post_appeals_path(search: params[:search].merge(is_resolved: post_appeal.is_resolved)) %>
+      <% t.column "Status", width: "5%" do |post_appeal| %>
+        <%= link_to post_appeal.status, post_appeals_path(search: { status: post_appeal.status }) %>
       <% end %>
       <% t.column "Uploaded", width: "15%" do |post_appeal| %>
         <%= compact_time post_appeal.post.created_at %>

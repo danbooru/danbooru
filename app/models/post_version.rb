@@ -15,12 +15,6 @@ class PostVersion < ApplicationRecord
 
   establish_connection database_url if enabled?
 
-  def self.check_for_retry(msg)
-    if msg =~ /can't get socket descriptor/ && msg =~ /post_versions/
-      connection.reconnect!
-    end
-  end
-
   module SearchMethods
     def changed_tags_include(tag)
       where_array_includes_all(:added_tags, [tag]).or(where_array_includes_all(:removed_tags, [tag]))
@@ -30,6 +24,10 @@ class PostVersion < ApplicationRecord
       tags.reduce(all) do |relation, tag|
         relation.changed_tags_include(tag)
       end
+    end
+
+    def changed_tags_include_any(tags)
+      where_array_includes_any(:added_tags, tags).or(where_array_includes_any(:removed_tags, tags))
     end
 
     def tag_matches(string)
@@ -45,6 +43,14 @@ class PostVersion < ApplicationRecord
 
       if params[:changed_tags]
         q = q.changed_tags_include_all(params[:changed_tags].scan(/[^[:space:]]+/))
+      end
+
+      if params[:all_changed_tags]
+        q = q.changed_tags_include_all(params[:all_changed_tags].scan(/[^[:space:]]+/))
+      end
+
+      if params[:any_changed_tags]
+        q = q.changed_tags_include_any(params[:any_changed_tags].scan(/[^[:space:]]+/))
       end
 
       if params[:tag_matches]

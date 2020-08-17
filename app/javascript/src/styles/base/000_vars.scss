@@ -1,20 +1,19 @@
-$h1_size: 2em;
-$h2_size: 1.5em;
-$h3_size: 1.16667em;
-$h4_size: 1em;
-$dtext_h1_size: 2em;
-$dtext_h2_size: 1.8em;
-$dtext_h3_size: 1.6em;
-$dtext_h4_size: 1.4em;
-$dtext_h5_size: 1.2em;
-$dtext_h6_size: 1em;
+:root {
+  --text-xs: 0.8em;
+  --text-sm: 0.9em;
+  --text-md: 1em;
+  --text-lg: 1.16667em;
+  --text-xl: 1.5em;
+  --text-xxl: 2em;
+  --header-font: Tahoma, Verdana, Helvetica, sans-serif;
+  --body-font: Verdana, Helvetica, sans-serif;
+  --monospace-font: 1.2em monospace;
+}
+
 $h1_padding: 0.8em 0 0.25em 0;
 $h2_padding: 0.8em 0 0.25em 0;
 $h3_padding: 0.8em 0 0.25em 0;
 $h4_padding: 0.8em 0 0.25em 0;
-
-/* stylelint-disable-next-line value-keyword-case */
-$base_font_family: Verdana, Helvetica, sans-serif;
 
 @mixin animated-icon {
   content: "►";

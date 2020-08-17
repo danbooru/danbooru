@@ -1,6 +1,5 @@
 import Uploads from './uploads.js.erb';
 import Utility from './utility';
-import Post from './posts.js.erb';
 
 let RelatedTag = {};
 
@@ -121,7 +120,8 @@ RelatedTag.toggle_tag = function(e) {
   setTimeout(function () { $field.prop('selectionStart', $field.val().length);}, 100);
   e.preventDefault();
 
-  Post.update_tag_count({ target: $field });
+  // Artificially trigger input event so the tag counter updates.
+  $field.trigger("input");
 }
 
 RelatedTag.show = function(e) {

@@ -65,11 +65,8 @@
           <div class="header">
             <%= f.label :tag_string, "Tags" %>
 
-            <span class="options">
-              <i id="face" class="fas"></i>
-              <span class="count"></span>
-              <a href="javascript:void(0)"><i id="open-edit-dialog" class="fas fa-arrows-alt" title="detach" data-shortcut="shift+e"></i></a>
-            </span>
+            <span data-tag-counter data-for="#upload_tag_string"></span>
+            <a href="javascript:void(0)"><i id="open-edit-dialog" class="fas fa-external-link-alt" title="detach" data-shortcut="shift+e"></i></a>
           </div>
 
           <%= f.input :tag_string, label: false, input_html: { size: "60x5", "data-autocomplete": "tag-edit", "data-shortcut": "e", spellcheck: false, value: params[:tag_string] } %>

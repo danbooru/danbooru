@@ -7,7 +7,8 @@ class Post < ApplicationRecord
   class TimeoutError < StandardError; end
 
   # Tags to copy when copying notes.
-  NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation]
+  NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation
+                      annotated partially_annotated check_annotation annotation_request]
 
   deletable
 
@@ -61,8 +62,10 @@ class Post < ApplicationRecord
   scope :pending, -> { where(is_pending: true) }
   scope :flagged, -> { where(is_flagged: true) }
   scope :banned, -> { where(is_banned: true) }
-  scope :active, -> { where(is_pending: false, is_deleted: false, is_flagged: false) }
-  scope :pending_or_flagged, -> { pending.or(flagged) }
+  scope :active, -> { where(is_pending: false, is_deleted: false, is_flagged: false).where.not(id: PostAppeal.pending) }
+  scope :appealed, -> { deleted.where(id: PostAppeal.pending.select(:post_id)) }
+  scope :in_modqueue, -> { pending.or(flagged).or(appealed) }
+  scope :expired, -> { pending.where("posts.created_at < ?", Danbooru.config.moderation_period.ago) }
 
   scope :unflagged, -> { where(is_flagged: false) }
   scope :has_notes, -> { where.not(last_noted_at: nil) }
@@ -237,9 +240,9 @@ class Post < ApplicationRecord
 
     def large_image_width
       if has_large?
-        [Danbooru.config.large_image_width, image_width].min
+        [Danbooru.config.large_image_width, image_width.to_i].min
       else
-        image_width
+        image_width.to_i
       end
     end
 
@@ -269,6 +272,7 @@ class Post < ApplicationRecord
     end
 
     def resize_percentage
+      return 100 if image_width.to_i == 0
       100 * large_image_width.to_f / image_width.to_f
     end
 
@@ -279,12 +283,28 @@ class Post < ApplicationRecord
   end
 
   module ApprovalMethods
+    def in_modqueue?
+      is_pending? || is_flagged? || is_appealed?
+    end
+
+    def is_active?
+      !is_deleted? && !in_modqueue?
+    end
+
+    def is_appealed?
+      is_deleted? && appeals.any?(&:pending?)
+    end
+
+    def is_appealable?
+      is_deleted? && !is_appealed?
+    end
+
     def is_approvable?(user = CurrentUser.user)
-      !is_status_locked? && (is_pending? || is_flagged? || is_deleted?) && uploader != user
+      !is_status_locked? && !is_active? && uploader != user
     end
 
     def flag!(reason, is_deletion: false)
-      flag = flags.create(reason: reason, is_resolved: false, is_deletion: is_deletion, creator: CurrentUser.user)
+      flag = flags.create(reason: reason, is_deletion: is_deletion, creator: CurrentUser.user)
 
       if flag.errors.any?
         raise PostFlag::Error.new(flag.errors.full_messages.join("; "))
@@ -375,12 +395,6 @@ class Post < ApplicationRecord
     def update_tag_post_counts
       decrement_tags = tag_array_was - tag_array
 
-      decrement_tags_except_requests = decrement_tags.reject {|tag| tag == "tagme" || tag.end_with?("_request")}
-      if !decrement_tags_except_requests.empty? && !CurrentUser.is_builder? && CurrentUser.created_at > 1.week.ago
-        self.errors.add(:updater_id, "must have an account at least 1 week old to remove tags")
-        return false
-      end
-
       increment_tags = tag_array - tag_array_was
       if increment_tags.any?
         Tag.increment_post_counts(increment_tags)
@@ -398,21 +412,13 @@ class Post < ApplicationRecord
       set_tag_count(category, self.send("tag_count_#{category}") + 1)
     end
 
-    def set_tag_counts(disable_cache = true)
+    def set_tag_counts
       self.tag_count = 0
       TagCategory.categories.each {|x| set_tag_count(x, 0)}
-      categories = Tag.categories_for(tag_array, :disable_caching => disable_cache)
+      categories = Tag.categories_for(tag_array, disable_caching: true)
       categories.each_value do |category|
         self.tag_count += 1
         inc_tag_count(TagCategory.reverse_mapping[category])
-      end
-    end
-
-    def fix_post_counts(post)
-      post.set_tag_counts(false)
-      if post.changes_saved?
-        args = Hash[TagCategory.categories.map {|x| ["tag_count_#{x}", post.send("tag_count_#{x}")]}].update(:tag_count => post.tag_count)
-        post.update_columns(args)
       end
     end
 
@@ -932,14 +938,7 @@ class Post < ApplicationRecord
     end
 
     def update_children_on_destroy
-      return unless children.present?
-
-      eldest = children[0]
-      siblings = children[1..-1]
-
-      eldest.update(parent_id: nil)
-      Post.where(id: siblings).find_each { |p| p.update(parent_id: eldest.id) }
-      # Post.where(id: siblings).update(parent_id: eldest.id) # XXX rails 5
+      children.update(parent: nil)
     end
 
     def update_parent_on_save
@@ -949,7 +948,7 @@ class Post < ApplicationRecord
       Post.find(parent_id_before_last_save).update_has_children_flag if parent_id_before_last_save.present?
     end
 
-    def give_favorites_to_parent(options = {})
+    def give_favorites_to_parent
       return if parent.nil?
 
       transaction do
@@ -959,9 +958,7 @@ class Post < ApplicationRecord
         end
       end
 
-      unless options[:without_mod_action]
-        ModAction.log("moved favorites from post ##{id} to post ##{parent.id}", :post_move_favorites)
-      end
+      ModAction.log("moved favorites from post ##{id} to post ##{parent.id}", :post_move_favorites)
     end
 
     def has_visible_children?
@@ -985,9 +982,8 @@ class Post < ApplicationRecord
 
       transaction do
         Post.without_timeout do
-          ModAction.log("permanently deleted post ##{id}", :post_permanent_delete)
+          ModAction.log("permanently deleted post ##{id} (md5=#{md5})", :post_permanent_delete)
 
-          give_favorites_to_parent
           update_children_on_destroy
           decrement_tag_post_counts
           remove_from_all_pools
@@ -1009,29 +1005,22 @@ class Post < ApplicationRecord
       ModAction.log("unbanned post ##{id}", :post_unban)
     end
 
-    def delete!(reason, options = {})
-      if is_status_locked?
-        self.errors.add(:is_status_locked, "; cannot delete post")
-        return false
-      end
+    def delete!(reason, move_favorites: false, user: CurrentUser.user)
+      transaction do
+        automated = (user == User.system)
 
-      Post.transaction do
-        flag!(reason, is_deletion: true)
+        flags.pending.update!(status: :succeeded)
+        appeals.pending.update!(status: :rejected)
 
-        update(
-          is_deleted: true,
-          is_pending: false,
-          is_flagged: false,
-          is_banned: is_banned || options[:ban] || has_tag?("banned_artist")
-        )
+        flags.create!(reason: reason, is_deletion: true, creator: user, status: :succeeded)
+        update!(is_deleted: true, is_pending: false, is_flagged: false)
 
         # XXX This must happen *after* the `is_deleted` flag is set to true (issue #3419).
-        give_favorites_to_parent(options) if options[:move_favorites]
+        give_favorites_to_parent if move_favorites
 
-        is_automatic = (reason == "Unapproved in three days")
-        uploader.upload_limit.update_limit!(self, incremental: is_automatic)
+        uploader.upload_limit.update_limit!(self, incremental: automated)
 
-        unless options[:without_mod_action]
+        unless automated
           ModAction.log("deleted post ##{id}, reason: #{reason}", :post_delete)
         end
       end
@@ -1213,8 +1202,6 @@ class Post < ApplicationRecord
     def with_flag_stats
       relation = left_outer_joins(:flags).group(:id).select("posts.*")
       relation = relation.select("COUNT(post_flags.id) AS flag_count")
-      relation = relation.select("COUNT(post_flags.id) FILTER (WHERE post_flags.is_resolved = TRUE)  AS resolved_flag_count")
-      relation = relation.select("COUNT(post_flags.id) FILTER (WHERE post_flags.is_resolved = FALSE) AS unresolved_flag_count")
       relation
     end
 
@@ -1253,6 +1240,14 @@ class Post < ApplicationRecord
       relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.is_deleted = FALSE) AS active_pool_count")
       relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.category = 'series') AS series_pool_count")
       relation = relation.select("COUNT(pools.id) FILTER (WHERE pools.category = 'collection') AS collection_pool_count")
+      relation
+    end
+
+    def with_queued_at
+      relation = group(:id)
+      relation = relation.left_outer_joins(:flags, :appeals)
+      relation = relation.select("posts.*")
+      relation = relation.select(Arel.sql("MAX(GREATEST(posts.created_at, post_flags.created_at, post_appeals.created_at)) AS queued_at"))
       relation
     end
 

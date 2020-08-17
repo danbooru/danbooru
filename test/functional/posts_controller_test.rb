@@ -361,6 +361,30 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_select "#post_#{@post.id}", 1
         end
+
+        should 'show deleted posts when searching for status:"deleted"' do
+          get posts_path(tags: 'status:"deleted"')
+          assert_response :success
+          assert_select "#post_#{@post.id}", 1
+        end
+
+        should "show deleted posts when searching for -status:active" do
+          get posts_path(tags: "-status:active")
+          assert_response :success
+          assert_select "#post_#{@post.id}", 1
+        end
+
+        context "with the hide_deleted_posts option enabled" do
+          should "show deleted posts when searching for status:appealed" do
+            @user.update!(hide_deleted_posts: true)
+            create(:post_appeal, post: @post)
+
+            get_auth posts_path(tags: "status:appealed"), @user
+
+            assert_response :success
+            assert_select "#post_#{@post.id}", 1
+          end
+        end
       end
 
       context "with restricted posts" do
@@ -483,7 +507,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
             create(:note, post: @post)
             create(:artist_commentary, post: @post)
             create(:post_flag, post: @post, creator: @user)
-            create(:post_appeal, post: @post, creator: @user)
+            #create(:post_appeal, post: @post, creator: @user)
             create(:post_vote, post: @post, user: @user)
             create(:favorite, post: @post, user: @user)
             create(:moderation_report, model: @comment, creator: @builder)
@@ -512,6 +536,15 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
         should "render for a builder with a search query" do
           get_auth post_path(@post, q: "tagme"), @builder
+          assert_response :success
+        end
+      end
+
+      context "a deleted post" do
+        should "render" do
+          @post.delete!("no", user: @user)
+          get post_path(@post)
+
           assert_response :success
         end
       end
@@ -630,6 +663,42 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         put_auth post_path(@post), @user, params: { post: { tag_string: "blah" }}
         assert_response 403
         assert_not_equal("blah", @post.reload.tag_string)
+      end
+    end
+
+    context "destroy action" do
+      setup do
+        @approver = create(:approver)
+      end
+
+      should "delete the post" do
+        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" } }
+
+        assert_redirected_to @post
+        assert_equal(true, @post.reload.is_deleted?)
+        assert_equal("test", @post.flags.last.reason)
+      end
+
+      should "delete the post even if the deleter has flagged the post previously" do
+        create(:post_flag, post: @post, creator: @approver)
+        delete_auth post_path(@post), @approver, params: { commit: "Delete", post: { reason: "test" } }
+
+        assert_redirected_to @post
+        assert_equal(true, @post.reload.is_deleted?)
+      end
+
+      should "not delete the post if the user is unauthorized" do
+        delete_auth post_path(@post), @user, params: { commit: "Delete" }
+
+        assert_response 403
+        assert_equal(false, @post.is_deleted?)
+      end
+
+      should "render the delete post dialog for an xhr request" do
+        delete_auth post_path(@post), @approver, xhr: true
+
+        assert_response :success
+        assert_equal(false, @post.is_deleted?)
       end
     end
 

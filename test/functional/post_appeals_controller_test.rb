@@ -49,10 +49,54 @@ class PostAppealsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
-      should "create a new appeal" do
-        assert_difference("PostAppeal.count", 1) do
-          post_auth post_appeals_path, @user, params: {:format => "js", :post_appeal => {:post_id => @post.id, :reason => "xxx"}}
+      context "appealing a deleted post" do
+        should "create a new appeal" do
+          @post = create(:post, is_deleted: true)
+
+          assert_difference("PostAppeal.count", 1) do
+            post_auth post_appeals_path, @user, params: { post_appeal: { post_id: @post.id, reason: "xxx" }}, as: :json
+          end
+
           assert_response :success
+        end
+      end
+
+      context "appealing a flagged post" do
+        should "fail" do
+          @flag = create(:post_flag)
+
+          assert_no_difference("PostAppeal.count") do
+            post_auth post_appeals_path, @user, params: { post_appeal: { post_id: @flag.post.id, reason: "xxx" }}, as: :json
+          end
+
+          assert_response 422
+          assert_equal(["cannot be appealed"], response.parsed_body.dig("errors", "post"))
+        end
+      end
+
+      context "appealing a pending post" do
+        should "fail" do
+          @post = create(:post, is_pending: true)
+
+          assert_no_difference("PostAppeal.count") do
+            post_auth post_appeals_path, @user, params: { post_appeal: { post_id: @post.id, reason: "xxx" }}, as: :json
+          end
+
+          assert_response 422
+          assert_equal(["cannot be appealed"], response.parsed_body.dig("errors", "post"))
+        end
+      end
+
+      context "appealing an already appealed post" do
+        should "fail" do
+          @appeal = create(:post_appeal)
+
+          assert_no_difference("PostAppeal.count") do
+            post_auth post_appeals_path, @user, params: { post_appeal: { post_id: @appeal.post.id, reason: "xxx" }}, as: :json
+          end
+
+          assert_response 422
+          assert_equal(["cannot be appealed"], response.parsed_body.dig("errors", "post"))
         end
       end
     end

@@ -4,14 +4,15 @@ class ModqueueController < ApplicationController
 
   def index
     authorize :modqueue
-    @posts = Post.includes(:appeals, :disapprovals, :uploader, flags: [:creator]).pending_or_flagged.available_for_moderation(CurrentUser.user, hidden: search_params[:hidden])
-    @posts = @posts.paginated_search(params, order: "modqueue", count_pages: true)
+    @posts = Post.includes(:appeals, :disapprovals, :uploader, flags: [:creator]).in_modqueue.available_for_moderation(CurrentUser.user, hidden: search_params[:hidden])
+    @modqueue_posts = @posts.reselect(nil).reorder(nil).offset(nil).limit(nil)
+    @posts = @posts.paginated_search(params, order: "modqueue", count_pages: true, count: @modqueue_posts.to_a.size)
 
-    @modqueue_posts = @posts.except(:offset, :limit, :order)
-    @pending_post_count = @modqueue_posts.pending.count
-    @flagged_post_count = @modqueue_posts.flagged.count
-    @disapproval_reasons = PostDisapproval.where(post: @modqueue_posts).where.not(reason: "disinterest").group(:reason).order(count: :desc).distinct.count(:post_id)
-    @uploaders = @modqueue_posts.group(:uploader).order(count: :desc).limit(20).count
+    @pending_post_count = @modqueue_posts.select(&:is_pending?).count
+    @flagged_post_count = @modqueue_posts.select(&:is_flagged?).count
+    @appealed_post_count = @modqueue_posts.select(&:is_appealed?).count
+    @disapproval_reasons = PostDisapproval.where(post_id: @modqueue_posts.map(&:id)).where.not(reason: "disinterest").group(:reason).order(count: :desc).distinct.count(:post_id)
+    @uploaders = @modqueue_posts.map(&:uploader).tally.sort_by(&:last).reverse.take(20).to_h
 
     @tags = RelatedTagCalculator.frequent_tags_for_post_relation(@modqueue_posts)
     @artist_tags = @tags.select(&:artist?).sort_by(&:overlap_count).reverse.take(10)

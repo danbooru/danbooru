@@ -6,7 +6,7 @@ class PostQueryBuilder
   COUNT_METATAGS = %w[
     comment_count deleted_comment_count active_comment_count
     note_count deleted_note_count active_note_count
-    flag_count resolved_flag_count unresolved_flag_count
+    flag_count
     child_count deleted_child_count active_child_count
     pool_count deleted_pool_count active_pool_count series_pool_count collection_pool_count
     appeal_count approval_count replacement_count
@@ -274,8 +274,10 @@ class PostQueryBuilder
       Post.pending
     when "flagged"
       Post.flagged
+    when "appealed"
+      Post.appealed
     when "modqueue"
-      Post.pending_or_flagged
+      Post.in_modqueue
     when "deleted"
       Post.deleted
     when "banned"
@@ -283,7 +285,7 @@ class PostQueryBuilder
     when "active"
       Post.active
     when "unmoderated"
-      Post.pending_or_flagged.available_for_moderation(current_user, hidden: false)
+      Post.in_modqueue.available_for_moderation(current_user, hidden: false)
     when "all", "any"
       Post.all
     else
@@ -307,7 +309,7 @@ class PostQueryBuilder
       Post.where(parent: nil)
     when "any"
       Post.where.not(parent: nil)
-    when /pending|flagged|modqueue|deleted|banned|active|unmoderated/
+    when "pending", "flagged", "appealed", "modqueue", "deleted", "banned", "active", "unmoderated"
       Post.where.not(parent: nil).where(parent: status_matches(parent))
     when /\A\d+\z/
       Post.where(id: parent).or(Post.where(parent: parent))
@@ -322,7 +324,7 @@ class PostQueryBuilder
       Post.where(has_children: false)
     when "any"
       Post.where(has_children: true)
-    when /pending|flagged|modqueue|deleted|banned|active|unmoderated/
+    when "pending", "flagged", "appealed", "modqueue", "deleted", "banned", "active", "unmoderated"
       Post.where(has_children: true).where(children: status_matches(child))
     else
       Post.none
@@ -330,8 +332,9 @@ class PostQueryBuilder
   end
 
   def source_matches(source, quoted = false)
-    case source.downcase
-    in "none" unless quoted
+    if source.empty?
+      Post.where_like(:source, "")
+    elsif source.downcase == "none" && !quoted
       Post.where_like(:source, "")
     else
       Post.where_ilike(:source, source + "*")
@@ -606,10 +609,10 @@ class PostQueryBuilder
         .order("contributor_fav_count DESC, posts.fav_count DESC, posts.id DESC")
 
     when "modqueue", "modqueue_desc"
-      relation = relation.left_outer_joins(:flags).order(Arel.sql("GREATEST(posts.created_at, post_flags.created_at) DESC, posts.id DESC"))
+      relation = relation.with_queued_at.order("queued_at DESC, posts.id DESC")
 
     when "modqueue_asc"
-      relation = relation.left_outer_joins(:flags).order(Arel.sql("GREATEST(posts.created_at, post_flags.created_at) ASC, posts.id ASC"))
+      relation = relation.with_queued_at.order("queued_at ASC, posts.id ASC")
 
     when "none"
       relation = relation.reorder(nil)
@@ -642,14 +645,7 @@ class PostQueryBuilder
         if scanner.scan(/(-)?(#{METATAGS.join("|")}):/io)
           operator = scanner.captures.first
           metatag = scanner.captures.second.downcase
-
-          if scanner.scan(/"(.+)"/) || scanner.scan(/'(.+)'/)
-            value = scanner.captures.first
-            quoted = true
-          else
-            value = scanner.scan(/[^ ]*/)
-            quoted = false
-          end
+          value, quoted = scan_string(scanner)
 
           if metatag.in?(COUNT_METATAG_SYNONYMS)
             metatag = metatag.singularize + "_count"
@@ -673,23 +669,41 @@ class PostQueryBuilder
       terms
     end
 
+    def scan_string(scanner)
+      if scanner.scan(/"((?:\\"|[^"])*)"/)
+        value = scanner.captures.first.gsub(/\\(.)/) { $1 }
+        quoted = true
+      elsif scanner.scan(/'((?:\\'|[^'])*)'/)
+        value = scanner.captures.first.gsub(/\\(.)/) { $1 }
+        quoted = true
+      else
+        value = scanner.scan(/(\\ |[^ ])*/)
+        value = value.gsub(/\\ /) { " " }
+        quoted = false
+      end
+
+      [value, quoted]
+    end
+
     def split_query
       terms.map do |term|
-        if term.type == :metatag && !term.negated && !term.quoted
-          "#{term.name}:#{term.value}"
-        elsif term.type == :metatag && !term.negated && term.quoted
-          "#{term.name}:\"#{term.value}\""
-        elsif term.type == :metatag && term.negated && !term.quoted
-          "-#{term.name}:#{term.value}"
-        elsif term.type == :metatag && term.negated && term.quoted
-          "-#{term.name}:\"#{term.value}\""
-        elsif term.type == :tag && term.negated
-          "-#{term.name}"
-        elsif term.type == :tag && term.optional
-          "~#{term.name}"
-        elsif term.type == :tag
-          term.name
+        type, name, value = term.type, term.name, term.value
+
+        str = ""
+        str += "-" if term.negated
+        str += "~" if term.optional
+
+        if type == :tag
+          str += name
+        elsif type == :metatag && (term.quoted || value.include?(" "))
+          value = value.gsub(/\\/) { '\\\\' }
+          value = value.gsub(/"/) { '\\"' }
+          str += "#{name}:\"#{value}\""
+        elsif type == :metatag
+          str += "#{name}:#{value}"
         end
+
+        str
       end
     end
 
@@ -898,8 +912,9 @@ class PostQueryBuilder
       metatags
     end
 
+    # XXX unify with PostSets::Post#show_deleted?
     def hide_deleted?
-      has_status_metatag = select_metatags(:status).any? { |metatag| metatag.value.downcase.in?(%w[deleted active any all]) }
+      has_status_metatag = select_metatags(:status).any? { |metatag| metatag.value.downcase.in?(%w[deleted active any all unmoderated modqueue appealed]) }
       hide_deleted_posts? && !has_status_metatag
     end
   end

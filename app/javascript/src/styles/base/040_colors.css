@@ -104,10 +104,8 @@
   --post-parent-notice-background: var(--success-background-color);
   --post-child-notice-background: var(--warning-background-color);
   --post-pending-notice-background: #D8D8FC;
-  --post-flagged-notice-background: var(--error-background-color);
   --post-banned-notice-background: var(--error-background-color);
   --post-deleted-notice-background: var(--error-background-color);
-  --post-appealed-notice-background: #D8F2FC;
   --post-resized-notice-background: #EED8FC;
   --post-search-notice-background: #EEE;
 
@@ -144,10 +142,6 @@
 
   --tag-count-color: var(--muted-text-color);
   --low-post-count-color: red;
-
-  --tag-count-indicator-frown-color: red;
-  --tag-count-indicator-meh-color: darkkhaki;
-  --tag-count-indicator-smile-color: green;
 
   --remove-favorite-button: deeppink;
 
@@ -387,10 +381,8 @@ body[data-current-user-theme="dark"] {
   --post-parent-notice-background: var(--green-0);
   --post-resized-notice-background: var(--purple-0);
   --post-pending-notice-background: var(--indigo-0);
-  --post-flagged-notice-background: var(--red-0);
   --post-deleted-notice-background: var(--red-0);
   --post-banned-notice-background: var(--red-0);
-  --post-appealed-notice-background: var(--blue-0);
 
   --post-tooltip-background-color: var(--grey-3);
   --post-tooltip-border-color: var(--grey-4);
@@ -416,10 +408,6 @@ body[data-current-user-theme="dark"] {
   --selected-related-tag-color: white;
 
   --target-background: var(--blue-0);
-
-  --tag-count-indicator-frown-color: var(--red-1);
-  --tag-count-indicator-meh-color: var(--yellow-1);
-  --tag-count-indicator-smile-color: var(--green-1);
 
   --uploads-dropzone-background: var(--grey-3);
   --uploads-dropzone-progress-bar-foreground-color: var(--link-color);

@@ -15,6 +15,10 @@ div.list-of-messages {
       width: 12em;
       margin-right: 1em;
 
+      div.author-name {
+        font-weight: bold;
+      }
+
       a.message-timestamp {
         font-style: italic;
         font-size: 0.90em;
@@ -42,7 +46,7 @@ div.list-of-messages {
         margin: 0 0 1em;
         width: auto;
 
-        h4 {
+        div.author-name {
           display: inline;
           margin-right: 0.5em;
         }

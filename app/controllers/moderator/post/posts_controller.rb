@@ -4,18 +4,6 @@ module Moderator
       skip_before_action :api_check
       respond_to :html, :json, :xml, :js
 
-      def confirm_delete
-        @post = ::Post.find(params[:id])
-      end
-
-      def delete
-        @post = authorize ::Post.find(params[:id])
-        if params[:commit] == "Delete"
-          @post.delete!(params[:reason], :move_favorites => params[:move_favorites].present?)
-        end
-        redirect_to(post_path(@post))
-      end
-
       def confirm_move_favorites
         @post = ::Post.find(params[:id])
       end
@@ -44,7 +32,7 @@ module Moderator
       def unban
         @post = authorize ::Post.find(params[:id])
         @post.unban!
-        flash[:notice] = "Post was banned"
+        flash[:notice] = "Post was unbanned"
 
         respond_with(@post)
       end

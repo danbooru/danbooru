@@ -3,6 +3,8 @@ class UploadLimit
 
   INITIAL_POINTS = 1000
   MAXIMUM_POINTS = 10_000
+  APPEAL_COST = 3
+  DELETION_COST = 5
 
   attr_reader :user
 
@@ -30,11 +32,20 @@ class UploadLimit
     end
   end
 
-  def used_upload_slots
-    pending = user.posts.pending
-    early_deleted = user.posts.deleted.where("created_at >= ?", 3.days.ago)
+  def maxed?
+    user.upload_points >= MAXIMUM_POINTS
+  end
 
-    pending.or(early_deleted).count
+  def used_upload_slots
+    pending_count = user.posts.pending.count
+    appealed_count = user.post_appeals.pending.count
+    early_deleted_count = user.posts.deleted.where("created_at >= ?", Danbooru.config.moderation_period.ago).count
+
+    pending_count + (early_deleted_count * DELETION_COST) + (appealed_count * APPEAL_COST)
+  end
+
+  def free_upload_slots
+    upload_slots - used_upload_slots
   end
 
   def upload_slots
@@ -111,6 +122,4 @@ class UploadLimit
       points_for_next_level(n - 1)
     end.sum
   end
-
-  memoize :used_upload_slots
 end

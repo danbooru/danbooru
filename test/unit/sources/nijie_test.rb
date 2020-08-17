@@ -69,7 +69,8 @@ module Sources
           ["眼鏡", "https://nijie.info/search.php?word=%E7%9C%BC%E9%8F%A1"],
           ["谷間", "https://nijie.info/search.php?word=%E8%B0%B7%E9%96%93"],
           ["リトルウィッチアカデミア", "https://nijie.info/search.php?word=%E3%83%AA%E3%83%88%E3%83%AB%E3%82%A6%E3%82%A3%E3%83%83%E3%83%81%E3%82%A2%E3%82%AB%E3%83%87%E3%83%9F%E3%82%A2"],
-          ["アーシュラ先生", "https://nijie.info/search.php?word=%E3%82%A2%E3%83%BC%E3%82%B7%E3%83%A5%E3%83%A9%E5%85%88%E7%94%9F"]
+          ["アーシュラ先生", "https://nijie.info/search.php?word=%E3%82%A2%E3%83%BC%E3%82%B7%E3%83%A5%E3%83%A9%E5%85%88%E7%94%9F"],
+          ["上着全開", "https://nijie.info/search.php?word=%E4%B8%8A%E7%9D%80%E5%85%A8%E9%96%8B"]
         ]
 
         assert_equal(tags, @site.tags)
@@ -289,6 +290,18 @@ module Sources
           assert_empty(site.tags)
           assert_nothing_raised { site.to_h }
         end
+      end
+    end
+
+    context "a post requiring login" do
+      should "not fail" do
+        site = Sources::Strategies.find("https://nijie.info/view.php?id=203688")
+
+        urls = %w[
+          https://pic.nijie.net/01/nijie_picture/676327_20170216212803_0.jpg
+          https://pic.nijie.net/04/nijie_picture/diff/main/676327_20170216212806_0.jpg
+        ]
+        assert_equal(urls, site.image_urls)
       end
     end
 

@@ -4,7 +4,7 @@
   <div id="a-site-map" class="fixed-width-container">
     <section>
       <ul>
-        <li><h1>Posts</h1></li>
+        <li><h2>Posts</h2></li>
         <li><%= link_to_wiki "Help", "help:posts" %></li>
         <li><%= link_to("Listing", posts_path) %></li>
         <li><%= link_to("Upload", new_upload_path) %></li>
@@ -18,7 +18,7 @@
         <% end %>
       </ul>
       <ul>
-        <li><h1>Post Events</h1></li>
+        <li><h2>Post Events</h2></li>
         <li><%= link_to("Changes", post_versions_path) %></li>
         <li><%= link_to("Approvals", post_approvals_path) %></li>
         <li><%= link_to("Disapprovals", post_disapprovals_path) %></li>
@@ -27,7 +27,7 @@
         <li><%= link_to("Replacements", post_replacements_path) %></li>
       </ul>
       <ul>
-        <li><h1>Tools</h1></li>
+        <li><h2>Tools</h2></li>
         <li><%= link_to("Source Code", Danbooru.config.source_code_url) %></li>
         <li><%= link_to("Bug Reports", Danbooru.config.issues_url) %></li>
         <li><%= link_to("Keyboard Shortcuts", keyboard_shortcuts_path) %></li>
@@ -37,7 +37,7 @@
         <li><%= link_to("Similar Images Search", iqdb_queries_path) %></li>
       </ul>
       <ul>
-        <li><h1>Artists</h1></li>
+        <li><h2>Artists</h2></li>
         <li><%= link_to_wiki "Help", "help:artists" %></li>
         <li><%= link_to("Listing", artists_path) %></li>
         <li><%= link_to("Banned", banned_artists_path) %></li>
@@ -46,7 +46,7 @@
     </section>
     <section>
       <ul>
-        <li><h1>Tags</h1></li>
+        <li><h2>Tags</h2></li>
         <li><%= link_to_wiki "Help", "help:tags" %></li>
         <li><%= link_to_wiki "Cheat sheet", "help:cheatsheet" %></li>
         <li><%= link_to("Aliases", tag_aliases_path) %></li>
@@ -54,14 +54,14 @@
         <li><%= link_to("Listing", tags_path) %></li>
       </ul>
       <ul>
-        <li><h1>Notes</h1></li>
+        <li><h2>Notes</h2></li>
         <li><%= link_to_wiki "Help", "help:notes" %></li>
         <li><%= link_to("Listing", notes_path) %></li>
         <li><%= link_to("Search", search_notes_path) %></li>
         <li><%= link_to("Changes", note_versions_path) %></li>
       </ul>
       <ul>
-        <li><h1>Pools</h1></li>
+        <li><h2>Pools</h2></li>
         <li><%= link_to_wiki "Help", "help:pools" %></li>
         <li><%= link_to("Listing", pools_path) %></li>
         <li><%= link_to("Gallery", gallery_pools_path) %></li>
@@ -70,7 +70,7 @@
         <% end %>
       </ul>
       <ul>
-        <li><h1>Reports</h1></li>
+        <li><h2>Reports</h2></li>
         <li><%= link_to("Performance Reports", "https://isshiki.donmai.us/user-reports") %></li>
         <li><%= link_to("Top Searches", searches_explore_posts_path) %></li>
         <li><%= link_to("Missed Searches", missed_searches_explore_posts_path) %></li>
@@ -78,7 +78,7 @@
     </section>
     <section>
       <ul>
-        <li><h1>Comments</h1></li>
+        <li><h2>Comments</h2></li>
         <li><%= link_to_wiki "Help", "help:comments" %></li>
         <li><%= link_to("Listing", comments_path) %></li>
         <li><%= link_to("Search", search_comments_path) %></li>
@@ -86,7 +86,7 @@
         <li><%= link_to("RSS", comments_path(:atom)) %></li>
       </ul>
       <ul>
-        <li><h1>Forum</h1></li>
+        <li><h2>Forum</h2></li>
         <li><%= link_to_wiki "Help", "help:forum" %></li>
         <li><%= link_to("Listing", forum_topics_path) %></li>
         <li><%= link_to("Search", search_forum_posts_path) %></li>
@@ -94,14 +94,14 @@
         <li><%= link_to("RSS", forum_topics_path(:atom)) %></li>
       </ul>
       <ul>
-        <li><h1>Wiki</h1></li>
+        <li><h2>Wiki</h2></li>
         <li><%= link_to_wiki "Help", "help:wiki" %></li>
         <li><%= link_to("Listing", wiki_pages_path) %></li>
         <li><%= link_to("Search", search_wiki_pages_path) %></li>
         <li><%= link_to("Changes", wiki_page_versions_path) %></li>
       </ul>
       <ul>
-        <li><h1>Artist commentary</h1></li>
+        <li><h2>Artist commentary</h2></li>
         <li><%= link_to_wiki "Help", "help:artist_commentary" %></li>
         <li><%= link_to("Listing", artist_commentaries_path) %></li>
         <li><%= link_to("Search", search_artist_commentaries_path) %></li>
@@ -110,7 +110,7 @@
     </section>
     <section>
       <ul>
-        <li><h1>Profile</h1></li>
+        <li><h2>Profile</h2></li>
         <% if CurrentUser.is_anonymous? %>
           <li><%= link_to "Login", login_path %></li>
           <li><%= link_to "Sign up", new_user_path %></li>
@@ -128,7 +128,7 @@
         <li><%= link_to "Upgrade information", new_user_upgrade_path %></li>
       </ul>
       <ul>
-        <li><h1>Users</h1></li>
+        <li><h2>Users</h2></li>
         <% if CurrentUser.is_moderator? %>
           <li><%= link_to("Dashboard", moderator_dashboard_path) %></li>
         <% end %>
@@ -141,7 +141,7 @@
         <li><%= link_to("Privacy Policy", privacy_policy_path) %></li>
       </ul>
       <ul>
-        <li><h1>Admin</h1></li>
+        <li><h2>Admin</h2></li>
         <li><%= link_to("Mod Actions", mod_actions_path) %></li>
         <li><%= link_to("Jobs", delayed_jobs_path) %></li>
         <li><%= link_to("Bulk Update Requests", bulk_update_requests_path) %></li>

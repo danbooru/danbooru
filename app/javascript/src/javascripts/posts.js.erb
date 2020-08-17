@@ -14,6 +14,7 @@ Post.SWIPE_VELOCITY = 0.6;
 Post.MAX_RECOMMENDATIONS = 45; // 3 rows of 9 posts at 1920x1080.
 Post.LOW_TAG_COUNT = 10;
 Post.HIGH_TAG_COUNT = 20;
+Post.EDIT_DIALOG_WIDTH = 720;
 
 Post.initialize_all = function() {
 
@@ -42,8 +43,6 @@ Post.initialize_all = function() {
   }
 
   var $fields_multiple = $('[data-autocomplete="tag-edit"]');
-  $fields_multiple.on("keypress.danbooru", Post.update_tag_count);
-  $fields_multiple.on("click", Post.update_tag_count);
 
   $(window).on('danbooru:initialize_saved_seraches', () => {
     Post.initialize_saved_searches();
@@ -105,14 +104,13 @@ Post.open_edit_dialog = function() {
   $("#post-edit-link").parent("li").addClass("active");
 
   var $tag_string = $("#post_tag_string,#upload_tag_string");
-  $("div.input").has($tag_string).prevAll().hide();
   $("#open-edit-dialog").hide();
 
   var dialog = $("<div/>").attr("id", "edit-dialog");
   $("#form").appendTo(dialog);
   dialog.dialog({
     title: "Edit tags",
-    width: $(window).width() * 0.6,
+    width: Post.EDIT_DIALOG_WIDTH,
     position: {
       my: "right",
       at: "right-20",
@@ -307,10 +305,11 @@ Post.view_original = function(e = null) {
   }
 
   var $image = $("#image");
+  var $post = $(".image-container");
   $image.attr("src", $(".image-view-original-link").attr("href"));
   $image.css("filter", "blur(8px)");
-  $image.width($image.data("original-width"));
-  $image.height($image.data("original-height"));
+  $image.width($post.data("width"));
+  $image.height($post.data("height"));
   $image.on("load.danbooru", function() {
     $image.css("animation", "sharpen 0.5s forwards");
   });
@@ -326,10 +325,11 @@ Post.view_large = function(e = null) {
   }
 
   var $image = $("#image");
+  var $post = $(".image-container");
   $image.attr("src", $(".image-view-large-link").attr("href"));
   $image.css("filter", "blur(8px)");
-  $image.width($image.data("large-width"));
-  $image.height($image.data("large-height"));
+  $image.width($post.data("large-width"));
+  $image.height($post.data("large-height"));
   $image.on("load.danbooru", function() {
     $image.css("animation", "sharpen 0.5s forwards");
   });
@@ -400,7 +400,6 @@ Post.initialize_post_sections = function() {
       $("#post_tag_string").focus().selectEnd().height($("#post_tag_string")[0].scrollHeight);
       $("#recommended").hide();
       $(document).trigger("danbooru:open-post-edit-tab");
-      Post.update_tag_count({target: $("#post_tag_string")});
     } else if (e.target.hash === "#recommended") {
       $("#comments").hide();
       $("#edit").hide();
@@ -510,32 +509,6 @@ Post.initialize_recommended = function() {
     $("#recommended").removeClass("loading-recommended-posts");
   });
 };
-
-Post.update_tag_count = function(event) {
-  let string = "0 tags";
-  let count = 0;
-
-  if (event) {
-    let tags = Utility.regexp_split($(event.target).val());
-    if (tags.length) {
-      count = tags.length;
-      string = (count === 1) ? (count + " tag") : (count + " tags")
-    }
-  }
-
-  $("#tags-container .count").html(string);
-  let klass = "";
-
-  if (count < Post.LOW_TAG_COUNT) {
-    klass = "frown";
-  } else if (count >= Post.LOW_TAG_COUNT && count < Post.HIGH_TAG_COUNT) {
-    klass = "meh";
-  } else {
-    klass = "smile";
-  }
-
-  $("#tags-container .options #face").removeClass().addClass(`far fa-${klass}`);
-}
 
 $(document).ready(function() {
   Post.initialize_all();

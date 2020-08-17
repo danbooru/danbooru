@@ -27,14 +27,14 @@
           <p>
             <% if @user.email_address.present? %>
               <%= @user.email_address.address %>
-              <% if !@user.email_address.is_verified %>
-                <em>(unverified)</em>
-              <% end %>
-            <% else %>
-              <em>blank</em>
-            <% end %>
 
-            - <%= link_to "Change your email", edit_user_email_path(@user) %>
+              (<%= link_to "Change email", edit_user_email_path(@user) %>
+              <% if !@user.email_address.is_verified %>
+                | <%= link_to "Verify email", verify_user_email_path(@user) %>
+              <% end %>)
+            <% else %>
+              <%= link_to "Add email", edit_user_email_path(@user) %>
+            <% end %>
           </p>
         </div>
 

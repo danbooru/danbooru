@@ -17,7 +17,7 @@ PostTooltip.initialize = function () {
 
   delegate("body", {
     allowHTML: true,
-    appendTo: document.body,
+    appendTo: document.querySelector("#post-tooltips"),
     delay: [PostTooltip.SHOW_DELAY, PostTooltip.HIDE_DELAY],
     duration: PostTooltip.DURATION,
     interactive: true,

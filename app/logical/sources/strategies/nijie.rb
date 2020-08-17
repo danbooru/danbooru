@@ -64,6 +64,10 @@ module Sources
       DIR = %r{(?:\d+/)?(?:__rs_\w+/)?nijie_picture(?:/diff/main)?}
       IMAGE_URL = %r{#{IMAGE_BASE_URL}/#{DIR}/#{Regexp.union(FILENAME1, FILENAME2, FILENAME3)}\.\w+\z}i
 
+      def self.enabled?
+        Danbooru.config.nijie_login.present? && Danbooru.config.nijie_password.present?
+      end
+
       def domains
         ["nijie.info", "nijie.net"]
       end
@@ -176,23 +180,37 @@ module Sources
       end
 
       def page
-        return nil if page_url.blank?
+        return nil if page_url.blank? || client.blank?
 
-        http = Danbooru::Http.new
-        form = { email: Danbooru.config.nijie_login, password: Danbooru.config.nijie_password }
-
-        # XXX `retriable` must come after `cache` so that retries don't return cached error responses.
-        response = http.cache(1.hour).use(retriable: { max_retries: 20 }).post("https://nijie.info/login_int.php", form: form)
-        DanbooruLogger.info "Nijie login failed (#{url}, #{response.status})" if response.status != 200
-        return nil unless response.status == 200
-
-        response = http.cookies(R18: 1).cache(1.minute).get(page_url)
+        response = client.cache(1.minute).get(page_url)
         return nil unless response.status == 200
 
         response&.parse
       end
-
       memoize :page
+
+      def client
+        http = Danbooru::Http.new.timeout(60)
+
+        cookie = Cache.get("nijie-session-cookie", 1.week) do
+          login_page = http.use(retriable: { max_retries: 20 }).get("https://nijie.info/login.php").parse
+          form = {
+            email: Danbooru.config.nijie_login,
+            password: Danbooru.config.nijie_password,
+            url: login_page.at("input[name='url']")["value"],
+            save: "on",
+            ticket: ""
+          }
+          response = http.use(retriable: { max_retries: 20 }).post("https://nijie.info/login_int.php", form: form)
+          DanbooruLogger.info "Nijie login failed (#{url}, #{response.status})" if response.status != 200
+          return nil unless response.status == 200
+
+          response.cookies.select { |c| c.name == "NIJIEIJIEID" }.compact.first
+        end
+
+        http.cookies(NIJIEIJIEID: cookie, R18: 1)
+      end
+      memoize :client
     end
   end
 end

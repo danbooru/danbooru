@@ -7,6 +7,8 @@
 # https://66.media.tumblr.com/5a2c3fe25c977e2281392752ab971c90/3dbfaec9b9e0c2e3-92/s500x750/4f92bbaaf95c0b4e7970e62b1d2e1415859dd659.png
 #
 # https://superboin.tumblr.com/post/141169066579/photoset_iframe/superboin/tumblr_o45miiAOts1u6rxu8/500/false
+#
+# https://make-do5.tumblr.com/post/619663949657423872 (extremely high res, extractable)
 
 module Sources::Strategies
   class Tumblr < Base
@@ -25,6 +27,11 @@ module Sources::Strategies
     IMAGE = %r{\Ahttps?://#{DOMAIN}/}i
     VIDEO = %r{\Ahttps?://(?:vtt|ve|va\.media)\.tumblr\.com/}i
     POST = %r{\Ahttps?://(?<blog_name>[^.]+)\.tumblr\.com/(?:post|image)/(?<post_id>\d+)}i
+
+    NEW_HEADERS = {
+      "user-agent": Danbooru.config.canonical_app_name,
+      "accept": "text/html"
+    }
 
     def self.enabled?
       Danbooru.config.tumblr_consumer_key.present?
@@ -161,14 +168,22 @@ module Sources::Strategies
     # http://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg
     # => https://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg
     def find_largest(url, sizes: SIZES)
-      return url unless url =~ OLD_IMAGE
+      if url =~ OLD_IMAGE
+        candidates = sizes.map do |size|
+          "https://media.tumblr.com/#{$~[:dir]}#{$~[:filename]}_#{size}.#{$~[:ext]}"
+        end
 
-      candidates = sizes.map do |size|
-        "https://media.tumblr.com/#{$~[:dir]}#{$~[:filename]}_#{size}.#{$~[:ext]}"
-      end
+        candidates.find do |candidate|
+          http_exists?(candidate)
+        end
+      elsif url =~ %r{/s\d+x\d+/(\w+\.\w+)$}i
+        max_size = Integer.sqrt(Danbooru.config.max_image_resolution)
+        url = url.gsub(%r{/s\d+x\d+/\w+\.\w+$}i, "/s#{max_size}x#{max_size}/#{$1}")
 
-      candidates.find do |candidate|
-        http_exists?(candidate)
+        resp = Danbooru::Http.cache(1.minute).get(url, headers: NEW_HEADERS).parse
+        resp.at("img[src*='/s#{max_size}x#{max_size}/']")["src"]
+      else
+        url
       end
     end
 

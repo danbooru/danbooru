@@ -6,12 +6,12 @@
            <% end %>
            data-creator="<%= forum_post.creator.name %>">
     <div class="author">
-      <h4>
+      <div class="author-name">
         <%= link_to_user forum_post.creator %>
         <% if forum_post.is_deleted? %>
           (deleted)
         <% end %>
-      </h4>
+      </div>
       <%= link_to time_ago_in_words_tagged(forum_post.created_at), forum_post, class: "message-timestamp" %>
     </div>
     <div class="content">

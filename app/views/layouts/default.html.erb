@@ -50,7 +50,7 @@
   <%= render "news_updates/listing" %>
 
   <header id="top">
-    <h1 id="app-name-header"><%= link_to Danbooru.config.app_name, "/" %></h1>
+    <%= link_to Danbooru.config.app_name, root_path, id: "app-name-header", class: "heading" %>
     
     <div id="maintoggle" class="mobile-only">
       <a href="#"><i id="maintoggle-on" class="fas fa-bars"></i></a>
@@ -68,6 +68,8 @@
   </header>
 
   <div id="page">
+    <%= render "users/verification_notice" %>
+
     <% if !CurrentUser.is_anonymous? && !CurrentUser.is_gold? && cookies[:hide_upgrade_account_notice].blank? && params[:action] != "upgrade_information" %>
       <%= render "users/upgrade_notice" %>
     <% end %>
@@ -86,6 +88,11 @@
     </div>
 
     <%= yield :layout %>
+  </div>
+
+  <div id="tooltips">
+    <div id="post-tooltips"></div>
+    <div id="user-tooltips"></div>
   </div>
 
   <script type="application/javascript">
