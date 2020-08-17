@@ -235,12 +235,12 @@ module Danbooru
 
     # Sets the order of the split tag header list (presenters/tag_set_presenter.rb)
     def split_tag_header_list
-      @split_tag_header_list ||= ["copyright", "character", "artist", "general", "meta"]
+      @split_tag_header_list ||= ["artist", "copyright", "character", "general", "meta"]
     end
 
     # Sets the order of the categorized tag string (presenters/post_presenter.rb)
     def categorized_tag_list
-      @categorized_tag_list ||= ["copyright", "character", "artist", "meta", "general"]
+      @categorized_tag_list ||= ["artist", "copyright", "character", "meta", "general"]
     end
 
     # Sets the order of the related tag buttons (javascripts/related_tag.js)
