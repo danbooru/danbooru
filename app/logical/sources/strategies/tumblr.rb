@@ -171,9 +171,9 @@ module Sources::Strategies
         candidates.find do |candidate|
           http_exists?(candidate)
         end
-      elsif url =~ %r{/s\d+x\d+/(\w+\.\w+)$}i
+      elsif url =~ %r{/s\d+x\d+/(\w+\.\w+)\z}i
         max_size = Integer.sqrt(Danbooru.config.max_image_resolution)
-        url = url.gsub(%r{/s\d+x\d+/\w+\.\w+$}i, "/s#{max_size}x#{max_size}/#{$1}")
+        url = url.gsub(%r{/s\d+x\d+/\w+\.\w+\z}i, "/s#{max_size}x#{max_size}/#{$1}")
 
         resp = http.cache(1.minute).headers(accept: "text/html").get(url).parse
         resp.at("img[src*='/s#{max_size}x#{max_size}/']")["src"]
