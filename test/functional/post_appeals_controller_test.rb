@@ -39,7 +39,6 @@ class PostAppealsControllerTest < ActionDispatch::IntegrationTest
 
       should respond_to_search({}).with { [@resolved_appeal, @unrelated_appeal, @post_appeal] }
       should respond_to_search(reason_matches: "Good.").with { @unrelated_appeal }
-      should respond_to_search(is_resolved: "true").with { @resolved_appeal }
 
       context "using includes" do
         should respond_to_search(post_id: 101).with { @post_appeal }

@@ -8,7 +8,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        @first_user = User.find(1)
         @mod_user = create(:moderator_user, name: "yukari")
         @other_user = create(:builder_user, can_upload_free: true, inviter: @mod_user, created_at: 2.weeks.ago)
         @uploader = create(:user, created_at: 2.weeks.ago)
@@ -35,8 +34,8 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_response 404
       end
 
-      should respond_to_search({}).with { [@uploader, @other_user, @mod_user, @user, @first_user] }
-      should respond_to_search(min_level: User::Levels::BUILDER).with { [@other_user, @mod_user, @first_user] }
+      should respond_to_search({}).with { [@uploader, @other_user, @mod_user, @user, User.system] }
+      should respond_to_search(min_level: User::Levels::BUILDER).with { [@other_user, @mod_user, User.system] }
       should respond_to_search(can_upload_free: "true").with { @other_user }
       should respond_to_search(name_matches: "yukari").with { @mod_user }
 
@@ -52,7 +51,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           end
           as (@other_user) do
             @other_post = create(:post, rating: "e", uploader: @other_user)
-            create(:post_appeal, creator: @other_user, post: @post)
+            create(:post_appeal, creator: @other_user)
             create(:comment, creator: @other_user, post: @other_post)
             create(:forum_post_vote, creator: @other_user, forum_post: @forum)
             create(:tag_alias, creator: @other_user)
