@@ -18,7 +18,7 @@ class PostAppeal < ApplicationRecord
   module SearchMethods
     def search(params)
       q = super
-      q = q.search_attributes(params, :creator, :post, :reason, :status)
+      q = q.search_attributes(params, :reason, :status)
       q = q.text_attribute_matches(:reason, params[:reason_matches])
 
       q.apply_default_order(params)
@@ -33,6 +33,10 @@ class PostAppeal < ApplicationRecord
 
   def validate_post_is_appealable
     errors[:post] << "cannot be appealed" if post.is_status_locked? || !post.is_appealable?
+  end
+
+  def self.searchable_includes
+    [:creator, :post]
   end
 
   def self.available_includes

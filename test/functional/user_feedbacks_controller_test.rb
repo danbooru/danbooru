@@ -3,9 +3,9 @@ require 'test_helper'
 class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
   context "The user feedbacks controller" do
     setup do
-      @user = create(:user)
-      @critic = create(:gold_user)
-      @mod = create(:moderator_user)
+      @user = create(:user, name: "cirno")
+      @critic = create(:gold_user, name: "eiki")
+      @mod = create(:moderator_user, id: 1000)
       @user_feedback = create(:user_feedback, user: @user, creator: @critic)
     end
 
@@ -37,23 +37,43 @@ class UserFeedbacksControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
+      setup do
+        @other_feedback = create(:user_feedback, user: @user, creator: @mod, body: "blah", category: "neutral")
+        @unrelated_feedback = create(:user_feedback, is_deleted: true)
+      end
+
       should "render" do
         get_auth user_feedbacks_path, @user
         assert_response :success
       end
 
-      should "not allow members to see deleted feedbacks" do
-        as(@user) { @user_feedback.update!(is_deleted: true) }
-        get_auth user_feedbacks_path, @user
+      context "as a user" do
+        setup do
+          CurrentUser.user = @user
+        end
 
-        assert_response :success
-        assert_select "tr#user-feedback-#{@user_feedback.id}", false
+        should respond_to_search({}).with { [@other_feedback, @user_feedback] }
+        should respond_to_search(body_matches: "blah").with { @other_feedback }
+        should respond_to_search(category: "positive").with { @user_feedback }
+        should respond_to_search(is_deleted: "true").with { [] }
+
+        context "using includes" do
+          should respond_to_search(creator_name: "eiki").with { @user_feedback }
+          should respond_to_search(creator_id: 1000).with { @other_feedback }
+          should respond_to_search(creator: {level: User::Levels::GOLD}).with { @user_feedback }
+        end
       end
 
-      context "with search parameters" do
-        should "render" do
-          get_auth user_feedbacks_path, @critic, params: {:search => {:user_id => @user.id}}
-          assert_response :success
+      context "as a moderator" do
+        setup do
+          CurrentUser.user = @mod
+        end
+
+        should respond_to_search({}).with { [@unrelated_feedback, @other_feedback, @user_feedback] }
+        should respond_to_search(is_deleted: "true").with { @unrelated_feedback }
+
+        context "using includes" do
+          should respond_to_search(user_name: "cirno").with { [@other_feedback, @user_feedback] }
         end
       end
     end

@@ -80,7 +80,6 @@ class User < ApplicationRecord
   validates_presence_of :comment_threshold
   before_validation :normalize_blacklisted_tags
   before_create :promote_to_admin_if_first_user
-  has_many :artists, foreign_key: :creator_id
   has_many :artist_versions, foreign_key: :updater_id
   has_many :artist_commentary_versions, foreign_key: :updater_id
   has_many :comments, foreign_key: :creator_id
@@ -91,7 +90,6 @@ class User < ApplicationRecord
   has_many :forum_topic_visits, dependent: :destroy
   has_many :visited_forum_topics, through: :forum_topic_visits, source: :forum_topic
   has_many :moderation_reports, as: :model
-  has_many :pools, foreign_key: :creator_id
   has_many :posts, :foreign_key => "uploader_id"
   has_many :post_appeals, foreign_key: :creator_id
   has_many :post_approvals, :dependent => :destroy
@@ -105,10 +103,10 @@ class User < ApplicationRecord
   has_one :api_key
   has_one :token_bucket
   has_one :email_address, dependent: :destroy
-  has_many :notes, foreign_key: :creator_id
   has_many :note_versions, :foreign_key => "updater_id"
   has_many :dmails, -> {order("dmails.id desc")}, :foreign_key => "owner_id"
   has_many :saved_searches
+  has_many :forum_topics, :foreign_key => "creator_id"
   has_many :forum_posts, -> {order("forum_posts.created_at, forum_posts.id")}, :foreign_key => "creator_id"
   has_many :user_name_change_requests, -> {order("user_name_change_requests.created_at desc")}
   has_many :favorite_groups, -> {order(name: :asc)}, foreign_key: :creator_id
@@ -537,7 +535,7 @@ class User < ApplicationRecord
       params = params.dup
       params[:name_matches] = params.delete(:name) if params[:name].present?
 
-      q = q.search_attributes(params, :name, :level, :inviter, :post_upload_count, :post_update_count, :note_update_count, :favorite_count)
+      q = q.search_attributes(params, :name, :level, :post_upload_count, :post_update_count, :note_update_count, :favorite_count)
 
       if params[:name_matches].present?
         q = q.where_ilike(:name, normalize_name(params[:name_matches]))
@@ -604,6 +602,10 @@ class User < ApplicationRecord
 
   def dtext_shortlink(**options)
     "<@#{name}>"
+  end
+
+  def self.searchable_includes
+    [:posts, :note_versions, :artist_commentary_versions, :post_appeals, :post_approvals, :artist_versions, :comments, :wiki_page_versions, :feedback, :forum_topics, :forum_posts, :forum_post_votes, :tag_aliases, :tag_implications, :bans, :inviter]
   end
 
   def self.available_includes

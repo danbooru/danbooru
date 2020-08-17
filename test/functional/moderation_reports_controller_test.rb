@@ -9,9 +9,8 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
 
       as(@spammer) do
         @dmail = create(:dmail, from: @spammer, owner: @user, to: @user)
-        @comment = create(:comment, creator: @spammer)
-        @forum_topic = create(:forum_topic, creator: @spammer)
-        @forum_post = create(:forum_post, topic: @forum_topic, creator: @spammer)
+        @comment = create(:comment, id: 1234, creator: @spammer)
+        @forum_post = create(:forum_post, topic: build(:forum_topic), body: "xxx", creator: @spammer)
       end
     end
 
@@ -29,23 +28,36 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        create(:moderation_report, model: @comment, creator: @user)
+        @comment_report = create(:moderation_report, model: @comment, creator: @user)
+        @forum_report = create(:moderation_report, model: @forum_post, creator: @user)
+        @dmail_report = create(:moderation_report, reason: "spam", model: @dmail, creator: build(:builder_user, name: "daiyousei", created_at: 2.weeks.ago))
       end
 
-      should "render the access denied page for members" do
-        get_auth moderation_reports_path, @user
-        assert_response 403
+      context "as a user" do
+        should "render the access denied page" do
+          get_auth moderation_reports_path, @user
+          assert_response 403
+        end
       end
 
-      should "render for mods" do
-        get_auth moderation_reports_path, @mod
-        assert_response :success
-      end
+      context "as a moderator" do
+        setup do
+          CurrentUser.user = @mod
+        end
 
-      context "with search parameters" do
         should "render" do
-          get_auth moderation_reports_path, @mod, params: {:search => {:model_id => @comment.id}}
+          get_auth moderation_reports_path, @mod
           assert_response :success
+        end
+
+        should respond_to_search({}).with { [@dmail_report, @forum_report, @comment_report] }
+        should respond_to_search(reason_matches: "spam").with { @dmail_report }
+
+        context "using includes" do
+          should respond_to_search(model_id: 1234).with { @comment_report }
+          should respond_to_search(model_type: "ForumPost").with { @forum_report }
+          should respond_to_search(ForumPost: {body_matches: "xxx"}).with { @forum_report }
+          should respond_to_search(creator_name: "daiyousei").with { @dmail_report }
         end
       end
     end

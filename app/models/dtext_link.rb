@@ -1,6 +1,7 @@
 class DtextLink < ApplicationRecord
   belongs_to :model, polymorphic: true
   belongs_to :linked_wiki, primary_key: :title, foreign_key: :link_target, class_name: "WikiPage", optional: true
+  belongs_to :linked_tag, primary_key: :name, foreign_key: :link_target, class_name: "Tag", optional: true
 
   enum link_type: [:wiki_link, :external_link]
 
@@ -28,43 +29,9 @@ class DtextLink < ApplicationRecord
     links
   end
 
-  def self.model_matches(params)
-    return all if params.blank?
-    where(model_type: "WikiPage", model_id: WikiPage.search(params).reorder(nil))
-  end
-
-  def self.linked_wiki_exists(exists = true)
-    dtext_links = DtextLink.arel_table
-    wiki_pages = WikiPage.arel_table
-    wiki_exists = wiki_pages.project(1).where(wiki_pages[:is_deleted].eq(false)).where(wiki_pages[:title].eq(dtext_links[:link_target])).exists
-
-    if exists
-      where(link_type: :wiki_link).where(wiki_exists)
-    else
-      where(link_type: :wiki_link).where.not(wiki_exists)
-    end
-  end
-
-  def self.linked_tag_exists(exists = true)
-    dtext_links = DtextLink.arel_table
-    tags = Tag.arel_table
-    tag_exists = tags.project(1).where(tags[:post_count].gt(0)).where(tags[:name].eq(dtext_links[:link_target])).exists
-
-    if exists
-      where(link_type: :wiki_link).where(tag_exists)
-    else
-      where(link_type: :wiki_link).where.not(tag_exists)
-    end
-  end
-
   def self.search(params)
     q = super
-    q = q.search_attributes(params, :model_type, :model_id, :link_type, :link_target)
-
-    q = q.model_matches(params[:model])
-    q = q.linked_wiki_exists(params[:linked_wiki_exists].truthy?) if params[:linked_wiki_exists].present?
-    q = q.linked_tag_exists(params[:linked_tag_exists].truthy?) if params[:linked_tag_exists].present?
-
+    q = q.search_attributes(params, :link_type, :link_target)
     q.apply_default_order(params)
   end
 
@@ -78,7 +45,15 @@ class DtextLink < ApplicationRecord
     self.link_target = self.link_target.truncate(2048, omission: "")
   end
 
+  def self.attribute_restriction(*)
+    where(link_type: :wiki_link)
+  end
+
+  def self.searchable_includes
+    [:model, :linked_wiki, :linked_tag]
+  end
+
   def self.available_includes
-    [:model]
+    [:model, :linked_wiki, :linked_tag]
   end
 end

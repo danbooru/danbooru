@@ -98,7 +98,7 @@ class Dmail < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :to, :from, :is_read, :is_deleted, :title, :body)
+      q = q.search_attributes(params, :is_read, :is_deleted, :title, :body)
       q = q.text_attribute_matches(:title, params[:title_matches])
       q = q.text_attribute_matches(:body, params[:message_matches], index_column: :message_index)
 
@@ -170,6 +170,10 @@ class Dmail < ApplicationRecord
 
   def dtext_shortlink(key: false, **options)
     key ? "dmail ##{id}/#{self.key}" : "dmail ##{id}"
+  end
+
+  def self.searchable_includes
+    [:to, :from]
   end
 
   def self.available_includes

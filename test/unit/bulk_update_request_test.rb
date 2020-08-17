@@ -83,7 +83,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
     context "that has an invalid alias" do
       setup do
-        @alias1 = create(:tag_alias, creator: @admin)
+        @alias1 = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", creator: @admin)
         @req = FactoryBot.build(:bulk_update_request, :script => "create alias bbb -> aaa")
       end
 

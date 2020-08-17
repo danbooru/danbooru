@@ -36,27 +36,43 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
       context "searching" do
         setup do
           as(@user) do
-            @miku = create(:tag, name: "hatsune_miku", category: Tag.categories.character)
-            @wokada = create(:tag, name: "wokada", category: Tag.categories.artist)
-            @vocaloid = create(:tag, name: "vocaloid", category: Tag.categories.copyright)
+            @miku = create(:character_tag, name: "hatsune_miku")
+            @wokada = create(:artist_tag, name: "wokada")
+            @vocaloid = create(:copyright_tag, name: "vocaloid")
+            @weapon = create(:tag, name: "weapon")
             @empty = create(:tag, name: "empty", post_count: 0)
 
             create(:tag_alias, antecedent_name: "miku", consequent_name: "hatsune_miku")
-            create(:wiki_page, title: "hatsune_miku")
+            create(:tag_implication, antecedent_name: "axe", consequent_name: "weapon")
+            create(:wiki_page, title: "hatsune_miku", body: "[[vocaloid]]")
             create(:artist, name: "wokada")
           end
         end
 
+      should "render" do
+        get tags_path
+        assert_response :success
+      end
+
+        should respond_to_search({}).with { [@weapon, @vocaloid, @wokada, @miku, @tag] }
         should respond_to_search(name_matches: "hatsune_miku").with { @miku }
         should respond_to_search(name_normalize: "HATSUNE_MIKU  ").with { @miku }
         should respond_to_search(name_or_alias_matches: "miku").with { @miku }
         should respond_to_search(fuzzy_name_matches: "miku_hatsune", order: "similarity").with { @miku }
         should respond_to_search(name: "empty", hide_empty: "true").with { [] }
         should respond_to_search(name: "empty", hide_empty: "false").with { [@empty] }
-        should respond_to_search(name: "wokada", has_artist: "true").with { @wokada }
-        should respond_to_search(name: "hatsune_miku", has_artist: "false").with { @miku }
-        should respond_to_search(name: "hatsune_miku", has_wiki: "true").with { @miku }
-        should respond_to_search(name: "vocaloid", has_wiki: "false").with { @vocaloid }
+
+        context "using includes" do
+          should respond_to_search(name: "wokada", has_artist: "true").with { @wokada }
+          should respond_to_search(name: "hatsune_miku", has_artist: "false").with { @miku }
+          should respond_to_search(name: "hatsune_miku", has_wiki_page: "true").with { @miku }
+          should respond_to_search(name: "vocaloid", has_wiki_page: "false").with { @vocaloid }
+          should respond_to_search(consequent_aliases: {antecedent_name: "miku"}).with { @miku }
+          should respond_to_search(consequent_implications: {antecedent_name: "axe"}).with { @weapon }
+          should respond_to_search(wiki_page: {body_matches: "*vocaloid*"}).with { @miku }
+          should respond_to_search(artist: {is_banned: "false"}).with { @wokada }
+          should respond_to_search(has_dtext_links: "true").with { @vocaloid }
+        end
       end
     end
 

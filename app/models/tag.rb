@@ -5,6 +5,7 @@ class Tag < ApplicationRecord
   has_many :consequent_aliases, -> {active}, :class_name => "TagAlias", :foreign_key => "consequent_name", :primary_key => "name"
   has_many :antecedent_implications, -> {active}, :class_name => "TagImplication", :foreign_key => "antecedent_name", :primary_key => "name"
   has_many :consequent_implications, -> {active}, :class_name => "TagImplication", :foreign_key => "consequent_name", :primary_key => "name"
+  has_many :dtext_links, foreign_key: :link_target, primary_key: :name
 
   validates :name, tag_name: true, uniqueness: true, on: :create
   validates :name, tag_name: true, on: :name
@@ -284,18 +285,6 @@ class Tag < ApplicationRecord
         q = q.nonempty
       end
 
-      if params[:has_wiki].to_s.truthy?
-        q = q.joins(:wiki_page).merge(WikiPage.undeleted)
-      elsif params[:has_wiki].to_s.falsy?
-        q = q.left_outer_joins(:wiki_page).where("wiki_pages.title IS NULL OR wiki_pages.is_deleted = TRUE")
-      end
-
-      if params[:has_artist].to_s.truthy?
-        q = q.joins(:artist).merge(Artist.undeleted)
-      elsif params[:has_artist].to_s.falsy?
-        q = q.left_outer_joins(:artist).where("artists.name IS NULL OR artists.is_deleted = TRUE")
-      end
-
       case params[:order]
       when "name"
         q = q.order("name")
@@ -355,8 +344,16 @@ class Tag < ApplicationRecord
     Post.system_tag_match(name)
   end
 
+  def self.model_restriction(table)
+    super.where(table[:post_count].gt(0))
+  end
+
+  def self.searchable_includes
+    [:wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications, :dtext_links]
+  end
+
   def self.available_includes
-    [:wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications]
+    [:wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications, :dtext_links]
   end
 
   include ApiMethods

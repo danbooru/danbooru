@@ -9,7 +9,9 @@ class ArtistVersion < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :updater, :is_deleted, :is_banned, :artist_id, :name, :group_name)
+      q = q.search_attributes(params, :is_deleted, :is_banned, :name, :group_name, :urls, :other_names)
+      q = q.text_attribute_matches(:name, params[:name_matches])
+      q = q.text_attribute_matches(:group_name, params[:group_name_matches])
 
       if params[:order] == "name"
         q = q.order("artist_versions.name").default_order
@@ -101,6 +103,10 @@ class ArtistVersion < ApplicationRecord
     else
       is_banned && !other.is_banned
     end
+  end
+
+  def self.searchable_includes
+    [:updater, :artist]
   end
 
   def self.available_includes

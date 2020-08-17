@@ -58,7 +58,7 @@ class PostFlag < ApplicationRecord
     def search(params)
       q = super
 
-      q = q.search_attributes(params, :post, :reason, :status)
+      q = q.search_attributes(params, :reason, :status)
       q = q.text_attribute_matches(:reason, params[:reason_matches])
 
       if params[:creator_id].present?
@@ -111,6 +111,10 @@ class PostFlag < ApplicationRecord
 
   def uploader_id
     post.uploader_id
+  end
+
+  def self.searchable_includes
+    [:post]
   end
 
   def self.available_includes

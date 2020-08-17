@@ -3,7 +3,7 @@
   <%= f.input :category, label: "Category", collection: TagCategory.canonical_mapping.to_a, include_blank: true,selected: params[:search][:category] %>
   <%= f.input :order, collection: [%w[Newest date], %w[Count count], %w[Name name]], include_blank: false, selected: params[:search][:order] %>
   <%= f.input :hide_empty, label: "Hide empty?", collection: %w[yes no], selected: params[:search][:hide_empty] %>
-  <%= f.input :has_wiki, label: "Has wiki?", collection: %w[yes no], include_blank: true, selected: params[:search][:has_wiki] %>
+  <%= f.input :has_wiki_page, label: "Has wiki?", collection: %w[yes no], include_blank: true, selected: params[:search][:has_wiki_page] %>
   <%= f.input :has_artist, label: "Has artist?", collection: %w[yes no], include_blank: true, selected: params[:search][:has_artist] %>
   <%= f.submit "Search" %>
 <% end %>

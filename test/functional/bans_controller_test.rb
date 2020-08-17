@@ -3,8 +3,11 @@ require 'test_helper'
 class BansControllerTest < ActionDispatch::IntegrationTest
   context "A bans controller" do
     setup do
-      @mod = create(:moderator_user)
-      @ban = create(:ban)
+      @mod = create(:moderator_user, name: "danbo")
+      @admin = create(:admin_user)
+      @user = create(:member_user, id: 999, name: "cirno")
+
+      as(@mod) { @ban = create(:ban, reason: "blah", user: @user, banner: @mod) }
     end
 
     context "new action" do
@@ -29,16 +32,25 @@ class BansControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
+      setup do
+        as(@admin) { @admin_ban = create(:ban, user: build(:builder_user), banner: @admin, expires_at: 1.day.ago ) }
+      end
+
       should "render" do
-        get_auth bans_path, @mod
+        get bans_path
         assert_response :success
       end
-    end
 
-    context "search action" do
-      should "render" do
-        get_auth bans_path(search: { user_name: @ban.user.name }), @mod
-        assert_response :success
+      should respond_to_search({}).with { [@admin_ban, @ban] }
+      should respond_to_search(reason_matches: "blah").with { @ban }
+      should respond_to_search(expired: "true").with { @admin_ban }
+
+      context "using includes" do
+        should respond_to_search(banner_name: "danbo").with { @ban }
+        should respond_to_search(banner: {level: User::Levels::ADMIN}).with { @admin_ban }
+        should respond_to_search(user_id: 999).with { @ban }
+        should respond_to_search(user: {name: "cirno"}).with { @ban }
+        should respond_to_search(user: {level: User::Levels::BUILDER}).with { @admin_ban }
       end
     end
 
@@ -55,7 +67,6 @@ class BansControllerTest < ActionDispatch::IntegrationTest
 
       should "not allow mods to ban admins" do
         assert_difference("Ban.count", 0) do
-          @admin = create(:admin_user)
           post_auth bans_path, @mod, params: { ban: { duration: 60, reason: "xxx", user_id: @admin.id }}
 
           assert_response 403

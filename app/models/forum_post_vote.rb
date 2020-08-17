@@ -20,7 +20,7 @@ class ForumPostVote < ApplicationRecord
 
   def self.search(params)
     q = super
-    q = q.search_attributes(params, :creator, :forum_post_id, :score)
+    q = q.search_attributes(params, :score)
     q = q.forum_post_matches(params[:forum_post])
     q.apply_default_order(params)
   end
@@ -59,7 +59,11 @@ class ForumPostVote < ApplicationRecord
     end
   end
 
+  def self.searchable_includes
+    [:creator, :forum_post]
+  end
+
   def self.available_includes
-    [:creator]
+    [:creator, :forum_post]
   end
 end

@@ -4,8 +4,8 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
   context "A comments controller" do
     setup do
       @mod = FactoryBot.create(:moderator_user)
-      @user = FactoryBot.create(:member_user)
-      @post = create(:post)
+      @user = FactoryBot.create(:member_user, name: "cirno")
+      @post = create(:post, id: 100)
 
       CurrentUser.user = @user
       CurrentUser.ip_addr = "127.0.0.1"
@@ -87,10 +87,31 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      should "render by comment" do
-        @comment = as(@user) { create(:comment, post: @post) }
-        get comments_path(group_by: "comment")
-        assert_response :success
+      context "grouped by comment" do
+        setup do
+          @user_comment = create(:comment, post: @post, score: 10, do_not_bump_post: true, creator: @user)
+          @mod_comment = create(:comment, post: build(:post, tag_string: "touhou"), body: "blah", is_sticky: true, creator: @mod)
+          @deleted_comment = create(:comment, is_deleted: true)
+        end
+
+        should "render" do
+          get comments_path(group_by: "comment")
+          assert_response :success
+        end
+
+        should respond_to_search({}, other_params: {group_by: "comment"}).with { [@deleted_comment, @mod_comment, @user_comment] }
+        should respond_to_search(body_matches: "blah").with { @mod_comment }
+        should respond_to_search(score: 10).with { @user_comment }
+        should respond_to_search(is_sticky: "true").with { @mod_comment }
+        should respond_to_search(do_not_bump_post: "true").with { @user_comment }
+        should respond_to_search(is_deleted: "true").with { @deleted_comment }
+
+        context "using includes" do
+          should respond_to_search(post_id: 100).with { @user_comment }
+          should respond_to_search(post_tags_match: "touhou").with { @mod_comment }
+          should respond_to_search(creator_name: "cirno").with { @user_comment }
+          should respond_to_search(creator: {level: User::Levels::MODERATOR}).with { @mod_comment }
+        end
       end
 
       context "for atom feeds" do

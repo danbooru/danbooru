@@ -184,7 +184,7 @@ class Upload < ApplicationRecord
   def self.search(params)
     q = super
 
-    q = q.search_attributes(params, :uploader, :post, :source, :rating, :parent_id, :server, :md5, :server, :file_ext, :file_size, :image_width, :image_height, :referer_url)
+    q = q.search_attributes(params, :source, :rating, :parent_id, :server, :md5, :server, :file_ext, :file_size, :image_width, :image_height, :referer_url)
 
     if params[:source_matches].present?
       q = q.where_like(:source, params[:source_matches])
@@ -223,6 +223,10 @@ class Upload < ApplicationRecord
 
   def has_commentary?
     artist_commentary_title.present? || artist_commentary_desc.present? || translated_commentary_title.present? || translated_commentary_desc.present?
+  end
+
+  def self.searchable_includes
+    [:uploader, :post]
   end
 
   def self.available_includes

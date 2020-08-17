@@ -8,24 +8,25 @@ class NotesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
-      should "list all notes" do
+      setup do
+        as(@user) do
+          @post_note = create(:note, post: build(:post, id: 2001, tag_string: "touhou"))
+          @deleted_note = create(:note, is_active: false)
+        end
+      end
+
+      should "render" do
         get notes_path
         assert_response :success
       end
 
-      should "list all notes (with search)" do
-        params = {
-          group_by: "note",
-          search: {
-            body_matches: "000",
-            is_active: true,
-            post_id: @note.post_id,
-            post_tags_match: @note.post.tag_array.first
-          }
-        }
+      should respond_to_search({}).with { [@deleted_note, @post_note, @note] }
+      should respond_to_search(body_matches: "000").with { @note }
+      should respond_to_search(is_active: "true").with { [@post_note, @note] }
 
-        get notes_path, params: params
-        assert_response :success
+      context "using includes" do
+        should respond_to_search(post_id: 2001).with { @post_note }
+        should respond_to_search(post_tags_match: "touhou").with { @post_note }
       end
     end
 

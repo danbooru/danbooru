@@ -23,7 +23,7 @@ class PostDisapproval < ApplicationRecord
       def search(params)
         q = super
 
-        q = q.search_attributes(params, :post, :user, :message, :reason)
+        q = q.search_attributes(params, :message, :reason)
         q = q.text_attribute_matches(:message, params[:message_matches])
 
         q = q.with_message if params[:has_message].to_s.truthy?
@@ -39,6 +39,10 @@ class PostDisapproval < ApplicationRecord
         q
       end
     end
+  end
+
+  def self.searchable_includes
+    [:user, :post]
   end
 
   def self.available_includes

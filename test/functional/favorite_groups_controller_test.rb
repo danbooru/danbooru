@@ -8,9 +8,30 @@ class FavoriteGroupsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
+      setup do
+        @mod_favgroup = create(:favorite_group, name: "monochrome", creator: build(:moderator_user, name: "fumimi"))
+        @private_favgroup = create(:favorite_group, creator: @user, is_public: false)
+      end
+
       should "render" do
         get favorite_groups_path
         assert_response :success
+      end
+
+      should respond_to_search({}).with { [@mod_favgroup, @favgroup] }
+      should respond_to_search(name: "monochrome").with { @mod_favgroup }
+
+      context "using includes" do
+        should respond_to_search(creator_name: "fumimi").with { @mod_favgroup }
+        should respond_to_search(creator: {level: User::Levels::MEMBER}).with { @favgroup }
+      end
+
+      context "for private favorite groups as the creator" do
+        setup do
+          CurrentUser.user = @user
+        end
+
+        should respond_to_search(is_public: "false").with { @private_favgroup }
       end
     end
 

@@ -4,10 +4,10 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
   context "The post flags controller" do
     setup do
       @user = create(:user)
-      @flagger = create(:gold_user, created_at: 2.weeks.ago)
-      @uploader = create(:mod_user, created_at: 2.weeks.ago)
+      @flagger = create(:gold_user, id: 999, created_at: 2.weeks.ago)
+      @uploader = create(:mod_user, name: "chen", created_at: 2.weeks.ago)
       @mod = create(:mod_user)
-      @post = create(:post, is_flagged: true, uploader: @uploader)
+      @post = create(:post, id: 101, is_flagged: true, uploader: @uploader)
       @post_flag = create(:post_flag, post: @post, creator: @flagger)
     end
 
@@ -26,6 +26,11 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
+      setup do
+        @other_flag = create(:post_flag, post: build(:post, is_flagged: true, tag_string: "touhou"))
+        @unrelated_flag = create(:post_flag, reason: "poor quality")
+      end
+
       should "render" do
         get post_flags_path
         assert_response :success
@@ -60,23 +65,46 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
         assert_select "tr#post-flag-#{@post_flag.id} .flagged-column a.user-gold", true
       end
 
-      context "with search parameters" do
-        should "render" do
-          get_auth post_flags_path(search: { post_id: @post_flag.post_id }), @user
-          assert_response :success
+      context "as a normal user" do
+        setup do
+          CurrentUser.user = @user
         end
 
-        should "hide flagged posts when the searcher is the uploader" do
-          get_auth post_flags_path(search: { creator_id: @flagger.id }), @uploader
-          assert_response :success
-          assert_select "tr#post-flag-#{@post_flag.id}", false
+        should respond_to_search({}).with { [@unrelated_flag, @other_flag, @post_flag] }
+        should respond_to_search(reason_matches: "poor quality").with { @unrelated_flag }
+        should respond_to_search(category: "normal").with { [@unrelated_flag, @other_flag, @post_flag] }
+        should respond_to_search(category: "deleted").with { [] }
+
+        context "using includes" do
+          should respond_to_search(post_id: 101).with { @post_flag }
+          should respond_to_search(post_tags_match: "touhou").with { @other_flag }
+          should respond_to_search(post: {uploader_name: "chen"}).with { @post_flag }
+          should respond_to_search(creator_id: 999).with { [] }
+        end
+      end
+
+      context "when the user is the uploader" do
+        setup do
+          CurrentUser.user = @uploader
         end
 
-        should "show flagged posts when the searcher is not the uploader" do
-          get_auth post_flags_path(search: { creator_id: @flagger.id }), @mod
-          assert_response :success
-          assert_select "tr#post-flag-#{@post_flag.id}", true
+        should respond_to_search(creator_id: 999).with { [] }
+      end
+
+      context "when the user is a mod and not the uploader" do
+        setup do
+          CurrentUser.user = @mod
         end
+
+        should respond_to_search(creator_id: 999).with { @post_flag }
+      end
+
+      context "when the user is the flagger" do
+        setup do
+          CurrentUser.user = @flagger
+        end
+
+        should respond_to_search(creator_id: 999).with { @post_flag }
       end
     end
 

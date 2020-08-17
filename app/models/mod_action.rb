@@ -63,7 +63,7 @@ class ModAction < ApplicationRecord
   def self.search(params)
     q = super
 
-    q = q.search_attributes(params, :creator, :category, :description)
+    q = q.search_attributes(params, :category, :description)
     q = q.text_attribute_matches(:description, params[:description_matches])
 
     q.apply_default_order(params)
@@ -75,6 +75,10 @@ class ModAction < ApplicationRecord
 
   def self.log(desc, cat = :other, user = CurrentUser.user)
     create(creator: user, description: desc, category: categories[cat])
+  end
+
+  def self.searchable_includes
+    [:creator]
   end
 
   def self.available_includes

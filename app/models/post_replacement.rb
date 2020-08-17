@@ -22,7 +22,7 @@ class PostReplacement < ApplicationRecord
     class_methods do
       def search(params = {})
         q = super
-        q = q.search_attributes(params, :post, :creator, :md5, :md5_was, :file_ext, :file_ext_was, :original_url, :replacement_url)
+        q = q.search_attributes(params, :md5, :md5_was, :file_ext, :file_ext_was, :original_url, :replacement_url)
         q.apply_default_order(params)
       end
     end
@@ -37,6 +37,10 @@ class PostReplacement < ApplicationRecord
 
     tags = tags.map { |tag| "-#{tag}" }
     tags.join(" ")
+  end
+
+  def self.searchable_includes
+    [:creator, :post]
   end
 
   def self.available_includes

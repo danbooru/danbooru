@@ -3,9 +3,9 @@ require 'test_helper'
 class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
   context "The post replacements controller" do
     setup do
-      @mod = create(:moderator_user, can_approve_posts: true, created_at: 1.month.ago)
+      @mod = create(:moderator_user, name: "yukari", can_approve_posts: true, created_at: 1.month.ago)
       as(@mod) do
-        @post = create(:post, source: "https://google.com")
+        @post = create(:post, source: "https://google.com", tag_string: "touhou")
         @post_replacement = create(:post_replacement, post: @post)
       end
     end
@@ -60,9 +60,22 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
+      setup do
+        as(create(:admin_user)) { @admin_replacement = create(:post_replacement, replacement_url: "https://danbooru.donmai.us") }
+      end
+
       should "render" do
-        get post_replacements_path, params: {format: "json"}
+        get post_replacements_path
         assert_response :success
+      end
+
+      should respond_to_search({}).with { [@admin_replacement, @post_replacement] }
+      should respond_to_search(replacement_url_like: "*danbooru*").with { @admin_replacement }
+
+      context "using includes" do
+        should respond_to_search(post_tags_match: "touhou").with { @post_replacement }
+        should respond_to_search(creator: {level: User::Levels::ADMIN}).with { @admin_replacement }
+        should respond_to_search(creator_name: "yukari").with { @post_replacement }
       end
     end
   end

@@ -13,7 +13,7 @@ class IpAddress < ApplicationRecord
 
   def self.search(params)
     q = super
-    q = q.search_attributes(params, :user, :model_type, :model_id, :ip_addr)
+    q = q.search_attributes(params, :ip_addr)
     q.order(created_at: :desc)
   end
 
@@ -52,6 +52,10 @@ class IpAddress < ApplicationRecord
 
   def html_data_attributes
     super & attributes.keys.map(&:to_sym)
+  end
+
+  def self.searchable_includes
+    [:user, :model]
   end
 
   def self.available_includes

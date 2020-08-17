@@ -2,6 +2,10 @@ require 'test_helper'
 
 class ModActionsControllerTest < ActionDispatch::IntegrationTest
   context "The mod actions controller" do
+    setup do
+      @mod_action = create(:mod_action, description: "blah", category: "post_delete")
+    end
+
     context "index action" do
       setup do
         @ban = create(:mod_action, category: :post_ban)
@@ -11,6 +15,15 @@ class ModActionsControllerTest < ActionDispatch::IntegrationTest
       should "work" do
         get mod_actions_path
         assert_response :success
+      end
+
+      should respond_to_search({}).with { [@unrelated_action, @promote_action, @mod_action] }
+      should respond_to_search(category: ModAction.categories["user_level_change"]).with { @promote_action }
+      should respond_to_search(description_matches: "blah").with { @mod_action }
+
+      context "using includes" do
+        should respond_to_search(creator_name: "rumia").with { @promote_action }
+        should respond_to_search(creator: {level: User::Levels::BUILDER}).with { @promote_action }
       end
 
       context "category enum searches" do
@@ -23,6 +36,7 @@ class ModActionsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(category_id: "44").with { [@ban] }
         should respond_to_search(category_id: "44,45").with { [@unban, @ban] }
         should respond_to_search(category_id: ">=44").with { [@unban, @ban] }
+
       end
     end
 

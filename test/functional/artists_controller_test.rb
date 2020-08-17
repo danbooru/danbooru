@@ -28,6 +28,8 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         @artist = create(:artist)
         @masao = create(:artist, name: "masao", url_string: "http://www.pixiv.net/member.php?id=32777")
         @artgerm = create(:artist, name: "artgerm", url_string: "http://artgerm.deviantart.com/")
+        @wiki = create(:wiki_page, title: "artgerm")
+        @post = create(:post, tag_string: "masao")
       end
     end
 
@@ -130,7 +132,7 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
-      should "get the index page" do
+      should "render" do
         get artists_path
         assert_response :success
       end
@@ -142,26 +144,36 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "when searching the index page" do
+        setup do
+          @deleted = create(:artist, is_deleted: true)
+          @banned = create(:artist, is_banned: true)
+        end
+
         should "find artists by name" do
           get artists_path(name: "masao", format: "json")
           assert_artist_found("masao")
         end
 
-        should "find artists by image URL" do
-          get artists_path(search: { url_matches: "http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_m.jpg" }, format: "json")
-          assert_artist_found("masao")
+        should respond_to_search({}).with { [@banned, @deleted, @artgerm, @masao, @artist] }
+        should respond_to_search(name: "masao").with { @masao }
+        should respond_to_search(is_banned: "true").with { @banned }
+        should respond_to_search(is_deleted: "true").with { @deleted }
+        should respond_to_search(url_matches: "http://i2.pixiv.net/img04/img/syounen_no_uta/46170939_m.jpg").with { @masao }
+        should respond_to_search(url_matches: "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939").with { @masao }
+
+        context "ignoring whitespace" do
+          should respond_to_search(url_matches: " http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939 ").with { @masao }
         end
 
-        should "find artists by page URL" do
-          url = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939"
-          get artists_path(search: { url_matches: url }, format: "json")
-          assert_artist_found("masao")
-        end
-
-        should "ignore whitespace when searching by URL" do
-          url = " http://www.pixiv.net/member_illust.php?mode=medium&illust_id=46170939 "
-          get artists_path(search: { url_matches: url }, format: "json")
-          assert_artist_found("masao")
+        context "using includes" do
+          should respond_to_search(has_wiki_page: "true").with { @artgerm }
+          should respond_to_search(has_wiki_page: "false").with { [@banned, @deleted, @masao, @artist] }
+          should respond_to_search(has_tag: "true").with { @masao }
+          should respond_to_search(has_tag: "false").with { [@banned, @deleted, @artgerm, @artist] }
+          should respond_to_search(has_urls: "true").with { [@artgerm, @masao] }
+          should respond_to_search(has_urls: "false").with { [@banned, @deleted, @artist] }
+          should respond_to_search(urls: {url: "http://www.pixiv.net/member.php?id=32777"}).with { @masao }
+          should respond_to_search(urls: {normalized_url: "http://www.deviantart.com/artgerm/"}).with { @artgerm }
         end
       end
     end

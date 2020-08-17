@@ -14,11 +14,13 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
           @deleted = create(:wiki_page, title: "deleted", is_deleted: true)
           @vocaloid = create(:wiki_page, title: "vocaloid")
           @miku = create(:wiki_page, title: "hatsune_miku", other_names: ["初音ミク"], body: "miku is a [[vocaloid]]")
-          create(:tag, name: "hatsune_miku", category: Tag.categories.character)
+          @picasso = create(:wiki_page, title: "picasso")
+          create(:artist, name: "picasso", is_banned: true)
+          create(:character_tag, name: "hatsune_miku")
         end
       end
 
-      should "list all wiki_pages" do
+      should "render" do
         get wiki_pages_path
         assert_response :success
       end
@@ -34,19 +36,27 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to wiki_pages_path(search: { title_normalize: "tagme" }, redirect: true)
       end
 
+      should respond_to_search({}).with { [@picasso, @miku, @vocaloid, @deleted, @tagme] }
       should respond_to_search(title: "tagme").with { @tagme }
       should respond_to_search(title: "tagme", order: "post_count").with { @tagme }
       should respond_to_search(title_normalize: "TAGME  ").with { @tagme }
 
-      should respond_to_search(tag: { category: Tag.categories.character }).with { @miku }
-      should respond_to_search(hide_deleted: "true").with { [@miku, @vocaloid, @tagme] }
+      should respond_to_search(hide_deleted: "true").with { [@picasso, @miku, @vocaloid, @tagme] }
       should respond_to_search(linked_to: "vocaloid").with { @miku }
-      should respond_to_search(not_linked_to: "vocaloid").with { [@vocaloid, @deleted, @tagme] }
+      should respond_to_search(not_linked_to: "vocaloid").with { [@picasso, @vocaloid, @deleted, @tagme] }
 
       should respond_to_search(other_names_match: "初音ミク").with { @miku }
       should respond_to_search(other_names_match: "初*").with { @miku }
       should respond_to_search(other_names_present: "true").with { @miku }
-      should respond_to_search(other_names_present: "false").with { [@vocaloid, @deleted, @tagme] }
+      should respond_to_search(other_names_present: "false").with { [@picasso, @vocaloid, @deleted, @tagme] }
+
+      context "using includes" do
+        should respond_to_search(has_tag: "true").with { @miku }
+        should respond_to_search(tag: { category: Tag.categories.character }).with { @miku }
+        should respond_to_search(has_dtext_links: "true").with { @miku }
+        should respond_to_search(has_artist: "true").with { @picasso }
+        should respond_to_search(artist: {is_banned: "true"}).with { @picasso }
+      end
     end
 
     context "search action" do
