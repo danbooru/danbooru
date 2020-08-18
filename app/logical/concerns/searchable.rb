@@ -2,7 +2,7 @@ module Searchable
   extend ActiveSupport::Concern
 
   def parameter_hash?(params)
-    params.present? && params.respond_to?(:each)
+    params.present? && params.respond_to?(:each_value)
   end
 
   def parameter_depth(params)
