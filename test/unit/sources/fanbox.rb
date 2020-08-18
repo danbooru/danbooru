@@ -90,6 +90,15 @@ module Sources
       end
     end
 
+    context "an age-restricted fanbox post" do
+      should "not raise an error" do
+        @source = Sources::Strategies.find("https://mfr.fanbox.cc/posts/1306390")
+
+        assert_nothing_raised { @source.to_h }
+        assert_equal("mfr", @source.artist_name)
+      end
+    end
+
     context "A link in the old format" do
       should "still work" do
         post = Sources::Strategies.find("https://www.pixiv.net/fanbox/creator/1566167/post/39714")

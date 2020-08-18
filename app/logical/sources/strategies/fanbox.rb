@@ -105,11 +105,7 @@ module Sources
       end
 
       def display_name
-        if api_response.present?
-          api_response["user"]["name"]
-        elsif artist_api_response.present?
-          artist_api_response["user"]["name"]
-        end
+        api_response.dig("user", "name") || artist_api_response.dig("user", "name")
       end
 
       def other_names
@@ -125,8 +121,9 @@ module Sources
       end
 
       def artist_commentary_desc
-        return if api_response.blank?
         body = api_response["body"]
+        return if body.blank?
+
         if body["text"].present?
           body["text"]
         elsif body["blocks"].present?
@@ -160,11 +157,12 @@ module Sources
         return {} if illust_id.blank?
         resp = client.get("https://api.fanbox.cc/post.info?postId=#{illust_id}")
         json_response = JSON.parse(resp)["body"]
-        if json_response["restrictedFor"] == 2 && json_response["body"].blank?
-          # Pixiv Fanbox login is protected by Google Recaptcha, so it's not possible for us to extract anything from them (save for the title).
-          # Other projects like PixivUtils ask the user to periodically extract cookies from the browser, but this is not feasible for Danbooru.
-          raise Sources::Error, "Age-restricted posts from Pixiv Fanbox are not supported."
-        end
+
+        # Pixiv Fanbox login is protected by Google Recaptcha, so it's not
+        # possible for us to extract anything from them (save for the title).
+        # Other projects like PixivUtils ask the user to periodically extract
+        # cookies from the browser, but this is not feasible for Danbooru.
+        return {} if json_response["restrictedFor"] == 2 && json_response["body"].blank?
 
         json_response
       rescue JSON::ParserError
@@ -181,7 +179,7 @@ module Sources
       end
 
       def client
-        Danbooru::Http.headers(Origin: "https://fanbox.cc").cache(1.minute)
+        @client ||= http.headers(Origin: "https://fanbox.cc").cache(1.minute)
       end
     end
   end
