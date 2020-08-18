@@ -883,7 +883,7 @@ class Note {
   }
 
   static initialize_all() {
-    if ($("#c-posts #a-show #image").length === 0 || $("video#image").length) {
+    if ($("#c-posts #a-show #image").length === 0 || $("video#image").length || $("canvas#image").length) {
       return;
     }
 
