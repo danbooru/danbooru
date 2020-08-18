@@ -25,7 +25,7 @@ class PostsController < ApplicationController
       @comments = @post.comments
       @comments = @comments.includes(:creator)
       @comments = @comments.includes(:votes) if CurrentUser.is_member?
-      @comments = @comments.visible(CurrentUser.user)
+      @comments = @comments.unhidden(CurrentUser.user)
 
       include_deleted = @post.is_deleted? || (@post.parent_id.present? && @post.parent.is_deleted?) || CurrentUser.user.show_deleted_children?
       @sibling_posts = @post.parent.present? ? @post.parent.children : Post.none
