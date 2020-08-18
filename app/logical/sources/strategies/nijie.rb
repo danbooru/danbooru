@@ -40,6 +40,11 @@
 #
 # * https://nijie.info/members.php?id=236014
 # * https://nijie.info/members_illust.php?id=236014
+#
+# Doujin
+# http://nijie.info/view.php?id=384548
+# http://pic.nijie.net/01/dojin_main/dojin_sam/20120213044700%E3%82%B3%E3%83%94%E3%83%BC%20%EF%BD%9E%200011%E3%81%AE%E3%82%B3%E3%83%94%E3%83%BC.jpg (NSFW)
+# http://pic.nijie.net/01/__rs_l120x120/dojin_main/dojin_sam/20120213044700%E3%82%B3%E3%83%94%E3%83%BC%20%EF%BD%9E%200011%E3%81%AE%E3%82%B3%E3%83%94%E3%83%BC.jpg
 
 module Sources
   module Strategies
@@ -64,6 +69,9 @@ module Sources
       DIR = %r{(?:\d+/)?(?:__rs_\w+/)?nijie_picture(?:/diff/main)?}
       IMAGE_URL = %r{#{IMAGE_BASE_URL}/#{DIR}/#{Regexp.union(FILENAME1, FILENAME2, FILENAME3)}\.\w+\z}i
 
+      DOJIN_DIR = %r{(?:\d+/)?(?:__rs_\w+/)?dojin_main(?:/dojin_sam)?}i
+      DOJIN_URL = %r{#{IMAGE_BASE_URL}/#{DOJIN_DIR}/.*\.\w+\z}i
+
       def self.enabled?
         Danbooru.config.nijie_login.present? && Danbooru.config.nijie_password.present?
       end
@@ -77,15 +85,20 @@ module Sources
       end
 
       def image_url
-        return to_full_image_url(url) if url.match?(IMAGE_URL)
+        return to_full_image_url(url) if url =~ IMAGE_URL || url =~ DOJIN_URL
         image_urls.first
       end
 
       def image_urls
-        images = page&.search("div#gallery a > .mozamoza").to_a.map do |img|
-          "https:#{img["src"]}"
+        if doujin?
+          images = page&.search("#dojin_left .left img").to_a.map { |img| img["src"] }
+          images += page&.search("#dojin_diff img.mozamoza").to_a.map { |img| img["data-original"] }
+        else
+          images = page&.search("div#gallery a > .mozamoza").to_a.map { |img| img["src"] }
         end
 
+        # Can't use URI.join here because nijie urls may contain japanese characters
+        images = images.map { |img| "https:#{img}" }
         images = [url] if url.match?(IMAGE_URL) && images.empty?
         images.map(&method(:to_full_image_url)).uniq
       end
@@ -110,22 +123,34 @@ module Sources
       end
 
       def artist_name
-        page&.search("a.name")&.first&.text
+        if doujin?
+          page&.at("#dojin_left .right a[href*='members.php?id=']")&.text
+        else
+          page&.at("a.name")&.text
+        end
       end
 
       def artist_commentary_title
-        page&.search("h2.illust_title")&.text
+        if doujin?
+          page&.search("#dojin_text p.title")&.text
+        else
+          page&.search("h2.illust_title")&.text
+        end
       end
 
       def artist_commentary_desc
-        page&.search('#illust_text > p')&.to_html
+        if doujin?
+          page&.search("#dojin_text p:not(.title)")&.to_html
+        else
+          page&.search('#illust_text > p')&.to_html
+        end
       end
 
       def tags
         links = page&.search("div#view-tag a") || []
 
         search_links = links.select do |node|
-          node["href"] =~ /search\.php/
+          node["href"] =~ /search(?:_dojin)?\.php/
         end
 
         search_links.map do |node|
@@ -177,6 +202,10 @@ module Sources
         return if illust_id.blank?
 
         "https://nijie.info/view.php?id=#{illust_id}"
+      end
+
+      def doujin?
+        page&.at("#dojin_left").present?
       end
 
       def page
