@@ -153,12 +153,13 @@ module Searchable
     # This allows the hash keys to be either strings or symbols
     indifferent_params = params.try(:with_indifferent_access) || params.try(:to_unsafe_h)
     raise ArgumentError, "unable to process params" if indifferent_params.nil?
+
     attributes.reduce(all) do |relation, attribute|
-      relation.search_attribute(attribute, indifferent_params)
+      relation.search_attribute(attribute, indifferent_params, CurrentUser.user)
     end
   end
 
-  def search_attribute(name, params)
+  def search_attribute(name, params, current_user)
     column = column_for_attribute(name)
     type = column.type || reflect_on_association(name)&.class_name
 
@@ -171,11 +172,11 @@ module Searchable
 
     case type
     when "User"
-      search_user_attribute(name, params)
+      search_user_attribute(name, params, current_user)
     when "Post"
-      search_post_attribute(name, params)
+      search_post_attribute(name, params, current_user)
     when "Model"
-      search_polymorphic_attribute(name, params)
+      search_polymorphic_attribute(name, params, current_user)
     when :string, :text
       search_text_attribute(name, params)
     when :boolean
@@ -190,7 +191,7 @@ module Searchable
       search_array_attribute(name, subtype, params)
     else
       raise NotImplementedError, "unhandled attribute type: #{name}" if type.blank?
-      search_includes(name, params, type)
+      search_includes(name, params, type, current_user)
     end
   end
 
@@ -230,36 +231,36 @@ module Searchable
     end
   end
 
-  def search_user_attribute(attr, params)
+  def search_user_attribute(attr, params, current_user)
     if params["#{attr}_name"].present?
       where(attr => User.search(name_matches: params["#{attr}_name"]).reorder(nil))
     else
-      search_includes(attr, params, "User")
+      search_includes(attr, params, "User", current_user)
     end
   end
 
-  def search_post_attribute(attr, params)
+  def search_post_attribute(attr, params, current_user)
     if params["#{attr}_tags_match"]
-      where(attr => Post.user_tag_match(params["#{attr}_tags_match"]).reorder(nil))
+      where(attr => Post.user_tag_match(params["#{attr}_tags_match"], current_user).reorder(nil))
     else
-      search_includes(attr, params, "Post")
+      search_includes(attr, params, "Post", current_user)
     end
   end
 
-  def search_includes(attr, params, type)
+  def search_includes(attr, params, type, current_user)
     model = Kernel.const_get(type)
     if params["#{attr}_id"].present?
-      search_attribute("#{attr}_id", params)
+      search_attribute("#{attr}_id", params, current_user)
     elsif params["has_#{attr}"].to_s.truthy? || params["has_#{attr}"].to_s.falsy?
       search_has_include(attr, params["has_#{attr}"].to_s.truthy?, model)
     elsif parameter_hash?(params[attr])
-      where(attr => model.search(params[attr]).reorder(nil))
+      where(attr => model.visible(current_user).search(params[attr]).reorder(nil))
     else
       all
     end
   end
 
-  def search_polymorphic_attribute(attr, params)
+  def search_polymorphic_attribute(attr, params, current_user)
     model_keys = ((model_types || []) & params.keys)
     # The user can only logically specify one model at a time, so more than that should return no results
     return none if model_keys.length > 1
@@ -272,15 +273,15 @@ module Searchable
       return none if params["#{attr}_type"].present? && params["#{attr}_type"] != model_key
       model_specified = true
       model = Kernel.const_get(model_key)
-      relation = relation.where(attr => model.search(params[model_key]))
+      relation = relation.where(attr => model.visible(current_user).search(params[model_key]))
     end
 
     if params["#{attr}_id"].present?
-      relation = relation.search_attribute("#{attr}_id", params)
+      relation = relation.search_attribute("#{attr}_id", params, current_user)
     end
 
     if params["#{attr}_type"].present? && !model_specified
-      relation = relation.search_attribute("#{attr}_type", params)
+      relation = relation.search_attribute("#{attr}_type", params, current_user)
     end
 
     relation

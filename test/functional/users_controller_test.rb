@@ -82,6 +82,19 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(posts_tags_match: "touhou").with { @uploader }
         should respond_to_search(posts: {rating: "e"}).with { @other_user }
         should respond_to_search(inviter: {name: "yukari"}).with { @other_user }
+
+        context "a user with private forum posts" do
+          setup do
+            as(@user) do
+              @private_post = create(:forum_post, body: "private", creator: @user, topic: create(:mod_up_forum_topic))
+              @public_post = create(:forum_post, body: "public", creator: @user)
+            end
+          end
+
+          # should ignore the existence of private forum posts the current user doesn't have access to.
+          should respond_to_search(forum_posts: { body: "private" }).with { [] }
+          should respond_to_search(forum_posts: { body: "public" }).with { [@user] }
+        end
       end
     end
 
