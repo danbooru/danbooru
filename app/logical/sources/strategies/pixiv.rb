@@ -19,17 +19,6 @@
 # * https://www.pixiv.net/stacc/noizave
 # * http://www.pixiv.me/noizave
 #
-# Fanbox
-#
-# * https://fanbox.pixiv.net/images/post/39714/JvjJal8v1yLgc5DPyEI05YpT.png
-# * https://pixiv.pximg.net/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg
-#
-# * https://pixiv.pximg.net/c/400x400_90_a2_g5/fanbox/public/images/creator/1566167/profile/Ix6bnJmTaOAFZhXHLbWyIY1e.jpeg
-# * https://pixiv.pximg.net/c/1200x630_90_a2_g5/fanbox/public/images/post/186919/cover/VCI1Mcs2rbmWPg0mmiTisovn.jpeg
-#
-# * https://www.pixiv.net/fanbox/creator/1566167/post/39714
-# * https://www.pixiv.net/fanbox/creator/1566167
-#
 # Novels
 #
 # * https://i.pximg.net/novel-cover-original/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42.jpg
@@ -97,6 +86,7 @@ module Sources
 
       def match?
         return false if parsed_url.nil?
+        return false if url.include? "/fanbox/"
         parsed_url.domain.in?(domains) || parsed_url.host == "tc-pximg01.techorus-cdn.com"
       end
 
