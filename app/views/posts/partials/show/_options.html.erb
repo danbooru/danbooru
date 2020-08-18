@@ -26,7 +26,7 @@
       <%= link_to "Favorite", favorites_path(post_id: post.id), remote: true, method: :post, id: "add-to-favorites", "data-shortcut": "f", style: ("display: none;" if @post.is_favorited?) %>
     </li>
     <li id="post-option-remove-from-favorites">
-      <%= link_to "Unfavorite", favorite_path(post), remote: true, method: :delete, id: "remove-from-favorites", "data-shortcut": "shift+f", style: ("display: none;" if !@post.is_favorited?) %>
+      <%= link_to "Unfavorite", favorite_path(post), remote: true, method: :delete, id: "remove-from-favorites", "data-shortcut": "shift+f", "data-shortcut-when": ":visible", style: ("display: none;" if !@post.is_favorited?) %>
     </li>
   <% end %>
   <% if policy(post).update? %>
