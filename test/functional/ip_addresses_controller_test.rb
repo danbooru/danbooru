@@ -43,12 +43,12 @@ class IpAddressesControllerTest < ActionDispatch::IntegrationTest
 
     context "show action" do
       should "be visible to mods" do
-        get_auth ip_address_path("1.1.1.1"), @mod
+        get_auth ip_address_path("1.2.3.4"), @mod
         assert_response :success
       end
 
       should "not be visible to members" do
-        get_auth ip_address_path("1.1.1.1"), @user
+        get_auth ip_address_path("1.2.3.4"), @user
         assert_response 403
       end
     end

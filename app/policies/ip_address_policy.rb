@@ -4,6 +4,6 @@ class IpAddressPolicy < ApplicationPolicy
   end
 
   def html_data_attributes
-    super & attributes.keys.map(&:to_sym)
+    super & record.attributes.keys.map(&:to_sym)
   end
 end
