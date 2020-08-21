@@ -88,6 +88,8 @@ module ArtistFinder
     "plurk.com", # http://www.plurk.com/a1amorea1a1
     "privatter.net",
     "privatter.net/u", # http://privatter.net/u/saaaatonaaaa
+    "reddit.com/r", # https://www.reddit.com/r/pixiepowderpuff/
+    "reddit.com/user", # https://www.reddit.com/user/dishwasher1910
     "rule34.paheal.net",
     "rule34.paheal.net/post/list", # http://rule34.paheal.net/post/list/Reach025/
     "sankakucomplex.com", # https://chan.sankakucomplex.com/?tags=user%3ASubridet
