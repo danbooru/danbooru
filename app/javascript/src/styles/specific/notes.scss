@@ -45,6 +45,10 @@
       font-size: 0.8em;
     }
 
+    code {
+      font: var(--monospace-font);
+    }
+
     a[rel*="external"] {
       word-break: initial;
     }
