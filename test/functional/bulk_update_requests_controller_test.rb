@@ -7,7 +7,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
       @builder = create(:builder_user)
       @admin = create(:admin_user)
       as(@admin) { @forum_topic = create(:forum_topic, id: 100, category_id: 0) }
-      as(@user) { @bulk_update_request = create(:bulk_update_request, user: @user, forum_topic: @forum_topic) }
+      as(@user) { @bulk_update_request = create(:bulk_update_request, user: @user, forum_topic: @forum_topic, script: "create alias aaa -> bbb") }
     end
 
     context "#new" do
@@ -69,6 +69,12 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
       should "not allow members to update other people's requests" do
         put_auth bulk_update_request_path(@bulk_update_request.id), create(:user), params: {bulk_update_request: {script: "create alias zzz -> 222", skip_secondary_validations: "0"}}
         assert_response 403
+        assert_equal("create alias aaa -> bbb", @bulk_update_request.reload.script)
+      end
+
+      should "fail for an invalid script" do
+        put_auth bulk_update_request_path(@bulk_update_request.id), @user, params: { bulk_update_request: { script: "create alis gray -> grey" }}
+        assert_response :success
         assert_equal("create alias aaa -> bbb", @bulk_update_request.reload.script)
       end
     end

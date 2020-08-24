@@ -9,14 +9,14 @@ class BulkUpdateRequest < ApplicationRecord
   belongs_to :approver, optional: true, class_name: "User"
 
   before_validation :normalize_text
-  before_validation :update_tags
   validates_presence_of :reason, on: :create
   validates_presence_of :script
   validates_presence_of :title, if: ->(rec) {rec.forum_topic_id.blank?}
   validates_presence_of :forum_topic, if: ->(rec) {rec.forum_topic_id.present?}
   validates_inclusion_of :status, :in => %w(pending approved rejected)
-  validate :validate_script, :on => :create
+  validate :validate_script, if: :script_changed?
 
+  before_save :update_tags, if: :script_changed?
   after_create :create_forum_topic
 
   scope :pending_first, -> { order(Arel.sql("(case status when 'pending' then 0 when 'approved' then 1 else 2 end)")) }
@@ -108,17 +108,14 @@ class BulkUpdateRequest < ApplicationRecord
     end
   end
 
-  module ValidationMethods
-    def validate_script
-      processor.validate!
-    rescue BulkUpdateRequestProcessor::Error => e
-      errors[:base] << e.message
+  def validate_script
+    if processor.invalid?
+      errors[:base] << processor.errors.full_messages.join("; ")
     end
   end
 
   extend SearchMethods
   include ApprovalMethods
-  include ValidationMethods
 
   def normalize_text
     self.script = script.downcase
@@ -133,7 +130,7 @@ class BulkUpdateRequest < ApplicationRecord
   end
 
   def processor
-    @processor ||= BulkUpdateRequestProcessor.new(script, forum_topic_id: forum_topic_id, skip_secondary_validations: skip_secondary_validations)
+    @processor ||= BulkUpdateRequestProcessor.new(self)
   end
 
   def is_tag_move_allowed?

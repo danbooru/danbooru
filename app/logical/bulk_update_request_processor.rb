@@ -1,109 +1,127 @@
 class BulkUpdateRequestProcessor
-  extend Memoist
+  include ActiveModel::Validations
 
   class Error < StandardError; end
-  attr_accessor :text, :forum_topic_id, :skip_secondary_validations
 
-  def initialize(text, forum_topic_id: nil, skip_secondary_validations: true)
-    @forum_topic_id = forum_topic_id
-    @text = text
-    @skip_secondary_validations = skip_secondary_validations
+  attr_reader :bulk_update_request
+  delegate :script, :forum_topic_id, :skip_secondary_validations, to: :bulk_update_request
+  validate :validate_script
+
+  def initialize(bulk_update_request)
+    @bulk_update_request = bulk_update_request
   end
 
-  def tokens
-    text.split(/\r\n|\r|\n/).reject(&:blank?).map do |line|
+  # Parse the script into a list of commands.
+  def commands
+    script.split(/\r\n|\r|\n/).reject(&:blank?).map do |line|
       line = line.gsub(/[[:space:]]+/, " ").strip
+      next if line.empty?
 
-      if line =~ /^(?:create alias|aliasing|alias) (\S+) -> (\S+)$/i
+      case line
+      when /\A(?:create alias|aliasing|alias) (\S+) -> (\S+)\z/i
         [:create_alias, $1, $2]
-      elsif line =~ /^(?:create implication|implicating|implicate|imply) (\S+) -> (\S+)$/i
+      when /\A(?:create implication|implicating|implicate|imply) (\S+) -> (\S+)\z/i
         [:create_implication, $1, $2]
-      elsif line =~ /^(?:remove alias|unaliasing|unalias) (\S+) -> (\S+)$/i
+      when /\A(?:remove alias|unaliasing|unalias) (\S+) -> (\S+)\z/i
         [:remove_alias, $1, $2]
-      elsif line =~ /^(?:remove implication|unimplicating|unimplicate|unimply) (\S+) -> (\S+)$/i
+      when /\A(?:remove implication|unimplicating|unimplicate|unimply) (\S+) -> (\S+)\z/i
         [:remove_implication, $1, $2]
-      elsif line =~ /^(?:mass update|updating|update|change) (.+?) -> (.*)$/i
+      when /\A(?:mass update|updating|update|change) (.+?) -> (.*)\z/i
         [:mass_update, $1, $2]
-      elsif line =~ /^category (\S+) -> (#{Tag.categories.regexp})/
+      when /\Acategory (\S+) -> (#{Tag.categories.regexp})\z/i
         [:change_category, $1, $2]
-      elsif line.strip.empty?
-        # do nothing
       else
-        raise Error, "Unparseable line: #{line}"
+        [:invalid_line, line]
       end
     end
   end
 
-  def validate!
-    tokens.map do |token|
-      case token[0]
+  def validate_script
+    commands.each do |command, *args|
+      case command
       when :create_alias
-        tag_alias = TagAlias.new(creator: User.system, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
-        unless tag_alias.valid?
-          raise Error, "Error: #{tag_alias.errors.full_messages.join("; ")} (create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name})"
+        tag_alias = TagAlias.new(creator: User.system, antecedent_name: args[0], consequent_name: args[1], skip_secondary_validations: skip_secondary_validations)
+        if tag_alias.invalid?
+          errors[:base] << "Can't create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name} (#{tag_alias.errors.full_messages.join("; ")})"
         end
 
       when :create_implication
-        tag_implication = TagImplication.new(creator: User.system, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
-        unless tag_implication.valid?
-          raise Error, "Error: #{tag_implication.errors.full_messages.join("; ")} (create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name})"
+        tag_implication = TagImplication.new(creator: User.system, antecedent_name: args[0], consequent_name: args[1], skip_secondary_validations: skip_secondary_validations)
+        if tag_implication.invalid?
+          errors[:base] << "Can't create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name} (#{tag_implication.errors.full_messages.join("; ")})"
         end
 
-      when :remove_alias, :remove_implication, :mass_update, :change_category
+      when :remove_alias
+        tag_alias = TagAlias.active.find_by(antecedent_name: args[0], consequent_name: args[1])
+        if tag_alias.nil?
+          errors[:base] << "Can't remove alias #{args[0]} -> #{args[1]} (alias doesn't exist)"
+        end
+
+      when :remove_implication
+        tag_implication = TagImplication.active.find_by(antecedent_name: args[0], consequent_name: args[1])
+        if tag_implication.nil?
+          errors[:base] << "Can't remove implication #{args[0]} -> #{args[1]} (implication doesn't exist)"
+        end
+
+      when :change_category
+        tag = Tag.find_by_name(args[0])
+        if tag.nil?
+          errors[:base] << "Can't change category #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)"
+        end
+
+      when :mass_update
         # okay
 
+      when :invalid_line
+        errors[:base] << "Invalid line: #{args[0]}"
+
       else
-        raise NotImplementedError, "Unknown token: #{token[0]}" # should never happen
+        # should never happen
+        raise Error, "Unknown command: #{command}"
       end
     end
   end
 
   def process!(approver)
     ActiveRecord::Base.transaction do
-      tokens.map do |token|
-        case token[0]
+      validate!
+
+      commands.map do |command, *args|
+        case command
         when :create_alias
-          tag_alias = TagAlias.create(creator: approver, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
-          unless tag_alias.valid?
-            raise Error, "Error: #{tag_alias.errors.full_messages.join("; ")} (create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name})"
-          end
+          tag_alias = TagAlias.create!(creator: approver, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: args[0], consequent_name: args[1], skip_secondary_validations: skip_secondary_validations)
           tag_alias.approve!(approver: approver)
 
         when :create_implication
-          tag_implication = TagImplication.create(creator: approver, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: token[1], consequent_name: token[2], skip_secondary_validations: skip_secondary_validations)
-          unless tag_implication.valid?
-            raise Error, "Error: #{tag_implication.errors.full_messages.join("; ")} (create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name})"
-          end
+          tag_implication = TagImplication.create!(creator: approver, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: args[0], consequent_name: args[1], skip_secondary_validations: skip_secondary_validations)
           tag_implication.approve!(approver: approver)
 
         when :remove_alias
-          tag_alias = TagAlias.active.find_by(antecedent_name: token[1], consequent_name: token[2])
-          raise Error, "Alias for #{token[1]} not found" if tag_alias.nil?
+          tag_alias = TagAlias.active.find_by!(antecedent_name: args[0], consequent_name: args[1])
           tag_alias.reject!
 
         when :remove_implication
-          tag_implication = TagImplication.active.find_by(antecedent_name: token[1], consequent_name: token[2])
-          raise Error, "Implication for #{token[1]} not found" if tag_implication.nil?
+          tag_implication = TagImplication.active.find_by!(antecedent_name: args[0], consequent_name: args[1])
           tag_implication.reject!
 
         when :mass_update
-          TagBatchChangeJob.perform_later(token[1], token[2], User.system, "127.0.0.1")
+          TagBatchChangeJob.perform_later(args[0], args[1], User.system, "127.0.0.1")
 
         when :change_category
-          tag = Tag.find_or_create_by_name(token[1])
-          tag.category = Tag.categories.value_for(token[2])
-          tag.save
+          tag = Tag.find_or_create_by_name(args[0])
+          tag.update!(category: Tag.categories.value_for(args[1]))
 
         else
-          raise Error, "Unknown token: #{token[0]}"
+          # should never happen
+          raise Error, "Unknown command: #{command}"
         end
       end
     end
   end
 
   def affected_tags
-    tokens.flat_map do |type, *args|
-      case type
+    commands.flat_map do |command, *args|
+      case command
       when :create_alias, :remove_alias, :create_implication, :remove_implication
         [args[0], args[1]]
       when :mass_update
@@ -113,13 +131,11 @@ class BulkUpdateRequestProcessor
         args[0]
       end
     end.sort.uniq
-  rescue Error
-    []
   end
 
   def is_tag_move_allowed?
-    tokens.all? do |type, *args|
-      case type
+    commands.all? do |command, *args|
+      case command
       when :create_alias
         BulkUpdateRequestProcessor.is_tag_move_allowed?(args[0], args[1])
       when :mass_update
@@ -134,16 +150,17 @@ class BulkUpdateRequestProcessor
   end
 
   def to_dtext
-    tokens.map do |token|
-      case token[0]
+    commands.map do |command, *args|
+      case command
       when :create_alias, :create_implication, :remove_alias, :remove_implication
-        "#{token[0].to_s.tr("_", " ")} [[#{token[1]}]] -> [[#{token[2]}]]"
+        "#{command.to_s.tr("_", " ")} [[#{args[0]}]] -> [[#{args[1]}]]"
       when :mass_update
-        "mass update {{#{token[1]}}} -> #{token[2]}"
+        "mass update {{#{args[0]}}} -> #{args[1]}"
       when :change_category
-        "category [[#{token[1]}]] -> #{token[2]}"
+        "category [[#{args[0]}]] -> #{args[1]}"
       else
-        raise "Unknown token: #{token[0]}"
+        # should never happen
+        raise Error, "Unknown command: #{command}"
       end
     end.join("\n")
   end
@@ -155,6 +172,4 @@ class BulkUpdateRequestProcessor
     (antecedent_tag.blank? || antecedent_tag.empty? || (antecedent_tag.artist? && antecedent_tag.post_count <= 100)) &&
     (consequent_tag.blank? || consequent_tag.empty? || (consequent_tag.artist? && consequent_tag.post_count <= 100))
   end
-
-  memoize :tokens
 end
