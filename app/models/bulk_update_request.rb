@@ -8,7 +8,6 @@ class BulkUpdateRequest < ApplicationRecord
   belongs_to :forum_post, optional: true
   belongs_to :approver, optional: true, class_name: "User"
 
-  before_validation :normalize_text
   validates_presence_of :reason, on: :create
   validates_presence_of :script
   validates_presence_of :title, if: ->(rec) {rec.forum_topic_id.blank?}
@@ -116,10 +115,6 @@ class BulkUpdateRequest < ApplicationRecord
 
   extend SearchMethods
   include ApprovalMethods
-
-  def normalize_text
-    self.script = script.downcase
-  end
 
   def update_tags
     self.tags = processor.affected_tags

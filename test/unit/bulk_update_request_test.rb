@@ -65,6 +65,16 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(false, @bur.valid?)
           assert_equal(["Can't create alias bbb -> aaa (A tag alias for aaa already exists)"], @bur.errors.full_messages)
         end
+
+        should "be case-insensitive" do
+          @bur = create(:bulk_update_request, script: "CREATE ALIAS AAA -> BBB")
+          @bur.approve!(@admin)
+          perform_enqueued_jobs
+
+          @alias = TagAlias.find_by(antecedent_name: "aaa", consequent_name: "bbb")
+          assert_equal(true, @alias.present?)
+          assert_equal(true, @alias.is_active?)
+        end
       end
 
       context "the create implication command" do
@@ -160,6 +170,16 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
         should "update the tags" do
           assert_equal("bar", @post.reload.tag_string)
+        end
+
+        should "be case-sensitive" do
+          @post = create(:post, source: "imageboard")
+          @bur = create(:bulk_update_request, script: "mass update source:imageboard -> source:Imageboard")
+
+          @bur.approve!(@admin)
+          perform_enqueued_jobs
+
+          assert_equal("Imageboard", @post.reload.source)
         end
       end
     end
@@ -292,10 +312,6 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
         @req = BulkUpdateRequest.find(@req.id)
         assert_equal("pending", @req.status)
-      end
-
-      should "downcase the text" do
-        assert_equal("create alias aaa -> bbb", @req.script)
       end
 
       should "update the topic when processed" do

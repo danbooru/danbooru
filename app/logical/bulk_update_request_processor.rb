@@ -19,17 +19,17 @@ class BulkUpdateRequestProcessor
 
       case line
       when /\A(?:create alias|aliasing|alias) (\S+) -> (\S+)\z/i
-        [:create_alias, $1, $2]
+        [:create_alias, Tag.normalize_name($1), Tag.normalize_name($2)]
       when /\A(?:create implication|implicating|implicate|imply) (\S+) -> (\S+)\z/i
-        [:create_implication, $1, $2]
+        [:create_implication, Tag.normalize_name($1), Tag.normalize_name($2)]
       when /\A(?:remove alias|unaliasing|unalias) (\S+) -> (\S+)\z/i
-        [:remove_alias, $1, $2]
+        [:remove_alias, Tag.normalize_name($1), Tag.normalize_name($2)]
       when /\A(?:remove implication|unimplicating|unimplicate|unimply) (\S+) -> (\S+)\z/i
-        [:remove_implication, $1, $2]
+        [:remove_implication, Tag.normalize_name($1), Tag.normalize_name($2)]
       when /\A(?:mass update|updating|update|change) (.+?) -> (.*)\z/i
         [:mass_update, $1, $2]
       when /\Acategory (\S+) -> (#{Tag.categories.regexp})\z/i
-        [:change_category, $1, $2]
+        [:change_category, Tag.normalize_name($1), $2.downcase]
       else
         [:invalid_line, line]
       end
