@@ -2,7 +2,6 @@ class TagAlias < TagRelationship
   after_save :create_mod_action
   validates_uniqueness_of :antecedent_name, scope: :status, conditions: -> { active }
   validate :absence_of_transitive_relation
-  validate :wiki_pages_present, on: :create, unless: :skip_secondary_validations
 
   module ApprovalMethods
     def approve!(approver: CurrentUser.user)
@@ -20,25 +19,13 @@ class TagAlias < TagRelationship
     names.map { |name| aliases[name] || name }
   end
 
-  def process!
-    unless valid?
-      raise errors.full_messages.join("; ")
-    end
-
-    CurrentUser.scoped(User.system) do
-      update!(status: "processing")
-      move_aliases_and_implications
-      move_saved_searches
-      ensure_category_consistency
-      update_posts
-      rename_wiki_and_artist
-      update!(status: "active")
-    end
+  def process!(user: User.system)
+    update!(status: "processing")
+    move_aliases_and_implications
+    TagMover.new(antecedent_name, consequent_name, user: user).move!
+    update!(status: "active")
   rescue Exception => e
-    CurrentUser.scoped(approver) do
-      update(status: "error: #{e}")
-    end
-
+    update!(status: "error: #{e}")
     DanbooruLogger.log(e, tag_alias_id: id, antecedent_name: antecedent_name, consequent_name: consequent_name)
   end
 
@@ -49,15 +36,6 @@ class TagAlias < TagRelationship
     # If the a -> b alias was created first, the new one will be allowed and the old one will be moved automatically instead.
     if TagAlias.active.exists?(antecedent_name: consequent_name)
       errors[:base] << "A tag alias for #{consequent_name} already exists"
-    end
-  end
-
-  def move_saved_searches
-    escaped = Regexp.escape(antecedent_name)
-
-    SavedSearch.where("query like ?", "%#{antecedent_name}%").find_each do |ss|
-      ss.query = ss.query.sub(/(?:^| )#{escaped}(?:$| )/, " #{consequent_name} ").strip.gsub(/  /, " ")
-      ss.save
     end
   end
 
@@ -87,35 +65,6 @@ class TagAlias < TagRelationship
       if !success && ti.errors.full_messages.join("; ") =~ /Cannot implicate a tag to itself/
         ti.destroy
       end
-    end
-  end
-
-  def ensure_category_consistency
-    if antecedent_tag.general? && !consequent_tag.general?
-      antecedent_tag.update!(category: consequent_tag.category)
-    elsif consequent_tag.general? && !antecedent_tag.general?
-      consequent_tag.update!(category: antecedent_tag.category)
-    end
-  end
-
-  def rename_wiki_and_artist
-    antecedent_wiki = WikiPage.titled(antecedent_name).first
-    if antecedent_wiki.present?
-      if WikiPage.titled(consequent_name).blank?
-        antecedent_wiki.update!(title: consequent_name)
-      end
-    end
-
-    if antecedent_tag.artist?
-      if antecedent_tag.artist.present? && consequent_tag.artist.blank?
-        antecedent_tag.artist.update!(name: consequent_name)
-      end
-    end
-  end
-
-  def wiki_pages_present
-    if antecedent_wiki.present? && consequent_wiki.present?
-      errors[:base] << "The tag alias [[#{antecedent_name}]] -> [[#{consequent_name}]] has conflicting wiki pages. [[#{consequent_name}]] should be updated to include information from [[#{antecedent_name}]] if necessary."
     end
   end
 

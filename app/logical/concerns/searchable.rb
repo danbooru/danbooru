@@ -57,12 +57,12 @@ module Searchable
 
   # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-REGEXP
   # "(?e)" means force use of ERE syntax; see sections 9.7.3.1 and 9.7.3.4.
-  def where_regex(attr, value)
-    where("#{qualified_column_for(attr)} ~ ?", "(?e)" + value)
+  def where_regex(attr, value, flags: "e")
+    where("#{qualified_column_for(attr)} ~ ?", "(?#{flags})" + value)
   end
 
-  def where_not_regex(attr, value)
-    where.not("#{qualified_column_for(attr)} ~ ?", "(?e)" + value)
+  def where_not_regex(attr, value, flags: "e")
+    where.not("#{qualified_column_for(attr)} ~ ?", "(?#{flags})" + value)
   end
 
   def where_inet_matches(attr, value)

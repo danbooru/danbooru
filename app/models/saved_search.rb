@@ -137,6 +137,14 @@ class SavedSearch < ApplicationRecord
         queries = searches.map(&:normalized_query)
         queries.sort.uniq
       end
+
+      def rewrite_queries!(old_name, new_name)
+        has_tag(old_name).find_each do |ss|
+          ss.lock!
+          ss.rewrite_query(old_name, new_name)
+          ss.save!
+        end
+      end
     end
 
     def normalized_query
@@ -145,6 +153,11 @@ class SavedSearch < ApplicationRecord
 
     def normalize_query
       self.query = PostQueryBuilder.new(query).normalized_query(sort: false).to_s
+    end
+
+    def rewrite_query(old_name, new_name)
+      self.query.gsub!(/(?:\A| )([-~])?#{Regexp.escape(old_name)}(?: |\z)/i) { " #{$1}#{new_name} " }
+      self.query.strip!
     end
   end
 
@@ -155,6 +168,7 @@ class SavedSearch < ApplicationRecord
   before_validation :normalize_query
   before_validation :normalize_labels
   scope :labeled, ->(label) { where_array_includes_any_lower(:labels, [normalize_label(label)]) }
+  scope :has_tag, ->(name) { where_regex(:query, "(^| )[~-]?#{Regexp.escape(name)}( |$)", flags: "i") }
 
   def validate_count
     if user.saved_searches.count + 1 > user.max_saved_searches

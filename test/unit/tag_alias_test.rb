@@ -67,17 +67,6 @@ class TagAliasTest < ActiveSupport::TestCase
       end
     end
 
-    context "on secondary validation" do
-      should "warn about conflicting wiki pages" do
-        FactoryBot.create(:wiki_page, title: "aaa", body: "aaa")
-        FactoryBot.create(:wiki_page, title: "bbb", body: "bbb")
-        ti = FactoryBot.build(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", skip_secondary_validations: false)
-
-        assert(ti.invalid?)
-        assert_includes(ti.errors[:base], "The tag alias [[aaa]] -> [[bbb]] has conflicting wiki pages. [[bbb]] should be updated to include information from [[aaa]] if necessary.")
-      end
-    end
-
     should "populate the creator information" do
       ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", creator: CurrentUser.user)
       assert_equal(CurrentUser.user.id, ta.creator_id)
@@ -97,15 +86,21 @@ class TagAliasTest < ActiveSupport::TestCase
 
     context "saved searches" do
       should "move saved searches" do
-        tag1 = FactoryBot.create(:tag, :name => "...")
-        tag2 = FactoryBot.create(:tag, :name => "bbb")
-        ss = FactoryBot.create(:saved_search, :query => "123 ... 456", :user => CurrentUser.user)
-        ta = FactoryBot.create(:tag_alias, :antecedent_name => "...", :consequent_name => "bbb")
+        @ss1 = create(:saved_search, query: "123 ... 456", user: CurrentUser.user)
+        @ss2 = create(:saved_search, query: "123 -... 456", user: CurrentUser.user)
+        @ss3 = create(:saved_search, query: "123 ~... 456", user: CurrentUser.user)
+        @ss4 = create(:saved_search, query: "... 456", user: CurrentUser.user)
+        @ss5 = create(:saved_search, query: "123 ...", user: CurrentUser.user)
+        @ta = create(:tag_alias, antecedent_name: "...", consequent_name: "bbb")
 
-        ta.approve!(approver: @admin)
+        @ta.approve!(approver: @admin)
         perform_enqueued_jobs
 
-        assert_equal(%w(123 456 bbb), ss.reload.query.split.sort)
+        assert_equal("123 bbb 456", @ss1.reload.query)
+        assert_equal("123 -bbb 456", @ss2.reload.query)
+        assert_equal("123 ~bbb 456", @ss3.reload.query)
+        assert_equal("bbb 456", @ss4.reload.query)
+        assert_equal("123 bbb", @ss5.reload.query)
       end
     end
 
@@ -131,15 +126,109 @@ class TagAliasTest < ActiveSupport::TestCase
       end
     end
 
-    should "move existing wikis" do
-      wiki = create(:wiki_page, title: "aaa")
-      ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
+    context "when the tags have wikis" do
+      should "rename the old wiki if there is no conflict" do
+        @wiki = create(:wiki_page, title: "aaa")
+        @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
 
-      ta.approve!(approver: @admin)
-      perform_enqueued_jobs
+        @ta.approve!(approver: @admin)
+        perform_enqueued_jobs
+        assert_equal("active", @ta.reload.status)
 
-      assert_equal("bbb", wiki.reload.title)
+        assert_equal("bbb", @wiki.reload.title)
+      end
+
+      should "merge existing wikis if there is a conflict" do
+        @wiki1 = create(:wiki_page, title: "aaa", other_names: "111 222", body: "first")
+        @wiki2 = create(:wiki_page, title: "bbb", other_names: "111 333", body: "second")
+        @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
+
+        @ta.approve!(approver: @admin)
+        perform_enqueued_jobs
+        assert_equal("active", @ta.reload.status)
+
+        assert_equal(true, @wiki1.reload.is_deleted)
+        assert_equal([], @wiki1.other_names)
+        assert_equal("This tag has been moved to [[#{@wiki2.title}]].", @wiki1.body)
+
+        assert_equal(false, @wiki2.reload.is_deleted)
+        assert_equal(%w[111 333 222], @wiki2.other_names)
+        assert_equal("second", @wiki2.body)
+      end
+
+      should "ignore the old wiki if it has been deleted" do
+        @wiki1 = create(:wiki_page, title: "aaa", other_names: "111 222", body: "first", is_deleted: true)
+        @wiki2 = create(:wiki_page, title: "bbb", other_names: "111 333", body: "second")
+        @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
+
+        @ta.approve!(approver: @admin)
+        perform_enqueued_jobs
+        assert_equal("active", @ta.reload.status)
+
+        assert_equal(true, @wiki1.reload.is_deleted)
+        assert_equal(%w[111 222], @wiki1.other_names)
+        assert_equal("first", @wiki1.body)
+
+        assert_equal(false, @wiki2.reload.is_deleted)
+        assert_equal(%w[111 333], @wiki2.other_names)
+        assert_equal("second", @wiki2.body)
+      end
     end
+
+    context "when the tags have artist entries" do
+      should "rename the old artist entry if there is no conflict" do
+        @artist = create(:artist, name: "aaa")
+        @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
+
+        @ta.approve!(approver: @admin)
+        perform_enqueued_jobs
+        assert_equal("active", @ta.reload.status)
+
+        assert_equal("bbb", @artist.reload.name)
+      end
+
+      should "merge existing artists if there is a conflict" do
+        @tag = create(:tag, name: "aaa", category: Tag.categories.artist)
+        @artist1 = create(:artist, name: "aaa", group_name: "g_aaa", other_names: "111 222", url_string: "https://twitter.com/111\n-https://twitter.com/222")
+        @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://twitter.com/111\n-https://twitter.com/333\nhttps://twitter.com/444")
+        @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
+
+        @ta.approve!(approver: @admin)
+        perform_enqueued_jobs
+        assert_equal("active", @ta.reload.status)
+
+        assert_equal(true, @artist1.reload.is_deleted)
+        assert_equal([@artist2.name], @artist1.other_names)
+        assert_equal("", @artist1.group_name)
+        assert_equal([], @artist1.url_array)
+
+        assert_equal(false, @artist2.reload.is_deleted)
+        assert_equal(%w[111 333 222 aaa], @artist2.other_names)
+        assert_equal("g_aaa", @artist2.group_name)
+        assert_equal(%w[-https://twitter.com/222 -https://twitter.com/333 https://twitter.com/111 https://twitter.com/444], @artist2.url_array)
+      end
+
+      should "ignore the old artist if it has been deleted" do
+        @artist1 = create(:artist, name: "aaa", group_name: "g_aaa", other_names: "111 222", url_string: "https://twitter.com/111\n-https://twitter.com/222", is_deleted: true)
+        @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://twitter.com/111\n-https://twitter.com/333\nhttps://twitter.com/444")
+        @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
+
+        @ta.approve!(approver: @admin)
+        perform_enqueued_jobs
+        assert_equal("active", @ta.reload.status)
+
+        assert_equal(true, @artist1.reload.is_deleted)
+        assert_equal(%w[111 222], @artist1.other_names)
+        assert_equal("g_aaa", @artist1.group_name)
+        assert_equal(%w[-https://twitter.com/222 https://twitter.com/111], @artist1.url_array)
+
+        assert_equal(false, @artist2.reload.is_deleted)
+        assert_equal(%w[111 333], @artist2.other_names)
+        assert_equal("", @artist2.group_name)
+        assert_equal(%w[-https://twitter.com/333 https://twitter.com/111 https://twitter.com/444], @artist2.url_array)
+      end
+    end
+
 
     should "move existing aliases" do
       ta1 = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :status => "pending")
