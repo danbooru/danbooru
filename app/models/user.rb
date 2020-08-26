@@ -125,6 +125,8 @@ class User < ApplicationRecord
   scope :undeleted, -> { where("name !~ 'user_[0-9]+~*'") }
   scope :admins, -> { where(level: Levels::ADMIN) }
 
+  scope :has_blacklisted_tag, ->(name) { where_regex(:blacklisted_tags, "(^| )[~-]?#{Regexp.escape(name)}( |$)", flags: "ni") }
+
   module BanMethods
     def unban!
       self.is_banned = false
@@ -312,9 +314,24 @@ class User < ApplicationRecord
     end
   end
 
-  module BlacklistMethods
+  concerning :BlacklistMethods do
+    class_methods do
+      def rewrite_blacklists!(old_name, new_name)
+        has_blacklisted_tag(old_name).find_each do |user|
+          user.lock!
+          user.rewrite_blacklist(old_name, new_name)
+          user.save!
+        end
+      end
+    end
+
+    def rewrite_blacklist(old_name, new_name)
+      self.blacklisted_tags.gsub!(/(?:^| )([-~])?#{Regexp.escape(old_name)}(?: |$)/i) { " #{$1}#{new_name} " }
+    end
+
     def normalize_blacklisted_tags
-      self.blacklisted_tags = blacklisted_tags.downcase if blacklisted_tags.present?
+      return unless blacklisted_tags.present?
+      self.blacklisted_tags = self.blacklisted_tags.lines.map(&:strip).join("\n")
     end
   end
 
@@ -581,7 +598,6 @@ class User < ApplicationRecord
   include BanMethods
   include LevelMethods
   include EmailMethods
-  include BlacklistMethods
   include ForumMethods
   include LimitMethods
   include ApiMethods

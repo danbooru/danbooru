@@ -104,6 +104,30 @@ class TagAliasTest < ActiveSupport::TestCase
       end
     end
 
+    context "blacklists" do
+      should "move blacklists" do
+        @u1 = create(:user, blacklisted_tags: "111 ... 222")
+        @u2 = create(:user, blacklisted_tags: "111 -... -222")
+        @u3 = create(:user, blacklisted_tags: "111 ~... ~222")
+        @u4 = create(:user, blacklisted_tags: "... 222")
+        @u5 = create(:user, blacklisted_tags: "111 ...")
+        @u6 = create(:user, blacklisted_tags: "111 222\n\n... 333\n")
+        @u7 = create(:user, blacklisted_tags: "111 ...\r\n222 333\n")
+        @ta = create(:tag_alias, antecedent_name: "...", consequent_name: "aaa")
+
+        @ta.approve!(approver: @admin)
+        perform_enqueued_jobs
+
+        assert_equal("111 aaa 222", @u1.reload.blacklisted_tags)
+        assert_equal("111 -aaa -222", @u2.reload.blacklisted_tags)
+        assert_equal("111 ~aaa ~222", @u3.reload.blacklisted_tags)
+        assert_equal("aaa 222", @u4.reload.blacklisted_tags)
+        assert_equal("111 aaa", @u5.reload.blacklisted_tags)
+        assert_equal("111 222\n\naaa 333", @u6.reload.blacklisted_tags)
+        assert_equal("111 aaa\n222 333", @u7.reload.blacklisted_tags)
+      end
+    end
+
     should "update any affected posts when saved" do
       post1 = FactoryBot.create(:post, :tag_string => "aaa bbb")
       post2 = FactoryBot.create(:post, :tag_string => "ccc ddd")
