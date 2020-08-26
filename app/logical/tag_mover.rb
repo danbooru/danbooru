@@ -14,6 +14,7 @@ class TagMover
       move_wiki!
       move_saved_searches!
       move_blacklists!
+      rewrite_wiki_links!
       move_posts!
     end
   end
@@ -61,6 +62,10 @@ class TagMover
 
   def move_blacklists!
     User.rewrite_blacklists!(old_tag.name, new_tag.name)
+  end
+
+  def rewrite_wiki_links!
+    WikiPage.rewrite_wiki_links!(old_tag.name, new_tag.name)
   end
 
   def merge_artists!

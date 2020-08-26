@@ -222,6 +222,16 @@ class WikiPage < ApplicationRecord
     TagAlias.to_aliased(titles & tags)
   end
 
+  def self.rewrite_wiki_links!(old_name, new_name)
+    broken_wikis = WikiPage.linked_to(old_name)
+
+    broken_wikis.each do |wiki|
+      wiki.lock!
+      wiki.body = DText.rewrite_wiki_links(wiki.body, old_name, new_name)
+      wiki.save!
+    end
+  end
+
   def to_param
     if title =~ /\A\d+\z/
       "~#{title}"

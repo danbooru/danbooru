@@ -197,6 +197,17 @@ class TagAliasTest < ActiveSupport::TestCase
         assert_equal(%w[111 333], @wiki2.other_names)
         assert_equal("second", @wiki2.body)
       end
+
+      should "rewrite links in other wikis to use the new tag" do
+        @wiki = create(:wiki_page, body: "foo [[aaa]] bar")
+        @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
+
+        @ta.approve!(approver: @admin)
+        perform_enqueued_jobs
+        assert_equal("active", @ta.reload.status)
+
+        assert_equal("foo [[bbb]] bar", @wiki.reload.body)
+      end
     end
 
     context "when the tags have artist entries" do

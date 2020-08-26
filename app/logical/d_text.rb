@@ -157,6 +157,52 @@ class DText
       Set.new(parse_external_links(a)) != Set.new(parse_external_links(b))
   end
 
+  # Rewrite wiki links to [[old_name]] with [[new_name]]. We attempt to match
+  # the capitalization of the old tag when rewriting it to the new tag, but if
+  # we can't determine how the new tag should be capitalized based on some
+  # simple heuristics, then we skip rewriting the tag.
+  def self.rewrite_wiki_links(dtext, old_name, new_name)
+    old_name = old_name.downcase.squeeze("_").tr("_", " ").strip
+    new_name = new_name.downcase.squeeze("_").tr("_", " ").strip
+
+    # Match `[[name]]` or `[[name|title]]`
+    dtext.gsub(/\[\[(.*?)(?:\|(.*?))?\]\]/) do |match|
+      name = $1
+      title = $2
+
+      # Skip this link if it isn't the tag we're trying to replace.
+      normalized_name = name.downcase.tr("_", " ").squeeze(" ").strip
+      next match if normalized_name != old_name
+
+      # Strip qualifiers, e.g. `atago (midsummer march) (azur lane)` => `atago`
+      unqualified_name = name.tr("_", " ").squeeze(" ").strip.gsub(/( \(.*\))+\z/, "")
+      has_qualifier = name.match?(/( \(.*\))+\z/)
+
+      # If old tag was lowercase, e.g. [[ink tank (Splatoon)]], then keep new tag in lowercase.
+      if unqualified_name == unqualified_name.downcase
+        final_name = new_name
+      # If old tag was capitalized, e.g. [[Colored pencil (medium)]], then capitialize new tag.
+      elsif unqualified_name == unqualified_name.downcase.capitalize
+        final_name = new_name.capitalize
+      # If old tag was in titlecase, e.g. [[Hatsune Miku (cosplay)]], then titlecase new tag.
+      elsif unqualified_name == unqualified_name.split.map(&:capitalize).join(" ")
+        final_name = new_name.split.map(&:capitalize).join(" ")
+      # If we can't determine how to capitalize the new tag, then keep the old tag.
+      # e.g. [[Suzumiya Haruhi no Yuuutsu]] -> [[The Melancholy of Haruhi Suzumiya]]
+      else
+        next match
+      end
+
+      if title.present?
+        "[[#{final_name}|#{title}]]"
+      elsif has_qualifier
+        "[[#{final_name}|]]"
+      else
+        "[[#{final_name}]]"
+      end
+    end
+  end
+
   def self.strip_blocks(string, tag)
     n = 0
     stripped = ""
