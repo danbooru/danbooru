@@ -210,6 +210,21 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(false, @bur.valid?)
           assert_equal(["Can't rename aaa -> bbb (the 'aaa' tag doesn't exist)"], @bur.errors.full_messages)
         end
+
+        context "when renaming a character tag with a *_(cosplay) tag" do
+          should "move the *_(cosplay) tag as well" do
+            @post = create(:post, tag_string: "toosaka_rin_(cosplay)")
+            @wiki = create(:wiki_page, title: "toosaka_rin_(cosplay)")
+            @ta = create(:tag_alias, antecedent_name: "toosaka_rin", consequent_name: "tohsaka_rin")
+
+            @bur = create(:bulk_update_request, script: "rename toosaka_rin -> tohsaka_rin")
+            @bur.approve!(@admin)
+            perform_enqueued_jobs
+
+            assert_equal("cosplay tohsaka_rin tohsaka_rin_(cosplay)", @post.reload.tag_string)
+            assert_equal("tohsaka_rin_(cosplay)", @wiki.reload.title)
+          end
+        end
       end
     end
 

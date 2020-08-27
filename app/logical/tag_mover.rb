@@ -9,6 +9,7 @@ class TagMover
 
   def move!
     CurrentUser.scoped(user) do
+      move_cosplay_tag!
       move_tag_category!
       move_artist!
       move_wiki!
@@ -53,6 +54,15 @@ class TagMover
       post.remove_tag(old_tag.name)
       post.add_tag(new_tag.name)
       post.save!
+    end
+  end
+
+  def move_cosplay_tag!
+    old_cosplay_tag = "#{old_tag.name}_(cosplay)"
+    new_cosplay_tag = "#{new_tag.name}_(cosplay)"
+
+    if Tag.nonempty.where(name: old_cosplay_tag).exists?
+      TagMover.new(old_cosplay_tag, new_cosplay_tag).move!
     end
   end
 
