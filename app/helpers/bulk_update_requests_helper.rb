@@ -1,13 +1,14 @@
 module BulkUpdateRequestsHelper
   def bur_script_example
     <<~EOS
-      create alias kitty -> cat
-      remove alias kitty -> cat
+      create alias bunny -> rabbit
+      remove alias bunny -> rabbit
 
-      create implication cat -> animal
-      remove implication cat -> animal
+      create implication bunny -> animal
+      remove implication bunny -> animal
 
-      mass update kitty -> cat
+      rename bunny -> rabbit
+
       category touhou -> copyright
     EOS
   end

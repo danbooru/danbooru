@@ -26,6 +26,8 @@ class BulkUpdateRequestProcessor
         [:remove_alias, Tag.normalize_name($1), Tag.normalize_name($2)]
       when /\A(?:remove implication|unimply) (\S+) -> (\S+)\z/i
         [:remove_implication, Tag.normalize_name($1), Tag.normalize_name($2)]
+      when /\Arename (\S+) -> (\S+)\z/i
+        [:rename, Tag.normalize_name($1), Tag.normalize_name($2)]
       when /\A(?:mass update|update) (.+?) -> (.*)\z/i
         [:mass_update, $1, $2]
       when /\Acategory (\S+) -> (#{Tag.categories.regexp})\z/i
@@ -69,6 +71,12 @@ class BulkUpdateRequestProcessor
           errors[:base] << "Can't change category #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)"
         end
 
+      when :rename
+        tag = Tag.find_by_name(args[0])
+        if tag.nil?
+          errors[:base] << "Can't rename #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)"
+        end
+
       when :mass_update
         # okay
 
@@ -105,7 +113,10 @@ class BulkUpdateRequestProcessor
           tag_implication.reject!
 
         when :mass_update
-          TagBatchChangeJob.perform_later(args[0], args[1], User.system, "127.0.0.1")
+          TagBatchChangeJob.perform_later(args[0], args[1])
+
+        when :rename
+          TagRenameJob.perform_later(args[0], args[1])
 
         when :change_category
           tag = Tag.find_or_create_by_name(args[0])
@@ -122,7 +133,7 @@ class BulkUpdateRequestProcessor
   def affected_tags
     commands.flat_map do |command, *args|
       case command
-      when :create_alias, :remove_alias, :create_implication, :remove_implication
+      when :create_alias, :remove_alias, :create_implication, :remove_implication, :rename
         [args[0], args[1]]
       when :mass_update
         tags = PostQueryBuilder.new(args[0]).tags + PostQueryBuilder.new(args[1]).tags
@@ -136,7 +147,7 @@ class BulkUpdateRequestProcessor
   def is_tag_move_allowed?
     commands.all? do |command, *args|
       case command
-      when :create_alias
+      when :create_alias, :rename
         BulkUpdateRequestProcessor.is_tag_move_allowed?(args[0], args[1])
       when :mass_update
         lhs = PostQueryBuilder.new(args[0])
@@ -152,7 +163,7 @@ class BulkUpdateRequestProcessor
   def to_dtext
     commands.map do |command, *args|
       case command
-      when :create_alias, :create_implication, :remove_alias, :remove_implication
+      when :create_alias, :create_implication, :remove_alias, :remove_implication, :rename
         "#{command.to_s.tr("_", " ")} [[#{args[0]}]] -> [[#{args[1]}]]"
       when :mass_update
         "mass update {{#{args[0]}}} -> #{args[1]}"

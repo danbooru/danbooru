@@ -182,6 +182,35 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal("Imageboard", @post.reload.source)
         end
       end
+
+      context "the rename command" do
+        setup do
+          @artist = create(:artist, name: "foo")
+          @wiki = create(:wiki_page, title: "foo", body: "[[foo]]")
+          @post = create(:post, tag_string: "foo blah")
+          @bur = create(:bulk_update_request, script: "rename foo -> bar")
+          @bur.approve!(@admin)
+          perform_enqueued_jobs
+        end
+
+        should "rename the tags" do
+          assert_equal("approved", @bur.status)
+          assert_equal("bar blah", @post.reload.tag_string)
+        end
+
+        should "move the tag's artist entry and wiki page" do
+          assert_equal("bar", @artist.reload.name)
+          assert_equal("bar", @wiki.reload.title)
+          assert_equal("[[bar]]", @wiki.body)
+        end
+
+        should "fail if the old tag doesn't exist" do
+          @bur = build(:bulk_update_request, script: "rename aaa -> bbb")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't rename aaa -> bbb (the 'aaa' tag doesn't exist)"], @bur.errors.full_messages)
+        end
+      end
     end
 
     context "when validating a script" do
