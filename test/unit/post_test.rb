@@ -1296,6 +1296,14 @@ class PostTest < ActiveSupport::TestCase
           refute(@post.has_tag?("cosplay"))
           assert(@post.warnings[:base].grep(/Couldn't add tag/).present?)
         end
+
+        should "allow creating a _(cosplay) tag for an empty general tag" do
+          @tag = create(:tag, name: "hatsune_miku", post_count: 0, category: Tag.categories.general)
+          @post = create(:post, tag_string: "hatsune_miku_(cosplay)")
+
+          assert_equal("cosplay hatsune_miku hatsune_miku_(cosplay)", @post.reload.tag_string)
+          assert_equal(true, @tag.reload.character?)
+        end
       end
 
       context "that has been updated" do

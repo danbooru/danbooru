@@ -31,7 +31,7 @@ class TagNameValidator < ActiveModel::EachValidator
       tag_name = TagAlias.to_aliased([$1]).first
       tag = Tag.find_by_name(tag_name)
 
-      if tag.present? && !tag.character?
+      if tag.present? && !tag.empty? && !tag.character?
         record.errors[attribute] << "#{tag_name} must be a character tag"
       end
     end
