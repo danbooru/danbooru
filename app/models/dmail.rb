@@ -6,10 +6,11 @@ class Dmail < ApplicationRecord
   belongs_to :owner, :class_name => "User"
   belongs_to :to, :class_name => "User"
   belongs_to :from, :class_name => "User"
-  has_many :moderation_reports, as: :model
+  has_many :moderation_reports, as: :model, dependent: :destroy
 
   before_create :autoreport_spam
   after_save :update_unread_dmail_count
+  after_destroy :update_unread_dmail_count
   after_commit :send_email, on: :create
 
   deletable
@@ -160,7 +161,7 @@ class Dmail < ApplicationRecord
   end
 
   def update_unread_dmail_count
-    return unless saved_change_to_id? || saved_change_to_is_read? || saved_change_to_is_deleted?
+    return unless saved_change_to_id? || saved_change_to_is_read? || saved_change_to_is_deleted? || destroyed?
 
     owner.with_lock do
       unread_count = owner.dmails.active.unread.count

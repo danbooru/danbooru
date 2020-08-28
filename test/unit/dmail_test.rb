@@ -104,6 +104,31 @@ class DmailTest < ActiveSupport::TestCase
       end
     end
 
+    context "destroying a dmail" do
+      setup do
+        @recipient = create(:user)
+        @dmail = Dmail.create_split(from: @user, to: @recipient, creator_ip_addr: "127.0.0.1", title: "foo", body: "foo")
+        @modreport = create(:moderation_report, model: @dmail)
+      end
+
+      should "update both users' unread dmail counts" do
+        assert_equal(0, @user.reload.unread_dmail_count)
+        assert_equal(1, @recipient.reload.unread_dmail_count)
+
+        @user.dmails.last.destroy!
+        @recipient.dmails.last.destroy!
+
+        assert_equal(0, @user.reload.unread_dmail_count)
+        assert_equal(0, @recipient.reload.unread_dmail_count)
+      end
+
+      should "destroy any associated moderation reports" do
+        assert_equal(1, @dmail.moderation_reports.count)
+        @dmail.destroy!
+        assert_equal(0, @dmail.moderation_reports.count)
+      end
+    end
+
     context "during validation" do
       subject { FactoryBot.build(:dmail) }
 
