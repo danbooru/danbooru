@@ -161,14 +161,23 @@ class SavedSearchTest < ActiveSupport::TestCase
 
   context "A user with max saved searches" do
     setup do
-      @user = FactoryBot.create(:gold_user)
-      CurrentUser.user = @user
-      User.any_instance.stubs(:max_saved_searches).returns(0)
-      @saved_search = @user.saved_searches.create(:query => "xxx")
+      @user = create(:gold_user)
+      User.any_instance.stubs(:max_saved_searches).returns(1)
+      @ss1 = create(:saved_search, user: @user)
     end
 
     should "not be able to create another saved search" do
-      assert_equal(["You can only have up to 0 saved searches"], @saved_search.errors.full_messages)
+      @ss2 = build(:saved_search, user: @user)
+
+      assert_equal(false, @ss2.valid?)
+      assert_equal(["You can only have up to 1 saved search"], @ss2.errors.full_messages)
+    end
+
+    should "be able to edit existing saved searches" do
+      @ss1.update!(query: "blah")
+
+      assert_equal(true, @ss1.valid?)
+      assert_equal("blah", @ss1.query)
     end
   end
 end

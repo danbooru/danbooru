@@ -8,7 +8,7 @@ class SavedSearch < ApplicationRecord
   before_validation :normalize_query
   before_validation :normalize_labels
   validates :query, presence: true
-  validate :validate_count
+  validate :validate_count, on: :create
 
   scope :labeled, ->(label) { where_array_includes_any_lower(:labels, [normalize_label(label)]) }
   scope :has_tag, ->(name) { where_regex(:query, "(^| )[~-]?#{Regexp.escape(name)}( |$)", flags: "i") }
@@ -173,7 +173,7 @@ class SavedSearch < ApplicationRecord
   end
 
   def validate_count
-    if user.saved_searches.count + 1 > user.max_saved_searches
+    if user.saved_searches.count >= user.max_saved_searches
       self.errors[:user] << "can only have up to #{user.max_saved_searches} " + "saved search".pluralize(user.max_saved_searches)
     end
   end
