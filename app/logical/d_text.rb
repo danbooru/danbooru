@@ -176,7 +176,6 @@ class DText
 
       # Strip qualifiers, e.g. `atago (midsummer march) (azur lane)` => `atago`
       unqualified_name = name.tr("_", " ").squeeze(" ").strip.gsub(/( \(.*\))+\z/, "")
-      has_qualifier = name.match?(/( \(.*\))+\z/)
 
       # If old tag was lowercase, e.g. [[ink tank (Splatoon)]], then keep new tag in lowercase.
       if unqualified_name == unqualified_name.downcase
@@ -195,7 +194,8 @@ class DText
 
       if title.present?
         "[[#{final_name}|#{title}]]"
-      elsif has_qualifier
+      # If the new name has a qualifier, then hide the qualifier in the link.
+      elsif final_name.match?(/( \(.*\))+\z/)
         "[[#{final_name}|]]"
       else
         "[[#{final_name}]]"

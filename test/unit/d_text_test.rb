@@ -151,6 +151,8 @@ class DTextTest < ActiveSupport::TestCase
 
         assert_rewrite_wiki_links("[[Zelda no Densetsu]]", "[[Zelda no Densetsu]]", "zelda_no_densetsu", "the_legend_of_zelda")
         assert_rewrite_wiki_links("[[Zelda_no_Densetsu]]", "[[Zelda_no_Densetsu]]", "zelda_no_densetsu", "the_legend_of_zelda")
+
+        assert_rewrite_wiki_links("[[Mario (series)|]]", "[[Mario]]", "mario", "mario_(series)")
       end
     end
 
