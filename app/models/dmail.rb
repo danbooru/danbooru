@@ -1,6 +1,7 @@
 require 'digest/sha1'
 
 class Dmail < ApplicationRecord
+  validate :validate_sender_is_not_limited, on: :create
   validates_presence_of :title, :body, on: :create
 
   belongs_to :owner, :class_name => "User"
@@ -151,6 +152,14 @@ class Dmail < ApplicationRecord
 
   def is_recipient?
     owner == to
+  end
+
+  def validate_sender_is_not_limited
+    return if from.is_gold?
+
+    if from.dmails.where("created_at > ?", 1.hour.ago).group(:to).reorder(nil).count.size >= 10
+      errors[:base] << "You can't send dmails to more than 10 users per hour"
+    end
   end
 
   def autoreport_spam
