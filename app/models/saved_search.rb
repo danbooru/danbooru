@@ -2,6 +2,17 @@ class SavedSearch < ApplicationRecord
   REDIS_EXPIRY = 1.hour
   QUERY_LIMIT = 1000
 
+  attr_reader :disable_labels
+  belongs_to :user
+
+  before_validation :normalize_query
+  before_validation :normalize_labels
+  validates :query, presence: true
+  validate :validate_count
+
+  scope :labeled, ->(label) { where_array_includes_any_lower(:labels, [normalize_label(label)]) }
+  scope :has_tag, ->(name) { where_regex(:query, "(^| )[~-]?#{Regexp.escape(name)}( |$)", flags: "i") }
+
   concerning :Redis do
     extend Memoist
 
@@ -160,15 +171,6 @@ class SavedSearch < ApplicationRecord
       self.query.strip!
     end
   end
-
-  attr_reader :disable_labels
-  belongs_to :user
-  validates :query, presence: true
-  validate :validate_count
-  before_validation :normalize_query
-  before_validation :normalize_labels
-  scope :labeled, ->(label) { where_array_includes_any_lower(:labels, [normalize_label(label)]) }
-  scope :has_tag, ->(name) { where_regex(:query, "(^| )[~-]?#{Regexp.escape(name)}( |$)", flags: "i") }
 
   def validate_count
     if user.saved_searches.count + 1 > user.max_saved_searches
