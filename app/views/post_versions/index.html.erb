@@ -13,8 +13,7 @@
       <%= f.input :updater_name, label: "Updater", input_html: { "data-autocomplete": "user", value: params.dig(:search, :updater_name) } %>
       <%= f.input :added_tags_include_all, label: "Added Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :added_tags_include_all) } %>
       <%= f.input :removed_tags_include_all, label: "Removed Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :removed_tags_include_all) } %>
-      <%= f.input :all_changed_tags, label: "All Changed Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :all_changed_tags) }, hint: "All tags must appear in either tag adds or removes" %>
-      <%= f.input :any_changed_tags, label: "Any Changed Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :any_changed_tags) }, hint: "Any tag must appear in either tag adds or removes" %>
+      <%= f.input :changed_tags, label: "Changed Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :changed_tags) }, hint: "Added or removed tags" %>
       <%= f.submit "Search" %>
       <%= link_to "Advanced", search_post_versions_path(params.except(:controller, :action, :index, :commit, :type).permit!), class: "advanced-search-link" %>
     <% end %>
