@@ -3,7 +3,7 @@ class ReportbooruService
 
   def initialize(http: Danbooru::Http.new, reportbooru_server: Danbooru.config.reportbooru_server)
     @reportbooru_server = reportbooru_server
-    @http = http
+    @http = http.timeout(0.5)
   end
 
   def enabled?
@@ -28,9 +28,9 @@ class ReportbooruService
     request("#{reportbooru_server}/post_views/rank?date=#{date}", expires_in)
   end
 
-  def popular_searches(date, limit: 100)
-    ranking = post_search_rankings(date)
-    ranking = post_search_rankings(date.yesterday) if ranking.blank?
+  def popular_searches(date, limit: 100, expires_in: 1.hour)
+    ranking = post_search_rankings(date, expires_in: expires_in)
+    ranking = post_search_rankings(date.yesterday, expires_in: expires_in) if ranking.blank?
     ranking.take(limit).map(&:first)
   end
 
