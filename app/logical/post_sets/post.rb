@@ -176,7 +176,6 @@ module PostSets
       end
 
       def popular_tags
-        return []
         ReportbooruService.new.popular_searches(Date.today, limit: MAX_SIDEBAR_TAGS)
       end
 
