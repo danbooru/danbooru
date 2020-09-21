@@ -16,7 +16,7 @@ class EmailAddress < ApplicationRecord
   end
 
   def nondisposable?
-    EmailValidator.nondisposable?(address)
+    EmailValidator.nondisposable?(normalized_address)
   end
 
   def validate_deliverable
