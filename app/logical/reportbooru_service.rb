@@ -3,7 +3,7 @@ class ReportbooruService
 
   def initialize(http: Danbooru::Http.new, reportbooru_server: Danbooru.config.reportbooru_server)
     @reportbooru_server = reportbooru_server
-    @http = http.timeout(0.5)
+    @http = http.timeout(1)
   end
 
   def enabled?
