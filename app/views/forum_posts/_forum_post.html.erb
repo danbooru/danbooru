@@ -1,5 +1,5 @@
 <% if policy(forum_post).show_deleted? %>
-  <article class="forum-post message" id="forum_post_<%= forum_post.id %>" 
+  <article class="forum-post message" id="forum_post_<%= forum_post.id %>"
            data-forum-post-id="<%= forum_post.id %>"
            <% if policy(moderation_reports).show? %>
             data-is-reported="<%= moderation_reports.pluck(:model_id).include?(forum_post.id) %>"

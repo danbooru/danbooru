@@ -9,7 +9,7 @@
 
     <p>
       Categories:
-      <%= link_to "All", forum_topics_path %>, 
+      <%= link_to "All", forum_topics_path %>,
       <%= link_to "New", forum_topics_path(search: { is_read: false }) %>,
       <% if policy(ForumTopic).moderate? %>
         <%= link_to "Private", forum_topics_path(search: { is_private: true }) %>,

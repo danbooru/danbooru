@@ -335,17 +335,17 @@ module Sources
 
           [b]blah[/b] [i]blah[/i] [u]blah[/u] [s]blah[/s]
           herp derp
-          
+
           [quote]this is a quote[/quote]
-          
+
           * one
           * two
           * three
-          
+
           * one
           * two
           * three
-          
+
           "Heart":[https://e.deviantart.net/emoticons/h/heart.gif]
         EOS
 

@@ -1,7 +1,7 @@
 <section id="related-box">
   <h2>Related</h2>
   <ul id="related-list">
-    <% if discover_mode? %> 
+    <% if discover_mode? %>
       <li id="secondary-links-posts-hot"><%= link_to "Hot", posts_path(:tags => "order:rank") %></li>
       <li id="secondary-links-posts-popular"><%= link_to "Popular", popular_explore_posts_path %></li>
       <li id="secondary-links-posts-curated"><%= link_to "Curated", curated_explore_posts_path %></li>

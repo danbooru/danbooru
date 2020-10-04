@@ -62,8 +62,8 @@ WITH constants AS (
 
 
 -- autovacuum stats
-SELECT relname, last_vacuum, last_autovacuum, last_analyze, last_autoanalyze  
-FROM pg_stat_all_tables  
+SELECT relname, last_vacuum, last_autovacuum, last_analyze, last_autoanalyze
+FROM pg_stat_all_tables
 WHERE schemaname = 'public'
 and relname = 'posts';
 
@@ -135,7 +135,7 @@ SELECT
              WHEN number_of_columns = 1 THEN 0
              ELSE 1
            END) AS multi_column
-FROM pg_namespace 
+FROM pg_namespace
 LEFT OUTER JOIN pg_class ON pg_namespace.oid = pg_class.relnamespace
 LEFT OUTER JOIN
        (SELECT indrelid,
@@ -149,7 +149,7 @@ LEFT OUTER JOIN
            JOIN pg_class ipg ON ipg.oid = x.indexrelid  )
     AS foo
     ON pg_class.relname = foo.ctablename
-WHERE 
+WHERE
      pg_namespace.nspname='public'
 AND  pg_class.relkind = 'r'
 GROUP BY pg_class.relname, pg_class.reltuples, x.is_unique
