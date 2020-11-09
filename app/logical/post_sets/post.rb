@@ -176,10 +176,12 @@ module PostSets
       end
 
       def popular_tags
+        return []
         ReportbooruService.new.popular_searches(Date.today, limit: MAX_SIDEBAR_TAGS)
       end
 
       def similar_tags
+        return []
         RelatedTagCalculator.cached_similar_tags_for_search(normalized_query(implicit: false), MAX_SIDEBAR_TAGS)
       end
 

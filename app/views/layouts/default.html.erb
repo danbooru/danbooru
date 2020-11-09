@@ -47,7 +47,7 @@
   <%= raw Danbooru.config.custom_html_header_content %>
 </head>
 <%= tag.body **body_attributes(CurrentUser.user, params, @current_item) do %>
-  <%= render "news_updates/listing" %>
+  <%#= render "news_updates/listing" %>
 
   <header id="top">
     <%= link_to Danbooru.config.app_name, root_path, id: "app-name-header", class: "heading" %>
