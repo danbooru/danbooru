@@ -116,7 +116,7 @@ module Downloads
         should "download new novel images" do
           @file_url = "https://i.pximg.net/novel-cover-original/img/2017/07/27/23/14/17/8465454_80685d10e6df4d7d53ad347ddc18a36b.jpg"
           @ref = 'https://www.pixiv.net/novel/show.php?id=8465454&mode=cover'
-          @file_size = 532_129
+          @file_size = 532_037
 
           assert_not_rewritten(@file_url, @ref)
           assert_downloaded(@file_size, @file_url, @ref)

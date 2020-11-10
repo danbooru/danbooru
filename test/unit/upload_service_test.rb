@@ -135,9 +135,9 @@ class UploadServiceTest < ActiveSupport::TestCase
           @upload = @service.start!
 
           assert_equal("preprocessed", @upload.status)
-          assert_equal(294591, @upload.file_size)
+          assert_equal(317733, @upload.file_size)
           assert_equal("jpg", @upload.file_ext)
-          assert_equal("3cb1ef624714c15dbb2d6e7b1d57faef", @upload.md5)
+          assert_equal("4c71da5638b897aa6da1150e742e2982", @upload.md5)
           assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
           assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :preview)))
         end

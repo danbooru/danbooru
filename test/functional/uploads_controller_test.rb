@@ -362,7 +362,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         should_upload_successfully("https://twitter.com/noizave/status/875768175136317440")
         should_upload_successfully("https://pbs.twimg.com/media/DCdZ_FhUIAAYKFN?format=jpg&name=medium")
-        should_upload_successfully("https://pbs.twimg.com/profile_banners/1225702850002468864/1588597370/1500x500")
+        should_upload_successfully("https://pbs.twimg.com/profile_banners/1130156172399353857/1597419344/1500x500")
         # XXX should_upload_successfully("https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4")
 
         should_upload_successfully("https://www.weibo.com/5501756072/J2UNKfbqV")
@@ -372,8 +372,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://art.ngfiles.com/comments/57000/iu_57615_7115981.jpg")
         should_upload_successfully("https://www.newgrounds.com/art/view/puddbytes/costanza-at-bat")
 
-        should_upload_successfully("https://www.fanbox.cc/@tsukiori/posts/1080657")
-        should_upload_successfully("https://downloads.fanbox.cc/images/post/1080657/SaakPC251KafLL6jIo1WPPmr.png")
+        should_upload_successfully("https://kmyama.fanbox.cc/posts/104708")
+        should_upload_successfully("https://downloads.fanbox.cc/images/post/104708/wsF73EC5Fq0CIK84W0LGYk2p.jpeg")
       end
     end
   end

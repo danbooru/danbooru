@@ -4,10 +4,11 @@ module Sources
   class NewGroundsTest < ActiveSupport::TestCase
     context "The source for a newgrounds picture" do
       setup do
-        @url = "https://www.newgrounds.com/art/view/natthelich/fire-emblem-marth-plus-progress-pic"
-        @comment = "https://art.ngfiles.com/comments/57000/iu_57615_7115981.jpg"
+        @url = "https://www.newgrounds.com/art/view/natthelich/d-d-light-domain-cleric-nathaniel-8"
+        @image_url = "https://art.ngfiles.com/images/1138000/1138016_natthelich_d-d-light-domain-cleric-nathaniel-8.png?f1578591058"
+        @comment = "https://art.ngfiles.com/comments/84000/iu_84427_7115981.jpg"
         @image_1 = Sources::Strategies.find(@url)
-        @image_2 = Sources::Strategies.find("https://art.ngfiles.com/images/1033000/1033622_natthelich_fire-emblem-marth-plus-progress-pic.png?f1569487181")
+        @image_2 = Sources::Strategies.find(@image_url)
         @image_3 = Sources::Strategies.find(@comment, @url)
       end
 
@@ -18,9 +19,9 @@ module Sources
       end
 
       should "get the artist commentary title" do
-        assert_equal("Fire Emblem - Marth (plus progress pic)", @image_1.artist_commentary_title)
-        assert_equal("Fire Emblem - Marth (plus progress pic)", @image_2.artist_commentary_title)
-        assert_equal("Fire Emblem - Marth (plus progress pic)", @image_3.artist_commentary_title)
+        assert_equal("D&D - Light Domain Cleric, Nathaniel", @image_1.artist_commentary_title)
+        assert_equal("D&D - Light Domain Cleric, Nathaniel", @image_2.artist_commentary_title)
+        assert_equal("D&D - Light Domain Cleric, Nathaniel", @image_3.artist_commentary_title)
       end
 
       should "get profile url" do
@@ -30,10 +31,10 @@ module Sources
       end
 
       should "get the image urls" do
-        assert_match(%r{https?://art\.ngfiles\.com/images/1033000/1033622_natthelich_fire-emblem-marth-plus-progress-pic\.png(?:\?\w+)?}i, @image_1.image_url)
+        assert_match(%r{https://art.ngfiles.com/images/1138000/1138016_natthelich_d-d-light-domain-cleric-nathaniel-8.png}i, @image_1.image_url)
         assert_includes(@image_1.image_urls, @comment)
 
-        assert_match(%r{https?://art\.ngfiles\.com/images/1033000/1033622_natthelich_fire-emblem-marth-plus-progress-pic\.png(?:\?\w+)?}i, @image_2.image_url)
+        assert_match(%r{https://art.ngfiles.com/images/1138000/1138016_natthelich_d-d-light-domain-cleric-nathaniel-8.png}i, @image_2.image_url)
         assert_equal(@comment, @image_3.image_url)
       end
 
@@ -44,16 +45,18 @@ module Sources
       end
 
       should "download an image" do
-        assert_downloaded(630365, @image_1.image_url)
-        assert_downloaded(630365, @image_2.image_url)
-        assert_downloaded(129033, @image_3.image_url)
+        assert_downloaded(1195723, @image_1.image_url)
+        assert_downloaded(1195723, @image_2.image_url)
+        assert_downloaded(158058, @image_3.image_url)
       end
 
       should "get the tags" do
         tags = [
-          %w[fire-emblem https://www.newgrounds.com/search/conduct/art?match=tags&tags=fire-emblem],
-          %w[marth       https://www.newgrounds.com/search/conduct/art?match=tags&tags=marth      ]
+          %w[cleric https://www.newgrounds.com/search/conduct/art?match=tags&tags=cleric],
+          %w[nathaniel https://www.newgrounds.com/search/conduct/art?match=tags&tags=nathaniel],
+          %w[oc https://www.newgrounds.com/search/conduct/art?match=tags&tags=oc]
         ]
+
         assert_equal(tags, @image_1.tags)
         assert_equal(tags, @image_2.tags)
         assert_equal(tags, @image_3.tags)

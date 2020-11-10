@@ -98,7 +98,7 @@ module Sources
         end
 
         should "get the remote image size" do
-          assert_equal(854_653, @site.remote_size)
+          assert_equal(863_758, @site.remote_size)
         end
 
         should "get the full size image url" do
