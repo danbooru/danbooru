@@ -16,7 +16,7 @@ class TagRelationship < ApplicationRecord
   belongs_to :consequent_wiki, class_name: "WikiPage", foreign_key: "consequent_name", primary_key: "title", optional: true
 
   scope :active, -> {approved}
-  scope :approved, -> {where(status: %w[active processing queued])}
+  scope :approved, -> {where(status: %w[active processing])}
   scope :deleted, -> {where(status: "deleted")}
   scope :expired, -> {where("created_at < ?", EXPIRY.days.ago)}
   scope :old, -> {where("created_at >= ? and created_at < ?", EXPIRY.days.ago, EXPIRY_WARNING.days.ago)}
@@ -24,7 +24,7 @@ class TagRelationship < ApplicationRecord
   scope :retired, -> {where(status: "retired")}
 
   before_validation :normalize_names
-  validates_format_of :status, :with => /\A(active|deleted|pending|processing|queued|retired|error: .*)\Z/
+  validates_format_of :status, :with => /\A(active|deleted|pending|processing|retired|error: .*)\Z/
   validates_presence_of :antecedent_name, :consequent_name
   validates :approver, presence: { message: "must exist" }, if: -> { approver_id.present? }
   validates :forum_topic, presence: { message: "must exist" }, if: -> { forum_topic_id.present? }
@@ -36,7 +36,7 @@ class TagRelationship < ApplicationRecord
   end
 
   def is_approved?
-    status.in?(%w[active processing queued])
+    status.in?(%w[active processing])
   end
 
   def is_rejected?
@@ -76,7 +76,7 @@ class TagRelationship < ApplicationRecord
       status = status.downcase
 
       if status == "approved"
-        where(status: %w[active processing queued])
+        where(status: %w[active processing])
       else
         where(status: status)
       end
@@ -89,7 +89,7 @@ class TagRelationship < ApplicationRecord
 
     def pending_first
       # unknown statuses return null and are sorted first
-      order(Arel.sql("array_position(array['queued', 'processing', 'pending', 'active', 'deleted', 'retired'], status::text) NULLS FIRST, id DESC"))
+      order(Arel.sql("array_position(array['processing', 'pending', 'active', 'deleted', 'retired'], status::text) NULLS FIRST, id DESC"))
     end
 
     def search(params)

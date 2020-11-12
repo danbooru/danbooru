@@ -9,7 +9,7 @@
   <%= f.simple_fields_for :consequent_tag do |fa| %>
     <%= fa.input :category, label: "To Category", collection: TagCategory.canonical_mapping.to_a, include_blank: true, selected: params.dig(:search, :consequent_tag, :category) %>
   <% end %>
-  <%= f.input :status, label: "Status", collection: %w[Approved Active Pending Deleted Retired Processing Queued], include_blank: true, selected: params[:search][:status] %>
+  <%= f.input :status, label: "Status", collection: %w[Approved Active Pending Deleted Retired Processing], include_blank: true, selected: params[:search][:status] %>
   <%= f.input :order, label: "Order", collection: [%w[Created created_at], %w[Updated updated_at], %w[Name name], %w[Tag\ count tag_count], %w[Status status]], include_blank: true, selected: params[:search][:order] %>
   <%= f.submit "Search" %>
 <% end %>

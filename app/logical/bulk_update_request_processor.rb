@@ -98,11 +98,11 @@ class BulkUpdateRequestProcessor
         case command
         when :create_alias
           tag_alias = TagAlias.create!(creator: approver, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: args[0], consequent_name: args[1], skip_secondary_validations: skip_secondary_validations)
-          tag_alias.approve!(approver: approver)
+          tag_alias.approve!(approver)
 
         when :create_implication
           tag_implication = TagImplication.create!(creator: approver, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: args[0], consequent_name: args[1], skip_secondary_validations: skip_secondary_validations)
-          tag_implication.approve!(approver: approver)
+          tag_implication.approve!(approver)
 
         when :remove_alias
           tag_alias = TagAlias.active.find_by!(antecedent_name: args[0], consequent_name: args[1])

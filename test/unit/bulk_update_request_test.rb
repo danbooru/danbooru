@@ -226,6 +226,20 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           end
         end
       end
+
+      context "that contains a mass update followed by an alias" do
+        should "make the alias take effect after the mass update" do
+          @bur = create(:bulk_update_request, script: "mass update maid_dress -> maid dress\nalias maid_dress -> maid")
+          @p1 = create(:post, tag_string: "maid_dress")
+          @p2 = create(:post, tag_string: "maid")
+
+          @bur.approve!(@admin)
+          perform_enqueued_jobs
+
+          assert_equal("dress maid", @p1.reload.tag_string)
+          assert_equal("maid", @p2.reload.tag_string)
+        end
+      end
     end
 
     context "when validating a script" do

@@ -3,8 +3,8 @@ require 'test_helper'
 class TagImplicationTest < ActiveSupport::TestCase
   context "A tag implication" do
     setup do
-      user = FactoryBot.create(:admin_user)
-      CurrentUser.user = user
+      @admin = create(:admin_user)
+      CurrentUser.user = @admin
       CurrentUser.ip_addr = "127.0.0.1"
     end
 
@@ -24,7 +24,6 @@ class TagImplicationTest < ActiveSupport::TestCase
       should allow_value('deleted').for(:status)
       should allow_value('pending').for(:status)
       should allow_value('processing').for(:status)
-      should allow_value('queued').for(:status)
       should allow_value('error: derp').for(:status)
 
       should_not allow_value('ACTIVE').for(:status)
@@ -135,8 +134,8 @@ class TagImplicationTest < ActiveSupport::TestCase
       ti1 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "xxx")
       ti2 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "yyy")
 
-      ti1.approve!
-      ti2.approve!
+      ti1.approve!(@admin)
+      ti2.approve!(@admin)
       perform_enqueued_jobs
 
       assert_equal("aaa bbb ccc xxx yyy", p1.reload.tag_string)

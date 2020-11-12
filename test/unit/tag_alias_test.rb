@@ -28,7 +28,6 @@ class TagAliasTest < ActiveSupport::TestCase
       should allow_value('deleted').for(:status)
       should allow_value('pending').for(:status)
       should allow_value('processing').for(:status)
-      should allow_value('queued').for(:status)
       should allow_value('error: derp').for(:status)
 
       should_not allow_value('ACTIVE').for(:status)
@@ -93,7 +92,7 @@ class TagAliasTest < ActiveSupport::TestCase
         @ss5 = create(:saved_search, query: "123 ...", user: CurrentUser.user)
         @ta = create(:tag_alias, antecedent_name: "...", consequent_name: "bbb")
 
-        @ta.approve!(approver: @admin)
+        @ta.approve!(@admin)
         perform_enqueued_jobs
 
         assert_equal("123 bbb 456", @ss1.reload.query)
@@ -115,7 +114,7 @@ class TagAliasTest < ActiveSupport::TestCase
         @u7 = create(:user, blacklisted_tags: "111 ...\r\n222 333\n")
         @ta = create(:tag_alias, antecedent_name: "...", consequent_name: "aaa")
 
-        @ta.approve!(approver: @admin)
+        @ta.approve!(@admin)
         perform_enqueued_jobs
 
         assert_equal("111 aaa 222", @u1.reload.blacklisted_tags)
@@ -133,7 +132,7 @@ class TagAliasTest < ActiveSupport::TestCase
       post2 = FactoryBot.create(:post, :tag_string => "ccc ddd")
 
       ta = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "ccc")
-      ta.approve!(approver: @admin)
+      ta.approve!(@admin)
       perform_enqueued_jobs
 
       assert_equal("bbb ccc", post1.reload.tag_string)
@@ -155,7 +154,7 @@ class TagAliasTest < ActiveSupport::TestCase
         @wiki = create(:wiki_page, title: "aaa")
         @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
 
-        @ta.approve!(approver: @admin)
+        @ta.approve!(@admin)
         perform_enqueued_jobs
         assert_equal("active", @ta.reload.status)
 
@@ -167,7 +166,7 @@ class TagAliasTest < ActiveSupport::TestCase
         @wiki2 = create(:wiki_page, title: "bbb", other_names: "111 333", body: "second")
         @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
 
-        @ta.approve!(approver: @admin)
+        @ta.approve!(@admin)
         perform_enqueued_jobs
         assert_equal("active", @ta.reload.status)
 
@@ -185,7 +184,7 @@ class TagAliasTest < ActiveSupport::TestCase
         @wiki2 = create(:wiki_page, title: "bbb", other_names: "111 333", body: "second")
         @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
 
-        @ta.approve!(approver: @admin)
+        @ta.approve!(@admin)
         perform_enqueued_jobs
         assert_equal("active", @ta.reload.status)
 
@@ -202,7 +201,7 @@ class TagAliasTest < ActiveSupport::TestCase
         @wiki = create(:wiki_page, body: "foo [[aaa]] bar")
         @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
 
-        @ta.approve!(approver: @admin)
+        @ta.approve!(@admin)
         perform_enqueued_jobs
         assert_equal("active", @ta.reload.status)
 
@@ -215,7 +214,7 @@ class TagAliasTest < ActiveSupport::TestCase
         @artist = create(:artist, name: "aaa")
         @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
 
-        @ta.approve!(approver: @admin)
+        @ta.approve!(@admin)
         perform_enqueued_jobs
         assert_equal("active", @ta.reload.status)
 
@@ -228,7 +227,7 @@ class TagAliasTest < ActiveSupport::TestCase
         @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://twitter.com/111\n-https://twitter.com/333\nhttps://twitter.com/444")
         @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
 
-        @ta.approve!(approver: @admin)
+        @ta.approve!(@admin)
         perform_enqueued_jobs
         assert_equal("active", @ta.reload.status)
 
@@ -248,7 +247,7 @@ class TagAliasTest < ActiveSupport::TestCase
         @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://twitter.com/111\n-https://twitter.com/333\nhttps://twitter.com/444")
         @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
 
-        @ta.approve!(approver: @admin)
+        @ta.approve!(@admin)
         perform_enqueued_jobs
         assert_equal("active", @ta.reload.status)
 
@@ -270,8 +269,8 @@ class TagAliasTest < ActiveSupport::TestCase
       ta2 = FactoryBot.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc", :status => "pending")
 
       # XXX this is broken, it depends on the order the jobs are executed in.
-      ta2.approve!(approver: @admin)
-      ta1.approve!(approver: @admin)
+      ta2.approve!(@admin)
+      ta1.approve!(@admin)
       perform_enqueued_jobs
 
       assert_equal("ccc", ta1.reload.consequent_name)
@@ -280,7 +279,7 @@ class TagAliasTest < ActiveSupport::TestCase
     should "move existing implications" do
       ti = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ta = FactoryBot.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc")
-      ta.approve!(approver: @admin)
+      ta.approve!(@admin)
       perform_enqueued_jobs
 
       assert_equal("ccc", ti.reload.consequent_name)
@@ -291,7 +290,7 @@ class TagAliasTest < ActiveSupport::TestCase
       tag2 = create(:tag, name: "artist", category: 1)
       ta = create(:tag_alias, antecedent_name: "general", consequent_name: "artist")
 
-      ta.approve!(approver: @admin)
+      ta.approve!(@admin)
       perform_enqueued_jobs
 
       assert_equal(1, tag1.reload.category)
@@ -303,7 +302,7 @@ class TagAliasTest < ActiveSupport::TestCase
       tag2 = create(:tag, name: "general", category: 0)
       ta = create(:tag_alias, antecedent_name: "artist", consequent_name: "general")
 
-      ta.approve!(approver: @admin)
+      ta.approve!(@admin)
       perform_enqueued_jobs
 
       assert_equal(1, tag1.reload.category)
@@ -315,7 +314,7 @@ class TagAliasTest < ActiveSupport::TestCase
       tag2 = create(:tag, name: "copyright", category: 3)
       ta = create(:tag_alias, antecedent_name: "character", consequent_name: "copyright")
 
-      ta.approve!(approver: @admin)
+      ta.approve!(@admin)
       perform_enqueued_jobs
 
       assert_equal(4, tag1.reload.category)

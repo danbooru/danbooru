@@ -120,13 +120,13 @@ class TagImplication < TagRelationship
   end
 
   module ApprovalMethods
-    def process!
+    def process!(approver)
       unless valid?
         raise errors.full_messages.join("; ")
       end
 
       CurrentUser.scoped(User.system) do
-        update(status: "processing")
+        update(approver: approver, status: "processing")
         update_posts
         update(status: "active")
       end
@@ -135,9 +135,8 @@ class TagImplication < TagRelationship
       DanbooruLogger.log(e, tag_implication_id: id, antecedent_name: antecedent_name, consequent_name: consequent_name)
     end
 
-    def approve!(approver: CurrentUser.user)
-      update(approver: approver, status: "queued")
-      ProcessTagImplicationJob.perform_later(self)
+    def approve!(approver)
+      ProcessTagImplicationJob.perform_later(self, approver)
     end
 
     def create_mod_action
