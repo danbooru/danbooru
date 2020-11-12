@@ -263,28 +263,6 @@ class TagAliasTest < ActiveSupport::TestCase
       end
     end
 
-
-    should "move existing aliases" do
-      ta1 = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :status => "pending")
-      ta2 = FactoryBot.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc", :status => "pending")
-
-      # XXX this is broken, it depends on the order the jobs are executed in.
-      ta2.approve!(@admin)
-      ta1.approve!(@admin)
-      perform_enqueued_jobs
-
-      assert_equal("ccc", ta1.reload.consequent_name)
-    end
-
-    should "move existing implications" do
-      ti = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
-      ta = FactoryBot.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc")
-      ta.approve!(@admin)
-      perform_enqueued_jobs
-
-      assert_equal("ccc", ti.reload.consequent_name)
-    end
-
     should "push the consequent's category to the antecedent if the antecedent is general" do
       tag1 = create(:tag, name: "general", category: 0)
       tag2 = create(:tag, name: "artist", category: 1)

@@ -58,6 +58,38 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal("bar", @wiki.reload.title)
         end
 
+        should "move any active aliases from the old tag to the new tag" do
+          @bur1 = create(:bulk_update_request, script: "alias aaa -> bbb")
+          @bur2 = create(:bulk_update_request, script: "alias bbb -> ccc")
+
+          @bur1.approve!(@admin)
+          @bur2.approve!(@admin)
+          perform_enqueued_jobs
+
+          assert_equal(false, TagAlias.where(antecedent_name: "aaa", consequent_name: "bbb", status: "active").exists?)
+          assert_equal(true, TagAlias.where(antecedent_name: "bbb", consequent_name: "ccc", status: "active").exists?)
+          assert_equal(true, TagAlias.where(antecedent_name: "aaa", consequent_name: "ccc", status: "active").exists?)
+        end
+
+        should "move any active implications from the old tag to the new tag" do
+          @bur1 = create(:bulk_update_request, script: "imply aaa -> bbb")
+          @bur2 = create(:bulk_update_request, script: "alias bbb -> ccc")
+
+          @bur1.approve!(@admin)
+          @bur2.approve!(@admin)
+          perform_enqueued_jobs
+
+          assert_equal(false, TagImplication.where(antecedent_name: "aaa", consequent_name: "bbb", status: "active").exists?)
+          assert_equal(true, TagImplication.where(antecedent_name: "aaa", consequent_name: "ccc", status: "active").exists?)
+
+          @bur3 = create(:bulk_update_request, script: "alias aaa -> ddd")
+          @bur3.approve!(@admin)
+          perform_enqueued_jobs
+
+          assert_equal(false, TagImplication.where(antecedent_name: "aaa", consequent_name: "ccc", status: "active").exists?)
+          assert_equal(true, TagImplication.where(antecedent_name: "ddd", consequent_name: "ccc", status: "active").exists?)
+        end
+
         should "fail if the alias is invalid" do
           create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
           @bur = build(:bulk_update_request, script: "create alias bbb -> aaa")

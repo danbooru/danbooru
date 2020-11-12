@@ -9,6 +9,8 @@ class TagMover
 
   def move!
     CurrentUser.scoped(user) do
+      move_aliases!
+      move_implications!
       move_cosplay_tag!
       move_tag_category!
       move_artist!
@@ -54,6 +56,22 @@ class TagMover
       post.remove_tag(old_tag.name)
       post.add_tag(new_tag.name)
       post.save!
+    end
+  end
+
+  def move_aliases!
+    old_tag.consequent_aliases.each do |tag_alias|
+      tag_alias.update!(consequent_name: new_tag.name)
+    end
+  end
+
+  def move_implications!
+    old_tag.antecedent_implications.each do |tag_implication|
+      tag_implication.update!(antecedent_name: new_tag.name)
+    end
+
+    old_tag.consequent_implications.each do |tag_implication|
+      tag_implication.update!(consequent_name: new_tag.name)
     end
   end
 

@@ -16,7 +16,6 @@ class TagAlias < TagRelationship
 
   def process!(approver)
     update!(approver: approver, status: "processing")
-    move_aliases_and_implications
     TagMover.new(antecedent_name, consequent_name, user: User.system).move!
     update!(status: "active")
   rescue Exception => e
@@ -31,35 +30,6 @@ class TagAlias < TagRelationship
     # If the a -> b alias was created first, the new one will be allowed and the old one will be moved automatically instead.
     if TagAlias.active.exists?(antecedent_name: consequent_name)
       errors[:base] << "A tag alias for #{consequent_name} already exists"
-    end
-  end
-
-  def move_aliases_and_implications
-    aliases = TagAlias.where(["consequent_name = ?", antecedent_name])
-    aliases.each do |ta|
-      ta.consequent_name = self.consequent_name
-      success = ta.save
-      if !success && ta.errors.full_messages.join("; ") =~ /Cannot alias a tag to itself/
-        ta.destroy
-      end
-    end
-
-    implications = TagImplication.where(["antecedent_name = ?", antecedent_name])
-    implications.each do |ti|
-      ti.antecedent_name = self.consequent_name
-      success = ti.save
-      if !success && ti.errors.full_messages.join("; ") =~ /Cannot implicate a tag to itself/
-        ti.destroy
-      end
-    end
-
-    implications = TagImplication.where(["consequent_name = ?", antecedent_name])
-    implications.each do |ti|
-      ti.consequent_name = self.consequent_name
-      success = ti.save
-      if !success && ti.errors.full_messages.join("; ") =~ /Cannot implicate a tag to itself/
-        ti.destroy
-      end
     end
   end
 
