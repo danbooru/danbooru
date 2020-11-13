@@ -44,6 +44,7 @@ module Danbooru
     config.autoload_paths += %W(#{config.root}/app/presenters #{config.root}/app/logical/concerns #{config.root}/app/logical #{config.root}/app/mailers)
     config.plugins = [:all]
     config.time_zone = 'Eastern Time (US & Canada)'
+    config.active_model.i18n_customize_full_message = true
 
     raise "Danbooru.config.secret_key_base not configured" if Danbooru.config.secret_key_base.blank?
     config.secret_key_base = Danbooru.config.secret_key_base

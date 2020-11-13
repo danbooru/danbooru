@@ -48,7 +48,7 @@ class BulkUpdateRequestProcessor
         end
 
       when :create_implication
-        tag_implication = TagImplication.new(creator: User.system, antecedent_name: args[0], consequent_name: args[1], skip_secondary_validations: skip_secondary_validations)
+        tag_implication = TagImplication.new(creator: User.system, antecedent_name: args[0], consequent_name: args[1], skip_secondary_validations: skip_secondary_validations, status: "active")
         if tag_implication.invalid?
           errors[:base] << "Can't create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name} (#{tag_implication.errors.full_messages.join("; ")})"
         end

@@ -129,6 +129,14 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(["Can't create implication a -> c (a already implies c through another implication)"], @bur.errors.full_messages)
         end
 
+        should "fail for an implication that is a duplicate of an existing implication" do
+          create(:tag_implication, antecedent_name: "a", consequent_name: "b")
+          @bur = build(:bulk_update_request, script: "imply a -> b")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't create implication a -> b (Implication already exists)"], @bur.errors.full_messages)
+        end
+
         should_eventually "fail for an implication that is redundant with another implication in the same BUR" do
           create(:tag_implication, antecedent_name: "b", consequent_name: "c")
           @bur = build(:bulk_update_request, script: "imply a -> b\nimply a -> c")

@@ -68,3 +68,10 @@ en:
       saved_search:
         user: "You"
         user_id: "You"
+    errors:
+      models:
+        tag_implication:
+          attributes:
+            antecedent_name:
+              taken: "Implication already exists"
+              format: "%{message}"

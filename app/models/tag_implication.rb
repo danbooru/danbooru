@@ -3,7 +3,7 @@ class TagImplication < TagRelationship
   has_many :parent_implications, class_name: "TagImplication", primary_key: :antecedent_name, foreign_key: :consequent_name
 
   after_save :create_mod_action
-  validates_uniqueness_of :antecedent_name, scope: [:consequent_name, :status], conditions: -> { active }
+  validates :antecedent_name, uniqueness: { scope: [:consequent_name, :status], conditions: -> { active }}
   validate :absence_of_circular_relation
   validate :absence_of_transitive_relation
   validate :antecedent_is_not_aliased

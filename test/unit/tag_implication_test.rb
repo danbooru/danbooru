@@ -47,7 +47,7 @@ class TagImplicationTest < ActiveSupport::TestCase
         [ti1, ti2, ti3, ti4, ti5].each { |ti| assert(ti.valid?) }
 
         ti5.update(status: "active")
-        assert_includes(ti5.errors[:antecedent_name], "has already been taken")
+        assert_includes(ti5.errors[:antecedent_name], "Implication already exists")
       end
     end
 
@@ -115,7 +115,7 @@ class TagImplicationTest < ActiveSupport::TestCase
       ti2 = FactoryBot.build(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ti2.save
       assert(ti2.errors.any?, "Tag implication should not have validated.")
-      assert_includes(ti2.errors.full_messages, "Antecedent name has already been taken")
+      assert_includes(ti2.errors.full_messages, "Implication already exists")
     end
 
     should "not validate if its antecedent or consequent are aliased to another tag" do
