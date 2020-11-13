@@ -90,7 +90,7 @@ class DText
 
   def self.tag_request_message(obj)
     if obj.is_a?(TagRelationship)
-      if obj.is_approved?
+      if obj.is_active?
         "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] has been approved."
       elsif obj.is_retired?
         "The #{obj.relationship} ##{obj.id} [[#{obj.antecedent_name}]] -> [[#{obj.consequent_name}]] has been retired."

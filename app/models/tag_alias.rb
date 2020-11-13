@@ -15,9 +15,8 @@ class TagAlias < TagRelationship
   end
 
   def process!(approver)
-    update!(approver: approver, status: "processing")
+    update!(approver: approver, status: "active")
     TagMover.new(antecedent_name, consequent_name, user: User.system).move!
-    update!(status: "active")
   rescue Exception => e
     update!(status: "error: #{e}")
     DanbooruLogger.log(e, tag_alias_id: id, antecedent_name: antecedent_name, consequent_name: consequent_name)

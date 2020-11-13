@@ -126,9 +126,8 @@ class TagImplication < TagRelationship
       end
 
       CurrentUser.scoped(User.system) do
-        update(approver: approver, status: "processing")
+        update!(approver: approver, status: "active")
         update_posts
-        update(status: "active")
       end
     rescue Exception => e
       update(status: "error: #{e}")
