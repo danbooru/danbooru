@@ -8,7 +8,6 @@ class TagImplication < TagRelationship
   validate :absence_of_transitive_relation
   validate :antecedent_is_not_aliased
   validate :consequent_is_not_aliased
-  validate :wiki_pages_present, on: :create, unless: :skip_secondary_validations
 
   module DescendantMethods
     extend ActiveSupport::Concern
@@ -105,16 +104,6 @@ class TagImplication < TagRelationship
       # We don't want to implicate a -> b if b is already aliased to c
       if TagAlias.active.exists?(["antecedent_name = ?", consequent_name])
         errors[:base] << "Consequent tag must not be aliased to another tag"
-      end
-    end
-
-    def wiki_pages_present
-      if consequent_wiki.blank?
-        errors[:base] << "The #{consequent_name} tag needs a corresponding wiki page"
-      end
-
-      if antecedent_wiki.blank?
-        errors[:base] << "The #{antecedent_name} tag needs a corresponding wiki page"
       end
     end
   end

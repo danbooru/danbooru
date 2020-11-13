@@ -4,8 +4,6 @@ class TagRelationship < ApplicationRecord
   EXPIRY = 60
   EXPIRY_WARNING = 55
 
-  attr_accessor :skip_secondary_validations
-
   belongs_to :creator, class_name: "User"
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :forum_post, optional: true

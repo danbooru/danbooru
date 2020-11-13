@@ -28,16 +28,6 @@
     </div>
   <% end %>
 
-  <% if @bulk_update_request.errors.any? %>
-    <div class="input">
-      <label class="checkbox optional" for="bulk_update_request_skip_secondary_validations">
-        <%= check_box "bulk_update_request", "skip_secondary_validations" %>
-        Skip validations
-      </label>
-      <p class="hint">You can ignore the wiki page and minimum count requirements</p>
-    </div>
-  <% end %>
-
   <% if @bulk_update_request.persisted? && policy(@bulk_update_request).can_update_forum? %>
     <%= f.input :forum_topic_id %>
     <%= f.input :forum_post_id %>

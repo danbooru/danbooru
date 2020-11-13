@@ -1,7 +1,6 @@
 class BulkUpdateRequest < ApplicationRecord
   attr_accessor :title
   attr_accessor :reason
-  attr_reader :skip_secondary_validations
 
   belongs_to :user
   belongs_to :forum_topic, optional: true
@@ -75,7 +74,7 @@ class BulkUpdateRequest < ApplicationRecord
       transaction do
         CurrentUser.scoped(approver) do
           processor.process!(approver)
-          update!(status: "approved", approver: approver, skip_secondary_validations: true)
+          update!(status: "approved", approver: approver)
           forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.")
         end
       end
@@ -118,10 +117,6 @@ class BulkUpdateRequest < ApplicationRecord
 
   def update_tags
     self.tags = processor.affected_tags
-  end
-
-  def skip_secondary_validations=(v)
-    @skip_secondary_validations = v.to_s.truthy?
   end
 
   def processor

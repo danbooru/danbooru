@@ -309,6 +309,24 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(true, @bur.valid?)
         end
       end
+
+      context "requesting an implication for an empty tag without a wiki" do
+        should "succeed" do
+          @bur = create(:bulk_update_request, script: "imply a -> b")
+          assert_equal(true, @bur.valid?)
+        end
+      end
+
+      context "requesting an implication for a populated tag without a wiki" do
+        should "fail" do
+          create(:tag, name: "a", post_count: 1)
+          create(:tag, name: "b", post_count: 1)
+          @bur = build(:bulk_update_request, script: "imply a -> b")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["'a' must have a wiki page; 'b' must have a wiki page"], @bur.errors.full_messages)
+        end
+      end
     end
 
     context "when the script is updated" do

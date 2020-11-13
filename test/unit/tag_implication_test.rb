@@ -61,16 +61,6 @@ class TagImplicationTest < ActiveSupport::TestCase
       end
     end
 
-    context "on secondary validation" do
-      should "warn if either tag is missing a wiki" do
-        ti = FactoryBot.build(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", skip_secondary_validations: false)
-
-        assert(ti.invalid?)
-        assert_includes(ti.errors[:base], "The aaa tag needs a corresponding wiki page")
-        assert_includes(ti.errors[:base], "The bbb tag needs a corresponding wiki page")
-      end
-    end
-
     should "populate the creator information" do
       ti = create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", creator: CurrentUser.user)
       assert_equal(CurrentUser.user.id, ti.creator_id)

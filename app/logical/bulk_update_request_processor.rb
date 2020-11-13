@@ -4,7 +4,7 @@ class BulkUpdateRequestProcessor
   class Error < StandardError; end
 
   attr_reader :bulk_update_request
-  delegate :script, :forum_topic_id, :skip_secondary_validations, to: :bulk_update_request
+  delegate :script, :forum_topic_id, to: :bulk_update_request
   validate :validate_script
 
   def initialize(bulk_update_request)
@@ -42,15 +42,23 @@ class BulkUpdateRequestProcessor
     commands.each do |command, *args|
       case command
       when :create_alias
-        tag_alias = TagAlias.new(creator: User.system, antecedent_name: args[0], consequent_name: args[1], skip_secondary_validations: skip_secondary_validations)
+        tag_alias = TagAlias.new(creator: User.system, antecedent_name: args[0], consequent_name: args[1])
         if tag_alias.invalid?
           errors[:base] << "Can't create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name} (#{tag_alias.errors.full_messages.join("; ")})"
         end
 
       when :create_implication
-        tag_implication = TagImplication.new(creator: User.system, antecedent_name: args[0], consequent_name: args[1], skip_secondary_validations: skip_secondary_validations, status: "active")
+        tag_implication = TagImplication.new(creator: User.system, antecedent_name: args[0], consequent_name: args[1], status: "active")
         if tag_implication.invalid?
           errors[:base] << "Can't create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name} (#{tag_implication.errors.full_messages.join("; ")})"
+        end
+
+        if !tag_implication.antecedent_tag.empty? && tag_implication.antecedent_wiki.blank?
+          errors[:base] << "'#{tag_implication.antecedent_tag.name}' must have a wiki page"
+        end
+
+        if !tag_implication.consequent_tag.empty? && tag_implication.consequent_wiki.blank?
+          errors[:base] << "'#{tag_implication.consequent_tag.name}' must have a wiki page"
         end
 
       when :remove_alias
@@ -97,11 +105,11 @@ class BulkUpdateRequestProcessor
       commands.map do |command, *args|
         case command
         when :create_alias
-          tag_alias = TagAlias.create!(creator: approver, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: args[0], consequent_name: args[1], skip_secondary_validations: skip_secondary_validations)
+          tag_alias = TagAlias.create!(creator: approver, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: args[0], consequent_name: args[1])
           tag_alias.approve!(approver)
 
         when :create_implication
-          tag_implication = TagImplication.create!(creator: approver, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: args[0], consequent_name: args[1], skip_secondary_validations: skip_secondary_validations)
+          tag_implication = TagImplication.create!(creator: approver, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: args[0], consequent_name: args[1])
           tag_implication.approve!(approver)
 
         when :remove_alias

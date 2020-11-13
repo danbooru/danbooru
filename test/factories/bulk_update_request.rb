@@ -4,6 +4,5 @@ FactoryBot.define do
     title {"xxx"}
     script {"create alias aaa -> bbb"}
     reason { FFaker::Lorem.sentences.join(" ") }
-    skip_secondary_validations {true}
   end
 end
