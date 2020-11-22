@@ -86,4 +86,9 @@
         <li id="post-option-replace-image"><%= link_to "Replace image", new_post_replacement_path(post_id: post.id), remote: true %></li>
       <% end %>
     <% end %>
+
+    <% if policy(PostRegeneration).create? %>
+      <li id="post-option-regenerate-iqdb"><%= link_to "Regenerate IQDB", post_regenerations_path(post_regeneration: {post_id: post.id, category: "iqdb"}), remote: true, method: :post %></li>
+      <li id="post-option-regenerate-preview"><%= link_to "Regenerate image sizes", post_regenerations_path(post_regeneration: {post_id: post.id, category: "resizes"}), remote: true, method: :post %></li>
+    <% end %>
 </ul>

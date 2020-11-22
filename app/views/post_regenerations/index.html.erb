@@ -1,0 +1,17 @@
+<div id="c-post-regenerations">
+  <div id="a-index">
+    <h1>Post regenerations</h1>
+    <%= table_for @post_regenerations, width: "100%" do |t| %>
+      <% t.column "Post", width: "1%" do |regeneration| %>
+        <%= PostPresenter.preview(regeneration.post, show_deleted: true) %>
+      <% end %>
+      <% t.column :category %>
+      <% t.column "Creator", width: "10%" do |regeneration| %>
+        <%= compact_time regeneration.created_at %>
+        <br> by <%= link_to_user regeneration.creator %>
+      <% end %>
+    <% end %>
+
+    <%= numbered_paginator(@post_regenerations) %>
+  </div>
+</div>

@@ -32,6 +32,22 @@ class UploadService
       [preview_file, crop_file, sample_file]
     end
 
+    def process_resizes(upload, file, original_post_id, media_file: nil)
+      media_file ||= upload.media_file
+      preview_file, crop_file, sample_file = Utils.generate_resizes(media_file)
+
+      begin
+        Utils.distribute_files(file, upload, :original, original_post_id: original_post_id) if file.present?
+        Utils.distribute_files(sample_file, upload, :large, original_post_id: original_post_id) if sample_file.present?
+        Utils.distribute_files(preview_file, upload, :preview, original_post_id: original_post_id) if preview_file.present?
+        Utils.distribute_files(crop_file, upload, :crop, original_post_id: original_post_id) if crop_file.present?
+      ensure
+        preview_file.try(:close!)
+        crop_file.try(:close!)
+        sample_file.try(:close!)
+      end
+    end
+
     def process_file(upload, file, original_post_id: nil)
       upload.file = file
       media_file = upload.media_file
@@ -45,18 +61,7 @@ class UploadService
       upload.validate!(:file)
       upload.tag_string = "#{upload.tag_string} #{Utils.automatic_tags(media_file)}"
 
-      preview_file, crop_file, sample_file = Utils.generate_resizes(media_file)
-
-      begin
-        Utils.distribute_files(file, upload, :original, original_post_id: original_post_id)
-        Utils.distribute_files(sample_file, upload, :large, original_post_id: original_post_id) if sample_file.present?
-        Utils.distribute_files(preview_file, upload, :preview, original_post_id: original_post_id) if preview_file.present?
-        Utils.distribute_files(crop_file, upload, :crop, original_post_id: original_post_id) if crop_file.present?
-      ensure
-        preview_file.try(:close!)
-        crop_file.try(:close!)
-        sample_file.try(:close!)
-      end
+      process_resizes(upload, file, original_post_id)
     end
 
     def automatic_tags(media_file)
