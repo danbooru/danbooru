@@ -1,0 +1,5 @@
+<% if @post_regeneration.errors.any? %>
+  Danbooru.error("<%= j @post_regeneration.errors.full_messages.join(',') %>");
+<% else %>
+  Danbooru.notice("Post regenerated");
+<% end %>
