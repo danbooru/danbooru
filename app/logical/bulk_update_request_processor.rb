@@ -4,7 +4,7 @@ class BulkUpdateRequestProcessor
   class Error < StandardError; end
 
   attr_reader :bulk_update_request
-  delegate :script, :forum_topic_id, to: :bulk_update_request
+  delegate :script, :forum_topic, to: :bulk_update_request
   validate :validate_script
 
   def initialize(bulk_update_request)
@@ -105,12 +105,10 @@ class BulkUpdateRequestProcessor
       commands.map do |command, *args|
         case command
         when :create_alias
-          tag_alias = TagAlias.create!(creator: approver, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: args[0], consequent_name: args[1])
-          tag_alias.approve!(approver)
+          TagAlias.approve!(antecedent_name: args[0], consequent_name: args[1], approver: approver, forum_topic: forum_topic)
 
         when :create_implication
-          tag_implication = TagImplication.create!(creator: approver, forum_topic_id: forum_topic_id, status: "pending", antecedent_name: args[0], consequent_name: args[1])
-          tag_implication.approve!(approver)
+          TagImplication.approve!(antecedent_name: args[0], consequent_name: args[1], approver: approver, forum_topic: forum_topic)
 
         when :remove_alias
           tag_alias = TagAlias.active.find_by!(antecedent_name: args[0], consequent_name: args[1])

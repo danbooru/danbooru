@@ -94,7 +94,6 @@ class ArtistTest < ActiveSupport::TestCase
       end
 
       should "create a new tag implication" do
-        perform_enqueued_jobs
         assert_equal(1, TagImplication.where(:antecedent_name => "aaa", :consequent_name => "banned_artist").count)
         assert_equal("aaa banned_artist", @post.reload.tag_string)
       end

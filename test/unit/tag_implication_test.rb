@@ -22,7 +22,6 @@ class TagImplicationTest < ActiveSupport::TestCase
 
       should allow_value('active').for(:status)
       should allow_value('deleted').for(:status)
-      should allow_value('pending').for(:status)
       should allow_value('error: derp').for(:status)
 
       should_not allow_value('ACTIVE').for(:status)
@@ -43,17 +42,16 @@ class TagImplicationTest < ActiveSupport::TestCase
         ti2 = FactoryBot.create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "retired")
         ti3 = FactoryBot.create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
         ti4 = FactoryBot.create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
-        ti5 = FactoryBot.create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
-        [ti1, ti2, ti3, ti4, ti5].each { |ti| assert(ti.valid?) }
+        [ti1, ti2, ti3, ti4].each { |ti| assert(ti.valid?) }
 
-        ti5.update(status: "active")
-        assert_includes(ti5.errors[:antecedent_name], "Implication already exists")
+        ti4.update(status: "active")
+        assert_includes(ti4.errors[:antecedent_name], "Implication already exists")
       end
     end
 
     context "#reject!" do
       should "not be blocked by alias validations" do
-        ti = create(:tag_implication, antecedent_name: "cat", consequent_name: "animal", status: "pending")
+        ti = create(:tag_implication, antecedent_name: "cat", consequent_name: "animal", status: "active")
         ta = create(:tag_alias, antecedent_name: "cat", consequent_name: "kitty", status: "active")
 
         ti.reject!
@@ -120,11 +118,9 @@ class TagImplicationTest < ActiveSupport::TestCase
 
     should "update any affected post upon save" do
       p1 = FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
-      ti1 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "xxx")
-      ti2 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "yyy")
 
-      ti1.approve!(@admin)
-      ti2.approve!(@admin)
+      TagImplication.approve!(antecedent_name: "aaa", consequent_name: "xxx", approver: @admin)
+      TagImplication.approve!(antecedent_name: "aaa", consequent_name: "yyy", approver: @admin)
       perform_enqueued_jobs
 
       assert_equal("aaa bbb ccc xxx yyy", p1.reload.tag_string)
@@ -149,7 +145,7 @@ class TagImplicationTest < ActiveSupport::TestCase
 
       should "not include inactive implications" do
         create(:tag_implication, antecedent_name: "a", consequent_name: "b", status: "active")
-        create(:tag_implication, antecedent_name: "b", consequent_name: "c", status: "pending")
+        create(:tag_implication, antecedent_name: "b", consequent_name: "c", status: "deleted")
         create(:tag_implication, antecedent_name: "c", consequent_name: "d", status: "active")
 
         assert_equal(["b"], TagImplication.tags_implied_by("a").map(&:name))

@@ -156,12 +156,14 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "artist2a", category: Tag.categories.artist, post_count: 20)
           @bulk_update_request = create(:bulk_update_request, script: "mass update artist1a -> artist1b\ncreate alias artist2a -> artist2b")
 
-          post_auth approve_bulk_update_request_path(@bulk_update_request), @builder
+          perform_enqueued_jobs do
+            post_auth approve_bulk_update_request_path(@bulk_update_request), @builder
+          end
 
           assert_redirected_to(bulk_update_requests_path)
           assert_equal("approved", @bulk_update_request.reload.status)
           assert_equal(@builder, @bulk_update_request.approver)
-          assert_equal(true, TagAlias.where(antecedent_name: "artist2a", consequent_name: "artist2b").exists?)
+          assert_equal(true, TagAlias.exists?(antecedent_name: "artist2a", consequent_name: "artist2b", status: "active"))
         end
       end
 

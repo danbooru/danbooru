@@ -161,6 +161,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "show a notice for a single tag search with a pending BUR" do
+          create(:tag, name: "foo")
           create(:bulk_update_request, script: "create alias foo -> bar")
           get_auth posts_path(tags: "foo"), @user
           assert_select ".tag-change-notice"

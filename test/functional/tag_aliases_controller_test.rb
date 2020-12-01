@@ -18,7 +18,7 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
         @antecedent_wiki = create(:wiki_page, title: "touhou", body: "zun project")
         @consequent_wiki = create(:wiki_page, title: "touhou_project")
 
-        @other_alias = create(:tag_alias, antecedent_name: "touhou", consequent_name: "touhou_project", creator: @user, status: "pending", forum_topic: @forum_topic, forum_post: @forum_post)
+        @other_alias = create(:tag_alias, antecedent_name: "touhou", consequent_name: "touhou_project", creator: @user, status: "deleted", forum_topic: @forum_topic, forum_post: @forum_post)
         @unrelated_alias = create(:tag_alias)
       end
 
@@ -30,7 +30,7 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search({}).with { [@unrelated_alias, @other_alias, @tag_alias] }
       should respond_to_search(antecedent_name: "aaa").with { @tag_alias }
       should respond_to_search(consequent_name: "bbb").with { @tag_alias }
-      should respond_to_search(status: "pending").with { @other_alias }
+      should respond_to_search(status: "deleted").with { @other_alias }
 
       context "using includes" do
         should respond_to_search(antecedent_tag: {post_count: 1000}).with { @other_alias }

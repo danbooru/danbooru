@@ -18,7 +18,7 @@ class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
         @antecedent_wiki = create(:wiki_page, title: "cannon", body: "made of fun")
         @consequent_wiki = create(:wiki_page, title: "weapon")
 
-        @other_implication = create(:tag_implication, antecedent_name: "cannon", consequent_name: "weapon", creator: @user, status: "pending", forum_topic: @forum_topic, forum_post: @forum_post)
+        @other_implication = create(:tag_implication, antecedent_name: "cannon", consequent_name: "weapon", creator: @user, status: "deleted", forum_topic: @forum_topic, forum_post: @forum_post)
         @unrelated_implication = create(:tag_implication)
       end
 
@@ -30,7 +30,7 @@ class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
       should respond_to_search({}).with { [@unrelated_implication, @other_implication, @tag_implication] }
       should respond_to_search(antecedent_name: "aaa").with { @tag_implication }
       should respond_to_search(consequent_name: "bbb").with { @tag_implication }
-      should respond_to_search(status: "pending").with { @other_implication }
+      should respond_to_search(status: "deleted").with { @other_implication }
 
       context "using includes" do
         should respond_to_search(antecedent_tag: {post_count: 10}).with { @other_implication }

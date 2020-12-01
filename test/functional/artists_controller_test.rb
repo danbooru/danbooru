@@ -107,10 +107,13 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
 
     context "ban action" do
       should "ban an artist" do
-        put_auth ban_artist_path(@artist.id), @admin
+        perform_enqueued_jobs do
+          put_auth ban_artist_path(@artist.id), @admin
+        end
+
         assert_redirected_to(@artist)
         assert_equal(true, @artist.reload.is_banned?)
-        assert_equal(true, TagImplication.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist"))
+        assert_equal(true, TagImplication.exists?(antecedent_name: @artist.name, consequent_name: "banned_artist", status: "active"))
       end
 
       should "not allow non-admins to ban artists" do

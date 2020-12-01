@@ -17,11 +17,10 @@ class TagRelationship < ApplicationRecord
   scope :deleted, -> {where(status: "deleted")}
   scope :expired, -> {where("created_at < ?", EXPIRY.days.ago)}
   scope :old, -> {where("created_at >= ? and created_at < ?", EXPIRY.days.ago, EXPIRY_WARNING.days.ago)}
-  scope :pending, -> {where(status: "pending")}
   scope :retired, -> {where(status: "retired")}
 
   before_validation :normalize_names
-  validates_format_of :status, :with => /\A(active|deleted|pending|retired|error: .*)\Z/
+  validates_format_of :status, :with => /\A(active|deleted|retired|error: .*)\Z/
   validates_presence_of :antecedent_name, :consequent_name
   validates :approver, presence: { message: "must exist" }, if: -> { approver_id.present? }
   validates :forum_topic, presence: { message: "must exist" }, if: -> { forum_topic_id.present? }
@@ -42,10 +41,6 @@ class TagRelationship < ApplicationRecord
 
   def is_deleted?
     status == "deleted"
-  end
-
-  def is_pending?
-    status == "pending"
   end
 
   def is_active?
@@ -72,11 +67,6 @@ class TagRelationship < ApplicationRecord
     def tag_matches(field, params)
       return all if params.blank?
       where(field => Tag.search(params).reorder(nil).select(:name))
-    end
-
-    def pending_first
-      # unknown statuses return null and are sorted first
-      order(Arel.sql("array_position(array['pending', 'active', 'deleted', 'retired'], status::text) NULLS FIRST, id DESC"))
     end
 
     def search(params)
@@ -107,8 +97,6 @@ class TagRelationship < ApplicationRecord
         q = q.order("antecedent_name asc, consequent_name asc")
       when "tag_count"
         q = q.joins(:consequent_tag).order("tags.post_count desc, antecedent_name asc, consequent_name asc")
-      when "status"
-        q = q.pending_first
       else
         q = q.apply_default_order(params)
       end
@@ -142,6 +130,10 @@ class TagRelationship < ApplicationRecord
         end
       end
     end
+  end
+
+  def self.approve!(antecedent_name:, consequent_name:, approver:, forum_topic: nil)
+    ProcessTagRelationshipJob.perform_later(class_name: self.name, approver: approver, antecedent_name: antecedent_name, consequent_name: consequent_name, forum_topic: forum_topic)
   end
 
   def self.model_restriction(table)

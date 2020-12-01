@@ -2857,7 +2857,7 @@ CREATE TABLE public.tag_aliases (
     consequent_name character varying NOT NULL,
     creator_id integer NOT NULL,
     forum_topic_id integer,
-    status text DEFAULT 'pending'::text NOT NULL,
+    status text DEFAULT 'active'::text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     approver_id integer,
@@ -2894,7 +2894,7 @@ CREATE TABLE public.tag_implications (
     consequent_name character varying NOT NULL,
     creator_id integer NOT NULL,
     forum_topic_id integer,
-    status text DEFAULT 'pending'::text NOT NULL,
+    status text DEFAULT 'active'::text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     approver_id integer,
@@ -7419,6 +7419,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200427190519'),
 ('20200520060951'),
 ('20200803022359'),
-('20200816175151');
+('20200816175151'),
+('20201201211748');
 
 

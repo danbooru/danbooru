@@ -26,7 +26,6 @@ class TagAliasTest < ActiveSupport::TestCase
 
       should allow_value('active').for(:status)
       should allow_value('deleted').for(:status)
-      should allow_value('pending').for(:status)
       should allow_value('error: derp').for(:status)
 
       should_not allow_value('ACTIVE').for(:status)
@@ -47,18 +46,17 @@ class TagAliasTest < ActiveSupport::TestCase
         ta2 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "retired")
         ta3 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
         ta4 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
-        ta5 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
-        [ta1, ta2, ta3, ta4, ta5].each { |ta| assert(ta.valid?) }
+        [ta1, ta2, ta3, ta4].each { |ta| assert(ta.valid?) }
 
-        ta5.update(status: "active")
-        assert_includes(ta5.errors[:antecedent_name], "has already been taken")
+        ta4.update(status: "active")
+        assert_includes(ta4.errors[:antecedent_name], "has already been taken")
       end
     end
 
     context "#reject!" do
       should "not be blocked by validations" do
         ta1 = create(:tag_alias, antecedent_name: "kitty", consequent_name: "kitten", status: "active")
-        ta2 = build(:tag_alias, antecedent_name: "cat", consequent_name: "kitty", status: "pending")
+        ta2 = build(:tag_alias, antecedent_name: "cat", consequent_name: "kitty", status: "active")
 
         ta2.reject!
         assert_equal("deleted", ta2.reload.status)
@@ -89,9 +87,8 @@ class TagAliasTest < ActiveSupport::TestCase
         @ss3 = create(:saved_search, query: "123 ~... 456", user: CurrentUser.user)
         @ss4 = create(:saved_search, query: "... 456", user: CurrentUser.user)
         @ss5 = create(:saved_search, query: "123 ...", user: CurrentUser.user)
-        @ta = create(:tag_alias, antecedent_name: "...", consequent_name: "bbb")
 
-        @ta.approve!(@admin)
+        TagAlias.approve!(antecedent_name: "...", consequent_name: "bbb", approver: @admin)
         perform_enqueued_jobs
 
         assert_equal("123 bbb 456", @ss1.reload.query)
@@ -111,9 +108,8 @@ class TagAliasTest < ActiveSupport::TestCase
         @u5 = create(:user, blacklisted_tags: "111 ...")
         @u6 = create(:user, blacklisted_tags: "111 222\n\n... 333\n")
         @u7 = create(:user, blacklisted_tags: "111 ...\r\n222 333\n")
-        @ta = create(:tag_alias, antecedent_name: "...", consequent_name: "aaa")
 
-        @ta.approve!(@admin)
+        TagAlias.approve!(antecedent_name: "...", consequent_name: "aaa", approver: @admin)
         perform_enqueued_jobs
 
         assert_equal("111 aaa 222", @u1.reload.blacklisted_tags)
@@ -130,8 +126,7 @@ class TagAliasTest < ActiveSupport::TestCase
       post1 = FactoryBot.create(:post, :tag_string => "aaa bbb")
       post2 = FactoryBot.create(:post, :tag_string => "ccc ddd")
 
-      ta = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "ccc")
-      ta.approve!(@admin)
+      TagAlias.approve!(antecedent_name: "aaa", consequent_name: "ccc", approver: @admin)
       perform_enqueued_jobs
 
       assert_equal("bbb ccc", post1.reload.tag_string)
@@ -151,11 +146,9 @@ class TagAliasTest < ActiveSupport::TestCase
     context "when the tags have wikis" do
       should "rename the old wiki if there is no conflict" do
         @wiki = create(:wiki_page, title: "aaa")
-        @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
 
-        @ta.approve!(@admin)
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
         perform_enqueued_jobs
-        assert_equal("active", @ta.reload.status)
 
         assert_equal("bbb", @wiki.reload.title)
       end
@@ -163,11 +156,9 @@ class TagAliasTest < ActiveSupport::TestCase
       should "merge existing wikis if there is a conflict" do
         @wiki1 = create(:wiki_page, title: "aaa", other_names: "111 222", body: "first")
         @wiki2 = create(:wiki_page, title: "bbb", other_names: "111 333", body: "second")
-        @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
 
-        @ta.approve!(@admin)
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
         perform_enqueued_jobs
-        assert_equal("active", @ta.reload.status)
 
         assert_equal(true, @wiki1.reload.is_deleted)
         assert_equal([], @wiki1.other_names)
@@ -181,11 +172,9 @@ class TagAliasTest < ActiveSupport::TestCase
       should "ignore the old wiki if it has been deleted" do
         @wiki1 = create(:wiki_page, title: "aaa", other_names: "111 222", body: "first", is_deleted: true)
         @wiki2 = create(:wiki_page, title: "bbb", other_names: "111 333", body: "second")
-        @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
 
-        @ta.approve!(@admin)
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
         perform_enqueued_jobs
-        assert_equal("active", @ta.reload.status)
 
         assert_equal(true, @wiki1.reload.is_deleted)
         assert_equal(%w[111 222], @wiki1.other_names)
@@ -198,11 +187,9 @@ class TagAliasTest < ActiveSupport::TestCase
 
       should "rewrite links in other wikis to use the new tag" do
         @wiki = create(:wiki_page, body: "foo [[aaa]] bar")
-        @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
 
-        @ta.approve!(@admin)
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
         perform_enqueued_jobs
-        assert_equal("active", @ta.reload.status)
 
         assert_equal("foo [[bbb]] bar", @wiki.reload.body)
       end
@@ -211,11 +198,9 @@ class TagAliasTest < ActiveSupport::TestCase
     context "when the tags have artist entries" do
       should "rename the old artist entry if there is no conflict" do
         @artist = create(:artist, name: "aaa")
-        @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
 
-        @ta.approve!(@admin)
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
         perform_enqueued_jobs
-        assert_equal("active", @ta.reload.status)
 
         assert_equal("bbb", @artist.reload.name)
       end
@@ -224,11 +209,9 @@ class TagAliasTest < ActiveSupport::TestCase
         @tag = create(:tag, name: "aaa", category: Tag.categories.artist)
         @artist1 = create(:artist, name: "aaa", group_name: "g_aaa", other_names: "111 222", url_string: "https://twitter.com/111\n-https://twitter.com/222")
         @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://twitter.com/111\n-https://twitter.com/333\nhttps://twitter.com/444")
-        @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
 
-        @ta.approve!(@admin)
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
         perform_enqueued_jobs
-        assert_equal("active", @ta.reload.status)
 
         assert_equal(true, @artist1.reload.is_deleted)
         assert_equal([@artist2.name], @artist1.other_names)
@@ -244,11 +227,9 @@ class TagAliasTest < ActiveSupport::TestCase
       should "ignore the old artist if it has been deleted" do
         @artist1 = create(:artist, name: "aaa", group_name: "g_aaa", other_names: "111 222", url_string: "https://twitter.com/111\n-https://twitter.com/222", is_deleted: true)
         @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://twitter.com/111\n-https://twitter.com/333\nhttps://twitter.com/444")
-        @ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
 
-        @ta.approve!(@admin)
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
         perform_enqueued_jobs
-        assert_equal("active", @ta.reload.status)
 
         assert_equal(true, @artist1.reload.is_deleted)
         assert_equal(%w[111 222], @artist1.other_names)
@@ -265,9 +246,8 @@ class TagAliasTest < ActiveSupport::TestCase
     should "push the consequent's category to the antecedent if the antecedent is general" do
       tag1 = create(:tag, name: "general", category: 0)
       tag2 = create(:tag, name: "artist", category: 1)
-      ta = create(:tag_alias, antecedent_name: "general", consequent_name: "artist")
 
-      ta.approve!(@admin)
+      TagAlias.approve!(antecedent_name: "general", consequent_name: "artist", approver: @admin)
       perform_enqueued_jobs
 
       assert_equal(1, tag1.reload.category)
@@ -277,9 +257,8 @@ class TagAliasTest < ActiveSupport::TestCase
     should "push the antecedent's category to the consequent if the consequent is general" do
       tag1 = create(:tag, name: "artist", category: 1)
       tag2 = create(:tag, name: "general", category: 0)
-      ta = create(:tag_alias, antecedent_name: "artist", consequent_name: "general")
 
-      ta.approve!(@admin)
+      TagAlias.approve!(antecedent_name: "artist", consequent_name: "general", approver: @admin)
       perform_enqueued_jobs
 
       assert_equal(1, tag1.reload.category)
@@ -289,9 +268,8 @@ class TagAliasTest < ActiveSupport::TestCase
     should "not change either tag category when neither the antecedent or consequent are general" do
       tag1 = create(:tag, name: "character", category: 4)
       tag2 = create(:tag, name: "copyright", category: 3)
-      ta = create(:tag_alias, antecedent_name: "character", consequent_name: "copyright")
 
-      ta.approve!(@admin)
+      TagAlias.approve!(antecedent_name: "character", consequent_name: "copyright", approver: @admin)
       perform_enqueued_jobs
 
       assert_equal(4, tag1.reload.category)

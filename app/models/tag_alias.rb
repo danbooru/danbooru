@@ -3,10 +3,6 @@ class TagAlias < TagRelationship
   validates_uniqueness_of :antecedent_name, scope: :status, conditions: -> { active }
   validate :absence_of_transitive_relation
 
-  def approve!(approver)
-    ProcessTagAliasJob.perform_later(self, approver)
-  end
-
   def self.to_aliased(names)
     names = Array(names).map(&:to_s)
     return [] if names.empty?
@@ -14,8 +10,7 @@ class TagAlias < TagRelationship
     names.map { |name| aliases[name] || name }
   end
 
-  def process!(approver)
-    update!(approver: approver, status: "active")
+  def process!
     TagMover.new(antecedent_name, consequent_name, user: User.system).move!
   rescue Exception => e
     update!(status: "error: #{e}")
