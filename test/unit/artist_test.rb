@@ -66,6 +66,7 @@ class ArtistTest < ActiveSupport::TestCase
         @post = FactoryBot.create(:post, :tag_string => "aaa")
         @admin = FactoryBot.create(:admin_user)
         @artist.ban!(banner: @admin)
+        perform_enqueued_jobs
         @post.reload
       end
 

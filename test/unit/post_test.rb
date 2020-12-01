@@ -547,6 +547,7 @@ class PostTest < ActiveSupport::TestCase
           CurrentUser.scoped(FactoryBot.create(:admin_user)) do
             @artist = FactoryBot.create(:artist)
             @artist.ban!
+            perform_enqueued_jobs
           end
           @post = FactoryBot.create(:post, :tag_string => @artist.name)
         end
