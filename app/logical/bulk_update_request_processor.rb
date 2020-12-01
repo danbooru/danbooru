@@ -39,62 +39,70 @@ class BulkUpdateRequestProcessor
   end
 
   def validate_script
-    commands.each do |command, *args|
-      case command
-      when :create_alias
-        tag_alias = TagAlias.new(creator: User.system, antecedent_name: args[0], consequent_name: args[1])
-        if tag_alias.invalid?
-          errors[:base] << "Can't create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name} (#{tag_alias.errors.full_messages.join("; ")})"
+    BulkUpdateRequest.transaction(requires_new: true) do
+      commands.each do |command, *args|
+        case command
+        when :create_alias
+          tag_alias = TagAlias.create(creator: User.system, antecedent_name: args[0], consequent_name: args[1])
+          if tag_alias.invalid?
+            errors[:base] << "Can't create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name} (#{tag_alias.errors.full_messages.join("; ")})"
+          end
+
+        when :create_implication
+          tag_implication = TagImplication.create(creator: User.system, antecedent_name: args[0], consequent_name: args[1], status: "active")
+          if tag_implication.invalid?
+            errors[:base] << "Can't create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name} (#{tag_implication.errors.full_messages.join("; ")})"
+          end
+
+          if !tag_implication.antecedent_tag.empty? && tag_implication.antecedent_wiki.blank?
+            errors[:base] << "'#{tag_implication.antecedent_tag.name}' must have a wiki page"
+          end
+
+          if !tag_implication.consequent_tag.empty? && tag_implication.consequent_wiki.blank?
+            errors[:base] << "'#{tag_implication.consequent_tag.name}' must have a wiki page"
+          end
+
+        when :remove_alias
+          tag_alias = TagAlias.active.find_by(antecedent_name: args[0], consequent_name: args[1])
+          if tag_alias.nil?
+            errors[:base] << "Can't remove alias #{args[0]} -> #{args[1]} (alias doesn't exist)"
+          else
+            tag_alias.update(status: "deleted")
+          end
+
+        when :remove_implication
+          tag_implication = TagImplication.active.find_by(antecedent_name: args[0], consequent_name: args[1])
+          if tag_implication.nil?
+            errors[:base] << "Can't remove implication #{args[0]} -> #{args[1]} (implication doesn't exist)"
+          else
+            tag_implication.update(status: "deleted")
+          end
+
+        when :change_category
+          tag = Tag.find_by_name(args[0])
+          if tag.nil?
+            errors[:base] << "Can't change category #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)"
+          end
+
+        when :rename
+          tag = Tag.find_by_name(args[0])
+          if tag.nil?
+            errors[:base] << "Can't rename #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)"
+          end
+
+        when :mass_update
+          # okay
+
+        when :invalid_line
+          errors[:base] << "Invalid line: #{args[0]}"
+
+        else
+          # should never happen
+          raise Error, "Unknown command: #{command}"
         end
-
-      when :create_implication
-        tag_implication = TagImplication.new(creator: User.system, antecedent_name: args[0], consequent_name: args[1], status: "active")
-        if tag_implication.invalid?
-          errors[:base] << "Can't create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name} (#{tag_implication.errors.full_messages.join("; ")})"
-        end
-
-        if !tag_implication.antecedent_tag.empty? && tag_implication.antecedent_wiki.blank?
-          errors[:base] << "'#{tag_implication.antecedent_tag.name}' must have a wiki page"
-        end
-
-        if !tag_implication.consequent_tag.empty? && tag_implication.consequent_wiki.blank?
-          errors[:base] << "'#{tag_implication.consequent_tag.name}' must have a wiki page"
-        end
-
-      when :remove_alias
-        tag_alias = TagAlias.active.find_by(antecedent_name: args[0], consequent_name: args[1])
-        if tag_alias.nil?
-          errors[:base] << "Can't remove alias #{args[0]} -> #{args[1]} (alias doesn't exist)"
-        end
-
-      when :remove_implication
-        tag_implication = TagImplication.active.find_by(antecedent_name: args[0], consequent_name: args[1])
-        if tag_implication.nil?
-          errors[:base] << "Can't remove implication #{args[0]} -> #{args[1]} (implication doesn't exist)"
-        end
-
-      when :change_category
-        tag = Tag.find_by_name(args[0])
-        if tag.nil?
-          errors[:base] << "Can't change category #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)"
-        end
-
-      when :rename
-        tag = Tag.find_by_name(args[0])
-        if tag.nil?
-          errors[:base] << "Can't rename #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)"
-        end
-
-      when :mass_update
-        # okay
-
-      when :invalid_line
-        errors[:base] << "Invalid line: #{args[0]}"
-
-      else
-        # should never happen
-        raise Error, "Unknown command: #{command}"
       end
+
+      raise ActiveRecord::Rollback
     end
   end
 
