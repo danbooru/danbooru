@@ -118,16 +118,6 @@ class TagRelationship < ApplicationRecord
     end
   end
 
-  def update_posts
-    Post.without_timeout do
-      Post.raw_tag_match(antecedent_name).find_each do |post|
-        post.with_lock do
-          post.save!
-        end
-      end
-    end
-  end
-
   def self.approve!(antecedent_name:, consequent_name:, approver:, forum_topic: nil)
     ProcessTagRelationshipJob.perform_later(class_name: self.name, approver: approver, antecedent_name: antecedent_name, consequent_name: consequent_name, forum_topic: forum_topic)
   end

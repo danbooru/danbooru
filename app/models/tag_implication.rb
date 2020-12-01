@@ -110,8 +110,15 @@ class TagImplication < TagRelationship
 
   module ApprovalMethods
     def process!
+      update_posts!
+    end
+
+    def update_posts!
       CurrentUser.scoped(User.system) do
-        update_posts
+        Post.system_tag_match("#{antecedent_name} -#{consequent_name}").find_each do |post|
+          post.lock!
+          post.save!
+        end
       end
     end
 

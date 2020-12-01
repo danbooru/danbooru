@@ -116,13 +116,14 @@ class TagImplicationTest < ActiveSupport::TestCase
     end
 
     should "update any affected post upon save" do
-      p1 = FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
+      p1 = create(:post, tag_string: "sword")
+      p2 = create(:post, tag_string: "sword weapon")
 
-      TagImplication.approve!(antecedent_name: "aaa", consequent_name: "xxx", approver: @admin)
-      TagImplication.approve!(antecedent_name: "aaa", consequent_name: "yyy", approver: @admin)
+      TagImplication.approve!(antecedent_name: "sword", consequent_name: "weapon", approver: @admin)
       perform_enqueued_jobs
 
-      assert_equal("aaa bbb ccc xxx yyy", p1.reload.tag_string)
+      assert_equal("sword weapon", p1.reload.tag_string)
+      assert_equal("sword weapon", p2.reload.tag_string)
     end
 
     context "when calculating implied tags" do
