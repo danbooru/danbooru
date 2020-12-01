@@ -22,7 +22,6 @@ class TagImplicationTest < ActiveSupport::TestCase
 
       should allow_value('active').for(:status)
       should allow_value('deleted').for(:status)
-      should allow_value('error: derp').for(:status)
 
       should_not allow_value('ACTIVE').for(:status)
       should_not allow_value('error').for(:status)

@@ -113,9 +113,6 @@ class TagImplication < TagRelationship
       CurrentUser.scoped(User.system) do
         update_posts
       end
-    rescue Exception => e
-      update(status: "error: #{e}")
-      DanbooruLogger.log(e, tag_implication_id: id, antecedent_name: antecedent_name, consequent_name: consequent_name)
     end
 
     def create_mod_action

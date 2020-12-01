@@ -20,7 +20,7 @@ class TagRelationship < ApplicationRecord
   scope :retired, -> {where(status: "retired")}
 
   before_validation :normalize_names
-  validates_format_of :status, :with => /\A(active|deleted|retired|error: .*)\Z/
+  validates :status, inclusion: { in: %w[active deleted retired] }
   validates_presence_of :antecedent_name, :consequent_name
   validates :approver, presence: { message: "must exist" }, if: -> { approver_id.present? }
   validates :forum_topic, presence: { message: "must exist" }, if: -> { forum_topic_id.present? }
@@ -45,10 +45,6 @@ class TagRelationship < ApplicationRecord
 
   def is_active?
     status == "active"
-  end
-
-  def is_errored?
-    status =~ /\Aerror:/
   end
 
   def reject!

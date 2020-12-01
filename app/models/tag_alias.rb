@@ -12,9 +12,6 @@ class TagAlias < TagRelationship
 
   def process!
     TagMover.new(antecedent_name, consequent_name, user: User.system).move!
-  rescue Exception => e
-    update!(status: "error: #{e}")
-    DanbooruLogger.log(e, tag_alias_id: id, antecedent_name: antecedent_name, consequent_name: consequent_name)
   end
 
   def absence_of_transitive_relation
