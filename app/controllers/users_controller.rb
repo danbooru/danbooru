@@ -26,7 +26,8 @@ class UsersController < ApplicationController
 
   def index
     if params[:name].present?
-      @user = User.find_by_name!(params[:name])
+      @user = User.find_by_name(params[:name])
+      raise ActiveRecord::RecordNotFound if @user.blank?
       redirect_to user_path(@user, variant: params[:variant])
       return
     end

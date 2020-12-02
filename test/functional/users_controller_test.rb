@@ -3,7 +3,7 @@ require 'test_helper'
 class UsersControllerTest < ActionDispatch::IntegrationTest
   context "The users controller" do
     setup do
-      @user = create(:user)
+      @user = create(:user, name: "bob")
     end
 
     context "index action" do
@@ -24,8 +24,13 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(User.count, response.parsed_body.css("urlset url loc").size)
       end
 
-      should "list all users for /users?name=<name>" do
+      should "redirect to the user's profile for /users?name=<name>" do
         get users_path, params: { name: @user.name }
+        assert_redirected_to(@user)
+      end
+
+      should "be case-insensitive when redirecting to the user's profile" do
+        get users_path, params: { name: @user.name.capitalize }
         assert_redirected_to(@user)
       end
 
