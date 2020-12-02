@@ -32,6 +32,8 @@ class BulkUpdateRequestProcessor
         [:mass_update, $1, $2]
       when /\Acategory (\S+) -> (#{Tag.categories.regexp})\z/i
         [:change_category, Tag.normalize_name($1), $2.downcase]
+      when /\Anuke (\S+)\z/i
+        [:nuke, $1]
       else
         [:invalid_line, line]
       end
@@ -90,7 +92,7 @@ class BulkUpdateRequestProcessor
             errors[:base] << "Can't rename #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)"
           end
 
-        when :mass_update
+        when :mass_update, :nuke
           # okay
 
         when :invalid_line
@@ -129,6 +131,9 @@ class BulkUpdateRequestProcessor
         when :mass_update
           TagBatchChangeJob.perform_later(args[0], args[1])
 
+        when :nuke
+          TagBatchChangeJob.perform_later(args[0], "-#{args[0]}")
+
         when :rename
           TagRenameJob.perform_later(args[0], args[1])
 
@@ -152,6 +157,8 @@ class BulkUpdateRequestProcessor
       when :mass_update
         tags = PostQueryBuilder.new(args[0]).tags + PostQueryBuilder.new(args[1]).tags
         tags.reject(&:negated).reject(&:optional).reject(&:wildcard).map(&:name)
+      when :nuke
+        PostQueryBuilder.new(args[0]).tags.map(&:name)
       when :change_category
         args[0]
       end
@@ -181,6 +188,14 @@ class BulkUpdateRequestProcessor
         "#{command.to_s.tr("_", " ")} [[#{args[0]}]] -> [[#{args[1]}]]"
       when :mass_update
         "mass update {{#{args[0]}}} -> #{args[1]}"
+      when :nuke
+        query = PostQueryBuilder.new(args[0])
+
+        if query.is_simple_tag?
+          "nuke [[#{args[0]}]]"
+        else
+          "nuke {{#{args[0]}}}"
+        end
       when :change_category
         "category [[#{args[0]}]] -> #{args[1]}"
       else

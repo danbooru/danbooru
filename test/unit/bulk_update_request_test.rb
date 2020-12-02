@@ -252,6 +252,24 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         end
       end
 
+      context "the nuke command" do
+        should "remove tags" do
+          @p1 = create(:post, tag_string: "foo")
+          @p2 = create(:post, tag_string: "bar")
+          @bur = create_bur!("nuke foo", @admin)
+
+          assert_equal("tagme", @p1.reload.tag_string)
+        end
+
+        should "remove pools" do
+          @pool = create(:pool)
+          @post = create(:post, tag_string: "bar pool:#{@pool.id}")
+          @bur = create_bur!("nuke pool:#{@pool.id}", @admin)
+
+          assert_equal([], @pool.post_ids)
+        end
+      end
+
       context "that contains a mass update followed by an alias" do
         should "make the alias take effect after the mass update" do
           @p1 = create(:post, tag_string: "maid_dress")
