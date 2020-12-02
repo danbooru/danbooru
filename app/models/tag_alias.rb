@@ -1,5 +1,4 @@
 class TagAlias < TagRelationship
-  after_save :create_mod_action
   validates_uniqueness_of :antecedent_name, scope: :status, conditions: -> { active }
   validate :absence_of_transitive_relation
 
@@ -21,26 +20,6 @@ class TagAlias < TagRelationship
     # If the a -> b alias was created first, the new one will be allowed and the old one will be moved automatically instead.
     if TagAlias.active.exists?(antecedent_name: consequent_name)
       errors[:base] << "A tag alias for #{consequent_name} already exists"
-    end
-  end
-
-  def create_mod_action
-    alias_desc = %("tag alias ##{id}":[#{Rails.application.routes.url_helpers.tag_alias_path(self)}]: [[#{antecedent_name}]] -> [[#{consequent_name}]])
-
-    if saved_change_to_id?
-      ModAction.log("created #{status} #{alias_desc}", :tag_alias_create)
-    else
-      # format the changes hash more nicely.
-      change_desc = saved_changes.except(:updated_at).map do |attribute, values|
-        old, new = values[0], values[1]
-        if old.nil?
-          %(set #{attribute} to "#{new}")
-        else
-          %(changed #{attribute} from "#{old}" to "#{new}")
-        end
-      end.join(", ")
-
-      ModAction.log("updated #{alias_desc}\n#{change_desc}", :tag_alias_update)
     end
   end
 end

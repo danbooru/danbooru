@@ -7,7 +7,6 @@ class TagBatchChangeJob < ApplicationJob
 
     CurrentUser.scoped(User.system) do
       migrate_posts(normalized_antecedent, normalized_consequent)
-      ModAction.log("processed mass update: #{antecedent} -> #{consequent}", :mass_update)
     end
   end
 

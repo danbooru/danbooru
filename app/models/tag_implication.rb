@@ -2,7 +2,6 @@ class TagImplication < TagRelationship
   has_many :child_implications, class_name: "TagImplication", primary_key: :consequent_name, foreign_key: :antecedent_name
   has_many :parent_implications, class_name: "TagImplication", primary_key: :antecedent_name, foreign_key: :consequent_name
 
-  after_save :create_mod_action
   validates :antecedent_name, uniqueness: { scope: [:consequent_name, :status], conditions: -> { active }}
   validate :absence_of_circular_relation
   validate :absence_of_transitive_relation
@@ -119,26 +118,6 @@ class TagImplication < TagRelationship
           post.lock!
           post.save!
         end
-      end
-    end
-
-    def create_mod_action
-      implication = %("tag implication ##{id}":[#{Rails.application.routes.url_helpers.tag_implication_path(self)}]: [[#{antecedent_name}]] -> [[#{consequent_name}]])
-
-      if saved_change_to_id?
-        ModAction.log("created #{status} #{implication}", :tag_implication_create)
-      else
-        # format the changes hash more nicely.
-        change_desc = saved_changes.except(:updated_at).map do |attribute, values|
-          old, new = values[0], values[1]
-          if old.nil?
-            %(set #{attribute} to "#{new}")
-          else
-            %(changed #{attribute} from "#{old}" to "#{new}")
-          end
-        end.join(", ")
-
-        ModAction.log("updated #{implication}\n#{change_desc}", :tag_implication_update)
       end
     end
   end
