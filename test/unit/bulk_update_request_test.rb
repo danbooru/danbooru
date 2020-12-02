@@ -335,7 +335,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = build(:bulk_update_request, script: "imply a -> b")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["'a' must have a wiki page; 'b' must have a wiki page"], @bur.errors.full_messages)
+          assert_equal(["Can't create implication a -> b ('a' must have a wiki page; 'b' must have a wiki page)"], @bur.errors.full_messages)
         end
       end
     end

@@ -7,6 +7,7 @@ class TagImplication < TagRelationship
   validate :absence_of_transitive_relation
   validate :antecedent_is_not_aliased
   validate :consequent_is_not_aliased
+  validate :has_wiki_page, on: :request
 
   concerning :HierarchyMethods do
     class_methods do
@@ -89,6 +90,16 @@ class TagImplication < TagRelationship
       # We don't want to implicate a -> b if b is already aliased to c
       if TagAlias.active.exists?(["antecedent_name = ?", consequent_name])
         errors[:base] << "Consequent tag must not be aliased to another tag"
+      end
+    end
+
+    def has_wiki_page
+      if !antecedent_tag.empty? && antecedent_wiki.blank?
+        errors[:base] << "'#{antecedent_name}' must have a wiki page"
+      end
+
+      if !consequent_tag.empty? && consequent_wiki.blank?
+        errors[:base] << "'#{consequent_name}' must have a wiki page"
       end
     end
   end

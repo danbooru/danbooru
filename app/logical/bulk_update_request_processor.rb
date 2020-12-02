@@ -40,28 +40,25 @@ class BulkUpdateRequestProcessor
     end
   end
 
+  # validation_context will be either :request (when the BUR is first created
+  # or edited) or :approval (when the BUR is approved). Certain validations
+  # only run when the BUR is requested, not when it's approved.
   def validate_script
     BulkUpdateRequest.transaction(requires_new: true) do
       commands.each do |command, *args|
         case command
         when :create_alias
-          tag_alias = TagAlias.create(creator: User.system, antecedent_name: args[0], consequent_name: args[1])
-          if tag_alias.invalid?
+          tag_alias = TagAlias.new(creator: User.system, antecedent_name: args[0], consequent_name: args[1])
+          tag_alias.save(context: validation_context)
+          if tag_alias.errors.present?
             errors[:base] << "Can't create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name} (#{tag_alias.errors.full_messages.join("; ")})"
           end
 
         when :create_implication
-          tag_implication = TagImplication.create(creator: User.system, antecedent_name: args[0], consequent_name: args[1], status: "active")
-          if tag_implication.invalid?
+          tag_implication = TagImplication.new(creator: User.system, antecedent_name: args[0], consequent_name: args[1], status: "active")
+          tag_implication.save(context: validation_context)
+          if tag_implication.errors.present?
             errors[:base] << "Can't create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name} (#{tag_implication.errors.full_messages.join("; ")})"
-          end
-
-          if !tag_implication.antecedent_tag.empty? && tag_implication.antecedent_wiki.blank?
-            errors[:base] << "'#{tag_implication.antecedent_tag.name}' must have a wiki page"
-          end
-
-          if !tag_implication.consequent_tag.empty? && tag_implication.consequent_wiki.blank?
-            errors[:base] << "'#{tag_implication.consequent_tag.name}' must have a wiki page"
           end
 
         when :remove_alias
@@ -110,8 +107,6 @@ class BulkUpdateRequestProcessor
 
   def process!(approver)
     ActiveRecord::Base.transaction do
-      validate!
-
       commands.map do |command, *args|
         case command
         when :create_alias

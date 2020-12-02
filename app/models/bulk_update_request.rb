@@ -73,6 +73,7 @@ class BulkUpdateRequest < ApplicationRecord
     def approve!(approver)
       transaction do
         CurrentUser.scoped(approver) do
+          processor.validate!(:approval)
           processor.process!(approver)
           update!(status: "approved", approver: approver)
           forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.")
@@ -107,7 +108,7 @@ class BulkUpdateRequest < ApplicationRecord
   end
 
   def validate_script
-    if processor.invalid?
+    if processor.invalid?(:request)
       errors[:base] << processor.errors.full_messages.join("; ")
     end
   end
