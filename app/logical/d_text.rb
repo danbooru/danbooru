@@ -109,11 +109,11 @@ class DText
       end
 
       if obj.is_approved?
-        "The bulk update request ##{obj.id} is active.\n\n#{embedded_script}"
+        "The \"bulk update request ##{obj.id}\":/bulk_update_requests/#{obj.id} is active.\n\n#{embedded_script}"
       elsif obj.is_pending?
         "The \"bulk update request ##{obj.id}\":/bulk_update_requests/#{obj.id} is pending approval.\n\n#{embedded_script}"
       elsif obj.is_rejected?
-        "The bulk update request ##{obj.id} has been rejected.\n\n#{embedded_script}"
+        "The \"bulk update request ##{obj.id}\":/bulk_update_requests/#{obj.id} has been rejected.\n\n#{embedded_script}"
       end
     end
   end
