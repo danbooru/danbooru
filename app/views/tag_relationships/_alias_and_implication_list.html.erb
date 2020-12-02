@@ -14,7 +14,7 @@
     </p>
   <% end %>
 
-  <% TagImplication.automatic_tags_for([tag.name]).tap do |automatic_tags| %>
+  <% Tag.automatic_tags_for([tag.name]).tap do |automatic_tags| %>
     <% if automatic_tags.present? %>
       <p class="fineprint">
         This tag automatically adds

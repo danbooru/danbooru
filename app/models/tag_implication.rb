@@ -8,20 +8,6 @@ class TagImplication < TagRelationship
   validate :antecedent_is_not_aliased
   validate :consequent_is_not_aliased
 
-  module DescendantMethods
-    extend ActiveSupport::Concern
-
-    module ClassMethods
-      def automatic_tags_for(names)
-        tags = []
-        tags += names.grep(/\A(.+)_\(cosplay\)\z/i) { "char:#{TagAlias.to_aliased([$1]).first}" }
-        tags << "cosplay" if names.any?(/_\(cosplay\)\z/i)
-        tags << "school_uniform" if names.any?(/_school_uniform\z/i)
-        tags.uniq
-      end
-    end
-  end
-
   concerning :HierarchyMethods do
     class_methods do
       def ancestors_of(names)
@@ -64,7 +50,7 @@ class TagImplication < TagRelationship
     end
   end
 
-  module ValidationMethods
+  concerning :ValidationMethods do
     def absence_of_circular_relation
       return if is_rejected?
 
@@ -107,7 +93,7 @@ class TagImplication < TagRelationship
     end
   end
 
-  module ApprovalMethods
+  concerning :ApprovalMethods do
     def process!
       update_posts!
     end
@@ -121,8 +107,4 @@ class TagImplication < TagRelationship
       end
     end
   end
-
-  include DescendantMethods
-  include ValidationMethods
-  include ApprovalMethods
 end

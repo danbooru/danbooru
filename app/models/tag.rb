@@ -335,6 +335,14 @@ class Tag < ApplicationRecord
     end
   end
 
+  def self.automatic_tags_for(names)
+    tags = []
+    tags += names.grep(/\A(.+)_\(cosplay\)\z/i) { "char:#{TagAlias.to_aliased([$1]).first}" }
+    tags << "cosplay" if names.any?(/_\(cosplay\)\z/i)
+    tags << "school_uniform" if names.any?(/_school_uniform\z/i)
+    tags.uniq
+  end
+
   def self.convert_cosplay_tags(tags)
     cosplay_tags, other_tags = tags.partition {|tag| tag.match(/\A(.+)_\(cosplay\)\Z/) }
     cosplay_tags.grep(/\A(.+)_\(cosplay\)\Z/) { "#{TagAlias.to_aliased([$1]).first}_(cosplay)" } + other_tags
