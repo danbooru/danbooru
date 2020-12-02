@@ -82,12 +82,20 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(true, TagImplication.where(antecedent_name: "ddd", consequent_name: "ccc", status: "active").exists?)
         end
 
+        should "allow aliases to be reversed in one step" do
+          @alias = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
+          @bur = create_bur!("create alias bbb -> aaa", @admin)
+
+          assert_equal(true, @alias.reload.is_deleted?)
+          assert_equal(true, TagAlias.active.exists?(antecedent_name: "bbb", consequent_name: "aaa"))
+        end
+
         should "fail if the alias is invalid" do
-          create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
-          @bur = build(:bulk_update_request, script: "create alias bbb -> aaa")
+          @alias = create(:tag_alias, antecedent_name: "bbb", consequent_name: "ccc")
+          @bur = build(:bulk_update_request, script: "create alias aaa -> bbb")
 
           assert_equal(false, @bur.valid?)
-          assert_equal(["Can't create alias bbb -> aaa (A tag alias for aaa already exists)"], @bur.errors.full_messages)
+          assert_equal(["Can't create alias aaa -> bbb (bbb is already aliased to ccc)"], @bur.errors.full_messages)
         end
 
         should "be case-insensitive" do

@@ -138,7 +138,7 @@ class TagAliasTest < ActiveSupport::TestCase
         ta2 = FactoryBot.build(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
         ta2.save
         assert(ta2.errors.any?, "Tag alias should be invalid")
-        assert_equal("A tag alias for bbb already exists", ta2.errors.full_messages.join)
+        assert_equal("bbb is already aliased to ccc", ta2.errors.full_messages.join)
       end
     end
 
