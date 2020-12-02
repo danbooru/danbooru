@@ -140,6 +140,18 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(false, @bur.valid?)
           assert_equal(["Can't create implication a -> c (a already implies c through another implication)"], @bur.errors.full_messages)
         end
+
+        should "fail for an implication between tags of different categories" do
+          create(:tag, name: "hatsune_miku", category: Tag.categories.character)
+          create(:tag, name: "vocaloid", category: Tag.categories.copyright)
+          create(:wiki_page, title: "hatsune_miku")
+          create(:wiki_page, title: "vocaloid")
+
+          @bur = build(:bulk_update_request, script: "imply hatsune_miku -> vocaloid")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't create implication hatsune_miku -> vocaloid (Can't imply a character tag to a copyright tag)"], @bur.errors.full_messages)
+        end
       end
 
       context "the remove alias command" do

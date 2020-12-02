@@ -7,6 +7,7 @@ class TagImplication < TagRelationship
   validate :absence_of_transitive_relation
   validate :antecedent_is_not_aliased
   validate :consequent_is_not_aliased
+  validate :tag_categories_are_compatible
   validate :has_wiki_page, on: :request
 
   concerning :HierarchyMethods do
@@ -90,6 +91,12 @@ class TagImplication < TagRelationship
       # We don't want to implicate a -> b if b is already aliased to c
       if TagAlias.active.exists?(["antecedent_name = ?", consequent_name])
         errors[:base] << "Consequent tag must not be aliased to another tag"
+      end
+    end
+
+    def tag_categories_are_compatible
+      if antecedent_tag.category != consequent_tag.category
+        errors[:base] << "Can't imply a #{antecedent_tag.category_name.downcase} tag to a #{consequent_tag.category_name.downcase} tag"
       end
     end
 
