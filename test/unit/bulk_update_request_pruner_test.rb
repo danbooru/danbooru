@@ -19,7 +19,7 @@ class BulkUpdateRequestPrunerTest < ActiveSupport::TestCase
 
       BulkUpdateRequestPruner.reject_expired
       assert_equal("rejected", bur.reload.status)
-      assert_match(/rejected because it was not approved within 60 days/, bur.forum_post.body)
+      assert_match(/rejected because it was not approved within 60 days/, ForumPost.second.body)
     end
   end
 end

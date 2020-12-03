@@ -60,14 +60,7 @@ class BulkUpdateRequest < ApplicationRecord
 
   module ApprovalMethods
     def forum_updater
-      @forum_updater ||= begin
-        post = if forum_topic
-          forum_post || forum_topic.forum_posts.first
-        else
-          nil
-        end
-        ForumUpdater.new(forum_topic, forum_post: post)
-      end
+      @forum_updater ||= ForumUpdater.new(forum_topic)
     end
 
     def approve!(approver)
