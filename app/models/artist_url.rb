@@ -20,9 +20,9 @@ class ArtistUrl < ApplicationRecord
       nil
     else
       url = url.sub(%r!^https://!, "http://")
-      url = url.sub(%r!^http://blog\d+\.fc2!, "http://blog.fc2")
       url = url.sub(%r!^http://blog-imgs-\d+\.fc2!, "http://blog.fc2")
       url = url.sub(%r!^http://blog-imgs-\d+-\w+\.fc2!, "http://blog.fc2")
+      url = url.sub(%r!^http://blog\d*\.fc2\.com/(?:\w/){,3}(\w+)!, "http://\\1.blog.fc2.com")
       url = url.sub(%r!^http://pictures.hentai-foundry.com//!, "http://pictures.hentai-foundry.com/")
 
       # the strategy won't always work for twitter because it looks for a status
