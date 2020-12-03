@@ -152,6 +152,21 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(false, @bur.valid?)
           assert_equal(["Can't create implication hatsune_miku -> vocaloid (Can't imply a character tag to a copyright tag)"], @bur.errors.full_messages)
         end
+
+        should "fail for a child tag that is too small" do
+          @t1 = create(:tag, name: "white_shirt", post_count: 9)
+          @t2 = create(:tag, name: "shirt", post_count: 1000000)
+          create(:wiki_page, title: "white_shirt")
+          create(:wiki_page, title: "shirt")
+          @bur = build(:bulk_update_request, script: "imply white_shirt -> shirt")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't create implication white_shirt -> shirt ('white_shirt' must have at least 10 posts)"], @bur.errors.full_messages)
+
+          @t1.update!(post_count: 99)
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't create implication white_shirt -> shirt ('white_shirt' must have at least 100 posts)"], @bur.errors.full_messages)
+        end
       end
 
       context "the remove alias command" do
@@ -342,8 +357,8 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
       context "requesting an implication for a populated tag without a wiki" do
         should "fail" do
-          create(:tag, name: "a", post_count: 1)
-          create(:tag, name: "b", post_count: 1)
+          create(:tag, name: "a", post_count: 10)
+          create(:tag, name: "b", post_count: 100)
           @bur = build(:bulk_update_request, script: "imply a -> b")
 
           assert_equal(false, @bur.valid?)

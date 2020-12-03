@@ -1,4 +1,8 @@
 class TagImplication < TagRelationship
+  MINIMUM_TAG_COUNT = 10
+  MINIMUM_TAG_PERCENTAGE = 0.0001
+  MAXIMUM_TAG_PERCENTAGE = 0.9
+
   has_many :child_implications, class_name: "TagImplication", primary_key: :consequent_name, foreign_key: :antecedent_name
   has_many :parent_implications, class_name: "TagImplication", primary_key: :antecedent_name, foreign_key: :consequent_name
 
@@ -8,6 +12,7 @@ class TagImplication < TagRelationship
   validate :antecedent_is_not_aliased
   validate :consequent_is_not_aliased
   validate :tag_categories_are_compatible
+  validate :meets_tag_size_requirements, on: :request
   validate :has_wiki_page, on: :request
 
   concerning :HierarchyMethods do
@@ -97,6 +102,26 @@ class TagImplication < TagRelationship
     def tag_categories_are_compatible
       if antecedent_tag.category != consequent_tag.category
         errors[:base] << "Can't imply a #{antecedent_tag.category_name.downcase} tag to a #{consequent_tag.category_name.downcase} tag"
+      end
+    end
+
+    # Require tags to have at least 10 posts or be at least 0.01% the size of
+    # the parent tag, and not make up more than 90% of the parent tag. Only
+    # applies to general tags. Doesn't apply when the parent tag is empty to
+    # allow creating new umbrella tags.
+    def meets_tag_size_requirements
+      return unless antecedent_tag.general?
+      return if consequent_tag.empty?
+
+      if antecedent_tag.post_count < MINIMUM_TAG_COUNT
+        errors[:base] << "'#{antecedent_name}' must have at least #{MINIMUM_TAG_COUNT} posts"
+      elsif antecedent_tag.post_count < (MINIMUM_TAG_PERCENTAGE * consequent_tag.post_count)
+        errors[:base] << "'#{antecedent_name}' must have at least #{(MINIMUM_TAG_PERCENTAGE * consequent_tag.post_count).to_i} posts"
+      end
+
+      max_count = MAXIMUM_TAG_PERCENTAGE * PostQueryBuilder.new("~#{antecedent_name} ~#{consequent_name}").fast_count.to_i
+      if antecedent_tag.post_count > max_count && max_count > 0
+        errors[:base] << "'#{antecedent_name}' can't make up than #{(MAXIMUM_TAG_PERCENTAGE * 100).to_i}% of '#{consequent_name}'"
       end
     end
 
