@@ -373,6 +373,15 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(["Can't create implication a -> b ('a' must have a wiki page; 'b' must have a wiki page)"], @bur.errors.full_messages)
         end
       end
+
+      context "a bulk update request that is too long" do
+        should "fail" do
+          @bur = build(:bulk_update_request, script: "nuke touhou\n" * 200)
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Bulk update request is too long (maximum size: 100 lines). Split your request into smaller chunks and try again."], @bur.errors.full_messages)
+        end
+      end
     end
 
     context "when the script is updated" do

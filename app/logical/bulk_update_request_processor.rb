@@ -1,5 +1,6 @@
 class BulkUpdateRequestProcessor
   MAXIMUM_RENAME_COUNT = 200
+  MAXIMUM_SCRIPT_LENGTH = 100
 
   include ActiveModel::Validations
 
@@ -8,6 +9,7 @@ class BulkUpdateRequestProcessor
   attr_reader :bulk_update_request
   delegate :script, :forum_topic, to: :bulk_update_request
   validate :validate_script
+  validate :validate_script_length
 
   def initialize(bulk_update_request)
     @bulk_update_request = bulk_update_request
@@ -106,6 +108,12 @@ class BulkUpdateRequestProcessor
       end
 
       raise ActiveRecord::Rollback
+    end
+  end
+
+  def validate_script_length
+    if commands.size > MAXIMUM_SCRIPT_LENGTH
+      errors[:base] << "Bulk update request is too long (maximum size: #{MAXIMUM_SCRIPT_LENGTH} lines). Split your request into smaller chunks and try again."
     end
   end
 
