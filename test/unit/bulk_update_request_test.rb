@@ -265,6 +265,14 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(["Can't rename aaa -> bbb (the 'aaa' tag doesn't exist)"], @bur.errors.full_messages)
         end
 
+        should "fail if the old tag has more than 200 posts" do
+          create(:tag, name: "aaa", post_count: 1000)
+          @bur = build(:bulk_update_request, script: "rename aaa -> bbb")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't rename aaa -> bbb ('aaa' has more than 200 posts, use an alias instead)"], @bur.errors.full_messages)
+        end
+
         context "when renaming a character tag with a *_(cosplay) tag" do
           should "move the *_(cosplay) tag as well" do
             @post = create(:post, tag_string: "toosaka_rin_(cosplay)")

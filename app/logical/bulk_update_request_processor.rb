@@ -1,4 +1,6 @@
 class BulkUpdateRequestProcessor
+  MAXIMUM_RENAME_COUNT = 200
+
   include ActiveModel::Validations
 
   class Error < StandardError; end
@@ -87,6 +89,8 @@ class BulkUpdateRequestProcessor
           tag = Tag.find_by_name(args[0])
           if tag.nil?
             errors[:base] << "Can't rename #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)"
+          elsif tag.post_count > MAXIMUM_RENAME_COUNT
+            errors[:base] << "Can't rename #{args[0]} -> #{args[1]} ('#{args[0]}' has more than #{MAXIMUM_RENAME_COUNT} posts, use an alias instead)"
           end
 
         when :mass_update, :nuke
