@@ -119,7 +119,7 @@ class TagImplication < TagRelationship
         errors[:base] << "'#{antecedent_name}' must have at least #{(MINIMUM_TAG_PERCENTAGE * consequent_tag.post_count).to_i} posts"
       end
 
-      max_count = MAXIMUM_TAG_PERCENTAGE * PostQueryBuilder.new("~#{antecedent_name} ~#{consequent_name}").fast_count.to_i
+      max_count = MAXIMUM_TAG_PERCENTAGE * PostQueryBuilder.new("~#{antecedent_name} ~#{consequent_name}").fast_count(timeout: 0).to_i
       if antecedent_tag.post_count > max_count && max_count > 0
         errors[:base] << "'#{antecedent_name}' can't make up than #{(MAXIMUM_TAG_PERCENTAGE * 100).to_i}% of '#{consequent_name}'"
       end
