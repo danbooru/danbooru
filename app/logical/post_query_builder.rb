@@ -398,7 +398,12 @@ class PostQueryBuilder
 
   def ordfav_matches(username)
     user = User.find_by_name(username)
-    favorites_include(username).joins(:favorites).merge(Favorite.for_user(user.id)).order("favorites.id DESC")
+
+    if user.present?
+      favorites_include(username).joins(:favorites).merge(Favorite.for_user(user.id)).order("favorites.id DESC")
+    else
+      Post.none
+    end
   end
 
   def note_matches(query)
