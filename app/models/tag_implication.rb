@@ -107,11 +107,11 @@ class TagImplication < TagRelationship
 
     # Require tags to have at least 10 posts or be at least 0.01% the size of
     # the parent tag, and not make up more than 90% of the parent tag. Only
-    # applies to general tags. Doesn't apply when the parent tag is empty to
-    # allow creating new umbrella tags.
+    # applies to general tags. Doesn't apply when either tag is empty to allow
+    # implying new tags.
     def meets_tag_size_requirements
       return unless antecedent_tag.general?
-      return if consequent_tag.empty?
+      return if antecedent_tag.empty? || consequent_tag.empty?
 
       if antecedent_tag.post_count < MINIMUM_TAG_COUNT
         errors[:base] << "'#{antecedent_name}' must have at least #{MINIMUM_TAG_COUNT} posts"
