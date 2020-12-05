@@ -9,10 +9,10 @@ class TagMover
 
   def move!
     CurrentUser.scoped(user) do
+      move_tag_category!
       move_aliases!
       move_implications!
       move_cosplay_tag!
-      move_tag_category!
       move_artist!
       move_wiki!
       move_saved_searches!

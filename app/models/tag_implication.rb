@@ -11,7 +11,7 @@ class TagImplication < TagRelationship
   validate :absence_of_transitive_relation
   validate :antecedent_is_not_aliased
   validate :consequent_is_not_aliased
-  validate :tag_categories_are_compatible
+  validate :tag_categories_are_compatible, on: :request
   validate :meets_tag_size_requirements, on: :request
   validate :has_wiki_page, on: :request
 

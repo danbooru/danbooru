@@ -82,6 +82,18 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(true, TagImplication.where(antecedent_name: "ddd", consequent_name: "ccc", status: "active").exists?)
         end
 
+        should "allow moving a copyright tag that implies another copyright tag" do
+          @t1 = create(:tag, name: "komeiji_koishi's_heart_throbbing_adventure", category: Tag.categories.general)
+          @t2 = create(:tag, name: "komeiji_koishi_no_dokidoki_daibouken", category: Tag.categories.copyright)
+          @t3 = create(:tag, name: "touhou", category: Tag.categories.copyright)
+          create(:tag_implication, antecedent_name: "komeiji_koishi_no_dokidoki_daibouken", consequent_name: "touhou")
+
+          create_bur!("alias komeiji_koishi_no_dokidoki_daibouken -> komeiji_koishi's_heart_throbbing_adventure", @admin)
+
+          assert_equal(true, @t1.reload.copyright?)
+          assert_equal(true, TagImplication.exists?(antecedent_name: "komeiji_koishi's_heart_throbbing_adventure", consequent_name: "touhou"))
+        end
+
         should "allow aliases to be reversed in one step" do
           @alias = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
           @bur = create_bur!("create alias bbb -> aaa", @admin)
