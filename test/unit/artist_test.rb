@@ -363,6 +363,20 @@ class ArtistTest < ActiveSupport::TestCase
       end
     end
 
+    context "when finding fc2.com artists" do
+      setup do
+        create(:artist, name: "awa", url_string: "http://abk00.blog.fc2.com")
+      end
+
+      should "find the artist" do
+        assert_artist_found("awa", "http://blog71.fc2.com/a/abk00/file/20080220194219.jpg")
+      end
+
+      should "return nothing for an unknown artist" do
+        assert_artist_not_found("http://blog71.fc2.com/a/nobody/file/20080220194219.jpg")
+      end
+    end
+
     should "normalize its other names" do
       artist = FactoryBot.create(:artist, name: "a1", other_names: "a1 aaa aaa AAA bbb ccc_ddd")
       assert_equal("aaa bbb ccc_ddd", artist.other_names_string)
