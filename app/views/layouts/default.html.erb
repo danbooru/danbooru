@@ -51,12 +51,12 @@
 
   <header id="top">
     <%= link_to Danbooru.config.app_name, root_path, id: "app-name-header", class: "heading" %>
-    
+
     <div id="maintoggle" class="mobile-only">
       <a href="#"><i id="maintoggle-on" class="fas fa-bars"></i></a>
       <a href="#"><i id="maintoggle-off" class="fas fa-times" style="display: none;"></i></a>
     </div>
-    
+
     <nav id="nav">
       <%= render "layouts/main_links" %>
       <% if content_for(:secondary_links).present? %>

@@ -33,7 +33,7 @@ CREATE FUNCTION public.favorites_insert_trigger() RETURNS trigger
       begin
         if (NEW.user_id % 100 = 0) then
           insert into favorites_0 values (NEW.*);
-    
+
         elsif (NEW.user_id % 100 = 1) then
           insert into favorites_1 values (NEW.*);
 

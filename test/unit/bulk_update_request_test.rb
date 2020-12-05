@@ -346,9 +346,9 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       context "a script with extra whitespace" do
         should "validate" do
           @script = %{
-            create alias aaa -> 000 
+            create alias aaa -> 000
 
-            create alias bbb -> 111 
+            create alias bbb -> 111
           }
 
           @bur = create(:bulk_update_request, script: @script)

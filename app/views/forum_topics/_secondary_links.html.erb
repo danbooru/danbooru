@@ -1,7 +1,7 @@
 <% content_for(:secondary_links) do %>
   <%= quick_search_form_for(:body_matches, forum_posts_path, "forum posts") %>
   <%= subnav_link_to "Listing", forum_topics_path %>
-  
+
   <% if policy(ForumTopic).create? %>
     <%= subnav_link_to "New", new_forum_topic_path %>
   <% end %>
@@ -14,7 +14,7 @@
   <% else %>
     <%= subnav_link_to "Request alias/implication", new_bulk_update_request_path %>
   <% end %>
-  
+
   <%= subnav_link_to "Search", search_forum_posts_path %>
   <%= subnav_link_to "Help", wiki_page_path("help:forum") %>
   <% if CurrentUser.is_member? && @forum_topic && !@forum_topic.new_record? %>

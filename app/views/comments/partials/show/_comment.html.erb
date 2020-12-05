@@ -30,7 +30,7 @@
         <%= format_text(comment.body, data: dtext_data) %>
       </div>
       <%= render "application/update_notice", record: comment %>
-      
+
       <% if policy(comment).create? %>
         <menu>
           <% if context == :index_by_comment %>

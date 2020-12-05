@@ -109,7 +109,7 @@
           <td>
             <%= link_to user.post_votes.count, post_votes_path(search: { user_name: user.name }) %> posts,
             <%= link_to user.comment_votes.count, comment_votes_path(search: { user_name: user.name }) %> comments,
-            <%= link_to user.forum_post_votes.count, forum_post_votes_path(search: { creator_name: user.name }) %> forum posts 
+            <%= link_to user.forum_post_votes.count, forum_post_votes_path(search: { creator_name: user.name }) %> forum posts
           </td>
         </tr>
       <% end %>
@@ -123,7 +123,7 @@
         <th>Post Changes</th>
         <td>
           <%= presenter.post_version_count(self) %>
-          <% if CurrentUser.id == user.id %> 
+          <% if CurrentUser.id == user.id %>
             (<%= link_to "refresh", new_maintenance_user_count_fixes_path %>)
           <% end %>
         </td>
@@ -190,7 +190,7 @@
         <th>Feedback</th>
         <td><%= presenter.feedbacks(self) %></td>
       </tr>
-      
+
       <% if policy(UserNameChangeRequest.new(user: user)).show? %>
         <% user.user_name_change_requests.visible(CurrentUser.user).tap do |changes| %>
           <% if changes.present? %>

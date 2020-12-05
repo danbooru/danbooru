@@ -7,8 +7,8 @@
 
     <%= edit_form_for @user do |f| %>
       <h2 id="edit-options">
-        <%= link_to "Basic", "#basic-settings", :class => "active" %> 
-        | <%= link_to "Advanced", "#advanced-settings" %> 
+        <%= link_to "Basic", "#basic-settings", :class => "active" %>
+        | <%= link_to "Advanced", "#advanced-settings" %>
       </h2>
 
       <fieldset id="basic-settings-section">
@@ -40,7 +40,7 @@
 
         <%= f.input :theme, collection: User.themes.keys, include_blank: false, hint: "The site's colorscheme (light mode or dark mode)." %>
         <%= f.input :enable_safe_mode, label: "Safe mode", hint: "Show only safe images. Hide questionable and explicit images.", as: :select, include_blank: false, collection: [["Yes", "true"], ["No", "false"]] %>
-        
+
         <%= f.input :per_page, label: "Posts per page", as: :select, hint: "Number of thumbnails per page", collection: (1..PostSets::Post::MAX_PER_PAGE), include_blank: false %>
         <%= f.input :default_image_size, hint: "Show full original images or resized #{Danbooru.config.large_image_width}px width samples.", label: "Default image width", collection: [["850px", "large"], ["original", "original"]], include_blank: false %>
         <%= f.input :receive_email_notifications, as: :select, include_blank: false, collection: [["Yes", "true"], ["No", "false"]], hint: "Receive an email when you receive a new dmail." %>
@@ -48,7 +48,7 @@
         <%= f.input :comment_threshold, hint: "Comments below this score will be hidden by default" %>
         <%= f.input :blacklisted_tags, hint: "Posts with these tags will be hidden. Put each tag on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, :input_html => {:size => "40x5", :data => {:autocomplete => "tag-query"}} %>
       </fieldset>
-      
+
       <fieldset id="advanced-settings-section">
         <div class="input">
           <label>Account</label>
