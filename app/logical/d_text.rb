@@ -109,7 +109,7 @@ class DText
       end
 
       if obj.is_approved?
-        "The \"bulk update request ##{obj.id}\":/bulk_update_requests/#{obj.id} has been approved by <@#{obj.approver.pretty_name}>.\n\n#{embedded_script}"
+        "The \"bulk update request ##{obj.id}\":/bulk_update_requests/#{obj.id} has been approved by <@#{obj.approver.name}>.\n\n#{embedded_script}"
       elsif obj.is_pending?
         "The \"bulk update request ##{obj.id}\":/bulk_update_requests/#{obj.id} is pending approval.\n\n#{embedded_script}"
       elsif obj.is_rejected?
