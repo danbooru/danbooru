@@ -207,6 +207,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post2 = create(:post, tag_string: "fav:#{CurrentUser.name}")
 
       assert_tag_match([post2, post1], "ordfav:#{CurrentUser.name}")
+      assert_tag_match([], "ordfav:does_not_exist")
     end
 
     should "return posts for the pool:<name> metatag" do
