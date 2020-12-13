@@ -155,7 +155,8 @@ class AutocompleteService
   end
 
   def autocomplete_saved_search_label(string)
-    labels = SavedSearch.search_labels(current_user.id, label: string).take(limit)
+    string = "*" + string + "*" unless string.include?("*")
+    labels = current_user.saved_searches.labels_like(string).take(limit)
 
     labels.map do |label|
       { label: label.tr("_", " "), value: label }

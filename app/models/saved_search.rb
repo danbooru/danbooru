@@ -63,6 +63,14 @@ class SavedSearch < ApplicationRecord
           .gsub(/[[:space:]]/, "_")
       end
 
+      def all_labels
+        select(Arel.sql("distinct unnest(labels) as label")).order(:label)
+      end
+
+      def labels_like(label)
+        all_labels.select { |ss| ss.label.ilike?(label) }.map(&:label)
+      end
+
       def search_labels(user_id, params)
         labels = labels_for(user_id)
 

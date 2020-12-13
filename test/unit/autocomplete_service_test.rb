@@ -61,8 +61,10 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
       create(:saved_search, query: "bkub", labels: ["artists"], user: user)
 
       assert_autocomplete_equals(["artists"], "art", :saved_search_label, current_user: user)
+      assert_autocomplete_equals([], "art", :saved_search_label, current_user: User.anonymous)
 
       assert_autocomplete_equals(["search:artists"], "search:art", :tag_query, current_user: user)
+      assert_autocomplete_equals([], "search:art", :saved_search_label, current_user: User.anonymous)
     end
 
     should "autocomplete single tags" do
