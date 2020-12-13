@@ -33,6 +33,10 @@ class WikiPage < ApplicationRecord
       where(title: normalize_title(title))
     end
 
+    def title_matches(title)
+      where_like(:title, normalize_title(title))
+    end
+
     def other_names_include(name)
       name = normalize_other_name(name)
       subquery = WikiPage.from("unnest(other_names) AS other_name").where_iequals("other_name", name)

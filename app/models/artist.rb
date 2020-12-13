@@ -203,6 +203,10 @@ class Artist < ApplicationRecord
   end
 
   module SearchMethods
+    def name_matches(query)
+      where_like(:name, normalize_name(query))
+    end
+
     def any_other_name_matches(regex)
       where(id: Artist.from("unnest(other_names) AS other_name").where_regex("other_name", regex))
     end

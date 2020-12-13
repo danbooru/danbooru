@@ -4,5 +4,5 @@
   <Description><%= Danbooru.config.app_name %> search</Description>
   <Image height="16" width="16" type="image/x-icon"><%= root_url %>favicon.ico</Image>
   <Url type="text/html" template="<%= posts_url %>?tags={searchTerms}&amp;utm_source=opensearch"/>
-  <Url type="application/x-suggestions+json" template="<%= autocomplete_index_url(format: :json) %>?query={searchTerms}&amp;type=tags&amp;variant=opensearch"/>
+  <Url type="application/x-suggestions+json" template="<%= autocomplete_index_url(format: :json) %>?search[query]={searchTerms}&amp;type=tags&amp;search[type]=opensearch"/>
 </OpenSearchDescription>
