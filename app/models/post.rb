@@ -1377,20 +1377,12 @@ class Post < ApplicationRecord
 
     def added_tags_are_valid
       new_tags = added_tags.select(&:empty?)
-      new_general_tags = new_tags.select(&:general?)
-      new_artist_tags = new_tags.select(&:artist?)
-      repopulated_tags = new_tags.select { |t| !t.general? && !t.meta? && (t.created_at < 1.hour.ago) }
+      new_artist_tags, new_general_tags = new_tags.partition(&:artist?)
 
       if new_general_tags.present?
         n = new_general_tags.size
         tag_wiki_links = new_general_tags.map { |tag| "[[#{tag.name}]]" }
         self.warnings[:base] << "Created #{n} new #{(n == 1) ? "tag" : "tags"}: #{tag_wiki_links.join(", ")}"
-      end
-
-      if repopulated_tags.present?
-        n = repopulated_tags.size
-        tag_wiki_links = repopulated_tags.map { |tag| "[[#{tag.name}]]" }
-        self.warnings[:base] << "Repopulated #{n} old #{(n == 1) ? "tag" : "tags"}: #{tag_wiki_links.join(", ")}"
       end
 
       new_artist_tags.each do |tag|
