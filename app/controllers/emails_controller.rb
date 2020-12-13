@@ -17,7 +17,7 @@ class EmailsController < ApplicationController
     if @user.authenticate_password(params[:user][:password])
       @user.update(email_address_attributes: { address: params[:user][:email] })
     else
-      @user.errors[:base] << "Password was incorrect"
+      @user.errors.add(:base, "Password was incorrect")
     end
 
     if @user.errors.none?

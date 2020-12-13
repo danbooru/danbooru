@@ -114,7 +114,7 @@ class TagRelationship < ApplicationRecord
 
   def antecedent_and_consequent_are_different
     if antecedent_name == consequent_name
-      errors[:base] << "Cannot alias or implicate a tag to itself"
+      errors.add(:base, "Cannot alias or implicate a tag to itself")
     end
   end
 

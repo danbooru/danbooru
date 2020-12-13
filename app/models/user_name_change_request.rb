@@ -30,7 +30,7 @@ class UserNameChangeRequest < ApplicationRecord
 
   def not_limited
     if UserNameChangeRequest.unscoped.where(user: user).where("created_at >= ?", 1.week.ago).exists?
-      errors[:base] << "You can only submit one name change request per week"
+      errors.add(:base, "You can only submit one name change request per week")
     end
   end
 end

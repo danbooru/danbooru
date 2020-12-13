@@ -156,7 +156,7 @@ class Artist < ApplicationRecord
       return unless !is_deleted? && name_changed? && tag.present?
 
       if tag.category_name != "Artist" && !tag.empty?
-        errors[:base] << "'#{name}' is a #{tag.category_name.downcase} tag; artist entries can only be created for artist tags"
+        errors.add(:base, "'#{name}' is a #{tag.category_name.downcase} tag; artist entries can only be created for artist tags")
       end
     end
 

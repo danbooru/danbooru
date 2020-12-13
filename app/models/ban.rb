@@ -45,7 +45,7 @@ class Ban < ApplicationRecord
   end
 
   def validate_user_is_bannable
-    self.errors[:user] << "is already banned" if user.is_banned?
+    errors.add(:user, "is already banned") if user.is_banned?
   end
 
   def update_user_on_create

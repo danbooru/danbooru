@@ -113,11 +113,11 @@ class ArtistUrl < ApplicationRecord
   end
 
   def validate_scheme(uri)
-    errors[:url] << "'#{uri}' must begin with http:// or https:// " unless uri.scheme.in?(%w[http https])
+    errors.add(:url, "'#{uri}' must begin with http:// or https:// ") unless uri.scheme.in?(%w[http https])
   end
 
   def validate_hostname(uri)
-    errors[:url] << "'#{uri}' has a hostname '#{uri.host}' that does not contain a dot" unless uri.host&.include?('.')
+    errors.add(:url, "'#{uri}' has a hostname '#{uri.host}' that does not contain a dot") unless uri.host&.include?('.')
   end
 
   def validate_url_format
@@ -125,7 +125,7 @@ class ArtistUrl < ApplicationRecord
     validate_scheme(uri)
     validate_hostname(uri)
   rescue Addressable::URI::InvalidURIError => error
-    errors[:url] << "'#{uri}' is malformed: #{error}"
+    errors.add(:url, "'#{uri}' is malformed: #{error}")
   end
 
   def self.searchable_includes

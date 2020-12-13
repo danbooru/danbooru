@@ -158,7 +158,7 @@ class Dmail < ApplicationRecord
     return if from.blank? || from.is_gold?
 
     if from.dmails.where("created_at > ?", 1.hour.ago).group(:to).reorder(nil).count.size >= 10
-      errors[:base] << "You can't send dmails to more than 10 users per hour"
+      errors.add(:base, "You can't send dmails to more than 10 users per hour")
     end
   end
 

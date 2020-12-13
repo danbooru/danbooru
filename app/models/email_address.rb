@@ -21,7 +21,7 @@ class EmailAddress < ApplicationRecord
 
   def validate_deliverable
     if EmailValidator.undeliverable?(address)
-      errors[:address] << "is invalid or does not exist"
+      errors.add(:address, "is invalid or does not exist")
     end
   end
 

@@ -80,7 +80,7 @@ class UsersController < ApplicationController
       flash[:notice] = "Sign up failed"
     elsif @user.email_address&.invalid?(:deliverable)
       flash[:notice] = "Sign up failed: email address is invalid or doesn't exist"
-      @user.errors[:base] << @user.email_address.errors.full_messages.join("; ")
+      @user.errors.add(:base, @user.email_address.errors.full_messages.join("; "))
     elsif !@user.save
       flash[:notice] = "Sign up failed: #{@user.errors.full_messages.join("; ")}"
     else

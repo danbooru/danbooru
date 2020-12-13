@@ -182,7 +182,7 @@ class SavedSearch < ApplicationRecord
 
   def validate_count
     if user.saved_searches.count >= user.max_saved_searches
-      self.errors[:user] << "can only have up to #{user.max_saved_searches} " + "saved search".pluralize(user.max_saved_searches)
+      errors.add(:user, "can only have up to #{user.max_saved_searches} " + "saved search".pluralize(user.max_saved_searches))
     end
   end
 

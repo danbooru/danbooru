@@ -26,7 +26,7 @@ class CommentVote < ApplicationRecord
 
   def validate_comment_can_be_down_voted
     if is_positive? && comment.creator == CurrentUser.user
-      errors.add :base, "You cannot upvote your own comments"
+      errors.add(:base, "You cannot upvote your own comments")
     end
   end
 

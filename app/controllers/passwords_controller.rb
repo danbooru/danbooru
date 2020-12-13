@@ -12,7 +12,7 @@ class PasswordsController < ApplicationController
     if @user.authenticate_password(params[:user][:old_password]) || @user.authenticate_login_key(params[:user][:signed_user_id])
       @user.update(password: params[:user][:password], password_confirmation: params[:user][:password_confirmation])
     else
-      @user.errors[:base] << "Incorrect password"
+      @user.errors.add(:base, "Incorrect password")
     end
 
     flash[:notice] = @user.errors.none? ? "Password updated" : @user.errors.full_messages.join("; ")

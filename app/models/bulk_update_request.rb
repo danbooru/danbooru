@@ -97,7 +97,7 @@ class BulkUpdateRequest < ApplicationRecord
 
   def validate_script
     if processor.invalid?(:request)
-      errors[:base] << processor.errors.full_messages.join("; ")
+      errors.add(:base, processor.errors.full_messages.join("; "))
     end
   end
 
