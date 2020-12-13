@@ -250,8 +250,8 @@ class User < ApplicationRecord
       end
     end
 
-    def promote_to!(new_level, options = {})
-      UserPromotion.new(self, CurrentUser.user, new_level, options).promote!
+    def promote_to!(new_level, promoter = CurrentUser.user, **options)
+      UserPromotion.new(self, promoter, new_level, **options).promote!
     end
 
     def promote_to_admin_if_first_user

@@ -48,7 +48,7 @@ class UserUpgradesController < ApplicationController
         :card => params[:stripeToken],
         :description => params[:desc]
       )
-      @user.promote_to!(level, is_upgrade: true)
+      @user.promote_to!(level, User.system, is_upgrade: true)
       flash[:success] = true
     rescue Stripe::CardError => e
       DanbooruLogger.log(e)

@@ -53,7 +53,7 @@ if User.count == 0
         password: "password1",
         password_confirmation: "password1"
       )
-      newuser.promote_to!(User::Levels.const_get(level), :is_upgrade => true, :skip_dmail => true)
+      newuser.promote_to!(User::Levels.const_get(level), user)
     end
 
     newuser = User.create(
