@@ -1,6 +1,6 @@
 class UserMailer < ApplicationMailer
-  add_template_helper ApplicationHelper
-  add_template_helper UsersHelper
+  helper :application
+  helper :users
 
   def dmail_notice(dmail)
     @dmail = dmail
