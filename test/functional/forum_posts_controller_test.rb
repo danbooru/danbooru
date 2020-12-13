@@ -76,6 +76,7 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(body_matches: "xxx").with { @forum_post }
         should respond_to_search(body_matches: "bababa").with { [] }
         should respond_to_search(is_deleted: "true").with { @unrelated_forum }
+        should respond_to_search(linked_to: "TEST").with { @other_forum }
 
         context "using includes" do
           should respond_to_search(topic: {title_matches: "my forum topic"}).with { @forum_post }

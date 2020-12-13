@@ -36,13 +36,17 @@ class ForumPost < ApplicationRecord
       where(topic_id: ForumTopic.visible(user))
     end
 
+    def wiki_link_matches(title)
+      where(id: DtextLink.forum_post.wiki_link.where(link_target: WikiPage.normalize_title(title)).select(:model_id))
+    end
+
     def search(params)
       q = super
       q = q.search_attributes(params, :is_deleted, :body)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :text_index)
 
       if params[:linked_to].present?
-        q = q.where(id: DtextLink.forum_post.wiki_link.where(link_target: params[:linked_to]).select(:model_id))
+        q = q.wiki_link_matches(params[:linked_to])
       end
 
       q.apply_default_order(params)
