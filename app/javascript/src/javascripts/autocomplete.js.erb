@@ -182,6 +182,8 @@ Autocomplete.render_item = function(list, item) {
 
   if (item.type === "tag") {
     $link.addClass("tag-type-" + item.category);
+  } else if (item.type === "tag_autocorrect") {
+    $link.addClass(`tag-type-${item.category} tag-type-autocorrect`);
   } else if (item.type === "user") {
     var level_class = "user-" + item.level.toLowerCase();
     $link.addClass(level_class);

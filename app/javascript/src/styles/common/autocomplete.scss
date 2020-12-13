@@ -21,4 +21,8 @@
   .autocomplete-arrow {
     color: var(--autocomplete-arrow-color);
   }
+
+  a.tag-type-autocorrect .autocomplete-antecedent {
+    text-decoration: dotted underline;
+  }
 }

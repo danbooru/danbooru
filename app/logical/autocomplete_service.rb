@@ -103,7 +103,7 @@ class AutocompleteService
     tags = Tag.nonempty.autocorrect_matches(string).limit(limit)
 
     tags.map do |tag|
-      { type: "tag", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count }
+      { type: "tag_autocorrect", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: string }
     end
   end
 
