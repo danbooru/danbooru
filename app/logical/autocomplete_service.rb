@@ -1,4 +1,6 @@
 class AutocompleteService
+  extend Memoist
+
   POST_STATUSES = %w[active deleted pending flagged appealed banned modqueue unmoderated]
 
   STATIC_METATAGS = {
@@ -197,4 +199,29 @@ class AutocompleteService
     results = autocomplete_tag(string).map { |result| result[:value] }
     [query, results]
   end
+
+  def cache_duration
+    if autocomplete_results.size == limit
+      24.hours
+    else
+      1.hour
+    end
+  end
+
+  # Queries that don't depend on the current user are safe to cache publicly.
+  def cache_publicly?
+    if type == :tag_query && parsed_search&.type == :tag
+      true
+    elsif type.in?(%i[tag artist wiki_page pool opensearch])
+      true
+    else
+      false
+    end
+  end
+
+  def parsed_search
+    PostQueryBuilder.new(query).terms.first
+  end
+
+  memoize :autocomplete_results
 end
