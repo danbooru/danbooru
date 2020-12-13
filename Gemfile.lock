@@ -1,4 +1,11 @@
 GIT
+  remote: https://github.com/danbooru/http-cookie
+  revision: 382d8a641e4df226e0e7b0d2bfaeadb2fe71dd84
+  specs:
+    http-cookie (1.0.4)
+      domain_name (~> 0.5)
+
+GIT
   remote: https://github.com/evazion/dtext_rb.git
   revision: a95bf1d537cbdba4585adb8e123f03f001f56fd7
   specs:
@@ -161,8 +168,6 @@ GEM
       http-cookie (~> 1.0)
       http-form_data (~> 2.2)
       http-parser (~> 1.2.0)
-    http-cookie (1.0.3)
-      domain_name (~> 0.5)
     http-form_data (2.3.0)
     http-parser (1.2.2)
       ffi-compiler
@@ -405,6 +410,7 @@ DEPENDENCIES
   ffaker
   flamegraph
   http
+  http-cookie!
   ipaddress_2
   listen
   mail
