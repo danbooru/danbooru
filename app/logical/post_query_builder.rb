@@ -92,8 +92,8 @@ class PostQueryBuilder
   def metatags_match(metatags, relation)
     metatags.each do |metatag|
       clause = metatag_matches(metatag.name, metatag.value, quoted: metatag.quoted)
-      clause = clause.negate if metatag.negated
-      relation = relation.and(clause)
+      clause = clause.negate_relation if metatag.negated
+      relation = relation.and_relation(clause)
     end
 
     relation

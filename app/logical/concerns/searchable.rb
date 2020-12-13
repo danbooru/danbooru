@@ -10,12 +10,13 @@ module Searchable
     1 + params.values.map { |v| parameter_hash?(v) ? parameter_depth(v) : 1 }.max
   end
 
-  def negate(kind = :nand)
-    unscoped.where(all.where_clause.invert(kind).ast)
+  def negate_relation
+    unscoped.where(all.where_clause.invert.ast)
   end
 
   # XXX hacky method to AND two relations together.
-  def and(relation)
+  # XXX Replace with ActiveRecord#and (cf https://github.com/rails/rails/pull/39328)
+  def and_relation(relation)
     q = all
     q = q.where(relation.where_clause.ast) if relation.where_clause.present?
     q = q.joins(relation.joins_values + q.joins_values) if relation.joins_values.present?
