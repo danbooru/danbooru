@@ -56,6 +56,11 @@ FactoryBot.define do
       can_approve_posts {true}
     end
 
+    factory(:owner_user) do
+      level { User::Levels::OWNER }
+      can_approve_posts {true}
+    end
+
     factory(:uploader) do
       created_at { 2.weeks.ago }
     end

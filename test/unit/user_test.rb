@@ -45,7 +45,14 @@ class UserTest < ActiveSupport::TestCase
     end
 
     should "normalize its level" do
+      user = FactoryBot.create(:user, :level => User::Levels::OWNER)
+      assert(user.is_owner?)
+      assert(user.is_admin?)
+      assert(user.is_moderator?)
+      assert(user.is_gold?)
+
       user = FactoryBot.create(:user, :level => User::Levels::ADMIN)
+      assert(!user.is_owner?)
       assert(user.is_moderator?)
       assert(user.is_gold?)
 

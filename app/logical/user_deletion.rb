@@ -64,7 +64,7 @@ class UserDeletion
       errors.add(:base, "Password is incorrect")
     end
 
-    if user.level >= User::Levels::ADMIN
+    if user.is_admin?
       errors.add(:base, "Admins cannot delete their account")
     end
   end

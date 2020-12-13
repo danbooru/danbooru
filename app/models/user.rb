@@ -12,6 +12,7 @@ class User < ApplicationRecord
     BUILDER = 32
     MODERATOR = 40
     ADMIN = 50
+    OWNER = 60
   end
 
   # Used for `before_action :<role>_only`. Must have a corresponding `is_<role>?` method.
@@ -191,6 +192,10 @@ class User < ApplicationRecord
     extend ActiveSupport::Concern
 
     module ClassMethods
+      def owner
+        User.find_by!(level: Levels::ADMIN)
+      end
+
       def system
         User.find_by!(name: Danbooru.config.system_user)
       end
@@ -208,7 +213,8 @@ class User < ApplicationRecord
           "Platinum" => Levels::PLATINUM,
           "Builder" => Levels::BUILDER,
           "Moderator" => Levels::MODERATOR,
-          "Admin" => Levels::ADMIN
+          "Admin" => Levels::ADMIN,
+          "Owner" => Levels::OWNER
         }
       end
 
@@ -234,6 +240,9 @@ class User < ApplicationRecord
 
         when Levels::ADMIN
           "Admin"
+
+        when Levels::OWNER
+          "Owner"
 
         else
           ""
@@ -297,6 +306,10 @@ class User < ApplicationRecord
 
     def is_admin?
       level >= Levels::ADMIN
+    end
+
+    def is_owner?
+      level >= Levels::OWNER
     end
 
     def is_approver?
