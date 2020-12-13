@@ -9,6 +9,21 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+
+--
+-- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION fuzzystrmatch; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance between strings';
+
+
 --
 -- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
 --
@@ -7420,6 +7435,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200520060951'),
 ('20200803022359'),
 ('20200816175151'),
-('20201201211748');
+('20201201211748'),
+('20201213052805');
 
 

@@ -234,16 +234,19 @@ class Tag < ApplicationRecord
   end
 
   module SearchMethods
+    def autocorrect_matches(name)
+      tags = fuzzy_name_matches(name).order_similarity(name)
+    end
+
     # ref: https://www.postgresql.org/docs/current/static/pgtrgm.html#idm46428634524336
     def order_similarity(name)
-      # trunc(3 * sim) reduces the similarity score from a range of 0.0 -> 1.0 to just 0, 1, or 2.
-      # This groups tags first by approximate similarity, then by largest tags within groups of similar tags.
-      order(Arel.sql("trunc(3 * similarity(name, #{connection.quote(name)})) DESC"), "post_count DESC", "name DESC")
+      order(Arel.sql("levenshtein(left(name, 255), #{connection.quote(name)}), tags.post_count DESC, tags.name ASC"))
     end
 
     # ref: https://www.postgresql.org/docs/current/static/pgtrgm.html#idm46428634524336
     def fuzzy_name_matches(name)
-      where("tags.name % ?", name)
+      max_distance = [name.size / 4, 3].max.floor.to_i
+      where("tags.name % ?", name).where("levenshtein(left(name, 255), ?) < ?", name, max_distance)
     end
 
     def name_matches(name)

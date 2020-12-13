@@ -58,7 +58,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(name_matches: "hatsune_miku").with { @miku }
         should respond_to_search(name_normalize: "HATSUNE_MIKU  ").with { @miku }
         should respond_to_search(name_or_alias_matches: "miku").with { @miku }
-        should respond_to_search(fuzzy_name_matches: "miku_hatsune", order: "similarity").with { @miku }
+        should respond_to_search(fuzzy_name_matches: "hatsune_mika", order: "similarity").with { @miku }
         should respond_to_search(name: "empty", hide_empty: "true").with { [] }
         should respond_to_search(name: "empty", hide_empty: "false").with { [@empty] }
 

@@ -100,7 +100,7 @@ class AutocompleteService
   end
 
   def tag_autocorrect_matches(string)
-    tags = Tag.nonempty.fuzzy_name_matches(string).order_similarity(string).limit(limit)
+    tags = Tag.nonempty.autocorrect_matches(string).limit(limit)
 
     tags.map do |tag|
       { type: "tag", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count }
