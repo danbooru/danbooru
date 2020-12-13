@@ -1,4 +1,6 @@
 class Tag < ApplicationRecord
+  ABBREVIATION_REGEXP = /([a-z0-9])[a-z0-9']*($|[^a-z0-9']+)/
+
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :artist, :foreign_key => "name", :primary_key => "name"
   has_one :antecedent_alias, -> {active}, :class_name => "TagAlias", :foreign_key => "antecedent_name", :primary_key => "name"
@@ -249,7 +251,7 @@ class Tag < ApplicationRecord
     end
 
     def alias_matches(name)
-      where(name: TagAlias.active.where_ilike(:antecedent_name, normalize_name(name)).select(:consequent_name))
+      where(name: TagAlias.active.where_like(:antecedent_name, normalize_name(name)).select(:consequent_name))
     end
 
     def name_or_alias_matches(name)
@@ -258,6 +260,11 @@ class Tag < ApplicationRecord
 
     def wildcard_matches(tag, limit: 25)
       nonempty.name_matches(tag).order(post_count: :desc, name: :asc).limit(limit).pluck(:name)
+    end
+
+    def abbreviation_matches(abbrev)
+      abbrev = abbrev.delete_prefix("/")
+      where("regexp_replace(tags.name, ?, '\\1', 'g') LIKE ?", ABBREVIATION_REGEXP.source, abbrev.to_escaped_for_sql_like)
     end
 
     def search(params)
@@ -350,6 +357,18 @@ class Tag < ApplicationRecord
 
   def posts
     Post.system_tag_match(name)
+  end
+
+  def abbreviation
+    name.gsub(ABBREVIATION_REGEXP, "\\1")
+  end
+
+  def tag_alias_for_pattern(pattern)
+    return nil if pattern.blank?
+
+    consequent_aliases.find do |tag_alias|
+      !name.ilike?(pattern) && tag_alias.antecedent_name.ilike?(pattern)
+    end
   end
 
   def self.model_restriction(table)

@@ -63,10 +63,45 @@ class AutocompleteService
   end
 
   def autocomplete_tag(string)
-    tags = Tag.names_matches_with_aliases(string, limit)
+    if string.starts_with?("/")
+      string = string + "*" unless string.include?("*")
+      results = tag_matches(string)
+      results += tag_abbreviation_matches(string)
+      results = results.uniq.sort_by { |r| [r[:antecedent].length, -r[:post_count]] }.take(limit)
+    elsif string.include?("*")
+      results = tag_matches(string)
+    else
+      results = tag_matches(string + "*")
+      results = tag_autocorrect_matches(string) if results.blank?
+    end
+
+    results
+  end
+
+  def tag_matches(string)
+    name_matches = Tag.nonempty.name_matches(string).order(post_count: :desc).limit(limit)
+    alias_matches = Tag.nonempty.alias_matches(string).order(post_count: :desc).limit(limit)
+    union = "((#{name_matches.to_sql}) UNION (#{alias_matches.to_sql})) AS tags"
+    tags = Tag.from(union).order(post_count: :desc).limit(limit).includes(:consequent_aliases)
 
     tags.map do |tag|
-      { type: "tag", label: tag.name.tr("_", " "), value: tag.name, antecedent: tag.antecedent_name, category: tag.category, post_count: tag.post_count, source: nil, weight: nil }
+      { type: "tag", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: tag.tag_alias_for_pattern(string)&.antecedent_name }
+    end
+  end
+
+  def tag_abbreviation_matches(string)
+    tags = Tag.nonempty.abbreviation_matches(string).order(post_count: :desc).limit(limit)
+
+    tags.map do |tag|
+      { type: "tag", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: "/" + tag.abbreviation }
+    end
+  end
+
+  def tag_autocorrect_matches(string)
+    tags = Tag.nonempty.fuzzy_name_matches(string).order_similarity(string).limit(limit)
+
+    tags.map do |tag|
+      { type: "tag", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count }
     end
   end
 
