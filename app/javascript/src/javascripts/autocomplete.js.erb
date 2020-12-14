@@ -180,10 +180,8 @@ Autocomplete.render_item = function(list, item) {
     $link.append($post_count);
   }
 
-  if (item.type === "tag") {
+  if (/^tag/.test(item.type)) {
     $link.addClass("tag-type-" + item.category);
-  } else if (item.type === "tag_autocorrect") {
-    $link.addClass(`tag-type-${item.category} tag-type-autocorrect`);
   } else if (item.type === "user") {
     var level_class = "user-" + item.level.toLowerCase();
     $link.addClass(level_class);
@@ -194,7 +192,7 @@ Autocomplete.render_item = function(list, item) {
   var $menu_item = $("<div/>").append($link);
   var $list_item = $("<li/>").data("item.autocomplete", item).append($menu_item);
 
-  var data_attributes = ["type", "source", "antecedent", "value", "category", "post_count", "weight"];
+  var data_attributes = ["type", "antecedent", "value", "category", "post_count"];
   data_attributes.forEach(attr => {
     $list_item.attr(`data-autocomplete-${attr.replace(/_/g, "-")}`, item[attr]);
   });

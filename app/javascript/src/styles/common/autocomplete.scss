@@ -22,7 +22,7 @@
     color: var(--autocomplete-arrow-color);
   }
 
-  a.tag-type-autocorrect .autocomplete-antecedent {
+  li[data-autocomplete-type="tag-autocorrect"] .autocomplete-antecedent {
     text-decoration: dotted underline;
   }
 }

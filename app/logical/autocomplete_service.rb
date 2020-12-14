@@ -92,7 +92,9 @@ class AutocompleteService
     tags = Tag.from(union).order(post_count: :desc).limit(limit).includes(:consequent_aliases)
 
     tags.map do |tag|
-      { type: "tag", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: tag.tag_alias_for_pattern(string)&.antecedent_name }
+      antecedent = tag.tag_alias_for_pattern(string)&.antecedent_name
+      type = antecedent.present? ? "tag-alias" : "tag"
+      { type: type, label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent }
     end
   end
 
@@ -100,7 +102,7 @@ class AutocompleteService
     tags = Tag.nonempty.abbreviation_matches(string).order(post_count: :desc).limit(limit)
 
     tags.map do |tag|
-      { type: "tag", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: "/" + tag.abbreviation }
+      { type: "tag-abbreviation", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: "/" + tag.abbreviation }
     end
   end
 
@@ -109,7 +111,7 @@ class AutocompleteService
     tags = Tag.nonempty.autocorrect_matches(string).limit(limit)
 
     tags.map do |tag|
-      { type: "tag_autocorrect", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: string }
+      { type: "tag-autocorrect", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: string }
     end
   end
 
@@ -124,7 +126,7 @@ class AutocompleteService
     tags.map do |tag|
       other_names = tag.artist&.other_names.to_a + tag.wiki_page&.other_names.to_a
       antecedent = other_names.find { |other_name| other_name.ilike?(string) }
-      { type: "tag", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent }
+      { type: "tag-other-name", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent }
     end
   end
 
