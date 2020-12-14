@@ -1,4 +1,8 @@
 class EmailAddressPolicy < ApplicationPolicy
+  def index?
+    user.is_moderator?
+  end
+
   def show?
     record.user_id == user.id || (user.is_moderator? && record.user.level < user.level)
   end

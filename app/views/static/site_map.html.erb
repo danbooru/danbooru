@@ -154,6 +154,10 @@
           <li><%= link_to("Moderation Reports", moderation_reports_path) %></li>
         <% end %>
 
+        <% if policy(EmailAddress).index? %>
+          <li><%= link_to("Email Addresses", emails_path) %></li>
+        <% end %>
+
         <% if policy(IpAddress).index? %>
           <li><%= link_to("IP Addresses", ip_addresses_path) %></li>
         <% end %>

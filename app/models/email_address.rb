@@ -10,6 +10,14 @@ class EmailAddress < ApplicationRecord
   validate :validate_deliverable, on: :deliverable
   after_save :update_user
 
+  def self.visible(user)
+    if user.is_moderator?
+      where(user: User.where("level < ?", user.level)).or(where(user: user))
+    else
+      none
+    end
+  end
+
   def address=(value)
     self.normalized_address = EmailValidator.normalize(value) || address
     super
@@ -27,6 +35,15 @@ class EmailAddress < ApplicationRecord
 
   def update_user
     user.update!(is_verified: is_verified? && nondisposable?)
+  end
+
+  def self.search(params)
+    q = super
+
+    q = q.search_attributes(params, :user, :address, :normalized_address, :is_verified, :is_deliverable)
+    q = q.apply_default_order(params)
+
+    q
   end
 
   concerning :VerificationMethods do

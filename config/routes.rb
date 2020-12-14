@@ -103,6 +103,7 @@ Rails.application.routes.draw do
   end
   resource  :dtext_preview, :only => [:create]
   resources :dtext_links, only: [:index]
+  resources :emails, only: [:index, :show]
   resources :favorites, :only => [:index, :create, :destroy]
   resources :favorite_groups do
     member do
