@@ -14,7 +14,7 @@ Cookie.put = function(name, value, days) {
     expires = "expires=" + date.toGMTString() + "; ";
   }
 
-  var new_val = name + "=" + encodeURIComponent(value) + "; " + expires + "path=/";
+  var new_val = name + "=" + encodeURIComponent(value) + "; " + expires + "path=/; SameSite=Lax";
   if (document.cookie.length < (4090 - new_val.length)) {
     document.cookie = new_val;
     return true;
