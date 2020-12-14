@@ -47,7 +47,6 @@ class UserPolicy < ApplicationPolicy
       :disable_tagged_filenames, :disable_cropped_thumbnails,
       :disable_mobile_gestures, :enable_safe_mode, :enable_desktop_mode,
       :disable_post_tooltips,
-      (:level if CurrentUser.is_admin?)
     ].compact
   end
 

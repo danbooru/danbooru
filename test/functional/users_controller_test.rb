@@ -335,11 +335,11 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       context "changing the level" do
         should "not work" do
-          @cuser = create(:user)
-          put_auth user_path(@user), @cuser, params: {:user => {:level => 40}}
+          @owner = create(:owner_user)
+          put_auth user_path(@user), @owner, params: { user: { level: User::Levels::BUILDER }}
 
           assert_response 403
-          assert_equal(20, @user.reload.level)
+          assert_equal(User::Levels::MEMBER, @user.reload.level)
         end
       end
 
