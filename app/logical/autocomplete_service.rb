@@ -72,8 +72,11 @@ class AutocompleteService
       results = results.uniq.sort_by { |r| [r[:antecedent].length, -r[:post_count]] }.take(limit)
     elsif string.include?("*")
       results = tag_matches(string)
+      results = tag_other_name_matches(string) if results.blank?
     else
-      results = tag_matches(string + "*")
+      string += "*"
+      results = tag_matches(string)
+      results = tag_other_name_matches(string) if results.blank?
       results = tag_autocorrect_matches(string) if results.blank?
     end
 
@@ -81,6 +84,8 @@ class AutocompleteService
   end
 
   def tag_matches(string)
+    return [] if string =~ /[^[:ascii:]]/
+
     name_matches = Tag.nonempty.name_matches(string).order(post_count: :desc).limit(limit)
     alias_matches = Tag.nonempty.alias_matches(string).order(post_count: :desc).limit(limit)
     union = "((#{name_matches.to_sql}) UNION (#{alias_matches.to_sql})) AS tags"
@@ -100,10 +105,26 @@ class AutocompleteService
   end
 
   def tag_autocorrect_matches(string)
+    string = string.delete("*")
     tags = Tag.nonempty.autocorrect_matches(string).limit(limit)
 
     tags.map do |tag|
       { type: "tag_autocorrect", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: string }
+    end
+  end
+
+  def tag_other_name_matches(string)
+    return [] unless string =~ /[^[:ascii:]]/
+
+    artists = Artist.undeleted.any_other_name_like(string)
+    wikis = WikiPage.undeleted.other_names_match(string)
+    tags = Tag.where(name: wikis.select(:title)).or(Tag.where(name: artists.select(:name)))
+    tags = tags.nonempty.order(post_count: :desc).limit(limit).includes(:wiki_page, :artist)
+
+    tags.map do |tag|
+      other_names = tag.artist&.other_names.to_a + tag.wiki_page&.other_names.to_a
+      antecedent = other_names.find { |other_name| other_name.ilike?(string) }
+      { type: "tag", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent }
     end
   end
 

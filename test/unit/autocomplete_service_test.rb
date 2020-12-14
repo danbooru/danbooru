@@ -97,6 +97,33 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
         assert_autocomplete_includes("mole_under_eye", "~/mue", :tag_query)
       end
 
+      should "autocomplete tags from wiki and artist other names" do
+        create(:tag, name: "touhou")
+        create(:tag, name: "bkub", category: Tag.categories.artist)
+        create(:wiki_page, title: "touhou", other_names: %w[東方 东方 동방])
+        create(:artist, name: "bkub", other_names: %w[大川ぶくぶ フミンバイン])
+
+        assert_autocomplete_equals(["touhou"], "東", :tag_query)
+        assert_autocomplete_equals(["touhou"], "东", :tag_query)
+        assert_autocomplete_equals(["touhou"], "동", :tag_query)
+
+        assert_autocomplete_equals(["touhou"], "*東*", :tag_query)
+        assert_autocomplete_equals(["touhou"], "東*", :tag_query)
+        assert_autocomplete_equals([], "*東", :tag_query)
+
+        assert_autocomplete_equals(["touhou"], "*方*", :tag_query)
+        assert_autocomplete_equals(["touhou"], "*方", :tag_query)
+        assert_autocomplete_equals([], "方", :tag_query)
+
+        assert_autocomplete_equals(["bkub"], "*大*", :tag_query)
+        assert_autocomplete_equals(["bkub"], "大", :tag_query)
+        assert_autocomplete_equals([], "*大", :tag_query)
+
+        assert_autocomplete_equals(["bkub"], "*川*", :tag_query)
+        assert_autocomplete_equals([], "*川", :tag_query)
+        assert_autocomplete_equals([], "川", :tag_query)
+      end
+
       should "autocomplete wildcard searches" do
         create(:tag, name: "mole", post_count: 150)
         create(:tag, name: "mole_under_eye", post_count: 100)
