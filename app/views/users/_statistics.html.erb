@@ -10,6 +10,7 @@
         <th>Join Date</th>
         <td><%= presenter.join_date %></td>
       </tr>
+
       <% if policy(IpAddress).show? %>
         <tr>
           <th>Last IP</th>
@@ -22,6 +23,33 @@
             <% else %>
               <em>unknown</em>
               (<%= link_to "IPs", ip_addresses_path(search: { user_id: user.id, group_by: "ip_addr" }) %>)
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+
+      <% if policy(user.email_address).show? %>
+        <tr class="user-email-address">
+          <th>Email Address</th>
+          <td>
+            <% if user.email_address.present? %>
+              <%= user.email_address.address %>
+
+              <% if user == CurrentUser.user %>
+                (<%= link_to "edit", edit_user_email_path(user) %>)
+              <% end %>
+
+              <% if user.email_address.is_verified? %>
+                <i class="fas fa-check-circle user-verified-email-icon" title="Verified email"></i>
+              <% elsif user == CurrentUser.user %>
+                <%= link_to verify_user_email_path(user) do %>
+                  <i class="fas fa-exclamation-triangle user-unverified-email-icon" title="Unverified email. Click here to verify your email."></i>
+                <% end %>
+              <% else %>
+                <i class="fas fa-exclamation-triangle user-email-unverified" title="Unverified email."></i>
+              <% end %>
+            <% else %>
+              <em>none</em>
             <% end %>
           </td>
         </tr>

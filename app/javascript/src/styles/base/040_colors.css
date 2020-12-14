@@ -201,6 +201,9 @@
   --user-member-color: var(--link-color);
   --user-banned-color: black;
 
+  --user-verified-email-color: #0A0;
+  --user-unverified-email-color: #F80;
+
   --news-updates-background: #EEE;
   --news-updates-border: 2px solid #666;
 
@@ -290,6 +293,9 @@ body[data-current-user-theme="dark"] {
   --user-builder-color: var(--purple-1);
   --user-moderator-color: var(--green-1);
   --user-admin-color: var(--red-1);
+
+  --user-verified-email-color: var(--green-1);
+  --user-unverified-email-color: var(--yellow-1);
 
   /* misc specific colors */
   --autocomplete-selected-background-color: var(--grey-3);

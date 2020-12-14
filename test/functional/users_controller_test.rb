@@ -114,7 +114,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     context "show action" do
       setup do
         # flesh out profile to get more test coverage of user presenter.
-        @user = create(:banned_user, can_approve_posts: true, created_at: 2.weeks.ago)
+        @user = create(:user, can_approve_posts: true, created_at: 2.weeks.ago)
         as(@user) do
           create(:saved_search, user: @user)
           create(:post, uploader: @user, tag_string: "fav:#{@user.name}")
@@ -150,6 +150,33 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_equal(false, xml["user"]["enable_safe_mode"])
+      end
+
+      context "for a user with an email address" do
+        setup do
+          create(:email_address, user: @user)
+        end
+
+        should "show the email address to the user themselves" do
+          get_auth user_path(@user), @user
+
+          assert_response :success
+          assert_select ".user-email-address", count: 1
+        end
+
+        should "show the email address to mods" do
+          get_auth user_path(@user), create(:moderator_user)
+
+          assert_response :success
+          assert_select ".user-email-address", count: 1
+        end
+
+        should "not show the email address to other users" do
+          get_auth user_path(@user), create(:user)
+
+          assert_response :success
+          assert_select ".user-email-address", count: 0
+        end
       end
 
       context "for a tooltip" do
