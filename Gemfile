@@ -86,4 +86,5 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
   gem "codecov", require: false
+  gem 'stripe-ruby-mock', require: "stripe_mock"
 end

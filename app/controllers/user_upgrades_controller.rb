@@ -42,15 +42,10 @@ class UserUpgradesController < ApplicationController
     end
 
     begin
-      charge = Stripe::Charge.create(
-        :amount => cost,
-        :currency => "usd",
-        :card => params[:stripeToken],
-        :description => params[:desc]
-      )
+      charge = Stripe::Charge.create(amount: cost, currency: "usd", source: params[:stripeToken], description: params[:desc])
       @user.promote_to!(level, User.system, is_upgrade: true)
       flash[:success] = true
-    rescue Stripe::CardError => e
+    rescue Stripe::StripeError => e
       DanbooruLogger.log(e)
       flash[:error] = e.message
     end
