@@ -193,7 +193,7 @@ class User < ApplicationRecord
 
     module ClassMethods
       def owner
-        User.find_by!(level: Levels::ADMIN)
+        User.find_by!(level: Levels::OWNER)
       end
 
       def system
