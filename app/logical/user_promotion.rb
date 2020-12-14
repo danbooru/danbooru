@@ -54,6 +54,8 @@ class UserPromotion
       raise User::PrivilegeError, "You can't promote other users to your rank or above"
     elsif user.level >= promoter.level
       raise User::PrivilegeError, "You can't promote or demote other users at your rank or above"
+    elsif is_upgrade && user.is_builder?
+      raise User::PrivilegeError, "You can't upgrade a user that is above Platinum level"
     end
   end
 

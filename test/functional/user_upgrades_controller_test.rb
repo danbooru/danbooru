@@ -77,6 +77,16 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "an upgrade for a user above Platinum level" do
+        should "not demote the user" do
+          @builder = create(:builder_user)
+          post_auth user_upgrade_path, @user, params: { stripeToken: @token, desc: "Upgrade to Gold", user_id: @builder.id }
+
+          assert_response 403
+          assert_equal(true, @builder.reload.is_builder?)
+        end
+      end
+
       context "an upgrade with a missing Stripe token" do
         should "not upgrade the user" do
           post_auth user_upgrade_path, @user, params: { desc: "Upgrade to Gold" }
