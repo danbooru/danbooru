@@ -77,7 +77,7 @@ chsh -s /bin/bash danbooru
 usermod -G danbooru,sudo danbooru
 
 # Set up Postgres
-export PG_VERSION=`pg_config --version | egrep -o '[0-9]{1,}\.[0-9]{1,}'`
+export PG_VERSION=`pg_config --version | egrep -o '[0-9]{1,}\.[0-9]{1,}[^-]'`
 if verlte 9.5 $PG_VERSION ; then
 	# only do this on postgres 9.5 and above
 
