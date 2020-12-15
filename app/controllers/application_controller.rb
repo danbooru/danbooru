@@ -15,6 +15,7 @@ class ApplicationController < ActionController::Base
   before_action :set_variant
   before_action :add_headers
   before_action :cause_error
+  after_action :skip_session_if_publicly_cached
   after_action :reset_current_user
   layout "default"
 
@@ -146,6 +147,14 @@ class ApplicationController < ActionController::Base
     CurrentUser.ip_addr = nil
     CurrentUser.safe_mode = false
     CurrentUser.root_url = root_url.chomp("/")
+  end
+
+  # Skip setting the session cookie if the response is being publicly cached to
+  # prevent the user's session cookie from being leaked to other users.
+  def skip_session_if_publicly_cached
+    if response.cache_control[:public] == true
+      request.session_options[:skip] = true
+    end
   end
 
   def set_variant
