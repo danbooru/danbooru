@@ -69,7 +69,8 @@ class AutocompleteService
       string = string + "*" unless string.include?("*")
       results = tag_matches(string)
       results += tag_abbreviation_matches(string)
-      results = results.uniq.sort_by { |r| [r[:antecedent].length, -r[:post_count]] }.take(limit)
+      results = results.sort_by { |r| [r[:antecedent].to_s.size, -r[:post_count]] }
+      results = results.uniq { |r| r[:value] }.take(limit)
     elsif string.include?("*")
       results = tag_matches(string)
       results = tag_other_name_matches(string) if results.blank?

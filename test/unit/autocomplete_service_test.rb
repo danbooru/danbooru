@@ -82,19 +82,31 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
         assert_autocomplete_includes("touhou", "~tou", :tag_query)
       end
 
-      should "autocomplete tag abbreviations" do
-        create(:tag, name: "mole", post_count: 150)
-        create(:tag, name: "mole_under_eye", post_count: 100)
-        create(:tag, name: "mole_under_mouth", post_count: 50)
+      context "for a tag abbreviation" do
+        should "autocomplete abbreviations" do
+          create(:tag, name: "mole", post_count: 150)
+          create(:tag, name: "mole_under_eye", post_count: 100)
+          create(:tag, name: "mole_under_mouth", post_count: 50)
 
-        assert_autocomplete_equals(%w[mole mole_under_eye mole_under_mouth], "/m", :tag_query)
-        assert_autocomplete_equals(%w[mole_under_eye mole_under_mouth], "/mu", :tag_query)
-        assert_autocomplete_equals(%w[mole_under_mouth], "/mum", :tag_query)
-        assert_autocomplete_equals(%w[mole_under_eye], "/mue", :tag_query)
-        assert_autocomplete_equals(%w[mole_under_eye], "/*ue", :tag_query)
+          assert_autocomplete_equals(%w[mole mole_under_eye mole_under_mouth], "/m", :tag_query)
+          assert_autocomplete_equals(%w[mole_under_eye mole_under_mouth], "/mu", :tag_query)
+          assert_autocomplete_equals(%w[mole_under_mouth], "/mum", :tag_query)
+          assert_autocomplete_equals(%w[mole_under_eye], "/mue", :tag_query)
+          assert_autocomplete_equals(%w[mole_under_eye], "/*ue", :tag_query)
 
-        assert_autocomplete_includes("mole_under_eye", "-/mue", :tag_query)
-        assert_autocomplete_includes("mole_under_eye", "~/mue", :tag_query)
+          assert_autocomplete_includes("mole_under_eye", "-/mue", :tag_query)
+          assert_autocomplete_includes("mole_under_eye", "~/mue", :tag_query)
+        end
+
+        should "work for regular tags starting with a /" do
+          create(:tag, name: "jojo_pose", post_count: 100)
+          create(:tag, name: "/jp/", post_count: 50)
+
+          assert_autocomplete_equals(%w[/jp/ jojo_pose], "/", :tag_query)
+          assert_autocomplete_equals(%w[/jp/ jojo_pose], "/j", :tag_query)
+          assert_autocomplete_equals(%w[/jp/ jojo_pose], "/jp", :tag_query)
+          assert_autocomplete_equals(%w[/jp/], "/jp/", :tag_query)
+        end
       end
 
       should "autocomplete tags from wiki and artist other names" do
