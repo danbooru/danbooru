@@ -164,6 +164,13 @@ class ArtistTest < ActiveSupport::TestCase
       assert_artist_not_found("http://i2.pixiv.net/img28/img/kyang692/35563903.jpg")
     end
 
+    should "ignore /en/ pixiv url matches" do
+      a1 = FactoryBot.create(:artist, :name => "vvv", :url_string => "https://www.pixiv.net/en/users/32072927/artworks")
+      a2 = FactoryBot.create(:artist, :name => "c01a", :url_string => "https://www.pixiv.net/en/users/31744504")
+      assert_artist_not_found("https://www.pixiv.net/en/artworks/85241178")
+      assert_artist_not_found("https://www.pixiv.net/en/users/85241178")
+    end
+
     should "find matches by url" do
       a1 = FactoryBot.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/x/test.jpg")
       a2 = FactoryBot.create(:artist, :name => "subway", :url_string => "http://subway.com/x/test.jpg")
