@@ -83,8 +83,8 @@ module ArtistFinder
     "pixiv.net", # https://www.pixiv.net/member.php?id=10442390
     "pixiv.net/stacc", # https://www.pixiv.net/stacc/aaaninja2013
     "pixiv.net/fanbox/creator", # https://www.pixiv.net/fanbox/creator/310630
-    "pixiv.net/users", # https://www.pixiv.net/users/555603
-    "pixiv.net/en/users", # https://www.pixiv.net/en/users/555603
+    %r{pixiv.net/(?:en/)?users}i, # https://www.pixiv.net/users/555603
+    %r{pixiv.net/(?:en/)?artworks}i, # https://www.pixiv.net/en/artworks/85241178
     "i.pximg.net",
     "plurk.com", # http://www.plurk.com/a1amorea1a1
     "privatter.net",
