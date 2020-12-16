@@ -201,7 +201,7 @@ Autocomplete.render_item = function(list, item) {
 };
 
 Autocomplete.autocomplete_source = function(query, type) {
-  return $.getJSON("/autocomplete", {
+  return $.getJSON("/autocomplete.json", {
     "search[query]": query,
     "search[type]": type,
     "limit": Autocomplete.MAX_RESULTS
