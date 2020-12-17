@@ -1296,7 +1296,10 @@ class Post < ApplicationRecord
         :image_height, :tag_count, :has_children, :has_active_children,
         :is_note_locked, :is_rating_locked, :is_status_locked, :is_pending,
         :is_flagged, :is_deleted, :is_banned, :last_comment_bumped_at,
-        :last_commented_at, :last_noted_at, :uploader_ip_addr
+        :last_commented_at, :last_noted_at, :uploader_ip_addr,
+        :uploader, :updater, :approver, :parent, :upload, :artist_commentary,
+        :flags, :appeals, :notes, :comments, :children, :approvals,
+        :replacements, :pixiv_ugoira_frame_data
       )
 
       if params[:tags].present?
@@ -1497,10 +1500,6 @@ class Post < ApplicationRecord
 
   def self.model_restriction(table)
     super.where(table[:is_pending].eq(false)).where(table[:is_flagged].eq(false)).where(table[:is_deleted].eq(false))
-  end
-
-  def self.searchable_includes
-    [:uploader, :updater, :approver, :parent, :upload, :artist_commentary, :flags, :appeals, :notes, :comments, :children, :approvals, :replacements, :pixiv_ugoira_frame_data]
   end
 
   def self.available_includes

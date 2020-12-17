@@ -271,7 +271,7 @@ class Tag < ApplicationRecord
     end
 
     def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_locked, :category, :post_count, :name)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_locked, :category, :post_count, :name, :wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications, :dtext_links)
 
       if params[:fuzzy_name_matches].present?
         q = q.fuzzy_name_matches(params[:fuzzy_name_matches])
@@ -374,10 +374,6 @@ class Tag < ApplicationRecord
 
   def self.model_restriction(table)
     super.where(table[:post_count].gt(0))
-  end
-
-  def self.searchable_includes
-    [:wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications, :dtext_links]
   end
 
   def self.available_includes

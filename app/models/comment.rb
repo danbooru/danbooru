@@ -26,7 +26,7 @@ class Comment < ApplicationRecord
 
   module SearchMethods
     def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :is_sticky, :do_not_bump_post, :body, :score)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :is_sticky, :do_not_bump_post, :body, :score, :post, :creator, :updater)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index)
 
       case params[:order]
@@ -135,10 +135,6 @@ class Comment < ApplicationRecord
 
   def quoted_response
     DText.quote(body, creator.name)
-  end
-
-  def self.searchable_includes
-    [:post, :creator, :updater]
   end
 
   def self.available_includes

@@ -21,7 +21,7 @@ class PostDisapproval < ApplicationRecord
   concerning :SearchMethods do
     class_methods do
       def search(params)
-        q = search_attributes(params, :id, :created_at, :updated_at, :message, :reason)
+        q = search_attributes(params, :id, :created_at, :updated_at, :message, :reason, :user, :post)
         q = q.text_attribute_matches(:message, params[:message_matches])
 
         q = q.with_message if params[:has_message].to_s.truthy?
@@ -37,10 +37,6 @@ class PostDisapproval < ApplicationRecord
         q
       end
     end
-  end
-
-  def self.searchable_includes
-    [:user, :post]
   end
 
   def self.available_includes

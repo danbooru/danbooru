@@ -19,7 +19,7 @@ class CommentVote < ApplicationRecord
   end
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :score)
+    q = search_attributes(params, :id, :created_at, :updated_at, :score, :comment, :user)
     q.apply_default_order(params)
   end
 
@@ -35,10 +35,6 @@ class CommentVote < ApplicationRecord
 
   def is_negative?
     score == -1
-  end
-
-  def self.searchable_includes
-    [:comment, :user]
   end
 
   def self.available_includes

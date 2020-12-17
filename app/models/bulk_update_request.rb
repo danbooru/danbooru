@@ -31,7 +31,7 @@ class BulkUpdateRequest < ApplicationRecord
     end
 
     def search(params = {})
-      q = search_attributes(params, :id, :created_at, :updated_at, :script, :tags)
+      q = search_attributes(params, :id, :created_at, :updated_at, :script, :tags, :user, :forum_topic, :forum_post, :approver)
       q = q.text_attribute_matches(:script, params[:script_matches])
 
       if params[:status].present?
@@ -124,10 +124,6 @@ class BulkUpdateRequest < ApplicationRecord
 
   def is_rejected?
     status == "rejected"
-  end
-
-  def self.searchable_includes
-    [:user, :forum_topic, :forum_post, :approver]
   end
 
   def self.available_includes

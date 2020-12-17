@@ -25,7 +25,7 @@ class IpBan < ApplicationRecord
   end
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :reason)
+    q = search_attributes(params, :id, :created_at, :updated_at, :reason, :creator)
     q = q.text_attribute_matches(:reason, params[:reason_matches])
 
     if params[:ip_addr].present?
@@ -75,10 +75,6 @@ class IpBan < ApplicationRecord
 
   def ip_addr=(ip_addr)
     super(ip_addr.strip)
-  end
-
-  def self.searchable_includes
-    [:creator]
   end
 
   def self.available_includes

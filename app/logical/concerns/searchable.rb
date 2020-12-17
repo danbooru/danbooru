@@ -155,7 +155,6 @@ module Searchable
     indifferent_params = params.try(:with_indifferent_access) || params.try(:to_unsafe_h)
     raise ArgumentError, "unable to process params" if indifferent_params.nil?
 
-    attributes += searchable_includes
     attributes.reduce(all) do |relation, attribute|
       relation.search_attribute(attribute, indifferent_params, CurrentUser.user)
     end

@@ -40,7 +40,7 @@ class ArtistUrl < ApplicationRecord
   end
 
   def self.search(params = {})
-    q = search_attributes(params, :id, :created_at, :updated_at, :url, :normalized_url, :is_active)
+    q = search_attributes(params, :id, :created_at, :updated_at, :url, :normalized_url, :is_active, :artist)
 
     q = q.url_matches(params[:url_matches])
     q = q.normalized_url_matches(params[:normalized_url_matches])
@@ -124,10 +124,6 @@ class ArtistUrl < ApplicationRecord
     validate_hostname(uri)
   rescue Addressable::URI::InvalidURIError => error
     errors.add(:url, "'#{uri}' is malformed: #{error}")
-  end
-
-  def self.searchable_includes
-    [:artist]
   end
 
   def self.available_includes

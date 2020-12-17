@@ -65,7 +65,7 @@ class WikiPage < ApplicationRecord
     end
 
     def search(params = {})
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_locked, :is_deleted, :body, :title, :other_names)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_locked, :is_deleted, :body, :title, :other_names, :tag, :artist, :dtext_links)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index, ts_config: "danbooru")
 
       if params[:title_normalize].present?
@@ -244,10 +244,6 @@ class WikiPage < ApplicationRecord
 
   def self.model_restriction(table)
     super.where(table[:is_deleted].eq(false))
-  end
-
-  def self.searchable_includes
-    [:tag, :artist, :dtext_links]
   end
 
   def self.available_includes

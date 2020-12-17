@@ -250,7 +250,7 @@ class Artist < ApplicationRecord
     end
 
     def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :is_banned, :name, :group_name, :other_names)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :is_banned, :name, :group_name, :other_names, :urls, :wiki_page, :tag_alias, :tag)
 
       if params[:any_other_name_like]
         q = q.any_other_name_like(params[:any_other_name_like])
@@ -293,10 +293,6 @@ class Artist < ApplicationRecord
 
   def self.model_restriction(table)
     super.where(table[:is_deleted].eq(false))
-  end
-
-  def self.searchable_includes
-    [:urls, :wiki_page, :tag_alias, :tag]
   end
 
   def self.available_includes
