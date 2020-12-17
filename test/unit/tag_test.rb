@@ -185,6 +185,7 @@ class TagTest < ActiveSupport::TestCase
       should_not allow_value("café").for(:name).on(:create)
       should_not allow_value("東方").for(:name).on(:create)
       should_not allow_value("FAV:blah").for(:name).on(:create)
+      should_not allow_value("X"*171).for(:name).on(:create)
 
       metatags = PostQueryBuilder::METATAGS + TagCategory.mapping.keys
       metatags.each do |metatag|

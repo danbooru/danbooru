@@ -1,6 +1,12 @@
 class TagNameValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
-    case Tag.normalize_name(value)
+    value = Tag.normalize_name(value)
+
+    if value.size > 170
+      record.errors.add(attribute, "'#{value}' cannot be more than 255 characters long")
+    end
+
+    case value
     when /\A_*\z/
       record.errors.add(attribute, "'#{value}' cannot be blank")
     when /\*/
