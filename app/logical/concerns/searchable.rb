@@ -183,7 +183,7 @@ module Searchable
     when :boolean
       search_boolean_attribute(name, params)
     when :integer, :datetime
-      numeric_attribute_matches(name, params[name])
+      search_numeric_attribute(name, params)
     when :inet
       search_inet_attribute(name, params)
     when :enum
@@ -193,6 +193,26 @@ module Searchable
     else
       raise NotImplementedError, "unhandled attribute type: #{name}" if type.blank?
       search_includes(name, params, type, current_user)
+    end
+  end
+
+  def search_numeric_attribute(attr, params)
+    if params[attr].present?
+      numeric_attribute_matches(attr, params[attr])
+    elsif params[:"#{attr}_eq"].present?
+      where_operator(attr, :eq, params[:"#{attr}_eq"])
+    elsif params[:"#{attr}_not_eq"].present?
+      where_operator(attr, :not_eq, params[:"#{attr}_not_eq"])
+    elsif params[:"#{attr}_gt"].present?
+      where_operator(attr, :gt, params[:"#{attr}_gt"])
+    elsif params[:"#{attr}_gteq"].present?
+      where_operator(attr, :gteq, params[:"#{attr}_gteq"])
+    elsif params[:"#{attr}_lt"].present?
+      where_operator(attr, :lt, params[:"#{attr}_lt"])
+    elsif params[:"#{attr}_lteq"].present?
+      where_operator(attr, :lteq, params[:"#{attr}_lteq"])
+    else
+      all
     end
   end
 
