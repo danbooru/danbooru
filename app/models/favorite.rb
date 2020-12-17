@@ -12,8 +12,7 @@ class Favorite < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-    q = q.search_attributes(params, :post)
+    q = search_attributes(params, :id, :post)
 
     if params[:user_id].present?
       q = q.for_user(params[:user_id])

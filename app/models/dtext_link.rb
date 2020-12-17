@@ -30,8 +30,7 @@ class DtextLink < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-    q = q.search_attributes(params, :link_type, :link_target)
+    q = search_attributes(params, :id, :created_at, :updated_at, :link_type, :link_target)
     q.apply_default_order(params)
   end
 

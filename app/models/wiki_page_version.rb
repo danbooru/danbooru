@@ -7,9 +7,7 @@ class WikiPageVersion < ApplicationRecord
 
   module SearchMethods
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :title, :body, :other_names, :is_locked, :is_deleted)
+      q = search_attributes(params, :id, :created_at, :updated_at, :title, :body, :other_names, :is_locked, :is_deleted)
       q = q.text_attribute_matches(:title, params[:title_matches])
       q = q.text_attribute_matches(:body, params[:body_matches])
 

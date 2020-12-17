@@ -66,8 +66,7 @@ class TagRelationship < ApplicationRecord
     end
 
     def search(params)
-      q = super
-      q = q.search_attributes(params, :antecedent_name, :consequent_name)
+      q = search_attributes(params, :id, :created_at, :updated_at, :antecedent_name, :consequent_name)
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])

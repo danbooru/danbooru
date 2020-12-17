@@ -36,9 +36,7 @@ class Pool < ApplicationRecord
     end
 
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :is_deleted, :name, :description, :post_ids)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :name, :description, :post_ids)
       q = q.text_attribute_matches(:description, params[:description_matches])
 
       if params[:post_tags_match]

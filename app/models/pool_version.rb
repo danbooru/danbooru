@@ -32,8 +32,7 @@ class PoolVersion < ApplicationRecord
     end
 
     def search(params)
-      q = super
-      q = q.search_attributes(params, :pool_id, :post_ids, :added_post_ids, :removed_post_ids, :updater_id, :description, :description_changed, :name, :name_changed, :version, :is_active, :is_deleted, :category)
+      q = search_attributes(params, :id, :created_at, :updated_at, :pool_id, :post_ids, :added_post_ids, :removed_post_ids, :updater_id, :description, :description_changed, :name, :name_changed, :version, :is_active, :is_deleted, :category)
 
       if params[:post_id]
         q = q.for_post_id(params[:post_id].to_i)

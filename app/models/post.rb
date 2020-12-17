@@ -1289,14 +1289,14 @@ class Post < ApplicationRecord
     end
 
     def search(params)
-      q = super
-
-      q = q.search_attributes(
+      q = search_attributes(
         params,
-        :rating, :source, :pixiv_id, :fav_count, :score, :up_score, :down_score, :md5, :file_ext,
-        :file_size, :image_width, :image_height, :tag_count, :has_children, :has_active_children,
-        :is_note_locked, :is_rating_locked, :is_status_locked, :is_pending, :is_flagged, :is_deleted,
-        :is_banned, :last_comment_bumped_at, :last_commented_at, :last_noted_at
+        :id, :created_at, :updated_at, :rating, :source, :pixiv_id, :fav_count,
+        :score, :up_score, :down_score, :md5, :file_ext, :file_size, :image_width,
+        :image_height, :tag_count, :has_children, :has_active_children,
+        :is_note_locked, :is_rating_locked, :is_status_locked, :is_pending,
+        :is_flagged, :is_deleted, :is_banned, :last_comment_bumped_at,
+        :last_commented_at, :last_noted_at, :uploader_ip_addr
       )
 
       if params[:tags].present?

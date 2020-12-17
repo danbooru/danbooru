@@ -4,9 +4,7 @@ class NoteVersion < ApplicationRecord
   belongs_to_updater :counter_cache => "note_update_count"
 
   def self.search(params)
-    q = super
-
-    q = q.search_attributes(params, :is_active, :x, :y, :width, :height, :body, :version)
+    q = search_attributes(params, :id, :created_at, :updated_at, :is_active, :x, :y, :width, :height, :body, :version)
     q = q.text_attribute_matches(:body, params[:body_matches])
 
     q.apply_default_order(params)

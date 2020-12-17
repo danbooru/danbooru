@@ -31,9 +31,7 @@ class BulkUpdateRequest < ApplicationRecord
     end
 
     def search(params = {})
-      q = super
-
-      q = q.search_attributes(params, :script, :tags)
+      q = search_attributes(params, :id, :created_at, :updated_at, :script, :tags)
       q = q.text_attribute_matches(:script, params[:script_matches])
 
       if params[:status].present?

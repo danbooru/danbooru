@@ -38,7 +38,7 @@ class PostApproval < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
+    q = search_attributes(params, :id, :created_at, :updated_at, :post, :user)
     q.apply_default_order(params)
   end
 

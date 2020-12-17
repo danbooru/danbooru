@@ -41,8 +41,7 @@ class ForumPost < ApplicationRecord
     end
 
     def search(params)
-      q = super
-      q = q.search_attributes(params, :is_deleted, :body)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :body)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :text_index)
 
       if params[:linked_to].present?

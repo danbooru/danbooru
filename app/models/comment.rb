@@ -26,9 +26,7 @@ class Comment < ApplicationRecord
 
   module SearchMethods
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :is_deleted, :is_sticky, :do_not_bump_post, :body, :score)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :is_sticky, :do_not_bump_post, :body, :score)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index)
 
       case params[:order]

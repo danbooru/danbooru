@@ -21,8 +21,7 @@ class PostReplacement < ApplicationRecord
   concerning :Search do
     class_methods do
       def search(params = {})
-        q = super
-        q = q.search_attributes(params, :md5, :md5_was, :file_ext, :file_ext_was, :original_url, :replacement_url)
+        q = search_attributes(params, :id, :created_at, :updated_at, :md5, :md5_was, :file_ext, :file_ext_was, :original_url, :replacement_url)
         q.apply_default_order(params)
       end
     end

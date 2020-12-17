@@ -38,9 +38,7 @@ class EmailAddress < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-
-    q = q.search_attributes(params, :user, :address, :normalized_address, :is_verified, :is_deliverable)
+    q = search_attributes(params, :id, :created_at, :updated_at, :user, :address, :normalized_address, :is_verified, :is_deliverable)
     q = q.apply_default_order(params)
 
     q

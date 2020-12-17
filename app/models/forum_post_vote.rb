@@ -19,8 +19,7 @@ class ForumPostVote < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-    q = q.search_attributes(params, :score)
+    q = search_attributes(params, :id, :created_at, :updated_at, :score)
     q = q.forum_post_matches(params[:forum_post])
     q.apply_default_order(params)
   end

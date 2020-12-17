@@ -86,8 +86,7 @@ class ForumTopic < ApplicationRecord
     end
 
     def search(params)
-      q = super
-      q = q.search_attributes(params, :is_sticky, :is_locked, :is_deleted, :category_id, :title, :response_count)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_sticky, :is_locked, :is_deleted, :category_id, :title, :response_count)
       q = q.text_attribute_matches(:title, params[:title_matches], index_column: :text_index)
 
       if params[:is_private].to_s.truthy?

@@ -7,9 +7,7 @@ class ArtistVersion < ApplicationRecord
 
   module SearchMethods
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :is_deleted, :is_banned, :name, :group_name, :urls, :other_names)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :is_banned, :name, :group_name, :urls, :other_names)
       q = q.text_attribute_matches(:name, params[:name_matches])
       q = q.text_attribute_matches(:group_name, params[:group_name_matches])
 

@@ -19,8 +19,7 @@ class PostVote < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-    q = q.search_attributes(params, :score)
+    q = search_attributes(params, :id, :created_at, :updated_at, :score)
     q.apply_default_order(params)
   end
 

@@ -21,9 +21,7 @@ class PostDisapproval < ApplicationRecord
   concerning :SearchMethods do
     class_methods do
       def search(params)
-        q = super
-
-        q = q.search_attributes(params, :message, :reason)
+        q = search_attributes(params, :id, :created_at, :updated_at, :message, :reason)
         q = q.text_attribute_matches(:message, params[:message_matches])
 
         q = q.with_message if params[:has_message].to_s.truthy?

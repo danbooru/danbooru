@@ -56,9 +56,7 @@ class PostFlag < ApplicationRecord
     end
 
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :reason, :status)
+      q = search_attributes(params, :id, :created_at, :updated_at, :reason, :status)
       q = q.text_attribute_matches(:reason, params[:reason_matches])
 
       if params[:creator_id].present?

@@ -14,9 +14,7 @@ class Note < ApplicationRecord
 
   module SearchMethods
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :is_active, :x, :y, :width, :height, :body, :version)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_active, :x, :y, :width, :height, :body, :version)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index)
 
       q.apply_default_order(params)

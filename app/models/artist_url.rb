@@ -40,9 +40,7 @@ class ArtistUrl < ApplicationRecord
   end
 
   def self.search(params = {})
-    q = super
-
-    q = q.search_attributes(params, :url, :normalized_url, :is_active)
+    q = search_attributes(params, :id, :created_at, :updated_at, :url, :normalized_url, :is_active)
 
     q = q.url_matches(params[:url_matches])
     q = q.normalized_url_matches(params[:normalized_url_matches])

@@ -13,8 +13,7 @@ class PixivUgoiraFrameData < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-    q = q.search_attributes(params, :data, :content_type)
+    q = search_attributes(params, :id, :data, :content_type)
     q.apply_default_order(params)
   end
 

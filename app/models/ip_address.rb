@@ -12,8 +12,7 @@ class IpAddress < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-    q = q.search_attributes(params, :ip_addr)
+    q = search_attributes(params, :ip_addr)
     q.order(created_at: :desc)
   end
 

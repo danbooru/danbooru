@@ -155,6 +155,7 @@ module Searchable
     indifferent_params = params.try(:with_indifferent_access) || params.try(:to_unsafe_h)
     raise ArgumentError, "unable to process params" if indifferent_params.nil?
 
+    attributes += searchable_includes
     attributes.reduce(all) do |relation, attribute|
       relation.search_attribute(attribute, indifferent_params, CurrentUser.user)
     end
@@ -404,14 +405,6 @@ module Searchable
       order_clause << sanitize_sql_array(["ID=? DESC", id])
     end
     where(id: ids).order(Arel.sql(order_clause.join(', ')))
-  end
-
-  def search(params = {})
-    params ||= {}
-
-    default_attributes = (attribute_names.map(&:to_sym) & %i[id created_at updated_at])
-    all_attributes = default_attributes + searchable_includes
-    search_attributes(params, *all_attributes)
   end
 
   private

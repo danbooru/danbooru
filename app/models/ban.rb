@@ -20,9 +20,7 @@ class Ban < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-
-    q = q.search_attributes(params, :expires_at, :reason)
+    q = search_attributes(params, :id, :created_at, :updated_at, :expires_at, :reason)
     q = q.text_attribute_matches(:reason, params[:reason_matches])
 
     q = q.expired if params[:expired].to_s.truthy?

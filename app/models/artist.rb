@@ -250,9 +250,7 @@ class Artist < ApplicationRecord
     end
 
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :is_deleted, :is_banned, :name, :group_name, :other_names)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :is_banned, :name, :group_name, :other_names)
 
       if params[:any_other_name_like]
         q = q.any_other_name_like(params[:any_other_name_like])

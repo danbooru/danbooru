@@ -560,12 +560,10 @@ class User < ApplicationRecord
 
   module SearchMethods
     def search(params)
-      q = super
-
       params = params.dup
       params[:name_matches] = params.delete(:name) if params[:name].present?
 
-      q = q.search_attributes(params, :name, :level, :post_upload_count, :post_update_count, :note_update_count, :favorite_count)
+      q = search_attributes(params, :id, :created_at, :updated_at, :name, :level, :post_upload_count, :post_update_count, :note_update_count, :favorite_count)
 
       if params[:name_matches].present?
         q = q.where_ilike(:name, normalize_name(params[:name_matches]))

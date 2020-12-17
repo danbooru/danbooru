@@ -182,9 +182,7 @@ class Upload < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-
-    q = q.search_attributes(params, :source, :rating, :parent_id, :server, :md5, :server, :file_ext, :file_size, :image_width, :image_height, :referer_url)
+    q = search_attributes(params, :id, :created_at, :updated_at, :source, :rating, :parent_id, :server, :md5, :server, :file_ext, :file_size, :image_width, :image_height, :referer_url)
 
     if params[:source_matches].present?
       q = q.where_like(:source, params[:source_matches])
