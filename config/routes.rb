@@ -227,6 +227,7 @@ Rails.application.routes.draw do
     get :sign_out, on: :collection
   end
   resource :source, :only => [:show]
+  resource :status, only: [:show], controller: "status"
   resources :tags do
     collection do
       get :autocomplete

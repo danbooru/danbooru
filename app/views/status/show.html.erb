@@ -1,0 +1,32 @@
+<div id="c-status">
+  <div id="a-show" class="fixed-width-container">
+    <h1>Status</h1>
+
+    <details>
+      <summary>
+        Server: <%= @status.hostname %>
+      </summary>
+      <%= render "list", hash: @status.serializable_hash[:status] %>
+    </details>
+
+    <h1>Postgres</h1>
+
+    <details>
+      <summary>
+        <%= pluralize @status.postgres_active_connections, "active connection" %>.
+      </summary>
+
+      <%= render "table", rows: @status.serializable_hash[:postgres][:connection_stats] %>
+    </details>
+
+    <h1>Redis</h1>
+
+    <details>
+      <summary>
+        <%= @status.redis_used_memory %> memory used.
+      </summary>
+
+      <%= render "list", hash: @status.serializable_hash[:redis][:info] %>
+    </details>
+  </div>
+</div>
