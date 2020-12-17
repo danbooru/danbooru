@@ -7,12 +7,8 @@ class TagNameValidator < ActiveModel::EachValidator
       record.errors.add(attribute, "'#{value}' cannot contain asterisks ('*')")
     when /,/
       record.errors.add(attribute, "'#{value}' cannot contain commas (',')")
-    when /\A~/
-      record.errors.add(attribute, "'#{value}' cannot begin with a tilde ('~')")
-    when /\A-/
-      record.errors.add(attribute, "'#{value}' cannot begin with a dash ('-')")
-    when /\A_/
-      record.errors.add(attribute, "'#{value}' cannot begin with an underscore")
+    when /\A[-~_`%){}\]\/]/
+      record.errors.add(attribute, "'#{value}' cannot begin with a '#{value[0]}'")
     when /_\z/
       record.errors.add(attribute, "'#{value}' cannot end with an underscore")
     when /__/

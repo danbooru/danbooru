@@ -97,16 +97,6 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
           assert_autocomplete_includes("mole_under_eye", "-/mue", :tag_query)
           assert_autocomplete_includes("mole_under_eye", "~/mue", :tag_query)
         end
-
-        should "work for regular tags starting with a /" do
-          create(:tag, name: "jojo_pose", post_count: 100)
-          create(:tag, name: "/jp/", post_count: 50)
-
-          assert_autocomplete_equals(%w[/jp/ jojo_pose], "/", :tag_query)
-          assert_autocomplete_equals(%w[/jp/ jojo_pose], "/j", :tag_query)
-          assert_autocomplete_equals(%w[/jp/ jojo_pose], "/jp", :tag_query)
-          assert_autocomplete_equals(%w[/jp/], "/jp/", :tag_query)
-        end
       end
 
       should "autocomplete tags from wiki and artist other names" do
