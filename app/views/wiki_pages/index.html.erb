@@ -3,6 +3,8 @@
 <% content_for(:content) do %>
   <h1>Wiki</h1>
 
+  <%= render "search" %>
+
   <%= table_for @wiki_pages, width: "100%" do |t| %>
     <% t.column "Title" do |wiki_page| %>
       <span class="<%= tag_class(wiki_page.tag) %>"><%= link_to_wiki wiki_page.title %></span>
