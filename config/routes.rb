@@ -142,9 +142,6 @@ Rails.application.routes.draw do
   resources :modqueue, only: [:index]
   resources :news_updates
   resources :notes do
-    collection do
-      get :search
-    end
     member do
       put :revert
     end

@@ -1,9 +1,6 @@
 class NotesController < ApplicationController
   respond_to :html, :xml, :json, :js
 
-  def search
-  end
-
   def index
     @notes = authorize Note.paginated_search(params)
     @notes = @notes.includes(:post) if request.format.html?
