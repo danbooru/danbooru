@@ -25,14 +25,18 @@ class IpBan < ApplicationRecord
   end
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :reason, :creator)
+    q = search_attributes(params, :id, :created_at, :updated_at, :ip_addr, :reason, :is_deleted, :category, :hit_count, :last_hit_at, :creator)
     q = q.text_attribute_matches(:reason, params[:reason_matches])
 
-    if params[:ip_addr].present?
-      q = q.where("ip_addr = ?", params[:ip_addr])
+    case params[:order]
+    when /\A(created_at|updated_at|last_hit_at)(?:_(asc|desc))?\z/i
+      dir = $2 || :desc
+      q = q.order($1 => dir).order(id: :desc)
+    else
+      q = q.apply_default_order(params)
     end
 
-    q.apply_default_order(params)
+    q
   end
 
   def create_mod_action
