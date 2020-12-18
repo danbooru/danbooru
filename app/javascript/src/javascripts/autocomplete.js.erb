@@ -110,7 +110,7 @@ Autocomplete.initialize_tag_autocomplete = function() {
 Autocomplete.current_term = function($input) {
   let query = $input.get(0).value;
   let caret = $input.get(0).selectionStart;
-  let match = query.substring(0, caret).match(/\S*/);
+  let match = query.substring(0, caret).match(/\S*$/);
   return match[0];
 };
 
