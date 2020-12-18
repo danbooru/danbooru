@@ -97,6 +97,14 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
           assert_autocomplete_includes("mole_under_eye", "-/mue", :tag_query)
           assert_autocomplete_includes("mole_under_eye", "~/mue", :tag_query)
         end
+
+        should "list aliases before abbreviations" do
+          create(:tag, name: "hair_ribbon", post_count: 300_000)
+          create(:tag, name: "hakurei_reimu", post_count: 50_000)
+          create(:tag_alias, antecedent_name: "/hr", consequent_name: "hakurei_reimu")
+
+          assert_autocomplete_equals(%w[hakurei_reimu hair_ribbon], "/hr", :tag_query)
+        end
       end
 
       should "autocomplete tags from wiki and artist other names" do

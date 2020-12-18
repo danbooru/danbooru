@@ -16,6 +16,11 @@ module Danbooru
         string
       end
 
+      # escape \ and * characters so that they're treated literally in LIKE searches.
+      def escape_wildcards
+        gsub(/\\/, '\\\\').gsub(/\*/, '\*')
+      end
+
       def to_escaped_for_tsquery_split
         scan(/\S+/).map {|x| x.to_escaped_for_tsquery}.join(" & ")
       end

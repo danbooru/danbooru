@@ -7,7 +7,15 @@ class TagAlias < TagRelationship
   def self.to_aliased(names)
     names = Array(names).map(&:to_s)
     return [] if names.empty?
+
     aliases = active.where(antecedent_name: names).map { |ta| [ta.antecedent_name, ta.consequent_name] }.to_h
+
+    abbreviations = names.select { |name| name.starts_with?("/") && !aliases.has_key?(name) }
+    abbreviations.each do |abbrev|
+      tag = Tag.nonempty.find_by_abbreviation(abbrev)
+      aliases[abbrev] = tag.name if tag.present?
+    end
+
     names.map { |name| aliases[name] || name }
   end
 

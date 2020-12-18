@@ -598,6 +598,10 @@ class PostTest < ActiveSupport::TestCase
       context "tagged with a valid tag" do
         subject { @post }
 
+        setup do
+          create(:tag, name: "hakurei_reimu")
+        end
+
         should allow_value("touhou 100%").for(:tag_string)
         should allow_value("touhou FOO").for(:tag_string)
         should allow_value("touhou -foo").for(:tag_string)
@@ -618,6 +622,8 @@ class PostTest < ActiveSupport::TestCase
         # \u3000 = ideographic space, \u00A0 = no-break space
         should allow_value("touhou\u3000foo").for(:tag_string)
         should allow_value("touhou\u00A0foo").for(:tag_string)
+
+        should allow_value("/hr").for(:tag_string)
       end
 
       context "tagged with an invalid tag" do
@@ -658,6 +664,16 @@ class PostTest < ActiveSupport::TestCase
           assert_invalid_tag("東方")
           assert_invalid_tag("new")
           assert_invalid_tag("search")
+        end
+      end
+
+      context "tagged with an abbreviation" do
+        should "expand the abbreviation" do
+          create(:tag, name: "hair_ribbon", post_count: 300_000)
+          create(:tag, name: "hakurei_reimu", post_count: 50_000)
+
+          @post.update!(tag_string: "aaa /hr")
+          assert_equal("aaa hair_ribbon", @post.reload.tag_string)
         end
       end
 
@@ -1189,6 +1205,17 @@ class PostTest < ActiveSupport::TestCase
           @post.update(:tag_string => "aaa translation_request -/tr")
 
           assert_equal("aaa", @post.tag_string)
+        end
+
+        should "resolve abbreviations" do
+          create(:tag, name: "hair_ribbon", post_count: 300_000)
+          create(:tag, name: "hakurei_reimu", post_count: 50_000)
+
+          @post.update!(tag_string: "aaa hair_ribbon hakurei_reimu")
+          assert_equal("aaa hair_ribbon hakurei_reimu", @post.reload.tag_string)
+
+          @post.update!(tag_string: "aaa hair_ribbon hakurei_reimu -/hr")
+          assert_equal("aaa hakurei_reimu", @post.reload.tag_string)
         end
       end
 

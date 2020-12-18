@@ -53,7 +53,7 @@ module Searchable
   end
 
   def where_iequals(attr, value)
-    where_ilike(attr, value.gsub(/\\/, '\\\\').gsub(/\*/, '\*'))
+    where_ilike(attr, value.escape_wildcards)
   end
 
   # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-REGEXP

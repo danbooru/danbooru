@@ -270,6 +270,11 @@ class Tag < ApplicationRecord
       where("regexp_replace(tags.name, ?, '\\1', 'g') LIKE ?", ABBREVIATION_REGEXP.source, abbrev.to_escaped_for_sql_like)
     end
 
+    def find_by_abbreviation(abbrev)
+      abbrev = abbrev.delete_prefix("/")
+      abbreviation_matches(abbrev.escape_wildcards).order(post_count: :desc).first
+    end
+
     def search(params)
       q = search_attributes(params, :id, :created_at, :updated_at, :is_locked, :category, :post_count, :name, :wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications, :dtext_links)
 
