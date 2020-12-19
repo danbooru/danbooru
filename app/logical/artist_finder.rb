@@ -60,6 +60,7 @@ module ArtistFinder
     "iwara.tv/users", # http://ecchi.iwara.tv/users/marumega
     "kym-cdn.com",
     "livedoor.blogimg.jp",
+    "blog.livedoor.jp", # http://blog.livedoor.jp/ac370ml
     "monappy.jp",
     "monappy.jp/u", # https://monappy.jp/u/abara_bone
     "mstdn.jp", # https://mstdn.jp/@oneb
