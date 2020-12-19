@@ -3,7 +3,10 @@
 
   <%= edit_form_for(@wiki_page, url: wiki_page_path(@wiki_page.id)) do |f| %>
     <%= f.input :title, error: false, input_html: { data: { autocomplete: "tag" } }, hint: "Change to rename this wiki page. Update any wikis linking to this page first." %>
-    <%= f.input :other_names_string, as: :text, input_html: { size: "30x1" }, label: "Other names (#{link_to_wiki "help", "help:translated_tags"})".html_safe, hint: "Names used for this tag on other sites such as Pixiv. Separate with spaces." %>
+
+    <% if !@wiki_page.tag&.artist? || @wiki_page.other_names.present? %>
+      <%= f.input :other_names_string, as: :text, input_html: { size: "30x1" }, label: "Other names (#{link_to_wiki "help", "help:translated_tags"})".html_safe, hint: "Names used for this tag on other sites such as Pixiv. Separate with spaces." %>
+    <% end %>
 
     <%= f.input :body, as: :dtext %>
 

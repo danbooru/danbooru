@@ -77,5 +77,15 @@ class WikiPageTest < ActiveSupport::TestCase
         assert_equal(0, @wiki_page.dtext_links.size)
       end
     end
+
+    context "with other names" do
+      should "not allow artist wikis to have other names" do
+        tag = create(:artist_tag)
+        wiki = build(:wiki_page, title: tag.name, other_names: ["blah"])
+
+        assert_equal(false, wiki.valid?)
+        assert_equal(["An artist wiki can't have other names"], wiki.errors[:base])
+      end
+    end
   end
 end

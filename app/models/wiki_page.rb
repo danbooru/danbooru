@@ -7,10 +7,12 @@ class WikiPage < ApplicationRecord
   before_save :normalize_other_names
   before_save :update_dtext_links, if: :dtext_links_changed?
   after_save :create_version
+
   validates_uniqueness_of :title, :case_sensitive => false
   validates_presence_of :title
   validates_presence_of :body, :unless => -> { is_deleted? || other_names.present? }
   validate :validate_rename
+  validate :validate_other_names
 
   array_attribute :other_names
   has_one :tag, :foreign_key => "name", :primary_key => "title"
@@ -121,6 +123,12 @@ class WikiPage < ApplicationRecord
     if broken_wikis.count > 0
       broken_wiki_search = Rails.application.routes.url_helpers.wiki_pages_path(search: { linked_to: title_was })
       warnings.add(:base, %!Warning: [[#{title_was}]] is still linked from "#{broken_wikis.count} #{"other wiki page".pluralize(broken_wikis.count)}":[#{broken_wiki_search}]. Update #{(broken_wikis.count > 1) ? "these wikis" : "this wiki"} to link to [[#{title}]] instead!)
+    end
+  end
+
+  def validate_other_names
+    if other_names.present? && tag&.artist?
+      errors.add(:base, "An artist wiki can't have other names")
     end
   end
 
