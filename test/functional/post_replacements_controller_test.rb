@@ -47,14 +47,14 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           format: :json,
           id: @post_replacement.id,
           post_replacement: {
-            file_size_was: 23,
+            old_file_size: 23,
             file_size: 42
           }
         }
 
         put_auth post_replacement_path(@post_replacement), @mod, params: params
         assert_response :success
-        assert_equal(23, @post_replacement.reload.file_size_was)
+        assert_equal(23, @post_replacement.reload.old_file_size)
         assert_equal(42, @post_replacement.file_size)
       end
     end

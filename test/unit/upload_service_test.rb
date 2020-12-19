@@ -287,11 +287,11 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         should "preserve the old values" do
           as(@user) { subject.process! }
-          assert_equal(1500, @replacement.image_width_was)
-          assert_equal(1000, @replacement.image_height_was)
-          assert_equal(2000, @replacement.file_size_was)
-          assert_equal("jpg", @replacement.file_ext_was)
-          assert_equal(@old_md5, @replacement.md5_was)
+          assert_equal(1500, @replacement.old_image_width)
+          assert_equal(1000, @replacement.old_image_height)
+          assert_equal(2000, @replacement.old_file_size)
+          assert_equal("jpg", @replacement.old_file_ext)
+          assert_equal(@old_md5, @replacement.old_md5)
         end
 
         should "record the new values" do

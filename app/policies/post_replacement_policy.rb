@@ -12,8 +12,8 @@ class PostReplacementPolicy < ApplicationPolicy
   end
 
   def permitted_attributes_for_update
-    [:file_ext_was, :file_size_was, :image_width_was, :image_height_was,
-     :md5_was, :file_ext, :file_size, :image_width, :image_height, :md5,
+    [:old_file_ext, :old_file_size, :old_image_width, :old_image_height,
+     :old_md5, :file_ext, :file_size, :image_width, :image_height, :md5,
      :original_url, :replacement_url]
   end
 end
