@@ -16,13 +16,6 @@ class SavedSearchesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    context "labels action" do
-      should "render" do
-        get_auth labels_saved_searches_path, @user, as: :json
-        assert_response :success
-      end
-    end
-
     context "create action" do
       should "render" do
         post_auth saved_searches_path, @user, params: { saved_search: { query: "bkub", label_string: "artist" }}

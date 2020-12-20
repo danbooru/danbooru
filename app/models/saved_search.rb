@@ -71,19 +71,6 @@ class SavedSearch < ApplicationRecord
         all_labels.select { |ss| ss.label.ilike?(label) }.map(&:label)
       end
 
-      def search_labels(user_id, params)
-        labels = labels_for(user_id)
-
-        if params[:label].present?
-          query = Regexp.escape(params[:label]).gsub("\\*", ".*")
-          query = ".*#{query}.*" unless query.include?("*")
-          query = /\A#{query}\z/
-          labels = labels.grep(query)
-        end
-
-        labels
-      end
-
       def labels_for(user_id)
         SavedSearch
           .where(user_id: user_id)

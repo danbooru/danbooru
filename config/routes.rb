@@ -215,21 +215,13 @@ Rails.application.routes.draw do
   resource :related_tag, :only => [:show, :update]
   resources :recommended_posts, only: [:index]
   resources :robots, only: [:index]
-  resources :saved_searches, :except => [:show] do
-    collection do
-      get :labels
-    end
-  end
+  resources :saved_searches, :except => [:show]
   resource :session, only: [:new, :create, :destroy] do
     get :sign_out, on: :collection
   end
   resource :source, :only => [:show]
   resource :status, only: [:show], controller: "status"
-  resources :tags do
-    collection do
-      get :autocomplete
-    end
-  end
+  resources :tags
   resources :tag_aliases, only: [:show, :index, :destroy]
   resources :tag_implications, only: [:show, :index, :destroy]
   resources :uploads do
