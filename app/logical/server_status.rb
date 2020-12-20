@@ -46,7 +46,7 @@ class ServerStatus
     end
 
     def distro_version
-      `source /etc/os-release; echo "$NAME $VERSION"`.chomp
+      `. /etc/os-release; echo "$NAME $VERSION"`.chomp
     end
 
     def libvips_version
