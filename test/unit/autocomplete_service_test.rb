@@ -150,6 +150,14 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
         assert_autocomplete_equals(%w[touhou], "touhuo", :tag_query)
       end
 
+      should "ignore unsupported metatags" do
+        assert_autocomplete_equals([], "date:2020", :tag_query)
+        assert_autocomplete_equals([], "score:20", :tag_query)
+        assert_autocomplete_equals([], "favcount:>20", :tag_query)
+        assert_autocomplete_equals([], "age:<1w", :tag_query)
+        assert_autocomplete_equals([], "limit:200", :tag_query)
+      end
+
       should "autocomplete static metatags" do
         assert_autocomplete_equals(["status:active"], "status:act", :tag_query)
         assert_autocomplete_equals(["parent:active"], "parent:act", :tag_query)

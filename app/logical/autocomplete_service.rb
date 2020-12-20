@@ -148,6 +148,8 @@ class AutocompleteService
       autocomplete_saved_search_label(value)
     when *STATIC_METATAGS.keys
       autocomplete_static_metatag(metatag, value)
+    else
+      []
     end
 
     results.map do |result|
