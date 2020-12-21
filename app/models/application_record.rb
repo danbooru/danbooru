@@ -3,6 +3,7 @@ class ApplicationRecord < ActiveRecord::Base
 
   include Deletable
   include Mentionable
+  include Normalizable
   extend HasBitFlags
   extend Searchable
 

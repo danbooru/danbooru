@@ -78,6 +78,19 @@ class WikiPageTest < ActiveSupport::TestCase
       end
     end
 
+    context "the wiki body" do
+      should "be normalized to NFC" do
+        # \u00E9: é; \u0301: acute accent
+        @wiki = create(:wiki_page, body: "Poke\u0301mon")
+        assert_equal("Pok\u00E9mon", @wiki.body)
+      end
+
+      should "normalize line endings and trim spaces" do
+        @wiki = create(:wiki_page, body: " foo\nbar\n")
+        assert_equal("foo\r\nbar", @wiki.body)
+      end
+    end
+
     context "during title validation" do
       # these values are allowed because they're normalized first
       should allow_value(" foo ").for(:title).on(:create)

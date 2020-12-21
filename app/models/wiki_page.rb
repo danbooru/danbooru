@@ -3,10 +3,12 @@ class WikiPage < ApplicationRecord
 
   META_WIKIS = ["list_of_", "tag_group:", "pool_group:", "howto:", "about:", "help:", "template:"]
 
-  before_validation :normalize_title
   before_validation :normalize_other_names
   before_save :update_dtext_links, if: :dtext_links_changed?
   after_save :create_version
+
+  normalize :title, :normalize_title
+  normalize :body, :normalize_text
 
   validates :title, tag_name: true, presence: true, uniqueness: true, if: :title_changed?
   validates :body, presence: true, unless: -> { is_deleted? || other_names.present? }
@@ -149,10 +151,6 @@ class WikiPage < ApplicationRecord
 
   def self.normalize_title(title)
     title.to_s.downcase.delete_prefix("~").gsub(/[[:space:]]+/, "_").gsub(/__/, "_").gsub(/\A_|_\z/, "")
-  end
-
-  def normalize_title
-    self.title = WikiPage.normalize_title(title)
   end
 
   def normalize_other_names
