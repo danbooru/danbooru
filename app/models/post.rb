@@ -20,6 +20,7 @@ class Post < ApplicationRecord
   before_validation :remove_parent_loops
   validates_uniqueness_of :md5, :on => :create, message: ->(obj, data) { "duplicate: #{Post.find_by_md5(obj.md5).id}"}
   validates_inclusion_of :rating, in: %w(s q e), message: "rating must be s, q, or e"
+  validates :source, length: { maximum: 1200 }
   validate :added_tags_are_valid
   validate :removed_tags_are_valid
   validate :has_artist_tag

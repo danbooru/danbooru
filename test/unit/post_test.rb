@@ -1076,6 +1076,13 @@ class PostTest < ActiveSupport::TestCase
             @post.update(:tag_string => "source:https://img18.pixiv.net/img/evazion/14901720.png")
             assert_equal(14901720, @post.pixiv_id)
           end
+
+          should "validate the max source length" do
+            @post.update(source: "X"*1201)
+
+            assert_equal(false, @post.valid?)
+            assert_equal(["is too long (maximum is 1200 characters)"], @post.errors[:source])
+          end
         end
 
         context "of" do
