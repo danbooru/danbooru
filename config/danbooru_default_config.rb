@@ -46,6 +46,12 @@ module Danbooru
       "DanbooruBot"
     end
 
+    # The name of the cookie that stores the current user's login session.
+    # Changing this will force all users to login again.
+    def session_cookie_name
+      "_danbooru2_session"
+    end
+
     def source_code_url
       "https://github.com/danbooru/danbooru"
     end
