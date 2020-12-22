@@ -23,6 +23,10 @@ class UserPolicy < ApplicationPolicy
     user.is_member?
   end
 
+  def can_see_last_logged_in_at?
+    user.is_moderator?
+  end
+
   def can_see_favorites?
     user.is_admin? || record.id == user.id || !record.enable_private_favorites?
   end

@@ -32,6 +32,11 @@
       <% t.column "Level" do |user| %>
         <%= user.level_string %>
       <% end %>
+      <% if policy(User).can_see_last_logged_in_at? %>
+        <% t.column "Last Seen" do |user| %>
+          <%= time_ago_in_words_tagged(user.last_logged_in_at) %>
+        <% end %>
+      <% end %>
       <% t.column "Joined" do |user| %>
         <%= compact_time user.created_at %>
       <% end %>

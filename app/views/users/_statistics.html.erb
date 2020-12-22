@@ -11,6 +11,13 @@
         <td><%= presenter.join_date %></td>
       </tr>
 
+      <% if policy(User).can_see_last_logged_in_at? %>
+        <tr>
+          <th>Last Seen</th>
+          <td><%= time_ago_in_words_tagged(user.last_logged_in_at) %></td>
+        </tr>
+      <% end %>
+
       <% if policy(IpAddress).show? %>
         <tr>
           <th>Last IP</th>
