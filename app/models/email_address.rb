@@ -12,7 +12,7 @@ class EmailAddress < ApplicationRecord
 
   def self.visible(user)
     if user.is_moderator?
-      where(user: User.where("level < ?", user.level)).or(where(user: user))
+      where(user: User.where("level < ?", user.level).or(User.where(id: user.id)))
     else
       none
     end
