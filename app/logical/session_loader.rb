@@ -87,7 +87,7 @@ class SessionLoader
 
   def update_last_logged_in_at
     return if CurrentUser.is_anonymous?
-    return if CurrentUser.last_logged_in_at && CurrentUser.last_logged_in_at > 1.week.ago
+    return if CurrentUser.last_logged_in_at && CurrentUser.last_logged_in_at > 1.hour.ago
     CurrentUser.user.update_attribute(:last_logged_in_at, Time.now)
   end
 
