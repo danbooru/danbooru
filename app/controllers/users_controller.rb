@@ -38,9 +38,6 @@ class UsersController < ApplicationController
     respond_with(@users)
   end
 
-  def search
-  end
-
   def show
     @user = authorize User.find(params[:id])
     respond_with(@user, methods: @user.full_attributes) do |format|

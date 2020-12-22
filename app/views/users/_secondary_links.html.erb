@@ -1,7 +1,6 @@
 <% content_for(:secondary_links) do %>
   <%= quick_search_form_for(:name_matches, users_path, "users", autocomplete: "user", redirect: true) %>
   <%= subnav_link_to "Listing", users_path %>
-  <%= subnav_link_to "Search", search_users_path %>
 
   <% if CurrentUser.user.is_anonymous? %>
     <%= subnav_link_to "Sign up", new_user_path %>

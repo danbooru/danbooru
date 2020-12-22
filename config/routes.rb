@@ -243,7 +243,6 @@ Rails.application.routes.draw do
     end
 
     collection do
-      get :search
       get :custom_style
     end
   end
