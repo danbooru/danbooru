@@ -24,7 +24,14 @@ class DanbooruLogger
   def self.add_session_attributes(request, session, user)
     request_params = request.parameters.with_indifferent_access.except(:controller, :action)
     session_params = session.to_h.with_indifferent_access.slice(:session_id, :started_at)
-    user_params = { id: user&.id, name: user&.name, level: user&.level_string, ip: request.remote_ip, safe_mode: CurrentUser.safe_mode? }
+    user_params = {
+      id: user&.id,
+      name: user&.name,
+      level: user&.level_string,
+      ip: request.remote_ip,
+      country: request.headers["CF-IPCountry"],
+      safe_mode: CurrentUser.safe_mode?
+    }
 
     add_attributes("request.params", request_params)
     add_attributes("session.params", session_params)
