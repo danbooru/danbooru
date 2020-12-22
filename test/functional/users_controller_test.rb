@@ -268,7 +268,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal("xxx", User.last.name)
         assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
         assert_equal("webmaster@danbooru.donmai.us", User.last.email_address.address)
-        assert_enqueued_email_with UserMailer, :welcome_user, args: [User.last]
+        assert_enqueued_email_with UserMailer, :welcome_user, args: [User.last], queue: "default"
       end
 
       should "not create a user with an invalid email" do

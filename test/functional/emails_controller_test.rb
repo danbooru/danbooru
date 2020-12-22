@@ -88,7 +88,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to(settings_path)
           assert_equal("abc@ogres.net", @user.reload.email_address.address)
           assert_equal(false, @user.email_address.is_verified)
-          assert_enqueued_email_with UserMailer, :email_change_confirmation, args: [@user]
+          assert_enqueued_email_with UserMailer, :email_change_confirmation, args: [@user], queue: "default"
         end
 
         should "create a new address" do
@@ -101,7 +101,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to(settings_path)
           assert_equal("abc@ogres.net", @user.reload.email_address.address)
           assert_equal(false, @user.reload.email_address.is_verified)
-          assert_enqueued_email_with UserMailer, :email_change_confirmation, args: [@user]
+          assert_enqueued_email_with UserMailer, :email_change_confirmation, args: [@user], queue: "default"
         end
       end
 
