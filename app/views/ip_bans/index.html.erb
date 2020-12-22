@@ -7,7 +7,7 @@
       <%= f.input :reason, input_html: { value: params[:search][:reason] } %>
       <%= f.input :creator_name, label: "Creator", input_html: { value: params[:search][:creator_name], "data-autocomplete": "user" } %>
       <%= f.input :category, collection: IpBan.categories, include_blank: true, selected: params[:search][:category] %>
-      <%= f.input :is_deleted, label: "Deleted?", collection: ["Yes", "No"], include_blank: true, input_html: { value: params[:search][:is_deleted] } %>
+      <%= f.input :is_deleted, label: "Status", collection: [["Active", "false"], ["Deleted", "true"]], include_blank: true, selected: params[:search][:is_deleted] %>
       <%= f.input :order, collection: [%w[Newest created_at], %w[Oldest created_at_asc], %w[Last\ Seen last_hit_at]], include_blank: true, selected: params[:search][:order] %>
       <%= f.submit "Search" %>
     <% end %>
