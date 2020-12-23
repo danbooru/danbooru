@@ -26,6 +26,7 @@ class ActiveSupport::TestCase
   include DownloadTestHelper
   include IqdbTestHelper
   include UploadTestHelper
+  extend StripeTestHelper
 
   mock_post_version_service!
   mock_pool_version_service!

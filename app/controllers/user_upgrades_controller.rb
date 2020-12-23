@@ -1,11 +1,12 @@
 class UserUpgradesController < ApplicationController
   helper_method :user
-  skip_before_action :verify_authenticity_token, only: [:create]
+  respond_to :js, :html
 
   def create
-    if params[:stripeToken]
-      create_stripe
-    end
+    @user_upgrade = UserUpgrade.new(recipient: user, purchaser: CurrentUser.user, level: params[:level].to_i)
+    @checkout = @user_upgrade.create_checkout
+
+    respond_with(@user_upgrade)
   end
 
   def new
@@ -20,40 +21,6 @@ class UserUpgradesController < ApplicationController
       User.find(params[:user_id])
     else
       CurrentUser.user
-    end
-  end
-
-  private
-
-  def create_stripe
-    @user = user
-
-    if params[:desc] == "Upgrade to Gold"
-      level = User::Levels::GOLD
-      cost = UserUpgrade.gold_price
-    elsif params[:desc] == "Upgrade to Platinum"
-      level = User::Levels::PLATINUM
-      cost = UserUpgrade.platinum_price
-    elsif params[:desc] == "Upgrade Gold to Platinum" && @user.level == User::Levels::GOLD
-      level = User::Levels::PLATINUM
-      cost = UserUpgrade.upgrade_price
-    else
-      raise "Invalid desc"
-    end
-
-    begin
-      charge = Stripe::Charge.create(amount: cost, currency: "usd", source: params[:stripeToken], description: params[:desc])
-      @user.promote_to!(level, User.system, is_upgrade: true)
-      flash[:success] = true
-    rescue Stripe::StripeError => e
-      DanbooruLogger.log(e)
-      flash[:error] = e.message
-    end
-
-    if @user == CurrentUser.user
-      redirect_to user_upgrade_path
-    else
-      redirect_to user_upgrade_path(user_id: params[:user_id])
     end
   end
 end

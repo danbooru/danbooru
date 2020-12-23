@@ -1,5 +1,6 @@
 <% page_title "Account Upgrade" %>
-<% meta_description "Upgrade to a Gold or Platinum account on #{Danbooru.config.app_name}." %>
+<% meta_description "Upgrade to a Gold or Platinum account." %>
+<script src="https://js.stripe.com/v3/"></script>
 
 <%= render "users/secondary_links" %>
 
@@ -96,9 +97,24 @@
       <% if CurrentUser.is_anonymous? %>
         <p><%= link_to "Sign up", new_user_path %> or <%= link_to "login", login_path(url: new_user_upgrade_path) %> first to upgrade your account.</p>
       <% elsif CurrentUser.safe_mode? %>
-        <%= render "stripe_payment" %>
+        <div class="section">
+          <p>You can pay with a credit or debit card. Safebooru uses <a href="https://www.stripe.com">Stripe</a>
+          as a payment intermediary so none of your personal information will be stored on the site.</p>
+
+          <% if user.level < User::Levels::GOLD %>
+            <p><%= button_to "Upgrade to Gold", user_upgrade_path(user_id: user.id, level: User::Levels::GOLD), remote: true, disable_with: "Redirecting..." %></p>
+            <p><%= button_to "Upgrade to Platinum", user_upgrade_path(user_id: user.id, level: User::Levels::PLATINUM), remote: true, disable_with: "Redirecting..." %></p>
+          <% elsif user.level < User::Levels::PLATINUM %>
+            <p><%= button_to "Upgrade Gold to Platinum", user_upgrade_path(user_id: user.id, level: User::Levels::PLATINUM), remote: true, disable_with: "Redirecting..." %></p>
+          <% end %>
+        </div>
       <% else %>
-        <%= render "stripe_payment_safebooru" %>
+        <div class="section">
+          <p>You can pay with a credit or debit card on
+          <%= link_to "Safebooru", new_user_upgrade_url(user_id: user.id, host: "safebooru.donmai.us", protocol: "https") %>.
+          Your account will then also be upgraded on Danbooru. You can login to
+          Safebooru with the same username and password you use on Danbooru.</p>
+        </div>
       <% end %>
     <% end %>
   </div>

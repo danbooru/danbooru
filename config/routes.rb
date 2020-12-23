@@ -257,6 +257,9 @@ Rails.application.routes.draw do
   resource :user_upgrade, :only => [:new, :create, :show]
   resources :user_feedbacks, except: [:destroy]
   resources :user_name_change_requests, only: [:new, :create, :show, :index]
+  resources :webhooks do
+    post :receive, on: :collection
+  end
   resources :wiki_pages, id: /.+?(?=\.json|\.xml|\.html)|.+/ do
     put :revert, on: :member
     get :search, on: :collection

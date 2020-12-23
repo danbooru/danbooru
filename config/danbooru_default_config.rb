@@ -359,6 +359,9 @@ module Danbooru
     def stripe_publishable_key
     end
 
+    def stripe_webhook_secret
+    end
+
     def twitter_api_key
     end
 
