@@ -11,7 +11,7 @@ class UploadService
     end
 
     def comment_replacement_message(post, replacement)
-      %("#{replacement.creator.name}":[/users/#{replacement.creator.id}] replaced this post with a new image:\n\n#{replacement_message(post, replacement)})
+      %("#{replacement.creator.name}":[#{Routes.user_path(replacement.creator)}] replaced this post with a new image:\n\n#{replacement_message(post, replacement)})
     end
 
     def replacement_message(post, replacement)

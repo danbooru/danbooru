@@ -1390,7 +1390,8 @@ class Post < ApplicationRecord
 
       new_artist_tags.each do |tag|
         if tag.artist.blank?
-          warnings.add(:base, "Artist [[#{tag.name}]] requires an artist entry. \"Create new artist entry\":[/artists/new?artist%5Bname%5D=#{CGI.escape(tag.name)}]")
+          new_artist_path = Routes.new_artist_path(artist: { name: tag.name })
+          warnings.add(:base, "Artist [[#{tag.name}]] requires an artist entry. \"Create new artist entry\":[#{new_artist_path}]")
         end
       end
     end
@@ -1412,7 +1413,8 @@ class Post < ApplicationRecord
       return if tags.any?(&:artist?)
       return if Sources::Strategies.find(source).is_a?(Sources::Strategies::Null)
 
-      warnings.add(:base, "Artist tag is required. \"Create new artist tag\":[/artists/new?artist%5Bsource%5D=#{CGI.escape(source)}]. Ask on the forum if you need naming help")
+      new_artist_path = Routes.new_artist_path(artist: { source: source })
+      warnings.add(:base, "Artist tag is required. \"Create new artist tag\":[#{new_artist_path}]. Ask on the forum if you need naming help")
     end
 
     def has_copyright_tag

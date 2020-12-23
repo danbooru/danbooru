@@ -28,7 +28,7 @@ class ForumPost < ApplicationRecord
   mentionable(
     :message_field => :body,
     :title => ->(user_name) {%{#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})}},
-    :body => ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[/forum_topics/#{topic_id}?page=#{forum_topic_page}]):\n\n[quote]\n#{DText.extract_mention(body, "@" + user_name)}\n[/quote]\n}}
+    :body => ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[#{Routes.forum_topic_path(topic, page: forum_topic_page)}]):\n\n[quote]\n#{DText.extract_mention(body, "@" + user_name)}\n[/quote]\n}}
   )
 
   module SearchMethods

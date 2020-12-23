@@ -32,16 +32,16 @@ class UserPromotion
 
   def create_mod_actions
     if old_can_approve_posts != user.can_approve_posts?
-      ModAction.log("\"#{promoter.name}\":/users/#{promoter.id} changed approval privileges for \"#{user.name}\":/users/#{user.id} from #{old_can_approve_posts} to [b]#{user.can_approve_posts?}[/b]", :user_approval_privilege)
+      ModAction.log("\"#{promoter.name}\":#{Routes.user_path(promoter)} changed approval privileges for \"#{user.name}\":#{Routes.user_path(user)} from #{old_can_approve_posts} to [b]#{user.can_approve_posts?}[/b]", :user_approval_privilege, promoter)
     end
 
     if old_can_upload_free != user.can_upload_free?
-      ModAction.log("\"#{promoter.name}\":/users/#{promoter.id} changed unlimited upload privileges for \"#{user.name}\":/users/#{user.id} from #{old_can_upload_free} to [b]#{user.can_upload_free?}[/b]", :user_upload_privilege)
+      ModAction.log("\"#{promoter.name}\":#{Routes.user_path(promoter)} changed unlimited upload privileges for \"#{user.name}\":#{Routes.user_path(user)} from #{old_can_upload_free} to [b]#{user.can_upload_free?}[/b]", :user_upload_privilege, promoter)
     end
 
     if user.level_changed?
       category = is_upgrade ? :user_account_upgrade : :user_level_change
-      ModAction.log(%{"#{user.name}":/users/#{user.id} level changed #{user.level_string_was} -> #{user.level_string}}, category)
+      ModAction.log(%{"#{user.name}":#{Routes.user_path(user)} level changed #{user.level_string_was} -> #{user.level_string}}, category, promoter)
     end
   end
 

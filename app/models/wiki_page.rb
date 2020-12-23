@@ -122,7 +122,7 @@ class WikiPage < ApplicationRecord
 
     broken_wikis = WikiPage.linked_to(title_was)
     if broken_wikis.count > 0
-      broken_wiki_search = Rails.application.routes.url_helpers.wiki_pages_path(search: { linked_to: title_was })
+      broken_wiki_search = Routes.wiki_pages_path(search: { linked_to: title_was })
       warnings.add(:base, %!Warning: [[#{title_was}]] is still linked from "#{broken_wikis.count} #{"other wiki page".pluralize(broken_wikis.count)}":[#{broken_wiki_search}]. Update #{(broken_wikis.count > 1) ? "these wikis" : "this wiki"} to link to [[#{title}]] instead!)
     end
   end

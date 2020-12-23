@@ -8,10 +8,10 @@ class UserFeedback < ApplicationRecord
   validates_inclusion_of :category, :in => %w(positive negative neutral)
   after_create :create_dmail, unless: :disable_dmail_notification
   after_update(:if => ->(rec) { CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log(%{#{CurrentUser.name} updated user feedback for "#{rec.user.name}":/users/#{rec.user_id}}, :user_feedback_update)
+    ModAction.log(%{#{CurrentUser.name} updated user feedback for "#{rec.user.name}":#{Routes.user_path(rec.user)}}, :user_feedback_update)
   end
   after_destroy(:if => ->(rec) { CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log(%{#{CurrentUser.name} deleted user feedback for "#{rec.user.name}":/users/#{rec.user_id}}, :user_feedback_delete)
+    ModAction.log(%{#{CurrentUser.name} deleted user feedback for "#{rec.user.name}":#{Routes.user_path(rec.user)}}, :user_feedback_delete)
   end
 
   deletable
@@ -52,7 +52,7 @@ class UserFeedback < ApplicationRecord
   end
 
   def create_dmail
-    body = %{#{disclaimer}@#{creator.name} created a "#{category} record":/user_feedbacks?search[user_id]=#{user_id} for your account:\n\n#{self.body}}
+    body = %{#{disclaimer}@#{creator.name} created a "#{category} record":#{Routes.user_feedbacks_path(search: { user_id: user_id })} for your account:\n\n#{self.body}}
     Dmail.create_automated(:to_id => user_id, :title => "Your user record has been updated", :body => body)
   end
 
