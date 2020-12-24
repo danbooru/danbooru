@@ -3,8 +3,8 @@ class UserUpgradesController < ApplicationController
   respond_to :js, :html
 
   def create
-    @user_upgrade = UserUpgrade.new(recipient: user, purchaser: CurrentUser.user, level: params[:level].to_i)
-    @checkout = @user_upgrade.create_checkout
+    @user_upgrade = authorize UserUpgrade.create(recipient: user, purchaser: CurrentUser.user, status: "pending", upgrade_type: params[:upgrade_type])
+    @checkout = @user_upgrade.create_checkout!
 
     respond_with(@user_upgrade)
   end
@@ -13,7 +13,8 @@ class UserUpgradesController < ApplicationController
   end
 
   def show
-    authorize User, :upgrade?
+    @user_upgrade = authorize UserUpgrade.find(params[:id])
+    respond_with(@user_upgrade)
   end
 
   def user

@@ -3,8 +3,8 @@ require 'test_helper'
 class WebhooksControllerTest < ActionDispatch::IntegrationTest
   mock_stripe!
 
-  def post_webhook(*args, **metadata)
-    event = StripeMock.mock_webhook_event(*args, metadata: metadata)
+  def post_webhook(*args, payment_status: "paid", **metadata)
+    event = StripeMock.mock_webhook_event(*args, payment_status: payment_status, metadata: metadata)
     signature = generate_stripe_signature(event)
     headers = { "Stripe-Signature": signature }
 
@@ -58,105 +58,83 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
         end
 
         context "for a checkout.session.completed event" do
+          context "for completed event with an unpaid payment status" do
+            should "not upgrade the user" do
+              @user_upgrade = create(:self_gold_upgrade)
+              post_webhook("checkout.session.completed", { user_upgrade_id: @user_upgrade.id, payment_status: "unpaid" })
+
+              assert_response 200
+              assert_equal("processing", @user_upgrade.reload.status)
+              assert_equal(User::Levels::MEMBER, @user_upgrade.recipient.reload.level)
+            end
+          end
+
           context "for a self upgrade" do
-            context "of a Member to Gold" do
+            context "to Gold" do
               should "upgrade the user" do
-                @user = create(:member_user)
-
-                post_webhook("checkout.session.completed", {
-                  recipient_id: @user.id,
-                  purchaser_id: @user.id,
-                  upgrade_type: "gold_upgrade",
-                  level: User::Levels::GOLD,
-                })
+                @user_upgrade = create(:self_gold_upgrade)
+                post_webhook("checkout.session.completed", { user_upgrade_id: @user_upgrade.id })
 
                 assert_response 200
-                assert_equal(User::Levels::GOLD, @user.reload.level)
+                assert_equal("complete", @user_upgrade.reload.status)
+                assert_equal(User::Levels::GOLD, @user_upgrade.recipient.reload.level)
               end
             end
 
-            context "of a Member to Platinum" do
+            context "to Platinum" do
               should "upgrade the user" do
-                @user = create(:member_user)
-
-                post_webhook("checkout.session.completed", {
-                  recipient_id: @user.id,
-                  purchaser_id: @user.id,
-                  upgrade_type: "platinum_upgrade",
-                  level: User::Levels::PLATINUM,
-                })
+                @user_upgrade = create(:self_platinum_upgrade)
+                post_webhook("checkout.session.completed", { user_upgrade_id: @user_upgrade.id })
 
                 assert_response 200
-                assert_equal(User::Levels::PLATINUM, @user.reload.level)
+                assert_equal("complete", @user_upgrade.reload.status)
+                assert_equal(User::Levels::PLATINUM, @user_upgrade.recipient.reload.level)
               end
             end
 
-            context "of a Gold user to Platinum" do
+            context "from Gold to Platinum" do
               should "upgrade the user" do
-                @user = create(:gold_user)
-
-                post_webhook("checkout.session.completed", {
-                  recipient_id: @user.id,
-                  purchaser_id: @user.id,
-                  upgrade_type: "gold_to_platinum_upgrade",
-                  level: User::Levels::PLATINUM,
-                })
+                @user_upgrade = create(:self_gold_to_platinum_upgrade)
+                post_webhook("checkout.session.completed", { user_upgrade_id: @user_upgrade.id })
 
                 assert_response 200
-                assert_equal(User::Levels::PLATINUM, @user.reload.level)
+                assert_equal("complete", @user_upgrade.reload.status)
+                assert_equal(User::Levels::PLATINUM, @user_upgrade.recipient.reload.level)
               end
             end
           end
 
           context "for a gifted upgrade" do
-            context "of a Member to Gold" do
+            context "to Gold" do
               should "upgrade the user" do
-                @recipient = create(:member_user)
-                @purchaser = create(:member_user)
-
-                post_webhook("checkout.session.completed", {
-                  recipient_id: @recipient.id,
-                  purchaser_id: @purchaser.id,
-                  upgrade_type: "gold_upgrade",
-                  level: User::Levels::GOLD,
-                })
+                @user_upgrade = create(:gift_gold_upgrade)
+                post_webhook("checkout.session.completed", { user_upgrade_id: @user_upgrade.id })
 
                 assert_response 200
-                assert_equal(User::Levels::GOLD, @recipient.reload.level)
+                assert_equal("complete", @user_upgrade.reload.status)
+                assert_equal(User::Levels::GOLD, @user_upgrade.recipient.reload.level)
               end
             end
 
-            context "of a Member to Platinum" do
+            context "to Platinum" do
               should "upgrade the user" do
-                @recipient = create(:member_user)
-                @purchaser = create(:member_user)
-
-                post_webhook("checkout.session.completed", {
-                  recipient_id: @recipient.id,
-                  purchaser_id: @purchaser.id,
-                  upgrade_type: "platinum_upgrade",
-                  level: User::Levels::PLATINUM,
-                })
+                @user_upgrade = create(:gift_platinum_upgrade)
+                post_webhook("checkout.session.completed", { user_upgrade_id: @user_upgrade.id })
 
                 assert_response 200
-                assert_equal(User::Levels::PLATINUM, @recipient.reload.level)
+                assert_equal("complete", @user_upgrade.reload.status)
+                assert_equal(User::Levels::PLATINUM, @user_upgrade.recipient.reload.level)
               end
             end
 
-            context "of a Gold user to Platinum" do
+            context "from Gold to Platinum" do
               should "upgrade the user" do
-                @recipient = create(:gold_user)
-                @purchaser = create(:member_user)
-
-                post_webhook("checkout.session.completed", {
-                  recipient_id: @recipient.id,
-                  purchaser_id: @purchaser.id,
-                  upgrade_type: "gold_to_platinum_upgrade",
-                  level: User::Levels::PLATINUM,
-                })
+                @user_upgrade = create(:gift_gold_to_platinum_upgrade)
+                post_webhook("checkout.session.completed", { user_upgrade_id: @user_upgrade.id })
 
                 assert_response 200
-                assert_equal(User::Levels::PLATINUM, @recipient.reload.level)
+                assert_equal("complete", @user_upgrade.reload.status)
+                assert_equal(User::Levels::PLATINUM, @user_upgrade.recipient.reload.level)
               end
             end
           end

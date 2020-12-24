@@ -1,5 +1,18 @@
-class UserUpgrade
-  attr_reader :recipient, :purchaser, :level
+class UserUpgrade < ApplicationRecord
+  belongs_to :recipient, class_name: "User"
+  belongs_to :purchaser, class_name: "User"
+
+  enum upgrade_type: {
+    gold: 0,
+    platinum: 10,
+    gold_to_platinum: 20
+  }, _suffix: "upgrade"
+
+  enum status: {
+    pending: 0,
+    processing: 10,
+    complete: 20
+  }
 
   def self.stripe_publishable_key
     Danbooru.config.stripe_publishable_key
@@ -21,51 +34,63 @@ class UserUpgrade
     platinum_price - gold_price
   end
 
-  def initialize(recipient:, purchaser:, level:)
-    @recipient, @purchaser, @level = recipient, purchaser, level.to_i
-  end
-
-  def upgrade_type
-    if level == User::Levels::GOLD && recipient.level == User::Levels::MEMBER
-      :gold_upgrade
-    elsif level == User::Levels::PLATINUM && recipient.level == User::Levels::MEMBER
-      :platinum_upgrade
-    elsif level == User::Levels::PLATINUM && recipient.level == User::Levels::GOLD
-      :gold_to_platinum_upgrade
+  def level
+    case upgrade_type
+    when "gold"
+      User::Levels::GOLD
+    when "platinum"
+      User::Levels::PLATINUM
+    when "gold_to_platinum"
+      User::Levels::PLATINUM
     else
-      raise ArgumentError, "Invalid upgrade"
+      raise NotImplementedError
     end
   end
 
   def upgrade_price
     case upgrade_type
-    when :gold_upgrade
+    when "gold"
       UserUpgrade.gold_price
-    when :platinum_upgrade
+    when "platinum"
       UserUpgrade.platinum_price
-    when :gold_to_platinum_upgrade
+    when "gold_to_platinum"
       UserUpgrade.gold_to_platinum_price
+    else
+      raise NotImplementedError
     end
   end
 
   def upgrade_description
     case upgrade_type
-    when :gold_upgrade
+    when "gold"
       "Upgrade to Gold"
-    when :platinum_upgrade
+    when "platinum"
       "Upgrade to Platinum"
-    when :gold_to_platinum_upgrade
+    when "gold_to_platinum"
       "Upgrade Gold to Platinum"
+    else
+      raise NotImplementedError
     end
+  end
+
+  def level_string
+    User.level_string(level)
   end
 
   def is_gift?
     recipient != purchaser
   end
 
-  def process_upgrade!
+  def process_upgrade!(payment_status)
     recipient.with_lock do
-      upgrade_recipient!
+      return if status == "complete"
+
+      if payment_status == "paid"
+        upgrade_recipient!
+        update!(status: :complete)
+      else
+        update!(status: :processing)
+      end
     end
   end
 
@@ -74,12 +99,12 @@ class UserUpgrade
   end
 
   concerning :StripeMethods do
-    def create_checkout
-      Stripe::Checkout::Session.create(
+    def create_checkout!
+      checkout = Stripe::Checkout::Session.create(
         mode: "payment",
-        success_url: Routes.user_upgrade_url(user_id: recipient.id),
+        success_url: Routes.user_upgrade_url(self),
         cancel_url: Routes.new_user_upgrade_url(user_id: recipient.id),
-        client_reference_id: "user_#{purchaser.id}",
+        client_reference_id: "user_upgrade_#{id}",
         customer_email: recipient.email_address&.address,
         payment_method_types: ["card"],
         line_items: [{
@@ -93,6 +118,7 @@ class UserUpgrade
           quantity: 1,
         }],
         metadata: {
+          user_upgrade_id: id,
           purchaser_id: purchaser.id,
           recipient_id: recipient.id,
           purchaser_name: purchaser.name,
@@ -102,6 +128,9 @@ class UserUpgrade
           level: level,
         },
       )
+
+      update!(stripe_id: checkout.id)
+      checkout
     end
 
     class_methods do
@@ -122,7 +151,7 @@ class UserUpgrade
         event = build_event(request)
 
         if event.type == "checkout.session.completed"
-          checkout_session_completed(event)
+          checkout_session_completed(event.data.object)
         end
       end
 
@@ -132,13 +161,9 @@ class UserUpgrade
         Stripe::Webhook.construct_event(payload, signature, stripe_webhook_secret)
       end
 
-      def checkout_session_completed(event)
-        recipient = User.find(event.data.object.metadata.recipient_id)
-        purchaser = User.find(event.data.object.metadata.purchaser_id)
-        level = event.data.object.metadata.level
-
-        user_upgrade = UserUpgrade.new(recipient: recipient, purchaser: purchaser, level: level)
-        user_upgrade.process_upgrade!
+      def checkout_session_completed(checkout)
+        user_upgrade = UserUpgrade.find(checkout.metadata.user_upgrade_id)
+        user_upgrade.process_upgrade!(checkout.payment_status)
       end
     end
   end

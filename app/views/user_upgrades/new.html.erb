@@ -101,11 +101,11 @@
           <p>You can pay with a credit or debit card. Safebooru uses <a href="https://www.stripe.com">Stripe</a>
           as a payment intermediary so none of your personal information will be stored on the site.</p>
 
-          <% if user.level < User::Levels::GOLD %>
-            <p><%= button_to "Upgrade to Gold", user_upgrade_path(user_id: user.id, level: User::Levels::GOLD), remote: true, disable_with: "Redirecting..." %></p>
-            <p><%= button_to "Upgrade to Platinum", user_upgrade_path(user_id: user.id, level: User::Levels::PLATINUM), remote: true, disable_with: "Redirecting..." %></p>
-          <% elsif user.level < User::Levels::PLATINUM %>
-            <p><%= button_to "Upgrade Gold to Platinum", user_upgrade_path(user_id: user.id, level: User::Levels::PLATINUM), remote: true, disable_with: "Redirecting..." %></p>
+          <% if user.level == User::Levels::MEMBER %>
+            <p><%= button_to "Upgrade to Gold", user_upgrades_path(user_id: user.id, upgrade_type: "gold"), remote: true, disable_with: "Redirecting..." %></p>
+            <p><%= button_to "Upgrade to Platinum", user_upgrades_path(user_id: user.id, upgrade_type: "platinum"), remote: true, disable_with: "Redirecting..." %></p>
+          <% elsif user.level == User::Levels::GOLD %>
+            <p><%= button_to "Upgrade Gold to Platinum", user_upgrades_path(user_id: user.id, upgrade_type: "gold_to_platinum"), remote: true, disable_with: "Redirecting..." %></p>
           <% end %>
         </div>
       <% else %>
