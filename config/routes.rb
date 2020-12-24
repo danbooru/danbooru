@@ -262,8 +262,6 @@ Rails.application.routes.draw do
 
   # legacy aliases
   get "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}&search[name]=#{CGI.escape(req.params[:name].to_s)}"}
-  get "/artist/index.xml", :controller => "legacy", :action => "artists", :format => "xml"
-  get "/artist/index.json", :controller => "legacy", :action => "artists", :format => "json"
   get "/artist/index" => redirect {|params, req| "/artists?page=#{req.params[:page]}"}
   get "/artist/show/:id" => redirect("/artists/%{id}")
   get "/artist/show" => redirect {|params, req| "/artists?name=#{CGI.escape(req.params[:name].to_s)}"}
@@ -335,8 +333,6 @@ Rails.application.routes.draw do
 
   get "/tag_implication" => redirect {|params, req| "/tag_implications?search[name_matches]=#{CGI.escape(req.params[:query].to_s)}"}
 
-  get "/user/index.xml", :controller => "legacy", :action => "users", :format => "xml"
-  get "/user/index.json", :controller => "legacy", :action => "users", :format => "json"
   get "/user" => redirect {|params, req| "/users?page=#{req.params[:page]}"}
   get "/user/index" => redirect {|params, req| "/users?page=#{req.params[:page]}"}
   get "/user/show/:id" => redirect("/users/%{id}")

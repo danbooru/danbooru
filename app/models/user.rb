@@ -483,15 +483,6 @@ class User < ApplicationRecord
       ]
     end
 
-    def to_legacy_json
-      return {
-        "name" => name,
-        "id" => id,
-        "level" => level,
-        "created_at" => created_at.strftime("%Y-%m-%d %H:%M")
-      }.to_json
-    end
-
     def api_token
       api_key.try(:key)
     end
