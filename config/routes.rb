@@ -321,5 +321,5 @@ Rails.application.routes.draw do
   get "/mock/iqdbs/similar" => "mock_services#iqdbs_similar", as: "mock_iqdbs_similar"
   post "/mock/iqdbs/similar" => "mock_services#iqdbs_similar"
 
-  get "*other", :to => "static#not_found"
+  match "*other", to: "static#not_found", via: :all
 end
