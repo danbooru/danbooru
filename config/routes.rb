@@ -1,4 +1,11 @@
 Rails.application.routes.draw do
+  resources :posts, only: [:index, :show, :update, :destroy]
+  resources :autocomplete, only: [:index]
+
+  # XXX This comes *after* defining posts above because otherwise the paginator
+  # generates `/?page=2` instead of `/posts?page=2` on the posts#index page.
+  root "posts#index"
+
   namespace :admin do
     resources :users, :only => [:edit, :update]
     resource  :dashboard, :only => [:show]
@@ -67,7 +74,6 @@ Rails.application.routes.draw do
       get :search
     end
   end
-  resources :autocomplete, only: [:index]
   resources :bans
   resources :bulk_update_requests do
     member do
@@ -171,7 +177,9 @@ Rails.application.routes.draw do
   end
   resources :post_replacements, :only => [:index, :new, :create, :update]
   resources :post_votes, only: [:index]
-  resources :posts, only: [:index, :show, :update, :destroy] do
+
+  # XXX Use `only: []` to avoid redefining post routes defined at top of file.
+  resources :posts, only: [] do
     resources :events, :only => [:index], :controller => "post_events"
     resources :replacements, :only => [:index, :new, :create], :controller => "post_replacements"
     resource :artist_commentary, :only => [:index, :show] do
@@ -312,8 +320,6 @@ Rails.application.routes.draw do
   get "/mock/reportbooru/post_views/rank" => "mock_services#reportbooru_post_views", as: "mock_reportbooru_post_views"
   get "/mock/iqdbs/similar" => "mock_services#iqdbs_similar", as: "mock_iqdbs_similar"
   post "/mock/iqdbs/similar" => "mock_services#iqdbs_similar"
-
-  root :to => "posts#index"
 
   get "*other", :to => "static#not_found"
 end
