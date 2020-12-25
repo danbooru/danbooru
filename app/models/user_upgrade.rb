@@ -34,7 +34,11 @@ class UserUpgrade < ApplicationRecord
   end
 
   def self.gold_price
-    2000
+    if Danbooru.config.is_promotion?
+      1500
+    else
+      2000
+    end
   end
 
   def self.platinum_price

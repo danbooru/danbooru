@@ -494,6 +494,12 @@ module Danbooru
     def redis_url
       "redis://localhost:6379"
     end
+
+    def is_promotion?
+      Time.use_zone("UTC") do
+        Time.zone.now < Time.zone.parse("2021-01-01")
+      end
+    end
   end
 
   EnvironmentConfiguration = Struct.new(:config) do

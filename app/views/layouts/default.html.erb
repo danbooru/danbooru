@@ -70,6 +70,25 @@
   <div id="page">
     <%= render "users/verification_notice" %>
 
+    <% if Danbooru.config.is_promotion? && cookies[:hide_promotion_notice].blank? %>
+      <div class="notice notice-info notice-large" id="promotion-notice">
+        <% if rand <= 0.0025 %>
+          <%= tag.img src: "/images/provgift.png", width: 24, height: 24 %>
+        <% elsif rand <= 0.0025 %>
+          <%= tag.img src: "/images/kemogift.png", width: 24, height: 24 %>
+        <% elsif rand <= 0.0025 %>
+          <%= tag.img src: "/images/padoru.gif", width: 24, height: 24 %>
+        <% elsif rand <= 0.0025 %>
+          <%= tag.img src: "/images/ablobgift.gif", width: 24, height: 24 %>
+        <% else %>
+          <%= tag.img src: "/images/blobgift.png", width: 24, height: 24 %>
+        <% end %>
+
+        <%= link_to "Danbooru Winter Sale!", forum_topic_path(17832) %> 25% off Gold and unlimited searches for Members!
+        (<%= link_to "hide", "#", id: "hide-promotion-notice" %>)
+      </div>
+    <% end %>
+
     <% if !CurrentUser.is_anonymous? && !CurrentUser.is_gold? && cookies[:hide_upgrade_account_notice].blank? && params[:action] != "upgrade_information" %>
       <%= render "users/upgrade_notice" %>
     <% end %>
