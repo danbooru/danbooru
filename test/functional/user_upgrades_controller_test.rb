@@ -45,6 +45,34 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "index action" do
+      setup do
+        @self_upgrade = create(:self_gold_upgrade)
+        @gift_upgrade = create(:gift_gold_upgrade)
+      end
+
+      should "show the purchaser's upgrades to the purchaser" do
+        get_auth user_upgrades_path, @gift_upgrade.purchaser
+
+        assert_response :success
+        assert_select "#user-upgrade-#{@gift_upgrade.id}", count: 1
+      end
+
+      should "show the recipient's upgrades to the recipient" do
+        get_auth user_upgrades_path, @gift_upgrade.recipient
+
+        assert_response :success
+        assert_select "#user-upgrade-#{@gift_upgrade.id}", count: 1
+      end
+
+      should "not show upgrades to unrelated users" do
+        get_auth user_upgrades_path, create(:user)
+
+        assert_response :success
+        assert_select "#user-upgrade-#{@gift_upgrade.id}", count: 0
+      end
+    end
+
     context "show action" do
       context "for a completed upgrade" do
         should "render for a self upgrade" do

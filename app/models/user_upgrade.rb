@@ -14,6 +14,9 @@ class UserUpgrade < ApplicationRecord
     complete: 20
   }
 
+  scope :gifted, -> { where("recipient_id != purchaser_id") }
+  scope :self_upgrade, -> { where("recipient_id = purchaser_id") }
+
   def self.enabled?
     stripe_secret_key.present? && stripe_publishable_key.present? && stripe_webhook_secret.present?
   end
@@ -87,6 +90,27 @@ class UserUpgrade < ApplicationRecord
 
   def is_gift?
     recipient != purchaser
+  end
+
+  def self.visible(user)
+    if user.is_owner?
+      all
+    else
+      where(recipient: user).or(where(purchaser: user))
+    end
+  end
+
+  def self.search(params)
+    q = search_attributes(params, :id, :created_at, :updated_at, :upgrade_type, :status, :stripe_id, :recipient, :purchaser)
+
+    if params[:is_gifted].to_s.truthy?
+      q = q.gifted
+    elsif params[:is_gifted].to_s.falsy?
+      q = q.self_upgrade
+    end
+
+    q = q.apply_default_order(params)
+    q
   end
 
   concerning :UpgradeMethods do
