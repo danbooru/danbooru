@@ -45,5 +45,19 @@ class UserUpgradeTest < ActiveSupport::TestCase
         end
       end
     end
+
+    context "the #create_checkout! method" do
+      context "for a gifted upgrade" do
+        context "to Gold" do
+          should "prefill the Stripe checkout page with the purchaser's email address" do
+            @user = create(:user, email_address: build(:email_address))
+            @user_upgrade = create(:gift_gold_upgrade, purchaser: @user)
+            @checkout = @user_upgrade.create_checkout!
+
+            assert_equal(@user.email_address.address, @checkout.customer_email)
+          end
+        end
+      end
+    end
   end
 end

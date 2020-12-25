@@ -166,7 +166,7 @@ class UserUpgrade < ApplicationRecord
         success_url: Routes.user_upgrade_url(self),
         cancel_url: Routes.new_user_upgrade_url(user_id: recipient.id),
         client_reference_id: "user_upgrade_#{id}",
-        customer_email: recipient.email_address&.address,
+        customer_email: purchaser.email_address&.address,
         payment_method_types: ["card"],
         line_items: [{
           price_data: {
