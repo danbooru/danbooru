@@ -1,13 +1,12 @@
 class UserPromotion
-  attr_reader :user, :promoter, :new_level, :old_can_approve_posts, :old_can_upload_free, :can_upload_free, :can_approve_posts, :is_upgrade
+  attr_reader :user, :promoter, :new_level, :old_can_approve_posts, :old_can_upload_free, :can_upload_free, :can_approve_posts
 
-  def initialize(user, promoter, new_level, can_upload_free: nil, can_approve_posts: nil, is_upgrade: false)
+  def initialize(user, promoter, new_level, can_upload_free: nil, can_approve_posts: nil)
     @user = user
     @promoter = promoter
     @new_level = new_level.to_i
     @can_upload_free = can_upload_free
     @can_approve_posts = can_approve_posts
-    @is_upgrade = is_upgrade
   end
 
   def promote!
@@ -21,7 +20,7 @@ class UserPromotion
     user.can_approve_posts = can_approve_posts unless can_approve_posts.nil?
     user.inviter = promoter
 
-    create_user_feedback unless is_upgrade
+    create_user_feedback
     create_dmail
     create_mod_actions
 
@@ -40,8 +39,7 @@ class UserPromotion
     end
 
     if user.level_changed?
-      category = is_upgrade ? :user_account_upgrade : :user_level_change
-      ModAction.log(%{"#{user.name}":#{Routes.user_path(user)} level changed #{user.level_string_was} -> #{user.level_string}}, category, promoter)
+      ModAction.log(%{"#{user.name}":#{Routes.user_path(user)} level changed #{user.level_string_was} -> #{user.level_string}}, :user_level_change, promoter)
     end
   end
 
@@ -54,8 +52,6 @@ class UserPromotion
       raise User::PrivilegeError, "You can't promote other users to your rank or above"
     elsif user.level >= promoter.level
       raise User::PrivilegeError, "You can't promote or demote other users at your rank or above"
-    elsif is_upgrade && user.is_builder?
-      raise User::PrivilegeError, "You can't upgrade a user that is above Platinum level"
     end
   end
 

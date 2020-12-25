@@ -81,21 +81,50 @@ class UserUpgrade < ApplicationRecord
     recipient != purchaser
   end
 
-  def process_upgrade!(payment_status)
-    recipient.with_lock do
-      return if status == "complete"
+  concerning :UpgradeMethods do
+    def process_upgrade!(payment_status)
+      recipient.with_lock do
+        return if status == "complete"
 
-      if payment_status == "paid"
-        upgrade_recipient!
-        update!(status: :complete)
-      else
-        update!(status: :processing)
+        if payment_status == "paid"
+          upgrade_recipient!
+          create_mod_action!
+          dmail_recipient!
+          dmail_purchaser!
+          update!(status: :complete)
+        else
+          update!(status: :processing)
+        end
       end
     end
-  end
 
-  def upgrade_recipient!
-    recipient.promote_to!(level, User.system, is_upgrade: true)
+    def upgrade_recipient!
+      recipient.update!(level: level, inviter: User.system)
+    end
+
+    def create_mod_action!
+      ModAction.log(%{"#{recipient.name}":#{Routes.user_path(recipient)} level changed #{User.level_string(recipient.level_before_last_save)} -> #{recipient.level_string}}, :user_account_upgrade, purchaser)
+    end
+
+    def dmail_recipient!
+      if is_gift?
+        body = "Congratulations, your account has been upgraded to #{level_string} by <@#{purchaser.name}>. Enjoy!"
+      else
+        body = "You are now a #{level_string} user. Thanks for supporting #{Danbooru.config.canonical_app_name}!"
+      end
+
+      title = "You have been upgraded to #{level_string}!"
+      Dmail.create_automated(to: recipient, title: title, body: body)
+    end
+
+    def dmail_purchaser!
+      return unless is_gift?
+
+      title = "#{recipient.name} has been upgraded to #{level_string}!"
+      body = "<@#{recipient.name}> is now a #{level_string} user. Thanks for supporting #{Danbooru.config.canonical_app_name}!"
+
+      Dmail.create_automated(to: purchaser, title: title, body: body)
+    end
   end
 
   concerning :StripeMethods do
