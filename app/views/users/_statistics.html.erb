@@ -75,8 +75,13 @@
         <th>Level</th>
         <td>
           <%= user.level_string %>
-          <% if CurrentUser.user == user && !CurrentUser.is_gold? %>
-            (<%= link_to "upgrade", new_user_upgrade_path %>)
+
+          <% if !user.is_platinum? %>
+            <% if CurrentUser.user == user %>
+              (<%= link_to "Upgrade account", new_user_upgrade_path %>)
+            <% else %>
+              (<%= link_to "Gift upgrade", new_user_upgrade_path(user_id: user.id) %>)
+            <% end %>
           <% end %>
         </td>
       </tr>

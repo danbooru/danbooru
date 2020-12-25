@@ -14,6 +14,14 @@ class UserUpgrade < ApplicationRecord
     complete: 20
   }
 
+  def self.enabled?
+    stripe_secret_key.present? && stripe_publishable_key.present? && stripe_webhook_secret.present?
+  end
+
+  def self.stripe_secret_key
+    Danbooru.config.stripe_secret_key
+  end
+
   def self.stripe_publishable_key
     Danbooru.config.stripe_publishable_key
   end

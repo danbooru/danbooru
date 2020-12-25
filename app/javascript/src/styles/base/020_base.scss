@@ -118,6 +118,17 @@ table tfoot {
   margin-top: 2em;
 }
 
+details {
+  border-bottom: 1px solid var(--details-border);
+
+  summary {
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+    line-height: 2em;
+  }
+}
+
 .fineprint {
   color: var(--muted-text-color);
   font-style: italic;

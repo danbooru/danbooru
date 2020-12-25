@@ -35,9 +35,12 @@
 
   --quick-search-form-background: var(--body-background-color);
 
+  --user-upgrade-basic-background-color: #F5F5FF;
   --user-upgrade-gold-background-color: #FFF380;
   --user-upgrade-platinum-background-color: #EEE;
-  --user-upgrade-table-row-hover-background-color: #FEF;
+  --user-upgrade-button-text-color: white;
+  --user-upgrade-button-background-color: var(--link-color);
+  --user-upgrade-button-hover-background-color: hsl(213, 100%, 40%);
 
   --table-header-border: 2px solid #666;
   --table-row-border: 1px solid #CCC;
@@ -71,6 +74,8 @@
   --moderation-report-border: 2px solid red;
 
   --comment-sticky-background-color: var(--subnav-menu-background-color);
+
+  --details-border: #DDD;
 
   --post-tooltip-background-color: var(--body-background-color);
   --post-tooltip-border-color: hsla(210, 100%, 3%, 0.15);
@@ -157,7 +162,8 @@
   --bulk-update-request-failed-color: red;
 
   --login-link-color: #E00;
-  --footer-border: 1px solid #EEE;
+  --footer-border: 1px solid #DDD;
+  --details-border: #DDD;
 
   --jquery-ui-widget-content-background: var(--body-background-color);
   --jquery-ui-widget-content-text-color: var(--text-color);
@@ -255,6 +261,7 @@ body[data-current-user-theme="dark"] {
   --subnav-menu-background-color: var(--grey-2);
   --responsive-menu-background-color: var(--grey-3);
   --footer-border: 1px solid var(--grey-3);
+  --details-border: var(--grey-3);
 
   --table-header-border: 2px solid var(--grey-3);
   --table-even-row-background: var(--grey-2);
@@ -419,9 +426,12 @@ body[data-current-user-theme="dark"] {
   --uploads-dropzone-progress-bar-foreground-color: var(--link-color);
   --uploads-dropzone-progress-bar-background-color: var(--link-hover-color);
 
-  --user-upgrade-gold-background-color: var(--yellow-0);
+  --user-upgrade-basic-background-color: var(--grey-2);
+  --user-upgrade-gold-background-color: var(--indigo-0);
   --user-upgrade-platinum-background-color: var(--blue-0);
-  --user-upgrade-table-row-hover-background-color: transparent;
+  --user-upgrade-button-text-color: white;
+  --user-upgrade-button-background-color: var(--link-color);
+  --user-upgrade-button-hover-background-color: var(--link-hover-color);
 
   --wiki-page-other-name-background-color: var(--grey-3);
   --wiki-page-versions-diff-del-background: var(--red-0);

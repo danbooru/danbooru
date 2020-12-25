@@ -3,15 +3,36 @@ require 'test_helper'
 class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
   context "The user upgrades controller" do
     context "new action" do
-      should "render for a self upgrade" do
+      should "render for a self upgrade to Gold" do
         @user = create(:user)
         get_auth new_user_upgrade_path, @user
 
         assert_response :success
       end
 
-      should "render for a gift upgrade" do
+      should "render for a self upgrade to Platinum" do
+        @user = create(:gold_user)
+        get_auth new_user_upgrade_path, @user
+
+        assert_response :success
+      end
+
+      should "render for a gifted upgrade to Gold" do
         @recipient = create(:user)
+        get_auth new_user_upgrade_path(user_id: @recipient.id), create(:user)
+
+        assert_response :success
+      end
+
+      should "render for a gifted upgrade to Platinum" do
+        @recipient = create(:gold_user)
+        get_auth new_user_upgrade_path(user_id: @recipient.id), create(:user)
+
+        assert_response :success
+      end
+
+      should "render for an invalid gifted upgrade to a user who is already Platinum" do
+        @recipient = create(:platinum_user)
         get_auth new_user_upgrade_path(user_id: @recipient.id), create(:user)
 
         assert_response :success
