@@ -189,7 +189,7 @@ module ApplicationHelper
     to_sentence(links, **options)
   end
 
-  def link_to_user(user)
+  def link_to_user(user, text = nil)
     return "anonymous" if user.blank?
 
     user_class = "user user-#{user.level_string.downcase}"
@@ -197,8 +197,9 @@ module ApplicationHelper
     user_class += " user-post-uploader" if user.can_upload_free?
     user_class += " user-banned" if user.is_banned?
 
+    text = user.pretty_name if text.blank?
     data = { "user-id": user.id, "user-name": user.name, "user-level": user.level }
-    link_to(user.pretty_name, user_path(user), class: user_class, data: data)
+    link_to(text, user, class: user_class, data: data)
   end
 
   def mod_link_to_user(user, positive_or_negative)
