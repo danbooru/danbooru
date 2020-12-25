@@ -271,6 +271,12 @@ Rails.application.routes.draw do
     end
   end
 
+  # Legacy Danbooru 1 API endpoints
+  get "/tag/index.xml", :controller => "legacy", :action => "tags", :format => "xml"
+  get "/tag/index.json", :controller => "legacy", :action => "tags", :format => "json"
+  get "/post/index.xml", :controller => "legacy", :action => "posts", :format => "xml"
+  get "/post/index.json", :controller => "legacy", :action => "posts", :format => "json"
+
   # Legacy Danbooru 1 redirects.
   get "/artist" => redirect {|params, req| "/artists?page=#{req.params[:page]}&search[name]=#{CGI.escape(req.params[:name].to_s)}"}
   get "/artist/show/:id" => redirect("/artists/%{id}")
@@ -293,12 +299,6 @@ Rails.application.routes.draw do
 
   get "/wiki/show" => redirect {|params, req| "/wiki_pages?title=#{CGI.escape(req.params[:title].to_s)}"}
   get "/help/:title" => redirect {|params, req| "/wiki_pages?title=#{CGI.escape('help:' + req.params[:title])}"}
-
-  # Legacy Danbooru 1 API endpoints
-  get "/tag/index.xml", :controller => "legacy", :action => "tags", :format => "xml"
-  get "/tag/index.json", :controller => "legacy", :action => "tags", :format => "json"
-  get "/post/index.xml", :controller => "legacy", :action => "posts", :format => "xml"
-  get "/post/index.json", :controller => "legacy", :action => "posts", :format => "json"
 
   get "/login", to: "sessions#new", as: :login
   get "/logout", to: "sessions#sign_out", as: :logout
