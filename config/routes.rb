@@ -1,5 +1,8 @@
 Rails.application.routes.draw do
-  resources :posts, only: [:index, :show, :update, :destroy]
+  resources :posts, only: [:index, :show, :update, :destroy] do
+    get :random, on: :collection
+  end
+
   resources :autocomplete, only: [:index]
 
   # XXX This comes *after* defining posts above because otherwise the paginator
@@ -187,9 +190,6 @@ Rails.application.routes.draw do
       member { put :revert }
     end
     resource :votes, controller: "post_votes", only: [:create, :destroy], as: "post_votes"
-    collection do
-      get :random
-    end
     member do
       put :revert
       put :copy_notes
