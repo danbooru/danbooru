@@ -17,7 +17,9 @@
       <% end %>
       <% if policy(IpAddress).show? %>
         <% t.column "IP" do |user| %>
-          <%= link_to user.last_ip_addr, ip_address_path(user.last_ip_addr) %>
+          <% if user.last_ip_addr.present? %>
+            <%= link_to user.last_ip_addr, ip_address_path(user.last_ip_addr) %>
+          <% end %>
         <% end %>
       <% end %>
       <% t.column "Posts" do |user| %>
