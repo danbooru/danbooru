@@ -4,7 +4,8 @@
   <%= NewRelic::Agent.browser_timing_header rescue "" %>
   <meta charset="utf-8">
   <title><%= page_title %></title>
-  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/favicon.ico" sizes="16x16" type="image/x-icon">
+  <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml">
   <link rel="top" title="<%= Danbooru.config.app_name %>" href="/">
   <%= csrf_meta_tag %>
   <%= raw Danbooru.config.custom_html_header_content %>
