@@ -102,16 +102,11 @@ module Searchable
     where_operator(qualified_column, *range)
   end
 
-  def search_boolean_attribute(attribute, params)
-    return all unless params.key?(attribute)
-
-    value = params[attribute].to_s
-    if value.truthy?
-      where(attribute => true)
-    elsif value.falsy?
-      where(attribute => false)
+  def search_boolean_attribute(attr, params)
+    if params[attr].present?
+      boolean_attribute_matches(attr, params[attr])
     else
-      raise ArgumentError, "value must be truthy or falsy"
+      all
     end
   end
 
@@ -131,6 +126,18 @@ module Searchable
     qualified_column = "#{table_name}.#{column.name}"
     range = PostQueryBuilder.new(nil).parse_range(value, column.type)
     where_operator(qualified_column, *range)
+  end
+
+  def boolean_attribute_matches(attribute, value)
+    value = value.to_s
+
+    if value.truthy?
+      where(attribute => true)
+    elsif value.falsy?
+      where(attribute => false)
+    else
+      raise ArgumentError, "value must be truthy or falsy"
+    end
   end
 
   def text_attribute_matches(attribute, value, index_column: nil, ts_config: "english")
