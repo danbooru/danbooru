@@ -59,7 +59,7 @@ class UsersController < ApplicationController
   end
 
   def create
-    requires_verification = IpLookup.new(CurrentUser.ip_addr).is_proxy? || IpBan.hit!(:partial, CurrentUser.ip_addr)
+    requires_verification = UserVerifier.new(CurrentUser.user, request).requires_verification?
 
     @user = authorize User.new(
       last_ip_addr: CurrentUser.ip_addr,

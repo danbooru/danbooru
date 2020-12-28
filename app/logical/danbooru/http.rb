@@ -1,3 +1,4 @@
+require "danbooru/http/application_client"
 require "danbooru/http/html_adapter"
 require "danbooru/http/xml_adapter"
 require "danbooru/http/cache"

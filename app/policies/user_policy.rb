@@ -1,6 +1,10 @@
 class UserPolicy < ApplicationPolicy
   def create?
-    user.is_anonymous? && !sockpuppet?
+    true
+  end
+
+  def new?
+    true
   end
 
   def update?
@@ -29,10 +33,6 @@ class UserPolicy < ApplicationPolicy
 
   def can_see_favorites?
     user.is_admin? || record.id == user.id || !record.enable_private_favorites?
-  end
-
-  def sockpuppet?
-    User.where(last_ip_addr: request.remote_ip).where("created_at > ?", 1.day.ago).exists?
   end
 
   def permitted_attributes_for_create

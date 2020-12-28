@@ -243,6 +243,11 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         get new_user_path
         assert_response :success
       end
+
+      should "render for a logged in user" do
+        get_auth new_user_path, @user
+        assert_response :success
+      end
     end
 
     context "create action" do
@@ -254,11 +259,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
         assert_nil(User.last.email_address)
         assert_no_enqueued_emails
-      end
-
-      should "not allow logged in users to create a new account" do
-        post_auth users_path, @user, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
-        assert_response 403
       end
 
       should "create a user with a valid email" do
@@ -289,45 +289,71 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      should "mark users signing up from proxies as requiring verification" do
-        skip unless IpLookup.enabled?
+      context "sockpuppet detection" do
+        setup do
+          @private_ip = "192.168.0.1"
+          @valid_ip = "187.37.226.17" # a random valid, non-proxy public IP
+          @proxy_ip = "51.15.128.1"
+        end
 
-        self.remote_addr = "51.15.128.1"
-        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+        should "mark accounts created by already logged in users as requiring verification" do
+          self.remote_addr = @valid_ip
 
-        assert_redirected_to User.last
-        assert_equal(true, User.last.requires_verification)
-      end
+          post_auth users_path, @user, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
-      should "mark users signing up from a partial banned IP as requiring verification" do
-        skip unless IpLookup.enabled?
-        self.remote_addr = "187.37.226.17"
+          assert_redirected_to User.last
+          assert_equal(true, User.last.requires_verification)
+        end
 
-        @ip_ban = create(:ip_ban, ip_addr: self.remote_addr, category: :partial)
-        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+        should "mark users signing up from proxies as requiring verification" do
+          skip unless IpLookup.enabled?
+          self.remote_addr = @proxy_ip
 
-        assert_redirected_to User.last
-        assert_equal(true, User.last.requires_verification)
-        assert_equal(1, @ip_ban.reload.hit_count)
-        assert(@ip_ban.last_hit_at > 1.minute.ago)
-      end
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
-      should "not mark users signing up from non-proxies as requiring verification" do
-        skip unless IpLookup.enabled?
-        self.remote_addr = "187.37.226.17"
-        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+          assert_redirected_to User.last
+          assert_equal(true, User.last.requires_verification)
+        end
 
-        assert_redirected_to User.last
-        assert_equal(false, User.last.requires_verification)
-      end
+        should "mark users signing up from a partial banned IP as requiring verification" do
+          self.remote_addr = @valid_ip
 
-      context "with sockpuppet validation enabled" do
-        should "not allow registering multiple accounts with the same IP" do
-          assert_difference("User.count", 0) do
-            @user.update(last_ip_addr: "127.0.0.1")
-            post users_path, params: {:user => {:name => "dupe", :password => "xxxxx1", :password_confirmation => "xxxxx1"}}
-            assert_response 403
-          end
+          @ip_ban = create(:ip_ban, ip_addr: self.remote_addr, category: :partial)
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+          assert_redirected_to User.last
+          assert_equal(true, User.last.requires_verification)
+          assert_equal(1, @ip_ban.reload.hit_count)
+          assert(@ip_ban.last_hit_at > 1.minute.ago)
+        end
+
+        should "not mark users signing up from non-proxies as requiring verification" do
+          skip unless IpLookup.enabled?
+          self.remote_addr = @valid_ip
+
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+          assert_redirected_to User.last
+          assert_equal(false, User.last.requires_verification)
+        end
+
+        should "mark accounts registered from an IPv4 address recently used for another account as requiring verification" do
+          @user.update!(last_ip_addr: @valid_ip)
+          self.remote_addr = @valid_ip
+
+          post users_path, params: { user: { name: "dupe", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+          assert_redirected_to User.last
+          assert_equal(true, User.last.requires_verification)
+        end
+
+        should "not mark users signing up from localhost as requiring verification" do
+          self.remote_addr = "127.0.0.1"
+
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+          assert_redirected_to User.last
+          assert_equal(false, User.last.requires_verification)
         end
       end
     end
