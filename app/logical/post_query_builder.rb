@@ -985,6 +985,11 @@ class PostQueryBuilder
     def is_wildcard_search?
       is_single_tag? && tags.first.wildcard
     end
+
+    def simple_tag
+      return nil if !is_simple_tag?
+      Tag.find_by_name(tags.first.name)
+    end
   end
 
   memoize :split_query, :normalized_query

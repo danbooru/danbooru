@@ -13,16 +13,6 @@ class TagTest < ActiveSupport::TestCase
   end
 
   context "A tag category fetcher" do
-    should "fetch for a single tag" do
-      FactoryBot.create(:artist_tag, :name => "test")
-      assert_equal(Tag.categories.artist, Tag.category_for("test"))
-    end
-
-    should "fetch for a single tag with strange markup" do
-      FactoryBot.create(:artist_tag, :name => "!@$%")
-      assert_equal(Tag.categories.artist, Tag.category_for("!@$%"))
-    end
-
     should "fetch for multiple tags" do
       FactoryBot.create(:artist_tag, :name => "aaa")
       FactoryBot.create(:copyright_tag, :name => "bbb")

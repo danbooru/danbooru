@@ -127,18 +127,6 @@ class Tag < ApplicationRecord
         Tag.where(name: tag_name).pick(:category).to_i
       end
 
-      def category_for(tag_name, options = {})
-        return Tag.categories.general if tag_name.blank?
-
-        if options[:disable_caching]
-          select_category_for(tag_name)
-        else
-          Cache.get("tc:#{Cache.hash(tag_name)}") do
-            select_category_for(tag_name)
-          end
-        end
-      end
-
       def categories_for(tag_names, options = {})
         if options[:disable_caching]
           Array(tag_names).inject({}) do |hash, tag_name|
