@@ -314,7 +314,8 @@ Rails.application.routes.draw do
   get "/static/site_map" => "static#site_map", :as => "site_map"
   get "/static/contact" => "static#contact", :as => "contact"
   get "/static/dtext_help" => "static#dtext_help", :as => "dtext_help"
-  get "/static/terms_of_service" => redirect { "/terms_of_service" }
+  get "/static/terms_of_service", to: redirect("/terms_of_service")
+  get "/user_upgrade/new", to: redirect("/user_upgrades/new")
 
   get "/mock/recommender/recommend/:user_id" => "mock_services#recommender_recommend", as: "mock_recommender_recommend"
   get "/mock/recommender/similiar/:post_id" => "mock_services#recommender_similar", as: "mock_recommender_similar"
