@@ -9,6 +9,7 @@ class UserVerifier
   end
 
   def requires_verification?
+    return false if !Danbooru.config.new_user_verification?
     return false if is_local_ip?
 
     # we check for IP bans first to make sure we bump the IP ban hit count

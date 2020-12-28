@@ -69,6 +69,19 @@ module Danbooru
       "#{source_code_url}/issues"
     end
 
+    # If true, new accounts will require email verification if they seem
+    # suspicious (they were created using a proxy, multiple accounts were
+    # created by the same IP, etc).
+    #
+    # This doesn't apply to personal or development installs running on
+    # localhost or the local network.
+    #
+    # Disable this if you're running a public booru and you don't want email
+    # verification for new accounts.
+    def new_user_verification?
+      true
+    end
+
     # An array of regexes containing disallowed usernames.
     def user_name_blacklist
       []
