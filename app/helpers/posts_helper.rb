@@ -58,11 +58,4 @@ module PostsHelper
     return false if !params.key?(:pool_id)
     return params[:pool_id].to_i == pool.id
   end
-
-  private
-
-  def nav_params_for(page)
-    query_params = params.except(:controller, :action, :id).merge(page: page).permit!
-    { params: query_params }
-  end
 end
