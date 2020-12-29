@@ -1,5 +1,5 @@
 class UserUpgradesController < ApplicationController
-  respond_to :js, :html
+  respond_to :js, :html, :json, :xml
 
   def create
     @user_upgrade = authorize UserUpgrade.create(recipient: recipient, purchaser: CurrentUser.user, status: "pending", upgrade_type: params[:upgrade_type])
