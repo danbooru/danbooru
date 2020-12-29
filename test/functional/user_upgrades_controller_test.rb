@@ -183,6 +183,51 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "refund action" do
+      mock_stripe!
+
+      context "for a self upgrade" do
+        context "to Gold" do
+          should_eventually "refund the upgrade" do
+            @user_upgrade = create(:self_gold_upgrade, recipient: create(:gold_user), status: "complete")
+            @user_upgrade.create_checkout!
+
+            put_auth refund_user_upgrade_path(@user_upgrade), create(:owner_user), xhr: true
+
+            assert_response :success
+            assert_equal("refunded", @user_upgrade.reload.status)
+            assert_equal(User::Levels::MEMBER, @user_upgrade.recipient.level)
+          end
+        end
+      end
+
+      context "for a gifted upgrade" do
+        context "to Platinum" do
+          should_eventually "refund the upgrade" do
+            @user_upgrade = create(:gift_platinum_upgrade, recipient: create(:platinum_user), status: "complete")
+            @user_upgrade.create_checkout!
+
+            put_auth refund_user_upgrade_path(@user_upgrade), create(:owner_user), xhr: true
+
+            assert_response :success
+            assert_equal("refunded", @user_upgrade.reload.status)
+            assert_equal(User::Levels::MEMBER, @user_upgrade.recipient.level)
+          end
+        end
+      end
+
+      should "not allow unauthorized users to create a refund" do
+        @user_upgrade = create(:self_gold_upgrade, recipient: create(:gold_user), status: "complete")
+        @user_upgrade.create_checkout!
+
+        put_auth refund_user_upgrade_path(@user_upgrade), @user_upgrade.purchaser, xhr: true
+
+        assert_response 403
+        assert_equal("complete", @user_upgrade.reload.status)
+        assert_equal(User::Levels::GOLD, @user_upgrade.recipient.level)
+      end
+    end
+
     context "create action" do
       mock_stripe!
 

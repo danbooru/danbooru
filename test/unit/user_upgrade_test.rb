@@ -82,5 +82,16 @@ class UserUpgradeTest < ActiveSupport::TestCase
         end
       end
     end
+
+    context "the #refund! method" do
+      should_eventually "refund a Gold upgrade" do
+        @user_upgrade = create(:self_gold_upgrade, recipient: create(:gold_user), status: "complete")
+        @user_upgrade.create_checkout!
+        @user_upgrade.refund!
+
+        assert_equal("refunded", @user_upgrade.reload.status)
+        assert_equal(User::Levels::MEMBER, @user_upgrade.recipient.level)
+      end
+    end
   end
 end

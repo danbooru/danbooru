@@ -40,6 +40,9 @@
         <% if policy(user_upgrade).payment? %>
           | <%= link_to "Payment", payment_user_upgrade_path(user_upgrade), target: "_blank" %>
         <% end %>
+        <% if policy(user_upgrade).refund? %>
+          | <%= link_to "Refund", refund_user_upgrade_path(user_upgrade), remote: true, method: :put, "data-confirm": "Are you sure you want to refund this payment?" %>
+        <% end %>
       <% end %>
     <% end %>
 

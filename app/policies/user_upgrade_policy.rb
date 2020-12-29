@@ -11,6 +11,10 @@ class UserUpgradePolicy < ApplicationPolicy
     record.recipient == user || record.purchaser == user || user.is_owner?
   end
 
+  def refund?
+    user.is_owner? && record.complete?
+  end
+
   def receipt?
     (record.purchaser == user || user.is_owner?) && record.has_receipt?
   end

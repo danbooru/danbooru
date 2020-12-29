@@ -11,7 +11,8 @@ class UserUpgrade < ApplicationRecord
   enum status: {
     pending: 0,
     processing: 10,
-    complete: 20
+    complete: 20,
+    refunded: 30,
   }
 
   scope :gifted, -> { where("recipient_id != purchaser_id") }
@@ -57,6 +58,19 @@ class UserUpgrade < ApplicationRecord
       User::Levels::PLATINUM
     when "gold_to_platinum"
       User::Levels::PLATINUM
+    else
+      raise NotImplementedError
+    end
+  end
+
+  def previous_level
+    case upgrade_type
+    when "gold"
+      User::Levels::MEMBER
+    when "platinum"
+      User::Levels::MEMBER
+    when "gold_to_platinum"
+      User::Levels::GOLD
     else
       raise NotImplementedError
     end
@@ -120,7 +134,7 @@ class UserUpgrade < ApplicationRecord
   concerning :UpgradeMethods do
     def process_upgrade!(payment_status)
       recipient.with_lock do
-        return if status == "complete"
+        return unless pending? || processing?
 
         if payment_status == "paid"
           upgrade_recipient!
@@ -198,22 +212,36 @@ class UserUpgrade < ApplicationRecord
       checkout
     end
 
+    def refund!(reason: nil)
+      with_lock do
+        return if refunded?
+
+        Stripe::Refund.create(payment_intent: payment_intent.id, reason: reason)
+        recipient.update!(level: previous_level)
+        update!(status: "refunded")
+      end
+    end
+
     def receipt_url
       return nil if pending? || stripe_id.nil?
-
-      checkout_session = Stripe::Checkout::Session.retrieve(stripe_id)
-      payment_intent = Stripe::PaymentIntent.retrieve(checkout_session.payment_intent)
-      charge = payment_intent.charges.data.first
       charge.receipt_url
     end
 
     def payment_url
       return nil if pending? || stripe_id.nil?
-
-      checkout_session = Stripe::Checkout::Session.retrieve(stripe_id)
-      payment_intent = Stripe::PaymentIntent.retrieve(checkout_session.payment_intent)
-
       "https://dashboard.stripe.com/payments/#{payment_intent.id}"
+    end
+
+    def checkout_session
+      @checkout_session ||= Stripe::Checkout::Session.retrieve(stripe_id)
+    end
+
+    def payment_intent
+      @payment_intent ||= Stripe::PaymentIntent.retrieve(checkout_session.payment_intent)
+    end
+
+    def charge
+      payment_intent.charges.data.first
     end
 
     def has_receipt?

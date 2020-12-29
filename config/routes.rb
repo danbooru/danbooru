@@ -257,6 +257,7 @@ Rails.application.routes.draw do
   resources :user_upgrades, only: [:new, :create, :show, :index] do
     get :receipt, on: :member
     get :payment, on: :member
+    put :refund, on: :member
   end
   resources :user_feedbacks, except: [:destroy]
   resources :user_name_change_requests, only: [:new, :create, :show, :index]
