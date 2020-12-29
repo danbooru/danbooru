@@ -10,4 +10,12 @@ class UserUpgradePolicy < ApplicationPolicy
   def show?
     record.recipient == user || record.purchaser == user || user.is_owner?
   end
+
+  def receipt?
+    (record.purchaser == user || user.is_owner?) && record.has_receipt?
+  end
+
+  def payment?
+    user.is_owner? && record.has_payment?
+  end
 end

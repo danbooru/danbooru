@@ -27,6 +27,16 @@ class UserUpgradesController < ApplicationController
     respond_with(@user_upgrade)
   end
 
+  def receipt
+    @user_upgrade = authorize UserUpgrade.find(params[:id])
+    redirect_to @user_upgrade.receipt_url
+  end
+
+  def payment
+    @user_upgrade = authorize UserUpgrade.find(params[:id])
+    redirect_to @user_upgrade.payment_url
+  end
+
   private
 
   def recipient

@@ -30,12 +30,18 @@
       <% if @user_upgrade.is_gift? && CurrentUser.user == @user_upgrade.recipient %>
         <p><%= link_to_user @user_upgrade.purchaser %> has upgraded your account to <%= @user_upgrade.level_string %>. Enjoy your new account!</p>
       <% elsif @user_upgrade.is_gift? && CurrentUser.user == @user_upgrade.purchaser %>
-        <p><%= link_to_user @user_upgrade.recipient %> is now a <%= @user_upgrade.level_string %> user. Thanks for supporting the site!</p>
+        <p><%= link_to_user @user_upgrade.recipient %> is now a <%= @user_upgrade.level_string %> user. Thanks for supporting the site! A receipt has been sent to your email.</p>
       <% else %>
-        <p>You are now a <%= @user_upgrade.level_string %> user. Thanks for supporting the site!</p>
+        <p>You are now a <%= @user_upgrade.level_string %> user. Thanks for supporting the site! A receipt has been sent to your email.</p>
       <% end %>
 
-      <p><%= link_to "Go back to #{Danbooru.config.canonical_app_name}", "https://danbooru.donmai.us" %> to continue using the site.</p>
+      <% if policy(@user_upgrade).receipt? %>
+        <%= link_to "View Receipt", receipt_user_upgrade_path(@user_upgrade), target: "_blank" %>
+      <% end %>
+
+      <% if policy(@user_upgrade).payment? %>
+        | <%= link_to "View Payment", payment_user_upgrade_path(@user_upgrade), target: "_blank" %>
+      <% end %>
     <% else %>
       <%= content_for :html_header do %>
         <meta http-equiv="refresh" content="5">

@@ -121,6 +121,68 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "receipt action" do
+      mock_stripe!
+
+      setup do
+        @user_upgrade = create(:gift_gold_upgrade, status: "complete")
+        @user_upgrade.create_checkout!
+      end
+
+      should "not allow unauthorized users to view the receipt" do
+        get_auth receipt_user_upgrade_path(@user_upgrade), create(:user)
+
+        assert_response 403
+      end
+
+      should "not allow the recipient to view the receipt" do
+        get_auth receipt_user_upgrade_path(@user_upgrade), @user_upgrade.recipient
+
+        assert_response 403
+      end
+
+      should "not allow the purchaser to view a pending receipt" do
+        @user_upgrade.update!(status: "pending")
+        get_auth receipt_user_upgrade_path(@user_upgrade), @user_upgrade.purchaser
+
+        assert_response 403
+      end
+
+      # XXX not supported yet by stripe-ruby-mock
+      should_eventually "allow the purchaser to view the receipt" do
+        get_auth receipt_user_upgrade_path(@user_upgrade), @user_upgrade.purchaser
+
+        assert_redirected_to "xxx"
+      end
+
+      # XXX not supported yet by stripe-ruby-mock
+      should_eventually "allow the site owner to view the receipt" do
+        get_auth receipt_user_upgrade_path(@user_upgrade), create(:owner_user)
+
+        assert_redirected_to "xxx"
+      end
+    end
+
+    context "payment action" do
+      setup do
+        @user_upgrade = create(:gift_gold_upgrade, status: "complete")
+        @user_upgrade.create_checkout!
+      end
+
+      should "not allow unauthorized users to view the receipt" do
+        get_auth payment_user_upgrade_path(@user_upgrade), @user_upgrade.purchaser
+
+        assert_response 403
+      end
+
+      # XXX not supported yet by stripe-ruby-mock
+      should_eventually "allow the site owner to view the receipt" do
+        get_auth payment_user_upgrade_path(@user_upgrade), create(:owner_user)
+
+        assert_redirected_to "xxx"
+      end
+    end
+
     context "create action" do
       mock_stripe!
 

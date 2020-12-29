@@ -59,5 +59,28 @@ class UserUpgradeTest < ActiveSupport::TestCase
         end
       end
     end
+
+    context "the #receipt_url method" do
+      mock_stripe!
+
+      context "a pending upgrade" do
+        should "not have a receipt" do
+          @user_upgrade = create(:self_gold_upgrade, status: "pending")
+          @user_upgrade.create_checkout!
+
+          assert_equal(nil, @user_upgrade.receipt_url)
+        end
+      end
+
+      context "a complete upgrade" do
+        # XXX not supported yet by stripe-ruby-mock
+        should_eventually "have a receipt" do
+          @user_upgrade = create(:self_gold_upgrade, status: "complete")
+          @user_upgrade.create_checkout!
+
+          assert_equal("xxx", @user_upgrade.receipt_url)
+        end
+      end
+    end
   end
 end

@@ -198,6 +198,32 @@ class UserUpgrade < ApplicationRecord
       checkout
     end
 
+    def receipt_url
+      return nil if pending? || stripe_id.nil?
+
+      checkout_session = Stripe::Checkout::Session.retrieve(stripe_id)
+      payment_intent = Stripe::PaymentIntent.retrieve(checkout_session.payment_intent)
+      charge = payment_intent.charges.data.first
+      charge.receipt_url
+    end
+
+    def payment_url
+      return nil if pending? || stripe_id.nil?
+
+      checkout_session = Stripe::Checkout::Session.retrieve(stripe_id)
+      payment_intent = Stripe::PaymentIntent.retrieve(checkout_session.payment_intent)
+
+      "https://dashboard.stripe.com/payments/#{payment_intent.id}"
+    end
+
+    def has_receipt?
+      !pending?
+    end
+
+    def has_payment?
+      !pending?
+    end
+
     class_methods do
       def register_webhook
         webhook = Stripe::WebhookEndpoint.create({

@@ -254,7 +254,10 @@ Rails.application.routes.draw do
       get :custom_style
     end
   end
-  resources :user_upgrades, only: [:new, :create, :show, :index]
+  resources :user_upgrades, only: [:new, :create, :show, :index] do
+    get :receipt, on: :member
+    get :payment, on: :member
+  end
   resources :user_feedbacks, except: [:destroy]
   resources :user_name_change_requests, only: [:new, :create, :show, :index]
   resources :webhooks do
