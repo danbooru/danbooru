@@ -1,10 +1,7 @@
 class EmailAddress < ApplicationRecord
-  # https://www.regular-expressions.info/email.html
-  EMAIL_REGEX = /\A[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\z/
-
   belongs_to :user, inverse_of: :email_address
 
-  validates :address, presence: true, confirmation: true, format: { with: EMAIL_REGEX }
+  validates :address, presence: true, confirmation: true, format: { with: EmailValidator::EMAIL_REGEX }
   validates :normalized_address, uniqueness: true
   validates :user_id, uniqueness: true
   validate :validate_deliverable, on: :deliverable
@@ -23,8 +20,49 @@ class EmailAddress < ApplicationRecord
     super
   end
 
-  def nondisposable?
-    EmailValidator.nondisposable?(normalized_address)
+  def is_restricted?
+    EmailValidator.is_restricted?(normalized_address)
+  end
+
+  def is_normalized?
+    address == normalized_address
+  end
+
+  def is_valid?
+    EmailValidator.is_valid?(address)
+  end
+
+  def self.restricted(restricted = true)
+    domains = Danbooru.config.email_domain_verification_list
+    domain_regex = domains.map { |domain| Regexp.escape(domain) }.join("|")
+
+    if restricted.to_s.truthy?
+      where_not_regex(:normalized_address, "@(#{domain_regex})$")
+    elsif restricted.to_s.falsy?
+      where_regex(:normalized_address, "@(#{domain_regex})$")
+    else
+      all
+    end
+  end
+
+  def self.valid(valid = true)
+    if valid.to_s.truthy?
+      where_regex(:address, EmailValidator::POSTGRES_EMAIL_REGEX.to_s)
+    elsif valid.to_s.falsy?
+      where_not_regex(:address, EmailValidator::POSTGRES_EMAIL_REGEX.to_s)
+    else
+      all
+    end
+  end
+
+  def self.search(params)
+    q = search_attributes(params, :id, :created_at, :updated_at, :user, :address, :normalized_address, :is_verified, :is_deliverable)
+
+    q = q.restricted(params[:is_restricted])
+    q = q.valid(params[:is_valid])
+    q = q.apply_default_order(params)
+
+    q
   end
 
   def validate_deliverable
@@ -34,14 +72,7 @@ class EmailAddress < ApplicationRecord
   end
 
   def update_user
-    user.update!(is_verified: is_verified? && nondisposable?)
-  end
-
-  def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :user, :address, :normalized_address, :is_verified, :is_deliverable)
-    q = q.apply_default_order(params)
-
-    q
+    user.update!(is_verified: is_verified? && !is_restricted?)
   end
 
   concerning :VerificationMethods do
