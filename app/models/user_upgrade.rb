@@ -76,32 +76,6 @@ class UserUpgrade < ApplicationRecord
     end
   end
 
-  def upgrade_price
-    case upgrade_type
-    when "gold"
-      UserUpgrade.gold_price
-    when "platinum"
-      UserUpgrade.platinum_price
-    when "gold_to_platinum"
-      UserUpgrade.gold_to_platinum_price
-    else
-      raise NotImplementedError
-    end
-  end
-
-  def upgrade_description
-    case upgrade_type
-    when "gold"
-      "Upgrade to Gold"
-    when "platinum"
-      "Upgrade to Platinum"
-    when "gold_to_platinum"
-      "Upgrade Gold to Platinum"
-    else
-      raise NotImplementedError
-    end
-  end
-
   def level_string
     User.level_string(level)
   end
@@ -178,23 +152,24 @@ class UserUpgrade < ApplicationRecord
   end
 
   concerning :StripeMethods do
-    def create_checkout!
+    def create_checkout!(country: "US")
+      methods = payment_method_types(country)
+      currency = preferred_currency(country)
+      price_id = upgrade_price_id(currency)
+
       checkout = Stripe::Checkout::Session.create(
         mode: "payment",
         success_url: Routes.user_upgrade_url(self),
         cancel_url: Routes.new_user_upgrade_url(user_id: recipient.id),
         client_reference_id: "user_upgrade_#{id}",
         customer_email: purchaser.email_address&.address,
-        payment_method_types: ["card"],
+        payment_method_types: methods,
         line_items: [{
-          price_data: {
-            unit_amount: upgrade_price,
-            currency: "usd",
-            product_data: {
-              name: upgrade_description,
-            },
-          },
+          price: price_id,
           quantity: 1,
+        }],
+        discounts: [{
+          coupon: promotion_discount_id,
         }],
         metadata: {
           user_upgrade_id: id,
@@ -203,6 +178,7 @@ class UserUpgrade < ApplicationRecord
           purchaser_name: purchaser.name,
           recipient_name: recipient.name,
           upgrade_type: upgrade_type,
+          country: country,
           is_gift: is_gift?,
           level: level,
         },
@@ -250,6 +226,63 @@ class UserUpgrade < ApplicationRecord
 
     def has_payment?
       !pending?
+    end
+
+    def promotion_discount_id
+      if Danbooru.config.is_promotion?
+        Danbooru.config.stripe_promotion_discount_id
+      end
+    end
+
+    def upgrade_price_id(currency)
+      case [upgrade_type, currency]
+      when ["gold", "usd"]
+        Danbooru.config.stripe_gold_usd_price_id
+      when ["gold", "eur"]
+        Danbooru.config.stripe_gold_eur_price_id
+      when ["platinum", "usd"]
+        Danbooru.config.stripe_platinum_usd_price_id
+      when ["platinum", "eur"]
+        Danbooru.config.stripe_platinum_eur_price_id
+      when ["gold_to_platinum", "usd"]
+        Danbooru.config.stripe_gold_to_platinum_usd_price_id
+      when ["gold_to_platinum", "eur"]
+        Danbooru.config.stripe_gold_to_platinum_eur_price_id
+      else
+        raise NotImplementedError
+      end
+    end
+
+    def payment_method_types(country)
+      case country.to_s.upcase
+      # Austria, https://stripe.com/docs/payments/bancontact
+      when "AT"
+        ["card", "eps"]
+      # Belgium, https://stripe.com/docs/payments/eps
+      when "BE"
+        ["card", "bancontact"]
+      # Germany, https://stripe.com/docs/payments/giropay
+      when "DE"
+        ["card", "giropay"]
+      # Netherlands, https://stripe.com/docs/payments/ideal
+      when "NL"
+        ["card", "ideal"]
+      # Poland, https://stripe.com/docs/payments/p24
+      when "PL"
+        ["card", "p24"]
+      else
+        ["card"]
+      end
+    end
+
+    def preferred_currency(country)
+      case country.to_s.upcase
+      # Austria, Belgium, Germany, Netherlands, Poland
+      when "AT", "BE", "DE", "NL", "PL"
+        "eur"
+      else
+        "usd"
+      end
     end
 
     class_methods do

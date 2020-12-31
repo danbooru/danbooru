@@ -3,7 +3,8 @@ class UserUpgradesController < ApplicationController
 
   def create
     @user_upgrade = authorize UserUpgrade.create(recipient: recipient, purchaser: CurrentUser.user, status: "pending", upgrade_type: params[:upgrade_type])
-    @checkout = @user_upgrade.create_checkout!
+    @country = params[:country] || CurrentUser.country || "US"
+    @checkout = @user_upgrade.create_checkout!(country: @country)
 
     respond_with(@user_upgrade)
   end

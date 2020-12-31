@@ -1,7 +1,13 @@
 require 'test_helper'
 
 class WebhooksControllerTest < ActionDispatch::IntegrationTest
-  mock_stripe!
+  setup do
+    StripeMock.start
+  end
+
+  teardown do
+    StripeMock.stop
+  end
 
   def post_webhook(*args, payment_status: "paid", **metadata)
     event = StripeMock.mock_webhook_event(*args, payment_status: payment_status, metadata: metadata)

@@ -375,6 +375,27 @@ module Danbooru
     def stripe_webhook_secret
     end
 
+    def stripe_gold_usd_price_id
+    end
+
+    def stripe_platinum_usd_price_id
+    end
+
+    def stripe_gold_to_platinum_usd_price_id
+    end
+
+    def stripe_gold_eur_price_id
+    end
+
+    def stripe_platinum_eur_price_id
+    end
+
+    def stripe_gold_to_platinum_eur_price_id
+    end
+
+    def stripe_promotion_discount_id
+    end
+
     def twitter_api_key
     end
 

@@ -112,12 +112,12 @@
             <td><%= link_to "Get #{Danbooru.config.canonical_app_name} Platinum", login_path(url: new_user_upgrade_path), class: "login-button" %></td>
           <% elsif @recipient.level == User::Levels::MEMBER %>
             <td></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold"), remote: true, disable_with: "Redirecting..." %></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Platinum", user_upgrades_path(user_id: @recipient.id, upgrade_type: "platinum"), remote: true, disable_with: "Redirecting..." %></td>
+            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold", country: params[:country]), remote: true, disable_with: "Redirecting..." %></td>
+            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Platinum", user_upgrades_path(user_id: @recipient.id, upgrade_type: "platinum", country: params[:country]), remote: true, disable_with: "Redirecting..." %></td>
           <% elsif @recipient.level == User::Levels::GOLD %>
             <td></td>
             <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, disabled: true %></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Platinum", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold_to_platinum"), remote: true, disable_with: "Redirecting..." %></td>
+            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Platinum", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold_to_platinum", country: params[:country]), remote: true, disable_with: "Redirecting..." %></td>
           <% else %>
             <td></td>
             <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, disabled: true %></td>
@@ -150,7 +150,10 @@
         <summary>What payment methods do you support?</summary>
 
         <p>We support all major credit and debit cards, including international
-        cards. Payments are securely handled by <a href="https://www.stripe.com">Stripe</a>.
+        cards. We also support bank payments in several European countries,
+        including Austria, Belgium, Germany, the Netherlands, and Poland.</p>
+
+        <p>Payments are securely handled by <a href="https://www.stripe.com">Stripe</a>.
         We don't support PayPal or Bitcoin at this time.</p>
       </details>
 
