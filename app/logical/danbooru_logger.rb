@@ -51,7 +51,7 @@ class DanbooruLogger
       name: user&.name,
       level: user&.level_string,
       ip: request.remote_ip,
-      country: request.headers["CF-IPCountry"],
+      country: CurrentUser.country,
       safe_mode: CurrentUser.safe_mode?
     }
   end
