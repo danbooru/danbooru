@@ -88,7 +88,7 @@ class ApplicationController < ActionController::Base
   end
 
   def rescue_exception(exception)
-    return if Danbooru.config.debug_mode
+    raise exception if Danbooru.config.debug_mode
 
     case exception
     when ActionView::Template::Error
