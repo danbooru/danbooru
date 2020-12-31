@@ -70,21 +70,14 @@
   <div id="page">
     <%= render "users/verification_notice" %>
 
-    <% if Danbooru.config.is_promotion? && cookies[:hide_promotion_notice].blank? %>
+    <% if Danbooru.config.is_promotion? && cookies[:hide_final_promotion_notice].blank? %>
       <div class="notice notice-info notice-large" id="promotion-notice">
-        <% if rand <= 0.0025 %>
-          <%= tag.img src: "/images/provgift.png", width: 24, height: 24 %>
-        <% elsif rand <= 0.0025 %>
-          <%= tag.img src: "/images/kemogift.png", width: 24, height: 24 %>
-        <% elsif rand <= 0.0025 %>
-          <%= tag.img src: "/images/padoru.gif", width: 24, height: 24 %>
-        <% elsif rand <= 0.0025 %>
-          <%= tag.img src: "/images/ablobgift.gif", width: 24, height: 24 %>
-        <% else %>
-          <%= tag.img src: "/images/blobgift.png", width: 24, height: 24 %>
-        <% end %>
+        <% file = %w[provgift.png kemogift.png padoru.gif ablobgift.gif].sample %>
+        <%= tag.img src: "/images/#{file}", width: 24, height: 24 %>
 
-        <%= link_to "Danbooru Winter Sale!", forum_topic_path(17832) %> 25% off Gold and unlimited searches for Members!
+        <%= link_to "Danbooru Winter Sale", forum_topic_path(17832) %> ends in
+        <%= Time.use_zone("UTC") { humanized_duration(Time.zone.parse("2021-01-01"), Time.zone.now, compact: true) } %>!
+        Get 25% off Gold &amp; Platinum
         (<%= link_to "hide", "#", id: "hide-promotion-notice" %>)
       </div>
     <% end %>

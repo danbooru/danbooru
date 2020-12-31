@@ -108,11 +108,15 @@ module ApplicationHelper
     tag.time content || datetime, datetime: datetime, title: time.to_formatted_s, **options
   end
 
-  def humanized_duration(from, to)
+  def humanized_duration(from, to, compact: false)
     if to - from > 10.years
       duration = "forever"
     else
       duration = distance_of_time_in_words(from, to)
+    end
+
+    if compact
+      duration = duration.gsub(/almost|about|over/, "").gsub(/less than a/, "<1").strip
     end
 
     datetime = from.iso8601 + "/" + to.iso8601
