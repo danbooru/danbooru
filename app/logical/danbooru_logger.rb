@@ -24,6 +24,7 @@ class DanbooruLogger
   end
 
   def self.add_session_attributes(request, session, user)
+    add_attributes("request", { path: request.path })
     add_attributes("request.headers", header_params(request))
     add_attributes("request.params", request_params(request))
     add_attributes("session.params", session_params(session))

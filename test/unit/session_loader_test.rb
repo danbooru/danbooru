@@ -6,6 +6,7 @@ class SessionLoaderTest < ActiveSupport::TestCase
       @request = mock
       @request.stubs(:host).returns("danbooru")
       @request.stubs(:remote_ip).returns("127.0.0.1")
+      @request.stubs(:path).returns("/")
       @request.stubs(:authorization).returns(nil)
       @request.stubs(:cookie_jar).returns({})
       @request.stubs(:parameters).returns({})
