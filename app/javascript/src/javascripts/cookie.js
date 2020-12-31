@@ -1,10 +1,10 @@
 let Cookie = {};
 
-Cookie.put = function(name, value, max_age_in_days = 365 * 20) {
+Cookie.put = function(name, value, max_age_in_seconds = 60 * 60 * 24 * 365 * 20) {
   let cookie = `${name}=${encodeURIComponent(value)}; Path=/; SameSite=Lax;`;
 
-  if (max_age_in_days) {
-    cookie += ` Max-Age=${max_age_in_days * 24 * 60 * 60};`
+  if (max_age_in_seconds) {
+    cookie += ` Max-Age=${max_age_in_seconds};`
   }
 
   if (location.protocol === "https:") {
