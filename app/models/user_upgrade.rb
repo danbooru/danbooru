@@ -35,11 +35,7 @@ class UserUpgrade < ApplicationRecord
   end
 
   def self.gold_price
-    if Danbooru.config.is_promotion?
-      1500
-    else
-      2000
-    end
+    2000
   end
 
   def self.platinum_price
@@ -168,9 +164,6 @@ class UserUpgrade < ApplicationRecord
           price: price_id,
           quantity: 1,
         }],
-        discounts: [{
-          coupon: promotion_discount_id,
-        }],
         metadata: {
           user_upgrade_id: id,
           purchaser_id: purchaser.id,
@@ -226,12 +219,6 @@ class UserUpgrade < ApplicationRecord
 
     def has_payment?
       !pending?
-    end
-
-    def promotion_discount_id
-      if Danbooru.config.is_promotion?
-        Danbooru.config.stripe_promotion_discount_id
-      end
     end
 
     def upgrade_price_id(currency)

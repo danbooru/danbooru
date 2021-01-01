@@ -18,14 +18,6 @@
     <% else %>
       <h1>Upgrade Account</h1>
 
-      <% if Danbooru.config.is_promotion? %>
-        <p>
-          <%= tag.img src: "/images/padoru.gif", width: 24, height: 24 %>
-          <b>Danbooru Winter Sale! Gold and Platinum upgrades are 25% off. Sale ends in <%= Time.use_zone("UTC") { humanized_duration(Time.zone.parse("2021-01-01"), Time.zone.now, compact: true) } %>.</b>
-          <%= tag.img src: "/images/padoru.gif", width: 24, height: 24 %>
-        </p>
-      <% end %>
-
       <p>Upgrading your account gives you exclusive benefits and helps support
       <%= Danbooru.config.canonical_app_name %>. Your support helps keep the
       site ad-free for everyone!</p>
@@ -52,16 +44,10 @@
           <td></td>
           <td>Free</td>
           <td>
-            <% if Danbooru.config.is_promotion? %>
-              <s>$20</s>
-            <% end %>
             <%= cents_to_usd(UserUpgrade.gold_price) %>
             <div class="fineprint">One time fee</div>
           </td>
           <td>
-            <% if Danbooru.config.is_promotion? %>
-              <s>$40</s>
-            <% end %>
             <%= cents_to_usd(UserUpgrade.platinum_price) %>
             <div class="fineprint">One time fee</div>
           </td>
