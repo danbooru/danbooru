@@ -293,7 +293,17 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         setup do
           @private_ip = "192.168.0.1"
           @valid_ip = "187.37.226.17" # a random valid, non-proxy public IP
+          @valid_ipv6 = "2600:1700:6b0:a518::1"
           @proxy_ip = "51.15.128.1"
+        end
+
+        should "work for a public IPv6 address" do
+          self.remote_addr = @valid_ipv6
+
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+          assert_redirected_to User.last
+          assert_equal(false, User.last.requires_verification)
         end
 
         should "mark accounts created by already logged in users as requiring verification" do

@@ -23,7 +23,11 @@ class UserVerifier
   end
 
   def is_local_ip?
-    ip_address.loopback? || ip_address.link_local? || ip_address.private? || ip_address.try(:unique_local?)
+    if ip_address.ipv4?
+      ip_address.loopback? || ip_address.link_local? || ip_address.private?
+    elsif ip_address.ipv6?
+      ip_address.loopback? || ip_address.link_local? || ip_address.unique_local?
+    end
   end
 
   def is_logged_in?
