@@ -148,7 +148,7 @@ class UserUpgrade < ApplicationRecord
   end
 
   concerning :StripeMethods do
-    def create_checkout!(country: "US")
+    def create_checkout!(country: "US", allow_promotion_codes: false)
       methods = payment_method_types(country)
       currency = preferred_currency(country)
       price_id = upgrade_price_id(currency)
@@ -160,6 +160,7 @@ class UserUpgrade < ApplicationRecord
         client_reference_id: "user_upgrade_#{id}",
         customer_email: purchaser.email_address&.address,
         payment_method_types: methods,
+        allow_promotion_codes: allow_promotion_codes,
         line_items: [{
           price: price_id,
           quantity: 1,

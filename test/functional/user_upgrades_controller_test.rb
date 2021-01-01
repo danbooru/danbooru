@@ -38,6 +38,18 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "render for the country param" do
+        get new_user_upgrade_path(country: "DE")
+
+        assert_response :success
+      end
+
+      should "render for the promo param" do
+        get new_user_upgrade_path(promo: "true")
+
+        assert_response :success
+      end
+
       should "render for an anonymous user" do
         get new_user_upgrade_path
 
