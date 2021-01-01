@@ -20,7 +20,7 @@ class AutocompleteService
 
   def initialize(query, type, current_user: User.anonymous, limit: 10)
     @query = query.to_s
-    @type = type.to_sym
+    @type = type.to_s.to_sym
     @current_user = current_user
     @limit = limit
   end

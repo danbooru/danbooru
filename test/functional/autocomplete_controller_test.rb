@@ -35,6 +35,13 @@ class AutocompleteControllerTest < ActionDispatch::IntegrationTest
         assert_autocomplete_equals(["rating:safe"], "-rating:s", "tag_query")
       end
 
+      should "work for a missing type" do
+        get autocomplete_index_path(search: { query: "azur" }), as: :json
+
+        assert_response :success
+        assert_equal([], response.parsed_body)
+      end
+
       should "not set session cookies when the response is publicly cached" do
         get autocomplete_index_path(search: { query: "azur", type: "tag_query" }), as: :json
 
