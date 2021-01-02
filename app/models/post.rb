@@ -56,6 +56,7 @@ class Post < ApplicationRecord
   has_many :approvals, :class_name => "PostApproval", :dependent => :destroy
   has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
   has_many :favorites
+  has_many :favorited_users, through: :favorites, source: :user
   has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
 
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning, :view_count
@@ -802,14 +803,11 @@ class Post < ApplicationRecord
       false
     end
 
-    # users who favorited this post, ordered by users who favorited it first
-    def favorited_users
-      favorited_user_ids = fav_string.scan(/\d+/).map(&:to_i)
-      visible_users = User.find(favorited_user_ids).select do |user|
-        Pundit.policy!([CurrentUser.user, nil], user).can_see_favorites?
+    # Users who publicly favorited this post, ordered by time of favorite.
+    def visible_favorited_users(viewer)
+      favorited_users.order("favorites.id DESC").select do |fav_user|
+        Pundit.policy!([viewer, nil], fav_user).can_see_favorites?
       end
-      ordered_users = visible_users.index_by(&:id).slice(*favorited_user_ids).values
-      ordered_users
     end
 
     def favorite_groups

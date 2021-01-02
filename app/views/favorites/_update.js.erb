@@ -14,7 +14,7 @@ $(".fav-buttons").toggleClass("fav-buttons-false").toggleClass("fav-buttons-true
 
 <% if policy(@post).can_view_favlist? %>
   var fav_count = <%= @post.fav_count %>;
-  $("#favlist").html("<%= j post_favlist(@post) %>");
+  $("#favlist").html("<%= j render "posts/partials/show/favorite_list", post: @post %>");
 
   if (fav_count === 0) {
     $("#show-favlist-link, #hide-favlist-link, #favlist").hide();

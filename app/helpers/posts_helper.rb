@@ -48,10 +48,6 @@ module PostsHelper
     end
   end
 
-  def post_favlist(post)
-    post.favorited_users.reverse_each.map {|user| link_to_user(user)}.join(", ").html_safe
-  end
-
   def is_pool_selected?(pool)
     return false if params.key?(:q)
     return false if params.key?(:favgroup_id)
