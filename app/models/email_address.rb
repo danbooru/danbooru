@@ -45,21 +45,10 @@ class EmailAddress < ApplicationRecord
     end
   end
 
-  def self.valid(valid = true)
-    if valid.to_s.truthy?
-      where_regex(:address, EmailValidator::POSTGRES_EMAIL_REGEX.to_s)
-    elsif valid.to_s.falsy?
-      where_not_regex(:address, EmailValidator::POSTGRES_EMAIL_REGEX.to_s)
-    else
-      all
-    end
-  end
-
   def self.search(params)
     q = search_attributes(params, :id, :created_at, :updated_at, :user, :address, :normalized_address, :is_verified, :is_deliverable)
 
     q = q.restricted(params[:is_restricted])
-    q = q.valid(params[:is_valid])
     q = q.apply_default_order(params)
 
     q

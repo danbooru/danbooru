@@ -5,7 +5,6 @@ module EmailValidator
 
   # https://www.regular-expressions.info/email.html
   EMAIL_REGEX = /\A[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\z/
-  POSTGRES_EMAIL_REGEX = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
 
   IGNORE_DOTS = %w[gmail.com]
   IGNORE_PLUS_ADDRESSING = %w[gmail.com hotmail.com outlook.com live.com]
