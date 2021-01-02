@@ -375,7 +375,9 @@ class User < ApplicationRecord
       end
 
       def tag_query_limit(level)
-        if level >= User::Levels::PLATINUM
+        if level >= User::Levels::BUILDER
+          Float::INFINITY
+        elsif level == User::Levels::PLATINUM
           12
         elsif level == User::Levels::GOLD
           6
@@ -395,7 +397,9 @@ class User < ApplicationRecord
       end
 
       def favorite_group_limit(level)
-        if level >= User::Levels::PLATINUM
+        if level >= User::Levels::BUILDER
+          Float::INFINITY
+        elsif level == User::Levels::PLATINUM
           10
         elsif level == User::Levels::GOLD
           5
@@ -405,7 +409,9 @@ class User < ApplicationRecord
       end
 
       def max_saved_searches(level)
-        if level >= User::Levels::PLATINUM
+        if level >= User::Levels::BUILDER
+          Float::INFINITY
+        elsif level == User::Levels::PLATINUM
           1_000
         else
           250
