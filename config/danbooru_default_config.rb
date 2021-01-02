@@ -107,11 +107,6 @@ module Danbooru
       2
     end
 
-    # Users cannot search for more than X regular tags at a time.
-    def base_tag_query_limit
-      6
-    end
-
     # After this many pages, the paginator will switch to sequential mode.
     def max_numbered_pages
       1_000

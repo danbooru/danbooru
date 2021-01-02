@@ -360,15 +360,84 @@ class User < ApplicationRecord
     end
   end
 
-  module LimitMethods
-    extend Memoist
+  concerning :LimitMethods do
+    class_methods do
+      def statement_timeout(level)
+        if Rails.env.development?
+          60_000
+        elsif level >= User::Levels::PLATINUM
+          9_000
+        elsif level == User::Levels::GOLD
+          6_000
+        else
+          3_000
+        end
+      end
+
+      def tag_query_limit(level)
+        if level >= User::Levels::PLATINUM
+          12
+        elsif level == User::Levels::GOLD
+          6
+        else
+          2
+        end
+      end
+
+      def favorite_limit(level)
+        if level >= User::Levels::PLATINUM
+          Float::INFINITY
+        elsif level == User::Levels::GOLD
+          20_000
+        else
+          10_000
+        end
+      end
+
+      def favorite_group_limit(level)
+        if level >= User::Levels::PLATINUM
+          10
+        elsif level == User::Levels::GOLD
+          5
+        else
+          3
+        end
+      end
+
+      def max_saved_searches(level)
+        if level >= User::Levels::PLATINUM
+          1_000
+        else
+          250
+        end
+      end
+
+      # regen this amount per second
+      def api_regen_multiplier(level)
+        if level >= User::Levels::PLATINUM
+          4
+        elsif level == User::Levels::GOLD
+          2
+        else
+          1
+        end
+      end
+
+      # can make this many api calls at once before being bound by
+      # api_regen_multiplier refilling your pool
+      def api_burst_limit(level)
+        if level >= User::Levels::PLATINUM
+          60
+        elsif level == User::Levels::GOLD
+          30
+        else
+          10
+        end
+      end
+    end
 
     def max_saved_searches
-      if is_platinum?
-        1_000
-      else
-        250
-      end
+      User.max_saved_searches(level)
     end
 
     def is_comment_limited?
@@ -404,56 +473,23 @@ class User < ApplicationRecord
     end
 
     def tag_query_limit
-      if is_platinum?
-        Danbooru.config.base_tag_query_limit * 2
-      elsif is_gold?
-        Danbooru.config.base_tag_query_limit
-      else
-        2
-      end
+      User.tag_query_limit(level)
     end
 
     def favorite_limit
-      if is_platinum?
-        Float::INFINITY
-      elsif is_gold?
-        20_000
-      else
-        10_000
-      end
+      User.favorite_limit(level)
     end
 
     def favorite_group_limit
-      if is_platinum?
-        10
-      elsif is_gold?
-        5
-      else
-        3
-      end
+      User.favorite_group_limit(level)
     end
 
     def api_regen_multiplier
-      # regen this amount per second
-      if is_platinum?
-        4
-      elsif is_gold?
-        2
-      else
-        1
-      end
+      User.api_regen_multiplier(level)
     end
 
     def api_burst_limit
-      # can make this many api calls at once before being bound by
-      # api_regen_multiplier refilling your pool
-      if is_platinum?
-        60
-      elsif is_gold?
-        30
-      else
-        10
-      end
+      User.api_burst_limit(level)
     end
 
     def remaining_api_limit
@@ -461,15 +497,7 @@ class User < ApplicationRecord
     end
 
     def statement_timeout
-      if Rails.env.development?
-        60_000
-      elsif is_platinum?
-        9_000
-      elsif is_gold?
-        6_000
-      else
-        3_000
-      end
+      User.statement_timeout(level)
     end
   end
 
@@ -610,7 +638,6 @@ class User < ApplicationRecord
   include LevelMethods
   include EmailMethods
   include ForumMethods
-  include LimitMethods
   include ApiMethods
   include CountMethods
   extend SearchMethods

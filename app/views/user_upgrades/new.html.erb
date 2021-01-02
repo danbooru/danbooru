@@ -54,9 +54,9 @@
         </tr>
         <tr>
           <td>Tag Limit</td>
-          <td>2</td>
-          <td><%= Danbooru.config.base_tag_query_limit %></td>
-          <td><%= Danbooru.config.base_tag_query_limit*2 %></td>
+          <td><%= User.tag_query_limit(User::Levels::MEMBER) %></td>
+          <td><%= User.tag_query_limit(User::Levels::GOLD) %></td>
+          <td><%= User.tag_query_limit(User::Levels::PLATINUM) %></td>
         </tr>
         <tr>
           <td>See Hidden Tags</td>
