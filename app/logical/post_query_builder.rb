@@ -3,6 +3,9 @@ require "strscan"
 class PostQueryBuilder
   extend Memoist
 
+  # How many tags a `blah*` search should match.
+  MAX_WILDCARD_TAGS = 100
+
   COUNT_METATAGS = %w[
     comment_count deleted_comment_count active_comment_count
     note_count deleted_note_count active_note_count
@@ -77,9 +80,9 @@ class PostQueryBuilder
     optional_tags = optional_tags.map(&:name)
     required_tags = required_tags.map(&:name)
 
-    negated_tags += negated_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name) }
-    optional_tags += optional_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name) }
-    optional_tags += required_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name) }
+    negated_tags += negated_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name).limit(MAX_WILDCARD_TAGS).pluck(:name) }
+    optional_tags += optional_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name).limit(MAX_WILDCARD_TAGS).pluck(:name) }
+    optional_tags += required_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name).limit(MAX_WILDCARD_TAGS).pluck(:name) }
 
     tsquery << "!(#{negated_tags.sort.uniq.map(&:to_escaped_for_tsquery).join(" | ")})" if negated_tags.present?
     tsquery << "(#{optional_tags.sort.uniq.map(&:to_escaped_for_tsquery).join(" | ")})" if optional_tags.present?
