@@ -123,6 +123,15 @@ class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for a refunded upgrade" do
+        should "render" do
+          @user_upgrade = create(:self_gold_upgrade, status: "refunded")
+          get_auth user_upgrade_path(@user_upgrade), @user_upgrade.purchaser
+
+          assert_response :success
+        end
+      end
+
       context "for a pending upgrade" do
         should "render" do
           @user_upgrade = create(:self_gold_upgrade, status: "pending")

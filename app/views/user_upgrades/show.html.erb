@@ -9,11 +9,14 @@
       <ul>
         <li>
           <strong>Purchased</strong>
-          <%= time_ago_in_words_tagged @user_upgrade.updated_at %>
           by <%= link_to_user @user_upgrade.purchaser %>
           <% if @user_upgrade.is_gift? %>
             for <%= link_to_user @user_upgrade.recipient %>
           <% end %>
+        </li>
+        <li>
+          <strong>Updated</strong>
+          <%= time_ago_in_words_tagged @user_upgrade.updated_at %>
         </li>
         <li>
           <strong>Upgrade Type</strong>
@@ -26,7 +29,7 @@
       </ul>
     </p>
 
-    <% if @user_upgrade.status == "complete" %>
+    <% if @user_upgrade.complete? %>
       <% if @user_upgrade.is_gift? && CurrentUser.user == @user_upgrade.recipient %>
         <p><%= link_to_user @user_upgrade.purchaser %> has upgraded your account to <%= @user_upgrade.level_string %>. Enjoy your new account!</p>
       <% elsif @user_upgrade.is_gift? && CurrentUser.user == @user_upgrade.purchaser %>
@@ -35,13 +38,13 @@
         <p>You are now a <%= @user_upgrade.level_string %> user. Thanks for supporting the site! A receipt has been sent to your email.</p>
       <% end %>
 
-      <% if policy(@user_upgrade).receipt? %>
-        <%= link_to "View Receipt", receipt_user_upgrade_path(@user_upgrade), target: "_blank" %>
-      <% end %>
+      <%= render "stripe_links", user_upgrade: @user_upgrade %>
+    <% elsif @user_upgrade.refunded? %>
+      <p>This purchase has been refunded. A receipt has been sent to your email. It can take up to
+      5-10 days for the refund to appear on your credit card or bank statement. If it takes longer,
+      please contact your bank for assistance.</p>
 
-      <% if policy(@user_upgrade).payment? %>
-        | <%= link_to "View Payment", payment_user_upgrade_path(@user_upgrade), target: "_blank" %>
-      <% end %>
+      <%= render "stripe_links", user_upgrade: @user_upgrade %>
     <% else %>
       <%= content_for :html_header do %>
         <meta http-equiv="refresh" content="5">
