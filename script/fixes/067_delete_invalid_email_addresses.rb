@@ -3,5 +3,5 @@
 require_relative "../../config/environment"
 
 EmailAddress.transaction do
-  EmailAddress.where("address !~ ? AND address !~ ?", "@", "\\.").count
+  EmailAddress.valid(false).destroy_all
 end
