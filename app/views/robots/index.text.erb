@@ -6,25 +6,29 @@ Allow: /$
 Disallow: /*.atom
 Disallow: /*.json
 
-Allow: /artists
-Allow: /artist_commentaries
-Allow: /comments
-Allow: /explore
-Allow: /favorite_groups
-Allow: /forum_posts
-Allow: /forum_topics
-Allow: /iqdb_queries
-Allow: /login
-Allow: /notes
-Allow: /pools
-Allow: /posts
-Allow: /sessions
-Allow: /static
-Allow: /tags
-Allow: /uploads
-Allow: /user_upgrade
-Allow: /users
-Allow: /wiki_pages
+Allow: <%= artists_path %>
+Allow: <%= artist_commentaries_path %>
+Allow: <%= comments_path %>
+Allow: <%= popular_explore_posts_path %>
+Allow: <%= curated_explore_posts_path %>
+Allow: <%= viewed_explore_posts_path %>
+Allow: <%= searches_explore_posts_path %>
+Allow: <%= missed_searches_explore_posts_path %>
+Allow: <%= favorite_groups_path %>
+Allow: <%= forum_posts_path %>
+Allow: <%= forum_topics_path %>
+Allow: <%= iqdb_queries_path %>
+Allow: <%= login_path %>
+Allow: <%= notes_path %>
+Allow: <%= pools_path %>
+Allow: <%= posts_path %>
+Allow: <%= new_session_path %>
+Allow: <%= sign_out_session_path %>
+Allow: <%= tags_path %>
+Allow: <%= uploads_path %>
+Allow: <%= user_upgrades_path %>
+Allow: <%= users_path %>
+Allow: <%= wiki_pages_path %>
 
 <%# Legacy redirects %>
 Allow: /artist
