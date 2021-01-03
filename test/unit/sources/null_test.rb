@@ -85,9 +85,9 @@ module Sources
         source2 = "http://simg.gelbooru.com//images/2003/edd1d2b3881cf70c3acf540780507531.png"
         source3 = "https://simg3.gelbooru.com//samples/0b/3a/sample_0b3ae5e225072b8e391c827cb470d29c.jpg"
 
-        assert_equal("https://gelbooru.com/index.php?page=post&s=list&md5=ee5c9a69db9602c95debdb9b98fb3e3e", Sources::Strategies.normalize_source(source1))
-        assert_equal("https://gelbooru.com/index.php?page=post&s=list&md5=edd1d2b3881cf70c3acf540780507531", Sources::Strategies.normalize_source(source2))
-        assert_equal("https://gelbooru.com/index.php?page=post&s=list&md5=0b3ae5e225072b8e391c827cb470d29c", Sources::Strategies.normalize_source(source3))
+        assert_equal("https://gelbooru.com/index.php?page=post&s=list&tags=md5:ee5c9a69db9602c95debdb9b98fb3e3e", Sources::Strategies.normalize_source(source1))
+        assert_equal("https://gelbooru.com/index.php?page=post&s=list&tags=md5:edd1d2b3881cf70c3acf540780507531", Sources::Strategies.normalize_source(source2))
+        assert_equal("https://gelbooru.com/index.php?page=post&s=list&tags=md5:0b3ae5e225072b8e391c827cb470d29c", Sources::Strategies.normalize_source(source3))
       end
 
       should "normalize wikia links" do
