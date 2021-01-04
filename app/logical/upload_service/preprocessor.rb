@@ -66,20 +66,6 @@ class UploadService
     def start!
       raise NotImplementedError, "No login credentials configured for #{strategy.site_name}." unless strategy.class.enabled?
 
-      if Utils.is_downloadable?(source)
-        if Post.system_tag_match("source:#{canonical_source}").where.not(id: original_post_id).exists?
-          raise ActiveRecord::RecordNotUnique, "A post with source #{canonical_source} already exists"
-        end
-
-        if Upload.where(source: source, status: "completed").exists?
-          raise ActiveRecord::RecordNotUnique, "A completed upload with source #{source} already exists"
-        end
-
-        if Upload.where(source: source).where("status like ?", "error%").exists?
-          raise ActiveRecord::RecordNotUnique, "An errored upload with source #{source} already exists"
-        end
-      end
-
       params[:rating] ||= "q"
       params[:tag_string] ||= "tagme"
       upload = Upload.create!(params)
