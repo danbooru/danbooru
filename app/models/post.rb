@@ -762,11 +762,10 @@ class Post < ApplicationRecord
       update_column(:fav_count, fav_count)
     end
 
-    def favorited_by?(user_id = CurrentUser.id)
-      fav_string.match?(/(?:\A| )fav:#{user_id}(?:\Z| )/)
+    def favorited_by?(user)
+      return false if user.is_anonymous?
+      Favorite.exists?(post: self, user: user)
     end
-
-    alias is_favorited? favorited_by?
 
     def append_user_to_fav_string(user_id)
       update_column(:fav_string, (fav_string + " fav:#{user_id}").strip)

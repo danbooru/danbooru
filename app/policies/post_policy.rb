@@ -88,11 +88,11 @@ class PostPolicy < ApplicationPolicy
 
   def api_attributes
     attributes = super
-    attributes += [:has_large, :has_visible_children, :is_favorited?]
+    attributes += [:has_large, :has_visible_children]
     attributes += TagCategory.categories.map {|x| "tag_string_#{x}".to_sym}
     attributes += [:file_url, :large_file_url, :preview_file_url] if visible?
     attributes -= [:id, :md5, :file_ext] if !visible?
-    attributes -= [:fav_string] if !user.is_moderator?
+    attributes -= [:fav_string]
     attributes
   end
 

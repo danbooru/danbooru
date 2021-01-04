@@ -633,7 +633,6 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_nil(response.parsed_body["md5"])
           assert_nil(response.parsed_body["file_url"])
-          assert_nil(response.parsed_body["fav_string"])
         end
       end
     end
