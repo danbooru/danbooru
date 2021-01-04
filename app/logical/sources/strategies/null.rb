@@ -57,7 +57,7 @@ module Sources
         # http://simg.gelbooru.com//images/2003/edd1d2b3881cf70c3acf540780507531.png
         # https://simg3.gelbooru.com//samples/0b/3a/sample_0b3ae5e225072b8e391c827cb470d29c.jpg
         when %r{\Ahttps?://(?:\w+\.)?gelbooru\.com//?(?:images|samples)/(?:\d+|\h\h/\h\h)/(?:sample_)?(?<md5>\h{32})\.}i
-          "https://gelbooru.com/index.php?page=post&s=list&md5=#{$~[:md5]}"
+          "https://gelbooru.com/index.php?page=post&s=list&tags=md5:#{$~[:md5]}"
 
         when %r{\Ahttps?://(?:slot\d*\.)?im(?:g|ages)\d*\.wikia\.(?:nocookie\.net|com)/(?:_{2}cb\d{14}/)?([^/]+)(?:/[a-z]{2})?/images/(?:(?:thumb|archive)?/)?[a-f0-9]/[a-f0-9]{2}/(?:\d{14}(?:!|%21))?([^/]+)}i
           subdomain = $1
