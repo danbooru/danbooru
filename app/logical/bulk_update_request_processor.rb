@@ -1,5 +1,11 @@
 class BulkUpdateRequestProcessor
+  # Maximum tag size allowed by the rename command before an alias must be used.
   MAXIMUM_RENAME_COUNT = 200
+
+  # Maximum size of artist tags movable by builders.
+  MAXIMUM_BUILDER_MOVE_COUNT = 200
+
+  # Maximum number of lines a BUR may have.
   MAXIMUM_SCRIPT_LENGTH = 100
 
   include ActiveModel::Validations
@@ -216,13 +222,13 @@ class BulkUpdateRequestProcessor
   #
   # * The antecedent tag is an artist tag.
   # * The consequent_tag is a nonexistent tag, an empty tag (of any type), or an artist tag.
-  # * Both tags have less than 100 posts.
+  # * Both tags have less than 200 posts.
   def self.is_tag_move_allowed?(antecedent_name, consequent_name)
     antecedent_tag = Tag.find_by_name(Tag.normalize_name(antecedent_name))
     consequent_tag = Tag.find_by_name(Tag.normalize_name(consequent_name))
 
-    antecedent_allowed = antecedent_tag.present? && antecedent_tag.artist? && antecedent_tag.post_count < 100
-    consequent_allowed = consequent_tag.nil? || consequent_tag.empty? || (consequent_tag.artist? && consequent_tag.post_count < 100)
+    antecedent_allowed = antecedent_tag.present? && antecedent_tag.artist? && antecedent_tag.post_count < MAXIMUM_BUILDER_MOVE_COUNT
+    consequent_allowed = consequent_tag.nil? || consequent_tag.empty? || (consequent_tag.artist? && consequent_tag.post_count < MAXIMUM_BUILDER_MOVE_COUNT)
 
     antecedent_allowed && consequent_allowed
   end
