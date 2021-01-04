@@ -191,9 +191,15 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post1], "fav:#{user1.name}")
       assert_tag_match([post2], "fav:#{user2.name}")
       assert_tag_match([], "fav:#{user3.name}")
+
+      assert_tag_match([], "fav:#{user1.name} fav:#{user2.name}")
+      assert_tag_match([post1], "fav:#{user1.name} -fav:#{user2.name}")
+      assert_tag_match([post3], "-fav:#{user1.name} -fav:#{user2.name}")
+
       assert_tag_match([], "fav:dne")
 
       assert_tag_match([post3, post2], "-fav:#{user1.name}")
+      assert_tag_match([post3], "-fav:#{user1.name} -fav:#{user2.name}")
       assert_tag_match([post3, post2, post1], "-fav:dne")
 
       as(user3) do

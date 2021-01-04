@@ -393,7 +393,8 @@ class PostQueryBuilder
     favuser = User.find_by_name(username)
 
     if favuser.present? && Pundit.policy!([current_user, nil], favuser).can_see_favorites?
-      tags_include("fav:#{favuser.id}")
+      favorites = Favorite.from("favorites_#{favuser.id % 100} AS favorites").where(user: favuser)
+      Post.where(id: favorites.select(:post_id))
     else
       Post.none
     end
@@ -402,8 +403,8 @@ class PostQueryBuilder
   def ordfav_matches(username)
     user = User.find_by_name(username)
 
-    if user.present?
-      favorites_include(username).joins(:favorites).merge(Favorite.for_user(user.id)).order("favorites.id DESC")
+    if user.present? && Pundit.policy!([current_user, nil], user).can_see_favorites?
+      Post.joins(:favorites).merge(Favorite.for_user(user.id)).order("favorites.id DESC")
     else
       Post.none
     end
