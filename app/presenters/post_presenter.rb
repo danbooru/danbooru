@@ -131,7 +131,6 @@ class PostPresenter
       "data-source" => post.source,
       "data-uploader-id" => post.uploader_id,
       "data-normalized-source" => post.normalized_source,
-      "data-is-favorited" => post.favorited_by?(CurrentUser.user.id)
     }
 
     if post.visible?

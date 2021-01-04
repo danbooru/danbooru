@@ -71,9 +71,12 @@ class RelatedTagQuery
   end
 
   def other_wiki_pages
-    if Tag.category_for(query) == Tag.categories.copyright
+    tag = post_query.simple_tag
+    return [] if tag.nil?
+
+    if tag.copyright?
       copyright_other_wiki_pages
-    elsif Tag.category_for(query) == Tag.categories.general
+    elsif tag.general?
       general_other_wiki_pages
     else
       []

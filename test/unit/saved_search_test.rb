@@ -44,19 +44,6 @@ class SavedSearchTest < ActiveSupport::TestCase
     end
   end
 
-  context ".search_labels" do
-    setup do
-      FactoryBot.create(:tag_alias, antecedent_name: "bbb", consequent_name: "ccc", creator: @user)
-      FactoryBot.create(:saved_search, user: @user, label_string: "blah", query: "aaa")
-      FactoryBot.create(:saved_search, user: @user, label_string: "blahbling", query: "CCC BBB AAA")
-      FactoryBot.create(:saved_search, user: @user, label_string: "qux", query: " aaa  bbb  ccc ")
-    end
-
-    should "fetch the queries used by a user for a label" do
-      assert_equal(%w(blah blahbling), SavedSearch.search_labels(@user.id, label: "blah"))
-    end
-  end
-
   context ".post_ids_for" do
     context "with a label" do
       setup do

@@ -47,9 +47,41 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
   end
 
   context "not_found action" do
-    should "work" do
+    should "return the 404 page for GET requests" do
       get "/qwoiqogieqg"
       assert_response 404
+    end
+
+    should "return the 404 page for POST requests" do
+      post "/qwoiqogieqg"
+      assert_response 404
+    end
+
+    should "return a JSON response for a 404'd JSON request" do
+      get "/qwoiqogieqg", as: :json
+
+      assert_response 404
+      assert_equal("Page not found", response.parsed_body["message"])
+    end
+
+    should "return an XML response for a 404'd XML request" do
+      get "/qwoiqogieqg", as: :xml
+
+      assert_response 404
+      assert_equal("Page not found", response.parsed_body.at("result").text)
+    end
+
+    should "render the 404 page when page_not_found_pool_id is configured" do
+      as(create(:user)) do
+        @post = create(:post, tag_string: "artist:bkub")
+        @pool = create(:pool, post_ids: [@post.id])
+        Danbooru.config.stubs(:page_not_found_pool_id).returns(@pool.id)
+      end
+
+      get "/qwoiqogieqg"
+
+      assert_response 404
+      assert_select "#c-static #a-not-found img", count: 1
     end
   end
 
@@ -62,6 +94,8 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
 
   context "contact action" do
     should "work" do
+      create(:owner_user)
+
       get contact_path
       assert_response :success
     end

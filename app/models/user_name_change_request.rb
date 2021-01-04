@@ -19,8 +19,7 @@ class UserNameChangeRequest < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-    q = q.search_attributes(params, :user, :original_name, :desired_name)
+    q = search_attributes(params, :id, :created_at, :updated_at, :user, :original_name, :desired_name)
     q.apply_default_order(params)
   end
 
@@ -30,7 +29,7 @@ class UserNameChangeRequest < ApplicationRecord
 
   def not_limited
     if UserNameChangeRequest.unscoped.where(user: user).where("created_at >= ?", 1.week.ago).exists?
-      errors[:base] << "You can only submit one name change request per week"
+      errors.add(:base, "You can only submit one name change request per week")
     end
   end
 end

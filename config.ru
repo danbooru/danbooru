@@ -1,6 +1,6 @@
 # This file is used by Rack-based servers to start the application.
 
-require ::File.expand_path('../config/environment', __FILE__)
+require_relative "config/environment"
 
 if defined?(Unicorn) && Rails.env.production?
   # Unicorn self-process killer
@@ -14,3 +14,4 @@ if defined?(Unicorn) && Rails.env.production?
 end
 
 run Rails.application
+Rails.application.load_server

@@ -66,8 +66,7 @@ class TagRelationship < ApplicationRecord
     end
 
     def search(params)
-      q = super
-      q = q.search_attributes(params, :antecedent_name, :consequent_name)
+      q = search_attributes(params, :id, :created_at, :updated_at, :antecedent_name, :consequent_name, :creator, :approver, :forum_post, :forum_topic, :antecedent_tag, :consequent_tag, :antecedent_wiki, :consequent_wiki)
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
@@ -114,7 +113,7 @@ class TagRelationship < ApplicationRecord
 
   def antecedent_and_consequent_are_different
     if antecedent_name == consequent_name
-      errors[:base] << "Cannot alias or implicate a tag to itself"
+      errors.add(:base, "Cannot alias or implicate a tag to itself")
     end
   end
 
@@ -124,10 +123,6 @@ class TagRelationship < ApplicationRecord
 
   def self.model_restriction(table)
     super.where(table[:status].eq("active"))
-  end
-
-  def self.searchable_includes
-    [:creator, :approver, :forum_post, :forum_topic, :antecedent_tag, :consequent_tag, :antecedent_wiki, :consequent_wiki]
   end
 
   def self.available_includes

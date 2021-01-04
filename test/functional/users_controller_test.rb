@@ -114,7 +114,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
     context "show action" do
       setup do
         # flesh out profile to get more test coverage of user presenter.
-        @user = create(:banned_user, can_approve_posts: true, created_at: 2.weeks.ago)
+        @user = create(:user, can_approve_posts: true, created_at: 2.weeks.ago)
         as(@user) do
           create(:saved_search, user: @user)
           create(:post, uploader: @user, tag_string: "fav:#{@user.name}")
@@ -150,6 +150,33 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_equal(false, xml["user"]["enable_safe_mode"])
+      end
+
+      context "for a user with an email address" do
+        setup do
+          create(:email_address, user: @user)
+        end
+
+        should "show the email address to the user themselves" do
+          get_auth user_path(@user), @user
+
+          assert_response :success
+          assert_select ".user-email-address", count: 1
+        end
+
+        should "show the email address to mods" do
+          get_auth user_path(@user), create(:moderator_user)
+
+          assert_response :success
+          assert_select ".user-email-address", count: 1
+        end
+
+        should "not show the email address to other users" do
+          get_auth user_path(@user), create(:user)
+
+          assert_response :success
+          assert_select ".user-email-address", count: 0
+        end
       end
 
       context "for a tooltip" do
@@ -216,6 +243,11 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         get new_user_path
         assert_response :success
       end
+
+      should "render for a logged in user" do
+        get_auth new_user_path, @user
+        assert_response :success
+      end
     end
 
     context "create action" do
@@ -229,11 +261,6 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_no_enqueued_emails
       end
 
-      should "not allow logged in users to create a new account" do
-        post_auth users_path, @user, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
-        assert_response 403
-      end
-
       should "create a user with a valid email" do
         post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1", email: "webmaster@danbooru.donmai.us" }}
 
@@ -241,7 +268,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal("xxx", User.last.name)
         assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
         assert_equal("webmaster@danbooru.donmai.us", User.last.email_address.address)
-        assert_enqueued_email_with UserMailer, :welcome_user, args: [User.last]
+        assert_enqueued_email_with UserMailer, :welcome_user, args: [User.last], queue: "default"
       end
 
       should "not create a user with an invalid email" do
@@ -262,45 +289,81 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      should "mark users signing up from proxies as requiring verification" do
-        skip unless IpLookup.enabled?
+      context "sockpuppet detection" do
+        setup do
+          @private_ip = "192.168.0.1"
+          @valid_ip = "187.37.226.17" # a random valid, non-proxy public IP
+          @valid_ipv6 = "2600:1700:6b0:a518::1"
+          @proxy_ip = "51.15.128.1"
+        end
 
-        self.remote_addr = "51.15.128.1"
-        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+        should "work for a public IPv6 address" do
+          self.remote_addr = @valid_ipv6
 
-        assert_redirected_to User.last
-        assert_equal(true, User.last.requires_verification)
-      end
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
-      should "mark users signing up from a partial banned IP as requiring verification" do
-        skip unless IpLookup.enabled?
-        self.remote_addr = "187.37.226.17"
+          assert_redirected_to User.last
+          assert_equal(false, User.last.requires_verification)
+        end
 
-        @ip_ban = create(:ip_ban, ip_addr: self.remote_addr, category: :partial)
-        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+        should "mark accounts created by already logged in users as requiring verification" do
+          self.remote_addr = @valid_ip
 
-        assert_redirected_to User.last
-        assert_equal(true, User.last.requires_verification)
-        assert_equal(1, @ip_ban.reload.hit_count)
-        assert(@ip_ban.last_hit_at > 1.minute.ago)
-      end
+          post_auth users_path, @user, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
-      should "not mark users signing up from non-proxies as requiring verification" do
-        skip unless IpLookup.enabled?
-        self.remote_addr = "187.37.226.17"
-        post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+          assert_redirected_to User.last
+          assert_equal(true, User.last.requires_verification)
+        end
 
-        assert_redirected_to User.last
-        assert_equal(false, User.last.requires_verification)
-      end
+        should "mark users signing up from proxies as requiring verification" do
+          skip unless IpLookup.enabled?
+          self.remote_addr = @proxy_ip
 
-      context "with sockpuppet validation enabled" do
-        should "not allow registering multiple accounts with the same IP" do
-          assert_difference("User.count", 0) do
-            @user.update(last_ip_addr: "127.0.0.1")
-            post users_path, params: {:user => {:name => "dupe", :password => "xxxxx1", :password_confirmation => "xxxxx1"}}
-            assert_response 403
-          end
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+          assert_redirected_to User.last
+          assert_equal(true, User.last.requires_verification)
+        end
+
+        should "mark users signing up from a partial banned IP as requiring verification" do
+          self.remote_addr = @valid_ip
+
+          @ip_ban = create(:ip_ban, ip_addr: self.remote_addr, category: :partial)
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+          assert_redirected_to User.last
+          assert_equal(true, User.last.requires_verification)
+          assert_equal(1, @ip_ban.reload.hit_count)
+          assert(@ip_ban.last_hit_at > 1.minute.ago)
+        end
+
+        should "not mark users signing up from non-proxies as requiring verification" do
+          skip unless IpLookup.enabled?
+          self.remote_addr = @valid_ip
+
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+          assert_redirected_to User.last
+          assert_equal(false, User.last.requires_verification)
+        end
+
+        should "mark accounts registered from an IPv4 address recently used for another account as requiring verification" do
+          @user.update!(last_ip_addr: @valid_ip)
+          self.remote_addr = @valid_ip
+
+          post users_path, params: { user: { name: "dupe", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+          assert_redirected_to User.last
+          assert_equal(true, User.last.requires_verification)
+        end
+
+        should "not mark users signing up from localhost as requiring verification" do
+          self.remote_addr = "127.0.0.1"
+
+          post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
+
+          assert_redirected_to User.last
+          assert_equal(false, User.last.requires_verification)
         end
       end
     end
@@ -335,11 +398,11 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
       context "changing the level" do
         should "not work" do
-          @cuser = create(:user)
-          put_auth user_path(@user), @cuser, params: {:user => {:level => 40}}
+          @owner = create(:owner_user)
+          put_auth user_path(@user), @owner, params: { user: { level: User::Levels::BUILDER }}
 
           assert_response 403
-          assert_equal(20, @user.reload.level)
+          assert_equal(User::Levels::MEMBER, @user.reload.level)
         end
       end
 

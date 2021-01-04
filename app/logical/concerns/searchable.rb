@@ -10,12 +10,13 @@ module Searchable
     1 + params.values.map { |v| parameter_hash?(v) ? parameter_depth(v) : 1 }.max
   end
 
-  def negate(kind = :nand)
-    unscoped.where(all.where_clause.invert(kind).ast)
+  def negate_relation
+    unscoped.where(all.where_clause.invert.ast)
   end
 
   # XXX hacky method to AND two relations together.
-  def and(relation)
+  # XXX Replace with ActiveRecord#and (cf https://github.com/rails/rails/pull/39328)
+  def and_relation(relation)
     q = all
     q = q.where(relation.where_clause.ast) if relation.where_clause.present?
     q = q.joins(relation.joins_values + q.joins_values) if relation.joins_values.present?
@@ -52,7 +53,7 @@ module Searchable
   end
 
   def where_iequals(attr, value)
-    where_ilike(attr, value.gsub(/\\/, '\\\\').gsub(/\*/, '\*'))
+    where_ilike(attr, value.escape_wildcards)
   end
 
   # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-REGEXP
@@ -101,16 +102,11 @@ module Searchable
     where_operator(qualified_column, *range)
   end
 
-  def search_boolean_attribute(attribute, params)
-    return all unless params.key?(attribute)
-
-    value = params[attribute].to_s
-    if value.truthy?
-      where(attribute => true)
-    elsif value.falsy?
-      where(attribute => false)
+  def search_boolean_attribute(attr, params)
+    if params[attr].present?
+      boolean_attribute_matches(attr, params[attr])
     else
-      raise ArgumentError, "value must be truthy or falsy"
+      all
     end
   end
 
@@ -130,6 +126,18 @@ module Searchable
     qualified_column = "#{table_name}.#{column.name}"
     range = PostQueryBuilder.new(nil).parse_range(value, column.type)
     where_operator(qualified_column, *range)
+  end
+
+  def boolean_attribute_matches(attribute, value)
+    value = value.to_s
+
+    if value.truthy?
+      where(attribute => true)
+    elsif value.falsy?
+      where(attribute => false)
+    else
+      raise ArgumentError, "value must be truthy or falsy"
+    end
   end
 
   def text_attribute_matches(attribute, value, index_column: nil, ts_config: "english")
@@ -182,7 +190,7 @@ module Searchable
     when :boolean
       search_boolean_attribute(name, params)
     when :integer, :datetime
-      numeric_attribute_matches(name, params[name])
+      search_numeric_attribute(name, params)
     when :inet
       search_inet_attribute(name, params)
     when :enum
@@ -192,6 +200,26 @@ module Searchable
     else
       raise NotImplementedError, "unhandled attribute type: #{name}" if type.blank?
       search_includes(name, params, type, current_user)
+    end
+  end
+
+  def search_numeric_attribute(attr, params)
+    if params[attr].present?
+      numeric_attribute_matches(attr, params[attr])
+    elsif params[:"#{attr}_eq"].present?
+      where_operator(attr, :eq, params[:"#{attr}_eq"])
+    elsif params[:"#{attr}_not_eq"].present?
+      where_operator(attr, :not_eq, params[:"#{attr}_not_eq"])
+    elsif params[:"#{attr}_gt"].present?
+      where_operator(attr, :gt, params[:"#{attr}_gt"])
+    elsif params[:"#{attr}_gteq"].present?
+      where_operator(attr, :gteq, params[:"#{attr}_gteq"])
+    elsif params[:"#{attr}_lt"].present?
+      where_operator(attr, :lt, params[:"#{attr}_lt"])
+    elsif params[:"#{attr}_lteq"].present?
+      where_operator(attr, :lteq, params[:"#{attr}_lteq"])
+    else
+      all
     end
   end
 
@@ -383,14 +411,6 @@ module Searchable
       order_clause << sanitize_sql_array(["ID=? DESC", id])
     end
     where(id: ids).order(Arel.sql(order_clause.join(', ')))
-  end
-
-  def search(params = {})
-    params ||= {}
-
-    default_attributes = (attribute_names.map(&:to_sym) & %i[id created_at updated_at])
-    all_attributes = default_attributes + searchable_includes
-    search_attributes(params, *all_attributes)
   end
 
   private

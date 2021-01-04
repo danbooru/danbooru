@@ -16,7 +16,7 @@ class DtextInput < SimpleForm::Inputs::Base
     t = template
     merged_input_options = merge_wrapper_options(input_html_options, wrapper_options)
 
-    t.tag.div(class: "dtext-previewable") do
+    t.tag.div(class: "dtext-previewable", spellcheck: true) do
       if options[:inline]
         t.concat @builder.text_field(attribute_name, merged_input_options)
       else

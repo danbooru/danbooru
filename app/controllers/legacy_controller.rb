@@ -17,16 +17,8 @@ class LegacyController < ApplicationController
     end
   end
 
-  def users
-    @users = User.limit(100).search(params).paginate(params[:page])
-  end
-
   def tags
     @tags = Tag.limit(100).search(params).paginate(params[:page], :limit => params[:limit])
-  end
-
-  def artists
-    @artists = Artist.limit(100).search(search_params).paginate(params[:page])
   end
 
   def unavailable

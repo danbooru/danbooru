@@ -3,16 +3,10 @@ import CurrentUser from './current_user'
 let Autocomplete = {};
 
 /* eslint-disable */
-Autocomplete.METATAGS = <%= PostQueryBuilder::METATAGS.to_json.html_safe %>;
 Autocomplete.TAG_CATEGORIES = <%= TagCategory.mapping.to_json.html_safe %>;
-Autocomplete.ORDER_METATAGS = <%= PostQueryBuilder::ORDER_METATAGS.to_json.html_safe %>;
-Autocomplete.DISAPPROVAL_REASONS = <%= PostDisapproval::REASONS.to_json.html_safe %>;
 /* eslint-enable */
 
-Autocomplete.MISC_STATUSES = ["deleted", "active", "pending", "flagged", "banned", "modqueue", "unmoderated", "appealed"];
 Autocomplete.TAG_PREFIXES = "-|~|" + Object.keys(Autocomplete.TAG_CATEGORIES).map(category => category + ":").join("|");
-Autocomplete.METATAGS_REGEX = Autocomplete.METATAGS.concat(Object.keys(Autocomplete.TAG_CATEGORIES)).join("|");
-Autocomplete.TERM_REGEX = new RegExp(`([-~]*)(?:(${Autocomplete.METATAGS_REGEX}):)?(\\S*)$`, "i");
 Autocomplete.MAX_RESULTS = 10;
 
 Autocomplete.initialize_all = function() {
@@ -39,20 +33,20 @@ Autocomplete.initialize_all = function() {
 
     this.initialize_tag_autocomplete();
     this.initialize_mention_autocomplete($("form div.input.dtext textarea"));
-    this.initialize_fields($('[data-autocomplete="tag"]'), Autocomplete.tag_source);
-    this.initialize_fields($('[data-autocomplete="artist"]'), Autocomplete.artist_source);
-    this.initialize_fields($('[data-autocomplete="pool"]'), Autocomplete.pool_source);
-    this.initialize_fields($('[data-autocomplete="user"]'), Autocomplete.user_source);
-    this.initialize_fields($('[data-autocomplete="wiki-page"]'), Autocomplete.wiki_source);
-    this.initialize_fields($('[data-autocomplete="favorite-group"]'), Autocomplete.favorite_group_source);
-    this.initialize_fields($('[data-autocomplete="saved-search-label"]'), Autocomplete.saved_search_source);
+    this.initialize_fields($('[data-autocomplete="tag"]'), "tag");
+    this.initialize_fields($('[data-autocomplete="artist"]'), "artist");
+    this.initialize_fields($('[data-autocomplete="pool"]'), "pool");
+    this.initialize_fields($('[data-autocomplete="user"]'), "user");
+    this.initialize_fields($('[data-autocomplete="wiki-page"]'), "wiki_page");
+    this.initialize_fields($('[data-autocomplete="favorite-group"]'), "favorite_group");
+    this.initialize_fields($('[data-autocomplete="saved-search-label"]'), "saved_search_label");
   }
 }
 
-Autocomplete.initialize_fields = function($fields, autocomplete) {
+Autocomplete.initialize_fields = function($fields, type) {
   $fields.autocomplete({
     source: async function(request, respond) {
-      let results = await autocomplete(request.term);
+      let results = await Autocomplete.autocomplete_source(request.term, type);
       respond(results);
     },
   });
@@ -84,7 +78,7 @@ Autocomplete.initialize_mention_autocomplete = function($fields) {
       }
 
       if (name) {
-        let results = await Autocomplete.user_source(name, "@");
+        let results = await Autocomplete.autocomplete_source(name, "mention");
         resp(results);
       }
     }
@@ -106,76 +100,18 @@ Autocomplete.initialize_tag_autocomplete = function() {
       return false;
     },
     source: async function(req, resp) {
-      var query = Autocomplete.parse_query(req.term, this.element.get(0).selectionStart);
-      var metatag = query.metatag;
-      var term = query.term;
-      var results = [];
-
-      switch (metatag) {
-      case "order":
-      case "status":
-      case "rating":
-      case "locked":
-      case "child":
-      case "parent":
-      case "filetype":
-      case "disapproved":
-      case "embedded":
-        results = Autocomplete.static_metatag_source(term, metatag);
-        break;
-      case "user":
-      case "approver":
-      case "commenter":
-      case "comm":
-      case "noter":
-      case "noteupdater":
-      case "commentaryupdater":
-      case "artcomm":
-      case "fav":
-      case "ordfav":
-      case "appealer":
-      case "flagger":
-      case "upvote":
-      case "downvote":
-        results = await Autocomplete.user_source(term, metatag + ":");
-        break;
-      case "pool":
-      case "ordpool":
-        results = await Autocomplete.pool_source(term, metatag + ":");
-        break;
-      case "favgroup":
-      case "ordfavgroup":
-        results = await Autocomplete.favorite_group_source(term, metatag + ":", CurrentUser.data("id"));
-        break;
-      case "search":
-        results = await Autocomplete.saved_search_source(term, metatag + ":");
-        break;
-      case "tag":
-        results = await Autocomplete.tag_source(term);
-        break;
-      default:
-        results = [];
-        break;
-      }
-
+      let term = Autocomplete.current_term(this.element);
+      let results = await Autocomplete.autocomplete_source(term, "tag_query");
       resp(results);
     }
   });
 }
 
-Autocomplete.parse_query = function(text, caret) {
-  let before_caret_text = text.substring(0, caret);
-  let match = before_caret_text.match(Autocomplete.TERM_REGEX);
-
-  let operator = match[1];
-  let metatag = match[2] ? match[2].toLowerCase() : "tag";
-  let term = match[3];
-
-  if (metatag in Autocomplete.TAG_CATEGORIES) {
-    metatag = "tag";
-  }
-
-  return { operator: operator, metatag: metatag, term: term };
+Autocomplete.current_term = function($input) {
+  let query = $input.get(0).value;
+  let caret = $input.get(0).selectionStart;
+  let match = query.substring(0, caret).match(/\S*$/);
+  return match[0];
 };
 
 // Update the input field with the item currently focused in the
@@ -244,7 +180,7 @@ Autocomplete.render_item = function(list, item) {
     $link.append($post_count);
   }
 
-  if (item.type === "tag") {
+  if (/^tag/.test(item.type)) {
     $link.addClass("tag-type-" + item.category);
   } else if (item.type === "user") {
     var level_class = "user-" + item.level.toLowerCase();
@@ -256,7 +192,7 @@ Autocomplete.render_item = function(list, item) {
   var $menu_item = $("<div/>").append($link);
   var $list_item = $("<li/>").data("item.autocomplete", item).append($menu_item);
 
-  var data_attributes = ["type", "source", "antecedent", "value", "category", "post_count", "weight"];
+  var data_attributes = ["type", "antecedent", "value", "category", "post_count"];
   data_attributes.forEach(attr => {
     $list_item.attr(`data-autocomplete-${attr.replace(/_/g, "-")}`, item[attr]);
   });
@@ -264,165 +200,11 @@ Autocomplete.render_item = function(list, item) {
   return $list_item.appendTo(list);
 };
 
-Autocomplete.static_metatags = {
-  order: Autocomplete.ORDER_METATAGS,
-  status: ["any"].concat(Autocomplete.MISC_STATUSES),
-  rating: [
-    "safe", "questionable", "explicit"
-  ],
-  locked: [
-    "rating", "note", "status"
-  ],
-  embedded: [
-    "true", "false"
-  ],
-  child: ["any", "none"].concat(Autocomplete.MISC_STATUSES),
-  parent: ["any", "none"].concat(Autocomplete.MISC_STATUSES),
-  filetype: [
-    "jpg", "png", "gif", "swf", "zip", "webm", "mp4"
-  ],
-  commentary: [
-    "true", "false", "translated", "untranslated"
-  ],
-  disapproved: Autocomplete.DISAPPROVAL_REASONS
-}
-
-Autocomplete.static_metatag_source = function(term, metatag) {
-  var sub_metatags = this.static_metatags[metatag];
-
-  var matches = sub_metatags.filter(sub_metatag => sub_metatag.startsWith(term.toLowerCase()));
-  matches = matches.map(sub_metatag => `${metatag}:${sub_metatag}`).sort().slice(0, Autocomplete.MAX_RESULTS);
-
-  return matches;
-}
-
-Autocomplete.tag_source = async function(term) {
-  if (term === "") {
-    return [];
-  }
-
-  let tags = await $.getJSON("/tags/autocomplete", {
-    "search[name_matches]": term,
-    "limit": Autocomplete.MAX_RESULTS,
-    "expiry": 7
-  });
-
-  return tags.map(function(tag) {
-    return {
-      type: "tag",
-      label: tag.name.replace(/_/g, " "),
-      antecedent: tag.antecedent_name,
-      value: tag.name,
-      category: tag.category,
-      source: tag.source,
-      weight: tag.weight,
-      post_count: tag.post_count
-    };
-  });
-}
-
-Autocomplete.artist_source = async function(term) {
-  let artists = await $.getJSON("/artists", {
-    "search[name_like]": term.trim().replace(/\s+/g, "_") + "*",
-    "search[is_deleted]": false,
-    "search[order]": "post_count",
-    "limit": Autocomplete.MAX_RESULTS,
-    "expiry": 7
-  });
-
-  return artists.map(function(artist) {
-    return {
-      type: "tag",
-      label: artist.name.replace(/_/g, " "),
-      value: artist.name,
-      category: Autocomplete.TAG_CATEGORIES.artist,
-    };
-  });
-};
-
-Autocomplete.wiki_source = async function(term) {
-  let wiki_pages = await $.getJSON("/wiki_pages", {
-    "search[title_normalize]": term + "*",
-    "search[hide_deleted]": "Yes",
-    "search[order]": "post_count",
-    "limit": Autocomplete.MAX_RESULTS,
-    "expiry": 7
-  });
-
-  return wiki_pages.map(function(wiki_page) {
-    return {
-      type: "tag",
-      label: wiki_page.title.replace(/_/g, " "),
-      value: wiki_page.title,
-      category: wiki_page.category_name
-    };
-  });
-};
-
-Autocomplete.user_source = async function(term, prefix = "") {
-  let users = await $.getJSON("/users", {
-    "search[order]": "post_upload_count",
-    "search[current_user_first]": "true",
-    "search[name_matches]": term + "*",
+Autocomplete.autocomplete_source = function(query, type) {
+  return $.getJSON("/autocomplete.json", {
+    "search[query]": query,
+    "search[type]": type,
     "limit": Autocomplete.MAX_RESULTS
-  });
-
-  return users.map(function(user) {
-    return {
-      type: "user",
-      label: user.name.replace(/_/g, " "),
-      value: prefix + user.name,
-      level: user.level_string
-    };
-  });
-};
-
-Autocomplete.pool_source = async function(term, prefix = "") {
-  let pools = await $.getJSON("/pools", {
-    "search[name_matches]": term,
-    "search[is_deleted]": false,
-    "search[order]": "post_count",
-    "limit": Autocomplete.MAX_RESULTS
-  });
-
-  return pools.map(function(pool) {
-    return {
-      type: "pool",
-      label: pool.name.replace(/_/g, " "),
-      value: prefix + pool.name,
-      post_count: pool.post_count,
-      category: pool.category
-    };
-  });
-};
-
-Autocomplete.favorite_group_source = async function(term, prefix = "", creator_id = null) {
-  let favgroups = await $.getJSON("/favorite_groups", {
-    "search[creator_id]": creator_id,
-    "search[name_matches]": term,
-    "limit": Autocomplete.MAX_RESULTS
-  });
-
-  return favgroups.map(function(favgroup) {
-    return {
-      label: favgroup.name.replace(/_/g, " "),
-      value: prefix + favgroup.name,
-      post_count: favgroup.post_count
-    };
-  });
-};
-
-Autocomplete.saved_search_source = async function(term, prefix = "") {
-  let labels = await $.getJSON("/saved_searches/labels", {
-    "search[label]": term + "*",
-    "limit": Autocomplete.MAX_RESULTS
-  });
-
-  return labels.map(function(label) {
-    return {
-      label: label.replace(/_/g, " "),
-      value: prefix + label,
-    };
   });
 }
 

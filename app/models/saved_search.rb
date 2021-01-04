@@ -63,17 +63,12 @@ class SavedSearch < ApplicationRecord
           .gsub(/[[:space:]]/, "_")
       end
 
-      def search_labels(user_id, params)
-        labels = labels_for(user_id)
+      def all_labels
+        select(Arel.sql("distinct unnest(labels) as label")).order(:label)
+      end
 
-        if params[:label].present?
-          query = Regexp.escape(params[:label]).gsub("\\*", ".*")
-          query = ".*#{query}.*" unless query.include?("*")
-          query = /\A#{query}\z/
-          labels = labels.grep(query)
-        end
-
-        labels
+      def labels_like(label)
+        all_labels.select { |ss| ss.label.ilike?(label) }.map(&:label)
       end
 
       def labels_for(user_id)
@@ -105,8 +100,7 @@ class SavedSearch < ApplicationRecord
   concerning :Search do
     class_methods do
       def search(params)
-        q = super
-        q = q.search_attributes(params, :query)
+        q = search_attributes(params, :id, :created_at, :updated_at, :query)
 
         if params[:label]
           q = q.labeled(params[:label])
@@ -174,7 +168,7 @@ class SavedSearch < ApplicationRecord
 
   def validate_count
     if user.saved_searches.count >= user.max_saved_searches
-      self.errors[:user] << "can only have up to #{user.max_saved_searches} " + "saved search".pluralize(user.max_saved_searches)
+      errors.add(:user, "can only have up to #{user.max_saved_searches} " + "saved search".pluralize(user.max_saved_searches))
     end
   end
 

@@ -1,0 +1,9 @@
+<%= search_form_for(wiki_pages_path) do |f| %>
+  <%= f.input :title_normalize, label: "Title", hint: "Use * for wildcard", input_html: { value: params[:search][:title_normalize], "data-autocomplete": "wiki-page" } %>
+  <%= f.input :other_names_match, label: "Other names", hint: "Use * for wildcard", input_html: { value: params[:search][:other_names_match] } %>
+  <%= f.input :body_matches, label: "Body", hint: "Use * for wildcard", input_html: { value: params[:search][:body_matches] } %>
+  <%= f.input :linked_to, hint: "Find wikis linking to this wiki", input_html: { value: params[:search][:linked_to], "data-autocomplete": "wiki-page" } %>
+  <%= f.input :is_deleted, label: "Deleted?", as: :select, include_blank: true, selected: params[:search][:is_deleted] %>
+  <%= f.input :order, collection: [%w[Newest created_at], %w[Title title], %w[Posts post_count]], include_blank: true, selected: params[:search][:order] %>
+  <%= f.submit "Search" %>
+<% end %>

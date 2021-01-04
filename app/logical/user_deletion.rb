@@ -61,11 +61,11 @@ class UserDeletion
 
   def validate_deletion
     if !user.authenticate_password(password)
-      errors[:base] << "Password is incorrect"
+      errors.add(:base, "Password is incorrect")
     end
 
-    if user.level >= User::Levels::ADMIN
-      errors[:base] << "Admins cannot delete their account"
+    if user.is_admin?
+      errors.add(:base, "Admins cannot delete their account")
     end
   end
 end

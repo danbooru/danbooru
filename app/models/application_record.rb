@@ -3,6 +3,7 @@ class ApplicationRecord < ActiveRecord::Base
 
   include Deletable
   include Mentionable
+  include Normalizable
   extend HasBitFlags
   extend Searchable
 
@@ -93,10 +94,6 @@ class ApplicationRecord < ActiveRecord::Base
 
   concerning :SearchMethods do
     class_methods do
-      def searchable_includes
-        []
-      end
-
       def model_restriction(table)
         table.project(1)
       end

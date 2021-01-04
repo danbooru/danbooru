@@ -10,6 +10,26 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
       @restricted_user = create(:user, requires_verification: true, is_verified: false)
     end
 
+    context "#index" do
+      should "not let regular users see emails belonging to other users" do
+        get_auth emails_path, @user
+        assert_response 403
+      end
+
+      should "let mods see emails belonging to themselves and all users below mod level" do
+        @mod1 = create(:moderator_user, email_address: build(:email_address))
+        @mod2 = create(:moderator_user, email_address: build(:email_address))
+
+        get_auth emails_path, @mod1
+
+        assert_response :success
+        assert_select "#email-address-#{@user.email_address.id}", count: 1
+        assert_select "#email-address-#{@other_user.email_address.id}", count: 1
+        assert_select "#email-address-#{@mod1.email_address.id}", count: 1
+        assert_select "#email-address-#{@mod2.email_address.id}", count: 0
+      end
+    end
+
     context "#show" do
       should "render" do
         get_auth user_email_path(@user), @user, as: :json
@@ -68,7 +88,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to(settings_path)
           assert_equal("abc@ogres.net", @user.reload.email_address.address)
           assert_equal(false, @user.email_address.is_verified)
-          assert_enqueued_email_with UserMailer, :email_change_confirmation, args: [@user]
+          assert_enqueued_email_with UserMailer, :email_change_confirmation, args: [@user], queue: "default"
         end
 
         should "create a new address" do
@@ -81,7 +101,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to(settings_path)
           assert_equal("abc@ogres.net", @user.reload.email_address.address)
           assert_equal(false, @user.reload.email_address.is_verified)
-          assert_enqueued_email_with UserMailer, :email_change_confirmation, args: [@user]
+          assert_enqueued_email_with UserMailer, :email_change_confirmation, args: [@user], queue: "default"
         end
       end
 

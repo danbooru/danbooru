@@ -9,6 +9,21 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+
+--
+-- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS fuzzystrmatch WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION fuzzystrmatch; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION fuzzystrmatch IS 'determine similarities and distance between strings';
+
+
 --
 -- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
 --
@@ -2721,11 +2736,11 @@ CREATE TABLE public.post_replacements (
     replacement_url text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    file_ext_was character varying,
-    file_size_was integer,
-    image_width_was integer,
-    image_height_was integer,
-    md5_was character varying,
+    old_file_ext character varying,
+    old_file_size integer,
+    old_image_width integer,
+    old_image_height integer,
+    old_md5 character varying,
     file_ext character varying,
     file_size integer,
     image_width integer,
@@ -3087,6 +3102,41 @@ CREATE SEQUENCE public.user_name_change_requests_id_seq
 --
 
 ALTER SEQUENCE public.user_name_change_requests_id_seq OWNED BY public.user_name_change_requests.id;
+
+
+--
+-- Name: user_upgrades; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_upgrades (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    recipient_id bigint NOT NULL,
+    purchaser_id bigint NOT NULL,
+    upgrade_type integer NOT NULL,
+    status integer NOT NULL,
+    stripe_id character varying
+);
+
+
+--
+-- Name: user_upgrades_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_upgrades_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_upgrades_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_upgrades_id_seq OWNED BY public.user_upgrades.id;
 
 
 --
@@ -4158,6 +4208,13 @@ ALTER TABLE ONLY public.user_name_change_requests ALTER COLUMN id SET DEFAULT ne
 
 
 --
+-- Name: user_upgrades id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_upgrades ALTER COLUMN id SET DEFAULT nextval('public.user_upgrades_id_seq'::regclass);
+
+
+--
 -- Name: users id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4520,6 +4577,14 @@ ALTER TABLE ONLY public.user_feedback
 
 ALTER TABLE ONLY public.user_name_change_requests
     ADD CONSTRAINT user_name_change_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_upgrades user_upgrades_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_upgrades
+    ADD CONSTRAINT user_upgrades_pkey PRIMARY KEY (id);
 
 
 --
@@ -7031,6 +7096,41 @@ CREATE INDEX index_user_name_change_requests_on_user_id ON public.user_name_chan
 
 
 --
+-- Name: index_user_upgrades_on_purchaser_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_upgrades_on_purchaser_id ON public.user_upgrades USING btree (purchaser_id);
+
+
+--
+-- Name: index_user_upgrades_on_recipient_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_upgrades_on_recipient_id ON public.user_upgrades USING btree (recipient_id);
+
+
+--
+-- Name: index_user_upgrades_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_upgrades_on_status ON public.user_upgrades USING btree (status);
+
+
+--
+-- Name: index_user_upgrades_on_stripe_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_upgrades_on_stripe_id ON public.user_upgrades USING btree (stripe_id);
+
+
+--
+-- Name: index_user_upgrades_on_upgrade_type; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_upgrades_on_upgrade_type ON public.user_upgrades USING btree (upgrade_type);
+
+
+--
 -- Name: index_users_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7420,6 +7520,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200520060951'),
 ('20200803022359'),
 ('20200816175151'),
-('20201201211748');
+('20201201211748'),
+('20201213052805'),
+('20201219201007'),
+('20201224101208');
 
 

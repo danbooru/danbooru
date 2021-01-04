@@ -3,6 +3,9 @@ require "strscan"
 class PostQueryBuilder
   extend Memoist
 
+  # How many tags a `blah*` search should match.
+  MAX_WILDCARD_TAGS = 100
+
   COUNT_METATAGS = %w[
     comment_count deleted_comment_count active_comment_count
     note_count deleted_note_count active_note_count
@@ -77,9 +80,9 @@ class PostQueryBuilder
     optional_tags = optional_tags.map(&:name)
     required_tags = required_tags.map(&:name)
 
-    negated_tags += negated_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name) }
-    optional_tags += optional_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name) }
-    optional_tags += required_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name) }
+    negated_tags += negated_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name).limit(MAX_WILDCARD_TAGS).pluck(:name) }
+    optional_tags += optional_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name).limit(MAX_WILDCARD_TAGS).pluck(:name) }
+    optional_tags += required_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name).limit(MAX_WILDCARD_TAGS).pluck(:name) }
 
     tsquery << "!(#{negated_tags.sort.uniq.map(&:to_escaped_for_tsquery).join(" | ")})" if negated_tags.present?
     tsquery << "(#{optional_tags.sort.uniq.map(&:to_escaped_for_tsquery).join(" | ")})" if optional_tags.present?
@@ -92,8 +95,8 @@ class PostQueryBuilder
   def metatags_match(metatags, relation)
     metatags.each do |metatag|
       clause = metatag_matches(metatag.name, metatag.value, quoted: metatag.quoted)
-      clause = clause.negate if metatag.negated
-      relation = relation.and(clause)
+      clause = clause.negate_relation if metatag.negated
+      relation = relation.and_relation(clause)
     end
 
     relation
@@ -390,7 +393,8 @@ class PostQueryBuilder
     favuser = User.find_by_name(username)
 
     if favuser.present? && Pundit.policy!([current_user, nil], favuser).can_see_favorites?
-      tags_include("fav:#{favuser.id}")
+      favorites = Favorite.from("favorites_#{favuser.id % 100} AS favorites").where(user: favuser)
+      Post.where(id: favorites.select(:post_id))
     else
       Post.none
     end
@@ -399,8 +403,8 @@ class PostQueryBuilder
   def ordfav_matches(username)
     user = User.find_by_name(username)
 
-    if user.present?
-      favorites_include(username).joins(:favorites).merge(Favorite.for_user(user.id)).order("favorites.id DESC")
+    if user.present? && Pundit.policy!([current_user, nil], user).can_see_favorites?
+      Post.joins(:favorites).merge(Favorite.for_user(user.id)).order("favorites.id DESC")
     else
       Post.none
     end
@@ -984,6 +988,11 @@ class PostQueryBuilder
 
     def is_wildcard_search?
       is_single_tag? && tags.first.wildcard
+    end
+
+    def simple_tag
+      return nil if !is_simple_tag?
+      Tag.find_by_name(tags.first.name)
     end
   end
 

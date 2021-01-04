@@ -34,6 +34,7 @@ class SessionLoader
     update_last_logged_in_at
     update_last_ip_addr
     set_time_zone
+    set_country
     set_safe_mode
     initialize_session_cookies
     CurrentUser.user.unban! if CurrentUser.user.ban_expired?
@@ -87,7 +88,7 @@ class SessionLoader
 
   def update_last_logged_in_at
     return if CurrentUser.is_anonymous?
-    return if CurrentUser.last_logged_in_at && CurrentUser.last_logged_in_at > 1.week.ago
+    return if CurrentUser.last_logged_in_at && CurrentUser.last_logged_in_at > 1.hour.ago
     CurrentUser.user.update_attribute(:last_logged_in_at, Time.now)
   end
 
@@ -99,6 +100,12 @@ class SessionLoader
 
   def set_time_zone
     Time.zone = CurrentUser.user.time_zone
+  end
+
+  # Depends on Cloudflare
+  # https://support.cloudflare.com/hc/en-us/articles/200168236-Configuring-Cloudflare-IP-Geolocation
+  def set_country
+    CurrentUser.country = request.headers["CF-IPCountry"]
   end
 
   def set_safe_mode

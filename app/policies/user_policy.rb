@@ -1,6 +1,10 @@
 class UserPolicy < ApplicationPolicy
   def create?
-    user.is_anonymous? && !sockpuppet?
+    true
+  end
+
+  def new?
+    true
   end
 
   def update?
@@ -23,12 +27,12 @@ class UserPolicy < ApplicationPolicy
     user.is_member?
   end
 
-  def can_see_favorites?
-    user.is_admin? || record.id == user.id || !record.enable_private_favorites?
+  def can_see_last_logged_in_at?
+    user.is_moderator?
   end
 
-  def sockpuppet?
-    User.where(last_ip_addr: request.remote_ip).where("created_at > ?", 1.day.ago).exists?
+  def can_see_favorites?
+    user.is_admin? || record.id == user.id || !record.enable_private_favorites?
   end
 
   def permitted_attributes_for_create
@@ -47,7 +51,6 @@ class UserPolicy < ApplicationPolicy
       :disable_tagged_filenames, :disable_cropped_thumbnails,
       :disable_mobile_gestures, :enable_safe_mode, :enable_desktop_mode,
       :disable_post_tooltips,
-      (:level if CurrentUser.is_admin?)
     ].compact
   end
 

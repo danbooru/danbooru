@@ -187,16 +187,19 @@ module PostSets
         RelatedTagCalculator.frequent_tags_for_post_array(posts).take(MAX_SIDEBAR_TAGS)
       end
 
+      # Wildcard searches can show up to 100 tags in the sidebar, not 25,
+      # because that's how many tags the search itself will use.
       def wildcard_tags
-        Tag.wildcard_matches(tag_string)
+        Tag.wildcard_matches(tag_string).limit(PostQueryBuilder::MAX_WILDCARD_TAGS).pluck(:name)
       end
 
       def saved_search_tags
-        ["search:all"] + SavedSearch.labels_for(CurrentUser.user.id).map {|x| "search:#{x}"}
+        searches = ["search:all"] + SavedSearch.labels_for(CurrentUser.user.id).map {|x| "search:#{x}"}
+        searches.take(MAX_SIDEBAR_TAGS)
       end
 
       def tag_set_presenter
-        @tag_set_presenter ||= TagSetPresenter.new(related_tags.take(MAX_SIDEBAR_TAGS))
+        @tag_set_presenter ||= TagSetPresenter.new(related_tags)
       end
 
       def tag_list_html(**options)

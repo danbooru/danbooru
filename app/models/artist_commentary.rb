@@ -31,9 +31,7 @@ class ArtistCommentary < ApplicationRecord
     end
 
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :original_title, :original_description, :translated_title, :translated_description)
+      q = search_attributes(params, :id, :created_at, :updated_at, :original_title, :original_description, :translated_title, :translated_description, :post)
 
       if params[:text_matches].present?
         q = q.text_matches(params[:text_matches])
@@ -145,10 +143,6 @@ class ArtistCommentary < ApplicationRecord
 
   extend SearchMethods
   include VersionMethods
-
-  def self.searchable_includes
-    [:post]
-  end
 
   def self.available_includes
     [:post]

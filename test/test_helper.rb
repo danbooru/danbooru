@@ -26,15 +26,18 @@ class ActiveSupport::TestCase
   include DownloadTestHelper
   include IqdbTestHelper
   include UploadTestHelper
+  extend StripeTestHelper
 
   mock_post_version_service!
   mock_pool_version_service!
 
-  parallelize
-  parallelize_setup do |worker|
-    Rails.application.load_seed
+  unless Danbooru.config.debug_mode
+    parallelize
+    parallelize_setup do |worker|
+      Rails.application.load_seed
 
-    SimpleCov.command_name "#{SimpleCov.command_name}-#{worker}"
+      SimpleCov.command_name "#{SimpleCov.command_name}-#{worker}"
+    end
   end
 
   parallelize_teardown do |worker|

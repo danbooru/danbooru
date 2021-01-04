@@ -2,9 +2,19 @@
   <div id="a-index">
     <h1>IP Bans</h1>
 
+    <%= search_form_for(ip_bans_path) do |f| %>
+      <%= f.input :ip_addr, label: "IP Addr", hint: "Use /24 for subnet", input_html: { value: params[:search][:ip_addr] } %>
+      <%= f.input :reason, input_html: { value: params[:search][:reason] } %>
+      <%= f.input :creator_name, label: "Creator", input_html: { value: params[:search][:creator_name], "data-autocomplete": "user" } %>
+      <%= f.input :category, collection: IpBan.categories, include_blank: true, selected: params[:search][:category] %>
+      <%= f.input :is_deleted, label: "Status", collection: [["Active", "false"], ["Deleted", "true"]], include_blank: true, selected: params[:search][:is_deleted] %>
+      <%= f.input :order, collection: [%w[Newest created_at], %w[Oldest created_at_asc], %w[Last\ Seen last_hit_at]], include_blank: true, selected: params[:search][:order] %>
+      <%= f.submit "Search" %>
+    <% end %>
+
     <%= table_for @ip_bans, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "IP Address" do |ip_ban| %>
-        <%= link_to_ip ip_ban.subnetted_ip %>
+        <%= link_to ip_ban.subnetted_ip, ip_address_path(ip_ban.ip_addr.to_s) %>
       <% end %>
       <% t.column :reason, td: { class: "col-expand" } %>
       <% t.column "Status" do |ip_ban| %>
@@ -25,7 +35,6 @@
         <div><%= time_ago_in_words_tagged(ip_ban.created_at) %></div>
       <% end %>
       <% t.column column: "control" do |ip_ban| %>
-        <%= link_to "Details", ip_address_path(ip_ban.ip_addr.to_s) %> |
         <% if ip_ban.is_deleted? %>
           <%= link_to "Undelete", ip_ban_path(ip_ban), remote: true, method: :put, "data-params": "ip_ban[is_deleted]=false", "data-confirm": "Are you sure you want to undelete this IP ban?" %>
         <% else %>

@@ -1,4 +1,6 @@
 class Tag < ApplicationRecord
+  ABBREVIATION_REGEXP = /([a-z0-9])[a-z0-9']*($|[^a-z0-9']+)/
+
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :artist, :foreign_key => "name", :primary_key => "name"
   has_one :antecedent_alias, -> {active}, :class_name => "TagAlias", :foreign_key => "antecedent_name", :primary_key => "name"
@@ -125,18 +127,6 @@ class Tag < ApplicationRecord
         Tag.where(name: tag_name).pick(:category).to_i
       end
 
-      def category_for(tag_name, options = {})
-        return Tag.categories.general if tag_name.blank?
-
-        if options[:disable_caching]
-          select_category_for(tag_name)
-        else
-          Cache.get("tc:#{Cache.hash(tag_name)}") do
-            select_category_for(tag_name)
-          end
-        end
-      end
-
       def categories_for(tag_names, options = {})
         if options[:disable_caching]
           Array(tag_names).inject({}) do |hash, tag_name|
@@ -232,16 +222,19 @@ class Tag < ApplicationRecord
   end
 
   module SearchMethods
+    def autocorrect_matches(name)
+      tags = fuzzy_name_matches(name).order_similarity(name)
+    end
+
     # ref: https://www.postgresql.org/docs/current/static/pgtrgm.html#idm46428634524336
     def order_similarity(name)
-      # trunc(3 * sim) reduces the similarity score from a range of 0.0 -> 1.0 to just 0, 1, or 2.
-      # This groups tags first by approximate similarity, then by largest tags within groups of similar tags.
-      order(Arel.sql("trunc(3 * similarity(name, #{connection.quote(name)})) DESC"), "post_count DESC", "name DESC")
+      order(Arel.sql("levenshtein(left(name, 255), #{connection.quote(name)}), tags.post_count DESC, tags.name ASC"))
     end
 
     # ref: https://www.postgresql.org/docs/current/static/pgtrgm.html#idm46428634524336
     def fuzzy_name_matches(name)
-      where("tags.name % ?", name)
+      max_distance = [name.size / 4, 3].max.floor.to_i
+      where("tags.name % ?", name).where("levenshtein(left(name, 255), ?) < ?", name, max_distance)
     end
 
     def name_matches(name)
@@ -249,21 +242,29 @@ class Tag < ApplicationRecord
     end
 
     def alias_matches(name)
-      where(name: TagAlias.active.where_ilike(:antecedent_name, normalize_name(name)).select(:consequent_name))
+      where(name: TagAlias.active.where_like(:antecedent_name, normalize_name(name)).select(:consequent_name))
     end
 
     def name_or_alias_matches(name)
       name_matches(name).or(alias_matches(name))
     end
 
-    def wildcard_matches(tag, limit: 25)
-      nonempty.name_matches(tag).order(post_count: :desc, name: :asc).limit(limit).pluck(:name)
+    def wildcard_matches(tag)
+      nonempty.name_matches(tag).order(post_count: :desc, name: :asc)
+    end
+
+    def abbreviation_matches(abbrev)
+      abbrev = abbrev.delete_prefix("/")
+      where("regexp_replace(tags.name, ?, '\\1', 'g') LIKE ?", ABBREVIATION_REGEXP.source, abbrev.to_escaped_for_sql_like)
+    end
+
+    def find_by_abbreviation(abbrev)
+      abbrev = abbrev.delete_prefix("/")
+      abbreviation_matches(abbrev.escape_wildcards).order(post_count: :desc).first
     end
 
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :is_locked, :category, :post_count, :name)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_locked, :category, :post_count, :name, :wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications, :dtext_links)
 
       if params[:fuzzy_name_matches].present?
         q = q.fuzzy_name_matches(params[:fuzzy_name_matches])
@@ -352,12 +353,20 @@ class Tag < ApplicationRecord
     Post.system_tag_match(name)
   end
 
-  def self.model_restriction(table)
-    super.where(table[:post_count].gt(0))
+  def abbreviation
+    name.gsub(ABBREVIATION_REGEXP, "\\1")
   end
 
-  def self.searchable_includes
-    [:wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications, :dtext_links]
+  def tag_alias_for_pattern(pattern)
+    return nil if pattern.blank?
+
+    consequent_aliases.find do |tag_alias|
+      !name.ilike?(pattern) && tag_alias.antecedent_name.ilike?(pattern)
+    end
+  end
+
+  def self.model_restriction(table)
+    super.where(table[:post_count].gt(0))
   end
 
   def self.available_includes

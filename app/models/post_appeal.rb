@@ -17,8 +17,7 @@ class PostAppeal < ApplicationRecord
 
   module SearchMethods
     def search(params)
-      q = super
-      q = q.search_attributes(params, :reason, :status)
+      q = search_attributes(params, :id, :created_at, :updated_at, :reason, :status, :creator, :post)
       q = q.text_attribute_matches(:reason, params[:reason_matches])
 
       q.apply_default_order(params)
@@ -28,15 +27,11 @@ class PostAppeal < ApplicationRecord
   extend SearchMethods
 
   def validate_creator_is_not_limited
-    errors[:creator] << "have reached your appeal limit" if creator.is_appeal_limited?
+    errors.add(:creator, "have reached your appeal limit") if creator.is_appeal_limited?
   end
 
   def validate_post_is_appealable
-    errors[:post] << "cannot be appealed" if post.is_status_locked? || !post.is_appealable?
-  end
-
-  def self.searchable_includes
-    [:creator, :post]
+    errors.add(:post, "cannot be appealed") if post.is_status_locked? || !post.is_appealable?
   end
 
   def self.available_includes

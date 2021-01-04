@@ -7,7 +7,15 @@ class TagAlias < TagRelationship
   def self.to_aliased(names)
     names = Array(names).map(&:to_s)
     return [] if names.empty?
+
     aliases = active.where(antecedent_name: names).map { |ta| [ta.antecedent_name, ta.consequent_name] }.to_h
+
+    abbreviations = names.select { |name| name.starts_with?("/") && !aliases.has_key?(name) }
+    abbreviations.each do |abbrev|
+      tag = Tag.nonempty.find_by_abbreviation(abbrev)
+      aliases[abbrev] = tag.name if tag.present?
+    end
+
     names.map { |name| aliases[name] || name }
   end
 
@@ -23,7 +31,7 @@ class TagAlias < TagRelationship
 
     tag_alias = TagAlias.active.find_by(antecedent_name: consequent_name)
     if tag_alias.present? && tag_alias.consequent_name != antecedent_name
-      errors[:base] << "#{tag_alias.antecedent_name} is already aliased to #{tag_alias.consequent_name}"
+      errors.add(:base, "#{tag_alias.antecedent_name} is already aliased to #{tag_alias.consequent_name}")
     end
   end
 

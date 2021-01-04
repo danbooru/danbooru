@@ -1,5 +1,11 @@
 class BulkUpdateRequestProcessor
+  # Maximum tag size allowed by the rename command before an alias must be used.
   MAXIMUM_RENAME_COUNT = 200
+
+  # Maximum size of artist tags movable by builders.
+  MAXIMUM_BUILDER_MOVE_COUNT = 200
+
+  # Maximum number of lines a BUR may have.
   MAXIMUM_SCRIPT_LENGTH = 100
 
   include ActiveModel::Validations
@@ -55,20 +61,20 @@ class BulkUpdateRequestProcessor
           tag_alias = TagAlias.new(creator: User.system, antecedent_name: args[0], consequent_name: args[1])
           tag_alias.save(context: validation_context)
           if tag_alias.errors.present?
-            errors[:base] << "Can't create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name} (#{tag_alias.errors.full_messages.join("; ")})"
+            errors.add(:base, "Can't create alias #{tag_alias.antecedent_name} -> #{tag_alias.consequent_name} (#{tag_alias.errors.full_messages.join("; ")})")
           end
 
         when :create_implication
           tag_implication = TagImplication.new(creator: User.system, antecedent_name: args[0], consequent_name: args[1], status: "active")
           tag_implication.save(context: validation_context)
           if tag_implication.errors.present?
-            errors[:base] << "Can't create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name} (#{tag_implication.errors.full_messages.join("; ")})"
+            errors.add(:base, "Can't create implication #{tag_implication.antecedent_name} -> #{tag_implication.consequent_name} (#{tag_implication.errors.full_messages.join("; ")})")
           end
 
         when :remove_alias
           tag_alias = TagAlias.active.find_by(antecedent_name: args[0], consequent_name: args[1])
           if tag_alias.nil?
-            errors[:base] << "Can't remove alias #{args[0]} -> #{args[1]} (alias doesn't exist)"
+            errors.add(:base, "Can't remove alias #{args[0]} -> #{args[1]} (alias doesn't exist)")
           else
             tag_alias.update(status: "deleted")
           end
@@ -76,7 +82,7 @@ class BulkUpdateRequestProcessor
         when :remove_implication
           tag_implication = TagImplication.active.find_by(antecedent_name: args[0], consequent_name: args[1])
           if tag_implication.nil?
-            errors[:base] << "Can't remove implication #{args[0]} -> #{args[1]} (implication doesn't exist)"
+            errors.add(:base, "Can't remove implication #{args[0]} -> #{args[1]} (implication doesn't exist)")
           else
             tag_implication.update(status: "deleted")
           end
@@ -84,22 +90,22 @@ class BulkUpdateRequestProcessor
         when :change_category
           tag = Tag.find_by_name(args[0])
           if tag.nil?
-            errors[:base] << "Can't change category #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)"
+            errors.add(:base, "Can't change category #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)")
           end
 
         when :rename
           tag = Tag.find_by_name(args[0])
           if tag.nil?
-            errors[:base] << "Can't rename #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)"
+            errors.add(:base, "Can't rename #{args[0]} -> #{args[1]} (the '#{args[0]}' tag doesn't exist)")
           elsif tag.post_count > MAXIMUM_RENAME_COUNT
-            errors[:base] << "Can't rename #{args[0]} -> #{args[1]} ('#{args[0]}' has more than #{MAXIMUM_RENAME_COUNT} posts, use an alias instead)"
+            errors.add(:base, "Can't rename #{args[0]} -> #{args[1]} ('#{args[0]}' has more than #{MAXIMUM_RENAME_COUNT} posts, use an alias instead)")
           end
 
         when :mass_update, :nuke
           # okay
 
         when :invalid_line
-          errors[:base] << "Invalid line: #{args[0]}"
+          errors.add(:base, "Invalid line: #{args[0]}")
 
         else
           # should never happen
@@ -113,7 +119,7 @@ class BulkUpdateRequestProcessor
 
   def validate_script_length
     if commands.size > MAXIMUM_SCRIPT_LENGTH
-      errors[:base] << "Bulk update request is too long (maximum size: #{MAXIMUM_SCRIPT_LENGTH} lines). Split your request into smaller chunks and try again."
+      errors.add(:base, "Bulk update request is too long (maximum size: #{MAXIMUM_SCRIPT_LENGTH} lines). Split your request into smaller chunks and try again.")
     end
   end
 
@@ -212,11 +218,18 @@ class BulkUpdateRequestProcessor
     end.join("\n")
   end
 
+  # Tag move is allowed if:
+  #
+  # * The antecedent tag is an artist tag.
+  # * The consequent_tag is a nonexistent tag, an empty tag (of any type), or an artist tag.
+  # * Both tags have less than 200 posts.
   def self.is_tag_move_allowed?(antecedent_name, consequent_name)
     antecedent_tag = Tag.find_by_name(Tag.normalize_name(antecedent_name))
     consequent_tag = Tag.find_by_name(Tag.normalize_name(consequent_name))
 
-    (antecedent_tag.blank? || antecedent_tag.empty? || (antecedent_tag.artist? && antecedent_tag.post_count <= 100)) &&
-    (consequent_tag.blank? || consequent_tag.empty? || (consequent_tag.artist? && consequent_tag.post_count <= 100))
+    antecedent_allowed = antecedent_tag.present? && antecedent_tag.artist? && antecedent_tag.post_count < MAXIMUM_BUILDER_MOVE_COUNT
+    consequent_allowed = consequent_tag.nil? || consequent_tag.empty? || (consequent_tag.artist? && consequent_tag.post_count < MAXIMUM_BUILDER_MOVE_COUNT)
+
+    antecedent_allowed && consequent_allowed
   end
 end

@@ -13,8 +13,10 @@
         <% end %>
       <% end %>
       <% t.column "Other Names", td: {class: "col-expand"} do |artist| %>
-        <% artist.other_names.each do |name| %>
-          <%= link_to name, artists_path(search: { any_name_matches: name }), class: "artist-other-name", rel: "nofollow" %>
+        <% unless artist.is_banned? && !policy(artist).can_view_banned? %>
+          <% artist.other_names.each do |name| %>
+            <%= link_to name, artists_path(search: { any_name_matches: name }), class: "artist-other-name", rel: "nofollow" %>
+          <% end %>
         <% end %>
       <% end %>
       <% t.column "Status" do |artist| %>

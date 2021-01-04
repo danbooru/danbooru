@@ -31,9 +31,7 @@ class BulkUpdateRequest < ApplicationRecord
     end
 
     def search(params = {})
-      q = super
-
-      q = q.search_attributes(params, :script, :tags)
+      q = search_attributes(params, :id, :created_at, :updated_at, :script, :tags, :user, :forum_topic, :forum_post, :approver)
       q = q.text_attribute_matches(:script, params[:script_matches])
 
       if params[:status].present?
@@ -91,13 +89,13 @@ class BulkUpdateRequest < ApplicationRecord
     end
 
     def bulk_update_request_link
-      %{"bulk update request ##{id}":/bulk_update_requests?search%5Bid%5D=#{id}}
+      %{"bulk update request ##{id}":#{Routes.bulk_update_requests_path(search: { id: id })}}
     end
   end
 
   def validate_script
     if processor.invalid?(:request)
-      errors[:base] << processor.errors.full_messages.join("; ")
+      errors.add(:base, processor.errors.full_messages.join("; "))
     end
   end
 
@@ -126,10 +124,6 @@ class BulkUpdateRequest < ApplicationRecord
 
   def is_rejected?
     status == "rejected"
-  end
-
-  def self.searchable_includes
-    [:user, :forum_topic, :forum_post, :approver]
   end
 
   def self.available_includes

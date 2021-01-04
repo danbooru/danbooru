@@ -6,12 +6,6 @@ class SavedSearchesController < ApplicationController
     respond_with(@saved_searches)
   end
 
-  def labels
-    authorize SavedSearch
-    @labels = SavedSearch.search_labels(CurrentUser.id, params[:search]).take(params[:limit].to_i || 10)
-    respond_with(@labels)
-  end
-
   def create
     @saved_search = authorize SavedSearch.new(user: CurrentUser.user, **permitted_attributes(SavedSearch))
     @saved_search.save

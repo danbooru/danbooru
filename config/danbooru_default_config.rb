@@ -46,12 +46,40 @@ module Danbooru
       "DanbooruBot"
     end
 
+    # The name of the cookie that stores the current user's login session.
+    # Changing this will force all users to login again.
+    def session_cookie_name
+      "_danbooru2_session"
+    end
+
+    # Debug mode does some things to make testing easier. It disables parallel
+    # testing and it replaces Danbooru's custom exception page with the default
+    # Rails exception page. This is only useful during development and testing.
+    #
+    # Usage: `DANBOORU_DEBUG_MODE=true bin/rails test
+    def debug_mode
+      false
+    end
+
     def source_code_url
       "https://github.com/danbooru/danbooru"
     end
 
     def issues_url
       "#{source_code_url}/issues"
+    end
+
+    # If true, new accounts will require email verification if they seem
+    # suspicious (they were created using a proxy, multiple accounts were
+    # created by the same IP, etc).
+    #
+    # This doesn't apply to personal or development installs running on
+    # localhost or the local network.
+    #
+    # Disable this if you're running a public booru and you don't want email
+    # verification for new accounts.
+    def new_user_verification?
+      true
     end
 
     # An array of regexes containing disallowed usernames.
@@ -77,11 +105,6 @@ module Danbooru
     # Members cannot post more than X comments in an hour.
     def member_comment_limit
       2
-    end
-
-    # Users cannot search for more than X regular tags at a time.
-    def base_tag_query_limit
-      6
     end
 
     # After this many pages, the paginator will switch to sequential mode.
@@ -266,6 +289,11 @@ module Danbooru
       restricted_tags + %w[censored condom nipples nude penis pussy sexually_suggestive]
     end
 
+    # If present, the 404 page will show a random post from this pool.
+    def page_not_found_pool_id
+      nil
+    end
+
     # Tags that are only visible to Gold+ users.
     def restricted_tags
       []
@@ -337,6 +365,30 @@ module Danbooru
     end
 
     def stripe_publishable_key
+    end
+
+    def stripe_webhook_secret
+    end
+
+    def stripe_gold_usd_price_id
+    end
+
+    def stripe_platinum_usd_price_id
+    end
+
+    def stripe_gold_to_platinum_usd_price_id
+    end
+
+    def stripe_gold_eur_price_id
+    end
+
+    def stripe_platinum_eur_price_id
+    end
+
+    def stripe_gold_to_platinum_eur_price_id
+    end
+
+    def stripe_promotion_discount_id
     end
 
     def twitter_api_key

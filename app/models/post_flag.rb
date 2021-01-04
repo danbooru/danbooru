@@ -56,9 +56,7 @@ class PostFlag < ApplicationRecord
     end
 
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :reason, :status)
+      q = search_attributes(params, :id, :created_at, :updated_at, :reason, :status, :post)
       q = q.text_attribute_matches(:reason, params[:reason_matches])
 
       if params[:creator_id].present?
@@ -95,26 +93,22 @@ class PostFlag < ApplicationRecord
   end
 
   def validate_creator_is_not_limited
-    errors[:creator] << "have reached your flag limit" if creator.is_flag_limited? && !is_deletion
+    errors.add(:creator, "have reached your flag limit") if creator.is_flag_limited? && !is_deletion
   end
 
   def validate_post
-    errors[:post] << "is pending and cannot be flagged" if post.is_pending? && !is_deletion
-    errors[:post] << "is deleted and cannot be flagged" if post.is_deleted? && !is_deletion
-    errors[:post] << "is locked and cannot be flagged" if post.is_status_locked?
+    errors.add(:post, "is pending and cannot be flagged") if post.is_pending? && !is_deletion
+    errors.add(:post, "is deleted and cannot be flagged") if post.is_deleted? && !is_deletion
+    errors.add(:post, "is locked and cannot be flagged") if post.is_status_locked?
 
     flag = post.flags.in_cooldown.last
     if !is_deletion && flag.present?
-      errors[:post] << "cannot be flagged more than once every #{Danbooru.config.moderation_period.inspect} (last flagged: #{flag.created_at.to_s(:long)})"
+      errors.add(:post, "cannot be flagged more than once every #{Danbooru.config.moderation_period.inspect} (last flagged: #{flag.created_at.to_s(:long)})")
     end
   end
 
   def uploader_id
     post.uploader_id
-  end
-
-  def self.searchable_includes
-    [:post]
   end
 
   def self.available_includes

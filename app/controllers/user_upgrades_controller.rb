@@ -1,64 +1,59 @@
 class UserUpgradesController < ApplicationController
-  helper_method :user
-  skip_before_action :verify_authenticity_token, only: [:create]
+  respond_to :js, :html, :json, :xml
 
   def create
-    if params[:stripeToken]
-      create_stripe
-    end
+    @user_upgrade = authorize UserUpgrade.create(recipient: recipient, purchaser: CurrentUser.user, status: "pending", upgrade_type: params[:upgrade_type])
+    @country = params[:country] || CurrentUser.country || "US"
+    @allow_promotion_codes = params[:promo].to_s.truthy?
+    @checkout = @user_upgrade.create_checkout!(country: @country, allow_promotion_codes: @allow_promotion_codes)
+
+    respond_with(@user_upgrade)
   end
 
   def new
+    @user_upgrade = authorize UserUpgrade.new(recipient: recipient, purchaser: CurrentUser.user)
+    @recipient = @user_upgrade.recipient
+
+    respond_with(@user_upgrade)
+  end
+
+  def index
+    @user_upgrades = authorize UserUpgrade.visible(CurrentUser.user).paginated_search(params, count_pages: true)
+    @user_upgrades = @user_upgrades.includes(:recipient, :purchaser) if request.format.html?
+
+    respond_with(@user_upgrades)
   end
 
   def show
-    authorize User, :upgrade?
+    @user_upgrade = authorize UserUpgrade.find(params[:id])
+    respond_with(@user_upgrade)
   end
 
-  def user
-    if params[:user_id]
-      User.find(params[:user_id])
-    else
-      CurrentUser.user
-    end
+  def refund
+    @user_upgrade = authorize UserUpgrade.find(params[:id])
+    @user_upgrade.refund!
+    flash[:notice] = "Upgrade refunded"
+
+    respond_with(@user_upgrade)
+  end
+
+  def receipt
+    @user_upgrade = authorize UserUpgrade.find(params[:id])
+    redirect_to @user_upgrade.receipt_url
+  end
+
+  def payment
+    @user_upgrade = authorize UserUpgrade.find(params[:id])
+    redirect_to @user_upgrade.payment_url
   end
 
   private
 
-  def create_stripe
-    @user = user
-
-    if params[:desc] == "Upgrade to Gold"
-      level = User::Levels::GOLD
-      cost = UserUpgrade.gold_price
-    elsif params[:desc] == "Upgrade to Platinum"
-      level = User::Levels::PLATINUM
-      cost = UserUpgrade.platinum_price
-    elsif params[:desc] == "Upgrade Gold to Platinum" && @user.level == User::Levels::GOLD
-      level = User::Levels::PLATINUM
-      cost = UserUpgrade.upgrade_price
+  def recipient
+    if params[:user_id]
+      User.find(params[:user_id])
     else
-      raise "Invalid desc"
-    end
-
-    begin
-      charge = Stripe::Charge.create(
-        :amount => cost,
-        :currency => "usd",
-        :card => params[:stripeToken],
-        :description => params[:desc]
-      )
-      @user.promote_to!(level, is_upgrade: true)
-      flash[:success] = true
-    rescue Stripe::CardError => e
-      DanbooruLogger.log(e)
-      flash[:error] = e.message
-    end
-
-    if @user == CurrentUser.user
-      redirect_to user_upgrade_path
-    else
-      redirect_to user_upgrade_path(user_id: params[:user_id])
+      CurrentUser.user
     end
   end
 end

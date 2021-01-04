@@ -1,0 +1,2 @@
+<%# post %>
+<%= safe_join(post.visible_favorited_users(CurrentUser.user).map { |user| link_to_user(user) }, ", ") %>

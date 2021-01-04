@@ -109,13 +109,6 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_response 404
       end
 
-      should "render for a negated tag" do
-        as(@user) { @wiki_page.update(title: "-aaa") }
-
-        get wiki_page_path(@wiki_page.id)
-        assert_redirected_to wiki_page_path(@wiki_page.title)
-      end
-
       should "work for a title containing dots" do
         as(@user) { create(:wiki_page, title: "...") }
 

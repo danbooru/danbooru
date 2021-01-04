@@ -30,6 +30,14 @@ div#c-users {
       p {
         margin-bottom: 0.5em;
       }
+
+      .user-verified-email-icon {
+        color: var(--user-verified-email-color);
+      }
+
+      .user-unverified-email-icon {
+        color: var(--user-unverified-email-color);
+      }
     }
   }
 

@@ -13,9 +13,9 @@
         </tr>
       </thead>
       <tbody>
-        <% @searches.each do |tags, count| %>
-          <tr class="tag-type-<%= Tag.category_for(tags) %>">
-            <td><%= link_to tags, posts_path(:tags => tags) %></td>
+        <% @searches.each do |search, count| %>
+          <tr class="tag-type-<%= Tag.find_by_name(search)&.category.to_i %>">
+            <td><%= link_to search, posts_path(tags: search) %></td>
             <td style="text-align: right;"><%= count.to_i %></td>
           </tr>
         <% end %>

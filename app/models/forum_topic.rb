@@ -86,8 +86,7 @@ class ForumTopic < ApplicationRecord
     end
 
     def search(params)
-      q = super
-      q = q.search_attributes(params, :is_sticky, :is_locked, :is_deleted, :category_id, :title, :response_count)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_sticky, :is_locked, :is_deleted, :category_id, :title, :response_count, :creator, :updater, :forum_posts, :bulk_update_requests, :tag_aliases, :tag_implications)
       q = q.text_attribute_matches(:title, params[:title_matches], index_column: :text_index)
 
       if params[:is_private].to_s.truthy?
@@ -188,10 +187,6 @@ class ForumTopic < ApplicationRecord
 
   def pretty_title
     title.gsub(/\A\[APPROVED\]|\[REJECTED\]/, "")
-  end
-
-  def self.searchable_includes
-    [:creator, :updater, :forum_posts, :bulk_update_requests, :tag_aliases, :tag_implications]
   end
 
   def self.available_includes

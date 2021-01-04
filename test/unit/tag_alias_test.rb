@@ -79,6 +79,18 @@ class TagAliasTest < ActiveSupport::TestCase
       assert_equal(["bbb", "bbb"], TagAlias.to_aliased(["aaa", "aaa"]))
     end
 
+    should "handle abbreviations in TagAlias.to_aliased" do
+      create(:tag, name: "hair_ribbon", post_count: 300_000)
+      create(:tag, name: "hakurei_reimu", post_count: 50_000)
+      create(:tag, name: "kirisama_marisa", post_count: 50_000)
+      create(:tag, name: "kaname_madoka", post_count: 20_000)
+      create(:tag_alias, antecedent_name: "/hr", consequent_name: "hakurei_reimu")
+
+      assert_equal(["hakurei_reimu"], TagAlias.to_aliased(["/hr"]))
+      assert_equal(["kirisama_marisa"], TagAlias.to_aliased(["/km"]))
+      assert_equal(["hakurei_reimu", "kirisama_marisa"], TagAlias.to_aliased(["/hr", "/km"]))
+    end
+
     context "saved searches" do
       should "move saved searches" do
         @ss1 = create(:saved_search, query: "123 ... 456", user: CurrentUser.user)

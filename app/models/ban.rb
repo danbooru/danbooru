@@ -20,9 +20,7 @@ class Ban < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-
-    q = q.search_attributes(params, :expires_at, :reason)
+    q = search_attributes(params, :id, :created_at, :updated_at, :expires_at, :reason, :user, :banner)
     q = q.text_attribute_matches(:reason, params[:reason_matches])
 
     q = q.expired if params[:expired].to_s.truthy?
@@ -45,7 +43,7 @@ class Ban < ApplicationRecord
   end
 
   def validate_user_is_bannable
-    self.errors[:user] << "is already banned" if user.is_banned?
+    errors.add(:user, "is already banned") if user.is_banned?
   end
 
   def update_user_on_create
@@ -87,10 +85,6 @@ class Ban < ApplicationRecord
 
   def create_unban_mod_action
     ModAction.log(%{Unbanned <@#{user_name}>}, :user_unban)
-  end
-
-  def self.searchable_includes
-    [:user, :banner]
   end
 
   def self.available_includes

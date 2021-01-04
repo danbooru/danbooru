@@ -1,4 +1,8 @@
 body[data-current-user-style-usernames="true"] {
+  a.user-owner {
+    color: var(--user-admin-color);
+  }
+
   a.user-admin {
     color: var(--user-admin-color);
   }

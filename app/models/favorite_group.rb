@@ -26,8 +26,7 @@ class FavoriteGroup < ApplicationRecord
     end
 
     def search(params)
-      q = super
-      q = q.search_attributes(params, :name, :is_public, :post_ids)
+      q = search_attributes(params, :id, :created_at, :updated_at, :name, :is_public, :post_ids, :creator)
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
@@ -56,13 +55,13 @@ class FavoriteGroup < ApplicationRecord
       if !creator.is_platinum?
         error += " Upgrade your account to create more."
       end
-      self.errors.add(:base, error)
+      errors.add(:base, error)
     end
   end
 
   def validate_number_of_posts
     if post_count > 10_000
-      errors[:base] << "Favorite groups can have up to 10,000 posts each"
+      errors.add(:base, "Favorite groups can have up to 10,000 posts each")
     end
   end
 
@@ -72,12 +71,12 @@ class FavoriteGroup < ApplicationRecord
     nonexisting_post_ids = added_post_ids - existing_post_ids
 
     if nonexisting_post_ids.present?
-      errors[:base] << "Cannot add invalid post(s) to favgroup: #{nonexisting_post_ids.to_sentence}"
+      errors.add(:base, "Cannot add invalid post(s) to favgroup: #{nonexisting_post_ids.to_sentence}")
     end
 
     duplicate_post_ids = post_ids.group_by(&:itself).transform_values(&:size).select { |id, count| count > 1 }.keys
     if duplicate_post_ids.present?
-      errors[:base] << "Favgroup already contains post #{duplicate_post_ids.to_sentence}"
+      errors.add(:base, "Favgroup already contains post #{duplicate_post_ids.to_sentence}")
     end
   end
 
@@ -162,10 +161,6 @@ class FavoriteGroup < ApplicationRecord
 
   def contains?(post_id)
     post_ids.include?(post_id)
-  end
-
-  def self.searchable_includes
-    [:creator]
   end
 
   def self.available_includes

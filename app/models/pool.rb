@@ -36,9 +36,7 @@ class Pool < ApplicationRecord
     end
 
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :is_deleted, :name, :description, :post_ids)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :name, :description, :post_ids)
       q = q.text_attribute_matches(:description, params[:description_matches])
 
       if params[:post_tags_match]
@@ -147,7 +145,7 @@ class Pool < ApplicationRecord
 
   def updater_can_edit_deleted
     if is_deleted? && !Pundit.policy!([CurrentUser.user, nil], self).update?
-      errors[:base] << "You cannot update pools that are deleted"
+      errors.add(:base, "You cannot update pools that are deleted")
     end
   end
 
@@ -254,23 +252,23 @@ class Pool < ApplicationRecord
   def validate_name
     case name
     when /\A(any|none|series|collection)\z/i
-      errors[:name] << "cannot be any of the following names: any, none, series, collection"
+      errors.add(:name, "cannot be any of the following names: any, none, series, collection")
     when /,/
-      errors[:name] << "cannot contain commas"
+      errors.add(:name, "cannot contain commas")
     when /\*/
-      errors[:name] << "cannot contain asterisks"
+      errors.add(:name, "cannot contain asterisks")
     when /\A_/
-      errors[:name] << "cannot begin with an underscore"
+      errors.add(:name, "cannot begin with an underscore")
     when /_\z/
-      errors[:name] << "cannot end with an underscore"
+      errors.add(:name, "cannot end with an underscore")
     when /__/
-      errors[:name] << "cannot contain consecutive underscores"
+      errors.add(:name, "cannot contain consecutive underscores")
     when /[^[:graph:]]/
-      errors[:name] << "cannot contain non-printable characters"
+      errors.add(:name, "cannot contain non-printable characters")
     when ""
-      errors[:name] << "cannot be blank"
+      errors.add(:name, "cannot be blank")
     when /\A[0-9]+\z/
-      errors[:name] << "cannot contain only digits"
+      errors.add(:name, "cannot contain only digits")
     end
   end
 end

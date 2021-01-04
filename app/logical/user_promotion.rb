@@ -1,33 +1,27 @@
 class UserPromotion
-  attr_reader :user, :promoter, :new_level, :options, :old_can_approve_posts, :old_can_upload_free
+  attr_reader :user, :promoter, :new_level, :old_can_approve_posts, :old_can_upload_free, :can_upload_free, :can_approve_posts
 
-  def initialize(user, promoter, new_level, options = {})
+  def initialize(user, promoter, new_level, can_upload_free: nil, can_approve_posts: nil)
     @user = user
     @promoter = promoter
-    @new_level = new_level
-    @options = options
+    @new_level = new_level.to_i
+    @can_upload_free = can_upload_free
+    @can_approve_posts = can_approve_posts
   end
 
   def promote!
-    validate
+    validate!
 
     @old_can_approve_posts = user.can_approve_posts?
     @old_can_upload_free = user.can_upload_free?
 
     user.level = new_level
+    user.can_upload_free = can_upload_free unless can_upload_free.nil?
+    user.can_approve_posts = can_approve_posts unless can_approve_posts.nil?
+    user.inviter = promoter
 
-    if options.key?(:can_approve_posts)
-      user.can_approve_posts = options[:can_approve_posts]
-    end
-
-    if options.key?(:can_upload_free)
-      user.can_upload_free = options[:can_upload_free]
-    end
-
-    user.inviter_id = promoter.id
-
-    create_user_feedback unless options[:is_upgrade]
-    create_dmail unless options[:skip_dmail]
+    create_user_feedback
+    create_dmail
     create_mod_actions
 
     user.save
@@ -37,28 +31,28 @@ class UserPromotion
 
   def create_mod_actions
     if old_can_approve_posts != user.can_approve_posts?
-      ModAction.log("\"#{promoter.name}\":/users/#{promoter.id} changed approval privileges for \"#{user.name}\":/users/#{user.id} from #{old_can_approve_posts} to [b]#{user.can_approve_posts?}[/b]", :user_approval_privilege)
+      ModAction.log("\"#{promoter.name}\":#{Routes.user_path(promoter)} changed approval privileges for \"#{user.name}\":#{Routes.user_path(user)} from #{old_can_approve_posts} to [b]#{user.can_approve_posts?}[/b]", :user_approval_privilege, promoter)
     end
 
     if old_can_upload_free != user.can_upload_free?
-      ModAction.log("\"#{promoter.name}\":/users/#{promoter.id} changed unlimited upload privileges for \"#{user.name}\":/users/#{user.id} from #{old_can_upload_free} to [b]#{user.can_upload_free?}[/b]", :user_upload_privilege)
+      ModAction.log("\"#{promoter.name}\":#{Routes.user_path(promoter)} changed unlimited upload privileges for \"#{user.name}\":#{Routes.user_path(user)} from #{old_can_upload_free} to [b]#{user.can_upload_free?}[/b]", :user_upload_privilege, promoter)
     end
 
     if user.level_changed?
-      category = options[:is_upgrade] ? :user_account_upgrade : :user_level_change
-      ModAction.log(%{"#{user.name}":/users/#{user.id} level changed #{user.level_string_was} -> #{user.level_string}}, category)
+      ModAction.log(%{"#{user.name}":#{Routes.user_path(user)} level changed #{user.level_string_was} -> #{user.level_string}}, :user_level_change, promoter)
     end
   end
 
-  def validate
-    # admins can do anything
-    return if promoter.is_admin?
-
-    # can't promote/demote moderators
-    raise User::PrivilegeError if user.is_moderator?
-
-    # can't promote to admin
-    raise User::PrivilegeError if new_level.to_i >= User::Levels::ADMIN
+  def validate!
+    if !promoter.is_moderator?
+      raise User::PrivilegeError, "You can't promote or demote other users"
+    elsif promoter == user
+      raise User::PrivilegeError, "You can't promote or demote yourself"
+    elsif new_level >= promoter.level
+      raise User::PrivilegeError, "You can't promote other users to your rank or above"
+    elsif user.level >= promoter.level
+      raise User::PrivilegeError, "You can't promote or demote other users at your rank or above"
+    end
   end
 
   def build_messages

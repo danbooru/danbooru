@@ -58,7 +58,7 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
         should respond_to_search(name_matches: "hatsune_miku").with { @miku }
         should respond_to_search(name_normalize: "HATSUNE_MIKU  ").with { @miku }
         should respond_to_search(name_or_alias_matches: "miku").with { @miku }
-        should respond_to_search(fuzzy_name_matches: "miku_hatsune", order: "similarity").with { @miku }
+        should respond_to_search(fuzzy_name_matches: "hatsune_mika", order: "similarity").with { @miku }
         should respond_to_search(name: "empty", hide_empty: "true").with { [] }
         should respond_to_search(name: "empty", hide_empty: "false").with { [@empty] }
 
@@ -73,20 +73,6 @@ class TagsControllerTest < ActionDispatch::IntegrationTest
           should respond_to_search(artist: {is_banned: "false"}).with { @wokada }
           should respond_to_search(has_dtext_links: "true").with { @vocaloid }
         end
-      end
-    end
-
-    context "autocomplete action" do
-      should "render" do
-        get autocomplete_tags_path, params: { search: { name_matches: "t" }, format: :json }
-        assert_response :success
-      end
-
-      should "respect the only param" do
-        get autocomplete_tags_path, params: { search: { name_matches: "t", only: "name" }, format: :json }
-
-        assert_response :success
-        assert_equal "touhou", response.parsed_body.first["name"]
       end
     end
 

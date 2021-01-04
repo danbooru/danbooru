@@ -12,13 +12,13 @@ class Upload < ApplicationRecord
 
     def validate_file_ext(record)
       if record.file_ext == "bin"
-        record.errors[:file_ext] << "is invalid (only JPEG, PNG, GIF, SWF, MP4, and WebM files are allowed"
+        record.errors.add(:file_ext, "is invalid (only JPEG, PNG, GIF, SWF, MP4, and WebM files are allowed")
       end
     end
 
     def validate_integrity(record)
       if record.media_file.is_corrupt?
-        record.errors[:file] << "is corrupted"
+        record.errors.add(:file, "is corrupted")
       end
     end
 
@@ -37,24 +37,24 @@ class Upload < ApplicationRecord
         return
       end
 
-      record.errors[:md5] << "duplicate: #{md5_post.id}"
+      record.errors.add(:md5, "duplicate: #{md5_post.id}")
     end
 
     def validate_resolution(record)
       resolution = record.image_width.to_i * record.image_height.to_i
 
       if resolution > Danbooru.config.max_image_resolution
-        record.errors[:base] << "image resolution is too large (resolution: #{(resolution / 1_000_000.0).round(1)} megapixels (#{record.image_width}x#{record.image_height}); max: #{Danbooru.config.max_image_resolution / 1_000_000} megapixels)"
+        record.errors.add(:base, "image resolution is too large (resolution: #{(resolution / 1_000_000.0).round(1)} megapixels (#{record.image_width}x#{record.image_height}); max: #{Danbooru.config.max_image_resolution / 1_000_000} megapixels)")
       elsif record.image_width > Danbooru.config.max_image_width
-        record.errors[:image_width] << "is too large (width: #{record.image_width}; max width: #{Danbooru.config.max_image_width})"
+        record.errors.add(:image_width, "is too large (width: #{record.image_width}; max width: #{Danbooru.config.max_image_width})")
       elsif record.image_height > Danbooru.config.max_image_height
-        record.errors[:image_height] << "is too large (height: #{record.image_height}; max height: #{Danbooru.config.max_image_height})"
+        record.errors.add(:image_height, "is too large (height: #{record.image_height}; max height: #{Danbooru.config.max_image_height})")
       end
     end
 
     def validate_video_duration(record)
       if !record.uploader.is_admin? && record.media_file.is_video? && record.media_file.duration > 120
-        record.errors[:base] << "video must not be longer than 2 minutes"
+        record.errors.add(:base, "video must not be longer than 2 minutes")
       end
     end
   end
@@ -182,9 +182,7 @@ class Upload < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-
-    q = q.search_attributes(params, :source, :rating, :parent_id, :server, :md5, :server, :file_ext, :file_size, :image_width, :image_height, :referer_url)
+    q = search_attributes(params, :id, :created_at, :updated_at, :source, :rating, :parent_id, :server, :md5, :server, :file_ext, :file_size, :image_width, :image_height, :referer_url, :uploader, :post)
 
     if params[:source_matches].present?
       q = q.where_like(:source, params[:source_matches])
@@ -223,10 +221,6 @@ class Upload < ApplicationRecord
 
   def has_commentary?
     artist_commentary_title.present? || artist_commentary_desc.present? || translated_commentary_title.present? || translated_commentary_desc.present?
-  end
-
-  def self.searchable_includes
-    [:uploader, :post]
   end
 
   def self.available_includes

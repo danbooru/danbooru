@@ -21,14 +21,12 @@ class Comment < ApplicationRecord
   mentionable(
     :message_field => :body,
     :title => ->(user_name) {"#{creator.name} mentioned you in a comment on post ##{post_id}"},
-    :body => ->(user_name) {"@#{creator.name} mentioned you in a \"comment\":/posts/#{post_id}#comment-#{id} on post ##{post_id}:\n\n[quote]\n#{DText.extract_mention(body, "@" + user_name)}\n[/quote]\n"}
+    :body => ->(user_name) {"@#{creator.name} mentioned you in a \"comment\":#{Routes.post_path(post, anchor: "comment-#{id}")} on post ##{post_id}:\n\n[quote]\n#{DText.extract_mention(body, "@" + user_name)}\n[/quote]\n"}
   )
 
   module SearchMethods
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :is_deleted, :is_sticky, :do_not_bump_post, :body, :score)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :is_sticky, :do_not_bump_post, :body, :score, :post, :creator, :updater)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index)
 
       case params[:order]
@@ -137,10 +135,6 @@ class Comment < ApplicationRecord
 
   def quoted_response
     DText.quote(body, creator.name)
-  end
-
-  def self.searchable_includes
-    [:post, :creator, :updater]
   end
 
   def self.available_includes

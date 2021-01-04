@@ -7,7 +7,7 @@ class UserFeedbackTest < ActiveSupport::TestCase
       gold = FactoryBot.create(:gold_user)
       member = FactoryBot.create(:user)
       dmail = <<~EOS.chomp
-        @#{gold.name} created a "positive record":/user_feedbacks?search[user_id]=#{user.id} for your account:
+        @#{gold.name} created a "positive record":/user_feedbacks?search%5Buser_id%5D=#{user.id} for your account:
 
         good job!
       EOS

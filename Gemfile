@@ -40,7 +40,8 @@ gem 'puma'
 gem 'scenic'
 gem 'ipaddress_2'
 gem 'http'
-gem 'activerecord-hierarchical_query'
+gem 'activerecord-hierarchical_query', git: "https://github.com/walski/activerecord-hierarchical_query", branch: "rails-6-1"
+gem 'http-cookie', git: "https://github.com/danbooru/http-cookie"
 gem 'pundit'
 gem 'mail'
 gem 'nokogiri'
@@ -59,7 +60,7 @@ end
 group :development do
   gem 'rubocop'
   gem 'rubocop-rails'
-  gem 'meta_request'
+  # gem 'meta_request' # hangs on Rails 6.1
   gem 'rack-mini-profiler'
   gem 'stackprof'
   gem 'flamegraph'
@@ -85,4 +86,5 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
   gem "codecov", require: false
+  gem 'stripe-ruby-mock', require: "stripe_mock"
 end

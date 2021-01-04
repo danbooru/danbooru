@@ -3,7 +3,7 @@ import Cookie from './cookie'
 $(function() {
   $("#hide-upgrade-account-notice").on("click.danbooru", function(e) {
     $("#upgrade-account-notice").hide();
-    Cookie.put('hide_upgrade_account_notice', '1', 7);
+    Cookie.put('hide_upgrade_account_notice', '1', 7 * 24 * 60 * 60);
     e.preventDefault();
   });
 
@@ -17,7 +17,7 @@ $(function() {
 
   $("#hide-verify-account-notice").on("click.danbooru", function(e) {
     $("#verify-account-notice").hide();
-    Cookie.put('hide_verify_account_notice', '1', 3);
+    Cookie.put('hide_verify_account_notice', '1', 3 * 24 * 60 * 60);
     e.preventDefault();
   });
 

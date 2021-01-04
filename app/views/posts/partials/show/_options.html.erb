@@ -23,10 +23,10 @@
 
   <% if policy(Favorite).create? %>
     <li id="post-option-add-to-favorites">
-      <%= link_to "Favorite", favorites_path(post_id: post.id), remote: true, method: :post, id: "add-to-favorites", "data-shortcut": "f", style: ("display: none;" if @post.is_favorited?) %>
+      <%= link_to "Favorite", favorites_path(post_id: post.id), remote: true, method: :post, id: "add-to-favorites", "data-shortcut": "f", style: ("display: none;" if @post.favorited_by?(CurrentUser.user)) %>
     </li>
     <li id="post-option-remove-from-favorites">
-      <%= link_to "Unfavorite", favorite_path(post), remote: true, method: :delete, id: "remove-from-favorites", "data-shortcut": "shift+f", "data-shortcut-when": ":visible", style: ("display: none;" if !@post.is_favorited?) %>
+      <%= link_to "Unfavorite", favorite_path(post), remote: true, method: :delete, id: "remove-from-favorites", "data-shortcut": "shift+f", "data-shortcut-when": ":visible", style: ("display: none;" if !@post.favorited_by?(CurrentUser.user)) %>
     </li>
   <% end %>
   <% if policy(post).update? %>

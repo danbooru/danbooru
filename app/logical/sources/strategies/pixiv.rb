@@ -65,15 +65,15 @@ module Sources
 
         text = text.gsub(%r{https?://www\.pixiv\.net/member_illust\.php\?mode=medium&illust_id=([0-9]+)}i) do |_match|
           pixiv_id = $1
-          %(pixiv ##{pixiv_id} "»":[/posts?tags=pixiv:#{pixiv_id}])
+          %(pixiv ##{pixiv_id} "»":[#{Routes.posts_path(tags: "pixiv:#{pixiv_id}")}])
         end
 
         text = text.gsub(%r{https?://www\.pixiv\.net/member\.php\?id=([0-9]+)}i) do |_match|
           member_id = $1
           profile_url = "https://www.pixiv.net/users/#{member_id}"
-          search_params = {"search[url_matches]" => profile_url}.to_param
+          artist_search_url = Routes.artists_path(search: { url_matches: profile_url })
 
-          %("user/#{member_id}":[#{profile_url}] "»":[/artists?#{search_params}])
+          %("user/#{member_id}":[#{profile_url}] "»":[#{artist_search_url}])
         end
 
         text = text.gsub(/\r\n|\r|\n/, "<br>")

@@ -13,16 +13,6 @@ class TagTest < ActiveSupport::TestCase
   end
 
   context "A tag category fetcher" do
-    should "fetch for a single tag" do
-      FactoryBot.create(:artist_tag, :name => "test")
-      assert_equal(Tag.categories.artist, Tag.category_for("test"))
-    end
-
-    should "fetch for a single tag with strange markup" do
-      FactoryBot.create(:artist_tag, :name => "!@$%")
-      assert_equal(Tag.categories.artist, Tag.category_for("!@$%"))
-    end
-
     should "fetch for multiple tags" do
       FactoryBot.create(:artist_tag, :name => "aaa")
       FactoryBot.create(:copyright_tag, :name => "bbb")
@@ -169,6 +159,13 @@ class TagTest < ActiveSupport::TestCase
       should_not allow_value("___").for(:name).on(:create)
       should_not allow_value("~foo").for(:name).on(:create)
       should_not allow_value("-foo").for(:name).on(:create)
+      should_not allow_value("/foo").for(:name).on(:create)
+      should_not allow_value("`foo").for(:name).on(:create)
+      should_not allow_value("%foo").for(:name).on(:create)
+      should_not allow_value(")foo").for(:name).on(:create)
+      should_not allow_value("{foo").for(:name).on(:create)
+      should_not allow_value("}foo").for(:name).on(:create)
+      should_not allow_value("]foo").for(:name).on(:create)
       should_not allow_value("_foo").for(:name).on(:create)
       should_not allow_value("foo_").for(:name).on(:create)
       should_not allow_value("foo__bar").for(:name).on(:create)
@@ -178,6 +175,7 @@ class TagTest < ActiveSupport::TestCase
       should_not allow_value("café").for(:name).on(:create)
       should_not allow_value("東方").for(:name).on(:create)
       should_not allow_value("FAV:blah").for(:name).on(:create)
+      should_not allow_value("X"*171).for(:name).on(:create)
 
       metatags = PostQueryBuilder::METATAGS + TagCategory.mapping.keys
       metatags.each do |metatag|

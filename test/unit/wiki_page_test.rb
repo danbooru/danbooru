@@ -77,5 +77,51 @@ class WikiPageTest < ActiveSupport::TestCase
         assert_equal(0, @wiki_page.dtext_links.size)
       end
     end
+
+    context "the wiki body" do
+      should "be normalized to NFC" do
+        # \u00E9: é; \u0301: acute accent
+        @wiki = create(:wiki_page, body: "Poke\u0301mon")
+        assert_equal("Pok\u00E9mon", @wiki.body)
+      end
+
+      should "normalize line endings and trim spaces" do
+        @wiki = create(:wiki_page, body: " foo\nbar\n")
+        assert_equal("foo\r\nbar", @wiki.body)
+      end
+    end
+
+    context "during title validation" do
+      # these values are allowed because they're normalized first
+      should allow_value(" foo ").for(:title).on(:create)
+      should allow_value("~foo").for(:title).on(:create)
+      should allow_value("_foo").for(:title).on(:create)
+      should allow_value("foo_").for(:title).on(:create)
+      should allow_value("foo__bar").for(:title).on(:create)
+      should allow_value("FOO").for(:title).on(:create)
+      should allow_value("foo bar").for(:title).on(:create)
+
+      should_not allow_value("").for(:title).on(:create)
+      should_not allow_value("___").for(:title).on(:create)
+      should_not allow_value("-foo").for(:title).on(:create)
+      should_not allow_value("/foo").for(:title).on(:create)
+      should_not allow_value("foo*bar").for(:title).on(:create)
+      should_not allow_value("foo,bar").for(:title).on(:create)
+      should_not allow_value("foo\abar").for(:title).on(:create)
+      should_not allow_value("café").for(:title).on(:create)
+      should_not allow_value("東方").for(:title).on(:create)
+      should_not allow_value("FAV:blah").for(:title).on(:create)
+      should_not allow_value("X"*171).for(:title).on(:create)
+    end
+
+    context "with other names" do
+      should "not allow artist wikis to have other names" do
+        tag = create(:artist_tag)
+        wiki = build(:wiki_page, title: tag.name, other_names: ["blah"])
+
+        assert_equal(false, wiki.valid?)
+        assert_equal(["An artist wiki can't have other names"], wiki.errors[:base])
+      end
+    end
   end
 end

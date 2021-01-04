@@ -16,6 +16,7 @@ class DmailPolicy < ApplicationPolicy
   end
 
   def show?
+    return true if user.is_owner?
     user.is_member? && (record.owner_id == user.id || record.valid_key?(request.params[:key]))
   end
 

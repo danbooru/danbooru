@@ -10,7 +10,7 @@
         <%= link_to_wiki "?", tag.name, class: tag_class(tag) %>
         <%= link_to tag.name, posts_path(tags: tag.name), class: tag_class(tag) %>
 
-        <% tag_alias = tag_alias_for_pattern(tag, params[:search][:name_or_alias_matches]) %>
+        <% tag_alias = tag.tag_alias_for_pattern(params[:search][:name_or_alias_matches]) %>
         <% if tag_alias.present? %>
           ← <%= link_to tag_alias.antecedent_name, tag_alias, class: "fineprint" %>
         <% end %>

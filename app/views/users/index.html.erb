@@ -2,40 +2,54 @@
   <div id="a-index">
     <h1>Users</h1>
 
-    <%= table_for @users, width: "100%" do |t| %>
-      <% t.column column: "control" do |user| %>
-        <% if policy(CurrentUser.user).promote? %>
-          <%= link_to "Edit", edit_admin_user_path(user) %>
-        <% end %>
-      <% end %>
-      <% t.column "Name" do |user| %>
+    <%= search_form_for(users_path) do |f| %>
+      <%= f.input :name_matches, label: "Name", hint: "Use * for wildcard", input_html: { value: params[:search][:name_matches], data: { autocomplete: "user" } } %>
+      <%= f.input :level, collection: User.level_hash.to_a, include_blank: true, selected: params[:search][:level] %>
+      <%= f.input :can_upload_free, label: "Contributor?", as: :select, include_blank: true, selected: params[:search][:can_upload_free] %>
+      <%= f.input :can_approve_posts, label: "Approver?", as: :select, include_blank: true, selected: params[:search][:can_approve_posts] %>
+      <%= f.input :order, collection: [["Joined", "date"], ["Name", "name"], ["Posts", "post_upload_count"], ["Edits", "post_update_count"], ["Notes", "note_count"]], include_blank: true, selected: params[:search][:order] %>
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <%= table_for @users, width: "100%", class: "striped autofit" do |t| %>
+      <% t.column "Name", td: { class: "col-expand" } do |user| %>
         <%= link_to_user user %>
-        <% if user.inviter %>
-          &larr; <%= link_to_user user.inviter %>
+      <% end %>
+      <% if policy(IpAddress).show? %>
+        <% t.column "IP" do |user| %>
+          <% if user.last_ip_addr.present? %>
+            <%= link_to user.last_ip_addr, ip_address_path(user.last_ip_addr) %>
+          <% end %>
         <% end %>
       <% end %>
       <% t.column "Posts" do |user| %>
         <%= link_to user.post_upload_count, posts_path(:tags => "user:#{user.name}") %>
       <% end %>
-      <% t.column "Deleted" do |user| %>
-        <%= user.posts.deleted.count %>
+      <% t.column "Edits" do |user| %>
+        <%= link_to user.post_update_count, post_versions_path(:search => {:updater_id => user.id}) %>
       <% end %>
       <% t.column "Notes" do |user| %>
         <%= link_to user.note_update_count, note_versions_path(:search => {:updater_id => user.id}) %>
       <% end %>
-      <% t.column "Edits" do |user| %>
-        <%= link_to user.post_update_count, post_versions_path(:search => {:updater_id => user.id}) %>
-      <% end %>
       <% t.column "Level" do |user| %>
         <%= user.level_string %>
+      <% end %>
+      <% if policy(User).can_see_last_logged_in_at? %>
+        <% t.column "Last Seen" do |user| %>
+          <%= time_ago_in_words_tagged(user.last_logged_in_at) %>
+        <% end %>
       <% end %>
       <% t.column "Joined" do |user| %>
         <%= compact_time user.created_at %>
       <% end %>
+      <% t.column column: "control" do |user| %>
+        <% if policy(CurrentUser.user).promote? %>
+          <%= link_to "Promote", edit_admin_user_path(user) %>
+        <% end %>
+      <% end %>
     <% end %>
 
     <%= numbered_paginator(@users) %>
-
   </div>
 </div>
 

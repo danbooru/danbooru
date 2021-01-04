@@ -19,14 +19,13 @@ class CommentVote < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-    q = q.search_attributes(params, :score)
+    q = search_attributes(params, :id, :created_at, :updated_at, :score, :comment, :user)
     q.apply_default_order(params)
   end
 
   def validate_comment_can_be_down_voted
     if is_positive? && comment.creator == CurrentUser.user
-      errors.add :base, "You cannot upvote your own comments"
+      errors.add(:base, "You cannot upvote your own comments")
     end
   end
 
@@ -36,10 +35,6 @@ class CommentVote < ApplicationRecord
 
   def is_negative?
     score == -1
-  end
-
-  def self.searchable_includes
-    [:comment, :user]
   end
 
   def self.available_includes

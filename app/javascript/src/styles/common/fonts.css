@@ -320,3 +320,12 @@
     local("Anarchy"),
     url("../../../../../public/fonts/Anarchy.ttf") format("truetype");
 }
+
+/* https://www.1001freefonts.com/gisele-script.font */
+@font-face {
+  font-family: "Childlike";
+  font-display: swap;
+  src:
+    local("Gisele Script"),
+    url("../../../../../public/fonts/gisele.ttf") format("truetype");
+}

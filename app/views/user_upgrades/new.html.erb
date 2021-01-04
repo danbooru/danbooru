@@ -1,105 +1,173 @@
 <% page_title "Account Upgrade" %>
-<% meta_description "Upgrade to a Gold or Platinum account on #{Danbooru.config.app_name}." %>
+<% meta_description "Upgrade to a Gold or Platinum account." %>
+<script src="https://js.stripe.com/v3/"></script>
 
 <%= render "users/secondary_links" %>
 
 <div id="c-user-upgrades">
   <div id="a-new" class="fixed-width-container">
-    <h1>Upgrade Account</h1>
 
-    <% unless params[:user_id] %>
-      <p class="copy">Want more searching power? Upgrade your account and become a power user of the best database of anime artwork on the internet.</p>
+    <% if @user_upgrade.is_gift? %>
+      <h1>Gift Account Upgrade</h1>
 
-      <div id="feature-comparison">
-        <table>
-          <thead>
-            <tr>
-              <th></th>
-              <th>Basic</th>
-              <th>Gold</th>
-              <th>Platinum</th>
-            </tr>
-          </thead>
-          <tbody>
-            <colgroup id="labels"></colgroup>
-            <colgroup id="basic"></colgroup>
-            <colgroup id="gold"></colgroup>
-            <colgroup id="platinum"></colgroup>
-            <tr>
-              <td>Cost</td>
-              <td>Free</td>
-              <td>
-                <%= cents_to_usd(UserUpgrade.gold_price) %>
-                <div class="fineprint">One time fee</div>
-              </td>
-              <td>
-                <%= cents_to_usd(UserUpgrade.platinum_price) %>
-                <div class="fineprint">One time fee</div>
-              </td>
-            </tr>
-            <tr>
-              <td>Tag Limit</td>
-              <td>2</td>
-              <td><%= Danbooru.config.base_tag_query_limit %></td>
-              <td><%= Danbooru.config.base_tag_query_limit*2 %></td>
-            </tr>
-            <tr>
-              <td>Favorite Limit</td>
-              <td>10,000</td>
-              <td>20,000</td>
-              <td>Unlimited</td>
-            </tr>
-            <tr>
-              <td>Favorite Groups</td>
-              <td>3</td>
-              <td>5</td>
-              <td>10</td>
-            </tr>
-            <tr>
-              <td>Page Limit</td>
-              <td>1,000</td>
-              <td>2,000</td>
-              <td>5,000</td>
-            </tr>
-            <tr>
-              <td>Saved Searches</td>
-              <td>250</td>
-              <td>250</td>
-              <td>1,000</td>
-            </tr>
-            <tr>
-              <td>See Hidden Tags</td>
-              <td>No</td>
-              <td>Yes</td>
-              <td>Yes</td>
-            </tr>
-            <tr>
-              <td>Search Timeout</td>
-              <td>3 sec</td>
-              <td>6 sec</td>
-              <td>9 sec</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <% if @user_upgrade.recipient.is_platinum? %>
+        <p><%= link_to_user @recipient %> is already above Platinum level and can't be upgraded!</p>
+      <% else %>
+        <h6>You are gifting this upgrade to <%= link_to_user @user_upgrade.recipient %>.</h6>
+      <% end %>
+    <% else %>
+      <h1>Upgrade Account</h1>
+
+      <p>Upgrading your account gives you exclusive benefits and helps support
+      <%= Danbooru.config.canonical_app_name %>. Your support helps keep the
+      site ad-free for everyone!</p>
+
+      <p>You can also gift an account upgrade to someone else. Just go to
+      their profile page and look for a "Gift Upgrade" link.</p>
     <% end %>
 
-    <div class="section">
-      <% if params[:user_id] %>
-        <p>You are gifting this account upgrade to <%= link_to user.pretty_name, user_path(params[:user_id]) %>.</p>
-      <% else %>
-        <p>You can also upgrade someone else's account for the same price. The easiest way is to go to their profile page and look for a "Gift Upgrade" link.</p>
-      <% end %>
+    <table id="feature-comparison">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Basic</th>
+          <th>Gold</th>
+          <th>Platinum</th>
+        </tr>
+      </thead>
+      <tbody>
+        <colgroup id="labels"></colgroup>
+        <colgroup id="basic"></colgroup>
+        <colgroup id="gold"></colgroup>
+        <colgroup id="platinum"></colgroup>
+        <tr>
+          <td></td>
+          <td>Free</td>
+          <td>
+            <%= cents_to_usd(UserUpgrade.gold_price) %>
+            <div class="fineprint">One time fee</div>
+          </td>
+          <td>
+            <%= cents_to_usd(UserUpgrade.platinum_price) %>
+            <div class="fineprint">One time fee</div>
+          </td>
+        </tr>
+        <tr>
+          <td>Tag Limit</td>
+          <td><%= User.tag_query_limit(User::Levels::MEMBER) %></td>
+          <td><%= User.tag_query_limit(User::Levels::GOLD) %></td>
+          <td><%= User.tag_query_limit(User::Levels::PLATINUM) %></td>
+        </tr>
+        <tr>
+          <td>See Hidden Tags</td>
+          <td>No</td>
+          <td>Yes</td>
+          <td>Yes</td>
+        </tr>
+        <tr>
+          <td>Page Limit</td>
+          <td>1,000</td>
+          <td>2,000</td>
+          <td>5,000</td>
+        </tr>
+        <tr>
+          <td>Favorite Limit</td>
+          <td>10,000</td>
+          <td>20,000</td>
+          <td>Unlimited</td>
+        </tr>
+        <tr>
+          <td>Favorite Groups</td>
+          <td>3</td>
+          <td>5</td>
+          <td>10</td>
+        </tr>
+        <tr>
+          <td>Saved Searches</td>
+          <td>250</td>
+          <td>250</td>
+          <td>1,000</td>
+        </tr>
+        <tr>
+          <td>Search Timeout</td>
+          <td>3 sec</td>
+          <td>6 sec</td>
+          <td>9 sec</td>
+        </tr>
+        <tr>
+          <td></td>
+          <% if @user_upgrade.purchaser.is_anonymous? %>
+            <td><%= link_to "Login", login_path(url: new_user_upgrade_path), class: "login-button" %></td>
+            <td><%= link_to "Get #{Danbooru.config.canonical_app_name} Gold", login_path(url: new_user_upgrade_path), class: "login-button" %></td>
+            <td><%= link_to "Get #{Danbooru.config.canonical_app_name} Platinum", login_path(url: new_user_upgrade_path), class: "login-button" %></td>
+          <% elsif @recipient.level == User::Levels::MEMBER %>
+            <td></td>
+            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold", country: params[:country], promo: params[:promo]), remote: true, disable_with: "Redirecting..." %></td>
+            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Platinum", user_upgrades_path(user_id: @recipient.id, upgrade_type: "platinum", country: params[:country], promo: params[:promo]), remote: true, disable_with: "Redirecting..." %></td>
+          <% elsif @recipient.level == User::Levels::GOLD %>
+            <td></td>
+            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, disabled: true %></td>
+            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Platinum", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold_to_platinum", country: params[:country], promo: params[:promo]), remote: true, disable_with: "Redirecting..." %></td>
+          <% else %>
+            <td></td>
+            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, disabled: true %></td>
+            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Platinum", nil, disabled: true %></td>
+          <% end %>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Frequently Asked Questions</h2>
+
+    <div id="frequently-asked-questions">
+      <details>
+        <summary>What are the benefits of <%= Danbooru.config.canonical_app_name %> Gold?</summary>
+
+        <p><%= Danbooru.config.canonical_app_name %> Gold lets you do more
+        complicated searches, and it lets you see hidden tags that non-Gold users
+        can't see. You can search more tags at once, browser deeper in search
+        results, and also keep more favorites, favorite groups, and saved searches.</p>
+      </details>
+
+      <details>
+        <summary>What are the benefits of <%= Danbooru.config.canonical_app_name %> Platinum?</summary>
+
+        <p>Platinum is like Gold, but it lets you search even more tags at once,
+        and keep even more favorites, favorite groups, and saved searches.</p>
+      </details>
+
+      <details>
+        <summary>What payment methods do you support?</summary>
+
+        <p>We support all major credit and debit cards, including international
+        cards. We also support bank payments in several European countries,
+        including Austria, Belgium, Germany, the Netherlands, and Poland.</p>
+
+        <p>Payments are securely handled by <a href="https://www.stripe.com">Stripe</a>.
+        We don't support PayPal or Bitcoin at this time.</p>
+      </details>
+
+      <details>
+        <summary>Is this a subscription?</summary>
+
+        <p>No, this is not a subscription. This is a one-time payment. You pay
+        only once and keep the upgrade forever.</p>
+      </details>
+
+      <details>
+        <summary>If I upgrade to Gold first, can I upgrade to Platinum later?</summary>
+
+        <p>Yes, if you have a Gold account, you can always upgrade to a Platinum
+        account later. You don't have to pay full price to upgrade from Gold to
+        Platinum. You only have to pay the difference.</p>
+      </details>
+
+      <details>
+        <summary>What is your refund policy?</summary>
+
+        <p>You can <%= link_to "contact us", contact_path %> to request a refund
+        for any reason within 48 hours of your purchase.</p>
+      </details>
     </div>
-
-    <% if Danbooru.config.stripe_publishable_key %>
-      <% if CurrentUser.is_anonymous? %>
-        <p><%= link_to "Sign up", new_user_path %> or <%= link_to "login", login_path(url: new_user_upgrade_path) %> first to upgrade your account.</p>
-      <% elsif CurrentUser.safe_mode? %>
-        <%= render "stripe_payment" %>
-      <% else %>
-        <%= render "stripe_payment_safebooru" %>
-      <% end %>
-    <% end %>
   </div>
 </div>

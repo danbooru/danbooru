@@ -12,8 +12,7 @@ class IpAddress < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-    q = q.search_attributes(params, :ip_addr)
+    q = search_attributes(params, :ip_addr, :user, :model)
     q.order(created_at: :desc)
   end
 
@@ -48,10 +47,6 @@ class IpAddress < ApplicationRecord
 
   def readonly?
     true
-  end
-
-  def self.searchable_includes
-    [:user, :model]
   end
 
   def self.available_includes

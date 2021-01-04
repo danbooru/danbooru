@@ -191,9 +191,15 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post1], "fav:#{user1.name}")
       assert_tag_match([post2], "fav:#{user2.name}")
       assert_tag_match([], "fav:#{user3.name}")
+
+      assert_tag_match([], "fav:#{user1.name} fav:#{user2.name}")
+      assert_tag_match([post1], "fav:#{user1.name} -fav:#{user2.name}")
+      assert_tag_match([post3], "-fav:#{user1.name} -fav:#{user2.name}")
+
       assert_tag_match([], "fav:dne")
 
       assert_tag_match([post3, post2], "-fav:#{user1.name}")
+      assert_tag_match([post3], "-fav:#{user1.name} -fav:#{user2.name}")
       assert_tag_match([post3, post2, post1], "-fav:dne")
 
       as(user3) do
@@ -1016,6 +1022,17 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([post1], "kitten")
       assert_tag_match([post2], "-kitten")
+    end
+
+    should "resolve abbreviations to the actual tag" do
+      tag1 = create(:tag, name: "hair_ribbon", post_count: 300_000)
+      tag2 = create(:tag, name: "hakurei_reimu", post_count: 50_000)
+      ta1 = create(:tag_alias, antecedent_name: "/hr", consequent_name: "hakurei_reimu")
+      post1 = create(:post, tag_string: "hair_ribbon")
+      post2 = create(:post, tag_string: "hakurei_reimu")
+
+      assert_tag_match([post2], "/hr")
+      assert_tag_match([post1], "-/hr")
     end
 
     should "fail for more than 6 tags" do

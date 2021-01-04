@@ -11,18 +11,17 @@ class PostReplacement < ApplicationRecord
     self.original_url = post.source
     self.tags = post.tag_string + " " + self.tags.to_s
 
-    self.file_ext_was =  post.file_ext
-    self.file_size_was = post.file_size
-    self.image_width_was = post.image_width
-    self.image_height_was = post.image_height
-    self.md5_was = post.md5
+    self.old_file_ext = post.file_ext
+    self.old_file_size = post.file_size
+    self.old_image_width = post.image_width
+    self.old_image_height = post.image_height
+    self.old_md5 = post.md5
   end
 
   concerning :Search do
     class_methods do
       def search(params = {})
-        q = super
-        q = q.search_attributes(params, :md5, :md5_was, :file_ext, :file_ext_was, :original_url, :replacement_url)
+        q = search_attributes(params, :id, :created_at, :updated_at, :md5, :old_md5, :file_ext, :old_file_ext, :original_url, :replacement_url, :creator, :post)
         q.apply_default_order(params)
       end
     end
@@ -37,10 +36,6 @@ class PostReplacement < ApplicationRecord
 
     tags = tags.map { |tag| "-#{tag}" }
     tags.join(" ")
-  end
-
-  def self.searchable_includes
-    [:creator, :post]
   end
 
   def self.available_includes

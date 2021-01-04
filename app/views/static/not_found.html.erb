@@ -1,0 +1,26 @@
+<% page_title "Page not found" %>
+
+<div id="c-static">
+  <div id="a-not-found">
+    <div style="text-align: center">
+      <h1>Page not found</h1>
+
+      <% if @post.present? && @artist.present? %>
+        <p>
+          <%= link_to @post do %>
+            <%= tag.img src: @post.large_file_url %>
+          <% end %>
+
+          <p class="fineprint">
+            <%= link_to "post ##{@post.id}", @post %>
+            by <%= link_to @artist.name, posts_path(tags: @artist.name), class: tag_class(@artist) %>
+          </p>
+        </p>
+      <% else %>
+        <p>Nobody here but us chickens!</p>
+      <% end %>
+
+      <p><%= link_to "Return to previous page", :back %></p>
+    </div>
+  </div>
+</div>

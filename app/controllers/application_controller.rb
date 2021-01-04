@@ -15,6 +15,7 @@ class ApplicationController < ActionController::Base
   before_action :set_variant
   before_action :add_headers
   before_action :cause_error
+  after_action :skip_session_if_publicly_cached
   after_action :reset_current_user
   layout "default"
 
@@ -87,6 +88,8 @@ class ApplicationController < ActionController::Base
   end
 
   def rescue_exception(exception)
+    raise exception if Danbooru.config.debug_mode
+
     case exception
     when ActionView::Template::Error
       rescue_exception(exception.cause)
@@ -121,17 +124,17 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def render_error_page(status, exception, message: exception.message, template: "static/error", format: request.format.symbol)
+  def render_error_page(status, exception = nil, message: exception.message, template: "static/error", format: request.format.symbol)
     @exception = exception
     @expected = status < 500
     @message = message.encode("utf-8", invalid: :replace, undef: :replace)
-    @backtrace = Rails.backtrace_cleaner.clean(@exception.backtrace)
+    @backtrace = Rails.backtrace_cleaner.clean(@exception.backtrace) if @exception
     format = :html unless format.in?(%i[html json xml js atom])
 
     # if InvalidAuthenticityToken was raised, CurrentUser isn't set so we have to use the blank layout.
     layout = CurrentUser.user.present? ? "default" : "blank"
 
-    DanbooruLogger.log(@exception, expected: @expected)
+    DanbooruLogger.log(@exception, expected: @expected) if @exception
     render template, layout: layout, status: status, formats: format
   rescue ActionView::MissingTemplate
     render "static/error", layout: layout, status: status, formats: format
@@ -146,6 +149,14 @@ class ApplicationController < ActionController::Base
     CurrentUser.ip_addr = nil
     CurrentUser.safe_mode = false
     CurrentUser.root_url = root_url.chomp("/")
+  end
+
+  # Skip setting the session cookie if the response is being publicly cached to
+  # prevent the user's session cookie from being leaked to other users.
+  def skip_session_if_publicly_cached
+    if response.cache_control[:public] == true
+      request.session_options[:skip] = true
+    end
   end
 
   def set_variant

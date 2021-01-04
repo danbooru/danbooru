@@ -1,38 +1,40 @@
 class TagNameValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
-    case Tag.normalize_name(value)
+    value = Tag.normalize_name(value)
+
+    if value.size > 170
+      record.errors.add(attribute, "'#{value}' cannot be more than 255 characters long")
+    end
+
+    case value
     when /\A_*\z/
-      record.errors[attribute] << "'#{value}' cannot be blank"
+      record.errors.add(attribute, "'#{value}' cannot be blank")
     when /\*/
-      record.errors[attribute] << "'#{value}' cannot contain asterisks ('*')"
+      record.errors.add(attribute, "'#{value}' cannot contain asterisks ('*')")
     when /,/
-      record.errors[attribute] << "'#{value}' cannot contain commas (',')"
-    when /\A~/
-      record.errors[attribute] << "'#{value}' cannot begin with a tilde ('~')"
-    when /\A-/
-      record.errors[attribute] << "'#{value}' cannot begin with a dash ('-')"
-    when /\A_/
-      record.errors[attribute] << "'#{value}' cannot begin with an underscore"
+      record.errors.add(attribute, "'#{value}' cannot contain commas (',')")
+    when /\A[-~_`%){}\]\/]/
+      record.errors.add(attribute, "'#{value}' cannot begin with a '#{value[0]}'")
     when /_\z/
-      record.errors[attribute] << "'#{value}' cannot end with an underscore"
+      record.errors.add(attribute, "'#{value}' cannot end with an underscore")
     when /__/
-      record.errors[attribute] << "'#{value}' cannot contain consecutive underscores"
+      record.errors.add(attribute, "'#{value}' cannot contain consecutive underscores")
     when /[^[:graph:]]/
-      record.errors[attribute] << "'#{value}' cannot contain non-printable characters"
+      record.errors.add(attribute, "'#{value}' cannot contain non-printable characters")
     when /[^[:ascii:]]/
-      record.errors[attribute] << "'#{value}' must consist of only ASCII characters"
+      record.errors.add(attribute, "'#{value}' must consist of only ASCII characters")
     when /\A(#{PostQueryBuilder::METATAGS.join("|")}):(.+)\z/i
-      record.errors[attribute] << "'#{value}' cannot begin with '#{$1}:'"
+      record.errors.add(attribute, "'#{value}' cannot begin with '#{$1}:'")
     when /\A(#{Tag.categories.regexp}):(.+)\z/i
-      record.errors[attribute] << "'#{value}' cannot begin with '#{$1}:'"
+      record.errors.add(attribute, "'#{value}' cannot begin with '#{$1}:'")
     when "new", "search"
-      record.errors[attribute] << "'#{value}' is a reserved name and cannot be used"
+      record.errors.add(attribute, "'#{value}' is a reserved name and cannot be used")
     when /\A(.+)_\(cosplay\)\z/i
       tag_name = TagAlias.to_aliased([$1]).first
       tag = Tag.find_by_name(tag_name)
 
       if tag.present? && !tag.empty? && !tag.character?
-        record.errors[attribute] << "#{tag_name} must be a character tag"
+        record.errors.add(attribute, "#{tag_name} must be a character tag")
       end
     end
   end

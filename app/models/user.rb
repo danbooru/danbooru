@@ -12,6 +12,7 @@ class User < ApplicationRecord
     BUILDER = 32
     MODERATOR = 40
     ADMIN = 50
+    OWNER = 60
   end
 
   # Used for `before_action :<role>_only`. Must have a corresponding `is_<role>?` method.
@@ -98,6 +99,8 @@ class User < ApplicationRecord
   has_many :post_votes
   has_many :post_versions, foreign_key: :updater_id
   has_many :bans, -> {order("bans.id desc")}
+  has_many :received_upgrades, class_name: "UserUpgrade", foreign_key: :recipient_id, dependent: :destroy
+  has_many :purchased_upgrades, class_name: "UserUpgrade", foreign_key: :purchaser_id, dependent: :destroy
   has_one :recent_ban, -> {order("bans.id desc")}, :class_name => "Ban"
 
   has_one :api_key
@@ -191,6 +194,10 @@ class User < ApplicationRecord
     extend ActiveSupport::Concern
 
     module ClassMethods
+      def owner
+        User.find_by!(level: Levels::OWNER)
+      end
+
       def system
         User.find_by!(name: Danbooru.config.system_user)
       end
@@ -208,7 +215,8 @@ class User < ApplicationRecord
           "Platinum" => Levels::PLATINUM,
           "Builder" => Levels::BUILDER,
           "Moderator" => Levels::MODERATOR,
-          "Admin" => Levels::ADMIN
+          "Admin" => Levels::ADMIN,
+          "Owner" => Levels::OWNER
         }
       end
 
@@ -235,14 +243,17 @@ class User < ApplicationRecord
         when Levels::ADMIN
           "Admin"
 
+        when Levels::OWNER
+          "Owner"
+
         else
           ""
         end
       end
     end
 
-    def promote_to!(new_level, options = {})
-      UserPromotion.new(self, CurrentUser.user, new_level, options).promote!
+    def promote_to!(new_level, promoter = CurrentUser.user, **options)
+      UserPromotion.new(self, promoter, new_level, **options).promote!
     end
 
     def promote_to_admin_if_first_user
@@ -299,6 +310,10 @@ class User < ApplicationRecord
       level >= Levels::ADMIN
     end
 
+    def is_owner?
+      level >= Levels::OWNER
+    end
+
     def is_approver?
       can_approve_posts?
     end
@@ -345,15 +360,90 @@ class User < ApplicationRecord
     end
   end
 
-  module LimitMethods
-    extend Memoist
+  concerning :LimitMethods do
+    class_methods do
+      def statement_timeout(level)
+        if Rails.env.development?
+          60_000
+        elsif level >= User::Levels::PLATINUM
+          9_000
+        elsif level == User::Levels::GOLD
+          6_000
+        else
+          3_000
+        end
+      end
+
+      def tag_query_limit(level)
+        if level >= User::Levels::BUILDER
+          Float::INFINITY
+        elsif level == User::Levels::PLATINUM
+          12
+        elsif level == User::Levels::GOLD
+          6
+        else
+          2
+        end
+      end
+
+      def favorite_limit(level)
+        if level >= User::Levels::PLATINUM
+          Float::INFINITY
+        elsif level == User::Levels::GOLD
+          20_000
+        else
+          10_000
+        end
+      end
+
+      def favorite_group_limit(level)
+        if level >= User::Levels::BUILDER
+          Float::INFINITY
+        elsif level == User::Levels::PLATINUM
+          10
+        elsif level == User::Levels::GOLD
+          5
+        else
+          3
+        end
+      end
+
+      def max_saved_searches(level)
+        if level >= User::Levels::BUILDER
+          Float::INFINITY
+        elsif level == User::Levels::PLATINUM
+          1_000
+        else
+          250
+        end
+      end
+
+      # regen this amount per second
+      def api_regen_multiplier(level)
+        if level >= User::Levels::PLATINUM
+          4
+        elsif level == User::Levels::GOLD
+          2
+        else
+          1
+        end
+      end
+
+      # can make this many api calls at once before being bound by
+      # api_regen_multiplier refilling your pool
+      def api_burst_limit(level)
+        if level >= User::Levels::PLATINUM
+          60
+        elsif level == User::Levels::GOLD
+          30
+        else
+          10
+        end
+      end
+    end
 
     def max_saved_searches
-      if is_platinum?
-        1_000
-      else
-        250
-      end
+      User.max_saved_searches(level)
     end
 
     def is_comment_limited?
@@ -389,56 +479,23 @@ class User < ApplicationRecord
     end
 
     def tag_query_limit
-      if is_platinum?
-        Danbooru.config.base_tag_query_limit * 2
-      elsif is_gold?
-        Danbooru.config.base_tag_query_limit
-      else
-        2
-      end
+      User.tag_query_limit(level)
     end
 
     def favorite_limit
-      if is_platinum?
-        Float::INFINITY
-      elsif is_gold?
-        20_000
-      else
-        10_000
-      end
+      User.favorite_limit(level)
     end
 
     def favorite_group_limit
-      if is_platinum?
-        10
-      elsif is_gold?
-        5
-      else
-        3
-      end
+      User.favorite_group_limit(level)
     end
 
     def api_regen_multiplier
-      # regen this amount per second
-      if is_platinum?
-        4
-      elsif is_gold?
-        2
-      else
-        1
-      end
+      User.api_regen_multiplier(level)
     end
 
     def api_burst_limit
-      # can make this many api calls at once before being bound by
-      # api_regen_multiplier refilling your pool
-      if is_platinum?
-        60
-      elsif is_gold?
-        30
-      else
-        10
-      end
+      User.api_burst_limit(level)
     end
 
     def remaining_api_limit
@@ -446,15 +503,7 @@ class User < ApplicationRecord
     end
 
     def statement_timeout
-      if Rails.env.development?
-        60_000
-      elsif is_platinum?
-        9_000
-      elsif is_gold?
-        6_000
-      else
-        3_000
-      end
+      User.statement_timeout(level)
     end
   end
 
@@ -468,15 +517,6 @@ class User < ApplicationRecord
         appeal_count flag_count positive_feedback_count
         neutral_feedback_count negative_feedback_count
       ]
-    end
-
-    def to_legacy_json
-      return {
-        "name" => name,
-        "id" => id,
-        "level" => level,
-        "created_at" => created_at.strftime("%Y-%m-%d %H:%M")
-      }.to_json
     end
 
     def api_token
@@ -547,12 +587,17 @@ class User < ApplicationRecord
 
   module SearchMethods
     def search(params)
-      q = super
-
       params = params.dup
       params[:name_matches] = params.delete(:name) if params[:name].present?
 
-      q = q.search_attributes(params, :name, :level, :post_upload_count, :post_update_count, :note_update_count, :favorite_count)
+      q = search_attributes(params,
+        :id, :created_at, :updated_at, :name, :level, :post_upload_count,
+        :post_update_count, :note_update_count, :favorite_count, :posts,
+        :note_versions, :artist_commentary_versions, :post_appeals,
+        :post_approvals, :artist_versions, :comments, :wiki_page_versions,
+        :feedback, :forum_topics, :forum_posts, :forum_post_votes,
+        :tag_aliases, :tag_implications, :bans, :inviter
+      )
 
       if params[:name_matches].present?
         q = q.where_ilike(:name, normalize_name(params[:name_matches]))
@@ -599,7 +644,6 @@ class User < ApplicationRecord
   include LevelMethods
   include EmailMethods
   include ForumMethods
-  include LimitMethods
   include ApiMethods
   include CountMethods
   extend SearchMethods
@@ -618,10 +662,6 @@ class User < ApplicationRecord
 
   def dtext_shortlink(**options)
     "<@#{name}>"
-  end
-
-  def self.searchable_includes
-    [:posts, :note_versions, :artist_commentary_versions, :post_appeals, :post_approvals, :artist_versions, :comments, :wiki_page_versions, :feedback, :forum_topics, :forum_posts, :forum_post_votes, :tag_aliases, :tag_implications, :bans, :inviter]
   end
 
   def self.available_includes

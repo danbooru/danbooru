@@ -1,0 +1,7 @@
+<%# hash %>
+<dl>
+  <% hash.each do |key, value| %>
+    <dt><%= key.to_s.humanize %></dt>
+    <dd><%= value %></dd>
+  <% end %>
+</dl>

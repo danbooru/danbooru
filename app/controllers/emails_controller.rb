@@ -1,8 +1,19 @@
 class EmailsController < ApplicationController
   respond_to :html, :xml, :json
 
+  def index
+    @email_addresses = authorize EmailAddress.visible(CurrentUser.user).paginated_search(params, count_pages: true)
+    @email_addresses = @email_addresses.includes(:user)
+    respond_with(@email_addresses)
+  end
+
   def show
-    @email_address = authorize EmailAddress.find_by_user_id!(params[:user_id])
+    if params[:user_id]
+      @email_address = authorize EmailAddress.find_by_user_id!(params[:user_id])
+    else
+      @email_address = authorize EmailAddress.find(params[:id])
+    end
+
     respond_with(@email_address)
   end
 
@@ -17,7 +28,7 @@ class EmailsController < ApplicationController
     if @user.authenticate_password(params[:user][:password])
       @user.update(email_address_attributes: { address: params[:user][:email] })
     else
-      @user.errors[:base] << "Password was incorrect"
+      @user.errors.add(:base, "Password was incorrect")
     end
 
     if @user.errors.none?

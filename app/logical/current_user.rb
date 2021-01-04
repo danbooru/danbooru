@@ -40,6 +40,14 @@ class CurrentUser
     RequestStore[:current_ip_addr] = ip_addr
   end
 
+  def self.country
+    RequestStore[:country]
+  end
+
+  def self.country=(country)
+    RequestStore[:country] = country
+  end
+
   def self.root_url
     RequestStore[:current_root_url] || "https://#{Danbooru.config.hostname}"
   end

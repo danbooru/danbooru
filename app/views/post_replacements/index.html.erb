@@ -29,10 +29,10 @@
         </dl>
       <% end %>
       <% t.column "MD5" do |post_replacement| %>
-        <% if post_replacement.md5_was.present? && post_replacement.md5.present? %>
+        <% if post_replacement.old_md5.present? && post_replacement.md5.present? %>
           <dl>
             <dt>Original MD5</dt>
-            <dd><%= post_replacement.md5_was %></dd>
+            <dd><%= post_replacement.old_md5 %></dd>
 
             <dt>Replacement MD5</dt>
             <dd><%= post_replacement.md5 %></dd>
@@ -40,12 +40,12 @@
         <% end %>
       <% end %>
       <% t.column "Size" do |post_replacement| %>
-        <% if %i[image_width_was image_height_was file_size_was file_ext_was image_width image_height file_size file_ext].all? { |k| post_replacement[k].present? } %>
+        <% if %i[old_image_width old_image_height old_file_size old_file_ext image_width image_height file_size file_ext].all? { |k| post_replacement[k].present? } %>
           <dl>
             <dt>Original Size</dt>
             <dd>
-              <%= post_replacement.image_width_was %>x<%= post_replacement.image_height_was %>
-              (<%= post_replacement.file_size_was.to_s(:human_size, precision: 4) %>, <%= post_replacement.file_ext_was %>)
+              <%= post_replacement.old_image_width %>x<%= post_replacement.old_image_height %>
+              (<%= post_replacement.old_file_size.to_s(:human_size, precision: 4) %>, <%= post_replacement.old_file_ext %>)
             </dd>
 
             <dt>Replacement Size</dt>

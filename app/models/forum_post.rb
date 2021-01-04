@@ -28,7 +28,7 @@ class ForumPost < ApplicationRecord
   mentionable(
     :message_field => :body,
     :title => ->(user_name) {%{#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})}},
-    :body => ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[/forum_topics/#{topic_id}?page=#{forum_topic_page}]):\n\n[quote]\n#{DText.extract_mention(body, "@" + user_name)}\n[/quote]\n}}
+    :body => ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[#{Routes.forum_topic_path(topic, page: forum_topic_page)}]):\n\n[quote]\n#{DText.extract_mention(body, "@" + user_name)}\n[/quote]\n}}
   )
 
   module SearchMethods
@@ -36,13 +36,16 @@ class ForumPost < ApplicationRecord
       where(topic_id: ForumTopic.visible(user))
     end
 
+    def wiki_link_matches(title)
+      where(id: DtextLink.forum_post.wiki_link.where(link_target: WikiPage.normalize_title(title)).select(:model_id))
+    end
+
     def search(params)
-      q = super
-      q = q.search_attributes(params, :is_deleted, :body)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :body, :creator, :updater, :topic, :dtext_links, :votes, :tag_alias, :tag_implication, :bulk_update_request)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :text_index)
 
       if params[:linked_to].present?
-        q = q.where(id: DtextLink.forum_post.wiki_link.where(link_target: params[:linked_to]).select(:model_id))
+        q = q.wiki_link_matches(params[:linked_to])
       end
 
       q.apply_default_order(params)
@@ -158,10 +161,6 @@ class ForumPost < ApplicationRecord
 
   def dtext_shortlink(**options)
     "forum ##{id}"
-  end
-
-  def self.searchable_includes
-    [:creator, :updater, :topic, :dtext_links, :votes, :tag_alias, :tag_implication, :bulk_update_request]
   end
 
   def self.available_includes

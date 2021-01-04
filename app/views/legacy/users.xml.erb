@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<users type="array">
-  <% @users.each do |user| %>
-    <user name="<%= user.name %>" id="<%= user.id %>" created_at="<%= user.created_at.strftime('%Y-%m-%d %H:%M') %>" level="<%= user.level %>"></user>
-  <% end %>
-</users>

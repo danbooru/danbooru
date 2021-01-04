@@ -18,7 +18,7 @@
     </h2>
     <div>
       <% presenter.favorites.each do |post| %>
-        <%= PostPresenter.preview(post, :tags => "fav:#{user.name}") %>
+        <%= PostPresenter.preview(post, tags: "ordfav:#{user.name}") %>
       <% end %>
     </div>
   </div>

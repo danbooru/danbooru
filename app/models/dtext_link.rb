@@ -30,8 +30,7 @@ class DtextLink < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-    q = q.search_attributes(params, :link_type, :link_target)
+    q = search_attributes(params, :id, :created_at, :updated_at, :link_type, :link_target, :model, :linked_wiki, :linked_tag)
     q.apply_default_order(params)
   end
 
@@ -47,10 +46,6 @@ class DtextLink < ApplicationRecord
 
   def self.attribute_restriction(*)
     where(link_type: :wiki_link)
-  end
-
-  def self.searchable_includes
-    [:model, :linked_wiki, :linked_tag]
   end
 
   def self.available_includes

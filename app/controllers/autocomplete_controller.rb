@@ -2,15 +2,16 @@ class AutocompleteController < ApplicationController
   respond_to :xml, :json
 
   def index
-    @tags = Tag.names_matches_with_aliases(params[:query], params.fetch(:limit, 10).to_i)
+    @query = params.dig(:search, :query)
+    @type = params.dig(:search, :type)
+    @limit = params.fetch(:limit, 10).to_i
+    @autocomplete = AutocompleteService.new(@query, @type, current_user: CurrentUser.user, limit: @limit)
 
-    if request.variant.opensearch?
-      expires_in 1.hour
-      results = [params[:query], @tags.map(&:pretty_name)]
-      respond_with(results)
-    else
-      # XXX
-      respond_with(@tags.map(&:attributes))
-    end
+    @results = @autocomplete.autocomplete_results
+    @expires_in = @autocomplete.cache_duration
+    @public = @autocomplete.cache_publicly?
+
+    expires_in @expires_in, public: @public unless response.cache_control.present?
+    respond_with(@results)
   end
 end

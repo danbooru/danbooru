@@ -6,12 +6,12 @@
 
     <% if @user.is_restricted? %>
       <p>Your account is restricted because you signed up from a VPN or proxy.
-      You can still use the site, but you won't be able to leave comments, edit
-      tags, or upload posts until you verify your account.</p>
+      You can still use the site, but you must verify your email address to be
+      able to leave comments, edit tags, or upload posts.</p>
     <% end %>
 
-    <p>Click below to send an email to <strong><%= @email_address.address %></strong>
-    to verify your account.</p>
+    <p>Your email address is unverified. Click below to send an email to
+    <strong><%= @email_address.address %></strong> to verify your email address.</p>
 
     <%= edit_form_for(@user, method: :post, url: send_confirmation_user_email_path(@user)) do |f| %>
       <%= f.submit "Send confirmation email" %>

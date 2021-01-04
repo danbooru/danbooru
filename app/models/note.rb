@@ -14,9 +14,7 @@ class Note < ApplicationRecord
 
   module SearchMethods
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :is_active, :x, :y, :width, :height, :body, :version)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_active, :x, :y, :width, :height, :body, :version, :post)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index)
 
       q.apply_default_order(params)
@@ -26,13 +24,13 @@ class Note < ApplicationRecord
   extend SearchMethods
 
   def validate_post_is_not_locked
-    errors[:post] << "is note locked" if post.is_note_locked?
+    errors.add(:post, "is note locked") if post.is_note_locked?
   end
 
   def note_within_image
     return false unless post.present?
     if x < 0 || y < 0 || (x > post.image_width) || (y > post.image_height) || width < 0 || height < 0 || (x + width > post.image_width) || (y + height > post.image_height)
-      self.errors.add(:note, "must be inside the image")
+      errors.add(:note, "must be inside the image")
     end
   end
 
@@ -127,10 +125,6 @@ class Note < ApplicationRecord
     new_note.height = height * height_ratio
 
     new_note.save
-  end
-
-  def self.searchable_includes
-    [:post]
   end
 
   def self.available_includes

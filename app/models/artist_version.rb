@@ -7,9 +7,7 @@ class ArtistVersion < ApplicationRecord
 
   module SearchMethods
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :is_deleted, :is_banned, :name, :group_name, :urls, :other_names)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :is_banned, :name, :group_name, :urls, :other_names, :updater, :artist)
       q = q.text_attribute_matches(:name, params[:name_matches])
       q = q.text_attribute_matches(:group_name, params[:group_name_matches])
 
@@ -103,10 +101,6 @@ class ArtistVersion < ApplicationRecord
     else
       is_banned && !other.is_banned
     end
-  end
-
-  def self.searchable_includes
-    [:updater, :artist]
   end
 
   def self.available_includes

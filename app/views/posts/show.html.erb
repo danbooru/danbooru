@@ -50,7 +50,7 @@
   <% end -%>
 
   <% if policy(Favorite).create? %>
-    <%= content_tag(:div, class: "fav-buttons fav-buttons-#{@post.is_favorited?}") do %>
+    <%= content_tag(:div, class: "fav-buttons fav-buttons-#{@post.favorited_by?(CurrentUser.user)}") do %>
       <%= form_tag(favorites_path(post_id: @post.id), method: "post", id: "add-fav-button", "data-remote": true) do %>
         <%= button_tag tag.i(class: "far fa-heart"), class: "ui-button ui-widget ui-corner-all", "data-disable-with": tag.i(class: "fas fa-spinner fa-spin") %>
       <% end %>

@@ -3,6 +3,9 @@ require 'resolv'
 module EmailValidator
   module_function
 
+  # https://www.regular-expressions.info/email.html
+  EMAIL_REGEX = /\A[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\z/
+
   IGNORE_DOTS = %w[gmail.com]
   IGNORE_PLUS_ADDRESSING = %w[gmail.com hotmail.com outlook.com live.com]
   IGNORE_MINUS_ADDRESSING = %w[yahoo.com]
@@ -80,10 +83,17 @@ module EmailValidator
     "#{name}@#{domain}"
   end
 
-  def nondisposable?(address)
-    return true if Danbooru.config.email_domain_verification_list.blank?
+  def is_valid?(address)
+    address.match?(EMAIL_REGEX)
+  end
+
+  def is_restricted?(address)
+    return false if Danbooru.config.email_domain_verification_list.blank?
+
     domain = Mail::Address.new(address).domain
-    domain.in?(Danbooru.config.email_domain_verification_list.to_a)
+    !domain.in?(Danbooru.config.email_domain_verification_list.to_a)
+  rescue Mail::Field::IncompleteParseError
+    true
   end
 
   def undeliverable?(to_address, from_address: Danbooru.config.contact_email, timeout: 3)

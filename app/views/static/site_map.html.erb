@@ -57,7 +57,6 @@
         <li><h2>Notes</h2></li>
         <li><%= link_to_wiki "Help", "help:notes" %></li>
         <li><%= link_to("Listing", notes_path) %></li>
-        <li><%= link_to("Search", search_notes_path) %></li>
         <li><%= link_to("Changes", note_versions_path) %></li>
       </ul>
       <ul>
@@ -134,7 +133,6 @@
         <% end %>
         <li><%= link_to_wiki "Help", "help:users" %></li>
         <li><%= link_to("Listing", users_path) %></li>
-        <li><%= link_to("Search", search_users_path) %></li>
         <li><%= link_to("Bans", bans_path) %></li>
         <li><%= link_to("Feedback", user_feedbacks_path) %></li>
         <li><%= link_to("Terms of Service", terms_of_service_path) %></li>
@@ -152,6 +150,10 @@
 
         <% if policy(ModerationReport).index? %>
           <li><%= link_to("Moderation Reports", moderation_reports_path) %></li>
+        <% end %>
+
+        <% if policy(EmailAddress).index? %>
+          <li><%= link_to("Email Addresses", emails_path) %></li>
         <% end %>
 
         <% if policy(IpAddress).index? %>

@@ -98,9 +98,7 @@ class Dmail < ApplicationRecord
     end
 
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :is_read, :is_deleted, :title, :body)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_read, :is_deleted, :title, :body, :to, :from)
       q = q.text_attribute_matches(:title, params[:title_matches])
       q = q.text_attribute_matches(:body, params[:message_matches], index_column: :message_index)
 
@@ -158,7 +156,7 @@ class Dmail < ApplicationRecord
     return if from.blank? || from.is_gold?
 
     if from.dmails.where("created_at > ?", 1.hour.ago).group(:to).reorder(nil).count.size >= 10
-      errors[:base] << "You can't send dmails to more than 10 users per hour"
+      errors.add(:base, "You can't send dmails to more than 10 users per hour")
     end
   end
 
@@ -180,10 +178,6 @@ class Dmail < ApplicationRecord
 
   def dtext_shortlink(key: false, **options)
     key ? "dmail ##{id}/#{self.key}" : "dmail ##{id}"
-  end
-
-  def self.searchable_includes
-    [:to, :from]
   end
 
   def self.available_includes
