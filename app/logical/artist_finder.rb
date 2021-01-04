@@ -8,6 +8,7 @@ module ArtistFinder
     "www.artstation.com", # http://www.artstation.com/serafleur/
     %r{cdn[ab]?\.artstation\.com/p/assets/images/images}i, # https://cdna.artstation.com/p/assets/images/images/001/658/068/large/yang-waterkuma-b402.jpg?1450269769
     "ask.fm", # http://ask.fm/mikuroko_396
+    "baraag.net",
     "bcyimg.com",
     "bcyimg.com/drawer", # https://img9.bcyimg.com/drawer/32360/post/178vu/46229ec06e8111e79558c1b725ebc9e6.jpg
     "bcy.net",
@@ -84,8 +85,8 @@ module ArtistFinder
     "pixiv.net", # https://www.pixiv.net/member.php?id=10442390
     "pixiv.net/stacc", # https://www.pixiv.net/stacc/aaaninja2013
     "pixiv.net/fanbox/creator", # https://www.pixiv.net/fanbox/creator/310630
-    "pixiv.net/users", # https://www.pixiv.net/users/555603
-    "pixiv.net/en/users", # https://www.pixiv.net/en/users/555603
+    %r{pixiv.net/(?:en/)?users}i, # https://www.pixiv.net/users/555603
+    %r{pixiv.net/(?:en/)?artworks}i, # https://www.pixiv.net/en/artworks/85241178
     "i.pximg.net",
     "plurk.com", # http://www.plurk.com/a1amorea1a1
     "privatter.net",
