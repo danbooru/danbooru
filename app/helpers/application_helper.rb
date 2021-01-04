@@ -273,6 +273,7 @@ module ApplicationHelper
     {
       lang: "en",
       class: "c-#{controller_param} a-#{action_param}",
+      spellcheck: "false",
       data: {
         controller: controller_param,
         action: action_param,
