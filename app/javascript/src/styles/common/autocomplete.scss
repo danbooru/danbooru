@@ -1,25 +1,23 @@
 .ui-autocomplete.ui-widget {
-  font-size: 0.9em;
+  font-size: var(--text-sm);
   border: var(--autocomplete-border);
 
-  .ui-state-active {
+  div.ui-menu-item-wrapper {
+    padding: 0.25em 0.4em;
     border: none;
-    margin: 0 -1px;
-    background-color: var(--autocomplete-selected-background-color);
-    border-left: var(--autocomplete-border);
-    border-right: var(--autocomplete-border);
-  }
 
-  .ui-menu-item-wrapper {
-    padding: 3px 0.5em 3px 0.4em;
-
-    a {
-      margin-right: 1em;
+    &.ui-state-active {
+      cursor: pointer;
+      background-color: var(--autocomplete-selected-background-color);
     }
-  }
 
-  .autocomplete-arrow {
-    color: var(--autocomplete-arrow-color);
+    span.autocomplete-arrow {
+      color: var(--text-color);
+    }
+
+    span.post-count {
+      margin-left: 1em;
+    }
   }
 
   /* Display a red wavy underline beneath misspelled tags. */
