@@ -22,7 +22,14 @@
     color: var(--autocomplete-arrow-color);
   }
 
+  /* Display a red wavy underline beneath misspelled tags. */
+  /* https://stackoverflow.com/a/28152272 */
   li[data-autocomplete-type="tag-autocorrect"] .autocomplete-antecedent {
-    text-decoration: dotted underline;
+    position: relative;
+    display: inline-block;
+    background: var(--autocomplete-tag-autocorrect-underline);
+    background-repeat: repeat-x;
+    background-position-y: 1.2em;
+    line-height: 1.5em;
   }
 }

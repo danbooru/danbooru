@@ -96,6 +96,7 @@
   --autocomplete-selected-background-color: var(--subnav-menu-background-color);
   --autocomplete-border: 1px solid #CCC;
   --autocomplete-arrow-color: var(--text-color);
+  --autocomplete-tag-autocorrect-underline: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAHElEQVQYV2NkQAL/GRj+M4IJBgY4zQhSABMEsQHMOAgCT5YN9gAAAABJRU5ErkJggg==);
 
   --diff-list-added-color: green;
   --diff-list-removed-color: red;
