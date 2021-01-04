@@ -27,6 +27,10 @@ class PostPolicy < ApplicationPolicy
     user.is_approver? && record.fav_count > 0 && record.parent_id.present?
   end
 
+  def regenerate?
+    user.is_moderator?
+  end
+
   def delete?
     user.is_approver? && !record.is_deleted?
   end

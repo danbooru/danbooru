@@ -1325,6 +1325,22 @@ class Post < ApplicationRecord
     end
   end
 
+  concerning :RegenerationMethods do
+    def regenerate!(category, user)
+      if category == "iqdb"
+        update_iqdb_async
+
+        ModAction.log("<@#{user.name}> regenerated IQDB for post ##{id}", :post_regenerate_iqdb, user)
+      else
+        media_file = MediaFile.open(file, frame_data: pixiv_ugoira_frame_data)
+        UploadService::Utils.process_resizes(self, nil, id, media_file: media_file)
+        update_iqdb_async
+
+        ModAction.log("<@#{user.name}> regenerated image samples for post ##{id}", :post_regenerate, user)
+      end
+    end
+  end
+
   module IqdbMethods
     extend ActiveSupport::Concern
 

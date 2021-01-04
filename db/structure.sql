@@ -2725,39 +2725,6 @@ ALTER SEQUENCE public.post_flags_id_seq OWNED BY public.post_flags.id;
 
 
 --
--- Name: post_regenerations; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.post_regenerations (
-    id bigint NOT NULL,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    creator_id integer NOT NULL,
-    post_id integer NOT NULL,
-    category character varying NOT NULL
-);
-
-
---
--- Name: post_regenerations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.post_regenerations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: post_regenerations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.post_regenerations_id_seq OWNED BY public.post_regenerations.id;
-
-
---
 -- Name: post_replacements; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4171,13 +4138,6 @@ ALTER TABLE ONLY public.post_flags ALTER COLUMN id SET DEFAULT nextval('public.p
 
 
 --
--- Name: post_regenerations id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.post_regenerations ALTER COLUMN id SET DEFAULT nextval('public.post_regenerations_id_seq'::regclass);
-
-
---
 -- Name: post_replacements id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4537,14 +4497,6 @@ ALTER TABLE ONLY public.post_disapprovals
 
 ALTER TABLE ONLY public.post_flags
     ADD CONSTRAINT post_flags_pkey PRIMARY KEY (id);
-
-
---
--- Name: post_regenerations post_regenerations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.post_regenerations
-    ADD CONSTRAINT post_regenerations_pkey PRIMARY KEY (id);
 
 
 --
@@ -6801,20 +6753,6 @@ CREATE INDEX index_post_flags_on_status ON public.post_flags USING btree (status
 
 
 --
--- Name: index_post_regenerations_on_creator_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_post_regenerations_on_creator_id ON public.post_regenerations USING btree (creator_id);
-
-
---
--- Name: index_post_regenerations_on_post_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_post_regenerations_on_post_id ON public.post_regenerations USING btree (post_id);
-
-
---
 -- Name: index_post_replacements_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7582,7 +7520,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200520060951'),
 ('20200803022359'),
 ('20200816175151'),
-('20201121180345'),
 ('20201201211748'),
 ('20201213052805'),
 ('20201219201007'),

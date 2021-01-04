@@ -178,7 +178,7 @@ Rails.application.routes.draw do
       get :search
     end
   end
-  resources :post_regenerations, :only => [:index, :create]
+  resources :post_regenerations, :only => [:create]
   resources :post_replacements, :only => [:index, :new, :create, :update]
   resources :post_votes, only: [:index]
 
