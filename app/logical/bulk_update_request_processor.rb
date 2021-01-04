@@ -212,11 +212,18 @@ class BulkUpdateRequestProcessor
     end.join("\n")
   end
 
+  # Tag move is allowed if:
+  #
+  # * The antecedent tag is an artist tag.
+  # * The consequent_tag is a nonexistent tag, an empty tag (of any type), or an artist tag.
+  # * Both tags have less than 100 posts.
   def self.is_tag_move_allowed?(antecedent_name, consequent_name)
     antecedent_tag = Tag.find_by_name(Tag.normalize_name(antecedent_name))
     consequent_tag = Tag.find_by_name(Tag.normalize_name(consequent_name))
 
-    (antecedent_tag.blank? || antecedent_tag.empty? || (antecedent_tag.artist? && antecedent_tag.post_count <= 100)) &&
-    (consequent_tag.blank? || consequent_tag.empty? || (consequent_tag.artist? && consequent_tag.post_count <= 100))
+    antecedent_allowed = antecedent_tag.present? && antecedent_tag.artist? && antecedent_tag.post_count < 100
+    consequent_allowed = consequent_tag.nil? || consequent_tag.empty? || (consequent_tag.artist? && consequent_tag.post_count < 100)
+
+    antecedent_allowed && consequent_allowed
   end
 end

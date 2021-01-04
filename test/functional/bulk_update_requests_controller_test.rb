@@ -139,6 +139,17 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "for a builder" do
+        should "fail when moving a non-artist tag" do
+          create(:tag, name: "sfw", post_count: 0)
+          @bulk_update_request = create(:bulk_update_request, script: "alias sfw -> rating:s")
+
+          post_auth approve_bulk_update_request_path(@bulk_update_request), @builder
+
+          assert_response 403
+          assert_equal("pending", @bulk_update_request.reload.status)
+          assert_equal(false, TagAlias.exists?(antecedent_name: "sfw", consequent_name: "rating:s"))
+        end
+
         should "fail for a large artist move" do
           create(:tag, name: "artist1", category: Tag.categories.artist, post_count: 1000)
           @bulk_update_request = create(:bulk_update_request, script: "create alias artist1 -> artist2")
