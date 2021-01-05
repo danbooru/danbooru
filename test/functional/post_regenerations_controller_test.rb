@@ -36,7 +36,7 @@ class PostRegenerationsControllerTest < ActionDispatch::IntegrationTest
 
           assert_equal(@mod, ModAction.last.creator)
           assert_equal("post_regenerate_iqdb", ModAction.last.category)
-          assert_equal("@#{@mod.name} regenerated IQDB for post ##{@post.id}", ModAction.last.description)
+          assert_equal("<@#{@mod.name}> regenerated IQDB for post ##{@post.id}", ModAction.last.description)
         end
       end
 
@@ -58,7 +58,7 @@ class PostRegenerationsControllerTest < ActionDispatch::IntegrationTest
 
           assert_equal(@mod, ModAction.last.creator)
           assert_equal("post_regenerate", ModAction.last.category)
-          assert_equal("@#{@mod.name} regenerated image samples for post ##{@post.id}", ModAction.last.description)
+          assert_equal("<@#{@mod.name}> regenerated image samples for post ##{@post.id}", ModAction.last.description)
         end
       end
     end
