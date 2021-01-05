@@ -1338,10 +1338,18 @@ class Post < ApplicationRecord
       else
         media_file = MediaFile.open(file, frame_data: pixiv_ugoira_frame_data)
         UploadService::Utils.process_resizes(self, nil, id, media_file: media_file)
+
+        # XXX This may be racy; the thumbnail may not be purged from Cloudflare by the time IQDB tries to download it.
+        purge_cached_urls!
         update_iqdb_async
 
         ModAction.log("<@#{user.name}> regenerated image samples for post ##{id}", :post_regenerate, user)
       end
+    end
+
+    def purge_cached_urls!
+      urls = [preview_file_url, large_file_url]
+      CloudflareService.new.purge_cache(urls)
     end
   end
 
