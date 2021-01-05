@@ -88,6 +88,6 @@
     <% end %>
 
     <% if policy(post).regenerate? %>
-      <li id="post-option-regenerate-preview"><%= link_to "Regenerate image", post_regenerations_path(post_id: post.id, category: "resizes"), remote: true, method: :post, "data-confirm": "This will regenerate the posts's thumbnail images. Are you sure?" %></li>
+      <li id="post-option-regenerate-preview"><%= link_to "Regenerate image", post_regenerations_path(post_id: post.id, category: "resizes"), method: :post, "data-confirm": "This will regenerate the posts's thumbnail images. Are you sure?" %></li>
     <% end %>
 </ul>

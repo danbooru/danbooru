@@ -1326,6 +1326,10 @@ class Post < ApplicationRecord
   end
 
   concerning :RegenerationMethods do
+    def regenerate_later!(category, user)
+      RegeneratePostJob.perform_later(post: self, category: category, user: user)
+    end
+
     def regenerate!(category, user)
       if category == "iqdb"
         update_iqdb_async
