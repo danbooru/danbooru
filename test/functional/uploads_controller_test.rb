@@ -1,33 +1,6 @@
 require 'test_helper'
 
 class UploadsControllerTest < ActionDispatch::IntegrationTest
-  def self.should_upload_successfully(source)
-    should "upload successfully from #{source}" do
-      assert_successful_upload(source, user: create(:user, created_at: 1.month.ago))
-    end
-  end
-
-  def assert_successful_upload(source_or_file_path, user: @user, **params)
-    if source_or_file_path =~ %r{\Ahttps?://}i
-      source = { source: source_or_file_path }
-    else
-      file = Rack::Test::UploadedFile.new(Rails.root.join(source_or_file_path))
-      source = { file: file }
-    end
-
-    assert_difference(["Upload.count"]) do
-      post_auth uploads_path, user, params: { upload: { tag_string: "abc", rating: "e", **source, **params }}
-    end
-
-    upload = Upload.last
-    assert_response :redirect
-    assert_redirected_to upload
-    assert_equal("completed", upload.status)
-    assert_equal(Post.last, upload.post)
-    assert_equal(upload.post.md5, upload.md5)
-    upload
-  end
-
   context "The uploads controller" do
     setup do
       @user = create(:contributor_user, name: "marisa")
