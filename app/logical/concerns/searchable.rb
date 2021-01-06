@@ -10,6 +10,10 @@ module Searchable
     1 + params.values.map { |v| parameter_hash?(v) ? parameter_depth(v) : 1 }.max
   end
 
+  def prefix_matches(prefix, params)
+    params.keys.any? { |x| x.starts_with?(prefix) }
+  end
+
   def negate_relation
     unscoped.where(all.where_clause.invert.ast)
   end
@@ -206,6 +210,8 @@ module Searchable
   def search_numeric_attribute(attr, params)
     if params[attr].present?
       numeric_attribute_matches(attr, params[attr])
+    elsif params[:"#{attr}_not"].present?
+      where.not(id: numeric_attribute_matches(attr, params[:"#{attr}_not"]))
     elsif params[:"#{attr}_eq"].present?
       where_operator(attr, :eq, params[:"#{attr}_eq"])
     elsif params[:"#{attr}_not_eq"].present?
@@ -277,7 +283,7 @@ module Searchable
 
   def search_includes(attr, params, type, current_user)
     model = Kernel.const_get(type)
-    if params["#{attr}_id"].present?
+    if prefix_matches("#{attr}_id", params)
       search_attribute("#{attr}_id", params, current_user)
     elsif params["has_#{attr}"].to_s.truthy? || params["has_#{attr}"].to_s.falsy?
       search_has_include(attr, params["has_#{attr}"].to_s.truthy?, model)
@@ -323,6 +329,8 @@ module Searchable
       relation = relation.where(name => value)
     elsif params["#{name}_id"].present?
       relation = relation.numeric_attribute_matches(name, params["#{name}_id"])
+    elsif params["#{name}_id_not"].present?
+      relation = relation.where.not(id: relation.numeric_attribute_matches(name, params["#{name}_id_not"]))
     end
 
     relation
