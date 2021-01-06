@@ -10,6 +10,10 @@ module Searchable
     1 + params.values.map { |v| parameter_hash?(v) ? parameter_depth(v) : 1 }.max
   end
 
+  def prefix_matches(prefix, params)
+    params.keys.any? { |x| x.starts_with?(prefix) }
+  end
+
   def negate_relation
     unscoped.where(all.where_clause.invert.ast)
   end
@@ -279,7 +283,7 @@ module Searchable
 
   def search_includes(attr, params, type, current_user)
     model = Kernel.const_get(type)
-    if params["#{attr}_id"].present?
+    if prefix_matches("#{attr}_id", params)
       search_attribute("#{attr}_id", params, current_user)
     elsif params["has_#{attr}"].to_s.truthy? || params["has_#{attr}"].to_s.falsy?
       search_has_include(attr, params["has_#{attr}"].to_s.truthy?, model)
