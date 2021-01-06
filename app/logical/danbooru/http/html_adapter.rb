@@ -5,7 +5,7 @@ module Danbooru
       HTTP::MimeType.register_alias "text/html", :html
 
       def decode(str)
-        Nokogiri::HTML5(str)
+        Nokogiri::HTML5(str, max_tree_depth: -1)
       end
     end
   end

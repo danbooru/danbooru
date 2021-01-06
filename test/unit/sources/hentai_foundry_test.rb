@@ -102,5 +102,12 @@ module Sources
         assert_equal(bad_source, Sources::Strategies.normalize_source(bad_source))
       end
     end
+
+    context "a post with a deeply nested commentary" do
+      should "work" do
+        @source = Sources::Strategies.find("https://hentai-foundry.com/pictures/user/LumiNyu/867562/Mona-patreon-winner")
+        assert_nothing_raised { @source.to_h }
+      end
+    end
   end
 end
