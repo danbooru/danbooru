@@ -329,6 +329,8 @@ module Searchable
       relation = relation.where(name => value)
     elsif params["#{name}_id"].present?
       relation = relation.numeric_attribute_matches(name, params["#{name}_id"])
+    elsif params["#{name}_id_not"].present?
+      relation = relation.where.not(id: relation.numeric_attribute_matches(name, params["#{name}_id_not"]))
     end
 
     relation
