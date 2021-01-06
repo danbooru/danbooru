@@ -69,7 +69,7 @@
             <a href="javascript:void(0)"><i id="open-edit-dialog" class="fas fa-external-link-alt" title="detach" data-shortcut="shift+e"></i></a>
           </div>
 
-          <%= f.input :tag_string, label: false, input_html: { size: "60x5", "data-autocomplete": "tag-edit", "data-shortcut": "e", value: params[:tag_string] } %>
+          <%= f.input :tag_string, label: false, hint: "Ctrl+Enter to submit", input_html: { size: "60x5", "data-autocomplete": "tag-edit", "data-shortcut": "e", value: params[:tag_string] } %>
           <%= render "related_tags/buttons" %>
         </div>
 
