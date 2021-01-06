@@ -10,7 +10,7 @@
       <% end %>
       <li><strong>Creator</strong> <%= link_to_user @tag_alias.creator %></li>
       <li><strong>Date</strong> <%= @tag_alias.created_at %></li>
-      <% if @tag_alias.respond_to?(:reason) && @tag_alias.reason.present? %>
+      <% if @tag_alias.reason.present? %>
         <li>
           <strong>Reason</strong>
           <div class="prose">

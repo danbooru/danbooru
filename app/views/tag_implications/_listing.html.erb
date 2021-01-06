@@ -1,26 +1,31 @@
-<%= table_for tag_implications, width: "100%" do |t| %>
-  <% t.column "From", width: "25%" do |tag_implication| %>
+<%= table_for tag_implications, class: "striped autofit" do |t| %>
+  <% t.column "From", width: "30%" do |tag_implication| %>
     <%= link_to tag_implication.antecedent_name, posts_path(tags: tag_implication.antecedent_name), class: tag_class(tag_implication.antecedent_tag) %>
     <%= link_to "»", tag_implications_path(search: { implied_from: tag_implication.antecedent_name }) %>
     <span class="count"><%= tag_implication.antecedent_tag&.post_count.to_i %></span>
   <% end %>
-  <% t.column "To", width: "25%" do |tag_implication| %>
+  <% t.column "To", td: { class: "col-expand" } do |tag_implication| %>
     <%= link_to tag_implication.consequent_name, posts_path(tags: tag_implication.consequent_name), class: tag_class(tag_implication.consequent_tag) %>
     <%= link_to "»", tag_implications_path(search: { implied_to: tag_implication.consequent_name }) %>
     <span class="count"><%= tag_implication.consequent_tag&.post_count.to_i %></span>
   <% end %>
-  <% t.column "Topic", width: "10%" do |tag_implication| %>
+  <% t.column "Reason" do |tag_implication| %>
+    <span class="prose">
+      <%= format_text(tag_implication.reason, inline: true) %>
+    </span>
+  <% end %>
+  <% t.column "Topic" do |tag_implication| %>
     <% if tag_implication.forum_topic_id %>
       <%= link_to "topic ##{tag_implication.forum_topic_id}", forum_topic_path(tag_implication.forum_topic_id) %>
     <% end %>
   <% end %>
-  <% t.column "Approver", width: "15%" do |tag_implication| %>
+  <% t.column "Approver" do |tag_implication| %>
     <%= link_to_user(tag_implication.approver) if tag_implication.approver %>
   <% end %>
-  <% t.column "Status", width: "5%" do |tag_implication| %>
+  <% t.column "Status" do |tag_implication| %>
     <span id="tag-implication-status-for-<%= tag_implication.id %>"><%= tag_implication.status %></span>
   <% end %>
-  <% t.column column: "control", width: "15%" do |tag_implication| %>
+  <% t.column column: "control" do |tag_implication| %>
     <%= link_to "Show", tag_implication_path(tag_implication) %>
 
     <% if policy(tag_implication).destroy? %>

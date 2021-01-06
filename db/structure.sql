@@ -2876,7 +2876,8 @@ CREATE TABLE public.tag_aliases (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     approver_id integer,
-    forum_post_id integer
+    forum_post_id integer,
+    reason text DEFAULT ''::text NOT NULL
 );
 
 
@@ -2913,7 +2914,8 @@ CREATE TABLE public.tag_implications (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     approver_id integer,
-    forum_post_id integer
+    forum_post_id integer,
+    reason text DEFAULT ''::text NOT NULL
 );
 
 
@@ -7523,6 +7525,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20201201211748'),
 ('20201213052805'),
 ('20201219201007'),
-('20201224101208');
+('20201224101208'),
+('20210106212805');
 
 
