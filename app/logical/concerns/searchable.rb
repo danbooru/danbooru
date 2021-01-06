@@ -206,6 +206,8 @@ module Searchable
   def search_numeric_attribute(attr, params)
     if params[attr].present?
       numeric_attribute_matches(attr, params[attr])
+    elsif params[:"#{attr}_not"].present?
+      where.not(id: numeric_attribute_matches(attr, params[:"#{attr}_not"]))
     elsif params[:"#{attr}_eq"].present?
       where_operator(attr, :eq, params[:"#{attr}_eq"])
     elsif params[:"#{attr}_not_eq"].present?
