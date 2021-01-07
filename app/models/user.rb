@@ -6,6 +6,7 @@ class User < ApplicationRecord
 
   module Levels
     ANONYMOUS = 0
+    RESTRICTED = 10
     MEMBER = 20
     GOLD = 30
     PLATINUM = 31
@@ -211,6 +212,7 @@ class User < ApplicationRecord
       def level_hash
         return {
           "Member" => Levels::MEMBER,
+          "Restricted" => Levels::RESTRICTED,
           "Gold" => Levels::GOLD,
           "Platinum" => Levels::PLATINUM,
           "Builder" => Levels::BUILDER,
@@ -224,6 +226,9 @@ class User < ApplicationRecord
         case value
         when Levels::ANONYMOUS
           "Anonymous"
+
+        when Levels::RESTRICTED
+          "Restricted"
 
         when Levels::MEMBER
           "Member"
@@ -278,12 +283,12 @@ class User < ApplicationRecord
       name.match?(/\Auser_[0-9]+~*\z/)
     end
 
-    def is_restricted?
-      requires_verification? && !is_verified?
-    end
-
     def is_anonymous?
       level == Levels::ANONYMOUS
+    end
+
+    def is_restricted?
+      level == Levels::RESTRICTED
     end
 
     def is_member?

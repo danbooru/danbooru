@@ -1,6 +1,8 @@
 # Checks whether a new account seems suspicious and should require email verification.
 
 class UserVerifier
+  extend Memoist
+
   attr_reader :current_user, :request
 
   # current_user is the user creating the new account, not the new account itself.
@@ -14,6 +16,14 @@ class UserVerifier
 
     # we check for IP bans first to make sure we bump the IP ban hit count
     is_ip_banned? || is_logged_in? || is_recent_signup? || is_proxy?
+  end
+
+  def initial_level
+    if requires_verification?
+      User::Levels::RESTRICTED
+    else
+      User::Levels::MEMBER
+    end
   end
 
   private
@@ -48,4 +58,6 @@ class UserVerifier
   def is_proxy?
     IpLookup.new(ip_address).is_proxy?
   end
+
+  memoize :is_ip_banned?, :is_proxy?, :is_recent_signup?
 end

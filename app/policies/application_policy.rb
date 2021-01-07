@@ -39,11 +39,7 @@ class ApplicationPolicy
   end
 
   def unbanned?
-    user.is_member? && !user.is_banned? && verified?
-  end
-
-  def verified?
-    user.is_verified? || user.is_gold? || !user.requires_verification?
+    user.is_member? && !user.is_banned? && !user.is_restricted?
   end
 
   def policy(object)

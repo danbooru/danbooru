@@ -15,6 +15,12 @@ FactoryBot.define do
       is_banned {true}
     end
 
+    factory(:restricted_user) do
+      level {10}
+      requires_verification { true }
+      is_verified { false }
+    end
+
     factory(:member_user) do
       level {20}
     end

@@ -4,20 +4,20 @@ class DmailPolicy < ApplicationPolicy
   end
 
   def index?
-    user.is_member?
+    !user.is_anonymous?
   end
 
   def mark_all_as_read?
-    user.is_member?
+    !user.is_anonymous?
   end
 
   def update?
-    user.is_member? && record.owner_id == user.id
+    !user.is_anonymous? && record.owner_id == user.id
   end
 
   def show?
     return true if user.is_owner?
-    user.is_member? && (record.owner_id == user.id || record.valid_key?(request.params[:key]))
+    !user.is_anonymous? && (record.owner_id == user.id || record.valid_key?(request.params[:key]))
   end
 
   def reportable?

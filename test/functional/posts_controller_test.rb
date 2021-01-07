@@ -659,8 +659,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "not allow unverified users to update posts" do
-        @user.update!(requires_verification: true, is_verified: false)
-        put_auth post_path(@post), @user, params: { post: { tag_string: "blah" }}
+        put_auth post_path(@post), create(:restricted_user), params: { post: { tag_string: "blah" }}
         assert_response 403
         assert_not_equal("blah", @post.reload.tag_string)
       end

@@ -49,7 +49,7 @@ class EmailsController < ApplicationController
       redirect_to edit_user_email_path(@user)
     elsif params[:email_verification_key].present?
       authorize @email_address
-      @email_address.update!(is_verified: true)
+      @email_address.verify!
       flash[:notice] = "Email address verified"
       redirect_to @email_address.user
     else

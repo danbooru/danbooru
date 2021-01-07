@@ -16,7 +16,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def upgrade?
-    user.is_member?
+    !user.is_anonymous?
   end
 
   def reportable?
@@ -24,7 +24,7 @@ class UserPolicy < ApplicationPolicy
   end
 
   def fix_counts?
-    user.is_member?
+    !user.is_anonymous?
   end
 
   def can_see_last_logged_in_at?

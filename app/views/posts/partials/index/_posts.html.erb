@@ -19,7 +19,7 @@
     </div>
   <% end %>
 
-  <% if CurrentUser.user.is_member? && post_set.tag.present? && post_set.current_page == 1 %>
+  <% if !CurrentUser.user.is_anonymous? && post_set.tag.present? && post_set.current_page == 1 %>
     <% cache("tag-change-notice:#{post_set.tag.name}", expires_in: 4.hours) do %>
       <% if post_set.pending_bulk_update_requests.present? %>
         <div class="fineprint tag-change-notice">

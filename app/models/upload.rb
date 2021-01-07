@@ -93,10 +93,10 @@ class Upload < ApplicationRecord
   def self.visible(user)
     if user.is_admin?
       all
-    elsif user.is_member?
-      completed.or(where(uploader: user))
-    else
+    elsif user.is_anonymous?
       completed
+    else
+      completed.or(where(uploader: user))
     end
   end
 

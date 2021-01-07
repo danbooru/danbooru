@@ -1,10 +1,10 @@
 class SavedSearchPolicy < ApplicationPolicy
   def index?
-    user.is_member?
+    !user.is_anonymous?
   end
 
   def create?
-    user.is_member?
+    !user.is_anonymous?
   end
 
   def update?

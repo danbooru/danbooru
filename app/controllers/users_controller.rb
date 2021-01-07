@@ -48,7 +48,7 @@ class UsersController < ApplicationController
   def profile
     @user = authorize CurrentUser.user
 
-    if @user.is_member?
+    if !@user.is_anonymous?
       params[:action] = "show"
       respond_with(@user, methods: @user.full_attributes, template: "users/show")
     elsif request.format.html?
@@ -59,11 +59,12 @@ class UsersController < ApplicationController
   end
 
   def create
-    requires_verification = UserVerifier.new(CurrentUser.user, request).requires_verification?
+    user_verifier = UserVerifier.new(CurrentUser.user, request)
 
     @user = authorize User.new(
       last_ip_addr: CurrentUser.ip_addr,
-      requires_verification: requires_verification,
+      requires_verification: user_verifier.requires_verification?,
+      level: user_verifier.initial_level,
       name: params[:user][:name],
       password: params[:user][:password],
       password_confirmation: params[:user][:password_confirmation]

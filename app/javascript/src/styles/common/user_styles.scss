@@ -26,4 +26,8 @@ body[data-current-user-style-usernames="true"] {
   a.user-member {
     color: var(--user-member-color);
   }
+
+  a.user-restricted {
+    color: var(--user-restricted-color);
+  }
 }

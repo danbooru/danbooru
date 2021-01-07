@@ -11,10 +11,10 @@ class UserNameChangeRequest < ApplicationRecord
   def self.visible(user)
     if user.is_moderator?
       all
-    elsif user.is_member?
-      where(user: User.undeleted)
-    else
+    elsif user.is_anonymous?
       none
+    else
+      where(user: User.undeleted)
     end
   end
 

@@ -12,7 +12,7 @@ class ArtistPolicy < ApplicationPolicy
   end
 
   def can_view_banned?
-    user.is_member?
+    !user.is_anonymous?
   end
 
   def permitted_attributes

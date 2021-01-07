@@ -4,7 +4,7 @@ class FavoriteGroupPolicy < ApplicationPolicy
   end
 
   def create?
-    user.is_member?
+    !user.is_anonymous?
   end
 
   def update?

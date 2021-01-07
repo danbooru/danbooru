@@ -256,6 +256,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to User.last
         assert_equal("xxx", User.last.name)
+        assert_equal(User::Levels::MEMBER, User.last.level)
         assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
         assert_nil(User.last.email_address)
         assert_no_enqueued_emails
@@ -303,66 +304,80 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
           assert_redirected_to User.last
+          assert_equal(true, User.last.is_member?)
+          assert_equal(false, User.last.is_restricted?)
           assert_equal(false, User.last.requires_verification)
         end
 
-        should "mark accounts created by already logged in users as requiring verification" do
+        should "mark accounts created by already logged in users as restricted" do
           self.remote_addr = @valid_ip
 
           post_auth users_path, @user, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
           assert_redirected_to User.last
+          assert_equal(false, User.last.is_member?)
+          assert_equal(true, User.last.is_restricted?)
           assert_equal(true, User.last.requires_verification)
         end
 
-        should "mark users signing up from proxies as requiring verification" do
+        should "mark users signing up from proxies as restricted" do
           skip unless IpLookup.enabled?
           self.remote_addr = @proxy_ip
 
           post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
           assert_redirected_to User.last
+          assert_equal(false, User.last.is_member?)
+          assert_equal(true, User.last.is_restricted?)
           assert_equal(true, User.last.requires_verification)
         end
 
-        should "mark users signing up from a partial banned IP as requiring verification" do
+        should "mark users signing up from a partial banned IP as restricted" do
           self.remote_addr = @valid_ip
 
           @ip_ban = create(:ip_ban, ip_addr: self.remote_addr, category: :partial)
           post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
           assert_redirected_to User.last
+          assert_equal(false, User.last.is_member?)
+          assert_equal(true, User.last.is_restricted?)
           assert_equal(true, User.last.requires_verification)
           assert_equal(1, @ip_ban.reload.hit_count)
           assert(@ip_ban.last_hit_at > 1.minute.ago)
         end
 
-        should "not mark users signing up from non-proxies as requiring verification" do
+        should "not mark users signing up from non-proxies as restricted" do
           skip unless IpLookup.enabled?
           self.remote_addr = @valid_ip
 
           post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
           assert_redirected_to User.last
+          assert_equal(true, User.last.is_member?)
+          assert_equal(false, User.last.is_restricted?)
           assert_equal(false, User.last.requires_verification)
         end
 
-        should "mark accounts registered from an IPv4 address recently used for another account as requiring verification" do
+        should "mark accounts registered from an IPv4 address recently used for another account as restricted" do
           @user.update!(last_ip_addr: @valid_ip)
           self.remote_addr = @valid_ip
 
           post users_path, params: { user: { name: "dupe", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
           assert_redirected_to User.last
+          assert_equal(false, User.last.is_member?)
+          assert_equal(true, User.last.is_restricted?)
           assert_equal(true, User.last.requires_verification)
         end
 
-        should "not mark users signing up from localhost as requiring verification" do
+        should "not mark users signing up from localhost as restricted" do
           self.remote_addr = "127.0.0.1"
 
           post users_path, params: { user: { name: "xxx", password: "xxxxx1", password_confirmation: "xxxxx1" }}
 
           assert_redirected_to User.last
+          assert_equal(true, User.last.is_member?)
+          assert_equal(false, User.last.is_restricted?)
           assert_equal(false, User.last.requires_verification)
         end
       end

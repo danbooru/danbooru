@@ -5,7 +5,6 @@ class EmailAddress < ApplicationRecord
   validates :normalized_address, uniqueness: true
   validates :user_id, uniqueness: true
   validate :validate_deliverable, on: :deliverable
-  after_save :update_user
 
   def self.visible(user)
     if user.is_moderator?
@@ -60,8 +59,14 @@ class EmailAddress < ApplicationRecord
     end
   end
 
-  def update_user
-    user.update!(is_verified: is_verified? && !is_restricted?)
+  def verify!
+    transaction do
+      update!(is_verified: true)
+
+      if user.is_restricted? && !is_restricted?
+        user.update!(level: User::Levels::MEMBER, is_verified: is_verified?)
+      end
+    end
   end
 
   concerning :VerificationMethods do

@@ -20,7 +20,7 @@ class ForumTopicPolicy < ApplicationPolicy
   end
 
   def mark_all_as_read?
-    user.is_member?
+    !user.is_anonymous?
   end
 
   def reply?

@@ -11,10 +11,10 @@ class CommentVote < ApplicationRecord
   def self.visible(user)
     if user.is_moderator?
       all
-    elsif user.is_member?
-      where(user: user)
-    else
+    elsif user.is_anonymous?
       none
+    else
+      where(user: user)
     end
   end
 

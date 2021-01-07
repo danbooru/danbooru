@@ -7,7 +7,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
     setup do
       @user = create(:user, email_address: build(:email_address, { address: "bob@ogres.net", is_verified: false }))
       @other_user = create(:user, email_address: build(:email_address, { address: "alice@ogres.net", is_verified: false }))
-      @restricted_user = create(:user, requires_verification: true, is_verified: false)
+      @restricted_user = create(:restricted_user, email_address: build(:email_address, { is_verified: false }))
     end
 
     context "#index" do
@@ -136,27 +136,47 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      context "with a nondisposable email address" do
-        should "mark the user as verified" do
-          Danbooru.config.stubs(:email_domain_verification_list).returns(["gmail.com"])
-          @user.email_address.update!(address: "test@gmail.com")
-          get email_verification_url(@user)
+      context "for a Restricted user" do
+        context "with a nondisposable email address" do
+          should "unrestrict the user's account" do
+            Danbooru.config.stubs(:email_domain_verification_list).returns(["gmail.com"])
+            @restricted_user.email_address.update!(address: "test@gmail.com")
 
-          assert_redirected_to @user
-          assert_equal(true, @user.reload.email_address.is_verified)
-          assert_equal(true, @user.is_verified)
+            get email_verification_url(@restricted_user)
+
+            assert_redirected_to @restricted_user
+            assert_equal(true, @restricted_user.reload.email_address.is_verified)
+            assert_equal(false, @restricted_user.is_restricted?)
+            assert_equal(true, @restricted_user.is_member?)
+          end
+        end
+
+        context "with a disposable email address" do
+          should "leave the user's account restricted" do
+            Danbooru.config.stubs(:email_domain_verification_list).returns(["gmail.com"])
+            @restricted_user.email_address.update!(address: "test@mailinator.com")
+
+            get email_verification_url(@restricted_user)
+
+            assert_redirected_to @restricted_user
+            assert_equal(true, @restricted_user.reload.email_address.is_verified)
+            assert_equal(true, @restricted_user.is_restricted?)
+            assert_equal(false, @restricted_user.is_member?)
+          end
         end
       end
 
-      context "with a disposable email address" do
-        should "not mark the user as verified" do
+      context "for a Gold user" do
+        should "not change the user's level" do
+          @user = create(:gold_user, email_address: build(:email_address, { address: "test@gmail.com", is_verified: false }))
           Danbooru.config.stubs(:email_domain_verification_list).returns(["gmail.com"])
-          @user.email_address.update!(address: "test@mailinator.com")
+
           get email_verification_url(@user)
 
           assert_redirected_to @user
           assert_equal(true, @user.reload.email_address.is_verified)
-          assert_equal(false, @user.is_verified)
+          assert_equal(false, @user.is_restricted?)
+          assert_equal(true, @user.is_gold?)
         end
       end
 
