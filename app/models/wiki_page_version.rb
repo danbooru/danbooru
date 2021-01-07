@@ -2,12 +2,11 @@ class WikiPageVersion < ApplicationRecord
   array_attribute :other_names
   belongs_to :wiki_page
   belongs_to_updater
-  belongs_to :artist, optional: true
   belongs_to :tag, primary_key: :name, foreign_key: :title, optional: true
 
   module SearchMethods
     def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :title, :body, :other_names, :is_locked, :is_deleted, :updater, :wiki_page, :artist, :tag)
+      q = search_attributes(params, :id, :created_at, :updated_at, :title, :body, :other_names, :is_locked, :is_deleted, :updater, :wiki_page, :tag)
       q = q.text_attribute_matches(:title, params[:title_matches])
       q = q.text_attribute_matches(:body, params[:body_matches])
 
@@ -76,6 +75,6 @@ class WikiPageVersion < ApplicationRecord
   end
 
   def self.available_includes
-    [:updater, :wiki_page, :artist, :tag]
+    [:updater, :wiki_page, :tag]
   end
 end

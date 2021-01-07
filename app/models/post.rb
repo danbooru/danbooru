@@ -39,7 +39,6 @@ class Post < ApplicationRecord
   after_commit :remove_iqdb_async, :on => :destroy
   after_commit :update_iqdb_async, :on => :create
 
-  belongs_to :updater, :class_name => "User", optional: true # this is handled in versions
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
   belongs_to :parent, class_name: "Post", optional: true
@@ -1295,7 +1294,7 @@ class Post < ApplicationRecord
         :is_note_locked, :is_rating_locked, :is_status_locked, :is_pending,
         :is_flagged, :is_deleted, :is_banned, :last_comment_bumped_at,
         :last_commented_at, :last_noted_at, :uploader_ip_addr,
-        :uploader, :updater, :approver, :parent, :upload, :artist_commentary,
+        :uploader, :approver, :parent, :upload, :artist_commentary,
         :flags, :appeals, :notes, :comments, :children, :approvals,
         :replacements, :pixiv_ugoira_frame_data
       )
