@@ -10,10 +10,6 @@ module Searchable
     1 + params.values.map { |v| parameter_hash?(v) ? parameter_depth(v) : 1 }.max
   end
 
-  def prefix_matches(prefix, params)
-    params.keys.any? { |x| x.starts_with?(prefix) }
-  end
-
   def negate_relation
     unscoped.where(all.where_clause.invert.ast)
   end
@@ -172,8 +168,18 @@ module Searchable
   end
 
   def search_attribute(name, params, current_user)
+    if has_attribute?(name)
+      search_basic_attribute(name, params, current_user)
+    elsif reflections.has_key?(name.to_s)
+      search_association_attribute(name, params, current_user)
+    else
+      raise ArgumentError, "#{name} is not an attribute or association"
+    end
+  end
+
+  def search_basic_attribute(name, params, current_user)
     column = column_for_attribute(name)
-    type = column.type || reflect_on_association(name)&.class_name
+    type = column.type
 
     if column.try(:array?)
       subtype = type
@@ -183,12 +189,6 @@ module Searchable
     end
 
     case type
-    when "User"
-      search_user_attribute(name, params, current_user)
-    when "Post"
-      search_post_attribute(name, params, current_user)
-    when "Model"
-      search_polymorphic_attribute(name, params, current_user)
     when :string, :text
       search_text_attribute(name, params)
     when :boolean
@@ -202,8 +202,7 @@ module Searchable
     when :array
       search_array_attribute(name, subtype, params)
     else
-      raise NotImplementedError, "unhandled attribute type: #{name}" if type.blank?
-      search_includes(name, params, type, current_user)
+      raise NotImplementedError, "unhandled attribute type: #{name}"
     end
   end
 
@@ -265,33 +264,36 @@ module Searchable
     end
   end
 
-  def search_user_attribute(attr, params, current_user)
-    if params["#{attr}_name"].present?
-      where(attr => User.search(name_matches: params["#{attr}_name"]).reorder(nil))
-    else
-      search_includes(attr, params, "User", current_user)
-    end
-  end
+  def search_association_attribute(attr, params, current_user)
+    association = reflect_on_association(attr)
+    relation = all
 
-  def search_post_attribute(attr, params, current_user)
-    if params["#{attr}_tags_match"]
-      where(attr => Post.user_tag_match(params["#{attr}_tags_match"], current_user).reorder(nil))
-    else
-      search_includes(attr, params, "Post", current_user)
+    if association.polymorphic?
+      return search_polymorphic_attribute(attr, params, current_user)
     end
-  end
 
-  def search_includes(attr, params, type, current_user)
-    model = Kernel.const_get(type)
-    if prefix_matches("#{attr}_id", params)
-      search_attribute("#{attr}_id", params, current_user)
-    elsif params["has_#{attr}"].to_s.truthy? || params["has_#{attr}"].to_s.falsy?
-      search_has_include(attr, params["has_#{attr}"].to_s.truthy?, model)
-    elsif parameter_hash?(params[attr])
-      where(attr => model.visible(current_user).search(params[attr]).reorder(nil))
-    else
-      all
+    if association.belongs_to?
+      relation = relation.search_attribute(association.foreign_key, params, current_user)
     end
+
+    model = association.klass
+    if model == User && params["#{attr}_name"].present?
+      relation = relation.where(attr => User.search(name_matches: params["#{attr}_name"]).reorder(nil))
+    end
+
+    if model == Post && params["#{attr}_tags_match"].present?
+      relation = relation.where(attr => Post.user_tag_match(params["#{attr}_tags_match"], current_user).reorder(nil))
+    end
+
+    if params["has_#{attr}"].to_s.truthy? || params["has_#{attr}"].to_s.falsy?
+      relation = relation.search_has_include(attr, params["has_#{attr}"].to_s.truthy?, model)
+    end
+
+    if parameter_hash?(params[attr])
+      relation = relation.where(attr => model.visible(current_user).search(params[attr]).reorder(nil))
+    end
+
+    relation
   end
 
   def search_polymorphic_attribute(attr, params, current_user)
