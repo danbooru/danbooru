@@ -88,8 +88,6 @@ class ApplicationController < ActionController::Base
   end
 
   def rescue_exception(exception)
-    raise exception if Danbooru.config.debug_mode
-
     case exception
     when ActionView::Template::Error
       rescue_exception(exception.cause)
@@ -120,6 +118,7 @@ class ApplicationController < ActionController::Base
     when PG::ConnectionBad
       render_error_page(503, exception, message: "The database is unavailable. Try again later.")
     else
+      raise exception if Danbooru.config.debug_mode
       render_error_page(500, exception)
     end
   end
