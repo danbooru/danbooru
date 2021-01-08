@@ -9,6 +9,7 @@ class PasswordResetsController < ApplicationController
       redirect_to password_reset_path
     elsif @user.can_receive_email?(require_verification: false)
       UserMailer.password_reset(@user).deliver_later
+      UserEvent.create_from_request!(@user, :password_reset, request)
       flash[:notice] = "Password reset email sent. Check your email"
       respond_with(@user, location: new_session_path)
     else

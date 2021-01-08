@@ -10,12 +10,28 @@ class SessionLoader
   end
 
   def login(name, password)
-    user = User.find_by_name(name)&.authenticate_password(password)
-    return nil unless user
+    user = User.find_by_name(name)
 
-    session[:user_id] = user.id
-    user.update_column(:last_ip_addr, request.remote_ip)
-    user
+    if user.present? && user.authenticate_password(password)
+      session[:user_id] = user.id
+
+      UserEvent.build_from_request(user, :login, request)
+      user.last_logged_in_at = Time.now
+      user.last_ip_addr = request.remote_ip
+      user.save!
+
+      user
+    elsif user.nil?
+      nil # username incorrect
+    else
+      UserEvent.create_from_request!(user, :failed_login, request)
+      nil # password incorrect
+    end
+  end
+
+  def logout
+    session.delete(:user_id)
+    UserEvent.create_from_request!(CurrentUser.user, :logout, request)
   end
 
   def load
@@ -76,6 +92,7 @@ class SessionLoader
     CurrentUser.user = user
   end
 
+  # XXX use rails 6.1 signed ids (https://github.com/rails/rails/blob/6-1-stable/activerecord/CHANGELOG.md)
   def load_param_user(signed_user_id)
     session[:user_id] = Danbooru::MessageVerifier.new(:login).verify(signed_user_id)
     load_session_user

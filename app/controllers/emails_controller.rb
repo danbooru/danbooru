@@ -26,6 +26,7 @@ class EmailsController < ApplicationController
     @user = authorize User.find(params[:user_id]), policy_class: EmailAddressPolicy
 
     if @user.authenticate_password(params[:user][:password])
+      UserEvent.build_from_request(@user, :email_change, request)
       @user.update(email_address_attributes: { address: params[:user][:email] })
     else
       @user.errors.add(:base, "Password was incorrect")

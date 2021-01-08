@@ -1,11 +1,18 @@
 require 'test_helper'
 
 class UserDeletionTest < ActiveSupport::TestCase
+  setup do
+    @request = mock
+    @request.stubs(:remote_ip).returns("1.1.1.1")
+    @request.stubs(:user_agent).returns("Firefox")
+    @request.stubs(:session).returns(session_id: "1234")
+  end
+
   context "an invalid user deletion" do
     context "for an invalid password" do
       should "fail" do
         @user = create(:user)
-        @deletion = UserDeletion.new(@user, "wrongpassword")
+        @deletion = UserDeletion.new(@user, "wrongpassword", @request)
         @deletion.delete!
         assert_includes(@deletion.errors[:base], "Password is incorrect")
       end
@@ -14,7 +21,7 @@ class UserDeletionTest < ActiveSupport::TestCase
     context "for an admin" do
       should "fail" do
         @user = create(:admin_user)
-        @deletion = UserDeletion.new(@user, "password")
+        @deletion = UserDeletion.new(@user, "password", @request)
         @deletion.delete!
         assert_includes(@deletion.errors[:base], "Admins cannot delete their account")
       end
@@ -24,7 +31,7 @@ class UserDeletionTest < ActiveSupport::TestCase
   context "a valid user deletion" do
     setup do
       @user = create(:user, name: "foo", email_address: build(:email_address))
-      @deletion = UserDeletion.new(@user, "password")
+      @deletion = UserDeletion.new(@user, "password", @request)
     end
 
     should "blank out the email" do

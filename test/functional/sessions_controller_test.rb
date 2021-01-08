@@ -20,10 +20,19 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to posts_path
         assert_equal(@user.id, session[:user_id])
         assert_not_nil(@user.reload.last_ip_addr)
+        assert_equal(true, @user.user_events.login.exists?)
       end
 
       should "not log the user in when given an incorrect password" do
         post session_path, params: { name: @user.name, password: "wrong"}
+
+        assert_response 401
+        assert_nil(nil, session[:user_id])
+        assert_equal(true, @user.user_events.failed_login.exists?)
+      end
+
+      should "not log the user in when given an incorrect username" do
+        post session_path, params: { name: "dne", password: "password" }
 
         assert_response 401
         assert_nil(nil, session[:user_id])
@@ -66,10 +75,17 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "destroy action" do
-      should "clear the session" do
+      setup do
         delete_auth session_path, @user
+      end
+
+      should "clear the session" do
         assert_redirected_to posts_path
         assert_nil(session[:user_id])
+      end
+
+      should "generate a logout event" do
+        assert_equal(true, @user.user_events.logout.exists?)
       end
     end
 

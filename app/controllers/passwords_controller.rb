@@ -10,6 +10,7 @@ class PasswordsController < ApplicationController
     @user = authorize User.find(params[:user_id]), policy_class: PasswordPolicy
 
     if @user.authenticate_password(params[:user][:old_password]) || @user.authenticate_login_key(params[:user][:signed_user_id]) || CurrentUser.user.is_owner?
+      UserEvent.build_from_request(@user, :password_change, request)
       @user.update(password: params[:user][:password], password_confirmation: params[:user][:password_confirmation])
     else
       @user.errors.add(:base, "Incorrect password")

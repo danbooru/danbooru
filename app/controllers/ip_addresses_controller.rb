@@ -17,7 +17,7 @@ class IpAddressesController < ApplicationController
 
   def show
     @ip_address = authorize IpAddress.new(ip_addr: params[:id])
-    @ip_info = @ip_address.lookup.info
+    @ip_info = @ip_address.lookup.response
     respond_with(@ip_info)
   end
 end

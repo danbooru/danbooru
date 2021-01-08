@@ -260,6 +260,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
         assert_nil(User.last.email_address)
         assert_no_enqueued_emails
+        assert_equal(true, User.last.user_events.user_creation.exists?)
       end
 
       should "create a user with a valid email" do
@@ -270,6 +271,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
         assert_equal("webmaster@danbooru.donmai.us", User.last.email_address.address)
         assert_enqueued_email_with UserMailer, :welcome_user, args: [User.last], queue: "default"
+        assert_equal(true, User.last.user_events.user_creation.exists?)
       end
 
       should "not create a user with an invalid email" do
@@ -307,6 +309,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, User.last.is_member?)
           assert_equal(false, User.last.is_restricted?)
           assert_equal(false, User.last.requires_verification)
+          assert_equal(true, User.last.user_events.user_creation.exists?)
         end
 
         should "mark accounts created by already logged in users as restricted" do
@@ -318,6 +321,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, User.last.is_member?)
           assert_equal(true, User.last.is_restricted?)
           assert_equal(true, User.last.requires_verification)
+          assert_equal(true, User.last.user_events.user_creation.exists?)
         end
 
         should "mark users signing up from proxies as restricted" do
@@ -330,6 +334,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, User.last.is_member?)
           assert_equal(true, User.last.is_restricted?)
           assert_equal(true, User.last.requires_verification)
+          assert_equal(true, User.last.user_events.user_creation.exists?)
         end
 
         should "mark users signing up from a partial banned IP as restricted" do
@@ -344,6 +349,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, User.last.requires_verification)
           assert_equal(1, @ip_ban.reload.hit_count)
           assert(@ip_ban.last_hit_at > 1.minute.ago)
+          assert_equal(true, User.last.user_events.user_creation.exists?)
         end
 
         should "not mark users signing up from non-proxies as restricted" do
@@ -356,6 +362,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, User.last.is_member?)
           assert_equal(false, User.last.is_restricted?)
           assert_equal(false, User.last.requires_verification)
+          assert_equal(true, User.last.user_events.user_creation.exists?)
         end
 
         should "mark accounts registered from an IPv4 address recently used for another account as restricted" do
@@ -368,6 +375,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, User.last.is_member?)
           assert_equal(true, User.last.is_restricted?)
           assert_equal(true, User.last.requires_verification)
+          assert_equal(true, User.last.user_events.user_creation.exists?)
         end
 
         should "not mark users signing up from localhost as restricted" do
@@ -379,6 +387,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
           assert_equal(true, User.last.is_member?)
           assert_equal(false, User.last.is_restricted?)
           assert_equal(false, User.last.requires_verification)
+          assert_equal(true, User.last.user_events.user_creation.exists?)
         end
       end
     end

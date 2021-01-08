@@ -2365,6 +2365,49 @@ ALTER SEQUENCE public.ip_bans_id_seq OWNED BY public.ip_bans.id;
 
 
 --
+-- Name: ip_geolocations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.ip_geolocations (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    ip_addr inet NOT NULL,
+    network inet,
+    asn integer,
+    is_proxy boolean NOT NULL,
+    latitude double precision,
+    longitude double precision,
+    organization character varying,
+    time_zone character varying,
+    continent character varying,
+    country character varying,
+    region character varying,
+    city character varying,
+    carrier character varying
+);
+
+
+--
+-- Name: ip_geolocations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.ip_geolocations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: ip_geolocations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.ip_geolocations_id_seq OWNED BY public.ip_geolocations.id;
+
+
+--
 -- Name: mod_actions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3039,6 +3082,39 @@ ALTER SEQUENCE public.uploads_id_seq OWNED BY public.uploads.id;
 
 
 --
+-- Name: user_events; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_events (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    user_id bigint NOT NULL,
+    user_session_id bigint NOT NULL,
+    category integer NOT NULL
+);
+
+
+--
+-- Name: user_events_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_events_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_events_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_events_id_seq OWNED BY public.user_events.id;
+
+
+--
 -- Name: user_feedback; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3104,6 +3180,39 @@ CREATE SEQUENCE public.user_name_change_requests_id_seq
 --
 
 ALTER SEQUENCE public.user_name_change_requests_id_seq OWNED BY public.user_name_change_requests.id;
+
+
+--
+-- Name: user_sessions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.user_sessions (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    ip_addr inet NOT NULL,
+    session_id character varying NOT NULL,
+    user_agent character varying
+);
+
+
+--
+-- Name: user_sessions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.user_sessions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: user_sessions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.user_sessions_id_seq OWNED BY public.user_sessions.id;
 
 
 --
@@ -4063,6 +4172,13 @@ ALTER TABLE ONLY public.ip_bans ALTER COLUMN id SET DEFAULT nextval('public.ip_b
 
 
 --
+-- Name: ip_geolocations id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ip_geolocations ALTER COLUMN id SET DEFAULT nextval('public.ip_geolocations_id_seq'::regclass);
+
+
+--
 -- Name: mod_actions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4196,6 +4312,13 @@ ALTER TABLE ONLY public.uploads ALTER COLUMN id SET DEFAULT nextval('public.uplo
 
 
 --
+-- Name: user_events id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_events ALTER COLUMN id SET DEFAULT nextval('public.user_events_id_seq'::regclass);
+
+
+--
 -- Name: user_feedback id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4207,6 +4330,13 @@ ALTER TABLE ONLY public.user_feedback ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 ALTER TABLE ONLY public.user_name_change_requests ALTER COLUMN id SET DEFAULT nextval('public.user_name_change_requests_id_seq'::regclass);
+
+
+--
+-- Name: user_sessions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_sessions ALTER COLUMN id SET DEFAULT nextval('public.user_sessions_id_seq'::regclass);
 
 
 --
@@ -4414,6 +4544,13 @@ ALTER TABLE ONLY public.ip_bans
 
 
 --
+-- Name: ip_geolocations ip_geolocations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.ip_geolocations
+    ADD CONSTRAINT ip_geolocations_pkey PRIMARY KEY (id);
+
+
 -- Name: mod_actions mod_actions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4566,6 +4703,14 @@ ALTER TABLE ONLY public.uploads
 
 
 --
+-- Name: user_events user_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_events
+    ADD CONSTRAINT user_events_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: user_feedback user_feedback_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4579,6 +4724,14 @@ ALTER TABLE ONLY public.user_feedback
 
 ALTER TABLE ONLY public.user_name_change_requests
     ADD CONSTRAINT user_name_change_requests_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_sessions user_sessions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.user_sessions
+    ADD CONSTRAINT user_sessions_pkey PRIMARY KEY (id);
 
 
 --
@@ -6531,6 +6684,110 @@ CREATE INDEX index_ip_bans_on_is_deleted ON public.ip_bans USING btree (is_delet
 
 
 --
+-- Name: index_ip_geolocations_on_asn; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_asn ON public.ip_geolocations USING btree (asn);
+
+
+--
+-- Name: index_ip_geolocations_on_carrier; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_carrier ON public.ip_geolocations USING btree (carrier);
+
+
+--
+-- Name: index_ip_geolocations_on_city; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_city ON public.ip_geolocations USING btree (city);
+
+
+--
+-- Name: index_ip_geolocations_on_continent; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_continent ON public.ip_geolocations USING btree (continent);
+
+
+--
+-- Name: index_ip_geolocations_on_country; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_country ON public.ip_geolocations USING btree (country);
+
+
+--
+-- Name: index_ip_geolocations_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_created_at ON public.ip_geolocations USING btree (created_at);
+
+
+--
+-- Name: index_ip_geolocations_on_ip_addr; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_ip_geolocations_on_ip_addr ON public.ip_geolocations USING btree (ip_addr);
+
+
+--
+-- Name: index_ip_geolocations_on_is_proxy; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_is_proxy ON public.ip_geolocations USING btree (is_proxy);
+
+
+--
+-- Name: index_ip_geolocations_on_latitude; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_latitude ON public.ip_geolocations USING btree (latitude);
+
+
+--
+-- Name: index_ip_geolocations_on_longitude; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_longitude ON public.ip_geolocations USING btree (longitude);
+
+
+--
+-- Name: index_ip_geolocations_on_network; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_network ON public.ip_geolocations USING btree (network);
+
+
+--
+-- Name: index_ip_geolocations_on_organization; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_organization ON public.ip_geolocations USING btree (organization);
+
+
+--
+-- Name: index_ip_geolocations_on_region; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_region ON public.ip_geolocations USING btree (region);
+
+
+--
+-- Name: index_ip_geolocations_on_time_zone; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_time_zone ON public.ip_geolocations USING btree (time_zone);
+
+
+--
+-- Name: index_ip_geolocations_on_updated_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ip_geolocations_on_updated_at ON public.ip_geolocations USING btree (updated_at);
+
+
 -- Name: index_mod_actions_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7063,6 +7320,41 @@ CREATE INDEX index_uploads_on_uploader_ip_addr ON public.uploads USING btree (up
 
 
 --
+-- Name: index_user_events_on_category; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_events_on_category ON public.user_events USING btree (category);
+
+
+--
+-- Name: index_user_events_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_events_on_created_at ON public.user_events USING btree (created_at);
+
+
+--
+-- Name: index_user_events_on_updated_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_events_on_updated_at ON public.user_events USING btree (updated_at);
+
+
+--
+-- Name: index_user_events_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_events_on_user_id ON public.user_events USING btree (user_id);
+
+
+--
+-- Name: index_user_events_on_user_session_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_events_on_user_session_id ON public.user_events USING btree (user_session_id);
+
+
+--
 -- Name: index_user_feedback_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7095,6 +7387,34 @@ CREATE INDEX index_user_name_change_requests_on_original_name ON public.user_nam
 --
 
 CREATE INDEX index_user_name_change_requests_on_user_id ON public.user_name_change_requests USING btree (user_id);
+
+
+--
+-- Name: index_user_sessions_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_sessions_on_created_at ON public.user_sessions USING btree (created_at);
+
+
+--
+-- Name: index_user_sessions_on_ip_addr; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_sessions_on_ip_addr ON public.user_sessions USING btree (ip_addr);
+
+
+--
+-- Name: index_user_sessions_on_session_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_sessions_on_session_id ON public.user_sessions USING btree (session_id);
+
+
+--
+-- Name: index_user_sessions_on_updated_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_sessions_on_updated_at ON public.user_sessions USING btree (updated_at);
 
 
 --
@@ -7526,6 +7846,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20201213052805'),
 ('20201219201007'),
 ('20201224101208'),
-('20210106212805');
+('20210106212805'),
+('20210108030722'),
+('20210108030723'),
+('20210108030724');
 
 

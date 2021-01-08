@@ -140,6 +140,7 @@ Rails.application.routes.draw do
   resources :forum_topic_visits, only: [:index]
   resources :ip_bans, only: [:index, :new, :create, :update]
   resources :ip_addresses, only: [:show, :index], id: /.+?(?=\.json|\.xml|\.html)|.+/
+  resources :ip_geolocations, only: [:index]
   resource :iqdb_queries, :only => [:show, :create] do
     collection do
       get :preview
@@ -260,7 +261,9 @@ Rails.application.routes.draw do
     get :payment, on: :member
     put :refund, on: :member
   end
+  resources :user_events, only: [:index]
   resources :user_feedbacks, except: [:destroy]
+  resources :user_sessions, only: [:index]
   resources :user_name_change_requests, only: [:new, :create, :show, :index]
   resources :webhooks do
     post :receive, on: :collection

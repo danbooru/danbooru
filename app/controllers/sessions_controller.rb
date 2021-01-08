@@ -20,7 +20,7 @@ class SessionsController < ApplicationController
   end
 
   def destroy
-    session.delete(:user_id)
+    SessionLoader.new(request).logout
     redirect_to(posts_path, :notice => "You are now logged out")
   end
 

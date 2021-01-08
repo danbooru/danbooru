@@ -1,0 +1,43 @@
+<div id="c-ip-geolocations">
+  <div id="a-index">
+    <%= search_form_for(ip_geolocations_path) do |f| %>
+      <%= f.input :ip_addr, label: "IP Address", input_html: { value: params[:search][:ip_addr] } %>
+      <%= f.input :asn, input_html: { value: params[:search][:asn] } %>
+      <%= f.input :continent, input_html: { value: params[:search][:continent] } %>
+      <%= f.input :country, as: :string, input_html: { value: params[:search][:country] } %>
+      <%= f.input :region, input_html: { value: params[:search][:region] } %>
+      <%= f.input :city, input_html: { value: params[:search][:city] } %>
+      <%= f.input :is_proxy, label: "Proxy?", as: :select, include_blank: true, selected: params[:search][:is_proxy] %>
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <%= table_for @ip_geolocations, class: "striped autofit" do |t| %>
+      <% t.column "IP Address" do |ip_geolocation| %>
+        <%= ip_geolocation.ip_addr %>
+      <% end %>
+
+      <% t.column :network %>
+      <% t.column :asn %>
+      <% t.column :organization %>
+      <% t.column :is_proxy %>
+      <% t.column :continent %>
+      <% t.column :country %>
+      <% t.column :region %>
+      <% t.column :city %>
+
+      <% t.column "Updated" do |ip_geolocation| %>
+        <%= time_ago_in_words_tagged(ip_geolocation.updated_at) %>
+      <% end %>
+
+      <% t.column "Created" do |ip_geolocation| %>
+        <%= time_ago_in_words_tagged(ip_geolocation.created_at) %>
+      <% end %>
+
+      <% t.column column: "control" do |ip_geolocation| %>
+        <%= external_link_to "https://ipinfo.io/#{ip_geolocation.ip_addr}", "IP Info" %>
+      <% end %>
+    <% end %>
+
+    <%= numbered_paginator(@ip_geolocations) %>
+  </div>
+</div>

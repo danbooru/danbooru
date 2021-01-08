@@ -33,11 +33,7 @@ class UserVerifier
   end
 
   def is_local_ip?
-    if ip_address.ipv4?
-      ip_address.loopback? || ip_address.link_local? || ip_address.private?
-    elsif ip_address.ipv6?
-      ip_address.loopback? || ip_address.link_local? || ip_address.unique_local?
-    end
+    IpLookup.new(ip_address).is_local?
   end
 
   def is_logged_in?

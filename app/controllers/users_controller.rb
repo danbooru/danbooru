@@ -70,6 +70,8 @@ class UsersController < ApplicationController
       password_confirmation: params[:user][:password_confirmation]
     )
 
+    UserEvent.build_from_request(@user, :user_creation, request)
+
     if params[:user][:email].present?
       @user.email_address = EmailAddress.new(address: params[:user][:email])
     end

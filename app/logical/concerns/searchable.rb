@@ -193,7 +193,7 @@ module Searchable
       search_text_attribute(name, params)
     when :boolean
       search_boolean_attribute(name, params)
-    when :integer, :datetime
+    when :integer, :float, :datetime
       search_numeric_attribute(name, params)
     when :inet
       search_inet_attribute(name, params)
