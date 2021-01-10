@@ -10,12 +10,13 @@ class WikiPage < ApplicationRecord
   normalize :body, :normalize_text
   normalize :other_names, :normalize_other_names
 
+  array_attribute :other_names # XXX must come after `normalize :other_names`
+
   validates :title, tag_name: true, presence: true, uniqueness: true, if: :title_changed?
   validates :body, presence: true, unless: -> { is_deleted? || other_names.present? }
   validate :validate_rename
   validate :validate_other_names
 
-  array_attribute :other_names
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, -> { active }, foreign_key: "name", primary_key: "title"
   has_many :versions, -> {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy

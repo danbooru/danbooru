@@ -101,6 +101,10 @@ class WikiPageTest < ActiveSupport::TestCase
       should normalize_attribute(:other_names).from(["ＡＢＣ"]).to(["ABC"])
       should normalize_attribute(:other_names).from(["foo", "foo"]).to(["foo"])
       should normalize_attribute(:other_names).from(%w[foo*bar baz baz 加賀（艦これ）]).to(%w[foo*bar baz 加賀(艦これ)])
+
+      should normalize_attribute(:other_names).from("foo foo").to(["foo"])
+      should normalize_attribute(:other_names).from("foo bar").to(["foo", "bar"])
+      should normalize_attribute(:other_names).from("_foo_ Bar").to(["foo", "Bar"])
     end
 
     context "during title validation" do
