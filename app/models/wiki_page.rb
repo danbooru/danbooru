@@ -150,7 +150,7 @@ class WikiPage < ApplicationRecord
   end
 
   def self.normalize_title(title)
-    title.to_s.downcase.delete_prefix("~").gsub(/[[:space:]]+/, "_").gsub(/__/, "_").gsub(/\A_|_\z/, "")
+    title.to_s.downcase.delete_prefix("~").gsub(/[[:space:]]+/, "_").squeeze("_").gsub(/\A_|_\z/, "")
   end
 
   def normalize_other_names

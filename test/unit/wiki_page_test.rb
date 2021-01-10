@@ -98,7 +98,10 @@ class WikiPageTest < ActiveSupport::TestCase
       should normalize_attribute(:title).from("foo_").to("foo")
       should normalize_attribute(:title).from("FOO").to("foo")
       should normalize_attribute(:title).from("foo__bar").to("foo_bar")
+      should normalize_attribute(:title).from("foo___bar").to("foo_bar")
+      should normalize_attribute(:title).from("___foo___bar___").to("foo_bar")
       should normalize_attribute(:title).from("foo bar").to("foo_bar")
+      should normalize_attribute(:title).from(" Foo___   Bar ").to("foo_bar")
 
       should_not allow_value("").for(:title).on(:create)
       should_not allow_value("___").for(:title).on(:create)
