@@ -92,14 +92,13 @@ class WikiPageTest < ActiveSupport::TestCase
     end
 
     context "during title validation" do
-      # these values are allowed because they're normalized first
-      should allow_value(" foo ").for(:title).on(:create)
-      should allow_value("~foo").for(:title).on(:create)
-      should allow_value("_foo").for(:title).on(:create)
-      should allow_value("foo_").for(:title).on(:create)
-      should allow_value("foo__bar").for(:title).on(:create)
-      should allow_value("FOO").for(:title).on(:create)
-      should allow_value("foo bar").for(:title).on(:create)
+      should normalize_attribute(:title).from(" foo ").to("foo")
+      should normalize_attribute(:title).from("~foo").to("foo")
+      should normalize_attribute(:title).from("_foo").to("foo")
+      should normalize_attribute(:title).from("foo_").to("foo")
+      should normalize_attribute(:title).from("FOO").to("foo")
+      should normalize_attribute(:title).from("foo__bar").to("foo_bar")
+      should normalize_attribute(:title).from("foo bar").to("foo_bar")
 
       should_not allow_value("").for(:title).on(:create)
       should_not allow_value("___").for(:title).on(:create)
