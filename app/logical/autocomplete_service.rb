@@ -65,7 +65,9 @@ class AutocompleteService
   end
 
   def autocomplete_tag(string)
-    if string.starts_with?("/")
+    if !string.ascii_only?
+      results = tag_other_name_matches(string)
+    elsif string.starts_with?("/")
       string = string + "*" unless string.include?("*")
 
       results = tag_matches(string)
@@ -77,11 +79,8 @@ class AutocompleteService
       results = results.uniq { |r| r[:value] }.take(limit)
     elsif string.include?("*")
       results = tag_matches(string)
-      results = tag_other_name_matches(string) if results.blank?
     else
-      string += "*"
-      results = tag_matches(string)
-      results = tag_other_name_matches(string) if results.blank?
+      results = tag_matches(string + "*")
       results = tag_autocorrect_matches(string) if results.blank?
     end
 
@@ -89,7 +88,7 @@ class AutocompleteService
   end
 
   def tag_matches(string)
-    return [] if string =~ /[^[:ascii:]]/
+    return [] unless string.ascii_only?
 
     name_matches = Tag.nonempty.name_matches(string).order(post_count: :desc).limit(limit)
     alias_matches = Tag.nonempty.alias_matches(string).order(post_count: :desc).limit(limit)
@@ -112,7 +111,6 @@ class AutocompleteService
   end
 
   def tag_autocorrect_matches(string)
-    string = string.delete("*")
     tags = Tag.nonempty.autocorrect_matches(string).limit(limit)
 
     tags.map do |tag|
@@ -121,16 +119,14 @@ class AutocompleteService
   end
 
   def tag_other_name_matches(string)
-    return [] unless string =~ /[^[:ascii:]]/
-
-    artists = Artist.undeleted.any_other_name_like(string)
-    wikis = WikiPage.undeleted.other_names_match(string)
+    artists = Artist.undeleted.where_any_in_array_starts_with(:other_names, string)
+    wikis = WikiPage.undeleted.where_any_in_array_starts_with(:other_names, string)
     tags = Tag.where(name: wikis.select(:title)).or(Tag.where(name: artists.select(:name)))
     tags = tags.nonempty.order(post_count: :desc).limit(limit).includes(:wiki_page, :artist)
 
     tags.map do |tag|
       other_names = tag.artist&.other_names.to_a + tag.wiki_page&.other_names.to_a
-      antecedent = other_names.find { |other_name| other_name.ilike?(string) }
+      antecedent = other_names.find { |other_name| other_name.ilike?(string + "*") }
       { type: "tag-other-name", label: tag.pretty_name, value: tag.name, category: tag.category, post_count: tag.post_count, antecedent: antecedent }
     end
   end

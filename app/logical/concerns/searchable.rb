@@ -97,6 +97,11 @@ module Searchable
     where("? ~<< ANY(#{qualified_column_for(attr)})", "(?#{flags})#{regex}")
   end
 
+  # The column should have a `array_to_tsvector(column) using gin` index for best performance.
+  def where_any_in_array_starts_with(attr, value)
+    where("array_to_tsvector(#{qualified_column_for(attr)}) @@ ?", value.to_escaped_for_tsquery + ":*")
+  end
+
   def where_text_includes_lower(attr, values)
     where("lower(#{qualified_column_for(attr)}) IN (?)", values.map(&:downcase))
   end

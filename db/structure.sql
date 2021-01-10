@@ -4899,6 +4899,13 @@ CREATE INDEX index_artist_versions_on_updater_ip_addr ON public.artist_versions 
 
 
 --
+-- Name: index_artists_on_array_to_tsvector_other_names; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_artists_on_array_to_tsvector_other_names ON public.artists USING gin (array_to_tsvector(other_names));
+
+
+--
 -- Name: index_artists_on_group_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7536,6 +7543,13 @@ CREATE INDEX index_wiki_page_versions_on_wiki_page_id ON public.wiki_page_versio
 
 
 --
+-- Name: index_wiki_pages_on_array_to_tsvector_other_names; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_wiki_pages_on_array_to_tsvector_other_names ON public.wiki_pages USING gin (array_to_tsvector(other_names));
+
+
+--
 -- Name: index_wiki_pages_on_body_index_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7870,6 +7884,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210108030722'),
 ('20210108030723'),
 ('20210108030724'),
-('20210110015410');
+('20210110015410'),
+('20210110090656');
 
 
