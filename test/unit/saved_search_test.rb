@@ -110,6 +110,25 @@ class SavedSearchTest < ActiveSupport::TestCase
     end
   end
 
+  context "The #normalize_labels method" do
+    subject { build(:saved_search) }
+
+    should normalize_attribute(:labels).from(["FOO"]).to(["foo"])
+    should normalize_attribute(:labels).from(["   foo"]).to(["foo"])
+    should normalize_attribute(:labels).from(["foo   "]).to(["foo"])
+    should normalize_attribute(:labels).from(["___foo"]).to(["foo"])
+    should normalize_attribute(:labels).from(["foo___"]).to(["foo"])
+    should normalize_attribute(:labels).from(["foo\n"]).to(["foo"])
+    should normalize_attribute(:labels).from(["foo bar"]).to(["foo_bar"])
+    should normalize_attribute(:labels).from(["foo   bar"]).to(["foo_bar"])
+    should normalize_attribute(:labels).from(["foo___bar"]).to(["foo_bar"])
+    should normalize_attribute(:labels).from([" _Foo Bar_ "]).to(["foo_bar"])
+    should normalize_attribute(:labels).from(["Я"]).to(["я"])
+    should normalize_attribute(:labels).from(["foo 1", "bar 2"]).to(["foo_1", "bar_2"])
+    should normalize_attribute(:labels).from(["foo", nil, "", " ", "bar"]).to(["foo", "bar"])
+    should normalize_attribute(:labels).from([nil, "", " "]).to([])
+  end
+
   context "Populating a saved search" do
     setup do
       @saved_search = create(:saved_search, query: "bkub", user: @user)

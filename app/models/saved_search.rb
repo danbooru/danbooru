@@ -5,8 +5,9 @@ class SavedSearch < ApplicationRecord
   attr_reader :disable_labels
   belongs_to :user
 
-  before_validation :normalize_query
-  before_validation :normalize_labels
+  normalize :query, :normalize_query
+  normalize :labels, :normalize_labels
+
   validates :query, presence: true
   validate :validate_count, on: :create
 
@@ -55,12 +56,13 @@ class SavedSearch < ApplicationRecord
 
   concerning :Labels do
     class_methods do
+      def normalize_labels(labels)
+        # XXX should sort and uniq, but will break some use cases.
+        labels.map { |label| normalize_label(label) }.reject(&:blank?)
+      end
+
       def normalize_label(label)
-        label
-          .to_s
-          .strip
-          .downcase
-          .gsub(/[[:space:]]/, "_")
+        label.to_s.unicode_normalize(:nfc).normalize_whitespace.downcase.gsub(/[[:space:]]+/, "_").squeeze("_").gsub(/\A_|_\z/, "")
       end
 
       def all_labels
@@ -79,21 +81,12 @@ class SavedSearch < ApplicationRecord
       end
     end
 
-    def normalize_labels
-      self.labels = labels.map {|x| SavedSearch.normalize_label(x)}.reject(&:blank?)
-    end
-
     def label_string
       labels.join(" ")
     end
 
     def label_string=(val)
       self.labels = val.to_s.split(/[[:space:]]+/)
-    end
-
-    def labels=(labels)
-      labels = labels.map { |label| SavedSearch.normalize_label(label) }
-      super(labels)
     end
   end
 
@@ -136,6 +129,10 @@ class SavedSearch < ApplicationRecord
 
   concerning :Queries do
     class_methods do
+      def normalize_query(query)
+        PostQueryBuilder.new(query.to_s).normalized_query(sort: false).to_s
+      end
+
       def queries_for(user_id, label: nil, options: {})
         searches = SavedSearch.where(user_id: user_id)
         searches = searches.labeled(label) if label.present?
@@ -154,10 +151,6 @@ class SavedSearch < ApplicationRecord
 
     def normalized_query
       PostQueryBuilder.new(query).normalized_query.to_s
-    end
-
-    def normalize_query
-      self.query = PostQueryBuilder.new(query).normalized_query(sort: false).to_s
     end
 
     def rewrite_query(old_name, new_name)
