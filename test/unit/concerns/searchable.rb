@@ -127,6 +127,9 @@ class SearchableTest < ActiveSupport::TestCase
         assert_search_equals(@wp, other_names_include_any_lower_array: ["A1", "BLAH"])
         assert_search_equals(@wp, other_names_include_all_lower_array: ["A1", "B2"])
 
+        assert_search_equals(@wp, any_other_name_matches_regex: "^a")
+        assert_search_equals(@wp, any_other_name_matches_regex: "[a-z][0-9]")
+
         assert_search_equals(@wp, other_name_count: 2)
       end
     end

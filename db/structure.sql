@@ -353,6 +353,15 @@ CREATE FUNCTION public.favorites_insert_trigger() RETURNS trigger
 
 
 --
+-- Name: reverse_textregexeq(text, text); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION public.reverse_textregexeq(text, text) RETURNS boolean
+    LANGUAGE sql IMMUTABLE PARALLEL SAFE
+    AS $_$ SELECT textregexeq($2, $1); $_$;
+
+
+--
 -- Name: testprs_end(internal); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -386,6 +395,17 @@ CREATE FUNCTION public.testprs_lextype(internal) RETURNS internal
 CREATE FUNCTION public.testprs_start(internal, integer) RETURNS internal
     LANGUAGE c STRICT
     AS '$libdir/test_parser', 'testprs_start';
+
+
+--
+-- Name: ~<<; Type: OPERATOR; Schema: public; Owner: -
+--
+
+CREATE OPERATOR public.~<< (
+    FUNCTION = public.reverse_textregexeq,
+    LEFTARG = text,
+    RIGHTARG = text
+);
 
 
 --
@@ -7849,6 +7869,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210106212805'),
 ('20210108030722'),
 ('20210108030723'),
-('20210108030724');
+('20210108030724'),
+('20210110015410');
 
 

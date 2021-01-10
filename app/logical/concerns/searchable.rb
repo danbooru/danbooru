@@ -92,6 +92,11 @@ module Searchable
     where("lower(#{qualified_column_for(attr)}::text)::text[] @> ARRAY[?]", values.map(&:downcase))
   end
 
+  # `~<<` is a custom Postgres operator. It's the `~` regex operator with reversed arguments.
+  def where_any_in_array_matches_regex(attr, regex, flags: "e")
+    where("? ~<< ANY(#{qualified_column_for(attr)})", "(?#{flags})#{regex}")
+  end
+
   def where_text_includes_lower(attr, values)
     where("lower(#{qualified_column_for(attr)}) IN (?)", values.map(&:downcase))
   end
@@ -340,6 +345,7 @@ module Searchable
 
   def search_array_attribute(name, type, params)
     relation = all
+    singular_name = name.to_s.singularize
 
     if params[:"#{name}_include_any"]
       items = params[:"#{name}_include_any"].to_s.scan(/[^[:space:]]+/)
@@ -369,10 +375,12 @@ module Searchable
       relation = relation.where_array_includes_any_lower(name, params[:"#{name}_include_any_lower_array"])
     elsif params[:"#{name}_include_all_lower_array"]
       relation = relation.where_array_includes_all_lower(name, params[:"#{name}_include_all_lower_array"])
+    elsif params[:"any_#{singular_name}_matches_regex"]
+      relation = relation.where_any_in_array_matches_regex(name, params[:"any_#{singular_name}_matches_regex"])
     end
 
-    if params[:"#{name.to_s.singularize}_count"]
-      relation = relation.where_array_count(name, params[:"#{name.to_s.singularize}_count"])
+    if params[:"#{singular_name}_count"]
+      relation = relation.where_array_count(name, params[:"#{singular_name}_count"])
     end
 
     relation
