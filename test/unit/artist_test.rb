@@ -401,6 +401,7 @@ class ArtistTest < ActiveSupport::TestCase
       should normalize_attribute(:other_names).from([nil, "", " "]).to([])
       should normalize_attribute(:other_names).from(["pokémon".unicode_normalize(:nfd)]).to(["pokémon".unicode_normalize(:nfkc)])
       should normalize_attribute(:other_names).from(["foo", "foo"]).to(["foo"])
+      should normalize_attribute(:other_names).from(["🏳️‍🌈"]).to(["🏳️‍🌈"])
 
       should normalize_attribute(:other_names).from("foo foo").to(["foo"])
       should normalize_attribute(:other_names).from("foo bar").to(["foo", "bar"])
