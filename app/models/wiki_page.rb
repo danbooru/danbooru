@@ -3,12 +3,12 @@ class WikiPage < ApplicationRecord
 
   META_WIKIS = ["list_of_", "tag_group:", "pool_group:", "howto:", "about:", "help:", "template:"]
 
-  before_validation :normalize_other_names
   before_save :update_dtext_links, if: :dtext_links_changed?
   after_save :create_version
 
   normalize :title, :normalize_title
   normalize :body, :normalize_text
+  normalize :other_names, :normalize_other_names
 
   validates :title, tag_name: true, presence: true, uniqueness: true, if: :title_changed?
   validates :body, presence: true, unless: -> { is_deleted? || other_names.present? }
@@ -153,12 +153,12 @@ class WikiPage < ApplicationRecord
     title.to_s.downcase.delete_prefix("~").gsub(/[[:space:]]+/, "_").squeeze("_").gsub(/\A_|_\z/, "")
   end
 
-  def normalize_other_names
-    self.other_names = other_names.map { |name| WikiPage.normalize_other_name(name) }.uniq
+  def self.normalize_other_names(other_names)
+    other_names.map { |name| normalize_other_name(name) }.uniq.reject(&:blank?)
   end
 
   def self.normalize_other_name(name)
-    name.unicode_normalize(:nfkc).gsub(/[[:space:]]+/, " ").strip.tr(" ", "_")
+    name.to_s.unicode_normalize(:nfkc).normalize_whitespace.gsub(/[[:space:]]+/, "_").squeeze("_").gsub(/\A_|_\z/, "")
   end
 
   def category_name

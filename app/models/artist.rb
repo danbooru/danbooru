@@ -3,11 +3,13 @@ class Artist < ApplicationRecord
   class RevertError < StandardError; end
 
   attr_accessor :url_string_changed
-  array_attribute :other_names
+
   deletable
 
-  before_validation :normalize_name
-  before_validation :normalize_other_names
+  normalize :name, :normalize_name
+  normalize :other_names, :normalize_other_names
+  array_attribute :other_names # XXX must come after `normalize :other_names`
+
   validate :validate_tag_category
   validates :name, tag_name: true, uniqueness: true
   before_save :update_tag_category
@@ -55,26 +57,25 @@ class Artist < ApplicationRecord
     end
   end
 
-  module NameMethods
-    extend ActiveSupport::Concern
-
-    module ClassMethods
+  concerning :NameMethods do
+    class_methods do
       def normalize_name(name)
         name.to_s.mb_chars.downcase.strip.gsub(/ /, '_').to_s
       end
-    end
 
-    def normalize_name
-      self.name = Artist.normalize_name(name)
+      def normalize_other_names(other_names)
+        other_names.map { |name| normalize_other_name(name) }.uniq.reject(&:blank?)
+      end
+
+      # XXX Differences from wiki page other names: allow uppercase, use NFC
+      # instead of NFKC, and allow repeated, leading, and trailing underscores.
+      def normalize_other_name(other_name)
+        other_name.to_s.unicode_normalize(:nfc).normalize_whitespace.squish.tr(" ", "_")
+      end
     end
 
     def pretty_name
       name.tr("_", " ")
-    end
-
-    def normalize_other_names
-      self.other_names = other_names.map { |x| Artist.normalize_name(x) }.uniq
-      self.other_names -= [name]
     end
   end
 
@@ -145,8 +146,6 @@ class Artist < ApplicationRecord
         artist = Artist.new(params)
       end
 
-      artist.normalize_name
-      artist.normalize_other_names
       artist
     end
   end
@@ -284,7 +283,6 @@ class Artist < ApplicationRecord
   end
 
   include UrlMethods
-  include NameMethods
   include VersionMethods
   extend FactoryMethods
   include TagMethods

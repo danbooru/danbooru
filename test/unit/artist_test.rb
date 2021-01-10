@@ -384,9 +384,27 @@ class ArtistTest < ActiveSupport::TestCase
       end
     end
 
-    should "normalize its other names" do
-      artist = FactoryBot.create(:artist, name: "a1", other_names: "a1 aaa aaa AAA bbb ccc_ddd")
-      assert_equal("aaa bbb ccc_ddd", artist.other_names_string)
+    context "the #normalize_other_names method" do
+      subject { build(:artist) }
+
+      should normalize_attribute(:other_names).from(["   foo"]).to(["foo"])
+      should normalize_attribute(:other_names).from(["foo   "]).to(["foo"])
+      should normalize_attribute(:other_names).from(["___foo"]).to(["___foo"])
+      should normalize_attribute(:other_names).from(["foo___"]).to(["foo___"])
+      should normalize_attribute(:other_names).from(["foo\n"]).to(["foo"])
+      should normalize_attribute(:other_names).from(["foo bar"]).to(["foo_bar"])
+      should normalize_attribute(:other_names).from(["foo   bar"]).to(["foo_bar"])
+      should normalize_attribute(:other_names).from(["foo___bar"]).to(["foo___bar"])
+      should normalize_attribute(:other_names).from([" _Foo Bar_ "]).to(["_Foo_Bar_"])
+      should normalize_attribute(:other_names).from(["foo 1", "bar 2"]).to(["foo_1", "bar_2"])
+      should normalize_attribute(:other_names).from(["foo", nil, "", " ", "bar"]).to(["foo", "bar"])
+      should normalize_attribute(:other_names).from([nil, "", " "]).to([])
+      should normalize_attribute(:other_names).from(["pokémon".unicode_normalize(:nfd)]).to(["pokémon".unicode_normalize(:nfkc)])
+      should normalize_attribute(:other_names).from(["foo", "foo"]).to(["foo"])
+
+      should normalize_attribute(:other_names).from("foo foo").to(["foo"])
+      should normalize_attribute(:other_names).from("foo bar").to(["foo", "bar"])
+      should normalize_attribute(:other_names).from("_foo_ Bar").to(["_foo_", "Bar"])
     end
 
     should "search on its name should return results" do
@@ -550,7 +568,7 @@ class ArtistTest < ActiveSupport::TestCase
         artist = Artist.new_with_defaults(source: source)
 
         assert_equal("niceandcool", artist.name)
-        assert_equal("nice_and_cool", artist.other_names_string)
+        assert_equal("Nice_and_Cool niceandcool", artist.other_names_string)
         assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/users/906442")
         assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/stacc/niceandcool")
       end
@@ -561,7 +579,7 @@ class ArtistTest < ActiveSupport::TestCase
         artist = Artist.new_with_defaults(name: "test_artist")
 
         assert_equal("test_artist", artist.name)
-        assert_equal("nice_and_cool niceandcool", artist.other_names_string)
+        assert_equal("Nice_and_Cool niceandcool", artist.other_names_string)
         assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/users/906442")
         assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/stacc/niceandcool")
       end
