@@ -63,7 +63,7 @@ class TagSetPresenter
     end.reject(&:blank?).join(" \n")
   end
 
-  def humanized_essential_tag_string(default: "")
+  def humanized_essential_tag_string
     chartags = tags_for_category("character")
     characters = chartags.max_by(5, &:post_count).map(&:unqualified_name)
     characters += ["#{chartags.size - 5} more"] if chartags.size > 5
@@ -78,8 +78,7 @@ class TagSetPresenter
     artists = tags_for_category("artist").map(&:name).grep_v("banned_artist").to_sentence
     artists = "drawn by #{artists}" if artists.present?
 
-    strings = "#{characters} #{copyrights} #{artists}"
-    strings.presence || default
+    "#{characters} #{copyrights} #{artists}".strip
   end
 
   private

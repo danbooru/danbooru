@@ -101,7 +101,7 @@ class RelatedTagQuery
     other_wikis
   end
 
-  def serializable_hash(**options)
+  def serializable_hash(options = {})
     {
       query: query,
       category: category,

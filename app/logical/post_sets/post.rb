@@ -3,11 +3,11 @@ module PostSets
     MAX_PER_PAGE = 200
     MAX_SIDEBAR_TAGS = 25
 
-    attr_reader :page, :random, :post_count, :format, :tag_string, :query
-    delegate :normalized_query, to: :query
+    attr_reader :page, :random, :post_count, :format, :tag_string, :query, :normalized_query
 
     def initialize(tags, page = 1, per_page = nil, user: CurrentUser.user, random: false, format: "html")
       @query = PostQueryBuilder.new(tags, user, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
+      @normalized_query = query.normalized_query
       @tag_string = tags
       @page = page
       @per_page = per_page
@@ -180,7 +180,7 @@ module PostSets
       end
 
       def similar_tags
-        RelatedTagCalculator.cached_similar_tags_for_search(normalized_query(implicit: false), MAX_SIDEBAR_TAGS)
+        RelatedTagCalculator.cached_similar_tags_for_search(query.normalized_query(implicit: false), MAX_SIDEBAR_TAGS)
       end
 
       def frequent_tags

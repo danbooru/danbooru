@@ -3,7 +3,7 @@ class ServerStatus
   include ActiveModel::Serializers::JSON
   include ActiveModel::Serializers::Xml
 
-  def serializable_hash(*options)
+  def serializable_hash(options = {})
     {
       status: {
         hostname: hostname,

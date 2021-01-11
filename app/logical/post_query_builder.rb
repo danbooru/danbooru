@@ -996,5 +996,5 @@ class PostQueryBuilder
     end
   end
 
-  memoize :split_query, :normalized_query
+  memoize :split_query
 end

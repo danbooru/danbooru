@@ -150,7 +150,7 @@ class SavedSearch < ApplicationRecord
     end
 
     def normalized_query
-      PostQueryBuilder.new(query).normalized_query.to_s
+      @normalized_query ||= PostQueryBuilder.new(query).normalized_query.to_s
     end
 
     def rewrite_query(old_name, new_name)
