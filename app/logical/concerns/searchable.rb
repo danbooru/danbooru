@@ -217,61 +217,107 @@ module Searchable
   end
 
   def search_numeric_attribute(attr, params)
+    relation = all
+
     if params[attr].present?
-      numeric_attribute_matches(attr, params[attr])
-    elsif params[:"#{attr}_not"].present?
-      where.not(id: numeric_attribute_matches(attr, params[:"#{attr}_not"]))
-    elsif params[:"#{attr}_eq"].present?
-      where_operator(attr, :eq, params[:"#{attr}_eq"])
-    elsif params[:"#{attr}_not_eq"].present?
-      where_operator(attr, :not_eq, params[:"#{attr}_not_eq"])
-    elsif params[:"#{attr}_gt"].present?
-      where_operator(attr, :gt, params[:"#{attr}_gt"])
-    elsif params[:"#{attr}_gteq"].present?
-      where_operator(attr, :gteq, params[:"#{attr}_gteq"])
-    elsif params[:"#{attr}_lt"].present?
-      where_operator(attr, :lt, params[:"#{attr}_lt"])
-    elsif params[:"#{attr}_lteq"].present?
-      where_operator(attr, :lteq, params[:"#{attr}_lteq"])
-    else
-      all
+      relation = relation.numeric_attribute_matches(attr, params[attr])
     end
+
+    if params[:"#{attr}_not"].present?
+      relation = relation.where.not(id: numeric_attribute_matches(attr, params[:"#{attr}_not"]))
+    end
+
+    if params[:"#{attr}_eq"].present?
+      relation = relation.where_operator(attr, :eq, params[:"#{attr}_eq"])
+    end
+
+    if params[:"#{attr}_not_eq"].present?
+      relation = relation.where_operator(attr, :not_eq, params[:"#{attr}_not_eq"])
+    end
+
+    if params[:"#{attr}_gt"].present?
+      relation = relation.where_operator(attr, :gt, params[:"#{attr}_gt"])
+    end
+
+    if params[:"#{attr}_gteq"].present?
+      relation = relation.where_operator(attr, :gteq, params[:"#{attr}_gteq"])
+    end
+
+    if params[:"#{attr}_lt"].present?
+      relation = relation.where_operator(attr, :lt, params[:"#{attr}_lt"])
+    end
+
+    if params[:"#{attr}_lteq"].present?
+      relation = relation.where_operator(attr, :lteq, params[:"#{attr}_lteq"])
+    end
+
+    relation
   end
 
   def search_text_attribute(attr, params)
+    relation = all
+
     if params[attr].present?
-      where(attr => params[attr])
-    elsif params[:"#{attr}_eq"].present?
-      where(attr => params[:"#{attr}_eq"])
-    elsif params[:"#{attr}_not_eq"].present?
-      where.not(attr => params[:"#{attr}_not_eq"])
-    elsif params[:"#{attr}_like"].present?
-      where_like(attr, params[:"#{attr}_like"])
-    elsif params[:"#{attr}_ilike"].present?
-      where_ilike(attr, params[:"#{attr}_ilike"])
-    elsif params[:"#{attr}_not_like"].present?
-      where_not_like(attr, params[:"#{attr}_not_like"])
-    elsif params[:"#{attr}_not_ilike"].present?
-      where_not_ilike(attr, params[:"#{attr}_not_ilike"])
-    elsif params[:"#{attr}_regex"].present?
-      where_regex(attr, params[:"#{attr}_regex"])
-    elsif params[:"#{attr}_not_regex"].present?
-      where_not_regex(attr, params[:"#{attr}_not_regex"])
-    elsif params[:"#{attr}_array"].present?
-      where(attr => params[:"#{attr}_array"])
-    elsif params[:"#{attr}_comma"].present?
-      where(attr => params[:"#{attr}_comma"].split(','))
-    elsif params[:"#{attr}_space"].present?
-      where(attr => params[:"#{attr}_space"].split(' '))
-    elsif params[:"#{attr}_lower_array"].present?
-      where_text_includes_lower(attr, params[:"#{attr}_lower_array"])
-    elsif params[:"#{attr}_lower_comma"].present?
-      where_text_includes_lower(attr, params[:"#{attr}_lower_comma"].split(','))
-    elsif params[:"#{attr}_lower_space"].present?
-      where_text_includes_lower(attr, params[:"#{attr}_lower_space"].split(' '))
-    else
-      all
+      relation = relation.where(attr => params[attr])
     end
+
+    if params[:"#{attr}_eq"].present?
+      relation = relation.where(attr => params[:"#{attr}_eq"])
+    end
+
+    if params[:"#{attr}_not_eq"].present?
+      relation = relation.where.not(attr => params[:"#{attr}_not_eq"])
+    end
+
+    if params[:"#{attr}_like"].present?
+      relation = relation.where_like(attr, params[:"#{attr}_like"])
+    end
+
+    if params[:"#{attr}_ilike"].present?
+      relation = relation.where_ilike(attr, params[:"#{attr}_ilike"])
+    end
+
+    if params[:"#{attr}_not_like"].present?
+      relation = relation.where_not_like(attr, params[:"#{attr}_not_like"])
+    end
+
+    if params[:"#{attr}_not_ilike"].present?
+      relation = relation.where_not_ilike(attr, params[:"#{attr}_not_ilike"])
+    end
+
+    if params[:"#{attr}_regex"].present?
+      relation = relation.where_regex(attr, params[:"#{attr}_regex"])
+    end
+
+    if params[:"#{attr}_not_regex"].present?
+      relation = relation.where_not_regex(attr, params[:"#{attr}_not_regex"])
+    end
+
+    if params[:"#{attr}_array"].present?
+      relation = relation.where(attr => params[:"#{attr}_array"])
+    end
+
+    if params[:"#{attr}_comma"].present?
+      relation = relation.where(attr => params[:"#{attr}_comma"].split(','))
+    end
+
+    if params[:"#{attr}_space"].present?
+      relation = relation.where(attr => params[:"#{attr}_space"].split(' '))
+    end
+
+    if params[:"#{attr}_lower_array"].present?
+      relation = relation.where_text_includes_lower(attr, params[:"#{attr}_lower_array"])
+    end
+
+    if params[:"#{attr}_lower_comma"].present?
+      relation = relation.where_text_includes_lower(attr, params[:"#{attr}_lower_comma"].split(','))
+    end
+
+    if params[:"#{attr}_lower_space"].present?
+      relation = relation.where_text_includes_lower(attr, params[:"#{attr}_lower_space"].split(' '))
+    end
+
+    relation
   end
 
   def search_association_attribute(attr, params, current_user)
@@ -339,9 +385,13 @@ module Searchable
     if params[name].present?
       value = params[name].split(/[, ]+/).map(&:downcase)
       relation = relation.where(name => value)
-    elsif params["#{name}_id"].present?
+    end
+
+    if params["#{name}_id"].present?
       relation = relation.numeric_attribute_matches(name, params["#{name}_id"])
-    elsif params["#{name}_id_not"].present?
+    end
+
+    if params["#{name}_id_not"].present?
       relation = relation.where.not(id: relation.numeric_attribute_matches(name, params["#{name}_id_not"]))
     end
 
@@ -357,30 +407,46 @@ module Searchable
       items = items.map(&:to_i) if type == :integer
 
       relation = relation.where_array_includes_any(name, items)
-    elsif params[:"#{name}_include_all"]
+    end
+
+    if params[:"#{name}_include_all"]
       items = params[:"#{name}_include_all"].to_s.scan(/[^[:space:]]+/)
       items = items.map(&:to_i) if type == :integer
 
       relation = relation.where_array_includes_all(name, items)
-    elsif params[:"#{name}_include_any_array"]
+    end
+
+    if params[:"#{name}_include_any_array"]
       relation = relation.where_array_includes_any(name, params[:"#{name}_include_any_array"])
-    elsif params[:"#{name}_include_all_array"]
+    end
+
+    if params[:"#{name}_include_all_array"]
       relation = relation.where_array_includes_all(name, params[:"#{name}_include_all_array"])
-    elsif params[:"#{name}_include_any_lower"]
+    end
+
+    if params[:"#{name}_include_any_lower"]
       items = params[:"#{name}_include_any_lower"].to_s.scan(/[^[:space:]]+/)
       items = items.map(&:to_i) if type == :integer
 
       relation = relation.where_array_includes_any_lower(name, items)
-    elsif params[:"#{name}_include_all_lower"]
+    end
+
+    if params[:"#{name}_include_all_lower"]
       items = params[:"#{name}_include_all_lower"].to_s.scan(/[^[:space:]]+/)
       items = items.map(&:to_i) if type == :integer
 
       relation = relation.where_array_includes_all_lower(name, items)
-    elsif params[:"#{name}_include_any_lower_array"]
+    end
+
+    if params[:"#{name}_include_any_lower_array"]
       relation = relation.where_array_includes_any_lower(name, params[:"#{name}_include_any_lower_array"])
-    elsif params[:"#{name}_include_all_lower_array"]
+    end
+
+    if params[:"#{name}_include_all_lower_array"]
       relation = relation.where_array_includes_all_lower(name, params[:"#{name}_include_all_lower_array"])
-    elsif params[:"any_#{singular_name}_matches_regex"]
+    end
+
+    if params[:"any_#{singular_name}_matches_regex"]
       relation = relation.where_any_in_array_matches_regex(name, params[:"any_#{singular_name}_matches_regex"])
     end
 

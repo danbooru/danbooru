@@ -45,6 +45,16 @@ class SearchableTest < ActiveSupport::TestCase
         assert_search_equals([@p2, @p1], score: "3...1")
         assert_search_equals([@p3, @p2, @p1], score: "1..3")
         assert_search_equals([@p3, @p2, @p1], score: "3..1")
+
+        assert_search_equals([@p3, @p2], score_not: "1")
+        assert_search_equals(@p3, score_not: "1..2")
+        assert_search_equals(@p1, score_not: ">1")
+      end
+
+      should "support multiple operators on the same attribute" do
+        assert_search_equals(@p2, score_eq: 2, score_gt: 1)
+        assert_search_equals(@p2, score_gt: 1, score_lt: 3)
+        assert_search_equals(@p2, score_eq: 2, score_not: "1,3")
       end
     end
 
@@ -67,6 +77,11 @@ class SearchableTest < ActiveSupport::TestCase
         assert_search_equals([@p3, @p2], source_not_like: "a*")
         assert_search_equals([@p3, @p2], source_not_ilike: "A*")
         assert_search_equals([@p3, @p2], source_not_regex: "^a.*")
+      end
+
+      should "support multiple operators on the same attribute" do
+        assert_search_equals([], source: "a1", source_not_eq: "a1")
+        assert_search_equals(@p1, source: "a1", source_not_eq: "b2")
       end
     end
 
@@ -97,12 +112,19 @@ class SearchableTest < ActiveSupport::TestCase
       subject { PostFlag }
 
       should "work" do
-        @pf = create(:post_flag, status: :pending)
+        @pf1 = create(:post_flag, status: :pending)
+        @pf2 = create(:post_flag, status: :rejected)
 
-        assert_search_equals(@pf, status: "pending")
-        assert_search_equals(@pf, status: "pending,blah")
-        assert_search_equals(@pf, status: "pending blah")
-        assert_search_equals(@pf, status_id: 0)
+        assert_search_equals(@pf1, status: "pending")
+        assert_search_equals(@pf1, status: "pending,blah")
+        assert_search_equals(@pf1, status: "pending blah")
+        assert_search_equals(@pf1, status_id: PostFlag.statuses[:pending])
+      end
+
+      should "support multiple operators on the same attribute" do
+        assert_search_equals(@pf1, status: "pending", status_id: PostFlag.statuses[:pending])
+        assert_search_equals([], status: "pending", status_id: PostFlag.statuses[:rejected])
+        assert_search_equals(@pf1, status_id: PostFlag.statuses[:pending], status_id_not: PostFlag.statuses[:rejected])
       end
     end
 
@@ -110,27 +132,33 @@ class SearchableTest < ActiveSupport::TestCase
       subject { WikiPage }
 
       should "work" do
-        @wp = create(:wiki_page, other_names: ["a1", "b2"])
+        @wp1 = create(:wiki_page, other_names: ["a1", "b2"])
+        @wp2 = create(:wiki_page, other_names: ["c3", "d4"])
 
-        assert_search_equals(@wp, other_names_include_any: "a1")
-        assert_search_equals(@wp, other_names_include_any: "a1 blah")
+        assert_search_equals(@wp1, other_names_include_any: "a1")
+        assert_search_equals(@wp1, other_names_include_any: "a1 blah")
 
-        assert_search_equals(@wp, other_names_include_all: "a1")
-        assert_search_equals(@wp, other_names_include_all: "a1 b2")
+        assert_search_equals(@wp1, other_names_include_all: "a1")
+        assert_search_equals(@wp1, other_names_include_all: "a1 b2")
 
-        assert_search_equals(@wp, other_names_include_any_array: ["a1", "blah"])
-        assert_search_equals(@wp, other_names_include_all_array: ["a1", "b2"])
+        assert_search_equals(@wp1, other_names_include_any_array: ["a1", "blah"])
+        assert_search_equals(@wp1, other_names_include_all_array: ["a1", "b2"])
 
-        assert_search_equals(@wp, other_names_include_any_lower: "A1 BLAH")
-        assert_search_equals(@wp, other_names_include_all_lower: "A1 B2")
+        assert_search_equals(@wp1, other_names_include_any_lower: "A1 BLAH")
+        assert_search_equals(@wp1, other_names_include_all_lower: "A1 B2")
 
-        assert_search_equals(@wp, other_names_include_any_lower_array: ["A1", "BLAH"])
-        assert_search_equals(@wp, other_names_include_all_lower_array: ["A1", "B2"])
+        assert_search_equals(@wp1, other_names_include_any_lower_array: ["A1", "BLAH"])
+        assert_search_equals(@wp1, other_names_include_all_lower_array: ["A1", "B2"])
 
-        assert_search_equals(@wp, any_other_name_matches_regex: "^a")
-        assert_search_equals(@wp, any_other_name_matches_regex: "[a-z][0-9]")
+        assert_search_equals(@wp1, any_other_name_matches_regex: "^a")
+        assert_search_equals(@wp1, any_other_name_matches_regex: "[ab][12]")
 
-        assert_search_equals(@wp, other_name_count: 2)
+        assert_search_equals([@wp2, @wp1], other_name_count: 2)
+      end
+
+      should "support multiple operators on the same attribute" do
+        assert_search_equals(@wp1, other_names_include_any: "a1", other_name_count: 2)
+        assert_search_equals(@wp2, other_names_include_any: "c3", other_name_count: 2)
       end
     end
 
