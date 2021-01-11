@@ -65,6 +65,9 @@ class AutocompleteService
   end
 
   def autocomplete_tag(string)
+    return [] if string.size > TagNameValidator::MAX_TAG_LENGTH
+    return [] if string.start_with?("http://", "https://")
+
     if !string.ascii_only?
       results = tag_other_name_matches(string)
     elsif string.starts_with?("/")
@@ -88,8 +91,6 @@ class AutocompleteService
   end
 
   def tag_matches(string)
-    return [] unless string.ascii_only?
-
     name_matches = Tag.nonempty.name_matches(string).order(post_count: :desc).limit(limit)
     alias_matches = Tag.nonempty.alias_matches(string).order(post_count: :desc).limit(limit)
     union = "((#{name_matches.to_sql}) UNION (#{alias_matches.to_sql})) AS tags"
@@ -102,7 +103,9 @@ class AutocompleteService
     end
   end
 
-  def tag_abbreviation_matches(string)
+  def tag_abbreviation_matches(string, max_length: 10)
+    return [] if string.size > max_length
+
     tags = Tag.nonempty.abbreviation_matches(string).order(post_count: :desc).limit(limit)
 
     tags.map do |tag|
@@ -111,6 +114,9 @@ class AutocompleteService
   end
 
   def tag_autocorrect_matches(string)
+    # autocorrect uses trigram indexing, which needs at least 3 alphanumeric characters to work.
+    return [] if string.remove(/[^a-zA-Z0-9]/).size < 3
+
     tags = Tag.nonempty.autocorrect_matches(string).limit(limit)
 
     tags.map do |tag|

@@ -1,9 +1,11 @@
 class TagNameValidator < ActiveModel::EachValidator
+  MAX_TAG_LENGTH = 170
+
   def validate_each(record, attribute, value)
     value = Tag.normalize_name(value)
 
-    if value.size > 170
-      record.errors.add(attribute, "'#{value}' cannot be more than 255 characters long")
+    if value.size > MAX_TAG_LENGTH
+      record.errors.add(attribute, "'#{value}' cannot be more than #{MAX_TAG_LENGTH} characters long")
     end
 
     case value
@@ -30,6 +32,7 @@ class TagNameValidator < ActiveModel::EachValidator
     when "new", "search"
       record.errors.add(attribute, "'#{value}' is a reserved name and cannot be used")
     when /\A(.+)_\(cosplay\)\z/i
+      # XXX don't allow aliases here?
       tag_name = TagAlias.to_aliased([$1]).first
       tag = Tag.find_by_name(tag_name)
 

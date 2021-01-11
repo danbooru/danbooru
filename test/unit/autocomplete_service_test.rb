@@ -87,15 +87,20 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
           create(:tag, name: "mole", post_count: 150)
           create(:tag, name: "mole_under_eye", post_count: 100)
           create(:tag, name: "mole_under_mouth", post_count: 50)
+          create(:tag, name: "x_x_x_x_x_x_x_x_x_x_x_x", post_count: 1)
 
           assert_autocomplete_equals(%w[mole mole_under_eye mole_under_mouth], "/m", :tag_query)
           assert_autocomplete_equals(%w[mole_under_eye mole_under_mouth], "/mu", :tag_query)
           assert_autocomplete_equals(%w[mole_under_mouth], "/mum", :tag_query)
           assert_autocomplete_equals(%w[mole_under_eye], "/mue", :tag_query)
           assert_autocomplete_equals(%w[mole_under_eye], "/*ue", :tag_query)
+          assert_autocomplete_equals(%w[mole_under_eye], "/MUE", :tag_query)
 
           assert_autocomplete_includes("mole_under_eye", "-/mue", :tag_query)
           assert_autocomplete_includes("mole_under_eye", "~/mue", :tag_query)
+
+          assert_autocomplete_equals([], "/xxxxxxxxxx", :tag_query)
+          assert_autocomplete_equals([], "/_", :tag_query)
         end
 
         should "list aliases before abbreviations" do
@@ -117,19 +122,19 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
         assert_autocomplete_equals(["touhou"], "东", :tag_query)
         assert_autocomplete_equals(["touhou"], "동", :tag_query)
 
-        assert_autocomplete_equals(["touhou"], "*東*", :tag_query)
-        assert_autocomplete_equals(["touhou"], "東*", :tag_query)
+        assert_autocomplete_equals([], "*東*", :tag_query)
+        assert_autocomplete_equals([], "東*", :tag_query)
         assert_autocomplete_equals([], "*東", :tag_query)
 
-        assert_autocomplete_equals(["touhou"], "*方*", :tag_query)
-        assert_autocomplete_equals(["touhou"], "*方", :tag_query)
+        assert_autocomplete_equals([], "*方*", :tag_query)
+        assert_autocomplete_equals([], "*方", :tag_query)
         assert_autocomplete_equals([], "方", :tag_query)
 
-        assert_autocomplete_equals(["bkub"], "*大*", :tag_query)
+        assert_autocomplete_equals([], "*大*", :tag_query)
         assert_autocomplete_equals(["bkub"], "大", :tag_query)
         assert_autocomplete_equals([], "*大", :tag_query)
 
-        assert_autocomplete_equals(["bkub"], "*川*", :tag_query)
+        assert_autocomplete_equals([], "*川*", :tag_query)
         assert_autocomplete_equals([], "*川", :tag_query)
         assert_autocomplete_equals([], "川", :tag_query)
       end
@@ -148,6 +153,8 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
         create(:tag, name: "touhou")
 
         assert_autocomplete_equals(%w[touhou], "touhuo", :tag_query)
+        assert_autocomplete_equals(%w[], ".....", :tag_query)
+        assert_autocomplete_equals(%w[], "t___", :tag_query)
       end
 
       should "ignore unsupported metatags" do
@@ -192,6 +199,11 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
         assert_autocomplete_equals(["disapproved:disinterest"], "disapproved:dis", :tag_query)
 
         assert_autocomplete_equals(["order:score", "order:score_asc"], "order:sco", :tag_query)
+      end
+
+      should "ignore bogus tags" do
+        assert_autocomplete_equals([], "x"*200, :tag_query)
+        assert_autocomplete_equals([], "http://www.google.com", :tag_query)
       end
     end
   end

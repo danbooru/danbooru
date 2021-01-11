@@ -254,12 +254,13 @@ class Tag < ApplicationRecord
     end
 
     def abbreviation_matches(abbrev)
-      abbrev = abbrev.delete_prefix("/")
+      abbrev = abbrev.downcase.delete_prefix("/")
+      return none if abbrev !~ /\A[a-z0-9\*]*\z/
+
       where("regexp_replace(tags.name, ?, '\\1', 'g') LIKE ?", ABBREVIATION_REGEXP.source, abbrev.to_escaped_for_sql_like)
     end
 
     def find_by_abbreviation(abbrev)
-      abbrev = abbrev.delete_prefix("/")
       abbreviation_matches(abbrev.escape_wildcards).order(post_count: :desc).first
     end
 
