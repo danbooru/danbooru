@@ -26,7 +26,6 @@ class StringTest < ActiveSupport::TestCase
       assert_equal("foobar", "foo\u180Ebar".normalize_whitespace)
       assert_equal("foobar", "foo\u200Bbar".normalize_whitespace)
       assert_equal("foobar", "foo\u200Cbar".normalize_whitespace)
-      assert_equal("foobar", "foo\u200Dbar".normalize_whitespace)
       assert_equal("foobar", "foo\u2060bar".normalize_whitespace)
       assert_equal("foobar", "foo\uFEFFbar".normalize_whitespace)
     end

@@ -180,7 +180,7 @@ class UserUpgradeTest < ActiveSupport::TestCase
           @user_upgrade = create(:self_gold_upgrade, status: "pending")
           @user_upgrade.create_checkout!
 
-          assert_equal(nil, @user_upgrade.receipt_url)
+          assert_nil(@user_upgrade.receipt_url)
         end
       end
 
