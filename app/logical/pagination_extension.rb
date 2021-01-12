@@ -3,7 +3,7 @@ module PaginationExtension
 
   attr_accessor :current_page, :records_per_page, :paginator_count, :paginator_mode
 
-  def paginate(page, limit: nil, max_limit: 1000, count: nil, search_count: nil)
+  def paginate(page, limit: nil, max_limit: 1000, page_limit: CurrentUser.user.page_limit, count: nil, search_count: nil)
     @records_per_page = limit || Danbooru.config.posts_per_page
     @records_per_page = @records_per_page.to_i.clamp(1, max_limit)
 
@@ -22,7 +22,7 @@ module PaginationExtension
     else
       @paginator_mode = :numbered
       @current_page = [page.to_i, 1].max
-      raise PaginationError if current_page > Danbooru.config.max_numbered_pages
+      raise PaginationError if current_page > page_limit
 
       paginate_numbered(current_page, records_per_page)
     end

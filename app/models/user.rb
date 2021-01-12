@@ -380,6 +380,16 @@ class User < ApplicationRecord
         end
       end
 
+      def page_limit(level)
+        if level >= User::Levels::PLATINUM
+          5000
+        elsif level == User::Levels::GOLD
+          2000
+        else
+          1000
+        end
+      end
+
       def tag_query_limit(level)
         if level >= User::Levels::BUILDER
           Float::INFINITY
@@ -482,6 +492,10 @@ class User < ApplicationRecord
 
     def upload_limit
       @upload_limit ||= UploadLimit.new(self)
+    end
+
+    def page_limit
+      User.page_limit(level)
     end
 
     def tag_query_limit

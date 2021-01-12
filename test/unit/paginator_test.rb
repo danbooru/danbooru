@@ -3,6 +3,11 @@ require 'test_helper'
 class PaginatorTest < ActiveSupport::TestCase
   setup do
     @posts = FactoryBot.create_list(:post, 5)
+    CurrentUser.user = User.anonymous
+  end
+
+  teardown do
+    CurrentUser.user = nil
   end
 
   context "sequential pagination (before)" do
@@ -37,9 +42,8 @@ class PaginatorTest < ActiveSupport::TestCase
     end
 
     should "raise an error when exceeding the page limit" do
-      Danbooru.config.stubs(:max_numbered_pages).returns(5)
       assert_raises(PaginationExtension::PaginationError) do
-        Post.paginate(10)
+        Post.paginate(10, page_limit: 5)
       end
     end
 

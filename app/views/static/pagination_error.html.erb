@@ -8,7 +8,7 @@
   <% if CurrentUser.is_platinum? %>
     Try narrowing your search terms.
   <% else %>
-    Try narrowing your search terms, or <%= link_to "upgrade your account", new_user_upgrade_path  %> to go beyond page <%= Danbooru.config.max_numbered_pages %>.
+    Try narrowing your search terms, or <%= link_to "upgrade your account", new_user_upgrade_path  %> to go beyond page <%= CurrentUser.user.page_limit %>.
   <% end %>
 </p>
 

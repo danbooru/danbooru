@@ -107,11 +107,6 @@ module Danbooru
       2
     end
 
-    # After this many pages, the paginator will switch to sequential mode.
-    def max_numbered_pages
-      1_000
-    end
-
     # Maximum size of an upload. If you change this, you must also change
     # `client_max_body_size` in your nginx.conf.
     def max_file_size
