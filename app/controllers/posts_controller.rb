@@ -12,6 +12,7 @@ class PostsController < ApplicationController
       tag_query = params[:tags] || params.dig(:post, :tags)
       @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], random: params[:random], format: params[:format])
       @posts = authorize @post_set.posts, policy_class: PostPolicy
+      @post_set.log!
       respond_with(@posts) do |format|
         format.atom
       end
