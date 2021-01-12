@@ -35,7 +35,7 @@ module Searchable
     elsif has_attribute?(field)
       node = arel_table[field]
     else
-      node = Arel.sql(field)
+      node = Arel.sql(field.to_s)
     end
 
     arel = node.send(operator, *args, **options)

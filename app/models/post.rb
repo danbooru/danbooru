@@ -658,12 +658,12 @@ class Post < ApplicationRecord
           end
 
         when /^-child:(.+)$/i
-          children.numeric_attribute_matches(:id, $1).each do |post|
+          children.search(id: $1).each do |post|
             post.update!(parent_id: nil)
           end
 
         when /^child:(.+)$/i
-          Post.numeric_attribute_matches(:id, $1).where.not(id: id).limit(10).each do |post|
+          Post.search(id: $1).where.not(id: id).limit(10).each do |post|
             post.update!(parent_id: id)
           end
 
