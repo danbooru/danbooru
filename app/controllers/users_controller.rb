@@ -70,6 +70,7 @@ class UsersController < ApplicationController
       password_confirmation: params[:user][:password_confirmation]
     )
 
+    user_verifier.log! if user_verifier.requires_verification?
     UserEvent.build_from_request(@user, :user_creation, request)
 
     if params[:user][:email].present?
