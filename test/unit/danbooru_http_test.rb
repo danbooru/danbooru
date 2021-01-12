@@ -175,13 +175,13 @@ class DanbooruHttpTest < ActiveSupport::TestCase
 
       should "fail if the url points to a private IP" do
         assert_raises(Danbooru::Http::DownloadError) do
-          Danbooru::Http.public_only.download_media("https://127.0.0.1.xip.io")
+          Danbooru::Http.public_only.download_media("https://127.0.0.1.nip.io")
         end
       end
 
       should "fail if the url redirects to a private IP" do
         assert_raises(Danbooru::Http::DownloadError) do
-          Danbooru::Http.public_only.download_media(httpbin_url("redirect-to?url=https://127.0.0.1.xip.io"))
+          Danbooru::Http.public_only.download_media(httpbin_url("redirect-to?url=https://127.0.0.1.nip.io"))
         end
       end
 
