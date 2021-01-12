@@ -123,7 +123,19 @@ class SearchableTest < ActiveSupport::TestCase
         assert_search_equals(@pf1, status: "pending")
         assert_search_equals(@pf1, status: "pending,blah")
         assert_search_equals(@pf1, status: "pending blah")
-        assert_search_equals(@pf1, status_id: PostFlag.statuses[:pending])
+
+        assert_search_equals(@pf2, status_not: "pending")
+        assert_search_equals([], status_not: "pending,rejected")
+
+        assert_search_equals(@pf1, status_id: "0")
+        assert_search_equals(@pf1, status_id_eq: "0")
+        assert_search_equals([@pf2, @pf1], status_id: "0 2")
+        assert_search_equals([@pf2, @pf1], status_id: "0,2")
+        assert_search_equals([@pf2, @pf1], status_id: "0..2")
+        assert_search_equals([@pf2], status_id: ">0")
+
+        assert_search_equals(@pf2, status_id_not: "0")
+        assert_search_equals(@pf2, status_id_not_eq: "0")
       end
 
       should "support multiple operators on the same attribute" do

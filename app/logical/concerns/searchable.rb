@@ -213,7 +213,7 @@ module Searchable
     when :boolean
       search_boolean_attribute(name, params)
     when :integer, :float, :datetime
-      search_numeric_attribute(name, params)
+      search_numeric_attribute(name, params, type: type)
     when :inet
       search_inet_attribute(name, params)
     when :enum
@@ -225,39 +225,39 @@ module Searchable
     end
   end
 
-  def search_numeric_attribute(attr, params)
+  def search_numeric_attribute(attr, params, key: attr, type: :integer)
     relation = all
 
-    if params[attr].present?
-      relation = relation.numeric_attribute_matches(attr, params[attr])
+    if params[key].present?
+      relation = relation.where_numeric_matches(attr, params[key], type)
     end
 
-    if params[:"#{attr}_not"].present?
-      relation = relation.where.not(id: numeric_attribute_matches(attr, params[:"#{attr}_not"]))
+    if params[:"#{key}_not"].present?
+      relation = relation.where.not(id: relation.where_numeric_matches(attr, params[:"#{key}_not"], type))
     end
 
-    if params[:"#{attr}_eq"].present?
-      relation = relation.where_operator(attr, :eq, params[:"#{attr}_eq"])
+    if params[:"#{key}_eq"].present?
+      relation = relation.where_operator(attr, :eq, params[:"#{key}_eq"])
     end
 
-    if params[:"#{attr}_not_eq"].present?
-      relation = relation.where_operator(attr, :not_eq, params[:"#{attr}_not_eq"])
+    if params[:"#{key}_not_eq"].present?
+      relation = relation.where_operator(attr, :not_eq, params[:"#{key}_not_eq"])
     end
 
-    if params[:"#{attr}_gt"].present?
-      relation = relation.where_operator(attr, :gt, params[:"#{attr}_gt"])
+    if params[:"#{key}_gt"].present?
+      relation = relation.where_operator(attr, :gt, params[:"#{key}_gt"])
     end
 
-    if params[:"#{attr}_gteq"].present?
-      relation = relation.where_operator(attr, :gteq, params[:"#{attr}_gteq"])
+    if params[:"#{key}_gteq"].present?
+      relation = relation.where_operator(attr, :gteq, params[:"#{key}_gteq"])
     end
 
-    if params[:"#{attr}_lt"].present?
-      relation = relation.where_operator(attr, :lt, params[:"#{attr}_lt"])
+    if params[:"#{key}_lt"].present?
+      relation = relation.where_operator(attr, :lt, params[:"#{key}_lt"])
     end
 
-    if params[:"#{attr}_lteq"].present?
-      relation = relation.where_operator(attr, :lteq, params[:"#{attr}_lteq"])
+    if params[:"#{key}_lteq"].present?
+      relation = relation.where_operator(attr, :lteq, params[:"#{key}_lteq"])
     end
 
     relation
@@ -396,13 +396,12 @@ module Searchable
       relation = relation.where(name => value)
     end
 
-    if params["#{name}_id"].present?
-      relation = relation.numeric_attribute_matches(name, params["#{name}_id"])
+    if params[:"#{name}_not"].present?
+      value = params[:"#{name}_not"].split(/[, ]+/).map(&:downcase)
+      relation = relation.where.not(name => value)
     end
 
-    if params["#{name}_id_not"].present?
-      relation = relation.where.not(id: relation.numeric_attribute_matches(name, params["#{name}_id_not"]))
-    end
+    relation = relation.search_numeric_attribute(name, params, key: :"#{name}_id")
 
     relation
   end
