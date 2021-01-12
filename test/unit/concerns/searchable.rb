@@ -66,6 +66,11 @@ class SearchableTest < ActiveSupport::TestCase
         assert_search_equals(@p1, source_ilike: "A*")
         assert_search_equals(@p1, source_regex: "^a.*")
 
+        assert_search_equals([], id: @p1.id, source_like: "A*")
+        assert_search_equals([@p1], id: @p1.id, source_not_like: "A*")
+        assert_search_equals([], id: @p1.id, source_regex: "^A.*")
+        assert_search_equals([@p1], id: @p1.id, source_not_regex: "^A.*")
+
         assert_search_equals(@p1, source_array: ["a1", "blah"])
         assert_search_equals(@p1, source_comma: "a1,blah")
         assert_search_equals(@p1, source_space: "a1 blah")

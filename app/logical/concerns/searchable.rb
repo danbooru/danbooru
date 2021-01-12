@@ -24,32 +24,43 @@ module Searchable
     q
   end
 
-  # `operator` is an Arel::Predications method: :eq, :gt, :lt, :between, :in, etc.
+  # Search a table field by an Arel operator. `field` may be an Arel node, the
+  # name of a table column, or raw SQL. `operator` is an Arel::Predications
+  # method: :eq, :gt, :lt, :between, :in, :matches (LIKE), etc.
+  #
   # https://github.com/rails/rails/blob/master/activerecord/lib/arel/predications.rb
-  def where_operator(field, operator, *args)
-    if field.is_a?(Symbol)
-      attribute = arel_table[field]
+  def where_operator(field, operator, *args, **options)
+    if field.is_a?(Arel::Nodes::Node)
+      node = field
+    elsif has_attribute?(field)
+      node = arel_table[field]
     else
-      attribute = Arel.sql(field)
+      node = Arel.sql(field)
     end
 
-    where(attribute.send(operator, *args))
+    arel = node.send(operator, *args, **options)
+    where(arel)
+  end
+
+  def where_array_operator(attr, operator, values)
+    array = Arel.sql(ActiveRecord::Base.sanitize_sql(["ARRAY[?]", values]))
+    where_operator(attr, operator, array)
   end
 
   def where_like(attr, value)
-    where("#{qualified_column_for(attr)} LIKE ? ESCAPE E'\\\\'", value.to_escaped_for_sql_like)
+    where_operator(attr, :matches, value.to_escaped_for_sql_like, nil, true)
   end
 
   def where_not_like(attr, value)
-    where.not("#{qualified_column_for(attr)} LIKE ? ESCAPE E'\\\\'", value.to_escaped_for_sql_like)
+    where_operator(attr, :does_not_match, value.to_escaped_for_sql_like, nil, true)
   end
 
   def where_ilike(attr, value)
-    where("#{qualified_column_for(attr)} ILIKE ? ESCAPE E'\\\\'", value.mb_chars.to_escaped_for_sql_like)
+    where_operator(attr, :matches, value.to_escaped_for_sql_like, nil, false)
   end
 
   def where_not_ilike(attr, value)
-    where.not("#{qualified_column_for(attr)} ILIKE ? ESCAPE E'\\\\'", value.mb_chars.to_escaped_for_sql_like)
+    where_operator(attr, :does_not_match, value.to_escaped_for_sql_like, nil, false)
   end
 
   def where_iequals(attr, value)
@@ -59,11 +70,11 @@ module Searchable
   # https://www.postgresql.org/docs/current/static/functions-matching.html#FUNCTIONS-POSIX-REGEXP
   # "(?e)" means force use of ERE syntax; see sections 9.7.3.1 and 9.7.3.4.
   def where_regex(attr, value, flags: "e")
-    where("#{qualified_column_for(attr)} ~ ?", "(?#{flags})" + value)
+    where_operator(attr, :matches_regexp, "(?#{flags})" + value)
   end
 
   def where_not_regex(attr, value, flags: "e")
-    where.not("#{qualified_column_for(attr)} ~ ?", "(?#{flags})" + value)
+    where_operator(attr, :does_not_match_regexp, "(?#{flags})" + value)
   end
 
   def where_inet_matches(attr, value)
@@ -76,12 +87,14 @@ module Searchable
     end
   end
 
+  # The && operator
   def where_array_includes_any(attr, values)
-    where("#{qualified_column_for(attr)} && ARRAY[?]", values)
+    where_array_operator(attr, :overlaps, values)
   end
 
+  # The @> operator
   def where_array_includes_all(attr, values)
-    where("#{qualified_column_for(attr)} @> ARRAY[?]", values)
+    where_array_operator(attr, :contains, values)
   end
 
   def where_array_includes_any_lower(attr, values)
@@ -128,14 +141,10 @@ module Searchable
     end
   end
 
-  # range: "5", ">5", "<5", ">=5", "<=5", "5..10", "5,6,7"
-  def numeric_attribute_matches(attribute, value)
-    return all unless value.present?
-
-    column = column_for_attribute(attribute)
-    qualified_column = "#{table_name}.#{column.name}"
-    range = PostQueryBuilder.new(nil).parse_range(value, column.type)
-    where_operator(qualified_column, *range)
+  # value: "5", ">5", "<5", ">=5", "<=5", "5..10", "5,6,7"
+  def where_numeric_matches(attribute, value, type = :integer)
+    range = PostQueryBuilder.new(nil).parse_range(value, type)
+    where_operator(attribute, *range)
   end
 
   def boolean_attribute_matches(attribute, value)
@@ -505,10 +514,6 @@ module Searchable
   private
 
   def qualified_column_for(attr)
-    if attr.is_a?(Symbol)
-      "#{table_name}.#{column_for_attribute(attr).name}"
-    else
-      attr.to_s
-    end
+    "#{table_name}.#{column_for_attribute(attr).name}"
   end
 end
