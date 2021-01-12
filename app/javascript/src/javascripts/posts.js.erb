@@ -444,6 +444,7 @@ Post.show_pending_update_notice = function() {
 }
 
 Post.tag = function(post_id, tags) {
+  tags ??= "";
   const tag_string = (Array.isArray(tags) ? tags.join(" ") : String(tags));
   Post.update(post_id, "tag-script", { post: { old_tag_string: "", tag_string: tag_string }});
 }

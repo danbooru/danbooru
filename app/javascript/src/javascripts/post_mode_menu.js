@@ -151,7 +151,7 @@ PostModeMenu.click = function(e) {
     Post.tag(post_id, "upvote:me");
   } else if (s === "tag-script") {
     var current_script_id = localStorage.getItem("current_tag_script_id");
-    var tag_script = localStorage.getItem("tag-script-" + current_script_id);
+    var tag_script = localStorage.getItem("tag-script-" + current_script_id) ?? "";
     Post.tag(post_id, tag_script);
   } else {
     return;
