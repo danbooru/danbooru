@@ -1,5 +1,5 @@
 class UserSessionPolicy < ApplicationPolicy
   def index?
-    user.is_moderator?
+    user.is_admin?
   end
 end

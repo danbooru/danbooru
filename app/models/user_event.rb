@@ -22,8 +22,10 @@ class UserEvent < ApplicationRecord
   delegate :country, :city, :is_proxy?, to: :ip_geolocation, allow_nil: true
 
   def self.visible(user)
-    if user.is_moderator?
+    if user.is_admin?
       all
+    elsif user.is_moderator?
+      where(category: [:login, :logout, :user_creation]).or(where(user: user))
     else
       where(user: user)
     end
