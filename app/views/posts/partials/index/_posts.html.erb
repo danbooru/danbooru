@@ -1,6 +1,10 @@
 <div id="posts" class="user-disable-cropped-<%= CurrentUser.user.disable_cropped_thumbnails? %>">
   <div id="posts-container">
-    <%= post_set.post_previews_html(self) %>
+    <% if post_set.shown_posts.empty? %>
+      <%= render "post_sets/blank" %>
+    <% else %>
+      <%= post_previews_html(post_set.posts, show_deleted: post_set.show_deleted?, show_cropped: true, tags: post_set.tag_string) %>
+    <% end %>
   </div>
 
   <% if post_set.hidden_posts.present? %>

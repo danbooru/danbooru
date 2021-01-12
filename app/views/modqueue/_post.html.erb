@@ -1,6 +1,6 @@
-<%= content_tag(:div, { id: "post-#{post.id}", class: ["post", "mod-queue-preview", "column-container", *PostPresenter.preview_class(post)].join(" ") }.merge(PostPresenter.data_attributes(post))) do %>
+<%= tag.div id: "post-#{post.id}", **PostPreviewComponent.new(post: post).article_attrs("post mod-queue-preview column-container") do %>
   <aside class="column column-shrink">
-    <%= PostPresenter.preview(post, size: true, show_deleted: true) %>
+    <%= post_preview(post, size: true, show_deleted: true) %>
   </aside>
 
   <section class="column column-expand">

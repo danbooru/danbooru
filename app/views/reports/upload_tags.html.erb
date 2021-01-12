@@ -8,7 +8,7 @@
 
     <%= table_for @upload_reports do |t| %>
       <% t.column "Post ID", width: "10%" do |upload_report| %>
-        <%= PostPresenter.preview(upload_report.becomes(Post), show_deleted: true, tags: "user:#{upload_report.uploader.name}") %>
+        <%= post_preview(upload_report.becomes(Post), show_deleted: true, tags: "user:#{upload_report.uploader.name}") %>
       <% end %>
       <% t.column "Tags added by uploader", width: "45%" do |upload_report| %>
         <%= TagSetPresenter.new(upload_report.uploader_tags_array).inline_tag_list_html %>

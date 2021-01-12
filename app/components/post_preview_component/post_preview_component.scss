@@ -1,0 +1,162 @@
+@import "../../javascript/src/styles/base/000_vars.scss";
+
+article.post-preview {
+  height: 154px;
+  width: 154px;
+  margin: 0 10px 10px 0;
+  overflow: hidden;
+  text-align: center;
+  display: inline-block;
+  position: relative;
+
+  a {
+    display: inline-block;
+  }
+
+  &.captioned {
+    height: auto;
+    vertical-align: text-top;
+  }
+
+  &.post-preview-compact {
+    width: auto;
+    height: auto;
+  }
+
+  .desc {
+    font-size: 80%;
+    margin-bottom: 0;
+  }
+
+  img {
+    margin: auto;
+  }
+
+  &[data-tags~=animated]::before, &[data-file-ext=swf]::before, &[data-file-ext=webm]::before, &[data-file-ext=mp4]::before, &[data-file-ext=zip]::before {
+    @include animated-icon;
+  }
+
+  &[data-has-sound=true]::before {
+    @include sound-icon;
+  }
+}
+
+/* Avoid dead space around thumbnails in tables. */
+table article.post-preview {
+  height: auto;
+  width: auto;
+  margin: 0;
+}
+
+.post-preview {
+  img {
+    border: 2px solid transparent;
+  }
+
+  &.post-status-has-children img {
+    border-color: var(--preview-has-children-color);
+  }
+
+  &.post-status-has-parent img {
+    border-color: var(--preview-has-parent-color);
+  }
+
+  &.post-status-has-children.post-status-has-parent img {
+    border-color: var(--preview-has-children-color) var(--preview-has-parent-color) var(--preview-has-parent-color) var(--preview-has-children-color);
+  }
+
+  &.post-status-deleted img {
+    border-color: var(--preview-deleted-color);
+  }
+
+  &.post-status-has-children.post-status-deleted img {
+    border-color: var(--preview-has-children-color) var(--preview-deleted-color) var(--preview-deleted-color) var(--preview-has-children-color);
+  }
+
+  &.post-status-has-parent.post-status-deleted img {
+    border-color: var(--preview-has-parent-color) var(--preview-deleted-color) var(--preview-deleted-color) var(--preview-has-parent-color);
+  }
+
+  &.post-status-has-children.post-status-has-parent.post-status-deleted img {
+    border-color: var(--preview-has-children-color) var(--preview-deleted-color) var(--preview-deleted-color) var(--preview-has-parent-color);
+  }
+
+  /* Pending and flagged posts have blue borders (except in the modqueue). */
+  &.post-status-pending:not(.mod-queue-preview) img,
+  &.post-status-flagged:not(.mod-queue-preview) img {
+    border-color: var(--preview-pending-color);
+  }
+
+  &.post-status-has-children.post-status-pending:not(.mod-queue-preview) img,
+  &.post-status-has-children.post-status-flagged:not(.mod-queue-preview) img {
+    border-color: var(--preview-has-children-color) var(--preview-pending-color) var(--preview-pending-color) var(--preview-has-children-color);
+  }
+
+  &.post-status-has-parent.post-status-pending:not(.mod-queue-preview) img,
+  &.post-status-has-parent.post-status-flagged:not(.mod-queue-preview) img {
+    border-color: var(--preview-has-parent-color) var(--preview-pending-color) var(--preview-pending-color) var(--preview-has-parent-color);
+  }
+
+  &.post-status-has-children.post-status-has-parent.post-status-pending:not(.mod-queue-preview) img,
+  &.post-status-has-children.post-status-has-parent.post-status-flagged:not(.mod-queue-preview) img {
+    border-color: var(--preview-has-children-color) var(--preview-pending-color) var(--preview-pending-color) var(--preview-has-parent-color);
+  }
+}
+
+/* Flagged posts have red borders for approvers. */
+body[data-current-user-can-approve-posts="true"] .post-preview {
+  &.post-status-flagged img {
+    border-color: var(--preview-flagged-color);
+  }
+
+  &.post-status-has-children.post-status-flagged img {
+    border-color: var(--preview-has-children-color) var(--preview-flagged-color) var(--preview-flagged-color) var(--preview-has-children-color);
+  }
+
+  &.post-status-has-parent.post-status-flagged img {
+    border-color: var(--preview-has-parent-color) var(--preview-flagged-color) var(--preview-flagged-color) var(--preview-has-parent-color);
+  }
+
+  &.post-status-has-children.post-status-has-parent.post-status-flagged img {
+    border-color: var(--preview-has-children-color) var(--preview-flagged-color) var(--preview-flagged-color) var(--preview-has-parent-color);
+  }
+}
+
+.post-preview.current-post {
+  background-color: var(--preview-current-post-background);
+}
+
+@media screen and (max-width: 660px) {
+  article.post-preview {
+    margin: 0;
+    text-align: center;
+    vertical-align: middle;
+    display: inline-block;
+
+    a {
+      margin: 0 auto;
+    }
+
+    img {
+      width: 33.3vw;
+      border: none !important;
+    }
+  }
+
+  .user-disable-cropped-false {
+    article.post-preview {
+      width: 33.3%;
+      height: 33.3vw;
+      overflow: hidden;
+    }
+
+    img {
+      width: 33.3vw;
+      height: 33.3vw;
+
+      &.has-cropped-false {
+        object-fit: cover;
+      }
+    }
+  }
+}

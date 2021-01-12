@@ -45,6 +45,7 @@ gem 'http-cookie', git: "https://github.com/danbooru/http-cookie"
 gem 'pundit'
 gem 'mail'
 gem 'nokogiri'
+gem 'view_component', require: 'view_component/engine'
 
 group :production, :staging do
   gem 'unicorn', :platforms => :ruby

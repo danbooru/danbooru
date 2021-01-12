@@ -1,10 +1,10 @@
-<%= content_tag(:article, article_attrs) do -%>
+<%= tag.article id: "post_#{post.id}", **article_attrs do -%>
   <%= link_to polymorphic_path(link_target, link_params) do -%>
-    <%= content_tag(:picture) do -%>
+    <picture>
       <%= tag.source media: "(max-width: 660px)", srcset: cropped_url -%>
-      <%= tag.source media: "(min-width: 660px)", srcset: preview_url -%>
-      <%= tag.img class: "has-cropped-#{has_cropped}", src: preview_url, style: "min-width: #{preview_width}px; min-height: #{preview_height}px;", title: tooltip, alt: alt_text -%>
-    <% end -%>
+      <%= tag.source media: "(min-width: 660px)", srcset: post.preview_file_url -%>
+      <%= tag.img class: "has-cropped-#{post.has_cropped?}", src: post.preview_file_url, style: "min-width: #{preview_dimensions[:width]}px; min-height: #{preview_dimensions[:height]}px;", title: tooltip, alt: "post ##{post.id}" -%>
+    </picture>
   <% end -%>
   <% if pool -%>
     <p class="desc">
@@ -24,7 +24,7 @@
   <% if size -%>
     <p class="desc">
       <%= link_to number_to_human_size(size), post.file_url %>
-      (<%= width %>x<%= height %>)
+      (<%= post.image_width %>x<%= post.image_height %>)
     </p>
   <% end -%>
   <% if similarity -%>

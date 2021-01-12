@@ -11,7 +11,7 @@
 
     <section>
       <% @pools.each do |pool| %>
-        <%= PostPresenter.preview(pool.cover_post, link_target: pool, pool: pool, show_deleted: true) %>
+        <%= post_preview(pool.cover_post, link_target: pool, pool: pool, show_deleted: true) %>
       <% end %>
 
       <%= numbered_paginator(@pools) %>

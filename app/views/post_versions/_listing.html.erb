@@ -1,6 +1,6 @@
 <div id="p-<%= listing_type(:post_id) %>-listing">
   <% if listing_type(:post_id) == :revert %>
-    <%= PostPresenter.preview(@post_versions.first.post, show_deleted: true) %>
+    <%= post_preview(@post_versions.first.post, show_deleted: true) %>
   <% end %>
 
     <%= table_for @post_versions, id: "post-versions-table", class: "striped autofit", width: "100%" do |t| %>
@@ -11,7 +11,7 @@
       <% end %>
       <% if listing_type(:post_id) == :standard %>
         <% t.column "Post", width: "1%" do |post_version| %>
-          <%= PostPresenter.preview(post_version.post, show_deleted: true) %>
+          <%= post_preview(post_version.post, show_deleted: true) %>
         <% end %>
       <% end %>
       <% t.column "Version", width: "1%" do |post_version| %>

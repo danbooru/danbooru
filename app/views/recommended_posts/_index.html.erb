@@ -4,6 +4,6 @@
   <% end %>
 
   <% @recs.each do |rec| %>
-    <%= PostPresenter.preview(rec[:post], recommended: 100*rec[:score]) %>
+    <%= post_preview(rec[:post], recommended: 100*rec[:score]) %>
   <% end %>
 </section>

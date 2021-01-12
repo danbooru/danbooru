@@ -140,20 +140,6 @@ module PostSets
       @pending_bulk_update_requests ||= BulkUpdateRequest.pending.where_array_includes_any(:tags, tag.name)
     end
 
-    def post_previews_html(template)
-      html = ""
-      if shown_posts.empty?
-        return template.render("post_sets/blank")
-      end
-
-      shown_posts.each do |post|
-        html << PostPresenter.preview(post, show_deleted: show_deleted?, show_cropped: true, tags: tag_string)
-        html << "\n"
-      end
-
-      html.html_safe
-    end
-
     def show_deleted?
       query.select_metatags("status").any? do |metatag|
         metatag.value.in?(%w[all any active unmoderated modqueue deleted appealed])

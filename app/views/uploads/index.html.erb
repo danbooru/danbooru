@@ -5,7 +5,7 @@
 
     <%= table_for @uploads, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "Upload" do |upload| %>
-        <%= PostPresenter.preview(upload.post, tags: "user:#{upload.uploader.name}", show_deleted: true) %>
+        <%= post_preview(upload.post, tags: "user:#{upload.uploader.name}", show_deleted: true) %>
       <% end %>
       <% t.column "Info", td: {class: "col-expand upload-info"} do |upload| %>
         <span class="info">

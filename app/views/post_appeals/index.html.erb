@@ -6,7 +6,7 @@
 
     <%= table_for @post_appeals, width: "100%" do |t| %>
       <% t.column "Post", width: "1%" do |post_appeal| %>
-        <%= PostPresenter.preview(post_appeal.post, show_deleted: true) %>
+        <%= post_preview(post_appeal.post, show_deleted: true) %>
       <% end %>
       <% t.column "Reason" do |post_appeal| %>
         <span class="prose">

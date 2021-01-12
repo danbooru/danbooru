@@ -14,7 +14,7 @@
 
     <%= table_for @comment_votes, class: "striped autofit" do |t| %>
       <% t.column "Post" do |vote| %>
-        <%= PostPresenter.preview(vote.comment.post, show_deleted: true) %>
+        <%= post_preview(vote.comment.post, show_deleted: true) %>
       <% end %>
       <% t.column "Comment", td: {class: "col-expand"} do |vote| %>
         <div class="prose">

@@ -1,8 +1,10 @@
 module PostsHelper
+  def post_preview(post, **options)
+    render PostPreviewComponent.new(post: post, **options)
+  end
+
   def post_previews_html(posts, **options)
-    posts.map do |post|
-      PostPresenter.preview(post, **options)
-    end.join("").html_safe
+    render PostPreviewComponent.with_collection(posts, **options)
   end
 
   def reportbooru_enabled?

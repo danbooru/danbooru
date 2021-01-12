@@ -44,7 +44,7 @@
 
   <%= render "posts/partials/show/notices", :post => @post %>
 
-  <%= content_tag(:section, class: "image-container note-container", **PostPresenter.data_attributes(@post)) do -%>
+  <%= content_tag(:section, class: "image-container note-container", **PostPreviewComponent.new(post: @post).data_attributes) do -%>
     <%= render "posts/partials/show/embedded", post: @post %>
     <div id="note-preview"></div>
   <% end -%>

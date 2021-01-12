@@ -5,7 +5,7 @@
 
   <% @posts.select(&:visible?).each do |post| %>
     <% if post.comments.unhidden(CurrentUser.user).any? || post.comments.hidden(CurrentUser.user).any? %>
-      <%= content_tag(:div, { id: "post_#{post.id}", class: ["post", *PostPresenter.preview_class(post)].join(" ") }.merge(PostPresenter.data_attributes(post))) do %>
+      <%= tag.div id: "post_#{post.id}", **PostPreviewComponent.new(post: post).article_attrs("post") do %>
         <div class="preview">
           <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>
         </div>

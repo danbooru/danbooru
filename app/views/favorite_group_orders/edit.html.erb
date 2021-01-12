@@ -8,7 +8,7 @@
     <ul id="sortable">
       <% @favorite_group.posts.limit(1_000).each do |post| %>
         <li class="ui-state-default" id="favorite_group[post_ids]_<%= post.id %>">
-          <%= PostPresenter.preview(post, show_deleted: true).presence || "Hidden: Post ##{post.id}" %>
+          <%= post_preview(post, show_deleted: true).presence || "Hidden: Post ##{post.id}" %>
         </li>
       <% end %>
     </ul>

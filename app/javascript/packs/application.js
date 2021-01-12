@@ -28,6 +28,8 @@ require("@fortawesome/fontawesome-free/css/regular.css");
 
 importAll(require.context('../src/javascripts', true, /\.js(\.erb)?$/));
 importAll(require.context('../src/styles', true, /\.s?css(?:\.erb)?$/));
+importAll(require.context('../../components', true, /\.js(\.erb)?$/));
+importAll(require.context('../../components', true, /\.s?css(?:\.erb)?$/));
 
 export { default as jQuery } from "jquery";
 export { default as Autocomplete } from '../src/javascripts/autocomplete.js.erb';

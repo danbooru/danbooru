@@ -66,37 +66,4 @@
     align-items: center;
     justify-content: flex-start;
   }
-
-  article.post-preview {
-    margin: 0;
-    text-align: center;
-    vertical-align: middle;
-    display: inline-block;
-
-    a {
-      margin: 0 auto;
-    }
-
-    img {
-      width: 33.3vw;
-      border: none !important;
-    }
-  }
-
-  .user-disable-cropped-false {
-    article.post-preview {
-      width: 33.3%;
-      height: 33.3vw;
-      overflow: hidden;
-    }
-
-    img {
-      width: 33.3vw;
-      height: 33.3vw;
-
-      &.has-cropped-false {
-        object-fit: cover;
-      }
-    }
-  }
 }

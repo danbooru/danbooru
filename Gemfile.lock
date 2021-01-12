@@ -381,6 +381,8 @@ GEM
     unicorn-worker-killer (0.4.4)
       get_process_mem (~> 0)
       unicorn (>= 4, < 6)
+    view_component (2.24.0)
+      activesupport (>= 5.0.0, < 7.0)
     webpacker (5.2.1)
       activesupport (>= 5.2)
       rack-proxy (>= 0.6.1)
@@ -467,6 +469,7 @@ DEPENDENCIES
   stripe-ruby-mock
   unicorn
   unicorn-worker-killer
+  view_component
   webpacker (>= 4.0.x)
   whenever
 

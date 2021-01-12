@@ -6,7 +6,7 @@
 
     <%= table_for @post_flags, width: "100%" do |t| %>
       <% t.column "Post", width: "1%" do |post_flag| %>
-        <%= PostPresenter.preview(post_flag.post, show_deleted: true) %>
+        <%= post_preview(post_flag.post, show_deleted: true) %>
       <% end %>
       <% t.column "Reason" do |post_flag| %>
         <span class="prose">

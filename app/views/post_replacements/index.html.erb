@@ -12,7 +12,7 @@
 
     <%= table_for @post_replacements, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "Post", width: "1%" do |post_replacement| %>
-        <%= PostPresenter.preview(post_replacement.post, show_deleted: true) %>
+        <%= post_preview(post_replacement.post, show_deleted: true) %>
       <% end %>
       <% t.column "Source" do |post_replacement| %>
         <dl>

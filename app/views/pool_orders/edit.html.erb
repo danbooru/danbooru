@@ -14,7 +14,7 @@
         <ul id="sortable">
           <% @pool.posts.each do |post| %>
             <li class="ui-state-default" id="pool[post_ids]_<%= post.id %>">
-              <%= PostPresenter.preview(post, show_deleted: true).presence || "Hidden: Post ##{post.id}" %>
+              <%= post_preview(post, show_deleted: true).presence || "Hidden: Post ##{post.id}" %>
             </li>
           <% end %>
         </ul>
