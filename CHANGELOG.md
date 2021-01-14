@@ -6,6 +6,8 @@
   the navbar beneath posts that lets you move to the next or previous post in a
   tag search. Previously this was only available to logged-in users.
 
+* Removed the option to disable the next/previous post navbar.
+
 ## 2021-01-12
 
 ### Changes

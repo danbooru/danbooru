@@ -671,7 +671,6 @@ class User < ApplicationRecord
   def initialize_attributes
     self.enable_post_navigation = true
     self.new_post_navigation_layout = true
-    self.enable_sequential_post_navigation = true
     self.enable_auto_complete = true
     self.always_resize_images = true
   end

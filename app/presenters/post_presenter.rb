@@ -25,6 +25,6 @@ class PostPresenter
   def has_sequential_navigation?(params)
     return false if PostQueryBuilder.new(params[:q]).has_metatag?(:order, :ordfav, :ordpool)
     return false if params[:pool_id].present? || params[:favgroup_id].present?
-    return CurrentUser.user.enable_sequential_post_navigation
+    true
   end
 end
