@@ -1,3 +1,11 @@
+## Unreleased
+
+### Changes
+
+* The next/previous post navbar is now available to logged out users. This is
+  the navbar beneath posts that lets you move to the next or previous post in a
+  tag search. Previously this was only available to logged-in users.
+
 ## 2021-01-12
 
 ### Changes

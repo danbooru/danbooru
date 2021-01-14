@@ -34,7 +34,7 @@ class PostPreviewComponent < ApplicationComponent
   def link_params
     link_params = {}
 
-    link_params["q"] = tags if tags.present? && !current_user.is_anonymous?
+    link_params["q"] = tags if tags.present?
     link_params["pool_id"] = pool_id if pool_id
     link_params["favgroup_id"] = favgroup_id if favgroup_id
 
