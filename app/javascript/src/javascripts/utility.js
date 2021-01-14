@@ -1,4 +1,3 @@
-import CurrentUser from "./current_user";
 import Rails from '@rails/ujs';
 
 let Utility = {};
@@ -74,9 +73,7 @@ Utility.dialog = function(title, html) {
 }
 
 Utility.keydown = function(keys, namespace, handler, selector = document) {
-  if (CurrentUser.data("enable-post-navigation")) {
-    $(selector).on("keydown.danbooru." + namespace, null, keys, handler);
-  }
+  $(selector).on("keydown.danbooru." + namespace, null, keys, handler);
 };
 
 Utility.is_subset = function(array, subarray) {

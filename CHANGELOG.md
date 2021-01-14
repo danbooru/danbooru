@@ -8,6 +8,8 @@
 
 * Removed the option to disable the next/previous post navbar.
 
+* Removed the option to disable keyboard shortcuts.
+
 ## 2021-01-12
 
 ### Changes

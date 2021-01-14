@@ -44,12 +44,12 @@ class UserPolicy < ApplicationPolicy
       :comment_threshold, :default_image_size, :favorite_tags,
       :blacklisted_tags, :time_zone, :per_page, :custom_style, :theme,
       :receive_email_notifications, :always_resize_images,
-      :enable_post_navigation, :new_post_navigation_layout,
-      :enable_private_favorites, :hide_deleted_posts, :style_usernames,
-      :enable_auto_complete, :show_deleted_children,
-      :disable_categorized_saved_searches, :disable_tagged_filenames,
-      :disable_cropped_thumbnails, :disable_mobile_gestures, :enable_safe_mode,
-      :enable_desktop_mode, :disable_post_tooltips,
+      :new_post_navigation_layout, :enable_private_favorites,
+      :hide_deleted_posts, :style_usernames, :enable_auto_complete,
+      :show_deleted_children, :disable_categorized_saved_searches,
+      :disable_tagged_filenames, :disable_cropped_thumbnails,
+      :disable_mobile_gestures, :enable_safe_mode, :enable_desktop_mode,
+      :disable_post_tooltips,
     ].compact
   end
 
