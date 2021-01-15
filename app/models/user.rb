@@ -69,7 +69,36 @@ class User < ApplicationRecord
     is_verified
   )
 
+  DEFAULT_BLACKLIST = ["spoilers", "guro", "scat", "furry -rating:s"].join("\n")
+
+  attribute :id
+  attribute :created_at
+  attribute :updated_at
+  attribute :name
+  attribute :level, default: Levels::MEMBER
+  attribute :bcrypt_password_hash
+  attribute :inviter_id
+  attribute :last_logged_in_at, default: -> { Time.zone.now }
+  attribute :last_forum_read_at, default: "1960-01-01 00:00:00"
+  attribute :last_ip_addr
+  attribute :comment_threshold, default: 0
+  attribute :default_image_size, default: "large"
+  attribute :favorite_tags
+  attribute :blacklisted_tags, default: DEFAULT_BLACKLIST
+  attribute :time_zone, default: "Eastern Time (US & Canada)"
+  attribute :custom_style
+  attribute :post_upload_count, default: 0
+  attribute :post_update_count, default: 0
+  attribute :note_update_count, default: 0
+  attribute :unread_dmail_count, default: 0
+  attribute :favorite_count, default: 0
+  attribute :per_page, default: 20
+  attribute :theme, default: :light
+  attribute :upload_points, default: 1000
+  attribute :bit_prefs, default: 0
+
   has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
+  enum theme: { light: 0, dark: 100 }, _suffix: true
 
   attr_reader :password
 
@@ -122,7 +151,6 @@ class User < ApplicationRecord
   belongs_to :inviter, class_name: "User", optional: true
 
   accepts_nested_attributes_for :email_address, reject_if: :all_blank, allow_destroy: true
-  enum theme: { light: 0, dark: 100 }, _suffix: true
 
   # UserDeletion#rename renames deleted users to `user_<1234>~`. Tildes
   # are appended if the username is taken.

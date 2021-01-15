@@ -2236,32 +2236,29 @@ ALTER TABLE ONLY public.posts ALTER COLUMN tag_index SET STATISTICS 2000;
 CREATE TABLE public.users (
     id integer NOT NULL,
     name character varying NOT NULL,
-    level integer DEFAULT 20 NOT NULL,
+    level integer NOT NULL,
     inviter_id integer,
     created_at timestamp without time zone NOT NULL,
-    last_logged_in_at timestamp without time zone DEFAULT now(),
-    last_forum_read_at timestamp without time zone DEFAULT '1960-01-01 00:00:00'::timestamp without time zone,
-    comment_threshold integer DEFAULT 0 NOT NULL,
+    last_logged_in_at timestamp without time zone,
+    last_forum_read_at timestamp without time zone,
+    comment_threshold integer NOT NULL,
     updated_at timestamp without time zone,
-    default_image_size character varying DEFAULT 'large'::character varying NOT NULL,
+    default_image_size character varying NOT NULL,
     favorite_tags text,
-    blacklisted_tags text DEFAULT 'spoilers
-guro
-scat
-furry -rating:s'::text,
-    time_zone character varying DEFAULT 'Eastern Time (US & Canada)'::character varying NOT NULL,
-    post_update_count integer DEFAULT 0 NOT NULL,
-    note_update_count integer DEFAULT 0 NOT NULL,
-    favorite_count integer DEFAULT 0 NOT NULL,
-    post_upload_count integer DEFAULT 0 NOT NULL,
+    blacklisted_tags text,
+    time_zone character varying NOT NULL,
+    post_update_count integer NOT NULL,
+    note_update_count integer NOT NULL,
+    favorite_count integer NOT NULL,
+    post_upload_count integer NOT NULL,
     bcrypt_password_hash text,
-    per_page integer DEFAULT 20 NOT NULL,
+    per_page integer NOT NULL,
     custom_style text,
-    bit_prefs bigint DEFAULT 0 NOT NULL,
+    bit_prefs bigint NOT NULL,
     last_ip_addr inet,
-    unread_dmail_count integer DEFAULT 0 NOT NULL,
-    theme integer DEFAULT 0 NOT NULL,
-    upload_points integer DEFAULT 1000 NOT NULL
+    unread_dmail_count integer NOT NULL,
+    theme integer NOT NULL,
+    upload_points integer NOT NULL
 );
 
 
@@ -7885,6 +7882,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210108030723'),
 ('20210108030724'),
 ('20210110015410'),
-('20210110090656');
+('20210110090656'),
+('20210115015308');
 
 

@@ -63,6 +63,7 @@ class UsersController < ApplicationController
 
     @user = authorize User.new(
       last_ip_addr: CurrentUser.ip_addr,
+      last_logged_in_at: Time.zone.now,
       requires_verification: user_verifier.requires_verification?,
       level: user_verifier.initial_level,
       name: params[:user][:name],

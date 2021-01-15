@@ -72,7 +72,7 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
       should "not record a topic visit for non-html requests" do
         get_auth forum_topic_path(@forum_topic), @user, params: {format: :json}
         @user.reload
-        assert_nil(@user.last_forum_read_at)
+        assert_equal(Time.zone.parse("1960-01-01"), @user.last_forum_read_at)
       end
 
       should "render for atom feed" do

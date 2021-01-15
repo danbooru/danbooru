@@ -2,13 +2,8 @@ FactoryBot.define do
   factory(:user, aliases: [:creator, :updater]) do
     name { SecureRandom.uuid }
     password {"password"}
-    default_image_size {"large"}
     level {20}
-    created_at {Time.now}
     last_logged_in_at {Time.now}
-    favorite_count {0}
-    bit_prefs {0}
-    last_forum_read_at {nil}
 
     factory(:banned_user) do
       transient { ban_duration {3} }
