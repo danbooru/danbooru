@@ -1,0 +1,33 @@
+article.forum-post {
+  &[data-is-reported="true"] {
+    border: var(--moderation-report-border);
+  }
+
+  a.voted {
+    font-weight: bold;
+  }
+
+  .vote-score-up {
+    color: var(--forum-vote-up-color);
+  }
+
+  .vote-score-meh {
+    color: var(--forum-vote-meh-color);
+  }
+
+  .vote-score-down {
+    color: var(--forum-vote-down-color);
+  }
+
+  div.content {
+    .edit_forum_post, .edit_forum_topic {
+      display: none;
+    }
+
+    menu {
+      ul.votes {
+        margin: 0.5em 0;
+      }
+    }
+  }
+}
