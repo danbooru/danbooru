@@ -1,5 +1,6 @@
 <div id="p-index-by-comment" class="comments-for-post">
   <div class="list-of-comments list-of-messages">
+    <% dtext_data = DText.preprocess(@comments.map(&:body)) %>
     <% @comments.each do |comment| %>
       <% if CurrentUser.is_moderator? || (params[:search] && params[:search][:is_deleted] =~ /t/) || !comment.is_deleted? %>
         <%= tag.div id: "post_#{comment.post.id}", **PostPreviewComponent.new(post: comment.post).article_attrs("post") do %>
@@ -8,7 +9,7 @@
               <%= link_to(image_tag(comment.post.preview_file_url), post_path(comment.post)) %>
             <% end %>
           </div>
-          <%= render partial: "comments/partials/show/comment", collection: [comment], locals: { context: :index_by_comment, dtext_data: DText.preprocess(@comments.map(&:body)), moderation_reports: [] } %>
+          <%= render_comment(comment, dtext_data: dtext_data, context: :index_by_comment, show_deleted: params.dig(:search, :is_deleted).to_s.truthy?) %>
         <% end %>
       <% end %>
     <% end %>

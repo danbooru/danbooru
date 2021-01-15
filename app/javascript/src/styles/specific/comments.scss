@@ -10,40 +10,6 @@ div.comments-for-post {
   div.hidden-comments-notice {
     margin: 1em 0;
   }
-
-  div.list-of-comments {
-    article.comment {
-      flex: 1;
-
-      &[data-is-sticky="true"] {
-        background: var(--comment-sticky-background-color);
-      }
-
-      &[data-is-reported="true"] {
-        border: var(--moderation-report-border);
-      }
-
-      &[data-is-voted="true"] {
-        .comment-vote-up-link, .comment-vote-down-link {
-          display: none;
-        }
-      }
-
-      &[data-is-voted="false"] {
-        .comment-unvote-link {
-          display: none;
-        }
-      }
-
-      &[data-below-threshold="true"][data-is-sticky="false"] {
-        opacity: 0.3;
-
-        &:hover {
-          opacity: 1;
-        }
-      }
-    }
-  }
 }
 
 div#c-comments {
