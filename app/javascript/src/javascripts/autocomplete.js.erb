@@ -10,37 +10,35 @@ Autocomplete.TAG_PREFIXES = "-|~|" + Object.keys(Autocomplete.TAG_CATEGORIES).ma
 Autocomplete.MAX_RESULTS = 10;
 
 Autocomplete.initialize_all = function() {
-  if (CurrentUser.data("enable-auto-complete")) {
-    $.widget("ui.autocomplete", $.ui.autocomplete, {
-      options: {
-        delay: 0,
-        minLength: 1,
-        autoFocus: false,
-        focus: function() { return false; },
-      },
-      _create: function() {
-        this.element.on("keydown.Autocomplete.tab", null, "tab", Autocomplete.on_tab);
-        this._super();
-      },
-      _renderItem: Autocomplete.render_item,
-      search: function(value, event) {
-        if ($(this).data("ui-autocomplete")) {
-          $(this).data("ui-autocomplete").menu.bindings = $();
-        }
-        this._super(value, event);
-      },
-    });
+  $.widget("ui.autocomplete", $.ui.autocomplete, {
+    options: {
+      delay: 0,
+      minLength: 1,
+      autoFocus: false,
+      focus: function() { return false; },
+    },
+    _create: function() {
+      this.element.on("keydown.Autocomplete.tab", null, "tab", Autocomplete.on_tab);
+      this._super();
+    },
+    _renderItem: Autocomplete.render_item,
+    search: function(value, event) {
+      if ($(this).data("ui-autocomplete")) {
+        $(this).data("ui-autocomplete").menu.bindings = $();
+      }
+      this._super(value, event);
+    },
+  });
 
-    this.initialize_tag_autocomplete();
-    this.initialize_mention_autocomplete($("form div.input.dtext textarea"));
-    this.initialize_fields($('[data-autocomplete="tag"]'), "tag");
-    this.initialize_fields($('[data-autocomplete="artist"]'), "artist");
-    this.initialize_fields($('[data-autocomplete="pool"]'), "pool");
-    this.initialize_fields($('[data-autocomplete="user"]'), "user");
-    this.initialize_fields($('[data-autocomplete="wiki-page"]'), "wiki_page");
-    this.initialize_fields($('[data-autocomplete="favorite-group"]'), "favorite_group");
-    this.initialize_fields($('[data-autocomplete="saved-search-label"]'), "saved_search_label");
-  }
+  this.initialize_tag_autocomplete();
+  this.initialize_mention_autocomplete($("form div.input.dtext textarea"));
+  this.initialize_fields($('[data-autocomplete="tag"]'), "tag");
+  this.initialize_fields($('[data-autocomplete="artist"]'), "artist");
+  this.initialize_fields($('[data-autocomplete="pool"]'), "pool");
+  this.initialize_fields($('[data-autocomplete="user"]'), "user");
+  this.initialize_fields($('[data-autocomplete="wiki-page"]'), "wiki_page");
+  this.initialize_fields($('[data-autocomplete="favorite-group"]'), "favorite_group");
+  this.initialize_fields($('[data-autocomplete="saved-search-label"]'), "saved_search_label");
 }
 
 Autocomplete.initialize_fields = function($fields, type) {

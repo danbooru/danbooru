@@ -289,8 +289,8 @@ module ApplicationHelper
     %i[
       id name level level_string theme always_resize_images can_upload_free
       can_approve_posts disable_categorized_saved_searches
-      disable_mobile_gestures disable_post_tooltips enable_auto_complete
-      enable_safe_mode hide_deleted_posts show_deleted_children style_usernames
+      disable_mobile_gestures disable_post_tooltips enable_safe_mode
+      hide_deleted_posts show_deleted_children style_usernames
       default_image_size
     ] + User::Roles.map { |role| :"is_#{role}?" }
   end

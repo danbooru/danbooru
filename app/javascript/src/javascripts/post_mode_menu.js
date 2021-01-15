@@ -1,4 +1,3 @@
-import CurrentUser from './current_user'
 import Post from './posts.js.erb'
 import Utility from './utility'
 
@@ -77,9 +76,7 @@ PostModeMenu.initialize_edit_form = function() {
 
 PostModeMenu.close_edit_form = function() {
   $("#quick-edit-div").slideUp("fast");
-  if (CurrentUser.data("enable-auto-complete")) {
-    $("#post_tag_string").data("uiAutocomplete").close();
-  }
+  $("#post_tag_string").data("uiAutocomplete").close();
 }
 
 PostModeMenu.initialize_tag_script_field = function() {

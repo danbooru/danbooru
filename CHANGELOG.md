@@ -10,6 +10,8 @@
 
 * Removed the option to disable keyboard shortcuts.
 
+* Removed the option to disable tag autocomplete.
+
 ## 2021-01-12
 
 ### Changes

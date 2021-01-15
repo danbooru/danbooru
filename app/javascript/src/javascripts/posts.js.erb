@@ -117,9 +117,7 @@ Post.open_edit_dialog = function() {
       of: window
     },
     drag: function(e, ui) {
-      if (CurrentUser.data("enable-auto-complete")) {
-        $tag_string.data("uiAutocomplete").close();
-      }
+      $tag_string.data("uiAutocomplete").close();
     },
     close: Post.close_edit_dialog
   });
