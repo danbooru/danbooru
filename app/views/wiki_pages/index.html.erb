@@ -9,8 +9,13 @@
     <% t.column "Title" do |wiki_page| %>
       <span class="<%= tag_class(wiki_page.tag) %>"><%= link_to_wiki wiki_page.title %></span>
     <% end %>
-    <% t.column "Last edited" do |wiki_page| %>
+    <% t.column "Last edited", width: "10%" do |wiki_page| %>
       <%= time_ago_in_words_tagged(wiki_page.updated_at) %>
+    <% end %>
+    <% t.column column: "control", width: "5%" do |wiki_page| %>
+      <% if policy(wiki_page).update? %>
+        <%= link_to "Edit", edit_artist_path(wiki_page) %>
+      <% end %>
     <% end %>
   <% end %>
 
