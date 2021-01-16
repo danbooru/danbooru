@@ -19,10 +19,6 @@ class UserPolicy < ApplicationPolicy
     !user.is_anonymous?
   end
 
-  def reportable?
-    false
-  end
-
   def fix_counts?
     !user.is_anonymous?
   end

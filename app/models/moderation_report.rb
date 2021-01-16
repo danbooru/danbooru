@@ -1,26 +1,23 @@
 class ModerationReport < ApplicationRecord
+  MODEL_TYPES = %w[Dmail Comment ForumPost]
+
   belongs_to :model, polymorphic: true
   belongs_to :creator, class_name: "User"
 
   validates :reason, presence: true
-  validates :model_type, inclusion: { in: %w[Comment Dmail ForumPost User] }
+  validates :model_type, inclusion: { in: MODEL_TYPES }
   validates :creator, uniqueness: { scope: [:model_type, :model_id], message: "have already reported this message." }
 
   after_create :create_forum_post!
   after_create :autoban_reported_user
 
-  scope :user, -> { where(model_type: "User") }
   scope :dmail, -> { where(model_type: "Dmail") }
   scope :comment, -> { where(model_type: "Comment") }
   scope :forum_post, -> { where(model_type: "ForumPost") }
   scope :recent, -> { where("moderation_reports.created_at >= ?", 1.week.ago) }
 
-  def self.enabled?
-    !Rails.env.production?
-  end
-
   def self.model_types
-    %w[User Dmail Comment ForumPost]
+    MODEL_TYPES
   end
 
   def forum_topic_title
