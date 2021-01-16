@@ -42,8 +42,6 @@ class ForumTopicsController < ApplicationController
 
     if request.format.atom?
       @forum_posts = @forum_posts.reverse_order.load
-    elsif request.format.html?
-      @forum_posts = @forum_posts.includes(:creator, :bulk_update_request)
     end
 
     respond_with(@forum_topic)

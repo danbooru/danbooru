@@ -8,11 +8,9 @@
           data-do-not-bump-post="<%= comment.do_not_bump_post? %>"
           data-is-deleted="<%= comment.is_deleted? %>"
           data-is-sticky="<%= comment.is_sticky? %>"
-          data-below-threshold="<%= comment.score < CurrentUser.user.comment_threshold %>"
-          <% if moderation_reports.present? && policy(moderation_reports).show? %>
-          data-is-reported="<%= moderation_reports.pluck(:model_id).include?(comment.id) %>"
-          <% end %>
-          data-is-voted="<%= comment.voted_by?(CurrentUser.user) %>">
+          data-below-threshold="<%= comment.score < current_user.comment_threshold %>"
+          data-is-reported="<%= has_moderation_reports? %>"
+          data-is-voted="<%= comment.voted_by?(current_user) %>">
   <div class="author">
     <div class="author-name">
       <%= link_to_user comment.creator %>
@@ -55,6 +53,9 @@
         </li>
         <% if policy(comment).reportable? %>
           <li><%= link_to "Report", new_moderation_report_path(moderation_report: { model_type: "Comment", model_id: comment.id }), remote: true %></li>
+        <% end %>
+        <% if has_moderation_reports? %>
+          <li class="moderation-report-notice">This comment has been reported! (<%= link_to pluralize(comment.moderation_reports.length, "report"), moderation_reports_path(search: { model_type: "Comment", model_id: comment.id }) %>)</li>
         <% end %>
       </menu>
       <% if policy(comment).update? %>

@@ -3,13 +3,6 @@
     <%= render "comments/partials/index/header", :post => post %>
   <% end %>
 
-  <% if post.moderation_reports.visible(CurrentUser.user).recent.present? %>
-    <div class="row moderation-comments-notice">
-      <span class="info" id="moderation-comments-notice-for-<%= post.id %>">
-        This post has comments reported for moderation! (<%= pluralize(post.moderation_reports.visible(CurrentUser.user).recent.length, "report") %>)
-      </span>
-    </div>
-  <% end %>
   <% if post.comments.hidden(CurrentUser.user).any? || (page == :comments && post.comments.size > 6) %>
     <div class="row hidden-comments-notice">
       <span class="info" id="threshold-comments-notice-for-<%= post.id %>">
@@ -20,7 +13,7 @@
 
   <div class="list-of-comments list-of-messages">
     <% if comments.present? %>
-      <%= render_comment_list(comments, context: :index_by_post, moderation_reports: post.moderation_reports.visible(CurrentUser.user).recent) %>
+      <%= render_comment_list(comments, context: :index_by_post) %>
     <% elsif post.last_commented_at.present? %>
       <p>There are no visible comments.</p>
     <% else %>

@@ -3,6 +3,10 @@ class ModerationReportPolicy < ApplicationPolicy
     user.is_moderator?
   end
 
+  def show?
+    user.is_moderator?
+  end
+
   def create?
     unbanned? && policy(record.model).reportable?
   end

@@ -4,7 +4,6 @@ module CommentsHelper
   end
 
   def render_comment_list(comments, **options)
-    dtext_data = DText.preprocess(comments.map(&:body))
-    render CommentComponent.with_collection(comments, dtext_data: dtext_data, **options)
+    render CommentComponent.with_collection(comments, current_user: CurrentUser.user, **options)
   end
 end

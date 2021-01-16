@@ -16,7 +16,6 @@ class ForumTopic < ApplicationRecord
   has_many :forum_posts, foreign_key: "topic_id", dependent: :destroy, inverse_of: :topic
   has_many :forum_topic_visits
   has_one :forum_topic_visit_by_current_user, -> { where(user_id: CurrentUser.id) }, class_name: "ForumTopicVisit"
-  has_many :moderation_reports, through: :forum_posts
   has_one :original_post, -> { order(id: :asc) }, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
   has_many :bulk_update_requests, :foreign_key => "forum_topic_id"
   has_many :tag_aliases, :foreign_key => "forum_topic_id"

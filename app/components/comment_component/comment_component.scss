@@ -6,7 +6,7 @@ article.comment {
   }
 
   &[data-is-reported="true"] {
-    border: var(--moderation-report-border);
+    background-color: var(--moderation-report-background-color);
   }
 
   &[data-is-voted="true"] {
@@ -27,5 +27,10 @@ article.comment {
     &:hover {
       opacity: 1;
     }
+  }
+
+  .moderation-report-notice {
+    font-weight: bold;
+    color: var(--moderation-report-text-color);
   }
 }

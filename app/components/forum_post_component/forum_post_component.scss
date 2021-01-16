@@ -1,6 +1,6 @@
 article.forum-post {
   &[data-is-reported="true"] {
-    border: var(--moderation-report-border);
+    background-color: var(--moderation-report-background-color);
   }
 
   a.voted {
@@ -29,5 +29,10 @@ article.forum-post {
         margin: 0.5em 0;
       }
     }
+  }
+
+  .moderation-report-notice {
+    font-weight: bold;
+    color: var(--moderation-report-text-color);
   }
 }

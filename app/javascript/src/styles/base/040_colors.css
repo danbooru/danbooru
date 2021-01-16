@@ -71,7 +71,7 @@
   --forum-topic-status-rejected-color: hsla(0, 25%, 55%, 1);
 
   --moderation-report-text-color: red;
-  --moderation-report-border: 2px solid red;
+  --moderation-report-background-color: var(--error-background-color);
 
   --comment-sticky-background-color: var(--subnav-menu-background-color);
 
@@ -349,7 +349,7 @@ body[data-current-user-theme="dark"] {
   --forum-topic-status-rejected-color: var(--red-3);
 
   --moderation-report-text-color: var(--red-1);
-  --moderation-report-border: 2px solid var(--red-1);
+  --moderation-report-background-color: var(--red-0);
 
   --jquery-ui-widget-content-text-color: var(--text-color);
   --jquery-ui-widget-content-background: var(--grey-2);
