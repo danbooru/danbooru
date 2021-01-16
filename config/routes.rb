@@ -11,7 +11,6 @@ Rails.application.routes.draw do
 
   namespace :admin do
     resources :users, :only => [:edit, :update]
-    resource  :dashboard, :only => [:show]
   end
   namespace :moderator do
     resource :dashboard, :only => [:show]

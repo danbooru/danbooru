@@ -167,10 +167,6 @@
         <% if policy(NewsUpdate).index? %>
           <li><%= link_to("News Updates", news_updates_path) %></li>
         <% end %>
-
-        <% if CurrentUser.is_admin? %>
-          <li><%= link_to("Admin Dashboard", admin_dashboard_path) %></li>
-        <% end %>
       </ul>
     </section>
   </div>
