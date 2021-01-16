@@ -1,22 +1,39 @@
 <div id="c-moderation-reports">
   <div id="a-index">
     <h1>Moderation reports</h1>
-    <%= table_for @moderation_reports, width: "100%" do |t| %>
-      <% t.column "Reported", width: "10%" do |report| %>
+
+    <%= search_form_for(moderation_reports_path) do |f| %>
+      <%= f.input :creator_name, label: "Reporter", input_html: { value: params[:search][:creator_name], "data-autocomplete": "user" } %>
+      <%= f.input :reason_matches, label: "Reason", input_html: { value: params[:search][:reason_matches] } %>
+      <%= f.input :model_id, label: "ID", input_html: { value: params[:search][:model_id] } %>
+      <%= f.input :model_type, label: "Type", collection: ModerationReport.model_types, include_blank: true, selected: params[:search][:model_type] %>
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <%= table_for @moderation_reports, class: "striped autofit", width: "100%" do |t| %>
+      <% t.column "Reported" do |report| %>
         <% if report.model_type == "Dmail" %>
           <%= link_to report.model.dtext_shortlink, dmail_path(report.model, key: report.model.key) %>
         <% else %>
           <%= link_to report.model.dtext_shortlink, report.model %>
         <% end %>
+        <%= link_to "»", moderation_reports_path(search: { model_type: report.model_type, model_id: report.model_id }) %>
       <% end %>
-      <% t.column "Reason" do |report| %>
+
+      <% t.column "Reason", td: { class: "col-expand" } do |report| %>
         <span class="prose">
           <%= format_text report.reason, inline: true %>
         </span>
       <% end %>
-      <% t.column "Creator", width: "10%" do |report| %>
-        <%= compact_time report.created_at %>
-        <br> by <%= link_to_user report.creator %>
+
+      <% t.column "Reported user" do |report| %>
+        <%= link_to_user report.reported_user %>
+      <% end %>
+
+      <% t.column "Reporter" do |report| %>
+        <%= link_to_user report.creator %>
+        <%= link_to "»", moderation_reports_path(search: { creator_name: report.creator.name }) %>
+        <div><%= time_ago_in_words_tagged(report.created_at) %></div>
       <% end %>
     <% end %>
 
