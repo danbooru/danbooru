@@ -2,6 +2,10 @@
   <div id="a-show" class="fixed-width-container">
     <h1>Status</h1>
 
+    <p>Running <%= external_link_to "#{Danbooru.config.source_code_url}/commits/#{@status.danbooru_version}", @status.danbooru_version.first(7) %>.</p>
+
+    <h2>Server</h2>
+
     <details>
       <summary>
         Server: <%= @status.hostname %>
@@ -9,7 +13,7 @@
       <%= render "list", hash: @status.serializable_hash[:status] %>
     </details>
 
-    <h1>Postgres</h1>
+    <h2>Postgres</h2>
 
     <details>
       <summary>
@@ -19,7 +23,7 @@
       <%= render "table", rows: @status.serializable_hash[:postgres][:connection_stats] %>
     </details>
 
-    <h1>Redis</h1>
+    <h2>Redis</h2>
 
     <details>
       <summary>

@@ -9,6 +9,7 @@ class ServerStatus
         hostname: hostname,
         uptime: uptime,
         loadavg: loadavg,
+        danbooru_version: danbooru_version,
         ruby_version: RUBY_VERSION,
         distro_version: distro_version,
         kernel_version: kernel_version,
@@ -39,6 +40,10 @@ class ServerStatus
 
     def loadavg
       File.read("/proc/loadavg").chomp
+    end
+
+    def danbooru_version
+      Rails.application.config.x.git_hash
     end
 
     def kernel_version
