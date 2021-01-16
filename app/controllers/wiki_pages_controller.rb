@@ -38,7 +38,12 @@ class WikiPagesController < ApplicationController
     elsif @wiki_page.blank?
       raise ActiveRecord::RecordNotFound
     else
-      respond_with(@wiki_page)
+      @redirect = @wiki_page.wiki_redirect
+      if @redirect.blank? || params["redirect"] == "false"
+        respond_with(@wiki_page)
+      else
+        redirect_to wiki_page_path(@redirect, redirect: false)
+      end
     end
   end
 
