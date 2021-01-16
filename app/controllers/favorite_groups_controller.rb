@@ -47,7 +47,7 @@ class FavoriteGroupsController < ApplicationController
     @favorite_group = authorize FavoriteGroup.find(params[:id])
     @favorite_group.destroy!
     flash[:notice] = "Favorite group deleted" if request.format.html?
-    respond_with(@favorite_group, location: favorite_groups_path(search: { creator_name: CurrentUser.name }))
+    respond_with(@favorite_group, location: favorite_groups_path(search: { creator_name: CurrentUser.user.name }))
   end
 
   def add_post

@@ -18,10 +18,10 @@ class ForumPost < ApplicationRecord
   validates_presence_of :body
   after_save :delete_topic_if_original_post
   after_update(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |rec|
-    ModAction.log("#{CurrentUser.name} updated forum ##{rec.id}", :forum_post_update)
+    ModAction.log("#{CurrentUser.user.name} updated forum ##{rec.id}", :forum_post_update)
   end
   after_destroy(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |rec|
-    ModAction.log("#{CurrentUser.name} deleted forum ##{rec.id}", :forum_post_delete)
+    ModAction.log("#{CurrentUser.user.name} deleted forum ##{rec.id}", :forum_post_delete)
   end
 
   deletable

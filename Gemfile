@@ -33,7 +33,6 @@ gem 'activemodel-serializers-xml'
 gem 'webpacker', '>= 4.0.x'
 gem 'rake'
 gem 'redis'
-gem 'request_store'
 gem 'builder'
 # gem 'did_you_mean' # github.com/yuki24/did_you_mean/issues/117
 gem 'puma'

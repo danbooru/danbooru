@@ -209,10 +209,10 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the ordfav:<name> metatag" do
-      post1 = create(:post, tag_string: "fav:#{CurrentUser.name}")
-      post2 = create(:post, tag_string: "fav:#{CurrentUser.name}")
+      post1 = create(:post, tag_string: "fav:#{CurrentUser.user.name}")
+      post2 = create(:post, tag_string: "fav:#{CurrentUser.user.name}")
 
-      assert_tag_match([post2, post1], "ordfav:#{CurrentUser.name}")
+      assert_tag_match([post2, post1], "ordfav:#{CurrentUser.user.name}")
       assert_tag_match([], "ordfav:does_not_exist")
     end
 
@@ -855,13 +855,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         upvoted   = create(:post, tag_string: "upvote:self")
         downvoted = create(:post, tag_string: "downvote:self")
 
-        assert_tag_match([upvoted], "upvote:#{CurrentUser.name}")
-        assert_tag_match([downvoted], "downvote:#{CurrentUser.name}")
-        assert_tag_match([], "upvote:nobody upvote:#{CurrentUser.name}")
-        assert_tag_match([], "downvote:nobody downvote:#{CurrentUser.name}")
+        assert_tag_match([upvoted], "upvote:#{CurrentUser.user.name}")
+        assert_tag_match([downvoted], "downvote:#{CurrentUser.user.name}")
+        assert_tag_match([], "upvote:nobody upvote:#{CurrentUser.user.name}")
+        assert_tag_match([], "downvote:nobody downvote:#{CurrentUser.user.name}")
 
-        assert_tag_match([downvoted], "-upvote:#{CurrentUser.name}")
-        assert_tag_match([upvoted], "-downvote:#{CurrentUser.name}")
+        assert_tag_match([downvoted], "-upvote:#{CurrentUser.user.name}")
+        assert_tag_match([upvoted], "-downvote:#{CurrentUser.user.name}")
       end
     end
 
@@ -871,14 +871,14 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         disapproved = create(:post, is_pending: true)
         disapproval = create(:post_disapproval, user: CurrentUser.user, post: disapproved, reason: "disinterest")
 
-        assert_tag_match([disapproved], "disapproved:#{CurrentUser.name}")
-        assert_tag_match([disapproved], "disapproved:#{CurrentUser.name.upcase}")
+        assert_tag_match([disapproved], "disapproved:#{CurrentUser.user.name}")
+        assert_tag_match([disapproved], "disapproved:#{CurrentUser.user.name.upcase}")
         assert_tag_match([disapproved], "disapproved:disinterest")
         assert_tag_match([disapproved], "disapproved:DISINTEREST")
         assert_tag_match([], "disapproved:breaks_rules")
         assert_tag_match([], "disapproved:breaks_rules disapproved:disinterest")
 
-        assert_tag_match([pending], "-disapproved:#{CurrentUser.name}")
+        assert_tag_match([pending], "-disapproved:#{CurrentUser.user.name}")
         assert_tag_match([pending], "-disapproved:disinterest")
         assert_tag_match([disapproved, pending], "-disapproved:breaks_rules")
       end

@@ -12,7 +12,7 @@ class FavoritesController < ApplicationController
       user = User.find(params[:user_id])
       redirect_to posts_path(tags: "ordfav:#{user.name}", format: request.format.symbol)
     elsif !CurrentUser.is_anonymous?
-      redirect_to posts_path(tags: "ordfav:#{CurrentUser.name}", format: request.format.symbol)
+      redirect_to posts_path(tags: "ordfav:#{CurrentUser.user.name}", format: request.format.symbol)
     else
       redirect_to posts_path(format: request.format.symbol)
     end

@@ -3,13 +3,13 @@
   <%= subnav_link_to "Upload", new_upload_path %>
   <%= subnav_link_to "Hot", posts_path(:tags => "order:rank", :d => "1") %>
   <% if RecommenderService.available_for_user?(CurrentUser.user) %>
-    <%= subnav_link_to "Recommended", recommended_posts_path(search: { user_name: CurrentUser.name }) %>
+    <%= subnav_link_to "Recommended", recommended_posts_path(search: { user_name: CurrentUser.user.name }) %>
   <% end %>
   <% if policy(Favorite).create? %>
     <%= subnav_link_to "Favorites", posts_path(tags: "ordfav:#{CurrentUser.user.name}") %>
   <% end %>
   <% if policy(FavoriteGroup).create? %>
-    <%= subnav_link_to "Fav groups", favorite_groups_path(search: { creator_name: CurrentUser.name }) %>
+    <%= subnav_link_to "Fav groups", favorite_groups_path(search: { creator_name: CurrentUser.user.name }) %>
   <% end %>
   <% if policy(SavedSearch).create? %>
     <%= subnav_link_to "Saved searches", posts_path(tags: "search:all") %>

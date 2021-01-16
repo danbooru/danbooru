@@ -10,11 +10,11 @@ class Comment < ApplicationRecord
   before_create :autoreport_spam
   after_create :update_last_commented_at_on_create
   after_update(:if => ->(rec) {(!rec.is_deleted? || !rec.saved_change_to_is_deleted?) && CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log("comment ##{rec.id} updated by #{CurrentUser.name}", :comment_update)
+    ModAction.log("comment ##{rec.id} updated by #{CurrentUser.user.name}", :comment_update)
   end
   after_save :update_last_commented_at_on_destroy, :if => ->(rec) {rec.is_deleted? && rec.saved_change_to_is_deleted?}
   after_save(:if => ->(rec) {rec.is_deleted? && rec.saved_change_to_is_deleted? && CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log("comment ##{rec.id} deleted by #{CurrentUser.name}", :comment_delete)
+    ModAction.log("comment ##{rec.id} deleted by #{CurrentUser.user.name}", :comment_delete)
   end
 
   deletable

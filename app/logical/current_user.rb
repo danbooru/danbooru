@@ -1,16 +1,13 @@
-class CurrentUser
-  def self.scoped(user, ip_addr = "127.0.0.1")
-    old_user = self.user
-    old_ip_addr = self.ip_addr
+class CurrentUser < ActiveSupport::CurrentAttributes
+  attribute :user, :ip_addr, :country, :root_url, :safe_mode
 
-    self.user = user
-    self.ip_addr = ip_addr
+  alias_method :safe_mode?, :safe_mode
+  delegate :id, to: :user, allow_nil: true
+  delegate_missing_to :user
 
-    begin
-      yield
-    ensure
-      self.user = old_user
-      self.ip_addr = old_ip_addr
+  def self.scoped(user, ip_addr = "127.0.0.1", &block)
+    set(user: user, ip_addr: ip_addr) do
+      yield user
     end
   end
 
@@ -24,59 +21,7 @@ class CurrentUser
     scoped(user, &block)
   end
 
-  def self.user
-    RequestStore[:current_user]
-  end
-
-  def self.user=(user)
-    RequestStore[:current_user] = user
-  end
-
-  def self.ip_addr
-    RequestStore[:current_ip_addr]
-  end
-
-  def self.ip_addr=(ip_addr)
-    RequestStore[:current_ip_addr] = ip_addr
-  end
-
-  def self.country
-    RequestStore[:country]
-  end
-
-  def self.country=(country)
-    RequestStore[:country] = country
-  end
-
   def self.root_url
-    RequestStore[:current_root_url] || "https://#{Danbooru.config.hostname}"
-  end
-
-  def self.root_url=(root_url)
-    RequestStore[:current_root_url] = root_url
-  end
-
-  def self.id
-    if user.nil?
-      nil
-    else
-      user.id
-    end
-  end
-
-  def self.name
-    user.name
-  end
-
-  def self.safe_mode?
-    RequestStore[:safe_mode]
-  end
-
-  def self.safe_mode=(safe_mode)
-    RequestStore[:safe_mode] = safe_mode
-  end
-
-  def self.method_missing(method, *params, &block)
-    user.__send__(method, *params, &block)
+    attributes[:root_url] || "https://#{Danbooru.config.hostname}"
   end
 end

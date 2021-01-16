@@ -7,7 +7,7 @@ class UserNameChangeRequestsController < ApplicationController
   end
 
   def create
-    @change_request = authorize UserNameChangeRequest.new(user: CurrentUser.user, original_name: CurrentUser.name)
+    @change_request = authorize UserNameChangeRequest.new(user: CurrentUser.user, original_name: CurrentUser.user.name)
     @change_request.update(permitted_attributes(@change_request))
     flash[:notice] = "Your name has been changed" if @change_request.valid?
     respond_with(@change_request, location: profile_path)

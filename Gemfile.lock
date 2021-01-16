@@ -301,8 +301,6 @@ GEM
       json
     redis (4.2.5)
     regexp_parser (1.8.2)
-    request_store (1.5.0)
-      rack (>= 1.4)
     responders (3.0.1)
       actionpack (>= 5.0)
       railties (>= 5.0)
@@ -450,7 +448,6 @@ DEPENDENCIES
   rakismet
   recaptcha
   redis
-  request_store
   responders
   rubocop
   rubocop-rails

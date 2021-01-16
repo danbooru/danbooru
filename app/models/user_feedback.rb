@@ -8,10 +8,10 @@ class UserFeedback < ApplicationRecord
   validates_inclusion_of :category, :in => %w(positive negative neutral)
   after_create :create_dmail, unless: :disable_dmail_notification
   after_update(:if => ->(rec) { CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log(%{#{CurrentUser.name} updated user feedback for "#{rec.user.name}":#{Routes.user_path(rec.user)}}, :user_feedback_update)
+    ModAction.log(%{#{CurrentUser.user.name} updated user feedback for "#{rec.user.name}":#{Routes.user_path(rec.user)}}, :user_feedback_update)
   end
   after_destroy(:if => ->(rec) { CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log(%{#{CurrentUser.name} deleted user feedback for "#{rec.user.name}":#{Routes.user_path(rec.user)}}, :user_feedback_delete)
+    ModAction.log(%{#{CurrentUser.user.name} deleted user feedback for "#{rec.user.name}":#{Routes.user_path(rec.user)}}, :user_feedback_delete)
   end
 
   deletable
