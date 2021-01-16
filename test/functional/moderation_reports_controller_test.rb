@@ -34,9 +34,21 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "as a user" do
-        should "render the access denied page" do
+        should "show reports submitted by the current user" do
           get_auth moderation_reports_path, @user
-          assert_response 403
+
+          assert_response :success
+          assert_select "tbody tr", count: 2
+          assert_select "tr#moderation-report-#{@comment_report.id}", count: 1
+          assert_select "tr#moderation-report-#{@forum_report.id}", count: 1
+          assert_select "tr#moderation-report-#{@dmail_report.id}", count: 0
+        end
+
+        should "not show reports submitted by other users" do
+          get_auth moderation_reports_path, create(:user)
+
+          assert_response :success
+          assert_select "tbody tr", count: 0
         end
       end
 

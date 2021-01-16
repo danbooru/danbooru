@@ -20,6 +20,14 @@ class ModerationReport < ApplicationRecord
     MODEL_TYPES
   end
 
+  def self.visible(user)
+    if user.is_moderator?
+      all
+    else
+      where(creator: user)
+    end
+  end
+
   def forum_topic_title
     "Reports requiring moderation"
   end
@@ -72,10 +80,6 @@ class ModerationReport < ApplicationRecord
     else
       raise NotImplementedError
     end
-  end
-
-  def self.visible(user)
-    user.is_moderator? ? all : none
   end
 
   def self.search(params)

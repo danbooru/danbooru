@@ -1,10 +1,10 @@
 class ModerationReportPolicy < ApplicationPolicy
   def index?
-    user.is_moderator?
+    !user.is_anonymous?
   end
 
   def show?
-    user.is_moderator?
+    !user.is_anonymous?
   end
 
   def create?

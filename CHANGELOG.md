@@ -12,6 +12,9 @@
 
 * Removed the option to disable tag autocomplete.
 
+* You can now see the list of comments and forum posts you've reported to
+  the moderators at <https://danbooru.donmai.us/moderation_reports>.
+
 ## 2021-01-12
 
 ### Changes
