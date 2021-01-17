@@ -4,9 +4,12 @@
   <h1>Wiki</h1>
   <%= render "search" %>
 
-  <%= table_for @wiki_pages, width: "100%" do |t| %>
-    <% t.column "Title" do |wiki_page| %>
+  <%= table_for @wiki_pages, class: "striped autofit", width: "100%" do |t| %>
+    <% t.column "Title", td: {class: "col-expand"} do |wiki_page| %>
       <span class="<%= tag_class(wiki_page.tag) %>"><%= link_to_wiki wiki_page.title %></span>
+    <% end %>
+    <% t.column "Redirect", width: "8%" do |wiki_page| %>
+      <%= wiki_page_redirect(wiki_page) %>
     <% end %>
     <% t.column "Last edited", width: "10%" do |wiki_page| %>
       <%= time_ago_in_words_tagged(wiki_page.updated_at) %>

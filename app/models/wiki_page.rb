@@ -178,9 +178,15 @@ class WikiPage < ApplicationRecord
     WikiPage.is_meta_wiki?(title)
   end
 
+  def redirect_title
+    @redirect_title ||= begin
+      match = body.match(/\A#redirect \[\[([^\]]+)\]\]\z/i)
+      match ? WikiPage.normalize_title(match[1]) : nil
+    end
+  end
+
   def wiki_redirect
-    match = body.match(/\A#redirect \[\[([^\]]+)\]\]\z/i)
-    match ? WikiPage.find_by(title: WikiPage.normalize_title(match[1])) : nil
+    redirect_title ? WikiPage.find_by(title: redirect_title) : nil
   end
 
   def wiki_page_changed?
