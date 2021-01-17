@@ -204,7 +204,7 @@ class Tag < ApplicationRecord
             # next few lines if the category is changed.
             tag.update_category_cache
 
-            if Pundit.policy!([creator, nil], tag).can_change_category?
+            if Pundit.policy!(creator, tag).can_change_category?
               tag.update(category: category_id)
             end
           end

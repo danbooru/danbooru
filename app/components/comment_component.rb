@@ -7,7 +7,7 @@ class CommentComponent < ApplicationComponent
   def self.with_collection(comments, current_user:, **options)
     dtext_data = DText.preprocess(comments.map(&:body))
     # XXX
-    #comments = comments.includes(:moderation_reports) if Pundit.policy!([current_user, nil], ModerationReport).show?
+    #comments = comments.includes(:moderation_reports) if Pundit.policy!(current_user, ModerationReport).show?
 
     super(comments, current_user: current_user, dtext_data: dtext_data, **options)
   end

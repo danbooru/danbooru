@@ -144,7 +144,7 @@ class Pool < ApplicationRecord
   end
 
   def updater_can_edit_deleted
-    if is_deleted? && !Pundit.policy!([CurrentUser.user, nil], self).update?
+    if is_deleted? && !Pundit.policy!(CurrentUser.user, self).update?
       errors.add(:base, "You cannot update pools that are deleted")
     end
   end

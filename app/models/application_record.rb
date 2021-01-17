@@ -57,13 +57,13 @@ class ApplicationRecord < ActiveRecord::Base
 
     # XXX deprecated, shouldn't expose this as an instance method.
     def api_attributes(user: CurrentUser.user)
-      policy = Pundit.policy([user, nil], self) || ApplicationPolicy.new([user, nil], self)
+      policy = Pundit.policy(user, self) || ApplicationPolicy.new(user, self)
       policy.api_attributes
     end
 
     # XXX deprecated, shouldn't expose this as an instance method.
     def html_data_attributes(user: CurrentUser.user)
-      policy = Pundit.policy([user, nil], self) || ApplicationPolicy.new([user, nil], self)
+      policy = Pundit.policy(user, self) || ApplicationPolicy.new(user, self)
       policy.html_data_attributes
     end
 

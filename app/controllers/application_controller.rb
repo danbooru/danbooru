@@ -182,7 +182,7 @@ class ApplicationController < ActionController::Base
   end
 
   def pundit_user
-    [CurrentUser.user, request]
+    CurrentUser.user
   end
 
   def pundit_params_for(record)

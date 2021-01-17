@@ -1,8 +1,8 @@
 class ApplicationPolicy
-  attr_reader :user, :request, :record
+  attr_reader :user, :record
 
-  def initialize(context, record)
-    @user, @request = context
+  def initialize(user, record)
+    @user = user
     @record = record
   end
 
@@ -43,7 +43,7 @@ class ApplicationPolicy
   end
 
   def policy(object)
-    Pundit.policy!([user, request], object)
+    Pundit.policy!(user, object)
   end
 
   def permitted_attributes
@@ -68,6 +68,7 @@ class ApplicationPolicy
 
   # The list of attributes that are permitted to be returned by the API.
   def api_attributes
+    # XXX allow inet
     record.class.attribute_types.reject { |name, attr| attr.type.in?([:inet, :tsvector]) }.keys.map(&:to_sym)
   end
 

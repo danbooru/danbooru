@@ -668,12 +668,12 @@ class Post < ApplicationRecord
 
         when /^-favgroup:(.+)$/i
           favgroup = FavoriteGroup.find_by_name_or_id!($1, CurrentUser.user)
-          raise User::PrivilegeError unless Pundit.policy!([CurrentUser.user, nil], favgroup).update?
+          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, favgroup).update?
           favgroup&.remove!(self)
 
         when /^favgroup:(.+)$/i
           favgroup = FavoriteGroup.find_by_name_or_id!($1, CurrentUser.user)
-          raise User::PrivilegeError unless Pundit.policy!([CurrentUser.user, nil], favgroup).update?
+          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, favgroup).update?
           favgroup&.add!(self)
 
         end
@@ -779,7 +779,7 @@ class Post < ApplicationRecord
 
     def add_favorite!(user)
       Favorite.add(post: self, user: user)
-      vote!("up", user) if Pundit.policy!([user, nil], PostVote).create?
+      vote!("up", user) if Pundit.policy!(user, PostVote).create?
     rescue PostVote::Error
     end
 
@@ -789,7 +789,7 @@ class Post < ApplicationRecord
 
     def remove_favorite!(user)
       Favorite.remove(post: self, user: user)
-      unvote!(user) if Pundit.policy!([user, nil], PostVote).create?
+      unvote!(user) if Pundit.policy!(user, PostVote).create?
     rescue PostVote::Error
     end
 
@@ -803,7 +803,7 @@ class Post < ApplicationRecord
     # Users who publicly favorited this post, ordered by time of favorite.
     def visible_favorited_users(viewer)
       favorited_users.order("favorites.id DESC").select do |fav_user|
-        Pundit.policy!([viewer, nil], fav_user).can_see_favorites?
+        Pundit.policy!(viewer, fav_user).can_see_favorites?
       end
     end
 
@@ -876,7 +876,7 @@ class Post < ApplicationRecord
     end
 
     def vote!(vote, voter = CurrentUser.user)
-      unless Pundit.policy!([voter, nil], PostVote).create?
+      unless Pundit.policy!(voter, PostVote).create?
         raise PostVote::Error.new("You do not have permission to vote")
       end
 

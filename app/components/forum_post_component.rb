@@ -11,7 +11,7 @@ class ForumPostComponent < ApplicationComponent
     original_forum_post_id = forum_topic.original_post&.id
 
     forum_posts = forum_posts.includes(:creator, :bulk_update_request)
-    forum_posts = forum_posts.includes(:moderation_reports) if Pundit.policy!([current_user, nil], ModerationReport).show?
+    forum_posts = forum_posts.includes(:moderation_reports) if Pundit.policy!(current_user, ModerationReport).show?
 
     super(forum_posts, dtext_data: dtext_data, original_forum_post_id: original_forum_post_id, current_user: current_user)
   end
