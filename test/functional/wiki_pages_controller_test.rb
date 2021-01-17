@@ -69,6 +69,9 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
     context "show action" do
       setup do
         @wiki_page = as(@user) { create(:wiki_page) }
+        @redirect_to = as(@user) { create(:wiki_page, title: "blah") }
+        @redirect_from = as(@user) { create(:wiki_page, title: "blahblah", body: "#REDIRECT [[blah]]") }
+        @extra_redirect = as(@user) { create(:wiki_page, body: "#REDIRECT [[blahblah]]") }
       end
 
       should "redirect to the title for an id" do
@@ -77,6 +80,14 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
 
         get wiki_page_path(@wiki_page.id), as: :json
         assert_response :success
+      end
+
+      should "redirect for #REDIRECT wikis" do
+        get wiki_page_path(@redirect_from.title)
+        assert_redirected_to wiki_page_path(@redirect_to.title, redirect: false)
+
+        get wiki_page_path(@extra_redirect.title)
+        assert_redirected_to wiki_page_path(@redirect_from.title, redirect: false)
       end
 
       should "distinguish between an id and a title" do
