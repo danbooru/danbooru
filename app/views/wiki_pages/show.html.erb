@@ -17,6 +17,10 @@
     <% end %>
   </h1>
 
+  <% if params[:redirect] == "false" && params[:from].present? %>
+    <div id="wiki-page-redirect">(Redirected from <%= link_to(params[:from], wiki_page_path(params[:from], redirect: false), class: "wiki-link") %>)</div>
+  <% end %>
+
   <div id="wiki-page-body" class="prose">
     <% if @wiki_page.other_names.present? %>
       <p><%= wiki_page_other_names_list(@wiki_page) %></p>

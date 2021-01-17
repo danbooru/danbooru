@@ -42,7 +42,7 @@ class WikiPagesController < ApplicationController
       if @redirect.blank? || params["redirect"] == "false"
         respond_with(@wiki_page)
       else
-        redirect_to wiki_page_path(@redirect, redirect: false)
+        redirect_to wiki_page_path(@redirect, redirect: false, from: @wiki_page.title)
       end
     end
   end
