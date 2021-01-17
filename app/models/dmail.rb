@@ -109,16 +109,20 @@ class Dmail < ApplicationRecord
   end
 
   concerning :AuthorizationMethods do
-    def verifier
-      @verifier ||= Danbooru::MessageVerifier.new(:dmail_link)
+    class_methods do
+      # XXX hack so that rails' signed_id mechanism works with our pre-existing dmail keys.
+      # https://github.com/rails/rails/blob/main/activerecord/lib/active_record/signed_id.rb
+      def signed_id_verifier_secret
+        Rails.application.key_generator.generate_key("dmail_link")
+      end
+
+      def combine_signed_id_purposes(purpose)
+        purpose
+      end
     end
 
     def key
-      verifier.generate(id)
-    end
-
-    def valid_key?(key)
-      id == verifier.verified(key)
+      signed_id(purpose: "dmail_link")
     end
   end
 

@@ -69,17 +69,7 @@ class EmailAddress < ApplicationRecord
     end
   end
 
-  concerning :VerificationMethods do
-    def verifier
-      @verifier ||= Danbooru::MessageVerifier.new(:email_verification_key)
-    end
-
-    def verification_key
-      verifier.generate(id)
-    end
-
-    def valid_key?(key)
-      id == verifier.verified(key)
-    end
+  def verification_key
+    signed_id(purpose: "verify")
   end
 end

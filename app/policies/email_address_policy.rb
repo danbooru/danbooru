@@ -13,11 +13,7 @@ class EmailAddressPolicy < ApplicationPolicy
   end
 
   def verify?
-    if request.params[:email_verification_key].present?
-      record.valid_key?(request.params[:email_verification_key])
-    else
-      record.user_id == user.id
-    end
+    record.user_id == user.id
   end
 
   def send_confirmation?

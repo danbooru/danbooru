@@ -20,7 +20,11 @@ class DmailsController < ApplicationController
   end
 
   def show
-    @dmail = authorize Dmail.find(params[:id])
+    if params[:key].present?
+      @dmail = Dmail.find_signed!(params[:key], purpose: "dmail_link")
+    else
+      @dmail = authorize Dmail.find(params[:id])
+    end
 
     if request.format.html? && @dmail.owner == CurrentUser.user
       @dmail.update!(is_read: true)

@@ -99,6 +99,8 @@ class ApplicationController < ActionController::Base
       render_error_page(401, exception, template: "sessions/new")
     when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest
       render_error_page(403, exception)
+    when ActiveSupport::MessageVerifier::InvalidSignature # raised by `find_signed!`
+      render_error_page(403, exception, template: "static/access_denied", message: "Access denied")
     when User::PrivilegeError, Pundit::NotAuthorizedError
       render_error_page(403, exception, template: "static/access_denied", message: "Access denied")
     when ActiveRecord::RecordNotFound
