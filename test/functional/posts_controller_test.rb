@@ -560,58 +560,6 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      context "with only deleted comments" do
-        setup do
-          as(@user) { create(:comment, creator: @user, post: @post, is_deleted: true) }
-        end
-
-        should "not show deleted comments to regular members" do
-          get_auth post_path(@post), @user, params: { id: @post.id }
-
-          assert_response :success
-          assert_select "article.comment", 0
-          assert_select "a#show-all-comments-link", 0
-          assert_select "div.list-of-comments p", /There are no comments/
-        end
-
-        should "not show deleted comments to moderators by default, but allow them to be unhidden" do
-          mod = create(:mod_user)
-          get_auth post_path(@post), mod, params: { id: @post.id }
-
-          assert_response :success
-          assert_select "article.comment", 0
-          assert_select "a#show-all-comments-link", 1
-          assert_select "div.list-of-comments p", /There are no comments/
-        end
-      end
-
-      context "with only downvoted comments" do
-        should "not show thresholded comments" do
-          comment = as(@user) { create(:comment, creator: @user, post: @post, score: -10) }
-          get_auth post_path(@post), @user, params: { id: @post.id }
-
-          assert_response :success
-          assert_select "article.comment", 0
-          assert_select "a#show-all-comments-link", 1
-          assert_select "div.list-of-comments p", /There are no visible comments/
-        end
-      end
-
-      context "with a mix of comments" do
-        should "not show deleted or thresholded comments " do
-          as(@user) { create(:comment, creator: @user, post: @post, do_not_bump_post: true, body: "good") }
-          as(@user) { create(:comment, creator: @user, post: @post, do_not_bump_post: true, body: "bad", score: -10) }
-          as(@user) { create(:comment, creator: @user, post: @post, do_not_bump_post: true, body: "ugly", is_deleted: true) }
-
-          get_auth post_path(@post), @user, params: { id: @post.id }
-
-          assert_response :success
-          assert_select "article.comment", 1
-          assert_select "article.comment", /good/
-          assert_select "a#show-all-comments-link", 1
-        end
-      end
-
       context "when the recommend service is enabled" do
         setup do
           @post2 = create(:post)

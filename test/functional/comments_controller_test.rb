@@ -34,40 +34,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
           assert_select "#post_#{@post.id}", 1
           assert_select "#post_#{@post.id} .comment", 1
-          assert_select "#post_#{@post.id} #show-all-comments-link", 0
-        end
-
-        should "show the 'Show hidden comments' link on posts with thresholded comments" do
-          as(@user) { create(:comment, post: @post, score: -10) }
-          get comments_path(group_by: "post")
-
-          assert_response :success
-          assert_select "#post_#{@post.id}", 1
-          assert_select "#post_#{@post.id} #show-all-comments-link", /Show 1 hidden comment/
-          assert_select "#post_#{@post.id} .comment", 0
-          assert_select "#post_#{@post.id} .list-of-comments", /There are no visible comments/
-        end
-
-        should "not show the 'Show hidden comments' link on posts with deleted comments to Members" do
-          @comment1 = as(@user) { create(:comment, post: @post) }
-          @comment2 = as(@user) { create(:comment, post: @post, is_deleted: true) }
-          get comments_path(group_by: "post")
-
-          assert_response :success
-          assert_select "#post_#{@post.id}", 1
-          assert_select "#post_#{@post.id} .comment", 1
-          assert_select "#post_#{@post.id} #show-all-comments-link", 0
-        end
-
-        should "show the 'Show hidden comments' link on posts with deleted comments to Moderators" do
-          @comment1 = as(@user) { create(:comment, post: @post) }
-          @comment2 = as(@user) { create(:comment, post: @post, is_deleted: true) }
-          get_auth comments_path(group_by: "post"), @mod
-
-          assert_response :success
-          assert_select "#post_#{@post.id}", 1
-          assert_select "#post_#{@post.id} .comment", 1
-          assert_select "#post_#{@post.id} #show-all-comments-link", /Show 1 hidden comment/
+          assert_select "#post_#{@post.id} .show-all-comments-link", 0
         end
 
         should "not bump posts with nonbumping comments" do

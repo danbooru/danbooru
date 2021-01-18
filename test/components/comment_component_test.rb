@@ -40,5 +40,33 @@ class CommentComponentTest < ViewComponent::TestCase
         assert_no_css(".moderation-report-notice")
       end
     end
+
+    context "for a downvoted comment" do
+      setup do
+        @user = create(:user, comment_threshold: -8)
+      end
+
+      context "that is thresholded" do
+        should "hide the comment" do
+          as(@user) { @comment.update!(score: -9) }
+          render_comment(@comment, current_user: @user)
+
+          assert_css("article.comment[data-is-thresholded=true]")
+          assert_css("article.comment[data-is-dimmed=true]")
+          assert_css("article.comment .unhide-comment-link")
+        end
+      end
+
+      context "that is dimmed" do
+        should "dim the comment" do
+          as(@user) { @comment.update!(score: -5) }
+          render_comment(@comment, current_user: @user)
+
+          assert_css("article.comment[data-is-thresholded=false]")
+          assert_css("article.comment[data-is-dimmed=true]")
+          assert_no_css("article.comment .unhide-comment-link")
+        end
+      end
+    end
   end
 end

@@ -8,7 +8,8 @@
           data-do-not-bump-post="<%= comment.do_not_bump_post? %>"
           data-is-deleted="<%= comment.is_deleted? %>"
           data-is-sticky="<%= comment.is_sticky? %>"
-          data-below-threshold="<%= comment.score < current_user.comment_threshold %>"
+          data-is-dimmed="<%= dimmed? %>"
+          data-is-thresholded="<%= thresholded? %>"
           data-is-reported="<%= has_moderation_reports? %>"
           data-is-voted="<%= comment.voted_by?(current_user) %>">
   <div class="author">
@@ -21,10 +22,14 @@
     <%= link_to time_ago_in_words_tagged(comment.created_at), post_path(comment.post, anchor: "comment_#{comment.id}"), class: "message-timestamp" %>
   </div>
   <div class="content">
-    <div class="body prose">
+    <% if thresholded? %>
+      <%= link_to "[hidden]", "javascript:void(0)", class: "unhide-comment-link" %>
+    <% end %>
+
+    <%= tag.div class: "body prose", style: ("display: none;" if thresholded?) do %>
       <%= format_text(comment.body, data: dtext_data) %>
-    </div>
-    <%= render "application/update_notice", record: comment %>
+      <%= render "application/update_notice", record: comment %>
+    <% end %>
 
     <% if policy(comment).create? %>
       <menu>

@@ -105,7 +105,7 @@
   <% end %>
 
   <section id="comments">
-    <%= render "comments/partials/index/list", comments: @comments, post: @post, page: :post %>
+    <%= render_comment_section(@post, current_user: CurrentUser.user) %>
   </section>
 
   <section id="notes" style="display: none;">

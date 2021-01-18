@@ -1,12 +1,4 @@
 module PostsHelper
-  def post_preview(post, **options)
-    render PostPreviewComponent.new(post: post, **options)
-  end
-
-  def post_previews_html(posts, **options)
-    render PostPreviewComponent.with_collection(posts, **options)
-  end
-
   def reportbooru_enabled?
     Danbooru.config.reportbooru_server.present? && Danbooru.config.reportbooru_key.present?
   end

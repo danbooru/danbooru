@@ -21,12 +21,17 @@ article.comment {
     }
   }
 
-  &[data-below-threshold="true"][data-is-sticky="false"] {
+  &[data-is-dimmed="true"] {
     opacity: 0.3;
 
     &:hover {
       opacity: 1;
     }
+  }
+
+  .unhide-comment-link {
+    margin-bottom: 1em;
+    display: block;
   }
 
   .moderation-report-notice {

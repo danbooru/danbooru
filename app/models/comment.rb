@@ -118,21 +118,6 @@ class Comment < ApplicationRecord
     user.id.in?(votes.map(&:user_id))
   end
 
-  def visibility(user)
-    return :invisible if is_deleted? && !user.is_moderator?
-    return :hidden if is_deleted? && user.is_moderator?
-    return :hidden if score < user.comment_threshold && !is_sticky?
-    return :visible
-  end
-
-  def self.hidden(user)
-    select { |comment| comment.visibility(user) == :hidden }
-  end
-
-  def self.unhidden(user)
-    select { |comment| comment.visibility(user) == :visible }
-  end
-
   def quoted_response
     DText.quote(body, creator.name)
   end

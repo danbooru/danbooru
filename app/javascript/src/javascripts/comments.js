@@ -4,6 +4,7 @@ Comment.initialize_all = function() {
   if ($("#c-posts").length || $("#c-comments").length) {
     $(document).on("click.danbooru.comment", ".edit_comment_link", Comment.show_edit_form);
     $(document).on("click.danbooru.comment", ".expand-comment-response", Comment.show_new_comment_form);
+    $(document).on("click.danbooru.comment", ".unhide-comment-link", Comment.unhide_comment);
   }
 }
 
@@ -17,6 +18,13 @@ Comment.show_new_comment_form = function(e) {
 
 Comment.show_edit_form = function(e) {
   $(this).closest(".comment").find(".edit_comment").show();
+  e.preventDefault();
+}
+
+Comment.unhide_comment = function(e) {
+  let $comment = $(this).closest(".comment");
+  $comment.find(".unhide-comment-link").hide();
+  $comment.find(".body").show();
   e.preventDefault();
 }
 

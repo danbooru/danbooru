@@ -1,0 +1,28 @@
+# frozen_string_literal: true
+
+class CommentSectionComponent < ApplicationComponent
+  attr_reader :post, :comments, :current_user, :limit, :dtext_data
+
+  def initialize(post:, current_user:, limit: nil)
+    @post = post
+    @current_user = current_user
+    @limit = limit
+
+    @comments = @post.comments.order(id: :asc)
+    @comments = @comments.includes(:creator)
+    @comments = @comments.includes(:votes) if !current_user.is_anonymous?
+    @comments = @comments.includes(:moderation_reports) if policy(ModerationReport).show?
+    @comments = @comments.last(limit) if limit.present?
+
+    @dtext_data = DText.preprocess(@comments.map(&:body))
+  end
+
+  def has_unloaded_comments?
+    unloaded_comment_count > 0
+  end
+
+  def unloaded_comment_count
+    return 0 if limit.nil?
+    [post.comments.size - limit, 0].max
+  end
+end
