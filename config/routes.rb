@@ -186,7 +186,7 @@ Rails.application.routes.draw do
   resources :posts, only: [] do
     resources :events, :only => [:index], :controller => "post_events"
     resources :replacements, :only => [:index, :new, :create], :controller => "post_replacements"
-    resource :artist_commentary, :only => [:index, :show] do
+    resource :artist_commentary, only: [:show] do
       collection { put :create_or_update }
       member { put :revert }
     end
