@@ -11,6 +11,10 @@ class ModerationReportPolicy < ApplicationPolicy
     unbanned? && policy(record.model).reportable?
   end
 
+  def can_see_moderation_reports?
+    user.is_moderator?
+  end
+
   def permitted_attributes
     [:model_type, :model_id, :reason]
   end
