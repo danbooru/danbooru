@@ -12,11 +12,11 @@ class CommentComponent < ApplicationComponent
   end
 
   def dimmed?
-    comment.is_deleted? || (!comment.is_sticky? && comment.score < current_user.comment_threshold/2.0)
+    comment.is_deleted? || (!comment.is_sticky? && comment.score <= current_user.comment_threshold/2.0)
   end
 
   def thresholded?
-    !comment.is_deleted? && !comment.is_sticky? && comment.score < current_user.comment_threshold
+    !comment.is_deleted? && !comment.is_sticky? && comment.score <= current_user.comment_threshold
   end
 
   def redact_deleted?

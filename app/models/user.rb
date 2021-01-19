@@ -81,7 +81,7 @@ class User < ApplicationRecord
   attribute :last_logged_in_at, default: -> { Time.zone.now }
   attribute :last_forum_read_at, default: "1960-01-01 00:00:00"
   attribute :last_ip_addr
-  attribute :comment_threshold, default: 0
+  attribute :comment_threshold, default: -8
   attribute :default_image_size, default: "large"
   attribute :favorite_tags
   attribute :blacklisted_tags, default: DEFAULT_BLACKLIST
@@ -108,7 +108,7 @@ class User < ApplicationRecord
   validates_inclusion_of :default_image_size, :in => %w(large original)
   validates_inclusion_of :per_page, in: (1..PostSets::Post::MAX_PER_PAGE)
   validates_confirmation_of :password
-  validates_presence_of :comment_threshold
+  validates :comment_threshold, inclusion: { in: (-100..5) }
   before_validation :normalize_blacklisted_tags
   before_create :promote_to_admin_if_first_user
   has_many :artist_versions, foreign_key: :updater_id

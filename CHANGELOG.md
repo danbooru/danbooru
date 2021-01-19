@@ -18,6 +18,19 @@
 * You can now see when a post has deleted comments. Deleted comments are now
   replaced with the word `[deleted]`, instead of being completely hidden.
 
+* The way downvoted comments work has changed. Instead of comments being
+  completely hidden when they get downvoted, and having to click "Show X hidden
+  comments" to see them, now they get collapsed and marked as `[hidden]`, and
+  you click the comment itself to unhide it.
+
+* The default comment threshold has been lowered to -8. This means that
+  comments are now hidden at -8 and greyed out at -4. If your threshold was
+  higher than this, it has been reset to -8. You can go to your settings to
+  change this.
+
+* The maximum comment threshold is now 5 and the minumum threshold is now
+  -100. You can't set your threshold any higher or lower than this.
+
 ### API Changes
 
 * Deleted comments now have some of their fields hidden in the API. The

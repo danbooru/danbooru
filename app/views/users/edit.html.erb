@@ -45,7 +45,7 @@
         <%= f.input :default_image_size, hint: "Show full original images or resized #{Danbooru.config.large_image_width}px width samples.", label: "Default image width", collection: [["850px", "large"], ["original", "original"]], include_blank: false %>
         <%= f.input :receive_email_notifications, as: :select, include_blank: false, collection: [["Yes", "true"], ["No", "false"]], hint: "Receive an email when you receive a new dmail." %>
         <%= f.input :time_zone, include_blank: false, hint: "The timezone to use for timestamps." %>
-        <%= f.input :comment_threshold, hint: "Comments below this score will be hidden by default" %>
+        <%= f.input :comment_threshold, hint: "Comments at or below this score will be hidden by default.", input_html: { min: -100, max: 5 } %>
         <%= f.input :blacklisted_tags, hint: "Posts with these tags will be hidden. Put each tag on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, :input_html => {:size => "40x5", :data => {:autocomplete => "tag-query"}} %>
       </fieldset>
 
