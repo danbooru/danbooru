@@ -15,6 +15,15 @@
 * You can now see the list of comments and forum posts you've reported to
   the moderators at <https://danbooru.donmai.us/moderation_reports>.
 
+* You can now see when a post has deleted comments. Deleted comments are now
+  replaced with the word `[deleted]`, instead of being completely hidden.
+
+### API Changes
+
+* Deleted comments now have some of their fields hidden in the API. The
+  `creator_id`, `updater_id`, and `body` fields are hidden if you're not a
+  moderator.
+
 ## 2021-01-12
 
 ### Changes

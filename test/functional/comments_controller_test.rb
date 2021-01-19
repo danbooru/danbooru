@@ -113,6 +113,19 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
         get comment_path(@comment.id)
         assert_redirected_to post_path(@comment.post, anchor: "comment_#{@comment.id}")
       end
+
+      context "for a deleted comment" do
+        should "not show the creator, updater, or body to non-Moderators" do
+          @comment = create(:comment, post: @post, is_deleted: true)
+          get comment_path(@comment.id), as: :json
+
+          assert_response :success
+          assert_equal(@comment.id, response.parsed_body["id"])
+          assert_nil(response.parsed_body["creator_id"])
+          assert_nil(response.parsed_body["updater_id"])
+          assert_nil(response.parsed_body["body"])
+        end
+      end
     end
 
     context "edit action" do
@@ -154,6 +167,16 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           put_auth comment_path(@comment.id), @user, params: {comment: {is_sticky: true}}
           assert_response 403
           assert_equal(false, @comment.reload.is_sticky)
+        end
+      end
+
+      context "for a deleted comment" do
+        should "not allow the creator to edit the comment" do
+          @comment.update!(is_deleted: true)
+          put_auth comment_path(@comment.id), @user, params: { comment: { body: "blah" }}
+
+          assert_response 403
+          assert_not_equal("blah", @comment.reload.body)
         end
       end
 
@@ -224,20 +247,16 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "undelete action" do
-      should "mark comment as undeleted" do
+      should "allow Moderators to undelete comments" do
         @comment = create(:comment, post: @post, is_deleted: true)
-        post_auth undelete_comment_path(@comment.id), @user
+        post_auth undelete_comment_path(@comment.id), @mod
 
-        assert_equal(false, @comment.reload.is_deleted)
         assert_redirected_to(@comment)
+        assert_equal(false, @comment.reload.is_deleted)
       end
 
-      should "not allow undeleting comments deleted by a moderator" do
-        @comment = create(:comment, post: @post)
-
-        delete_auth comment_path(@comment.id), @mod
-        assert_redirected_to @comment
-        assert(@comment.reload.is_deleted?)
+      should "not allow normal Members to undelete their own comments" do
+        @comment = create(:comment, post: @post, is_deleted: true)
 
         post_auth undelete_comment_path(@comment.id), @user
         assert_response 403
