@@ -113,11 +113,6 @@ class Comment < ApplicationRecord
     end
   end
 
-  def voted_by?(user)
-    return false if user.is_anonymous?
-    user.id.in?(votes.map(&:user_id))
-  end
-
   def quoted_response
     DText.quote(body, creator.name)
   end

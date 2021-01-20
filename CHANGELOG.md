@@ -15,6 +15,8 @@
 * You can now see the list of comments and forum posts you've reported to
   the moderators at <https://danbooru.donmai.us/moderation_reports>.
 
+* Comment scores are now visible and the vote buttons have been reworked.
+
 * You can now see when a post has deleted comments. Deleted comments are now
   replaced with the word `[deleted]`, instead of being completely hidden.
 

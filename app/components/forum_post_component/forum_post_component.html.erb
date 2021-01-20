@@ -41,7 +41,7 @@
         <li><%= link_to "Report", new_moderation_report_path(moderation_report: { model_type: "ForumPost", model_id: forum_post.id }), remote: true, title: "Report this forum post to the moderators" %></li>
       <% end %>
       <% if has_moderation_reports? %>
-        <li class="moderation-report-notice">This post has been reported! (<%= link_to pluralize(forum_post.moderation_reports.length, "report"), moderation_reports_path(search: { model_type: "ForumPost", model_id: forum_post.id }) %>)</li>
+        <li class="moderation-report-notice">Reported (<%= link_to pluralize(forum_post.moderation_reports.length, "report"), moderation_reports_path(search: { model_type: "ForumPost", model_id: forum_post.id }) %>)</li>
       <% end %>
       <% if forum_post.bulk_update_request.present? %>
         <ul class="votes" id="forum-post-votes-for-<%= forum_post.id %>">

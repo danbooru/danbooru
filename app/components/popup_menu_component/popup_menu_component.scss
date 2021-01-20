@@ -1,4 +1,6 @@
 div.popup-menu {
+  display: inline-block;
+
   a.popup-menu-button {
     display: flex;
     align-items: center;
@@ -8,7 +10,8 @@ div.popup-menu {
     border-radius: 50%;
     color: var(--muted-text-color);
 
-    &:hover {
+    &:focus, &:hover {
+      color: var(--link-color);
       background-color: var(--subnav-menu-background-color);
     }
   }
@@ -16,8 +19,12 @@ div.popup-menu {
   ul.popup-menu-content {
     display: none;
 
-    .icon {
-      width: 1.5em;
+    li {
+      margin: 0 2em 0.25em 0;
+
+      i.icon {
+        width: 2em;
+      }
     }
   }
 }

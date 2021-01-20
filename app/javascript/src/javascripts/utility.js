@@ -1,4 +1,5 @@
 import Rails from '@rails/ujs';
+import { hideAll } from 'tippy.js';
 
 let Utility = {};
 
@@ -70,6 +71,9 @@ Utility.dialog = function(title, html) {
   $dialog.find("form").on("submit.danbooru", function() {
     $dialog.dialog("close");
   });
+
+  // XXX hides the popup menu when the Report comment button is clicked.
+  hideAll({ duration: 0 });
 }
 
 Utility.keydown = function(keys, namespace, handler, selector = document) {

@@ -20,12 +20,7 @@ class CommentPolicy < ApplicationPolicy
   end
 
   def reply?
-    create? && !record.is_deleted?
-  end
-
-  def vote?
-    # XXX should use CommentVotePolicy
-    unbanned? && !record.is_deleted?
+    !record.is_deleted?
   end
 
   def permitted_attributes_for_create

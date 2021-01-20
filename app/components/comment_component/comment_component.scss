@@ -9,15 +9,15 @@ article.comment {
     background-color: var(--moderation-report-background-color);
   }
 
-  &[data-is-voted="true"] {
-    .comment-vote-up-link, .comment-vote-down-link {
-      display: none;
+  &[data-is-upvoted="true"] {
+    a.comment-upvote-link {
+      color: var(--link-color);
     }
   }
 
-  &[data-is-voted="false"] {
-    .comment-unvote-link {
-      display: none;
+  &[data-is-downvoted="true"] {
+    a.comment-downvote-link {
+      color: var(--link-color);
     }
   }
 
@@ -37,5 +37,22 @@ article.comment {
   .moderation-report-notice {
     font-weight: bold;
     color: var(--moderation-report-text-color);
+  }
+
+  .comment-votes {
+    color: var(--muted-text-color);
+
+    a {
+      color: var(--muted-text-color);
+
+      &:hover {
+        color: var(--link-color);
+      }
+    }
+  }
+
+  .popup-menu {
+    width: 1.5em;
+    height: 1.5em;
   }
 }

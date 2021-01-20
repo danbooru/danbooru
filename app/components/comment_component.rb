@@ -23,7 +23,21 @@ class CommentComponent < ApplicationComponent
     comment.is_deleted? && !policy(comment).can_see_deleted?
   end
 
-  def has_moderation_reports?
+  def votable?
+    !comment.is_deleted? || current_user.is_moderator?
+  end
+
+  def upvoted?
+    return false if current_user.is_anonymous?
+    comment.votes.select(&:is_positive?).map(&:user_id).include?(current_user.id)
+  end
+
+  def downvoted?
+    return false if current_user.is_anonymous?
+    comment.votes.select(&:is_negative?).map(&:user_id).include?(current_user.id)
+  end
+
+  def reported?
     policy(ModerationReport).can_see_moderation_reports? && comment.moderation_reports.present?
   end
 end

@@ -1,2 +1,2 @@
-Danbooru.Utility.notice("Removed vote");
-$(".comment[data-id=<%= @comment.id %>]").attr("data-is-voted", "false");
+var $comment = $("article#comment_<%= @comment.id %>");
+$comment.replaceWith("<%= j render_comment(@comment, current_user: CurrentUser.user) %>");

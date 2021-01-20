@@ -31,7 +31,7 @@ div.list-of-messages {
       flex: 1;
 
       menu {
-        li {
+        > li {
           padding: 0;
           margin-right: 1.5em;
         }

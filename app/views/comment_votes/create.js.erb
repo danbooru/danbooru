@@ -1,2 +1,2 @@
-Danbooru.Utility.notice("Vote saved");
-$(".comment[data-id=<%= @comment.id %>]").attr("data-is-voted", "true");
+var $comment = $("article#comment_<%= @comment.id %>");
+$comment.replaceWith("<%= j render_comment(@comment, current_user: CurrentUser.user) %>");
