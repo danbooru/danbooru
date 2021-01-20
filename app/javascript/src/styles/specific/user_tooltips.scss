@@ -57,29 +57,11 @@
       font-size: 0.75em;
     }
 
-    a.user-tooltip-menu-button {
-      color: var(--muted-text-color);
+    div.popup-menu {
       grid-area: menu;
       align-self: center;
-      text-align: center;
       width: 28px;
       height: 28px;
-      line-height: 28px;
-      border-radius: 50%;
-
-      &:hover {
-        background-color: var(--subnav-menu-background-color);
-      }
-    }
-
-    > ul.user-tooltip-menu {
-      display: none;
-    }
-
-    ul.user-tooltip-menu {
-      .icon {
-        width: 1.5em;
-      }
     }
   }
 

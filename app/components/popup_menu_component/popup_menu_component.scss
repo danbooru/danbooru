@@ -1,0 +1,23 @@
+div.popup-menu {
+  a.popup-menu-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    color: var(--muted-text-color);
+
+    &:hover {
+      background-color: var(--subnav-menu-background-color);
+    }
+  }
+
+  ul.popup-menu-content {
+    display: none;
+
+    .icon {
+      width: 1.5em;
+    }
+  }
+}
