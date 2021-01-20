@@ -33,6 +33,9 @@
 * The maximum comment threshold is now 5 and the minumum threshold is now
   -100. You can't set your threshold any higher or lower than this.
 
+* Changed the way [quote] tags look. Now quotes are Reddit-style instead of
+  traditional forum style.
+
 ### API Changes
 
 * Deleted comments now have some of their fields hidden in the API. The

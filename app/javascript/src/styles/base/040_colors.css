@@ -174,8 +174,7 @@
   --notice-info-background: var(--warning-background-color);
   --notice-info-border: 1px solid #CCC999;
 
-  --dtext-blockquote-border: 1px solid #666;
-  --dtext-blockquote-background: #EEE;
+  --dtext-blockquote-border-color: #999;
   --dtext-code-background: #EEE;
   --dtext-expand-border: 1px inset #666;
   --dtext-spoiler-background-color: black;
@@ -320,8 +319,7 @@ body[data-current-user-theme="dark"] {
   --diff-list-obsolete-added-color: var(--green-3);
   --diff-list-obsolete-removed-color: var(--red-3);
 
-  --dtext-blockquote-background: var(--grey-3);
-  --dtext-blockquote-border: 1px solid var(--grey-4);
+  --dtext-blockquote-border-color: var(--grey-4);
   --dtext-code-background: var(--grey-2);
   --dtext-expand-border: 1px inset var(--grey-4);
   --dtext-spoiler-background-color: black;

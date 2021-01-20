@@ -70,9 +70,13 @@ div.prose {
 
   blockquote {
     margin-bottom: 1em;
-    padding: 1em 1em 0.2em;
-    border: var(--dtext-blockquote-border);
-    background: var(--dtext-blockquote-background);
+    padding-left: 0.5em;
+    opacity: 0.75;
+    border-left: 3px solid var(--dtext-blockquote-border-color);
+
+    blockquote {
+      opacity: 1.0;
+    }
   }
 
   .tn {
