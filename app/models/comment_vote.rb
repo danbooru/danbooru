@@ -1,12 +1,14 @@
 class CommentVote < ApplicationRecord
-  class Error < StandardError; end
-
   belongs_to :comment
   belongs_to :user
+
   validates_presence_of :score
   validates_uniqueness_of :user_id, :scope => :comment_id, :message => "have already voted for this comment"
   validate :validate_comment_can_be_down_voted
   validates_inclusion_of :score, :in => [-1, 1], :message => "must be 1 or -1"
+
+  after_create :update_score_after_create
+  after_destroy :update_score_after_destroy
 
   def self.visible(user)
     if user.is_moderator?
@@ -35,6 +37,18 @@ class CommentVote < ApplicationRecord
 
   def is_negative?
     score == -1
+  end
+
+  def update_score_after_create
+    comment.with_lock do
+      comment.update_columns(score: comment.score + score)
+    end
+  end
+
+  def update_score_after_destroy
+    comment.with_lock do
+      comment.update_columns(score: comment.score - score)
+    end
   end
 
   def self.available_includes

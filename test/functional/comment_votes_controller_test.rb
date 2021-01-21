@@ -46,43 +46,83 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
-    context "#create.json" do
-      should "create a vote" do
+    context "create action" do
+      setup do
+        @user = create(:user)
+        @comment = create(:comment)
+      end
+
+      should "not allow anonymous users to vote" do
+        post comment_comment_votes_path(comment_id: @comment.id, score: "1"), xhr: true
+        assert_response 403
+      end
+
+      should "allow Members to vote" do
+        post_auth comment_comment_votes_path(comment_id: @comment.id, score: "1"), @user, xhr: true
+        assert_response :success
+      end
+
+      should "create a upvote" do
         assert_difference("CommentVote.count", 1) do
-          post_auth comment_comment_votes_path(comment_id: @comment.id, score: "down"), @user, as: :json
-          assert_response :success
-
-          assert_equal(@comment.id, response.parsed_body["id"])
-          assert_equal(-1, response.parsed_body["score"])
+          post_auth comment_comment_votes_path(comment_id: @comment.id, score: "1"), @user, xhr: true
         end
+
+        assert_response :success
+        assert_equal(1, @comment.reload.score)
       end
 
-      should "fail silently on errors" do
-        create(:comment_vote, user: @user, comment: @comment, score: -1)
-        assert_difference("CommentVote.count", 0) do
-          post_auth comment_comment_votes_path(comment_id: @comment.id, score: "down", format: "json"), @user
-          assert_response 422
-
-          comment = JSON.parse(@response.body)
-          assert_equal(false, comment["success"])
-          assert_equal("Validation failed: You have already voted for this comment", comment["message"])
-        end
-      end
-    end
-
-    context "#create.js" do
-      should "create a vote" do
+      should "create a downvote" do
         assert_difference("CommentVote.count", 1) do
-          post_auth comment_comment_votes_path(comment_id: @comment.id, format: "json", score: "down"), @user
-          assert_response :success
+          post_auth comment_comment_votes_path(comment_id: @comment.id, score: "-1"), @user, xhr: true
         end
+
+        assert_response :success
+        assert_equal(-1, @comment.reload.score)
       end
 
-      should "fail on errors" do
-        create(:comment_vote, user: @user, comment: @comment, score: -1)
+      should "ignore duplicate votes" do
+        vote = create(:comment_vote, comment: @comment, user: @user, score: 1)
+        assert_equal(1, vote.comment.reload.score)
+
         assert_difference("CommentVote.count", 0) do
-          post_auth comment_comment_votes_path(comment_id: @comment.id, :score => "down", format: "js"), @user
-          assert_response 422
+          post_auth comment_comment_votes_path(comment_id: @comment.id, score: "1"), @user, xhr: true
+        end
+
+        assert_response :success
+        assert_equal(1, @comment.reload.score)
+      end
+
+      should "automatically undo existing votes" do
+        create(:comment_vote, comment: @comment, user: @user, score: -1)
+        assert_equal(-1, @comment.reload.score)
+
+        assert_difference("CommentVote.count", 0) do
+          post_auth comment_comment_votes_path(comment_id: @comment.id, score: "1"), @user, xhr: true
+        end
+
+        assert_response :success
+        assert_equal(1, @comment.reload.score)
+      end
+
+      should "not allow voting on deleted comments" do
+        @comment.update!(is_deleted: true)
+
+        assert_difference("CommentVote.count", 0) do
+          post_auth comment_comment_votes_path(comment_id: @comment.id, score: "1"), @user, xhr: true
+        end
+
+        assert_response 403
+        assert_equal(0, @comment.reload.score)
+      end
+
+      should "not update the comment's updated_at or updater_id" do
+        assert_no_difference(["@comment.updater_id", "@comment.reload.updated_at"]) do
+          assert_difference("CommentVote.count", 1) do
+            post_auth comment_comment_votes_path(comment_id: @comment.id, score: "1"), @user, xhr: true
+
+            assert_response :success
+            assert_equal(1, @comment.reload.score)
+          end
         end
       end
     end
@@ -92,8 +132,8 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
         @vote = create(:comment_vote, user: @user)
 
         assert_difference("CommentVote.count", -1) do
-          delete_auth comment_comment_votes_path(@vote.comment), @user
-          assert_redirected_to @vote.comment
+          delete_auth comment_comment_votes_path(@vote.comment), @user, xhr: true
+          assert_response :success
         end
       end
 
@@ -101,8 +141,8 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
         @vote = create(:comment_vote)
 
         assert_difference("CommentVote.count", 0) do
-          delete_auth comment_comment_votes_path(@vote.comment), @user
-          assert_response 422
+          delete_auth comment_comment_votes_path(@vote.comment), @user, xhr: true
+          assert_response 404
         end
       end
     end

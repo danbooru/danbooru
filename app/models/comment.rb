@@ -44,39 +44,7 @@ class Comment < ApplicationRecord
     end
   end
 
-  module VoteMethods
-    def vote!(val, voter = CurrentUser.user)
-      numerical_score = (val == "up") ? 1 : -1
-      vote = votes.create!(user: voter, score: numerical_score)
-
-      if vote.is_positive?
-        update_column(:score, score + 1)
-      elsif vote.is_negative?
-        update_column(:score, score - 1)
-      end
-
-      return vote
-    end
-
-    def unvote!
-      vote = votes.where("user_id = ?", CurrentUser.user.id).first
-
-      if vote
-        if vote.is_positive?
-          update_column(:score, score - 1)
-        else
-          update_column(:score, score + 1)
-        end
-
-        vote.destroy
-      else
-        raise CommentVote::Error.new("You have not voted for this comment")
-      end
-    end
-  end
-
   extend SearchMethods
-  include VoteMethods
 
   def validate_creator_is_not_limited
     if creator.is_comment_limited? && !do_not_bump_post?

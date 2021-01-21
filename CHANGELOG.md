@@ -42,6 +42,12 @@
   `creator_id`, `updater_id`, and `body` fields are hidden if you're not a
   moderator.
 
+* The `POST /comment_votes` and `DELETE /comment_votes` endpoints now return a
+  comment vote instead of a comment.
+
+* The `score` param in the `POST /comment_votes` endpoint is now 1 or -1, not
+  `up` or `down`.
+
 ## 2021-01-12
 
 ### Changes

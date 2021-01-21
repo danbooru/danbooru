@@ -1,2 +1,6 @@
-var $comment = $("article#comment_<%= @comment.id %>");
-$comment.replaceWith("<%= j render_comment(@comment, current_user: CurrentUser.user) %>");
+<% if flash[:notice] %>
+  Danbooru.Utility.notice("<%= j flash[:notice] %>");
+<% end %>
+
+var $comment = $("article#comment_<%= @comment_vote.comment_id %>");
+$comment.replaceWith("<%= j render_comment(@comment_vote.comment, current_user: CurrentUser.user) %>");

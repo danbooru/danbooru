@@ -1,23 +1,31 @@
 class CommentVotesController < ApplicationController
   skip_before_action :api_check
   respond_to :js, :json, :xml, :html
-  rescue_with CommentVote::Error, ActiveRecord::RecordInvalid, status: 422
 
   def index
     @comment_votes = authorize CommentVote.visible(CurrentUser.user).paginated_search(params, count_pages: true)
     @comment_votes = @comment_votes.includes(:user, comment: [:creator, post: [:uploader]]) if request.format.html?
+
     respond_with(@comment_votes)
   end
 
   def create
-    @comment = authorize Comment.find(params[:comment_id]), policy_class: CommentVotePolicy
-    @comment_vote = @comment.vote!(params[:score])
-    respond_with(@comment)
+    @comment = Comment.find(params[:comment_id])
+
+    @comment.with_lock do
+      @comment_vote = authorize CommentVote.new(comment: @comment, score: params[:score], user: CurrentUser.user)
+      CommentVote.where(comment: @comment, user: CurrentUser.user).destroy_all
+      @comment_vote.save
+    end
+
+    flash.now[:notice] = @comment_vote.errors.full_messages.join("; ") if @comment_vote.errors.present?
+    respond_with(@comment_vote)
   end
 
   def destroy
-    @comment = authorize Comment.find(params[:comment_id]), policy_class: CommentVotePolicy
-    @comment.unvote!
-    respond_with(@comment)
+    @comment_vote = authorize CommentVote.find_by!(comment_id: params[:comment_id], user: CurrentUser.user)
+    @comment_vote.destroy
+
+    respond_with(@comment_vote)
   end
 end

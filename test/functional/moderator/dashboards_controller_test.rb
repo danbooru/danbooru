@@ -86,9 +86,7 @@ module Moderator
             end
 
             @users.each do |user|
-              CurrentUser.as(user) do
-                @comment.vote!(-1)
-              end
+              create(:comment_vote, score: -1, comment: @comment, user: user)
             end
           end
 

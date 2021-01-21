@@ -51,7 +51,7 @@
           <% elsif upvoted? %>
             <%= link_to "🡹", comment_comment_votes_path(comment_id: comment.id), class: "comment-upvote-link comment-unvote-link", method: :delete, remote: true %>
           <% else %>
-            <%= link_to "🡹", comment_comment_votes_path(comment_id: comment.id, score: "up"), class: "comment-upvote-link", method: :post, remote: true %>
+            <%= link_to "🡹", comment_comment_votes_path(comment_id: comment.id, score: "1"), class: "comment-upvote-link", method: :post, remote: true %>
           <% end %>
 
           <span class="comment-score"><%= comment.score %></span>
@@ -61,7 +61,7 @@
           <% elsif downvoted? %>
             <%= link_to "🡻",  comment_comment_votes_path(comment_id: comment.id), class: "comment-downvote-link comment-unvote-link", method: :delete, remote: true %>
           <% else %>
-            <%= link_to "🡻",  comment_comment_votes_path(comment_id: comment.id, score: "down"), class: "comment-downvote-link", method: :post, remote: true %>
+            <%= link_to "🡻",  comment_comment_votes_path(comment_id: comment.id, score: "-1"), class: "comment-downvote-link", method: :post, remote: true %>
           <% end %>
         </li>
       <% end %>
