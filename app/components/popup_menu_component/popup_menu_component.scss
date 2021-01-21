@@ -1,3 +1,5 @@
+@import "../../javascript/src/styles/base/030_links.scss";
+
 div.popup-menu {
   display: inline-block;
 
@@ -10,20 +12,26 @@ div.popup-menu {
     border-radius: 50%;
     color: var(--muted-text-color);
 
-    &:focus, &:hover {
-      color: var(--link-color);
-      background-color: var(--subnav-menu-background-color);
+    // the popup menu is open
+    &[aria-expanded="true"] {
+      @extend .active-link;
+    }
+
+    // the popup menu is not open
+    &:not([aria-expanded="true"]) {
+      @extend .inactive-link;
     }
   }
 
   ul.popup-menu-content {
     display: none;
 
-    li {
-      margin: 0 2em 0.25em 0;
+    li a {
+      display: block;
+      padding: 0.125em 2em 0.125em 0;
 
       i.icon {
-        width: 2em;
+        width: 1.5em;
       }
     }
   }

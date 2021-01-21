@@ -22,6 +22,23 @@ a.active {
   font-weight: bold;
 }
 
+a.active-link {
+  color: var(--link-color);
+
+  &:hover {
+    background-color: var(--subnav-menu-background-color);
+  }
+}
+
+a.inactive-link {
+  color: var(--muted-text-color);
+
+  &:hover {
+    color: var(--link-hover-color);
+    background-color: var(--subnav-menu-background-color);
+  }
+}
+
 a[rel*="external"] {
   word-break: break-all;
 }

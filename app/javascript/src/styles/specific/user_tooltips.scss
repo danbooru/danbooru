@@ -55,6 +55,10 @@
       grid-area: header-bottom;
       color: var(--muted-text-color);
       font-size: 0.75em;
+
+      a {
+        color: var(--muted-text-color);
+      }
     }
 
     div.popup-menu {
@@ -73,6 +77,10 @@
 
     .user-tooltip-stat-item {
       text-align: center;
+
+      a {
+        color: var(--text-color);
+      }
 
       .user-tooltip-stat-value {
         font-weight: bold;
