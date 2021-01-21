@@ -44,9 +44,9 @@
         <li class="moderation-report-notice">Reported (<%= link_to pluralize(forum_post.moderation_reports.length, "report"), moderation_reports_path(search: { model_type: "ForumPost", model_id: forum_post.id }) %>)</li>
       <% end %>
       <% if forum_post.bulk_update_request.present? %>
-        <ul class="votes" id="forum-post-votes-for-<%= forum_post.id %>">
+        <menu class="votes" id="forum-post-votes-for-<%= forum_post.id %>">
           <%= render "forum_post_votes/list", votes: forum_post.votes, forum_post: forum_post %>
-        </ul>
+        </menu>
       <% end %>
     </menu>
 
