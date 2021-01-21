@@ -33,6 +33,8 @@
 * The maximum comment threshold is now 5 and the minumum threshold is now
   -100. You can't set your threshold any higher or lower than this.
 
+* Removed the rule that you can't upvote your own comments.
+
 * Changed the way [quote] tags look. Now quotes are Reddit-style instead of
   traditional forum style.
 
