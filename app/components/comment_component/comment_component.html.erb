@@ -25,7 +25,7 @@
         <% end %>
       <% end %>
     </div>
-    <%= link_to time_ago_in_words_tagged(comment.created_at), post_path(comment.post, anchor: "comment_#{comment.id}"), class: "message-timestamp" %>
+    <%= link_to time_ago_in_words_tagged(comment.created_at), comment, class: "message-timestamp" %>
   </div>
 
   <div class="content">

@@ -71,7 +71,7 @@ class CommentTest < ActiveSupport::TestCase
 
           dmail = Dmail.last
           assert_equal(<<-EOS.strip_heredoc, dmail.body)
-            @#{@comment.creator.name} mentioned you in a \"comment\":/posts/#{@comment.post_id}#comment-#{@comment.id} on post ##{@comment.post_id}:
+            @#{@comment.creator.name} mentioned you in comment ##{@comment.id} on post ##{@comment.post_id}:
 
             [quote]
             Hey @#{@user2.name} check this out!
