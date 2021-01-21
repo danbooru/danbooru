@@ -179,6 +179,12 @@ ul.list-inline {
   height: auto !important;
 }
 
+.svg-icon {
+  display: inline-block;
+  vertical-align: middle;
+  height: 1em;
+}
+
 .mobile-only {
   display: none;
   @media (max-width: 660px) { display: initial; }

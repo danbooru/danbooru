@@ -4,12 +4,20 @@ module IconHelper
     tag.i(class: "icon #{icon_class} #{klass}", **options)
   end
 
-  def upvote_icon(**options)
-    icon_tag("far fa-thumbs-up", **options)
+  def svg_icon_tag(type, path, **options)
+    tag.svg(class: "icon svg-icon #{type}", role: "img", xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 448 512", **options) do
+      tag.path(fill: "currentColor", d: path)
+    end
   end
 
+  # fontawesome.com/icons/arrow-alt-up
+  def upvote_icon(**options)
+    svg_icon_tag("upvote-icon", "M272 480h-96c-13.3 0-24-10.7-24-24V256H48.2c-21.4 0-32.1-25.8-17-41L207 39c9.4-9.4 24.6-9.4 34 0l175.8 176c15.1 15.1 4.4 41-17 41H296v200c0 13.3-10.7 24-24 24z", **options)
+  end
+
+  # fontawesome.com/icons/arrow-alt-down
   def downvote_icon(**options)
-    icon_tag("far fa-thumbs-down", **options)
+    svg_icon_tag("downvote-icon", "M176 32h96c13.3 0 24 10.7 24 24v200h103.8c21.4 0 32.1 25.8 17 41L241 473c-9.4 9.4-24.6 9.4-34 0L31.3 297c-15.1-15.1-4.4-41 17-41H152V56c0-13.3 10.7-24 24-24z", **options)
   end
 
   def sticky_icon(**options)
