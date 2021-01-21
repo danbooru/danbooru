@@ -3,18 +3,18 @@
 
   <span class="post-tooltip-favorites post-tooltip-info">
     <span><%= @post.fav_count %></span>
-    <i class="far fa-heart fa-xs"></i>
+    <%= favorite_icon(class: "fa-xs") %>
   </span>
 
   <span class="post-tooltip-score post-tooltip-info">
     <span><%= @post.score %></span>
-    <i class="far fa-thumbs-up fa-xs"></i>
+    <%= upvote_icon(class: "fa-xs") %>
   </span>
 
   <% if @post.last_commented_at.present? %>
     <span class="post-tooltip-comments post-tooltip-info">
       <span><%= @post.comments.count %></span>
-      <i class="far fa-comments fa-xs"></i>
+      <%= comments_icon(class: "fa-xs") %>
     </span>
   <% end %>
 
@@ -32,7 +32,7 @@
   <%= link_to "#{@post.image_width}x#{@post.image_height}", @post.file_url, class: "post-tooltip-dimensions post-tooltip-info" %>
 
   <%= link_to "#", class: "post-tooltip-disable", title: "Disable enhanced tooltips" do %>
-    <i class="fas fa-times-circle"></i>
+    <%= close_icon %>
   <% end %>
 </div>
 

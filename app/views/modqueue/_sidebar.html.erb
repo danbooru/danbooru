@@ -5,7 +5,7 @@
     <%= f.input :tags, label: false, input_html: { placeholder: "Tags", value: params.dig(:search, :tags), "data-autocomplete": "tag-query" } %>
     <%= f.input :order, label: false, collection: [["Newest", "modqueue"], ["Oldest", "modqueue_asc"], ["Score (Highest)", "score"], ["Score (Lowest)", "score_asc"]], selected: params[:search][:order] %>
     <%= f.button :button, name: nil, id: "search-box-submit" do %>
-      <i class="fas fa-search"></i>
+      <%= search_icon %>
     <% end %>
   <% end %>
 

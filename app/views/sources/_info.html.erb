@@ -2,7 +2,7 @@
 
 <div id="source-info">
   <%= link_to "Fetch source data", source_path, id: "fetch-data-manual" %>
-  <i id="source-info-loading" class="fas fa-spinner fa-spin"></i>
+  <%= spinner_icon(id: "source-info-loading") %>
 
   <% if @source.present? %>
     <dl id="source-info-content">

@@ -79,7 +79,7 @@ div#c-posts {
     }
   }
 
-  #remove-fav-button i.fa-heart {
+  form#remove-fav-button button:not([disabled]) i.icon {
     color: var(--remove-favorite-button);
   }
 
@@ -364,7 +364,7 @@ div#c-posts, div#c-uploads {
       display: inline-block;
     }
 
-    i.fa-external-link-alt {
+    i#open-edit-dialog {
       font-size: var(--text-xs);
     }
 

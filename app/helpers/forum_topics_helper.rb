@@ -20,4 +20,14 @@ module ForumTopicsHelper
       :rejected
     end
   end
+
+  def forum_post_vote_icon(vote)
+    if vote.score == 1
+      upvote_icon
+    elsif vote.score == -1
+      downvote_icon
+    else
+      meh_icon
+    end
+  end
 end

@@ -7,6 +7,6 @@
       <%= hidden_field_tag :random, params[:random] %>
     <% end %>
     <%= text_field_tag("tags", tags, :id => tags_dom_id, :"data-shortcut" => "q", :"data-autocomplete" => "tag-query") %>
-    <button id="search-box-submit" type="submit"><i class="fas fa-search"></i></button>
+    <button id="search-box-submit" type="submit"><%= search_icon %></button>
   <% end %>
 </section>

@@ -50,7 +50,9 @@
       <%= f.label :tag_string, "Tags" %>
 
       <span data-tag-counter data-for="#post_tag_string"></span>
-      <a href="javascript:void(0)"><i id="open-edit-dialog" class="fas fa-external-link-alt" title="detach" data-shortcut="shift+e"></i></a>
+      <a href="javascript:void(0)">
+        <%= external_link_icon(id: "open-edit-dialog", "data-shortcut": "shift+e") %>
+      </a>
     </div>
 
     <div>

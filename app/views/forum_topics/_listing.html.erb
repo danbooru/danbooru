@@ -8,25 +8,25 @@
 
     <% if topic.is_sticky? %>
       <%= link_to forum_topics_path(search: { is_sticky: true }) do %>
-        <i class="topic-status icon stickied fas fa-thumbtack" title="Stickied"></i>
+        <%= sticky_icon(class: "topic-status stickied", title: "Stickied") %>
       <% end %>
     <% end %>
 
     <% if topic.is_locked? %>
       <%= link_to forum_topics_path(search: { is_locked: true }) do %>
-        <i class="topic-status icon locked fas fa-lock" title="Locked"></i>
+        <%= lock_icon(class: "topic-status locked", title: "Locked") %>
       <% end %>
     <% end %>
 
     <% if topic.is_deleted? %>
       <%= link_to forum_topics_path(search: { is_deleted: true }) do %>
-        <i class="topic-status icon deleted fas fa-trash-alt" title="Deleted"></i>
+        <%= delete_icon(class: "topic-status deleted", title: "Deleted") %>
       <% end %>
     <% end %>
 
     <% if topic.is_private? %>
       <%= link_to forum_topics_path(search: { is_private: true }) do %>
-        <i class="topic-status icon private fas fa-hand-paper" title="<%= User.level_string(topic.min_level) %> only"></i>
+        <%= private_icon(class: "topic-status private", title: "#{User.level_string(topic.min_level)} only") %>
       <% end %>
     <% end %>
 

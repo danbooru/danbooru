@@ -1,6 +1,7 @@
 <div class="user-tooltip">
   <div class="user-tooltip-header">
-    <i class="fas fa-user-circle user-tooltip-avatar"></i>
+    <%= avatar_icon(class: "user-tooltip-avatar") %>
+
     <div class="user-tooltip-header-top">
       <span class="user-tooltip-name"><%= link_to_user @user %></span>
 
@@ -20,12 +21,12 @@
 
       <% if @user.positive_feedback_count > 0 %>
         <%= link_to user_feedbacks_path(search: { user_id: @user.id }), class: "link-plain user-tooltip-badge user-tooltip-badge-positive-feedback" do %>
-          <i class="fas fa-medal"></i>
+          <%= medal_icon %>
           <span><%= @user.positive_feedback_count %>
         <% end %>
       <% elsif @user.negative_feedback_count > 0 %>
         <%= link_to user_feedbacks_path(search: { user_id: @user.id }), class: "link-plain user-tooltip-badge user-tooltip-badge-negative-feedback" do %>
-          <i class="fas fa-times-circle"></i>
+          <%= negative_icon %>
           <span><%= @user.negative_feedback_count %>
         <% end %>
       <% end %>
@@ -47,14 +48,14 @@
     <%= render PopupMenuComponent.new do |menu| %>
       <%= menu.item do %>
         <%= link_to new_dmail_path(dmail: { to_id: @user.id }) do %>
-          <i class="icon far fa-envelope"></i> Send Message
+          <%= message_icon %> Send Message
         <% end %>
       <% end %>
 
       <% if !@user.is_platinum? %>
         <%= menu.item do %>
           <%= link_to new_user_upgrade_path(user_id: @user.id) do %>
-            <i class="icon fas fa-gift"></i> Gift Upgrade
+            <%= gift_icon %> Gift Upgrade
           <% end %>
         <% end %>
       <% end %>
@@ -62,7 +63,7 @@
       <% if policy(UserFeedback.new(user: @user)).create? %>
         <%= menu.item do %>
           <%= link_to new_user_feedback_path(user_feedback: { user_id: @user.id }) do %>
-            <i class="icon fas fa-file-signature"></i> Give Feedback
+            <%= feedback_icon %> Give Feedback
           <% end %>
         <% end %>
       <% end %>
@@ -70,7 +71,7 @@
       <% if policy(CurrentUser.user).promote? %>
         <%= menu.item do %>
           <%= link_to edit_admin_user_path(@user.id) do %>
-            <i class="icon fas fa-user-plus"></i> Promote User
+            <%= promotion_icon %> Promote User
           <% end %>
         <% end %>
       <% end %>
@@ -78,7 +79,7 @@
       <% if policy(Ban.new(user: @user)).create? %>
         <%= menu.item do %>
           <%= link_to new_ban_path(ban: { user_id: @user.id }) do %>
-            <i class="icon fas fa-user-slash"></i> Ban User
+            <%= ban_icon %> Ban User
           <% end %>
         <% end %>
       <% end %>

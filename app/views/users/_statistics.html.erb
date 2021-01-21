@@ -47,13 +47,13 @@
               <% end %>
 
               <% if user.email_address.is_verified? %>
-                <i class="fas fa-check-circle user-verified-email-icon" title="Verified email"></i>
+                <%= checkmark_icon(class: "user-verified-email-icon", title: "Verified email") %>
               <% elsif user == CurrentUser.user %>
                 <%= link_to verify_user_email_path(user) do %>
-                  <i class="fas fa-exclamation-triangle user-unverified-email-icon" title="Unverified email. Click here to verify your email."></i>
+                  <%= exclamation_icon(class: "user-unverified-email-icon", title: "Unverified email. Click here to verify your email.") %>
                 <% end %>
               <% else %>
-                <i class="fas fa-exclamation-triangle user-email-unverified" title="Unverified email."></i>
+                <%= exclamation_icon(class: "user-email-unverified", title: "Unverified email") %>
               <% end %>
             <% else %>
               <em>none</em>

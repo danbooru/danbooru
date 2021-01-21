@@ -38,7 +38,7 @@
       <%= link_to recommended_posts_path(search: { post_id: post.id }), class: "more-recommended-posts", "data-post-id": post.id do %>
         <%= post.fav_count %>
 
-        <i class="far fa-heart fa-xs"></i>
+        <%= favorite_icon(class: "fa-xs") %>
 
         <br>more »
       <% end %>

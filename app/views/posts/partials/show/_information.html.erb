@@ -25,8 +25,8 @@
     <% if policy(PostVote).create? %>
       <%= tag.span id: "vote-links-for-post-#{post.id}", style: ("display: none;" if !@post.can_be_voted_by?(CurrentUser.user)) do %>
         (vote
-        <%= link_to tag.i(class: "far fa-thumbs-up"), post_post_votes_path(post_id: post.id, score: "up"), remote: true, method: :post %>
-        <%= link_to tag.i(class: "far fa-thumbs-down"), post_post_votes_path(post_id: post.id, score: "down"), remote: true, method: :post %>)
+        <%= link_to upvote_icon, post_post_votes_path(post_id: post.id, score: "up"), remote: true, method: :post %>
+        <%= link_to downvote_icon, post_post_votes_path(post_id: post.id, score: "down"), remote: true, method: :post %>)
       <% end %>
       <%= tag.span id: "unvote-link-for-post-#{post.id}", style: ("display: none;" if @post.can_be_voted_by?(CurrentUser.user)) do %>
         (<%= link_to "undo vote", post_post_votes_path(post), remote: true, method: :delete, class: "unvote-post-link" %>)

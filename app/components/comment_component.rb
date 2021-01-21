@@ -2,7 +2,7 @@
 
 class CommentComponent < ApplicationComponent
   attr_reader :comment, :context, :dtext_data, :current_user
-  delegate :link_to_user, :time_ago_in_words_tagged, :format_text, to: :helpers
+  delegate :link_to_user, :time_ago_in_words_tagged, :format_text, :edit_icon, :delete_icon, :undelete_icon, :flag_icon, to: :helpers
 
   def initialize(comment:, current_user:, context: nil, dtext_data: nil)
     @comment = comment

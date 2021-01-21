@@ -2,7 +2,7 @@
   <h2>Options</h2>
   <ul>
     <% if policy(SavedSearch).create? %>
-      <li><%= button_tag(tag.i(class: "fas fa-bookmark") + " Save search", id: "save-search", class: "ui-button ui-widget ui-corner-all sub") %></li>
+      <li><%= button_tag(bookmark_icon + " Save search", id: "save-search", class: "ui-button ui-widget ui-corner-all sub") %></li>
     <% end %>
   </ul>
 </section>
