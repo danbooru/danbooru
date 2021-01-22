@@ -135,4 +135,8 @@ module IconHelper
   def flag_icon(**options)
     icon_tag("fas fa-flag", **options)
   end
+
+  def link_icon(**options)
+    icon_tag("fas fa-link", **options)
+  end
 end
