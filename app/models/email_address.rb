@@ -82,4 +82,8 @@ class EmailAddress < ApplicationRecord
       id == verifier.verified(key)
     end
   end
+
+  def self.available_includes
+    [:user]
+  end
 end

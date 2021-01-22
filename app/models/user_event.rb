@@ -37,6 +37,10 @@ class UserEvent < ApplicationRecord
     q
   end
 
+  def self.available_includes
+    [:user, :user_session]
+  end
+
   concerning :ConstructorMethods do
     class_methods do
       # Build an event but don't save it yet. The caller is expected to update the user, which will save the event.

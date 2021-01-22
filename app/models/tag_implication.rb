@@ -150,4 +150,8 @@ class TagImplication < TagRelationship
       end
     end
   end
+
+  def self.available_includes
+    super + [:child_implications, :parent_implications]
+  end
 end
