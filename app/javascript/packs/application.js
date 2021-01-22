@@ -34,7 +34,7 @@ importAll(require.context('../../components', true, /\.s?css(?:\.erb)?$/));
 export { default as jQuery } from "jquery";
 export { default as Autocomplete } from '../src/javascripts/autocomplete.js.erb';
 export { default as Blacklist } from '../src/javascripts/blacklists.js';
-export { default as Comment } from '../src/javascripts/comments.js';
+export { default as CommentComponent } from "../../components/comment_component/comment_component.js";
 export { default as CurrentUser } from '../src/javascripts/current_user.js';
 export { default as Dtext } from '../src/javascripts/dtext.js';
 export { default as IqdbQuery } from '../src/javascripts/iqdb_queries.js';
