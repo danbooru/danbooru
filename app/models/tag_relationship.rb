@@ -60,11 +60,6 @@ class TagRelationship < ApplicationRecord
       where(status: status.downcase)
     end
 
-    def tag_matches(field, params)
-      return all if params.blank?
-      where(field => Tag.search(params).reorder(nil).select(:name))
-    end
-
     def search(params)
       q = search_attributes(params, :id, :created_at, :updated_at, :antecedent_name, :consequent_name, :reason, :creator, :approver, :forum_post, :forum_topic, :antecedent_tag, :consequent_tag, :antecedent_wiki, :consequent_wiki)
 
@@ -75,9 +70,6 @@ class TagRelationship < ApplicationRecord
       if params[:status].present?
         q = q.status_matches(params[:status])
       end
-
-      q = q.tag_matches(:antecedent_name, params[:antecedent_tag])
-      q = q.tag_matches(:consequent_name, params[:consequent_tag])
 
       if params[:category].present?
         q = q.joins(:consequent_tag).where("tags.category": params[:category].split)
