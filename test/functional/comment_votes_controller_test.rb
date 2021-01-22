@@ -44,6 +44,13 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
           should respond_to_search(user: {level: User::Levels::GOLD}).with { @vote }
         end
       end
+
+      context "compact variant" do
+        should "render" do
+          get_auth comment_votes_path(variant: "compact"), create(:moderator_user)
+          assert_response :success
+        end
+      end
     end
 
     context "create action" do

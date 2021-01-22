@@ -2,15 +2,7 @@
 
 <div id="c-comment-votes">
   <div id="a-index">
-    <%= search_form_for(comment_votes_path) do |f| %>
-      <%= f.input :user_name, label: "Voter", input_html: { value: params[:search][:user_name], "data-autocomplete": "user" } %>
-      <%= f.simple_fields_for :comment do |fc| %>
-        <%= fc.input :creator_name, label: "Commenter", input_html: { value: params.dig(:search, :comment, :creator_name), "data-autocomplete": "user" } %>
-        <%= fc.input :post_tags_match, label: "Tags", input_html: { value: params.dig(:search, :comment, :post_tags_match), "data-autocomplete": "tag-query" } %>
-      <% end %>
-      <%= f.input :score, collection: [["+1", "1"], ["-1", "-1"]], include_blank: true, selected: params[:search][:score] %>
-      <%= f.submit "Search" %>
-    <% end %>
+    <%= render "search" %>
 
     <%= table_for @comment_votes, class: "striped autofit" do |t| %>
       <% t.column "Post" do |vote| %>
