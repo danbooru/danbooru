@@ -35,8 +35,10 @@ class ApplicationController < ActionController::Base
       return
     end
 
+    model = options[0]&.delete(:model)
     if subject.respond_to?(:includes) && (request.format.json? || request.format.xml?)
-      associations = ParameterBuilder.includes_parameters(params[:only], model_name)
+      model ||= model_name
+      associations = ParameterBuilder.includes_parameters(params[:only], model)
       subject = subject.includes(associations)
     end
 
