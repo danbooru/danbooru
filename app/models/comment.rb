@@ -1,5 +1,4 @@
 class Comment < ApplicationRecord
-  validate :validate_creator_is_not_limited, :on => :create
   validates_presence_of :body, :message => "has no content"
   belongs_to :post
   belongs_to :creator, class_name: "User"
@@ -45,12 +44,6 @@ class Comment < ApplicationRecord
   end
 
   extend SearchMethods
-
-  def validate_creator_is_not_limited
-    if creator.is_comment_limited? && !do_not_bump_post?
-      errors.add(:base, "You can only post #{Danbooru.config.member_comment_limit} comments per hour")
-    end
-  end
 
   def autoreport_spam
     if SpamDetector.new(self).spam?

@@ -64,7 +64,6 @@ class UserPolicy < ApplicationPolicy
         custom_style favorite_count api_regen_multiplier
         api_burst_limit remaining_api_limit statement_timeout
         favorite_group_limit favorite_limit tag_query_limit
-        is_comment_limited?
         max_saved_searches theme
       ]
     end

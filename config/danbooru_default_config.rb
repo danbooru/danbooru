@@ -102,11 +102,6 @@ module Danbooru
       40
     end
 
-    # Members cannot post more than X comments in an hour.
-    def member_comment_limit
-      2
-    end
-
     # Maximum size of an upload. If you change this, you must also change
     # `client_max_body_size` in your nginx.conf.
     def max_file_size

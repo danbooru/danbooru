@@ -16,7 +16,6 @@ class CommentTest < ActiveSupport::TestCase
     context "that mentions a user" do
       setup do
         @post = FactoryBot.create(:post)
-        Danbooru.config.stubs(:member_comment_limit).returns(100)
       end
 
       context "added in an edit" do
@@ -82,10 +81,6 @@ class CommentTest < ActiveSupport::TestCase
     end
 
     context "created by an unlimited user" do
-      setup do
-        Danbooru.config.stubs(:member_comment_limit).returns(100)
-      end
-
       context "that is then deleted" do
         setup do
           @post = FactoryBot.create(:post)

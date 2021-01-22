@@ -490,14 +490,6 @@ class User < ApplicationRecord
       User.max_saved_searches(level)
     end
 
-    def is_comment_limited?
-      if is_gold?
-        false
-      else
-        Comment.where("creator_id = ? and created_at > ?", id, 1.hour.ago).count >= Danbooru.config.member_comment_limit
-      end
-    end
-
     def is_appeal_limited?
       return false if can_upload_free?
       upload_limit.free_upload_slots < UploadLimit::APPEAL_COST
