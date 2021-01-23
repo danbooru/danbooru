@@ -4,8 +4,9 @@ module IconHelper
     tag.i(class: "icon #{icon_class} #{klass}", **options)
   end
 
-  def svg_icon_tag(type, path, **options)
-    tag.svg(class: "icon svg-icon #{type}", role: "img", xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 448 512", **options) do
+  def svg_icon_tag(type, path, class: nil, **options)
+    klass = binding.local_variable_get(:class)
+    tag.svg(class: "icon svg-icon #{type} #{klass}", role: "img", xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 448 512", **options) do
       tag.path(fill: "currentColor", d: path)
     end
   end

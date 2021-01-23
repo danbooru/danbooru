@@ -8,7 +8,7 @@
 
   <span class="post-tooltip-score post-tooltip-info">
     <span><%= @post.score %></span>
-    <%= upvote_icon(class: "fa-xs") %>
+    <%= upvote_icon %>
   </span>
 
   <% if @post.last_commented_at.present? %>
