@@ -10,6 +10,7 @@ class PopupMenuComponent {
       target: "a.popup-menu-button",
       placement: "bottom-start",
       trigger: "click",
+      touch: "hold",
       animation: null,
       content: PopupMenuComponent.content,
     });
