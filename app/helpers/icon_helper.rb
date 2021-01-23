@@ -57,8 +57,12 @@ module IconHelper
     icon_tag("fas fa-bookmark", **options)
   end
 
-  def favorite_icon(**options)
+  def empty_heart_icon(**options)
     icon_tag("far fa-heart", **options)
+  end
+
+  def solid_heart_icon(**options)
+    icon_tag("fas fa-heart", **options)
   end
 
   def comments_icon(**options)
