@@ -50,3 +50,21 @@ $h4_padding: 0.8em 0 0.25em 0;
   font-weight: 900;
   content: $content;
 }
+
+@mixin active-link {
+  color: var(--link-color);
+
+  &:hover, &:focus {
+    background-color: var(--subnav-menu-background-color);
+    outline: none;
+  }
+}
+
+@mixin inactive-link {
+  color: var(--muted-text-color);
+
+  &:hover {
+    color: var(--link-hover-color);
+    background-color: var(--subnav-menu-background-color);
+  }
+}

@@ -1,3 +1,5 @@
+@import "../../javascript/src/styles/base/000_vars.scss";
+
 a:link {
   color: var(--link-color);
   text-decoration: none;
@@ -23,20 +25,11 @@ a.active {
 }
 
 a.active-link {
-  color: var(--link-color);
-
-  &:hover {
-    background-color: var(--subnav-menu-background-color);
-  }
+  @include active-link;
 }
 
 a.inactive-link {
-  color: var(--muted-text-color);
-
-  &:hover {
-    color: var(--link-hover-color);
-    background-color: var(--subnav-menu-background-color);
-  }
+  @include inactive-link;
 }
 
 a[rel*="external"] {

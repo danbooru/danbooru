@@ -1,4 +1,4 @@
-@import "../../javascript/src/styles/base/030_links.scss";
+@import "../../javascript/src/styles/base/000_vars.scss";
 
 div.popup-menu {
   display: inline-block;
@@ -14,12 +14,12 @@ div.popup-menu {
 
     // the popup menu is open
     &[aria-expanded="true"] {
-      @extend .active-link;
+      @include active-link;
     }
 
     // the popup menu is not open
     &:not([aria-expanded="true"]) {
-      @extend .inactive-link;
+      @include inactive-link;
     }
   }
 
