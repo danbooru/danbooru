@@ -14,6 +14,15 @@ class CommentVoteTest < ActiveSupport::TestCase
       should validate_inclusion_of(:score).in_array([-1, 1]).with_message("must be 1 or -1")
     end
 
+    should "not allow creating duplicate votes" do
+      v1 = create(:comment_vote, comment: @comment, user: @user)
+      v2 = build(:comment_vote, comment: @comment, user: @user)
+
+      assert_raise(ActiveRecord::RecordNotUnique) do
+        v2.save(validate: false)
+      end
+    end
+
     context "creating" do
       context "an upvote" do
         should "increment the comment's score" do

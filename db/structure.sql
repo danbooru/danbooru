@@ -5008,16 +5008,24 @@ CREATE INDEX index_comment_votes_on_user_id ON public.comment_votes USING btree 
 
 
 --
--- Name: index_comments_on_created_at; Type: INDEX; Schema: public; Owner: -
+-- Name: index_comment_votes_on_user_id_and_comment_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_comments_on_created_at ON public.comments USING btree (created_at);
+CREATE UNIQUE INDEX index_comment_votes_on_user_id_and_comment_id ON public.comment_votes USING btree (user_id, comment_id);
+
 
 --
 -- Name: index_comments_on_body_index; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_comments_on_body_index ON public.comments USING gin (body_index);
+
+
+--
+-- Name: index_comments_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_comments_on_created_at ON public.comments USING btree (created_at);
 
 
 --
@@ -7883,6 +7891,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210108030724'),
 ('20210110015410'),
 ('20210110090656'),
-('20210115015308');
+('20210115015308'),
+('20210123112752');
 
 
