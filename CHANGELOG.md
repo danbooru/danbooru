@@ -1,54 +1,50 @@
-## Unreleased
+## 2021-01-23
 
 ### Changes
 
-* The next/previous post navbar is now available to logged out users. This is
-  the navbar beneath posts that lets you move to the next or previous post in a
-  tag search. Previously this was only available to logged-in users.
+* Changed 'Shortlink' to 'Copy ID' in comment menu.
 
-* Removed the option to disable the next/previous post navbar.
+### Fixes
 
-* Removed the option to disable keyboard shortcuts.
+* Fixed favorite icon not being filled in on favorited posts.
+* Fixed series pool titles not being purple.
+* Fixed bug when a logged out user tried to logout again.
 
-* Removed the option to disable tag autocomplete.
+## 2021-01-22
 
-* You can now see the list of comments and forum posts you've reported to
-  the moderators at <https://danbooru.donmai.us/moderation_reports>.
+### Changes
 
-* Comment scores are now visible and the vote buttons have been reworked.
+* Comment system overhaul:
 
-* You can now see when a post has deleted comments. Deleted comments are now
-  replaced with the word `[deleted]`, instead of being completely hidden.
+  * Comment scores are now visible.
+  * The upvote and downvote buttons are now arrows.
+  * `[quote]` tags have a new appearance.
+  * The [Comments](https://danbooru.donmai.us/comments) page now shows 20 posts per page (before it was 5 posts per page).
+  * The comment report/edit/delete options are now hidden behind a menu.
+  * The comment menu has a "Shortlink" option that copies a comment #1234 link to the clipboard.
+  * Removed the rule that regular Members couldn't post more than 2 bumping comments per hour. Now there's no limit on the number of bumping comments you can post per hour.
+  * Removed the rule that you couldn't upvote your own comments.
+  * The way hidden comments work has changed. Now when comments are hidden, instead of being hidden completely, they're replaced with a [hidden] link that you can click to unhide the comment.
+  * The way deleted comments work has changed. Now when comments are deleted, they're replaced with a [deleted] placeholder, so you can see when a post has deleted comments.
+  * The default comment threshold has been lowered to -8. This means that comments are now hidden when their score is -8 and greyed out when their score is -4. You can edit your settings to change your threshold back. Note that a threshold of -1 in the new system is the same as a threshold of 0 in the old system. So don't set it back to 0, set it to -1. Also, the max threshold is now 5 and the minimum threshold is now -100.
+  * Mods can now click the comment score to see the list of voters.
 
-* The way downvoted comments work has changed. Instead of comments being
-  completely hidden when they get downvoted, and having to click "Show X hidden
-  comments" to see them, now they get collapsed and marked as `[hidden]`, and
-  you click the comment itself to unhide it.
+* Account settings:
 
-* The default comment threshold has been lowered to -8. This means that
-  comments are now hidden at -8 and greyed out at -4. If your threshold was
-  higher than this, it has been reset to -8. You can go to your settings to
-  change this.
+  * Removed the option to disable the next/previous post navbar under posts.
+  * Removed the option to disable keyboard shortcuts.
+  * Removed the option to disable tag autocomplete.
 
-* The maximum comment threshold is now 5 and the minumum threshold is now
-  -100. You can't set your threshold any higher or lower than this.
-
-* Removed the rule that you can't upvote your own comments.
-
-* Changed the way [quote] tags look. Now quotes are Reddit-style instead of
-  traditional forum style.
+* The next/previous post navbar is now available to logged out users. This is the navbar beneath posts that lets you move to the next or previous post in a tag search. Previously this was only available to logged in users.
+* You can now see the list of comments and forum posts you've reported to the moderators at [Moderation Reports](https://danbooru.donmai.us/moderation_reports).
 
 ### API Changes
 
-* Deleted comments now have some of their fields hidden in the API. The
-  `creator_id`, `updater_id`, and `body` fields are hidden if you're not a
-  moderator.
+* Deleted comments now have some of their fields hidden in the API. The creator_id, updater_id, and body fields are hidden if you're not a moderator.
+* The `POST /comment_votes` and `DELETE /comment_votes` endpoints now return a comment vote instead of a comment.
+* The `score` param in the `POST /comment_votes` endpoint now takes the values "1" or "-1", not "up" or "down".
 
-* The `POST /comment_votes` and `DELETE /comment_votes` endpoints now return a
-  comment vote instead of a comment.
-
-* The `score` param in the `POST /comment_votes` endpoint is now 1 or -1, not
-  `up` or `down`.
+Full changelog: https://github.com/danbooru/danbooru/compare/production-2021.01.13-021402-utc...production-2021.01.23-063752-utc
 
 ## 2021-01-12
 
