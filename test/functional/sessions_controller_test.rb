@@ -75,17 +75,24 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "destroy action" do
-      setup do
-        delete_auth session_path, @user
-      end
-
       should "clear the session" do
+        delete_auth session_path, @user
+
         assert_redirected_to posts_path
         assert_nil(session[:user_id])
       end
 
       should "generate a logout event" do
+        delete_auth session_path, @user
+
         assert_equal(true, @user.user_events.logout.exists?)
+      end
+
+      should "not fail if the user is already logged out" do
+        delete session_path
+
+        assert_redirected_to posts_path
+        assert_nil(session[:user_id])
       end
     end
 

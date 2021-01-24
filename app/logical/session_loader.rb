@@ -31,6 +31,7 @@ class SessionLoader
 
   def logout
     session.delete(:user_id)
+    return if CurrentUser.user.is_anonymous?
     UserEvent.create_from_request!(CurrentUser.user, :logout, request)
   end
 
