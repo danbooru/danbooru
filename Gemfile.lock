@@ -1,4 +1,13 @@
 GIT
+  remote: https://github.com/alpaca-tc/rails_panel
+  revision: 4133c4ee18d5bf6a98c5893c8cbe09c26b78a9de
+  branch: support_rails6_1
+  specs:
+    meta_request (0.7.2)
+      rack-contrib (>= 1.1, < 3)
+      railties (>= 3.0.0, < 7)
+
+GIT
   remote: https://github.com/danbooru/http-cookie
   revision: 382d8a641e4df226e0e7b0d2bfaeadb2fe71dd84
   specs:
@@ -258,6 +267,8 @@ GEM
       activesupport (>= 3.0.0)
     racc (1.5.2)
     rack (2.2.3)
+    rack-contrib (2.3.0)
+      rack (~> 2.0)
     rack-mini-profiler (2.3.0)
       rack (>= 1.2.0)
     rack-proxy (0.6.5)
@@ -429,6 +440,7 @@ DEPENDENCIES
   mail
   memoist
   memory_profiler
+  meta_request!
   minitest-ci
   minitest-reporters
   mocha

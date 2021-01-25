@@ -60,7 +60,7 @@ end
 group :development do
   gem 'rubocop'
   gem 'rubocop-rails'
-  # gem 'meta_request' # hangs on Rails 6.1
+  gem 'meta_request', git: "https://github.com/alpaca-tc/rails_panel", branch: "support_rails6_1"
   gem 'rack-mini-profiler'
   gem 'stackprof'
   gem 'flamegraph'
