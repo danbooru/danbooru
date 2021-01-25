@@ -1,6 +1,10 @@
 <% content_for(:secondary_links) do %>
   <%= subnav_link_to "Listing", posts_path %>
-  <%= subnav_link_to "Upload", new_upload_path %>
+  <% if CurrentUser.user.is_anonymous? %>
+    <%= subnav_link_to "Upload", login_path(url: new_upload_path) %>
+  <% else %>
+    <%= subnav_link_to "Upload", new_upload_path %>
+  <% end %>
   <%= subnav_link_to "Hot", posts_path(:tags => "order:rank", :d => "1") %>
   <% if RecommenderService.available_for_user?(CurrentUser.user) %>
     <%= subnav_link_to "Recommended", recommended_posts_path(search: { user_name: CurrentUser.user.name }) %>
