@@ -9,7 +9,6 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
-
 --
 -- Name: fuzzystrmatch; Type: EXTENSION; Schema: -; Owner: -
 --
@@ -39,6 +38,20 @@ COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching
 
 
 --
+-- Name: pgstattuple; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgstattuple WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pgstattuple; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pgstattuple IS 'show tuple-level statistics';
+
+
+--
 -- Name: favorites_insert_trigger(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -48,8 +61,7 @@ CREATE FUNCTION public.favorites_insert_trigger() RETURNS trigger
       begin
         if (NEW.user_id % 100 = 0) then
           insert into favorites_0 values (NEW.*);
-
-        elsif (NEW.user_id % 100 = 1) then
+                elsif (NEW.user_id % 100 = 1) then
           insert into favorites_1 values (NEW.*);
 
         elsif (NEW.user_id % 100 = 2) then
@@ -451,6 +463,7 @@ CREATE TABLE public.api_keys (
 --
 
 CREATE SEQUENCE public.api_keys_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -498,6 +511,7 @@ CREATE TABLE public.artist_commentaries (
 --
 
 CREATE SEQUENCE public.artist_commentaries_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -535,6 +549,7 @@ CREATE TABLE public.artist_commentary_versions (
 --
 
 CREATE SEQUENCE public.artist_commentary_versions_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -569,6 +584,7 @@ CREATE TABLE public.artist_urls (
 --
 
 CREATE SEQUENCE public.artist_urls_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -608,6 +624,7 @@ CREATE TABLE public.artist_versions (
 --
 
 CREATE SEQUENCE public.artist_versions_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -643,6 +660,7 @@ CREATE TABLE public.artists (
 --
 
 CREATE SEQUENCE public.artists_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -677,6 +695,7 @@ CREATE TABLE public.bans (
 --
 
 CREATE SEQUENCE public.bans_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -714,6 +733,7 @@ CREATE TABLE public.bulk_update_requests (
 --
 
 CREATE SEQUENCE public.bulk_update_requests_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -747,6 +767,7 @@ CREATE TABLE public.comment_votes (
 --
 
 CREATE SEQUENCE public.comment_votes_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -788,6 +809,7 @@ CREATE TABLE public.comments (
 --
 
 CREATE SEQUENCE public.comments_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -827,6 +849,7 @@ CREATE TABLE public.delayed_jobs (
 --
 
 CREATE SEQUENCE public.delayed_jobs_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -867,6 +890,7 @@ CREATE TABLE public.dmails (
 --
 
 CREATE SEQUENCE public.dmails_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -970,6 +994,7 @@ CREATE TABLE public.favorite_groups (
 --
 
 CREATE SEQUENCE public.favorite_groups_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2000,6 +2025,7 @@ INHERITS (public.favorites);
 --
 
 CREATE SEQUENCE public.favorites_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2069,6 +2095,7 @@ CREATE TABLE public.forum_posts (
 --
 
 CREATE SEQUENCE public.forum_posts_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2102,6 +2129,7 @@ CREATE TABLE public.forum_topic_visits (
 --
 
 CREATE SEQUENCE public.forum_topic_visits_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2142,6 +2170,7 @@ CREATE TABLE public.forum_topics (
 --
 
 CREATE SEQUENCE public.forum_topics_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2226,7 +2255,7 @@ CREATE TABLE public.posts (
     bit_flags bigint DEFAULT 0 NOT NULL,
     tag_count_meta integer DEFAULT 0 NOT NULL
 );
-ALTER TABLE ONLY public.posts ALTER COLUMN tag_index SET STATISTICS 2000;
+ALTER TABLE ONLY public.posts ALTER COLUMN tag_index SET STATISTICS 3000;
 
 
 --
@@ -2367,6 +2396,7 @@ CREATE TABLE public.ip_bans (
 --
 
 CREATE SEQUENCE public.ip_bans_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2443,6 +2473,7 @@ CREATE TABLE public.mod_actions (
 --
 
 CREATE SEQUENCE public.mod_actions_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2510,6 +2541,7 @@ CREATE TABLE public.news_updates (
 --
 
 CREATE SEQUENCE public.news_updates_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2529,6 +2561,7 @@ ALTER SEQUENCE public.news_updates_id_seq OWNED BY public.news_updates.id;
 --
 
 CREATE SEQUENCE public.note_versions_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2568,6 +2601,7 @@ CREATE TABLE public.notes (
 --
 
 CREATE SEQUENCE public.notes_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2599,6 +2633,7 @@ CREATE TABLE public.pixiv_ugoira_frame_data (
 --
 
 CREATE SEQUENCE public.pixiv_ugoira_frame_data_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2635,6 +2670,7 @@ CREATE TABLE public.pools (
 --
 
 CREATE SEQUENCE public.pools_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2669,6 +2705,7 @@ CREATE TABLE public.post_appeals (
 --
 
 CREATE SEQUENCE public.post_appeals_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2701,6 +2738,7 @@ CREATE TABLE public.post_approvals (
 --
 
 CREATE SEQUENCE public.post_approvals_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2735,6 +2773,7 @@ CREATE TABLE public.post_disapprovals (
 --
 
 CREATE SEQUENCE public.post_disapprovals_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2770,6 +2809,7 @@ CREATE TABLE public.post_flags (
 --
 
 CREATE SEQUENCE public.post_flags_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2814,6 +2854,7 @@ CREATE TABLE public.post_replacements (
 --
 
 CREATE SEQUENCE public.post_replacements_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2847,6 +2888,7 @@ CREATE TABLE public.post_votes (
 --
 
 CREATE SEQUENCE public.post_votes_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2866,6 +2908,7 @@ ALTER SEQUENCE public.post_votes_id_seq OWNED BY public.post_votes.id;
 --
 
 CREATE SEQUENCE public.posts_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2899,6 +2942,7 @@ CREATE TABLE public.saved_searches (
 --
 
 CREATE SEQUENCE public.saved_searches_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2946,6 +2990,7 @@ CREATE TABLE public.tag_aliases (
 --
 
 CREATE SEQUENCE public.tag_aliases_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2984,6 +3029,7 @@ CREATE TABLE public.tag_implications (
 --
 
 CREATE SEQUENCE public.tag_implications_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3018,6 +3064,7 @@ CREATE TABLE public.tags (
 --
 
 CREATE SEQUENCE public.tags_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3084,6 +3131,7 @@ CREATE TABLE public.uploads (
 --
 
 CREATE SEQUENCE public.uploads_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3152,6 +3200,7 @@ CREATE TABLE public.user_feedback (
 --
 
 CREATE SEQUENCE public.user_feedback_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3185,6 +3234,7 @@ CREATE TABLE public.user_name_change_requests (
 --
 
 CREATE SEQUENCE public.user_name_change_requests_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3272,6 +3322,7 @@ ALTER SEQUENCE public.user_upgrades_id_seq OWNED BY public.user_upgrades.id;
 --
 
 CREATE SEQUENCE public.users_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3291,6 +3342,7 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 --
 
 CREATE SEQUENCE public.wiki_page_versions_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -3327,6 +3379,7 @@ CREATE TABLE public.wiki_pages (
 --
 
 CREATE SEQUENCE public.wiki_pages_id_seq
+    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -4568,6 +4621,7 @@ ALTER TABLE ONLY public.ip_geolocations
     ADD CONSTRAINT ip_geolocations_pkey PRIMARY KEY (id);
 
 
+--
 -- Name: mod_actions mod_actions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4685,6 +4739,14 @@ ALTER TABLE ONLY public.posts
 
 ALTER TABLE ONLY public.saved_searches
     ADD CONSTRAINT saved_searches_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: schema_migrations schema_migrations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.schema_migrations
+    ADD CONSTRAINT schema_migrations_pkey PRIMARY KEY (version);
 
 
 --
@@ -6820,6 +6882,7 @@ CREATE INDEX index_ip_geolocations_on_time_zone ON public.ip_geolocations USING 
 CREATE INDEX index_ip_geolocations_on_updated_at ON public.ip_geolocations USING btree (updated_at);
 
 
+--
 -- Name: index_mod_actions_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7177,13 +7240,6 @@ CREATE INDEX index_posts_on_pixiv_id ON public.posts USING btree (pixiv_id) WHER
 
 
 --
--- Name: index_posts_on_source; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_posts_on_source ON public.posts USING btree (lower((source)::text));
-
-
---
 -- Name: index_posts_on_source_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7191,10 +7247,10 @@ CREATE INDEX index_posts_on_source_trgm ON public.posts USING gin (source public
 
 
 --
--- Name: index_posts_on_tags_index; Type: INDEX; Schema: public; Owner: -
+-- Name: index_posts_on_tag_index; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_posts_on_tags_index ON public.posts USING gin (tag_index);
+CREATE INDEX index_posts_on_tag_index ON public.posts USING gin (tag_index);
 
 
 --
@@ -7878,7 +7934,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20200403210353'),
 ('20200406054838'),
 ('20200427190519'),
-('20200520060951'),
 ('20200803022359'),
 ('20200816175151'),
 ('20201201211748'),
@@ -7892,6 +7947,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210110015410'),
 ('20210110090656'),
 ('20210115015308'),
-('20210123112752');
+('20210123112752'),
+('20210127000201');
 
 
