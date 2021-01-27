@@ -2,6 +2,10 @@ require 'test_helper'
 
 class UserUpgradesControllerTest < ActionDispatch::IntegrationTest
   context "The user upgrades controller" do
+    setup do
+      skip unless UserUpgrade.enabled?
+    end
+
     context "new action" do
       should "render for a self upgrade to Gold" do
         @user = create(:user)

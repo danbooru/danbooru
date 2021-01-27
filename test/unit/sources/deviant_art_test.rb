@@ -275,6 +275,7 @@ module Sources
 
     context "The source for a non-downloadable flash file" do
       should "return working image url" do
+        skip
         @site = Sources::Strategies.find("https://www.deviantart.com/heartgear/art/SL-40v3-522007633")
 
         # md5: 6adf1a3d532f898f44cf9948cbc7db7d

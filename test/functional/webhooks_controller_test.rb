@@ -10,6 +10,7 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
   end
 
   def post_webhook(*args, metadata: {}, payment_status: "paid")
+    skip unless UserUpgrade.enabled?
     event = StripeMock.mock_webhook_event(*args, payment_status: payment_status, metadata: metadata)
     signature = generate_stripe_signature(event)
     headers = { "Stripe-Signature": signature }
