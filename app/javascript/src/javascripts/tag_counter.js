@@ -1,5 +1,5 @@
 import { h, Component, render } from "preact";
-import { observable, computed, action } from "mobx";
+import { makeObservable, observable, computed, action } from "mobx";
 import { observer } from "mobx-react";
 
 import Utility from "./utility";
@@ -9,6 +9,11 @@ export default @observer class TagCounter extends Component {
   static highCount = 20;
 
   @observable tagCount = 0;
+
+  constructor() {
+    super();
+    makeObservable(this);
+  }
 
   componentDidMount() {
     $(this.props.tags).on("input", this.updateCount);
