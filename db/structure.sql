@@ -7240,6 +7240,13 @@ CREATE INDEX index_posts_on_pixiv_id ON public.posts USING btree (pixiv_id) WHER
 
 
 --
+-- Name: index_posts_on_rating; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_rating ON public.posts USING btree (rating) WHERE (rating <> 's'::bpchar);
+
+
+--
 -- Name: index_posts_on_source_trgm; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7948,6 +7955,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210110090656'),
 ('20210115015308'),
 ('20210123112752'),
-('20210127000201');
+('20210127000201'),
+('20210127012303');
 
 
