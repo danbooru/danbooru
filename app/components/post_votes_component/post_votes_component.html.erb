@@ -1,0 +1,19 @@
+<span class="post-votes" data-id="<%= post.id %>">
+  <% if can_vote? %>
+    <% if upvoted? %>
+      <%= link_to upvote_icon, post_post_votes_path(post_id: post.id), class: "post-upvote-link post-unvote-link active-link", method: :delete, remote: true %>
+    <% else %>
+      <%= link_to upvote_icon, post_post_votes_path(post_id: post.id, score: "up"), class: "post-upvote-link inactive-link", method: :post, remote: true %>
+    <% end %>
+  <% end %>
+
+  <span class="post-score"><%= post.score %></span>
+
+  <% if can_vote? %>
+    <% if downvoted? %>
+      <%= link_to downvote_icon, post_post_votes_path(post_id: post.id), class: "post-downvote-link post-unvote-link active-link", method: :delete, remote: true %>
+    <% else %>
+      <%= link_to downvote_icon, post_post_votes_path(post_id: post.id, score: "down"), class: "post-downvote-link inactive-link", method: :post, remote: true %>
+    <% end %>
+  <% end %>
+</span>

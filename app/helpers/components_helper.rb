@@ -14,4 +14,8 @@ module ComponentsHelper
   def render_comment_section(post, **options)
     render CommentSectionComponent.new(post: post, **options)
   end
+
+  def render_post_votes(post, **options)
+    render PostVotesComponent.new(post: post, **options)
+  end
 end

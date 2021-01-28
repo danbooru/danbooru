@@ -28,12 +28,7 @@
 
       <span class="info">
         <strong>Score</strong>
-        <span>
-          <span id="score-for-post-<%= post.id %>"><%= post.score %></span>
-          <% if policy(PostVote).create? %>
-            (vote <%= link_to upvote_icon, post_post_votes_path(score: "up", post_id: post.id), remote: true, method: :post %>/<%= link_to downvote_icon, post_post_votes_path(score: "down", post_id: post.id), remote: true, method: :post %>)
-          <% end %>
-        </span>
+        <%= render_post_votes post, current_user: CurrentUser.user %>
       </span>
     </div>
 

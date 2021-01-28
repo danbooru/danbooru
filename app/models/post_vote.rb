@@ -33,6 +33,14 @@ class PostVote < ApplicationRecord
     end
   end
 
+  def is_positive?
+    score > 0
+  end
+
+  def is_negative?
+    score < 0
+  end
+
   def update_post_on_create
     if score > 0
       Post.where(:id => post_id).update_all("score = score + #{score}, up_score = up_score + #{score}")

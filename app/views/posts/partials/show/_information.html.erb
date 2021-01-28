@@ -21,17 +21,8 @@
   </li>
   <li id="post-info-source">Source: <%= post_source_tag(post.source, post.normalized_source) %></li>
   <li id="post-info-rating">Rating: <%= post.pretty_rating %></li>
-  <li id="post-info-score">Score: <span id="score-for-post-<%= post.id %>"><%= post.score %></span>
-    <% if policy(PostVote).create? %>
-      <%= tag.span id: "vote-links-for-post-#{post.id}", style: ("display: none;" if !@post.can_be_voted_by?(CurrentUser.user)) do %>
-        (vote
-        <%= link_to upvote_icon, post_post_votes_path(post_id: post.id, score: "up"), remote: true, method: :post %>
-        <%= link_to downvote_icon, post_post_votes_path(post_id: post.id, score: "down"), remote: true, method: :post %>)
-      <% end %>
-      <%= tag.span id: "unvote-link-for-post-#{post.id}", style: ("display: none;" if @post.can_be_voted_by?(CurrentUser.user)) do %>
-        (<%= link_to "undo vote", post_post_votes_path(post), remote: true, method: :delete, class: "unvote-post-link" %>)
-      <% end %>
-    <% end %>
+  <li id="post-info-score">
+    Score: <%= render_post_votes post, current_user: CurrentUser.user %>
   </li>
   <li id="post-info-favorites">Favorites: <span id="favcount-for-post-<%= post.id %>"><%= post.fav_count %></span>
     <% if policy(post).can_view_favlist? %>
