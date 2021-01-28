@@ -11,6 +11,8 @@ globals:
 parser: babel-eslint
 plugins:
   - babel
+ignorePatterns:
+  - app/javascript/vendor/**/*.js
 rules:
   # https://eslint.org/docs/rules/
   array-callback-return: error
@@ -29,7 +31,7 @@ rules:
   no-lone-blocks: error
   no-lonely-if: error
   no-mixed-operators: error
-  no-new: error
+  no-new: warn
   no-new-wrappers: error
   no-return-assign: error
   no-self-compare: error

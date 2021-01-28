@@ -1,8 +1,15 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'development'
 
-const environment = require('./environment')
-const eslint = require('./loaders/eslint')
+const { merge } = require('@rails/webpacker')
+const webpackConfig = require('./base');
+const ESLintPlugin = require('eslint-webpack-plugin');
 
-environment.loaders.append('eslint', eslint);
-
-module.exports = environment.toWebpackConfig()
+module.exports = merge(webpackConfig, {
+  plugins: [
+    new ESLintPlugin({
+      cache: true,
+      threads: true,
+      emitWarning: true
+    })
+  ]
+});

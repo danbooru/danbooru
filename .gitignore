@@ -1,4 +1,5 @@
 .env.*
+.eslintcache
 .yarn-integrity
 .gitconfig
 .git/

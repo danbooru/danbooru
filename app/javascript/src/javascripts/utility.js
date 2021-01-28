@@ -114,7 +114,8 @@ Utility.regexp_escape = function(string) {
 }
 
 Utility.regexp_split = function(string) {
-  return [...new Set(String(string === null || string === undefined ? "" : string).match(/\S+/g))];
+  string ??= "";
+  return string.match(/\S+/g) ?? [];
 }
 
 $.fn.selectEnd = function() {

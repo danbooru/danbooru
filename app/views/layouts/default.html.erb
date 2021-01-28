@@ -16,8 +16,8 @@
   <% if CurrentUser.user.blacklisted_tags.present? %>
     <meta name="blacklisted-tags" content="<%= CurrentUser.user.blacklisted_tags.gsub(/(?:\r|\n)+/, ",") %>">
   <% end %>
-  <%= javascript_pack_tag "application" %>
-  <%= stylesheet_pack_tag "application" %>
+  <%= javascript_packs_with_chunks_tag "application" %>
+  <%= stylesheet_packs_with_chunks_tag "application" %>
   <% if CurrentUser.user.custom_style.present? && params.fetch(:css, "true").truthy?  %>
     <%= stylesheet_link_tag custom_style_users_path(md5: Digest::MD5.hexdigest(CurrentUser.user.custom_style)), media: "screen" %>
   <% end %>
