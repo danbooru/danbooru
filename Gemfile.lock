@@ -269,7 +269,7 @@ GEM
     rack (2.2.3)
     rack-contrib (2.3.0)
       rack (~> 2.0)
-    rack-mini-profiler (2.3.0)
+    rack-mini-profiler (2.3.1)
       rack (>= 1.2.0)
     rack-proxy (0.6.5)
       rack
@@ -392,7 +392,7 @@ GEM
       unicorn (>= 4, < 6)
     view_component (2.25.0)
       activesupport (>= 5.0.0, < 7.0)
-    webpacker (6.0.0.pre.2)
+    webpacker (6.0.0.beta.4)
       activesupport (>= 5.2)
       rack-proxy (>= 0.6.1)
       railties (>= 5.2)
@@ -479,7 +479,7 @@ DEPENDENCIES
   unicorn
   unicorn-worker-killer
   view_component
-  webpacker (>= 4.0.x)
+  webpacker (= 6.0.0.beta.4)
   whenever
 
 BUNDLED WITH

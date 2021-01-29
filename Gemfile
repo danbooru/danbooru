@@ -30,7 +30,7 @@ gem 'addressable'
 gem 'rakismet'
 gem 'recaptcha', require: "recaptcha/rails"
 gem 'activemodel-serializers-xml'
-gem 'webpacker', '>= 4.0.x'
+gem 'webpacker', '= 6.0.0.beta.4'
 gem 'rake'
 gem 'redis'
 gem 'builder'
