@@ -24,6 +24,7 @@
   --form-input-background: var(--body-background-color);
   --form-input-border: 1px solid #CCC;
   --form-input-placeholder-text-color: grey;
+  --form-input-validation-error-border-color: red;
   --form-button-text-color: var(--form-input-text-color);
   --form-button-background: #EEE;
   --form-button-border: var(--form-input-border);
@@ -329,6 +330,7 @@ body[data-current-user-theme="dark"] {
   --form-input-background: var(--grey-3);
   --form-input-border: 1px solid var(--grey-4);
   --form-input-placeholder-text-color: var(--grey-4);
+  --form-input-validation-error-border-color: var(--red-1);
   --form-button-text-color: var(--grey-1);
   --form-button-background: var(--grey-5);
   --form-button-border: 1px solid var(--grey-4);

@@ -11,7 +11,6 @@ require('jquery-hotkeys');
 importAll(require.context('../vendor', true, /\.js$/));
 
 require('jquery');
-require("jquery-ui/ui/effects/effect-shake");
 require("jquery-ui/ui/widgets/autocomplete");
 require("jquery-ui/ui/widgets/button");
 require("jquery-ui/ui/widgets/dialog");

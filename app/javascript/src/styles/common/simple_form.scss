@@ -39,6 +39,10 @@ form.simple_form {
       padding-left: 1em;
     }
 
+    input.validation-error {
+      border: 1px solid var(--form-input-validation-error-border-color);
+    }
+
     &.text, &.dtext {
       .hint {
         padding-left: 0;
