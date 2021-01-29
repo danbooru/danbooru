@@ -46,52 +46,94 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
 
     context "create action" do
       should "not allow anonymous users to vote" do
-        post post_post_votes_path(post_id: @post.id), params: {:score => "up", :format => "js"}
+        post post_post_votes_path(post_id: @post.id), params: { score: 1, format: "js" }
+
         assert_response 403
         assert_equal(0, @post.reload.score)
       end
 
       should "not allow banned users to vote" do
-        @banned = create(:user)
-        @ban = create(:ban, user: @banned)
-        post_auth post_post_votes_path(post_id: @post.id), @banned, params: {:score => "up", :format => "js"}
+        post_auth post_post_votes_path(post_id: @post.id), create(:banned_user), params: { score: 1, format: "js"}
+
         assert_response 403
         assert_equal(0, @post.reload.score)
       end
 
       should "not allow members to vote" do
-        @member = create(:member_user)
-        post_auth post_post_votes_path(post_id: @post.id), @member, params: {:score => "up", :format => "js"}
+        post_auth post_post_votes_path(post_id: @post.id), create(:user), params: { score: 1, format: "js" }
+
         assert_response 403
         assert_equal(0, @post.reload.score)
       end
 
+      should "not allow invalid scores" do
+        post_auth post_post_votes_path(post_id: @post.id), @user, params: { score: 3, format: "js" }
+
+        assert_response 200
+        assert_equal(0, @post.reload.score)
+        assert_equal(0, @post.up_score)
+        assert_equal(0, @post.votes.count)
+      end
+
       should "increment a post's score if the score is positive" do
-        post_auth post_post_votes_path(post_id: @post.id), @user, params: {:score => "up", :format => "js"}
+        post_auth post_post_votes_path(post_id: @post.id), @user, params: { score: 1, format: "js" }
+
         assert_response :success
-        @post.reload
-        assert_equal(1, @post.score)
+        assert_equal(1, @post.reload.score)
+        assert_equal(1, @post.up_score)
+        assert_equal(1, @post.votes.count)
+      end
+
+      should "decrement a post's score if the score is negative" do
+        post_auth post_post_votes_path(post_id: @post.id), @user, params: { score: -1, format: "js" }
+
+        assert_response :success
+        assert_equal(-1, @post.reload.score)
+        assert_equal(-1, @post.down_score)
+        assert_equal(1, @post.votes.count)
       end
 
       context "for a post that has already been voted on" do
-        should "not create another vote" do
-          @post.vote!("up", @user)
-          assert_no_difference("PostVote.count") do
-            post_auth post_post_votes_path(post_id: @post.id), @user, params: { score: "up", format: "js" }
-            assert_response 422
+        should "replace the vote" do
+          @post.vote!(1, @user)
+
+          assert_no_difference("@post.votes.count") do
+            post_auth post_post_votes_path(post_id: @post.id), @user, params: { score: -1, format: "js" }
+
+            assert_response :success
+            assert_equal(-1, @post.reload.score)
+            assert_equal(0, @post.up_score)
+            assert_equal(-1, @post.down_score)
           end
         end
       end
     end
 
     context "destroy action" do
-      should "remove a vote" do
-        as(@user) { create(:post_vote, post_id: @post.id, user_id: @user.id) }
+      should "do nothing for anonymous users" do
+        delete post_post_votes_path(post_id: @post.id), xhr: true
 
-        assert_difference("PostVote.count", -1) do
-          delete_auth post_post_votes_path(post_id: @post.id), @user, as: :javascript
-          assert_redirected_to @post
-        end
+        assert_response 200
+        assert_equal(0, @post.reload.score)
+      end
+
+      should "do nothing if the post hasn't been voted on" do
+        delete_auth post_post_votes_path(post_id: @post.id), @user, xhr: true
+
+        assert_response :success
+        assert_equal(0, @post.reload.score)
+        assert_equal(0, @post.down_score)
+        assert_equal(0, @post.votes.count)
+      end
+
+      should "remove a vote" do
+        @post.vote!(1, @user)
+        delete_auth post_post_votes_path(post_id: @post.id), @user, xhr: true
+
+        assert_response :success
+        assert_equal(0, @post.reload.score)
+        assert_equal(0, @post.down_score)
+        assert_equal(0, @post.votes.count)
       end
     end
   end

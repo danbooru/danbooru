@@ -34,7 +34,7 @@ class PostVotesComponentTest < ViewComponent::TestCase
 
       context "for a downvoted post" do
         should "highlight the downvote button as active" do
-          @post.vote!("down", @user)
+          @post.vote!(-1, @user)
           render_post_votes(@post, current_user: @user)
 
           assert_css(".post-upvote-link.inactive-link")
@@ -44,7 +44,7 @@ class PostVotesComponentTest < ViewComponent::TestCase
 
       context "for an upvoted post" do
         should "highlight the upvote button as active" do
-          @post.vote!("up", @user)
+          @post.vote!(1, @user)
           render_post_votes(@post, current_user: @user)
 
           assert_css(".post-upvote-link.active-link")

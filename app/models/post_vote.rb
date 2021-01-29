@@ -1,15 +1,12 @@
 class PostVote < ApplicationRecord
-  class Error < StandardError; end
-
   belongs_to :post
   belongs_to :user
-  attr_accessor :vote
 
-  after_initialize :initialize_attributes, if: :new_record?
-  validates_presence_of :score
-  validates_inclusion_of :score, in: [1, -1]
-  after_create :update_post_on_create
-  after_destroy :update_post_on_destroy
+  validates :user_id, uniqueness: { scope: :post_id, message: "have already voted for this post" }
+  validates :score, inclusion: { in: [1, -1], message: "must be 1 or -1" }
+
+  after_create :update_score_after_create
+  after_destroy :update_score_after_destroy
 
   scope :positive, -> { where("post_votes.score > 0") }
   scope :negative, -> { where("post_votes.score < 0") }
@@ -23,16 +20,6 @@ class PostVote < ApplicationRecord
     q.apply_default_order(params)
   end
 
-  def initialize_attributes
-    self.user_id ||= CurrentUser.id
-
-    if vote == "up"
-      self.score = 1
-    elsif vote == "down"
-      self.score = -1
-    end
-  end
-
   def is_positive?
     score > 0
   end
@@ -41,19 +28,19 @@ class PostVote < ApplicationRecord
     score < 0
   end
 
-  def update_post_on_create
-    if score > 0
-      Post.where(:id => post_id).update_all("score = score + #{score}, up_score = up_score + #{score}")
+  def update_score_after_create
+    if is_positive?
+      Post.update_counters(post_id, { score: score, up_score: score })
     else
-      Post.where(:id => post_id).update_all("score = score + #{score}, down_score = down_score + #{score}")
+      Post.update_counters(post_id, { score: score, down_score: score })
     end
   end
 
-  def update_post_on_destroy
-    if score > 0
-      Post.where(:id => post_id).update_all("score = score - #{score}, up_score = up_score - #{score}")
+  def update_score_after_destroy
+    if is_positive?
+      Post.update_counters(post_id, { score: -score, up_score: -score })
     else
-      Post.where(:id => post_id).update_all("score = score - #{score}, down_score = down_score - #{score}")
+      Post.update_counters(post_id, { score: -score, down_score: -score })
     end
   end
 

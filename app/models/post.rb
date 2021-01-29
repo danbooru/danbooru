@@ -633,7 +633,8 @@ class Post < ApplicationRecord
           remove_favorite(CurrentUser.user)
 
         when /^(up|down)vote:(.+)$/i
-          vote!($1)
+          score = ($1 == "up" ? 1 : -1)
+          vote!(score, CurrentUser.user)
 
         when /^status:active$/i
           raise User::PrivilegeError unless CurrentUser.is_approver?
@@ -779,8 +780,7 @@ class Post < ApplicationRecord
 
     def add_favorite!(user)
       Favorite.add(post: self, user: user)
-      vote!("up", user) if Pundit.policy!(user, PostVote).create?
-    rescue PostVote::Error
+      vote!(1, user)
     end
 
     def delete_user_from_fav_string(user_id)
@@ -789,8 +789,7 @@ class Post < ApplicationRecord
 
     def remove_favorite!(user)
       Favorite.remove(post: self, user: user)
-      unvote!(user) if Pundit.policy!(user, PostVote).create?
-    rescue PostVote::Error
+      unvote!(user)
     end
 
     def remove_favorite(user)
@@ -871,30 +870,22 @@ class Post < ApplicationRecord
   end
 
   module VoteMethods
-    def can_be_voted_by?(user)
-      !PostVote.exists?(:user_id => user.id, :post_id => id)
+    def vote!(score, voter)
+      # Ignore vote if user doesn't have permission to vote.
+      return unless Pundit.policy!(voter, PostVote).create?
+
+      with_lock do
+        votes.destroy_by(user: voter)
+        votes.create!(user: voter, score: score)
+        reload # PostVote.create modifies our score. Reload to get the new score.
+      end
     end
 
-    def vote!(vote, voter = CurrentUser.user)
-      unless Pundit.policy!(voter, PostVote).create?
-        raise PostVote::Error.new("You do not have permission to vote")
-      end
+    def unvote!(voter)
+      return unless Pundit.policy!(voter, PostVote).create?
 
-      unless can_be_voted_by?(voter)
-        raise PostVote::Error.new("You have already voted for this post")
-      end
-
-      votes.create!(user: voter, vote: vote)
-      reload # PostVote.create modifies our score. Reload to get the new score.
-    end
-
-    def unvote!(voter = CurrentUser.user)
-      if can_be_voted_by?(voter)
-        raise PostVote::Error.new("You have not voted for this post")
-      else
-        votes.where(user: voter).destroy_all
-        reload
-      end
+      votes.destroy_by(user: voter)
+      reload
     end
   end
 

@@ -4,6 +4,6 @@ class PostVotePolicy < ApplicationPolicy
   end
 
   def destroy?
-    unbanned? && user.is_gold?
+    unbanned? && record.user == user
   end
 end

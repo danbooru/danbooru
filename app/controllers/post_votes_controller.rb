@@ -1,7 +1,6 @@
 class PostVotesController < ApplicationController
   skip_before_action :api_check
   respond_to :js, :json, :xml, :html
-  rescue_with PostVote::Error, status: 422
 
   def index
     @post_votes = authorize PostVote.visible(CurrentUser.user).paginated_search(params, count_pages: true)
@@ -11,16 +10,23 @@ class PostVotesController < ApplicationController
   end
 
   def create
-    @post = authorize Post.find(params[:post_id]), policy_class: PostVotePolicy
-    @post.vote!(params[:score])
+    @post = Post.find(params[:post_id])
 
-    respond_with(@post)
+    @post.with_lock do
+      @post_vote = authorize PostVote.new(post: @post, score: params[:score], user: CurrentUser.user)
+      PostVote.where(post: @post, user: CurrentUser.user).destroy_all
+      @post_vote.save
+    end
+
+    flash.now[:notice] = @post_vote.errors.full_messages.join("; ") if @post_vote.errors.present?
+    respond_with(@post_vote)
   end
 
   def destroy
-    @post = authorize Post.find(params[:post_id]), policy_class: PostVotePolicy
-    @post.unvote!
+    @post = Post.find(params[:post_id])
+    @post_vote = @post.votes.find_by(user: CurrentUser.user)
 
-    respond_with(@post)
+    authorize(@post_vote).destroy if @post_vote
+    respond_with(@post_vote)
   end
 end

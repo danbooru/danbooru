@@ -2,9 +2,8 @@ class CommentVote < ApplicationRecord
   belongs_to :comment
   belongs_to :user
 
-  validates_presence_of :score
-  validates_uniqueness_of :user_id, :scope => :comment_id, :message => "have already voted for this comment"
-  validates_inclusion_of :score, :in => [-1, 1], :message => "must be 1 or -1"
+  validates :user_id, uniqueness: { scope: :comment_id, message: "have already voted for this comment" }
+  validates :score, inclusion: { in: [-1, 1], message: "must be 1 or -1" }
 
   after_create :update_score_after_create
   after_destroy :update_score_after_destroy

@@ -1162,19 +1162,19 @@ class PostTest < ActiveSupport::TestCase
           context "upvote:self or downvote:self" do
             context "by a member" do
               should "not upvote the post" do
-                assert_raises PostVote::Error do
-                  @post.update(:tag_string => "upvote:self")
+                assert_no_difference("PostVote.count") do
+                  @post.update(tag_string: "upvote:self")
                 end
 
-                assert_equal(0, @post.score)
+                assert_equal(0, @post.reload.score)
               end
 
               should "not downvote the post" do
-                assert_raises PostVote::Error do
-                  @post.update(:tag_string => "downvote:self")
+                assert_no_difference("PostVote.count") do
+                  @post.update(tag_string: "downvote:self")
                 end
 
-                assert_equal(0, @post.score)
+                assert_equal(0, @post.reload.score)
               end
             end
 
@@ -1832,50 +1832,63 @@ class PostTest < ActiveSupport::TestCase
 
   context "Voting:" do
     should "not allow members to vote" do
-      @user = FactoryBot.create(:user)
-      @post = FactoryBot.create(:post)
-      as(@user) do
-        assert_raises(PostVote::Error) { @post.vote!("up") }
-      end
+      user = create(:user)
+      post = create(:post)
+
+      assert_nothing_raised { post.vote!(1, user) }
+      assert_equal(0, post.votes.count)
+      assert_equal(0, post.reload.score)
     end
 
     should "not allow duplicate votes" do
-      user = FactoryBot.create(:gold_user)
-      post = FactoryBot.create(:post)
-      CurrentUser.scoped(user, "127.0.0.1") do
-        assert_nothing_raised {post.vote!("up")}
-        assert_raises(PostVote::Error) {post.vote!("up")}
-        post.reload
-        assert_equal(1, PostVote.count)
-        assert_equal(1, post.score)
-      end
+      user = create(:gold_user)
+      post = create(:post)
+
+      post.vote!(1, user)
+      post.vote!(1, user)
+
+      assert_equal(1, post.reload.score)
+      assert_equal(1, post.votes.count)
     end
 
     should "allow undoing of votes" do
-      user = FactoryBot.create(:gold_user)
-      post = FactoryBot.create(:post)
+      user = create(:gold_user)
+      post = create(:post)
 
       # We deliberately don't call post.reload until the end to verify that
       # post.unvote! returns the correct score even when not forcibly reloaded.
-      CurrentUser.scoped(user, "127.0.0.1") do
-        post.vote!("up")
-        assert_equal(1, post.score)
+      post.vote!(1, user)
+      assert_equal(1, post.score)
+      assert_equal(1, post.up_score)
+      assert_equal(0, post.down_score)
+      assert_equal(1, post.votes.positive.count)
 
-        post.unvote!
-        assert_equal(0, post.score)
+      post.unvote!(user)
+      assert_equal(0, post.score)
+      assert_equal(0, post.up_score)
+      assert_equal(0, post.down_score)
+      assert_equal(0, post.votes.count)
 
-        assert_nothing_raised {post.vote!("down")}
-        assert_equal(-1, post.score)
+      post.vote!(-1, user)
+      assert_equal(-1, post.score)
+      assert_equal(0, post.up_score)
+      assert_equal(-1, post.down_score)
+      assert_equal(1, post.votes.negative.count)
 
-        post.unvote!
-        assert_equal(0, post.score)
+      post.unvote!(user)
+      assert_equal(0, post.score)
+      assert_equal(0, post.up_score)
+      assert_equal(0, post.down_score)
+      assert_equal(0, post.votes.count)
 
-        assert_nothing_raised {post.vote!("up")}
-        assert_equal(1, post.score)
+      post.vote!(1, user)
+      assert_equal(1, post.score)
+      assert_equal(1, post.up_score)
+      assert_equal(0, post.down_score)
+      assert_equal(1, post.votes.positive.count)
 
-        post.reload
-        assert_equal(1, post.score)
-      end
+      post.reload
+      assert_equal(1, post.score)
     end
   end
 
