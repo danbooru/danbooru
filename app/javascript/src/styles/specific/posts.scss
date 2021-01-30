@@ -208,10 +208,6 @@ div#c-posts {
       margin: 1em 0 0.5em;
     }
 
-    .pool-name, .search-name {
-      word-wrap: break-word;
-    }
-
     textarea {
       margin-bottom: 0.25em;
     }
@@ -225,49 +221,9 @@ div#c-posts {
       word-wrap: break-word;
     }
 
-    #search-seq-nav + #pool-nav, #search-seq-nav + #favgroup-nav, #pool-nav + #favgroup-nav {
-      margin-top: 0.5em;
-    }
-
     #recommended.loading-recommended-posts {
       pointer-events: none;
       opacity: 0.5;
-    }
-
-    #pool-nav, #search-seq-nav, #favgroup-nav {
-      li {
-        position: relative;
-        text-align: center;
-        padding: 0 5.5em;
-
-        &[data-selected="true"] {
-          font-weight: bold;
-        }
-
-        .prev {
-          position: absolute;
-          left: 2em;
-          top: 0;
-        }
-
-        .next {
-          position: absolute;
-          right: 2em;
-          top: 0;
-        }
-
-        .first {
-          position: absolute;
-          left: 0.5em;
-          top: 0;
-        }
-
-        .last {
-          position: absolute;
-          right: 0.5em;
-          top: 0;
-        }
-      }
     }
 
     span.close-button {

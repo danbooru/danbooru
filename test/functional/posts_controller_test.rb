@@ -556,7 +556,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get post_path(@post)
 
           assert_response :success
-          assert_select "#pool-nav .pool-name", /Pool: comic/
+          assert_select ".pool-navbar .pool-name", /Pool: comic/
         end
       end
 

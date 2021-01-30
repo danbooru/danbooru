@@ -38,8 +38,8 @@
 <% end %>
 
 <% content_for(:content) do %>
-  <% if @post.presenter.has_nav_links?(self) %>
-    <%= render "posts/partials/show/nav_links", :post => @post, :position => "top" %>
+  <% if !CurrentUser.user.new_post_navigation_layout %>
+    <%= render_post_navbar(@post, current_user: CurrentUser.user, search: params[:q], pool_id: params[:pool_id], favgroup_id: params[:favgroup_id]) %>
   <% end %>
 
   <%= render "posts/partials/show/notices", :post => @post %>
@@ -82,8 +82,8 @@
     </div>
   <% end %>
 
-  <% if @post.presenter.has_nav_links?(self) %>
-    <%= render "posts/partials/show/nav_links", :post => @post, :position => "bottom" %>
+  <% if CurrentUser.user.new_post_navigation_layout %>
+    <%= render_post_navbar(@post, current_user: CurrentUser.user, search: params[:q], pool_id: params[:pool_id], favgroup_id: params[:favgroup_id]) %>
   <% end %>
 
   <menu id="post-sections">

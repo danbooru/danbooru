@@ -41,11 +41,4 @@ module PostsHelper
       source
     end
   end
-
-  def is_pool_selected?(pool)
-    return false if params.key?(:q)
-    return false if params.key?(:favgroup_id)
-    return false if !params.key?(:pool_id)
-    return params[:pool_id].to_i == pool.id
-  end
 end

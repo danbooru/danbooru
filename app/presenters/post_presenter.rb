@@ -17,14 +17,4 @@ class PostPresenter
   def filename_for_download
     "#{humanized_essential_tag_string} - #{@post.md5}.#{@post.file_ext}"
   end
-
-  def has_nav_links?(template)
-    has_sequential_navigation?(template.params) || @post.pools.undeleted.any? || CurrentUser.favorite_groups.for_post(@post.id).any?
-  end
-
-  def has_sequential_navigation?(params)
-    return false if PostQueryBuilder.new(params[:q]).has_metatag?(:order, :ordfav, :ordpool)
-    return false if params[:pool_id].present? || params[:favgroup_id].present?
-    true
-  end
 end

@@ -18,4 +18,8 @@ module ComponentsHelper
   def render_post_votes(post, **options)
     render PostVotesComponent.new(post: post, **options)
   end
+
+  def render_post_navbar(post, **options)
+    render PostNavbarComponent.new(post: post, **options)
+  end
 end

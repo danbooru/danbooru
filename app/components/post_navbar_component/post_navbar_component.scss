@@ -1,0 +1,31 @@
+.post-notice-search {
+  li {
+    display: flex;
+
+    &[data-selected="true"] {
+      font-weight: bold;
+    }
+
+    .first, .prev, .next, .last {
+      flex: 0;
+      margin: 0 0.25em;
+      white-space: nowrap;
+    }
+
+    .first, .last {
+      flex-basis: 1em;
+    }
+
+    &.search-navbar .prev, &.search-navbar .next {
+      margin: 0 1.75em;
+    }
+
+    .pool-name, .favgroup-name, .search-name {
+      flex: 1;
+      text-align: center;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+}
