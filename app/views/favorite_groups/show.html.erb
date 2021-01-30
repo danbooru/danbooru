@@ -19,7 +19,7 @@
       <% if @favorite_group.post_count == 0 %>
         <%= render "post_sets/blank" %>
       <% else %>
-        <%= post_previews_html(@posts, favgroup_id: @favorite_group.id, show_deleted: true) %>
+        <%= post_previews_html(@posts, tags: "favgroup:#{@favorite_group.id}", show_deleted: true) %>
 
         <%= numbered_paginator(@posts) %>
       <% end %>

@@ -39,7 +39,7 @@
 
 <% content_for(:content) do %>
   <% if !CurrentUser.user.new_post_navigation_layout %>
-    <%= render_post_navbar(@post, current_user: CurrentUser.user, search: params[:q], pool_id: params[:pool_id], favgroup_id: params[:favgroup_id]) %>
+    <%= render_post_navbar(@post, current_user: CurrentUser.user, search: params[:q]) %>
   <% end %>
 
   <%= render "posts/partials/show/notices", :post => @post %>
@@ -83,7 +83,7 @@
   <% end %>
 
   <% if CurrentUser.user.new_post_navigation_layout %>
-    <%= render_post_navbar(@post, current_user: CurrentUser.user, search: params[:q], pool_id: params[:pool_id], favgroup_id: params[:favgroup_id]) %>
+    <%= render_post_navbar(@post, current_user: CurrentUser.user, search: params[:q]) %>
   <% end %>
 
   <menu id="post-sections">

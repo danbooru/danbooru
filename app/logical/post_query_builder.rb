@@ -949,8 +949,8 @@ class PostQueryBuilder
       metatags.select { |term| term.name.in?(names.map(&:to_s)) }
     end
 
-    def find_metatag(metatag)
-      select_metatags(metatag).first.try(:value)
+    def find_metatag(*metatags)
+      select_metatags(*metatags).first.try(:value)
     end
 
     def has_metatag?(*metatag_names)

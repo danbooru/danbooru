@@ -3,18 +3,16 @@
 class PostPreviewComponent < ApplicationComponent
   with_collection_parameter :post
 
-  attr_reader :post, :tags, :show_deleted, :show_cropped, :link_target, :pool, :pool_id, :favgroup_id, :similarity, :recommended, :compact, :size, :current_user, :options
+  attr_reader :post, :tags, :show_deleted, :show_cropped, :link_target, :pool, :similarity, :recommended, :compact, :size, :current_user, :options
   delegate :external_link_to, :time_ago_in_words_tagged, :empty_heart_icon, to: :helpers
 
-  def initialize(post:, tags: "", show_deleted: false, show_cropped: true, link_target: post, pool: nil, pool_id: nil, favgroup_id: nil, similarity: nil, recommended: nil, compact: nil, size: nil, current_user: CurrentUser.user, **options)
+  def initialize(post:, tags: "", show_deleted: false, show_cropped: true, link_target: post, pool: nil, similarity: nil, recommended: nil, compact: nil, size: nil, current_user: CurrentUser.user, **options)
     @post = post
-    @tags = tags
+    @tags = tags.presence
     @show_deleted = show_deleted
     @show_cropped = show_cropped
     @link_target = link_target
     @pool = pool
-    @pool_id = pool_id
-    @favgroup_id = favgroup_id
     @similarity = similarity.round(1) if similarity.present?
     @recommended = recommended.round(1) if recommended.present?
     @compact = compact
@@ -29,16 +27,6 @@ class PostPreviewComponent < ApplicationComponent
 
   def article_attrs(classes = nil)
     { class: [classes, *preview_class].compact.join(" "), **data_attributes }
-  end
-
-  def link_params
-    link_params = {}
-
-    link_params["q"] = tags if tags.present?
-    link_params["pool_id"] = pool_id if pool_id
-    link_params["favgroup_id"] = favgroup_id if favgroup_id
-
-    link_params
   end
 
   def cropped_url

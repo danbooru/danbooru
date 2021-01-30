@@ -16,11 +16,11 @@
 
     <%= tag.li class: "pool-navbar pool-category-#{pool.category}", "data-selected": selected do %>
       <span class="first">
-        <%= link_to_unless first_post_id == post.id, "«", post_path(first_post_id, pool_id: pool.id), rel: "nofollow", title: "to page 1" %>
+        <%= link_to_unless first_post_id == post.id, "«", post_path(first_post_id, q: "pool:#{pool.id}"), rel: "nofollow", title: "to page 1" %>
       </span>
 
       <span class="prev">
-        <%= link_to_if previous_post_id, "‹ prev", post_path(previous_post_id.to_i, pool_id: pool.id), rel: ["nofollow", ("prev" if selected)], title: "to page #{pool.page_number(previous_post_id)}" %>
+        <%= link_to_if previous_post_id, "‹ prev", post_path(previous_post_id.to_i, q: "pool:#{pool.id}"), rel: ["nofollow", ("prev" if selected)], title: "to page #{pool.page_number(previous_post_id)}" %>
       </span>
 
       <span class="pool-name">
@@ -28,11 +28,11 @@
       </span>
 
       <span class="next">
-        <%= link_to_if next_post_id, "next ›", post_path(next_post_id.to_i, pool_id: pool.id), rel: ["nofollow", ("next" if selected)], title: "to page #{pool.page_number(next_post_id)}" %>
+        <%= link_to_if next_post_id, "next ›", post_path(next_post_id.to_i, q: "pool:#{pool.id}"), rel: ["nofollow", ("next" if selected)], title: "to page #{pool.page_number(next_post_id)}" %>
       </span>
 
       <span class="last">
-        <%= link_to_unless last_post_id == post.id, "»", post_path(last_post_id, pool_id: pool.id), rel: "nofollow", title: "to page #{pool.post_count}" %>
+        <%= link_to_unless last_post_id == post.id, "»", post_path(last_post_id, q: "pool:#{pool.id}"), rel: "nofollow", title: "to page #{pool.post_count}" %>
       </span>
     <% end %>
   <% end %>
@@ -46,11 +46,11 @@
 
     <%= tag.li class: "favgroup-navbar", "data-selected": selected do %>
       <span class="first">
-        <%= link_to_unless first_post_id == post.id, "«", post_path(first_post_id, favgroup_id: favgroup.id), rel: "nofollow" %>
+        <%= link_to_unless first_post_id == post.id, "«", post_path(first_post_id, q: "favgroup:#{favgroup.id}"), rel: "nofollow" %>
       </span>
 
       <span class="prev">
-        <%= link_to_if previous_post_id, "‹ prev", post_path(previous_post_id.to_i, favgroup_id: favgroup.id), rel: ["nofollow", ("prev" if selected)] %>
+        <%= link_to_if previous_post_id, "‹ prev", post_path(previous_post_id.to_i, q: "favgroup:#{favgroup.id}"), rel: ["nofollow", ("prev" if selected)] %>
       </span>
 
       <span class="favgroup-name">
@@ -58,11 +58,11 @@
       </span>
 
       <span class="next">
-        <%= link_to_if next_post_id, "next ›", post_path(next_post_id.to_i, favgroup_id: favgroup.id), rel: ["nofollow", ("next" if selected)] %>
+        <%= link_to_if next_post_id, "next ›", post_path(next_post_id.to_i, q: "favgroup:#{favgroup.id}"), rel: ["nofollow", ("next" if selected)] %>
       </span>
 
       <span class="last">
-        <%= link_to_unless last_post_id == post.id, "»", post_path(last_post_id, favgroup_id: favgroup.id), rel: "nofollow" %>
+        <%= link_to_unless last_post_id == post.id, "»", post_path(last_post_id, q: "favgroup:#{favgroup.id}"), rel: "nofollow" %>
       </span>
     <% end %>
   <% end %>

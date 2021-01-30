@@ -24,7 +24,7 @@
       <% if @pool.post_count == 0 %>
         <%= render "post_sets/blank" %>
       <% else %>
-        <%= post_previews_html(@posts, pool_id: @pool.id, show_deleted: @pool.is_series?) %>
+        <%= post_previews_html(@posts, tags: "pool:#{@pool.id}", show_deleted: @pool.is_series?) %>
 
         <%= numbered_paginator(@posts) %>
       <% end %>

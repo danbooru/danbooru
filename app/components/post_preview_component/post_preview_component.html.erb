@@ -1,5 +1,5 @@
 <%= tag.article id: "post_#{post.id}", **article_attrs do -%>
-  <%= link_to polymorphic_path(link_target, link_params) do -%>
+  <%= link_to polymorphic_path(link_target, q: tags) do -%>
     <picture>
       <%= tag.source media: "(max-width: 660px)", srcset: cropped_url -%>
       <%= tag.source media: "(min-width: 660px)", srcset: post.preview_file_url -%>
