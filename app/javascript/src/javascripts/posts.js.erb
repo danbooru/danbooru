@@ -19,7 +19,6 @@ Post.EDIT_DIALOG_WIDTH = 720;
 Post.initialize_all = function() {
 
   if ($("#c-posts").length) {
-    this.initialize_shortcuts();
     this.initialize_saved_searches();
   }
 
@@ -175,39 +174,12 @@ Post.swipe_prev = function(e) {
   e.preventDefault();
 }
 
-Post.nav_prev = function(e) {
-  var href = "";
-
-  if ($(".paginator a[rel~=prev], .post-notice-search a[rel~=prev]").length) {
-    location.href = $("a[rel~=prev]").attr("href");
-  }
-
-  e.preventDefault();
-}
-
-Post.nav_next = function(e) {
-  var href = "";
-
-  if ($(".paginator a[rel~=next], .post-notice-search a[rel~=next]").length) {
-    location.href = $("a[rel~=next]").attr("href");
-  }
-
-  e.preventDefault();
-}
-
 Post.swipe_next = function(e) {
   if ($(".paginator a[rel~=next ]").length) {
     location.href = $(".paginator a[rel~=next]").attr("href");
   }
 
   e.preventDefault();
-}
-
-Post.initialize_shortcuts = function() {
-  if ($("#a-show").length) {
-    Utility.keydown("a", "prev_page", Post.nav_prev);
-    Utility.keydown("d", "next_page", Post.nav_next);
-  }
 }
 
 Post.initialize_links = function() {

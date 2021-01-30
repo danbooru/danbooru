@@ -1,9 +1,9 @@
 <ul class="notice post-notice post-notice-search">
   <% if has_search_navbar? %>
     <li class="search-navbar" data-selected="true">
-      <%= link_to "‹ prev", show_seq_post_path(post, q: search, seq: "prev"), rel: "nofollow prev", class: "prev" %>
+      <%= link_to "‹ prev", show_seq_post_path(post, q: search, seq: "prev"), rel: "nofollow prev", class: "prev", "data-shortcut": "a" %>
       <span class="search-name">Search: <%= link_to search, posts_path(tags: search), rel: "nofollow" %></span>
-      <%= link_to "next ›", show_seq_post_path(post, q: search, seq: "next"), rel: "nofollow next", class: "next" %>
+      <%= link_to "next ›", show_seq_post_path(post, q: search, seq: "next"), rel: "nofollow next", class: "next", "data-shortcut": "d" %>
     </li>
   <% end %>
 
@@ -20,7 +20,7 @@
       </span>
 
       <span class="prev">
-        <%= link_to_if previous_post_id, "‹ prev", post_path(previous_post_id.to_i, q: "pool:#{pool.id}"), rel: ["nofollow", ("prev" if selected)], title: "to page #{pool.page_number(previous_post_id)}" %>
+        <%= link_to_if previous_post_id, "‹ prev", post_path(previous_post_id.to_i, q: "pool:#{pool.id}"), rel: ["nofollow", ("prev" if selected)], title: "to page #{pool.page_number(previous_post_id)}", "data-shortcut": ("a" if selected) %>
       </span>
 
       <span class="pool-name">
@@ -28,7 +28,7 @@
       </span>
 
       <span class="next">
-        <%= link_to_if next_post_id, "next ›", post_path(next_post_id.to_i, q: "pool:#{pool.id}"), rel: ["nofollow", ("next" if selected)], title: "to page #{pool.page_number(next_post_id)}" %>
+        <%= link_to_if next_post_id, "next ›", post_path(next_post_id.to_i, q: "pool:#{pool.id}"), rel: ["nofollow", ("next" if selected)], title: "to page #{pool.page_number(next_post_id)}", "data-shortcut": ("d" if selected) %>
       </span>
 
       <span class="last">
@@ -50,7 +50,7 @@
       </span>
 
       <span class="prev">
-        <%= link_to_if previous_post_id, "‹ prev", post_path(previous_post_id.to_i, q: "favgroup:#{favgroup.id}"), rel: ["nofollow", ("prev" if selected)] %>
+        <%= link_to_if previous_post_id, "‹ prev", post_path(previous_post_id.to_i, q: "favgroup:#{favgroup.id}"), rel: ["nofollow", ("prev" if selected)], "data-shortcut": ("a" if selected) %>
       </span>
 
       <span class="favgroup-name">
@@ -58,7 +58,7 @@
       </span>
 
       <span class="next">
-        <%= link_to_if next_post_id, "next ›", post_path(next_post_id.to_i, q: "favgroup:#{favgroup.id}"), rel: ["nofollow", ("next" if selected)] %>
+        <%= link_to_if next_post_id, "next ›", post_path(next_post_id.to_i, q: "favgroup:#{favgroup.id}"), rel: ["nofollow", ("next" if selected)], "data-shortcut": ("d" if selected) %>
       </span>
 
       <span class="last">
