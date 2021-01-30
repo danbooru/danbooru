@@ -7,7 +7,7 @@
 
   <section id="tag-box">
     <h2>Tags</h2>
-    <%= @post_set.tag_list_html(current_query: params[:tags], show_extra_links: policy(Post).show_extra_links?) %>
+    <%= render_search_tag_list(@post_set.related_tags, current_query: params[:tags], show_extra_links: policy(Post).show_extra_links?) %>
   </section>
 
   <%= render "posts/partials/index/options" %>

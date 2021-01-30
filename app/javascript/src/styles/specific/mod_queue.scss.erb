@@ -27,7 +27,7 @@ div#c-modqueue {
     }
 
     <% Danbooru.config.modqueue_warning_tags.each do |tag| %>
-      li[data-tag-name="<%= tag %>"] {
+      a[data-tag-name="<%= tag %>"] {
         background-color: var(--modqueue-tag-warning-color);
       }
     <% end %>

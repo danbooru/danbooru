@@ -1,6 +1,6 @@
 class PostPresenter
   attr_reader :pool, :next_post_in_pool
-  delegate :tag_list_html, :split_tag_list_html, :split_tag_list_text, :inline_tag_list_html, to: :tag_set_presenter
+  delegate :split_tag_list_text, to: :tag_set_presenter
 
   def initialize(post)
     @post = post

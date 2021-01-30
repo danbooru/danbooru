@@ -3,6 +3,6 @@
 <%= content_tag(:div, class: ["tag-column", local_assigns[:class] || "#{title.parameterize}-related-tags-column", "is-empty-#{tags.empty?}"].join(" ")) do %>
   <% if tags.present? %>
     <h3><%= title %></h3>
-    <%= TagSetPresenter.new(tags).tag_list_html(name_only: true) %>
+    <%= render_simple_tag_list(tags) %>
   <% end %>
 <% end %>

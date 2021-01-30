@@ -22,7 +22,10 @@
           <%= post_version_field(post_version, :rating) %>
           <%= post_version_field(post_version, :parent_id) %>
         </div>
-        <div><b>Tags:</b> <%= TagSetPresenter.new(post_version.tag_array).inline_tag_list_html %></div>
+        <div>
+          <b>Tags:</b>
+          <%= render_inline_tag_list_from_names(post_version.tag_array) %>
+        </div>
         <div>
           <%= post_source_tag(post_version.source) %>
         </div>

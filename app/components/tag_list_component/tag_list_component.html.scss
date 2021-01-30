@@ -1,0 +1,25 @@
+.tag-list {
+  a.search-tag {
+    overflow-wrap: normal;
+  }
+
+  &.inline-tag-list {
+    display: inline;
+
+    a {
+      margin-right: 0.5em;
+    }
+  }
+
+  &.categorized-tag-list {
+    ul {
+      margin-bottom: 1em;
+    }
+  }
+
+  &.simple-tag-list {
+    a {
+      display: block;
+    }
+  }
+}

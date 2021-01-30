@@ -201,14 +201,6 @@ module PostSets
         searches = ["search:all"] + SavedSearch.labels_for(CurrentUser.user.id).map {|x| "search:#{x}"}
         searches.take(MAX_SIDEBAR_TAGS)
       end
-
-      def tag_set_presenter
-        @tag_set_presenter ||= TagSetPresenter.new(related_tags)
-      end
-
-      def tag_list_html(**options)
-        tag_set_presenter.tag_list_html(name_only: query.is_metatag?(:search), **options)
-      end
     end
   end
 end

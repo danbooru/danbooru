@@ -4,6 +4,10 @@ FactoryBot.define do
     post_count { 100 }
     category {Tag.categories.general}
 
+    factory(:general_tag) do
+      category {Tag.categories.general}
+    end
+
     factory(:artist_tag) do
       category {Tag.categories.artist}
     end
@@ -14,6 +18,10 @@ FactoryBot.define do
 
     factory(:character_tag) do
       category {Tag.categories.character}
+    end
+
+    factory(:meta_tag) do
+      category {Tag.categories.meta}
     end
   end
 end
