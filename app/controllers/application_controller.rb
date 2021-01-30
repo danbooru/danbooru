@@ -120,7 +120,7 @@ class ApplicationController < ActionController::Base
     when PG::ConnectionBad
       render_error_page(503, exception, message: "The database is unavailable. Try again later.")
     else
-      raise exception if Danbooru.config.debug_mode
+      raise exception if !Rails.env.production? || Danbooru.config.debug_mode
       render_error_page(500, exception)
     end
   end
