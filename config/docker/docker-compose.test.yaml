@@ -1,5 +1,5 @@
 #
-# Usage: docker-compose --env-file .env.test -f config/docker/docker-compose-test.yaml -p danbooru run -T danbooru
+# Usage: docker-compose --env-file .env.test -f config/docker/docker-compose.test.yaml -p danbooru run -T danbooru
 #
 # Docker Compose file to create an instance of danbooru along with a test database and run the test suite.
 #
