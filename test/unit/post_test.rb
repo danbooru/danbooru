@@ -1214,6 +1214,16 @@ class PostTest < ActiveSupport::TestCase
           assert_equal("aaa", @post.tag_string)
         end
 
+        should "resolve aliases before removing negated tags" do
+          create(:tag_alias, antecedent_name: "female_focus", consequent_name: "female")
+
+          @post.update!(tag_string: "blah female_focus -female")
+          assert_equal("blah", @post.tag_string)
+
+          @post.update!(tag_string: "blah female_focus -female_focus")
+          assert_equal("blah", @post.tag_string)
+        end
+
         should "resolve abbreviations" do
           create(:tag, name: "hair_ribbon", post_count: 300_000)
           create(:tag, name: "hakurei_reimu", post_count: 50_000)

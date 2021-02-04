@@ -472,8 +472,8 @@ class Post < ApplicationRecord
       normalized_tags = apply_casesensitive_metatags(normalized_tags)
       normalized_tags = normalized_tags.map(&:downcase)
       normalized_tags = filter_metatags(normalized_tags)
-      normalized_tags = remove_negated_tags(normalized_tags)
       normalized_tags = TagAlias.to_aliased(normalized_tags)
+      normalized_tags = remove_negated_tags(normalized_tags)
       normalized_tags = %w(tagme) if normalized_tags.empty?
       normalized_tags = add_automatic_tags(normalized_tags)
       normalized_tags = remove_invalid_tags(normalized_tags)
