@@ -297,6 +297,19 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
             assert_equal("tohsaka_rin_(cosplay)", @wiki.reload.title)
           end
         end
+
+        context "when renaming an artist tag with a *_(style) tag" do
+          should "move the *_(style) tag as well" do
+            create(:tag, name: "tanaka_takayuki", category: Tag.categories.artist)
+            @post = create(:post, tag_string: "tanaka_takayuki_(style)")
+            @wiki = create(:wiki_page, title: "tanaka_takayuki_(style)")
+
+            create_bur!("rename tanaka_takayuki -> tony_taka", @admin)
+
+            assert_equal("tony_taka_(style)", @post.reload.tag_string)
+            assert_equal("tony_taka_(style)", @wiki.reload.title)
+          end
+        end
       end
 
       context "the nuke command" do
