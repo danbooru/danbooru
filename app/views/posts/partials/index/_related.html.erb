@@ -11,8 +11,8 @@
 
     <li><%= link_to "Deleted", posts_path(tags: "#{params[:tags]} status:deleted"), rel: "nofollow" %></li>
     <li><%= link_to "Random", random_posts_path(tags: params[:tags]), id: "random-post", "data-shortcut": "r", rel: "nofollow" %></li>
-    <% if post_set.query.is_simple_tag? %>
-      <li><%= link_to "History", post_versions_path(search: { changed_tags: params[:tags] }), rel: "nofollow" %></li>
+    <% if post_set.normalized_query.has_single_tag? %>
+      <li><%= link_to "History", post_versions_path(search: { changed_tags: post_set.normalized_query.tags.first.name }), rel: "nofollow" %></li>
     <% end %>
     <li><%= link_to "Count", posts_counts_path(tags: params[:tags]), rel: "nofollow" %></li>
   </ul>
