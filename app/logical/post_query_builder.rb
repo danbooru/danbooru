@@ -290,7 +290,7 @@ class PostQueryBuilder
     when "unmoderated"
       Post.in_modqueue.available_for_moderation(current_user, hidden: false)
     when "all", "any"
-      Post.all
+      Post.where("TRUE")
     else
       Post.none
     end

@@ -639,6 +639,13 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([disapproved], "-status:unmoderated")
     end
 
+    should "return nothing for the -status:any metatag" do
+      create(:post)
+
+      assert_tag_match([], "-status:any")
+      assert_tag_match([], "-status:all")
+    end
+
     should "respect the 'Deleted post filter' option when using the status: metatag" do
       deleted = create(:post, is_deleted: true, is_banned: true)
       undeleted = create(:post, is_banned: true)
