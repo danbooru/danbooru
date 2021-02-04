@@ -50,7 +50,7 @@ module Sources::Strategies
       nil
     end
 
-    def self.artist_name_from_url(url)
+    def self.tag_name_from_url(url)
       if url =~ PROFILE && !$~[:username].in?(RESERVED_USERNAMES)
         $~[:username]
       else
@@ -100,13 +100,13 @@ module Sources::Strategies
     end
 
     def page_url
-      return nil if status_id.blank? || artist_name.blank?
-      "https://twitter.com/#{artist_name}/status/#{status_id}"
+      return nil if status_id.blank? || tag_name.blank?
+      "https://twitter.com/#{tag_name}/status/#{status_id}"
     end
 
     def profile_url
-      return nil if artist_name.blank?
-      "https://twitter.com/#{artist_name}"
+      return nil if tag_name.blank?
+      "https://twitter.com/#{tag_name}"
     end
 
     def intent_url
@@ -119,13 +119,21 @@ module Sources::Strategies
       [profile_url, intent_url].compact
     end
 
-    def artist_name
-      if artist_name_from_url.present?
-        artist_name_from_url
+    def tag_name
+      if tag_name_from_url.present?
+        tag_name_from_url
       elsif api_response.present?
         api_response.dig(:user, :screen_name)
       else
         ""
+      end
+    end
+
+    def artist_name
+      if api_response.present?
+        api_response.dig(:user, :name)
+      else
+        tag_name
       end
     end
 
@@ -208,8 +216,8 @@ module Sources::Strategies
       [url, referer_url].map {|x| self.class.status_id_from_url(x)}.compact.first
     end
 
-    def artist_name_from_url
-      [url, referer_url].map {|x| self.class.artist_name_from_url(x)}.compact.first
+    def tag_name_from_url
+      [url, referer_url].map {|x| self.class.tag_name_from_url(x)}.compact.first
     end
 
     memoize :api_response
