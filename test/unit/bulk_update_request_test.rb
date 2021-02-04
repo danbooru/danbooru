@@ -285,6 +285,12 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(["Can't rename aaa -> bbb ('aaa' has more than 200 posts, use an alias instead)"], @bur.errors.full_messages)
         end
 
+        context "when moving an artist" do
+          should "add the artist's old tag name to their other names" do
+            assert_equal(["foo"], @artist.reload.other_names)
+          end
+        end
+
         context "when renaming a character tag with a *_(cosplay) tag" do
           should "move the *_(cosplay) tag as well" do
             @post = create(:post, tag_string: "toosaka_rin_(cosplay)")

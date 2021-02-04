@@ -35,7 +35,9 @@ class TagMover
     return unless old_tag.artist? && old_artist.present? && !old_artist.is_deleted?
 
     if new_artist.nil?
-      old_artist.update!(name: new_tag.name)
+      old_artist.name = new_tag.name
+      old_artist.other_names += [old_tag.name]
+      old_artist.save!
     else
       merge_artists!
     end
