@@ -112,8 +112,8 @@ class Note {
     }
 
     // Place the note box. The input values are pixel coordinates relative to the full image.
-    place_note(x, y, w, h) {
-      if (this.note.embed && this.note.has_rotation) {
+    place_note(x, y, w, h, was_nudged = false) {
+      if (this.note.embed && this.note.has_rotation && !was_nudged) {
         let position = this.get_min_max_position();
         x = position.norm_left / this.note.scale_factor;
         y = position.norm_top / this.note.scale_factor;
@@ -212,7 +212,7 @@ class Note {
         // do nothing
       }
 
-      this.place_note(this.note.x, this.note.y, this.note.w, this.note.h);
+      this.place_note(this.note.x, this.note.y, this.note.w, this.note.h, true);
       Note.Body.hide_all();
       this.$note_box.addClass("unsaved");
       event.preventDefault();
