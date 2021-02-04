@@ -32,6 +32,7 @@ COPY package.json yarn.lock ./
 RUN yarn install
 
 COPY . .
+RUN bundle config set path vendor/bundle --local
 
 ARG DATABASE_URL=postgresql://0.0.0.0
 ARG DANBOORU_SECRET_KEY_BASE=1234
