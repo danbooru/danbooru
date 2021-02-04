@@ -35,14 +35,14 @@ class IpGeolocationTest < ActiveSupport::TestCase
 
         assert_equal(28, @ip.network.prefix)
         assert_equal(false, @ip.is_proxy?)
-        assert_equal(48.75919, @ip.latitude)
-        assert_equal(2.16969, @ip.longitude)
+        assert_equal(49, @ip.latitude.round(0))
+        assert_equal(2, @ip.longitude.round(0))
         assert_equal("Free SAS", @ip.organization)
         assert_equal("Europe/Paris", @ip.time_zone)
         assert_equal("EU", @ip.continent)
         assert_equal("FR", @ip.country)
         assert_equal("FR-IDF", @ip.region)
-        assert_equal("Jouy-en-Josas", @ip.city)
+        assert_equal("Argenteuil", @ip.city)
         assert_nil(@ip.carrier)
       end
 
