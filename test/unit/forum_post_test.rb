@@ -60,6 +60,12 @@ class ForumPostTest < ActiveSupport::TestCase
           EOS
         end
       end
+
+      should "not send a mention to yourself" do
+        assert_no_difference("Dmail.count") do
+          @forum_post = as(@user) { create(:forum_post, body: "hi from @#{@user.name}") }
+        end
+      end
     end
 
     context "that belongs to a topic with several pages of posts" do

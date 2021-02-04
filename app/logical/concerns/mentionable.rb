@@ -28,12 +28,14 @@ module Mentionable
     text_was = send(:attribute_before_last_save, message_field)
 
     names = DText.parse_mentions(text) - DText.parse_mentions(text_was)
+    users = names.map { |name| User.find_by_name(name) }.uniq
+    users = users.without(CurrentUser.user)
 
-    names.uniq.each do |name|
-      body  = self.instance_exec(name, &self.class.mentionable_option(:body))
-      title = self.instance_exec(name, &self.class.mentionable_option(:title))
+    users.each do |user|
+      body  = self.instance_exec(user.name, &self.class.mentionable_option(:body))
+      title = self.instance_exec(user.name, &self.class.mentionable_option(:title))
 
-      Dmail.create_automated(to_name: name, title: title, body: body)
+      Dmail.create_automated(to: user, title: title, body: body)
     end
   end
 end
