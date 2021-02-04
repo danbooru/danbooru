@@ -1,6 +1,8 @@
 class Upload < ApplicationRecord
   class Error < StandardError; end
 
+  MAX_VIDEO_DURATION = 140
+
   class FileValidator < ActiveModel::Validator
     def validate(record)
       validate_file_ext(record)
@@ -53,8 +55,8 @@ class Upload < ApplicationRecord
     end
 
     def validate_video_duration(record)
-      if !record.uploader.is_admin? && record.media_file.is_video? && record.media_file.duration > 120
-        record.errors.add(:base, "video must not be longer than 2 minutes")
+      if !record.uploader.is_admin? && record.media_file.is_video? && record.media_file.duration > MAX_VIDEO_DURATION
+        record.errors.add(:base, "video must not be longer than #{MAX_VIDEO_DURATION.seconds.inspect}")
       end
     end
   end
