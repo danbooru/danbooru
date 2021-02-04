@@ -2,7 +2,9 @@
   <div id="a-new" data-image-size="small">
     <h1>Upload</h1>
 
-    <% if !CurrentUser.user.upload_limit.limited? %>
+    <% if CurrentUser.user.upload_limit.limited? %>
+      <h2 style="margin-bottom: 1em;">You have reached your upload limit</h2>
+    <% else %>
       <%= embed_wiki("help:upload_notice", id: "upload-guide-notice") %>
 
       <% unless CurrentUser.can_upload_free? %>
@@ -79,8 +81,6 @@
 
         <%= render "related_tags/container" %>
       <% end %>
-    <% else %>
-      <h2 style="margin-bottom: 1em;">You <%= CurrentUser.user.upload_limit.limit_reason %></h2>
     <% end %>
   </div>
 </div>

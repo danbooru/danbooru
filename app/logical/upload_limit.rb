@@ -13,23 +13,7 @@ class UploadLimit
   end
 
   def limited?
-    if user.can_upload_free?
-      false
-    elsif user.created_at > 1.week.ago
-      true
-    else
-      used_upload_slots >= upload_slots
-    end
-  end
-
-  def limit_reason
-    if user.created_at > 1.week.ago
-      "cannot upload during your first week of registration"
-    elsif limited?
-      "have reached your upload limit"
-    else
-      nil
-    end
+    !user.can_upload_free? && used_upload_slots >= upload_slots
   end
 
   def maxed?
