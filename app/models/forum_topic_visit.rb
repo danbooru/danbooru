@@ -7,7 +7,11 @@ class ForumTopicVisit < ApplicationRecord
   end
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :user, :forum_topic_id, :last_read_at)
+    q = search_attributes(params, :id, :created_at, :updated_at, :user, :forum_topic, :last_read_at)
     q.apply_default_order(params)
+  end
+
+  def self.available_includes
+    [:forum_topic]
   end
 end

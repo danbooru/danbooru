@@ -72,4 +72,8 @@ class EmailAddress < ApplicationRecord
   def verification_key
     signed_id(purpose: "verify")
   end
+
+  def self.available_includes
+    [:user]
+  end
 end
