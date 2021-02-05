@@ -45,6 +45,7 @@ gem 'pundit'
 gem 'mail'
 gem 'nokogiri'
 gem 'view_component', require: 'view_component/engine'
+gem 'tzinfo-data'
 
 group :production, :staging do
   gem 'unicorn', :platforms => :ruby

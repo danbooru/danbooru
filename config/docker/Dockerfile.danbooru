@@ -1,4 +1,4 @@
-FROM ubuntu:20.04 AS build
+FROM ubuntu:20.10 AS build
 
 RUN \
   apt-get update && \
@@ -40,7 +40,7 @@ ARG RAILS_ENV=production
 RUN bin/rails assets:precompile && ln -sf packs public/packs-test
 RUN rm -rf node_modules log tmp && mkdir log tmp
 
-FROM ubuntu:20.04
+FROM ubuntu:20.10
 
 RUN \
   useradd --create-home --user-group danbooru && \
