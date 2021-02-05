@@ -29,15 +29,13 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def respond_with(subject, *options, &block)
+  def respond_with(subject, *args, model: model_name, **options, &block)
     if params[:action] == "index" && is_redirect?(subject)
       redirect_to_show(subject)
       return
     end
 
-    model = options[0]&.delete(:model)
     if subject.respond_to?(:includes) && (request.format.json? || request.format.xml?)
-      model ||= model_name
       associations = ParameterBuilder.includes_parameters(params[:only], model)
       subject = subject.includes(associations)
     end
