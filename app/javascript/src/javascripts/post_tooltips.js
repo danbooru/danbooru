@@ -9,13 +9,14 @@ PostTooltip.POST_SELECTOR = "*:not(.ui-sortable-handle) > .post-preview img, .dt
 PostTooltip.SHOW_DELAY = 500;
 PostTooltip.HIDE_DELAY = 125;
 PostTooltip.DURATION = 250;
+PostTooltip.instance = null;
 
 PostTooltip.initialize = function () {
   if (PostTooltip.disabled()) {
     return;
   }
 
-  delegate("body", {
+  PostTooltip.instance = delegate("body", {
     allowHTML: true,
     appendTo: document.querySelector("#post-tooltips"),
     delay: [PostTooltip.SHOW_DELAY, PostTooltip.HIDE_DELAY],
@@ -98,8 +99,8 @@ PostTooltip.on_disable_tooltips = async function (event) {
   }
 
   await CurrentUser.update({ disable_post_tooltips: true });
-  Utility.notice("Tooltips disabled; check your account settings to re-enable.");
-  location.reload();
+  Utility.notice(`Tooltips disabled; check your <a href="/settings">account settings</a> to re-enable.`);
+  PostTooltip.instance[0].destroy();
 };
 
 $(document).ready(PostTooltip.initialize);
