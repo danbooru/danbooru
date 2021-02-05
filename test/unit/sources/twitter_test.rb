@@ -121,7 +121,7 @@ module Sources
       end
 
       should "get the artist name" do
-        assert_equal("nounproject", @site.artist_name)
+        assert_equal("Noun Project", @site.artist_name)
       end
 
       should "get the image urls" do
@@ -154,7 +154,8 @@ module Sources
       end
 
       should "get the source data" do
-        assert_equal("nounproject", @site.artist_name)
+        assert_equal("nounproject", @site.tag_name)
+        assert_equal("Noun Project", @site.artist_name)
         assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig", @site.image_url)
         assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:small", @site.preview_url)
       end
@@ -218,7 +219,7 @@ module Sources
         @site = Sources::Strategies.find("https://twitter.com/masayasuf/status/870734961778630656")
         @artist = FactoryBot.create(:artist, name: "masayasuf", url_string: @site.url)
 
-        assert_equal("masayasuf", @site.artist_name)
+        assert_equal("masayasuf", @site.tag_name)
         assert_equal("https://twitter.com/masayasuf", @site.profile_url)
         assert_equal([@artist], @site.artists)
       end
@@ -286,7 +287,7 @@ module Sources
         site = Sources::Strategies.find("https://twitter.com/tanso_panz/status/1192429800717029377")
 
         assert_equal(site.site_name, "Twitter")
-        assert_equal("tanso_panz", site.artist_name)
+        assert_equal("tanso_panz", site.tag_name)
         assert_equal("https://twitter.com/tanso_panz", site.profile_url)
         assert_nil(site.image_url)
       end
