@@ -13,7 +13,7 @@
         <% end %>
 
         <% source.artists.each do |artist| %>
-          <%= render_simple_tag_list(["banned_artist"]) %>
+          <%= render_simple_tag_list([artist.name]) %>
 
           <ul>
             <% artist.sorted_urls.each do |url| %>
