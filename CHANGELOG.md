@@ -1,3 +1,21 @@
+## 2021-02-05
+
+### Changes
+
+* Removed the rule that new users couldn't upload in their first 7 days.
+* Raised the max video length from 2:00 minutes to 2:20 minutes for video uploads.
+* Changed the post buttons to work the same way as the comment vote buttons.
+* When aliasing or renaming an artist, the artist's {{\*\_(style)}} tag is now 
+  moved too, if the artist has one.
+
+### Fixes
+
+* Fixed error when searching for {{-status:any}}.
+* Fixed @-ing yourself in a comment or forum post sending you a notification dmail.
+* Fixed buggy keyboard movement of notes.
+* Fixed the tag 'History' link not showing up on post search pages when the
+  search contained a metatag.
+
 ## 2021-01-23
 
 ### Changes
