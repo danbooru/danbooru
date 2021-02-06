@@ -3,7 +3,7 @@
     <li class="tag-type-<%= t.category %>" data-tag-name="<%= t.name %>">
       <%# ignore search:foo metatags %>
       <% if t.artist? %>
-        <%= link_to "?", show_or_new_artists_path(t.name), class: "wiki-link" %>
+        <%= link_to "?", show_or_new_artists_path(name: t.name), class: "wiki-link" %>
       <% elsif t.name =~ /\A\d+\z/ %>
         <%= link_to "?", wiki_page_path("~#{t.name}"), class: "wiki-link" %>
       <% else %>
