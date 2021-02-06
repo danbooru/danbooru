@@ -1,5 +1,7 @@
-<div class="tag-list simple-tag-list">
+<ul class="tag-list simple-tag-list">
   <% tags.each do |t| %>
-    <%= link_to t.pretty_name, posts_path(tags: t.name), class: "search-tag tag-type-#{t.category}", "data-tag-name": t.name %>
+    <li>
+      <%= link_to t.pretty_name, posts_path(tags: t.name), class: "search-tag tag-type-#{t.category}", "data-tag-name": t.name %>
+    </li>
   <% end %>
-</div>
+</ul>
