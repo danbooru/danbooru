@@ -1,4 +1,5 @@
 [![codecov](https://codecov.io/gh/danbooru/danbooru/branch/master/graph/badge.svg)](https://codecov.io/gh/danbooru/danbooru) [![Discord](https://img.shields.io/discord/310432830138089472?label=Discord)](https://discord.gg/eSVKkUF)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdanbooru%2Fdanbooru.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdanbooru%2Fdanbooru?ref=badge_shield)
 
 ## Installation
 
@@ -94,3 +95,7 @@ Post recommendations require the [Recommender service](https://github.com/r88888
 There's optional support for cropped thumbnails. This relies on installing
 `libvips-8.6` or higher and setting `Danbooru.config.enable_image_cropping`
 to true.
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fdanbooru%2Fdanbooru.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Fdanbooru%2Fdanbooru?ref=badge_large)
