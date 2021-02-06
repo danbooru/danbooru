@@ -66,6 +66,12 @@ class ForumPostTest < ActiveSupport::TestCase
           @forum_post = as(@user) { create(:forum_post, body: "hi from @#{@user.name}") }
         end
       end
+
+      should "not fail when mentioning a nonexistent user" do
+        assert_no_difference("Dmail.count") do
+          @forum_post = as(@user) { create(:forum_post, body: "hi from @nonamethanks") }
+        end
+      end
     end
 
     context "that belongs to a topic with several pages of posts" do

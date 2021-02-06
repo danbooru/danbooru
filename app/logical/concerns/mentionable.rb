@@ -28,7 +28,7 @@ module Mentionable
     text_was = send(:attribute_before_last_save, message_field)
 
     names = DText.parse_mentions(text) - DText.parse_mentions(text_was)
-    users = names.map { |name| User.find_by_name(name) }.uniq
+    users = names.map { |name| User.find_by_name(name) }.compact.uniq
     users = users.without(CurrentUser.user)
 
     users.each do |user|
