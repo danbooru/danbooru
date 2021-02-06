@@ -28,6 +28,6 @@ class ForumPostComponent < ApplicationComponent
   end
 
   def has_moderation_reports?
-    policy(ModerationReport).show? && forum_post.moderation_reports.present?
+    policy(ModerationReport).can_see_moderation_reports? && forum_post.moderation_reports.present?
   end
 end

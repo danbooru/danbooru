@@ -35,7 +35,7 @@ class ForumPostComponentTest < ViewComponent::TestCase
       end
 
       should "not show the report notice to regular users" do
-        render_forum_post(@forum_post, current_user: User.anonymous)
+        render_forum_post(@forum_post, current_user: create(:user))
 
         assert_no_css(".moderation-report-notice")
       end
