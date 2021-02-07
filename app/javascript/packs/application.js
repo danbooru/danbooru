@@ -3,6 +3,9 @@ function importAll(r) {
   r.keys().forEach(r);
 }
 
+// XXX for dropzone.
+import "core-js/web/dom-collections";
+
 require('@rails/ujs').start();
 require('hammerjs');
 require('jquery-hotkeys');

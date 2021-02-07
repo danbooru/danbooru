@@ -1,39 +1,29 @@
-import { h, Component, render } from "preact";
-import { makeObservable, observable, computed, action } from "mobx";
-import { observer } from "mobx-react";
-
 import Utility from "./utility";
 
-export default @observer class TagCounter extends Component {
+export default class TagCounter {
   static lowCount = 10;
   static highCount = 20;
 
-  @observable tagCount = 0;
-
-  constructor() {
-    super();
-    makeObservable(this);
+  constructor($element) {
+    this.$element = $element;
+    this.$target.on("input", (event) => this.update(event));
+    this.update();
   }
 
-  componentDidMount() {
-    $(this.props.tags).on("input", this.updateCount);
-    this.updateCount();
+  update() {
+    this.$element.find(".tag-count").text(`${this.tagCount} / ${TagCounter.highCount} tags`);
+    this.$element.find("img").attr("src", `/images/${this.iconName}.png`);
   }
 
-  render() {
-    return (
-      <span class="tag-counter">
-        <span class="tag-count">{this.tagCount}</span> / {TagCounter.highCount} tags
-        <img src={`/images/${this.iconName}.png`}/>
-      </span>
-    );
+  get $target() {
+    return $(this.$element.attr("data-for"));
   }
 
-  @action.bound updateCount() {
-    this.tagCount = Utility.regexp_split($(this.props.tags).val()).length;
+  get tagCount() {
+    return Utility.regexp_split(this.$target.val()).length;
   }
 
-  @computed get iconName() {
+  get iconName() {
     if (this.tagCount < TagCounter.lowCount) {
       return "blobglare";
     } else if (this.tagCount >= TagCounter.lowCount && this.tagCount < TagCounter.highCount) {
@@ -45,8 +35,7 @@ export default @observer class TagCounter extends Component {
 
   static initialize() {
     $("[data-tag-counter]").toArray().forEach(element => {
-      let target = $($(element).attr("data-for")).get(0);
-      render(h(TagCounter, { tags: target }), element);
+      new TagCounter($(element));
     });
   }
 }

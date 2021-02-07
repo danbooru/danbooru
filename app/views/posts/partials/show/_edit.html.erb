@@ -49,7 +49,10 @@
     <div class="header">
       <%= f.label :tag_string, "Tags" %>
 
-      <span data-tag-counter data-for="#post_tag_string"></span>
+      <span data-tag-counter data-for="#post_tag_string">
+        <span class="tag-count"></span>
+        <img>
+      </span>
       <a href="javascript:void(0)">
         <%= external_link_icon(id: "open-edit-dialog", "data-shortcut": "shift+e") %>
       </a>
