@@ -16,7 +16,11 @@
       <% t.column "IP Address" do |ip_ban| %>
         <%= link_to ip_ban.subnetted_ip, ip_address_path(ip_ban.ip_addr.to_s) %>
       <% end %>
-      <% t.column :reason, td: { class: "col-expand" } %>
+      <% t.column "Reason", td: { class: "col-expand" } do |ban| %>
+        <div class="prose">
+          <%= format_text ban.reason %>
+        </div>
+      <% end %>
       <% t.column "Status" do |ip_ban| %>
         <% if ip_ban.is_deleted? %>
           Deleted
