@@ -6,6 +6,14 @@ Allow: /$
 Disallow: /*.atom
 Disallow: /*.json
 
+Disallow: <%= artist_urls_path %>
+Disallow: <%= artist_versions_path %>
+Disallow: <%= artist_commentary_versions_path %>
+Disallow: <%= note_versions_path %>
+Disallow: <%= post_versions_path %>
+Disallow: <%= pool_versions_path %>
+Disallow: <%= wiki_page_versions_path %>
+
 Allow: <%= artists_path %>
 Allow: <%= artist_commentaries_path %>
 Allow: <%= comments_path %>
