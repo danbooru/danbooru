@@ -30,7 +30,7 @@ class ArtistsController < ApplicationController
   def index
     # XXX
     params[:search][:name] = params.delete(:name) if params[:name]
-    @artists = authorize Artist.paginated_search(params)
+    @artists = authorize Artist.visible(CurrentUser.user).paginated_search(params)
     @artists = @artists.includes(:urls, :tag) if request.format.html?
 
     respond_with(@artists)

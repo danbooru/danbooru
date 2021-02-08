@@ -7,7 +7,7 @@
   <% end %>
   <%= subnav_link_to "Recent changes", artist_versions_path %>
   <%= subnav_link_to "URLs", artist_urls_path %>
-  <% if @artist && !@artist.new_record? %>
+  <% if @artist && !@artist.new_record? && (!@artist.is_banned? || policy(@artist).can_view_banned?) %>
     <li>|</li>
     <%= subnav_link_to "Posts (#{@artist.tag.try(:post_count).to_i})", posts_path(:tags => @artist.name) %>
     <%= subnav_link_to "Show", artist_path(@artist) %>

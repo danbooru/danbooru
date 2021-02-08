@@ -29,6 +29,14 @@ class ApplicationRecord < ActiveRecord::Base
       def visible(user)
         all
       end
+
+      def policy(current_user)
+        Pundit.policy(current_user, self)
+      end
+    end
+
+    def policy(current_user)
+      Pundit.policy(current_user, self)
     end
   end
 
