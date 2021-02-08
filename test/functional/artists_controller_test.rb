@@ -65,6 +65,14 @@ class ArtistsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_select ".artist-wiki", count: 0
       end
+
+      should "mark banned artists as noindex" do
+        @artist = create(:artist, is_banned: true)
+        get artist_path(@artist.id)
+
+        assert_response :success
+        assert_select "meta[name=robots][content=noindex]"
+      end
     end
 
     context "new action" do

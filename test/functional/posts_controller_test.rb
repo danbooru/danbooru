@@ -112,6 +112,16 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_select "#view-artist-link", count: 0
         end
 
+        should "render for a banned artist tag" do
+          artist = create(:artist, is_banned: true)
+          create(:post, tag_string: artist.name)
+          get posts_path, params: { tags: artist.name }
+
+          assert_response :success
+          assert_select "#show-excerpt-link", count: 1, text: "Artist"
+          assert_select "meta[name=robots][content=noindex]"
+        end
+
         should "render for a tag with a wiki page" do
           create(:post, tag_string: "char:fumimi", rating: "s")
           get posts_path, params: { tags: "fumimi" }

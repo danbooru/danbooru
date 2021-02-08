@@ -121,6 +121,14 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         get wiki_page_path("....xml")
         assert_response :success
       end
+
+      should "mark banned artists as noindex" do
+        @artist = create(:artist, name: @wiki_page.title, is_banned: true)
+        get wiki_page_path(@wiki_page.title)
+
+        assert_response :success
+        assert_select "meta[name=robots][content=noindex]"
+      end
     end
 
     context "show_or_new action" do

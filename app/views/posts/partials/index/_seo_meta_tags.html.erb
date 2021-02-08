@@ -14,9 +14,7 @@
   <% canonical_url root_url(host: Danbooru.config.hostname) %>
 <% end %>
 
-<% if @post_set.hide_from_crawler? %>
-  <meta name="robots" content="nofollow,noindex">
-<% end %>
+<% noindex if @post_set.hide_from_crawler? %>
 
 <% if @post_set.has_explicit? %>
   <meta name="rating" content="adult">

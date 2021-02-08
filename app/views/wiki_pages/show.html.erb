@@ -1,6 +1,10 @@
 <% page_title "#{@wiki_page.pretty_title.titleize} Wiki" %>
 <% meta_description DText.excerpt(@wiki_page.body) %>
 
+<% if @wiki_page.artist.present? && @wiki_page.artist.is_banned? %>
+  <% noindex %>
+<% end %>
+
 <%= render "secondary_links" %>
 <%= render "sidebar" %>
 

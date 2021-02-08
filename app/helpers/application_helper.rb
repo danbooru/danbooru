@@ -362,6 +362,10 @@ module ApplicationHelper
     end
   end
 
+  def noindex
+    content_for(:html_header, tag.meta(name: "robots", content: "noindex"))
+  end
+
   def atom_feed_tag(title, url = {})
     content_for(:html_header, auto_discovery_link_tag(:atom, url, title: title))
   end
