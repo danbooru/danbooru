@@ -129,11 +129,7 @@ module Downloads
         @strategy = Sources::Strategies.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
 
         assert_equal(2, @strategy.data[:ugoira_frame_data].size)
-        if @strategy.data[:ugoira_frame_data][0]["file"]
-          assert_equal([{"file" => "000000.jpg", "delay" => 125}, {"file" => "000001.jpg", "delay" => 125}], @download.data[:ugoira_frame_data])
-        else
-          assert_equal([{"delay_msec" => 125}, {"delay_msec" => 125}], @strategy.data[:ugoira_frame_data])
-        end
+        assert_equal([{"file" => "000000.jpg", "delay" => 125}, {"file" => "000001.jpg", "delay" => 125}], @strategy.data[:ugoira_frame_data])
       end
     end
   end

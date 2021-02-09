@@ -44,12 +44,10 @@ module Sources
         end
 
         should "capture the frame data" do
-          assert_equal(2, @site.ugoira_frame_data.size)
-          if @site.ugoira_frame_data[0]["file"]
-            assert_equal([{"file" => "000000.jpg", "delay" => 125}, {"file" => "000001.jpg", "delay" => 125}], @site.ugoira_frame_data)
-          else
-            assert_equal([{"delay_msec" => 125}, {"delay_msec" => 125}], @site.ugoira_frame_data)
-          end
+          ugoira_frame_data = @site.data[:ugoira_frame_data]
+
+          assert_equal(2, ugoira_frame_data.size)
+          assert_equal([{"file" => "000000.jpg", "delay" => 125}, {"file" => "000001.jpg", "delay" => 125}], ugoira_frame_data)
         end
       end
 
@@ -195,7 +193,7 @@ module Sources
         should "convert illust links and member links to dtext" do
           get_source("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=63421642")
 
-          dtext_desc = %(foo 【pixiv #46337015 "»":[/posts?tags=pixiv%3A46337015]】bar 【pixiv #14901720 "»":[/posts?tags=pixiv%3A14901720]】\n\nbaz【"user/83739":[https://www.pixiv.net/users/83739] "»":[/artists?search%5Burl_matches%5D=https%3A%2F%2Fwww.pixiv.net%2Fusers%2F83739]】)
+          dtext_desc = %(foo 【[b]pixiv #46337015 "»":[/posts?tags=pixiv%3A46337015][/b]】bar 【[b]pixiv #14901720 "»":[/posts?tags=pixiv%3A14901720][/b]】\n\nbaz【[b]"user/83739":[https://www.pixiv.net/users/83739] "»":[/artists?search%5Burl_matches%5D=https%3A%2F%2Fwww.pixiv.net%2Fusers%2F83739][/b]】)
           assert_equal(dtext_desc, @site.dtext_artist_commentary_desc)
         end
       end

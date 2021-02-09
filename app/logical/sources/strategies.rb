@@ -2,7 +2,7 @@ module Sources
   module Strategies
     def self.all
       [
-        #Strategies::Pixiv,
+        Strategies::Pixiv,
         Strategies::Fanbox,
         Strategies::NicoSeiga,
         Strategies::Twitter,

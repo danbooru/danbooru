@@ -289,11 +289,10 @@ module Danbooru
       []
     end
 
-    def pixiv_login
-      nil
-    end
-
-    def pixiv_password
+    # Your Pixiv PHPSESSID cookie. Get this by logging in to Pixiv and using
+    # the devtools to find the PHPSESSID cookie. This is need for Pixiv upload
+    # support.
+    def pixiv_phpsessid
       nil
     end
 
