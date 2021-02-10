@@ -15,25 +15,28 @@
 # * https://pawoo.net/oauth_authentications/17230064
 
 module Sources::Strategies
-  class Pawoo < Base
-    HOST = %r{\Ahttps?://(www\.)?pawoo\.net}i
+  class Mastodon < Base
+    HOST = %r{\Ahttps?://(?:www\.)?(?<domain>pawoo\.net)}i
     IMAGE = %r{\Ahttps?://img\.pawoo\.net/media_attachments/files/(\d+/\d+/\d+)}
     NAMED_PROFILE = %r{#{HOST}/@(?<artist_name>\w+)}i
-    ID_PROFILE = %r{#{HOST}/web/accounts/(?<artist_id>\d+)}
+    ID_PROFILE = %r{#{HOST}/web/accounts/(?<account_id>\d+)}
 
     STATUS1 = %r{\A#{HOST}/web/statuses/(?<status_id>\d+)}
     STATUS2 = %r{\A#{NAMED_PROFILE}/(?<status_id>\d+)}
-
-    def self.enabled?
-      Danbooru.config.pawoo_client_id.present? && Danbooru.config.pawoo_client_secret.present?
-    end
 
     def domains
       ["pawoo.net"]
     end
 
     def site_name
-      "Pawoo"
+      parsed_url.domain
+    end
+
+    def file_host
+      case site_name
+      when "pawoo.net" then "img.pawoo.net"
+      else site_name
+      end
     end
 
     def image_url
@@ -41,33 +44,40 @@ module Sources::Strategies
     end
 
     def image_urls
-      if url =~ %r{#{IMAGE}/small/([a-z0-9]+\.\w+)\z}i
-        ["https://img.pawoo.net/media_attachments/files/#{$1}/original/#{$2}"]
-      elsif url =~ %r{#{IMAGE}/original/([a-z0-9]+\.\w+)\z}i
-        [url]
+      if url =~ %r{#{IMAGE}/(?:small|original)/([a-z0-9]+\.\w+)\z}i
+        ["https://#{file_host}/media_attachments/files/#{$1}/original/#{$2}"]
       else
         api_response.image_urls
       end
     end
 
     def page_url
-      [url, referer_url].each do |x|
-        if PawooApiClient::Status.is_match?(x)
-          return x
-        end
-      end
+      artist_name = artist_name_from_url
+      status_id = status_id_from_url
+      return if status_id.blank?
 
-      super
+      if artist_name.present?
+        "https://#{site_name}/@#{artist_name}/#{status_id}"
+      else
+        "https://#{site_name}/web/statuses/#{status_id}"
+      end
     end
 
     def profile_url
-      if url =~ PawooApiClient::PROFILE2
-        "https://pawoo.net/@#{$1}"
-      elsif api_response.profile_url.blank?
-        url
-      else
+      if artist_name_from_url.present?
+        "https://#{site_name}/@#{artist_name_from_url}"
+      elsif api_response.present? && api_response.profile_url.present?
         api_response.profile_url
       end
+    end
+
+    def account_url
+      return if account_id.blank?
+      "https://#{site_name}/web/accounts/#{account_id}"
+    end
+
+    def profile_urls
+      [profile_url, account_url].compact
     end
 
     def artist_name
@@ -75,15 +85,15 @@ module Sources::Strategies
     end
 
     def artist_name_from_url
-      if url =~ NAMED_PROFILE
-        url[NAMED_PROFILE, :artist_name]
-      end
+      url[NAMED_PROFILE, :artist_name]
     end
 
-    def artist_id_from_url
-      if url =~ ID_PROFILE
-        url[ID_PROFILE, :artist_name]
-      end
+    def other_names
+      [api_response.display_name]
+    end
+
+    def account_id
+      url[ID_PROFILE, :account_id] || api_response.account_id
     end
 
     def status_id_from_url
@@ -99,15 +109,7 @@ module Sources::Strategies
     end
 
     def normalize_for_source
-      artist_name = artist_name_from_url
-      status_id = status_id_from_url
-      return if status_id.blank?
-
-      if artist_name.present?
-        "https://pawoo.net/@#{artist_name}/#{status_id}"
-      else
-        "https://pawoo.net/web/statuses/#{status_id}"
-      end
+      page_url
     end
 
     def dtext_artist_commentary_desc
@@ -121,13 +123,8 @@ module Sources::Strategies
     end
 
     def api_response
-      [url, referer_url].each do |x|
-        if (client = PawooApiClient.new.get(x))
-          return client
-        end
-      end
-
-      nil
+      return {} if status_id_from_url.blank?
+      MastodonApiClient.new(site_name, status_id_from_url)
     end
     memoize :api_response
   end

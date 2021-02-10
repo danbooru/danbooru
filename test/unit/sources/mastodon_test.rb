@@ -1,7 +1,7 @@
 require 'test_helper'
 
 module Sources
-  class PawooTest < ActiveSupport::TestCase
+  class MastodonTest < ActiveSupport::TestCase
     context "The source site for a https://pawoo.net/web/status/$id url" do
       setup do
         skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
@@ -38,7 +38,9 @@ module Sources
       end
 
       should "get the profile" do
-        assert_equal("https://pawoo.net/@evazion", @site.profile_url)
+        profiles = %w[https://pawoo.net/@evazion https://pawoo.net/web/accounts/47806]
+        assert_equal(profiles.first, @site.profile_url)
+        assert_equal(profiles, @site.profile_urls)
       end
 
       should "get the artist name" do
@@ -68,7 +70,7 @@ module Sources
       end
 
       should "get the dtext-ified commentary" do
-        desc = <<-EOS.strip_heredoc.chomp
+        desc = <<-DESC.strip_heredoc.chomp
           test post please ignore
 
           blah blah blah
@@ -76,7 +78,7 @@ module Sources
           this is a test 🍕
 
           "#foo":[https://pawoo.net/tags/foo] "#bar":[https://pawoo.net/tags/bar] "#baz":[https://pawoo.net/tags/baz]
-        EOS
+        DESC
 
         assert_equal(desc, @site.dtext_artist_commentary_desc)
       end

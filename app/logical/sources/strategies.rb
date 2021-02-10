@@ -11,7 +11,7 @@ module Sources
         Strategies::Tumblr,
         Strategies::ArtStation,
         Strategies::Nijie,
-        Strategies::Pawoo,
+        Strategies::Mastodon,
         Strategies::Moebooru,
         Strategies::HentaiFoundry,
         Strategies::Weibo,
