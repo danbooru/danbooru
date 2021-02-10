@@ -330,6 +330,14 @@ module Danbooru
       nil
     end
 
+    def baraag_client_id
+      nil
+    end
+
+    def baraag_client_secret
+      nil
+    end
+
     # 1. Register app at https://www.tumblr.com/oauth/register.
     # 2. Copy "OAuth Consumer Key" from https://www.tumblr.com/oauth/apps.
     def tumblr_consumer_key

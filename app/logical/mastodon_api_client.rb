@@ -66,9 +66,13 @@ class MastodonApiClient
   end
 
   def client
-    if @site_name == "pawoo.net"
+    case @site_name
+    when "pawoo.net"
       client_id = Danbooru.config.pawoo_client_id
       client_secret = Danbooru.config.pawoo_client_secret
+    when "baraag.net"
+      client_id = Danbooru.config.baraag_client_id
+      client_secret = Danbooru.config.baraag_client_secret
     end
 
     return unless client_id && client_secret
