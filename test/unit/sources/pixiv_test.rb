@@ -196,6 +196,21 @@ module Sources
           dtext_desc = %(foo 【[b]pixiv #46337015 "»":[/posts?tags=pixiv%3A46337015][/b]】bar 【[b]pixiv #14901720 "»":[/posts?tags=pixiv%3A14901720][/b]】\n\nbaz【[b]"user/83739":[https://www.pixiv.net/users/83739] "»":[/artists?search%5Burl_matches%5D=https%3A%2F%2Fwww.pixiv.net%2Fusers%2F83739][/b]】)
           assert_equal(dtext_desc, @site.dtext_artist_commentary_desc)
         end
+
+        should "convert jump.php links" do
+          get_source("https://www.pixiv.net/en/artworks/68955584")
+
+          dtext_desc = <<~EOS
+            東方や版権中心にまとめました
+
+            ◆例大祭の新刊([b]pixiv #68490887 "»":[/posts?tags=pixiv%3A68490887][/b])を一部加筆して再版しました。通販在庫復活しているのでよろしければ▷<https://www.melonbooks.co.jp/detail/detail.php?product_id=364421>
+            今週末京都みやこめっせで開催される「古明地こんぷれっくす　いつつめ」にも持っていきます〜。スペースは【古13】です。他にも色々持って行く予定なので、改めて告知します。
+
+            ◇pixivFANBOX開設してみました。のんびり投稿していく予定です(:˒[￣]メイキングとかやってみたい…▶︎<https://www.pixiv.net/fanbox/creator/143555>
+          EOS
+
+          assert_equal(dtext_desc.chomp, @site.dtext_artist_commentary_desc)
+        end
       end
 
       context "translating the tags" do

@@ -66,12 +66,17 @@ module Sources
         text = text.gsub(%r{<a href="https?://www\.pixiv\.net/en/users/([0-9]+)">user/[0-9]+</a>}i) do |_match|
           member_id = $1
           profile_url = "https://www.pixiv.net/users/#{member_id}"
+
           artist_search_url = Routes.artists_path(search: { url_matches: profile_url })
 
           %("user/#{member_id}":[#{profile_url}] "»":[#{artist_search_url}])
         end
 
-        DText.from_html(text)
+        DText.from_html(text) do |element|
+          if element.name == "a" && element["href"].match?(%r!\A/jump\.php\?!)
+            element["href"] = Addressable::URI.heuristic_parse(element["href"]).normalized_query
+          end
+        end
       end
 
       def domains
