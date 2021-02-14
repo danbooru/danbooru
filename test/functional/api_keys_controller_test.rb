@@ -45,7 +45,7 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         post_auth user_api_keys_path(@user.id), @user
 
         assert_redirected_to user_api_keys_path(@user.id)
-        assert_equal(true, @user.api_key.present?)
+        assert_equal(true, @user.api_keys.last.present?)
       end
     end
 
@@ -58,14 +58,14 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
         delete_auth api_key_path(@api_key.id), @user
 
         assert_redirected_to user_api_keys_path(@user.id)
-        assert_nil(@user.reload.api_key)
+        assert_raise(ActiveRecord::RecordNotFound) { @api_key.reload }
       end
 
       should "not allow deleting another user's API key" do
         delete_auth api_key_path(@api_key.id), create(:user)
 
         assert_response 403
-        assert_not_nil(@user.reload.api_key)
+        assert_not_nil(@api_key.reload)
       end
     end
   end

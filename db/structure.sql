@@ -4856,7 +4856,7 @@ CREATE UNIQUE INDEX index_api_keys_on_key ON public.api_keys USING btree (key);
 -- Name: index_api_keys_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_api_keys_on_user_id ON public.api_keys USING btree (user_id);
+CREATE INDEX index_api_keys_on_user_id ON public.api_keys USING btree (user_id);
 
 
 --
@@ -7956,6 +7956,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210115015308'),
 ('20210123112752'),
 ('20210127000201'),
-('20210127012303');
+('20210127012303'),
+('20210214095121');
 
 

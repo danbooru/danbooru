@@ -55,6 +55,13 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
 
+        should "succeed when the user has multiple api keys" do
+          @api_key2 = create(:api_key, user: @user)
+          basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:#{@api_key2.key}")}"
+          get edit_user_path(@user), headers: { HTTP_AUTHORIZATION: basic_auth_string }
+          assert_response :success
+        end
+
         should "fail for api key mismatches" do
           basic_auth_string = "Basic #{::Base64.encode64("#{@user.name}:badpassword")}"
           get profile_path, as: :json, headers: { HTTP_AUTHORIZATION: basic_auth_string }
@@ -73,6 +80,12 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       context "using the api_key parameter" do
         should "succeed for api key matches" do
           get edit_user_path(@user), params: { login: @user.name, api_key: @api_key.key }
+          assert_response :success
+        end
+
+        should "succeed when the user has multiple api keys" do
+          @api_key2 = create(:api_key, user: @user)
+          get edit_user_path(@user), params: { login: @user.name, api_key: @api_key2.key }
           assert_response :success
         end
 

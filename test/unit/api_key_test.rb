@@ -25,7 +25,7 @@ class ApiKeyTest < ActiveSupport::TestCase
 
     should "have the same limits whether or not they have an api key" do
       assert_no_difference(["@user.reload.api_regen_multiplier", "@user.reload.api_burst_limit"]) do
-        @user.api_key.destroy
+        @api_key.destroy
       end
     end
   end

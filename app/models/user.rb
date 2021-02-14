@@ -134,9 +134,9 @@ class User < ApplicationRecord
   has_many :user_events, dependent: :destroy
   has_one :recent_ban, -> {order("bans.id desc")}, :class_name => "Ban"
 
-  has_one :api_key
   has_one :token_bucket
   has_one :email_address, dependent: :destroy
+  has_many :api_keys, dependent: :destroy
   has_many :note_versions, :foreign_key => "updater_id"
   has_many :dmails, -> {order("dmails.id desc")}, :foreign_key => "owner_id"
   has_many :saved_searches
@@ -208,6 +208,7 @@ class User < ApplicationRecord
     end
 
     def authenticate_api_key(key)
+      api_key = api_keys.find_by(key: key)
       api_key.present? && ActiveSupport::SecurityUtils.secure_compare(api_key.key, key) && self
     end
 
@@ -560,7 +561,7 @@ class User < ApplicationRecord
     end
 
     def api_token
-      api_key.try(:key)
+      api_keys.first.try(:key)
     end
   end
 
