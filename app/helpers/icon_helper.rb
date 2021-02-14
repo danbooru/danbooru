@@ -144,4 +144,8 @@ module IconHelper
   def link_icon(**options)
     icon_tag("fas fa-link", **options)
   end
+
+  def plus_icon(**options)
+    icon_tag("fas fa-plus", **options)
+  end
 end

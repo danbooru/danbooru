@@ -39,7 +39,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
     context "on api authentication" do
       setup do
         @user = create(:user, password: "password")
-        @api_key = ApiKey.generate!(@user)
+        @api_key = create(:api_key, user: @user)
 
         ActionController::Base.allow_forgery_protection = true
       end

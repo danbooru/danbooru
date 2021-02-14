@@ -55,3 +55,18 @@ footer#page-footer {
     }
   }
 }
+
+/* A container for the main <h1> tag, with optional right-aligned action buttons */
+div.page-heading {
+  display: flex;
+  margin-bottom: 1em;
+
+  h1 {
+    flex-grow: 1;
+    line-height: 1em;
+  }
+
+  a {
+    align-self: center;
+  }
+}

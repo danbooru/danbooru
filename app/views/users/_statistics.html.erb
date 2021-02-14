@@ -261,7 +261,7 @@
         <tr>
           <th>API Key</th>
           <td>
-            <%= link_to (CurrentUser.api_key ? "View" : "Generate"), user_api_key_path(CurrentUser.user) %>
+            <%= link_to "View", user_api_keys_path(CurrentUser.user) %>
             (<%= link_to_wiki "help", "help:api" %>)
           </td>
         </tr>

@@ -1,0 +1,63 @@
+<%= render "secondary_links" %>
+
+<div id="c-api-keys">
+  <div id="a-index" class="fixed-width-container">
+    <div class="page-heading">
+      <h1>API Keys</h1>
+
+      <%= link_to user_api_keys_path(CurrentUser.user.id), class: "button-primary", method: :post do %>
+        <%= plus_icon %> Add
+      <% end %>
+    </div>
+
+    <% if params[:user_id].present? %>
+      <div class="prose">
+        <p>An API key is used to give programs access to your <%= Danbooru.config.canonical_app_name %> account.</p>
+
+        <p>If you're a developer, you can use an API key to access the
+        <%= link_to_wiki "#{Danbooru.config.canonical_app_name} API", "help:api" %>. If you're not a
+        developer, you probably don't need an API key.</p>
+
+        <p><strong>Your API key is like your password</strong>. Anyone who has it has full access to
+        your account. Don't give your API key to apps or people you don't trust, and don't post your
+        API key in public locations.</p>
+
+        <p>Example usage:
+          <code>
+            <% if @api_keys.present? %>
+              <%= profile_url(format: "json", login: CurrentUser.user.name, api_key: @api_keys.first.key) %>
+            <% else %>
+              <%= profile_url(format: "json", login: CurrentUser.user.name, api_key: "your_api_key_goes_here") %>
+            <% end %>
+          </code>
+        </p>
+
+        <p>See the <%= link_to_wiki "API documentation", "help:api" %> to learn more.</p>
+      </div>
+    <% end %>
+
+    <% if params[:user_id].present? && !@api_keys.present? %>
+      <%= link_to "Create API key", user_api_keys_path(CurrentUser.user.id), method: :post %>
+    <% else %>
+      <%= table_for @api_keys, width: "100%", class: "striped autofit" do |t| %>
+        <% t.column :key, td: { class: "col-expand" } %>
+
+        <% if !params[:user_id].present? %>
+          <% t.column "User" do |api_key| %>
+            <%= link_to_user api_key.user %>
+          <% end %>
+        <% end %>
+
+        <% t.column "Created" do |api_key| %>
+          <%= time_ago_in_words_tagged api_key.created_at %>
+        <% end %>
+
+        <% t.column column: "control" do |api_key| %>
+          <%= link_to "Delete", api_key, method: :delete %>
+        <% end %>
+      <% end %>
+
+      <%= numbered_paginator(@api_keys) %>
+    <% end %>
+  </div>
+</div>

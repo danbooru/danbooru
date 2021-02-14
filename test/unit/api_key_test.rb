@@ -3,14 +3,8 @@ require 'test_helper'
 class ApiKeyTest < ActiveSupport::TestCase
   context "in all cases a user" do
     setup do
-      @user = FactoryBot.create(:gold_user, :name => "abcdef")
-      @api_key = ApiKey.generate!(@user)
-    end
-
-    should "regenerate the key" do
-      assert_changes(-> { @api_key.key }) do
-        @api_key.regenerate!
-      end
+      @user = create(:user)
+      @api_key = create(:api_key, user: @user)
     end
 
     should "generate a unique key" do

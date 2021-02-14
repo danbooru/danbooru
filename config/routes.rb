@@ -53,11 +53,10 @@ Rails.application.routes.draw do
       resource :count_fixes, only: [:new, :create]
       resource :email_notification, :only => [:show, :destroy]
       resource :deletion, :only => [:show, :destroy]
-      resource :api_key, :only => [:show, :view, :update, :destroy] do
-        post :view
-      end
     end
   end
+
+  resources :api_keys, only: [:create, :index, :destroy]
 
   resources :artists do
     member do
@@ -247,9 +246,7 @@ Rails.application.routes.draw do
       post :send_confirmation
     end
     resource :password, only: [:edit, :update]
-    resource :api_key, :only => [:show, :view, :update, :destroy], :controller => "maintenance/user/api_keys" do
-      post :view
-    end
+    resources :api_keys, only: [:create, :index, :destroy]
 
     collection do
       get :custom_style
