@@ -1,0 +1,89 @@
+%button {
+  display: inline-block;
+  white-space: nowrap;
+  border-radius: 4px;
+  padding: 0.5em 1em;
+
+  &[disabled] {
+    cursor: default;
+  }
+}
+
+input[type="button"], input[type="submit"], button {
+  border-radius: 3px;
+  padding: 0.25em 1em;
+
+  background: var(--form-button-background);
+  border: var(--form-button-border);
+  color: var(--form-button-text-color);
+
+  &:hover {
+    box-shadow: var(--form-button-hover-box-shadow);
+    background: var(--form-button-hover-background);
+  }
+
+  &:active {
+    box-shadow: var(--form-button-hover-box-shadow);
+    background: var(--form-button-active-background);
+  }
+}
+
+/* Buttons, modeled after Material Design and Bootstrap. */
+a, button, input[type="submit"] {
+  /* A solid blue button. */
+  &.button-primary {
+    @extend %button;
+
+    color: var(--button-primary-text-color);
+    background-color: var(--button-primary-background-color);
+    border: none;
+
+    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+    box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12);
+
+    &:hover:not([disabled]) {
+      background-color: var(--button-primary-hover-background-color);
+      box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)
+    }
+
+    &[disabled] {
+      background-color: var(--button-primary-disabled-color);
+    }
+  }
+
+  /* An outlined blue button. */
+  &.button-outline-primary {
+    @extend %button;
+
+    color: var(--button-outline-primary-color);
+    background-color: transparent;
+    border: 1px solid var(--button-outline-primary-color);
+
+    transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+
+    &:hover:not([disabled]) {
+      color: var(--inverse-text-color);
+      background-color: var(--button-outline-primary-color);
+    }
+
+    &[disabled] {
+      color: var(--button-primary-disabled-color);
+      border: 1px solid var(--button-primary-disabled-color);
+    }
+  }
+
+  /* A small button. */
+  &.button-sm {
+    padding: 0.25em 1em;
+  }
+
+  /* A medium button. */
+  &.button-md {
+    padding: 0.50em 1em;
+  }
+
+  /* A large button. */
+  &.button-lg {
+    padding: 0.75em 1em;
+  }
+}

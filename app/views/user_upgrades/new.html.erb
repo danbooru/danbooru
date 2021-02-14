@@ -97,21 +97,21 @@
         <tr>
           <td></td>
           <% if @user_upgrade.purchaser.is_anonymous? %>
-            <td><%= link_to "Login", login_path(url: new_user_upgrade_path), class: "login-button" %></td>
-            <td><%= link_to "Get #{Danbooru.config.canonical_app_name} Gold", login_path(url: new_user_upgrade_path), class: "login-button" %></td>
-            <td><%= link_to "Get #{Danbooru.config.canonical_app_name} Platinum", login_path(url: new_user_upgrade_path), class: "login-button" %></td>
+            <td><%= link_to "Login", login_path(url: new_user_upgrade_path), class: "login-button button-primary" %></td>
+            <td><%= link_to "Get #{Danbooru.config.canonical_app_name} Gold", login_path(url: new_user_upgrade_path), class: "login-button button-primary" %></td>
+            <td><%= link_to "Get #{Danbooru.config.canonical_app_name} Platinum", login_path(url: new_user_upgrade_path), class: "login-button button-primary" %></td>
           <% elsif @recipient.level == User::Levels::MEMBER %>
             <td></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold", country: params[:country], promo: params[:promo]), remote: true, disable_with: "Redirecting..." %></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Platinum", user_upgrades_path(user_id: @recipient.id, upgrade_type: "platinum", country: params[:country], promo: params[:promo]), remote: true, disable_with: "Redirecting..." %></td>
+            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold", country: params[:country], promo: params[:promo]), class: "button-primary", remote: true, disable_with: "Redirecting..." %></td>
+            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Platinum", user_upgrades_path(user_id: @recipient.id, upgrade_type: "platinum", country: params[:country], promo: params[:promo]), class: "button-primary", remote: true, disable_with: "Redirecting..." %></td>
           <% elsif @recipient.level == User::Levels::GOLD %>
             <td></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, disabled: true %></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Platinum", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold_to_platinum", country: params[:country], promo: params[:promo]), remote: true, disable_with: "Redirecting..." %></td>
+            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, class: "button-primary", disabled: true %></td>
+            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Platinum", user_upgrades_path(user_id: @recipient.id, upgrade_type: "gold_to_platinum", country: params[:country], promo: params[:promo]), class: "button-primary", remote: true, disable_with: "Redirecting..." %></td>
           <% else %>
             <td></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, disabled: true %></td>
-            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Platinum", nil, disabled: true %></td>
+            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Gold", nil, class: "button-primary", disabled: true %></td>
+            <td><%= button_to "Get #{Danbooru.config.canonical_app_name} Platinum", nil, class: "button-primary", disabled: true %></td>
           <% end %>
         </tr>
       </tbody>

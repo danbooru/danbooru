@@ -63,25 +63,6 @@ textarea {
   font-size: var(--text-sm);
 }
 
-input[type="button"], input[type="submit"], button {
-  border-radius: 3px;
-  padding: 0.25em 1em;
-
-  background: var(--form-button-background);
-  border: var(--form-button-border);
-  color: var(--form-button-text-color);
-
-  &:hover {
-    box-shadow: var(--form-button-hover-box-shadow);
-    background: var(--form-button-hover-background);
-  }
-
-  &:active {
-    box-shadow: var(--form-button-hover-box-shadow);
-    background: var(--form-button-active-background);
-  }
-}
-
 /* placeholder text in <input type="text"> elements */
 ::placeholder {
   color: var(--form-input-placeholder-text-color);

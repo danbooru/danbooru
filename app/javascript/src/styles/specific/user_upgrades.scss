@@ -10,30 +10,6 @@ div#c-user-upgrades {
       text-align: center;
     }
 
-    .login-button, form.button_to input[type="submit"] {
-      display: inline-block;
-
-      color: var(--user-upgrade-button-text-color);
-      background-color: var(--user-upgrade-button-background-color);
-
-      border: none;
-      border-radius: 4px;
-      padding: 0.75em;
-
-      transition: background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
-      box-shadow: 0px 3px 1px -2px rgba(0,0,0,0.2), 0px 2px 2px 0px rgba(0,0,0,0.14), 0px 1px 5px 0px rgba(0,0,0,0.12);
-
-      &:hover:not([disabled]) {
-        background-color: var(--user-upgrade-button-hover-background-color);
-        box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2), 0px 4px 5px 0px rgba(0,0,0,0.14), 0px 1px 10px 0px rgba(0,0,0,0.12)
-      }
-
-      &[disabled] {
-        background-color: grey;
-        cursor: default;
-      }
-    }
-
     table#feature-comparison {
       width: 100%;
 

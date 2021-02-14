@@ -25,6 +25,7 @@
   --form-input-border: 1px solid #CCC;
   --form-input-placeholder-text-color: grey;
   --form-input-validation-error-border-color: red;
+
   --form-button-text-color: var(--form-input-text-color);
   --form-button-background: #EEE;
   --form-button-border: var(--form-input-border);
@@ -33,15 +34,17 @@
   --form-button-active-background: #DDD;
   --form-button-active-border: var(--form-button-border);
   --form-button-active-color: var(--form-button-text-color);
+  --button-primary-text-color: white;
+  --button-primary-background-color: var(--link-color);
+  --button-primary-hover-background-color: hsl(213, 100%, 40%);
+  --button-primary-disabled-color: grey;
+  --button-outline-primary-color: var(--link-color);
 
   --quick-search-form-background: var(--body-background-color);
 
   --user-upgrade-basic-background-color: #F5F5FF;
   --user-upgrade-gold-background-color: #FFF380;
   --user-upgrade-platinum-background-color: #EEE;
-  --user-upgrade-button-text-color: white;
-  --user-upgrade-button-background-color: var(--link-color);
-  --user-upgrade-button-hover-background-color: hsl(213, 100%, 40%);
 
   --table-header-border: 2px solid #666;
   --table-row-border: 1px solid #CCC;
@@ -331,6 +334,7 @@ body[data-current-user-theme="dark"] {
   --form-input-border: 1px solid var(--grey-4);
   --form-input-placeholder-text-color: var(--grey-4);
   --form-input-validation-error-border-color: var(--red-1);
+
   --form-button-text-color: var(--grey-1);
   --form-button-background: var(--grey-5);
   --form-button-border: 1px solid var(--grey-4);
@@ -339,6 +343,10 @@ body[data-current-user-theme="dark"] {
   --form-button-active-background: var(--grey-5);
   --form-button-active-border: 1px solid var(--grey-5);
   --form-button-active-color: white;
+  --button-primary-text-color: white;
+  --button-primary-background-color: var(--link-color);
+  --button-primary-hover-background-color: var(--link-hover-color);
+  --button-primary-disabled-color: var(--grey-4);
 
   --forum-vote-up-color: var(--green-1);
   --forum-vote-meh-color: var(--yellow-1);
@@ -430,9 +438,6 @@ body[data-current-user-theme="dark"] {
   --user-upgrade-basic-background-color: var(--grey-2);
   --user-upgrade-gold-background-color: var(--indigo-0);
   --user-upgrade-platinum-background-color: var(--blue-0);
-  --user-upgrade-button-text-color: white;
-  --user-upgrade-button-background-color: var(--link-color);
-  --user-upgrade-button-hover-background-color: var(--link-hover-color);
 
   --wiki-page-other-name-background-color: var(--grey-3);
   --wiki-page-versions-diff-del-background: var(--red-0);
