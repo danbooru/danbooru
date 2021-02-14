@@ -879,6 +879,46 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@fontsource/anton@^4.0.0":
+  version "4.2.2"
+  resolved "https://registry.yarnpkg.com/@fontsource/anton/-/anton-4.2.2.tgz#87bf88895d3501a373a0d260294539d543556cc2"
+  integrity sha512-Jis/b03orB+tjook59Xwp97CXZdQ3Nqx42B2qu/+rviPmuFaj/6i1iR9rgnTJc5cbrm1okUXzpC9xL3BuP2xlg==
+
+"@fontsource/archivo-narrow@^4.0.0":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@fontsource/archivo-narrow/-/archivo-narrow-4.2.1.tgz#dc6e4d1b232055f3d1154ce5edf9bc4d186535bd"
+  integrity sha512-SPvc+Nm381ugvvwDSc1f8FDDn5Bgi1vq4eh2UvJbX2ceXDgi6Tn9Lew+BdYleWXGAk+027S9JcwalA6qazLoQA==
+
+"@fontsource/ibm-plex-mono@^4.0.0":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@fontsource/ibm-plex-mono/-/ibm-plex-mono-4.2.1.tgz#db3ed8fd3490363a87352903503d6c1c6b840376"
+  integrity sha512-D+v2+dt141X47g4R/DlYFl1C3tADbd/xKCz4JXjbxvJcb5VhNkyIdwTPAnDlBKHqRpZCnGVPscnTACNPbVNRmQ==
+
+"@fontsource/indie-flower@^4.0.0":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@fontsource/indie-flower/-/indie-flower-4.2.1.tgz#7020052cdabf855ac73e81c3aa1f1a8a372aa657"
+  integrity sha512-oWuD6xfNDVVuJPDkKneuKlbpTEoem9JhXGqS2pfoQDT6Apw290shC7K8+OrlHmIO52RyebG6L67a1bIndQg7SQ==
+
+"@fontsource/lora@^4.0.0":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@fontsource/lora/-/lora-4.2.1.tgz#0e52d21f167b3d0433744bcef9bd1c00ecbf3181"
+  integrity sha512-alufqFaVNyHyA/Aa21EgPxyWbzTShraw8nNNWL6qu+O1eMmNB8T3HYQe1vrDAgZjPhSFYLUhxBphctk3AYsT5w==
+
+"@fontsource/petit-formal-script@^4.0.0":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@fontsource/petit-formal-script/-/petit-formal-script-4.2.1.tgz#abd98c4b47f12ccb42a8c776572ad3a45254f51b"
+  integrity sha512-QgJL7Oj8pNGlEph/H7w3eZlz6mZyXjmH22R68fP03XHQwkoknDTAXSMDme2LGe0zJPj/4CdvV2ynB2ev21lpsQ==
+
+"@fontsource/rokkitt@^4.0.0":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@fontsource/rokkitt/-/rokkitt-4.2.1.tgz#6a5e3018c793381ac8189a74326f88140c816ba7"
+  integrity sha512-1RaccLDvuOPAoYLljEx1oxlPaHc6V54eSRJ7AalaE7ZCp9odSu/qXp06gSsIqiCxQy3sTgPxnMOjT7xBLodmYw==
+
+"@fontsource/unifrakturmaguntia@^4.0.0":
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/@fontsource/unifrakturmaguntia/-/unifrakturmaguntia-4.2.1.tgz#4210129ecca90446746b394a093dcee20525bf9c"
+  integrity sha512-0bzgQ86nLAbjS+M+rr8gIxuLZnAU67C87EF9RqVziK1ayB+eFmyrcQnMoVDOz36qShJdC62d3iovHt58t3iDvA==
+
 "@fortawesome/fontawesome-free@^5.11.2":
   version "5.15.2"
   resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-free/-/fontawesome-free-5.15.2.tgz#218cd7276ab4f9ab57cc3d2efa2697e6a579f25d"
@@ -6570,46 +6610,6 @@ typedarray-to-buffer@^3.1.5:
   integrity sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==
   dependencies:
     is-typedarray "^1.0.0"
-
-typeface-anton@^0.0.72:
-  version "0.0.72"
-  resolved "https://registry.yarnpkg.com/typeface-anton/-/typeface-anton-0.0.72.tgz#f30d21979fd90e13ef50630027f09575b57cadb4"
-  integrity sha512-erWLoPnR9O0Y1UtvTW8eUIPfihmQBR6MLPyhvkqaOvK7VjOyS2ofJxbriRnjX1OjtvPtYh5lH6bnPFddrkP1OA==
-
-typeface-archivo-narrow@^1.0.0:
-  version "1.1.13"
-  resolved "https://registry.yarnpkg.com/typeface-archivo-narrow/-/typeface-archivo-narrow-1.1.13.tgz#ceb5e7b43b444edacff889dda402e02cd2ca5445"
-  integrity sha512-0FkYcIu3zXhRfmGDdTTMt5CAyFZVA9PkKYk0QHADlTgQGTklJ5MSrgoduloAN7ocF1Zrk99Ab3BgyUitkm3UZw==
-
-typeface-ibm-plex-mono@^0.0.61:
-  version "0.0.61"
-  resolved "https://registry.yarnpkg.com/typeface-ibm-plex-mono/-/typeface-ibm-plex-mono-0.0.61.tgz#ee7f12643e2bfee5c5c6915350005d6dfdaa66fd"
-  integrity sha512-4Pzza33ihcW1l9qSs6WmRRb6FxVoDvpoTws55V9rwN7zVqURFh1c/i4qWCmHJ0Dyr0c+pYgQVyb/aAwsRjv2Lg==
-
-typeface-indie-flower@^0.0.72:
-  version "0.0.72"
-  resolved "https://registry.yarnpkg.com/typeface-indie-flower/-/typeface-indie-flower-0.0.72.tgz#80b18841d9c789b262e6f7ff6950a4472e565f60"
-  integrity sha512-BwdRkMP4icqG9nSPQ/k1fyEEs06V0/97yJKrOBrGu77Ge6tGCtqvBV+2ke9ASMGxKOUyufZoPZ0zscE3ZxvSvw==
-
-typeface-lora@^0.0.72:
-  version "0.0.72"
-  resolved "https://registry.yarnpkg.com/typeface-lora/-/typeface-lora-0.0.72.tgz#850c211ef51167d8b71b610c93a9b1ca0f17863c"
-  integrity sha512-6Q029hpZAJOU2K0V3JM0xColUa/u/0xpzgN5nv1aKe019lNYp9u+6u+BF3zK7n+gwGAjrz75qdFxhM34fheSAA==
-
-typeface-petit-formal-script@^0.0.72:
-  version "0.0.72"
-  resolved "https://registry.yarnpkg.com/typeface-petit-formal-script/-/typeface-petit-formal-script-0.0.72.tgz#aa9361a5a919ca8403dca24dc115770b17ed0fd3"
-  integrity sha512-1gxpzetKTvVZvbvpYMPpd110VHi3gbwVvTBa+YydyFnv4iVgSBGwvYrnz6QlNQ/u08+N32CFvaSAVFjtb6CLlw==
-
-typeface-rokkitt@^1.0.0:
-  version "1.1.13"
-  resolved "https://registry.yarnpkg.com/typeface-rokkitt/-/typeface-rokkitt-1.1.13.tgz#77c78b9fcb3f7fa06aef74b97db2284e7332faa4"
-  integrity sha512-2sPdAOij0gmCXhwdXrCXKb9y1mCtM9dQRI8thh94VwAZ6bFcPzLG2qQcPsGBW2gvo/vSGwIo5ABedfdGbCfo+Q==
-
-typeface-unifrakturmaguntia@^0.0.72:
-  version "0.0.72"
-  resolved "https://registry.yarnpkg.com/typeface-unifrakturmaguntia/-/typeface-unifrakturmaguntia-0.0.72.tgz#2c314a0ebf54d522c9ceb84fa338bbf3b698b6d4"
-  integrity sha512-+arjO+M5PK9CEMtJm7KWCxZS4NIhxHx04iBuTKiU95JyB9xD4YBpfU5Y3NYqUPvUj3YnNJbPvq9B9Ayt0JE8ug==
 
 typopro-web@^4.2.2:
   version "4.2.5"

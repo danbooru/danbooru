@@ -45,8 +45,8 @@
   font-display: swap;
   src:
     local("IBM Plex Mono"),
-    url("../../../../../node_modules/typeface-ibm-plex-mono/files/ibm-plex-mono-latin-200.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-ibm-plex-mono/files/ibm-plex-mono-latin-200.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-200-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-200-normal.woff") format("woff");
 }
 
 @font-face {
@@ -56,8 +56,8 @@
   font-display: swap;
   src:
     local("IBM Plex Mono"),
-    url("../../../../../node_modules/typeface-ibm-plex-mono/files/ibm-plex-mono-latin-200italic.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-ibm-plex-mono/files/ibm-plex-mono-latin-200italic.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-200-italic.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-200-italic.woff") format("woff");
 }
 
 @font-face {
@@ -67,8 +67,8 @@
   font-display: swap;
   src:
     local("IBM Plex Mono"),
-    url("../../../../../node_modules/typeface-ibm-plex-mono/files/ibm-plex-mono-latin-700.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-ibm-plex-mono/files/ibm-plex-mono-latin-700.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-700-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-700-normal.woff") format("woff");
 }
 
 @font-face {
@@ -78,8 +78,8 @@
   font-display: swap;
   src:
     local("IBM Plex Mono"),
-    url("../../../../../node_modules/typeface-ibm-plex-mono/files/ibm-plex-mono-latin-700italic.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-ibm-plex-mono/files/ibm-plex-mono-latin-700italic.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-700-italic.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-700-italic.woff") format("woff");
 }
 
 /* https://fonts.google.com/specimen/Rokkitt */
@@ -88,8 +88,8 @@
   font-weight: 400;
   font-display: swap;
   src:
-    url("../../../../../node_modules/typeface-rokkitt/files/rokkitt-latin-400.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-rokkitt/files/rokkitt-latin-400.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/rokkitt/files/rokkitt-latin-400-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/rokkitt/files/rokkitt-latin-400-normal.woff") format("woff");
 }
 
 @font-face {
@@ -97,8 +97,8 @@
   font-weight: 700;
   font-display: swap;
   src:
-    url("../../../../../node_modules/typeface-rokkitt/files/rokkitt-latin-700.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-rokkitt/files/rokkitt-latin-700.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/rokkitt/files/rokkitt-latin-700-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/rokkitt/files/rokkitt-latin-700-normal.woff") format("woff");
 }
 
 @font-face {
@@ -106,8 +106,8 @@
   font-weight: 400;
   font-display: swap;
   src:
-    url("../../../../../node_modules/typeface-rokkitt/files/rokkitt-latin-400.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-rokkitt/files/rokkitt-latin-400.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/rokkitt/files/rokkitt-latin-400-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/rokkitt/files/rokkitt-latin-400-normal.woff") format("woff");
 }
 
 @font-face {
@@ -115,8 +115,8 @@
   font-weight: 700;
   font-display: swap;
   src:
-    url("../../../../../node_modules/typeface-rokkitt/files/rokkitt-latin-700.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-rokkitt/files/rokkitt-latin-700.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/rokkitt/files/rokkitt-latin-700-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/rokkitt/files/rokkitt-latin-700-normal.woff") format("woff");
 }
 
 /* https://fonts.google.com/specimen/Anton */
@@ -125,8 +125,8 @@
   font-display: swap;
   src:
     local("Anton"),
-    url("../../../../../node_modules/typeface-anton/files/anton-latin-400.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-anton/files/anton-latin-400.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/anton/files/anton-latin-400-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/anton/files/anton-latin-400-normal.woff") format("woff");
 }
 
 @font-face {
@@ -134,8 +134,8 @@
   font-display: swap;
   src:
     local("Anton"),
-    url("../../../../../node_modules/typeface-anton/files/anton-latin-400.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-anton/files/anton-latin-400.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/anton/files/anton-latin-400-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/anton/files/anton-latin-400-normal.woff") format("woff");
 }
 
 /* https://fonts.google.com/specimen/Archivo+Narrow */
@@ -145,8 +145,8 @@
   font-display: swap;
   src:
     local("Archivo Narrow"),
-    url("../../../../../node_modules/typeface-archivo-narrow/files/archivo-narrow-latin-400.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-archivo-narrow/files/archivo-narrow-latin-400.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-400-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-400-normal.woff") format("woff");
 }
 
 @font-face {
@@ -156,8 +156,8 @@
   font-display: swap;
   src:
     local("Archivo Narrow"),
-    url("../../../../../node_modules/typeface-archivo-narrow/files/archivo-narrow-latin-400italic.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-archivo-narrow/files/archivo-narrow-latin-400italic.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-400-italic.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-400-italic.woff") format("woff");
 }
 
 @font-face {
@@ -166,8 +166,8 @@
   font-display: swap;
   src:
     local("Archivo Narrow"),
-    url("../../../../../node_modules/typeface-archivo-narrow/files/archivo-narrow-latin-700.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-archivo-narrow/files/archivo-narrow-latin-700.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-700-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-700-normal.woff") format("woff");
 }
 
 @font-face {
@@ -177,8 +177,8 @@
   font-display: swap;
   src:
     local("Archivo Narrow"),
-    url("../../../../../node_modules/typeface-archivo-narrow/files/archivo-narrow-latin-700italic.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-archivo-narrow/files/archivo-narrow-latin-700italic.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-700-italic.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-700-italic.woff") format("woff");
 }
 
 @font-face {
@@ -187,8 +187,8 @@
   font-display: swap;
   src:
     local("Archivo Narrow"),
-    url("../../../../../node_modules/typeface-archivo-narrow/files/archivo-narrow-latin-400.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-archivo-narrow/files/archivo-narrow-latin-400.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-400-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-400-normal.woff") format("woff");
 }
 
 @font-face {
@@ -198,8 +198,8 @@
   font-display: swap;
   src:
     local("Archivo Narrow"),
-    url("../../../../../node_modules/typeface-archivo-narrow/files/archivo-narrow-latin-400italic.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-archivo-narrow/files/archivo-narrow-latin-400italic.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-400-italic.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-400-italic.woff") format("woff");
 }
 
 @font-face {
@@ -208,8 +208,8 @@
   font-display: swap;
   src:
     local("Archivo Narrow"),
-    url("../../../../../node_modules/typeface-archivo-narrow/files/archivo-narrow-latin-700.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-archivo-narrow/files/archivo-narrow-latin-700.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-700-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-700-normal.woff") format("woff");
 }
 
 @font-face {
@@ -219,8 +219,8 @@
   font-display: swap;
   src:
     local("Archivo Narrow"),
-    url("../../../../../node_modules/typeface-archivo-narrow/files/archivo-narrow-latin-700italic.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-archivo-narrow/files/archivo-narrow-latin-700italic.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-700-italic.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/archivo-narrow/files/archivo-narrow-latin-700-italic.woff") format("woff");
 }
 
 /* https://fonts.google.com/specimen/Lora */
@@ -229,8 +229,8 @@
   font-display: swap;
   src:
     local("Lora"),
-    url("../../../../../node_modules/typeface-lora/files/lora-latin-400.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-lora/files/lora-latin-400.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/lora/files/lora-latin-400-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/lora/files/lora-latin-400-normal.woff") format("woff");
 }
 
 @font-face {
@@ -239,8 +239,8 @@
   font-display: swap;
   src:
     local("Lora"),
-    url("../../../../../node_modules/typeface-lora/files/lora-latin-700.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-lora/files/lora-latin-700.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/lora/files/lora-latin-700-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/lora/files/lora-latin-700-normal.woff") format("woff");
 }
 
 @font-face {
@@ -249,8 +249,8 @@
   font-display: swap;
   src:
     local("Lora"),
-    url("../../../../../node_modules/typeface-lora/files/lora-latin-400italic.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-lora/files/lora-latin-400italic.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/lora/files/lora-latin-400-italic.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/lora/files/lora-latin-400-italic.woff") format("woff");
 }
 
 @font-face {
@@ -260,8 +260,8 @@
   font-display: swap;
   src:
     local("Lora"),
-    url("../../../../../node_modules/typeface-lora/files/lora-latin-700italic.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-lora/files/lora-latin-700italic.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/lora/files/lora-latin-700-italic.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/lora/files/lora-latin-700-italic.woff") format("woff");
 }
 
 /* https://fonts.google.com/specimen/Lora */
@@ -288,8 +288,8 @@
   font-display: swap;
   src:
     local("Indie Flower"),
-    url("../../../../../node_modules/typeface-indie-flower/files/indie-flower-latin-400.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-indie-flower/files/indie-flower-latin-400.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/indie-flower/files/indie-flower-latin-400-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/indie-flower/files/indie-flower-latin-400-normal.woff") format("woff");
 }
 
 /* https://fonts.google.com/specimen/Petit+Formal+Script */
@@ -298,8 +298,8 @@
   font-display: swap;
   src:
     local("Petit Formal Script"),
-    url("../../../../../node_modules/typeface-petit-formal-script/files/petit-formal-script-latin-400.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-petit-formal-script/files/petit-formal-script-latin-400.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/petit-formal-script/files/petit-formal-script-latin-400-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/petit-formal-script/files/petit-formal-script-latin-400-normal.woff") format("woff");
 }
 
 /* https://fonts.google.com/specimen/UnifrakturMaguntia */
@@ -308,8 +308,8 @@
   font-display: swap;
   src:
     local("UnifrakturMaguntia"),
-    url("../../../../../node_modules/typeface-unifrakturmaguntia/files/unifrakturmaguntia-latin-400.woff2") format("woff2"),
-    url("../../../../../node_modules/typeface-unifrakturmaguntia/files/unifrakturmaguntia-latin-400.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/unifrakturmaguntia/files/unifrakturmaguntia-latin-400-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/unifrakturmaguntia/files/unifrakturmaguntia-latin-400-normal.woff") format("woff");
 }
 
 /* https://www.dafont.com/anarchy2.font */
