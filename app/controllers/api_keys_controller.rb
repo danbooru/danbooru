@@ -1,4 +1,5 @@
 class ApiKeysController < ApplicationController
+  before_action :requires_reauthentication
   respond_to :html, :json, :xml
 
   def new

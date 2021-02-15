@@ -14,6 +14,7 @@ class SessionLoader
 
     if user.present? && user.authenticate_password(password)
       session[:user_id] = user.id
+      session[:last_authenticated_at] = Time.now.utc.to_s
 
       UserEvent.build_from_request(user, :login, request)
       user.last_logged_in_at = Time.now
@@ -31,6 +32,7 @@ class SessionLoader
 
   def logout
     session.delete(:user_id)
+    session.delete(:last_authenticated_at)
     return if CurrentUser.user.is_anonymous?
     UserEvent.create_from_request!(CurrentUser.user, :logout, request)
   end

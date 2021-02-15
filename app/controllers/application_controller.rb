@@ -189,6 +189,15 @@ class ApplicationController < ActionController::Base
     params.fetch(PolicyFinder.new(record).param_key, {})
   end
 
+  def requires_reauthentication
+    return if CurrentUser.user.is_anonymous?
+
+    last_authenticated_at = session[:last_authenticated_at]
+    if last_authenticated_at.blank? || Time.parse(last_authenticated_at) < 60.minutes.ago
+      redirect_to confirm_password_session_path(url: request.fullpath)
+    end
+  end
+
   # Remove blank `search` params from the url.
   #
   # /tags?search[name]=touhou&search[category]=&search[order]=

@@ -225,6 +225,7 @@ Rails.application.routes.draw do
   resources :robots, only: [:index]
   resources :saved_searches, :except => [:show]
   resource :session, only: [:new, :create, :destroy] do
+    get :confirm_password, on: :collection
     get :sign_out, on: :collection
   end
   resource :source, :only => [:show]

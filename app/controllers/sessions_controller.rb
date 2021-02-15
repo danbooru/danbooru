@@ -6,6 +6,9 @@ class SessionsController < ApplicationController
     @user = User.new
   end
 
+  def confirm_password
+  end
+
   def create
     name, password, url = params.fetch(:session, params).slice(:name, :password, :url).values
     user = SessionLoader.new(request).login(name, password)
