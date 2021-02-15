@@ -32,28 +32,9 @@ div.related-tags {
       max-width: 45em;
     }
 
-    ul {
-      margin: 0;
-
-      li {
-        em {
-          font-weight: bold;
-        }
-
-        svg {
-          margin-top: 2px;
-          cursor: pointer;
-        }
-
-        a {
-          min-width: 3em;
-        }
-
-        a.selected {
-          background: var(--selected-related-tag-background-color);
-          color: var(--selected-related-tag-color);
-        }
-      }
+    a.selected {
+      background: var(--selected-related-tag-background-color);
+      color: var(--selected-related-tag-color);
     }
   }
 }

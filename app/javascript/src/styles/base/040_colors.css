@@ -162,9 +162,6 @@
 
   --error-message-color: #A00;
 
-  --bulk-update-request-approved-color: green;
-  --bulk-update-request-failed-color: red;
-
   --login-link-color: #E00;
   --footer-border: 1px solid #DDD;
   --details-border: #DDD;
@@ -200,7 +197,6 @@
   --artist-tag-hover-color: #B66;
   --meta-tag-color: #F80;
   --meta-tag-hover-color: #FA6;
-  --selected-tag-color: white;
 
   --user-admin-color: red;
   --user-moderator-color: orange;
@@ -312,9 +308,6 @@ body[data-current-user-theme="dark"] {
   /* misc specific colors */
   --autocomplete-selected-background-color: var(--grey-3);
   --autocomplete-border: 1px solid var(--grey-4);
-
-  --bulk-update-request-approved-color: var(--green-1);
-  --bulk-update-request-failed-color: var(--red-1);
 
   --comment-sticky-background-color: var(--blue-0);
 
