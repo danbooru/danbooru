@@ -51,14 +51,22 @@
           <%= safe_join(api_key.permitted_ip_addresses, "<br>".html_safe).presence || "All" %>
         <% end %>
 
-        <% if !params[:user_id].present? %>
-          <% t.column "User" do |api_key| %>
-            <%= link_to_user api_key.user %>
+        <% t.column :uses %>
+
+        <% t.column "Last Used" do |api_key| %>
+          <%= time_ago_in_words_tagged api_key.last_used_at %>
+
+          <% if api_key.last_ip_address.present? %>
+            <br>by <%= api_key.last_ip_address %>
           <% end %>
         <% end %>
 
         <% t.column "Created" do |api_key| %>
           <%= time_ago_in_words_tagged api_key.created_at %>
+
+          <% if !params[:user_id].present? %>
+            <br> by <%= link_to_user api_key.user %>
+          <% end %>
         <% end %>
 
         <% t.column column: "control" do |api_key| %>

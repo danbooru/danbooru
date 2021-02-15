@@ -3,6 +3,8 @@
 ### API Changes
 
 * You can now have multiple API keys.
+* You can now see when your API keys were last used, how many times they've
+  been used, and which IP address last used them.
 * API keys can be restricted to only work with certain IPs or certain API
   endpoints.
 * If you're an app or script developer, and you have an app that requests API

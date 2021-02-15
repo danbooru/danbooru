@@ -90,6 +90,7 @@ class SessionLoader
   def authenticate_api_key(name, key)
     user, api_key = User.find_by_name(name)&.authenticate_api_key(key)
     raise AuthenticationFailure if user.blank?
+    update_api_key(api_key)
     raise User::PrivilegeError if !api_key.has_permission?(request.remote_ip, request.params[:controller], request.params[:action])
     CurrentUser.user = user
   end
@@ -115,6 +116,11 @@ class SessionLoader
     return if CurrentUser.is_anonymous?
     return if CurrentUser.user.last_ip_addr == @request.remote_ip
     CurrentUser.user.update_attribute(:last_ip_addr, @request.remote_ip)
+  end
+
+  def update_api_key(api_key)
+    api_key.increment!(:uses, touch: :last_used_at)
+    api_key.update!(last_ip_address: request.remote_ip)
   end
 
   def set_time_zone
