@@ -56,7 +56,7 @@ Rails.application.routes.draw do
     end
   end
 
-  resources :api_keys, only: [:create, :index, :destroy]
+  resources :api_keys, only: [:new, :create, :edit, :update, :index, :destroy]
 
   resources :artists do
     member do
@@ -246,7 +246,7 @@ Rails.application.routes.draw do
       post :send_confirmation
     end
     resource :password, only: [:edit, :update]
-    resources :api_keys, only: [:create, :index, :destroy]
+    resources :api_keys, only: [:new, :create, :edit, :update, :index, :destroy]
 
     collection do
       get :custom_style

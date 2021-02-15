@@ -454,7 +454,13 @@ CREATE TABLE public.api_keys (
     user_id integer NOT NULL,
     key character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    name character varying DEFAULT ''::character varying NOT NULL,
+    permissions character varying[] DEFAULT '{}'::character varying[] NOT NULL,
+    permitted_ip_addresses inet[] DEFAULT '{}'::inet[] NOT NULL,
+    uses integer DEFAULT 0 NOT NULL,
+    last_used_at timestamp without time zone,
+    last_ip_address inet
 );
 
 
@@ -7957,6 +7963,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210123112752'),
 ('20210127000201'),
 ('20210127012303'),
-('20210214095121');
+('20210214095121'),
+('20210214101614');
 
 

@@ -4,13 +4,10 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
   context "An api keys controller" do
     setup do
       @user = create(:user)
+      @api_key = create(:api_key, user: @user)
     end
 
     context "#index action" do
-      setup do
-        @api_key = create(:api_key, user: @user)
-      end
-
       should "let a user see their own API keys" do
         get_auth user_api_keys_path(@user.id), @user
 
@@ -40,20 +37,54 @@ class ApiKeysControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "#new action" do
+      should "render for a Member user" do
+        get_auth new_user_api_key_path(@user.id), @user
+        assert_response :success
+      end
+
+      should "fail for an Anonymous user" do
+        get new_user_api_key_path(@user.id)
+        assert_response 403
+      end
+    end
+
     context "#create action" do
       should "create a new API key" do
-        post_auth user_api_keys_path(@user.id), @user
+        post_auth user_api_keys_path(@user.id), @user, params: { api_key: { name: "blah" }}
 
         assert_redirected_to user_api_keys_path(@user.id)
-        assert_equal(true, @user.api_keys.last.present?)
+        assert_equal("blah", @user.api_keys.last.name)
+      end
+    end
+
+    context "#edit action" do
+      should "render for the API key owner" do
+        get_auth edit_api_key_path(@api_key.id), @user
+        assert_response :success
+      end
+
+      should "fail for someone else" do
+        get_auth edit_api_key_path(@api_key.id), create(:user)
+        assert_response 403
+      end
+    end
+
+    context "#update action" do
+      should "render for the API key owner" do
+        put_auth api_key_path(@api_key.id), @user, params: { api_key: { name: "blah" }}
+
+        assert_redirected_to user_api_keys_path(@user.id)
+        assert_equal("blah", @api_key.reload.name)
+      end
+
+      should "fail for someone else" do
+        put_auth api_key_path(@api_key.id), create(:user)
+        assert_response 403
       end
     end
 
     context "#destroy" do
-      setup do
-        @api_key = create(:api_key, user: @user)
-      end
-
       should "delete the user's API key" do
         delete_auth api_key_path(@api_key.id), @user
 

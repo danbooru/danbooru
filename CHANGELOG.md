@@ -1,3 +1,17 @@
+## Unreleased
+
+### API Changes
+
+* You can now have multiple API keys.
+* API keys can be restricted to only work with certain IPs or certain API
+  endpoints.
+* If you're an app or script developer, and you have an app that requests API
+  keys from users, you're highly encouraged to only request the minimum API
+  permissions necessary for your app to work.
+* If you have a privileged account, and you run scripts under your account,
+  you're highly encouraged to restrict your API keys to limit damage in case
+  they get leaked or stolen.
+
 ## 2021-02-05
 
 ### Changes

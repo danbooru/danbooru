@@ -69,6 +69,13 @@ form.simple_form {
       }
     }
   }
+
+  &.stacked-hints {
+    span.hint {
+      display: block;
+      padding-left: 0;
+    }
+  }
 }
 
 form.inline-form {

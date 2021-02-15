@@ -60,7 +60,7 @@ class SessionLoader
   end
 
   def has_api_authentication?
-    request.authorization.present? || params[:login].present? || params[:api_key].present?
+    request.authorization.present? || params[:login].present? || (params[:api_key].present? && params[:api_key].is_a?(String))
   end
 
   private
@@ -87,9 +87,10 @@ class SessionLoader
     authenticate_api_key(login, api_key)
   end
 
-  def authenticate_api_key(name, api_key)
-    user = User.find_by_name(name)&.authenticate_api_key(api_key)
+  def authenticate_api_key(name, key)
+    user, api_key = User.find_by_name(name)&.authenticate_api_key(key)
     raise AuthenticationFailure if user.blank?
+    raise User::PrivilegeError if !api_key.has_permission?(request.remote_ip, request.params[:controller], request.params[:action])
     CurrentUser.user = user
   end
 

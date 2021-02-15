@@ -5,7 +5,7 @@
     <div class="page-heading">
       <h1>API Keys</h1>
 
-      <%= link_to user_api_keys_path(CurrentUser.user.id), class: "button-primary", method: :post do %>
+      <%= link_to new_user_api_key_path(CurrentUser.user.id), class: "button-primary" do %>
         <%= plus_icon %> Add
       <% end %>
     </div>
@@ -16,7 +16,7 @@
 
         <p>If you're a developer, you can use an API key to access the
         <%= link_to_wiki "#{Danbooru.config.canonical_app_name} API", "help:api" %>. If you're not a
-        developer, you probably don't need an API key.</p>
+        developer, and you're not using any third-party apps, then you probably don't need an API key.</p>
 
         <p><strong>Your API key is like your password</strong>. Anyone who has it has full access to
         your account. Don't give your API key to apps or people you don't trust, and don't post your
@@ -37,10 +37,19 @@
     <% end %>
 
     <% if params[:user_id].present? && !@api_keys.present? %>
-      <%= link_to "Create API key", user_api_keys_path(CurrentUser.user.id), method: :post %>
+      <%= link_to "Create API key", new_user_api_key_path(CurrentUser.user.id) %>
     <% else %>
       <%= table_for @api_keys, width: "100%", class: "striped autofit" do |t| %>
+        <% t.column :name %>
         <% t.column :key, td: { class: "col-expand" } %>
+
+        <% t.column :permissions do |api_key| %>
+          <%= safe_join(api_key.permissions, "<br>".html_safe).presence || "All" %>
+        <% end %>
+
+        <% t.column "IPs" do |api_key| %>
+          <%= safe_join(api_key.permitted_ip_addresses, "<br>".html_safe).presence || "All" %>
+        <% end %>
 
         <% if !params[:user_id].present? %>
           <% t.column "User" do |api_key| %>
@@ -53,7 +62,8 @@
         <% end %>
 
         <% t.column column: "control" do |api_key| %>
-          <%= link_to "Delete", api_key, method: :delete %>
+          <%= link_to "Edit", edit_api_key_path(api_key) %>
+          | <%= link_to "Delete", api_key, method: :delete %>
         <% end %>
       <% end %>
 

@@ -209,7 +209,7 @@ class User < ApplicationRecord
 
     def authenticate_api_key(key)
       api_key = api_keys.find_by(key: key)
-      api_key.present? && ActiveSupport::SecurityUtils.secure_compare(api_key.key, key) && self
+      api_key.present? && ActiveSupport::SecurityUtils.secure_compare(api_key.key, key) && [self, api_key]
     end
 
     def authenticate_password(password)
@@ -560,6 +560,7 @@ class User < ApplicationRecord
       ]
     end
 
+    # XXX
     def api_token
       api_keys.first.try(:key)
     end

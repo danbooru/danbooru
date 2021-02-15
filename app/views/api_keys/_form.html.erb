@@ -1,0 +1,6 @@
+<%= edit_form_for(api_key, html: { class: "stacked-hints" }) do |f| %>
+  <%= f.input :name, as: :string, hint: "An optional name to help you remember what this key is for." %>
+  <%= f.input :permitted_ip_addresses, label: "IP Addresses", as: :string, hint: "An optional list of IPs allowed to use this key. Leave blank to allow all IPs." %>
+  <%= f.input :permissions, as: :select, collection: ApiKey.permissions_list, hint: "An optional list of API endpoints this key can use. Ctrl+click to select multiple endpoints. Leave blank to allow all API endpoints.", input_html: { multiple: true, size: 10 } %>
+  <%= f.submit "Create" %>
+<% end %>

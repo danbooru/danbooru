@@ -108,6 +108,53 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "for an API key with restrictions" do
+        should "restrict requests to the permitted IP addresses" do
+          @api_key = create(:api_key, permitted_ip_addresses: ["192.168.0.1", "10.0.0.1/24", "2600::1/64"])
+
+          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("192.168.0.1")
+          get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          assert_response :success
+
+          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("10.0.0.42")
+          get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          assert_response :success
+
+          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("2600::1234:0:0:1")
+          get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          assert_response :success
+
+          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("127.0.0.2")
+          get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          assert_response 403
+
+          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("10.0.1.0")
+          get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          assert_response 403
+
+          ActionDispatch::Request.any_instance.stubs(:remote_ip).returns("2600:dead:beef::1")
+          get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          assert_response 403
+        end
+
+        should "restrict requests to the permitted endpoints" do
+          @post = create(:post)
+          @api_key = create(:api_key, permissions: ["posts:index", "posts:show"])
+
+          get posts_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          assert_response :success
+
+          get post_path(@post), params: { login: @api_key.user.name, api_key: @api_key.key }
+          assert_response :success
+
+          get tags_path, params: { login: @api_key.user.name, api_key: @api_key.key }
+          assert_response 403
+
+          put post_path(@post), params: { login: @api_key.user.name, api_key: @api_key.key, post: { rating: "s" }}
+          assert_response 403
+        end
+      end
+
       context "with cookie-based authentication" do
         should "not allow non-GET requests without a CSRF token" do
           # get the csrf token from the login page so we can login
