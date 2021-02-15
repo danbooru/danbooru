@@ -33,7 +33,7 @@ class IpGeolocationTest < ActiveSupport::TestCase
       should "work for a residential IP" do
         @ip = IpGeolocation.create_or_update!("2a01:0e35:2f22:e3d0::1")
 
-        assert_equal(28, @ip.network.prefix)
+        assert_equal(26, @ip.network.prefix)
         assert_equal(false, @ip.is_proxy?)
         assert_equal(49, @ip.latitude.round(0))
         assert_equal(2, @ip.longitude.round(0))
