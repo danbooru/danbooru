@@ -559,11 +559,6 @@ class User < ApplicationRecord
         neutral_feedback_count negative_feedback_count
       ]
     end
-
-    # XXX
-    def api_token
-      api_keys.first.try(:key)
-    end
   end
 
   module CountMethods

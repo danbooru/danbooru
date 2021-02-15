@@ -15,7 +15,7 @@ class SessionsController < ApplicationController
 
     if user
       url = posts_path unless url&.start_with?("/")
-      respond_with(user, location: url, methods: [:api_token])
+      respond_with(user, location: url)
     else
       flash.now[:notice] = "Password was incorrect"
       raise SessionLoader::AuthenticationFailure

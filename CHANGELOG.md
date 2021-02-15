@@ -14,6 +14,8 @@
   you're highly encouraged to restrict your API keys to limit damage in case
   they get leaked or stolen.
 
+* The login action (POST /sessions) no longer returns the api_token field.
+
 ## 2021-02-05
 
 ### Changes
