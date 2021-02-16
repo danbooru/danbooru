@@ -46,7 +46,7 @@
         <%= f.input :receive_email_notifications, as: :select, include_blank: false, collection: [["Yes", "true"], ["No", "false"]], hint: "Receive an email when you receive a new dmail." %>
         <%= f.input :time_zone, include_blank: false, hint: "The timezone to use for timestamps." %>
         <%= f.input :comment_threshold, hint: "Comments at or below this score will be hidden by default.", input_html: { min: -100, max: 5 } %>
-        <%= f.input :blacklisted_tags, hint: "Posts with these tags will be hidden. Put each tag on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, :input_html => {:size => "40x5", :data => {:autocomplete => "tag-query"}} %>
+        <%= f.input :blacklisted_tags, hint: "Posts with these tags will be hidden. Put each tag on a separate line. <a href='/wiki_pages/help:blacklists'>View help.</a>".html_safe, :input_html => { :data => {:autocomplete => "tag-query"}} %>
       </fieldset>
 
       <fieldset id="advanced-settings-section">
@@ -70,8 +70,8 @@
         <%= f.input :disable_cropped_thumbnails, :as => :select, :hint => "Disable cropped (square) thumbnails on mobile", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
         <%= f.input :enable_desktop_mode, :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false, :hint => "Use the desktop layout on mobile" %>
 
-        <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :rows => 5, :data => { :autocomplete => "tag-query" } } %>
-        <%= f.input :custom_style, :label => "Custom <a href='https://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "CSS rules to apply to the whole site.", :input_html => {:size => "40x5"} %>
+        <%= f.input :favorite_tags, :label => "Frequent tags", :hint => "A list of tags that you use often. They will appear when using the list of Related Tags.", :input_html => { :data => { :autocomplete => "tag-query" } } %>
+        <%= f.input :custom_style, :label => "Custom <a href='https://en.wikipedia.org/wiki/Cascading_Style_Sheets'>CSS</a> style".html_safe, :hint => "CSS rules to apply to the whole site." %>
       </fieldset>
 
       <%= f.button :submit, "Submit" %>

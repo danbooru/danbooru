@@ -155,10 +155,6 @@ div#c-posts {
       margin: 1em 0 0.5em;
     }
 
-    #edit textarea {
-      width: 100%;
-    }
-
     #favlist {
       word-wrap: break-word;
     }
@@ -186,14 +182,6 @@ div#c-posts {
         max-height: 20em;
         overflow-y: auto;
       }
-    }
-  }
-
-  div#quick-edit-div {
-    textarea {
-      width: 70%;
-      height: 4em;
-      display: block;
     }
   }
 }
@@ -253,6 +241,8 @@ div#c-posts, div#c-uploads {
 
 /* Container for the tag edit <textarea>, header, and related tags buttons. */
 #tags-container {
+  max-width: 60rem;
+
   div.header {
     line-height: 1.5em;
 
@@ -275,20 +265,5 @@ div#c-posts, div#c-uploads {
         height: 20px;
       }
     }
-  }
-}
-
-#add-commentary-dialog {
-  input {
-    width: 70%;
-  }
-
-  input[type=checkbox] {
-    width: auto;
-  }
-
-  textarea {
-    font-size: 1em;
-    width: 100%;
   }
 }

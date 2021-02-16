@@ -124,12 +124,6 @@ PostModeMenu.open_edit = function(post_id) {
   $("#quick-edit-div").slideDown("fast");
   $("#quick-edit-form").attr("data-post-id", post_id);
   $("#post_tag_string").val($post.data("tags") + " ").focus().selectEnd();
-
-  /* Set height of tag edit box to fit content. */
-  $("#post_tag_string").height(80); // min height: 80px.
-  var padding = $("#post_tag_string").innerHeight() - $("#post_tag_string").height();
-  var height = $("#post_tag_string").prop("scrollHeight") - padding;
-  $("#post_tag_string").height(height);
 }
 
 PostModeMenu.click = function(e) {

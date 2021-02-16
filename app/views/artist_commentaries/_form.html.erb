@@ -14,10 +14,10 @@
   <%= f.input :post_id, as: :hidden, input_html: { value: post.id } %>
 
   <%= f.input :original_title, as: :string, input_html: { value: artist_commentary.try(:original_title) } %>
-  <%= f.input :original_description, input_html: { size: "40x6", value: artist_commentary.try(:original_description) } %>
+  <%= f.input :original_description, input_html: { value: artist_commentary.try(:original_description) } %>
 
   <%= f.input :translated_title, as: :string, input_html: { value: artist_commentary.try(:translated_title) } %>
-  <%= f.input :translated_description, input_html: { size: "40x6", value: artist_commentary.try(:translated_description) } %>
+  <%= f.input :translated_description, input_html: { value: artist_commentary.try(:translated_description) } %>
 
   <% if post.has_tag?("commentary") %>
     <%= f.input :remove_commentary_tag, as: :boolean %>

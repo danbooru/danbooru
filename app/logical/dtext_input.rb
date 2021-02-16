@@ -20,7 +20,7 @@ class DtextInput < SimpleForm::Inputs::Base
       if options[:inline]
         t.concat @builder.text_field(attribute_name, merged_input_options)
       else
-        t.concat @builder.text_area(attribute_name, { rows: 20, cols: 30 }.merge(merged_input_options))
+        t.concat @builder.text_area(attribute_name, merged_input_options)
       end
 
       t.concat t.tag.div(id: "dtext-preview", class: "dtext-preview prose")

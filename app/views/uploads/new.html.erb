@@ -35,7 +35,7 @@
         </div>
 
         <div class="upload_source_container">
-          <%= f.input :source, as: :string, placeholder: "Enter the URL to upload here", input_html: { size: 50, value: params[:url] } %>
+          <%= f.input :source, as: :string, placeholder: "Enter the URL to upload here", input_html: { value: params[:url] } %>
           <%= tag.button "Similar", id: "similar-button" %>
         </div>
 
@@ -48,8 +48,8 @@
           <a href="#" id="toggle-artist-commentary">show »</a>
 
           <div class="artist-commentary" style="display: none;">
-            <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { size: 60, value: params[:artist_commentary_title] } %>
-            <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { size: "60x5", value: params[:artist_commentary_desc] } %>
+            <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { value: params[:artist_commentary_title] } %>
+            <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { value: params[:artist_commentary_desc] } %>
           </div>
         </div>
 
@@ -58,8 +58,8 @@
           <a href="#" id="toggle-commentary-translation">show »</a>
 
           <div class="commentary-translation" style="display: none;">
-            <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { size: 60, value: params[:translated_commentary_title] } %>
-            <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { size: "60x5", value: params[:translated_commentary_desc] } %>
+            <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { value: params[:translated_commentary_title] } %>
+            <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { value: params[:translated_commentary_desc] } %>
           </div>
         </div>
 
@@ -76,7 +76,7 @@
             </a>
           </div>
 
-          <%= f.input :tag_string, label: false, hint: "Ctrl+Enter to submit", input_html: { size: "60x5", "data-autocomplete": "tag-edit", "data-shortcut": "e", value: params[:tag_string] } %>
+          <%= f.input :tag_string, label: false, hint: "Ctrl+Enter to submit", input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: params[:tag_string] } %>
           <%= render "related_tags/buttons" %>
         </div>
 

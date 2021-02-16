@@ -42,8 +42,8 @@
     </fieldset>
   <% end %>
 
-  <%= f.input :parent_id, label: "Parent", input_html: { size: 60 }, as: :string %>
-  <%= f.input :source, input_html: { size: 60 } %>
+  <%= f.input :parent_id, label: "Parent", as: :string %>
+  <%= f.input :source %>
 
   <div class="input fixed-width-container" id="tags-container">
     <div class="header">
@@ -59,7 +59,7 @@
     </div>
 
     <div>
-      <%= f.input :tag_string, label: false, hint: "Ctrl+Enter to submit", input_html: { size: "60x5", "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.presenter.split_tag_list_text + " " } %>
+      <%= f.input :tag_string, label: false, hint: "Ctrl+Enter to submit", input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.presenter.split_tag_list_text + " " } %>
     </div>
 
     <%= render "related_tags/buttons" %>

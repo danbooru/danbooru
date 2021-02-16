@@ -3,7 +3,7 @@
     <h1>New Update</h1>
 
     <%= edit_form_for(@news_update) do |f| %>
-      <%= f.input :message, :hint => "Use HTML for formatting", :input_html => {:size => "30x5"} %>
+      <%= f.input :message, hint: "Use HTML for formatting" %>
       <%= f.button :submit, "Submit" %>
     <% end %>
   </div>

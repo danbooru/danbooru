@@ -31,12 +31,17 @@ form.simple_form {
     margin-bottom: 1em;
 
     input[type=text], input[type=file], input[type=password], input[type=email] {
-      max-width: 20em;
+      width: 100%;
+      max-width: 25em;
     }
 
     .hint {
       @extend .fineprint;
       padding-left: 1em;
+
+      @media (max-width: 660px) {
+        display: none;
+      }
     }
 
     input.validation-error {
@@ -48,10 +53,20 @@ form.simple_form {
         padding-left: 0;
         display: block;
       }
+
+      textarea {
+        width: 100%;
+        max-width: 60rem;
+        max-height: 15rem;
+
+        &.text  { height: 20vh; }
+        &.dtext { height: 40vh; }
+      }
     }
 
-    textarea {
-      width: 70%;
+    select[multiple] {
+      height: 20vh;
+      max-height: 15rem;
     }
 
     label {
@@ -80,6 +95,7 @@ form.simple_form {
 
 form.inline-form {
   display: table;
+  width: 100%;
 
   > div.input {
     display: table-row;
@@ -87,12 +103,13 @@ form.inline-form {
 
     label {
       text-align: right;
+      padding-right: 1em;
+      white-space: nowrap;
+      width: 1%;
     }
 
     label, input {
       display: table-cell;
-      padding-right: 1em;
-      white-space: nowrap;
       line-height: 1em;
     }
   }
