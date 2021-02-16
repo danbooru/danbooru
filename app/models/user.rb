@@ -240,8 +240,8 @@ class User < ApplicationRecord
 
       def level_hash
         return {
-          "Member" => Levels::MEMBER,
           "Restricted" => Levels::RESTRICTED,
+          "Member" => Levels::MEMBER,
           "Gold" => Levels::GOLD,
           "Platinum" => Levels::PLATINUM,
           "Builder" => Levels::BUILDER,
