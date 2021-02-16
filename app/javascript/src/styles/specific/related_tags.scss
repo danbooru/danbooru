@@ -14,10 +14,6 @@ div.related-tags {
   div.tag-column {
     max-width: 15em;
 
-    &.wide-column {
-      max-width: 45em;
-    }
-
     a.selected {
       background: var(--selected-related-tag-background-color);
       color: var(--selected-related-tag-color);
