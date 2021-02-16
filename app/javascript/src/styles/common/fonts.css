@@ -45,8 +45,8 @@
   font-display: swap;
   src:
     local("IBM Plex Mono"),
-    url("../../../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-200-normal.woff2") format("woff2"),
-    url("../../../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-200-normal.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-normal.woff") format("woff");
 }
 
 @font-face {
@@ -56,8 +56,8 @@
   font-display: swap;
   src:
     local("IBM Plex Mono"),
-    url("../../../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-200-italic.woff2") format("woff2"),
-    url("../../../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-200-italic.woff") format("woff");
+    url("../../../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-italic.woff2") format("woff2"),
+    url("../../../../../node_modules/@fontsource/ibm-plex-mono/files/ibm-plex-mono-latin-400-italic.woff") format("woff");
 }
 
 @font-face {
