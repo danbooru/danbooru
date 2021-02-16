@@ -5,15 +5,16 @@
     <%= render "search" %>
 
     <%= table_for @tags, class: "striped autofit" do |t| %>
-      <% t.column :post_count, name: "Count" %>
-      <% t.column "Name", td: {class: "col-expand"} do |tag| %>
-        <%= link_to_wiki "?", tag.name, class: tag_class(tag) %>
-        <%= link_to tag.name, posts_path(tags: tag.name), class: tag_class(tag) %>
+      <% t.column "Name", td: {class: "col-expand"} do |t| %>
+        <%= link_to_wiki "?", t.name, class: tag_class(t) %>
+        <%= link_to t.name, posts_path(tags: t.name), class: tag_class(t) %>
 
-        <% tag_alias = tag.tag_alias_for_pattern(params[:search][:name_or_alias_matches]) %>
+        <% tag_alias = t.tag_alias_for_pattern(params[:search][:name_or_alias_matches]) %>
         <% if tag_alias.present? %>
           ← <%= link_to tag_alias.antecedent_name, tag_alias, class: "fineprint" %>
         <% end %>
+
+        <%= tag.span t.post_count, class: "post-count" %>
       <% end %>
       <% t.column column: "control" do |tag| %>
         <% if policy(tag).update? %>
