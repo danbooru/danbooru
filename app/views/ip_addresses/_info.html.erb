@@ -71,5 +71,5 @@
 </div>
 
 <div class="ip-address-map">
-  <%= embedded_google_map("#{ip_info.dig(:location, :latitude)},#{ip_info.dig(:location, :longitude)}", 300, 200) %>
+  <%= embedded_map(ip_info.dig(:location, :latitude), ip_info.dig(:location, :longitude), 300, 200) %>
 </div>

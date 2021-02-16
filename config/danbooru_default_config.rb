@@ -486,12 +486,6 @@ module Danbooru
       []
     end
 
-    # API key for Google Maps. Used for embedding maps on IP address lookup pages.
-    # Generate at https://console.developers.google.com/apis/credentials
-    def google_maps_api_key
-      nil
-    end
-
     # Cloudflare API token. Used to purge URLs from Cloudflare's cache when a
     # post is replaced. The token must have 'zone.cache_purge' permissions.
     # https://support.cloudflare.com/hc/en-us/articles/200167836-Managing-API-Tokens-and-Keys

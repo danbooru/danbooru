@@ -1,11 +1,13 @@
 module IpAddressesHelper
-  def embedded_google_map(location, width, height, api_key: Danbooru.config.google_maps_api_key)
+  # https://www.bing.com/maps/embed-a-map
+  # https://docs.microsoft.com/en-us/bingmaps/articles/create-a-custom-map-url
+  def embedded_map(lat, long, width, height, zoom: 10)
     tag.iframe(
       width: width,
       height: height,
       frameborder: 0,
       allowfullscreen: true,
-      src: "https://www.google.com/maps/embed/v1/search?q=#{location}&key=#{api_key}"
+      src: "https://www.bing.com/maps/embed?w=#{width}&h=#{height}&cp=#{lat}~#{long}&lvl=#{zoom}"
     )
   end
 end

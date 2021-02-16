@@ -34,7 +34,6 @@ services:
       - DANBOORU_RAKISMET_KEY
       - DANBOORU_RAKISMET_URL
       - DANBOORU_IP_REGISTRY_API_KEY
-      - DANBOORU_GOOGLE_MAPS_API_KEY
     depends_on:
       - postgres
     user: root
