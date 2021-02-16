@@ -50,7 +50,7 @@
   <% end -%>
 
   <% if policy(Favorite).create? %>
-    <%= content_tag(:div, class: "fav-buttons fav-buttons-#{@post.favorited_by?(CurrentUser.user)}") do %>
+    <%= content_tag(:div, class: "mb-2 fav-buttons fav-buttons-#{@post.favorited_by?(CurrentUser.user)}") do %>
       <%= form_tag(favorites_path(post_id: @post.id), method: "post", id: "add-fav-button", "data-remote": true) do %>
         <%= button_tag empty_heart_icon, class: "ui-button ui-widget ui-corner-all", "data-disable-with": spinner_icon %>
       <% end %>
@@ -86,7 +86,7 @@
     <%= render_post_navbar(@post, current_user: CurrentUser.user, search: params[:q]) %>
   <% end %>
 
-  <menu id="post-sections">
+  <menu id="post-sections" class="mb-4">
     <li class="active"><a href="#comments">Comments</a></li>
 
     <% if RecommenderService.available_for_post?(@post) %>

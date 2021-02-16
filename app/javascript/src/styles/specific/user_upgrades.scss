@@ -1,26 +1,6 @@
 div#c-user-upgrades {
   div#a-new {
-    margin: 0 auto;
-
-    * {
-      margin-bottom: 1em;
-    }
-
-    h1 {
-      text-align: center;
-    }
-
     table#feature-comparison {
-      width: 100%;
-
-      th {
-        font-weight: bold;
-      }
-
-      colgroup {
-        width: 10em;
-      }
-
       colgroup#basic {
         background-color: var(--user-upgrade-basic-background-color);
       }
@@ -31,12 +11,6 @@ div#c-user-upgrades {
 
       colgroup#platinum {
         background-color: var(--user-upgrade-platinum-background-color);
-      }
-
-      td, th {
-        text-align: center;
-        vertical-align: top;
-        padding: 0.5em 0;
       }
     }
   }

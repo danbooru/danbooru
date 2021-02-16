@@ -28,7 +28,7 @@
     <% if policy(post).can_view_favlist? %>
     <%= link_to "Show »", "#", id: "show-favlist-link", style: ("display: none;" if post.fav_count == 0) %>
     <%= link_to "« Hide", "#", id: "hide-favlist-link", style: "display: none;" %>
-    <div id="favlist" style="display: none;">
+    <div id="favlist" style="display: none;" class="ml-4">
       <%= render "posts/partials/show/favorite_list", post: post %>
     </div>
   <% end %></li>

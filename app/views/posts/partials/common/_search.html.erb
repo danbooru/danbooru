@@ -2,11 +2,11 @@
 
 <section id="search-box">
   <h2>Search</h2>
-  <%= form_tag(path, method: "get", id: "search-box-form") do %>
+  <%= form_tag(path, method: "get", id: "search-box-form", class: "flex") do %>
     <% if params[:random] %>
       <%= hidden_field_tag :random, params[:random] %>
     <% end %>
-    <%= text_field_tag("tags", tags, :id => tags_dom_id, :"data-shortcut" => "q", :"data-autocomplete" => "tag-query") %>
+    <%= text_field_tag("tags", tags, :id => tags_dom_id, :class => "flex-auto", :"data-shortcut" => "q", :"data-autocomplete" => "tag-query") %>
     <button id="search-box-submit" type="submit"><%= search_icon %></button>
   <% end %>
 </section>

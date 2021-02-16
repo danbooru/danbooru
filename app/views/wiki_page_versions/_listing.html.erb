@@ -34,7 +34,7 @@
     <% end %>
 
     <% if listing_type(:wiki_page_id, member_check: false, types: [:page, :global]) == :page %>
-      <%= submit_tag "Diff" %>
+      <%= submit_tag "Diff", class: "mt-4" %>
     <% end %>
   <% end %>
 </div>

@@ -5,10 +5,10 @@
 <%= render "users/secondary_links" %>
 
 <div id="c-user-upgrades">
-  <div id="a-new" class="fixed-width-container">
+  <div id="a-new" class="fixed-width-container mx-auto">
 
     <% if @user_upgrade.is_gift? %>
-      <h1>Gift Account Upgrade</h1>
+      <h1 class="text-center mb-4">Gift Account Upgrade</h1>
 
       <% if @user_upgrade.recipient.is_platinum? %>
         <p><%= link_to_user @recipient %> is already above Platinum level and can't be upgraded!</p>
@@ -16,7 +16,7 @@
         <h6>You are gifting this upgrade to <%= link_to_user @user_upgrade.recipient %>.</h6>
       <% end %>
     <% else %>
-      <h1>Upgrade Account</h1>
+      <h1 class="text-center mb-4">Upgrade Account</h1>
 
       <p>Upgrading your account gives you exclusive benefits and helps support
       <%= Danbooru.config.canonical_app_name %>. Your support helps keep the
@@ -26,7 +26,7 @@
       their profile page and look for a "Gift Upgrade" link.</p>
     <% end %>
 
-    <table id="feature-comparison">
+    <table id="feature-comparison" class="w-full text-center table-md">
       <thead>
         <tr>
           <th></th>
@@ -36,10 +36,10 @@
         </tr>
       </thead>
       <tbody>
-        <colgroup id="labels"></colgroup>
-        <colgroup id="basic"></colgroup>
-        <colgroup id="gold"></colgroup>
-        <colgroup id="platinum"></colgroup>
+        <colgroup id="labels" class="w-1/4"></colgroup>
+        <colgroup id="basic" class="w-1/4"></colgroup>
+        <colgroup id="gold" class="w-1/4"></colgroup>
+        <colgroup id="platinum" class="w-1/4"></colgroup>
         <tr>
           <td></td>
           <td>Free</td>

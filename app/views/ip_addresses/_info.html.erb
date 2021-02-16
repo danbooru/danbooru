@@ -1,75 +1,77 @@
-<div class="ip-address-details">
-  <table class="aligned-vertical">
-    <tr>
-      <th>Location</th>
-      <td>
-        <% if ip_info.dig(:location, :city) %>
-          <%= ip_info.dig(:location, :city) %>,
-        <% end %>
-        <% if ip_info.dig(:location, :region, :name).present? %>
-          <%= ip_info.dig(:location, :region, :name) %>,
-        <% end %>
-        <%= ip_info.dig(:location, :country, :name) %>
-      </td>
-    </tr>
-    <tr>
-      <th>Network</th>
-      <td>
-        <%= link_to ip_info.dig(:connection, :route), ip_addresses_path(search: { ip_addr: ip_info.dig(:connection, :route) }) %>
-        (<%= link_to "info", "https://ipinfo.io/AS#{ip_info.dig(:connection, :asn)}/#{ip_info.dig(:connection, :route)}"  %>)
-      </td>
-    </tr>
-    <tr>
-      <th>Proxy</th>
-      <td><%= ip_address.lookup.is_proxy? ? "yes" : "no" %></td>
-    </tr>
-    <tr>
-      <th>IP Banned</th>
-      <td>
-        <% if IpBan.ip_matches(ip_address.ip_addr.to_s).exists? %>
-          yes (<%= link_to "info", ip_bans_path(search: { ip_addr: ip_address.to_s }) %>)
-        <% else %>
-          no
-        <% end %>
-      </td>
-    </tr>
-    <tr>
-      <th>Type</th>
-      <td><%= ip_info.dig(:connection, :type) %></td>
-    </tr>
-    <tr>
-      <th>ASN</th>
-      <td>
-        <%= link_to "AS#{ip_info.dig(:connection, :asn)}", "https://ipinfo.io/AS#{ip_info.dig(:connection, :asn)}" %>
-      </td>
-    </tr>
-    <tr>
-      <th>Organization</th>
-      <td>
-        <%= ip_info.dig(:connection, :organization) %>
-      </td>
-    </tr>
-    <% if ip_info.dig(:carrier, :name).present? %>
+<div class="space-x-4">
+  <div class="inline-block">
+    <table class="aligned-vertical">
       <tr>
-        <th>Mobile Carrier</th>
-        <td><%= ip_info.dig(:carrier, :name) %></td>
+        <th>Location</th>
+        <td>
+          <% if ip_info.dig(:location, :city) %>
+            <%= ip_info.dig(:location, :city) %>,
+          <% end %>
+          <% if ip_info.dig(:location, :region, :name).present? %>
+            <%= ip_info.dig(:location, :region, :name) %>,
+          <% end %>
+          <%= ip_info.dig(:location, :country, :name) %>
+        </td>
       </tr>
-    <% end %>
-    <tr>
-      <th>Website</th>
-      <td><%= external_link_to("http://#{ip_info.dig(:connection, :domain)}") %></td>
-    </tr>
-    <tr>
-      <th>Details</th>
-      <td>
-        <details>
-          <pre><%= JSON.pretty_generate(ip_info) %></pre>
-        </details>
-      </td>
-    </tr>
-  </table>
-</div>
+      <tr>
+        <th>Network</th>
+        <td>
+          <%= link_to ip_info.dig(:connection, :route), ip_addresses_path(search: { ip_addr: ip_info.dig(:connection, :route) }) %>
+          (<%= link_to "info", "https://ipinfo.io/AS#{ip_info.dig(:connection, :asn)}/#{ip_info.dig(:connection, :route)}"  %>)
+        </td>
+      </tr>
+      <tr>
+        <th>Proxy</th>
+        <td><%= ip_address.lookup.is_proxy? ? "yes" : "no" %></td>
+      </tr>
+      <tr>
+        <th>IP Banned</th>
+        <td>
+          <% if IpBan.ip_matches(ip_address.ip_addr.to_s).exists? %>
+            yes (<%= link_to "info", ip_bans_path(search: { ip_addr: ip_address.to_s }) %>)
+          <% else %>
+            no
+          <% end %>
+        </td>
+      </tr>
+      <tr>
+        <th>Type</th>
+        <td><%= ip_info.dig(:connection, :type) %></td>
+      </tr>
+      <tr>
+        <th>ASN</th>
+        <td>
+          <%= link_to "AS#{ip_info.dig(:connection, :asn)}", "https://ipinfo.io/AS#{ip_info.dig(:connection, :asn)}" %>
+        </td>
+      </tr>
+      <tr>
+        <th>Organization</th>
+        <td>
+          <%= ip_info.dig(:connection, :organization) %>
+        </td>
+      </tr>
+      <% if ip_info.dig(:carrier, :name).present? %>
+        <tr>
+          <th>Mobile Carrier</th>
+          <td><%= ip_info.dig(:carrier, :name) %></td>
+        </tr>
+      <% end %>
+      <tr>
+        <th>Website</th>
+        <td><%= external_link_to("http://#{ip_info.dig(:connection, :domain)}") %></td>
+      </tr>
+      <tr>
+        <th>Details</th>
+        <td>
+          <details>
+            <pre><%= JSON.pretty_generate(ip_info) %></pre>
+          </details>
+        </td>
+      </tr>
+    </table>
+  </div>
 
-<div class="ip-address-map">
-  <%= embedded_map(ip_info.dig(:location, :latitude), ip_info.dig(:location, :longitude), 300, 200) %>
+  <div class="inline-block align-top">
+    <%= embedded_map(ip_info.dig(:location, :latitude), ip_info.dig(:location, :longitude), 300, 200) %>
+  </div>
 </div>

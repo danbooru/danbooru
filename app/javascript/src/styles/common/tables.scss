@@ -13,17 +13,12 @@ table.striped {
     }
   }
 
-  .number, .links {
-    text-align: right;
-  }
-
   thead {
     tr {
       border-bottom: var(--table-header-border);
     }
 
     th {
-      font-weight: bold;
       text-align: left;
     }
   }
@@ -71,4 +66,12 @@ table.search, table.aligned-vertical {
 
 table.aligned-vertical {
   height: 1.75em;
+}
+
+table.table-sm {
+  th, td { padding: 0.25rem; }
+}
+
+table.table-md {
+  th, td { padding: 0.5rem; }
 }

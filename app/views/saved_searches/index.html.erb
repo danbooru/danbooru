@@ -36,7 +36,7 @@
       <% t.column "Created" do |ss| %>
         <%= time_ago_in_words_tagged ss.created_at %>
       <% end %>
-      <% t.column th: {class: "links"}, td: {class: "links"} do |ss| %>
+      <% t.column column: "control" do |ss| %>
         <%= link_to "edit", edit_saved_search_path(ss) %>
           | <%= link_to "delete", saved_search_path(ss), :method => :delete, :remote => true %>
       <% end %>

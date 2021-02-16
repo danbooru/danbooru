@@ -10,16 +10,14 @@
 ) %>
 
 <div id="ugoira-controls">
-  <div id="ugoira-control-panel" style="width: <%= [@post.image_width, 350].max %>px;">
+  <div id="ugoira-control-panel" class="mb-2 flex items-center" style="width: <%= [@post.image_width, 350].max %>px;">
     <%= button_tag "Play", :id => "ugoira-play", :style => "display: none;" %>
     <%= button_tag "Pause", :id => "ugoira-pause" %>
-    <div id="seek-slider" style="width: <%= [@post.image_width, 350].max - 81 %>px;"></div>
+    <div id="seek-slider" class="ml-4" style="width: <%= [@post.image_width, 350].max - 81 %>px;"></div>
   </div>
-  <p id="save-video-link">
-    <% if post.has_ugoira_webm? %>
-      <%= link_to "Save as video (right click and save)", post.tagged_large_file_url %>
-    <% else %>
-      WebM conversion pending
-    <% end %>
-  </p>
+  <% if post.has_ugoira_webm? %>
+    <%= link_to "Save as video (right click and save)", post.tagged_large_file_url %>
+  <% else %>
+    WebM conversion pending
+  <% end %>
 </div>

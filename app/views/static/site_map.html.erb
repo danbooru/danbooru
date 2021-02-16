@@ -1,8 +1,8 @@
 <% page_title "Site Map" %>
 
 <div id="c-static">
-  <div id="a-site-map" class="fixed-width-container">
-    <section>
+  <div id="a-site-map" class="fixed-width-container space-y-4 md:flex md:space-y-0">
+    <section class="flex-auto space-y-4">
       <ul>
         <li><h2>Posts</h2></li>
         <li><%= link_to_wiki "Help", "help:posts" %></li>
@@ -44,7 +44,7 @@
         <li><%= link_to("Changes", artist_versions_path) %></li>
       </ul>
     </section>
-    <section>
+    <section class="flex-auto space-y-4">
       <ul>
         <li><h2>Tags</h2></li>
         <li><%= link_to_wiki "Help", "help:tags" %></li>
@@ -75,7 +75,7 @@
         <li><%= link_to("Missed Searches", missed_searches_explore_posts_path) %></li>
       </ul>
     </section>
-    <section>
+    <section class="flex-auto space-y-4">
       <ul>
         <li><h2>Comments</h2></li>
         <li><%= link_to_wiki "Help", "help:comments" %></li>
@@ -107,7 +107,7 @@
         <li><%= link_to("Changes", artist_commentary_versions_path) %></li>
       </ul>
     </section>
-    <section>
+    <section class="flex-auto space-y-4">
       <ul>
         <li><h2>Profile</h2></li>
         <% if CurrentUser.is_anonymous? %>

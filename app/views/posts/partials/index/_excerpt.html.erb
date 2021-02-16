@@ -15,7 +15,7 @@
         <%= render "artists/summary", artist: artist %>
         <%= render "tag_relationships/alias_and_implication_list", tag: artist.tag %>
 
-        <p class="links">
+        <p class="mt-4">
           <% if artist.wiki_page.present? %>
             <%= link_to "View wiki", artist.wiki_page, id: "view-wiki-link" %> |
           <% end %>
@@ -33,7 +33,7 @@
         <%= format_text(wiki_page.body) %>
         <%= render "tag_relationships/alias_and_implication_list", tag: wiki_page.tag %>
 
-        <p class="links">
+        <p class="mt-4">
           <%= link_to_wiki "View wiki", wiki_page.title, id: "view-wiki-link" %>
         </p>
       </div>
@@ -52,7 +52,7 @@
         <%= format_text(post_set.pool.description) %>
       </div>
 
-      <p class="links">
+      <p class="mt-4">
         <%= link_to "View pool", pool_path(post_set.pool.id) %>
       </p>
     <% end %>

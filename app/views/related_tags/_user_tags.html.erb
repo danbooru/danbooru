@@ -1,6 +1,6 @@
-<div class="user-related-tags-columns">
+<div class="user-related-tags-columns flex space-x-4">
   <% if related_tags.present? %>
-    <%= render "related_tags/tag_column", tags: related_tags.recent_tags, title: "Recent" %>
-    <%= render "related_tags/tag_column", tags: related_tags.favorite_tags, title: "Frequent" %>
+    <%= render "related_tags/tag_column", tags: related_tags.recent_tags, class: "recent-related-tags-column", title: "Recent" %>
+    <%= render "related_tags/tag_column", tags: related_tags.favorite_tags, class: "frequent-related-tags-column", title: "Frequent" %>
   <% end %>
 </div>

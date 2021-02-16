@@ -4,7 +4,7 @@
   <div id="a-index">
     <%= render "search" %>
 
-    <%= table_for @artists, class: "striped autofit" do |t| %>
+    <%= table_for @artists, class: "striped autofit", tr: { class: "h-10" } do |t| %>
       <% t.column "Name" do |artist| %>
         <%= link_to artist.name, artist, class: "tag-type-#{Tag.categories.artist}" %>
         <span class="post-count"><%= artist.tag.try(:post_count) || 0 %></span>

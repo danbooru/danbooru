@@ -1,6 +1,6 @@
-<div class="source-related-tags-columns">
+<div class="source-related-tags-columns flex space-x-4">
   <% if source.present? %>
-    <%= render "related_tags/tag_column", tags: source.translated_tags.map(&:name), title: "Translated Tags" %>
+    <%= render "related_tags/tag_column", tags: source.translated_tags.map(&:name), class: "translated-tags-related-tags-column", title: "Translated Tags" %>
 
     <div class="tag-column wide-column artist-related-tags-column">
       <h3>Artist</h3>

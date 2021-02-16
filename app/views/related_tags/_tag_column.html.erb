@@ -1,7 +1,7 @@
-<%# tags, title, class (optional) %>
+<%# tags, title, class %>
 
-<%= content_tag(:div, class: ["tag-column", local_assigns[:class] || "#{title.parameterize}-related-tags-column", "is-empty-#{tags.empty?}"].join(" ")) do %>
-  <% if tags.present? %>
+<% if tags.present? %>
+  <%= tag.div class: ["tag-column", local_assigns[:class]] do %>
     <h3><%= title %></h3>
     <%= render_simple_tag_list(tags) %>
   <% end %>

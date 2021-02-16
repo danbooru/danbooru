@@ -1,4 +1,8 @@
 .tag-list {
+  a.wiki-link {
+    margin-right: 0.25rem;
+  }
+
   a.search-tag {
     overflow-wrap: normal;
   }
@@ -11,9 +15,7 @@
     }
   }
 
-  &.categorized-tag-list {
-    ul {
-      margin-bottom: 1em;
-    }
+  ul {
+    margin-bottom: 1em;
   }
 }

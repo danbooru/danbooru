@@ -1,4 +1,4 @@
-<div class="current-related-tags-columns">
+<div class="current-related-tags-columns flex space-x-4">
   <% if related_tags.present? %>
     <%= render "related_tags/tag_column", tags: related_tags.tags.map(&:name), class: "general-related-tags-column", title: related_tags.pretty_name %>
     <%= render "related_tags/tag_column", tags: related_tags.wiki_page_tags, class: "wiki-related-tags-column", title: link_to_wiki("wiki:#{related_tags.pretty_name}", related_tags.query) %>

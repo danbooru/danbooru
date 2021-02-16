@@ -22,14 +22,6 @@
   }
 }
 
-#saved-searches-nav {
-  margin-top: 1em;
-}
-
-#excerpt p.links {
-  margin-top: 1em;
-}
-
 #edit-dialog {
   /* Hide everything but the rating and tags fields. */
   .post_has_embedded_notes_fieldset, .post_lock_fieldset, .post_parent_id,
@@ -68,11 +60,6 @@
 div#c-posts {
   .fav-buttons {
     font-size: 14pt;
-    margin: 0.5em 0;
-
-    i {
-      margin-right: 0.1em;
-    }
 
     button.ui-button {
       padding: 0.25em 0.75em;
@@ -97,8 +84,6 @@ div#c-posts {
 
   #ugoira-controls {
     div#seek-slider {
-      margin-top: 0.5em;
-      float: right;
       overflow: visible;
       background: var(--ugoira-seek-slider-background);
 
@@ -107,22 +92,10 @@ div#c-posts {
       }
     }
 
-    #save-video-link {
-      margin: 0.5em 0;
-    }
-
-    button {
-      margin-top: 0.3em;
-    }
-
     #ugoira-load-progress {
       display: inline;
       margin-left: 17px;
     }
-  }
-
-  .outer-recent-searches {
-    overflow: hidden;
   }
 
   .post-notice {
@@ -144,40 +117,19 @@ div#c-posts {
     &.post-notice-search { background: var(--post-search-notice-background); }
   }
 
-  aside#sidebar > section > ul {
-    margin-bottom: 1em;
-
-    a.wiki-link {
-      margin-right: 0.3em;
-    }
-  }
-
-  aside#sidebar > section > ul ul li {
-    margin-left: 1em;
-  }
-
-  #search-box-form {
-    display: flex;
-
-    input {
-      min-width: 0;
-      flex: 1;
-    }
-
-    #search-box-submit {
-      padding: 2px 6px;
-      border-left: none;
-      border-radius: 0;
-    }
+  /* override default <button> tag styling */
+  #search-box-submit {
+    padding: 2px 6px;
+    border-left: none;
+    border-radius: 0;
   }
 
   div#a-index {
     menu#post-sections {
-      margin-bottom: 0.5em;
       font-size: var(--text-lg);
 
       li {
-        padding: 0 1em 0.5em 0;
+        padding: 0 1em 0 0;
 
         &.active {
           font-weight: bold;
@@ -191,12 +143,7 @@ div#c-posts {
       word-break: break-all;
     }
 
-    .recommended-posts {
-      margin-top: 1em;
-    }
-
     menu#post-sections {
-      margin: 0;
       font-size: var(--text-lg);
 
       li {
@@ -208,16 +155,11 @@ div#c-posts {
       margin: 1em 0 0.5em;
     }
 
-    textarea {
-      margin-bottom: 0.25em;
-    }
-
     #edit textarea {
       width: 100%;
     }
 
     #favlist {
-      margin-left: 1em;
       word-wrap: break-word;
     }
 
@@ -289,8 +231,6 @@ div#c-posts, div#c-uploads {
   /* Fetch source data box */
   div#source-info {
     border-radius: 4px;
-    margin: 1em 0;
-    padding: 1em;
     border: var(--fetch-source-data-border);
 
     &:not(.loading) #source-info-loading { display: none; }
@@ -335,31 +275,6 @@ div#c-posts, div#c-uploads {
         height: 20px;
       }
     }
-  }
-}
-
-div#c-explore-posts {
-  a.desc {
-    font-weight: bold;
-    margin: 0 0.5em;
-  }
-
-  .date-nav-links {
-    text-align: center;
-  }
-
-  .period {
-    margin: 0 5em;
-
-    &:first-child {
-      margin-left: 0;
-    }
-  }
-}
-
-div#unapprove-dialog {
-  p {
-    margin-bottom: 1em;
   }
 }
 
