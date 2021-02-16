@@ -13,7 +13,7 @@
     </li>
   <% end %>
   <li id="post-option-find-similar">
-    <%= link_to "Find similar", iqdb_queries_path(post_id: post.id) %>
+    <%= link_to "Find similar", iqdb_queries_path(post_id: post.id), ref: "nofollow" %>
   </li>
   <% if policy(post).visible? %>
     <li id="post-option-download">
