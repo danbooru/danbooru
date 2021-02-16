@@ -3,8 +3,6 @@ div[data-tippy-root].tooltip-loading {
 }
 
 .tippy-box[data-theme~="common-tooltip"] {
-  box-sizing: border-box;
-
   border: 1px solid var(--post-tooltip-border-color);
   border-radius: 4px;
 
