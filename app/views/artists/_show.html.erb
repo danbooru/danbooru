@@ -22,11 +22,13 @@
 
       <% if @artist.tag.present? && @artist.tag.post_count > 0 %>
         <div class="recent-posts">
-          <h2>Recent Posts <%= link_to "»", posts_path(tags: @artist.name) %></h2>
+          <h2 class="recent-posts-header">
+            <%= link_to "Posts", posts_path(tags: @artist.name) %>
+          </h2>
 
           <%= render "posts/partials/common/inline_blacklist" %>
 
-          <div>
+          <div class="recent-posts-previews">
             <%= post_previews_html(@artist.tag.posts.limit(8), tags: @artist.name) %>
           </div>
         </div>

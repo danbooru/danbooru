@@ -1,0 +1,9 @@
+/* A small set of recent posts. Used for recent uploads and favorites on user
+ * profile pages, and recent posts on artist and wiki pages. */
+div.recent-posts {
+  margin-bottom: 1rem;
+
+  h2.recent-posts-header {
+    margin-bottom: 0.25rem;
+  }
+}
