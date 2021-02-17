@@ -36,7 +36,7 @@ class TagListComponent < ApplicationComponent
   end
 
   def is_underused_tag?(tag)
-    tag.post_count <= 1 && tag.general?
+    tag.post_count <= 1 && tag.general? && tag.name !~ /_\((cosplay|style)\)\z/
   end
 
   def humanized_post_count(tag)
