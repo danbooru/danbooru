@@ -5,8 +5,8 @@ module Sources
     context "A free Pixiv Fanbox post" do
       setup do
         @post1 = Sources::Strategies.find("https://yanmi0308.fanbox.cc/posts/1141325")
-        @post2 = Sources::Strategies.find("https://www.fanbox.cc/@tsukiori/posts/1080657")
-        @post3 = Sources::Strategies.find("https://downloads.fanbox.cc/images/post/1080657/SaakPC251KafLL6jIo1WPPmr.png")
+        @post2 = Sources::Strategies.find("https://chanxco.fanbox.cc/posts/209386")
+        @post3 = Sources::Strategies.find("https://downloads.fanbox.cc/images/post/209386/w/1200/8dRNHXkFqAwSt31W2Bg8fSdL.jpeg")
 
         assert_nothing_raised { @post1.to_h }
         assert_nothing_raised { @post2.to_h }
@@ -25,15 +25,11 @@ module Sources
 
         # "imageMapi" in api response (embedded pics)
         images2 = %w[
-          https://downloads.fanbox.cc/images/post/1080657/fMD4FYzodzcNrEamag7oSpUt.png
-          https://downloads.fanbox.cc/images/post/1080657/IHhfqr4jjos6XWLBOD7QP4BJ.png
-          https://downloads.fanbox.cc/images/post/1080657/mIUSuwQsGiStRrLQMZ6oKMAl.png
-          https://downloads.fanbox.cc/images/post/1080657/s0UHQTY6zqN3LYoeS4OoB184.png
-          https://downloads.fanbox.cc/images/post/1080657/SaakPC251KafLL6jIo1WPPmr.png
-          https://downloads.fanbox.cc/images/post/1080657/z6iw3dewfzAiZEOrG10a8ALa.png
+          https://downloads.fanbox.cc/images/post/209386/Q8rZ0iMHpcmJDACEzNGjTj9E.jpeg
+          https://downloads.fanbox.cc/images/post/209386/8dRNHXkFqAwSt31W2Bg8fSdL.jpeg
+          https://downloads.fanbox.cc/images/post/209386/AGGWF0JxytFcNL2ybPKBaqp7.jpeg
         ]
         assert_equal(images2, @post2.image_urls)
-        assert_equal([@post3.url], @post3.image_urls)
       end
 
       should "get the commentary" do
@@ -44,24 +40,24 @@ module Sources
         assert_equal(body1, @post1.artist_commentary_desc)
 
         # With embedded pics
-        assert_equal("はじめまして　＃１", @post2.artist_commentary_title)
-        assert_equal("はじめまして　＃１", @post3.artist_commentary_title)
+        assert_equal("水着BBちゃん＋アラフィフ＋ライダーさん", @post2.artist_commentary_title)
+        assert_equal("水着BBちゃん＋アラフィフ＋ライダーさん", @post3.artist_commentary_title)
 
-        body2 = "\nhttps://downloads.fanbox.cc/images/post/1080657/z6iw3dewfzAiZEOrG10a8ALa.png\nいらっしゃいませ……\nあら？あらあら、もしかして……初めてのお客さま！？\n\nhttps://downloads.fanbox.cc/images/post/1080657/SaakPC251KafLL6jIo1WPPmr.png\n調ノ宮喫茶店へようこそっ！\n\nhttps://downloads.fanbox.cc/images/post/1080657/mIUSuwQsGiStRrLQMZ6oKMAl.png\nあ、すみません。ひとりで盛り上がってしまって。\nなにせこんな辺鄙(へんぴ)なところに来て下さるお客さまは少ないものですから。\n\n藍ちゃん、藍ちゃーん。\n初めてのお客様だよ。\n\nhttps://downloads.fanbox.cc/images/post/1080657/IHhfqr4jjos6XWLBOD7QP4BJ.png\nえ。なに？\n今日はちゃんと化粧してない？　はずかしい？\n大丈夫だよいつもと変わんないから……あ！ちょっと！\n\nhttps://downloads.fanbox.cc/images/post/1080657/s0UHQTY6zqN3LYoeS4OoB184.png\n…………\nえっと……すみません。\nなんかちょっと照れてるみたいで。\n\nなにはともあれ、せっかく来られたんですからゆっくりしていってください。\n\nhttps://downloads.fanbox.cc/images/post/1080657/fMD4FYzodzcNrEamag7oSpUt.png\nあ、そっちの陽が差している窓際の席がオススメですよ。\n向かいの島がよく見渡せるんです。\n\nではご注文が決まりましたら伺いますので……\n藍ちゃん……じゃなくて、店主の焼くパンケーキはふわふわでバターの香りがして、\nナッツとシロップがたっぷり乗っててとってもおいしいですよ。\nぜひ食べてみてくださいね。\n"
+        body2 = "今週のらくがきまとめ\n\nhttps://downloads.fanbox.cc/images/post/209386/Q8rZ0iMHpcmJDACEzNGjTj9E.jpeg\n水着BBちゃん\n第一再臨もなかなかセクシー\nhttps://downloads.fanbox.cc/images/post/209386/8dRNHXkFqAwSt31W2Bg8fSdL.jpeg\nアラフィフ\n男キャラも描いていこうと練習中\n新宿での軽いキャラも好き\nhttps://downloads.fanbox.cc/images/post/209386/AGGWF0JxytFcNL2ybPKBaqp7.jpeg\nライダーさん\nつい眼鏡も描いてしまう\n\n＃FGO\n"
         assert_equal(body2, @post2.artist_commentary_desc)
         assert_equal(body2, @post3.artist_commentary_desc)
       end
 
       should "get the right page url" do
         assert_equal("https://yanmi0308.fanbox.cc/posts/1141325", @post1.page_url)
-        assert_equal("https://tsukiori.fanbox.cc/posts/1080657", @post2.page_url)
-        assert_equal("https://tsukiori.fanbox.cc/posts/1080657", @post3.page_url)
+        assert_equal("https://chanxco.fanbox.cc/posts/209386", @post2.page_url)
+        assert_equal("https://chanxco.fanbox.cc/posts/209386", @post3.page_url)
       end
 
       should "correctly download the right image" do
         assert_downloaded(431_225, @post1.image_url)
-        assert_downloaded(76_012, @post2.image_url)
-        assert_downloaded(78_751, @post3.image_url)
+        assert_downloaded(245_678, @post2.image_url)
+        assert_downloaded(320_056, @post3.image_url)
       end
 
       should "get the tags" do
@@ -74,7 +70,7 @@ module Sources
 
       should "find the correct artist" do
         @artist1 = FactoryBot.create(:artist, name: "yanmi", url_string: @post1.url)
-        @artist2 = FactoryBot.create(:artist, name: "tsukiori", url_string: @post2.url)
+        @artist2 = FactoryBot.create(:artist, name: "chanxco", url_string: @post2.url)
         assert_equal([@artist1], @post1.artists)
         assert_equal([@artist2], @post2.artists)
         assert_equal([@artist2], @post3.artists)
@@ -83,19 +79,20 @@ module Sources
       should "find the right artist names" do
         assert_equal("yanmi0308", @post1.artist_name)
         assert_equal("栗山やんみ", @post1.display_name)
-        assert_equal("tsukiori", @post2.artist_name)
-        assert_equal("調ノ宮喫茶店", @post2.display_name)
+        assert_equal("chanxco", @post2.artist_name)
+        assert_equal("CHANxCO", @post2.display_name)
         assert_equal(@post2.artist_name, @post3.artist_name)
         assert_equal(@post2.display_name, @post3.display_name)
       end
     end
 
     context "an age-restricted fanbox post" do
-      should "not raise an error" do
+      should "work" do
         @source = Sources::Strategies.find("https://mfr.fanbox.cc/posts/1306390")
 
         assert_nothing_raised { @source.to_h }
         assert_equal("mfr", @source.artist_name)
+        assert_equal("https://downloads.fanbox.cc/images/post/1306390/VOXblkyvltL5fRhMoR7RdSkk.png", @source.image_url)
       end
     end
 

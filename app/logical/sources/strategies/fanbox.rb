@@ -60,15 +60,18 @@ module Sources
 
       def image_urls
         if url =~ IMAGE || url =~ OTHER_IMAGES
-          [url]
+          [url.gsub(%r{/w/\d+/}, "/")]
         elsif api_response.present?
           # There's two ways pics are returned via api:
           # Pics in proper array: https://yanmi0308.fanbox.cc/posts/1141325
           # Embedded pics (imageMap): https://www.fanbox.cc/@tsukiori/posts/1080657
           images = api_response.dig("body", "images").to_a + api_response.dig("body", "imageMap").to_a.map { |id| id[1] }
+          # The following is needed because imageMap is sorted alphabetically rather than by image order
+          sort_order = api_response.dig("body", "blocks").to_a.map { |b| b["imageId"] if b["type"] == "image" }.compact.uniq
+          images = images.sort_by { |img| sort_order.index(img["id"]) } if sort_order.present?
           images.map { |img| img["originalUrl"] }
         else
-          [url]
+          [url.gsub(%r{/w/\d+/}, "/")]
         end
       end
 
@@ -158,10 +161,8 @@ module Sources
         resp = client.get("https://api.fanbox.cc/post.info?postId=#{illust_id}")
         json_response = JSON.parse(resp)["body"]
 
-        # Pixiv Fanbox login is protected by Google Recaptcha, so it's not
-        # possible for us to extract anything from them (save for the title).
-        # Other projects like PixivUtils ask the user to periodically extract
-        # cookies from the browser, but this is not feasible for Danbooru.
+        # At some point in 2020 fanbox stopped hiding R18 posts from the api
+        # This check exists in case they ever start blocking them again
         return {} if json_response["restrictedFor"] == 2 && json_response["body"].blank?
 
         json_response
