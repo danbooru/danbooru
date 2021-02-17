@@ -1,7 +1,7 @@
 require 'test_helper'
 
 module Sources
-  class PawooTest < ActiveSupport::TestCase
+  class MastodonTest < ActiveSupport::TestCase
     context "The source site for a https://pawoo.net/web/status/$id url" do
       setup do
         skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
@@ -38,7 +38,9 @@ module Sources
       end
 
       should "get the profile" do
-        assert_equal("https://pawoo.net/@evazion", @site.profile_url)
+        profiles = %w[https://pawoo.net/@evazion https://pawoo.net/web/accounts/47806]
+        assert_equal(profiles.first, @site.profile_url)
+        assert_equal(profiles, @site.profile_urls)
       end
 
       should "get the artist name" do
@@ -68,7 +70,7 @@ module Sources
       end
 
       should "get the dtext-ified commentary" do
-        desc = <<-EOS.strip_heredoc.chomp
+        desc = <<-DESC.strip_heredoc.chomp
           test post please ignore
 
           blah blah blah
@@ -76,7 +78,7 @@ module Sources
           this is a test 🍕
 
           "#foo":[https://pawoo.net/tags/foo] "#bar":[https://pawoo.net/tags/bar] "#baz":[https://pawoo.net/tags/baz]
-        EOS
+        DESC
 
         assert_equal(desc, @site.dtext_artist_commentary_desc)
       end
@@ -95,21 +97,40 @@ module Sources
       end
     end
 
+    context "A baraag url" do
+      setup do
+        skip "Baraag keys not set" unless Danbooru.config.baraag_client_id
+        @url = "https://baraag.net/@bardbot/105732813175612920"
+        @site = Sources::Strategies.find(@url)
+      end
+
+      should "work" do
+        assert_equal("https://baraag.net/@bardbot", @site.profile_url)
+        assert_equal(["https://baraag.net/system/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"], @site.image_urls)
+        assert_equal("bardbot", @site.artist_name)
+        assert_equal("🍌", @site.dtext_artist_commentary_desc)
+      end
+    end
+
     context "normalizing for source" do
       should "normalize correctly" do
         source1 = "https://pawoo.net/@evazion/19451018/"
         source2 = "https://pawoo.net/web/statuses/19451018/favorites"
+        source3 = "https://baraag.net/@bardbot/105732813175612920/"
 
         assert_equal("https://pawoo.net/@evazion/19451018", Sources::Strategies.normalize_source(source1))
         assert_equal("https://pawoo.net/web/statuses/19451018", Sources::Strategies.normalize_source(source2))
+        assert_equal("https://baraag.net/@bardbot/105732813175612920", Sources::Strategies.normalize_source(source3))
       end
 
       should "avoid normalizing unnormalizable urls" do
         bad_source1 = "https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png"
         bad_source2 = "https://pawoo.net/@evazion/media"
+        bad_source3 = "https://baraag.net/system/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"
 
         assert_equal(bad_source1, Sources::Strategies.normalize_source(bad_source1))
         assert_equal(bad_source2, Sources::Strategies.normalize_source(bad_source2))
+        assert_equal(bad_source3, Sources::Strategies.normalize_source(bad_source3))
       end
     end
   end
