@@ -117,7 +117,7 @@
             (<%= link_to "tag changes report", post_versions_path(search: { updater_id: user.id, version: 1 }, type: "current") %>)
           <% end %>
           <% if CurrentUser.is_moderator? %>
-            [<%= link_to "sample", posts_path(:tags => "user:#{user.name} order:random limit:300") %>]
+            [<%= link_to "sample", posts_path(:tags => "user:#{user.name} order:random limit:#{PostSets::Post::MAX_PER_PAGE}") %>]
           <% end %>
         </td>
       </tr>
@@ -127,7 +127,7 @@
         <td>
           <%= presenter.deleted_upload_count(self) %>
           <% if CurrentUser.is_moderator? %>
-            [<%= link_to "sample", posts_path(:tags => "user:#{user.name} order:random limit:300 status:deleted") %>]
+            [<%= link_to "sample", posts_path(:tags => "user:#{user.name} order:random limit:#{PostSets::Post::MAX_PER_PAGE} status:deleted") %>]
           <% end %>
 
         </td>
@@ -138,7 +138,7 @@
         <td>
           <%= presenter.favorite_count(self) %>
           <% if CurrentUser.is_moderator? %>
-            [<%= link_to "sample", posts_path(:tags => "fav:#{user.name} order:random limit:300") %>]
+            [<%= link_to "sample", posts_path(:tags => "fav:#{user.name} order:random limit:#{PostSets::Post::MAX_PER_PAGE}") %>]
           <% end %>
         </td>
       </tr>
