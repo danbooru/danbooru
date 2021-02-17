@@ -31,7 +31,7 @@ class TagSetPresenter
     copyrights = copytags.max_by(1, &:post_count).map(&:unqualified_name)
     copyrights += ["#{copytags.size - 1} more"] if copytags.size > 1
     copyrights = copyrights.to_sentence
-    copyrights = "(#{copyrights})" if characters.present?
+    copyrights = "(#{copyrights})" if characters.present? && copyrights.present?
 
     artists = tags_for_category("artist").map(&:name).grep_v("banned_artist").to_sentence
     artists = "drawn by #{artists}" if artists.present?
