@@ -220,10 +220,6 @@ class Post < ApplicationRecord
     def has_dimensions?
       image_width.present? && image_height.present?
     end
-
-    def has_ugoira_webm?
-      true
-    end
   end
 
   module ImageMethods
