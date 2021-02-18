@@ -554,7 +554,7 @@ class Note {
         return;
       }
 
-      let $textarea = $('<textarea></textarea>');
+      let $textarea = $('<textarea spellcheck="true"></textarea>');
       $textarea.val(note.original_body);
       $textarea.css({
         height: "85%",
