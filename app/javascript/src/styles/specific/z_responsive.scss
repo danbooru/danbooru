@@ -41,22 +41,6 @@
     }
   }
 
-  div.paginator {
-    font-size: var(--text-lg);
-    padding: 1em 0 0;
-
-    li {
-      a, span {
-        margin: 0 0.25rem;
-        padding: 0;
-      }
-
-      &.numbered-page, &.more {
-        display: none;
-      }
-    }
-  }
-
   #posts #posts-container {
     width: 100%;
     display: flex;

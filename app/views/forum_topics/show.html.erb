@@ -2,7 +2,7 @@
 <% meta_description(DText.excerpt(@forum_topic.original_post&.body)) %>
 
 <% atom_feed_tag(@forum_topic.title, forum_topic_url(@forum_topic.id, format: :atom)) %>
-<%= render "meta_links", collection: @forum_posts %>
+<%= render_meta_links @forum_posts %>
 <%= render "secondary_links" %>
 
 <div id="c-forum-topics">

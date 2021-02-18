@@ -1,11 +1,12 @@
 module PaginationExtension
   class PaginationError < StandardError; end
 
-  attr_accessor :current_page, :records_per_page, :paginator_count, :paginator_mode
+  attr_accessor :current_page, :records_per_page, :paginator_count, :paginator_mode, :paginator_page_limit
 
   def paginate(page, limit: nil, max_limit: 1000, page_limit: CurrentUser.user.page_limit, count: nil, search_count: nil)
     @records_per_page = limit || Danbooru.config.posts_per_page
     @records_per_page = @records_per_page.to_i.clamp(1, max_limit)
+    @paginator_page_limit = page_limit
 
     if count.present?
       @paginator_count = count
@@ -65,10 +66,8 @@ module PaginationExtension
       nil
     elsif paginator_mode == :numbered
       current_page - 1
-    elsif paginator_mode == :sequential_before && records.present?
+    elsif records.present?
       "a#{records.first.id}"
-    elsif paginator_mode == :sequential_after && records.present?
-      "b#{records.last.id}"
     else
       nil
     end
@@ -81,10 +80,8 @@ module PaginationExtension
       nil
     elsif paginator_mode == :numbered
       current_page + 1
-    elsif paginator_mode == :sequential_before && records.present?
+    elsif records.present?
       "b#{records.last.id}"
-    elsif paginator_mode == :sequential_after && records.present?
-      "a#{records.first.id}"
     else
       nil
     end

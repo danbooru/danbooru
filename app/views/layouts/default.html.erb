@@ -5,7 +5,7 @@
   <title><%= page_title %></title>
 
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-  <%= render "meta_links", collection: @current_item %>
+  <%= render_meta_links @current_item if @current_item.respond_to?(:paginate) %>
   <%= tag.link rel: "canonical", href: canonical_url %>
   <%= tag.link rel: "search", type: "application/opensearchdescription+xml", href: opensearch_url(format: :xml, version: 2), title: "Search posts" %>
 

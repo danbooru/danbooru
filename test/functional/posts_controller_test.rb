@@ -22,32 +22,32 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path(page: "a0")
           assert_response :success
           assert_select ".post-preview", count: 3
-          assert_select "#paginator-prev", count: 0
-          assert_select "#paginator-next", count: 1
+          assert_select "a.paginator-prev", count: 0
+          assert_select "a.paginator-next", count: 1
         end
 
         should "work with page=b0" do
           get posts_path(page: "b0")
           assert_response :success
           assert_select ".post-preview", count: 0
-          assert_select "#paginator-prev", count: 0
-          assert_select "#paginator-next", count: 0
+          assert_select "a.paginator-prev", count: 0
+          assert_select "a.paginator-next", count: 0
         end
 
         should "work with page=b100000" do
           get posts_path(page: "b100000")
           assert_response :success
           assert_select ".post-preview", count: 3
-          assert_select "#paginator-prev", count: 1
-          assert_select "#paginator-next", count: 0
+          assert_select "a.paginator-prev", count: 1
+          assert_select "a.paginator-next", count: 0
         end
 
         should "work with page=a100000" do
           get posts_path(page: "a100000")
           assert_response :success
           assert_select ".post-preview", count: 0
-          assert_select "#paginator-prev", count: 0
-          assert_select "#paginator-next", count: 0
+          assert_select "a.paginator-prev", count: 0
+          assert_select "a.paginator-next", count: 0
         end
       end
 

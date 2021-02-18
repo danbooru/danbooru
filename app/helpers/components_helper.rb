@@ -50,4 +50,19 @@ module ComponentsHelper
     tags = TagListComponent.tags_from_names(tag_names)
     render TagListComponent.new(tags: tags, **options).with_variant(:search)
   end
+
+  # The <link rel="next"> / <link rel="prev"> links in the <meta> element of the <head>.
+  def render_meta_links(records)
+    render PaginatorComponent.new(records: records, params: params).with_variant(:meta_links)
+  end
+
+  def numbered_paginator(records)
+    paginator = PaginatorComponent.new(records: records, params: params)
+
+    if paginator.use_sequential_paginator?
+      render paginator.with_variant(:sequential)
+    else
+      render paginator.with_variant(:numbered)
+    end
+  end
 end

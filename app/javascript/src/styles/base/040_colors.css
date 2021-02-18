@@ -183,7 +183,6 @@
 
   --wiki-page-other-name-background-color: #EEE;
 
-  --paginator-ellipsis-color: grey;
   --paginator-arrow-background-color: white;
   --paginator-arrow-color: var(--link-color);
 
@@ -377,7 +376,6 @@ body[data-current-user-theme="dark"] {
 
   --paginator-arrow-background-color: white;
   --paginator-arrow-color: var(--link-color);
-  --paginator-ellipsis-color: var(--grey-4);
 
   --post-artist-commentary-container-background: var(--grey-3);
   --post-artist-commentary-container-border: 1px solid var(--grey-3);
