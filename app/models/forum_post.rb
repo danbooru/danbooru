@@ -23,6 +23,7 @@ class ForumPost < ApplicationRecord
   after_destroy(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |rec|
     ModAction.log("#{CurrentUser.user.name} deleted forum ##{rec.id}", :forum_post_delete)
   end
+  after_create_commit :async_send_discord_notification
 
   deletable
   mentionable(
@@ -151,6 +152,15 @@ class ForumPost < ApplicationRecord
     if is_deleted? && is_original_post?
       topic.update_attribute(:is_deleted, true)
     end
+  end
+
+  def async_send_discord_notification
+    DiscordNotificationJob.perform_later(forum_post: self)
+  end
+
+  def send_discord_notification
+    return unless policy(User.anonymous).show?
+    DiscordApiClient.new.post_message(self)
   end
 
   def build_response

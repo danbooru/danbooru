@@ -250,6 +250,29 @@ class DText
     text.gsub(/\A[[:space:]]+|[[:space:]]+\z/, "")
   end
 
+  def self.to_markdown(dtext)
+    html_to_markdown(format_text(dtext))
+  end
+
+  def self.html_to_markdown(html)
+    html = Nokogiri::HTML.fragment(html)
+
+    html.children.map do |node|
+      case node.name
+      when "div", "blockquote", "table"
+        "" # strip [expand], [quote], and [table] tags
+      when "br"
+        "\n"
+      when "text"
+        node.text.gsub(/_/, '\_').gsub(/\*/, '\*')
+      when "p", "h1", "h2", "h3", "h4", "h5", "h6"
+        html_to_markdown(node.inner_html) + "\n\n"
+      else
+        html_to_markdown(node.inner_html)
+      end
+    end.join
+  end
+
   def self.from_html(text, inline: false, &block)
     html = Nokogiri::HTML.fragment(text)
 

@@ -394,6 +394,14 @@ module Danbooru
     def twitter_api_secret
     end
 
+    # If defined, Danbooru will automatically post new forum posts to the
+    # Discord channel belonging to this webhook.
+    def discord_webhook_id
+    end
+
+    def discord_webhook_secret
+    end
+
     # you should override this
     def email_key
       "zDMSATq0W3hmA5p3rKTgD"
