@@ -851,7 +851,7 @@ class PostQueryBuilder
     end
 
     def estimated_row_count
-      ExplainParser.new(build.to_sql).row_count
+      ExplainParser.new(build).row_count
     end
 
     def cached_count
