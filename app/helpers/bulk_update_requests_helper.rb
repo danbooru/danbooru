@@ -1,6 +1,6 @@
 module BulkUpdateRequestsHelper
   def bur_script_example
-    <<~EOS
+    <<~BUR
       create alias bunny -> rabbit
       remove alias bunny -> rabbit
 
@@ -9,7 +9,11 @@ module BulkUpdateRequestsHelper
 
       rename bunny -> rabbit
 
+      update bunny_focus -> animal_focus bunny
+
+      nuke bunny
+
       category touhou -> copyright
-    EOS
+    BUR
   end
 end
