@@ -20,10 +20,14 @@ module PaginationExtension
     elsif page.to_s =~ /\Aa(\d+)\z/i
       @paginator_mode = :sequential_after
       paginate_sequential_after($1, records_per_page)
+    elsif page.to_i > page_limit
+      raise PaginationError
+    elsif page.to_i == page_limit
+      @paginator_mode = :sequential_after
+      paginate_numbered(page.to_i, records_per_page)
     else
       @paginator_mode = :numbered
       @current_page = [page.to_i, 1].max
-      raise PaginationError if current_page > page_limit
 
       paginate_numbered(current_page, records_per_page)
     end

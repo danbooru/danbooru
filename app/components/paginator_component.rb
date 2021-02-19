@@ -12,7 +12,7 @@ class PaginatorComponent < ApplicationComponent
   end
 
   def use_sequential_paginator?
-    paginator_mode != :numbered || current_page >= paginator_page_limit
+    paginator_mode != :numbered
   end
 
   def pages
