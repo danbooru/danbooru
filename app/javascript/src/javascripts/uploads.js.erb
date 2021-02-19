@@ -13,7 +13,7 @@ Upload.IQDB_HIGH_SIMILARITY = 70;
 
 Upload.initialize_all = function() {
   if ($("#c-uploads,#c-posts").length) {
-    Utility.keydown("return", "submit", Shortcuts.submit_form, "#upload_tag_string, #post_tag_string");
+    Utility.keydown("return", "submit", Upload.submit_form, "#upload_tag_string, #post_tag_string");
     $("#upload_source").on("change.danbooru", Upload.fetch_data_manual);
     $(document).on("click.danbooru", "#fetch-data-manual", Upload.fetch_data_manual);
   }
@@ -40,6 +40,13 @@ Upload.initialize_all = function() {
   if ($("#c-uploads #a-new").length) {
     this.initialize_dropzone();
   }
+}
+
+Upload.submit_form = async function(event) {
+  event.preventDefault();
+  Utility.notice("The Enter shortcut will be removed soon. Use Ctrl+Enter instead");
+  await Utility.delay(3000);
+  Shortcuts.submit_form(event);
 }
 
 Upload.initialize_submit = function() {
