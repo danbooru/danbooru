@@ -16,7 +16,7 @@ class PaginatorComponent < ApplicationComponent
   end
 
   def pages
-    last_page = total_pages
+    last_page = total_pages.clamp(1..)
     left = (current_page - window).clamp(2..)
     right = (current_page + window).clamp(..last_page - 1)
 
@@ -25,7 +25,7 @@ class PaginatorComponent < ApplicationComponent
       ("..." unless left == 2),
       (left..right).to_a,
       ("..." unless right == last_page - 1),
-      last_page
+      (last_page unless last_page == 1)
     ].flatten.compact
   end
 
