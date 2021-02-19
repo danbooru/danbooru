@@ -122,7 +122,13 @@ module ApplicationHelper
   end
 
   def humanized_number(number)
-    number_to_human number, units: { thousand: "k", million: "m" }, format: "%n%u"
+    if number >= 10_000
+      "#{number / 1_000}k"
+    elsif number >= 1_000
+      "%.1fk" % (number / 1_000.0)
+    else
+      number.to_s
+    end
   end
 
   def time_ago_in_words_tagged(time, compact: false)

@@ -22,7 +22,7 @@
 
           <%= link_to t.pretty_name, posts_path(tags: t.name), class: "search-tag" %>
 
-          <%= tag.span humanized_post_count(t), class: ["post-count", ("low-post-count" if is_underused_tag?(t))], title: t.post_count %>
+          <%= tag.span humanized_number(t.post_count), class: ["post-count", ("low-post-count" if is_underused_tag?(t))], title: t.post_count %>
         </li>
       <% end %>
     </ul>

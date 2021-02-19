@@ -2,6 +2,7 @@
 
 class TagListComponent < ApplicationComponent
   attr_reader :tags, :current_query, :show_extra_links
+  delegate :humanized_number, to: :helpers
 
   def initialize(tags: [], current_query: nil, show_extra_links: false)
     @tags = tags
@@ -37,15 +38,5 @@ class TagListComponent < ApplicationComponent
 
   def is_underused_tag?(tag)
     tag.post_count <= 1 && tag.general? && tag.name !~ /_\((cosplay|style)\)\z/
-  end
-
-  def humanized_post_count(tag)
-    if tag.post_count >= 10_000
-      "#{tag.post_count / 1_000}k"
-    elsif tag.post_count >= 1_000
-      "%.1fk" % (tag.post_count / 1_000.0)
-    else
-      tag.post_count.to_s
-    end
   end
 end

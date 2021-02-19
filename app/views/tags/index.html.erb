@@ -14,7 +14,7 @@
           ← <%= link_to tag_alias.antecedent_name, tag_alias, class: "fineprint" %>
         <% end %>
 
-        <%= tag.span t.post_count, class: "post-count" %>
+        <%= tag.span humanized_number(t.post_count), class: "post-count", title: t.post_count %>
       <% end %>
       <% t.column column: "control" do |tag| %>
         <% if policy(tag).update? %>
