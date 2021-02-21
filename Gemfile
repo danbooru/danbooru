@@ -46,6 +46,7 @@ gem 'mail'
 gem 'nokogiri'
 gem 'view_component', require: 'view_component/engine'
 gem 'tzinfo-data'
+gem 'hsluv'
 
 group :production, :staging do
   gem 'unicorn', :platforms => :ruby

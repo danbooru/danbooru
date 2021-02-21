@@ -65,7 +65,7 @@ img {
 
 input, select, textarea {
   background: var(--form-input-background);
-  border: var(--form-input-border);
+  border: 1px solid var(--form-input-border-color);
   color: var(--form-input-text-color);
   padding-left: 0.25em;
   font: var(--body-font);
@@ -112,7 +112,7 @@ table tfoot {
 }
 
 details {
-  border-bottom: 1px solid var(--details-border);
+  border-bottom: 1px solid var(--details-border-color);
 
   summary {
     cursor: pointer;

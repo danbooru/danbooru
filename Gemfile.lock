@@ -191,6 +191,7 @@ GEM
       ffi (~> 1.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
+    hsluv (1.0.1)
     http (4.4.1)
       addressable (~> 2.3)
       http-cookie (~> 1.0)
@@ -444,6 +445,7 @@ DEPENDENCIES
   factory_bot
   ffaker
   flamegraph
+  hsluv
   http
   http-cookie!
   ipaddress_2

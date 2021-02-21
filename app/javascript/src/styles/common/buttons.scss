@@ -14,16 +14,16 @@ input[type="button"], input[type="submit"], button {
   padding: 0.25em 1em;
 
   background: var(--form-button-background);
-  border: var(--form-button-border);
+  border: 1px solid var(--form-button-border-color);
   color: var(--form-button-text-color);
 
   &:hover {
-    box-shadow: var(--form-button-hover-box-shadow);
+    box-shadow: 0 0 2px var(--form-button-hover-box-shadow-color);
     background: var(--form-button-hover-background);
   }
 
   &:active {
-    box-shadow: var(--form-button-hover-box-shadow);
+    box-shadow: 0 0 2px var(--form-button-hover-box-shadow-color);
     background: var(--form-button-active-background);
   }
 }

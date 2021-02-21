@@ -41,10 +41,10 @@ div#notice {
 
 .notice-info {
   background: var(--notice-info-background);
-  border: var(--notice-info-border);
+  border: 1px solid var(--notice-info-border-color);
 }
 
 .notice-error {
   background: var(--notice-error-background);
-  border: var(--notice-error-border);
+  border: 1px solid var(--notice-error-border-color);
 }

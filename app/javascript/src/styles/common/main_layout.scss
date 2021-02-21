@@ -17,7 +17,7 @@ footer#page-footer {
   margin-top: 1em;
   text-align: center;
   padding: 1em 0 1em;
-  border-top: var(--footer-border);
+  border-top: 1px solid var(--footer-border-color);
 
   .social-icon img {
     vertical-align: bottom;

@@ -10,7 +10,7 @@
     display: none;
     position: absolute;
     font-size: 14px;
-    border: var(--note-body-border);
+    border: 1px solid var(--note-body-border-color);
     background: var(--note-body-background);
     color: var(--note-body-text-color);
     min-width: 140px;
@@ -88,7 +88,7 @@
     align-items: center;
     text-align: center;
     position: absolute !important;
-    border: var(--note-box-border);
+    border: 1px solid var(--note-box-border-color);
     min-width: 5px;
     min-height: 5px;
     width: 100px;
@@ -105,11 +105,11 @@
     }
 
     &.unsaved {
-      border: var(--unsaved-note-box-border);
+      border: 2px solid var(--unsaved-note-box-border-color);
     }
 
     &.movable {
-      border: var(--movable-note-box-border);
+      border: 2px solid var(--movable-note-box-border-color);
     }
 
     &.embedded {
@@ -118,7 +118,7 @@
       opacity: 1;
 
       &:hover {
-        border: var(--note-box-border);
+        border: 1px solid var(--note-box-border-color);
         box-shadow: var(--note-box-shadow);
 
         &.editing,
@@ -160,7 +160,7 @@
 div#note-preview {
   position: absolute;
   cursor: crosshair;
-  border: var(--note-preview-border);
+  border: 2px solid var(--note-preview-border-color);
   opacity: 0.6;
   display: none;
   background: var(--note-preview-background);

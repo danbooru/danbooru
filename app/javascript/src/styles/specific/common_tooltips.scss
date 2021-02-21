@@ -9,7 +9,7 @@ div[data-tippy-root].tooltip-loading {
   color: var(--text-color);
   background-color: var(--post-tooltip-background-color);
   background-clip: padding-box;
-  box-shadow: var(--post-tooltip-box-shadow);
+  box-shadow: 0 4px 14px -2px var(--post-tooltip-box-shadow-color);
 
   /* bordered arrow styling; see https://github.com/atomiks/tippyjs/blob/master/src/scss/themes/light-border.scss */
   &[data-placement^=bottom] {
