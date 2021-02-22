@@ -135,13 +135,13 @@ ArtistCommentary.merge_commentaries = function(description, commentary) {
 
 // Update commentary field if it's blank, signal an error if there's a conflict.
 ArtistCommentary.update_field = function($field, value) {
-  $field.removeClass("validation-error");
+  $field.closest(".input").removeClass("field_with_errors");
 
   if ($field.val().trim() === "") {
     $field.val(value);
     return true;
   } else if ($field.val().trim() !== value) {
-    $field.addClass("validation-error");
+    $field.closest(".input").addClass("field_with_errors");
     return false;
   } else {
     return true;

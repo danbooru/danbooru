@@ -44,7 +44,7 @@ form.simple_form {
       }
     }
 
-    input.validation-error {
+    &.field_with_errors input {
       border: 1px solid var(--form-input-validation-error-border-color);
     }
 
