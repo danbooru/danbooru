@@ -2,6 +2,14 @@
   box-sizing: border-box;
 }
 
+/*
+ * Make sure elements with the HTML5 [hidden] attribute (e.g. <span hidden>blah</span>)
+ * really are hidden. Otherwise the `display` property can override the [hidden] attribute.
+ */
+[hidden] {
+  display: none !important;
+}
+
 body {
   color: var(--text-color);
   background-color: var(--body-background-color);
