@@ -6,8 +6,6 @@
     be visible on your profile to other Danbooru members, but they won't be visible
     to search engines.</p>
 
-    <%= error_messages_for "change_request" %>
-
     <%= edit_form_for(@change_request) do |f| %>
       <%= f.input :desired_name, label: "Name" %>
       <%= f.input :desired_name_confirmation, label: "Confirm name" %>

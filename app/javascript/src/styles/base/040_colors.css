@@ -114,6 +114,7 @@ html {
   --form-input-border-color: var(--grey-2);
   --form-input-placeholder-text-color: var(--grey-4);
   --form-input-validation-error-border-color: var(--red-4);
+  --form-input-validation-error-text-color: var(--red-5);
 
   --form-button-text-color: var(--text-color);
   --form-button-background: var(--grey-1);
@@ -246,8 +247,6 @@ html {
   --keyboard-shortcut-color: var(--inverse-text-color);
   --keyboard-shortcut-background-color: var(--grey-6);
 
-  --error-message-color: var(--red-5);
-
   --login-link-color: var(--red-5);
   --footer-border-color: var(--grey-1);
   --details-border-color: var(--grey-2);
@@ -326,6 +325,7 @@ body[data-current-user-theme="dark"] {
   --form-input-border-color: var(--grey-5);
   --form-input-placeholder-text-color: var(--grey-3);
   --form-input-validation-error-border-color: var(--red-4);
+  --form-input-validation-error-text-color: var(--red-5);
 
   --form-button-text-color: var(--grey-9);
   --form-button-background: var(--grey-2);
@@ -443,8 +443,6 @@ body[data-current-user-theme="dark"] {
 
   --keyboard-shortcut-color: var(--grey-0);
   --keyboard-shortcut-background-color: var(--grey-7);
-
-  --error-message-color: var(--red-4);
 
   --login-link-color: var(--red-4);
   --footer-border-color: var(--grey-7);

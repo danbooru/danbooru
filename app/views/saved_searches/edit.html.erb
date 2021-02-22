@@ -2,8 +2,6 @@
   <div id="a-edit">
     <h1>Edit Saved Search</h1>
 
-    <%= error_messages_for :saved_search %>
-
     <%= edit_form_for(@saved_search) do |f| %>
       <%= f.input :query, :as => :string %>
       <%= f.input :label_string, label: "Labels", hint: "A list of tags to help categorize this search. Space delimited.", input_html: { "data-autocomplete": "saved-search-label" } %>

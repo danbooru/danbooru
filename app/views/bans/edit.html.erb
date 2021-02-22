@@ -3,8 +3,6 @@
     <h1>Edit Ban</h1>
 
     <%= edit_form_for(@ban) do |f| %>
-      <%= error_messages_for("ban") %>
-
       <%= f.input :duration, :hint => "in days" %>
       <%= f.input :reason %>
       <%= f.button :submit, :value => "Ban" %>

@@ -44,8 +44,17 @@ form.simple_form {
       }
     }
 
-    &.field_with_errors input {
-      border: 1px solid var(--form-input-validation-error-border-color);
+    &.field_with_errors  {
+      input, select, textarea {
+        border: 1px solid var(--form-input-validation-error-border-color);
+      }
+
+      span.error {
+        display: block;
+        color: var(--form-input-validation-error-text-color);
+        font-style: italic;
+        font-size: 0.8em;
+      }
     }
 
     &.text, &.dtext {

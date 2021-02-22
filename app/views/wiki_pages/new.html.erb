@@ -9,8 +9,6 @@
     </div>
   <% end %>
 
-  <%= error_messages_for("wiki_page") %>
-
   <%= edit_form_for(@wiki_page) do |f| %>
     <%= f.input :title, error: false, input_html: { data: { autocomplete: "tag" } } %>
     <%= f.input :other_names_string, as: :string, label: "Other names (#{link_to_wiki "help", "help:translated_tags"})".html_safe, hint: "Names used for this tag on other sites such as Pixiv. Separate with spaces." %>

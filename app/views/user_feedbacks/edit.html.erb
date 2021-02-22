@@ -5,8 +5,6 @@
     <div id="preview">
     </div>
 
-    <%= error_messages_for "user_feedback" %>
-
     <%= edit_form_for(@user_feedback) do |f| %>
       <%= f.input :category, :collection => ["positive", "neutral", "negative"], :include_blank => false %>
       <%= f.input :body, as: :dtext %>

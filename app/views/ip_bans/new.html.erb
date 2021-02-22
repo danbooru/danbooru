@@ -12,8 +12,6 @@
       they've verified their email address.
     <p>
 
-    <%= error_messages_for "ip_ban" %>
-
     <%= edit_form_for(@ip_ban) do |f| %>
       <%= f.input :ip_addr, label: "IP Address", as: :string, hint: "Add /24 to ban a subnet. Example: 1.2.3.4/24" %>
       <%= f.input :reason, as: :string %>

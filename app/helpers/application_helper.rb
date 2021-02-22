@@ -92,16 +92,6 @@ module ApplicationHelper
     DText.strip_dtext(text)
   end
 
-  def error_messages_for(instance_name)
-    instance = instance_variable_get("@#{instance_name}")
-
-    if instance&.errors&.any?
-      %{<div class="error-messages ui-state-error ui-corner-all"><strong>Error</strong>: #{instance.__send__(:errors).full_messages.join(", ")}</div>}.html_safe
-    else
-      ""
-    end
-  end
-
   def time_tag(content, time, **options)
     datetime = time.strftime("%Y-%m-%dT%H:%M%:z")
 
@@ -256,7 +246,14 @@ module ApplicationHelper
   def edit_form_for(model, **options, &block)
     options[:html] = { autocomplete: "off", **options[:html].to_h }
     options[:authenticity_token] = true if options[:remote] == true
-    simple_form_for(model, **options, &block)
+
+    simple_form_for(model, **options) do |form|
+      if model.try(:errors).try(:any?)
+        concat tag.div(model.errors.full_messages.join("; "), class: "notice notice-error notice-small")
+      end
+
+      block.call(form)
+    end
   end
 
   def table_for(...)
