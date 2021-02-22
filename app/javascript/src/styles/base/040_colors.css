@@ -145,7 +145,7 @@ html {
   --preview-deleted-color: var(--grey-9);
   --preview-has-children-color: var(--green-3);
   --preview-has-parent-color: var(--orange-3);
-  --preview-selected-color: var(--blue-3);
+  --preview-selected-color: rgba(0, 0, 0, 0.15);
 
   --preview-icon-color: var(--inverse-text-color);
   --preview-icon-background: rgba(0, 0, 0, 0.5);
@@ -356,7 +356,7 @@ body[data-current-user-theme="dark"] {
   --preview-deleted-color: var(--grey-3);
   --preview-has-children-color: var(--green-3);
   --preview-has-parent-color: var(--orange-3);
-  --preview-selected-color: var(--blue-3);
+  --preview-selected-color: rgba(255, 255, 255, 0.25);
 
   --modqueue-tag-warning-color: var(--red-7);
 

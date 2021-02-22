@@ -38,13 +38,14 @@
   article.post-preview {
     width: auto;
     height: auto;
-    margin: 0.5rem 0.25rem;
-    padding: 0.25rem;
+    margin: 0.5rem 0;
+    padding: 0.5rem;
     overflow: hidden;
     vertical-align: top;
+    border-radius: 0.25rem;
 
     &.current-post {
-      outline: 3px solid var(--preview-selected-color);
+      background-color: var(--preview-selected-color);
     }
 
     img {
