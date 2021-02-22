@@ -37,10 +37,15 @@
 
   article.post-preview {
     width: auto;
-    border: none;
-    margin: 0;
-    padding: 5px 5px 10px;
-    max-width: 154px;
+    height: auto;
+    margin: 0.5rem 0.25rem;
+    padding: 0.25rem;
+    overflow: hidden;
+    vertical-align: top;
+
+    &.current-post {
+      outline: 3px solid var(--preview-selected-color);
+    }
 
     img {
       white-space: normal;

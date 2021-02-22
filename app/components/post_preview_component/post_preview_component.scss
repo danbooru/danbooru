@@ -122,10 +122,6 @@ body[data-current-user-can-approve-posts="true"] .post-preview {
   }
 }
 
-.post-preview.current-post {
-  background-color: var(--preview-current-post-background);
-}
-
 @media screen and (max-width: 660px) {
   article.post-preview {
     margin: 0;
