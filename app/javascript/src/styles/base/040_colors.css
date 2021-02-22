@@ -161,7 +161,7 @@ html {
   --forum-vote-down-color: var(--red-5);
 
   --forum-topic-status-new-color: var(--red-4);
-  --forum-topic-status-pending-color: var(--azure-5);
+  --forum-topic-status-pending-color: var(--blue-5);
   --forum-topic-status-approved-color: var(--green-4);
   --forum-topic-status-rejected-color: var(--red-4);
 
@@ -368,10 +368,10 @@ body[data-current-user-theme="dark"] {
   --forum-vote-meh-color: var(--yellow-2);
   --forum-vote-down-color: var(--red-4);
 
-  --forum-topic-status-new-color: var(--red-4);
-  --forum-topic-status-pending-color: var(--blue-4);
-  --forum-topic-status-approved-color: var(--green-4);
-  --forum-topic-status-rejected-color: var(--red-4);
+  --forum-topic-status-new-color: var(--red-3);
+  --forum-topic-status-pending-color: var(--azure-3);
+  --forum-topic-status-approved-color: var(--green-3);
+  --forum-topic-status-rejected-color: var(--red-3);
 
   --moderation-report-text-color: var(--red-4);
   --moderation-report-background-color: var(--red-9);

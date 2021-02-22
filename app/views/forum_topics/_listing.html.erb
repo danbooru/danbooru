@@ -1,33 +1,23 @@
 <%= table_for forum_topics, width: "100%" do |t| %>
   <% t.column "Title" do |topic| %>
     <% if !topic.is_read? %>
-      <%= link_to forum_topics_path(search: { is_read: false }) do %>
-        <span class="topic-status label new">New</span>
-      <% end %>
+      <%= link_to "New", forum_topics_path(search: { is_read: false }), class: "topic-status label new" %>
     <% end %>
 
     <% if topic.is_sticky? %>
-      <%= link_to forum_topics_path(search: { is_sticky: true }) do %>
-        <%= sticky_icon(class: "topic-status stickied", title: "Stickied") %>
-      <% end %>
+      <%= link_to sticky_icon, forum_topics_path(search: { is_sticky: true }), class: "topic-status icon stickied", title: "Stickied" %>
     <% end %>
 
     <% if topic.is_locked? %>
-      <%= link_to forum_topics_path(search: { is_locked: true }) do %>
-        <%= lock_icon(class: "topic-status locked", title: "Locked") %>
-      <% end %>
+      <%= link_to lock_icon, forum_topics_path(search: { is_locked: true }), class: "topic-status icon locked", title: "Locked" %>
     <% end %>
 
     <% if topic.is_deleted? %>
-      <%= link_to forum_topics_path(search: { is_deleted: true }) do %>
-        <%= delete_icon(class: "topic-status deleted", title: "Deleted") %>
-      <% end %>
+      <%= link_to delete_icon, forum_topics_path(search: { is_deleted: true }), class: "topic-status icon deleted", title: "Deleted" %>
     <% end %>
 
     <% if topic.is_private? %>
-      <%= link_to forum_topics_path(search: { is_private: true }) do %>
-        <%= private_icon(class: "topic-status private", title: "#{User.level_string(topic.min_level)} only") %>
-      <% end %>
+      <%= link_to private_icon, forum_topics_path(search: { is_private: true }), class: "topic-status icon private", title: "#{User.level_string(topic.min_level)} only" %>
     <% end %>
 
     <% if forum_topic_status(topic).present? %>
@@ -42,8 +32,8 @@
   <% end %>
   <% t.column "Status", width: "1%" do |topic| %>
     <% status = forum_topic_status(topic) %>
-    <%= link_to forum_topics_path(search: { status: status }) do %>
-      <span class="topic-status label <%= status %>"><%= status %></span>
+    <% if status.present? %>
+      <%= link_to status, forum_topics_path(search: { status: status }), class: "topic-status label #{status}" %>
     <% end %>
   <% end %>
   <% t.column "Creator", width: "8%" do |topic| %>

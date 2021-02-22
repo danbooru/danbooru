@@ -18,6 +18,8 @@ module ForumTopicsHelper
       :approved
     elsif topic.category_name == "Tags" && topic.bulk_update_requests.present? && topic.bulk_update_requests.all?(&:is_rejected?)
       :rejected
+    else
+      nil
     end
   end
 
