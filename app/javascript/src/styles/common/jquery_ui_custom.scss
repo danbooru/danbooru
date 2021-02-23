@@ -24,7 +24,7 @@ div.ui-dialog {
   overflow: visible;
   font-size: 1em;
   z-index: 999 !important;
-  box-shadow: var(--jquery-ui-dialog-box-shadow);
+  box-shadow: var(--shadow-lg);
   padding: 0;
 
   .ui-dialog-titlebar {

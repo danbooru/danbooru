@@ -13,6 +13,7 @@
     border: 1px solid var(--note-body-border-color);
     background: var(--note-body-background);
     color: var(--note-body-text-color);
+    box-shadow: var(--shadow-lg);
     min-width: 140px;
     width: min-content;
     min-height: 1em;
@@ -95,6 +96,7 @@
     height: 100px;
     cursor: move;
     background: var(--note-body-background);
+    box-shadow: var(--shadow-lg);
     line-height: 1.25;
     opacity: 0.5;
     z-index: 100;
@@ -116,6 +118,7 @@
       color: var(--note-body-text-color);
       border: 1px solid transparent;
       opacity: 1;
+      box-shadow: none;
 
       &:hover {
         border: 1px solid var(--note-box-border-color);
@@ -164,6 +167,7 @@ div#note-preview {
   opacity: 0.6;
   display: none;
   background: var(--note-preview-background);
+  box-shadow: var(--shadow-lg);
   z-index: 250;
 }
 

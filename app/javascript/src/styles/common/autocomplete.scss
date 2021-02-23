@@ -1,6 +1,7 @@
 .ui-autocomplete.ui-widget {
   font-size: var(--text-sm);
   border: 1px solid var(--autocomplete-border-color);
+  box-shadow: var(--shadow-lg);
 
   div.ui-menu-item-wrapper {
     padding: 0.25em 0.4em;
