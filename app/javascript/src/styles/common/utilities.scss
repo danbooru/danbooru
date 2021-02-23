@@ -5,6 +5,9 @@
 
 $spacer: 0.25rem; /* 4px */
 
+.invisible { visibility: hidden; }
+.visible { visibility: visible; }
+
 .font-monospace { font-family: var(--monospace-font); }
 .font-bold { font-weight: bold; }
 
@@ -34,6 +37,7 @@ $spacer: 0.25rem; /* 4px */
 
 .h-10 { height: 10 * $spacer; }
 
+.space-x-1 > * + * { margin-left: 1 * $spacer; }
 .space-x-2 > * + * { margin-left: 2 * $spacer; }
 .space-x-4 > * + * { margin-left: 4 * $spacer; }
 .space-y-4 > * + * { margin-top: 4 * $spacer; }

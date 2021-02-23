@@ -12,11 +12,19 @@ div.related-tags {
   flex-wrap: wrap;
 
   div.tag-column {
-    max-width: 15em;
+    width: 15em;
+  }
 
-    a.selected {
-      background: var(--selected-related-tag-background-color);
-      color: var(--selected-related-tag-color);
-    }
+  /* Hide the related tag checkbox unless it's checked or hovered. */
+  input[type="checkbox"] {
+    visibility: hidden;
+  }
+
+  li.selected a {
+    font-weight: bold;
+  }
+
+  li.selected, li:hover {
+    input[type="checkbox"] { visibility: visible; }
   }
 }

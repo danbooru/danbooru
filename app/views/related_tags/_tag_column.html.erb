@@ -2,7 +2,10 @@
 
 <% if tags.present? %>
   <%= tag.div class: ["tag-column", local_assigns[:class]] do %>
-    <h3><%= title %></h3>
+    <h3 class="flex items-center space-x-1">
+      <input type="checkbox" class="invisible">
+      <span><%= title %></span>
+    </h3>
     <%= render_simple_tag_list(tags) %>
   <% end %>
 <% end %>

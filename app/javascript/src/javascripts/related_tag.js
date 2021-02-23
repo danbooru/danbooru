@@ -5,7 +5,8 @@ let RelatedTag = {};
 
 RelatedTag.initialize_all = function() {
   $(document).on("click.danbooru", ".related-tags-button", RelatedTag.on_click_related_tags_button);
-  $(document).on("click.danbooru", ".related-tags a.search-tag", RelatedTag.toggle_tag);
+  $(document).on("change.danbooru", ".related-tags input", RelatedTag.toggle_tag);
+  $(document).on("click.danbooru", ".related-tags a", RelatedTag.toggle_tag);
   $(document).on("click.danbooru", "#show-related-tags-link", RelatedTag.show);
   $(document).on("click.danbooru", "#hide-related-tags-link", RelatedTag.hide);
   $(document).on("keyup.danbooru.relatedTags", "#upload_tag_string, #post_tag_string", RelatedTag.update_selected);
@@ -89,11 +90,16 @@ RelatedTag.current_tag = function() {
 
 RelatedTag.update_selected = function(e) {
   var current_tags = RelatedTag.current_tags();
-  var $all_tags = $(".related-tags a.search-tag");
-  $all_tags.removeClass("selected");
-  $all_tags.each(function(i, tag) {
-    if (current_tags.includes(tag.textContent.replace(/ /g, "_"))) {
-      $(tag).addClass("selected");
+
+  $(".related-tags li").each((_, li) => {
+    let tag_name = $(li).text().trim().replace(/ /g, "_");
+
+    if (current_tags.includes(tag_name)) {
+      $(li).addClass("selected");
+      $(li).find("input").prop("checked", true);
+    } else {
+      $(li).removeClass("selected");
+      $(li).find("input").prop("checked", false);
     }
   });
 }
@@ -104,7 +110,7 @@ RelatedTag.current_tags = function() {
 
 RelatedTag.toggle_tag = function(e) {
   var $field = $("#upload_tag_string,#post_tag_string");
-  var tag = $(e.target).html().replace(/ /g, "_").replace(/&gt;/g, ">").replace(/&lt;/g, "<").replace(/&amp;/g, "&");
+  var tag = $(e.target).closest("li").text().trim().replace(/ /g, "_");
 
   if (RelatedTag.current_tags().includes(tag)) {
     var escaped_tag = Utility.regexp_escape(tag);

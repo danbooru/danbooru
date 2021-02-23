@@ -297,7 +297,7 @@ html {
   --news-updates-background: var(--grey-0);
   --news-updates-border-color: var(--grey-1);
 
-  --related-tags-container-background: var(--blue-0);
+  --related-tags-container-background: var(--grey-0);
   --selected-related-tag-background-color: var(--link-color);
   --selected-related-tag-color: var(--inverse-text-color);
 }
