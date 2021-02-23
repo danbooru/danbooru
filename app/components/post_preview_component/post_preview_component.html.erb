@@ -1,10 +1,10 @@
 <%= tag.article id: "post_#{post.id}", **article_attrs do -%>
   <%= link_to polymorphic_path(link_target, q: tags) do -%>
-    <picture>
+    <%= tag.picture do -%>
       <%= tag.source media: "(max-width: 660px)", srcset: cropped_url -%>
       <%= tag.source media: "(min-width: 660px)", srcset: post.preview_file_url -%>
       <%= tag.img class: "has-cropped-#{post.has_cropped?}", src: post.preview_file_url, style: "min-width: #{preview_dimensions[:width]}px; min-height: #{preview_dimensions[:height]}px;", title: tooltip, alt: "post ##{post.id}" -%>
-    </picture>
+    <% end -%>
   <% end -%>
   <% if pool -%>
     <p class="desc">

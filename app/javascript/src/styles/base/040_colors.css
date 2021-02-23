@@ -229,12 +229,7 @@ html {
 
   --fetch-source-data-border-color: var(--grey-2);
 
-  --post-mode-menu-edit-background: var(--green-2);
-  --post-mode-menu-tag-script-background: var(--purple-2);
-  --post-mode-menu-add-fav-background: var(--yellow-2);
-  --post-mode-menu-remove-fav-background: var(--yellow-2);
-  --post-mode-menu-vote-up-background: var(--blue-2);
-  --post-mode-menu-vote-down-background: var(--red-2);
+  --post-mode-menu-active-post-outline-color: var(--blue-2);
   --post-mode-menu-translation-background: var(--blue-2);
 
   --tag-count-color: var(--muted-text-color);
@@ -426,12 +421,7 @@ body[data-current-user-theme="dark"] {
 
   --fetch-source-data-border-color: var(--grey-4);
 
-  --post-mode-menu-edit-background: var(--green-8);
-  --post-mode-menu-tag-script-background: var(--purple-8);
-  --post-mode-menu-add-fav-background: var(--yellow-8);
-  --post-mode-menu-remove-fav-background: var(--yellow-8);
-  --post-mode-menu-vote-up-background: var(--blue-8);
-  --post-mode-menu-vote-down-background: var(--red-8);
+  --post-mode-menu-active-post-outline-color: var(--azure-4);
   --post-mode-menu-translation-background: var(--blue-8);
 
   --low-post-count-color: var(--red-4);

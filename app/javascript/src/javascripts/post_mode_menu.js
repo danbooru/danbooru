@@ -18,8 +18,20 @@ PostModeMenu.initialize_shortcuts = function() {
   Utility.keydown("1 2 3 4 5 6 7 8 9 0", "change_tag_script", PostModeMenu.change_tag_script);
 }
 
-PostModeMenu.show_notice = function(i) {
-  Utility.notice("Switched to tag script #" + i + ". To switch tag scripts, use the number keys.");
+PostModeMenu.show_notice = function(mode, tag_script_index = 0) {
+  if (mode === "add-fav") {
+    Utility.notice("Switched to favorite mode. Click a post to favorite it.");
+  } else if (mode === "remove-fav") {
+    Utility.notice("Switched to unfavorite mode. Click a post to unfavorite it.");
+  } else if (mode === "edit") {
+    Utility.notice("Switched to edit mode. Click a post to edit it.");
+  } else if (mode === 'vote-down') {
+    Utility.notice("Switched to downvote mode. Click a post to downvote it.");
+  } else if (mode === 'vote-up') {
+    Utility.notice("Switched to upvote mode. Click a post to upvote it.");
+  } else if (mode === "tag-script") {
+    Utility.notice(`Switched to tag script #${tag_script_index}. To switch tag scripts, use the number keys.`);
+  }
 }
 
 PostModeMenu.change_tag_script = function(e) {
@@ -33,7 +45,7 @@ PostModeMenu.change_tag_script = function(e) {
     $("#tag-script-field").val(new_tag_script);
     localStorage.setItem("current_tag_script_id", new_tag_script_id);
     if (old_tag_script_id !== new_tag_script_id) {
-      PostModeMenu.show_notice(new_tag_script_id);
+      PostModeMenu.show_notice("tag-script", new_tag_script_id);
     }
 
     e.preventDefault();
@@ -99,9 +111,9 @@ PostModeMenu.change = function() {
   if (s === undefined) {
     return;
   }
-  var $body = $(document.body);
-  $body.removeClass((i, classNames) => classNames.split(/ /).filter(name => /^mode-/.test(name)).join(" "));
-  $body.addClass("mode-" + s);
+
+  $("body").attr("data-mode-menu-active", s !== "view");
+  $("body").attr("data-mode-menu", s);
   localStorage.setItem("mode", s, 1);
 
   if (s === "tag-script") {
@@ -113,9 +125,10 @@ PostModeMenu.change = function() {
     var script = localStorage.getItem("tag-script-" + current_script_id);
 
     $("#tag-script-field").val(script).show();
-    PostModeMenu.show_notice(current_script_id);
+    PostModeMenu.show_notice(s, current_script_id);
   } else {
     $("#tag-script-field").hide();
+    PostModeMenu.show_notice(s);
   }
 }
 
