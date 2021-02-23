@@ -21,7 +21,10 @@ div.related-tags {
   }
 
   li.selected a {
-    font-weight: bold;
+    /* https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-stroke */
+    /* https://caniuse.com/text-stroke */
+    -webkit-text-stroke: 0.5px;
+    text-stroke: 0.5px;
   }
 
   li.selected, li:hover {
