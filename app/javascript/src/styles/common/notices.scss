@@ -5,6 +5,7 @@ div#notice {
   left: 25%;
   width: 50%;
   z-index: 9999;
+  box-shadow: var(--shadow-lg);
 
   a#close-notice-link {
     position: absolute;
