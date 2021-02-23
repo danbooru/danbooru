@@ -1,6 +1,7 @@
 .note-container {
   display: inline-block;
   position: relative;
+  box-sizing: content-box;
 
   &.hide-notes .note-box {
     visibility: hidden;
@@ -26,6 +27,8 @@
   }
 
   div.note-body, div.note-box.embedded div.note-box-inner-border {
+    box-sizing: content-box;
+
     h1, h2, h3, h4, h5, h6, a, span, div, blockquote, p, ul, li, ol, em, strong, small, big, b, i, font, u, s, code, center {
       line-height: 1.25;
     }
@@ -100,6 +103,7 @@
     line-height: 1.25;
     opacity: 0.5;
     z-index: 100;
+    box-sizing: content-box;
 
     /* Raise notes on hover so overlapping embedded notes are readable. */
     &:hover {
@@ -107,11 +111,11 @@
     }
 
     &.unsaved {
-      border: 2px solid var(--unsaved-note-box-border-color);
+      border: 1px solid var(--unsaved-note-box-border-color);
     }
 
     &.movable {
-      border: 2px solid var(--movable-note-box-border-color);
+      border: 1px solid var(--movable-note-box-border-color);
     }
 
     &.embedded {
@@ -137,11 +141,11 @@
 
       &.unsaved,
       &.out-of-bounds {
-        border: var(--unsaved-note-box-border);
+        border: 1px solid var(--unsaved-note-box-border-color);
       }
 
       &.movable {
-        border: var(--movable-note-box-border);
+        border: 1px solid var(--movable-note-box-border-color);
       }
 
       &:not(:hover) div.ui-resizable-handle {
@@ -150,7 +154,7 @@
     }
 
     &.note-box-highlighted {
-      outline: 2px solid var(--note-highlight-color);
+      outline: 1px solid var(--note-highlight-color);
     }
 
     div.ui-resizable-handle {
@@ -163,12 +167,13 @@
 div#note-preview {
   position: absolute;
   cursor: crosshair;
-  border: 2px solid var(--note-preview-border-color);
+  border: 1px solid var(--note-preview-border-color);
   opacity: 0.6;
   display: none;
   background: var(--note-preview-background);
   box-shadow: var(--shadow-lg);
   z-index: 250;
+  box-sizing: content-box;
 }
 
 div.note-edit-dialog {
