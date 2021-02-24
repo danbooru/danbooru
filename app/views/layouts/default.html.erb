@@ -96,17 +96,6 @@
     <div id="popup-menus"></div>
   </div>
 
-  <script type="application/javascript">
-    if (typeof window.Danbooru !== "object") {
-      window.Danbooru = {};
-    }
-
-    window.Danbooru.notice = Danbooru.Utility.notice;
-    window.Danbooru.error = Danbooru.Utility.error;
-    window.$ = Danbooru.jQuery;
-    window.jQuery = Danbooru.jQuery;
-  </script>
-
   <%= render "static/footer" %>
 <% end %>
 </html>
