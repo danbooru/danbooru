@@ -105,7 +105,8 @@ RelatedTag.update_selected = function(e) {
 }
 
 RelatedTag.current_tags = function() {
-  return Utility.regexp_split($("#upload_tag_string,#post_tag_string").val().toLowerCase());
+  let tagString = $("#upload_tag_string,#post_tag_string").val().toLowerCase();
+  return Utility.splitWords(tagString);
 }
 
 RelatedTag.toggle_tag = function(e) {

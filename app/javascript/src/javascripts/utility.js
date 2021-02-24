@@ -1,5 +1,6 @@
 import Rails from '@rails/ujs';
 import { hideAll } from 'tippy.js';
+import words from "lodash/words";
 
 let Utility = {};
 
@@ -113,9 +114,8 @@ Utility.regexp_escape = function(string) {
   return string.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
 }
 
-Utility.regexp_split = function(string) {
-  string ??= "";
-  return string.match(/\S+/g) ?? [];
+Utility.splitWords = function(string) {
+  return words(string, /\S+/g);
 }
 
 $.fn.selectEnd = function() {

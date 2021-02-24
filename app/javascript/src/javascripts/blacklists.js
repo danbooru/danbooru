@@ -15,7 +15,9 @@ Blacklist.parse_entry = function(string) {
     "hits": 0,
     "min_score": null
   };
-  Utility.regexp_split(string).forEach(function(tag) {
+
+  let tags = Utility.splitWords(string);
+  tags.forEach(function(tag) {
     if (tag.charAt(0) === '-') {
       entry.exclude.push(tag.slice(1));
     } else if (tag.charAt(0) === '~') {
@@ -171,11 +173,11 @@ Blacklist.post_match = function(post, entry) {
   var score = parseInt($post.attr("data-score"));
   var score_test = entry.min_score === null || score < entry.min_score;
 
-  var tags = Utility.regexp_split($post.attr("data-tags"));
-  tags.push(...Utility.regexp_split($post.attr("data-pools")));
+  var tags = Utility.splitWords($post.attr("data-tags"));
+  tags.push(...Utility.splitWords($post.attr("data-pools")));
   tags.push("rating:" + $post.data("rating"));
   tags.push("uploaderid:" + $post.attr("data-uploader-id"));
-  Utility.regexp_split($post.data("flags")).forEach(function(v) {
+  Utility.splitWords($post.data("flags")).forEach(function(v) {
     tags.push("status:" + v);
   });
 

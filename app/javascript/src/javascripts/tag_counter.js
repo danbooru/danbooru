@@ -1,4 +1,5 @@
 import Utility from "./utility";
+import uniq from "lodash/uniq";
 
 export default class TagCounter {
   static lowCount = 10;
@@ -20,7 +21,9 @@ export default class TagCounter {
   }
 
   get tagCount() {
-    return Utility.regexp_split(this.$target.val()).length;
+    let tagString = this.$target.val().toLowerCase();
+    let tags = uniq(Utility.splitWords(tagString));
+    return tags.length;
   }
 
   get iconName() {
