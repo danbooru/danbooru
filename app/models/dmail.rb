@@ -165,7 +165,7 @@ class Dmail < ApplicationRecord
   end
 
   def autoreport_spam
-    if is_recipient? && SpamDetector.new(self).spam?
+    if is_recipient? && !is_sender? && SpamDetector.new(self).spam?
       self.is_deleted = true
       moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
     end

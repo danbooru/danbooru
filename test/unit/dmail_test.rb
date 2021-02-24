@@ -23,6 +23,16 @@ class DmailTest < ActiveSupport::TestCase
         assert_equal(1, dmail.moderation_reports.count)
         assert_equal(true, dmail.reload.is_deleted?)
       end
+
+      should "not mark dmails sent to oneself as spam" do
+        @user = create(:user, created_at: 2.weeks.ago, email_address: build(:email_address, address: "akismet-guaranteed-spam@example.com"))
+
+        SpamDetector.stubs(:enabled?).returns(true)
+        dmail = create(:dmail, owner: @user, from: @user, to: @user, creator_ip_addr: "127.0.0.1")
+
+        assert_equal(0, dmail.moderation_reports.count)
+        assert_equal(false, dmail.reload.is_deleted?)
+      end
     end
 
     context "search" do
