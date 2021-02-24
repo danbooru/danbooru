@@ -1,4 +1,63 @@
-## Unreleased
+## 2021-02-24
+
+### Changes
+
+#### UI
+
+* Using the Enter key to submit uploads or tag edits now shows a warning
+  that you should use Ctrl+Enter instead.
+
+* Adjusted input boxes to be a bit bigger in some places, to fit better on
+  smaller screens, and to more consistently sized throughout the site.
+
+#### Colors
+
+* Changed colors in light mode to have better contrast and be more consistent
+  throughout the site.
+
+* Changed username colors (in light mode, if you have colored usernames turned on):
+** Gold users are now orange.
+** Moderators are now green.
+** Builders are now purplier.
+** Admins are now darker red.
+** Username colors now use the same colors as tag colors.
+
+* Parent/child borders are now darker green and darker orange.
+
+* Changed the current post in the parent/child box to have a darker background,
+  to make it easier to see.
+
+* Changed how the New/Approved/Pending/Rejected labels look in the forum.
+
+* Changed how the post mode menu indicates the active mode (for tag script
+  mode, etc). Instead of giving the page a different background color, the post
+  is highlighted when you hover over it.
+
+#### Related tags
+
+* Moved the artist tag to the translated tags section.
+* Removed the artist URLs from beneath the artist tag.
+* Selected tags are now shown in bold with a checkbox, instead of highlighted
+  in blue. This is so you can see the tag type of selected tags.
+
+#### Notes
+
+* Removed support for a few disused CSS properties.
+* Made the monospace font slightly thicker.
+
+#### Other
+
+* Added Baraag upload support.
+
+### Fixes
+
+* Fixed Pixiv commentaries generating bad /jump.php URLs.
+* Fixed the tag counter counting duplicate tags.
+* Fixed it so that when users send a dmail to themselves, it won't get
+  potentially marked as spam.
+* Fixed spellcheck being disabled in the note edit box.
+* Fixed "()" in page title when the post didn't have a copyright tag.
+* Fixed `*_(cosplay)` tags with a single post having their tag count marked in red.
 
 ### API Changes
 
@@ -8,13 +67,12 @@
 * API keys can be restricted to only work with certain IPs or certain API
   endpoints.
 * If you're an app or script developer, and you have an app that requests API
-  keys from users, you're highly encouraged to only request the minimum API
-  permissions necessary for your app to work.
+  keys from users, you're highly encouraged to request that users generate keys
+  with only the minimum permissions necessary for your app to work.
 * If you have a privileged account, and you run scripts under your account,
   you're highly encouraged to restrict your API keys to limit damage in case
   they get leaked or stolen.
-
-* The login action (POST /sessions) no longer returns the api_token field.
+* The login action (POST /sessions) no longer returns the `api_token` field.
 
 ## 2021-02-05
 
@@ -22,13 +80,13 @@
 
 * Removed the rule that new users couldn't upload in their first 7 days.
 * Raised the max video length from 2:00 minutes to 2:20 minutes for video uploads.
-* Changed the post buttons to work the same way as the comment vote buttons.
+* Changed the post vote buttons to work the same way as the comment vote buttons.
 * When aliasing or renaming an artist, the artist's {{\*\_(style)}} tag is now 
   moved too, if the artist has one.
 
 ### Fixes
 
-* Fixed error when searching for {{-status:any}}.
+* Fixed an error when searching for {{-status:any}}.
 * Fixed @-ing yourself in a comment or forum post sending you a notification dmail.
 * Fixed buggy keyboard movement of notes.
 * Fixed the tag 'History' link not showing up on post search pages when the
