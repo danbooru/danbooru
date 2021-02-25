@@ -161,7 +161,7 @@ class AutocompleteService
 
   def autocomplete_static_metatag(metatag, value)
     values = STATIC_METATAGS[metatag.to_sym]
-    results = values.select { |v| v.starts_with?(value) }.sort.take(limit)
+    results = values.select { |v| v.starts_with?(value.downcase) }.sort.take(limit)
 
     results.map do |v|
       { label: metatag + ":" + v, value: v }

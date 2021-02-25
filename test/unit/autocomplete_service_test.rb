@@ -201,6 +201,12 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
         assert_autocomplete_equals(["order:score", "order:score_asc"], "order:sco", :tag_query)
       end
 
+      should "match static metatags case-insensitively" do
+        assert_autocomplete_equals(["rating:safe"], "rating:S", :tag_query)
+        assert_autocomplete_equals(["rating:questionable"], "rating:Q", :tag_query)
+        assert_autocomplete_equals(["rating:explicit"], "rating:E", :tag_query)
+      end
+
       should "ignore bogus tags" do
         assert_autocomplete_equals([], "x"*200, :tag_query)
         assert_autocomplete_equals([], "http://www.google.com", :tag_query)
