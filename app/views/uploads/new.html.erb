@@ -34,8 +34,9 @@
           <div class="dropzone-hint hint">Max size: <%= number_to_human_size(Danbooru.config.max_file_size) %>. Supported filetypes: jpg, png, gif, swf, mp4, webm.</div>
         </div>
 
-        <div class="upload_source_container">
-          <%= f.input :source, as: :string, placeholder: "Enter the URL to upload here", input_html: { value: params[:url] } %>
+        <div class="input string optional upload_source">
+          <%= f.label :source %>
+          <%= f.input_field :source, as: :string, placeholder: "Enter the URL to upload here", value: params[:url] %>
           <%= tag.button "Similar", id: "similar-button" %>
         </div>
 
