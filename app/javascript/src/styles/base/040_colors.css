@@ -37,7 +37,7 @@ html {
   --orange-7: #653700; /* hsluv(37, 100, 28.0) */
   --orange-8: #482500; /* hsluv(37, 100, 19.0) */
   --orange-9: #331900; /* hsluv(37, 100, 12.0) */
-  --yellow-0: #fcf6ea; /* hsluv(68, 60, 97.0) */
+  --yellow-0: #fdf6e6; /* hsluv(68, 80, 97.0) */
   --yellow-1: #f7e7c3; /* hsluv(68, 60, 92.0) */
   --yellow-2: #ead084; /* hsluv(68, 60, 84.0) */
   --yellow-3: #ccaa00; /* hsluv(68, 100, 70.5) */
@@ -47,7 +47,7 @@ html {
   --yellow-7: #504100; /* hsluv(68, 100, 28.0) */
   --yellow-8: #382d00; /* hsluv(68, 100, 19.0) */
   --yellow-9: #271f04; /* hsluv(68, 90, 12.0) */
-  --green-0: #edfaee; /* hsluv(130, 40, 97.0) */
+  --green-0: #e8fce9; /* hsluv(130, 60, 97.0) */
   --green-1: #cbf2ce; /* hsluv(130, 40, 92.0) */
   --green-2: #93e49a; /* hsluv(130, 50, 84.0) */
   --green-3: #35c64a; /* hsluv(130, 90, 70.5) */
@@ -87,6 +87,16 @@ html {
   --purple-7: #6700a1; /* hsluv(282, 100, 28.0) */
   --purple-8: #421765; /* hsluv(282, 80, 19.0) */
   --purple-9: #2f0e49; /* hsluv(282, 80, 12.0) */
+  --magenta-0: #fff3ff; /* hsluv(307, 100, 97.0) */
+  --magenta-1: #f8e1f8; /* hsluv(307, 70, 92.0) */
+  --magenta-2: #fabefb; /* hsluv(307, 90, 84.0) */
+  --magenta-3: #fd78ff; /* hsluv(307, 100, 70.5) */
+  --magenta-4: #fd23ff; /* hsluv(307, 100, 61.0) */
+  --magenta-5: #d700d9; /* hsluv(307, 100, 51.2) */
+  --magenta-6: #a800aa; /* hsluv(307, 100, 40.0) */
+  --magenta-7: #79007a; /* hsluv(307, 100, 28.0) */
+  --magenta-8: #4f1450; /* hsluv(307, 80, 19.0) */
+  --magenta-9: #380c39; /* hsluv(307, 80, 12.0) */
 
   --white: #FFFFFF;
   --black: #000000;
@@ -137,16 +147,16 @@ html {
   --user-upgrade-gold-background-color: var(--yellow-1);
   --user-upgrade-platinum-background-color: var(--blue-1);
 
-  --table-header-border-color: var(--grey-2);
+  --table-header-border-color: var(--grey-6);
   --table-row-border-color: var(--grey-2);
   --table-row-hover-background: var(--blue-1);
   --table-even-row-background: var(--grey-0);
 
   --preview-pending-color: var(--blue-5);
-  --preview-flagged-color: var(--red-4);
+  --preview-flagged-color: var(--red-5);
   --preview-deleted-color: var(--grey-9);
   --preview-has-children-color: var(--green-3);
-  --preview-has-parent-color: var(--orange-3);
+  --preview-has-parent-color: var(--yellow-3);
   --preview-selected-color: rgba(0, 0, 0, 0.15);
 
   --preview-icon-color: var(--inverse-text-color);
@@ -162,10 +172,10 @@ html {
   --forum-vote-meh-color: var(--orange-3);
   --forum-vote-down-color: var(--red-5);
 
-  --forum-topic-status-new-color: var(--red-4);
+  --forum-topic-status-new-color: var(--red-5);
   --forum-topic-status-pending-color: var(--blue-5);
-  --forum-topic-status-approved-color: var(--green-4);
-  --forum-topic-status-rejected-color: var(--red-4);
+  --forum-topic-status-approved-color: var(--green-5);
+  --forum-topic-status-rejected-color: var(--red-5);
 
   --moderation-report-text-color: var(--red-5);
   --moderation-report-background-color: var(--red-1);
@@ -196,14 +206,14 @@ html {
   --wiki-page-versions-diff-del-background: var(--red-2);
   --wiki-page-versions-diff-ins-background: var(--green-2);
 
-  --post-notice-border-color: var(--grey-1);
+  --post-notice-border-color: var(--grey-2);
   --post-parent-notice-background: var(--green-0);
   --post-child-notice-background: var(--yellow-0);
-  --post-pending-notice-background: var(--blue-0);
+  --post-pending-notice-background: var(--blue-1);
   --post-banned-notice-background: var(--red-1);
   --post-deleted-notice-background: var(--red-1);
-  --post-resized-notice-background: var(--purple-1);
-  --post-search-notice-background: var(--grey-0);
+  --post-resized-notice-background: var(--magenta-1);
+  --post-search-notice-background: var(--grey-1);
 
   --post-artist-commentary-container-background: var(--grey-0);
   --post-artist-commentary-container-border-color: var(--grey-1);
@@ -261,15 +271,15 @@ html {
   --dtext-spoiler-background-color: var(--text-color);
   --dtext-spoiler-hover-color: var(--inverse-text-color);
 
-  --wiki-page-other-name-background-color: var(--blue-0);
+  --wiki-page-other-name-background-color: var(--grey-1);
 
   --paginator-arrow-background-color: var(--inverse-text-color);
   --paginator-arrow-color: var(--link-color);
 
   --artist-tag-color: var(--red-6);
   --artist-tag-hover-color: var(--red-5);
-  --copyright-tag-color: var(--purple-6);
-  --copyright-tag-hover-color: var(--purple-5);
+  --copyright-tag-color: var(--magenta-6);
+  --copyright-tag-hover-color: var(--magenta-5);
   --character-tag-color: var(--green-4);
   --character-tag-hover-color: var(--green-3);
   --general-tag-color: var(--link-color);
@@ -277,7 +287,7 @@ html {
   --meta-tag-color: var(--orange-3);
   --meta-tag-hover-color: var(--orange-2);
 
-  --user-admin-color: var(--artist-tag-color);
+  --user-admin-color: var(--red-5);
   --user-moderator-color: var(--character-tag-color);
   --user-builder-color: var(--copyright-tag-color);
   --user-platinum-color: var(--grey-5);
@@ -471,7 +481,7 @@ body[data-current-user-theme="dark"] {
   --user-admin-color: var(--artist-tag-color);
   --user-moderator-color: var(--character-tag-color);
   --user-builder-color: var(--copyright-tag-color);
-  --user-platinum-color: var(--grey-4);
+  --user-platinum-color: var(--grey-3);
   --user-gold-color: var(--meta-tag-color);
   --user-member-color: var(--general-tag-color);
   --user-restricted-color: var(--general-tag-color);
