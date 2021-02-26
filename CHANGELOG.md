@@ -1,3 +1,15 @@
+## 2021-02-26
+
+### Changes
+
+* Uploads: added links to the artist's profile pages to the 'Fetch source data' box.
+* Tweaked light mode color scheme.
+
+### Fixes
+
+* Fixed source field being too small on uploads page.
+* Fixed `rating:S` not matching `rating:safe` in autocomplete.
+
 ## 2021-02-24
 
 ### Changes
