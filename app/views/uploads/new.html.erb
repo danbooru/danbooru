@@ -15,7 +15,7 @@
 
       <%= render "image" %>
       <%= render "related_posts", source: @source %>
-      <%= render "sources/info" %>
+      <%= render_source_data(nil) %>
 
       <div id="client-errors" class="error-messages ui-state-error ui-corner-all" style="display:none"></div>
 

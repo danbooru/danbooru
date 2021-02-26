@@ -221,30 +221,6 @@ div#c-post-versions, div#c-artist-versions {
   }
 }
 
-div#c-posts, div#c-uploads {
-  /* Fetch source data box */
-  div#source-info {
-    border-radius: 4px;
-    border: 1px solid var(--fetch-source-data-border-color);
-
-    &:not(.loading) #source-info-loading { display: none; }
-    &.loading #source-info-content { display: none; }
-    &.loading #fetch-data-manual { display: none; }
-
-    ul {
-      display: inline-block;
-    }
-
-    dt, dd, li {
-      display: inline;
-    }
-
-    dt, #source-info-tags li {
-      margin-right: 1em;
-    }
-  }
-}
-
 /* Container for the tag edit <textarea>, header, and related tags buttons. */
 #tags-container {
   max-width: 60rem;

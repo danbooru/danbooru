@@ -1,0 +1,20 @@
+div.source-data {
+  border-radius: 4px;
+  border: 1px solid var(--fetch-source-data-border-color);
+
+  &:not(.loading) .source-data-loading { display: none; }
+  &.loading .source-data-content { display: none; }
+  &.loading .source-data-fetch { display: none; }
+
+  ul {
+    display: inline-block;
+  }
+
+  dt, dd, li {
+    display: inline;
+  }
+
+  dt, .source-data-tags li {
+    margin-right: 1em;
+  }
+}

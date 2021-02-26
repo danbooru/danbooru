@@ -14,8 +14,6 @@ Upload.IQDB_HIGH_SIMILARITY = 70;
 Upload.initialize_all = function() {
   if ($("#c-uploads,#c-posts").length) {
     Utility.keydown("return", "submit", Upload.submit_form, "#upload_tag_string, #post_tag_string");
-    $("#upload_source").on("change.danbooru", Upload.fetch_data_manual);
-    $(document).on("click.danbooru", "#fetch-data-manual", Upload.fetch_data_manual);
   }
 
   if ($("#c-uploads").length) {
@@ -157,18 +155,6 @@ Upload.update_scale = function() {
     let scale_percentage = Math.round(100 * $image.width() / natural_width);
     $("#upload-image-metadata-resolution").html(`(${natural_width}x${natural_height}, resized to ${scale_percentage}%)`);
   }
-}
-
-Upload.fetch_data_manual = function(e) {
-  var url = $("#upload_source,#post_source").val();
-  var ref = $("#upload_referer_url").val();
-
-  if (/^https?:\/\//.test(url)) {
-    $("#source-info").addClass("loading");
-    $.get("/source.js", { url: url, ref: ref }).always(resp => $("#source-info").removeClass("loading"));
-  }
-
-  e.preventDefault();
 }
 
 Upload.toggle_commentary = function() {

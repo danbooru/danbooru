@@ -23,6 +23,10 @@ module ComponentsHelper
     render PostNavbarComponent.new(post: post, **options)
   end
 
+  def render_source_data(source, **options)
+    render SourceDataComponent.new(source: source, **options)
+  end
+
   # A simple vertical tag list with no post counts. Used in related tags.
   def render_simple_tag_list(tag_names, **options)
     tags = TagListComponent.tags_from_names(tag_names)

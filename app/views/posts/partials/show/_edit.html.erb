@@ -4,7 +4,7 @@
   </div>
 <% end %>
 
-<%= render "sources/info" %>
+<%= render_source_data(nil) %>
 
 <%= edit_form_for(post, html: { id: "form" }) do |f| %>
   <%= f.input :tags_query, as: :hidden, input_html: { id: nil, name: "tags_query", value: params[:q] } %>
