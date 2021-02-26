@@ -85,7 +85,7 @@ module Sources::Strategies
     end
 
     def artist_name_from_url
-      url[NAMED_PROFILE, :artist_name]
+      urls.map { |url| url[NAMED_PROFILE, :artist_name] }.compact.first
     end
 
     def other_names
@@ -93,7 +93,7 @@ module Sources::Strategies
     end
 
     def account_id
-      url[ID_PROFILE, :account_id] || api_response.account_id
+      urls.map { |url| url[ID_PROFILE, :account_id] }.compact.first || api_response.account_id
     end
 
     def status_id_from_url

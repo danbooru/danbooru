@@ -95,6 +95,10 @@ module Sources
       should "fetch the source data" do
         assert_equal("evazion", @site.artist_name)
       end
+
+      should "correctly get the page url" do
+        assert_equal(@ref, @site.page_url)
+      end
     end
 
     context "A baraag url" do
