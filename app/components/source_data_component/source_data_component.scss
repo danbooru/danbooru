@@ -6,15 +6,27 @@ div.source-data {
   &.loading .source-data-content { display: none; }
   &.loading .source-data-fetch { display: none; }
 
-  ul {
+  th {
+    padding-right: 1rem;
+    padding-bottom: 0.25rem;
+  }
+
+  td {
+    vertical-align: top;
+  }
+
+  .icon {
+    height: 1rem;
+    font-size: 1rem;
+    vertical-align: bottom;
+  }
+
+  .source-data-tag {
     display: inline-block;
-  }
-
-  dt, dd, li {
-    display: inline;
-  }
-
-  dt, .source-data-tags li {
-    margin-right: 1em;
+    background-color: var(--wiki-page-other-name-background-color);
+    padding: 0 0.25rem;
+    margin-right: 0.25rem;
+    margin-bottom: 0.25rem;
+    border-radius: 0.25rem;
   }
 }

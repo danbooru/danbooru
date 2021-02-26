@@ -6,17 +6,17 @@
   <span class="social-icons">
     <% if Danbooru.config.source_code_url.present? %>
       <%= link_to Danbooru.config.source_code_url, title: "Running commit: #{Rails.application.config.x.git_hash&.first(9)}", class: "social-icon" do %>
-        <img src="/images/github-logo.png">
+        <%= github_icon %>
       <% end %>
     <% end %>
     <% if Danbooru.config.twitter_username.present? %>
       <%= link_to "https://twitter.com/#{Danbooru.config.twitter_username}", class: "social-icon" do %>
-        <img src="/images/twitter-logo.png">
+        <%= twitter_icon %>
       <% end %>
     <% end %>
     <% if Danbooru.config.discord_server_url.present? %>
       <%= link_to Danbooru.config.discord_server_url, class: "social-icon" do %>
-        <img src="/images/discord-logo.png">
+        <%= discord_icon %>
       <% end %>
     <% end %>
   </span>

@@ -90,7 +90,12 @@ module Sources
       end
 
       def site_name
-        "Pixiv"
+        # XXX pixiv sketch should be in a separate strategy
+        if parsed_url.host.in?(%w[sketch.pixiv.net img-sketch.pixiv.net img-sketch.pximg.net])
+          "Pixiv Sketch"
+        else
+          "Pixiv"
+        end
       end
 
       def image_urls

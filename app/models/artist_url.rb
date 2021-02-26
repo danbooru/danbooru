@@ -7,6 +7,7 @@ class ArtistUrl < ApplicationRecord
 
   scope :url_matches, ->(url) { url_attribute_matches(:url, url) }
   scope :normalized_url_matches, ->(url) { url_attribute_matches(:normalized_url, url) }
+  scope :active, -> { where(is_active: true) }
 
   def self.parse_prefix(url)
     prefix, url = url.match(/\A(-)?(.*)/)[1, 2]
@@ -68,22 +69,49 @@ class ArtistUrl < ApplicationRecord
     end
   end
 
-  def priority
-    if normalized_url =~ /pixiv\.net\/member\.php/
-      10
+  def domain
+    uri = Addressable::URI.parse(normalized_url)
+    uri.domain
+  end
 
-    elsif normalized_url =~ /seiga\.nicovideo\.jp\/user\/illust/
-      10
+  def site_name
+    source = Sources::Strategies.find(normalized_url)
+    source.site_name
+  end
 
-    elsif normalized_url =~ /twitter\.com/ && normalized_url !~ /status/
-      15
-
-    elsif normalized_url =~ /tumblr|patreon|deviantart|artstation/
-      20
-
+  # A secondary URL is an artist URL that we don't normally want to display,
+  # usually because it's redundant with the primary profile URL.
+  def secondary_url?
+    case url
+    when %r!pixiv\.net/stacc!i
+      true
+    when %r!pixiv\.net/fanbox!i
+      true
+    when %r!twitter\.com/intent!i
+      true
+    when %r!lohas\.nicoseiga\.jp!i
+      true
+    when %r!(?:www|com|dic)\.nicovideo\.jp!i
+      true
+    when %r!pawoo\.net/web/accounts!i
+      true
+    when %r!www\.artstation\.com!i
+      true
     else
-      100
+      false
     end
+  end
+
+  # The sort order of sites in artist URL lists.
+  def priority
+    sites = %w[
+      Pixiv Twitter
+      ArtStation Deviant\ Art Nico\ Seiga Nijie pawoo.net Pixiv\ Fanbox Pixiv\ Sketch Tinami Tumblr
+      Booth.pm Facebook Fantia FC2 Gumroad Instagram Lofter Patreon Privatter Skeb Weibo Youtube
+      Circle.ms DLSite Melonbooks Toranoana
+    ]
+
+    sites.index(site_name) || 1000
   end
 
   def normalize

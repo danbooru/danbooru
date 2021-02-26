@@ -60,7 +60,47 @@ module Sources
       end
 
       def site_name
-        Addressable::URI.heuristic_parse(url)&.host
+        host = Addressable::URI.heuristic_parse(url)&.host
+
+        # XXX should go in dedicated strategies.
+        case host
+        when /bcy\.net\z/i
+          "BCY"
+        when /booth\.pm\z/i
+          "Booth.pm"
+        when /circle\.ms\z/i
+          "Circle.ms"
+        when /dlsite\.(com|net)\z/i
+          "DLSite"
+        when /facebook\.com\z/i
+          "Facebook"
+        when /fantia\.jp\z/i
+          "Fantia"
+        when /fc2\.com\z/i
+          "FC2"
+        when /gumroad\.com\z/i
+          "Gumroad"
+        when /instagram\.com\z/i
+          "Instagram"
+        when /lofter\.com\z/i
+          "Lofter"
+        when /melonbooks\.co\.jp\z/i
+          "Melonbooks"
+        when /patreon\.com\z/i
+          "Patreon"
+        when /privatter\.net\z/i
+          "Privatter"
+        when /skeb\.jp\z/i
+          "Skeb"
+        when /tinami\.com\z/i
+          "Tinami"
+        when /toranoana\.(jp|shop)\z/i
+          "Toranoana"
+        when /youtube\.com\z/i
+          "Youtube"
+        else
+          host
+        end
       rescue Addressable::URI::InvalidURIError
         nil
       end
