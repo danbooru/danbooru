@@ -12,7 +12,7 @@
     "@fontsource/unifrakturmaguntia": "^4.0.0",
     "@fortawesome/fontawesome-free": "^5.11.2",
     "@rails/ujs": "^6.0.2-1",
-    "@rails/webpacker": "^6.0.0-beta.4",
+    "@rails/webpacker": "=6.0.0-beta.6",
     "css-loader": "^5.0.1",
     "dropzone": "^5.5.1",
     "hammerjs": "^2.0.8",
