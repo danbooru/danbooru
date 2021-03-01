@@ -1,7 +1,7 @@
 class IpAddress < ApplicationRecord
   belongs_to :model, polymorphic: true
   belongs_to :user
-  attribute :ip_addr, IpAddressType.new
+  attribute :ip_addr, :ip_address
 
   def self.model_types
     %w[Post User Comment Dmail ArtistVersion ArtistCommentaryVersion NoteVersion WikiPageVersion]
@@ -41,8 +41,7 @@ class IpAddress < ApplicationRecord
   end
 
   def to_s
-    # include the subnet mask only when the IP denotes a subnet.
-    (ip_addr.size > 1) ? ip_addr.to_string : ip_addr.to_s
+    ip_addr.to_s
   end
 
   def readonly?

@@ -1,4 +1,7 @@
 class ApiKey < ApplicationRecord
+  attribute :permitted_ip_addresses, :ip_address, array: true
+  attribute :last_ip_address, :ip_address
+
   array_attribute :permissions
   array_attribute :permitted_ip_addresses
 
