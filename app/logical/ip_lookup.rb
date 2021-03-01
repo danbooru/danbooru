@@ -10,12 +10,13 @@ class IpLookup
   end
 
   def initialize(ip_addr, api_key: Danbooru.config.ip_registry_api_key, cache_duration: 3.days)
-    @ip_addr = IPAddress.parse(ip_addr.to_s)
+    @ip_addr = Danbooru::IpAddress.new(ip_addr)
     @api_key = api_key
     @cache_duration = cache_duration
   end
 
   def ip_info
+    return {} if ip_addr.is_local?
     return {} if response.blank?
 
     {
@@ -41,14 +42,6 @@ class IpLookup
     return {} if response.status != 200
     json = response.parse.deep_symbolize_keys.with_indifferent_access
     json
-  end
-
-  def is_local?
-    if ip_addr.ipv4?
-      ip_addr.loopback? || ip_addr.link_local? || ip_addr.private?
-    elsif ip_addr.ipv6?
-      ip_addr.loopback? || ip_addr.link_local? || ip_addr.unique_local?
-    end
   end
 
   def is_proxy?

@@ -12,7 +12,7 @@ class UserVerifier
 
   def requires_verification?
     return false if !Danbooru.config.new_user_verification?
-    return false if is_local_ip?
+    return false if ip_address.is_local?
 
     # we check for IP bans first to make sure we bump the IP ban hit count
     is_ip_banned? || is_logged_in? || is_recent_signup? || is_proxy?
@@ -33,11 +33,7 @@ class UserVerifier
   private
 
   def ip_address
-    @ip_address ||= IPAddress.parse(request.remote_ip)
-  end
-
-  def is_local_ip?
-    IpLookup.new(ip_address).is_local?
+    @ip_address ||= Danbooru::IpAddress.new(request.remote_ip)
   end
 
   def is_logged_in?
@@ -56,7 +52,7 @@ class UserVerifier
   end
 
   def is_proxy?
-    IpLookup.new(ip_address).is_proxy?
+    ip_address.is_proxy?
   end
 
   def to_h

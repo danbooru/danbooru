@@ -3,6 +3,8 @@
 # and their browser user agent. This is used to track logins and other events.
 
 class UserSession < ApplicationRecord
+  attribute :ip_addr, :ip_address
+
   belongs_to :ip_geolocation, foreign_key: :ip_addr, primary_key: :ip_addr, optional: true
 
   def self.visible(user)

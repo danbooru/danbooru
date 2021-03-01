@@ -37,7 +37,7 @@ class IpAddress < ApplicationRecord
   end
 
   def lookup
-    @lookup ||= IpLookup.new(ip_addr)
+    @lookup ||= ip_addr.ip_lookup
   end
 
   def to_s

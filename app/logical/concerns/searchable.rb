@@ -79,10 +79,10 @@ module Searchable
 
   def where_inet_matches(attr, value)
     if value.match?(/[, ]/)
-      ips = value.split(/[, ]+/).map { |ip| IPAddress.parse(ip).to_string }
+      ips = value.split(/[, ]+/).map { |ip| Danbooru::IpAddress.new(ip).to_string }
       where("#{qualified_column_for(attr)} = ANY(ARRAY[?]::inet[])", ips)
     else
-      ip = IPAddress.parse(value)
+      ip = Danbooru::IpAddress.new(value)
       where("#{qualified_column_for(attr)} <<= ?", ip.to_string)
     end
   end

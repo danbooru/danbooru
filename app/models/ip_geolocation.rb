@@ -1,6 +1,9 @@
 # An IpGeolocation contains metadata associated with an IP address, primarily geolocation data.
 
 class IpGeolocation < ApplicationRecord
+  attribute :ip_addr, :ip_address
+  attribute :network, :ip_address
+
   has_many :user_sessions, foreign_key: :ip_addr, primary_key: :ip_addr
 
   def self.visible(user)
@@ -17,13 +20,12 @@ class IpGeolocation < ApplicationRecord
     q
   end
 
-  def self.create_or_update!(ip_addr)
-    ip_lookup = IpLookup.new(ip_addr)
-    return nil if ip_lookup.is_local?
-    return nil if ip_lookup.ip_info.blank?
+  def self.create_or_update!(ip)
+    ip_address = Danbooru::IpAddress.new(ip)
+    return nil if ip_address.ip_info.blank?
 
-    ip_geolocation = IpGeolocation.create_with(**ip_lookup.ip_info).create_or_find_by!(ip_addr: ip_addr)
-    ip_geolocation.update!(**ip_lookup.ip_info)
+    ip_geolocation = IpGeolocation.create_with(**ip_address.ip_info).create_or_find_by!(ip_addr: ip_address)
+    ip_geolocation.update!(**ip_address.ip_info)
     ip_geolocation
   end
 end
