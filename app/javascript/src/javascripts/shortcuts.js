@@ -45,7 +45,7 @@ Shortcuts.initialize_data_shortcuts = function() {
 };
 
 Shortcuts.submit_form = function(event) {
-  $(event.target).parents("form").find('input[type="submit"]').click();
+  $(event.target).parents("form").find('[type="submit"]').click();
   event.preventDefault();
 };
 
