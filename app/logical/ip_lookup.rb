@@ -17,6 +17,7 @@ class IpLookup
 
   def ip_info
     return {} if ip_addr.is_local?
+    return {} if ip_addr.is_tor?
     return {} if response.blank?
 
     {
@@ -45,6 +46,7 @@ class IpLookup
   end
 
   def is_proxy?
+    return true if ip_addr.is_tor?
     response[:security].present? && response[:security].values.any?
   end
 

@@ -24,6 +24,20 @@ module Danbooru
       end
     end
 
+    # If we're being reverse proxied behind Cloudflare, then Tor connections
+    # will appear to originate from 2405:8100:8000::/48.
+    # https://blog.cloudflare.com/cloudflare-onion-service/
+    def is_tor?
+      Danbooru::IpAddress.new("2405:8100:8000::/48").include?(ip_address)
+    end
+
+    def include?(other)
+      other = Danbooru::IpAddress.new(other)
+      return false if (ipv4? && other.ipv6?) || (ipv6? && other.ipv4?)
+
+      ip_address.include?(other.ip_address)
+    end
+
     # "1.2.3.4/24" if the address is a subnet, "1.2.3.4" otherwise.
     def to_s
       ip_address.size > 1 ? ip_address.to_string : ip_address.to_s
