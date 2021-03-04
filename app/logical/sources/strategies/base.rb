@@ -90,8 +90,6 @@ module Sources
           "Patreon"
         when /privatter\.net\z/i
           "Privatter"
-        when /skeb\.jp\z/i
-          "Skeb"
         when /tinami\.com\z/i
           "Tinami"
         when /toranoana\.(jp|shop)\z/i

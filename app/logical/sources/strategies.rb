@@ -15,7 +15,8 @@ module Sources
         Strategies::Moebooru,
         Strategies::HentaiFoundry,
         Strategies::Weibo,
-        Strategies::Newgrounds
+        Strategies::Newgrounds,
+        Strategies::Skeb
       ]
     end
 
