@@ -63,7 +63,7 @@
       <% end %>
 
       <tr>
-        <th>Inviter</th>
+        <th>Promoter</th>
         <% if user.inviter %>
           <td><%= link_to_user user.inviter %> <%= link_to "»", users_path(search: { inviter: { name: user.inviter.name }}) %></td>
         <% else %>
