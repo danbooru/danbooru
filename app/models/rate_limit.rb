@@ -10,7 +10,7 @@ class RateLimit < ApplicationRecord
   # `cost` is the number of points the action costs.
   # `rate` is the number of points per second that are refilled.
   # `burst` is the maximum number of points that can be saved up.
-  def self.create_or_update!(action:, keys:, cost:, rate:, burst:)
+  def self.create_or_update!(action:, keys:, cost:, rate:, burst:, minimum_points: -30)
     # { key0: keys[0], ..., keyN: keys[N] }
     key_params = keys.map.with_index { |key, i| [:"key#{i}", key] }.to_h
 
@@ -19,6 +19,12 @@ class RateLimit < ApplicationRecord
 
     # Do an upsert, creating a new rate limit object for each key that doesn't
     # already exist, and updating the limit for each limit that already exists.
+    #
+    # If the current point count is negative, then we're limited. Penalize the
+    # caller 1 second (1 rate unit), up to a maximum penalty of 30 seconds (by default).
+    #
+    # Otherwise, if the point count is positive, then we're not limited. Update
+    # the point count and subtract the cost of the call.
     #
     # https://www.postgresql.org/docs/current/sql-insert.html#SQL-ON-CONFLICT
     sql = <<~SQL
@@ -30,9 +36,9 @@ class RateLimit < ApplicationRecord
         points =
           CASE
           WHEN rate_limits.points + :rate * EXTRACT(epoch FROM (:now - rate_limits.updated_at)) < 0 THEN
-            LEAST(:burst, rate_limits.points + :rate * EXTRACT(epoch FROM (:now - rate_limits.updated_at)))
+            GREATEST(:minimum_points, LEAST(:burst, rate_limits.points + :rate * EXTRACT(epoch FROM (:now - rate_limits.updated_at))) - :rate)
           ELSE
-            LEAST(:burst, rate_limits.points + :rate * EXTRACT(epoch FROM (:now - rate_limits.updated_at))) - :cost
+            GREATEST(:minimum_points, LEAST(:burst, rate_limits.points + :rate * EXTRACT(epoch FROM (:now - rate_limits.updated_at))) - :cost)
           END
       RETURNING *
     SQL
@@ -44,6 +50,7 @@ class RateLimit < ApplicationRecord
       burst: burst,
       cost: cost,
       points: burst - cost,
+      minimum_points: minimum_points,
       **key_params
     }
 
