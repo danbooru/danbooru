@@ -8,7 +8,7 @@ class ApplicationController < ActionController::Base
   before_action :reset_current_user
   before_action :set_current_user
   before_action :normalize_search
-  before_action :api_check
+  before_action :check_rate_limit
   before_action :ip_ban_check
   before_action :set_variant
   before_action :add_headers
@@ -69,18 +69,12 @@ class ApplicationController < ActionController::Base
     response.headers["X-Git-Hash"] = Rails.application.config.x.git_hash
   end
 
-  def api_check
-    return if CurrentUser.is_anonymous? || request.get? || request.head?
+  def check_rate_limit
+    return if request.get? || request.head?
 
-    rate_limiter = RateLimiter.new(
-      "write",
-      [CurrentUser.user.cache_key],
-      cost: 1,
-      rate: CurrentUser.user.api_regen_multiplier,
-      burst: CurrentUser.user.api_burst_limit
-    )
-
+    rate_limiter = RateLimiter.for_action(controller_name, action_name, CurrentUser.user, CurrentUser.ip_addr)
     headers["X-Rate-Limit"] = rate_limiter.to_json
+
     rate_limiter.limit!
   end
 

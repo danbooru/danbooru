@@ -1,5 +1,4 @@
 class CommentVotesController < ApplicationController
-  skip_before_action :api_check
   respond_to :js, :json, :xml, :html
 
   def index

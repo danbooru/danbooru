@@ -2,7 +2,6 @@ class ForumTopicsController < ApplicationController
   respond_to :html, :xml, :json
   respond_to :atom, only: [:index, :show]
   before_action :normalize_search, :only => :index
-  skip_before_action :api_check
 
   def new
     @forum_topic = authorize ForumTopic.new

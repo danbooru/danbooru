@@ -1,7 +1,6 @@
 class CommentsController < ApplicationController
   respond_to :html, :xml, :json, :atom
   respond_to :js, only: [:new, :destroy, :undelete]
-  skip_before_action :api_check
 
   def index
     params[:group_by] ||= "comment" if params[:search].present?

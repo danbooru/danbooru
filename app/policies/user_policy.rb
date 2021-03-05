@@ -61,10 +61,8 @@ class UserPolicy < ApplicationPolicy
         updated_at last_logged_in_at last_forum_read_at
         comment_threshold default_image_size
         favorite_tags blacklisted_tags time_zone per_page
-        custom_style favorite_count api_regen_multiplier
-        api_burst_limit statement_timeout
-        favorite_group_limit favorite_limit tag_query_limit
-        max_saved_searches theme
+        custom_style favorite_count statement_timeout favorite_group_limit
+        favorite_limit tag_query_limit max_saved_searches theme
       ]
     end
 

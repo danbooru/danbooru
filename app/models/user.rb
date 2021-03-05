@@ -464,24 +464,10 @@ class User < ApplicationRecord
 
       # regen this amount per second
       def api_regen_multiplier(level)
-        if level >= User::Levels::PLATINUM
+        if level >= User::Levels::GOLD
           4
-        elsif level == User::Levels::GOLD
-          2
         else
           1
-        end
-      end
-
-      # can make this many api calls at once before being bound by
-      # api_regen_multiplier refilling your pool
-      def api_burst_limit(level)
-        if level >= User::Levels::PLATINUM
-          60
-        elsif level == User::Levels::GOLD
-          30
-        else
-          10
         end
       end
     end
@@ -532,10 +518,6 @@ class User < ApplicationRecord
 
     def api_regen_multiplier
       User.api_regen_multiplier(level)
-    end
-
-    def api_burst_limit
-      User.api_burst_limit(level)
     end
 
     def statement_timeout
