@@ -5,13 +5,13 @@ module DanbooruMaintenance
     safely { Upload.prune! }
     safely { PostPruner.prune! }
     safely { PostAppealForumUpdater.update_forum! }
+    safely { RateLimit.prune! }
     safely { regenerate_post_counts! }
   end
 
   def daily
     safely { Delayed::Job.where('created_at < ?', 45.days.ago).delete_all }
     safely { PostDisapproval.prune! }
-    safely { TokenBucket.prune! }
     safely { BulkUpdateRequestPruner.warn_old }
     safely { BulkUpdateRequestPruner.reject_expired }
     safely { Ban.prune! }

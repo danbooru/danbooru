@@ -134,7 +134,6 @@ class User < ApplicationRecord
   has_many :user_events, dependent: :destroy
   has_one :recent_ban, -> {order("bans.id desc")}, :class_name => "Ban"
 
-  has_one :token_bucket
   has_one :email_address, dependent: :destroy
   has_many :api_keys, dependent: :destroy
   has_many :note_versions, :foreign_key => "updater_id"
@@ -537,10 +536,6 @@ class User < ApplicationRecord
 
     def api_burst_limit
       User.api_burst_limit(level)
-    end
-
-    def remaining_api_limit
-      token_bucket.try(:token_count) || api_burst_limit
     end
 
     def statement_timeout

@@ -265,14 +265,6 @@
             (<%= link_to_wiki "help", "help:api" %>)
           </td>
         </tr>
-
-        <tr>
-          <th>API Limits</th>
-          <td>
-            <%= CurrentUser.user.remaining_api_limit %>
-            / <%= CurrentUser.user.api_burst_limit %> <span class="fineprint">(may not be up to date)</span>
-          </td>
-        </tr>
       <% end %>
     </tbody>
   </table>

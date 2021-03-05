@@ -2,8 +2,6 @@ class ApplicationController < ActionController::Base
   include Pundit
   helper_method :search_params
 
-  class ApiLimitError < StandardError; end
-
   self.responder = ApplicationResponder
 
   skip_forgery_protection if: -> { SessionLoader.new(request).has_api_authentication? }
@@ -74,17 +72,16 @@ class ApplicationController < ActionController::Base
   def api_check
     return if CurrentUser.is_anonymous? || request.get? || request.head?
 
-    if CurrentUser.user.token_bucket.nil?
-      TokenBucket.create_default(CurrentUser.user)
-      CurrentUser.user.reload
-    end
+    rate_limiter = RateLimiter.new(
+      "write",
+      [CurrentUser.user.cache_key],
+      cost: 1,
+      rate: CurrentUser.user.api_regen_multiplier,
+      burst: CurrentUser.user.api_burst_limit
+    )
 
-    throttled = CurrentUser.user.token_bucket.throttled?
-    headers["X-Api-Limit"] = CurrentUser.user.token_bucket.token_count.to_s
-
-    if throttled
-      raise ApiLimitError, "too many requests"
-    end
+    headers["X-Rate-Limit"] = rate_limiter.to_json
+    rate_limiter.limit!
   end
 
   def rescue_exception(exception)
@@ -113,7 +110,7 @@ class ApplicationController < ActionController::Base
       render_error_page(410, exception, template: "static/pagination_error", message: "You cannot go beyond page #{CurrentUser.user.page_limit}.")
     when Post::SearchError
       render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
-    when ApiLimitError
+    when RateLimiter::RateLimitError
       render_error_page(429, exception)
     when NotImplementedError
       render_error_page(501, exception, message: "This feature isn't available: #{exception.message}")

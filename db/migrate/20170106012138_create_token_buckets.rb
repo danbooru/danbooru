@@ -5,6 +5,6 @@ class CreateTokenBuckets < ActiveRecord::Migration[4.2]
   end
 
   def down
-    raise NotImplementedError
+    drop_table :token_buckets
   end
 end

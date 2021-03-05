@@ -2930,6 +2930,41 @@ ALTER SEQUENCE public.posts_id_seq OWNED BY public.posts.id;
 
 
 --
+-- Name: rate_limits; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE UNLOGGED TABLE public.rate_limits (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    limited boolean DEFAULT false NOT NULL,
+    points double precision NOT NULL,
+    action character varying NOT NULL,
+    key character varying NOT NULL
+)
+WITH (fillfactor='50');
+
+
+--
+-- Name: rate_limits_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.rate_limits_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: rate_limits_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.rate_limits_id_seq OWNED BY public.rate_limits.id;
+
+
+--
 -- Name: saved_searches; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3083,17 +3118,6 @@ CREATE SEQUENCE public.tags_id_seq
 --
 
 ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
-
-
---
--- Name: token_buckets; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE UNLOGGED TABLE public.token_buckets (
-    user_id integer,
-    last_touched_at timestamp without time zone NOT NULL,
-    token_count real NOT NULL
-);
 
 
 --
@@ -4353,6 +4377,13 @@ ALTER TABLE ONLY public.posts ALTER COLUMN id SET DEFAULT nextval('public.posts_
 
 
 --
+-- Name: rate_limits id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.rate_limits ALTER COLUMN id SET DEFAULT nextval('public.rate_limits_id_seq'::regclass);
+
+
+--
 -- Name: saved_searches id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4737,6 +4768,14 @@ ALTER TABLE ONLY public.post_votes
 
 ALTER TABLE ONLY public.posts
     ADD CONSTRAINT posts_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: rate_limits rate_limits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.rate_limits
+    ADD CONSTRAINT rate_limits_pkey PRIMARY KEY (id);
 
 
 --
@@ -7281,6 +7320,13 @@ CREATE INDEX index_posts_on_uploader_ip_addr ON public.posts USING btree (upload
 
 
 --
+-- Name: index_rate_limits_on_key_and_action; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_rate_limits_on_key_and_action ON public.rate_limits USING btree (key, action);
+
+
+--
 -- Name: index_saved_searches_on_labels; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7383,13 +7429,6 @@ CREATE INDEX index_tags_on_name_trgm ON public.tags USING gin (name public.gin_t
 --
 
 CREATE INDEX index_tags_on_post_count ON public.tags USING btree (post_count);
-
-
---
--- Name: index_token_buckets_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_token_buckets_on_user_id ON public.token_buckets USING btree (user_id);
 
 
 --
@@ -7964,6 +8003,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210127000201'),
 ('20210127012303'),
 ('20210214095121'),
-('20210214101614');
+('20210214101614'),
+('20210303195217');
 
 
