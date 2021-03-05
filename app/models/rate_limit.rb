@@ -5,6 +5,22 @@ class RateLimit < ApplicationRecord
     expired.delete_all
   end
 
+  def self.visible(user)
+    if user.is_owner?
+      all
+    elsif user.is_anonymous?
+      none
+    else
+      where(key: [user.cache_key])
+    end
+  end
+
+  def self.search(params)
+    q = search_attributes(params, :id, :created_at, :updated_at, :limited, :points, :action, :key)
+    q = q.apply_default_order(params)
+    q
+  end
+
   # `action` is the action being limited. Usually a controller endpoint.
   # `keys` is who is being limited. Usually a [user, ip] pair, meaning the action is limited both by the user's ID and their IP.
   # `cost` is the number of points the action costs.
