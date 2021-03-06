@@ -15,11 +15,6 @@ div.related-tags {
     width: 15em;
   }
 
-  /* Hide the related tag checkbox unless it's checked or hovered. */
-  input[type="checkbox"] {
-    visibility: hidden;
-  }
-
   li.selected a {
     /* https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-stroke */
     /* https://caniuse.com/text-stroke */
@@ -27,7 +22,14 @@ div.related-tags {
     text-stroke: 0.5px;
   }
 
-  li.selected, li:hover {
-    input[type="checkbox"] { visibility: visible; }
+  /* On computers with a mouse, hide the related tag checkbox unless it's checked or hovered. */
+  @media (hover: hover) {
+    input[type="checkbox"] {
+      visibility: hidden;
+    }
+
+    li.selected, li:hover {
+      input[type="checkbox"] { visibility: visible; }
+    }
   }
 }
