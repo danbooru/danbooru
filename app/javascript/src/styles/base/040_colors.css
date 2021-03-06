@@ -255,7 +255,7 @@ html {
 
   --login-link-color: var(--red-5);
   --footer-border-color: var(--grey-1);
-  --details-border-color: var(--grey-2);
+  --divider-border-color: var(--grey-2);
 
   --jquery-ui-widget-content-background: var(--body-background-color);
   --jquery-ui-widget-content-text-color: var(--text-color);
@@ -446,7 +446,7 @@ body[data-current-user-theme="dark"] {
 
   --login-link-color: var(--red-4);
   --footer-border-color: var(--grey-7);
-  --details-border-color: var(--grey-7);
+  --divider-border-color: var(--grey-7);
 
   --jquery-ui-widget-content-text-color: var(--text-color);
   --jquery-ui-widget-content-background: var(--grey-8);

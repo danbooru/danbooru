@@ -131,6 +131,14 @@ div.prose {
   .spoiler {
     background: var(--dtext-spoiler-background-color);
   }
+
+  details {
+    margin-bottom: 1em;
+
+    summary {
+      margin-bottom: 1em;
+    }
+  }
 }
 
 // avoid empty gaps beneath dtext blocks in table rows.

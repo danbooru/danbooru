@@ -42,6 +42,8 @@ $spacer: 0.25rem; /* 4px */
 .space-x-4 > * + * { margin-left: 4 * $spacer; }
 .space-y-4 > * + * { margin-top: 4 * $spacer; }
 
+.divide-y-1 > * + * { border-top: 1px solid var(--divider-border-color); }
+
 .align-top { vertical-align: top; }
 
 .flex-auto { flex: 1 1 auto; }
