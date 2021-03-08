@@ -116,8 +116,6 @@ module Sources
           "Sakura.ne.jp"
         when /stickam\.jp\z/i
           "Stickam"
-        when /skeb\.jp\z/i
-          "Skeb"
         when /tinami\.com\z/i
           "Tinami"
         when /toranoana\.(jp|shop)\z/i
