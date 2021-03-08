@@ -10,7 +10,7 @@ class TagNameValidator < ActiveModel::EachValidator
 
     case value
     when /\A_*\z/
-      record.errors.add(attribute, "'#{value}' cannot be blank")
+      record.errors.add(attribute, "cannot be blank")
     when /\*/
       record.errors.add(attribute, "'#{value}' cannot contain asterisks ('*')")
     when /,/

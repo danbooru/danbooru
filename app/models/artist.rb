@@ -12,6 +12,7 @@ class Artist < ApplicationRecord
 
   validate :validate_tag_category
   validates :name, tag_name: true, uniqueness: true
+
   before_save :update_tag_category
   after_save :create_version
   after_save :clear_url_string_changed
@@ -155,7 +156,7 @@ class Artist < ApplicationRecord
       return unless !is_deleted? && name_changed? && tag.present?
 
       if tag.category_name != "Artist" && !tag.empty?
-        errors.add(:base, "'#{name}' is a #{tag.category_name.downcase} tag; artist entries can only be created for artist tags")
+        errors.add(:name, "'#{name}' is a #{tag.category_name.downcase} tag; artist entries can only be created for artist tags")
       end
     end
 

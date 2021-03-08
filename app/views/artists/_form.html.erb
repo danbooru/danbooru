@@ -5,7 +5,7 @@
   <%= f.input :group_name %>
   <%= f.input :url_string, label: "URLs", as: :text, input_html: { value: params.dig(:artist, :url_string) || @artist.urls.join("\n")}, hint: "You can prefix a URL with - to mark it as dead." %>
 
-  <% if @artist.wiki_page.present? %>
+  <% if @artist.tag&.artist? && @artist.wiki_page.present? %>
     <div class="input">
       <label>Wiki (<%= link_to "Edit", edit_wiki_page_path(@artist.wiki_page) %>)</label>
     </div>
