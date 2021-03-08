@@ -15,7 +15,8 @@ module Sources
         Strategies::Fanbox,
         Strategies::Mastodon,
         Strategies::Weibo,
-        Strategies::Newgrounds
+        Strategies::Newgrounds,
+        Strategies::Skeb
       ]
     end
 
