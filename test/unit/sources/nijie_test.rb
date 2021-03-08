@@ -305,6 +305,18 @@ module Sources
       end
     end
 
+    context "when the cached session cookie is invalid" do
+      should "clear the cached cookie after failing to fetch the data" do
+        site = Sources::Strategies.find("https://nijie.info/view.php?id=203688")
+
+        Cache.put("nijie-session-cookie", HTTP::Cookie.new(name: "NIJIEIJIEID", value: "fake", domain: "nijie.info", path: "/"))
+        assert_equal("fake", site.cached_session_cookie.value)
+
+        assert_equal([], site.image_urls)
+        assert_nil(Cache.get("nijie-session-cookie"))
+      end
+    end
+
     context "a doujin post" do
       should "work" do
         image = "https://pic.nijie.net/01/dojin_main/dojin_sam/20120213044700%E3%82%B3%E3%83%94%E3%83%BC%20%EF%BD%9E%200011%E3%81%AE%E3%82%B3%E3%83%94%E3%83%BC.jpg"

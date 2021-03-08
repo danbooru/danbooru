@@ -212,34 +212,57 @@ module Sources
         return nil if page_url.blank? || client.blank?
 
         response = client.cache(1.minute).get(page_url)
-        return nil unless response.status == 200
 
-        response&.parse
+        if response.status != 200 || response.parse.search("#login_illust").present?
+          clear_cached_session_cookie!
+        else
+          response.parse
+        end
       end
       memoize :page
 
       def client
-        nijie = http.timeout(60).use(retriable: { max_retries: 20 })
-
-        cookie = Cache.get("nijie-session-cookie", 60.minutes) do
-          login_page = nijie.get("https://nijie.info/login.php").parse
-          form = {
-            email: Danbooru.config.nijie_login,
-            password: Danbooru.config.nijie_password,
-            url: login_page.at("input[name='url']")["value"],
-            save: "on",
-            ticket: ""
-          }
-          response = nijie.post("https://nijie.info/login_int.php", form: form)
-          DanbooruLogger.info "Nijie login failed (#{url}, #{response.status})" if response.status != 200
-          return nil unless response.status == 200
-
-          response.cookies.select { |c| c.name == "NIJIEIJIEID" }.compact.first
-        end
-
-        nijie.cookies(NIJIEIJIEID: cookie, R18: 1)
+        return nil if cached_session_cookie.nil?
+        http.cookies(NIJIEIJIEID: cached_session_cookie, R18: 1)
       end
-      memoize :client
+
+      def http
+        super.timeout(60).use(retriable: { max_retries: 20 })
+      end
+
+      def cached_session_cookie
+        Cache.get("nijie-session-cookie", 60.minutes, skip_nil: true) do
+          session_cookie
+        end
+      end
+
+      def clear_cached_session_cookie!
+        flush_cache # clear memoized session cookie
+        Cache.delete("nijie-session-cookie")
+      end
+
+      def session_cookie
+        login_page = http.get("https://nijie.info/login.php").parse
+
+        form = {
+          email: Danbooru.config.nijie_login,
+          password: Danbooru.config.nijie_password,
+          url: login_page.at("input[name='url']")["value"],
+          save: "on",
+          ticket: ""
+        }
+
+        response = http.post("https://nijie.info/login_int.php", form: form)
+
+        if response.status == 200
+          response.cookies.select { |c| c.name == "NIJIEIJIEID" }.compact.first
+        else
+          DanbooruLogger.info "Nijie login failed (#{url}, #{response.status})"
+          nil
+        end
+      end
+
+      memoize :client, :cached_session_cookie
     end
   end
 end
