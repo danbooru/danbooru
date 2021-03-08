@@ -62,6 +62,13 @@
         </tr>
       <% end %>
 
+      <% if user.inviter %>
+        <tr>
+          <th>Promoter</th>
+          <td><%= link_to_user user.inviter %> <%= link_to "»", users_path(search: { inviter: { name: user.inviter.name }}) %></td>
+        </tr>
+      <% end %>
+
       <tr>
         <th>Level</th>
         <td>
