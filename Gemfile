@@ -69,6 +69,7 @@ group :development do
   gem 'memory_profiler'
   gem 'better_errors'
   gem 'binding_of_caller'
+  gem 'benchmark-ips', require: "benchmark/ips"
 end
 
 group :development, :test do
