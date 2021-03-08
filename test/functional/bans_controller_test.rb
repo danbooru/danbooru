@@ -100,6 +100,11 @@ class BansControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
       end
+
+      should "not raise an exception on a blank username" do
+        post_auth bans_path, @mod, params: {}
+        assert_response :success
+      end
     end
 
     context "update action" do
