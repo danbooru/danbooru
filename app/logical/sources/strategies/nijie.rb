@@ -221,7 +221,7 @@ module Sources
       def client
         nijie = http.timeout(60).use(retriable: { max_retries: 20 })
 
-        cookie = Cache.get("nijie-session-cookie", 1.week) do
+        cookie = Cache.get("nijie-session-cookie", 60.minutes) do
           login_page = nijie.get("https://nijie.info/login.php").parse
           form = {
             email: Danbooru.config.nijie_login,
