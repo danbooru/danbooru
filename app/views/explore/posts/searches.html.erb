@@ -22,7 +22,7 @@
       </tbody>
     </table>
 
-    <div class="paginator">
+    <div class="paginator text-center mt-4">
       <menu>
         <li><%= link_to "< Previous", searches_explore_posts_path(:date => 1.day.ago(@date).to_date), :class => "arrow" %></li>
         <li><%= link_to "Next >", searches_explore_posts_path(:date => 1.day.since(@date).to_date), :class => "arrow" %></li>
