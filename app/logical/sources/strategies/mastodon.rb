@@ -17,7 +17,7 @@
 module Sources::Strategies
   class Mastodon < Base
     HOST = %r{\Ahttps?://(?:www\.)?(?<domain>pawoo\.net|baraag\.net)}i
-    IMAGE = %r{\Ahttps?://(?:img\.pawoo\.net|baraag\.net)/media_attachments/files/(\d+/\d+/\d+)}
+    IMAGE = %r{\Ahttps?://(?:img\.pawoo\.net|baraag\.net(?:/system(?:/cache)?)?)/media_attachments/files/((?:\d+/)+\d+)}
     NAMED_PROFILE = %r{#{HOST}/@(?<artist_name>\w+)}i
     ID_PROFILE = %r{#{HOST}/web/accounts/(?<account_id>\d+)}
 
@@ -35,6 +35,7 @@ module Sources::Strategies
     def file_host
       case site_name
       when "pawoo.net" then "img.pawoo.net"
+      when "baraag.net" then "baraag.net/system"
       else site_name
       end
     end

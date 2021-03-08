@@ -101,14 +101,20 @@ module Sources
       setup do
         skip "Baraag keys not set" unless Danbooru.config.baraag_client_id
         @url = "https://baraag.net/@bardbot/105732813175612920"
-        @site = Sources::Strategies.find(@url)
+        @site1 = Sources::Strategies.find(@url)
+
+        @img = "https://baraag.net/system/media_attachments/files/105/803/948/862/719/091/original/54e1cb7ca33ec449.png"
+        @ref = "https://baraag.net/@Nakamura/105803949565505009"
+        @site2 = Sources::Strategies.find(@img, @ref)
       end
 
       should "work" do
-        assert_equal("https://baraag.net/@bardbot", @site.profile_url)
-        assert_equal(["https://baraag.net/system/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"], @site.image_urls)
-        assert_equal("bardbot", @site.artist_name)
-        assert_equal("🍌", @site.dtext_artist_commentary_desc)
+        assert_equal("https://baraag.net/@bardbot", @site1.profile_url)
+        assert_equal(["https://baraag.net/system/media_attachments/files/105/732/803/241/495/700/original/556e1eb7f5ca610f.png"], @site1.image_urls)
+        assert_equal("bardbot", @site1.artist_name)
+        assert_equal("🍌", @site1.dtext_artist_commentary_desc)
+
+        assert_equal([@img], @site2.image_urls)
       end
     end
 
