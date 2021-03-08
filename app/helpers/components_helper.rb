@@ -7,8 +7,8 @@ module ComponentsHelper
     render PostPreviewComponent.with_collection(posts, **options)
   end
 
-  def render_comment(comment, **options)
-    render CommentComponent.new(comment: comment, **options)
+  def render_comment(comment, current_user:, **options)
+    render CommentComponent.new(comment: comment, current_user: current_user, **options)
   end
 
   def render_comment_section(post, **options)

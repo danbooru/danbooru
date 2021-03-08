@@ -30,8 +30,9 @@ div.popup-menu {
       display: block;
       padding: 0.125em 2em 0.125em 0;
 
-      i.icon {
-        width: 1.5em;
+      .icon {
+        width: 1rem;
+        margin-right: 0.25rem;
       }
     }
   }

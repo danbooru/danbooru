@@ -6,9 +6,6 @@
   <%= f.button :submit, "Submit" %>
   <%= dtext_preview_button "comment_body" %>
   <% if comment.new_record? %>
-    <%= f.input :do_not_bump_post, :label => "No bump" %>
-  <% end %>
-  <% if policy(comment).can_sticky_comment? %>
-    <%= f.input :is_sticky, label: "Sticky", for: "comment_is_sticky" %>
+    <%= f.input :do_not_bump_post, label: "No bump" %>
   <% end %>
 <% end %>

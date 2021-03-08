@@ -1,6 +1,6 @@
 class CommentsController < ApplicationController
   respond_to :html, :xml, :json, :atom
-  respond_to :js, only: [:new, :destroy, :undelete]
+  respond_to :js, only: [:new, :update, :destroy, :undelete]
 
   def index
     params[:group_by] ||= "comment" if params[:search].present?
@@ -31,7 +31,7 @@ class CommentsController < ApplicationController
   def update
     @comment = authorize Comment.find(params[:id])
     @comment.update(permitted_attributes(@comment))
-    respond_with(@comment, :location => post_path(@comment.post_id))
+    respond_with(@comment)
   end
 
   def create
