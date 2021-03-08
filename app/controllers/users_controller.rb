@@ -1,6 +1,5 @@
 class UsersController < ApplicationController
   respond_to :html, :xml, :json
-  skip_before_action :api_check
 
   def new
     @user = authorize User.new

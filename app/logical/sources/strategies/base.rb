@@ -64,6 +64,10 @@ module Sources
 
         # XXX should go in dedicated strategies.
         case host
+        when /amazon\.(com|jp|co\.jp)\z/i
+          "Amazon"
+        when /ask\.fm\z/i
+          "Ask.fm"
         when /bcy\.net\z/i
           "BCY"
         when /booth\.pm\z/i
@@ -72,6 +76,10 @@ module Sources
           "Circle.ms"
         when /dlsite\.(com|net)\z/i
           "DLSite"
+        when /doujinshi\.mugimugi\.org\z/i, /doujinshi\.org\z/i
+          "Doujinshi.org"
+        when /erogamescape\.dyndns\.org\z/i
+          "Erogamescape"
         when /facebook\.com\z/i
           "Facebook"
         when /fantia\.jp\z/i
@@ -82,18 +90,42 @@ module Sources
           "Gumroad"
         when /instagram\.com\z/i
           "Instagram"
+        when /ko-fi\.com\z/i
+          "Ko-fi"
+        when /livedoor\.(jp|com)\z/i
+          "Livedoor"
         when /lofter\.com\z/i
           "Lofter"
+        when /mangaupdates\.com\z/i
+          "Mangaupdates"
         when /melonbooks\.co\.jp\z/i
           "Melonbooks"
+        when /mihuashi\.com\z/i
+          "Mihuashi"
+        when /mixi\.jp\z/i
+          "Mixi.jp"
         when /patreon\.com\z/i
           "Patreon"
+        when /piapro\.jp\z/i
+          "Piapro.jp"
+        when /picarto\.tv\z/i
+          "Picarto"
         when /privatter\.net\z/i
           "Privatter"
+        when /sakura\.ne\.jp\z/i
+          "Sakura.ne.jp"
+        when /stickam\.jp\z/i
+          "Stickam"
+        when /skeb\.jp\z/i
+          "Skeb"
         when /tinami\.com\z/i
           "Tinami"
         when /toranoana\.(jp|shop)\z/i
           "Toranoana"
+        when /twitch\.tv\z/i
+          "Twitch"
+        when /wikipedia\.org\z/i
+          "Wikipedia"
         when /youtube\.com\z/i
           "Youtube"
         else

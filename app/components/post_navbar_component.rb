@@ -1,4 +1,6 @@
 class PostNavbarComponent < ApplicationComponent
+  extend Memoist
+
   attr_reader :post, :current_user, :search
 
   def initialize(post:, current_user:, search: nil)
@@ -18,7 +20,9 @@ class PostNavbarComponent < ApplicationComponent
   end
 
   def favgroups
-    @favgroups ||= current_user.favorite_groups.for_post(post.id).sort_by do |favgroup|
+    favgroups = FavoriteGroup.visible(current_user).for_post(post.id)
+    favgroups = favgroups.where(creator: current_user).or(favgroups.where(id: favgroup_id))
+    favgroups.sort_by do |favgroup|
       [favgroup.id == favgroup_id ? 0 : 1, favgroup.name]
     end
   end
@@ -38,4 +42,6 @@ class PostNavbarComponent < ApplicationComponent
   def query
     @query ||= PostQueryBuilder.new(search)
   end
+
+  memoize :favgroups
 end

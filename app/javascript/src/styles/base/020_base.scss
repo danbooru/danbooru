@@ -112,13 +112,10 @@ table tfoot {
 }
 
 details {
-  border-bottom: 1px solid var(--details-border-color);
-
   summary {
     cursor: pointer;
     user-select: none;
     outline: none;
-    line-height: 2em;
   }
 }
 

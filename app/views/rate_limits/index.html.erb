@@ -1,0 +1,21 @@
+<div id="c-rate-limits">
+  <div id="a-index">
+    <%= table_for @rate_limits, class: "striped autofit" do |t| %>
+      <% t.column :action %>
+
+      <% t.column :key %>
+
+      <% t.column :points do |rate_limit| %>
+        <%= rate_limit.points.round(2) %>
+      <% end %>
+
+      <% t.column :limited? %>
+
+      <% t.column :updated_at do |rate_limit| %>
+        <%= time_ago_in_words_tagged rate_limit.updated_at %>
+      <% end %>
+    <% end %>
+
+    <%= numbered_paginator(@rate_limits) %>
+  </div>
+</div>

@@ -97,6 +97,8 @@ class ArtistUrl < ApplicationRecord
       true
     when %r!www\.artstation\.com!i
       true
+    when %r!blogimg\.jp!i, %r!image\.blog\.livedoor\.jp!i
+      true
     else
       false
     end
@@ -106,9 +108,9 @@ class ArtistUrl < ApplicationRecord
   def priority
     sites = %w[
       Pixiv Twitter
-      ArtStation Deviant\ Art Nico\ Seiga Nijie pawoo.net Pixiv\ Fanbox Pixiv\ Sketch Tinami Tumblr
-      Booth.pm Facebook Fantia FC2 Gumroad Instagram Lofter Patreon Privatter Skeb Weibo Youtube
-      Circle.ms DLSite Melonbooks Toranoana
+      ArtStation BCY Deviant\ Art Hentai\ Foundry Nico\ Seiga Nijie pawoo.net Pixiv\ Fanbox Pixiv\ Sketch Tinami Tumblr
+      Ask.fm Booth.pm Facebook Fantia FC2 Gumroad Instagram Ko-fi Livedoor Lofter Mihuashi Mixi.jp Patreon Piapro.jp Picarto Privatter Sakura.ne.jp Stickam Skeb Twitch Weibo Youtube
+      Amazon Circle.ms DLSite Doujinshi.org Erogamescape Mangaupdates Melonbooks Toranoana Wikipedia
     ]
 
     sites.index(site_name) || 1000

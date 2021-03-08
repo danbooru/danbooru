@@ -1,0 +1,1 @@
+$("#comment_<%= @comment.id %>").replaceWith("<%= j render_comment(@comment, current_user: CurrentUser.user) %>");

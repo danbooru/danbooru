@@ -1,6 +1,5 @@
 class FavoritesController < ApplicationController
   respond_to :html, :xml, :json, :js
-  skip_before_action :api_check
   rescue_with Favorite::Error, status: 422
 
   def index

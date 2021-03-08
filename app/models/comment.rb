@@ -1,10 +1,12 @@
 class Comment < ApplicationRecord
-  validates_presence_of :body, :message => "has no content"
   belongs_to :post
   belongs_to :creator, class_name: "User"
   belongs_to_updater
+
   has_many :moderation_reports, as: :model
   has_many :votes, :class_name => "CommentVote", :dependent => :destroy
+
+  validates :body, presence: true
 
   before_create :autoreport_spam
   after_create :update_last_commented_at_on_create

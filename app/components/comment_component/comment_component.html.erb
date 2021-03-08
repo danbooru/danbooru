@@ -99,12 +99,26 @@
 
           <%= menu.item do %>
             <% if comment.is_deleted? %>
-              <%= link_to undelete_comment_path(comment.id), method: :post, remote: true do %>
+              <%= link_to comment_path(comment.id), "data-params": "comment[is_deleted]=false", method: :put, remote: true do %>
                 <%= undelete_icon %> Undelete
               <% end %>
             <% else %>
-              <%= link_to comment_path(comment.id), "data-confirm": "Are you sure you want to delete this comment?", method: :delete, remote: true do %>
+              <%= link_to comment_path(comment.id), "data-params": "comment[is_deleted]=true", "data-confirm": "Are you sure you want to delete this comment?", method: :put, remote: true do %>
                 <%= delete_icon %> Delete
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+
+        <% if policy(comment).can_sticky_comment? %>
+          <%= menu.item do %>
+            <% if comment.is_sticky? %>
+              <%= link_to comment_path(comment.id), "data-params": "comment[is_sticky]=false", method: :put, remote: true do %>
+                <%= unsticky_icon %> Unsticky
+              <% end %>
+            <% else %>
+              <%= link_to comment_path(comment.id), "data-params": "comment[is_sticky]=true", method: :put, remote: true do %>
+                <%= sticky_icon %> Sticky
               <% end %>
             <% end %>
           <% end %>

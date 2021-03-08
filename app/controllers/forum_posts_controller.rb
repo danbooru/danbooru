@@ -1,6 +1,5 @@
 class ForumPostsController < ApplicationController
   respond_to :html, :xml, :json, :js
-  skip_before_action :api_check
 
   def new
     @forum_post = authorize ForumPost.new_reply(params)

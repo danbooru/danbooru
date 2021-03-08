@@ -119,7 +119,7 @@ class UserUpgrade < ApplicationRecord
     end
 
     def upgrade_recipient!
-      recipient.update!(level: level, inviter: User.system)
+      recipient.update!(level: level)
     end
 
     def create_mod_action!

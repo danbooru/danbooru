@@ -2,15 +2,13 @@ class ApplicationController < ActionController::Base
   include Pundit
   helper_method :search_params
 
-  class ApiLimitError < StandardError; end
-
   self.responder = ApplicationResponder
 
   skip_forgery_protection if: -> { SessionLoader.new(request).has_api_authentication? }
   before_action :reset_current_user
   before_action :set_current_user
   before_action :normalize_search
-  before_action :api_check
+  before_action :check_rate_limit
   before_action :ip_ban_check
   before_action :set_variant
   before_action :add_headers
@@ -71,20 +69,13 @@ class ApplicationController < ActionController::Base
     response.headers["X-Git-Hash"] = Rails.application.config.x.git_hash
   end
 
-  def api_check
-    return if CurrentUser.is_anonymous? || request.get? || request.head?
+  def check_rate_limit
+    return if request.get? || request.head?
 
-    if CurrentUser.user.token_bucket.nil?
-      TokenBucket.create_default(CurrentUser.user)
-      CurrentUser.user.reload
-    end
+    rate_limiter = RateLimiter.for_action(controller_name, action_name, CurrentUser.user, CurrentUser.ip_addr)
+    headers["X-Rate-Limit"] = rate_limiter.to_json
 
-    throttled = CurrentUser.user.token_bucket.throttled?
-    headers["X-Api-Limit"] = CurrentUser.user.token_bucket.token_count.to_s
-
-    if throttled
-      raise ApiLimitError, "too many requests"
-    end
+    rate_limiter.limit!
   end
 
   def rescue_exception(exception)
@@ -113,7 +104,7 @@ class ApplicationController < ActionController::Base
       render_error_page(410, exception, template: "static/pagination_error", message: "You cannot go beyond page #{CurrentUser.user.page_limit}.")
     when Post::SearchError
       render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
-    when ApiLimitError
+    when RateLimiter::RateLimitError
       render_error_page(429, exception)
     when NotImplementedError
       render_error_page(501, exception, message: "This feature isn't available: #{exception.message}")

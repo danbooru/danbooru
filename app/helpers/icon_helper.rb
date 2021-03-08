@@ -30,6 +30,10 @@ module IconHelper
     icon_tag("fas fa-thumbtack", **options)
   end
 
+  def unsticky_icon(**options)
+    svg_icon_tag("unsticky-icon", "M306.5 186.6l-5.7-42.6H328c13.2 0 24-10.8 24-24V24c0-13.2-10.8-24-24-24H56C42.8 0 32 10.8 32 24v96c0 13.2 10.8 24 24 24h27.2l-5.7 42.6C29.6 219.4 0 270.7 0 328c0 13.2 10.8 24 24 24h144v104c0 .9.1 1.7.4 2.5l16 48c2.4 7.3 12.8 7.3 15.2 0l16-48c.3-.8.4-1.7.4-2.5V352h144c13.2 0 24-10.8 24-24 0-57.3-29.6-108.6-77.5-141.4zM50.5 304c8.3-38.5 35.6-70 71.5-87.8L138 96H80V48h224v48h-58l16 120.2c35.8 17.8 63.2 49.4 71.5 87.8z", **options)
+  end
+
   def lock_icon(**options)
     icon_tag("fas fa-lock", **options)
   end
@@ -39,7 +43,7 @@ module IconHelper
   end
 
   def undelete_icon(**options)
-    icon_tag("fas fa-trash-restore_alt", **options)
+    icon_tag("fas fa-trash-restore-alt", **options)
   end
 
   def private_icon(**options)
@@ -172,18 +176,26 @@ module IconHelper
 
   def external_site_icon(site_name, **options)
     case site_name
+    when "Amazon"
+      image_icon_tag("amazon-logo.png", **options)
     when "ArtStation"
       image_icon_tag("artstation-logo.png", **options)
+    when "Ask.fm"
+      image_icon_tag("ask-fm-logo.png", **options)
     when "BCY"
       image_icon_tag("bcy-logo.png", **options)
     when "Booth.pm"
       image_icon_tag("booth-pm-logo.png", **options)
     when "Circle.ms"
       image_icon_tag("circle-ms-logo.png", **options)
-    when "DLSite"
-      image_icon_tag("dlsite-logo.png", **options)
     when "Deviant Art"
       image_icon_tag("deviantart-logo.png", **options)
+    when "DLSite"
+      image_icon_tag("dlsite-logo.png", **options)
+    when "Doujinshi.org"
+      image_icon_tag("doujinshi-org-logo.png", **options)
+    when "Erogamescape"
+      image_icon_tag("erogamescape-logo.png", **options)
     when "Facebook"
       image_icon_tag("facebook-logo.png", **options)
     when "Fantia"
@@ -192,12 +204,24 @@ module IconHelper
       image_icon_tag("fc2-logo.png", **options)
     when "Gumroad"
       image_icon_tag("gumroad-logo.png", **options)
+    when "Hentai Foundry"
+      image_icon_tag("hentai-foundry-logo.png", **options)
     when "Instagram"
       image_icon_tag("instagram-logo.png", **options)
+    when "Ko-fi"
+      image_icon_tag("ko-fi-logo.png", **options)
+    when "Livedoor"
+      image_icon_tag("livedoor-logo.png", **options)
     when "Lofter"
       image_icon_tag("lofter-logo.png", **options)
+    when "Mangaupdates"
+      image_icon_tag("mangaupdates-logo.png", **options)
     when "Melonbooks"
       image_icon_tag("melonbooks-logo.png", **options)
+    when "Mihuashi"
+      image_icon_tag("mihuashi-logo.png", **options)
+    when "Mixi.jp"
+      image_icon_tag("mixi-jp-logo.png", **options)
     when "Nico Seiga"
       image_icon_tag("nicoseiga-logo.png", **options)
     when "Nijie"
@@ -206,6 +230,10 @@ module IconHelper
       image_icon_tag("patreon-logo.png", **options)
     when "pawoo.net"
       image_icon_tag("pawoo-logo.png", **options)
+    when "Piapro.jp"
+      image_icon_tag("piapro-jp-logo.png", **options)
+    when "Picarto"
+      image_icon_tag("picarto-logo.png", **options)
     when "Pixiv"
       image_icon_tag("pixiv-logo.png", **options)
     when "Pixiv Fanbox"
@@ -214,6 +242,10 @@ module IconHelper
       image_icon_tag("pixiv-sketch-logo.png", **options)
     when "Privatter"
       image_icon_tag("privatter-logo.png", **options)
+    when "Sakura.ne.jp"
+      image_icon_tag("sakura-ne-jp-logo.png", **options)
+    when "Stickam"
+      image_icon_tag("stickam-logo.png", **options)
     when "Skeb"
       image_icon_tag("skeb-logo.png", **options)
     when "Tinami"
@@ -224,8 +256,12 @@ module IconHelper
       image_icon_tag("twitter-logo.png", **options)
     when "Toranoana"
       image_icon_tag("toranoana-logo.png", **options)
+    when "Twitch"
+      image_icon_tag("twitch-logo.png", **options)
     when "Weibo"
       image_icon_tag("weibo-logo.png", **options)
+    when "Wikipedia"
+      image_icon_tag("wikipedia-logo.png", **options)
     when "Youtube"
       image_icon_tag("youtube-logo.png", **options)
     else

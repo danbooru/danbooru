@@ -1,9 +1,12 @@
 class FavoriteGroup < ApplicationRecord
-  validates_uniqueness_of :name, :case_sensitive => false, :scope => :creator_id
-  validates_format_of :name, :with => /\A[^,]+\Z/, :message => "cannot have commas"
   belongs_to :creator, class_name: "User"
+
   before_validation :normalize_name
   before_validation :strip_name
+
+  validates :name, presence: true
+  validates :name, uniqueness: { case_sensitive: false, scope: :creator_id }
+  validates :name, format: { without: /,/, message: "cannot have commas" }
   validate :creator_can_create_favorite_groups, :on => :create
   validate :validate_number_of_posts
   validate :validate_posts

@@ -3,17 +3,17 @@ module Sources
     def self.all
       [
         Strategies::Pixiv,
-        Strategies::Fanbox,
-        Strategies::NicoSeiga,
         Strategies::Twitter,
+        Strategies::Tumblr,
+        Strategies::NicoSeiga,
         Strategies::Stash, # must come before DeviantArt
         Strategies::DeviantArt,
-        Strategies::Tumblr,
-        Strategies::ArtStation,
-        Strategies::Nijie,
-        Strategies::Mastodon,
         Strategies::Moebooru,
+        Strategies::Nijie,
+        Strategies::ArtStation,
         Strategies::HentaiFoundry,
+        Strategies::Fanbox,
+        Strategies::Mastodon,
         Strategies::Weibo,
         Strategies::Newgrounds,
         Strategies::Skeb
@@ -21,7 +21,7 @@ module Sources
     end
 
     def self.find(url, referer = nil, default: Strategies::Null)
-      strategy = all.map { |strategy| strategy.new(url, referer) }.detect(&:match?)
+      strategy = all.lazy.map { |s| s.new(url, referer) }.detect(&:match?)
       strategy || default&.new(url, referer)
     end
 

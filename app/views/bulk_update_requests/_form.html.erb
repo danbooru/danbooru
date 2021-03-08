@@ -1,25 +1,26 @@
 <%= edit_form_for(@bulk_update_request) do |f| %>
-  <p>
-    Request aliases or implications using the format shown below. An <b>alias</b> makes the first tag a
-    synonym for the second tag. An <b>implication</b> makes the first tag automatically add the second tag.
-    A <b>rename</b> replaces the first tag with the second tag without making it a permanent alias.
-    An <b>update</b> moves multiple tags and pools at once.
-  </p>
+  <div class="prose">
+    <details>
+      <summary>Help: How to make a bulk update request</summary>
 
-  <p>
-    <% if @bulk_update_request.new_record? && @bulk_update_request.forum_topic.present? %>
-      This request will be attached to
-      <%= link_to "topic ##{@bulk_update_request.forum_topic_id}: #{@bulk_update_request.forum_topic.title}", @bulk_update_request.forum_topic %>.
-      <%= f.input :forum_topic_id, as: :hidden, input_html: { value: params.dig(:bulk_update_request, :forum_topic_id) } %>
-    <% elsif @bulk_update_request.new_record? && @bulk_update_request.forum_topic.blank? %>
-      This request will create a new forum topic. To attach this request to an existing topic, find
-      the forum topic and click "Request alias/implication" at the top of the page.
+      <%= embed_wiki "help:bur_notice" %>
+    </details>
 
-      <%= f.input :title, label: "Forum Title", as: :string %>
-    <% end %>
-  </p>
+    <p>
+      <% if @bulk_update_request.new_record? && @bulk_update_request.forum_topic.present? %>
+        This request will be attached to
+        <%= link_to "topic ##{@bulk_update_request.forum_topic_id}: #{@bulk_update_request.forum_topic.title}", @bulk_update_request.forum_topic %>.
+        <%= f.input :forum_topic_id, as: :hidden, input_html: { value: params.dig(:bulk_update_request, :forum_topic_id) } %>
+      <% elsif @bulk_update_request.new_record? && @bulk_update_request.forum_topic.blank? %>
+        This request will create a new forum topic. To attach this request to an existing topic, find
+        the forum topic and click "Request alias/implication" at the top of the page.
 
-  <%= f.input :script, label: "Request", as: :text, placeholder: bur_script_example %>
+        <%= f.input :title, label: "Forum Title", as: :string %>
+      <% end %>
+    </p>
+  </div>
+
+  <%= f.input :script, label: "Request", as: :text %>
 
   <% if @bulk_update_request.new_record? %>
     <div class="input">

@@ -48,11 +48,5 @@ class ApiKeyTest < ActiveSupport::TestCase
     should "not authenticate with the wrong name" do
       assert_equal(false, create(:user).authenticate_api_key(@api_key.key))
     end
-
-    should "have the same limits whether or not they have an api key" do
-      assert_no_difference(["@user.reload.api_regen_multiplier", "@user.reload.api_burst_limit"]) do
-        @api_key.destroy
-      end
-    end
   end
 end

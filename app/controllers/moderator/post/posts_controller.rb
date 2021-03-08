@@ -1,7 +1,6 @@
 module Moderator
   module Post
     class PostsController < ApplicationController
-      skip_before_action :api_check
       respond_to :html, :json, :xml, :js
 
       def confirm_move_favorites

@@ -1,5 +1,9 @@
 div#c-user-upgrades {
   div#a-new {
+    summary {
+      padding: 1rem 0;
+    }
+
     table#feature-comparison {
       colgroup#basic {
         background-color: var(--user-upgrade-basic-background-color);

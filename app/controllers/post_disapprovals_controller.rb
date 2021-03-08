@@ -1,5 +1,4 @@
 class PostDisapprovalsController < ApplicationController
-  skip_before_action :api_check
   respond_to :js, :html, :json, :xml
 
   def create

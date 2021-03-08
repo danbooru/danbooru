@@ -62,14 +62,12 @@
         </tr>
       <% end %>
 
-      <tr>
-        <th>Inviter</th>
-        <% if user.inviter %>
+      <% if user.inviter %>
+        <tr>
+          <th>Promoter</th>
           <td><%= link_to_user user.inviter %> <%= link_to "»", users_path(search: { inviter: { name: user.inviter.name }}) %></td>
-        <% else %>
-          <td>None</td>
-        <% end %>
-      </tr>
+        </tr>
+      <% end %>
 
       <tr>
         <th>Level</th>
@@ -263,14 +261,6 @@
           <td>
             <%= link_to "View", user_api_keys_path(CurrentUser.user) %>
             (<%= link_to_wiki "help", "help:api" %>)
-          </td>
-        </tr>
-
-        <tr>
-          <th>API Limits</th>
-          <td>
-            <%= CurrentUser.user.remaining_api_limit %>
-            / <%= CurrentUser.user.api_burst_limit %> <span class="fineprint">(may not be up to date)</span>
           </td>
         </tr>
       <% end %>

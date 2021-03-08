@@ -220,6 +220,7 @@ Rails.application.routes.draw do
     end
   end
   resources :artist_commentary_versions, :only => [:index, :show]
+  resources :rate_limits, only: [:index]
   resource :related_tag, :only => [:show, :update]
   resources :recommended_posts, only: [:index]
   resources :robots, only: [:index]

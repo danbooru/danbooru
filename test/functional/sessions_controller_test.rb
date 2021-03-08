@@ -72,6 +72,31 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(0, @ip_ban.reload.hit_count)
         assert_nil(@ip_ban.last_hit_at)
       end
+
+      should "rate limit logins to 10 per minute per IP" do
+        freeze_time
+
+        11.times do
+          post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
+          assert_redirected_to posts_path
+          assert_equal(@user.id, session[:user_id])
+          delete_auth session_path, @user
+        end
+
+        post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
+        assert_response 429
+        assert_not_equal(@user.id, session[:user_id])
+
+        travel 59.seconds
+        post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
+        assert_response 429
+        assert_not_equal(@user.id, session[:user_id])
+
+        travel 10.seconds
+        post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
+        assert_redirected_to posts_path
+        assert_equal(@user.id, session[:user_id])
+      end
     end
 
     context "destroy action" do
