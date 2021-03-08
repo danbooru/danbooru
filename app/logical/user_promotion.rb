@@ -18,7 +18,6 @@ class UserPromotion
     user.level = new_level
     user.can_upload_free = can_upload_free unless can_upload_free.nil?
     user.can_approve_posts = can_approve_posts unless can_approve_posts.nil?
-    user.inviter = promoter
 
     create_user_feedback
     create_dmail
