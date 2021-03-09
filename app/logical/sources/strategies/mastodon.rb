@@ -124,7 +124,6 @@ module Sources::Strategies
     end
 
     def api_response
-      return {} if status_id_from_url.blank?
       MastodonApiClient.new(site_name, status_id_from_url)
     end
     memoize :api_response

@@ -143,5 +143,20 @@ module Sources
         assert_equal(bad_source3, Sources::Strategies.normalize_source(bad_source3))
       end
     end
+
+    context "A deleted or invalid source" do
+      setup do
+        @site1 = Sources::Strategies.find("https://pawoo.net/@nantokakun/105643037682139899") # 404
+        @site2 = Sources::Strategies.find("https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png")
+
+        assert_nothing_raised { @site1.to_h }
+        assert_nothing_raised { @site2.to_h }
+      end
+
+      should "still find the artist" do
+        @artist = FactoryBot.create(:artist, name: "nantokakun", url_string: "https://pawoo.net/@nantokakun")
+        assert_equal([@artist], @site1.artists)
+      end
+    end
   end
 end

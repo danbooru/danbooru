@@ -7,27 +7,31 @@ class MastodonApiClient
 
     return if access_token.blank?
 
-    begin
-      @json = JSON.parse(access_token.get("/api/v1/statuses/#{id}").body)
-    rescue StandardError
+    if id.blank?
       @json = {}
+    else
+      begin
+        @json = JSON.parse(access_token.get("/api/v1/statuses/#{id}").body)
+      rescue StandardError
+        @json = {}
+      end
     end
   end
 
   def profile_url
-    json.dig("account", "url")
+    json&.dig("account", "url")
   end
 
   def account_name
-    json.dig("account", "username")
+    json&.dig("account", "username")
   end
 
   def display_name
-    json.dig("account", "display_name")
+    json&.dig("account", "display_name")
   end
 
   def account_id
-    json.dig("account", "id")
+    json&.dig("account", "id")
   end
 
   def image_url
@@ -35,17 +39,17 @@ class MastodonApiClient
   end
 
   def image_urls
-    json["media_attachments"].to_a.map {|x| x["url"]}
+    json&.dig("media_attachments").to_a.map {|x| x["url"]}
   end
 
   def tags
-    json["tags"].to_a.map { |tag| [tag["name"], tag["url"]] }
+    json&.dig("tags").to_a.map { |tag| [tag["name"], tag["url"]] }
   end
 
   def commentary
     commentary = ""
     commentary << "<p>#{json["spoiler_text"]}</p>" if json["spoiler_text"].present?
-    commentary << json["content"]
+    commentary << json["content"] if json["content"].present?
     commentary
   end
 
