@@ -6,7 +6,7 @@ class Comment < ApplicationRecord
   has_many :moderation_reports, as: :model
   has_many :votes, :class_name => "CommentVote", :dependent => :destroy
 
-  validates :body, presence: true
+  validates :body, presence: true, length: { maximum: 15_000 }, if: :body_changed?
 
   before_create :autoreport_spam
   after_create :update_last_commented_at_on_create

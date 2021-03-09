@@ -2,7 +2,8 @@ require 'digest/sha1'
 
 class Dmail < ApplicationRecord
   validate :validate_sender_is_not_limited, on: :create
-  validates_presence_of :title, :body, on: :create
+  validates :title, presence: true, length: { maximum: 200 }, if: :title_changed?
+  validates :body, presence: true, length: { maximum: 50_000 }, if: :body_changed?
 
   belongs_to :owner, :class_name => "User"
   belongs_to :to, :class_name => "User"

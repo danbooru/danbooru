@@ -21,11 +21,11 @@ class ForumTopic < ApplicationRecord
   has_many :tag_aliases, :foreign_key => "forum_topic_id"
   has_many :tag_implications, :foreign_key => "forum_topic_id"
 
-  validates_presence_of :title
+  validates :title, presence: true, length: { maximum: 200 }, if: :title_changed?
   validates_associated :original_post
   validates_inclusion_of :category_id, :in => CATEGORIES.keys
   validates_inclusion_of :min_level, :in => MIN_LEVELS.values
-  validates :title, :length => {:maximum => 255}
+
   accepts_nested_attributes_for :original_post
   after_update :update_orignal_post
   after_save(:if => ->(rec) {rec.is_locked? && rec.saved_change_to_is_locked?}) do |rec|

@@ -1,8 +1,10 @@
 class ForumPost < ApplicationRecord
   attr_readonly :topic_id
+
   belongs_to :creator, class_name: "User"
   belongs_to_updater
   belongs_to :topic, class_name: "ForumTopic", inverse_of: :forum_posts
+
   has_many :dtext_links, as: :model, dependent: :destroy
   has_many :moderation_reports, as: :model
   has_many :votes, class_name: "ForumPostVote"
@@ -10,12 +12,13 @@ class ForumPost < ApplicationRecord
   has_one :tag_implication
   has_one :bulk_update_request
 
+  validates :body, presence: true, length: { maximum: 200_000 }, if: :body_changed?
+
   before_save :update_dtext_links, if: :dtext_links_changed?
   before_create :autoreport_spam
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
   after_destroy :update_topic_updated_at_on_destroy
-  validates_presence_of :body
   after_save :delete_topic_if_original_post
   after_update(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |rec|
     ModAction.log("#{CurrentUser.user.name} updated forum ##{rec.id}", :forum_post_update)
