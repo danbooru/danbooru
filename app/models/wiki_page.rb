@@ -162,10 +162,6 @@ class WikiPage < ApplicationRecord
     name.to_s.unicode_normalize(:nfkc).normalize_whitespace.gsub(/[[:space:]]+/, "_").squeeze("_").gsub(/\A_|_\z/, "")
   end
 
-  def category_name
-    tag&.category
-  end
-
   def pretty_title
     title.tr("_", " ")
   end

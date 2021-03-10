@@ -14,12 +14,4 @@ class WikiPagePolicy < ApplicationPolicy
   def permitted_attributes
     [:title, :body, :other_names, :other_names_string, :is_deleted, (:is_locked if can_edit_locked?)].compact
   end
-
-  def api_attributes
-    super + [:category_name]
-  end
-
-  def html_data_attributes
-    super + [:category_name]
-  end
 end

@@ -4,7 +4,7 @@
 <%= render "wiki_pages/sidebar" %>
 
 <% content_for(:content) do %>
-  <h1>Wiki Page Version Comparison:  <%= link_to @thispage.title, wiki_page_versions_path(search: { wiki_page_id: @thispage.wiki_page_id }, type: params[:type], anchor: "wiki-page-version-#{@thispage.id}"), class: "tag-type-#{@thispage.wiki_page.category_name}" %></h1>
+  <h1>Wiki Page Version Comparison: <%= link_to @thispage.title, wiki_page_versions_path(search: { wiki_page_id: @thispage.wiki_page_id }, type: params[:type], anchor: "wiki-page-version-#{@thispage.id}"), class: "tag-type-#{@thispage.wiki_page.tag.category}" %></h1>
 
   <% if params[:type].present? %>
     <%= render "versions/types" %>
