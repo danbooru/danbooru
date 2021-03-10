@@ -84,26 +84,6 @@ class BanTest < ActiveSupport::TestCase
         CurrentUser.user = nil
         CurrentUser.ip_addr = nil
       end
-
-      context "when only expired bans exist" do
-        setup do
-          @ban = FactoryBot.create(:ban, :user => @user, :banner => @admin, :duration => -1)
-        end
-
-        should "not return expired bans" do
-          assert(!Ban.is_banned?(@user))
-        end
-      end
-
-      context "when active bans still exist" do
-        setup do
-          @ban = FactoryBot.create(:ban, :user => @user, :banner => @admin, :duration => 1)
-        end
-
-        should "return active bans" do
-          assert(Ban.is_banned?(@user))
-        end
-      end
     end
   end
 end

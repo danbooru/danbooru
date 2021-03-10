@@ -1,4 +1,6 @@
 class Ban < ApplicationRecord
+  attribute :duration, :interval
+
   after_create :create_feedback
   after_create :update_user_on_create
   after_create :create_ban_mod_action
@@ -7,20 +9,14 @@ class Ban < ApplicationRecord
   belongs_to :user
   belongs_to :banner, :class_name => "User"
 
-  validates_presence_of :reason, :duration
+  validates :reason, presence: true
   validate :user, :validate_user_is_bannable, on: :create
 
-  scope :unexpired, -> { where("bans.expires_at > ?", Time.now) }
-  scope :expired, -> { where("bans.expires_at <= ?", Time.now) }
-
-  attr_reader :duration
-
-  def self.is_banned?(user)
-    exists?(["user_id = ? AND expires_at > ?", user.id, Time.now])
-  end
+  scope :unexpired, -> { where("bans.created_at + bans.duration > ?", Time.now) }
+  scope :expired, -> { where("bans.created_at + bans.duration <= ?", Time.now) }
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :expires_at, :reason, :user, :banner)
+    q = search_attributes(params, :id, :created_at, :updated_at, :duration, :reason, :user, :banner)
     q = q.text_attribute_matches(:reason, params[:reason_matches])
 
     q = q.expired if params[:expired].to_s.truthy?
@@ -28,7 +24,7 @@ class Ban < ApplicationRecord
 
     case params[:order]
     when "expires_at_desc"
-      q = q.order("bans.expires_at desc")
+      q = q.order(Arel.sql("bans.created_at + bans.duration DESC"))
     else
       q = q.apply_default_order(params)
     end
@@ -62,9 +58,8 @@ class Ban < ApplicationRecord
     self.user = User.find_by_name(username)
   end
 
-  def duration=(dur)
-    self.expires_at = dur.to_i.days.from_now
-    @duration = dur
+  def expires_at
+    created_at + duration
   end
 
   def humanized_duration

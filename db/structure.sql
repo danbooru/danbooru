@@ -690,7 +690,7 @@ CREATE TABLE public.bans (
     user_id integer,
     reason text NOT NULL,
     banner_id integer NOT NULL,
-    expires_at timestamp without time zone NOT NULL,
+    expires_at interval NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -5066,10 +5066,10 @@ CREATE INDEX index_bans_on_banner_id ON public.bans USING btree (banner_id);
 
 
 --
--- Name: index_bans_on_expires_at; Type: INDEX; Schema: public; Owner: -
+-- Name: index_bans_on_duration; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bans_on_expires_at ON public.bans USING btree (expires_at);
+CREATE INDEX index_bans_on_duration ON public.bans USING btree (duration);
 
 
 --
@@ -8004,6 +8004,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210127012303'),
 ('20210214095121'),
 ('20210214101614'),
-('20210303195217');
+('20210303195217'),
+('20210310221248');
 
 

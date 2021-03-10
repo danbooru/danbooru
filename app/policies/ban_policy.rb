@@ -9,11 +9,11 @@ class BanPolicy < ApplicationPolicy
   alias_method :destroy?, :bannable?
 
   def permitted_attributes_for_create
-    [:reason, :duration, :expires_at, :user_id, :user_name]
+    [:reason, :duration, :user_id, :user_name]
   end
 
   def permitted_attributes_for_update
-    [:reason, :duration, :expires_at]
+    [:reason, :duration]
   end
 
   def html_data_attributes

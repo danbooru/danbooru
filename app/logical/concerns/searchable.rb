@@ -212,7 +212,7 @@ module Searchable
       search_text_attribute(name, params)
     when :boolean
       search_boolean_attribute(name, params)
-    when :integer, :float, :datetime
+    when :integer, :float, :datetime, :interval
       search_numeric_attribute(name, params, type: type)
     when :inet
       search_inet_attribute(name, params)
@@ -221,7 +221,7 @@ module Searchable
     when :array
       search_array_attribute(name, subtype, params)
     else
-      raise NotImplementedError, "unhandled attribute type: #{name}"
+      raise NotImplementedError, "unhandled attribute type: #{name} (#{type})"
     end
   end
 

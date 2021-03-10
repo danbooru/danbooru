@@ -1,5 +1,5 @@
 class BansController < ApplicationController
-  respond_to :html, :xml, :json
+  respond_to :html, :xml, :json, :js
 
   def new
     @ban = authorize Ban.new(permitted_attributes(Ban))

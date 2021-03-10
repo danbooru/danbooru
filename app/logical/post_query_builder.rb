@@ -740,6 +740,9 @@ class PostQueryBuilder
       when :age
         DurationParser.parse(object).ago
 
+      when :interval
+        DurationParser.parse(object)
+
       when :ratio
         object =~ /\A(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)\Z/i
 
@@ -765,6 +768,9 @@ class PostQueryBuilder
         end
 
         (size * conversion_factor).to_i
+
+      else
+        raise NotImplementedError, "unrecognized type #{type} for #{object}"
       end
     end
 

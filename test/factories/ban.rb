@@ -3,6 +3,6 @@ FactoryBot.define do
     banner :factory => :admin_user
     user
     reason {FFaker::Lorem.words.join(" ")}
-    duration {60}
+    duration { 1.week }
   end
 end
