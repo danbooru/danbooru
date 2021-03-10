@@ -12,6 +12,14 @@ class IpBan < ApplicationRecord
     partial: 100
   }, _suffix: "ban"
 
+  def self.visible(user)
+    if user.is_moderator?
+      all
+    else
+      none
+    end
+  end
+
   def self.ip_matches(ip_addr)
     where("ip_addr >>= ?", ip_addr)
   end

@@ -1,9 +1,9 @@
 class NewsUpdatesController < ApplicationController
-  respond_to :html
+  respond_to :html, :json, :xml
 
   def index
     authorize NewsUpdate
-    @news_updates = NewsUpdate.order("id desc").paginate(params[:page], :limit => params[:limit])
+    @news_updates = NewsUpdate.visible(CurrentUser.user).paginated_search(params, count_pages: true)
     respond_with(@news_updates)
   end
 

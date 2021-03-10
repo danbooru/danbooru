@@ -2,7 +2,7 @@ class SavedSearchesController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def index
-    @saved_searches = authorize SavedSearch.where(user: CurrentUser.user).paginated_search(params, count_pages: true)
+    @saved_searches = authorize SavedSearch.visible(CurrentUser.user).paginated_search(params, count_pages: true)
     respond_with(@saved_searches)
   end
 
