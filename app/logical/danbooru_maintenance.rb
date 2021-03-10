@@ -15,6 +15,7 @@ module DanbooruMaintenance
     safely { BulkUpdateRequestPruner.warn_old }
     safely { BulkUpdateRequestPruner.reject_expired }
     safely { Ban.prune! }
+    safely { BigqueryExportService.async_export_all! }
     safely { ActiveRecord::Base.connection.execute("vacuum analyze") unless Rails.env.test? }
   end
 

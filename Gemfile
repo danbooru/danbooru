@@ -47,6 +47,8 @@ gem 'nokogiri'
 gem 'view_component', require: 'view_component/engine'
 gem 'tzinfo-data'
 gem 'hsluv'
+gem 'google-cloud-bigquery', require: "google/cloud/bigquery"
+gem 'google-cloud-storage', require: "google/cloud/storage"
 
 group :production, :staging do
   gem 'unicorn', :platforms => :ruby

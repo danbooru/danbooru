@@ -512,6 +512,18 @@ module Danbooru
     def cloudflare_zone
     end
 
+    # Google Cloud API key. Used for exporting data to BigQuery and to Google
+    # Cloud Storage. Should be the JSON key object you get after creating a
+    # service account. Must have the "BigQuery User" and "Storage Admin" roles.
+    #
+    # * Go to https://console.cloud.google.com/iam-admin/serviceaccounts and create a service account.
+    # * Go to "Keys" and add a new key.
+    # * Go to https://console.cloud.google.com/iam-admin/iam and add the
+    #   BigQuery User and Storage Admin roles to the service account.
+    # * Paste the JSON key file here.
+    def google_cloud_credentials
+    end
+
     # The URL for the recommender server (https://github.com/evazion/recommender).
     # Optional. Used to generate post recommendations.
     # Set to http://localhost/mock/recommender to enable a fake recommender
