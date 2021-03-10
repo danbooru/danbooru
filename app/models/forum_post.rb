@@ -40,6 +40,10 @@ class ForumPost < ApplicationRecord
       where(topic_id: ForumTopic.visible(user))
     end
 
+    def not_visible(user)
+      where.not(topic_id: ForumTopic.visible(user))
+    end
+
     def wiki_link_matches(title)
       where(id: DtextLink.forum_post.wiki_link.where(link_target: WikiPage.normalize_title(title)).select(:model_id))
     end
