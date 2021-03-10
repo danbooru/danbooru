@@ -13,7 +13,7 @@ class PostDisapprovalPolicy < ApplicationPolicy
 
   def api_attributes
     attributes = super
-    attributes -= [:creator_id] unless can_view_creator?
+    attributes -= [:user_id] unless can_view_creator?
     attributes
   end
 end
