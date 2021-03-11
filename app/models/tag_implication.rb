@@ -99,7 +99,10 @@ class TagImplication < TagRelationship
       end
     end
 
+    # Require tags to have the same category. Doesn't apply when either tag is empty,
+    # because they could have been populated from a previous update script.
     def tag_categories_are_compatible
+      return if antecedent_tag.empty? || consequent_tag.empty?
       if antecedent_tag.category != consequent_tag.category
         errors.add(:base, "Can't imply a #{antecedent_tag.category_name.downcase} tag to a #{consequent_tag.category_name.downcase} tag")
       end
