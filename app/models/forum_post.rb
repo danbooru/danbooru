@@ -167,7 +167,7 @@ class ForumPost < ApplicationRecord
 
   def send_discord_notification
     return unless policy(User.anonymous).show?
-    DiscordApiClient.new.post_message(self)
+    DiscordWebhookService.new.post_message(self)
   end
 
   def build_response

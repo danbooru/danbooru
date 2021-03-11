@@ -1,4 +1,7 @@
-class DiscordApiClient
+# Used for posting notifications to Discord about new forum posts.
+# https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks
+
+class DiscordWebhookService
   attr_reader :webhook_id, :webhook_secret, :http
 
   def initialize(webhook_id: Danbooru.config.discord_webhook_id, webhook_secret: Danbooru.config.discord_webhook_secret, http: Danbooru::Http.new)
