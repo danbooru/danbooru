@@ -66,4 +66,8 @@ Rails.application.configure do
 
   BetterErrors::Middleware.allow_ip!(IPAddr.new("0.0.0.0/0"))
   BetterErrors::Middleware.allow_ip!(IPAddr.new("::/0"))
+
+  # https://bigbinary.com/blog/rails-6-adds-guard-against-dns-rebinding-attacks
+  # hxxps://github.com/rails/rails/pull/33145
+  config.hosts += [".ngrok.io", ".lvh.me", ".xip.io", ".nip.io"]
 end
