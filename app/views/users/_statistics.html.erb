@@ -112,7 +112,7 @@
         <td>
           <%= presenter.upload_count(self) %>
           <% if presenter.has_uploads? %>
-            (<%= link_to "tag changes report", post_versions_path(search: { updater_id: user.id, version: 1 }, type: "current") %>)
+            (<%= link_to "tag changes report", post_versions_path(search: { updater_name: user.name, version: 1 }, type: "current") %>)
           <% end %>
           <% if CurrentUser.is_moderator? %>
             [<%= link_to "sample", posts_path(:tags => "user:#{user.name} order:random limit:#{PostSets::Post::MAX_PER_PAGE}") %>]
