@@ -1144,10 +1144,11 @@ class Post < ApplicationRecord
   end
 
   module SearchMethods
-    # returns one single post
-    def random
-      key = Digest::MD5.hexdigest(Time.now.to_f.to_s)
-      random_up(key) || random_down(key)
+    def random(n = 1)
+      n.times.map do
+        key = SecureRandom.hex(16)
+        random_up(key) || random_down(key)
+      end.compact.uniq
     end
 
     def random_up(key)

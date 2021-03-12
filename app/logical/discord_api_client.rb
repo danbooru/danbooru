@@ -22,16 +22,20 @@ class DiscordApiClient
     post("/applications/#{application_id}/guilds/#{guild_id}/commands", json)
   end
 
-  def get_channel(channel_id)
-    get("/channels/#{channel_id}")
+  def get_channel(channel_id, **options)
+    get("/channels/#{channel_id}", **options)
   end
 
-  def me
-    get("/users/@me")
+  def me(**options)
+    get("/users/@me", **options)
   end
 
-  def get(url)
-    client.get("#{BASE_URL}/#{url}").parse
+  def get(url, cache: nil, **options)
+    if cache
+      client.cache(cache).get("#{BASE_URL}/#{url}").parse
+    else
+      client.get("#{BASE_URL}/#{url}").parse
+    end
   end
 
   def post(url, data)

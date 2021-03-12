@@ -103,9 +103,7 @@ module PostSets
     end
 
     def get_random_posts
-      per_page.times.inject([]) do |all, _|
-        all << ::Post.user_tag_match(tag_string).random
-      end.compact.uniq
+      ::Post.user_tag_match(tag_string).random(per_page)
     end
 
     def posts

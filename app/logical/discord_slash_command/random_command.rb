@@ -1,13 +1,11 @@
 class DiscordSlashCommand
-  class PostsCommand < DiscordSlashCommand
-    extend Memoist
-
+  class RandomCommand < DiscordSlashCommand
     def name
-      "posts"
+      "random"
     end
 
     def description
-      "Do a tag search"
+      "Show a random post"
     end
 
     def options
@@ -27,8 +25,8 @@ class DiscordSlashCommand
 
     def call
       tags = params[:tags]
-      limit = params.fetch(:limit, 3).clamp(1, 10)
-      posts = Post.user_tag_match(tags, User.anonymous).limit(limit)
+      limit = params.fetch(:limit, 1).clamp(1, 10)
+      posts = Post.user_tag_match(tags, User.anonymous).random(limit)
 
       respond_with(posts: posts)
     end

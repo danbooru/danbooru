@@ -4,6 +4,7 @@ class DiscordSlashCommand
   COMMANDS = {
     count: DiscordSlashCommand::CountCommand,
     posts: DiscordSlashCommand::PostsCommand,
+    random: DiscordSlashCommand::RandomCommand,
   }
 
   # https://discord.com/developers/docs/interactions/slash-commands#interaction-interactiontype
@@ -15,6 +16,7 @@ class DiscordSlashCommand
   # https://discord.com/developers/docs/interactions/slash-commands#applicationcommandoptiontype
   module ApplicationCommandOptionType
     String = 3
+    Integer = 4
   end
 
   attr_reader :data, :discord
@@ -51,14 +53,19 @@ class DiscordSlashCommand
   concerning :HelperMethods do
     # The parameters passed to the command. A hash.
     def params
-      @params ||= data.dig(:data, :options).map do |opt|
+      @params ||= data.dig(:data, :options).to_a.map do |opt|
         [opt[:name], opt[:value]]
       end.to_h.with_indifferent_access
     end
 
     # https://discord.com/developers/docs/interactions/slash-commands#responding-to-an-interaction
     # https://discord.com/developers/docs/interactions/slash-commands#interaction-response
-    def respond_with(content = nil, type: 4, **options)
+    def respond_with(content = nil, type: 4, posts: [], **options)
+      if posts.present?
+        embeds = posts.map { |post| DiscordSlashCommand::PostEmbed.new(post, self).to_h }
+        options[:embeds] = embeds
+      end
+
       {
         type: type,
         data: {
@@ -66,6 +73,10 @@ class DiscordSlashCommand
           **options
         }
       }
+    end
+
+    def channel
+      discord.get_channel(data[:channel_id], cache: 1.minute)
     end
 
     # Register the command with the Discord API (replacing it if it already exists).
