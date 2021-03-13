@@ -17,12 +17,12 @@ class DiscordSlashCommand
         image: {
           width: post.image_width,
           height: post.image_height,
-          url: embed_image,
+          url: embed_image_url,
         },
       }
     end
 
-    def embed_image
+    def embed_image_url
       if is_censored?
         nil
       elsif post.file_ext.match?(/jpe?g|png|gif/)

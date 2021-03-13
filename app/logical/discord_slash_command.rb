@@ -5,6 +5,7 @@ class DiscordSlashCommand
     count: DiscordSlashCommand::CountCommand,
     posts: DiscordSlashCommand::PostsCommand,
     random: DiscordSlashCommand::RandomCommand,
+    wiki: DiscordSlashCommand::WikiCommand,
   }
 
   # https://discord.com/developers/docs/interactions/slash-commands#interaction-interactiontype
