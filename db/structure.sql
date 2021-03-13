@@ -690,7 +690,7 @@ CREATE TABLE public.bans (
     user_id integer,
     reason text NOT NULL,
     banner_id integer NOT NULL,
-    expires_at interval NOT NULL,
+    duration interval NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
