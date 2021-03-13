@@ -1,3 +1,59 @@
+## 2021-03-12
+
+### Changes
+
+* Added max length limits for comments, forum posts, and dmails. The limits are
+  max 15,000 characters for comments, max 200,000 characters for forum posts,
+  and max 50,000 characters for dmails. These limits shouldn't affect most
+  users.
+
+### Fixes
+
+* Fixed having to double tap related tags on iOS.
+* Fixed Pawoo uploads saving the wrong source.
+* Fixed a bug with Baraag.net that caused the batch bookmarklet to always pick
+  the first picture in multi-image posts.
+* Fixed the API key IP address whitelist not showing IP subnets.
+* Hopefully fixed issue with Nijie uploads sometimes failing because of
+  Danbooru getting logged out of Nijie.
+* Fixed favgroup navbar not showing above post when browsing another user's
+  favgroup.
+
+### API Changes
+
+* On the `/bans.json` endpoint, changed the `expires_at` field to `duration.
+* On the `/wiki_pages.json` endpoint, removed the `category_name` field. You can
+  use `/wiki_pages.json?only=title,tag` instead if you need this.
+
+Reworked rate limit system:
+
+* Rate limits are now per-endpoint instead of global. This means that each
+  endpoint has different rate limit counters; if you're rate limited on one
+  endpoint, it won't affect other endpoints.
+* Rate limits are now tied to both your account and your IP address. If
+  multiple accounts share the same IP address, then they share the same rate
+  limit counters.
+* If you make a call while rate limited, you're penalized 1 second, up
+  to a max of 30 seconds. This means that if you don't stop making calls while
+  rate limited, you will stay rate limited forever until you stop and wait for
+  your rate limit to recover.
+* All write endpoints now have rate limits. Previously some actions, such as
+  voting, commenting, or forum posting, didn't have rate limits.
+* Added stricter rate limits for some actions, most notably creating new
+  accounts, logging in, sending dmails, commenting, forum posting, and voting.
+  These limits are meant to be high enough that they shouldn't affect most
+  normal non-spammy usage.
+* Raised the default write rate limit for Gold users from 2 per second to 4 per
+  second for all other write actions. Now Gold+ users all have the same rate limits.
+* Added a `/rate_limits` page where you can view your rate limits. This only
+  updates after each API call, so it only shows the state after the last call,
+  not the current state.
+* Renamed the `X-Api-Limit` HTTP header to `X-Rate-Limit`. `X-Rate-Limit` is
+  now a JSON object that includes more information, including the cost of the
+  call, the endpoint's recharge rate, and the burst limit.
+* Removed the `remaining_api_limit`, `api_regen_multiplier`, and
+  `api_burst_limit` fields from `/profile.json`.
+
 ## 2021-02-26
 
 ### Changes
