@@ -6,7 +6,7 @@ module PostSets
     attr_reader :page, :random, :post_count, :format, :tag_string, :query, :normalized_query
 
     def initialize(tags, page = 1, per_page = nil, user: CurrentUser.user, random: false, format: "html")
-      @query = PostQueryBuilder.new(tags, user, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
+      @query = PostQueryBuilder.new(tags, user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
       @normalized_query = query.normalized_query
       @tag_string = tags
       @page = page

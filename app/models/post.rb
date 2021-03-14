@@ -1265,11 +1265,11 @@ class Post < ApplicationRecord
     end
 
     def system_tag_match(query)
-      user_tag_match(query, User.system, safe_mode: false, hide_deleted_posts: false)
+      user_tag_match(query, User.system, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
     end
 
-    def user_tag_match(query, user = CurrentUser.user, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
-      post_query = PostQueryBuilder.new(query, user, safe_mode: safe_mode, hide_deleted_posts: hide_deleted_posts)
+    def user_tag_match(query, user = CurrentUser.user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
+      post_query = PostQueryBuilder.new(query, user, tag_limit: tag_limit, safe_mode: safe_mode, hide_deleted_posts: hide_deleted_posts)
       post_query.normalized_query.build
     end
 

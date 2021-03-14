@@ -26,7 +26,7 @@ class DiscordSlashCommand
     def call
       tags = params[:tags]
       limit = params.fetch(:limit, 1).clamp(1, 10)
-      posts = Post.user_tag_match(tags, User.anonymous).random(limit)
+      posts = Post.user_tag_match(tags, User.anonymous, tag_limit: nil).random(limit)
 
       respond_with(posts: posts)
     end

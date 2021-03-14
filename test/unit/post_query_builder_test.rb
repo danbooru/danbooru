@@ -1045,7 +1045,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     should "fail for more than 6 tags" do
       post1 = create(:post, rating: "s")
 
-      assert_raise(::Post::SearchError) do
+      assert_raise(PostQueryBuilder::TagLimitError) do
         Post.user_tag_match("a b c rating:s width:10 height:10 user:bob")
       end
     end

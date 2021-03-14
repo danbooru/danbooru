@@ -3,6 +3,8 @@ require "strscan"
 class PostQueryBuilder
   extend Memoist
 
+  class TagLimitError < StandardError; end
+
   # How many tags a `blah*` search should match.
   MAX_WILDCARD_TAGS = 100
 
@@ -58,13 +60,14 @@ class PostQueryBuilder
 
   UNLIMITED_METATAGS = %w[status rating limit]
 
-  attr_reader :query_string, :current_user, :safe_mode, :hide_deleted_posts
+  attr_reader :query_string, :current_user, :tag_limit, :safe_mode, :hide_deleted_posts
   alias_method :safe_mode?, :safe_mode
   alias_method :hide_deleted_posts?, :hide_deleted_posts
 
-  def initialize(query_string, current_user = User.anonymous, safe_mode: false, hide_deleted_posts: false)
+  def initialize(query_string, current_user = User.anonymous, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
     @query_string = query_string
     @current_user = current_user
+    @tag_limit = tag_limit
     @safe_mode = safe_mode
     @hide_deleted_posts = hide_deleted_posts
   end
@@ -468,15 +471,8 @@ class PostQueryBuilder
     relation
   end
 
-  def self.is_unlimited_tag?(term)
-    term.type == :metatag && term.name.in?(UNLIMITED_METATAGS)
-  end
-
   def build
-    tag_count = terms.count { |term| !PostQueryBuilder.is_unlimited_tag?(term) }
-    if tag_count > current_user.tag_query_limit
-      raise ::Post::SearchError
-    end
+    validate!
 
     relation = Post.all
     relation = add_joins(relation)
@@ -640,6 +636,18 @@ class PostQueryBuilder
     return relation.none unless operator == :in
 
     relation.find_ordered(ids)
+  end
+
+  def validate!
+    tag_count = terms.count { |term| !is_unlimited_tag?(term) }
+
+    if tag_limit.present? && tag_count > tag_limit
+      raise TagLimitError
+    end
+  end
+
+  def is_unlimited_tag?(term)
+    term.type == :metatag && term.name.in?(UNLIMITED_METATAGS)
   end
 
   concerning :ParseMethods do

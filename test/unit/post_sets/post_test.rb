@@ -82,7 +82,7 @@ module PostSets
           should "fail" do
             @set = PostSets::Post.new("a b c", user: create(:user))
 
-            assert_raises(::Post::SearchError) do
+            assert_raises(PostQueryBuilder::TagLimitError) do
               @set.posts
             end
           end
