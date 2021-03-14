@@ -109,7 +109,7 @@ class UsersController < ApplicationController
   end
 
   def custom_style
-    @css = CustomCss.parse(CurrentUser.user.custom_style)
+    @css = CurrentUser.user.custom_style
     expires_in 10.years
   end
 
