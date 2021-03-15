@@ -937,6 +937,17 @@ class UploadServiceTest < ActiveSupport::TestCase
         assert_equal([], post.errors.full_messages)
         assert_not_nil(post.id)
       end
+
+      should "create a media asset" do
+        post = subject.new({}).create_post_from_upload(@upload)
+
+        assert_not_nil(post.media_asset)
+        assert_equal("12345", post.media_asset.md5)
+        assert_equal("jpg", post.media_asset.file_ext)
+        assert_equal(1000, post.media_asset.file_size)
+        assert_equal(100, post.media_asset.image_width)
+        assert_equal(100, post.media_asset.image_height)
+      end
     end
   end
 
