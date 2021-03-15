@@ -214,10 +214,6 @@ class Post < ApplicationRecord
     def has_preview?
       is_image? || is_video? || is_ugoira?
     end
-
-    def has_dimensions?
-      image_width.present? && image_height.present?
-    end
   end
 
   module ImageMethods
@@ -502,27 +498,25 @@ class Post < ApplicationRecord
     def add_automatic_tags(tags)
       tags -= %w[incredibly_absurdres absurdres highres lowres huge_filesize flash]
 
-      if has_dimensions?
-        if image_width >= 10_000 || image_height >= 10_000
-          tags << "incredibly_absurdres"
-        end
-        if image_width >= 3200 || image_height >= 2400
-          tags << "absurdres"
-        end
-        if image_width >= 1600 || image_height >= 1200
-          tags << "highres"
-        end
-        if image_width <= 500 && image_height <= 500
-          tags << "lowres"
-        end
+      if image_width >= 10_000 || image_height >= 10_000
+        tags << "incredibly_absurdres"
+      end
+      if image_width >= 3200 || image_height >= 2400
+        tags << "absurdres"
+      end
+      if image_width >= 1600 || image_height >= 1200
+        tags << "highres"
+      end
+      if image_width <= 500 && image_height <= 500
+        tags << "lowres"
+      end
 
-        if image_width >= 1024 && image_width.to_f / image_height >= 4
-          tags << "wide_image"
-          tags << "long_image"
-        elsif image_height >= 1024 && image_height.to_f / image_width >= 4
-          tags << "tall_image"
-          tags << "long_image"
-        end
+      if image_width >= 1024 && image_width.to_f / image_height >= 4
+        tags << "wide_image"
+        tags << "long_image"
+      elsif image_height >= 1024 && image_height.to_f / image_width >= 4
+        tags << "tall_image"
+        tags << "long_image"
       end
 
       if file_size >= 10.megabytes

@@ -22,9 +22,7 @@
           <span class="info">
             <strong>Size</strong>
             <%= link_to "#{upload.post.file_size.to_s(:human_size, precision: 4)} #{upload.post.file_ext}", upload.post.file_url %>
-            <% if upload.post.has_dimensions? %>
-              (<%= upload.post.image_width %>x<%= upload.post.image_height %>)
-            <% end %>
+            (<%= upload.post.image_width %>x<%= upload.post.image_height %>)
           </span>
         <% end %>
         <br>
