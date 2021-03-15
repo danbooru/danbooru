@@ -124,18 +124,6 @@ class StorageManagerTest < ActiveSupport::TestCase
         assert_equal("http://localhost/images/download-preview.png", @storage_manager.file_url(@post, :preview))
       end
     end
-
-    context "when the original_subdir option is used" do
-      should "store original files at the correct path" do
-        @post = FactoryBot.create(:post, file_ext: "png")
-        @storage_manager = StorageManager::Local.new(base_dir: @temp_dir, base_url: "/data", original_subdir: "original/")
-
-        assert_equal("#{@temp_dir}/original/#{@post.md5}.png", @storage_manager.file_path(@post, @post.file_ext, :original))
-
-        @storage_manager.store_file(StringIO.new("data"), @post, :original)
-        assert_equal(true, File.exist?("#{@temp_dir}/original/#{@post.md5}.png"))
-      end
-    end
   end
 
   context "StorageManager::Hybrid" do

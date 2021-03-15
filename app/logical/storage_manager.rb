@@ -1,14 +1,13 @@
 class StorageManager
   class Error < StandardError; end
 
-  attr_reader :base_url, :base_dir, :hierarchical, :tagged_filenames, :original_subdir
+  attr_reader :base_url, :base_dir, :hierarchical, :tagged_filenames
 
-  def initialize(base_url:, base_dir:, hierarchical: false, tagged_filenames: Danbooru.config.enable_seo_post_urls, original_subdir: "")
+  def initialize(base_url:, base_dir:, hierarchical: false, tagged_filenames: Danbooru.config.enable_seo_post_urls)
     @base_url = base_url.chomp("/")
     @base_dir = base_dir
     @hierarchical = hierarchical
     @tagged_filenames = tagged_filenames
-    @original_subdir = original_subdir
   end
 
   # Store the given file at the given path. If a file already exists at that
@@ -56,7 +55,7 @@ class StorageManager
     elsif type == :large && post.has_large?
       "#{base_url}/sample/#{subdir}#{seo_tags}#{file}"
     else
-      "#{base_url}/#{original_subdir}#{subdir}#{seo_tags}#{post.md5}.#{post.file_ext}"
+      "#{base_url}/original/#{subdir}#{seo_tags}#{post.md5}.#{post.file_ext}"
     end
   end
 
@@ -79,7 +78,7 @@ class StorageManager
     when :large
       "#{base_dir}/sample/#{subdir}#{file}"
     when :original
-      "#{base_dir}/#{original_subdir}#{subdir}#{file}"
+      "#{base_dir}/original/#{subdir}#{file}"
     end
   end
 
