@@ -1,5 +1,5 @@
 class CurrentUser < ActiveSupport::CurrentAttributes
-  attribute :user, :ip_addr, :country, :root_url, :safe_mode
+  attribute :user, :ip_addr, :country, :safe_mode
 
   alias_method :safe_mode?, :safe_mode
   delegate :id, to: :user, allow_nil: true
@@ -19,9 +19,5 @@ class CurrentUser < ActiveSupport::CurrentAttributes
     end
 
     scoped(user, &block)
-  end
-
-  def self.root_url
-    attributes[:root_url] || "https://#{Danbooru.config.hostname}"
   end
 end

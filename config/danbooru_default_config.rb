@@ -28,14 +28,17 @@ module Danbooru
       Socket.gethostname
     end
 
-    # The canonical url for the site (e.g. https://danbooru.donmai.us)
+    # The canonical root url for the site (e.g. https://danbooru.donmai.us).
+    # Images will be served from this URL by default. Change this to http:// if
+    # you don't support HTTPS. Protip: use ngrok.com for easy HTTPS support
+    # during development.
     def canonical_url
-      "https://#{hostname}"
+      "https://#{Danborou.config.hostname}"
     end
 
     # Contact email address of the admin.
     def contact_email
-      "webmaster@#{hostname}"
+      "webmaster@#{Danbooru.config.hostname}"
     end
 
     # System actions, such as sending automated dmails, will be performed with
@@ -148,10 +151,10 @@ module Danbooru
     def storage_manager
       # Store files on the local filesystem.
       # base_dir - where to store files (default: under public/data)
-      # base_url - where to serve files from (default: http://#{hostname}/data)
+      # base_url - where to serve files from (default: https://#{hostname}/data)
       # hierarchical: false - store files in a single directory
       # hierarchical: true - store files in a hierarchical directory structure, based on the MD5 hash
-      StorageManager::Local.new(base_url: "#{CurrentUser.root_url}/data", base_dir: Rails.root.join("public/data"), hierarchical: false)
+      StorageManager::Local.new(base_url: "#{Danbooru.config.canonical_url}/data", base_dir: Rails.root.join("public/data"), hierarchical: false)
 
       # Store files on one or more remote host(s). Configure SSH settings in
       # ~/.ssh_config or in the ssh_options param (ref: http://net-ssh.github.io/net-ssh/Net/SSH.html#method-c-start)

@@ -140,7 +140,6 @@ class ApplicationController < ActionController::Base
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
     CurrentUser.safe_mode = false
-    CurrentUser.root_url = root_url.chomp("/")
   end
 
   # Skip setting the session cookie if the response is being publicly cached to
