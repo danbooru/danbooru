@@ -33,7 +33,7 @@ module Danbooru
     # you don't support HTTPS. Protip: use ngrok.com for easy HTTPS support
     # during development.
     def canonical_url
-      "https://#{Danborou.config.hostname}"
+      "https://#{Danbooru.config.hostname}"
     end
 
     # Contact email address of the admin.
@@ -152,22 +152,20 @@ module Danbooru
       # Store files on the local filesystem.
       # base_dir - where to store files (default: under public/data)
       # base_url - where to serve files from (default: https://#{hostname}/data)
-      # hierarchical: false - store files in a single directory
-      # hierarchical: true - store files in a hierarchical directory structure, based on the MD5 hash
-      StorageManager::Local.new(base_url: "#{Danbooru.config.canonical_url}/data", base_dir: Rails.root.join("public/data"), hierarchical: false)
+      StorageManager::Local.new(base_url: "#{Danbooru.config.canonical_url}/data", base_dir: Rails.root.join("public/data"))
 
       # Store files on one or more remote host(s). Configure SSH settings in
       # ~/.ssh_config or in the ssh_options param (ref: http://net-ssh.github.io/net-ssh/Net/SSH.html#method-c-start)
-      # StorageManager::SFTP.new("i1.example.com", "i2.example.com", base_dir: "/mnt/backup", hierarchical: false, ssh_options: {})
+      # StorageManager::SFTP.new("i1.example.com", "i2.example.com", base_dir: "/mnt/backup", ssh_options: {})
 
       # Select the storage method based on the post's id and type (preview, large, or original).
       # StorageManager::Hybrid.new do |id, md5, file_ext, type|
       #   ssh_options = { user: "danbooru" }
       #
       #   if type.in?([:large, :original]) && id.in?(0..850_000)
-      #     StorageManager::SFTP.new("raikou1.donmai.us", base_url: "https://raikou1.donmai.us", base_dir: "/path/to/files", hierarchical: true, ssh_options: ssh_options)
+      #     StorageManager::SFTP.new("raikou1.donmai.us", base_url: "https://raikou1.donmai.us", base_dir: "/path/to/files", ssh_options: ssh_options)
       #   elsif type.in?([:large, :original]) && id.in?(850_001..2_000_000)
-      #     StorageManager::SFTP.new("raikou2.donmai.us", base_url: "https://raikou2.donmai.us", base_dir: "/path/to/files", hierarchical: true, ssh_options: ssh_options)
+      #     StorageManager::SFTP.new("raikou2.donmai.us", base_url: "https://raikou2.donmai.us", base_dir: "/path/to/files", ssh_options: ssh_options)
       #   elsif type.in?([:large, :original]) && id.in?(2_000_001..3_000_000)
       #     StorageManager::SFTP.new(*all_server_hosts, base_url: "https://hijiribe.donmai.us/data", ssh_options: ssh_options)
       #   else
@@ -182,7 +180,7 @@ module Danbooru
       StorageManager::Null.new
 
       # Backup files to /mnt/backup on the local filesystem.
-      # StorageManager::Local.new(base_dir: "/mnt/backup", hierarchical: false)
+      # StorageManager::Local.new(base_dir: "/mnt/backup")
 
       # Backup files to /mnt/backup on a remote system. Configure SSH settings
       # in ~/.ssh_config or in the ssh_options param (ref: http://net-ssh.github.io/net-ssh/Net/SSH.html#method-c-start)

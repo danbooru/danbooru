@@ -81,10 +81,11 @@ class StorageManagerTest < ActiveSupport::TestCase
         @storage_manager.store_file(StringIO.new("data"), @post, :preview)
         @storage_manager.store_file(StringIO.new("data"), @post, :large)
         @storage_manager.store_file(StringIO.new("data"), @post, :original)
+        subdir = "#{@post.md5[0..1]}/#{@post.md5[2..3]}"
 
-        @file_path = "#{@temp_dir}/preview/#{@post.md5}.jpg"
-        @large_file_path = "#{@temp_dir}/sample/sample-#{@post.md5}.jpg"
-        @preview_file_path = "#{@temp_dir}/#{@post.md5}.#{@post.file_ext}"
+        @file_path = "#{@temp_dir}/preview/#{subdir}/#{@post.md5}.jpg"
+        @large_file_path = "#{@temp_dir}/sample/#{subdir}/sample-#{@post.md5}.jpg"
+        @preview_file_path = "#{@temp_dir}/original/#{subdir}/#{@post.md5}.#{@post.file_ext}"
       end
 
       should "store the files at the correct path" do
@@ -108,10 +109,11 @@ class StorageManagerTest < ActiveSupport::TestCase
       should "return the correct urls" do
         @post = FactoryBot.create(:post, file_ext: "png")
         @storage_manager.stubs(:tagged_filenames).returns(false)
+        subdir = "#{@post.md5[0..1]}/#{@post.md5[2..3]}"
 
-        assert_equal("/data/#{@post.md5}.png", @storage_manager.file_url(@post, :original))
-        assert_equal("/data/sample/sample-#{@post.md5}.jpg", @storage_manager.file_url(@post, :large))
-        assert_equal("/data/preview/#{@post.md5}.jpg", @storage_manager.file_url(@post, :preview))
+        assert_equal("/data/original/#{subdir}/#{@post.md5}.png", @storage_manager.file_url(@post, :original))
+        assert_equal("/data/sample/#{subdir}/sample-#{@post.md5}.jpg", @storage_manager.file_url(@post, :large))
+        assert_equal("/data/preview/#{subdir}/#{@post.md5}.jpg", @storage_manager.file_url(@post, :preview))
       end
 
       should "return the correct url for flash files" do
@@ -145,15 +147,15 @@ class StorageManagerTest < ActiveSupport::TestCase
         @storage_manager.store_file(StringIO.new("post1"), @post1, :original)
         @storage_manager.store_file(StringIO.new("post2"), @post2, :original)
 
-        assert(File.exist?("#{@temp_dir}/i1/#{@post1.md5}.png"))
-        assert(File.exist?("#{@temp_dir}/i2/#{@post2.md5}.png"))
+        assert(File.exist?("#{@temp_dir}/i1/original/#{@post1.md5[0..1]}/#{@post1.md5[2..3]}/#{@post1.md5}.png"))
+        assert(File.exist?("#{@temp_dir}/i2/original/#{@post2.md5[0..1]}/#{@post2.md5[2..3]}/#{@post2.md5}.png"))
       end
     end
 
     context "#file_url method" do
       should "generate /i1 urls for odd posts and /i2 urls for even posts" do
-        assert_equal("/i1/#{@post1.md5}.png", @storage_manager.file_url(@post1, :original))
-        assert_equal("/i2/#{@post2.md5}.png", @storage_manager.file_url(@post2, :original))
+        assert_equal("/i1/original/#{@post1.md5[0..1]}/#{@post1.md5[2..3]}/#{@post1.md5}.png", @storage_manager.file_url(@post1, :original))
+        assert_equal("/i2/original/#{@post2.md5[0..1]}/#{@post2.md5[2..3]}/#{@post2.md5}.png", @storage_manager.file_url(@post2, :original))
       end
     end
   end

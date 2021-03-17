@@ -1,12 +1,11 @@
 class StorageManager
   class Error < StandardError; end
 
-  attr_reader :base_url, :base_dir, :hierarchical, :tagged_filenames
+  attr_reader :base_url, :base_dir, :tagged_filenames
 
-  def initialize(base_url:, base_dir:, hierarchical: false, tagged_filenames: Danbooru.config.enable_seo_post_urls)
+  def initialize(base_url:, base_dir:, tagged_filenames: Danbooru.config.enable_seo_post_urls)
     @base_url = base_url.chomp("/")
     @base_dir = base_dir
-    @hierarchical = hierarchical
     @tagged_filenames = tagged_filenames
   end
 
@@ -98,11 +97,7 @@ class StorageManager
   end
 
   def subdir_for(md5)
-    if hierarchical
-      "#{md5[0..1]}/#{md5[2..3]}/"
-    else
-      ""
-    end
+    "#{md5[0..1]}/#{md5[2..3]}/"
   end
 
   def seo_tags(post)
