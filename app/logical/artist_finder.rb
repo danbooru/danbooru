@@ -97,6 +97,7 @@ module ArtistFinder
     "rule34.paheal.net/post/list", # http://rule34.paheal.net/post/list/Reach025/
     "sankakucomplex.com", # https://chan.sankakucomplex.com/?tags=user%3ASubridet
     "society6.com", # http://society6.com/serafleur/
+    "skeb.jp", # https://skeb.jp/@212kisaragi
     "tinami.com",
     "tinami.com/creator/profile", # http://www.tinami.com/creator/profile/29024
     "data.tumblr.com",
