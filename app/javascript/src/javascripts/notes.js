@@ -10,6 +10,7 @@ class Note {
   static HIDE_DELAY = 250;
   static NORMALIZE_ATTRIBUTES = ['letter-spacing', 'line-height', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom', 'padding-left', 'padding-right', 'padding-top', 'padding-bottom'];
   static COPY_ATTRIBUTES = ['background-color', 'border-radius', 'transform', 'justify-content', 'align-items'];
+  static BOX_LEVEL_CLASSES = Array.from({length: 5}, (_, i) => 'level-' + (i + 1));
   static RESIZE_HANDLES = "se, nw";
 
   // Notes must be at least 10x10 in size so they're big enough to drag and resize.
@@ -167,6 +168,12 @@ class Note {
         this.note.has_rotation = true;
       } else {
         this.note.has_rotation = false;
+      }
+
+      $note_box.removeClass(Note.BOX_LEVEL_CLASSES);
+      const level_class = ($attribute_child.attr('class') || "").split(/\s+/).filter((klass) => Note.BOX_LEVEL_CLASSES.includes(klass))[0];
+      if (level_class) {
+        $note_box.addClass(level_class);
       }
     }
 
