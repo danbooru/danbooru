@@ -5,6 +5,7 @@ class DiscordSlashCommand
     count: DiscordSlashCommand::CountCommand,
     posts: DiscordSlashCommand::PostsCommand,
     random: DiscordSlashCommand::RandomCommand,
+    time: DiscordSlashCommand::TimeCommand,
     wiki: DiscordSlashCommand::WikiCommand,
   }
 
