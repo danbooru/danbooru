@@ -2,24 +2,16 @@ class DiscordSlashCommand
   class WikiCommand < DiscordSlashCommand
     extend Memoist
 
-    def name
-      "wiki"
-    end
-
-    def description
-      "Show a wiki page"
-    end
-
-    def options
-      [
-        {
-          name: "name",
-          description: "The name of the wiki page",
-          required: true,
-          type: ApplicationCommandOptionType::String
-        },
-      ]
-    end
+    self.name = "wiki"
+    self.description = "Show a wiki page"
+    self.options = [
+      {
+        name: "name",
+        description: "The name of the wiki page",
+        required: true,
+        type: ApplicationCommandOptionType::String
+      },
+    ]
 
     def call
       if wiki_page.nil?

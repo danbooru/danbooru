@@ -1,14 +1,6 @@
 class DiscordSlashCommand
   class WebhookVerificationError < StandardError; end
 
-  COMMANDS = {
-    count: DiscordSlashCommand::CountCommand,
-    posts: DiscordSlashCommand::PostsCommand,
-    random: DiscordSlashCommand::RandomCommand,
-    time: DiscordSlashCommand::TimeCommand,
-    wiki: DiscordSlashCommand::WikiCommand,
-  }
-
   # https://discord.com/developers/docs/interactions/slash-commands#interaction-interactiontype
   module InteractionType
     Ping = 1
@@ -21,6 +13,16 @@ class DiscordSlashCommand
     Integer = 4
   end
 
+  # The name of the slash command.
+  class_attribute :name
+
+  # A description of the slash command.
+  class_attribute :description
+
+  # The parameters of the slash command.
+  # https://discord.com/developers/docs/interactions/slash-commands#applicationcommandoption
+  class_attribute :options, default: []
+
   attr_reader :data, :discord
 
   # `data` is the the interaction data sent to us by Discord for the command.
@@ -28,22 +30,6 @@ class DiscordSlashCommand
   def initialize(data: {}, discord: DiscordApiClient.new)
     @data = data
     @discord = discord
-  end
-
-  # The name of the slash command.
-  def name
-    raise NotImplementedError
-  end
-
-  # A description of the slash command.
-  def description
-    raise NotImplementedError
-  end
-
-  # The parameters of the slash command.
-  # https://discord.com/developers/docs/interactions/slash-commands#applicationcommandoption
-  def options
-    []
   end
 
   # Should return the response to the command.
@@ -81,10 +67,27 @@ class DiscordSlashCommand
       discord.get_channel(data[:channel_id], cache: 1.minute)
     end
 
-    # Register the command with the Discord API (replacing it if it already exists).
-    # https://discord.com/developers/docs/interactions/slash-commands#registering-a-command
-    def register_slash_command
-      discord.register_slash_command(name: name, description: description, options: options)
+    class_methods do
+      # Register all commands with Discord.
+      def register_slash_commands!
+        slash_commands.values.each(&:register_slash_command!)
+      end
+
+      # Register the command with Discord (replacing it if it already exists).
+      # https://discord.com/developers/docs/interactions/slash-commands#registering-a-command
+      def register_slash_command!(discord: DiscordApiClient.new, guild_id: Danbooru.config.discord_guild_id)
+        discord.register_slash_command(name: name, description: description, options: options, guild_id: guild_id)
+      end
+
+      def slash_commands
+        {
+          count: DiscordSlashCommand::CountCommand,
+          posts: DiscordSlashCommand::PostsCommand,
+          random: DiscordSlashCommand::RandomCommand,
+          time: DiscordSlashCommand::TimeCommand,
+          wiki: DiscordSlashCommand::WikiCommand,
+        }
+      end
     end
   end
 
@@ -101,7 +104,7 @@ class DiscordSlashCommand
           { type: InteractionType::Ping }
         when InteractionType::ApplicationCommand
           name = data.dig(:data, :name)
-          klass = COMMANDS.fetch(name&.to_sym)
+          klass = slash_commands.fetch(name&.to_sym)
           klass.new(data: data).call
         else
           raise NotImplementedError, "unknown Discord interaction type #{data[:type]}"

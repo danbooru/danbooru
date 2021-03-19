@@ -3,23 +3,26 @@ class DiscordApiClient
 
   BASE_URL = "https://discord.com/api/v8"
 
-  attr_reader :application_id, :guild_id, :bot_token, :http
+  attr_reader :application_id, :bot_token, :http
 
-  def initialize(application_id: Danbooru.config.discord_application_client_id, guild_id: Danbooru.config.discord_guild_id, bot_token: Danbooru.config.discord_bot_token, http: Danbooru::Http.new)
+  def initialize(application_id: Danbooru.config.discord_application_client_id, bot_token: Danbooru.config.discord_bot_token, http: Danbooru::Http.new)
     @application_id = application_id
-    @guild_id = guild_id
     @bot_token = bot_token
     @http = http
   end
 
-  def register_slash_command(name:, description:, options: [])
+  def register_slash_command(name:, description:, options: [], guild_id: nil)
     json = {
       name: name,
       description: description,
       options: options
     }
 
-    post("/applications/#{application_id}/guilds/#{guild_id}/commands", json)
+    if guild_id.present?
+      post("/applications/#{application_id}/guilds/#{guild_id}/commands", json)
+    else
+      post("/applications/#{application_id}/commands", json)
+    end
   end
 
   def get_channel(channel_id, **options)

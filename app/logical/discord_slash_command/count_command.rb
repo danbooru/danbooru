@@ -1,21 +1,13 @@
 class DiscordSlashCommand
   class CountCommand < DiscordSlashCommand
-    def name
-      "count"
-    end
-
-    def description
-      "Do a tag search and return the number of results"
-    end
-
-    def options
-      [{
-        name: "tags",
-        description: "The tags to search",
-        required: true,
-        type: ApplicationCommandOptionType::String
-      }]
-    end
+    self.name = "count"
+    self.description = "Do a tag search and return the number of results"
+    self.options = [{
+      name: "tags",
+      description: "The tags to search",
+      required: true,
+      type: ApplicationCommandOptionType::String
+    }]
 
     def call
       tags = params[:tags]

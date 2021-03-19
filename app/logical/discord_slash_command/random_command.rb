@@ -1,27 +1,19 @@
 class DiscordSlashCommand
   class RandomCommand < DiscordSlashCommand
-    def name
-      "random"
-    end
-
-    def description
-      "Show a random post"
-    end
-
-    def options
-      [
-        {
-          name: "tags",
-          description: "The tags to search",
-          type: ApplicationCommandOptionType::String
-        },
-        {
-          name: "limit",
-          description: "The number of posts to show (max 10)",
-          type: ApplicationCommandOptionType::Integer
-        }
-      ]
-    end
+    self.name = "random"
+    self.description = "Show a random post"
+    self.options = [
+      {
+        name: "tags",
+        description: "The tags to search",
+        type: ApplicationCommandOptionType::String
+      },
+      {
+        name: "limit",
+        description: "The number of posts to show (max 10)",
+        type: ApplicationCommandOptionType::Integer
+      }
+    ]
 
     def call
       tags = params[:tags]

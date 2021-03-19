@@ -1,21 +1,13 @@
 class DiscordSlashCommand
   class TimeCommand < DiscordSlashCommand
-    def name
-      "time"
-    end
-
-    def description
-      "Show the current time around the world"
-    end
-
-    def options
-      [{
-        name: "name",
-        description: "The name of the country to show",
-        required: false,
-        type: ApplicationCommandOptionType::String
-      }]
-    end
+    self.name = "time"
+    self.description = "Show the current time around the world"
+    self.options = [{
+      name: "name",
+      description: "The name of the country to show",
+      required: false,
+      type: ApplicationCommandOptionType::String
+    }]
 
     def call
       name = params[:name]

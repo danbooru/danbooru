@@ -2,28 +2,21 @@ class DiscordSlashCommand
   class PostsCommand < DiscordSlashCommand
     extend Memoist
 
-    def name
-      "posts"
-    end
+    self.name = "posts"
+    self.description = "Do a tag search"
 
-    def description
-      "Do a tag search"
-    end
-
-    def options
-      [
-        {
-          name: "tags",
-          description: "The tags to search",
-          type: ApplicationCommandOptionType::String
-        },
-        {
-          name: "limit",
-          description: "The number of posts to show (max 10)",
-          type: ApplicationCommandOptionType::Integer
-        }
-      ]
-    end
+    self.options = [
+      {
+        name: "tags",
+        description: "The tags to search",
+        type: ApplicationCommandOptionType::String
+      },
+      {
+        name: "limit",
+        description: "The number of posts to show (max 10)",
+        type: ApplicationCommandOptionType::Integer
+      }
+    ]
 
     def call
       tags = params[:tags]
