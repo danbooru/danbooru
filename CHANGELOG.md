@@ -1,3 +1,37 @@
+## 2021-03-19
+
+### Changes
+
+* Custom CSS: Custom CSS no longer automatically adds `!important` to the end
+  of your CSS rules. This means your custom CSS may no longer work because it
+  doesn't override the site's CSS in some cases. If your custom CSS no longer
+  works, you will need to manually add `!important` to the end of your rules,
+  or otherwise change your selectors to increase your CSS's specificity.
+  See https://developer.mozilla.org/en-US/docs/Web/CSS/Specificity.
+
+* Notes: translators can control the stacking order of overlapping notes with
+  e.g. `<div class="note-box-attributes level-5"></div>`. Valid levels are
+  level-1 through level-5.
+
+* Discord: Fixed Fumimi's /posts and /count commands being limited to 2 tags.
+
+### Fixes
+
+* Fixed `user_xxx` names being automatically added to the Other Names field of
+  new Pixiv artists.
+
+### Other Changes
+
+* Changed how uploaded files are stored by default. If you're running your own
+  Danbooru instance, and images are broken, you may have to move some files in
+  the `public/data` folder or create some symlinks. This only affects users
+  running their own Danbooru instance. See these commits for details:
+
+  https://github.com/danbooru/danbooru/commit/a620a71b59e95ed5f6e6501bec97e4a4da31d546
+  https://github.com/danbooru/danbooru/commit/0f90ae0feda1aca6b1b8d3f65165d2e1f645812e
+  https://github.com/danbooru/danbooru/commit/29d2e7fed2357fd57552472c13defee9f348a741
+
+
 ## 2021-03-12
 
 ### Changes
