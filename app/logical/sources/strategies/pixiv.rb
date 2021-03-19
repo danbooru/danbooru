@@ -162,7 +162,9 @@ module Sources
       end
 
       def other_names
-        [artist_name, moniker].compact.uniq
+        other_names = [artist_name]
+        other_names << moniker unless moniker&.starts_with?("user_")
+        other_names.compact.uniq
       end
 
       def artist_commentary_title

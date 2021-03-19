@@ -303,6 +303,11 @@ module Sources
           assert_includes(source.profile_urls, "https://www.pixiv.net/users/696859")
           assert_includes(source.profile_urls, "https://www.pixiv.net/stacc/uroobnad")
         end
+
+        should "not add pixiv-generated 'user_' usernames to the other names field" do
+          source = get_source("https://www.pixiv.net/en/artworks/88487025")
+          assert_equal(["éé"], source.other_names)
+        end
       end
 
       context "parsing illust ids" do
