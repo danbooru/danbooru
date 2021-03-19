@@ -11,8 +11,9 @@ require "danbooru/http/unpolish_cloudflare"
 
 module Danbooru
   class Http
-    class DownloadError < StandardError; end
-    class FileTooLargeError < StandardError; end
+    class Error < StandardError; end
+    class DownloadError < Error; end
+    class FileTooLargeError < Error; end
 
     DEFAULT_TIMEOUT = 10
     MAX_REDIRECTS = 5
@@ -43,7 +44,7 @@ module Danbooru
     end
 
     def put(url, **options)
-      request(:get, url, **options)
+      request(:put, url, **options)
     end
 
     def post(url, **options)
@@ -52,6 +53,14 @@ module Danbooru
 
     def delete(url, **options)
       request(:delete, url, **options)
+    end
+
+    def get!(url, **options)
+      request!(:get, url, **options)
+    end
+
+    def post!(url, **options)
+      request!(:post, url, **options)
     end
 
     def follow(*args)
@@ -134,6 +143,16 @@ module Danbooru
       fake_response(598, "")
     rescue HTTP::Error
       fake_response(599, "")
+    end
+
+    def request!(method, url, **options)
+      response = request(method, url, **options)
+
+      if response.status.in?(200..399)
+        response
+      else
+        raise Error, "#{method.upcase} #{url} failed (HTTP #{response.status})"
+      end
     end
 
     def fake_response(status, body)

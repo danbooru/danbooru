@@ -260,6 +260,10 @@ class Tag < ApplicationRecord
       where("regexp_replace(tags.name, ?, '\\1', 'g') LIKE ?", ABBREVIATION_REGEXP.source, abbrev.to_escaped_for_sql_like)
     end
 
+    def find_by_name_or_alias(name)
+      find_by_name(TagAlias.to_aliased(normalize_name(name)))
+    end
+
     def find_by_abbreviation(abbrev)
       abbreviation_matches(abbrev.escape_wildcards).order(post_count: :desc).first
     end

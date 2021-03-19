@@ -50,6 +50,7 @@ gem 'hsluv'
 gem 'google-cloud-bigquery', require: "google/cloud/bigquery"
 gem 'google-cloud-storage', require: "google/cloud/storage"
 gem 'ed25519'
+gem 'terminal-table'
 
 group :production, :staging do
   gem 'unicorn', :platforms => :ruby

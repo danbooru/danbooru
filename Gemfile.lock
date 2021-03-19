@@ -446,6 +446,7 @@ GEM
       dante (>= 0.2.0)
       multi_json (~> 1.0)
       stripe (> 5, < 6)
+    terminal-table (1.6.0)
     thor (1.1.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
@@ -556,6 +557,7 @@ DEPENDENCIES
   streamio-ffmpeg
   stripe
   stripe-ruby-mock
+  terminal-table
   tzinfo-data
   unicorn
   unicorn-worker-killer

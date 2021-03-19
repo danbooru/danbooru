@@ -7,10 +7,18 @@ class DiscordSlashCommand
     ApplicationCommand = 2
   end
 
+  # https://discord.com/developers/docs/interactions/slash-commands#interaction-response-interactionresponsetype
+  module InteractionResponseType
+    Pong = 1
+    ChannelMessageWithSource = 4
+    DeferredChannelMessageWithSource = 5
+  end
+
   # https://discord.com/developers/docs/interactions/slash-commands#applicationcommandoptiontype
   module ApplicationCommandOptionType
     String = 3
     Integer = 4
+    Boolean = 5
   end
 
   # The name of the slash command.
@@ -48,7 +56,7 @@ class DiscordSlashCommand
 
     # https://discord.com/developers/docs/interactions/slash-commands#responding-to-an-interaction
     # https://discord.com/developers/docs/interactions/slash-commands#interaction-response
-    def respond_with(content = nil, type: 4, posts: [], **options)
+    def respond_with(content = nil, type: InteractionResponseType::ChannelMessageWithSource, posts: [], **options)
       if posts.present?
         embeds = posts.map { |post| DiscordSlashCommand::PostEmbed.new(post, self).to_h }
         options[:embeds] = embeds
@@ -61,6 +69,35 @@ class DiscordSlashCommand
           **options
         }
       }
+    end
+
+    # Post a response to the command later, after it's ready.
+    # https://discord.com/developers/docs/interactions/slash-commands#interaction-response
+    def respond_later(&block)
+      create_deferred_followup(&block)
+      trigger_typing_indicator
+      respond_with(type: InteractionResponseType::DeferredChannelMessageWithSource)
+    end
+
+    def create_deferred_followup(&block)
+      Thread.new do
+        content = block.call
+        create_followup_message(content)
+      rescue StandardError => e
+        create_followup_message("`Error: #{e.message}`")
+      end
+    end
+
+    def get_channel_messages(**options)
+      discord.get_channel_messages(data[:channel_id], **options)
+    end
+
+    def trigger_typing_indicator
+      discord.trigger_typing_indicator(data[:channel_id])
+    end
+
+    def create_followup_message(content)
+      discord.create_followup_message(data[:token], content: content)
     end
 
     def channel
@@ -84,6 +121,7 @@ class DiscordSlashCommand
           count: DiscordSlashCommand::CountCommand,
           posts: DiscordSlashCommand::PostsCommand,
           random: DiscordSlashCommand::RandomCommand,
+          tagme: DiscordSlashCommand::TagmeCommand,
           time: DiscordSlashCommand::TimeCommand,
           wiki: DiscordSlashCommand::WikiCommand,
         }
@@ -101,7 +139,7 @@ class DiscordSlashCommand
 
         case data[:type]
         when InteractionType::Ping
-          { type: InteractionType::Ping }
+          { type: InteractionResponseType::Pong }
         when InteractionType::ApplicationCommand
           name = data.dig(:data, :name)
           klass = slash_commands.fetch(name&.to_sym)
