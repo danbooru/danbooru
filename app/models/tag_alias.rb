@@ -2,7 +2,7 @@ class TagAlias < TagRelationship
   validates_uniqueness_of :antecedent_name, scope: :status, conditions: -> { active }
   validate :absence_of_transitive_relation
 
-  before_create :delete_conflicting_alias
+  before_create :delete_conflicting_relationships
 
   def self.to_aliased(names)
     names = Array(names).map(&:to_s)
@@ -37,8 +37,12 @@ class TagAlias < TagRelationship
 
   # Allow aliases to be reversed. If A -> B already exists, but we're trying to
   # create B -> A, then automatically delete A -> B so we can make B -> A.
-  def delete_conflicting_alias
-    tag_alias = TagAlias.active.find_by(antecedent_name: consequent_name, consequent_name: antecedent_name)
-    tag_alias.reject! if tag_alias.present?
+  # Also automatically remove implications that are being replaced by aliases
+  def delete_conflicting_relationships
+    tag_relationships = []
+    tag_relationships << TagAlias.active.find_by(antecedent_name: consequent_name, consequent_name: antecedent_name)
+    tag_relationships << TagImplication.active.find_by(antecedent_name: antecedent_name, consequent_name: consequent_name)
+    tag_relationships << TagImplication.active.find_by(antecedent_name: consequent_name, consequent_name: antecedent_name)
+    tag_relationships.each { |rel| rel.reject! if rel.present? }
   end
 end
