@@ -593,6 +593,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           assert_nil(response.parsed_body["file_url"])
         end
       end
+
+      should "respect the disable tagged filenames option in the Download link" do
+        @user.update!(disable_tagged_filenames: true)
+        get_auth post_path(@post), @user
+
+        assert_response :success
+        assert_equal("#{@post.md5}.#{@post.file_ext}", response.parsed_body.css("#post-option-download a").attr("download").value)
+      end
     end
 
     context "update action" do

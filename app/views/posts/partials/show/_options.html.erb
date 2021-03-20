@@ -17,7 +17,7 @@
   </li>
   <% if policy(post).visible? %>
     <li id="post-option-download">
-      <%= link_to "Download", post.tagged_file_url + "?download=1", download: post.presenter.filename_for_download %>
+      <%= link_to "Download", post.tagged_file_url + "?download=1", download: post.presenter.filename_for_download(CurrentUser.user) %>
     </li>
   <% end %>
 

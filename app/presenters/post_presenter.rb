@@ -14,7 +14,11 @@ class PostPresenter
     @humanized_essential_tag_string ||= tag_set_presenter.humanized_essential_tag_string.presence || "##{@post.id}"
   end
 
-  def filename_for_download
-    "#{humanized_essential_tag_string} - #{@post.md5}.#{@post.file_ext}"
+  def filename_for_download(current_user)
+    if current_user.disable_tagged_filenames?
+      "#{@post.md5}.#{@post.file_ext}"
+    else
+      "#{humanized_essential_tag_string} - #{@post.md5}.#{@post.file_ext}"
+    end
   end
 end
