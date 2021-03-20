@@ -25,8 +25,8 @@ namespace :images do
       hash = {
         path: File.absolute_path(path),
         name: File.basename(path, ".*"),
-        md5: file.md5,
-        size: file.file_size,
+        md5: file&.md5,
+        size: file&.file_size,
         error: e.message,
       }
 
