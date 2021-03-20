@@ -21,6 +21,16 @@ namespace :images do
       }
 
       puts hash.to_json
+    rescue StandardError => e
+      hash = {
+        path: File.absolute_path(path),
+        name: File.basename(path, ".*"),
+        md5: file.md5,
+        size: file.file_size,
+        error: e.message,
+      }
+
+      puts hash.to_json
     end
   end
 
