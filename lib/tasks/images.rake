@@ -1,4 +1,29 @@
+require "find"
+
 namespace :images do
+  task manifest: :environment do
+    root = ENV.fetch("DIR", Rails.root.join("public/data/original"))
+
+    paths = Find.find(root).lazy
+    paths = paths.reject { |path| File.directory?(path) }
+
+    paths.each do |path|
+      file = MediaFile.open(path)
+
+      hash = {
+        path: File.absolute_path(path),
+        name: File.basename(path, ".*"),
+        md5: file.md5,
+        size: file.file_size,
+        ext: file.file_ext,
+        w: file.width,
+        h: file.height,
+      }
+
+      puts hash.to_json
+    end
+  end
+
   desc "Backup images"
   task :backup => :environment do
     CurrentUser.user = User.system
