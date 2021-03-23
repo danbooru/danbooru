@@ -1,4 +1,6 @@
 <div class="delete-post-dialog-body">
+  <%= embed_wiki("help:delete_notice") %>
+
   <%= edit_form_for(post, method: :delete, remote: true) do |f| %>
     <input type="hidden" name="commit" value="Delete">
     <%= f.input :reason, as: :dtext, inline: true, input_html: { value: "" } %>
