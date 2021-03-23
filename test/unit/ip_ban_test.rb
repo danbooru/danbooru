@@ -16,6 +16,13 @@ class IpBanTest < ActiveSupport::TestCase
     assert(IpBan.ip_matches("1.2.3.255").exists?)
   end
 
+  should "allow a full ban to overlap a partial ban" do
+    @ip_ban1 = create(:ip_ban, ip_addr: "1.2.3.0/24", category: :partial)
+    @ip_ban2 = build(:ip_ban, ip_addr: "1.2.3.4", category: :full)
+
+    assert_equal(true, @ip_ban2.valid?)
+  end
+
   context "validation" do
     setup { create(:ip_ban, ip_addr: "5.6.7.8") }
     subject { build(:ip_ban) }
