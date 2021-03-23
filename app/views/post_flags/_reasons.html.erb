@@ -2,6 +2,10 @@
   <li>
     <span class="prose"><%= format_text(flag.reason, inline: true) %></span>
 
+    <% if policy(flag).edit? %>
+      (<%= link_to "edit", edit_post_flag_url(flag) %>)
+    <% end %>
+
     <% if policy(flag).can_view_flagger? %>
       (<%= link_to_user(flag.creator) %>, <%= time_ago_in_words_tagged(flag.created_at) %>)
     <% else %>

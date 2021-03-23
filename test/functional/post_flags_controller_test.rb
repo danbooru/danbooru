@@ -8,7 +8,7 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
       @uploader = create(:mod_user, name: "chen", created_at: 2.weeks.ago)
       @mod = create(:mod_user)
       @post = create(:post, id: 101, is_flagged: true, uploader: @uploader)
-      @post_flag = create(:post_flag, post: @post, creator: @flagger)
+      @post_flag = create(:post_flag, reason: "xxx", post: @post, creator: @flagger)
     end
 
     context "new action" do
@@ -116,6 +116,51 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
           assert_redirected_to PostFlag.last
           assert_equal(true, @post.reload.is_flagged?)
         end
+      end
+    end
+
+    context "edit action" do
+      should "allow the flagger to edit the flag" do
+        get_auth edit_post_flag_path(@post_flag), @flagger
+
+        assert_response :success
+      end
+
+      should "not allow the flagger to edit a resolved flag" do
+        @post_flag.update!(status: "rejected")
+        get_auth edit_post_flag_path(@post_flag), @flagger
+
+        assert_response 403
+      end
+
+      should "not allow other users to edit the flag" do
+        get_auth edit_post_flag_path(@post_flag), @mod
+
+        assert_response 403
+      end
+    end
+
+    context "update action" do
+      should "allow the flagger to update the flag" do
+        put_auth post_flag_path(@post_flag), @flagger, params: { post_flag: { reason: "no" }}
+
+        assert_redirected_to @post_flag.post
+        assert_equal("no", @post_flag.reload.reason)
+      end
+
+      should "not allow the flagger to update a resolved flag" do
+        @post_flag.update!(status: "rejected")
+        put_auth post_flag_path(@post_flag), @flagger, params: { post_flag: { reason: "no" }}
+
+        assert_response 403
+        assert_equal("xxx", @post_flag.reload.reason)
+      end
+
+      should "not allow other users to update the flag" do
+        put_auth post_flag_path(@post_flag), @mod, params: { post_flag: { reason: "no" }}
+
+        assert_response 403
+        assert_equal("xxx", @post_flag.reload.reason)
       end
     end
   end

@@ -31,4 +31,17 @@ class PostFlagsController < ApplicationController
       fmt.html { redirect_to post_flags_path(search: { id: @post_flag.id }) }
     end
   end
+
+  def edit
+    @post_flag = authorize PostFlag.find(params[:id])
+    respond_with(@post_flag)
+  end
+
+  def update
+    @post_flag = authorize PostFlag.find(params[:id])
+    @post_flag.update(permitted_attributes(@post_flag))
+    respond_with(@post_flag) do |fmt|
+      fmt.html { redirect_to post_path(@post_flag.post) }
+    end
+  end
 end

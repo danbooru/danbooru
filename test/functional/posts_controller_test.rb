@@ -549,6 +549,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get_auth post_path(@post, q: "tagme"), @builder
           assert_response :success
         end
+
+        should "render the flag edit link for the flagger" do
+          get_auth post_path(@post), @user
+
+          assert_response :success
+          assert_select ".post-flag-reason a:first", true, text: "edit"
+        end
       end
 
       context "a deleted post" do

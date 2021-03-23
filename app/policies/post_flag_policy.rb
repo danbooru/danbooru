@@ -1,4 +1,12 @@
 class PostFlagPolicy < ApplicationPolicy
+  def edit?
+    update?
+  end
+
+  def update?
+    unbanned? && record.pending? && record.creator_id == user.id
+  end
+
   def can_search_flagger?
     user.is_moderator?
   end
@@ -7,8 +15,12 @@ class PostFlagPolicy < ApplicationPolicy
     (user.is_moderator? || record.creator_id == user.id) && (record.post&.uploader_id != user.id)
   end
 
-  def permitted_attributes
+  def permitted_attributes_for_create
     [:post_id, :reason]
+  end
+
+  def permitted_attributes_for_update
+    [:reason]
   end
 
   def api_attributes
