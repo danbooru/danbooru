@@ -139,7 +139,6 @@ mkdir -p /var/www/danbooru2/shared/data
 mkdir -p /var/www/danbooru2/shared/data/preview
 mkdir -p /var/www/danbooru2/shared/data/sample
 chown -R danbooru:danbooru /var/www/danbooru2
-curl -L -s $GITHUB_INSTALL_SCRIPTS/database.yml.templ -o /var/www/danbooru2/shared/config/database.yml
 curl -L -s $GITHUB_INSTALL_SCRIPTS/danbooru_local_config.rb.templ -o /var/www/danbooru2/shared/config/danbooru_local_config.rb
 
 echo "* Almost done! You are now ready to deploy Danbooru onto this server."

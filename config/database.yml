@@ -1,0 +1,39 @@
+# Don't edit this file. To override this file, set `DATABASE_URL` in .env.local
+# instead. Example:
+#
+#   DATABASE_URL=postgresql://danbooru:password@localhost/danbooru2
+#
+# https://guides.rubyonrails.org/configuring.html#configuring-a-database
+
+default: &default
+  adapter: postgresql
+  username: danbooru
+  host: localhost
+  url: <%= ENV["DATABASE_URL"] %>
+
+production:
+  <<: *default
+  database: danbooru2
+
+development:
+  <<: *default
+  database: danbooru2
+
+test:
+  <<: *default
+  database: danbooru2_test
+
+archive_production:
+  <<: *default
+  database: archive_production
+  url: <%= ENV["ARCHIVE_DATABASE_URL"] %>
+
+archive_development:
+  <<: *default
+  database: archive_development
+  url: <%= ENV["ARCHIVE_DATABASE_URL"] %>
+
+archive_test:
+  <<: *default
+  database: archive_test
+  url: <%= ENV["ARCHIVE_DATABASE_URL"] %>
