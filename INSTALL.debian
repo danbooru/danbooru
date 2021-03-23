@@ -100,13 +100,6 @@ sudo -u danbooru git clone git://github.com/sstephenson/ruby-build.git ~danbooru
 sudo -u danbooru bash -l -c "RUBY_CONFIGURE_OPTS=--disable-install-doc rbenv install --verbose $RUBY_VERSION"
 sudo -u danbooru bash -l -c "rbenv global $RUBY_VERSION"
 
-# Generate secret token and secret key
-echo "* Generating secret keys..."
-sudo -u danbooru mkdir ~danbooru/.danbooru/
-sudo -u danbooru sh -c 'openssl rand -hex 32 > ~danbooru/.danbooru/secret_token'
-sudo -u danbooru sh -c 'openssl rand -hex 32 > ~danbooru/.danbooru/session_secret_key'
-chmod 600 ~danbooru/.danbooru/*
-
 # Install gems
 echo "* Installing gems..."
 sudo -u danbooru bash -l -c 'gem install --no-ri --no-rdoc bundler'

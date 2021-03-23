@@ -1,13 +1,20 @@
 module Danbooru
   class Configuration
-    # A secret key used to encrypt session cookies, among other things. If this
-    # token is changed, existing login sessions will become invalid. If this
-    # token is stolen, attackers will be able to forge session cookies and
-    # login as any user.
+    # A secret key used to encrypt session cookies, among other things.
     #
-    # Must be specified. Use `rake secret` to generate a random secret token.
+    # If this key is changed, existing login sessions will become invalid and
+    # all users will be logged out.
+    #
+    # If this key is stolen, attackers will be able to forge session cookies
+    # and login as any user.
+    #
+    # Must be specified. If this is not specified, then a new secret key will
+    # generated every time the server starts, which will log out all users on
+    # every restart.
+    #
+    # Use `rake secret` to generate a random secret key.
     def secret_key_base
-      ENV["SECRET_TOKEN"].presence || File.read(File.expand_path("~/.danbooru/secret_token"))
+      SecureRandom.uuid
     end
 
     # The name of this Danbooru.

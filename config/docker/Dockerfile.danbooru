@@ -34,8 +34,6 @@ RUN yarn install
 COPY . .
 RUN bundle config set path vendor/bundle --local
 
-ARG DATABASE_URL=postgresql://0.0.0.0
-ARG DANBOORU_SECRET_KEY_BASE=1234
 ARG RAILS_ENV=production
 RUN bin/rails assets:precompile && ln -sf packs public/packs-test
 RUN rm -rf node_modules log tmp .yarn/cache && mkdir log tmp
