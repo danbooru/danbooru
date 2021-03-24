@@ -1,5 +1,25 @@
 [![codecov](https://codecov.io/gh/danbooru/danbooru/branch/master/graph/badge.svg)](https://codecov.io/gh/danbooru/danbooru) [![Discord](https://img.shields.io/discord/310432830138089472?label=Discord)](https://discord.gg/eSVKkUF)
 
+## Quickstart
+
+Clone this repository and run `bin/danbooru` to start a basic Danbooru instance:
+
+```sh
+git clone https://github.com/danbooru/danbooru
+cd danbooru
+./bin/danbooru
+```
+
+This will install [Docker Compose](https://docs.docker.com/compose/) and use it
+to start Danbooru. This will take several minutes and produce lots of output.
+When it's done, Danbooru will be running at http://localhost.
+
+Alternatively, if you already have Docker Compose installed, you can just do:
+
+```sh
+docker-compose -f config/docker/docker-compose.simple.yaml up
+```
+
 ## Installation
 
 It is recommended that you install Danbooru on a Debian-based system

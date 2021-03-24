@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+#
+# This script starts Danbooru by installing Docker and Docker Compose, then
+# starting Danbooru in a container. Danbooru will be available at http://localhost.
+#
+# Usage:
+#
+#     bin/danbooru up   # start Danbooru
+#     bin/danbooru down # stop and remove Danbooru container.
+#     bin/danbooru help # show Docker Compose help
+#
+# Alternatively, if you already have Docker installed, you can just do:
+#
+#     docker-compose -f config/docker/docker-compose.simple.yaml up
+#
+# This script is just a wrapper for that command.
+
+install_docker_compose() {
+  if docker-compose version > /dev/null; then
+    return
+  fi
+
+  if apt --version; then
+    sudo apt install docker docker-compose
+  elif dnf --version; then
+    sudo dnf install docker docker-compose
+  elif pacman --version; then
+    sudo pacman -Sy docker docker-compose
+  else
+    echo "Error: Couldn't automatically install docker-compose. Install docker-compose manually."
+    exit 1
+  fi
+}
+
+start_docker() {
+  if docker version > /dev/null; then
+    return
+  fi
+
+  sudo systemctl start docker
+}
+
+docker_compose() {
+  COMPOSE_FILE="$(dirname "$(realpath "$0")")/../config/docker/docker-compose.simple.yaml"
+  docker-compose -f "$COMPOSE_FILE" "$@"
+}
+
+install_docker_compose
+start_docker
+docker_compose "${@:-up}"
