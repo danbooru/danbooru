@@ -194,7 +194,7 @@ html {
   --user-tooltip-positive-feedback-color: var(--orange-3);
   --user-tooltip-negative-feedback-color: var(--red-5);
 
-  --autocomplete-selected-background-color: var(--blue-0);
+  --autocomplete-selected-background-color: var(--blue-1);
   --autocomplete-border-color: var(--grey-2);
   --autocomplete-tag-autocorrect-underline: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAQAAAADCAYAAAC09K7GAAAAHElEQVQYV2NkQAL/GRj+M4IJBgY4zQhSABMEsQHMOAgCT5YN9gAAAABJRU5ErkJggg==);
 
