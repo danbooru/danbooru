@@ -1,4 +1,8 @@
 class StorageManager::Null < StorageManager
+  def initialize(base_url: "/", base_dir: "/")
+    super
+  end
+
   def store(io, path)
     # no-op
   end
