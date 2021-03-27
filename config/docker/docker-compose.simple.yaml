@@ -16,14 +16,15 @@ services:
     ports:
       - "80:3000"
     environment:
-      - RAILS_ENV=development
+      - RAILS_ENV=production
+      - RAILS_SERVE_STATIC_FILES=true
       - DATABASE_URL=postgresql://danbooru@postgres/danbooru
       - DANBOORU_CANONICAL_URL=http://localhost
     volumes:
-      - "danbooru-images:/home/danbooru/app/public/data"
+      - "danbooru-images:/danbooru/public/data"
     depends_on:
       - postgres
-    entrypoint: ["bash", "-c", "bin/rails db:setup 2> /dev/null; bin/rails server -b 0.0.0.0"]
+    command: ["bash", "-c", "bin/rails db:setup; bin/rails server -b 0.0.0.0"]
     user: root
 
   postgres:

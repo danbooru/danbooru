@@ -1,62 +1,70 @@
-FROM ubuntu:20.10 AS build
+ARG RUBY_VERSION=2.7.1
+ARG NODE_VERSION=14.15.5
+ARG VIPS_VERSION=8.10.6
+ARG FFMPEG_VERSION=4.3.2
+
+
+
+FROM ubuntu:20.10 AS base
+
+WORKDIR /danbooru
+ENV PATH="/root/.asdf/bin:/root/.asdf/shims:$PATH"
+
+COPY config/docker/build-base-image.sh .
+
+RUN \
+  ./build-base-image.sh && \
+  chmod go+rx /root && \
+  useradd --home-dir /root --user-group danbooru && \
+  rm build-base-image.sh
+
+
+
+FROM base AS development
+ARG NODE_VERSION
 
 RUN \
   apt-get update && \
-  DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
-    build-essential \
-    ruby \
-    ruby-dev \
-    ruby-bundler \
-    git \
-    nodejs \
-    yarnpkg \
-    webpack \
-    libvips-dev \
-    libxml2-dev \
-    libxslt-dev \
-    zlib1g-dev \
-    postgresql-server-dev-all && \
-    # webpacker expects the binary to be called `yarn`, but debian/ubuntu installs it as `yarnpkg`.
-    ln -sf /usr/bin/yarnpkg /usr/bin/yarn
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    build-essential libpq-dev libvips-dev libxml2-dev libxslt-dev zlib1g-dev \
+    curl ca-certificates dirmngr git gpg && \
+  rm -rf /var/lib/apt/lists/*
 
-WORKDIR /build
-
-COPY .bundle .bundle
-COPY Gemfile Gemfile.lock ./
 RUN \
-  bundle config set deployment true --local && \
-  bundle config set path vendor/bundle && \
-  bundle install --jobs 4
+  asdf plugin add nodejs && \
+  asdf install nodejs "$NODE_VERSION" && \
+  asdf global nodejs "$NODE_VERSION" && \
+  npm install --unsafe-perm=true -g yarn
 
-COPY package.json yarn.lock ./
+COPY .bundle Gemfile Gemfile.lock ./
+RUN \
+  bundle install --jobs "$(nproc)" && \
+  rm -rf "$(gem environment gemdir)/cache" && \
+  find "$(gem environment gemdir)" -name "*.o" -delete
+
+COPY .yarn package.json yarn.lock ./
 RUN yarn install
 
 COPY . .
-RUN bundle config set path vendor/bundle --local
 
-ARG RAILS_ENV=production
-RUN bin/rails assets:precompile && ln -sf packs public/packs-test
-RUN rm -rf node_modules log tmp .yarn/cache && mkdir log tmp
 
-FROM ubuntu:20.10
+
+FROM development AS assets
 
 RUN \
-  useradd --create-home --user-group danbooru && \
-  apt-get update && \
-  DEBIAN_FRONTEND=noninteractive apt-get -y install --no-install-recommends \
-    ruby \
-    ffmpeg \
-    mkvtoolnix \
-    libvips \
-    libxml2 \
-    libxslt1.1 \
-    zlib1g \
-    postgresql-client
+  bin/rails assets:precompile && \
+  rm -rf \
+    node_modules .yarn/cache tmp /usr/local/share/.cache/yarn \
+    /root/.yarn/berry/cache /root/.bundle/cache /root/.npm && \
+  asdf uninstall nodejs && \
+  ln -s /tmp tmp
+
+
+
+FROM base as production
+
+COPY --from=development /root /root
+COPY --from=assets /danbooru /danbooru
 
 USER danbooru
-WORKDIR /home/danbooru/app
-COPY --from=build --chown=danbooru /build .
-
-VOLUME ["/home/danbooru/app/public/data"]
-ENTRYPOINT ["./bin/rails"]
-CMD ["server"]
+CMD ["bin/rails", "server"]
