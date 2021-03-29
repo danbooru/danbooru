@@ -1,1 +1,3 @@
-ActiveRecord::Type.register(:ip_address, IpAddressType)
+Rails.application.reloader.to_prepare do
+  ActiveRecord::Type.register(:ip_address, IpAddressType)
+end
