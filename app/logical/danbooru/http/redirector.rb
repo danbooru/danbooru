@@ -31,7 +31,7 @@ module Danbooru
         uri = HTTP::URI.parse(location)
 
         verb = request.verb
-        verb = :get if response.status == 303 && !request.verb.in?([:get, :head])
+        verb = :get if response.status.in?([302, 303]) && !request.verb.in?([:get, :head])
 
         request.redirect(uri, verb)
       end

@@ -78,6 +78,13 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
     end
 
+    context "#post method" do
+      should "follow 302 redirects with a GET" do
+        response = Danbooru::Http.get(httpbin_url("redirect-to?url=#{httpbin_url("get")}"))
+        assert_equal(200, response.status)
+      end
+    end
+
     context "cache feature" do
       should "cache multiple requests to the same url" do
         http = Danbooru::Http.cache(1.hour)
