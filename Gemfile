@@ -66,7 +66,7 @@ end
 group :development do
   gem 'rubocop'
   gem 'rubocop-rails'
-  gem 'meta_request'
+  #gem 'meta_request'
   gem 'rack-mini-profiler'
   gem 'stackprof'
   gem 'flamegraph'
