@@ -562,8 +562,11 @@ module Danbooru
     def recommender_server
     end
 
+    # Uncomment to enable the Redis cache store. Caching is optional for
+    # small boorus but highly recommended for large multi-user boorus. Redis is
+    # required to enable saved searches.
     def redis_url
-      "redis://localhost:6379"
+      # "redis://localhost:6379"
     end
   end
 
