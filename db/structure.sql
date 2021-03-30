@@ -764,7 +764,8 @@ CREATE TABLE public.comment_votes (
     user_id integer NOT NULL,
     score integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL
 );
 
 
@@ -5108,6 +5109,13 @@ CREATE INDEX index_comment_votes_on_created_at ON public.comment_votes USING btr
 
 
 --
+-- Name: index_comment_votes_on_is_deleted; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_comment_votes_on_is_deleted ON public.comment_votes USING btree (is_deleted) WHERE (is_deleted = true);
+
+
+--
 -- Name: index_comment_votes_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5118,7 +5126,7 @@ CREATE INDEX index_comment_votes_on_user_id ON public.comment_votes USING btree 
 -- Name: index_comment_votes_on_user_id_and_comment_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX index_comment_votes_on_user_id_and_comment_id ON public.comment_votes USING btree (user_id, comment_id);
+CREATE UNIQUE INDEX index_comment_votes_on_user_id_and_comment_id ON public.comment_votes USING btree (user_id, comment_id) WHERE (is_deleted = false);
 
 
 --
@@ -8005,6 +8013,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210214095121'),
 ('20210214101614'),
 ('20210303195217'),
-('20210310221248');
+('20210310221248'),
+('20210330003356');
 
 

@@ -13,7 +13,11 @@ class CommentVotesController < ApplicationController
 
     @comment.with_lock do
       @comment_vote = authorize CommentVote.new(comment: @comment, score: params[:score], user: CurrentUser.user)
-      CommentVote.where(comment: @comment, user: CurrentUser.user).destroy_all
+
+      CommentVote.active.where(comment: @comment, user: CurrentUser.user).each do |vote|
+        vote.soft_delete!(updater: CurrentUser.user)
+      end
+
       @comment_vote.save
     end
 
@@ -22,8 +26,9 @@ class CommentVotesController < ApplicationController
   end
 
   def destroy
-    @comment_vote = authorize CommentVote.find_by!(comment_id: params[:comment_id], user: CurrentUser.user)
-    @comment_vote.destroy
+    # XXX should find by comment vote id.
+    @comment_vote = authorize CommentVote.active.find_by!(comment_id: params[:comment_id], user: CurrentUser.user)
+    @comment_vote.soft_delete(updater: CurrentUser.user)
 
     respond_with(@comment_vote)
   end

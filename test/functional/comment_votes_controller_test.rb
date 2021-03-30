@@ -91,24 +91,28 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
         vote = create(:comment_vote, comment: @comment, user: @user, score: 1)
         assert_equal(1, vote.comment.reload.score)
 
-        assert_difference("CommentVote.count", 0) do
+        assert_difference("CommentVote.count", 1) do
           post_auth comment_comment_votes_path(comment_id: @comment.id, score: "1"), @user, xhr: true
         end
 
         assert_response :success
         assert_equal(1, @comment.reload.score)
+        assert_equal(1, @comment.votes.active.count)
+        assert_equal(1, @comment.votes.deleted.count)
       end
 
       should "automatically undo existing votes" do
         create(:comment_vote, comment: @comment, user: @user, score: -1)
         assert_equal(-1, @comment.reload.score)
 
-        assert_difference("CommentVote.count", 0) do
+        assert_difference("CommentVote.count", 1) do
           post_auth comment_comment_votes_path(comment_id: @comment.id, score: "1"), @user, xhr: true
         end
 
         assert_response :success
         assert_equal(1, @comment.reload.score)
+        assert_equal(1, @comment.votes.active.count)
+        assert_equal(1, @comment.votes.deleted.count)
       end
 
       should "not allow voting on deleted comments" do
@@ -138,9 +142,10 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
       should "allow users to remove their own comment votes" do
         @vote = create(:comment_vote, user: @user)
 
-        assert_difference("CommentVote.count", -1) do
+        assert_difference("CommentVote.count", 0) do
           delete_auth comment_comment_votes_path(@vote.comment), @user, xhr: true
           assert_response :success
+          assert_equal(true, @vote.reload.is_deleted?)
         end
       end
 
@@ -150,6 +155,22 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
         assert_difference("CommentVote.count", 0) do
           delete_auth comment_comment_votes_path(@vote.comment), @user, xhr: true
           assert_response 404
+          assert_equal(false, @vote.reload.is_deleted?)
+        end
+      end
+
+      context "deleting a vote on a comment that already has deleted votes" do
+        setup do
+          create(:comment_vote, comment: @comment, user: @user, score: 1, is_deleted: true)
+          create(:comment_vote, comment: @comment, user: @user, score: -1, is_deleted: true)
+        end
+
+        should "delete the current active vote" do
+          @vote = create(:comment_vote, comment: @comment, user: @user)
+          delete_auth comment_comment_votes_path(@vote.comment), @user, xhr: true
+
+          assert_response :success
+          assert_equal(true, @vote.reload.is_deleted?)
         end
       end
     end

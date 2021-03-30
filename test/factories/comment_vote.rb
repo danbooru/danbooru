@@ -3,5 +3,6 @@ FactoryBot.define do
     comment
     user
     score {1}
+    is_deleted { false }
   end
 end

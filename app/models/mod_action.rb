@@ -37,6 +37,8 @@ class ModAction < ApplicationRecord
     artist_unban: 185,
     comment_update: 81,
     comment_delete: 82,
+    comment_vote_delete: 92,
+    comment_vote_undelete: 93,
     forum_topic_delete: 202,
     forum_topic_undelete: 203,
     forum_topic_lock: 206,

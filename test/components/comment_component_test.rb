@@ -92,5 +92,16 @@ class CommentComponentTest < ViewComponent::TestCase
         end
       end
     end
+
+    context "for a comment with a deleted vote" do
+      should "not treat the vote as active" do
+        @user = create(:user)
+        @vote = create(:comment_vote, user: @user, comment: @comment, is_deleted: true, score: 1)
+        render_comment(@comment, current_user: @user)
+
+        assert_css("article.comment[data-is-upvoted=false]")
+        assert_css("article.comment .comment-upvote-link.inactive-link")
+      end
+    end
   end
 end

@@ -28,12 +28,12 @@ class CommentComponent < ApplicationComponent
 
   def upvoted?
     return false if current_user.is_anonymous?
-    comment.votes.select(&:is_positive?).map(&:user_id).include?(current_user.id)
+    comment.votes.active.select(&:is_positive?).map(&:user_id).include?(current_user.id)
   end
 
   def downvoted?
     return false if current_user.is_anonymous?
-    comment.votes.select(&:is_negative?).map(&:user_id).include?(current_user.id)
+    comment.votes.active.select(&:is_negative?).map(&:user_id).include?(current_user.id)
   end
 
   def reported?

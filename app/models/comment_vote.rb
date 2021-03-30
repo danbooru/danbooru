@@ -1,12 +1,16 @@
 class CommentVote < ApplicationRecord
+  attr_accessor :updater
+
   belongs_to :comment
   belongs_to :user
 
-  validates :user_id, uniqueness: { scope: :comment_id, message: "have already voted for this comment" }
+  validate :validate_vote_is_unique, if: :is_deleted_changed?
   validates :score, inclusion: { in: [-1, 1], message: "must be 1 or -1" }
 
-  after_create :update_score_after_create
-  after_destroy :update_score_after_destroy
+  before_create :update_score_on_create
+  before_save :update_score_on_delete_or_undelete, if: -> { !new_record? && is_deleted_changed? }
+
+  deletable
 
   def self.visible(user)
     if user.is_moderator?
@@ -19,7 +23,7 @@ class CommentVote < ApplicationRecord
   end
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :score, :comment, :user)
+    q = search_attributes(params, :id, :created_at, :updated_at, :score, :is_deleted, :comment, :user)
     q.apply_default_order(params)
   end
 
@@ -31,15 +35,34 @@ class CommentVote < ApplicationRecord
     score == -1
   end
 
-  def update_score_after_create
+  # allow duplicate deleted votes but not duplicate active votes
+  def validate_vote_is_unique
+    if !is_deleted? && CommentVote.active.where.not(id: id).exists?(comment_id: comment_id, user_id: user_id)
+      errors.add(:user, "have already voted for this comment")
+    end
+  end
+
+  def update_score_on_create
     comment.with_lock do
       comment.update_columns(score: comment.score + score)
     end
   end
 
-  def update_score_after_destroy
+  def update_score_on_delete_or_undelete
     comment.with_lock do
-      comment.update_columns(score: comment.score - score)
+      if is_deleted_changed?(from: false, to: true)
+        comment.update_columns(score: comment.score - score)
+
+        if updater != user
+          ModAction.log("#{updater.name} deleted comment vote ##{id} on comment ##{comment_id}", :comment_vote_delete, updater)
+        end
+      else
+        comment.update_columns(score: comment.score + score)
+
+        if updater != user
+          ModAction.log("#{updater.name} undeleted comment vote ##{id} on comment ##{comment_id}", :comment_vote_undelete, updater)
+        end
+      end
     end
   end
 
