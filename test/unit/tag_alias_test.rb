@@ -286,5 +286,12 @@ class TagAliasTest < ActiveSupport::TestCase
       assert_equal(4, tag1.reload.category)
       assert_equal(3, tag2.reload.category)
     end
+
+    should "automatically remove a redundant implication" do
+      ti = create(:tag_implication, antecedent_name: "new_asuka", consequent_name: "asuka", status: "active")
+      create(:tag_alias, antecedent_name: "new_asuka", consequent_name: "asuka", status: "active")
+
+      assert_equal("deleted", ti.reload.status)
+    end
   end
 end
