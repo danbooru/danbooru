@@ -687,7 +687,7 @@ ALTER SEQUENCE public.artists_id_seq OWNED BY public.artists.id;
 
 CREATE TABLE public.bans (
     id integer NOT NULL,
-    user_id integer,
+    user_id integer NOT NULL,
     reason text NOT NULL,
     banner_id integer NOT NULL,
     duration interval NOT NULL,
@@ -888,7 +888,7 @@ CREATE TABLE public.dmails (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     creator_ip_addr inet NOT NULL,
-    is_spam boolean DEFAULT false
+    is_spam boolean DEFAULT false NOT NULL
 );
 
 
@@ -2123,9 +2123,9 @@ ALTER SEQUENCE public.forum_posts_id_seq OWNED BY public.forum_posts.id;
 
 CREATE TABLE public.forum_topic_visits (
     id integer NOT NULL,
-    user_id integer,
-    forum_topic_id integer,
-    last_read_at timestamp without time zone,
+    user_id integer NOT NULL,
+    forum_topic_id integer NOT NULL,
+    last_read_at timestamp without time zone NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -2227,8 +2227,8 @@ CREATE TABLE public.posts (
     md5 character varying NOT NULL,
     last_comment_bumped_at timestamp without time zone,
     rating character(1) DEFAULT 'q'::bpchar NOT NULL,
-    image_width integer,
-    image_height integer,
+    image_width integer NOT NULL,
+    image_height integer NOT NULL,
     uploader_ip_addr inet NOT NULL,
     tag_string text DEFAULT ''::text NOT NULL,
     is_note_locked boolean DEFAULT false NOT NULL,
@@ -2287,7 +2287,7 @@ CREATE TABLE public.users (
     note_update_count integer NOT NULL,
     favorite_count integer NOT NULL,
     post_upload_count integer NOT NULL,
-    bcrypt_password_hash text,
+    bcrypt_password_hash text NOT NULL,
     per_page integer NOT NULL,
     custom_style text,
     bit_prefs bigint NOT NULL,
@@ -2471,7 +2471,7 @@ CREATE TABLE public.mod_actions (
     description text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    category integer
+    category integer NOT NULL
 );
 
 
@@ -2629,7 +2629,7 @@ ALTER SEQUENCE public.notes_id_seq OWNED BY public.notes.id;
 
 CREATE TABLE public.pixiv_ugoira_frame_data (
     id integer NOT NULL,
-    post_id integer,
+    post_id integer NOT NULL,
     data text NOT NULL,
     content_type character varying NOT NULL
 );
@@ -2661,7 +2661,7 @@ ALTER SEQUENCE public.pixiv_ugoira_frame_data_id_seq OWNED BY public.pixiv_ugoir
 
 CREATE TABLE public.pools (
     id integer NOT NULL,
-    name character varying,
+    name character varying NOT NULL,
     description text,
     is_active boolean DEFAULT true NOT NULL,
     post_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
@@ -2700,7 +2700,7 @@ CREATE TABLE public.post_appeals (
     id integer NOT NULL,
     post_id integer NOT NULL,
     creator_id integer NOT NULL,
-    reason text,
+    reason text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     status integer DEFAULT 0 NOT NULL
@@ -2802,8 +2802,8 @@ ALTER SEQUENCE public.post_disapprovals_id_seq OWNED BY public.post_disapprovals
 CREATE TABLE public.post_flags (
     id integer NOT NULL,
     post_id integer NOT NULL,
+    reason text NOT NULL,
     creator_id integer NOT NULL,
-    reason text,
     is_resolved boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -2971,8 +2971,8 @@ ALTER SEQUENCE public.rate_limits_id_seq OWNED BY public.rate_limits.id;
 
 CREATE TABLE public.saved_searches (
     id integer NOT NULL,
-    user_id integer,
-    query text,
+    user_id integer NOT NULL,
+    query text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     labels text[] DEFAULT '{}'::text[] NOT NULL
@@ -3253,8 +3253,8 @@ ALTER SEQUENCE public.user_feedback_id_seq OWNED BY public.user_feedback.id;
 CREATE TABLE public.user_name_change_requests (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    original_name character varying,
-    desired_name character varying,
+    original_name character varying NOT NULL,
+    desired_name character varying NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
@@ -8014,6 +8014,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210214101614'),
 ('20210303195217'),
 ('20210310221248'),
-('20210330003356');
+('20210330003356'),
+('20210330093133');
 
 
