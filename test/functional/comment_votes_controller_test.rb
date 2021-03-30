@@ -141,21 +141,51 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
     context "#destroy" do
       should "allow users to remove their own comment votes" do
         @vote = create(:comment_vote, user: @user)
+        assert_equal(1, @vote.comment.score)
 
         assert_difference("CommentVote.count", 0) do
-          delete_auth comment_comment_votes_path(@vote.comment), @user, xhr: true
+          delete_auth comment_vote_path(@vote), @user, xhr: true
+
           assert_response :success
           assert_equal(true, @vote.reload.is_deleted?)
+          assert_equal(0, @vote.comment.score)
+
+          assert_equal(false, ModAction.comment_vote_delete.exists?)
         end
       end
 
-      should "not allow users to remove comment votes by other users" do
+      should "not allow normal users to remove comment votes by other users" do
         @vote = create(:comment_vote)
+        assert_equal(1, @vote.comment.score)
 
         assert_difference("CommentVote.count", 0) do
-          delete_auth comment_comment_votes_path(@vote.comment), @user, xhr: true
-          assert_response 404
+          delete_auth comment_vote_path(@vote), @user, xhr: true, params: { variant: "listing" }
+
+          assert_response 403
           assert_equal(false, @vote.reload.is_deleted?)
+          assert_equal(1, @vote.comment.score)
+        end
+      end
+
+      should "not allow deleting already deleted votes" do
+        @vote = create(:comment_vote, is_deleted: true)
+        delete_auth comment_vote_path(@vote), @user, xhr: true
+        assert_response 403
+      end
+
+      should "allow admins to remove comment votes by other users" do
+        @vote = create(:comment_vote)
+        assert_equal(1, @vote.comment.score)
+
+        assert_difference("CommentVote.count", 0) do
+          delete_auth comment_vote_path(@vote), create(:admin_user), xhr: true, params: { variant: "listing" }
+
+          assert_response :success
+          assert_equal(true, @vote.reload.is_deleted?)
+          assert_equal(0, @vote.comment.score)
+
+          assert_equal("comment_vote_delete", ModAction.last.category)
+          assert_match(/deleted comment vote/, ModAction.last.description)
         end
       end
 
@@ -167,7 +197,7 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
 
         should "delete the current active vote" do
           @vote = create(:comment_vote, comment: @comment, user: @user)
-          delete_auth comment_comment_votes_path(@vote.comment), @user, xhr: true
+          delete_auth comment_vote_path(@vote), @user, xhr: true
 
           assert_response :success
           assert_equal(true, @vote.reload.is_deleted?)

@@ -8,27 +8,40 @@
       <% t.column "Post" do |vote| %>
         <%= post_preview(vote.comment.post, show_deleted: true) %>
       <% end %>
+
       <% t.column "Comment", td: {class: "col-expand"} do |vote| %>
         <div class="prose">
           <%= format_text(vote.comment.body) %>
         </div>
       <% end %>
+
+      <% t.column "Status" do |vote| %>
+        <%= "Deleted" if vote.is_deleted? %>
+      <% end %>
+
       <% t.column "Score" do |vote| %>
         <%= link_to sprintf("%+d", vote.score), comment_votes_path(search: { score: vote.score }) %>
       <% end %>
+
       <% t.column "Commenter" do |vote| %>
         <%= link_to_user vote.comment.creator %>
         <%= link_to "»", comment_votes_path(search: { comment: { creator_name: vote.comment.creator.name }}) %>
         <div><%= time_ago_in_words_tagged(vote.comment.created_at) %></div>
       <% end %>
+
       <% t.column "Voter" do |vote| %>
         <%= link_to_user vote.user %>
         <%= link_to "»", comment_votes_path(search: { user_name: vote.user.name }) %>
         <div><%= time_ago_in_words_tagged(vote.created_at) %></div>
       <% end %>
+
       <% t.column column: "control" do |vote| %>
-        <% if vote.user == CurrentUser.user %>
-          <%= link_to "unvote", comment_comment_votes_path(vote.comment), remote: true, method: :delete %>
+        <% if policy(vote).destroy? %>
+          <%= render PopupMenuComponent.new do |menu| %>
+            <%= menu.item do %>
+              <%= link_to "Remove", comment_vote_path(vote, variant: "listing"), remote: true, method: :delete %>
+            <% end %>
+          <% end %>
         <% end %>
       <% end %>
     <% end %>

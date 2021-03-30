@@ -4,7 +4,7 @@ class CommentVotePolicy < ApplicationPolicy
   end
 
   def destroy?
-    record.user_id == user.id
+    !record.is_deleted? && (record.user_id == user.id || user.is_admin?)
   end
 
   def can_see_votes?

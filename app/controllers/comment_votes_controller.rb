@@ -26,8 +26,7 @@ class CommentVotesController < ApplicationController
   end
 
   def destroy
-    # XXX should find by comment vote id.
-    @comment_vote = authorize CommentVote.active.find_by!(comment_id: params[:comment_id], user: CurrentUser.user)
+    @comment_vote = authorize CommentVote.find(params[:id])
     @comment_vote.soft_delete(updater: CurrentUser.user)
 
     respond_with(@comment_vote)

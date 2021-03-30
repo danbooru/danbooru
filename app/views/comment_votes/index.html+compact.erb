@@ -14,8 +14,22 @@
         <%= link_to "»", comment_votes_path(search: { user_name: vote.user.name }) %>
       <% end %>
 
+      <% t.column "Status" do |vote| %>
+        <%= "Deleted" if vote.is_deleted? %>
+      <% end %>
+
       <% t.column "Created" do |vote| %>
         <%= time_ago_in_words_tagged(vote.created_at) %>
+      <% end %>
+
+      <% t.column column: "control" do |vote| %>
+        <% if policy(vote).destroy? %>
+          <%= render PopupMenuComponent.new do |menu| %>
+            <%= menu.item do %>
+              <%= link_to "Remove", comment_vote_path(vote, variant: "listing"), remote: true, method: :delete %>
+            <% end %>
+          <% end %>
+        <% end %>
       <% end %>
     <% end %>
 

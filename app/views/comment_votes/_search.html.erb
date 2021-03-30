@@ -6,6 +6,7 @@
     <%= fc.input :post_id, label: "Post", input_html: { value: params.dig(:search, :comment, :post_id) } %>
   <% end %>
   <%= f.input :comment_id, label: "Comment", input_html: { value: params[:search][:comment_id] } %>
+  <%= f.input :is_deleted, label: "Deleted?", as: :select, include_blank: true, selected: params[:search][:is_deleted] %>
   <%= f.input :score, collection: [["+1", "1"], ["-1", "-1"]], include_blank: true, selected: params[:search][:score] %>
   <%= f.submit "Search" %>
 <% end %>

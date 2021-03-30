@@ -81,7 +81,7 @@ Rails.application.routes.draw do
       post :approve
     end
   end
-  resources :comment_votes, only: [:index]
+  resources :comment_votes, only: [:index, :destroy]
   resources :comments do
     resource :votes, controller: "comment_votes", only: [:create, :destroy], as: "comment_votes"
     collection do
