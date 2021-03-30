@@ -1,5 +1,5 @@
 Rails.application.configure do
-  if Rails.env.test? || Danbooru.config.redis_url.blank?
+  if Danbooru.config.redis_url.blank?
     cache_config = [:memory_store, { size: 32.megabytes }]
   else
     cache_config = [

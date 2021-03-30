@@ -25,11 +25,14 @@ class SavedSearch < ApplicationRecord
       extend Memoist
 
       def redis
+        return nil if Danbooru.config.redis_url.blank?
         ::Redis.new(url: Danbooru.config.redis_url)
       end
       memoize :redis
 
       def post_ids_for(user_id, label: nil)
+        return [] if redis.nil?
+
         queries = queries_for(user_id, label: label)
         post_ids = Set.new
         queries.each do |query|
@@ -46,6 +49,8 @@ class SavedSearch < ApplicationRecord
     end
 
     def refreshed_at
+      return Time.zone.now if SavedSearch.redis.nil?
+
       ttl = SavedSearch.redis.ttl("search:#{normalized_query}")
       return nil if ttl < 0
       (REDIS_EXPIRY.to_i - ttl).seconds.ago
@@ -53,6 +58,8 @@ class SavedSearch < ApplicationRecord
     memoize :refreshed_at
 
     def cached_size
+      return 0 if SavedSearch.redis.nil?
+
       SavedSearch.redis.scard("search:#{normalized_query}")
     end
     memoize :cached_size
@@ -116,6 +123,8 @@ class SavedSearch < ApplicationRecord
       end
 
       def populate(query, timeout: 10_000)
+        return if redis.nil?
+
         redis_key = "search:#{query}"
         return if redis.exists?(redis_key)
 
