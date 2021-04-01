@@ -567,6 +567,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "a nonexistent post id" do
+        should "return 404" do
+          get post_path(id: 9_999_999)
+
+          assert_response 404
+        end
+      end
+
       context "with pools" do
         should "render the pool list" do
           as(@user) { @post.update(tag_string: "newpool:comic") }
