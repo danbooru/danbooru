@@ -1,3 +1,43 @@
+## 2021-03-31
+
+### Changes
+
+* Uploading new [[Flash]] files is no longer allowed.
+* Added support for viewing old [[Flash]] posts using the Ruffle Flash
+  emulator. This is experimental. Many Flash files aren't fully supported by
+  Ruffle.
+* You can now edit the flag reason after you flag a post.
+* Discord: fixed the /count command not working sometimes because of search timeouts.
+* Discord: fixed the /tagme command not working.
+
+### Fixes
+
+* Fixed a bug where if tag A implied tag B, and you tried to alias A to B, then
+  it wouldn't remove the implication first.
+* Fixed the Download link in the sidebar not respecting the "Disable tagged
+  filenames" option.
+
+### Other changes
+
+These changes are only relevant to people running a personal Danbooru instance:
+
+* Made it easier to run a personal Danbooru instance. Just clone the Git repo
+  and run `bin/danbooru` and it will automatically start a new Danbooru
+  instance for you. See the Quickstart section in the README for more details.
+  Note: this has known limitations and is still a work in progress.
+
+* Changed the default database connection settings. You may have to update your
+  config if you get database connection errors. See commit 189adc683 for
+  details.
+
+* Removed support for the `~/.danbooru/secret_token` file and the
+  `SECRET_TOKEN` environment variable. You will have to update your config if
+  you used the `~/.danbooru/secret_token` file. See commit 1a8c70f5f for
+  details.
+
+* Disabled Redis by default. You will have to edit your config to re-enable
+  Redis. See commit d59b0234a for details.
+
 ## 2021-03-19
 
 ### Changes
