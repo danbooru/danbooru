@@ -48,7 +48,7 @@
           <% if current_user.is_anonymous? %>
             <%= link_to upvote_icon, login_path(url: request.fullpath), class: "comment-upvote-link inactive-link" %>
           <% elsif upvoted? %>
-            <%= link_to upvote_icon, comment_vote_path(current_vote), class: "comment-upvote-link comment-unvote-link active-link", method: :delete, remote: true %>
+            <%= link_to upvote_icon(active: true), comment_vote_path(current_vote), class: "comment-upvote-link comment-unvote-link active-link", method: :delete, remote: true %>
           <% else %>
             <%= link_to upvote_icon, comment_comment_votes_path(comment_id: comment.id, score: "1"), class: "comment-upvote-link inactive-link", method: :post, remote: true %>
           <% end %>
@@ -64,7 +64,7 @@
           <% if current_user.is_anonymous? %>
             <%= link_to downvote_icon, login_path(url: request.fullpath), class: "comment-downvote-link inactive-link" %>
           <% elsif downvoted? %>
-            <%= link_to downvote_icon, comment_vote_path(current_vote), class: "comment-downvote-link comment-unvote-link active-link", method: :delete, remote: true %>
+            <%= link_to downvote_icon(active: true), comment_vote_path(current_vote), class: "comment-downvote-link comment-unvote-link active-link", method: :delete, remote: true %>
           <% else %>
             <%= link_to downvote_icon, comment_comment_votes_path(comment_id: comment.id, score: "-1"), class: "comment-downvote-link inactive-link", method: :post, remote: true %>
           <% end %>

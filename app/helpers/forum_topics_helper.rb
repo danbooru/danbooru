@@ -25,9 +25,9 @@ module ForumTopicsHelper
 
   def forum_post_vote_icon(vote)
     if vote.score == 1
-      upvote_icon
+      tag.img(src: "https://cdn.discordapp.com/emojis/814623669392375809.png?v=1", width: 24, height: 24)
     elsif vote.score == -1
-      downvote_icon
+      tag.img(src: "https://cdn.discordapp.com/emojis/814335138376056843.png?v=1", width: 24, height: 24)
     else
       meh_icon
     end

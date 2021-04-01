@@ -5,7 +5,7 @@ import 'tippy.js/dist/tippy.css';
 
 let PostTooltip = {};
 
-PostTooltip.POST_SELECTOR = "*:not(.ui-sortable-handle) > .post-preview img, .dtext-post-id-link";
+PostTooltip.POST_SELECTOR = "*:not(.ui-sortable-handle) > .post-preview img:not(.prov), .dtext-post-id-link";
 PostTooltip.SHOW_DELAY = 500;
 PostTooltip.HIDE_DELAY = 125;
 PostTooltip.DURATION = 250;
