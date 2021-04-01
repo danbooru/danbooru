@@ -20,6 +20,12 @@ module.exports = merge(webpackConfig, {
       options: {
         runner: "bin/rails runner"
       }
+    }, {
+      test: /\.wasm$/,
+      type: 'asset/resource',
+      generator: {
+        filename: 'js/[name][ext]'
+      }
     }]
   },
 });
