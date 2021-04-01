@@ -13,8 +13,8 @@ class Upload < ApplicationRecord
     end
 
     def validate_file_ext(record)
-      if record.file_ext == "bin"
-        record.errors.add(:file_ext, "is invalid (only JPEG, PNG, GIF, SWF, MP4, and WebM files are allowed")
+      if record.file_ext.in?(["bin", "swf"])
+        record.errors.add(:file_ext, "is invalid (only JPEG, PNG, GIF, MP4, and WebM files are allowed")
       end
     end
 
