@@ -48,6 +48,9 @@
     "stylelint-config-standard": "^20.0.0",
     "webpack-dev-server": "^3.11.2"
   },
+  "resolutions": {
+    "webpack": "5.26.3"
+  },
   "scripts": {
     "eslint-all": "yarn run eslint --plugin eslint-plugin-ignore-erb --ext .js,.js.erb app/javascript/src/javascripts",
     "stylelint-all": "yarn run stylelint 'app/javascript/src/styles/**/*.scss'"
