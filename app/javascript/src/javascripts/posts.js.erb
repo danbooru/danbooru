@@ -35,6 +35,7 @@ Post.initialize_all = function() {
     this.initialize_post_image_resize_links();
     this.initialize_recommended();
     this.initialize_ugoira_player();
+    this.initialize_ruffle_player();
   }
 
   if ($("#c-posts #a-show, #c-uploads #a-new").length) {
@@ -378,6 +379,19 @@ Post.initialize_ugoira_player = function() {
     Ugoira.create_player(content_type, frames, file_url);
     $(window).on("resize.danbooru.ugoira_scale", Post.resize_ugoira_controls);
   }
+};
+
+Post.initialize_ruffle_player = function() {
+  if (!window.RufflePlayer) {
+    return;
+  }
+
+  let ruffle = window.RufflePlayer.newest();
+  let player = ruffle.createPlayer();
+  let $container = $(".ruffle-container[data-swf]");
+  let src = $container.attr("data-swf");
+  $container.get(0).appendChild(player);
+  player.load(src);
 };
 
 Post.resize_ugoira_controls = function() {

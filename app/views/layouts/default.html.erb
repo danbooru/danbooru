@@ -16,7 +16,14 @@
   <% if CurrentUser.user.blacklisted_tags.present? %>
     <meta name="blacklisted-tags" content="<%= CurrentUser.user.blacklisted_tags.gsub(/(?:\r|\n)+/, ",") %>">
   <% end %>
-  <%= javascript_pack_tag "application" %>
+
+  <%# XXX hack to only load Ruffle on Flash posts %>
+  <% if controller_name == "posts" && action_name == "show" && @post.is_flash? %>
+    <%= javascript_pack_tag "application", "flash" %>
+  <% else %>
+    <%= javascript_pack_tag "application" %>
+  <% end %>
+
   <%= stylesheet_pack_tag "application" %>
   <% if CurrentUser.user.custom_style.present? && params.fetch(:css, "true").truthy?  %>
     <%= stylesheet_link_tag custom_style_users_path(md5: Digest::MD5.hexdigest(CurrentUser.user.custom_style)), media: "screen" %>
