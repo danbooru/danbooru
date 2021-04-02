@@ -17,41 +17,13 @@ module IconHelper
   end
 
   # fontawesome.com/icons/arrow-alt-up
-  def upvote_icon(active: false, post: nil, **options)
-    if !active
-      svg_icon_tag("upvote-icon", "M272 480h-96c-13.3 0-24-10.7-24-24V256H48.2c-21.4 0-32.1-25.8-17-41L207 39c9.4-9.4 24.6-9.4 34 0l175.8 176c15.1 15.1 4.4 41-17 41H296v200c0 13.3-10.7 24-24 24z", **options)
-    elsif post&.has_tag?("fate/grand_order")
-      tag.img(src: "https://cdn.discordapp.com/emojis/653748516224761908.gif?v=1", height: 24)
-    elsif post&.has_tag?("touhou")
-      tag.img(src: "https://cdn.discordapp.com/emojis/827033081197101066.png?v=1", height: 24)
-    elsif post&.has_tag?("kantai_collection")
-      tag.img(src: "https://cdn.discordapp.com/emojis/733153966917156866.png?v=1", height: 24)
-    elsif post&.has_tag?("azur_lane") && post.rating != "s"
-      tag.img(src: "https://cdn.discordapp.com/emojis/801657092439277569.png?v=1", height: 24)
-    elsif post&.has_tag?("hololive") && post.rating == "s"
-      tag.img(src: "https://cdn.discordapp.com/emojis/772303879051149312.png?v=1", height: 24)
-    elsif post&.has_tag?("hololive") && post.rating != "s"
-      tag.img(src: "https://cdn.discordapp.com/emojis/759597982176903212.gif?v=1", height: 24)
-    elsif post&.has_tag?("arknights")
-      tag.img(src: "https://cdn.discordapp.com/emojis/701113445713445004.gif?v=1", height: 24)
-    elsif post&.has_tag?("fire_emblem")
-      tag.img(src: "https://cdn.discordapp.com/emojis/625999795882033163.png?v=1", height: 24)
-    elsif post&.has_tag?("foot_focus")
-      tag.img(src: "https://cdn.discordapp.com/emojis/795007213919928361.png?v=1", height: 24)
-    elsif post&.has_tag?("albert_yi")
-      tag.img(src: "https://cdn.discordapp.com/emojis/380454608096722956.png?v=1", height: 24)
-    else
-      tag.img(src: "https://cdn.discordapp.com/emojis/688562186930618391.png?v=1", class: "prov", height: 20)
-    end
+  def upvote_icon(**options)
+    svg_icon_tag("upvote-icon", "M272 480h-96c-13.3 0-24-10.7-24-24V256H48.2c-21.4 0-32.1-25.8-17-41L207 39c9.4-9.4 24.6-9.4 34 0l175.8 176c15.1 15.1 4.4 41-17 41H296v200c0 13.3-10.7 24-24 24z", **options)
   end
 
   # fontawesome.com/icons/arrow-alt-down
-  def downvote_icon(active: false, post: nil, **options)
-    if !active
-      svg_icon_tag("downvote-icon", "M176 32h96c13.3 0 24 10.7 24 24v200h103.8c21.4 0 32.1 25.8 17 41L241 473c-9.4 9.4-24.6 9.4-34 0L31.3 297c-15.1-15.1-4.4-41 17-41H152V56c0-13.3 10.7-24 24-24z", **options)
-    else
-      tag.img(src: "https://cdn.discordapp.com/emojis/769954192050618439.png?v=1", class: "prov", height: 20)
-    end
+  def downvote_icon(**options)
+    svg_icon_tag("downvote-icon", "M176 32h96c13.3 0 24 10.7 24 24v200h103.8c21.4 0 32.1 25.8 17 41L241 473c-9.4 9.4-24.6 9.4-34 0L31.3 297c-15.1-15.1-4.4-41 17-41H152V56c0-13.3 10.7-24 24-24z", **options)
   end
 
   def sticky_icon(**options)
