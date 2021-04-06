@@ -49,7 +49,8 @@
     "webpack-dev-server": "^3.11.2"
   },
   "resolutions": {
-    "webpack": "5.26.3"
+    "webpack": "5.26.3",
+    "ruffle-mirror": "2021.3.31"
   },
   "scripts": {
     "eslint-all": "yarn run eslint --plugin eslint-plugin-ignore-erb --ext .js,.js.erb app/javascript/src/javascripts",
