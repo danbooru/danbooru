@@ -30,17 +30,30 @@ module Danbooru
       "Danbooru"
     end
 
-    # The canonical hostname for the site, e.g. danbooru.donmai.us.
+    # The public domain name of your site, e.g. "danbooru.donmai.us". If your
+    # site were called `www.mybooru.com`, then you would set this to "www.mybooru.com"
+    #
+    # By default, this is set to the machine hostname. You can use `hostnamectl`
+    # to change the machine hostname.
+    #
+    # You can set this to "localhost" if your site doesn't have a public domain name.
     def hostname
       Socket.gethostname
     end
 
-    # The canonical root url for the site (e.g. https://danbooru.donmai.us).
-    # Images will be served from this URL by default. Change this to http:// if
-    # you don't support HTTPS. Protip: use ngrok.com for easy HTTPS support
-    # during development.
+    # The URL of your site, e.g. https://danbooru.donmai.us.
+    #
+    # If you support HTTPS, change this to "https://www.mybooru.com". If you set
+    # this to https://, then you *must* use https:// to access your site. You can't
+    # use http:// because in HTTPS mode session cookies won't be sent over HTTP.
+    #
+    # Images will be served from this URL by default. See the `base_url` option
+    # for the `storage_manager` below if you want to serve images from a
+    # different domain.
+    #
+    # Protip: use ngrok.com for easy HTTPS support during development.
     def canonical_url
-      "https://#{Danbooru.config.hostname}"
+      "http://#{Danbooru.config.hostname}"
     end
 
     # Contact email address of the admin.
