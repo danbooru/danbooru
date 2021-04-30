@@ -16,7 +16,7 @@ Bundler.require(*Rails.groups)
 
 begin
   require_relative "danbooru_default_config"
-  require_relative "danbooru_local_config"
+  require_relative ENV.fetch("DANBOORU_CONFIG_FILE", "danbooru_local_config")
 rescue LoadError
 end
 
