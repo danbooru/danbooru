@@ -16,10 +16,9 @@ VIPS_BUILD_DEPS="
   libjpeg-turbo8-dev libexpat1-dev libglib2.0-dev libgif-dev libexif-dev
 "
 DANBOORU_RUNTIME_DEPS="
-  mkvtoolnix postgresql-client-12 libpq5 libxml2 libxslt1.1 zlib1g
-  libfftw3-3 libwebp6 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2
-  libpng16-16 libjpeg-turbo8 libexpat1 libglib2.0 libgif7 libexif12
-  libvpx6
+  ca-certificates mkvtoolnix postgresql-client-12 libpq5 libxml2 libxslt1.1
+  zlib1g libfftw3-3 libwebp6 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2
+  libpng16-16 libjpeg-turbo8 libexpat1 libglib2.0 libgif7 libexif12 libvpx6
 "
 
 apt_install() {
@@ -71,10 +70,10 @@ install_ruby() {
 }
 
 cleanup() {
-  apt-get purge -y $COMMON_BUILD_DEPS $RUBY_BUILD_DEPS $VIPS_BUILD_DEPS $FFMPEG_BUILD_DEPS
+  apt-get purge -y $RUBY_BUILD_DEPS $VIPS_BUILD_DEPS $FFMPEG_BUILD_DEPS
   apt-get purge -y --allow-remove-essential \
-    e2fsprogs git libglib2.0-bin libglib2.0-doc mount perl-modules-5.30 procps \
-    python3 readline-common shared-mime-info tzdata
+    build-essential pkg-config e2fsprogs git libglib2.0-bin libglib2.0-doc \
+    mount perl-modules-5.30 procps python3 readline-common shared-mime-info tzdata
   apt-get autoremove -y
 
   rm -rf \
