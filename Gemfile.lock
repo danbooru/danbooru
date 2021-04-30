@@ -106,6 +106,7 @@ GEM
     aws-sigv4 (1.2.3)
       aws-eventstream (~> 1, >= 1.0.2)
     bcrypt (3.1.16)
+    bcrypt_pbkdf (1.1.0)
     benchmark-ips (2.8.4)
     better_errors (2.9.1)
       coderay (>= 1.0.0)
@@ -476,6 +477,7 @@ DEPENDENCIES
   addressable
   aws-sdk-sqs (~> 1)
   bcrypt
+  bcrypt_pbkdf
   benchmark-ips
   better_errors
   binding_of_caller
