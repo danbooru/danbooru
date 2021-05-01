@@ -2,7 +2,9 @@
   <div id="a-show" class="fixed-width-container">
     <h1>Status</h1>
 
-    <p>Running <%= external_link_to "#{Danbooru.config.source_code_url}/commits/#{@status.danbooru_version}", @status.danbooru_version.first(7) %>.</p>
+    <% if @status.danbooru_version.present? && Danbooru.config.source_code_url.present? %>
+      <p>Running <%= external_link_to "#{Danbooru.config.source_code_url}/commits/#{@status.danbooru_version}", @status.danbooru_version.first(7) %>.</p>
+    <% end %>
 
     <h2>Server</h2>
 
