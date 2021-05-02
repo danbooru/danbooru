@@ -47,6 +47,9 @@ RUN yarn install
 
 COPY . .
 
+ARG SOURCE_COMMIT
+RUN echo "$SOURCE_COMMIT" > REVISION
+
 
 
 FROM development AS assets
