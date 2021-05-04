@@ -44,7 +44,10 @@ module Sources
         if url =~ IMAGE_URL
           [url]
         elsif page.present?
-          [page.text[/window\.__NUXT__=.*,preview_url:"(.*?)",/, 1].gsub("\\u002F", "/")]
+          # Heavy heuristic to extract the uncropped image among the nighmare that is the skeb minified json
+          candidates = page&.css("script")&.map { |script| script.text&.scan(/(https:\\u002F\\u002Fskeb\.imgix\.net.*?)(?:"|,|\s)/) }
+          candidates = candidates.to_a.flatten.compact.uniq.reject { |match| match.include? "crop=" }
+          [candidates.first.gsub("\\u002F", "/")]
         else
           []
         end
