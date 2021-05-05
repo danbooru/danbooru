@@ -129,6 +129,31 @@ module Sources
       end
     end
 
+    context "A commentary with spoiler" do
+      should "correctly add spoiler tags" do
+        site = Sources::Strategies.find("https://seiga.nicovideo.jp/seiga/im8992650")
+
+        commentary = <<~COMM.chomp
+          SLVN大好き。ホントニアコガレテル。
+
+          [spoiler]
+          「魔理沙とアリスのクッキーKiss」
+          企画者HZNの企画した東方合同動画企画
+          苦行を称する東方ボイスドラマ
+          遥か昔、東方界隈のはずれ
+          その偏境に消えぬボイスドラマの火を見出したとき
+          若き健常者HZNの心にも
+          消えぬ野心が灯ったのだろう
+          戦技は「義務教育」
+          クッキー☆を終わるまで視聴させる技
+          27分にわたる苦行からのエンディングで視聴者はぬわ疲に包まれる
+          [/spoiler]
+        COMM
+
+        assert_equal(commentary, site.dtext_artist_commentary_desc)
+      end
+    end
+
     context "normalizing for source" do
       should "normalize correctly" do
         source1 = "http://lohas.nicoseiga.jp/priv/3521156?e=1382558156&h=f2e089256abd1d453a455ec8f317a6c703e2cedf"

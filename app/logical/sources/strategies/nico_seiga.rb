@@ -134,7 +134,11 @@ module Sources
       end
 
       def dtext_artist_commentary_desc
-        DText.from_html(artist_commentary_desc).gsub(/[^\w]im(\d+)/, ' seiga #\1 ')
+        DText.from_html(artist_commentary_desc) do |element|
+          if element.name == "font" && element["color"] == "white"
+            element.content = "[spoiler]#{element.content}[/spoiler]"
+          end
+        end.gsub(/[^\w]im(\d+)/, ' seiga #\1 ').chomp
       end
 
       def normalize_for_source
