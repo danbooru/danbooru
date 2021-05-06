@@ -34,5 +34,14 @@
 
       <%= render "list", hash: @status.serializable_hash[:redis][:info] %>
     </details>
+
+    <h2>Request</h2>
+
+    <details>
+      <summary>
+        IP: <%= @status.request.remote_ip %>
+      </summary>
+      <%= render "list", hash: @status.serializable_hash[:headers] %>
+    </details>
   </div>
 </div>

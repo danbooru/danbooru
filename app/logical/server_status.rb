@@ -3,8 +3,16 @@ class ServerStatus
   include ActiveModel::Serializers::JSON
   include ActiveModel::Serializers::Xml
 
+  attr_reader :request
+
+  def initialize(request)
+    @request = request
+  end
+
   def serializable_hash(options = {})
     {
+      ip: request.remote_ip,
+      headers: http_headers,
       status: {
         hostname: hostname,
         uptime: uptime,
@@ -29,6 +37,14 @@ class ServerStatus
   end
 
   concerning :InfoMethods do
+    def http_headers
+      headers = request.headers.env.select { |key| key.starts_with?("HTTP_") }
+      headers = headers.transform_keys { |key| key.delete_prefix("HTTP_").titleize.tr(" ", "-") }
+      headers = headers.except("Cookie")
+      headers = headers.reject { |k, v| v.blank? }
+      headers
+    end
+
     def hostname
       Socket.gethostname
     end
