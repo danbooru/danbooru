@@ -36,11 +36,11 @@ class UserPresenter
   end
 
   def posts_for_saved_search_category(category)
-    Post.tag_match("search:#{category}").limit(10)
+    Post.user_tag_match("search:#{category}").limit(10)
   end
 
   def uploads
-    Post.tag_match("user:#{user.name}").limit(6)
+    Post.user_tag_match("user:#{user.name}").limit(6)
   end
 
   def has_uploads?
@@ -48,7 +48,7 @@ class UserPresenter
   end
 
   def favorites
-    Post.tag_match("ordfav:#{user.name}").limit(6)
+    Post.user_tag_match("ordfav:#{user.name}").limit(6)
   end
 
   def has_favorites?
@@ -56,15 +56,15 @@ class UserPresenter
   end
 
   def upload_count(template)
-    template.link_to(user.post_upload_count, template.posts_path(:tags => "user:#{user.name}"))
+    template.link_to(user.post_upload_count, template.posts_path(tags: "user:#{user.name}"), rel: "nofollow")
   end
 
   def deleted_upload_count(template)
-    template.link_to(user.posts.deleted.count, template.posts_path(:tags => "status:deleted user:#{user.name}"))
+    template.link_to(user.posts.deleted.count, template.posts_path(tags: "status:deleted user:#{user.name}"), rel: "nofollow")
   end
 
   def favorite_count(template)
-    template.link_to(user.favorite_count, template.posts_path(tags: "ordfav:#{user.name}"))
+    template.link_to(user.favorite_count, template.posts_path(tags: "ordfav:#{user.name}"), rel: "nofollow")
   end
 
   def favorite_group_count(template)
@@ -76,13 +76,13 @@ class UserPresenter
   end
 
   def commented_posts_count(template)
-    count = CurrentUser.without_safe_mode { Post.fast_count("commenter:#{user.name}") }
+    count = PostQueryBuilder.new("commenter:#{user.name}").fast_count
     count = "?" if count.nil?
-    template.link_to(count, template.posts_path(:tags => "commenter:#{user.name} order:comment_bumped"))
+    template.link_to(count, template.posts_path(tags: "commenter:#{user.name} order:comment_bumped"), rel: "nofollow")
   end
 
   def post_version_count(template)
-    template.link_to(user.post_update_count, template.post_versions_path(:search => {:updater_id => user.id}))
+    template.link_to(user.post_update_count, template.post_versions_path(:search => {:updater_name => user.name}))
   end
 
   def note_version_count(template)
@@ -90,9 +90,9 @@ class UserPresenter
   end
 
   def noted_posts_count(template)
-    count = CurrentUser.without_safe_mode { Post.fast_count("noteupdater:#{user.name}") }
+    count = PostQueryBuilder.new("noteupdater:#{user.name}").fast_count
     count = "?" if count.nil?
-    template.link_to(count, template.posts_path(:tags => "noteupdater:#{user.name} order:note"))
+    template.link_to(count, template.posts_path(tags: "noteupdater:#{user.name} order:note"), rel: "nofollow")
   end
 
   def wiki_page_version_count(template)
@@ -108,7 +108,7 @@ class UserPresenter
   end
 
   def forum_post_count(template)
-    template.link_to(user.forum_post_count, template.forum_posts_path(:search => {:creator_id => user.id}))
+    template.link_to(user.forum_post_count, template.forum_posts_path(search: { creator_id: user.id }), rel: "nofollow")
   end
 
   def pool_version_count(template)
@@ -128,7 +128,7 @@ class UserPresenter
   end
 
   def approval_count(template)
-    template.link_to(Post.where("approver_id = ?", user.id).count, template.posts_path(:tags => "approver:#{user.name}"))
+    template.link_to(Post.where(approver: user).count, template.posts_path(tags: "approver:#{user.name}"), rel: "nofollow")
   end
 
   def feedbacks(template)
@@ -145,11 +145,5 @@ class UserPresenter
     else
       []
     end
-  end
-
-  def previous_names(template)
-    user.user_name_change_requests.visible(CurrentUser.user).map do |req|
-      template.link_to req.original_name, req
-    end.join(", ").html_safe
   end
 end

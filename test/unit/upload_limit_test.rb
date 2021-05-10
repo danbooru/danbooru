@@ -12,8 +12,16 @@ class UploadLimitTest < ActiveSupport::TestCase
         @post = create(:post, uploader: @user, is_pending: true, created_at: 7.days.ago)
         assert_equal(1000, @user.reload.upload_points)
 
-        PostPruner.new.prune!
+        PostPruner.prune!
         assert_equal(967, @user.reload.upload_points)
+      end
+    end
+
+    context "a new post that is deleted within the first 3 days" do
+      should "cost the uploader 5 upload slots" do
+        @post = create(:post, uploader: @user, is_deleted: true, created_at: 1.days.ago)
+
+        assert_equal(5, @user.upload_limit.used_upload_slots)
       end
     end
 

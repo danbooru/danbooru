@@ -1,5 +1,3 @@
-<%= error_messages_for("forum_topic") %>
-
 <div id="form-content">
   <%= edit_form_for(forum_topic) do |f| %>
     <%= f.input :title %>
@@ -10,16 +8,16 @@
     </div>
 
     <%= f.simple_fields_for :original_post do |pf| %>
-      <%= dtext_field "forum_post", "body", :classes => "autocomplete-mentions", :input_name => "forum_topic[original_post_attributes][body]", :value => forum_topic.original_post.body, :input_id => "forum_post_body_for_#{forum_topic.original_post.id}", :preview_id => "dtext-preview-for-#{forum_topic.original_post.id}" %>
+      <%= pf.input :body, as: :dtext %>
     <% end %>
 
-    <% if CurrentUser.is_moderator? %>
+    <% if policy(forum_topic).moderate? %>
       <%= f.input :min_level, :include_blank => false, :collection => available_min_user_levels %>
       <%= f.input :is_sticky, :label => "Sticky" %>
       <%= f.input :is_locked, :label => "Locked" %>
     <% end %>
 
     <%= f.button :submit, "Submit" %>
-    <%= dtext_preview_button "forum_post", "body", :input_id => "forum_post_body_for_#{forum_topic.original_post.id}", :preview_id => "dtext-preview-for-#{forum_topic.original_post.id}" %>
+    <%= dtext_preview_button "forum_topic_original_post_body" %>
   <% end %>
 </div>

@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory(:post_disapproval) do
-    user
-    post
-    reason { %w(breaks_rules poor_quality disinterest).sample }
+    user factory: :moderator_user
+    post factory: :post, is_pending: true
+    reason { PostDisapproval::REASONS.sample }
     message { FFaker::Lorem.sentence }
   end
 end

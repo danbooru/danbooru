@@ -20,11 +20,6 @@ Pool.initialize_add_to_pool_link = function() {
     e.preventDefault();
     $("#add-to-pool-dialog").dialog("open");
   });
-
-  $("#recent-pools li").on("click.danbooru", function(e) {
-    e.preventDefault();
-    $("#pool_name").val($(this).attr("data-value"));
-  });
 }
 
 Pool.initialize_simple_edit = function() {

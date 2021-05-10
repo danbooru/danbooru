@@ -3,19 +3,22 @@
     <h1>Search Changes</h1>
 
     <%= search_form_for(post_versions_path) do |f| %>
-      <%= f.input :updated_at, label: "Date" %>
-      <%= f.input :updater_name, label: "Updater", input_html: { "data-autocomplete": "user" } %>
-      <%= f.input :added_tags_include_all, label: "Added tags", input_html: { "data-autocomplete": "tag-query" } %>
-      <%= f.input :removed_tags_include_all, label: "Removed tags", input_html: { "data-autocomplete": "tag-query" } %>
-      <%= f.input :changed_tags, label: "Changed tags", input_html: { "data-autocomplete": "tag-query" } %>
-      <%= f.input :post_id %>
-      <%= f.input :parent_id %>
-      <%= f.input :rating %>
-      <%= f.input :source_ilike, label: "Source", hint: "Use * for wildcard" %>
-      <%= f.input :version %>
-      <%= f.input :rating_changed, as: :select %>
-      <%= f.input :parent_changed, as: :select %>
-      <%= f.input :source_changed, as: :select %>
+      <%= f.input :updated_at, label: "Date", input_html: { value: params.dig(:search, :updated_at) } %>
+      <%= f.input :updater_name, label: "Updater", input_html: { value: params.dig(:search, :updater_name), "data-autocomplete": "user" } %>
+      <%= f.input :added_tags_include_all, label: "Added tags", input_html: { value: params.dig(:search, :added_tags_include_all), "data-autocomplete": "tag-query" } %>
+      <%= f.input :removed_tags_include_all, label: "Removed tags", input_html: { value: params.dig(:search, :removed_tags_include_all), "data-autocomplete": "tag-query" } %>
+      <%= f.input :all_changed_tags, label: "All Changed Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :all_changed_tags) }, hint: "All tags must appear in either tag adds or removes" %>
+      <%= f.input :any_changed_tags, label: "Any Changed Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :any_changed_tags) }, hint: "Any tag must appear in either tag adds or removes" %>
+      <%= f.input :post_id, input_html: { value: params.dig(:search, :post_id) } %>
+      <%= f.input :parent_id, input_html: { value: params.dig(:search, :parent_id) } %>
+      <%= f.input :rating, input_html: { value: params.dig(:search, :rating) } %>
+      <%= f.input :source_ilike, label: "Source", input_html: { value: params.dig(:search, :source_ilike) }, hint: "Use * for wildcard" %>
+      <%= f.input :tag_matches, input_html: { value: params.dig(:search, :tag_matches) }, hint: "Single tag, use * for wildcard" %>
+      <%= f.input :version, input_html: { value: params.dig(:search, :version) } %>
+      <%= f.input :is_new, label: "Include uploads?", collection: [["Yes", nil], ["No", false], ["Only", true]], include_blank: false, selected: params.dig(:search, :is_new), hint: "I.e. the 1st version of a post" %>
+      <%= f.input :rating_changed, as: :select, include_blank: true, selected: params.dig(:search, :rating_changed) %>
+      <%= f.input :parent_changed, as: :select, include_blank: true, selected: params.dig(:search, :parent_changed) %>
+      <%= f.input :source_changed, as: :select, include_blank: true, selected: params.dig(:search, :source_changed) %>
       <%= f.submit "Search" %>
     <% end %>
   </div>

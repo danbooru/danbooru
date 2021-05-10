@@ -1,0 +1,86 @@
+<div id="c-static">
+  <div id="a-colors">
+    <h1>Colors</h1>
+
+    <div class="space-y-4">
+      <table style="border-spacing: 0.25rem; border-collapse: separate">
+        <tr>
+          <td></td>
+          <% ColorPalette::LIGHTNESSES.each_with_index do |_, i| %>
+            <td class="text-muted text-center"><%= i %></td>
+          <% end %>
+        </tr>
+
+        <% ColorPalette::HUES.each do |hue, _| %>
+          <tr>
+            <td class="text-muted"><%= hue %></td>
+            <% ColorPalette::LIGHTNESSES.each_with_index do |_, i| %>
+              <td style="height: 2rem; width: 4rem; background-color: var(--<%= "#{hue}-#{i}" %>)"></td>
+            <% end %>
+          </tr>
+        <% end %>
+      </table>
+
+      <table style="border-spacing: 0.25rem; border-collapse: separate">
+        <tr>
+          <td></td>
+          <% ColorPalette::LIGHTNESSES.each_with_index do |_, i| %>
+            <td class="text-muted text-center"><%= i %></td>
+          <% end %>
+        </tr>
+
+        <% ColorPalette::HUES.each do |hue, _| %>
+          <tr>
+            <td class="text-muted"><%= hue %></td>
+            <% ColorPalette::LIGHTNESSES.each_with_index do |_, i| %>
+              <td class="text-center" style="height: 2rem; width: 4rem; background-color: white; color: var(--<%= "#{hue}-#{i}" %>)">
+                Aa
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </table>
+
+      <table style="border-spacing: 0.25rem; border-collapse: separate">
+        <tr>
+          <td></td>
+          <% ColorPalette::LIGHTNESSES.each_with_index do |_, i| %>
+            <td class="text-muted text-center"><%= i %></td>
+          <% end %>
+        </tr>
+
+        <% ColorPalette::HUES.each do |hue, _| %>
+          <tr>
+            <td class="text-muted"><%= hue %></td>
+            <% ColorPalette::LIGHTNESSES.each_with_index do |_, i| %>
+              <td class="text-center" style="height: 2rem; width: 4rem; background-color: var(--<%= "#{hue}-#{i}" %>)">
+                <span style="color: white">Aa</span>
+                <span style="color: var(--grey-9)">Aa</span>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </table>
+
+      <table style="border-spacing: 0.25rem; border-collapse: separate">
+        <tr>
+          <td></td>
+          <% ColorPalette::LIGHTNESSES.each_with_index do |_, i| %>
+            <td class="text-muted text-center"><%= i %></td>
+          <% end %>
+        </tr>
+
+        <% ColorPalette::HUES.each do |hue, _| %>
+          <tr>
+            <td class="text-muted"><%= hue %></td>
+            <% ColorPalette::LIGHTNESSES.each_with_index do |_, i| %>
+              <td class="text-center" style="height: 2rem; width: 4rem; background-color: var(--grey-9); color: var(--<%= "#{hue}-#{i}" %>)">
+                Aa
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  </div>
+</div>

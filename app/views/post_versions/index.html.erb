@@ -1,23 +1,31 @@
 <div id="c-post-versions">
   <div id="a-index">
     <% if listing_type(:post_id) == :revert && @post_versions.present? %>
-      <h1>Tag History: <%= link_to "Post ##{params.dig(:search, :post_id)}", @post_versions[0].post %></h1>
+      <h1>Post History: <%= link_to "Post ##{params.dig(:search, :post_id)}", @post_versions[0].post %></h1>
     <% else %>
-      <h1>Tag History</h1>
+      <h1>Post History</h1>
     <% end %>
+
+    <%= render "versions/types" %>
 
     <%= search_form_for(post_versions_path, classes: "inline-form") do |f| %>
       <%= f.input :post_id, label: "Post", input_html: { value: params.dig(:search, :post_id) } %>
       <%= f.input :updater_name, label: "Updater", input_html: { "data-autocomplete": "user", value: params.dig(:search, :updater_name) } %>
       <%= f.input :added_tags_include_all, label: "Added Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :added_tags_include_all) } %>
       <%= f.input :removed_tags_include_all, label: "Removed Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :removed_tags_include_all) } %>
-      <%= f.input :changed_tags, label: "Changed Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :changed_tags) } %>
-      <%= f.submit "Search" %>
-      <%= link_to "Advanced", search_post_versions_path, class: "advanced-search-link" %>
+      <%= f.input :changed_tags, label: "Changed Tags", input_html: { "data-autocomplete": "tag-query", value: params.dig(:search, :changed_tags) }, hint: "Added or removed tags" %>
+
+      <div class="flex items-center space-x-4">
+        <%= f.submit "Search" %>
+        <%= link_to "Advanced", search_post_versions_path(params.except(:controller, :action, :index, :commit, :type).permit!) %>
+      </div>
     <% end %>
 
     <%= render "posts/partials/common/inline_blacklist" %>
-    <p class="fineprint">Recent updates may not have been processed yet. The most recently processed version was <%= time_ago_in_words_tagged(PostVersion.maximum(:updated_at)) %>.</p>
+    <p class="fineprint">
+      Recent updates may not have been processed yet. The
+      most recently processed version was <%= time_ago_in_words_tagged(PostVersion.maximum(:updated_at) || Time.zone.now) %>.
+    </p>
 
     <% if @post_versions.length == 0 %>
       <%= render "post_sets/blank" %>

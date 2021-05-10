@@ -1,0 +1,60 @@
+// A small set of utility classes, modeled after TailwindCSS and Bootstrap.
+//
+// https://tailwindcss.com/docs
+// https://getbootstrap.com/docs/5.0/utilities/spacing/
+
+$spacer: 0.25rem; /* 4px */
+
+.invisible { visibility: hidden; }
+.visible { visibility: visible; }
+
+.font-monospace { font-family: var(--monospace-font); }
+.font-bold { font-weight: bold; }
+
+.inline-block { display: inline-block; }
+.flex { display: flex; }
+
+.text-center { text-align: center; }
+.text-muted { color: var(--muted-text-color); }
+
+.mx-auto { margin-left: auto; margin-right: auto; }
+.mx-2    { margin-left: 2 * $spacer; margin-right: 2 * $spacer; }
+
+.mt-2  { margin-top: 2 * $spacer; }
+.mt-4  { margin-top: 4 * $spacer; }
+.mt-8  { margin-top: 8 * $spacer; }
+
+.mb-2  { margin-bottom: 2 * $spacer; }
+.mb-4  { margin-bottom: 4 * $spacer; }
+.mb-8  { margin-bottom: 8 * $spacer; }
+
+.ml-4  { margin-left: 4 * $spacer; }
+
+.p-4  { padding: 4 * $spacer; }
+
+.w-1\/4 { width: 25%; }
+.w-full { width: 100%; }
+
+.h-10 { height: 10 * $spacer; }
+
+.space-x-1 > * + * { margin-left: 1 * $spacer; }
+.space-x-2 > * + * { margin-left: 2 * $spacer; }
+.space-x-4 > * + * { margin-left: 4 * $spacer; }
+.space-y-4 > * + * { margin-top: 4 * $spacer; }
+
+.divide-y-1 > * + * { border-top: 1px solid var(--divider-border-color); }
+
+.align-top { vertical-align: top; }
+
+.flex-auto { flex: 1 1 auto; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+
+@media screen and (min-width: 660px) {
+  .md\:inline-block { display: inline-block; }
+  .md\:flex { display: flex; }
+
+  .md\:space-x-4 > * + * { margin-left: 4 * $spacer; }
+  .md\:space-x-8 > * + * { margin-left: 8 * $spacer; }
+  .md\:space-y-0 > * + * { margin-top: 0; }
+}

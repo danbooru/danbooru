@@ -9,33 +9,39 @@ div.prose {
   }
 
   h1 {
-    font-size: $dtext_h1_size;
+    font-size: var(--text-xl);
     padding: $h1_padding;
   }
 
   h2 {
-    font-size: $dtext_h2_size;
+    font-size: var(--text-xl);
     padding: $h2_padding;
   }
 
   h3 {
-    font-size: $dtext_h3_size;
+    font-size: var(--text-xl);
     padding: $h3_padding;
   }
 
   h4 {
-    font-size: $dtext_h4_size;
+    font-size: var(--text-xl);
     padding: $h4_padding;
   }
 
   h5 {
-    font-size: $dtext_h5_size;
+    font-size: var(--text-lg);
     padding: $h4_padding;
   }
 
   h6 {
-    font-size: $dtext_h6_size;
+    font-size: var(--text-md);
     padding: $h4_padding;
+  }
+
+  table {
+    th {
+      white-space: nowrap;
+    }
   }
 
   ul {
@@ -51,25 +57,26 @@ div.prose {
     list-style-type: disc;
   }
 
+  code, pre {
+    font: var(--monospace-font);
+    background: var(--dtext-code-background);
+  }
+
   pre {
-    font-family: monospace;
-    font-size: 1.2em;
     margin: 0.5em 0;
     padding: 0.5em 1em;
-    background: var(--dtext-code-background);
     white-space: pre-wrap;
   }
 
   blockquote {
     margin-bottom: 1em;
-    padding: 1em 1em 0.2em;
-    border: var(--dtext-blockquote-border);
-    background: var(--dtext-blockquote-background);
-  }
+    padding-left: 0.5em;
+    opacity: 0.75;
+    border-left: 3px solid var(--dtext-blockquote-border-color);
 
-  code {
-    font-family: monospace;
-    background: var(--dtext-code-background);
+    blockquote {
+      opacity: 1.0;
+    }
   }
 
   .tn {
@@ -94,7 +101,6 @@ div.prose {
   div.expandable-content {
     display: none;
     padding: 0.4em;
-    border-top: 1px solid var(--dtext-expand-border-color);
 
     > :last-child {
       margin-bottom: 0;
@@ -124,6 +130,14 @@ div.prose {
 
   .spoiler {
     background: var(--dtext-spoiler-background-color);
+  }
+
+  details {
+    margin-bottom: 1em;
+
+    summary {
+      margin-bottom: 1em;
+    }
   }
 }
 

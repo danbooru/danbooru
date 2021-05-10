@@ -1,6 +1,6 @@
 <menu id="main-menu" class="main">
   <% if CurrentUser.is_anonymous? %>
-    <%= nav_link_to("Login", login_path) %>
+    <%= nav_link_to("Login", login_path(url: request.fullpath), rel: "nofollow") %>
   <% else %>
     <%= nav_link_to("My Account #{unread_dmail_indicator(CurrentUser.user)}", profile_path) %>
   <% end %>

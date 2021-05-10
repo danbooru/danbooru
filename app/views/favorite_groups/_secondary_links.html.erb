@@ -1,6 +1,6 @@
 <% content_for(:secondary_links) do %>
   <%= subnav_link_to "Listing", favorite_groups_path %>
-  <% if CurrentUser.is_member? %>
+  <% if policy(FavoriteGroup).create? %>
     <%= subnav_link_to "New", new_favorite_group_path %>
   <% end %>
   <%= subnav_link_to "Help", wiki_page_path("help:favorite_groups") %>
@@ -8,8 +8,8 @@
   <% if @favorite_group && !@favorite_group.new_record? %>
     <li>|</li>
     <%= subnav_link_to "Show", favorite_group_path(@favorite_group) %>
-    <%= subnav_link_to "Posts", posts_path(:tags => "favgroup:#{@favorite_group.id}") %>
-    <% if @favorite_group.editable_by?(CurrentUser.user) %>
+    <%= subnav_link_to "Posts", posts_path(:tags => "favgroup:#{@favorite_group.id} status:any") %>
+    <% if policy(@favorite_group).update? %>
       <%= subnav_link_to "Edit", edit_favorite_group_path(@favorite_group) %>
       <%= subnav_link_to "Delete", favorite_group_path(@favorite_group), :method => :delete, :data => {:confirm => "Are you sure you want to delete this favorite group?"} %>
       <% if @favorite_group.post_count <= 100 %>

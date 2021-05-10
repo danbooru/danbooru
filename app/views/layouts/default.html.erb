@@ -1,17 +1,13 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="utf-8">
   <title><%= page_title %></title>
 
   <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-
-  <% if @current_item.try(:prev_page) %>
-    <%= tag.link rel: "prev", href: url_for(nav_params_for(@current_item.prev_page)) %>
-  <% end %>
-
-  <% if @current_item.try(:next_page) %>
-    <%= tag.link rel: "next", href: url_for(nav_params_for(@current_item.next_page)) %>
-  <% end %>
+  <%= render_meta_links @current_item if @current_item.respond_to?(:paginate) %>
+  <%= tag.link rel: "canonical", href: canonical_url %>
+  <%= tag.link rel: "search", type: "application/opensearchdescription+xml", href: opensearch_url(format: :xml, version: 2), title: "Search posts" %>
 
   <%= csrf_meta_tag %>
   <% unless CurrentUser.enable_desktop_mode? %>
@@ -20,70 +16,39 @@
   <% if CurrentUser.user.blacklisted_tags.present? %>
     <meta name="blacklisted-tags" content="<%= CurrentUser.user.blacklisted_tags.gsub(/(?:\r|\n)+/, ",") %>">
   <% end %>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-  <%= javascript_pack_tag "application" %>
+
+  <%# XXX hack to only load Ruffle on Flash posts %>
+  <% if controller_name == "posts" && action_name == "show" && @post&.is_flash? %>
+    <%= javascript_pack_tag "application", "flash" %>
+  <% else %>
+    <%= javascript_pack_tag "application" %>
+  <% end %>
+
   <%= stylesheet_pack_tag "application" %>
-  <% if CurrentUser.user.custom_style.present? %>
+  <% if CurrentUser.user.custom_style.present? && params.fetch(:css, "true").truthy?  %>
     <%= stylesheet_link_tag custom_style_users_path(md5: Digest::MD5.hexdigest(CurrentUser.user.custom_style)), media: "screen" %>
   <% end %>
-  <% if Danbooru.config.twitter_site %>
-    <script type="application/ld+json">
-      {
-        "@context" : "http://schema.org",
-        "@type" : "Organization",
-        "name" : "<%= Danbooru.config.app_name %>",
-        "url" : "<%= root_url %>",
-        "sameAs" : [
-          "https://twitter.com/<%= Danbooru.config.twitter_site[1..-1] %>"
-        ]
-      }
-    </script>
+
+  <% if current_page?(root_url) %>
+    <%= json_ld_website_data %>
   <% end %>
-  <script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "WebSite",
-    "url" : "<%= root_url %>",
-    "potentialAction": [{
-      "@type": "SearchAction",
-      "target": "<%= posts_url %>?tags={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }]
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "http://schema.org",
-    "@type": "WebSite",
-    "name": "<%= Danbooru.config.app_name %>",
-    "alternateName": "Anime Image Board",
-    "url" : "<%= root_url %>"
-  }
-  </script>
-  <script>
-    if (typeof window.Danbooru !== "object") {
-      window.Danbooru = {};
-    }
-
-    window.Danbooru.notice = Danbooru.Utility.notice;
-    window.Danbooru.error = Danbooru.Utility.error;
-
-    window.addthis_config = { ui_click: true };
-  </script>
 
   <%= tag.meta name: "description", content: meta_description %>
-
   <%= tag.meta property: "og:type", content: "website" %>
   <%= tag.meta property: "og:site_name", content: Danbooru.config.app_name %>
   <%= tag.meta property: "og:title", content: page_title %>
   <%= tag.meta property: "og:description", content: meta_description %>
   <%= tag.meta property: "og:url", content: request.original_url %>
 
-  <% if Danbooru.config.twitter_site.present? %>
-    <%= tag.meta name: "twitter:site", content: Danbooru.config.twitter_site %>
-    <%= tag.meta name: "twitter:title", content: page_title %>
-    <%= tag.meta name: "twitter:description", content: meta_description %>
+  <% if Danbooru.config.twitter_username.present? %>
+    <%= tag.meta name: "twitter:site", content: "@#{Danbooru.config.twitter_username}" %>
   <% end %>
+
+  <%= tag.meta name: "twitter:title", content: page_title %>
+  <%= tag.meta name: "twitter:description", content: meta_description %>
+
+  <%= tag.meta name: "git-hash", content: Rails.application.config.x.git_hash %>
+  <%= tag.meta name: "theme-color", content: "hsl(213, 100%, 50%)" %>
 
   <%= yield :html_header %>
   <%= raw Danbooru.config.custom_html_header_content %>
@@ -92,13 +57,13 @@
   <%= render "news_updates/listing" %>
 
   <header id="top">
-    <h1 id="app-name-header"><%= link_to Danbooru.config.app_name, "/" %></h1>
-    
+    <%= link_to Danbooru.config.app_name, root_path, id: "app-name-header", class: "heading" %>
+
     <div id="maintoggle" class="mobile-only">
-      <a href="#"><i id="maintoggle-on" class="fas fa-bars"></i></a>
-      <a href="#"><i id="maintoggle-off" class="fas fa-times" style="display: none;"></i></a>
+      <a href="#"><%= menu_icon(id: "maintoggle-on") %></a>
+      <a href="#"><%= close_icon(id: "maintoggle-off", style: "display: none;") %></a>
     </div>
-    
+
     <nav id="nav">
       <%= render "layouts/main_links" %>
       <% if content_for(:secondary_links).present? %>
@@ -110,6 +75,8 @@
   </header>
 
   <div id="page">
+    <%= render "users/verification_notice" %>
+
     <% if !CurrentUser.is_anonymous? && !CurrentUser.is_gold? && cookies[:hide_upgrade_account_notice].blank? && params[:action] != "upgrade_information" %>
       <%= render "users/upgrade_notice" %>
     <% end %>
@@ -128,6 +95,12 @@
     </div>
 
     <%= yield :layout %>
+  </div>
+
+  <div id="tooltips">
+    <div id="post-tooltips"></div>
+    <div id="user-tooltips"></div>
+    <div id="popup-menus"></div>
   </div>
 
   <%= render "static/footer" %>

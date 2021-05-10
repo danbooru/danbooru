@@ -4,9 +4,7 @@ class RecommendedPostsControllerTest < ActionDispatch::IntegrationTest
   context "The recommended posts controller" do
     setup do
       @user = travel_to(1.month.ago) {create(:user)}
-      as_user do
-        @post = create(:post, :tag_string => "aaaa")
-      end
+      @post = as(@user) { create(:post, tag_string: "aaaa") }
       RecommenderService.stubs(:enabled?).returns(true)
     end
 
@@ -35,6 +33,12 @@ class RecommendedPostsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
         assert_select ".recommended-posts"
         assert_select ".recommended-posts #post_#{@post.id}"
+      end
+
+      should "not show recommendations for users with private favorites to other users" do
+        @other_user = create(:user, enable_private_favorites: true)
+        get_auth recommended_posts_path(search: { user_id: @other_user.id }), @user
+        assert_response 403
       end
     end
   end

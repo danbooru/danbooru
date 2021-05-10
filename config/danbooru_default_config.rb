@@ -1,15 +1,20 @@
 module Danbooru
-  module_function
-
   class Configuration
-    # A secret key used to encrypt session cookies, among other things. If this
-    # token is changed, existing login sessions will become invalid. If this
-    # token is stolen, attackers will be able to forge session cookies and
-    # login as any user.
+    # A secret key used to encrypt session cookies, among other things.
     #
-    # Must be specified. Use `rake secret` to generate a random secret token.
+    # If this key is changed, existing login sessions will become invalid and
+    # all users will be logged out.
+    #
+    # If this key is stolen, attackers will be able to forge session cookies
+    # and login as any user.
+    #
+    # Must be specified. If this is not specified, then a new secret key will
+    # generated every time the server starts, which will log out all users on
+    # every restart.
+    #
+    # Use `rake secret` to generate a random secret key.
     def secret_key_base
-      ENV["SECRET_TOKEN"].presence || File.read(File.expand_path("~/.danbooru/secret_token"))
+      SecureRandom.uuid
     end
 
     # The name of this Danbooru.
@@ -25,14 +30,35 @@ module Danbooru
       "Danbooru"
     end
 
-    # The canonical hostname of the site.
+    # The public domain name of your site, e.g. "danbooru.donmai.us". If your
+    # site were called `www.mybooru.com`, then you would set this to "www.mybooru.com"
+    #
+    # By default, this is set to the machine hostname. You can use `hostnamectl`
+    # to change the machine hostname.
+    #
+    # You can set this to "localhost" if your site doesn't have a public domain name.
     def hostname
       Socket.gethostname
     end
 
+    # The URL of your site, e.g. https://danbooru.donmai.us.
+    #
+    # If you support HTTPS, change this to "https://www.mybooru.com". If you set
+    # this to https://, then you *must* use https:// to access your site. You can't
+    # use http:// because in HTTPS mode session cookies won't be sent over HTTP.
+    #
+    # Images will be served from this URL by default. See the `base_url` option
+    # for the `storage_manager` below if you want to serve images from a
+    # different domain.
+    #
+    # Protip: use ngrok.com for easy HTTPS support during development.
+    def canonical_url
+      "http://#{Danbooru.config.hostname}"
+    end
+
     # Contact email address of the admin.
     def contact_email
-      "webmaster@#{hostname}"
+      "webmaster@#{Danbooru.config.hostname}"
     end
 
     # System actions, such as sending automated dmails, will be performed with
@@ -43,30 +69,45 @@ module Danbooru
       "DanbooruBot"
     end
 
-    def source_code_url
-      "https://github.com/danbooru/danbooru"
+    # The name of the cookie that stores the current user's login session.
+    # Changing this will force all users to login again.
+    def session_cookie_name
+      "_danbooru2_session"
     end
 
-    def commit_url(hash)
-      "#{source_code_url}/commit/#{hash}"
+    # Debug mode does some things to make testing easier. It disables parallel
+    # testing and it replaces Danbooru's custom exception page with the default
+    # Rails exception page. This is only useful during development and testing.
+    #
+    # Usage: `DANBOORU_DEBUG_MODE=true bin/rails test
+    def debug_mode
+      false
+    end
+
+    def source_code_url
+      "https://github.com/danbooru/danbooru"
     end
 
     def issues_url
       "#{source_code_url}/issues"
     end
 
-    # Set the default level, permissions, and other settings for new users here.
-    def customize_new_user(user)
-      # user.level = User::Levels::MEMBER
-      # user.can_approve_posts = false
-      # user.can_upload_free = false
-      #
-      # user.comment_threshold = -1
-      # user.blacklisted_tags = ["spoilers", "guro", "scat", "furry -rating:s"].join("\n")
-      # user.default_image_size = "large"
-      # user.per_page = 20
-      # user.disable_tagged_filenames = false
+    # If true, new accounts will require email verification if they seem
+    # suspicious (they were created using a proxy, multiple accounts were
+    # created by the same IP, etc).
+    #
+    # This doesn't apply to personal or development installs running on
+    # localhost or the local network.
+    #
+    # Disable this if you're running a public booru and you don't want email
+    # verification for new accounts.
+    def new_user_verification?
       true
+    end
+
+    # An array of regexes containing disallowed usernames.
+    def user_name_blacklist
+      []
     end
 
     # Thumbnail size
@@ -84,38 +125,10 @@ module Danbooru
       40
     end
 
-    # Members cannot post more than X comments in an hour.
-    def member_comment_limit
-      2
-    end
-
-    # Users cannot search for more than X regular tags at a time.
-    def base_tag_query_limit
-      6
-    end
-
-    def tag_query_limit
-      if CurrentUser.user.present?
-        CurrentUser.user.tag_query_limit
-      else
-        base_tag_query_limit * 2
-      end
-    end
-
-    # Return true if the given tag shouldn't count against the user's tag search limit.
-    def is_unlimited_tag?(tag)
-      tag.match?(/\A(-?status:deleted|rating:s.*|limit:.+)\z/i)
-    end
-
-    # After this many pages, the paginator will switch to sequential mode.
-    def max_numbered_pages
-      1_000
-    end
-
     # Maximum size of an upload. If you change this, you must also change
     # `client_max_body_size` in your nginx.conf.
     def max_file_size
-      35.megabytes
+      50.megabytes
     end
 
     # Maximum resolution (width * height) of an upload. Default: 441 megapixels (21000x21000 pixels).
@@ -133,8 +146,9 @@ module Danbooru
       40000
     end
 
-    def member_comment_time_threshold
-      1.week.ago
+    # How long pending posts stay in the modqueue before being deleted.
+    def moderation_period
+      3.days
     end
 
     # https://guides.rubyonrails.org/action_mailer_basics.html#action-mailer-configuration
@@ -157,23 +171,21 @@ module Danbooru
     def storage_manager
       # Store files on the local filesystem.
       # base_dir - where to store files (default: under public/data)
-      # base_url - where to serve files from (default: http://#{hostname}/data)
-      # hierarchical: false - store files in a single directory
-      # hierarchical: true - store files in a hierarchical directory structure, based on the MD5 hash
-      StorageManager::Local.new(base_url: "#{CurrentUser.root_url}/data", base_dir: Rails.root.join("public/data"), hierarchical: false)
+      # base_url - where to serve files from (default: https://#{hostname}/data)
+      StorageManager::Local.new(base_url: "#{Danbooru.config.canonical_url}/data", base_dir: Rails.root.join("public/data"))
 
       # Store files on one or more remote host(s). Configure SSH settings in
       # ~/.ssh_config or in the ssh_options param (ref: http://net-ssh.github.io/net-ssh/Net/SSH.html#method-c-start)
-      # StorageManager::SFTP.new("i1.example.com", "i2.example.com", base_dir: "/mnt/backup", hierarchical: false, ssh_options: {})
+      # StorageManager::SFTP.new("i1.example.com", "i2.example.com", base_dir: "/mnt/backup", ssh_options: {})
 
       # Select the storage method based on the post's id and type (preview, large, or original).
       # StorageManager::Hybrid.new do |id, md5, file_ext, type|
       #   ssh_options = { user: "danbooru" }
       #
       #   if type.in?([:large, :original]) && id.in?(0..850_000)
-      #     StorageManager::SFTP.new("raikou1.donmai.us", base_url: "https://raikou1.donmai.us", base_dir: "/path/to/files", hierarchical: true, ssh_options: ssh_options)
+      #     StorageManager::SFTP.new("raikou1.donmai.us", base_url: "https://raikou1.donmai.us", base_dir: "/path/to/files", ssh_options: ssh_options)
       #   elsif type.in?([:large, :original]) && id.in?(850_001..2_000_000)
-      #     StorageManager::SFTP.new("raikou2.donmai.us", base_url: "https://raikou2.donmai.us", base_dir: "/path/to/files", hierarchical: true, ssh_options: ssh_options)
+      #     StorageManager::SFTP.new("raikou2.donmai.us", base_url: "https://raikou2.donmai.us", base_dir: "/path/to/files", ssh_options: ssh_options)
       #   elsif type.in?([:large, :original]) && id.in?(2_000_001..3_000_000)
       #     StorageManager::SFTP.new(*all_server_hosts, base_url: "https://hijiribe.donmai.us/data", ssh_options: ssh_options)
       #   else
@@ -188,7 +200,7 @@ module Danbooru
       StorageManager::Null.new
 
       # Backup files to /mnt/backup on the local filesystem.
-      # StorageManager::Local.new(base_dir: "/mnt/backup", hierarchical: false)
+      # StorageManager::Local.new(base_dir: "/mnt/backup")
 
       # Backup files to /mnt/backup on a remote system. Configure SSH settings
       # in ~/.ssh_config or in the ssh_options param (ref: http://net-ssh.github.io/net-ssh/Net/SSH.html#method-c-start)
@@ -204,7 +216,6 @@ module Danbooru
           "category" => 0,
           "short" => "gen",
           "extra" => [],
-          "header" => %{<h1 class="general-tag-list">Tags</h1>},
           "relatedbutton" => "General",
           "css" => {
             "color" => "var(--general-tag-color)",
@@ -215,7 +226,6 @@ module Danbooru
           "category" => 4,
           "short" => "char",
           "extra" => ["ch"],
-          "header" => %{<h2 class="character-tag-list">Characters</h2>},
           "relatedbutton" => "Characters",
           "css" => {
             "color" => "var(--character-tag-color)",
@@ -226,7 +236,6 @@ module Danbooru
           "category" => 3,
           "short" => "copy",
           "extra" => ["co"],
-          "header" => %{<h2 class="copyright-tag-list">Copyrights</h2>},
           "relatedbutton" => "Copyrights",
           "css" => {
             "color" => "var(--copyright-tag-color)",
@@ -237,7 +246,6 @@ module Danbooru
           "category" => 1,
           "short" => "art",
           "extra" => [],
-          "header" => %{<h2 class="artist-tag-list">Artists</h2>},
           "relatedbutton" => "Artists",
           "css" => {
             "color" => "var(--artist-tag-color)",
@@ -248,7 +256,6 @@ module Danbooru
           "category" => 5,
           "short" => "meta",
           "extra" => [],
-          "header" => %{<h2 class="meta-tag-list">Meta</h2>},
           "relatedbutton" => nil,
           "css" => {
             "color" => "var(--meta-tag-color)",
@@ -262,12 +269,12 @@ module Danbooru
 
     # Sets the order of the split tag header list (presenters/tag_set_presenter.rb)
     def split_tag_header_list
-      @split_tag_header_list ||= ["copyright", "character", "artist", "general", "meta"]
+      @split_tag_header_list ||= ["artist", "copyright", "character", "general", "meta"]
     end
 
     # Sets the order of the categorized tag string (presenters/post_presenter.rb)
     def categorized_tag_list
-      @categorized_tag_list ||= ["copyright", "character", "artist", "meta", "general"]
+      @categorized_tag_list ||= ["artist", "copyright", "character", "meta", "general"]
     end
 
     # Sets the order of the related tag buttons (javascripts/related_tag.js)
@@ -293,33 +300,20 @@ module Danbooru
       restricted_tags + %w[censored condom nipples nude penis pussy sexually_suggestive]
     end
 
+    # If present, the 404 page will show a random post from this pool.
+    def page_not_found_pool_id
+      nil
+    end
+
     # Tags that are only visible to Gold+ users.
     def restricted_tags
       []
     end
 
-    # Counting every post is typically expensive because it involves a sequential scan on
-    # potentially millions of rows. If this method returns a value, then blank searches
-    # will return that number for the fast_count call instead.
-    def blank_tag_search_fast_count
-      nil
-    end
-
-    # DeviantArt login cookies. Login to DeviantArt and extract these from the browser.
-    # https://github.com/danbooru/danbooru/issues/4219
-    def deviantart_cookies
-      {
-        userinfo: "XXX",
-        auth_secure: "XXX",
-        auth: "XXX"
-      }.to_json
-    end
-
-    def pixiv_login
-      nil
-    end
-
-    def pixiv_password
+    # Your Pixiv PHPSESSID cookie. Get this by logging in to Pixiv and using
+    # the devtools to find the PHPSESSID cookie. This is need for Pixiv upload
+    # support.
+    def pixiv_phpsessid
       nil
     end
 
@@ -339,6 +333,15 @@ module Danbooru
       nil
     end
 
+    # Register at https://www.deviantart.com/developers/
+    def deviantart_client_id
+      nil
+    end
+
+    def deviantart_client_secret
+      nil
+    end
+
     # http://tinysubversions.com/notes/mastodon-bot/
     def pawoo_client_id
       nil
@@ -348,21 +351,32 @@ module Danbooru
       nil
     end
 
+    def baraag_client_id
+      nil
+    end
+
+    def baraag_client_secret
+      nil
+    end
+
     # 1. Register app at https://www.tumblr.com/oauth/register.
     # 2. Copy "OAuth Consumer Key" from https://www.tumblr.com/oauth/apps.
     def tumblr_consumer_key
       nil
     end
 
-    # Should return true if the given tag should be suggested for removal in the post replacement dialog box.
-    def remove_tag_after_replacement?(tag)
-      tag =~ /\A(?:replaceme|.*_sample|resized|upscaled|downscaled|md5_mismatch|jpeg_artifacts|corrupted_image|source_request|non-web_source)\z/i
+    # A list of tags that should be removed when a post is replaced. Regexes allowed.
+    def post_replacement_tag_removals
+      %w[replaceme .*_sample resized upscaled downscaled md5_mismatch
+      jpeg_artifacts corrupted_image missing_image missing_sample missing_thumbnail
+      resolution_mismatch source_larger source_smaller source_request non-web_source]
     end
 
     # Posts with these tags will be highlighted in the modqueue.
     def modqueue_warning_tags
       %w[hard_translated self_upload nude_filter third-party_edit screencap
-      duplicate image_sample md5_mismatch resized upscaled downscaled]
+      duplicate image_sample md5_mismatch resized upscaled downscaled
+      resolution_mismatch source_larger source_smaller]
     end
 
     def stripe_secret_key
@@ -371,26 +385,65 @@ module Danbooru
     def stripe_publishable_key
     end
 
+    def stripe_webhook_secret
+    end
+
+    def stripe_gold_usd_price_id
+    end
+
+    def stripe_platinum_usd_price_id
+    end
+
+    def stripe_gold_to_platinum_usd_price_id
+    end
+
+    def stripe_gold_eur_price_id
+    end
+
+    def stripe_platinum_eur_price_id
+    end
+
+    def stripe_gold_to_platinum_eur_price_id
+    end
+
+    def stripe_promotion_discount_id
+    end
+
     def twitter_api_key
     end
 
     def twitter_api_secret
     end
 
-    # The default headers to be sent with outgoing http requests. Some external
-    # services will fail if you don't set a valid User-Agent.
-    def http_headers
-      {
-        "User-Agent" => "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}"
-      }
+    # If defined, Danbooru will automatically post new forum posts to the
+    # Discord channel belonging to this webhook.
+    def discord_webhook_id
     end
 
-    def httparty_options
-      # proxy example:
-      # {http_proxyaddr: "", http_proxyport: "", http_proxyuser: nil, http_proxypass: nil}
-      {
-        headers: Danbooru.config.http_headers
-      }
+    def discord_webhook_secret
+    end
+
+    # Settings used for Discord slash commands.
+    #
+    # * Go to https://discord.com/developers/applications
+    # * Create an application.
+    # * Copy the client ID and public key.
+    # * Create a bot user.
+    # * Copy the bot token.
+    # * Go to the OAuth2 page, select the `bot` and `applications.commands`
+    #   scopes, and the `Administrator` permission, then follow the oauth2
+    #   link to add the bot to the Discord server.
+    def discord_application_client_id
+    end
+
+    def discord_application_public_key
+    end
+
+    def discord_bot_token
+    end
+
+    # The ID of the Discord server to register slash commands for.
+    def discord_guild_id
     end
 
     # you should override this
@@ -398,43 +451,19 @@ module Danbooru
       "zDMSATq0W3hmA5p3rKTgD"
     end
 
-    # For downloads, if the host matches any of these IPs, block it
-    def banned_ip_for_download?(ip_addr)
-      raise ArgumentError unless ip_addr.is_a?(IPAddr)
-
-      if ip_addr.ipv4?
-        if IPAddr.new("127.0.0.1") == ip_addr
-          true
-        elsif IPAddr.new("169.254.0.0/16").include?(ip_addr)
-          true
-        elsif IPAddr.new("10.0.0.0/8").include?(ip_addr)
-          true
-        elsif IPAddr.new("172.16.0.0/12").include?(ip_addr)
-          true
-        elsif IPAddr.new("192.168.0.0/16").include?(ip_addr)
-          true
-        else
-          false
-        end
-      elsif ip_addr.ipv6?
-        if IPAddr.new("::1") == ip_addr
-          true
-        elsif IPAddr.new("fe80::/10").include?(ip_addr)
-          true
-        elsif IPAddr.new("fd00::/8").include?(ip_addr)
-          true
-        else
-          false
-        end
-      else
-        false
-      end
+    # The url of the Discord server associated with this site.
+    def discord_server_url
+      nil
     end
 
-    def twitter_site
+    # The twitter username associated with this site (username only, don't include the @-sign).
+    def twitter_username
+      nil
     end
 
-    def addthis_key
+    def twitter_url
+      return nil unless Danbooru.config.twitter_username.present?
+      "https://twitter.com/#{Danbooru.config.twitter_username}"
     end
 
     # include essential tags in image urls (requires nginx/apache rewrites)
@@ -442,36 +471,21 @@ module Danbooru
       false
     end
 
-    # enable some (donmai-specific) optimizations for post counts
-    def estimate_post_counts
-      false
-    end
-
-    # disable this for tests
-    def enable_sock_puppet_validation?
-      true
-    end
-
-    # Enables recording of popular searches, missed searches, and post view
-    # counts. Requires Reportbooru to be configured and running - see below.
-    def enable_post_search_counts
-      false
-    end
-
-    # reportbooru options - see https://github.com/r888888888/reportbooru
+    # The URL for the Reportbooru server (https://github.com/evazion/reportbooru).
+    # Optional. Used for tracking post views, popular searches, and missed searches.
+    # Set to http://localhost/mock/reportbooru to enable a fake reportbooru
+    # server for development purposes.
     def reportbooru_server
     end
 
     def reportbooru_key
     end
 
-    # iqdbs options - see https://github.com/r888888888/iqdbs
+    # The URL for the IQDBs server (https://github.com/evazion/iqdbs).
+    # Optional. Used for dupe detection and reverse image searches.
+    # Set to http://localhost/mock/iqdbs to enable a fake iqdb server for
+    # development purposes.
     def iqdbs_server
-    end
-
-    # AWS config options
-    def aws_region
-      "us-east-1"
     end
 
     def aws_credentials
@@ -505,16 +519,31 @@ module Danbooru
     def recaptcha_secret_key
     end
 
-    def enable_image_cropping
-      true
-    end
-
     # Akismet API key. Used for Dmail spam detection. http://akismet.com/signup/
     def rakismet_key
     end
 
     def rakismet_url
       "https://#{hostname}"
+    end
+
+    # API key for https://ipregistry.co. Used for looking up IP address
+    # information and for detecting proxies during signup.
+    def ip_registry_api_key
+      nil
+    end
+
+    # The whitelist of email domains allowed for account verification purposes.
+    # If a user signs up from a proxy, they must verify their account using an
+    # email address from one of the domains on this list before they can do
+    # anything on the site. This is meant to prevent users from using
+    # disposable emails to create sockpuppet accounts.
+    #
+    # If this list is empty or nil, then there are no restrictions on which
+    # email domains can be used to verify accounts.
+    def email_domain_verification_list
+      # ["gmail.com", "outlook.com", "yahoo.com"]
+      []
     end
 
     # Cloudflare API token. Used to purge URLs from Cloudflare's cache when a
@@ -527,27 +556,38 @@ module Danbooru
     def cloudflare_zone
     end
 
+    # Google Cloud API key. Used for exporting data to BigQuery and to Google
+    # Cloud Storage. Should be the JSON key object you get after creating a
+    # service account. Must have the "BigQuery User" and "Storage Admin" roles.
+    #
+    # * Go to https://console.cloud.google.com/iam-admin/serviceaccounts and create a service account.
+    # * Go to "Keys" and add a new key.
+    # * Go to https://console.cloud.google.com/iam-admin/iam and add the
+    #   BigQuery User and Storage Admin roles to the service account.
+    # * Paste the JSON key file here.
+    def google_cloud_credentials
+    end
+
+    # The URL for the recommender server (https://github.com/evazion/recommender).
+    # Optional. Used to generate post recommendations.
+    # Set to http://localhost/mock/recommender to enable a fake recommender
+    # server for development purposes.
     def recommender_server
     end
 
+    # Uncomment to enable the Redis cache store. Caching is optional for
+    # small boorus but highly recommended for large multi-user boorus. Redis is
+    # required to enable saved searches.
     def redis_url
-      "redis://localhost:6379"
+      # "redis://localhost:6379"
     end
   end
 
-  class EnvironmentConfiguration
-    def custom_configuration
-      @custom_configuration ||= CustomConfiguration.new
-    end
-
+  EnvironmentConfiguration = Struct.new(:config) do
     def method_missing(method, *args)
       var = ENV["DANBOORU_#{method.to_s.upcase.chomp("?")}"]
 
-      var.presence || custom_configuration.send(method, *args)
+      var.presence || config.send(method, *args)
     end
-  end
-
-  def config
-    @config ||= EnvironmentConfiguration.new
   end
 end

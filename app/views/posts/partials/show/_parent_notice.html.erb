@@ -1,8 +1,8 @@
-This post belongs to a <%= link_to "parent", posts_path(tags: "parent:#{parent.id}") %> <% "(deleted)" if parent.is_deleted? %>
+This post belongs to a <%= link_to "parent", posts_path(tags: "parent:#{parent.id}"), rel: "nofollow" %> <% "(deleted)" if parent.is_deleted? %>
 
 <% children.length.tap do |children_count| %>
   <% if children_count > 1 %>
-    and has <%= link_to pluralize(children_count - 1, "sibling"), posts_path(tags: "parent:#{parent.id}") %>
+    and has <%= link_to pluralize(children_count - 1, "sibling"), posts_path(tags: "parent:#{parent.id}"), rel: "nofollow" %>
   <% end %>
 <% end %>
 

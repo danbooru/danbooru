@@ -1,164 +1,48 @@
 class TagAlias < TagRelationship
-  after_save :create_mod_action
   validates_uniqueness_of :antecedent_name, scope: :status, conditions: -> { active }
   validate :absence_of_transitive_relation
-  validate :wiki_pages_present, on: :create, unless: :skip_secondary_validations
 
-  module ApprovalMethods
-    def approve!(approver: CurrentUser.user, update_topic: true)
-      update(approver: approver, status: "queued")
-      ProcessTagAliasJob.perform_later(self, update_topic: update_topic)
-    end
-  end
-
-  module ForumMethods
-    def forum_updater
-      @forum_updater ||= begin
-        post = if forum_topic
-          forum_post || forum_topic.posts.where("body like ?", TagAliasRequest.command_string(antecedent_name, consequent_name, id) + "%").last
-        else
-          nil
-        end
-        ForumUpdater.new(
-          forum_topic,
-          forum_post: post,
-          expected_title: "Tag alias: #{antecedent_name} -> #{consequent_name}",
-          skip_update: !TagRelationship::SUPPORT_HARD_CODED
-        )
-      end
-    end
-  end
-
-  include ApprovalMethods
-  include ForumMethods
+  before_create :delete_conflicting_relationships
 
   def self.to_aliased(names)
     names = Array(names).map(&:to_s)
     return [] if names.empty?
+
     aliases = active.where(antecedent_name: names).map { |ta| [ta.antecedent_name, ta.consequent_name] }.to_h
+
+    abbreviations = names.select { |name| name.starts_with?("/") && !aliases.has_key?(name) }
+    abbreviations.each do |abbrev|
+      tag = Tag.nonempty.find_by_abbreviation(abbrev)
+      aliases[abbrev] = tag.name if tag.present?
+    end
+
     names.map { |name| aliases[name] || name }
   end
 
-  def process!(update_topic: true)
-    unless valid?
-      raise errors.full_messages.join("; ")
-    end
-
-    CurrentUser.scoped(User.system) do
-      update!(status: "processing")
-      move_aliases_and_implications
-      move_saved_searches
-      ensure_category_consistency
-      update_posts
-      forum_updater.update(approval_message(approver), "APPROVED") if update_topic
-      rename_wiki_and_artist
-      update!(status: "active")
-    end
-  rescue Exception => e
-    CurrentUser.scoped(approver) do
-      forum_updater.update(failure_message(e), "FAILED") if update_topic
-      update(status: "error: #{e}")
-    end
-
-    DanbooruLogger.log(e, tag_alias_id: id, antecedent_name: antecedent_name, consequent_name: consequent_name)
+  def process!
+    TagMover.new(antecedent_name, consequent_name, user: User.system).move!
   end
 
+  # We don't want a -> b && b -> c chains if the b -> c alias was created
+  # first. If the a -> b alias was created first, the new one will be allowed
+  # and the old one will be moved automatically instead.
   def absence_of_transitive_relation
     return if is_rejected?
 
-    # We don't want a -> b && b -> c chains if the b -> c alias was created first.
-    # If the a -> b alias was created first, the new one will be allowed and the old one will be moved automatically instead.
-    if TagAlias.active.exists?(antecedent_name: consequent_name)
-      errors[:base] << "A tag alias for #{consequent_name} already exists"
+    tag_alias = TagAlias.active.find_by(antecedent_name: consequent_name)
+    if tag_alias.present? && tag_alias.consequent_name != antecedent_name
+      errors.add(:base, "#{tag_alias.antecedent_name} is already aliased to #{tag_alias.consequent_name}")
     end
   end
 
-  def move_saved_searches
-    escaped = Regexp.escape(antecedent_name)
-
-    SavedSearch.where("query like ?", "%#{antecedent_name}%").find_each do |ss|
-      ss.query = ss.query.sub(/(?:^| )#{escaped}(?:$| )/, " #{consequent_name} ").strip.gsub(/  /, " ")
-      ss.save
-    end
-  end
-
-  def move_aliases_and_implications
-    aliases = TagAlias.where(["consequent_name = ?", antecedent_name])
-    aliases.each do |ta|
-      ta.consequent_name = self.consequent_name
-      success = ta.save
-      if !success && ta.errors.full_messages.join("; ") =~ /Cannot alias a tag to itself/
-        ta.destroy
-      end
-    end
-
-    implications = TagImplication.where(["antecedent_name = ?", antecedent_name])
-    implications.each do |ti|
-      ti.antecedent_name = self.consequent_name
-      success = ti.save
-      if !success && ti.errors.full_messages.join("; ") =~ /Cannot implicate a tag to itself/
-        ti.destroy
-      end
-    end
-
-    implications = TagImplication.where(["consequent_name = ?", antecedent_name])
-    implications.each do |ti|
-      ti.consequent_name = self.consequent_name
-      success = ti.save
-      if !success && ti.errors.full_messages.join("; ") =~ /Cannot implicate a tag to itself/
-        ti.destroy
-      end
-    end
-  end
-
-  def ensure_category_consistency
-    if antecedent_tag.category != consequent_tag.category && antecedent_tag.category != Tag.categories.general
-      consequent_tag.update_attribute(:category, antecedent_tag.category)
-    end
-  end
-
-  def rename_wiki_and_artist
-    antecedent_wiki = WikiPage.titled(antecedent_name).first
-    if antecedent_wiki.present?
-      if WikiPage.titled(consequent_name).blank?
-        antecedent_wiki.update!(title: consequent_name)
-      else
-        forum_updater.update(conflict_message)
-      end
-    end
-
-    if antecedent_tag.category == Tag.categories.artist
-      if antecedent_tag.artist.present? && consequent_tag.artist.blank?
-        antecedent_tag.artist.update!(name: consequent_name)
-      end
-    end
-  end
-
-  def wiki_pages_present
-    if antecedent_wiki.present? && consequent_wiki.present?
-      errors[:base] << conflict_message
-    elsif antecedent_wiki.blank? && consequent_wiki.blank?
-      errors[:base] << "The #{consequent_name} tag needs a corresponding wiki page"
-    end
-  end
-
-  def create_mod_action
-    alias_desc = %("tag alias ##{id}":[#{Rails.application.routes.url_helpers.tag_alias_path(self)}]: [[#{antecedent_name}]] -> [[#{consequent_name}]])
-
-    if saved_change_to_id?
-      ModAction.log("created #{status} #{alias_desc}", :tag_alias_create)
-    else
-      # format the changes hash more nicely.
-      change_desc = saved_changes.except(:updated_at).map do |attribute, values|
-        old, new = values[0], values[1]
-        if old.nil?
-          %(set #{attribute} to "#{new}")
-        else
-          %(changed #{attribute} from "#{old}" to "#{new}")
-        end
-      end.join(", ")
-
-      ModAction.log("updated #{alias_desc}\n#{change_desc}", :tag_alias_update)
-    end
+  # Allow aliases to be reversed. If A -> B already exists, but we're trying to
+  # create B -> A, then automatically delete A -> B so we can make B -> A.
+  # Also automatically remove implications that are being replaced by aliases
+  def delete_conflicting_relationships
+    tag_relationships = []
+    tag_relationships << TagAlias.active.find_by(antecedent_name: consequent_name, consequent_name: antecedent_name)
+    tag_relationships << TagImplication.active.find_by(antecedent_name: antecedent_name, consequent_name: consequent_name)
+    tag_relationships << TagImplication.active.find_by(antecedent_name: consequent_name, consequent_name: antecedent_name)
+    tag_relationships.each { |rel| rel.reject! if rel.present? }
   end
 end

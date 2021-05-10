@@ -15,14 +15,13 @@ class UploadService
       start!
     end
   rescue ActiveRecord::RecordNotUnique
-    return
   end
 
   def start!
     preprocessor = Preprocessor.new(params)
 
     if preprocessor.in_progress?
-      UploadServiceDelayedStartJob.set(wait: 5.seconds).perform_later(CurrentUser.user)
+      UploadServiceDelayedStartJob.set(wait: 5.seconds).perform_later(params, CurrentUser.user)
       return preprocessor.predecessor
     end
 
@@ -31,8 +30,8 @@ class UploadService
 
       begin
         create_post_from_upload(@upload)
-      rescue Exception => x
-        @upload.update(status: "error: #{x.class} - #{x.message}", backtrace: x.backtrace.join("\n"))
+      rescue Exception => e
+        @upload.update(status: "error: #{e.class} - #{e.message}", backtrace: e.backtrace.join("\n"))
       end
       return @upload
     end
@@ -48,21 +47,21 @@ class UploadService
 
       @upload.update(status: "processing")
 
-      @upload.file = Utils.get_file_for_upload(@upload, file: @upload.file)
+      @upload.file = Utils.get_file_for_upload(@upload, file: @upload.file&.tempfile)
       Utils.process_file(upload, @upload.file)
 
       @upload.save!
       @post = create_post_from_upload(@upload)
-      return @upload
-    rescue Exception => x
-      @upload.update(status: "error: #{x.class} - #{x.message}", backtrace: x.backtrace.join("\n"))
+      @upload
+    rescue Exception => e
+      @upload.update(status: "error: #{e.class} - #{e.message}", backtrace: e.backtrace.join("\n"))
       @upload
     end
   end
 
   def warnings
     return [] if @post.nil?
-    return @post.warnings.full_messages
+    @post.warnings.full_messages
   end
 
   def create_post_from_upload(upload)
@@ -77,7 +76,7 @@ class UploadService
       )
     end
 
-    if upload.include_artist_commentary
+    if upload.has_commentary?
       @post.create_artist_commentary(
         :original_title => upload.artist_commentary_title,
         :original_description => upload.artist_commentary_desc,

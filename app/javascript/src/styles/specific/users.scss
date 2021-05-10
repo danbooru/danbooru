@@ -1,53 +1,33 @@
 div#c-users {
   div#a-show {
-    div.moderation-users-notice {
-      margin: 1em 0;
-      font-weight: bold;
-      color: var(--moderation-report-text-color);
-    }
-
-    div.box {
-      margin-bottom: 2em;
-    }
-
     table.user-statistics {
-      tr {
-        height: 1.75em;
-      }
-
       th {
         width: 15%;
         text-align: right;
         padding-right: 1em;
-        vertical-align: top;
       }
 
-      td {
-        width: 85%;
-        vertical-align: top;
+      .user-verified-email-icon {
+        color: var(--user-verified-email-color);
       }
 
-      p {
-        margin-bottom: 0.5em;
+      .user-unverified-email-icon {
+        color: var(--user-unverified-email-color);
       }
     }
   }
 
   div#a-edit {
-    h1 {
-      margin: 0.5em 0;
-    }
-
-    h2 {
-      margin: 0.5em 0;
-    }
-
     div.input {
       margin-bottom: 2em;
     }
 
     .active {
       color: var(--text-color);
+    }
+
+    #advanced-settings-section {
+      display: none;
     }
   }
 }

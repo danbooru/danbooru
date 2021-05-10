@@ -1,5 +1,5 @@
 <%= render layout: "show" do %>
   <div>
-    <p>This artist entry does not exist. <%= link_to "Create new artist entry", new_artist_path(artist: { name: params[:name] }) %>.</p>
+    <p>This artist entry does not exist. <%= link_to "Create new artist entry", new_artist_path(artist: { name: params[:name] }), rel: "nofollow" %>.</p>
   </div>
 <% end %>

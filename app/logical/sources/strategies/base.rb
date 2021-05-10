@@ -14,6 +14,8 @@
 module Sources
   module Strategies
     class Base
+      class DownloadError < StandardError; end
+
       attr_reader :url, :referer_url, :urls, :parsed_url, :parsed_referer, :parsed_urls
 
       extend Memoist
@@ -35,9 +37,9 @@ module Sources
       #   <tt>referrer_url</tt> so the strategy can discover the HTML
       #   page and other information.
       def initialize(url, referer_url = nil)
-        @url = url
-        @referer_url = referer_url
-        @urls = [url, referer_url].select(&:present?)
+        @url = url.to_s
+        @referer_url = referer_url&.to_s
+        @urls = [@url, @referer_url].select(&:present?)
 
         @parsed_url = Addressable::URI.heuristic_parse(url) rescue nil
         @parsed_referer = Addressable::URI.heuristic_parse(referer_url) rescue nil
@@ -58,8 +60,76 @@ module Sources
       end
 
       def site_name
-        Addressable::URI.heuristic_parse(url).host
-      rescue Addressable::URI::InvalidURIError => e
+        host = Addressable::URI.heuristic_parse(url)&.host
+
+        # XXX should go in dedicated strategies.
+        case host
+        when /amazon\.(com|jp|co\.jp)\z/i
+          "Amazon"
+        when /ask\.fm\z/i
+          "Ask.fm"
+        when /bcy\.net\z/i
+          "BCY"
+        when /booth\.pm\z/i
+          "Booth.pm"
+        when /circle\.ms\z/i
+          "Circle.ms"
+        when /dlsite\.(com|net)\z/i
+          "DLSite"
+        when /doujinshi\.mugimugi\.org\z/i, /doujinshi\.org\z/i
+          "Doujinshi.org"
+        when /erogamescape\.dyndns\.org\z/i
+          "Erogamescape"
+        when /facebook\.com\z/i
+          "Facebook"
+        when /fantia\.jp\z/i
+          "Fantia"
+        when /fc2\.com\z/i
+          "FC2"
+        when /gumroad\.com\z/i
+          "Gumroad"
+        when /instagram\.com\z/i
+          "Instagram"
+        when /ko-fi\.com\z/i
+          "Ko-fi"
+        when /livedoor\.(jp|com)\z/i
+          "Livedoor"
+        when /lofter\.com\z/i
+          "Lofter"
+        when /mangaupdates\.com\z/i
+          "Mangaupdates"
+        when /melonbooks\.co\.jp\z/i
+          "Melonbooks"
+        when /mihuashi\.com\z/i
+          "Mihuashi"
+        when /mixi\.jp\z/i
+          "Mixi.jp"
+        when /patreon\.com\z/i
+          "Patreon"
+        when /piapro\.jp\z/i
+          "Piapro.jp"
+        when /picarto\.tv\z/i
+          "Picarto"
+        when /privatter\.net\z/i
+          "Privatter"
+        when /sakura\.ne\.jp\z/i
+          "Sakura.ne.jp"
+        when /stickam\.jp\z/i
+          "Stickam"
+        when /tinami\.com\z/i
+          "Tinami"
+        when /toranoana\.(jp|shop)\z/i
+          "Toranoana"
+        when /twitch\.tv\z/i
+          "Twitch"
+        when /wikipedia\.org\z/i
+          "Wikipedia"
+        when /youtube\.com\z/i
+          "Youtube"
+        else
+          host
+        end
+      rescue Addressable::URI::InvalidURIError
         nil
       end
 
@@ -90,9 +160,7 @@ module Sources
       # eventually be assigned as the source for the post, but it does not
       # represent what the downloader will fetch.
       def page_url
-        Rails.logger.warn "Valid page url for (#{url}, #{referer_url}) not found"
-
-        return nil
+        nil
       end
 
       # This will be the url stored in posts. Typically this is the page
@@ -127,7 +195,7 @@ module Sources
       # A list of all profile urls associated with the artist. These urls will
       # be suggested when creating a new artist.
       def profile_urls
-        [normalize_for_artist_finder]
+        [profile_url].compact
       end
 
       def artist_commentary_title
@@ -141,40 +209,48 @@ module Sources
       # Subclasses should merge in any required headers needed to access resources
       # on the site.
       def headers
-        return Danbooru.config.http_headers
+        {}
       end
 
       # Returns the size of the image resource without actually downloading the file.
-      def size
-        Downloads::File.new(image_url).size
-      end
-      memoize :size
+      def remote_size
+        response = http_downloader.head(image_url)
+        return nil unless response.status == 200 && response.content_length.present?
 
-      # Subclasses should return true only if the URL is in its final normalized form.
-      #
-      # Sources::Strategies.find("http://img.pixiv.net/img/evazion").normalized_for_artist_finder?
-      # => true
-      # Sources::Strategies.find("http://i2.pixiv.net/img18/img/evazion/14901720_m.png").normalized_for_artist_finder?
-      # => false
-      def normalized_for_artist_finder?
-        false
+        response.content_length.to_i
+      end
+      memoize :remote_size
+
+      # Download the file at the given url, or at the main image url by default.
+      def download_file!(download_url = image_url)
+        raise DownloadError, "Download failed: couldn't find download url for #{url}" if download_url.blank?
+        response, file = http_downloader.download_media(download_url)
+        raise DownloadError, "Download failed: #{download_url} returned error #{response.status}" if response.status != 200
+        file
       end
 
-      # Subclasses should return true only if the URL is a valid URL that could
-      # be converted into normalized form.
-      #
-      # Sources::Strategies.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=18557054").normalizable_for_artist_finder?
-      # => true
-      # Sources::Strategies.find("http://dic.pixiv.net/a/THUNDERproject").normalizable_for_artist_finder?
-      # => false
-      def normalizable_for_artist_finder?
-        normalize_for_artist_finder.present?
+      # A http client for API requests.
+      def http
+        Danbooru::Http.new.public_only
       end
+      memoize :http
+
+      # A http client for downloading files.
+      def http_downloader
+        http.timeout(30).max_size(Danbooru.config.max_file_size).use(:spoof_referrer).use(:unpolish_cloudflare)
+      end
+      memoize :http_downloader
 
       # The url to use for artist finding purposes. This will be stored in the
       # artist entry. Normally this will be the profile url.
       def normalize_for_artist_finder
         profile_url.presence || url
+      end
+
+      # Given a post/image url, this is the normalized url that will be displayed in a post's page in its stead.
+      # This function should never make any network call, even indirectly. Return nil to never normalize.
+      def normalize_for_source
+        nil
       end
 
       def artists
@@ -204,7 +280,7 @@ module Sources
       end
 
       def normalized_tags
-        tags.map { |tag, url| normalize_tag(tag) }.sort.uniq
+        tags.map { |tag, _url| normalize_tag(tag) }.sort.uniq
       end
 
       def normalize_tag(tag)
@@ -213,7 +289,7 @@ module Sources
 
       def translated_tags
         translated_tags = normalized_tags.flat_map(&method(:translate_tag)).uniq.sort
-        translated_tags.reject { |tag| tag.category == Tag.categories.artist }
+        translated_tags.reject(&:artist?)
       end
 
       # Given a tag from the source site, should return an array of corresponding Danbooru tags.
@@ -248,7 +324,7 @@ module Sources
       end
 
       def related_posts(limit = 5)
-        CurrentUser.as_system { Post.tag_match(related_posts_search_query).paginate(1, limit: limit) }
+        Post.system_tag_match(related_posts_search_query).paginate(1, limit: limit)
       end
       memoize :related_posts
 
@@ -258,7 +334,7 @@ module Sources
       end
 
       def to_h
-        return {
+        {
           :artist => {
             :name => artist_name,
             :tag_name => tag_name,
@@ -291,9 +367,8 @@ module Sources
         to_h.to_json
       end
 
-      def http_exists?(url, headers)
-        res = HTTParty.head(url, Danbooru.config.httparty_options.deep_merge(headers: headers))
-        res.success?
+      def http_exists?(url)
+        http_downloader.head(url).status.success?
       end
 
       # Convert commentary to dtext by stripping html tags. Sites can override

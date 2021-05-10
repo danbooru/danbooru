@@ -1,0 +1,36 @@
+article.forum-post {
+  &[data-is-reported="true"] {
+    background-color: var(--moderation-report-background-color);
+  }
+
+  a.voted {
+    font-weight: bold;
+  }
+
+  .vote-score-up {
+    color: var(--forum-vote-up-color);
+  }
+
+  .vote-score-meh {
+    color: var(--forum-vote-meh-color);
+  }
+
+  .vote-score-down {
+    color: var(--forum-vote-down-color);
+  }
+
+  div.content {
+    .edit_forum_post, .edit_forum_topic {
+      display: none;
+    }
+
+    menu.votes {
+      margin: 0.5em 0;
+    }
+  }
+
+  .moderation-report-notice {
+    font-weight: bold;
+    color: var(--moderation-report-text-color);
+  }
+}

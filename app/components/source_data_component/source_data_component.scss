@@ -1,0 +1,32 @@
+div.source-data {
+  border-radius: 4px;
+  border: 1px solid var(--fetch-source-data-border-color);
+
+  &:not(.loading) .source-data-loading { display: none; }
+  &.loading .source-data-content { display: none; }
+  &.loading .source-data-fetch { display: none; }
+
+  th {
+    padding-right: 1rem;
+    padding-bottom: 0.25rem;
+  }
+
+  td {
+    vertical-align: top;
+  }
+
+  .icon {
+    height: 1rem;
+    font-size: 1rem;
+    vertical-align: bottom;
+  }
+
+  .source-data-tag {
+    display: inline-block;
+    background-color: var(--wiki-page-other-name-background-color);
+    padding: 0 0.25rem;
+    margin-right: 0.25rem;
+    margin-bottom: 0.25rem;
+    border-radius: 0.25rem;
+  }
+}

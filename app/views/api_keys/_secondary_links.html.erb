@@ -1,0 +1,5 @@
+<% content_for(:secondary_links) do %>
+  <%= subnav_link_to "Listing", user_api_keys_path(CurrentUser.user.id) %>
+  <%= subnav_link_to "New", new_user_api_key_path(CurrentUser.user.id) %>
+  <%= subnav_link_to "Help", wiki_page_path("help:api") %>
+<% end %>

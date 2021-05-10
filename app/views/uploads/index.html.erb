@@ -3,9 +3,9 @@
     <%= render "uploads/search" %>
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <%= table_for @uploads, {class: "striped autofit", width: "100%"} do |t| %>
+    <%= table_for @uploads, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "Upload" do |upload| %>
-        <%= PostPresenter.preview(upload.post, tags: "user:#{upload.uploader.name}", show_deleted: true) %>
+        <%= post_preview(upload.post, tags: "user:#{upload.uploader.name}", show_deleted: true) %>
       <% end %>
       <% t.column "Info", td: {class: "col-expand upload-info"} do |upload| %>
         <span class="info">
@@ -44,10 +44,12 @@
           <br>
         <% end %>
 
-        <span class="info">
-          <strong>Tags</strong>
-          <%= upload.presenter.inline_tag_list_html %>
-        </span>
+        <% if policy(upload).can_view_tags? %>
+          <span class="info">
+            <strong>Tags</strong>
+            <%= render_inline_tag_list_from_names(upload.tag_string.split) %>
+          </span>
+        <% end %>
       <% end %>
       <% t.column "Uploader" do |upload| %>
         <%= link_to_user upload.uploader %>

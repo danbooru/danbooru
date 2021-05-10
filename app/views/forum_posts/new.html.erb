@@ -1,7 +1,7 @@
 <div id="c-forum-posts">
   <div id="a-new">
-    <% if @forum_topic %>
-      <h1>Reply to <%= @forum_topic.title %></h1>
+    <% if @forum_post.topic.present? %>
+      <h1>Reply to <%= @forum_post.topic.title %></h1>
     <% else %>
       <h1>New Forum Post</h1>
     <% end %>

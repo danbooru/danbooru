@@ -3,11 +3,9 @@ require 'test_helper'
 class DmailsControllerTest < ActionDispatch::IntegrationTest
   context "The dmails controller" do
     setup do
-      @user = create(:user, unread_dmail_count: 1)
-      @unrelated_user = create(:user)
-      as_user do
-        @dmail = create(:dmail, :owner => @user)
-      end
+      @user = create(:user, id: 999, unread_dmail_count: 1)
+      @unrelated_user = create(:moderator_user, id: 1000, name: "reimu")
+      @dmail = create(:dmail, owner: @user, from: @user)
     end
 
     teardown do
@@ -22,9 +20,8 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "with a respond_to_id" do
-        should "check privileges" do
-          @user2 = create(:user)
-          get_auth new_dmail_path, @user2, params: {:respond_to_id => @dmail.id}
+        should "not allow users to quote dmails belonging to unrelated users " do
+          get_auth new_dmail_path, @unrelated_user, params: {:respond_to_id => @dmail.id}
           assert_response 403
         end
 
@@ -43,28 +40,41 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
-      should "show dmails owned by the current user by sent" do
-        get_auth dmails_path, @user, params: {:search => {:owner_id => @dmail.owner_id, :folder => "sent"}}
+      setup do
+        CurrentUser.user = @user
+        @received_dmail = create(:dmail, owner: @user, body: "blah", to: @user, from: @unrelated_user, is_read: true)
+        @deleted_dmail = create(:dmail, owner: @user, title: "UMAD", to: @unrelated_user, from: @user, is_deleted: true)
+        @unrelated_dmail = create(:dmail, owner: @unrelated_user, from: @unrelated_user)
+      end
+
+      should "render" do
+        get_auth dmails_path, @user
         assert_response :success
       end
 
-      should "show dmails owned by the current user by received" do
-        get_auth dmails_path, @user, params: {:search => {:owner_id => @dmail.owner_id, :folder => "received"}}
-        assert_response :success
+      should respond_to_search({}).with { [@deleted_dmail, @received_dmail, @dmail] }
+      should respond_to_search(folder: "sent").with { @dmail }
+      should respond_to_search(folder: "received").with { @received_dmail }
+      should respond_to_search(title_matches: "UMAD").with { @deleted_dmail }
+      should respond_to_search(message_matches: "blah").with { @received_dmail }
+      should respond_to_search(is_read: "true").with { @received_dmail }
+      should respond_to_search(is_deleted: "true").with { @deleted_dmail }
+
+      context "using includes" do
+        should respond_to_search(to_id: 1000).with { @deleted_dmail }
+        should respond_to_search(from_id: 999).with { [@deleted_dmail, @dmail] }
+        should respond_to_search(from_name: "reimu").with { @received_dmail }
+        should respond_to_search(from: {level: User::Levels::MODERATOR}).with { @received_dmail }
       end
 
-      should "not show dmails not owned by the current user" do
-        get_auth dmails_path, @user, params: {:search => {:owner_id => @dmail.owner_id}}
-        assert_response :success
-      end
+      context "as a banned user" do
+        setup do
+          as(create(:admin_user)) do
+            create(:ban, user: @user)
+          end
 
-      should "work for banned users" do
-        as(create(:admin_user)) do
-          create(:ban, :user => @user)
+          should respond_to_search({}).with { [@received_dmail, @dmail] }
         end
-        get_auth dmails_path, @dmail.owner, params: {:search => {:owner_id => @dmail.owner_id, :folder => "sent"}}
-
-        assert_response :success
       end
     end
 
@@ -87,6 +97,11 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
       should "not show dmails not owned by the current user when given an invalid key" do
         get_auth dmail_path(@dmail, key: @dmail.key + "blah"), @unrelated_user
         assert_response 403
+      end
+
+      should "show dmails to the site owner" do
+        get_auth dmail_path(@dmail), create(:owner_user)
+        assert_response :success
       end
 
       should "mark dmails as read" do
@@ -124,6 +139,24 @@ class DmailsControllerTest < ActionDispatch::IntegrationTest
           dmail_attribs = {:to_id => @user_2.id, :title => "abc", :body => "abc"}
           post_auth dmails_path, @user, params: {:dmail => dmail_attribs}
           assert_redirected_to dmail_path(Dmail.last)
+        end
+      end
+
+      should "send an email if the recipient has email notifications turned on" do
+        recipient = create(:user, receive_email_notifications: true, email_address: build(:email_address))
+        post_auth dmails_path, @user, params: { dmail: { to_name: recipient.name, title: "test", body: "test" }}
+
+        assert_redirected_to Dmail.last
+        assert_enqueued_emails 1
+      end
+
+      should "not allow banned users to send dmails" do
+        create(:ban, user: @user)
+        @user.reload
+
+        assert_difference("Dmail.count", 0) do
+          post_auth dmails_path, @user, params: { dmail: { to_id: @unrelated_user.id, title: "abc", body: "abc" }}
+          assert_response 403
         end
       end
     end

@@ -1,19 +1,26 @@
-require "tmpdir"
-
 class Upload < ApplicationRecord
   class Error < StandardError; end
+
+  MAX_VIDEO_DURATION = 140
 
   class FileValidator < ActiveModel::Validator
     def validate(record)
       validate_file_ext(record)
+      validate_integrity(record)
       validate_md5_uniqueness(record)
       validate_video_duration(record)
       validate_resolution(record)
     end
 
     def validate_file_ext(record)
-      if record.file_ext == "bin"
-        record.errors[:file_ext] << "is invalid (only JPEG, PNG, GIF, SWF, MP4, and WebM files are allowed"
+      if record.file_ext.in?(["bin", "swf"])
+        record.errors.add(:file_ext, "is invalid (only JPEG, PNG, GIF, MP4, and WebM files are allowed")
+      end
+    end
+
+    def validate_integrity(record)
+      if record.media_file.is_corrupt?
+        record.errors.add(:file, "is corrupted")
       end
     end
 
@@ -32,24 +39,24 @@ class Upload < ApplicationRecord
         return
       end
 
-      record.errors[:md5] << "duplicate: #{md5_post.id}"
+      record.errors.add(:md5, "duplicate: #{md5_post.id}")
     end
 
     def validate_resolution(record)
       resolution = record.image_width.to_i * record.image_height.to_i
 
       if resolution > Danbooru.config.max_image_resolution
-        record.errors[:base] << "image resolution is too large (resolution: #{(resolution / 1_000_000.0).round(1)} megapixels (#{record.image_width}x#{record.image_height}); max: #{Danbooru.config.max_image_resolution / 1_000_000} megapixels)"
+        record.errors.add(:base, "image resolution is too large (resolution: #{(resolution / 1_000_000.0).round(1)} megapixels (#{record.image_width}x#{record.image_height}); max: #{Danbooru.config.max_image_resolution / 1_000_000} megapixels)")
       elsif record.image_width > Danbooru.config.max_image_width
-        record.errors[:image_width] << "is too large (width: #{record.image_width}; max width: #{Danbooru.config.max_image_width})"
+        record.errors.add(:image_width, "is too large (width: #{record.image_width}; max width: #{Danbooru.config.max_image_width})")
       elsif record.image_height > Danbooru.config.max_image_height
-        record.errors[:image_height] << "is too large (height: #{record.image_height}; max height: #{Danbooru.config.max_image_height})"
+        record.errors.add(:image_height, "is too large (height: #{record.image_height}; max height: #{Danbooru.config.max_image_height})")
       end
     end
 
     def validate_video_duration(record)
-      if record.is_video? && record.video.duration > 120
-        record.errors[:base] << "video must not be longer than 2 minutes"
+      if !record.uploader.is_admin? && record.media_file.is_video? && record.media_file.duration > MAX_VIDEO_DURATION
+        record.errors.add(:base, "video must not be longer than #{MAX_VIDEO_DURATION.seconds.inspect}")
       end
     end
   end
@@ -70,6 +77,7 @@ class Upload < ApplicationRecord
 
   scope :pending, -> { where(status: "pending") }
   scope :preprocessed, -> { where(status: "preprocessed") }
+  scope :completed, -> { where(status: "completed") }
   scope :uploaded_by, ->(user_id) { where(uploader_id: user_id) }
 
   def initialize_attributes
@@ -78,25 +86,25 @@ class Upload < ApplicationRecord
     self.server = Socket.gethostname
   end
 
-  def self.prune!(date = 1.day.ago)
-    where("created_at < ?", date).lock.destroy_all
+  def self.prune!
+    completed.where("created_at < ?", 1.hour.ago).lock.destroy_all
+    preprocessed.where("created_at < ?", 1.day.ago).lock.destroy_all
+    where("created_at < ?", 3.days.ago).lock.destroy_all
   end
 
-  module FileMethods
-    def is_image?
-      %w(jpg gif png).include?(file_ext)
+  def self.visible(user)
+    if user.is_admin?
+      all
+    elsif user.is_anonymous?
+      completed
+    else
+      completed.or(where(uploader: user))
     end
+  end
 
-    def is_flash?
-      %w(swf).include?(file_ext)
-    end
-
-    def is_video?
-      %w(webm mp4).include?(file_ext)
-    end
-
-    def is_ugoira?
-      %w(zip).include?(file_ext)
+  concerning :FileMethods do
+    def media_file
+      @media_file ||= MediaFile.open(file, frame_data: context.to_h.dig("ugoira", "frame_data"))
     end
 
     def delete_files
@@ -105,7 +113,7 @@ class Upload < ApplicationRecord
         return
       end
 
-      DanbooruLogger.info("Uploads: Deleting files for upload md5=#{md5}", upload: as_json)
+      DanbooruLogger.info("Uploads: Deleting files for upload md5=#{md5}")
       Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :original)
       Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :large)
       Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :preview)
@@ -115,7 +123,7 @@ class Upload < ApplicationRecord
     end
   end
 
-  module StatusMethods
+  concerning :StatusMethods do
     def is_pending?
       status == "pending"
     end
@@ -157,7 +165,7 @@ class Upload < ApplicationRecord
     end
   end
 
-  module SourceMethods
+  concerning :SourceMethods do
     def source=(source)
       source = source.unicode_normalize(:nfc)
 
@@ -175,62 +183,46 @@ class Upload < ApplicationRecord
     end
   end
 
-  module VideoMethods
-    def video
-      @video ||= FFMPEG::Movie.new(file.path)
+  def self.search(params)
+    q = search_attributes(params, :id, :created_at, :updated_at, :source, :rating, :parent_id, :server, :md5, :server, :file_ext, :file_size, :image_width, :image_height, :referer_url, :uploader, :post)
+
+    if params[:source_matches].present?
+      q = q.where_like(:source, params[:source_matches])
     end
-  end
 
-  module SearchMethods
-    def search(params)
-      q = super
-
-      q = q.search_attributes(params, :uploader, :post, :source, :rating, :parent_id, :server, :md5, :server, :file_ext, :file_size, :image_width, :image_height, :referer_url)
-
-      if params[:source_matches].present?
-        q = q.where_like(:source, params[:source_matches])
-      end
-
-      if params[:has_post].to_s.truthy?
-        q = q.where.not(post_id: nil)
-      elsif params[:has_post].to_s.falsy?
-        q = q.where(post_id: nil)
-      end
-
-      if params[:status].present?
-        q = q.where_like(:status, params[:status])
-      end
-
-      if params[:backtrace].present?
-        q = q.where_like(:backtrace, params[:backtrace])
-      end
-
-      if params[:tag_string].present?
-        q = q.where_like(:tag_string, params[:tag_string])
-      end
-
-      q.apply_default_order(params)
+    if params[:has_post].to_s.truthy?
+      q = q.where.not(post_id: nil)
+    elsif params[:has_post].to_s.falsy?
+      q = q.where(post_id: nil)
     end
-  end
 
-  include FileMethods
-  include StatusMethods
-  include VideoMethods
-  extend SearchMethods
-  include SourceMethods
+    if params[:status].present?
+      q = q.where_like(:status, params[:status])
+    end
+
+    if params[:backtrace].present?
+      q = q.where_like(:backtrace, params[:backtrace])
+    end
+
+    if params[:tag_string].present?
+      q = q.where_like(:tag_string, params[:tag_string])
+    end
+
+    q.apply_default_order(params)
+  end
 
   def assign_rating_from_tags
-    if rating = Tag.has_metatag?(tag_string, :rating)
+    if rating = PostQueryBuilder.new(tag_string).find_metatag(:rating)
       self.rating = rating.downcase.first
     end
   end
 
-  def presenter
-    @presenter ||= UploadPresenter.new(self)
-  end
-
   def upload_as_pending?
     as_pending.to_s.truthy?
+  end
+
+  def has_commentary?
+    artist_commentary_title.present? || artist_commentary_desc.present? || translated_commentary_title.present? || translated_commentary_desc.present?
   end
 
   def self.available_includes

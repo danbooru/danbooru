@@ -1,12 +1,10 @@
 <div class="report-dialog-body">
   <%= embed_wiki("help:report_notice") %>
 
-  <%# XXX dtext_field expects there to be a `moderation_report` instance variable. %>
-  <% @moderation_report = moderation_report %>
-  <%= edit_form_for(@moderation_report, format: :js, remote: true) do |f| %>
+  <%= edit_form_for(moderation_report, format: :js, remote: true) do |f| %>
     <%= f.hidden_field :model_type %>
     <%= f.hidden_field :model_id %>
-    <%= dtext_field "moderation_report", "reason", preview_id: "dtext-preview-for-moderation-report", type: "string" %>
-    <%= dtext_preview_button "moderation_report", "reason", preview_id: "dtext-preview-for-moderation-report" %>
+    <%= f.input :reason, as: :dtext, inline: true %>
+    <%= dtext_preview_button "moderation_report_reason" %>
   <% end %>
 </div>

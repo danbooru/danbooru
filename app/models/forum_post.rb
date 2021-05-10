@@ -1,8 +1,10 @@
 class ForumPost < ApplicationRecord
   attr_readonly :topic_id
+
   belongs_to :creator, class_name: "User"
   belongs_to_updater
-  belongs_to :topic, :class_name => "ForumTopic"
+  belongs_to :topic, class_name: "ForumTopic", inverse_of: :forum_posts
+
   has_many :dtext_links, as: :model, dependent: :destroy
   has_many :moderation_reports, as: :model
   has_many :votes, class_name: "ForumPostVote"
@@ -10,67 +12,55 @@ class ForumPost < ApplicationRecord
   has_one :tag_implication
   has_one :bulk_update_request
 
+  validates :body, presence: true, length: { maximum: 200_000 }, if: :body_changed?
+
   before_save :update_dtext_links, if: :dtext_links_changed?
   before_create :autoreport_spam
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
   after_destroy :update_topic_updated_at_on_destroy
-  validates_presence_of :body
-  validate :validate_topic_is_unlocked
-  validate :topic_is_not_restricted, :on => :create
   after_save :delete_topic_if_original_post
   after_update(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |rec|
-    ModAction.log("#{CurrentUser.name} updated forum ##{rec.id}", :forum_post_update)
+    ModAction.log("#{CurrentUser.user.name} updated forum ##{rec.id}", :forum_post_update)
   end
   after_destroy(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |rec|
-    ModAction.log("#{CurrentUser.name} deleted forum ##{rec.id}", :forum_post_delete)
+    ModAction.log("#{CurrentUser.user.name} deleted forum ##{rec.id}", :forum_post_delete)
   end
+  after_create_commit :async_send_discord_notification
 
   deletable
   mentionable(
     :message_field => :body,
     :title => ->(user_name) {%{#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})}},
-    :body => ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[/forum_topics/#{topic_id}?page=#{forum_topic_page}]):\n\n[quote]\n#{DText.extract_mention(body, "@" + user_name)}\n[/quote]\n}}
+    :body => ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[#{Routes.forum_topic_path(topic, page: forum_topic_page)}]):\n\n[quote]\n#{DText.extract_mention(body, "@" + user_name)}\n[/quote]\n}}
   )
 
   module SearchMethods
-    def topic_title_matches(title)
-      where(topic_id: ForumTopic.search(title_matches: title).select(:id))
-    end
-
     def visible(user)
       where(topic_id: ForumTopic.visible(user))
     end
 
+    def not_visible(user)
+      where.not(topic_id: ForumTopic.visible(user))
+    end
+
+    def wiki_link_matches(title)
+      where(id: DtextLink.forum_post.wiki_link.where(link_target: WikiPage.normalize_title(title)).select(:model_id))
+    end
+
     def search(params)
-      q = super
-      q = q.search_attributes(params, :creator, :updater, :topic_id, :is_deleted, :body)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :body, :creator, :updater, :topic, :dtext_links, :votes, :tag_alias, :tag_implication, :bulk_update_request)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :text_index)
 
       if params[:linked_to].present?
-        q = q.where(id: DtextLink.forum_post.wiki_link.where(link_target: params[:linked_to]).select(:model_id))
-      end
-
-      if params[:topic_title_matches].present?
-        q = q.topic_title_matches(params[:topic_title_matches])
-      end
-
-      if params[:topic_category_id].present?
-        q = q.where(topic_id: ForumTopic.where(category_id: params[:topic_category_id]))
+        q = q.wiki_link_matches(params[:linked_to])
       end
 
       q.apply_default_order(params)
     end
   end
 
-  module ApiMethods
-    def html_data_attributes
-      super + [[:topic, :is_deleted?]]
-    end
-  end
-
   extend SearchMethods
-  include ApiMethods
 
   def self.new_reply(params)
     if params[:topic_id]
@@ -83,14 +73,6 @@ class ForumPost < ApplicationRecord
     end
   end
 
-  def reportable_by?(user)
-    visible?(user) && creator_id != user.id && !creator.is_moderator?
-  end
-
-  def votable?
-    bulk_update_request.present? && bulk_update_request.is_pending?
-  end
-
   def voted?(user, score)
     votes.where(creator_id: user.id, score: score).exists?
   end
@@ -99,26 +81,6 @@ class ForumPost < ApplicationRecord
     if SpamDetector.new(self, user_ip: CurrentUser.ip_addr).spam?
       moderation_reports << ModerationReport.new(creator: User.system, reason: "Spam.")
     end
-  end
-
-  def validate_topic_is_unlocked
-    if topic.is_locked? && !updater.is_moderator?
-      errors[:topic] << "is locked"
-    end
-  end
-
-  def topic_is_not_restricted
-    if topic && !topic.visible?(creator)
-      errors[:topic] << "is restricted"
-    end
-  end
-
-  def editable_by?(user)
-    (creator_id == user.id || user.is_moderator?) && visible?(user)
-  end
-
-  def visible?(user, show_deleted_posts = false)
-    user.is_moderator? || (topic.visible?(user) && (show_deleted_posts || !is_deleted?))
   end
 
   def update_topic_updated_at_on_create
@@ -199,13 +161,22 @@ class ForumPost < ApplicationRecord
     end
   end
 
+  def async_send_discord_notification
+    DiscordNotificationJob.perform_later(forum_post: self)
+  end
+
+  def send_discord_notification
+    return unless policy(User.anonymous).show?
+    DiscordWebhookService.new.post_message(self)
+  end
+
   def build_response
     dup.tap do |x|
       x.body = x.quoted_response
     end
   end
 
-  def dtext_shortlink
+  def dtext_shortlink(**options)
     "forum ##{id}"
   end
 

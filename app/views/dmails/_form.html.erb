@@ -1,7 +1,7 @@
 <%= edit_form_for(dmail) do |f| %>
   <%= f.input :to_name, :label => "To", :input_html => { value: dmail.to.try(:name), data: { autocomplete: "user" } } %>
   <%= f.input :title, :as => :string %>
-  <%= dtext_field "dmail", "body" %>
+  <%= f.input :body, as: :dtext %>
   <%= f.button :submit, "Send", :data => { :disable_with => "Sending..." } %>
-  <%= dtext_preview_button "dmail", "body" %>
+  <%= dtext_preview_button "dmail_body" %>
 <% end %>

@@ -1,10 +1,6 @@
-<% if @post_disapproval.errors.any? %>
-  Danbooru.error("Error: " + <%= @post_disapproval.errors.full_messages.join("; ").to_json.html_safe %>);
-<% else %>
-  if ($("#c-posts #a-show").length) {
-    location.reload();
-  } else if ($("#c-modqueue").length) {
-    $("#c-modqueue #post-<%= @post_disapproval.post.id %>").hide();
-    Danbooru.notice("Post was hidden");
-  }
-<% end %>
+if ($("#c-posts #a-show").length) {
+  location.reload();
+} else if ($("#c-modqueue").length) {
+  $("#c-modqueue #post-<%= @post_disapproval.post.id %>").hide();
+  Danbooru.notice("Post was hidden");
+}

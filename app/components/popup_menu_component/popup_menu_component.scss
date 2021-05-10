@@ -1,0 +1,39 @@
+@import "../../javascript/src/styles/base/000_vars.scss";
+
+div.popup-menu {
+  display: inline-block;
+
+  a.popup-menu-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    color: var(--muted-text-color);
+
+    // the popup menu is open
+    &[aria-expanded="true"] {
+      @include active-link;
+    }
+
+    // the popup menu is not open
+    &:not([aria-expanded="true"]) {
+      @include inactive-link;
+    }
+  }
+
+  ul.popup-menu-content {
+    display: none;
+
+    li a {
+      display: block;
+      padding: 0.125em 2em 0.125em 0;
+
+      .icon {
+        width: 1rem;
+        margin-right: 0.25rem;
+      }
+    }
+  }
+}

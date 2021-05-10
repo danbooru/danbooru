@@ -1,15 +1,18 @@
 require 'test_helper'
 
 class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
+  def default_search_order(items)
+    ->{ items.each { |val| val.reload }.sort_by(&:updated_at).reverse }
+  end
+
   context "The forum topics controller" do
     setup do
       @user = create(:user)
       @other_user = create(:user)
-      @mod = create(:moderator_user)
+      @mod = create(:moderator_user, name: "okuu")
 
       as(@user) do
-        @forum_topic = create(:forum_topic, creator: @user, title: "my forum topic")
-        @forum_post = create(:forum_post, creator: @user, topic: @forum_topic, body: "xxx")
+        @forum_topic = create(:forum_topic, creator: @user, title: "my forum topic", original_post: build(:forum_post, creator: @user, topic: @forum_topic, body: "xxx"))
       end
     end
 
@@ -69,7 +72,7 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
       should "not record a topic visit for non-html requests" do
         get_auth forum_topic_path(@forum_topic), @user, params: {format: :json}
         @user.reload
-        assert_nil(@user.last_forum_read_at)
+        assert_equal(Time.zone.parse("1960-01-01"), @user.last_forum_read_at)
       end
 
       should "render for atom feed" do
@@ -87,23 +90,27 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        as_user do
-          @topic1 = create(:forum_topic, is_sticky: true, creator: @user)
-          @topic2 = create(:forum_topic, creator: @user)
-          @post1 = create(:forum_post, topic: @topic1, creator: @user, body: "xxx")
-          @post2 = create(:forum_post, topic: @topic2, creator: @user, body: "xxx")
+        as(@user) do
+          @sticky_topic = create(:forum_topic, is_sticky: true, creator: @user, original_post: build(:forum_post))
+          @other_topic = create(:forum_topic, creator: @user, original_post: build(:forum_post))
         end
+        @mod_topic = as(@mod) { create(:forum_topic, creator: @mod, min_level: User::Levels::MODERATOR, original_post: build(:forum_post)) }
+        create(:bulk_update_request, forum_topic: @forum_topic)
+        create(:tag_alias, forum_topic: @other_topic)
       end
 
-      should "list all forum topics" do
+      should "list public forum topics for members" do
         get forum_topics_path
+
         assert_response :success
+        assert_select "a.forum-post-link", count: 1, text: @sticky_topic.title
+        assert_select "a.forum-post-link", count: 1, text: @other_topic.title
       end
 
       should "not list stickied topics first for JSON responses" do
         get forum_topics_path, params: {format: :json}
         forum_topics = JSON.parse(response.body)
-        assert_equal([@topic2.id, @topic1.id, @forum_topic.id], forum_topics.map {|t| t["id"]})
+        assert_equal(default_search_order([@other_topic, @sticky_topic, @forum_topic]).call.map(&:id), forum_topics.map {|t| t["id"]})
       end
 
       should "render for atom feed" do
@@ -111,67 +118,107 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      context "with search conditions" do
-        should "list all matching forum topics" do
-          get forum_topics_path, params: {:search => {:title_matches => "forum"}}
+      should "render for a sitemap" do
+        get forum_topics_path(format: :sitemap)
+        assert_response :success
+        assert_equal(ForumTopic.visible(User.anonymous).count, response.parsed_body.css("urlset url loc").size)
+      end
+
+      context "with private topics" do
+        should "not show private topics to unprivileged users" do
+          as(@user) { @other_topic.update!(min_level: User::Levels::MODERATOR) }
+          get forum_topics_path
+
           assert_response :success
-          assert_select "a.forum-post-link", @forum_topic.title
-          assert_select "a.forum-post-link", count: 0, text: @topic1.title
-          assert_select "a.forum-post-link", count: 0, text: @topic2.title
+          assert_select "a.forum-post-link", count: 1, text: @sticky_topic.title
+          assert_select "a.forum-post-link", count: 0, text: @other_topic.title
         end
 
-        should "list nothing for when the search matches nothing" do
-          get forum_topics_path, params: {:search => {:title_matches => "bababa"}}
+        should "show private topics to privileged users" do
+          as(@user) { @other_topic.update!(min_level: User::Levels::MODERATOR) }
+          get_auth forum_topics_path, @mod
+
           assert_response :success
-          assert_select "a.forum-post-link", count: 0, text: @forum_topic.title
-          assert_select "a.forum-post-link", count: 0, text: @topic1.title
-          assert_select "a.forum-post-link", count: 0, text: @topic2.title
+          assert_select "a.forum-post-link", count: 1, text: @sticky_topic.title
+          assert_select "a.forum-post-link", count: 1, text: @other_topic.title
+        end
+      end
+
+      context "with search conditions" do
+        context "as a user" do
+          setup do
+            CurrentUser.user = @user
+          end
+
+          should respond_to_search({}).with { default_search_order([@sticky_topic, @other_topic, @forum_topic]) }
+          should respond_to_search(order: "id").with { [@other_topic, @sticky_topic, @forum_topic] }
+          should respond_to_search(title_matches: "forum").with { @forum_topic }
+          should respond_to_search(title_matches: "bababa").with { [] }
+          should respond_to_search(is_sticky: "true").with { @sticky_topic }
+
+          context "using includes" do
+            should respond_to_search(forum_posts: {body_matches: "xxx"}).with { @forum_topic }
+            should respond_to_search(has_bulk_update_requests: "true").with { @forum_topic }
+            should respond_to_search(has_tag_aliases: "true").with { @other_topic }
+            should respond_to_search(creator_name: "okuu").with { [] }
+          end
+        end
+
+        context "as a moderator" do
+          setup do
+            CurrentUser.user = @mod
+          end
+
+          should respond_to_search({}).with { default_search_order([@sticky_topic, @other_topic, @mod_topic, @forum_topic]) }
+
+          context "using includes" do
+            should respond_to_search(creator_name: "okuu").with { @mod_topic }
+          end
         end
       end
 
       context "when listing topics" do
         should "always show topics as read for anonymous users" do
           get forum_topics_path
-          assert_select "span.new", count: 0
+          assert_select 'tr[data-is-read="false"]', count: 0
         end
 
         should "show topics as read after viewing them" do
           get_auth forum_topics_path, @user
           assert_response :success
-          assert_select "span.new", count: 3
+          assert_select 'tr[data-is-read="false"]', count: 3
 
           get_auth forum_topic_path(@forum_topic.id), @user
           assert_response :success
 
           get_auth forum_topics_path, @user
           assert_response :success
-          assert_select "span.new", count: 2
         end
 
         should "show topics as read after marking all as read" do
           get_auth forum_topics_path, @user
           assert_response :success
-          assert_select "span.new", count: 3
+          assert_select 'tr[data-is-read="false"]', count: 3
 
           post_auth mark_all_as_read_forum_topics_path, @user
           assert_response 302
 
           get_auth forum_topics_path, @user
           assert_response :success
-          assert_select "span.new", count: 0
+          assert_select 'tr[data-is-read="false"]', count: 0
         end
 
         should "show topics on page 2 as read after marking all as read" do
           get_auth forum_topics_path(page: 2, limit: 1), @user
           assert_response :success
-          assert_select "span.new", count: 1
+          assert_select 'tr[data-is-read="false"]', count: 1
 
           post_auth mark_all_as_read_forum_topics_path, @user
           assert_response 302
 
           get_auth forum_topics_path(page: 2, limit: 1), @user
           assert_response :success
-          assert_select "span.new", count: 0
+          assert_select 'tr[data-is-read="false"]', count: 0
         end
       end
     end
@@ -218,12 +265,35 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to forum_topic_path(@forum_topic)
         assert_equal(true, @forum_topic.reload.is_locked)
       end
+
+      should "allow users to update their own topics" do
+        put_auth forum_topic_path(@forum_topic), @user, params: { forum_topic: { title: "test" }}
+
+        assert_redirected_to forum_topic_path(@forum_topic)
+        assert_equal("test", @forum_topic.reload.title)
+      end
+
+      should "not allow users to update locked topics" do
+        as(@mod) { @forum_topic.update!(is_locked: true) }
+        put_auth forum_topic_path(@forum_topic), @user, params: { forum_topic: { title: "test" }}
+
+        assert_response 403
+        assert_not_equal("test", @forum_topic.reload.title)
+      end
+
+      should "allow mods to update locked topics" do
+        as(@mod) { @forum_topic.update!(is_locked: true) }
+        put_auth forum_topic_path(@forum_topic), @mod, params: { forum_topic: { title: "test" }}
+
+        assert_redirected_to forum_topic_path(@forum_topic)
+        assert_equal("test", @forum_topic.reload.title)
+      end
     end
 
     context "destroy action" do
       setup do
-        as_user do
-          @post = create(:forum_post, :topic_id => @forum_topic.id)
+        as(@user) do
+          @post = create(:forum_post, topic: @forum_topic)
         end
       end
 

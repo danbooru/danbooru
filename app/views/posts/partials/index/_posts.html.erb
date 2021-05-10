@@ -1,6 +1,10 @@
-<div id="posts" class="user-disable-cropped-<%= Danbooru.config.enable_image_cropping && CurrentUser.user.disable_cropped_thumbnails? %>">
+<div id="posts" class="user-disable-cropped-<%= CurrentUser.user.disable_cropped_thumbnails? %>">
   <div id="posts-container">
-    <%= post_set.presenter.post_previews_html(self) %>
+    <% if post_set.shown_posts.empty? %>
+      <%= render "post_sets/blank" %>
+    <% else %>
+      <%= post_previews_html(post_set.posts, show_deleted: post_set.show_deleted?, show_cropped: true, tags: post_set.tag_string) %>
+    <% end %>
   </div>
 
   <% if post_set.hidden_posts.present? %>
@@ -19,10 +23,17 @@
     </div>
   <% end %>
 
-  <% if show_tag_change_notice? %>
-    <div class="fineprint tag-change-notice">
-      <p>This tag is the subject of an ongoing discussion. If you have any relevant information, please join the <%= link_to "discussion", forum_topic_path(TagChangeNoticeService.get_forum_topic_id(params[:tags]) || 1) %>.</p>
-    </div>
+  <% if !CurrentUser.user.is_anonymous? && post_set.tag.present? && post_set.current_page == 1 %>
+    <% cache("tag-change-notice:#{post_set.tag.name}", expires_in: 4.hours) do %>
+      <% if post_set.pending_bulk_update_requests.present? %>
+        <div class="fineprint tag-change-notice">
+          <p>
+            This tag is being discussed in
+            <%= to_sentence post_set.pending_bulk_update_requests.map { |bur| link_to "Topic ##{bur.forum_topic_id}: #{bur.forum_topic.title}", bur.forum_post } %>.
+          </p>
+        </div>
+      <% end %>
+    <% end %>
   <% end %>
 
   <% unless post_set.is_random? %>

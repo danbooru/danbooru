@@ -2,24 +2,24 @@ module DanbooruMaintenance
   module_function
 
   def hourly
+    safely { Upload.prune! }
+    safely { PostPruner.prune! }
+    safely { PostAppealForumUpdater.update_forum! }
+    safely { RateLimit.prune! }
+    safely { regenerate_post_counts! }
   end
 
   def daily
-    safely { PostPruner.new.prune! }
-    safely { Upload.prune! }
     safely { Delayed::Job.where('created_at < ?', 45.days.ago).delete_all }
     safely { PostDisapproval.prune! }
-    safely { PostDisapproval.dmail_messages! }
-    safely { regenerate_post_counts! }
-    safely { TokenBucket.prune! }
-    safely { TagChangeRequestPruner.warn_all }
-    safely { TagChangeRequestPruner.reject_all }
+    safely { BulkUpdateRequestPruner.warn_old }
+    safely { BulkUpdateRequestPruner.reject_expired }
     safely { Ban.prune! }
+    safely { BigqueryExportService.async_export_all! }
     safely { ActiveRecord::Base.connection.execute("vacuum analyze") unless Rails.env.test? }
   end
 
   def weekly
-    safely { UserPasswordResetNonce.prune! }
     safely { TagRelationshipRetirementService.find_and_retire! }
     safely { ApproverPruner.dmail_inactive_approvers! }
   end
@@ -37,8 +37,12 @@ module DanbooruMaintenance
 
   def safely(&block)
     ActiveRecord::Base.connection.execute("set statement_timeout = 0")
-    yield
+
+    CurrentUser.scoped(User.system, "127.0.0.1") do
+      yield
+    end
   rescue StandardError => exception
     DanbooruLogger.log(exception)
+    raise exception if Rails.env.test?
   end
 end

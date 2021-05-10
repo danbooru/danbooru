@@ -1,5 +1,13 @@
+<%= render "secondary_links" %>
+
 <div id="c-ip-addresses">
   <div id="a-index">
+    <% if @ip_address %>
+      <h1>IP Address: <%= @ip_address.ip_addr %></h1>
+    <% else %>
+      <h1>IP Addresses</h1>
+    <% end %>
+
     <%= search_form_for(ip_addresses_path) do |f| %>
       <%= f.input :user_id, label: "User ID", input_html: { value: params[:search][:user_id] }, hint: "Separate with spaces" %>
       <%= f.input :user_name, label: "User Name", input_html: { "data-autocomplete": "user", value: params[:search][:user_name] }, hint: "Use * for wildcard" %>

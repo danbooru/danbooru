@@ -11,6 +11,15 @@ class ArtistCommentary < ApplicationRecord
   after_save :create_version
   after_commit :tag_post
 
+  scope :original_absent, -> { where(original_title: "").where(original_description: "") }
+  scope :original_present, -> { where.not(original_title: "").or(where.not(original_description: "")) }
+  scope :translation_absent, -> { where(translated_title: "").where(translated_description: "") }
+  scope :translation_present, -> { where.not(translated_title: "").or(where.not(translated_description: "")) }
+  scope :translated, -> { original_present.translation_present }
+  scope :untranslated, -> { original_present.translation_absent }
+  scope :deleted, -> { original_absent.translation_absent }
+  scope :undeleted, -> { original_present.or(translation_present) }
+
   module SearchMethods
     def text_matches(query)
       query = "*#{query}*" unless query =~ /\*/
@@ -21,18 +30,8 @@ class ArtistCommentary < ApplicationRecord
         .or(where_ilike(:translated_description, query))
     end
 
-    def deleted
-      where(original_title: "", original_description: "", translated_title: "", translated_description: "")
-    end
-
-    def undeleted
-      where("original_title != '' OR original_description != '' OR translated_title != '' OR translated_description != ''")
-    end
-
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :post, :original_title, :original_description, :translated_title, :translated_description)
+      q = search_attributes(params, :id, :created_at, :updated_at, :original_title, :original_description, :translated_title, :translated_description, :post)
 
       if params[:text_matches].present?
         q = q.text_matches(params[:text_matches])

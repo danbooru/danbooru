@@ -1,29 +1,26 @@
 /* eslint no-console:0 */
-
 function importAll(r) {
   r.keys().forEach(r);
 }
 
+// XXX for dropzone.
+import "core-js/web/dom-collections";
+
 require('@rails/ujs').start();
 require('hammerjs');
-require('stupid-table-plugin');
 require('jquery-hotkeys');
 
 // should start looking for nodejs replacements
 importAll(require.context('../vendor', true, /\.js$/));
 
-require("jquery-ui/ui/effects/effect-shake");
+import jQuery from 'jquery';
 require("jquery-ui/ui/widgets/autocomplete");
 require("jquery-ui/ui/widgets/button");
 require("jquery-ui/ui/widgets/dialog");
-require("jquery-ui/ui/widgets/draggable");
-require("jquery-ui/ui/widgets/resizable");
 require("jquery-ui/themes/base/core.css");
 require("jquery-ui/themes/base/autocomplete.css");
 require("jquery-ui/themes/base/button.css");
 require("jquery-ui/themes/base/dialog.css");
-require("jquery-ui/themes/base/draggable.css");
-require("jquery-ui/themes/base/resizable.css");
 require("jquery-ui/themes/base/theme.css");
 
 require("@fortawesome/fontawesome-free/css/fontawesome.css");
@@ -32,20 +29,51 @@ require("@fortawesome/fontawesome-free/css/regular.css");
 
 importAll(require.context('../src/javascripts', true, /\.js(\.erb)?$/));
 importAll(require.context('../src/styles', true, /\.s?css(?:\.erb)?$/));
+importAll(require.context('../../components', true, /\.js(\.erb)?$/));
+importAll(require.context('../../components', true, /\.s?css(?:\.erb)?$/));
 
-export { default as Autocomplete } from '../src/javascripts/autocomplete.js.erb';
-export { default as Blacklist } from '../src/javascripts/blacklists.js';
-export { default as Comment } from '../src/javascripts/comments.js';
-export { default as CurrentUser } from '../src/javascripts/current_user.js';
-export { default as Dtext } from '../src/javascripts/dtext.js';
-export { default as IqdbQuery } from '../src/javascripts/iqdb_queries.js';
-export { default as Note } from '../src/javascripts/notes.js';
-export { default as Post } from '../src/javascripts/posts.js.erb';
-export { default as PostModeMenu } from '../src/javascripts/post_mode_menu.js';
-export { default as PostTooltip } from '../src/javascripts/post_tooltips.js';
-export { default as PostVersion } from '../src/javascripts/post_version.js';
-export { default as RelatedTag } from '../src/javascripts/related_tag.js';
-export { default as Shortcuts } from '../src/javascripts/shortcuts.js';
-export { default as Upload } from '../src/javascripts/uploads.js.erb';
-export { default as Utility } from '../src/javascripts/utility.js';
-export { default as Ugoira } from '../src/javascripts/ugoira.js';
+import Autocomplete from "../src/javascripts/autocomplete.js.erb";
+import Blacklist from "../src/javascripts/blacklists.js";
+import CommentComponent from "../../components/comment_component/comment_component.js";
+import CurrentUser from "../src/javascripts/current_user.js";
+import Dtext from "../src/javascripts/dtext.js";
+import IqdbQuery from "../src/javascripts/iqdb_queries.js";
+import Note from "../src/javascripts/notes.js";
+import PopupMenuComponent from "../../components/popup_menu_component/popup_menu_component.js";
+import Post from "../src/javascripts/posts.js.erb";
+import PostModeMenu from "../src/javascripts/post_mode_menu.js";
+import PostTooltip from "../src/javascripts/post_tooltips.js";
+import RelatedTag from "../src/javascripts/related_tag.js";
+import Shortcuts from "../src/javascripts/shortcuts.js";
+import TagCounter from "../src/javascripts/tag_counter.js";
+import Upload from "../src/javascripts/uploads.js.erb";
+import UserTooltip from "../src/javascripts/user_tooltips.js";
+import Utility from "../src/javascripts/utility.js";
+import Ugoira from "../src/javascripts/ugoira.js"
+
+let Danbooru = {};
+Danbooru.Autocomplete = Autocomplete;
+Danbooru.Blacklist = Blacklist;
+Danbooru.CommentComponent = CommentComponent;
+Danbooru.CurrentUser = CurrentUser;
+Danbooru.Dtext = Dtext;
+Danbooru.IqdbQuery = IqdbQuery;
+Danbooru.Note = Note;
+Danbooru.PopupMenuComponent = PopupMenuComponent;
+Danbooru.Post = Post;
+Danbooru.PostModeMenu = PostModeMenu;
+Danbooru.PostTooltip = PostTooltip;
+Danbooru.RelatedTag = RelatedTag;
+Danbooru.Shortcuts = Shortcuts;
+Danbooru.TagCounter = TagCounter;
+Danbooru.Upload = Upload;
+Danbooru.UserTooltip = UserTooltip;
+Danbooru.Utility = Utility;
+Danbooru.Ugoira = Ugoira;
+
+Danbooru.notice = Utility.notice;
+Danbooru.error = Utility.error;
+
+window.$ = jQuery;
+window.jQuery = jQuery;
+window.Danbooru = Danbooru;

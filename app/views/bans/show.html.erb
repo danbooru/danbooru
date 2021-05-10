@@ -5,10 +5,10 @@
   <div id="a-show">
     <h1>Show Ban</h1>
     <ul style="margin-bottom: 1em;">
-      <li><strong>User</strong>: <%= link_to_user(@ban.user) %></li>
-      <li><strong>Expires</strong>: <%= compact_time @ban.expires_at %></li>
+      <li><strong>User</strong> <%= link_to_user(@ban.user) %></li>
+      <li><strong>Duration</strong> <%= humanized_duration(@ban.created_at, @ban.expires_at) %></li>
       <li>
-        <strong>Reason</strong>:
+        <strong>Reason</strong>
         <div class="prose">
           <%= format_text @ban.reason %>
         </div>

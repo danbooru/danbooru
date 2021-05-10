@@ -2,7 +2,7 @@
   <div id="a-index">
     <h1>Delayed Jobs</h1>
 
-    <%= table_for @delayed_jobs, {class: "striped autofit"} do |t| %>
+    <%= table_for @delayed_jobs, class: "striped autofit" do |t| %>
       <% t.column :queue %>
       <% t.column "Name" do |job| %>
         <%= raw print_name(job) %>
@@ -24,7 +24,7 @@
         <%= time_ago_in_words_tagged(job.run_at) %>
       <% end %>
       <% t.column column: "control" do |job| %>
-        <% if CurrentUser.is_admin? %>
+        <% if DelayedJobPolicy.new(CurrentUser.user, job).update? %>
           <% if job.locked_at? %>
             Running
           <% elsif job.failed? %>

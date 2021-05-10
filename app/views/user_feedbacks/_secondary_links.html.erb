@@ -1,12 +1,20 @@
 <% content_for(:secondary_links) do %>
-  <% if CurrentUser.is_gold? %>
-    <% if @user_feedback %>
-      <%= subnav_link_to "New", new_user_feedback_path(:user_feedback => {:user_id => @user_feedback.user_id}) %>
+  <%= quick_search_form_for(:user_name, user_feedbacks_path, "users", autocomplete: "user") %>
+  <%= subnav_link_to "Listing", user_feedbacks_path %>
+  <% if policy(IpAddress).index? %>
+    <%= subnav_link_to "IP Addresses", ip_addresses_path %>
+  <% end %>
+  <% if policy(IpBan).index? %>
+    <%= subnav_link_to "IP Bans", ip_bans_path %>
+  <% end %>
+  <%= subnav_link_to "Bans", bans_path %>
+  <% if policy(UserFeedback.new).create? %>
+    <% if @user_feedback.present? && policy(@user_feedback).create? %>
+      | <%= subnav_link_to "New", new_user_feedback_path(:user_feedback => {:user_id => @user_feedback.user_id}) %>
     <% elsif params[:search] && params[:search][:user_id] %>
-      <%= subnav_link_to "New", new_user_feedback_path(:user_feedback => {:user_id => params[:search][:user_id]}) %>
+      | <%= subnav_link_to "New", new_user_feedback_path(:user_feedback => {:user_id => params[:search][:user_id]}) %>
     <% else %>
-      <%= subnav_link_to "New", new_user_feedback_path %>
+      | <%= subnav_link_to "New", new_user_feedback_path %>
     <% end %>
   <% end %>
-  <%= subnav_link_to "Listing", user_feedbacks_path %>
 <% end %>

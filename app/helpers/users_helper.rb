@@ -15,4 +15,8 @@ module UsersHelper
     verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.email_key, serializer: JSON, digest: "SHA256")
     verifier.generate(user.id.to_s)
   end
+
+  def email_verification_url(user)
+    verify_user_email_url(user, email_verification_key: user.email_address.verification_key)
+  end
 end

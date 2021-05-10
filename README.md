@@ -1,3 +1,25 @@
+[![codecov](https://codecov.io/gh/danbooru/danbooru/branch/master/graph/badge.svg)](https://codecov.io/gh/danbooru/danbooru) [![Discord](https://img.shields.io/discord/310432830138089472?label=Discord)](https://discord.gg/eSVKkUF)
+
+## Quickstart
+
+Clone this repository and run `bin/danbooru` to start a basic Danbooru instance:
+
+```sh
+git clone https://github.com/danbooru/danbooru
+cd danbooru
+./bin/danbooru
+```
+
+This will install [Docker Compose](https://docs.docker.com/compose/) and use it
+to start Danbooru. This will take several minutes and produce lots of output.
+When it's done, Danbooru will be running at http://localhost.
+
+Alternatively, if you already have Docker Compose installed, you can just do:
+
+```sh
+docker-compose -f config/docker/docker-compose.simple.yaml up
+```
+
 ## Installation
 
 It is recommended that you install Danbooru on a Debian-based system
@@ -8,7 +30,7 @@ simple to adapt for other platforms.
 
 For best performance, you will need at least 256MB of RAM for
 PostgreSQL and Rails. The memory requirement will grow as your
-database gets bigger. 
+database gets bigger.
 
 On production Danbooru uses PostgreSQL 9.4, but any 9.x release should
 work.
@@ -39,7 +61,7 @@ debug your Nginx configuration file.
 
 ## Services
 
-Danbooru employs numerous external services to delegate some 
+Danbooru employs numerous external services to delegate some
 functionality.
 
 For development purposes, you can just run mocked version of these
@@ -48,7 +70,7 @@ automatically using Foreman and the provided Procfile.
 
 ### Amazon Web Services
 
-In order to enable the following features, you will need an AWS SQS 
+In order to enable the following features, you will need an AWS SQS
 account:
 
 * Pool versions
@@ -66,11 +88,11 @@ The following features requires a Google API account:
 
 ### IQDB Service
 
-IQDB integration is delegated to the [IQDBS service](https://github.com/r888888888/iqdbs). 
+IQDB integration is delegated to the [IQDBS service](https://github.com/r888888888/iqdbs).
 
 ### Archive Service
 
-In order to access versioned data for pools and posts you will 
+In order to access versioned data for pools and posts you will
 need to install and configure the [Archives service](https://github.com/r888888888/archives).
 
 ### Reportbooru Service

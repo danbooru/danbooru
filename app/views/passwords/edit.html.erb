@@ -1,0 +1,20 @@
+<% page_title "Change Password" %>
+
+<div id="c-passwords">
+  <div id="a-edit">
+    <h1>Change Password</h1>
+
+    <p>Enter a new password below.</p>
+
+    <%= edit_form_for(@user, url: user_password_path(@user)) do |f| %>
+      <% if params[:signed_user_id] %>
+        <%= f.input :signed_user_id, as: :hidden, input_html: { value: params[:signed_user_id] }  %>
+      <% else %>
+        <%= f.input :old_password, as: :password, hint: "Re-enter your current password." %>
+      <% end %>
+      <%= f.input :password, label: "New password", hint: "Must be at least 5 characters long." %>
+      <%= f.input :password_confirmation, label: "Confirm new password" %>
+      <%= f.submit "Save" %>
+    <% end %>
+  </div>
+</div>

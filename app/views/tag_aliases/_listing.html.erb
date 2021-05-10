@@ -1,29 +1,34 @@
-<%= table_for tag_aliases, width: "100%" do |t| %>
-  <% t.column "From", width: "25%" do |tag_alias| %>
+<%= table_for tag_aliases, class: "striped autofit" do |t| %>
+  <% t.column "From", width: "30%" do |tag_alias| %>
     <%= link_to tag_alias.antecedent_name, posts_path(tags: tag_alias.antecedent_name), class: tag_class(tag_alias.antecedent_tag) %>
     <%= link_to "»", tag_aliases_path(search: { antecedent_name_ilike: tag_alias.antecedent_name }) %>
     <span class="count"><%= tag_alias.antecedent_tag&.post_count.to_i %></span>
   <% end %>
-  <% t.column "To", width: "25%" do |tag_alias| %>
+  <% t.column "To", td: { class: "col-expand" } do |tag_alias| %>
     <%= link_to tag_alias.consequent_name, posts_path(tags: tag_alias.consequent_name), class: tag_class(tag_alias.consequent_tag) %>
     <%= link_to "»", tag_aliases_path(search: { consequent_name_ilike: tag_alias.consequent_name }) %>
     <span class="count"><%= tag_alias.consequent_tag&.post_count.to_i %></span>
   <% end %>
-  <% t.column "Topic", width: "10%" do |tag_alias| %>
+  <% t.column "Reason" do |tag_alias| %>
+    <span class="prose">
+      <%= format_text(tag_alias.reason, inline: true) %>
+    </span>
+  <% end %>
+  <% t.column "Topic" do |tag_alias| %>
     <% if tag_alias.forum_topic_id %>
       <%= link_to "topic ##{tag_alias.forum_topic_id}", forum_topic_path(tag_alias.forum_topic_id) %>
     <% end %>
   <% end %>
-  <% t.column "Approver", width: "15%" do |tag_alias| %>
+  <% t.column "Approver" do |tag_alias| %>
     <%= link_to_user(tag_alias.approver) if tag_alias.approver %>
   <% end %>
-  <% t.column "Status", width: "5%" do |tag_alias| %>
+  <% t.column "Status" do |tag_alias| %>
     <span id="tag-alias-status-for-<%= tag_alias.id %>"><%= tag_alias.status %></span>
   <% end %>
-  <% t.column column: "control", width: "15%" do |tag_alias| %>
+  <% t.column column: "control" do |tag_alias| %>
     <%= link_to "Show", tag_alias_path(tag_alias) %>
 
-    <% if tag_alias.deletable_by?(CurrentUser.user) %>
+    <% if policy(tag_alias).destroy? %>
       | <%= link_to "Delete", tag_alias_path(tag_alias), :remote => true, :method => :delete, :data => {:confirm => "Are you sure you want to delete this alias?"} %>
     <% end %>
   <% end %>

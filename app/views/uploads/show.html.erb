@@ -5,7 +5,9 @@
     <ul>
       <li>Date: <%= @upload.created_at %></li>
       <li>Source: <%= @upload.source %></li>
-      <li>Tags: <%= @upload.tag_string %></li>
+      <% if policy(@upload).can_view_tags? %>
+        <li>Tags: <%= @upload.tag_string %></li>
+      <% end %>
       <% if @upload.md5.present? %>
         <li>MD5: <%= @upload.md5 %>
       <% end %>
@@ -13,7 +15,7 @@
         <li>
           Size: <%= number_to_human_size(@upload.file_size) %></li>
           <% if @upload.image_width.present? %>
-            (<span itemprop="width"><%= @upload.image_width %></span>x<span itemprop="height"><%= @upload.image_height %></span>)
+            (<%= @upload.image_width %>x<%= @upload.image_height %>)
           <% end %>
         </li>
       <% end %>
@@ -36,9 +38,6 @@
 
     <p>
       You can <%= link_to "upload another file", new_upload_path %> or <%= link_to "view your current uploads", uploads_path(:search => {:uploader_id => CurrentUser.id}) %>.
-      <% if CurrentUser.user.is_moderator? && @upload.is_pending? %>
-        <%= link_to "Force update", upload_path(@upload, :format => "js"), :remote => true, :method => :put %>.
-      <% end %>
     </p>
   </div>
 </div>

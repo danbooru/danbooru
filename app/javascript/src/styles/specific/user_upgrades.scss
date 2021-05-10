@@ -1,43 +1,20 @@
 div#c-user-upgrades {
   div#a-new {
-    form.stripe {
-      display: inline;
+    summary {
+      padding: 1rem 0;
     }
 
-    div.section {
-      margin-bottom: 2em;
-    }
+    table#feature-comparison {
+      colgroup#basic {
+        background-color: var(--user-upgrade-basic-background-color);
+      }
 
-    div#feature-comparison {
-      overflow: hidden;
-      margin-bottom: 1em;
+      colgroup#gold {
+        background-color: var(--user-upgrade-gold-background-color);
+      }
 
-      table {
-        width: 100%;
-
-        colgroup {
-          width: 10em;
-        }
-
-        colgroup#gold {
-          background-color: var(--user-upgrade-gold-background-color);
-        }
-
-        colgroup#platinum {
-          background-color: var(--user-upgrade-platinum-background-color);
-        }
-
-        td, th {
-          text-align: center;
-          vertical-align: top;
-          padding: 0.5em 0;
-        }
-
-        tbody {
-          tr:hover {
-            background-color: var(--user-upgrade-table-row-hover-background-color);
-          }
-        }
+      colgroup#platinum {
+        background-color: var(--user-upgrade-platinum-background-color);
       }
     }
   }

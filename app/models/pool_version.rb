@@ -3,10 +3,14 @@ class PoolVersion < ApplicationRecord
   belongs_to :pool
 
   def self.enabled?
-    Danbooru.config.aws_sqs_archives_url.present?
+    Rails.env.test? || Danbooru.config.aws_sqs_archives_url.present?
   end
 
-  establish_connection (ENV["ARCHIVE_DATABASE_URL"] || "archive_#{Rails.env}".to_sym) if enabled?
+  def self.database_url
+    ENV["ARCHIVE_DATABASE_URL"] || "archive_#{Rails.env}".to_sym
+  end
+
+  establish_connection database_url if enabled?
 
   module SearchMethods
     def default_order
@@ -28,8 +32,7 @@ class PoolVersion < ApplicationRecord
     end
 
     def search(params)
-      q = super
-      q = q.search_attributes(params, :pool_id, :post_ids, :added_post_ids, :removed_post_ids, :updater_id, :description, :description_changed, :name, :name_changed, :version, :is_active, :is_deleted, :category)
+      q = search_attributes(params, :id, :created_at, :updated_at, :pool_id, :post_ids, :added_post_ids, :removed_post_ids, :updater_id, :description, :description_changed, :name, :name_changed, :version, :is_active, :is_deleted, :category)
 
       if params[:post_id]
         q = q.for_post_id(params[:post_id].to_i)
@@ -89,23 +92,6 @@ class PoolVersion < ApplicationRecord
     normalize_name(name).mb_chars.downcase
   end
 
-  def build_diff(other = previous)
-    diff = {}
-
-    if other.nil?
-      diff[:added_post_ids] = added_post_ids
-      diff[:removed_post_ids] = removed_post_ids
-      diff[:added_desc] = description
-    else
-      diff[:added_post_ids] = post_ids - other.post_ids
-      diff[:removed_post_ids] = other.post_ids - post_ids
-      diff[:added_desc] = description
-      diff[:removed_desc] = other.description
-    end
-
-    diff
-  end
-
   def previous
     @previous ||= begin
       PoolVersion.where("pool_id = ? and version < ?", pool_id, version).order("version desc").limit(1).to_a
@@ -113,8 +99,23 @@ class PoolVersion < ApplicationRecord
     @previous.first
   end
 
+  def subsequent
+    @subsequent ||= begin
+      PoolVersion.where("pool_id = ? and version > ?", pool_id, version).order("version asc").limit(1).to_a
+    end
+    @subsequent.first
+  end
+
+  def current
+    @current ||= begin
+      PoolVersion.where("pool_id = ?", pool_id).order("version desc").limit(1).to_a
+    end
+    @current.first
+  end
+
   def self.status_fields
     {
+      posts_changed: "Posts",
       name: "Renamed",
       description: "Description",
       was_deleted: "Deleted",
@@ -124,24 +125,45 @@ class PoolVersion < ApplicationRecord
     }
   end
 
-  def was_deleted
-    is_deleted && !previous.is_deleted
+  def posts_changed(type)
+    other = self.send(type)
+    ((post_ids - other.post_ids) | (other.post_ids - post_ids)).length.positive?
   end
 
-  def was_undeleted
-    !is_deleted && previous.is_deleted
+  def was_deleted(type)
+    other = self.send(type)
+    if type == "previous"
+      is_deleted && !other.is_deleted
+    else
+      !is_deleted && other.is_deleted
+    end
   end
 
-  def was_activated
-    is_active && !previous.is_active
+  def was_undeleted(type)
+    other = self.send(type)
+    if type == "previous"
+      !is_deleted && other.is_deleted
+    else
+      is_deleted && !other.is_deleted
+    end
   end
 
-  def was_deactivated
-    !is_active && previous.is_active
+  def was_activated(type)
+    other = self.send(type)
+    if type == "previous"
+      is_active && !other.is_active
+    else
+      !is_active && other.is_active
+    end
   end
 
-  def text_field_changed
-    previous.present? && (name_changed || description_changed)
+  def was_deactivated(type)
+    other = self.send(type)
+    if type == "previous"
+      !is_active && other.is_active
+    else
+      is_active && !other.is_active
+    end
   end
 
   def pretty_name

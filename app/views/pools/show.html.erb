@@ -1,6 +1,7 @@
 <% page_title @pool.pretty_name %>
-<% meta_description("#{number_with_delimiter(@pool.post_count)} pages. #{DText.excerpt(@pool.description)}") %>
+<% meta_description("#{number_with_delimiter(@pool.post_count)} posts. #{DText.excerpt(@pool.description)}") %>
 
+<%= render_meta_links @posts %>
 <%= render "secondary_links" %>
 
 <div id="c-pools">
@@ -13,7 +14,7 @@
       <% end %>
     </h1>
 
-    <div id="description" class="prose">
+    <div id="description" class="prose mb-4">
       <%= format_text(@pool.description) %>
     </div>
 
@@ -23,7 +24,7 @@
       <% if @pool.post_count == 0 %>
         <%= render "post_sets/blank" %>
       <% else %>
-        <%= post_previews_html(@posts, pool_id: @pool.id) %>
+        <%= post_previews_html(@posts, tags: "pool:#{@pool.id}", show_deleted: @pool.is_series?) %>
 
         <%= numbered_paginator(@posts) %>
       <% end %>

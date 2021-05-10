@@ -1,11 +1,9 @@
 <%# bur %>
 
-<% if bur.approvable?(CurrentUser.user) %>
-  <%= link_to "Approve", approve_bulk_update_request_path(bur), remote: true, method: :post, "data-confirm": "Are you sure you want to approve this bulk update request?" %> |
-<% end %>
-<% if bur.rejectable?(CurrentUser.user) %>
+<%= link_to_if policy(bur).approve?, "Approve", approve_bulk_update_request_path(bur), remote: true, method: :post, "data-confirm": "Are you sure you want to approve this bulk update request?" %> |
+<% if policy(bur).destroy? %>
   <%= link_to "Reject", bur, remote: true, method: :delete, "data-confirm": "Are you sure you want to reject this bulk update request?" %> |
 <% end %>
-<% if bur.editable?(CurrentUser.user) %>
+<% if policy(bur).update? %>
   <%= link_to "Edit", edit_bulk_update_request_path(bur), :"data-shortcut" => "e" %>
 <% end %>

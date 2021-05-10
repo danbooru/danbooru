@@ -2,8 +2,6 @@
   <div id="a-edit">
     <h1>Edit Favorite Group: <%= @favorite_group.pretty_name %></h1>
 
-    <%= error_messages_for "favorite_group" %>
-
     <%= edit_form_for(@favorite_group) do |f| %>
       <%= f.input :name, :as => :string, :input_html => { :value => @favorite_group.pretty_name } %>
       <%= f.input :post_ids_string, label: "Posts", as: :text %>

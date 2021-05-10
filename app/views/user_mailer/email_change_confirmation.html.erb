@@ -1,0 +1,20 @@
+<!doctype html>
+<html>
+  <body>
+    <h2>Hi <%= @user.name %>,</h2>
+
+    <p>
+      You recently changed your email address on <%= Danbooru.config.app_name %>.
+      Click the link below to verify your new email address.
+    </p>
+
+    <p>
+      <%= link_to "Verify email address", email_verification_url(@user) %>
+    </p>
+
+    <p>
+      If you did not recently change your email address on <%= Danbooru.config.app_name %>,
+      you may delete and ignore this email.
+    </p>
+  </body>
+</html>

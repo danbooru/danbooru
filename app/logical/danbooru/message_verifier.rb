@@ -8,12 +8,16 @@ module Danbooru
       @verifier = ActiveSupport::MessageVerifier.new(secret, serializer: JSON, digest: "SHA256")
     end
 
-    def generate(*options)
-      verifier.generate(*options, purpose: purpose)
+    def generate(*args, **options)
+      verifier.generate(*args, purpose: purpose, **options)
     end
 
-    def verified(*options)
-      verifier.verified(*options, purpose: purpose)
+    def verify(*args, **options)
+      verifier.verify(*args, purpose: purpose, **options)
+    end
+
+    def verified(*args, **options)
+      verifier.verified(*args, purpose: purpose, **options)
     end
   end
 end

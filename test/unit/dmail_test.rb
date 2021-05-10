@@ -6,9 +6,6 @@ class DmailTest < ActiveSupport::TestCase
       @user = FactoryBot.create(:user)
       CurrentUser.user = @user
       CurrentUser.ip_addr = "1.2.3.4"
-      ActionMailer::Base.delivery_method = :test
-      ActionMailer::Base.perform_deliveries = true
-      ActionMailer::Base.deliveries = []
     end
 
     teardown do
@@ -18,7 +15,7 @@ class DmailTest < ActiveSupport::TestCase
     context "that is spam" do
       should "be automatically reported and deleted" do
         @recipient = create(:user)
-        @spammer = create(:user, created_at: 2.weeks.ago, email: "akismet-guaranteed-spam@example.com")
+        @spammer = create(:user, created_at: 2.weeks.ago, email_address: build(:email_address, address: "akismet-guaranteed-spam@example.com"))
 
         SpamDetector.stubs(:enabled?).returns(true)
         dmail = create(:dmail, owner: @recipient, from: @spammer, to: @recipient, creator_ip_addr: "127.0.0.1")
@@ -26,15 +23,15 @@ class DmailTest < ActiveSupport::TestCase
         assert_equal(1, dmail.moderation_reports.count)
         assert_equal(true, dmail.reload.is_deleted?)
       end
-    end
 
-    context "from a banned user" do
-      should "not validate" do
-        user = create(:banned_user)
-        dmail = build(:dmail, owner: user, from: user)
+      should "not mark dmails sent to oneself as spam" do
+        @user = create(:user, created_at: 2.weeks.ago, email_address: build(:email_address, address: "akismet-guaranteed-spam@example.com"))
 
-        assert_equal(false, dmail.valid?)
-        assert_equal(["Sender is banned and cannot send messages"], dmail.errors.full_messages)
+        SpamDetector.stubs(:enabled?).returns(true)
+        dmail = create(:dmail, owner: @user, from: @user, to: @user, creator_ip_addr: "127.0.0.1")
+
+        assert_equal(0, dmail.moderation_reports.count)
+        assert_equal(false, dmail.reload.is_deleted?)
       end
     end
 
@@ -82,21 +79,7 @@ class DmailTest < ActiveSupport::TestCase
     should "create a copy for each user" do
       @new_user = FactoryBot.create(:user)
       assert_difference("Dmail.count", 2) do
-        Dmail.create_split(from: CurrentUser.user, creator_ip_addr: "127.0.0.1", to_id: @new_user.id, title: "foo", body: "foo")
-      end
-    end
-
-    should "send an email if the user wants it" do
-      user = create(:user, receive_email_notifications: true)
-      assert_difference("ActionMailer::Base.deliveries.size", 1) do
-        create(:dmail, to: user, owner: user, body: "test [[tagme]]")
-      end
-    end
-
-    should "create only one message for a split response" do
-      user = FactoryBot.create(:user, :receive_email_notifications => true)
-      assert_difference("ActionMailer::Base.deliveries.size", 1) do
-        Dmail.create_split(from: CurrentUser.user, creator_ip_addr: "127.0.0.1", to_id: user.id, title: "foo", body: "foo")
+        Dmail.create_split(from: CurrentUser.user, creator_ip_addr: "127.0.0.1", to: @new_user, title: "foo", body: "foo")
       end
     end
 
@@ -128,6 +111,46 @@ class DmailTest < ActiveSupport::TestCase
           dmail = Dmail.create_automated(to_name: "this_name_does_not_exist", title: "test", body: "test")
           assert_equal(["must exist"], dmail.errors[:to])
         end
+      end
+    end
+
+    context "sending a dmail" do
+      should "fail if the user has sent too many dmails recently" do
+        10.times do
+          Dmail.create_split(from: @user, to: create(:user), title: "blah", body: "blah", creator_ip_addr: "127.0.0.1")
+        end
+
+        assert_no_difference("Dmail.count") do
+          @dmail = Dmail.create_split(from: @user, to: create(:user), title: "blah", body: "blah", creator_ip_addr: "127.0.0.1")
+
+          assert_equal(false, @dmail.valid?)
+          assert_equal(["You can't send dmails to more than 10 users per hour"], @dmail.errors[:base])
+        end
+      end
+    end
+
+    context "destroying a dmail" do
+      setup do
+        @recipient = create(:user)
+        @dmail = Dmail.create_split(from: @user, to: @recipient, creator_ip_addr: "127.0.0.1", title: "foo", body: "foo")
+        @modreport = create(:moderation_report, model: @dmail)
+      end
+
+      should "update both users' unread dmail counts" do
+        assert_equal(0, @user.reload.unread_dmail_count)
+        assert_equal(1, @recipient.reload.unread_dmail_count)
+
+        @user.dmails.last.destroy!
+        @recipient.dmails.last.destroy!
+
+        assert_equal(0, @user.reload.unread_dmail_count)
+        assert_equal(0, @recipient.reload.unread_dmail_count)
+      end
+
+      should "destroy any associated moderation reports" do
+        assert_equal(1, @dmail.moderation_reports.count)
+        @dmail.destroy!
+        assert_equal(0, @dmail.moderation_reports.count)
       end
     end
 

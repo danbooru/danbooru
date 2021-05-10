@@ -10,7 +10,7 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <%= table_for @forum_post_votes, {class: "striped autofit"} do |t| %>
+    <%= table_for @forum_post_votes, class: "striped autofit" do |t| %>
       <% t.column "Forum Post" do |forum_post_vote| %>
         <%= link_to "Forum ##{forum_post_vote.forum_post_id}", forum_post_vote.forum_post %>
         <%= link_to "»", forum_post_votes_path(search: { forum_post_id: forum_post_vote.forum_post_id }) %>

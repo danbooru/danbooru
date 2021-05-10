@@ -1,21 +1,27 @@
 class UserDeletion
-  class ValidationError < StandardError; end
+  include ActiveModel::Validations
 
-  attr_reader :user, :password
+  attr_reader :user, :password, :request
 
-  def initialize(user, password)
+  validate :validate_deletion
+
+  def initialize(user, password, request)
     @user = user
     @password = password
+    @request = request
   end
 
   def delete!
-    validate
+    return false if invalid?
+
     clear_user_settings
     remove_favorites
     clear_saved_searches
     rename
     reset_password
     create_mod_action
+    create_user_event
+    user
   end
 
   private
@@ -24,12 +30,16 @@ class UserDeletion
     ModAction.log("user ##{user.id} deleted", :user_delete)
   end
 
+  def create_user_event
+    UserEvent.create_from_request!(user, :user_deletion, request)
+  end
+
   def clear_saved_searches
     SavedSearch.where(user_id: user.id).destroy_all
   end
 
   def clear_user_settings
-    user.email = nil
+    user.email_address = nil
     user.last_logged_in_at = nil
     user.last_forum_read_at = nil
     user.favorite_tags = ''
@@ -41,11 +51,7 @@ class UserDeletion
   end
 
   def reset_password
-    random = SecureRandom.hex(16)
-    user.password = random
-    user.password_confirmation = random
-    user.old_password = password
-    user.save!
+    user.update!(password: SecureRandom.hex(16))
   end
 
   def remove_favorites
@@ -54,24 +60,19 @@ class UserDeletion
 
   def rename
     name = "user_#{user.id}"
-    n = 0
-    name += "~" while User.where(:name => name).exists? && (n < 10)
+    name += "~" while User.exists?(name: name)
 
-    if n == 10
-      raise ValidationError.new("New name could not be found")
-    end
-
-    user.name = name
-    user.save!
+    request = UserNameChangeRequest.new(user: user, desired_name: name, original_name: user.name)
+    request.save!(validate: false) # XXX don't validate so that the 1 name change per week rule doesn't interfere
   end
 
-  def validate
-    if !User.authenticate(user.name, password)
-      raise ValidationError.new("Password is incorrect")
+  def validate_deletion
+    if !user.authenticate_password(password)
+      errors.add(:base, "Password is incorrect")
     end
 
-    if user.level >= User::Levels::ADMIN
-      raise ValidationError.new("Admins cannot delete their account")
+    if user.is_admin?
+      errors.add(:base, "Admins cannot delete their account")
     end
   end
 end

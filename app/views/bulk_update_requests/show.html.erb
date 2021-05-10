@@ -1,6 +1,6 @@
 <div id="c-bulk-update-requests">
   <div id="a-show">
-    <h1>Bulk Update Request: <%= @bulk_update_request.title %></h1>
+    <h1>Bulk Update Request</h1>
 
     <ul>
       <% if @bulk_update_request.forum_topic_id %>
@@ -12,9 +12,8 @@
     </ul>
 
     <div style="margin: 1em 0;">
-      <h2>Script</h2>
       <div class="prose">
-        <%= format_text @bulk_update_request.script_with_links %>
+        <%= format_text @bulk_update_request.processor.to_dtext %>
       </div>
 
       <%= render "bur_edit_links", bur: @bulk_update_request %>

@@ -10,9 +10,9 @@ class PostSearchContext
 
   def post_id
     if seq == "prev"
-      Post.tag_match(tags).where("posts.id > ?", id).reorder("posts.id asc").first.try(:id)
+      Post.user_tag_match(tags).where("posts.id > ?", id).reorder("posts.id asc").first.try(:id)
     else
-      Post.tag_match(tags).where("posts.id < ?", id).reorder("posts.id desc").first.try(:id)
+      Post.user_tag_match(tags).where("posts.id < ?", id).reorder("posts.id desc").first.try(:id)
     end
   end
 

@@ -2,26 +2,31 @@
   <%= quick_search_form_for(:name_matches, pools_path, "pools", autocomplete: "pool", redirect: true) %>
   <%= subnav_link_to "Gallery", gallery_pools_path %>
   <%= subnav_link_to "Listing", pools_path %>
-  <%= subnav_link_to "New", new_pool_path %>
+  <% if policy(Pool).create? %>
+    <%= subnav_link_to "New", new_pool_path %>
+  <% end %>
+  <% if PoolVersion.enabled? %>
+    <%= subnav_link_to "Recent changes", pool_versions_path %>
+  <% end %>
   <%= subnav_link_to "Help", wiki_page_path("help:pools") %>
   <% if @pool && !@pool.new_record? %>
     <li>|</li>
     <%= subnav_link_to "Show", pool_path(@pool) %>
     <%= subnav_link_to "Posts", posts_path(:tags => "pool:#{@pool.id}") %>
-    <% if CurrentUser.is_member? %>
+    <% if policy(@pool).update? %>
       <%= subnav_link_to "Edit", edit_pool_path(@pool), "data-shortcut": "e" %>
     <% end %>
-    <% if @pool.deletable_by?(CurrentUser.user) %>
-      <% if @pool.is_deleted? %>
+    <% if current_page?({ action: :edit }) %>
+      <% if policy(@pool).undelete? %>
         <%= subnav_link_to "Undelete", undelete_pool_path(@pool), :method => :post, :remote => true %>
-      <% else %>
+      <% elsif policy(@pool).destroy? %>
         <%= subnav_link_to "Delete", pool_path(@pool), :method => :delete, :"data-shortcut" => "shift+d", :"data-confirm" => "Are you sure you want to delete this pool?", :remote => true %>
       <% end %>
     <% end %>
     <% if PoolVersion.enabled? %>
       <%= subnav_link_to "History", pool_versions_path(:search => {:pool_id => @pool.id}) %>
     <% end %>
-    <% if CurrentUser.is_member? %>
+    <% if policy(@pool).update? %>
       <%= subnav_link_to "Order", edit_pool_order_path(@pool) %>
     <% end %>
   <% end %>

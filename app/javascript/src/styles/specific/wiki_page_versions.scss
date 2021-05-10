@@ -9,15 +9,5 @@ div#c-wiki-page-versions {
       background: var(--wiki-page-versions-diff-ins-background);
       text-decoration: none;
     }
-
-    ul.wiki-other-names-diff-list li.obsolete {
-      text-decoration: dotted underline;
-    }
-  }
-
-  #a-index {
-    table {
-      margin-bottom: 1em;
-    }
   }
 }

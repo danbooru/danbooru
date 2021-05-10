@@ -1,0 +1,10 @@
+<% if CurrentUser.user.is_restricted? && (params[:controller] == "users" || cookies[:hide_verify_account_notice].blank?) %>
+  <div class="notice notice-info notice-large" id="verify-account-notice">
+    <h2>Your account is restricted.</h2>
+    <div>
+      You must verify your account because you signed up from a proxy or a VPN.
+      <%= link_to "Verify your account now", verify_user_email_path(CurrentUser.user) %>.
+    </div>
+    <div><%= link_to "Close this", "#", id: "hide-verify-account-notice" %></div>
+  </div>
+<% end %>

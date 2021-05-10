@@ -7,10 +7,11 @@ class PostEventsControllerTest < ActionDispatch::IntegrationTest
       @mod = create(:mod_user)
     end
 
-    as_user do
-      @post = create(:post)
-      @post.flag!("aaa")
-      create(:post_appeal, post: @post)
+    as(@user) do
+      @post = create(:post, is_flagged: true)
+      create(:post_flag, post: @post, status: :rejected)
+      @post.update(is_deleted: true)
+      create(:post_appeal, post: @post, status: :succeeded)
       @post.approve!(@mod)
     end
   end
@@ -36,10 +37,6 @@ class PostEventsControllerTest < ActionDispatch::IntegrationTest
 
     should "render" do
       assert_not_nil(@appeal)
-    end
-
-    should "return is_resolved correctly" do
-      assert_equal(false, @appeal["is_resolved"])
     end
   end
 end

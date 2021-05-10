@@ -1,21 +1,23 @@
 <footer id="page-footer" class="text-small">
   <span class="page-footer-app-name"><%= Danbooru.config.app_name %></span>
-  <% if Rails.application.config.x.git_hash %>
-    <span class="desktop-only page-footer-git-hash">
-      (<%= link_to Rails.application.config.x.git_hash.first(9), Danbooru.config.commit_url(Rails.application.config.x.git_hash) %>)
-    </span>
-  <% end %>
-  &ndash; <%= link_to "Rules", terms_of_service_path %>
-  &ndash; <%= link_to "Contact", contact_path %>
-  <% if CurrentUser.user.enable_post_navigation %>
-    <span id="keyboard-shortcuts-link" class="desktop-only">
-      &ndash; <%= link_to "Keyboard shortcuts", keyboard_shortcuts_path %>
-    </span>
-  <% end %>
-  <% if CurrentUser.is_member? %>
-    <span id="desktop-version-link" class="mobile-only">
-      &ndash;
-      <%= link_to "Desktop mode", edit_user_path(CurrentUser.id) %>
-    </span>
-  <% end %>
+  / <%= link_to "Rules", terms_of_service_path %>
+  / <%= link_to "Contact", contact_path %>
+  /
+  <span class="social-icons">
+    <% if Danbooru.config.source_code_url.present? %>
+      <%= link_to Danbooru.config.source_code_url, title: "Running commit: #{Rails.application.config.x.git_hash&.first(9)}", class: "social-icon" do %>
+        <%= github_icon %>
+      <% end %>
+    <% end %>
+    <% if Danbooru.config.twitter_username.present? %>
+      <%= link_to "https://twitter.com/#{Danbooru.config.twitter_username}", class: "social-icon" do %>
+        <%= twitter_icon %>
+      <% end %>
+    <% end %>
+    <% if Danbooru.config.discord_server_url.present? %>
+      <%= link_to Danbooru.config.discord_server_url, class: "social-icon" do %>
+        <%= discord_icon %>
+      <% end %>
+    <% end %>
+  </span>
 </footer>

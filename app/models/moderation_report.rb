@@ -1,26 +1,31 @@
 class ModerationReport < ApplicationRecord
+  MODEL_TYPES = %w[Dmail Comment ForumPost]
+
   belongs_to :model, polymorphic: true
   belongs_to :creator, class_name: "User"
 
   validates :reason, presence: true
-  validates :model_type, inclusion: { in: %w[Comment Dmail ForumPost User] }
+  validates :model_type, inclusion: { in: MODEL_TYPES }
   validates :creator, uniqueness: { scope: [:model_type, :model_id], message: "have already reported this message." }
 
   after_create :create_forum_post!
   after_create :autoban_reported_user
 
-  scope :user, -> { where(model_type: "User") }
   scope :dmail, -> { where(model_type: "Dmail") }
   scope :comment, -> { where(model_type: "Comment") }
   scope :forum_post, -> { where(model_type: "ForumPost") }
   scope :recent, -> { where("moderation_reports.created_at >= ?", 1.week.ago) }
 
-  def self.enabled?
-    !Rails.env.production?
+  def self.model_types
+    MODEL_TYPES
   end
 
-  def self.model_types
-    %w[User Dmail Comment ForumPost]
+  def self.visible(user)
+    if user.is_moderator?
+      all
+    else
+      where(creator: user)
+    end
   end
 
   def forum_topic_title
@@ -34,7 +39,7 @@ class ModerationReport < ApplicationRecord
   def forum_topic
     topic = ForumTopic.find_by_title(forum_topic_title)
     if topic.nil?
-      CurrentUser.as_system do
+      CurrentUser.scoped(User.system) do
         topic = ForumTopic.create!(creator: User.system, title: forum_topic_title, category_id: 0, min_level: User::Levels::MODERATOR)
         forum_post = ForumPost.create!(creator: User.system, body: forum_topic_body, topic: topic)
       end
@@ -77,13 +82,9 @@ class ModerationReport < ApplicationRecord
     end
   end
 
-  def self.visible(user = CurrentUser.user)
-    user.is_moderator? ? all : none
-  end
-
   def self.search(params)
-    q = super
-    q = q.search_attributes(params, :model_type, :model_id, :creator_id)
+    q = search_attributes(params, :id, :created_at, :updated_at, :reason, :creator, :model)
+    q = q.text_attribute_matches(:reason, params[:reason_matches])
 
     q.apply_default_order(params)
   end

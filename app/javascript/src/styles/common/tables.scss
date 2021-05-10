@@ -5,7 +5,7 @@ table.striped {
 
   tbody {
     tr {
-      border-bottom: var(--table-row-border);
+      border-bottom: 1px solid var(--table-row-border-color);
 
       &:hover {
         background: var(--table-row-hover-background);
@@ -13,17 +13,12 @@ table.striped {
     }
   }
 
-  .number, .links {
-    text-align: right;
-  }
-
   thead {
     tr {
-      border-bottom: var(--table-header-border);
+      border-bottom: 2px solid var(--table-header-border-color);
     }
 
     th {
-      font-weight: bold;
       text-align: left;
     }
   }
@@ -53,7 +48,7 @@ table.autofit {
   }
 }
 
-table.search {
+table.search, table.aligned-vertical {
   tr {
     height: 2em;
   }
@@ -70,9 +65,13 @@ table.search {
 }
 
 table.aligned-vertical {
-  @extend table.search;
+  height: 1.75em;
+}
 
-  tr {
-    height: 1.75em;
-  }
+table.table-sm {
+  th, td { padding: 0.25rem; }
+}
+
+table.table-md {
+  th, td { padding: 0.5rem; }
 }

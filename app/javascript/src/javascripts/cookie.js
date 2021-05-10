@@ -1,27 +1,17 @@
-import Utility from "./utility";
-
 let Cookie = {};
 
-Cookie.put = function(name, value, days) {
-  var expires = "";
-  if (days !== "session") {
-    if (!days) {
-      days = 365;
-    }
+Cookie.put = function(name, value, max_age_in_seconds = 60 * 60 * 24 * 365 * 20) {
+  let cookie = `${name}=${encodeURIComponent(value)}; Path=/; SameSite=Lax;`;
 
-    var date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    expires = "expires=" + date.toGMTString() + "; ";
+  if (max_age_in_seconds) {
+    cookie += ` Max-Age=${max_age_in_seconds};`
   }
 
-  var new_val = name + "=" + encodeURIComponent(value) + "; " + expires + "path=/";
-  if (document.cookie.length < (4090 - new_val.length)) {
-    document.cookie = new_val;
-    return true;
-  } else {
-    Utility.error("You have too many cookies on this site. Consider deleting them all.")
-    return false;
+  if (location.protocol === "https:") {
+    cookie += " Secure;";
   }
+
+  document.cookie = cookie;
 }
 
 Cookie.raw_get = function(name) {

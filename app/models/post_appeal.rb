@@ -1,27 +1,24 @@
 class PostAppeal < ApplicationRecord
-  class Error < StandardError; end
-
-  MAX_APPEALS_PER_DAY = 1
-
   belongs_to :creator, :class_name => "User"
   belongs_to :post
-  validates_presence_of :reason
-  validate :validate_post_is_inactive
-  validate :validate_creator_is_not_limited
-  validates_uniqueness_of :creator_id, :scope => :post_id, :message => "have already appealed this post"
 
-  scope :resolved, -> { where(post: Post.undeleted.unflagged) }
-  scope :unresolved, -> { where(post: Post.deleted.or(Post.flagged)) }
-  scope :recent, -> { where("post_appeals.created_at >= ?", 1.day.ago) }
+  validates :reason, length: { maximum: 140 }
+  validate :validate_post_is_appealable, on: :create
+  validate :validate_creator_is_not_limited, on: :create
+  validates :creator, uniqueness: { scope: :post, message: "have already appealed this post" }, on: :create
+
+  enum status: {
+    pending: 0,
+    succeeded: 1,
+    rejected: 2
+  }
+
+  scope :expired, -> { pending.where("post_appeals.created_at < ?", Danbooru.config.moderation_period.ago) }
 
   module SearchMethods
     def search(params)
-      q = super
-      q = q.search_attributes(params, :creator, :post, :reason)
+      q = search_attributes(params, :id, :created_at, :updated_at, :reason, :status, :creator, :post)
       q = q.text_attribute_matches(:reason, params[:reason_matches])
-
-      q = q.resolved if params[:is_resolved].to_s.truthy?
-      q = q.unresolved if params[:is_resolved].to_s.falsy?
 
       q.apply_default_order(params)
     end
@@ -29,28 +26,12 @@ class PostAppeal < ApplicationRecord
 
   extend SearchMethods
 
-  def resolved?
-    post.present? && !post.is_deleted? && !post.is_flagged?
-  end
-
-  def is_resolved
-    resolved?
-  end
-
   def validate_creator_is_not_limited
-    if appeal_count_for_creator >= MAX_APPEALS_PER_DAY
-      errors[:creator] << "can appeal at most #{MAX_APPEALS_PER_DAY} post a day"
-    end
+    errors.add(:creator, "have reached your appeal limit") if creator.is_appeal_limited?
   end
 
-  def validate_post_is_inactive
-    if resolved?
-      errors[:post] << "is active"
-    end
-  end
-
-  def appeal_count_for_creator
-    creator.post_appeals.recent.count
+  def validate_post_is_appealable
+    errors.add(:post, "cannot be appealed") if post.is_status_locked? || !post.is_appealable?
   end
 
   def self.available_includes

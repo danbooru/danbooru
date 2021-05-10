@@ -1,62 +1,48 @@
 class BulkUpdateRequestsController < ApplicationController
   respond_to :html, :xml, :json, :js
-  before_action :member_only, :except => [:index, :show]
-  before_action :admin_only, :only => [:approve]
-  before_action :load_bulk_update_request, :except => [:new, :create, :index]
 
   def new
-    @bulk_update_request = BulkUpdateRequest.new(bur_params(:create))
+    @bulk_update_request = authorize BulkUpdateRequest.new(permitted_attributes(BulkUpdateRequest))
     respond_with(@bulk_update_request)
   end
 
   def create
-    @bulk_update_request = BulkUpdateRequest.create(bur_params(:create).merge(user: CurrentUser.user))
+    @bulk_update_request = authorize BulkUpdateRequest.new(user: CurrentUser.user, **permitted_attributes(BulkUpdateRequest))
+    @bulk_update_request.save
     respond_with(@bulk_update_request, :location => bulk_update_requests_path)
   end
 
   def show
+    @bulk_update_request = authorize BulkUpdateRequest.find(params[:id])
     respond_with(@bulk_update_request)
   end
 
   def edit
+    @bulk_update_request = authorize BulkUpdateRequest.find(params[:id])
+    respond_with(@bulk_update_request)
   end
 
   def update
-    raise User::PrivilegeError unless @bulk_update_request.editable?(CurrentUser.user)
-
-    @bulk_update_request.update(bur_params(:update))
+    @bulk_update_request = authorize BulkUpdateRequest.find(params[:id])
+    @bulk_update_request.update(permitted_attributes(@bulk_update_request))
     respond_with(@bulk_update_request, location: bulk_update_requests_path, notice: "Bulk update request updated")
   end
 
   def approve
+    @bulk_update_request = authorize BulkUpdateRequest.find(params[:id])
     @bulk_update_request.approve!(CurrentUser.user)
     respond_with(@bulk_update_request, :location => bulk_update_requests_path)
   end
 
   def destroy
-    raise User::PrivilegeError unless @bulk_update_request.rejectable?(CurrentUser.user)
-
+    @bulk_update_request = authorize BulkUpdateRequest.find(params[:id])
     @bulk_update_request.reject!(CurrentUser.user)
     respond_with(@bulk_update_request, location: bulk_update_requests_path, notice: "Bulk update request rejected")
   end
 
   def index
-    @bulk_update_requests = BulkUpdateRequest.paginated_search(params, count_pages: true)
+    @bulk_update_requests = authorize BulkUpdateRequest.paginated_search(params, count_pages: true)
     @bulk_update_requests = @bulk_update_requests.includes(:user, :approver, :forum_topic, forum_post: [:votes]) if request.format.html?
     respond_with(@bulk_update_requests)
-  end
-
-  private
-
-  def load_bulk_update_request
-    @bulk_update_request = BulkUpdateRequest.find(params[:id])
-  end
-
-  def bur_params(context)
-    permitted_params = %i[script skip_secondary_validations]
-    permitted_params += %i[title reason forum_topic_id] if context == :create
-    permitted_params += %i[forum_topic_id forum_post_id] if context == :update && CurrentUser.is_admin?
-
-    params.fetch(:bulk_update_request, {}).permit(permitted_params)
   end
 end

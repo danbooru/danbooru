@@ -1,7 +1,12 @@
-import CurrentUser from "./current_user";
 import Rails from '@rails/ujs';
+import { hideAll } from 'tippy.js';
+import words from "lodash/words";
 
 let Utility = {};
+
+export function clamp(value, low, high) {
+  return Math.max(low, Math.min(value, high));
+}
 
 Utility.delay = function(milliseconds) {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
@@ -67,12 +72,13 @@ Utility.dialog = function(title, html) {
   $dialog.find("form").on("submit.danbooru", function() {
     $dialog.dialog("close");
   });
+
+  // XXX hides the popup menu when the Report comment button is clicked.
+  hideAll({ duration: 0 });
 }
 
 Utility.keydown = function(keys, namespace, handler, selector = document) {
-  if (CurrentUser.data("enable-post-navigation")) {
-    $(selector).on("keydown.danbooru." + namespace, null, keys, handler);
-  }
+  $(selector).on("keydown.danbooru." + namespace, null, keys, handler);
 };
 
 Utility.is_subset = function(array, subarray) {
@@ -106,6 +112,10 @@ Utility.intersect = function(a, b) {
 
 Utility.regexp_escape = function(string) {
   return string.replace(/([.?*+^$[\]\\(){}|-])/g, "\\$1");
+}
+
+Utility.splitWords = function(string) {
+  return words(string, /\S+/g);
 }
 
 $.fn.selectEnd = function() {

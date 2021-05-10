@@ -1,11 +1,12 @@
 <% page_title "Favgroup: #{@favorite_group.pretty_name}" %>
+<%= render_meta_links @posts %>
 <%= render "secondary_links" %>
 
 <div id="c-favorite-groups">
   <div id="a-show">
     <h1>
       Favorite Group:
-      <%= link_to @favorite_group.pretty_name, posts_path(:tags => "favgroup:#{@favorite_group.id}") %>
+      <%= link_to @favorite_group.pretty_name, posts_path(:tags => "favgroup:#{@favorite_group.id} status:any") %>
     </h1>
 
     Creator: <%= link_to_user @favorite_group.creator %>
@@ -18,7 +19,7 @@
       <% if @favorite_group.post_count == 0 %>
         <%= render "post_sets/blank" %>
       <% else %>
-        <%= post_previews_html(@posts, favgroup_id: @favorite_group.id) %>
+        <%= post_previews_html(@posts, tags: "favgroup:#{@favorite_group.id}", show_deleted: true) %>
 
         <%= numbered_paginator(@posts) %>
       <% end %>

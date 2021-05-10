@@ -3,23 +3,25 @@ class WikiPage < ApplicationRecord
 
   META_WIKIS = ["list_of_", "tag_group:", "pool_group:", "howto:", "about:", "help:", "template:"]
 
-  before_save :normalize_title
-  before_save :normalize_other_names
   before_save :update_dtext_links, if: :dtext_links_changed?
   after_save :create_version
-  validates_uniqueness_of :title, :case_sensitive => false
-  validates_presence_of :title
-  validates_presence_of :body, :unless => -> { is_deleted? || other_names.present? }
-  validate :validate_rename
-  validate :validate_not_locked
 
-  array_attribute :other_names
+  normalize :title, :normalize_title
+  normalize :body, :normalize_text
+  normalize :other_names, :normalize_other_names
+
+  array_attribute :other_names # XXX must come after `normalize :other_names`
+
+  validates :title, tag_name: true, presence: true, uniqueness: true, if: :title_changed?
+  validates :body, presence: true, unless: -> { is_deleted? || other_names.present? }
+  validate :validate_rename
+  validate :validate_other_names
+
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, -> { active }, foreign_key: "name", primary_key: "title"
   has_many :versions, -> {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
   has_many :dtext_links, as: :model, dependent: :destroy
 
-  api_attributes including: [:category_name]
   deletable
 
   module SearchMethods
@@ -35,6 +37,10 @@ class WikiPage < ApplicationRecord
       where(title: normalize_title(title))
     end
 
+    def title_matches(title)
+      where_like(:title, normalize_title(title))
+    end
+
     def other_names_include(name)
       name = normalize_other_name(name)
       subquery = WikiPage.from("unnest(other_names) AS other_name").where_iequals("other_name", name)
@@ -43,19 +49,19 @@ class WikiPage < ApplicationRecord
 
     def other_names_match(name)
       if name =~ /\*/
-        subquery = WikiPage.from("unnest(other_names) AS other_name").where_ilike("other_name", name)
+        subquery = WikiPage.from("unnest(other_names) AS other_name").where_ilike("other_name", normalize_other_name(name))
         where(id: subquery)
       else
         other_names_include(name)
       end
     end
 
-    def tag_matches(params)
-      where(title: Tag.search(params).select(:name).reorder(nil))
+    def linked_to(title)
+      where(dtext_links: DtextLink.wiki_page.wiki_link.where(link_target: normalize_title(title)))
     end
 
-    def linked_to(title)
-      where(id: DtextLink.wiki_page.wiki_link.where(link_target: title).select(:model_id))
+    def not_linked_to(title)
+      where.not(dtext_links: DtextLink.wiki_page.wiki_link.where(link_target: normalize_title(title)))
     end
 
     def default_order
@@ -63,9 +69,7 @@ class WikiPage < ApplicationRecord
     end
 
     def search(params = {})
-      q = super
-
-      q = q.search_attributes(params, :is_locked, :is_deleted, :body, :title, :other_names)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_locked, :is_deleted, :body, :title, :other_names, :tag, :artist, :dtext_links)
       q = q.text_attribute_matches(:body, params[:body_matches], index_column: :body_index, ts_config: "danbooru")
 
       if params[:title_normalize].present?
@@ -76,12 +80,12 @@ class WikiPage < ApplicationRecord
         q = q.other_names_match(params[:other_names_match])
       end
 
-      if params[:tag].present?
-        q = q.tag_matches(params[:tag])
-      end
-
       if params[:linked_to].present?
         q = q.linked_to(params[:linked_to])
+      end
+
+      if params[:not_linked_to].present?
+        q = q.not_linked_to(params[:not_linked_to])
       end
 
       if params[:hide_deleted].to_s.truthy?
@@ -107,33 +111,26 @@ class WikiPage < ApplicationRecord
     end
   end
 
-  module ApiMethods
-    def html_data_attributes
-      super + [:category_name]
-    end
-  end
-
   extend SearchMethods
-  include ApiMethods
-
-  def validate_not_locked
-    if is_locked? && !CurrentUser.is_builder?
-      errors.add(:is_locked, "and cannot be updated")
-    end
-  end
 
   def validate_rename
     return unless title_changed?
 
     tag_was = Tag.find_by_name(Tag.normalize_name(title_was))
-    if tag_was.present? && tag_was.post_count > 0
-      warnings[:base] << %!Warning: {{#{title_was}}} still has #{tag_was.post_count} #{"post".pluralize(tag_was.post_count)}. Be sure to move the posts!
+    if tag_was.present? && !tag_was.empty?
+      warnings.add(:base, %!Warning: {{#{title_was}}} still has #{tag_was.post_count} #{"post".pluralize(tag_was.post_count)}. Be sure to move the posts!)
     end
 
     broken_wikis = WikiPage.linked_to(title_was)
     if broken_wikis.count > 0
-      broken_wiki_search = Rails.application.routes.url_helpers.wiki_pages_path(search: { linked_to: title_was })
-      warnings[:base] << %!Warning: [[#{title_was}]] is still linked from "#{broken_wikis.count} #{"other wiki page".pluralize(broken_wikis.count)}":[#{broken_wiki_search}]. Update #{(broken_wikis.count > 1) ? "these wikis" : "this wiki"} to link to [[#{title}]] instead!
+      broken_wiki_search = Routes.wiki_pages_path(search: { linked_to: title_was })
+      warnings.add(:base, %!Warning: [[#{title_was}]] is still linked from "#{broken_wikis.count} #{"other wiki page".pluralize(broken_wikis.count)}":[#{broken_wiki_search}]. Update #{(broken_wikis.count > 1) ? "these wikis" : "this wiki"} to link to [[#{title}]] instead!)
+    end
+  end
+
+  def validate_other_names
+    if other_names.present? && tag&.artist?
+      errors.add(:base, "An artist wiki can't have other names")
     end
   end
 
@@ -154,23 +151,15 @@ class WikiPage < ApplicationRecord
   end
 
   def self.normalize_title(title)
-    title.downcase.delete_prefix("~").gsub(/[[:space:]]+/, "_").gsub(/__/, "_").gsub(/\A_|_\z/, "")
+    title.to_s.downcase.delete_prefix("~").gsub(/[[:space:]]+/, "_").squeeze("_").gsub(/\A_|_\z/, "")
   end
 
-  def normalize_title
-    self.title = WikiPage.normalize_title(title)
-  end
-
-  def normalize_other_names
-    self.other_names = other_names.map { |name| WikiPage.normalize_other_name(name) }.uniq
+  def self.normalize_other_names(other_names)
+    other_names.map { |name| normalize_other_name(name) }.uniq.reject(&:blank?)
   end
 
   def self.normalize_other_name(name)
-    name.unicode_normalize(:nfkc).gsub(/[[:space:]]+/, " ").strip.tr(" ", "_")
-  end
-
-  def category_name
-    tag&.category
+    name.to_s.unicode_normalize(:nfkc).normalize_whitespace.gsub(/[[:space:]]+/, "_").squeeze("_").gsub(/\A_|_\z/, "")
   end
 
   def pretty_title
@@ -196,12 +185,12 @@ class WikiPage < ApplicationRecord
 
   def merge_version?
     prev = versions.last
-    prev && prev.updater_id == CurrentUser.user.id && prev.updated_at > 1.hour.ago
+    prev && prev.updater_id == CurrentUser.id && prev.updated_at > 1.hour.ago
   end
 
   def create_new_version
     versions.create(
-      :updater_id => CurrentUser.user.id,
+      :updater_id => CurrentUser.id,
       :updater_ip_addr => CurrentUser.ip_addr,
       :title => title,
       :body => body,
@@ -236,12 +225,26 @@ class WikiPage < ApplicationRecord
     TagAlias.to_aliased(titles & tags)
   end
 
+  def self.rewrite_wiki_links!(old_name, new_name)
+    broken_wikis = WikiPage.linked_to(old_name)
+
+    broken_wikis.each do |wiki|
+      wiki.lock!
+      wiki.body = DText.rewrite_wiki_links(wiki.body, old_name, new_name)
+      wiki.save!
+    end
+  end
+
   def to_param
     if title =~ /\A\d+\z/
       "~#{title}"
     else
       title
     end
+  end
+
+  def self.model_restriction(table)
+    super.where(table[:is_deleted].eq(false))
   end
 
   def self.available_includes

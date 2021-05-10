@@ -6,14 +6,12 @@ class UserFeedback < ApplicationRecord
   attr_accessor :disable_dmail_notification
   validates_presence_of :body, :category
   validates_inclusion_of :category, :in => %w(positive negative neutral)
-  validate :creator_is_gold
-  validate :user_is_not_creator
   after_create :create_dmail, unless: :disable_dmail_notification
   after_update(:if => ->(rec) { CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log(%{#{CurrentUser.name} updated user feedback for "#{rec.user.name}":/users/#{rec.user_id}}, :user_feedback_update)
+    ModAction.log(%{#{CurrentUser.user.name} updated user feedback for "#{rec.user.name}":#{Routes.user_path(rec.user)}}, :user_feedback_update)
   end
   after_destroy(:if => ->(rec) { CurrentUser.id != rec.creator_id}) do |rec|
-    ModAction.log(%{#{CurrentUser.name} deleted user feedback for "#{rec.user.name}":/users/#{rec.user_id}}, :user_feedback_delete)
+    ModAction.log(%{#{CurrentUser.user.name} deleted user feedback for "#{rec.user.name}":#{Routes.user_path(rec.user)}}, :user_feedback_delete)
   end
 
   deletable
@@ -32,23 +30,14 @@ class UserFeedback < ApplicationRecord
     end
 
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :user, :creator, :category, :body, :is_deleted)
+      q = search_attributes(params, :id, :created_at, :updated_at, :category, :body, :is_deleted, :creator, :user)
       q = q.text_attribute_matches(:body, params[:body_matches])
 
       q.apply_default_order(params)
     end
   end
 
-  module ApiMethods
-    def html_data_attributes
-      super + [:category]
-    end
-  end
-
   extend SearchMethods
-  include ApiMethods
 
   def user_name=(name)
     self.user = User.find_by_name(name)
@@ -63,28 +52,8 @@ class UserFeedback < ApplicationRecord
   end
 
   def create_dmail
-    body = %{#{disclaimer}@#{creator.name} created a "#{category} record":/user_feedbacks?search[user_id]=#{user_id} for your account:\n\n#{self.body}}
+    body = %{#{disclaimer}@#{creator.name} created a "#{category} record":#{Routes.user_feedbacks_path(search: { user_id: user_id })} for your account:\n\n#{self.body}}
     Dmail.create_automated(:to_id => user_id, :title => "Your user record has been updated", :body => body)
-  end
-
-  def creator_is_gold
-    if !creator.is_gold?
-      errors[:creator] << "must be gold"
-    end
-  end
-
-  def user_is_not_creator
-    if user_id == creator_id
-      errors[:creator] << "cannot submit feedback for yourself"
-    end
-  end
-
-  def deletable_by?(deleter)
-    deleter.is_moderator? && deleter != user
-  end
-
-  def editable_by?(editor)
-    (editor.is_moderator? && editor != user) || (creator == editor && !is_deleted?)
   end
 
   def self.available_includes

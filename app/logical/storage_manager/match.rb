@@ -8,15 +8,15 @@
 #
 #   StorageManager::Match.new do |matcher|
 #     matcher.add_manager(type: :crop) do
-#       StorageManager::SFTP.new("raikou3.donmai.us", base_url: "https://raikou3.donmai.us", hierarchical: true, base_dir: "/var/www/raikou3")
+#       StorageManager::SFTP.new("raikou3.donmai.us", base_url: "https://raikou3.donmai.us", base_dir: "/var/www/raikou3")
 #     end
 #
 #     matcher.add_manager(id: 1..850_000) do
-#       StorageManager::SFTP.new("raikou1.donmai.us", base_url: "https://raikou1.donmai.us", hierarchical: true, base_dir: "/var/www/raikou1")
+#       StorageManager::SFTP.new("raikou1.donmai.us", base_url: "https://raikou1.donmai.us", base_dir: "/var/www/raikou1")
 #     end
 #
 #     matcher.add_manager(id: 850_001..2_000_000) do
-#       StorageManager::SFTP.new("raikou2.donmai.us", base_url: "https://raikou2.donmai.us", hierarchical: true, base_dir: "/var/www/raikou2")
+#       StorageManager::SFTP.new("raikou2.donmai.us", base_url: "https://raikou2.donmai.us", base_dir: "/var/www/raikou2")
 #     end
 #
 #     matcher.add_manager(id: 1..3_000_000, type: [:large, :original]) do

@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <body>
+    <h2>Hi <%= @user.name %>,</h2>
+
+    <p>
+      Welcome to <%= Danbooru.config.app_name %>! Click the link below to verify your email address.
+    </p>
+
+    <p>
+      <%= link_to "Verify email address", email_verification_url(@user) %>
+    </p>
+
+    <p>
+      By verifying your email address, you can receive site notifications and you can
+      recover your account if you ever forget your password.
+    </p>
+  </body>
+</html>

@@ -1,6 +1,7 @@
 # Original images:
 #
 # * https://yande.re/image/b4b1d11facd1700544554e4805d47bb6/.png
+# * https://files.yande.re/image/e4c2ba38de88ff1640aaebff84c84e81/469784.jpg
 # * https://files.yande.re/image/2a5d1d688f565cb08a69ecf4e35017ab/yande.re%20349790%20breast_hold%20kurashima_tomoyasu%20mahouka_koukou_no_rettousei%20naked%20nipples.jpg
 # * https://ayase.yande.re/image/2d0d229fd8465a325ee7686fcc7f75d2/yande.re%20192481%20animal_ears%20bunny_ears%20garter_belt%20headphones%20mitha%20stockings%20thighhighs.jpg
 # * https://yuno.yande.re/image/1764b95ae99e1562854791c232e3444b/yande.re%20281544%20cameltoe%20erect_nipples%20fundoshi%20horns%20loli%20miyama-zero%20sarashi%20sling_bikini%20swimsuits.jpg
@@ -31,10 +32,10 @@
 module Sources
   module Strategies
     class Moebooru < Base
-      BASE_URL = %r!\Ahttps?://(?:[^.]+\.)?(?<domain>yande\.re|konachan\.com)!i
-      POST_URL = %r!#{BASE_URL}/post/show/(?<id>\d+)!i
-      URL_SLUG = %r!/(?:yande\.re%20|Konachan\.com%20-%20)(?<id>\d+).*!i
-      IMAGE_URL = %r!#{BASE_URL}/(?<type>image|jpeg|sample)/(?<md5>\h{32})#{URL_SLUG}?\.(?<ext>jpg|jpeg|png|gif)\z!i
+      BASE_URL = %r{\Ahttps?://(?:[^.]+\.)?(?<domain>yande\.re|konachan\.com)}i
+      POST_URL = %r{#{BASE_URL}/post/show/(?<id>\d+)}i
+      URL_SLUG = %r{/(?:yande\.re%20|Konachan\.com%20-%20)?(?<id>\d+)?.*}i
+      IMAGE_URL = %r{#{BASE_URL}/(?<type>image|jpeg|sample)/(?<md5>\h{32})#{URL_SLUG}?\.(?<ext>jpg|jpeg|png|gif)\z}i
 
       delegate :artist_name, :profile_url, :tag_name, :artist_commentary_title, :artist_commentary_desc, :dtext_artist_commentary_title, :dtext_artist_commentary_desc, to: :sub_strategy, allow_nil: true
 
@@ -62,7 +63,7 @@ module Sources
       end
 
       def preview_urls
-        return image_urls unless post_md5.present?
+        return image_urls if post_md5.blank?
         ["https://#{file_host}/data/preview/#{post_md5[0..1]}/#{post_md5[2..3]}/#{post_md5}.jpg"]
       end
 
@@ -73,6 +74,17 @@ module Sources
 
       def canonical_url
         image_url
+      end
+
+      def normalize_for_source
+        id = post_id_from_url
+        md5 = post_md5_from_url
+
+        if id.present?
+          "https://#{site_name}/post/show/#{id}"
+        elsif md5.present?
+          "https://#{site_name}/post?tags=md5:#{md5}"
+        end
       end
 
       def tags
@@ -101,7 +113,7 @@ module Sources
           return {}
         end
 
-        response = Danbooru::Http.cache(1.minute).get("https://#{site_name}/post.json", params: params)
+        response = http.cache(1.minute).get("https://#{site_name}/post.json", params: params)
         post = response.parse.first&.with_indifferent_access
         post || {}
       end
@@ -143,7 +155,7 @@ module Sources
 
           # the api_response wasn't available because it's a deleted post.
           elsif post_md5.present?
-            %w[jpg png gif].find { |ext| http_exists?("https://#{site_name}/image/#{post_md5}.#{ext}", headers) }
+            %w[jpg png gif].find { |ext| http_exists?("https://#{site_name}/image/#{post_md5}.#{ext}") }
 
           else
             nil

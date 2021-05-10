@@ -12,15 +12,20 @@
 
   .dz-preview {
     display: flex;
+    flex-direction: column;
+    text-align: center;
 
-    img[data-dz-thumbnail] {
-      padding: 1em;
+    &.dz-image-preview img {
+      margin: 1em 0;
+      object-fit: contain;
     }
 
     .dz-details {
-      display: flex;
-      flex-direction: column;
-      align-self: center;
+      margin-bottom: 1em;
+
+      .dz-filename, .dz-size {
+        display: inline;
+      }
     }
   }
 

@@ -2,6 +2,6 @@
   Danbooru.error(<%= raw @forum_post_vote.errors.full_messages.join("; ").to_json %>);
 <% else %>
   Danbooru.notice("Voted");
-  var code = <%= raw render(partial: "forum_post_votes/list", locals: {forum_post: @forum_post, votes: @forum_post.votes}).to_json %>;
-  $("#forum-post-votes-for-<%= @forum_post.id %>").html(code);
+  var code = <%= raw render(partial: "forum_post_votes/list", locals: {forum_post: @forum_post_vote.forum_post, votes: @forum_post_vote.forum_post.votes }).to_json %>;
+  $("#forum-post-votes-for-<%= @forum_post_vote.forum_post.id %>").html(code);
 <% end %>

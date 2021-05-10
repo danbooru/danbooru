@@ -1,0 +1,15 @@
+<div id="c-post-flags">
+  <div id="a-edit">
+    <h1>Edit Flag</h1>
+
+    <p>
+      Editing flag for <%= link_to "post ##{@post_flag.post_id}", @post_flag.post %>.
+    </p>
+
+    <%= edit_form_for(@post_flag) do |f| %>
+      <%= f.input :reason, as: :dtext, inline: true %>
+      <%= f.button :submit, "Submit" %>
+      <%= dtext_preview_button "post_flag_reason" %>
+    <% end %>
+  </div>
+</div>

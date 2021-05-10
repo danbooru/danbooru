@@ -10,34 +10,14 @@ module Moderator
             @user = create(:gold_user)
           end
 
-          as_user do
+          as(@user) do
             @post = create(:post)
-          end
-        end
-
-        context "confirm_delete action" do
-          should "render" do
-            get_auth confirm_delete_moderator_post_post_path(@post), @admin
-            assert_response :success
-          end
-        end
-
-        context "delete action" do
-          should "render" do
-            post_auth delete_moderator_post_post_path(@post), @admin, params: {:reason => "xxx", :format => "js", :commit => "Delete"}
-            assert(@post.reload.is_deleted?)
-          end
-
-          should "work even if the deleter has flagged the post previously" do
-            create(:post_flag, post: @post, creator: @admin)
-            post_auth delete_moderator_post_post_path(@post), @admin, params: {:reason => "xxx", :format => "js", :commit => "Delete"}
-            assert(@post.reload.is_deleted?)
           end
         end
 
         context "confirm_move_favorites action" do
           should "render" do
-            get_auth confirm_ban_moderator_post_post_path(@post), @admin
+            get_auth confirm_move_favorites_moderator_post_post_path(@post), @admin
             assert_response :success
           end
         end
@@ -48,7 +28,7 @@ module Moderator
           end
 
           should "render" do
-            as_user do
+            as(@user) do
               @parent = create(:post)
               @child = create(:post, parent: @parent)
             end
@@ -78,18 +58,11 @@ module Moderator
           end
         end
 
-        context "confirm_ban action" do
-          should "render" do
-            get_auth confirm_ban_moderator_post_post_path(@post), @admin
-            assert_response :success
-          end
-        end
-
         context "ban action" do
           should "render" do
-            post_auth ban_moderator_post_post_path(@post), @admin, params: { commit: "Ban", format: "js" }
+            post_auth ban_moderator_post_post_path(@post), @admin
 
-            assert_response :success
+            assert_redirected_to @post
             assert_equal(true, @post.reload.is_banned?)
           end
         end
@@ -97,7 +70,7 @@ module Moderator
         context "unban action" do
           should "render" do
             @post.ban!
-            post_auth unban_moderator_post_post_path(@post), @admin, params: { format: "js" }
+            post_auth unban_moderator_post_post_path(@post), @admin
 
             assert_redirected_to(@post)
             assert_equal(false, @post.reload.is_banned?)

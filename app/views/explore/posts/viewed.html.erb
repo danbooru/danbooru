@@ -11,7 +11,7 @@
 
     <%= post_previews_html(@posts) %>
 
-    <div class="paginator">
+    <div class="paginator text-center mt-4">
       <menu>
         <li><%= link_to "< Previous", viewed_explore_posts_path(:date => 1.day.ago(@date).to_date) %></li>
         <li><%= link_to "Next >", viewed_explore_posts_path(:date => 1.day.since(@date).to_date) %></li>

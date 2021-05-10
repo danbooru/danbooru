@@ -2,11 +2,10 @@
   <div id="a-new">
     <h1>New Favorite Group</h1>
 
-    <%= error_messages_for "favorite_group" %>
-
     <%= edit_form_for(@favorite_group) do |f| %>
       <%= f.input :name, as: :string, required: true %>
       <%= f.input :post_ids_string, label: "Posts", as: :text %>
+      <%= f.input :is_public, label: "Public" %>
       <%= f.submit "Submit" %>
     <% end %>
   </div>

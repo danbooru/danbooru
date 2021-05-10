@@ -1,3 +1,5 @@
+@import "./000_vars.scss";
+
 a:link {
   color: var(--link-color);
   text-decoration: none;
@@ -20,6 +22,14 @@ a:active {
 
 a.active {
   font-weight: bold;
+}
+
+a.active-link {
+  @include active-link;
+}
+
+a.inactive-link {
+  @include inactive-link;
 }
 
 a[rel*="external"] {

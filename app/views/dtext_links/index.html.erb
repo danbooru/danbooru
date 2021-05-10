@@ -4,8 +4,8 @@
       <%= f.input :link_target_ilike, label: "Link", hint: "Use * for wildcard", input_html: { value: params[:search][:link_target_ilike], data: { autocomplete: "wiki-page" } } %>
       <%= f.input :model_type, label: "Page Type", collection: [["Wiki Page", "WikiPage"], ["Forum Post", "ForumPost"]], include_blank: true, selected: params[:search][:model_type] %>
       <%= f.input :link_type, label: "Link Type", collection: [["Wiki", "0"], ["External", "1"]], include_blank: true, selected: params[:search][:link_type] %>
-      <%= f.input :linked_wiki_exists, label: "Wiki Exists?", collection: ["Yes", "No"], include_blank: true, selected: params[:search][:linked_wiki_exists] %>
-      <%= f.input :linked_tag_exists, label: "Tag Exists?", collection: ["Yes", "No"], include_blank: true, selected: params[:search][:linked_tag_exists] %>
+      <%= f.input :has_linked_wiki, label: "Wiki Exists?", collection: ["Yes", "No"], include_blank: true, selected: params[:search][:has_linked_wiki] %>
+      <%= f.input :has_linked_tag, label: "Tag Exists?", collection: ["Yes", "No"], include_blank: true, selected: params[:search][:has_linked_tag] %>
       <%= f.submit "Search" %>
     <% end %>
 

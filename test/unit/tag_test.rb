@@ -13,16 +13,6 @@ class TagTest < ActiveSupport::TestCase
   end
 
   context "A tag category fetcher" do
-    should "fetch for a single tag" do
-      FactoryBot.create(:artist_tag, :name => "test")
-      assert_equal(Tag.categories.artist, Tag.category_for("test"))
-    end
-
-    should "fetch for a single tag with strange markup" do
-      FactoryBot.create(:artist_tag, :name => "!@$%")
-      assert_equal(Tag.categories.artist, Tag.category_for("!@$%"))
-    end
-
     should "fetch for multiple tags" do
       FactoryBot.create(:artist_tag, :name => "aaa")
       FactoryBot.create(:copyright_tag, :name => "bbb")
@@ -88,64 +78,6 @@ class TagTest < ActiveSupport::TestCase
 
     context "not be settable to an invalid category" do
       should validate_inclusion_of(:category).in_array(TagCategory.category_ids)
-    end
-  end
-
-  context "A tag parser" do
-    should "scan a query" do
-      assert_equal(%w(aaa bbb), PostQueryBuilder.scan_query("aaa bbb"))
-      assert_equal(%w(~AAa -BBB* -bbb*), PostQueryBuilder.scan_query("~AAa -BBB* -bbb*"))
-    end
-
-    should "not strip out valid characters when scanning" do
-      assert_equal(%w(aaa bbb), PostQueryBuilder.scan_query("aaa bbb"))
-      assert_equal(%w(favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%), PostQueryBuilder.scan_query("favgroup:yondemasu_yo,_azazel-san. pool:ichigo_100%"))
-    end
-
-    should "cast values" do
-      assert_equal(2048, PostQueryBuilder.parse_cast("2kb", :filesize))
-      assert_equal(2097152, PostQueryBuilder.parse_cast("2m", :filesize))
-      assert_nothing_raised {PostQueryBuilder.parse_cast("2009-01-01", :date)}
-      assert_nothing_raised {PostQueryBuilder.parse_cast("1234", :integer)}
-      assert_nothing_raised {PostQueryBuilder.parse_cast("1234.56", :float)}
-    end
-
-    should "parse a query" do
-      tag1 = FactoryBot.create(:tag, :name => "abc")
-      tag2 = FactoryBot.create(:tag, :name => "acb")
-
-      assert_equal(["abc"], PostQueryBuilder.parse_query("md5:abc")[:md5])
-      assert_equal([:between, 1, 2], PostQueryBuilder.parse_query("id:1..2")[:post_id])
-      assert_equal([:gte, 1], PostQueryBuilder.parse_query("id:1..")[:post_id])
-      assert_equal([:lte, 2], PostQueryBuilder.parse_query("id:..2")[:post_id])
-      assert_equal([:gt, 2], PostQueryBuilder.parse_query("id:>2")[:post_id])
-      assert_equal([:lt, 3], PostQueryBuilder.parse_query("id:<3")[:post_id])
-      assert_equal([:lt, 3], PostQueryBuilder.parse_query("ID:<3")[:post_id])
-
-      assert_equal(["acb"], PostQueryBuilder.parse_query("a*b")[:tags][:include])
-    end
-
-    should "parse single tags correctly" do
-      assert_equal(true, Tag.is_single_tag?("foo"))
-      assert_equal(true, Tag.is_single_tag?("-foo"))
-      assert_equal(true, Tag.is_single_tag?("~foo"))
-      assert_equal(true, Tag.is_single_tag?("foo*"))
-      assert_equal(true, Tag.is_single_tag?("fav:1234"))
-      assert_equal(true, Tag.is_single_tag?("pool:1234"))
-      assert_equal(true, Tag.is_single_tag?('source:"foo bar baz"'))
-      assert_equal(false, Tag.is_single_tag?("foo bar"))
-    end
-
-    should "parse simple tags correctly" do
-      assert_equal(true, Tag.is_simple_tag?("foo"))
-      assert_equal(false, Tag.is_simple_tag?("-foo"))
-      assert_equal(false, Tag.is_simple_tag?("~foo"))
-      assert_equal(false, Tag.is_simple_tag?("foo*"))
-      assert_equal(false, Tag.is_simple_tag?("fav:1234"))
-      assert_equal(false, Tag.is_simple_tag?("FAV:1234"))
-      assert_equal(false, Tag.is_simple_tag?("pool:1234"))
-      assert_equal(false, Tag.is_simple_tag?('source:"foo bar baz"'))
-      assert_equal(false, Tag.is_simple_tag?("foo bar"))
     end
   end
 
@@ -227,6 +159,13 @@ class TagTest < ActiveSupport::TestCase
       should_not allow_value("___").for(:name).on(:create)
       should_not allow_value("~foo").for(:name).on(:create)
       should_not allow_value("-foo").for(:name).on(:create)
+      should_not allow_value("/foo").for(:name).on(:create)
+      should_not allow_value("`foo").for(:name).on(:create)
+      should_not allow_value("%foo").for(:name).on(:create)
+      should_not allow_value(")foo").for(:name).on(:create)
+      should_not allow_value("{foo").for(:name).on(:create)
+      should_not allow_value("}foo").for(:name).on(:create)
+      should_not allow_value("]foo").for(:name).on(:create)
       should_not allow_value("_foo").for(:name).on(:create)
       should_not allow_value("foo_").for(:name).on(:create)
       should_not allow_value("foo__bar").for(:name).on(:create)
@@ -236,6 +175,7 @@ class TagTest < ActiveSupport::TestCase
       should_not allow_value("café").for(:name).on(:create)
       should_not allow_value("東方").for(:name).on(:create)
       should_not allow_value("FAV:blah").for(:name).on(:create)
+      should_not allow_value("X"*171).for(:name).on(:create)
 
       metatags = PostQueryBuilder::METATAGS + TagCategory.mapping.keys
       metatags.each do |metatag|

@@ -1,12 +1,25 @@
 module ReportbooruHelper
-  def mock_popular_search_service!
-    Danbooru.config.stubs(:reportbooru_server).returns("http://localhost:3003")
-    stub_request(:get, "http://localhost:3003/post_searches/month?date=#{Date.today}").to_return(body: "kantai_collection 1000.0\ntouhou 500.0")
-    stub_request(:get, "http://localhost:3003/post_searches/day?date=#{Date.today}").to_return(body: "kantai_collection 1000.0\ntouhou 500.0")
+  def mock_request(url, method: :get, status: 200, body: nil, http: Danbooru::Http.any_instance, **options)
+    response = HTTP::Response.new(status: status, body: body, version: "1.1")
+    http.stubs(method).with(url, **options).returns(response)
   end
 
-  def mock_missed_search_service!
-    Danbooru.config.stubs(:reportbooru_server).returns("http://localhost:3003")
-    stub_request(:get, "http://localhost:3003/missed_searches").to_return(body: "kantai_collection 1000.0\ntouhou 500.0")
+  def mock_post_search_rankings(date = Date.today, rankings)
+    Danbooru.config.stubs(:reportbooru_server).returns("http://localhost:1234")
+    url = "http://localhost:1234/post_searches/rank?date=#{date}"
+    mock_request(url, body: rankings.to_json)
+  end
+
+  def mock_missed_search_rankings(date = Date.today, rankings)
+    Danbooru.config.stubs(:reportbooru_server).returns("http://localhost:1234")
+    url = "http://localhost:1234/missed_searches"
+    data = rankings.map { _1.join(" ") }.join("\n")
+    mock_request(url, body: data)
+  end
+
+  def mock_post_view_rankings(date = Date.today, rankings)
+    Danbooru.config.stubs(:reportbooru_server).returns("http://localhost:1234")
+    url = "http://localhost:1234/post_views/rank?date=#{date}"
+    mock_request(url, body: rankings.to_json)
   end
 end

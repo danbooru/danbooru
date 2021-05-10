@@ -36,7 +36,7 @@ module RecommenderService
     posts = posts.where.not(id: post.id) if post
     posts = posts.where.not(uploader_id: uploader.id) if uploader
     posts = posts.where.not(id: favoriter.favorites.select(:post_id)) if favoriter
-    posts = posts.where(id: Post.tag_match(tags).reorder(nil).select(:id)) if tags.present?
+    posts = posts.where(id: Post.user_tag_match(tags).reorder(nil).select(:id)) if tags.present?
 
     id_to_score = recs.to_h
     recs = posts.map { |post| { score: id_to_score[post.id], post: post } }
@@ -54,7 +54,7 @@ module RecommenderService
     end
 
     if user.present?
-      raise User::PrivilegeError if user.hide_favorites?
+      raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, user).can_see_favorites?
       max_recommendations = params.fetch(:max_recommendations, user.favorite_count + 500).to_i.clamp(0, 50000)
       recs = RecommenderService.recommend_for_user(user, tags: params[:post_tags_match], limit: max_recommendations)
     elsif post.present?

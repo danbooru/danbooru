@@ -1,6 +1,6 @@
 <div>
   <h2>Statistics</h2>
-  <table width="100%" class="user-statistics">
+  <table width="100%" class="user-statistics table-sm">
     <tbody>
       <tr>
         <th>User ID</th>
@@ -10,14 +10,23 @@
         <th>Join Date</th>
         <td><%= presenter.join_date %></td>
       </tr>
-      <% if CurrentUser.is_moderator? %>
+
+      <% if policy(User).can_see_last_logged_in_at? %>
+        <tr>
+          <th>Last Seen</th>
+          <td><%= time_ago_in_words_tagged(user.last_logged_in_at) %></td>
+        </tr>
+      <% end %>
+
+      <% if policy(IpAddress).show? %>
         <tr>
           <th>Last IP</th>
           <td>
             <% if user.last_ip_addr.present? %>
               <%= link_to user.last_ip_addr, ip_addresses_path(search: { ip_addr: user.last_ip_addr }) %>
-              (<%= link_to "users", ip_addresses_path(search: { ip_addr: user.last_ip_addr, group_by: "user" }) %>,
-              <%= link_to "IPs", ip_addresses_path(search: { user_id: user.id, group_by: "ip_addr" }) %>)
+              (<%= link_to "info", ip_address_path(user.last_ip_addr) %>,
+               <%= link_to "users", ip_addresses_path(search: { ip_addr: user.last_ip_addr, group_by: "user" }) %>,
+               <%= link_to "IPs", ip_addresses_path(search: { user_id: user.id, group_by: "ip_addr" }) %>)
             <% else %>
               <em>unknown</em>
               (<%= link_to "IPs", ip_addresses_path(search: { user_id: user.id, group_by: "ip_addr" }) %>)
@@ -26,21 +35,51 @@
         </tr>
       <% end %>
 
-      <tr>
-        <th>Inviter</th>
-        <% if user.inviter %>
+      <% if policy(user.email_address).show? %>
+        <tr class="user-email-address">
+          <th>Email Address</th>
+          <td>
+            <% if user.email_address.present? %>
+              <%= user.email_address.address %>
+
+              <% if user == CurrentUser.user %>
+                (<%= link_to "edit", edit_user_email_path(user) %>)
+              <% end %>
+
+              <% if user.email_address.is_verified? %>
+                <%= checkmark_icon(class: "user-verified-email-icon", title: "Verified email") %>
+              <% elsif user == CurrentUser.user %>
+                <%= link_to verify_user_email_path(user) do %>
+                  <%= exclamation_icon(class: "user-unverified-email-icon", title: "Unverified email. Click here to verify your email.") %>
+                <% end %>
+              <% else %>
+                <%= exclamation_icon(class: "user-unverified-email-icon", title: "Unverified email") %>
+              <% end %>
+            <% else %>
+              <em>none</em>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+
+      <% if user.inviter %>
+        <tr>
+          <th>Promoter</th>
           <td><%= link_to_user user.inviter %> <%= link_to "»", users_path(search: { inviter: { name: user.inviter.name }}) %></td>
-        <% else %>
-          <td>None</td>
-        <% end %>
-      </tr>
+        </tr>
+      <% end %>
 
       <tr>
         <th>Level</th>
         <td>
           <%= user.level_string %>
-          <% if CurrentUser.user == user && !CurrentUser.is_gold? %>
-            (<%= link_to "upgrade", new_user_upgrade_path %>)
+
+          <% if !user.is_platinum? %>
+            <% if CurrentUser.user == user %>
+              (<%= link_to "Upgrade account", new_user_upgrade_path %>)
+            <% else %>
+              (<%= link_to "Gift upgrade", new_user_upgrade_path(user_id: user.id) %>)
+            <% end %>
           <% end %>
         </td>
       </tr>
@@ -73,10 +112,10 @@
         <td>
           <%= presenter.upload_count(self) %>
           <% if presenter.has_uploads? %>
-            (<%= link_to "tag changes report", reports_upload_tags_path(user_id: user.id) %>)
+            (<%= link_to "tag changes report", post_versions_path(search: { updater_name: user.name, version: 1 }, type: "current") %>)
           <% end %>
           <% if CurrentUser.is_moderator? %>
-            [<%= link_to "sample", posts_path(:tags => "user:#{user.name} order:random limit:300") %>]
+            [<%= link_to "sample", posts_path(:tags => "user:#{user.name} order:random limit:#{PostSets::Post::MAX_PER_PAGE}") %>]
           <% end %>
         </td>
       </tr>
@@ -86,7 +125,7 @@
         <td>
           <%= presenter.deleted_upload_count(self) %>
           <% if CurrentUser.is_moderator? %>
-            [<%= link_to "sample", posts_path(:tags => "user:#{user.name} order:random limit:300 status:deleted") %>]
+            [<%= link_to "sample", posts_path(:tags => "user:#{user.name} order:random limit:#{PostSets::Post::MAX_PER_PAGE} status:deleted") %>]
           <% end %>
 
         </td>
@@ -97,7 +136,7 @@
         <td>
           <%= presenter.favorite_count(self) %>
           <% if CurrentUser.is_moderator? %>
-            [<%= link_to "sample", posts_path(:tags => "fav:#{user.name} order:random limit:300") %>]
+            [<%= link_to "sample", posts_path(:tags => "fav:#{user.name} order:random limit:#{PostSets::Post::MAX_PER_PAGE}") %>]
           <% end %>
         </td>
       </tr>
@@ -108,7 +147,7 @@
           <td>
             <%= link_to user.post_votes.count, post_votes_path(search: { user_name: user.name }) %> posts,
             <%= link_to user.comment_votes.count, comment_votes_path(search: { user_name: user.name }) %> comments,
-            <%= link_to user.forum_post_votes.count, forum_post_votes_path(search: { creator_name: user.name }) %> forum posts 
+            <%= link_to user.forum_post_votes.count, forum_post_votes_path(search: { creator_name: user.name }) %> forum posts
           </td>
         </tr>
       <% end %>
@@ -122,7 +161,7 @@
         <th>Post Changes</th>
         <td>
           <%= presenter.post_version_count(self) %>
-          <% if CurrentUser.id == user.id %> 
+          <% if CurrentUser.id == user.id %>
             (<%= link_to "refresh", new_maintenance_user_count_fixes_path %>)
           <% end %>
         </td>
@@ -130,7 +169,10 @@
 
       <tr>
         <th>Note Changes</th>
-        <td><%= presenter.note_version_count(self) %> in <%= presenter.noted_posts_count(self) %> posts</td>
+        <td>
+          <%= presenter.note_version_count(self) %> in <%= presenter.noted_posts_count(self) %> posts
+          (<%= link_to "note changes report", note_versions_path(search: { updater_id: user.id, version: 1 }, type: "current") %>)
+        </td>
       </tr>
 
       <tr>
@@ -170,12 +212,12 @@
         <td><%= presenter.comment_count(self) %> in <%= presenter.commented_posts_count(self) %> posts</td>
       </tr>
 
-      <% if CurrentUser.user.id == user.id || CurrentUser.is_moderator? %>
-        <tr>
-          <th>Appeals</th>
-          <td><%= presenter.appeal_count(self) %></td>
-        </tr>
+      <tr>
+        <th>Appeals</th>
+        <td><%= presenter.appeal_count(self) %></td>
+      </tr>
 
+      <% if CurrentUser.user.id == user.id || CurrentUser.is_moderator? %>
         <tr>
           <th>Flags</th>
           <td><%= presenter.flag_count(self) %></td>
@@ -184,14 +226,22 @@
 
       <tr>
         <th>Feedback</th>
-        <td><%= presenter.feedbacks(self) %></td>    </tbody>
+        <td><%= presenter.feedbacks(self) %></td>
       </tr>
-      
-      <% if CurrentUser.is_moderator? && presenter.previous_names(self).present? %>
-        <tr>
-          <th>Previous Names</th>
-          <td><%= presenter.previous_names(self) %></td>
-        </tr>
+
+      <% if policy(UserNameChangeRequest.new(user: user)).show? %>
+        <% user.user_name_change_requests.visible(CurrentUser.user).tap do |changes| %>
+          <% if changes.present? %>
+            <tr>
+              <th>Previous Names</th>
+              <td>
+                <%= changes.map do |change| %>
+                  <% link_to change.original_name, change %>
+                <% end.join(", ").html_safe %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
       <% end %>
 
       <% if CurrentUser.id == user.id %>
@@ -209,18 +259,11 @@
         <tr>
           <th>API Key</th>
           <td>
-            <%= link_to (CurrentUser.api_key ? "View" : "Generate"), user_api_key_path(CurrentUser.user) %>
+            <%= link_to "View", user_api_keys_path(CurrentUser.user) %>
             (<%= link_to_wiki "help", "help:api" %>)
           </td>
         </tr>
-
-        <tr>
-          <th>API Limits</th>
-          <td>
-            <%= CurrentUser.user.remaining_api_limit %>
-            / <%= CurrentUser.user.api_burst_limit %> <span class="fineprint">(may not be up to date)</span>
-          </td>
-        </tr>
       <% end %>
+    </tbody>
   </table>
 </div>

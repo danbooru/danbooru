@@ -1,54 +1,10 @@
 @import "../base/000_vars.scss";
 
-div.comments-for-post {
-  div.moderation-comments-notice {
-    margin: 1em 0;
-    font-weight: bold;
-    color: var(--moderation-report-text-color);
-  }
-
-  div.hidden-comments-notice {
-    margin: 1em 0;
-  }
-
-  div.list-of-comments {
-    article.comment {
-      flex: 1;
-
-      &[data-is-sticky="true"] {
-        background: var(--comment-sticky-background-color);
-      }
-
-      &[data-is-reported="true"] {
-        border: var(--moderation-report-border);
-      }
-
-      &[data-is-voted="true"] {
-        .comment-vote-up-link, .comment-vote-down-link {
-          display: none;
-        }
-      }
-
-      &[data-is-voted="false"] {
-        .comment-unvote-link {
-          display: none;
-        }
-      }
-
-      &[data-below-threshold="true"][data-is-sticky="false"] {
-        opacity: 0.3;
-
-        &:hover {
-          opacity: 1;
-        }
-      }
-    }
-  }
-}
-
 div#c-comments {
-  div#a-index, div#a-show {
+  div#a-index {
     div.header {
+      margin-bottom: 1em;
+
       span.info {
         margin-right: 1.5em;
       }
@@ -92,7 +48,7 @@ div#c-comments {
         text-align: center;
       }
 
-      div.comments-for-post {
+      div.comment-section {
         flex: 1;
       }
     }
@@ -122,12 +78,6 @@ form.edit_comment div.input.boolean {
         margin: 1em auto;
         width: auto;
         height: auto;
-      }
-
-      div.comments-for-post {
-        div.header div.row span.info {
-          display: block;
-        }
       }
     }
   }

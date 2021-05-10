@@ -1,6 +1,6 @@
 <div id="p-<%= listing_type(:post_id, :note_id) %>-listing">
 
-    <%= table_for @note_versions, {class: "striped autofit", width: "100%"} do |t| %>
+    <%= table_for @note_versions, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "Post", width: "5%" do |note_version| %>
         <%= link_to note_version.post_id, post_path(note_version.post_id) %>
         <% if !params.dig(:search, :post_id).present? %>
@@ -14,16 +14,16 @@
         <% end %>
       <% end %>
       <% t.column "Body", td: {class: "col-expand diff-body"} do |note_version| %>
-        <%= diff_body_html(note_version, note_version.previous, :body) %>
+        <%= note_version_body_diff(note_version, params[:type]) %>
       <% end %>
       <% t.column "Position (X,Y)", width: "5%", column: "position" do |note_version| %>
-        <%= note_version_position_diff(note_version) %>
+        <%= note_version_position_diff(note_version, params[:type]) %>
       <% end %>
       <% t.column "Size (WxH)", width: "5%", column: "size"  do |note_version| %>
-        <%= note_version_size_diff(note_version) %>
+        <%= note_version_size_diff(note_version, params[:type]) %>
       <% end %>
       <% t.column "Changes", width: "3%" do |note_version| %>
-        <%= status_diff_html(note_version) %>
+        <%= status_diff_html(note_version, params[:type]) %>
       <% end %>
       <% t.column "Updated", width: "10%" do |note_version| %>
         <div>

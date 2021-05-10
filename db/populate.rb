@@ -53,7 +53,7 @@ if User.count == 0
         password: "password1",
         password_confirmation: "password1"
       )
-      newuser.promote_to!(User::Levels.const_get(level), :is_upgrade => true, :skip_dmail => true)
+      newuser.promote_to!(User::Levels.const_get(level), user)
     end
 
     newuser = User.create(
@@ -68,14 +68,14 @@ if User.count == 0
       :password => "password1",
       :password_confirmation => "password1"
     )
-    newuser.promote_to!(User::Levels::BUILDER, :can_upload_free => true, :is_upgrade => true, :skip_dmail => true)
+    newuser.promote_to!(User::Levels::BUILDER, :can_upload_free => true, :skip_dmail => true)
 
     newuser = User.create(
       :name => "approver",
       :password => "password1",
       :password_confirmation => "password1"
     )
-    newuser.promote_to!(User::Levels::BUILDER, :can_approve_posts => true, :is_upgrade => true, :skip_dmail => true)
+    newuser.promote_to!(User::Levels::BUILDER, :can_approve_posts => true, :skip_dmail => true)
   end
 
   0.upto(10) do |i|
@@ -91,11 +91,10 @@ else
   user = User.find_by_name("albert")
 end
 
-CurrentUser.as_admin
+CurrentUser.user = User.admins.first
+CurrentUser.ip_addr = "127.0.0.1"
 
 if Upload.count == 0
-  ENV["SKIP_CLOUDFLARE_CHECK"] = "true"
-
   puts "Creating uploads"
   1.upto(50) do |i|
     color1 = rand(4096).to_s(16)

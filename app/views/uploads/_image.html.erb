@@ -1,23 +1,22 @@
 <% if params[:url] %>
+  <p id="upload-image-metadata">
+    <strong>Size</strong>
+    <% if @remote_size.present? %>
+      <span id="upload-image-metadata-filesize"><%= number_to_human_size(@remote_size) %></span>
+    <% end %>
+    <span id="upload-image-metadata-resolution"></span>
+    <span id="upload-image-metadata-size-links">
+      (<a id="upload-image-view-small" href="">small</a> | <a id="upload-image-view-large" href="">large</a> | <a id="upload-image-view-full" href="">full</a>)
+    </span>
+  </p>
+
   <div id="upload-image">
     <% if ImageProxy.needs_proxy?(@source.image_url) %>
-      <%= tag.img src: image_proxy_uploads_path(url: @source.image_url), title: "Preview", id: "image" %>
+      <%= tag.img src: image_proxy_uploads_path(url: @source.image_url), title: "Preview", id: "image", class: "fit-width fit-height", onerror: "Danbooru.Upload.no_image_available()", "data-shortcut": "z" %>
     <% elsif @source.image_url.present? %>
-      <%= tag.img src: @source.image_url, title: "Preview", id: "image", referrerpolicy: "no-referrer" %>
+      <%= tag.img src: @source.image_url, title: "Preview", id: "image", referrerpolicy: "no-referrer", class: "fit-width fit-height", onerror: "Danbooru.Upload.no_image_available()", "data-shortcut": "z" %>
     <% end %>
+
+    <div id="no-image-available">No image preview available</div>
   </div>
-
-  <ul id="upload-image-metadata">
-    <li id="no-image-available"><em>No image preview available</em></li>
-
-    <% if @remote_size %>
-      <li><strong>Size:</strong> <%= number_to_human_size(@remote_size) %></li>
-    <% end %>
-
-    <% if params[:ref] %>
-      <li><strong>Referrer:</strong> <%= params[:ref] %></li>
-    <% end %>
-
-    <li id="scale-link"><span id="scale"></span> (<%= link_to "toggle size", "#", :id => "image-resize-to-window-link" %>)</li>
-  </ul>
 <% end %>

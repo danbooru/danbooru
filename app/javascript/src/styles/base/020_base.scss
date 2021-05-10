@@ -1,20 +1,25 @@
-@import "../base/000_vars.scss";
+*, ::before, ::after {
+  box-sizing: border-box;
+}
+
+/*
+ * Make sure elements with the HTML5 [hidden] attribute (e.g. <span hidden>blah</span>)
+ * really are hidden. Otherwise the `display` property can override the [hidden] attribute.
+ */
+[hidden] {
+  display: none !important;
+}
 
 body {
   color: var(--text-color);
   background-color: var(--body-background-color);
-  font-family: $base_font_family;
+  font-family: var(--body-font);
   font-size: 87.5%;
   line-height: 1.25em;
 }
 
 abbr[title=required] {
   display: none;
-}
-
-code {
-  font-family: monospace;
-  font-size: 1.2em;
 }
 
 dd {
@@ -25,22 +30,23 @@ dt {
   font-weight: bold;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: Tahoma, Verdana, Helvetica, sans-serif;
+h1, h2, h3, h4, h5, h6, .heading {
+  font-family: var(--header-font);
+  font-weight: bold;
   line-height: 1.5em;
   color: var(--header-color);
 }
 
 h1 {
-  font-size: $h1_size;
+  font-size: var(--text-xxl);
 }
 
 h2 {
-  font-size: $h2_size;
+  font-size: var(--text-lg);
 }
 
 h3, h4, h5, h6 {
-  font-size: $h3_size;
+  font-size: var(--text-md);
 }
 
 fieldset {
@@ -59,28 +65,14 @@ img {
 
 input, select, textarea {
   background: var(--form-input-background);
-  border: var(--form-input-border);
+  border: 1px solid var(--form-input-border-color);
   color: var(--form-input-text-color);
   padding-left: 0.25em;
+  font: var(--body-font);
 }
 
-input[type="button"], input[type="submit"], button {
-  border-radius: 3px;
-  padding: 0.25em 1em;
-
-  background: var(--form-button-background);
-  border: var(--form-button-border);
-  color: var(--form-button-text-color);
-
-  &:hover {
-    box-shadow: var(--form-button-hover-box-shadow);
-    background: var(--form-button-hover-background);
-  }
-
-  &:active {
-    box-shadow: var(--form-button-hover-box-shadow);
-    background: var(--form-button-active-background);
-  }
+textarea {
+  font-size: var(--text-sm);
 }
 
 /* placeholder text in <input type="text"> elements */
@@ -104,7 +96,7 @@ menu {
     padding: 0;
   }
 
-  li {
+  > li {
     margin: 0;
     padding: 0 0.2em;
     display: inline;
@@ -119,6 +111,14 @@ table tfoot {
   margin-top: 2em;
 }
 
+details {
+  summary {
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+  }
+}
+
 .fineprint {
   color: var(--muted-text-color);
   font-style: italic;
@@ -126,7 +126,15 @@ table tfoot {
 }
 
 .text-small {
-  font-size: 0.8em;
+  font-size: 0.9em;
+}
+
+a.link-plain {
+  color: unset;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .fixed-width-container {
@@ -149,6 +157,22 @@ ul.list-inline {
   &, li {
     display: inline;
   }
+}
+
+.fit-width {
+  max-width: 100%;
+  height: auto !important;
+}
+
+.fit-height {
+  max-height: 90vh;
+  height: auto !important;
+}
+
+.svg-icon {
+  display: inline-block;
+  vertical-align: middle;
+  height: 1em;
 }
 
 .mobile-only {

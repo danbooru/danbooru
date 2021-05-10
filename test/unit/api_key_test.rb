@@ -1,15 +1,35 @@
 require 'test_helper'
 
 class ApiKeyTest < ActiveSupport::TestCase
-  context "in all cases a user" do
+  context "ApiKey:" do
     setup do
-      @user = FactoryBot.create(:gold_user, :name => "abcdef")
-      @api_key = ApiKey.generate!(@user)
+      @user = create(:user)
+      @api_key = create(:api_key, user: @user)
     end
 
-    should "regenerate the key" do
-      assert_changes(-> { @api_key.key }) do
-        @api_key.regenerate!
+    context "During validation" do
+      subject { build(:api_key) }
+
+      context "of permissions" do
+        should allow_value([]).for(:permissions)
+        should allow_value(["posts:index"]).for(:permissions)
+        should allow_value(["posts:index", "posts:show"]).for(:permissions)
+
+        should_not allow_value(["blah"]).for(:permissions)
+        should_not allow_value(["posts:blah"]).for(:permissions)
+        should_not allow_value(["blah:index"]).for(:permissions)
+      end
+
+      context "of IP addresses" do
+        should allow_value([]).for(:permitted_ip_addresses)
+        should allow_value(["1.2.3.4"]).for(:permitted_ip_addresses)
+        should allow_value(["1.2.3.4/24"]).for(:permitted_ip_addresses)
+        should allow_value(["0.0.0.0/0"]).for(:permitted_ip_addresses)
+        should allow_value(["2600::1/64"]).for(:permitted_ip_addresses)
+
+        #should allow_value(["1.2.3.4/24 4.5.6.7/24"]).for(:permitted_ip_addresses)
+        #should_not allow_value(["blah"]).for(:permitted_ip_addresses)
+        #should_not allow_value(["1.2.3.4/64"]).for(:permitted_ip_addresses)
       end
     end
 
@@ -18,21 +38,15 @@ class ApiKeyTest < ActiveSupport::TestCase
     end
 
     should "authenticate via api key" do
-      assert_not_nil(User.authenticate_api_key(@user.name, @api_key.key))
+      assert_equal([@user, @api_key], @user.authenticate_api_key(@api_key.key))
     end
 
     should "not authenticate with the wrong api key" do
-      assert_nil(User.authenticate_api_key(@user.name, "xxx"))
+      assert_equal(false, @user.authenticate_api_key("xxx"))
     end
 
     should "not authenticate with the wrong name" do
-      assert_nil(User.authenticate_api_key("xxx", @api_key.key))
-    end
-
-    should "have the same limits whether or not they have an api key" do
-      assert_no_difference(["@user.reload.api_regen_multiplier", "@user.reload.api_burst_limit"]) do
-        @user.api_key.destroy
-      end
+      assert_equal(false, create(:user).authenticate_api_key(@api_key.key))
     end
   end
 end

@@ -1,11 +1,12 @@
 module PaginationExtension
   class PaginationError < StandardError; end
 
-  attr_accessor :current_page, :records_per_page, :paginator_count, :paginator_mode
+  attr_accessor :current_page, :records_per_page, :paginator_count, :paginator_mode, :paginator_page_limit
 
-  def paginate(page, limit: nil, count: nil, search_count: nil)
+  def paginate(page, limit: nil, max_limit: 1000, page_limit: CurrentUser.user.page_limit, count: nil, search_count: nil)
     @records_per_page = limit || Danbooru.config.posts_per_page
-    @records_per_page = @records_per_page.to_i.clamp(1, 1000)
+    @records_per_page = @records_per_page.to_i.clamp(1, max_limit)
+    @paginator_page_limit = page_limit
 
     if count.present?
       @paginator_count = count
@@ -13,16 +14,20 @@ module PaginationExtension
       @paginator_count = 1_000_000
     end
 
-    if page =~ /\Ab(\d+)\z/i
+    if page.to_s =~ /\Ab(\d+)\z/i
       @paginator_mode = :sequential_before
       paginate_sequential_before($1, records_per_page)
-    elsif page =~ /\Aa(\d+)\z/i
+    elsif page.to_s =~ /\Aa(\d+)\z/i
       @paginator_mode = :sequential_after
       paginate_sequential_after($1, records_per_page)
+    elsif page.to_i > page_limit
+      raise PaginationError
+    elsif page.to_i == page_limit
+      @paginator_mode = :sequential_after
+      paginate_numbered(page.to_i, records_per_page)
     else
       @paginator_mode = :numbered
       @current_page = [page.to_i, 1].max
-      raise PaginationError if current_page > Danbooru.config.max_numbered_pages
 
       paginate_numbered(current_page, records_per_page)
     end
@@ -61,27 +66,31 @@ module PaginationExtension
   end
 
   def prev_page
-    return nil if is_first_page?
-
-    if paginator_mode == :numbered
+    if is_first_page?
+      nil
+    elsif paginator_mode == :numbered
       current_page - 1
-    elsif paginator_mode == :sequential_before
+    elsif records.present?
       "a#{records.first.id}"
-    elsif paginator_mode == :sequential_after
-      "b#{records.last.id}"
+    else
+      nil
     end
+  rescue ActiveRecord::QueryCanceled
+    nil
   end
 
   def next_page
-    return nil if is_last_page?
-
-    if paginator_mode == :numbered
+    if is_last_page?
+      nil
+    elsif paginator_mode == :numbered
       current_page + 1
-    elsif paginator_mode == :sequential_before
+    elsif records.present?
       "b#{records.last.id}"
-    elsif paginator_mode == :sequential_after
-      "a#{records.first.id}"
+    else
+      nil
     end
+  rescue ActiveRecord::QueryCanceled
+    nil
   end
 
   # XXX Hack: in sequential pagination we fetch one more record than we
@@ -106,10 +115,7 @@ module PaginationExtension
   def total_count
     @paginator_count ||= unscoped.from(except(:offset, :limit, :order).reorder(nil)).count
   rescue ActiveRecord::StatementInvalid => e
-    if e.to_s =~ /statement timeout/
-      @paginator_count ||= 1_000_000
-    else
-      raise
-    end
+    raise unless e.to_s =~ /statement timeout/
+    @paginator_count ||= 1_000_000
   end
 end

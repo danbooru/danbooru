@@ -1,4 +1,4 @@
-$("#source-info").replaceWith("<%= j render "info", source: @source %>");
+$(".source-data").replaceWith("<%= j render_source_data(@source) %>");
 
 $(document).trigger("danbooru:update-source-data", {
   source: <%= raw @source.to_json %>,

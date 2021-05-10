@@ -1,44 +1,68 @@
 {
   "license": "MIT",
   "dependencies": {
+    "@babel/plugin-proposal-decorators": "^7.10.5",
+    "@fontsource/anton": "^4.0.0",
+    "@fontsource/archivo-narrow": "^4.0.0",
+    "@fontsource/ibm-plex-mono": "^4.0.0",
+    "@fontsource/indie-flower": "^4.0.0",
+    "@fontsource/lora": "^4.0.0",
+    "@fontsource/petit-formal-script": "^4.0.0",
+    "@fontsource/rokkitt": "^4.0.0",
+    "@fontsource/unifrakturmaguntia": "^4.0.0",
     "@fortawesome/fontawesome-free": "^5.11.2",
     "@rails/ujs": "^6.0.2-1",
-    "@rails/webpacker": "^4.0.0",
-    "debug-loader": "^0.0.1",
+    "@rails/webpacker": "=6.0.0-beta.6",
+    "css-loader": "^5.0.1",
     "dropzone": "^5.5.1",
-    "expose-loader": "^0.7.5",
     "hammerjs": "^2.0.8",
+    "jquery": "3.5.1",
     "jquery-hotkeys": "^0.2.2",
     "jquery-ui": "^1.12.1",
-    "qtip2": "^3.0.3",
+    "lodash": "^4.17.21",
+    "mini-css-extract-plugin": "^1.3.4",
+    "postcss": "^8.2.4",
+    "postcss-flexbugs-fixes": "^5.0.2",
+    "postcss-import": "^14.0.0",
+    "postcss-loader": "^5.0.0",
+    "postcss-preset-env": "^6.7.0",
     "rails-erb-loader": "^5.5.0",
-    "script-loader": "^0.7.2",
+    "ruffle-mirror": "^2021.3.31",
+    "sass": "^1.32.5",
+    "sass-loader": "^11.0.0",
     "spark-md5": "^3.0.0",
-    "stupid-table-plugin": "^1.1.3",
-    "typeface-anton": "^0.0.72",
-    "typeface-archivo-narrow": "^1.0.0",
-    "typeface-indie-flower": "^0.0.72",
-    "typeface-lora": "^0.0.72",
-    "typeface-petit-formal-script": "^0.0.72",
-    "typeface-rokkitt": "^1.0.0",
-    "typeface-unifrakturmaguntia": "^0.0.72",
+    "tippy.js": "^6.2.3",
     "typopro-web": "^4.2.2",
-    "webpack-cli": "^3.3.0"
+    "webpack": "^5.11.0",
+    "webpack-cli": "^4.2.0"
   },
   "devDependencies": {
-    "eslint": "^6.0.0",
-    "eslint-loader": "^3.0.0",
+    "@babel/cli": "^7.12.13",
+    "@webpack-cli/serve": "^1.2.2",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.0.0",
+    "eslint-plugin-babel": "^5.3.0",
     "eslint-plugin-ignore-erb": "^0.1.1",
+    "eslint-webpack-plugin": "^2.4.3",
     "stylelint": "^13.0.0",
     "stylelint-config-standard": "^20.0.0",
-    "webpack-dev-server": "^3.8.0"
+    "webpack-dev-server": "^3.11.2"
+  },
+  "resolutions": {
+    "webpack": "5.26.3",
+    "ruffle-mirror": "2021.3.31"
+  },
+  "scripts": {
+    "eslint-all": "yarn run eslint --plugin eslint-plugin-ignore-erb --ext .js,.js.erb app/javascript/src/javascripts",
+    "stylelint-all": "yarn run stylelint 'app/javascript/src/styles/**/*.scss'"
+  },
+  "babel": {
+    "presets": [
+      "./node_modules/@rails/webpacker/package/babel/preset.js"
+    ]
   },
   "browserslist": [
     "defaults",
     "since 2012"
-  ],
-  "scripts": {
-    "eslint-all": "yarn run eslint --plugin eslint-plugin-ignore-erb --ext .js,.js.erb app/javascript/src/javascripts",
-    "stylelint-all": "yarn run stylelint 'app/javascript/src/styles/**/*.scss'"
-  }
+  ]
 }

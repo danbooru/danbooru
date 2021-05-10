@@ -1,16 +1,23 @@
 module Maintenance
   module User
     class DeletionsController < ApplicationController
+      respond_to :html, :json, :xml
+
       def show
       end
 
       def destroy
-        deletion = UserDeletion.new(CurrentUser.user, params[:password])
+        deletion = UserDeletion.new(CurrentUser.user, params.dig(:user, :password), request)
         deletion.delete!
-        session.delete(:user_id)
-        cookies.delete(:password_hash)
-        cookies.delete(:user_name)
-        redirect_to(posts_path, :notice => "You are now logged out")
+
+        if deletion.errors.none?
+          session.delete(:user_id)
+          flash[:notice] = "Your account has been deactivated"
+          respond_with(deletion, location: posts_path)
+        else
+          flash[:notice] = deletion.errors.full_messages.join("; ")
+          redirect_to maintenance_user_deletion_path
+        end
       end
     end
   end

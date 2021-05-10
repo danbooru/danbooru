@@ -1,0 +1,7 @@
+<% content_for(:secondary_links) do %>
+  <%= quick_search_form_for(:ip_addr, ip_addresses_path, "ip addresses") %>
+  <%= subnav_link_to "Listing", ip_addresses_path %>
+  <%= subnav_link_to "IP Bans", ip_bans_path %>
+  <%= subnav_link_to "Bans", bans_path %>
+  <%= subnav_link_to "Feedbacks", user_feedbacks_path %>
+<% end %>

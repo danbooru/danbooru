@@ -1,61 +1,53 @@
 <ul>
   <li id="post-info-id">ID: <%= post.id %></li>
-  <% if CurrentUser.is_moderator? %>
-    <li id="post-info-uploader">Uploader: <%= link_to_user(post.uploader) %></li>
-  <% end %>
+  <li id="post-info-uploader">
+    Uploader: <%= link_to_user(post.uploader) %>
+    <%= link_to "»", posts_path(tags: "user:#{post.uploader.name}") %>
+  </li>
   <li id="post-info-date">
     Date: <%= link_to time_ago_in_words_tagged(post.created_at), posts_path(tags: "date:#{post.created_at.to_date}") %>
-    <meta itemprop="uploadDate" content="<%= post.created_at.iso8601 %>">
   </li>
   <% if post.approver %>
-    <li id="post-info-approver">Approver: <%= link_to_user(post.approver) %></li>
+    <li id="post-info-approver">
+      Approver: <%= link_to_user(post.approver) %>
+      <%= link_to "»", posts_path(tags: "approver:#{post.approver.name}") %>
+    </li>
   <% end %>
   <li id="post-info-size">
-    Size: <%= link_to_if post.visible?, number_to_human_size(post.file_size), post.tagged_file_url %>
+    Size: <%= link_to_if policy(post).visible?, "#{number_to_human_size(post.file_size)} .#{post.file_ext}", post.tagged_file_url %>
     <% if post.has_dimensions? %>
-      (<span itemprop="width"><%= post.image_width %></span>x<span itemprop="height"><%= post.image_height %></span>)
+      (<%= post.image_width %>x<%= post.image_height %>)
     <% end %>
   </li>
-  <li id="post-info-source">Source: <%= post_source_tag(post) %></li>
+  <li id="post-info-source">Source: <%= post_source_tag(post.source, post.normalized_source) %></li>
   <li id="post-info-rating">Rating: <%= post.pretty_rating %></li>
-  <li id="post-info-score">Score: <span id="score-for-post-<%= post.id %>"><%= post.score %></span>
-    <% if CurrentUser.is_voter? %>
-      <%= tag.span id: "vote-links-for-post-#{post.id}", style: ("display: none;" if !@post.can_be_voted_by?(CurrentUser.user)) do %>
-        (vote
-        <%= link_to tag.i(class: "far fa-thumbs-up"), post_post_votes_path(post_id: post.id, score: "up"), remote: true, method: :post %>
-        <%= link_to tag.i(class: "far fa-thumbs-down"), post_post_votes_path(post_id: post.id, score: "down"), remote: true, method: :post %>)
-      <% end %>
-      <%= tag.span id: "unvote-link-for-post-#{post.id}", style: ("display: none;" if @post.can_be_voted_by?(CurrentUser.user)) do %>
-        (<%= link_to "undo vote", post_post_votes_path(post), remote: true, method: :delete, class: "unvote-post-link" %>)
-      <% end %>
-    <% end %>
+  <li id="post-info-score">
+    Score: <%= render_post_votes post, current_user: CurrentUser.user %>
   </li>
   <li id="post-info-favorites">Favorites: <span id="favcount-for-post-<%= post.id %>"><%= post.fav_count %></span>
-  <% if CurrentUser.is_gold? %>
+    <% if policy(post).can_view_favlist? %>
     <%= link_to "Show »", "#", id: "show-favlist-link", style: ("display: none;" if post.fav_count == 0) %>
     <%= link_to "« Hide", "#", id: "hide-favlist-link", style: "display: none;" %>
-    <div id="favlist" style="display: none;"><%= post_favlist(post) %></div>
+    <div id="favlist" style="display: none;" class="ml-4">
+      <%= render "posts/partials/show/favorite_list", post: post %>
+    </div>
   <% end %></li>
   <li id="post-info-status">
     Status:
     <% if post.is_pending? %>
       Pending
-    <% end %>
-
-    <% if post.is_deleted? %>
-      Deleted
-    <% end %>
-
-    <% if post.is_flagged? %>
+    <% elsif post.is_flagged? %>
       Flagged
+    <% elsif post.is_appealed? %>
+      Appealed
+    <% elsif post.is_deleted? %>
+      Deleted
+    <% else %>
+      Active
     <% end %>
 
     <% if post.is_banned? %>
       Banned
-    <% end %>
-
-    <% if !post.is_pending? && !post.is_deleted? && !post.is_banned? %>
-      Active
     <% end %>
   </li>
 </ul>

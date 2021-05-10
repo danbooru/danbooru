@@ -1,7 +1,7 @@
 <%# path, date, scale, %>
 
-<p class="date-nav-links">
+<div class="date-nav-links text-center md:space-x-8">
   <%= render "explore/posts/nav_links_for_scale", path: path, date: date, selected_scale: scale, scale: "day" %>
   <%= render "explore/posts/nav_links_for_scale", path: path, date: date, selected_scale: scale, scale: "week" %>
   <%= render "explore/posts/nav_links_for_scale", path: path, date: date, selected_scale: scale, scale: "month" %>
-</p>
+</div>

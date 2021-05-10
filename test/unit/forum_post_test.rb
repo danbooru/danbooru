@@ -60,6 +60,18 @@ class ForumPostTest < ActiveSupport::TestCase
           EOS
         end
       end
+
+      should "not send a mention to yourself" do
+        assert_no_difference("Dmail.count") do
+          @forum_post = as(@user) { create(:forum_post, body: "hi from @#{@user.name}") }
+        end
+      end
+
+      should "not fail when mentioning a nonexistent user" do
+        assert_no_difference("Dmail.count") do
+          @forum_post = as(@user) { create(:forum_post, body: "hi from @nonamethanks") }
+        end
+      end
     end
 
     context "that belongs to a topic with several pages of posts" do
@@ -99,25 +111,6 @@ class ForumPostTest < ActiveSupport::TestCase
         @posts.last.destroy
         @topic.reload
         assert_equal(@posts[8].updated_at.to_s, @topic.updated_at.to_s)
-      end
-    end
-
-    context "belonging to a locked topic" do
-      setup do
-        @post = create(:forum_post, topic: @topic, body: "zzz")
-        @topic.update(is_locked: true)
-      end
-
-      should "not be updateable" do
-        @post.update(body: "xxx")
-        assert_equal(true, @post.invalid?)
-        assert_equal("zzz", @post.reload.body)
-      end
-
-      should "not be deletable" do
-        @post.delete!
-        assert_equal(true, @post.invalid?)
-        assert_equal(false, @post.reload.is_deleted)
       end
     end
 

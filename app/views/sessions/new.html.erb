@@ -1,5 +1,6 @@
 <% page_title "Login" %>
 <% meta_description "Login to #{Danbooru.config.app_name}" %>
+<% canonical_url login_url %>
 
 <%= render "sessions/secondary_links" %>
 
@@ -11,12 +12,13 @@
       <%= simple_form_for(:session, url: session_path) do |f| %>
         <%= f.input :url, as: :hidden, input_html: { value: params[:url] } %>
         <%= f.input :name %>
-        <%= f.input :password, hint: link_to("Forgot password?", new_maintenance_user_password_reset_path), input_html: { autocomplete: "password" } %>
+        <%= f.input :password, hint: link_to("Forgot password?", password_reset_path), input_html: { autocomplete: "password" } %>
         <%= f.submit "Login" %>
       <% end %>
 
       <p class="fineprint">
         New to <%= Danbooru.config.app_name %>? <%= link_to "Create a new account", new_user_path %>.
       </p>
+    </section>
   </div>
 </div>

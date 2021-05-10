@@ -4,8 +4,7 @@
 <div id="c-dmails">
   <div id="a-show">
     <div class="dmail">
-      <h1>Show Message</h1>
-      <h2><%= @dmail.title %></h2>
+      <h1><%= @dmail.title %></h1>
 
       <ul style="margin-bottom: 1em;">
         <li><strong>Sender</strong>: <%= link_to_user @dmail.from %></li>
@@ -13,7 +12,6 @@
         <li><strong>Date</strong>: <%= compact_time(@dmail.created_at) %></li>
       </ul>
 
-      <h3>Body</h3>
       <div class="prose">
         <%= format_text(@dmail.body) %>
 
@@ -29,7 +27,7 @@
           <%= link_to "Respond", new_dmail_path(:respond_to_id => @dmail) %>
           | <%= link_to "Forward", new_dmail_path(:respond_to_id => @dmail, :forward => true) %>
           | <%= link_to "Share", dmail_path(@dmail, key: @dmail.key), title: "Anyone with this link will be able to view this dmail." %>
-          <% if @dmail.reportable_by?(CurrentUser.user) %>
+          <% if policy(@dmail).reportable? %>
             | <%= link_to "Report", new_moderation_report_path(moderation_report: { model_type: "Dmail", model_id: @dmail.id }), remote: true, title: "Report this dmail to the moderators" %>
           <% end %>
         </p>

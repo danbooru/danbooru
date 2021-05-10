@@ -7,53 +7,29 @@ div#related-tags-container {
 }
 
 div.related-tags {
-  width: 100%;
-  margin-bottom: 1em;
-  padding: 1em;
   background: var(--related-tags-container-background);
   overflow: auto;
-  border-radius: 4px;
-  display: flex;
   flex-wrap: wrap;
 
-  div.user-related-tags-columns, div.current-related-tags-columns, div.source-related-tags-columns {
-    display: flex;
+  div.tag-column {
+    width: 15em;
   }
 
-  div.tag-column {
-    max-width: 15em;
-    margin-right: 2em;
+  li.selected a {
+    /* https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-stroke */
+    /* https://caniuse.com/text-stroke */
+    -webkit-text-stroke: 0.5px;
+    text-stroke: 0.5px;
+  }
 
-    &.is-empty-true {
-      display: none;
+  /* On computers with a mouse, hide the related tag checkbox unless it's checked or hovered. */
+  @media (hover: hover) {
+    input[type="checkbox"] {
+      visibility: hidden;
     }
 
-    &.wide-column {
-      max-width: 45em;
-    }
-
-    ul {
-      margin: 0;
-
-      li {
-        em {
-          font-weight: bold;
-        }
-
-        svg {
-          margin-top: 2px;
-          cursor: pointer;
-        }
-
-        a {
-          min-width: 3em;
-        }
-
-        a.selected {
-          background: var(--selected-related-tag-background-color);
-          color: var(--selected-related-tag-color);
-        }
-      }
+    li.selected, li:hover {
+      input[type="checkbox"] { visibility: visible; }
     }
   }
 }

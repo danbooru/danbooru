@@ -1,9 +1,11 @@
-<ul class="post-appeal-reasons list-bulleted">
-  <% appeals.each do |appeal| %>
-    <li class="post-appeal-reason">
+<ul class="post-appeal-reason list-bulleted">
+  <li>
+    <% if appeal.reason.present? %>
       <span class="prose"><%= format_text(appeal.reason, inline: true) %></span>
-      - <%= link_to_user(appeal.creator) %>
-      - <%= time_ago_in_words_tagged(appeal.created_at) %>
-    </li>
-  <% end %>
+    <% else %>
+      <span class="prose"><em>no reason</em></span>
+    <% end %>
+
+    (<%= link_to_user(appeal.creator) %>, <%= time_ago_in_words_tagged(appeal.created_at) %>)
+  </li>
 </ul>

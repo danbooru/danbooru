@@ -14,7 +14,7 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <%= table_for @saved_searches, {class: "striped autofit", width: "100%"} do |t| %>
+    <%= table_for @saved_searches, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "Query", th: {"data-sort": "string"}, td: {class: "col-expand"} do |ss| %>
         <%= link_to ss.query, posts_path(tags: ss.query) %>
       <% end %>
@@ -36,7 +36,7 @@
       <% t.column "Created" do |ss| %>
         <%= time_ago_in_words_tagged ss.created_at %>
       <% end %>
-      <% t.column th: {class: "links"}, td: {class: "links"} do |ss| %>
+      <% t.column column: "control" do |ss| %>
         <%= link_to "edit", edit_saved_search_path(ss) %>
           | <%= link_to "delete", saved_search_path(ss), :method => :delete, :remote => true %>
       <% end %>

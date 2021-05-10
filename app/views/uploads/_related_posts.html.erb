@@ -10,7 +10,7 @@
 
     <div>
       <% source.related_posts.each do |post| %>
-        <%= PostPresenter.preview(post, show_deleted: true, size: true) %>
+        <%= post_preview(post, show_deleted: true, size: true) %>
       <% end %>
     </div>
   </div>

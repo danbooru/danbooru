@@ -1,8 +1,6 @@
 class ModAction < ApplicationRecord
   belongs_to :creator, :class_name => "User"
 
-  api_attributes including: [:category_id]
-
   # ####DIVISIONS#####
   # Groups:     0-999
   # Individual: 1000-1999
@@ -31,24 +29,29 @@ class ModAction < ApplicationRecord
     post_unban: 45,
     post_permanent_delete: 46,
     post_move_favorites: 47,
+    post_regenerate: 48,
+    post_regenerate_iqdb: 49,
     pool_delete: 62,
     pool_undelete: 63,
     artist_ban: 184,
     artist_unban: 185,
     comment_update: 81,
     comment_delete: 82,
+    comment_vote_delete: 92,
+    comment_vote_undelete: 93,
     forum_topic_delete: 202,
     forum_topic_undelete: 203,
     forum_topic_lock: 206,
     forum_post_update: 101,
     forum_post_delete: 102,
     tag_alias_create: 120,
-    tag_alias_update: 121,
+    tag_alias_update: 121, # XXX unused
     tag_implication_create: 140,
-    tag_implication_update: 141,
+    tag_implication_update: 141, # XXX unused
     ip_ban_create: 160,
     ip_ban_delete: 162,
-    mass_update: 1000,
+    ip_ban_undelete: 163,
+    mass_update: 1000, # XXX unused
     bulk_revert: 1001, # XXX unused
     other: 2000
   }
@@ -62,9 +65,7 @@ class ModAction < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-
-    q = q.search_attributes(params, :creator, :category, :description)
+    q = search_attributes(params, :id, :created_at, :updated_at, :category, :description, :creator)
     q = q.text_attribute_matches(:description, params[:description_matches])
 
     q.apply_default_order(params)

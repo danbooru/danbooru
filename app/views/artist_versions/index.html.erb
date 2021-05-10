@@ -2,9 +2,11 @@
   <div id="a-index">
     <h1>Artist History</h1>
 
+    <%= render "versions/types" %>
+
     <%= render "listing" %>
 
-    <%= numbered_paginator(@artist_versions, :search_count => params[:search]) %>
+    <%= numbered_paginator(@artist_versions) %>
 
   </div>
 </div>

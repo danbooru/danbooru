@@ -5,24 +5,28 @@
 # https://emlan.tumblr.com/post/189469423572/kuro-attempts-to-buy-a-racy-book-at-comiket-but
 # https://66.media.tumblr.com/168dabd09d5ad69eb5fedcf94c45c31a/3dbfaec9b9e0c2e3-72/s640x960/bf33a1324f3f36d2dc64f011bfeab4867da62bc8.png
 # https://66.media.tumblr.com/5a2c3fe25c977e2281392752ab971c90/3dbfaec9b9e0c2e3-92/s500x750/4f92bbaaf95c0b4e7970e62b1d2e1415859dd659.png
+#
+# https://superboin.tumblr.com/post/141169066579/photoset_iframe/superboin/tumblr_o45miiAOts1u6rxu8/500/false
+#
+# https://make-do5.tumblr.com/post/619663949657423872 (extremely high res, extractable)
 
 module Sources::Strategies
   class Tumblr < Base
     SIZES = %w[1280 640 540 500h 500 400 250 100]
 
-    BASE_URL = %r!\Ahttps?://(?:[^/]+\.)*tumblr\.com!i
-    DOMAIN = %r{(data|(\d+\.)?media)\.tumblr\.com}
-    MD5 = %r{(?<md5>[0-9a-f]{32})}i
-    FILENAME = %r{(?<filename>(tumblr_(inline_)?)?[a-z0-9]+(_r[0-9]+)?)}i
-    EXT = %r{(?<ext>\w+)}
+    BASE_URL = %r{\Ahttps?://(?:[^/]+\.)*tumblr\.com}i
+    DOMAIN = /(data|(?:\d+\.)?media)\.tumblr\.com/i
+    MD5 = /(?<md5>[0-9a-f]{32})/i
+    FILENAME = /(?<filename>(?:tumblr_(?:inline_)?)?[a-z0-9]+(?:_r[0-9]+)?)/i
+    EXT = /(?<ext>\w+)/
 
     # old: https://66.media.tumblr.com/2c6f55531618b4335c67e29157f5c1fc/tumblr_pz4a44xdVj1ssucdno1_1280.png
     # new: https://66.media.tumblr.com/168dabd09d5ad69eb5fedcf94c45c31a/3dbfaec9b9e0c2e3-72/s640x960/bf33a1324f3f36d2dc64f011bfeab4867da62bc8.png
-    OLD_IMAGE = %r!\Ahttps?://#{DOMAIN}/(?<dir>#{MD5}/)?#{FILENAME}_(?<size>\w+)\.#{EXT}\z!i
+    OLD_IMAGE = %r{\Ahttps?://#{DOMAIN}/(?<dir>#{MD5}/)?#{FILENAME}_(?<size>\w+)\.#{EXT}\z}i
 
-    IMAGE = %r!\Ahttps?://#{DOMAIN}/!i
-    VIDEO = %r!\Ahttps?://(?:vtt|ve\.media)\.tumblr\.com/!i
-    POST = %r!\Ahttps?://(?<blog_name>[^.]+)\.tumblr\.com/(?:post|image)/(?<post_id>\d+)!i
+    IMAGE = %r{\Ahttps?://#{DOMAIN}/}i
+    VIDEO = %r{\Ahttps?://(?:vtt|ve|va\.media)\.tumblr\.com/}i
+    POST = %r{\Ahttps?://(?<blog_name>[^.]+)\.tumblr\.com/(?:post|image)/(?<post_id>\d+)}i
 
     def self.enabled?
       Danbooru.config.tumblr_consumer_key.present?
@@ -46,7 +50,11 @@ module Sources::Strategies
 
       case post[:type]
       when "photo"
-        list += post[:photos].map { |photo| photo[:original_size][:url] }
+        list += post[:photos].map do |photo|
+          sizes = [photo[:original_size]] + photo[:alt_sizes]
+          biggest = sizes.max_by { |x| x[:width] * x[:height] }
+          biggest[:url]
+        end
 
       when "video"
         list += [post[:video_url]]
@@ -62,7 +70,7 @@ module Sources::Strategies
 
     def preview_urls
       image_urls.map do |x|
-        x.sub(%r!_1280\.(jpg|png|gif|jpeg)\z!, '_250.\1')
+        x.sub(/_1280\.(jpg|png|gif|jpeg)\z/, '_250.\1')
       end
     end
 
@@ -127,6 +135,12 @@ module Sources::Strategies
       super(tag)
     end
 
+    def normalize_for_source
+      return unless blog_name.present? && post_id.present?
+
+      "https://#{blog_name}.tumblr.com/post/#{post_id}"
+    end
+
     def dtext_artist_commentary_desc
       DText.from_html(artist_commentary_desc).strip
     end
@@ -149,14 +163,22 @@ module Sources::Strategies
     # http://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg
     # => https://media.tumblr.com/tumblr_m24kbxqKAX1rszquso1_1280.jpg
     def find_largest(url, sizes: SIZES)
-      return url unless url =~ OLD_IMAGE
+      if url =~ OLD_IMAGE
+        candidates = sizes.map do |size|
+          "https://media.tumblr.com/#{$~[:dir]}#{$~[:filename]}_#{size}.#{$~[:ext]}"
+        end
 
-      candidates = sizes.map do |size|
-        "https://media.tumblr.com/#{$~[:dir]}#{$~[:filename]}_#{size}.#{$~[:ext]}"
-      end
+        candidates.find do |candidate|
+          http_exists?(candidate)
+        end
+      elsif url =~ %r{/s\d+x\d+/(\w+\.\w+)\z}i
+        max_size = Integer.sqrt(Danbooru.config.max_image_resolution)
+        url = url.gsub(%r{/s\d+x\d+/\w+\.\w+\z}i, "/s#{max_size}x#{max_size}/#{$1}")
 
-      candidates.find do |candidate|
-        http_exists?(candidate, headers)
+        resp = http.cache(1.minute).headers(accept: "text/html").get(url).parse
+        resp.at("img[src*='/s#{max_size}x#{max_size}/']")["src"]
+      else
+        url
       end
     end
 
@@ -177,7 +199,7 @@ module Sources::Strategies
       return {} unless self.class.enabled?
       return {} unless blog_name.present? && post_id.present?
 
-      response = Danbooru::Http.cache(1.minute).get(
+      response = http.cache(1.minute).get(
         "https://api.tumblr.com/v2/blog/#{blog_name}/posts",
         params: { id: post_id, api_key: Danbooru.config.tumblr_consumer_key }
       )

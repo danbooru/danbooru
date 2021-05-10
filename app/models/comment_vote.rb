@@ -1,46 +1,30 @@
 class CommentVote < ApplicationRecord
-  class Error < StandardError; end
+  attr_accessor :updater
 
   belongs_to :comment
   belongs_to :user
-  validates_presence_of :score
-  validates_uniqueness_of :user_id, :scope => :comment_id, :message => "have already voted for this comment"
-  validate :validate_user_can_vote
-  validate :validate_comment_can_be_down_voted
-  validates_inclusion_of :score, :in => [-1, 1], :message => "must be 1 or -1"
+
+  validate :validate_vote_is_unique, if: :is_deleted_changed?
+  validates :score, inclusion: { in: [-1, 1], message: "must be 1 or -1" }
+
+  before_create :update_score_on_create
+  before_save :update_score_on_delete_or_undelete, if: -> { !new_record? && is_deleted_changed? }
+
+  deletable
 
   def self.visible(user)
-    if user.is_admin?
+    if user.is_moderator?
       all
-    elsif user.is_member?
-      where(user: user)
-    else
+    elsif user.is_anonymous?
       none
+    else
+      where(user: user)
     end
-  end
-
-  def self.comment_matches(params)
-    return all if params.blank?
-    where(comment_id: Comment.search(params).reorder(nil).select(:id))
   end
 
   def self.search(params)
-    q = super
-    q = q.search_attributes(params, :comment_id, :user, :score)
-    q = q.comment_matches(params[:comment])
+    q = search_attributes(params, :id, :created_at, :updated_at, :score, :is_deleted, :comment, :user)
     q.apply_default_order(params)
-  end
-
-  def validate_user_can_vote
-    if !user.can_comment_vote?
-      errors.add :base, "You cannot vote on more than 10 comments per hour"
-    end
-  end
-
-  def validate_comment_can_be_down_voted
-    if is_positive? && comment.creator == CurrentUser.user
-      errors.add :base, "You cannot upvote your own comments"
-    end
   end
 
   def is_positive?
@@ -49,6 +33,37 @@ class CommentVote < ApplicationRecord
 
   def is_negative?
     score == -1
+  end
+
+  # allow duplicate deleted votes but not duplicate active votes
+  def validate_vote_is_unique
+    if !is_deleted? && CommentVote.active.where.not(id: id).exists?(comment_id: comment_id, user_id: user_id)
+      errors.add(:user, "have already voted for this comment")
+    end
+  end
+
+  def update_score_on_create
+    comment.with_lock do
+      comment.update_columns(score: comment.score + score)
+    end
+  end
+
+  def update_score_on_delete_or_undelete
+    comment.with_lock do
+      if is_deleted_changed?(from: false, to: true)
+        comment.update_columns(score: comment.score - score)
+
+        if updater != user
+          ModAction.log("#{updater.name} deleted comment vote ##{id} on comment ##{comment_id}", :comment_vote_delete, updater)
+        end
+      else
+        comment.update_columns(score: comment.score + score)
+
+        if updater != user
+          ModAction.log("#{updater.name} undeleted comment vote ##{id} on comment ##{comment_id}", :comment_vote_undelete, updater)
+        end
+      end
+    end
   end
 
   def self.available_includes

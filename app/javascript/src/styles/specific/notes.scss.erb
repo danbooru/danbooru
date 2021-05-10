@@ -1,0 +1,188 @@
+.note-container {
+  display: inline-block;
+  position: relative;
+  box-sizing: content-box;
+
+  &.hide-notes .note-box {
+    visibility: hidden;
+  }
+
+  div.note-body {
+    display: none;
+    position: absolute;
+    font-size: 14px;
+    border: 1px solid var(--note-body-border-color);
+    background: var(--note-body-background);
+    color: var(--note-body-text-color);
+    box-shadow: var(--shadow-lg);
+    min-width: 140px;
+    width: min-content;
+    min-height: 1em;
+    line-height: 1.25;
+    cursor: pointer;
+    padding: 4px;
+    z-index: 150;
+    overflow-wrap: break-word;
+    overflow-y: hidden;
+  }
+
+  div.note-body, div.note-box.embedded div.note-box-inner-border {
+    box-sizing: content-box;
+
+    h1, h2, h3, h4, h5, h6, a, span, div, blockquote, p, ul, li, ol, em, strong, small, big, b, i, font, u, s, code, center {
+      line-height: 1.25;
+    }
+
+    > :last-child {
+      margin-bottom: 0;
+    }
+
+    b, strong {
+      font-weight: bold;
+    }
+
+    i, em {
+      font-style: italic;
+    }
+
+    small {
+      font-size: 0.8em;
+    }
+
+    code {
+      font: var(--monospace-font);
+    }
+
+    a[rel*="external"] {
+      word-break: initial;
+    }
+
+    .tn {
+      font-size: 0.8em;
+      color: var(--note-tn-color);
+    }
+
+    ruby {
+      rt {
+        font-size: 0.8em;
+      }
+    }
+
+    ul {
+      margin-left: 1em;
+      margin-bottom: 1em;
+
+      ul {
+        margin-bottom: 0;
+      }
+
+      li {
+        list-style-type: disc;
+
+        + br {
+          display: none;
+        }
+      }
+    }
+  }
+
+  div.note-box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    position: absolute !important;
+    border: 1px solid var(--note-box-border-color);
+    min-width: 5px;
+    min-height: 5px;
+    width: 100px;
+    height: 100px;
+    cursor: move;
+    background: var(--note-body-background);
+    box-shadow: var(--shadow-lg);
+    line-height: 1.25;
+    opacity: 0.5;
+    z-index: 100;
+    box-sizing: content-box;
+
+    /* Raise notes on hover so overlapping embedded notes are readable. */
+    &:hover {
+      z-index: 200;
+    }
+
+    &.unsaved {
+      border: 1px solid var(--unsaved-note-box-border-color);
+    }
+
+    &.movable {
+      border: 1px solid var(--movable-note-box-border-color);
+    }
+
+    &.embedded {
+      color: var(--note-body-text-color);
+      border: 1px solid transparent;
+      opacity: 1;
+      box-shadow: none;
+
+      &:hover {
+        border: 1px solid var(--note-box-border-color);
+        box-shadow: var(--note-box-shadow);
+
+        &.editing,
+        &.movable {
+          opacity: 1;
+        }
+      }
+
+      &.editing,
+      &.movable {
+        opacity: 0.4;
+      }
+
+      &.unsaved,
+      &.out-of-bounds {
+        border: 1px solid var(--unsaved-note-box-border-color);
+      }
+
+      &.movable {
+        border: 1px solid var(--movable-note-box-border-color);
+      }
+
+      <% for i in 1..5 do %>
+        <%# Selector order is deliberate as placing the not after the level consistently caused segmentaion faults for unknown reasons. %>
+        &:not(:hover).level-<%= i %> {
+          z-index: <%= 100 + i %>;
+        }
+      <% end %>
+
+      &:not(:hover) div.ui-resizable-handle {
+        display: none !important;
+      }
+    }
+
+    &.note-box-highlighted {
+      outline: 1px solid var(--note-highlight-color);
+    }
+
+    div.ui-resizable-handle {
+      position: absolute;
+    }
+  }
+}
+
+/* the box that appears when dragging to create a new note. */
+div#note-preview {
+  position: absolute;
+  cursor: crosshair;
+  border: 1px solid var(--note-preview-border-color);
+  opacity: 0.6;
+  display: none;
+  background: var(--note-preview-background);
+  box-shadow: var(--shadow-lg);
+  z-index: 250;
+  box-sizing: content-box;
+}
+
+div.note-edit-dialog {
+  font-size: 0.8em;
+}

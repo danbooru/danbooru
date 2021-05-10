@@ -1,28 +1,19 @@
 class TagImplication < TagRelationship
+  MINIMUM_TAG_COUNT = 10
+  MINIMUM_TAG_PERCENTAGE = 0.0001
+  MAXIMUM_TAG_PERCENTAGE = 0.9
+
   has_many :child_implications, class_name: "TagImplication", primary_key: :consequent_name, foreign_key: :antecedent_name
   has_many :parent_implications, class_name: "TagImplication", primary_key: :antecedent_name, foreign_key: :consequent_name
 
-  after_save :create_mod_action
-  validates_uniqueness_of :antecedent_name, scope: [:consequent_name, :status], conditions: -> { active }
+  validates :antecedent_name, uniqueness: { scope: [:consequent_name, :status], conditions: -> { active }}
   validate :absence_of_circular_relation
   validate :absence_of_transitive_relation
   validate :antecedent_is_not_aliased
   validate :consequent_is_not_aliased
-  validate :wiki_pages_present, on: :create, unless: :skip_secondary_validations
-
-  module DescendantMethods
-    extend ActiveSupport::Concern
-
-    module ClassMethods
-      def automatic_tags_for(names)
-        tags = []
-        tags += names.grep(/\A(.+)_\(cosplay\)\z/i) { "char:#{TagAlias.to_aliased([$1]).first}" }
-        tags << "cosplay" if names.any?(/_\(cosplay\)\z/i)
-        tags << "school_uniform" if names.any?(/_school_uniform\z/i)
-        tags.uniq
-      end
-    end
-  end
+  validate :tag_categories_are_compatible, on: :request
+  validate :meets_tag_size_requirements, on: :request
+  validate :has_wiki_page, on: :request
 
   concerning :HierarchyMethods do
     class_methods do
@@ -66,14 +57,14 @@ class TagImplication < TagRelationship
     end
   end
 
-  module ValidationMethods
+  concerning :ValidationMethods do
     def absence_of_circular_relation
       return if is_rejected?
 
       # We don't want a -> b -> a chains
       implied_tags = TagImplication.tags_implied_by(consequent_name).map(&:name)
       if implied_tags.include?(antecedent_name)
-        errors[:base] << "Tag implication can not create a circular relation with another tag implication"
+        errors.add(:base, "Tag implication can not create a circular relation with another tag implication")
       end
     end
 
@@ -86,7 +77,7 @@ class TagImplication < TagRelationship
       implied_tags = implications.tags_implied_by(antecedent_name).map(&:name)
 
       if implied_tags.include?(consequent_name)
-        errors[:base] << "#{antecedent_name} already implies #{consequent_name} through another implication"
+        errors.add(:base, "#{antecedent_name} already implies #{consequent_name} through another implication")
       end
     end
 
@@ -95,7 +86,7 @@ class TagImplication < TagRelationship
 
       # We don't want to implicate a -> b if a is already aliased to c
       if TagAlias.active.exists?(["antecedent_name = ?", antecedent_name])
-        errors[:base] << "Antecedent tag must not be aliased to another tag"
+        errors.add(:base, "Antecedent tag must not be aliased to another tag")
       end
     end
 
@@ -104,81 +95,66 @@ class TagImplication < TagRelationship
 
       # We don't want to implicate a -> b if b is already aliased to c
       if TagAlias.active.exists?(["antecedent_name = ?", consequent_name])
-        errors[:base] << "Consequent tag must not be aliased to another tag"
+        errors.add(:base, "Consequent tag must not be aliased to another tag")
       end
     end
 
-    def wiki_pages_present
-      if consequent_wiki.blank?
-        errors[:base] << "The #{consequent_name} tag needs a corresponding wiki page"
+    # Require tags to have the same category. Doesn't apply when either tag is empty,
+    # because they could have been populated from a previous update script.
+    def tag_categories_are_compatible
+      return if antecedent_tag.empty? || consequent_tag.empty?
+      if antecedent_tag.category != consequent_tag.category
+        errors.add(:base, "Can't imply a #{antecedent_tag.category_name.downcase} tag to a #{consequent_tag.category_name.downcase} tag")
+      end
+    end
+
+    # Require tags to have at least 10 posts or be at least 0.01% the size of
+    # the parent tag, and not make up more than 90% of the parent tag. Only
+    # applies to general tags. Doesn't apply when either tag is empty to allow
+    # implying new tags.
+    def meets_tag_size_requirements
+      return unless antecedent_tag.general?
+      return if antecedent_tag.empty? || consequent_tag.empty?
+
+      if antecedent_tag.post_count < MINIMUM_TAG_COUNT
+        errors.add(:base, "'#{antecedent_name}' must have at least #{MINIMUM_TAG_COUNT} posts")
+      elsif antecedent_tag.post_count < (MINIMUM_TAG_PERCENTAGE * consequent_tag.post_count)
+        errors.add(:base, "'#{antecedent_name}' must have at least #{(MINIMUM_TAG_PERCENTAGE * consequent_tag.post_count).to_i} posts")
       end
 
-      if antecedent_wiki.blank?
-        errors[:base] << "The #{antecedent_name} tag needs a corresponding wiki page"
+      max_count = MAXIMUM_TAG_PERCENTAGE * PostQueryBuilder.new("~#{antecedent_name} ~#{consequent_name}").fast_count(timeout: 0).to_i
+      if antecedent_tag.post_count > max_count && max_count > 0
+        errors.add(:base, "'#{antecedent_name}' can't make up more than #{(MAXIMUM_TAG_PERCENTAGE * 100).to_i}% of '#{consequent_name}'")
+      end
+    end
+
+    def has_wiki_page
+      if !antecedent_tag.empty? && antecedent_wiki.blank?
+        errors.add(:base, "'#{antecedent_name}' must have a wiki page")
+      end
+
+      if !consequent_tag.empty? && consequent_wiki.blank?
+        errors.add(:base, "'#{consequent_name}' must have a wiki page")
       end
     end
   end
 
-  module ApprovalMethods
-    def process!(update_topic: true)
-      unless valid?
-        raise errors.full_messages.join("; ")
-      end
+  concerning :ApprovalMethods do
+    def process!
+      update_posts!
+    end
 
+    def update_posts!
       CurrentUser.scoped(User.system) do
-        update(status: "processing")
-        update_posts
-        update(status: "active")
-        forum_updater.update(approval_message(approver), "APPROVED") if update_topic
+        Post.system_tag_match("#{antecedent_name} -#{consequent_name}").find_each do |post|
+          post.lock!
+          post.save!
+        end
       end
-    rescue Exception => e
-      forum_updater.update(failure_message(e), "FAILED") if update_topic
-      update(status: "error: #{e}")
-
-      DanbooruLogger.log(e, tag_implication_id: id, antecedent_name: antecedent_name, consequent_name: consequent_name)
-    end
-
-    def approve!(approver: CurrentUser.user, update_topic: true)
-      update(approver: approver, status: "queued")
-      ProcessTagImplicationJob.perform_later(self, update_topic: update_topic)
-    end
-
-    def create_mod_action
-      implication = %("tag implication ##{id}":[#{Rails.application.routes.url_helpers.tag_implication_path(self)}]: [[#{antecedent_name}]] -> [[#{consequent_name}]])
-
-      if saved_change_to_id?
-        ModAction.log("created #{status} #{implication}", :tag_implication_create)
-      else
-        # format the changes hash more nicely.
-        change_desc = saved_changes.except(:updated_at).map do |attribute, values|
-          old, new = values[0], values[1]
-          if old.nil?
-            %(set #{attribute} to "#{new}")
-          else
-            %(changed #{attribute} from "#{old}" to "#{new}")
-          end
-        end.join(", ")
-
-        ModAction.log("updated #{implication}\n#{change_desc}", :tag_implication_update)
-      end
-    end
-
-    def forum_updater
-      post = if forum_topic
-        forum_post || forum_topic.posts.where("body like ?", TagImplicationRequest.command_string(antecedent_name, consequent_name, id) + "%").last
-      else
-        nil
-      end
-      ForumUpdater.new(
-        forum_topic,
-        forum_post: post,
-        expected_title: "Tag implication: #{antecedent_name} -> #{consequent_name}",
-        skip_update: !TagRelationship::SUPPORT_HARD_CODED
-      )
     end
   end
 
-  include DescendantMethods
-  include ValidationMethods
-  include ApprovalMethods
+  def self.available_includes
+    super + [:child_implications, :parent_implications]
+  end
 end

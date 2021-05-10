@@ -1,4 +1,4 @@
-<% dtext_data = DText.preprocess(bulk_update_requests.map(&:script_with_links)) %>
+<% dtext_data = DText.preprocess(bulk_update_requests.map(&:processor).map(&:to_dtext)) %>
 
 <%= table_for bulk_update_requests, width: "100%" do |t| %>
   <% t.column "Request" do |request| %>
@@ -9,7 +9,7 @@
       <% end %>
 
       <div class="prose">
-        <%= format_text(request.script_with_links, data: dtext_data) %>
+        <%= format_text(request.processor.to_dtext, data: dtext_data) %>
       </div>
   <% end %>
   <% t.column "Votes" do |request| %>

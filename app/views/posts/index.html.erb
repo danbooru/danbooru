@@ -6,36 +6,29 @@
   <%= render "posts/partials/index/blacklist" %>
 
   <section id="tag-box">
-    <h1>Tags</h1>
-    <%= @post_set.presenter.tag_list_html(current_query: params[:tags], show_extra_links: CurrentUser.user.is_gold?) %>
+    <h2>Tags</h2>
+    <%= render_search_tag_list(@post_set.related_tags, current_query: params[:tags], show_extra_links: policy(Post).show_extra_links?) %>
   </section>
-
-  <% if Danbooru.config.addthis_key.present? %>
-    <section id="post-share">
-      <h1>Share</h1>
-      <%= render "posts/partials/index/share" %>
-    </section>
-  <% end %>
 
   <%= render "posts/partials/index/options" %>
 
-  <%= render "posts/partials/index/related" %>
+  <%= render "posts/partials/index/related", post_set: @post_set %>
 <% end %>
 
 <% content_for(:content) do %>
-  <menu id="post-sections">
+  <menu id="post-sections" class="mb-4">
     <li class="active"><a href="#" id="show-posts-link">Posts</a></li>
 
     <% if @post_set.artist.present? %>
-      <li><%= link_to "Artist", artist_path(@post_set.artist), :id => "show-excerpt-link" %></li>
+      <li class="artist-excerpt-link"><%= link_to "Artist", artist_path(@post_set.artist), :id => "show-excerpt-link" %></li>
     <% elsif @post_set.wiki_page.present? %>
-      <li><%= link_to "Wiki", wiki_page_path(@post_set.wiki_page), :id => "show-excerpt-link" %></li>
+      <li class="wiki-excerpt-link"><%= link_to "Wiki", wiki_page_path(@post_set.wiki_page), :id => "show-excerpt-link" %></li>
     <% elsif @post_set.pool.present? %>
-      <li><%= link_to "Pool", pool_path(@post_set.pool), :id => "show-excerpt-link" %></li>
+      <li class="pool-excerpt-link"><%= link_to "Pool", pool_path(@post_set.pool), :id => "show-excerpt-link" %></li>
     <% elsif @post_set.favgroup.present? %>
-      <li><%= link_to "Favorite Group", favorite_group_path(@post_set.favgroup), :id => "show-excerpt-link" %></li>
+      <li class="favgroup-excerpt-link"><%= link_to "Favorite Group", favorite_group_path(@post_set.favgroup), :id => "show-excerpt-link" %></li>
     <% elsif @post_set.has_blank_wiki? %>
-      <li><%= link_to "Wiki", new_wiki_page_path(wiki_page: { title: @post_set.tag_string }), id: "show-excerpt-link" %></li>
+      <li class="blank-wiki-excerpt-link"><%= link_to "Wiki", new_wiki_page_path(wiki_page: { title: @post_set.tag.name }), id: "show-excerpt-link" %></li>
     <% end %>
 
     <li id="searchbox-redirect-link" class="mobile-only"><a href="#search-box">Search &raquo;</a></li>
@@ -46,8 +39,6 @@
   <%= render "posts/partials/index/posts", :post_set => @post_set %>
 <% end %>
 
-<%= post_search_count_js %>
-
 <div id="saved-searches-nav">
   <%= render "saved_searches/interface" %>
 </div>
@@ -56,6 +47,14 @@
   <%= render "saved_searches/secondary_links" %>
 <% else %>
   <%= render "posts/partials/common/secondary_links" %>
+<% end %>
+
+<% if @post_set.query.is_simple_tag? && @post_set.current_page == 1 %>
+  <% if @post_set.post_count == 0 %>
+    <%= missed_post_search_count_js(@post_set.query.to_s) %>
+  <% else %>
+    <%= post_search_count_js(@post_set.query.to_s) %>
+  <% end %>
 <% end %>
 
 <% content_for(:html_header) do %>

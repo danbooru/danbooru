@@ -26,10 +26,6 @@ class TagAliasTest < ActiveSupport::TestCase
 
       should allow_value('active').for(:status)
       should allow_value('deleted').for(:status)
-      should allow_value('pending').for(:status)
-      should allow_value('processing').for(:status)
-      should allow_value('queued').for(:status)
-      should allow_value('error: derp').for(:status)
 
       should_not allow_value('ACTIVE').for(:status)
       should_not allow_value('error').for(:status)
@@ -49,50 +45,20 @@ class TagAliasTest < ActiveSupport::TestCase
         ta2 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "retired")
         ta3 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
         ta4 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
-        ta5 = FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
-        [ta1, ta2, ta3, ta4, ta5].each { |ta| assert(ta.valid?) }
+        [ta1, ta2, ta3, ta4].each { |ta| assert(ta.valid?) }
 
-        ta5.update(status: "active")
-        assert_includes(ta5.errors[:antecedent_name], "has already been taken")
-      end
-    end
-
-    context "#update_notice" do
-      setup do
-        @forum_topic = FactoryBot.create(:forum_topic)
-      end
-
-      should "update the cache" do
-        FactoryBot.create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", skip_secondary_validations: true, forum_topic: @forum_topic)
-        assert_equal(@forum_topic.id, Cache.get("tcn:aaa"))
+        ta4.update(status: "active")
+        assert_includes(ta4.errors[:antecedent_name], "has already been taken")
       end
     end
 
     context "#reject!" do
       should "not be blocked by validations" do
         ta1 = create(:tag_alias, antecedent_name: "kitty", consequent_name: "kitten", status: "active")
-        ta2 = build(:tag_alias, antecedent_name: "cat", consequent_name: "kitty", status: "pending")
+        ta2 = build(:tag_alias, antecedent_name: "cat", consequent_name: "kitty", status: "active")
 
         ta2.reject!
         assert_equal("deleted", ta2.reload.status)
-      end
-    end
-
-    context "on secondary validation" do
-      should "warn about missing wiki pages" do
-        ti = FactoryBot.build(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", skip_secondary_validations: false)
-
-        assert(ti.invalid?)
-        assert_includes(ti.errors[:base], "The bbb tag needs a corresponding wiki page")
-      end
-
-      should "warn about conflicting wiki pages" do
-        FactoryBot.create(:wiki_page, title: "aaa", body: "aaa")
-        FactoryBot.create(:wiki_page, title: "bbb", body: "bbb")
-        ti = FactoryBot.build(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", skip_secondary_validations: false)
-
-        assert(ti.invalid?)
-        assert_includes(ti.errors[:base], "The tag alias [[aaa]] -> [[bbb]]  has conflicting wiki pages. [[bbb]] should be updated to include information from [[aaa]] if necessary.")
       end
     end
 
@@ -113,17 +79,57 @@ class TagAliasTest < ActiveSupport::TestCase
       assert_equal(["bbb", "bbb"], TagAlias.to_aliased(["aaa", "aaa"]))
     end
 
+    should "handle abbreviations in TagAlias.to_aliased" do
+      create(:tag, name: "hair_ribbon", post_count: 300_000)
+      create(:tag, name: "hakurei_reimu", post_count: 50_000)
+      create(:tag, name: "kirisama_marisa", post_count: 50_000)
+      create(:tag, name: "kaname_madoka", post_count: 20_000)
+      create(:tag_alias, antecedent_name: "/hr", consequent_name: "hakurei_reimu")
+
+      assert_equal(["hakurei_reimu"], TagAlias.to_aliased(["/hr"]))
+      assert_equal(["kirisama_marisa"], TagAlias.to_aliased(["/km"]))
+      assert_equal(["hakurei_reimu", "kirisama_marisa"], TagAlias.to_aliased(["/hr", "/km"]))
+    end
+
     context "saved searches" do
       should "move saved searches" do
-        tag1 = FactoryBot.create(:tag, :name => "...")
-        tag2 = FactoryBot.create(:tag, :name => "bbb")
-        ss = FactoryBot.create(:saved_search, :query => "123 ... 456", :user => CurrentUser.user)
-        ta = FactoryBot.create(:tag_alias, :antecedent_name => "...", :consequent_name => "bbb")
+        @ss1 = create(:saved_search, query: "123 ... 456", user: CurrentUser.user)
+        @ss2 = create(:saved_search, query: "123 -... 456", user: CurrentUser.user)
+        @ss3 = create(:saved_search, query: "123 ~... 456", user: CurrentUser.user)
+        @ss4 = create(:saved_search, query: "... 456", user: CurrentUser.user)
+        @ss5 = create(:saved_search, query: "123 ...", user: CurrentUser.user)
 
-        ta.approve!(approver: @admin)
+        TagAlias.approve!(antecedent_name: "...", consequent_name: "bbb", approver: @admin)
         perform_enqueued_jobs
 
-        assert_equal(%w(123 456 bbb), ss.reload.query.split.sort)
+        assert_equal("123 bbb 456", @ss1.reload.query)
+        assert_equal("123 -bbb 456", @ss2.reload.query)
+        assert_equal("123 ~bbb 456", @ss3.reload.query)
+        assert_equal("bbb 456", @ss4.reload.query)
+        assert_equal("123 bbb", @ss5.reload.query)
+      end
+    end
+
+    context "blacklists" do
+      should "move blacklists" do
+        @u1 = create(:user, blacklisted_tags: "111 ... 222")
+        @u2 = create(:user, blacklisted_tags: "111 -... -222")
+        @u3 = create(:user, blacklisted_tags: "111 ~... ~222")
+        @u4 = create(:user, blacklisted_tags: "... 222")
+        @u5 = create(:user, blacklisted_tags: "111 ...")
+        @u6 = create(:user, blacklisted_tags: "111 222\n\n... 333\n")
+        @u7 = create(:user, blacklisted_tags: "111 ...\r\n222 333\n")
+
+        TagAlias.approve!(antecedent_name: "...", consequent_name: "aaa", approver: @admin)
+        perform_enqueued_jobs
+
+        assert_equal("111 aaa 222", @u1.reload.blacklisted_tags)
+        assert_equal("111 -aaa -222", @u2.reload.blacklisted_tags)
+        assert_equal("111 ~aaa ~222", @u3.reload.blacklisted_tags)
+        assert_equal("aaa 222", @u4.reload.blacklisted_tags)
+        assert_equal("111 aaa", @u5.reload.blacklisted_tags)
+        assert_equal("111 222\n\naaa 333", @u6.reload.blacklisted_tags)
+        assert_equal("111 aaa\n222 333", @u7.reload.blacklisted_tags)
       end
     end
 
@@ -131,8 +137,7 @@ class TagAliasTest < ActiveSupport::TestCase
       post1 = FactoryBot.create(:post, :tag_string => "aaa bbb")
       post2 = FactoryBot.create(:post, :tag_string => "ccc ddd")
 
-      ta = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "ccc")
-      ta.approve!(approver: @admin)
+      TagAlias.approve!(antecedent_name: "aaa", consequent_name: "ccc", approver: @admin)
       perform_enqueued_jobs
 
       assert_equal("bbb ccc", post1.reload.tag_string)
@@ -145,119 +150,148 @@ class TagAliasTest < ActiveSupport::TestCase
         ta2 = FactoryBot.build(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
         ta2.save
         assert(ta2.errors.any?, "Tag alias should be invalid")
-        assert_equal("A tag alias for bbb already exists", ta2.errors.full_messages.join)
+        assert_equal("bbb is already aliased to ccc", ta2.errors.full_messages.join)
       end
     end
 
-    should "move existing wikis" do
-      wiki = create(:wiki_page, title: "aaa")
-      ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
+    context "when the tags have wikis" do
+      should "rename the old wiki if there is no conflict" do
+        @wiki = create(:wiki_page, title: "aaa")
 
-      ta.approve!(approver: @admin)
-      perform_enqueued_jobs
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
+        perform_enqueued_jobs
 
-      assert_equal("bbb", wiki.reload.title)
+        assert_equal("bbb", @wiki.reload.title)
+      end
+
+      should "merge existing wikis if there is a conflict" do
+        @wiki1 = create(:wiki_page, title: "aaa", other_names: "111 222", body: "first")
+        @wiki2 = create(:wiki_page, title: "bbb", other_names: "111 333", body: "second")
+
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
+        perform_enqueued_jobs
+
+        assert_equal(true, @wiki1.reload.is_deleted)
+        assert_equal([], @wiki1.other_names)
+        assert_equal("This tag has been moved to [[#{@wiki2.title}]].", @wiki1.body)
+
+        assert_equal(false, @wiki2.reload.is_deleted)
+        assert_equal(%w[111 333 222], @wiki2.other_names)
+        assert_equal("second", @wiki2.body)
+      end
+
+      should "ignore the old wiki if it has been deleted" do
+        @wiki1 = create(:wiki_page, title: "aaa", other_names: "111 222", body: "first", is_deleted: true)
+        @wiki2 = create(:wiki_page, title: "bbb", other_names: "111 333", body: "second")
+
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
+        perform_enqueued_jobs
+
+        assert_equal(true, @wiki1.reload.is_deleted)
+        assert_equal(%w[111 222], @wiki1.other_names)
+        assert_equal("first", @wiki1.body)
+
+        assert_equal(false, @wiki2.reload.is_deleted)
+        assert_equal(%w[111 333], @wiki2.other_names)
+        assert_equal("second", @wiki2.body)
+      end
+
+      should "rewrite links in other wikis to use the new tag" do
+        @wiki = create(:wiki_page, body: "foo [[aaa]] bar")
+
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
+        perform_enqueued_jobs
+
+        assert_equal("foo [[bbb]] bar", @wiki.reload.body)
+      end
     end
 
-    should "move existing aliases" do
-      ta1 = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :status => "pending")
-      ta2 = FactoryBot.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc", :status => "pending")
+    context "when the tags have artist entries" do
+      should "rename the old artist entry if there is no conflict" do
+        @artist = create(:artist, name: "aaa")
 
-      # XXX this is broken, it depends on the order the jobs are executed in.
-      ta2.approve!(approver: @admin)
-      ta1.approve!(approver: @admin)
-      perform_enqueued_jobs
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
+        perform_enqueued_jobs
 
-      assert_equal("ccc", ta1.reload.consequent_name)
+        assert_equal("bbb", @artist.reload.name)
+      end
+
+      should "merge existing artists if there is a conflict" do
+        @tag = create(:tag, name: "aaa", category: Tag.categories.artist)
+        @artist1 = create(:artist, name: "aaa", group_name: "g_aaa", other_names: "111 222", url_string: "https://twitter.com/111\n-https://twitter.com/222")
+        @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://twitter.com/111\n-https://twitter.com/333\nhttps://twitter.com/444")
+
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
+        perform_enqueued_jobs
+
+        assert_equal(true, @artist1.reload.is_deleted)
+        assert_equal([@artist2.name], @artist1.other_names)
+        assert_equal("", @artist1.group_name)
+        assert_equal([], @artist1.url_array)
+
+        assert_equal(false, @artist2.reload.is_deleted)
+        assert_equal(%w[111 333 222 aaa], @artist2.other_names)
+        assert_equal("g_aaa", @artist2.group_name)
+        assert_equal(%w[-https://twitter.com/222 -https://twitter.com/333 https://twitter.com/111 https://twitter.com/444], @artist2.url_array)
+      end
+
+      should "ignore the old artist if it has been deleted" do
+        @artist1 = create(:artist, name: "aaa", group_name: "g_aaa", other_names: "111 222", url_string: "https://twitter.com/111\n-https://twitter.com/222", is_deleted: true)
+        @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://twitter.com/111\n-https://twitter.com/333\nhttps://twitter.com/444")
+
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
+        perform_enqueued_jobs
+
+        assert_equal(true, @artist1.reload.is_deleted)
+        assert_equal(%w[111 222], @artist1.other_names)
+        assert_equal("g_aaa", @artist1.group_name)
+        assert_equal(%w[-https://twitter.com/222 https://twitter.com/111], @artist1.url_array)
+
+        assert_equal(false, @artist2.reload.is_deleted)
+        assert_equal(%w[111 333], @artist2.other_names)
+        assert_equal("", @artist2.group_name)
+        assert_equal(%w[-https://twitter.com/333 https://twitter.com/111 https://twitter.com/444], @artist2.url_array)
+      end
     end
 
-    should "move existing implications" do
-      ti = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
-      ta = FactoryBot.create(:tag_alias, :antecedent_name => "bbb", :consequent_name => "ccc")
-      ta.approve!(approver: @admin)
+    should "push the consequent's category to the antecedent if the antecedent is general" do
+      tag1 = create(:tag, name: "general", category: 0)
+      tag2 = create(:tag, name: "artist", category: 1)
+
+      TagAlias.approve!(antecedent_name: "general", consequent_name: "artist", approver: @admin)
       perform_enqueued_jobs
 
-      assert_equal("ccc", ti.reload.consequent_name)
-    end
-
-    should "not push the antecedent's category to the consequent if the antecedent is general" do
-      tag1 = FactoryBot.create(:tag, :name => "aaa")
-      tag2 = FactoryBot.create(:tag, :name => "bbb", :category => 1)
-      ta = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
-      tag2.reload
-      assert_equal(1, tag2.category)
-    end
-
-    should "push the antecedent's category to the consequent" do
-      tag1 = FactoryBot.create(:tag, :name => "aaa", :category => 1)
-      tag2 = FactoryBot.create(:tag, :name => "bbb", :category => 0)
-      ta = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb")
-
-      ta.approve!(approver: @admin)
-      perform_enqueued_jobs
-
+      assert_equal(1, tag1.reload.category)
       assert_equal(1, tag2.reload.category)
     end
 
-    context "with an associated forum topic" do
-      setup do
-        @admin = FactoryBot.create(:admin_user)
-        CurrentUser.scoped(@admin) do
-          @topic = FactoryBot.create(:forum_topic, :title => "Tag alias: aaa -> bbb")
-          @post = FactoryBot.create(:forum_post, :topic_id => @topic.id, :body => TagAliasRequest.command_string("aaa", "bbb"))
-          @alias = FactoryBot.create(:tag_alias, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic, :forum_post => @post, :status => "pending")
-        end
-      end
+    should "push the antecedent's category to the consequent if the consequent is general" do
+      tag1 = create(:tag, name: "artist", category: 1)
+      tag2 = create(:tag, name: "general", category: 0)
 
-      context "and conflicting wiki pages" do
-        setup do
-          CurrentUser.scoped(@admin) do
-            @wiki1 = FactoryBot.create(:wiki_page, :title => "aaa")
-            @wiki2 = FactoryBot.create(:wiki_page, :title => "bbb")
-            @alias.approve!(approver: @admin)
-            perform_enqueued_jobs
-          end
-        end
+      TagAlias.approve!(antecedent_name: "artist", consequent_name: "general", approver: @admin)
+      perform_enqueued_jobs
 
-        should "update the forum topic when approved" do
-          assert_equal("[APPROVED] Tag alias: aaa -> bbb", @topic.reload.title)
-          assert_match(/The tag alias .* been approved/m, @topic.posts.second.body)
-        end
+      assert_equal(1, tag1.reload.category)
+      assert_equal(1, tag2.reload.category)
+    end
 
-        should "warn about conflicting wiki pages when approved" do
-          assert_match(/has conflicting wiki pages/m, @topic.posts.third.body)
-        end
-      end
+    should "not change either tag category when neither the antecedent or consequent are general" do
+      tag1 = create(:tag, name: "character", category: 4)
+      tag2 = create(:tag, name: "copyright", category: 3)
 
-      should "update the topic when processed" do
-        assert_difference("ForumPost.count") do
-          @alias.approve!(approver: @admin)
-          perform_enqueued_jobs
-        end
-      end
+      TagAlias.approve!(antecedent_name: "character", consequent_name: "copyright", approver: @admin)
+      perform_enqueued_jobs
 
-      should "update the parent post" do
-        previous = @post.body
-        @alias.approve!(approver: @admin)
-        perform_enqueued_jobs
-        assert_not_equal(previous, @post.reload.body)
-      end
+      assert_equal(4, tag1.reload.category)
+      assert_equal(3, tag2.reload.category)
+    end
 
-      should "update the topic when rejected" do
-        assert_difference("ForumPost.count") do
-          @alias.reject!
-        end
-      end
+    should "automatically remove a redundant implication" do
+      ti = create(:tag_implication, antecedent_name: "new_asuka", consequent_name: "asuka", status: "active")
+      create(:tag_alias, antecedent_name: "new_asuka", consequent_name: "asuka", status: "active")
 
-      should "update the topic when failed" do
-        @alias.stubs(:sleep).returns(true)
-        @alias.stubs(:update_posts).raises(Exception, "oh no")
-        @alias.process!
-
-        assert_equal("[FAILED] Tag alias: aaa -> bbb", @topic.reload.title)
-        assert_match(/error: oh no/, @alias.status)
-        assert_match(/The tag alias .* failed during processing/, @topic.posts.last.body)
-      end
+      assert_equal("deleted", ti.reload.status)
     end
   end
 end

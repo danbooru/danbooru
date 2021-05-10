@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'webmock/minitest'
 
 class CloudflareServiceTest < ActiveSupport::TestCase
   def setup
@@ -8,16 +7,11 @@ class CloudflareServiceTest < ActiveSupport::TestCase
 
   context "#purge_cache" do
     should "make calls to cloudflare's api" do
-      stub_request(:any, "api.cloudflare.com")
-      @cloudflare.purge_cache(["http://localhost/file.txt"])
+      url = "http://www.example.com/file.jpg"
+      mock_request("https://api.cloudflare.com/client/v4/zones/123/purge_cache", method: :delete, json: { files: [url] })
 
-      assert_requested(:delete, "https://api.cloudflare.com/client/v4/zones/123/purge_cache", times: 1)
-    end
-  end
-
-  context "#ips" do
-    should "work" do
-      refute_empty(@cloudflare.ips)
+      response = @cloudflare.purge_cache([url])
+      assert_equal(200, response.status)
     end
   end
 end

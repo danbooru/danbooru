@@ -1,17 +1,13 @@
 class ArtistsController < ApplicationController
   respond_to :html, :xml, :json, :js
-  before_action :member_only, :except => [:index, :show, :show_or_new, :banned]
-  before_action :admin_only, :only => [:ban, :unban]
-  before_action :load_artist, :only => [:ban, :unban, :show, :edit, :update, :destroy, :undelete]
 
   def new
-    @artist = Artist.new_with_defaults(artist_params(:new))
-    @artist.build_wiki_page if @artist.wiki_page.nil?
+    @artist = authorize Artist.new_with_defaults(permitted_attributes(Artist))
     respond_with(@artist)
   end
 
   def edit
-    @artist.build_wiki_page if @artist.wiki_page.nil?
+    @artist = authorize Artist.find(params[:id])
     respond_with(@artist)
   end
 
@@ -20,11 +16,13 @@ class ArtistsController < ApplicationController
   end
 
   def ban
+    @artist = authorize Artist.find(params[:id])
     @artist.ban!(banner: CurrentUser.user)
     redirect_to(artist_path(@artist), :notice => "Artist was banned")
   end
 
   def unban
+    @artist = authorize Artist.find(params[:id])
     @artist.unban!
     redirect_to(artist_path(@artist), :notice => "Artist was unbanned")
   end
@@ -32,35 +30,38 @@ class ArtistsController < ApplicationController
   def index
     # XXX
     params[:search][:name] = params.delete(:name) if params[:name]
-    @artists = Artist.paginated_search(params)
+    @artists = authorize Artist.visible(CurrentUser.user).paginated_search(params)
     @artists = @artists.includes(:urls, :tag) if request.format.html?
 
     respond_with(@artists)
   end
 
   def show
-    @artist = Artist.find(params[:id])
+    @artist = authorize Artist.find(params[:id])
     respond_with(@artist)
   end
 
   def create
-    @artist = Artist.create(artist_params)
+    @artist = authorize Artist.new(permitted_attributes(Artist))
+    @artist.save
     respond_with(@artist)
   end
 
   def update
-    @artist.update(artist_params)
+    @artist = authorize Artist.find(params[:id])
+    @artist.update(permitted_attributes(@artist))
     flash[:notice] = @artist.valid? ? "Artist updated" : @artist.errors.full_messages.join("; ")
     respond_with(@artist)
   end
 
   def destroy
+    @artist = authorize Artist.find(params[:id])
     @artist.update_attribute(:is_deleted, true)
     redirect_to(artist_path(@artist), :notice => "Artist deleted")
   end
 
   def revert
-    @artist = Artist.find(params[:id])
+    @artist = authorize Artist.find(params[:id])
     @version = @artist.versions.find(params[:version_id])
     @artist.revert_to!(@version)
     respond_with(@artist)
@@ -70,7 +71,7 @@ class ArtistsController < ApplicationController
     @artist = Artist.find_by_name(params[:name])
 
     if params[:name].blank?
-      redirect_to new_artist_path(artist_params(:new))
+      redirect_to new_artist_path(permitted_attributes(Artist))
     elsif @artist.present?
       redirect_to artist_path(@artist)
     else
@@ -87,17 +88,5 @@ class ArtistsController < ApplicationController
     else
       true
     end
-  end
-
-  def load_artist
-    @artist = Artist.find(params[:id])
-  end
-
-  def artist_params(context = nil)
-    permitted_params = %i[name other_names other_names_string group_name url_string notes is_deleted]
-    permitted_params << { wiki_page_attributes: %i[id body] }
-    permitted_params << :source if context == :new
-
-    params.fetch(:artist, {}).permit(permitted_params)
   end
 end

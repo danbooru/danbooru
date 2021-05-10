@@ -1,0 +1,50 @@
+article.comment {
+  flex: 1;
+
+  &[data-is-sticky="true"] {
+    background: var(--comment-sticky-background-color);
+  }
+
+  &[data-is-reported="true"] {
+    background-color: var(--moderation-report-background-color);
+  }
+
+  &[data-is-dimmed="true"] {
+    opacity: 0.3;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  .unhide-comment-link {
+    margin-bottom: 1em;
+    display: block;
+  }
+
+  .moderation-report-notice {
+    font-weight: bold;
+    color: var(--moderation-report-text-color);
+  }
+
+  .comment-votes {
+    color: var(--muted-text-color);
+
+    // Fix it so that the vote buttons don't move when the score changes width.
+    .comment-score {
+      display: inline-block;
+      text-align: center;
+      min-width: 1.25em;
+      white-space: nowrap;
+    }
+
+    .icon {
+      width: 1.25em;
+    }
+  }
+
+  .popup-menu {
+    width: 1.5em;
+    height: 1.5em;
+  }
+}

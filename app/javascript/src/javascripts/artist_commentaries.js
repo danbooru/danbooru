@@ -116,8 +116,8 @@ ArtistCommentary.fill_commentary = function(commentary) {
 // If the new description conflicts with the current description, merge them
 // by appending the new description onto the old one.
 ArtistCommentary.merge_commentaries = function(description, commentary) {
-  var post_source = $('#image-container').data().source;
-  var normalized_source = $("#image-container").data().normalizedSource;
+  var post_source = $('.image-container').data().source;
+  var normalized_source = $(".image-container").data().normalizedSource;
 
   if ((commentary.original_description && description) &&
       (commentary.original_description !== description)) {
@@ -135,11 +135,13 @@ ArtistCommentary.merge_commentaries = function(description, commentary) {
 
 // Update commentary field if it's blank, signal an error if there's a conflict.
 ArtistCommentary.update_field = function($field, value) {
+  $field.closest(".input").removeClass("field_with_errors");
+
   if ($field.val().trim() === "") {
     $field.val(value);
     return true;
   } else if ($field.val().trim() !== value) {
-    $field.effect("shake", { direction: "up", distance: 5 });
+    $field.closest(".input").addClass("field_with_errors");
     return false;
   } else {
     return true;

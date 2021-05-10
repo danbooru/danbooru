@@ -4,9 +4,7 @@ class NoteVersion < ApplicationRecord
   belongs_to_updater :counter_cache => "note_update_count"
 
   def self.search(params)
-    q = super
-
-    q = q.search_attributes(params, :updater, :is_active, :post, :note_id, :x, :y, :width, :height, :body, :version)
+    q = search_attributes(params, :id, :created_at, :updated_at, :is_active, :x, :y, :width, :height, :body, :version, :updater, :note, :post)
     q = q.text_attribute_matches(:body, params[:body_matches])
 
     q.apply_default_order(params)
@@ -14,9 +12,23 @@ class NoteVersion < ApplicationRecord
 
   def previous
     @previous ||= begin
-      NoteVersion.where("note_id = ? and updated_at < ?", note_id, updated_at).order("updated_at desc").limit(1).to_a
+      NoteVersion.where("note_id = ? and version < ?", note_id, version).order("updated_at desc").limit(1).to_a
     end
     @previous.first
+  end
+
+  def subsequent
+    @subsequent ||= begin
+      NoteVersion.where("note_id = ? and version > ?", note_id, version).order("updated_at asc").limit(1).to_a
+    end
+    @subsequent.first
+  end
+
+  def current
+    @current ||= begin
+      NoteVersion.where("note_id = ?", note_id).order("updated_at desc").limit(1).to_a
+    end
+    @current.first
   end
 
   def self.status_fields
@@ -29,20 +41,32 @@ class NoteVersion < ApplicationRecord
     }
   end
 
-  def was_moved
-    x != previous.x || y != previous.y
+  def was_moved(type)
+    other = self.send(type)
+    x != other.x || y != other.y
   end
 
-  def was_resized
-    width != previous.width || height != previous.height
+  def was_resized(type)
+    other = self.send(type)
+    width != other.width || height != other.height
   end
 
-  def was_deleted
-    !is_active && previous.is_active
+  def was_deleted(type)
+    other = self.send(type)
+    if type == "previous"
+      !is_active && other.is_active
+    else
+      is_active && !other.is_active
+    end
   end
 
-  def was_undeleted
-    is_active && !previous.is_active
+  def was_undeleted(type)
+    other = self.send(type)
+    if type == "previous"
+      is_active && !other.is_active
+    else
+      !is_active && other.is_active
+    end
   end
 
   def self.available_includes

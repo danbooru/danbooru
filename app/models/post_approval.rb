@@ -12,7 +12,7 @@ class PostApproval < ApplicationRecord
       errors.add(:post, "is locked and cannot be approved")
     end
 
-    if post.status == "active"
+    if post.is_active?
       errors.add(:post, "is already active and cannot be approved")
     end
 
@@ -28,7 +28,9 @@ class PostApproval < ApplicationRecord
   def approve_post
     is_undeletion = post.is_deleted
 
-    post.flags.each(&:resolve!)
+    post.flags.pending.update!(status: :rejected)
+    post.appeals.pending.update!(status: :succeeded)
+
     post.update(approver: user, is_flagged: false, is_pending: false, is_deleted: false)
     ModAction.log("undeleted post ##{post_id}", :post_undelete) if is_undeletion
 
@@ -36,8 +38,7 @@ class PostApproval < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-    q = q.search_attributes(params, :user, :post)
+    q = search_attributes(params, :id, :created_at, :updated_at, :user, :post)
     q.apply_default_order(params)
   end
 

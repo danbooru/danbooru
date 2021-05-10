@@ -23,66 +23,7 @@ class BanTest < ActiveSupport::TestCase
         assert(user.is_banned?)
       end
 
-      should "not be valid against another admin" do
-        user = FactoryBot.create(:admin_user)
-        ban = FactoryBot.build(:ban, :user => user, :banner => @banner)
-        ban.save
-        assert(ban.errors.any?)
-      end
-
-      should "be valid against anyone who is not an admin" do
-        user = FactoryBot.create(:moderator_user)
-        ban = FactoryBot.create(:ban, :user => user, :banner => @banner)
-        assert(ban.errors.empty?)
-
-        user = FactoryBot.create(:contributor_user)
-        ban = FactoryBot.create(:ban, :user => user, :banner => @banner)
-        assert(ban.errors.empty?)
-
-        user = FactoryBot.create(:gold_user)
-        ban = FactoryBot.create(:ban, :user => user, :banner => @banner)
-        assert(ban.errors.empty?)
-
-        user = FactoryBot.create(:user)
-        ban = FactoryBot.create(:ban, :user => user, :banner => @banner)
-        assert(ban.errors.empty?)
-      end
-    end
-
-    context "created by a moderator" do
-      setup do
-        @banner = FactoryBot.create(:moderator_user)
-        CurrentUser.user = @banner
-        CurrentUser.ip_addr = "127.0.0.1"
-      end
-
-      teardown do
-        @banner = nil
-        CurrentUser.user = nil
-        CurrentUser.ip_addr = nil
-      end
-
-      should "not be valid against an admin or moderator" do
-        user = FactoryBot.create(:admin_user)
-        ban = FactoryBot.build(:ban, :user => user, :banner => @banner)
-        ban.save
-        assert(ban.errors.any?)
-
-        user = FactoryBot.create(:moderator_user)
-        ban = FactoryBot.build(:ban, :user => user, :banner => @banner)
-        ban.save
-        assert(ban.errors.any?)
-      end
-
-      should "be valid against anyone who is not an admin or a moderator" do
-        user = FactoryBot.create(:contributor_user)
-        ban = FactoryBot.create(:ban, :user => user, :banner => @banner)
-        assert(ban.errors.empty?)
-
-        user = FactoryBot.create(:gold_user)
-        ban = FactoryBot.create(:ban, :user => user, :banner => @banner)
-        assert(ban.errors.empty?)
-
+      should "be valid" do
         user = FactoryBot.create(:user)
         ban = FactoryBot.create(:ban, :user => user, :banner => @banner)
         assert(ban.errors.empty?)
@@ -142,26 +83,6 @@ class BanTest < ActiveSupport::TestCase
       teardown do
         CurrentUser.user = nil
         CurrentUser.ip_addr = nil
-      end
-
-      context "when only expired bans exist" do
-        setup do
-          @ban = FactoryBot.create(:ban, :user => @user, :banner => @admin, :duration => -1)
-        end
-
-        should "not return expired bans" do
-          assert(!Ban.is_banned?(@user))
-        end
-      end
-
-      context "when active bans still exist" do
-        setup do
-          @ban = FactoryBot.create(:ban, :user => @user, :banner => @admin, :duration => 1)
-        end
-
-        should "return active bans" do
-          assert(Ban.is_banned?(@user))
-        end
       end
     end
   end

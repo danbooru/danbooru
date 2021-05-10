@@ -9,13 +9,18 @@ class UserNameChangeRequest < ApplicationRecord
   after_create :update_name!
 
   def self.visible(user)
-    if user.is_admin?
+    if user.is_moderator?
       all
-    elsif user.is_member?
-      where(user: User.undeleted)
-    else
+    elsif user.is_anonymous?
       none
+    else
+      where(user: User.undeleted)
     end
+  end
+
+  def self.search(params)
+    q = search_attributes(params, :id, :created_at, :updated_at, :user, :original_name, :desired_name)
+    q.apply_default_order(params)
   end
 
   def update_name!
@@ -24,7 +29,7 @@ class UserNameChangeRequest < ApplicationRecord
 
   def not_limited
     if UserNameChangeRequest.unscoped.where(user: user).where("created_at >= ?", 1.week.ago).exists?
-      errors[:base] << "You can only submit one name change request per week"
+      errors.add(:base, "You can only submit one name change request per week")
     end
   end
 end

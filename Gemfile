@@ -7,7 +7,6 @@ gem "pg"
 gem "delayed_job"
 gem "delayed_job_active_record"
 gem "simple_form"
-gem "mechanize"
 gem "whenever", :require => false
 gem "sanitize"
 gem 'ruby-vips'
@@ -28,30 +27,31 @@ gem 'daemons'
 gem 'oauth2'
 gem 'bootsnap'
 gem 'addressable'
-gem 'httparty'
 gem 'rakismet'
 gem 'recaptcha', require: "recaptcha/rails"
 gem 'activemodel-serializers-xml'
-gem 'jquery-rails'
-gem 'webpacker', '>= 4.0.x'
+gem 'webpacker', '= 6.0.0.beta.6'
 gem 'rake'
-gem 'retriable'
 gem 'redis'
-gem 'request_store'
 gem 'builder'
 # gem 'did_you_mean' # github.com/yuki24/did_you_mean/issues/117
 gem 'puma'
 gem 'scenic'
-gem 'ipaddress'
+gem 'ipaddress_2'
 gem 'http'
-gem 'activerecord-hierarchical_query'
-
-# needed for successful deploy
-gem 'bcrypt_pbkdf'
-gem 'ed25519', '< 2.0'
-
-# needed for looser jpeg header compat
-gem 'ruby-imagespec', :require => "image_spec", :git => "https://github.com/r888888888/ruby-imagespec.git", :branch => "exif-fixes"
+gem 'activerecord-hierarchical_query', git: "https://github.com/walski/activerecord-hierarchical_query", branch: "rails-6-1"
+gem 'http-cookie', git: "https://github.com/danbooru/http-cookie"
+gem 'pundit'
+gem 'mail'
+gem 'nokogiri'
+gem 'view_component', require: 'view_component/engine'
+gem 'tzinfo-data'
+gem 'hsluv'
+gem 'google-cloud-bigquery', require: "google/cloud/bigquery"
+gem 'google-cloud-storage', require: "google/cloud/storage"
+gem 'ed25519'
+gem 'bcrypt_pbkdf' # https://github.com/net-ssh/net-ssh/issues/565
+gem 'terminal-table'
 
 group :production, :staging do
   gem 'unicorn', :platforms => :ruby
@@ -65,19 +65,21 @@ group :production do
 end
 
 group :development do
-  gem 'sinatra'
-  gem 'meta_request'
+  gem 'rubocop'
+  gem 'rubocop-rails'
+  #gem 'meta_request'
   gem 'rack-mini-profiler'
   gem 'stackprof'
   gem 'flamegraph'
   gem 'memory_profiler'
+  gem 'better_errors'
+  gem 'binding_of_caller'
+  gem 'benchmark-ips', require: "benchmark/ips"
 end
 
 group :development, :test do
-  gem 'awesome_print'
   gem 'pry-byebug'
   gem 'pry-rails'
-  gem 'pry-inline'
   gem 'listen'
 end
 
@@ -85,12 +87,14 @@ group :test do
   gem "shoulda-context"
   gem "shoulda-matchers"
   gem "factory_bot"
-  gem "mocha"
+  gem "mocha", require: "mocha/minitest"
   gem "ffaker"
-  gem "simplecov", :require => false
-  gem "webmock"
+  gem "simplecov", require: false
   gem "minitest-ci"
+  gem "minitest-reporters", require: "minitest/reporters"
   gem "mock_redis"
   gem "capybara"
   gem "selenium-webdriver"
+  gem "codecov", require: false
+  gem 'stripe-ruby-mock', require: "stripe_mock"
 end

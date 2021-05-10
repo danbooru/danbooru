@@ -1,21 +1,35 @@
 <ul>
-  <li id="post-option-resize-to-window">
-    <%= link_to "Resize to window", "#", id: "image-resize-to-window-link" %>
-  </li>
+  <% if policy(post).visible? %>
+    <li id="post-option-resize-to-window">
+      <%= link_to "Resize to window", "#", class: "image-resize-to-window-link", "data-shortcut": "z" %>
+    </li>
+  <% end %>
+  <% if policy(post).visible? && post.has_large? && !post.is_ugoira? %>
+    <li id="post-option-view-large">
+      <%= link_to "View smaller", post.tagged_large_file_url, class: "image-view-large-link" %>
+    </li>
+    <li id="post-option-view-original">
+      <%= link_to "View original", post.tagged_file_url, class: "image-view-original-link" %>
+    </li>
+  <% end %>
   <li id="post-option-find-similar">
-    <%= link_to "Find similar", iqdb_queries_path(post_id: post.id) %>
+    <%= link_to "Find similar", iqdb_queries_path(post_id: post.id), ref: "nofollow" %>
   </li>
-  <li id="post-option-download">
-    <%= link_to_if post.visible?, "Download", post.tagged_file_url + "?download=1", download: post.presenter.filename_for_download %>
-  </li>
+  <% if policy(post).visible? %>
+    <li id="post-option-download">
+      <%= link_to "Download", post.tagged_file_url + "?download=1", download: post.presenter.filename_for_download(CurrentUser.user) %>
+    </li>
+  <% end %>
 
-  <% if CurrentUser.is_member? %>
+  <% if policy(Favorite).create? %>
     <li id="post-option-add-to-favorites">
-      <%= link_to "Favorite", favorites_path(post_id: post.id), remote: true, method: :post, id: "add-to-favorites", "data-shortcut": "f", style: ("display: none;" if @post.is_favorited?) %>
+      <%= link_to "Favorite", favorites_path(post_id: post.id), remote: true, method: :post, id: "add-to-favorites", "data-shortcut": "f", style: ("display: none;" if @post.favorited_by?(CurrentUser.user)) %>
     </li>
     <li id="post-option-remove-from-favorites">
-      <%= link_to "Unfavorite", favorite_path(post), remote: true, method: :delete, id: "remove-from-favorites", "data-shortcut": "shift+f", style: ("display: none;" if !@post.is_favorited?) %>
+      <%= link_to "Unfavorite", favorite_path(post), remote: true, method: :delete, id: "remove-from-favorites", "data-shortcut": "shift+f", "data-shortcut-when": ":visible", style: ("display: none;" if !@post.favorited_by?(CurrentUser.user)) %>
     </li>
+  <% end %>
+  <% if policy(post).update? %>
     <li id="post-option-edit"><%= link_to "Edit", "#edit", id: "side-edit-link" %></li>
     <li id="post-option-add-to-pool"><%= link_to "Add to pool", "#", id: "pool" %></li>
     <li id="post-option-add-note">
@@ -29,46 +43,51 @@
       <li id="post-option-copy-notes"><%= link_to "Copy notes", "#", id: "copy-notes" %></li>
     <% end %>
     <li id="post-option-add-commentary"><%= link_to "Add commentary", "#", id: "add-commentary" %></li>
+  <% end %>
+  <% if policy(FavoriteGroup).create? %>
     <li id="post-option-add-fav-group"><%= link_to "Add to fav group", "#", id: "open-favgroup-dialog-link", "data-shortcut": "g" %></li>
+  <% end %>
 
     <% if post.is_status_locked? %>
       <li id="post-option-status-locked">Status locked</li>
     <% else %>
-      <% if !post.is_deleted? && !post.is_pending? && !post.is_flagged? %>
+      <% if post.is_active? && policy(PostFlag).create? %>
         <li id="post-option-flag"><%= link_to "Flag", new_post_flag_path(post_flag: { post_id: post.id }), remote: true %></li>
-      <% elsif post.is_flagged? || post.is_deleted? %>
+      <% elsif post.is_appealable? && policy(PostAppeal).create? %>
         <li id="post-option-appeal"><%= link_to "Appeal", new_post_appeal_path(post_appeal: { post_id: post.id }), remote: true %></li>
       <% end %>
 
-      <% if CurrentUser.can_approve_posts? %>
-        <% if post.is_deleted? %>
-          <li id="post-option-undelete"><%= link_to "Undelete", post_approvals_path(post_id: post.id), remote: true, method: :post, "data-confirm": "Are you sure you want to undelete this post?" %></li>
-          <% if post.fav_count > 0 && post.parent_id %>
-            <li id="post-option-move-favorites"><%= link_to "Move favorites", confirm_move_favorites_moderator_post_post_path(post_id: post.id) %></li>
-          <% end %>
-        <% else %>
-          <li id="post-option-delete"><%= link_to "Delete", confirm_delete_moderator_post_post_path(post_id: post.id) %></li>
+      <% if policy(PostApproval).create? %>
+        <% if post.is_approvable? %>
+          <li id="post-option-approve"><%= link_to (post.is_deleted? ? "Undelete" : "Approve"), post_approvals_path(post_id: post.id), remote: true, method: :post, "data-shortcut": "shift+o", "data-confirm": "Are you sure you want to approve this post?" %></li>
+          <li id="post-option-disapprove"><%= link_to "Hide from queue", post_disapprovals_path(post_disapproval: { post_id: post.id, reason: "disinterest" }), remote: true, method: :post %></li>
         <% end %>
 
-        <% if post.is_approvable? && !post.is_deleted? %>
-          <li id="post-option-approve"><%= link_to "Approve", post_approvals_path(post_id: post.id), remote: true, method: :post, id: "approve", "data-shortcut": "shift+o", "data-confirm": "Are you sure you want to approve this post?" %></li>
-          <li id="post-option-disapprove"><%= link_to "Hide from queue", post_disapprovals_path(post_disapproval: { post_id: post.id, reason: "disinterest" }), remote: true, method: :post, id: "disapprove" %></li>
+        <% if post.is_deleted? && policy(post).move_favorites? %>
+          <li id="post-option-move-favorites"><%= link_to "Move favorites", confirm_move_favorites_moderator_post_post_path(post_id: post.id) %></li>
         <% end %>
 
-        <% if post.is_banned? %>
+        <% if !post.is_deleted? && policy(post).delete? %>
+          <li id="post-option-delete"><%= link_to "Delete", post, method: :delete, remote: true %></li>
+        <% end %>
+
+        <% if policy(post).unban? %>
           <li id="post-option-unban"><%= link_to "Unban", unban_moderator_post_post_path(post), method: :post, "data-confirm": "Are you sure you want to unban this post?" %></li>
-        <% else %>
+        <% elsif policy(post).ban? %>
           <li id="post-option-ban"><%= link_to "Ban", ban_moderator_post_post_path(post), method: :post, "data-confirm": "Are you sure you want to ban this post?" %></li>
         <% end %>
 
-        <% if CurrentUser.is_admin? %>
+        <% if policy(post).expunge? %>
           <li id="post-option-expunge"><%= link_to "Expunge", expunge_moderator_post_post_path(post_id: post.id), remote: true, method: :post, "data-confirm": "This will permanently delete this post (meaning the file will be deleted). Are you sure you want to delete this post?" %></li>
         <% end %>
+      <% end %>
 
-        <% if CurrentUser.is_moderator? %>
-          <li id="post-option-replace-image"><%= link_to "Replace image", new_post_replacement_path(post_id: post.id), remote: true %></li>
-        <% end %>
+      <% if policy(PostReplacement).create? %>
+        <li id="post-option-replace-image"><%= link_to "Replace image", new_post_replacement_path(post_id: post.id), remote: true %></li>
       <% end %>
     <% end %>
-  <% end %>
+
+    <% if policy(post).regenerate? %>
+      <li id="post-option-regenerate-preview"><%= link_to "Regenerate image", post_regenerations_path(post_id: post.id, category: "resizes"), method: :post, "data-confirm": "This will regenerate the posts's thumbnail images. Are you sure?" %></li>
+    <% end %>
 </ul>

@@ -1,21 +1,22 @@
 <div id="p-<%= listing_type(:pool_id) %>-listing">
 
-    <%= table_for @pool_versions, {class: "striped autofit", width: "100%"} do |t| %>
+    <%= table_for @pool_versions, class: "striped autofit", width: "100%" do |t| %>
       <% t.column column: "diff", width: "3%" do |pool_version| %>
-        <%= link_to_if pool_version.text_field_changed, "diff", diff_pool_version_path(pool_version.id) %>
+        <%= link_to_if pool_version_show_diff(pool_version, params[:type]), "diff", diff_pool_version_path(pool_version.id) %>
       <% end %>
-      <% t.column "Pool" do |pool_version| %>
+      <% t.column "Pool", td: {class: "diff-body"} do |pool_version| %>
         <%= link_to pool_version.pretty_name, pool_path(pool_version.pool_id), class: "pool-category-#{pool_version.pool.category}" %>
         <%= link_to "»", pool_versions_path(search: { pool_id: pool_version.pool_id }, anchor: "pool-version-#{pool_version.id}"), class: "pool-category-#{pool_version.pool.category}" %>
+        <%= pool_version_name_diff(pool_version, params[:type]) %>
       <% end %>
       <% t.column "Post Changes", td: { class: "col-expand" } do |pool_version| %>
-        <%= render "pool_versions/diff", diff: pool_version.build_diff  %>
+        <%= pool_version_post_diff(pool_version, params[:type]) %>
       <% end %>
       <% t.column "Post Count" do |pool_version| %>
         <%= link_to pool_version.post_ids.size, pool_versions_path(search: { pool_id: pool_version.pool_id }) %>
       <% end %>
       <% t.column "Changes", td: {class: "col-expand"} do |pool_version| %>
-        <%= status_diff_html(pool_version) %>
+        <%= status_diff_html(pool_version, params[:type]) %>
       <% end %>
       <% t.column "Updated", width: "10%" do |pool_version| %>
         <div>

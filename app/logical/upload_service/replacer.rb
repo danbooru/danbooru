@@ -11,7 +11,7 @@ class UploadService
     end
 
     def comment_replacement_message(post, replacement)
-      %("#{replacement.creator.name}":[/users/#{replacement.creator.id}] replaced this post with a new image:\n\n#{replacement_message(post, replacement)})
+      %("#{replacement.creator.name}":[#{Routes.user_path(replacement.creator)}] replaced this post with a new file:\n\n#{replacement_message(post, replacement)})
     end
 
     def replacement_message(post, replacement)
@@ -62,7 +62,7 @@ class UploadService
     end
 
     def source_strategy(upload)
-      return Sources::Strategies.find(upload.source, upload.referer_url)
+      Sources::Strategies.find(upload.source, upload.referer_url)
     end
 
     def find_replacement_url(repl, upload)
@@ -78,7 +78,7 @@ class UploadService
         return source_strategy(upload).canonical_url
       end
 
-      return upload.source
+      upload.source
     end
 
     def process!

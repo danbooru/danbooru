@@ -3,7 +3,7 @@
 
 <div id="c-explore-posts">
   <div id="a-searches">
-    <h1>Popular Searches - <%= @search_service.date %></h1>
+    <h1>Popular Searches - <%= @date %></h1>
 
     <table class="striped" width="100%">
       <thead>
@@ -13,16 +13,16 @@
         </tr>
       </thead>
       <tbody>
-        <% @search_service.each_search do |tags, count| %>
-          <tr class="tag-type-<%= Tag.category_for(tags) %>">
-            <td><%= link_to tags, posts_path(:tags => tags) %></td>
+        <% @searches.each do |search, count| %>
+          <tr class="tag-type-<%= Tag.find_by_name(search)&.category.to_i %>">
+            <td><%= link_to search, posts_path(tags: search) %></td>
             <td style="text-align: right;"><%= count.to_i %></td>
           </tr>
         <% end %>
       </tbody>
     </table>
 
-    <div class="paginator">
+    <div class="paginator text-center mt-4">
       <menu>
         <li><%= link_to "< Previous", searches_explore_posts_path(:date => 1.day.ago(@date).to_date), :class => "arrow" %></li>
         <li><%= link_to "Next >", searches_explore_posts_path(:date => 1.day.since(@date).to_date), :class => "arrow" %></li>

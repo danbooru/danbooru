@@ -1,0 +1,2 @@
+var stripe = Stripe("<%= j UserUpgrade.stripe_publishable_key %>");
+stripe.redirectToCheckout({ sessionId: "<%= j @checkout.id %>" });

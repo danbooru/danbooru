@@ -1,0 +1,47 @@
+<div id="c-status">
+  <div id="a-show" class="fixed-width-container">
+    <h1>Status</h1>
+
+    <% if @status.danbooru_version.present? && Danbooru.config.source_code_url.present? %>
+      <p>Running <%= external_link_to "#{Danbooru.config.source_code_url}/commits/#{@status.danbooru_version}", @status.danbooru_version.first(7) %>.</p>
+    <% end %>
+
+    <h2>Server</h2>
+
+    <details>
+      <summary>
+        Server: <%= @status.hostname %>
+      </summary>
+      <%= render "list", hash: @status.serializable_hash[:status] %>
+    </details>
+
+    <h2>Postgres</h2>
+
+    <details>
+      <summary>
+        <%= pluralize @status.postgres_active_connections, "active connection" %>.
+      </summary>
+
+      <%= render "table", rows: @status.serializable_hash[:postgres][:connection_stats] %>
+    </details>
+
+    <h2>Redis</h2>
+
+    <details>
+      <summary>
+        <%= @status.redis_used_memory %> memory used.
+      </summary>
+
+      <%= render "list", hash: @status.serializable_hash[:redis][:info] %>
+    </details>
+
+    <h2>Request</h2>
+
+    <details>
+      <summary>
+        IP: <%= @status.request.remote_ip %>
+      </summary>
+      <%= render "list", hash: @status.serializable_hash[:headers] %>
+    </details>
+  </div>
+</div>

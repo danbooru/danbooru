@@ -26,28 +26,43 @@ module Sources
     end
 
     context "A video" do
-      setup do
-        @site = Sources::Strategies.find("https://twitter.com/CincinnatiZoo/status/859073537713328129")
-      end
-
       should "get the correct urls" do
+        @site = Sources::Strategies.find("https://twitter.com/CincinnatiZoo/status/859073537713328129")
         assert_equal("https://video.twimg.com/ext_tw_video/859073467769126913/pu/vid/1280x720/cPGgVROXHy3yrK6u.mp4", @site.image_url)
         assert_equal(["https://pbs.twimg.com/ext_tw_video_thumb/859073467769126913/pu/img/VKHGdXPsqKASBTvm.jpg:small"], @site.preview_urls)
         assert_equal("https://twitter.com/CincinnatiZoo/status/859073537713328129", @site.canonical_url)
+      end
+
+      should "work when given a video thumbnail" do
+        # https://twitter.com/Kekeflipnote/status/1241038667898118144
+        @site = Sources::Strategies.find("https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:small")
+        assert_equal("https://pbs.twimg.com/tweet_video_thumb/ETkN_L3X0AMy1aT.jpg:orig", @site.image_url)
+      end
+
+      should "work when given an external video thumbnail" do
+        # https://twitter.com/chivedips/status/1243850897056133121
+        @site = Sources::Strategies.find("https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg:small")
+        assert_equal("https://pbs.twimg.com/ext_tw_video_thumb/1243725361986375680/pu/img/JDA7g7lcw7wK-PIv.jpg:orig", @site.image_url)
+      end
+
+      should "work when given an amplify video thumbnail" do
+        # https://twitter.com/UNITED_CINEMAS/status/1223138847417978881
+        @site = Sources::Strategies.find("https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg:small")
+        assert_equal("https://pbs.twimg.com/amplify_video_thumb/1215590775364259840/img/lolCkEEioFZTb5dl.jpg:orig", @site.image_url)
       end
     end
 
     context "An animated gif" do
       setup do
-        @site = Sources::Strategies.find("https://twitter.com/DaniStrawberry1/status/859435334765088769")
+        @site = Sources::Strategies.find("https://twitter.com/i/web/status/1252517866059907073")
       end
 
       should "get the image url" do
-        assert_equal("https://video.twimg.com/tweet_video/C-1Tns7WsAAqvqn.mp4", @site.image_url)
+        assert_equal("https://video.twimg.com/tweet_video/EWHWVrmVcAAp4Vw.mp4", @site.image_url)
       end
 
       should "get the preview urls" do
-        assert_equal(["https://pbs.twimg.com/tweet_video_thumb/C-1Tns7WsAAqvqn.jpg:small"], @site.preview_urls)
+        assert_equal(["https://pbs.twimg.com/tweet_video_thumb/EWHWVrmVcAAp4Vw.jpg:small"], @site.preview_urls)
       end
     end
 
@@ -106,7 +121,7 @@ module Sources
       end
 
       should "get the artist name" do
-        assert_equal("nounproject", @site.artist_name)
+        assert_equal("Noun Project", @site.artist_name)
       end
 
       should "get the image urls" do
@@ -139,7 +154,8 @@ module Sources
       end
 
       should "get the source data" do
-        assert_equal("nounproject", @site.artist_name)
+        assert_equal("nounproject", @site.tag_name)
+        assert_equal("Noun Project", @site.artist_name)
         assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:orig", @site.image_url)
         assert_equal("https://pbs.twimg.com/media/B4HSEP5CUAA4xyu.png:small", @site.preview_url)
       end
@@ -203,7 +219,7 @@ module Sources
         @site = Sources::Strategies.find("https://twitter.com/masayasuf/status/870734961778630656")
         @artist = FactoryBot.create(:artist, name: "masayasuf", url_string: @site.url)
 
-        assert_equal("masayasuf", @site.artist_name)
+        assert_equal("masayasuf", @site.tag_name)
         assert_equal("https://twitter.com/masayasuf", @site.profile_url)
         assert_equal([@artist], @site.artists)
       end
@@ -226,6 +242,14 @@ module Sources
         ]
 
         assert_equal(tags, @site.tags)
+      end
+    end
+
+    context "A profile banner image" do
+      should "work" do
+        @site = Sources::Strategies.find("https://pbs.twimg.com/profile_banners/1225702850002468864/1588597370/1500x500")
+        assert_equal(@site.image_url, @site.url)
+        assert_nothing_raised { @site.to_h }
       end
     end
 
@@ -263,7 +287,7 @@ module Sources
         site = Sources::Strategies.find("https://twitter.com/tanso_panz/status/1192429800717029377")
 
         assert_equal(site.site_name, "Twitter")
-        assert_equal("tanso_panz", site.artist_name)
+        assert_equal("tanso_panz", site.tag_name)
         assert_equal("https://twitter.com/tanso_panz", site.profile_url)
         assert_nil(site.image_url)
       end
@@ -281,6 +305,25 @@ module Sources
         assert_includes(site.tags.map(&:first), "西住みほ生誕祭2019")
         assert_includes(site.normalized_tags, "西住みほ")
         assert_includes(site.translated_tags.map(&:name), "nishizumi_miho")
+      end
+    end
+
+    context "normalizing for source" do
+      should "normalize correctly" do
+        source1 = "https://twitter.com/i/web/status/1261877313349640194"
+        source2 = "https://twitter.com/BOW999/status/1261877313349640194"
+        source3 = "https://twitter.com/BOW999/status/1261877313349640194/photo/1"
+        source4 = "https://twitter.com/BOW999/status/1261877313349640194?s=19"
+
+        assert_equal(source1, Sources::Strategies.normalize_source(source1))
+        assert_equal(source1, Sources::Strategies.normalize_source(source2))
+        assert_equal(source1, Sources::Strategies.normalize_source(source3))
+        assert_equal(source1, Sources::Strategies.normalize_source(source4))
+      end
+
+      should "normalize twimg twitpic correctly" do
+        source = "https://o.twimg.com/2/proxy.jpg?t=HBgpaHR0cHM6Ly90d2l0cGljLmNvbS9zaG93L2xhcmdlL2R0bnVydS5qcGcUsAkU0ggAFgASAA&s=dnN4DHCdnojC-iCJWdvZ-UZinrlWqAP7k7lmll2fTxs"
+        assert_equal("https://twitpic.com/dtnuru", Sources::Strategies.normalize_source(source))
       end
     end
   end

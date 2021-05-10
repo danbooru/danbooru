@@ -1,4 +1,3 @@
-import Post from './posts.js.erb'
 import Shortcuts from './shortcuts.js';
 import Utility from './utility.js';
 import Dropzone from 'dropzone';
@@ -6,29 +5,19 @@ import SparkMD5 from 'spark-md5';
 
 let Upload = {};
 
-Upload.MAX_FILE_SIZE = <%= Danbooru.config.max_file_size.to_json %> / (1024 * 1024);
+Upload.MAX_FILE_SIZE_BYTES = <%= Danbooru.config.max_file_size.to_json %>;
+Upload.MAX_FILE_SIZE = Upload.MAX_FILE_SIZE_BYTES / (1024 * 1024);
 Upload.IQDB_LIMIT = 5;
 Upload.IQDB_MIN_SIMILARITY = 50;
 Upload.IQDB_HIGH_SIMILARITY = 70;
 
 Upload.initialize_all = function() {
   if ($("#c-uploads,#c-posts").length) {
-    Utility.keydown("return", "submit", Shortcuts.submit_form, "#upload_tag_string, #post_tag_string");
-    $("#upload_source").on("change.danbooru", Upload.fetch_data_manual);
-    $(document).on("click.danbooru", "#fetch-data-manual", Upload.fetch_data_manual);
+    Utility.keydown("return", "submit", Upload.submit_form, "#upload_tag_string, #post_tag_string");
   }
 
   if ($("#c-uploads").length) {
-    if ($("#image").prop("complete")) {
-      this.initialize_image();
-    } else {
-      $("#image").on("error.danbooru", (e) => {
-        $("#upload-image").hide();
-        $("#scale-link").hide();
-        $("#iqdb-similar").hide();
-      });
-      $("#image").on("load.danbooru", this.initialize_image);
-    }
+    this.initialize_image();
     this.initialize_similar();
     this.initialize_submit();
     $("#similar-button").click();
@@ -49,6 +38,13 @@ Upload.initialize_all = function() {
   if ($("#c-uploads #a-new").length) {
     this.initialize_dropzone();
   }
+}
+
+Upload.submit_form = async function(event) {
+  event.preventDefault();
+  Utility.notice("The Enter shortcut will be removed soon. Use Ctrl+Enter instead");
+  await Utility.delay(3000);
+  Shortcuts.submit_form(event);
 }
 
 Upload.initialize_submit = function() {
@@ -93,46 +89,72 @@ Upload.initialize_similar = function() {
   });
 }
 
-Upload.update_scale = function() {
-  var $image = $("#image");
-  var ratio = $image.data("scale-factor");
-  if (ratio < 1) {
-    $("#scale").html("Scaled " + parseInt(100 * ratio) + "% (original: " + $image.data("original-width") + "x" + $image.data("original-height") + ")");
+Upload.initialize_image = function() {
+  let $image = $("#image");
+
+  if ($image.prop("complete")) {
+    Upload.update_scale();
   } else {
-    $("#scale").html("Original: " + $image.data("original-width") + "x" + $image.data("original-height"));
+    $image.on("load.danbooru", Upload.update_scale);
   }
+
+  $(window).on("resize.danbooru", Upload.update_scale);
+  $(document).on("click.danbooru", "#image", Upload.toggle_size);
+  $(document).on("click.danbooru", "#upload-image-view-small", Upload.view_small);
+  $(document).on("click.danbooru", "#upload-image-view-large", Upload.view_large);
+  $(document).on("click.danbooru", "#upload-image-view-full", Upload.view_full);
 }
 
-Upload.fetch_data_manual = function(e) {
-  var url = $("#upload_source,#post_source").val();
-  var ref = $("#upload_referer_url").val();
+Upload.no_image_available = function(e) {
+  $("#a-new").addClass("no-image-available");
+}
 
-  if (/^https?:\/\//.test(url)) {
-    $("#source-info").addClass("loading");
-    $.get("/source.js", { url: url, ref: ref }).always(resp => $("#source-info").removeClass("loading"));
-  }
-
+Upload.view_small = function(e) {
+  $("#image").addClass("fit-width fit-height");
+  $("#a-new").attr("data-image-size", "small");
+  Upload.update_scale();
   e.preventDefault();
 }
 
-Upload.initialize_image = function() {
-  var $image = $("#image");
-  if (!$image.length) {
-    return;
-  }
-  var width = $image.width();
-  var height = $image.height();
-  if (!width || !height) {
-    // we errored out
-    return;
-  }
-  $("#no-image-available").hide();
-  $image.data("original-width", width);
-  $image.data("original-height", height);
-  Post.resize_image_to_window($image);
-  Post.initialize_post_image_resize_to_window_link();
+Upload.view_large = function(e) {
+  $("#image").removeClass("fit-height").addClass("fit-width");
+  $("#a-new").attr("data-image-size", "large");
   Upload.update_scale();
-  $("#image-resize-to-window-link").on("click.danbooru", Upload.update_scale);
+  e.preventDefault();
+}
+
+Upload.view_full = function(e) {
+  $("#image").removeClass("fit-width fit-height");
+  $("#a-new").attr("data-image-size", "full");
+  Upload.update_scale();
+  e.preventDefault();
+}
+
+Upload.toggle_size = function(e) {
+  let window_aspect_ratio = $(window).width() / $(window).height();
+  let image_aspect_ratio = $("#image").width() / $("#image").height();
+  let image_size = $("#a-new").attr("data-image-size");
+
+  if (image_size === "small" && image_aspect_ratio >= window_aspect_ratio) {
+    Upload.view_full(e);
+  } else if (image_size === "small" && image_aspect_ratio < window_aspect_ratio) {
+    Upload.view_large(e);
+  } else if (image_size === "large") {
+    Upload.view_small(e);
+  } else if (image_size === "full") {
+    Upload.view_small(e);
+  }
+}
+
+Upload.update_scale = function() {
+  let $image = $("#image");
+
+  if ($image.length) {
+    let natural_width = $image.get(0).naturalWidth;
+    let natural_height = $image.get(0).naturalHeight;
+    let scale_percentage = Math.round(100 * $image.width() / natural_width);
+    $("#upload-image-metadata-resolution").html(`(${natural_width}x${natural_height}, resized to ${scale_percentage}%)`);
+  }
 }
 
 Upload.toggle_commentary = function() {

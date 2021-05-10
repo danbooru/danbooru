@@ -8,9 +8,15 @@ parserOptions:
 globals:
   $: false
   require: false
+parser: babel-eslint
+plugins:
+  - babel
+ignorePatterns:
+  - app/javascript/vendor/**/*.js
 rules:
   # https://eslint.org/docs/rules/
   array-callback-return: error
+  babel/no-unused-expressions: error
   block-scoped-var: error
   consistent-return: error
   default-case: error
@@ -25,14 +31,14 @@ rules:
   no-lone-blocks: error
   no-lonely-if: error
   no-mixed-operators: error
-  no-new: error
+  no-new: warn
   no-new-wrappers: error
   no-return-assign: error
   no-self-compare: error
   no-sequences: error
   no-shadow: error
   no-shadow-restricted-names: error
-  no-unused-expressions: error
+  #no-unused-expressions: error
   no-unused-vars:
     - error
     - argsIgnorePattern: "^_"

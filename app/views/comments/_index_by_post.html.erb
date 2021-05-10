@@ -1,22 +1,18 @@
 <div id="p-index-by-post">
-  <% if !CurrentUser.user.is_builder? %>
-    <div style="margin-bottom: 1em;">
-      <h2>Before commenting, read the <%= link_to_wiki "how to comment guide", "howto:comment" %>.</h2>
-    </div>
-  <% end %>
-
   <% if @posts.blank? %>
     <%= render "post_sets/blank" %>
   <% end %>
 
   <% @posts.select(&:visible?).each do |post| %>
-    <% if post.comments.visible(CurrentUser.user).any? || post.comments.hidden(CurrentUser.user).any? %>
-      <%= content_tag(:div, { id: "post_#{post.id}", class: ["post", *PostPresenter.preview_class(post)].join(" ") }.merge(PostPresenter.data_attributes(post))) do %>
-        <div class="preview">
-          <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>
-        </div>
-        <%= render "comments/partials/index/list", post: post, comments: post.comments.visible(CurrentUser.user).last(6), page: :comments %>
-      <% end %>
+    <%= tag.div id: "post_#{post.id}", **PostPreviewComponent.new(post: post).article_attrs("post") do %>
+      <div class="preview">
+        <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>
+      </div>
+
+      <div class="comment-section">
+        <%= render "comments/partials/index/header", post: post %>
+        <%= render_comment_section(post, limit: 6, current_user: CurrentUser.user) %>
+      </div>
     <% end %>
   <% end %>
 </div>

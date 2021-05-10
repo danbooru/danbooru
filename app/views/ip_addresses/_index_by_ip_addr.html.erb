@@ -2,7 +2,7 @@
   <%= link_to "Find all users associated with the top 10 IP addresses", ip_addresses_path(search: { ip_addr: @ip_addresses.map(&:to_s).take(10).join(" "), group_by: "user" }) %>
 </p>
 
-<%= table_for @ip_addresses, {class: "striped autofit"} do |t| %>
+<%= table_for @ip_addresses, class: "striped autofit" do |t| %>
   <% t.column "IP Address" do |ip| %>
     <%= link_to ip.to_s, ip_addresses_path(search: { ip_addr: ip.to_s }) %>
     <%= link_to "»", ip_addresses_path(search: { ip_addr: ip.to_s, group_by: "user" }) %>
@@ -11,6 +11,6 @@
     <%= link_to ip.count_all, ip_addresses_path(search: { ip_addr: ip.to_s }) %>
   <% end %>
   <% t.column column: "ip-info" do |ip| %>
-    <%= link_to "IP info", "https://ipinfo.io/#{ip.ip_addr}" %>
+    <%= link_to "Details", ip_address_path(ip.ip_addr.to_s) %>
   <% end %>
 <% end %>

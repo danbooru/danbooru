@@ -1,46 +1,74 @@
 require 'test_helper'
 
 class PostVoteTest < ActiveSupport::TestCase
-  def setup
-    super
-
-    @user = FactoryBot.create(:user)
-    CurrentUser.user = @user
-    CurrentUser.ip_addr = "127.0.0.1"
-
-    @post = FactoryBot.create(:post)
-  end
-
-  context "Voting for a post" do
-    should "interpret up as +1 score" do
-      vote = PostVote.create(:post_id => @post.id, :vote => "up")
-      assert_equal(1, vote.score)
+  context "A PostVote" do
+    setup do
+      @post = create(:post)
     end
 
-    should "interpret down as -1 score" do
-      vote = PostVote.create(:post_id => @post.id, :vote => "down")
-      assert_equal(-1, vote.score)
+    context "during validation" do
+      subject { build(:post_vote, post: @post) }
+
+      should validate_uniqueness_of(:user_id).scoped_to(:post_id).with_message("have already voted for this post")
+      should validate_inclusion_of(:score).in_array([-1, 1]).with_message("must be 1 or -1")
     end
 
-    should "not accept any other scores" do
-      vote = PostVote.create(:post_id => @post.id, :vote => "xxx")
-      assert(vote.errors.any?)
+    context "creating" do
+      context "an upvote" do
+        should "increment the post's score" do
+          vote = create(:post_vote, post: @post, score: 1)
+
+          assert_equal(1, @post.reload.score)
+          assert_equal(1, @post.up_score)
+          assert_equal(0, @post.down_score)
+          assert_equal(1, @post.votes.positive.count)
+        end
+      end
+
+      context "a downvote" do
+        should "decrement the post's score" do
+          vote = create(:post_vote, post: @post, score: -1)
+
+          assert_equal(-1, @post.reload.score)
+          assert_equal(0, @post.up_score)
+          assert_equal(-1, @post.down_score)
+          assert_equal(1, @post.votes.negative.count)
+        end
+      end
     end
 
-    should "increase the score of the post" do
-      @post.votes.create(vote: "up")
-      @post.reload
+    context "destroying" do
+      context "an upvote" do
+        should "decrement the post's score" do
+          vote = create(:post_vote, post: @post, score: 1)
+          assert_equal(1, @post.reload.score)
+          assert_equal(1, @post.up_score)
+          assert_equal(0, @post.down_score)
+          assert_equal(1, @post.votes.count)
 
-      assert_equal(1, @post.score)
-      assert_equal(1, @post.up_score)
-    end
+          vote.destroy
+          assert_equal(0, @post.reload.score)
+          assert_equal(0, @post.up_score)
+          assert_equal(0, @post.down_score)
+          assert_equal(0, @post.votes.count)
+        end
+      end
 
-    should "decrease the score of the post when removed" do
-      @post.votes.create(vote: "up").destroy
-      @post.reload
+      context "a downvote" do
+        should "increment the post's score" do
+          vote = create(:post_vote, post: @post, score: -1)
+          assert_equal(-1, @post.reload.score)
+          assert_equal(0, @post.up_score)
+          assert_equal(-1, @post.down_score)
+          assert_equal(1, @post.votes.count)
 
-      assert_equal(0, @post.score)
-      assert_equal(0, @post.up_score)
+          vote.destroy
+          assert_equal(0, @post.reload.score)
+          assert_equal(0, @post.up_score)
+          assert_equal(0, @post.down_score)
+          assert_equal(0, @post.votes.count)
+        end
+      end
     end
   end
 end

@@ -1,24 +1,34 @@
 .ui-autocomplete.ui-widget {
-  font-size: 0.9em;
-  border: var(--autocomplete-border);
+  font-size: var(--text-sm);
+  border: 1px solid var(--autocomplete-border-color);
+  box-shadow: var(--shadow-lg);
 
-  .ui-state-active {
+  div.ui-menu-item-wrapper {
+    padding: 0.25em 0.4em;
     border: none;
-    margin: 0 -1px;
-    background-color: var(--autocomplete-selected-background-color);
-    border-left: var(--autocomplete-border);
-    border-right: var(--autocomplete-border);
-  }
 
-  .ui-menu-item-wrapper {
-    padding: 3px 0.5em 3px 0.4em;
+    &.ui-state-active {
+      cursor: pointer;
+      background-color: var(--autocomplete-selected-background-color);
+    }
 
-    a {
-      margin-right: 1em;
+    span.autocomplete-arrow {
+      color: var(--text-color);
+    }
+
+    span.post-count {
+      margin-left: 1em;
     }
   }
 
-  .autocomplete-arrow {
-    color: var(--autocomplete-arrow-color);
+  /* Display a red wavy underline beneath misspelled tags. */
+  /* https://stackoverflow.com/a/28152272 */
+  li[data-autocomplete-type="tag-autocorrect"] .autocomplete-antecedent {
+    position: relative;
+    display: inline-block;
+    background: var(--autocomplete-tag-autocorrect-underline);
+    background-repeat: repeat-x;
+    background-position-y: 1.2em;
+    line-height: 1.5em;
   }
 }

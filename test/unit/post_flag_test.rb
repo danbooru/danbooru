@@ -1,114 +1,101 @@
 require 'test_helper'
 
 class PostFlagTest < ActiveSupport::TestCase
-  context "In all cases" do
-    setup do
-      travel_to(2.weeks.ago) do
-        @alice = create(:gold_user)
+  context "PostFlag: " do
+    context "an approver" do
+      should "be able to flag an unlimited number of posts" do
+        @user = create(:user, can_approve_posts: true)
+
+        assert_nothing_raised do
+          create_list(:post_flag, 6, creator: @user, status: :pending)
+        end
       end
-      as(@alice) do
-        @post = create(:post, tag_string: "aaa", uploader: @alice)
+    end
+
+    context "a user with unlimited flags" do
+      should "be able to flag an unlimited number of posts" do
+        @user = create(:user)
+        create_list(:post_flag, 30, status: :succeeded, creator: @user)
+
+        assert_equal(true, @user.has_unlimited_flags?)
+        assert_equal(false, @user.is_flag_limited?)
+
+        assert_nothing_raised do
+          create_list(:post_flag, 6, creator: @user, status: :pending)
+        end
       end
     end
 
     context "a basic user" do
-      should "not be able to flag more than 1 post in 24 hours" do
-        @bob = create(:user, created_at: 2.weeks.ago)
-        @post_flag = build(:post_flag, creator: @bob)
-        @post_flag.expects(:flag_count_for_creator).returns(1)
+      should "be able to flag up to 5 posts at once" do
+        @user = create(:user)
+        @flags = create_list(:post_flag, 5, creator: @user, status: :pending)
+        @flag = build(:post_flag, creator: @user, status: :pending)
 
-        assert_equal(false, @post_flag.valid?)
-        assert_equal(["You can flag 1 post a day"], @post_flag.errors.full_messages)
+        assert_equal(false, @flag.valid?)
+        assert_equal(["have reached your flag limit"], @flag.errors[:creator])
+      end
+
+      should "have early rejected flags count against their flag limit" do
+        @user = create(:user)
+
+        create(:post_flag, creator: @user, status: :pending)
+        assert_equal(1, @user.post_flags.active.count)
+
+        create(:post_flag, creator: @user, status: :rejected)
+        assert_equal(2, @user.post_flags.active.count)
+
+        create(:post_flag, creator: @user, status: :succeeded)
+        assert_equal(2, @user.post_flags.active.count)
+
+        create(:post_flag, creator: @user, status: :rejected, created_at: 4.days.ago)
+        assert_equal(2, @user.post_flags.active.count)
       end
     end
 
-    context "a gold user" do
-      setup do
-        @bob = create(:gold_user, created_at: 1.month.ago)
-      end
-
-      should "not be able to flag a post more than twice" do
-        @post_flag = create(:post_flag, post: @post, creator: @bob)
-        @post_flag = build(:post_flag, post: @post, creator: @bob)
+    context "a user" do
+      should "not be able to flag a post more than once" do
+        @user = create(:user)
+        @post = create(:post)
+        @post_flag = create(:post_flag, post: @post, creator: @user)
+        @post_flag = build(:post_flag, post: @post, creator: @user)
 
         assert_equal(false, @post_flag.valid?)
         assert_equal(["have already flagged this post"], @post_flag.errors[:creator_id])
       end
 
-      should "not be able to flag more than 10 posts in 24 hours" do
-        @post_flag = build(:post_flag, post: @post, creator: @bob)
-        @post_flag.expects(:flag_count_for_creator).returns(10)
-
-        assert_difference(-> { PostFlag.count }, 0) do
-          @post_flag.save
-        end
-
-        assert_equal(["You can flag 10 posts a day"], @post_flag.errors.full_messages)
-      end
-
       should "not be able to flag a deleted post" do
-        as(@alice) do
-          @post.update(is_deleted: true)
-        end
+        @post = create(:post, is_deleted: true)
+        @post_flag = build(:post_flag, post: @post)
 
-        @post_flag = build(:post_flag, post: @post, creator: @bob)
-        @post_flag.save
-        assert_equal(["Post is deleted"], @post_flag.errors.full_messages)
+        assert_equal(false, @post_flag.valid?)
+        assert_equal(["Post is deleted and cannot be flagged"], @post_flag.errors.full_messages)
       end
 
       should "not be able to flag a pending post" do
-        as(@alice) do
-          @post.update(is_pending: true)
-        end
-        @flag = @post.flags.create(reason: "test", creator: @bob)
+        @post = create(:post, is_pending: true)
+        @flag = build(:post_flag, post: @post)
 
+        assert_equal(false, @flag.valid?)
         assert_equal(["Post is pending and cannot be flagged"], @flag.errors.full_messages)
       end
 
       should "not be able to flag a post in the cooldown period" do
         @mod = create(:moderator_user)
+        @users = create_list(:user, 2)
+        @post = create(:post)
+        @flag1 = create(:post_flag, post: @post, creator: @users.first)
+        as(@mod) { @post.approve! }
 
-        travel_to(2.weeks.ago) do
-          @users = FactoryBot.create_list(:user, 2)
-        end
-
-        @flag1 = create(:post_flag, post: @post, reason: "something", creator: @users.first)
-
-        as(@mod) do
-          @post.approve!
-        end
-
-        travel_to(PostFlag::COOLDOWN_PERIOD.from_now - 1.minute) do
+        travel_to(Danbooru.config.moderation_period.from_now - 1.minute) do
           @flag2 = build(:post_flag, post: @post, reason: "something", creator: @users.second)
           assert_equal(false, @flag2.valid?)
           assert_match(/cannot be flagged more than once/, @flag2.errors[:post].join)
         end
 
-        travel_to(PostFlag::COOLDOWN_PERIOD.from_now + 1.minute) do
+        travel_to(Danbooru.config.moderation_period.from_now + 1.minute) do
           @flag3 = create(:post_flag, post: @post, reason: "something", creator: @users.second)
           assert(@flag3.errors.empty?)
-        end
-      end
-
-      should "initialize its creator" do
-        @post_flag = create(:post_flag, creator: @alice)
-        assert_equal(@alice.id, @post_flag.creator_id)
-      end
-    end
-
-    context "a moderator user" do
-      should "not be able to view flags on their own uploads" do
-        @dave = create(:moderator_user, created_at: 1.month.ago)
-        @modpost = create(:post, :tag_string => "mmm", :uploader => @dave)
-        @flag1 = create(:post_flag, post: @modpost, creator: @alice)
-
-        assert_equal(false, @dave.can_view_flagger_on_post?(@flag1))
-
-        as(@dave) do
-          flag2 = PostFlag.search(:creator_id => @alice.id)
-          assert_equal(0, flag2.length)
-          flag3 = PostFlag.search({})
-          assert_nil(JSON.parse(flag3.to_json)[0]["creator_id"])
         end
       end
     end

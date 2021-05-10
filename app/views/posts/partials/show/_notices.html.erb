@@ -1,22 +1,33 @@
-<% if post.is_flagged? && !post.is_deleted? && post.flags.any? %>
-  <div class="notice notice-small post-notice post-notice-flagged">
-    <p>This post was flagged for review (<%= link_to_wiki "learn more", "howto:flag" %>): </p>
-
-    <%= render "post_flags/reasons", flags: post.flags %>
-  </div>
-<% end %>
-
 <% if post.is_banned? %>
   <div class="notice notice-small post-notice post-notice-banned">
     The artist requested removal of this page
   </div>
 <% end %>
 
-<% if post.is_deleted? %>
+<% if post.in_modqueue? %>
+  <div class="notice notice-small post-notice post-notice-pending">
+    <% if post.is_pending? %>
+      This post is pending approval. (<%= link_to_wiki "learn more", "about:mod_queue" %>)
+    <% elsif post.is_flagged? %>
+      This post was flagged and is pending approval (<%= link_to_wiki "learn more", "howto:flag" %>)
+      <%= render "post_flags/reasons", flag: post.flags.select(&:pending?).last %>
+    <% elsif post.is_appealed? %>
+      This post was appealed and is pending approval (<%= link_to_wiki "learn more", "about:mod_queue" %>)
+      <%= render "post_appeals/reasons", appeal: post.appeals.select(&:pending?).last %>
+    <% end %>
+
+    <%= render "post_disapprovals/counts", :disapprovals => post.disapprovals, :post => post %>
+
+    <% if policy(PostDisapproval).create? && !post.disapproved_by?(CurrentUser.user) %>
+      <%= render "modqueue/quick_mod", post: post %>
+      <%= render "post_disapprovals/detailed_rejection_dialog" %>
+    <% end %>
+  </div>
+<% elsif post.is_deleted? %>
   <div class="notice notice-small post-notice post-notice-deleted">
-    <% if post.flags.any? %>
-      <p>This post was deleted for the following reasons: </p>
-      <%= render "post_flags/reasons", flags: post.flags %>
+    <% if post.flags.succeeded.last.present? %>
+      <p>This post was deleted for the following reason: </p>
+      <%= render "post_flags/reasons", flag: post.flags.succeeded.last %>
     <% else %>
       <p>This post was deleted</p>
     <% end %>
@@ -27,31 +38,6 @@
       <p>If you don't understand why your upload was deleted, you can ask for
       advice in the Upload Feedback Thread on the forum.</p>
     <% end %>
-  </div>
-<% end %>
-
-<% if post.is_pending? || post.is_flagged? %>
-  <div class="notice notice-small post-notice post-notice-pending">
-    <% if post.is_pending? %>
-      This post is pending approval. 
-      (<%= link_to_wiki "learn more", "about:mod_queue" %>)
-    <% else %>
-      This post was flagged and is pending approval (<%= link_to_wiki "learn more", "about:mod_queue" %>)
-    <% end %>
-
-    <%= render "post_disapprovals/counts", :disapprovals => post.disapprovals, :post => post %>
-
-    <% if CurrentUser.can_approve_posts? && !post.disapproved_by?(CurrentUser.user) %>
-      <%= render "modqueue/quick_mod", post: post %>
-      <%= render "post_disapprovals/detailed_rejection_dialog" %>
-    <% end %>
-  </div>
-<% end %>
-
-<% if (post.is_flagged? || post.is_deleted?) && post.appeals.any? %>
-  <div class="notice notice-small post-notice post-notice-appealed">
-    <p>This post was appealed:</p>
-    <%= render "post_appeals/reasons", appeals: post.appeals %>
   </div>
 <% end %>
 
@@ -67,9 +53,8 @@
   </div>
 <% end %>
 
-<% if post.visible? && post.has_large? && !post.is_ugoira? %>
-  <div class="notice notice-small post-notice post-notice-resized" id="image-resize-notice" style="<%= CurrentUser.default_image_size == "original" ? "display: none;" : "" %>">
-    <span>Resized to <%= number_to_percentage post.resize_percentage.floor, :precision => 0 %> of original (<%= link_to "view original", post.tagged_file_url, :id => "image-resize-link" %>)</span>
-    <span style="display: none;">Loading...</span>
+<% if policy(post).visible? && post.has_large? && !post.is_ugoira? && post.resize_percentage.floor < 100 %>
+  <div class="notice notice-small post-notice post-notice-resized" id="image-resize-notice">
+    Resized to <%= number_to_percentage post.resize_percentage.floor, precision: 0 %> of original (<%= link_to "view original", post.tagged_file_url, class: "image-view-original-link" %>)
   </div>
 <% end %>

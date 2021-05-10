@@ -1,46 +1,49 @@
 <div class="post-tooltip-header">
-  <span class="post-tooltip-header-left">
-    <% if CurrentUser.is_moderator? %>
-      <%= link_to_user @post.uploader %>
-    <% end %>
+  <%= link_to_user @post.uploader %>
 
-    <span class="post-tooltip-favorites post-tooltip-info">
-      <span><%= @post.fav_count %></span>
-      <i class="far fa-heart fa-xs"></i>
-    </span>
-
-    <span class="post-tooltip-score post-tooltip-info">
-      <span><%= @post.score %></span>
-      <i class="far fa-thumbs-up fa-xs"></i>
-    </span>
-
-    <% if @post.last_commented_at.present? %>
-      <span class="post-tooltip-comments post-tooltip-info">
-        <span><%= @post.comments.count %></span>
-        <i class="far fa-comments fa-xs"></i>
-      </span>
-    <% end %>
-
-    <%= link_to posts_path(tags: "date:#{@post.created_at.strftime("%Y-%m-%d")}"), class: "post-tooltip-date post-tooltip-info" do %>
-      <%= time_ago_in_words_tagged(@post.created_at, compact: true) %> ago
-    <% end %>
+  <span class="post-tooltip-favorites post-tooltip-info">
+    <span><%= @post.fav_count %></span>
+    <%= empty_heart_icon(class: "fa-xs") %>
   </span>
 
-  <span class="post-tooltip-header-right">
-    <%= link_to @post.source_domain, @post.normalized_source, class: "post-tooltip-source post-tooltip-info" if @post.source_domain.present? %>
-    <%= link_to "#{@post.pretty_rating.downcase}", posts_path(tags: "rating:#{@post.rating}"), class: "post-tooltip-rating post-tooltip-info" %>
-    <%= link_to "#{@post.image_width}x#{@post.image_height}", @post.file_url, class: "post-tooltip-dimensions post-tooltip-info" %>
-
-    <%= link_to "#", class: "post-tooltip-disable", title: "Disable enhanced tooltips" do %>
-      <i class="fas fa-times-circle"></i>
-    <% end %>
+  <span class="post-tooltip-score post-tooltip-info">
+    <span><%= @post.score %></span>
+    <%= upvote_icon %>
   </span>
+
+  <% if @post.last_commented_at.present? %>
+    <span class="post-tooltip-comments post-tooltip-info">
+      <span><%= @post.comments.count %></span>
+      <%= comments_icon(class: "fa-xs") %>
+    </span>
+  <% end %>
+
+  <%= link_to posts_path(tags: "date:#{@post.created_at.strftime("%Y-%m-%d")}"), class: "post-tooltip-date post-tooltip-info" do %>
+    <%= time_ago_in_words_tagged(@post.created_at, compact: true) %> ago
+  <% end %>
+
+  <% if @post.source_domain.present? %>
+    <%= link_to @post.source_domain, @post.normalized_source, class: "post-tooltip-source post-tooltip-info" %>
+  <% else %>
+    <%= link_to "no source", posts_path(tags: "source:none"), class: "post-tooltip-source post-tooltip-info" %>
+  <% end %>
+
+  <%= link_to "#{@post.rating.upcase}", posts_path(tags: "rating:#{@post.pretty_rating}"), class: "post-tooltip-rating post-tooltip-info" %>
+  <%= link_to "#{@post.image_width}x#{@post.image_height}", @post.file_url, class: "post-tooltip-dimensions post-tooltip-info" %>
+
+  <%= render PopupMenuComponent.new do |menu| %>
+    <%= menu.item do %>
+      <%= link_to "javascript:void(0)", class: "post-tooltip-disable"  do %>
+        <%= close_icon %> Disable tooltips
+      <% end %>
+    <% end %>
+  <% end %>
 </div>
 
 <div class="post-tooltip-body <%= "has-preview" if params[:preview].truthy? %>">
   <div class="post-tooltip-body-left">
     <% if params[:preview].truthy? %>
-      <%= PostPresenter.preview(@post, show_deleted: true, compact: true) %>
+      <%= post_preview(@post, show_deleted: true, compact: true) %>
     <% end %>
   </div>
 
@@ -48,11 +51,11 @@
     <div class="post-tooltip-pools">
       <% @post.pools.series.undeleted.each do |pool| %>
         <%= link_to pool, class: "pool-category-#{pool.category}" do %>
-          <%= "pool:#{pool.pretty_name} [#{pool.page_number(@post.id)}/#{pool.post_count}]" %>
+          <%= "pool:#{pool.name} [#{pool.page_number(@post.id)}/#{pool.post_count}]" %>
         <% end %>
       <% end %>
     </div>
 
-    <%= @post.presenter.inline_tag_list_html %>
+    <%= render_inline_tag_list(@post) %>
   </div>
 </div>

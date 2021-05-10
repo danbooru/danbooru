@@ -2,6 +2,11 @@ require 'test_helper'
 
 module Sources
   class DeviantArtTest < ActiveSupport::TestCase
+    def setup
+      super
+      skip "DeviantArt API keys not set" unless Danbooru.config.deviantart_client_id.present?
+    end
+
     context "A page url" do
       setup do
         @site = Sources::Strategies.find("https://www.deviantart.com/aeror404/art/Holiday-Elincia-424551484")
@@ -27,7 +32,7 @@ module Sources
         @artist = create(:artist, name: "nickbeja", url_string: "https://nickbeja.deviantart.com")
 
         assert_equal("https://pre00.deviantart.net/423b/th/pre/i/2017/281/e/0/mindflayer_girl01_by_nickbeja-dbpxdt8.png", @site.image_url)
-        assert_equal(@site.image_url, @site.canonical_url)
+        assert_equal(@site.page_url, @site.canonical_url)
         assert_equal("nickbeja", @site.artist_name)
         assert_equal("https://www.deviantart.com/nickbeja", @site.profile_url)
         assert_equal("https://www.deviantart.com/nickbeja/art/Mindflayer-Girl01-708675884", @site.page_url_from_image_url)
@@ -239,6 +244,56 @@ module Sources
       end
     end
 
+    context "The source for a api-da.wixmp.com image" do
+      setup do
+        @url = "https://api-da.wixmp.com/_api/download/file?downloadToken=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsImV4cCI6MTU5MDkwMTUzMywiaWF0IjoxNTkwOTAwOTIzLCJqdGkiOiI1ZWQzMzhjNWQ5YjI0Iiwib2JqIjpudWxsLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdLCJwYXlsb2FkIjp7InBhdGgiOiJcL2ZcL2U0NmE0OGViLTNkMGItNDQ5ZS05MGRjLTBhMWIzMWNiMTM2MVwvZGQzcDF4OS1mYjQ3YmM4Zi02NTNlLTQyYTItYmI0ZC1hZmFmOWZjMmI3ODEuanBnIn19.-zo8E2eDmkmDNCK-sMabBajkaGtVYJ2Q20iVrUtt05Q"
+        @ref = "https://www.deviantart.com/akizero1510/art/Ten-miles-of-cherry-blossoms-792268029"
+        @artist = create(:artist, name: "akizero", url_string: "https://akizero1510.deviantart.com")
+      end
+
+      context "with a referer" do
+        should "work" do
+          @site = Sources::Strategies.find(@url, @ref)
+
+          assert_equal(@ref, @site.page_url)
+          assert_equal(@ref, @site.canonical_url)
+          assert_equal([@artist], @site.artists)
+          assert_nothing_raised { @site.to_h }
+        end
+      end
+    end
+
+    context "The source for a non-downloadable animated gif with id<=790677560" do
+      should "return working image url" do
+        @site = Sources::Strategies.find("https://www.deviantart.com/heartgear/art/Silent-Night-579982816")
+
+        # md5: 62caac1863aa264a56d548b4b7607097
+        assert_match(%r!\Ahttps://images-wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/ea95be00-c5aa-4063-bd55-f5a9183912f7/d9lb1ls-7d625444-0003-4123-bf00-274737ca7fdd.gif\?token=!, @site.image_url)
+        assert_downloaded(350_156, @site.image_url)
+      end
+    end
+
+    context "The source for a non-downloadable flash file" do
+      should "return working image url" do
+        skip
+        @site = Sources::Strategies.find("https://www.deviantart.com/heartgear/art/SL-40v3-522007633")
+
+        # md5: 6adf1a3d532f898f44cf9948cbc7db7d
+        assert_match(%r!\Ahttps://api-da\.wixmp\.com/_api/download/file\?downloadToken=!, @site.image_url)
+        assert_downloaded(3_496_110, @site.image_url)
+      end
+    end
+
+    context "The source for a non-downloadable video file" do
+      should "return working image url" do
+        @site = Sources::Strategies.find("https://www.deviantart.com/gs-mantis/art/Chen-Goes-Fishing-505847233")
+
+        # md5: 344ac2b9fd5a87982af4b648aa2b2b0d
+        assert_equal("https://wixmp-ed30a86b8c4ca887773594c2.wixmp.com/v/mp4/fe046bc7-4d68-4699-96c1-19aa464edff6/d8d6281-91959e92-214f-4b2d-a138-ace09f4b6d09.1080p.8e57939eba634743a9fa41185e398d00.mp4", @site.image_url)
+        assert_downloaded(9_739_947, @site.image_url)
+      end
+    end
+
     context "The source for an DeviantArt artwork page" do
       setup do
         @site = Sources::Strategies.find("http://noizave.deviantart.com/art/test-post-please-ignore-685436408")
@@ -281,17 +336,17 @@ module Sources
 
           [b]blah[/b] [i]blah[/i] [u]blah[/u] [s]blah[/s]
           herp derp
-          
+
           [quote]this is a quote[/quote]
-          
+
           * one
           * two
           * three
-          
+
           * one
           * two
           * three
-          
+
           "Heart":[https://e.deviantart.net/emoticons/h/heart.gif]
         EOS
 
@@ -325,6 +380,33 @@ module Sources
         @artist = create(:artist, name: "noizave", url_string: "https://deviantart.com/noizave")
 
         assert_equal([@artist], @site.artists)
+      end
+    end
+
+    context "normalizing for source" do
+      should "normalize correctly" do
+        source1 = "http://fc06.deviantart.net/fs71/f/2013/295/d/7/you_are_already_dead__by_mar11co-d6rgm0e.jpg"
+        source2 = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/intermediary/f/8b472d70-a0d6-41b5-9a66-c35687090acc/d23jbr4-8a06af02-70cb-46da-8a96-42a6ba73cdb4.jpg/v1/fill/w_786,h_1017,q_70,strp/silverhawks_quicksilver_by_edsfox_d23jbr4-pre.jpg"
+        source3 = "http://orig12.deviantart.net/9b69/f/2017/023/7/c/illustration___tokyo_encount_oei__by_melisaongmiqin-dawi58s.png"
+        source4 = "http://fc00.deviantart.net/fs71/f/2013/337/3/5/35081351f62b432f84eaeddeb4693caf-d6wlrqs.jpg"
+        source5 = "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/76098ac8-04ab-4784-b382-88ca082ba9b1/d9x7lmk-595099de-fe8f-48e5-9841-7254f9b2ab8d.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOiIsImlzcyI6InVybjphcHA6Iiwib2JqIjpbW3sicGF0aCI6IlwvZlwvNzYwOThhYzgtMDRhYi00Nzg0LWIzODItODhjYTA4MmJhOWIxXC9kOXg3bG1rLTU5NTA5OWRlLWZlOGYtNDhlNS05ODQxLTcyNTRmOWIyYWI4ZC5wbmcifV1dLCJhdWQiOlsidXJuOnNlcnZpY2U6ZmlsZS5kb3dubG9hZCJdfQ.KFOVXAiF8MTlLb3oM-FlD0nnDvODmjqEhFYN5I2X5Bc"
+        source6 = "https://fav.me/dbc3a48"
+
+        assert_equal("https://www.deviantart.com/mar11co/art/You-Are-Already-Dead-408921710", Sources::Strategies.normalize_source(source1))
+        assert_equal("https://www.deviantart.com/edsfox/art/Silverhawks-Quicksilver-126872896", Sources::Strategies.normalize_source(source2))
+        assert_equal("https://www.deviantart.com/melisaongmiqin/art/Illustration-Tokyo-Encount-Oei-659256076", Sources::Strategies.normalize_source(source3))
+        assert_equal("https://www.deviantart.com/deviation/417560500", Sources::Strategies.normalize_source(source4))
+        assert_equal("https://www.deviantart.com/deviation/599977532", Sources::Strategies.normalize_source(source5))
+        assert_equal("https://www.deviantart.com/deviation/685436408", Sources::Strategies.normalize_source(source6))
+      end
+
+      should "avoid normalizing unnormalizable urls" do
+        bad_source1 = "http://fc08.deviantart.net/images3/i/2004/088/8/f/Blackrose_for_MuzicFreq.jpg"
+        bad_source2 = "http://prnt00.deviantart.net/9b74/b/2016/101/4/468a9d89f52a835d4f6f1c8caca0dfb2-pnjfbh.jpg"
+        bad_source3 = "https://deviantart.net"
+        assert_equal(bad_source1, Sources::Strategies.normalize_source(bad_source1))
+        assert_equal(bad_source2, Sources::Strategies.normalize_source(bad_source2))
+        assert_equal(bad_source3, Sources::Strategies.normalize_source(bad_source3))
       end
     end
   end

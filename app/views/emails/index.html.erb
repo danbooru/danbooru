@@ -1,0 +1,46 @@
+<div id="c-emails">
+  <div id="a-index">
+    <%= search_form_for(emails_path) do |f| %>
+      <%= f.simple_fields_for :user do |fa| %>
+        <%= fa.input :name, label: "User Name", input_html: { value: params.dig(:search, :user, :name), "data-autocomplete": "user" } %>
+      <% end %>
+
+      <%= f.input :address_ilike, label: "Address", input_html: { value: params[:search][:address_ilike] }, hint: "Use * for wildcard" %>
+      <%= f.input :normalized_address_ilike, label: "Normalized Address", input_html: { value: params[:search][:normalized_address_ilike] }, hint: "Use * for wildcard" %>
+      <%= f.input :is_verified, label: "Verified?", as: :select, include_blank: true, selected: params[:search][:is_verified] %>
+      <%= f.input :is_restricted, label: "Restricted?", as: :select, include_blank: true, selected: params[:search][:is_restricted] %>
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <%= table_for @email_addresses, class: "striped autofit" do |t| %>
+      <% t.column :user do |email| %>
+        <%= link_to_user email.user %>
+      <% end %>
+      <% t.column :address do |email| %>
+        <%= link_to email.address, emails_path(search: { address_ilike: email.address }) %>
+      <% end %>
+      <% t.column :normalized_address do |email| %>
+        <% unless email.is_normalized? %>
+          <%= link_to email.normalized_address, emails_path(search: { normalized_address_ilike: email.normalized_address }) %>
+        <% end %>
+      <% end %>
+      <% t.column "Restricted?" do |email| %>
+        <% if email.is_restricted? %>
+          <%= link_to "Yes", emails_path(search: { is_restricted: true }) %>
+        <% end %>
+      <% end %>
+      <% t.column "Verified?" do |email| %>
+        <% if email.is_verified? %>
+          <%= link_to "Yes", emails_path(search: { is_verified: true }) %>
+        <% else %>
+          <%= link_to "No", emails_path(search: { is_verified: false }) %>
+        <% end %>
+      <% end %>
+      <% t.column :updated_at, name: "Updated" do |email| %>
+        <%= time_ago_in_words_tagged(email.updated_at) %>
+      <% end %>
+    <% end %>
+
+    <%= numbered_paginator(@email_addresses) %>
+  </div>
+</div>

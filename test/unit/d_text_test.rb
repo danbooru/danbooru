@@ -5,6 +5,10 @@ class DTextTest < ActiveSupport::TestCase
     assert_equal(expected, DText.strip_dtext(dtext))
   end
 
+  def assert_rewrite_wiki_links(expected, dtext, old, new)
+    assert_equal(expected, DText.rewrite_wiki_links(dtext, old, new))
+  end
+
   context "DText" do
     context "#strip_dtext" do
       should "strip dtext markup from the input" do
@@ -93,7 +97,7 @@ class DTextTest < ActiveSupport::TestCase
 
       should "not link general tags to artist pages" do
         tag = create(:tag, name: "cat")
-        artist = create(:artist, name: "cat", is_active: false)
+        artist = create(:artist, name: "cat", is_deleted: true)
 
         assert_match(%r!/wiki_pages/cat!, DText.format_text("[[cat]]"))
       end
@@ -122,6 +126,44 @@ class DTextTest < ActiveSupport::TestCase
         ]
 
         assert_equal(links, DText.parse_external_links(dtext))
+      end
+    end
+
+    context "#rewrite_wiki_links" do
+      should "work" do
+        assert_rewrite_wiki_links("[[rabbit]]", "[[bunny]]", "bunny", "rabbit")
+        assert_rewrite_wiki_links("[[rabbit|bun]]", "[[bunny|bun]]", "bunny", "rabbit")
+
+        assert_rewrite_wiki_links("[[cat]] [[rabbit]]", "[[cat]] [[rabbit]]", "bunny", "rabbit")
+        assert_rewrite_wiki_links("I like [[cat]]s and [[bunny]]s", "I like [[cat]]s and [[rabbit]]s", "rabbit", "bunny")
+
+        assert_rewrite_wiki_links("[[miku hatsune (cosplay)|]]", "[[hatsune miku (cosplay)]]", "hatsune_miku_(cosplay)", "miku_hatsune_(cosplay)")
+        assert_rewrite_wiki_links("[[Miku hatsune (cosplay)|]]", "[[Hatsune miku (cosplay)]]", "hatsune_miku_(cosplay)", "miku_hatsune_(cosplay)")
+        assert_rewrite_wiki_links("[[Miku Hatsune (cosplay)|]]", "[[Hatsune Miku (cosplay)]]", "hatsune_miku_(cosplay)", "miku_hatsune_(cosplay)")
+        assert_rewrite_wiki_links("[[miku hatsune (cosplay)|miku]]", "[[hatsune miku (cosplay)|miku]]", "hatsune_miku_(cosplay)", "miku_hatsune_(cosplay)")
+
+        assert_rewrite_wiki_links("[[the legend of zelda]]", "[[zelda no densetsu]]", "zelda_no_densetsu", "the_legend_of_zelda")
+        assert_rewrite_wiki_links("[[The legend of zelda]]", "[[Zelda no densetsu]]", "zelda_no_densetsu", "the_legend_of_zelda")
+        assert_rewrite_wiki_links("[[The Legend Of Zelda]]", "[[Zelda No Densetsu]]", "zelda_no_densetsu", "the_legend_of_zelda")
+        assert_rewrite_wiki_links("[[the legend of zelda]]", "[[zelda_no_densetsu]]", "zelda_no_densetsu", "the_legend_of_zelda")
+        assert_rewrite_wiki_links("[[The legend of zelda]]", "[[Zelda_no_densetsu]]", "zelda_no_densetsu", "the_legend_of_zelda")
+        assert_rewrite_wiki_links("[[The Legend Of Zelda]]", "[[Zelda_No_Densetsu]]", "zelda_no_densetsu", "the_legend_of_zelda")
+
+        assert_rewrite_wiki_links("[[Zelda no Densetsu]]", "[[Zelda no Densetsu]]", "zelda_no_densetsu", "the_legend_of_zelda")
+        assert_rewrite_wiki_links("[[Zelda_no_Densetsu]]", "[[Zelda_no_Densetsu]]", "zelda_no_densetsu", "the_legend_of_zelda")
+
+        assert_rewrite_wiki_links("[[Mario (series)|]]", "[[Mario]]", "mario", "mario_(series)")
+      end
+    end
+
+    context "#from_html" do
+      should "convert basic html to dtext" do
+        assert_equal("[b]abc[/b] [i]def[/i] [u]ghi[/u]", DText.from_html("<b>abc</b> <i>def</i> <u>ghi</u>"))
+      end
+
+      should "convert links to dtext" do
+        assert_equal('"example":[https://www.example.com]', DText.from_html('<a href="https://www.example.com">example</a>'))
+        assert_equal("<https://www.example.com>", DText.from_html('<a href="https://www.example.com">https://www.example.com</a>'))
       end
     end
   end

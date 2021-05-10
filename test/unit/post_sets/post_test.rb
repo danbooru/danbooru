@@ -65,16 +65,6 @@ module PostSets
         end
       end
 
-      context "a set for the 'a b' tag query" do
-        setup do
-          @set = PostSets::Post.new("a b")
-        end
-
-        should "know it isn't a single tag" do
-          assert(!@set.is_single_tag?)
-        end
-      end
-
       context "a set going to the 1,001st page" do
         setup do
           @set = PostSets::Post.new("a", 1_001)
@@ -88,24 +78,20 @@ module PostSets
       end
 
       context "a set for the 'a b c' tag query" do
-        setup do
-          @set = PostSets::Post.new("a b c")
-        end
-
         context "for a non-gold user" do
           should "fail" do
-            assert_raises(::Post::SearchError) do
+            @set = PostSets::Post.new("a b c", user: create(:user))
+
+            assert_raises(PostQueryBuilder::TagLimitError) do
               @set.posts
             end
           end
         end
 
         context "for a gold user" do
-          setup do
-            CurrentUser.user = FactoryBot.create(:gold_user)
-          end
-
           should "pass" do
+            @set = PostSets::Post.new("a b c", user: create(:gold_user))
+
             assert_nothing_raised do
               @set.posts
             end
@@ -116,10 +102,6 @@ module PostSets
       context "a set for the 'a' tag query" do
         setup do
           @set = PostSets::Post.new("a")
-        end
-
-        should "know it is a single tag" do
-          assert(@set.is_single_tag?)
         end
 
         should "normalize its tag query" do
@@ -147,6 +129,7 @@ module PostSets
 
         context "that has a matching artist" do
           setup do
+            Tag.find_by(name: "a").update!(category: Tag.categories.artist)
             @artist = FactoryBot.create(:artist, :name => "a")
           end
 

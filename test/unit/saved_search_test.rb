@@ -44,19 +44,6 @@ class SavedSearchTest < ActiveSupport::TestCase
     end
   end
 
-  context ".search_labels" do
-    setup do
-      FactoryBot.create(:tag_alias, antecedent_name: "bbb", consequent_name: "ccc", creator: @user)
-      FactoryBot.create(:saved_search, user: @user, label_string: "blah", query: "aaa")
-      FactoryBot.create(:saved_search, user: @user, label_string: "blahbling", query: "CCC BBB AAA")
-      FactoryBot.create(:saved_search, user: @user, label_string: "qux", query: " aaa  bbb  ccc ")
-    end
-
-    should "fetch the queries used by a user for a label" do
-      assert_equal(%w(blah blahbling), SavedSearch.search_labels(@user.id, label: "blah"))
-    end
-  end
-
   context ".post_ids_for" do
     context "with a label" do
       setup do
@@ -123,6 +110,25 @@ class SavedSearchTest < ActiveSupport::TestCase
     end
   end
 
+  context "The #normalize_labels method" do
+    subject { build(:saved_search) }
+
+    should normalize_attribute(:labels).from(["FOO"]).to(["foo"])
+    should normalize_attribute(:labels).from(["   foo"]).to(["foo"])
+    should normalize_attribute(:labels).from(["foo   "]).to(["foo"])
+    should normalize_attribute(:labels).from(["___foo"]).to(["foo"])
+    should normalize_attribute(:labels).from(["foo___"]).to(["foo"])
+    should normalize_attribute(:labels).from(["foo\n"]).to(["foo"])
+    should normalize_attribute(:labels).from(["foo bar"]).to(["foo_bar"])
+    should normalize_attribute(:labels).from(["foo   bar"]).to(["foo_bar"])
+    should normalize_attribute(:labels).from(["foo___bar"]).to(["foo_bar"])
+    should normalize_attribute(:labels).from([" _Foo Bar_ "]).to(["foo_bar"])
+    should normalize_attribute(:labels).from(["Я"]).to(["я"])
+    should normalize_attribute(:labels).from(["foo 1", "bar 2"]).to(["foo_1", "bar_2"])
+    should normalize_attribute(:labels).from(["foo", nil, "", " ", "bar"]).to(["foo", "bar"])
+    should normalize_attribute(:labels).from([nil, "", " "]).to([])
+  end
+
   context "Populating a saved search" do
     setup do
       @saved_search = create(:saved_search, query: "bkub", user: @user)
@@ -161,14 +167,23 @@ class SavedSearchTest < ActiveSupport::TestCase
 
   context "A user with max saved searches" do
     setup do
-      @user = FactoryBot.create(:gold_user)
-      CurrentUser.user = @user
-      User.any_instance.stubs(:max_saved_searches).returns(0)
-      @saved_search = @user.saved_searches.create(:query => "xxx")
+      @user = create(:gold_user)
+      User.any_instance.stubs(:max_saved_searches).returns(1)
+      @ss1 = create(:saved_search, user: @user)
     end
 
     should "not be able to create another saved search" do
-      assert_equal(["You can only have up to 0 saved searches"], @saved_search.errors.full_messages)
+      @ss2 = build(:saved_search, user: @user)
+
+      assert_equal(false, @ss2.valid?)
+      assert_equal(["You can only have up to 1 saved search"], @ss2.errors.full_messages)
+    end
+
+    should "be able to edit existing saved searches" do
+      @ss1.update!(query: "blah")
+
+      assert_equal(true, @ss1.valid?)
+      assert_equal("blah", @ss1.query)
     end
   end
 end

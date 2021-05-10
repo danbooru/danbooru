@@ -1,17 +1,20 @@
 class Tag < ApplicationRecord
+  ABBREVIATION_REGEXP = /([a-z0-9])[a-z0-9']*($|[^a-z0-9']+)/
+
   has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
   has_one :artist, :foreign_key => "name", :primary_key => "name"
   has_one :antecedent_alias, -> {active}, :class_name => "TagAlias", :foreign_key => "antecedent_name", :primary_key => "name"
   has_many :consequent_aliases, -> {active}, :class_name => "TagAlias", :foreign_key => "consequent_name", :primary_key => "name"
   has_many :antecedent_implications, -> {active}, :class_name => "TagImplication", :foreign_key => "antecedent_name", :primary_key => "name"
   has_many :consequent_implications, -> {active}, :class_name => "TagImplication", :foreign_key => "consequent_name", :primary_key => "name"
+  has_many :dtext_links, foreign_key: :link_target, primary_key: :name
 
   validates :name, tag_name: true, uniqueness: true, on: :create
   validates :name, tag_name: true, on: :name
   validates_inclusion_of :category, in: TagCategory.category_ids
 
-  before_save :update_category_cache, if: :category_changed?
-  before_save :update_category_post_counts, if: :category_changed?
+  after_save :update_category_cache, if: :saved_change_to_category?
+  after_save :update_category_post_counts, if: :saved_change_to_category?
 
   scope :empty, -> { where("tags.post_count <= 0") }
   scope :nonempty, -> { where("tags.post_count > 0") }
@@ -41,14 +44,19 @@ class Tag < ApplicationRecord
     end
 
     def value_for(string)
-      TagCategory.mapping[string.to_s.downcase] || 0
+      norm_string = string.to_s.downcase
+      if norm_string =~ /\A#{TagCategory.category_ids_regex}\z/
+        norm_string.to_i
+      elsif TagCategory.mapping[string.to_s.downcase]
+        TagCategory.mapping[string.to_s.downcase]
+      else
+        0
+      end
     end
   end
 
-  module CountMethods
-    extend ActiveSupport::Concern
-
-    module ClassMethods
+  concerning :CountMethods do
+    class_methods do
       # Lock the tags first in alphabetical order to avoid deadlocks under concurrent updates.
       #
       # https://stackoverflow.com/questions/44660368/postgres-update-with-order-by-how-to-do-it
@@ -103,28 +111,20 @@ class Tag < ApplicationRecord
         tags
       end
     end
+
+    def empty?
+      post_count <= 0
+    end
   end
 
-  module CategoryMethods
-    module ClassMethods
+  concerning :CategoryMethods do
+    class_methods do
       def categories
         @categories ||= CategoryMapping.new
       end
 
       def select_category_for(tag_name)
         Tag.where(name: tag_name).pick(:category).to_i
-      end
-
-      def category_for(tag_name, options = {})
-        return Tag.categories.general if tag_name.blank?
-
-        if options[:disable_caching]
-          select_category_for(tag_name)
-        else
-          Cache.get("tc:#{Cache.hash(tag_name)}") do
-            select_category_for(tag_name)
-          end
-        end
       end
 
       def categories_for(tag_names, options = {})
@@ -141,8 +141,11 @@ class Tag < ApplicationRecord
       end
     end
 
-    def self.included(m)
-      m.extend(ClassMethods)
+    # define artist?, general?, character?, copyright?, meta?
+    TagCategory.categories.each do |category_name|
+      define_method("#{category_name}?") do
+        category == Tag.categories.send(category_name)
+      end
     end
 
     def category_name
@@ -150,12 +153,10 @@ class Tag < ApplicationRecord
     end
 
     def update_category_post_counts
-      Post.with_timeout(30_000, nil, :tags => name) do
-        Post.raw_tag_match(name).where("true /* Tag#update_category_post_counts */").find_each do |post|
-          post.reload
-          post.set_tag_counts(false)
-          args = TagCategory.categories.map {|x| ["tag_count_#{x}", post.send("tag_count_#{x}")]}.to_h.update(:tag_count => post.tag_count)
-          Post.where(:id => post.id).update_all(args)
+      Post.with_timeout(30_000) do
+        Post.raw_tag_match(name).find_each do |post|
+          post.set_tag_counts
+          post.save!
         end
       end
     end
@@ -203,7 +204,7 @@ class Tag < ApplicationRecord
             # next few lines if the category is changed.
             tag.update_category_cache
 
-            if tag.editable_by?(creator)
+            if Pundit.policy!(creator, tag).can_change_category?
               tag.update(category: category_id)
             end
           end
@@ -220,51 +221,20 @@ class Tag < ApplicationRecord
     end
   end
 
-  module ParseMethods
-    # true if query is a single "simple" tag (not a metatag, negated tag, or wildcard tag).
-    def is_simple_tag?(query)
-      is_single_tag?(query) && !is_metatag?(query) && !is_negated_tag?(query) && !is_optional_tag?(query) && !is_wildcard_tag?(query)
-    end
-
-    def is_single_tag?(query)
-      PostQueryBuilder.scan_query(query).size == 1
-    end
-
-    def is_metatag?(tag)
-      has_metatag?(tag, *PostQueryBuilder::METATAGS)
-    end
-
-    def is_negated_tag?(tag)
-      tag.starts_with?("-")
-    end
-
-    def is_optional_tag?(tag)
-      tag.starts_with?("~")
-    end
-
-    def is_wildcard_tag?(tag)
-      tag.include?("*")
-    end
-
-    def has_metatag?(tags, *metatags)
-      return nil if tags.blank?
-
-      tags = PostQueryBuilder.scan_query(tags.to_str) if tags.respond_to?(:to_str)
-      tags.grep(/\A(?:#{metatags.map(&:to_s).join("|")}):(.+)\z/i) { $1 }.first
-    end
-  end
-
   module SearchMethods
+    def autocorrect_matches(name)
+      tags = fuzzy_name_matches(name).order_similarity(name)
+    end
+
     # ref: https://www.postgresql.org/docs/current/static/pgtrgm.html#idm46428634524336
     def order_similarity(name)
-      # trunc(3 * sim) reduces the similarity score from a range of 0.0 -> 1.0 to just 0, 1, or 2.
-      # This groups tags first by approximate similarity, then by largest tags within groups of similar tags.
-      order(Arel.sql("trunc(3 * similarity(name, #{connection.quote(name)})) DESC"), "post_count DESC", "name DESC")
+      order(Arel.sql("levenshtein(left(name, 255), #{connection.quote(name)}), tags.post_count DESC, tags.name ASC"))
     end
 
     # ref: https://www.postgresql.org/docs/current/static/pgtrgm.html#idm46428634524336
     def fuzzy_name_matches(name)
-      where("tags.name % ?", name)
+      max_distance = [name.size / 4, 3].max.floor.to_i
+      where("tags.name % ?", name).where("levenshtein(left(name, 255), ?) < ?", name, max_distance)
     end
 
     def name_matches(name)
@@ -272,21 +242,34 @@ class Tag < ApplicationRecord
     end
 
     def alias_matches(name)
-      where(name: TagAlias.active.where_ilike(:antecedent_name, normalize_name(name)).select(:consequent_name))
+      where(name: TagAlias.active.where_like(:antecedent_name, normalize_name(name)).select(:consequent_name))
     end
 
     def name_or_alias_matches(name)
       name_matches(name).or(alias_matches(name))
     end
 
-    def wildcard_matches(tag, limit: 25)
-      nonempty.name_matches(tag).order(post_count: :desc, name: :asc).limit(limit).pluck(:name)
+    def wildcard_matches(tag)
+      nonempty.name_matches(tag).order(post_count: :desc, name: :asc)
+    end
+
+    def abbreviation_matches(abbrev)
+      abbrev = abbrev.downcase.delete_prefix("/")
+      return none if abbrev !~ /\A[a-z0-9\*]*\z/
+
+      where("regexp_replace(tags.name, ?, '\\1', 'g') LIKE ?", ABBREVIATION_REGEXP.source, abbrev.to_escaped_for_sql_like)
+    end
+
+    def find_by_name_or_alias(name)
+      find_by_name(TagAlias.to_aliased(normalize_name(name)))
+    end
+
+    def find_by_abbreviation(abbrev)
+      abbreviation_matches(abbrev.escape_wildcards).order(post_count: :desc).first
     end
 
     def search(params)
-      q = super
-
-      q = q.search_attributes(params, :is_locked, :category, :post_count, :name)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_locked, :category, :post_count, :name, :wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications, :dtext_links)
 
       if params[:fuzzy_name_matches].present?
         q = q.fuzzy_name_matches(params[:fuzzy_name_matches])
@@ -306,18 +289,6 @@ class Tag < ApplicationRecord
 
       if params[:hide_empty].to_s.truthy?
         q = q.nonempty
-      end
-
-      if params[:has_wiki].to_s.truthy?
-        q = q.joins(:wiki_page).merge(WikiPage.undeleted)
-      elsif params[:has_wiki].to_s.falsy?
-        q = q.left_outer_joins(:wiki_page).where("wiki_pages.title IS NULL OR wiki_pages.is_deleted = TRUE")
-      end
-
-      if params[:has_artist].to_s.truthy?
-        q = q.joins(:artist).merge(Artist.undeleted)
-      elsif params[:has_artist].to_s.falsy?
-        q = q.left_outer_joins(:artist).where("artists.name IS NULL OR artists.is_deleted = TRUE")
       end
 
       case params[:order]
@@ -342,8 +313,11 @@ class Tag < ApplicationRecord
 
       query1 =
         Tag
+        .nonempty
         .select("tags.name, tags.post_count, tags.category, null AS antecedent_name")
-        .search(:name_matches => wildcard_name, :order => "count").limit(limit)
+        .name_matches(wildcard_name)
+        .order(post_count: :desc)
+        .limit(limit)
 
       query2 =
         TagAlias
@@ -367,29 +341,43 @@ class Tag < ApplicationRecord
     end
   end
 
+  def self.automatic_tags_for(names)
+    tags = []
+    tags += names.grep(/\A(.+)_\(cosplay\)\z/i) { "char:#{TagAlias.to_aliased([$1]).first}" }
+    tags << "cosplay" if names.any?(/_\(cosplay\)\z/i)
+    tags << "school_uniform" if names.any?(/_school_uniform\z/i)
+    tags.uniq
+  end
+
   def self.convert_cosplay_tags(tags)
     cosplay_tags, other_tags = tags.partition {|tag| tag.match(/\A(.+)_\(cosplay\)\Z/) }
     cosplay_tags.grep(/\A(.+)_\(cosplay\)\Z/) { "#{TagAlias.to_aliased([$1]).first}_(cosplay)" } + other_tags
   end
 
-  def editable_by?(user)
-    return true if user.is_admin?
-    return true if !is_locked? && user.is_builder? && post_count < 1_000
-    return true if !is_locked? && user.is_member? && post_count < 50
-    return false
+  def posts
+    Post.system_tag_match(name)
   end
 
-  def posts
-    Post.tag_match(name)
+  def abbreviation
+    name.gsub(ABBREVIATION_REGEXP, "\\1")
+  end
+
+  def tag_alias_for_pattern(pattern)
+    return nil if pattern.blank?
+
+    consequent_aliases.find do |tag_alias|
+      !name.ilike?(pattern) && tag_alias.antecedent_name.ilike?(pattern)
+    end
+  end
+
+  def self.model_restriction(table)
+    super.where(table[:post_count].gt(0))
   end
 
   def self.available_includes
-    [:wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications]
+    [:wiki_page, :artist, :antecedent_alias, :consequent_aliases, :antecedent_implications, :consequent_implications, :dtext_links]
   end
 
   include ApiMethods
-  include CountMethods
-  include CategoryMethods
-  extend ParseMethods
   extend SearchMethods
 end

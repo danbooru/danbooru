@@ -1,22 +1,12 @@
-@import "../base/000_vars.scss";
-
 @media screen and (max-width: 660px) {
   div#page {
     margin: 0 0.5rem;
     padding: 0;
-
-    aside#sidebar {
-      font-size: $h3_size;
-    }
   }
 
   header#top {
     position: relative;
     text-align: center;
-
-    h1#app-name-header {
-      display: inline;
-    }
 
     #maintoggle {
       display: block;
@@ -28,7 +18,6 @@
     }
 
     nav#nav {
-      font-size: $h3_size;
       line-height: 2em;
       display: none;
 
@@ -52,60 +41,11 @@
     }
   }
 
-  div.paginator {
-    font-size: $h2_size;
-    padding: 1em 0 0;
-
-    li {
-      a, span {
-        margin: 0 0.25rem;
-        padding: 0;
-      }
-
-      &.numbered-page, &.more {
-        display: none;
-      }
-    }
-  }
-
   #posts #posts-container {
     width: 100%;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: flex-start;
-  }
-
-  article.post-preview {
-    margin: 0;
-    text-align: center;
-    vertical-align: middle;
-    display: inline-block;
-
-    a {
-      margin: 0 auto;
-    }
-
-    img {
-      width: 33.3vw;
-      border: none !important;
-    }
-  }
-
-  .user-disable-cropped-false {
-    article.post-preview {
-      width: 33.3%;
-      height: 33.3vw;
-      overflow: hidden;
-    }
-
-    img {
-      width: 33.3vw;
-      height: 33.3vw;
-
-      &.has-cropped-false {
-        object-fit: cover;
-      }
-    }
   }
 }

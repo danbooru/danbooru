@@ -6,7 +6,7 @@
 
     <%= table_for @post_flags, width: "100%" do |t| %>
       <% t.column "Post", width: "1%" do |post_flag| %>
-        <%= PostPresenter.preview(post_flag.post, show_deleted: true) %>
+        <%= post_preview(post_flag.post, show_deleted: true) %>
       <% end %>
       <% t.column "Reason" do |post_flag| %>
         <span class="prose">
@@ -19,8 +19,8 @@
       <% t.column "Category", width: "1%" do |post_flag| %>
         <%= link_to post_flag.category.to_s, post_flags_path(search: params[:search].merge(category: post_flag.category)) %>
       <% end %>
-      <% t.column "Resolved?", width: "1%" do |post_flag| %>
-        <%= link_to post_flag.is_resolved?.to_s, post_flags_path(search: params[:search].merge(is_resolved: post_flag.is_resolved?)) %>
+      <% t.column "Status", width: "5%" do |post_flag| %>
+        <%= link_to post_flag.status, post_flags_path(search: { status: post_flag.status }) %>
       <% end %>
       <% t.column "Uploaded", width: "15%" do |post_flag| %>
         <%= compact_time post_flag.post.created_at %>
@@ -29,7 +29,7 @@
       <% end %>
       <% t.column "Flagged", width: "15%" do |post_flag| %>
         <%= compact_time post_flag.created_at %>
-        <% if CurrentUser.can_view_flagger_on_post?(post_flag) %>
+        <% if policy(post_flag).can_view_flagger? %>
           <br> by <%= link_to_user post_flag.creator %>
           <%= link_to "»", post_flags_path(search: params[:search].merge(creator_name: post_flag.creator.name)) %>
         <% end %>

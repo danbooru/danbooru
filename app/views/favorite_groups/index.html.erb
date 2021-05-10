@@ -8,7 +8,7 @@
     <% end %>
 
     <%= table_for @favorite_groups, width: "100%" do |t| %>
-      <% t.column "Name", {width: "60%"} do |favgroup| %>
+      <% t.column "Name", width: "60%" do |favgroup| %>
         <%= link_to favgroup.pretty_name, favorite_group_path(favgroup) %>
         <% if favgroup.post_count > CurrentUser.user.per_page %>
           <%= link_to "page #{favgroup.last_page}", favorite_group_path(favgroup, :page => favgroup.last_page), :class => "last-page" %>
@@ -26,7 +26,7 @@
         <%= time_ago_in_words_tagged(favgroup.updated_at) %>
       <% end %>
       <% t.column column: "control" do |favgroup| %>
-        <% if favgroup.editable_by?(CurrentUser.user) %>
+        <% if policy(favgroup).update? %>
           <%= link_to "Edit", edit_favorite_group_path(favgroup) %> |
           <%= link_to "Delete", favorite_group_path(favgroup), method: :delete, remote: true, "data-confirm": "Are you sure you want to delete this favgroup? This cannot be undone." %>
         <% end %>

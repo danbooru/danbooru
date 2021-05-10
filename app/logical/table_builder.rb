@@ -35,12 +35,13 @@ class TableBuilder
     end
   end
 
-  attr_reader :columns, :table_attributes, :items
+  attr_reader :columns, :table_attributes, :row_attributes, :items
 
-  def initialize(items, **table_attributes)
+  def initialize(items, tr: {}, **table_attributes)
     @items = items
     @columns = []
     @table_attributes = { class: "striped", **table_attributes }
+    @row_attributes = tr
 
     if items.respond_to?(:model_name)
       @table_attributes[:id] ||= "#{items.model_name.plural.dasherize}-table"
@@ -49,8 +50,8 @@ class TableBuilder
     yield self if block_given?
   end
 
-  def column(*args, **options, &block)
-    @columns << Column.new(*args, **options, &block)
+  def column(...)
+    @columns << Column.new(...)
   end
 
   def all_row_attributes(item, i)
@@ -58,6 +59,7 @@ class TableBuilder
 
     {
       id: "#{item.model_name.singular.dasherize}-#{item.id}",
+      **row_attributes,
       **ApplicationController.helpers.data_attributes_for(item, "data", item.html_data_attributes)
     }
   end

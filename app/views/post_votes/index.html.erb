@@ -8,12 +8,12 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <%= table_for @post_votes, {class: "striped autofit"} do |t| %>
+    <%= table_for @post_votes, class: "striped autofit" do |t| %>
       <% t.column "Post" do |vote| %>
-        <%= PostPresenter.preview(vote.post, show_deleted: true) %>
+        <%= post_preview(vote.post, show_deleted: true) %>
       <% end %>
       <% t.column "Tags", td: {class: "col-expand"} do |vote| %>
-        <%= TagSetPresenter.new(vote.post.tag_array).inline_tag_list_html %>
+        <%= render_inline_tag_list(vote.post) %>
       <% end %>
       <% t.column "Score" do |vote| %>
         <%= link_to sprintf("%+d", vote.score), post_votes_path(search: { score: vote.score }) %>

@@ -1,70 +1,264 @@
 <% page_title "Terms of Service" %>
 
+<% @app_name = Danbooru.config.canonical_app_name %>
+<% @canonical_url = Danbooru.config.canonical_url %>
+<% @contact_email = Danbooru.config.contact_email %>
+
 <div id="c-static">
   <div id="a-terms-of-service" class="prose fixed-width-container">
-    <h1>Rules</h1>
-    
-    <p>Please read the following before using the site:</p>
-    
-    <ul>
-      <li>Danbooru reserves the right to delete or modify your account, or any content you have posted to the site.</li>
-      <li>You will make a best faith effort to upload only high quality anime-related images.</li>
-      <li>You have read the <%= link_to_wiki "tagging guidelines", "help:tags" %>.</li>
+    <h1>Terms of Service</h1>
+
+    <p class="summary">Last updated: July 5, 2020</p>
+
+    <p>These Terms of Service ("Terms") govern your access to and use of our
+    Site and Services. By accessing or using our Site, you agree to be bound by
+    these Terms. If you do not agree to these Terms, you may not access or use
+    the Site.</p>
+
+    <p>In addition to these Terms of Service, the
+    <%= link_to_wiki "Upload Rules", "help:upload_rules" %>,
+    <%= link_to_wiki "Community Rules", "help:community_rules" %>,
+    and <%= link_to "Privacy Policy", privacy_policy_path %> also govern your
+    use of the Site.</p>
+
+    <h4>Access To The Site</h4>
+
+    <p>Persons under the age of 18 are not allowed to create an account or
+    otherwise use our Services. By using our Services, you represent that you
+    are over the age required by the laws of your country to create an
+    account.</p>
+
+    <p>We may suspend or terminate your account or your ability to access or
+    use the Site at any time for any or no reason, including for a violation of
+    these Terms, the <%= link_to_wiki "Upload Rules", "help:upload_rules" %>,
+    or the <%= link_to_wiki "Community Rules", "help:community_rules" %>.</p>
+
+    <h4>Things You Cannot Do</h4>
+
+    <p>When accessing or using the Site, you agree to follow these Terms of
+    Service, the <%= link_to_wiki "Upload Rules", "help:upload_rules" %>, and
+    the <%= link_to_wiki "Community Rules", "help:community_rules" %>.
+
+    <p>When accessing or using the Site, you will not:</p>
+
+    <ul class="list-bulleted">
+      <li>
+        Create multiple accounts to bypass or circumvent bans, account
+        restrictions, site rules, or to send spam.
+      </li>
+
+      <li>
+        Bypass or circumvent any limitations or restrictions placed on your
+        account, including upload limits, comment limits, rate limits, post
+        access restrictions, and any other limits.
+      </li>
+
+      <li>
+        Share, sell, trade, transfer, or give access to your account to any
+        other user.
+      </li>
+
+      <li>
+        Sell or trade privileged user accounts, including Gold, Platinum, or
+        Builder accounts.
+      </li>
+
+      <li>
+        Send spam or unsolicited messages, including via comments, forum posts,
+        and private messages.
+      </li>
+
+      <li>
+        Attempt to gain unauthorized access to another user's account, the Site,
+        or to any computer systems or networks used by the Site.
+      </li>
+
+      <li>
+        Upload malware, computer viruses, or other malicious content to the
+        Site, or distribute or link to any such content through the Site.
+      </li>
+
+      <li>
+        Prevent or disrupt other users from using the Site, or damage,
+        overburden, or impair the operation of the Site in any manner.
+      </li>
+
+      <li>
+        Create, use, or distribute bots or scripts that cause harm to the Site,
+        or that allow users to bypass restrictions on the Site.
+      </li>
     </ul>
 
-    <div class="section">
-      <h6>Post/Comment Limiting</h6>
-      <p>You cannot upload a post or comment during the first week of signing up.</p>
-      <p>After the initial period, you can post up to two comments an hour and a variable number of posts based on how many of your previous uploads were approved or deleted.</p>
-    </div>
+    <h4>User-Generated Content</h4>
 
-    <div class="section">
-      <h6>Prohibited and Restricted Content</h6>
-      <p>You may not upload any of the following:</p>
-      <ul>
-        <li>Non-anime: Photographs of American porn actresses, for example, are prohibited. Photographs of cosplayers, figures, or prominent figures in the industry are acceptable.</li>
-        <li>Manga: Uploading entire manga or doujinshi chapters is discouraged. Individual pages can be uploaded if they meet the quality criterion.</li>
-        <li>Fake translations: Images that have false translations are not allowed in any case.</li>
-      </ul>
-    
-      <p>The following may be uploaded, but will be put to a higher level of artistic and qualitative scrutiny than normal, and (if applicable) you must tag them with the corresponding tag. Please do not upload more than 20 a day of these works:</p>
-      <ul>
-        <li>Western: Drawings of characters from non-Japanese comics, games, and other properties.</li>
-        <li>Furry: Any explicit image where a person's skin is made of fur or scales. Please use the <em>furry</em> tag.</li>
-        <li>Grotesque: Any depiction of extreme mutilation, extreme bodily distension, feces, or bodies that are far outside the realm of normal human proportion (for example, breasts that are larger than three heads in size or penises that are larger than two heads in size). Please use the <em>guro</em> tag.</li>
-        <li>Self Artwork: You can upload your own artwork but be aware that Danbooru is not a place to expect positive reinforcement. Your uploads will be subject to the same standards as everything else and may be flagged, downvoted, or even deleted. If you don't want to risk experiencing these things then don't upload your art.</li>
-      </ul>
+    <p>All content submitted to the Site, including text, links, translations,
+    images, videos, animations, songs, games, and any other materials
+    (collectively referred to as "Content") is the sole responsibility of the
+    person who submitted the Content. We take no responsibility for Content
+    submitted to the Site by users.</p>
 
-      <p>The following may be uploaded but are generally not recommended unless a better copy cannot be found:</p>
-      <ul>
-        <li>Third-Party Watermark: Any image where a person who is not the original copyright owner has placed a watermark on the image.</li>
-        <li>Hard translations: Images that have been edited to replace the original language are discouraged.</li>
-        <li>Poorly compressed: Any image where compression artifacts are easily visible. An exception to this is if the image was uploaded by the artist and there are no higher quality versions available.</li>
-        <li>Nude Filter: Images that have been edited by someone other than the original creator to remove clothing or censorship. These typically feature crude drawings of breasts or genitalia laid on top of the original image.</li>
-      </ul>
-    </div>
+    <p>Any Content you submit to the Site must abide by these Terms of Service, the
+    <%= link_to_wiki "Upload Rules", "help:upload_rules" %>, and the <%=
+    link_to_wiki "Community Rules", "help:community_rules" %>. Although we have
+    no obligation to monitor, review, or moderate any Content submitted to the
+    Site, we may, in our sole discretion, delete or remove access to Content at
+    any time and for any reason, including for a violation of these Terms, a
+    violation of our Upload Rules, or if you otherwise create liability for
+    us.</p>
 
-    <div class="section">
-      <h6>Copyright Infringement</h6>
+    <p>You understand that by using the Site, you may be exposed to Content
+    that might be considered offensive, harmful, obscene, inaccurate,
+    mislabeled, mistagged, unlawful in your jurisdiction, or otherwise
+    inappropriate. The use of any Content posted on the Site or obtained by you
+    through the Site is at your own risk. We do not endorse, support, represent
+    or guarantee the completeness, truthfulness, accuracy, or reliability of
+    any Content or communications posted on the Site or endorse any opinions
+    expressed via the Site.</p>
 
-      <p>If you believe a post infringes upon your copyright, please send an email to the <%= mail_to Danbooru.config.contact_email, "webmaster", :encode => "hex" %> with the following pieces of information:</p>
-      <ul>
-        <li>The URL of the infringing post.</li>
-        <li>Proof that you own the copyright.</li>
-      </ul>
-    </div>
+    <p>By submitting, posting, or uploading any Content to the Site, you
+    represent and warrant that you have all rights, power, and authority
+    necessary to grant the rights to Your Content contained within these Terms.
+    You agree you are responsible for any Content you provide to the Site,
+    including compliance with any applicable laws, rules, and regulations.
+    Because you alone are responsible for Your Content, you may expose yourself
+    to liability if you post or share Content without all necessary rights.</p>
 
-    <div class="section">
-      <h6>Privacy Policy</h6>
+    <p>By submitting Content to the Site, you grant <%= @app_name %> a
+    worldwide, royalty-free, perpetual, irrevocable, non-exclusive,
+    transferable, and sublicensable license to use, copy, modify, adapt,
+    distribute, create derivative works from, allow downloads of, and display
+    Your Content in all media formats and channels now known or later
+    developed.</p>
 
-      <p>Danbooru will not disclose the IP address, email address, password, or DMails of any user except to the staff.</p>
-      <p>Danbooru is allowed to make public everything else, including but not limited to: uploaded posts, favorited posts, comments, forum posts, wiki edits, and note edits.</p>
-    </div>
+    <h4>Copyright Infringment</h4>
 
-    <div class="section">
-      <h6>Accounts</h6>
+    <p>If you believe any Content on the Site infringes upon your copyright,
+    you may send an email to the <%= link_to "webmaster", "mailto:#{@contact_email}" %>
+    with the following pieces of information:</p>
 
-      <p>You may have alternative accounts for bots or scripts, but if there's any suspicion you either create a new account or reuse an existing one to evade a ban or any sort of account limitation (limited uploads, loss of flagging or user feedback permissions), then all your accounts will be banned. Bot accounts that flag posts or leave user feedback are not permitted and will be banned.</p>
-      <p>Account sharing is not permitted. If you are suspected of sharing an account, then it will be banned.</p>
-    </div>
+    <ul class="list-bulleted">
+      <li>A list of links to each post you believe infringes on your copyright.</li>
+      <li>Your contact information.</li>
+      <li>Proof of your identity.</li>
+      <li>
+        A statement affirming that you are the copyright holder for these
+        works, under penalty of perjury.
+      </li>
+    </ul>
+
+    <p>Acceptable proof of identity includes any of the following:</p>
+
+    <ul class="list-bulleted">
+      <li>
+        An email from an email address listed in one of your social media
+        profiles.
+      </li>
+
+      <li>
+        A copy or screenshot of the original .psd file or other source file
+        of one of your works.
+      </li>
+    </ul>
+
+    <p>Please be aware that information about you that does not infringe on
+    your copyright will not be removed from the Site. This includes artist
+    tags, artist profiles, wiki pages, comments, forum posts, links to your
+    social media profiles, and links to your works on other sites.</p>
+
+    <p>If you knowingly misrepresent that any activity or material on our Site
+    is infringing, you may be liable for costs and damages.</p>
+
+    <h4>Account Upgrades</h4>
+
+    <p>You may submit your debit card, credit card, or other payment information
+    ("Payment Information") to purchase a Gold or Platinum account upgrade or
+    other products or services from the Site. We use third-party service
+    providers to process your Payment Information, in accordance with our
+    Privacy Policy. If you submit your Payment Information, you agree to pay
+    all costs that you incur, and you give us permission to charge you when
+    payment is due for an amount that includes these costs and any applicable
+    taxes and fees.</p>
+
+    <p>We may change the fees and benefits associated with Gold and Platinum
+    account upgrades from time to time with reasonable advance notice;
+    provided, however, that no advance notice will be required for temporary
+    promotions, including temporary reductions in the fees associated with
+    these account upgrades.</p>
+
+    <h4>API Usage</h4>
+
+    <p>If you use our API, you agree to abide by the rate limits described in
+    our <%= link_to_wiki "API Documentation", "help:api" %>.</p>
+
+    <h4>Privacy</h4>
+
+    <p>Our <%= link_to "Privacy Policy", privacy_policy_path %> describes how
+    we handle any information we obtain about you when you use our Services.
+    You understand that through your use of our Services you consent to the
+    collection and use of your information as described in our Privacy Policy.</p>
+
+    <h4>Miscellaneous</h4>
+
+    <p>"<%= @app_name %>", "we", or "us" refers to <%= @app_name %>, its
+    successors, and its assigns. "You" refers to any person who has consented
+    to these terms or has become contractually bound to them, whether such
+    person is identified or not at the time.</p>
+
+    <p>These Terms constitute the entire agreement between you and us regarding
+    your access to and use of the Services. Our failure to exercise or enforce
+    any right or provision of these Terms will not operate as a waiver of such
+    right or provision. If any provision of these Terms is, for any reason,
+    held to be illegal, invalid or unenforceable, the rest of the Terms will
+    remain in effect. You may not assign or transfer any of your rights or
+    obligations under these Terms without our consent. We may freely assign
+    these Terms.</p>
+
+    <h4>Changes to These Terms</h4>
+
+    <p>We may update these Terms from time to time. The updated Terms will be
+    indicated by a new "Last updated" date at the top of this page. If we make
+    material changes to these Terms, we may, at our discretion, notify you
+    either by prominently posting a notice of such changes or by directly
+    sending you a notification.</p>
+
+    <p>Changes to these Terms will go into effect as soon as the updated Terms
+    are accessible. By continuing to use our Services after changes to these
+    Terms go into effect, you agree to be bound by the revised Terms.</p>
+
+    <h4>No Warranties</h4>
+
+    <p>THE SERVICES ARE PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES
+    OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING, BUT NOT LIMITED TO,
+    IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+    AND NON-INFRINGEMENT. <%= @app_name.upcase %>, ITS LICENSORS, AND ITS THIRD
+    PARTY SERVICE PROVIDERS DO NOT WARRANT THAT THE SERVICES ARE ACCURATE,
+    COMPLETE, RELIABLE, CURRENT, OR ERROR FREE. <%= @app_name.upcase %> DOES
+    NOT CONTROL, ENDORSE, OR TAKE RESPONSIBILITY FOR ANY CONTENT AVAILABLE ON
+    OR LINKED TO THE SERVICES OR THE ACTIONS OF ANY THIRD PARTY OR USER,
+    INCLUDING MODERATORS. WHILE <%= @app_name.upcase %> ATTEMPTS TO MAKE YOUR
+    ACCESS TO AND USE OF OUR SERVICES SAFE, WE DO NOT REPRESENT OR WARRANT THAT
+    OUR SERVICES OR SERVERS ARE FREE OF VIRUSES OR OTHER HARMFUL COMPONENTS.</p>
+
+    <h4>Limitation of Liability</h4>
+
+    <p>IN NO EVENT AND UNDER NO THEORY OF LIABILITY, INCLUDING CONTRACT, TORT,
+    NEGLIGENCE, STRICT LIABILITY, WARRANTY, OR OTHERWISE, WILL THE <%= @app_name.upcase %>
+    ENTITIES BE LIABLE TO YOU FOR ANY INDIRECT, CONSEQUENTIAL, EXEMPLARY,
+    INCIDENTAL, SPECIAL, OR PUNITIVE DAMAGES, OR LOST PROFITS ARISING FROM OR
+    RELATING TO THESE TERMS OR THE SERVICES, INCLUDING THOSE ARISING FROM OR
+    RELATING TO CONTENT MADE AVAILABLE ON THE SERVICES THAT IS ALLEGED TO BE
+    DEFAMATORY, OFFENSIVE, OR ILLEGAL. ACCESS TO, AND USE OF, THE SERVICES IS AT
+    YOUR OWN DISCRETION AND RISK, AND YOU WILL BE SOLELY RESPONSIBLE FOR ANY
+    DAMAGE TO YOUR DEVICE OR COMPUTER SYSTEM, OR LOSS OF DATA RESULTING
+    THEREFROM. IN NO EVENT WILL THE AGGREGATE LIABILITY OF THE <%= @app_name.upcase %>
+    ENTITIES EXCEED THE GREATER OF ONE HUNDRED U.S. DOLLARS ($100) OR ANY AMOUNT
+    YOU PAID <%= @app_name.upcase %> IN THE PREVIOUS SIX MONTHS FOR THE SERVICES
+    GIVING RISE TO THE CLAIM. THE LIMITATIONS OF THIS SECTION WILL APPLY TO ANY
+    THEORY OF LIABILITY, INCLUDING THOSE BASED ON WARRANTY, CONTRACT, STATUTE,
+    TORT (INCLUDING NEGLIGENCE) OR OTHERWISE, AND EVEN IF THE <%= @app_name.upcase %>
+    ENTITIES HAVE BEEN ADVISED OF THE POSSIBILITY OF ANY SUCH DAMAGE, AND EVEN IF
+    ANY REMEDY SET FORTH HEREIN IS FOUND TO HAVE FAILED ITS ESSENTIAL PURPOSE.
+    THE FOREGOING LIMITATION OF LIABILITY WILL APPLY TO THE FULLEST EXTENT
+    PERMITTED BY LAW IN THE APPLICABLE JURISDICTION.</p>
+  </div>
 </div>

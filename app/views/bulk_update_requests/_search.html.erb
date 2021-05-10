@@ -1,8 +1,7 @@
 <%= search_form_for(bulk_update_requests_path) do |f| %>
   <%= f.input :user_name, label: "Creator", input_html: { value: params[:search][:user_name], data: { autocomplete: "user" } } %>
   <%= f.input :approver_name, label: "Approver", input_html: { value: params[:search][:approver_name], data: { autocomplete: "user" } } %>
-  <%= f.input :title_matches, label: "Title", input_html: { value: params[:search][:title_matches] } %>
-  <%= f.input :script_matches, label: "Script", input_html: { value: params[:search][:script_matches] } %>
+  <%= f.input :tags_include_any, label: "Tags", input_html: { value: params[:search][:tags_include_any], data: { autocomplete: "tag-query" } } %>
   <%= f.input :status, label: "Status", collection: %w[pending approved rejected], include_blank: true, selected: params[:search][:status] %>
   <%= f.input :order, collection: [%w[Status status_desc], %w[Last\ updated updated_at_desc], %w[Newest id_desc], %w[Oldest id_asc]], include_blank: false, selected: params[:search][:order] %>
   <%= f.submit "Search" %>

@@ -3,7 +3,7 @@
 
   <%= edit_form_for(PostDisapproval.new, url: post_disapprovals_path, remote: true, html: { id: "detailed-rejection-form" }) do |f| %>
     <%= f.hidden_field :post_id, value: "x" %>
-    <%= f.input :reason, collection: [["Breaks Rules", "breaks_rules"], ["Poor Quality", "poor_quality"], ["No interest", "disinterest"]] %>
+    <%= f.input :reason, collection: PostDisapproval::REASONS.map { |x| [x.humanize, x] } %>
     <%= f.input :message, as: :string %>
   <% end %>
 </div>

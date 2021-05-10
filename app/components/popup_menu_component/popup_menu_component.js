@@ -1,0 +1,36 @@
+import { delegate } from 'tippy.js';
+import 'tippy.js/dist/tippy.css';
+
+class PopupMenuComponent {
+  static initialize() {
+    delegate("body", {
+      allowHTML: true,
+      interactive: true,
+      theme: "common-tooltip",
+      target: "a.popup-menu-button",
+      placement: "bottom-start",
+      trigger: "click",
+      touch: "hold",
+      animation: null,
+      content: PopupMenuComponent.content,
+    });
+
+    $(document).on("click.danbooru", ".popup-menu-content", PopupMenuComponent.onMenuItemClicked);
+  }
+
+  static content(element) {
+    let $content = $(element).parents(".popup-menu").find(".popup-menu-content");
+    $content.show();
+    return $content.get(0);
+  }
+
+  // Hides the menu when a menu item is clicked.
+  static onMenuItemClicked(event) {
+    let tippy = $(event.target).parents("[data-tippy-root]").get(0)._tippy;
+    tippy.hide();
+  }
+}
+
+$(document).ready(PopupMenuComponent.initialize);
+
+export default PopupMenuComponent;

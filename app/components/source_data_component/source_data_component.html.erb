@@ -1,0 +1,57 @@
+<div class="source-data p-4 mb-4">
+  <%= link_to "Fetch source data", source_path, class: "source-data-fetch" %>
+  <%= spinner_icon class: "source-data-loading" %>
+
+  <% if @source.present? %>
+    <table class="source-data-content mt-2">
+      <tbody>
+        <% if @source.artist_name.blank? %>
+          <tr>
+            <th>Artist</th>
+            <td><em>None</em></td>
+          </tr>
+        <% elsif @source.artists.empty? %>
+          <tr>
+            <th>Artist</th>
+            <td>
+              <%= external_link_to @source.profile_url, @source.artist_name %>
+              (<%= link_to "Create new artist", new_artist_path(artist: { source: @source.canonical_url }) %>)
+            </td>
+          </tr>
+        <% else %>
+          <% @source.artists.each do |artist| %>
+            <tr>
+              <th>Artist</th>
+              <td>
+                <%= link_to artist.name, artist_path(artist), class: tag_class(artist.tag) %>
+
+                <ul class="list-inline">
+                  <% profile_urls(artist).each do |artist_url| %>
+                    <%= external_link_to artist_url.url, external_site_icon(artist_url.site_name), title: artist_url.url %>
+                  <% end %>
+                </ul>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+
+        <tr class="source-data-tags">
+          <th>Tags</th>
+          <td>
+            <% if @source.tags.empty? %>
+              <em>None</em>
+            <% else %>
+              <ul class="list-inline">
+                <% @source.tags.each do |tag, href| %>
+                  <li>
+                    <%= external_link_to href, tag, class: "source-data-tag" %>
+                  </li>
+                <% end %>
+              </ul>
+            <% end %>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  <% end %>
+</div>

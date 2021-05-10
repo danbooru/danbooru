@@ -1,14 +1,13 @@
 class DelayedJobsController < ApplicationController
   respond_to :html, :xml, :json, :js
-  before_action :admin_only, except: [:index]
 
   def index
-    @delayed_jobs = Delayed::Job.order("run_at asc").extending(PaginationExtension).paginate(params[:page], :limit => params[:limit])
+    @delayed_jobs = authorize Delayed::Job.order("run_at asc").extending(PaginationExtension).paginate(params[:page], :limit => params[:limit]), policy_class: DelayedJobPolicy
     respond_with(@delayed_jobs)
   end
 
   def cancel
-    @job = Delayed::Job.find(params[:id])
+    @job = authorize Delayed::Job.find(params[:id]), policy_class: DelayedJobPolicy
     if !@job.locked_at?
       @job.fail!
     end
@@ -16,7 +15,7 @@ class DelayedJobsController < ApplicationController
   end
 
   def retry
-    @job = Delayed::Job.find(params[:id])
+    @job = authorize Delayed::Job.find(params[:id]), policy_class: DelayedJobPolicy
     if !@job.locked_at?
       @job.update(failed_at: nil, attempts: 0)
     end
@@ -24,7 +23,7 @@ class DelayedJobsController < ApplicationController
   end
 
   def run
-    @job = Delayed::Job.find(params[:id])
+    @job = authorize Delayed::Job.find(params[:id]), policy_class: DelayedJobPolicy
     if !@job.locked_at?
       @job.update(run_at: Time.now)
     end
@@ -32,7 +31,7 @@ class DelayedJobsController < ApplicationController
   end
 
   def destroy
-    @job = Delayed::Job.find(params[:id])
+    @job = authorize Delayed::Job.find(params[:id]), policy_class: DelayedJobPolicy
     if !@job.locked_at?
       @job.destroy
     end

@@ -1,8 +1,10 @@
 <div id="c-uploads">
-  <div id="a-new">
+  <div id="a-new" data-image-size="small">
     <h1>Upload</h1>
 
-    <% if !CurrentUser.user.upload_limit.limited? %>
+    <% if CurrentUser.user.upload_limit.limited? %>
+      <h2 style="margin-bottom: 1em;">You have reached your upload limit</h2>
+    <% else %>
       <%= embed_wiki("help:upload_notice", id: "upload-guide-notice") %>
 
       <% unless CurrentUser.can_upload_free? %>
@@ -13,7 +15,7 @@
 
       <%= render "image" %>
       <%= render "related_posts", source: @source %>
-      <%= render "sources/info" %>
+      <%= render_source_data(nil) %>
 
       <div id="client-errors" class="error-messages ui-state-error ui-corner-all" style="display:none"></div>
 
@@ -29,11 +31,12 @@
 
         <div class="input" id="filedropzone">
           <div class="dropzone-hint">Click or drag and drop to upload a file</div>
-          <div class="dropzone-hint hint">Max size: <%= number_to_human_size(Danbooru.config.max_file_size) %>. Supported filetypes: jpg, png, gif, swf, mp4, webm.</div>
+          <div class="dropzone-hint hint">Max size: <%= number_to_human_size(Danbooru.config.max_file_size) %>. Supported filetypes: jpg, png, gif, mp4, webm.</div>
         </div>
 
-        <div class="upload_source_container">
-          <%= f.input :source, as: :string, placeholder: "Enter the URL to upload here", input_html: { size: 50, value: params[:url] } %>
+        <div class="input string optional upload_source">
+          <%= f.label :source %>
+          <%= f.input_field :source, as: :string, placeholder: "Enter the URL to upload here", value: params[:url] %>
           <%= tag.button "Similar", id: "similar-button" %>
         </div>
 
@@ -46,9 +49,8 @@
           <a href="#" id="toggle-artist-commentary">show »</a>
 
           <div class="artist-commentary" style="display: none;">
-            <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { size: 60, value: params[:artist_commentary_title] } %>
-            <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { size: "60x5", value: params[:artist_commentary_desc] } %>
-            <%= f.input :include_artist_commentary, as: :boolean, label: "Include Commentary", input_html: { checked: params[:include_artist_commentary].present? } %>
+            <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { value: params[:artist_commentary_title] } %>
+            <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { value: params[:artist_commentary_desc] } %>
           </div>
         </div>
 
@@ -57,8 +59,8 @@
           <a href="#" id="toggle-commentary-translation">show »</a>
 
           <div class="commentary-translation" style="display: none;">
-            <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { size: 60, value: params[:translated_commentary_title] } %>
-            <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { size: "60x5", value: params[:translated_commentary_desc] } %>
+            <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { value: params[:translated_commentary_title] } %>
+            <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { value: params[:translated_commentary_desc] } %>
           </div>
         </div>
 
@@ -66,14 +68,16 @@
           <div class="header">
             <%= f.label :tag_string, "Tags" %>
 
-            <span class="options">
-              <i id="face" class="fas"></i>
-              <span class="count"></span>
-              <a href="javascript:void(0)"><i id="open-edit-dialog" class="fas fa-arrows-alt" title="detach" data-shortcut="shift+e"></i></a>
+            <span data-tag-counter data-for="#upload_tag_string">
+              <span class="tag-count"></span>
+              <img>
             </span>
+            <a href="javascript:void(0)">
+              <%= external_link_icon(id: "open-edit-dialog", "data-shortcut": "shift+e") %>
+            </a>
           </div>
 
-          <%= f.input :tag_string, label: false, input_html: { size: "60x5", "data-autocomplete": "tag-edit", "data-shortcut": "e", spellcheck: false, value: params[:tag_string] } %>
+          <%= f.input :tag_string, label: false, hint: "Ctrl+Enter to submit", input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: params[:tag_string] } %>
           <%= render "related_tags/buttons" %>
         </div>
 
@@ -81,8 +85,6 @@
 
         <%= render "related_tags/container" %>
       <% end %>
-    <% else %>
-      <h2 style="margin-bottom: 1em;">You <%= CurrentUser.user.upload_limit.limit_reason %></h2>
     <% end %>
   </div>
 </div>

@@ -31,24 +31,51 @@ form.simple_form {
     margin-bottom: 1em;
 
     input[type=text], input[type=file], input[type=password], input[type=email] {
-      max-width: 20em;
+      width: 100%;
+      max-width: 25em;
     }
 
     .hint {
       @extend .fineprint;
       padding-left: 1em;
+
+      @media (max-width: 660px) {
+        display: none;
+      }
     }
 
-    &.text {
+    &.field_with_errors  {
+      input, select, textarea {
+        border: 1px solid var(--form-input-validation-error-border-color);
+      }
+
+      span.error {
+        display: block;
+        color: var(--form-input-validation-error-text-color);
+        font-style: italic;
+        font-size: 0.8em;
+      }
+    }
+
+    &.text, &.dtext {
       .hint {
         padding-left: 0;
         display: block;
       }
+
+      textarea {
+        width: 100%;
+        max-width: 60rem;
+        max-height: 15rem;
+
+        &.text  { height: 20vh; }
+        &.dtext { height: 40vh; }
+      }
     }
 
-    textarea {
-      width: 70%;
-      font-size: 1.2em;
+    select[multiple] {
+      height: 20vh;
+      max-height: 15rem;
     }
 
     label {
@@ -66,10 +93,18 @@ form.simple_form {
       }
     }
   }
+
+  &.stacked-hints {
+    span.hint {
+      display: block;
+      padding-left: 0;
+    }
+  }
 }
 
 form.inline-form {
   display: table;
+  width: 100%;
 
   > div.input {
     display: table-row;
@@ -77,12 +112,14 @@ form.inline-form {
 
     label {
       text-align: right;
+      padding-right: 1em;
+      white-space: nowrap;
+      width: 1%;
     }
 
     label, input {
       display: table-cell;
-      padding-right: 1em;
-      white-space: nowrap;
+      line-height: 1em;
     }
   }
 }
@@ -107,10 +144,30 @@ form.one-line-form {
 }
 
 div.ui-dialog {
-  div.input {
-    input[type="text"] {
-      width: 100%;
-      max-width: 100%;
+  textarea, input[type="text"] {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  form.simple_form {
+    margin-bottom: 0;
+
+    div.input {
+      margin-bottom: 0.5em;
+    }
+
+    div.input.hidden {
+      display: none;
+    }
+  }
+
+  /* the submit and close buttons */
+  .ui-dialog-buttonpane {
+    margin-top: 0;
+    padding: 1em 1em 1em 0;
+
+    .ui-button {
+      margin: 0 0.25em;
     }
   }
 }

@@ -9,9 +9,10 @@
 
     <p>
       Categories:
-      <%= link_to "All", forum_topics_path %>, 
-      <% if CurrentUser.is_moderator? %>
-        <%= link_to "Mod+", forum_topics_path(:search => {:mod_only => true}) %>,
+      <%= link_to "All", forum_topics_path %>,
+      <%= link_to "New", forum_topics_path(search: { is_read: false }) %>,
+      <% if policy(ForumTopic).moderate? %>
+        <%= link_to "Private", forum_topics_path(search: { is_private: true }) %>,
       <% end %>
       <%= ForumTopic::CATEGORIES.map {|id, name| link_to_unless_current(name, forum_topics_path(:search => {:category_id => id}))}.join(", ").html_safe %>
     </p>

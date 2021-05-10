@@ -1,0 +1,10 @@
+.paginator {
+  > * {
+    padding: 0.25rem 0.75rem;
+  }
+
+  > a:hover {
+    background: var(--paginator-arrow-color);
+    color: var(--paginator-arrow-background-color);
+  }
+}

@@ -2,17 +2,6 @@ require 'test_helper'
 
 module Downloads
   class PixivTest < ActiveSupport::TestCase
-    def setup
-      super
-      Downloads::File.stubs(:is_cloudflare?).returns(false)
-      load_pixiv_tokens!
-    end
-
-    def teardown
-      save_pixiv_tokens!
-      super
-    end
-
     context "in all cases" do
       # Test a new illustration (one uploaded after 2014-09-30). New illustrations
       # must use /img-original/ for full size URLs. Old /imgXX/img/username/ style URLs
@@ -127,39 +116,20 @@ module Downloads
         should "download new novel images" do
           @file_url = "https://i.pximg.net/novel-cover-original/img/2017/07/27/23/14/17/8465454_80685d10e6df4d7d53ad347ddc18a36b.jpg"
           @ref = 'https://www.pixiv.net/novel/show.php?id=8465454&mode=cover'
-          @file_size = 532_129
+          @file_size = 532_037
 
           assert_not_rewritten(@file_url, @ref)
           assert_downloaded(@file_size, @file_url, @ref)
         end
       end
-
-      context "downloading a pixiv fanbox image" do
-        should "work" do
-          @source = "https://www.pixiv.net/fanbox/creator/12491073/post/82406"
-          @file_url = "https://fanbox.pixiv.net/images/post/82406/D833IKA7FIesJXL8xx39rrG0.jpeg"
-          @file_size = 873_387
-
-          assert_not_rewritten(@file_url, @source)
-          assert_downloaded(@file_size, @file_url, @source)
-        end
-      end
     end
 
     context "An ugoira site for pixiv" do
-      setup do
-        @download = Downloads::File.new("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
-        @tempfile, strategy = @download.download!
-        @tempfile.close!
-      end
-
       should "capture the data" do
-        assert_equal(2, @download.data[:ugoira_frame_data].size)
-        if @download.data[:ugoira_frame_data][0]["file"]
-          assert_equal([{"file" => "000000.jpg", "delay" => 125}, {"file" => "000001.jpg", "delay" => 125}], @download.data[:ugoira_frame_data])
-        else
-          assert_equal([{"delay_msec" => 125}, {"delay_msec" => 125}], @download.data[:ugoira_frame_data])
-        end
+        @strategy = Sources::Strategies.find("http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
+
+        assert_equal(2, @strategy.data[:ugoira_frame_data].size)
+        assert_equal([{"file" => "000000.jpg", "delay" => 125}, {"file" => "000001.jpg", "delay" => 125}], @strategy.data[:ugoira_frame_data])
       end
     end
   end

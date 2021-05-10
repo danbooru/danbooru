@@ -9,13 +9,11 @@ class PostVersion < ApplicationRecord
     Rails.env.test? || Danbooru.config.aws_sqs_archives_url.present?
   end
 
-  establish_connection (ENV["ARCHIVE_DATABASE_URL"] || "archive_#{Rails.env}".to_sym) if enabled?
-
-  def self.check_for_retry(msg)
-    if msg =~ /can't get socket descriptor/ && msg =~ /post_versions/
-      connection.reconnect!
-    end
+  def self.database_url
+    ENV["ARCHIVE_DATABASE_URL"] || "archive_#{Rails.env}".to_sym
   end
+
+  establish_connection database_url if enabled?
 
   module SearchMethods
     def changed_tags_include(tag)
@@ -28,16 +26,44 @@ class PostVersion < ApplicationRecord
       end
     end
 
+    def changed_tags_include_any(tags)
+      where_array_includes_any(:added_tags, tags).or(where_array_includes_any(:removed_tags, tags))
+    end
+
+    def tag_matches(string)
+      tag = string.match(/\S+/)[0]
+      return all if tag.nil?
+      tag = "*#{tag}*" unless tag =~ /\*/
+      where_ilike(:tags, tag)
+    end
+
     def search(params)
-      q = super
-      q = q.search_attributes(params, :updater_id, :post_id, :tags, :added_tags, :removed_tags, :rating, :rating_changed, :parent_id, :parent_changed, :source, :source_changed, :version)
+      q = search_attributes(params, :id, :updated_at, :updater_id, :post_id, :tags, :added_tags, :removed_tags, :rating, :rating_changed, :parent_id, :parent_changed, :source, :source_changed, :version)
 
       if params[:changed_tags]
         q = q.changed_tags_include_all(params[:changed_tags].scan(/[^[:space:]]+/))
       end
 
+      if params[:all_changed_tags]
+        q = q.changed_tags_include_all(params[:all_changed_tags].scan(/[^[:space:]]+/))
+      end
+
+      if params[:any_changed_tags]
+        q = q.changed_tags_include_any(params[:any_changed_tags].scan(/[^[:space:]]+/))
+      end
+
+      if params[:tag_matches]
+        q = q.tag_matches(params[:tag_matches])
+      end
+
       if params[:updater_name].present?
         q = q.where(updater_id: User.name_to_id(params[:updater_name]))
+      end
+
+      if params[:is_new].to_s.truthy?
+        q = q.where(version: 1)
+      elsif params[:is_new].to_s.falsy?
+        q = q.where("version != 1")
       end
 
       q.apply_default_order(params)
@@ -99,6 +125,20 @@ class PostVersion < ApplicationRecord
     @previous.first
   end
 
+  def subsequent
+    @subsequent ||= begin
+      PostVersion.where("post_id = ? and version > ?", post_id, version).order("version asc").limit(1).to_a
+    end
+    @subsequent.first
+  end
+
+  def current
+    @current ||= begin
+      PostVersion.where("post_id = ?", post_id).order("version desc").limit(1).to_a
+    end
+    @current.first
+  end
+
   def visible?
     post&.visible?
   end
@@ -112,38 +152,17 @@ class PostVersion < ApplicationRecord
     }
   end
 
-  def diff(version = nil)
-    if post.nil?
-      latest_tags = tag_array
-    else
-      latest_tags = post.tag_array
-      latest_tags << "rating:#{post.rating}" if post.rating.present?
-      latest_tags << "parent:#{post.parent_id}" if post.parent_id.present?
-      latest_tags << "source:#{post.source}" if post.source.present?
+  def pretty_rating
+    case rating
+    when "q"
+      "Questionable"
+
+    when "e"
+      "Explicit"
+
+    when "s"
+      "Safe"
     end
-
-    new_tags = tag_array
-    new_tags << "rating:#{rating}" if rating.present?
-    new_tags << "parent:#{parent_id}" if parent_id.present?
-    new_tags << "source:#{source}" if source.present?
-
-    old_tags = version.present? ? version.tag_array : []
-    if version.present?
-      old_tags << "rating:#{version.rating}" if version.rating.present?
-      old_tags << "parent:#{version.parent_id}" if version.parent_id.present?
-      old_tags << "source:#{version.source}" if version.source.present?
-    end
-
-    added_tags = new_tags - old_tags
-    removed_tags = old_tags - new_tags
-
-    return {
-      :added_tags => added_tags,
-      :removed_tags => removed_tags,
-      :obsolete_added_tags => added_tags - latest_tags,
-      :obsolete_removed_tags => removed_tags & latest_tags,
-      :unchanged_tags => new_tags & old_tags
-    }
   end
 
   def changes
@@ -251,18 +270,6 @@ class PostVersion < ApplicationRecord
     end
 
     post.save!
-  end
-
-  def can_undo?(user)
-    version > 1 && post&.visible? && user.is_member?
-  end
-
-  def can_revert_to?(user)
-    post&.visible? && user.is_member?
-  end
-
-  def api_attributes
-    super + [:obsolete_added_tags, :obsolete_removed_tags, :unchanged_tags]
   end
 
   def self.available_includes

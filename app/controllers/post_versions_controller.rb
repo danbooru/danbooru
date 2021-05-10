@@ -1,12 +1,12 @@
 class PostVersionsController < ApplicationController
-  before_action :member_only, except: [:index, :search]
   before_action :check_availabililty
   around_action :set_timeout
   respond_to :html, :xml, :json
   respond_to :js, only: [:undo]
 
   def index
-    @post_versions = PostVersion.paginated_search(params)
+    set_version_comparison("current")
+    @post_versions = authorize PostVersion.paginated_search(params)
 
     if request.format.html?
       @post_versions = @post_versions.includes(:updater, post: [:uploader, :versions])
@@ -21,10 +21,10 @@ class PostVersionsController < ApplicationController
   end
 
   def undo
-    @post_version = PostVersion.find(params[:id])
+    @post_version = authorize PostVersion.find(params[:id])
     @post_version.undo!
 
-    respond_with(@post_version)
+    respond_with(@post_version, location: post_versions_path(search: { post_id: @post_version.post_id }))
   end
 
   private

@@ -6,15 +6,11 @@ class ArtistTest < ActiveSupport::TestCase
 
     assert_equal(1, artists.size)
     assert_equal(expected_name, artists.first.name, "Testing URL: #{source_url}")
-  rescue Net::OpenTimeout, PixivApiClient::Error
-    skip "Remote connection failed for #{source_url}"
   end
 
   def assert_artist_not_found(source_url)
     artists = ArtistFinder.find_artists(source_url).to_a
     assert_equal(0, artists.size, "Testing URL: #{source_url}")
-  rescue Net::OpenTimeout
-    skip "Remote connection failed for #{source_url}"
   end
 
   context "An artist" do
@@ -66,21 +62,26 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "that has been banned" do
       setup do
-        @post = FactoryBot.create(:post, :tag_string => "aaa")
         @artist = FactoryBot.create(:artist, :name => "aaa")
+        @post = FactoryBot.create(:post, :tag_string => "aaa")
         @admin = FactoryBot.create(:admin_user)
         @artist.ban!(banner: @admin)
+        perform_enqueued_jobs
         @post.reload
       end
 
       should "allow unbanning" do
+        assert_equal(true, @artist.reload.is_banned?)
+        assert_equal(true, @post.reload.is_banned?)
+        assert_equal(true, @artist.versions.last.is_banned?)
+
         assert_difference("TagImplication.count", -1) do
           @artist.unban!
         end
-        @post.reload
-        @artist.reload
-        assert(!@artist.is_banned?, "artist should not be banned")
-        assert(!@post.is_banned?, "post should not be banned")
+
+        assert_equal(false, @artist.reload.is_banned?)
+        assert_equal(false, @post.reload.is_banned?)
+        assert_equal(false, @artist.versions.last.is_banned?)
         assert_equal("aaa", @post.tag_string)
       end
 
@@ -93,7 +94,6 @@ class ArtistTest < ActiveSupport::TestCase
       end
 
       should "create a new tag implication" do
-        perform_enqueued_jobs
         assert_equal(1, TagImplication.where(:antecedent_name => "aaa", :consequent_name => "banned_artist").count)
         assert_equal("aaa banned_artist", @post.reload.tag_string)
       end
@@ -101,6 +101,10 @@ class ArtistTest < ActiveSupport::TestCase
       should "set the approver of the banned_artist implication" do
         ta = TagImplication.where(:antecedent_name => "aaa", :consequent_name => "banned_artist").first
         assert_equal(@admin.id, ta.approver.id)
+      end
+
+      should "update the artist history" do
+        assert_equal(true, @artist.versions.last.is_banned?)
       end
     end
 
@@ -124,7 +128,8 @@ class ArtistTest < ActiveSupport::TestCase
     should "not allow invalid urls" do
       artist = FactoryBot.build(:artist, :url_string => "blah")
       assert_equal(false, artist.valid?)
-      assert_equal(["'blah' must begin with http:// or https:// "], artist.errors["urls.url"])
+      assert_includes(artist.errors["urls.url"], "'blah' must begin with http:// or https:// ")
+      assert_includes(artist.errors["urls.url"], "'blah' has a hostname '' that does not contain a dot")
     end
 
     should "allow fixing invalid urls" do
@@ -159,20 +164,23 @@ class ArtistTest < ActiveSupport::TestCase
       assert_artist_not_found("http://i2.pixiv.net/img28/img/kyang692/35563903.jpg")
     end
 
+    should "ignore /en/ pixiv url matches" do
+      a1 = FactoryBot.create(:artist, :name => "vvv", :url_string => "https://www.pixiv.net/en/users/32072927/artworks")
+      a2 = FactoryBot.create(:artist, :name => "c01a", :url_string => "https://www.pixiv.net/en/users/31744504")
+      assert_artist_not_found("https://www.pixiv.net/en/artworks/85241178")
+      assert_artist_not_found("https://www.pixiv.net/en/users/85241178")
+    end
+
     should "find matches by url" do
       a1 = FactoryBot.create(:artist, :name => "rembrandt", :url_string => "http://rembrandt.com/x/test.jpg")
       a2 = FactoryBot.create(:artist, :name => "subway", :url_string => "http://subway.com/x/test.jpg")
       a3 = FactoryBot.create(:artist, :name => "minko", :url_string => "https://minko.com/x/test.jpg")
 
-      begin
-        assert_artist_found("rembrandt", "http://rembrandt.com/x/test.jpg")
-        assert_artist_found("rembrandt", "http://rembrandt.com/x/another.jpg")
-        assert_artist_not_found("http://nonexistent.com/test.jpg")
-        assert_artist_found("minko", "https://minko.com/x/test.jpg")
-        assert_artist_found("minko", "http://minko.com/x/test.jpg")
-      rescue Net::OpenTimeout
-        skip "network failure"
-      end
+      assert_artist_found("rembrandt", "http://rembrandt.com/x/test.jpg")
+      assert_artist_found("rembrandt", "http://rembrandt.com/x/another.jpg")
+      assert_artist_not_found("http://nonexistent.com/test.jpg")
+      assert_artist_found("minko", "https://minko.com/x/test.jpg")
+      assert_artist_found("minko", "http://minko.com/x/test.jpg")
     end
 
     should "be case-insensitive to domains when finding matches by url" do
@@ -197,6 +205,7 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when finding deviantart artists" do
       setup do
+        skip "DeviantArt API keys not set" unless Danbooru.config.deviantart_client_id.present?
         FactoryBot.create(:artist, :name => "artgerm", :url_string => "http://artgerm.deviantart.com/")
         FactoryBot.create(:artist, :name => "trixia",  :url_string => "http://trixdraws.deviantart.com/")
       end
@@ -361,9 +370,42 @@ class ArtistTest < ActiveSupport::TestCase
       end
     end
 
-    should "normalize its other names" do
-      artist = FactoryBot.create(:artist, name: "a1", other_names: "a1 aaa aaa AAA bbb ccc_ddd")
-      assert_equal("aaa bbb ccc_ddd", artist.other_names_string)
+    context "when finding fc2.com artists" do
+      setup do
+        create(:artist, name: "awa", url_string: "http://abk00.blog.fc2.com")
+      end
+
+      should "find the artist" do
+        assert_artist_found("awa", "http://blog71.fc2.com/a/abk00/file/20080220194219.jpg")
+      end
+
+      should "return nothing for an unknown artist" do
+        assert_artist_not_found("http://blog71.fc2.com/a/nobody/file/20080220194219.jpg")
+      end
+    end
+
+    context "the #normalize_other_names method" do
+      subject { build(:artist) }
+
+      should normalize_attribute(:other_names).from(["   foo"]).to(["foo"])
+      should normalize_attribute(:other_names).from(["foo   "]).to(["foo"])
+      should normalize_attribute(:other_names).from(["___foo"]).to(["___foo"])
+      should normalize_attribute(:other_names).from(["foo___"]).to(["foo___"])
+      should normalize_attribute(:other_names).from(["foo\n"]).to(["foo"])
+      should normalize_attribute(:other_names).from(["foo bar"]).to(["foo_bar"])
+      should normalize_attribute(:other_names).from(["foo   bar"]).to(["foo_bar"])
+      should normalize_attribute(:other_names).from(["foo___bar"]).to(["foo___bar"])
+      should normalize_attribute(:other_names).from([" _Foo Bar_ "]).to(["_Foo_Bar_"])
+      should normalize_attribute(:other_names).from(["foo 1", "bar 2"]).to(["foo_1", "bar_2"])
+      should normalize_attribute(:other_names).from(["foo", nil, "", " ", "bar"]).to(["foo", "bar"])
+      should normalize_attribute(:other_names).from([nil, "", " "]).to([])
+      should normalize_attribute(:other_names).from(["pokémon".unicode_normalize(:nfd)]).to(["pokémon".unicode_normalize(:nfkc)])
+      should normalize_attribute(:other_names).from(["foo", "foo"]).to(["foo"])
+      should normalize_attribute(:other_names).from(["🏳️‍🌈"]).to(["🏳️‍🌈"])
+
+      should normalize_attribute(:other_names).from("foo foo").to(["foo"])
+      should normalize_attribute(:other_names).from("foo bar").to(["foo", "bar"])
+      should normalize_attribute(:other_names).from("_foo_ Bar").to(["_foo_", "Bar"])
     end
 
     should "search on its name should return results" do
@@ -405,9 +447,9 @@ class ArtistTest < ActiveSupport::TestCase
     end
 
     should "search on has_tag and return matches" do
-      post = FactoryBot.create(:post, tag_string: "bkub")
       bkub = FactoryBot.create(:artist, name: "bkub")
       none = FactoryBot.create(:artist, name: "none")
+      post = FactoryBot.create(:post, tag_string: "bkub")
 
       assert_equal(bkub.id, Artist.search(has_tag: "true").first.id)
       assert_equal(none.id, Artist.search(has_tag: "false").first.id)
@@ -441,8 +483,8 @@ class ArtistTest < ActiveSupport::TestCase
         assert(Tag.exists?(name: "bkub", category: Tag.categories.artist))
       end
 
-      should "change the tag to an artist tag if it was a gentag" do
-        tag = FactoryBot.create(:tag, name: "abc", category: Tag.categories.general)
+      should "change the tag to an artist tag if it was an empty gentag" do
+        tag = FactoryBot.create(:tag, name: "abc", category: Tag.categories.general, post_count: 0)
         artist = FactoryBot.create(:artist, name: "abc")
 
         assert_equal(Tag.categories.artist, tag.reload.category)
@@ -459,7 +501,7 @@ class ArtistTest < ActiveSupport::TestCase
 
     context "when renaming" do
       should "change the new tag to an artist tag if it was a gentag" do
-        tag = FactoryBot.create(:tag, name: "def", category: Tag.categories.general)
+        tag = FactoryBot.create(:tag, name: "def", category: Tag.categories.general, post_count: 0)
         artist = FactoryBot.create(:artist, name: "abc")
         artist.update(name: "def")
 
@@ -527,8 +569,8 @@ class ArtistTest < ActiveSupport::TestCase
         artist = Artist.new_with_defaults(source: source)
 
         assert_equal("niceandcool", artist.name)
-        assert_equal("nice_and_cool", artist.other_names_string)
-        assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/member.php?id=906442")
+        assert_equal("Nice_and_Cool niceandcool", artist.other_names_string)
+        assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/users/906442")
         assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/stacc/niceandcool")
       end
 
@@ -538,8 +580,8 @@ class ArtistTest < ActiveSupport::TestCase
         artist = Artist.new_with_defaults(name: "test_artist")
 
         assert_equal("test_artist", artist.name)
-        assert_equal("nice_and_cool niceandcool", artist.other_names_string)
-        assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/member.php?id=906442")
+        assert_equal("Nice_and_Cool niceandcool", artist.other_names_string)
+        assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/users/906442")
         assert_includes(artist.urls.map(&:url), "https://www.pixiv.net/stacc/niceandcool")
       end
     end

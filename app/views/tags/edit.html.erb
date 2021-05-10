@@ -9,7 +9,7 @@
         <%= f.input :category, :collection => TagCategory.canonical_mapping.to_a, :include_blank => false %>
       <% end %>
 
-      <% if CurrentUser.is_moderator? %>
+      <% if policy(@tag).can_lock? %>
         <%= f.input :is_locked, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
       <% end %>
 

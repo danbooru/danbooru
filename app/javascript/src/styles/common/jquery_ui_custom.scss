@@ -1,10 +1,8 @@
-@import "../base/000_vars.scss";
-
 .ui-widget {
-  font-family: $base_font_family;
+  font-family: var(--body-font);
 
   input, select, textarea, button {
-    font-family: $base_font_family;
+    font-family: var(--body-font);
   }
 }
 
@@ -26,7 +24,7 @@ div.ui-dialog {
   overflow: visible;
   font-size: 1em;
   z-index: 999 !important;
-  box-shadow: var(--jquery-ui-dialog-box-shadow);
+  box-shadow: var(--shadow-lg);
   padding: 0;
 
   .ui-dialog-titlebar {
@@ -63,7 +61,7 @@ div.ui-dialog {
 .ui-button {
   margin: 0;
   padding: 0.25em 1em;
-  border: var(--form-button-border);
+  border: 1px solid var(--form-button-border-color);
   background: var(--form-button-background);
   color: var(--form-button-text-color);
 
@@ -77,12 +75,12 @@ div.ui-dialog {
   }
 
   &:hover {
-    box-shadow: var(--form-button-hover-box-shadow);
+    box-shadow: 0 0 2px var(--form-button-hover-box-shadow-color);
     background: var(--form-button-hover-background);
   }
 
   &:active {
-    box-shadow: var(--form-button-hover-box-shadow);
+    box-shadow: 0 0 2px var(--form-button-hover-box-shadow-color);
     background: var(--form-button-active-background);
     color: var(--form-button-text-color);
   }

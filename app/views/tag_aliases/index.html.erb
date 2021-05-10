@@ -3,7 +3,7 @@
     <%= render "tag_relationships/search", url: tag_aliases_path %>
     <%= render "listing", :tag_aliases => @tag_aliases %>
 
-    <%= numbered_paginator(@tag_aliases) if @tag_aliases.respond_to?(:current_page) %>
+    <%= numbered_paginator(@tag_aliases) %>
   </div>
 </div>
 

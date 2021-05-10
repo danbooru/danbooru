@@ -20,17 +20,33 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
         should "succeed" do
           put_auth admin_user_path(@user), @mod, params: {:user => {:level => "30"}}
           assert_redirected_to(edit_admin_user_path(@user))
-          @user.reload
-          assert_equal(30, @user.level)
+          assert_equal(30, @user.reload.level)
           assert_equal(@mod.id, @user.inviter_id)
+        end
+
+        should "promote the user to unrestricted uploads" do
+          put_auth admin_user_path(@user), @mod, params: { user: { level: User::Levels::BUILDER, can_upload_free: true }}
+
+          assert_redirected_to(edit_admin_user_path(@user.reload))
+          assert_equal(true, @user.is_builder?)
+          assert_equal(true, @user.can_upload_free?)
+          assert_equal(false, @user.can_approve_posts?)
+        end
+
+        should "promote the user to approver" do
+          put_auth admin_user_path(@user), @mod, params: { user: { level: User::Levels::BUILDER, can_approve_posts: true }}
+
+          assert_redirected_to(edit_admin_user_path(@user.reload))
+          assert_equal(true, @user.is_builder?)
+          assert_equal(false, @user.can_upload_free?)
+          assert_equal(true, @user.can_approve_posts?)
         end
 
         context "promoted to an admin" do
           should "fail" do
             put_auth admin_user_path(@user), @mod, params: {:user => {:level => "50"}}
             assert_response(403)
-            @user.reload
-            assert_equal(20, @user.level)
+            assert_equal(20, @user.reload.level)
           end
         end
       end
@@ -39,8 +55,7 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
         should "fail" do
           put_auth admin_user_path(@admin), @mod, params: {:user => {:level => "30"}}
           assert_response(403)
-          @admin.reload
-          assert_equal(50, @admin.level)
+          assert_equal(50, @admin.reload.level)
         end
       end
     end

@@ -1,4 +1,6 @@
 class DanbooruLogger
+  HEADERS = %w[referer sec-fetch-dest sec-fetch-mode sec-fetch-site sec-fetch-user]
+
   def self.info(message, params = {})
     Rails.logger.info(message)
 
@@ -22,24 +24,51 @@ class DanbooruLogger
   end
 
   def self.add_session_attributes(request, session, user)
-    request_params = request.parameters.with_indifferent_access.except(:controller, :action)
-    session_params = session.to_h.with_indifferent_access.slice(:session_id, :started_at)
-    user_params = { id: user&.id, name: user&.name, level: user&.level_string, ip: request.remote_ip, safe_mode: CurrentUser.safe_mode? }
+    add_attributes("request", { path: request.path })
+    add_attributes("request.headers", header_params(request))
+    add_attributes("request.params", request_params(request))
+    add_attributes("session.params", session_params(session))
+    add_attributes("user", user_params(request, user))
+  end
 
-    add_attributes("request.params", request_params)
-    add_attributes("session.params", session_params)
-    add_attributes("user", user_params)
+  def self.header_params(request)
+    headers = request.headers.to_h.select { |header, value| header.match?(/\AHTTP_/) }
+    headers = headers.transform_keys { |header| header.delete_prefix("HTTP_").downcase }
+    headers = headers.select { |header, value| header.in?(HEADERS) }
+    headers
+  end
+
+  def self.request_params(request)
+    request.parameters.with_indifferent_access.except(:controller, :action)
+  end
+
+  def self.session_params(session)
+    session.to_h.with_indifferent_access.slice(:session_id, :started_at)
+  end
+
+  def self.user_params(request, user)
+    {
+      id: user&.id,
+      name: user&.name,
+      level: user&.level_string,
+      ip: request.remote_ip,
+      country: CurrentUser.country,
+      safe_mode: CurrentUser.safe_mode?
+    }
   end
 
   def self.add_attributes(prefix, hash)
-    return unless defined?(::NewRelic)
-
     attributes = flatten_hash(hash).transform_keys { |key| "#{prefix}.#{key}" }
     attributes.delete_if { |key, value| key.end_with?(*Rails.application.config.filter_parameters.map(&:to_s)) }
-    ::NewRelic::Agent.add_custom_attributes(attributes)
+    add_custom_attributes(attributes)
   end
 
   private_class_method
+
+  def self.add_custom_attributes(attributes)
+    return unless defined?(::NewRelic)
+    ::NewRelic::Agent.add_custom_attributes(attributes)
+  end
 
   # flatten_hash({ foo: { bar: { baz: 42 } } })
   # => { "foo.bar.baz" => 42 }

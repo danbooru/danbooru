@@ -55,13 +55,9 @@ en:
         creator: "You"
         creator_id: "You"
       post_disapproval:
-        post: "You"
-        post_id: "You"
-      comment:
-        post: "You"
-        post_id: "You"
+        user: "You"
+        user_id: "You"
       comment_vote:
-        comment: "You"
         user_id: "You"
       upload:
         uploader: "You"
@@ -72,3 +68,10 @@ en:
       saved_search:
         user: "You"
         user_id: "You"
+    errors:
+      models:
+        tag_implication:
+          attributes:
+            antecedent_name:
+              taken: "Implication already exists"
+              format: "%{message}"

@@ -1,19 +1,7 @@
-@import "../base/000_vars.scss";
-
 div#page {
   overflow: visible;
   margin: 0 20px;
   padding: 0 10px;
-
-  aside#sidebar {
-    h1 {
-      font-size: $h3_size;
-    }
-
-    #options-box i.fa-bookmark {
-      margin-right: 0.25em;
-    }
-  }
 
   aside#sidebar > section {
     margin-bottom: 1em;
@@ -29,7 +17,13 @@ footer#page-footer {
   margin-top: 1em;
   text-align: center;
   padding: 1em 0 1em;
-  border-top: var(--footer-border);
+  border-top: 1px solid var(--footer-border-color);
+
+  .social-icon img {
+    vertical-align: bottom;
+    margin: 0 0.1em;
+    height: 16px;
+  }
 }
 
 .sidebar-container {
@@ -57,5 +51,20 @@ footer#page-footer {
     #sidebar {
       order: 2;
     }
+  }
+}
+
+/* A container for the main <h1> tag, with optional right-aligned action buttons */
+div.page-heading {
+  display: flex;
+  margin-bottom: 1em;
+
+  h1 {
+    flex-grow: 1;
+    line-height: 1em;
+  }
+
+  a {
+    align-self: center;
   }
 }

@@ -7,7 +7,18 @@ body.c-post-versions.a-index {
     min-width: 2em;
   }
 
-  .advanced-search-link {
-    margin: 0 1em;
+  ins.diff-obsolete a {
+    color: var(--diff-list-obsolete-added-color);
+    font-weight: bold;
+  }
+
+  del.diff-obsolete a {
+    color: var(--diff-list-obsolete-removed-color);
+    font-weight: bold;
+  }
+
+  td.tags-column,
+  td.edits-column {
+    width: 40%;
   }
 }

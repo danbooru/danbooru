@@ -2,7 +2,6 @@
   <%= quick_search_form_for(:body_matches, notes_path, "notes") %>
   <%= subnav_link_to "Listing", notes_path %>
   <%= subnav_link_to "Posts", posts_path(:tags => "order:note") %>
-  <%= subnav_link_to "Search", search_notes_path %>
   <%= subnav_link_to "History", note_versions_path %>
   <%= subnav_link_to "Requests", posts_path(:tags => "translation_request") %>
   <%= subnav_link_to "Help", wiki_page_path("help:notes") %>

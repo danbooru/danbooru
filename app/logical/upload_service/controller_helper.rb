@@ -7,11 +7,8 @@ class UploadService
         # this gets called from UploadsController#new so we need to preprocess async
         UploadPreprocessorDelayedStartJob.perform_later(url, ref, CurrentUser.user)
 
-        begin
-          download = Downloads::File.new(url, ref)
-          remote_size = download.size
-        rescue Exception
-        end
+        strategy = Sources::Strategies.find(url, ref)
+        remote_size = strategy.remote_size
 
         return [upload, remote_size]
       end
@@ -21,7 +18,7 @@ class UploadService
         Preprocessor.new(file: file).delayed_start(CurrentUser.id)
       end
 
-      return [upload]
+      [upload]
     end
   end
 end

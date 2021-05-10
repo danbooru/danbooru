@@ -6,7 +6,7 @@
 
     <%= table_for @commentaries, width: "100%" do |t| %>
       <% t.column "Post", width: "1%" do |commentary| %>
-        <%= PostPresenter.preview(commentary.post, show_deleted: true) %>
+        <%= post_preview(commentary.post, show_deleted: true) %>
       <% end %>
       <% t.column "Original" do |commentary| %>
           <%= format_commentary_title(commentary.original_title) %>

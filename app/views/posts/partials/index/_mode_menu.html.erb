@@ -1,6 +1,6 @@
-<% if CurrentUser.is_gold? %>
+<% if policy(Post).can_use_mode_menu? %>
   <section id="mode-box">
-    <h1>Mode</h1>
+    <h2>Mode</h2>
     <form action="/">
       <select name="mode">
         <option value="view">View</option>

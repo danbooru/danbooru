@@ -14,6 +14,7 @@ module NoteSanitizer
   }
 
   ALLOWED_PROPERTIES = %w(
+    align-items
     background background-color
     border border-color border-image border-radius border-style border-width
     border-bottom border-bottom-color border-bottom-left-radius border-bottom-right-radius border-bottom-style border-bottom-width
@@ -22,28 +23,24 @@ module NoteSanitizer
     border-top border-top-color border-top-left-radious border-top-right-radius border-top-style border-top-width
     bottom left right top
     box-shadow
-    clear
     color
     display
     filter
     float
     font font-family font-size font-size-adjust font-style font-variant font-weight
     height width
+    justify-content
     letter-spacing
     line-height
-    list-style list-style-position list-style-type
     margin margin-bottom margin-left margin-right margin-top
-    mask mask-border mask-clip mask-composite mask-image mask-mode mask-origin mask-position mask-repeat mask-size
     opacity
-    outline outline-color outline-offset outline-width outline-style
     padding padding-bottom padding-left padding-right padding-top
     perspective perspective-origin
     position
     text-align
-    text-decoration text-decoration-color text-decoration-line text-decoration-style
+    text-decoration
     text-indent
     text-shadow
-    text-transform
     transform transform-origin
     white-space
     word-break

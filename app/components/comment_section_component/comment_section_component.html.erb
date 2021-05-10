@@ -1,0 +1,20 @@
+<div class="comments-for-post" data-post-id="<%= post.id %>">
+  <% if has_unloaded_comments? %>
+    <%= link_to "Show #{pluralize unloaded_comment_count, "more comment"}", comments_path(post_id: post.id), class: "show-all-comments-link", remote: true %>
+  <% end %>
+
+  <div class="list-of-comments list-of-messages">
+    <% if comments.present? %>
+      <%= render CommentComponent.with_collection(comments, current_user: current_user, context: :index_by_post, dtext_data: dtext_data) %>
+    <% else %>
+      <p>There are no comments.</p>
+    <% end %>
+  </div>
+
+  <% if policy(Comment).create? %>
+    <div class="new-comment">
+      <p><%= link_to "Post comment", new_comment_path(comment: { post_id: post.id }), class: "expand-comment-response" %></p>
+      <%= render "comments/form", comment: post.comments.new, hidden: true %>
+    </div>
+  <% end %>
+</div>

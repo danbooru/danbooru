@@ -1,6 +1,6 @@
 FactoryBot.define do
   factory(:post_vote) do
-    user
+    user factory: :gold_user
     post
     score { [-1, 1].sample }
   end

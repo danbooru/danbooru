@@ -1,13 +1,13 @@
-<%= table_for @ip_addresses, {class: "striped autofit"} do |t| %>
+<%= table_for @ip_addresses, class: "striped autofit" do |t| %>
+  <% t.column "IP Address" do |ip| %>
+    <%= link_to ip.ip_addr, ip_addresses_path(search: { ip_addr: ip.ip_addr }) %>
+    <%= link_to "»", ip_addresses_path(search: { ip_addr: ip.ip_addr, group_by: "user" }) %>
+  <% end %>
   <% t.column "Source" do |ip| %>
     <%= link_to ip.model_type.underscore.humanize, ip_addresses_path(search: { model_type: ip.model_type }) %>
   <% end %>
   <% t.column "ID" do |ip| %>
     <%= link_to "##{ip.model_id}", ip.model %>
-  <% end %>
-  <% t.column "IP Address" do |ip| %>
-    <%= link_to ip.ip_addr, ip_addresses_path(search: { ip_addr: ip.ip_addr }) %>
-    <%= link_to "»", ip_addresses_path(search: { ip_addr: ip.ip_addr, group_by: "user" }) %>
   <% end %>
   <% t.column "User" do |ip| %>
     <%= link_to_user ip.user %>
@@ -17,6 +17,8 @@
     <%= time_ago_in_words_tagged ip.created_at %>
   <% end %>
   <% t.column column: "ip-info" do |ip| %>
-    <%= link_to "IP info", "https://ipinfo.io/#{ip.ip_addr}" %>
+    <%= link_to "Details", ip_address_path(ip.ip_addr.to_s) %>
+    | <%= link_to "Ban IP", new_ip_ban_path(ip_ban: { ip_addr: ip.ip_addr.to_s }) %>
+    | <%= link_to "Ban User", new_ban_path(ban: { user_name: ip.user.name, duration: 999999 }) %>
   <% end %>
 <% end %>

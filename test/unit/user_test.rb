@@ -1,6 +1,19 @@
 require 'test_helper'
 
 class UserTest < ActiveSupport::TestCase
+  def assert_promoted_to(new_level, user, promoter)
+    user.promote_to!(new_level, promoter)
+    assert_equal(new_level, user.reload.level)
+  end
+
+  def assert_not_promoted_to(new_level, user, promoter)
+    assert_raise(User::PrivilegeError) do
+      user.promote_to!(new_level, promoter)
+    end
+
+    assert_not_equal(new_level, user.reload.level)
+  end
+
   context "A user" do
     setup do
       @user = FactoryBot.create(:user)
@@ -15,14 +28,74 @@ class UserTest < ActiveSupport::TestCase
 
     context "promoting a user" do
       setup do
-        CurrentUser.user = FactoryBot.create(:moderator_user)
+        @builder = create(:builder_user)
+        @mod = create(:moderator_user)
+        @admin = create(:admin_user)
+        @owner = create(:owner_user)
+      end
+
+      should "allow moderators to promote users up to builder level" do
+        assert_promoted_to(User::Levels::GOLD, @user, @mod)
+        assert_promoted_to(User::Levels::PLATINUM, @user, @mod)
+        assert_promoted_to(User::Levels::BUILDER, @user, @mod)
+
+        assert_not_promoted_to(User::Levels::MODERATOR, @user, @mod)
+        assert_not_promoted_to(User::Levels::ADMIN, @user, @mod)
+        assert_not_promoted_to(User::Levels::OWNER, @user, @mod)
+      end
+
+      should "allow admins to promote users up to moderator level" do
+        assert_promoted_to(User::Levels::GOLD, @user, @admin)
+        assert_promoted_to(User::Levels::PLATINUM, @user, @admin)
+        assert_promoted_to(User::Levels::BUILDER, @user, @admin)
+        assert_promoted_to(User::Levels::MODERATOR, @user, @admin)
+
+        assert_not_promoted_to(User::Levels::ADMIN, @user, @admin)
+        assert_not_promoted_to(User::Levels::OWNER, @user, @admin)
+      end
+
+      should "allow the owner to promote users up to admin level" do
+        assert_promoted_to(User::Levels::GOLD, @user, @owner)
+        assert_promoted_to(User::Levels::PLATINUM, @user, @owner)
+        assert_promoted_to(User::Levels::BUILDER, @user, @owner)
+        assert_promoted_to(User::Levels::MODERATOR, @user, @owner)
+        assert_promoted_to(User::Levels::ADMIN, @user, @owner)
+
+        assert_not_promoted_to(User::Levels::OWNER, @user, @owner)
+      end
+
+      should "not allow non-moderators to promote other users" do
+        assert_not_promoted_to(User::Levels::GOLD, @user, @builder)
+        assert_not_promoted_to(User::Levels::PLATINUM, @user, @builder)
+        assert_not_promoted_to(User::Levels::BUILDER, @user, @builder)
+        assert_not_promoted_to(User::Levels::MODERATOR, @user, @builder)
+        assert_not_promoted_to(User::Levels::ADMIN, @user, @builder)
+        assert_not_promoted_to(User::Levels::OWNER, @user, @builder)
+      end
+
+      should "not allow users to promote or demote other users at their rank or above" do
+        assert_not_promoted_to(User::Levels::ADMIN, create(:moderator_user), @mod)
+        assert_not_promoted_to(User::Levels::BUILDER, create(:moderator_user), @mod)
+
+        assert_not_promoted_to(User::Levels::OWNER, create(:admin_user), @admin)
+        assert_not_promoted_to(User::Levels::MODERATOR, create(:admin_user), @admin)
+
+        assert_not_promoted_to(User::Levels::ADMIN, create(:owner_user), @owner)
+      end
+
+      should "not allow users to promote themselves" do
+        assert_not_promoted_to(User::Levels::ADMIN, @mod, @mod)
+        assert_not_promoted_to(User::Levels::OWNER, @admin, @admin)
+      end
+
+      should "not allow users to demote themselves" do
+        assert_not_promoted_to(User::Levels::MEMBER, @mod, @mod)
+        assert_not_promoted_to(User::Levels::MEMBER, @admin, @admin)
+        assert_not_promoted_to(User::Levels::MEMBER, @owner, @owner)
       end
 
       should "create a neutral feedback" do
-        assert_difference("UserFeedback.count") do
-          @user.promote_to!(User::Levels::GOLD)
-        end
-
+        @user.promote_to!(User::Levels::GOLD, @mod)
         assert_equal("You have been promoted to a Gold level account from Member.", @user.feedback.last.body)
       end
 
@@ -31,58 +104,28 @@ class UserTest < ActiveSupport::TestCase
         User.stubs(:system).returns(bot)
 
         assert_difference("Dmail.count", 1) do
-          @user.promote_to!(User::Levels::GOLD)
+          @user.promote_to!(User::Levels::GOLD, @admin)
         end
 
-        assert(@user.dmails.exists?(from: bot, to: @user, title: "You have been promoted"))
+        assert(@user.dmails.exists?(from: bot, to: @user, title: "Your account has been updated"))
         refute(@user.dmails.exists?(from: bot, to: @user, title: "Your user record has been updated"))
       end
     end
 
-    should "not validate if the originating ip address is banned" do
-      CurrentUser.scoped(User.anonymous, "1.2.3.4") do
-        create(:ip_ban, ip_addr: '1.2.3.4')
-        user = build(:user, last_ip_addr: '1.2.3.4')
-        refute(user.valid?)
-        assert_equal("IP address is banned", user.errors.full_messages.join)
-      end
-    end
-
-    should "limit comment votes" do
-      Danbooru.config.stubs(:member_comment_time_threshold).returns(1.week.from_now)
-      Danbooru.config.stubs(:member_comment_limit).returns(10)
-      assert(@user.can_comment_vote?)
-      10.times do
-        comment = FactoryBot.create(:comment)
-        FactoryBot.create(:comment_vote, :comment_id => comment.id, :score => -1)
-      end
-
-      assert(!@user.can_comment_vote?)
-      CommentVote.update_all("created_at = '1990-01-01'")
-      assert(@user.can_comment_vote?)
-    end
-
-    should "limit comments" do
-      assert(!@user.can_comment?)
-      @user.update_column(:level, User::Levels::GOLD)
-      assert(@user.can_comment?)
-      @user.update_column(:level, User::Levels::MEMBER)
-      @user.update_column(:created_at, 1.year.ago)
-      assert(@user.can_comment?)
-      assert(!@user.is_comment_limited?)
-      create_list(:comment, Danbooru.config.member_comment_limit, creator: @user)
-      assert(@user.is_comment_limited?)
-    end
-
-    should "authenticate" do
-      assert(User.authenticate(@user.name, "password"), "Authentication should have succeeded")
-      assert(!User.authenticate(@user.name, "password2"), "Authentication should not have succeeded")
-      assert(User.authenticate_hash(@user.name, User.sha1("password")), "Authentication should have succeeded")
-      assert(!User.authenticate_hash(@user.name, User.sha1("xxx")), "Authentication should not have succeeded")
+    should "authenticate password" do
+      assert_equal(@user, @user.authenticate_password("password"))
+      assert_equal(false, @user.authenticate_password("password2"))
     end
 
     should "normalize its level" do
+      user = FactoryBot.create(:user, :level => User::Levels::OWNER)
+      assert(user.is_owner?)
+      assert(user.is_admin?)
+      assert(user.is_moderator?)
+      assert(user.is_gold?)
+
       user = FactoryBot.create(:user, :level => User::Levels::ADMIN)
+      assert(!user.is_owner?)
       assert(user.is_moderator?)
       assert(user.is_gold?)
 
@@ -126,6 +169,13 @@ class UserTest < ActiveSupport::TestCase
         user = FactoryBot.build(:user, :name => "x_")
         user.save
         assert_equal(["Name cannot begin or end with an underscore"], user.errors.full_messages)
+      end
+
+      should "not allow blacklisted names" do
+        Danbooru.config.stubs(:user_name_blacklist).returns(["voldemort"])
+        user = build(:user, name: "voldemort42")
+        user.save
+        assert_equal(["Name is not allowed"], user.errors.full_messages)
       end
 
       should "be updated" do
@@ -186,71 +236,6 @@ class UserTest < ActiveSupport::TestCase
     end
 
     context "password" do
-      should "match the cookie hash" do
-        @user = FactoryBot.create(:user)
-        @user.password = "zugzug5"
-        @user.password_confirmation = "zugzug5"
-        @user.save
-        @user.reload
-        assert(User.authenticate_cookie_hash(@user.name, @user.bcrypt_cookie_password_hash))
-      end
-
-      should "match the confirmation" do
-        @user = FactoryBot.create(:user)
-        @user.old_password = "password"
-        @user.password = "zugzug5"
-        @user.password_confirmation = "zugzug5"
-        @user.save
-        @user.reload
-        assert(User.authenticate(@user.name, "zugzug5"), "Authentication should have succeeded")
-      end
-
-      should "fail if the confirmation does not match" do
-        @user = FactoryBot.create(:user)
-        @user.password = "zugzug6"
-        @user.password_confirmation = "zugzug5"
-        @user.save
-        assert_equal(["Password confirmation doesn't match Password"], @user.errors.full_messages)
-      end
-
-      should "not be too short" do
-        @user = FactoryBot.create(:user)
-        @user.password = "x5"
-        @user.password_confirmation = "x5"
-        @user.save
-        assert_equal(["Password is too short (minimum is 5 characters)"], @user.errors.full_messages)
-      end
-
-      should "should be reset" do
-        @user = FactoryBot.create(:user)
-        new_pass = @user.reset_password
-        assert(User.authenticate(@user.name, new_pass), "Authentication should have succeeded")
-      end
-
-      should "not change the password if the password and old password are blank" do
-        @user = FactoryBot.create(:user, :password => "67890")
-        @user.update(password: "", old_password: "")
-        assert(@user.bcrypt_password == User.sha1("67890"))
-      end
-
-      should "not change the password if the old password is incorrect" do
-        @user = FactoryBot.create(:user, :password => "67890")
-        @user.update(password: "12345", old_password: "abcdefg")
-        assert(@user.bcrypt_password == User.sha1("67890"))
-      end
-
-      should "not change the password if the old password is blank" do
-        @user = FactoryBot.create(:user, :password => "67890")
-        @user.update(password: "12345", old_password: "")
-        assert(@user.bcrypt_password == User.sha1("67890"))
-      end
-
-      should "change the password if the old password is correct" do
-        @user = FactoryBot.create(:user, :password => "67890")
-        @user.update(password: "12345", old_password: "67890")
-        assert(@user.bcrypt_password == User.sha1("12345"))
-      end
-
       context "in the json representation" do
         setup do
           @user = FactoryBot.create(:user)
@@ -268,21 +253,6 @@ class UserTest < ActiveSupport::TestCase
 
         should "not appear" do
           assert(@user.to_xml !~ /password/)
-        end
-      end
-    end
-
-    context "that might be a sock puppet" do
-      setup do
-        @user = FactoryBot.create(:user, last_ip_addr: "127.0.0.2")
-        Danbooru.config.unstub(:enable_sock_puppet_validation?)
-      end
-
-      should "not validate" do
-        CurrentUser.scoped(nil, "127.0.0.2") do
-          @user = FactoryBot.build(:user)
-          @user.save
-          assert_equal(["Last ip addr was used recently for another account and cannot be reused for another day"], @user.errors.full_messages)
         end
       end
     end

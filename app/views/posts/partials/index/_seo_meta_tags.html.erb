@@ -1,6 +1,6 @@
-<% if @post_set.is_empty_tag? %>
+<% if @post_set.query.is_empty_search? %>
   <% page_title("#{Danbooru.config.app_name}: Anime Image Board", suffix: nil) %>
-  <% meta_description("#{Danbooru.config.canonical_app_name} is the original anime image 'booru. Find over 3.75 million anime pictures categorized by over 100 million tags.") %>
+  <% meta_description site_description %>
 
   <% atom_feed_tag "Posts", posts_url(format: :atom) %>
 <% else %>
@@ -10,20 +10,18 @@
   <% atom_feed_tag "Posts: #{@post_set.tag_string}", posts_url(tags: @post_set.tag_string, format: :atom) %>
 <% end %>
 
-<%= missed_post_search_count_js %>
-
-<% if @post_set.hide_from_crawler? %>
-  <meta name="robots" content="nofollow,noindex">
+<% if params[:tags].blank? && @post_set.current_page == 1 %>
+  <% canonical_url root_url(host: Danbooru.config.hostname) %>
 <% end %>
+
+<% noindex if @post_set.hide_from_crawler? %>
 
 <% if @post_set.has_explicit? %>
   <meta name="rating" content="adult">
 <% end %>
 
-<%= tag.meta name: "canonical", content: posts_url(tags: params[:tags], host: Danbooru.config.hostname, protocol: "https") %>
-
 <% if @post_set.best_post.present? %>
+  <%= tag.meta property: "og:image", content: @post_set.best_post.open_graph_image_url %>
   <%= tag.meta name: "twitter:image", content: @post_set.best_post.open_graph_image_url %>
-  <%= tag.meta name: "og:image", content: @post_set.best_post.open_graph_image_url %>
   <%= tag.meta name: "twitter:card", content: "summary_large_image" %>
 <% end %>

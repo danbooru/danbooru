@@ -43,7 +43,7 @@ module Sources
 
       should "get the image url" do
         assert_equal("https://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
-        assert_http_size(132_555, @site.image_url)
+        assert_downloaded(132_555, @site.image_url)
       end
 
       should "get the canonical url" do
@@ -53,7 +53,7 @@ module Sources
       should "get the preview url" do
         assert_equal("https://pic.nijie.net/03/__rs_l170x170/nijie_picture/728995_20170505014820_0.jpg", @site.preview_url)
         assert_equal([@site.preview_url], @site.preview_urls)
-        assert_http_exists(@site.preview_url)
+        assert_downloaded(132_555, @site.preview_url)
       end
 
       should "get the profile" do
@@ -69,7 +69,8 @@ module Sources
           ["眼鏡", "https://nijie.info/search.php?word=%E7%9C%BC%E9%8F%A1"],
           ["谷間", "https://nijie.info/search.php?word=%E8%B0%B7%E9%96%93"],
           ["リトルウィッチアカデミア", "https://nijie.info/search.php?word=%E3%83%AA%E3%83%88%E3%83%AB%E3%82%A6%E3%82%A3%E3%83%83%E3%83%81%E3%82%A2%E3%82%AB%E3%83%87%E3%83%9F%E3%82%A2"],
-          ["アーシュラ先生", "https://nijie.info/search.php?word=%E3%82%A2%E3%83%BC%E3%82%B7%E3%83%A5%E3%83%A9%E5%85%88%E7%94%9F"]
+          ["アーシュラ先生", "https://nijie.info/search.php?word=%E3%82%A2%E3%83%BC%E3%82%B7%E3%83%A5%E3%83%A9%E5%85%88%E7%94%9F"],
+          ["上着全開", "https://nijie.info/search.php?word=%E4%B8%8A%E7%9D%80%E5%85%A8%E9%96%8B"]
         ]
 
         assert_equal(tags, @site.tags)
@@ -89,8 +90,25 @@ module Sources
         title = "ジャージの下は"
         desc = "「リトルウィッチアカデミア」から無自覚サキュバスぶりを発揮するアーシュラ先生です"
 
-        assert_equal(title, @site.artist_commentary_title)
-        assert_equal(desc, @site.artist_commentary_desc)
+        assert_equal(title, @site.dtext_artist_commentary_title)
+        assert_equal(desc, @site.dtext_artist_commentary_desc)
+      end
+    end
+
+    context "For long commentaries that may be truncated" do
+      should "get the full commentary" do
+        site = Sources::Strategies.find("http://nijie.info/view.php?id=266532")
+        title = "ラミアの里"
+        desc = <<~EOS.chomp
+          サークルaskot様より販売されました「ラミアの里 ～ラミアはぁれむで搾られて～」にて前回に引き続きフラウのイラストを担当させて頂きました。
+
+          前作を知らなくても問題なく愉しめる内容となっております。体験版もありますので気になりましたら是非ダウンロードしてみて下さい。
+
+          DLsite【<http://www.dlsite.com/maniax/work/=/product_id/RJ226998.html>】
+        EOS
+
+        assert_equal(title, site.dtext_artist_commentary_title)
+        assert_equal(desc, site.dtext_artist_commentary_desc)
       end
     end
 
@@ -170,7 +188,7 @@ module Sources
         desc = <<-EOS.strip_heredoc.chomp
           foo [b]bold[/b] [i]italics[/i] [s]strike[/s] red
 
-          http://nijie.info/view.php?id=218944
+          <http://nijie.info/view.php?id=218944>
         EOS
 
         assert_equal(desc, @site.dtext_artist_commentary_desc)
@@ -188,8 +206,8 @@ module Sources
         assert_equal("https://nijie.info/members.php?id=236014", site.profile_url)
         assert_nothing_raised { site.to_h }
 
-        assert_http_size(3619, site.image_url)
-        assert_http_exists(site.preview_url)
+        assert_downloaded(3619, site.image_url)
+        assert_downloaded(3619, site.preview_url)
       end
     end
 
@@ -272,6 +290,76 @@ module Sources
           assert_empty(site.tags)
           assert_nothing_raised { site.to_h }
         end
+      end
+    end
+
+    context "a post requiring login" do
+      should "not fail" do
+        site = Sources::Strategies.find("https://nijie.info/view.php?id=203688")
+
+        urls = %w[
+          https://pic.nijie.net/01/nijie_picture/676327_20170216212803_0.jpg
+          https://pic.nijie.net/04/nijie_picture/diff/main/676327_20170216212806_0.jpg
+        ]
+        assert_equal(urls, site.image_urls)
+      end
+    end
+
+    context "when the cached session cookie is invalid" do
+      should "clear the cached cookie after failing to fetch the data" do
+        site = Sources::Strategies.find("https://nijie.info/view.php?id=203688")
+
+        Cache.put("nijie-session-cookie", HTTP::Cookie.new(name: "NIJIEIJIEID", value: "fake", domain: "nijie.info", path: "/"))
+        assert_equal("fake", site.cached_session_cookie.value)
+
+        assert_equal([], site.image_urls)
+        assert_nil(Cache.get("nijie-session-cookie"))
+      end
+    end
+
+    context "a doujin post" do
+      should "work" do
+        image = "https://pic.nijie.net/01/dojin_main/dojin_sam/20120213044700%E3%82%B3%E3%83%94%E3%83%BC%20%EF%BD%9E%200011%E3%81%AE%E3%82%B3%E3%83%94%E3%83%BC.jpg"
+        page = "https://nijie.info/view.php?id=53023"
+        site = Sources::Strategies.find(image, page)
+
+        images = %w[
+          https://pic.nijie.net/01/dojin_main/20120213044700表紙サンプル.jpg
+          https://pic.nijie.net/01/dojin_main/dojin_sam/20120213044700コピー\ ～\ 0006のコピー.jpg
+          https://pic.nijie.net/01/dojin_main/dojin_sam/20120213044700コピー\ ～\ 0011のコピー.jpg
+        ]
+        tags = [%w[中出し https://nijie.info/search_dojin.php?word=%E4%B8%AD%E5%87%BA%E3%81%97],
+                %w[フェラ https://nijie.info/search_dojin.php?word=%E3%83%95%E3%82%A7%E3%83%A9],
+                %w[TS https://nijie.info/search_dojin.php?word=TS],
+                %w[ほのぼの https://nijie.info/search_dojin.php?word=%E3%81%BB%E3%81%AE%E3%81%BC%E3%81%AE]]
+
+        assert(true, site.doujin?)
+        assert_equal(image, site.image_url)
+        assert_equal(images, site.image_urls)
+        assert_equal("作品情報", site.artist_commentary_title)
+        assert_equal("<p>ある日目がさめると女の子になっていたいつき<br>\nそこへ幼馴染の小梅が現れて…<br>\n2010年コミックマーケット78で販売したコピー本のDL版で<br>\n本編18Pの短編マンガです <br>\n</p>", site.artist_commentary_desc)
+        assert_equal(tags, site.tags)
+        assert_equal("リック・ロガニー", site.artist_name)
+      end
+    end
+
+    context "normalizing for source" do
+      should "normalize correctly" do
+        source1 = "https://pic01.nijie.info/nijie_picture/diff/main/218856_0_236014_20170620101329.png"
+        source2 = "https://pic04.nijie.info/nijie_picture/diff/main/287736_161475_20181112032855_1.png"
+
+        assert_equal("https://nijie.info/view.php?id=218856", Sources::Strategies.normalize_source(source1))
+        assert_equal("https://nijie.info/view.php?id=287736", Sources::Strategies.normalize_source(source2))
+      end
+
+      should "avoid normalizing unnormalizable urls" do
+        bad_source1 = "https://pic01.nijie.info/nijie_picture/20120211210359.jpg"
+        bad_source2 = "https://pic04.nijie.info/omata/4829_20161128012012.png"
+        bad_source3 = "https://pic03.nijie.info/nijie_picture/28310_20131101215959.jpg"
+
+        assert_equal(bad_source1, Sources::Strategies.normalize_source(bad_source1))
+        assert_equal(bad_source2, Sources::Strategies.normalize_source(bad_source2))
+        assert_equal(bad_source3, Sources::Strategies.normalize_source(bad_source3))
       end
     end
   end

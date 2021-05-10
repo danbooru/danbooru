@@ -1,17 +1,18 @@
 class PostsController < ApplicationController
-  before_action :member_only, :except => [:show, :show_seq, :index, :home, :random]
   respond_to :html, :xml, :json, :js
   layout "sidebar"
 
   def index
     if params[:md5].present?
-      @post = Post.find_by!(md5: params[:md5])
+      @post = authorize Post.find_by!(md5: params[:md5])
       respond_with(@post) do |format|
         format.html { redirect_to(@post) }
       end
     else
-      @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], raw: params[:raw], random: params[:random], format: params[:format])
-      @posts = @post_set.posts
+      tag_query = params[:tags] || params.dig(:post, :tags)
+      @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], random: params[:random], format: params[:format])
+      @posts = authorize @post_set.posts, policy_class: PostPolicy
+      @post_set.log!
       respond_with(@posts) do |format|
         format.atom
       end
@@ -19,14 +20,9 @@ class PostsController < ApplicationController
   end
 
   def show
-    @post = Post.find(params[:id])
+    @post = authorize Post.find(params[:id])
 
     if request.format.html?
-      @comments = @post.comments
-      @comments = @comments.includes(:creator)
-      @comments = @comments.includes(:votes) if CurrentUser.is_member?
-      @comments = @comments.visible(CurrentUser.user)
-
       include_deleted = @post.is_deleted? || (@post.parent_id.present? && @post.parent.is_deleted?) || CurrentUser.user.show_deleted_children?
       @sibling_posts = @post.parent.present? ? @post.parent.children : Post.none
       @sibling_posts = @sibling_posts.undeleted unless include_deleted
@@ -41,6 +37,7 @@ class PostsController < ApplicationController
   end
 
   def show_seq
+    authorize Post
     context = PostSearchContext.new(params)
     if context.post_id
       redirect_to(post_path(context.post_id, q: params[:q]))
@@ -50,19 +47,27 @@ class PostsController < ApplicationController
   end
 
   def update
-    @post = Post.find(params[:id])
+    @post = authorize Post.find(params[:id])
+    @post.update(permitted_attributes(@post))
+    respond_with_post_after_update(@post)
+  end
 
-    @post.update(post_params) if @post.visible?
+  def destroy
+    @post = authorize Post.find(params[:id])
+
+    if params[:commit] == "Delete"
+      move_favorites = params.dig(:post, :move_favorites).to_s.truthy?
+      @post.delete!(params.dig(:post, :reason), move_favorites: move_favorites, user: CurrentUser.user)
+      flash[:notice] = "Post deleted"
+    end
+
     respond_with_post_after_update(@post)
   end
 
   def revert
-    @post = Post.find(params[:id])
+    @post = authorize Post.find(params[:id])
     @version = @post.versions.find(params[:version_id])
-
-    if @post.visible?
-      @post.revert_to!(@version)
-    end
+    @post.revert_to!(@version)
 
     respond_with(@post) do |format|
       format.js
@@ -71,7 +76,7 @@ class PostsController < ApplicationController
 
   def copy_notes
     @post = Post.find(params[:id])
-    @other_post = Post.find(params[:other_post_id].to_i)
+    @other_post = authorize Post.find(params[:other_post_id].to_i)
     @post.copy_notes_to(@other_post)
 
     if @post.errors.any?
@@ -83,24 +88,21 @@ class PostsController < ApplicationController
   end
 
   def random
-    @post = Post.tag_match(params[:tags]).random
+    @post = Post.user_tag_match(params[:tags]).random(1).first
     raise ActiveRecord::RecordNotFound if @post.nil?
+    authorize @post
     respond_with(@post) do |format|
       format.html { redirect_to post_path(@post, :tags => params[:tags]) }
     end
   end
 
   def mark_as_translated
-    @post = Post.find(params[:id])
+    @post = authorize Post.find(params[:id])
     @post.mark_as_translated(params[:post])
     respond_with_post_after_update(@post)
   end
 
   private
-
-  def tag_query
-    params[:tags] || (params[:post] && params[:post][:tags])
-  end
 
   def respond_with_post_after_update(post)
     respond_with(post) do |format|
@@ -123,19 +125,5 @@ class PostsController < ApplicationController
         render :json => post.to_json
       end
     end
-  end
-
-  def post_params
-    permitted_params = %i[
-      tag_string old_tag_string
-      parent_id old_parent_id
-      source old_source
-      rating old_rating
-      has_embedded_notes
-    ]
-    permitted_params += %i[is_rating_locked is_note_locked] if CurrentUser.is_builder?
-    permitted_params += %i[is_status_locked] if CurrentUser.is_admin?
-
-    params.require(:post).permit(permitted_params)
   end
 end

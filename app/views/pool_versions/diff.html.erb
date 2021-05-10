@@ -3,34 +3,26 @@
 
 <div id="c-pool-versions">
   <div id="a-diff">
-    <h1>Pool Version Comparison: <%= @pool_version.name %></h1>
+    <h1>Pool Version Comparison: <%= link_to @pool_version.pretty_name, pool_versions_path(search: { pool_id: @pool_version.pool_id }, type: params[:type], anchor: "pool-version-#{@pool_version.id}"), class: "pool-category-#{@pool_version.pool.category}" %></h1>
+
+    <%= render "versions/types" %>
 
     <% if @other_version.present? %>
-      <p>Showing differences between <%= compact_time @pool_version.updated_at %> (<%= link_to_user @pool_version.updater %>) and <%= compact_time @other_version.updated_at %> (<%= link_to_user @other_version.updater %>)</p>
-      <div class="diff-body">
-        <h2>Name:</h2>
-        <p>
-          <% if @pool_version.name != @other_version.name %>
-            <del><%= @other_version.name %></del> -> <ins><%= @pool_version.name %></ins>
-          <% else %>
-            <%= @pool_version.name %>
-          <% end %>
-        </p>
-      </div>
-      <div>
-        <h2>Posts:</h2>
-        <p><%= render "pool_versions/diff", diff: @pool_version.build_diff(@other_version) %></p>
-      </div>
-      <div class="diff-body">
-        <h2>Description:</h2>
-        <p>
-          <% if @pool_version.description != @other_version.description %>
-            <%= diff_body_html(@pool_version, @other_version, :description) %>
-          <% else %>
-            <i>Unchanged.</i>
-          <% end %>
-        </p>
-      </div>
+      <% if @pool_version.id != @other_version.id %>
+        <p>Showing differences between <%= compact_time @pool_version.updated_at %> (<%= link_to_user @pool_version.updater %>) and <%= compact_time @other_version.updated_at %> (<%= link_to_user @other_version.updater %>)</p>
+
+        <% if @pool_version.description != @other_version.description %>
+          <div class="diff-body">
+              <%= diff_body_html(@pool_version, @other_version, :description) %>
+          </div>
+        <% else %>
+          <p><em>No changes to description.</em></p>
+        <% end %>
+      <% else %>
+        <p><em>Version is latest!</em></p>
+      <% end %>
+    <% else %>
+      <p><em>No versions to compare!</em></p>
     <% end %>
   </div>
 </div>

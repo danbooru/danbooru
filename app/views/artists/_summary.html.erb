@@ -1,6 +1,18 @@
 <%# artist %>
 <ul>
-  <li><strong>Status</strong> <%= artist.status %></li>
+  <% if artist.is_banned? || artist.is_deleted? %>
+    <li>
+      <strong>Status</strong>
+
+      <% if artist.is_banned? %>
+        Banned
+      <% end %>
+
+      <% if artist.is_deleted? %>
+        Deleted
+      <% end %>
+    </li>
+  <% end %>
 
   <% if artist.other_names.present? %>
     <li>

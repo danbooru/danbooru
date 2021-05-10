@@ -1,46 +1,31 @@
 class PostReplacementsController < ApplicationController
   respond_to :html, :xml, :json, :js
-  before_action :moderator_only, except: [:index]
 
   def new
-    @post_replacement = Post.find(params[:post_id]).replacements.new
+    @post_replacement = authorize PostReplacement.new(post_id: params[:post_id], **permitted_attributes(PostReplacement))
     respond_with(@post_replacement)
   end
 
   def create
-    @post = Post.find(params[:post_id])
-    @post_replacement = @post.replace!(create_params)
+    @post = authorize Post.find(params[:post_id]), policy_class: PostReplacementPolicy
+    @post_replacement = @post.replace!(permitted_attributes(PostReplacement))
 
     flash[:notice] = "Post replaced"
     respond_with(@post_replacement, location: @post)
   end
 
   def update
-    @post_replacement = PostReplacement.find(params[:id])
-    @post_replacement.update(update_params)
+    @post_replacement = authorize PostReplacement.find(params[:id])
+    @post_replacement.update(permitted_attributes(@post_replacement))
 
     respond_with(@post_replacement)
   end
 
   def index
     params[:search][:post_id] = params.delete(:post_id) if params.key?(:post_id)
-    @post_replacements = PostReplacement.paginated_search(params)
+    @post_replacements = authorize PostReplacement.paginated_search(params)
     @post_replacements = @post_replacements.includes(:creator, post: :uploader) if request.format.html?
 
     respond_with(@post_replacements)
-  end
-
-  private
-
-  def create_params
-    params.require(:post_replacement).permit(:replacement_url, :replacement_file, :final_source, :tags)
-  end
-
-  def update_params
-    params.require(:post_replacement).permit(
-      :file_ext_was, :file_size_was, :image_width_was, :image_height_was, :md5_was,
-      :file_ext, :file_size, :image_width, :image_height, :md5,
-      :original_url, :replacement_url
-    )
   end
 end

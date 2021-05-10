@@ -1,0 +1,73 @@
+ARG RUBY_VERSION=2.7.1
+ARG NODE_VERSION=14.15.5
+ARG VIPS_VERSION=8.10.6
+ARG FFMPEG_VERSION=4.3.2
+
+
+
+FROM ubuntu:20.10 AS base
+
+WORKDIR /danbooru
+ENV PATH="/root/.asdf/bin:/root/.asdf/shims:$PATH"
+
+COPY config/docker/build-base-image.sh .
+
+RUN \
+  ./build-base-image.sh && \
+  chmod go+rx /root && \
+  useradd --home-dir /root --user-group danbooru && \
+  rm build-base-image.sh
+
+
+
+FROM base AS development
+ARG NODE_VERSION
+
+RUN \
+  apt-get update && \
+  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    build-essential libpq-dev libvips-dev libxml2-dev libxslt-dev zlib1g-dev \
+    curl ca-certificates dirmngr git gpg && \
+  rm -rf /var/lib/apt/lists/*
+
+RUN \
+  asdf plugin add nodejs && \
+  asdf install nodejs "$NODE_VERSION" && \
+  asdf global nodejs "$NODE_VERSION" && \
+  npm install --unsafe-perm=true -g yarn
+
+COPY .bundle Gemfile Gemfile.lock ./
+RUN \
+  bundle install --jobs "$(nproc)" && \
+  rm -rf "$(gem environment gemdir)/cache" && \
+  find "$(gem environment gemdir)" -name "*.o" -delete
+
+COPY .yarn package.json yarn.lock ./
+RUN yarn install
+
+COPY . .
+
+ARG SOURCE_COMMIT
+RUN echo "$SOURCE_COMMIT" > REVISION
+
+
+
+FROM development AS assets
+
+RUN \
+  bin/rails assets:precompile && \
+  rm -rf \
+    node_modules .yarn/cache tmp /usr/local/share/.cache/yarn \
+    /root/.yarn/berry/cache /root/.bundle/cache /root/.npm && \
+  asdf uninstall nodejs && \
+  ln -s /tmp tmp
+
+
+
+FROM base as production
+
+COPY --from=development /root /root
+COPY --from=assets /danbooru /danbooru
+
+USER danbooru
+CMD ["bin/rails", "server"]

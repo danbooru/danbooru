@@ -4,29 +4,22 @@
       <strong>Date</strong>
       <%= compact_time(post.created_at) %>
     </span>
-    <% if CurrentUser.is_moderator? %>
-      <span class="info">
-        <strong>User</strong>
-        <%= link_to_user(post.uploader) %>
-      </span>
-    <% end %>
+    <span class="info">
+      <strong>Uploader</strong>
+      <%= link_to_user(post.uploader) %>
+    </span>
     <span class="info">
       <strong>Rating</strong>
       <%= post.pretty_rating %>
     </span>
     <span class="info">
       <strong>Score</strong>
-      <span>
-        <span id="score-for-post-<%= post.id %>"><%= post.score %></span>
-        <% if CurrentUser.is_voter? %>
-          (vote <%= link_to(content_tag("i", nil, class: "far fa-thumbs-up"), post_post_votes_path(:score => "up", :post_id => post.id), :remote => true, :method => :post) %>/<%= link_to(content_tag("i", nil, class: "far fa-thumbs-down"), post_post_votes_path(:score => "down", :post_id => post.id), :remote => true, :method => :post) %>)
-        <% end %>
-      </span>
+      <%= render_post_votes post, current_user: CurrentUser.user %>
     </span>
   </div>
   <div class="row list-of-tags">
     <strong>Tags</strong>
-    <%= post.presenter.inline_tag_list_html %>
+    <%= render_inline_tag_list(post) %>
   </div>
 </div>
 

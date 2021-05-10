@@ -4,6 +4,7 @@ class PoolVersionsController < ApplicationController
   around_action :set_timeout
 
   def index
+    set_version_comparison
     @pool_versions = PoolVersion.paginated_search(params)
     @pool_versions = @pool_versions.includes(:updater, :pool) if request.format.html?
 
@@ -19,7 +20,8 @@ class PoolVersionsController < ApplicationController
     if params[:other_id]
       @other_version = PoolVersion.find(params[:other_id])
     else
-      @other_version = @pool_version.previous
+      set_version_comparison
+      @other_version = @pool_version.send(params[:type])
     end
   end
 

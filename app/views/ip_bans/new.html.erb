@@ -1,12 +1,21 @@
 <div id="c-ip-bans">
-  <div id="a-new">
+  <div id="a-new" class="fixed-width-container">
     <h1>New IP Ban</h1>
 
-    <%= error_messages_for "ip_ban" %>
+    <p>
+      A full IP ban prevents the IP from creating new accounts, logging in to
+      existing accounts, or editing the site in any way.
+    </p>
+
+    <p>
+      A partial IP ban prevents new signups from editing anything until after
+      they've verified their email address.
+    <p>
 
     <%= edit_form_for(@ip_ban) do |f| %>
       <%= f.input :ip_addr, label: "IP Address", as: :string, hint: "Add /24 to ban a subnet. Example: 1.2.3.4/24" %>
-      <%= f.input :reason %>
+      <%= f.input :reason, as: :string %>
+      <%= f.input :category, as: :select, include_blank: false, collection: [["Full", "full"], ["Partial", "partial"]] %>
       <%= f.button :submit, "Submit" %>
     <% end %>
   </div>

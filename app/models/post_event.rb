@@ -30,10 +30,6 @@ class PostEvent
     event.try(:reason) || ""
   end
 
-  def is_resolved
-    event.try(:is_resolved) || false
-  end
-
   def creator_id
     event.try(:creator_id) || event.try(:user_id)
   end
@@ -42,13 +38,25 @@ class PostEvent
     event.try(:creator) || event.try(:user)
   end
 
+  def status
+    if event.is_a?(PostApproval)
+      "approved"
+    elsif (event.is_a?(PostAppeal) && event.succeeded?) || (event.is_a?(PostFlag) && event.rejected?)
+      "approved"
+    elsif (event.is_a?(PostAppeal) && event.rejected?) || (event.is_a?(PostFlag) && event.succeeded?)
+      "deleted"
+    else
+      "pending"
+    end
+  end
+
   def is_creator_visible?(user = CurrentUser.user)
     case event
     when PostAppeal, PostApproval
       true
     when PostFlag
       flag = event
-      user.can_view_flagger_on_post?(flag)
+      Pundit.policy!(user, flag).can_view_flagger?
     end
   end
 
@@ -57,13 +65,13 @@ class PostEvent
       "creator_id": nil,
       "created_at": nil,
       "reason": nil,
-      "is_resolved": nil,
+      "status": nil,
       "type": nil
     }
   end
 
   # XXX can't use hidden_attributes because we don't inherit from ApplicationRecord.
-  def serializable_hash(**options)
+  def serializable_hash(options = {})
     hash = super
     hash = hash.except(:creator_id) unless is_creator_visible?
     hash

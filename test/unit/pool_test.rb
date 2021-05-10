@@ -8,14 +8,9 @@ class PoolTest < ActiveSupport::TestCase
     end
 
     CurrentUser.ip_addr = "127.0.0.1"
-
-    mock_pool_archive_service!
-    PoolVersion.sqs_service.stubs(:merge?).returns(false)
-    start_pool_archive_transaction
   end
 
   teardown do
-    rollback_pool_archive_transaction
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
   end
@@ -84,56 +79,34 @@ class PoolTest < ActiveSupport::TestCase
 
   context "Reverting a pool" do
     setup do
-      PoolVersion.stubs(:enabled?).returns(true)
+      @p1 = create(:post)
+      @p2 = create(:post)
+      @u1 = create(:user, created_at: 1.month.ago)
+      @u2 = create(:user, created_at: 1.month.ago)
 
-      @pool = FactoryBot.create(:pool)
-      @p1 = FactoryBot.create(:post)
-      @p2 = FactoryBot.create(:post)
-      @p3 = FactoryBot.create(:post)
-      CurrentUser.scoped(@user, "1.2.3.4") do
-        @pool.add!(@p1)
-        @pool.reload
-      end
-      CurrentUser.scoped(@user, "1.2.3.5") do
-        @pool.add!(@p2)
-        @pool.reload
-      end
-      CurrentUser.scoped(@user, "1.2.3.6") do
-        @pool.add!(@p3)
-        @pool.reload
-      end
-      CurrentUser.scoped(@user, "1.2.3.7") do
-        @pool.remove!(@p1)
-        @pool.reload
-      end
-      CurrentUser.scoped(@user, "1.2.3.8") do
-        version = @pool.versions[1]
-        @pool.revert_to!(version)
-        @pool.reload
-      end
+      @pool = create(:pool)
+      as(@u1) { @pool.add!(@p1) }
+      as(@u2) { @pool.add!(@p2) }
     end
 
     should "have the correct versions" do
-      assert_equal(6, @pool.versions.size)
-      assert_equal([], @pool.versions.all[0].post_ids)
-      assert_equal([@p1.id], @pool.versions.all[1].post_ids)
-      assert_equal([@p1.id, @p2.id], @pool.versions.all[2].post_ids)
-      assert_equal([@p1.id, @p2.id, @p3.id], @pool.versions.all[3].post_ids)
-      assert_equal([@p2.id, @p3.id], @pool.versions.all[4].post_ids)
+      assert_equal(3, @pool.reload.versions.size)
+      assert_equal([], @pool.versions[0].post_ids)
+      assert_equal([@p1.id], @pool.versions[1].post_ids)
+      assert_equal([@p1.id, @p2.id], @pool.versions[2].post_ids)
+      assert_equal([@p1.id, @p2.id], @pool.post_ids)
     end
 
     should "update its post_ids" do
-      assert_equal([@p1.id], @pool.post_ids)
-    end
+      @pool.revert_to!(@pool.versions[1])
+      assert_equal([@p1.id], @pool.reload.post_ids)
+      assert_equal("pool:#{@pool.id}", @p1.reload.pool_string)
+      #assert_equal("", @p2.reload.pool_string)
 
-    should "update any old posts that were removed" do
-      @p2.reload
-      assert_equal("", @p2.pool_string)
-    end
-
-    should "update any new posts that were added" do
-      @p1.reload
-      assert_equal("pool:#{@pool.id}", @p1.pool_string)
+      @pool.revert_to!(@pool.versions[0])
+      assert_equal([], @pool.reload.post_ids)
+      assert_equal("", @p1.reload.pool_string)
+      #assert_equal("", @p2.reload.pool_string)
     end
   end
 
@@ -262,34 +235,21 @@ class PoolTest < ActiveSupport::TestCase
 
     should "create new versions for each distinct user" do
       assert_equal(1, @pool.versions.size)
-      user2 = travel_to(1.month.ago) {FactoryBot.create(:user)}
 
-      CurrentUser.scoped(user2, "127.0.0.2") do
-        @pool.post_ids = [@p1.id]
-        @pool.save
-      end
-
-      @pool.reload
-      assert_equal(2, @pool.versions.size)
+      user2 = create(:user)
+      as(user2) { @pool.update!(post_ids: [@p1.id]) }
+      assert_equal(2, @pool.reload.versions.size)
       assert_equal(user2.id, @pool.versions.last.updater_id)
-      assert_equal("127.0.0.2", @pool.versions.last.updater_ip_addr.to_s)
 
-      CurrentUser.scoped(user2, "127.0.0.3") do
-        @pool.post_ids = [@p1.id, @p2.id]
-        @pool.save
-      end
-
-      @pool.reload
-      assert_equal(3, @pool.versions.size)
-      assert_equal(user2.id, @pool.versions.last.updater_id)
-      assert_equal("127.0.0.3", @pool.versions.last.updater_ip_addr.to_s)
+      user3 = create(:user)
+      as(user3) { @pool.update!(post_ids: [@p1.id, @p2.id]) }
+      assert_equal(3, @pool.reload.versions.size)
+      assert_equal(user3.id, @pool.versions.last.updater_id)
     end
 
     should "should create a version if the name changes" do
-      assert_difference("@pool.versions.size", 1) do
-        @pool.update(name: "blah")
-        assert_equal("blah", @pool.versions.last.name)
-      end
+      as(create(:user)) { @pool.update!(name: "blah") }
+      assert_equal("blah", @pool.versions.last.name)
       assert_equal(2, @pool.versions.size)
     end
 

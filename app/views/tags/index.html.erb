@@ -4,19 +4,22 @@
   <div id="a-index" class="fixed-width-container">
     <%= render "search" %>
 
-    <%= table_for @tags, {class: "striped autofit"} do |t| %>
-      <% t.column :post_count, name: "Count" %>
-      <% t.column "Name", td: {class: "col-expand"} do |tag| %>
-        <%= link_to_wiki "?", tag.name, class: tag_class(tag) %>
-        <%= link_to tag.name, posts_path(tags: tag.name), class: tag_class(tag) %>
+    <%= table_for @tags, class: "striped autofit" do |t| %>
+      <% t.column "Name", td: {class: "col-expand"} do |t| %>
+        <%= link_to_wiki "?", t.name, class: tag_class(t) %>
+        <%= link_to t.name, posts_path(tags: t.name), class: tag_class(t) %>
 
-        <% tag_alias = tag_alias_for_pattern(tag, params[:search][:name_or_alias_matches]) %>
+        <% tag_alias = t.tag_alias_for_pattern(params[:search][:name_or_alias_matches]) %>
         <% if tag_alias.present? %>
           ← <%= link_to tag_alias.antecedent_name, tag_alias, class: "fineprint" %>
         <% end %>
+
+        <%= tag.span humanized_number(t.post_count), class: "post-count", title: t.post_count %>
       <% end %>
       <% t.column column: "control" do |tag| %>
-        <%= link_to_if tag.editable_by?(CurrentUser.user), "Edit", edit_tag_path(tag) %> |
+        <% if policy(tag).update? %>
+          <%= link_to "Edit", edit_tag_path(tag) %> |
+        <% end %>
         <%= link_to "History", post_versions_path(search: { changed_tags: tag.name }) %> |
         <%= link_to "Related", related_tag_path(search: { query: tag.name }) %> |
         <%= link_to "Similar", tags_path(search: { fuzzy_name_matches: tag.name, order: :similarity }) %>

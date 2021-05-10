@@ -1,3 +1,6 @@
-<% if post.visible? %>
-  <%= image_tag(post.file_url_for(CurrentUser.user), :width => post.image_width_for(CurrentUser.user), :height => post.image_height_for(CurrentUser.user), :id => "image", "data-original-width" => post.image_width, "data-original-height" => post.image_height, "data-large-width" => post.large_image_width, "data-large-height" => post.large_image_height, "data-tags" => post.tag_string, :alt => post.presenter.humanized_essential_tag_string, "data-uploader" => post.uploader.name, "data-rating" => post.rating, "data-flags" => post.status_flags, "data-parent-id" => post.parent_id, "data-has-children" => post.has_children?, "data-has-active-children" => post.has_active_children?, "data-score" => post.score, "data-fav-count" => post.fav_count, "itemprop" => "contentUrl") %>
+<% if policy(post).visible? %>
+  <%= content_tag(:picture) do -%>
+    <%= tag.source media: "(max-width: 660px)", srcset: post.tagged_large_file_url -%>
+    <%= tag.img width: post.image_width_for(CurrentUser.user), height: post.image_height_for(CurrentUser.user), id: "image", class: "fit-width", alt: post.presenter.humanized_essential_tag_string, src: post.file_url_for(CurrentUser.user) %>
+  <% end -%>
 <% end %>

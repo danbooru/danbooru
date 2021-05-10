@@ -3,8 +3,8 @@
 }
 
 header#top {
-  h1#app-name-header {
-    font-size: 2em;
+  #app-name-header {
+    font-size: var(--text-xxl);
     margin: 0 30px;
   }
 

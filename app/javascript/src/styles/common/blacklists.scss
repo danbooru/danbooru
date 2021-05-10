@@ -11,7 +11,7 @@
       vertical-align: bottom;
     }
 
-    a.blacklisted-active {
+    a.blacklisted-inactive {
       text-decoration: line-through;
     }
   }
@@ -40,6 +40,6 @@
   }
 }
 
-.post-preview.blacklisted-active, #image-container.blacklisted-active, #c-comments .post.blacklisted-active {
+.post-preview.blacklisted-active, .image-container.blacklisted-active, #c-comments .post.blacklisted-active {
   display: none !important;
 }

@@ -32,9 +32,6 @@ if [[ -z "$HOSTNAME" ]] ; then
   exit 1
 fi
 
-echo -n "* Enter the VLAN IP address for this server (ex: 172.16.0.1, enter nothing to skip): "
-read VLAN_IP_ADDR
-
 # Install packages
 echo "* Installing packages..."
 
@@ -51,17 +48,7 @@ apt-get -y install zlib1g-dev libglib2.0-dev
 apt-get -y install $LIBSSL_DEV_PKG build-essential automake libxml2-dev libxslt-dev ncurses-dev sudo libreadline-dev flex bison ragel redis git curl libcurl4-openssl-dev sendmail-bin sendmail nginx ssh coreutils ffmpeg mkvtoolnix
 apt-get -y install libpq-dev postgresql-client
 apt-get -y install liblcms2-dev $LIBJPEG_TURBO_DEV_PKG libexpat1-dev libgif-dev libpng-dev libexif-dev
-
-# vrack specific stuff
-if [ -n "$VLAN_IP_ADDR" ] ; then
-  apt-get -y install vlan
-  modprobe 8021q
-  echo "8021q" >> /etc/modules
-  vconfig add eno2 99
-  ip addr add $VLAN_IP_ADDR/24 dev eno2.99
-  ip link set up eno2.99
-  curl -L -s $GITHUB_INSTALL_SCRIPTS/vrack-cfg.yaml -o /etc/netplan/01-netcfg.yaml
-fi
+apt-get -y install gcc g++
 
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
@@ -90,7 +77,7 @@ chsh -s /bin/bash danbooru
 usermod -G danbooru,sudo danbooru
 
 # Set up Postgres
-export PG_VERSION=`pg_config --version | egrep -o '[0-9]{1,}\.[0-9]{1,}'`
+export PG_VERSION=`pg_config --version | egrep -o '[0-9]{1,}\.[0-9]{1,}[^-]'`
 if verlte 9.5 $PG_VERSION ; then
 	# only do this on postgres 9.5 and above
 
@@ -112,13 +99,6 @@ sudo -u danbooru mkdir -p ~danbooru/.rbenv/plugins
 sudo -u danbooru git clone git://github.com/sstephenson/ruby-build.git ~danbooru/.rbenv/plugins/ruby-build
 sudo -u danbooru bash -l -c "RUBY_CONFIGURE_OPTS=--disable-install-doc rbenv install --verbose $RUBY_VERSION"
 sudo -u danbooru bash -l -c "rbenv global $RUBY_VERSION"
-
-# Generate secret token and secret key
-echo "* Generating secret keys..."
-sudo -u danbooru mkdir ~danbooru/.danbooru/
-sudo -u danbooru sh -c 'openssl rand -hex 32 > ~danbooru/.danbooru/secret_token'
-sudo -u danbooru sh -c 'openssl rand -hex 32 > ~danbooru/.danbooru/session_secret_key'
-chmod 600 ~danbooru/.danbooru/*
 
 # Install gems
 echo "* Installing gems..."
@@ -152,7 +132,6 @@ mkdir -p /var/www/danbooru2/shared/data
 mkdir -p /var/www/danbooru2/shared/data/preview
 mkdir -p /var/www/danbooru2/shared/data/sample
 chown -R danbooru:danbooru /var/www/danbooru2
-curl -L -s $GITHUB_INSTALL_SCRIPTS/database.yml.templ -o /var/www/danbooru2/shared/config/database.yml
 curl -L -s $GITHUB_INSTALL_SCRIPTS/danbooru_local_config.rb.templ -o /var/www/danbooru2/shared/config/danbooru_local_config.rb
 
 echo "* Almost done! You are now ready to deploy Danbooru onto this server."

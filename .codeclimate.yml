@@ -1,0 +1,45 @@
+version: 2
+checks:
+  argument-count:
+    enabled: false
+  complex-logic:
+    config:
+      threshold: 8
+  file-lines:
+    config:
+      threshold: 1000
+  method-complexity:
+    config:
+      threshold: 15
+  method-count:
+    enabled: false
+  method-lines:
+    enabled: false
+  nested-control-flow:
+    config:
+      threshold: 4
+  return-statements:
+    enabled: false
+plugins:
+  eslint:
+    enabled: true
+    channel: "eslint-6"
+    config:
+      extensions:
+        - .js
+        - .js.erb
+  rubocop:
+    enabled: true
+    channel: "rubocop-0-83"
+  stylelint:
+    enabled: true
+exclude_patterns:
+  - "app/javascript/vendor"
+  - "config/"
+  - "db/"
+  - "lib/"
+  - "log/"
+  - "script/"
+  - "tmp/"
+  - "**/node_modules/"
+  - "**/test/"

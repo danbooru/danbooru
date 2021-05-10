@@ -1,11 +1,8 @@
 <div class="appeal-dialog-body">
   <%= embed_wiki("help:appeal_notice") %>
 
-  <%# XXX dtext_field expects there to be a `post_appeal` instance variable. %>
-  <% @post_appeal = post_appeal %>
-  <%= edit_form_for(@post_appeal, format: :js, remote: true) do |f| %>
+  <%= edit_form_for(post_appeal, format: :js, remote: true) do |f| %>
     <%= f.hidden_field :post_id %>
-    <%= dtext_field "post_appeal", "reason", preview_id: "dtext-preview-for-post-appeal", type: "string" %>
-    <%= dtext_preview_button "post_appeal", "reason", preview_id: "dtext-preview-for-post-appeal" %>
+    <%= f.input :reason, as: :dtext, inline: true, placeholder: "Optional" %>
   <% end %>
 </div>

@@ -1,14 +1,13 @@
-var post_id = <%= @post.id %>;
-var $post = $(`#post_${post_id}`);
-
 <% if @post.valid? %>
-  $post.replaceWith("<%= j PostPresenter.preview(@post, show_deleted: true) %>");
+  var $post = $("#post_<%= @post.id %>");
+  var $new_post = $("<%= j post_preview(@post, show_deleted: true) %>");
+  Danbooru.Blacklist.apply_post($new_post.get(0));
+  $("#post_<%= @post.id %>").replaceWith($new_post);
+  <% if params[:mode] == "quick-edit" %>
+    Danbooru.PostModeMenu.close_edit_form();
+  <% end %>
 <% else %>
-  Danbooru.error(`Post #${post_id}: <%= j @post.errors.full_messages.join("; ") %>`);
-<% end %>
-
-<% if @post.valid? && params[:mode] == "quick-edit" %>
-  Danbooru.PostModeMenu.close_edit_form();
+  Danbooru.error(`Post #<%= @post.id %>: <%= j @post.errors.full_messages.join("; ") %>`);
 <% end %>
 
 $(document).trigger("danbooru:post-preview-updated", <%= raw @post.to_json %>);

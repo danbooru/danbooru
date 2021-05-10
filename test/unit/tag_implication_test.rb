@@ -3,8 +3,8 @@ require 'test_helper'
 class TagImplicationTest < ActiveSupport::TestCase
   context "A tag implication" do
     setup do
-      user = FactoryBot.create(:admin_user)
-      CurrentUser.user = user
+      @admin = create(:admin_user)
+      CurrentUser.user = @admin
       CurrentUser.ip_addr = "127.0.0.1"
     end
 
@@ -22,10 +22,6 @@ class TagImplicationTest < ActiveSupport::TestCase
 
       should allow_value('active').for(:status)
       should allow_value('deleted').for(:status)
-      should allow_value('pending').for(:status)
-      should allow_value('processing').for(:status)
-      should allow_value('queued').for(:status)
-      should allow_value('error: derp').for(:status)
 
       should_not allow_value('ACTIVE').for(:status)
       should_not allow_value('error').for(:status)
@@ -45,42 +41,20 @@ class TagImplicationTest < ActiveSupport::TestCase
         ti2 = FactoryBot.create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "retired")
         ti3 = FactoryBot.create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
         ti4 = FactoryBot.create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "deleted")
-        ti5 = FactoryBot.create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", status: "pending")
-        [ti1, ti2, ti3, ti4, ti5].each { |ti| assert(ti.valid?) }
+        [ti1, ti2, ti3, ti4].each { |ti| assert(ti.valid?) }
 
-        ti5.update(status: "active")
-        assert_includes(ti5.errors[:antecedent_name], "has already been taken")
-      end
-    end
-
-    context "#update_notice" do
-      setup do
-        @forum_topic = FactoryBot.create(:forum_topic)
-      end
-
-      should "update the cache" do
-        FactoryBot.create(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", skip_secondary_validations: true, forum_topic: @forum_topic)
-        assert_equal(@forum_topic.id, Cache.get("tcn:aaa"))
+        ti4.update(status: "active")
+        assert_includes(ti4.errors[:antecedent_name], "Implication already exists")
       end
     end
 
     context "#reject!" do
       should "not be blocked by alias validations" do
-        ti = create(:tag_implication, antecedent_name: "cat", consequent_name: "animal", status: "pending")
+        ti = create(:tag_implication, antecedent_name: "cat", consequent_name: "animal", status: "active")
         ta = create(:tag_alias, antecedent_name: "cat", consequent_name: "kitty", status: "active")
 
         ti.reject!
         assert_equal("deleted", ti.reload.status)
-      end
-    end
-
-    context "on secondary validation" do
-      should "warn if either tag is missing a wiki" do
-        ti = FactoryBot.build(:tag_implication, antecedent_name: "aaa", consequent_name: "bbb", skip_secondary_validations: false)
-
-        assert(ti.invalid?)
-        assert_includes(ti.errors[:base], "The aaa tag needs a corresponding wiki page")
-        assert_includes(ti.errors[:base], "The bbb tag needs a corresponding wiki page")
       end
     end
 
@@ -128,7 +102,7 @@ class TagImplicationTest < ActiveSupport::TestCase
       ti2 = FactoryBot.build(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb")
       ti2.save
       assert(ti2.errors.any?, "Tag implication should not have validated.")
-      assert_includes(ti2.errors.full_messages, "Antecedent name has already been taken")
+      assert_includes(ti2.errors.full_messages, "Implication already exists")
     end
 
     should "not validate if its antecedent or consequent are aliased to another tag" do
@@ -142,15 +116,14 @@ class TagImplicationTest < ActiveSupport::TestCase
     end
 
     should "update any affected post upon save" do
-      p1 = FactoryBot.create(:post, :tag_string => "aaa bbb ccc")
-      ti1 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "xxx")
-      ti2 = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "yyy")
+      p1 = create(:post, tag_string: "sword")
+      p2 = create(:post, tag_string: "sword weapon")
 
-      ti1.approve!
-      ti2.approve!
+      TagImplication.approve!(antecedent_name: "sword", consequent_name: "weapon", approver: @admin)
       perform_enqueued_jobs
 
-      assert_equal("aaa bbb ccc xxx yyy", p1.reload.tag_string)
+      assert_equal("sword weapon", p1.reload.tag_string)
+      assert_equal("sword weapon", p2.reload.tag_string)
     end
 
     context "when calculating implied tags" do
@@ -172,41 +145,13 @@ class TagImplicationTest < ActiveSupport::TestCase
 
       should "not include inactive implications" do
         create(:tag_implication, antecedent_name: "a", consequent_name: "b", status: "active")
-        create(:tag_implication, antecedent_name: "b", consequent_name: "c", status: "pending")
+        create(:tag_implication, antecedent_name: "b", consequent_name: "c", status: "deleted")
         create(:tag_implication, antecedent_name: "c", consequent_name: "d", status: "active")
 
         assert_equal(["b"], TagImplication.tags_implied_by("a").map(&:name))
         assert_equal([], TagImplication.tags_implied_by("b").map(&:name))
         assert_equal(["d"], TagImplication.tags_implied_by("c").map(&:name))
         assert_equal([], TagImplication.tags_implied_by("d").map(&:name))
-      end
-    end
-
-    context "with an associated forum topic" do
-      setup do
-        @topic = FactoryBot.create(:forum_topic, :title => "Tag implication: aaa -> bbb")
-        @post = FactoryBot.create(:forum_post, topic_id: @topic.id, :body => TagImplicationRequest.command_string("aaa", "bbb"))
-        @implication = FactoryBot.create(:tag_implication, :antecedent_name => "aaa", :consequent_name => "bbb", :forum_topic => @topic, :forum_post => @post, :status => "pending")
-      end
-
-      should "update the topic when processed" do
-        assert_difference("ForumPost.count") do
-          @implication.approve!
-          perform_enqueued_jobs
-        end
-
-        assert_match(/The tag implication .* has been approved/, @post.reload.body)
-        assert_equal("[APPROVED] Tag implication: aaa -> bbb", @topic.reload.title)
-      end
-
-      should "update the topic when rejected" do
-        assert_difference("ForumPost.count") do
-          @implication.reject!
-        end
-        @post.reload
-        @topic.reload
-        assert_match(/The tag implication .* has been rejected/, @post.body)
-        assert_equal("[REJECTED] Tag implication: aaa -> bbb", @topic.title)
       end
     end
   end

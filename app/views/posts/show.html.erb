@@ -1,7 +1,8 @@
 <% page_title @post.presenter.humanized_essential_tag_string %>
 <% meta_description "View this #{@post.image_width}x#{@post.image_height} #{number_to_human_size(@post.file_size)} image" %>
-
+<% canonical_url post_url(@post, host: Danbooru.config.hostname) %>
 <% atom_feed_tag "Comments for post ##{@post.id}", comments_url(:atom, search: { post_id: @post.id }) %>
+
 <%= render "posts/partials/common/secondary_links" %>
 
 <% content_for(:sidebar) do %>
@@ -10,28 +11,21 @@
   <%= render "posts/partials/index/blacklist" %>
 
   <section id="tag-list">
-    <%= @post.presenter.split_tag_list_html(current_query: params[:q], show_extra_links: CurrentUser.user.is_gold?) %>
+    <%= render_categorized_tag_list(@post, current_query: params[:q], show_extra_links: policy(@post).show_extra_links?) %>
   </section>
 
   <section id="post-information">
-    <h1>Information</h1>
+    <h2>Information</h2>
     <%= render "posts/partials/show/information", :post => @post %>
   </section>
 
-  <% if Danbooru.config.addthis_key.present? %>
-    <section id="post-share">
-      <h1>Share</h1>
-      <%= render "posts/partials/show/share", post: @post %>
-    </section>
-  <% end %>
-
   <section id="post-options">
-    <h1>Options</h1>
+    <h2>Options</h2>
     <%= render "posts/partials/show/options", :post => @post %>
   </section>
 
   <section id="post-history">
-    <h1>History</h1>
+    <h2>History</h2>
     <ul>
       <li id="post-history-tags"><%= link_to "Tags", post_versions_path(search: { post_id: @post.id }) %></li>
       <li id="post-history-pools"><%= link_to "Pools", pool_versions_path(search: { post_id: @post.id }) %></li>
@@ -44,50 +38,41 @@
 <% end %>
 
 <% content_for(:content) do %>
-  <% if @post.presenter.has_nav_links?(self) %>
-    <%= render "posts/partials/show/nav_links", :post => @post, :position => "top" %>
+  <% if !CurrentUser.user.new_post_navigation_layout %>
+    <%= render_post_navbar(@post, current_user: CurrentUser.user, search: params[:q]) %>
   <% end %>
 
   <%= render "posts/partials/show/notices", :post => @post %>
 
-  <%= content_tag(:section, { id: "image-container" }.merge(PostPresenter.data_attributes(@post))) do -%>
-    <div id="note-container"></div>
-    <div id="note-preview"></div>
+  <%= content_tag(:section, class: "image-container note-container", **PostPreviewComponent.new(post: @post).data_attributes) do -%>
     <%= render "posts/partials/show/embedded", post: @post %>
+    <div id="note-preview"></div>
   <% end -%>
 
-  <% if CurrentUser.is_member? %>
-    <%= content_tag(:div, class: "fav-buttons fav-buttons-#{@post.is_favorited?}") do %>
+  <% if policy(Favorite).create? %>
+    <%= content_tag(:div, class: "mb-2 fav-buttons fav-buttons-#{@post.favorited_by?(CurrentUser.user)}") do %>
       <%= form_tag(favorites_path(post_id: @post.id), method: "post", id: "add-fav-button", "data-remote": true) do %>
-        <%= button_tag tag.i(class: "far fa-heart"), class: "ui-button ui-widget ui-corner-all", "data-disable-with": tag.i(class: "fas fa-spinner fa-spin") %>
+        <%= button_tag empty_heart_icon, class: "ui-button ui-widget ui-corner-all", "data-disable-with": spinner_icon %>
       <% end %>
 
       <%= form_tag(favorite_path(@post.id), method: "delete", id: "remove-fav-button", "data-remote": true) do %>
-        <%= button_tag tag.i(class: "fas fa-heart"), class: "ui-button ui-widget ui-corner-all", "data-disable-with": tag.i(class: "fas fa-spinner fa-spin") %>
+        <%= button_tag solid_heart_icon, class: "ui-button ui-widget ui-corner-all", "data-disable-with": spinner_icon %>
       <% end %>
     <% end %>
   <% end %>
 
-  <section id="mark-as-translated-section" style="display: none;">
-    <%= form_tag(mark_as_translated_post_path(@post), :class => "simple_form", :method => :put) do |f| %>
-      <%= hidden_field_tag :tags_query, params[:q] %>
-      <%= hidden_field_tag :pool_id, params[:pool_id] %>
+  <section id="mark-as-translated-section">
+    <%= edit_form_for(@post, url: mark_as_translated_post_path(@post), method: :put) do |f| %>
+      <%= f.input :tags_query, as: :hidden, input_html: { id: nil, name: "tags_query", value: params[:q] } %>
+      <%= f.input :pool_id, as: :hidden, input_html: { id: nil, name: "pool_id", value: params[:pool_id] } %>
+      <%= f.input :favgroup_id, as: :hidden, input_html: { id: nil, name: "favgroup_id", value: params[:favgroup_id] } %>
 
-      <fieldset>
-        <label for="post_check_translation">
-          <%= check_box "post", "check_translation", :checked => @post.has_tag?("check_translation") %>
-          Check translation
-        </label>
-
-        <label for="post_partially_translated">
-          <%= check_box "post", "partially_translated", :checked => @post.has_tag?("partially_translated") %>
-          Partially translated
-        </label>
+      <fieldset class="inline-fieldset">
+        <%= f.input :check_translation, as: :boolean, input_html: { checked: @post.has_tag?("check_translation") } %>
+        <%= f.input :partially_translated, as: :boolean, input_html: { checked: @post.has_tag?("partially_translated") } %>
       </fieldset>
 
-      <div class="input">
-        <%= submit_tag "Mark as translated" %>
-      </div>
+      <%= f.submit "Mark as translated" %>
     <% end %>
   </section>
 
@@ -97,18 +82,18 @@
     </div>
   <% end %>
 
-  <% if @post.presenter.has_nav_links?(self) %>
-    <%= render "posts/partials/show/nav_links", :post => @post, :position => "bottom" %>
+  <% if CurrentUser.user.new_post_navigation_layout %>
+    <%= render_post_navbar(@post, current_user: CurrentUser.user, search: params[:q]) %>
   <% end %>
 
-  <menu id="post-sections">
+  <menu id="post-sections" class="mb-4">
     <li class="active"><a href="#comments">Comments</a></li>
 
     <% if RecommenderService.available_for_post?(@post) %>
       <li><a href="#recommended">Recommended</a></li>
     <% end %>
 
-    <% if CurrentUser.is_member? && @post.visible? %>
+    <% if policy(@post).update? %>
       <li><a href="#edit" id="post-edit-link" data-shortcut="e">Edit</a></li>
     <% end %>
   </menu>
@@ -120,36 +105,35 @@
   <% end %>
 
   <section id="comments">
-    <% if !CurrentUser.user.is_builder? %>
-      <h2>Before commenting, read the <%= link_to_wiki "how to comment guide", "howto:comment" %>.</h2>
-    <% end %>
-    <%= render "comments/partials/index/list", comments: @comments, post: @post, page: :post %>
+    <%= render_comment_section(@post, current_user: CurrentUser.user) %>
   </section>
 
   <section id="notes" style="display: none;">
     <% if @post.has_notes? %>
-      <% cache("p/#{@post.id}/n/#{@post.last_noted_at.to_i}") do %>
-        <%= render :partial => "notes/note", :collection => @post.notes.active %>
-      <% end %>
+      <%= render partial: "notes/note", collection: @post.notes.active %>
     <% end %>
   </section>
 
-  <% if CurrentUser.is_member? && @post.visible? %>
+  <% if policy(@post).update? %>
     <section id="edit" style="display: none;">
       <%= render "posts/partials/show/edit", :post => @post %>
     </section>
   <% end %>
 <% end %>
 
-<% if CurrentUser.is_member? %>
+<% if policy(Pool).create? %>
   <div id="add-to-pool-dialog" title="Add to pool" style="display: none;">
     <%= render "pool_elements/new" %>
   </div>
+<% end %>
 
+<% if policy(ArtistCommentary).create_or_update? %>
   <div id="add-commentary-dialog" title="Add artist commentary" style="display: none;">
     <%= render "artist_commentaries/form", post: @post, artist_commentary: @post.artist_commentary || ArtistCommentary.new(post: @post) %>
   </div>
+<% end %>
 
+<% if policy(FavoriteGroup).create? %>
   <div id="add-to-favgroup-dialog" title="Add to favorite group" style="display: none;">
     <%= render "favorite_groups/add_to_favgroup_dialog", :post => @post %>
   </div>
@@ -161,16 +145,18 @@
   <meta name="post-id" content="<%= @post.id %>">
   <meta name="post-has-embedded-notes" content="<%= @post.has_embedded_notes? %>">
 
-  <% if @post.visible? %>
-    <%= tag.meta name: "og:image", content: @post.open_graph_image_url %>
-  <% end %>
+  <% if policy(@post).visible? %>
+    <%= tag.meta property: "og:image", content: @post.open_graph_image_url %>
 
-  <%= tag.meta name: "canonical", content: post_url(@post, host: Danbooru.config.hostname, protocol: "https") %>
+    <% if @post.is_video? %>
+      <%= json_ld_video_data(@post) %>
+    <% end %>
+  <% end %>
 
   <% if @post.twitter_card_supported? %>
     <meta name="twitter:card" content="summary_large_image">
 
-    <% if @post.visible? %>
+    <% if policy(@post).visible? %>
       <%= tag.meta name: "twitter:image", content: @post.open_graph_image_url %>
     <% end %>
   <% end %>

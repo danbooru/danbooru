@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
-  class ApiLimitError < StandardError; end
+  include Pundit
+  helper_method :search_params
 
   self.responder = ApplicationResponder
 
@@ -7,10 +8,12 @@ class ApplicationController < ActionController::Base
   before_action :reset_current_user
   before_action :set_current_user
   before_action :normalize_search
-  before_action :api_check
+  before_action :check_rate_limit
+  before_action :ip_ban_check
   before_action :set_variant
-  before_action :enable_cors
+  before_action :add_headers
   before_action :cause_error
+  after_action :skip_session_if_publicly_cached
   after_action :reset_current_user
   layout "default"
 
@@ -24,19 +27,23 @@ class ApplicationController < ActionController::Base
 
   private
 
-  def respond_with(subject, *options, &block)
+  def respond_with(subject, *args, model: model_name, **options, &block)
     if params[:action] == "index" && is_redirect?(subject)
       redirect_to_show(subject)
       return
     end
 
     if subject.respond_to?(:includes) && (request.format.json? || request.format.xml?)
-      associations = ParameterBuilder.includes_parameters(params[:only], model_name)
+      associations = ParameterBuilder.includes_parameters(params[:only], model)
       subject = subject.includes(associations)
     end
 
     @current_item = subject
     super
+  end
+
+  def set_version_comparison(default_type = "previous")
+    params[:type] = %w[previous subsequent current].include?(params[:type]) ? params[:type] : default_type
   end
 
   def model_name
@@ -57,28 +64,24 @@ class ApplicationController < ActionController::Base
 
   protected
 
-  def enable_cors
+  def add_headers
     response.headers["Access-Control-Allow-Origin"] = "*"
+    response.headers["X-Git-Hash"] = Rails.application.config.x.git_hash
   end
 
-  def api_check
-    return if CurrentUser.is_anonymous? || request.get? || request.head?
+  def check_rate_limit
+    return if request.get? || request.head?
 
-    if CurrentUser.user.token_bucket.nil?
-      TokenBucket.create_default(CurrentUser.user)
-      CurrentUser.user.reload
-    end
+    rate_limiter = RateLimiter.for_action(controller_name, action_name, CurrentUser.user, CurrentUser.ip_addr)
+    headers["X-Rate-Limit"] = rate_limiter.to_json
 
-    throttled = CurrentUser.user.token_bucket.throttled?
-    headers["X-Api-Limit"] = CurrentUser.user.token_bucket.token_count.to_s
-
-    if throttled
-      raise ApiLimitError, "too many requests"
-    end
+    rate_limiter.limit!
   end
 
   def rescue_exception(exception)
     case exception
+    when ActionView::Template::Error
+      rescue_exception(exception.cause)
     when ActiveRecord::QueryCanceled
       render_error_page(500, exception, template: "static/search_timeout", message: "The database timed out running your query.")
     when ActionController::BadRequest
@@ -87,7 +90,9 @@ class ApplicationController < ActionController::Base
       render_error_page(401, exception, template: "sessions/new")
     when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest
       render_error_page(403, exception)
-    when User::PrivilegeError
+    when ActiveSupport::MessageVerifier::InvalidSignature # raised by `find_signed!`
+      render_error_page(403, exception, template: "static/access_denied", message: "Access denied")
+    when User::PrivilegeError, Pundit::NotAuthorizedError
       render_error_page(403, exception, template: "static/access_denied", message: "Access denied")
     when ActiveRecord::RecordNotFound
       render_error_page(404, exception, message: "That record was not found.")
@@ -96,31 +101,32 @@ class ApplicationController < ActionController::Base
     when ActionController::UnknownFormat, ActionView::MissingTemplate
       render_error_page(406, exception, message: "#{request.format} is not a supported format for this page")
     when PaginationExtension::PaginationError
-      render_error_page(410, exception, template: "static/pagination_error", message: "You cannot go beyond page #{Danbooru.config.max_numbered_pages}.")
-    when Post::SearchError
+      render_error_page(410, exception, template: "static/pagination_error", message: "You cannot go beyond page #{CurrentUser.user.page_limit}.")
+    when PostQueryBuilder::TagLimitError
       render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
-    when ApiLimitError
+    when RateLimiter::RateLimitError
       render_error_page(429, exception)
     when NotImplementedError
       render_error_page(501, exception, message: "This feature isn't available: #{exception.message}")
     when PG::ConnectionBad
       render_error_page(503, exception, message: "The database is unavailable. Try again later.")
     else
+      raise exception if !Rails.env.production? || Danbooru.config.debug_mode
       render_error_page(500, exception)
     end
   end
 
-  def render_error_page(status, exception, message: exception.message, template: "static/error", format: request.format.symbol)
+  def render_error_page(status, exception = nil, message: exception.message, template: "static/error", format: request.format.symbol)
     @exception = exception
     @expected = status < 500
     @message = message.encode("utf-8", invalid: :replace, undef: :replace)
-    @backtrace = Rails.backtrace_cleaner.clean(@exception.backtrace)
+    @backtrace = Rails.backtrace_cleaner.clean(@exception.backtrace) if @exception
     format = :html unless format.in?(%i[html json xml js atom])
 
     # if InvalidAuthenticityToken was raised, CurrentUser isn't set so we have to use the blank layout.
     layout = CurrentUser.user.present? ? "default" : "blank"
 
-    DanbooruLogger.log(@exception, expected: @expected)
+    DanbooruLogger.log(@exception, expected: @expected) if @exception
     render template, layout: layout, status: status, formats: format
   rescue ActionView::MissingTemplate
     render "static/error", layout: layout, status: status, formats: format
@@ -134,7 +140,14 @@ class ApplicationController < ActionController::Base
     CurrentUser.user = nil
     CurrentUser.ip_addr = nil
     CurrentUser.safe_mode = false
-    CurrentUser.root_url = root_url.chomp("/")
+  end
+
+  # Skip setting the session cookie if the response is being publicly cached to
+  # prevent the user's session cookie from being leaked to other users.
+  def skip_session_if_publicly_cached
+    if response.cache_control[:public] == true
+      request.session_options[:skip] = true
+    end
   end
 
   def set_variant
@@ -143,9 +156,9 @@ class ApplicationController < ActionController::Base
 
   # allow api clients to force errors for testing purposes.
   def cause_error
-    return unless params[:error].present?
+    return unless params[:cause_error].present?
 
-    status = params[:error].to_i
+    status = params[:cause_error].to_i
     raise ArgumentError, "invalid status code" unless status.in?(400..599)
 
     error = StandardError.new(params[:message])
@@ -154,15 +167,24 @@ class ApplicationController < ActionController::Base
     render_error_page(status, error)
   end
 
-  def role_only!(role)
-    raise User::PrivilegeError if !CurrentUser.send("is_#{role}?")
-    raise User::PrivilegeError if !request.get? && CurrentUser.user.is_banned?
-    raise User::PrivilegeError if !request.get? && IpBan.is_banned?(CurrentUser.ip_addr)
+  def ip_ban_check
+    raise User::PrivilegeError if !request.get? && IpBan.hit!(:full, CurrentUser.ip_addr)
   end
 
-  User::Roles.each do |role|
-    define_method("#{role}_only") do
-      role_only!(role)
+  def pundit_user
+    CurrentUser.user
+  end
+
+  def pundit_params_for(record)
+    params.fetch(PolicyFinder.new(record).param_key, {})
+  end
+
+  def requires_reauthentication
+    return if CurrentUser.user.is_anonymous?
+
+    last_authenticated_at = session[:last_authenticated_at]
+    if last_authenticated_at.blank? || Time.parse(last_authenticated_at) < 60.minutes.ago
+      redirect_to confirm_password_session_path(url: request.fullpath)
     end
   end
 

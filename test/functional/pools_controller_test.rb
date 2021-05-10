@@ -3,22 +3,14 @@ require 'test_helper'
 class PoolsControllerTest < ActionDispatch::IntegrationTest
   context "The pools controller" do
     setup do
-      mock_pool_archive_service!
-      PoolVersion.sqs_service.stubs(:merge?).returns(false)
-      start_pool_archive_transaction
-
       travel_to(1.month.ago) do
         @user = create(:user)
         @mod = create(:moderator_user)
       end
-      as_user do
+      as(@user) do
         @post = create(:post)
         @pool = create(:pool)
       end
-    end
-
-    teardown do
-      rollback_pool_archive_transaction
     end
 
     context "index action" do
@@ -31,6 +23,13 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
         get pools_path, params: {:search => {:name_matches => @pool.name}}
         assert_response :success
       end
+
+      should "render for a sitemap" do
+        get pools_path(format: :sitemap)
+        assert_response :success
+        assert_equal(Pool.count, response.parsed_body.css("urlset url loc").size)
+      end
+
     end
 
     context "show action" do
@@ -108,28 +107,19 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
 
     context "revert action" do
       setup do
-        as_user do
-          @post_2 = create(:post)
-          @pool = create(:pool, post_ids: [@post.id])
-        end
-        CurrentUser.scoped(@user, "1.2.3.4") do
-          @pool.update(post_ids: [@post.id, @post_2.id])
-        end
+        @post_2 = as(@user) { create(:post) }
+        @pool = as(@user) { create(:pool, post_ids: [@post.id]) }
+        as(@mod) { @pool.update!(post_ids: [@post.id, @post_2.id]) }
       end
 
       should "revert to a previous version" do
-        @pool.reload
-        version = @pool.versions.first
-        assert_equal([@post.id], version.post_ids)
-        put_auth revert_pool_path(@pool), @mod, params: {:version_id => version.id}
-        @pool.reload
-        assert_equal([@post.id], @pool.post_ids)
+        put_auth revert_pool_path(@pool), @mod, params: { version_id: @pool.versions.first.id }
+        assert_redirected_to @pool
+        assert_equal([@post.id], @pool.reload.post_ids)
       end
 
       should "not allow reverting to a previous version of another pool" do
-        as_user do
-          @pool2 = create(:pool)
-        end
+        @pool2 = as(@user) { create(:pool) }
         put_auth revert_pool_path(@pool), @user, params: {:version_id => @pool2.versions.first.id }
         @pool.reload
         assert_not_equal(@pool.name, @pool2.name)

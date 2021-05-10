@@ -3,17 +3,17 @@
     <h1>Disapprovals</h1>
 
     <%= search_form_for(post_disapprovals_path) do |f| %>
-      <%= f.input :user_name, label: "Creator", input_html: { value: params[:search][:user_name] } %>
+      <%= f.input :user_name, label: "Creator", input_html: { value: params[:search][:user_name], "data-autocomplete": "user" } %>
       <%= f.input :post_id, label: "Post ID", input_html: { value: params[:search][:post_id] } %>
       <%= f.input :post_tags_match, label: "Tags", input_html: { value: params[:search][:post_tags_match], data: { autocomplete: "tag-query" } } %>
       <%= f.input :message_matches, label: "Message", input_html: { value: params[:search][:message_matches] } %>
-      <%= f.input :reason, label: "Reason", collection: %w[breaks_rules disinterest poor_quality].map { |x| [x.humanize, x] }, include_blank: true, selected: params[:search][:reason] %>
+      <%= f.input :reason, label: "Reason", collection: PostDisapproval::REASONS.map { |x| [x.humanize, x] }, include_blank: true, selected: params[:search][:reason] %>
       <%= f.input :has_message, label: "Has Message?", collection: %w[Yes No], include_blank: true, selected: params[:search][:has_message] %>
       <%= f.input :order, collection: [["ID", "id_desc"], ["Post ID", "post_id_desc"]], selected: params[:search][:order] %>
       <%= f.submit "Search" %>
     <% end %>
 
-    <%= table_for @post_disapprovals, {class: "striped autofit", width: "100%"} do |t| %>
+    <%= table_for @post_disapprovals, class: "striped autofit", width: "100%" do |t| %>
       <% t.column "Post" do |post_disapproval| %>
         <%= link_to "post ##{post_disapproval.post_id}", post_path(post_disapproval.post_id) %>
         <%= link_to "»", post_disapprovals_path(search: params[:search].merge(post_id: post_disapproval.post_id)) %>
@@ -27,7 +27,7 @@
         <%= link_to post_disapproval.reason.humanize, post_disapprovals_path(search: params[:search].merge(reason: post_disapproval.reason)) %>
       <% end %>
       <% t.column "Created" do |post_disapproval| %>
-        <% if post_disapproval.can_view_creator?(CurrentUser.user) %>
+        <% if policy(post_disapproval).can_view_creator? %>
           <%= link_to_user post_disapproval.user %>
           <%= link_to "»", post_disapprovals_path(search: params[:search].merge(creator_name: post_disapproval.user&.name)) %>
         <% end %>

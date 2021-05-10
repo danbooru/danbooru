@@ -19,8 +19,7 @@ class ForumPostVote < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-    q = q.search_attributes(params, :creator, :forum_post_id, :score)
+    q = search_attributes(params, :id, :created_at, :updated_at, :score, :creator, :forum_post)
     q = q.forum_post_matches(params[:forum_post])
     q.apply_default_order(params)
   end
@@ -37,16 +36,6 @@ class ForumPostVote < ApplicationRecord
     score == 0
   end
 
-  def fa_class
-    if score == 1
-      return "fa-thumbs-up"
-    elsif score == -1
-      return "fa-thumbs-down"
-    else
-      return "fa-meh"
-    end
-  end
-
   def vote_type
     if score == 1
       return "up"
@@ -60,6 +49,6 @@ class ForumPostVote < ApplicationRecord
   end
 
   def self.available_includes
-    [:creator]
+    [:creator, :forum_post]
   end
 end

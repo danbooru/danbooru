@@ -1,25 +1,5 @@
-body.mode-edit {
-  background-color: var(--post-mode-menu-edit-background);
-}
-
-body.mode-tag-script {
-  background-color: var(--post-mode-menu-tag-script-background);
-}
-
-body.mode-add-fav {
-  background-color: var(--post-mode-menu-add-fav-background);
-}
-
-body.mode-remove-fav {
-  background-color: var(--post-mode-menu-remove-fav-background);
-}
-
-body.mode-vote-up {
-  background-color: var(--post-mode-menu-vote-up-background);
-}
-
-body.mode-vote-down {
-  background-color: var(--post-mode-menu-vote-down-background);
+body[data-mode-menu-active="true"] .post-preview a:hover {
+  outline: 4px solid var(--post-mode-menu-active-post-outline-color);
 }
 
 body.mode-translation {

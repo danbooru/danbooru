@@ -2,7 +2,7 @@
   <%= link_to "Find all IP addresses associated with these users", ip_addresses_path(search: { user_id: @ip_addresses.map(&:user_id).join(" "), group_by: "ip_addr" }) %>
 </p>
 
-<%= table_for @ip_addresses, {class: "striped autofit"} do |t| %>
+<%= table_for @ip_addresses, class: "striped autofit" do |t| %>
   <% t.column "User" do |ip| %>
     <%= link_to_user ip.user %>
     <%= link_to "»", ip_addresses_path(search: { user_id: ip.user_id, group_by: "ip_addr" }) %>

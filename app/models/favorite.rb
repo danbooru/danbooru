@@ -4,7 +4,7 @@ class Favorite < ApplicationRecord
   belongs_to :post
   belongs_to :user
 
-  scope :for_user, ->(user_id) {where("user_id % 100 = #{user_id.to_i % 100} and user_id = #{user_id.to_i}")}
+  scope :for_user, ->(user_id) { where("favorites.user_id % 100 = ? AND favorites.user_id = ?", user_id.to_i % 100, user_id) }
   scope :public_favorites, -> { where(user: User.bit_prefs_match(:enable_private_favorites, false)) }
 
   def self.visible(user)
@@ -12,8 +12,7 @@ class Favorite < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-    q = q.search_attributes(params, :post)
+    q = search_attributes(params, :id, :post)
 
     if params[:user_id].present?
       q = q.for_user(params[:user_id])

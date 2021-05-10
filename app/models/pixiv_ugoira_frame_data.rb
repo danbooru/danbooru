@@ -9,8 +9,7 @@ class PixivUgoiraFrameData < ApplicationRecord
   end
 
   def self.search(params)
-    q = super
-    q = q.search_attributes(params, :post, :data, :content_type)
+    q = search_attributes(params, :id, :data, :content_type, :post)
     q.apply_default_order(params)
   end
 

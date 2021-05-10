@@ -1,0 +1,38 @@
+<%= render "comments/secondary_links" %>
+
+<div id="c-comment-votes">
+  <div id="a-index">
+    <%= render "search" %>
+
+    <%= table_for @comment_votes, class: "striped autofit" do |t| %>
+      <% t.column "Score" do |vote| %>
+        <%= link_to sprintf("%+d", vote.score), comment_votes_path(search: { score: vote.score }) %>
+      <% end %>
+
+      <% t.column "Voter" do |vote| %>
+        <%= link_to_user vote.user %>
+        <%= link_to "»", comment_votes_path(search: { user_name: vote.user.name }) %>
+      <% end %>
+
+      <% t.column "Status" do |vote| %>
+        <%= "Deleted" if vote.is_deleted? %>
+      <% end %>
+
+      <% t.column "Created" do |vote| %>
+        <%= time_ago_in_words_tagged(vote.created_at) %>
+      <% end %>
+
+      <% t.column column: "control" do |vote| %>
+        <% if policy(vote).destroy? %>
+          <%= render PopupMenuComponent.new do |menu| %>
+            <%= menu.item do %>
+              <%= link_to "Remove", comment_vote_path(vote, variant: "listing"), remote: true, method: :delete %>
+            <% end %>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <%= numbered_paginator(@comment_votes) %>
+  </div>
+</div>

@@ -1,23 +1,73 @@
-Sitemap: <%= root_url %>sitemap.xml
-
 User-agent: *
 Disallow: /
+Allow: /$
 
-<% if Rails.env.production? && Danbooru.config.hostname == request.host %>
-Allow: /artists
-Allow: /artist_commentaries
-Allow: /comments
-Allow: /explore
-Allow: /forum_posts
-Allow: /forum_topics
-Allow: /notes
-Allow: /pools
-Allow: /posts
-Allow: /sessions
-Allow: /static
-Allow: /tags
-Allow: /uploads
-Allow: /user_upgrades
-Allow: /users
-Allow: /wiki_pages
+<% if !Rails.env.production? || Danbooru.config.hostname == request.host %>
+Disallow: /*.atom
+Disallow: /*.json
+
+Disallow: <%= artist_urls_path %>
+Disallow: <%= artist_versions_path %>
+Disallow: <%= artist_commentary_versions_path %>
+Disallow: <%= note_versions_path %>
+Disallow: <%= post_versions_path %>
+Disallow: <%= pool_versions_path %>
+Disallow: <%= wiki_page_versions_path %>
+
+Allow: <%= artists_path %>
+Allow: <%= artist_commentaries_path %>
+Allow: <%= comments_path %>
+Allow: <%= popular_explore_posts_path %>
+Allow: <%= curated_explore_posts_path %>
+Allow: <%= viewed_explore_posts_path %>
+Allow: <%= searches_explore_posts_path %>
+Allow: <%= missed_searches_explore_posts_path %>
+Allow: <%= favorite_groups_path %>
+Allow: <%= forum_posts_path %>
+Allow: <%= forum_topics_path %>
+Allow: <%= login_path %>
+Allow: <%= notes_path %>
+Allow: <%= pools_path %>
+Allow: <%= posts_path %>
+Allow: <%= new_session_path %>
+Allow: <%= sign_out_session_path %>
+Allow: <%= tags_path %>
+Allow: <%= uploads_path %>
+Allow: <%= user_upgrades_path %>
+Allow: <%= users_path %>
+Allow: <%= wiki_pages_path %>
+
+<%# Legacy redirects %>
+Allow: /artist
+Allow: /comment
+Allow: /forum
+Allow: /note
+Allow: /pool
+Allow: /post
+Allow: /tag
+Allow: /user
+Allow: /wiki
+
+<%# Images %>
+Allow: /crop
+Allow: /preview
+Allow: /original
+Allow: /sample
+Allow: /data
+Allow: /images
+Allow: /packs
+
+<%# Static %>
+Allow: /terms_of_service
+Allow: /privacy
+Allow: /sitemap.xml
+Allow: /favicon.ico
+
+Sitemap: <%= sitemap_url(format: :xml, sitemap: "artists") %>
+Sitemap: <%= sitemap_url(format: :xml, sitemap: "forum_topics") %>
+Sitemap: <%= sitemap_url(format: :xml, sitemap: "pools") %>
+Sitemap: <%= sitemap_url(format: :xml, sitemap: "posts") %>
+Sitemap: <%= sitemap_url(format: :xml, sitemap: "tags") %>
+Sitemap: <%= sitemap_url(format: :xml, sitemap: "users") %>
+Sitemap: <%= sitemap_url(format: :xml, sitemap: "wiki_pages") %>
 <% end %>

@@ -1,34 +1,48 @@
 <%= table_for forum_topics, width: "100%" do |t| %>
   <% t.column "Title" do |topic| %>
-    <% if topic.is_sticky? %>
-      <span class="sticky">Sticky:</span>
-    <% end %>
-
     <% if !topic.is_read? %>
-      <span class="new">NEW</span>
+      <%= link_to "New", forum_topics_path(search: { is_read: false }), class: "topic-status label new" %>
     <% end %>
 
-    <%= link_to topic.title, forum_topic_path(topic), class: "forum-post-link" %>
+    <% if topic.is_sticky? %>
+      <%= link_to sticky_icon, forum_topics_path(search: { is_sticky: true }), class: "topic-status icon stickied", title: "Stickied" %>
+    <% end %>
+
+    <% if topic.is_locked? %>
+      <%= link_to lock_icon, forum_topics_path(search: { is_locked: true }), class: "topic-status icon locked", title: "Locked" %>
+    <% end %>
+
+    <% if topic.is_deleted? %>
+      <%= link_to delete_icon, forum_topics_path(search: { is_deleted: true }), class: "topic-status icon deleted", title: "Deleted" %>
+    <% end %>
+
+    <% if topic.is_private? %>
+      <%= link_to private_icon, forum_topics_path(search: { is_private: true }), class: "topic-status icon private", title: "#{User.level_string(topic.min_level)} only" %>
+    <% end %>
+
+    <% if forum_topic_status(topic).present? %>
+      <%= link_to topic.pretty_title, forum_topic_path(topic), class: "forum-post-link" %>
+    <% else %>
+      <%= link_to topic.title, forum_topic_path(topic), class: "forum-post-link" %>
+    <% end %>
 
     <% if topic.response_count > Danbooru.config.posts_per_page %>
       <%= link_to "page #{topic.last_page}", forum_topic_path(topic, :page => topic.last_page), :class => "last-page" %>
     <% end %>
-
-    <% if topic.is_locked? %>
-      <span class="locked-topic">(locked)</span>
-    <% end %>
-
-    <% if topic.min_level > 0 %>
-      <span class="level-topic">(<%= User.level_string(topic.min_level).downcase %> only)</span>
+  <% end %>
+  <% t.column "Status", width: "1%" do |topic| %>
+    <% status = forum_topic_status(topic) %>
+    <% if status.present? %>
+      <%= link_to status, forum_topics_path(search: { status: status }), class: "topic-status label #{status}" %>
     <% end %>
   <% end %>
-  <% t.column "Creator" do |topic| %>
+  <% t.column "Creator", width: "8%" do |topic| %>
     <%= link_to_user topic.creator %>
   <% end %>
-  <% t.column "Updated by" do |topic| %>
+  <% t.column "Updated by", width: "8%" do |topic| %>
     <%= link_to_user topic.updater %>
   <% end %>
-  <% t.column "Updated at" do |topic| %>
+  <% t.column "Updated at", width: "8%" do |topic| %>
     <%= compact_time topic.updated_at %>
   <% end %>
 <% end %>

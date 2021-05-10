@@ -1,5 +1,3 @@
-$("#threshold-comments-notice-for-<%= @post.id %>").hide();
-
-var current_comment_section = $("div.comments-for-post[data-post-id=<%= @post.id %>] div.list-of-comments");
-current_comment_section.html("<%= j(render(partial: 'comments/partials/show/comment', collection: @comments, locals: { context: :index_for_post, dtext_data: DText.preprocess(@comments.map(&:body)), moderation_reports: @post.moderation_reports.visible.recent })) %>");
+var current_comment_section = $("div.comments-for-post[data-post-id=<%= @post.id %>]");
+current_comment_section.replaceWith("<%= j render_comment_section(@post, limit: nil, current_user: CurrentUser.user) %>");
 $(window).trigger("danbooru:index_for_post", [<%= @post.id %>]);

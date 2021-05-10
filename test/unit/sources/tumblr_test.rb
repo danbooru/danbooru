@@ -169,7 +169,7 @@ module Sources
 
     context "The source for a 'http://ve.media.tumblr.com/*' video post with inline images" do
       setup do
-        @url = "https://ve.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4"
+        @url = "https://va.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4"
         @ref = "https://noizave.tumblr.com/post/162222617101"
       end
 
@@ -177,7 +177,7 @@ module Sources
         should "get the video and inline images" do
           site = Sources::Strategies.find(@url, @ref)
           urls = %w[
-            https://ve.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4
+            https://va.media.tumblr.com/tumblr_os31dkexhK1wsfqep.mp4
             https://media.tumblr.com/afed9f5b3c33c39dc8c967e262955de2/tumblr_inline_os31dclyCR1v11u29_1280.png
           ]
 
@@ -220,14 +220,13 @@ module Sources
 
     context "A Tumblr post with new image URLs" do
       should "return the correct image url" do
-        page_url = "https://emlan.tumblr.com/post/189469423572/kuro-attempts-to-buy-a-racy-book-at-comiket-but"
-        image1_url = "https://66.media.tumblr.com/168dabd09d5ad69eb5fedcf94c45c31a/3dbfaec9b9e0c2e3-72/s640x960/bf33a1324f3f36d2dc64f011bfeab4867da62bc8.png"
-        image2_url = "https://66.media.tumblr.com/5a2c3fe25c977e2281392752ab971c90/3dbfaec9b9e0c2e3-92/s540x810/cd270c29db06b5e7fdcee63114fe3eb2c9c0d590.png"
-        strategy = Sources::Strategies.find(image2_url, page_url)
+        image_url = "https://64.media.tumblr.com/3dfdab77d913ad1ea59f22407d6ac6f3/b1764aa0f9c378d0-23/s1280x1920/46f4af7ec94456f8fef380ee6311eb81178ce7e9.jpg"
+        page_url = "https://make-do5.tumblr.com/post/619663949657423872"
+        strategy = Sources::Strategies.find(image_url, page_url)
 
-        assert_equal([image1_url, image2_url], strategy.image_urls)
-        assert_equal(image2_url, strategy.image_url)
-        assert_equal("https://emlan.tumblr.com/post/189469423572", strategy.canonical_url)
+        assert_match(%r{/3dfdab77d913ad1ea59f22407d6ac6f3/b1764aa0f9c378d0-23/s\d+x\d+/}i, image_url)
+        assert_equal(page_url, strategy.canonical_url)
+        assert_downloaded(7_428_704, strategy.image_url)
       end
     end
 
@@ -257,6 +256,25 @@ module Sources
           assert_equal(full, site.image_url)
           assert_equal(full, site.image_urls.second)
         end
+      end
+    end
+
+    context "normalizing for source" do
+      should "normalize correctly" do
+        source1 = "https://octrain1020.tumblr.com/post/190713122589"
+        source2 = "https://octrain1020.tumblr.com/image/190713122589"
+        source3 = "https://octrain1020.tumblr.com/image/190713122589#asd"
+        source4 = "https://superboin.tumblr.com/post/141169066579/photoset_iframe/superboin/tumblr_o45miiAOts1u6rxu8/500/false"
+
+        assert_equal(source1, Sources::Strategies.normalize_source(source1))
+        assert_equal(source1, Sources::Strategies.normalize_source(source2))
+        assert_equal(source1, Sources::Strategies.normalize_source(source3))
+        assert_equal("https://superboin.tumblr.com/post/141169066579", Sources::Strategies.normalize_source(source4))
+      end
+
+      should "avoid normalizing unnormalizable urls" do
+        bad_source = "https://octrain1020.tumblr.com/"
+        assert_equal(bad_source, Sources::Strategies.normalize_source(bad_source))
       end
     end
   end

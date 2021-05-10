@@ -14,16 +14,28 @@ require "rails/test_unit/railtie"
 
 Bundler.require(*Rails.groups)
 
-require_relative "danbooru_default_config"
-require_relative "danbooru_local_config"
+begin
+  require_relative "danbooru_default_config"
+  require_relative ENV.fetch("DANBOORU_CONFIG_FILE", "danbooru_local_config")
+rescue LoadError
+end
 
 module Danbooru
+  mattr_accessor :config
+
+  # if danbooru_local_config exists then use it as the config, otherwise use danbooru_default_config.
+  if defined?(CustomConfiguration)
+    self.config = EnvironmentConfiguration.new(CustomConfiguration.new)
+  else
+    self.config = EnvironmentConfiguration.new(Configuration.new)
+  end
+
   class Application < Rails::Application
     # Use the responders controller from the responders gem
     config.app_generators.scaffold_controller :responders_controller
 
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 6.0
+    config.load_defaults 6.1
     config.active_record.schema_format = :sql
     config.encoding = "utf-8"
     config.filter_parameters += [:password, :password_confirmation, :password_hash, :api_key]
@@ -31,7 +43,8 @@ module Danbooru
     # config.assets.version = '1.0'
     config.autoload_paths += %W(#{config.root}/app/presenters #{config.root}/app/logical/concerns #{config.root}/app/logical #{config.root}/app/mailers)
     config.plugins = [:all]
-    config.time_zone = 'Berlin'
+    config.time_zone = 'Eastern Time (US & Canada)'
+    config.active_model.i18n_customize_full_message = true
 
     raise "Danbooru.config.secret_key_base not configured" if Danbooru.config.secret_key_base.blank?
     config.secret_key_base = Danbooru.config.secret_key_base
@@ -50,7 +63,7 @@ module Danbooru
     if File.exist?("#{config.root}/REVISION")
       config.x.git_hash = File.read("#{config.root}/REVISION").strip
     elsif system("type git > /dev/null && git rev-parse --show-toplevel > /dev/null")
-      config.x.git_hash = `git rev-parse --short HEAD`.strip
+      config.x.git_hash = `git rev-parse HEAD`.strip
     else
       config.x.git_hash = nil
     end

@@ -2,10 +2,10 @@
   <%= f.input :reason_matches, label: "Reason", hint: "Use * for wildcard searches", input_html: { value: params[:search][:reason_matches] } %>
   <%= f.input :post_tags_match, label: "Tags", input_html: { value: params[:search][:post_tags_match], data: { autocomplete: "tag-query" } } %>
   <%= f.input :post_id, label: "Post ID", input_html: { value: params[:search][:post_id] } %>
-  <% if CurrentUser.is_moderator? %>
+  <% if policy(PostFlag).can_search_flagger? %>
     <%= f.input :creator_name, label: "Creator", input_html: { value: params[:search][:creator_name], data: { autocomplete: "user" } } %>
   <% end %>
-  <%= f.input :is_resolved, label: "Resolved?", collection: [["Yes", true], ["No", false]], include_blank: true, selected: params[:search][:is_resolved] %>
   <%= f.input :category, label: "Category", collection: ["normal", "unapproved", "rejected", "deleted"], include_blank: true, selected: params[:search][:category] %>
+  <%= f.input :status, collection: PostFlag.statuses, include_blank: true, selected: params[:search][:status] %>
   <%= f.submit "Search" %>
 <% end %>

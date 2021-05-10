@@ -1,3 +1,5 @@
+<% noindex if @artist.is_banned? %>
+
 <%= render layout: "show" do %>
   <div>
     <%= render "summary", artist: @artist %>

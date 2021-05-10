@@ -2,11 +2,11 @@
 app_path = "/var/www/danbooru2/current"
 
 # Set unicorn options
-worker_processes 20
+worker_processes 30
 
-timeout 180
+timeout 60
 # listen "127.0.0.1:9000", :tcp_nopush => true
-listen "/tmp/.unicorn.sock", :backlog => 512
+listen "/tmp/.unicorn.sock", backlog: 1024
 
 # Spawn unicorn master worker for user apps (group: apps)
 user 'danbooru', 'danbooru'
@@ -73,7 +73,7 @@ before_fork do |server, worker|
   # to the implementation of standard Unix signal handlers, this
   # helps (but does not completely) prevent identical, repeated signals
   # from being lost when the receiving process is busy.
-  sleep 1
+  sleep 0.25
 end
 
 after_fork do |server, worker|

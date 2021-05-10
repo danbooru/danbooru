@@ -1,2 +1,6 @@
-Danbooru.Utility.notice("Vote saved");
-$(".comment[data-id=<%= @comment.id %>]").attr("data-is-voted", "true");
+<% if flash[:notice] %>
+  Danbooru.Utility.notice("<%= j flash[:notice] %>");
+<% end %>
+
+var $comment = $("article#comment_<%= @comment_vote.comment_id %>");
+$comment.replaceWith("<%= j render_comment(@comment_vote.comment, current_user: CurrentUser.user) %>");

@@ -1,0 +1,11 @@
+<% content_for(:secondary_links) do %>
+  <%= subnav_link_to "Modqueue", modqueue_index_path %>
+  |
+  <%= subnav_link_to "Appeals", post_appeals_path %>
+  <%= subnav_link_to "Flags", post_flags_path(search: { category: "normal" }) %>
+  <%= subnav_link_to "Approvals", post_approvals_path %>
+  <%= subnav_link_to "Undeletions", mod_actions_path(search: { category: 43 }) %>
+  <%= subnav_link_to "Deletions", mod_actions_path(search: { category: 42 }) %>
+  |
+  <%= subnav_link_to "Help", wiki_page_path("about:mod_queue") %>
+<% end %>

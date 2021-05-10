@@ -1,0 +1,5 @@
+FROM postgres:13.1
+
+WORKDIR /test_parser
+RUN apt-get update && apt-get -y install --no-install-recommends build-essential ca-certificates git postgresql-server-dev-all
+RUN git clone https://github.com/r888888888/test_parser . && make install

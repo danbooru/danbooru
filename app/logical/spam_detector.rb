@@ -7,12 +7,13 @@ class SpamDetector
   # if a person receives more than 10 automatic spam reports within a 1 hour
   # window, automatically ban them forever.
   AUTOBAN_THRESHOLD = 10
-  AUTOBAN_WINDOW = 1.hours
-  AUTOBAN_DURATION = 999999
+  AUTOBAN_WINDOW = 1.hour
+  AUTOBAN_DURATION = 999_999
 
   attr_accessor :record, :user, :user_ip, :content, :comment_type
+
   rakismet_attrs author: proc { user.name },
-                 author_email: proc { user.email },
+                 author_email: proc { user.email_address&.address },
                  blog_lang: "en",
                  blog_charset: "UTF-8",
                  comment_type: :comment_type,
@@ -84,8 +85,8 @@ class SpamDetector
     end
 
     is_spam
-  rescue StandardError => exception
-    DanbooruLogger.log(exception)
+  rescue StandardError => e
+    DanbooruLogger.log(e)
     false
   end
 end
