@@ -21,7 +21,6 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
           put_auth admin_user_path(@user), @mod, params: {:user => {:level => "30"}}
           assert_redirected_to(edit_admin_user_path(@user))
           assert_equal(30, @user.reload.level)
-          assert_equal(@mod.id, @user.inviter_id)
         end
 
         should "promote the user to unrestricted uploads" do

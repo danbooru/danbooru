@@ -28,12 +28,12 @@ class CommentComponent < ApplicationComponent
 
   def upvoted?
     return false if current_user.is_anonymous?
-    current_vote&.is_positive?
+    !!current_vote&.is_positive?
   end
 
   def downvoted?
     return false if current_user.is_anonymous?
-    current_vote&.is_negative?
+    !!current_vote&.is_negative?
   end
 
   def current_vote
