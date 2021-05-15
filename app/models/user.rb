@@ -132,7 +132,7 @@ class User < ApplicationRecord
   has_many :received_upgrades, class_name: "UserUpgrade", foreign_key: :recipient_id, dependent: :destroy
   has_many :purchased_upgrades, class_name: "UserUpgrade", foreign_key: :purchaser_id, dependent: :destroy
   has_many :user_events, dependent: :destroy
-  has_one :recent_ban, -> {order("bans.id desc")}, :class_name => "Ban"
+  has_one :active_ban, -> { active }, class_name: "Ban"
 
   has_one :email_address, dependent: :destroy
   has_many :api_keys, dependent: :destroy
@@ -166,7 +166,7 @@ class User < ApplicationRecord
     end
 
     def ban_expired?
-      is_banned? && recent_ban.try(:expired?)
+      is_banned? && active_ban.blank?
     end
   end
 

@@ -28,8 +28,8 @@
     <% end %>
 
     <% if policy(Ban.new(user: @user)).create? %>
-      <% if @user.is_banned? && @user.recent_ban.present? %>
-        <%= subnav_link_to "Unban", ban_path(@user.recent_ban) %>
+      <% if @user.is_banned? && @user.active_ban.present? %>
+        <%= subnav_link_to "Unban", ban_path(@user.active_ban) %>
       <% else %>
         <%= subnav_link_to "Ban", new_ban_path(:ban => {:user_id => @user.id}) %>
       <% end %>
