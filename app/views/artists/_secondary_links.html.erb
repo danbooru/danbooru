@@ -15,7 +15,7 @@
       <%= subnav_link_to "Edit", edit_artist_path(@artist), :"data-shortcut" => "e" %>
     <% end %>
     <%= subnav_link_to "History", artist_versions_path(:search => {:artist_id => @artist.id}) %>
-    <% if current_page?({ action: :edit }) && policy(@artist).update? %>
+    <% if current_page?(action: :edit) && policy(@artist).update? %>
       <% if @artist.is_deleted? %>
         <%= subnav_link_to "Undelete", artist_path(@artist, format: "js"), method: :put, data: {confirm: "Are you sure you want to undelete this artist?", params: "artist[is_deleted]=false"}, remote: true %>
       <% else %>
