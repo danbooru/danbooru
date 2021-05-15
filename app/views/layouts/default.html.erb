@@ -81,9 +81,7 @@
       <%= render "users/upgrade_notice" %>
     <% end %>
 
-    <% if CurrentUser.user.is_banned? %>
-      <%= render "users/ban_notice" %>
-    <% end %>
+    <%= render "users/ban_notice" %>
 
     <% if params[:controller] != "dmails" && has_unread_dmails?(CurrentUser.user) %>
       <%= render "users/dmail_notice" %>

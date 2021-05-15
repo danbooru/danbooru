@@ -64,7 +64,7 @@ class Ban < ApplicationRecord
   end
 
   def humanized_duration
-    ApplicationController.helpers.distance_of_time_in_words(created_at, expires_at)
+    ApplicationController.helpers.humanized_duration(duration)
   end
 
   def expired?
@@ -72,11 +72,11 @@ class Ban < ApplicationRecord
   end
 
   def create_feedback
-    user.feedback.create!(creator: banner, category: "negative", body: "Banned for #{humanized_duration}: #{reason}")
+    user.feedback.create!(creator: banner, category: "negative", body: "Banned #{humanized_duration}: #{reason}")
   end
 
   def create_ban_mod_action
-    ModAction.log(%{Banned <@#{user_name}> for #{humanized_duration}: #{reason}}, :user_ban)
+    ModAction.log(%{Banned <@#{user_name}> #{humanized_duration}: #{reason}}, :user_ban)
   end
 
   def create_unban_mod_action

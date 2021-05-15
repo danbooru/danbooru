@@ -98,17 +98,12 @@ module ApplicationHelper
     tag.time content || datetime, datetime: datetime, title: time.to_formatted_s, **options
   end
 
-  def humanized_duration(from, to)
-    if to - from > 10.years
-      duration = "forever"
+  def humanized_duration(duration)
+    if duration >= 100.years
+      "forever"
     else
-      duration = distance_of_time_in_words(from, to)
+      duration.inspect
     end
-
-    datetime = from.iso8601 + "/" + to.iso8601
-    title = "#{from.strftime("%Y-%m-%d %H:%M")} to #{to.strftime("%Y-%m-%d %H:%M")}"
-
-    raw content_tag(:time, duration, datetime: datetime, title: title)
   end
 
   def humanized_number(number)
