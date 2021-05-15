@@ -105,6 +105,16 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           assert_enqueued_email_with UserMailer, :email_change_confirmation, args: [@user], queue: "default"
           assert_equal(true, @user.user_events.email_change.exists?)
         end
+
+        should "not allow banned users to change their email address" do
+          create(:ban, user: @user, duration: 1.week)
+          put_auth user_email_path(@user), @user, params: { user: { password: "password", email: "abc@ogres.net" }}
+
+          assert_response 403
+          assert_equal("bob@ogres.net", @user.reload.email_address.address)
+          assert_no_emails
+          assert_equal(false, @user.user_events.email_change.exists?)
+        end
       end
 
       context "with the incorrect password" do

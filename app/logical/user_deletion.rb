@@ -74,5 +74,9 @@ class UserDeletion
     if user.is_admin?
       errors.add(:base, "Admins cannot delete their account")
     end
+
+    if user.is_banned?
+      errors.add(:base, "You cannot delete your account if you are banned")
+    end
   end
 end
