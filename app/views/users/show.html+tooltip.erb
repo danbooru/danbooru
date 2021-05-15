@@ -46,14 +46,14 @@
     </div>
 
     <%= render PopupMenuComponent.new do |menu| %>
-      <%= menu.item do %>
+      <% menu.item do %>
         <%= link_to new_dmail_path(dmail: { to_id: @user.id }) do %>
           <%= message_icon %> Send Message
         <% end %>
       <% end %>
 
       <% if !@user.is_platinum? %>
-        <%= menu.item do %>
+        <% menu.item do %>
           <%= link_to new_user_upgrade_path(user_id: @user.id) do %>
             <%= gift_icon %> Gift Upgrade
           <% end %>
@@ -61,7 +61,7 @@
       <% end %>
 
       <% if policy(UserFeedback.new(user: @user)).create? %>
-        <%= menu.item do %>
+        <% menu.item do %>
           <%= link_to new_user_feedback_path(user_feedback: { user_id: @user.id }) do %>
             <%= feedback_icon %> Give Feedback
           <% end %>
@@ -69,7 +69,7 @@
       <% end %>
 
       <% if policy(CurrentUser.user).promote? %>
-        <%= menu.item do %>
+        <% menu.item do %>
           <%= link_to edit_admin_user_path(@user.id) do %>
             <%= promotion_icon %> Promote User
           <% end %>
@@ -77,7 +77,7 @@
       <% end %>
 
       <% if policy(Ban.new(user: @user)).create? %>
-        <%= menu.item do %>
+        <% menu.item do %>
           <%= link_to new_ban_path(ban: { user_id: @user.id }) do %>
             <%= ban_icon %> Ban User
           <% end %>
