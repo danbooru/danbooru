@@ -33,7 +33,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://skeb.imgix.net/requests/229088_2?bg=%23fff&auto=format&w=800&s=9cac8b76c0838f2df4f19ebc41c1ae0a", @site.image_url)
+        assert_equal("https://skeb.imgix.net/requests/229088_2?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&w=800&s=32a275893cf5362d51e5744ff5d8f88b", @site.image_url)
       end
 
       should "get the canonical url" do
