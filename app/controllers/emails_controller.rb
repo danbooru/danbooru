@@ -1,4 +1,5 @@
 class EmailsController < ApplicationController
+  before_action :requires_reauthentication, only: [:edit, :update]
   respond_to :html, :xml, :json
 
   def index
@@ -24,17 +25,10 @@ class EmailsController < ApplicationController
 
   def update
     @user = authorize User.find(params[:user_id]), policy_class: EmailAddressPolicy
-
-    if @user.authenticate_password(params[:user][:password])
-      UserEvent.build_from_request(@user, :email_change, request)
-      @user.update(email_address_attributes: { address: params[:user][:email] })
-    else
-      @user.errors.add(:base, "Password was incorrect")
-    end
+    @user.change_email(params[:user][:email], request)
 
     if @user.errors.none?
       flash[:notice] = "Email updated. Check your email to confirm your new address"
-      UserMailer.email_change_confirmation(@user).deliver_later
       respond_with(@user, location: settings_url)
     else
       flash[:notice] = @user.errors.full_messages.join("; ")

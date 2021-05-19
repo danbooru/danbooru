@@ -43,6 +43,17 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "#edit" do
+      context "for a user who hasn't recently authenticated" do
+        should "redirect to the confirm password page" do
+          post session_path, params: { name: @user.name, password: @user.password }
+          travel_to 2.hours.from_now do
+            get edit_user_email_path(@user)
+          end
+
+          assert_redirected_to confirm_password_session_path(url: edit_user_email_path(@user.id))
+        end
+      end
+
       context "for a user with an email address" do
         should "render" do
           get_auth edit_user_email_path(@user), @user
@@ -59,7 +70,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
 
           assert_equal false, @user.email_address.present?
           assert_response :success
-          assert_select "h1", text: "Add Email"
+          assert_select "h1", text: "Change Email"
         end
       end
 
@@ -79,10 +90,24 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "#update" do
+      context "for a user who hasn't recently authenticated" do
+        should "redirect to the confirm password page" do
+          post session_path, params: { name: @user.name, password: @user.password }
+          travel_to 2.hours.from_now do
+            put user_email_path(@user), params: { user: { email: "abc@ogres.net" }}
+          end
+
+          assert_redirected_to confirm_password_session_path(url: user_email_path(@user.id))
+          assert_equal("bob@ogres.net", @user.reload.email_address.address)
+          assert_no_emails
+          assert_equal(false, @user.user_events.email_change.exists?)
+        end
+      end
+
       context "with the correct password" do
         should "update an existing address" do
           assert_difference("EmailAddress.count", 0) do
-            put_auth user_email_path(@user), @user, params: { user: { password: "password", email: "abc@ogres.net" }}
+            put_auth user_email_path(@user), @user, params: { user: { email: "abc@ogres.net" }}
           end
 
           assert_redirected_to(settings_path)
@@ -96,7 +121,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           @user.email_address.destroy
 
           assert_difference("EmailAddress.count", 1) do
-            put_auth user_email_path(@user), @user, params: { user: { password: "password", email: "abc@ogres.net" }}
+            put_auth user_email_path(@user), @user, params: { user: { email: "abc@ogres.net" }}
           end
 
           assert_redirected_to(settings_path)
@@ -108,7 +133,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
 
         should "not allow banned users to change their email address" do
           create(:ban, user: @user, duration: 1.week)
-          put_auth user_email_path(@user), @user, params: { user: { password: "password", email: "abc@ogres.net" }}
+          put_auth user_email_path(@user), @user, params: { user: { email: "abc@ogres.net" }}
 
           assert_response 403
           assert_equal("bob@ogres.net", @user.reload.email_address.address)
@@ -116,18 +141,6 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, @user.user_events.email_change.exists?)
         end
       end
-
-      context "with the incorrect password" do
-        should "not work" do
-          put_auth user_email_path(@user), @user, params: { user: { password: "passwordx", email: "abc@ogres.net" }}
-
-          assert_response :success
-          assert_equal("bob@ogres.net", @user.reload.email_address.address)
-          assert_no_emails
-          assert_equal(false, @user.user_events.email_change.exists?)
-        end
-      end
-    end
 
     context "#verify" do
       context "with a correct verification key" do
