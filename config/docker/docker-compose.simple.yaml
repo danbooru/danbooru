@@ -5,8 +5,18 @@
 #
 #     $ docker-compose -f config/docker/docker-compose.simple.yaml up
 #     $ docker-compose -f config/docker/docker-compose.simple.yaml down
+#
+# References:
+#
+# * https://docs.docker.com/get-docker/
+# * https://docs.docker.com/compose/install/
+# * https://docs.docker.com/compose/compose-file/compose-versioning
+# * https://docs.docker.com/compose/release-notes
 
-version: "3.7"
+# Version 3.4 is the latest version that is supported by the version of Docker
+# Compose shipped with Ubuntu 18.04 LTS (version 1.17.4).
+version: "3.4"
+
 services:
   danbooru:
     # image: evazion/danbooru
