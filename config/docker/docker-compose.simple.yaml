@@ -19,10 +19,10 @@ version: "3.4"
 
 services:
   danbooru:
-    # image: evazion/danbooru
-    build:
-      context: ../..
-      dockerfile: config/docker/Dockerfile.danbooru
+    image: evazion/danbooru
+    # build:
+    #  context: ../..
+    #  dockerfile: config/docker/Dockerfile.danbooru
     ports:
       - "80:3000"
     environment:
@@ -38,10 +38,10 @@ services:
     user: root
 
   postgres:
-    # image: evazion/postgres
-    build:
-      context: .
-      dockerfile: Dockerfile.postgres
+    image: evazion/postgres
+    # build:
+    #  context: .
+    #  dockerfile: Dockerfile.postgres
     environment:
       POSTGRES_USER: danbooru
       POSTGRES_HOST_AUTH_METHOD: trust
