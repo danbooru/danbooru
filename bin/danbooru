@@ -15,34 +15,45 @@
 #
 # This script is just a wrapper for that command.
 
+set -euxo pipefail
+
+# Check if program exists.
+has() {
+  type -p "$1" > /dev/null
+}
+
+# Install Docker and Docker Compose if they're not installed already.
 install_docker_compose() {
-  if docker-compose version > /dev/null; then
+  if has docker && has docker-compose; then
     return
   fi
 
-  if apt --version; then
-    sudo apt install docker docker-compose
-  elif dnf --version; then
-    sudo dnf install docker docker-compose
-  elif pacman --version; then
-    sudo pacman -Sy docker docker-compose
+  # Debian and Ubuntu
+  if has apt-get; then
+    sudo apt-get update
+    sudo apt-get install -y docker.io docker-compose
+  # Fedora
+  elif has dnf; then
+    sudo dnf install -y docker docker-compose
+  # Arch Linux
+  elif has pacman; then
+    sudo pacman -Sy --noconfirm docker docker-compose
   else
     echo "Error: Couldn't automatically install docker-compose. Install docker-compose manually."
     exit 1
   fi
 }
 
+# Start Docker if it's not running already.
 start_docker() {
-  if docker version > /dev/null; then
-    return
+  if ! sudo docker version > /dev/null; then
+    sudo systemctl start docker
   fi
-
-  sudo systemctl start docker
 }
 
 docker_compose() {
   COMPOSE_FILE="$(dirname "$(realpath "$0")")/../config/docker/docker-compose.simple.yaml"
-  docker-compose -f "$COMPOSE_FILE" "$@"
+  sudo docker-compose -f "$COMPOSE_FILE" "$@"
 }
 
 install_docker_compose
