@@ -1,10 +1,12 @@
 # A Docker Compose file that launches a minimal Danbooru instance. This is
 # suitable as a quick demo or for personal use, not for public-facing sites.
 #
+# This will start a Danbooru instance running on http://localhost.
+#
 # Usage:
 #
-#     $ docker-compose -f config/docker/docker-compose.simple.yaml up
-#     $ docker-compose -f config/docker/docker-compose.simple.yaml down
+#  docker-compose up
+#  docker-compose down
 #
 # References:
 #

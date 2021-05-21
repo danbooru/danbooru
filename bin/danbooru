@@ -11,7 +11,7 @@
 #
 # Alternatively, if you already have Docker installed, you can just do:
 #
-#     docker-compose -f config/docker/docker-compose.simple.yaml up
+#     docker-compose up
 #
 # This script is just a wrapper for that command.
 
@@ -51,11 +51,6 @@ start_docker() {
   fi
 }
 
-docker_compose() {
-  COMPOSE_FILE="$(dirname "$(realpath "$0")")/../config/docker/docker-compose.simple.yaml"
-  sudo docker-compose -f "$COMPOSE_FILE" "$@"
-}
-
 install_docker_compose
 start_docker
-docker_compose "${@:-up}"
+sudo docker-compose "${@:-up}"
