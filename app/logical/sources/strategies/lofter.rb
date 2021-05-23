@@ -10,6 +10,7 @@
 # Page URLs
 #
 # * https://gengar563.lofter.com/post/1e82da8c_1c98dae1b
+# * https://yuli031458.lofter.com/post/3163d871_1cbdc5f6d (different theme/css selectors)
 #
 # Profile URLs
 #
@@ -45,7 +46,7 @@ module Sources
       end
 
       def image_urls
-        images = page&.search(".pic img")
+        images = page&.search(".pic img, .content img")
         images.to_a.map { |img| get_full_version(img["src"]) }
       end
 
@@ -73,7 +74,7 @@ module Sources
       end
 
       def tags
-        tags = page&.search(".info .tag")
+        tags = page&.search(".info .tag, .main .tag a")
 
         tags.to_a.map do |tag|
           [tag.text, tag.attr("href")]
@@ -81,7 +82,7 @@ module Sources
       end
 
       def artist_commentary_desc
-        page&.search(".ct .text")&.to_html
+        page&.search(".ct .text, .content .text").to_a.compact.first&.to_html
       end
 
       def normalize_for_source
