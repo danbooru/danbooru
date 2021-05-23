@@ -141,6 +141,7 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(false, @user.user_events.email_change.exists?)
         end
       end
+    end
 
     context "#verify" do
       context "with a correct verification key" do
