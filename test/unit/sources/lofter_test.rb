@@ -44,6 +44,14 @@ module Sources
       end
     end
 
+    context "A different CSS schema" do
+      should "still find all the data" do
+        source = Sources::Strategies.find("https://yuli031458.lofter.com/post/3163d871_1cbdc5f6d")
+        assert_equal(["https://imglf5.lf127.net/img/Mm55d3lNK2tJUWpNTjVLN0MvaTRDc1UvQUFLMGszOHRvSjV6S3VSa1lwa3BDWUtVOWpBTHBnPT0.jpg"], source.image_urls)
+        assert_not_empty(source.tags)
+      end
+    end
+
     context "A bad link" do
       should "correctly get the full size" do
         source = Sources::Strategies.find("https://imglf4.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJUFczb2RKSVlpMHJkNy9kc3BSQVQvQm5DNzB4eVhxay9nPT0.png?imageView&thumbnail=1680x0&quality=96&stripmeta=0")
