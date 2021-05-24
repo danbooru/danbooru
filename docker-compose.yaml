@@ -21,10 +21,7 @@ version: "3.4"
 
 services:
   danbooru:
-    image: evazion/danbooru
-    # build:
-    #  context: ../..
-    #  dockerfile: config/docker/Dockerfile.danbooru
+    image: danbooru
     ports:
       - "80:3000"
     environment:
@@ -36,14 +33,21 @@ services:
       - "danbooru-images:/danbooru/public/data"
     depends_on:
       - postgres
-    command: ["bash", "-c", "bin/rails db:setup; bin/rails server -b 0.0.0.0"]
+    command: ["bash", "-c", "bin/rails db:setup; bin/rails db:migrate && bin/rails server -b 0.0.0.0"]
     user: root
+
+  delayed_jobs:
+    image: danbooru
+    environment:
+      - RAILS_ENV=production
+      - DATABASE_URL=postgresql://danbooru@postgres/danbooru
+      - DANBOORU_CANONICAL_URL=http://localhost
+    depends_on:
+      - danbooru
+    command: ["bash", "-c", "bin/wait-for-http http://danbooru:3000 3s && bin/delayed_job run"]
 
   postgres:
     image: evazion/postgres
-    # build:
-    #  context: .
-    #  dockerfile: Dockerfile.postgres
     environment:
       POSTGRES_USER: danbooru
       POSTGRES_HOST_AUTH_METHOD: trust
