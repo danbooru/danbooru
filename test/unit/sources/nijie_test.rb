@@ -362,5 +362,15 @@ module Sources
         assert_equal(bad_source3, Sources::Strategies.normalize_source(bad_source3))
       end
     end
+
+    context "an unsupported image url" do
+      should "not break the bookmarklet" do
+        image_url = "https://pic.nijie.net/01/nijie_picture/diff/main/201207181053373205_0.jpg"
+        ref = "https://nijie.info/view_popup.php?id=18858&#diff_1"
+        source = Sources::Strategies.find(image_url, ref)
+
+        assert_equal(image_url, source.image_url)
+      end
+    end
   end
 end
