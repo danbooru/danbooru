@@ -53,6 +53,7 @@ gem 'ed25519'
 gem 'bcrypt_pbkdf' # https://github.com/net-ssh/net-ssh/issues/565
 gem 'terminal-table'
 gem 'newrelic_rpm', require: false
+gem 'clockwork'
 
 group :production, :staging do
   gem 'unicorn', :platforms => :ruby

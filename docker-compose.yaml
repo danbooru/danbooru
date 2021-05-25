@@ -21,7 +21,7 @@ version: "3.4"
 
 services:
   danbooru:
-    image: danbooru
+    image: evazion/danbooru
     ports:
       - "80:3000"
     environment:
@@ -36,15 +36,25 @@ services:
     command: ["bash", "-c", "bin/rails db:setup; bin/rails db:migrate && bin/rails server -b 0.0.0.0"]
     user: root
 
-  delayed_jobs:
-    image: danbooru
+  cron:
+    image: evazion/danbooru
     environment:
       - RAILS_ENV=production
       - DATABASE_URL=postgresql://danbooru@postgres/danbooru
       - DANBOORU_CANONICAL_URL=http://localhost
     depends_on:
       - danbooru
-    command: ["bash", "-c", "bin/wait-for-http http://danbooru:3000 3s && bin/delayed_job run"]
+    command: ["bash", "-c", "bin/wait-for-http http://danbooru:3000 5s && bin/rails danbooru:cron"]
+
+  delayed_jobs:
+    image: evazion/danbooru
+    environment:
+      - RAILS_ENV=production
+      - DATABASE_URL=postgresql://danbooru@postgres/danbooru
+      - DANBOORU_CANONICAL_URL=http://localhost
+    depends_on:
+      - danbooru
+    command: ["bash", "-c", "bin/wait-for-http http://danbooru:3000 5s && bin/delayed_job run"]
 
   postgres:
     image: evazion/postgres

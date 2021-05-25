@@ -1,4 +1,9 @@
 namespace :danbooru do
+  desc "Run the cronjob scheduler"
+  task cron: :environment do
+    Clockwork::run
+  end
+
   namespace :docker do
     # Note that uncommited changes won't be included in the image; commit
     # changes first before building the image.
