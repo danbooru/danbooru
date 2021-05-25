@@ -581,6 +581,12 @@ module Danbooru
     def redis_url
       # "redis://localhost:6379"
     end
+
+    # Optional. The license key for your New Relic account.
+    # https://newrelic.com/
+    # https://docs.newrelic.com/docs/accounts/accounts-billing/account-setup/new-relic-license-key/
+    def new_relic_license_key
+    end
   end
 
   EnvironmentConfiguration = Struct.new(:config) do

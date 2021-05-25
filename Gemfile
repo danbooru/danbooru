@@ -52,6 +52,7 @@ gem 'google-cloud-storage', require: "google/cloud/storage"
 gem 'ed25519'
 gem 'bcrypt_pbkdf' # https://github.com/net-ssh/net-ssh/issues/565
 gem 'terminal-table'
+gem 'newrelic_rpm', require: false
 
 group :production, :staging do
   gem 'unicorn', :platforms => :ruby
@@ -60,7 +61,6 @@ end
 
 group :production do
   gem 'unicorn-worker-killer'
-  gem 'newrelic_rpm'
   gem 'capistrano-deploytags', '~> 1.0.0', require: false
 end
 
