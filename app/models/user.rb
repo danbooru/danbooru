@@ -110,7 +110,7 @@ class User < ApplicationRecord
   validates_confirmation_of :password
   validates :comment_threshold, inclusion: { in: (-100..5) }
   before_validation :normalize_blacklisted_tags
-  before_create :promote_to_admin_if_first_user
+  before_create :promote_to_owner_if_first_user
   has_many :artist_versions, foreign_key: :updater_id
   has_many :artist_commentary_versions, foreign_key: :updater_id
   has_many :comments, foreign_key: :creator_id
@@ -290,11 +290,11 @@ class User < ApplicationRecord
       UserPromotion.new(self, promoter, new_level, **options).promote!
     end
 
-    def promote_to_admin_if_first_user
+    def promote_to_owner_if_first_user
       return if Rails.env.test?
 
-      if User.admins.count == 0
-        self.level = Levels::ADMIN
+      if name != Danbooru.config.system_user && !User.where(level: Levels::OWNER).exists?
+        self.level = Levels::OWNER
         self.can_approve_posts = true
         self.can_upload_free = true
       end
