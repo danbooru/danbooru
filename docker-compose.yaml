@@ -28,6 +28,7 @@ services:
       - RAILS_ENV=production
       - RAILS_SERVE_STATIC_FILES=true
       - DATABASE_URL=postgresql://danbooru@postgres/danbooru
+      - DANBOORU_REDIS_URL=redis://redis:6379
       - DANBOORU_CANONICAL_URL=http://localhost
     volumes:
       - "danbooru-images:/danbooru/public/data"
@@ -41,6 +42,7 @@ services:
     environment:
       - RAILS_ENV=production
       - DATABASE_URL=postgresql://danbooru@postgres/danbooru
+      - DANBOORU_REDIS_URL=redis://redis:6379
       - DANBOORU_CANONICAL_URL=http://localhost
     depends_on:
       - danbooru
@@ -51,10 +53,14 @@ services:
     environment:
       - RAILS_ENV=production
       - DATABASE_URL=postgresql://danbooru@postgres/danbooru
+      - DANBOORU_REDIS_URL=redis://redis:6379
       - DANBOORU_CANONICAL_URL=http://localhost
     depends_on:
       - danbooru
     command: ["bash", "-c", "bin/wait-for-http http://danbooru:3000 5s && bin/delayed_job run"]
+
+  redis:
+    image: redis
 
   postgres:
     image: evazion/postgres
