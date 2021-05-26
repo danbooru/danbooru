@@ -32,6 +32,8 @@ services:
       - DANBOORU_CANONICAL_URL=http://localhost
     volumes:
       - "danbooru-images:/danbooru/public/data"
+    tmpfs:
+      - /tmp
     depends_on:
       - postgres
     command: ["bash", "-c", "bin/rails db:setup; bin/rails db:migrate && bin/rails server -b 0.0.0.0"]
