@@ -1,5 +1,6 @@
 # Image URLS
 # * http://ww1.sinaimg.cn/large/69917555gw1f6ggdghk28j20c87lbhdt.jpg
+# * https://wx1.sinaimg.cn/large/002NQ2vhly1gqzqfk1agfj62981aw4qr02.jpg (more than 32 characters in hash)
 #
 # Image Samples
 # * http://ww4.sinaimg.cn/mw690/77a2d531gw1f4u411ws3aj20m816fagg.jpg
@@ -41,7 +42,7 @@ module Sources
       PAGE_URL_3    = %r{\Ahttps?://m\.weibo\.cn/(?:detail/(?<illust_long_id>\d+)|status/(?<illust_base62_id>\w+))}i
       PAGE_URL_4    = %r{\Ahttps?://tw\.weibo\.com/(?:(?<artist_short_id>\d+)|\w+)/(?<illust_long_id>\d+)}i
 
-      IMAGE_URL     = %r{\Ahttps?://\w{3}\.sinaimg\.cn/\w+/(?<image_id>\w{32})\.}i
+      IMAGE_URL     = %r{\Ahttps?://\w+\.sinaimg\.cn/\w+/(?<image_id>\w+)\.}i
 
       def domains
         ["weibo.com", "weibo.cn", "weibocdn.com", "sinaimg.cn"]
@@ -179,15 +180,15 @@ module Sources
       end
 
       def illust_long_id
-        [url, referer_url].compact.map { |x| x[PAGE_URL_2, :illust_long_id] || x[PAGE_URL_3, :illust_long_id] || x[PAGE_URL_4, :illust_long_id] }.compact.first
+        urls.map { |x| x[PAGE_URL_2, :illust_long_id] || x[PAGE_URL_3, :illust_long_id] || x[PAGE_URL_4, :illust_long_id] }.compact.first
       end
 
       def illust_base62_id
-        [url, referer_url].compact.map { |x| x[PAGE_URL_1, :illust_base62_id] || x[PAGE_URL_3, :illust_base62_id] }.compact.first
+        urls.map { |x| x[PAGE_URL_1, :illust_base62_id] || x[PAGE_URL_3, :illust_base62_id] }.compact.first
       end
 
       def artist_short_id_from_url
-        [url, referer_url].compact.map { |x| x[PROFILE_URL_1, :artist_short_id] || x[PROFILE_URL_2, :artist_short_id] || x[PAGE_URL_1, :artist_short_id] || x[PAGE_URL_4, :artist_short_id] }.compact.first
+        urls.map { |x| x[PROFILE_URL_1, :artist_short_id] || x[PROFILE_URL_2, :artist_short_id] || x[PAGE_URL_1, :artist_short_id] || x[PAGE_URL_4, :artist_short_id] }.compact.first
       end
 
       def artist_short_id
@@ -195,7 +196,7 @@ module Sources
       end
 
       def artist_long_id
-        [url, referer_url].compact.map { |x| x[PROFILE_URL_3, :artist_long_id] }.compact.first
+        urls.map { |x| x[PROFILE_URL_3, :artist_long_id] }.compact.first
       end
 
       def mobile_url
