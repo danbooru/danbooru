@@ -61,7 +61,7 @@ class DiscordSlashCommand
     end
 
     def is_nsfw_channel?
-      command.channel.fetch("nsfw")
+      command.channel.fetch("nsfw", false)
     end
   end
 end
