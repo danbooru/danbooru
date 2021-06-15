@@ -71,13 +71,13 @@
     <% selected = parent_id == parent_relationship.first.id %>
     <% parent_post_id = parent_relationship.first.id %>
     <% last_post_id = parent_relationship.last.id %>
-    <% this_index = parent_relationship.find_index(post) || 0 %>
-    <% if parent_relationship.include? post && post != parent_relationship.first %>
+    <% this_index = parent_relationship.find_index { |relationship_element| relationship_element[:id] == post.id } || 0 %>
+    <% if post.id != parent_relationship.first.id %>
       <% previous_post_id = parent_relationship[this_index - 1].id %>
     <% else %>
       <% previous_post_id = nil %>
     <% end %>
-    <% if parent_relationship.include? post && post != parent_relationship.last %>
+    <% if post.id != parent_relationship.last.id %>
       <% next_post_id = parent_relationship[this_index + 1].id %>
     <% else %>
       <% next_post_id = nil %>

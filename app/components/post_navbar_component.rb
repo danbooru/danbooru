@@ -20,7 +20,7 @@ class PostNavbarComponent < ApplicationComponent
       @sibling_posts = post.parent.present? ? post.parent.children : Post.none
       @sibling_posts = @sibling_posts.undeleted unless include_deleted
       array_when_child = @sibling_posts.to_a
-      @sibling_posts.to_i
+      # @sibling_posts.to_i
       array_when_child.unshift(post.parent)
       if array_when_child.length > 0
         relationship_groups.push(array_when_child)
