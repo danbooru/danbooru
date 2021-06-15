@@ -36,7 +36,7 @@ class PostNavbarComponent < ApplicationComponent
   end
 
   def has_search_navbar?
-    !query.has_metatag?(:order, :ordfav, :ordpool) && pool_id.blank? && favgroup_id.blank? && parent_relationships.blank?
+    !query.has_metatag?(:order, :ordfav, :ordpool) && pool_id.blank? && favgroup_id.blank? && parent_id.blank?
   end
 
   def pool_id
