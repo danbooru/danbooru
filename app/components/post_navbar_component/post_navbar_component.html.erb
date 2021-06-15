@@ -72,18 +72,10 @@
     <% parent_post_id = parent_relationship.first.id %>
     <% last_post_id = parent_relationship.last.id %>
     <% this_index = parent_relationship.find_index { |relationship_element| relationship_element[:id] == post.id } || 0 %>
-    <% if post.id != parent_relationship.first.id %>
-      <% previous_post_id = parent_relationship[this_index - 1].id %>
-    <% else %>
-      <% previous_post_id = nil %>
-    <% end %>
-    <% if post.id != parent_relationship.last.id %>
-      <% next_post_id = parent_relationship[this_index + 1].id %>
-    <% else %>
-      <% next_post_id = nil %>
-    <% end %>
+    <% previous_post_id = (post.id != parent_relationship.first.id) ? parent_relationship[this_index - 1].id : nil %>
+    <% next_post_id = (post.id != parent_relationship.last.id) ? parent_relationship[this_index + 1].id : nil %>
 
-    <%= tag.li class: "favgroup-navbar", "data-selected": selected do %>
+    <%= tag.li class: "parent-navbar", "data-selected": selected do %>
       <span class="first">
         <%= link_to_unless parent_post_id == post.id, "«", post_path(parent_post_id, q: "parent:#{parent_post_id}"), rel: "nofollow" %>
       </span>
@@ -92,7 +84,7 @@
         <%= link_to_if previous_post_id, "‹ prev", post_path(previous_post_id.to_i, q: "parent:#{parent_post_id}"), rel: ["nofollow", ("prev" if selected)], "data-shortcut": ("a" if selected) %>
       </span>
 
-      <span class="favgroup-name">
+      <span class="parent-name">
         <%= link_to "Parent: #{parent_post_id}", parent_relationship.first %>
       </span>
 
