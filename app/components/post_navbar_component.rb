@@ -13,6 +13,25 @@ class PostNavbarComponent < ApplicationComponent
     has_search_navbar? || pools.any? || favgroups.any?
   end
 
+  def parent_relationships
+    relationship_groups = []
+    if post.parent.present?
+      array_when_child = @sibling_posts.to_a
+      array_when_child.push(post.parent)
+      if array_when_child.length > 0
+        relationship_groups.push(array_when_child)
+      end
+    end
+    if post.has_visible_children?
+      array_when_parent = @child_posts.to_a
+      array_when_parent.push(post)
+      if array_when_parent.length > 0
+        relationship_groups.push(array_when_parent)
+      end
+    end
+    @parent_relationships ||= relationship_groups
+  end
+
   def pools
     @pools ||= post.pools.undeleted.sort_by do |pool|
       [pool.id == pool_id ? 0 : 1, pool.is_series? ? 0 : 1, pool.name]
@@ -37,6 +56,10 @@ class PostNavbarComponent < ApplicationComponent
 
   def favgroup_id
     @favgroup_id ||= query.find_metatag(:favgroup, :ordfavgroup)&.to_i
+  end
+
+  def parent_id
+    @parent_id ||= query.find_metatag(:parent)&.to_i
   end
 
   def query
