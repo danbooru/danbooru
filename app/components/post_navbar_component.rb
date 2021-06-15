@@ -16,21 +16,8 @@ class PostNavbarComponent < ApplicationComponent
   def parent_relationships
     include_deleted = post.is_deleted? || (post.parent_id.present? && post.parent.is_deleted?) || CurrentUser.user.show_deleted_children?
     relationship_groups = []
-    if post.parent.present?
-      array_when_child = (include_deleted ? post.parent.children : post.parent.children.undeleted).to_a.unshift(post.parent)
-      if array_when_child.length > 0
-        relationship_groups.push(array_when_child)
-      end
-    end
-    if post.has_visible_children?
-      @child_posts = post.children
-      @child_posts = @child_posts.undeleted unless include_deleted
-      array_when_parent = @child_posts.to_a
-      array_when_parent.unshift(post)
-      if array_when_parent.length > 0
-        relationship_groups.push(array_when_parent)
-      end
-    end
+    relationship_groups.push((include_deleted ? post.parent.children : post.parent.children.undeleted).to_a.unshift(post.parent)) if post.parent.present?
+    relationship_groups.push((include_deleted ? post.children : post.children.undeleted).to_a.unshift(post)) if post.has_visible_children?
     @parent_relationships ||= relationship_groups
   end
 
