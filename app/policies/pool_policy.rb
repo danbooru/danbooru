@@ -20,7 +20,7 @@ class PoolPolicy < ApplicationPolicy
   end
 
   def permitted_attributes
-    [:name, :description, :category, :post_ids, :post_ids_string, post_ids: []]
+    [:name, :description, :category, :post_ids, :post_ids_string, { post_ids: [] }]
   end
 
   def api_attributes

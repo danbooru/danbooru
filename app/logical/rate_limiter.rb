@@ -17,14 +17,14 @@ class RateLimiter
 
     case action
     when "users:create"
-      rate, burst = 1.0/5.minutes, 10
+      rate, burst = 1.0 / 5.minutes, 10
     when "emails:update", "sessions:create", "moderation_reports:create"
-      rate, burst = 1.0/1.minute, 10
+      rate, burst = 1.0 / 1.minute, 10
     when "dmails:create", "comments:create", "forum_posts:create", "forum_topics:create"
-      rate, burst = 1.0/1.minute, 50
+      rate, burst = 1.0 / 1.minute, 50
     when "comment_votes:create", "comment_votes:destroy", "post_votes:create",
          "post_votes:destroy", "favorites:create", "favorites:destroy", "post_disapprovals:create"
-      rate, burst = 1.0/1.second, 200
+      rate, burst = 1.0 / 1.second, 200
     else
       rate = user.api_regen_multiplier
       burst = 200

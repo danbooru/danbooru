@@ -3,6 +3,7 @@ class SavedSearch < ApplicationRecord
   QUERY_LIMIT = 1000
 
   attr_reader :disable_labels
+
   belongs_to :user
 
   normalize :query, :normalize_query
@@ -146,7 +147,7 @@ class SavedSearch < ApplicationRecord
         PostQueryBuilder.new(query.to_s).normalized_query(sort: false).to_s
       end
 
-      def queries_for(user_id, label: nil, options: {})
+      def queries_for(user_id, label: nil)
         searches = SavedSearch.where(user_id: user_id)
         searches = searches.labeled(label) if label.present?
         queries = searches.map(&:normalized_query)
@@ -167,8 +168,8 @@ class SavedSearch < ApplicationRecord
     end
 
     def rewrite_query(old_name, new_name)
-      self.query.gsub!(/(?:\A| )([-~])?#{Regexp.escape(old_name)}(?: |\z)/i) { " #{$1}#{new_name} " }
-      self.query.strip!
+      query.gsub!(/(?:\A| )([-~])?#{Regexp.escape(old_name)}(?: |\z)/i) { " #{$1}#{new_name} " }
+      query.strip!
     end
   end
 

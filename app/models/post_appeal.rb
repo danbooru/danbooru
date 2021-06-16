@@ -10,7 +10,7 @@ class PostAppeal < ApplicationRecord
   enum status: {
     pending: 0,
     succeeded: 1,
-    rejected: 2
+    rejected: 2,
   }
 
   scope :expired, -> { pending.where("post_appeals.created_at < ?", Danbooru.config.moderation_period.ago) }

@@ -2,10 +2,12 @@
 
 class PaginatorComponent < ApplicationComponent
   attr_reader :records, :window, :params
+
   delegate :current_page, :prev_page, :next_page, :total_pages, :paginator_mode, :paginator_page_limit, to: :records
   delegate :ellipsis_icon, :chevron_left_icon, :chevron_right_icon, to: :helpers
 
   def initialize(records:, params:, window: 4)
+    super
     @records = records
     @window = window
     @params = params
@@ -25,7 +27,7 @@ class PaginatorComponent < ApplicationComponent
       ("..." unless left == 2),
       (left..right).to_a,
       ("..." unless right == last_page - 1),
-      (last_page unless last_page == 1)
+      (last_page unless last_page == 1),
     ].flatten.compact
   end
 

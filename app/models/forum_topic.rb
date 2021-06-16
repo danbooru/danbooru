@@ -2,13 +2,13 @@ class ForumTopic < ApplicationRecord
   CATEGORIES = {
     0 => "General",
     1 => "Tags",
-    2 => "Bugs & Features"
+    2 => "Bugs & Features",
   }
 
   MIN_LEVELS = {
     None: 0,
     Moderator: User::Levels::MODERATOR,
-    Admin: User::Levels::ADMIN
+    Admin: User::Levels::ADMIN,
   }
 
   belongs_to :creator, class_name: "User"
@@ -17,14 +17,14 @@ class ForumTopic < ApplicationRecord
   has_many :forum_topic_visits
   has_one :forum_topic_visit_by_current_user, -> { where(user_id: CurrentUser.id) }, class_name: "ForumTopicVisit"
   has_one :original_post, -> { order(id: :asc) }, class_name: "ForumPost", foreign_key: "topic_id", inverse_of: :topic
-  has_many :bulk_update_requests, :foreign_key => "forum_topic_id"
-  has_many :tag_aliases, :foreign_key => "forum_topic_id"
-  has_many :tag_implications, :foreign_key => "forum_topic_id"
+  has_many :bulk_update_requests
+  has_many :tag_aliases
+  has_many :tag_implications
 
   validates :title, presence: true, length: { maximum: 200 }, if: :title_changed?
   validates_associated :original_post
-  validates_inclusion_of :category_id, :in => CATEGORIES.keys
-  validates_inclusion_of :min_level, :in => MIN_LEVELS.values
+  validates :category_id, inclusion: { in: CATEGORIES.keys }
+  validates :min_level, inclusion: { in: MIN_LEVELS.values }
 
   accepts_nested_attributes_for :original_post
   after_update :update_orignal_post
@@ -129,9 +129,9 @@ class ForumTopic < ApplicationRecord
     def mark_as_read!(user = CurrentUser.user)
       return if user.is_anonymous?
 
-      match = ForumTopicVisit.where(:user_id => user.id, :forum_topic_id => id).first
-      if match
-        match.update_attribute(:last_read_at, updated_at)
+      visit = ForumTopicVisit.find_by(user_id: user.id, forum_topic_id: id)
+      if visit
+        visit.update!(last_read_at: updated_at)
       else
         ForumTopicVisit.create(:user_id => user.id, :forum_topic_id => id, :last_read_at => updated_at)
       end

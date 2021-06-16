@@ -82,7 +82,7 @@ class TagMover
     old_cosplay_tag = "#{old_tag.name}_(cosplay)"
     new_cosplay_tag = "#{new_tag.name}_(cosplay)"
 
-    if Tag.nonempty.where(name: old_cosplay_tag).exists?
+    if Tag.nonempty.exists?(name: old_cosplay_tag)
       TagMover.new(old_cosplay_tag, new_cosplay_tag).move!
     end
   end

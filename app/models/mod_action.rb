@@ -53,7 +53,7 @@ class ModAction < ApplicationRecord
     ip_ban_undelete: 163,
     mass_update: 1000, # XXX unused
     bulk_revert: 1001, # XXX unused
-    other: 2000
+    other: 2000,
   }
 
   def self.visible(user)

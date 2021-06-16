@@ -1,5 +1,3 @@
-require 'dtext'
-
 module ApplicationHelper
   def listing_type(*fields, member_check: true, types: [:revert, :standard])
     (fields.reduce(false) { |acc, field| acc || params.dig(:search, field).present? } && (!member_check || CurrentUser.is_member?) ? types[0] : types[1])
@@ -11,8 +9,7 @@ module ApplicationHelper
   end
 
   def diff_name_html(this_name, other_name)
-    pattern = Regexp.new('.')
-    DiffBuilder.new(this_name, other_name, pattern).build
+    DiffBuilder.new(this_name, other_name, /./).build
   end
 
   def diff_body_html(record, other, field)
@@ -21,7 +18,7 @@ module ApplicationHelper
       return h(diff_record[field]).gsub(/\r?\n/, '<span class="paragraph-mark">¶</span><br>').html_safe
     end
 
-    pattern = Regexp.new('(?:<.+?>)|(?:\w+)|(?:[ \t]+)|(?:\r?\n)|(?:.+?)')
+    pattern = /(?:<.+?>)|(?:\w+)|(?:[ \t]+)|(?:\r?\n)|(?:.+?)/
     DiffBuilder.new(record[field], other[field], pattern).build
   end
 
@@ -32,18 +29,17 @@ module ApplicationHelper
       return type == "previous" ? "New" : ""
     end
 
-    statuses = []
-    record.class.status_fields.each do |field, status|
-      if record.has_attribute?(field)
-        statuses += [status] if record[field] != other[field]
-      else
-        statuses += [status] if record.send(field, type)
-      end
+    changed_fields = record.class.status_fields.select do |field, status|
+      (record.has_attribute?(field) && record[field] != other[field]) ||
+      (!record.has_attribute?(field) && record.send(field, type))
     end
 
+    statuses = changed_fields.map { |field, status| status }
     altered = record.updater_id != other.updater_id
 
-    %(<div class="version-statuses" data-altered="#{altered}">#{statuses.join("<br>")}</div>).html_safe
+    tag.div(class: "version-statuses", "data-altered": altered) do
+      safe_join(statuses, tag.br)
+    end
   end
 
   def wordbreakify(string)

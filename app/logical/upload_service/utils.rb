@@ -14,7 +14,7 @@ class UploadService
     end
 
     def is_downloadable?(source)
-      source =~ /^https?:\/\//
+      source =~ %r{\Ahttps?://}
     end
 
     def generate_resizes(media_file)

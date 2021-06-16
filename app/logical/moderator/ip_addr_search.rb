@@ -62,7 +62,7 @@ module Moderator
     end
 
     def add_row(sums, counts)
-      sums.merge!(counts) { |key, oldcount, newcount| oldcount + newcount }
+      sums.merge!(counts) { |_key, oldcount, newcount| oldcount + newcount }
     end
 
     def add_row_id(sums, counts)

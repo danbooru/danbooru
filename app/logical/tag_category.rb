@@ -68,7 +68,7 @@ class TagCategory
     end
 
     def category_ids_regex
-      @@category_ids_regex ||= "[#{category_ids.join("")}]"
+      @@category_ids_regex ||= "[#{category_ids.join}]"
     end
   end
 

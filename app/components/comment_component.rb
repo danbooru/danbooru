@@ -4,6 +4,7 @@ class CommentComponent < ApplicationComponent
   attr_reader :comment, :context, :dtext_data, :current_user
 
   def initialize(comment:, current_user:, context: nil, dtext_data: nil)
+    super
     @comment = comment
     @context = context
     @dtext_data = dtext_data
@@ -11,7 +12,7 @@ class CommentComponent < ApplicationComponent
   end
 
   def dimmed?
-    comment.is_deleted? || (!comment.is_sticky? && comment.score <= current_user.comment_threshold/2.0)
+    comment.is_deleted? || (!comment.is_sticky? && comment.score <= current_user.comment_threshold / 2.0)
   end
 
   def thresholded?

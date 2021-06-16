@@ -45,7 +45,7 @@ class UploadsController < ApplicationController
   def preprocess
     authorize Upload
     @upload, @remote_size = UploadService::ControllerHelper.prepare(
-      url: params.dig(:upload, :source), file: params.dig(:upload, :file), ref: params.dig(:upload, :referer_url),
+      url: params.dig(:upload, :source), file: params.dig(:upload, :file), ref: params.dig(:upload, :referer_url)
     )
     render body: nil
   end

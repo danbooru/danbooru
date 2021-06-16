@@ -5,7 +5,7 @@ class PostDisapproval < ApplicationRecord
   belongs_to :post
   belongs_to :user
   validates :user, uniqueness: { scope: :post, message: "have already hidden this post" }
-  validates_inclusion_of :reason, in: REASONS
+  validates :reason, inclusion: { in: REASONS }
   validate :validate_disapproval
 
   scope :with_message, -> { where.not(message: nil) }

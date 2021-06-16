@@ -1,19 +1,19 @@
 module NoteSanitizer
-  ALLOWED_ELEMENTS = %w(
+  ALLOWED_ELEMENTS = %w[
     code center tn h1 h2 h3 h4 h5 h6 a span div blockquote br p ul li ol em
     strong small big b i font u s pre ruby rb rt rp rtc sub sup hr wbr
-  )
+  ]
 
   ALLOWED_ATTRIBUTES = {
-    :all => %w(style title),
-    "a" => %w(href),
-    "span" => %w(class),
-    "div" => %w(class align),
-    "p" => %w(class align),
-    "font" => %w(color size)
+    :all => %w[style title],
+    "a" => %w[href],
+    "span" => %w[class],
+    "div" => %w[class align],
+    "p" => %w[class align],
+    "font" => %w[color size]
   }
 
-  ALLOWED_PROPERTIES = %w(
+  ALLOWED_PROPERTIES = %w[
     align-items
     background background-color
     border border-color border-image border-radius border-style border-width
@@ -48,7 +48,7 @@ module NoteSanitizer
     word-wrap overflow-wrap
     writing-mode
     vertical-align
-  )
+  ]
 
   def self.sanitize(text)
     text.gsub!(/<( |-|3|:|>|\Z)/, "&lt;\\1")

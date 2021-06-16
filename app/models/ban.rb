@@ -12,8 +12,8 @@ class Ban < ApplicationRecord
   validates :reason, presence: true
   validate :user, :validate_user_is_bannable, on: :create
 
-  scope :unexpired, -> { where("bans.created_at + bans.duration > ?", Time.now) }
-  scope :expired, -> { where("bans.created_at + bans.duration <= ?", Time.now) }
+  scope :unexpired, -> { where("bans.created_at + bans.duration > ?", Time.zone.now) }
+  scope :expired, -> { where("bans.created_at + bans.duration <= ?", Time.zone.now) }
   scope :active, -> { unexpired }
 
   def self.search(params)
@@ -48,7 +48,7 @@ class Ban < ApplicationRecord
   end
 
   def update_user_on_destroy
-    user.update_attribute(:is_banned, false)
+    user.update!(is_banned: false)
   end
 
   def user_name
@@ -68,7 +68,7 @@ class Ban < ApplicationRecord
   end
 
   def expired?
-    persisted? && expires_at < Time.now
+    persisted? && expires_at < Time.zone.now
   end
 
   def create_feedback

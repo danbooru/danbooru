@@ -11,9 +11,10 @@ class NicoSeigaApiClient
   end
 
   def image_ids
-    if @work_type == "illust"
+    case @work_type
+    when "illust"
       [api_response["id"]]
-    elsif @work_type == "manga"
+    when "manga"
       manga_api_response.map do |x|
         case x["meta"]["source_url"]
         when %r{/thumb/(\d+)\w}i then Regexp.last_match(1)
@@ -40,20 +41,22 @@ class NicoSeigaApiClient
   end
 
   def user_name
-    if @work_type == "illust"
+    case @work_type
+    when "illust"
       api_response["nickname"]
-    elsif @work_type == "manga"
+    when "manga"
       user_api_response(user_id)["nickname"]
     end
   end
 
   def api_response
-    if @work_type == "illust"
+    case @work_type
+    when "illust"
       resp = get("https://sp.seiga.nicovideo.jp/ajax/seiga/im#{@work_id}")
       return {} if resp.blank? || resp.code.to_i == 404
       api_response = JSON.parse(resp)["target_image"]
 
-    elsif @work_type == "manga"
+    when "manga"
       resp = http.cache(1.minute).get("#{XML_API}/theme/info?id=#{@work_id}")
       return {} if resp.blank? || resp.code.to_i == 404
       api_response = Hash.from_xml(resp.to_s)["response"]["theme"]
@@ -86,16 +89,13 @@ class NicoSeigaApiClient
 
     # XXX should fail gracefully instead of raising exception
     resp = http.cache(1.hour).post("https://account.nicovideo.jp/login/redirector?site=seiga", form: form)
-    raise RuntimeError, "NicoSeiga login failed (status=#{resp.status} url=#{url})" if resp.status != 200
+    raise "NicoSeiga login failed (status=#{resp.status} url=#{url})" if resp.status != 200
 
     http
   end
 
   def get(url)
-    resp = login.cache(1.minute).get(url)
-    #raise RuntimeError, "NicoSeiga get failed (status=#{resp.status} url=#{url})" if resp.status != 200
-
-    resp
+    login.cache(1.minute).get(url)
   end
 
   memoize :api_response, :manga_api_response, :user_api_response

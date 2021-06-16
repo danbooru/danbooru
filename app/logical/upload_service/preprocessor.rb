@@ -34,14 +34,12 @@ class UploadService
 
     def in_progress?
       if md5.present?
-        return Upload.where(status: "preprocessing", md5: md5).exists?
+        Upload.exists?(status: "preprocessing", md5: md5)
+      elsif Utils.is_downloadable?(source)
+        Upload.exists?(status: "preprocessing", source: source)
+      else
+        false
       end
-
-      if Utils.is_downloadable?(source)
-        return Upload.where(status: "preprocessing", source: source).exists?
-      end
-
-      false
     end
 
     def predecessor

@@ -11,7 +11,7 @@ class Tag < ApplicationRecord
 
   validates :name, tag_name: true, uniqueness: true, on: :create
   validates :name, tag_name: true, on: :name
-  validates_inclusion_of :category, in: TagCategory.category_ids
+  validates :category, inclusion: { in: TagCategory.category_ids }
 
   after_save :update_category_cache, if: :saved_change_to_category?
   after_save :update_category_post_counts, if: :saved_change_to_category?
@@ -21,13 +21,13 @@ class Tag < ApplicationRecord
 
   module ApiMethods
     def to_legacy_json
-      return {
-        "name" => name,
-        "id" => id,
-        "created_at" => created_at.try(:strftime, "%Y-%m-%d %H:%M"),
-        "count" => post_count,
-        "type" => category,
-        "ambiguous" => false
+      {
+        name: name,
+        id: id,
+        created_at: created_at.try(:strftime, "%Y-%m-%d %H:%M"),
+        count: post_count,
+        type: category,
+        ambiguous: false,
       }.to_json
     end
   end
@@ -255,7 +255,7 @@ class Tag < ApplicationRecord
 
     def abbreviation_matches(abbrev)
       abbrev = abbrev.downcase.delete_prefix("/")
-      return none if abbrev !~ /\A[a-z0-9\*]*\z/
+      return none if abbrev !~ /\A[a-z0-9*]*\z/
 
       where("regexp_replace(tags.name, ?, '\\1', 'g') LIKE ?", ABBREVIATION_REGEXP.source, abbrev.to_escaped_for_sql_like)
     end
@@ -309,7 +309,7 @@ class Tag < ApplicationRecord
 
     def names_matches_with_aliases(name, limit)
       name = normalize_name(name)
-      wildcard_name = name + '*'
+      wildcard_name = "#{name}*"
 
       query1 =
         Tag

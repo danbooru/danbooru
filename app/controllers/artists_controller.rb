@@ -56,7 +56,7 @@ class ArtistsController < ApplicationController
 
   def destroy
     @artist = authorize Artist.find(params[:id])
-    @artist.update_attribute(:is_deleted, true)
+    @artist.update(is_deleted: true)
     redirect_to(artist_path(@artist), :notice => "Artist deleted")
   end
 

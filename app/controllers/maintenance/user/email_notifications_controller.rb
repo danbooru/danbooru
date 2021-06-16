@@ -4,7 +4,7 @@ module Maintenance
       class VerificationError < StandardError; end
 
       before_action :validate_sig, :only => [:destroy]
-      rescue_from VerificationError, :with => :render_403
+      rescue_from VerificationError, with: :render_verification_error
 
       def show
       end
@@ -17,15 +17,15 @@ module Maintenance
 
       private
 
-      def render_403
-        render plain: "", :status => 403
+      def render_verification_error
+        render plain: "", status: 403
       end
 
       def validate_sig
         verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.email_key, digest: "SHA256", serializer: JSON)
         calculated_sig = verifier.generate(params[:user_id].to_s)
         if calculated_sig != params[:sig]
-          raise VerificationError.new
+          raise VerificationError, "Invalid signature"
         end
       end
     end

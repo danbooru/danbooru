@@ -1,8 +1,3 @@
-require 'upload_service/controller_helper'
-require 'upload_service/preprocessor'
-require 'upload_service/replacer'
-require 'upload_service/utils'
-
 class UploadService
   attr_reader :params, :post, :upload
 

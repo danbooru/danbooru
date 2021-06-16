@@ -3,8 +3,8 @@ class Comment < ApplicationRecord
   belongs_to :creator, class_name: "User"
   belongs_to_updater
 
-  has_many :moderation_reports, as: :model
-  has_many :votes, :class_name => "CommentVote", :dependent => :destroy
+  has_many :moderation_reports, as: :model, dependent: :destroy
+  has_many :votes, class_name: "CommentVote", dependent: :destroy
 
   validates :body, presence: true, length: { maximum: 15_000 }, if: :body_changed?
 
@@ -20,9 +20,9 @@ class Comment < ApplicationRecord
 
   deletable
   mentionable(
-    :message_field => :body,
-    :title => ->(user_name) {"#{creator.name} mentioned you in a comment on post ##{post_id}"},
-    :body => ->(user_name) {"@#{creator.name} mentioned you in comment ##{id} on post ##{post_id}:\n\n[quote]\n#{DText.extract_mention(body, "@" + user_name)}\n[/quote]\n"}
+    message_field: :body,
+    title: ->(_user_name) {"#{creator.name} mentioned you in a comment on post ##{post_id}"},
+    body: ->(user_name) {"@#{creator.name} mentioned you in comment ##{id} on post ##{post_id}:\n\n[quote]\n#{DText.extract_mention(body, "@#{user_name}")}\n[/quote]\n"}
   )
 
   module SearchMethods
@@ -55,7 +55,7 @@ class Comment < ApplicationRecord
 
   def update_last_commented_at_on_create
     Post.where(:id => post_id).update_all(:last_commented_at => created_at)
-    if Comment.where("post_id = ?", post_id).count <= Danbooru.config.comment_threshold && !do_not_bump_post?
+    if Comment.where(post_id: post_id).count <= Danbooru.config.comment_threshold && !do_not_bump_post?
       Post.where(:id => post_id).update_all(:last_comment_bumped_at => created_at)
     end
   end

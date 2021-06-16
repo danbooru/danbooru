@@ -16,6 +16,6 @@ class FavoriteGroupPolicy < ApplicationPolicy
   end
 
   def permitted_attributes
-    [:name, :post_ids_string, :is_public, :post_ids, post_ids: []]
+    [:name, :post_ids_string, :is_public, :post_ids, { post_ids: [] }]
   end
 end

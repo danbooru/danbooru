@@ -4,7 +4,8 @@ class UserNameChangeRequest < ApplicationRecord
 
   validate :not_limited, on: :create
   validates :desired_name, user_name: true, confirmation: true, on: :create
-  validates_presence_of :original_name, :desired_name
+  validates :original_name, presence: true
+  validates :desired_name, presence: true
 
   after_create :update_name!
 
@@ -28,7 +29,7 @@ class UserNameChangeRequest < ApplicationRecord
   end
 
   def not_limited
-    if UserNameChangeRequest.unscoped.where(user: user).where("created_at >= ?", 1.week.ago).exists?
+    if UserNameChangeRequest.unscoped.where(user: user).exists?(["created_at >= ?", 1.week.ago])
       errors.add(:base, "You can only submit one name change request per week")
     end
   end

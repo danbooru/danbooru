@@ -20,7 +20,7 @@ module PostSets
     end
 
     def has_blank_wiki?
-      tag.present? && !wiki_page.present?
+      tag.present? && wiki_page.nil?
     end
 
     def wiki_page
@@ -94,7 +94,7 @@ module PostSets
     end
 
     def get_post_count
-      if %w(json atom xml).include?(format.downcase)
+      if %w[json atom xml].include?(format.downcase)
         # no need to get counts for formats that don't use a paginator
         nil
       else

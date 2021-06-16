@@ -35,8 +35,6 @@ class PoolVersionsController < ApplicationController
   end
 
   def check_availabililty
-    if !PoolVersion.enabled?
-      raise NotImplementedError.new("Archive service is not configured. Pool versions are not saved.")
-    end
+    raise NotImplementedError, "Archive service is not configured. Pool versions are not saved." unless PoolVersion.enabled?
   end
 end

@@ -4,6 +4,7 @@ class PostNavbarComponent < ApplicationComponent
   attr_reader :post, :current_user, :search
 
   def initialize(post:, current_user:, search: nil)
+    super
     @post = post
     @current_user = current_user
     @search = search.presence || "status:any"

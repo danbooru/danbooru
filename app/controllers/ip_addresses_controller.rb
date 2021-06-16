@@ -4,9 +4,10 @@ class IpAddressesController < ApplicationController
   def index
     @ip_addresses = authorize IpAddress.visible(CurrentUser.user).paginated_search(params)
 
-    if search_params[:group_by] == "ip_addr"
+    case search_params[:group_by]
+    when "ip_addr"
       @ip_addresses = @ip_addresses.group_by_ip_addr(search_params[:ipv4_masklen], search_params[:ipv6_masklen])
-    elsif search_params[:group_by] == "user"
+    when "user"
       @ip_addresses = @ip_addresses.group_by_user.includes(:user)
     else
       @ip_addresses = @ip_addresses.includes(:user, :model)

@@ -55,7 +55,7 @@ module RecommenderService
 
     if user.present?
       raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, user).can_see_favorites?
-      max_recommendations = params.fetch(:max_recommendations, user.favorite_count + 500).to_i.clamp(0, 50000)
+      max_recommendations = params.fetch(:max_recommendations, user.favorite_count + 500).to_i.clamp(0, 50_000)
       recs = RecommenderService.recommend_for_user(user, tags: params[:post_tags_match], limit: max_recommendations)
     elsif post.present?
       max_recommendations = params.fetch(:max_recommendations, 100).to_i.clamp(0, 1000)

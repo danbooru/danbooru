@@ -79,7 +79,7 @@ class ForumTopicsController < ApplicationController
 
   def mark_all_as_read
     authorize ForumTopic
-    CurrentUser.user.update_attribute(:last_forum_read_at, Time.now)
+    CurrentUser.user.update(last_forum_read_at: Time.zone.now)
     ForumTopicVisit.prune!(CurrentUser.user)
     redirect_to forum_topics_path, :notice => "All topics marked as read"
   end

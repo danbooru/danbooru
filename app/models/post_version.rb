@@ -81,7 +81,7 @@ class PostVersion < ApplicationRecord
       def queue(post)
         # queue updates to sqs so that if archives goes down for whatever reason it won't
         # block post updates
-        raise NotImplementedError.new("Archive service is not configured") if !enabled?
+        raise NotImplementedError, "Archive service is not configured" if !enabled?
 
         json = {
           "post_id" => post.id,
@@ -92,7 +92,7 @@ class PostVersion < ApplicationRecord
           "updater_ip_addr" => CurrentUser.ip_addr.to_s,
           "updated_at" => post.updated_at.try(:iso8601),
           "created_at" => post.created_at.try(:iso8601),
-          "tags" => post.tag_string
+          "tags" => post.tag_string,
         }
         msg = "add post version\n#{json.to_json}"
         sqs_service.send_message(msg, message_group_id: "post:#{post.id}")
@@ -117,25 +117,21 @@ class PostVersion < ApplicationRecord
       # HACK: if all the post versions for this post have already been preloaded,
       # we can use that to avoid a SQL query.
       if association(:post).loaded? && post && post.association(:versions).loaded?
-        ver = [post.versions.sort_by(&:version).reverse.find { |v| v.version < version }]
+        [post.versions.sort_by(&:version).reverse.find { |v| v.version < version }]
       else
-        ver = PostVersion.where("post_id = ? and version < ?", post_id, version).order("version desc").limit(1).to_a
+        PostVersion.where("post_id = ? and version < ?", post_id, version).order("version desc").limit(1).to_a
       end
     end
     @previous.first
   end
 
   def subsequent
-    @subsequent ||= begin
-      PostVersion.where("post_id = ? and version > ?", post_id, version).order("version asc").limit(1).to_a
-    end
+    @subsequent ||= PostVersion.where("post_id = ? and version > ?", post_id, version).order("version asc").limit(1).to_a
     @subsequent.first
   end
 
   def current
-    @current ||= begin
-      PostVersion.where("post_id = ?", post_id).order("version desc").limit(1).to_a
-    end
+    @current ||= PostVersion.where(post_id: post_id).order("version desc").limit(1).to_a
     @current.first
   end
 
@@ -167,11 +163,11 @@ class PostVersion < ApplicationRecord
 
   def changes
     delta = {
-      :added_tags => added_tags,
-      :removed_tags => removed_tags,
-      :obsolete_removed_tags => [],
-      :obsolete_added_tags => [],
-      :unchanged_tags => []
+      added_tags: added_tags,
+      removed_tags: removed_tags,
+      obsolete_removed_tags: [],
+      obsolete_added_tags: [],
+      unchanged_tags: [],
     }
 
     return delta if post.nil?
@@ -252,9 +248,10 @@ class PostVersion < ApplicationRecord
     removed = changes[:removed_tags] - changes[:obsolete_removed_tags]
 
     added.each do |tag|
-      if tag =~ /^source:/
+      case tag
+      when /^source:/
         post.source = ""
-      elsif tag =~ /^parent:/
+      when /^parent:/
         post.parent_id = nil
       else
         escaped_tag = Regexp.escape(tag)

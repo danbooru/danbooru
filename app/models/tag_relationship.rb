@@ -21,7 +21,8 @@ class TagRelationship < ApplicationRecord
 
   before_validation :normalize_names
   validates :status, inclusion: { in: %w[active deleted retired] }
-  validates_presence_of :antecedent_name, :consequent_name
+  validates :antecedent_name, presence: true
+  validates :consequent_name, presence: true
   validates :approver, presence: { message: "must exist" }, if: -> { approver_id.present? }
   validates :forum_topic, presence: { message: "must exist" }, if: -> { forum_topic_id.present? }
   validate :antecedent_and_consequent_are_different
@@ -110,7 +111,7 @@ class TagRelationship < ApplicationRecord
   end
 
   def self.approve!(antecedent_name:, consequent_name:, approver:, forum_topic: nil)
-    ProcessTagRelationshipJob.perform_later(class_name: self.name, approver: approver, antecedent_name: antecedent_name, consequent_name: consequent_name, forum_topic: forum_topic)
+    ProcessTagRelationshipJob.perform_later(class_name: name, approver: approver, antecedent_name: antecedent_name, consequent_name: consequent_name, forum_topic: forum_topic)
   end
 
   def self.model_restriction(table)

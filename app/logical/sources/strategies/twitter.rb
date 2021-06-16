@@ -156,12 +156,12 @@ module Sources::Strategies
         "https://twitter.com/i/web/status/#{status_id}"
       elsif url =~ %r{\Ahttps?://(?:o|image-proxy-origin)\.twimg\.com/\d/proxy\.jpg\?t=(\w+)&}i
         str = Base64.decode64($1)
-        source = URI.extract(str, ['http', 'https'])
+        source = URI.extract(str, %w[http https])
         if source.any?
           source = source[0]
           if source =~ %r{^https?://twitpic.com/show/large/[a-z0-9]+}i
             source.gsub!(%r{show/large/}, "")
-            index = source.rindex('.')
+            index = source.rindex(".")
             source = source[0..index - 1]
           end
           source

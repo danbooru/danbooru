@@ -18,8 +18,8 @@ class Post < ApplicationRecord
   before_validation :parse_pixiv_id
   before_validation :blank_out_nonexistent_parents
   before_validation :remove_parent_loops
-  validates_uniqueness_of :md5, :on => :create, message: ->(obj, data) { "duplicate: #{Post.find_by_md5(obj.md5).id}"}
-  validates_inclusion_of :rating, in: %w(s q e), message: "rating must be s, q, or e"
+  validates :md5, uniqueness: { message: ->(post, _data) { "duplicate: #{Post.find_by_md5(post.md5).id}" }}, on: :create
+  validates :rating, inclusion: { in: %w[s q e], message: "rating must be s, q, or e" }
   validates :source, length: { maximum: 1200 }
   validate :added_tags_are_valid
   validate :removed_tags_are_valid
@@ -79,8 +79,8 @@ class Post < ApplicationRecord
 
     module ClassMethods
       def delete_files(post_id, md5, file_ext, force: false)
-        if Post.where(md5: md5).exists? && !force
-          raise DeletionError.new("Files still in use; skipping deletion.")
+        if Post.exists?(md5: md5) && !force
+          raise DeletionError, "Files still in use; skipping deletion."
         end
 
         Danbooru.config.storage_manager.delete_file(post_id, md5, file_ext, :original)
@@ -302,7 +302,7 @@ class Post < ApplicationRecord
       flag = flags.create(reason: reason, is_deletion: is_deletion, creator: CurrentUser.user)
 
       if flag.errors.any?
-        raise PostFlag::Error.new(flag.errors.full_messages.join("; "))
+        raise PostFlag::Error, flag.errors.full_messages.join("; ")
       end
     end
 
@@ -311,7 +311,7 @@ class Post < ApplicationRecord
     end
 
     def disapproved_by?(user)
-      PostDisapproval.where(:user_id => user.id, :post_id => id).exists?
+      PostDisapproval.exists?(user_id: user.id, post_id: id)
     end
 
     def autoban
@@ -353,7 +353,7 @@ class Post < ApplicationRecord
     end
 
     def source_domain
-      return "" unless source =~ %r!\Ahttps?://!i
+      return "" unless source =~ %r{\Ahttps?://}i
 
       url = Addressable::URI.parse(normalized_source)
       url.domain
@@ -400,11 +400,11 @@ class Post < ApplicationRecord
     end
 
     def set_tag_count(category, tagcount)
-      self.send("tag_count_#{category}=", tagcount)
+      send("tag_count_#{category}=", tagcount)
     end
 
     def inc_tag_count(category)
-      set_tag_count(category, self.send("tag_count_#{category}") + 1)
+      set_tag_count(category, send("tag_count_#{category}") + 1)
     end
 
     def set_tag_counts
@@ -469,7 +469,7 @@ class Post < ApplicationRecord
       normalized_tags = filter_metatags(normalized_tags)
       normalized_tags = TagAlias.to_aliased(normalized_tags)
       normalized_tags = remove_negated_tags(normalized_tags)
-      normalized_tags = %w(tagme) if normalized_tags.empty?
+      normalized_tags = %w[tagme] if normalized_tags.empty?
       normalized_tags = add_automatic_tags(normalized_tags)
       normalized_tags = remove_invalid_tags(normalized_tags)
       normalized_tags = Tag.convert_cosplay_tags(normalized_tags)
@@ -496,11 +496,11 @@ class Post < ApplicationRecord
       @negated_tags, tags = tags.partition {|x| x =~ /\A-/i}
       @negated_tags = @negated_tags.map {|x| x[1..-1]}
       @negated_tags = TagAlias.to_aliased(@negated_tags)
-      return tags - @negated_tags
+      tags - @negated_tags
     end
 
     def add_automatic_tags(tags)
-      tags -= %w(incredibly_absurdres absurdres highres lowres huge_filesize flash)
+      tags -= %w[incredibly_absurdres absurdres highres lowres huge_filesize flash]
 
       if has_dimensions?
         if image_width >= 10_000 || image_height >= 10_000
@@ -549,7 +549,7 @@ class Post < ApplicationRecord
         tags -= ["animated_png"]
       end
 
-      return tags
+      tags
     end
 
     def apply_casesensitive_metatags(tags)
@@ -574,7 +574,8 @@ class Post < ApplicationRecord
           end
         end
       end
-      return tags
+
+      tags
     end
 
     def filter_metatags(tags)
@@ -582,7 +583,7 @@ class Post < ApplicationRecord
       tags = apply_categorization_metatags(tags)
       @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|-fav|child|-child|-favgroup|favgroup|upvote|downvote|status|-status|disapproved):/i}
       apply_pre_metatags
-      return tags
+      tags
     end
 
     def apply_categorization_metatags(tags)
@@ -1043,7 +1044,7 @@ class Post < ApplicationRecord
 
     def revert_to(target)
       if id != target.post_id
-        raise RevertError.new("You cannot revert to a previous version of another post.")
+        raise RevertError, "You cannot revert to a previous version of another post."
       end
 
       self.tag_string = target.tags
@@ -1359,11 +1360,9 @@ class Post < ApplicationRecord
     end
 
     def updater_can_change_rating
-      if rating_changed? && is_rating_locked?
-        # Don't forbid changes if the rating lock was just now set in the same update.
-        if !is_rating_locked_changed?
-          errors.add(:rating, "is locked and cannot be changed. Unlock the post first.")
-        end
+      # Don't forbid changes if the rating lock was just now set in the same update.
+      if rating_changed? && is_rating_locked? && !is_rating_locked_changed?
+        errors.add(:rating, "is locked and cannot be changed. Unlock the post first.")
       end
     end
 
@@ -1401,7 +1400,7 @@ class Post < ApplicationRecord
 
     def has_artist_tag
       return if !new_record?
-      return if source !~ %r!\Ahttps?://!
+      return if source !~ %r{\Ahttps?://}
       return if has_tag?("artist_request") || has_tag?("official_art")
       return if tags.any?(&:artist?)
       return if Sources::Strategies.find(source).is_a?(Sources::Strategies::Null)

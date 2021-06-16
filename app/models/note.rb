@@ -2,9 +2,14 @@ class Note < ApplicationRecord
   class RevertError < StandardError; end
 
   attr_accessor :html_id
+
   belongs_to :post
   has_many :versions, -> {order("note_versions.id ASC")}, :class_name => "NoteVersion", :dependent => :destroy
-  validates_presence_of :x, :y, :width, :height, :body
+  validates :x, presence: true
+  validates :y, presence: true
+  validates :width, presence: true
+  validates :height, presence: true
+  validates :body, presence: true
   validate :note_within_image
   after_save :update_post
   after_save :create_version
@@ -95,7 +100,7 @@ class Note < ApplicationRecord
 
   def revert_to(version)
     if id != version.note_id
-      raise RevertError.new("You cannot revert to a previous version of another note.")
+      raise RevertError, "You cannot revert to a previous version of another note."
     end
 
     self.x = version.x

@@ -10,7 +10,7 @@ class ReportbooruService
     reportbooru_server.present?
   end
 
-  def missed_search_rankings(expires_in: 1.minutes)
+  def missed_search_rankings(expires_in: 1.minute)
     return [] unless enabled?
 
     response = http.cache(expires_in).get("#{reportbooru_server}/missed_searches")
@@ -20,11 +20,11 @@ class ReportbooruService
     body.lines.map(&:split).map { [_1, _2.to_i] }
   end
 
-  def post_search_rankings(date, expires_in: 1.minutes)
+  def post_search_rankings(date, expires_in: 1.minute)
     request("#{reportbooru_server}/post_searches/rank?date=#{date}", expires_in)
   end
 
-  def post_view_rankings(date, expires_in: 1.minutes)
+  def post_view_rankings(date, expires_in: 1.minute)
     request("#{reportbooru_server}/post_views/rank?date=#{date}", expires_in)
   end
 

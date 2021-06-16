@@ -2,16 +2,18 @@
 
 class TagListComponent < ApplicationComponent
   attr_reader :tags, :current_query, :show_extra_links
+
   delegate :humanized_number, to: :helpers
 
   def initialize(tags: [], current_query: nil, show_extra_links: false)
+    super
     @tags = tags
     @current_query = current_query
     @show_extra_links = show_extra_links
   end
 
   def self.tags_from_names(tag_names)
-    names_to_tags = Tag.where(name: tag_names).map { |tag| [tag.name, tag] }.to_h
+    names_to_tags = Tag.where(name: tag_names).index_by(&:name)
 
     tag_names.map do |name|
       names_to_tags.fetch(name) { Tag.new(name: name).freeze }
