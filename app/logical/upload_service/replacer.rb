@@ -128,7 +128,7 @@ class UploadService
       replacement.save!
       post.save!
 
-      post.update_iqdb_async
+      post.update_iqdb
     end
 
     def purge_cached_urls(post)

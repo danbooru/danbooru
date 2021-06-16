@@ -15,7 +15,7 @@ class MockServicesControllerTest < ActionDispatch::IntegrationTest
           mock_reportbooru_missed_searches_path,
           mock_reportbooru_post_searches_path,
           mock_reportbooru_post_views_path,
-          mock_iqdbs_similar_path,
+          mock_iqdb_query_path,
         ]
 
         paths.each do |path|

@@ -35,6 +35,7 @@ class PostTest < ActiveSupport::TestCase
         @post = @upload.post
         Favorite.add(post: @post, user: @user)
         create(:favorite_group, post_ids: [@post.id])
+        perform_enqueued_jobs # perform IqdbAddPostJob
       end
 
       should "delete the files" do
@@ -85,10 +86,9 @@ class PostTest < ActiveSupport::TestCase
       end
 
       should "remove the post from iqdb" do
-        mock_iqdb_service!
-        Post.iqdb_sqs_service.expects(:send_message).with("remove\n#{@post.id}")
-
         @post.expunge!
+        perform_enqueued_jobs
+        assert_performed_jobs(1, only: IqdbRemovePostJob)
       end
 
       context "that is status locked" do

@@ -36,8 +36,6 @@ class Post < ApplicationRecord
   after_save :update_parent_on_save
   after_save :apply_post_metatags
   after_commit :delete_files, :on => :destroy
-  after_commit :remove_iqdb_async, :on => :destroy
-  after_commit :update_iqdb_async, :on => :create
 
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
@@ -977,6 +975,8 @@ class Post < ApplicationRecord
           update_parent_on_destroy
         end
       end
+
+      remove_iqdb # this is non-transactional
     end
 
     def ban!
@@ -1319,16 +1319,15 @@ class Post < ApplicationRecord
 
     def regenerate!(category, user)
       if category == "iqdb"
-        update_iqdb_async
+        update_iqdb
 
         ModAction.log("<@#{user.name}> regenerated IQDB for post ##{id}", :post_regenerate_iqdb, user)
       else
         media_file = MediaFile.open(file, frame_data: pixiv_ugoira_frame_data)
         UploadService::Utils.process_resizes(self, nil, id, media_file: media_file)
 
-        # XXX This may be racy; the thumbnail may not be purged from Cloudflare by the time IQDB tries to download it.
         purge_cached_urls!
-        update_iqdb_async
+        update_iqdb
 
         ModAction.log("<@#{user.name}> regenerated image samples for post ##{id}", :post_regenerate, user)
       end
@@ -1340,33 +1339,15 @@ class Post < ApplicationRecord
     end
   end
 
-  module IqdbMethods
-    extend ActiveSupport::Concern
-
-    module ClassMethods
-      def iqdb_sqs_service
-        SqsService.new(Danbooru.config.aws_sqs_iqdb_url)
-      end
-
-      def iqdb_enabled?
-        Danbooru.config.aws_sqs_iqdb_url.present?
-      end
-
-      def remove_iqdb(post_id)
-        if iqdb_enabled?
-          iqdb_sqs_service.send_message("remove\n#{post_id}")
-        end
-      end
+  concerning :IqdbMethods do
+    def update_iqdb
+      # performs IqdbClient.new.add_post(post)
+      IqdbAddPostJob.perform_later(self)
     end
 
-    def update_iqdb_async
-      if Post.iqdb_enabled? && has_preview?
-        Post.iqdb_sqs_service.send_message("update\n#{id}\n#{preview_file_url}")
-      end
-    end
-
-    def remove_iqdb_async
-      Post.remove_iqdb(id)
+    def remove_iqdb
+      # performs IqdbClient.new.remove(id)
+      IqdbRemovePostJob.perform_later(id)
     end
   end
 
@@ -1460,7 +1441,6 @@ class Post < ApplicationRecord
   include ApiMethods
   extend SearchMethods
   include PixivMethods
-  include IqdbMethods
   include ValidationMethods
 
   has_bit_flags ["has_embedded_notes", "has_cropped"]

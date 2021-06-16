@@ -329,8 +329,8 @@ Rails.application.routes.draw do
   get "/mock/reportbooru/missed_searches" => "mock_services#reportbooru_missed_searches", as: "mock_reportbooru_missed_searches"
   get "/mock/reportbooru/post_searches/rank" => "mock_services#reportbooru_post_searches", as: "mock_reportbooru_post_searches"
   get "/mock/reportbooru/post_views/rank" => "mock_services#reportbooru_post_views", as: "mock_reportbooru_post_views"
-  get "/mock/iqdbs/similar" => "mock_services#iqdbs_similar", as: "mock_iqdbs_similar"
-  post "/mock/iqdbs/similar" => "mock_services#iqdbs_similar"
+  get "/mock/iqdb/query" => "mock_services#iqdb_query", as: "mock_iqdb_query"
+  post "/mock/iqdb/query" => "mock_services#iqdb_query"
 
   match "*other", to: "static#not_found", via: :all
 end

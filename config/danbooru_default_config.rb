@@ -481,11 +481,12 @@ module Danbooru
     def reportbooru_key
     end
 
-    # The URL for the IQDBs server (https://github.com/evazion/iqdbs).
-    # Optional. Used for dupe detection and reverse image searches.
-    # Set to http://localhost/mock/iqdbs to enable a fake iqdb server for
+    # The URL for the IQDB server (https://github.com/danbooru/iqdb). Optional.
+    # Used for dupe detection and reverse image searches. Set this to
+    # http://localhost:3000/mock/iqdb to enable a fake iqdb server for
     # development purposes.
-    def iqdbs_server
+    def iqdb_url
+      # "http://localhost:3000/mock/iqdb"
     end
 
     def aws_credentials
@@ -499,9 +500,6 @@ module Danbooru
     end
 
     def aws_sqs_region
-    end
-
-    def aws_sqs_iqdb_url
     end
 
     def aws_sqs_archives_url

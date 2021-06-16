@@ -85,6 +85,8 @@ class UploadService
       )
     end
 
+    @post.update_iqdb
+
     upload.update(status: "completed", post_id: @post.id)
 
     @post

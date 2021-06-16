@@ -11,7 +11,7 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
       context "with a url parameter" do
         should "render a response" do
           @url = "https://google.com"
-          @matches = [{ "post_id" => @post.id, "width" => 128, "height" => 128, "score" => 95.0 }]
+          @matches = [{ post_id: @post.id, score: 95.0 }]
           mock_iqdb_matches(@matches)
 
           get_auth iqdb_queries_path, @user, as: :javascript, params: { url: @url }
@@ -22,9 +22,12 @@ class IqdbQueriesControllerTest < ActionDispatch::IntegrationTest
       end
 
       context "with a post_id parameter" do
-        should "redirect to iqdbs" do
-          @matches = [{ "post_id" => @post.id, "width" => 128, "height" => 128, "score" => 95.0 }]
+        should "render a response" do
+          @matches = [{ post_id: @post.id, score: 95.0 }]
           mock_iqdb_matches(@matches)
+
+          # Make the call to `@post.file(:preview)` work.
+          Post.any_instance.stubs(:file).returns(File.open("test/files/test.jpg"))
 
           get_auth iqdb_queries_path, @user, params: { post_id: @post.id }
 

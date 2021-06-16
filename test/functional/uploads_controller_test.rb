@@ -4,7 +4,6 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
   context "The uploads controller" do
     setup do
       @user = create(:contributor_user, name: "marisa")
-      mock_iqdb_service!
     end
 
     context "image proxy action" do
