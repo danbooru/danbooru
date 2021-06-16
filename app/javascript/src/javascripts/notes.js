@@ -513,6 +513,9 @@ class Note {
       text = text.replace(/<tn>/g, '<p class="tn">');
       text = text.replace(/<\/tn>/g, '</p>');
       text = text.replace(/\n/g, '<br>');
+      if (!text.match(/^<.*>.*$/g)) {
+          text = "<span>" + text + "</span>";
+      }
 
       if (this.note.embed) {
         this.note.box.$inner_border.html(text);
