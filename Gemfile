@@ -66,8 +66,8 @@ group :production do
 end
 
 group :development do
-  gem 'rubocop'
-  gem 'rubocop-rails'
+  gem 'rubocop', require: false
+  gem 'rubocop-rails', require: false
   #gem 'meta_request'
   gem 'rack-mini-profiler'
   gem 'stackprof'
