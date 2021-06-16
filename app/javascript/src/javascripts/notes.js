@@ -427,7 +427,7 @@ class Note {
         this.resized = true;
       }
 
-      this.$note_body.show();
+      this.$note_body.css('display', 'flex');
       this.initialize();
     }
 
