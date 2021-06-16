@@ -134,7 +134,8 @@ body[data-current-user-can-approve-posts="true"] .post-preview {
     }
 
     img {
-      width: 33.3vw;
+      max-width: 33.3%;
+      max-height: 33.3vw;
       border: none !important;
     }
   }
