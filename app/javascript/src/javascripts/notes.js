@@ -513,7 +513,7 @@ class Note {
       text = text.replace(/<tn>/g, '<p class="tn">');
       text = text.replace(/<\/tn>/g, '</p>');
       text = text.replace(/\n/g, '<br>');
-      if (!text.match(/^\s*<.*>.*$/g)) {
+      if (!text.match(/^\s*<.*>.*$/g) || text.match(/^\s*<.*>.*<\/.*>\s*.+/g)) {
           text = "<span>" + text + "</span>";
       }
 
