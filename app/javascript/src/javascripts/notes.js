@@ -533,7 +533,7 @@ class Note {
 
       this.display_text(response.body);
       this.initialize();
-      this.$note_body.show();
+      this.$note_body.css('display', 'flex');
     }
 
     on_mouseover(e) {
