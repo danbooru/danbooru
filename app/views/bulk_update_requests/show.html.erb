@@ -3,11 +3,13 @@
     <h1>Bulk Update Request</h1>
 
     <ul>
-      <% if @bulk_update_request.forum_topic_id %>
-        <li><strong>Reference</strong> <%= link_to "topic ##{@bulk_update_request.forum_topic_id}", forum_topic_path(@bulk_update_request.forum_topic_id) %></li>
+      <% if @bulk_update_request.forum_post.present? %>
+        <li><strong>Reference</strong>: <%= link_to "Forum ##{@bulk_update_request.forum_post_id}", @bulk_update_request.forum_post %></li>
+      <% elsif @bulk_update_request.forum_topic.present? %>
+        <li><strong>Reference</strong>: <%= link_to "Topic ##{@bulk_update_request.forum_topic_id}", @bulk_update_request.forum_topic %></li>
       <% end %>
-      <li><strong>Creator</strong> <%= link_to_user @bulk_update_request.user %></li>
-      <li><strong>Date</strong> <%= @bulk_update_request.created_at %></li>
+      <li><strong>Creator</strong>: <%= link_to_user @bulk_update_request.user %></li>
+      <li><strong>Date</strong>: <%= @bulk_update_request.created_at %></li>
       <li><strong>Status</strong>: <%= @bulk_update_request.status %></li>
     </ul>
 
