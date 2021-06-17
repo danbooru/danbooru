@@ -1,6 +1,6 @@
 require "application_system_test_case"
 
-class PostVersionTest < ApplicationSystemTestCase
+class PostVersionSystemTest < ApplicationSystemTestCase
   context "Post versions" do
     setup do
       @user = create(:builder_user)
