@@ -39,7 +39,7 @@ gem 'puma'
 gem 'scenic'
 gem 'ipaddress_2'
 gem 'http', "~> 4.4.1"
-gem 'activerecord-hierarchical_query', git: "https://github.com/walski/activerecord-hierarchical_query", branch: "rails-6-1"
+gem 'activerecord-hierarchical_query'
 gem 'http-cookie', git: "https://github.com/danbooru/http-cookie"
 gem 'pundit'
 gem 'mail'

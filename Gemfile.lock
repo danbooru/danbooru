@@ -12,15 +12,6 @@ GIT
     dtext_rb (1.10.6)
       nokogiri (~> 1.8)
 
-GIT
-  remote: https://github.com/walski/activerecord-hierarchical_query
-  revision: 3d6663307ed2f6a23347084c04700a26c7e7bb55
-  branch: rails-6-1
-  specs:
-    activerecord-hierarchical_query (1.2.3)
-      activerecord (>= 5.0, < 6.2)
-      pg (>= 0.21, < 1.3)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -74,6 +65,9 @@ GEM
     activerecord (6.1.3.2)
       activemodel (= 6.1.3.2)
       activesupport (= 6.1.3.2)
+    activerecord-hierarchical_query (1.3.0)
+      activerecord (>= 5.0, < 6.2)
+      pg (>= 0.21, < 1.3)
     activestorage (6.1.3.2)
       actionpack (= 6.1.3.2)
       activejob (= 6.1.3.2)
@@ -512,7 +506,7 @@ PLATFORMS
 
 DEPENDENCIES
   activemodel-serializers-xml
-  activerecord-hierarchical_query!
+  activerecord-hierarchical_query
   addressable
   aws-sdk-sqs (~> 1)
   bcrypt
