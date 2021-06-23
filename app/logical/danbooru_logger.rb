@@ -1,6 +1,13 @@
+# The DanbooruLogger class handles logging messages to the Rails log and to NewRelic.
+#
+# @see https://guides.rubyonrails.org/debugging_rails_applications.html#the-logger
+# @see https://docs.newrelic.com
 class DanbooruLogger
   HEADERS = %w[referer sec-fetch-dest sec-fetch-mode sec-fetch-site sec-fetch-user]
 
+  # Log a message to the Rails log and to NewRelic.
+  # @param message [String] the message to log
+  # @param params [Hash] optional key-value data to log with the message
   def self.info(message, params = {})
     Rails.logger.info(message)
 
@@ -10,6 +17,13 @@ class DanbooruLogger
     end
   end
 
+  # Log an exception to the Rails log and to NewRelic. The `expected` flag is
+  # used to separate expected exceptions, like search timeouts or auth failures,
+  # from unexpected exceptions, like runtime errors, in the NewRelic error log.
+  #
+  # @param message [Exception] the exception to log
+  # @param expected [Boolean] whether the exception was expected
+  # @param params [Hash] optional key-value data to log with the exception
   def self.log(exception, expected: false, **params)
     if expected
       Rails.logger.info("#{exception.class}: #{exception.message}")
@@ -23,6 +37,12 @@ class DanbooruLogger
     end
   end
 
+  # Log extra HTTP request data to NewRelic. Logs the user's IP, user agent,
+  # request params, and session cookies.
+  #
+  # @param request the HTTP request
+  # @param session the Rails session
+  # @param user [User] the current user
   def self.add_session_attributes(request, session, user)
     add_attributes("request", { path: request.path })
     add_attributes("request.headers", header_params(request))
@@ -31,6 +51,7 @@ class DanbooruLogger
     add_attributes("user", user_params(request, user))
   end
 
+  # Get logged HTTP headers from request.
   def self.header_params(request)
     headers = request.headers.to_h.select { |header, value| header.match?(/\AHTTP_/) }
     headers = headers.transform_keys { |header| header.delete_prefix("HTTP_").downcase }
@@ -65,6 +86,7 @@ class DanbooruLogger
 
   private_class_method
 
+  # @see https://docs.newrelic.com/docs/using-new-relic/data/customize-data/collect-custom-attributes/#ruby-att
   def self.add_custom_attributes(attributes)
     return unless defined?(::NewRelic)
     ::NewRelic::Agent.add_custom_attributes(attributes)

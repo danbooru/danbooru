@@ -1,3 +1,10 @@
+# Autocomplete tags, usernames, pools, and more.
+#
+# @example
+#   AutocompleteService.new("touho", :tag).autocomplete_results
+#   #=> [{ type: :tag, label: "touhou", value: "touhou", category: 3, post_count: 42 }]
+#
+# @see AutocompleteController
 class AutocompleteService
   extend Memoist
 
@@ -18,6 +25,11 @@ class AutocompleteService
 
   attr_reader :query, :type, :limit, :current_user
 
+  # Perform completion for the given search type and query.
+  # @param query [String] the string being completed
+  # @param type [String] the type of completion being performed
+  # @param current_user [User] the user we're performing completion for
+  # @param limit [Integer] the max number of results to return
   def initialize(query, type, current_user: User.anonymous, limit: 10)
     @query = query.to_s
     @type = type.to_s.to_sym
@@ -25,6 +37,8 @@ class AutocompleteService
     @limit = limit
   end
 
+  # Return the results of the completion.
+  # @return [Array<Hash>] the autocomplete results
   def autocomplete_results
     case type
     when :tag_query
@@ -52,6 +66,9 @@ class AutocompleteService
     end
   end
 
+  # Complete a tag search (a regular tag or a metatag)
+  # @param string [String] the string to complete
+  # @return [Array<Hash>] the autocomplete results
   def autocomplete_tag_query(string)
     term = PostQueryBuilder.new(string).terms.first
     return [] if term.nil?
@@ -64,10 +81,20 @@ class AutocompleteService
     end
   end
 
+  # Find tags matching a search.
+  #
+  # If the string is non-English, translate it to a Danbooru tag.
+  # If the string is a slash abbreviation, expand the abbreviation.
+  # If the string has a wildcard, do a wildcard search.
+  # If the string doesn't match anything, perform autocorrect.
+  #
+  # @param string [String] the string to complete
+  # @return [Array<Hash>] the autocomplete results
   def autocomplete_tag(string)
     return [] if string.size > TagNameValidator::MAX_TAG_LENGTH
     return [] if string.start_with?("http://", "https://")
 
+    # XXX convert to NFKC? deaccent?
     if !string.ascii_only?
       results = tag_other_name_matches(string)
     elsif string.starts_with?("/")
@@ -90,6 +117,9 @@ class AutocompleteService
     results
   end
 
+  # Find tags or tag aliases matching a wildcard search.
+  # @param string [String] the string to complete
+  # @return [Array<Hash>] the autocomplete results
   def tag_matches(string)
     name_matches = Tag.nonempty.name_matches(string).order(post_count: :desc).limit(limit)
     alias_matches = Tag.nonempty.alias_matches(string).order(post_count: :desc).limit(limit)
@@ -103,6 +133,12 @@ class AutocompleteService
     end
   end
 
+  # Find tags matching a slash abbreviation.
+  # Example: /evth => eyebrows_visible_through_hair
+  #
+  # @param string [String] the string to complete
+  # @param max_length [Integer] the max abbreviation length
+  # @return [Array<Hash>] the autocomplete results
   def tag_abbreviation_matches(string, max_length: 10)
     return [] if string.size > max_length
 
@@ -113,6 +149,11 @@ class AutocompleteService
     end
   end
 
+  # Find tags matching a mispelled tag.
+  # Example: logn_hair => long_hair
+  #
+  # @param string [String] the string to complete
+  # @return [Array<Hash>] the autocomplete results
   def tag_autocorrect_matches(string)
     # autocorrect uses trigram indexing, which needs at least 3 alphanumeric characters to work.
     return [] if string.remove(/[^a-zA-Z0-9]/).size < 3
@@ -124,6 +165,12 @@ class AutocompleteService
     end
   end
 
+  # Find tags matching a non-English string. Does a `name*` search in wiki page
+  # and artist other names to translate the non-English tag to a Danbooru tag.
+  # Example: 東方 => touhou.
+  #
+  # @param string [String] the string to complete
+  # @return [Array<Hash>] the autocomplete results
   def tag_other_name_matches(string)
     artists = Artist.undeleted.where_any_in_array_starts_with(:other_names, string)
     wikis = WikiPage.undeleted.where_any_in_array_starts_with(:other_names, string)
@@ -137,6 +184,10 @@ class AutocompleteService
     end
   end
 
+  # Complete a metatag.
+  # @param metatag [String] the type of metatag to complete
+  # @param value [String] the value of the metatag
+  # @return [Array<Hash>] the autocomplete results
   def autocomplete_metatag(metatag, value)
     results = case metatag.to_sym
     when :user, :approver, :commenter, :comm, :noter, :noteupdater, :commentaryupdater,
@@ -159,6 +210,10 @@ class AutocompleteService
     end
   end
 
+  # Complete a static metatag: rating, filetype, etc.
+  # @param metatag [String] the type of metatag to complete
+  # @param value [String] the value of the metatag
+  # @return [Array<Hash>] the autocomplete results
   def autocomplete_static_metatag(metatag, value)
     values = STATIC_METATAGS[metatag.to_sym]
     results = values.select { |v| v.starts_with?(value.downcase) }.sort.take(limit)
@@ -168,6 +223,9 @@ class AutocompleteService
     end
   end
 
+  # Complete a pool name. Does a `*name*` search.
+  # @param string [String] the name of the pool
+  # @return [Array<Hash>] the autocomplete results
   def autocomplete_pool(string)
     string = "*" + string + "*" unless string.include?("*")
     pools = Pool.undeleted.name_matches(string).search(order: "post_count").limit(limit)
@@ -177,6 +235,9 @@ class AutocompleteService
     end
   end
 
+  # Complete a favorite group name. Does a `*name*` search.
+  # @param string [String] the name of the favgroup
+  # @return [Array<Hash>] the autocomplete results
   def autocomplete_favorite_group(string)
     string = "*" + string + "*" unless string.include?("*")
     favgroups = FavoriteGroup.visible(current_user).where(creator: current_user).name_matches(string).search(order: "post_count").limit(limit)
@@ -186,6 +247,9 @@ class AutocompleteService
     end
   end
 
+  # Complete a saved search label. Does a `*name*` search.
+  # @param string [String] the name of the label
+  # @return [Array<Hash>] the autocomplete results
   def autocomplete_saved_search_label(string)
     string = "*" + string + "*" unless string.include?("*")
     labels = current_user.saved_searches.labels_like(string).take(limit)
@@ -195,6 +259,9 @@ class AutocompleteService
     end
   end
 
+  # Complete an artist name. Does a `name*` search.
+  # @param string [String] the name of the artist
+  # @return [Array<Hash>] the autocomplete results
   def autocomplete_artist(string)
     string = string + "*" unless string.include?("*")
     artists = Artist.undeleted.name_matches(string).search(order: "post_count").limit(limit)
@@ -204,6 +271,9 @@ class AutocompleteService
     end
   end
 
+  # Complete a wiki name. Does a `name*` search.
+  # @param string [String] the name of the wiki
+  # @return [Array<Hash>] the autocomplete results
   def autocomplete_wiki_page(string)
     string = string + "*" unless string.include?("*")
     wiki_pages = WikiPage.undeleted.title_matches(string).search(order: "post_count").limit(limit)
@@ -213,6 +283,9 @@ class AutocompleteService
     end
   end
 
+  # Complete a user name. Does a `name*` search.
+  # @param string [String] the name of the user
+  # @return [Array<Hash>] the autocomplete results
   def autocomplete_user(string)
     string = string + "*" unless string.include?("*")
     users = User.search(name_matches: string, current_user_first: true, order: "post_upload_count").limit(limit)
@@ -222,17 +295,27 @@ class AutocompleteService
     end
   end
 
+  # Complete an @mention for a user name. Does a `name*` search.
+  # @param string [String] the name of the user
+  # @return [Array<Hash>] the autocomplete results
   def autocomplete_mention(string)
     autocomplete_user(string).map do |result|
       { **result, value: "@" + result[:value] }
     end
   end
 
+  # Complete a search typed in the browser address bar.
+  # @param string [String] the name of the tag
+  # @return [Array<(String, [Array<String>])>] the autocomplete results
+  # @see https://en.wikipedia.org/wiki/OpenSearch
+  # @see https://developer.mozilla.org/en-US/docs/Web/OpenSearch
   def autocomplete_opensearch(string)
     results = autocomplete_tag(string).map { |result| result[:value] }
     [query, results]
   end
 
+  # How long autocomplete results can be cached. Cache short result lists (<10
+  # results) for less time because they're more likely to change.
   def cache_duration
     if autocomplete_results.size == limit
       24.hours
@@ -241,6 +324,7 @@ class AutocompleteService
     end
   end
 
+  # Whether the results can be safely cached with `Cache-Control: public`.
   # Queries that don't depend on the current user are safe to cache publicly.
   def cache_publicly?
     if type == :tag_query && parsed_search&.type == :tag

@@ -1,3 +1,4 @@
+# Parse an PNG and return whether or not it's animated.
 class APNGInspector
   attr_reader :frames
 

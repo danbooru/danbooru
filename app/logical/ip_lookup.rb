@@ -1,5 +1,7 @@
-# API client for https://ipregistry.co/
-
+# An API client for https://ipregistry.co. Looks up IP address information,
+# including the geolocation and whether the IP is a proxy.
+#
+# @see https://ipregistry.co/docs
 class IpLookup
   extend Memoist
 

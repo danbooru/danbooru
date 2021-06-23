@@ -1,3 +1,5 @@
+# Process a bulk update request. Parses the request and applies each line in
+# sequence.
 class BulkUpdateRequestProcessor
   # Maximum tag size allowed by the rename command before an alias must be used.
   MAXIMUM_RENAME_COUNT = 200
@@ -17,6 +19,7 @@ class BulkUpdateRequestProcessor
   validate :validate_script
   validate :validate_script_length
 
+  # @param bulk_update_request [String] the BUR
   def initialize(bulk_update_request)
     @bulk_update_request = bulk_update_request
   end
@@ -50,6 +53,8 @@ class BulkUpdateRequestProcessor
     end
   end
 
+  # Validate the bulk update request when it is created or approved.
+  #
   # validation_context will be either :request (when the BUR is first created
   # or edited) or :approval (when the BUR is approved). Certain validations
   # only run when the BUR is requested, not when it's approved.
@@ -117,12 +122,15 @@ class BulkUpdateRequestProcessor
     end
   end
 
+  # Validate that the script isn't too long.
   def validate_script_length
     if commands.size > MAXIMUM_SCRIPT_LENGTH
       errors.add(:base, "Bulk update request is too long (maximum size: #{MAXIMUM_SCRIPT_LENGTH} lines). Split your request into smaller chunks and try again.")
     end
   end
 
+  # Apply the script.
+  # @param approver [User] the approver of the request
   def process!(approver)
     ActiveRecord::Base.transaction do
       commands.map do |command, *args|
@@ -162,6 +170,8 @@ class BulkUpdateRequestProcessor
     end
   end
 
+  # The list of tags in the script. Used for search BURs by tag.
+  # @return [Tag] the list of tags
   def affected_tags
     commands.flat_map do |command, *args|
       case command
@@ -178,6 +188,7 @@ class BulkUpdateRequestProcessor
     end.sort.uniq
   end
 
+  # Returns true if a non-Admin is allowed to approve a rename or alias request.
   def is_tag_move_allowed?
     commands.all? do |command, *args|
       case command
@@ -194,6 +205,8 @@ class BulkUpdateRequestProcessor
     end
   end
 
+  # Convert the BUR to DText format.
+  # @return [String]
   def to_dtext
     commands.map do |command, *args|
       case command

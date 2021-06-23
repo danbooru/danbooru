@@ -1,3 +1,21 @@
+# The parent class for a Discord slash command. Each slash command handled by
+# Danbooru is a subclass of this class. Subclasses should set the {#name},
+# {#description}, and {#options} class attributes defining the slash command's
+# parameters, then implement the {#call} method to return a response to the
+# command.
+#
+# The lifecycle of a Discord slash command is this:
+#
+# * First we register the command with Discord with an API call ({DiscordApiClient#register_slash_command}).
+# * Then whenever someone uses the command, Discord sends us a HTTP request to
+#   https://danbooru.donmai.us/webhooks/receive.
+# * We validate the request really came from Discord, then return the
+#   command's response.
+#
+# @abstract
+# @see DiscordApiClient
+# @see WebhooksController#receive
+# @see https://discord.com/developers/docs/interactions/slash-commands
 class DiscordSlashCommand
   class WebhookVerificationError < StandardError; end
 
@@ -47,7 +65,7 @@ class DiscordSlashCommand
   end
 
   concerning :HelperMethods do
-    # The parameters passed to the command. A hash.
+    # @return [Hash] The parameters passed to the slash command by the Discord user.
     def params
       @params ||= data.dig(:data, :options).to_a.map do |opt|
         [opt[:name], opt[:value]]

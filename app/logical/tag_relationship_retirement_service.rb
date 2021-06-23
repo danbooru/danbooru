@@ -1,3 +1,8 @@
+# Removes tag aliases and implications if they haven't had any new uploads in
+# the last two years. Runs weekly. Posts a message to the forum when aliases or
+# implications are retired.
+#
+# @see DanbooruMaintenance#weekly
 module TagRelationshipRetirementService
   module_function
 

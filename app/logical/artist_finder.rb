@@ -1,3 +1,4 @@
+# Find the artist entry for a given artist profile URL.
 module ArtistFinder
   module_function
 
@@ -131,6 +132,14 @@ module ArtistFinder
     %r{\Ahttps?://(?:[a-zA-Z0-9_-]+\.)*#{domain}/\z}i
   end)
 
+  # Find the artist for a given artist profile URL. May return multiple Artists
+  # in the event of duplicate artist entries.
+  #
+  # Uses a path-stripping algorithm to find any artist URL that is a prefix
+  # of the given URL. A site blacklist is used to prevent false positives.
+  #
+  # @param url [String] the artist profile URL
+  # @return [Array<Artist>] the list of matching artists
   def find_artists(url)
     url = ArtistUrl.normalize(url)
     artists = []

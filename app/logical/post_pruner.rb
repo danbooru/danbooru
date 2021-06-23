@@ -1,3 +1,4 @@
+# Delete posts that were unapproved after three days.
 module PostPruner
   module_function
 

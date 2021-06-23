@@ -1,3 +1,6 @@
+# An API client for Mastodon.
+#
+# @see https://docs.joinmastodon.org/api
 class MastodonApiClient
   extend Memoist
   attr_reader :json

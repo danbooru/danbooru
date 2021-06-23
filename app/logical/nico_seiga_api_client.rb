@@ -1,3 +1,4 @@
+# An API client for the NicoSeiga XML API.
 class NicoSeigaApiClient
   extend Memoist
   XML_API = "https://seiga.nicovideo.jp/api"
