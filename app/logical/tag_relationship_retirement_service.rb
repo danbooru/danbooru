@@ -14,7 +14,7 @@ module TagRelationshipRetirementService
   def forum_topic
     topic = ForumTopic.where(title: forum_topic_title).first
     if topic.nil?
-      CurrentUser.as(User.system) do
+      CurrentUser.scoped(User.system) do
         topic = ForumTopic.create!(creator: User.system, title: forum_topic_title, category_id: 1)
         ForumPost.create!(creator: User.system, body: forum_topic_body, topic: topic)
       end

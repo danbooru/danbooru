@@ -5,8 +5,8 @@ class UploadService
     @params = params
   end
 
-  def delayed_start(uploader_id)
-    CurrentUser.as(uploader_id) do
+  def delayed_start(uploader)
+    CurrentUser.scoped(uploader) do
       start!
     end
   rescue ActiveRecord::RecordNotUnique

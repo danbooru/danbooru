@@ -30,7 +30,7 @@ class DanbooruMaintenanceTest < ActiveSupport::TestCase
         banner = FactoryBot.create(:admin_user)
         user = FactoryBot.create(:user)
 
-        CurrentUser.as(banner) { FactoryBot.create(:ban, user: user, banner: banner, duration: 1) }
+        as(banner) { create(:ban, user: user, banner: banner, duration: 1) }
 
         assert_equal(true, user.reload.is_banned)
         travel_to(2.days.from_now) { DanbooruMaintenance.daily }

@@ -72,7 +72,7 @@ class BulkUpdateRequest < ApplicationRecord
     end
 
     def create_forum_topic
-      CurrentUser.as(user) do
+      CurrentUser.scoped(user) do
         body = "[bur:#{id}]\n\n#{reason}"
         self.forum_topic = ForumTopic.create(title: title, category_id: 1, creator: user) unless forum_topic.present?
         self.forum_post = forum_topic.forum_posts.create(body: body, creator: user) unless forum_post.present?
