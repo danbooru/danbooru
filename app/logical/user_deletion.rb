@@ -1,3 +1,7 @@
+# Delete a user's account. Deleting an account really just deactivates the
+# account, it doesn't fully delete the user from the database. It wipes their
+# username, password, account settings, favorites, and saved searches, and logs
+# the deletion.
 class UserDeletion
   include ActiveModel::Validations
 
@@ -5,12 +9,19 @@ class UserDeletion
 
   validate :validate_deletion
 
+  # Initialize a user deletion.
+  # @param user [User] the user to delete
+  # @param password [String] the user's password (for confirmation)
+  # @param request the HTTP request (for logging the deletion in the user event log)
   def initialize(user, password, request)
     @user = user
     @password = password
     @request = request
   end
 
+  # Delete the account, if the deletion is allowed.
+  # @return [Boolean] if the deletion failed
+  # @return [User] if the deletion succeeded
   def delete!
     return false if invalid?
 

@@ -1,3 +1,5 @@
+# A job that downloads and generates thumbnails in the background for an image
+# uploaded with the upload bookmarklet.
 class UploadPreprocessorDelayedStartJob < ApplicationJob
   queue_as :default
   queue_with_priority(-1)

@@ -64,7 +64,7 @@ class IqdbClient
       post_ids = matches.map { |match| match["post_id"] }
       posts = Post.where(id: post_ids).group_by(&:id).transform_values(&:first)
 
-      json.map do |match|
+      matches.map do |match|
         post = posts.fetch(match["post_id"], nil)
         match.with_indifferent_access.merge(post: post) if post
       end.compact

@@ -1,3 +1,5 @@
+# Handle finding related tags by the {RelatedTagsController}. Used for finding
+# related tags when tagging a post.
 class RelatedTagQuery
   include ActiveModel::Serializers::JSON
   include ActiveModel::Serializers::Xml

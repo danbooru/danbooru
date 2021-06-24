@@ -1,10 +1,13 @@
-# https://github.com/joshfrench/rakismet
-# https://akismet.com/development/api/#comment-check
-
+# Detects whether a dmail, comment, or forum post seems like spam. Autobans
+# users who receive more than 10 spam reports in an hour. Uses the Akismet spam
+# detection service.
+#
+# @see https://github.com/joshfrench/rakismet
+# @see https://akismet.com/development/api/#comment-check
 class SpamDetector
   include Rakismet::Model
 
-  # if a person receives more than 10 automatic spam reports within a 1 hour
+  # If a person receives more than 10 automatic spam reports within a 1 hour
   # window, automatically ban them forever.
   AUTOBAN_THRESHOLD = 10
   AUTOBAN_WINDOW = 1.hour
@@ -12,6 +15,7 @@ class SpamDetector
 
   attr_accessor :record, :user, :user_ip, :content, :comment_type
 
+  # The attributes to pass to Akismet
   rakismet_attrs author: proc { user.name },
                  author_email: proc { user.email_address&.address },
                  blog_lang: "en",
@@ -20,17 +24,23 @@ class SpamDetector
                  content: :content,
                  user_ip: :user_ip
 
+  # @return [Boolean] true if the Akismet API keys are configured
   def self.enabled?
     Danbooru.config.rakismet_key.present? && Danbooru.config.rakismet_url.present? && !Rails.env.test?
   end
 
-  # rakismet raises an exception if the api key or url aren't configured
+  # @return [Boolean] true if the Akismet API keys are valid. Rakismet raises
+  #   an exception if the API key or URL aren't configured
   def self.working?
     Rakismet.validate_key
   rescue StandardError
     false
   end
 
+  # Check if the user seems like a spammer and should be banned. Checks if they
+  # have received more than 10 automatic spam reports in the last hour.
+  # @param user [User] the user to check
+  # @return [Boolean] true if the user should be autobanned
   def self.is_spammer?(user)
     return false if user.is_gold?
 
@@ -44,10 +54,15 @@ class SpamDetector
     report_count >= AUTOBAN_THRESHOLD
   end
 
+  # Autobans a user.
+  # @param spammer [User] the user to ban
   def self.ban_spammer!(spammer)
     spammer.bans.create!(banner: User.system, reason: "Spambot.", duration: AUTOBAN_DURATION)
   end
 
+  # Initialize a spam check for a message.
+  # @param record [Dmail, ForumPost, Comment] the message to spam check
+  # @param user_ip [String] the IP address of the user who posted the message
   def initialize(record, user_ip: nil)
     case record
     when Dmail
@@ -73,6 +88,9 @@ class SpamDetector
     end
   end
 
+  # Check if a message seems like spam. Gold users and users who have an account
+  # more than a month old aren't checked to reduce the number of API calls.
+  # @return [Boolean] true if the message is spam
   def spam?
     return false if !SpamDetector.enabled?
     return false if user.is_gold?

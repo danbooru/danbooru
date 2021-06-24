@@ -1,8 +1,36 @@
+# A mixin that adds a `#paginate` method to an ActiveRecord relation.
+#
+# There are two pagination techniques. The first is page-based (numbered):
+#
+#   https://danbooru.donmai.us/posts?page=1
+#   https://danbooru.donmai.us/posts?page=2
+#   https://danbooru.donmai.us/posts?page=3
+#
+# The second is id-based (sequential):
+#
+#   https://danbooru.donmai.us/posts?page=a1000&limit=100
+#   https://danbooru.donmai.us/posts?page=a1100&limit=100
+#   https://danbooru.donmai.us/posts?page=a1200&limit=100
+#
+#   https://danbooru.donmai.us/posts?page=b1000&limit=100
+#   https://danbooru.donmai.us/posts?page=b900&limit=100
+#   https://danbooru.donmai.us/posts?page=b800&limit=100
+#
+# where a1000 means "after id 1000" and b1000 means "before id 1000".
+#
 module PaginationExtension
   class PaginationError < StandardError; end
 
   attr_accessor :current_page, :records_per_page, :paginator_count, :paginator_mode, :paginator_page_limit
 
+  # Paginate an ActiveRecord relation. Returns a relation for the given page and number of posts per page.
+  #
+  # @param page [String] the page number, or an "aNNN" or "bNNN" string
+  # @param limit [Integer] the number of posts per page
+  # @param max_limit [Integer] the maximum number of posts per page the user can view
+  # @param page_limit [Integer] the highest page the user can view
+  # @param count [Integer] the precalculated number of search results, or nil to calculate it
+  # @param search_count [Object] if truthy, don't calculate the number of results; assume a large number of results
   def paginate(page, limit: nil, max_limit: 1000, page_limit: CurrentUser.user.page_limit, count: nil, search_count: nil)
     @records_per_page = limit || Danbooru.config.posts_per_page
     @records_per_page = @records_per_page.to_i.clamp(1, max_limit)

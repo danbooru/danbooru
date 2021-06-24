@@ -1,7 +1,6 @@
 # A wrapper around the IPAddress gem that adds some extra utility methods.
 #
-# https://github.com/ipaddress-gem/ipaddress
-
+# @see https://github.com/ipaddress-gem/ipaddress
 module Danbooru
   class IpAddress
     attr_reader :ip_address
@@ -26,7 +25,7 @@ module Danbooru
 
     # If we're being reverse proxied behind Cloudflare, then Tor connections
     # will appear to originate from 2405:8100:8000::/48.
-    # https://blog.cloudflare.com/cloudflare-onion-service/
+    # @see https://blog.cloudflare.com/cloudflare-onion-service/
     def is_tor?
       Danbooru::IpAddress.new("2405:8100:8000::/48").include?(ip_address)
     end

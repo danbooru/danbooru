@@ -1,9 +1,11 @@
 # A HTTP::Feature that automatically retries requests that return a 429 error
-# or a Retry-After header. Usage: `Danbooru::Http.use(:retriable).get(url)`.
+# or a Retry-After header.
 #
-# https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
-# https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After
-
+# @example
+#   Danbooru::Http.use(:retriable).get(url)
+#
+# @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/429
+# @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Retry-After
 module Danbooru
   class Http
     class Retriable < HTTP::Feature

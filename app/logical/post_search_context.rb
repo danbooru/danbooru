@@ -1,3 +1,8 @@
+# A PostSearchContext handles navigating to the next or previous post in a
+# search. This is used in the search navbar above or below posts.
+#
+# @see PostNavbarComponent
+# @see PostsController#show_seq
 class PostSearchContext
   extend Memoist
   attr_reader :id, :seq, :tags

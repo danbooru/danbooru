@@ -1,3 +1,7 @@
+# A PostSet is a set of posts returned by a search.  This contains helper
+# methods used on the post index page.
+#
+# @see PostsController#index
 module PostSets
   class Post
     MAX_PER_PAGE = 200

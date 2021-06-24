@@ -1,6 +1,16 @@
+# Promotes the user to a higher level, or grants them approver or unlimited
+# uploader privileges. Also validates that the promotion is allowed, gives the
+# user a feedback, sends them a notification dmail, and creates a mod action for
+# the promotion.
 class UserPromotion
   attr_reader :user, :promoter, :new_level, :old_can_approve_posts, :old_can_upload_free, :can_upload_free, :can_approve_posts
 
+  # Initialize a new promotion.
+  # @param user [User] the user to promote
+  # @param promoter [User] the user doing the promotion
+  # @param new_level [Integer] the new user level
+  # @param can_upload_free [Boolean] whether the user should gain unlimited upload privileges
+  # @param can_approve_posts [Boolean] whether the user should gain approval privileges
   def initialize(user, promoter, new_level, can_upload_free: nil, can_approve_posts: nil)
     @user = user
     @promoter = promoter
@@ -54,6 +64,7 @@ class UserPromotion
     end
   end
 
+  # Build the dmail and user feedback message.
   def build_messages
     messages = []
 

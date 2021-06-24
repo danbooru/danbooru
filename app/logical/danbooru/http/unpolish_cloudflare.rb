@@ -1,5 +1,7 @@
-# Bypass Cloudflare Polish (https://support.cloudflare.com/hc/en-us/articles/360000607372-Using-Cloudflare-Polish-to-compress-images)
-
+# Detect sites using Cloudflare Polish and bypass it by adding a random
+# cache-busting URL param.
+#
+# @see https://support.cloudflare.com/hc/en-us/articles/360000607372-Using-Cloudflare-Polish-to-compress-images
 module Danbooru
   class Http
     class UnpolishCloudflare < HTTP::Feature

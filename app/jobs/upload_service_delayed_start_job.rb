@@ -1,3 +1,4 @@
+# A job that tries to resume a preprocessed image upload.
 class UploadServiceDelayedStartJob < ApplicationJob
   queue_as :default
   queue_with_priority(-1)

@@ -9,6 +9,23 @@ require "danbooru/http/session"
 require "danbooru/http/spoof_referrer"
 require "danbooru/http/unpolish_cloudflare"
 
+# The HTTP client used by Danbooru for all outgoing HTTP requests. A wrapper
+# around the http.rb gem that adds some helper methods and custom behavior:
+#
+# * Redirects are automatically followed
+# * Referers are automatically spoofed
+# * Cookies are automatically remembered
+# * Requests can be cached
+# * Rate limited requests can be automatically retried
+# * HTML and XML responses are automatically parsed
+# * Sites using Cloudflare Polish are automatically bypassed
+# * SSRF attempts are blocked
+#
+# @example
+#   http = Danbooru::Http.new
+#   response = http.get("https://danbooru.donmai.us/posts.json")
+#   json = response.parse
+#
 module Danbooru
   class Http
     class Error < StandardError; end
@@ -30,6 +47,7 @@ module Danbooru
         .timeout(DEFAULT_TIMEOUT)
         .headers("Accept-Encoding" => "gzip")
         .headers("User-Agent": "#{Danbooru.config.canonical_app_name}/#{Rails.application.config.x.git_hash}")
+        #.headers("User-Agent": Danbooru.config.canonical_app_name)
         .use(:auto_inflate)
         .use(redirector: { max_redirects: MAX_REDIRECTS })
         .use(:session)
@@ -109,6 +127,13 @@ module Danbooru
     end
 
     concerning :DownloadMethods do
+      # Download a file from `url` and return a {MediaFile}.
+      #
+      # @param url [String] the URL to download
+      # @param file [Tempfile] the file to download the URL to
+      # @raise [DownloadError] if the server returns a non-200 OK response
+      # @raise [FileTooLargeError] if the file exceeds Danbooru's maximum download size.
+      # @return [Array<(HTTP::Response, MediaFile)>] the HTTP response and the downloaded file
       def download_media(url, file: Tempfile.new("danbooru-download-", binmode: true))
         response = get(url)
 
@@ -129,6 +154,13 @@ module Danbooru
 
     protected
 
+    # Perform a HTTP request for the given URL. On error, return a fake 5xx
+    # response so the caller doesn't have to deal with exceptions.
+    #
+    # @param method [String] the HTTP method
+    # @param url [String] the URL to request
+    # @param options [Hash] the URL parameters
+    # @return [HTTP::Response] the HTTP response
     def request(method, url, **options)
       http.send(method, url, **options)
     rescue OpenSSL::SSL::SSLError
@@ -145,6 +177,14 @@ module Danbooru
       fake_response(599, "")
     end
 
+    # Perform a HTTP request for the given URL, raising an error on 4xx or 5xx
+    # responses.
+    #
+    # @param method [String] the HTTP method
+    # @param url [String] the URL to request
+    # @param options [Hash] the URL parameters
+    # @raise [Danbooru::Http::Error] if the response was a 4xx or 5xx error
+    # @return [HTTP::Response] the HTTP response
     def request!(method, url, **options)
       response = request(method, url, **options)
 

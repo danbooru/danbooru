@@ -1,15 +1,21 @@
-# Checks whether a new account seems suspicious and should require email verification.
-
+# Checks whether a new account requires verification. An account requires
+# verification if the IP is a proxy, or the IP is under a partial (signup) IP
+# ban, or it was used to create another account recently.
 class UserVerifier
   extend Memoist
 
   attr_reader :current_user, :request
 
-  # current_user is the user creating the new account, not the new account itself.
+  # Create a user verifier.
+  # @param current_user [User] the user creating the new account, not the new account itself.
+  # @param request the HTTP request
   def initialize(current_user, request)
     @current_user, @request = current_user, request
   end
 
+  # Returns true if the new account should be restricted. Signups from local
+  # IPs are unrestricted so that verification isn't required for development,
+  # testing, or personal boorus.
   def requires_verification?
     return false if !Danbooru.config.new_user_verification?
     return false if ip_address.is_local?
@@ -18,6 +24,7 @@ class UserVerifier
     is_ip_banned? || is_logged_in? || is_recent_signup? || is_proxy?
   end
 
+  # @return [Integer] Returns whether the new account should be Restricted or a Member
   def initial_level
     if requires_verification?
       User::Levels::RESTRICTED

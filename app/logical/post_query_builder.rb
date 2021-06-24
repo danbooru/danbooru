@@ -1,8 +1,16 @@
 require "strscan"
 
+# A PostQueryBuilder represents a post search. It contains all logic for parsing
+# and executing searches.
+#
+# @example
+#   PostQueryBuilder.new("touhou rating:s").build
+#   #=> <set of posts>
+#
 class PostQueryBuilder
   extend Memoist
 
+  # Raised when the number of tags exceeds the user's tag limit.
   class TagLimitError < StandardError; end
 
   # How many tags a `blah*` search should match.
@@ -58,12 +66,19 @@ class PostQueryBuilder
     COUNT_METATAG_SYNONYMS.flat_map { |str| [str, "#{str}_asc"] } +
     CATEGORY_COUNT_METATAGS.flat_map { |str| [str, "#{str}_asc"] }
 
+  # Tags that don't count against the user's tag limit.
   UNLIMITED_METATAGS = %w[status rating limit]
 
   attr_reader :query_string, :current_user, :tag_limit, :safe_mode, :hide_deleted_posts
   alias_method :safe_mode?, :safe_mode
   alias_method :hide_deleted_posts?, :hide_deleted_posts
 
+  # Initialize a post query.
+  # @param query_string [String] the tag search
+  # @param current_user [User] the user performing the search
+  # @param tag_limit [Integer] the user's tag limit
+  # @param safe_mode [Boolean] whether safe mode is enabled. if true, return only rating:s posts.
+  # @param hide_deleted_posts [Boolean] if true, filter out status:deleted posts.
   def initialize(query_string, current_user = User.anonymous, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
     @query_string = query_string
     @current_user = current_user
@@ -638,6 +653,7 @@ class PostQueryBuilder
     relation.find_ordered(ids)
   end
 
+  # @raise [TagLimitError] if the number of tags exceeds the user's tag limit
   def validate!
     tag_count = terms.count { |term| !is_unlimited_tag?(term) }
 
@@ -646,11 +662,14 @@ class PostQueryBuilder
     end
   end
 
+  # @return [Boolean] true if the metatag doesn't count against the user's tag limit
   def is_unlimited_tag?(term)
     term.type == :metatag && term.name.in?(UNLIMITED_METATAGS)
   end
 
   concerning :ParseMethods do
+    # Parse the search into a list of search terms. A search term is a tag or a metatag.
+    # @return [Array<OpenStruct>] a list of terms
     def scan_query
       terms = []
       query = query_string.to_s.gsub(/[[:space:]]/, " ")
@@ -686,6 +705,9 @@ class PostQueryBuilder
       terms
     end
 
+    # Parse a single-quoted, double-quoted, or unquoted string. Used for parsing metatag values.
+    # @param scanner [StringScanner] the current parser state
+    # @return [Array<(String, Boolean)>] the string and whether it was quoted
     def scan_string(scanner)
       if scanner.scan(/"((?:\\"|[^"])*)"/)
         value = scanner.captures.first.gsub(/\\(.)/) { $1 }
@@ -702,6 +724,9 @@ class PostQueryBuilder
       [value, quoted]
     end
 
+    # Split the search query into a list of strings, one per search term.
+    # Roughly the same as splitting on spaces, but accounts for quoted strings.
+    # @return [Array<String>] the list of terms
     def split_query
       terms.map do |term|
         type, name, value = term.type, term.name, term.value
@@ -724,10 +749,16 @@ class PostQueryBuilder
       end
     end
 
+    # Parse a tag edit string into a list of strings, one per search term.
+    # @return [Array<String>] the list of terms
     def parse_tag_edit
       split_query
     end
 
+    # Parse a simple string value into a Ruby type.
+    # @param object [String] the value to parse
+    # @param type [Symbol] the value's type
+    # @return [Object] the parsed value
     def parse_cast(object, type)
       case type
       when :enum
@@ -790,6 +821,9 @@ class PostQueryBuilder
       end
     end
 
+    # Parse a metatag range value of the given type. For example: 1..10.
+    # @param string [String] the metatag value
+    # @param type [Symbol] the value's type
     def parse_range(string, type)
       range = case string
       when /\A(.+?)\.\.\.(.+)/ # A...B
@@ -846,6 +880,14 @@ class PostQueryBuilder
   end
 
   concerning :CountMethods do
+    # Return an estimate of the number of posts returned by the search.  By
+    # default, we try to use an estimated or cached count before doing an exact
+    # count.
+    #
+    # @param timeout [Integer] the database timeout
+    # @param estimate_count [Boolean] if true, estimate the count with inexact methods
+    # @param skip_cache [Boolean] if true, don't use the cached count
+    # @return [Integer, nil] the number of posts, or nil on timeout
     def fast_count(timeout: 1_000, estimate_count: true, skip_cache: false)
       count = nil
       count = estimated_count if estimate_count
@@ -864,6 +906,7 @@ class PostQueryBuilder
       end
     end
 
+    # Estimate the count by parsing the Postgres EXPLAIN output.
     def estimated_row_count
       ExplainParser.new(build).row_count
     end
@@ -896,6 +939,8 @@ class PostQueryBuilder
       end
     end
 
+    # @return [Boolean] true if the search depends on the current user because
+    #   of permissions or privacy settings.
     def is_user_dependent_search?
       metatags.any? do |metatag|
         metatag.name.in?(%w[upvoter upvote downvoter downvote search flagger fav ordfav favgroup ordfavgroup]) ||
@@ -906,6 +951,8 @@ class PostQueryBuilder
   end
 
   concerning :NormalizationMethods do
+    # Normalize a search by sorting tags and applying aliases.
+    # @return [PostQueryBuilder] the normalized query
     def normalized_query(implicit: true, sort: true)
       post_query = dup
       post_query.terms.concat(implicit_metatags) if implicit
@@ -914,6 +961,7 @@ class PostQueryBuilder
       post_query
     end
 
+    # Apply aliases to all tags in the query.
     def normalize_aliases!
       tag_names = tags.map(&:name)
       tag_aliases = tag_names.zip(TagAlias.to_aliased(tag_names)).to_h
@@ -924,10 +972,14 @@ class PostQueryBuilder
       end
     end
 
+    # Normalize the tag order.
     def normalize_order!
       terms.sort_by!(&:to_s).uniq!
     end
 
+    # Implicit metatags are metatags added by the user's account settings.
+    # rating:s is implicit under safe mode. -status:deleted is implicit when the
+    # "hide deleted posts" setting is on.
     def implicit_metatags
       metatags = []
       metatags << OpenStruct.new(type: :metatag, name: "rating", value: "s") if safe_mode?
@@ -947,34 +999,42 @@ class PostQueryBuilder
       split_query.join(" ")
     end
 
+    # The list of search terms. This includes regular tags and metatags.
     def terms
       @terms ||= scan_query
     end
 
+    # The list of regular tags in the search.
     def tags
       terms.select { |term| term.type == :tag }
     end
 
+    # The list of metatags in the search.
     def metatags
       terms.select { |term| term.type == :metatag }
     end
 
+    # Find all metatags with the given names.
     def select_metatags(*names)
       metatags.select { |term| term.name.in?(names.map(&:to_s)) }
     end
 
+    # Find the first metatag with any of the given names.
     def find_metatag(*metatags)
       select_metatags(*metatags).first.try(:value)
     end
 
+    # @return [Boolean] true if the search has a metatag with any of the given names.
     def has_metatag?(*metatag_names)
       metatags.any? { |term| term.name.in?(metatag_names.map(&:to_s).map(&:downcase)) }
     end
 
+    # @return [Boolean] true if the search has a single regular tag, with any number of metatags.
     def has_single_tag?
       tags.size == 1 && !tags.first.wildcard
     end
 
+    # @return [Boolean] true if the search is a single metatag search for the given metatag.
     def is_metatag?(name, value = nil)
       if value.nil?
         is_single_term? && has_metatag?(name)
@@ -983,27 +1043,33 @@ class PostQueryBuilder
       end
     end
 
+    # @return [Boolean] true if the search doesn't have any tags or metatags.
     def is_empty_search?
       terms.size == 0
     end
 
+    # @return [Boolean] true if the search consists of a single tag or metatag.
     def is_single_term?
       terms.size == 1
     end
 
+    # @return [Boolean] true if the search has a single tag, possibly with wildcards or negation.
     def is_single_tag?
       is_single_term? && tags.size == 1
     end
 
+    # @return [Boolean] true if the search has a single tag, without any wildcards or operators.
     def is_simple_tag?
       tag = tags.first
       is_single_tag? && !tag.negated && !tag.optional && !tag.wildcard
     end
 
+    # @return [Boolean] true if the search has a single tag with a wildcard
     def is_wildcard_search?
       is_single_tag? && tags.first.wildcard
     end
 
+    # @return [Tag, nil] the tag if the search is for a simple tag, otherwise nil
     def simple_tag
       return nil if !is_simple_tag?
       Tag.find_by_name(tags.first.name)
