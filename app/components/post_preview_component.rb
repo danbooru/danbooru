@@ -72,7 +72,7 @@ class PostPreviewComponent < ApplicationComponent
   def data_attributes
     attributes = {
       "data-id" => post.id,
-      "data-has-sound" => post.has_tag?("video_with_sound|flash_with_sound"),
+      "data-has-sound" => post.has_tag?("sound"),
       "data-tags" => post.tag_string,
       "data-pools" => post.pool_string,
       "data-approver-id" => post.approver_id,
