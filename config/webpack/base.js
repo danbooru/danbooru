@@ -13,6 +13,7 @@ module.exports = merge(webpackConfig, {
   },
   module: {
     rules: [{
+      // https://github.com/usabilityhub/rails-erb-loader
       test: /.erb$/,
       enforce: "pre",
       exclude: /node_modules/,

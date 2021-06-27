@@ -1,3 +1,7 @@
+# This file configures Spring, the Rails application preloader.
+#
+# @see https://github.com/rails/spring
+
 %w[
   .ruby-version
   .rbenv-vars

@@ -1,4 +1,10 @@
+# This file configures Webpacker, the Rails wrapper around Webpack. Webpack is
+# used to bundle Javascript and CSS assets.
+#
 # Note: You must restart bin/webpack-dev-server for changes to take effect
+#
+# @see https://github.com/rails/webpacker
+# @see https://edgeguides.rubyonrails.org/webpacker.html
 
 default: &default
   source_path: app/javascript

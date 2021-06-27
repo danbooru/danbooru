@@ -1,3 +1,26 @@
+# This file contains all the configuration settings for Danbooru.
+#
+# Don't edit this file. Instead, to configure your Danbooru instance, copy this
+# file to config/danbooru_local_config.rb and edit that. Remove all settings you
+# don't need to change, and edit only the settings you do need to change.
+#
+# You can also use environment variables to change settings on the command line.
+# For example, to change the site name, you could do:
+#
+#     DANBOORU_APP_NAME=MyBooru bin/rails server
+#
+# This works with nearly any setting. Just take the setting name, uppercase it,
+# and add DANBOORU_ to the front. More examples:
+#
+#     DANBOORU_CANONICAL_URL=https://booru.example.com
+#     DANBOORU_CONTACT_EMAIL=admin@borou.example.com
+#     DANBOORU_DISCORD_SERVER_URL=https://discord.gg/yourbooru
+#
+# Settings from environment variables will override those from the config file.
+#
+# You can also set these environment variables in an envfile instead of the
+# command line. See the .env file in the root project directory for details.
+#
 module Danbooru
   class Configuration
     # A secret key used to encrypt session cookies, among other things.

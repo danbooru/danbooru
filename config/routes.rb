@@ -1,3 +1,12 @@
+# This file contains configuration for Danbooru's URL routes. It defines all the
+# URL endpoints and HTTP redirects used by Danbooru.
+#
+# A list of routes can be found at http://localhost:3000/rails/info/routes when
+# running the server in development mode. You can also run `bin/rails routes` to
+# produce a list of routes.
+#
+# @see https://guides.rubyonrails.org/routing.html
+# @see http://localhost:3000/rails/info/routes
 Rails.application.routes.draw do
   resources :posts, only: [:index, :show, :update, :destroy] do
     get :random, on: :collection

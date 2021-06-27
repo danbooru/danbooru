@@ -1,5 +1,9 @@
-# https://solargraph.org/guides/rails
-# https://gist.github.com/castwide/28b349566a223dfb439a337aea29713e
+# This file is used by the Solargraph language server to add better knowledge of
+# Rails for intellisense purposes for editors like VS Code or Vim that have Ruby
+# language server support configured.
+#
+# @see https://solargraph.org/guides/rails
+# @see https://gist.github.com/castwide/28b349566a223dfb439a337aea29713e
 #
 # The following comments fill some of the gaps in Solargraph's understanding of
 # Rails apps. Since they're all in YARD, they get mapped in Solargraph but

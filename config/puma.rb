@@ -1,3 +1,10 @@
+# This file contains configuration settings for the Puma web server. These
+# settings apply when running Danbooru with `bin/rails server`. In production,
+# Danbooru currently uses Unicorn instead of Puma.
+#
+# @see https://puma.io
+# @see https://github.com/puma/puma
+
 # Puma can serve each request in a thread from an internal thread pool.
 # The `threads` method setting takes two numbers: a minimum and maximum.
 # Any libraries that use thread pools should be configured to match
