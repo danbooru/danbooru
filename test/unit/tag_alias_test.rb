@@ -180,6 +180,17 @@ class TagAliasTest < ActiveSupport::TestCase
         assert_equal("second", @wiki2.body)
       end
 
+      should "move the old wiki body to the new wiki if the new wiki has a blank body" do
+        @wiki1 = create(:wiki_page, title: "aaa", other_names: "111 222", body: "first")
+        @wiki2 = create(:wiki_page, title: "bbb", other_names: "111 333", body: "")
+
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
+        perform_enqueued_jobs
+
+        assert_equal("This tag has been moved to [[#{@wiki2.title}]].", @wiki1.reload.body)
+        assert_equal("first", @wiki2.reload.body)
+      end
+
       should "ignore the old wiki if it has been deleted" do
         @wiki1 = create(:wiki_page, title: "aaa", other_names: "111 222", body: "first", is_deleted: true)
         @wiki2 = create(:wiki_page, title: "bbb", other_names: "111 333", body: "second")

@@ -151,13 +151,16 @@ class TagMover
     old_artist.save!
   end
 
-  # Merge the other names from both wikis, then mark the old wiki as deleted.
+  # Merge the other names from both wikis. Transfer the body from the old wiki
+  # to the new wiki if the new wiki has an empty body. Then mark the old wiki
+  # as deleted.
   def merge_wikis!
     old_wiki.lock!
     new_wiki.lock!
 
     new_wiki.other_names += old_wiki.other_names
     new_wiki.is_deleted = false
+    new_wiki.body = old_wiki.body if new_wiki.body.blank? && old_wiki.body.present?
     new_wiki.save!
 
     old_wiki.body = "This tag has been moved to [[#{new_wiki.title}]]."
