@@ -73,7 +73,7 @@ Each controller action above corresponds to an URL:
 | BansController#update  | PUT https://danbooru.donmai.us/bans/1234    | PUT /bans/:id       |                     |                               |
 | BansController#destroy | DELETE https://danbooru.donmai.us/bans/1234 | DELETE /bans/:id    |                     |                               |
 
-These routes are defined in [config/routes.rb](../config/routes.rb).
+These routes are defined in [config/routes.rb](../../config/routes.rb).
 
 # Authorization
 

@@ -1,5 +1,6 @@
-# This file runs after config/boot.rb and before config/environment.rb. It loads Rails, loads the gems, loads the
-# Danbooru configuration, and does some basic Rails configuration.
+# This file runs after config/boot.rb and before config/environment.rb. It loads
+# Rails, loads the gems, loads the Danbooru configuration, and does some basic
+# Rails configuration.
 #
 # @see https://guides.rubyonrails.org/initialization.html
 
@@ -21,8 +22,8 @@ require "rails/test_unit/railtie"
 # Load the gems for the current Rails environment from the Gemfile.
 Bundler.require(*Rails.groups)
 
-# Load the default Danbooru configuration from config/danbooru_default_config.rb and the custom config from
-# config/danbooru_local_config.rb.
+# Load the default Danbooru configuration from config/danbooru_default_config.rb
+# and the custom config from config/danbooru_local_config.rb.
 begin
   require_relative "danbooru_default_config"
   require_relative ENV.fetch("DANBOORU_CONFIG_FILE", "danbooru_local_config")

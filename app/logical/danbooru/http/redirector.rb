@@ -1,6 +1,6 @@
 # A HTTP::Feature that automatically follows HTTP redirects.
-# https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections
-
+#
+# @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections
 module Danbooru
   class Http
     class Redirector < HTTP::Feature

@@ -1,5 +1,5 @@
 # A job that performs a mass update or tag nuke operation in a bulk update
-# request.
+# request. Jobs in the `bulk_update` queue are processed sequentially.
 class TagBatchChangeJob < ApplicationJob
   queue_as :bulk_update
 
