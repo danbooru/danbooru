@@ -68,5 +68,37 @@ class UploadLimitTest < ActiveSupport::TestCase
         assert_equal(1010, @user.reload.upload_points)
       end
     end
+
+    context "an appealed post that is undeleted" do
+      should "increase the uploader's upload points" do
+        @post = create(:post, uploader: @user)
+
+        as(@approver) { @post.delete!("bad") }
+        assert_equal(967, @user.reload.upload_points)
+
+        @appeal = create(:post_appeal, post: @post)
+        @post.approve!(@approver)
+
+        assert_equal(true, @appeal.reload.succeeded?)
+        assert_equal(false, @post.reload.is_deleted?)
+        assert_equal(1010, @user.reload.upload_points)
+      end
+    end
+
+    context "an appealed post that is rejected" do
+      should "not decrease the uploader's upload points" do
+        @post = create(:post, uploader: @user)
+
+        as(@approver) { @post.delete!("bad") }
+        assert_equal(967, @user.reload.upload_points)
+
+        @appeal = create(:post_appeal, post: @post)
+        travel(4.days) { PostPruner.prune! }
+
+        assert_equal(true, @appeal.reload.rejected?)
+        assert_equal(true, @post.reload.is_deleted?)
+        assert_equal(967, @user.reload.upload_points)
+      end
+    end
   end
 end

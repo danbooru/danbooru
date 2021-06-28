@@ -82,19 +82,26 @@ class UploadLimit
   end
 
   # Update the uploader's upload points when a post is approved or deleted.
-  # @param post [Post] The post that was approved or deleted.
-  # @param incremental [Boolean] True if the post was status:pending and we can
-  #   simply increment/decrement the upload points. False if the post was an
-  #   approval or undeletion of an old post, and we have to replay the user's
-  #   entire upload history to recalculate their points.
-  def update_limit!(post, incremental: true)
+  # This must be called *after* the post is approved or deleted.
+  #
+  # @param is_pending [Boolean] true if the post is pending, false if the post is
+  #   active, flagged, appealed, or deleted.
+  # @param is_approval [Boolean] true if the post is being approved or
+  #   undeleted, false if the post is being deleted.
+  def update_limit!(is_pending, is_approval)
     return if user.can_upload_free?
 
     user.with_lock do
-      if incremental
-        user.upload_points += UploadLimit.upload_value(user.upload_points, post.is_deleted)
+      # If we're approving or deleting a pending post, we can simply increment
+      # or decrement the upload points.
+      if is_pending
+        user.upload_points += UploadLimit.upload_value(user.upload_points, !is_approval)
         user.upload_points = user.upload_points.clamp(0, MAXIMUM_POINTS)
         user.save!
+
+      # If we're undeleting a deleted or appealed post, or deleting a flagged
+      # or active post, then we have to replay the user's entire upload
+      # history to recalculate their upload points.
       else
         user.update!(upload_points: UploadLimit.points_for_user(user))
       end

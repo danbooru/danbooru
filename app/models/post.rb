@@ -1003,7 +1003,7 @@ class Post < ApplicationRecord
         # XXX This must happen *after* the `is_deleted` flag is set to true (issue #3419).
         give_favorites_to_parent if move_favorites
 
-        uploader.upload_limit.update_limit!(self, incremental: automated)
+        uploader.upload_limit.update_limit!(is_pending?, false)
 
         unless automated
           ModAction.log("deleted post ##{id}, reason: #{reason}", :post_delete)
