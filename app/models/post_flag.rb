@@ -18,7 +18,7 @@ class PostFlag < ApplicationRecord
   enum status: {
     pending: 0,
     succeeded: 1,
-    rejected: 2
+    rejected: 2,
   }
 
   scope :by_users, -> { where.not(creator: User.system) }

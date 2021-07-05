@@ -38,8 +38,8 @@ gem 'builder'
 gem 'puma'
 gem 'scenic'
 gem 'ipaddress_2'
-gem 'http'
-gem 'activerecord-hierarchical_query', git: "https://github.com/walski/activerecord-hierarchical_query", branch: "rails-6-1"
+gem 'http', "~> 4.4.1"
+gem 'activerecord-hierarchical_query'
 gem 'http-cookie', git: "https://github.com/danbooru/http-cookie"
 gem 'pundit'
 gem 'mail'
@@ -52,6 +52,8 @@ gem 'google-cloud-storage', require: "google/cloud/storage"
 gem 'ed25519'
 gem 'bcrypt_pbkdf' # https://github.com/net-ssh/net-ssh/issues/565
 gem 'terminal-table'
+gem 'newrelic_rpm', require: false
+gem 'clockwork'
 
 group :production, :staging do
   gem 'unicorn', :platforms => :ruby
@@ -60,13 +62,12 @@ end
 
 group :production do
   gem 'unicorn-worker-killer'
-  gem 'newrelic_rpm'
   gem 'capistrano-deploytags', '~> 1.0.0', require: false
 end
 
 group :development do
-  gem 'rubocop'
-  gem 'rubocop-rails'
+  gem 'rubocop', require: false
+  gem 'rubocop-rails', require: false
   #gem 'meta_request'
   gem 'rack-mini-profiler'
   gem 'stackprof'
@@ -81,6 +82,7 @@ group :development, :test do
   gem 'pry-byebug'
   gem 'pry-rails'
   gem 'listen'
+  gem 'solargraph'
 end
 
 group :test do

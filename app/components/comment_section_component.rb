@@ -4,6 +4,7 @@ class CommentSectionComponent < ApplicationComponent
   attr_reader :post, :comments, :current_user, :limit, :dtext_data
 
   def initialize(post:, current_user:, limit: nil)
+    super
     @post = post
     @current_user = current_user
     @limit = limit

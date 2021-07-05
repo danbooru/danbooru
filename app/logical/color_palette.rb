@@ -1,3 +1,18 @@
+# Generates a set of CSS variables for site's color palette.
+#
+# The CSS variables are named like `var(--{hue}-{i})`, where `hue` is the color
+# name (see below) and `i` is the brightless level (0-9, 0 is white and 9 is
+# black).
+#
+# Based on the HSLuv color space. The color palette is designed to be
+# perceptually uniform, that is, to have equal brightness levels across each
+# color.
+#
+# @see https://www.hsluv.org/
+# @see https://en.wikipedia.org/wiki/HSLuv
+# @see https://github.com/hsluv/hsluv
+# @see https://danbooru.donmai.us/static/colors
+# @see app/javascript/src/styles/base/040_colors.css
 module ColorPalette
   module_function
 

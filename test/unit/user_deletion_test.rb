@@ -26,6 +26,15 @@ class UserDeletionTest < ActiveSupport::TestCase
         assert_includes(@deletion.errors[:base], "Admins cannot delete their account")
       end
     end
+
+    context "for a banned user" do
+      should "fail" do
+        @user = create(:banned_user)
+        @deletion = UserDeletion.new(@user, "password", @request)
+        @deletion.delete!
+        assert_includes(@deletion.errors[:base], "You cannot delete your account if you are banned")
+      end
+    end
   end
 
   context "a valid user deletion" do

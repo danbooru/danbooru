@@ -1,19 +1,21 @@
+# Sanitizes the HTML used in notes. Only safe HTML tags, HTML attributes, and
+# CSS properties are allowed.
 module NoteSanitizer
-  ALLOWED_ELEMENTS = %w(
+  ALLOWED_ELEMENTS = %w[
     code center tn h1 h2 h3 h4 h5 h6 a span div blockquote br p ul li ol em
     strong small big b i font u s pre ruby rb rt rp rtc sub sup hr wbr
-  )
+  ]
 
   ALLOWED_ATTRIBUTES = {
-    :all => %w(style title),
-    "a" => %w(href),
-    "span" => %w(class),
-    "div" => %w(class align),
-    "p" => %w(class align),
-    "font" => %w(color size)
+    :all => %w[style title],
+    "a" => %w[href],
+    "span" => %w[class],
+    "div" => %w[class align],
+    "p" => %w[class align],
+    "font" => %w[color size]
   }
 
-  ALLOWED_PROPERTIES = %w(
+  ALLOWED_PROPERTIES = %w[
     align-items
     background background-color
     border border-color border-image border-radius border-style border-width
@@ -48,8 +50,11 @@ module NoteSanitizer
     word-wrap overflow-wrap
     writing-mode
     vertical-align
-  )
+  ]
 
+  # Sanitize a string of HTML.
+  # @param text [String] the HTML to sanitize
+  # @return [String] the sanitized HTML
   def self.sanitize(text)
     text.gsub!(/<( |-|3|:|>|\Z)/, "&lt;\\1")
 
@@ -76,6 +81,8 @@ module NoteSanitizer
     )
   end
 
+  # Convert absolute Danbooru links inside notes to relative links.
+  # https://danbooru.donmai.us/posts/1 is converted to /posts/1.
   def self.relativize_links(node:, **env)
     return unless node.name == "a" && node["href"].present?
 

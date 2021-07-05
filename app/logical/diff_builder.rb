@@ -1,3 +1,4 @@
+# Builds an HTML diff between two pieces of text.
 class DiffBuilder
   attr_reader :this_text, :that_text, :pattern
 

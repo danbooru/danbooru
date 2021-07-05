@@ -1,3 +1,7 @@
+# A MediaFile for a JPEG, PNG, or GIF file. Uses libvips for resizing images.
+#
+# @see https://github.com/libvips/ruby-vips
+# @see https://libvips.github.io/libvips/API/current
 class MediaFile::Image < MediaFile
   # Taken from ArgyllCMS 2.0.0 (see also: https://ninedegreesbelow.com/photography/srgb-profile-comparison.html)
   SRGB_PROFILE = "#{Rails.root}/config/sRGB.icm"
@@ -31,8 +35,8 @@ class MediaFile::Image < MediaFile
     is_animated_gif? || is_animated_png?
   end
 
-  # https://github.com/jcupitt/libvips/wiki/HOWTO----Image-shrinking
-  # http://jcupitt.github.io/libvips/API/current/Using-vipsthumbnail.md.html
+  # @see https://github.com/jcupitt/libvips/wiki/HOWTO----Image-shrinking
+  # @see http://jcupitt.github.io/libvips/API/current/Using-vipsthumbnail.md.html
   def preview(width, height)
     output_file = Tempfile.new(["image-preview", ".jpg"])
     resized_image = image.thumbnail_image(width, height: height, **THUMBNAIL_OPTIONS)
@@ -62,6 +66,7 @@ class MediaFile::Image < MediaFile
     file_ext == :png && APNGInspector.new(file.path).inspect!.animated?
   end
 
+  # @return [Vips::Image] the Vips image object for the file
   def image
     Vips::Image.new_from_file(file.path, fail: true)
   end

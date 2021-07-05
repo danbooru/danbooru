@@ -12,8 +12,9 @@ class Ban < ApplicationRecord
   validates :reason, presence: true
   validate :user, :validate_user_is_bannable, on: :create
 
-  scope :unexpired, -> { where("bans.created_at + bans.duration > ?", Time.now) }
-  scope :expired, -> { where("bans.created_at + bans.duration <= ?", Time.now) }
+  scope :unexpired, -> { where("bans.created_at + bans.duration > ?", Time.zone.now) }
+  scope :expired, -> { where("bans.created_at + bans.duration <= ?", Time.zone.now) }
+  scope :active, -> { unexpired }
 
   def self.search(params)
     q = search_attributes(params, :id, :created_at, :updated_at, :duration, :reason, :user, :banner)
@@ -47,7 +48,7 @@ class Ban < ApplicationRecord
   end
 
   def update_user_on_destroy
-    user.update_attribute(:is_banned, false)
+    user.update!(is_banned: false)
   end
 
   def user_name
@@ -63,19 +64,19 @@ class Ban < ApplicationRecord
   end
 
   def humanized_duration
-    ApplicationController.helpers.distance_of_time_in_words(created_at, expires_at)
+    ApplicationController.helpers.humanized_duration(duration)
   end
 
   def expired?
-    persisted? && expires_at < Time.now
+    persisted? && expires_at < Time.zone.now
   end
 
   def create_feedback
-    user.feedback.create!(creator: banner, category: "negative", body: "Banned for #{humanized_duration}: #{reason}")
+    user.feedback.create!(creator: banner, category: "negative", body: "Banned #{humanized_duration}: #{reason}")
   end
 
   def create_ban_mod_action
-    ModAction.log(%{Banned <@#{user_name}> for #{humanized_duration}: #{reason}}, :user_ban)
+    ModAction.log(%{Banned <@#{user_name}> #{humanized_duration}: #{reason}}, :user_ban)
   end
 
   def create_unban_mod_action

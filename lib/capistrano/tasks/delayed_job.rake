@@ -6,9 +6,9 @@ namespace :delayed_job do
         with rails_env: fetch(:rails_env) do
           bundle = SSHKit.config.command_map[:bundle]
 
-          execute :"systemd-run", "--user --collect --slice delayed_job --unit delayed_job.bulk_update -E RAILS_ENV=$RAILS_ENV -p WorkingDirectory=$PWD -p Restart=always #{bundle} exec script/delayed_job --queues=bulk_update run"
+          execute :"systemd-run", "--user --collect --slice delayed_job --unit delayed_job.bulk_update -E RAILS_ENV=$RAILS_ENV -p WorkingDirectory=$PWD -p Restart=always #{bundle} exec bin/delayed_job --queues=bulk_update run"
           fetch(:delayed_job_workers, 16).times do |n|
-            execute :"systemd-run", "--user --collect --slice delayed_job --unit delayed_job.#{n} -E RAILS_ENV=$RAILS_ENV -p WorkingDirectory=$PWD -p Restart=always #{bundle} exec script/delayed_job --queues=default run"
+            execute :"systemd-run", "--user --collect --slice delayed_job --unit delayed_job.#{n} -E RAILS_ENV=$RAILS_ENV -p WorkingDirectory=$PWD -p Restart=always #{bundle} exec bin/delayed_job --queues=default run"
           end
         end
       end

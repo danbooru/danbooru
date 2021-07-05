@@ -1,3 +1,26 @@
+# This file contains all the configuration settings for Danbooru.
+#
+# Don't edit this file. Instead, to configure your Danbooru instance, copy this
+# file to config/danbooru_local_config.rb and edit that. Remove all settings you
+# don't need to change, and edit only the settings you do need to change.
+#
+# You can also use environment variables to change settings on the command line.
+# For example, to change the site name, you could do:
+#
+#     DANBOORU_APP_NAME=MyBooru bin/rails server
+#
+# This works with nearly any setting. Just take the setting name, uppercase it,
+# and add DANBOORU_ to the front. More examples:
+#
+#     DANBOORU_CANONICAL_URL=https://booru.example.com
+#     DANBOORU_CONTACT_EMAIL=admin@borou.example.com
+#     DANBOORU_DISCORD_SERVER_URL=https://discord.gg/yourbooru
+#
+# Settings from environment variables will override those from the config file.
+#
+# You can also set these environment variables in an envfile instead of the
+# command line. See the .env file in the root project directory for details.
+#
 module Danbooru
   class Configuration
     # A secret key used to encrypt session cookies, among other things.
@@ -481,11 +504,12 @@ module Danbooru
     def reportbooru_key
     end
 
-    # The URL for the IQDBs server (https://github.com/evazion/iqdbs).
-    # Optional. Used for dupe detection and reverse image searches.
-    # Set to http://localhost/mock/iqdbs to enable a fake iqdb server for
+    # The URL for the IQDB server (https://github.com/danbooru/iqdb). Optional.
+    # Used for dupe detection and reverse image searches. Set this to
+    # http://localhost:3000/mock/iqdb to enable a fake iqdb server for
     # development purposes.
-    def iqdbs_server
+    def iqdb_url
+      # "http://localhost:3000/mock/iqdb"
     end
 
     def aws_credentials
@@ -499,9 +523,6 @@ module Danbooru
     end
 
     def aws_sqs_region
-    end
-
-    def aws_sqs_iqdb_url
     end
 
     def aws_sqs_archives_url
@@ -580,6 +601,12 @@ module Danbooru
     # required to enable saved searches.
     def redis_url
       # "redis://localhost:6379"
+    end
+
+    # Optional. The license key for your New Relic account.
+    # https://newrelic.com/
+    # https://docs.newrelic.com/docs/accounts/accounts-billing/account-setup/new-relic-license-key/
+    def new_relic_license_key
     end
   end
 

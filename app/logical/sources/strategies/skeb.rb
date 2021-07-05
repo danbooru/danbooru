@@ -3,6 +3,7 @@
 # * https://skeb.imgix.net/requests/199886_0?bg=%23fff&auto=format&w=800&s=5a6a908ab964fcdfc4713fad179fe715
 ## Watermarked:
 # * https://skeb.imgix.net/requests/73290_0?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&w=800&s=4843435cff85d623b1f657209d131526
+# * https://skeb.imgix.net/uploads/origins/04d62c2f-e396-46f9-903a-3ca8bd69fc7c?bg=%23fff&auto=format&w=800&s=966c5d0389c3b94dc36ac970f812bef4 (new format)
 ## Full Size (found in commissioner_upload):
 # * https://skeb.imgix.net/requests/53269_1?bg=%23fff&fm=png&dl=53269.png&w=1.0&h=1.0&s=44588ea9c41881049e392adb1df21cce
 #
@@ -13,6 +14,7 @@
 # * https://skeb.jp/@OrvMZ/works/1 (separated request and client's message after delivery. We can't get the latter)
 # * https://skeb.jp/@asanagi/works/16 (age-restricted, watermarked)
 # * https://skeb.jp/@asanagi/works/6 (private, returns 404)
+# * https://skeb.jp/@nasuno42/works/30 (multi-image post)
 #
 # Profile URLS
 # Since skeb forces login through twitter, usernames are the same as twitter
@@ -25,7 +27,7 @@ module Sources
 
       PAGE_URL    = %r{#{PROFILE_URL}/works/(?<illust_id>\d+)}i
 
-      IMAGE_URL   = %r{https?://(?:www\.)?skeb\.imgix\.net/requests/[\d_]+\?.*}i
+      IMAGE_URL   = %r{https?://(?:www\.)?skeb\.imgix\.net/(requests|uploads/origins)/.*}i
 
       def domains
         ["skeb.jp"]
@@ -47,7 +49,7 @@ module Sources
           # Heavy heuristic to extract the uncropped image among the nighmare that is the skeb minified json
           candidates = page&.css("script")&.map { |script| script.text&.scan(/(https:\\u002F\\u002Fskeb\.imgix\.net.*?)(?:"|,|\s)/) }
           candidates = candidates.to_a.flatten.compact.uniq.reject { |match| match.include? "crop=" }
-          [candidates.first.gsub("\\u002F", "/")]
+          candidates.map { |img| img.gsub("\\u002F", "/") }
         else
           []
         end

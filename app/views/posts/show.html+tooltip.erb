@@ -32,7 +32,7 @@
   <%= link_to "#{@post.image_width}x#{@post.image_height}", @post.file_url, class: "post-tooltip-dimensions post-tooltip-info" %>
 
   <%= render PopupMenuComponent.new do |menu| %>
-    <%= menu.item do %>
+    <% menu.item do %>
       <%= link_to "javascript:void(0)", class: "post-tooltip-disable"  do %>
         <%= close_icon %> Disable tooltips
       <% end %>

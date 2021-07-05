@@ -14,7 +14,7 @@ class UploadService
     end
 
     def is_downloadable?(source)
-      source =~ /^https?:\/\//
+      source =~ %r{\Ahttps?://}
     end
 
     def generate_resizes(media_file)
@@ -66,7 +66,7 @@ class UploadService
 
     def automatic_tags(media_file)
       tags = []
-      tags << "video_with_sound" if media_file.has_audio?
+      tags << "sound" if media_file.has_audio?
       tags << "animated_gif" if media_file.file_ext == :gif && media_file.is_animated?
       tags << "animated_png" if media_file.file_ext == :png && media_file.is_animated?
       tags.join(" ")

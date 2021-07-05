@@ -1,4 +1,6 @@
-# Notes on Pixiv's AJAX API:
+# A client for Pixiv's AJAX API.
+#
+# Notes on the API:
 #
 # * The user agent must be spoofed as a browser user agent, otherwise the API
 #   will return an error.
@@ -359,23 +361,40 @@ class PixivAjaxClient
 
   attr_reader :phpsessid, :http
 
+  # @param phpsessid [String] the Pixiv login cookie
+  # @param http [Danbooru::Http] the HTTP client to use for Pixiv
   def initialize(phpsessid, http: Danbooru::Http.new)
     @phpsessid = phpsessid
     @http = http
   end
 
+  # Return the illust data for a Pixiv illustration.
+  # @see https://www.pixiv.net/ajax/illust/87598468
+  # @param illust_id [Integer] the Pixiv illustration id
+  # @return [Hash] the illustration data
   def illust(illust_id)
     get("https://www.pixiv.net/ajax/illust/#{illust_id}").with_indifferent_access
   end
 
+  # Return the data for a Pixiv manga illust with multiple pages.
+  # @see https://www.pixiv.net/ajax/illust/87598468/pages
+  # @param illust_id [Integer] the Pixiv illustration id
+  # @return [Hash] the illustration data
   def pages(illust_id)
     get("https://www.pixiv.net/ajax/illust/#{illust_id}/pages")
   end
 
+  # Return the data for a Pixiv ugoira.
+  # @see https://www.pixiv.net/ajax/illust/74932152/ugoira_meta
+  # @param illust_id [Integer] the Pixiv illustration id
+  # @return [Hash] the ugoira data
   def ugoira_meta(illust_id)
     get("https://www.pixiv.net/ajax/illust/#{illust_id}/ugoira_meta").with_indifferent_access
   end
 
+  # Perform a GET request for a Pixiv URL.
+  # @param url [String] the Pixiv URL
+  # @return [Hash] the parsed response, or blank on error
   def get(url)
     response = client.cache(1.minute).get(url)
 
@@ -387,6 +406,7 @@ class PixivAjaxClient
     end
   end
 
+  # @return [Danbooru::Http] the HTTP client used for Pixiv
   def client
     @client ||= http.headers("User-Agent": USER_AGENT).cookies(PHPSESSID: phpsessid)
   end

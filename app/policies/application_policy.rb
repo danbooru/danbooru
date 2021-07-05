@@ -69,7 +69,7 @@ class ApplicationPolicy
   # The list of attributes that are permitted to be returned by the API.
   def api_attributes
     # XXX allow inet
-    record.class.attribute_types.reject { |name, attr| attr.type.in?([:inet, :tsvector]) }.keys.map(&:to_sym)
+    record.class.attribute_types.reject { |_name, attr| attr.type.in?([:inet, :tsvector]) }.keys.map(&:to_sym)
   end
 
   # The list of attributes that are permitted to be used as data-* attributes

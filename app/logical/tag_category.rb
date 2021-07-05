@@ -1,3 +1,5 @@
+# Utility methods for working with tag categories (general, character,
+# copyright, artist, meta).
 class TagCategory
   module Mappings
     # Returns a hash mapping various tag categories to a numerical value.
@@ -68,7 +70,7 @@ class TagCategory
     end
 
     def category_ids_regex
-      @@category_ids_regex ||= "[#{category_ids.join("")}]"
+      @@category_ids_regex ||= "[#{category_ids.join}]"
     end
   end
 

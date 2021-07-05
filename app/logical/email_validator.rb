@@ -1,14 +1,25 @@
 require 'resolv'
 
+# Validates that an email address is well-formed, is deliverable, and is not a
+# disposable or throwaway email address. Also normalizes equivalent addresses to
+# a single canonical form, so that users can't use different forms of the same
+# address to register multiple accounts.
 module EmailValidator
   module_function
 
   # https://www.regular-expressions.info/email.html
   EMAIL_REGEX = /\A[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\z/
 
+  # Sites that ignore dots in email addresses, e.g. where `te.st@gmail.com` is
+  # the same as `test@gmail.com`.
   IGNORE_DOTS = %w[gmail.com]
+
+  # Sites that allow plus addressing, e.g. `test+nospam@gmail.com`.
+  # @see https://en.wikipedia.org/wiki/Email_address#Subaddressing
   IGNORE_PLUS_ADDRESSING = %w[gmail.com hotmail.com outlook.com live.com]
   IGNORE_MINUS_ADDRESSING = %w[yahoo.com]
+
+  # Sites that have multiple domains mapping to the same logical email address.
   CANONICAL_DOMAINS = {
     "googlemail.com" => "gmail.com",
     "hotmail.co.uk" => "outlook.com",
@@ -66,10 +77,16 @@ module EmailValidator
     "gmx.us" => "gmx.net",
   }
 
+  # Returns true if it's okay to connect to port 25. Disabled outside of
+  # production because many home ISPs blackhole port 25.
   def smtp_enabled?
     Rails.env.production?
   end
 
+  # Normalize an email address by stripping out plus addressing and dots, if
+  # applicable, and rewriting the domain to a canonical domain.
+  # @param address [String] the email address to normalize
+  # @return [String] the normalized address
   def normalize(address)
     return nil unless address.count("@") == 1
 
@@ -83,10 +100,16 @@ module EmailValidator
     "#{name}@#{domain}"
   end
 
+  # Returns true if the email address is correctly formatted.
+  # @param [String] the email address
+  # @return [Boolean]
   def is_valid?(address)
     address.match?(EMAIL_REGEX)
   end
 
+  # Returns true if the email is a throwaway or disposable email address.
+  # @param [String] the email address
+  # @return [Boolean]
   def is_restricted?(address)
     return false if Danbooru.config.email_domain_verification_list.blank?
 
@@ -96,6 +119,11 @@ module EmailValidator
     true
   end
 
+  # Returns true if the email can't be delivered. Checks if the domain has an MX
+  # record and responds to the RCPT TO command.
+  # @param to_address [String] the email address to check
+  # @param from_address [String] the email address to check from
+  # @return [Boolean]
   def undeliverable?(to_address, from_address: Danbooru.config.contact_email, timeout: 3)
     mail_server = mx_domain(to_address, timeout: timeout)
     mail_server.nil? || rcpt_to_failed?(to_address, from_address, mail_server, timeout: timeout)
@@ -103,6 +131,13 @@ module EmailValidator
     false
   end
 
+  # Returns true if the email can't be delivered. Sends a RCPT TO command over
+  # port 25 to check if the mailbox exists.
+  # @param to_address [String] the email address to check
+  # @param from_address [String] the email address to check from
+  # @param mail_server [String] the DNS name of the SMTP server
+  # @param timeout [Integer] the network timeout
+  # @return [Boolean]
   def rcpt_to_failed?(to_address, from_address, mail_server, timeout: nil)
     return false unless smtp_enabled?
 
@@ -121,6 +156,11 @@ module EmailValidator
     end
   end
 
+  # Does a DNS MX record lookup of the domain in the email address and returns the
+  # name of the mail server, if it exists.
+  # @param to_address [String] the email address to check
+  # @param timeout [Integer] the network timeout
+  # @return [String] the DNS name of the mail server
   def mx_domain(to_address, timeout: nil)
     domain = Mail::Address.new(to_address).domain
 

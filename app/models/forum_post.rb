@@ -30,9 +30,9 @@ class ForumPost < ApplicationRecord
 
   deletable
   mentionable(
-    :message_field => :body,
-    :title => ->(user_name) {%{#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})}},
-    :body => ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[#{Routes.forum_topic_path(topic, page: forum_topic_page)}]):\n\n[quote]\n#{DText.extract_mention(body, "@" + user_name)}\n[/quote]\n}}
+    message_field: :body,
+    title: ->(_user_name) {%{#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})}},
+    body: ->(user_name) {%{@#{creator.name} mentioned you in topic ##{topic_id} ("#{topic.title}":[#{Routes.forum_topic_path(topic, page: forum_topic_page)}]):\n\n[quote]\n#{DText.extract_mention(body, "@#{user_name}")}\n[/quote]\n}}
   )
 
   module SearchMethods
@@ -74,7 +74,7 @@ class ForumPost < ApplicationRecord
   end
 
   def voted?(user, score)
-    votes.where(creator_id: user.id, score: score).exists?
+    votes.exists?(creator_id: user.id, score: score)
   end
 
   def autoreport_spam
@@ -149,7 +149,7 @@ class ForumPost < ApplicationRecord
 
   def is_original_post?(original_post_id = nil)
     if original_post_id
-      return id == original_post_id
+      id == original_post_id
     else
       ForumPost.exists?(["id = ? and id = (select _.id from forum_posts _ where _.topic_id = ? order by _.id asc limit 1)", id, topic_id])
     end

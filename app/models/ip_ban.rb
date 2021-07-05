@@ -9,7 +9,7 @@ class IpBan < ApplicationRecord
   deletable
   enum category: {
     full: 0,
-    partial: 100
+    partial: 100,
   }, _suffix: "ban"
 
   def self.visible(user)

@@ -18,7 +18,7 @@ class PoolVersion < ApplicationRecord
     end
 
     def for_user(user_id)
-      where("updater_id = ?", user_id)
+      where(updater_id: user_id)
     end
 
     def for_post_id(post_id)
@@ -65,7 +65,7 @@ class PoolVersion < ApplicationRecord
   def self.queue(pool, updater, updater_ip_addr)
     # queue updates to sqs so that if archives goes down for whatever reason it won't
     # block pool updates
-    raise NotImplementedError.new("Archive service is not configured.") if !enabled?
+    raise NotImplementedError, "Archive service is not configured." if !enabled?
 
     json = {
       pool_id: pool.id,
@@ -93,23 +93,17 @@ class PoolVersion < ApplicationRecord
   end
 
   def previous
-    @previous ||= begin
-      PoolVersion.where("pool_id = ? and version < ?", pool_id, version).order("version desc").limit(1).to_a
-    end
+    @previous ||= PoolVersion.where("pool_id = ? and version < ?", pool_id, version).order("version desc").limit(1).to_a
     @previous.first
   end
 
   def subsequent
-    @subsequent ||= begin
-      PoolVersion.where("pool_id = ? and version > ?", pool_id, version).order("version asc").limit(1).to_a
-    end
+    @subsequent ||= PoolVersion.where("pool_id = ? and version > ?", pool_id, version).order("version asc").limit(1).to_a
     @subsequent.first
   end
 
   def current
-    @current ||= begin
-      PoolVersion.where("pool_id = ?", pool_id).order("version desc").limit(1).to_a
-    end
+    @current ||= PoolVersion.where(pool_id: pool_id).order("version desc").limit(1).to_a
     @current.first
   end
 
@@ -126,12 +120,12 @@ class PoolVersion < ApplicationRecord
   end
 
   def posts_changed(type)
-    other = self.send(type)
+    other = send(type)
     ((post_ids - other.post_ids) | (other.post_ids - post_ids)).length.positive?
   end
 
   def was_deleted(type)
-    other = self.send(type)
+    other = send(type)
     if type == "previous"
       is_deleted && !other.is_deleted
     else
@@ -140,7 +134,7 @@ class PoolVersion < ApplicationRecord
   end
 
   def was_undeleted(type)
-    other = self.send(type)
+    other = send(type)
     if type == "previous"
       !is_deleted && other.is_deleted
     else
@@ -149,7 +143,7 @@ class PoolVersion < ApplicationRecord
   end
 
   def was_activated(type)
-    other = self.send(type)
+    other = send(type)
     if type == "previous"
       is_active && !other.is_active
     else
@@ -158,7 +152,7 @@ class PoolVersion < ApplicationRecord
   end
 
   def was_deactivated(type)
-    other = self.send(type)
+    other = send(type)
     if type == "previous"
       !is_active && other.is_active
     else

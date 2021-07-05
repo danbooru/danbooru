@@ -37,8 +37,7 @@ class PostVersionsController < ApplicationController
   end
 
   def check_availabililty
-    if !PostVersion.enabled?
-      raise NotImplementedError.new("Archive service is not configured. Post versions are not saved.")
-    end
+    return if PostVersion.enabled?
+    raise NotImplementedError, "Archive service is not configured. Post versions are not saved."
   end
 end

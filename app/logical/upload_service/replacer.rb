@@ -11,7 +11,7 @@ class UploadService
     end
 
     def comment_replacement_message(post, replacement)
-      %("#{replacement.creator.name}":[#{Routes.user_path(replacement.creator)}] replaced this post with a new file:\n\n#{replacement_message(post, replacement)})
+      %{"#{replacement.creator.name}":[#{Routes.user_path(replacement.creator)}] replaced this post with a new file:\n\n#{replacement_message(post, replacement)}}
     end
 
     def replacement_message(post, replacement)
@@ -49,7 +49,7 @@ class UploadService
       truncated_source = source.gsub(%r{\Ahttps?://}, "").truncate(64, omission: "...#{source.last(32)}")
 
       if source =~ %r{\Ahttps?://}i
-        %("#{truncated_source}":[#{source}])
+        %{"#{truncated_source}":[#{source}]}
       else
         truncated_source
       end
@@ -70,7 +70,7 @@ class UploadService
         return "file://#{repl.replacement_file.original_filename}"
       end
 
-      if !upload.source.present?
+      if upload.source.blank?
         raise "No source found in upload for replacement"
       end
 
@@ -128,7 +128,7 @@ class UploadService
       replacement.save!
       post.save!
 
-      post.update_iqdb_async
+      post.update_iqdb
     end
 
     def purge_cached_urls(post)

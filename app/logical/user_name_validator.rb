@@ -1,3 +1,9 @@
+# Define a custom validator for user names.
+#
+# @example
+#   validates :name, user_name: true
+#
+# @see https://guides.rubyonrails.org/active_record_validations.html#custom-validators
 class UserNameValidator < ActiveModel::EachValidator
   def validate_each(rec, attr, value)
     name = value

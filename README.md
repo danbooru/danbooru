@@ -88,7 +88,7 @@ The following features requires a Google API account:
 
 ### IQDB Service
 
-IQDB integration is delegated to the [IQDBS service](https://github.com/r888888888/iqdbs).
+IQDB integration is delegated to the [IQDB service](https://github.com/danbooru/iqdb).
 
 ### Archive Service
 

@@ -7,8 +7,8 @@ class CommentVote < ApplicationRecord
   validate :validate_vote_is_unique, if: :is_deleted_changed?
   validates :score, inclusion: { in: [-1, 1], message: "must be 1 or -1" }
 
-  before_create :update_score_on_create
   before_save :update_score_on_delete_or_undelete, if: -> { !new_record? && is_deleted_changed? }
+  before_create :update_score_on_create
 
   deletable
 

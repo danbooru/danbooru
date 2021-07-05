@@ -1,3 +1,5 @@
+# A DeviantArt API client.
+#
 # Authentication is via OAuth2 with the client credentials grant. Register a
 # new app at https://www.deviantart.com/developers/ to obtain a client_id and
 # client_secret. The app doesn't need to be published.

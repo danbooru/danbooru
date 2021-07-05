@@ -86,6 +86,7 @@ module Sources
 
       def image_url
         return to_full_image_url(url) if url =~ IMAGE_URL || url =~ DOJIN_URL
+        return url if url =~ IMAGE_BASE_URL
         image_urls.first
       end
 

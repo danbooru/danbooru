@@ -328,6 +328,9 @@ class ArtistTest < ActiveSupport::TestCase
       should "find the artist" do
         assert_artist_found("evazion", "https://pawoo.net/@evazion/19451018")
         assert_artist_found("evazion", "https://pawoo.net/web/statuses/19451018")
+      end
+
+      should_eventually "find artists by account id" do
         assert_artist_found("yasumo01", "https://pawoo.net/@yasumo01/222337")
         assert_artist_found("yasumo01", "https://pawoo.net/web/statuses/222337")
       end

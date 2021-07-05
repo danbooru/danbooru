@@ -54,7 +54,7 @@ class PoolsController < ApplicationController
 
   def destroy
     @pool = authorize Pool.find(params[:id])
-    @pool.update_attribute(:is_deleted, true)
+    @pool.update(is_deleted: true)
     @pool.create_mod_action_for_delete
     flash[:notice] = "Pool deleted"
     respond_with(@pool)
@@ -62,7 +62,7 @@ class PoolsController < ApplicationController
 
   def undelete
     @pool = authorize Pool.find(params[:id])
-    @pool.update_attribute(:is_deleted, false)
+    @pool.update(is_deleted: false)
     @pool.create_mod_action_for_undelete
     flash[:notice] = "Pool undeleted"
     respond_with(@pool)

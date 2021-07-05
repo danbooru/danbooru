@@ -1,3 +1,8 @@
+# Returns status information about the running server, including software
+# versions, basic load info, and Redis and Postgres info.
+#
+# @see StatusController
+# @see https://danbooru.donmai.us/status
 class ServerStatus
   extend Memoist
   include ActiveModel::Serializers::JSON

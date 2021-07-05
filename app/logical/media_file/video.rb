@@ -1,3 +1,7 @@
+# A MediaFile for a webm or mp4 video. Uses ffmpeg to generate preview
+# thumbnails.
+#
+# @see https://github.com/streamio/streamio-ffmpeg
 class MediaFile::Video < MediaFile
   def dimensions
     [video.width, video.height]

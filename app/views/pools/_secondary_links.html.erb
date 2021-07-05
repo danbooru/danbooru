@@ -16,7 +16,7 @@
     <% if policy(@pool).update? %>
       <%= subnav_link_to "Edit", edit_pool_path(@pool), "data-shortcut": "e" %>
     <% end %>
-    <% if current_page?({ action: :edit }) %>
+    <% if current_page?(action: :edit) %>
       <% if policy(@pool).undelete? %>
         <%= subnav_link_to "Undelete", undelete_pool_path(@pool), :method => :post, :remote => true %>
       <% elsif policy(@pool).destroy? %>

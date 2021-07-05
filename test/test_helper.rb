@@ -60,7 +60,7 @@ class ActiveSupport::TestCase
   end
 
   def as(user, &block)
-    CurrentUser.as(user, &block)
+    CurrentUser.scoped(user, &block)
   end
 end
 

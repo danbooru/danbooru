@@ -16,7 +16,8 @@ module Sources
         Strategies::Mastodon,
         Strategies::Weibo,
         Strategies::Newgrounds,
-        Strategies::Skeb
+        Strategies::Skeb,
+        Strategies::Lofter
       ]
     end
 

@@ -6,6 +6,7 @@ class PostRegenerationsControllerTest < ActionDispatch::IntegrationTest
       @mod = create(:moderator_user, name: "yukari", created_at: 1.month.ago)
       @upload = assert_successful_upload("test/files/test.jpg", user: @mod)
       @post = @upload.post
+      perform_enqueued_jobs # add post to iqdb
     end
 
     context "create action" do
@@ -23,9 +24,6 @@ class PostRegenerationsControllerTest < ActionDispatch::IntegrationTest
 
       context "for an IQDB regeneration" do
         should "regenerate IQDB" do
-          mock_iqdb_service!
-          Post.iqdb_sqs_service.expects(:send_message).with("update\n#{@post.id}\n#{@post.preview_file_url}")
-
           post_auth post_regenerations_path, @mod, params: { post_id: @post.id, category: "iqdb" }
           perform_enqueued_jobs
         end

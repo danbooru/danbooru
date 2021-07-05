@@ -40,12 +40,12 @@ module PostVersionsHelper
   def post_version_field(post_version, field)
     value = post_version_value(post_version.send(field))
     prefix = (field == :parent_id ? "parent" : field.to_s)
-    search = prefix + ":" + value.to_s
+    search = "#{prefix}:#{value}"
     display = (field == :rating ? post_version.pretty_rating : value)
     %(<b>#{field.to_s.titleize}:</b> #{link_to(display, posts_path(:tags => search))}).html_safe
   end
 
   def post_version_value(value)
-    return (value.present? ? value : "none")
+    value.presence || "none"
   end
 end

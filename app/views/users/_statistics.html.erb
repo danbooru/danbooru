@@ -89,12 +89,13 @@
         <td><%= presenter.permissions %></td>
       </tr>
 
-      <% if user.is_banned? && user.recent_ban %>
+      <% if user.is_banned? && user.active_ban.present? %>
         <tr>
           <th>Ban reason</th>
           <td>
             <span class="prose">
-              <%= format_text presenter.ban_reason, inline: true %>
+              <%= format_text user.active_ban.reason, inline: true %>
+              (banned <%= humanized_duration(user.active_ban.duration) %>)
             </span>
           </td>
         </tr>

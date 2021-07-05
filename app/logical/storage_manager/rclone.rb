@@ -1,3 +1,8 @@
+# A StorageManager that stores file on remote filesystem using rclone. Rclone
+# can store files on most cloud storage systems. Requires the `rclone` binary to
+# be installed and configured.
+#
+# @see https://rclone.org/
 class StorageManager::Rclone < StorageManager
   class Error < StandardError; end
   attr_reader :remote, :bucket, :rclone_path, :rclone_options

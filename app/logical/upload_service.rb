@@ -1,8 +1,4 @@
-require 'upload_service/controller_helper'
-require 'upload_service/preprocessor'
-require 'upload_service/replacer'
-require 'upload_service/utils'
-
+# A service object for uploading an image.
 class UploadService
   attr_reader :params, :post, :upload
 
@@ -10,8 +6,8 @@ class UploadService
     @params = params
   end
 
-  def delayed_start(uploader_id)
-    CurrentUser.as(uploader_id) do
+  def delayed_start(uploader)
+    CurrentUser.scoped(uploader) do
       start!
     end
   rescue ActiveRecord::RecordNotUnique
@@ -84,6 +80,8 @@ class UploadService
         :translated_description => upload.translated_commentary_desc
       )
     end
+
+    @post.update_iqdb
 
     upload.update(status: "completed", post_id: @post.id)
 

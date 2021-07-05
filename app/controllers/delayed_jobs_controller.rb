@@ -8,33 +8,25 @@ class DelayedJobsController < ApplicationController
 
   def cancel
     @job = authorize Delayed::Job.find(params[:id]), policy_class: DelayedJobPolicy
-    if !@job.locked_at?
-      @job.fail!
-    end
+    @job.fail! unless @job.locked_at?
     respond_with(@job)
   end
 
   def retry
     @job = authorize Delayed::Job.find(params[:id]), policy_class: DelayedJobPolicy
-    if !@job.locked_at?
-      @job.update(failed_at: nil, attempts: 0)
-    end
+    @job.update(failed_at: nil, attempts: 0) unless @job.locked_at?
     respond_with(@job)
   end
 
   def run
     @job = authorize Delayed::Job.find(params[:id]), policy_class: DelayedJobPolicy
-    if !@job.locked_at?
-      @job.update(run_at: Time.now)
-    end
+    @job.update(run_at: Time.zone.now) unless @job.locked_at?
     respond_with(@job)
   end
 
   def destroy
     @job = authorize Delayed::Job.find(params[:id]), policy_class: DelayedJobPolicy
-    if !@job.locked_at?
-      @job.destroy
-    end
+    @job.destroy unless @job.locked_at?
     respond_with(@job)
   end
 end

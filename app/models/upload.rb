@@ -62,13 +62,14 @@ class Upload < ApplicationRecord
   end
 
   attr_accessor :as_pending, :replaced_post, :file
+
   belongs_to :uploader, :class_name => "User"
   belongs_to :post, optional: true
 
   before_validation :initialize_attributes, on: :create
   before_validation :assign_rating_from_tags
   # validates :source, format: { with: /\Ahttps?/ }, if: ->(record) {record.file.blank?}, on: :create
-  validates :rating, inclusion: { in: %w(q e s) }, allow_nil: true
+  validates :rating, inclusion: { in: %w[q e s] }, allow_nil: true
   validates :md5, confirmation: true, if: ->(rec) { rec.md5_confirmation.present? }
   validates_with FileValidator, on: :file
   serialize :context, JSON
@@ -109,7 +110,7 @@ class Upload < ApplicationRecord
 
     def delete_files
       # md5 is blank if the upload errored out before downloading the file.
-      if is_completed? || md5.blank? || Upload.where(md5: md5).exists? || Post.where(md5: md5).exists?
+      if is_completed? || md5.blank? || Upload.exists?(md5: md5) || Post.exists?(md5: md5)
         return
       end
 
@@ -170,7 +171,7 @@ class Upload < ApplicationRecord
       source = source.unicode_normalize(:nfc)
 
       # percent encode unicode characters in urls
-      if source =~ %r!\Ahttps?://!i
+      if source =~ %r{\Ahttps?://}i
         source = Addressable::URI.normalized_encode(source) rescue source
       end
 
@@ -178,7 +179,7 @@ class Upload < ApplicationRecord
     end
 
     def source_url
-      return nil unless source =~ %r!\Ahttps?://!i
+      return nil unless source =~ %r{\Ahttps?://}i
       Addressable::URI.heuristic_parse(source) rescue nil
     end
   end

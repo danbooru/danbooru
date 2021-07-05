@@ -11,23 +11,17 @@ class NoteVersion < ApplicationRecord
   end
 
   def previous
-    @previous ||= begin
-      NoteVersion.where("note_id = ? and version < ?", note_id, version).order("updated_at desc").limit(1).to_a
-    end
+    @previous ||= NoteVersion.where("note_id = ? and version < ?", note_id, version).order("updated_at desc").limit(1).to_a
     @previous.first
   end
 
   def subsequent
-    @subsequent ||= begin
-      NoteVersion.where("note_id = ? and version > ?", note_id, version).order("updated_at asc").limit(1).to_a
-    end
+    @subsequent ||= NoteVersion.where("note_id = ? and version > ?", note_id, version).order("updated_at asc").limit(1).to_a
     @subsequent.first
   end
 
   def current
-    @current ||= begin
-      NoteVersion.where("note_id = ?", note_id).order("updated_at desc").limit(1).to_a
-    end
+    @current ||= NoteVersion.where(note_id: note_id).order("updated_at desc").limit(1).to_a
     @current.first
   end
 
@@ -42,17 +36,17 @@ class NoteVersion < ApplicationRecord
   end
 
   def was_moved(type)
-    other = self.send(type)
+    other = send(type)
     x != other.x || y != other.y
   end
 
   def was_resized(type)
-    other = self.send(type)
+    other = send(type)
     width != other.width || height != other.height
   end
 
   def was_deleted(type)
-    other = self.send(type)
+    other = send(type)
     if type == "previous"
       !is_active && other.is_active
     else
@@ -61,7 +55,7 @@ class NoteVersion < ApplicationRecord
   end
 
   def was_undeleted(type)
-    other = self.send(type)
+    other = send(type)
     if type == "previous"
       is_active && !other.is_active
     else

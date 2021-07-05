@@ -1,9 +1,28 @@
-# Don't edit this file. To override this file, set `DATABASE_URL` in .env.local
-# instead. Example:
+# This file contains database configuration. Don't edit this file. To override
+# this file, set `DATABASE_URL` in .env.local instead.
 #
-#   DATABASE_URL=postgresql://danbooru:password@localhost/danbooru2
+# By default, with no configuration, we try to connect to the Postgres server
+# running on localhost with username `danbooru` and database name `danbooru2`.
 #
-# https://guides.rubyonrails.org/configuring.html#configuring-a-database
+# Example:
+#
+#   # Connect to the database named `danbooru2` via localhost on port 5432
+#   DATABASE_URL=postgresql://localhost/danbooru2
+#
+#   # Connect via Unix domain socket in /var/run/postgresql
+#   # https://zaiste.net/posts/postgresql-unix-socket-tcpip-loopback/
+#   DATABASE_URL=postgresql://%2Fvar%2Frun%2Fpostgresql/danbooru2
+#
+# The general form for a database URL is:
+#
+#   postgresql://[user[:password]@][host][:port][/dbname][?param1=value1&...]`
+#
+# The default is:
+#
+#   postgresql://danbooru@localhost/danbooru2
+#
+# @see https://guides.rubyonrails.org/configuring.html#configuring-a-database
+# @see https://www.postgresql.org/docs/current/libpq-connect.html#id-1.7.3.8.3.6
 
 default: &default
   adapter: postgresql

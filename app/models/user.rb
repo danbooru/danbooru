@@ -1,5 +1,3 @@
-require 'digest/sha1'
-
 class User < ApplicationRecord
   class Error < StandardError; end
   class PrivilegeError < StandardError; end
@@ -17,10 +15,7 @@ class User < ApplicationRecord
   end
 
   # Used for `before_action :<role>_only`. Must have a corresponding `is_<role>?` method.
-  Roles = Levels.constants.map(&:downcase) + [
-    :banned,
-    :approver
-  ]
+  Roles = Levels.constants.map(&:downcase) + %i[banned approver]
 
   # candidates for removal:
   # - enable_post_navigation (disabled by 700)
@@ -36,7 +31,7 @@ class User < ApplicationRecord
   # - enable_recommended_posts
   # - has_mail
   # - is_super_voter
-  BOOLEAN_ATTRIBUTES = %w(
+  BOOLEAN_ATTRIBUTES = %w[
     is_banned
     has_mail
     receive_email_notifications
@@ -67,7 +62,7 @@ class User < ApplicationRecord
     no_feedback
     requires_verification
     is_verified
-  )
+  ]
 
   DEFAULT_BLACKLIST = ["spoilers", "guro", "scat", "furry -rating:s"].join("\n")
 
@@ -104,13 +99,13 @@ class User < ApplicationRecord
 
   after_initialize :initialize_attributes, if: :new_record?
   validates :name, user_name: true, on: :create
-  validates_length_of :password, :minimum => 5, :if => ->(rec) { rec.new_record? || rec.password.present?}
-  validates_inclusion_of :default_image_size, :in => %w(large original)
-  validates_inclusion_of :per_page, in: (1..PostSets::Post::MAX_PER_PAGE)
-  validates_confirmation_of :password
+  validates :password, length: { minimum: 5 }, if: ->(rec) { rec.new_record? || rec.password.present? }
+  validates :default_image_size, inclusion: { in: %w[large original] }
+  validates :per_page, inclusion: { in: (1..PostSets::Post::MAX_PER_PAGE) }
+  validates :password, confirmation: true
   validates :comment_threshold, inclusion: { in: (-100..5) }
   before_validation :normalize_blacklisted_tags
-  before_create :promote_to_admin_if_first_user
+  before_create :promote_to_owner_if_first_user
   has_many :artist_versions, foreign_key: :updater_id
   has_many :artist_commentary_versions, foreign_key: :updater_id
   has_many :comments, foreign_key: :creator_id
@@ -132,7 +127,7 @@ class User < ApplicationRecord
   has_many :received_upgrades, class_name: "UserUpgrade", foreign_key: :recipient_id, dependent: :destroy
   has_many :purchased_upgrades, class_name: "UserUpgrade", foreign_key: :purchaser_id, dependent: :destroy
   has_many :user_events, dependent: :destroy
-  has_one :recent_ban, -> {order("bans.id desc")}, :class_name => "Ban"
+  has_one :active_ban, -> { active }, class_name: "Ban"
 
   has_one :email_address, dependent: :destroy
   has_many :api_keys, dependent: :destroy
@@ -166,7 +161,7 @@ class User < ApplicationRecord
     end
 
     def ban_expired?
-      is_banned? && recent_ban.try(:expired?)
+      is_banned? && active_ban.blank?
     end
   end
 
@@ -233,13 +228,13 @@ class User < ApplicationRecord
       end
 
       def anonymous
-        user = User.new(name: "Anonymous", level: Levels::ANONYMOUS, created_at: Time.now)
+        user = User.new(name: "Anonymous", level: Levels::ANONYMOUS, created_at: Time.zone.now)
         user.freeze.readonly!
         user
       end
 
       def level_hash
-        return {
+        {
           "Restricted" => Levels::RESTRICTED,
           "Member" => Levels::MEMBER,
           "Gold" => Levels::GOLD,
@@ -247,7 +242,7 @@ class User < ApplicationRecord
           "Builder" => Levels::BUILDER,
           "Moderator" => Levels::MODERATOR,
           "Admin" => Levels::ADMIN,
-          "Owner" => Levels::OWNER
+          "Owner" => Levels::OWNER,
         }
       end
 
@@ -290,11 +285,11 @@ class User < ApplicationRecord
       UserPromotion.new(self, promoter, new_level, **options).promote!
     end
 
-    def promote_to_admin_if_first_user
+    def promote_to_owner_if_first_user
       return if Rails.env.test?
 
-      if User.admins.count == 0
-        self.level = Levels::ADMIN
+      if name != Danbooru.config.system_user && !User.exists?(level: Levels::OWNER)
+        self.level = Levels::OWNER
         self.can_approve_posts = true
         self.can_upload_free = true
       end
@@ -361,6 +356,17 @@ class User < ApplicationRecord
     def can_receive_email?(require_verification: true)
       email_address.present? && email_address.is_deliverable? && (email_address.is_verified? || !require_verification)
     end
+
+    def change_email(new_email, request)
+      transaction do
+        update(email_address_attributes: { address: new_email })
+
+        if errors.none?
+          UserEvent.create_from_request!(self, :email_change, request)
+          UserMailer.email_change_confirmation(self).deliver_later
+        end
+      end
+    end
   end
 
   concerning :BlacklistMethods do
@@ -375,12 +381,12 @@ class User < ApplicationRecord
     end
 
     def rewrite_blacklist(old_name, new_name)
-      self.blacklisted_tags.gsub!(/(?:^| )([-~])?#{Regexp.escape(old_name)}(?: |$)/i) { " #{$1}#{new_name} " }
+      blacklisted_tags.gsub!(/(?:^| )([-~])?#{Regexp.escape(old_name)}(?: |$)/i) { " #{$1}#{new_name} " }
     end
 
     def normalize_blacklisted_tags
       return unless blacklisted_tags.present?
-      self.blacklisted_tags = self.blacklisted_tags.lines.map(&:strip).join("\n")
+      self.blacklisted_tags = blacklisted_tags.lines.map(&:strip).join("\n")
     end
   end
 
@@ -604,7 +610,8 @@ class User < ApplicationRecord
       params = params.dup
       params[:name_matches] = params.delete(:name) if params[:name].present?
 
-      q = search_attributes(params,
+      q = search_attributes(
+        params,
         :id, :created_at, :updated_at, :name, :level, :post_upload_count,
         :post_update_count, :note_update_count, :favorite_count, :posts,
         :note_versions, :artist_commentary_versions, :post_appeals,

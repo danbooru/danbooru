@@ -1,3 +1,10 @@
+# A concern that adds common helper methods to models that are soft deletable.
+#
+# @example
+#   class Post
+#     deletable
+#   end
+#
 module Deletable
   extend ActiveSupport::Concern
 

@@ -4,14 +4,14 @@ class Pool < ApplicationRecord
 
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
 
-  validates_uniqueness_of :name, case_sensitive: false, if: :name_changed?
+  validates :name, uniqueness: { case_sensitive: false }, if: :name_changed?
   validate :validate_name, if: :name_changed?
-  validates_inclusion_of :category, :in => %w(series collection)
+  validates :category, inclusion: { in: %w[series collection] }
   validate :updater_can_edit_deleted
   before_validation :normalize_post_ids
   before_validation :normalize_name
-  after_save :create_version
   after_create :synchronize!
+  after_save :create_version
 
   deletable
 
@@ -47,9 +47,10 @@ class Pool < ApplicationRecord
         q = q.name_matches(params[:name_matches])
       end
 
-      if params[:category] == "series"
+      case params[:category]
+      when "series"
         q = q.series
-      elsif params[:category] == "collection"
+      when "collection"
         q = q.collection
       end
 
@@ -80,7 +81,7 @@ class Pool < ApplicationRecord
 
   def self.named(name)
     if name =~ /^\d+$/
-      where("pools.id = ?", name.to_i)
+      where(id: name.to_i)
     elsif name
       where_ilike(:name, normalize_name_for_search(name))
     else
@@ -93,11 +94,8 @@ class Pool < ApplicationRecord
   end
 
   def versions
-    if PoolVersion.enabled?
-      PoolVersion.where("pool_id = ?", id).order("id asc")
-    else
-      raise "Archive service not configured"
-    end
+    raise NotImplementedError, "Archive service not configured" unless PoolVersion.enabled?
+    PoolVersion.where(pool_id: id).order("id asc")
   end
 
   def is_series?
@@ -126,7 +124,7 @@ class Pool < ApplicationRecord
 
   def revert_to!(version)
     if id != version.pool_id
-      raise RevertError.new("You cannot revert to a previous version of another pool.")
+      raise RevertError, "You cannot revert to a previous version of another pool."
     end
 
     self.post_ids = version.post_ids

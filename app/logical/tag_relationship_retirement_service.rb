@@ -1,3 +1,8 @@
+# Removes tag aliases and implications if they haven't had any new uploads in
+# the last two years. Runs weekly. Posts a message to the forum when aliases or
+# implications are retired.
+#
+# @see DanbooruMaintenance#weekly
 module TagRelationshipRetirementService
   module_function
 
@@ -14,9 +19,9 @@ module TagRelationshipRetirementService
   def forum_topic
     topic = ForumTopic.where(title: forum_topic_title).first
     if topic.nil?
-      CurrentUser.as(User.system) do
+      CurrentUser.scoped(User.system) do
         topic = ForumTopic.create!(creator: User.system, title: forum_topic_title, category_id: 1)
-        forum_post = ForumPost.create!(creator: User.system, body: forum_topic_body, topic: topic)
+        ForumPost.create!(creator: User.system, body: forum_topic_body, topic: topic)
       end
     end
     topic
@@ -45,6 +50,6 @@ module TagRelationshipRetirementService
   end
 
   def is_unused?(name)
-    !Post.raw_tag_match(name).where("created_at > ?", THRESHOLD.ago).exists?
+    !Post.raw_tag_match(name).exists?(["created_at > ?", THRESHOLD.ago])
   end
 end

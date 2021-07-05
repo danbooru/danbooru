@@ -1,3 +1,6 @@
+# Posts new appeals to the Deletion appeal thread once per hour.
+#
+# @see DanbooruMaintenance#hourly
 module PostAppealForumUpdater
   APPEAL_TOPIC_TITLE = "Deletion appeal thread"
 

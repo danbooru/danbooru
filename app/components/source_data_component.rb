@@ -2,9 +2,11 @@
 
 class SourceDataComponent < ApplicationComponent
   attr_reader :source
+
   delegate :spinner_icon, :external_site_icon, to: :helpers
 
   def initialize(source:)
+    super
     @source = source
   end
 

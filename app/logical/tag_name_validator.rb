@@ -1,3 +1,11 @@
+# Define a custom validator for tag names. Tags must be plain ASCII, no spaces,
+# no redundant underscores, no conflicts with metatags, and can't begin with
+# certain special characters.
+#
+# @example
+#   validates :name, tag_name: true
+#
+# @see https://guides.rubyonrails.org/active_record_validations.html#custom-validators
 class TagNameValidator < ActiveModel::EachValidator
   MAX_TAG_LENGTH = 170
 

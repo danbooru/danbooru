@@ -2,6 +2,7 @@
 
 class ForumPostComponent < ApplicationComponent
   attr_reader :forum_post, :original_forum_post_id, :dtext_data, :moderation_reports, :current_user
+
   delegate :link_to_user, :time_ago_in_words_tagged, :format_text, :policy, to: :helpers
 
   with_collection_parameter :forum_post
@@ -17,6 +18,7 @@ class ForumPostComponent < ApplicationComponent
   end
 
   def initialize(forum_post:, original_forum_post_id: nil, dtext_data: nil, current_user: User.anonymous)
+    super
     @forum_post = forum_post
     @original_forum_post_id = original_forum_post_id
     @dtext_data = dtext_data

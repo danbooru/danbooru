@@ -82,7 +82,7 @@ class CommentsController < ApplicationController
 
   def index_by_post
     @limit = params.fetch(:limit, 20)
-    @posts = Post.where("last_comment_bumped_at IS NOT NULL").user_tag_match(params[:tags]).reorder("last_comment_bumped_at DESC NULLS LAST").paginate(params[:page], limit: @limit, search_count: params[:search])
+    @posts = Post.where.not(last_comment_bumped_at: nil).user_tag_match(params[:tags]).reorder("last_comment_bumped_at DESC NULLS LAST").paginate(params[:page], limit: @limit, search_count: params[:search])
 
     if request.format.html?
       @posts = @posts.includes(comments: [:creator])

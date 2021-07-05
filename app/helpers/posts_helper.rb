@@ -41,4 +41,8 @@ module PostsHelper
       source
     end
   end
+
+  def is_danbirthday?(post)
+    post.id == 1 && post.created_at.strftime("%m-%d") == Time.zone.today.strftime("%m-%d")
+  end
 end

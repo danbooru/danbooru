@@ -3,7 +3,7 @@ class CommentVotesController < ApplicationController
 
   def index
     @comment_votes = authorize CommentVote.visible(CurrentUser.user).paginated_search(params, count_pages: true)
-    @comment_votes = @comment_votes.includes(:user, comment: [:creator, post: [:uploader]]) if request.format.html?
+    @comment_votes = @comment_votes.includes(:user, comment: [:creator, { post: [:uploader] }]) if request.format.html?
 
     respond_with(@comment_votes)
   end

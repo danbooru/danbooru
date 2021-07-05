@@ -31,7 +31,7 @@ class MockServicesController < ApplicationController
     render json: @data
   end
 
-  def iqdbs_similar
+  def iqdb_query
     @data = posts.map { |post| { post_id: post.id, score: rand(0..100)} }
     render json: @data
   end

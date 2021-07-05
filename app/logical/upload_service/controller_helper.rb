@@ -15,7 +15,7 @@ class UploadService
 
       if file
         # this gets called via XHR so we can process sync
-        Preprocessor.new(file: file).delayed_start(CurrentUser.id)
+        Preprocessor.new(file: file).delayed_start(CurrentUser.user)
       end
 
       [upload]

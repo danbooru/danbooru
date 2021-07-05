@@ -1,3 +1,6 @@
+# A Discord API Client.
+#
+# @see https://discord.com/developers/docs/intro
 class DiscordApiClient
   extend Memoist
 

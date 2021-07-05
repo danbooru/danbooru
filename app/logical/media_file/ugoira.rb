@@ -1,3 +1,10 @@
+# A MediaFile for a Pixiv ugoira file.
+#
+# A Pixiv ugoira is an animation format that consists of a zip file containing
+# JPEG or PNG images, one per frame, plus a JSON object containing the
+# inter-frame delay timings. Each frame can have a different delay, therefore
+# ugoiras can have a variable framerate. The frame data isn't stored inside the
+# zip file, so it must be passed around separately.
 class MediaFile::Ugoira < MediaFile
   class Error < StandardError; end
   attr_reader :frame_data
@@ -25,6 +32,7 @@ class MediaFile::Ugoira < MediaFile
     preview_frame.crop(width, height)
   end
 
+  # Convert a ugoira to a webm.
   # XXX should take width and height and resize image
   def convert
     raise NotImplementedError, "can't convert ugoira to webm: ffmpeg or mkvmerge not installed" unless self.class.videos_enabled?

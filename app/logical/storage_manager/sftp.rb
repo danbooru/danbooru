@@ -1,3 +1,4 @@
+# A StorageManager that stores files on a remote filesystem using SFTP.
 class StorageManager::SFTP < StorageManager
   DEFAULT_PERMISSIONS = 0o644
 

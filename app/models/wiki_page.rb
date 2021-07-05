@@ -118,13 +118,13 @@ class WikiPage < ApplicationRecord
 
     tag_was = Tag.find_by_name(Tag.normalize_name(title_was))
     if tag_was.present? && !tag_was.empty?
-      warnings.add(:base, %!Warning: {{#{title_was}}} still has #{tag_was.post_count} #{"post".pluralize(tag_was.post_count)}. Be sure to move the posts!)
+      warnings.add(:base, %{Warning: {{#{title_was}}} still has #{tag_was.post_count} #{"post".pluralize(tag_was.post_count)}. Be sure to move the posts})
     end
 
     broken_wikis = WikiPage.linked_to(title_was)
     if broken_wikis.count > 0
       broken_wiki_search = Routes.wiki_pages_path(search: { linked_to: title_was })
-      warnings.add(:base, %!Warning: [[#{title_was}]] is still linked from "#{broken_wikis.count} #{"other wiki page".pluralize(broken_wikis.count)}":[#{broken_wiki_search}]. Update #{(broken_wikis.count > 1) ? "these wikis" : "this wiki"} to link to [[#{title}]] instead!)
+      warnings.add(:base, %{Warning: [[#{title_was}]] is still linked from "#{broken_wikis.count} #{"other wiki page".pluralize(broken_wikis.count)}":[#{broken_wiki_search}]. Update #{(broken_wikis.count > 1) ? "these wikis" : "this wiki"} to link to [[#{title}]] instead})
     end
   end
 
@@ -136,7 +136,7 @@ class WikiPage < ApplicationRecord
 
   def revert_to(version)
     if id != version.wiki_page_id
-      raise RevertError.new("You cannot revert to a previous version of another wiki page.")
+      raise RevertError, "You cannot revert to a previous version of another wiki page."
     end
 
     self.title = version.title

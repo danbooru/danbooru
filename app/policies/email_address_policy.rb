@@ -9,7 +9,7 @@ class EmailAddressPolicy < ApplicationPolicy
 
   def update?
     # XXX here record is a user, not the email address.
-    record.id == user.id
+    record.id == user.id && !user.is_banned?
   end
 
   def verify?

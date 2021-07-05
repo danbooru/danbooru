@@ -1,3 +1,12 @@
+# This file contains configuration settings for deploying Danbooru to the
+# production servers using Capistrano. This is only used by production and
+# shouldn't be edited by end users.
+#
+# @see Capfile
+# @see config/deploy
+# @see lib/capistrano/tasks
+# @see https://capistranorb.com
+
 set :stages, %w(production development staging)
 set :default_stage, "staging"
 set :application, "danbooru"

@@ -4,7 +4,7 @@ module ForumTopicsHelper
   end
 
   def available_min_user_levels
-    ForumTopic::MIN_LEVELS.select { |name, level| level <= CurrentUser.level }.to_a
+    ForumTopic::MIN_LEVELS.select { |_name, level| level <= CurrentUser.level }.to_a
   end
 
   def new_forum_topic?(topic, read_forum_topics)

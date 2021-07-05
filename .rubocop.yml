@@ -18,6 +18,9 @@ Layout/CaseIndentation:
 Layout/EmptyLineAfterGuardClause:
   Enabled: false
 
+Layout/EmptyLineBetweenDefs:
+  AllowAdjacentOneLineDefs: true
+
 Layout/EndAlignment:
   EnforcedStyleAlignWith: variable
 
@@ -44,7 +47,7 @@ Metrics/AbcSize:
 
 Metrics/BlockLength:
   Max: 50
-  ExcludedMethods:
+  IgnoredMethods:
     - concerning
     - context
     - should
@@ -66,7 +69,7 @@ Metrics/ModuleLength:
   Max: 500
 
 Metrics/ParameterLists:
-  Max: 4
+  Max: 6
 
 Metrics/PerceivedComplexity:
   Max: 20
@@ -74,17 +77,42 @@ Metrics/PerceivedComplexity:
 Lint/InheritException:
   EnforcedStyle: standard_error
 
+Naming/HeredocDelimiterNaming:
+  Enabled: false
+
 Naming/MethodParameterName:
+  Enabled: false
+
+Naming/PredicateName:
+  Enabled: false
+
+Rails/Blank:
+  UnlessPresent: false
+
+Rails/DynamicFindBy:
+  Enabled: false
+
+Rails/HasManyOrHasOneDependent:
   Enabled: false
 
 Rails/HttpStatus:
   EnforcedStyle: numeric
+
+Rails/InverseOf:
+  Enabled: false
+
+Style/Alias:
+  EnforcedStyle: prefer_alias_method
 
 Style/AsciiComments:
   Enabled: false
 
 Style/CommentAnnotation:
   Enabled: false
+
+Style/ConditionalAssignment:
+  EnforcedStyle: assign_inside_condition
+  IncludeTernaryExpressions: false
 
 Style/Documentation:
   Enabled: false
@@ -104,6 +132,9 @@ Style/FloatDivision:
 Style/FrozenStringLiteralComment:
   Enabled: false
 
+Style/GuardClause:
+  MinBodyLength: 20
+
 Style/HashSyntax:
   Enabled: false
 
@@ -113,12 +144,20 @@ Style/IfUnlessModifier:
 Style/MutableConstant:
   Enabled: false
 
+Style/NegatedIf:
+  Enabled: false
+
 Style/NumericPredicate:
   Enabled: false
 
 Style/PercentLiteralDelimiters:
   PreferredDelimiters:
-    "default": "[]"
+    "default": "{}"
+    "%i": "[]"
+    "%I": "[]"
+    "%w": "[]"
+    "%W": "[]"
+    "%r": "{}"
 
 Style/ParallelAssignment:
   Enabled: false
@@ -134,7 +173,7 @@ Style/SpecialGlobalVars:
   Enabled: false
 
 Style/StringLiterals:
-  Enabled: false
+  EnforcedStyle: double_quotes
 
 Style/StringLiteralsInInterpolation:
   Enabled: false
@@ -142,8 +181,18 @@ Style/StringLiteralsInInterpolation:
 Style/SymbolArray:
   MinSize: 10
 
+Style/SymbolProc:
+  IgnoredMethods:
+    - respond_with
+
 Style/TernaryParentheses:
   EnforcedStyle: require_parentheses_when_complex
+
+Style/TrailingCommaInArrayLiteral:
+  EnforcedStyleForMultiline: consistent_comma
+
+Style/TrailingCommaInHashLiteral:
+  EnforcedStyleForMultiline: consistent_comma
 
 Style/WordArray:
   MinSize: 10

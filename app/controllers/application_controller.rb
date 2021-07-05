@@ -90,9 +90,9 @@ class ApplicationController < ActionController::Base
       render_error_page(401, exception, template: "sessions/new")
     when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest
       render_error_page(403, exception)
-    when ActiveSupport::MessageVerifier::InvalidSignature # raised by `find_signed!`
-      render_error_page(403, exception, template: "static/access_denied", message: "Access denied")
-    when User::PrivilegeError, Pundit::NotAuthorizedError
+    when ActiveSupport::MessageVerifier::InvalidSignature, # raised by `find_signed!`
+         User::PrivilegeError,
+         Pundit::NotAuthorizedError
       render_error_page(403, exception, template: "static/access_denied", message: "Access denied")
     when ActiveRecord::RecordNotFound
       render_error_page(404, exception, message: "That record was not found.")
@@ -183,7 +183,7 @@ class ApplicationController < ActionController::Base
     return if CurrentUser.user.is_anonymous?
 
     last_authenticated_at = session[:last_authenticated_at]
-    if last_authenticated_at.blank? || Time.parse(last_authenticated_at) < 60.minutes.ago
+    if last_authenticated_at.blank? || Time.zone.parse(last_authenticated_at) < 60.minutes.ago
       redirect_to confirm_password_session_path(url: request.fullpath)
     end
   end
@@ -197,7 +197,7 @@ class ApplicationController < ActionController::Base
     params[:search] ||= ActionController::Parameters.new
 
     deep_reject_blank = lambda do |hash|
-      hash.reject { |k, v| v.blank? || (v.is_a?(Hash) && deep_reject_blank.call(v).blank?) }
+      hash.reject { |_k, v| v.blank? || (v.is_a?(Hash) && deep_reject_blank.call(v).blank?) }
     end
     nonblank_search_params = deep_reject_blank.call(params[:search])
 

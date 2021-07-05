@@ -1,3 +1,5 @@
+# A simple Cloudflare API client for purging cached images after they're
+# regenerated or deleted.
 class CloudflareService
   attr_reader :api_token, :zone
 
@@ -9,6 +11,9 @@ class CloudflareService
     api_token.present? && zone.present?
   end
 
+  # Purge a list of URLs from Cloudflare's cache.
+  # @param urls [Array<String>] the list of URLs to purge
+  # @see https://api.cloudflare.com/#zone-purge-files-by-url
   def purge_cache(urls)
     return unless enabled?
 

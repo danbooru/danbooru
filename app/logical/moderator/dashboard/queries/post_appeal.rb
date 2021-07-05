@@ -3,7 +3,8 @@ module Moderator
     module Queries
       class PostAppeal
         def self.all(min_date)
-          ::Post.joins(:appeals).includes(:uploader, :flags, appeals: [:creator])
+          ::Post
+            .joins(:appeals).includes(:uploader, :flags, appeals: [:creator])
             .deleted
             .where("post_appeals.created_at > ?", min_date)
             .group(:id)

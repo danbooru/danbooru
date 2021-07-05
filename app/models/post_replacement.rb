@@ -9,7 +9,7 @@ class PostReplacement < ApplicationRecord
   def initialize_fields
     self.creator = CurrentUser.user
     self.original_url = post.source
-    self.tags = post.tag_string + " " + self.tags.to_s
+    self.tags = "#{post.tag_string} #{tags}"
 
     self.old_file_ext = post.file_ext
     self.old_file_size = post.file_size

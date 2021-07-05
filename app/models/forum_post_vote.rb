@@ -7,7 +7,7 @@ class ForumPostVote < ApplicationRecord
   scope :up, -> {where(score: 1)}
   scope :down, -> {where(score: -1)}
   scope :by, ->(user_id) {where(creator_id: user_id)}
-  scope :excluding_user, ->(user_id) {where("creator_id <> ?", user_id)}
+  scope :excluding_user, ->(user_id) { where.not(creator_id: user_id) }
 
   def self.visible(user)
     where(forum_post: ForumPost.visible(user))
@@ -37,14 +37,13 @@ class ForumPostVote < ApplicationRecord
   end
 
   def vote_type
-    if score == 1
-      return "up"
-    elsif score == -1
-      return "down"
-    elsif score == 0
-      return "meh"
-    else
-      raise
+    case score
+    when 1
+      "up"
+    when -1
+      "down"
+    when 0
+      "meh"
     end
   end
 

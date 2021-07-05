@@ -32,7 +32,7 @@ class IpBansControllerTest < ActionDispatch::IntegrationTest
       setup do
         CurrentUser.user = @admin
         @subnet_ban = create(:ip_ban, ip_addr: "2.0.0.0/24", creator: @admin)
-        @other_ban = create(:ip_ban, reason: "malware")
+        @other_ban = create(:ip_ban, ip_addr: "1.2.3.4", reason: "malware")
       end
 
       should "render access denied for anonymous users" do

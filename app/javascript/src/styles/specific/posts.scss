@@ -159,6 +159,16 @@ div#c-posts {
 
     .image-container {
       margin: 1em 0 0.5em;
+
+      &.danbirthday::before {
+        content: "";
+        position: absolute;
+        left: 33%;
+        top: -16%;
+        width: 100%;
+        height: 100%;
+        background: top left/20% no-repeat url(../../../../../public/images/danbirthday.png);
+      }
     }
 
     #favlist {

@@ -1,3 +1,6 @@
+# A job that processes a single tag alias or implication when a bulk update
+# request is approved. One job per alias or implication is spawned. Jobs are
+# processed sequentially in the `bulk_update` queue.
 class ProcessTagRelationshipJob < ApplicationJob
   queue_as :bulk_update
   retry_on Exception, attempts: 0

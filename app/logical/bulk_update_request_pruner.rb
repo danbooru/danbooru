@@ -1,6 +1,8 @@
+# Rejects bulk update requests that haven't been approved in 60 days.
 module BulkUpdateRequestPruner
   module_function
 
+  # Posts a warning when a bulk update request is pending automatic rejection in 5 days.
   def warn_old
     BulkUpdateRequest.old.pending.find_each do |bulk_update_request|
       if bulk_update_request.forum_topic
@@ -12,6 +14,7 @@ module BulkUpdateRequestPruner
     end
   end
 
+  # Rejects bulk update requests that haven't been approved in 60 days.
   def reject_expired
     BulkUpdateRequest.expired.pending.find_each do |bulk_update_request|
       ApplicationRecord.transaction do

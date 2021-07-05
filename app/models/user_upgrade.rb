@@ -5,7 +5,7 @@ class UserUpgrade < ApplicationRecord
   enum upgrade_type: {
     gold: 0,
     platinum: 10,
-    gold_to_platinum: 20
+    gold_to_platinum: 20,
   }, _suffix: "upgrade"
 
   enum status: {
@@ -175,7 +175,7 @@ class UserUpgrade < ApplicationRecord
           country: country,
           is_gift: is_gift?,
           level: level,
-        },
+        }
       )
 
       update!(stripe_id: checkout.id)

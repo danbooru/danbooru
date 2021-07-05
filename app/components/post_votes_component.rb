@@ -5,6 +5,7 @@ class PostVotesComponent < ApplicationComponent
   attr_reader :post, :current_user
 
   def initialize(post:, current_user:)
+    super
     @post = post
     @current_user = current_user
   end

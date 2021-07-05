@@ -4,9 +4,11 @@ class PostPreviewComponent < ApplicationComponent
   with_collection_parameter :post
 
   attr_reader :post, :tags, :show_deleted, :show_cropped, :link_target, :pool, :similarity, :recommended, :compact, :size, :current_user, :options
+
   delegate :external_link_to, :time_ago_in_words_tagged, :empty_heart_icon, to: :helpers
 
   def initialize(post:, tags: "", show_deleted: false, show_cropped: true, link_target: post, pool: nil, similarity: nil, recommended: nil, compact: nil, size: nil, current_user: CurrentUser.user, **options)
+    super
     @post = post
     @tags = tags.presence
     @show_deleted = show_deleted
@@ -44,7 +46,7 @@ class PostPreviewComponent < ApplicationComponent
 
       {
         width: [(downscale_ratio * post.image_width).floor, post.image_width].min,
-        height: [(downscale_ratio * post.image_height).floor, post.image_height].min
+        height: [(downscale_ratio * post.image_height).floor, post.image_height].min,
       }
     else
       { width: 0, height: 0 }
@@ -70,7 +72,7 @@ class PostPreviewComponent < ApplicationComponent
   def data_attributes
     attributes = {
       "data-id" => post.id,
-      "data-has-sound" => post.has_tag?('video_with_sound|flash_with_sound'),
+      "data-has-sound" => post.has_tag?("sound"),
       "data-tags" => post.tag_string,
       "data-pools" => post.pool_string,
       "data-approver-id" => post.approver_id,

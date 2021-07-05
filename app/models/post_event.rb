@@ -4,6 +4,7 @@ class PostEvent
   include ActiveModel::Serializers::Xml
 
   attr_accessor :event
+
   delegate :created_at, to: :event
 
   def self.find_for_post(post_id)
@@ -62,11 +63,11 @@ class PostEvent
 
   def attributes
     {
-      "creator_id": nil,
-      "created_at": nil,
-      "reason": nil,
-      "status": nil,
-      "type": nil
+      creator_id: nil,
+      created_at: nil,
+      reason: nil,
+      status: nil,
+      type: nil,
     }
   end
 

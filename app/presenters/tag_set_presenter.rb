@@ -55,7 +55,7 @@ class TagSetPresenter
   end
 
   def ordered_tags
-    names_to_tags = tags.map { |tag| [tag.name, tag] }.to_h
+    names_to_tags = tags.index_by(&:name)
 
     tag_names.map do |name|
       names_to_tags[name] || Tag.new(name: name).freeze

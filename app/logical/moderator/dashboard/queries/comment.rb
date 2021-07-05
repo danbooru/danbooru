@@ -3,7 +3,8 @@ module Moderator
     module Queries
       class Comment < ::Struct.new(:comment, :count)
         def self.all(min_date, max_level)
-          ::CommentVote.joins(comment: [:creator])
+          ::CommentVote
+            .joins(comment: [:creator])
             .where("comments.score < 0")
             .where("comment_votes.created_at > ?", min_date)
             .where("users.level <= ?", max_level)

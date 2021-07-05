@@ -1,17 +1,10 @@
 <div id="c-emails">
   <div id="a-edit" class="fixed-width-container">
+    <% page_title "Change Email" %>
+    <h1>Change Email</h1>
+
     <% if @user.email_address.present? %>
-      <% page_title "Change Email" %>
-      <h1>Change Email</h1>
-
       <p>Your current email address is <strong><%= @user.email_address.address %></strong>.
-      You must re-enter your password in order to update your email address.</p>
-    <% else %>
-      <% page_title "Add Email" %>
-      <h1>Add Email</h1>
-
-      <p>Add a new email address below. You must re-enter your password in
-      order to update your email address.</p>
     <% end %>
 
     <% if @user.is_restricted? %>
@@ -23,8 +16,7 @@
     <% end %>
 
     <%= edit_form_for(@user, url: user_email_path(@user)) do |f| %>
-      <%= f.input :email, as: :email, label: "New Email", input_html: { value: "" } %>
-      <%= f.input :password %>
+      <%= f.input :email, as: :email, input_html: { value: @user&.email_address&.address } %>
       <%= f.submit "Save" %>
     <% end %>
   </div>

@@ -1,17 +1,16 @@
 class BulkUpdateRequest < ApplicationRecord
-  attr_accessor :title
-  attr_accessor :reason
+  attr_accessor :title, :reason
 
   belongs_to :user
   belongs_to :forum_topic, optional: true
   belongs_to :forum_post, optional: true
   belongs_to :approver, optional: true, class_name: "User"
 
-  validates_presence_of :reason, on: :create
-  validates_presence_of :script
-  validates_presence_of :title, if: ->(rec) {rec.forum_topic_id.blank?}
-  validates_presence_of :forum_topic, if: ->(rec) {rec.forum_topic_id.present?}
-  validates_inclusion_of :status, :in => %w(pending approved rejected)
+  validates :reason, presence: true, on: :create
+  validates :script, presence: true
+  validates :title, presence: true, if: ->(rec) { rec.forum_topic_id.blank? }
+  validates :forum_topic, presence: true, if: ->(rec) { rec.forum_topic_id.present? }
+  validates :status, inclusion: { in: %w[pending approved rejected] }
   validate :validate_script, if: :script_changed?
 
   before_save :update_tags, if: :script_changed?
@@ -73,7 +72,7 @@ class BulkUpdateRequest < ApplicationRecord
     end
 
     def create_forum_topic
-      CurrentUser.as(user) do
+      CurrentUser.scoped(user) do
         body = "[bur:#{id}]\n\n#{reason}"
         self.forum_topic = ForumTopic.create(title: title, category_id: 1, creator: user) unless forum_topic.present?
         self.forum_post = forum_topic.forum_posts.create(body: body, creator: user) unless forum_post.present?

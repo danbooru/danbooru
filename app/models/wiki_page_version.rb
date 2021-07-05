@@ -21,23 +21,17 @@ class WikiPageVersion < ApplicationRecord
   end
 
   def previous
-    @previous ||= begin
-      WikiPageVersion.where("wiki_page_id = ? and id < ?", wiki_page_id, id).order("id desc").limit(1).to_a
-    end
+    @previous ||= WikiPageVersion.where("wiki_page_id = ? and id < ?", wiki_page_id, id).order("id desc").limit(1).to_a
     @previous.first
   end
 
   def subsequent
-    @subsequent ||= begin
-      WikiPageVersion.where("wiki_page_id = ? and id > ?", wiki_page_id, id).order("id asc").limit(1).to_a
-    end
+    @subsequent ||= WikiPageVersion.where("wiki_page_id = ? and id > ?", wiki_page_id, id).order("id asc").limit(1).to_a
     @subsequent.first
   end
 
   def current
-    @current ||= begin
-      WikiPageVersion.where("wiki_page_id = ?", wiki_page_id).order("id desc").limit(1).to_a
-    end
+    @current ||= WikiPageVersion.where(wiki_page_id: wiki_page_id).order("id desc").limit(1).to_a
     @current.first
   end
 
@@ -52,12 +46,12 @@ class WikiPageVersion < ApplicationRecord
   end
 
   def other_names_changed(type)
-    other = self.send(type)
+    other = send(type)
     ((other_names - other.other_names) | (other.other_names - other_names)).length.positive?
   end
 
   def was_deleted(type)
-    other = self.send(type)
+    other = send(type)
     if type == "previous"
       is_deleted && !other.is_deleted
     else
@@ -66,7 +60,7 @@ class WikiPageVersion < ApplicationRecord
   end
 
   def was_undeleted(type)
-    other = self.send(type)
+    other = send(type)
     if type == "previous"
       !is_deleted && other.is_deleted
     else

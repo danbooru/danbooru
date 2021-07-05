@@ -1,3 +1,4 @@
+# A StorageManager that stores files on the local filesystem.
 class StorageManager::Local < StorageManager
   DEFAULT_PERMISSIONS = 0o644
 
