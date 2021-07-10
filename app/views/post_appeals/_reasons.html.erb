@@ -6,6 +6,10 @@
       <span class="prose"><em>no reason</em></span>
     <% end %>
 
+    <% if policy(appeal).edit? %>
+      (<%= link_to "edit", edit_post_appeal_url(appeal) %>)
+    <% end %>
+    
     (<%= link_to_user(appeal.creator) %>, <%= time_ago_in_words_tagged(appeal.created_at) %>)
   </li>
 </ul>

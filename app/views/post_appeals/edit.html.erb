@@ -1,0 +1,15 @@
+<div id="c-post-appeals">
+  <div id="a-edit">
+    <h1>Edit Appeal</h1>
+
+    <p>
+      Editing appeal for <%= link_to "post ##{@post_appeal.post_id}", @post_appeal.post %>.
+    </p>
+
+    <%= edit_form_for(@post_appeal) do |f| %>
+      <%= f.input :reason, as: :dtext, inline: true %>
+      <%= f.button :submit, "Submit" %>
+      <%= dtext_preview_button "post_appeal_reason" %>
+    <% end %>
+  </div>
+</div>
