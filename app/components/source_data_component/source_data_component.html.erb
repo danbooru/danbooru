@@ -5,20 +5,7 @@
   <% if @source.present? %>
     <table class="source-data-content mt-2">
       <tbody>
-        <% if @source.artist_name.blank? %>
-          <tr>
-            <th>Artist</th>
-            <td><em>None</em></td>
-          </tr>
-        <% elsif @source.artists.empty? %>
-          <tr>
-            <th>Artist</th>
-            <td>
-              <%= external_link_to @source.profile_url, @source.artist_name %>
-              (<%= link_to "Create new artist", new_artist_path(artist: { source: @source.canonical_url }) %>)
-            </td>
-          </tr>
-        <% else %>
+        <% if @source.artists.present? %>
           <% @source.artists.each do |artist| %>
             <tr>
               <th>Artist</th>
@@ -30,6 +17,21 @@
                     <%= external_link_to artist_url.url, external_site_icon(artist_url.site_name), title: artist_url.url %>
                   <% end %>
                 </ul>
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <% if @source.artist_name.blank? %>
+            <tr>
+              <th>Artist</th>
+              <td><em>None</em></td>
+            </tr>
+          <% else %>
+            <tr>
+              <th>Artist</th>
+              <td>
+                <%= external_link_to @source.profile_url, @source.artist_name %>
+                (<%= link_to "Create new artist", new_artist_path(artist: { source: @source.canonical_url }) %>)
               </td>
             </tr>
           <% end %>
