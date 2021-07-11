@@ -52,6 +52,7 @@
         <li><%= link_to("Aliases", tag_aliases_path) %></li>
         <li><%= link_to("Implications", tag_implications_path) %></li>
         <li><%= link_to("Listing", tags_path) %></li>
+        <li><%= link_to("Related Tags", related_tag_path) %></li>
       </ul>
       <ul>
         <li><h2>Notes</h2></li>
@@ -71,6 +72,7 @@
       <ul>
         <li><h2>Reports</h2></li>
         <li><%= link_to("Performance Reports", "https://isshiki.donmai.us/user-reports") %></li>
+        <li><%= link_to("Dashboard", moderator_dashboard_path) %></li>
         <li><%= link_to("Top Searches", searches_explore_posts_path) %></li>
         <li><%= link_to("Missed Searches", missed_searches_explore_posts_path) %></li>
       </ul>
@@ -128,9 +130,6 @@
       </ul>
       <ul>
         <li><h2>Users</h2></li>
-        <% if CurrentUser.is_moderator? %>
-          <li><%= link_to("Dashboard", moderator_dashboard_path) %></li>
-        <% end %>
         <li><%= link_to_wiki "Help", "help:users" %></li>
         <li><%= link_to("Listing", users_path) %></li>
         <li><%= link_to("Bans", bans_path) %></li>
@@ -141,7 +140,6 @@
       <ul>
         <li><h2>Admin</h2></li>
         <li><%= link_to("Mod Actions", mod_actions_path) %></li>
-        <li><%= link_to("Jobs", delayed_jobs_path) %></li>
         <li><%= link_to("Bulk Update Requests", bulk_update_requests_path) %></li>
 
         <% if policy(UserNameChangeRequest).index? %>
@@ -150,6 +148,10 @@
 
         <% if policy(ModerationReport).index? %>
           <li><%= link_to("Moderation Reports", moderation_reports_path) %></li>
+        <% end %>
+
+        <% if policy(UserEvent).index? %>
+          <li><%= link_to("User Events", user_events_path) %></li>
         <% end %>
 
         <% if policy(EmailAddress).index? %>
@@ -167,6 +169,8 @@
         <% if policy(NewsUpdate).index? %>
           <li><%= link_to("News Updates", news_updates_path) %></li>
         <% end %>
+
+        <li><%= link_to("Jobs", delayed_jobs_path) %></li>
       </ul>
     </section>
   </div>

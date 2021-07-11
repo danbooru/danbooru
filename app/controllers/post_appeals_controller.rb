@@ -31,4 +31,17 @@ class PostAppealsController < ApplicationController
       fmt.html { redirect_to post_appeals_path(search: { id: @post_appeal.id }) }
     end
   end
+
+  def edit
+    @post_appeal = authorize PostAppeal.find(params[:id])
+    respond_with(@post_appeal)
+  end
+
+  def update
+    @post_appeal = authorize PostAppeal.find(params[:id])
+    @post_appeal.update(permitted_attributes(@post_appeal))
+    respond_with(@post_appeal) do |fmt|
+      fmt.html { redirect_to post_path(@post_appeal.post) }
+    end
+  end
 end
