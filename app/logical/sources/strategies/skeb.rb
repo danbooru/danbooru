@@ -48,7 +48,8 @@ module Sources
         elsif page.present?
           # Heavy heuristic to extract the uncropped image among the nighmare that is the skeb minified json
           candidates = page&.css("script")&.map { |script| script.text&.scan(/(https:\\u002F\\u002Fskeb\.imgix\.net.*?)(?:"|,|\s)/) }
-          candidates = candidates.to_a.flatten.compact.uniq.reject { |match| match.include? "crop=" }
+          candidates = candidates.to_a.flatten.compact.uniq.reject { |match| match.include? "crop=" } # cropped variants
+          candidates = candidates.reject { |match| match.include? "&q=" } # lower quality, lower resolution variants
           candidates.map { |img| img.gsub("\\u002F", "/") }
         else
           []
