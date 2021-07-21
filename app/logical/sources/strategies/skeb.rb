@@ -49,7 +49,12 @@ module Sources
           # Heavy heuristic to extract the uncropped image among the nighmare that is the skeb minified json
           candidates = page&.css("script")&.map { |script| script.text&.scan(/(https:\\u002F\\u002Fskeb\.imgix\.net.*?)(?:"|,|\s)/) }
           candidates = candidates.to_a.flatten.compact.uniq.reject { |match| match.include? "crop=" }
-          candidates.map { |img| img.gsub("\\u002F", "/") }
+          # sometimes skeb offers a slightly-smaller, non-watermarked version picture
+          unwatermarked = candidates.reject { |match| match.include? "=SAMPLE" }
+          unsampled = unwatermarked.reject { |match| match.include? "q=" }
+
+          final_candidates = [unsampled, unwatermarked, candidates].reject(&:empty?).first&.to_a
+          final_candidates.map { |img| img.gsub("\\u002F", "/") }
         else
           []
         end
