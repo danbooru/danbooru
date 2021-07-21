@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 module Sources
   class SkebTest < ActiveSupport::TestCase
@@ -62,6 +62,32 @@ module Sources
       should "still find the right artist" do
         artist = FactoryBot.create(:artist, name: "kai_chiisame", url_string: @site.url)
         assert_equal([artist], @site.artists)
+      end
+    end
+
+    context "A post with a smaller unwatermarked version" do
+      should "get the smaller but clean picture" do
+        site = Sources::Strategies.find("https://skeb.jp/@2gi0gi_/works/13")
+        assert_equal(["https://skeb.imgix.net/requests/191942_0?bg=%23fff&fm=jpg&q=45&w=696&s=5783ee951cc55d183713395926389453"], site.image_urls)
+      end
+    end
+
+    context "A post with both the small and large version clean" do
+      should "just get the bigger image" do
+        site = Sources::Strategies.find("https://skeb.jp/@LambOic029/works/149")
+        assert_equal(["https://skeb.imgix.net/uploads/origins/ebe94108-7ca7-4b3d-b80c-b37759ffd695?bg=%23fff&auto=format&w=800&s=25a889a808e6062d03985f7408201a4d"], site.image_urls)
+      end
+    end
+
+    context "A post with two images" do
+      should "get both correctly" do
+        site = Sources::Strategies.find("https://skeb.jp/@LambOic029/works/146")
+        image_urls = %w[
+          https://skeb.imgix.net/uploads/origins/e888bb27-e1a6-48ec-a317-7615252ff818?bg=%23fff&auto=format&w=800&s=7c518083d3fb19c8d5e7376f628f0fb0
+          https://skeb.imgix.net/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?bg=%23fff&auto=format&w=800&s=f20697609ca2923f96fc49ca7eba22b6
+        ]
+
+        assert_equal(image_urls, site.image_urls)
       end
     end
 
