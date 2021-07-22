@@ -17579,7 +17579,7 @@ gboolean parse_helper(StateMachine* sm) {
 #line 219 "ext/dtext/dtext.rl"
 			{( sm->te) = ( sm->p);( sm->p) = ( sm->p) - 1;{
 #line 219 "ext/dtext/dtext.rl"
-					append_id_link(sm, "issue", "github", "https://github.com/r888888888/danbooru/issues/"); }
+					append_id_link(sm, "issue", "github", "https://github.com/danbooru/danbooru/issues/"); }
 			}}
 		
 #line 17586 "ext/dtext/dtext.c"

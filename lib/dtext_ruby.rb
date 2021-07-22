@@ -133,7 +133,7 @@ class DTextRuby
     str = str.gsub(/\bpool #(\d+)/i, %{<a href="/pools/\\1">pool #\\1</a>})
     str = str.gsub(/\buser #(\d+)/i, %{<a href="/users/\\1">user #\\1</a>})
     str = str.gsub(/\bartist #(\d+)/i, %{<a href="/artists/\\1">artist #\\1</a>})
-    str = str.gsub(/\bissue #(\d+)/i, %{<a href="https://github.com/r888888888/danbooru/issues/\\1">issue #\\1</a>})
+    str = str.gsub(/\bissue #(\d+)/i, %{<a href="https://github.com/danbooru/danbooru/issues/\\1">issue #\\1</a>})
     str = str.gsub(/\bpixiv #(\d+)(?!\/p\d|\d)/i, %{<a href="http://www.pixiv.net/member_illust.php?mode=medium&illust_id=\\1">pixiv #\\1</a>})
     str = str.gsub(/\bpixiv #(\d+)\/p(\d+)/i, %{<a href="http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=\\1&page=\\2">pixiv #\\1/p\\2</a>})
   end

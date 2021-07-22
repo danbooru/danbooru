@@ -409,7 +409,7 @@ class DTextTest < Minitest::Test
     assert_parse_id_link("dtext-moderation-report-id-link", "/moderation_reports/1234", "modreport #1234")
     assert_parse_id_link("dtext-dmail-id-link", "/dmails/1234", "dmail #1234")
 
-    assert_parse_id_link("dtext-github-id-link", "https://github.com/r888888888/danbooru/issues/1234", "issue #1234")
+    assert_parse_id_link("dtext-github-id-link", "https://github.com/danbooru/danbooru/issues/1234", "issue #1234")
     assert_parse_id_link("dtext-artstation-id-link", "https://www.artstation.com/artwork/A1", "artstation #A1")
     assert_parse_id_link("dtext-deviantart-id-link", "https://www.deviantart.com/deviation/1234", "deviantart #1234")
     assert_parse_id_link("dtext-nijie-id-link", "https://nijie.info/view.php?id=1234", "nijie #1234")
