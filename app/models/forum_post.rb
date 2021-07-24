@@ -45,7 +45,10 @@ class ForumPost < ApplicationRecord
     end
 
     def wiki_link_matches(title)
-      where(id: DtextLink.forum_post.wiki_link.where(link_target: WikiPage.normalize_title(title)).select(:model_id))
+      dtext_links = DtextLink.forum_post.wiki_link.where(link_target: WikiPage.normalize_title(title)).select(:model_id)
+      bur_links = BulkUpdateRequest.where_array_includes_any(:tags, title).select(:forum_post_id)
+
+      where(id: dtext_links).or(where(id: bur_links))
     end
 
     def search(params)
