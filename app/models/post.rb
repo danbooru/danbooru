@@ -31,6 +31,7 @@ class Post < ApplicationRecord
   validate :uploader_is_not_limited, on: :create
   before_save :update_tag_post_counts
   before_save :set_tag_counts
+  before_save :create_mod_action_for_lock_change
   before_create :autoban
   after_save :create_version
   after_save :update_parent_on_save
@@ -1490,6 +1491,32 @@ class Post < ApplicationRecord
     end
 
     save
+  end
+
+  def create_mod_action_for_lock_change
+    if is_note_locked != is_note_locked_was
+      if is_note_locked
+        ModAction.log("locked notes for post ##{id}", :post_note_lock)
+      else
+        ModAction.log("unlocked notes for post ##{id}", :post_note_unlock)
+      end
+    end
+
+    if is_rating_locked != is_rating_locked_was
+      if is_rating_locked
+        ModAction.log("locked rating for post ##{id}", :post_rating_lock)
+      else
+        ModAction.log("unlocked rating for post ##{id}", :post_rating_unlock)
+      end
+    end
+
+    if is_status_locked != is_status_locked_was
+      if is_status_locked
+        ModAction.log("locked status for post ##{id}", :post_status_lock)
+      else
+        ModAction.log("unlocked status for post ##{id}", :post_status_unlock)
+      end
+    end
   end
 
   def self.model_restriction(table)
