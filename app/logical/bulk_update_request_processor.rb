@@ -220,7 +220,7 @@ class BulkUpdateRequestProcessor
       when :create_alias, :create_implication, :remove_alias, :remove_implication, :rename
         "#{command.to_s.tr("_", " ")} [[#{args[0]}]] -> [[#{args[1]}]]"
       when :mass_update
-        "mass update {{#{args[0]}}} -> #{args[1]}"
+        "mass update {{#{args[0]}}} -> {{#{args[1]}}}"
       when :nuke
         query = PostQueryBuilder.new(args[0])
 
