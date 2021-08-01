@@ -1496,25 +1496,25 @@ class Post < ApplicationRecord
   def create_mod_action_for_lock_change
     if is_note_locked != is_note_locked_was
       if is_note_locked
-        ModAction.log("locked notes for post ##{id}", :post_note_lock)
+        ModAction.log("locked notes for post ##{id}", :post_note_lock_create)
       else
-        ModAction.log("unlocked notes for post ##{id}", :post_note_unlock)
+        ModAction.log("unlocked notes for post ##{id}", :post_note_lock_delete)
       end
     end
 
     if is_rating_locked != is_rating_locked_was
       if is_rating_locked
-        ModAction.log("locked rating for post ##{id}", :post_rating_lock)
+        ModAction.log("locked rating for post ##{id}", :post_rating_lock_create)
       else
-        ModAction.log("unlocked rating for post ##{id}", :post_rating_unlock)
+        ModAction.log("unlocked rating for post ##{id}", :post_rating_lock_delete)
       end
     end
 
     if is_status_locked != is_status_locked_was
       if is_status_locked
-        ModAction.log("locked status for post ##{id}", :post_status_lock)
+        ModAction.log("locked status for post ##{id}", :post_status_lock_create)
       else
-        ModAction.log("unlocked status for post ##{id}", :post_status_unlock)
+        ModAction.log("unlocked status for post ##{id}", :post_status_lock_delete)
       end
     end
   end
