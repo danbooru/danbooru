@@ -47,12 +47,9 @@ module Sources
     context "A different CSS schema" do
       should "still find all the data" do
         source1 = Sources::Strategies.find("https://yuli031458.lofter.com/post/3163d871_1cbdc5f6d")
-        source2 = Sources::Strategies.find("https://ssucrose.lofter.com/post/1d30f3e4_1cc58e9f0")
 
         assert_equal(["https://imglf5.lf127.net/img/Mm55d3lNK2tJUWpNTjVLN0MvaTRDc1UvQUFLMGszOHRvSjV6S3VSa1lwa3BDWUtVOWpBTHBnPT0.jpg"], source1.image_urls)
         assert_not_empty(source1.tags)
-
-        assert_equal(["https://imglf5.lf127.net/img/d052Q09DWkVNMVJwZm9rNURwNHdPcjlzRFlQc1BmTXArSG9TdXdJZnlCbUpEYnZJTHUwTGRRPT0.jpg"], source2.image_urls)
       end
     end
 
