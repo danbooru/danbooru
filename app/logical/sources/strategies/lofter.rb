@@ -23,7 +23,6 @@ module Sources
       PROFILE_URL = %r{\Ahttps?://(?<artist_name>[\w-]+).lofter.com}i
       PAGE_URL =    %r{#{PROFILE_URL}/post/(?<illust_id>[\w-]+)}i
       IMAGE_HOST =  %r{\Ahttps?://imglf\d\.(?:nosdn\d?\.12\d|lf127)\.net}i
-      IMAGE_URL =   %r{#{IMAGE_HOST}/img/\w+\.\w+}i
 
       def domains
         ["lofter.com", "lf127.net"]
@@ -39,7 +38,7 @@ module Sources
       end
 
       def image_url
-        if url =~ IMAGE_URL
+        if url =~ IMAGE_HOST
           get_full_version(url)
         else
           image_urls.first
