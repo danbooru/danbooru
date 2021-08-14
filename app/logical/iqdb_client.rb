@@ -53,7 +53,7 @@ class IqdbClient
       strategy = Sources::Strategies.find(url)
       download_url = strategy.send(type)
       file = strategy.download_file!(download_url)
-      file
+      file.preview(Danbooru.config.small_image_width, Danbooru.config.small_image_width)
     end
 
     # Transform the JSON returned by IQDB to add the full post data for each
