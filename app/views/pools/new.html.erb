@@ -2,7 +2,7 @@
   <div id="c-new">
     <h1>New Pool</h1>
 
-    <p style="font-weight: bold;">Before creating a pool, read the <%= link_to "pool guidelines", wiki_page_path(:id => "howto:pools") %>.</p>
+    <%= embed_wiki("help:pool_notice") %>
 
     <%= edit_form_for(@pool) do |f| %>
       <%= f.input :name, :as => :string, :required => true %>

@@ -1,4 +1,4 @@
-require 'test_helper'
+require "test_helper"
 
 module Sources
   class LofterTest < ActiveSupport::TestCase
@@ -46,9 +46,10 @@ module Sources
 
     context "A different CSS schema" do
       should "still find all the data" do
-        source = Sources::Strategies.find("https://yuli031458.lofter.com/post/3163d871_1cbdc5f6d")
-        assert_equal(["https://imglf5.lf127.net/img/Mm55d3lNK2tJUWpNTjVLN0MvaTRDc1UvQUFLMGszOHRvSjV6S3VSa1lwa3BDWUtVOWpBTHBnPT0.jpg"], source.image_urls)
-        assert_not_empty(source.tags)
+        source1 = Sources::Strategies.find("https://yuli031458.lofter.com/post/3163d871_1cbdc5f6d")
+
+        assert_equal(["https://imglf5.lf127.net/img/Mm55d3lNK2tJUWpNTjVLN0MvaTRDc1UvQUFLMGszOHRvSjV6S3VSa1lwa3BDWUtVOWpBTHBnPT0.jpg"], source1.image_urls)
+        assert_not_empty(source1.tags)
       end
     end
 

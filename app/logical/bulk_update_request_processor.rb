@@ -15,6 +15,7 @@ class BulkUpdateRequestProcessor
   class Error < StandardError; end
 
   attr_reader :bulk_update_request
+
   delegate :script, :forum_topic, to: :bulk_update_request
   validate :validate_script
   validate :validate_script_length
@@ -153,6 +154,12 @@ class BulkUpdateRequestProcessor
           TagBatchChangeJob.perform_later(args[0], args[1])
 
         when :nuke
+          # Reject existing implications from any other tag to the one we're nuking
+          # otherwise the tag won't be removed from posts that have those other tags
+          if PostQueryBuilder.new(args[0]).is_simple_tag?
+            TagImplication.active.where(consequent_name: args[0]).each(&:reject!)
+          end
+
           TagBatchChangeJob.perform_later(args[0], "-#{args[0]}")
 
         when :rename
@@ -213,7 +220,7 @@ class BulkUpdateRequestProcessor
       when :create_alias, :create_implication, :remove_alias, :remove_implication, :rename
         "#{command.to_s.tr("_", " ")} [[#{args[0]}]] -> [[#{args[1]}]]"
       when :mass_update
-        "mass update {{#{args[0]}}} -> #{args[1]}"
+        "mass update {{#{args[0]}}} -> {{#{args[1]}}}"
       when :nuke
         query = PostQueryBuilder.new(args[0])
 
