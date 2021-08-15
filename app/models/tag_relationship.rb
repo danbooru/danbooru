@@ -1,9 +1,6 @@
 class TagRelationship < ApplicationRecord
   self.abstract_class = true
 
-  EXPIRY = 60
-  EXPIRY_WARNING = 55
-
   belongs_to :creator, class_name: "User"
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :forum_post, optional: true
@@ -15,8 +12,6 @@ class TagRelationship < ApplicationRecord
 
   scope :active, -> {where(status: "active")}
   scope :deleted, -> {where(status: "deleted")}
-  scope :expired, -> {where("created_at < ?", EXPIRY.days.ago)}
-  scope :old, -> {where("created_at >= ? and created_at < ?", EXPIRY.days.ago, EXPIRY_WARNING.days.ago)}
   scope :retired, -> {where(status: "retired")}
 
   before_validation :normalize_names

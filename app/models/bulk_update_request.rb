@@ -21,8 +21,6 @@ class BulkUpdateRequest < ApplicationRecord
   scope :approved, -> { where(status: "approved") }
   scope :rejected, -> { where(status: "rejected") }
   scope :has_topic, -> { where.not(forum_topic: nil) }
-  scope :expired, -> {where("created_at < ?", TagRelationship::EXPIRY.days.ago)}
-  scope :old, -> {where("created_at between ? and ?", TagRelationship::EXPIRY.days.ago, TagRelationship::EXPIRY_WARNING.days.ago)}
 
   module SearchMethods
     def default_order
