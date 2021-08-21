@@ -27,7 +27,7 @@
     "postcss-loader": "^5.0.0",
     "postcss-preset-env": "^6.7.0",
     "rails-erb-loader": "^5.5.0",
-    "ruffle-mirror": "2021.3.31",
+    "ruffle-mirror": "2021.8.21",
     "sass": "^1.32.5",
     "sass-loader": "^11.0.0",
     "spark-md5": "^3.0.0",
@@ -50,7 +50,7 @@
   },
   "resolutions": {
     "webpack": "5.26.3",
-    "ruffle-mirror": "2021.3.31"
+    "ruffle-mirror": "2021.8.21"
   },
   "scripts": {
     "eslint-all": "yarn run eslint --plugin eslint-plugin-ignore-erb --ext .js,.js.erb app/javascript/src/javascripts",

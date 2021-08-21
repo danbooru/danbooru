@@ -8355,7 +8355,7 @@ fsevents@~2.3.2:
     postcss-loader: ^5.0.0
     postcss-preset-env: ^6.7.0
     rails-erb-loader: ^5.5.0
-    ruffle-mirror: 2021.3.31
+    ruffle-mirror: 2021.8.21
     sass: ^1.32.5
     sass-loader: ^11.0.0
     spark-md5: ^3.0.0
@@ -8369,10 +8369,10 @@ fsevents@~2.3.2:
   languageName: unknown
   linkType: soft
 
-"ruffle-mirror@npm:2021.3.31":
-  version: 2021.3.31
-  resolution: "ruffle-mirror@npm:2021.3.31"
-  checksum: 2247ab90331e9e9a6c532a576ef04f31ecde95fe246b83f96f3af1facd4ab566e99e7834ddfbe8ea5932594e187c78515bac174382c630e34a7ac72b7d6bbb8e
+"ruffle-mirror@npm:2021.8.21":
+  version: 2021.8.21
+  resolution: "ruffle-mirror@npm:2021.8.21"
+  checksum: 63430ada7e4536afcff99d477b0391e049125b9582a20889490b02ea1bbabe755fd763768892d20ccb8f3b1ab57f943f331c2d7245feb64e93fab972f29d9e46
   languageName: node
   linkType: hard
 
