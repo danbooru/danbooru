@@ -321,10 +321,16 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       context "the nuke command" do
         should "remove tags" do
           @post = create(:post, tag_string: "foo bar")
-          @bur1 = create_bur!("imply foo -> bar", @admin)
-          @bur2 = create_bur!("nuke bar", @admin)
+          create_bur!("nuke bar", @admin)
 
           assert_equal("foo", @post.reload.tag_string)
+        end
+
+        should "remove implications" do
+          @ti = create(:tag_implication, antecedent_name: "foo", consequent_name: "bar")
+          create_bur!("nuke bar", @admin)
+
+          assert_equal("deleted", @ti.reload.status)
         end
 
         should "remove pools" do
