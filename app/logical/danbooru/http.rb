@@ -117,6 +117,14 @@ module Danbooru
       use(cache: { expires_in: expires_in })
     end
 
+    def proxy(host: Danbooru.config.http_proxy_host, port: Danbooru.config.http_proxy_port.to_i, username: Danbooru.config.http_proxy_username, password: Danbooru.config.http_proxy_password)
+      return self if host.blank?
+
+      dup.tap do |o|
+        o.http = o.http.via(host, port, username, password)
+      end
+    end
+
     # allow requests only to public IPs, not to local or private networks.
     def public_only
       dup.tap do |o|

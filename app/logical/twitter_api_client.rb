@@ -3,13 +3,13 @@
 class TwitterApiClient
   extend Memoist
 
-  attr_reader :api_key, :api_secret
+  attr_reader :api_key, :api_secret, :http
 
   # Create a Twitter API client
   # @param api_key [String] the Twitter API key
   # @param api_secret [String] the Twitter API secret
-  def initialize(api_key, api_secret)
-    @api_key, @api_secret = api_key, api_secret
+  def initialize(api_key, api_secret, http: Danbooru::Http.new)
+    @api_key, @api_secret, @http = api_key, api_secret, http
   end
 
   # Authenticate to Twitter with an API key and secret and receive a bearer token in response.
@@ -17,14 +17,13 @@ class TwitterApiClient
   # @return [String] the Twitter bearer token
   # @see https://developer.twitter.com/en/docs/authentication/api-reference/token
   def bearer_token(token_expiry = 24.hours)
-    http = Danbooru::Http.basic_auth(user: api_key, pass: api_secret)
-    response = http.cache(token_expiry).post("https://api.twitter.com/oauth2/token", form: { grant_type: :client_credentials })
+    response = http.basic_auth(user: api_key, pass: api_secret).cache(token_expiry).post("https://api.twitter.com/oauth2/token", form: { grant_type: :client_credentials })
     response.parse["access_token"]
   end
 
   # @return [Danbooru::Http] the HTTP client to connect to Twitter with
   def client
-    Danbooru::Http.auth("Bearer #{bearer_token}")
+    http.auth("Bearer #{bearer_token}")
   end
 
   # Fetch a tweet by id.
