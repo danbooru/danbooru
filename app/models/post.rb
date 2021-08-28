@@ -1324,7 +1324,7 @@ class Post < ApplicationRecord
 
         ModAction.log("<@#{user.name}> regenerated IQDB for post ##{id}", :post_regenerate_iqdb, user)
       else
-        media_file = MediaFile.open(file, frame_data: pixiv_ugoira_frame_data)
+        media_file = MediaFile.open(file, frame_data: pixiv_ugoira_frame_data&.data.to_a)
         UploadService::Utils.process_resizes(self, nil, id, media_file: media_file)
 
         purge_cached_urls!
