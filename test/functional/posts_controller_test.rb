@@ -322,6 +322,15 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { random: "1" }
           assert_response :success
         end
+
+        should "return all posts for a .json response" do
+          create_list(:post, 2, tag_string: "honk_honk")
+          get posts_path, params: { tags: "honk_honk order:random" }, as: :json
+
+          assert_response :success
+          assert_equal(true, response.parsed_body.is_a?(Array))
+          assert_equal(2, response.parsed_body.size)
+        end
       end
 
       context "with the .atom format" do

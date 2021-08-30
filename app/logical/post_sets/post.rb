@@ -115,7 +115,7 @@ module PostSets
         @post_count = get_post_count
 
         if is_random?
-          get_random_posts
+          get_random_posts.paginate(page, search_count: false, limit: per_page, max_limit: max_per_page).load
         else
           normalized_query.build.paginate(page, count: post_count, search_count: !post_count.nil?, limit: per_page, max_limit: max_per_page).load
         end
