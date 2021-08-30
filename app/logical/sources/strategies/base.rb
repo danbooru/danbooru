@@ -231,7 +231,7 @@ module Sources
 
       # A http client for API requests.
       def http
-        Danbooru::Http.new.public_only
+        Danbooru::Http.new.proxy.public_only
       end
       memoize :http
 

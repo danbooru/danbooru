@@ -4,6 +4,16 @@ namespace :danbooru do
     Clockwork::run
   end
 
+  # Schedules all posts to be reindexed in IQDB. Requires the delayed jobs
+  # worker (bin/delayed_job) to be running.
+  desc "Reindex all posts in IQDB"
+  task reindex_iqdb: :environment do
+    Post.find_each do |post|
+      puts "post ##{post.id}"
+      post.update_iqdb
+    end
+  end
+
   namespace :docker do
     # Note that uncommited changes won't be included in the image; commit
     # changes first before building the image.

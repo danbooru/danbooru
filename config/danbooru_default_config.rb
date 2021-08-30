@@ -494,6 +494,18 @@ module Danbooru
       false
     end
 
+    def http_proxy_host
+    end
+
+    def http_proxy_port
+    end
+
+    def http_proxy_username
+    end
+
+    def http_proxy_password
+    end
+
     # The URL for the Reportbooru server (https://github.com/evazion/reportbooru).
     # Optional. Used for tracking post views, popular searches, and missed searches.
     # Set to http://localhost/mock/reportbooru to enable a fake reportbooru

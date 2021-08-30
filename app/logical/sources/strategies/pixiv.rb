@@ -269,7 +269,7 @@ module Sources
       end
 
       def api_client
-        PixivAjaxClient.new(Danbooru.config.pixiv_phpsessid)
+        PixivAjaxClient.new(Danbooru.config.pixiv_phpsessid, http: http)
       end
 
       def api_illust

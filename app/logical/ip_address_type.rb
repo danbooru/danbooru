@@ -7,15 +7,24 @@ require "active_record/connection_adapters/postgresql_adapter"
 #
 # @see config/initializers/types.rb
 # @see https://www.bigbinary.com/blog/rails-5-attributes-api
+# @see https://api.rubyonrails.org/classes/ActiveModel/Type/Value.html
 class IpAddressType < ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Inet
+  # Cast a String (or nil) value from the database to a Danbooru::IpAddress object.
+  #
   # @param value [String] the IP address from the database
+  # @return [Danbooru::IpAddress]
   def cast(value)
     return nil if value.blank?
     super(Danbooru::IpAddress.new(value))
   end
 
-  # @param [Danbooru::IpAddress] the IP address object
+  # Serialize a Danbooru::IpAddress to a String for the database.
+  # XXX May be passed a string in some situations?
+  #
+  # @param value [Danbooru::IpAddress] the IP address object
+  # @return [String]
   def serialize(value)
-    value&.to_string
+    return value.to_string if value.is_a?(Danbooru::IpAddress)
+    super value
   end
 end

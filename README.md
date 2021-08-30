@@ -75,7 +75,6 @@ account:
 
 * Pool versions
 * Post versions
-* IQDB
 * Saved searches
 * Related tags
 

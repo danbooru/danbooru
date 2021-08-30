@@ -1145,11 +1145,18 @@ class Post < ApplicationRecord
   end
 
   module SearchMethods
+    # Return a set of up to N random posts. May return less if there aren't
+    # enough posts.
+    #
+    # @param n [Integer] The maximum number of posts to return
+    # @return [ActiveRecord::Relation<Post>]
     def random(n = 1)
-      n.times.map do
+      posts = n.times.map do
         key = SecureRandom.hex(16)
         random_up(key) || random_down(key)
       end.compact.uniq
+
+      find_ordered(posts.map(&:id))
     end
 
     def random_up(key)
@@ -1324,7 +1331,7 @@ class Post < ApplicationRecord
 
         ModAction.log("<@#{user.name}> regenerated IQDB for post ##{id}", :post_regenerate_iqdb, user)
       else
-        media_file = MediaFile.open(file, frame_data: pixiv_ugoira_frame_data)
+        media_file = MediaFile.open(file, frame_data: pixiv_ugoira_frame_data&.data.to_a)
         UploadService::Utils.process_resizes(self, nil, id, media_file: media_file)
 
         purge_cached_urls!
