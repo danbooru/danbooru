@@ -49,7 +49,7 @@ class DText
   # @param artists [Array<Artist>]
   # @return [String] the HTML output
   def self.postprocess(html, wiki_pages, tags, artists)
-    fragment = Nokogiri::HTML.fragment(html)
+    fragment = Nokogiri::HTML5.fragment(html)
 
     fragment.css("a.dtext-wiki-link").each do |node|
       path = Addressable::URI.parse(node["href"]).path
@@ -174,7 +174,7 @@ class DText
   # @return [Array<String>] the list of wiki page names
   def self.parse_wiki_titles(text)
     html = DTextRagel.parse(text)
-    fragment = Nokogiri::HTML.fragment(html)
+    fragment = Nokogiri::HTML5.fragment(html)
 
     titles = fragment.css("a.dtext-wiki-link").map do |node|
       title = node["href"][%r{\A/wiki_pages/(.*)\z}i, 1]
@@ -191,7 +191,7 @@ class DText
   # @return [Array<String>] the list of external URLs
   def self.parse_external_links(text)
     html = DTextRagel.parse(text)
-    fragment = Nokogiri::HTML.fragment(html)
+    fragment = Nokogiri::HTML5.fragment(html)
 
     links = fragment.css("a.dtext-external-link").map { |node| node["href"] }
     links.uniq
@@ -326,7 +326,7 @@ class DText
   # @param html [String] the HTML input
   # @return [String] the Markdown output
   def self.html_to_markdown(html)
-    html = Nokogiri::HTML.fragment(html)
+    html = Nokogiri::HTML5.fragment(html)
 
     html.children.map do |node|
       case node.name
@@ -349,7 +349,7 @@ class DText
   # @param inline [Boolean] if true, convert <img> tags to plaintext
   # @return [String] the DText output
   def self.from_html(text, inline: false, &block)
-    html = Nokogiri::HTML.fragment(text)
+    html = Nokogiri::HTML5.fragment(text)
 
     dtext = html.children.map do |element|
       block.call(element) if block.present?

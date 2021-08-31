@@ -183,7 +183,7 @@ module Sources::Strategies
     end
 
     def inline_images
-      html = Nokogiri::HTML.fragment(artist_commentary_desc)
+      html = Nokogiri::HTML5.fragment(artist_commentary_desc)
       html.css("img").map { |node| node["src"] }
     end
 
