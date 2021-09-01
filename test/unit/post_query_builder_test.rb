@@ -874,21 +874,30 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for a disapproved:<type> metatag" do
-      CurrentUser.scoped(create(:mod_user)) do
-        pending     = create(:post, is_pending: true)
-        disapproved = create(:post, is_pending: true)
-        disapproval = create(:post_disapproval, user: CurrentUser.user, post: disapproved, reason: "disinterest")
+      disapprover = create(:user)
+      pending     = create(:post, is_pending: true)
+      disapproved = create(:post, is_pending: true)
+      disapproval = create(:post_disapproval, user: disapprover, post: disapproved, reason: "disinterest")
 
-        assert_tag_match([disapproved], "disapproved:#{CurrentUser.user.name}")
-        assert_tag_match([disapproved], "disapproved:#{CurrentUser.user.name.upcase}")
+      as(disapprover) do
+        assert_tag_match([disapproved], "disapproved:#{disapprover.name}")
+        assert_tag_match([disapproved], "disapproved:#{disapprover.name.upcase}")
         assert_tag_match([disapproved], "disapproved:disinterest")
         assert_tag_match([disapproved], "disapproved:DISINTEREST")
         assert_tag_match([], "disapproved:breaks_rules")
         assert_tag_match([], "disapproved:breaks_rules disapproved:disinterest")
 
-        assert_tag_match([pending], "-disapproved:#{CurrentUser.user.name}")
+        assert_tag_match([pending], "-disapproved:#{disapprover.name}")
         assert_tag_match([pending], "-disapproved:disinterest")
         assert_tag_match([disapproved, pending], "-disapproved:breaks_rules")
+      end
+
+      as(create(:user)) do
+        assert_tag_match([], "disapproved:#{disapprover.name}")
+      end
+
+      as(create(:mod_user)) do
+        assert_tag_match([disapproved], "disapproved:#{disapprover.name}")
       end
     end
 

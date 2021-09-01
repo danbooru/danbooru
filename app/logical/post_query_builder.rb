@@ -97,15 +97,15 @@ class PostQueryBuilder
     negated_tags = negated_tags.map(&:name)
     optional_tags = optional_tags.map(&:name)
     required_tags = required_tags.map(&:name)
-    
+
     matched_negated_wildcard_tags = negated_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name).limit(MAX_WILDCARD_TAGS).pluck(:name) }
     matched_optional_wildcard_tags = optional_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name).limit(MAX_WILDCARD_TAGS).pluck(:name) }
     matched_required_wildcard_tags = required_wildcard_tags.flat_map { |tag| Tag.wildcard_matches(tag.name).limit(MAX_WILDCARD_TAGS).pluck(:name) }
-    
+
     negated_tags += (matched_negated_wildcard_tags.empty? && !negated_wildcard_tags.empty?) ? negated_wildcard_tags.map(&:name) : matched_negated_wildcard_tags
     optional_tags += (matched_optional_wildcard_tags.empty? && !optional_wildcard_tags.empty?) ? optional_wildcard_tags.map(&:name) : matched_optional_wildcard_tags
     optional_tags += (matched_required_wildcard_tags.empty? && !required_wildcard_tags.empty?) ? required_wildcard_tags.map(&:name) : matched_required_wildcard_tags
-    
+
     tsquery << "!(#{negated_tags.sort.uniq.map(&:to_escaped_for_tsquery).join(" | ")})" if negated_tags.present?
     tsquery << "(#{optional_tags.sort.uniq.map(&:to_escaped_for_tsquery).join(" | ")})" if optional_tags.present?
     tsquery << "(#{required_tags.sort.uniq.map(&:to_escaped_for_tsquery).join(" & ")})" if required_tags.present?
@@ -321,10 +321,9 @@ class PostQueryBuilder
   def disapproved_matches(query)
     if query.downcase.in?(PostDisapproval::REASONS)
       Post.where(disapprovals: PostDisapproval.where(reason: query.downcase))
-    elsif User.normalize_name(query) == current_user.name
-      Post.where(disapprovals: PostDisapproval.where(user: current_user))
     else
-      Post.none
+      user = User.find_by_name(query)
+      Post.where(disapprovals: PostDisapproval.creator_matches(user, current_user))
     end
   end
 
@@ -949,7 +948,7 @@ class PostQueryBuilder
       metatags.any? do |metatag|
         metatag.name.in?(%w[upvoter upvote downvoter downvote search flagger fav ordfav favgroup ordfavgroup]) ||
         metatag.name == "status" && metatag.value == "unmoderated" ||
-        metatag.name == "disapproved" && User.normalize_name(metatag.value) == current_user.name
+        metatag.name == "disapproved" && !metatag.value.downcase.in?(PostDisapproval::REASONS)
       end
     end
   end
