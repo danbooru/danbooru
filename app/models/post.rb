@@ -1272,10 +1272,26 @@ class Post < ApplicationRecord
       where("posts.tag_index @@ to_tsquery('danbooru', E?)", tag.to_escaped_for_tsquery)
     end
 
+    # Perform a tag search as an anonymous user. No tag limit is enforced.
+    def anon_tag_match(query)
+      user_tag_match(query, User.anonymous, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
+    end
+
+    # Perform a tag search as the system user, DanbooruBot. The search will
+    # have moderator-level permissions. No tag limit is enforced.
     def system_tag_match(query)
       user_tag_match(query, User.system, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
     end
 
+    # Perform a tag search as the current user, or as another user.
+    #
+    # @param query [String] the tag search to perform
+    # @param user [User] the user to perform the search as
+    # @param tag_limit [Integer] the maximum number of tags allowed per search.
+    #   An exception will be raised if the search has too many tags.
+    # @param safe_mode [Boolean] if true, automatically add rating:s to the search
+    # @param hide_deleted_posts [Boolean] if true, automatically add -status:deleted to the search
+    # @return [ActiveRecord::Relation<Post>] the set of resulting posts
     def user_tag_match(query, user = CurrentUser.user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
       post_query = PostQueryBuilder.new(query, user, tag_limit: tag_limit, safe_mode: safe_mode, hide_deleted_posts: hide_deleted_posts)
       post_query.normalized_query.build
