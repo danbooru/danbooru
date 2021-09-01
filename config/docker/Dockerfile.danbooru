@@ -26,7 +26,7 @@ ARG NODE_VERSION
 RUN \
   apt-get update && \
   DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    build-essential libpq-dev libvips-dev libxml2-dev libxslt-dev zlib1g-dev \
+    build-essential libpq-dev libvips-dev zlib1g-dev \
     curl ca-certificates dirmngr git gpg && \
   rm -rf /var/lib/apt/lists/*
 
@@ -36,7 +36,7 @@ RUN \
   asdf global nodejs "$NODE_VERSION" && \
   npm install --unsafe-perm=true -g yarn
 
-COPY .bundle Gemfile Gemfile.lock ./
+COPY Gemfile Gemfile.lock ./
 RUN \
   bundle install --jobs "$(nproc)" && \
   rm -rf "$(gem environment gemdir)/cache" && \

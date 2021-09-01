@@ -16,7 +16,7 @@ VIPS_BUILD_DEPS="
   libjpeg-turbo8-dev libexpat1-dev libglib2.0-dev libgif-dev libexif-dev
 "
 DANBOORU_RUNTIME_DEPS="
-  ca-certificates mkvtoolnix postgresql-client-12 libpq5 libxml2 libxslt1.1
+  ca-certificates mkvtoolnix postgresql-client-12 libpq5
   zlib1g libfftw3-3 libwebp6 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2
   libpng16-16 libjpeg-turbo8 libexpat1 libglib2.0 libgif7 libexif12 libvpx6
 "

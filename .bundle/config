@@ -1,3 +1,0 @@
----
-BUNDLE_BUILD__NOKOGIRI: "--use-system-libraries"
-BUNDLE_BUILD__NOKOGUMBO: "--without-libxml2"
