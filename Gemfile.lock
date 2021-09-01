@@ -1,16 +1,16 @@
 GIT
+  remote: https://github.com/danbooru/dtext_rb.git
+  revision: 954cd9aa52401108beed122fe93203b0beb8682a
+  specs:
+    dtext_rb (1.10.7)
+      nokogiri (~> 1.8)
+
+GIT
   remote: https://github.com/danbooru/http-cookie
   revision: 382d8a641e4df226e0e7b0d2bfaeadb2fe71dd84
   specs:
     http-cookie (1.0.4)
       domain_name (~> 0.5)
-
-GIT
-  remote: https://github.com/evazion/dtext_rb.git
-  revision: a95bf1d537cbdba4585adb8e123f03f001f56fd7
-  specs:
-    dtext_rb (1.10.6)
-      nokogiri (~> 1.8)
 
 GEM
   remote: https://rubygems.org/

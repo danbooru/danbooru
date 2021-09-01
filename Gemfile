@@ -21,7 +21,7 @@ gem 'rubyzip', :require => "zip"
 gem 'stripe'
 gem 'aws-sdk-sqs', '~> 1'
 gem 'responders'
-gem 'dtext_rb', git: "https://github.com/evazion/dtext_rb.git", require: "dtext"
+gem 'dtext_rb', git: "https://github.com/danbooru/dtext_rb.git", require: "dtext"
 gem 'memoist'
 gem 'daemons'
 gem 'oauth2'
