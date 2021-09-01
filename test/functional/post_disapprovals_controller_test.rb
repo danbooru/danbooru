@@ -56,7 +56,7 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
       context "using includes" do
         should respond_to_search(post_tags_match: "touhou").with { @post_disapproval }
         should respond_to_search(post: {uploader_name: "marisa"}).with { @post_disapproval }
-        should respond_to_search(user_name: "eiki").with { @user_disapproval }
+        should respond_to_search(user_name: "eiki").with { [] }
       end
 
       should "allow mods to see disapprover names" do
@@ -69,6 +69,20 @@ class PostDisapprovalsControllerTest < ActionDispatch::IntegrationTest
         get post_disapprovals_path
         assert_response :success
         assert_select "tr#post-disapproval-#{@post_disapproval.id} .created-column a.user-post-approver", false
+      end
+
+      context "when a non-mod searches by disapprover name" do
+        should respond_to_search(user_name: "eiki").with { [] }
+      end
+
+      context "when a mod searches by disapprover name" do
+        setup { CurrentUser.user = create(:mod_user) }
+        should respond_to_search(user_name: "eiki").with { @user_disapproval }
+      end
+
+      context "when a disapprover searches by their own name" do
+        setup { CurrentUser.user = @approver }
+        should respond_to_search(user_name: "eiki").with { @user_disapproval }
       end
     end
   end
