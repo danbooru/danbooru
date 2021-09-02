@@ -7,15 +7,14 @@ module PostSets
     MAX_PER_PAGE = 200
     MAX_SIDEBAR_TAGS = 25
 
-    attr_reader :page, :random, :post_count, :format, :tag_string, :query, :normalized_query
+    attr_reader :page, :post_count, :format, :tag_string, :query, :normalized_query
 
-    def initialize(tags, page = 1, per_page = nil, user: CurrentUser.user, random: false, format: "html")
+    def initialize(tags, page = 1, per_page = nil, user: CurrentUser.user, format: "html")
       @query = PostQueryBuilder.new(tags, user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
       @normalized_query = query.normalized_query
       @tag_string = tags
       @page = page
       @per_page = per_page
-      @random = random.to_s.truthy?
       @format = format.to_s
     end
 
@@ -94,7 +93,7 @@ module PostSets
     end
 
     def is_random?
-      random || query.find_metatag(:order) == "random"
+      query.find_metatag(:order) == "random"
     end
 
     def get_post_count

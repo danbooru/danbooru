@@ -8,9 +8,12 @@ class PostsController < ApplicationController
       respond_with(@post) do |format|
         format.html { redirect_to(@post) }
       end
+    elsif params[:random].to_s.truthy?
+      @query = PostQueryBuilder.new(params[:tags])
+      redirect_to posts_path(tags: "#{@query.to_s} order:random", page: params[:page], limit: params[:limit], format: params[:format])
     else
       tag_query = params[:tags] || params.dig(:post, :tags)
-      @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], random: params[:random], format: params[:format])
+      @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], format: params[:format])
       @posts = authorize @post_set.posts, policy_class: PostPolicy
       @post_set.log!
       respond_with(@posts) do |format|
