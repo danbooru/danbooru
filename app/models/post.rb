@@ -1156,7 +1156,7 @@ class Post < ApplicationRecord
         random_up(key) || random_down(key)
       end.compact.uniq
 
-      find_ordered(posts.map(&:id))
+      reorder(nil).find_ordered(posts.map(&:id))
     end
 
     def random_up(key)
