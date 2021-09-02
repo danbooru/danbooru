@@ -21,18 +21,18 @@ class IqdbClient
       similarity = similarity.to_f.clamp(0.0, 100.0)
       high_similarity = high_similarity.to_f.clamp(0.0, 100.0)
 
-      if file.blank?
-        if url.present?
-          file = download(url, :preview_url)
-        elsif image_url.present?
-          file = download(image_url, :url)
-        elsif file_url.present?
-          file = download(file_url, :image_url)
-        elsif post_id.present?
-          file = Post.find(post_id).file(:preview)
-        else
-          return [[], [], []]
-        end
+      if file.present?
+        file = file.tempfile
+      elsif url.present?
+        file = download(url, :preview_url)
+      elsif image_url.present?
+        file = download(image_url, :url)
+      elsif file_url.present?
+        file = download(file_url, :image_url)
+      elsif post_id.present?
+        file = Post.find(post_id).file(:preview)
+      else
+        return [[], [], []]
       end
 
       results = query(file, limit: limit)
@@ -53,7 +53,7 @@ class IqdbClient
       strategy = Sources::Strategies.find(url)
       download_url = strategy.send(type)
       file = strategy.download_file!(download_url)
-      file.preview(Danbooru.config.small_image_width, Danbooru.config.small_image_width)
+      file
     end
 
     # Transform the JSON returned by IQDB to add the full post data for each
@@ -83,7 +83,9 @@ class IqdbClient
     # Search for an image in IQDB.
     # @param file [File] the image to search
     def query(file, limit: 20)
-      file = HTTP::FormData::File.new(file)
+      media_file = MediaFile.open(file)
+      preview = media_file.preview(Danbooru.config.small_image_width, Danbooru.config.small_image_width)
+      file = HTTP::FormData::File.new(preview)
       request(:post, "query", form: { file: file }, params: { limit: limit })
     end
 
