@@ -1,9 +1,9 @@
 const { webpackConfig, merge } = require('@rails/webpacker')
 
 module.exports = merge(webpackConfig, {
-  output: {
-    library: "Danbooru",
-  },
+//  output: {
+//    library: "Danbooru",
+//  },
   resolve: {
     alias: {
       "jquery": "jquery/src/jquery.js",
