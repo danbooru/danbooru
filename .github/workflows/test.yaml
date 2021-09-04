@@ -10,6 +10,36 @@ on:
     - master
 
 jobs:
+  # Build Docker image and push to Github Packages registry.
+  docker:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        shell: bash
+
+    env:
+      IMAGE_NAME: ${{ github.repository }}
+      IMAGE_ID: ghcr.io/${{ github.repository }}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build image
+        run: docker build . --file Dockerfile --tag "$IMAGE_NAME" --label "github_run_id=${{ github.run_id }}"
+
+      - name: Log in to registry
+        run: docker login ghcr.io -u "${{ github.repository_owner }}" -p "${{ github.token }}"
+
+      - name: Push image
+        run: |
+          REF=$(echo ${{ github.sha }} | cut -c1-9)
+
+          docker tag $IMAGE_NAME $IMAGE_ID:$REF
+          docker tag $IMAGE_NAME $IMAGE_ID:latest
+          docker push $IMAGE_ID:$REF
+          docker push $IMAGE_ID:latest
+
   test:
     runs-on: ubuntu-latest
     container: ubuntu:20.10
