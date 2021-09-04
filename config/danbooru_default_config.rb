@@ -200,21 +200,6 @@ module Danbooru
       # Store files on one or more remote host(s). Configure SSH settings in
       # ~/.ssh_config or in the ssh_options param (ref: http://net-ssh.github.io/net-ssh/Net/SSH.html#method-c-start)
       # StorageManager::SFTP.new("i1.example.com", "i2.example.com", base_dir: "/mnt/backup", ssh_options: {})
-
-      # Select the storage method based on the post's id and type (preview, large, or original).
-      # StorageManager::Hybrid.new do |id, md5, file_ext, type|
-      #   ssh_options = { user: "danbooru" }
-      #
-      #   if type.in?([:large, :original]) && id.in?(0..850_000)
-      #     StorageManager::SFTP.new("raikou1.donmai.us", base_url: "https://raikou1.donmai.us", base_dir: "/path/to/files", ssh_options: ssh_options)
-      #   elsif type.in?([:large, :original]) && id.in?(850_001..2_000_000)
-      #     StorageManager::SFTP.new("raikou2.donmai.us", base_url: "https://raikou2.donmai.us", base_dir: "/path/to/files", ssh_options: ssh_options)
-      #   elsif type.in?([:large, :original]) && id.in?(2_000_001..3_000_000)
-      #     StorageManager::SFTP.new(*all_server_hosts, base_url: "https://hijiribe.donmai.us/data", ssh_options: ssh_options)
-      #   else
-      #     StorageManager::SFTP.new(*all_server_hosts, ssh_options: ssh_options)
-      #   end
-      # end
     end
 
     # The method to use for backing up image files.
