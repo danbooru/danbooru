@@ -20,37 +20,35 @@ Alternatively, if you already have Docker Compose installed, you can just do:
 docker-compose -f config/docker/docker-compose.simple.yaml up
 ```
 
-## Installation
+## Manual Installation
 
-It is recommended that you install Danbooru on a Debian-based system
-since most of the required packages are available on APT. Danbooru
-has been successfully installed on Fedora, CentOS, FreeBSD, and OS X.
-The INSTALL.debian install script is straightforward and should be
-simple to adapt for other platforms.
+Follow the [INSTALL.debian](INSTALL.debian) script to install Danbooru.
 
-For best performance, you will need at least 256MB of RAM for
-PostgreSQL and Rails. The memory requirement will grow as your
-database gets bigger.
+The INSTALL.debian script is written for Debian, but can be adapted for other
+distributions. Danbooru has been successfully installed on Debian, Ubuntu,
+Fedora, Arch, and OS X. It is recommended that you use an Ubuntu-based system
+since Ubuntu is what is used in development and production.
 
-On production Danbooru uses PostgreSQL 9.4, but any 9.x release should
-work.
+See [here](https://github.com/danbooru/danbooru/wiki/Ubuntu-Installation-Help-Guide)
+for a guide on how set up Danbooru inside a virtual machine.
 
-Use your operating system's package management system whenever
-possible.  This will simplify the process of installing init scripts,
-which will not always happen when compiling from source.
+For best performance, you will need at least 256MB of RAM for PostgreSQL and
+Rails. The memory requirement will grow as your database gets bigger.
+
+In production, Danbooru uses PostgreSQL 10.18, but any release later than this
+should work.
 
 ## Troubleshooting
 
-These instructions won't work for everyone. If your setup is not
-working, here are the steps I usually recommend to people:
+If your setup is not working, here are the steps I usually recommend to people:
 
-1) Test the database. Make sure you can connect to it using psql. Make
+1) Test the database. Make sure you can connect to it using `psql`. Make
 sure the tables exist. If this fails, you need to work on correctly
 installing PostgreSQL, importing the initial schema, and running the
 migrations.
 
-2) Test the Rails database connection by using rails console. Run
-Post.count to make sure Rails can connect to the database. If this
+2) Test the Rails database connection by using `bin/rails console`. Run
+`Post.count` to make sure Rails can connect to the database. If this
 fails, you need to make sure your Danbooru configuration files are
 correct.
 
@@ -61,29 +59,21 @@ debug your Nginx configuration file.
 
 ## Services
 
-Danbooru employs numerous external services to delegate some
-functionality.
-
-For development purposes, you can just run mocked version of these
-services. They're available in `scripts/mock_services` and can be started
-automatically using Foreman and the provided Procfile.
+Danboou depends on a couple of cloud services and several microservices to
+implement certain features.
 
 ### Amazon Web Services
 
-In order to enable the following features, you will need an AWS SQS
-account:
+The following features require an Amazon AWS account:
 
-* Pool versions
-* Post versions
-* Saved searches
-* Related tags
+* Pool history
+* Post history
 
 ### Google APIs
 
-The following features requires a Google API account:
+The following features require a Google Cloud account:
 
-* Bulk revert
-* Post versions report
+* BigQuery database export
 
 ### IQDB Service
 
@@ -91,25 +81,17 @@ IQDB integration is delegated to the [IQDB service](https://github.com/danbooru/
 
 ### Archive Service
 
-In order to access versioned data for pools and posts you will
-need to install and configure the [Archives service](https://github.com/r888888888/archives).
+In order to access pool and post histories you will need to install and
+configure the [Archives service](https://github.com/danbooru/archives).
 
 ### Reportbooru Service
 
-The following features are delegated to the [Reportbooru service](https://github.com/r888888888/reportbooru):
+The following features are delegated to the [Reportbooru service](https://github.com/danbooru/reportbooru):
 
-* Related tags
+* Post views
 * Missed searches report
 * Popular searches report
-* Favorite searches
-* Upload trend graphs
 
 ### Recommender Service
 
-Post recommendations require the [Recommender service](https://github.com/r888888888/recommender).
-
-### Cropped Thumbnails
-
-There's optional support for cropped thumbnails. This relies on installing
-`libvips-8.6` or higher and setting `Danbooru.config.enable_image_cropping`
-to true.
+Post recommendations require the [Recommender service](https://github.com/danbooru/recommender).
