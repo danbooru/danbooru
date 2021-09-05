@@ -32,7 +32,7 @@ class EmailAddress < ApplicationRecord
   end
 
   def self.restricted(restricted = true)
-    domains = Danbooru.config.email_domain_verification_list
+    domains = EmailValidator::NONDISPOSABLE_DOMAINS
     domain_regex = domains.map { |domain| Regexp.escape(domain) }.join("|")
 
     if restricted.to_s.truthy?

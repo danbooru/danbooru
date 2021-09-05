@@ -166,7 +166,6 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
       context "for a Restricted user" do
         context "with a nondisposable email address" do
           should "unrestrict the user's account" do
-            Danbooru.config.stubs(:email_domain_verification_list).returns(["gmail.com"])
             @restricted_user.email_address.update!(address: "test@gmail.com")
 
             get email_verification_url(@restricted_user)
@@ -180,7 +179,6 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
 
         context "with a disposable email address" do
           should "leave the user's account restricted" do
-            Danbooru.config.stubs(:email_domain_verification_list).returns(["gmail.com"])
             @restricted_user.email_address.update!(address: "test@mailinator.com")
 
             get email_verification_url(@restricted_user)
@@ -196,8 +194,6 @@ class EmailsControllerTest < ActionDispatch::IntegrationTest
       context "for a Gold user" do
         should "not change the user's level" do
           @user = create(:gold_user, email_address: build(:email_address, { address: "test@gmail.com", is_verified: false }))
-          Danbooru.config.stubs(:email_domain_verification_list).returns(["gmail.com"])
-
           get email_verification_url(@user)
 
           assert_redirected_to @user

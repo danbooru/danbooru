@@ -551,19 +551,6 @@ module Danbooru
       nil
     end
 
-    # The whitelist of email domains allowed for account verification purposes.
-    # If a user signs up from a proxy, they must verify their account using an
-    # email address from one of the domains on this list before they can do
-    # anything on the site. This is meant to prevent users from using
-    # disposable emails to create sockpuppet accounts.
-    #
-    # If this list is empty or nil, then there are no restrictions on which
-    # email domains can be used to verify accounts.
-    def email_domain_verification_list
-      # ["gmail.com", "outlook.com", "yahoo.com"]
-      []
-    end
-
     # Cloudflare API token. Used to purge URLs from Cloudflare's cache when a
     # post is replaced. The token must have 'zone.cache_purge' permissions.
     # https://support.cloudflare.com/hc/en-us/articles/200167836-Managing-API-Tokens-and-Keys
