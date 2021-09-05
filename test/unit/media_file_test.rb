@@ -33,7 +33,8 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "determine the correct dimensions for a ugoira file" do
       skip unless MediaFile.videos_enabled?
-      assert_equal([60, 60], MediaFile.open("test/files/valid_ugoira.zip").dimensions)
+      frame_data = JSON.parse(File.read("test/files/ugoira.json"))
+      assert_equal([60, 60], MediaFile.open("test/files/ugoira.zip", frame_data: frame_data).dimensions)
     end
 
     should "determine the correct dimensions for a flash file" do
@@ -57,7 +58,8 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([512, 512], mf.dimensions)
       assert_equal([512, 512], mf.dimensions)
 
-      mf = MediaFile.open("test/files/valid_ugoira.zip")
+      frame_data = JSON.parse(File.read("test/files/ugoira.json"))
+      mf = MediaFile.open("test/files/ugoira.zip", frame_data: frame_data)
       assert_equal([60, 60], mf.dimensions)
       assert_equal([60, 60], mf.dimensions)
     end
@@ -92,7 +94,7 @@ class MediaFileTest < ActiveSupport::TestCase
     end
 
     should "determine the correct extension for a ugoira file" do
-      assert_equal(:zip, MediaFile.open("test/files/valid_ugoira.zip").file_ext)
+      assert_equal(:zip, MediaFile.open("test/files/ugoira.zip").file_ext)
     end
 
     should "determine the correct extension for a flash file" do
@@ -113,10 +115,16 @@ class MediaFileTest < ActiveSupport::TestCase
   end
 
   context "#preview" do
-    should "generate a preview image" do
+    should "generate a preview image for a static image" do
       assert_equal([150, 101], MediaFile.open("test/files/test.jpg").preview(150, 150).dimensions)
       assert_equal([113, 150], MediaFile.open("test/files/test.png").preview(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/test.gif").preview(150, 150).dimensions)
+    end
+
+    should "generate a preview image for an animated image" do
+      skip unless MediaFile.videos_enabled?
+      assert_equal([86, 52], MediaFile.open("test/files/test-animated-86x52.gif").preview(150, 150).dimensions)
+      assert_equal([150, 150], MediaFile.open("test/files/apng/normal_apng.png").preview(150, 150).dimensions)
     end
 
     should "generate a preview image for a video" do

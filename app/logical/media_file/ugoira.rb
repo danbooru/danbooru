@@ -36,6 +36,7 @@ class MediaFile::Ugoira < MediaFile
   # XXX should take width and height and resize image
   def convert
     raise NotImplementedError, "can't convert ugoira to webm: ffmpeg or mkvmerge not installed" unless self.class.videos_enabled?
+    raise RuntimeError, "can't convert ugoira to webm: no ugoira frame data was provided" unless frame_data.present?
 
     Dir.mktmpdir("ugoira-#{md5}") do |tmpdir|
       output_file = Tempfile.new(["ugoira-conversion", ".webm"], binmode: true)
@@ -87,10 +88,8 @@ class MediaFile::Ugoira < MediaFile
   end
 
   def preview_frame
-    tempfile = Tempfile.new("ugoira-preview", binmode: true)
-    zipfile.entries.first.extract(tempfile.path) { true } #  'true' means overwrite the existing tempfile.
-    MediaFile.open(tempfile)
+    FFmpeg.new(convert).smart_video_preview
   end
 
-  memoize :zipfile, :preview_frame, :dimensions
+  memoize :zipfile, :preview_frame, :dimensions, :convert
 end

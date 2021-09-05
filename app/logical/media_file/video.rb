@@ -32,9 +32,7 @@ class MediaFile::Video < MediaFile
   end
 
   def preview_frame
-    vp = Tempfile.new(["video-preview", ".jpg"], binmode: true)
-    video.screenshot(vp.path, seek_time: 0)
-    MediaFile.open(vp.path)
+    FFmpeg.new(file).smart_video_preview
   end
 
   memoize :video, :preview_frame, :dimensions, :duration, :has_audio?

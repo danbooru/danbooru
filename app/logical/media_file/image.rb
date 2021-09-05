@@ -38,11 +38,15 @@ class MediaFile::Image < MediaFile
   # @see https://github.com/jcupitt/libvips/wiki/HOWTO----Image-shrinking
   # @see http://jcupitt.github.io/libvips/API/current/Using-vipsthumbnail.md.html
   def preview(width, height)
-    output_file = Tempfile.new(["image-preview", ".jpg"])
-    resized_image = image.thumbnail_image(width, height: height, **THUMBNAIL_OPTIONS)
-    resized_image.jpegsave(output_file.path, **JPEG_OPTIONS)
+    if is_animated?
+      FFmpeg.new(file).smart_video_preview
+    else
+      output_file = Tempfile.new(["image-preview", ".jpg"])
+      resized_image = image.thumbnail_image(width, height: height, **THUMBNAIL_OPTIONS)
+      resized_image.jpegsave(output_file.path, **JPEG_OPTIONS)
 
-    MediaFile::Image.new(output_file)
+      MediaFile::Image.new(output_file)
+    end
   end
 
   def crop(width, height)

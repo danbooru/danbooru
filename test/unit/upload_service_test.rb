@@ -60,8 +60,6 @@ class UploadServiceTest < ActiveSupport::TestCase
 
           assert_not_nil(@upload.context["ugoira"])
           assert_operator(File.size(file.path), :>, 0)
-
-          file.close
         end
       end
     end
