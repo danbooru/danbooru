@@ -38,26 +38,28 @@ class MediaFile::Image < MediaFile
   # @see https://github.com/jcupitt/libvips/wiki/HOWTO----Image-shrinking
   # @see http://jcupitt.github.io/libvips/API/current/Using-vipsthumbnail.md.html
   def preview(width, height)
-    if is_animated?
-      FFmpeg.new(file).smart_video_preview
-    else
-      output_file = Tempfile.new(["image-preview", ".jpg"])
-      resized_image = image.thumbnail_image(width, height: height, **THUMBNAIL_OPTIONS)
-      resized_image.jpegsave(output_file.path, **JPEG_OPTIONS)
-
-      MediaFile::Image.new(output_file)
-    end
-  end
-
-  def crop(width, height)
-    output_file = Tempfile.new(["image-crop", ".jpg"])
-    resized_image = image.thumbnail_image(width, height: height, **CROP_OPTIONS)
+    output_file = Tempfile.new(["image-preview", ".jpg"])
+    resized_image = preview_frame.image.thumbnail_image(width, height: height, **THUMBNAIL_OPTIONS)
     resized_image.jpegsave(output_file.path, **JPEG_OPTIONS)
 
     MediaFile::Image.new(output_file)
   end
 
-  private
+  def crop(width, height)
+    output_file = Tempfile.new(["image-crop", ".jpg"])
+    resized_image = preview_frame.image.thumbnail_image(width, height: height, **CROP_OPTIONS)
+    resized_image.jpegsave(output_file.path, **JPEG_OPTIONS)
+
+    MediaFile::Image.new(output_file)
+  end
+
+  def preview_frame
+    if is_animated?
+      FFmpeg.new(file).smart_video_preview
+    else
+      self
+    end
+  end
 
   def is_animated_gif?
     file_ext == :gif && image.get("n-pages") > 1

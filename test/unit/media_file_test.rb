@@ -124,6 +124,8 @@ class MediaFileTest < ActiveSupport::TestCase
     should "generate a preview image for an animated image" do
       skip unless MediaFile.videos_enabled?
       assert_equal([86, 52], MediaFile.open("test/files/test-animated-86x52.gif").preview(150, 150).dimensions)
+      assert_equal([150, 105], MediaFile.open("test/files/test-animated-400x281.gif").preview(150, 150).dimensions)
+      assert_equal([150, 150], MediaFile.open("test/files/test-animated-256x256.png").preview(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/apng/normal_apng.png").preview(150, 150).dimensions)
     end
 
