@@ -14,12 +14,12 @@ class FFmpeg
     @file = file.is_a?(String) ? File.open(file) : file
   end
 
-  # Generate a .jpg preview image for a video or animation. Generates
+  # Generate a .png preview image for a video or animation. Generates
   # thumbnails intelligently by avoiding blank frames.
   #
   # @return [MediaFile] the preview image
   def smart_video_preview
-    vp = Tempfile.new(["video-preview", ".jpg"], binmode: true)
+    vp = Tempfile.new(["video-preview", ".png"], binmode: true)
 
     # https://ffmpeg.org/ffmpeg.html#Main-options
     # https://ffmpeg.org/ffmpeg-filters.html#thumbnail
