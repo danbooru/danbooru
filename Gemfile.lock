@@ -458,8 +458,6 @@ GEM
       net-scp (>= 1.1.2)
       net-ssh (>= 2.8.0)
     stackprof (0.2.17)
-    streamio-ffmpeg (3.0.2)
-      multi_json (~> 1.8)
     stripe (5.38.0)
     stripe-ruby-mock (3.0.1)
       dante (>= 0.2.0)
@@ -580,7 +578,6 @@ DEPENDENCIES
   simplecov
   solargraph
   stackprof
-  streamio-ffmpeg
   stripe
   stripe-ruby-mock
   terminal-table

@@ -16,7 +16,6 @@ gem 'bcrypt', :require => "bcrypt"
 gem 'capistrano', '~> 3.10'
 gem 'capistrano-rails'
 gem 'capistrano-rbenv'
-gem 'streamio-ffmpeg'
 gem 'rubyzip', :require => "zip"
 gem 'stripe'
 gem 'aws-sdk-sqs', '~> 1'

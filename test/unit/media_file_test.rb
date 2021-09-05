@@ -170,4 +170,11 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([60, 60], webm.dimensions)
     end
   end
+
+  context "for a video" do
+    should "detect videos with audio" do
+      assert_equal(true, MediaFile.open("test/files/test-audio.mp4").has_audio?)
+      assert_equal(false, MediaFile.open("test/files/test-300x300.mp4").has_audio?)
+    end
+  end
 end
