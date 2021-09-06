@@ -327,10 +327,12 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         end
 
         should "remove implications" do
-          @ti = create(:tag_implication, antecedent_name: "foo", consequent_name: "bar")
-          create_bur!("nuke bar", @admin)
+          @ti1 = create(:tag_implication, antecedent_name: "fly", consequent_name: "insect")
+          @ti2 = create(:tag_implication, antecedent_name: "insect", consequent_name: "bug")
+          create_bur!("nuke insect", @admin)
 
-          assert_equal("deleted", @ti.reload.status)
+          assert_equal("deleted", @ti1.reload.status)
+          assert_equal("deleted", @ti2.reload.status)
         end
 
         should "remove pools" do

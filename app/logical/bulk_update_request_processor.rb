@@ -158,6 +158,7 @@ class BulkUpdateRequestProcessor
           # otherwise the tag won't be removed from posts that have those other tags
           if PostQueryBuilder.new(args[0]).is_simple_tag?
             TagImplication.active.where(consequent_name: args[0]).each { |ti| ti.reject!(User.system) }
+            TagImplication.active.where(antecedent_name: args[0]).each { |ti| ti.reject!(User.system) }
           end
 
           TagBatchChangeJob.perform_later(args[0], "-#{args[0]}")
