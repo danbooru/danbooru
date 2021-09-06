@@ -8,6 +8,12 @@ on:
   pull_request:
     branches:
     - master
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
 
 jobs:
   # Build Docker image and push to Github Container Registry.
@@ -138,6 +144,14 @@ jobs:
 
     - name: Prepare database
       run: config/docker/prepare-tests.sh
+
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      timeout-minutes: 10
+      if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
+      with:
+        limit-access-to-actor: true
+        sudo: false
 
     - name: Run tests
       run: bin/rails test
