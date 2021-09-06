@@ -75,7 +75,7 @@ module Sources
     context "A post with both the small and large version clean" do
       should "just get the bigger image" do
         site = Sources::Strategies.find("https://skeb.jp/@LambOic029/works/149")
-        assert_equal(["https://skeb.imgix.net/uploads/origins/ebe94108-7ca7-4b3d-b80c-b37759ffd695?bg=%23fff&auto=format&w=800&s=25a889a808e6062d03985f7408201a4d"], site.image_urls)
+        assert_equal(["https://skeb.imgix.net/uploads/origins/ebe94108-7ca7-4b3d-b80c-b37759ffd695?bg=%23fff&fm=jpg&q=45&w=696&s=9c4e093a440fe4030ac1596813ce7e17"], site.image_urls)
       end
     end
 
@@ -83,8 +83,8 @@ module Sources
       should "get both correctly" do
         site = Sources::Strategies.find("https://skeb.jp/@LambOic029/works/146")
         image_urls = %w[
-          https://skeb.imgix.net/uploads/origins/e888bb27-e1a6-48ec-a317-7615252ff818?bg=%23fff&auto=format&w=800&s=7c518083d3fb19c8d5e7376f628f0fb0
-          https://skeb.imgix.net/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?bg=%23fff&auto=format&w=800&s=f20697609ca2923f96fc49ca7eba22b6
+          https://skeb.imgix.net/uploads/origins/e888bb27-e1a6-48ec-a317-7615252ff818?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&w=800&s=9df9b46bbfad404d3a65c7c56b0cbf40
+          https://skeb.imgix.net/uploads/origins/3fc062c5-231d-400f-921f-22d77cde54df?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&w=800&s=80a1373b3f8e9bf0108d201fba34de71
         ]
 
         assert_equal(image_urls, site.image_urls)
