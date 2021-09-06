@@ -46,6 +46,7 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=sha,format=short,prefix=
+            type=sha,format=long,prefix=
             type=ref,event=branch
             type=ref,event=tag
             type=ref,event=pr
@@ -69,14 +70,13 @@ jobs:
 
   test:
     runs-on: ubuntu-latest
-    container: ubuntu:20.10
-
-    defaults:
-      run:
-        shell: bash
+    needs: docker
+    container:
+      image: ghcr.io/danbooru/danbooru:${{ github.sha }}
+      options: --user root
 
     env:
-      DEBIAN_FRONTEND: noninteractive
+      RAILS_ENV: test
       PARALLEL_WORKERS: 8 # number of parallel tests to run
       RUBYOPT: -W0 # silence ruby warnings
       VIPS_WARNING: 0 # silence libvips warnings
@@ -125,33 +125,32 @@ jobs:
           POSTGRES_PASSWORD: danbooru
 
     steps:
-    - name: Install OS dependencies
-      run: |
-        apt-get update
-        apt-get -y install --no-install-recommends build-essential ruby ruby-dev ruby-bundler git nodejs yarnpkg webpack ffmpeg mkvtoolnix libvips-dev libxml2-dev libxslt-dev zlib1g-dev postgresql-server-dev-all wget curl git
-        ln -sf /usr/bin/yarnpkg /usr/bin/yarn
-
-    - name: Check out code
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
-
-    - name: Install Ruby dependencies
-      run: BUNDLE_DEPLOYMENT=true bundle install --jobs 4
-
-    - name: Install Javascript dependencies
-      run: yarn install
-
-    - name: Prepare database
-      run: config/docker/prepare-tests.sh
-
     - name: Setup tmate session
       uses: mxschmitt/action-tmate@v3
-      timeout-minutes: 10
+      timeout-minutes: 20
       if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
       with:
         limit-access-to-actor: true
         sudo: false
 
+    - name: Prepare database
+      run: |
+        export HOME=/root
+        cd /danbooru
+        bin/rails db:test:prepare
+
+        apt-get update
+        apt-get -y install --no-install-recommends ruby-dev postgresql-server-dev-all build-essential zlib1g-dev git
+        mkdir ~/archives
+        cd ~/archives
+        git clone https://github.com/evazion/archives .
+        gem install bundler -v 1.13.3
+        bundle install --binstubs
+        bin/rake db:migrate
+
     - name: Run tests
-      run: bin/rails test
+      run: |
+        export HOME=/root
+        cd /danbooru
+        ln -s packs public/packs-test
+        bin/rails test
