@@ -209,4 +209,19 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([115, 150], @preview.dimensions)
     end
   end
+
+  context "an image with a weird embedded color profile" do
+    should "successfully generate a thumbnail" do
+      @image = MediaFile.open("test/files/test-weird-profile.jpg")
+      @preview = @image.preview(150, 150)
+
+      assert_equal(3, @image.channels)
+      assert_equal(:srgb, @image.colorspace)
+      assert_equal([154, 192], @image.dimensions)
+
+      assert_equal(3, @preview.channels)
+      assert_equal(:srgb, @preview.colorspace)
+      assert_equal([115, 150], @preview.dimensions)
+    end
+  end
 end
