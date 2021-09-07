@@ -68,6 +68,9 @@ jobs:
           cache-from: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache
           cache-to: type=registry,ref=ghcr.io/${{ github.repository }}:buildcache,mode=max
 
+          build-args: |
+            SOURCE_COMMIT=${{ github.sha }}
+
   test:
     runs-on: ubuntu-latest
     needs: docker
