@@ -2497,6 +2497,38 @@ ALTER SEQUENCE public.media_assets_id_seq OWNED BY public.media_assets.id;
 
 
 --
+-- Name: media_metadata; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.media_metadata (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    media_asset_id bigint NOT NULL,
+    metadata jsonb DEFAULT '"{}"'::jsonb NOT NULL
+);
+
+
+--
+-- Name: media_metadata_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.media_metadata_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: media_metadata_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.media_metadata_id_seq OWNED BY public.media_metadata.id;
+
+
+--
 -- Name: mod_actions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4322,6 +4354,13 @@ ALTER TABLE ONLY public.media_assets ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
+-- Name: media_metadata id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.media_metadata ALTER COLUMN id SET DEFAULT nextval('public.media_metadata_id_seq'::regclass);
+
+
+--
 -- Name: mod_actions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4707,6 +4746,14 @@ ALTER TABLE ONLY public.ip_geolocations
 
 ALTER TABLE ONLY public.media_assets
     ADD CONSTRAINT media_assets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: media_metadata media_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.media_metadata
+    ADD CONSTRAINT media_metadata_pkey PRIMARY KEY (id);
 
 
 --
@@ -7035,6 +7082,20 @@ CREATE INDEX index_media_assets_on_updated_at ON public.media_assets USING btree
 
 
 --
+-- Name: index_media_metadata_on_media_asset_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_media_metadata_on_media_asset_id ON public.media_metadata USING btree (media_asset_id);
+
+
+--
+-- Name: index_media_metadata_on_metadata; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_media_metadata_on_metadata ON public.media_metadata USING gin (metadata);
+
+
+--
 -- Name: index_mod_actions_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -8115,6 +8176,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210310221248'),
 ('20210330003356'),
 ('20210330093133'),
-('20210901230931');
+('20210901230931'),
+('20210908015203');
 
 

@@ -65,6 +65,7 @@ class Upload < ApplicationRecord
 
   belongs_to :uploader, :class_name => "User"
   belongs_to :post, optional: true
+  has_one :media_asset, foreign_key: :md5, primary_key: :md5
 
   before_validation :initialize_attributes, on: :create
   before_validation :assign_rating_from_tags
@@ -114,6 +115,7 @@ class Upload < ApplicationRecord
         return
       end
 
+      media_asset.destroy!
       DanbooruLogger.info("Uploads: Deleting files for upload md5=#{md5}")
       Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :original)
       Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :large)

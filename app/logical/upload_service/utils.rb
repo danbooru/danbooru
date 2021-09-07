@@ -62,6 +62,8 @@ class UploadService
       upload.tag_string = "#{upload.tag_string} #{Utils.automatic_tags(media_file)}"
 
       process_resizes(upload, file, original_post_id)
+
+      MediaAsset.create_from_media_file!(media_file)
     end
 
     def automatic_tags(media_file)

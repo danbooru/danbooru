@@ -104,13 +104,6 @@ class UploadService
       p.uploader_id = upload.uploader_id
       p.uploader_ip_addr = upload.uploader_ip_addr
       p.parent_id = upload.parent_id
-      p.media_asset = MediaAsset.new(
-        md5: upload.md5,
-        file_ext: upload.file_ext,
-        file_size: upload.file_size,
-        image_width: upload.image_width,
-        image_height: upload.image_height,
-      )
 
       if !upload.uploader.can_upload_free? || upload.upload_as_pending?
         p.is_pending = true

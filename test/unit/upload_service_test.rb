@@ -85,6 +85,22 @@ class UploadServiceTest < ActiveSupport::TestCase
         assert_equal(335, @upload.image_height)
         assert_equal(500, @upload.image_width)
       end
+
+      should "create a media asset" do
+        UploadService::Utils.expects(:distribute_files).times(3)
+        UploadService::Utils.process_file(@upload, @upload.file.tempfile)
+
+        @media_asset = @upload.media_asset
+        assert_not_nil(@media_asset)
+        assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", @media_asset.md5)
+        assert_equal("jpg", @media_asset.file_ext)
+        assert_equal(28086, @media_asset.file_size)
+        assert_equal(500, @media_asset.image_width)
+        assert_equal(335, @media_asset.image_height)
+
+        metadata = @media_asset.media_metadata.metadata
+        assert_equal(91, metadata.count)
+      end
     end
   end
 
@@ -934,17 +950,6 @@ class UploadServiceTest < ActiveSupport::TestCase
         post = subject.new({}).create_post_from_upload(@upload)
         assert_equal([], post.errors.full_messages)
         assert_not_nil(post.id)
-      end
-
-      should "create a media asset" do
-        post = subject.new({}).create_post_from_upload(@upload)
-
-        assert_not_nil(post.media_asset)
-        assert_equal("12345", post.media_asset.md5)
-        assert_equal("jpg", post.media_asset.file_ext)
-        assert_equal(1000, post.media_asset.file_size)
-        assert_equal(100, post.media_asset.image_width)
-        assert_equal(100, post.media_asset.image_height)
       end
     end
   end
