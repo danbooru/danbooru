@@ -10,9 +10,12 @@ class MediaFile::Image < MediaFile
   JPEG_OPTIONS = { Q: 90, background: 255, strip: true, interlace: true, optimize_coding: true }
 
   # http://jcupitt.github.io/libvips/API/current/libvips-resample.html#vips-thumbnail
-  if Vips.at_least_libvips?(8, 8)
-    THUMBNAIL_OPTIONS = { size: :down, linear: false, no_rotate: true, export_profile: SRGB_PROFILE, import_profile: SRGB_PROFILE }
-    CROP_OPTIONS = { crop: :attention, linear: false, no_rotate: true, export_profile: SRGB_PROFILE, import_profile: SRGB_PROFILE }
+  if Vips.at_least_libvips?(8, 10)
+    THUMBNAIL_OPTIONS = { size: :down, linear: false, no_rotate: true }
+    CROP_OPTIONS = { crop: :attention, linear: false, no_rotate: true }
+  elsif Vips.at_least_libvips?(8, 8)
+    THUMBNAIL_OPTIONS = { size: :down, linear: false, no_rotate: true, export_profile: "srgb" }
+    CROP_OPTIONS = { crop: :attention, linear: false, no_rotate: true, export_profile: "srgb" }
   else
     THUMBNAIL_OPTIONS = { size: :down, linear: false, auto_rotate: false, export_profile: SRGB_PROFILE, import_profile: SRGB_PROFILE }
     CROP_OPTIONS = { crop: :attention, linear: false, auto_rotate: false, export_profile: SRGB_PROFILE, import_profile: SRGB_PROFILE }
@@ -33,6 +36,14 @@ class MediaFile::Image < MediaFile
 
   def is_animated?
     is_animated_gif? || is_animated_png?
+  end
+
+  def channels
+    image.bands
+  end
+
+  def colorspace
+    image.interpretation
   end
 
   # @see https://github.com/jcupitt/libvips/wiki/HOWTO----Image-shrinking

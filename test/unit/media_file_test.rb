@@ -179,4 +179,34 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(false, MediaFile.open("test/files/test-300x300.mp4").has_audio?)
     end
   end
+
+  context "a greyscale image without an embedded color profile" do
+    should "successfully generate a thumbnail" do
+      @image = MediaFile.open("test/files/test-grey-no-profile.jpg")
+      @preview = @image.preview(150, 150)
+
+      assert_equal(1, @image.channels)
+      assert_equal(:"b-w", @image.colorspace)
+      assert_equal([535, 290], @image.dimensions)
+
+      assert_equal(3, @preview.channels)
+      assert_equal(:srgb, @preview.colorspace)
+      assert_equal([150, 81], @preview.dimensions)
+    end
+  end
+
+  context "a CMYK image without an embedded color profile" do
+    should "successfully generate a thumbnail" do
+      @image = MediaFile.open("test/files/test-cmyk-no-profile.jpg")
+      @preview = @image.preview(150, 150)
+
+      assert_equal(4, @image.channels)
+      assert_equal(:cmyk, @image.colorspace)
+      assert_equal([197, 256], @image.dimensions)
+
+      assert_equal(3, @preview.channels)
+      assert_equal(:srgb, @preview.colorspace)
+      assert_equal([115, 150], @preview.dimensions)
+    end
+  end
 end
