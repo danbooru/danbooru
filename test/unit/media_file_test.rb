@@ -189,8 +189,10 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(:"b-w", @image.colorspace)
       assert_equal([535, 290], @image.dimensions)
 
-      assert_equal(3, @preview.channels)
-      assert_equal(:srgb, @preview.colorspace)
+      # XXX This will fail on libvips lower than 8.10. Before 8.10 it's 3
+      # channel srgb, after 8.10 it's 1 channel greyscale.
+      assert_equal(1, @preview.channels)
+      assert_equal(:"b-w", @preview.colorspace)
       assert_equal([150, 81], @preview.dimensions)
     end
   end
@@ -206,7 +208,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
       assert_equal(3, @preview.channels)
       assert_equal(:srgb, @preview.colorspace)
-      assert_equal([115, 150], @preview.dimensions)
+      assert_equal([120, 150], @preview.dimensions)
     end
   end
 
@@ -221,7 +223,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
       assert_equal(3, @preview.channels)
       assert_equal(:srgb, @preview.colorspace)
-      assert_equal([115, 150], @preview.dimensions)
+      assert_equal([120, 150], @preview.dimensions)
     end
   end
 end
