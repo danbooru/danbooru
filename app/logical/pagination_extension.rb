@@ -39,7 +39,7 @@ module PaginationExtension
     if count.present?
       @paginator_count = count
     elsif !search_count.nil? && search_count.blank?
-      @paginator_count = 1_000_000
+      @paginator_count = Float::INFINITY
     end
 
     if page.to_s =~ /\Ab(\d+)\z/i
@@ -138,15 +138,17 @@ module PaginationExtension
     end
   end
 
+  # Return the number of pages of results, or infinity if it takes too long to count.
   def total_pages
+    return Float::INFINITY if total_count.infinite?
     (total_count.to_f / records_per_page).ceil
   end
 
-  # taken from kaminari (https://github.com/amatsuda/kaminari)
+  # Return the number of results, or infinity if it takes too long to count.
   def total_count
     @paginator_count ||= unscoped.from(except(:offset, :limit, :order).reorder(nil)).count
   rescue ActiveRecord::StatementInvalid => e
     raise unless e.to_s =~ /statement timeout/
-    @paginator_count ||= 1_000_000
+    @paginator_count ||= Float::INFINITY
   end
 end
