@@ -31,12 +31,6 @@ class UserUpgradeTest < ActiveSupport::TestCase
             assert_equal("complete", @user_upgrade.status)
           end
 
-          should "log an account upgrade modaction" do
-            assert_difference("ModAction.user_account_upgrade.count") do
-              @user_upgrade.process_upgrade!("paid")
-            end
-          end
-
           should "send the recipient a dmail" do
             assert_difference("@user_upgrade.recipient.dmails.received.count") do
               @user_upgrade.process_upgrade!("paid")

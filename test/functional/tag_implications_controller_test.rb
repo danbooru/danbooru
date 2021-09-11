@@ -65,10 +65,12 @@ class TagImplicationsControllerTest < ActionDispatch::IntegrationTest
 
     context "destroy action" do
       should "allow admins to delete implications" do
-        delete_auth tag_implication_path(@tag_implication), create(:admin_user)
+        user = create(:admin_user)
+        delete_auth tag_implication_path(@tag_implication), user
 
         assert_response :redirect
         assert_equal("deleted", @tag_implication.reload.status)
+        assert_equal(user, ModAction.tag_implication_delete.last.creator)
       end
 
       should "not allow members to delete aliases" do

@@ -33,7 +33,8 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "determine the correct dimensions for a ugoira file" do
       skip unless MediaFile.videos_enabled?
-      assert_equal([60, 60], MediaFile.open("test/files/valid_ugoira.zip").dimensions)
+      frame_data = JSON.parse(File.read("test/files/ugoira.json"))
+      assert_equal([60, 60], MediaFile.open("test/files/ugoira.zip", frame_data: frame_data).dimensions)
     end
 
     should "determine the correct dimensions for a flash file" do
@@ -57,7 +58,8 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([512, 512], mf.dimensions)
       assert_equal([512, 512], mf.dimensions)
 
-      mf = MediaFile.open("test/files/valid_ugoira.zip")
+      frame_data = JSON.parse(File.read("test/files/ugoira.json"))
+      mf = MediaFile.open("test/files/ugoira.zip", frame_data: frame_data)
       assert_equal([60, 60], mf.dimensions)
       assert_equal([60, 60], mf.dimensions)
     end
@@ -92,7 +94,7 @@ class MediaFileTest < ActiveSupport::TestCase
     end
 
     should "determine the correct extension for a ugoira file" do
-      assert_equal(:zip, MediaFile.open("test/files/valid_ugoira.zip").file_ext)
+      assert_equal(:zip, MediaFile.open("test/files/ugoira.zip").file_ext)
     end
 
     should "determine the correct extension for a flash file" do
@@ -113,10 +115,18 @@ class MediaFileTest < ActiveSupport::TestCase
   end
 
   context "#preview" do
-    should "generate a preview image" do
+    should "generate a preview image for a static image" do
       assert_equal([150, 101], MediaFile.open("test/files/test.jpg").preview(150, 150).dimensions)
       assert_equal([113, 150], MediaFile.open("test/files/test.png").preview(150, 150).dimensions)
       assert_equal([150, 150], MediaFile.open("test/files/test.gif").preview(150, 150).dimensions)
+    end
+
+    should "generate a preview image for an animated image" do
+      skip unless MediaFile.videos_enabled?
+      assert_equal([86, 52], MediaFile.open("test/files/test-animated-86x52.gif").preview(150, 150).dimensions)
+      assert_equal([150, 105], MediaFile.open("test/files/test-animated-400x281.gif").preview(150, 150).dimensions)
+      assert_equal([150, 150], MediaFile.open("test/files/test-animated-256x256.png").preview(150, 150).dimensions)
+      assert_equal([150, 150], MediaFile.open("test/files/apng/normal_apng.png").preview(150, 150).dimensions)
     end
 
     should "generate a preview image for a video" do
@@ -160,6 +170,60 @@ class MediaFileTest < ActiveSupport::TestCase
       webm = @ugoira.convert
       assert_equal(:webm, webm.file_ext)
       assert_equal([60, 60], webm.dimensions)
+    end
+  end
+
+  context "for a video" do
+    should "detect videos with audio" do
+      assert_equal(true, MediaFile.open("test/files/test-audio.mp4").has_audio?)
+      assert_equal(false, MediaFile.open("test/files/test-300x300.mp4").has_audio?)
+    end
+  end
+
+  context "a greyscale image without an embedded color profile" do
+    should "successfully generate a thumbnail" do
+      @image = MediaFile.open("test/files/test-grey-no-profile.jpg")
+      @preview = @image.preview(150, 150)
+
+      assert_equal(1, @image.channels)
+      assert_equal(:"b-w", @image.colorspace)
+      assert_equal([535, 290], @image.dimensions)
+
+      # XXX This will fail on libvips lower than 8.10. Before 8.10 it's 3
+      # channel srgb, after 8.10 it's 1 channel greyscale.
+      assert_equal(1, @preview.channels)
+      assert_equal(:"b-w", @preview.colorspace)
+      assert_equal([150, 81], @preview.dimensions)
+    end
+  end
+
+  context "a CMYK image without an embedded color profile" do
+    should "successfully generate a thumbnail" do
+      @image = MediaFile.open("test/files/test-cmyk-no-profile.jpg")
+      @preview = @image.preview(150, 150)
+
+      assert_equal(4, @image.channels)
+      assert_equal(:cmyk, @image.colorspace)
+      assert_equal([197, 256], @image.dimensions)
+
+      assert_equal(3, @preview.channels)
+      assert_equal(:srgb, @preview.colorspace)
+      assert_equal([120, 150], @preview.dimensions)
+    end
+  end
+
+  context "an image with a weird embedded color profile" do
+    should "successfully generate a thumbnail" do
+      @image = MediaFile.open("test/files/test-weird-profile.jpg")
+      @preview = @image.preview(150, 150)
+
+      assert_equal(3, @image.channels)
+      assert_equal(:srgb, @image.colorspace)
+      assert_equal([154, 192], @image.dimensions)
+
+      assert_equal(3, @preview.channels)
+      assert_equal(:srgb, @preview.colorspace)
+      assert_equal([120, 150], @preview.dimensions)
     end
   end
 end

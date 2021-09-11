@@ -22,30 +22,70 @@ module EmailValidator
   # Sites that have multiple domains mapping to the same logical email address.
   CANONICAL_DOMAINS = {
     "googlemail.com" => "gmail.com",
+    "hotmail.com.ar" => "outlook.com",
+    "hotmail.com.br" => "outlook.com",
+    "hotmail.com.hk" => "outlook.com",
+    "hotmail.com.tw" => "outlook.com",
     "hotmail.co.uk" => "outlook.com",
     "hotmail.co.jp" => "outlook.com",
     "hotmail.co.th" => "outlook.com",
     "hotmail.com" => "outlook.com",
+    "hotmail.be" => "outlook.com",
     "hotmail.ca" => "outlook.com",
     "hotmail.de" => "outlook.com",
+    "hotmail.dk" => "outlook.com",
     "hotmail.es" => "outlook.com",
+    "hotmail.fi" => "outlook.com",
     "hotmail.fr" => "outlook.com",
+    "hotmail.hu" => "outlook.com",
     "hotmail.it" => "outlook.com",
+    "hotmail.my" => "outlook.com",
+    "hotmail.nl" => "outlook.com",
+    "hotmail.no" => "outlook.com",
+    "hotmail.se" => "outlook.com",
     "live.com.au" => "outlook.com",
     "live.com.ar" => "outlook.com",
     "live.com.mx" => "outlook.com",
+    "live.com.pt" => "outlook.com",
     "live.co.uk" => "outlook.com",
     "live.com" => "outlook.com",
+    "live.at" => "outlook.com",
     "live.ca" => "outlook.com",
     "live.cl" => "outlook.com",
     "live.cn" => "outlook.com",
     "live.de" => "outlook.com",
+    "live.dk" => "outlook.com",
     "live.fr" => "outlook.com",
     "live.it" => "outlook.com",
     "live.jp" => "outlook.com",
     "live.nl" => "outlook.com",
     "live.se" => "outlook.com",
     "msn.com" => "outlook.com",
+    "outlook.com.ar" => "outlook.com",
+    "outlook.com.au" => "outlook.com",
+    "outlook.com.br" => "outlook.com",
+    "outlook.co.id" => "outlook.com",
+    "outlook.co.uk" => "outlook.com",
+    "outlook.co.jp" => "outlook.com",
+    "outlook.co.nz" => "outlook.com",
+    "outlook.co.th" => "outlook.com",
+    "outlook.at" => "outlook.com",
+    "outlook.be" => "outlook.com",
+    "outlook.ca" => "outlook.com",
+    "outlook.cl" => "outlook.com",
+    "outlook.cn" => "outlook.com",
+    "outlook.de" => "outlook.com",
+    "outlook.dk" => "outlook.com",
+    "outlook.fr" => "outlook.com",
+    "outlook.ie" => "outlook.com",
+    "outlook.it" => "outlook.com",
+    "outlook.kr" => "outlook.com",
+    "outlook.jp" => "outlook.com",
+    "outlook.nl" => "outlook.com",
+    "outlook.pt" => "outlook.com",
+    "outlook.ru" => "outlook.com",
+    "outlook.sa" => "outlook.com",
+    "outlook.se" => "outlook.com",
     "yahoo.com.au" => "yahoo.com",
     "yahoo.com.ar" => "yahoo.com",
     "yahoo.com.br" => "yahoo.com",
@@ -59,7 +99,9 @@ module EmailValidator
     "yahoo.co.id" => "yahoo.com",
     "yahoo.co.kr" => "yahoo.com",
     "yahoo.co.jp" => "yahoo.com",
+    "yahoo.co.nz" => "yahoo.com",
     "yahoo.co.uk" => "yahoo.com",
+    "yahoo.ne.jp" => "yahoo.com",
     "yahoo.ca" => "yahoo.com",
     "yahoo.cn" => "yahoo.com",
     "yahoo.de" => "yahoo.com",
@@ -75,7 +117,94 @@ module EmailValidator
     "gmx.de" => "gmx.net",
     "gmx.fr" => "gmx.net",
     "gmx.us" => "gmx.net",
+    "pm.me" => "protonmail.com",
+    "protonmail.ch" => "protonmail.com",
+    "tuta.io"     => "tutanota.com",
+    "email.com"   => "mail.com",
+    "me.com"      => "icloud.com",
+    "ya.ru"       => "yandex.ru",
+    "yandex.com"  => "yandex.ru",
+    "yandex.by"   => "yandex.ru",
+    "yandex.ua"   => "yandex.ru",
+    "yandex.kz"   => "yandex.ru",
+    "inbox.ru"    => "mail.ru",
+    "bk.ru"       => "mail.ru",
+    "list.ru"     => "mail.ru",
+    "internet.ru" => "mail.ru",
+    "hanmail.net" => "daum.net",
   }
+
+  # A list of domains known not to be disposable. A user's email must be on
+  # this list to unrestrict their account. If a user is Restricted and their
+  # email is not in this list, then it's assumed to be disposable and can't be
+  # used to unrestrict their account even if they verify their email address.
+  #
+  # https://www.mailboxvalidator.com/domain
+  NONDISPOSABLE_DOMAINS = %w[
+    gmail.com
+    outlook.com
+    yahoo.com
+    aol.com
+    comcast.net
+    att.net
+    bellsouth.net
+    cox.net
+    sbcglobal.net
+    verizon.net
+    icloud.com
+    rocketmail.com
+    windowslive.com
+    qq.com
+    vip.qq.com
+    sina.com
+    naver.com
+    163.com
+    daum.net
+    mail.goo.ne.jp
+    nate.com
+    mail.com
+    protonmail.com
+    gmx.net
+    web.de
+    freenet.de
+    o2.pl
+    op.pl
+    wp.pl
+    interia.pl
+    mail.ru
+    yandex.ru
+    rambler.ru
+    abv.bg
+    seznam.cz
+    libero.it
+    laposte.net
+    free.fr
+    orange.fr
+    citromail.hu
+    ukr.net
+    t-online.de
+    inbox.lv
+    luukku.com
+    lycos.com
+    tlen.pl
+    infoseek.jp
+    excite.co.jp
+    mac.com
+    wanadoo.fr
+    ezweb.ne.jp
+    arcor.de
+    docomo.ne.jp
+    earthlink.net
+    charter.net
+    hushmail.com
+    inbox.com
+    juno.com
+    shaw.ca
+    walla.com
+    tutanota.com
+    foxmail.com
+    vivaldi.net
+  ]
 
   # Returns true if it's okay to connect to port 25. Disabled outside of
   # production because many home ISPs blackhole port 25.
@@ -111,10 +240,8 @@ module EmailValidator
   # @param [String] the email address
   # @return [Boolean]
   def is_restricted?(address)
-    return false if Danbooru.config.email_domain_verification_list.blank?
-
     domain = Mail::Address.new(address).domain
-    !domain.in?(Danbooru.config.email_domain_verification_list.to_a)
+    !domain.in?(NONDISPOSABLE_DOMAINS)
   rescue Mail::Field::IncompleteParseError
     true
   end

@@ -505,7 +505,7 @@ module Searchable
   def find_ordered(ids)
     order_clause = []
     ids.each do |id|
-      order_clause << sanitize_sql_array(["ID=? DESC", id])
+      order_clause << sanitize_sql_array(["#{qualified_column_for(:id)} = ? DESC", id])
     end
     where(id: ids).order(Arel.sql(order_clause.join(', ')))
   end

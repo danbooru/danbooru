@@ -43,8 +43,16 @@ class TagRelationship < ApplicationRecord
     status == "active"
   end
 
-  def reject!
+  # Mark an alias or implication as deleted, and log a mod action if the
+  # deletion was manually performed by an admin, as opposed to automatically by
+  # DanbooruBot as part of a BUR.
+  def reject!(rejector = CurrentUser.user)
     update!(status: "deleted")
+
+    if rejector != User.system
+      category = relationship == "tag alias" ? :tag_alias_delete : :tag_implication_delete
+      ModAction.log("deleted #{relationship} #{antecedent_name} -> #{consequent_name}", category, rejector)
+    end
   end
 
   module SearchMethods

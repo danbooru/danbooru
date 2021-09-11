@@ -144,11 +144,11 @@ class BulkUpdateRequestProcessor
 
         when :remove_alias
           tag_alias = TagAlias.active.find_by!(antecedent_name: args[0], consequent_name: args[1])
-          tag_alias.reject!
+          tag_alias.reject!(User.system)
 
         when :remove_implication
           tag_implication = TagImplication.active.find_by!(antecedent_name: args[0], consequent_name: args[1])
-          tag_implication.reject!
+          tag_implication.reject!(User.system)
 
         when :mass_update
           TagBatchChangeJob.perform_later(args[0], args[1])
@@ -157,7 +157,8 @@ class BulkUpdateRequestProcessor
           # Reject existing implications from any other tag to the one we're nuking
           # otherwise the tag won't be removed from posts that have those other tags
           if PostQueryBuilder.new(args[0]).is_simple_tag?
-            TagImplication.active.where(consequent_name: args[0]).each(&:reject!)
+            TagImplication.active.where(consequent_name: args[0]).each { |ti| ti.reject!(User.system) }
+            TagImplication.active.where(antecedent_name: args[0]).each { |ti| ti.reject!(User.system) }
           end
 
           TagBatchChangeJob.perform_later(args[0], "-#{args[0]}")

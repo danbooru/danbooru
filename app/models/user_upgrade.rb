@@ -108,7 +108,6 @@ class UserUpgrade < ApplicationRecord
 
         if payment_status == "paid"
           upgrade_recipient!
-          create_mod_action!
           dmail_recipient!
           dmail_purchaser!
           update!(status: :complete)
@@ -120,10 +119,6 @@ class UserUpgrade < ApplicationRecord
 
     def upgrade_recipient!
       recipient.update!(level: level)
-    end
-
-    def create_mod_action!
-      ModAction.log(%{"#{recipient.name}":#{Routes.user_path(recipient)} level changed #{User.level_string(recipient.level_before_last_save)} -> #{recipient.level_string}}, :user_account_upgrade, purchaser)
     end
 
     def dmail_recipient!

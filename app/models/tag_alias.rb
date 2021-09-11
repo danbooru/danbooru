@@ -43,6 +43,6 @@ class TagAlias < TagRelationship
     tag_relationships << TagAlias.active.find_by(antecedent_name: consequent_name, consequent_name: antecedent_name)
     tag_relationships << TagImplication.active.find_by(antecedent_name: antecedent_name, consequent_name: consequent_name)
     tag_relationships << TagImplication.active.find_by(antecedent_name: consequent_name, consequent_name: antecedent_name)
-    tag_relationships.each { |rel| rel.reject! if rel.present? }
+    tag_relationships.each { |rel| rel.reject!(User.system) if rel.present? }
   end
 end

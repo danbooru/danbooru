@@ -49,6 +49,7 @@ apt-get -y install $LIBSSL_DEV_PKG build-essential automake libxml2-dev libxslt-
 apt-get -y install libpq-dev postgresql-client
 apt-get -y install liblcms2-dev $LIBJPEG_TURBO_DEV_PKG libexpat1-dev libgif-dev libpng-dev libexif-dev
 apt-get -y install gcc g++
+apt-get -y install exiftool
 
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list

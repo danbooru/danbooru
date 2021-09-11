@@ -32,6 +32,8 @@ module UploadTestHelper
     assert_equal("completed", upload.status)
     assert_equal(Post.last, upload.post)
     assert_equal(upload.post.md5, upload.md5)
+    assert_not_nil(upload.media_asset)
+    assert_operator(upload.media_asset.media_metadata.metadata.count, :>=, 1)
     upload
   end
 

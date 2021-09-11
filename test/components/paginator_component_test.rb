@@ -76,6 +76,19 @@ class PaginatorComponentTest < ViewComponent::TestCase
           assert_css("span", count: 3)
         end
       end
+
+      context "for a search with an unknown number of pages" do
+        should "show the unlimited paginator" do
+          @tags = Tag.all
+          @tags.stubs(:total_count).returns(Float::INFINITY)
+          html = render_paginator(:numbered, @tags, page: 1, limit: 200)
+
+          assert_css("span.paginator-current", text: "1")
+          assert_css("span.paginator-prev")
+          assert_css("a.paginator-next")
+          assert_css(".paginator a.paginator-page", count: 4, visible: :all)
+        end
+      end
     end
   end
 end

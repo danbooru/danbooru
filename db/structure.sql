@@ -2462,6 +2462,73 @@ ALTER SEQUENCE public.ip_geolocations_id_seq OWNED BY public.ip_geolocations.id;
 
 
 --
+-- Name: media_assets; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.media_assets (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    md5 character varying NOT NULL,
+    file_ext character varying NOT NULL,
+    file_size integer NOT NULL,
+    image_width integer NOT NULL,
+    image_height integer NOT NULL
+);
+
+
+--
+-- Name: media_assets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.media_assets_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: media_assets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.media_assets_id_seq OWNED BY public.media_assets.id;
+
+
+--
+-- Name: media_metadata; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.media_metadata (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    media_asset_id bigint NOT NULL,
+    metadata jsonb DEFAULT '"{}"'::jsonb NOT NULL
+);
+
+
+--
+-- Name: media_metadata_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.media_metadata_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: media_metadata_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.media_metadata_id_seq OWNED BY public.media_metadata.id;
+
+
+--
 -- Name: mod_actions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4280,6 +4347,20 @@ ALTER TABLE ONLY public.ip_geolocations ALTER COLUMN id SET DEFAULT nextval('pub
 
 
 --
+-- Name: media_assets id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.media_assets ALTER COLUMN id SET DEFAULT nextval('public.media_assets_id_seq'::regclass);
+
+
+--
+-- Name: media_metadata id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.media_metadata ALTER COLUMN id SET DEFAULT nextval('public.media_metadata_id_seq'::regclass);
+
+
+--
 -- Name: mod_actions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4657,6 +4738,22 @@ ALTER TABLE ONLY public.ip_bans
 
 ALTER TABLE ONLY public.ip_geolocations
     ADD CONSTRAINT ip_geolocations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: media_assets media_assets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.media_assets
+    ADD CONSTRAINT media_assets_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: media_metadata media_metadata_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.media_metadata
+    ADD CONSTRAINT media_metadata_pkey PRIMARY KEY (id);
 
 
 --
@@ -6936,6 +7033,69 @@ CREATE INDEX index_ip_geolocations_on_updated_at ON public.ip_geolocations USING
 
 
 --
+-- Name: index_media_assets_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_media_assets_on_created_at ON public.media_assets USING btree (created_at);
+
+
+--
+-- Name: index_media_assets_on_file_ext; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_media_assets_on_file_ext ON public.media_assets USING btree (file_ext);
+
+
+--
+-- Name: index_media_assets_on_file_size; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_media_assets_on_file_size ON public.media_assets USING btree (file_size);
+
+
+--
+-- Name: index_media_assets_on_image_height; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_media_assets_on_image_height ON public.media_assets USING btree (image_height);
+
+
+--
+-- Name: index_media_assets_on_image_width; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_media_assets_on_image_width ON public.media_assets USING btree (image_width);
+
+
+--
+-- Name: index_media_assets_on_md5; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_media_assets_on_md5 ON public.media_assets USING btree (md5);
+
+
+--
+-- Name: index_media_assets_on_updated_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_media_assets_on_updated_at ON public.media_assets USING btree (updated_at);
+
+
+--
+-- Name: index_media_metadata_on_media_asset_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_media_metadata_on_media_asset_id ON public.media_metadata USING btree (media_asset_id);
+
+
+--
+-- Name: index_media_metadata_on_metadata; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_media_metadata_on_metadata ON public.media_metadata USING gin (metadata);
+
+
+--
 -- Name: index_mod_actions_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -8015,6 +8175,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210303195217'),
 ('20210310221248'),
 ('20210330003356'),
-('20210330093133');
+('20210330093133'),
+('20210901230931'),
+('20210908015203');
 
 

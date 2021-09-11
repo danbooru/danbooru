@@ -2,6 +2,11 @@ require 'test_helper'
 
 module Sources
   class NijieTest < ActiveSupport::TestCase
+    setup do
+      # Add a random delay to work around test failures due to rate limiting by Nijie.
+      sleep (3..5).to_a.sample
+    end
+
     context "downloading a 'http://nijie.info/view.php?id=:id' url" do
       should "download the original file" do
         @source = "http://nijie.info/view.php?id=213043"

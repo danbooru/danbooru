@@ -382,16 +382,15 @@ Post.initialize_ugoira_player = function() {
 };
 
 Post.initialize_ruffle_player = function() {
-  if (!window.RufflePlayer) {
-    return;
-  }
-
-  let ruffle = window.RufflePlayer.newest();
-  let player = ruffle.createPlayer();
   let $container = $(".ruffle-container[data-swf]");
-  let src = $container.attr("data-swf");
-  $container.get(0).appendChild(player);
-  player.load(src);
+
+  if ($container.length) {
+    let ruffle = window.RufflePlayer.newest();
+    let player = ruffle.createPlayer();
+    let src = $container.attr("data-swf");
+    $container.get(0).appendChild(player);
+    player.load(src);
+  }
 };
 
 Post.resize_ugoira_controls = function() {

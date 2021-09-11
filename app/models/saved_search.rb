@@ -130,7 +130,7 @@ class SavedSearch < ApplicationRecord
         return if redis.exists?(redis_key)
 
         post_ids = Post.with_timeout(timeout, [], query: query) do
-          Post.system_tag_match(query).limit(QUERY_LIMIT).pluck(:id)
+          Post.anon_tag_match(query).limit(QUERY_LIMIT).pluck(:id)
         end
 
         if post_ids.present?

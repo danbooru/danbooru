@@ -144,6 +144,13 @@ class SavedSearchTest < ActiveSupport::TestCase
       SavedSearch.populate("does_not_exist")
       assert_equal([], SavedSearch.post_ids_for(@user.id))
     end
+
+    should "not allow users to perform privileged searches" do
+      @flag = create(:post_flag)
+      @saved_search = create(:saved_search, query: "flagger:#{@flag.creator.name}", user: @user)
+      SavedSearch.populate("flagger:#{@flag.creator.name}")
+      assert_equal([], SavedSearch.post_ids_for(@user.id))
+    end
   end
 
   context "Creating a saved search" do

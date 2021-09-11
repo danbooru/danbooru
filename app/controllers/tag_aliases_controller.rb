@@ -15,7 +15,7 @@ class TagAliasesController < ApplicationController
 
   def destroy
     @tag_alias = authorize TagAlias.find(params[:id])
-    @tag_alias.reject!
+    @tag_alias.reject!(CurrentUser.user)
 
     respond_with(@tag_alias, location: tag_aliases_path, notice: "Tag alias was deleted")
   end

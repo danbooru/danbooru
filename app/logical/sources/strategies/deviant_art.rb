@@ -269,7 +269,7 @@ module Sources
         resp = http.cache(1.minute).get(page_url_from_image_url, follow: {max_hops: 1})
 
         if resp.status.success?
-          Nokogiri::HTML(resp.body.to_s)
+          resp.parse
         # the work was deleted
         elsif resp.code == 404
           nil

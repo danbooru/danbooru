@@ -15,32 +15,33 @@ class IqdbClient
   end
 
   concerning :QueryMethods do
-    # Search for an image by file, URL, or post ID.
-    def search(post_id: nil, file: nil, url: nil, image_url: nil, file_url: nil, similarity: 0.0, high_similarity: 65.0, limit: 20)
+    # Search for an image by file, URL, hash, or post ID.
+    def search(post_id: nil, file: nil, hash: nil, url: nil, image_url: nil, file_url: nil, similarity: 0.0, high_similarity: 65.0, limit: 20)
       limit = limit.to_i.clamp(1, 1000)
       similarity = similarity.to_f.clamp(0.0, 100.0)
       high_similarity = high_similarity.to_f.clamp(0.0, 100.0)
 
-      if file.blank?
-        if url.present?
-          file = download(url, :preview_url)
-        elsif image_url.present?
-          file = download(image_url, :url)
-        elsif file_url.present?
-          file = download(file_url, :image_url)
-        elsif post_id.present?
-          file = Post.find(post_id).file(:preview)
-        else
-          return [[], [], []]
-        end
+      if file.present?
+        file = file.tempfile
+      elsif url.present?
+        file = download(url, :preview_url)
+      elsif image_url.present?
+        file = download(image_url, :url)
+      elsif file_url.present?
+        file = download(file_url, :image_url)
+      elsif post_id.present?
+        file = Post.find(post_id).file(:preview)
       end
 
-      results = query(file, limit: limit)
-      results = results.select { |result| result["score"] >= similarity }.take(limit)
-      matches = decorate_posts(results)
-      high_similarity_matches, low_similarity_matches = matches.partition { |match| match["score"] >= high_similarity }
+      if hash.present?
+        results = query_hash(hash, limit: limit)
+      elsif file.present?
+        results = query_file(file, limit: limit)
+      else
+        results = []
+      end
 
-      [high_similarity_matches, low_similarity_matches, matches]
+      process_results(results, similarity, high_similarity)
     ensure
       file.try(:close)
     end
@@ -53,21 +54,27 @@ class IqdbClient
       strategy = Sources::Strategies.find(url)
       download_url = strategy.send(type)
       file = strategy.download_file!(download_url)
-      file.preview(Danbooru.config.small_image_width, Danbooru.config.small_image_width)
+      file
     end
 
     # Transform the JSON returned by IQDB to add the full post data for each
     # match.
     # @param matches [Array<Hash>] the array of IQDB matches
-    # @return [Array<Hash>] the array of IQDB matches, with post data
-    def decorate_posts(matches)
+    # @param low_similarity [Float] the threshold for a result to be considered low similarity
+    # @param high_similarity [Float] the threshold for a result to be considered high similarity
+    # @return [(Array, Array, Array)] the set of high similarity, low similarity, and all matches
+    def process_results(matches, low_similarity, high_similarity)
+      matches = matches.select { |result| result["score"] >= low_similarity }
       post_ids = matches.map { |match| match["post_id"] }
       posts = Post.where(id: post_ids).group_by(&:id).transform_values(&:first)
 
-      matches.map do |match|
+      matches = matches.map do |match|
         post = posts.fetch(match["post_id"], nil)
         match.with_indifferent_access.merge(post: post) if post
       end.compact
+
+      high_similarity_matches, low_similarity_matches = matches.partition { |match| match["score"] >= high_similarity }
+      [high_similarity_matches, low_similarity_matches, matches]
     end
   end
 
@@ -80,10 +87,18 @@ class IqdbClient
   end
 
   concerning :HttpMethods do
-    # Search for an image in IQDB.
+    # Search for an image in IQDB by hash.
+    # @param hash [String] the IQDB hash to search
+    def query_hash(hash, limit: 20)
+      request(:post, "query", params: { hash: hash, limit: limit })
+    end
+
+    # Search for an image file in IQDB.
     # @param file [File] the image to search
-    def query(file, limit: 20)
-      file = HTTP::FormData::File.new(file)
+    def query_file(file, limit: 20)
+      media_file = MediaFile.open(file)
+      preview = media_file.preview(Danbooru.config.small_image_width, Danbooru.config.small_image_width)
+      file = HTTP::FormData::File.new(preview)
       request(:post, "query", form: { file: file }, params: { limit: limit })
     end
 

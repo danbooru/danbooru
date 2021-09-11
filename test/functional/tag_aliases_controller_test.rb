@@ -55,10 +55,12 @@ class TagAliasesControllerTest < ActionDispatch::IntegrationTest
 
     context "destroy action" do
       should "allow admins to delete aliases" do
-        delete_auth tag_alias_path(@tag_alias), create(:admin_user)
+        user = create(:admin_user)
+        delete_auth tag_alias_path(@tag_alias), user
 
         assert_response :redirect
         assert_equal("deleted", @tag_alias.reload.status)
+        assert_equal(user, ModAction.tag_alias_delete.last.creator)
       end
 
       should "not allow members to delete aliases" do

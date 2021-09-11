@@ -60,8 +60,6 @@ class UploadServiceTest < ActiveSupport::TestCase
 
           assert_not_nil(@upload.context["ugoira"])
           assert_operator(File.size(file.path), :>, 0)
-
-          file.close
         end
       end
     end
@@ -86,6 +84,22 @@ class UploadServiceTest < ActiveSupport::TestCase
         assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", @upload.md5)
         assert_equal(335, @upload.image_height)
         assert_equal(500, @upload.image_width)
+      end
+
+      should "create a media asset" do
+        UploadService::Utils.expects(:distribute_files).times(3)
+        UploadService::Utils.process_file(@upload, @upload.file.tempfile)
+
+        @media_asset = @upload.media_asset
+        assert_not_nil(@media_asset)
+        assert_equal("ecef68c44edb8a0d6a3070b5f8e8ee76", @media_asset.md5)
+        assert_equal("jpg", @media_asset.file_ext)
+        assert_equal(28086, @media_asset.file_size)
+        assert_equal(500, @media_asset.image_width)
+        assert_equal(335, @media_asset.image_height)
+
+        metadata = @media_asset.media_metadata.metadata
+        assert_equal(91, metadata.count)
       end
     end
   end

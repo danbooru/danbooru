@@ -20,12 +20,32 @@ class PostDisapproval < ApplicationRecord
 
   concerning :SearchMethods do
     class_methods do
+      def creator_matches(creator, searcher)
+        return none if creator.nil?
+
+        policy = Pundit.policy!(searcher, PostDisapproval.new(user: creator))
+
+        if policy.can_view_creator?
+          where(user: creator)
+        else
+          none
+        end
+      end
+
       def search(params)
-        q = search_attributes(params, :id, :created_at, :updated_at, :message, :reason, :user, :post)
+        q = search_attributes(params, :id, :created_at, :updated_at, :message, :reason, :post)
         q = q.text_attribute_matches(:message, params[:message_matches])
 
         q = q.with_message if params[:has_message].to_s.truthy?
         q = q.without_message if params[:has_message].to_s.falsy?
+
+        if params[:user_id].present?
+          user = User.find(params[:user_id])
+          q = q.creator_matches(user, CurrentUser.user)
+        elsif params[:user_name].present?
+          user = User.find_by_name(params[:user_name])
+          q = q.creator_matches(user, CurrentUser.user)
+        end
 
         case params[:order]
         when "post_id", "post_id_desc"

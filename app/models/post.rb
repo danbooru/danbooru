@@ -40,6 +40,7 @@ class Post < ApplicationRecord
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
   belongs_to :parent, class_name: "Post", optional: true
+  has_one :media_asset, foreign_key: :md5, primary_key: :md5
   has_one :upload, :dependent => :destroy
   has_one :artist_commentary, :dependent => :destroy
   has_one :pixiv_ugoira_frame_data, :class_name => "PixivUgoiraFrameData", :dependent => :destroy
@@ -213,10 +214,6 @@ class Post < ApplicationRecord
 
     def has_preview?
       is_image? || is_video? || is_ugoira?
-    end
-
-    def has_dimensions?
-      image_width.present? && image_height.present?
     end
   end
 
@@ -502,27 +499,25 @@ class Post < ApplicationRecord
     def add_automatic_tags(tags)
       tags -= %w[incredibly_absurdres absurdres highres lowres huge_filesize flash]
 
-      if has_dimensions?
-        if image_width >= 10_000 || image_height >= 10_000
-          tags << "incredibly_absurdres"
-        end
-        if image_width >= 3200 || image_height >= 2400
-          tags << "absurdres"
-        end
-        if image_width >= 1600 || image_height >= 1200
-          tags << "highres"
-        end
-        if image_width <= 500 && image_height <= 500
-          tags << "lowres"
-        end
+      if image_width >= 10_000 || image_height >= 10_000
+        tags << "incredibly_absurdres"
+      end
+      if image_width >= 3200 || image_height >= 2400
+        tags << "absurdres"
+      end
+      if image_width >= 1600 || image_height >= 1200
+        tags << "highres"
+      end
+      if image_width <= 500 && image_height <= 500
+        tags << "lowres"
+      end
 
-        if image_width >= 1024 && image_width.to_f / image_height >= 4
-          tags << "wide_image"
-          tags << "long_image"
-        elsif image_height >= 1024 && image_height.to_f / image_width >= 4
-          tags << "tall_image"
-          tags << "long_image"
-        end
+      if image_width >= 1024 && image_width.to_f / image_height >= 4
+        tags << "wide_image"
+        tags << "long_image"
+      elsif image_height >= 1024 && image_height.to_f / image_width >= 4
+        tags << "tall_image"
+        tags << "long_image"
       end
 
       if file_size >= 10.megabytes
@@ -1156,7 +1151,7 @@ class Post < ApplicationRecord
         random_up(key) || random_down(key)
       end.compact.uniq
 
-      find_ordered(posts.map(&:id))
+      reorder(nil).find_ordered(posts.map(&:id))
     end
 
     def random_up(key)
@@ -1272,10 +1267,26 @@ class Post < ApplicationRecord
       where("posts.tag_index @@ to_tsquery('danbooru', E?)", tag.to_escaped_for_tsquery)
     end
 
+    # Perform a tag search as an anonymous user. No tag limit is enforced.
+    def anon_tag_match(query)
+      user_tag_match(query, User.anonymous, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
+    end
+
+    # Perform a tag search as the system user, DanbooruBot. The search will
+    # have moderator-level permissions. No tag limit is enforced.
     def system_tag_match(query)
       user_tag_match(query, User.system, tag_limit: nil, safe_mode: false, hide_deleted_posts: false)
     end
 
+    # Perform a tag search as the current user, or as another user.
+    #
+    # @param query [String] the tag search to perform
+    # @param user [User] the user to perform the search as
+    # @param tag_limit [Integer] the maximum number of tags allowed per search.
+    #   An exception will be raised if the search has too many tags.
+    # @param safe_mode [Boolean] if true, automatically add rating:s to the search
+    # @param hide_deleted_posts [Boolean] if true, automatically add -status:deleted to the search
+    # @return [ActiveRecord::Relation<Post>] the set of resulting posts
     def user_tag_match(query, user = CurrentUser.user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
       post_query = PostQueryBuilder.new(query, user, tag_limit: tag_limit, safe_mode: safe_mode, hide_deleted_posts: hide_deleted_posts)
       post_query.normalized_query.build

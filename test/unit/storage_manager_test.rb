@@ -5,42 +5,6 @@ class StorageManagerTest < ActiveSupport::TestCase
     CurrentUser.ip_addr = "127.0.0.1"
   end
 
-  context "StorageManager::Match" do
-    setup do
-      @storage_manager = StorageManager::Match.new do |matcher|
-        matcher.add_manager(type: :crop) do
-          "crop"
-        end
-
-        matcher.add_manager(type: [:large, :original]) do
-          "large or original"
-        end
-
-        matcher.add_manager(id: 1..100) do
-          "first"
-        end
-
-        matcher.add_manager(id: 101..200, type: :preview) do
-          "preview"
-        end
-
-        matcher.add_manager({}) do
-          "default"
-        end
-      end
-    end
-
-    should "find the different matches" do
-      assert_equal("large or original", @storage_manager.find(type: :original))
-      assert_equal("crop", @storage_manager.find(type: :crop))
-      assert_equal("large or original", @storage_manager.find(type: :large))
-      assert_equal("preview", @storage_manager.find(type: :preview, id: 150))
-      assert_equal("default", @storage_manager.find(type: :preview, id: 1000))
-      assert_equal("crop", @storage_manager.find(type: :crop, id: 1_000))
-      assert_equal("large or original", @storage_manager.find(type: :large, id: 1_000))
-    end
-  end
-
   context "StorageManager::Local" do
     setup do
       @storage_manager = StorageManager::Local.new(base_dir: @temp_dir, base_url: "/data")
@@ -124,38 +88,6 @@ class StorageManagerTest < ActiveSupport::TestCase
 
         @storage_manager.stubs(:base_url).returns("http://localhost/data")
         assert_equal("http://localhost/images/download-preview.png", @storage_manager.file_url(@post, :preview))
-      end
-    end
-  end
-
-  context "StorageManager::Hybrid" do
-    setup do
-      @post1 = FactoryBot.build(:post, id: 1, file_ext: "png")
-      @post2 = FactoryBot.build(:post, id: 2, file_ext: "png")
-
-      @storage_manager = StorageManager::Hybrid.new do |id, md5, file_ext, type|
-        if id.odd?
-          StorageManager::Local.new(base_dir: "#{@temp_dir}/i1", base_url: "/i1")
-        else
-          StorageManager::Local.new(base_dir: "#{@temp_dir}/i2", base_url: "/i2")
-        end
-      end
-    end
-
-    context "#store_file method" do
-      should "store odd-numbered posts under /i1 and even-numbered posts under /i2" do
-        @storage_manager.store_file(StringIO.new("post1"), @post1, :original)
-        @storage_manager.store_file(StringIO.new("post2"), @post2, :original)
-
-        assert(File.exist?("#{@temp_dir}/i1/original/#{@post1.md5[0..1]}/#{@post1.md5[2..3]}/#{@post1.md5}.png"))
-        assert(File.exist?("#{@temp_dir}/i2/original/#{@post2.md5[0..1]}/#{@post2.md5[2..3]}/#{@post2.md5}.png"))
-      end
-    end
-
-    context "#file_url method" do
-      should "generate /i1 urls for odd posts and /i2 urls for even posts" do
-        assert_equal("/i1/original/#{@post1.md5[0..1]}/#{@post1.md5[2..3]}/#{@post1.md5}.png", @storage_manager.file_url(@post1, :original))
-        assert_equal("/i2/original/#{@post2.md5[0..1]}/#{@post2.md5[2..3]}/#{@post2.md5}.png", @storage_manager.file_url(@post2, :original))
       end
     end
   end

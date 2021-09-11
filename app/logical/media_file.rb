@@ -102,6 +102,10 @@ class MediaFile
     file.size
   end
 
+  def metadata
+    ExifTool.new(file).metadata
+  end
+
   # @return [Boolean] true if the file is an image
   def is_image?
     file_ext.in?([:jpg, :png, :gif])
@@ -164,5 +168,5 @@ class MediaFile
     nil
   end
 
-  memoize :file_ext, :file_size, :md5
+  memoize :file_ext, :file_size, :md5, :metadata
 end

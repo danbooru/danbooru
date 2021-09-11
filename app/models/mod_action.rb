@@ -20,7 +20,7 @@ class ModAction < ApplicationRecord
     user_level_change: 7,
     user_approval_privilege: 8,
     user_upload_privilege: 9,
-    user_account_upgrade: 19,
+    user_account_upgrade: 19, # XXX unused
     user_feedback_update: 21,
     user_feedback_delete: 22,
     post_delete: 42,
@@ -46,8 +46,10 @@ class ModAction < ApplicationRecord
     forum_post_delete: 102,
     tag_alias_create: 120,
     tag_alias_update: 121, # XXX unused
+    tag_alias_delete: 122,
     tag_implication_create: 140,
     tag_implication_update: 141, # XXX unused
+    tag_implication_delete: 142,
     ip_ban_create: 160,
     ip_ban_delete: 162,
     ip_ban_undelete: 163,
