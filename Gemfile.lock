@@ -316,6 +316,7 @@ GEM
     parser (3.0.2.0)
       ast (~> 2.4.1)
     pg (1.2.3)
+    prometheus-client (2.1.0)
     pry (0.13.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -327,6 +328,9 @@ GEM
     public_suffix (4.0.6)
     puma (5.4.0)
       nio4r (~> 2.0)
+    puma-metrics (1.2.3)
+      prometheus-client (>= 0.10)
+      puma (>= 3.0)
     pundit (2.1.1)
       activesupport (>= 3.0.0)
     racc (1.5.2)
@@ -557,6 +561,7 @@ DEPENDENCIES
   pry-byebug
   pry-rails
   puma
+  puma-metrics
   pundit
   rack-mini-profiler
   rails (~> 6.0)
