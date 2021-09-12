@@ -6,6 +6,7 @@ RUBY_VERSION="${RUBY_VERSION:-2.7.1}"
 VIPS_VERSION="${VIPS_VERSION:-8.10.6}"
 FFMPEG_VERSION="${FFMPEG_VERSION:-4.3.2}"
 EXIFTOOL_VERSION="${EXIFTOOL_VERSION:-12.30}"
+OPENRESTY_VERSION="${OPENRESTY_VERSION:-1.19.9.1}"
 
 COMMON_BUILD_DEPS="
   curl ca-certificates build-essential pkg-config git
@@ -84,6 +85,23 @@ install_ruby() {
   ruby --version
 }
 
+install_openresty() {
+  apt_install libpcre++-dev
+
+  OPENRESTY_URL="https://openresty.org/download/openresty-${OPENRESTY_VERSION}.tar.gz"
+  curl -L "$OPENRESTY_URL" | tar -C /usr/local/src -xzvf -
+  cd /usr/local/src/openresty-${OPENRESTY_VERSION}
+
+  # https://github.com/openresty/docker-openresty/blob/master/alpine/Dockerfile
+  ./configure -j$(nproc) --prefix=/usr/local \
+    --with-threads --with-compat --with-pcre-jit --with-file-aio \
+    --with-http_gunzip_module --with-http_gzip_static_module \
+    --with-http_realip_module --with-http_ssl_module \
+    --with-http_stub_status_module --with-http_v2_module
+  make -j $(nproc)
+  make install
+}
+
 install_busybox() {
   busybox --install -s
 }
@@ -114,5 +132,6 @@ install_exiftool
 install_ffmpeg
 install_vips
 install_ruby
+install_openresty
 cleanup
 install_busybox # after cleanup so we can install some utils removed by cleanup
