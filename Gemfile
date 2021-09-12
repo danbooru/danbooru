@@ -54,6 +54,7 @@ gem 'terminal-table'
 gem 'newrelic_rpm', require: false
 gem 'clockwork'
 gem 'puma-metrics'
+gem 'puma_worker_killer'
 
 group :production, :staging do
   gem 'unicorn', :platforms => :ruby

@@ -13,6 +13,7 @@
 # * PUMA_PIDFILE
 # * PUMA_CONTROL_URL
 # * PUMA_METRICS_URL
+# * PUMA_RESTART_INTERVAL
 #
 # Use `bin/pumactl` to control a running Puma instance.
 #
@@ -105,3 +106,12 @@ metrics_url ENV.fetch("PUMA_METRICS_URL", "tcp://localhost:9393")
 #
 # https://github.com/puma/puma#controlstatus-server
 activate_control_app ENV.fetch("PUMA_CONTROL_URL", "tcp://localhost:9293"), no_token: true
+
+# https://github.com/schneems/puma_worker_killer
+# https://docs.gitlab.com/ee/administration/operations/puma.html#puma-worker-killer
+before_fork do
+  require 'puma_worker_killer'
+
+  PumaWorkerKiller.rolling_restart_splay_seconds = 0.0..180.0 # 0 to 3 minutes in seconds
+  PumaWorkerKiller.enable_rolling_restart ENV.fetch("PUMA_RESTART_INTERVAL", 2 * 60 * 60).to_i # every 2 hours by default
+end
