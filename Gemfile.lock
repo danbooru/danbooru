@@ -344,6 +344,7 @@ GEM
       rack
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
+    rack-timeout (0.6.0)
     rails (6.1.4.1)
       actioncable (= 6.1.4.1)
       actionmailbox (= 6.1.4.1)
@@ -568,6 +569,7 @@ DEPENDENCIES
   puma_worker_killer
   pundit
   rack-mini-profiler
+  rack-timeout
   rails (~> 6.0)
   rake
   rakismet
