@@ -208,7 +208,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
       assert_equal(3, @preview.channels)
       assert_equal(:srgb, @preview.colorspace)
-      assert_equal([120, 150], @preview.dimensions)
+      assert_equal([115, 150], @preview.dimensions)
     end
   end
 
