@@ -21,6 +21,9 @@ DANBOORU_RUNTIME_DEPS="
   zlib1g libfftw3-3 libwebp6 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2
   libpng16-16 libjpeg-turbo8 libexpat1 libglib2.0 libgif7 libexif12 libvpx6
 "
+EXTRA_DEPS="
+  busybox
+"
 
 apt_install() {
   DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends "$@"
@@ -81,6 +84,10 @@ install_ruby() {
   ruby --version
 }
 
+install_busybox() {
+  busybox --install -s
+}
+
 cleanup() {
   apt-get purge -y $RUBY_BUILD_DEPS $VIPS_BUILD_DEPS $FFMPEG_BUILD_DEPS
   apt-get purge -y --allow-remove-essential \
@@ -101,10 +108,11 @@ cleanup() {
 }
 
 apt-get update
-apt_install $COMMON_BUILD_DEPS $DANBOORU_RUNTIME_DEPS
+apt_install $COMMON_BUILD_DEPS $DANBOORU_RUNTIME_DEPS $EXTRA_DEPS
 install_asdf
 install_exiftool
 install_ffmpeg
 install_vips
 install_ruby
 cleanup
+install_busybox # after cleanup so we can install some utils removed by cleanup
