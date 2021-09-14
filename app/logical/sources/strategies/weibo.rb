@@ -137,6 +137,10 @@ module Sources
         "https://www.weibo.com/p/#{artist_long_id}"
       end
 
+      def artist_name
+        api_response&.dig("user", "screen_name")
+      end
+
       def artist_commentary_desc
         return if api_response.blank?
 

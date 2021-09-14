@@ -83,7 +83,7 @@ module Sources
       end
 
       def artist_name
-        url[PROFILE_URL, :artist_name]
+        urls.map { |u| u[PROFILE_URL, :artist_name] }.compact.first
       end
 
       def display_name
