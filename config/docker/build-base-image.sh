@@ -21,9 +21,7 @@ DANBOORU_RUNTIME_DEPS="
   ca-certificates mkvtoolnix postgresql-client-12 libpq5
   zlib1g libfftw3-3 libwebp6 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2
   libpng16-16 libjpeg-turbo8 libexpat1 libglib2.0 libgif7 libexif12 libvpx6
-"
-EXTRA_DEPS="
-  busybox
+  perl perl-modules busybox
 "
 
 apt_install() {
@@ -64,6 +62,8 @@ install_ffmpeg() {
   ffprobe -version
 }
 
+# https://github.com/exiftool/exiftool/blob/master/README
+# Optional dependencies: Compress::Zlib (for SWF files), Archive::Zip (ZIP), Digest::MD5
 install_exiftool() {
   EXIFTOOL_URL="https://github.com/exiftool/exiftool/archive/refs/tags/${EXIFTOOL_VERSION}.tar.gz"
   curl -L "$EXIFTOOL_URL" | tar -C /usr/local/src -xzvf -
@@ -73,6 +73,9 @@ install_exiftool() {
   make -j "$(nproc)" install
 
   exiftool -ver
+  perl -e 'require Compress::Zlib' || exit 1
+  perl -e 'require Archive::Zip' || exit 1
+  perl -e 'require Digest::MD5' || exit 1
 }
 
 install_ruby() {
@@ -126,7 +129,7 @@ cleanup() {
 }
 
 apt-get update
-apt_install $COMMON_BUILD_DEPS $DANBOORU_RUNTIME_DEPS $EXTRA_DEPS
+apt_install $COMMON_BUILD_DEPS $DANBOORU_RUNTIME_DEPS
 install_asdf
 install_exiftool
 install_ffmpeg
