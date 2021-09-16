@@ -57,7 +57,7 @@ gem 'puma-metrics'
 gem 'puma_worker_killer'
 gem "rack-timeout", require: "rack/timeout/base"
 
-group :production, :staging do
+group :production do
   gem 'unicorn', :platforms => :ruby
   gem 'capistrano3-unicorn'
 end
