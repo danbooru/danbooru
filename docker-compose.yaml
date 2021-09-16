@@ -22,7 +22,7 @@ version: "3.4"
 services:
   danbooru:
     user: root
-    image: evazion/danbooru
+    image: ghcr.io/danbooru/danbooru
     ports:
       - "80:3000"
     environment:
@@ -43,7 +43,7 @@ services:
 
   cron:
     user: root
-    image: evazion/danbooru
+    image: ghcr.io/danbooru/danbooru
     environment:
       - RAILS_ENV=production
       - DATABASE_URL=postgresql://danbooru@postgres/danbooru
@@ -59,7 +59,7 @@ services:
   delayed_jobs:
     # We need root to write temp upload files in the images directory (/danbooru/public/data)
     user: root
-    image: evazion/danbooru
+    image: ghcr.io/danbooru/danbooru
     environment:
       - RAILS_ENV=production
       - DATABASE_URL=postgresql://danbooru@postgres/danbooru
