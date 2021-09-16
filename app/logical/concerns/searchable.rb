@@ -125,6 +125,30 @@ module Searchable
     where_operator(qualified_column, *range)
   end
 
+  # @param attr [String] the name of the JSON field
+  # @param hash [Hash] the hash of values it should contain
+  def where_json_contains(attr, hash)
+    # XXX Hack to transform strings to numbers. Needed to match numeric JSON
+    # values when given string input values from an URL.
+    hash = hash.transform_values do |value|
+      if Integer(value, exception: false)
+        value.to_i
+      elsif Float(value, exception: false)
+        value.to_f
+      else
+        value
+      end
+    end
+
+    where("#{qualified_column_for(attr)} @> :hash", hash: hash.to_json)
+  end
+
+  # @param attr [String] the name of the JSON field
+  # @param hash [String] the key it should contain
+  def where_json_has_key(attr, key)
+    where("#{qualified_column_for(attr)} ? :key", key: key)
+  end
+
   def search_boolean_attribute(attr, params)
     if params[attr].present?
       boolean_attribute_matches(attr, params[attr])
@@ -218,6 +242,8 @@ module Searchable
       search_inet_attribute(name, params)
     when :enum
       search_enum_attribute(name, params)
+    when :jsonb
+      search_jsonb_attribute(name, params)
     when :array
       search_array_attribute(name, subtype, params)
     else
@@ -402,6 +428,26 @@ module Searchable
     end
 
     relation = relation.search_numeric_attribute(name, params, key: :"#{name}_id")
+
+    relation
+  end
+
+  def search_jsonb_attribute(name, params)
+    relation = all
+
+    if params[name].present?
+      relation = relation.where_json_contains(:metadata, params[name])
+    end
+
+    if params["#{name}_has_key"]
+      relation = relation.where_json_has_key(:metadata, params["#{name}_has_key"])
+    end
+
+    if params["has_#{name}"].to_s.truthy?
+      relation = relation.where.not(name => "{}")
+    elsif params["has_#{name}"].to_s.falsy?
+      relation = relation.where(name => "{}")
+    end
 
     relation
   end

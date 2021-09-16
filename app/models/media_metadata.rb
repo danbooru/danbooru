@@ -15,8 +15,12 @@ class MediaMetadata < ApplicationRecord
   belongs_to :media_asset
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :media_asset_id)
+    q = search_attributes(params, :id, :created_at, :updated_at, :media_asset, :metadata)
     q = q.apply_default_order(params)
     q
+  end
+
+  def file=(file_or_path)
+    self.metadata = MediaFile.open(file_or_path).metadata
   end
 end

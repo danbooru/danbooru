@@ -63,7 +63,7 @@ class UploadService
 
       process_resizes(upload, file, original_post_id)
 
-      MediaAsset.create_from_media_file!(media_file)
+      MediaAsset.create!(file: media_file)
     end
 
     def automatic_tags(media_file)
