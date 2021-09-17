@@ -2,10 +2,11 @@
 
 set -xeuo pipefail
 
-RUBY_VERSION="${RUBY_VERSION:-2.7.1}"
+RUBY_VERSION="${RUBY_VERSION:-2.7.4}"
 VIPS_VERSION="${VIPS_VERSION:-8.10.6}"
-FFMPEG_VERSION="${FFMPEG_VERSION:-4.3.2}"
+FFMPEG_VERSION="${FFMPEG_VERSION:-4.4}"
 EXIFTOOL_VERSION="${EXIFTOOL_VERSION:-12.30}"
+OPENRESTY_VERSION="${OPENRESTY_VERSION:-1.19.9.1}"
 
 COMMON_BUILD_DEPS="
   curl ca-certificates build-essential pkg-config git
@@ -16,10 +17,12 @@ VIPS_BUILD_DEPS="
   libfftw3-dev libwebp-dev liborc-dev liblcms2-dev libpng-dev
   libjpeg-turbo8-dev libexpat1-dev libglib2.0-dev libgif-dev libexif-dev
 "
+EXIFTOOL_RUNTIME_DEPS="perl perl-modules libarchive-zip-perl"
 DANBOORU_RUNTIME_DEPS="
   ca-certificates mkvtoolnix postgresql-client-12 libpq5
   zlib1g libfftw3-3 libwebp6 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2
   libpng16-16 libjpeg-turbo8 libexpat1 libglib2.0 libgif7 libexif12 libvpx6
+  busybox $EXIFTOOL_RUNTIME_DEPS
 "
 
 apt_install() {
@@ -60,6 +63,8 @@ install_ffmpeg() {
   ffprobe -version
 }
 
+# https://github.com/exiftool/exiftool/blob/master/README
+# Optional dependencies: Compress::Zlib (for SWF files), Archive::Zip (ZIP), Digest::MD5
 install_exiftool() {
   EXIFTOOL_URL="https://github.com/exiftool/exiftool/archive/refs/tags/${EXIFTOOL_VERSION}.tar.gz"
   curl -L "$EXIFTOOL_URL" | tar -C /usr/local/src -xzvf -
@@ -69,6 +74,9 @@ install_exiftool() {
   make -j "$(nproc)" install
 
   exiftool -ver
+  perl -e 'require Compress::Zlib' || exit 1
+  perl -e 'require Archive::Zip' || exit 1
+  perl -e 'require Digest::MD5' || exit 1
 }
 
 install_ruby() {
@@ -79,6 +87,27 @@ install_ruby() {
   asdf global ruby "$RUBY_VERSION"
 
   ruby --version
+}
+
+install_openresty() {
+  apt_install libpcre++-dev
+
+  OPENRESTY_URL="https://openresty.org/download/openresty-${OPENRESTY_VERSION}.tar.gz"
+  curl -L "$OPENRESTY_URL" | tar -C /usr/local/src -xzvf -
+  cd /usr/local/src/openresty-${OPENRESTY_VERSION}
+
+  # https://github.com/openresty/docker-openresty/blob/master/alpine/Dockerfile
+  ./configure -j$(nproc) --prefix=/usr/local \
+    --with-threads --with-compat --with-pcre-jit --with-file-aio \
+    --with-http_gunzip_module --with-http_gzip_static_module \
+    --with-http_realip_module --with-http_ssl_module \
+    --with-http_stub_status_module --with-http_v2_module
+  make -j $(nproc)
+  make install
+}
+
+install_busybox() {
+  busybox --install -s
 }
 
 cleanup() {
@@ -107,4 +136,6 @@ install_exiftool
 install_ffmpeg
 install_vips
 install_ruby
+install_openresty
 cleanup
+install_busybox # after cleanup so we can install some utils removed by cleanup

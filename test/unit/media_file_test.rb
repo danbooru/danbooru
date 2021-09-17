@@ -180,6 +180,50 @@ class MediaFileTest < ActiveSupport::TestCase
     end
   end
 
+  context "a compressed SWF file" do
+    should "get all the metadata" do
+      @metadata = MediaFile.open("test/files/compressed.swf").metadata
+
+      assert_equal(true, @metadata["Flash:Compressed"])
+      assert_not_equal("Install Compress::Zlib to extract compressed information", @metadata["ExifTool:Warning"])
+      assert_equal(6, @metadata.count)
+    end
+  end
+
+  context "a corrupt GIF" do
+    should "still read the metadata" do
+      @file = MediaFile.open("test/files/test-corrupt.gif")
+      @metadata = @file.metadata
+
+      assert_equal(true, @file.is_corrupt?)
+      assert_equal("File format error", @metadata["ExifTool:Error"])
+      assert_equal("89a", @metadata["GIF:GIFVersion"])
+      assert_equal(6, @metadata.count)
+    end
+  end
+
+  context "a corrupt PNG" do
+    should "still read the metadata" do
+      @file = MediaFile.open("test/files/test-corrupt.png")
+      @metadata = @file.metadata
+
+      assert_equal(true, @file.is_corrupt?)
+      assert_equal("Grayscale", @metadata["PNG:ColorType"])
+      assert_equal(6, @metadata.count)
+    end
+  end
+
+  context "a corrupt JPEG" do
+    should "still read the metadata" do
+      @file = MediaFile.open("test/files/test-corrupt.jpg")
+      @metadata = @file.metadata
+
+      assert_equal(true, @file.is_corrupt?)
+      assert_equal(1, @metadata["File:ColorComponents"])
+      assert_equal(7, @metadata.count)
+    end
+  end
+
   context "a greyscale image without an embedded color profile" do
     should "successfully generate a thumbnail" do
       @image = MediaFile.open("test/files/test-grey-no-profile.jpg")
@@ -208,7 +252,7 @@ class MediaFileTest < ActiveSupport::TestCase
 
       assert_equal(3, @preview.channels)
       assert_equal(:srgb, @preview.colorspace)
-      assert_equal([120, 150], @preview.dimensions)
+      assert_equal([115, 150], @preview.dimensions)
     end
   end
 

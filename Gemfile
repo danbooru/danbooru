@@ -53,8 +53,11 @@ gem 'bcrypt_pbkdf' # https://github.com/net-ssh/net-ssh/issues/565
 gem 'terminal-table'
 gem 'newrelic_rpm', require: false
 gem 'clockwork'
+gem 'puma-metrics'
+gem 'puma_worker_killer'
+gem "rack-timeout", require: "rack/timeout/base"
 
-group :production, :staging do
+group :production do
   gem 'unicorn', :platforms => :ruby
   gem 'capistrano3-unicorn'
 end

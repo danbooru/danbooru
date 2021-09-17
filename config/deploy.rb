@@ -7,8 +7,8 @@
 # @see lib/capistrano/tasks
 # @see https://capistranorb.com
 
-set :stages, %w(production development staging)
-set :default_stage, "staging"
+set :stages, %w(production test)
+set :default_stage, "test"
 set :application, "danbooru"
 set :repo_url,  "git://github.com/GlassedSilver/danbooru.git"
 set :deploy_to, "/var/www/danbooru2"

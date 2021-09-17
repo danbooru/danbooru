@@ -34,6 +34,21 @@ namespace :images do
     end
   end
 
+  task populate_media_metadata: :environment do
+    sm = StorageManager::Local.new(base_url: "/", base_dir: ENV.fetch("DIR", Rails.root.join("public/data")))
+
+    MediaMetadata.joins(:media_asset).where(metadata: {}).find_each do |metadata|
+      asset = metadata.media_asset
+      file = sm.open(sm.file_path(asset.md5, asset.file_ext, :original))
+      media_file = MediaFile.open(file)
+
+      metadata.update!(metadata: media_file.metadata)
+      puts "metadata[id=#{metadata.id}, md5=#{asset.md5}]: #{media_file.metadata.count}"
+    rescue StandardError => e
+      puts "error[id=#{metadata.id}]: #{e}"
+    end
+  end
+
   desc "Backup images"
   task :backup => :environment do
     CurrentUser.user = User.system

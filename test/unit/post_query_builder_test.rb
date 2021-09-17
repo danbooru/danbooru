@@ -901,6 +901,20 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       end
     end
 
+    should "return posts for an exif:<value> metatag" do
+      jpg = create(:post, media_asset: create(:media_asset, file: "test/files/test.jpg"))
+      gif = create(:post, media_asset: create(:media_asset, file: "test/files/test.gif"))
+      png = create(:post, media_asset: create(:media_asset, file: "test/files/test.png"))
+
+      assert_tag_match([jpg], "exif:File:ColorComponents")
+      assert_tag_match([jpg], "exif:File:ColorComponents=3")
+      assert_tag_match([gif], "exif:GIF:GIFVersion")
+      assert_tag_match([gif], "exif:GIF:GIFVersion=89a")
+      assert_tag_match([png], "exif:PNG:ColorType")
+      assert_tag_match([png], "exif:PNG:ColorType=RGB")
+      assert_tag_match([], "exif:DNE")
+    end
+
     should "return posts ordered by a particular attribute" do
       posts = (1..2).map do |n|
         tags = ["tagme", "gentag1 gentag2 artist:arttag char:chartag copy:copytag"]

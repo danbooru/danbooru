@@ -106,6 +106,8 @@ class ApplicationController < ActionController::Base
       render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
     when RateLimiter::RateLimitError
       render_error_page(429, exception)
+    when Rack::Timeout::RequestTimeoutException
+      render_error_page(500, exception, message: "Your request took too long to complete and was canceled.")
     when NotImplementedError
       render_error_page(501, exception, message: "This feature isn't available: #{exception.message}")
     when PG::ConnectionBad

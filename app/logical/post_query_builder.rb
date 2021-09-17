@@ -37,7 +37,7 @@ class PostQueryBuilder
     ordpool note comment commentary id rating locked source status filetype
     disapproved parent child search embedded md5 width height mpixels ratio
     score favcount filesize date age order limit tagcount pixiv_id pixiv
-    unaliased
+    unaliased exif
   ] + COUNT_METATAGS + COUNT_METATAG_SYNONYMS + CATEGORY_COUNT_METATAGS
 
   ORDER_METATAGS = %w[
@@ -192,6 +192,8 @@ class PostQueryBuilder
       ordfav_matches(value)
     when "unaliased"
       unaliased_matches(value)
+    when "exif"
+      exif_matches(value)
     when "user"
       user_matches(:uploader, value)
     when "approver"
@@ -240,6 +242,20 @@ class PostQueryBuilder
     else
       tags_include(tag)
     end
+  end
+
+  def exif_matches(string)
+    # string = exif:File:ColorComponents=3
+    if string.include?("=")
+      key, value = string.split(/=/, 2)
+      hash = { key => value }
+      metadata = MediaMetadata.joins(:media_asset).where_json_contains(:metadata, hash)
+    # string = exif:File:ColorComponents
+    else
+      metadata = MediaMetadata.joins(:media_asset).where_json_has_key(:metadata, string)
+    end
+
+    Post.where(md5: metadata.select(:md5))
   end
 
   def attribute_matches(value, field, type = :integer)

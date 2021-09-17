@@ -235,9 +235,14 @@ module Sources
       end
       memoize :http
 
+      # The http timeout to download a file. Overrideable by each site
+      def download_timeout
+        30
+      end
+
       # A http client for downloading files.
       def http_downloader
-        http.timeout(30).max_size(Danbooru.config.max_file_size).use(:spoof_referrer).use(:unpolish_cloudflare)
+        http.timeout(download_timeout).max_size(Danbooru.config.max_file_size).use(:spoof_referrer).use(:unpolish_cloudflare)
       end
       memoize :http_downloader
 

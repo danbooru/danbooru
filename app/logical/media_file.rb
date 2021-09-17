@@ -6,6 +6,8 @@
 # supported by a File.
 class MediaFile
   extend Memoist
+  include ActiveModel::Serializers::JSON
+
   attr_accessor :file
 
   # delegate all File methods to `file`.
@@ -166,6 +168,19 @@ class MediaFile
   # @return [MediaFile] a cropped preview file
   def crop(width, height, **options)
     nil
+  end
+
+  def attributes
+    {
+      path: path,
+      width: width,
+      height: height,
+      file_ext: file_ext,
+      file_size: file_size,
+      md5: md5,
+      is_corrupt?: is_corrupt?,
+      metadata: metadata
+    }.stringify_keys
   end
 
   memoize :file_ext, :file_size, :md5, :metadata

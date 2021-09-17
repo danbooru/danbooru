@@ -19,7 +19,7 @@ namespace :danbooru do
     # changes first before building the image.
     desc "Build a Docker image based on latest commit"
     task :build do
-      system("git archive HEAD | docker build - --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) -t danbooru -f Dockerfile")
+      system("git archive HEAD | docker buildx build - --build-arg SOURCE_COMMIT=$(git rev-parse HEAD) -t danbooru -f Dockerfile")
     end
   end
 end

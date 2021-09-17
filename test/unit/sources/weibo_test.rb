@@ -2,6 +2,11 @@ require 'test_helper'
 
 module Sources
   class WeiboTest < ActiveSupport::TestCase
+    setup do
+      # Add a random delay to work around test failures due to rate limiting by Weibo.
+      sleep (3..5).to_a.sample
+    end
+
     context "A post with multiple pictures" do
       setup do
         @site = Sources::Strategies.find("https://www.weibo.com/5501756072/J2UNKfbqV?type=comment#_rnd1590548401855")
