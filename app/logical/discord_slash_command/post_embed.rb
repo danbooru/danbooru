@@ -56,8 +56,12 @@ class DiscordSlashCommand
       { text: text }
     end
 
+    def censored_tags
+      ["guro", "bestiality"]
+    end
+
     def is_censored?
-      post.rating != "s" && !is_nsfw_channel?
+      (post.rating != "s" && !is_nsfw_channel?) || !post.visible?(User.anonymous) || censored_tags.any? { |tag| tag.in?(post.tag_array) }
     end
 
     def is_nsfw_channel?
