@@ -534,6 +534,52 @@ class PostTest < ActiveSupport::TestCase
         assert_includes(approval.errors.full_messages, "Post is locked and cannot be approved")
       end
     end
+
+    context "Locking post fields" do
+      should "create ModAction entries" do
+        @post = create(:post)
+        assert_difference("ModAction.post_note_lock_create.count", 1) do
+          @post.is_note_locked = true
+          @post.save!
+        end
+
+        assert_difference("ModAction.post_note_lock_delete.count", 1) do
+          @post.is_note_locked = false
+          @post.save!
+        end
+
+        assert_difference("ModAction.post_rating_lock_create.count", 1) do
+          @post.is_rating_locked = true
+          @post.save!
+        end
+
+        assert_difference("ModAction.post_rating_lock_delete.count", 1) do
+          @post.is_rating_locked = false
+          @post.save!
+        end
+
+        assert_difference("ModAction.post_status_lock_create.count", 1) do
+          @post.is_status_locked = true
+          @post.save!
+        end
+
+        assert_difference("ModAction.post_status_lock_delete.count", 1) do
+          @post.is_status_locked = false
+          @post.save!
+        end
+
+        assert_difference("ModAction.post_status_lock_create.count", 1) do
+          assert_difference("ModAction.post_rating_lock_create.count", 1) do
+            assert_difference("ModAction.post_note_lock_create.count", 1) do
+              @post.is_status_locked = true
+              @post.is_rating_locked = true
+              @post.is_note_locked = true
+              @post.save!
+            end
+          end
+        end
+      end
+    end
   end
 
   context "Tagging:" do
