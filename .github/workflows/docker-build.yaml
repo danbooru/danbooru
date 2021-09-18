@@ -17,6 +17,11 @@ name: Docker Build
 # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
 on: [push, create]
 
+# https://docs.github.com/en/actions/reference/authentication-in-a-workflow#permissions-for-the-github_token
+# https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idpermissions
+permissions:
+  packages: write
+
 jobs:
   docker-build:
     runs-on: ubuntu-latest

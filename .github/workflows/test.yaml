@@ -2,6 +2,9 @@
 
 name: Test
 
+# https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#permissions
+permissions: read-all
+
 on:
   # https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_run
   workflow_run:
