@@ -56,7 +56,6 @@ jobs:
             docker.io/evazion/danbooru
             ghcr.io/danbooru/danbooru
           tags: |
-            type=sha,format=short,prefix=
             type=sha,format=long,prefix=
             type=ref,event=branch
             type=ref,event=tag
