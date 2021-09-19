@@ -15,7 +15,7 @@
 name: Docker Build
 
 # https://docs.github.com/en/actions/reference/events-that-trigger-workflows
-on: [push, create]
+on: [push, create, workflow_dispatch]
 
 # https://docs.github.com/en/actions/reference/authentication-in-a-workflow#permissions-for-the-github_token
 # https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idpermissions
