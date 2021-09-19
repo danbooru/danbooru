@@ -1,0 +1,7 @@
+# This file is used by Github to prevent pull requests from modifying CI
+# workflow files without approval.
+#
+# https://docs.github.com/en/actions/learn-github-actions/security-hardening-for-github-actions#using-codeowners-to-monitor-changes
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+.github/ @evazion
