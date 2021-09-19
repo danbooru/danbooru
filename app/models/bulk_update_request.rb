@@ -62,8 +62,8 @@ class BulkUpdateRequest < ApplicationRecord
       transaction do
         CurrentUser.scoped(approver) do
           processor.validate!(:approval)
-          processor.process!(approver)
           update!(status: "approved", approver: approver)
+          processor.process_later!
           forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.")
         end
       end

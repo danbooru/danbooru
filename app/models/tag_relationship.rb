@@ -114,7 +114,8 @@ class TagRelationship < ApplicationRecord
   end
 
   def self.approve!(antecedent_name:, consequent_name:, approver:, forum_topic: nil)
-    ProcessTagRelationshipJob.perform_later(class_name: name, approver: approver, antecedent_name: antecedent_name, consequent_name: consequent_name, forum_topic: forum_topic)
+    tag_relationship = create!(creator: approver, approver: approver, antecedent_name: antecedent_name, consequent_name: consequent_name, forum_topic: forum_topic)
+    tag_relationship.process!
   end
 
   def self.model_restriction(table)

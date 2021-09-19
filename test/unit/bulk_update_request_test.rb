@@ -205,6 +205,14 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(false, @bur.valid?)
           assert_equal(["Can't remove alias foo -> bar (alias doesn't exist)"], @bur.errors[:base])
         end
+
+        should "be processed sequentially after the create alias command" do
+          @bur = create_bur!("create alias foo -> bar\nremove alias foo -> bar", @admin)
+
+          @alias = TagAlias.find_by(antecedent_name: "foo", consequent_name: "bar")
+          assert_equal(true, @alias.present?)
+          assert_equal(true, @alias.is_deleted?)
+        end
       end
 
       context "the remove implication command" do
@@ -230,6 +238,14 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
           assert_equal(false, @bur.valid?)
           assert_equal(["Can't remove implication foo -> bar (implication doesn't exist)"], @bur.errors[:base])
+        end
+
+        should "be processed sequentially after the create implication command" do
+          @bur = create_bur!("imply foo -> bar\nunimply foo -> bar", @admin)
+
+          @ti = TagImplication.find_by(antecedent_name: "foo", consequent_name: "bar")
+          assert_equal(true, @ti.present?)
+          assert_equal(true, @ti.is_deleted?)
         end
       end
 

@@ -16,11 +16,11 @@ class BulkUpdateRequestProcessor
 
   attr_reader :bulk_update_request
 
-  delegate :script, :forum_topic, to: :bulk_update_request
+  delegate :script, :forum_topic, :approver, to: :bulk_update_request
   validate :validate_script
   validate :validate_script_length
 
-  # @param bulk_update_request [String] the BUR
+  # @param bulk_update_request [BulkUpdateRequest] the BUR
   def initialize(bulk_update_request)
     @bulk_update_request = bulk_update_request
   end
@@ -130,50 +130,45 @@ class BulkUpdateRequestProcessor
     end
   end
 
-  # Apply the script.
-  # @param approver [User] the approver of the request
-  def process!(approver)
-    ActiveRecord::Base.transaction do
-      commands.map do |command, *args|
-        case command
-        when :create_alias
-          TagAlias.approve!(antecedent_name: args[0], consequent_name: args[1], approver: approver, forum_topic: forum_topic)
+  # Schedule the bulk update request to be processed later, in the background.
+  def process_later!
+    ProcessBulkUpdateRequestJob.perform_later(bulk_update_request)
+  end
 
-        when :create_implication
-          TagImplication.approve!(antecedent_name: args[0], consequent_name: args[1], approver: approver, forum_topic: forum_topic)
+  # Process the bulk update request immediately.
+  def process!
+    commands.map do |command, *args|
+      case command
+      when :create_alias
+        TagAlias.approve!(antecedent_name: args[0], consequent_name: args[1], approver: approver, forum_topic: forum_topic)
 
-        when :remove_alias
-          tag_alias = TagAlias.active.find_by!(antecedent_name: args[0], consequent_name: args[1])
-          tag_alias.reject!(User.system)
+      when :create_implication
+        TagImplication.approve!(antecedent_name: args[0], consequent_name: args[1], approver: approver, forum_topic: forum_topic)
 
-        when :remove_implication
-          tag_implication = TagImplication.active.find_by!(antecedent_name: args[0], consequent_name: args[1])
-          tag_implication.reject!(User.system)
+      when :remove_alias
+        tag_alias = TagAlias.active.find_by!(antecedent_name: args[0], consequent_name: args[1])
+        tag_alias.reject!(User.system)
 
-        when :mass_update
-          TagBatchChangeJob.perform_later(args[0], args[1])
+      when :remove_implication
+        tag_implication = TagImplication.active.find_by!(antecedent_name: args[0], consequent_name: args[1])
+        tag_implication.reject!(User.system)
 
-        when :nuke
-          # Reject existing implications from any other tag to the one we're nuking
-          # otherwise the tag won't be removed from posts that have those other tags
-          if PostQueryBuilder.new(args[0]).is_simple_tag?
-            TagImplication.active.where(consequent_name: args[0]).each { |ti| ti.reject!(User.system) }
-            TagImplication.active.where(antecedent_name: args[0]).each { |ti| ti.reject!(User.system) }
-          end
+      when :mass_update
+        BulkUpdateRequestProcessor.mass_update(args[0], args[1])
 
-          TagBatchChangeJob.perform_later(args[0], "-#{args[0]}")
+      when :nuke
+        BulkUpdateRequestProcessor.nuke(args[0])
 
-        when :rename
-          TagRenameJob.perform_later(args[0], args[1])
+      when :rename
+        TagMover.new(args[0], args[1], user: User.system).move!
 
-        when :change_category
-          tag = Tag.find_or_create_by_name(args[0])
-          tag.update!(category: Tag.categories.value_for(args[1]))
+      when :change_category
+        tag = Tag.find_or_create_by_name(args[0])
+        tag.update!(category: Tag.categories.value_for(args[1]))
 
-        else
-          # should never happen
-          raise Error, "Unknown command: #{command}"
-        end
+      else
+        # should never happen
+        raise Error, "Unknown command: #{command}"
       end
     end
   end
@@ -237,6 +232,31 @@ class BulkUpdateRequestProcessor
         raise Error, "Unknown command: #{command}"
       end
     end.join("\n")
+  end
+
+  def self.nuke(tag_name)
+    # Reject existing implications from any other tag to the one we're nuking
+    # otherwise the tag won't be removed from posts that have those other tags
+    if PostQueryBuilder.new(tag_name).is_simple_tag?
+      TagImplication.active.where(consequent_name: tag_name).each { |ti| ti.reject!(User.system) }
+      TagImplication.active.where(antecedent_name: tag_name).each { |ti| ti.reject!(User.system) }
+    end
+
+    mass_update(tag_name, "-#{tag_name}")
+  end
+
+  def self.mass_update(antecedent, consequent, user: User.system)
+    normalized_antecedent = PostQueryBuilder.new(antecedent).split_query
+    normalized_consequent = PostQueryBuilder.new(consequent).parse_tag_edit
+
+    CurrentUser.scoped(user) do
+      Post.anon_tag_match(normalized_antecedent.join(" ")).find_each do |post|
+        post.with_lock do
+          tags = (post.tag_array - normalized_antecedent + normalized_consequent).join(" ")
+          post.update(tag_string: tags)
+        end
+      end
+    end
   end
 
   # Tag move is allowed if:
