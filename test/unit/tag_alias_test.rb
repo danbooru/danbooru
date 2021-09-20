@@ -142,6 +142,8 @@ class TagAliasTest < ActiveSupport::TestCase
 
       assert_equal("bbb ccc", post1.reload.tag_string)
       assert_equal("ccc ddd", post2.reload.tag_string)
+      assert_equal(User.system, post1.versions.last.updater)
+      assert_equal(CurrentUser.user, post2.versions.last.updater)
     end
 
     should "not validate for transitive relations" do

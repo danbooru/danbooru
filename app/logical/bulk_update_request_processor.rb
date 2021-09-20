@@ -137,45 +137,47 @@ class BulkUpdateRequestProcessor
 
   # Process the bulk update request immediately.
   def process!
-    commands.map do |command, *args|
-      case command
-      when :create_alias
-        TagAlias.approve!(antecedent_name: args[0], consequent_name: args[1], approver: approver, forum_topic: forum_topic)
+    CurrentUser.scoped(User.system, "127.0.0.1") do
+      commands.map do |command, *args|
+        case command
+        when :create_alias
+          TagAlias.approve!(antecedent_name: args[0], consequent_name: args[1], approver: approver, forum_topic: forum_topic)
 
-      when :create_implication
-        TagImplication.approve!(antecedent_name: args[0], consequent_name: args[1], approver: approver, forum_topic: forum_topic)
+        when :create_implication
+          TagImplication.approve!(antecedent_name: args[0], consequent_name: args[1], approver: approver, forum_topic: forum_topic)
 
-      when :remove_alias
-        tag_alias = TagAlias.active.find_by!(antecedent_name: args[0], consequent_name: args[1])
-        tag_alias.reject!(User.system)
+        when :remove_alias
+          tag_alias = TagAlias.active.find_by!(antecedent_name: args[0], consequent_name: args[1])
+          tag_alias.reject!(User.system)
 
-      when :remove_implication
-        tag_implication = TagImplication.active.find_by!(antecedent_name: args[0], consequent_name: args[1])
-        tag_implication.reject!(User.system)
+        when :remove_implication
+          tag_implication = TagImplication.active.find_by!(antecedent_name: args[0], consequent_name: args[1])
+          tag_implication.reject!(User.system)
 
-      when :mass_update
-        BulkUpdateRequestProcessor.mass_update(args[0], args[1])
+        when :mass_update
+          BulkUpdateRequestProcessor.mass_update(args[0], args[1])
 
-      when :nuke
-        BulkUpdateRequestProcessor.nuke(args[0])
+        when :nuke
+          BulkUpdateRequestProcessor.nuke(args[0])
 
-      when :rename
-        TagMover.new(args[0], args[1], user: User.system).move!
+        when :rename
+          TagMover.new(args[0], args[1], user: User.system).move!
 
-      when :change_category
-        tag = Tag.find_or_create_by_name(args[0])
-        tag.update!(category: Tag.categories.value_for(args[1]))
+        when :change_category
+          tag = Tag.find_or_create_by_name(args[0])
+          tag.update!(category: Tag.categories.value_for(args[1]))
 
-      else
-        # should never happen
-        raise Error, "Unknown command: #{command}"
+        else
+          # should never happen
+          raise Error, "Unknown command: #{command}"
+        end
       end
-    end
 
-    bulk_update_request.update!(status: "approved")
-  rescue StandardError
-    bulk_update_request.update!(status: "failed")
-    raise
+      bulk_update_request.update!(status: "approved")
+    rescue StandardError
+      bulk_update_request.update!(status: "failed")
+      raise
+    end
   end
 
   # The list of tags in the script. Used for search BURs by tag.
@@ -255,7 +257,7 @@ class BulkUpdateRequestProcessor
     normalized_consequent = PostQueryBuilder.new(consequent).parse_tag_edit
 
     CurrentUser.scoped(user) do
-      Post.anon_tag_match(normalized_antecedent.join(" ")).find_each do |post|
+      Post.anon_tag_match(normalized_antecedent.join(" ")).reorder(nil).parallel_each do |post|
         post.with_lock do
           tags = (post.tag_array - normalized_antecedent + normalized_consequent).join(" ")
           post.update(tag_string: tags)

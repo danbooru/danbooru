@@ -56,6 +56,7 @@ gem 'clockwork'
 gem 'puma-metrics'
 gem 'puma_worker_killer'
 gem "rack-timeout", require: "rack/timeout/base"
+gem "parallel"
 
 group :production do
   gem 'unicorn', :platforms => :ruby

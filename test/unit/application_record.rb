@@ -21,4 +21,28 @@ class ApplicationRecordTest < ActiveSupport::TestCase
       assert_equal(@tags.reverse, Tag.search(updated_at: ">=#{@tags.first.updated_at}"))
     end
   end
+
+  context "ApplicationRecord#parallel_each" do
+    context "in threaded mode" do
+      should "set CurrentUser correctly" do
+        @user1 = create(:user)
+        @user2 = create(:user)
+
+        CurrentUser.scoped(@user1, "1.1.1.1") do
+          Tag.parallel_each do |tag|
+            assert_equal(@user1, CurrentUser.user)
+            assert_equal("1.1.1.1", CurrentUser.ip_addr)
+
+            CurrentUser.scoped(@user2, "2.2.2.2") do
+              assert_equal(@user2, CurrentUser.user)
+              assert_equal("2.2.2.2", CurrentUser.ip_addr)
+            end
+
+            assert_equal(@user1, CurrentUser.user)
+            assert_equal("1.1.1.1", CurrentUser.ip_addr)
+          end
+        end
+      end
+    end
+  end
 end

@@ -69,7 +69,7 @@ class TagMover
 
   # Retag the posts from the old tag to the new tag.
   def move_posts!
-    Post.raw_tag_match(old_tag.name).find_each do |post|
+    Post.raw_tag_match(old_tag.name).reorder(nil).parallel_each do |post|
       post.lock!
       post.remove_tag(old_tag.name)
       post.add_tag(new_tag.name)

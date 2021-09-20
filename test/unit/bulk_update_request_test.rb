@@ -266,6 +266,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         should "update the tags" do
           assert_equal("bar", @post.reload.tag_string)
           assert_equal("approved", @bur.reload.status)
+          assert_equal(User.system, @post.versions.last.updater)
         end
 
         should "be case-sensitive" do
@@ -288,6 +289,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         should "rename the tags" do
           assert_equal("bar blah", @post.reload.tag_string)
           assert_equal("approved", @bur.reload.status)
+          assert_equal(User.system, @post.versions.last.updater)
         end
 
         should "move the tag's artist entry and wiki page" do
@@ -351,6 +353,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
           assert_equal("foo", @post.reload.tag_string)
           assert_equal("approved", @bur.reload.status)
+          assert_equal(User.system, @post.versions.last.updater)
         end
 
         should "remove implications" do
@@ -370,6 +373,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
           assert_equal([], @pool.post_ids)
           assert_equal("approved", @bur.reload.status)
+          assert_equal(User.system, @pool.versions.last.updater)
         end
       end
 
@@ -512,6 +516,10 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
       should "set the BUR as approved" do
         assert_equal("approved", @bur.reload.status)
+      end
+
+      should "update the post as DanbooruBot" do
+        assert_equal(User.system, @post.versions.last.updater)
       end
 
       should "set the BUR as failed if there is an unexpected error during processing" do

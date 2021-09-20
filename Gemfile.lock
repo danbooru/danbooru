@@ -561,6 +561,7 @@ DEPENDENCIES
   newrelic_rpm
   nokogiri
   oauth2
+  parallel
   pg
   pry-byebug
   pry-rails

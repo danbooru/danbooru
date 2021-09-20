@@ -124,6 +124,8 @@ class TagImplicationTest < ActiveSupport::TestCase
 
       assert_equal("sword weapon", p1.reload.tag_string)
       assert_equal("sword weapon", p2.reload.tag_string)
+      assert_equal(User.system, p1.versions.last.updater)
+      assert_equal(CurrentUser.user, p2.versions.last.updater)
     end
 
     context "when calculating implied tags" do
