@@ -7,7 +7,6 @@ gem "pg"
 gem "delayed_job"
 gem "delayed_job_active_record"
 gem "simple_form"
-gem "whenever", :require => false
 gem "sanitize"
 gem 'ruby-vips'
 gem 'net-sftp'
