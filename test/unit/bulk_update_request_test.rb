@@ -539,6 +539,42 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       end
     end
 
+    context "when a bulk update request fails" do
+      should "allow it to be approved again" do
+        @post = create(:post, tag_string: "foo aaa")
+        @bur = create(:bulk_update_request, script: "alias foo -> bar")
+
+        TagAlias.any_instance.stubs(:process!).raises(RuntimeError.new("oh no"))
+        @bur.approve!(@admin)
+        assert_raises(RuntimeError) { perform_enqueued_jobs }
+
+        assert_equal("aaa foo", @post.reload.tag_string)
+
+        assert_equal("failed", @bur.reload.status)
+        assert_not_nil(@bur.forum_topic)
+        assert_equal(@admin, @bur.approver)
+
+        @ta = TagAlias.find_by!(antecedent_name: "foo", consequent_name: "bar")
+        assert_equal("active", @ta.status)
+        assert_equal(@admin, @ta.approver)
+        assert_equal(@bur.forum_topic, @ta.forum_topic)
+
+        TagAlias.any_instance.unstub(:process!)
+        @bur.approve!(@admin)
+        perform_enqueued_jobs
+
+        assert_equal("aaa bar", @post.reload.tag_string)
+
+        assert_equal("approved", @bur.reload.status)
+        assert_not_nil(@bur.forum_topic)
+        assert_equal(@admin, @bur.approver)
+
+        assert_equal("active", @ta.reload.status)
+        assert_equal(@admin, @ta.approver)
+        assert_equal(@bur.forum_topic, @ta.forum_topic)
+      end
+    end
+
     should "create a forum topic" do
       bur = create(:bulk_update_request, reason: "zzz", script: "create alias aaa -> bbb")
 

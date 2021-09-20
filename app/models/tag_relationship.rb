@@ -115,8 +115,21 @@ class TagRelationship < ApplicationRecord
     end
   end
 
+  # Create a new alias or implication, set it to active, and update the posts.
+  # This method is idempotent; if the alias or implication already exists, keep
+  # it and update the posts again.
+  #
+  # @param antecedent_name [String] the left-hand side of the alias or implication
+  # @param consequent_name [String] the right-hand side of the alias or implication
+  # @param approver [User] the user approving the alias or implication
+  # @param forum_topic [ForumTopic] the forum topic where the alias or implication was requested.
   def self.approve!(antecedent_name:, consequent_name:, approver:, forum_topic: nil)
-    tag_relationship = create!(creator: approver, approver: approver, antecedent_name: antecedent_name, consequent_name: consequent_name, forum_topic: forum_topic)
+    tag_relationship = find_or_create_by!(antecedent_name: antecedent_name, consequent_name: consequent_name, status: "active") do |relationship|
+      relationship.creator = approver
+      relationship.approver = approver
+      relationship.forum_topic = forum_topic
+    end
+
     tag_relationship.process!
   end
 
