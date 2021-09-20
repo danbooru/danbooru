@@ -5,4 +5,12 @@ class ApplicationComponent < ViewComponent::Base
   def policy(subject)
     Pundit.policy!(current_user, subject)
   end
+
+  # XXX Silence warnings about `with_variant` being deprecated until we can fix it.
+  # DEPRECATION WARNING: `with_variant` is deprecated and will be removed in ViewComponent v3.0.0
+  def with_variant(...)
+    ActiveSupport::Deprecation.silence do
+      super(...)
+    end
+  end
 end
