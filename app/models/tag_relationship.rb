@@ -1,4 +1,6 @@
 class TagRelationship < ApplicationRecord
+  STATUSES = %w[active deleted retired]
+
   self.abstract_class = true
 
   belongs_to :creator, class_name: "User"
@@ -15,7 +17,7 @@ class TagRelationship < ApplicationRecord
   scope :retired, -> {where(status: "retired")}
 
   before_validation :normalize_names
-  validates :status, inclusion: { in: %w[active deleted retired] }
+  validates :status, inclusion: { in: STATUSES }
   validates :antecedent_name, presence: true
   validates :consequent_name, presence: true
   validates :approver, presence: { message: "must exist" }, if: -> { approver_id.present? }

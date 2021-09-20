@@ -171,6 +171,11 @@ class BulkUpdateRequestProcessor
         raise Error, "Unknown command: #{command}"
       end
     end
+
+    bulk_update_request.update!(status: "approved")
+  rescue StandardError
+    bulk_update_request.update!(status: "failed")
+    raise
   end
 
   # The list of tags in the script. Used for search BURs by tag.

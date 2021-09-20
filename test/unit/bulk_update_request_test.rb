@@ -3,7 +3,8 @@ require 'test_helper'
 class BulkUpdateRequestTest < ActiveSupport::TestCase
   def create_bur!(script, approver)
     bur = create(:bulk_update_request, script: script)
-    perform_enqueued_jobs { bur.approve!(approver) }
+    bur.approve!(approver)
+    perform_enqueued_jobs
     bur
   end
 
@@ -32,6 +33,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
           assert_equal(true, @bur.valid?)
           assert_equal(true, @tag.reload.artist?)
+          assert_equal("approved", @bur.reload.status)
         end
 
         should "fail if the tag doesn't already exist" do
@@ -53,6 +55,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @alias = TagAlias.find_by(antecedent_name: "foo", consequent_name: "bar")
           assert_equal(true, @alias.present?)
           assert_equal(true, @alias.is_active?)
+          assert_equal("approved", @bur.reload.status)
         end
 
         should "rename the aliased tag's artist entry and wiki page" do
@@ -126,6 +129,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @implication = TagImplication.find_by(antecedent_name: "foo", consequent_name: "bar")
           assert_equal(true, @implication.present?)
           assert_equal(true, @implication.is_active?)
+          assert_equal("approved", @bur.reload.status)
         end
 
         should "fail for an implication that is redundant with an existing implication" do
@@ -189,6 +193,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @alias = TagAlias.find_by(antecedent_name: "foo", consequent_name: "bar")
           assert_equal(true, @alias.present?)
           assert_equal(true, @alias.is_deleted?)
+          assert_equal("approved", @bur.reload.status)
         end
 
         should "fail if the alias isn't active" do
@@ -212,6 +217,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @alias = TagAlias.find_by(antecedent_name: "foo", consequent_name: "bar")
           assert_equal(true, @alias.present?)
           assert_equal(true, @alias.is_deleted?)
+          assert_equal("approved", @bur.reload.status)
         end
       end
 
@@ -223,6 +229,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @implication = TagImplication.find_by(antecedent_name: "foo", consequent_name: "bar")
           assert_equal(true, @implication.present?)
           assert_equal(true, @implication.is_deleted?)
+          assert_equal("approved", @bur.reload.status)
         end
 
         should "fail if the implication isn't active" do
@@ -246,6 +253,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @ti = TagImplication.find_by(antecedent_name: "foo", consequent_name: "bar")
           assert_equal(true, @ti.present?)
           assert_equal(true, @ti.is_deleted?)
+          assert_equal("approved", @bur.reload.status)
         end
       end
 
@@ -257,6 +265,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
         should "update the tags" do
           assert_equal("bar", @post.reload.tag_string)
+          assert_equal("approved", @bur.reload.status)
         end
 
         should "be case-sensitive" do
@@ -264,6 +273,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = create_bur!("mass update source:imageboard -> source:Imageboard", @admin)
 
           assert_equal("Imageboard", @post.reload.source)
+          assert_equal("approved", @bur.reload.status)
         end
       end
 
@@ -276,8 +286,8 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         end
 
         should "rename the tags" do
-          assert_equal("approved", @bur.status)
           assert_equal("bar blah", @post.reload.tag_string)
+          assert_equal("approved", @bur.reload.status)
         end
 
         should "move the tag's artist entry and wiki page" do
@@ -337,18 +347,20 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       context "the nuke command" do
         should "remove tags" do
           @post = create(:post, tag_string: "foo bar")
-          create_bur!("nuke bar", @admin)
+          @bur = create_bur!("nuke bar", @admin)
 
           assert_equal("foo", @post.reload.tag_string)
+          assert_equal("approved", @bur.reload.status)
         end
 
         should "remove implications" do
           @ti1 = create(:tag_implication, antecedent_name: "fly", consequent_name: "insect")
           @ti2 = create(:tag_implication, antecedent_name: "insect", consequent_name: "bug")
-          create_bur!("nuke insect", @admin)
+          @bur = create_bur!("nuke insect", @admin)
 
           assert_equal("deleted", @ti1.reload.status)
           assert_equal("deleted", @ti2.reload.status)
+          assert_equal("approved", @bur.reload.status)
         end
 
         should "remove pools" do
@@ -357,6 +369,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur = create_bur!("nuke pool:#{@pool.id}", @admin)
 
           assert_equal([], @pool.post_ids)
+          assert_equal("approved", @bur.reload.status)
         end
       end
 
@@ -365,20 +378,22 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @p1 = create(:post, tag_string: "maid_dress")
           @p2 = create(:post, tag_string: "maid")
 
-          create_bur!("mass update maid_dress -> maid dress\nalias maid_dress -> maid", @admin)
+          @bur = create_bur!("mass update maid_dress -> maid dress\nalias maid_dress -> maid", @admin)
 
           assert_equal("dress maid", @p1.reload.tag_string)
           assert_equal("maid", @p2.reload.tag_string)
+          assert_equal("approved", @bur.reload.status)
         end
       end
 
       context "that reverses an alias by removing and recreating it" do
         should "not fail with an alias conflict" do
           @ta = create(:tag_alias, antecedent_name: "rabbit", consequent_name: "bunny")
-          create_bur!("unalias rabbit -> bunny\nalias bunny -> rabbit", @admin)
+          @bur = create_bur!("unalias rabbit -> bunny\nalias bunny -> rabbit", @admin)
 
           assert_equal("deleted", @ta.reload.status)
           assert_equal("active", TagAlias.find_by(antecedent_name: "bunny", consequent_name: "rabbit").status)
+          assert_equal("approved", @bur.reload.status)
         end
       end
     end
@@ -494,6 +509,26 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         assert_equal(@admin.id, @ta.approver.id)
         assert_equal(@admin.id, @ti.approver.id)
       end
+
+      should "set the BUR as approved" do
+        assert_equal("approved", @bur.reload.status)
+      end
+
+      should "set the BUR as failed if there is an unexpected error during processing" do
+        @bur = create(:bulk_update_request, script: "alias one -> two")
+        TagAlias.any_instance.stubs(:process!).raises(RuntimeError.new("oh no"))
+
+        assert_equal("pending", @bur.status)
+        @bur.approve!(@admin)
+        assert_equal("processing", @bur.status)
+
+        assert_raises(RuntimeError) { perform_enqueued_jobs }
+        assert_equal("failed", @bur.reload.status)
+
+        assert_equal("active", TagAlias.find_by!(antecedent_name: "one", consequent_name: "two").status)
+        assert_equal("alias one -> two", @bur.script)
+        assert_equal(@admin, @bur.approver)
+      end
     end
 
     should "create a forum topic" do
@@ -511,7 +546,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @req = FactoryBot.create(:bulk_update_request, :script => "create alias AAA -> BBB", :forum_topic_id => @topic.id, :forum_post_id => @post.id, :title => "[bulk] hoge")
       end
 
-      should "gracefully handle validation errors during approval" do
+      should "leave the BUR pending if there is a validation error during approval" do
         @req.stubs(:update!).raises(BulkUpdateRequestProcessor::Error.new("blah"))
         assert_equal("pending", @req.reload.status)
       end

@@ -76,13 +76,22 @@ class DTextTest < ActiveSupport::TestCase
       end
 
       should "parse [ta:<id>], [ti:<id>], [bur:<id>] pseudo tags" do
-        @bur = create(:bulk_update_request)
+        @bur = create(:bulk_update_request, approver: create(:admin_user))
         @ti = create(:tag_implication)
         @ta = create(:tag_alias)
 
-        assert_match(/bulk update request/, DText.format_text("[bur:#{@bur.id}]"))
-        assert_match(/implication ##{@ti.id}/, DText.format_text("[ti:#{@ti.id}]"))
-        assert_match(/alias ##{@ta.id}/, DText.format_text("[ta:#{@ta.id}]"))
+        BulkUpdateRequest::STATUSES.each do |status|
+          @bur.update!(status: status)
+          assert_match(/bulk update request/, DText.format_text("[bur:#{@bur.id}]"))
+        end
+
+        TagRelationship::STATUSES.each do |status|
+          @ta.update!(status: status)
+          @ti.update!(status: status)
+
+          assert_match(/implication ##{@ti.id}/, DText.format_text("[ti:#{@ti.id}]"))
+          assert_match(/alias ##{@ta.id}/, DText.format_text("[ta:#{@ta.id}]"))
+        end
       end
 
       should "link artist tags to the artist page instead of the wiki page" do

@@ -181,7 +181,10 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
       context "for an admin" do
         should "succeed" do
           post_auth approve_bulk_update_request_path(@bulk_update_request), @admin
+
           assert_response :redirect
+          assert_equal("processing", @bulk_update_request.reload.status)
+          perform_enqueued_jobs
           assert_equal("approved", @bulk_update_request.reload.status)
         end
       end
