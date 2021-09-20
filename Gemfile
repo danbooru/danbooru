@@ -54,14 +54,6 @@ gem 'puma_worker_killer'
 gem "rack-timeout", require: "rack/timeout/base"
 gem "parallel"
 
-group :production do
-  gem 'unicorn', :platforms => :ruby
-end
-
-group :production do
-  gem 'unicorn-worker-killer'
-end
-
 group :development do
   gem 'rubocop', require: false
   gem 'rubocop-rails', require: false

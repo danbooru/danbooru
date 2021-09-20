@@ -241,7 +241,6 @@ GEM
     jmespath (1.4.0)
     json (2.5.1)
     jwt (2.2.3)
-    kgio (2.11.4)
     kramdown (2.3.1)
       rexml
     kramdown-parser-gfm (1.1.0)
@@ -350,7 +349,6 @@ GEM
       rake (>= 0.13)
       thor (~> 1.0)
     rainbow (3.0.0)
-    raindrops (0.19.2)
     rake (13.0.6)
     rakismet (1.5.4)
     rb-fsevent (0.11.0)
@@ -460,12 +458,6 @@ GEM
       unf_ext
     unf_ext (0.0.7.7)
     unicode-display_width (2.0.0)
-    unicorn (6.0.0)
-      kgio (~> 2.6)
-      raindrops (~> 0.7)
-    unicorn-worker-killer (0.4.5)
-      get_process_mem (~> 0)
-      unicorn (>= 4, < 7)
     view_component (2.40.0)
       activesupport (>= 5.0.0, < 8.0)
       method_source (~> 1.0)
@@ -562,8 +554,6 @@ DEPENDENCIES
   stripe-ruby-mock
   terminal-table
   tzinfo-data
-  unicorn
-  unicorn-worker-killer
   view_component
   webpacker (= 6.0.0.beta.6)
 
