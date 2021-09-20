@@ -65,7 +65,7 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
 
-        should respond_to_search({}, other_params: {group_by: "comment"}).with { [@deleted_comment, @mod_comment, @user_comment] }
+        should respond_to_search(other_params: {group_by: "comment"}).with { [@deleted_comment, @mod_comment, @user_comment] }
         should respond_to_search(body_matches: "blah").with { @mod_comment }
         should respond_to_search(score: 10).with { @user_comment }
         should respond_to_search(is_sticky: "true").with { @mod_comment }

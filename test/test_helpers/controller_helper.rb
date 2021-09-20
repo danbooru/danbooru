@@ -9,7 +9,7 @@ module ControllerHelper
   #   setup { @touhou = create(:tag, name: "touhou") }
   #   should respond_to_search(name: "touhou").with { @touhou }
   #
-  def respond_to_search(search_params, other_params: {})
+  ruby2_keywords def respond_to_search(search_params, other_params: {})
     RespondToSearchMatcher.new(search_params, other_params)
   end
 
