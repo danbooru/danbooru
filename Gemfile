@@ -12,9 +12,6 @@ gem 'ruby-vips'
 gem 'net-sftp'
 gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt', :require => "bcrypt"
-gem 'capistrano', '~> 3.10'
-gem 'capistrano-rails'
-gem 'capistrano-rbenv'
 gem 'rubyzip', :require => "zip"
 gem 'stripe'
 gem 'aws-sdk-sqs', '~> 1'
@@ -59,12 +56,10 @@ gem "parallel"
 
 group :production do
   gem 'unicorn', :platforms => :ruby
-  gem 'capistrano3-unicorn'
 end
 
 group :production do
   gem 'unicorn-worker-killer'
-  gem 'capistrano-deploytags', '~> 1.0.0', require: false
 end
 
 group :development do
