@@ -2723,6 +2723,50 @@ ALTER SEQUENCE public.pixiv_ugoira_frame_data_id_seq OWNED BY public.pixiv_ugoir
 
 
 --
+-- Name: pool_versions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.pool_versions (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    pool_id bigint NOT NULL,
+    updater_id bigint NOT NULL,
+    updater_ip_addr inet NOT NULL,
+    version integer DEFAULT 1 NOT NULL,
+    name text NOT NULL,
+    description text DEFAULT ''::text NOT NULL,
+    category character varying NOT NULL,
+    is_active boolean DEFAULT true NOT NULL,
+    is_deleted boolean DEFAULT false NOT NULL,
+    description_changed boolean DEFAULT false NOT NULL,
+    name_changed boolean DEFAULT false NOT NULL,
+    post_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
+    added_post_ids integer[] DEFAULT '{}'::integer[] NOT NULL,
+    removed_post_ids integer[] DEFAULT '{}'::integer[] NOT NULL
+);
+
+
+--
+-- Name: pool_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.pool_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pool_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.pool_versions_id_seq OWNED BY public.pool_versions.id;
+
+
+--
 -- Name: pools; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2941,6 +2985,49 @@ CREATE SEQUENCE public.post_replacements_id_seq
 --
 
 ALTER SEQUENCE public.post_replacements_id_seq OWNED BY public.post_replacements.id;
+
+
+--
+-- Name: post_versions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.post_versions (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    post_id bigint NOT NULL,
+    updater_id bigint NOT NULL,
+    updater_ip_addr inet NOT NULL,
+    version integer DEFAULT 1 NOT NULL,
+    parent_changed boolean DEFAULT false NOT NULL,
+    rating_changed boolean DEFAULT false NOT NULL,
+    source_changed boolean DEFAULT false NOT NULL,
+    parent_id integer,
+    rating character varying(1) NOT NULL,
+    source text DEFAULT ''::text NOT NULL,
+    tags text DEFAULT ''::text NOT NULL,
+    added_tags text[] DEFAULT '{}'::text[] NOT NULL,
+    removed_tags text[] DEFAULT '{}'::text[] NOT NULL
+);
+
+
+--
+-- Name: post_versions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.post_versions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: post_versions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.post_versions_id_seq OWNED BY public.post_versions.id;
 
 
 --
@@ -4403,6 +4490,13 @@ ALTER TABLE ONLY public.pixiv_ugoira_frame_data ALTER COLUMN id SET DEFAULT next
 
 
 --
+-- Name: pool_versions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pool_versions ALTER COLUMN id SET DEFAULT nextval('public.pool_versions_id_seq'::regclass);
+
+
+--
 -- Name: pools id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4442,6 +4536,13 @@ ALTER TABLE ONLY public.post_flags ALTER COLUMN id SET DEFAULT nextval('public.p
 --
 
 ALTER TABLE ONLY public.post_replacements ALTER COLUMN id SET DEFAULT nextval('public.post_replacements_id_seq'::regclass);
+
+
+--
+-- Name: post_versions id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.post_versions ALTER COLUMN id SET DEFAULT nextval('public.post_versions_id_seq'::regclass);
 
 
 --
@@ -4805,6 +4906,14 @@ ALTER TABLE ONLY public.pixiv_ugoira_frame_data
 
 
 --
+-- Name: pool_versions pool_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pool_versions
+    ADD CONSTRAINT pool_versions_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: pools pools_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4850,6 +4959,14 @@ ALTER TABLE ONLY public.post_flags
 
 ALTER TABLE ONLY public.post_replacements
     ADD CONSTRAINT post_replacements_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: post_versions post_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.post_versions
+    ADD CONSTRAINT post_versions_pkey PRIMARY KEY (id);
 
 
 --
@@ -7187,6 +7304,69 @@ CREATE UNIQUE INDEX index_pixiv_ugoira_frame_data_on_post_id ON public.pixiv_ugo
 
 
 --
+-- Name: index_pool_versions_on_added_post_ids; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pool_versions_on_added_post_ids ON public.pool_versions USING btree (added_post_ids);
+
+
+--
+-- Name: index_pool_versions_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pool_versions_on_created_at ON public.pool_versions USING btree (created_at);
+
+
+--
+-- Name: index_pool_versions_on_description_changed; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pool_versions_on_description_changed ON public.pool_versions USING btree (description_changed);
+
+
+--
+-- Name: index_pool_versions_on_name_changed; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pool_versions_on_name_changed ON public.pool_versions USING btree (name_changed);
+
+
+--
+-- Name: index_pool_versions_on_pool_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pool_versions_on_pool_id ON public.pool_versions USING btree (pool_id);
+
+
+--
+-- Name: index_pool_versions_on_post_ids; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pool_versions_on_post_ids ON public.pool_versions USING btree (post_ids);
+
+
+--
+-- Name: index_pool_versions_on_removed_post_ids; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pool_versions_on_removed_post_ids ON public.pool_versions USING btree (removed_post_ids);
+
+
+--
+-- Name: index_pool_versions_on_updated_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pool_versions_on_updated_at ON public.pool_versions USING btree (updated_at);
+
+
+--
+-- Name: index_pool_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pool_versions_on_updater_id ON public.pool_versions USING btree (updater_id);
+
+
+--
 -- Name: index_pools_on_category; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7331,6 +7511,76 @@ CREATE INDEX index_post_replacements_on_creator_id ON public.post_replacements U
 --
 
 CREATE INDEX index_post_replacements_on_post_id ON public.post_replacements USING btree (post_id);
+
+
+--
+-- Name: index_post_versions_on_added_tags; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_versions_on_added_tags ON public.post_versions USING btree (added_tags);
+
+
+--
+-- Name: index_post_versions_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_versions_on_created_at ON public.post_versions USING btree (created_at);
+
+
+--
+-- Name: index_post_versions_on_parent_changed; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_versions_on_parent_changed ON public.post_versions USING btree (parent_changed);
+
+
+--
+-- Name: index_post_versions_on_post_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_versions_on_post_id ON public.post_versions USING btree (post_id);
+
+
+--
+-- Name: index_post_versions_on_rating_changed; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_versions_on_rating_changed ON public.post_versions USING btree (rating_changed);
+
+
+--
+-- Name: index_post_versions_on_removed_tags; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_versions_on_removed_tags ON public.post_versions USING btree (removed_tags);
+
+
+--
+-- Name: index_post_versions_on_source_changed; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_versions_on_source_changed ON public.post_versions USING btree (source_changed);
+
+
+--
+-- Name: index_post_versions_on_updated_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_versions_on_updated_at ON public.post_versions USING btree (updated_at);
+
+
+--
+-- Name: index_post_versions_on_updater_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_versions_on_updater_id ON public.post_versions USING btree (updater_id);
+
+
+--
+-- Name: index_post_versions_on_version; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_versions_on_version ON public.post_versions USING btree (version);
 
 
 --
@@ -8177,6 +8427,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210330003356'),
 ('20210330093133'),
 ('20210901230931'),
-('20210908015203');
+('20210908015203'),
+('20210921164936'),
+('20210921170444');
 
 

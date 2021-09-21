@@ -92,15 +92,6 @@ jobs:
         cd /danbooru
         bin/rails db:test:prepare
 
-        apt-get update
-        apt-get -y install --no-install-recommends ruby-dev postgresql-server-dev-all build-essential zlib1g-dev git
-        mkdir ~/archives
-        cd ~/archives
-        git clone https://github.com/evazion/archives .
-        gem install bundler -v 1.13.3
-        bundle install --binstubs
-        bin/rake db:migrate
-
     - name: Run tests
       run: |
         export HOME=/root
