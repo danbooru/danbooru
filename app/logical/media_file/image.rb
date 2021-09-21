@@ -80,7 +80,7 @@ class MediaFile::Image < MediaFile
   end
 
   def is_animated_png?
-    file_ext == :png && APNGInspector.new(file.path).inspect!.animated?
+    file_ext == :png && metadata.fetch("PNG:AnimationFrames", 1) > 1
   end
 
   # @return [Vips::Image] the Vips image object for the file

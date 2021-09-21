@@ -190,6 +190,59 @@ class MediaFileTest < ActiveSupport::TestCase
     end
   end
 
+  context "a PNG file" do
+    context "that is not animated" do
+      should "not be detected as animated" do
+        file = MediaFile.open("test/files/apng/not_apng.png")
+
+        assert_equal(false, file.is_corrupt?)
+        assert_equal(false, file.is_animated?)
+      end
+    end
+
+    context "that is animated" do
+      should "be detected as animated" do
+        file = MediaFile.open("test/files/apng/normal_apng.png")
+
+        assert_equal(false, file.is_corrupt?)
+        assert_equal(true, file.is_animated?)
+      end
+    end
+
+    context "that is animated but with only one frame" do
+      should "not be detected as animated" do
+        file = MediaFile.open("test/files/apng/single_frame.png")
+
+        assert_equal(false, file.is_corrupt?)
+        assert_equal(false, file.is_animated?)
+      end
+    end
+
+    context "that is animated but malformed" do
+      should "be handled correctly" do
+        file = MediaFile.open("test/files/apng/iend_missing.png")
+        assert_equal(false, file.is_corrupt?)
+        assert_equal(true, file.is_animated?)
+
+        file = MediaFile.open("test/files/apng/misaligned_chunks.png")
+        assert_equal(true, file.is_corrupt?)
+        assert_equal(true, file.is_animated?)
+
+        file = MediaFile.open("test/files/apng/broken.png")
+        assert_equal(true, file.is_corrupt?)
+        assert_equal(true, file.is_animated?)
+
+        file = MediaFile.open("test/files/apng/actl_wronglen.png")
+        assert_equal(false, file.is_corrupt?)
+        assert_equal(true, file.is_animated?)
+
+        file = MediaFile.open("test/files/apng/actl_zero_frames.png")
+        assert_equal(false, file.is_corrupt?)
+        assert_equal(false, file.is_animated?)
+      end
+    end
+  end
+
   context "a corrupt GIF" do
     should "still read the metadata" do
       @file = MediaFile.open("test/files/test-corrupt.gif")
