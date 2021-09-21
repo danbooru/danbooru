@@ -30,4 +30,48 @@ class MediaAsset < ApplicationRecord
   def is_animated_png?
     file_ext == "png" && metadata.fetch("PNG:AnimationFrames", 1) > 1
   end
+
+  # @see https://exiftool.org/TagNames/JPEG.html
+  # @see https://exiftool.org/TagNames/PNG.html
+  # @see https://danbooru.donmai.us/posts?tags=exif:File:ColorComponents=1
+  # @see https://danbooru.donmai.us/posts?tags=exif:PNG:ColorType=Grayscale
+  def is_greyscale?
+    metadata["File:ColorComponents"] == 1 ||
+    metadata["PNG:ColorType"] == "Grayscale" ||
+    metadata["PNG:ColorType"] == "Grayscale with Alpha"
+
+    # Not always accurate:
+    # metadata["ICC-header:ColorSpaceData"] == "GRAY" ||
+    # metadata["XMP-photoshop:ColorMode"] == "Grayscale" ||
+    # metadata["XMP-photoshop:ICCProfileName"] == "EPSON Gray - Gamma 2.2" ||
+    # metadata["XMP-photoshop:ICCProfileName"] == "Gray Gamma 2.2"
+  end
+
+  # https://exiftool.org/TagNames/EXIF.html
+  def is_rotated?
+    metadata["IFD0:Orientation"].in?(["Rotate 90 CW", "Rotate 270 CW", "Rotate 180"]) ||
+    metadata["IFD1:Orientation"].in?(["Rotate 90 CW", "Rotate 270 CW", "Rotate 180"])
+  end
+
+  # Some animations technically have a finite loop count, but loop for hundreds
+  # or thousands of times. Only count animations with a low loop count as non-repeating.
+  def is_non_repeating_animation?
+    loop_count.in?(0..10)
+  end
+
+  # @see https://exiftool.org/TagNames/GIF.html
+  # @see https://exiftool.org/TagNames/PNG.html
+  # @see https://danbooru.donmai.us/posts?tags=-exif:GIF:AnimationIterations=Infinite+animated_gif
+  # @see https://danbooru.donmai.us/posts?tags=-exif:PNG:AnimationPlays=inf+animated_png
+  def loop_count
+    return Float::INFINITY if metadata["GIF:AnimationIterations"] == "Infinite"
+    return Float::INFINITY if metadata["PNG:AnimationPlays"] == "inf"
+    return metadata["GIF:AnimationIterations"] if metadata["GIF:AnimationIterations"].present?
+    return metadata["PNG:AnimationPlays"] if metadata["PNG:AnimationPlays"].present?
+
+    # If the AnimationIterations tag isn't present, then it's counted as a loop count of 0.
+    return 0 if is_animated_gif? && metadata["GIF:AnimationIterations"].nil?
+
+    nil
+  end
 end

@@ -1318,6 +1318,38 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "a greyscale image missing the greyscale tag" do
+        should "automatically add the greyscale tag" do
+          @media_asset = MediaAsset.create!(file: "test/files/test-grey-no-profile.jpg")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme")
+          assert_equal("greyscale tagme", @post.tag_string)
+        end
+      end
+
+      context "an exif-rotated image missing the exif_rotation tag" do
+        should "automatically add the exif_rotation tag" do
+          @media_asset = MediaAsset.create!(file: "test/files/test-rotation-90cw.jpg")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme")
+          assert_equal("exif_rotation tagme", @post.tag_string)
+        end
+      end
+
+      context "a non-repeating GIF missing the non-repeating_animation tag" do
+        should "automatically add the non-repeating_animation tag" do
+          @media_asset = MediaAsset.create!(file: "test/files/test-animated-86x52-loop-1.gif")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme")
+          assert_equal("animated animated_gif non-repeating_animation tagme", @post.tag_string)
+
+          @media_asset = MediaAsset.create!(file: "test/files/test-animated-86x52-loop-2.gif")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme")
+          assert_equal("animated animated_gif non-repeating_animation tagme", @post.tag_string)
+        end
+      end
+
       should "have an array representation of its tags" do
         post = FactoryBot.create(:post)
         post.reload

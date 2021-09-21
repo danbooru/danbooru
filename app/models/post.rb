@@ -498,7 +498,7 @@ class Post < ApplicationRecord
     end
 
     def add_automatic_tags(tags)
-      tags -= %w[incredibly_absurdres absurdres highres lowres huge_filesize flash video ugoira animated_gif animated_png]
+      tags -= %w[incredibly_absurdres absurdres highres lowres huge_filesize flash video ugoira animated_gif animated_png exif_rotation non-repeating_animation]
 
       if image_width >= 10_000 || image_height >= 10_000
         tags << "incredibly_absurdres"
@@ -542,6 +542,10 @@ class Post < ApplicationRecord
       tags << "animated" if media_asset.is_animated?
       tags << "animated_gif" if media_asset.is_animated_gif?
       tags << "animated_png" if media_asset.is_animated_png?
+
+      tags << "greyscale" if media_asset.is_greyscale?
+      tags << "exif_rotation" if media_asset.is_rotated?
+      tags << "non-repeating_animation" if media_asset.is_non_repeating_animation?
 
       tags
     end
