@@ -3,23 +3,12 @@
 # @see https://github.com/libvips/ruby-vips
 # @see https://libvips.github.io/libvips/API/current
 class MediaFile::Image < MediaFile
-  # Taken from ArgyllCMS 2.0.0 (see also: https://ninedegreesbelow.com/photography/srgb-profile-comparison.html)
-  SRGB_PROFILE = "#{Rails.root}/config/sRGB.icm"
-
   # http://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegsave
   JPEG_OPTIONS = { Q: 90, background: 255, strip: true, interlace: true, optimize_coding: true }
 
   # http://jcupitt.github.io/libvips/API/current/libvips-resample.html#vips-thumbnail
-  if Vips.at_least_libvips?(8, 10)
-    THUMBNAIL_OPTIONS = { size: :down, linear: false, no_rotate: true }
-    CROP_OPTIONS = { crop: :attention, linear: false, no_rotate: true }
-  elsif Vips.at_least_libvips?(8, 8)
-    THUMBNAIL_OPTIONS = { size: :down, linear: false, no_rotate: true, export_profile: "srgb" }
-    CROP_OPTIONS = { crop: :attention, linear: false, no_rotate: true, export_profile: "srgb" }
-  else
-    THUMBNAIL_OPTIONS = { size: :down, linear: false, auto_rotate: false, export_profile: SRGB_PROFILE, import_profile: SRGB_PROFILE }
-    CROP_OPTIONS = { crop: :attention, linear: false, auto_rotate: false, export_profile: SRGB_PROFILE, import_profile: SRGB_PROFILE }
-  end
+  THUMBNAIL_OPTIONS = { size: :down, linear: false, no_rotate: true }
+  CROP_OPTIONS = { crop: :attention, linear: false, no_rotate: true }
 
   def dimensions
     image.size
@@ -74,9 +63,6 @@ class MediaFile::Image < MediaFile
 
   def is_animated_gif?
     file_ext == :gif && image.get("n-pages") > 1
-  # older versions of libvips that don't support n-pages will raise an error
-  rescue Vips::Error
-    false
   end
 
   def is_animated_png?
