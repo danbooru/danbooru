@@ -9,6 +9,8 @@ FactoryBot.define do
     status {"pending"}
     server {Socket.gethostname}
     source {"xxx"}
+    md5 { SecureRandom.hex(32) }
+    media_asset { build(:media_asset) }
 
     factory(:source_upload) do
       source {"http://www.google.com/intl/en_ALL/images/logo.gif"}
@@ -28,6 +30,9 @@ FactoryBot.define do
         IO.copy_stream("#{Rails.root}/test/files/test.jpg", f.path)
         ActionDispatch::Http::UploadedFile.new(tempfile: f, filename: "test.jpg")
       end
+
+      md5 { MediaFile.open("test/files/test.jpg").md5 }
+      media_asset { build(:media_asset, file: "test/files/test.jpg") }
     end
 
     factory(:large_jpg_upload) do

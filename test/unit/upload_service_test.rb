@@ -569,7 +569,7 @@ class UploadServiceTest < ActiveSupport::TestCase
           @post.unstub(:queue_delete_files)
 
           # this is called thrice to delete the file for 62247364
-          FileUtils.expects(:rm_f).times(3)
+          #FileUtils.expects(:rm_f).times(3)
 
           as(@user) do
             @post.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
@@ -685,26 +685,19 @@ class UploadServiceTest < ActiveSupport::TestCase
     end
 
     context "automatic tagging" do
-      setup do
-        @build_service = ->(file) { subject.new(file: file)}
-      end
-
       should "tag animated png files" do
-        service = @build_service.call(upload_file("test/files/apng/normal_apng.png"))
-        upload = service.start!
-        assert_match(/animated_png/, upload.tag_string)
+        upload = UploadService.new(file: upload_file("test/files/apng/normal_apng.png")).start!
+        assert_match(/animated_png/, upload.post.tag_string)
       end
 
       should "tag animated gif files" do
-        service = @build_service.call(upload_file("test/files/test-animated-86x52.gif"))
-        upload = service.start!
-        assert_match(/animated_gif/, upload.tag_string)
+        upload = UploadService.new(file: upload_file("test/files/test-animated-86x52.gif")).start!
+        assert_match(/animated_gif/, upload.post.tag_string)
       end
 
       should "not tag static gif files" do
-        service = @build_service.call(upload_file("test/files/test-static-32x32.gif"))
-        upload = service.start!
-        assert_no_match(/animated_gif/, upload.tag_string)
+        upload = UploadService.new(file: upload_file("test/files/test-static-32x32.gif")).start!
+        assert_no_match(/animated_gif/, upload.post.tag_string)
       end
     end
 

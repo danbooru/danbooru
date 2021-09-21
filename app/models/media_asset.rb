@@ -1,5 +1,6 @@
 class MediaAsset < ApplicationRecord
   has_one :media_metadata, dependent: :destroy
+  delegate :metadata, to: :media_metadata
 
   def self.search(params)
     q = search_attributes(params, :id, :created_at, :updated_at, :md5, :file_ext, :file_size, :image_width, :image_height)
@@ -16,5 +17,17 @@ class MediaAsset < ApplicationRecord
     self.image_width = media_file.width
     self.image_height = media_file.height
     self.media_metadata = MediaMetadata.new(file: media_file)
+  end
+
+  def is_animated?
+    is_animated_gif? || is_animated_png?
+  end
+
+  def is_animated_gif?
+    file_ext == "gif" && metadata.fetch("GIF:FrameCount", 1) > 1
+  end
+
+  def is_animated_png?
+    file_ext == "png" && metadata.fetch("PNG:AnimationFrames", 1) > 1
   end
 end
