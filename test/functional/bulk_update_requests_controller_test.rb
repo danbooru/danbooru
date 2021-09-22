@@ -48,10 +48,16 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "#update" do
-      should "allow builders to update other people's requests" do
-        put_auth bulk_update_request_path(@bulk_update_request.id), create(:builder_user), params: {bulk_update_request: {script: "create alias zzz -> 222" }}
+      should "allow admins to update other people's requests" do
+        put_auth bulk_update_request_path(@bulk_update_request.id), create(:admin_user), params: {bulk_update_request: {script: "create alias zzz -> 222" }}
         assert_response :redirect
         assert_equal("create alias zzz -> 222", @bulk_update_request.reload.script)
+      end
+
+      should "not allow builders to update other people's requests" do
+        put_auth bulk_update_request_path(@bulk_update_request.id), create(:builder_user), params: {bulk_update_request: {script: "create alias zzz -> 222" }}
+        assert_response 403
+        assert_equal("create alias aaa -> bbb", @bulk_update_request.reload.script)
       end
 
       should "not allow members to update other people's requests" do
@@ -111,10 +117,10 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      context "for another member" do
+      context "for another Builder" do
         should "fail" do
           assert_difference("BulkUpdateRequest.count", 0) do
-            delete_auth bulk_update_request_path(@bulk_update_request), create(:user)
+            delete_auth bulk_update_request_path(@bulk_update_request), create(:builder_user)
             assert_response 403
           end
         end
