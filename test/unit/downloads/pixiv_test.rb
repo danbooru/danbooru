@@ -54,6 +54,8 @@ module Downloads
         end
 
         should "download the full size image instead of the HTML page" do
+          skip "Pixiv credentials not configured" unless Sources::Strategies::Pixiv.enabled?
+
           assert_rewritten(@p0_full_size_image, @medium_page)
           assert_rewritten(@p0_full_size_image, @manga_page)
           assert_rewritten(@p1_full_size_image, @manga_big_p1_page)
@@ -63,6 +65,8 @@ module Downloads
         end
 
         should "download the full size image instead of the thumbnail" do
+          skip "Pixiv credentials not configured" unless Sources::Strategies::Pixiv.enabled?
+
           assert_rewritten(@p0_full_size_image, @p0_large_thumbnail)
           assert_rewritten(@p1_full_size_image, @p1_large_thumbnail)
           assert_downloaded(@p0_file_size, @p0_large_thumbnail)
