@@ -4,7 +4,6 @@ module DanbooruMaintenance
   def hourly
     safely { Upload.prune! }
     safely { PostPruner.prune! }
-    #safely { PostAppealForumUpdater.update_forum! }
     safely { RateLimit.prune! }
     safely { regenerate_post_counts! }
   end

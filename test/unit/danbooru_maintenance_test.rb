@@ -38,32 +38,4 @@ class DanbooruMaintenanceTest < ActiveSupport::TestCase
       end
     end
   end
-
-  context "PostAppealForumUpdater" do
-    should "work when there are no pending appeals" do
-      assert_nothing_raised do
-        PostAppealForumUpdater.update_forum!
-      end
-    end
-
-    should "post pending appeals to the deletion appeal thread" do
-      @topic = as(create(:user)) { create(:forum_topic, title: PostAppealForumUpdater::APPEAL_TOPIC_TITLE) }
-      @appeal1 = create(:post_appeal, reason: "test")
-      @appeal2 = create(:post_appeal, reason: "")
-      @appeal3 = create(:post_appeal, created_at: 2.hours.ago)
-
-      PostAppealForumUpdater.update_forum!
-
-      assert_equal(@topic.id, ForumPost.last.topic_id)
-      assert_equal("post ##{@appeal1.post_id}: #{@appeal1.reason}\npost ##{@appeal2.post_id}", ForumPost.last.body)
-    end
-
-    should "create the deletion appeal thread if it doesn't already exist" do
-      @appeal = create(:post_appeal, reason: "")
-      PostAppealForumUpdater.update_forum!
-
-      assert_equal(PostAppealForumUpdater::APPEAL_TOPIC_TITLE, ForumPost.last.topic.title)
-      assert_equal("post ##{@appeal.post_id}", ForumPost.last.body)
-    end
-  end
 end
