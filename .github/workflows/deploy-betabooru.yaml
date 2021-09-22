@@ -8,14 +8,11 @@ permissions: read-all
 on:
   # https://docs.github.com/en/actions/reference/events-that-trigger-workflows#workflow_run
   workflow_dispatch:
-  workflow_run:
-    workflows: ["Docker Build"]
-    types: [completed]
+  push:
     branches: [betabooru]
 
 jobs:
   deploy-betabooru:
-    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
 
     # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#concurrency
