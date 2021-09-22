@@ -1,4 +1,6 @@
 class TagRelationship < ApplicationRecord
+  STATUSES = %w[active deleted retired]
+
   self.abstract_class = true
 
   belongs_to :creator, class_name: "User"
@@ -15,7 +17,7 @@ class TagRelationship < ApplicationRecord
   scope :retired, -> {where(status: "retired")}
 
   before_validation :normalize_names
-  validates :status, inclusion: { in: %w[active deleted retired] }
+  validates :status, inclusion: { in: STATUSES }
   validates :antecedent_name, presence: true
   validates :consequent_name, presence: true
   validates :approver, presence: { message: "must exist" }, if: -> { approver_id.present? }
@@ -113,8 +115,22 @@ class TagRelationship < ApplicationRecord
     end
   end
 
+  # Create a new alias or implication, set it to active, and update the posts.
+  # This method is idempotent; if the alias or implication already exists, keep
+  # it and update the posts again.
+  #
+  # @param antecedent_name [String] the left-hand side of the alias or implication
+  # @param consequent_name [String] the right-hand side of the alias or implication
+  # @param approver [User] the user approving the alias or implication
+  # @param forum_topic [ForumTopic] the forum topic where the alias or implication was requested.
   def self.approve!(antecedent_name:, consequent_name:, approver:, forum_topic: nil)
-    ProcessTagRelationshipJob.perform_later(class_name: name, approver: approver, antecedent_name: antecedent_name, consequent_name: consequent_name, forum_topic: forum_topic)
+    tag_relationship = find_or_create_by!(antecedent_name: antecedent_name, consequent_name: consequent_name, status: "active") do |relationship|
+      relationship.creator = approver
+      relationship.approver = approver
+      relationship.forum_topic = forum_topic
+    end
+
+    tag_relationship.process!
   end
 
   def self.model_restriction(table)

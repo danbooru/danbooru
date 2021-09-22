@@ -7,15 +7,11 @@ gem "pg"
 gem "delayed_job"
 gem "delayed_job_active_record"
 gem "simple_form"
-gem "whenever", :require => false
 gem "sanitize"
 gem 'ruby-vips'
 gem 'net-sftp'
 gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt', :require => "bcrypt"
-gem 'capistrano', '~> 3.10'
-gem 'capistrano-rails'
-gem 'capistrano-rbenv'
 gem 'rubyzip', :require => "zip"
 gem 'stripe'
 gem 'aws-sdk-sqs', '~> 1'
@@ -56,16 +52,7 @@ gem 'clockwork'
 gem 'puma-metrics'
 gem 'puma_worker_killer'
 gem "rack-timeout", require: "rack/timeout/base"
-
-group :production do
-  gem 'unicorn', :platforms => :ruby
-  gem 'capistrano3-unicorn'
-end
-
-group :production do
-  gem 'unicorn-worker-killer'
-  gem 'capistrano-deploytags', '~> 1.0.0', require: false
-end
+gem "parallel"
 
 group :development do
   gem 'rubocop', require: false

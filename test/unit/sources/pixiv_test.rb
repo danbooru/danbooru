@@ -2,6 +2,10 @@ require 'test_helper'
 
 module Sources
   class PixivTest < ActiveSupport::TestCase
+    setup do
+      skip "Pixiv credentials not configured" unless Sources::Strategies::Pixiv.enabled?
+    end
+
     def assert_illust_id(illust_id, url)
       site = Sources::Strategies.find(url)
       assert_equal(illust_id, site.illust_id)

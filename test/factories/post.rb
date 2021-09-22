@@ -12,5 +12,6 @@ FactoryBot.define do
     file_size {2000}
     rating {"q"}
     source { FFaker::Internet.http_url }
+    media_asset { build(:media_asset) }
   end
 end

@@ -81,6 +81,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a direct link twitter post" do
         setup do
+          skip "Twitter credentials not configured" unless Sources::Strategies::Twitter.enabled?
+
           @ref = "https://twitter.com/onsen_musume_jp/status/865534101918330881"
           @source = "https://pbs.twimg.com/media/DAL-ntWV0AEbhes.jpg:orig"
         end
@@ -116,6 +118,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a pixiv post" do
         setup do
+          skip "Pixiv credentials not configured" unless Sources::Strategies::Pixiv.enabled?
           @ref = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=49270482"
           @source = "https://i.pximg.net/img-original/img/2015/03/14/17/53/32/49270482_p0.jpg"
         end
@@ -253,6 +256,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a 2+ minute long video" do
         should "allow the upload if the user is an admin" do
+          skip "Twitter keys are not set" unless Danbooru.config.twitter_api_key
+
           @source = "https://twitter.com/7u_NABY/status/1269599527700295681"
           post_auth uploads_path, create(:admin_user, created_at: 1.week.ago), params: { upload: { tag_string: "aaa", rating: "q", source: @source }}
           assert_redirected_to Upload.last
@@ -323,8 +328,8 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://nijie.info/view_popup.php?id=213043")
         should_upload_successfully("https://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg")
 
-        should_upload_successfully("https://pawoo.net/web/statuses/1202176")
-        should_upload_successfully("https://img.pawoo.net/media_attachments/files/000/128/953/original/4c0a06087b03343f.png")
+        should_upload_successfully("https://pawoo.net/web/statuses/1202176") if Danbooru.config.pawoo_client_id.present? # XXX
+        should_upload_successfully("https://img.pawoo.net/media_attachments/files/000/128/953/original/4c0a06087b03343f.png") if Danbooru.config.pawoo_client_id.present? # XXX
 
         should_upload_successfully("https://www.pixiv.net/en/artworks/64476642")
         should_upload_successfully("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg")

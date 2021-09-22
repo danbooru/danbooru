@@ -348,6 +348,7 @@ class ArtistTest < ActiveSupport::TestCase
       end
 
       should "find the artist" do
+        skip "Nijie credentials not configured" unless Sources::Strategies::Nijie.enabled?
         assert_artist_found("evazion", "http://nijie.info/view.php?id=218944")
         assert_artist_found("728995",  "http://nijie.info/view.php?id=213043")
       end

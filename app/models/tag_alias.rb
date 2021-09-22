@@ -1,5 +1,7 @@
 class TagAlias < TagRelationship
-  validates_uniqueness_of :antecedent_name, scope: :status, conditions: -> { active }
+  # Validate that the alias doesn't exist yet when it's created or when a BUR
+  # is requested, but not when a BUR is approved (to allow failed BURs to be reapproved)
+  validates_uniqueness_of :antecedent_name, scope: :status, conditions: -> { active }, on: %i[create update request]
   validate :absence_of_transitive_relation
 
   before_create :delete_conflicting_relationships

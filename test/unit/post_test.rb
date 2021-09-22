@@ -1282,13 +1282,71 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
-      context "tagged with animated_gif or animated_png" do
-        should "remove the tag if not a gif or png" do
-          @post.update(tag_string: "tagme animated_gif")
+      context "a static image tagged with animated_gif" do
+        should "remove the tag" do
+          @media_asset = create(:media_asset, file: "test/files/test-static-32x32.gif")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme animated animated_gif")
           assert_equal("tagme", @post.tag_string)
+        end
+      end
 
-          @post.update(tag_string: "tagme animated_png")
+      context "a static image tagged with animated_png" do
+        should "remove the tag" do
+          @media_asset = create(:media_asset, file: "test/files/test.png")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme animated animated_png")
           assert_equal("tagme", @post.tag_string)
+        end
+      end
+
+      context "an animated gif missing the animated_gif tag" do
+        should "automatically add the animated_gif tag" do
+          @media_asset = MediaAsset.create!(file: "test/files/test-animated-86x52.gif")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme")
+          assert_equal("animated animated_gif tagme", @post.tag_string)
+        end
+      end
+
+      context "an animated png missing the animated_png tag" do
+        should "automatically add the animated_png tag" do
+          @media_asset = MediaAsset.create!(file: "test/files/test-animated-256x256.png")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme")
+          assert_equal("animated animated_png tagme", @post.tag_string)
+        end
+      end
+
+      context "a greyscale image missing the greyscale tag" do
+        should "automatically add the greyscale tag" do
+          @media_asset = MediaAsset.create!(file: "test/files/test-grey-no-profile.jpg")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme")
+          assert_equal("greyscale tagme", @post.tag_string)
+        end
+      end
+
+      context "an exif-rotated image missing the exif_rotation tag" do
+        should "automatically add the exif_rotation tag" do
+          @media_asset = MediaAsset.create!(file: "test/files/test-rotation-90cw.jpg")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme")
+          assert_equal("exif_rotation tagme", @post.tag_string)
+        end
+      end
+
+      context "a non-repeating GIF missing the non-repeating_animation tag" do
+        should "automatically add the non-repeating_animation tag" do
+          @media_asset = MediaAsset.create!(file: "test/files/test-animated-86x52-loop-1.gif")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme")
+          assert_equal("animated animated_gif non-repeating_animation tagme", @post.tag_string)
+
+          @media_asset = MediaAsset.create!(file: "test/files/test-animated-86x52-loop-2.gif")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme")
+          assert_equal("animated animated_gif non-repeating_animation tagme", @post.tag_string)
         end
       end
 

@@ -146,6 +146,8 @@ module Sources
 
     context "A deleted or invalid source" do
       setup do
+        skip "Pawoo keys not set" unless Danbooru.config.pawoo_client_id
+
         @site1 = Sources::Strategies.find("https://pawoo.net/@nantokakun/105643037682139899") # 404
         @site2 = Sources::Strategies.find("https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png")
 

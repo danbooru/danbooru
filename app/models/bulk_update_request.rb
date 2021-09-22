@@ -1,4 +1,6 @@
 class BulkUpdateRequest < ApplicationRecord
+  STATUSES = %w[pending approved rejected processing failed]
+
   attr_accessor :title, :reason
 
   belongs_to :user
@@ -10,16 +12,18 @@ class BulkUpdateRequest < ApplicationRecord
   validates :script, presence: true
   validates :title, presence: true, if: ->(rec) { rec.forum_topic_id.blank? }
   validates :forum_topic, presence: true, if: ->(rec) { rec.forum_topic_id.present? }
-  validates :status, inclusion: { in: %w[pending approved rejected] }
+  validates :status, inclusion: { in: STATUSES }
   validate :validate_script, if: :script_changed?
 
   before_save :update_tags, if: :script_changed?
   after_create :create_forum_topic
 
-  scope :pending_first, -> { order(Arel.sql("(case status when 'pending' then 0 when 'approved' then 1 else 2 end)")) }
+  scope :pending_first, -> { order(Arel.sql("(case status when 'failed' then 0 when 'processing' then 1 when 'pending' then 2 when 'approved' then 3 when 'rejected' then 4 else 5 end)")) }
   scope :pending, -> {where(status: "pending")}
   scope :approved, -> { where(status: "approved") }
   scope :rejected, -> { where(status: "rejected") }
+  scope :processing, -> { where(status: "processing") }
+  scope :failed, -> { where(status: "failed") }
   scope :has_topic, -> { where.not(forum_topic: nil) }
 
   module SearchMethods
@@ -62,8 +66,8 @@ class BulkUpdateRequest < ApplicationRecord
       transaction do
         CurrentUser.scoped(approver) do
           processor.validate!(:approval)
-          processor.process!(approver)
-          update!(status: "approved", approver: approver)
+          update!(status: "processing", approver: approver)
+          processor.process_later!
           forum_updater.update("The #{bulk_update_request_link} (forum ##{forum_post.id}) has been approved by @#{approver.name}.")
         end
       end
@@ -116,7 +120,7 @@ class BulkUpdateRequest < ApplicationRecord
   end
 
   def is_approved?
-    status == "approved"
+    status.in?(%w[approved processing])
   end
 
   def is_rejected?

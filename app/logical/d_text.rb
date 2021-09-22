@@ -146,12 +146,19 @@ class DText
         embedded_script = "[expand]#{obj.processor.to_dtext}[/expand]"
       end
 
-      if obj.is_approved?
+      case obj.status
+      when "approved"
         "The \"bulk update request ##{obj.id}\":#{Routes.bulk_update_request_path(obj)} has been approved by <@#{obj.approver.name}>.\n\n#{embedded_script}"
-      elsif obj.is_pending?
+      when "pending"
         "The \"bulk update request ##{obj.id}\":#{Routes.bulk_update_request_path(obj)} is pending approval.\n\n#{embedded_script}"
-      elsif obj.is_rejected?
+      when "rejected"
         "The \"bulk update request ##{obj.id}\":#{Routes.bulk_update_request_path(obj)} has been rejected.\n\n#{embedded_script}"
+      when "processing"
+        "The \"bulk update request ##{obj.id}\":#{Routes.bulk_update_request_path(obj)} is being processed.\n\n#{embedded_script}"
+      when "failed"
+        "The \"bulk update request ##{obj.id}\":#{Routes.bulk_update_request_path(obj)} has failed.\n\n#{embedded_script}"
+      else
+        raise ArgumentError, "unknown bulk update request status"
       end
     end
   end

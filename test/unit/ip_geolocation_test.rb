@@ -1,6 +1,10 @@
 require 'test_helper'
 
 class IpGeolocationTest < ActiveSupport::TestCase
+  setup do
+    skip "IP Registry credentials not configured" unless IpLookup.enabled?
+  end
+
   context "IpGeolocation: " do
     context "the create_or_update! method" do
       should "create a new record if the IP record doesn't already exist" do

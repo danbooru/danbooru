@@ -16,6 +16,7 @@ module UploadTestHelper
 
   def assert_successful_upload(source_or_file_path, user: @user, **params)
     if source_or_file_path =~ %r{\Ahttps?://}i
+      return "Login credentials not configured for #{source_or_file_path}" unless Sources::Strategies.find(source_or_file_path).class.enabled?
       source = { source: source_or_file_path }
     else
       file = Rack::Test::UploadedFile.new(Rails.root.join(source_or_file_path))

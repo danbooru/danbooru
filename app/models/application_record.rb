@@ -166,6 +166,36 @@ class ApplicationRecord < ActiveRecord::Base
     end
   end
 
+  concerning :ConcurrencyMethods do
+    class_methods do
+      def parallel_each(batch_size: 1000, in_processes: 4, in_threads: nil, &block)
+        # XXX Use threads in testing because processes can't see each other's
+        # database transactions.
+        if Rails.env.test?
+          in_processes = nil
+          in_threads = 2
+        end
+
+        # XXX Threads deadlock during tests if a transaction is open; do a non-parallel each.
+        return find_each(&block) if Rails.env.test? && connection.transaction_open?
+
+        current_user = CurrentUser.user
+        current_ip = CurrentUser.ip_addr
+
+        find_in_batches(batch_size: batch_size, error_on_ignore: true) do |batch|
+          Parallel.each(batch, in_processes: in_processes, in_threads: in_threads) do |record|
+            # XXX In threaded mode, the current user isn't inherited from the
+            # parent thread because the current user is a thread-local
+            # variable. Hence, we have to set it explicitly in the child thread.
+            CurrentUser.scoped(current_user, current_ip) do
+              yield record
+            end
+          end
+        end
+      end
+    end
+  end
+
   def warnings
     @warnings ||= ActiveModel::Errors.new(self)
   end

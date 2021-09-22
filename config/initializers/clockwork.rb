@@ -4,6 +4,13 @@
 # See also `app/logical/danbooru_maintenance.rb`.
 
 module Clockwork
+  # Touch a heartbeat file every minute so that Kubernetes knows we're alive and running.
+  if Rails.env.production?
+    every(1.minute, "heartbeat") do
+      File.write("tmp/danbooru-cron-heartbeat.txt", Time.now.utc.to_s + "\n")
+    end
+  end
+
   every(1.hour, "hourly", at: "**:00") do
     DanbooruMaintenance.hourly
   end

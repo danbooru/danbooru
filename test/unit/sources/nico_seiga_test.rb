@@ -2,6 +2,10 @@ require 'test_helper'
 
 module Sources
   class NicoSeigaTest < ActiveSupport::TestCase
+    setup do
+      skip "NicoSeiga credentials not configured" unless Sources::Strategies::NicoSeiga.enabled?
+    end
+
     context "The source site for nico seiga" do
       setup do
         @site_1 = Sources::Strategies.find("http://lohas.nicoseiga.jp/o/910aecf08e542285862954017f8a33a8c32a8aec/1433298801/4937663")
