@@ -159,6 +159,7 @@ div#c-posts {
 
     .image-container {
       margin: 1em 0 0.5em;
+      image-orientation: from-image;
 
       &.danbirthday::before {
         content: "";

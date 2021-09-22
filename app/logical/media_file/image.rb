@@ -7,13 +7,25 @@ class MediaFile::Image < MediaFile
   JPEG_OPTIONS = { Q: 90, background: 255, strip: true, interlace: true, optimize_coding: true }
 
   # http://jcupitt.github.io/libvips/API/current/libvips-resample.html#vips-thumbnail
-  THUMBNAIL_OPTIONS = { size: :down, linear: false, no_rotate: true }
-  CROP_OPTIONS = { crop: :attention, linear: false, no_rotate: true }
+  THUMBNAIL_OPTIONS = { size: :down, linear: false }
+  CROP_OPTIONS = { crop: :attention, linear: false }
 
   def dimensions
-    image.size
+    [width, height]
   rescue Vips::Error
     [0, 0]
+  end
+
+  def width
+    is_rotated? ? image.height : image.width
+  rescue Vips::Error
+    0
+  end
+
+  def height
+    is_rotated? ? image.width : image.height
+  rescue Vips::Error
+    0
   end
 
   def is_corrupt?
@@ -67,6 +79,11 @@ class MediaFile::Image < MediaFile
 
   def is_animated_png?
     file_ext == :png && metadata.fetch("PNG:AnimationFrames", 1) > 1
+  end
+
+  # https://exiftool.org/TagNames/EXIF.html
+  def is_rotated?
+    metadata["IFD0:Orientation"].in?(["Rotate 90 CW", "Rotate 270 CW"])
   end
 
   # @return [Vips::Image] the Vips image object for the file

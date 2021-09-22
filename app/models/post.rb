@@ -1348,6 +1348,20 @@ class Post < ApplicationRecord
         media_file = MediaFile.open(file, frame_data: pixiv_ugoira_frame_data&.data.to_a)
         UploadService::Utils.process_resizes(self, nil, id, media_file: media_file)
 
+        update!(
+          image_width: media_file.width,
+          image_height: media_file.height,
+          file_size: media_file.file_size,
+          file_ext: media_file.file_ext,
+        )
+
+        media_asset.update!(
+          image_width: media_file.width,
+          image_height: media_file.height,
+          file_size: media_file.file_size,
+          file_ext: media_file.file_ext,
+        )
+
         purge_cached_urls!
         update_iqdb
 

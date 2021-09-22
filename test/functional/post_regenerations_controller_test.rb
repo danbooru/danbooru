@@ -58,6 +58,20 @@ class PostRegenerationsControllerTest < ActionDispatch::IntegrationTest
           assert_equal("post_regenerate", ModAction.last.category)
           assert_equal("<@#{@mod.name}> regenerated image samples for post ##{@post.id}", ModAction.last.description)
         end
+
+        should "fix the width and height of exif-rotated images" do
+          @upload = assert_successful_upload("test/files/test-rotation-90cw.jpg", user: @mod)
+          @post = @upload.post
+
+          post_auth post_regenerations_path, @mod, params: { post_id: @post.id }
+          perform_enqueued_jobs
+          @post.reload
+
+          assert_equal(96, @post.image_width)
+          assert_equal(128, @post.image_height)
+          assert_equal(96, @post.media_asset.image_width)
+          assert_equal(128, @post.media_asset.image_height)
+        end
       end
     end
   end

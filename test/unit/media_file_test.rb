@@ -323,4 +323,40 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([120, 150], @preview.dimensions)
     end
   end
+
+  context "an image that is rotated 90 degrees clockwise" do
+    should "have the correct dimensions" do
+      @file = MediaFile.open("test/files/test-rotation-90cw.jpg")
+      assert_equal([96, 128], @file.dimensions)
+    end
+
+    should "generate a rotated thumbnail" do
+      @file = MediaFile.open("test/files/test-rotation-90cw.jpg")
+      assert_equal([48, 64], @file.preview(64, 64).dimensions)
+    end
+  end
+
+  context "an image that is rotated 270 degrees clockwise" do
+    should "have the correct dimensions" do
+      @file = MediaFile.open("test/files/test-rotation-270cw.jpg")
+      assert_equal([100, 66], @file.dimensions)
+    end
+
+    should "generate a rotated thumbnail" do
+      @file = MediaFile.open("test/files/test-rotation-270cw.jpg")
+      assert_equal([50, 33], @file.preview(50, 50).dimensions)
+    end
+  end
+
+  context "an image that is rotated 180 degrees" do
+    should "have the correct dimensions" do
+      @file = MediaFile.open("test/files/test-rotation-180.jpg")
+      assert_equal([66, 100], @file.dimensions)
+    end
+
+    should "generate a rotated thumbnail" do
+      @file = MediaFile.open("test/files/test-rotation-180.jpg")
+      assert_equal([33, 50], @file.preview(50, 50).dimensions)
+    end
+  end
 end
