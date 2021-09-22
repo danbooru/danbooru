@@ -63,6 +63,7 @@ COPY --from=development /root /root
 COPY --from=assets /danbooru /danbooru
 
 USER danbooru
+ENTRYPOINT ["tini", "--"]
 CMD ["bin/rails", "server"]
 
 # https://github.com/opencontainers/image-spec/blob/main/annotations.md
