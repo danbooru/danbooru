@@ -1033,5 +1033,12 @@ class UploadServiceTest < ActiveSupport::TestCase
       assert(@upload.is_errored?)
       assert_difference("Upload.count", -1) { @upload.destroy! }
     end
+
+    should "work on uploads with an invalid file" do
+      @upload = as(@user) { UploadService.new(file: upload_file("test/files/test-empty.bin")).start! }
+
+      assert(@upload.is_errored?)
+      assert_difference("Upload.count", -1) { @upload.destroy! }
+    end
   end
 end
