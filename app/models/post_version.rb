@@ -10,7 +10,7 @@ class PostVersion < ApplicationRecord
   end
 
   def self.database_url
-    ENV["ARCHIVE_DATABASE_URL"] || "archive_#{Rails.env}".to_sym
+    ENV["ARCHIVE_DATABASE_URL"] || ENV["DATABASE_URL"]
   end
 
   establish_connection database_url if enabled?

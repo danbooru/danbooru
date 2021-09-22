@@ -37,7 +37,6 @@ jobs:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
       DATABASE_URL: postgresql://danbooru:danbooru@postgres/danbooru
-      ARCHIVE_DATABASE_URL: postgresql://danbooru:danbooru@postgres/danbooru
       DANBOORU_SECRET_KEY_BASE: 1234
       DANBOORU_AWS_SQS_ENABLED: false
       DANBOORU_TWITTER_API_KEY: ${{ secrets.DANBOORU_TWITTER_API_KEY }}
