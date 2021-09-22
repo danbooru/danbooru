@@ -49,8 +49,7 @@ class MediaAsset < ApplicationRecord
 
   # https://exiftool.org/TagNames/EXIF.html
   def is_rotated?
-    metadata["IFD0:Orientation"].in?(["Rotate 90 CW", "Rotate 270 CW", "Rotate 180"]) ||
-    metadata["IFD1:Orientation"].in?(["Rotate 90 CW", "Rotate 270 CW", "Rotate 180"])
+    metadata["IFD0:Orientation"].in?(["Rotate 90 CW", "Rotate 270 CW", "Rotate 180"])
   end
 
   # Some animations technically have a finite loop count, but loop for hundreds
