@@ -11,21 +11,9 @@ class MediaFile::Image < MediaFile
   CROP_OPTIONS = { crop: :attention, linear: false }
 
   def dimensions
-    [width, height]
+    image.size
   rescue Vips::Error
     [0, 0]
-  end
-
-  def width
-    is_rotated? ? image.height : image.width
-  rescue Vips::Error
-    0
-  end
-
-  def height
-    is_rotated? ? image.width : image.height
-  rescue Vips::Error
-    0
   end
 
   def is_corrupt?
@@ -81,14 +69,9 @@ class MediaFile::Image < MediaFile
     file_ext == :png && metadata.fetch("PNG:AnimationFrames", 1) > 1
   end
 
-  # https://exiftool.org/TagNames/EXIF.html
-  def is_rotated?
-    metadata["IFD0:Orientation"].in?(["Rotate 90 CW", "Rotate 270 CW"])
-  end
-
   # @return [Vips::Image] the Vips image object for the file
   def image
-    Vips::Image.new_from_file(file.path, fail: true)
+    Vips::Image.new_from_file(file.path, fail: true).autorot
   end
 
   memoize :image, :dimensions, :is_corrupt?, :is_animated_gif?, :is_animated_png?

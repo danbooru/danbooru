@@ -1336,6 +1336,15 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "a PNG with the exif orientation flag" do
+        should "not add the exif_rotation tag" do
+          @media_asset = MediaAsset.create!(file: "test/files/test-rotation-90cw.png")
+          @post.update!(md5: @media_asset.md5)
+          @post.reload.update!(tag_string: "tagme")
+          assert_equal("tagme", @post.tag_string)
+        end
+      end
+
       context "a non-repeating GIF missing the non-repeating_animation tag" do
         should "automatically add the non-repeating_animation tag" do
           @media_asset = MediaAsset.create!(file: "test/files/test-animated-86x52-loop-1.gif")

@@ -359,4 +359,16 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([33, 50], @file.preview(50, 50).dimensions)
     end
   end
+
+  context "a PNG with an exif orientation flag" do
+    should "not generate rotated dimensions" do
+      @file = MediaFile.open("test/files/test-rotation-90cw.png")
+      assert_equal([128, 96], @file.dimensions)
+    end
+
+    should "not generate a rotated thumbnail" do
+      @file = MediaFile.open("test/files/test-rotation-90cw.png")
+      assert_equal([64, 48], @file.preview(64, 64).dimensions)
+    end
+  end
 end
