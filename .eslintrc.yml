@@ -31,7 +31,7 @@ rules:
   no-lone-blocks: error
   no-lonely-if: error
   no-mixed-operators: error
-  no-new: warn
+  #no-new: warn
   no-new-wrappers: error
   no-return-assign: error
   no-self-compare: error

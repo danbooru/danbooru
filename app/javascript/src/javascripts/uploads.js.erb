@@ -1,5 +1,3 @@
-import Shortcuts from './shortcuts.js';
-import Utility from './utility.js';
 import Dropzone from 'dropzone';
 import SparkMD5 from 'spark-md5';
 
@@ -44,8 +42,7 @@ Upload.validate_upload = function (e) {
   var error_messages = [];
   if (($("#upload_file").val() === undefined) && !/^https?:\/\/.+/i.test($("#upload_source").val()) && $("#upload_md5_confirmation").val() === "") {
     error_messages.push("Must choose file or specify source");
-  }
-  else if ($(".dz-progress:visible").length) {
+  } else if ($(".dz-progress:visible").length) {
     error_messages.push("File has not finished uploading yet")
   }
   if (!$("#upload_rating_s").prop("checked") && !$("#upload_rating_q").prop("checked") && !$("#upload_rating_e").prop("checked") &&

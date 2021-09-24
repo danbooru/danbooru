@@ -42,8 +42,6 @@ Post.initialize_all = function() {
     this.initialize_edit_dialog();
   }
 
-  var $fields_multiple = $('[data-autocomplete="tag-edit"]');
-
   $(window).on('danbooru:initialize_saved_seraches', () => {
     Post.initialize_saved_searches();
   });
