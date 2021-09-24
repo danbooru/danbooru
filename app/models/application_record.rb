@@ -169,15 +169,15 @@ class ApplicationRecord < ActiveRecord::Base
   concerning :ConcurrencyMethods do
     class_methods do
       def parallel_each(batch_size: 1000, in_processes: 4, in_threads: nil, &block)
+        # XXX We may deadlock if a transaction is open; do a non-parallel each.
+        return find_each(&block) if connection.transaction_open?
+
         # XXX Use threads in testing because processes can't see each other's
         # database transactions.
         if Rails.env.test?
           in_processes = nil
           in_threads = 2
         end
-
-        # XXX Threads deadlock during tests if a transaction is open; do a non-parallel each.
-        return find_each(&block) if Rails.env.test? && connection.transaction_open?
 
         current_user = CurrentUser.user
         current_ip = CurrentUser.ip_addr
