@@ -23,14 +23,14 @@ checks:
 plugins:
   eslint:
     enabled: true
-    channel: "eslint-6"
+    channel: "eslint-7"
     config:
       extensions:
         - .js
         - .js.erb
   rubocop:
     enabled: true
-    channel: "rubocop-0-83"
+    channel: "rubocop-1-20-0"
   stylelint:
     enabled: true
 exclude_patterns:
