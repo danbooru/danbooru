@@ -58,6 +58,7 @@ module ArtistFinder
     %r{pictures\.hentai-foundry\.com(?:/\w)?}i, # http://pictures.hentai-foundry.com/a/aaaninja/
     "i.imgur.com", # http://i.imgur.com/Ic9q3.jpg
     "instagram.com", # http://www.instagram.com/serafleur.art/
+    "instagram.com/p", # https://www.instagram.com/p/CT79fEjhDwo/
     "iwara.tv",
     "iwara.tv/users", # http://ecchi.iwara.tv/users/marumega
     "kym-cdn.com",
@@ -89,6 +90,7 @@ module ArtistFinder
     %r{pixiv.net/(?:en/)?users}i, # https://www.pixiv.net/users/555603
     %r{pixiv.net/(?:en/)?artworks}i, # https://www.pixiv.net/en/artworks/85241178
     "i.pximg.net",
+    "poipiku.com", # https://poipiku.com/1776623/
     "plurk.com", # http://www.plurk.com/a1amorea1a1
     "privatter.net",
     "privatter.net/u", # http://privatter.net/u/saaaatonaaaa
