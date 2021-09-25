@@ -40,17 +40,12 @@ class PostPreviewComponent < ApplicationComponent
   end
 
   def preview_dimensions
-    # XXX work around ancient bad posts with null or zero dimensions.
-    if post.image_width.to_i > 0 && post.image_height.to_i > 0
-      downscale_ratio = Danbooru.config.small_image_width.to_f / [post.image_width, post.image_height].max
+    downscale_ratio = Danbooru.config.small_image_width.to_f / [post.image_width, post.image_height].max
 
-      {
-        width: [(downscale_ratio * post.image_width).floor, post.image_width].min,
-        height: [(downscale_ratio * post.image_height).floor, post.image_height].min,
-      }
-    else
-      { width: 0, height: 0 }
-    end
+    {
+      width: [(downscale_ratio * post.image_width).floor, post.image_width].min,
+      height: [(downscale_ratio * post.image_height).floor, post.image_height].min,
+    }
   end
 
   def tooltip
