@@ -125,12 +125,12 @@ class Post < ApplicationRecord
       storage_manager.open_file(self, type)
     end
 
-    def tagged_file_url
-      storage_manager.file_url(self, :original, tagged_filenames: !CurrentUser.user.disable_tagged_filenames?)
+    def tagged_file_url(tagged_filenames: !CurrentUser.user.disable_tagged_filenames?)
+      storage_manager.file_url(self, :original, tagged_filenames: tagged_filenames)
     end
 
-    def tagged_large_file_url
-      storage_manager.file_url(self, :large, tagged_filenames: !CurrentUser.user.disable_tagged_filenames?)
+    def tagged_large_file_url(tagged_filenames: !CurrentUser.user.disable_tagged_filenames?)
+      storage_manager.file_url(self, :large, tagged_filenames: tagged_filenames)
     end
 
     def file_url
@@ -1368,7 +1368,11 @@ class Post < ApplicationRecord
     end
 
     def purge_cached_urls!
-      urls = [preview_file_url, large_file_url]
+      urls = [
+        preview_file_url, crop_file_url, large_file_url, file_url,
+        tagged_file_url(tagged_filenames: true), tagged_large_file_url(tagged_filenames: true)
+      ]
+
       CloudflareService.new.purge_cache(urls)
     end
   end
