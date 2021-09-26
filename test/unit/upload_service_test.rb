@@ -405,7 +405,6 @@ class UploadServiceTest < ActiveSupport::TestCase
         should "work" do
           as(@user) { @post.replace!(replacement_url: @post.source) }
           assert_equal(@post_md5, @post.md5)
-          assert_match(/#{@post_md5}/, @post.file_path)
         end
       end
 

@@ -103,16 +103,6 @@ class Post < ApplicationRecord
       Post.delete_files(id, md5, file_ext, force: true)
     end
 
-    def distribute_files(file, sample_file, preview_file)
-      storage_manager.store_file(file, self, :original)
-      storage_manager.store_file(sample_file, self, :large) if sample_file.present?
-      storage_manager.store_file(preview_file, self, :preview) if preview_file.present?
-
-      backup_storage_manager.store_file(file, self, :original)
-      backup_storage_manager.store_file(sample_file, self, :large) if sample_file.present?
-      backup_storage_manager.store_file(preview_file, self, :preview) if preview_file.present?
-    end
-
     def backup_storage_manager
       Danbooru.config.backup_storage_manager
     end
@@ -145,18 +135,6 @@ class Post < ApplicationRecord
       storage_manager.file_url(self, :preview)
     end
 
-    def file_path
-      storage_manager.file_path(self, file_ext, :original)
-    end
-
-    def large_file_path
-      storage_manager.file_path(self, file_ext, :large)
-    end
-
-    def preview_file_path
-      storage_manager.file_path(self, file_ext, :preview)
-    end
-
     def crop_file_url
       storage_manager.file_url(self, :crop)
     end
@@ -185,28 +163,12 @@ class Post < ApplicationRecord
       file_ext =~ /jpg|gif|png/i
     end
 
-    def is_png?
-      file_ext =~ /png/i
-    end
-
-    def is_gif?
-      file_ext =~ /gif/i
-    end
-
     def is_flash?
       file_ext =~ /swf/i
     end
 
-    def is_webm?
-      file_ext =~ /webm/i
-    end
-
-    def is_mp4?
-      file_ext =~ /mp4/i
-    end
-
     def is_video?
-      is_webm? || is_mp4?
+      file_ext.in?(%w[webm mp4])
     end
 
     def is_ugoira?
