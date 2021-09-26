@@ -2474,7 +2474,8 @@ CREATE TABLE public.media_assets (
     file_size integer NOT NULL,
     image_width integer NOT NULL,
     image_height integer NOT NULL,
-    duration double precision
+    duration double precision,
+    status integer DEFAULT 200 NOT NULL
 );
 
 
@@ -7200,6 +7201,13 @@ CREATE INDEX index_media_assets_on_md5 ON public.media_assets USING btree (md5);
 
 
 --
+-- Name: index_media_assets_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_media_assets_on_status ON public.media_assets USING btree (status) WHERE (status <> 200);
+
+
+--
 -- Name: index_media_assets_on_updated_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -8438,6 +8446,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210908015203'),
 ('20210921164936'),
 ('20210921170444'),
-('20210926123414');
+('20210926123414'),
+('20210926125826');
 
 

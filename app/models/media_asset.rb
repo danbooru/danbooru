@@ -3,6 +3,13 @@ class MediaAsset < ApplicationRecord
   delegate :metadata, to: :media_metadata
   delegate :is_animated?, :is_animated_gif?, :is_animated_png?, :is_non_repeating_animation?, :is_greyscale?, :is_rotated?, to: :metadata
 
+  enum status: {
+    processing: 100,
+    active: 200,
+    deleted: 300,
+    expunged: 400,
+  }
+
   def self.search(params)
     q = search_attributes(params, :id, :created_at, :updated_at, :md5, :file_ext, :file_size, :image_width, :image_height)
     q = q.apply_default_order(params)
