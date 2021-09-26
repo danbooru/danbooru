@@ -1382,18 +1382,6 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
-      context "with a large file size" do
-        setup do
-          @post.file_size = 11.megabytes
-          @post.tag_string = ""
-          @post.save
-        end
-
-        should "have the appropriate file size tags added automatically" do
-          assert_match(/huge_filesize/, @post.tag_string)
-        end
-      end
-
       context "with a .zip file extension" do
         setup do
           @post.file_ext = "zip"

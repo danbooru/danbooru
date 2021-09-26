@@ -460,7 +460,7 @@ class Post < ApplicationRecord
     end
 
     def add_automatic_tags(tags)
-      tags -= %w[incredibly_absurdres absurdres highres lowres huge_filesize flash video ugoira animated_gif animated_png exif_rotation non-repeating_animation]
+      tags -= %w[incredibly_absurdres absurdres highres lowres flash video ugoira animated_gif animated_png exif_rotation non-repeating_animation]
 
       if image_width >= 10_000 || image_height >= 10_000
         tags << "incredibly_absurdres"
@@ -479,10 +479,6 @@ class Post < ApplicationRecord
         tags << "wide_image"
       elsif image_height >= 1024 && image_height.to_f / image_width >= 4
         tags << "tall_image"
-      end
-
-      if file_size >= 10.megabytes
-        tags << "huge_filesize"
       end
 
       if is_flash?
