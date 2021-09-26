@@ -23,4 +23,8 @@ class MediaMetadata < ApplicationRecord
   def file=(file_or_path)
     self.metadata = MediaFile.open(file_or_path).metadata
   end
+
+  def metadata
+    ExifTool::Metadata.new(self[:metadata])
+  end
 end
