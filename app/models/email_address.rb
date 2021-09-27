@@ -48,9 +48,8 @@ class EmailAddress < ApplicationRecord
     q = search_attributes(params, :id, :created_at, :updated_at, :user, :address, :normalized_address, :is_verified, :is_deliverable)
 
     q = q.restricted(params[:is_restricted])
-    q = q.apply_default_order(params)
 
-    q
+    q.apply_default_order(params)
   end
 
   def validate_deliverable

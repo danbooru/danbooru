@@ -13,7 +13,6 @@ class NewsUpdate < ApplicationRecord
 
   def self.search(params)
     q = search_attributes(params, :id, :created_at, :updated_at, :message, :creator, :updater)
-    q = q.apply_default_order(params)
-    q
+    q.apply_default_order(params)
   end
 end

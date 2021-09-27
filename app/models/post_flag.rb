@@ -11,7 +11,7 @@ class PostFlag < ApplicationRecord
   validates :reason, presence: true, length: { in: 1..140 }
   validate :validate_creator_is_not_limited, on: :create
   validate :validate_post, on: :create
-  validates_uniqueness_of :creator_id, scope: :post_id, on: :create, unless: :is_deletion, message: "have already flagged this post"
+  validates :creator_id, uniqueness: { scope: :post_id, on: :create, unless: :is_deletion, message: "have already flagged this post" }
   before_save :update_post
   attr_accessor :is_deletion
 

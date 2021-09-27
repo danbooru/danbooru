@@ -48,7 +48,7 @@ class Note < ApplicationRecord
   end
 
   def update_post
-    if self.saved_changes?
+    if saved_changes?
       if post.notes.active.exists?
         post.update_columns(last_noted_at: updated_at)
       else

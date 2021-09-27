@@ -9,8 +9,8 @@ class Dmail < ApplicationRecord
   has_many :moderation_reports, as: :model, dependent: :destroy
 
   before_create :autoreport_spam
-  after_save :update_unread_dmail_count
   after_destroy :update_unread_dmail_count
+  after_save :update_unread_dmail_count
   after_commit :send_email, on: :create
 
   deletable

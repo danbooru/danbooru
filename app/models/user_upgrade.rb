@@ -97,8 +97,7 @@ class UserUpgrade < ApplicationRecord
       q = q.self_upgrade
     end
 
-    q = q.apply_default_order(params)
-    q
+    q.apply_default_order(params)
   end
 
   concerning :UpgradeMethods do

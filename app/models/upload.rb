@@ -215,7 +215,9 @@ class Upload < ApplicationRecord
   end
 
   def assign_rating_from_tags
-    if rating = PostQueryBuilder.new(tag_string).find_metatag(:rating)
+    rating = PostQueryBuilder.new(tag_string).find_metatag(:rating)
+
+    if rating.present?
       self.rating = rating.downcase.first
     end
   end

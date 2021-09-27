@@ -77,7 +77,7 @@ class FavoriteGroup < ApplicationRecord
       errors.add(:base, "Cannot add invalid post(s) to favgroup: #{nonexisting_post_ids.to_sentence}")
     end
 
-    duplicate_post_ids = post_ids.group_by(&:itself).transform_values(&:size).select { |id, count| count > 1 }.keys
+    duplicate_post_ids = post_ids.group_by(&:itself).transform_values(&:size).select { |_id, count| count > 1 }.keys
     if duplicate_post_ids.present?
       errors.add(:base, "Favgroup already contains post #{duplicate_post_ids.to_sentence}")
     end
@@ -117,7 +117,7 @@ class FavoriteGroup < ApplicationRecord
 
   def posts
     favgroup_posts = FavoriteGroup.where(id: id).joins("CROSS JOIN unnest(favorite_groups.post_ids) WITH ORDINALITY AS row(post_id, favgroup_index)").select(:post_id, :favgroup_index)
-    posts = Post.joins("JOIN (#{favgroup_posts.to_sql}) favgroup_posts ON favgroup_posts.post_id = posts.id").order("favgroup_posts.favgroup_index ASC")
+    Post.joins("JOIN (#{favgroup_posts.to_sql}) favgroup_posts ON favgroup_posts.post_id = posts.id").order("favgroup_posts.favgroup_index ASC")
   end
 
   def add!(post)

@@ -17,8 +17,7 @@ class RateLimit < ApplicationRecord
 
   def self.search(params)
     q = search_attributes(params, :id, :created_at, :updated_at, :limited, :points, :action, :key)
-    q = q.apply_default_order(params)
-    q
+    q.apply_default_order(params)
   end
 
   # `action` is the action being limited. Usually a controller endpoint.
@@ -31,7 +30,7 @@ class RateLimit < ApplicationRecord
     key_params = keys.map.with_index { |key, i| [:"key#{i}", key] }.to_h
 
     # (created_at, updated_at, action, keyN, points)
-    values = keys.map.with_index { |key, i| "(:now, :now, :action, :key#{i}, :points)" }
+    values = keys.map.with_index { |_key, i| "(:now, :now, :action, :key#{i}, :points)" }
 
     # Do an upsert, creating a new rate limit object for each key that doesn't
     # already exist, and updating the limit for each limit that already exists.
@@ -43,7 +42,7 @@ class RateLimit < ApplicationRecord
     # the point count and subtract the cost of the call.
     #
     # https://www.postgresql.org/docs/current/sql-insert.html#SQL-ON-CONFLICT
-    sql = <<~SQL
+    sql = <<~SQL.squish
       INSERT INTO rate_limits (created_at, updated_at, action, key, points)
       VALUES #{values.join(", ")}
       ON CONFLICT (action, key) DO UPDATE SET
@@ -67,10 +66,9 @@ class RateLimit < ApplicationRecord
       cost: cost,
       points: burst - cost,
       minimum_points: minimum_points,
-      **key_params
+      **key_params,
     }
 
-    rate_limits = RateLimit.find_by_sql([sql, sql_params])
-    rate_limits
+    RateLimit.find_by_sql([sql, sql_params])
   end
 end

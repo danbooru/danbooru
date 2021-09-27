@@ -43,7 +43,7 @@ module ArtistVersionsHelper
       else
         name_diff = diff_name_html(other.name, artist_version.name)
       end
-      %(<br><br><b>Rename:</b><br>&ensp;#{name_diff}</p>).html_safe
+      %{<br><br><b>Rename:</b><br>&ensp;#{name_diff}</p>}.html_safe
     else
       ""
     end
@@ -58,7 +58,7 @@ module ArtistVersionsHelper
       else
         group_name_diff = diff_name_html(other_group_name, artist_version.group_name)
       end
-      %(<b>Group:</b><br>&ensp;#{group_name_diff}<br><br>).html_safe
+      %{<b>Group:</b><br>&ensp;#{group_name_diff}<br><br>}.html_safe
     else
       ""
     end

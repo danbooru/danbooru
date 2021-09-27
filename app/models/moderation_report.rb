@@ -41,7 +41,7 @@ class ModerationReport < ApplicationRecord
     if topic.nil?
       CurrentUser.scoped(User.system) do
         topic = ForumTopic.create!(creator: User.system, title: forum_topic_title, category_id: 0, min_level: User::Levels::MODERATOR)
-        forum_post = ForumPost.create!(creator: User.system, body: forum_topic_body, topic: topic)
+        ForumPost.create!(creator: User.system, body: forum_topic_body, topic: topic)
       end
     end
     topic

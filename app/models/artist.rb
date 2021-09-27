@@ -61,7 +61,7 @@ class Artist < ApplicationRecord
   concerning :NameMethods do
     class_methods do
       def normalize_name(name)
-        name.to_s.mb_chars.downcase.strip.gsub(/ /, '_').to_s
+        name.to_s.mb_chars.downcase.strip.gsub(/ /, "_").to_s
       end
 
       def normalize_other_names(other_names)
@@ -216,7 +216,7 @@ class Artist < ApplicationRecord
     end
 
     def any_name_matches(query)
-      if query =~ %r!\A/(.*)/\z!
+      if query =~ %r{\A/(.*)/\z}
         where_regex(:name, $1).or(any_other_name_matches($1)).or(where_regex(:group_name, $1))
       else
         normalized_name = normalize_name(query)
@@ -228,11 +228,11 @@ class Artist < ApplicationRecord
     def url_matches(query)
       query = query.strip
 
-      if query =~ %r!\A/(.*)/\z!
+      if query =~ %r{\A/(.*)/\z}
         where(id: ArtistUrl.where_regex(:url, $1).select(:artist_id))
       elsif query.include?("*")
         where(id: ArtistUrl.where_like(:url, query).select(:artist_id))
-      elsif query =~ %r!\Ahttps?://!i
+      elsif query =~ %r{\Ahttps?://}i
         ArtistFinder.find_artists(query)
       else
         where(id: ArtistUrl.where_like(:url, "*#{query}*").select(:artist_id))
@@ -242,7 +242,7 @@ class Artist < ApplicationRecord
     def any_name_or_url_matches(query)
       query = query.strip
 
-      if query =~ %r!\Ahttps?://!i
+      if query =~ %r{\Ahttps?://}i
         url_matches(query)
       else
         any_name_matches(query)

@@ -25,12 +25,12 @@ module PostVersionsHelper
     html = '<span class="diff-list">'
 
     added_tags.each do |tag|
-      obsolete_class = (obsolete_added_tags.include?(tag) ? "diff-obsolete" : "");
-      html << %(<ins class="#{obsolete_class}">#{link_to(wordbreakify(tag), posts_path(:tags => tag))}</ins> )
+      obsolete_class = (obsolete_added_tags.include?(tag) ? "diff-obsolete" : "")
+      html << %{<ins class="#{obsolete_class}">#{link_to(wordbreakify(tag), posts_path(:tags => tag))}</ins> }
     end
     removed_tags.each do |tag|
-      obsolete_class = (obsolete_removed_tags.include?(tag) ? "diff-obsolete" : "");
-      html << %(<del class="#{obsolete_class}">#{link_to(wordbreakify(tag), posts_path(:tags => tag))}</del> )
+      obsolete_class = (obsolete_removed_tags.include?(tag) ? "diff-obsolete" : "")
+      html << %{<del class="#{obsolete_class}">#{link_to(wordbreakify(tag), posts_path(:tags => tag))}</del> }
     end
 
     html << "</span>"
@@ -42,7 +42,7 @@ module PostVersionsHelper
     prefix = (field == :parent_id ? "parent" : field.to_s)
     search = "#{prefix}:#{value}"
     display = (field == :rating ? post_version.pretty_rating : value)
-    %(<b>#{field.to_s.titleize}:</b> #{link_to(display, posts_path(:tags => search))}).html_safe
+    %{<b>#{field.to_s.titleize}:</b> #{link_to(display, posts_path(:tags => search))}}.html_safe
   end
 
   def post_version_value(value)

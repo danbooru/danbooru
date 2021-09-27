@@ -83,7 +83,7 @@ class PostsController < ApplicationController
       @error_message = @post.errors.full_messages.join("; ")
       render :json => {:success => false, :reason => @error_message}.to_json, :status => 400
     else
-      head :no_content
+      head 204
     end
   end
 

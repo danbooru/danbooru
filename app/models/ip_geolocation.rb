@@ -16,8 +16,7 @@ class IpGeolocation < ApplicationRecord
 
   def self.search(params)
     q = search_attributes(params, :id, :created_at, :updated_at, :ip_addr, :network, :asn, :is_proxy, :latitude, :longitude, :organization, :time_zone, :continent, :country, :region, :city, :carrier)
-    q = q.apply_default_order(params)
-    q
+    q.apply_default_order(params)
   end
 
   def self.create_or_update!(ip)

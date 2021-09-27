@@ -29,9 +29,9 @@ module ApplicationHelper
       return type == "previous" ? "New" : ""
     end
 
-    changed_fields = record.class.status_fields.select do |field, status|
+    changed_fields = record.class.status_fields.select do |field, _status|
       (record.has_attribute?(field) && record[field] != other[field]) ||
-      (!record.has_attribute?(field) && record.send(field, type))
+        (!record.has_attribute?(field) && record.send(field, type))
     end
 
     statuses = changed_fields.map { |field, status| status }
@@ -52,7 +52,7 @@ module ApplicationHelper
     html = []
     %w[previous subsequent current].each do |type|
       if type == params[:type]
-        html << %(<span>#{type}</span>)
+        html << %{<span>#{type}</span>}
       else
         html << tag.li(link_to(type, params.except(:controller, :action).merge(type: type).permit!))
       end
@@ -106,7 +106,7 @@ module ApplicationHelper
     if number >= 10_000
       "#{number / 1_000}k"
     elsif number >= 1_000
-      "%.1fk" % (number / 1_000.0)
+      format("%.1fk", number / 1_000.0)
     else
       number.to_s
     end
@@ -142,11 +142,11 @@ module ApplicationHelper
   end
 
   def external_link_to(url, text = url, truncate: nil, strip: false, **link_options)
-    text = text.gsub(%r!\Ahttps?://!i, "") if strip == :scheme
-    text = text.gsub(%r!\Ahttps?://(?:www\.)?!i, "") if strip == :subdomain
+    text = text.gsub(%r{\Ahttps?://}i, "") if strip == :scheme
+    text = text.gsub(%r{\Ahttps?://(?:www\.)?}i, "") if strip == :subdomain
     text = text.truncate(truncate) if truncate
 
-    if url =~ %r!\Ahttps?://!i
+    if url =~ %r{\Ahttps?://}i
       link_to text, url, rel: "external noreferrer nofollow", **link_options
     else
       url
@@ -369,37 +369,37 @@ module ApplicationHelper
   def nav_link_match(controller, url)
     url =~ case controller
     when "sessions", "users", "admin/users"
-      /^\/(session|users)/
+      %r{^/(session|users)}
 
     when "comments"
-      /^\/comments/
+      %r{^/comments}
 
     when "notes", "note_versions"
-      /^\/notes/
+      %r{^/notes}
 
     when "posts", "uploads", "post_versions", "explore/posts", "moderator/post/dashboards", "favorites"
-      /^\/post/
+      %r{^/post}
 
     when "artists", "artist_versions"
-      /^\/artist/
+      %r{^/artist}
 
     when "tags", "tag_aliases", "tag_implications"
-      /^\/tags/
+      %r{^/tags}
 
     when "pools", "pool_versions"
-      /^\/pools/
+      %r{^/pools}
 
     when "moderator/dashboards"
-      /^\/moderator/
+      %r{^/moderator}
 
     when "wiki_pages", "wiki_page_versions"
-      /^\/wiki_pages/
+      %r{^/wiki_pages}
 
     when "forum_topics", "forum_posts"
-      /^\/forum_topics/
+      %r{^/forum_topics}
 
     else
-      /^\/static/
+      %r{^/static}
     end
   end
 end

@@ -23,7 +23,7 @@ module WikiPageVersionsHelper
       else
         name_diff = diff_name_html(other.title, wiki_page_version.title)
       end
-      %((<b>Rename:</b>&ensp;#{name_diff})).html_safe
+      %{(<b>Rename:</b>&ensp;#{name_diff})}.html_safe
     else
       ""
     end

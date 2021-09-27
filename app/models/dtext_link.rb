@@ -47,7 +47,7 @@ class DtextLink < ApplicationRecord
 
     # postgres will raise an error if the link is more than 2712 bytes long
     # because it can't index values that take up more than 1/3 of an 8kb page.
-    self.link_target = self.link_target.truncate(2048, omission: "")
+    self.link_target = link_target.truncate(2048, omission: "")
   end
 
   def self.attribute_restriction(*)

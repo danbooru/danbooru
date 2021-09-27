@@ -238,7 +238,7 @@ class PostVersion < ApplicationRecord
   end
 
   def truncated_source
-    source.gsub(/^http:\/\//, "").sub(/\/.+/, "")
+    source.gsub(%r{^http://}, "").sub(%r{/.+}, "")
   end
 
   def undo!

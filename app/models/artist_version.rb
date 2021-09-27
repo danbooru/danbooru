@@ -42,9 +42,7 @@ class ArtistVersion < ApplicationRecord
   end
 
   def current
-    @previous ||= begin
-      ArtistVersion.where(artist_id: artist_id).order("created_at desc").limit(1).to_a
-    end
+    @previous ||= ArtistVersion.where(artist_id: artist_id).order("created_at desc").limit(1).to_a
     @previous.first
   end
 

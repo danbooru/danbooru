@@ -23,8 +23,7 @@ class ApiKey < ApplicationRecord
 
   def self.search(params)
     q = search_attributes(params, :id, :created_at, :updated_at, :key, :user)
-    q = q.apply_default_order(params)
-    q
+    q.apply_default_order(params)
   end
 
   concerning :PermissionMethods do
@@ -59,9 +58,11 @@ class ApiKey < ApplicationRecord
       end
 
       def permissions_list
-        Rails.application.routes.routes.select do |route|
+        routes = Rails.application.routes.routes.select do |route|
           route.defaults[:controller].present? && !route.internal
-        end.map do |route|
+        end
+
+        routes.map do |route|
           "#{route.defaults[:controller]}:#{route.defaults[:action]}"
         end.uniq.sort
       end

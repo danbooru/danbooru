@@ -33,8 +33,7 @@ class UserEvent < ApplicationRecord
 
   def self.search(params)
     q = search_attributes(params, :id, :created_at, :updated_at, :category, :user, :user_session)
-    q = q.apply_default_order(params)
-    q
+    q.apply_default_order(params)
   end
 
   def self.available_includes

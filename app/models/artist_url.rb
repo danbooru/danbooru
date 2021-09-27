@@ -20,22 +20,22 @@ class ArtistUrl < ApplicationRecord
     if url.nil?
       nil
     else
-      url = url.sub(%r!^https://!, "http://")
-      url = url.sub(%r!^http://blog-imgs-\d+\.fc2!, "http://blog.fc2")
-      url = url.sub(%r!^http://blog-imgs-\d+-\w+\.fc2!, "http://blog.fc2")
-      url = url.sub(%r!^http://blog\d*\.fc2\.com/(?:\w/){,3}(\w+)!, "http://\\1.blog.fc2.com")
-      url = url.sub(%r!^http://pictures.hentai-foundry.com//!, "http://pictures.hentai-foundry.com/")
+      url = url.sub(%r{^https://}, "http://")
+      url = url.sub(%r{^http://blog-imgs-\d+\.fc2}, "http://blog.fc2")
+      url = url.sub(%r{^http://blog-imgs-\d+-\w+\.fc2}, "http://blog.fc2")
+      url = url.sub(%r{^http://blog\d*\.fc2\.com/(?:\w/){,3}(\w+)}, "http://\\1.blog.fc2.com")
+      url = url.sub(%r{^http://pictures.hentai-foundry.com//}, "http://pictures.hentai-foundry.com/")
 
       # the strategy won't always work for twitter because it looks for a status
-      url = url.downcase if url =~ %r!^https?://(?:mobile\.)?twitter\.com!
+      url = url.downcase if url =~ %r{^https?://(?:mobile\.)?twitter\.com}
 
       url = Sources::Strategies.find(url).normalize_for_artist_finder
 
       # XXX the Pixiv strategy should implement normalize_for_artist_finder and return the correct url directly.
-      url = url.sub(%r!\Ahttps?://www\.pixiv\.net/(?:en/)?users/(\d+)\z!i, 'https://www.pixiv.net/member.php?id=\1')
+      url = url.sub(%r{\Ahttps?://www\.pixiv\.net/(?:en/)?users/(\d+)\z}i, 'https://www.pixiv.net/member.php?id=\1')
 
-      url = url.gsub(/\/+\Z/, "")
-      url = url.gsub(%r!^https://!, "http://")
+      url = url.gsub(%r{/+\Z}, "")
+      url = url.gsub(%r{^https://}, "http://")
       url + "/"
     end
   end
@@ -60,7 +60,7 @@ class ArtistUrl < ApplicationRecord
   def self.url_attribute_matches(attr, url)
     if url.blank?
       all
-    elsif url =~ %r!\A/(.*)/\z!
+    elsif url =~ %r{\A/(.*)/\z}
       where_regex(attr, $1)
     elsif url.include?("*")
       where_ilike(attr, url)
@@ -83,21 +83,21 @@ class ArtistUrl < ApplicationRecord
   # usually because it's redundant with the primary profile URL.
   def secondary_url?
     case url
-    when %r!pixiv\.net/stacc!i
+    when %r{pixiv\.net/stacc}i
       true
-    when %r!pixiv\.net/fanbox!i
+    when %r{pixiv\.net/fanbox}i
       true
-    when %r!twitter\.com/intent!i
+    when %r{twitter\.com/intent}i
       true
-    when %r!lohas\.nicoseiga\.jp!i
+    when %r{lohas\.nicoseiga\.jp}i
       true
-    when %r!(?:www|com|dic)\.nicovideo\.jp!i
+    when %r{(?:www|com|dic)\.nicovideo\.jp}i
       true
-    when %r!pawoo\.net/web/accounts!i
+    when %r{pawoo\.net/web/accounts}i
       true
-    when %r!www\.artstation\.com!i
+    when %r{www\.artstation\.com}i
       true
-    when %r!blogimg\.jp!i, %r!image\.blog\.livedoor\.jp!i
+    when %r{blogimg\.jp}i, %r{image\.blog\.livedoor\.jp}i
       true
     else
       false
@@ -145,15 +145,15 @@ class ArtistUrl < ApplicationRecord
   end
 
   def validate_hostname(uri)
-    errors.add(:url, "'#{uri}' has a hostname '#{uri.host}' that does not contain a dot") unless uri.host&.include?('.')
+    errors.add(:url, "'#{uri}' has a hostname '#{uri.host}' that does not contain a dot") unless uri.host&.include?(".")
   end
 
   def validate_url_format
     uri = Addressable::URI.parse(url)
     validate_scheme(uri)
     validate_hostname(uri)
-  rescue Addressable::URI::InvalidURIError => error
-    errors.add(:url, "'#{uri}' is malformed: #{error}")
+  rescue Addressable::URI::InvalidURIError => e
+    errors.add(:url, "'#{uri}' is malformed: #{e}")
   end
 
   def self.available_includes

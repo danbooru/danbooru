@@ -20,7 +20,7 @@ class IpAddress < ApplicationRecord
     ipv4_masklen ||= 32
     ipv6_masklen ||= 128
 
-    q = select(sanitize_sql([<<~SQL, ipv4_masklen, ipv6_masklen]))
+    q = select(sanitize_sql([<<~SQL.squish, ipv4_masklen, ipv6_masklen]))
       CASE
         WHEN family(ip_addr) = 4
         THEN network(set_masklen(ip_addr, ?))

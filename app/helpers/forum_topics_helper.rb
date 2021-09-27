@@ -8,7 +8,7 @@ module ForumTopicsHelper
   end
 
   def new_forum_topic?(topic, read_forum_topics)
-    !read_forum_topics.map(&:id).include?(topic.id)
+    read_forum_topics.map(&:id).exclude?(topic.id)
   end
 
   def forum_topic_status(topic)
@@ -24,9 +24,10 @@ module ForumTopicsHelper
   end
 
   def forum_post_vote_icon(vote)
-    if vote.score == 1
+    case vote.score
+    when 1
       upvote_icon
-    elsif vote.score == -1
+    when -1
       downvote_icon
     else
       meh_icon

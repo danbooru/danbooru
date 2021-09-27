@@ -26,7 +26,7 @@ class ApplicationRecord < ActiveRecord::Base
 
   concerning :PrivilegeMethods do
     class_methods do
-      def visible(user)
+      def visible(_user)
         all
       end
 
@@ -47,14 +47,14 @@ class ApplicationRecord < ActiveRecord::Base
       end
 
       def multiple_includes
-        reflections.reject { |k,v| v.macro != :has_many }.keys.map(&:to_sym)
+        reflections.select { |_, v| v.macro == :has_many }.keys.map(&:to_sym)
       end
 
       def associated_models(name)
         if reflections[name].options[:polymorphic]
-          associated_models = reflections[name].active_record.try(:model_types) || []
+          reflections[name].active_record.try(:model_types) || []
         else
-          associated_models = [reflections[name].class_name]
+          [reflections[name].class_name]
         end
       end
     end
@@ -77,7 +77,7 @@ class ApplicationRecord < ActiveRecord::Base
 
     def serializable_hash(options = {})
       options ||= {}
-      if options[:only] && options[:only].is_a?(String)
+      if options[:only].is_a?(String)
         options.delete(:methods)
         options.delete(:include)
         options.merge!(ParameterBuilder.serial_parameters(options[:only], self))
@@ -116,20 +116,20 @@ class ApplicationRecord < ActiveRecord::Base
   concerning :ActiveRecordExtensions do
     class_methods do
       def without_timeout
-        connection.execute("SET STATEMENT_TIMEOUT = 0") unless Rails.env == "test"
+        connection.execute("SET STATEMENT_TIMEOUT = 0") unless Rails.env.test?
         yield
       ensure
-        connection.execute("SET STATEMENT_TIMEOUT = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env == "test"
+        connection.execute("SET STATEMENT_TIMEOUT = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env.test?
       end
 
       def with_timeout(n, default_value = nil, new_relic_params = {})
-        connection.execute("SET STATEMENT_TIMEOUT = #{n}") unless Rails.env == "test"
+        connection.execute("SET STATEMENT_TIMEOUT = #{n}") unless Rails.env.test?
         yield
-      rescue ::ActiveRecord::StatementInvalid => x
-        DanbooruLogger.log(x, expected: false, **new_relic_params)
-        return default_value
+      rescue ::ActiveRecord::StatementInvalid => e
+        DanbooruLogger.log(e, expected: false, **new_relic_params)
+        default_value
       ensure
-        connection.execute("SET STATEMENT_TIMEOUT = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env == "test"
+        connection.execute("SET STATEMENT_TIMEOUT = #{CurrentUser.user.try(:statement_timeout) || 3_000}") unless Rails.env.test?
       end
 
       def update!(*args)
@@ -161,7 +161,7 @@ class ApplicationRecord < ActiveRecord::Base
   end
 
   concerning :DtextMethods do
-    def dtext_shortlink(**options)
+    def dtext_shortlink(**_options)
       "#{self.class.name.underscore.tr("_", " ")} ##{id}"
     end
   end

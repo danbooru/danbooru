@@ -179,7 +179,7 @@ class ForumPost < ApplicationRecord
     end
   end
 
-  def dtext_shortlink(**options)
+  def dtext_shortlink(**_options)
     "forum ##{id}"
   end
 

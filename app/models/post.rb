@@ -444,7 +444,7 @@ class Post < ApplicationRecord
       invalid_tags = tag_names.map { |name| Tag.new(name: name) }.select { |tag| tag.invalid?(:name) }
 
       invalid_tags.each do |tag|
-        tag.errors.messages.each do |attribute, messages|
+        tag.errors.messages.each do |_attribute, messages|
           warnings.add(:base, "Couldn't add tag: #{messages.join(';')}")
         end
       end
@@ -524,7 +524,7 @@ class Post < ApplicationRecord
         when /^newpool:(.+)$/i
           pool = Pool.find_by_name($1)
           if pool.nil?
-            pool = Pool.create(name: $1, description: "This pool was automatically generated")
+            Pool.create(name: $1, description: "This pool was automatically generated")
           end
         end
       end
@@ -1073,7 +1073,7 @@ class Post < ApplicationRecord
         "tags" => tag_string,
         "height" => image_height,
         "file_size" => file_size,
-        "id" => id
+        "id" => id,
       }
 
       if visible?
@@ -1148,7 +1148,7 @@ class Post < ApplicationRecord
 
     def with_flag_stats
       relation = left_outer_joins(:flags).group(:id).select("posts.*")
-      relation = relation.select("COUNT(post_flags.id) AS flag_count")
+      relation.select("COUNT(post_flags.id) AS flag_count")
       relation
     end
 
@@ -1308,14 +1308,14 @@ class Post < ApplicationRecord
           image_width: media_file.width,
           image_height: media_file.height,
           file_size: media_file.file_size,
-          file_ext: media_file.file_ext,
+          file_ext: media_file.file_ext
         )
 
         media_asset.update!(
           image_width: media_file.width,
           image_height: media_file.height,
           file_size: media_file.file_size,
-          file_ext: media_file.file_ext,
+          file_ext: media_file.file_ext
         )
 
         purge_cached_urls!
@@ -1328,7 +1328,7 @@ class Post < ApplicationRecord
     def purge_cached_urls!
       urls = [
         preview_file_url, crop_file_url, large_file_url, file_url,
-        tagged_file_url(tagged_filenames: true), tagged_large_file_url(tagged_filenames: true)
+        tagged_file_url(tagged_filenames: true), tagged_large_file_url(tagged_filenames: true),
       ]
 
       CloudflareService.new.purge_cache(urls)
@@ -1519,8 +1519,10 @@ class Post < ApplicationRecord
 
   def self.available_includes
     # attributes accessible through the ?only= parameter
-    [:uploader, :updater, :approver, :upload, :flags, :appeals,
-     :parent, :children, :notes, :comments, :approvals, :disapprovals,
-     :replacements, :pixiv_ugoira_frame_data, :artist_commentary]
+    %i[
+      uploader updater approver upload flags appeals parent children notes
+      comments approvals disapprovals replacements pixiv_ugoira_frame_data
+      artist_commentary
+    ]
   end
 end

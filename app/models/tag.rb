@@ -74,7 +74,7 @@ class Tag < ApplicationRecord
 
       # fix tags where the post count is non-zero but the tag isn't present on any posts.
       def regenerate_nonexistent_post_counts!
-        Tag.find_by_sql(<<~SQL)
+        Tag.find_by_sql(<<~SQL.squish)
           UPDATE tags
           SET post_count = 0
           WHERE
@@ -90,7 +90,7 @@ class Tag < ApplicationRecord
 
       # fix tags where the stored post count doesn't match the true post count.
       def regenerate_incorrect_post_counts!
-        Tag.find_by_sql(<<~SQL)
+        Tag.find_by_sql(<<~SQL.squish)
           UPDATE tags
           SET post_count = true_count
           FROM (
@@ -223,7 +223,7 @@ class Tag < ApplicationRecord
 
   module SearchMethods
     def autocorrect_matches(name)
-      tags = fuzzy_name_matches(name).order_similarity(name)
+      fuzzy_name_matches(name).order_similarity(name)
     end
 
     # ref: https://www.postgresql.org/docs/current/static/pgtrgm.html#idm46428634524336

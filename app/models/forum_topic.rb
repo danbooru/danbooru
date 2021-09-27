@@ -94,11 +94,12 @@ class ForumTopic < ApplicationRecord
         q = q.public_only
       end
 
-      if params[:status] == "pending"
+      case params[:status]
+      when "pending"
         q = q.pending
-      elsif params[:status] == "approved"
+      when "approved"
         q = q.approved
-      elsif params[:status] == "rejected"
+      when "rejected"
         q = q.rejected
       end
 

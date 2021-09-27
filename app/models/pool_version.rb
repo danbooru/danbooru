@@ -78,7 +78,7 @@ class PoolVersion < ApplicationRecord
       name: pool.name,
       is_active: pool.is_active?,
       is_deleted: pool.is_deleted?,
-      category: pool.category
+      category: pool.category,
     }
     msg = "add pool version\n#{json.to_json}"
     sqs_service.send_message(msg, message_group_id: "pool:#{pool.id}")

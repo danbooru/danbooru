@@ -1,10 +1,15 @@
 class ArtistCommentary < ApplicationRecord
   class RevertError < StandardError; end
 
-  attr_accessor :remove_commentary_tag, :remove_commentary_request_tag, :remove_commentary_check_tag, :remove_partial_commentary_tag
-  attr_accessor :add_commentary_tag, :add_commentary_request_tag, :add_commentary_check_tag, :add_partial_commentary_tag
+  attr_accessor(
+    :remove_commentary_tag, :remove_commentary_request_tag,
+    :remove_commentary_check_tag, :remove_partial_commentary_tag,
+    :add_commentary_tag, :add_commentary_request_tag, :add_commentary_check_tag,
+    :add_partial_commentary_tag
+  )
+
   before_validation :trim_whitespace
-  validates_uniqueness_of :post_id
+  validates :post_id, uniqueness: true
   belongs_to :post
   has_many :versions, -> {order("artist_commentary_versions.id ASC")}, :class_name => "ArtistCommentaryVersion", :dependent => :destroy, :foreign_key => :post_id, :primary_key => :post_id
   has_one :previous_version, -> {order(id: :desc)}, :class_name => "ArtistCommentaryVersion", :foreign_key => :post_id, :primary_key => :post_id
@@ -126,7 +131,7 @@ class ArtistCommentary < ApplicationRecord
 
     def revert_to(version)
       if post_id != version.post_id
-        raise RevertError.new("You cannot revert to a previous artist commentary of another post.")
+        raise RevertError, "You cannot revert to a previous artist commentary of another post."
       end
 
       self.original_description = version.original_description
