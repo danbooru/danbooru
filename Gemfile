@@ -59,7 +59,7 @@ gem "pry-rails"
 group :development do
   gem 'rubocop', require: false
   gem 'rubocop-rails', require: false
-  #gem 'meta_request'
+  gem 'meta_request'
   gem 'rack-mini-profiler'
   gem 'stackprof'
   gem 'flamegraph'
