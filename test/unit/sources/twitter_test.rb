@@ -316,9 +316,9 @@ module Sources
         source4 = "https://twitter.com/BOW999/status/1261877313349640194?s=19"
 
         assert_equal(source1, Sources::Strategies.normalize_source(source1))
-        assert_equal(source1, Sources::Strategies.normalize_source(source2))
-        assert_equal(source1, Sources::Strategies.normalize_source(source3))
-        assert_equal(source1, Sources::Strategies.normalize_source(source4))
+        assert_equal(source2, Sources::Strategies.normalize_source(source2))
+        assert_equal(source2, Sources::Strategies.normalize_source(source3))
+        assert_equal(source2, Sources::Strategies.normalize_source(source4))
       end
 
       should "normalize twimg twitpic correctly" do

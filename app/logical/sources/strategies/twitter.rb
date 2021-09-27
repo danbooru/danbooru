@@ -151,8 +151,9 @@ module Sources::Strategies
     end
 
     def normalize_for_source
-      status_id = self.class.status_id_from_url(url)
-      if status_id.present?
+      if tag_name_from_url.present? && status_id.present?
+        "https://twitter.com/#{tag_name_from_url}/status/#{status_id}"
+      elsif status_id.present?
         "https://twitter.com/i/web/status/#{status_id}"
       elsif url =~ %r{\Ahttps?://(?:o|image-proxy-origin)\.twimg\.com/\d/proxy\.jpg\?t=(\w+)&}i
         str = Base64.decode64($1)
