@@ -53,6 +53,8 @@ gem 'puma-metrics'
 gem 'puma_worker_killer'
 gem "rack-timeout", require: "rack/timeout/base"
 gem "parallel"
+gem "pry-byebug"
+gem "pry-rails"
 
 group :development do
   gem 'rubocop', require: false
@@ -68,8 +70,6 @@ group :development do
 end
 
 group :development, :test do
-  gem 'pry-byebug'
-  gem 'pry-rails'
   gem 'listen'
   gem 'solargraph'
 end
