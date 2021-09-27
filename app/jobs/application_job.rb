@@ -6,6 +6,14 @@ class ApplicationJob < ActiveJob::Base
   queue_as :default
   queue_with_priority 0
 
+  around_perform do |_job, block|
+    CurrentUser.scoped(User.system, "127.0.0.1") do
+      ApplicationRecord.without_timeout do
+        block.call
+      end
+    end
+  end
+
   discard_on ActiveJob::DeserializationError do |_job, error|
     DanbooruLogger.log(error)
   end
