@@ -40,27 +40,41 @@ class FFmpeg
   end
 
   def width
-    video_channels.first[:width]
+    video_streams.first[:width]
   end
 
   def height
-    video_channels.first[:height]
+    video_streams.first[:height]
   end
 
   def duration
     metadata.dig(:format, :duration).to_f
   end
 
-  def video_channels
+  def frame_count
+    if video_streams.first.has_key?(:nb_frames)
+      video_streams.first[:nb_frames].to_i
+    else
+      (duration * frame_rate).to_i
+    end
+  end
+
+  def frame_rate
+    rate = video_streams.first[:avg_frame_rate] # "100/57"
+    numerator, denominator = rate.split("/")
+    (numerator.to_f / denominator.to_f)
+  end
+
+  def video_streams
     metadata[:streams].select { |stream| stream[:codec_type] == "video" }
   end
 
-  def audio_channels
+  def audio_streams
     metadata[:streams].select { |stream| stream[:codec_type] == "audio" }
   end
 
   def has_audio?
-    audio_channels.present?
+    audio_streams.present?
   end
 
   def shell!(command)

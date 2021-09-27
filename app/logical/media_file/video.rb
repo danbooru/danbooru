@@ -3,7 +3,7 @@
 #
 # @see https://github.com/streamio/streamio-ffmpeg
 class MediaFile::Video < MediaFile
-  delegate :duration, :has_audio?, to: :video
+  delegate :duration, :frame_count, :frame_rate, :has_audio?, to: :video
 
   def dimensions
     [video.width, video.height]

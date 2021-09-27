@@ -23,8 +23,49 @@ class MediaFile::Image < MediaFile
     true
   end
 
-  def is_animated?
-    is_animated_gif? || is_animated_png?
+  def duration
+    if is_animated_gif?
+      if metadata.has_key?("GIF:Duration")
+        # GIF:Duration => "9.03 s"
+        metadata["GIF:Duration"].to_f
+      else
+        # If GIF:Duration is absent then it means the GIF has an unlimited
+        # framerate. In this situation we assume the browser will play the GIF
+        # at 10 FPS; this is browser dependent.
+        #
+        # A GIF consists of a series of frames, each frame having a separate frame
+        # delay. The duration of the GIF is the sum of each frame delay. If the frame
+        # delay of each frame is zero, then it means the GIF has an unlimited framerate
+        # and should be played as fast as possible. In reality, browsers cap the
+        # framerate to around 10FPS.
+        (frame_count * (1.0/10.0)).round(2)
+      end
+    elsif is_animated_png?
+      frame_count.to_f / frame_rate
+    else
+      nil
+    end
+  end
+
+  def frame_count
+    if file_ext == :gif
+      image.get("n-pages")
+    elsif file_ext == :png
+      metadata.fetch("PNG:AnimationFrames", 1)
+    else
+      nil
+    end
+  end
+
+  def frame_rate
+    if is_animated_gif?
+      frame_count / duration
+    elsif is_animated_png?
+      # XXX we have to resort to ffprobe to get the frame rate because libvips and exiftool can't get it.
+      video.frame_rate
+    else
+      nil
+    end
   end
 
   def channels
@@ -62,11 +103,11 @@ class MediaFile::Image < MediaFile
   end
 
   def is_animated_gif?
-    file_ext == :gif && image.get("n-pages") > 1
+    file_ext == :gif && is_animated?
   end
 
   def is_animated_png?
-    file_ext == :png && metadata.fetch("PNG:AnimationFrames", 1) > 1
+    file_ext == :png && is_animated?
   end
 
   # @return [Vips::Image] the Vips image object for the file
@@ -74,5 +115,9 @@ class MediaFile::Image < MediaFile
     Vips::Image.new_from_file(file.path, fail: true).autorot
   end
 
-  memoize :image, :dimensions, :is_corrupt?, :is_animated_gif?, :is_animated_png?
+  def video
+    FFmpeg.new(file)
+  end
+
+  memoize :image, :video, :dimensions, :is_corrupt?, :is_animated_gif?, :is_animated_png?
 end

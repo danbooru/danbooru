@@ -166,6 +166,12 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal([150, 150], @ugoira.crop(150, 150).dimensions)
     end
 
+    should "get the duration" do
+      assert_equal(1.05, @ugoira.duration)
+      assert_equal(4.76, @ugoira.frame_rate.round(2))
+      assert_equal(5, @ugoira.frame_count)
+    end
+
     should "convert to a webm" do
       webm = @ugoira.convert
       assert_equal(:webm, webm.file_ext)
@@ -173,10 +179,31 @@ class MediaFileTest < ActiveSupport::TestCase
     end
   end
 
-  context "for a video" do
+  context "for an mp4 file " do
     should "detect videos with audio" do
       assert_equal(true, MediaFile.open("test/files/test-audio.mp4").has_audio?)
       assert_equal(false, MediaFile.open("test/files/test-300x300.mp4").has_audio?)
+    end
+
+    should "determine the duration of the video" do
+      file = MediaFile.open("test/files/test-audio.mp4")
+      assert_equal(1.002667, file.duration)
+      assert_equal(10, file.frame_rate)
+      assert_equal(10, file.frame_count)
+
+      file = MediaFile.open("test/files/test-300x300.mp4")
+      assert_equal(5.7, file.duration)
+      assert_equal(1.75, file.frame_rate.round(2))
+      assert_equal(10, file.frame_count)
+    end
+  end
+
+  context "for a webm file" do
+    should "determine the duration of the video" do
+      file = MediaFile.open("test/files/test-512x512.webm")
+      assert_equal(0.48, file.duration)
+      assert_equal(50, file.frame_rate)
+      assert_equal(24, file.frame_count)
     end
   end
 
@@ -190,6 +217,15 @@ class MediaFileTest < ActiveSupport::TestCase
     end
   end
 
+  context "an animated GIF file" do
+    should "determine the duration of the animation" do
+      file = MediaFile.open("test/files/test-animated-86x52.gif")
+      assert_equal(0.4, file.duration)
+      assert_equal(10, file.frame_rate)
+      assert_equal(4, file.frame_count)
+    end
+  end
+
   context "a PNG file" do
     context "that is not animated" do
       should "not be detected as animated" do
@@ -197,6 +233,9 @@ class MediaFileTest < ActiveSupport::TestCase
 
         assert_equal(false, file.is_corrupt?)
         assert_equal(false, file.is_animated?)
+        assert_nil(file.duration)
+        assert_nil(file.frame_rate)
+        assert_equal(1, file.frame_count)
       end
     end
 
@@ -206,6 +245,9 @@ class MediaFileTest < ActiveSupport::TestCase
 
         assert_equal(false, file.is_corrupt?)
         assert_equal(true, file.is_animated?)
+        assert_equal(9, file.duration)
+        assert_equal(0.33, file.frame_rate.round(2))
+        assert_equal(3, file.frame_count)
       end
     end
 
@@ -215,6 +257,9 @@ class MediaFileTest < ActiveSupport::TestCase
 
         assert_equal(false, file.is_corrupt?)
         assert_equal(false, file.is_animated?)
+        assert_nil(file.duration)
+        assert_nil(file.frame_rate)
+        assert_equal(1, file.frame_count)
       end
     end
 
@@ -239,6 +284,7 @@ class MediaFileTest < ActiveSupport::TestCase
         file = MediaFile.open("test/files/apng/actl_zero_frames.png")
         assert_equal(false, file.is_corrupt?)
         assert_equal(false, file.is_animated?)
+        assert_equal(0, file.frame_count)
       end
     end
   end

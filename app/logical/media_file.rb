@@ -135,17 +135,31 @@ class MediaFile
 
   # @return [Boolean] true if the file is animated. Note that GIFs and PNGs may be animated.
   def is_animated?
-    is_video?
+    is_video? || frame_count.to_i > 1
+  end
+
+  # @return [Float, nil] the duration of the video or animation in seconds, or
+  #   nil if not a video or animation, or the duration is unknown.
+  def duration
+    nil
+  end
+
+  # @return [Float, nil] the number of frames in the video or animation, or nil
+  #   if not a video or animation.
+  def frame_count
+    nil
+  end
+
+  # @return [Float, nil] the average frame rate of the video or animation, or
+  #   nil if not a video or animation. Note that GIFs and PNGs can have a
+  #   variable frame rate.
+  def frame_rate
+    nil
   end
 
   # @return [Boolean] true if the file has an audio track. The track may not be audible.
   def has_audio?
     false
-  end
-
-  # @return [Float] the duration of the video or animation, in seconds.
-  def duration
-    0.0
   end
 
   # Return a preview of the file, sized to fit within the given width and
@@ -179,6 +193,9 @@ class MediaFile
       file_size: file_size,
       md5: md5,
       is_corrupt?: is_corrupt?,
+      duration: duration,
+      frame_count: frame_count,
+      frame_rate: frame_rate,
       metadata: metadata
     }.stringify_keys
   end

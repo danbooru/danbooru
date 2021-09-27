@@ -32,6 +32,22 @@ class MediaFile::Ugoira < MediaFile
     preview_frame.crop(width, height)
   end
 
+  def duration
+    (frame_delays.sum / 1000.0)
+  end
+
+  def frame_count
+    frame_data.count
+  end
+
+  def frame_rate
+    frame_count / duration
+  end
+
+  def frame_delays
+    frame_data.map { |frame| frame["delay"] }
+  end
+
   # Convert a ugoira to a webm.
   # XXX should take width and height and resize image
   def convert
