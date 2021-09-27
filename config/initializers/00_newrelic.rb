@@ -9,6 +9,7 @@ if Danbooru.config.new_relic_license_key.present?
     log_level: Danbooru.config.debug_mode ? "debug" : "error",
     #log: Rails.logger,
     "rake.tasks": ["maintenance:.*"],
+    "browser_monitoring.auto_instrument": false,
     config: Rails.application.config,
   )
 end

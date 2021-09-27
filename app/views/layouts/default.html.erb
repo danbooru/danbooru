@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+  <%= NewRelic::Agent.browser_timing_header rescue "" %>
   <meta charset="utf-8">
   <title><%= page_title %></title>
 
