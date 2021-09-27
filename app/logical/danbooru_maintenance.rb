@@ -2,45 +2,34 @@ module DanbooruMaintenance
   module_function
 
   def hourly
-    safely { Upload.prune! }
-    safely { PostPruner.prune! }
-    safely { RateLimit.prune! }
-    safely { regenerate_post_counts! }
+    queue PruneUploadsJob
+    queue PrunePostsJob
+    queue PruneRateLimitsJob
+    queue RegeneratePostCountsJob
   end
 
   def daily
-    safely { Delayed::Job.where('created_at < ?', 45.days.ago).delete_all }
-    safely { PostDisapproval.prune! }
-    safely { BulkUpdateRequestPruner.warn_old }
-    safely { BulkUpdateRequestPruner.reject_expired }
-    safely { Ban.prune! }
-    safely { BigqueryExportService.async_export_all! }
-    safely { ActiveRecord::Base.connection.execute("vacuum analyze") unless Rails.env.test? }
+    queue PruneDelayedJobsJob
+    queue PrunePostDisapprovalsJob
+    queue PruneBulkUpdateRequestsJob
+    queue PruneBansJob
+    queue BigqueryExportAllJob
+    queue VacuumDatabaseJob
   end
 
   def weekly
-    safely { TagRelationshipRetirementService.find_and_retire! }
-    safely { ApproverPruner.dmail_inactive_approvers! }
+    queue RetireTagRelationshipsJob
+    queue DmailInactiveApproversJob
   end
 
   def monthly
-    safely { ApproverPruner.prune! }
+    queue PruneApproversJob
   end
 
-  def regenerate_post_counts!
-    updated_tags = Tag.regenerate_post_counts!
-    updated_tags.each do |tag|
-      DanbooruLogger.info("Updated tag count", tag.attributes)
-    end
-  end
-
-  def safely(&block)
-    ActiveRecord::Base.connection.execute("set statement_timeout = 0")
-
-    CurrentUser.scoped(User.system, "127.0.0.1") do
-      yield
-    end
-  rescue StandardError => exception
+  def queue(job)
+    DanbooruLogger.info("Queueing #{job.name}")
+    job.perform_later
+  rescue Exception # rubocop:disable Lint/RescueException
     DanbooruLogger.log(exception)
     raise exception if Rails.env.test?
   end
