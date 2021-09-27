@@ -18,19 +18,29 @@ class ServerStatus
     {
       ip: request.remote_ip,
       headers: http_headers,
-      status: {
-        hostname: hostname,
-        uptime: uptime,
-        loadavg: loadavg,
+      instance: {
+        container_name: container_name,
+        instance_name: instance_name,
+        worker_name: worker_name,
+        container_uptime: container_uptime,
+        instance_uptime: instance_uptime,
+        worker_uptime: worker_uptime,
+        requests_processed: requests_processed,
         danbooru_version: danbooru_version,
         ruby_version: RUBY_VERSION,
         distro_version: distro_version,
-        kernel_version: kernel_version,
         libvips_version: libvips_version,
         ffmpeg_version: ffmpeg_version,
         mkvmerge_version: mkvmerge_version,
+        exiftool_version: exiftool_version,
         redis_version: redis_version,
         postgres_version: postgres_version,
+      },
+      server: {
+        node_name: node_name,
+        node_uptime: node_uptime,
+        loadavg: loadavg,
+        kernel_version: kernel_version,
       },
       postgres: {
         connection_stats: postgres_connection_stats,
@@ -54,9 +64,53 @@ class ServerStatus
       Socket.gethostname
     end
 
-    def uptime
-      seconds = File.read("/proc/uptime").split[0].to_f
-      "#{seconds.seconds.in_days.round} days"
+    def instance_name
+      if container_name.present?
+        "#{container_name}/#{node_name}"
+      else
+        node_name
+      end
+    end
+
+    def container_name
+      ENV["K8S_POD_NAME"]
+    end
+
+    def node_name
+      ENV["K8S_NODE_NAME"] || hostname
+    end
+
+    def worker_name
+      Thread.current.object_id
+    end
+
+    def node_uptime
+      uptime = File.read("/proc/uptime").split[0].to_f.seconds
+      Danbooru::Helpers.distance_of_time_in_words(uptime)
+    end
+
+    def container_uptime
+      started_at = File.stat("/proc/1").mtime
+      uptime = Time.zone.now - started_at
+      Danbooru::Helpers.distance_of_time_in_words(uptime)
+    end
+
+    def instance_uptime
+      started_at = File.stat("/proc/#{Process.ppid}").mtime
+      uptime = Time.zone.now - started_at
+      Danbooru::Helpers.distance_of_time_in_words(uptime)
+    end
+
+    def worker_uptime
+      started_at = File.stat("/proc/#{Process.pid}").mtime
+      uptime = Time.zone.now - started_at
+      Danbooru::Helpers.distance_of_time_in_words(uptime)
+    end
+
+    def requests_processed
+      if Puma::Server.current.present?
+        Puma::Server.current.requests_count
+      end
     end
 
     def loadavg
@@ -86,6 +140,10 @@ class ServerStatus
 
     def mkvmerge_version
       `mkvmerge --version`.chomp
+    end
+
+    def exiftool_version
+      `exiftool -ver`.chomp
     end
   end
 

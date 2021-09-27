@@ -1,7 +1,9 @@
 <%# hash %>
-<dl>
+<table class="striped aligned-vertical">
   <% hash.each do |key, value| %>
-    <dt><%= key.to_s.humanize %></dt>
-    <dd><%= value %></dd>
+    <tr>
+      <th><%= key.to_s.humanize %></th>
+      <td><%= value %></td>
+    </tr>
   <% end %>
-</dl>
+</table>

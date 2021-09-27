@@ -2,17 +2,27 @@
   <div id="a-show" class="fixed-width-container">
     <h1>Status</h1>
 
-    <% if @status.danbooru_version.present? && Danbooru.config.source_code_url.present? %>
-      <p>Running <%= external_link_to "#{Danbooru.config.source_code_url}/commits/#{@status.danbooru_version}", @status.danbooru_version.first(7) %>.</p>
-    <% end %>
-
-    <h2>Server</h2>
+    <h2>Instance</h1>
 
     <details>
       <summary>
-        Server: <%= @status.hostname %>
+        Running
+        <% if @status.danbooru_version.present? && Danbooru.config.source_code_url.present? %>
+          <%= external_link_to "#{Danbooru.config.source_code_url}/commits/#{@status.danbooru_version}", @status.danbooru_version.first(7) %>
+        <% end %>
+        on <%= @status.instance_name %>
+        for <%= @status.instance_uptime %>
       </summary>
-      <%= render "list", hash: @status.serializable_hash[:status] %>
+      <%= render "list", hash: @status.serializable_hash[:instance] %>
+    </details>
+
+    <h2>Server</h1>
+
+    <details>
+      <summary>
+        Server: <%= @status.node_name %>
+      </summary>
+      <%= render "list", hash: @status.serializable_hash[:server] %>
     </details>
 
     <h2>Postgres</h2>
