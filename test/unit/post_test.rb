@@ -91,17 +91,6 @@ class PostTest < ActiveSupport::TestCase
         assert_performed_jobs(1, only: IqdbRemovePostJob)
       end
 
-      context "that is status locked" do
-        setup do
-          @post.update(is_status_locked: true)
-        end
-
-        should "not destroy the record" do
-          @post.expunge!
-          assert_equal(1, Post.where("id = ?", @post.id).count)
-        end
-      end
-
       context "that belongs to a pool" do
         setup do
           # must be a builder to update deleted pools. must be >1 week old to remove posts from pools.
@@ -136,20 +125,6 @@ class PostTest < ActiveSupport::TestCase
     end
 
     context "Deleting a post" do
-      context "that is status locked" do
-        setup do
-          @post = FactoryBot.create(:post, is_status_locked: true)
-        end
-
-        should "fail" do
-          assert_raise(ActiveRecord::RecordInvalid) do
-            @post.delete!("test")
-          end
-
-          assert_equal(false, @post.reload.is_deleted?)
-        end
-      end
-
       context "that is pending" do
         setup do
           @post = FactoryBot.create(:post, is_pending: true)
@@ -375,18 +350,6 @@ class PostTest < ActiveSupport::TestCase
         @post = FactoryBot.create(:post, :is_deleted => true)
       end
 
-      context "that is status locked" do
-        setup do
-          @post.update(is_status_locked: true)
-        end
-
-        should "not allow undeletion" do
-          approval = @post.approve!
-          assert_equal(["Post is locked and cannot be approved"], approval.errors.full_messages)
-          assert_equal(true, @post.is_deleted?)
-        end
-      end
-
       context "that is undeleted" do
         setup do
           @mod = FactoryBot.create(:moderator_user)
@@ -508,75 +471,6 @@ class PostTest < ActiveSupport::TestCase
           post.reload
           assert_equal(false, post.is_flagged?)
           assert_equal(false, post.is_pending?)
-        end
-      end
-    end
-
-    context "A status locked post" do
-      should "not allow new flags" do
-        assert_raises(PostFlag::Error) do
-          @post = create(:post, is_status_locked: true)
-          @post.flag!("wrong")
-        end
-      end
-
-      should "not allow new appeals" do
-        @post = create(:post, is_status_locked: true, is_deleted: true)
-        @appeal = build(:post_appeal, post: @post)
-
-        assert_equal(false, @appeal.valid?)
-        assert_equal(["Post cannot be appealed"], @appeal.errors.full_messages)
-      end
-
-      should "not allow approval" do
-        @post = create(:post, is_status_locked: true, is_pending: true)
-        approval = @post.approve!
-        assert_includes(approval.errors.full_messages, "Post is locked and cannot be approved")
-      end
-    end
-
-    context "Locking post fields" do
-      should "create ModAction entries" do
-        @post = create(:post)
-        assert_difference("ModAction.post_note_lock_create.count", 1) do
-          @post.is_note_locked = true
-          @post.save!
-        end
-
-        assert_difference("ModAction.post_note_lock_delete.count", 1) do
-          @post.is_note_locked = false
-          @post.save!
-        end
-
-        assert_difference("ModAction.post_rating_lock_create.count", 1) do
-          @post.is_rating_locked = true
-          @post.save!
-        end
-
-        assert_difference("ModAction.post_rating_lock_delete.count", 1) do
-          @post.is_rating_locked = false
-          @post.save!
-        end
-
-        assert_difference("ModAction.post_status_lock_create.count", 1) do
-          @post.is_status_locked = true
-          @post.save!
-        end
-
-        assert_difference("ModAction.post_status_lock_delete.count", 1) do
-          @post.is_status_locked = false
-          @post.save!
-        end
-
-        assert_difference("ModAction.post_status_lock_create.count", 1) do
-          assert_difference("ModAction.post_rating_lock_create.count", 1) do
-            assert_difference("ModAction.post_note_lock_create.count", 1) do
-              @post.is_status_locked = true
-              @post.is_rating_locked = true
-              @post.is_note_locked = true
-              @post.save!
-            end
-          end
         end
       end
     end
@@ -943,25 +837,6 @@ class PostTest < ActiveSupport::TestCase
               assert_equal("q", @post.rating)
             end
           end
-
-          context "that is locked" do
-            should "change the rating if locked in the same update" do
-              @post.update(tag_string: "rating:e", is_rating_locked: true)
-
-              assert(@post.valid?)
-              assert_equal("e", @post.reload.rating)
-            end
-
-            should "not change the rating if locked previously" do
-              @post.is_rating_locked = true
-              @post.save
-
-              @post.update(:tag_string => "rating:e")
-
-              assert(@post.invalid?)
-              assert_not_equal("e", @post.reload.rating)
-            end
-          end
         end
 
         context "for a fav" do
@@ -1128,75 +1003,6 @@ class PostTest < ActiveSupport::TestCase
 
             assert_equal(false, @post.valid?)
             assert_equal(["is too long (maximum is 1200 characters)"], @post.errors[:source])
-          end
-        end
-
-        context "of" do
-          setup do
-            @builder = FactoryBot.create(:builder_user)
-          end
-
-          context "locked:notes" do
-            context "by a member" do
-              should "not lock the notes" do
-                @post.update(:tag_string => "locked:notes")
-                assert_equal(false, @post.is_note_locked)
-              end
-            end
-
-            context "by a builder" do
-              should "lock/unlock the notes" do
-                CurrentUser.scoped(@builder) do
-                  @post.update(:tag_string => "locked:notes")
-                  assert_equal(true, @post.is_note_locked)
-
-                  @post.update(:tag_string => "-locked:notes")
-                  assert_equal(false, @post.is_note_locked)
-                end
-              end
-            end
-          end
-
-          context "locked:rating" do
-            context "by a member" do
-              should "not lock the rating" do
-                @post.update(:tag_string => "locked:rating")
-                assert_equal(false, @post.is_rating_locked)
-              end
-            end
-
-            context "by a builder" do
-              should "lock/unlock the rating" do
-                CurrentUser.scoped(@builder) do
-                  @post.update(:tag_string => "locked:rating")
-                  assert_equal(true, @post.is_rating_locked)
-
-                  @post.update(:tag_string => "-locked:rating")
-                  assert_equal(false, @post.is_rating_locked)
-                end
-              end
-            end
-          end
-
-          context "locked:status" do
-            context "by a member" do
-              should "not lock the status" do
-                @post.update(:tag_string => "locked:status")
-                assert_equal(false, @post.is_status_locked)
-              end
-            end
-
-            context "by an admin" do
-              should "lock/unlock the status" do
-                CurrentUser.scoped(FactoryBot.create(:admin_user)) do
-                  @post.update(:tag_string => "locked:status")
-                  assert_equal(true, @post.is_status_locked)
-
-                  @post.update(:tag_string => "-locked:status")
-                  assert_equal(false, @post.is_status_locked)
-                end
-              end
-            end
           end
         end
 
@@ -1723,25 +1529,6 @@ class PostTest < ActiveSupport::TestCase
         end
       end
     end
-
-    context "A rating locked post" do
-      setup { @post = FactoryBot.create(:post, :is_rating_locked => true) }
-      subject { @post }
-
-      should "not allow values S, safe, derp" do
-        ["S", "safe", "derp"].each do |rating|
-          subject.rating = rating
-          assert(!subject.valid?)
-        end
-      end
-
-      should "not allow values s, e" do
-        ["s", "e"].each do |rating|
-          subject.rating = rating
-          assert(!subject.valid?)
-        end
-      end
-    end
   end
 
   context "Favorites:" do
@@ -2004,34 +1791,6 @@ class PostTest < ActiveSupport::TestCase
   end
 
   context "Reverting: " do
-    context "a post that is rating locked" do
-      setup do
-        @post = FactoryBot.create(:post, :rating => "s")
-        travel(2.hours) do
-          @post.update(rating: "q", is_rating_locked: true)
-        end
-      end
-
-      should "not revert the rating" do
-        assert_raises ActiveRecord::RecordInvalid do
-          @post.revert_to!(@post.versions.first)
-        end
-
-        assert_equal(["Rating is locked and cannot be changed. Unlock the post first."], @post.errors.full_messages)
-        assert_equal(@post.versions.last.rating, @post.reload.rating)
-      end
-
-      should "revert the rating after unlocking" do
-        @post.update(rating: "e", is_rating_locked: false)
-        assert_nothing_raised do
-          @post.revert_to!(@post.versions.first)
-        end
-
-        assert(@post.valid?)
-        assert_equal(@post.versions.first.rating, @post.rating)
-      end
-    end
-
     context "a post that has been updated" do
       setup do
         PostVersion.sqs_service.stubs(:merge?).returns(false)

@@ -31,7 +31,7 @@ class PostAppeal < ApplicationRecord
   end
 
   def validate_post_is_appealable
-    errors.add(:post, "cannot be appealed") if post.is_status_locked? || !post.is_appealable?
+    errors.add(:post, "cannot be appealed") if !post.is_appealable?
   end
 
   def self.available_includes

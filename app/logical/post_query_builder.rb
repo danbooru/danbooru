@@ -162,8 +162,6 @@ class PostQueryBuilder
       child_matches(value)
     when "rating"
       Post.where(rating: value.first.downcase)
-    when "locked"
-      locked_matches(value)
     when "embedded"
       embedded_matches(value)
     when "source"
@@ -467,19 +465,6 @@ class PostQueryBuilder
       Post.where(artist_commentary: ArtistCommentary.untranslated)
     else
       Post.where(artist_commentary: ArtistCommentary.text_matches(query))
-    end
-  end
-
-  def locked_matches(query)
-    case query.downcase
-    when "rating"
-      Post.where(is_rating_locked: true)
-    when "note", "notes"
-      Post.where(is_note_locked: true)
-    when "status"
-      Post.where(is_status_locked: true)
-    else
-      Post.none
     end
   end
 

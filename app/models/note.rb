@@ -13,7 +13,6 @@ class Note < ApplicationRecord
   validate :note_within_image
   after_save :update_post
   after_save :create_version
-  validate :validate_post_is_not_locked
 
   scope :active, -> { where(is_active: true) }
 
@@ -27,10 +26,6 @@ class Note < ApplicationRecord
   end
 
   extend SearchMethods
-
-  def validate_post_is_not_locked
-    errors.add(:post, "is note locked") if post.is_note_locked?
-  end
 
   def note_within_image
     return false unless post.present?

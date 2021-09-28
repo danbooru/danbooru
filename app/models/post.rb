@@ -27,11 +27,9 @@ class Post < ApplicationRecord
   validate :has_copyright_tag
   validate :has_enough_tags
   validate :post_is_not_its_own_parent
-  validate :updater_can_change_rating
   validate :uploader_is_not_limited, on: :create
   before_save :update_tag_post_counts
   before_save :set_tag_counts
-  before_save :create_mod_action_for_lock_change
   before_create :autoban
   after_save :create_version
   after_save :update_parent_on_save
@@ -255,7 +253,7 @@ class Post < ApplicationRecord
     end
 
     def is_approvable?(user = CurrentUser.user)
-      !is_status_locked? && !is_active? && uploader != user
+      !is_active? && uploader != user
     end
 
     def flag!(reason, is_deletion: false)
@@ -533,7 +531,7 @@ class Post < ApplicationRecord
     end
 
     def filter_metatags(tags)
-      @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent|-?locked):/i}
+      @pre_metatags, tags = tags.partition {|x| x =~ /\A(?:rating|parent|-parent):/i}
       tags = apply_categorization_metatags(tags)
       @post_metatags, tags = tags.partition {|x| x =~ /\A(?:-pool|pool|newpool|fav|-fav|child|-child|-favgroup|favgroup|upvote|downvote|status|-status|disapproved):/i}
       apply_pre_metatags
@@ -652,15 +650,6 @@ class Post < ApplicationRecord
 
         when /^rating:([qse])/i
           self.rating = $1
-
-        when /^(-?)locked:notes?$/i
-          self.is_note_locked = ($1 != "-") if CurrentUser.is_builder?
-
-        when /^(-?)locked:rating$/i
-          self.is_rating_locked = ($1 != "-") if CurrentUser.is_builder?
-
-        when /^(-?)locked:status$/i
-          self.is_status_locked = ($1 != "-") if CurrentUser.is_admin?
 
         end
       end
@@ -912,11 +901,6 @@ class Post < ApplicationRecord
 
   module DeletionMethods
     def expunge!
-      if is_status_locked?
-        errors.add(:is_status_locked, "; cannot delete post")
-        return false
-      end
-
       transaction do
         Post.without_timeout do
           ModAction.log("permanently deleted post ##{id} (md5=#{md5})", :post_permanent_delete)
@@ -1257,12 +1241,11 @@ class Post < ApplicationRecord
         :id, :created_at, :updated_at, :rating, :source, :pixiv_id, :fav_count,
         :score, :up_score, :down_score, :md5, :file_ext, :file_size, :image_width,
         :image_height, :tag_count, :has_children, :has_active_children,
-        :is_note_locked, :is_rating_locked, :is_status_locked, :is_pending,
-        :is_flagged, :is_deleted, :is_banned, :last_comment_bumped_at,
-        :last_commented_at, :last_noted_at, :uploader_ip_addr,
-        :uploader, :approver, :parent, :upload, :artist_commentary,
-        :flags, :appeals, :notes, :comments, :children, :approvals,
-        :replacements, :pixiv_ugoira_frame_data
+        :is_pending, :is_flagged, :is_deleted, :is_banned,
+        :last_comment_bumped_at, :last_commented_at, :last_noted_at,
+        :uploader_ip_addr, :uploader, :approver, :parent, :upload,
+        :artist_commentary, :flags, :appeals, :notes, :comments, :children,
+        :approvals, :replacements, :pixiv_ugoira_frame_data
       )
 
       if params[:tags].present?
@@ -1351,13 +1334,6 @@ class Post < ApplicationRecord
     def post_is_not_its_own_parent
       if !new_record? && id == parent_id
         errors.add(:base, "Post cannot have itself as a parent")
-      end
-    end
-
-    def updater_can_change_rating
-      # Don't forbid changes if the rating lock was just now set in the same update.
-      if rating_changed? && is_rating_locked? && !is_rating_locked_changed?
-        errors.add(:rating, "is locked and cannot be changed. Unlock the post first.")
       end
     end
 
@@ -1485,32 +1461,6 @@ class Post < ApplicationRecord
     end
 
     save
-  end
-
-  def create_mod_action_for_lock_change
-    if is_note_locked != is_note_locked_was
-      if is_note_locked
-        ModAction.log("locked notes for post ##{id}", :post_note_lock_create)
-      else
-        ModAction.log("unlocked notes for post ##{id}", :post_note_lock_delete)
-      end
-    end
-
-    if is_rating_locked != is_rating_locked_was
-      if is_rating_locked
-        ModAction.log("locked rating for post ##{id}", :post_rating_lock_create)
-      else
-        ModAction.log("unlocked rating for post ##{id}", :post_rating_lock_delete)
-      end
-    end
-
-    if is_status_locked != is_status_locked_was
-      if is_status_locked
-        ModAction.log("locked status for post ##{id}", :post_status_lock_create)
-      else
-        ModAction.log("unlocked status for post ##{id}", :post_status_lock_delete)
-      end
-    end
   end
 
   def self.model_restriction(table)

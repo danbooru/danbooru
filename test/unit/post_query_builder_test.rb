@@ -836,28 +836,6 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match(all - [e], "-rating:e")
     end
 
-    should "return posts for a locked:<rating|note|status> metatag" do
-      rating_locked = create(:post, is_rating_locked: true)
-      note_locked   = create(:post, is_note_locked: true)
-      status_locked = create(:post, is_status_locked: true)
-      all = [status_locked, note_locked, rating_locked]
-
-      assert_tag_match([rating_locked], "locked:rating")
-      assert_tag_match([note_locked], "locked:note")
-      assert_tag_match([status_locked], "locked:status")
-
-      assert_tag_match(all - [rating_locked], "-locked:rating")
-      assert_tag_match(all - [note_locked], "-locked:note")
-      assert_tag_match(all - [status_locked], "-locked:status")
-
-      assert_tag_match([rating_locked], "locked:RATING")
-      assert_tag_match([status_locked], "-locked:rating -locked:note")
-      assert_tag_match([], "locked:rating locked:note")
-
-      assert_tag_match([], "locked:garbage")
-      assert_tag_match(all, "-locked:garbage")
-    end
-
     should "return posts for a upvote:<user>, downvote:<user> metatag" do
       CurrentUser.scoped(create(:mod_user)) do
         upvoted   = create(:post, tag_string: "upvote:self")

@@ -86,20 +86,6 @@ class NoteTest < ActiveSupport::TestCase
         @post.reload
         assert_not_nil(@post.last_noted_at)
       end
-
-      context "for a note-locked post" do
-        setup do
-          @post.update_attribute(:is_note_locked, true)
-        end
-
-        should "fail" do
-          assert_difference("Note.count", 0) do
-            @note = FactoryBot.build(:note, :post => @post)
-            @note.save
-          end
-          assert_equal(["Post is note locked"], @note.errors.full_messages)
-        end
-      end
     end
 
     context "updating a note" do
@@ -135,17 +121,6 @@ class NoteTest < ActiveSupport::TestCase
         assert_equal(2, @note.version)
         assert_equal(@user.id, @note.versions.last.updater_id)
         assert_equal(CurrentUser.ip_addr, @note.versions.last.updater_ip_addr.to_s)
-      end
-
-      context "for a note-locked post" do
-        setup do
-          @post.update_attribute(:is_note_locked, true)
-        end
-
-        should "fail" do
-          @note.update(x: 500)
-          assert_equal(["Post is note locked"], @note.errors.full_messages)
-        end
       end
 
       context "without making any changes" do
