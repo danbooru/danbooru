@@ -12,7 +12,7 @@ class PostFlagPolicy < ApplicationPolicy
   end
 
   def can_view_flagger?
-    (user.is_moderator? || record.creator_id == user.id) && (record.post&.uploader_id != user.id)
+    (user.is_moderator? && record.post&.uploader_id != user.id) || record.creator_id == user.id
   end
 
   def permitted_attributes_for_create

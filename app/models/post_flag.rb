@@ -33,10 +33,12 @@ class PostFlag < ApplicationRecord
 
       policy = Pundit.policy!(searcher, PostFlag.new(creator: creator))
 
-      if policy.can_view_flagger?
-        where(creator: creator).where.not(post: searcher.posts)
+      return none if !policy.can_view_flagger?
+
+      if creator.id == searcher.id
+        where(creator: creator)
       else
-        none
+        where(creator: creator).where.not(post: searcher.posts)
       end
     end
 
