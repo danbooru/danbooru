@@ -30,8 +30,8 @@ module DanbooruMaintenance
     Rails.logger.level = :info
     DanbooruLogger.info("Queueing #{job.name}")
     job.perform_later
-  rescue Exception # rubocop:disable Lint/RescueException
+  rescue Exception => e # rubocop:disable Lint/RescueException
     DanbooruLogger.log(exception)
-    raise exception if Rails.env.test?
+    raise e if Rails.env.test?
   end
 end
