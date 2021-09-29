@@ -287,6 +287,12 @@ class Tag < ApplicationRecord
         q = q.name_or_alias_matches(params[:name_or_alias_matches])
       end
 
+      if params[:is_empty].to_s.truthy?
+        q = q.empty
+      elsif params[:is_empty].to_s.falsy?
+        q = q.nonempty
+      end
+
       if params[:hide_empty].to_s.truthy?
         q = q.nonempty
       end

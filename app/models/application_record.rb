@@ -14,12 +14,21 @@ class ApplicationRecord < ActiveRecord::Base
         extending(PaginationExtension).paginate(*args, **options)
       end
 
-      def paginated_search(params, count_pages: params[:search].present?, **defaults)
+      # Perform a search using the model's `search` method, then paginate the results.
+      #
+      # params [Hash] The URL request params from the user
+      # page [Integer] The page number
+      # limit [Integer] The number of posts per page
+      # count_pages [Boolean] If true, show the exact number of pages of
+      #   results. If false (the default), don't count the exact number of pages
+      #   of results; assume there are too many pages to count.
+      # defaults [Hash] The default params for the search
+      def paginated_search(params, page: params[:page], limit: params[:limit], count_pages: params[:search].present?, defaults: {})
         search_params = params.fetch(:search, {}).permit!
         search_params = defaults.merge(search_params).with_indifferent_access
 
         max_limit = (params[:format] == "sitemap") ? 10_000 : 1_000
-        search(search_params).paginate(params[:page], limit: params[:limit], max_limit: max_limit, search_count: count_pages)
+        search(search_params).paginate(page, limit: limit, max_limit: max_limit, search_count: count_pages)
       end
     end
   end

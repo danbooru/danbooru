@@ -15,11 +15,12 @@ class ForumTopicsController < ApplicationController
   end
 
   def index
-    params[:search] ||= {}
-    params[:search][:order] ||= "sticky" if request.format.html?
-    params[:limit] ||= 40
-
-    @forum_topics = authorize ForumTopic.visible(CurrentUser.user).paginated_search(params)
+    if request.format.html?
+      limit = params.fetch(:limit, 40)
+      @forum_topics = authorize ForumTopic.visible(CurrentUser.user).paginated_search(params, limit: limit, defaults: { order: "sticky", is_deleted: false })
+    else
+      @forum_topics = authorize ForumTopic.visible(CurrentUser.user).paginated_search(params)
+    end
 
     if request.format.atom?
       @forum_topics = @forum_topics.includes(:creator, :original_post)

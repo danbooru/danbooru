@@ -2,6 +2,7 @@
   <%= f.input :name_matches, label: "Name", input_html: { value: params.dig(:search, :name_matches), "data-autocomplete": "pool" } %>
   <%= f.input :description_matches, label: "Description", input_html: { value: params.dig(:search, :description_matches) } %>
   <%= f.input :post_tags_match, label: "Post tags", input_html: { value: params.dig(:search, :post_tags_match), "data-autocomplete": "tag-query" } %>
+  <%= f.input :is_deleted, label: "Deleted?", as: :select, include_blank: true, selected: params[:search][:is_deleted] %>
   <%= f.input :category, collection: %w[series collection], include_blank: true, selected: params[:search][:category] %>
   <%= f.input :order, collection: [%w[Last\ updated updated_at], %w[Name name], %w[Recently\ created created_at], %w[Post\ count post_count]], include_blank: true, selected: params.dig(:search, :order) %>
   <%= f.submit "Search" %>

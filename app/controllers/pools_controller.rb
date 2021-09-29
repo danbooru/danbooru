@@ -12,7 +12,11 @@ class PoolsController < ApplicationController
   end
 
   def index
-    @pools = authorize Pool.paginated_search(params, count_pages: true)
+    if request.format.html?
+      @pools = authorize Pool.paginated_search(params, count_pages: true, defaults: { is_deleted: false })
+    else
+      @pools = authorize Pool.paginated_search(params, count_pages: true)
+    end
 
     respond_with(@pools)
   end
