@@ -11,7 +11,12 @@ class MediaAsset < ApplicationRecord
   }
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :md5, :file_ext, :file_size, :image_width, :image_height)
+    q = search_attributes(params, :id, :created_at, :updated_at, :md5, :file_ext, :file_size, :image_width, :image_height, :media_metadata)
+
+    if params[:metadata].present?
+      q = q.joins(:media_metadata).merge(MediaMetadata.search(metadata: params[:metadata]))
+    end
+
     q.apply_default_order(params)
   end
 

@@ -1,0 +1,20 @@
+<div id="c-media-assets">
+  <div id="a-show" class="fixed-width-container">
+    <h1 class="mb-4">Media Asset</h1>
+
+    <% if @post.present? %>
+      <%= post_preview(@post, show_deleted: true) %>
+    <% else %>
+      <p>MD5: <%= link_to @media_asset.md5, posts_path(md5: @media_asset.md5) %></p>
+    <% end %>
+
+    <table class="striped aligned-vertical">
+      <% @media_asset.metadata.sort.each do |key, value| %>
+        <tr>
+          <th><%= key %></th>
+          <td><%= link_to value, media_assets_path(search: { metadata: { key => value }}) %></td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+</div>

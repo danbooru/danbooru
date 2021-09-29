@@ -16,6 +16,7 @@
   <li id="post-info-size">
     Size: <%= link_to_if policy(post).visible?, "#{number_to_human_size(post.file_size)} .#{post.file_ext}", post.tagged_file_url %>
     (<%= post.image_width %>x<%= post.image_height %>)
+    <%= link_to "»", @post.media_asset %>
   </li>
   <li id="post-info-source">Source: <%= post_source_tag(post.source, post.normalized_source) %></li>
   <li id="post-info-rating">Rating: <%= post.pretty_rating %></li>

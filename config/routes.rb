@@ -154,7 +154,7 @@ Rails.application.routes.draw do
       get :check, to: redirect {|path_params, req| "/iqdb_queries?#{req.query_string}"}
     end
   end
-  resources :media_assets, only: [:index]
+  resources :media_assets, only: [:index, :show]
   resources :media_metadata, only: [:index]
   resources :mod_actions
   resources :moderation_reports, only: [:new, :create, :index, :show]

@@ -1,0 +1,39 @@
+<div id="c-media-assets">
+  <div id="a-index">
+    <%= search_form_for(media_assets_path) do |f| %>
+      <%= f.input :md5, input_html: { value: params[:search][:md5] } %>
+      <%= f.input :image_width, input_html: { value: params[:search][:image_width] } %>
+      <%= f.input :image_height, input_html: { value: params[:search][:image_height] } %>
+      <%= f.input :file_size, input_html: { value: params[:search][:file_size] } %>
+      <%= f.input :file_ext, input_html: { value: params[:search][:file_ext] } %>
+
+      <%= f.simple_fields_for :metadata do |meta| %>
+        <% params.dig(:search, :metadata).to_h.each do |key, value| %>
+          <%= meta.input key, label: key, input_html: { value: value } %>
+        <% end %>
+      <% end %>
+
+      <%= f.submit "Search" %>
+    <% end %>
+
+    <%= table_for @media_assets, class: "striped autofit" do |t| %>
+      <% t.column "MD5", td: { class: "font-monospace" } do |media_asset| %>
+        <%= link_to media_asset.md5, posts_path(md5: media_asset.md5) %>
+      <% end %>
+      <% t.column :image_width %>
+      <% t.column :image_height %>
+      <% t.column :file_size %>
+      <% t.column :file_ext %>
+
+      <% t.column "Metadata" do |media_asset| %>
+        <%= link_to pluralize(media_asset.metadata.size, "tags"), media_asset %>
+      <% end %>
+
+      <% t.column "Created" do |media_asset| %>
+        <%= time_ago_in_words_tagged(media_asset.created_at) %>
+      <% end %>
+    <% end %>
+
+    <%= numbered_paginator(@media_assets) %>
+  </div>
+</div>

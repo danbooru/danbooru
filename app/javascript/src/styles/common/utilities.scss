@@ -8,7 +8,7 @@ $spacer: 0.25rem; /* 4px */
 .invisible { visibility: hidden; }
 .visible { visibility: visible; }
 
-.font-monospace { font-family: var(--monospace-font); }
+.font-monospace { font: var(--monospace-font); }
 .font-bold { font-weight: bold; }
 
 .inline-block { display: inline-block; }
