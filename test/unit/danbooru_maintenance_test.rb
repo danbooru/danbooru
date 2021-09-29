@@ -8,6 +8,16 @@ class DanbooruMaintenanceTest < ActiveSupport::TestCase
         perform_enqueued_jobs
       end
     end
+
+    should "log errors" do
+      assert_raise(RuntimeError) do
+        PrunePostsJob.stubs(:perform_later).raises(RuntimeError)
+        DanbooruLogger.expects(:log)
+
+        DanbooruMaintenance.hourly
+        perform_enqueued_jobs
+      end
+    end
   end
 
   context "daily maintenance" do

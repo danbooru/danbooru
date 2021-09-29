@@ -32,7 +32,7 @@ module DanbooruMaintenance
     ApplicationRecord.connection.verify!
     job.perform_later
   rescue Exception => e # rubocop:disable Lint/RescueException
-    DanbooruLogger.log(exception)
+    DanbooruLogger.log(e)
     raise e if Rails.env.test?
   end
 end
