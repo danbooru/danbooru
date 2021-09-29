@@ -26,8 +26,6 @@ jobs:
   docker-build:
     runs-on: ubuntu-latest
 
-    concurrency: docker-build
-
     steps:
       # https://github.com/docker/setup-buildx-action
       - name: Set up Docker Buildx
