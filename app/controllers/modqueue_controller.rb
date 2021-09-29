@@ -6,7 +6,7 @@ class ModqueueController < ApplicationController
     authorize :modqueue
     @posts = Post.includes(:appeals, :disapprovals, :uploader, flags: [:creator]).in_modqueue.available_for_moderation(CurrentUser.user, hidden: search_params[:hidden])
     @modqueue_posts = @posts.reselect(nil).reorder(nil).offset(nil).limit(nil)
-    @posts = @posts.paginated_search(params, order: "modqueue", count_pages: true, count: @modqueue_posts.to_a.size)
+    @posts = @posts.paginated_search(params, count_pages: true, count: @modqueue_posts.to_a.size, defaults: { order: "modqueue" })
 
     @pending_post_count = @modqueue_posts.select(&:is_pending?).count
     @flagged_post_count = @modqueue_posts.select(&:is_flagged?).count
