@@ -56,11 +56,12 @@ table.search, table.aligned-vertical {
   th {
     text-align: right;
     padding-right: 1em;
-    vertical-align: top;
+    vertical-align: middle;
+    white-space: nowrap;
   }
 
   td {
-    vertical-align: top;
+    vertical-align: middle;
   }
 }
 
