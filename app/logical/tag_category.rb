@@ -1,80 +1,97 @@
 # Utility methods for working with tag categories (general, character,
 # copyright, artist, meta).
-class TagCategory
-  module Mappings
-    # Returns a hash mapping various tag categories to a numerical value.
-    def mapping
-      @@mapping ||=
-        Hash[
-          Danbooru.config.full_tag_config_info.map { |k, v| v["extra"].map { |y| [y, v["category"]] }}.reduce([], :+)
-        ]
-        .update(Hash[Danbooru.config.full_tag_config_info.map { |k, v| [v["short"], v["category"]] }])
-        .update(Hash[Danbooru.config.full_tag_config_info.map { |k, v| [k, v["category"]] }])
-    end
 
-    # Returns a hash mapping more suited for views
-    def canonical_mapping
-      @@canonical_mapping ||= Hash[Danbooru.config.full_tag_config_info.map { |k, v| [k.capitalize, v["category"]] }]
-    end
+module TagCategory
+  module_function
 
-    # Returns a hash mapping numerical category values to their string equivalent.
-    def reverse_mapping
-      @@reverse_mapping ||= Hash[Danbooru.config.full_tag_config_info.map { |k, v| [v["category"], k] }]
-    end
-
-    # Returns a hash mapping for the short name usage in metatags
-    def short_name_mapping
-      @@short_name_mapping ||= Hash[Danbooru.config.full_tag_config_info.map { |k, v| [v["short"], k] }]
-    end
-
-    # Returns a hash mapping for related tag buttons (javascripts/related_tag.js.erb)
-    def related_button_mapping
-      @@related_button_mapping ||= Hash[Danbooru.config.full_tag_config_info.map { |k, v| [k, v["relatedbutton"]] }]
-    end
-
-    # Returns a hash mapping for CSS (stylesheets/posts.scss.erb)
-    def css_mapping
-      @@css_mapping ||= Hash[Danbooru.config.full_tag_config_info.map { |k, v| [v["category"], v["css"]] }]
-    end
+  # Returns a hash mapping various tag categories to a numerical value.
+  def mapping
+    {
+      "ch" => 4,
+      "co" => 3,
+      "gen" => 0,
+      "char" => 4,
+      "copy" => 3,
+      "art" => 1,
+      "meta" => 5,
+      "general" => 0,
+      "character" => 4,
+      "copyright" => 3,
+      "artist" => 1,
+    }
   end
 
-  module Lists
-    def categories
-      @@categories ||= Danbooru.config.full_tag_config_info.keys
-    end
-
-    def category_ids
-      @@category_ids ||= canonical_mapping.values
-    end
-
-    def short_name_list
-      @@short_name_list ||= short_name_mapping.keys
-    end
-
-    def split_header_list
-      Danbooru.config.split_tag_header_list
-    end
-
-    def categorized_list
-      Danbooru.config.categorized_tag_list
-    end
-
-    def related_button_list
-      Danbooru.config.related_tag_button_list
-    end
+  # The order of tags in dropdown lists.
+  def canonical_mapping
+    {
+      "Artist"    => 1,
+      "Copyright" => 3,
+      "Character" => 4,
+      "General"   => 0,
+      "Meta"      => 5,
+    }
   end
 
-  module Regexes
-    def short_name_regex
-      @@short_name_regex ||= short_name_list.join("|")
-    end
-
-    def category_ids_regex
-      @@category_ids_regex ||= "[#{category_ids.join}]"
-    end
+  # Returns a hash mapping numerical category values to their string equivalent.
+  def reverse_mapping
+    {
+      0 => "general",
+      4 => "character",
+      3 => "copyright",
+      1 => "artist",
+      5 => "meta",
+    }
   end
 
-  extend Mappings
-  extend Lists
-  extend Regexes
+  def short_name_mapping
+    {
+      "art"  => "artist",
+      "copy" => "copyright",
+      "char" => "character",
+      "gen"  => "general",
+      "meta" => "meta",
+    }
+  end
+
+  # Returns a hash mapping for related tag buttons (javascripts/related_tag.js.erb)
+  def related_button_mapping
+    {
+      "general" => "General",
+      "character" => "Characters",
+      "copyright" => "Copyrights",
+      "artist" => "Artists",
+      "meta" => nil,
+    }
+  end
+
+  def categories
+    %w[general character copyright artist meta]
+  end
+
+  def category_ids
+    canonical_mapping.values
+  end
+
+  def short_name_list
+    %w[art copy char gen meta]
+  end
+
+  # The order of tags on the post page tag list.
+  def split_header_list
+    %w[artist copyright character general meta]
+  end
+
+  # The order of tags inside the tag edit box, and on the comments page.
+  def categorized_list
+    %w[artist copyright character meta general]
+  end
+
+  # The order of tags in the related tag buttons.
+  def related_button_list
+    %w[general artist character copyright]
+  end
+
+  def category_ids_regex
+    "[#{category_ids.join}]"
+  end
 end

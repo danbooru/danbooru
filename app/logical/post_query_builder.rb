@@ -665,10 +665,12 @@ class PostQueryBuilder
     when "duration_asc"
       relation = relation.joins(:media_asset).order("media_assets.duration ASC NULLS LAST, posts.id ASC")
 
-    when /(#{TagCategory.short_name_regex})tags(?:\Z|_desc)/
+    # artags_desc, copytags_desc, chartags_desc, gentags_desc, metatags_desc
+    when /(#{TagCategory.short_name_list.join("|")})tags(?:\Z|_desc)/
       relation = relation.order("posts.tag_count_#{TagCategory.short_name_mapping[$1]} DESC")
 
-    when /(#{TagCategory.short_name_regex})tags_asc/
+    # artags_asc, copytags_asc, chartags_asc, gentags_asc, metatags_asc
+    when /(#{TagCategory.short_name_list.join("|")})tags_asc/
       relation = relation.order("posts.tag_count_#{TagCategory.short_name_mapping[$1]} ASC")
 
     when "rank"
