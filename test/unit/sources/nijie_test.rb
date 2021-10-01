@@ -4,8 +4,7 @@ module Sources
   class NijieTest < ActiveSupport::TestCase
     setup do
       skip "Nijie credentials not configured" unless Sources::Strategies::Nijie.enabled?
-      # Add a random delay to work around test failures due to rate limiting by Nijie.
-      sleep (3..5).to_a.sample
+      skip if ENV["CI"].present?
     end
 
     context "downloading a 'http://nijie.info/view.php?id=:id' url" do

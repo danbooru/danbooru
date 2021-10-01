@@ -157,6 +157,8 @@ class DanbooruHttpTest < ActiveSupport::TestCase
 
     context "unpolish cloudflare feature" do
       should "return the original image for polished images" do
+        skip if ENV["CI"].present?
+
         url = "https://cdnb.artstation.com/p/assets/images/images/025/273/307/4k/atey-ghailan-a-sage-keyart-s-ch-04-outlined-1.jpg?1585246642"
         response = Danbooru::Http.use(:unpolish_cloudflare).get(url)
 

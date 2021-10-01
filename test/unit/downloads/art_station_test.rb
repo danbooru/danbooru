@@ -10,6 +10,8 @@ module Downloads
 
     context "for an image where an original does not exist" do
       should "not try to download the original" do
+        skip if ENV["CI"].present?
+
         assert_downloaded(452_795, "https://cdna.artstation.com/p/assets/images/images/004/730/278/large/mendel-oh-dragonll.jpg")
       end
     end
