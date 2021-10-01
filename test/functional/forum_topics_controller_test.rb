@@ -124,6 +124,15 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(ForumTopic.visible(User.anonymous).count, response.parsed_body.css("urlset url loc").size)
       end
 
+      should "not show deleted topics for HTML responses by default" do
+        as(@user) { create(:forum_topic, is_deleted: true) }
+        get forum_topics_path
+
+        assert_response :success
+        assert_select 'tr[data-is-deleted="true"]', count: 0
+        assert_select 'tr[data-is-deleted="false"]', count: 3
+      end
+
       context "with private topics" do
         should "not show private topics to unprivileged users" do
           as(@user) { @other_topic.update!(min_level: User::Levels::MODERATOR) }

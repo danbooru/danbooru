@@ -17,7 +17,7 @@ class ForumTopicsController < ApplicationController
   def index
     if request.format.html?
       limit = params.fetch(:limit, 40)
-      @forum_topics = authorize ForumTopic.visible(CurrentUser.user).paginated_search(params, limit: limit, defaults: { order: "sticky", is_deleted: false })
+      @forum_topics = authorize ForumTopic.visible(CurrentUser.user).paginated_search(params, limit: limit, defaults: { order: "sticky", is_deleted: "false" })
     else
       @forum_topics = authorize ForumTopic.visible(CurrentUser.user).paginated_search(params)
     end
