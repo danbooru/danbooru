@@ -78,7 +78,8 @@ jobs:
         env:
           POSTGRES_USER: danbooru
           POSTGRES_PASSWORD: danbooru
-          PGDATA: /tmp
+        options: >-
+          --mount type=tmpfs,destination=/var/lib/postgresql/data
 
     steps:
     - name: Setup tmate session
