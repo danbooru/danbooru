@@ -2,7 +2,7 @@
   <div id="news-updates" data-id="<%= NewsUpdate.recent.first.try(:id) %>" style="display: none;">
     <ul>
       <% NewsUpdate.recent.each do |news_update| %>
-        <li><%= news_update.created_at.strftime("%b %d") %>: <%= news_update.message.html_safe %></li>
+        <li><%= time_ago_in_words_tagged(news_update.created_at, compact: true) %> ago: <%= news_update.message.html_safe %></li>
       <% end %>
     </ul>
 
