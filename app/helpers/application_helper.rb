@@ -103,7 +103,9 @@ module ApplicationHelper
   end
 
   def humanized_number(number)
-    if number >= 10_000
+    if number >= 1_000_000
+      format("%.1fM", number / 1_000_000.0)
+    elsif number >= 10_000
       "#{number / 1_000}k"
     elsif number >= 1_000
       format("%.1fk", number / 1_000.0)
