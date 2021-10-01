@@ -22,6 +22,9 @@ jobs:
   test:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
+    # Don't run the test suite multiple times for the same commit.
+    concurrency: "test-${{ github.sha }}"
+
     runs-on: ubuntu-latest
 
     container:
