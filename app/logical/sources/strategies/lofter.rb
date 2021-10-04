@@ -74,10 +74,10 @@ module Sources
       end
 
       def tags
-        tags = page&.search(".info .tag, .main .tag a, .tagarea")
+        tags = page&.search(".info .tag, .main .tag a, .tagarea, .m-info .tags .tag")
 
         tags.to_a.map do |tag|
-          [tag.text, tag.attr("href")]
+          [tag.text.gsub(/^● /, ""), tag.attr("href")]
         end
       end
 
