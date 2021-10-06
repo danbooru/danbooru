@@ -427,7 +427,6 @@ class Post < ApplicationRecord
       normalized_tags = filter_metatags(normalized_tags)
       normalized_tags = TagAlias.to_aliased(normalized_tags)
       normalized_tags = remove_negated_tags(normalized_tags)
-      normalized_tags = %w[tagme] if normalized_tags.empty?
       normalized_tags = add_automatic_tags(normalized_tags)
       normalized_tags = remove_invalid_tags(normalized_tags)
       normalized_tags = Tag.convert_cosplay_tags(normalized_tags)
@@ -459,6 +458,12 @@ class Post < ApplicationRecord
 
     def add_automatic_tags(tags)
       tags -= %w[incredibly_absurdres absurdres highres lowres flash video ugoira animated_gif animated_png exif_rotation non-repeating_animation]
+
+      if tags.size >= 30
+        tags -= ["tagme"]
+      elsif tags.empty?
+        tags << "tagme"
+      end
 
       if image_width >= 10_000 || image_height >= 10_000
         tags << "incredibly_absurdres"
