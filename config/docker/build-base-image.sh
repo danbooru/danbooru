@@ -7,6 +7,7 @@ VIPS_VERSION="${VIPS_VERSION:-8.11.3}"
 FFMPEG_VERSION="${FFMPEG_VERSION:-4.4}"
 EXIFTOOL_VERSION="${EXIFTOOL_VERSION:-12.30}"
 OPENRESTY_VERSION="${OPENRESTY_VERSION:-1.19.9.1}"
+POSTGRESQL_CLIENT_VERSION="${POSTGRESQL_CLIENT_VERSION:-14}"
 
 COMMON_BUILD_DEPS="
   curl ca-certificates build-essential pkg-config git
@@ -19,7 +20,7 @@ VIPS_BUILD_DEPS="
 "
 EXIFTOOL_RUNTIME_DEPS="perl perl-modules libarchive-zip-perl"
 DANBOORU_RUNTIME_DEPS="
-  ca-certificates mkvtoolnix postgresql-client-12 libpq5
+  ca-certificates mkvtoolnix libpq5
   zlib1g libfftw3-3 libwebp6 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2
   libpng16-16 libjpeg-turbo8 libexpat1 libglib2.0 libgif7 libexif12 libvpx6
 "
@@ -108,6 +109,17 @@ install_openresty() {
   make install
 }
 
+install_postgresql_client() {
+  apt_install gnupg
+
+  . /etc/lsb-release
+  curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor > /usr/share/keyrings/postgresql.gpg
+  echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt $DISTRIB_CODENAME-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+
+  apt-get update
+  apt_install postgresql-client-${POSTGRESQL_CLIENT_VERSION}
+}
+
 install_busybox() {
   busybox --install -s
 }
@@ -116,7 +128,7 @@ cleanup() {
   apt-get purge -y $RUBY_BUILD_DEPS $VIPS_BUILD_DEPS $FFMPEG_BUILD_DEPS
   apt-get purge -y --allow-remove-essential \
     build-essential pkg-config e2fsprogs git libglib2.0-bin libglib2.0-doc \
-    mount procps python3 readline-common shared-mime-info tzdata
+    mount procps python3 shared-mime-info tzdata
   apt-get autoremove -y
 
   rm -rf \
@@ -139,5 +151,6 @@ install_ffmpeg
 install_vips
 install_ruby
 install_openresty
+install_postgresql_client
 cleanup
 install_busybox # after cleanup so we can install some utils removed by cleanup
