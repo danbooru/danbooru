@@ -6,6 +6,7 @@ module DanbooruMaintenance
     queue PrunePostsJob
     queue PruneRateLimitsJob
     queue RegeneratePostCountsJob
+    queue AmcheckDatabaseJob
   end
 
   def daily
