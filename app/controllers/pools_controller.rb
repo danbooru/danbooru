@@ -45,11 +45,8 @@ class PoolsController < ApplicationController
   end
 
   def update
-    # need to do this in order for synchronize! to work correctly
     @pool = authorize Pool.find(params[:id])
-    @pool.attributes = permitted_attributes(@pool)
-    @pool.synchronize
-    @pool.save
+    @pool.update(permitted_attributes(@pool))
     unless @pool.errors.any?
       flash[:notice] = "Pool updated"
     end

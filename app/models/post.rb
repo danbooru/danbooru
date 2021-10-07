@@ -10,6 +10,8 @@ class Post < ApplicationRecord
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation
                       annotated partially_annotated check_annotation annotation_request]
 
+  self.ignored_columns = [:pool_string]
+
   deletable
 
   before_validation :merge_old_changes
@@ -561,23 +563,23 @@ class Post < ApplicationRecord
         case tag
         when /^-pool:(\d+)$/i
           pool = Pool.find_by_id($1.to_i)
-          remove_pool!(pool) if pool
+          pool&.remove!(self)
 
         when /^-pool:(.+)$/i
           pool = Pool.find_by_name($1)
-          remove_pool!(pool) if pool
+          pool&.remove!(self)
 
         when /^pool:(\d+)$/i
           pool = Pool.find_by_id($1.to_i)
-          add_pool!(pool) if pool
+          pool&.add!(self)
 
         when /^pool:(.+)$/i
           pool = Pool.find_by_name($1)
-          add_pool!(pool) if pool
+          pool&.add!(self)
 
         when /^newpool:(.+)$/i
           pool = Pool.find_by_name($1)
-          add_pool!(pool) if pool
+          pool&.add!(self)
 
         when /^fav:(.+)$/i
           add_favorite(CurrentUser.user)
@@ -775,35 +777,6 @@ class Post < ApplicationRecord
 
     def has_active_pools?
       pools.undeleted.present?
-    end
-
-    def belongs_to_pool?(pool)
-      pool_string =~ /(?:\A| )pool:#{pool.id}(?:\Z| )/
-    end
-
-    def belongs_to_pool_with_id?(pool_id)
-      pool_string =~ /(?:\A| )pool:#{pool_id}(?:\Z| )/
-    end
-
-    def add_pool!(pool, force = false)
-      return if belongs_to_pool?(pool)
-      return if pool.is_deleted? && !force
-
-      with_lock do
-        self.pool_string = "#{pool_string} pool:#{pool.id}".strip
-        update_column(:pool_string, pool_string) unless new_record?
-        pool.add!(self)
-      end
-    end
-
-    def remove_pool!(pool)
-      return unless belongs_to_pool?(pool)
-
-      with_lock do
-        self.pool_string = pool_string.gsub(/(?:\A| )pool:#{pool.id}(?:\Z| )/, " ").strip
-        update_column(:pool_string, pool_string) unless new_record?
-        pool.remove!(self)
-      end
     end
 
     def remove_from_all_pools

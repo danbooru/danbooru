@@ -69,7 +69,6 @@ class PostPreviewComponent < ApplicationComponent
       "data-id" => post.id,
       "data-has-sound" => post.has_tag?("sound"),
       "data-tags" => post.tag_string,
-      "data-pools" => post.pool_string,
       "data-approver-id" => post.approver_id,
       "data-rating" => post.rating,
       "data-large-width" => post.large_image_width,

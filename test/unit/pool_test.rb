@@ -68,13 +68,6 @@ class PoolTest < ActiveSupport::TestCase
     should "initialize the post count" do
       assert_equal(@posts.size, @pool.post_count)
     end
-
-    should "synchronize the posts with the pool" do
-      assert_equal(@posts.map(&:id), @pool.post_ids)
-
-      @posts.each(&:reload)
-      assert_equal(["pool:#{@pool.id}"] * @posts.size, @posts.map(&:pool_string))
-    end
   end
 
   context "Reverting a pool" do
@@ -94,19 +87,15 @@ class PoolTest < ActiveSupport::TestCase
       assert_equal([], @pool.versions[0].post_ids)
       assert_equal([@p1.id], @pool.versions[1].post_ids)
       assert_equal([@p1.id, @p2.id], @pool.versions[2].post_ids)
-      assert_equal([@p1.id, @p2.id], @pool.post_ids)
+      assert_equal([@p1.id, @p2.id], @pool.reload.post_ids)
     end
 
     should "update its post_ids" do
       @pool.revert_to!(@pool.versions[1])
-      assert_equal([@p1.id], @pool.reload.post_ids)
-      assert_equal("pool:#{@pool.id}", @p1.reload.pool_string)
-      #assert_equal("", @p2.reload.pool_string)
+      assert_equal([@p1.id], @pool.post_ids)
 
       @pool.revert_to!(@pool.versions[0])
       assert_equal([], @pool.reload.post_ids)
-      assert_equal("", @p1.reload.pool_string)
-      #assert_equal("", @p2.reload.pool_string)
     end
   end
 
@@ -125,7 +114,6 @@ class PoolTest < ActiveSupport::TestCase
       context "by #attributes=" do
         setup do
           @pool.attributes = {post_ids: [@p1.id, @p2.id]}
-          @pool.synchronize
           @pool.save
         end
 
@@ -136,10 +124,6 @@ class PoolTest < ActiveSupport::TestCase
 
       should "add the post to the pool" do
         assert_equal([@p1.id], @pool.post_ids)
-      end
-
-      should "add the pool to the post" do
-        assert_equal("pool:#{@pool.id}", @p1.pool_string)
       end
 
       should "increment the post count" do
@@ -155,10 +139,6 @@ class PoolTest < ActiveSupport::TestCase
           assert_equal([@p1.id], @pool.post_ids)
         end
 
-        should "not double add the pool to the post" do
-          assert_equal("pool:#{@pool.id}", @p1.pool_string)
-        end
-
         should "not double increment the post count" do
           assert_equal(1, @pool.post_count)
         end
@@ -171,7 +151,6 @@ class PoolTest < ActiveSupport::TestCase
 
           @pool.update_attribute(:is_deleted, true)
           @pool.post_ids += [@p2.id]
-          @pool.synchronize!
           @pool.save
           @pool.reload
           @p2.reload
@@ -179,10 +158,6 @@ class PoolTest < ActiveSupport::TestCase
 
         should "add the post to the pool" do
           assert_equal([@p1.id, @p2.id], @pool.post_ids)
-        end
-
-        should "add the pool to the post" do
-          assert_equal("pool:#{@pool.id}", @p2.pool_string)
         end
 
         should "increment the post count" do
@@ -205,10 +180,6 @@ class PoolTest < ActiveSupport::TestCase
           assert_equal([], @pool.post_ids)
         end
 
-        should "remove the pool from the post" do
-          assert_equal("", @p1.pool_string)
-        end
-
         should "update the post count" do
           assert_equal(0, @pool.post_count)
         end
@@ -221,10 +192,6 @@ class PoolTest < ActiveSupport::TestCase
 
         should "not affect the pool" do
           assert_equal([@p1.id], @pool.post_ids)
-        end
-
-        should "not affect the post" do
-          assert_equal("pool:#{@pool.id}", @p1.pool_string)
         end
 
         should "not affect the post count" do
@@ -287,29 +254,6 @@ class PoolTest < ActiveSupport::TestCase
       @pool.add!(@p1)
       @pool.add!(@p2)
       @pool.add!(@p3)
-    end
-
-    context "that is synchronized" do
-      setup do
-        @pool.reload
-        @pool.post_ids = [@p2.id]
-        @pool.synchronize!
-      end
-
-      should "update the pool" do
-        @pool.reload
-        assert_equal(1, @pool.post_count)
-        assert_equal([@p2.id], @pool.post_ids)
-      end
-
-      should "update the posts" do
-        @p1.reload
-        @p2.reload
-        @p3.reload
-        assert_equal("", @p1.pool_string)
-        assert_equal("pool:#{@pool.id}", @p2.pool_string)
-        assert_equal("", @p3.pool_string)
-      end
     end
 
     should "find the neighbors for the first post" do
