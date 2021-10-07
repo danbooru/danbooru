@@ -61,8 +61,9 @@ class MediaFile::Image < MediaFile
     if is_animated_gif?
       frame_count / duration
     elsif is_animated_png?
-      # XXX we have to resort to ffprobe to get the frame rate because libvips and exiftool can't get it.
-      video.frame_rate
+      # XXX As with GIFs, animated PNGs can have an unspecified frame rate.
+      # Assume 10FPS if the frame rate is unspecified.
+      video.frame_rate.presence || 10.0
     else
       nil
     end

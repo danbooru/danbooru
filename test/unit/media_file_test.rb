@@ -263,6 +263,18 @@ class MediaFileTest < ActiveSupport::TestCase
       end
     end
 
+    context "that is animated but with an unspecified frame rate" do
+      should "have an assumed frame rate of 10FPS" do
+        file = MediaFile.open("test/files/test-animated-inf-fps.png")
+
+        assert_equal(false, file.is_corrupt?)
+        assert_equal(true, file.is_animated?)
+        assert_equal(0.2, file.duration)
+        assert_equal(2, file.frame_count)
+        assert_equal(10, file.frame_rate)
+      end
+    end
+
     context "that is animated but malformed" do
       should "be handled correctly" do
         file = MediaFile.open("test/files/apng/iend_missing.png")

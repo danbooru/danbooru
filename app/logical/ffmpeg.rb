@@ -59,10 +59,18 @@ class FFmpeg
     end
   end
 
+  # @return [Float, nil] The frame rate of the video or animation, or nil if
+  # unknown. The frame rate can be unknown for animated PNGs that have zero
+  # delay between frames.
   def frame_rate
     rate = video_streams.first[:avg_frame_rate] # "100/57"
     numerator, denominator = rate.split("/")
-    (numerator.to_f / denominator.to_f)
+
+    if numerator.to_f == 0 || denominator.to_f == 0
+      nil
+    else
+      (numerator.to_f / denominator.to_f)
+    end
   end
 
   def video_streams
