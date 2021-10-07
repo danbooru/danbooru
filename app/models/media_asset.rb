@@ -28,6 +28,7 @@ class MediaAsset < ApplicationRecord
     self.file_size = media_file.file_size
     self.image_width = media_file.width
     self.image_height = media_file.height
+    self.duration = media_file.duration
     self.media_metadata = MediaMetadata.new(file: media_file)
   end
 end
