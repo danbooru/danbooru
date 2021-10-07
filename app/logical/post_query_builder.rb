@@ -37,7 +37,7 @@ class PostQueryBuilder
     ordpool note comment commentary id rating locked source status filetype
     disapproved parent child search embedded md5 width height mpixels ratio
     score favcount filesize date age order limit tagcount pixiv_id pixiv
-    unaliased exif
+    unaliased exif duration
   ] + COUNT_METATAGS + COUNT_METATAG_SYNONYMS + CATEGORY_COUNT_METATAGS
 
   ORDER_METATAGS = %w[
@@ -55,6 +55,7 @@ class PostQueryBuilder
     portrait landscape
     filesize filesize_asc
     tagcount tagcount_asc
+    duration duration_asc
     rank
     curated
     modqueue
@@ -154,6 +155,8 @@ class PostQueryBuilder
       attribute_matches(value, :pixiv_id)
     when "tagcount"
       attribute_matches(value, :tag_count)
+    when "duration"
+      attribute_matches(value, "media_assets.duration", :float).joins(:media_asset)
     when "status"
       status_matches(value)
     when "parent"
@@ -611,6 +614,12 @@ class PostQueryBuilder
 
     when "tagcount_asc"
       relation = relation.order("posts.tag_count ASC")
+
+    when "duration", "duration_desc"
+      relation = relation.joins(:media_asset).order("media_assets.duration DESC NULLS LAST, posts.id DESC")
+
+    when "duration_asc"
+      relation = relation.joins(:media_asset).order("media_assets.duration ASC NULLS LAST, posts.id ASC")
 
     when /(#{TagCategory.short_name_regex})tags(?:\Z|_desc)/
       relation = relation.order("posts.tag_count_#{TagCategory.short_name_mapping[$1]} DESC")

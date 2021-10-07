@@ -593,6 +593,15 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "-ratio:2.0")
     end
 
+    should "return posts for the duration:<x> metatag" do
+      post = create(:post, media_asset: create(:media_asset, file: "test/files/test-512x512.webm"))
+
+      assert_tag_match([post], "duration:0.48")
+      assert_tag_match([post], "duration:>0.4")
+      assert_tag_match([post], "duration:<0.5")
+      assert_tag_match([], "duration:>1")
+    end
+
     should "return posts for the status:<type> metatag" do
       pending = create(:post, is_pending: true)
       flagged = create(:post, is_flagged: true)
@@ -941,6 +950,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match(posts.reverse, "order:notes_desc")
       assert_tag_match(posts.reverse, "order:md5")
       assert_tag_match(posts.reverse, "order:md5_desc")
+      assert_tag_match(posts.reverse, "order:duration_desc")
 
       assert_tag_match(posts, "order:id_asc")
       assert_tag_match(posts, "order:score_asc")
@@ -961,6 +971,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match(posts, "order:note_count_asc")
       assert_tag_match(posts, "order:notes_asc")
       assert_tag_match(posts, "order:md5_asc")
+      assert_tag_match(posts, "order:duration_asc")
 
       # ordering is unpredictable so can't be tested.
       assert_tag_match([posts.first], "id:#{posts.first.id} order:none")
