@@ -47,12 +47,5 @@ class FavoriteTest < ActiveSupport::TestCase
       assert_equal("You have already favorited this post", error.message)
       assert_equal(1, @user1.favorite_count)
     end
-
-    should "not allow exceeding the user's favorite limit" do
-      @user1.stubs(:favorite_limit).returns(0)
-      error = assert_raises(Favorite::Error) { @p1.add_favorite!(@user1) }
-
-      assert_equal("You can only keep up to 0 favorites. Upgrade your account to save more.", error.message)
-    end
   end
 end

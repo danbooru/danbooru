@@ -29,9 +29,7 @@ class Favorite < ApplicationRecord
     Favorite.transaction do
       User.where(id: user.id).select("id").lock("FOR UPDATE").first
 
-      if user.favorite_count >= user.favorite_limit
-        raise Error, "You can only keep up to #{user.favorite_limit} favorites. Upgrade your account to save more."
-      elsif Favorite.for_user(user.id).where(:user_id => user.id, :post_id => post.id).exists?
+      if Favorite.for_user(user.id).where(:user_id => user.id, :post_id => post.id).exists?
         raise Error, "You have already favorited this post"
       end
 

@@ -436,16 +436,6 @@ class User < ApplicationRecord
         end
       end
 
-      def favorite_limit(level)
-        if level >= User::Levels::PLATINUM
-          Float::INFINITY
-        elsif level == User::Levels::GOLD
-          20_000
-        else
-          10_000
-        end
-      end
-
       def favorite_group_limit(level)
         if level >= User::Levels::BUILDER
           Float::INFINITY
@@ -512,10 +502,6 @@ class User < ApplicationRecord
 
     def tag_query_limit
       User.tag_query_limit(level)
-    end
-
-    def favorite_limit
-      User.favorite_limit(level)
     end
 
     def favorite_group_limit
