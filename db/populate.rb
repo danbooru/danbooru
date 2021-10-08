@@ -186,8 +186,8 @@ if Favorite.count == 0
 
   Post.order("random()").limit(50).each do |post|
     user = User.order("random()").first
-    post.add_favorite!(user)
-    post.add_favorite!(CurrentUser.user)
+    Favorite.create!(post: post, user: user)
+    Favorite.create!(post: post, user: Currentuser.user)
   end
 else
   puts "Skipping favorites"

@@ -10,7 +10,7 @@ class Post < ApplicationRecord
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation
                       annotated partially_annotated check_annotation annotation_request]
 
-  self.ignored_columns = [:pool_string]
+  self.ignored_columns = [:pool_string, :fav_string]
 
   deletable
 
@@ -53,7 +53,7 @@ class Post < ApplicationRecord
   has_many :children, -> {order("posts.id")}, :class_name => "Post", :foreign_key => "parent_id"
   has_many :approvals, :class_name => "PostApproval", :dependent => :destroy
   has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
-  has_many :favorites
+  has_many :favorites, dependent: :destroy
   has_many :favorited_users, through: :favorites, source: :user
   has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
 
@@ -582,10 +582,10 @@ class Post < ApplicationRecord
           pool&.add!(self)
 
         when /^fav:(.+)$/i
-          add_favorite(CurrentUser.user)
+          Favorite.create(post: self, user: CurrentUser.user)
 
         when /^-fav:(.+)$/i
-          remove_favorite(CurrentUser.user)
+          Favorite.destroy_by(post: self, user: CurrentUser.user)
 
         when /^(up|down)vote:(.+)$/i
           score = ($1 == "up" ? 1 : -1)
@@ -695,54 +695,9 @@ class Post < ApplicationRecord
   end
 
   module FavoriteMethods
-    def clean_fav_string?
-      true
-    end
-
-    def clean_fav_string!
-      array = fav_string.split.uniq
-      self.fav_string = array.join(" ")
-      self.fav_count = array.size
-      update_column(:fav_string, fav_string)
-      update_column(:fav_count, fav_count)
-    end
-
     def favorited_by?(user)
       return false if user.is_anonymous?
       Favorite.exists?(post: self, user: user)
-    end
-
-    def append_user_to_fav_string(user_id)
-      update_column(:fav_string, (fav_string + " fav:#{user_id}").strip)
-      clean_fav_string! if clean_fav_string?
-    end
-
-    def add_favorite(user)
-      add_favorite!(user)
-      true
-    rescue Favorite::Error
-      false
-    end
-
-    def add_favorite!(user)
-      Favorite.add(post: self, user: user)
-      vote!(1, user)
-    end
-
-    def delete_user_from_fav_string(user_id)
-      update_column(:fav_string, fav_string.gsub(/(?:\A| )fav:#{user_id}(?:\Z| )/, " ").strip)
-    end
-
-    def remove_favorite!(user)
-      Favorite.remove(post: self, user: user)
-      unvote!(user)
-    end
-
-    def remove_favorite(user)
-      remove_favorite!(user)
-      true
-    rescue Favorite::Error
-      false
     end
 
     # Users who publicly favorited this post, ordered by time of favorite.
@@ -754,13 +709,6 @@ class Post < ApplicationRecord
 
     def favorite_groups
       FavoriteGroup.for_post(id)
-    end
-
-    def remove_from_favorites
-      Favorite.where(post_id: id).delete_all
-      user_ids = fav_string.scan(/\d+/)
-      User.where(:id => user_ids).update_all("favorite_count = favorite_count - 1")
-      PostVote.where(post_id: id).delete_all
     end
 
     def remove_from_fav_groups
@@ -857,8 +805,8 @@ class Post < ApplicationRecord
 
       transaction do
         favorites.each do |fav|
-          remove_favorite!(fav.user)
-          parent.add_favorite(fav.user)
+          fav.destroy!
+          Favorite.create(post: parent, user: fav.user)
         end
       end
 
@@ -887,7 +835,6 @@ class Post < ApplicationRecord
           decrement_tag_post_counts
           remove_from_all_pools
           remove_from_fav_groups
-          remove_from_favorites
           destroy
           update_parent_on_destroy
         end

@@ -22,7 +22,7 @@ module Explore
       context "#curated" do
         should "render" do
           @builder = create(:builder_user)
-          @post.add_favorite!(@builder)
+          Favorite.create!(post: @post, user: @builder)
           get curated_explore_posts_path
           assert_response :success
         end

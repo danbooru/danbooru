@@ -1,23 +1,19 @@
 class Favorite < ApplicationRecord
-  class Error < StandardError; end
+  belongs_to :post, counter_cache: :fav_count
+  belongs_to :user, counter_cache: :favorite_count
 
-  belongs_to :post
-  belongs_to :user
+  validates :user_id, uniqueness: { scope: :post_id, message: "have already favorited this post" }
+  after_create :upvote_post_on_create
+  after_destroy :unvote_post_on_destroy
 
-  scope :for_user, ->(user_id) { where(user_id: user_id) }
   scope :public_favorites, -> { where(user: User.bit_prefs_match(:enable_private_favorites, false)) }
 
   def self.visible(user)
-    user.is_admin? ? all : for_user(user.id).or(public_favorites)
+    user.is_admin? ? all : where(user: user).or(public_favorites)
   end
 
   def self.search(params)
-    q = search_attributes(params, :id, :post)
-
-    if params[:user_id].present?
-      q = q.for_user(params[:user_id])
-    end
-
+    q = search_attributes(params, :id, :post, :user)
     q.apply_default_order(params)
   end
 
@@ -25,37 +21,16 @@ class Favorite < ApplicationRecord
     [:post, :user]
   end
 
-  def self.add(post:, user:)
-    Favorite.transaction do
-      User.where(id: user.id).select("id").lock("FOR UPDATE").first
+  def upvote_post_on_create
+    if Pundit.policy!(user, PostVote).create?
+      PostVote.negative.destroy_by(post: post, user: user)
 
-      if Favorite.for_user(user.id).where(:user_id => user.id, :post_id => post.id).exists?
-        raise Error, "You have already favorited this post"
-      end
-
-      Favorite.create!(:user_id => user.id, :post_id => post.id)
-      Post.where(:id => post.id).update_all("fav_count = fav_count + 1")
-      post.append_user_to_fav_string(user.id)
-      User.where(:id => user.id).update_all("favorite_count = favorite_count + 1")
-      user.favorite_count += 1
+      # Silently ignore the error if the user has already upvoted the post.
+      PostVote.create(post: post, user: user, score: 1)
     end
   end
 
-  def self.remove(user:, post: nil, post_id: nil)
-    Favorite.transaction do
-      if post && post_id.nil?
-        post_id = post.id
-      end
-
-      User.where(id: user.id).select("id").lock("FOR UPDATE").first
-
-      return unless Favorite.for_user(user.id).where(:user_id => user.id, :post_id => post_id).exists?
-      Favorite.for_user(user.id).where(post_id: post_id).delete_all
-      Post.where(:id => post_id).update_all("fav_count = fav_count - 1")
-      post&.delete_user_from_fav_string(user.id)
-      User.where(:id => user.id).update_all("favorite_count = favorite_count - 1")
-      user.favorite_count -= 1
-      post.fav_count -= 1 if post
-    end
+  def unvote_post_on_destroy
+    PostVote.positive.destroy_by(post: post, user: user)
   end
 end

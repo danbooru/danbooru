@@ -6,7 +6,7 @@ class FavoritesControllerTest < ActionDispatch::IntegrationTest
       @user = create(:user)
       @post = create(:post)
       @faved_post = create(:post)
-      @faved_post.add_favorite!(@user)
+      create(:favorite, post: @faved_post, user: @user)
     end
 
     context "index action" do
@@ -33,30 +33,48 @@ class FavoritesControllerTest < ActionDispatch::IntegrationTest
 
     context "create action" do
       should "create a favorite for the current user" do
-        assert_difference("Favorite.count", 1) do
+        assert_difference [-> { @post.favorites.count }, -> { @post.reload.fav_count }, -> { @user.reload.favorite_count }], 1 do
+          post_auth favorites_path(post_id: @post.id), @user, as: :javascript
+          assert_response :redirect
+        end
+      end
+
+      should "not allow creating duplicate favorites" do
+        create(:favorite, post: @post, user: @user)
+
+        assert_no_difference [-> { @post.favorites.count }, -> { @post.reload.fav_count }, -> { @user.reload.favorite_count }] do
           post_auth favorites_path(post_id: @post.id), @user, as: :javascript
           assert_response :redirect
         end
       end
 
       should "allow banned users to create favorites" do
-        assert_difference("Favorite.count", 1) do
-          post_auth favorites_path(post_id: @post.id), create(:banned_user), as: :javascript
+        @banned_user = create(:banned_user)
+
+        assert_difference [-> { @post.favorites.count }, -> { @post.reload.fav_count }, -> { @banned_user.reload.favorite_count }], 1 do
+          post_auth favorites_path(post_id: @post.id), @banned_user, as: :javascript
           assert_response :redirect
+        end
+      end
+
+      should "not allow anonymous users to create favorites" do
+        assert_no_difference [-> { @post.favorites.count }, -> { @post.reload.fav_count }] do
+          post favorites_path(post_id: @post.id), as: :javascript
+          assert_response 403
         end
       end
     end
 
     context "destroy action" do
-      should "remove the favorite from the current user" do
-        assert_difference("Favorite.count", -1) do
+      should "remove the favorite for the current user" do
+        assert_difference [-> { @faved_post.favorites.count }, -> { @faved_post.reload.fav_count }, -> { @user.reload.favorite_count }], -1 do
           delete_auth favorite_path(@faved_post.id), @user, as: :javascript
           assert_response :redirect
         end
       end
 
       should "allow banned users to destroy favorites" do
-        assert_difference("Favorite.count", -1) do
+        assert_difference [-> { @faved_post.favorites.count }, -> { @faved_post.reload.fav_count }, -> { @user.reload.favorite_count }], -1 do
           delete_auth favorite_path(@faved_post.id), @user, as: :javascript
           assert_response :redirect
         end

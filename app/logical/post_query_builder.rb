@@ -441,7 +441,7 @@ class PostQueryBuilder
     user = User.find_by_name(username)
 
     if user.present? && Pundit.policy!(current_user, user).can_see_favorites?
-      Post.joins(:favorites).merge(Favorite.for_user(user.id)).order("favorites.id DESC")
+      Post.joins(:favorites).merge(Favorite.where(user: user)).order("favorites.id DESC")
     else
       Post.none
     end

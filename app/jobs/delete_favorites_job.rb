@@ -5,9 +5,7 @@ class DeleteFavoritesJob < ApplicationJob
 
   def perform(user)
     Post.without_timeout do
-      user.favorites.find_each do |favorite|
-        Favorite.remove(post: favorite.post, user: user)
-      end
+      user.favorites.destroy_all
     end
   end
 end

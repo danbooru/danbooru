@@ -34,7 +34,7 @@ module Moderator
             end
             users = FactoryBot.create_list(:user, 2)
             users.each do |u|
-              @child.add_favorite!(u)
+              Favorite.create!(post: @child, user: u)
               @child.reload
             end
 

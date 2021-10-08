@@ -33,7 +33,7 @@ class PostTest < ActiveSupport::TestCase
       setup do
         @upload = UploadService.new(FactoryBot.attributes_for(:jpg_upload)).start!
         @post = @upload.post
-        Favorite.add(post: @post, user: @user)
+        Favorite.create!(post: @post, user: @user)
         create(:favorite_group, post_ids: [@post.id])
         perform_enqueued_jobs # perform IqdbAddPostJob
       end
@@ -51,7 +51,9 @@ class PostTest < ActiveSupport::TestCase
       should "remove all favorites" do
         @post.expunge!
 
-        assert_equal(0, Favorite.for_user(@user.id).where("post_id = ?", @post.id).count)
+        assert_equal(0, @post.favorites.count)
+        assert_equal(0, @user.favorites.count)
+        assert_equal(0, @user.reload.favorite_count)
       end
 
       should "remove all favgroups" do
@@ -248,7 +250,7 @@ class PostTest < ActiveSupport::TestCase
           p1 = FactoryBot.create(:post)
           c1 = FactoryBot.create(:post, :parent_id => p1.id)
           user = FactoryBot.create(:gold_user)
-          c1.add_favorite!(user)
+          create(:favorite, post: c1, user: user)
           c1.delete!("test")
           p1.reload
           assert(Favorite.exists?(:post_id => c1.id, :user_id => user.id))
@@ -259,7 +261,7 @@ class PostTest < ActiveSupport::TestCase
           p1 = FactoryBot.create(:post)
           c1 = FactoryBot.create(:post, :parent_id => p1.id)
           user = FactoryBot.create(:gold_user)
-          c1.add_favorite!(user)
+          create(:favorite, post: c1, user: user)
           c1.delete!("test", :move_favorites => true)
           p1.reload
           assert(!Favorite.exists?(:post_id => c1.id, :user_id => user.id), "Child should not still have favorites")
@@ -278,7 +280,7 @@ class PostTest < ActiveSupport::TestCase
           user = FactoryBot.create(:gold_user)
           p1 = FactoryBot.create(:post)
           c1 = FactoryBot.create(:post, :parent_id => p1.id)
-          c1.add_favorite!(user)
+          create(:favorite, post: c1, user: user)
 
           assert_equal(true, p1.reload.has_active_children?)
           c1.delete!("test", :move_favorites => true)
@@ -837,18 +839,18 @@ class PostTest < ActiveSupport::TestCase
         context "for a fav" do
           should "add/remove the current user to the post's favorite listing" do
             @post.update(tag_string: "aaa fav:self")
-            assert_equal("fav:#{@user.id}", @post.fav_string)
+            assert_equal(1, @post.favorites.where(user: @user).count)
 
             @post.update(tag_string: "aaa -fav:self")
-            assert_equal("", @post.fav_string)
+            assert_equal(0, @post.favorites.count)
           end
 
           should "not fail when the fav: metatag is used twice" do
             @post.update(tag_string: "aaa fav:self fav:me")
-            assert_equal("fav:#{@user.id}", @post.fav_string)
+            assert_equal(1, @post.favorites.where(user: @user).count)
 
             @post.update(tag_string: "aaa -fav:self -fav:me")
-            assert_equal("", @post.fav_string)
+            assert_equal(0, @post.favorites.count)
           end
         end
 
@@ -1531,33 +1533,33 @@ class PostTest < ActiveSupport::TestCase
       setup do
         @user = FactoryBot.create(:contributor_user)
         @post = FactoryBot.create(:post)
-        @post.add_favorite!(@user)
+        create(:favorite, post: @post, user: @user)
         @user.reload
       end
 
       should "decrement the user's favorite_count" do
-        assert_difference("@user.favorite_count", -1) do
-          @post.remove_favorite!(@user)
+        assert_difference("@user.reload.favorite_count", -1) do
+          Favorite.destroy_by(post: @post, user: @user)
         end
       end
 
       should "decrement the post's score for gold users" do
-        assert_difference("@post.score", -1) do
-          @post.remove_favorite!(@user)
+        assert_difference("@post.reload.score", -1) do
+          Favorite.destroy_by(post: @post, user: @user)
         end
       end
 
       should "not decrement the post's score for basic users" do
         @member = FactoryBot.create(:user)
 
-        assert_no_difference("@post.score") { @post.add_favorite!(@member) }
-        assert_no_difference("@post.score") { @post.remove_favorite!(@member) }
+        assert_no_difference("@post.score") { create(:favorite, post: @post, user: @member) }
+        assert_no_difference("@post.score") { Favorite.destroy_by(post: @post, user: @member) }
       end
 
       should "not decrement the user's favorite_count if the user did not favorite the post" do
         @post2 = FactoryBot.create(:post)
         assert_no_difference("@user.favorite_count") do
-          @post2.remove_favorite!(@user)
+          Favorite.destroy_by(post: @post2, user: @user)
         end
       end
     end
@@ -1568,52 +1570,21 @@ class PostTest < ActiveSupport::TestCase
         @post = FactoryBot.create(:post)
       end
 
-      should "periodically clean the fav_string" do
-        @post.update_column(:fav_string, "fav:1 fav:1 fav:1")
-        @post.update_column(:fav_count, 3)
-        @post.stubs(:clean_fav_string?).returns(true)
-        @post.append_user_to_fav_string(2)
-        assert_equal("fav:1 fav:2", @post.fav_string)
-        assert_equal(2, @post.fav_count)
-      end
-
       should "increment the user's favorite_count" do
         assert_difference("@user.favorite_count", 1) do
-          @post.add_favorite!(@user)
+          create(:favorite, post: @post, user: @user)
         end
       end
 
       should "increment the post's score for gold users" do
-        @post.add_favorite!(@user)
-        assert_equal(1, @post.score)
+        create(:favorite, post: @post, user: @user)
+        assert_equal(1, @post.reload.score)
       end
 
       should "not increment the post's score for basic users" do
         @member = FactoryBot.create(:user)
-        @post.add_favorite!(@member)
+        create(:favorite, post: @post, user: @member)
         assert_equal(0, @post.score)
-      end
-
-      should "update the fav strings on the post" do
-        @post.add_favorite!(@user)
-        @post.reload
-        assert_equal("fav:#{@user.id}", @post.fav_string)
-        assert(Favorite.exists?(:user_id => @user.id, :post_id => @post.id))
-
-        assert_raises(Favorite::Error) { @post.add_favorite!(@user) }
-        @post.reload
-        assert_equal("fav:#{@user.id}", @post.fav_string)
-        assert(Favorite.exists?(:user_id => @user.id, :post_id => @post.id))
-
-        @post.remove_favorite!(@user)
-        @post.reload
-        assert_equal("", @post.fav_string)
-        assert(!Favorite.exists?(:user_id => @user.id, :post_id => @post.id))
-
-        @post.remove_favorite!(@user)
-        @post.reload
-        assert_equal("", @post.fav_string)
-        assert(!Favorite.exists?(:user_id => @user.id, :post_id => @post.id))
       end
     end
 
@@ -1625,8 +1596,8 @@ class PostTest < ActiveSupport::TestCase
         @user1 = FactoryBot.create(:user, enable_private_favorites: true)
         @gold1 = FactoryBot.create(:gold_user)
 
-        @child.add_favorite!(@user1)
-        @child.add_favorite!(@gold1)
+        create(:favorite, post: @child, user: @user1)
+        create(:favorite, post: @child, user: @gold1)
 
         @child.give_favorites_to_parent
         @child.reload
@@ -1636,12 +1607,10 @@ class PostTest < ActiveSupport::TestCase
       should "move the favorites" do
         assert_equal(0, @child.fav_count)
         assert_equal(0, @child.favorites.count)
-        assert_equal("", @child.fav_string)
         assert_equal([], @child.favorites.pluck(:user_id))
 
         assert_equal(2, @parent.fav_count)
         assert_equal(2, @parent.favorites.count)
-        assert_equal("fav:#{@user1.id} fav:#{@gold1.id}", @parent.fav_string)
         assert_equal([@user1.id, @gold1.id], @parent.favorites.pluck(:user_id))
       end
 

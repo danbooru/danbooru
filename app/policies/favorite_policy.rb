@@ -4,6 +4,6 @@ class FavoritePolicy < ApplicationPolicy
   end
 
   def destroy?
-    !user.is_anonymous?
+    record.user_id == user.id
   end
 end

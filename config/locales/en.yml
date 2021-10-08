@@ -35,6 +35,9 @@ en:
     attributes:
       artist_url:
         url: ""
+      favorite:
+        user: "You"
+        user_id: "You"
       forum_post_vote:
         creator_id: "Your vote"
       moderation_report:

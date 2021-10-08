@@ -69,13 +69,12 @@ class UserDeletionTest < ActiveSupport::TestCase
 
     should "remove any favorites" do
       @post = create(:post)
-      Favorite.add(post: @post, user: @user)
+      Favorite.create!(post: @post, user: @user)
 
       perform_enqueued_jobs { @deletion.delete! }
 
       assert_equal(0, Favorite.count)
-      assert_equal("", @post.reload.fav_string)
-      assert_equal(0, @post.fav_count)
+      assert_equal(0, @post.reload.fav_count)
     end
   end
 end
