@@ -138,7 +138,7 @@ class User < ApplicationRecord
   has_many :forum_posts, -> {order("forum_posts.created_at, forum_posts.id")}, :foreign_key => "creator_id"
   has_many :user_name_change_requests, -> {order("user_name_change_requests.created_at desc")}
   has_many :favorite_groups, -> {order(name: :asc)}, foreign_key: :creator_id
-  has_many :favorites, ->(rec) {where("user_id % 100 = #{rec.id % 100} and user_id = #{rec.id}").order("id desc")}
+  has_many :favorites
   has_many :ip_bans, foreign_key: :creator_id
   has_many :tag_aliases, foreign_key: :creator_id
   has_many :tag_implications, foreign_key: :creator_id

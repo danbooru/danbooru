@@ -50,10 +50,11 @@ class CreateFavorites < ActiveRecord::Migration[4.2]
   end
 
   def self.down
-    drop_table "favorites"
-
     0.upto(TABLE_COUNT - 1) do |i|
       drop_table "favorites_#{i}"
     end
+
+    drop_table "favorites"
+    execute "DROP FUNCTION favorites_insert_trigger"
   end
 end

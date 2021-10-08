@@ -431,8 +431,7 @@ class PostQueryBuilder
     favuser = User.find_by_name(username)
 
     if favuser.present? && Pundit.policy!(current_user, favuser).can_see_favorites?
-      favorites = Favorite.from("favorites_#{favuser.id % 100} AS favorites").where(user: favuser)
-      Post.where(id: favorites.select(:post_id))
+      Post.where(id: favuser.favorites.select(:post_id))
     else
       Post.none
     end
@@ -509,6 +508,8 @@ class PostQueryBuilder
       relation = search_order(relation, "created_at_desc")
     elsif find_metatag(:order) == "custom"
       relation = search_order_custom(relation, select_metatags(:id).map(&:value))
+    elsif has_metatag?(:ordfav)
+      # no-op
     else
       relation = search_order(relation, find_metatag(:order))
     end
