@@ -18,7 +18,7 @@ class Favorite < ApplicationRecord
       q = q.for_user(params[:user_id])
     end
 
-    q.order(post_id: :desc)
+    q.apply_default_order(params)
   end
 
   def self.available_includes
