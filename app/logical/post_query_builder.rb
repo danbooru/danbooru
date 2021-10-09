@@ -917,6 +917,20 @@ class PostQueryBuilder
         Tag.find_by(name: tags.first.name).try(:post_count)
       elsif is_metatag?(:rating)
         estimated_row_count
+      elsif is_metatag?(:pool) || is_metatag?(:ordpool)
+        name = find_metatag(:pool, :ordpool)
+        Pool.find_by_name(name)&.post_count || 0
+      elsif is_metatag?(:fav) || is_metatag?(:ordfav)
+        name = find_metatag(:fav, :ordfav)
+        user = User.find_by_name(name)
+
+        if user.nil?
+          0
+        elsif Pundit.policy!(current_user, user).can_see_favorites?
+          user.favorite_count
+        else
+          nil
+        end
       end
     end
 

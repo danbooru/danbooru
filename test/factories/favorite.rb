@@ -1,3 +1,6 @@
 FactoryBot.define do
-  factory(:favorite)
+  factory(:favorite) do
+    user
+    post
+  end
 end

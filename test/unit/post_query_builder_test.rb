@@ -1190,9 +1190,34 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       end
 
       should "return the correct cached count for a pool:<id> search" do
-        build(:tag, name: "pool:1234", post_count: -100).save(validate: false)
+        pool = create(:pool, post_ids: [1, 2, 3])
+
+        build(:tag, name: "pool:#{pool.id}", post_count: -100).save(validate: false)
         PostQueryBuilder.new("pool:1234").set_cached_count(100)
-        assert_fast_count(100, "pool:1234")
+
+        assert_fast_count(3, "pool:#{pool.id}")
+        assert_fast_count(3, "pool:#{pool.name}")
+      end
+
+      should "return the correct favorite count for a fav:<name> search" do
+        fav = create(:favorite)
+        fav.user.update!(favorite_count: 1)
+
+        assert_fast_count(1, "fav:#{fav.user.name}")
+        assert_fast_count(1, "ordfav:#{fav.user.name}")
+      end
+
+      should "return the correct favorite count for a fav:<name> search for a user with private favorites" do
+        fav = create(:favorite)
+        fav.user.update!(favorite_count: 1, enable_private_favorites: true)
+
+        assert_fast_count(0, "fav:#{fav.user.name}")
+        assert_fast_count(0, "ordfav:#{fav.user.name}")
+      end
+
+      should "return the correct favorite count for a fav:<name> search for a nonexistent user" do
+        assert_fast_count(0, "fav:doesnotexist")
+        assert_fast_count(0, "ordfav:doesnotexist")
       end
     end
 
