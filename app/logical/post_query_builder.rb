@@ -107,12 +107,10 @@ class PostQueryBuilder
     optional_tags += (matched_optional_wildcard_tags.empty? && !optional_wildcard_tags.empty?) ? optional_wildcard_tags.map(&:name) : matched_optional_wildcard_tags
     optional_tags += (matched_required_wildcard_tags.empty? && !required_wildcard_tags.empty?) ? required_wildcard_tags.map(&:name) : matched_required_wildcard_tags
 
-    tsquery << "!(#{negated_tags.sort.uniq.map(&:to_escaped_for_tsquery).join(" | ")})" if negated_tags.present?
-    tsquery << "(#{optional_tags.sort.uniq.map(&:to_escaped_for_tsquery).join(" | ")})" if optional_tags.present?
-    tsquery << "(#{required_tags.sort.uniq.map(&:to_escaped_for_tsquery).join(" & ")})" if required_tags.present?
-
-    return relation if tsquery.empty?
-    relation.where("posts.tag_index @@ to_tsquery('danbooru', E?)", tsquery.join(" & "))
+    relation = relation.where_array_includes_all("string_to_array(posts.tag_string, ' ')", required_tags) if required_tags.present?
+    relation = relation.where_array_includes_any("string_to_array(posts.tag_string, ' ')", optional_tags) if optional_tags.present?
+    relation = relation.where_array_includes_none("string_to_array(posts.tag_string, ' ')", negated_tags) if negated_tags.present?
+    relation
   end
 
   def metatags_match(metatags, relation)
@@ -232,8 +230,7 @@ class PostQueryBuilder
   end
 
   def tags_include(*tags)
-    query = tags.map(&:to_escaped_for_tsquery).join(" & ")
-    Post.where("posts.tag_index @@ to_tsquery('danbooru', E?)", query)
+    Post.where_array_includes_all("string_to_array(posts.tag_string, ' ')", tags)
   end
 
   def unaliased_matches(tag)

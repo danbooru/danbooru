@@ -1,8 +1,8 @@
 require 'test_helper'
 
 class PostQueryBuilderTest < ActiveSupport::TestCase
-  def assert_tag_match(posts, query)
-    assert_equal(posts.map(&:id), Post.user_tag_match(query).pluck(:id))
+  def assert_tag_match(posts, query, **options)
+    assert_equal(posts.map(&:id), Post.user_tag_match(query, CurrentUser.user, **options).pluck(:id))
   end
 
   def assert_fast_count(count, query, query_options = {}, fast_count_options = {})
@@ -142,6 +142,20 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post3], "~bbb -a*")
       assert_tag_match([post1], "a* -*b")
       assert_tag_match([post2], "-*c -a*a")
+    end
+
+    should "return posts for a complex search with multiple AND, OR, and NOT tags" do
+      post1 = create(:post, tag_string: "original")
+      post2 = create(:post, tag_string: "smile")
+      post3 = create(:post, tag_string: "original smile")
+      post4 = create(:post, tag_string: "original smile 1girl")
+      post5 = create(:post, tag_string: "original smile 1girl 1boy")
+      post6 = create(:post, tag_string: "original smile 1girl multiple_boys")
+      post7 = create(:post, tag_string: "original smile multiple_girls")
+      post8 = create(:post, tag_string: "original smile multiple_girls 1boy")
+      post9 = create(:post, tag_string: "original smile multiple_girls multiple_boys")
+
+      assert_tag_match([post7, post4], "original smile ~1girl ~multiple_girls -1boy -multiple_boys", tag_limit: 100)
     end
 
     should "ignore invalid operator syntax" do

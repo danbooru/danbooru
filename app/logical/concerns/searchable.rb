@@ -24,27 +24,34 @@ module Searchable
     q
   end
 
-  # Search a table field by an Arel operator. `field` may be an Arel node, the
-  # name of a table column, or raw SQL. `operator` is an Arel::Predications
-  # method: :eq, :gt, :lt, :between, :in, :matches (LIKE), etc.
+  # Search a table column by an Arel operator.
   #
-  # https://github.com/rails/rails/blob/master/activerecord/lib/arel/predications.rb
+  # @see https://github.com/rails/rails/blob/master/activerecord/lib/arel/predications.rb
+  #
+  # @example SELECT * FROM posts WHERE id <= 42
+  #   Post.where_operator(:id, :lteq, 42)
+  #
+  # @param field [String, Arel::Nodes::Node] the name of a table column, an
+  #   Arel node, or raw SQL
+  # @param operator [Symbol] the name of an Arel::Predications method (:eq,
+  #   :gt, :lt, :between, :in, :matches (LIKE), etc).
+  # @return ActiveRecord::Relation
   def where_operator(field, operator, *args, **options)
-    if field.is_a?(Arel::Nodes::Node)
-      node = field
-    elsif has_attribute?(field)
-      node = arel_table[field]
-    else
-      node = Arel.sql(field.to_s)
-    end
-
-    arel = node.send(operator, *args, **options)
+    arel = arel_node(field).send(operator, *args, **options)
     where(arel)
   end
 
+  def where_not_operator(field, operator, *args, **options)
+    arel = arel_node(field).send(operator, *args, **options)
+    where.not(arel)
+  end
+
   def where_array_operator(attr, operator, values)
-    array = Arel.sql(ActiveRecord::Base.sanitize_sql(["ARRAY[?]", values]))
-    where_operator(attr, operator, array)
+    where_operator(attr, operator, sql_array(values))
+  end
+
+  def where_not_array_operator(attr, operator, values)
+    where_not_operator(attr, operator, sql_array(values))
   end
 
   def where_like(attr, value)
@@ -95,6 +102,10 @@ module Searchable
   # The @> operator
   def where_array_includes_all(attr, values)
     where_array_operator(attr, :contains, values)
+  end
+
+  def where_array_includes_none(attr, values)
+    where_not_array_operator(attr, :overlaps, values)
   end
 
   def where_array_includes_any_lower(attr, values)
@@ -560,5 +571,28 @@ module Searchable
 
   def qualified_column_for(attr)
     "#{table_name}.#{column_for_attribute(attr).name}"
+  end
+
+  # Convert a column name or a raw SQL fragment to an Arel node.
+  #
+  # @param field [String, Arel::Nodes::Node] an Arel node, the name of a table
+  #   column, or a raw SQL fragment
+  # @return Arel::Expressions the Arel node
+  def arel_node(field)
+    if field.is_a?(Arel::Nodes::Node)
+      field
+    elsif has_attribute?(field)
+      arel_table[field]
+    else
+      Arel.sql(field.to_s)
+    end
+  end
+
+  # Convert a Ruby array to an SQL array.
+  #
+  # @param values [Array]
+  # @return Arel::Nodes::SqlLiteral
+  def sql_array(array)
+    Arel.sql(ActiveRecord::Base.sanitize_sql(["ARRAY[?]", array]))
   end
 end

@@ -1132,7 +1132,7 @@ class Post < ApplicationRecord
     end
 
     def raw_tag_match(tag)
-      where("posts.tag_index @@ to_tsquery('danbooru', E?)", tag.to_escaped_for_tsquery)
+      Post.where_array_includes_all("string_to_array(posts.tag_string, ' ')", [tag])
     end
 
     # Perform a tag search as an anonymous user. No tag limit is enforced.
