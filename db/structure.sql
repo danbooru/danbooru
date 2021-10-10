@@ -4342,6 +4342,14 @@ CREATE INDEX index_posts_on_source_trgm ON public.posts USING gin (source public
 
 
 --
+-- Name: index_posts_on_string_to_array_tag_string; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_posts_on_string_to_array_tag_string ON public.posts USING gin (string_to_array(tag_string, ' '::text));
+ALTER INDEX public.index_posts_on_string_to_array_tag_string ALTER COLUMN 1 SET STATISTICS 3000;
+
+
+--
 -- Name: index_posts_on_tag_index; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5050,6 +5058,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210921170444'),
 ('20210926123414'),
 ('20210926125826'),
-('20211008091234');
+('20211008091234'),
+('20211010181657');
 
 
