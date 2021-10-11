@@ -947,8 +947,6 @@ class PostQueryBuilder
 
       set_cached_count(count) if count.present?
       count
-    rescue Post::SearchError
-      nil
     end
 
     def set_cached_count(count)

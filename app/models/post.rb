@@ -1,10 +1,6 @@
 class Post < ApplicationRecord
-  class ApprovalError < StandardError; end
-  class DisapprovalError < StandardError; end
   class RevertError < StandardError; end
-  class SearchError < StandardError; end
   class DeletionError < StandardError; end
-  class TimeoutError < StandardError; end
 
   # Tags to copy when copying notes.
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation

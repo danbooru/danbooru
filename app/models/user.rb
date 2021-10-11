@@ -1,5 +1,4 @@
 class User < ApplicationRecord
-  class Error < StandardError; end
   class PrivilegeError < StandardError; end
 
   module Levels
