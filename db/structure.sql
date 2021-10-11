@@ -4801,7 +4801,7 @@ CREATE TRIGGER trigger_posts_on_tag_index_update BEFORE INSERT OR UPDATE ON publ
 -- Name: wiki_pages trigger_wiki_pages_on_update; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER trigger_wiki_pages_on_update BEFORE INSERT OR UPDATE ON public.wiki_pages FOR EACH ROW EXECUTE FUNCTION tsvector_update_trigger('body_index', 'public.danbooru', 'body', 'title');
+CREATE TRIGGER trigger_wiki_pages_on_update BEFORE INSERT OR UPDATE ON public.wiki_pages FOR EACH ROW EXECUTE FUNCTION tsvector_update_trigger('body_index', 'pg_catalog.english', 'body', 'title');
 
 
 --
@@ -5059,6 +5059,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210926123414'),
 ('20210926125826'),
 ('20211008091234'),
-('20211010181657');
+('20211010181657'),
+('20211011044400');
 
 

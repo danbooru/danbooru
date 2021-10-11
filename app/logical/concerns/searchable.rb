@@ -194,7 +194,7 @@ module Searchable
     end
   end
 
-  def text_attribute_matches(attribute, value, index_column: nil, ts_config: "english")
+  def text_attribute_matches(attribute, value, index_column: nil)
     return all unless value.present?
 
     column = column_for_attribute(attribute)
@@ -203,9 +203,9 @@ module Searchable
     if value =~ /\*/
       where("lower(#{qualified_column}) LIKE :value ESCAPE E'\\\\'", value: value.mb_chars.downcase.to_escaped_for_sql_like)
     elsif index_column.present?
-      where("#{table_name}.#{index_column} @@ plainto_tsquery(:ts_config, :value)", ts_config: ts_config, value: value)
+      where("#{table_name}.#{index_column} @@ plainto_tsquery('english', :value)", value: value)
     else
-      where("to_tsvector(:ts_config, #{qualified_column}) @@ plainto_tsquery(:ts_config, :value)", ts_config: ts_config, value: value)
+      where("to_tsvector('english', #{qualified_column}) @@ plainto_tsquery('english', :value)", value: value)
     end
   end
 
