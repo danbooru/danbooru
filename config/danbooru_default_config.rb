@@ -318,6 +318,13 @@ module Danbooru
       []
     end
 
+    # Tag searches with less than this many results will be considered "small
+    # searches" and optimized specially. This is unnecessary unless you have a
+    # Danbooru-sized database.
+    def small_search_threshold
+      nil
+    end
+
     # Your Pixiv PHPSESSID cookie. Get this by logging in to Pixiv and using
     # the devtools to find the PHPSESSID cookie. This is need for Pixiv upload
     # support.

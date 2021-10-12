@@ -514,6 +514,52 @@ class PostQueryBuilder
     relation
   end
 
+  def paginated_posts(page, small_search_threshold: Danbooru.config.small_search_threshold, **options)
+    posts = build.paginate(page, **options)
+    posts = optimize_search(posts, 30_000)
+    posts.load
+  end
+
+  # XXX This is an ugly hack to try to deal with slow searches. By default,
+  # Postgres wants to do an index scan down the post id index for large
+  # order:id searches, and a bitmap scan on the tag index for small searches.
+  # The problem is that Postgres can't always tell whether a search is large or
+  # small. For large mutually-exclusive tags like 1girl + multiple_girls,
+  # Postgres assumes the search is large when actually it's small. For small
+  # tags, Postgres sometimes assumes tags in the 10k-50k range are large enough
+  # for a post id index scan, when in reality a tag index bitmap scan would be
+  # better.
+  def optimize_search(relation, small_search_threshold)
+    return relation unless small_search_threshold.present?
+    return relation unless relation.order_values == ["posts.id DESC"]
+
+    if post_count.nil?
+      # If post_count is nil, then the search took too long to count and we don't
+      # know whether it's large or small. First we try it normally assuming it's
+      # large, then if that times out we try again assuming it's small.
+      posts = Post.with_timeout(1000) { relation.load }
+      posts = small_search(relation) if posts.nil?
+    elsif post_count <= small_search_threshold
+      # Otherwise if we know the search is small, then treat it as a small search.
+      posts = small_search(relation)
+    else
+      # Otherwise if we know it's large, treat it normally
+      posts = relation
+    end
+
+    posts
+  end
+
+  # Perform a search, forcing Postgres to do a bitmap scan on the tags index.
+  # https://www.postgresql.org/docs/current/runtime-config-query.html
+  def small_search(relation)
+    Post.transaction do
+      Post.connection.execute("SET LOCAL enable_seqscan = off")
+      Post.connection.execute("SET LOCAL enable_indexscan = off")
+      relation.load
+    end
+  end
+
   def search_order(relation, order)
     case order.to_s.downcase
     when "id", "id_asc"
@@ -891,6 +937,10 @@ class PostQueryBuilder
   end
 
   concerning :CountMethods do
+    def post_count
+      fast_count
+    end
+
     # Return an estimate of the number of posts returned by the search.  By
     # default, we try to use an estimated or cached count before doing an exact
     # count.
@@ -1093,5 +1143,5 @@ class PostQueryBuilder
     end
   end
 
-  memoize :split_query
+  memoize :split_query, :post_count
 end

@@ -7,7 +7,8 @@ module PostSets
     MAX_PER_PAGE = 200
     MAX_SIDEBAR_TAGS = 25
 
-    attr_reader :page, :random, :post_count, :format, :tag_string, :query, :normalized_query
+    attr_reader :page, :random, :format, :tag_string, :query, :normalized_query
+    delegate :post_count, to: :normalized_query
 
     def initialize(tags, page = 1, per_page = nil, user: CurrentUser.user, random: false, format: "html")
       @query = PostQueryBuilder.new(tags, user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
@@ -97,27 +98,16 @@ module PostSets
       random || query.find_metatag(:order) == "random"
     end
 
-    def get_post_count
-      if %w[json atom xml].include?(format.downcase)
-        # no need to get counts for formats that don't use a paginator
-        nil
-      else
-        normalized_query.fast_count
-      end
-    end
-
     def get_random_posts
       ::Post.user_tag_match(tag_string).random(per_page)
     end
 
     def posts
       @posts ||= begin
-        @post_count = get_post_count
-
         if is_random?
           get_random_posts.paginate(page, search_count: false, limit: per_page, max_limit: max_per_page).load
         else
-          normalized_query.build.paginate(page, count: post_count, search_count: !post_count.nil?, limit: per_page, max_limit: max_per_page).load
+          normalized_query.paginated_posts(page, count: post_count, search_count: !post_count.nil?, limit: per_page, max_limit: max_per_page).load
         end
       end
     end

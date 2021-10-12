@@ -23,7 +23,7 @@ module RelatedTagCalculator
   # @param category [Integer] an optional tag category, to restrict the tags to a given category.
   # @return [Array<Tag>] the set of similar tags, ordered by most similar
   def self.similar_tags_for_search(post_query, search_sample_size: 1000, tag_sample_size: 250, category: nil)
-    search_count = post_query.fast_count
+    search_count = post_query.post_count
     return [] if search_count.nil?
 
     search_sample_size = [search_count, search_sample_size].min
