@@ -514,9 +514,9 @@ class PostQueryBuilder
     relation
   end
 
-  def paginated_posts(page, small_search_threshold: Danbooru.config.small_search_threshold, **options)
+  def paginated_posts(page, small_search_threshold: Danbooru.config.small_search_threshold.to_i, **options)
     posts = build.paginate(page, **options)
-    posts = optimize_search(posts, 30_000)
+    posts = optimize_search(posts, small_search_threshold)
     posts.load
   end
 
