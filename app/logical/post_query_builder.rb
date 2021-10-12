@@ -902,8 +902,8 @@ class PostQueryBuilder
     def fast_count(timeout: 1_000, estimate_count: true, skip_cache: false)
       count = nil
       count = estimated_count if estimate_count
-      count = cached_count if count.nil? && !skip_cache
-      count = exact_count(timeout) if count.nil?
+      count = cached_count(timeout) if count.nil? && !skip_cache
+      count = exact_count(timeout) if count.nil? && skip_cache
       count
     end
 
@@ -936,22 +936,16 @@ class PostQueryBuilder
       ExplainParser.new(build).row_count
     end
 
-    def cached_count
-      Cache.get(count_cache_key)
+    def cached_count(timeout, duration: 5.minutes)
+      Cache.get(count_cache_key, duration) do
+        exact_count(timeout)
+      end
     end
 
     def exact_count(timeout)
-      count = Post.with_timeout(timeout, nil) do
+      Post.with_timeout(timeout) do
         build.count
       end
-
-      set_cached_count(count) if count.present?
-      count
-    end
-
-    def set_cached_count(count)
-      expiry = count.seconds.clamp(3.minutes, 20.hours).to_i
-      Cache.put(count_cache_key, count, expiry)
     end
 
     def count_cache_key

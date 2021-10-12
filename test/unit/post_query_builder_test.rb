@@ -1199,7 +1199,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     context "for a single metatag" do
       should "return the correct cached count" do
         build(:tag, name: "score:42", post_count: -100).save(validate: false)
-        PostQueryBuilder.new("score:42").set_cached_count(100)
+        Cache.put("pfc:score:42", 100)
         assert_fast_count(100, "score:42")
       end
 
@@ -1207,7 +1207,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         pool = create(:pool, post_ids: [1, 2, 3])
 
         build(:tag, name: "pool:#{pool.id}", post_count: -100).save(validate: false)
-        PostQueryBuilder.new("pool:1234").set_cached_count(100)
+        Cache.put("pfc:pool:1234", 100)
 
         assert_fast_count(3, "pool:#{pool.id}")
         assert_fast_count(3, "pool:#{pool.name}")
@@ -1237,16 +1237,11 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     context "for a multi-tag search" do
       should "return the cached count, if it exists" do
-        PostQueryBuilder.new("score:42 aaa").set_cached_count(100)
+        Cache.put("pfc:score:42 aaa", 100)
         assert_fast_count(100, "aaa score:42")
       end
 
       should "return the true count, if not cached" do
-        assert_fast_count(1, "aaa score:42")
-      end
-
-      should "set the expiration time" do
-        Cache.expects(:put).with(PostQueryBuilder.new("score:42 aaa").count_cache_key, 1, 180)
         assert_fast_count(1, "aaa score:42")
       end
 
