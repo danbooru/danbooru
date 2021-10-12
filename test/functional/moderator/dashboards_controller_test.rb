@@ -110,14 +110,8 @@ module Moderator
         end
 
         context "for flags" do
-          setup do
-            as(@user) do
-              @post = create(:post)
-              @post.flag!("blah")
-            end
-          end
-
           should "render" do
+            create(:post_flag)
             get_auth moderator_dashboard_path, @admin
             assert_response :success
           end

@@ -1,6 +1,4 @@
 class PostFlag < ApplicationRecord
-  class Error < StandardError; end
-
   module Reasons
     UNAPPROVED = "Unapproved in three days"
     REJECTED = "Unapproved in three days after returning to moderation queue%"

@@ -29,7 +29,7 @@ class PostApproval < ApplicationRecord
     post.appeals.pending.update!(status: :succeeded)
 
     post.update(approver: user, is_flagged: false, is_pending: false, is_deleted: false)
-    ModAction.log("undeleted post ##{post_id}", :post_undelete) if is_undeletion
+    ModAction.log("undeleted post ##{post_id}", :post_undelete, user) if is_undeletion
 
     post.uploader.upload_limit.update_limit!(is_pending, true)
   end

@@ -14,7 +14,7 @@ class ApproverPrunerTest < ActiveSupport::TestCase
 
     should "not demote active approvers" do
       posts = create_list(:post, ApproverPruner::MINIMUM_APPROVALS + 1, is_pending: true)
-      posts.each { |post| post.approve!(@approver) }
+      posts.each { |post| create(:post_approval, post: post, user: @approver) }
 
       assert_equal([], ApproverPruner.inactive_approvers.map(&:id))
     end

@@ -85,7 +85,7 @@ class PostFlagTest < ActiveSupport::TestCase
         @users = create_list(:user, 2)
         @post = create(:post)
         @flag1 = create(:post_flag, post: @post, creator: @users.first)
-        as(@mod) { @post.approve! }
+        create(:post_approval, post: @post, user: @mod)
 
         travel_to(Danbooru.config.moderation_period.from_now - 1.minute) do
           @flag2 = build(:post_flag, post: @post, reason: "something", creator: @users.second)

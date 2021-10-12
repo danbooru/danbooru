@@ -12,7 +12,7 @@ class PostEventsControllerTest < ActionDispatch::IntegrationTest
       create(:post_flag, post: @post, status: :rejected)
       @post.update(is_deleted: true)
       create(:post_appeal, post: @post, status: :succeeded)
-      @post.approve!(@mod)
+      create(:post_approval, post: @post, user: @mod)
     end
   end
 

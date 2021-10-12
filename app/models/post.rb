@@ -254,18 +254,6 @@ class Post < ApplicationRecord
       !is_active? && uploader != user
     end
 
-    def flag!(reason, is_deletion: false)
-      flag = flags.create(reason: reason, is_deletion: is_deletion, creator: CurrentUser.user)
-
-      if flag.errors.any?
-        raise PostFlag::Error, flag.errors.full_messages.join("; ")
-      end
-    end
-
-    def approve!(approver = CurrentUser.user)
-      approvals.create(user: approver)
-    end
-
     def disapproved_by?(user)
       PostDisapproval.exists?(user_id: user.id, post_id: id)
     end

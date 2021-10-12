@@ -152,12 +152,11 @@ class PostTest < ActiveSupport::TestCase
 
       context "that is still in cooldown after being flagged" do
         should "succeed" do
-          post = FactoryBot.create(:post)
-          post.flag!("test flag")
-          post.delete!("test deletion")
+          flag = create(:post_flag)
+          flag.post.delete!("test deletion")
 
-          assert_equal(true, post.is_deleted)
-          assert_equal(2, post.flags.size)
+          assert_equal(true, flag.post.is_deleted)
+          assert_equal(2, flag.post.flags.size)
         end
       end
 
@@ -322,158 +321,16 @@ class PostTest < ActiveSupport::TestCase
         end
       end
     end
-
-    context "Undeleting a post with a parent" do
-      should "update with a new approver" do
-        new_user = FactoryBot.create(:moderator_user)
-        p1 = FactoryBot.create(:post)
-        c1 = FactoryBot.create(:post, :parent_id => p1.id)
-        c1.delete!("test")
-        c1.approve!(new_user)
-        p1.reload
-        assert_equal(new_user.id, c1.approver_id)
-      end
-
-      should "preserve the parent's has_children flag" do
-        p1 = FactoryBot.create(:post)
-        c1 = FactoryBot.create(:post, :parent_id => p1.id)
-        c1.delete!("test")
-        c1.approve!
-        p1.reload
-        assert_not_nil(c1.parent_id)
-        assert(p1.has_children?, "Parent should have children")
-      end
-    end
   end
 
   context "Moderation:" do
     context "A deleted post" do
-      setup do
-        @post = FactoryBot.create(:post, :is_deleted => true)
-      end
-
-      context "that is undeleted" do
-        setup do
-          @mod = FactoryBot.create(:moderator_user)
-          CurrentUser.user = @mod
-        end
-
-        context "by the approver" do
-          setup do
-            @post.update_attribute(:approver_id, @mod.id)
-          end
-
-          should "not be permitted" do
-            approval = @post.approve!
-
-            assert_equal(false, approval.valid?)
-            assert_equal(["You have previously approved this post and cannot approve it again"], approval.errors.full_messages)
-          end
-        end
-
-        context "by the uploader" do
-          setup do
-            @post.update_attribute(:uploader_id, @mod.id)
-          end
-
-          should "not be permitted" do
-            approval = @post.approve!
-
-            assert_equal(false, approval.valid?)
-            assert_equal(["You cannot approve a post you uploaded"], approval.errors.full_messages)
-          end
-        end
-      end
-
-      context "when undeleted" do
-        should "be undeleted" do
-          @post.approve!
-          assert_equal(false, @post.reload.is_deleted?)
-        end
-
-        should "create a mod action" do
-          @post.approve!
-          assert_equal("undeleted post ##{@post.id}", ModAction.last.description)
-          assert_equal("post_undelete", ModAction.last.category)
-        end
-      end
-
-      context "when approved" do
-        should "be undeleted" do
-          @post.approve!
-          assert_equal(false, @post.reload.is_deleted?)
-        end
-
-        should "create a mod action" do
-          @post.approve!
-          assert_equal("undeleted post ##{@post.id}", ModAction.last.description)
-          assert_equal("post_undelete", ModAction.last.category)
-        end
-      end
-
       should "be appealed" do
+        @post = create(:post, is_deleted: true)
         create(:post_appeal, post: @post)
+
         assert(@post.is_deleted?, "Post should still be deleted")
         assert_equal(1, @post.appeals.count)
-      end
-    end
-
-    context "An approved post" do
-      should "be flagged" do
-        post = FactoryBot.create(:post)
-        assert_difference("PostFlag.count", 1) do
-          post.flag!("bad")
-        end
-        assert(post.is_flagged?, "Post should be flagged.")
-        assert_equal(1, post.flags.count)
-      end
-
-      should "not be flagged if no reason is given" do
-        post = FactoryBot.create(:post)
-        assert_difference("PostFlag.count", 0) do
-          assert_raises(PostFlag::Error) do
-            post.flag!("")
-          end
-        end
-      end
-    end
-
-    context "An unapproved post" do
-      should "preserve the approver's identity when approved" do
-        post = FactoryBot.create(:post, :is_pending => true)
-        post.approve!
-        assert_equal(post.approver_id, CurrentUser.id)
-      end
-
-      context "that was previously approved by person X" do
-        setup do
-          @user = FactoryBot.create(:moderator_user, :name => "xxx")
-          @user2 = FactoryBot.create(:moderator_user, :name => "yyy")
-          @post = FactoryBot.create(:post, :approver_id => @user.id)
-          @post.flag!("bad")
-        end
-
-        should "not allow person X to reapprove that post" do
-          approval = @post.approve!(@user)
-          assert_includes(approval.errors.full_messages, "You have previously approved this post and cannot approve it again")
-        end
-
-        should "allow person Y to approve the post" do
-          @post.approve!(@user2)
-          assert(@post.valid?)
-        end
-      end
-
-      context "that has been reapproved" do
-        should "no longer be flagged or pending" do
-          post = FactoryBot.create(:post)
-          post.flag!("bad")
-          post.approve!
-          assert(post.errors.empty?, post.errors.full_messages.join(", "))
-          post.reload
-          assert_equal(false, post.is_flagged?)
-          assert_equal(false, post.is_pending?)
-        end
       end
     end
   end

@@ -30,7 +30,7 @@ class UploadLimitTest < ActiveSupport::TestCase
         @post = create(:post, uploader: @user, is_pending: true, created_at: 7.days.ago)
         assert_equal(1000, @user.reload.upload_points)
 
-        @post.approve!(@approver)
+        create(:post_approval, post: @post, user: @approver)
         assert_equal(1010, @user.reload.upload_points)
       end
 
@@ -40,7 +40,7 @@ class UploadLimitTest < ActiveSupport::TestCase
         @post = create(:post, uploader: @user, is_pending: true, created_at: 7.days.ago)
         assert_equal(UploadLimit::MAXIMUM_POINTS, @user.reload.upload_points)
 
-        @post.approve!(@approver)
+        create(:post_approval, post: @post, user: @approver)
         assert_equal(UploadLimit::MAXIMUM_POINTS, @user.reload.upload_points)
       end
     end
@@ -50,7 +50,7 @@ class UploadLimitTest < ActiveSupport::TestCase
         @post = create(:post, uploader: @user, is_pending: true)
         assert_equal(1000, @user.reload.upload_points)
 
-        @post.approve!(@approver)
+        create(:post_approval, post: @post, user: @approver)
         assert_equal(1010, @user.reload.upload_points)
 
         as(@approver) { @post.delete!("bad") }
@@ -64,7 +64,7 @@ class UploadLimitTest < ActiveSupport::TestCase
         as(@approver) { @post.delete!("bad") }
         assert_equal(967, @user.reload.upload_points)
 
-        @post.approve!(@approver)
+        create(:post_approval, post: @post, user: @approver)
         assert_equal(1010, @user.reload.upload_points)
       end
     end
@@ -77,7 +77,7 @@ class UploadLimitTest < ActiveSupport::TestCase
         assert_equal(967, @user.reload.upload_points)
 
         @appeal = create(:post_appeal, post: @post)
-        @post.approve!(@approver)
+        create(:post_approval, post: @post, user: @approver)
 
         assert_equal(true, @appeal.reload.succeeded?)
         assert_equal(false, @post.reload.is_deleted?)
