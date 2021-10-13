@@ -11,4 +11,4 @@ web: bin/rails server
 worker: bin/rails jobs:work
 clock: bin/rails danbooru:cron
 webpack-dev-server: bin/webpack-dev-server
-# db: docker run --rm -it --name danbooru-postgres --shm-size=8g -p 5432:5432 -e POSTGRES_USER=danbooru - e POSTRES_HOST_AUTH_METHOD=trust -v danbooru-postgres:/var/lib/postgresql/data evazion/postgres
+# db: docker run --rm -it --name danbooru-postgres --shm-size=8g -p 5432:5432 -e POSTGRES_USER=danbooru - e POSTRES_HOST_AUTH_METHOD=trust -v danbooru-postgres:/var/lib/postgresql/data ghcr.io/danbooru/postgres:14.0

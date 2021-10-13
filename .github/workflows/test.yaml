@@ -74,7 +74,7 @@ jobs:
 
     services:
       postgres:
-        image: evazion/postgres
+        image: ghcr.io/danbooru/postgres:14.0
         env:
           POSTGRES_USER: danbooru
           POSTGRES_PASSWORD: danbooru
