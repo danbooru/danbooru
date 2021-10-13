@@ -148,12 +148,11 @@
         border: 1px solid var(--movable-note-box-border-color);
       }
 
-      <% for i in 1..5 do %>
-        <%# Selector order is deliberate as placing the not after the level consistently caused segmentaion faults for unknown reasons. %>
-        &:not(:hover).level-<%= i %> {
-          z-index: <%= 100 + i %>;
-        }
-      <% end %>
+      &:not(:hover).level-1 { z-index: 101; }
+      &:not(:hover).level-2 { z-index: 102; }
+      &:not(:hover).level-3 { z-index: 103; }
+      &:not(:hover).level-4 { z-index: 104; }
+      &:not(:hover).level-5 { z-index: 105; }
 
       &:not(:hover) div.ui-resizable-handle {
         display: none !important;

@@ -18,6 +18,8 @@
     <meta name="blacklisted-tags" content="<%= CurrentUser.user.blacklisted_tags.gsub(/(?:\r|\n)+/, ",") %>">
   <% end %>
 
+  <%= tag.meta name: "autocomplete-tag-prefixes", content: AutocompleteService::TAG_PREFIXES.to_json %>
+
   <%# XXX hack to only load Ruffle on Flash posts %>
   <% if controller_name == "posts" && action_name == "show" && @post&.is_flash? %>
     <%= javascript_pack_tag "application", "flash" %>

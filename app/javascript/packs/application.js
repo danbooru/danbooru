@@ -32,7 +32,7 @@ importAll(require.context('../src/styles', true, /\.s?css(?:\.erb)?$/));
 importAll(require.context('../../components', true, /\.js(\.erb)?$/));
 importAll(require.context('../../components', true, /\.s?css(?:\.erb)?$/));
 
-import Autocomplete from "../src/javascripts/autocomplete.js.erb";
+import Autocomplete from "../src/javascripts/autocomplete.js";
 import Blacklist from "../src/javascripts/blacklists.js";
 import CommentComponent from "../../components/comment_component/comment_component.js";
 import CurrentUser from "../src/javascripts/current_user.js";
@@ -40,13 +40,13 @@ import Dtext from "../src/javascripts/dtext.js";
 import IqdbQuery from "../src/javascripts/iqdb_queries.js";
 import Note from "../src/javascripts/notes.js";
 import PopupMenuComponent from "../../components/popup_menu_component/popup_menu_component.js";
-import Post from "../src/javascripts/posts.js.erb";
+import Post from "../src/javascripts/posts.js";
 import PostModeMenu from "../src/javascripts/post_mode_menu.js";
 import PostTooltip from "../src/javascripts/post_tooltips.js";
 import RelatedTag from "../src/javascripts/related_tag.js";
 import Shortcuts from "../src/javascripts/shortcuts.js";
 import TagCounter from "../src/javascripts/tag_counter.js";
-import Upload from "../src/javascripts/uploads.js.erb";
+import Upload from "../src/javascripts/uploads.js";
 import UserTooltip from "../src/javascripts/user_tooltips.js";
 import Utility from "../src/javascripts/utility.js";
 import Ugoira from "../src/javascripts/ugoira.js"

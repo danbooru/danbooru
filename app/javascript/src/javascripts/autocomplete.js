@@ -1,10 +1,5 @@
 let Autocomplete = {};
 
-/* eslint-disable */
-Autocomplete.TAG_CATEGORIES = <%= TagCategory.mapping.to_json.html_safe %>;
-/* eslint-enable */
-
-Autocomplete.TAG_PREFIXES = "-|~|" + Object.keys(Autocomplete.TAG_CATEGORIES).map(category => category + ":").join("|");
 Autocomplete.MAX_RESULTS = 10;
 
 Autocomplete.initialize_all = function() {
@@ -117,7 +112,7 @@ Autocomplete.insert_completion = function(input, completion) {
   var before_caret_text = input.value.substring(0, input.selectionStart).replace(/^[ \t]+|[ \t]+$/gm, "");
   var after_caret_text = input.value.substring(input.selectionStart).replace(/^[ \t]+|[ \t]+$/gm, "");
 
-  var regexp = new RegExp("(" + Autocomplete.TAG_PREFIXES + ")?\\S+$", "g");
+  var regexp = new RegExp("(" + Autocomplete.tag_prefixes().join("|") + ")?\\S+$", "g");
   before_caret_text = before_caret_text.replace(regexp, "$1") + completion + " ";
 
   input.value = before_caret_text + after_caret_text;
@@ -207,6 +202,10 @@ Autocomplete.autocomplete_source = function(query, type) {
     "limit": Autocomplete.MAX_RESULTS
   });
 }
+
+Autocomplete.tag_prefixes = function() {
+  return JSON.parse($("meta[name=autocomplete-tag-prefixes]").attr("content"));
+};
 
 $(document).ready(function() {
   Autocomplete.initialize_all();

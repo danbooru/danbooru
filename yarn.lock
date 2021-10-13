@@ -5864,7 +5864,7 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"loader-utils@npm:^1.1.0, loader-utils@npm:^1.4.0":
+"loader-utils@npm:^1.4.0":
   version: 1.4.0
   resolution: "loader-utils@npm:1.4.0"
   dependencies:
@@ -5914,13 +5914,6 @@ fsevents@~2.3.2:
   version: 4.0.8
   resolution: "lodash.debounce@npm:4.0.8"
   checksum: b6042bd8c09ff1961c9127d32266316bc21f946ece5e3464a663ec61fadb98e7d56ec0ef7e23b47d393695310c19cf24e651c1756be6da91ac02c72be7f79465
-  languageName: node
-  linkType: hard
-
-"lodash.defaults@npm:^4.2.0":
-  version: 4.2.0
-  resolution: "lodash.defaults@npm:4.2.0"
-  checksum: fde72e71f7b7ece10c24e43dd601574168467d50bc76687302d40de341d5cb8e35b100105d938458747d2ad5f20d8bb736e62523ef39d1a8b40f7307c50f10ac
   languageName: node
   linkType: hard
 
@@ -7885,18 +7878,6 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"rails-erb-loader@npm:^5.5.2":
-  version: 5.5.2
-  resolution: "rails-erb-loader@npm:5.5.2"
-  dependencies:
-    loader-utils: ^1.1.0
-    lodash.defaults: ^4.2.0
-  peerDependencies:
-    webpack: ^2.0.0 || >= 3.0.0-rc.0 || ^3.0.0
-  checksum: 3862a70a892db8392990f2a48431597c30ca88260dfa0a658bc612db944ec7138411aa9fbe5219fb9c08a66659073720b016d39580d58c5cd0ff810bbd5f31d0
-  languageName: node
-  linkType: hard
-
 "randombytes@npm:^2.1.0":
   version: 2.1.0
   resolution: "randombytes@npm:2.1.0"
@@ -8387,7 +8368,6 @@ fsevents@~2.3.2:
     postcss-import: ^14.0.2
     postcss-loader: ^6.1.1
     postcss-preset-env: ^6.7.0
-    rails-erb-loader: ^5.5.2
     ruffle-mirror: 2021.10.12
     sass: ^1.38.2
     sass-loader: ^12.1.0

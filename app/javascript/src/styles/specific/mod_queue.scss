@@ -23,11 +23,5 @@ div#c-modqueue {
         margin-top: 1em;
       }
     }
-
-    <% Danbooru.config.modqueue_warning_tags.each do |tag| %>
-      a[data-tag-name="<%= tag %>"] {
-        background-color: var(--modqueue-tag-warning-color);
-      }
-    <% end %>
   }
 }

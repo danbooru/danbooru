@@ -3,8 +3,6 @@ import SparkMD5 from 'spark-md5';
 
 let Upload = {};
 
-Upload.MAX_FILE_SIZE_BYTES = <%= Danbooru.config.max_file_size.to_json %>;
-Upload.MAX_FILE_SIZE = Upload.MAX_FILE_SIZE_BYTES / (1024 * 1024);
 Upload.IQDB_LIMIT = 5;
 Upload.IQDB_MIN_SIMILARITY = 50;
 Upload.IQDB_HIGH_SIMILARITY = 70;
@@ -183,8 +181,8 @@ Upload.initialize_dropzone = function() {
     thumbnailMethod: "contain",
     addRemoveLinks: false,
     maxFiles: 1,
-    maxFilesize: Upload.MAX_FILE_SIZE,
-    maxThumbnailFilesize: Upload.MAX_FILE_SIZE,
+    maxFilesize: Upload.max_file_size(),
+    maxThumbnailFilesize: Upload.max_file_size(),
     timeout: 0,
     acceptedFiles: "image/jpeg,image/png,image/gif,video/mp4,video/webm",
     previewTemplate: $("#dropzone-preview-template").html(),
@@ -224,6 +222,10 @@ Upload.initialize_dropzone = function() {
 
 Upload.batch_open_all = function() {
   $(".upload-preview > a").each((_i, link) => window.open(link.href));
+};
+
+Upload.max_file_size = function() {
+  return Number($("meta[name=max-file-size]").attr("content")) / (1024 * 1024);
 };
 
 $(function() {

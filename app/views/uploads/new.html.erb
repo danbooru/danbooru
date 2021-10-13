@@ -1,3 +1,7 @@
+<%= content_for :html_header do %>
+  <meta name="max-file-size" content="<%= Danbooru.config.max_file_size %>">
+<% end %>
+
 <div id="c-uploads">
   <div id="a-new" data-image-size="small">
     <h1>Upload</h1>

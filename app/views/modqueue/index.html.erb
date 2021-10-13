@@ -1,5 +1,15 @@
 <% page_title "Moderation Queue" %>
 
+<%= content_for :html_header do %>
+  <style>
+    <% Danbooru.config.modqueue_warning_tags.each do |tag| %>
+      div.post a[data-tag-name="<%= tag %>"] {
+        background-color: var(--modqueue-tag-warning-color);
+      }
+    <% end %>
+  </style>
+<% end %>
+
 <% content_for(:top_content) do %>
   <h1>Moderation Queue</h1>
 

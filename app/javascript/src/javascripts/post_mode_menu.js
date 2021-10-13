@@ -1,4 +1,4 @@
-import Post from './posts.js.erb'
+import Post from './posts.js'
 import Utility from './utility'
 
 let PostModeMenu = {};
