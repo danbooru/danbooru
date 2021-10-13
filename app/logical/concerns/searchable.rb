@@ -307,6 +307,14 @@ module Searchable
       relation = relation.where(attr => params[attr])
     end
 
+    if params[:"#{attr}_present"].present? && params[:"#{attr}_present"].truthy?
+      relation = relation.where.not(attr => "")
+    end
+
+    if params[:"#{attr}_present"].present? && params[:"#{attr}_present"].falsy?
+      relation = relation.where(attr => "")
+    end
+
     if params[:"#{attr}_eq"].present?
       relation = relation.where(attr => params[:"#{attr}_eq"])
     end

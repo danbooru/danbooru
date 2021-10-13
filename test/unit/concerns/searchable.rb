@@ -82,6 +82,9 @@ class SearchableTest < ActiveSupport::TestCase
         assert_search_equals([@p3, @p2], source_not_like: "a*")
         assert_search_equals([@p3, @p2], source_not_ilike: "A*")
         assert_search_equals([@p3, @p2], source_not_regex: "^a.*")
+
+        assert_search_equals([], source_present: "false")
+        assert_search_equals([@p3, @p2, @p1], source_present: "true")
       end
 
       should "support multiple operators on the same attribute" do
