@@ -12,7 +12,7 @@ class AmcheckDatabaseJob < ApplicationJob
   end
 
   def notify(output)
-    DanbooruLogger.info(output)
+    DanbooruLogger.info(output) unless Rails.env.test?
     Dmail.create_automated(to: User.owner, title: "pg_amcheck failed", body: output)
   end
 end
