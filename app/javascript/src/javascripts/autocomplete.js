@@ -81,12 +81,6 @@ Autocomplete.initialize_tag_autocomplete = function() {
 
   $fields_multiple.autocomplete({
     select: function(event, ui) {
-      // Prevent Upload.initialize_enter_on_tags from running if the
-      // Enter key is used to select a tag from the autocomplete menu.
-      if (event.key === "Enter") {
-        event.stopImmediatePropagation();
-      }
-
       Autocomplete.insert_completion(this, ui.item.value);
       return false;
     },
