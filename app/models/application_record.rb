@@ -145,6 +145,29 @@ class ApplicationRecord < ActiveRecord::Base
       def update!(*args)
         all.each { |record| record.update!(*args) }
       end
+
+      def each_duplicate(*columns)
+        return enum_for(:each_duplicate, *columns) unless block_given?
+
+        group(columns).having("count(*) > 1").count.each do |values, count|
+          hash = columns.zip(Array.wrap(values)).to_h
+          yield count: count, **hash
+        end
+      end
+
+      def destroy_duplicates!(*columns, log: true)
+        each_duplicate(*columns) do |count:, **columns_with_values|
+          records = where(columns_with_values).order(:id)
+          dupes = records.drop(1)
+
+          if log
+            data = { keep: records.first.id, destroy: dupes.map(&:id), count: count, **columns_with_values }
+            DanbooruLogger.info("Destroying duplicate #{self.name} #{dupes.map(&:id).join(", ")}", data)
+          end
+
+          dupes.each(&:destroy!)
+        end
+      end
     end
   end
 

@@ -4097,6 +4097,13 @@ CREATE INDEX index_post_disapprovals_on_user_id ON public.post_disapprovals USIN
 
 
 --
+-- Name: index_post_disapprovals_on_user_id_and_post_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_post_disapprovals_on_user_id_and_post_id ON public.post_disapprovals USING btree (user_id, post_id);
+
+
+--
 -- Name: index_post_flags_on_creator_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5060,6 +5067,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210926125826'),
 ('20211008091234'),
 ('20211010181657'),
-('20211011044400');
+('20211011044400'),
+('20211013011619');
 
 
