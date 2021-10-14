@@ -75,32 +75,40 @@ class CreatePosts < ActiveRecord::Migration[4.2]
     execute "SET statement_timeout = 0"
     execute "SET search_path = public"
 
-    execute "CREATE OR REPLACE FUNCTION testprs_start(internal, int4)
-    RETURNS internal
-    AS '$libdir/test_parser'
-    LANGUAGE C STRICT"
+    #execute "CREATE OR REPLACE FUNCTION testprs_start(internal, int4)
+    #RETURNS internal
+    #AS '$libdir/test_parser'
+    #LANGUAGE C STRICT"
 
-    execute "CREATE OR REPLACE FUNCTION testprs_getlexeme(internal, internal, internal)
-    RETURNS internal
-    AS '$libdir/test_parser'
-    LANGUAGE C STRICT"
+    #execute "CREATE OR REPLACE FUNCTION testprs_getlexeme(internal, internal, internal)
+    #RETURNS internal
+    #AS '$libdir/test_parser'
+    #LANGUAGE C STRICT"
 
-    execute "CREATE OR REPLACE FUNCTION testprs_end(internal)
-    RETURNS void
-    AS '$libdir/test_parser'
-    LANGUAGE C STRICT"
+    #execute "CREATE OR REPLACE FUNCTION testprs_end(internal)
+    #RETURNS void
+    #AS '$libdir/test_parser'
+    #LANGUAGE C STRICT"
 
-    execute "CREATE OR REPLACE FUNCTION testprs_lextype(internal)
-    RETURNS internal
-    AS '$libdir/test_parser'
-    LANGUAGE C STRICT"
+    #execute "CREATE OR REPLACE FUNCTION testprs_lextype(internal)
+    #RETURNS internal
+    #AS '$libdir/test_parser'
+    #LANGUAGE C STRICT"
+
+    #execute "CREATE TEXT SEARCH PARSER testparser (
+    #    START    = testprs_start,
+    #    GETTOKEN = testprs_getlexeme,
+    #    END      = testprs_end,
+    #    HEADLINE = pg_catalog.prsd_headline,
+    #    LEXTYPES = testprs_lextype
+    #)"
 
     execute "CREATE TEXT SEARCH PARSER testparser (
-        START    = testprs_start,
-        GETTOKEN = testprs_getlexeme,
-        END      = testprs_end,
+        START    = pg_catalog.prsd_start,
+        GETTOKEN = pg_catalog.prsd_nexttoken,
+        END      = pg_catalog.prsd_end,
         HEADLINE = pg_catalog.prsd_headline,
-        LEXTYPES = testprs_lextype
+        LEXTYPES = pg_catalog.prsd_lextype
     )"
 
     execute "CREATE INDEX index_posts_on_tags_index ON posts USING gin (tag_index)"

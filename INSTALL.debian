@@ -79,15 +79,6 @@ usermod -G danbooru,sudo danbooru
 
 # Set up Postgres
 export PG_VERSION=`pg_config --version | egrep -o '[0-9]{1,}\.[0-9]{1,}[^-]'`
-if verlte 9.5 $PG_VERSION ; then
-	# only do this on postgres 9.5 and above
-
-	#necessary to build parser extension
-	apt install postgresql-server-dev-all -y
-	git clone https://github.com/r888888888/test_parser.git /tmp/test_parser
-	cd /tmp/test_parser
-	make install
-fi
 
 # Install rbenv
 echo "* Installing rbenv..."
