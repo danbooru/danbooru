@@ -167,7 +167,7 @@ module Searchable
       to_tsvector("pg_catalog.english", arel_table[column])
     end.reduce(:concat)
 
-    where("(#{tsvectors.to_sql}) @@ plainto_tsquery('pg_catalog.english', :query)", query: query)
+    where("(#{tsvectors.to_sql}) @@ websearch_to_tsquery('pg_catalog.english', :query)", query: query)
   end
 
   def search_boolean_attribute(attr, params)
