@@ -53,7 +53,7 @@ class ForumPost < ApplicationRecord
 
     def search(params)
       q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :body, :creator, :updater, :topic, :dtext_links, :votes, :tag_alias, :tag_implication, :bulk_update_request)
-      q = q.text_attribute_matches(:body, params[:body_matches], index_column: :text_index)
+      q = q.text_attribute_matches(:body, params[:body_matches])
 
       if params[:linked_to].present?
         q = q.wiki_link_matches(params[:linked_to])

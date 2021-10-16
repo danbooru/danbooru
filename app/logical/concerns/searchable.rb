@@ -160,6 +160,16 @@ module Searchable
     where("#{qualified_column_for(attr)} ? :key", key: key)
   end
 
+  # https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-PARSING-DOCUMENTS
+  # https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-PARSING-QUERIES
+  def where_tsvector_matches(columns, query)
+    tsvectors = Array.wrap(columns).map do |column|
+      to_tsvector("pg_catalog.english", arel_table[column])
+    end.reduce(:concat)
+
+    where("(#{tsvectors.to_sql}) @@ plainto_tsquery('pg_catalog.english', :query)", query: query)
+  end
+
   def search_boolean_attribute(attr, params)
     if params[attr].present?
       boolean_attribute_matches(attr, params[attr])
@@ -194,18 +204,17 @@ module Searchable
     end
   end
 
-  def text_attribute_matches(attribute, value, index_column: nil)
-    return all unless value.present?
+  def text_attribute_matches(columns, query)
+    columns = Array.wrap(columns)
 
-    column = column_for_attribute(attribute)
-    qualified_column = "#{table_name}.#{column.name}"
-
-    if value =~ /\*/
-      where("lower(#{qualified_column}) LIKE :value ESCAPE E'\\\\'", value: value.mb_chars.downcase.to_escaped_for_sql_like)
-    elsif index_column.present?
-      where("#{table_name}.#{index_column} @@ plainto_tsquery('english', :value)", value: value)
+    if query.nil?
+      all
+    elsif query =~ /\*/
+      columns.map do |column|
+        where_ilike(column, query)
+      end.reduce(:or)
     else
-      where("to_tsvector('english', #{qualified_column}) @@ plainto_tsquery('english', :value)", value: value)
+      where_tsvector_matches(columns, query)
     end
   end
 
@@ -596,11 +605,36 @@ module Searchable
     end
   end
 
+  def sql_value(value)
+    if Arel.arel_node?(value)
+      value
+    elsif value.is_a?(String)
+      Arel::Nodes.build_quoted(value)
+    elsif value.is_a?(Symbol)
+      arel_table[value]
+    elsif value.is_a?(Array)
+      sql_array(value)
+    else
+      raise ArgumentError
+    end
+  end
+
   # Convert a Ruby array to an SQL array.
   #
   # @param values [Array]
   # @return Arel::Nodes::SqlLiteral
   def sql_array(array)
     Arel.sql(ActiveRecord::Base.sanitize_sql(["ARRAY[?]", array]))
+  end
+
+  # @example Tag.sql_function(:sum, Tag.arel_table[:post_count]).to_sql == "SUM(tags.post_count)"
+  def sql_function(name, *args)
+    Arel::Nodes::NamedFunction.new(name.to_s, args.map { |arg| sql_value(arg) })
+  end
+
+  # @example Note.to_tsvector("pg_catalog.english", :body).to_sql == "to_tsvector('pg_catalog.english', notes.body)"
+  # https://www.postgresql.org/docs/current/textsearch-controls.html#TEXTSEARCH-PARSING-DOCUMENTS
+  def to_tsvector(config, column)
+    sql_function(:to_tsvector, config, column)
   end
 end
