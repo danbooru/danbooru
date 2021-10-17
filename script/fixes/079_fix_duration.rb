@@ -4,7 +4,7 @@ require_relative "../../config/environment"
 
 tags = ENV.fetch("TAGS", "animated")
 posts = Post.system_tag_match(tags)
-assets = posts.joins(:media_asset).where(media_asset: { duration: nil })
+posts = posts.joins(:media_asset).where(media_asset: { duration: nil })
 
 posts.find_each do |post|
   media_file = MediaFile.open(post.file(:original), frame_data: post.pixiv_ugoira_frame_data&.data)
