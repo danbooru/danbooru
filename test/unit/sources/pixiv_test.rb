@@ -48,10 +48,10 @@ module Sources
         end
 
         should "capture the frame data" do
-          ugoira_frame_data = @site.data[:ugoira_frame_data]
+          media_file = @site.download_file!
 
-          assert_equal(2, ugoira_frame_data.size)
-          assert_equal([{"file" => "000000.jpg", "delay" => 125}, {"file" => "000001.jpg", "delay" => 125}], ugoira_frame_data)
+          assert_equal(2, media_file.frame_data.size)
+          assert_equal([{"file" => "000000.jpg", "delay" => 125}, {"file" => "000001.jpg", "delay" => 125}], media_file.frame_data)
         end
       end
 

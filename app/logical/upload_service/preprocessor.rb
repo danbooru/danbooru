@@ -71,7 +71,7 @@ class UploadService
       begin
         upload.update(status: "preprocessing")
 
-        file = Utils.get_file_for_upload(upload, file: params[:file]&.tempfile)
+        file = Utils.get_file_for_upload(upload.source_url, upload.referer_url, params[:file]&.tempfile)
         Utils.process_file(upload, file, original_post_id: original_post_id)
 
         upload.rating = params[:rating]

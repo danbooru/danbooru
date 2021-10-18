@@ -43,7 +43,7 @@ class UploadService
 
       @upload.update(status: "processing")
 
-      @upload.file = Utils.get_file_for_upload(@upload, file: @upload.file&.tempfile)
+      @upload.file = Utils.get_file_for_upload(@upload.source_url, @upload.referer_url, @upload.file&.tempfile)
       Utils.process_file(upload, @upload.file)
 
       @upload.save!
@@ -63,14 +63,6 @@ class UploadService
   def create_post_from_upload(upload)
     @post = convert_to_post(upload)
     @post.save!
-
-    if upload.context && upload.context["ugoira"]
-      PixivUgoiraFrameData.create(
-        post_id: @post.id,
-        data: upload.context["ugoira"]["frame_data"],
-        content_type: upload.context["ugoira"]["content_type"]
-      )
-    end
 
     if upload.has_commentary?
       @post.create_artist_commentary(

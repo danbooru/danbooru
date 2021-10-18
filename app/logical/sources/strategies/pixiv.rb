@@ -199,6 +199,12 @@ module Sources
         tag.gsub(/\d+users入り\z/i, "")
       end
 
+      def download_file!(url = image_url)
+        file = super(url)
+        file.frame_data = ugoira_frame_data if is_ugoira?
+        file
+      end
+
       def translate_tag(tag)
         translated_tags = super(tag)
 
@@ -297,8 +303,9 @@ module Sources
         end
       end
 
-      def data
-        { ugoira_frame_data: api_ugoira[:frames] }
+      def ugoira_frame_data
+        return nil unless is_ugoira?
+        api_ugoira[:frames]
       end
 
       def ugoira_content_type

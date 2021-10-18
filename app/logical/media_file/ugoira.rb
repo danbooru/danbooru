@@ -7,7 +7,7 @@
 # zip file, so it must be passed around separately.
 class MediaFile::Ugoira < MediaFile
   class Error < StandardError; end
-  attr_reader :frame_data
+  attr_accessor :frame_data
 
   def initialize(file, frame_data: {}, **options)
     super(file, **options)

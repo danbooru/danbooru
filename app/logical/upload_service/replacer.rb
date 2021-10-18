@@ -61,86 +61,49 @@ class UploadService
       undoer.process!
     end
 
-    def source_strategy(upload)
-      Sources::Strategies.find(upload.source, upload.referer_url)
-    end
-
-    def find_replacement_url(repl, upload)
-      if repl.replacement_file.present?
-        return "file://#{repl.replacement_file.original_filename}"
+    def replacement_url
+      if replacement.replacement_file.present?
+        "file://#{replacement.replacement_file.original_filename}"
+      else
+        Sources::Strategies.find(replacement.replacement_url).canonical_url
       end
-
-      if upload.source.blank?
-        raise "No source found in upload for replacement"
-      end
-
-      if source_strategy(upload).canonical_url.present?
-        return source_strategy(upload).canonical_url
-      end
-
-      upload.source
     end
 
     def process!
-      preprocessor = Preprocessor.new(
-        rating: post.rating,
-        tag_string: replacement.tags,
-        source: replacement.replacement_url,
-        file: replacement.replacement_file,
-        replaced_post: post,
-        original_post_id: post.id
-      )
-      upload = preprocessor.start!
-      raise Error, upload.status if upload.is_errored?
-      upload = preprocessor.finish!(upload)
-      raise Error, upload.status if upload.is_errored?
-      md5_changed = upload.md5 != post.md5
+      media_file = Utils::get_file_for_upload(replacement.replacement_url, nil, replacement.replacement_file&.tempfile)
 
-      replacement.replacement_url = find_replacement_url(replacement, upload)
-
-      if md5_changed
-        post.queue_delete_files(PostReplacement::DELETION_GRACE_PERIOD)
+      if media_file.md5 == post.md5
+        raise Error, "Can't replace a post with itself; regenerate the post instead"
+      elsif Post.exists?(md5: media_file.md5)
+        raise Error, "Duplicate: post with md5 #{media_file.md5} already exists"
       end
 
-      replacement.file_ext = upload.file_ext
-      replacement.file_size = upload.file_size
-      replacement.image_height = upload.image_height
-      replacement.image_width = upload.image_width
-      replacement.md5 = upload.md5
+      media_asset = MediaAsset.upload!(media_file)
+      post.queue_delete_files(PostReplacement::DELETION_GRACE_PERIOD)
 
-      post.md5 = upload.md5
-      post.file_ext = upload.file_ext
-      post.image_width = upload.image_width
-      post.image_height = upload.image_height
-      post.file_size = upload.file_size
+      replacement.replacement_url = replacement_url
+      replacement.file_ext = media_asset.file_ext
+      replacement.file_size = media_asset.file_size
+      replacement.image_height = media_asset.image_height
+      replacement.image_width = media_asset.image_width
+      replacement.md5 = media_asset.md5
+
+      post.md5 = media_asset.md5
+      post.file_ext = media_asset.file_ext
+      post.image_width = media_asset.image_width
+      post.image_height = media_asset.image_height
+      post.file_size = media_asset.file_size
       post.source = replacement.final_source.presence || replacement.replacement_url
-      post.tag_string = upload.tag_string
+      post.tag_string = replacement.tags
 
       rescale_notes(post)
-      update_ugoira_frame_data(post, upload)
 
-      if md5_changed
-        CurrentUser.scoped(User.system) { Comment.create!(post: post, creator: User.system, updater: User.system, body: comment_replacement_message(post, replacement), do_not_bump_post: true, creator_ip_addr: "127.0.0.1") }
-      else
-        purge_cached_urls(post)
-      end
+      CurrentUser.scoped(User.system) { Comment.create!(post: post, creator: User.system, updater: User.system, body: comment_replacement_message(post, replacement), do_not_bump_post: true, creator_ip_addr: "127.0.0.1") }
 
       replacement.save!
       post.save!
 
       post.update_iqdb
-    end
-
-    def purge_cached_urls(post)
-      urls = [
-        post.preview_file_url,
-        post.large_file_url,
-        post.file_url,
-        post.tagged_large_file_url,
-        post.tagged_file_url
-      ]
-
-      CloudflareService.new.purge_cache(urls)
     end
 
     def rescale_notes(post)
@@ -150,20 +113,6 @@ class UploadService
       post.notes.each do |note|
         note.rescale!(x_scale, y_scale)
       end
-    end
-
-    def update_ugoira_frame_data(post, upload)
-      post.pixiv_ugoira_frame_data.destroy if post.pixiv_ugoira_frame_data.present?
-
-      unless post.is_ugoira?
-        return
-      end
-
-      PixivUgoiraFrameData.create(
-        post_id: post.id,
-        data: upload.context["ugoira"]["frame_data"],
-        content_type: upload.context["ugoira"]["content_type"]
-      )
     end
   end
 end

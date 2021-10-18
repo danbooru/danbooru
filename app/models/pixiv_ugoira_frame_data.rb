@@ -1,5 +1,6 @@
 class PixivUgoiraFrameData < ApplicationRecord
-  belongs_to :post
+  belongs_to :post, optional: true, foreign_key: :md5, primary_key: :md5
+  belongs_to :media_asset, foreign_key: :md5, primary_key: :md5
 
   serialize :data
   before_validation :normalize_data, on: :create
@@ -9,7 +10,7 @@ class PixivUgoiraFrameData < ApplicationRecord
   end
 
   def self.search(params)
-    q = search_attributes(params, :id, :data, :content_type, :post)
+    q = search_attributes(params, :id, :data, :content_type, :post, :md5)
     q.apply_default_order(params)
   end
 

@@ -1327,7 +1327,7 @@ ALTER SEQUENCE public.notes_id_seq OWNED BY public.notes.id;
 
 CREATE TABLE public.pixiv_ugoira_frame_data (
     id integer NOT NULL,
-    post_id integer NOT NULL,
+    post_id integer,
     data text NOT NULL,
     content_type character varying NOT NULL,
     md5 character varying
@@ -5048,6 +5048,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211013011619'),
 ('20211014063943'),
 ('20211015223510'),
-('20211018045429');
+('20211018045429'),
+('20211018062916');
 
 

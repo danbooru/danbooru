@@ -19,6 +19,8 @@ class MediaFile
   # @param options [Hash] extra options for the MediaFile subclass.
   # @return [MediaFile] the media file
   def self.open(file, **options)
+    return file.dup if file.is_a?(MediaFile)
+
     file = Kernel.open(file, "r", binmode: true) unless file.respond_to?(:read)
 
     case file_ext(file)

@@ -276,10 +276,6 @@ module Sources
         image_url
       end
 
-      def data
-        {}
-      end
-
       def tags
         (@tags || []).uniq
       end

@@ -23,59 +23,6 @@ class UploadServiceTest < ActiveSupport::TestCase
   end
 
   context "::Utils" do
-    context "#get_file_for_upload" do
-      context "for a non-source site" do
-        setup do
-          @source = "https://upload.wikimedia.org/wikipedia/commons/c/c5/Moraine_Lake_17092005.jpg"
-          @upload = Upload.new
-          @upload.source = @source
-        end
-
-        should "work on a jpeg" do
-          file = UploadService::Utils.get_file_for_upload(@upload)
-          assert_operator(File.size(file.path), :>, 0)
-          file.close
-        end
-      end
-
-      context "for a pixiv" do
-        setup do
-          skip "Pixiv credentials not configured" unless Sources::Strategies::Pixiv.enabled?
-
-          @source = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350"
-          @upload = Upload.new
-          @upload.source = @source
-        end
-
-        should "work on an ugoira url" do
-          begin
-            file = UploadService::Utils.get_file_for_upload(@upload)
-            assert_operator(File.size(file.path), :>, 0)
-            file.close
-          end
-        end
-      end
-
-      context "for a pixiv ugoira" do
-        setup do
-          skip "Pixiv credentials not configured" unless Sources::Strategies::Pixiv.enabled?
-
-          @source = "https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip"
-          @referer = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364"
-          @upload = Upload.new
-          @upload.source = @source
-          @upload.referer_url = @referer
-        end
-
-        should "work on an ugoira url" do
-          file = UploadService::Utils.get_file_for_upload(@upload)
-
-          assert_not_nil(@upload.context["ugoira"])
-          assert_operator(File.size(file.path), :>, 0)
-        end
-      end
-    end
-
     context ".process_file" do
       setup do
         @upload = FactoryBot.build(:jpg_upload)
@@ -286,12 +233,6 @@ class UploadServiceTest < ActiveSupport::TestCase
       subject { UploadService::Replacer.new(post: @post, replacement: @replacement) }
 
       context "#process!" do
-        should "create a new upload" do
-          assert_difference(-> { Upload.count }) do
-            as(@user) { subject.process! }
-          end
-        end
-
         should "create a comment" do
           assert_difference(-> { @post.comments.count }) do
             as(@user) { subject.process! }
@@ -342,19 +283,10 @@ class UploadServiceTest < ActiveSupport::TestCase
       end
 
       context "a post with the same file" do
-        should "not raise a duplicate error" do
+        should "raise an error" do
           upload_file("test/files/test.png") do |file|
-            assert_nothing_raised do
+            assert_raises(UploadService::Replacer::Error) do
               as(@user) { @post.replace!(replacement_file: file, replacement_url: "") }
-            end
-          end
-        end
-
-        should "not queue a deletion or log a comment" do
-          upload_file("test/files/test.png") do |file|
-            assert_no_difference(-> { @post.comments.count }) do
-              as(@user) { @post.replace!(replacement_file: file, replacement_url: "") }
-              @post.reload
             end
           end
         end
@@ -407,9 +339,10 @@ class UploadServiceTest < ActiveSupport::TestCase
       subject { UploadService::Replacer.new(post: @post, replacement: @replacement) }
 
       context "when replacing with its own source" do
-        should "work" do
-          as(@user) { @post.replace!(replacement_url: @post.source) }
-          assert_equal(@post_md5, @post.md5)
+        should "raise an error" do
+          assert_raises(UploadService::Replacer::Error) do
+            as(@user) { @post.replace!(replacement_url: @post.source) }
+          end
         end
       end
 
@@ -480,12 +413,6 @@ class UploadServiceTest < ActiveSupport::TestCase
       end
 
       context "#process!" do
-        should "create a new upload" do
-          assert_difference(-> { Upload.count }) do
-            as(@user) { subject.process! }
-          end
-        end
-
         should "create a comment" do
           assert_difference(-> { @post.comments.count }) do
             as(@user) { subject.process! }
@@ -908,20 +835,6 @@ class UploadServiceTest < ActiveSupport::TestCase
       should "record the canonical source" do
         post = subject.new({}).create_post_from_upload(@upload)
         assert_equal(@ref, post.source)
-      end
-    end
-
-    context "for a pixiv ugoira" do
-      setup do
-        @upload = FactoryBot.create(:ugoira_upload, file_size: 1000, md5: "12345", file_ext: "jpg", image_width: 100, image_height: 100, context: UGOIRA_CONTEXT)
-      end
-
-      should "create a post" do
-        assert_difference(-> { PixivUgoiraFrameData.count }) do
-          post = subject.new({}).create_post_from_upload(@upload)
-          assert_equal([], post.errors.full_messages)
-          assert_not_nil(post.id)
-        end
       end
     end
 
