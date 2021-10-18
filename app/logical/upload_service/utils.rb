@@ -17,15 +17,8 @@ class UploadService
       upload.image_height = media_file.height
 
       upload.validate!(:file)
-      upload.tag_string = "#{upload.tag_string} #{Utils.automatic_tags(media_file)}"
 
       MediaAsset.upload!(media_file)
-    end
-
-    def automatic_tags(media_file)
-      tags = []
-      tags << "sound" if media_file.has_audio?
-      tags.join(" ")
     end
 
     def get_file_for_upload(source_url, referer_url, file)
