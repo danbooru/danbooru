@@ -1329,7 +1329,8 @@ CREATE TABLE public.pixiv_ugoira_frame_data (
     id integer NOT NULL,
     post_id integer NOT NULL,
     data text NOT NULL,
-    content_type character varying NOT NULL
+    content_type character varying NOT NULL,
+    md5 character varying
 );
 
 
@@ -3898,6 +3899,13 @@ CREATE INDEX index_notes_on_post_id ON public.notes USING btree (post_id);
 
 
 --
+-- Name: index_pixiv_ugoira_frame_data_on_md5; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_pixiv_ugoira_frame_data_on_md5 ON public.pixiv_ugoira_frame_data USING btree (md5);
+
+
+--
 -- Name: index_pixiv_ugoira_frame_data_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5039,6 +5047,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211011044400'),
 ('20211013011619'),
 ('20211014063943'),
-('20211015223510');
+('20211015223510'),
+('20211018045429');
 
 
