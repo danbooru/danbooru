@@ -47,30 +47,34 @@ class FFmpeg
     video_streams.first[:height]
   end
 
+  # @see https://trac.ffmpeg.org/wiki/FFprobeTips#Duration
+  # @return [Float, nil] The duration of the video or animation in seconds, or nil if unknown.
   def duration
-    metadata.dig(:format, :duration).to_f
+    if metadata.dig(:format, :duration).present?
+      metadata.dig(:format, :duration).to_f
+    elsif playback_info.has_key?(:time)
+      hours, minutes, seconds = playback_info[:time].split(/:/)
+      hours.to_f*60*60 + minutes.to_f*60 + seconds.to_f
+    else
+      nil
+    end
   end
 
+  # @return [Integer, nil] The number of frames in the video or animation, or nil if unknown.
   def frame_count
     if video_streams.first.has_key?(:nb_frames)
       video_streams.first[:nb_frames].to_i
+    elsif playback_info.has_key?(:frame)
+      playback_info[:frame].to_i
     else
-      (duration * frame_rate).to_i
+      nil
     end
   end
 
-  # @return [Float, nil] The frame rate of the video or animation, or nil if
-  # unknown. The frame rate can be unknown for animated PNGs that have zero
-  # delay between frames.
+  # @return [Float, nil] The average frame rate of the video or animation, or nil if unknown.
   def frame_rate
-    rate = video_streams.first[:avg_frame_rate] # "100/57"
-    numerator, denominator = rate.split("/")
-
-    if numerator.to_f == 0 || denominator.to_f == 0
-      nil
-    else
-      (numerator.to_f / denominator.to_f)
-    end
+    return nil if frame_count.nil? || duration.nil? || duration == 0
+    frame_count / duration
   end
 
   def video_streams
@@ -85,6 +89,19 @@ class FFmpeg
     audio_streams.present?
   end
 
+  # Decode the full video and return a hash containing the frame count, fps, and runtime.
+  def playback_info
+    output = shell!("ffmpeg -i #{file.path.shellescape} -f null /dev/null")
+    status_line = output.lines.grep(/\Aframe=/).first.chomp
+
+    # status_line = "frame=   10 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.48 bitrate=N/A speed= 179x"
+    # info = {"frame"=>"10", "fps"=>"0.0", "q"=>"-0.0", "Lsize"=>"N/A", "time"=>"00:00:00.48", "bitrate"=>"N/A", "speed"=>"188x"}
+    info = status_line.scan(/\S+=\s*\S+/).map { |pair| pair.split(/=\s*/) }.to_h
+    info.with_indifferent_access
+  rescue Error => e
+    {}
+  end
+
   def shell!(command)
     program = command.shellsplit.first
     output, status = Open3.capture2e(command)
@@ -92,5 +109,5 @@ class FFmpeg
     output
   end
 
-  memoize :metadata
+  memoize :metadata, :playback_info, :frame_count, :duration
 end

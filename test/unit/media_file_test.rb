@@ -188,7 +188,7 @@ class MediaFileTest < ActiveSupport::TestCase
     should "determine the duration of the video" do
       file = MediaFile.open("test/files/test-audio.mp4")
       assert_equal(1.002667, file.duration)
-      assert_equal(10, file.frame_rate)
+      assert_equal(10/1.002667, file.frame_rate)
       assert_equal(10, file.frame_count)
 
       file = MediaFile.open("test/files/test-300x300.mp4")
@@ -202,8 +202,8 @@ class MediaFileTest < ActiveSupport::TestCase
     should "determine the duration of the video" do
       file = MediaFile.open("test/files/test-512x512.webm")
       assert_equal(0.48, file.duration)
-      assert_equal(50, file.frame_rate)
-      assert_equal(24, file.frame_count)
+      assert_equal(10/0.48, file.frame_rate)
+      assert_equal(10, file.frame_count)
     end
   end
 
@@ -245,8 +245,8 @@ class MediaFileTest < ActiveSupport::TestCase
 
         assert_equal(false, file.is_corrupt?)
         assert_equal(true, file.is_animated?)
-        assert_equal(9, file.duration)
-        assert_equal(0.33, file.frame_rate.round(2))
+        assert_equal(3.0, file.duration)
+        assert_equal(1.0, file.frame_rate)
         assert_equal(3, file.frame_count)
       end
     end
@@ -264,14 +264,14 @@ class MediaFileTest < ActiveSupport::TestCase
     end
 
     context "that is animated but with an unspecified frame rate" do
-      should "have an assumed frame rate of 10FPS" do
+      should "have an assumed frame rate of ~6.66 FPS" do
         file = MediaFile.open("test/files/test-animated-inf-fps.png")
 
         assert_equal(false, file.is_corrupt?)
         assert_equal(true, file.is_animated?)
-        assert_equal(0.2, file.duration)
+        assert_equal(0.3, file.duration)
         assert_equal(2, file.frame_count)
-        assert_equal(10, file.frame_rate)
+        assert_equal(2/0.3, file.frame_rate)
       end
     end
 

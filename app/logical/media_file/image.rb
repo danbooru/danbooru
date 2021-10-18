@@ -24,27 +24,8 @@ class MediaFile::Image < MediaFile
   end
 
   def duration
-    if is_animated_gif?
-      if metadata.has_key?("GIF:Duration")
-        # GIF:Duration => "9.03 s"
-        metadata["GIF:Duration"].to_f
-      else
-        # If GIF:Duration is absent then it means the GIF has an unlimited
-        # framerate. In this situation we assume the browser will play the GIF
-        # at 10 FPS; this is browser dependent.
-        #
-        # A GIF consists of a series of frames, each frame having a separate frame
-        # delay. The duration of the GIF is the sum of each frame delay. If the frame
-        # delay of each frame is zero, then it means the GIF has an unlimited framerate
-        # and should be played as fast as possible. In reality, browsers cap the
-        # framerate to around 10FPS.
-        (frame_count * (1.0/10.0)).round(2)
-      end
-    elsif is_animated_png?
-      frame_count.to_f / frame_rate
-    else
-      nil
-    end
+    return nil if !is_animated?
+    video.duration
   end
 
   def frame_count
@@ -58,15 +39,8 @@ class MediaFile::Image < MediaFile
   end
 
   def frame_rate
-    if is_animated_gif?
-      frame_count / duration
-    elsif is_animated_png?
-      # XXX As with GIFs, animated PNGs can have an unspecified frame rate.
-      # Assume 10FPS if the frame rate is unspecified.
-      video.frame_rate.presence || 10.0
-    else
-      nil
-    end
+    return nil if !is_animated? || frame_count.nil? || duration.nil? || duration == 0
+    frame_count / duration
   end
 
   def channels
@@ -101,6 +75,10 @@ class MediaFile::Image < MediaFile
     else
       self
     end
+  end
+
+  def is_animated?
+    frame_count.to_i > 1
   end
 
   def is_animated_gif?
