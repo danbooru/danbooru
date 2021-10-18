@@ -6,7 +6,7 @@ class UploadService
       source =~ %r{\Ahttps?://}
     end
 
-    def process_file(upload, file, original_post_id: nil)
+    def process_file(upload, file)
       media_file = MediaFile.open(file)
 
       upload.file = media_file

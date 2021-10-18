@@ -28,12 +28,6 @@ class UploadServiceTest < ActiveSupport::TestCase
         @upload = FactoryBot.build(:jpg_upload)
       end
 
-      context "with an original_post_id" do
-        should "run" do
-          UploadService::Utils.process_file(@upload, @upload.file.tempfile, original_post_id: 12345)
-        end
-      end
-
       should "run" do
         UploadService::Utils.process_file(@upload, @upload.file.tempfile)
         assert_equal("jpg", @upload.file_ext)
@@ -723,7 +717,7 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         assert_equal(true, upload.valid?)
         assert_equal("s", upload.rating)
-        assert_equal("rating:safe blah ", upload.tag_string)
+        assert_equal("rating:safe blah", upload.tag_string)
 
         assert_equal("s", upload.post.rating)
         assert_equal("blah", upload.post.tag_string)

@@ -2,10 +2,9 @@ class UploadService
   class Preprocessor
     extend Memoist
 
-    attr_reader :params, :original_post_id
+    attr_reader :params
 
     def initialize(params)
-      @original_post_id = params.delete(:original_post_id) || -1
       @params = params
     end
 
@@ -20,17 +19,6 @@ class UploadService
     def referer_url
       params[:referer_url]
     end
-
-    def strategy
-      Sources::Strategies.find(source, referer_url)
-    end
-    memoize :strategy
-
-    # When searching posts we have to use the canonical source
-    def canonical_source
-      strategy.canonical_url
-    end
-    memoize :canonical_source
 
     def in_progress?
       if md5.present?
@@ -62,8 +50,6 @@ class UploadService
     end
 
     def start!
-      raise NotImplementedError, "No login credentials configured for #{strategy.site_name}." unless strategy.class.enabled?
-
       params[:rating] ||= "q"
       params[:tag_string] ||= "tagme"
       upload = Upload.create!(params)
@@ -72,7 +58,7 @@ class UploadService
         upload.update(status: "preprocessing")
 
         file = Utils.get_file_for_upload(upload.source_url, upload.referer_url, params[:file]&.tempfile)
-        Utils.process_file(upload, file, original_post_id: original_post_id)
+        Utils.process_file(upload, file)
 
         upload.rating = params[:rating]
         upload.tag_string = params[:tag_string]
