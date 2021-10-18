@@ -2,50 +2,8 @@ class UploadService
   module Utils
     module_function
 
-    def distribute_files(file, record, type, original_post_id: nil)
-      # need to do this for hybrid storage manager
-      post = Post.new
-      post.id = original_post_id if original_post_id.present?
-      post.md5 = record.md5
-      post.file_ext = record.file_ext
-      [Danbooru.config.storage_manager, Danbooru.config.backup_storage_manager].each do |sm|
-        sm.store_file(file, post, type)
-      end
-    end
-
     def is_downloadable?(source)
       source =~ %r{\Ahttps?://}
-    end
-
-    def generate_resizes(media_file)
-      preview_file = media_file.preview(Danbooru.config.small_image_width, Danbooru.config.small_image_width)
-      crop_file = media_file.crop(Danbooru.config.small_image_width, Danbooru.config.small_image_width)
-
-      if media_file.is_ugoira?
-        sample_file = media_file.convert
-      elsif media_file.is_image? && media_file.width > Danbooru.config.large_image_width
-        sample_file = media_file.preview(Danbooru.config.large_image_width, media_file.height)
-      else
-        sample_file = nil
-      end
-
-      [preview_file, crop_file, sample_file]
-    end
-
-    def process_resizes(upload, file, original_post_id, media_file: nil)
-      media_file ||= upload.media_file
-      preview_file, crop_file, sample_file = Utils.generate_resizes(media_file)
-
-      begin
-        Utils.distribute_files(file, upload, :original, original_post_id: original_post_id) if file.present?
-        Utils.distribute_files(sample_file, upload, :large, original_post_id: original_post_id) if sample_file.present?
-        Utils.distribute_files(preview_file, upload, :preview, original_post_id: original_post_id) if preview_file.present?
-        Utils.distribute_files(crop_file, upload, :crop, original_post_id: original_post_id) if crop_file.present?
-      ensure
-        preview_file.try(:close!)
-        crop_file.try(:close!)
-        sample_file.try(:close!)
-      end
     end
 
     def process_file(upload, file, original_post_id: nil)
@@ -61,9 +19,7 @@ class UploadService
       upload.validate!(:file)
       upload.tag_string = "#{upload.tag_string} #{Utils.automatic_tags(media_file)}"
 
-      process_resizes(upload, file, original_post_id)
-
-      MediaAsset.create!(file: media_file)
+      MediaAsset.upload!(media_file)
     end
 
     def automatic_tags(media_file)

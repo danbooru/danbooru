@@ -19,6 +19,7 @@ class StorageManager::SFTP < StorageManager
   end
 
   def store(file, dest_path)
+    dest_path = full_path(dest_path)
     temp_upload_path = dest_path + "-" + SecureRandom.uuid + ".tmp"
     dest_backup_path = dest_path + "-" + SecureRandom.uuid + ".bak"
 
@@ -42,7 +43,7 @@ class StorageManager::SFTP < StorageManager
 
   def delete(dest_path)
     each_host do |_host, sftp|
-      force { sftp.remove!(dest_path) }
+      force { sftp.remove!(full_path(dest_path)) }
     end
   end
 
@@ -50,7 +51,7 @@ class StorageManager::SFTP < StorageManager
     file = Tempfile.new(binmode: true)
 
     Net::SFTP.start(hosts.first, nil, ssh_options) do |sftp|
-      sftp.download!(dest_path, file.path)
+      sftp.download!(full_path(dest_path), file.path)
     end
 
     file

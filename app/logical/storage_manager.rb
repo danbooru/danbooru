@@ -109,13 +109,13 @@ class StorageManager
 
     case type
     when :preview
-      "#{base_dir}/preview/#{subdir}#{file}"
+      "/preview/#{subdir}#{file}"
     when :crop
-      "#{base_dir}/crop/#{subdir}#{file}"
+      "/crop/#{subdir}#{file}"
     when :large
-      "#{base_dir}/sample/#{subdir}#{file}"
+      "/sample/#{subdir}#{file}"
     when :original
-      "#{base_dir}/original/#{subdir}#{file}"
+      "/original/#{subdir}#{file}"
     end
   end
 
@@ -144,5 +144,9 @@ class StorageManager
 
     tags = post.presenter.humanized_essential_tag_string.gsub(/[^a-z0-9]+/, "_").gsub(/(?:^_+)|(?:_+$)/, "").gsub(/_{2,}/, "_")
     "__#{tags}__"
+  end
+
+  def full_path(path)
+    File.join(base_dir, path)
   end
 end

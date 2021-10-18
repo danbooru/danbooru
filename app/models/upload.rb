@@ -116,13 +116,8 @@ class Upload < ApplicationRecord
       end
 
       media_asset&.destroy!
+      media_asset&.delete_files!
       DanbooruLogger.info("Uploads: Deleting files for upload md5=#{md5}")
-      Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :original)
-      Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :large)
-      Danbooru.config.storage_manager.delete_file(nil, md5, file_ext, :preview)
-      Danbooru.config.backup_storage_manager.delete_file(nil, md5, file_ext, :original)
-      Danbooru.config.backup_storage_manager.delete_file(nil, md5, file_ext, :large)
-      Danbooru.config.backup_storage_manager.delete_file(nil, md5, file_ext, :preview)
     end
   end
 

@@ -14,6 +14,14 @@ class UploadServiceTest < ActiveSupport::TestCase
     }
   }
 
+  def assert_file_exists(upload, variant)
+    assert_nothing_raised { upload.media_asset.variant(variant).open_file }
+  end
+
+  def assert_file_does_not_exist(upload, variant)
+    assert_raise { upload.media_asset.variant(variant).open_file }
+  end
+
   context "::Utils" do
     context "#get_file_for_upload" do
       context "for a non-source site" do
@@ -75,13 +83,11 @@ class UploadServiceTest < ActiveSupport::TestCase
 
       context "with an original_post_id" do
         should "run" do
-          UploadService::Utils.expects(:distribute_files).times(3)
           UploadService::Utils.process_file(@upload, @upload.file.tempfile, original_post_id: 12345)
         end
       end
 
       should "run" do
-        UploadService::Utils.expects(:distribute_files).times(3)
         UploadService::Utils.process_file(@upload, @upload.file.tempfile)
         assert_equal("jpg", @upload.file_ext)
         assert_equal(28086, @upload.file_size)
@@ -91,7 +97,6 @@ class UploadServiceTest < ActiveSupport::TestCase
       end
 
       should "create a media asset" do
-        UploadService::Utils.expects(:distribute_files).times(3)
         UploadService::Utils.process_file(@upload, @upload.file.tempfile)
 
         @media_asset = @upload.media_asset
@@ -138,8 +143,8 @@ class UploadServiceTest < ActiveSupport::TestCase
           assert_equal(9800, @upload.file_size)
           assert_equal("png", @upload.file_ext)
           assert_equal("f5fe24f3a3a13885285f6627e04feec9", @upload.md5)
-          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "png", :original)))
-          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "png", :preview)))
+          assert_file_exists(@upload, :preview)
+          assert_file_exists(@upload, :original)
         end
       end
 
@@ -158,8 +163,8 @@ class UploadServiceTest < ActiveSupport::TestCase
           assert_equal(317733, @upload.file_size)
           assert_equal("jpg", @upload.file_ext)
           assert_equal("4c71da5638b897aa6da1150e742e2982", @upload.md5)
-          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
-          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :preview)))
+          assert_file_exists(@upload, :preview)
+          assert_file_exists(@upload, :original)
         end
       end
 
@@ -179,8 +184,8 @@ class UploadServiceTest < ActiveSupport::TestCase
           assert_equal(2804, @upload.file_size)
           assert_equal("zip", @upload.file_ext)
           assert_equal("cad1da177ef309bf40a117c17b8eecf5", @upload.md5)
-          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "zip", :original)))
-          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "zip", :large)))
+          assert_file_exists(@upload, :sample)
+          assert_file_exists(@upload, :original)
         end
       end
 
@@ -197,9 +202,9 @@ class UploadServiceTest < ActiveSupport::TestCase
           assert_equal(181309, @upload.file_size)
           assert_equal("jpg", @upload.file_ext)
           assert_equal("93f4dd66ef1eb11a89e56d31f9adc8d0", @upload.md5)
-          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
-          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :large)))
-          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :preview)))
+          assert_file_exists(@upload, :preview)
+          assert_file_exists(@upload, :sample)
+          assert_file_exists(@upload, :original)
         end
       end
 
@@ -216,8 +221,8 @@ class UploadServiceTest < ActiveSupport::TestCase
           assert_equal("mp4", @upload.file_ext)
           assert_operator(@upload.file_size, :>, 0)
           assert_not_nil(@upload.source)
-          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "mp4", :original)))
-          assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "mp4", :preview)))
+          assert_file_exists(@upload, :preview)
+          assert_file_exists(@upload, :original)
         end
       end
 
@@ -982,31 +987,31 @@ class UploadServiceTest < ActiveSupport::TestCase
 
     should "delete unused files after deleting the upload" do
       @upload = as(@user) { UploadService::Preprocessor.new(file: upload_file("test/files/test.jpg")).start! }
-      assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+      assert_file_exists(@upload, :original)
 
       @upload.destroy!
-      refute(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+      assert_file_does_not_exist(@upload, :original)
     end
 
     should "not delete files that are still in use by a post" do
       @upload = as(@user) { UploadService.new(file: upload_file("test/files/test.jpg")).start! }
-      assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+      assert_file_exists(@upload, :original)
 
       @upload.destroy!
-      assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+      assert_file_exists(@upload, :original)
     end
 
     should "not delete files if they're still in use by another upload" do
       @upload1 = as(@user) { UploadService::Preprocessor.new(file: upload_file("test/files/test.jpg")).start! }
       @upload2 = as(@user) { UploadService::Preprocessor.new(file: upload_file("test/files/test.jpg")).start! }
       assert_equal(@upload1.md5, @upload2.md5)
-      assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload1.md5, "jpg", :original)))
+      assert_file_exists(@upload1, :original)
 
       @upload1.destroy!
-      assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload1.md5, "jpg", :original)))
+      assert_file_exists(@upload1, :original)
 
       @upload2.destroy!
-      refute(File.exist?(Danbooru.config.storage_manager.file_path(@upload2.md5, "jpg", :original)))
+      assert_file_does_not_exist(@upload2, :original)
     end
 
     should "not delete files that were replaced after upload and are still pending deletion" do
@@ -1019,11 +1024,11 @@ class UploadServiceTest < ActiveSupport::TestCase
       # after replacement the uploaded file is no longer in use, but it shouldn't be
       # deleted yet. it should only be deleted by the replacer after the grace period.
       @upload.destroy!
-      assert(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+      assert_file_exists(@upload, :original)
 
       travel (PostReplacement::DELETION_GRACE_PERIOD + 1).days
       perform_enqueued_jobs
-      refute(File.exist?(Danbooru.config.storage_manager.file_path(@upload.md5, "jpg", :original)))
+      assert_file_does_not_exist(@upload, :original)
     end
 
     should "work on uploads without a file" do

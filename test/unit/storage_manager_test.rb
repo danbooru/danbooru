@@ -12,14 +12,14 @@ class StorageManagerTest < ActiveSupport::TestCase
 
     context "#store method" do
       should "store the file" do
-        @storage_manager.store(StringIO.new("data"), "#{@temp_dir}/test.txt")
+        @storage_manager.store(StringIO.new("data"), "test.txt")
 
         assert("data", File.read("#{@temp_dir}/test.txt"))
       end
 
       should "overwrite the file if it already exists" do
-        @storage_manager.store(StringIO.new("foo"), "#{@temp_dir}/test.txt")
-        @storage_manager.store(StringIO.new("bar"), "#{@temp_dir}/test.txt")
+        @storage_manager.store(StringIO.new("foo"), "test.txt")
+        @storage_manager.store(StringIO.new("bar"), "test.txt")
 
         assert("bar", File.read("#{@temp_dir}/test.txt"))
       end
