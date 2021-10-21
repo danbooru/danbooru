@@ -14,7 +14,7 @@ module RecommenderService
 
   MIN_POST_FAVS = 5
   MIN_USER_FAVS = 50
-  CACHE_LIFETIME = 4.hours
+  CACHE_LIFETIME = 5.minutes
 
   def enabled?
     Danbooru.config.recommender_server.present?
