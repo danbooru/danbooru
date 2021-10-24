@@ -15,7 +15,6 @@ class AutocompleteService
     child: %w[any none] + POST_STATUSES,
     parent: %w[any none] + POST_STATUSES,
     rating: %w[safe questionable explicit],
-    locked: %w[rating note status],
     embedded: %w[true false],
     filetype: %w[jpg png gif swf zip webm mp4],
     commentary: %w[true false translated untranslated],

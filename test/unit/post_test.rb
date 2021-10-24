@@ -414,8 +414,6 @@ class PostTest < ActiveSupport::TestCase
         should allow_value("touhou child:1").for(:tag_string)
         should allow_value("touhou source:foo").for(:tag_string)
         should allow_value("touhou rating:z").for(:tag_string)
-        should allow_value("touhou locked:rating").for(:tag_string)
-        should allow_value("touhou -locked:rating").for(:tag_string)
 
         # \u3000 = ideographic space, \u00A0 = no-break space
         should allow_value("touhou\u3000foo").for(:tag_string)
@@ -676,7 +674,7 @@ class PostTest < ActiveSupport::TestCase
 
         context "for a rating" do
           context "that is valid" do
-            should "update the rating if the post is unlocked" do
+            should "update the rating" do
               @post.update(tag_string: "aaa rating:e")
               @post.reload
               assert_equal("e", @post.rating)
@@ -1364,7 +1362,7 @@ class PostTest < ActiveSupport::TestCase
       end
     end
 
-    context "A rating unlocked post" do
+    context "A post" do
       setup { @post = FactoryBot.create(:post) }
       subject { @post }
 
