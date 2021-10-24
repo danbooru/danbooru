@@ -79,7 +79,6 @@ class UploadService
       end
 
       media_asset = MediaAsset.upload!(media_file)
-      post.queue_delete_files(PostReplacement::DELETION_GRACE_PERIOD)
 
       replacement.replacement_url = replacement_url
       replacement.file_ext = media_asset.file_ext

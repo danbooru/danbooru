@@ -1,6 +1,4 @@
 class PostReplacement < ApplicationRecord
-  DELETION_GRACE_PERIOD = 30.days
-
   belongs_to :post
   belongs_to :creator, class_name: "User"
   before_validation :initialize_fields, on: :create

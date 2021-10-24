@@ -91,10 +91,6 @@ class Post < ApplicationRecord
       end
     end
 
-    def queue_delete_files(grace_period)
-      DeletePostFilesJob.set(wait: grace_period).perform_later(id, md5, file_ext)
-    end
-
     def delete_files
       Post.delete_files(id, md5, file_ext, force: true)
     end

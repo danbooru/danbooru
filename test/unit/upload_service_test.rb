@@ -219,7 +219,6 @@ class UploadServiceTest < ActiveSupport::TestCase
         as(@user) do
           @post = FactoryBot.create(:post, md5: Digest::MD5.hexdigest(@old_file.read))
           @old_md5 = @post.md5
-          @post.stubs(:queue_delete_files)
           @replacement = FactoryBot.create(:post_replacement, post: @post, replacement_url: "", replacement_file: @new_file)
         end
       end
@@ -301,7 +300,6 @@ class UploadServiceTest < ActiveSupport::TestCase
 
         as(@user) do
           @post = FactoryBot.create(:post, source: "http://blah", file_ext: "jpg", md5: "something", uploader_ip_addr: "127.0.0.2")
-          @post.stubs(:queue_delete_files)
           @replacement = FactoryBot.create(:post_replacement, post: @post, replacement_url: @new_url)
         end
       end
@@ -323,7 +321,6 @@ class UploadServiceTest < ActiveSupport::TestCase
         as(@user) do
           @post_md5 = "710fd9cba4ef37260f9152ffa9d154d8"
           @post = FactoryBot.create(:post, source: "https://cdn.donmai.us/original/71/0f/#{@post_md5}.png", file_ext: "png", md5: @post_md5, uploader_ip_addr: "127.0.0.2")
-          @post.stubs(:queue_delete_files)
           @replacement = FactoryBot.create(:post_replacement, post: @post, replacement_url: @new_url)
         end
       end
@@ -341,7 +338,6 @@ class UploadServiceTest < ActiveSupport::TestCase
           @post.update(md5: @new_md5)
           as(@user) do
             @post2 = FactoryBot.create(:post)
-            @post2.stubs(:queue_delete_files)
           end
         end
 
@@ -379,7 +375,6 @@ class UploadServiceTest < ActiveSupport::TestCase
           @user = travel_to(1.month.ago) { FactoryBot.create(:user) }
           as(@user) do
             @post = FactoryBot.create(:post, source: "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg")
-            @post.stubs(:queue_delete_files)
             @new_url = "https://cdn.donmai.us/original/fd/b4/fdb47f79fb8da82e66eeb1d84a1cae8d.jpg"
             @post.reload.replace!(replacement_url: @new_url, tags: "-tag1 tag2")
           end
@@ -465,17 +460,6 @@ class UploadServiceTest < ActiveSupport::TestCase
           assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.replacements.last.replacement_url)
           assert_equal("https://i.pximg.net/img-original/img/2017/04/04/08/54/15/62247350_p0.png", @post.source)
         end
-
-        should "delete the old files after thirty days" do
-          @post.unstub(:queue_delete_files)
-          FileUtils.expects(:rm_f).times(3)
-
-          as(@user) { @post.reload.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350") }
-
-          travel_to((PostReplacement::DELETION_GRACE_PERIOD + 1).days.from_now) do
-            perform_enqueued_jobs
-          end
-        end
       end
 
       context "a post that is replaced by a ugoira" do
@@ -497,76 +481,6 @@ class UploadServiceTest < ActiveSupport::TestCase
             assert_equal("https://i.pximg.net/img-zip-ugoira/img/2017/04/04/08/57/38/62247364_ugoira1920x1080.zip", @post.source)
             assert_equal([{"delay" => 125, "file" => "000000.jpg"}, {"delay" => 125, "file" => "000001.jpg"}], @post.pixiv_ugoira_frame_data.data)
           end
-        end
-      end
-
-      context "a post that is replaced to another file then replaced back to the original file" do
-        should "not delete the original files" do
-          skip unless MediaFile::Ugoira.videos_enabled?
-          skip "Pixiv credentials not configured" unless Sources::Strategies::Pixiv.enabled?
-
-          @post.unstub(:queue_delete_files)
-
-          # this is called thrice to delete the file for 62247364
-          #FileUtils.expects(:rm_f).times(3)
-
-          as(@user) do
-            @post.reload.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
-            @post.reload.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
-            Upload.destroy_all
-            @post.reload.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
-          end
-
-          assert_nothing_raised { @post.file(:original) }
-          assert_nothing_raised { @post.file(:preview) }
-
-          assert_enqueued_jobs 3, only: DeletePostFilesJob
-          travel PostReplacement::DELETION_GRACE_PERIOD + 1.day
-          assert_raise(Post::DeletionError) { perform_enqueued_jobs }
-
-          assert_nothing_raised { @post.file(:original) }
-          assert_nothing_raised { @post.file(:preview) }
-        end
-      end
-
-      context "two posts that have had their files swapped" do
-        setup do
-          skip "Pixiv credentials not configured" unless Sources::Strategies::Pixiv.enabled?
-
-          as(@user) do
-            @post1 = FactoryBot.create(:post)
-            @post2 = FactoryBot.create(:post)
-          end
-        end
-
-        should "not delete the still active files" do
-          # swap the images between @post1 and @post2.
-          as(@user) do
-            skip unless MediaFile::Ugoira.videos_enabled?
-
-            @post1.reload.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
-            @post2.reload.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
-            assert_equal("4ceadc314938bc27f3574053a3e1459a", @post1.md5)
-            assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post2.md5)
-
-            @post2.reload.replace!(replacement_url: "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg")
-            assert_equal("d34e4cf0a437a5d65f8e82b7bcd02606", @post2.md5)
-            Upload.destroy_all
-
-            @post1.reload.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
-            @post2.reload.replace!(replacement_url: "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247350")
-            assert_equal("cad1da177ef309bf40a117c17b8eecf5", @post1.md5)
-            assert_equal("4ceadc314938bc27f3574053a3e1459a", @post2.md5)
-          end
-
-          travel_to (PostReplacement::DELETION_GRACE_PERIOD + 1).days.from_now do
-            assert_raise(Post::DeletionError) do
-              perform_enqueued_jobs
-            end
-          end
-
-          assert_nothing_raised { @post1.file(:original) }
-          assert_nothing_raised { @post2.file(:original) }
         end
       end
 

@@ -25,9 +25,6 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
 
-        travel(PostReplacement::DELETION_GRACE_PERIOD + 1.day)
-        perform_enqueued_jobs
-
         assert_equal("https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg", @post.reload.source)
         assert_equal("d34e4cf0a437a5d65f8e82b7bcd02606", @post.md5)
         assert_equal("d34e4cf0a437a5d65f8e82b7bcd02606", Digest::MD5.file(@post.file(:original)).hexdigest)
