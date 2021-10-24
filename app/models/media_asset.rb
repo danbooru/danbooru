@@ -10,7 +10,10 @@ class MediaAsset < ApplicationRecord
     active: 200,
     deleted: 300,
     expunged: 400,
+    failed: 500,
   }
+
+  validates :md5, uniqueness: { conditions: -> { where(status: [:processing, :active]) } }
 
   class Variant
     attr_reader :media_asset, :variant
@@ -120,11 +123,46 @@ class MediaAsset < ApplicationRecord
 
   concerning :FileMethods do
     class_methods do
+      # Upload a file to Danbooru. Resize and distribute it then return a MediaAsset.
+      #
+      # If the file has already been uploaded to Danbooru, then return the
+      # existing MediaAsset. If someone else is uploading the same file at the
+      # same time, wait until they're finished and return the existing
+      # MediaAsset. If distributing the file fails, then mark the MediaAsset as
+      # failed and raise an exception.
+      #
+      # This can't be called inside a transaction because the transaction will
+      # fail if there's a RecordNotUnique error when the asset already exists.
       def upload!(media_file)
         media_asset = create!(file: media_file, status: :processing)
         media_asset.distribute_files!(media_file)
         media_asset.update!(status: :active)
         media_asset
+
+      # If the file has already been uploaded, then the `create!` call will raise one of these errors.
+      rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique => e
+        raise if e.is_a?(ActiveRecord::RecordInvalid) && !e.record.errors.of_kind?(:md5, :taken)
+
+        media_asset = find_by!(md5: media_file.md5, status: [:processing, :active])
+
+        # XXX If the asset is still being processed by another thread, wait up
+        # to 30 seconds for it to finish.
+        if media_asset.processing?
+          30.times do
+            break if !media_asset.processing?
+            sleep 1
+            media_asset.reload
+          end
+
+          # If the asset is still processing after 30 seconds, or if it moved
+          # from the processing state to the failed state, then fail.
+          raise "Upload failed" if !media_asset.active?
+        end
+
+        media_asset
+      rescue Exception
+        media_asset&.update!(status: :failed)
+        raise
       end
     end
 

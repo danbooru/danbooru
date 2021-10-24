@@ -31,8 +31,7 @@ class PostTest < ActiveSupport::TestCase
   context "Deletion:" do
     context "Expunging a post" do
       setup do
-        @upload = UploadService.new(FactoryBot.attributes_for(:jpg_upload)).start!
-        @post = @upload.post
+        @post = create(:post_with_file, uploader: @user, filename: "test.jpg")
         Favorite.create!(post: @post, user: @user)
         create(:favorite_group, post_ids: [@post.id])
         perform_enqueued_jobs # perform IqdbAddPostJob

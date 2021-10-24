@@ -3780,6 +3780,13 @@ CREATE INDEX index_media_assets_on_md5 ON public.media_assets USING btree (md5);
 
 
 --
+-- Name: index_media_assets_on_md5_and_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_media_assets_on_md5_and_status ON public.media_assets USING btree (md5) WHERE (status = ANY (ARRAY[100, 200]));
+
+
+--
 -- Name: index_media_assets_on_status; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5049,6 +5056,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211014063943'),
 ('20211015223510'),
 ('20211018045429'),
-('20211018062916');
+('20211018062916'),
+('20211023225730');
 
 

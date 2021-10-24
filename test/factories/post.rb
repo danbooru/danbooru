@@ -13,5 +13,20 @@ FactoryBot.define do
     rating {"q"}
     source { FFaker::Internet.http_url }
     media_asset { build(:media_asset) }
+
+    factory(:post_with_file) do
+      transient do
+        filename { "test.jpg" }
+        media_file { MediaFile.open("test/files/#{filename}") }
+      end
+
+      md5 { media_file.md5 }
+      image_width { media_file.width }
+      image_height { media_file.height }
+      file_ext { media_file.file_ext }
+      file_size { media_file.file_size }
+
+      before(:create) { |post, evaluator| MediaAsset.upload!(evaluator.media_file) }
+    end
   end
 end
