@@ -884,52 +884,6 @@ class UploadServiceTest < ActiveSupport::TestCase
       assert_difference("Upload.count", -1) { Upload.prune! }
     end
 
-    should "delete unused files after deleting the upload" do
-      @upload = as(@user) { UploadService::Preprocessor.new(file: upload_file("test/files/test.jpg")).start! }
-      assert_file_exists(@upload, :original)
-
-      @upload.destroy!
-      assert_file_does_not_exist(@upload, :original)
-    end
-
-    should "not delete files that are still in use by a post" do
-      @upload = as(@user) { UploadService.new(file: upload_file("test/files/test.jpg")).start! }
-      assert_file_exists(@upload, :original)
-
-      @upload.destroy!
-      assert_file_exists(@upload, :original)
-    end
-
-    should "not delete files if they're still in use by another upload" do
-      @upload1 = as(@user) { UploadService::Preprocessor.new(file: upload_file("test/files/test.jpg")).start! }
-      @upload2 = as(@user) { UploadService::Preprocessor.new(file: upload_file("test/files/test.jpg")).start! }
-      assert_equal(@upload1.md5, @upload2.md5)
-      assert_file_exists(@upload1, :original)
-
-      @upload1.destroy!
-      assert_file_exists(@upload1, :original)
-
-      @upload2.destroy!
-      assert_file_does_not_exist(@upload2, :original)
-    end
-
-    should "not delete files that were replaced after upload and are still pending deletion" do
-      @upload = as(@user) { UploadService.new(file: upload_file("test/files/test.jpg")).start! }
-      assert(@upload.is_completed?)
-
-      as(@user) { @upload.post.replace!(replacement_file: upload_file("test/files/test.png"), replacement_url: "") }
-      assert_not_equal(@upload.md5, @upload.post.md5)
-
-      # after replacement the uploaded file is no longer in use, but it shouldn't be
-      # deleted yet. it should only be deleted by the replacer after the grace period.
-      @upload.destroy!
-      assert_file_exists(@upload, :original)
-
-      travel (PostReplacement::DELETION_GRACE_PERIOD + 1).days
-      perform_enqueued_jobs
-      assert_file_does_not_exist(@upload, :original)
-    end
-
     should "work on uploads without a file" do
       @upload = as(@user) { UploadService.new(source: "http://14903gf0vm3g134yjq3n535yn3n.com/does_not_exist.jpg").start! }
 

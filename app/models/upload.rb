@@ -75,8 +75,6 @@ class Upload < ApplicationRecord
   validates_with FileValidator, on: :file
   serialize :context, JSON
 
-  after_destroy_commit :delete_files
-
   scope :pending, -> { where(status: "pending") }
   scope :preprocessed, -> { where(status: "preprocessed") }
   scope :completed, -> { where(status: "completed") }
@@ -101,19 +99,6 @@ class Upload < ApplicationRecord
       completed
     else
       completed.or(where(uploader: user))
-    end
-  end
-
-  concerning :FileMethods do
-    def delete_files
-      # md5 is blank if the upload errored out before downloading the file.
-      if is_completed? || md5.blank? || Upload.exists?(md5: md5) || Post.exists?(md5: md5)
-        return
-      end
-
-      media_asset&.destroy!
-      media_asset&.delete_files!
-      DanbooruLogger.info("Uploads: Deleting files for upload md5=#{md5}")
     end
   end
 
