@@ -465,6 +465,23 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([posts[2]], "-note_count:1")
     end
 
+    should "return posts for the flag_count:<N> metatag" do
+      posts = create_list(:post, 3)
+      create(:post_flag, post: posts[1], status: :succeeded)
+      create(:post_flag, post: posts[2], status: :rejected, created_at: 4.days.ago)
+      create(:post_flag, post: posts[2], status: :pending)
+
+      assert_tag_match([posts[0]], "flag_count:0")
+      assert_tag_match([posts[1]], "flag_count:1")
+      assert_tag_match([posts[2]], "flag_count:2")
+
+      assert_tag_match([posts[0]], "flags:0")
+      assert_tag_match([posts[1]], "flags:1")
+      assert_tag_match([posts[2]], "flags:2")
+
+      assert_tag_match([posts[2], posts[0]], "-flags:1")
+    end
+
     should "return posts for the commentaryupdater:<name> metatag" do
       user1 = create(:user)
       user2 = create(:user)

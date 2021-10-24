@@ -1036,7 +1036,6 @@ class Post < ApplicationRecord
     def with_flag_stats
       relation = left_outer_joins(:flags).group(:id).select("posts.*")
       relation.select("COUNT(post_flags.id) AS flag_count")
-      relation
     end
 
     def with_appeal_stats
