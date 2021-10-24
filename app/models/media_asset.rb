@@ -1,6 +1,6 @@
 class MediaAsset < ApplicationRecord
   has_one :media_metadata, dependent: :destroy
-  has_one :pixiv_ugoira_frame_data, class_name: "PixivUgoiraFrameData", dependent: :destroy, foreign_key: :md5, primary_key: :md5
+  has_one :pixiv_ugoira_frame_data, class_name: "PixivUgoiraFrameData", foreign_key: :md5, primary_key: :md5
 
   delegate :metadata, to: :media_metadata
   delegate :is_non_repeating_animation?, :is_greyscale?, :is_rotated?, to: :metadata
