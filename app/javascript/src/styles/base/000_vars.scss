@@ -1,13 +1,13 @@
 :root {
-  --text-xs: 0.643em; // 9px
-  --text-sm: 0.9em;
-  --text-md: 1em;
-  --text-lg: 1.16667em;
-  --text-xl: 1.5em;
-  --text-xxl: 2em;
+  --text-xs: 0.5625rem; // 9px
+  --text-sm: 0.7875rem; // 12.6px
+  --text-md: 0.875rem;  // 14px
+  --text-lg: 1.0208rem; // 16.3333px
+  --text-xl: 1.3125rem; // 21px
+  --text-xxl: 1.75rem;  // 28px
   --header-font: Tahoma, Verdana, Helvetica, sans-serif;
   --body-font: Verdana, Helvetica, sans-serif;
-  --monospace-font: 1.2em monospace;
+  --monospace-font: 0.85rem monospace; // 13.6px
 }
 
 $h1_padding: 0.8em 0 0.25em 0;
