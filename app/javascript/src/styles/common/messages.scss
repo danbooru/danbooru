@@ -21,7 +21,7 @@ div.list-of-messages {
 
       a.message-timestamp {
         font-style: italic;
-        font-size: 0.90em;
+        font-size: var(--text-sm);
         color: var(--muted-text-color);
         &:hover { text-decoration: underline; }
       }
@@ -54,7 +54,7 @@ div.list-of-messages {
         a.message-timestamp {
           display: inline;
           color: var(--muted-text-color);
-          font-size: 0.8em;
+          font-size: var(--text-sm);
         }
       }
     }

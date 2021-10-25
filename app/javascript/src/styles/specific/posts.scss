@@ -65,7 +65,7 @@
 
 div#c-posts {
   .fav-buttons {
-    font-size: 14pt;
+    font-size: var(--text-lg);
 
     button.ui-button {
       padding: 0.25em 0.75em;

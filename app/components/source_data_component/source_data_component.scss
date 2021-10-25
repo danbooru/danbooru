@@ -16,8 +16,8 @@ div.source-data {
   }
 
   .icon {
-    height: 1rem;
-    font-size: 1rem;
+    height: var(--text-lg);
+    font-size: var(--text-lg);
     vertical-align: bottom;
   }
 

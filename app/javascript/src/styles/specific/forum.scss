@@ -13,7 +13,7 @@ div#c-forum-topics {
 
     &.label {
       display: inline-block;
-      font-size: 0.7em;
+      font-size: var(--text-xs);
       text-transform: uppercase;
       border: 1px solid;
       border-radius: 0.25rem;

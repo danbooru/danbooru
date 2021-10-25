@@ -3,7 +3,7 @@ div#news-updates {
   background: var(--news-updates-background);
   border-bottom: 2px solid var(--news-updates-border-color);
   overflow: hidden;
-  font-size: 0.8em;
+  font-size: var(--text-sm);
 
   ul {
     float: left;
