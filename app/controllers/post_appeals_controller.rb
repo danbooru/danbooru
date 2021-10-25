@@ -10,7 +10,7 @@ class PostAppealsController < ApplicationController
     @post_appeals = authorize PostAppeal.paginated_search(params)
 
     if request.format.html?
-      @post_appeals = @post_appeals.includes(:creator, post: [:appeals, :uploader, :approver])
+      @post_appeals = @post_appeals.includes(:creator, post: [:appeals, :uploader, :approver, :media_asset])
     else
       @post_appeals = @post_appeals.includes(:post)
     end

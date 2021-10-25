@@ -1,5 +1,5 @@
 :root {
-  --text-xs: 0.8em;
+  --text-xs: 0.643em; // 9px
   --text-sm: 0.9em;
   --text-md: 1em;
   --text-lg: 1.16667em;
@@ -14,28 +14,6 @@ $h1_padding: 0.8em 0 0.25em 0;
 $h2_padding: 0.8em 0 0.25em 0;
 $h3_padding: 0.8em 0 0.25em 0;
 $h4_padding: 0.8em 0 0.25em 0;
-
-@mixin animated-icon {
-  content: "►";
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  color: var(--preview-icon-color);
-  background: var(--preview-icon-background);
-  margin: 2px;
-  text-align: center;
-}
-
-@mixin sound-icon {
-  content: "♪";
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  color: var(--preview-icon-color);
-  background: var(--preview-icon-background);
-  margin: 2px;
-  text-align: center;
-}
 
 // https://fontawesome.com/how-to-use/on-the-web/advanced/css-pseudo-elements
 @mixin fa-solid-icon($content) {

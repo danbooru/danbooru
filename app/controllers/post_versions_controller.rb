@@ -9,7 +9,7 @@ class PostVersionsController < ApplicationController
     @post_versions = authorize PostVersion.paginated_search(params)
 
     if request.format.html?
-      @post_versions = @post_versions.includes(:updater, post: [:uploader, :versions])
+      @post_versions = @post_versions.includes(:updater, post: [:uploader, :media_asset, :versions])
     else
       @post_versions = @post_versions.includes(post: :versions)
     end

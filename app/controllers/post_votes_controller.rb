@@ -3,7 +3,7 @@ class PostVotesController < ApplicationController
 
   def index
     @post_votes = authorize PostVote.visible(CurrentUser.user).paginated_search(params, count_pages: true)
-    @post_votes = @post_votes.includes(:user, post: :uploader) if request.format.html?
+    @post_votes = @post_votes.includes(:user, post: [:uploader, :media_asset]) if request.format.html?
 
     respond_with(@post_votes)
   end

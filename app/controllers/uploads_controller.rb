@@ -26,7 +26,7 @@ class UploadsController < ApplicationController
 
   def index
     @uploads = authorize Upload.visible(CurrentUser.user).paginated_search(params, count_pages: true)
-    @uploads = @uploads.includes(:uploader, post: :uploader) if request.format.html?
+    @uploads = @uploads.includes(:uploader, post: [:media_asset, :uploader]) if request.format.html?
 
     respond_with(@uploads)
   end

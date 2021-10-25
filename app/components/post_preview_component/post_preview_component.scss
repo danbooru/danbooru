@@ -11,6 +11,12 @@ article.post-preview {
 
   a {
     display: inline-block;
+    position: relative;
+
+    .post-animation-icon {
+      color: var(--preview-icon-color);
+      background: var(--preview-icon-background);
+    }
   }
 
   &.captioned {
@@ -30,14 +36,6 @@ article.post-preview {
 
   img {
     margin: auto;
-  }
-
-  &[data-tags~=animated]::before, &[data-file-ext=swf]::before, &[data-file-ext=webm]::before, &[data-file-ext=mp4]::before, &[data-file-ext=zip]::before {
-    @include animated-icon;
-  }
-
-  &[data-has-sound=true]::before {
-    @include sound-icon;
   }
 }
 

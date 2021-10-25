@@ -102,6 +102,20 @@ module ApplicationHelper
     end
   end
 
+  def duration_to_hhmmss(seconds)
+    hh = seconds.div(1.hour).to_s
+    mm = seconds.div(1.minute).to_s
+    ss = "%.2d" % (seconds.round % 1.minute)
+
+    if seconds >= 1.hour
+      "#{hh}:#{mm}:#{ss}"
+    elsif seconds >= 1.second
+      "#{mm}:#{ss}"
+    else
+      "0:01"
+    end
+  end
+
   def humanized_number(number)
     if number >= 1_000_000
       format("%.1fM", number / 1_000_000.0)

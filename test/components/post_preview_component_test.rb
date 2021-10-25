@@ -18,6 +18,28 @@ class PostPreviewComponentTest < ViewComponent::TestCase
       end
     end
 
+    context "for a video post" do
+      should "render" do
+        @post = create(:post_with_file, filename: "test-512x512.webm").reload
+        node = render_preview(@post, current_user: User.anonymous)
+
+        assert_equal(post_path(@post), node.css("article a").attr("href").value)
+        assert_equal(@post.preview_file_url, node.css("article img").attr("src").value)
+        assert_equal("0:01", node.css("article .post-duration").text.strip)
+      end
+    end
+
+    context "for a video post with sound" do
+      should "render" do
+        @post = create(:post_with_file, tag_string: "sound", filename: "test-audio.mp4").reload
+        node = render_preview(@post, current_user: User.anonymous)
+
+        assert_equal(post_path(@post), node.css("article a").attr("href").value)
+        assert_equal(@post.preview_file_url, node.css("article img").attr("src").value)
+        assert(node.css("article .sound-icon").present?)
+      end
+    end
+
     context "for a post with restricted tags" do
       setup do
         Danbooru.config.stubs(:restricted_tags).returns(["touhou"])

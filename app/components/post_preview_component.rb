@@ -5,7 +5,9 @@ class PostPreviewComponent < ApplicationComponent
 
   attr_reader :post, :tags, :show_deleted, :show_cropped, :link_target, :pool, :similarity, :recommended, :compact, :size, :current_user, :options
 
-  delegate :external_link_to, :time_ago_in_words_tagged, :empty_heart_icon, to: :helpers
+  delegate :external_link_to, :time_ago_in_words_tagged, :duration_to_hhmmss, :empty_heart_icon, :sound_icon, to: :helpers
+  delegate :image_width, :image_height, :file_ext, :file_size, :duration, :is_animated?, to: :media_asset
+  delegate :media_asset, to: :post
 
   def initialize(post:, tags: "", show_deleted: false, show_cropped: true, link_target: post, pool: nil, similarity: nil, recommended: nil, compact: nil, size: nil, current_user: CurrentUser.user, **options)
     super
@@ -67,7 +69,7 @@ class PostPreviewComponent < ApplicationComponent
   def data_attributes
     attributes = {
       "data-id" => post.id,
-      "data-has-sound" => post.has_tag?("sound"),
+      "data-has-sound" => has_sound?,
       "data-tags" => post.tag_string,
       "data-approver-id" => post.approver_id,
       "data-rating" => post.rating,
@@ -95,5 +97,9 @@ class PostPreviewComponent < ApplicationComponent
     end
 
     attributes
+  end
+
+  def has_sound?
+    post.has_tag?("sound")
   end
 end

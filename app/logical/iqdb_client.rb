@@ -66,7 +66,7 @@ class IqdbClient
     def process_results(matches, low_similarity, high_similarity)
       matches = matches.select { |result| result["score"] >= low_similarity }
       post_ids = matches.map { |match| match["post_id"] }
-      posts = Post.where(id: post_ids).group_by(&:id).transform_values(&:first)
+      posts = Post.includes(:media_asset).where(id: post_ids).group_by(&:id).transform_values(&:first)
 
       matches = matches.map do |match|
         post = posts.fetch(match["post_id"], nil)

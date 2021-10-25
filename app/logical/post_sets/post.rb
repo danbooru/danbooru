@@ -107,7 +107,7 @@ module PostSets
         if is_random?
           get_random_posts.paginate(page, search_count: false, limit: per_page, max_limit: max_per_page).load
         else
-          normalized_query.paginated_posts(page, count: post_count, search_count: !post_count.nil?, limit: per_page, max_limit: max_per_page).load
+          normalized_query.paginated_posts(page, includes: :media_asset, count: post_count, search_count: !post_count.nil?, limit: per_page, max_limit: max_per_page).load
         end
       end
     end

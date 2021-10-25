@@ -3,7 +3,7 @@ class ArtistCommentariesController < ApplicationController
 
   def index
     @commentaries = authorize ArtistCommentary.paginated_search(params)
-    @commentaries = @commentaries.includes(post: :uploader) if request.format.html?
+    @commentaries = @commentaries.includes(post: [:uploader, :media_asset]) if request.format.html?
 
     respond_with(@commentaries)
   end

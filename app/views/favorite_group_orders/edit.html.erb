@@ -6,7 +6,7 @@
     <%= render "posts/partials/common/inline_blacklist" %>
 
     <ul id="sortable">
-      <% @favorite_group.posts.limit(1_000).each do |post| %>
+      <% @favorite_group.posts.includes(:media_asset).limit(1_000).each do |post| %>
         <%= tag.li id: "favorite_group[post_ids]_#{post.id}" do -%>
           <%= post_preview(post, show_deleted: true).presence || "Hidden: Post ##{post.id}" -%>
         <% end -%>

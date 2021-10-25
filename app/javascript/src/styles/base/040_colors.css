@@ -160,7 +160,7 @@ html {
   --preview-selected-color: rgba(0, 0, 0, 0.15);
 
   --preview-icon-color: var(--inverse-text-color);
-  --preview-icon-background: rgba(0, 0, 0, 0.5);
+  --preview-icon-background: rgba(0, 0, 0, 0.7);
 
   --modqueue-tag-warning-color: var(--red-1);
 

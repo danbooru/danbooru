@@ -59,7 +59,7 @@ module RecommenderService
   # Process a set of recommendations to filter out posts the user uploaded
   # themselves, or has already favorited, or that don't match a tag search.
   def process_recs(recs, post: nil, uploader: nil, favoriter: nil, tags: nil)
-    posts = Post.where(id: recs.map(&:first))
+    posts = Post.includes(:media_asset).where(id: recs.map(&:first))
     posts = posts.where.not(id: post.id) if post
     posts = posts.where.not(uploader_id: uploader.id) if uploader
     posts = posts.where.not(id: favoriter.favorites.select(:post_id)) if favoriter

@@ -14,28 +14,6 @@ div#c-comments {
       }
     }
 
-    div.post-preview {
-      &[data-tags~=animated], &[data-file-ext=swf], &[data-file-ext=webm], &[data-file-ext=zip], &[data-file-ext=mp4] {
-        div.preview {
-          position: relative;
-
-          &::before {
-            @include animated-icon;
-          }
-        }
-      }
-
-      &[data-has-sound=true] {
-        div.preview {
-          position: relative;
-
-          &::before {
-            @include sound-icon;
-          }
-        }
-      }
-    }
-
     div.post {
       display: flex;
       margin-bottom: 4em;

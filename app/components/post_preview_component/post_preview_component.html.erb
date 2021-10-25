@@ -1,5 +1,18 @@
 <%= tag.article id: "post_#{post.id}", **article_attrs do -%>
   <%= link_to polymorphic_path(link_target, q: tags) do -%>
+    <% if is_animated? || has_sound? %>
+      <div class="post-animation-icon absolute top-0.5 left-0.5 p-0.5 leading-none text-xs">
+        <% if is_animated? %>
+          <span class="post-duration align-middle">
+            <%= duration_to_hhmmss(duration) %>
+          </span>
+        <% end %>
+        <% if has_sound? %>
+          <%= sound_icon(class: "h-3 mx-0.5") -%>
+        <% end %>
+      </div>
+    <% end %>
+
     <%= tag.picture do -%>
       <%= tag.source media: "(max-width: 660px)", srcset: cropped_url -%>
       <%= tag.source media: "(min-width: 660px)", srcset: post.preview_file_url -%>

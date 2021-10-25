@@ -10,7 +10,7 @@ class PostFlagsController < ApplicationController
     @post_flags = authorize PostFlag.paginated_search(params)
 
     if request.format.html?
-      @post_flags = @post_flags.includes(:creator, post: [:flags, :uploader, :approver])
+      @post_flags = @post_flags.includes(:creator, post: [:flags, :uploader, :approver, :media_asset])
     else
       @post_flags = @post_flags.includes(:post)
     end

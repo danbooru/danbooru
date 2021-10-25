@@ -4,6 +4,7 @@ module ComponentsHelper
   end
 
   def post_previews_html(posts, **options)
+    posts = posts.includes(:media_asset) if posts.is_a?(ActiveRecord::Relation)
     render PostPreviewComponent.with_collection(posts, **options)
   end
 

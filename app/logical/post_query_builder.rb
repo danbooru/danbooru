@@ -489,10 +489,10 @@ class PostQueryBuilder
     relation
   end
 
-  def build
+  def build(includes: nil)
     validate!
 
-    relation = Post.all
+    relation = Post.includes(includes)
     relation = add_joins(relation)
     relation = metatags_match(metatags, relation)
     relation = tags_match(tags, relation)
@@ -514,8 +514,8 @@ class PostQueryBuilder
     relation
   end
 
-  def paginated_posts(page, small_search_threshold: Danbooru.config.small_search_threshold.to_i, **options)
-    posts = build.paginate(page, **options)
+  def paginated_posts(page, small_search_threshold: Danbooru.config.small_search_threshold.to_i, includes: nil, **options)
+    posts = build(includes: includes).paginate(page, **options)
     posts = optimize_search(posts, small_search_threshold)
     posts.load
   end

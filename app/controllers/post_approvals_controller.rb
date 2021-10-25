@@ -9,7 +9,7 @@ class PostApprovalsController < ApplicationController
 
   def index
     @post_approvals = authorize PostApproval.paginated_search(params)
-    @post_approvals = @post_approvals.includes(:user, post: :uploader) if request.format.html?
+    @post_approvals = @post_approvals.includes(:user, post: [:uploader, :media_asset]) if request.format.html?
 
     respond_with(@post_approvals)
   end
