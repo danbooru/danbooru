@@ -174,10 +174,6 @@ class AutocompleteServiceTest < ActiveSupport::TestCase
         assert_autocomplete_equals(["rating:questionable"], "rating:q", :tag_query)
         assert_autocomplete_equals(["rating:explicit"], "rating:e", :tag_query)
 
-        assert_autocomplete_equals(["locked:rating"], "locked:r", :tag_query)
-        assert_autocomplete_equals(["locked:status"], "locked:s", :tag_query)
-        assert_autocomplete_equals(["locked:note"], "locked:n", :tag_query)
-
         assert_autocomplete_equals(["embedded:true"], "embedded:t", :tag_query)
         assert_autocomplete_equals(["embedded:false"], "embedded:f", :tag_query)
 
