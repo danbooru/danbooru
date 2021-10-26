@@ -47,6 +47,12 @@ class PostTest < ActiveSupport::TestCase
         assert_raise(StandardError) { @post.file(:original) }
       end
 
+      should "mark the media asset as expunged" do
+        @post.expunge!
+
+        assert_equal("expunged", @post.media_asset.status)
+      end
+
       should "remove all favorites" do
         @post.expunge!
 

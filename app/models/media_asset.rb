@@ -179,6 +179,14 @@ class MediaAsset < ApplicationRecord
       self.pixiv_ugoira_frame_data = PixivUgoiraFrameData.new(data: media_file.frame_data, content_type: "image/jpeg") if is_ugoira?
     end
 
+    def expunge!
+      delete_files!
+      update!(status: :expunged)
+    rescue
+      update!(status: :failed)
+      raise
+    end
+
     def delete_files!
       variants.each(&:delete_file!)
     end

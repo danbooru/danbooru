@@ -25,8 +25,7 @@ FactoryBot.define do
       image_height { media_file.height }
       file_ext { media_file.file_ext }
       file_size { media_file.file_size }
-
-      before(:create) { |post, evaluator| MediaAsset.upload!(evaluator.media_file) }
+      media_asset { MediaAsset.upload!(media_file) }
     end
   end
 end

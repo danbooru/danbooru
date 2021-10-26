@@ -32,7 +32,6 @@ class Post < ApplicationRecord
   after_save :create_version
   after_save :update_parent_on_save
   after_save :apply_post_metatags
-  after_commit :delete_files, :on => :destroy
 
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
@@ -74,30 +73,6 @@ class Post < ApplicationRecord
 
   module FileMethods
     extend ActiveSupport::Concern
-
-    module ClassMethods
-      def delete_files(post_id, md5, file_ext, force: false)
-        if Post.exists?(md5: md5) && !force
-          raise DeletionError, "Files still in use; skipping deletion."
-        end
-
-        Danbooru.config.storage_manager.delete_file(post_id, md5, file_ext, :original)
-        Danbooru.config.storage_manager.delete_file(post_id, md5, file_ext, :large)
-        Danbooru.config.storage_manager.delete_file(post_id, md5, file_ext, :preview)
-
-        Danbooru.config.backup_storage_manager.delete_file(post_id, md5, file_ext, :original)
-        Danbooru.config.backup_storage_manager.delete_file(post_id, md5, file_ext, :large)
-        Danbooru.config.backup_storage_manager.delete_file(post_id, md5, file_ext, :preview)
-      end
-    end
-
-    def delete_files
-      Post.delete_files(id, md5, file_ext, force: true)
-    end
-
-    def backup_storage_manager
-      Danbooru.config.backup_storage_manager
-    end
 
     def storage_manager
       Danbooru.config.storage_manager
@@ -815,6 +790,7 @@ class Post < ApplicationRecord
           decrement_tag_post_counts
           remove_from_all_pools
           remove_from_fav_groups
+          media_asset.expunge!
           destroy
           update_parent_on_destroy
         end
