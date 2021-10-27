@@ -2,10 +2,10 @@
   <div id="news-updates" data-id="<%= NewsUpdate.recent.first.try(:id) %>" style="display: none;">
     <ul>
       <% NewsUpdate.recent.each do |news_update| %>
-        <li><%= time_ago_in_words_tagged(news_update.created_at, compact: true) %> ago: <%= news_update.message.html_safe %></li>
+        <li><%= news_update.message.html_safe %></li>
       <% end %>
     </ul>
 
-    <a href="#" id="close-news-ticker-link">close</a>
+    <a href="#" id="close-news-ticker-link"><%= close_icon %></a>
   </div>
 <% end %>
