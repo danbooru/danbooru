@@ -76,13 +76,37 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           @bur1 = create_bur!("imply aaa -> bbb", @admin)
           @bur2 = create_bur!("alias bbb -> ccc", @admin)
 
-          assert_equal(false, TagImplication.where(antecedent_name: "aaa", consequent_name: "bbb", status: "active").exists?)
-          assert_equal(true, TagImplication.where(antecedent_name: "aaa", consequent_name: "ccc", status: "active").exists?)
+          assert_equal(false, TagImplication.active.exists?(antecedent_name: "aaa", consequent_name: "bbb", status: "active"))
+          assert_equal(true, TagImplication.active.exists?(antecedent_name: "aaa", consequent_name: "ccc", status: "active"))
 
           @bur3 = create_bur!("alias aaa -> ddd", @admin)
 
-          assert_equal(false, TagImplication.where(antecedent_name: "aaa", consequent_name: "ccc", status: "active").exists?)
-          assert_equal(true, TagImplication.where(antecedent_name: "ddd", consequent_name: "ccc", status: "active").exists?)
+          assert_equal(false, TagImplication.active.exists?(antecedent_name: "aaa", consequent_name: "ccc", status: "active"))
+          assert_equal(true, TagImplication.active.exists?(antecedent_name: "ddd", consequent_name: "ccc", status: "active"))
+        end
+
+        should "not fail when merging two tags that imply the same parent tag" do
+          @ta1 = create(:tag_implication, antecedent_name: "bird_on_finger", consequent_name: "bird")
+          @ta2 = create(:tag_implication, antecedent_name: "bird_on_hand", consequent_name: "bird")
+
+          @bur = create_bur!("alias bird_on_finger -> bird_on_hand", @admin)
+
+          assert_equal(false, TagImplication.active.exists?(antecedent_name: "bird_on_finger", consequent_name: "bird"))
+          assert_equal(true, TagImplication.deleted.exists?(antecedent_name: "bird_on_finger", consequent_name: "bird"))
+          assert_equal(true, TagImplication.active.exists?(antecedent_name: "bird_on_hand", consequent_name: "bird"))
+          assert_equal(true, TagAlias.active.exists?(antecedent_name: "bird_on_finger", consequent_name: "bird_on_hand"))
+        end
+
+        should "not fail when merging two tags implied by the same child tag" do
+          @ta1 = create(:tag_implication, antecedent_name: "spider", consequent_name: "insect")
+          @ta2 = create(:tag_implication, antecedent_name: "spider", consequent_name: "bug")
+
+          @bur = create_bur!("alias insect -> bug", @admin)
+
+          assert_equal(false, TagImplication.active.exists?(antecedent_name: "spider", consequent_name: "insect"))
+          assert_equal(true, TagImplication.deleted.exists?(antecedent_name: "spider", consequent_name: "insect"))
+          assert_equal(true, TagImplication.active.exists?(antecedent_name: "spider", consequent_name: "bug"))
+          assert_equal(true, TagAlias.active.exists?(antecedent_name: "insect", consequent_name: "bug"))
         end
 
         should "allow moving a copyright tag that implies another copyright tag" do
@@ -94,7 +118,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           create_bur!("alias komeiji_koishi_no_dokidoki_daibouken -> komeiji_koishi's_heart_throbbing_adventure", @admin)
 
           assert_equal(true, @t1.reload.copyright?)
-          assert_equal(true, TagImplication.exists?(antecedent_name: "komeiji_koishi's_heart_throbbing_adventure", consequent_name: "touhou"))
+          assert_equal(true, TagImplication.active.exists?(antecedent_name: "komeiji_koishi's_heart_throbbing_adventure", consequent_name: "touhou"))
         end
 
         should "allow aliases to be reversed in one step" do

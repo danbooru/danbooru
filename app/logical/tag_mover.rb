@@ -86,12 +86,24 @@ class TagMover
 
   # Transfer any implications from the old tag to the new tag.
   def move_implications!
+    # When renaming A to B, remove any existing A -> ??? implications and
+    # replace them with B -> ???, unless they already exist.
     old_tag.antecedent_implications.each do |tag_implication|
-      tag_implication.update!(antecedent_name: new_tag.name)
+      tag_implication.update!(status: :deleted)
+
+      unless TagImplication.active.exists?(antecedent_name: new_tag.name, consequent_name: tag_implication.consequent_name)
+        TagImplication.create!(antecedent_name: new_tag.name, consequent_name: tag_implication.consequent_name, creator: user, approver: user, status: :active)
+      end
     end
 
+    # When renaming A to B, remove any existing ??? -> A implications and
+    # replace them with ??? -> B, unless they already exist.
     old_tag.consequent_implications.each do |tag_implication|
-      tag_implication.update!(consequent_name: new_tag.name)
+      tag_implication.update!(status: :deleted)
+
+      unless TagImplication.active.exists?(antecedent_name: tag_implication.antecedent_name, consequent_name: new_tag.name)
+        TagImplication.create!(antecedent_name: tag_implication.antecedent_name, consequent_name: new_tag.name, creator: user, approver: user, status: :active)
+      end
     end
   end
 
