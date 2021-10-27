@@ -1359,7 +1359,7 @@ class Post < ApplicationRecord
   def self.available_includes
     # attributes accessible through the ?only= parameter
     %i[
-      uploader updater approver upload flags appeals parent children notes
+      uploader approver upload flags appeals parent children notes
       comments approvals disapprovals replacements pixiv_ugoira_frame_data
       artist_commentary
     ]
