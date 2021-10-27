@@ -3,8 +3,8 @@
 #
 # https://www.postgresql.org/docs/14/app-pgamcheck.html
 class AmcheckDatabaseJob < ApplicationJob
-  def perform(options: "--verbose --install-missing --heapallindexed --parent-check")
-    return unless system("pg_amcheck --version")
+  def perform(options: "--verbose --install-missing --heapallindexed --parent-check 2>&1")
+    return unless system("pg_amcheck --version > /dev/null")
 
     connection_url = ApplicationRecord.connection_db_config.url
     output = %x(PGDATABASE="#{connection_url}" pg_amcheck #{options})
