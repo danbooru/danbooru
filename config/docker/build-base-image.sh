@@ -20,7 +20,7 @@ VIPS_BUILD_DEPS="
 "
 EXIFTOOL_RUNTIME_DEPS="perl perl-modules libarchive-zip-perl"
 DANBOORU_RUNTIME_DEPS="
-  ca-certificates mkvtoolnix libpq5
+  ca-certificates mkvtoolnix rclone libpq5
   zlib1g libfftw3-3 libwebp6 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2
   libpng16-16 libjpeg-turbo8 libexpat1 libglib2.0 libgif7 libexif12 libvpx6
 "
