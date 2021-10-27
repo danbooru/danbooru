@@ -49,6 +49,7 @@ class IpLookup
 
   def is_proxy?
     return true if ip_addr.is_tor?
+    return true if response.dig(:connection, :type) == "hosting"
     response[:security].present? && response[:security].values.any?
   end
 
