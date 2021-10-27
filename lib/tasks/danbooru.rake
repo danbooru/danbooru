@@ -70,8 +70,7 @@ namespace :danbooru do
 
       MediaMetadata.joins(:media_asset).where(metadata: {}).find_each do |metadata|
         asset = metadata.media_asset
-        file = sm.open(sm.file_path(asset.md5, asset.file_ext, :original))
-        media_file = MediaFile.open(file)
+        media_file = asset.variant(:original).open_file
 
         metadata.update!(metadata: media_file.metadata)
         puts "metadata[id=#{metadata.id}, md5=#{asset.md5}]: #{media_file.metadata.count}"

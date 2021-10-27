@@ -74,36 +74,47 @@ class Post < ApplicationRecord
   module FileMethods
     extend ActiveSupport::Concern
 
-    def storage_manager
-      Danbooru.config.storage_manager
+    def seo_tags
+      presenter.humanized_essential_tag_string.gsub(/[^a-z0-9]+/, "_").gsub(/(?:^_+)|(?:_+$)/, "").gsub(/_{2,}/, "_")
     end
 
     def file(type = :original)
-      storage_manager.open_file(self, type)
+      media_asset.variant(type).open_file
     end
 
     def tagged_file_url(tagged_filenames: !CurrentUser.user.disable_tagged_filenames?)
-      storage_manager.file_url(self, :original, tagged_filenames: tagged_filenames)
+      slug = seo_tags if tagged_filenames
+      media_asset.variant(:original).file_url(slug)
     end
 
     def tagged_large_file_url(tagged_filenames: !CurrentUser.user.disable_tagged_filenames?)
-      storage_manager.file_url(self, :large, tagged_filenames: tagged_filenames)
+      slug = seo_tags if tagged_filenames
+
+      if media_asset.has_variant?(:sample)
+        media_asset.variant(:sample).file_url(slug)
+      else
+        media_asset.variant(:original).file_url(slug)
+      end
     end
 
     def file_url
-      storage_manager.file_url(self, :original)
+      media_asset.variant(:original).file_url
     end
 
     def large_file_url
-      storage_manager.file_url(self, :large)
+      if media_asset.has_variant?(:sample)
+        media_asset.variant(:sample).file_url
+      else
+        media_asset.variant(:original).file_url
+      end
     end
 
     def preview_file_url
-      storage_manager.file_url(self, :preview)
+      media_asset.variant(:preview).file_url
     end
 
     def crop_file_url
-      storage_manager.file_url(self, :crop)
+      media_asset.variant(:crop).file_url
     end
 
     def open_graph_image_url
@@ -1162,7 +1173,7 @@ class Post < ApplicationRecord
 
         ModAction.log("<@#{user.name}> regenerated IQDB for post ##{id}", :post_regenerate_iqdb, user)
       else
-        media_file = MediaFile.open(file, frame_data: pixiv_ugoira_frame_data&.data.to_a)
+        media_file = media_asset.variant(:original).open_file
         media_asset.distribute_files!(media_file)
 
         update!(

@@ -38,7 +38,9 @@ class MediaAsset < ApplicationRecord
     end
 
     def open_file
-      storage_service.open(file_path)
+      file = storage_service.open(file_path)
+      frame_data = media_asset.pixiv_ugoira_frame_data&.data if media_asset.is_ugoira?
+      MediaFile.open(file, frame_data: frame_data)
     end
 
     def convert_file(media_file)

@@ -40,8 +40,8 @@ class PostRegenerationsControllerTest < ActionDispatch::IntegrationTest
 
       context "for an image sample regeneration" do
         should "regenerate missing thumbnails" do
-          @preview_file_size = @post.file(:preview).size
-          @post.storage_manager.delete_file(@post.id, @post.md5, @post.file_ext, :preview)
+          @preview_file_size = @post.media_asset.variant(:preview).open_file.size
+          @post.media_asset.variant(:preview).delete_file!
           assert_raise(Errno::ENOENT) { @post.file(:preview) }
 
           post_auth post_regenerations_path, @mod, params: { post_id: @post.id }
