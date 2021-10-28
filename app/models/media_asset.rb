@@ -67,6 +67,7 @@ class MediaAsset < ApplicationRecord
         "/images/download-preview.png"
       else
         slug = "__#{slug}__" if slug.present?
+        slug = nil if !Danbooru.config.enable_seo_post_urls
         "/#{variant}/#{md5[0..1]}/#{md5[2..3]}/#{slug}#{file_name}"
       end
     end
