@@ -17,9 +17,9 @@ class StorageManager
   # @param base_url [String] the base URL where images are stored (ex: "https://cdn.donmai.us/")
   # @param base_dir [String] the base directory where images are stored (ex: "/var/www/danbooru/public/images")
   # @param tagged_filenames [Boolean] whether image URLs can include tags
-  def initialize(base_url:, base_dir:, tagged_filenames: Danbooru.config.enable_seo_post_urls)
-    @base_url = base_url.chomp("/")
-    @base_dir = base_dir
+  def initialize(base_url: nil, base_dir: nil, tagged_filenames: Danbooru.config.enable_seo_post_urls)
+    @base_url = base_url.to_s.chomp("/")
+    @base_dir = base_dir.to_s
     @tagged_filenames = tagged_filenames
   end
 
