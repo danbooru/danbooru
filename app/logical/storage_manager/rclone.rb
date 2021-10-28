@@ -5,11 +5,12 @@
 # @see https://rclone.org/
 class StorageManager::Rclone < StorageManager
   class Error < StandardError; end
-  attr_reader :remote, :bucket, :rclone_path, :rclone_options
+  attr_reader :remote, :bucket, :rclone_path, :rclone_options, :base_dir
 
-  def initialize(remote:, bucket:, rclone_path: "rclone", rclone_options: {}, **options)
+  def initialize(remote:, bucket:, base_dir: nil, rclone_path: "rclone", rclone_options: {}, **options)
     @remote = remote
     @bucket = bucket
+    @base_dir = base_dir.to_s
     @rclone_path = rclone_path
     @rclone_options = rclone_options
     super(**options)
@@ -36,5 +37,9 @@ class StorageManager::Rclone < StorageManager
 
   def key(path)
     ":#{remote}:#{bucket}#{full_path(path)}"
+  end
+
+  def full_path(path)
+    File.join(base_dir, path)
   end
 end

@@ -1,8 +1,8 @@
 # A null StorageManager that doesn't store files at all. Used for testing or
 # disabling backups.
 class StorageManager::Null < StorageManager
-  def initialize(base_url: "/", base_dir: "/")
-    super
+  def initialize
+    super(base_url: nil)
   end
 
   def store(io, path)

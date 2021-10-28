@@ -10,10 +10,11 @@ class StorageManager::SFTP < StorageManager
     non_interactive: true
   }
 
-  attr_reader :hosts, :ssh_options
+  attr_reader :hosts, :ssh_options, :base_dir
 
-  def initialize(*hosts, ssh_options: {}, **options)
+  def initialize(*hosts, base_dir: nil, ssh_options: {}, **options)
     @hosts = hosts
+    @base_dir = base_dir.to_s
     @ssh_options = DEFAULT_SSH_OPTIONS.merge(ssh_options)
     super(**options)
   end
@@ -72,5 +73,9 @@ class StorageManager::SFTP < StorageManager
         yield host, sftp
       end
     end
+  end
+
+  def full_path(path)
+    File.join(base_dir, path)
   end
 end

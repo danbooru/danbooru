@@ -3,22 +3,25 @@
 # are handled by a StorageManager.
 #
 # A StorageManager has methods for saving, deleting, and opening files, and for
-# generates URLs for images.
+# generating URLs for files.
 #
 # @abstract
 # @see StorageManager::Local
+# @see StorageManager::Mirror
+# @see StorageManager::Rclone
 # @see StorageManager::SFTP
 class StorageManager
   class Error < StandardError; end
 
-  attr_reader :base_url, :base_dir
+  attr_reader :base_url
 
   # Initialize a storage manager object.
-  # @param base_url [String] the base URL where images are stored (ex: "https://cdn.donmai.us/")
-  # @param base_dir [String] the base directory where images are stored (ex: "/var/www/danbooru/public/images")
-  def initialize(base_url: nil, base_dir: nil)
-    @base_url = base_url.to_s.chomp("/")
-    @base_dir = base_dir.to_s
+  #
+  # @param base_url [String, nil] the base URL where files are served from (ex:
+  # "https://cdn.donmai.us"), or nil if the files don't have an URL (they're
+  # stored in a publicly inaccessible location).
+  def initialize(base_url: nil)
+    @base_url = base_url
   end
 
   # Store the given file at the given path. If a file already exists at that
@@ -41,16 +44,16 @@ class StorageManager
 
   # Return a readonly copy of the file located at the given path.
   # @param path [String] the remote path of the file to open
-  # @return [MediaFile] the image file
+  # @return [File] the file
   def open(path)
     raise NotImplementedError, "open not implemented"
   end
 
+  # Return the full URL of the file at the given path, or nil if the file
+  # doesn't have an URL.
+  # @return [String, nil] the file URL
   def file_url(path)
+    return nil if base_dir.nil?
     File.join(base_url, path)
-  end
-
-  def full_path(path)
-    File.join(base_dir, path)
   end
 end
