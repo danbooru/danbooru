@@ -34,7 +34,6 @@ Rails.application.routes.draw do
           post :expunge
           get :confirm_move_favorites
           post :move_favorites
-          get :confirm_ban
           post :ban
           post :unban
         end
