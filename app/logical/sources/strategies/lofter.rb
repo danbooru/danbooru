@@ -12,6 +12,7 @@
 # * https://gengar563.lofter.com/post/1e82da8c_1c98dae1b
 # * https://yuli031458.lofter.com/post/3163d871_1cbdc5f6d (different theme/css selectors)
 # * https://ssucrose.lofter.com/post/1d30f3e4_1cc58e9f0 (another different theme)
+# * https://zuodaoxing.lofter.com/post/30b9c9c3_1cd15b686 (another theme)
 #
 # Profile URLs
 #
@@ -79,10 +80,18 @@ module Sources
         tags.to_a.map do |tag|
           [tag.text.gsub(/^● /, ""), tag.attr("href")]
         end
+
+        if tags.blank?
+          tags = page&.search(".main .tags a").to_a.map do |tag|
+            [tag.text.gsub(/^#/, ""), tag.attr("href")]
+          end
+        end
+
+        tags
       end
 
       def artist_commentary_desc
-        page&.search(".ct .text, .content .text").to_a.compact.first&.to_html
+        page&.search(".ct .text, .content .text, .posts .photo .text").to_a.compact.first&.to_html
       end
 
       def normalize_for_source
