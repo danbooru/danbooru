@@ -247,6 +247,8 @@ module IconHelper
       image_icon_tag("pixiv-fanbox-logo.png", **options)
     when "Pixiv Sketch"
       image_icon_tag("pixiv-sketch-logo.png", **options)
+    when "Plurk"
+      image_icon_tag("plurk-logo.png", **options)
     when "Privatter"
       image_icon_tag("privatter-logo.png", **options)
     when "Sakura.ne.jp"
