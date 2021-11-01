@@ -17,7 +17,8 @@ module Sources
         Strategies::Weibo,
         Strategies::Newgrounds,
         Strategies::Skeb,
-        Strategies::Lofter
+        Strategies::Lofter,
+        Strategies::Foundation,
       ]
     end
 

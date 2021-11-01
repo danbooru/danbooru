@@ -202,6 +202,8 @@ module IconHelper
       image_icon_tag("fantia-logo.png", **options)
     when "FC2"
       image_icon_tag("fc2-logo.png", **options)
+    when "Foundation"
+      image_icon_tag("foundation-logo.png", **options)
     when "Gumroad"
       image_icon_tag("gumroad-logo.png", **options)
     when "Hentai Foundry"
