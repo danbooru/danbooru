@@ -47,6 +47,7 @@ module ArtistFinder
     "fav.me", # http://fav.me/d9y1njg
     /blog-imgs-\d+(?:-origin)?\.fc2\.com/i,
     %r{blog\.fc2\.com(/\w)+/?}i, # http://blog71.fc2.com/a/abk00/file/20080220194219.jpg
+    "foundation.app",
     "furaffinity.net",
     "furaffinity.net/user", # http://www.furaffinity.net/user/achthenuts
     "gelbooru.com", # http://gelbooru.com/index.php?page=account&s=profile&uname=junou
