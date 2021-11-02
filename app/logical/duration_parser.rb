@@ -1,27 +1,32 @@
+require 'abbrev'
+
 module DurationParser
   def self.parse(string)
-    string =~ /(\d+)(s(econds?)?|mi(nutes?)?|h(ours?)?|d(ays?)?|w(eeks?)?|mo(nths?)?|y(ears?)?)?/i
+    abbrevs = Abbrev.abbrev(%w[seconds minutes hours days weeks months years])
 
-    size = $1.to_i
-    unit = $2
+    raise unless string =~ /(.*?)([a-z]+)\z/i
+    size = Float($1)
+    unit = abbrevs.fetch($2.downcase)
 
     case unit
-    when /^s/i
+    when "seconds"
       size.seconds
-    when /^mi/i
+    when "minutes"
       size.minutes
-    when /^h/i
+    when "hours"
       size.hours
-    when /^d/i
+    when "days"
       size.days
-    when /^w/i
+    when "weeks"
       size.weeks
-    when /^mo/i
-      size.months
-    when /^y/i
-      size.years
+    when "months"
+      size * (365.25.days / 12)
+    when "years"
+      size * (365.25.days)
     else
-      size.seconds
+      raise NotImplementedError
     end
+  rescue
+    raise ArgumentError, "'#{string}' is not a valid duration"
   end
 end

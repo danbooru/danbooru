@@ -12,6 +12,7 @@ class PostQueryBuilder
 
   # Raised when the number of tags exceeds the user's tag limit.
   class TagLimitError < StandardError; end
+  class ParseError < StandardError; end
 
   # How many tags a `blah*` search should match.
   MAX_WILDCARD_TAGS = 100
@@ -259,6 +260,8 @@ class PostQueryBuilder
   def attribute_matches(value, field, type = :integer)
     operator, *args = parse_metatag_value(value, type)
     Post.where_operator(field, operator, *args)
+  rescue ParseError
+    Post.none
   end
 
   def user_matches(field, username)
@@ -815,45 +818,43 @@ class PostQueryBuilder
     end
 
     # Parse a simple string value into a Ruby type.
-    # @param object [String] the value to parse
+    # @param string [String] the value to parse
     # @param type [Symbol] the value's type
     # @return [Object] the parsed value
-    def parse_cast(object, type)
+    def parse_cast(string, type)
       case type
       when :enum
-        object.to_s.downcase
+        string.downcase
 
       when :integer
-        object.to_i
+        Integer(string) # raises ArgumentError if string is invalid
 
       when :float
-        object.to_f
+        Float(string) # raises ArgumentError if string is invalid
 
       when :md5
-        object.to_s.downcase
+        raise ParseError, "#{string} is not a valid MD5" unless string.match?(/\A[0-9a-fA-F]{32}\z/)
+        string.downcase
 
       when :date, :datetime
-        Time.zone.parse(object) rescue nil
+        date = Time.zone.parse(string)
+        raise ParseError, "#{string} is not a valid date" if date.nil?
+        date
 
       when :age
-        DurationParser.parse(object).ago
+        DurationParser.parse(string).ago
 
       when :interval
-        DurationParser.parse(object)
+        DurationParser.parse(string)
 
       when :ratio
-        object =~ /\A(\d+(?:\.\d+)?):(\d+(?:\.\d+)?)\Z/i
-
-        if $1 && $2.to_f != 0.0
-          ($1.to_f / $2.to_f).round(2)
-        else
-          object.to_f.round(2)
-        end
+        string = string.tr(":", "/") # "2:3" => "2/3"
+        Rational(string).to_f.round(2) # raises ArgumentError or ZeroDivisionError if string is invalid
 
       when :filesize
-        object =~ /\A(\d+(?:\.\d*)?|\d*\.\d+)([kKmM]?)[bB]?\Z/
+        raise ParseError, "#{string} is not a valid filesize" unless string =~ /\A(\d+(?:\.\d*)?|\d*\.\d+)([kKmM]?)[bB]?\Z/
 
-        size = $1.to_f
+        size = Float($1)
         unit = $2
 
         conversion_factor = case unit
@@ -868,8 +869,11 @@ class PostQueryBuilder
         (size * conversion_factor).to_i
 
       else
-        raise NotImplementedError, "unrecognized type #{type} for #{object}"
+        raise NotImplementedError, "unrecognized type #{type} for #{string}"
       end
+
+    rescue ArgumentError, ZeroDivisionError => e
+      raise ParseError, e.message
     end
 
     def parse_metatag_value(string, type)

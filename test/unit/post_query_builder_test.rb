@@ -165,6 +165,47 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       end
     end
 
+    context "for an invalid metatag value" do
+      should "return nothing" do
+        post = create(:post_with_file, created_at: Time.parse("2021-06-15 12:00:00"), score: 42, filename: "test.jpg")
+
+        assert_tag_match([], "score:foo")
+        assert_tag_match([], "score:42x")
+        assert_tag_match([], "score:x42")
+        assert_tag_match([], "score:42.0")
+
+        assert_tag_match([], "mpixels:foo")
+        assert_tag_match([], "mpixels:0.1675foo")
+        assert_tag_match([], "mpixels:foo0.1675")
+
+        assert_tag_match([], "ratio:foo")
+        assert_tag_match([], "ratio:1.49foo")
+        assert_tag_match([], "ratio:foo1.49")
+        assert_tag_match([], "ratio:1:0")
+        assert_tag_match([], "ratio:1/0")
+        assert_tag_match([], "ratio:-149/-100")
+
+        assert_tag_match([], "filesize:foo")
+        assert_tag_match([], "filesize:28086foo")
+        assert_tag_match([], "filesize:foo28086")
+
+        assert_tag_match([], "filesize:foo")
+        assert_tag_match([], "filesize:28086foo")
+        assert_tag_match([], "filesize:foo28086")
+
+        assert_tag_match([], "date:foo")
+        assert_tag_match([], "date:2021-13-01")
+        assert_tag_match([], "date:2021-01-32")
+        assert_tag_match([], "date:01-32-2021")
+        assert_tag_match([], "date:13-01-2021")
+
+        assert_tag_match([], "age:foo")
+        assert_tag_match([], "age:30")
+
+        assert_tag_match([], "md5:foo")
+      end
+    end
+
     should "return posts for the id:<N> metatag" do
       posts = create_list(:post, 3)
 
@@ -583,16 +624,22 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the date:<d> metatag" do
-      post = create(:post, created_at: Time.parse("2017-01-01 12:00"))
+      post = create(:post, created_at: Time.zone.parse("2017-05-15 12:00"))
 
-      assert_tag_match([post], "date:2017-01-01")
-      assert_tag_match([], "-date:2017-01-01")
+      assert_tag_match([post], "date:2017-05-15")
+      assert_tag_match([post], "date:2017/05/15")
+      assert_tag_match([post], "date:2017.05.15")
+
+      assert_tag_match([post], "date:15-5-2017")
+      assert_tag_match([post], "date:15/5/2017")
+      assert_tag_match([post], "date:15.5.2017")
+
+      assert_tag_match([], "-date:2017-05-15")
     end
 
     should "return posts for the age:<n> metatag" do
       post = create(:post)
 
-      assert_tag_match([post], "age:<60")
       assert_tag_match([post], "age:<60s")
       assert_tag_match([post], "age:<1mi")
       assert_tag_match([post], "age:<1h")
@@ -604,8 +651,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([post], "age:<=1y")
       assert_tag_match([post], "age:>0s")
       assert_tag_match([post], "age:>=0s")
-      assert_tag_match([post], "age:0s..1m")
-      assert_tag_match([post], "age:1m..0s")
+      assert_tag_match([post], "age:0s..1min")
+      assert_tag_match([post], "age:1min..0s")
 
       assert_tag_match([], "age:>1y")
       assert_tag_match([], "age:>=1y")
@@ -614,14 +661,35 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match([post], "-age:>1y")
       assert_tag_match([], "-age:<1y")
+
+      assert_tag_match([], "age:<60")
     end
 
     should "return posts for the ratio:<x:y> metatag" do
-      post = create(:post, image_width: 1000, image_height: 500)
+      post = create(:post_with_file, filename: "test.jpg")
 
-      assert_tag_match([post], "ratio:2:1")
-      assert_tag_match([post], "ratio:2.0")
-      assert_tag_match([], "-ratio:2.0")
+      assert_tag_match([post], "ratio:1.49")
+      assert_tag_match([post], "ratio:.149e1")
+      assert_tag_match([post], "ratio:0.149e1")
+      assert_tag_match([post], "ratio:149e-2")
+      assert_tag_match([post], "ratio:1490:1000")
+      assert_tag_match([post], "ratio:149:100")
+      assert_tag_match([post], "ratio:149/100")
+
+      assert_tag_match([], "-ratio:1.49")
+    end
+
+    should "return posts for the mpixels:N metatag" do
+      post = create(:post_with_file, filename: "test.jpg")
+
+      assert_tag_match([post], "mpixels:0.1675")
+      assert_tag_match([post], "mpixels:+0.1675")
+      assert_tag_match([post], "mpixels:.1675")
+      assert_tag_match([post], "mpixels:+.1675")
+      assert_tag_match([post], "mpixels:1675e-4")
+
+      assert_tag_match([], "mpixels:0.2")
+      assert_tag_match([], "-mpixels:0.1675")
     end
 
     should "return posts for the duration:<x> metatag" do
@@ -755,15 +823,20 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
     end
 
     should "return posts for the md5:<md5> metatag" do
-      post1 = create(:post, md5: "abcd")
+      post1 = create(:post_with_file, filename: "test.jpg")
       post2 = create(:post)
 
-      assert_tag_match([post1], "md5:abcd")
-      assert_tag_match([post1], "md5:ABCD")
-      assert_tag_match([post1], "md5:123,abcd")
-      assert_tag_match([], "md5:abcd md5:xyz")
+      assert_tag_match([post1], "md5:ecef68c44edb8a0d6a3070b5f8e8ee76")
+      assert_tag_match([post1], "md5:ECEF68C44EDB8A0D6A3070B5F8E8EE76")
+      assert_tag_match([post1], "md5:081a5c3b92d8980d1aadbd215bfac5b9,ecef68c44edb8a0d6a3070b5f8e8ee76")
 
-      assert_tag_match([post2], "-md5:abcd")
+      assert_tag_match([post2], "-md5:ecef68c44edb8a0d6a3070b5f8e8ee76")
+      assert_tag_match([post2], "-md5:ECEF68C44EDB8A0D6A3070B5F8E8EE76")
+
+      assert_tag_match([], "md5:xyz")
+      assert_tag_match([], "md5:ecef68c44edb8a0d6a3070b5f8e8ee76 md5:xyz")
+
+      assert_tag_match([post2, post1], "-md5:xyz")
     end
 
     should "return posts for a source:<text> search" do
