@@ -19,6 +19,7 @@ module Sources
         Strategies::Skeb,
         Strategies::Lofter,
         Strategies::Foundation,
+        Strategies::Plurk,
       ]
     end
 
