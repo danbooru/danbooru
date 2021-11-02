@@ -13,12 +13,13 @@ module Sources
       end
 
       should "extract all the image urls" do
-        @site = Sources::Strategies.find("https://twitter.com/aoimanabu/status/892370963630743552")
+        @site = Sources::Strategies.find("https://twitter.com/baalbuddy/status/1455330043828264963")
 
         urls = %w[
-          https://pbs.twimg.com/media/DGJWp59UIAA_-en.jpg:orig
-          https://pbs.twimg.com/media/DGJWqGLUwAAn2RL.jpg:orig
-          https://pbs.twimg.com/media/DGJWqT_UMAAvmSK.jpg:orig
+          https://pbs.twimg.com/media/FDJekEfX0AQZ-Mx.png:orig
+          https://pbs.twimg.com/media/FDJekEkWYAICHzF.png:orig
+          https://pbs.twimg.com/media/FDJekEiWEAEsPky.png:orig
+          https://pbs.twimg.com/media/FDJekEkWEAo4sMQ.png:orig
         ]
 
         assert_equal(urls, @site.image_urls)

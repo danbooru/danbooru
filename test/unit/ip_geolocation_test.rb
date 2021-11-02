@@ -57,7 +57,7 @@ class IpGeolocationTest < ActiveSupport::TestCase
 
       should "work for a proxy IP" do
         @ip = IpGeolocation.create_or_update!("31.214.184.59")
-        assert_equal("Soluciones Corporativas IP (SCIP)", @ip.organization)
+        assert_equal("Soluciones Corporativas IP, SL", @ip.organization)
         assert_equal(true, @ip.is_proxy?)
       end
 
