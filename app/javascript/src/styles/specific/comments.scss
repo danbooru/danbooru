@@ -17,18 +17,6 @@ div#c-comments {
     div.post {
       display: flex;
       margin-bottom: 4em;
-
-      div.preview {
-        width: 154px;
-        height: 154px;
-        margin-right: 30px;
-        overflow: hidden;
-        text-align: center;
-      }
-
-      div.comment-section {
-        flex: 1;
-      }
     }
   }
 }

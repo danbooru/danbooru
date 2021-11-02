@@ -4,12 +4,10 @@
   <% end %>
 
   <% @posts.select(&:visible?).each do |post| %>
-    <%= tag.div id: "post_#{post.id}", **PostPreviewComponent.new(post: post).article_attrs("post") do %>
-      <div class="preview">
-        <%= link_to(image_tag(post.preview_file_url), post_path(post)) %>
-      </div>
+    <%= tag.div id: "post_#{post.id}", **PostPreviewComponent.new(post: post).article_attrs("post space-x-4") do %>
+      <%= post_preview(post, show_deleted: true) %>
 
-      <div class="comment-section">
+      <div class="flex-1">
         <%= render "comments/partials/index/header", post: post %>
         <%= render_comment_section(post, limit: 6, current_user: CurrentUser.user) %>
       </div>

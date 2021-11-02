@@ -31,9 +31,9 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
           get comments_path(group_by: "post")
 
           assert_response :success
-          assert_select "#post_#{@post.id}", 1
-          assert_select "#post_#{@post.id} .comment", 1
-          assert_select "#post_#{@post.id} .show-all-comments-link", 0
+          assert_select "div#post_#{@post.id}", 1
+          assert_select "div#post_#{@post.id} .comment", 1
+          assert_select "div#post_#{@post.id} .show-all-comments-link", 0
         end
 
         should "not bump posts with nonbumping comments" do

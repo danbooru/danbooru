@@ -1,9 +1,10 @@
 div.list-of-messages {
   margin: 1em 0;
 
+  > * + * { margin-top: 2em; }
+
   article.message {
     display: flex;
-    margin-top: 2em;
     word-wrap: break-word;
     padding: 5px;
 
