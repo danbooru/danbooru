@@ -90,8 +90,6 @@ class PostQueryBuilder
   end
 
   def tags_match(tags, relation)
-    tsquery = []
-
     negated_wildcard_tags, negated_tags = tags.select(&:negated).partition(&:wildcard)
     optional_wildcard_tags, optional_tags = tags.select(&:optional).partition(&:wildcard)
     required_wildcard_tags, required_tags = tags.reject(&:negated).reject(&:optional).partition(&:wildcard)
@@ -191,7 +189,7 @@ class PostQueryBuilder
     when "ordfav"
       ordfav_matches(value)
     when "unaliased"
-      unaliased_matches(value)
+      tags_include(value)
     when "exif"
       exif_matches(value)
     when "user"
@@ -232,15 +230,6 @@ class PostQueryBuilder
 
   def tags_include(*tags)
     Post.where_array_includes_all("string_to_array(posts.tag_string, ' ')", tags)
-  end
-
-  def unaliased_matches(tag)
-    # don't let users use unaliased:fav:1 to view private favorites
-    if tag =~ /\Afav:\d+\z/
-      Post.none
-    else
-      tags_include(tag)
-    end
   end
 
   def exif_matches(string)
