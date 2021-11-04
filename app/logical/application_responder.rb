@@ -10,7 +10,9 @@ class ApplicationResponder < ActionController::Responder
 
     if get?
       if params["expires_in"]
-        controller.expires_in(DurationParser.parse(params["expires_in"]))
+        expires_in = params["expires_in"]
+        expires_in += "seconds" if expires_in =~ /\d+\z/
+        controller.expires_in(DurationParser.parse(expires_in))
       elsif request.params["expiry"]
         controller.expires_in(params["expiry"].to_i.days)
       end
