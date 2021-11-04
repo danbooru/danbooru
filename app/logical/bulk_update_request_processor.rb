@@ -79,7 +79,10 @@ class BulkUpdateRequestProcessor
 
         when :remove_alias
           tag_alias = TagAlias.active.find_by(antecedent_name: args[0], consequent_name: args[1])
-          if tag_alias.nil?
+
+          if validation_context == :approval
+            # ignore non-existing aliases when approving a BUR
+          elsif tag_alias.nil?
             errors.add(:base, "Can't remove alias #{args[0]} -> #{args[1]} (alias doesn't exist)")
           else
             tag_alias.update(status: "deleted")
@@ -87,7 +90,10 @@ class BulkUpdateRequestProcessor
 
         when :remove_implication
           tag_implication = TagImplication.active.find_by(antecedent_name: args[0], consequent_name: args[1])
-          if tag_implication.nil?
+
+          if validation_context == :approval
+            # ignore non-existing implication when approving a BUR
+          elsif tag_implication.nil?
             errors.add(:base, "Can't remove implication #{args[0]} -> #{args[1]} (implication doesn't exist)")
           else
             tag_implication.update(status: "deleted")
@@ -147,12 +153,12 @@ class BulkUpdateRequestProcessor
           TagImplication.approve!(antecedent_name: args[0], consequent_name: args[1], approver: approver, forum_topic: forum_topic)
 
         when :remove_alias
-          tag_alias = TagAlias.active.find_by!(antecedent_name: args[0], consequent_name: args[1])
-          tag_alias.reject!(User.system)
+          tag_alias = TagAlias.active.find_by(antecedent_name: args[0], consequent_name: args[1])
+          tag_alias&.reject!(User.system)
 
         when :remove_implication
-          tag_implication = TagImplication.active.find_by!(antecedent_name: args[0], consequent_name: args[1])
-          tag_implication.reject!(User.system)
+          tag_implication = TagImplication.active.find_by(antecedent_name: args[0], consequent_name: args[1])
+          tag_implication&.reject!(User.system)
 
         when :mass_update
           BulkUpdateRequestProcessor.mass_update(args[0], args[1])

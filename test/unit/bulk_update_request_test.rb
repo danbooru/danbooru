@@ -220,7 +220,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal("approved", @bur.reload.status)
         end
 
-        should "fail if the alias isn't active" do
+        should "fail to validate if the alias isn't active" do
           create(:tag_alias, antecedent_name: "foo", consequent_name: "bar", status: "deleted")
           @bur = build(:bulk_update_request, script: "remove alias foo -> bar")
 
@@ -228,11 +228,23 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(["Can't remove alias foo -> bar (alias doesn't exist)"], @bur.errors[:base])
         end
 
-        should "fail if the alias doesn't already exist" do
+        should "fail to validate if the alias doesn't already exist" do
           @bur = build(:bulk_update_request, script: "remove alias foo -> bar")
 
           assert_equal(false, @bur.valid?)
           assert_equal(["Can't remove alias foo -> bar (alias doesn't exist)"], @bur.errors[:base])
+        end
+
+        should "allow reapproving a failed BUR when the alias has already been removed" do
+          @alias = create(:tag_alias, antecedent_name: "foo", consequent_name: "bar")
+          @bur = create(:bulk_update_request, script: "unalias foo -> bar", status: "failed")
+          @alias.reject!
+
+          @bur.approve!(@admin)
+          perform_enqueued_jobs
+
+          assert_equal(true, @alias.reload.is_deleted?)
+          assert_equal("approved", @bur.reload.status)
         end
 
         should "be processed sequentially after the create alias command" do
@@ -256,7 +268,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal("approved", @bur.reload.status)
         end
 
-        should "fail if the implication isn't active" do
+        should "fail to validate if the implication isn't active" do
           create(:tag_implication, antecedent_name: "foo", consequent_name: "bar", status: "deleted")
           @bur = build(:bulk_update_request, script: "remove implication foo -> bar")
 
@@ -264,11 +276,23 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(["Can't remove implication foo -> bar (implication doesn't exist)"], @bur.errors[:base])
         end
 
-        should "fail if the implication doesn't already exist" do
+        should "fail to validate if the implication doesn't already exist" do
           @bur = build(:bulk_update_request, script: "remove implication foo -> bar")
 
           assert_equal(false, @bur.valid?)
           assert_equal(["Can't remove implication foo -> bar (implication doesn't exist)"], @bur.errors[:base])
+        end
+
+        should "allow reapproving a failed BUR when the implication has already been removed" do
+          @implication = create(:tag_implication, antecedent_name: "foo", consequent_name: "bar")
+          @bur = create(:bulk_update_request, script: "unimply foo -> bar", status: "failed")
+          @implication.reject!
+
+          @bur.approve!(@admin)
+          perform_enqueued_jobs
+
+          assert_equal(true, @implication.reload.is_deleted?)
+          assert_equal("approved", @bur.reload.status)
         end
 
         should "be processed sequentially after the create implication command" do
