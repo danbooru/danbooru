@@ -16,6 +16,12 @@ class TagRelationship < ApplicationRecord
   scope :deleted, -> {where(status: "deleted")}
   scope :retired, -> {where(status: "retired")}
 
+  # TagAlias.artist, TagAlias.general, TagAlias.character, TagAlias.copyright, TagAlias.meta
+  # TagImplication.artist, TagImplication.general, TagImplication.character, TagImplication.copyright, TagImplication.meta
+  TagCategory.categories.each do |category|
+    scope category, -> { joins(:consequent_tag).where(consequent_tag: { category: TagCategory.mapping[category] }) }
+  end
+
   before_validation :normalize_names
   validates :status, inclusion: { in: STATUSES }
   validates :antecedent_name, presence: true
@@ -102,10 +108,6 @@ class TagRelationship < ApplicationRecord
     def relationship
       # "TagAlias" -> "tag alias", "TagImplication" -> "tag implication"
       self.class.name.underscore.tr("_", " ")
-    end
-
-    def retirement_message
-      "The #{relationship} [[#{antecedent_name}]] -> [[#{consequent_name}]] has been retired."
     end
   end
 

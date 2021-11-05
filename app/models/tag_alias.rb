@@ -6,6 +6,8 @@ class TagAlias < TagRelationship
 
   before_create :delete_conflicting_relationships
 
+  scope :empty, -> { joins(:consequent_tag).merge(Tag.empty) }
+
   def self.to_aliased(names)
     names = Array(names).map(&:to_s)
     return [] if names.empty?

@@ -15,6 +15,8 @@ class TagImplication < TagRelationship
   validate :meets_tag_size_requirements, on: :request
   validate :has_wiki_page, on: :request
 
+  scope :empty, -> { joins(:antecedent_tag).merge(Tag.empty) }
+
   concerning :HierarchyMethods do
     class_methods do
       def ancestors_of(names)
