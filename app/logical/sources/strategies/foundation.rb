@@ -4,6 +4,7 @@
 # Page URLs
 #
 # * https://foundation.app/@mochiiimo/~/97376
+# * https://foundation.app/@huwari/~/88982 (video)
 #
 # Profile URLs
 #
@@ -34,13 +35,17 @@ module Sources
 
       def image_urls
         return [url.gsub(/\?.*/, "")] if url =~ IMAGE_URL
-        page&.search("meta[property='og:image']").map do |img|
-          img["content"].gsub(/\?.*/, "")
+        image = page&.at(".fullscreen img, .fullscreen video")&.[](:src)&.gsub(/\?.*/, "")
+
+        if image =~ %r{assets\.foundation\.app/(?:\w+/)+(\w+)/nft_\w+\.(\w+)}i
+          image = "https://f8n-ipfs-production.imgix.net/#{$1}/nft.#{$2}"
         end
+
+        [image]
       end
 
       def preview_urls
-        image_urls.map { |img| "#{img}?fit=fill&max-h=600" }
+        [page&.at("meta[property='og:image']")&.[](:content)]
       end
 
       def page_url
