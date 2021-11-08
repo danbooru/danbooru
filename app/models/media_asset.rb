@@ -1,10 +1,19 @@
 class MediaAsset < ApplicationRecord
+  class Error < StandardError; end
+
   has_one :media_metadata, dependent: :destroy
   has_one :pixiv_ugoira_frame_data, class_name: "PixivUgoiraFrameData", foreign_key: :md5, primary_key: :md5
 
   delegate :metadata, to: :media_metadata
   delegate :is_non_repeating_animation?, :is_greyscale?, :is_rotated?, to: :metadata
 
+  # Processing: The asset's files are currently being resized and distributed to the backend servers.
+  # Active: The asset has been successfully uploaded and is ready to use.
+  # Deleted: The asset's files have been deleted by moving them to a trash folder. They can be undeleted
+  #          by moving them out of the trash folder. (Not implemented yet).
+  # Expunged: The asset's files have been permanently deleted.
+  # Failed: The asset failed to upload. The asset may be in a partially uploaded state, with some
+  #         files missing or incompletely transferred.
   enum status: {
     processing: 100,
     active: 200,
@@ -150,20 +159,25 @@ class MediaAsset < ApplicationRecord
 
         # XXX If the asset is still being processed by another thread, wait up
         # to 30 seconds for it to finish.
-        if media_asset.processing?
+        if media_asset.processing? && media_asset.created_at > 5.minutes.ago
           30.times do
             break if !media_asset.processing?
             sleep 1
             media_asset.reload
           end
+        end
 
-          # If the asset is still processing after 30 seconds, or if it moved
-          # from the processing state to the failed state, then fail.
-          raise "Upload failed" if !media_asset.active?
+        # If the asset is stuck in the processing state, or if a processing asset moved to the
+        # failed state, then mark the asset as failed so the user can try the upload again later.
+        if !media_asset.active?
+          media_asset.update!(status: :failed)
+          raise Error, "Upload failed, try again (upload was stuck in 'processing' state)"
         end
 
         media_asset
       rescue Exception
+        # If resizing or distributing the file to the backend servers failed, then mark the asset as
+        # failed so the user can try the upload again later.
         media_asset&.update!(status: :failed)
         raise
       end

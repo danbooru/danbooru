@@ -284,6 +284,20 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "when re-uploading a media asset stuck in the 'processing' state" do
+        should "mark the asset as failed" do
+          asset = create(:media_asset, file: File.open("test/files/test.jpg"), status: "processing")
+          file = Rack::Test::UploadedFile.new("test/files/test.jpg")
+
+          post_auth uploads_path, @user, params: { upload: { file: file, tag_string: "abc", rating: "e", }}
+          upload = Upload.last
+
+          assert_redirected_to upload
+          assert_match("MediaAsset::Error", upload.reload.status)
+          assert_equal("failed", asset.reload.status)
+        end
+      end
+
       context "uploading a file from your computer" do
         should_upload_successfully("test/files/test.jpg")
         should_upload_successfully("test/files/test.png")
