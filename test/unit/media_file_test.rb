@@ -177,6 +177,10 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(:webm, webm.file_ext)
       assert_equal([60, 60], webm.dimensions)
     end
+
+    should "get the metadata" do
+      assert_equal(9, @ugoira.metadata.count)
+    end
   end
 
   context "for an mp4 file " do
@@ -307,7 +311,7 @@ class MediaFileTest < ActiveSupport::TestCase
       @metadata = @file.metadata
 
       assert_equal(true, @file.is_corrupt?)
-      assert_equal("File format error", @metadata["ExifTool:Error"])
+      assert_equal("Unknown file type", @metadata["ExifTool:Error"])
       assert_equal("89a", @metadata["GIF:GIFVersion"])
       assert_equal(6, @metadata.count)
     end

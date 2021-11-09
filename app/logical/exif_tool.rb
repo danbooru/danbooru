@@ -5,11 +5,11 @@ class ExifTool
   extend Memoist
 
   # @see https://exiftool.org/exiftool_pod.html#OPTIONS
-  DEFAULT_OPTIONS = %q(
+  DEFAULT_OPTIONS = %w[
     -G1 -duplicates -unknown -struct --binary
-    -x 'System:*' -x ExifToolVersion -x FileType -x FileTypeExtension
+    -x System:* -x ExifToolVersion -x FileType -x FileTypeExtension
     -x MIMEType -x ImageWidth -x ImageHeight -x ImageSize -x MegaPixels
-  ).squish
+  ]
 
   attr_reader :file
 
@@ -22,10 +22,10 @@ class ExifTool
 
   # Get the file's metadata.
   #
-  # @param options [String] the options to pass to exiftool
+  # @param options [Array<String>] the options to pass to exiftool
   # @return [ExifTool::Metadata] the file's metadata
   def metadata(options: DEFAULT_OPTIONS)
-    output = %x(exiftool #{options} -json #{file.path.shellescape})
+    output = Sandbox.new.run("exiftool", *options, "-json", "-", stdin: file)
     json = JSON.parse(output).first
     json = json.except("SourceFile")
     ExifTool::Metadata.new(json.with_indifferent_access)
