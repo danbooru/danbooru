@@ -508,6 +508,7 @@ DEPENDENCIES
   ed25519
   factory_bot
   ffaker
+  ffi
   flamegraph
   google-cloud-bigquery
   google-cloud-storage
