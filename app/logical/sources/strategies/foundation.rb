@@ -6,15 +6,22 @@
 # * https://foundation.app/@mochiiimo/~/97376
 # * https://foundation.app/@huwari/~/88982 (video)
 #
+# Even if the username is wrong, the ID is still fetched correctly. Example:
+# * https://foundation.app/@asdasdasd/~/97376
+#
 # Profile URLs
 #
+# Profile urls seem to accept any character in them, even no character at all:
 # * https://foundation.app/@mochiiimo
+# * https://foundation.app/@ <- This seems to be a novelty account.
+#                               Probably not worth supporting it given its
+#                               uniqueness and chance for headaches
 
 module Sources
   module Strategies
     class Foundation < Base
       BASE_URL    = %r{\Ahttps?://(www\.)?foundation\.app}i
-      PROFILE_URL = %r{#{BASE_URL}/@(?<artist_name>\w+)}i
+      PROFILE_URL = %r{#{BASE_URL}/@(?<artist_name>[^/]+)/?}i
       PAGE_URL    = %r{#{PROFILE_URL}/~/(?<illust_id>\d+)}i
 
       IMAGE_HOST  = /f8n-ipfs-production\.imgix\.net/
