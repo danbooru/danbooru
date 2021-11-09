@@ -49,5 +49,17 @@ module Sources
         assert_nothing_raised { @image3.to_h }
       end
     end
+
+    context "non-alphanumeric usernames" do
+      should "still work" do
+        case1 = Sources::Strategies.find("https://foundation.app/@brandon.dalmer/~/6792")
+        case2 = Sources::Strategies.find("https://foundation.app/@~/~/6792")
+        image = "https://f8n-ipfs-production.imgix.net/QmVnpe39qodMjTe8v3fijPfB1tjwhT8hgobtgLPtsangqc/nft.png"
+        assert_nothing_raised { case1.to_h }
+        assert_nothing_raised { case2.to_h }
+        assert_equal(image, case1.image_url)
+        assert_equal(image, case2.image_url)
+      end
+    end
   end
 end
