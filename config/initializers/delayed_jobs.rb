@@ -8,7 +8,7 @@ class DelayedJobTimeoutPlugin < ::Delayed::Plugin
   end
 end
 
-Delayed::Worker.logger = Logger.new(STDOUT, level: :debug)
+Delayed::Worker.logger = Logger.new(STDERR, level: :debug)
 Delayed::Worker.default_queue_name = "default"
 Delayed::Worker.destroy_failed_jobs = false
 Delayed::Worker.plugins << DelayedJobTimeoutPlugin
