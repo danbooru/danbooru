@@ -55,6 +55,7 @@ gem "rack-timeout", require: "rack/timeout/base"
 gem "parallel"
 gem "pry-byebug"
 gem "pry-rails"
+gem "ffi"
 
 group :development do
   gem 'rubocop', require: false
