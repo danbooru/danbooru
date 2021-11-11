@@ -67,9 +67,6 @@ group :development do
   gem 'better_errors'
   gem 'binding_of_caller'
   gem 'benchmark-ips', require: "benchmark/ips"
-end
-
-group :development, :test do
   gem 'listen'
   gem 'solargraph'
 end
