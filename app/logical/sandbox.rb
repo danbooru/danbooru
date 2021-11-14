@@ -223,6 +223,7 @@ class Sandbox
     mount!("tmpfs", "/tmp", fstype: "tmpfs")
 
     ro.each do |path|
+      # XXX bug: submounts don't get mounted readonly.
       bind_mount!(path, File.join("/tmp", path), flags: %i[rdonly nodev nosuid])
     end
     rw.each do |path|
@@ -232,7 +233,7 @@ class Sandbox
     if process
       bind_mount!("/proc", "/tmp/proc")
     else
-      mount!("proc", "/tmp/proc", fstype: "proc")
+      mount!("proc", "/tmp/proc", fstype: "proc", flags: %i[rdonly])
     end
 
     if tmp
@@ -241,7 +242,7 @@ class Sandbox
       mount!("tmpfs", "/tmp/dev/shm", fstype: "tmpfs")
     end
 
-    remount!("/tmp", flags: %i[rdonly nodev nosuid])
+    remount!("/tmp", flags: %i[rdonly nodev nosuid noexec noatime])
     pivot_root!("/tmp")
   end
 
@@ -309,7 +310,8 @@ class Sandbox
   # Bind mount a directory to a new mountpoint. Bind mounting `/usr` to
   # `/tmp/usr` means `/tmp/usr` refers to the same directory as `/usr`.
   def bind_mount!(source, target, flags: [])
-    mount!(source, target, flags: [:bind, :rec, :private, *flags])
+    mount!(source, target, flags: [:bind, :rec, :private])
+    remount!(target, flags: [:bind, *flags])
   end
 
   # Change the root (`/`) directory to the given directory.
@@ -372,7 +374,9 @@ class Sandbox
       :rdonly,  0,
       :nosuid,  1,
       :nodev,   2,
+      :noexec,  3,
       :remount, 5,
+      :noatime, 10,
       :bind,    12,
       :rec,     14,
       :private, 18,
