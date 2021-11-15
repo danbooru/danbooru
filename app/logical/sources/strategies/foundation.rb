@@ -52,7 +52,9 @@ module Sources
       end
 
       def preview_urls
-        [page&.at("meta[property='og:image']")&.[](:content)]
+        previews = [page&.at("meta[property='og:image']")&.[](:content)].compact
+
+        previews.presence || image_urls
       end
 
       def page_url
