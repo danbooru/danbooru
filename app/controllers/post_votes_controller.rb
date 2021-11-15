@@ -8,6 +8,11 @@ class PostVotesController < ApplicationController
     respond_with(@post_votes)
   end
 
+  def show
+    @post_vote = authorize PostVote.find(params[:id])
+    respond_with(@post_vote)
+  end
+
   def create
     @post = Post.find(params[:post_id])
 

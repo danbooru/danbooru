@@ -34,7 +34,22 @@ class ForumPostVotesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "show action" do
+      should "show the vote to all users" do
+        @forum_post_vote = create(:forum_post_vote, forum_post: @forum_post)
+        get forum_post_vote_path(@forum_post_vote), as: :json
+        assert_response :success
+      end
+    end
+
     context "create action" do
+      should "work for a JSON response" do
+        post_auth forum_post_votes_path, @user, params: { forum_post_id: @forum_post.id, forum_post_vote: { score: 1 }}, as: :json
+
+        assert_response 201
+        assert_equal(1, @forum_post.votes.count)
+      end
+
       should "allow members to vote" do
         assert_difference("ForumPostVote.count", 1) do
           post_auth forum_post_votes_path(format: :js), @user, params: { forum_post_id: @forum_post.id, forum_post_vote: { score: 1 }}

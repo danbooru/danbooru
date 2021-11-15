@@ -8,6 +8,11 @@ class ForumPostVotesController < ApplicationController
     respond_with(@forum_post_votes)
   end
 
+  def show
+    @forum_post_vote = authorize ForumPostVote.find(params[:id])
+    respond_with(@forum_post_vote)
+  end
+
   def create
     @forum_post = ForumPost.find(params[:forum_post_id])
     @forum_post_vote = authorize ForumPostVote.new(creator: CurrentUser.user, forum_post: @forum_post, **permitted_attributes(ForumPostVote))

@@ -44,7 +44,35 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "show action" do
+      setup do
+        @post_vote = create(:post_vote, post: @post, user: @user)
+      end
+
+      should "show the vote to the voter" do
+        get_auth post_vote_path(@post_vote), @user, as: :json
+        assert_response :success
+      end
+
+      should "show the vote to admins" do
+        get_auth post_vote_path(@post_vote), create(:admin_user), as: :json
+        assert_response :success
+      end
+
+      should "not show the vote to other users" do
+        get_auth post_vote_path(@post_vote), create(:user), as: :json
+        assert_response 403
+      end
+    end
+
     context "create action" do
+      should "work for a JSON response" do
+        post_auth post_post_votes_path(post_id: @post.id), @user, params: { score: 1, format: "json" }
+
+        assert_response 201
+        assert_equal(1, @post.reload.score)
+      end
+
       should "not allow anonymous users to vote" do
         post post_post_votes_path(post_id: @post.id), params: { score: 1, format: "js" }
 

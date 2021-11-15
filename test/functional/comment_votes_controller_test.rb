@@ -53,10 +53,38 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "show action" do
+      setup do
+        @comment_vote = create(:comment_vote, comment: @comment, user: @user)
+      end
+
+      should "show the vote to the voter" do
+        get_auth comment_vote_path(@comment_vote), @user, as: :json
+        assert_response :success
+      end
+
+      should "show the vote to moderators" do
+        get_auth comment_vote_path(@comment_vote), create(:moderator_user), as: :json
+        assert_response :success
+      end
+
+      should "not show the vote to other users" do
+        get_auth comment_vote_path(@comment_vote), create(:user), as: :json
+        assert_response 403
+      end
+    end
+
     context "create action" do
       setup do
         @user = create(:user)
         @comment = create(:comment)
+      end
+
+      should "work for a JSON response" do
+        post_auth comment_comment_votes_path(comment_id: @comment.id), @user, params: { score: 1, format: "json" }
+
+        assert_response 201
+        assert_equal(1, @comment.reload.score)
       end
 
       should "not allow anonymous users to vote" do

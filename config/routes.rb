@@ -89,7 +89,7 @@ Rails.application.routes.draw do
       post :approve
     end
   end
-  resources :comment_votes, only: [:index, :destroy]
+  resources :comment_votes, only: [:index, :show, :destroy]
   resources :comments do
     resource :votes, controller: "comment_votes", only: [:create, :destroy], as: "comment_votes"
     collection do
@@ -134,7 +134,7 @@ Rails.application.routes.draw do
       get :search
     end
   end
-  resources :forum_post_votes, only: [:index, :create, :destroy]
+  resources :forum_post_votes, only: [:index, :show, :create, :destroy]
   resources :forum_topics do
     member do
       post :undelete
@@ -189,7 +189,7 @@ Rails.application.routes.draw do
   end
   resources :post_regenerations, :only => [:create]
   resources :post_replacements, :only => [:index, :new, :create, :update]
-  resources :post_votes, only: [:index]
+  resources :post_votes, only: [:index, :show]
 
   # XXX Use `only: []` to avoid redefining post routes defined at top of file.
   resources :posts, only: [] do

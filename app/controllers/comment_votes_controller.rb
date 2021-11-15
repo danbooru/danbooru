@@ -8,6 +8,11 @@ class CommentVotesController < ApplicationController
     respond_with(@comment_votes)
   end
 
+  def show
+    @comment_vote = authorize CommentVote.find(params[:id])
+    respond_with(@comment_vote)
+  end
+
   def create
     @comment = Comment.find(params[:comment_id])
 
