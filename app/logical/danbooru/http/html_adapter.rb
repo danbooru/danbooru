@@ -5,7 +5,8 @@ module Danbooru
       HTTP::MimeType.register_alias "text/html", :html
 
       def decode(str)
-        Nokogiri::HTML5(str, max_tree_depth: -1)
+        # XXX technically should use the charset from the http headers.
+        Nokogiri::HTML5.parse(str.force_encoding("utf-8"), max_tree_depth: -1)
       end
     end
   end
