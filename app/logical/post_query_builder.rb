@@ -37,7 +37,7 @@ class PostQueryBuilder
     flagger appealer upvote downvote fav ordfav favgroup ordfavgroup pool
     ordpool note comment commentary id rating source status filetype
     disapproved parent child search embedded md5 width height mpixels ratio
-    score favcount filesize date age order limit tagcount pixiv_id pixiv
+    score upvotes downvotes favcount filesize date age order limit tagcount pixiv_id pixiv
     unaliased exif duration
   ] + COUNT_METATAGS + COUNT_METATAG_SYNONYMS + CATEGORY_COUNT_METATAGS
 
@@ -45,6 +45,8 @@ class PostQueryBuilder
     id id_desc
     md5 md5_asc
     score score_asc
+    upvotes upvotes_asc
+    downvotes downvotes_asc
     favcount favcount_asc
     created_at created_at_asc
     change change_asc
@@ -138,6 +140,10 @@ class PostQueryBuilder
       attribute_matches(value, "ROUND(1.0 * posts.image_width / GREATEST(1, posts.image_height), 2)", :ratio)
     when "score"
       attribute_matches(value, :score)
+    when "upvotes"
+      attribute_matches(value, :up_score)
+    when "downvotes"
+      attribute_matches(value, "ABS(posts.down_score)")
     when "favcount"
       attribute_matches(value, :fav_count)
     when "filesize"
@@ -571,6 +577,19 @@ class PostQueryBuilder
 
     when "score_asc"
       relation = relation.order("posts.score ASC, posts.id ASC")
+
+    when "upvotes", "upvotes_desc"
+      relation = relation.order("posts.up_score DESC, posts.id DESC")
+
+    when "upvotes_asc"
+      relation = relation.order("posts.up_score ASC, posts.id ASC")
+
+    # XXX down_score is negative so order:downvotes sorts lowest-to-highest so that most downvoted is first.
+    when "downvotes", "downvotes_desc"
+      relation = relation.order("posts.down_score ASC, posts.id ASC")
+
+    when "downvotes_asc"
+      relation = relation.order("posts.down_score DESC, posts.id DESC")
 
     when "favcount"
       relation = relation.order("posts.fav_count DESC, posts.id DESC")

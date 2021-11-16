@@ -235,6 +235,30 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([posts[1]], "id:>#{posts[0].id} id:<#{posts[2].id}")
     end
 
+    should "return posts for the score:<N> metatag" do
+      post1 = create(:post, score: 5)
+      post2 = create(:post, score: 0)
+
+      assert_tag_match([post1], "score:5")
+      assert_tag_match([post2], "score:0")
+    end
+
+    should "return posts for the upvotes:<N> metatag" do
+      post1 = create(:post, up_score: 5)
+      post2 = create(:post, up_score: 0)
+
+      assert_tag_match([post1], "upvotes:5")
+      assert_tag_match([post2], "upvotes:0")
+    end
+
+    should "return posts for the downvotes:<N> metatag" do
+      post1 = create(:post, down_score: -5)
+      post2 = create(:post, down_score: 0)
+
+      assert_tag_match([post1], "downvotes:5")
+      assert_tag_match([post2], "downvotes:0")
+    end
+
     should "return posts for the fav:<name> metatag" do
       user1 = create(:user)
       user2 = create(:user)
@@ -1013,6 +1037,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         p = create(
           :post,
           score: n,
+          up_score: n,
+          down_score: -n,
           md5: n.to_s,
           fav_count: n,
           file_size: 1.megabyte * n,
@@ -1033,6 +1059,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match(posts.reverse, "order:id_desc")
       assert_tag_match(posts.reverse, "order:score")
+      assert_tag_match(posts.reverse, "order:upvotes")
+      assert_tag_match(posts.reverse, "order:downvotes")
       assert_tag_match(posts.reverse, "order:favcount")
       assert_tag_match(posts.reverse, "order:change")
       assert_tag_match(posts.reverse, "order:comment")
@@ -1058,6 +1086,8 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       assert_tag_match(posts, "order:id_asc")
       assert_tag_match(posts, "order:score_asc")
+      assert_tag_match(posts, "order:upvotes_asc")
+      assert_tag_match(posts, "order:downvotes_asc")
       assert_tag_match(posts, "order:favcount_asc")
       assert_tag_match(posts, "order:change_asc")
       assert_tag_match(posts, "order:comment_asc")
