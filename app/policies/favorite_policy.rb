@@ -1,6 +1,6 @@
 class FavoritePolicy < ApplicationPolicy
   def create?
-    !user.is_anonymous?
+    unbanned? && user.is_member?
   end
 
   def destroy?

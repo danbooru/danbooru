@@ -48,12 +48,21 @@ class FavoritesControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      should "allow banned users to create favorites" do
+      should "not allow banned users to create favorites" do
         @banned_user = create(:banned_user)
 
-        assert_difference [-> { @post.favorites.count }, -> { @post.reload.fav_count }, -> { @banned_user.reload.favorite_count }], 1 do
+        assert_difference [-> { @post.favorites.count }, -> { @post.reload.fav_count }, -> { @banned_user.reload.favorite_count }], 0 do
           post_auth favorites_path(post_id: @post.id), @banned_user, as: :javascript
-          assert_response :redirect
+          assert_response 403
+        end
+      end
+
+      should "not allow restricted users to create favorites" do
+        @restricted_user = create(:restricted_user)
+
+        assert_difference [-> { @post.favorites.count }, -> { @post.reload.fav_count }, -> { @restricted_user.reload.favorite_count }], 0 do
+          post_auth favorites_path(post_id: @post.id), @restricted_user, as: :javascript
+          assert_response 403
         end
       end
 

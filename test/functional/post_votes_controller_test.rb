@@ -185,11 +185,18 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
         assert_equal(0, @post.reload.score)
       end
 
-      should "not allow members to vote" do
-        post_auth post_post_votes_path(post_id: @post.id), create(:user), params: { score: 1, format: "js" }
+      should "not allow restricted users to vote" do
+        post_auth post_post_votes_path(post_id: @post.id), create(:restricted_user), params: { score: 1, format: "js"}
 
         assert_response 403
         assert_equal(0, @post.reload.score)
+      end
+
+      should "allow members to vote" do
+        post_auth post_post_votes_path(post_id: @post.id), create(:user), params: { score: 1, format: "js" }
+
+        assert_response :success
+        assert_equal(1, @post.reload.score)
       end
 
       should "not allow invalid scores" do

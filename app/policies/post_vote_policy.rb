@@ -1,6 +1,6 @@
 class PostVotePolicy < ApplicationPolicy
   def create?
-    unbanned? && user.is_gold?
+    unbanned? && user.is_member?
   end
 
   def destroy?
