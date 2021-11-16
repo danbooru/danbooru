@@ -152,6 +152,8 @@ class User < ApplicationRecord
   scope :admins, -> { where(level: Levels::ADMIN) }
 
   scope :has_blacklisted_tag, ->(name) { where_regex(:blacklisted_tags, "(^| )[~-]?#{Regexp.escape(name)}( |$)", flags: "ni") }
+  scope :has_private_favorites, -> { bit_prefs_match(:enable_private_favorites, true) }
+  scope :has_public_favorites,  -> { bit_prefs_match(:enable_private_favorites, false) }
 
   module BanMethods
     def unban!

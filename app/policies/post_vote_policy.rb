@@ -8,6 +8,16 @@ class PostVotePolicy < ApplicationPolicy
   end
 
   def show?
-    user.is_admin? || record.user == user
+    user.is_admin? || record.user == user || (record.is_positive? && !record.user.enable_private_favorites?)
+  end
+
+  def can_see_voter?
+    show?
+  end
+
+  def api_attributes
+    attributes = super
+    attributes -= [:user_id] unless can_see_voter?
+    attributes
   end
 end

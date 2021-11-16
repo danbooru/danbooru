@@ -24,8 +24,12 @@
         <div><%= time_ago_in_words_tagged(vote.post.created_at) %></div>
       <% end %>
       <% t.column "Voter" do |vote| %>
-        <%= link_to_user vote.user %>
-        <%= link_to "»", post_votes_path(search: { user_name: vote.user.name }) %>
+        <% if policy(vote).can_see_voter? %>
+          <%= link_to_user vote.user %>
+          <%= link_to "»", post_votes_path(search: { user_name: vote.user.name }) %>
+        <% else %>
+          <i>hidden</i>
+        <% end %>
         <div><%= time_ago_in_words_tagged(vote.created_at) %></div>
       <% end %>
       <% t.column column: "control" do |vote| %>

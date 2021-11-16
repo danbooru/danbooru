@@ -10,13 +10,15 @@ class PostVote < ApplicationRecord
 
   scope :positive, -> { where("post_votes.score > 0") }
   scope :negative, -> { where("post_votes.score < 0") }
+  scope :public_votes, -> { positive.where(user: User.has_public_favorites) }
 
   def self.visible(user)
-    user.is_admin? ? all : where(user: user)
+    user.is_admin? ? all : where(user: user).or(public_votes)
   end
 
   def self.search(params)
     q = search_attributes(params, :id, :created_at, :updated_at, :score, :user, :post)
+
     q.apply_default_order(params)
   end
 

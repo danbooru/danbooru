@@ -973,6 +973,75 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match(all - [e], "-rating:e")
     end
 
+    context "for the upvote:<user> metatag" do
+      setup do
+        @user = create(:user)
+        @upvote = create(:post_vote, user: @user, score: 1)
+        @downvote = create(:post_vote, user: @user, score: -1)
+      end
+
+      should "show public upvotes to all users" do
+        as(User.anonymous) do
+          assert_tag_match([@upvote.post], "upvote:#{@user.name}")
+          assert_tag_match([@downvote.post], "-upvote:#{@user.name}")
+        end
+      end
+
+      should "not show private upvotes to other users" do
+        @user.update!(enable_private_favorites: true)
+
+        as(User.anonymous) do
+          assert_tag_match([], "upvote:#{@user.name}")
+          assert_tag_match([@downvote.post, @upvote.post], "-upvote:#{@user.name}")
+        end
+      end
+
+      should "show private upvotes to admins" do
+        @user.update!(enable_private_favorites: true)
+
+        as(create(:admin_user)) do
+          assert_tag_match([@upvote.post], "upvote:#{@user.name}")
+          assert_tag_match([@downvote.post], "-upvote:#{@user.name}")
+        end
+      end
+
+      should "show private upvotes to the voter themselves" do
+        as(@user) do
+          assert_tag_match([@upvote.post], "upvote:#{@user.name}")
+          assert_tag_match([@downvote.post], "-upvote:#{@user.name}")
+        end
+      end
+    end
+
+    context "for the downvote:<user> metatag" do
+      setup do
+        @user = create(:user, enable_private_favorites: true)
+        @upvote = create(:post_vote, user: @user, score: 1)
+        @downvote = create(:post_vote, user: @user, score: -1)
+      end
+
+      should "not show downvotes to other users" do
+        as(User.anonymous) do
+          assert_tag_match([], "downvote:#{@user.name}")
+          assert_tag_match([@downvote.post, @upvote.post], "-downvote:#{@user.name}")
+        end
+      end
+
+      should "show downvotes to admins" do
+        as(create(:admin_user)) do
+          assert_tag_match([@downvote.post], "downvote:#{@user.name}")
+          assert_tag_match([@upvote.post], "-downvote:#{@user.name}")
+        end
+      end
+
+      should "show downvotes to the voter themselves" do
+        as(@user) do
+          assert_tag_match([@downvote.post], "downvote:#{@user.name}")
+          assert_tag_match([@upvote.post], "-downvote:#{@user.name}")
+        end
+      end
+    end
+
     should "return posts for a upvote:<user>, downvote:<user> metatag" do
       CurrentUser.scoped(create(:mod_user)) do
         upvoted   = create(:post, tag_string: "upvote:self")
