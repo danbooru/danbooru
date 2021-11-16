@@ -103,6 +103,7 @@ class User < ApplicationRecord
   validates :per_page, inclusion: { in: (1..PostSets::Post::MAX_PER_PAGE) }
   validates :password, confirmation: true
   validates :comment_threshold, inclusion: { in: (-100..5) }
+  validate  :validate_enable_private_favorites, on: :update
   before_validation :normalize_blacklisted_tags
   before_create :promote_to_owner_if_first_user
   has_many :artist_versions, foreign_key: :updater_id
@@ -189,6 +190,14 @@ class User < ApplicationRecord
 
     def pretty_name
       name.gsub(/([^_])_+(?=[^_])/, "\\1 \\2")
+    end
+  end
+
+  concerning :ValidationMethods do
+    def validate_enable_private_favorites
+      if enable_private_favorites_was == false && enable_private_favorites == true && !Pundit.policy!(self, self).can_enable_private_favorites?
+        errors.add(:base, "Can't enable privacy mode without a Gold account")
+      end
     end
   end
 
