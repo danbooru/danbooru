@@ -7,7 +7,9 @@
     <% end %>
   <% end %>
 
-  <span class="post-score"><%= post.score %></span>
+  <span class="post-score">
+    <%= link_to post.score, post_votes_path(search: { post_id: post.id }, variant: :compact) %>
+  </span>
 
   <% if can_vote? %>
     <% if downvoted? %>

@@ -40,7 +40,7 @@
   <% end %>
 </div>
 
-<div class="post-tooltip-body <%= "has-preview" if params[:preview].truthy? %>">
+<div class="post-tooltip-body thin-scrollbar <%= "has-preview" if params[:preview].truthy? %>">
   <div class="post-tooltip-body-left">
     <% if params[:preview].truthy? %>
       <%= post_preview(@post, show_deleted: true, compact: true) %>

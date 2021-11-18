@@ -1,0 +1,24 @@
+<%= render "posts/partials/common/secondary_links" %>
+
+<div id="c-post-votes">
+  <div id="a-index">
+    <%= render "search" %>
+
+    <%= table_for @post_votes, class: "striped autofit" do |t| %>
+      <% t.column "Score" do |vote| %>
+        <%= link_to sprintf("%+d", vote.score), post_votes_path(search: { score: vote.score }) %>
+      <% end %>
+
+      <% t.column "Voter" do |vote| %>
+        <%= link_to_user vote.user %>
+        <%= link_to "»", post_votes_path(search: { user_name: vote.user.name }) %>
+      <% end %>
+
+      <% t.column "Created" do |vote| %>
+        <%= time_ago_in_words_tagged(vote.created_at) %>
+      <% end %>
+    <% end %>
+
+    <%= numbered_paginator(@post_votes) %>
+  </div>
+</div>

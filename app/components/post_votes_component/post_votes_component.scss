@@ -6,5 +6,11 @@
     text-align: center;
     min-width: 1.25em;
     white-space: nowrap;
+    vertical-align: middle;
+
+    a {
+      color: var(--text-color);
+      &:hover { text-decoration: underline; }
+    }
   }
 }

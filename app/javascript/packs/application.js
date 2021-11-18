@@ -43,6 +43,7 @@ import PopupMenuComponent from "../../components/popup_menu_component/popup_menu
 import Post from "../src/javascripts/posts.js";
 import PostModeMenu from "../src/javascripts/post_mode_menu.js";
 import PostTooltip from "../src/javascripts/post_tooltips.js";
+import PostVotesTooltipComponent from "../../components/post_votes_tooltip_component/post_votes_tooltip_component.js";
 import RelatedTag from "../src/javascripts/related_tag.js";
 import Shortcuts from "../src/javascripts/shortcuts.js";
 import TagCounter from "../src/javascripts/tag_counter.js";
@@ -64,6 +65,7 @@ Danbooru.PopupMenuComponent = PopupMenuComponent;
 Danbooru.Post = Post;
 Danbooru.PostModeMenu = PostModeMenu;
 Danbooru.PostTooltip = PostTooltip;
+Danbooru.PostVotesTooltipComponent = PostVotesTooltipComponent;
 Danbooru.RelatedTag = RelatedTag;
 Danbooru.Shortcuts = Shortcuts;
 Danbooru.TagCounter = TagCounter;

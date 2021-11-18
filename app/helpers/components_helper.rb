@@ -20,6 +20,10 @@ module ComponentsHelper
     render PostVotesComponent.new(post: post, **options)
   end
 
+  def render_post_votes_tooltip(post, **options)
+    render PostVotesTooltipComponent.new(post: post, **options)
+  end
+
   def render_post_navbar(post, **options)
     render PostNavbarComponent.new(post: post, **options)
   end

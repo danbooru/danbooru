@@ -1,0 +1,16 @@
+.post-votes-tooltip {
+  font-size: var(--text-xs);
+  max-height: 240px;
+
+  .upvote-icon {
+    color: var(--post-upvote-color);
+  }
+
+  .downvote-icon {
+    color: var(--post-downvote-color);
+  }
+
+  .post-voter {
+    max-width: 160px;
+  }
+}

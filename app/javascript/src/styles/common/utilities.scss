@@ -22,6 +22,12 @@ $spacer: 0.25rem; /* 4px */
 .text-xs  { font-size: var(--text-xs); }
 .text-sm  { font-size: var(--text-sm); }
 
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .leading-none { line-height: 1; }
 
 .absolute { position: absolute; }
@@ -52,6 +58,9 @@ $spacer: 0.25rem; /* 4px */
 .p-0\.5 { padding: 0.5 * $spacer; }
 .p-4  { padding: 4 * $spacer; }
 
+.pr-2 { padding-right: 2 * $spacer; }
+.pr-4 { padding-right: 4 * $spacer; }
+
 .w-1\/4 { width: 25%; }
 .w-full { width: 100%; }
 
@@ -72,6 +81,60 @@ $spacer: 0.25rem; /* 4px */
 .flex-auto { flex: 1 1 auto; }
 .items-center { align-items: center; }
 .justify-center { justify-content: center; }
+
+.thin-scrollbar {
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 2 * $spacer;
+  overscroll-behavior: contain; // https://caniuse.com/css-overscroll-behavior
+
+  // Firefox only
+  // https://caniuse.com/?search=scrollbar-width
+  // https://developer.mozilla.org/en-US/docs/Web/CSS/scrollbar-width
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  &::-webkit-scrollbar-button {
+    width: 0;
+    height: 0;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--post-tooltip-scrollbar-background);
+    border: none;
+    border-radius: 0;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--post-tooltip-scrollbar-thumb-color);
+  }
+
+  &::-webkit-scrollbar-thumb:active {
+    background: var(--post-tooltip-scrollbar-thumb-color);
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--post-tooltip-scrollbar-track-background);
+    border: none;
+    border-radius: 0;
+  }
+
+  &::-webkit-scrollbar-track:hover {
+    background: var(--post-tooltip-scrollbar-track-background);
+  }
+
+  &::-webkit-scrollbar-track:active {
+    background: var(--post-tooltip-scrollbar-track-background);
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
 
 @media screen and (min-width: 660px) {
   .md\:inline-block { display: inline-block; }

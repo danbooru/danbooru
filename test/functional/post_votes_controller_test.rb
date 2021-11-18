@@ -10,12 +10,22 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
     context "index action" do
       setup do
         @user = create(:user, enable_private_favorites: true)
-        create(:post_vote, user: @user, score: 1)
-        create(:post_vote, user: @user, score: -1)
+        @upvote = create(:post_vote, user: @user, score: 1)
+        @downvote = create(:post_vote, user: @user, score: -1)
       end
 
       should "render" do
         get post_votes_path
+        assert_response :success
+      end
+
+      should "render for a compact view" do
+        get post_votes_path(variant: "compact")
+        assert_response :success
+      end
+
+      should "render for a tooltip" do
+        get post_votes_path(search: { post_id: @upvote.post_id }, variant: "tooltip")
         assert_response :success
       end
 
