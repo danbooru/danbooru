@@ -6,6 +6,9 @@
     <% if params[:random] %>
       <%= hidden_field_tag :random, params[:random] %>
     <% end %>
+    <% if params[:view] %>
+      <%= hidden_field_tag :view, params[:view] %>
+    <% end %>
     <%= text_field_tag("tags", tags, :id => tags_dom_id, :class => "flex-auto", :"data-shortcut" => "q", :"data-autocomplete" => "tag-query") %>
     <button id="search-box-submit" type="submit"><%= search_icon %></button>
   <% end %>

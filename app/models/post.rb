@@ -40,6 +40,7 @@ class Post < ApplicationRecord
   has_one :upload, :dependent => :destroy
   has_one :artist_commentary, :dependent => :destroy
   has_one :pixiv_ugoira_frame_data, class_name: "PixivUgoiraFrameData", foreign_key: :md5, primary_key: :md5
+  has_one :vote_by_current_user, -> { where(user_id: CurrentUser.id) }, class_name: "PostVote" # XXX using current user here is wrong
   has_many :flags, :class_name => "PostFlag", :dependent => :destroy
   has_many :appeals, :class_name => "PostAppeal", :dependent => :destroy
   has_many :votes, :class_name => "PostVote", :dependent => :destroy

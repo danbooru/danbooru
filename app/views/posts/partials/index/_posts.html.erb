@@ -3,7 +3,7 @@
     <% if post_set.shown_posts.empty? %>
       <%= render "post_sets/blank" %>
     <% else %>
-      <%= post_previews_html(post_set.posts, show_deleted: post_set.show_deleted?, show_cropped: true, tags: post_set.tag_string) %>
+      <%= post_previews_html(post_set.posts, show_deleted: post_set.show_deleted?, show_cropped: true, tags: post_set.tag_string, show_votes: post_set.show_votes?) %>
     <% end %>
   </div>
 

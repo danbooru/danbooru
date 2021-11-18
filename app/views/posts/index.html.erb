@@ -7,7 +7,7 @@
 
   <section id="tag-box">
     <h2>Tags</h2>
-    <%= render_search_tag_list(@post_set.related_tags, current_query: params[:tags], show_extra_links: policy(Post).show_extra_links?) %>
+    <%= render_search_tag_list(@post_set.related_tags, current_query: params[:tags], show_extra_links: policy(Post).show_extra_links?, search_params: { view: params[:view] }) %>
   </section>
 
   <%= render "posts/partials/index/options" %>
@@ -16,7 +16,7 @@
 <% end %>
 
 <% content_for(:content) do %>
-  <menu id="post-sections" class="mb-4">
+  <menu id="post-sections" class="mb-4 space-x-2">
     <li class="active"><a href="#" id="show-posts-link">Posts</a></li>
 
     <% if @post_set.artist.present? %>
@@ -30,6 +30,18 @@
     <% elsif @post_set.has_blank_wiki? %>
       <li class="blank-wiki-excerpt-link"><%= link_to "Wiki", new_wiki_page_path(wiki_page: { title: @post_set.tag.name }), id: "show-excerpt-link" %></li>
     <% end %>
+
+    <li class="float-right">
+      <%= render PopupMenuComponent.new do |menu| %>
+        <% menu.item do %>
+          <% if params[:view] == "score" %>
+            <%= link_to "Hide scores", posts_path(tags: params[:tags], view: nil) %>
+          <% else %>
+            <%= link_to "Show scores", posts_path(tags: params[:tags], view: "score") %>
+          <% end %>
+        <% end %>
+      <% end %>
+    </li>
 
     <li id="searchbox-redirect-link" class="mobile-only"><a href="#search-box">Search &raquo;</a></li>
   </menu>

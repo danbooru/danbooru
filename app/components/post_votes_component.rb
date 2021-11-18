@@ -15,7 +15,7 @@ class PostVotesComponent < ApplicationComponent
   end
 
   def current_vote
-    post.votes.find_by(user: current_user)
+    post.vote_by_current_user
   end
 
   def upvoted?

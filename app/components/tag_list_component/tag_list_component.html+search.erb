@@ -11,11 +11,11 @@
       <% end %>
 
       <% if show_extra_links && current_query.present? %>
-        <%= link_to "+", posts_path(tags: "#{current_query} #{t.name}"), class: "search-inc-tag" %>
-        <%= link_to "-", posts_path(tags: "#{current_query} -#{t.name}"), class: "search-exl-tag" %>
+        <%= link_to "+", posts_path(tags: "#{current_query} #{t.name}", **search_params), class: "search-inc-tag" %>
+        <%= link_to "-", posts_path(tags: "#{current_query} -#{t.name}", **search_params), class: "search-exl-tag" %>
       <% end %>
 
-      <%= link_to t.pretty_name, posts_path(tags: t.name), class: "search-tag" %>
+      <%= link_to t.pretty_name, posts_path(tags: t.name, **search_params), class: "search-tag" %>
       <%= tag.span humanized_number(t.post_count), class: "post-count", title: t.post_count %>
     </li>
   <% end %>
