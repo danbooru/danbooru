@@ -10,6 +10,7 @@ class FavoriteGroup < ApplicationRecord
   validate :creator_can_create_favorite_groups, :on => :create
   validate :validate_number_of_posts
   validate :validate_posts
+  validate :validate_can_enable_privacy
 
   array_attribute :post_ids, parse: /\d+/, cast: :to_i
 
@@ -83,6 +84,12 @@ class FavoriteGroup < ApplicationRecord
     end
   end
 
+  def validate_can_enable_privacy
+    if is_public_change == [true, false] && !Pundit.policy!(creator, self).can_enable_privacy?
+      errors.add(:base, "Can't enable privacy without a Gold account")
+    end
+  end
+
   def self.normalize_name(name)
     name.gsub(/[[:space:]]+/, "_")
   end
@@ -112,7 +119,7 @@ class FavoriteGroup < ApplicationRecord
   end
 
   def pretty_name
-    name.tr("_", " ")
+    name&.tr("_", " ")
   end
 
   def posts
@@ -164,6 +171,18 @@ class FavoriteGroup < ApplicationRecord
 
   def contains?(post_id)
     post_ids.include?(post_id)
+  end
+
+  def is_private=(value)
+    self.is_public = !ActiveModel::Type::Boolean.new.cast(value)
+  end
+
+  def is_private
+    !is_public?
+  end
+
+  def is_private?
+    !is_public?
   end
 
   def self.available_includes
