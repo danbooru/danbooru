@@ -43,6 +43,8 @@ class FavoriteGroup < ApplicationRecord
         q = q.order(name: :asc, id: :desc)
       when "created_at"
         q = q.order(id: :desc)
+      when "updated_at"
+        q = q.order(updated_at: :desc)
       when "post_count"
         q = q.order(Arel.sql("cardinality(post_ids) desc")).order(id: :desc)
       else
