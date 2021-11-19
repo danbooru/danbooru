@@ -9,7 +9,7 @@
   <tbody>
     <% @dashboard.posts.each do |activity| %>
       <tr>
-        <td><%= mod_link_to_user(activity.user, :positive) %></td>
+        <td><%= link_to_user(activity.user) %></td>
         <td><%= link_to activity.count, posts_path(:tags => "user:#{activity.user.name}") %></td>
       </tr>
     <% end %>
