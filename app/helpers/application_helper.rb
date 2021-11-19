@@ -206,25 +206,6 @@ module ApplicationHelper
     link_to(text, user, class: user_class, data: data)
   end
 
-  def mod_link_to_user(user, positive_or_negative)
-    html = ""
-    html << link_to_user(user)
-
-    if CurrentUser.is_gold? && user != CurrentUser.user
-      if positive_or_negative == :positive
-        html << " [" + link_to("+", new_user_feedback_path(:user_feedback => {:category => "positive", :user_id => user.id})) + "]"
-
-        if CurrentUser.is_moderator? && !user.is_builder?
-          html << " [" + link_to("promote", edit_admin_user_path(user)) + "]"
-        end
-      else
-        html << " [" + link_to("&ndash;".html_safe, new_user_feedback_path(:user_feedback => {:category => "negative", :user_id => user.id})) + "]"
-      end
-    end
-
-    html.html_safe
-  end
-
   def embed_wiki(title, **options)
     wiki = WikiPage.find_by(title: title)
     text = format_text(wiki&.body)
