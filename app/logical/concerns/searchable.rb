@@ -397,7 +397,12 @@ module Searchable
 
     model = association.klass
     if model == User && params["#{attr}_name"].present?
-      relation = relation.where(attr => User.search(name_matches: params["#{attr}_name"]).reorder(nil))
+      name = params["#{attr}_name"]
+      if name.include?("*")
+        relation = relation.where(attr => User.search(name_matches: name).reorder(nil))
+      else
+        relation = relation.where(attr => User.find_by_name(name))
+      end
     end
 
     if model == Post && params["#{attr}_tags_match"].present?
