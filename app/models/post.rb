@@ -548,9 +548,11 @@ class Post < ApplicationRecord
           pool&.add!(self)
 
         when /^fav:(.+)$/i
+          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, Favorite).create?
           Favorite.create(post: self, user: CurrentUser.user)
 
         when /^-fav:(.+)$/i
+          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, Favorite).create?
           Favorite.destroy_by(post: self, user: CurrentUser.user)
 
         when /^(up|down)vote:(.+)$/i

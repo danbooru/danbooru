@@ -35,9 +35,9 @@
       <%= render PopupMenuComponent.new do |menu| %>
         <% menu.item do %>
           <% if params[:view] == "score" %>
-            <%= link_to "Hide scores", posts_path(tags: params[:tags], view: nil) %>
+            <%= link_to "Hide scores", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], view: nil), rel: "nofollow" %>
           <% else %>
-            <%= link_to "Show scores", posts_path(tags: params[:tags], view: "score") %>
+            <%= link_to "Show scores", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], view: "score"), rel: "nofollow" %>
           <% end %>
         <% end %>
       <% end %>

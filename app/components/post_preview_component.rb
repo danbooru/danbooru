@@ -9,7 +9,7 @@ class PostPreviewComponent < ApplicationComponent
   delegate :image_width, :image_height, :file_ext, :file_size, :duration, :is_animated?, to: :media_asset
   delegate :media_asset, to: :post
 
-  def initialize(post:, tags: "", show_deleted: false, show_cropped: true, show_votes: true, link_target: post, pool: nil, similarity: nil, recommended: nil, compact: nil, size: nil, current_user: CurrentUser.user, **options)
+  def initialize(post:, tags: "", show_deleted: false, show_cropped: true, show_votes: false, link_target: post, pool: nil, similarity: nil, recommended: nil, compact: nil, size: nil, current_user: CurrentUser.user, **options)
     super
     @post = post
     @tags = tags.presence

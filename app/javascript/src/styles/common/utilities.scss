@@ -28,6 +28,8 @@ $spacer: 0.25rem; /* 4px */
   white-space: nowrap;
 }
 
+.whitespace-nowrap { white-space: nowrap; }
+
 .leading-none { line-height: 1; }
 
 .absolute { position: absolute; }
@@ -45,6 +47,7 @@ $spacer: 0.25rem; /* 4px */
 .mx-0\.5 { margin-left: 0.5 * $spacer; margin-right: 0.5 * $spacer; }
 .mx-2    { margin-left: 2   * $spacer; margin-right: 2   * $spacer; }
 
+.mt-1  { margin-top: 1 * $spacer; }
 .mt-2  { margin-top: 2 * $spacer; }
 .mt-4  { margin-top: 4 * $spacer; }
 .mt-8  { margin-top: 8 * $spacer; }

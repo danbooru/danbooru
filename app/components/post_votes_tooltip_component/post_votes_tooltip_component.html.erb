@@ -1,6 +1,6 @@
 <div class="post-votes-tooltip thin-scrollbar">
-  <div class="text-center text-muted">
-    +<%= post.up_score %> / <%= post.down_score %> <%= upvote_ratio %>
+  <div class="text-center text-muted whitespace-nowrap">
+    +<%= post.up_score %> / -<%= post.down_score.abs %> <%= upvote_ratio %>
   </div>
 
   <div class="post-voters">

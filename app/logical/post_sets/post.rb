@@ -115,6 +115,7 @@ module PostSets
 
     def hide_from_crawler?
       return true if current_page > 50
+      return true if show_votes?
       return true if artist.present? && artist.is_banned?
       return false if query.is_empty_search? || query.is_simple_tag? || query.is_metatag?(:order, :rank)
       true

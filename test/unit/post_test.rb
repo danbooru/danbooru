@@ -699,10 +699,34 @@ class PostTest < ActiveSupport::TestCase
         context "for a fav" do
           should "add/remove the current user to the post's favorite listing" do
             @post.update(tag_string: "aaa fav:self")
+            assert_equal(1, @post.reload.score)
             assert_equal(1, @post.favorites.where(user: @user).count)
+            assert_equal(1, @post.votes.positive.where(user: @user).count)
 
             @post.update(tag_string: "aaa -fav:self")
+            assert_equal(0, @post.reload.score)
             assert_equal(0, @post.favorites.count)
+            assert_equal(0, @post.votes.positive.where(user: @user).count)
+          end
+
+          should "not allow banned users to fav" do
+            assert_raises(User::PrivilegeError) do
+              as(create(:banned_user)) { @post.update(tag_string: "aaa fav:self") }
+            end
+
+            assert_raises(User::PrivilegeError) do
+              as(create(:banned_user)) { @post.update(tag_string: "aaa -fav:self") }
+            end
+          end
+
+          should "not allow restricted users to fav" do
+            assert_raises(User::PrivilegeError) do
+              as(create(:restricted_user)) { @post.update(tag_string: "aaa fav:self") }
+            end
+
+            assert_raises(User::PrivilegeError) do
+              as(create(:restricted_user)) { @post.update(tag_string: "aaa -fav:self") }
+            end
           end
 
           should "not fail when the fav: metatag is used twice" do
@@ -870,20 +894,20 @@ class PostTest < ActiveSupport::TestCase
 
           context "upvote:self or downvote:self" do
             context "by a member" do
-              should "not upvote the post" do
-                assert_no_difference("PostVote.count") do
+              should "upvote the post" do
+                assert_difference("PostVote.count") do
                   @post.update(tag_string: "upvote:self")
                 end
 
-                assert_equal(0, @post.reload.score)
+                assert_equal(1, @post.reload.score)
               end
 
-              should "not downvote the post" do
-                assert_no_difference("PostVote.count") do
+              should "downvote the post" do
+                assert_difference("PostVote.count") do
                   @post.update(tag_string: "downvote:self")
                 end
 
-                assert_equal(0, @post.reload.score)
+                assert_equal(-1, @post.reload.score)
               end
             end
 
@@ -1476,7 +1500,8 @@ class PostTest < ActiveSupport::TestCase
 
       should "create a vote for each user who can vote" do
         assert(@parent.votes.where(user: @gold1).exists?)
-        assert_equal(1, @parent.score)
+        assert(@parent.votes.where(user: @user1).exists?)
+        assert_equal(2, @parent.score)
       end
     end
   end
@@ -1523,13 +1548,13 @@ class PostTest < ActiveSupport::TestCase
   end
 
   context "Voting:" do
-    should "not allow members to vote" do
+    should "allow members to vote" do
       user = create(:user)
       post = create(:post)
 
       assert_nothing_raised { post.vote!(1, user) }
-      assert_equal(0, post.votes.count)
-      assert_equal(0, post.reload.score)
+      assert_equal(1, post.votes.count)
+      assert_equal(1, post.reload.score)
     end
 
     should "not allow duplicate votes" do

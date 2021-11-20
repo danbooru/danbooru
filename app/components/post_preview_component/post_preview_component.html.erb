@@ -55,8 +55,8 @@
       <% end %>
     </p>
   <% elsif show_votes -%>
-    <p class="desc">
+    <div class="post-preview-score text-sm mt-1">
       <%= render_post_votes post, current_user: current_user %>
-    </p>
+    </div>
   <% end -%>
 <% end -%>

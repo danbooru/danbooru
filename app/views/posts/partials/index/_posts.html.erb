@@ -1,5 +1,5 @@
-<div id="posts" class="user-disable-cropped-<%= CurrentUser.user.disable_cropped_thumbnails? %>">
-  <div id="posts-container">
+<div id="posts">
+  <div class="posts-container user-disable-cropped-<%= CurrentUser.user.disable_cropped_thumbnails? %>">
     <% if post_set.shown_posts.empty? %>
       <%= render "post_sets/blank" %>
     <% else %>

@@ -41,11 +41,13 @@
     }
   }
 
-  #posts #posts-container {
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: flex-start;
+  .posts-container {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.25rem;
+
+    &.user-disable-cropped-false article.post-preview img.has-cropped-true {
+      object-fit: none;
+    }
   }
 }

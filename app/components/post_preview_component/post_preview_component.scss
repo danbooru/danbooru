@@ -1,12 +1,10 @@
 @import "../../javascript/src/styles/base/000_vars.scss";
 
 article.post-preview {
-  width: 154px;
-  margin: 0 10px 10px 0;
   text-align: center;
   display: inline-block;
   position: relative;
-  vertical-align: top;
+  overflow: hidden;
 
   a {
     display: inline-block;
@@ -119,38 +117,16 @@ body[data-current-user-can-approve-posts="true"] .post-preview {
   }
 }
 
-@media screen and (max-width: 660px) {
+@media screen and (min-width: 660px) {
   article.post-preview {
-    margin: 0;
-    text-align: center;
-    vertical-align: middle;
-    display: inline-block;
-
-    a {
-      margin: 0 auto;
-    }
-
-    img {
-      max-width: 33.3vw;
-      max-height: 33.3vw;
-      border: none !important;
-    }
+    width: 154px;
+    margin: 0 10px 10px 0;
+    vertical-align: top;
   }
+}
 
-  .user-disable-cropped-false {
-    article.post-preview {
-      width: 33.3%;
-      height: 33.3vw;
-      overflow: hidden;
-    }
-
-    img {
-      width: 33.3vw;
-      height: 33.3vw;
-
-      &.has-cropped-false {
-        object-fit: cover;
-      }
-    }
+@media screen and (max-width: 660px) {
+  article.post-preview img {
+    border: none !important;
   }
 }

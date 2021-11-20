@@ -390,7 +390,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       favgroup1 = create(:favorite_group, creator: CurrentUser.user, post_ids: [post1.id])
       favgroup2 = create(:favorite_group, creator: CurrentUser.user, post_ids: [post2.id])
-      favgroup3 = create(:favorite_group, creator: create(:user), post_ids: [post3.id], is_public: false)
+      favgroup3 = create(:private_favorite_group, post_ids: [post3.id])
 
       assert_tag_match([post1], "favgroup:#{favgroup1.id}")
       assert_tag_match([post2], "favgroup:#{favgroup2.name}")
@@ -421,7 +421,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post3 = create(:post)
 
       favgroup1 = create(:favorite_group, creator: CurrentUser.user, post_ids: [post1.id, post2.id])
-      favgroup2 = create(:favorite_group, creator: create(:user), post_ids: [post2.id, post3.id], is_public: false)
+      favgroup2 = create(:private_favorite_group, post_ids: [post2.id, post3.id])
 
       assert_tag_match([post1, post2], "ordfavgroup:#{favgroup1.id}")
       assert_tag_match([post1, post2], "ordfavgroup:#{favgroup1.name}")
@@ -975,7 +975,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
     context "for the upvote:<user> metatag" do
       setup do
-        @user = create(:user)
+        @user = create(:gold_user)
         @upvote = create(:post_vote, user: @user, score: 1)
         @downvote = create(:post_vote, user: @user, score: -1)
       end
@@ -1411,8 +1411,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       end
 
       should "return the correct favorite count for a fav:<name> search for a user with private favorites" do
-        fav = create(:favorite)
-        fav.user.update!(favorite_count: 1, enable_private_favorites: true)
+        fav = create(:private_favorite)
 
         assert_fast_count(0, "fav:#{fav.user.name}")
         assert_fast_count(0, "ordfav:#{fav.user.name}")
