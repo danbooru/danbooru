@@ -1,0 +1,44 @@
+<div id="c-favorites">
+  <div id="a-index">
+    <% if @post %>
+      <h1><%= link_to "Favorites", favorites_path %>/<%= link_to @post.dtext_shortlink, @post %></h1>
+    <% elsif @user %>
+      <h1><%= link_to "Favorites", favorites_path %>/<%= link_to_user @user %></h1>
+    <% else %>
+      <h1><%= link_to "Favorites", favorites_path %></h1>
+    <% end %>
+
+    <%= render "search" %>
+
+    <%= table_for @favorites.includes(:user, post: [:uploader, :media_asset]), class: "striped autofit" do |t| %>
+      <% if @post.nil? %>
+        <% t.column "Post" do |favorite| %>
+          <%= post_preview(favorite.post, show_deleted: true) %>
+        <% end %>
+
+        <% t.column "Tags", td: {class: "col-expand"} do |favorite| %>
+          <%= render_inline_tag_list(favorite.post) %>
+        <% end %>
+
+        <% t.column "Uploader" do |favorite| %>
+          <%= link_to_user favorite.post.uploader %>
+          <%= link_to "»", favorites_path(search: { post_tags_match: "user:#{favorite.post.uploader.name}" }) %>
+          <div><%= time_ago_in_words_tagged(favorite.post.created_at) %></div>
+        <% end %>
+      <% end %>
+
+      <% if @user.nil? %>
+        <% t.column "Favoriter" do |favorite| %>
+          <% if policy(favorite).can_see_favoriter? %>
+            <%= link_to_user favorite.user %>
+            <%= link_to "»", favorites_path(search: { user_name: favorite.user.name }) %>
+          <% else %>
+            <i>hidden</i>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <%= numbered_paginator(@favorites) %>
+  </div>
+</div>

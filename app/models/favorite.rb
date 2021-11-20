@@ -6,10 +6,16 @@ class Favorite < ApplicationRecord
   after_create :upvote_post_on_create
   after_destroy :unvote_post_on_destroy
 
-  scope :public_favorites, -> { where(user: User.bit_prefs_match(:enable_private_favorites, false)) }
+  scope :public_favorites, -> { where(user: User.has_public_favorites) }
 
   def self.visible(user)
-    user.is_admin? ? all : where(user: user).or(public_favorites)
+    if user.is_admin?
+      all
+    elsif user.is_anonymous?
+      public_favorites
+    else
+      where(user: user).or(public_favorites)
+    end
   end
 
   def self.search(params)

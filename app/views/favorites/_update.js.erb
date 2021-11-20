@@ -4,19 +4,8 @@
   $("#add-to-favorites, #add-fav-button, #remove-from-favorites, #remove-fav-button").toggle();
   $("#remove-fav-button").addClass("animate");
   $("span.post-votes[data-id=<%= @post.id %>]").replaceWith("<%= j render_post_votes @post, current_user: CurrentUser.user %>");
-  $("#favcount-for-post-<%= @post.id %>").text(<%= @post.fav_count %>);
+  $("span.post-favcount[data-id=<%= @post.id %>]").html("<%= j link_to @post.fav_count, favorites_path(post_id: @post.id, variant: :compact) %>");
   $(".fav-buttons").toggleClass("fav-buttons-false").toggleClass("fav-buttons-true");
-
-  <% if policy(@post).can_view_favlist? %>
-    var fav_count = <%= @post.fav_count %>;
-    $("#favlist").html("<%= j render "posts/partials/show/favorite_list", post: @post %>");
-
-    if (fav_count === 0) {
-      $("#show-favlist-link, #hide-favlist-link, #favlist").hide();
-    } else if (!$("#favlist").is(":visible")) {
-      $("#show-favlist-link").show();
-    }
-  <% end %>
 
   Danbooru.Utility.notice("<%= j flash[:notice] %>");
 <% end %>

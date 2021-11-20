@@ -1,0 +1,13 @@
+.favorites-tooltip {
+  font-size: var(--text-xs);
+  max-height: 240px;
+
+  .post-favoriter {
+    max-width: 160px;
+  }
+}
+
+span.post-favcount a {
+  color: var(--text-color);
+  &:hover { text-decoration: underline; }
+}

@@ -50,7 +50,6 @@ class Post < ApplicationRecord
   has_many :approvals, :class_name => "PostApproval", :dependent => :destroy
   has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
   has_many :favorites, dependent: :destroy
-  has_many :favorited_users, through: :favorites, source: :user
   has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
 
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning
@@ -665,13 +664,6 @@ class Post < ApplicationRecord
     def favorited_by?(user)
       return false if user.is_anonymous?
       Favorite.exists?(post: self, user: user)
-    end
-
-    # Users who publicly favorited this post, ordered by time of favorite.
-    def visible_favorited_users(viewer)
-      favorited_users.order("favorites.id DESC").select do |fav_user|
-        Pundit.policy!(viewer, fav_user).can_see_favorites?
-      end
     end
 
     def favorite_groups

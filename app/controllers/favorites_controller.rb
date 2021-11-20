@@ -1,19 +1,16 @@
 class FavoritesController < ApplicationController
-  respond_to :html, :xml, :json, :js
+  respond_to :js, :json, :html, :xml
 
   def index
-    authorize Favorite
-    if !request.format.html?
-      @favorites = Favorite.visible(CurrentUser.user).paginated_search(params)
-      respond_with(@favorites)
-    elsif params[:user_id].present?
-      user = User.find(params[:user_id])
-      redirect_to posts_path(tags: "ordfav:#{user.name}", format: request.format.symbol)
-    elsif !CurrentUser.is_anonymous?
-      redirect_to posts_path(tags: "ordfav:#{CurrentUser.user.name}", format: request.format.symbol)
-    else
-      redirect_to posts_path(format: request.format.symbol)
-    end
+    post_id = params[:post_id] || params[:search][:post_id]
+    user_id = params[:user_id] || params[:search][:user_id]
+    user_name = params[:search][:user_name]
+    @post = Post.find(post_id) if post_id
+    @user = User.find(user_id) if user_id
+    @user = User.find_by_name(user_name) if user_name
+
+    @favorites = authorize Favorite.visible(CurrentUser.user).paginated_search(params, defaults: { post_id: @post&.id, user_id: @user&.id })
+    respond_with(@favorites)
   end
 
   def create

@@ -1,0 +1,9 @@
+<div class="favorites-tooltip thin-scrollbar">
+  <div class="post-favoriters">
+    <% favorites.each do |favorite| %>
+      <div class="post-favoriter truncate">
+        <%= favoriter_name(favorite) %>
+      </div>
+    <% end %>
+  </div>
+</div>
