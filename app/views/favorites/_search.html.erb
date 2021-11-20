@@ -1,0 +1,6 @@
+<%= search_form_for(favorites_path) do |f| %>
+  <%= f.input :user_name, label: "Favoriter", input_html: { value: @user&.name, "data-autocomplete": "user" } %>
+  <%= f.input :post_id, label: "Post", input_html: { value: @post&.id } %>
+  <%= f.input :post_tags_match, label: "Tags", input_html: { value: params[:search][:post_tags_match], "data-autocomplete": "tag-query" } %>
+  <%= f.submit "Search" %>
+<% end %>

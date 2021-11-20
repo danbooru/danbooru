@@ -10,23 +10,33 @@ class FavoritesControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "index action" do
-      should "redirect the user_id param to an ordfav: search" do
-        get favorites_path(user_id: @user.id)
-        assert_redirected_to posts_path(tags: "ordfav:#{@user.name}", format: "html")
-      end
-
-      should "redirect members to an ordfav: search" do
-        get_auth favorites_path, @user
-        assert_redirected_to posts_path(tags: "ordfav:#{@user.name}", format: "html")
-      end
-
-      should "redirect anonymous users to the posts index" do
-        get favorites_path
-        assert_redirected_to posts_path(format: "html")
-      end
-
       should "render for json" do
         get favorites_path, as: :json
+        assert_response :success
+      end
+
+      should "render for html" do
+        get favorites_path
+        assert_response :success
+      end
+
+      should "render for /favorites?variant=tooltip" do
+        get post_favorites_path(@post, variant: "tooltip")
+        assert_response :success
+      end
+
+      should "render for /users/:id/favorites" do
+        get user_favorites_path(@user)
+        assert_response :success
+      end
+
+      should "render for /posts/:id/favorites" do
+        get post_favorites_path(@faved_post)
+        assert_response :success
+      end
+
+      should "render for /favorites?search[user_name]=<name>" do
+        get favorites_path(search: { user_name: @user.name })
         assert_response :success
       end
     end
@@ -48,12 +58,21 @@ class FavoritesControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      should "allow banned users to create favorites" do
+      should "not allow banned users to create favorites" do
         @banned_user = create(:banned_user)
 
-        assert_difference [-> { @post.favorites.count }, -> { @post.reload.fav_count }, -> { @banned_user.reload.favorite_count }], 1 do
+        assert_difference [-> { @post.favorites.count }, -> { @post.reload.fav_count }, -> { @banned_user.reload.favorite_count }], 0 do
           post_auth favorites_path(post_id: @post.id), @banned_user, as: :javascript
-          assert_response :redirect
+          assert_response 403
+        end
+      end
+
+      should "not allow restricted users to create favorites" do
+        @restricted_user = create(:restricted_user)
+
+        assert_difference [-> { @post.favorites.count }, -> { @post.reload.fav_count }, -> { @restricted_user.reload.favorite_count }], 0 do
+          post_auth favorites_path(post_id: @post.id), @restricted_user, as: :javascript
+          assert_response 403
         end
       end
 

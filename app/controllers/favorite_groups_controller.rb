@@ -19,7 +19,7 @@ class FavoriteGroupsController < ApplicationController
   end
 
   def new
-    @favorite_group = authorize FavoriteGroup.new
+    @favorite_group = authorize FavoriteGroup.new(creator: CurrentUser.user)
     respond_with(@favorite_group)
   end
 

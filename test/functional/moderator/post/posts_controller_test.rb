@@ -43,8 +43,8 @@ module Moderator
             @parent.reload
             @child.reload
             as(@admin) do
-              assert_equal(users.map(&:id).sort, @parent.favorited_users.map(&:id).sort)
-              assert_equal([], @child.favorited_users.map(&:id))
+              assert_equal(users.map(&:id).sort, @parent.favorites.map(&:user_id).sort)
+              assert_equal([], @child.favorites.map(&:user_id))
             end
           end
         end

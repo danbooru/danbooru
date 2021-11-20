@@ -31,6 +31,10 @@ class UserPolicy < ApplicationPolicy
     user.is_admin? || record.id == user.id || !record.enable_private_favorites?
   end
 
+  def can_enable_private_favorites?
+    user.is_gold?
+  end
+
   def permitted_attributes_for_create
     [:name, :password, :password_confirmation, { email_address_attributes: [:address] }]
   end

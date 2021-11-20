@@ -15,7 +15,11 @@ class FavoriteGroupPolicy < ApplicationPolicy
     update?
   end
 
+  def can_enable_privacy?
+    record.creator.is_gold?
+  end
+
   def permitted_attributes
-    [:name, :post_ids_string, :is_public, :post_ids, { post_ids: [] }]
+    [:name, :post_ids_string, :is_public, :is_private, :post_ids, { post_ids: [] }]
   end
 end

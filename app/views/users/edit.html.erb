@@ -63,7 +63,13 @@
         <%= f.input :hide_deleted_posts, :as => :select, :label => "Deleted post filter", :hint => "Remove deleted posts from search results", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
         <%= f.input :show_deleted_children, :as => :select, :label => "Show deleted children", :hint => "Show thumbnail borders on parent posts even if the children are deleted", :include_blank => false, :collection => [["Yes", "true"], ["No", "false"]] %>
         <%= f.input :disable_categorized_saved_searches, :hint => "Don't show dialog box when creating a new saved search", :as => :select, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
-        <%= f.input :enable_private_favorites, :as => :select, :hint => "Make your favorites private", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
+        <% if policy(@user).can_enable_private_favorites? %>
+          <%= f.input :enable_private_favorites, label: "Private favorites and votes", as: :select, hint: "Make your favorites and upvotes private", collection: { "No" => false, "Yes" => true }, include_blank: false %>
+        <% elsif @user.enable_private_favorites? %>
+          <%= f.input :enable_private_favorites, label: "Private favorites and votes", as: :select, hint: "Make your favorites and upvotes private. (Warning: if you disable this, you can't re-enable it without ".html_safe + link_to("upgrading to a Gold account", new_user_upgrade_path) + " first. (".html_safe + link_to_wiki("learn more", "help:privacy_mode") + ")".html_safe, collection: { "No" => false, "Yes" => true }, include_blank: false %>
+        <% else %>
+          <%= f.input :enable_private_favorites, label: "Private favorites and votes", as: :select, hint: link_to("Upgrade to Danbooru Gold to enable private favorites and upvotes", new_user_upgrade_path), collection: { "No" => false, "Yes" => true }, include_blank: false %>
+        <% end %>
         <%= f.input :disable_tagged_filenames, :as => :select, :hint => "Don't include tags in image filenames", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
         <%= f.input :disable_mobile_gestures, :as => :select, :hint => "Disable swipe left / swipe right gestures on mobile", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
         <%= f.input :disable_post_tooltips, :as => :select, :hint => "Disable advanced tooltips when hovering over thumbnails", :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>

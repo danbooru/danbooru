@@ -7,7 +7,7 @@ class PostNavbarComponentTest < ViewComponent::TestCase
 
   setup do
     @post = create(:post)
-    @user = create(:user)
+    @user = create(:gold_user)
   end
 
   context "The PostNavbarComponent" do
@@ -46,9 +46,8 @@ class PostNavbarComponentTest < ViewComponent::TestCase
     context "for a post with favgroups" do
       setup do
         as(@user) do
-          @favgroup1 = create(:favorite_group, creator: @user, is_public: true)
-          @favgroup2 = create(:favorite_group, creator: @user, is_public: false)
-          @post.update(tag_string: "favgroup:#{@favgroup1.id} favgroup:#{@favgroup2.id}")
+          @favgroup1 = create(:favorite_group, creator: @user, post_ids: [@post.id])
+          @favgroup2 = create(:private_favorite_group, creator: @user, post_ids: [@post.id])
         end
       end
 

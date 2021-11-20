@@ -218,6 +218,9 @@ html {
   --post-artist-commentary-container-background: var(--grey-0);
   --post-artist-commentary-container-border-color: var(--grey-1);
 
+  --post-upvote-color: var(--link-color);
+  --post-downvote-color: var(--red-5);
+
   --note-body-background: #FFE;
   --note-body-text-color: var(--black);
   --note-body-border-color: var(--black);
@@ -417,6 +420,9 @@ body[data-current-user-theme="dark"] {
 
   --post-artist-commentary-container-background: var(--grey-8);
   --post-artist-commentary-container-border-color: var(--grey-7);
+
+  --post-upvote-color: var(--link-color);
+  --post-downvote-color: var(--red-4);
 
   --unsaved-note-box-border-color: var(--red-5);
   --movable-note-box-border-color: var(--blue-5);

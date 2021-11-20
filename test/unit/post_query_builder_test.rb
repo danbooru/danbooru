@@ -390,7 +390,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
 
       favgroup1 = create(:favorite_group, creator: CurrentUser.user, post_ids: [post1.id])
       favgroup2 = create(:favorite_group, creator: CurrentUser.user, post_ids: [post2.id])
-      favgroup3 = create(:favorite_group, creator: create(:user), post_ids: [post3.id], is_public: false)
+      favgroup3 = create(:private_favorite_group, post_ids: [post3.id])
 
       assert_tag_match([post1], "favgroup:#{favgroup1.id}")
       assert_tag_match([post2], "favgroup:#{favgroup2.name}")
@@ -421,7 +421,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       post3 = create(:post)
 
       favgroup1 = create(:favorite_group, creator: CurrentUser.user, post_ids: [post1.id, post2.id])
-      favgroup2 = create(:favorite_group, creator: create(:user), post_ids: [post2.id, post3.id], is_public: false)
+      favgroup2 = create(:private_favorite_group, post_ids: [post2.id, post3.id])
 
       assert_tag_match([post1, post2], "ordfavgroup:#{favgroup1.id}")
       assert_tag_match([post1, post2], "ordfavgroup:#{favgroup1.name}")
@@ -973,6 +973,75 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match(all - [e], "-rating:e")
     end
 
+    context "for the upvote:<user> metatag" do
+      setup do
+        @user = create(:gold_user)
+        @upvote = create(:post_vote, user: @user, score: 1)
+        @downvote = create(:post_vote, user: @user, score: -1)
+      end
+
+      should "show public upvotes to all users" do
+        as(User.anonymous) do
+          assert_tag_match([@upvote.post], "upvote:#{@user.name}")
+          assert_tag_match([@downvote.post], "-upvote:#{@user.name}")
+        end
+      end
+
+      should "not show private upvotes to other users" do
+        @user.update!(enable_private_favorites: true)
+
+        as(User.anonymous) do
+          assert_tag_match([], "upvote:#{@user.name}")
+          assert_tag_match([@downvote.post, @upvote.post], "-upvote:#{@user.name}")
+        end
+      end
+
+      should "show private upvotes to admins" do
+        @user.update!(enable_private_favorites: true)
+
+        as(create(:admin_user)) do
+          assert_tag_match([@upvote.post], "upvote:#{@user.name}")
+          assert_tag_match([@downvote.post], "-upvote:#{@user.name}")
+        end
+      end
+
+      should "show private upvotes to the voter themselves" do
+        as(@user) do
+          assert_tag_match([@upvote.post], "upvote:#{@user.name}")
+          assert_tag_match([@downvote.post], "-upvote:#{@user.name}")
+        end
+      end
+    end
+
+    context "for the downvote:<user> metatag" do
+      setup do
+        @user = create(:user, enable_private_favorites: true)
+        @upvote = create(:post_vote, user: @user, score: 1)
+        @downvote = create(:post_vote, user: @user, score: -1)
+      end
+
+      should "not show downvotes to other users" do
+        as(User.anonymous) do
+          assert_tag_match([], "downvote:#{@user.name}")
+          assert_tag_match([@downvote.post, @upvote.post], "-downvote:#{@user.name}")
+        end
+      end
+
+      should "show downvotes to admins" do
+        as(create(:admin_user)) do
+          assert_tag_match([@downvote.post], "downvote:#{@user.name}")
+          assert_tag_match([@upvote.post], "-downvote:#{@user.name}")
+        end
+      end
+
+      should "show downvotes to the voter themselves" do
+        as(@user) do
+          assert_tag_match([@downvote.post], "downvote:#{@user.name}")
+          assert_tag_match([@upvote.post], "-downvote:#{@user.name}")
+        end
+      end
+    end
+
     should "return posts for a upvote:<user>, downvote:<user> metatag" do
       CurrentUser.scoped(create(:mod_user)) do
         upvoted   = create(:post, tag_string: "upvote:self")
@@ -1342,8 +1411,7 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       end
 
       should "return the correct favorite count for a fav:<name> search for a user with private favorites" do
-        fav = create(:favorite)
-        fav.user.update!(favorite_count: 1, enable_private_favorites: true)
+        fav = create(:private_favorite)
 
         assert_fast_count(0, "fav:#{fav.user.name}")
         assert_fast_count(0, "ordfav:#{fav.user.name}")

@@ -6,6 +6,7 @@ module HasBitFlags
   def has_bit_flags(attributes, field: :bit_flags)
     attributes.each.with_index do |attribute, i|
       bit_flag = 1 << i
+      field_was = "#{field}_was"
 
       define_method(attribute) do
         send(field) & bit_flag > 0
@@ -13,6 +14,14 @@ module HasBitFlags
 
       define_method("#{attribute}?") do
         send(field) & bit_flag > 0
+      end
+
+      define_method("#{attribute}_was") do
+        send(field_was) & bit_flag > 0
+      end
+
+      define_method("#{attribute}_was?") do
+        send(field_was) & bit_flag > 0
       end
 
       define_method("#{attribute}=") do |val|

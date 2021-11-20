@@ -1,12 +1,6 @@
 <div id="c-post-votes">
   <div id="a-index">
-    <%= search_form_for(post_votes_path) do |f| %>
-      <%= f.input :user_name, label: "Voter", input_html: { value: params[:search][:user_name], "data-autocomplete": "user" } %>
-      <%= f.input :post_id, label: "Post", input_html: { value: params[:search][:post_id] } %>
-      <%= f.input :post_tags_match, label: "Tags", input_html: { value: params[:search][:post_tags_match], "data-autocomplete": "tag-query" } %>
-      <%= f.input :score, collection: [["+3", "3"], ["+1", "1"], ["-1", "-1"], ["-3", "-3"]], include_blank: true, selected: params[:search][:score] %>
-      <%= f.submit "Search" %>
-    <% end %>
+    <%= render "search" %>
 
     <%= table_for @post_votes, class: "striped autofit" do |t| %>
       <% t.column "Post" do |vote| %>
@@ -24,8 +18,12 @@
         <div><%= time_ago_in_words_tagged(vote.post.created_at) %></div>
       <% end %>
       <% t.column "Voter" do |vote| %>
-        <%= link_to_user vote.user %>
-        <%= link_to "»", post_votes_path(search: { user_name: vote.user.name }) %>
+        <% if policy(vote).can_see_voter? %>
+          <%= link_to_user vote.user %>
+          <%= link_to "»", post_votes_path(search: { user_name: vote.user.name }) %>
+        <% else %>
+          <i>hidden</i>
+        <% end %>
         <div><%= time_ago_in_words_tagged(vote.created_at) %></div>
       <% end %>
       <% t.column column: "control" do |vote| %>

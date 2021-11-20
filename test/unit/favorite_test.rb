@@ -11,10 +11,13 @@ class FavoriteTest < ActiveSupport::TestCase
   context "Favorites: " do
     context "removing a favorite" do
       should "update the post and user favorite counts" do
+        @user1 = create(:restricted_user)
         fav = Favorite.create!(post: @p1, user: @user1)
 
         assert_equal(1, @user1.reload.favorite_count)
         assert_equal(1, @p1.reload.fav_count)
+        assert_equal(0, @p1.reload.score)
+        refute(PostVote.positive.exists?(post: @p1, user: @user))
 
         Favorite.destroy_by(post: @p1, user: @user1)
 
@@ -42,14 +45,8 @@ class FavoriteTest < ActiveSupport::TestCase
     end
 
     context "adding a favorite" do
-      should "update the post and user favorite counts" do
-        Favorite.create!(post: @p1, user: @user1)
-
-        assert_equal(1, @user1.reload.favorite_count)
-        assert_equal(1, @p1.reload.fav_count)
-      end
-
       should "not upvote the post if the user can't vote" do
+        @user1 = create(:restricted_user)
         Favorite.create!(post: @p1, user: @user1)
 
         assert_equal(1, @user1.reload.favorite_count)
@@ -89,7 +86,7 @@ class FavoriteTest < ActiveSupport::TestCase
         assert_equal(["You have already favorited this post"], @f2.errors.full_messages)
         assert_equal(1, @user1.reload.favorite_count)
         assert_equal(1, @p1.reload.fav_count)
-        assert_equal(0, @p1.reload.score)
+        assert_equal(1, @p1.reload.score)
       end
     end
   end

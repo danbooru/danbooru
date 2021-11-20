@@ -420,6 +420,34 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal("xyz", @user.favorite_tags)
       end
 
+      context "for a Member-level user" do
+        should "allow disabling the private favorites option" do
+          @user = create(:user, enable_private_favorites: true)
+          put_auth user_path(@user), @user, params: { user: { enable_private_favorites: false }}
+
+          assert_redirected_to edit_user_path(@user)
+          assert_equal(false, @user.reload.enable_private_favorites)
+        end
+
+        should "not allow enabling the private favorites option" do
+          @user = create(:user, enable_private_favorites: false)
+          put_auth user_path(@user), @user, params: { user: { enable_private_favorites: true }}
+
+          assert_redirected_to edit_user_path(@user)
+          assert_equal(false, @user.reload.enable_private_favorites)
+        end
+      end
+
+      context "for a Gold-level user" do
+        should "allow enabling the private favorites option" do
+          @user = create(:gold_user, enable_private_favorites: false)
+          put_auth user_path(@user), @user, params: { user: { enable_private_favorites: true }}
+
+          assert_redirected_to edit_user_path(@user)
+          assert_equal(true, @user.reload.enable_private_favorites)
+        end
+      end
+
       context "changing the level" do
         should "not work" do
           @owner = create(:owner_user)

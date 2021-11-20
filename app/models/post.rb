@@ -40,6 +40,7 @@ class Post < ApplicationRecord
   has_one :upload, :dependent => :destroy
   has_one :artist_commentary, :dependent => :destroy
   has_one :pixiv_ugoira_frame_data, class_name: "PixivUgoiraFrameData", foreign_key: :md5, primary_key: :md5
+  has_one :vote_by_current_user, -> { where(user_id: CurrentUser.id) }, class_name: "PostVote" # XXX using current user here is wrong
   has_many :flags, :class_name => "PostFlag", :dependent => :destroy
   has_many :appeals, :class_name => "PostAppeal", :dependent => :destroy
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
@@ -49,7 +50,6 @@ class Post < ApplicationRecord
   has_many :approvals, :class_name => "PostApproval", :dependent => :destroy
   has_many :disapprovals, :class_name => "PostDisapproval", :dependent => :destroy
   has_many :favorites, dependent: :destroy
-  has_many :favorited_users, through: :favorites, source: :user
   has_many :replacements, class_name: "PostReplacement", :dependent => :destroy
 
   attr_accessor :old_tag_string, :old_parent_id, :old_source, :old_rating, :has_constraints, :disable_versioning
@@ -548,9 +548,11 @@ class Post < ApplicationRecord
           pool&.add!(self)
 
         when /^fav:(.+)$/i
+          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, Favorite).create?
           Favorite.create(post: self, user: CurrentUser.user)
 
         when /^-fav:(.+)$/i
+          raise User::PrivilegeError unless Pundit.policy!(CurrentUser.user, Favorite).create?
           Favorite.destroy_by(post: self, user: CurrentUser.user)
 
         when /^(up|down)vote:(.+)$/i
@@ -664,13 +666,6 @@ class Post < ApplicationRecord
     def favorited_by?(user)
       return false if user.is_anonymous?
       Favorite.exists?(post: self, user: user)
-    end
-
-    # Users who publicly favorited this post, ordered by time of favorite.
-    def visible_favorited_users(viewer)
-      favorited_users.order("favorites.id DESC").select do |fav_user|
-        Pundit.policy!(viewer, fav_user).can_see_favorites?
-      end
     end
 
     def favorite_groups

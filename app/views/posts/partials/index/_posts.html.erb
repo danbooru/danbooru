@@ -1,9 +1,9 @@
-<div id="posts" class="user-disable-cropped-<%= CurrentUser.user.disable_cropped_thumbnails? %>">
-  <div id="posts-container">
+<div id="posts">
+  <div class="posts-container user-disable-cropped-<%= CurrentUser.user.disable_cropped_thumbnails? %>">
     <% if post_set.shown_posts.empty? %>
       <%= render "post_sets/blank" %>
     <% else %>
-      <%= post_previews_html(post_set.posts, show_deleted: post_set.show_deleted?, show_cropped: true, tags: post_set.tag_string) %>
+      <%= post_previews_html(post_set.posts, show_deleted: post_set.show_deleted?, show_cropped: true, tags: post_set.tag_string, show_votes: post_set.show_votes?) %>
     <% end %>
   </div>
 

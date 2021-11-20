@@ -8,6 +8,7 @@ FactoryBot.define do
     factory(:banned_user) do
       transient { ban_duration {3} }
       is_banned {true}
+      active_ban factory: :ban
     end
 
     factory(:restricted_user) do

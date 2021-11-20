@@ -9,59 +9,167 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       setup do
-        @admin = create(:admin_user)
-        as(@user) { @post_vote = create(:post_vote, post: @post, user: @user) }
-        as(@admin) { @admin_vote = create(:post_vote, post: @post, user: @admin) }
-        @unrelated_vote = create(:post_vote)
+        @user = create(:user, enable_private_favorites: true)
+        @upvote = create(:post_vote, user: @user, score: 1)
+        @downvote = create(:post_vote, user: @user, score: -1)
       end
 
       should "render" do
-        get_auth post_votes_path, @user
+        get post_votes_path
+        assert_response :success
+      end
+
+      should "render for a compact view" do
+        get post_votes_path(variant: "compact")
+        assert_response :success
+      end
+
+      should "render for a tooltip" do
+        get post_votes_path(search: { post_id: @upvote.post_id }, variant: "tooltip")
         assert_response :success
       end
 
       context "as a user" do
-        setup do
-          CurrentUser.user = @user
+        should "show the user all their own votes" do
+          get_auth post_votes_path, @user
+          assert_response :success
+          assert_select "tbody tr", 2
+
+          get_auth post_votes_path(search: { user_id: @user.id }), @user
+          assert_response :success
+          assert_select "tbody tr", 2
+
+          get_auth post_votes_path(search: { user_name: @user.name }), @user
+          assert_response :success
+          assert_select "tbody tr", 2
         end
 
-        should respond_to_search({}).with { @post_vote }
+        should "not show private upvotes to other users" do
+          get_auth post_votes_path, create(:user)
+          assert_response :success
+          assert_select "tbody tr", 0
+
+          get_auth post_votes_path(search: { user_id: @user.id }), create(:user)
+          assert_response :success
+          assert_select "tbody tr", 0
+
+          get_auth post_votes_path(search: { user_name: @user.name }), create(:user)
+          assert_response :success
+          assert_select "tbody tr", 0
+        end
+
+        should "not show downvotes to other users" do
+          @user.update!(enable_private_favorites: false)
+
+          get_auth post_votes_path, create(:user)
+          assert_response :success
+          assert_select "tbody tr[data-score=1]", 1
+          assert_select "tbody tr[data-score=-1]", 0
+
+          get_auth post_votes_path(search: { user_id: @user.id }), create(:user)
+          assert_response :success
+          assert_select "tbody tr[data-score=1]", 1
+          assert_select "tbody tr[data-score=-1]", 0
+
+          get_auth post_votes_path(search: { user_name: @user.name }), create(:user)
+          assert_response :success
+          assert_select "tbody tr[data-score=1]", 1
+          assert_select "tbody tr[data-score=-1]", 0
+        end
       end
 
-      context "as a moderator" do
-        setup do
-          CurrentUser.user = @admin
-        end
+      context "as an admin" do
+        should "show all votes by other users" do
+          @admin = create(:admin_user)
 
-        should respond_to_search({}).with { [@unrelated_vote, @admin_vote, @post_vote] }
-        should respond_to_search(score: 1).with { [@unrelated_vote, @admin_vote, @post_vote].select{ |v| v.score == 1 } }
+          get_auth post_votes_path, @admin
+          assert_response :success
+          assert_select "tbody tr", 2
 
-        context "using includes" do
-          should respond_to_search(post_tags_match: "dragon").with { [@admin_vote, @post_vote] }
-          should respond_to_search(user_name: "meiling").with { @post_vote }
-          should respond_to_search(user: {level: User::Levels::ADMIN}).with { @admin_vote }
+          get_auth post_votes_path(search: { user_id: @user.id }), @admin
+          assert_response :success
+          assert_select "tbody tr", 2
+
+          get_auth post_votes_path(search: { user_name: @user.name }), @admin
+          assert_response :success
+          assert_select "tbody tr", 2
+
+          get_auth post_votes_path(search: { user: { level: @user.level }}), @admin
+          assert_response :success
+          assert_select "tbody tr", 2
         end
       end
     end
 
     context "show action" do
-      setup do
-        @post_vote = create(:post_vote, post: @post, user: @user)
+      context "for a public upvote" do
+        setup do
+          @user = create(:user, enable_private_favorites: false)
+          @post_vote = create(:post_vote, user: @user, score: 1)
+        end
+
+        should "show the voter to everyone" do
+          get post_vote_path(@post_vote), as: :json
+
+          assert_response :success
+          assert_equal(@user.id, response.parsed_body["user_id"])
+        end
       end
 
-      should "show the vote to the voter" do
-        get_auth post_vote_path(@post_vote), @user, as: :json
-        assert_response :success
+      context "for a private upvote" do
+        setup do
+          @user = create(:user, enable_private_favorites: true)
+          @post_vote = create(:post_vote, user: @user, score: 1)
+        end
+
+        should "show the voter to themselves" do
+          get_auth post_vote_path(@post_vote), @user, as: :json
+
+          assert_response :success
+          assert_equal(@user.id, response.parsed_body["user_id"])
+        end
+
+        should "show the voter to admins" do
+          get_auth post_vote_path(@post_vote), create(:admin_user), as: :json
+
+          assert_response :success
+          assert_equal(@user.id, response.parsed_body["user_id"])
+        end
+
+        should "not show the voter to other users" do
+          get post_vote_path(@post_vote), as: :json
+
+          assert_response 403
+          assert_nil(response.parsed_body["user_id"])
+        end
       end
 
-      should "show the vote to admins" do
-        get_auth post_vote_path(@post_vote), create(:admin_user), as: :json
-        assert_response :success
-      end
+      context "for a downvote" do
+        setup do
+          @user = create(:user, enable_private_favorites: false)
+          @post_vote = create(:post_vote, user: @user, score: -1)
+        end
 
-      should "not show the vote to other users" do
-        get_auth post_vote_path(@post_vote), create(:user), as: :json
-        assert_response 403
+        should "show the voter to themselves" do
+          get_auth post_vote_path(@post_vote), @user, as: :json
+
+          assert_response :success
+          assert_equal(@user.id, response.parsed_body["user_id"])
+        end
+
+        should "show the voter to admins" do
+          get_auth post_vote_path(@post_vote), create(:admin_user), as: :json
+
+          assert_response :success
+          assert_equal(@user.id, response.parsed_body["user_id"])
+        end
+
+        should "not show the voter to other users" do
+          get post_vote_path(@post_vote), as: :json
+
+          assert_response 403
+          assert_nil(response.parsed_body["user_id"])
+        end
       end
     end
 
@@ -87,11 +195,18 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
         assert_equal(0, @post.reload.score)
       end
 
-      should "not allow members to vote" do
-        post_auth post_post_votes_path(post_id: @post.id), create(:user), params: { score: 1, format: "js" }
+      should "not allow restricted users to vote" do
+        post_auth post_post_votes_path(post_id: @post.id), create(:restricted_user), params: { score: 1, format: "js"}
 
         assert_response 403
         assert_equal(0, @post.reload.score)
+      end
+
+      should "allow members to vote" do
+        post_auth post_post_votes_path(post_id: @post.id), create(:user), params: { score: 1, format: "js" }
+
+        assert_response :success
+        assert_equal(1, @post.reload.score)
       end
 
       should "not allow invalid scores" do

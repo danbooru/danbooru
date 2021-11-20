@@ -1,19 +1,21 @@
 <span class="post-votes" data-id="<%= post.id %>">
-  <% if can_vote? %>
-    <% if upvoted? %>
-      <%= link_to upvote_icon, post_post_votes_path(post_id: post.id), class: "post-upvote-link post-unvote-link active-link", method: :delete, remote: true %>
-    <% else %>
-      <%= link_to upvote_icon, post_post_votes_path(post_id: post.id, score: 1), class: "post-upvote-link inactive-link", method: :post, remote: true %>
-    <% end %>
+  <% if current_user.is_anonymous? %>
+    <%= link_to upvote_icon, login_path(url: request.fullpath), class: "post-upvote-link inactive-link" %>
+  <% elsif upvoted? %>
+    <%= link_to upvote_icon, post_post_votes_path(post_id: post.id), class: "post-upvote-link post-unvote-link active-link", method: :delete, remote: true %>
+  <% else %>
+    <%= link_to upvote_icon, post_post_votes_path(post_id: post.id, score: 1), class: "post-upvote-link inactive-link", method: :post, remote: true %>
   <% end %>
 
-  <span class="post-score"><%= post.score %></span>
+  <span class="post-score">
+    <%= link_to post.score, post_votes_path(search: { post_id: post.id }, variant: :compact) %>
+  </span>
 
-  <% if can_vote? %>
-    <% if downvoted? %>
-      <%= link_to downvote_icon, post_post_votes_path(post_id: post.id), class: "post-downvote-link post-unvote-link active-link", method: :delete, remote: true %>
-    <% else %>
-      <%= link_to downvote_icon, post_post_votes_path(post_id: post.id, score: -1), class: "post-downvote-link inactive-link", method: :post, remote: true %>
-    <% end %>
+  <% if current_user.is_anonymous? %>
+    <%= link_to downvote_icon, login_path(url: request.fullpath), class: "post-downvote-link inactive-link" %>
+  <% elsif downvoted? %>
+    <%= link_to downvote_icon, post_post_votes_path(post_id: post.id), class: "post-downvote-link post-unvote-link active-link", method: :delete, remote: true %>
+  <% else %>
+    <%= link_to downvote_icon, post_post_votes_path(post_id: post.id, score: -1), class: "post-downvote-link inactive-link", method: :post, remote: true %>
   <% end %>
 </span>

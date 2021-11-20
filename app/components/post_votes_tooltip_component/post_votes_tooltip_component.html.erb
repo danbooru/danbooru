@@ -1,0 +1,13 @@
+<div class="post-votes-tooltip thin-scrollbar">
+  <div class="text-center text-muted whitespace-nowrap">
+    +<%= post.up_score %> / -<%= post.down_score.abs %> <%= upvote_ratio %>
+  </div>
+
+  <div class="post-voters">
+    <% votes.each do |vote| %>
+      <div class="post-voter truncate">
+        <%= vote_icon(vote) %> <%= voter_name(vote) %>
+      </div>
+    <% end %>
+  </div>
+</div>

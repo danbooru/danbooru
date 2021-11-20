@@ -194,6 +194,7 @@ Rails.application.routes.draw do
   # XXX Use `only: []` to avoid redefining post routes defined at top of file.
   resources :posts, only: [] do
     resources :events, :only => [:index], :controller => "post_events"
+    resources :favorites, only: [:index, :create, :destroy]
     resources :replacements, :only => [:index, :new, :create], :controller => "post_replacements"
     resource :artist_commentary, only: [:show] do
       collection { put :create_or_update }
@@ -252,6 +253,7 @@ Rails.application.routes.draw do
     end
   end
   resources :users do
+    resources :favorites, only: [:index, :create, :destroy]
     resources :favorite_groups, controller: "favorite_groups", only: [:index], as: "favorite_groups"
     resource :email, only: [:show, :edit, :update] do
       get :verify

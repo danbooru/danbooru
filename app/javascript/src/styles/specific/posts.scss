@@ -135,8 +135,6 @@ div#c-posts {
       font-size: var(--text-lg);
 
       li {
-        padding: 0 1em 0 0;
-
         &.active {
           font-weight: bold;
         }
@@ -170,10 +168,6 @@ div#c-posts {
         height: 100%;
         background: top left/20% no-repeat url(../../../../../public/images/danbirthday.png);
       }
-    }
-
-    #favlist {
-      word-wrap: break-word;
     }
 
     #recommended.loading-recommended-posts {
