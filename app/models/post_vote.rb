@@ -12,6 +12,8 @@ class PostVote < ApplicationRecord
   scope :negative, -> { where("post_votes.score < 0") }
   scope :public_votes, -> { positive.where(user: User.has_public_favorites) }
 
+  deletable
+
   def self.visible(user)
     user.is_admin? ? all : where(user: user).or(public_votes)
   end

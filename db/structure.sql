@@ -1672,7 +1672,8 @@ CREATE TABLE public.post_votes (
     user_id integer NOT NULL,
     score integer NOT NULL,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    is_deleted boolean DEFAULT false
 );
 
 
@@ -4214,6 +4215,13 @@ CREATE INDEX index_post_votes_on_created_at ON public.post_votes USING btree (cr
 
 
 --
+-- Name: index_post_votes_on_is_deleted; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_post_votes_on_is_deleted ON public.post_votes USING btree (is_deleted) WHERE (is_deleted = true);
+
+
+--
 -- Name: index_post_votes_on_post_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4225,6 +4233,13 @@ CREATE INDEX index_post_votes_on_post_id ON public.post_votes USING btree (post_
 --
 
 CREATE INDEX index_post_votes_on_user_id ON public.post_votes USING btree (user_id);
+
+
+--
+-- Name: index_post_votes_on_user_id_and_post_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_post_votes_on_user_id_and_post_id ON public.post_votes USING btree (user_id, post_id) WHERE (is_deleted = false);
 
 
 --
@@ -5057,6 +5072,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211015223510'),
 ('20211018045429'),
 ('20211018062916'),
-('20211023225730');
+('20211023225730'),
+('20211121080239');
 
 
