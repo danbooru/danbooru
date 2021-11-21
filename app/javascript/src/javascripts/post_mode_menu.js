@@ -25,10 +25,6 @@ PostModeMenu.show_notice = function(mode, tag_script_index = 0) {
     Utility.notice("Switched to unfavorite mode. Click a post to unfavorite it.");
   } else if (mode === "edit") {
     Utility.notice("Switched to edit mode. Click a post to edit it.");
-  } else if (mode === 'vote-down') {
-    Utility.notice("Switched to downvote mode. Click a post to downvote it.");
-  } else if (mode === 'vote-up') {
-    Utility.notice("Switched to upvote mode. Click a post to upvote it.");
   } else if (mode === "tag-script") {
     Utility.notice(`Switched to tag script #${tag_script_index}. To switch tag scripts, use the number keys.`);
   }
@@ -149,10 +145,6 @@ PostModeMenu.click = function(e) {
     Post.tag(post_id, "-fav:me");
   } else if (s === "edit") {
     PostModeMenu.open_edit(post_id);
-  } else if (s === 'vote-down') {
-    Post.tag(post_id, "downvote:me");
-  } else if (s === 'vote-up') {
-    Post.tag(post_id, "upvote:me");
   } else if (s === "tag-script") {
     var current_script_id = localStorage.getItem("current_tag_script_id");
     var tag_script = localStorage.getItem("tag-script-" + current_script_id) ?? "";
