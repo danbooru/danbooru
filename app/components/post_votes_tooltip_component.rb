@@ -21,7 +21,7 @@ class PostVotesTooltipComponent < ApplicationComponent
 
   def upvote_ratio
     return nil if votes.length == 0
-    sprintf("(%.1f%%)", 100.0 * votes.select(&:is_positive?).length / votes.length)
+    sprintf("(%.1f%%)", 100.0 * post.up_score / (post.up_score + post.down_score.abs))
   end
 
   def voter_name(vote)
