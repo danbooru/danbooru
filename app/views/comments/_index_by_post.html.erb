@@ -3,9 +3,9 @@
     <%= render "post_sets/blank" %>
   <% end %>
 
-  <% @posts.select(&:visible?).each do |post| %>
+  <% @posts.includes(:media_asset, :uploader, :vote_by_current_user, comments: [:creator, :votes]).select(&:visible?).each do |post| %>
     <%= tag.div id: "post_#{post.id}", **PostPreviewComponent.new(post: post).article_attrs("post space-x-4") do %>
-      <%= post_preview(post, show_deleted: true) %>
+      <%= post_preview(post, show_deleted: true, show_votes: true) %>
 
       <div class="flex-1">
         <%= render "comments/partials/index/header", post: post %>
