@@ -11,7 +11,7 @@ class SpamDetector
   # window, automatically ban them forever.
   AUTOBAN_THRESHOLD = 10
   AUTOBAN_WINDOW = 1.hour
-  AUTOBAN_DURATION = 999_999
+  AUTOBAN_DURATION = 100.years
 
   attr_accessor :record, :user, :user_ip, :content, :comment_type
 
