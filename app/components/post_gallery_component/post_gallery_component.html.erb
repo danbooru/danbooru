@@ -1,0 +1,17 @@
+<div class="post-gallery post-gallery-<%= gallery_type %>">
+  <% if empty? %>
+    <p>No posts found.</p>
+  <% else %>
+    <div class="posts-container user-disable-cropped-<%= current_user.disable_cropped_thumbnails? %>">
+      <% posts.each do |post| -%>
+<%    %><%= post_preview(post, **options) -%>
+      <% end -%>
+    </div>
+  <% end %>
+
+  <%= footer %>
+
+  <% if has_paginator? %>
+    <%= numbered_paginator(posts) %>
+  <% end %>
+</div>

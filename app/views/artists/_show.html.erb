@@ -28,9 +28,7 @@
 
           <%= render "posts/partials/common/inline_blacklist" %>
 
-          <div class="recent-posts-previews">
-            <%= post_previews_html(@artist.tag.posts.limit(8), tags: @artist.name) %>
-          </div>
+          <%= render_post_gallery(@artist.tag.posts.limit(8), tags: @artist.name) %>
         </div>
       <% end %>
     <% end%>

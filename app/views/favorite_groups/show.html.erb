@@ -15,14 +15,6 @@
 
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <section>
-      <% if @favorite_group.post_count == 0 %>
-        <%= render "post_sets/blank" %>
-      <% else %>
-        <%= post_previews_html(@posts, tags: "favgroup:#{@favorite_group.id}", show_deleted: true) %>
-
-        <%= numbered_paginator(@posts) %>
-      <% end %>
-    </section>
+    <%= render_post_gallery(@posts, tags: "favgroup:#{@favorite_group.id}", show_deleted: true) %>
   </div>
 </div>

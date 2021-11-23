@@ -20,14 +20,6 @@
 
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <section>
-      <% if @pool.post_count == 0 %>
-        <%= render "post_sets/blank" %>
-      <% else %>
-        <%= post_previews_html(@posts, tags: "pool:#{@pool.id}", show_deleted: @pool.is_series?) %>
-
-        <%= numbered_paginator(@posts) %>
-      <% end %>
-    </section>
+    <%= render_post_gallery(@posts, tags: "pool:#{@pool.id}", show_deleted: @pool.is_series?) %>
   </div>
 </div>

@@ -10,5 +10,5 @@ This post belongs to a <%= link_to "parent", posts_path(tags: "parent:#{parent.i
 <%= link_to "« hide", "#", id: "has-parent-relationship-preview-link" %>
 
 <div id="has-parent-relationship-preview">
-  <%= post_previews_html([parent, *children], tags: "parent:#{parent.id}", show_deleted: true) %>
+  <%= render_post_gallery([parent, *children], tags: "parent:#{parent.id}", show_deleted: true, inline: true) %>
 </div>

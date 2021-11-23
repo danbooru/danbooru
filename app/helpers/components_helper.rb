@@ -8,6 +8,10 @@ module ComponentsHelper
     render PostPreviewComponent.with_collection(posts, **options)
   end
 
+  def render_post_gallery(posts, current_user: CurrentUser.user, **options, &block)
+    render PostGalleryComponent.new(posts: posts, current_user: current_user, **options), &block
+  end
+
   def render_comment(comment, current_user:, **options)
     render CommentComponent.new(comment: comment, current_user: current_user, **options)
   end

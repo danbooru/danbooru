@@ -4,8 +4,6 @@
       <%= link_to "Posts", posts_path(tags: wiki_page.title) %>
     </h2>
 
-    <div class="recent-posts-previews">
-      <%= post_previews_html(wiki_page.tag.posts.limit(8), tags: wiki_page.title) %>
-    </div>
+    <%= render_post_gallery(wiki_page.tag.posts.limit(8), tags: wiki_page.title) %>
   </div>
 <% end %>

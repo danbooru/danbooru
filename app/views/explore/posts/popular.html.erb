@@ -10,7 +10,6 @@
     <%= render "explore/posts/nav_links", path: :popular_explore_posts_path, date: @date, scale: @scale %>
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <%= post_previews_html(@posts) %>
-    <%= numbered_paginator(@posts) %>
+    <%= render_post_gallery(@posts) %>
   </div>
 </div>

@@ -32,25 +32,9 @@
 }
 
 #has-parent-relationship-preview, #has-children-relationship-preview {
-  overflow-x: auto;
-  white-space: nowrap;
-
-  article.post-preview {
-    width: auto;
-    height: auto;
-    margin: 0.5rem 0;
-    padding: 0.5rem;
-    overflow: hidden;
-    vertical-align: top;
+  article.post-preview.current-post {
     border-radius: 0.25rem;
-
-    &.current-post {
-      background-color: var(--preview-selected-color);
-    }
-
-    img {
-      white-space: normal;
-    }
+    background-color: var(--preview-selected-color);
   }
 }
 
