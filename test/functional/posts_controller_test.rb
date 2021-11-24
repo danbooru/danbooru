@@ -69,7 +69,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         should "render the second page" do
           get posts_path(page: 2, limit: 1)
           assert_response :success
-          assert_canonical_url_equals(posts_url(page: 2, host: Danbooru.config.hostname))
+          assert_canonical_url_equals(posts_url(page: 2, limit: 1, host: Danbooru.config.hostname))
         end
       end
 
