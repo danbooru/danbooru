@@ -35,6 +35,8 @@ class ModAction < ApplicationRecord
     post_note_lock_delete: 212,
     post_rating_lock_create: 220,
     post_rating_lock_delete: 222,
+    post_vote_delete: 232,
+    post_vote_undelete: 233,
     pool_delete: 62,
     pool_undelete: 63,
     artist_ban: 184,

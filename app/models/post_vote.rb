@@ -1,25 +1,36 @@
 class PostVote < ApplicationRecord
+  attr_accessor :updater
+
   belongs_to :post
   belongs_to :user
 
-  validates :user_id, uniqueness: { scope: :post_id, message: "have already voted for this post" }
   validates :score, inclusion: { in: [1, -1], message: "must be 1 or -1" }
 
-  after_create :update_score_after_create
-  after_destroy :update_score_after_destroy
+  before_save { post.lock! }
+  before_save :update_score_on_delete, if: -> { !new_record? && is_deleted_changed?(from: false, to: true) }
+  before_save :update_score_on_undelete, if: -> { !new_record? && is_deleted_changed?(from: true, to: false) }
+  before_save :create_mod_action_on_delete_or_undelete
+  before_create :update_score_on_create
+  before_create :remove_conflicting_votes
 
   scope :positive, -> { where("post_votes.score > 0") }
   scope :negative, -> { where("post_votes.score < 0") }
-  scope :public_votes, -> { positive.where(user: User.has_public_favorites) }
+  scope :public_votes, -> { active.positive.where(user: User.has_public_favorites) }
 
   deletable
 
   def self.visible(user)
-    user.is_admin? ? all : where(user: user).or(public_votes)
+    if user.is_admin?
+      all
+    elsif user.is_anonymous?
+      public_votes
+    else
+      active.where(user: user).or(public_votes)
+    end
   end
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :score, :user, :post)
+    q = search_attributes(params, :id, :created_at, :updated_at, :score, :is_deleted, :user, :post)
 
     q.apply_default_order(params)
   end
@@ -32,7 +43,19 @@ class PostVote < ApplicationRecord
     score < 0
   end
 
-  def update_score_after_create
+  def remove_conflicting_votes
+    PostVote.active.where.not(id: id).where(post: post, user: user).each do |vote|
+      vote.soft_delete!(updater: updater)
+    end
+  end
+
+  def validate_vote_is_unique
+    if !is_deleted? && PostVote.active.where.not(id: id).exists?(post: post, user: user)
+      errors.add(:user, "have already voted for this post")
+    end
+  end
+
+  def update_score_on_create
     if is_positive?
       Post.update_counters(post_id, { score: score, up_score: score })
     else
@@ -40,11 +63,25 @@ class PostVote < ApplicationRecord
     end
   end
 
-  def update_score_after_destroy
+  def update_score_on_delete
     if is_positive?
       Post.update_counters(post_id, { score: -score, up_score: -score })
     else
       Post.update_counters(post_id, { score: -score, down_score: -score })
+    end
+  end
+
+  def update_score_on_undelete
+    update_score_on_create
+  end
+
+  def create_mod_action_on_delete_or_undelete
+    return if new_record? || updater.nil? || updater == user
+
+    if is_deleted_changed?(from: false, to: true)
+      ModAction.log("#{updater.name} deleted post vote ##{id} on post ##{post_id}", :post_vote_delete, updater)
+    elsif is_deleted_changed?(from: true, to: false)
+      ModAction.log("#{updater.name} undeleted post vote ##{id} on post ##{post_id}", :post_vote_undelete, updater)
     end
   end
 

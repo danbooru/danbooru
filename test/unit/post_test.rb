@@ -701,12 +701,12 @@ class PostTest < ActiveSupport::TestCase
             @post.update(tag_string: "aaa fav:self")
             assert_equal(1, @post.reload.score)
             assert_equal(1, @post.favorites.where(user: @user).count)
-            assert_equal(1, @post.votes.positive.where(user: @user).count)
+            assert_equal(1, @post.votes.active.positive.where(user: @user).count)
 
             @post.update(tag_string: "aaa -fav:self")
             assert_equal(0, @post.reload.score)
             assert_equal(0, @post.favorites.count)
-            assert_equal(0, @post.votes.positive.where(user: @user).count)
+            assert_equal(0, @post.votes.active.positive.where(user: @user).count)
           end
 
           should "not allow banned users to fav" do
@@ -1433,11 +1433,12 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
-      should "not decrement the post's score for basic users" do
+      should "decrement the post's score for basic users" do
         @member = FactoryBot.create(:user)
 
-        assert_no_difference("@post.score") { create(:favorite, post: @post, user: @member) }
-        assert_no_difference("@post.score") { Favorite.destroy_by(post: @post, user: @member) }
+        assert_difference("@post.reload.score", -1) do
+          Favorite.destroy_by(post: @post, user: @user)
+        end
       end
 
       should "not decrement the user's favorite_count if the user did not favorite the post" do
@@ -1565,7 +1566,7 @@ class PostTest < ActiveSupport::TestCase
       post.vote!(1, user)
 
       assert_equal(1, post.reload.score)
-      assert_equal(1, post.votes.count)
+      assert_equal(1, post.votes.active.count)
     end
 
     should "allow undoing of votes" do
@@ -1578,31 +1579,33 @@ class PostTest < ActiveSupport::TestCase
       assert_equal(1, post.score)
       assert_equal(1, post.up_score)
       assert_equal(0, post.down_score)
-      assert_equal(1, post.votes.positive.count)
+      assert_equal(1, post.votes.active.positive.count)
 
-      post.unvote!(user)
+      post.votes.last.soft_delete!
+      post.reload
       assert_equal(0, post.score)
       assert_equal(0, post.up_score)
       assert_equal(0, post.down_score)
-      assert_equal(0, post.votes.count)
+      assert_equal(0, post.votes.active.count)
 
       post.vote!(-1, user)
       assert_equal(-1, post.score)
       assert_equal(0, post.up_score)
       assert_equal(-1, post.down_score)
-      assert_equal(1, post.votes.negative.count)
+      assert_equal(1, post.votes.active.negative.count)
 
-      post.unvote!(user)
+      post.votes.last.soft_delete!
+      post.reload
       assert_equal(0, post.score)
       assert_equal(0, post.up_score)
       assert_equal(0, post.down_score)
-      assert_equal(0, post.votes.count)
+      assert_equal(0, post.votes.active.count)
 
       post.vote!(1, user)
       assert_equal(1, post.score)
       assert_equal(1, post.up_score)
       assert_equal(0, post.down_score)
-      assert_equal(1, post.votes.positive.count)
+      assert_equal(1, post.votes.active.positive.count)
 
       post.reload
       assert_equal(1, post.score)

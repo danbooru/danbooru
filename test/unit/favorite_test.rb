@@ -40,7 +40,8 @@ class FavoriteTest < ActiveSupport::TestCase
         assert_equal(0, @user.reload.favorite_count)
         assert_equal(0, @p1.reload.fav_count)
         assert_equal(0, @p1.reload.score)
-        refute(PostVote.positive.exists?(post: @p1, user: @user))
+        refute(PostVote.active.positive.exists?(post: @p1, user: @user))
+        assert(PostVote.deleted.positive.exists?(post: @p1, user: @user))
       end
     end
 
@@ -75,8 +76,8 @@ class FavoriteTest < ActiveSupport::TestCase
         assert_equal(1, @user.reload.favorite_count)
         assert_equal(1, @p1.reload.fav_count)
         assert_equal(1, @p1.reload.score)
-        assert(PostVote.positive.exists?(post: @p1, user: @user))
-        refute(PostVote.negative.exists?(post: @p1, user: @user))
+        assert(PostVote.active.positive.exists?(post: @p1, user: @user))
+        assert(PostVote.deleted.negative.exists?(post: @p1, user: @user))
       end
 
       should "not allow duplicate favorites" do

@@ -40,7 +40,7 @@ class Post < ApplicationRecord
   has_one :upload, :dependent => :destroy
   has_one :artist_commentary, :dependent => :destroy
   has_one :pixiv_ugoira_frame_data, class_name: "PixivUgoiraFrameData", foreign_key: :md5, primary_key: :md5
-  has_one :vote_by_current_user, -> { where(user_id: CurrentUser.id) }, class_name: "PostVote" # XXX using current user here is wrong
+  has_one :vote_by_current_user, -> { active.where(user_id: CurrentUser.id) }, class_name: "PostVote" # XXX using current user here is wrong
   has_many :flags, :class_name => "PostFlag", :dependent => :destroy
   has_many :appeals, :class_name => "PostAppeal", :dependent => :destroy
   has_many :votes, :class_name => "PostVote", :dependent => :destroy
@@ -701,17 +701,9 @@ class Post < ApplicationRecord
       return unless Pundit.policy!(voter, PostVote).create?
 
       with_lock do
-        votes.destroy_by(user: voter)
-        votes.create!(user: voter, score: score)
+        votes.create!(user: voter, score: score) unless votes.active.exists?(user: voter, score: score)
         reload # PostVote.create modifies our score. Reload to get the new score.
       end
-    end
-
-    def unvote!(voter)
-      return unless Pundit.policy!(voter, PostVote).create?
-
-      votes.destroy_by(user: voter)
-      reload
     end
   end
 

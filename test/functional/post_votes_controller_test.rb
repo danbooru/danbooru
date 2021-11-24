@@ -175,51 +175,51 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
 
     context "create action" do
       should "work for a JSON response" do
-        post_auth post_post_votes_path(post_id: @post.id), @user, params: { score: 1, format: "json" }
+        post_auth post_post_votes_path(post_id: @post.id, score: 1), @user, as: :json
 
         assert_response 201
         assert_equal(1, @post.reload.score)
       end
 
       should "not allow anonymous users to vote" do
-        post post_post_votes_path(post_id: @post.id), params: { score: 1, format: "js" }
+        post post_post_votes_path(post_id: @post.id, score: 1), xhr: true
 
         assert_response 403
         assert_equal(0, @post.reload.score)
       end
 
       should "not allow banned users to vote" do
-        post_auth post_post_votes_path(post_id: @post.id), create(:banned_user), params: { score: 1, format: "js"}
+        post_auth post_post_votes_path(post_id: @post.id, score: 1), create(:banned_user), xhr: true
 
         assert_response 403
         assert_equal(0, @post.reload.score)
       end
 
       should "not allow restricted users to vote" do
-        post_auth post_post_votes_path(post_id: @post.id), create(:restricted_user), params: { score: 1, format: "js"}
+        post_auth post_post_votes_path(post_id: @post.id, score: 1), create(:restricted_user), xhr: true
 
         assert_response 403
         assert_equal(0, @post.reload.score)
       end
 
       should "allow members to vote" do
-        post_auth post_post_votes_path(post_id: @post.id), create(:user), params: { score: 1, format: "js" }
+        post_auth post_post_votes_path(post_id: @post.id, score: 1), create(:user), xhr: true
 
         assert_response :success
         assert_equal(1, @post.reload.score)
       end
 
       should "not allow invalid scores" do
-        post_auth post_post_votes_path(post_id: @post.id), @user, params: { score: 3, format: "js" }
+        post_auth post_post_votes_path(post_id: @post.id, score: 3), @user, xhr: true
 
-        assert_response 200
+        assert_response :success
         assert_equal(0, @post.reload.score)
         assert_equal(0, @post.up_score)
         assert_equal(0, @post.votes.count)
       end
 
       should "increment a post's score if the score is positive" do
-        post_auth post_post_votes_path(post_id: @post.id), @user, params: { score: 1, format: "js" }
+        post_auth post_post_votes_path(post_id: @post.id, score: 1), @user, xhr: true
 
         assert_response :success
         assert_equal(1, @post.reload.score)
@@ -228,7 +228,7 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "decrement a post's score if the score is negative" do
-        post_auth post_post_votes_path(post_id: @post.id), @user, params: { score: -1, format: "js" }
+        post_auth post_post_votes_path(post_id: @post.id, score: -1), @user, xhr: true
 
         assert_response :success
         assert_equal(-1, @post.reload.score)
@@ -238,45 +238,66 @@ class PostVotesControllerTest < ActionDispatch::IntegrationTest
 
       context "for a post that has already been voted on" do
         should "replace the vote" do
-          @post.vote!(1, @user)
+          vote = create(:post_vote, post: @post, user: @user, score: 1)
+          post_auth post_post_votes_path(post_id: @post.id, score: -1), @user, xhr: true
 
-          assert_no_difference("@post.votes.count") do
-            post_auth post_post_votes_path(post_id: @post.id), @user, params: { score: -1, format: "js" }
-
-            assert_response :success
-            assert_equal(-1, @post.reload.score)
-            assert_equal(0, @post.up_score)
-            assert_equal(-1, @post.down_score)
-          end
+          assert_response :success
+          assert_equal(-1, @post.reload.score)
+          assert_equal(0, @post.up_score)
+          assert_equal(-1, @post.down_score)
+          assert_equal(1, @post.votes.negative.active.count)
+          assert_equal(1, @post.votes.positive.deleted.count)
+          assert_equal(true, vote.reload.is_deleted?)
         end
       end
     end
 
     context "destroy action" do
-      should "do nothing for anonymous users" do
-        delete post_post_votes_path(post_id: @post.id), xhr: true
-
-        assert_response 200
-        assert_equal(0, @post.reload.score)
+      setup do
+        @vote = create(:post_vote, post: @post, user: @user, score: 1)
       end
 
-      should "do nothing if the post hasn't been voted on" do
-        delete_auth post_post_votes_path(post_id: @post.id), @user, xhr: true
+      should "allow users to remove their own votes" do
+        delete_auth post_post_votes_path(post_id: @vote.post_id), @user, xhr: true
 
         assert_response :success
         assert_equal(0, @post.reload.score)
-        assert_equal(0, @post.down_score)
-        assert_equal(0, @post.votes.count)
+        assert_equal(0, @post.up_score)
+        assert_equal(0, @post.votes.active.count)
+        assert_equal(true, @vote.reload.is_deleted?)
       end
 
-      should "remove a vote" do
-        @post.vote!(1, @user)
-        delete_auth post_post_votes_path(post_id: @post.id), @user, xhr: true
+      should "not allow regular users to remove votes by other users" do
+        delete_auth post_vote_path(@vote), create(:user), xhr: true
+
+        assert_response 403
+        assert_equal(1, @post.reload.score)
+        assert_equal(1, @post.up_score)
+        assert_equal(1, @post.votes.active.count)
+        assert_equal(false, @vote.reload.is_deleted?)
+      end
+
+      should "allow admins to remove votes by other users" do
+        admin = create(:admin_user)
+        delete_auth post_vote_path(@vote), admin, xhr: true
 
         assert_response :success
         assert_equal(0, @post.reload.score)
-        assert_equal(0, @post.down_score)
-        assert_equal(0, @post.votes.count)
+        assert_equal(0, @post.up_score)
+        assert_equal(0, @post.votes.active.count)
+        assert_equal(true, @vote.reload.is_deleted?)
+        assert_match(/#{admin.name} deleted post vote #\d+ on post #\d+/, ModAction.post_vote_delete.last.description)
+      end
+
+      should "not fail when attempting to remove an already removed vote" do
+        @vote.soft_delete!
+        delete_auth post_post_votes_path(post_id: @vote.post_id), @user, xhr: true
+
+        assert_response :success
+        assert_equal(0, @post.reload.score)
+        assert_equal(0, @post.up_score)
+        assert_equal(0, @post.votes.active.count)
+        assert_equal(true, @vote.reload.is_deleted?)
       end
     end
   end

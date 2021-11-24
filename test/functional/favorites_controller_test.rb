@@ -86,10 +86,14 @@ class FavoritesControllerTest < ActionDispatch::IntegrationTest
 
     context "destroy action" do
       should "remove the favorite for the current user" do
-        assert_difference [-> { @faved_post.favorites.count }, -> { @faved_post.reload.fav_count }, -> { @user.reload.favorite_count }], -1 do
-          delete_auth favorite_path(@faved_post.id), @user, as: :javascript
-          assert_response :redirect
-        end
+        delete_auth favorite_path(@faved_post.id), @user, as: :javascript
+
+        assert_response :redirect
+        assert_equal(0, @faved_post.favorites.count)
+        assert_equal(0, @faved_post.reload.fav_count)
+        assert_equal(0, @faved_post.votes.active.count)
+        assert_equal(1, @faved_post.votes.deleted.count)
+        assert_equal(0, @user.reload.favorite_count)
       end
 
       should "allow banned users to destroy favorites" do

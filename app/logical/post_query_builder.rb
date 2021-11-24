@@ -215,9 +215,9 @@ class PostQueryBuilder
     when "noteupdater"
       user_subquery_matches(NoteVersion.unscoped, value, field: :updater)
     when "upvoter", "upvote"
-      user_subquery_matches(PostVote.positive.visible(current_user), value, field: :user)
+      user_subquery_matches(PostVote.active.positive.visible(current_user), value, field: :user)
     when "downvoter", "downvote"
-      user_subquery_matches(PostVote.negative.visible(current_user), value, field: :user)
+      user_subquery_matches(PostVote.active.negative.visible(current_user), value, field: :user)
     when *CATEGORY_COUNT_METATAGS
       short_category = name.delete_suffix("tags")
       category = TagCategory.short_name_mapping[short_category]

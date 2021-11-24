@@ -28,15 +28,13 @@ class Favorite < ApplicationRecord
   end
 
   def upvote_post_on_create
-    if Pundit.policy!(user, PostVote).create?
-      PostVote.negative.destroy_by(post: post, user: user)
-
-      # Silently ignore the error if the user has already upvoted the post.
-      PostVote.create(post: post, user: user, score: 1)
+    if Pundit.policy!(user, PostVote).create? && !PostVote.active.exists?(post: post, user: user, score: 1)
+      PostVote.create!(post: post, user: user, score: 1)
     end
   end
 
   def unvote_post_on_destroy
-    PostVote.positive.destroy_by(post: post, user: user)
+    vote = PostVote.active.positive.find_by(post: post, user: user)
+    vote&.soft_delete!(updater: user)
   end
 end

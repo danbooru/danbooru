@@ -4,11 +4,11 @@ class PostVotePolicy < ApplicationPolicy
   end
 
   def destroy?
-    unbanned? && record.user == user
+    record.user == user || user.is_admin?
   end
 
   def show?
-    user.is_admin? || record.user == user || (record.is_positive? && !record.user.enable_private_favorites?)
+    user.is_admin? || record.user == user || (record.is_positive? && !record.is_deleted? && !record.user.enable_private_favorites?)
   end
 
   def can_see_voter?

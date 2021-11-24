@@ -6,17 +6,25 @@
       <% t.column "Post" do |vote| %>
         <%= post_preview(vote.post, show_deleted: true) %>
       <% end %>
+
       <% t.column "Tags", td: {class: "col-expand"} do |vote| %>
         <%= render_inline_tag_list(vote.post) %>
       <% end %>
+
       <% t.column "Score" do |vote| %>
         <%= link_to sprintf("%+d", vote.score), post_votes_path(search: { score: vote.score }) %>
+
+        <% if vote.is_deleted? %>
+          (deleted)
+        <% end %>
       <% end %>
+
       <% t.column "Uploader" do |vote| %>
         <%= link_to_user vote.post.uploader %>
         <%= link_to "»", post_votes_path(search: { post_tags_match: "user:#{vote.post.uploader.name}" }) %>
         <div><%= time_ago_in_words_tagged(vote.post.created_at) %></div>
       <% end %>
+
       <% t.column "Voter" do |vote| %>
         <% if policy(vote).can_see_voter? %>
           <%= link_to_user vote.user %>
@@ -26,9 +34,14 @@
         <% end %>
         <div><%= time_ago_in_words_tagged(vote.created_at) %></div>
       <% end %>
+
       <% t.column column: "control" do |vote| %>
-        <% if vote.user == CurrentUser.user %>
-          <%= link_to "unvote", post_post_votes_path(vote.post), remote: true, method: :delete %>
+        <% if !vote.is_deleted? && policy(vote).destroy? %>
+          <%= render PopupMenuComponent.new do |menu| %>
+            <% menu.item do %>
+              <%= link_to "Remove", post_vote_path(vote.id, variant: "listing"), method: :delete, remote: true %>
+            <% end %>
+          <% end %>
         <% end %>
       <% end %>
     <% end %>

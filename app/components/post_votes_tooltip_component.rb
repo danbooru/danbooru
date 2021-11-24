@@ -12,7 +12,7 @@ class PostVotesTooltipComponent < ApplicationComponent
   end
 
   def votes
-    @post.votes.includes(:user).order(id: :desc)
+    @post.votes.active.includes(:user).order(id: :desc)
   end
 
   def vote_icon(vote)
