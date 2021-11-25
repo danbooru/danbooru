@@ -36,7 +36,5 @@
     <% end %>
   <% end %>
 
-  <% unless post_set.is_random? %>
-    <%= numbered_paginator(post_set.posts) %>
-  <% end %>
+  <%= numbered_paginator(post_set.posts) %>
 </div>

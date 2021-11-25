@@ -309,18 +309,21 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { tags: "order:random" }
           assert_response :success
 
-          get posts_path, params: { random: "1" }
-          assert_response :success
+          get posts_path(random: "1")
+          assert_redirected_to posts_path(tags: "random:20", format: :html)
 
-          get posts_path(format: :json), params: { random: "1" }
-          assert_response :success
+          get posts_path(random: "1"), as: :json
+          assert_redirected_to posts_path(tags: "random:20", format: :json)
+
+          get posts_path(tags: "touhou", random: "true")
+          assert_redirected_to posts_path(tags: "touhou random:20", format: :html)
         end
 
         should "render with multiple posts" do
           @posts = create_list(:post, 2)
 
-          get posts_path, params: { random: "1" }
-          assert_response :success
+          get posts_path(random: "1")
+          assert_redirected_to posts_path(tags: "random:20", format: :html)
         end
 
         should "return all posts for a .json response" do

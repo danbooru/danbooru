@@ -7,16 +7,15 @@ module PostSets
     MAX_PER_PAGE = 200
     MAX_SIDEBAR_TAGS = 25
 
-    attr_reader :page, :random, :format, :tag_string, :query, :normalized_query, :view
+    attr_reader :page, :format, :tag_string, :query, :normalized_query, :view
     delegate :post_count, to: :normalized_query
 
-    def initialize(tags, page = 1, per_page = nil, user: CurrentUser.user, random: false, format: "html", view: "simple")
+    def initialize(tags, page = 1, per_page = nil, user: CurrentUser.user, format: "html", view: "simple")
       @query = PostQueryBuilder.new(tags, user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
       @normalized_query = query.normalized_query
       @tag_string = tags
       @page = page
       @per_page = per_page
-      @random = random.to_s.truthy?
       @format = format.to_s
       @view = view.presence || "simple"
     end
@@ -92,25 +91,11 @@ module PostSets
     end
 
     def max_per_page
-      (format == "sitemap") ? 10_000 : MAX_PER_PAGE
-    end
-
-    def is_random?
-      random || query.find_metatag(:order) == "random"
-    end
-
-    def get_random_posts
-      ::Post.user_tag_match(tag_string).random(per_page)
+      (format.to_sym == :sitemap) ? 10_000 : MAX_PER_PAGE
     end
 
     def posts
-      @posts ||= begin
-        if is_random?
-          get_random_posts.paginate(page, search_count: false, limit: per_page, max_limit: max_per_page).load
-        else
-          normalized_query.paginated_posts(page, includes: includes, count: post_count, search_count: !post_count.nil?, limit: per_page, max_limit: max_per_page).load
-        end
-      end
+      @posts ||= normalized_query.paginated_posts(page, includes: includes, count: post_count, search_count: !post_count.nil?, limit: per_page, max_limit: max_per_page).load
     end
 
     def hide_from_crawler?

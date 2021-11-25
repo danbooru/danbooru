@@ -38,7 +38,7 @@ class PostQueryBuilder
     ordpool note comment commentary id rating source status filetype
     disapproved parent child search embedded md5 width height mpixels ratio
     score upvotes downvotes favcount filesize date age order limit tagcount pixiv_id pixiv
-    unaliased exif duration
+    unaliased exif duration random
   ] + COUNT_METATAGS + COUNT_METATAG_SYNONYMS + CATEGORY_COUNT_METATAGS
 
   ORDER_METATAGS = %w[
@@ -218,6 +218,8 @@ class PostQueryBuilder
       user_subquery_matches(PostVote.active.positive.visible(current_user), value, field: :user)
     when "downvoter", "downvote"
       user_subquery_matches(PostVote.active.negative.visible(current_user), value, field: :user)
+    when "random"
+      Post.all # handled in the `build` method
     when *CATEGORY_COUNT_METATAGS
       short_category = name.delete_suffix("tags")
       category = TagCategory.short_name_mapping[short_category]
@@ -513,6 +515,11 @@ class PostQueryBuilder
       relation = search_order(relation, find_metatag(:order))
     end
 
+    if count = find_metatag(:random)
+      count = Integer(count).clamp(0, PostSets::Post::MAX_PER_PAGE)
+      relation = relation.random(count)
+    end
+
     relation
   end
 
@@ -687,6 +694,9 @@ class PostQueryBuilder
     # artags_asc, copytags_asc, chartags_asc, gentags_asc, metatags_asc
     when /(#{TagCategory.short_name_list.join("|")})tags_asc/
       relation = relation.order("posts.tag_count_#{TagCategory.short_name_mapping[$1]} ASC")
+
+    when "random"
+      relation = relation.order("random()")
 
     when "rank"
       relation = relation.where("posts.score > 0 and posts.created_at >= ?", 2.days.ago)

@@ -1099,6 +1099,14 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
       assert_tag_match([], "exif:DNE")
     end
 
+    should "return posts for the random:<N> metatag" do
+      post = create(:post)
+
+      assert_tag_match([], "random:0")
+      assert_tag_match([post], "random:1")
+      assert_tag_match([post], "random:1000")
+    end
+
     should "return posts ordered by a particular attribute" do
       posts = (1..2).map do |n|
         tags = ["tagme", "gentag1 gentag2 artist:arttag char:chartag copy:copytag"]
@@ -1208,6 +1216,12 @@ class PostQueryBuilderTest < ActiveSupport::TestCase
         assert_tag_match([], "id:1,2 id:2,3 order:custom")
         assert_tag_match([], "order:custom")
       end
+    end
+
+    should "return posts for order:random" do
+      post = create(:post)
+
+      assert_tag_match([post], "order:random")
     end
 
     should "return posts for a filesize search" do
