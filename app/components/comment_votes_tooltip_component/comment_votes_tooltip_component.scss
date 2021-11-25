@@ -1,4 +1,4 @@
-.post-votes-tooltip {
+.comment-votes-tooltip {
   max-height: 240px;
 
   .upvote-icon {
@@ -9,7 +9,7 @@
     color: var(--post-downvote-color);
   }
 
-  .post-voter {
+  .comment-voter {
     max-width: 160px;
   }
 }

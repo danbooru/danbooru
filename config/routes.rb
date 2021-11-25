@@ -91,7 +91,9 @@ Rails.application.routes.draw do
   end
   resources :comment_votes, only: [:index, :show, :destroy]
   resources :comments do
-    resource :votes, controller: "comment_votes", only: [:create, :destroy], as: "comment_votes"
+    resource :votes, controller: "comment_votes", only: [:create, :destroy], as: "comment_votes" do
+      get "/", action: :index
+    end
     collection do
       get :search
     end

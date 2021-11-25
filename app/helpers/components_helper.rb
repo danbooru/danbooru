@@ -24,6 +24,10 @@ module ComponentsHelper
     render PostVotesTooltipComponent.new(post: post, **options)
   end
 
+  def render_comment_votes_tooltip(comment, **options)
+    render CommentVotesTooltipComponent.new(comment: comment, **options)
+  end
+
   def render_favorites_tooltip(post, **options)
     render FavoritesTooltipComponent.new(post: post, **options)
   end

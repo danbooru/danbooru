@@ -1,0 +1,15 @@
+<div class="comment-votes-tooltip thin-scrollbar text-xs">
+  <div class="text-center text-muted whitespace-nowrap">
+    +<%= upvote_count %> / -<%= downvote_count %> <%= upvote_ratio %>
+  </div>
+
+  <% if policy(CommentVote).can_see_votes? %>
+    <div class="comment-voters">
+      <% votes.each do |vote| %>
+        <div class="comment-voter truncate">
+          <%= vote_icon(vote) %> <%= link_to_user(vote.user, classes: "align-middle") %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

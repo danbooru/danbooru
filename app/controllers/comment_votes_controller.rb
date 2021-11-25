@@ -5,6 +5,9 @@ class CommentVotesController < ApplicationController
     @comment_votes = authorize CommentVote.visible(CurrentUser.user).paginated_search(params, count_pages: true)
     @comment_votes = @comment_votes.includes(:user, comment: [:creator, { post: [:uploader, :media_asset] }]) if request.format.html?
 
+    comment_id = params[:comment_id] || params[:search][:comment_id]
+    @comment = Comment.find(comment_id) if comment_id
+
     respond_with(@comment_votes)
   end
 

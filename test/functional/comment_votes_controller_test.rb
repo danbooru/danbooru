@@ -27,12 +27,22 @@ class CommentVotesControllerTest < ActionDispatch::IntegrationTest
           assert_response :success
         end
 
+        should "render for a tooltip" do
+          get comment_votes_path(comment_id: @comment.id, variant: "tooltip")
+          assert_response :success
+        end
+
         should respond_to_search({}).with { [] }
       end
 
       context "as a moderator" do
         setup do
           CurrentUser.user = create(:mod_user)
+        end
+
+        should "render for a tooltip" do
+          get comment_votes_path(comment_id: @comment.id, variant: "tooltip")
+          assert_response :success
         end
 
         should respond_to_search({}).with { [@unrelated_vote, @negative_vote, @vote] }

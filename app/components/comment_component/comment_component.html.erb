@@ -53,13 +53,13 @@
             <%= link_to upvote_icon, comment_comment_votes_path(comment_id: comment.id, score: "1"), class: "comment-upvote-link inactive-link", method: :post, remote: true %>
           <% end %>
 
-          <% if policy(CommentVote).can_see_votes? %>
-            <%= link_to comment_votes_path(search: { comment_id: comment.id }, variant: "compact"), class: "inactive-link" do %>
-              <span class="comment-score"><%= comment.score %></span>
+          <span class="comment-score">
+            <% if policy(CommentVote).can_see_votes? %>
+              <%= link_to comment.score, comment_votes_path(search: { comment_id: comment.id }, variant: "compact"), class: "inactive-link" %>
+            <% else %>
+              <%= comment.score %>
             <% end %>
-          <% else %>
-            <span class="comment-score"><%= comment.score %></span>
-          <% end %>
+          </span>
 
           <% if current_user.is_anonymous? %>
             <%= link_to downvote_icon, login_path(url: request.fullpath), class: "comment-downvote-link inactive-link" %>
