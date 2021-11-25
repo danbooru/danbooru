@@ -266,7 +266,9 @@ class PostQueryBuilder
     when "none"
       Post.where(field => nil)
     else
-      Post.where(field => User.name_matches(username))
+      user = User.find_by_name(username)
+      return Post.none if user.nil?
+      Post.where(field => user)
     end
   end
 
@@ -278,7 +280,9 @@ class PostQueryBuilder
     elsif username == "none"
       Post.where("NOT EXISTS (#{subquery.to_sql})")
     elsif block.nil?
-      subquery = subquery.where(field => User.name_matches(username))
+      user = User.find_by_name(username)
+      return Post.none if user.nil?
+      subquery = subquery.where(field => user)
       Post.where("EXISTS (#{subquery.to_sql})")
     else
       subquery = subquery.merge(block.call(username))
