@@ -25,7 +25,7 @@ class PostVotesController < ApplicationController
 
   def destroy
     if params[:post_id].present?
-      @post_vote = PostVote.active.find_by(post_id: params[:post_id], user_id: CurrentUser.user)
+      @post_vote = PostVote.active.find_by(post_id: params[:post_id], user: CurrentUser.user)
       @post = Post.find(params[:post_id])
     else
       @post_vote = PostVote.find(params[:id])
