@@ -2,7 +2,7 @@
 
 set -xeuo pipefail
 
-RUBY_VERSION="${RUBY_VERSION:-3.0.2}"
+RUBY_VERSION="${RUBY_VERSION:-3.0.3}"
 VIPS_VERSION="${VIPS_VERSION:-8.12.1}"
 FFMPEG_VERSION="${FFMPEG_VERSION:-4.4.1}"
 EXIFTOOL_VERSION="${EXIFTOOL_VERSION:-12.30}"
@@ -12,7 +12,7 @@ POSTGRESQL_CLIENT_VERSION="${POSTGRESQL_CLIENT_VERSION:-14}"
 COMMON_BUILD_DEPS="
   curl ca-certificates build-essential pkg-config git
 "
-RUBY_BUILD_DEPS="libssl-dev zlib1g-dev"
+RUBY_BUILD_DEPS="libssl-dev zlib1g-dev libgmp-dev"
 FFMPEG_BUILD_DEPS="libvpx-dev nasm"
 VIPS_BUILD_DEPS="
   libfftw3-dev libwebp-dev liborc-dev liblcms2-dev libpng-dev
@@ -20,7 +20,7 @@ VIPS_BUILD_DEPS="
 "
 EXIFTOOL_RUNTIME_DEPS="perl perl-modules libarchive-zip-perl"
 DANBOORU_RUNTIME_DEPS="
-  ca-certificates mkvtoolnix rclone libpq5
+  ca-certificates mkvtoolnix rclone libpq5 openssl libgmpxx4ldbl
   zlib1g libfftw3-3 libwebp6 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2
   libpng16-16 libjpeg-turbo8 libexpat1 libglib2.0 libgif7 libexif12 libheif1 libvpx6
   libseccomp2 libseccomp-dev
