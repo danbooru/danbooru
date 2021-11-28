@@ -3,7 +3,7 @@
 set -xeuo pipefail
 
 RUBY_VERSION="${RUBY_VERSION:-3.0.2}"
-VIPS_VERSION="${VIPS_VERSION:-8.11.4}"
+VIPS_VERSION="${VIPS_VERSION:-8.12.1}"
 FFMPEG_VERSION="${FFMPEG_VERSION:-4.4.1}"
 EXIFTOOL_VERSION="${EXIFTOOL_VERSION:-12.30}"
 OPENRESTY_VERSION="${OPENRESTY_VERSION:-1.19.9.1}"
@@ -16,13 +16,13 @@ RUBY_BUILD_DEPS="libssl-dev zlib1g-dev"
 FFMPEG_BUILD_DEPS="libvpx-dev nasm"
 VIPS_BUILD_DEPS="
   libfftw3-dev libwebp-dev liborc-dev liblcms2-dev libpng-dev
-  libjpeg-turbo8-dev libexpat1-dev libglib2.0-dev libgif-dev libexif-dev
+  libjpeg-turbo8-dev libexpat1-dev libglib2.0-dev libgif-dev libexif-dev libheif-dev
 "
 EXIFTOOL_RUNTIME_DEPS="perl perl-modules libarchive-zip-perl"
 DANBOORU_RUNTIME_DEPS="
   ca-certificates mkvtoolnix rclone libpq5
   zlib1g libfftw3-3 libwebp6 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2
-  libpng16-16 libjpeg-turbo8 libexpat1 libglib2.0 libgif7 libexif12 libvpx6
+  libpng16-16 libjpeg-turbo8 libexpat1 libglib2.0 libgif7 libexif12 libheif1 libvpx6
   libseccomp2 libseccomp-dev
 "
 COMMON_RUNTIME_DEPS="
