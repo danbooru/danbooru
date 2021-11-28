@@ -409,7 +409,10 @@ Post.update = async function(post_id, mode, params) {
     Post.pending_update_count += 1;
     Post.show_pending_update_notice()
 
-    await $.ajax({ type: "PUT", url: `/posts/${post_id}.js?mode=${mode}`, data: params });
+    let urlParams = new URLSearchParams(window.location.search);
+    let view = urlParams.get("view");
+
+    await $.ajax({ type: "PUT", url: `/posts/${post_id}.js?mode=${mode}&view=${view}`, data: params });
 
     Post.pending_update_count -= 1;
     Post.show_pending_update_notice();
