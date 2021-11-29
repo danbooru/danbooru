@@ -3,6 +3,10 @@ FROM ubuntu:21.04 AS base
 WORKDIR /danbooru
 ENV PATH="/root/.asdf/bin:/root/.asdf/shims:$PATH:/usr/lib/postgresql/14/bin"
 
+# Reduces memory usage at the cost of higher thread contention.
+# https://bugs.ruby-lang.org/issues/14718
+ENV MALLOC_ARENA_MAX=2
+
 COPY config/docker/build-base-image.sh .
 
 RUN \
