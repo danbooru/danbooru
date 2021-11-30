@@ -202,5 +202,18 @@ class MediaFile
     }.stringify_keys
   end
 
+  # Scale `width` and `height` to fit within `max_width` and `max_height`.
+  def self.scale_dimensions(width, height, max_width, max_height)
+    max_width ||= Float::INFINITY
+    max_height ||= Float::INFINITY
+
+    if width <= max_width && height <= max_height
+      [width, height]
+    else
+      scale = [max_width.to_f / width.to_f, max_height.to_f / height.to_f].min
+      [(width * scale).round.to_i, (height * scale).round.to_i]
+    end
+  end
+
   memoize :file_ext, :file_size, :md5, :metadata
 end

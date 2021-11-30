@@ -72,8 +72,9 @@ class MediaFile::Image < MediaFile
     MediaFile::Image.new(output_file)
   end
 
-  def preview(max_width, max_height)
-    resize(max_width, max_height, size: :down)
+  def preview(max_width, max_height, **options)
+    w, h = MediaFile.scale_dimensions(width, height, max_width, max_height)
+    resize(w, h, size: :force, **options)
   end
 
   def crop(max_width, max_height)

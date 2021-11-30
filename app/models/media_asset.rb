@@ -25,12 +25,14 @@ class MediaAsset < ApplicationRecord
   validates :md5, uniqueness: { conditions: -> { where(status: [:processing, :active]) } }
 
   class Variant
+    extend Memoist
+
     attr_reader :media_asset, :variant
     delegate :md5, :storage_service, :backup_storage_service, to: :media_asset
 
     def initialize(media_asset, variant)
       @media_asset = media_asset
-      @variant = variant
+      @variant = variant.to_sym
 
       raise ArgumentError, "asset doesn't have #{variant} variant" unless Variant.exists?(media_asset, variant)
     end
@@ -55,13 +57,13 @@ class MediaAsset < ApplicationRecord
     def convert_file(media_file)
       case variant
       in :preview
-        media_file.preview(Danbooru.config.small_image_width, Danbooru.config.small_image_width)
+        media_file.preview(width, height)
       in :crop
-        media_file.crop(Danbooru.config.small_image_width, Danbooru.config.small_image_width)
+        media_file.crop(width, height)
       in :sample if media_asset.is_ugoira?
         media_file.convert
-      in :sample if media_asset.is_static_image? && media_asset.image_width > Danbooru.config.large_image_width
-        media_file.preview(Danbooru.config.large_image_width, media_asset.image_height)
+      in :sample if media_asset.is_static_image?
+        media_file.preview(width, height)
       in :original
         media_file
       end
@@ -105,6 +107,36 @@ class MediaAsset < ApplicationRecord
       end
     end
 
+    def max_dimensions
+      case variant
+      when :preview
+        [150, 150]
+      when :crop
+        [150, 150]
+      when :sample
+        [850, nil]
+      when :original
+        [nil, nil]
+      end
+    end
+
+    def dimensions
+      case variant
+      when :crop
+        max_dimensions
+      else
+        MediaFile.scale_dimensions(media_asset.image_width, media_asset.image_height, max_dimensions[0], max_dimensions[1])
+      end
+    end
+
+    def width
+      dimensions[0]
+    end
+
+    def height
+      dimensions[1]
+    end
+
     def self.exists?(media_asset, variant)
       case variant
       when :preview
@@ -117,6 +149,8 @@ class MediaAsset < ApplicationRecord
         true
       end
     end
+
+    memoize :file_name, :file_ext, :max_dimensions, :dimensions
   end
 
   concerning :SearchMethods do
