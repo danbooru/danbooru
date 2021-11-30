@@ -361,8 +361,8 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(:cmyk, @image.colorspace)
       assert_equal([197, 256], @image.dimensions)
 
-      assert_equal(3, @preview.channels)
-      assert_equal(:srgb, @preview.colorspace)
+      assert_equal(4, @preview.channels)
+      assert_equal(:cmyk, @preview.colorspace)
       assert_equal([115, 150], @preview.dimensions)
     end
   end
