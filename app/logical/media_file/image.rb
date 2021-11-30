@@ -3,9 +3,6 @@
 # @see https://github.com/libvips/ruby-vips
 # @see https://libvips.github.io/libvips/API/current
 class MediaFile::Image < MediaFile
-  # http://jcupitt.github.io/libvips/API/current/VipsForeignSave.html#vips-jpegsave
-  JPEG_OPTIONS = { Q: 90, background: 255, strip: true, interlace: true, optimize_coding: true }
-
   def dimensions
     image.size
   rescue Vips::Error
@@ -66,8 +63,20 @@ class MediaFile::Image < MediaFile
       raise NotImplementedError
     end
 
-    output_file = Tempfile.new(["image-preview", ".jpg"])
-    resized_image.jpegsave(output_file.path, **JPEG_OPTIONS)
+    output_file = Tempfile.new(["image-preview-#{md5}", ".#{format.to_s}"])
+    case format.to_sym
+    when :jpeg
+      # https://www.libvips.org/API/current/VipsForeignSave.html#vips-jpegsave
+      resized_image.jpegsave(output_file.path, Q: 85, background: 255, strip: true, interlace: true, optimize_coding: true, optimize_scans: true, trellis_quant: true, overshoot_deringing: true, quant_table: 3)
+    when :webp
+      # https://www.libvips.org/API/current/VipsForeignSave.html#vips-webpsave
+      resized_image.webpsave(output_file.path, Q: 85, preset: :drawing, effort: 4, strip: true)
+    when :avif
+      # https://www.libvips.org/API/current/VipsForeignSave.html#vips-heifsave
+      resized_image.heifsave(output_file.path, Q: 40, compression: :av1, effort: 4, strip: true)
+    else
+      raise NotImplementedError
+    end
 
     MediaFile::Image.new(output_file)
   end
