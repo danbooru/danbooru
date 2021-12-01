@@ -120,7 +120,7 @@ class MediaFile::Image < MediaFile
 
   # @return [Vips::Image] the Vips image object for the file
   def image
-    Vips::Image.new_from_file(file.path, fail: true).autorot
+    Vips::Image.new_from_file(file.path, fail: strict).autorot
   end
 
   def video

@@ -8,7 +8,7 @@ class MediaFile
   extend Memoist
   include ActiveModel::Serializers::JSON
 
-  attr_accessor :file
+  attr_accessor :file, :strict
 
   # delegate all File methods to `file`.
   delegate *(File.instance_methods - MediaFile.instance_methods), to: :file
@@ -71,9 +71,13 @@ class MediaFile
   end
 
   # Initialize a MediaFile from a regular File.
-  # @param file [File] the image file
-  def initialize(file, **options)
+  #
+  # @param file [File] The image file.
+  # @param strict [Boolean] If true, raise errors if the file is corrupt. If false,
+  #   try to process corrupt files without raising any errors.
+  def initialize(file, strict: true, **options)
     @file = file
+    @strict = strict
   end
 
   # @return [Array<(Integer, Integer)>] the width and height of the file
