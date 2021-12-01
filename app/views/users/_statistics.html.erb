@@ -156,8 +156,8 @@
         <tr>
           <th>Votes</th>
           <td>
-            <%= link_to user.post_votes.count, post_votes_path(search: { user_name: user.name }) %> posts,
-            <%= link_to user.comment_votes.count, comment_votes_path(search: { user_name: user.name }) %> comments,
+            <%= link_to user.post_votes.active.count, post_votes_path(search: { user_name: user.name }) %> posts,
+            <%= link_to user.comment_votes.active.count, comment_votes_path(search: { user_name: user.name }) %> comments,
             <%= link_to user.forum_post_votes.count, forum_post_votes_path(search: { creator_name: user.name }) %> forum posts
           </td>
         </tr>
