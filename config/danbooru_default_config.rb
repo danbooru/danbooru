@@ -196,10 +196,6 @@ module Danbooru
       # base_dir - where to store files (default: under public/data)
       # base_url - where to serve files from (default: https://#{hostname}/data)
       StorageManager::Local.new(base_url: "#{Danbooru.config.canonical_url}/data", base_dir: Rails.root.join("public/data"))
-
-      # Store files on one or more remote host(s). Configure SSH settings in
-      # ~/.ssh_config or in the ssh_options param (ref: http://net-ssh.github.io/net-ssh/Net/SSH.html#method-c-start)
-      # StorageManager::SFTP.new("i1.example.com", "i2.example.com", base_dir: "/mnt/backup", ssh_options: {})
     end
 
     # The method to use for backing up image files.
@@ -209,10 +205,6 @@ module Danbooru
 
       # Backup files to /mnt/backup on the local filesystem.
       # StorageManager::Local.new(base_dir: "/mnt/backup")
-
-      # Backup files to /mnt/backup on a remote system. Configure SSH settings
-      # in ~/.ssh_config or in the ssh_options param (ref: http://net-ssh.github.io/net-ssh/Net/SSH.html#method-c-start)
-      # StorageManager::SFTP.new("www.example.com", base_dir: "/mnt/backup", ssh_options: {})
     end
 
     # Any custom code you want to insert into the default layout without

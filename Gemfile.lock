@@ -277,9 +277,6 @@ GEM
     multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.1.1)
-    net-sftp (3.0.0)
-      net-ssh (>= 5.0.0, < 7.0.0)
-    net-ssh (6.1.0)
     newrelic_rpm (8.0.0)
     nio4r (2.5.8)
     nokogiri (1.12.5)
@@ -525,7 +522,6 @@ DEPENDENCIES
   minitest-reporters
   mocha
   mock_redis
-  net-sftp
   newrelic_rpm
   nokogiri
   oauth2

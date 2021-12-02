@@ -9,7 +9,6 @@
 # @see StorageManager::Local
 # @see StorageManager::Mirror
 # @see StorageManager::Rclone
-# @see StorageManager::SFTP
 class StorageManager
   class Error < StandardError; end
 

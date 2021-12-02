@@ -9,7 +9,6 @@ gem "delayed_job_active_record"
 gem "simple_form"
 gem "sanitize"
 gem 'ruby-vips'
-gem 'net-sftp'
 gem 'diff-lcs', :require => "diff/lcs/array"
 gem 'bcrypt', :require => "bcrypt"
 gem 'rubyzip', :require => "zip"
