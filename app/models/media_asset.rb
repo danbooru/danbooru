@@ -1,6 +1,8 @@
 class MediaAsset < ApplicationRecord
   class Error < StandardError; end
 
+  VARIANTS = %i[preview crop 180x180 360x360 sample original]
+
   has_one :media_metadata, dependent: :destroy
   has_one :pixiv_ugoira_frame_data, class_name: "PixivUgoiraFrameData", foreign_key: :md5, primary_key: :md5
 
@@ -34,7 +36,7 @@ class MediaAsset < ApplicationRecord
       @media_asset = media_asset
       @variant = variant.to_sym
 
-      raise ArgumentError, "asset doesn't have #{variant} variant" unless Variant.exists?(media_asset, variant)
+      raise ArgumentError, "asset doesn't have #{@variant} variant" unless Variant.exists?(@media_asset, @variant)
     end
 
     def store_file!(original_file)
@@ -56,7 +58,7 @@ class MediaAsset < ApplicationRecord
 
     def convert_file(media_file)
       case variant
-      in :preview
+      in :preview, :"180x180", :"360x360"
         media_file.preview(width, height)
       in :crop
         media_file.crop(width, height)
@@ -74,7 +76,7 @@ class MediaAsset < ApplicationRecord
     end
 
     def file_path(slug = "")
-      if variant.in?(%i[preview crop]) && media_asset.is_flash?
+      if variant.in?(%i[preview crop 180x180 360x360]) && media_asset.is_flash?
         "/images/download-preview.png"
       else
         slug = "__#{slug}__" if slug.present?
@@ -96,9 +98,7 @@ class MediaAsset < ApplicationRecord
     # The file extension of this variant.
     def file_ext
       case variant
-      when :preview
-        "jpg"
-      when :crop
+      when :preview, :crop, :"180x180", :"360x360"
         "jpg"
       when :sample
         media_asset.is_ugoira? ? "webm" : "jpg"
@@ -113,6 +113,10 @@ class MediaAsset < ApplicationRecord
         [150, 150]
       when :crop
         [150, 150]
+      when :"180x180"
+        [180, 180]
+      when :"360x360"
+        [360, 360]
       when :sample
         [850, nil]
       when :original
@@ -142,6 +146,10 @@ class MediaAsset < ApplicationRecord
       when :preview
         true
       when :crop
+        true
+      when :"180x180"
+        true
+      when :"360x360"
         true
       when :sample
         media_asset.is_ugoira? || (media_asset.is_static_image? && media_asset.image_width > Danbooru.config.large_image_width)
@@ -267,7 +275,7 @@ class MediaAsset < ApplicationRecord
     end
 
     def variants
-      %i[preview crop sample original].select { |v| has_variant?(v) }.map { |v| variant(v) }
+      VARIANTS.select { |v| has_variant?(v) }.map { |v| variant(v) }
     end
   end
 
