@@ -2,7 +2,7 @@
   <% if empty? %>
     <p>No posts found.</p>
   <% else %>
-    <div class="posts-container grid gap-1 grid-cols-2 md:block user-disable-cropped-<%= current_user.disable_cropped_thumbnails? %>">
+    <div class="posts-container grid gap-1 grid-cols-2 md:block">
       <% posts.each do |post| -%>
 <%    %><%= post_preview(post, **options) -%>
       <% end -%>

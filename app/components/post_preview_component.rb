@@ -3,18 +3,17 @@
 class PostPreviewComponent < ApplicationComponent
   with_collection_parameter :post
 
-  attr_reader :post, :tags, :show_deleted, :show_cropped, :link_target, :pool, :similarity, :recommended, :show_votes, :compact, :size, :current_user, :options
+  attr_reader :post, :tags, :show_deleted, :link_target, :pool, :similarity, :recommended, :show_votes, :compact, :size, :current_user, :options
 
   delegate :external_link_to, :time_ago_in_words_tagged, :duration_to_hhmmss, :render_post_votes, :empty_heart_icon, :sound_icon, to: :helpers
   delegate :image_width, :image_height, :file_ext, :file_size, :duration, :is_animated?, to: :media_asset
   delegate :media_asset, to: :post
 
-  def initialize(post:, tags: "", show_deleted: false, show_cropped: true, show_votes: false, link_target: post, pool: nil, similarity: nil, recommended: nil, compact: nil, size: nil, current_user: CurrentUser.user, **options)
+  def initialize(post:, tags: "", show_deleted: false, show_votes: false, link_target: post, pool: nil, similarity: nil, recommended: nil, compact: nil, size: nil, current_user: CurrentUser.user, **options)
     super
     @post = post
     @tags = tags.presence
     @show_deleted = show_deleted
-    @show_cropped = show_cropped
     @show_votes = show_votes
     @link_target = link_target
     @pool = pool
@@ -32,14 +31,6 @@ class PostPreviewComponent < ApplicationComponent
 
   def article_attrs(classes = nil)
     { class: [classes, *preview_class].compact.join(" "), **data_attributes }
-  end
-
-  def cropped_url
-    if show_cropped && post.has_cropped? && !current_user.disable_cropped_thumbnails?
-      post.crop_file_url
-    else
-      post.preview_file_url
-    end
   end
 
   def preview_width
