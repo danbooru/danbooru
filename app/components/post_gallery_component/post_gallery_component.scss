@@ -15,10 +15,6 @@
 @media screen and (max-width: 660px) {
   .post-gallery-full {
     .posts-container {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 0.25rem;
-
       &.user-disable-cropped-false article.post-preview img.has-cropped-true {
         object-fit: none;
       }
