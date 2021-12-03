@@ -204,6 +204,8 @@ module EmailValidator
     tutanota.com
     foxmail.com
     vivaldi.net
+    fastmail.com
+    relay.firefox.com
   ]
 
   # Returns true if it's okay to connect to port 25. Disabled outside of
