@@ -7,7 +7,7 @@
 # * Inline galleries that fit on a single row, as seen in parent/child post sets.
 #
 class PostGalleryComponent < ApplicationComponent
-  attr_reader :posts, :current_user, :inline, :options
+  attr_reader :posts, :current_user, :inline, :size, :options
 
   delegate :post_preview, :numbered_paginator, to: :helpers
 
@@ -18,14 +18,22 @@ class PostGalleryComponent < ApplicationComponent
   # @param current_user [User] The current user.
   # @param inline [Boolean] If true, the gallery is rendered as a single row with a
   #   horizontal scrollbar. If false, the gallery is rendered as a grid of thumbnails.
+  # @param size [String] The size of thumbnails in the gallery. Can be "150",
+  #   "180", "225", "225w", "270", "270w", or "360".
   # @param options [Hash] A set of options given to the thumbnail in `post_preview`.
-  def initialize(posts:, current_user:, inline: false, **options)
+  def initialize(posts:, current_user:, inline: false, size: PostPreviewComponent::DEFAULT_SIZE, **options)
     super
     @posts = posts
     @posts = @posts.includes(:media_asset) if posts.is_a?(ActiveRecord::Relation)
     @current_user = current_user
     @inline = inline
     @options = options
+
+    if size.to_s.in?(PostPreviewComponent::SIZES)
+      @size = size
+    else
+      @size = PostPreviewComponent::DEFAULT_SIZE
+    end
   end
 
   def gallery_type

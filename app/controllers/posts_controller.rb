@@ -11,7 +11,7 @@ class PostsController < ApplicationController
     elsif params[:random].to_s.truthy?
       post_set = PostSets::Post.new(params[:tags], params[:page], params[:limit], format: request.format.symbol, view: params[:view])
       query = "#{post_set.normalized_query.to_s} random:#{post_set.per_page}".strip
-      redirect_to posts_path(tags: query, page: params[:page], limit: params[:limit], format: request.format.symbol, view: params[:view])
+      redirect_to posts_path(tags: query, page: params[:page], limit: params[:limit], format: request.format.symbol, view: params[:view], size: params[:size])
     else
       tag_query = params[:tags] || params.dig(:post, :tags)
       @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], format: request.format.symbol, view: params[:view])

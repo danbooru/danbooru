@@ -1,6 +1,10 @@
-<div class="popup-menu">
+<div class="popup-menu <%= classes %>">
   <a class="popup-menu-button" href="javascript:void(0)">
-    <%= ellipsis_icon %>
+    <% if button.present? %>
+      <%= button %>
+    <% else %>
+      <%= helpers.ellipsis_icon %>
+    <% end %>
   </a>
 
   <ul class="popup-menu-content">

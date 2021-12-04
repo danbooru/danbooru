@@ -1,18 +1,33 @@
 # frozen_string_literal: true
 
 class PostPreviewComponent < ApplicationComponent
+  DEFAULT_SIZE = "150"
+
+  SIZES = %w[150 180 225 225w 270 270w 360]
+
   with_collection_parameter :post
 
-  attr_reader :post, :tags, :show_deleted, :link_target, :pool, :similarity, :recommended, :show_votes, :compact, :size, :current_user, :options
+  attr_reader :post, :tags, :size, :show_deleted, :link_target, :pool, :similarity, :recommended, :show_votes, :compact, :show_size, :current_user, :options
 
   delegate :external_link_to, :time_ago_in_words_tagged, :duration_to_hhmmss, :render_post_votes, :empty_heart_icon, :sound_icon, to: :helpers
   delegate :image_width, :image_height, :file_ext, :file_size, :duration, :is_animated?, to: :media_asset
   delegate :media_asset, to: :post
 
-  def initialize(post:, tags: "", show_deleted: false, show_votes: false, link_target: post, pool: nil, similarity: nil, recommended: nil, compact: nil, size: nil, current_user: CurrentUser.user, **options)
+  # @param post [Post] The post to show the thumbnail for.
+  # @param tags [String] The current tag search, if any.
+  # @param size [String] The size of the thumbnail. One of "150", "180", "225",
+  #   "225w", "270", "270w", or "360".
+  # @param show_deleted [Boolean] If true, show thumbnails for deleted posts.
+  #   If false, hide thumbnails of deleted posts.
+  # @param show_votes [Boolean] If true, show scores and vote buttons beneath the thumbnail.
+  # @param show_size [Boolean] If true, show filesize and resolution beneath the thumbnail.
+  # @param link_target [ApplicationRecord] What the thumbnail links to (default: the post).
+  # @param current_user [User] The current user.
+  def initialize(post:, tags: "", size: DEFAULT_SIZE, show_deleted: false, show_votes: false, link_target: post, pool: nil, similarity: nil, recommended: nil, compact: nil, show_size: nil, current_user: CurrentUser.user, **options)
     super
     @post = post
     @tags = tags.presence
+    @size = size.presence || DEFAULT_SIZE
     @show_deleted = show_deleted
     @show_votes = show_votes
     @link_target = link_target
@@ -20,7 +35,7 @@ class PostPreviewComponent < ApplicationComponent
     @similarity = similarity.round(1) if similarity.present?
     @recommended = recommended.round(1) if recommended.present?
     @compact = compact
-    @size = post.file_size if size.present?
+    @show_size = show_size
     @current_user = current_user
     @options = options
   end
@@ -33,16 +48,33 @@ class PostPreviewComponent < ApplicationComponent
     { class: [classes, *preview_class].compact.join(" "), **data_attributes }
   end
 
-  def preview_width
-    variant.width
-  end
-
-  def preview_height
-    variant.height
-  end
-
   def variant
-    @variant ||= media_asset.variant(:preview)
+    case size
+    when "150"
+      media_asset.variant("preview")
+    when "180"
+      media_asset.variant("180x180")
+    when "225", "225w"
+      media_asset.variant("360x360")
+    when "270", "270w"
+      media_asset.variant("360x360")
+    when "360"
+      media_asset.variant("360x360")
+    else
+      raise NotImplementedError
+    end
+  end
+
+  def preview_srcset
+    if size == "180"
+      "#{media_asset.variant("180x180").file_url} 1x, #{media_asset.variant("360x360").file_url} 2x"
+    else
+      nil
+    end
+  end
+
+  def preview_url
+    variant.file_url
   end
 
   def tooltip
@@ -51,13 +83,14 @@ class PostPreviewComponent < ApplicationComponent
 
   def preview_class
     klass = ["post-preview"]
-    klass << "captioned" if pool || size || similarity || recommended
+    klass << "captioned" if pool || show_size || similarity || recommended
     klass << "post-status-pending" if post.is_pending?
     klass << "post-status-flagged" if post.is_flagged?
     klass << "post-status-deleted" if post.is_deleted?
     klass << "post-status-has-parent" if post.parent_id
     klass << "post-status-has-children" if post.has_visible_children?
     klass << "post-preview-compact" if compact
+    klass << "post-preview-#{size}"
     klass
   end
 

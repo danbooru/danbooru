@@ -308,19 +308,19 @@ Post.initialize_excerpt = function() {
   $("#excerpt").hide();
 
   $("#show-posts-link").on("click.danbooru", function(e) {
-    $("#show-posts-link").parent("li").addClass("active");
-    $("#show-excerpt-link").parent("li").removeClass("active");
+    $("#show-posts-link").addClass("active");
+    $("#show-excerpt-link").removeClass("active");
     $("#posts").show();
     $("#excerpt").hide();
     e.preventDefault();
   });
 
   $("#show-excerpt-link").on("click.danbooru", function(e) {
-    if ($(this).parent("li").hasClass("active")) {
+    if ($(this).hasClass("active")) {
       return;
     }
-    $("#show-posts-link").parent("li").removeClass("active");
-    $("#show-excerpt-link").parent("li").addClass("active");
+    $("#show-posts-link").removeClass("active");
+    $("#show-excerpt-link").addClass("active");
     $("#posts").hide();
     $("#excerpt").show();
     e.preventDefault();
@@ -411,8 +411,9 @@ Post.update = async function(post_id, mode, params) {
 
     let urlParams = new URLSearchParams(window.location.search);
     let view = urlParams.get("view");
+    let size = urlParams.get("size");
 
-    await $.ajax({ type: "PUT", url: `/posts/${post_id}.js?mode=${mode}&view=${view}`, data: params });
+    await $.ajax({ type: "PUT", url: `/posts/${post_id}.js?mode=${mode}&view=${view}&size=${size}`, data: params });
 
     Post.pending_update_count -= 1;
     Post.show_pending_update_notice();

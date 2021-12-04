@@ -2,7 +2,14 @@
 
 class PopupMenuComponent < ApplicationComponent
   include ViewComponent::SlotableV2
-  delegate :ellipsis_icon, to: :helpers
 
+  attr_reader :classes
+
+  renders_one :button
   renders_many :items
+
+  # @param classes [String] A list of CSS classes for the root element.
+  def initialize(classes: nil)
+    @classes = classes
+  end
 end

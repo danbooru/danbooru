@@ -1,8 +1,8 @@
-<div class="post-gallery post-gallery-<%= gallery_type %>">
+<div class="post-gallery post-gallery-<%= gallery_type %> post-gallery-<%= size %>">
   <% if empty? %>
     <p>No posts found.</p>
   <% else %>
-    <div class="posts-container grid gap-1 grid-cols-2 md:block">
+    <div class="posts-container grid gap-2">
       <% posts.each do |post| -%>
 <%    %><%= post_preview(post, **options) -%>
       <% end -%>

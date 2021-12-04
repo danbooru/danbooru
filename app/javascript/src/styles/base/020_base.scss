@@ -171,10 +171,10 @@ ul.list-inline {
 }
 
 .mobile-only {
-  display: none;
-  @media (max-width: 660px) { display: initial; }
+  display: none !important;
+  @media (max-width: 660px) { display: initial !important; }
 }
 
 .desktop-only {
-  @media (max-width: 660px) { display: none; }
+  @media (max-width: 660px) { display: none !important; }
 }

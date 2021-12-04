@@ -1,6 +1,6 @@
 <% if @post.valid? %>
   var $post = $("#post_<%= @post.id %>");
-  var $new_post = $("<%= j post_preview(@post, show_deleted: true, show_votes: params[:view] == "score") %>");
+  var $new_post = $("<%= j post_preview(@post, show_deleted: true, show_votes: params[:view] == "score", size: params[:size]) %>");
   Danbooru.Blacklist.apply_post($new_post.get(0));
   $("#post_<%= @post.id %>").replaceWith($new_post);
   <% if params[:mode] == "quick-edit" %>

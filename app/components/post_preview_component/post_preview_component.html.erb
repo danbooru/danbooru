@@ -1,5 +1,5 @@
 <%= tag.article id: "post_#{post.id}", **article_attrs do -%>
-  <%= link_to polymorphic_path(link_target, q: tags) do -%>
+  <%= link_to polymorphic_path(link_target, q: tags), class: "post-preview-link" do -%>
     <% if is_animated? || has_sound? %>
       <div class="post-animation-icon absolute top-0.5 left-0.5 p-0.5 m-0.5 leading-none rounded text-xs font-arial font-bold">
         <% if is_animated? %>
@@ -13,9 +13,7 @@
       </div>
     <% end %>
 
-    <%= tag.picture do -%>
-      <%= tag.img src: post.preview_file_url, style: "min-width: #{preview_width}px; min-height: #{preview_height}px;", title: tooltip, alt: "post ##{post.id}", crossorigin: "anonymous" -%>
-    <% end -%>
+    <%= tag.img srcset: preview_srcset, src: preview_url, width: variant.width, height: variant.height, class: "post-preview-image", title: tooltip, alt: "post ##{post.id}", crossorigin: "anonymous" -%>
   <% end -%>
   <% if pool -%>
     <p class="desc">
@@ -37,9 +35,9 @@
     <p class="desc">
       <%= link_to "#{similarity}%", iqdb_queries_path(post_id: post.id) %> similarity
     </p>
-  <% elsif size -%>
+  <% elsif show_size -%>
     <p class="desc">
-      <%= link_to number_to_human_size(size), post.file_url %>
+      <%= link_to number_to_human_size(file_size), post.file_url %>
       (<%= post.image_width %>x<%= post.image_height %>)
     </p>
   <% elsif recommended -%>
@@ -53,7 +51,7 @@
       <% end %>
     </p>
   <% elsif show_votes -%>
-    <div class="post-preview-score text-sm mt-1">
+    <div class="post-preview-score text-sm text-center mt-1">
       <%= render_post_votes post, current_user: current_user %>
     </div>
   <% end -%>
