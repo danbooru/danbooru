@@ -9,12 +9,12 @@
 
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <section>
+    <%= render(PostGalleryComponent.new) do |gallery| %>
       <% @pools.each do |pool| %>
-        <%= post_preview(pool.cover_post, link_target: pool, pool: pool, show_deleted: true) %>
+        <% gallery.post(post: pool.cover_post, link_target: pool, pool: pool, show_deleted: true) %>
       <% end %>
+    <% end %>
 
-      <%= numbered_paginator(@pools) %>
-    </section>
+    <%= numbered_paginator(@pools) %>
   </div>
 </div>

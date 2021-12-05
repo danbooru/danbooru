@@ -10,6 +10,10 @@
     <%= render "explore/posts/nav_links", path: :curated_explore_posts_path, date: @date, scale: @scale %>
     <%= render "posts/partials/common/inline_blacklist" %>
 
-    <%= render_post_gallery(@posts) %>
+    <%= render_post_gallery(@posts) do |gallery| %>
+      <% gallery.footer do %>
+        <%= numbered_paginator(@posts) %>
+      <% end %>
+    <% end %>
   </div>
 </div>

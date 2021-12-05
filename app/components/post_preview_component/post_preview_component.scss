@@ -1,7 +1,9 @@
 @import "../../javascript/src/styles/base/000_vars.scss";
 
 article.post-preview {
-  display: inline-block;
+  display: inline-flex;
+  flex-direction: column;
+  place-items: center;
   position: relative;
   overflow: hidden;
 
@@ -28,6 +30,7 @@ article.post-preview {
   .desc {
     font-size: var(--text-sm);
     margin-bottom: 0;
+    text-align: center;
   }
 }
 

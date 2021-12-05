@@ -3,13 +3,22 @@ module ComponentsHelper
     render PostPreviewComponent.new(post: post, **options)
   end
 
-  def post_previews_html(posts, **options)
+  # Render a set of posts as thumbnail gallery.
+  #
+  # @param posts [ActiveRecord::Relation<Post>, Array<Post>] A set of posts.
+  # @param options [Hash] A hash of options for the PostGalleryComponent and PostPreviewComponent.
+  def render_post_gallery(posts, **options, &block)
     posts = posts.includes(:media_asset) if posts.is_a?(ActiveRecord::Relation)
-    render PostPreviewComponent.with_collection(posts, **options)
-  end
 
-  def render_post_gallery(posts, current_user: CurrentUser.user, **options, &block)
-    render PostGalleryComponent.new(posts: posts, current_user: current_user, **options), &block
+    render(PostGalleryComponent.new(**options)) do |gallery|
+      posts.each do |post|
+        gallery.post(post: post, size: gallery.size, **options)
+      end
+
+      if block_given?
+        yield(gallery, posts)
+      end
+    end
   end
 
   def render_comment(comment, current_user:, **options)

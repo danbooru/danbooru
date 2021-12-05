@@ -2,7 +2,7 @@
   <% if post_set.shown_posts.empty? %>
     <%= render "post_sets/blank" %>
   <% else %>
-    <%= render_post_gallery(post_set.posts, show_deleted: post_set.show_deleted?, tags: post_set.tag_string, show_votes: post_set.show_votes?, size: params[:size]) do |gallery| %>
+    <%= render_post_gallery(post_set.posts, show_deleted: post_set.show_deleted?, tags: post_set.tag_string, show_votes: post_set.show_votes?, size: params[:size]) do |gallery, posts| %>
       <% gallery.footer do %>
         <% if post_set.hidden_posts.present? %>
           <div class="fineprint hidden-posts-notice">
@@ -32,6 +32,8 @@
             <% end %>
           <% end %>
         <% end %>
+
+        <%= numbered_paginator(posts) %>
       <% end %>
     <% end %>
   <% end %>
