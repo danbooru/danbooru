@@ -22,9 +22,14 @@ article.post-preview {
     vertical-align: text-top;
   }
 
-  &.post-preview-compact {
-    width: auto;
-    height: auto;
+  &.post-preview-fit-fixed {
+    &.post-preview-150  { min-width: 150px; min-height: 150px; }
+    &.post-preview-180  { min-width: 180px; min-height: 180px; }
+    &.post-preview-225  { min-width: 225px; min-height: 225px; }
+    &.post-preview-225w { min-width: 225px; min-height: 360px; }
+    &.post-preview-270  { min-width: 270px; min-height: 270px; }
+    &.post-preview-270w { min-width: 270px; min-height: 360px; }
+    &.post-preview-360  { min-width: 360px; min-height: 360px; }
   }
 
   .desc {

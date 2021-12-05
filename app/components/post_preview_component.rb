@@ -7,7 +7,7 @@ class PostPreviewComponent < ApplicationComponent
 
   with_collection_parameter :post
 
-  attr_reader :post, :tags, :size, :show_deleted, :link_target, :pool, :similarity, :recommended, :show_votes, :compact, :show_size, :current_user, :options
+  attr_reader :post, :tags, :size, :show_deleted, :link_target, :pool, :similarity, :recommended, :show_votes, :fit, :show_size, :current_user, :options
 
   delegate :external_link_to, :time_ago_in_words_tagged, :duration_to_hhmmss, :render_post_votes, :empty_heart_icon, :sound_icon, to: :helpers
   delegate :image_width, :image_height, :file_ext, :file_size, :duration, :is_animated?, to: :media_asset
@@ -23,7 +23,10 @@ class PostPreviewComponent < ApplicationComponent
   # @param show_size [Boolean] If true, show filesize and resolution beneath the thumbnail.
   # @param link_target [ApplicationRecord] What the thumbnail links to (default: the post).
   # @param current_user [User] The current user.
-  def initialize(post:, tags: "", size: DEFAULT_SIZE, show_deleted: false, show_votes: false, link_target: post, pool: nil, similarity: nil, recommended: nil, compact: nil, show_size: nil, current_user: CurrentUser.user, **options)
+  # @param fit [Symbol] If `:fixed`, make the thumbnail container a fixed size
+  #   (e.g. 180x180), even if the thumbnail image is smaller than that. If `:compact`,
+  #   make the thumbnail container shrink to the same size as the thumbnail image.
+  def initialize(post:, tags: "", size: DEFAULT_SIZE, show_deleted: false, show_votes: false, link_target: post, pool: nil, similarity: nil, recommended: nil, show_size: nil, fit: :compact, current_user: CurrentUser.user, **options)
     super
     @post = post
     @tags = tags.presence
@@ -34,7 +37,7 @@ class PostPreviewComponent < ApplicationComponent
     @pool = pool
     @similarity = similarity.round(1) if similarity.present?
     @recommended = recommended
-    @compact = compact
+    @fit = fit
     @show_size = show_size
     @current_user = current_user
     @options = options
@@ -77,7 +80,7 @@ class PostPreviewComponent < ApplicationComponent
     klass << "post-status-deleted" if post.is_deleted?
     klass << "post-status-has-parent" if post.parent_id
     klass << "post-status-has-children" if post.has_visible_children?
-    klass << "post-preview-compact" if compact
+    klass << "post-preview-fit-#{fit}"
     klass << "post-preview-#{size}"
     klass
   end
