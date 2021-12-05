@@ -44,7 +44,7 @@ class MediaFile::Image < MediaFile
     image.interpretation
   end
 
-  def resize(max_width, max_height, format: :jpeg, **options)
+  def resize(max_width, max_height, format: :jpeg, quality: 85, **options)
     # @see https://www.libvips.org/API/current/Using-vipsthumbnail.md.html
     # @see https://www.libvips.org/API/current/libvips-resample.html#vips-thumbnail
     if colorspace == :srgb
@@ -63,17 +63,21 @@ class MediaFile::Image < MediaFile
       raise NotImplementedError
     end
 
+    if resized_image.has_alpha?
+      resized_image = resized_image.flatten(background: 255)
+    end
+
     output_file = Tempfile.new(["image-preview-#{md5}", ".#{format.to_s}"])
     case format.to_sym
     when :jpeg
       # https://www.libvips.org/API/current/VipsForeignSave.html#vips-jpegsave
-      resized_image.jpegsave(output_file.path, Q: 85, background: 255, strip: true, interlace: true, optimize_coding: true, optimize_scans: true, trellis_quant: true, overshoot_deringing: true, quant_table: 3)
+      resized_image.jpegsave(output_file.path, Q: quality, strip: true, interlace: true, optimize_coding: true, optimize_scans: true, trellis_quant: true, overshoot_deringing: true, quant_table: 3)
     when :webp
       # https://www.libvips.org/API/current/VipsForeignSave.html#vips-webpsave
-      resized_image.webpsave(output_file.path, Q: 85, preset: :drawing, effort: 4, strip: true)
+      resized_image.webpsave(output_file.path, Q: quality, preset: :drawing, smart_subsample: false, effort: 4, strip: true)
     when :avif
       # https://www.libvips.org/API/current/VipsForeignSave.html#vips-heifsave
-      resized_image.heifsave(output_file.path, Q: 40, compression: :av1, effort: 4, strip: true)
+      resized_image.heifsave(output_file.path, Q: quality, compression: :av1, effort: 4, strip: true)
     else
       raise NotImplementedError
     end

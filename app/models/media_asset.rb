@@ -1,7 +1,7 @@
 class MediaAsset < ApplicationRecord
   class Error < StandardError; end
 
-  VARIANTS = %i[preview crop 180x180 360x360 sample original]
+  VARIANTS = %i[preview crop 180x180 360x360 720x720 sample original]
 
   has_one :media_metadata, dependent: :destroy
   has_one :pixiv_ugoira_frame_data, class_name: "PixivUgoiraFrameData", foreign_key: :md5, primary_key: :md5
@@ -59,13 +59,15 @@ class MediaAsset < ApplicationRecord
     def convert_file(media_file)
       case variant
       in :preview, :"180x180", :"360x360"
-        media_file.preview(width, height)
+        media_file.preview(width, height, format: :jpeg, quality: 85)
+      in :"720x720"
+        media_file.preview(width, height, format: :webp, quality: 75)
       in :crop
         media_file.crop(width, height)
       in :sample if media_asset.is_ugoira?
         media_file.convert
       in :sample if media_asset.is_static_image?
-        media_file.preview(width, height)
+        media_file.preview(width, height, format: :jpeg, quality: 85)
       in :original
         media_file
       end
@@ -76,7 +78,7 @@ class MediaAsset < ApplicationRecord
     end
 
     def file_path(slug = "")
-      if variant.in?(%i[preview crop 180x180 360x360]) && media_asset.is_flash?
+      if variant.in?(%i[preview crop 180x180 360x360 720x720]) && media_asset.is_flash?
         "/images/download-preview.png"
       else
         slug = "__#{slug}__" if slug.present?
@@ -100,6 +102,8 @@ class MediaAsset < ApplicationRecord
       case variant
       when :preview, :crop, :"180x180", :"360x360"
         "jpg"
+      when :"720x720"
+        "webp"
       when :sample
         media_asset.is_ugoira? ? "webm" : "jpg"
       when :original
@@ -117,6 +121,8 @@ class MediaAsset < ApplicationRecord
         [180, 180]
       when :"360x360"
         [360, 360]
+      when :"720x720"
+        [720, 720]
       when :sample
         [850, nil]
       when :original
@@ -150,6 +156,8 @@ class MediaAsset < ApplicationRecord
       when :"180x180"
         true
       when :"360x360"
+        true
+      when :"720x720"
         true
       when :sample
         media_asset.is_ugoira? || (media_asset.is_static_image? && media_asset.image_width > Danbooru.config.large_image_width)

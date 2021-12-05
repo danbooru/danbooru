@@ -65,18 +65,6 @@ class PostPreviewComponent < ApplicationComponent
     end
   end
 
-  def preview_srcset
-    if size == "180"
-      "#{media_asset.variant("180x180").file_url} 1x, #{media_asset.variant("360x360").file_url} 2x"
-    else
-      nil
-    end
-  end
-
-  def preview_url
-    variant.file_url
-  end
-
   def tooltip
     "#{post.tag_string} rating:#{post.rating} score:#{post.score}"
   end
