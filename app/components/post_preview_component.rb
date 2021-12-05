@@ -33,7 +33,7 @@ class PostPreviewComponent < ApplicationComponent
     @link_target = link_target
     @pool = pool
     @similarity = similarity.round(1) if similarity.present?
-    @recommended = recommended.round(1) if recommended.present?
+    @recommended = recommended
     @compact = compact
     @show_size = show_size
     @current_user = current_user
