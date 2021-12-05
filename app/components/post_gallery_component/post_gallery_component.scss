@@ -1,6 +1,14 @@
+.post-gallery {
+  .post-preview-image {
+    max-width: 100%;
+  }
+}
+
 .post-gallery-inline {
-  overflow-x: auto;
-  white-space: nowrap;
+  .posts-container {
+    overflow-x: auto;
+    white-space: nowrap;
+  }
 
   article.post-preview {
     width: auto;
@@ -12,13 +20,10 @@
   }
 }
 
-.post-gallery {
+.post-gallery-grid {
   .posts-container {
-    place-items: center;
-  }
-
-  .post-preview-image {
-    max-width: 100%;
+    display: grid;
+    gap: 0.5rem;
   }
 
   &.post-gallery-150  .posts-container { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
