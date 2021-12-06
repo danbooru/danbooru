@@ -47,15 +47,15 @@ class MediaFile::Image < MediaFile
   def resize(max_width, max_height, format: :jpeg, quality: 85, **options)
     # @see https://www.libvips.org/API/current/Using-vipsthumbnail.md.html
     # @see https://www.libvips.org/API/current/libvips-resample.html#vips-thumbnail
-    if colorspace == :srgb
+    if colorspace.in?(%i[srgb rgb16])
       resized_image = preview_frame.image.thumbnail_image(max_width, height: max_height, import_profile: "srgb", export_profile: "srgb", **options)
     elsif colorspace == :cmyk
       # Leave CMYK as CMYK for better color accuracy than sRGB.
       resized_image = preview_frame.image.thumbnail_image(max_width, height: max_height, import_profile: "cmyk", export_profile: "cmyk", intent: :relative, **options)
-    elsif colorspace == :"b-w" && has_embedded_profile?
+    elsif colorspace.in?(%i[b-w grey16]) && has_embedded_profile?
       # Convert greyscale to sRGB so that the color profile is properly applied before we strip it.
       resized_image = preview_frame.image.thumbnail_image(max_width, height: max_height, export_profile: "srgb", **options)
-    elsif colorspace == :"b-w"
+    elsif colorspace.in?(%i[b-w grey16])
       # Otherwise, leave greyscale without a profile as greyscale because
       # converting it to sRGB would change it from 1 channel to 3 channels.
       resized_image = preview_frame.image.thumbnail_image(max_width, height: max_height, **options)
