@@ -58,7 +58,11 @@ class MediaAsset < ApplicationRecord
 
     def convert_file(media_file)
       case variant
-      in :preview, :"180x180", :"360x360"
+      in :preview
+        media_file.preview(width, height, format: :jpeg, quality: 85)
+      in :"180x180"
+        media_file.preview(width, height, format: :jpeg, quality: 85)
+      in :"360x360"
         media_file.preview(width, height, format: :jpeg, quality: 85)
       in :"720x720"
         media_file.preview(width, height, format: :webp, quality: 75)
