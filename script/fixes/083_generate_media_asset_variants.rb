@@ -2,7 +2,7 @@
 
 require_relative "../../config/environment"
 
-MediaAsset.active.parallel_each do |media_asset|
+MediaAsset.active.where.not(file_ext: "swf").parallel_each do |media_asset|
   media_file = media_asset.variant(:original).open_file
   media_asset.variant("180x180").store_file!(media_file)
   media_asset.variant("360x360").store_file!(media_file)
