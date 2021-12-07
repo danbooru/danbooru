@@ -25,42 +25,50 @@ namespace :danbooru do
     end
   end
 
-  # Usage: TAGS="touhou" bin/rails danbooru:images:validate
+  # Usage: bin/rails danbooru:images:validate
   #
   # Check whether any images are missing, corrupt, or don't match the
   # width/height/size/ext metadata in the database.
   namespace :images do
     task validate: :environment do
       processes = ENV.fetch("PROCESSES", Etc.nprocessors).to_i
-      posts = Post.system_tag_match(ENV["TAGS"]).reorder(nil)
 
-      posts.parallel_each(in_processes: processes) do |post|
-        media_file = MediaFile.open(post.file(:original))
+      MediaAsset.active.parallel_each(in_processes: processes) do |asset|
+        media_file = asset.variant(:original).open_file
 
-        raise if post.md5 != media_file.md5
-        raise if post.image_width != media_file.width
-        raise if post.image_height != media_file.height
-        raise if post.file_size != media_file.file_size
-        raise if post.file_ext != media_file.file_ext.to_s
+        raise if asset.md5 != media_file.md5
+        raise if asset.image_width != media_file.width
+        raise if asset.image_height != media_file.height
+        raise if asset.file_size != media_file.file_size
+        raise if asset.file_ext != media_file.file_ext.to_s
 
-        puts "post ##{post.id}"
+        asset.variants.each do |variant|
+          f = variant.open_file
+          raise if f.is_corrupt?
+          f.close
+        end
+
+        puts { id: asset.id, md5: asset.md5 }.to_json
       rescue RuntimeError => e
         hash = {
-          post: {
-            id: post.id,
-            md5: post.md5,
-            width: post.image_width,
-            height: post.image_height,
-            size: post.file_size,
-            ext: post.file_ext,
+          asset: {
+            id: asset.id,
+            md5: asset.md5,
+            width: asset.image_width,
+            height: asset.image_height,
+            size: asset.file_size,
+            ext: asset.file_ext,
           },
           media_file: media_file.as_json.except("metadata"),
           error: e.to_s,
         }
         STDERR.puts hash.to_json
       rescue StandardError => e
-        hash = { id: post.id, md5: post.md5, error: e.to_s }
+        hash = { id: asset.id, error: e.to_s }
         STDERR.puts hash.to_json
+
+      ensure
+        media_file&.close
       end
     end
 
