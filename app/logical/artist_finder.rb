@@ -65,6 +65,9 @@ module ArtistFinder
     "kym-cdn.com",
     "livedoor.blogimg.jp",
     "blog.livedoor.jp", # http://blog.livedoor.jp/ac370ml
+    "mega.nz", # https://mega.nz/file/9zxwxCDD#TJn7S7sPag30wDVD-kaVhFkeROzz-fE7_ZOb3gIZPTA
+    "mega.nz/file", # https://mega.nz/file/9zxwxCDD#TJn7S7sPag30wDVD-kaVhFkeROzz-fE7_ZOb3gIZPTA
+    "mega.nz/folder", # https://mega.nz/folder/8d4E0LxK#yzYqKHoGFu92RzMNWnoZEw/file/tUgAQZJA
     "monappy.jp",
     "monappy.jp/u", # https://monappy.jp/u/abara_bone
     "mstdn.jp", # https://mstdn.jp/@oneb
