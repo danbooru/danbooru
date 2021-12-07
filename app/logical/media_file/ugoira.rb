@@ -24,8 +24,8 @@ class MediaFile::Ugoira < MediaFile
     preview_frame.dimensions
   end
 
-  def preview(width, height)
-    preview_frame.preview(width, height)
+  def preview(width, height, **options)
+    preview_frame.preview(width, height, **options)
   end
 
   def crop(width, height)
