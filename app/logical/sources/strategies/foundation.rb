@@ -93,9 +93,9 @@ module Sources
       end
 
       def artist_commentary_desc
-        header = page&.xpath("//div[text()='Description']")&.first
+        header = page&.xpath("//h2[text()='Description']")&.first
         return nil if header.blank?
-        header&.parent&.search("div").to_a.fetch(1, nil)&.to_html
+        header&.parent&.search("div").first&.to_html
       end
 
       def dtext_artist_commentary_desc
