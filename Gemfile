@@ -38,7 +38,7 @@ gem 'http-cookie', git: "https://github.com/danbooru/http-cookie"
 gem 'pundit'
 gem 'mail'
 gem 'nokogiri'
-gem 'view_component', require: 'view_component/engine'
+gem 'view_component'
 gem 'tzinfo-data'
 gem 'hsluv'
 gem 'google-cloud-bigquery', require: "google/cloud/bigquery"
