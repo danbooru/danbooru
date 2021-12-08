@@ -8,15 +8,11 @@ module PostsHelper
   end
 
   def missed_post_search_count_js(tags)
-    return unless reportbooru_enabled?
-
     sig = generate_reportbooru_signature(tags)
     render "posts/partials/index/missed_search_count", sig: sig
   end
 
   def post_search_count_js(tags)
-    return unless reportbooru_enabled?
-
     sig = generate_reportbooru_signature("ps-#{tags}")
     render "posts/partials/index/search_count", sig: sig
   end

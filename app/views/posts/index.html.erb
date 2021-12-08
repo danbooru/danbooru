@@ -1,7 +1,21 @@
 <% content_for(:sidebar) do %>
   <%= render "posts/partials/common/search", :path => posts_path, :tags => params[:tags], :tags_dom_id => "tags" %>
 
-  <%= render "posts/partials/index/mode_menu" %>
+  <% if policy(Post).can_use_mode_menu? %>
+    <section id="mode-box">
+      <h2>Mode</h2>
+      <form action="/">
+        <select name="mode">
+          <option value="view">View</option>
+          <option value="edit">Edit</option>
+          <option value="tag-script">Tag script</option>
+          <option value="add-fav">Favorite</option>
+          <option value="remove-fav">Unfavorite</option>
+        </select>
+      </form>
+      <input id="tag-script-field" data-autocomplete="tag-edit" placeholder="Enter tag script" style="display: none; margin-top: 0.5em;">
+    </section>
+  <% end %>
 
   <%= render "posts/partials/index/blacklist" %>
 
@@ -10,9 +24,35 @@
     <%= render_search_tag_list(@post_set.related_tags, current_query: params[:tags], show_extra_links: policy(Post).show_extra_links?, search_params: { view: params[:view], size: params[:size] }) %>
   </section>
 
-  <%= render "posts/partials/index/options" %>
+  <section id="options-box">
+    <h2>Options</h2>
+    <ul>
+      <% if policy(SavedSearch).create? %>
+        <li><%= button_tag(bookmark_icon + " Save search", id: "save-search", class: "ui-button ui-widget ui-corner-all sub") %></li>
+      <% end %>
+    </ul>
+  </section>
 
-  <%= render "posts/partials/index/related", post_set: @post_set %>
+  <section id="related-box">
+    <h2>Related</h2>
+    <ul id="related-list">
+      <% if discover_mode? %>
+        <li id="secondary-links-posts-hot"><%= link_to "Hot", posts_path(:tags => "order:rank") %></li>
+        <li id="secondary-links-posts-popular"><%= link_to "Popular", popular_explore_posts_path %></li>
+        <li id="secondary-links-posts-curated"><%= link_to "Curated", curated_explore_posts_path %></li>
+        <li><%= link_to "Searches", searches_explore_posts_path %></li>
+        <li><%= link_to "Viewed", viewed_explore_posts_path %></li>
+      <% end %>
+
+      <li><%= link_to "Deleted", posts_path(tags: "#{params[:tags]} status:deleted"), rel: "nofollow" %></li>
+      <li><%= link_to "Random", random_posts_path(tags: params[:tags]), id: "random-post", "data-shortcut": "r", rel: "nofollow" %></li>
+      <% if @post_set.normalized_query.has_single_tag? %>
+        <li><%= link_to "History", post_versions_path(search: { changed_tags: @post_set.normalized_query.tags.first.name }), rel: "nofollow" %></li>
+        <li><%= link_to "Discussions", forum_posts_path(search: { linked_to: @post_set.normalized_query.tags.first.name }), rel: "nofollow" %></li>
+      <% end %>
+      <li><%= link_to "Count", posts_counts_path(tags: params[:tags]), rel: "nofollow" %></li>
+    </ul>
+  </section>
 <% end %>
 
 <% content_for(:content) do %>
@@ -103,9 +143,125 @@
     <% end %>
   </menu>
 
-  <%= render "posts/partials/index/edit" %>
-  <%= render "posts/partials/index/excerpt", :post_set => @post_set %>
-  <%= render "posts/partials/index/posts", :post_set => @post_set %>
+  <div id="quick-edit-div" style="display: none;">
+    <h2>Edit</h2>
+
+    <%= edit_form_for(:post, html: { id: "quick-edit-form" }) do |f| %>
+      <%= f.input :tag_string, label: "Tags", as: :text, input_html: { "data-autocomplete": "tag-edit" } %>
+      <%= f.submit "Submit", data: { disable_with: false } %>
+      <%= f.button :button, "Cancel", name: :cancel, type: :button %>
+    <% end %>
+  </div>
+
+  <div id="excerpt" style="display: none;">
+    <% if @post_set.artist.present? && @post_set.artist.is_banned? && !policy(@post_set.artist).can_view_banned? %>
+      <p>The artist requested removal of this page.</p>
+    <% elsif @post_set.artist.present? %>
+      <% @post_set.artist.tap do |artist| %>
+        <% unless artist.wiki_page.blank? %>
+          <div class="prose">
+            <%= format_text(artist.wiki_page.body) %>
+          </div>
+        <% end %>
+
+        <div>
+          <%= render "artists/summary", artist: artist %>
+          <%= render "tag_relationships/alias_and_implication_list", tag: artist.tag %>
+
+          <p class="mt-4">
+            <% if artist.wiki_page.present? %>
+              <%= link_to "View wiki", artist.wiki_page, id: "view-wiki-link" %> |
+            <% end %>
+            <%= link_to "View artist", artist, id: "view-artist-link" %>
+          </p>
+        </div>
+      <% end %>
+    <% elsif @post_set.wiki_page.present? %>
+      <% @post_set.wiki_page.tap do |wiki_page| %>
+        <div class="prose">
+          <% if wiki_page.other_names.present? %>
+            <p><%= wiki_page_other_names_list(wiki_page) %></p>
+          <% end %>
+
+          <%= format_text(wiki_page.body) %>
+          <%= render "tag_relationships/alias_and_implication_list", tag: wiki_page.tag %>
+
+          <p class="mt-4">
+            <%= link_to_wiki "View wiki", wiki_page.title, id: "view-wiki-link" %>
+          </p>
+        </div>
+      <% end %>
+    <% elsif @post_set.pool.present? %>
+      <% @post_set.pool.tap do |pool| %>
+        <h2>
+          <%= pool.pretty_category %>:
+          <%= link_to pool.pretty_name, pool_path(pool), :class => "pool-category-#{pool.category}" %>
+          <% if pool.is_deleted? %>
+            <span class="inactive">(deleted)</span>
+          <% end %>
+        </h2>
+
+        <div id="description" class="prose">
+          <%= format_text(@post_set.pool.description) %>
+        </div>
+
+        <p class="mt-4">
+          <%= link_to "View pool", pool_path(@post_set.pool.id) %>
+        </p>
+      <% end %>
+    <% elsif @post_set.favgroup.present? %>
+      <h2>
+        Favorite Group:
+        <%= link_to @post_set.favgroup.pretty_name, favorite_group_path(@post_set.favgroup) %>
+      </h2>
+      Creator: <%= link_to_user @post_set.favgroup.creator %>
+    <% elsif @post_set.has_blank_wiki? %>
+      <p>There is currently no wiki page for the tag <%= link_to_wiki @post_set.tag.pretty_name %>. You can <%= link_to "create one", new_wiki_page_path(wiki_page: { title: @post_set.tag.name }), rel: "nofollow" %>.</p>
+
+      <%= render "tag_relationships/alias_and_implication_list", tag: @post_set.tag %>
+    <% end %>
+  </div>
+
+  <div id="posts">
+    <% if @post_set.shown_posts.empty? %>
+      <%= render "post_sets/blank" %>
+    <% else %>
+      <%= render_post_gallery(@post_set.posts, show_deleted: @post_set.show_deleted?, tags: @post_set.tag_string, show_votes: @post_set.show_votes?, size: params[:size]) do |gallery, posts| %>
+        <% gallery.footer do %>
+          <% if @post_set.hidden_posts.present? %>
+            <div class="fineprint hidden-posts-notice">
+              <% if @post_set.banned_posts.present? %>
+                <%= @post_set.banned_posts.size %> post(s) were removed from this page at the artist's request (<%= link_to_wiki "learn more", "banned_artist" %>).<br>
+              <% end %>
+
+              <% if @post_set.censored_posts.present? %>
+                <%= @post_set.censored_posts.size %> post(s) on this page require a <%= link_to "Gold account", new_user_upgrade_path %> to view (<%= link_to_wiki "learn more", "help:censored_tags" %>).<br>
+              <% end %>
+
+              <% if @post_set.safe_posts.present? %>
+                <%= @post_set.safe_posts.size %> post(s) on this page were hidden by safe mode. Go to <%= link_to "Danbooru", "https://danbooru.donmai.us" %> or disable safe mode to view them (<%= link_to_wiki "learn more", "help:user_settings" %>).<br>
+              <% end %>
+            </div>
+          <% end %>
+
+          <% if !CurrentUser.user.is_anonymous? && @post_set.tag.present? && @post_set.current_page == 1 %>
+            <% cache("tag-change-notice:#{@post_set.tag.name}", expires_in: 4.hours) do %>
+              <% if @post_set.pending_bulk_update_requests.present? %>
+                <div class="fineprint tag-change-notice">
+                  <p>
+                    This tag is being discussed in
+                    <%= to_sentence @post_set.pending_bulk_update_requests.map { |bur| link_to "Topic ##{bur.forum_topic_id}: #{bur.forum_topic.title}", bur.forum_post } %>.
+                  </p>
+                </div>
+              <% end %>
+            <% end %>
+          <% end %>
+
+          <%= numbered_paginator(posts) %>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
 <% end %>
 
 <div id="saved-searches-nav">
@@ -118,7 +274,7 @@
   <%= render "posts/partials/common/secondary_links" %>
 <% end %>
 
-<% if @post_set.query.is_simple_tag? && @post_set.current_page == 1 %>
+<% if reportbooru_enabled? && @post_set.query.is_simple_tag? && @post_set.current_page == 1 %>
   <% if @post_set.post_count == 0 %>
     <%= missed_post_search_count_js(@post_set.query.to_s) %>
   <% else %>
@@ -127,5 +283,33 @@
 <% end %>
 
 <% content_for(:html_header) do %>
-  <%= render "posts/partials/index/seo_meta_tags" %>
+  <% if @post_set.query.is_empty_search? %>
+    <% page_title("#{Danbooru.config.app_name}: Anime Image Board", suffix: nil) %>
+    <% meta_description site_description %>
+
+    <% atom_feed_tag "Posts", posts_url(format: :atom) %>
+  <% else %>
+    <% page_title("#{@post_set.humanized_tag_string} Art") %>
+    <% meta_description("See over #{number_with_delimiter(@post_set.post_count)} #{@post_set.humanized_tag_string} images on #{Danbooru.config.app_name}. #{DText.excerpt(@post_set.wiki_page&.body)}") %>
+
+    <% atom_feed_tag "Posts: #{@post_set.tag_string}", posts_url(tags: @post_set.tag_string, format: :atom) %>
+  <% end %>
+
+  <% if params[:tags].blank? && @post_set.current_page == 1 %>
+    <% canonical_url root_url(host: Danbooru.config.hostname) %>
+  <% else %>
+    <% canonical_url posts_url(host: Danbooru.config.hostname, tags: params[:tags], page: params[:page], limit: params[:limit]) %>
+  <% end %>
+
+  <% noindex if @post_set.hide_from_crawler? %>
+
+  <% if @post_set.has_explicit? %>
+    <meta name="rating" content="adult">
+  <% end %>
+
+  <% if @post_set.best_post.present? %>
+    <%= tag.meta property: "og:image", content: @post_set.best_post.open_graph_image_url %>
+    <%= tag.meta name: "twitter:image", content: @post_set.best_post.open_graph_image_url %>
+    <%= tag.meta name: "twitter:card", content: "summary_large_image" %>
+  <% end %>
 <% end %>
