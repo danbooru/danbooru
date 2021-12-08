@@ -21,7 +21,7 @@ module Sources
       end
 
       should "get the commentary" do
-        desc = '<p>a mind forever voyaging through strange seas of thought alone <a href="https://pawoo.net/media/9hJzXvwxVl1CezW0ecM" rel="nofollow noopener" target="_blank"><span class="invisible">https://</span><span class="ellipsis">pawoo.net/media/9hJzXvwxVl1Cez</span><span class="invisible">W0ecM</span></a></p>'
+        desc = '<p>a mind forever voyaging through strange seas of thought alone <a href="https://pawoo.net/media/9hJzXvwxVl1CezW0ecM" rel="nofollow noopener noreferrer" target="_blank"><span class="invisible">https://</span><span class="ellipsis">pawoo.net/media/9hJzXvwxVl1Cez</span><span class="invisible">W0ecM</span></a></p>'
         assert_equal(desc, @site.artist_commentary_desc)
       end
 

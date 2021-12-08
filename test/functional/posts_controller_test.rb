@@ -171,7 +171,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "show a notice for a single tag search with a pending BUR" do
-          create(:tag, name: "foo")
+          create(:post, tag_string: "foo")
           create(:bulk_update_request, script: "create alias foo -> bar")
           get_auth posts_path(tags: "foo"), @user
           assert_select ".tag-change-notice"
@@ -196,7 +196,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { tags: "1girl rating:s" }
 
           assert_response :success
-          assert_select "li.wiki-excerpt-link", count: 1
+          assert_select "a.wiki-excerpt-link", count: 1
         end
 
         should "show the blank wiki excerpt if the search has tag without a wiki" do
@@ -204,7 +204,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get posts_path, params: { tags: "1girl rating:s" }
 
           assert_response :success
-          assert_select "li.blank-wiki-excerpt-link", count: 1
+          assert_select "a.blank-wiki-excerpt-link", count: 1
         end
 
         should "render an error when searching for too many tags" do

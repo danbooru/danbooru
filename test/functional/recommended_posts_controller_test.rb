@@ -17,8 +17,7 @@ class RecommendedPostsControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         get_auth recommended_posts_path(search: { post_id: @post.id }), @user
         assert_response :success
-        assert_select ".recommended-posts"
-        assert_select ".recommended-posts #post_#{@post.id}"
+        assert_select ".post-gallery #post_#{@post.id}"
       end
     end
 
@@ -31,8 +30,7 @@ class RecommendedPostsControllerTest < ActionDispatch::IntegrationTest
       should "render" do
         get_auth recommended_posts_path(search: { user_id: @user.id }), @user
         assert_response :success
-        assert_select ".recommended-posts"
-        assert_select ".recommended-posts #post_#{@post.id}"
+        assert_select ".post-gallery #post_#{@post.id}"
       end
 
       should "not show recommendations for users with private favorites to other users" do
