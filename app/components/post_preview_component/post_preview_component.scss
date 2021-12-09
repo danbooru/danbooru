@@ -45,8 +45,8 @@ article.post-preview {
 }
 
 @media screen and (min-width: 660px) {
-  .post-preview-225 .post-preview-image { max-height: 225px; }
-  .post-preview-270 .post-preview-image { max-height: 270px; }
+  .post-preview-225 .post-preview-image { max-height: 225px; width: auto; }
+  .post-preview-270 .post-preview-image { max-height: 270px; width: auto; }
 }
 
 .post-preview {
