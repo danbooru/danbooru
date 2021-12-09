@@ -29,7 +29,7 @@
   &.post-gallery-360  .posts-container { grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); }
 
   @media screen and (max-width: 660px) {
-    &.post-gallery-150  .posts-container { grid-template-columns: repeat(3, auto); }
+    &.post-gallery-150  .posts-container { grid-template-columns: repeat(2, auto); }
     &.post-gallery-180  .posts-container { grid-template-columns: repeat(2, auto); }
     &.post-gallery-225  .posts-container { grid-template-columns: repeat(2, auto); }
     &.post-gallery-225w .posts-container { grid-template-columns: repeat(2, auto); }
