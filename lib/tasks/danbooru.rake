@@ -48,7 +48,8 @@ namespace :danbooru do
           f.close
         end
 
-        puts { id: asset.id, md5: asset.md5 }.to_json
+        hash = { id: asset.id, md5: asset.md5 }.to_json
+        puts hash
       rescue RuntimeError => e
         hash = {
           asset: {
