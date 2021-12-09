@@ -1,9 +1,9 @@
 $tooltip-line-height: 16px;
-$tooltip-body-height: $tooltip-line-height * 4; // 4 lines high.
+$tooltip-body-height: $tooltip-line-height * 6; // 4 lines high.
 
 .tippy-box[data-theme~="post-tooltip"] {
   min-width: 20em;
-  max-width: 40em !important;
+  max-width: 35em !important;
   font-size: 11px;
   line-height: $tooltip-line-height;
 
