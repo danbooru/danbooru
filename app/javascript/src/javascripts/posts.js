@@ -26,6 +26,7 @@ Post.initialize_all = function() {
     this.initialize_excerpt();
     this.initialize_gestures();
     this.initialize_post_preview_size_menu();
+    this.initialize_post_preview_options_menu();
   }
 
   if ($("#c-posts").length && $("#a-show").length) {
@@ -255,6 +256,20 @@ Post.initialize_post_preview_size_menu = function() {
   });
 }
 
+Post.initialize_post_preview_options_menu = function() {
+  $(document).on("click.danbooru", "a.post-preview-show-votes", (e) => {
+    Cookie.put("post_preview_show_votes", "true");
+    location.reload();
+    e.preventDefault();
+  });
+
+  $(document).on("click.danbooru", "a.post-preview-hide-votes", (e) => {
+    Cookie.put("post_preview_show_votes", "false");
+    location.reload();
+    e.preventDefault();
+  });
+}
+
 Post.view_original = function(e = null) {
   if (Utility.test_max_width(660)) {
     // Do the default behavior (navigate to image)
@@ -424,10 +439,10 @@ Post.update = async function(post_id, mode, params) {
     Post.show_pending_update_notice()
 
     let urlParams = new URLSearchParams(window.location.search);
-    let view = urlParams.get("view");
+    let show_votes = urlParams.get("show_votes");
     let size = urlParams.get("size");
 
-    await $.ajax({ type: "PUT", url: `/posts/${post_id}.js`, data: { mode, view, size, ...params }});
+    await $.ajax({ type: "PUT", url: `/posts/${post_id}.js`, data: { mode, show_votes, size, ...params }});
 
     Post.pending_update_count -= 1;
     Post.show_pending_update_notice();

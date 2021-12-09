@@ -7,17 +7,18 @@ module PostSets
     MAX_PER_PAGE = 200
     MAX_SIDEBAR_TAGS = 25
 
-    attr_reader :page, :format, :tag_string, :query, :normalized_query, :view
+    attr_reader :page, :format, :tag_string, :query, :normalized_query, :show_votes
     delegate :post_count, to: :normalized_query
+    alias_method :show_votes?, :show_votes
 
-    def initialize(tags, page = 1, per_page = nil, user: CurrentUser.user, format: "html", view: "simple")
+    def initialize(tags, page = 1, per_page = nil, user: CurrentUser.user, format: "html", show_votes: false)
       @query = PostQueryBuilder.new(tags, user, tag_limit: user.tag_query_limit, safe_mode: CurrentUser.safe_mode?, hide_deleted_posts: user.hide_deleted_posts?)
       @normalized_query = query.normalized_query
       @tag_string = tags
       @page = page
       @per_page = per_page
       @format = format.to_s
-      @view = view.presence || "simple"
+      @show_votes = show_votes
     end
 
     def humanized_tag_string
@@ -124,10 +125,6 @@ module PostSets
       query.select_metatags("status").any? do |metatag|
         metatag.value.in?(%w[all any active unmoderated modqueue deleted appealed])
       end
-    end
-
-    def show_votes?
-      view == "score"
     end
 
     def includes
