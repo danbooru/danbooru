@@ -15,6 +15,7 @@ class PostsController < ApplicationController
     else
       tag_query = params[:tags] || params.dig(:post, :tags)
       @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], format: request.format.symbol, view: params[:view])
+      @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostPreviewComponent::DEFAULT_SIZE
       @posts = authorize @post_set.posts, policy_class: PostPolicy
       @post_set.log!
       respond_with(@posts) do |format|
@@ -55,6 +56,7 @@ class PostsController < ApplicationController
   def update
     @post = authorize Post.find(params[:id])
     @post.update(permitted_attributes(@post))
+    @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostPreviewComponent::DEFAULT_SIZE
     respond_with_post_after_update(@post)
   end
 

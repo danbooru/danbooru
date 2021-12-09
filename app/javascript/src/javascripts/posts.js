@@ -25,6 +25,7 @@ Post.initialize_all = function() {
   if ($("#c-posts").length && $("#a-index").length) {
     this.initialize_excerpt();
     this.initialize_gestures();
+    this.initialize_post_preview_size_menu();
   }
 
   if ($("#c-posts").length && $("#a-show").length) {
@@ -239,6 +240,19 @@ Post.toggle_relationship_preview = function(preview, preview_link) {
     preview_link.html("show &raquo;");
     Cookie.put("show-relationship-previews", "0");
   }
+}
+
+Post.initialize_post_preview_size_menu = function() {
+  $(document).on("click.danbooru", ".post-preview-size-menu .popup-menu-content a", (e) => {
+    let url = new URL($(e.target).get(0).href);
+    let size = url.searchParams.get("size");
+
+    Cookie.put("post_preview_size", size);
+    url.searchParams.delete("size");
+    location.replace(url);
+
+    e.preventDefault();
+  });
 }
 
 Post.view_original = function(e = null) {
