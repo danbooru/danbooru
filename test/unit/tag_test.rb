@@ -99,14 +99,6 @@ class TagTest < ActiveSupport::TestCase
       end
     end
 
-    should "not change the category is the tag is locked" do
-      tag = FactoryBot.create(:tag, :is_locked => true)
-      assert_equal(true, tag.is_locked?)
-      Tag.find_or_create_by_name("artist:#{tag.name}")
-      tag.reload
-      assert_equal(0, tag.category)
-    end
-
     should "not change category when the tag is too large to be changed by a builder" do
       tag = FactoryBot.create(:tag, post_count: 1001)
       Tag.find_or_create_by_name("artist:#{tag.name}", creator: @builder)

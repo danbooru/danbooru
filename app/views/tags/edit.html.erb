@@ -5,15 +5,10 @@
     <%= edit_form_for(@tag) do |f| %>
       <% if policy(@tag).can_change_category? %>
         <%= f.input :category, collection: TagCategory.canonical_mapping.to_a, include_blank: false %>
+        <%= f.button :submit, "Submit" %>
       <% else %>
         <p>Create a <%= link_to "bulk update request", new_bulk_update_request_path(bulk_update_request: { script: "category #{@tag.name} -> general" }) %> to change this tag's category.</p>
       <% end %>
-
-      <% if policy(@tag).can_lock? %>
-        <%= f.input :is_locked, :collection => [["No", "false"], ["Yes", "true"]], :include_blank => false %>
-      <% end %>
-
-      <%= f.button :submit, "Submit" %>
     <% end %>
   </div>
 </div>
