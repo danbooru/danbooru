@@ -80,6 +80,7 @@ class PostPreviewComponent < ApplicationComponent
     klass << "post-status-deleted" if post.is_deleted?
     klass << "post-status-has-parent" if post.parent_id
     klass << "post-status-has-children" if post.has_visible_children?
+    klass << "post-preview-show-votes" if show_votes
     klass << "post-preview-fit-#{fit}"
     klass << "post-preview-#{size}"
     klass
