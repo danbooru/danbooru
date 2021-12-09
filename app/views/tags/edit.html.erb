@@ -3,10 +3,10 @@
     <h1>Tag: <%= @tag.name %></h1>
 
     <%= edit_form_for(@tag) do |f| %>
-      <% if @tag.is_locked? %>
-        <p>This tag is category locked</p>
+      <% if policy(@tag).can_change_category? %>
+        <%= f.input :category, collection: TagCategory.canonical_mapping.to_a, include_blank: false %>
       <% else %>
-        <%= f.input :category, :collection => TagCategory.canonical_mapping.to_a, :include_blank => false %>
+        <p>Create a <%= link_to "bulk update request", new_bulk_update_request_path(bulk_update_request: { script: "category #{@tag.name} -> general" }) %> to change this tag's category.</p>
       <% end %>
 
       <% if policy(@tag).can_lock? %>
