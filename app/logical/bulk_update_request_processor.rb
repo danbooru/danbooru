@@ -113,7 +113,15 @@ class BulkUpdateRequestProcessor
             errors.add(:base, "Can't rename #{args[0]} -> #{args[1]} ('#{args[0]}' has more than #{MAXIMUM_RENAME_COUNT} posts, use an alias instead)")
           end
 
-        when :mass_update, :nuke
+        when :mass_update
+          lhs = PostQueryBuilder.new(args[0])
+          rhs = PostQueryBuilder.new(args[1])
+
+          if lhs.is_simple_tag? && rhs.is_simple_tag?
+            errors.add(:base, "Can't mass update #{args[0]} -> #{args[1]} (use an alias or a rename instead for tag moves)")
+          end
+
+        when :nuke
           # okay
 
         when :invalid_line
@@ -210,11 +218,6 @@ class BulkUpdateRequestProcessor
       case command
       when :create_alias, :rename
         BulkUpdateRequestProcessor.is_tag_move_allowed?(args[0], args[1])
-      when :mass_update
-        lhs = PostQueryBuilder.new(args[0])
-        rhs = PostQueryBuilder.new(args[1])
-
-        lhs.is_simple_tag? && rhs.is_simple_tag? && BulkUpdateRequestProcessor.is_tag_move_allowed?(args[0], args[1])
       else
         false
       end

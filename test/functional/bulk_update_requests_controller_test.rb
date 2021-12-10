@@ -171,7 +171,7 @@ class BulkUpdateRequestsControllerTest < ActionDispatch::IntegrationTest
           create(:tag, name: "artist1a", category: Tag.categories.artist, post_count: 10)
           create(:tag, name: "artist1b", category: Tag.categories.general, post_count: 0)
           create(:tag, name: "artist2a", category: Tag.categories.artist, post_count: 20)
-          @bulk_update_request = create(:bulk_update_request, script: "mass update artist1a -> artist1b\ncreate alias artist2a -> artist2b")
+          @bulk_update_request = create(:bulk_update_request, script: "rename artist1a -> artist1b\ncreate alias artist2a -> artist2b")
 
           perform_enqueued_jobs do
             post_auth approve_bulk_update_request_path(@bulk_update_request), @builder

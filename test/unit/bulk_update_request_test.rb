@@ -308,11 +308,11 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       context "the mass update command" do
         setup do
           @post = create(:post, tag_string: "foo")
-          @bur = create_bur!("mass update foo -> bar", @admin)
+          @bur = create_bur!("mass update foo -> bar baz", @admin)
         end
 
         should "update the tags" do
-          assert_equal("bar", @post.reload.tag_string)
+          assert_equal("bar baz", @post.reload.tag_string)
           assert_equal("approved", @bur.reload.status)
           assert_equal(User.system, @post.versions.last.updater)
         end
@@ -323,6 +323,13 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
 
           assert_equal("Imageboard", @post.reload.source)
           assert_equal("approved", @bur.reload.status)
+        end
+
+        should "not allow mass update for simple A -> B moves" do
+          @bur = build(:bulk_update_request, script: "mass update bunny -> rabbit")
+
+          assert_equal(false, @bur.valid?)
+          assert_equal(["Can't mass update bunny -> rabbit (use an alias or a rename instead for tag moves)"], @bur.errors.full_messages)
         end
       end
 
@@ -535,7 +542,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
         @script = '
           create alias foo -> bar
           create implication bar -> baz
-          mass update aaa -> bbb
+          mass update aaa -> bbb blah
         '
 
         @bur = create_bur!(@script, @admin)
@@ -554,7 +561,7 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
       end
 
       should "process mass updates" do
-        assert_equal("bar baz bbb", @post.reload.tag_string)
+        assert_equal("bar baz bbb blah", @post.reload.tag_string)
       end
 
       should "set the alias/implication approvers" do
