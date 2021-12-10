@@ -2,6 +2,8 @@ module Explore
   class PostsController < ApplicationController
     respond_to :html, :xml, :json
 
+    rate_limit :popular, rate: 1.0/1.minute, burst: 50, if: -> { request.format.json? }, key: "explore:popular.json"
+
     def popular
       @date, @scale, @min_date, @max_date = parse_date(params)
 
