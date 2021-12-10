@@ -8,7 +8,7 @@
   <% end %>
 
   <span class="post-score">
-    <%= link_to post.score, post_votes_path(search: { post_id: post.id }, variant: :compact) %>
+    <%= link_to post.score, post_votes_path(search: { post_id: post.id }, variant: :compact), rel: "nofollow" %>
   </span>
 
   <% if current_user.is_anonymous? %>

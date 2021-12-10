@@ -26,7 +26,7 @@
   <li id="post-info-favorites">
     Favorites:
     <%= tag.span class: "post-favcount", "data-id": post.id do %>
-      <%= link_to post.fav_count, post_favorites_path(post) %>
+      <%= link_to post.fav_count, post_favorites_path(post), rel: "nofollow" %>
     <% end %>
   </li>
   <li id="post-info-status">
