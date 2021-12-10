@@ -133,7 +133,7 @@ RelatedTag.toggle_tag = function(e) {
 
 RelatedTag.show = function(e) {
   $(document).trigger("danbooru:show-related-tags");
-  $("#related-tags-container").removeClass("hidden").addClass("visible");
+  $("#related-tags-container").removeClass("collapsed").addClass("visible");
 
   if (e) {
     e.preventDefault();
@@ -141,7 +141,7 @@ RelatedTag.show = function(e) {
 }
 
 RelatedTag.hide = function(e) {
-  $("#related-tags-container").removeClass("visible").addClass("hidden");
+  $("#related-tags-container").removeClass("visible").addClass("collapsed");
 
   if (e) {
     e.preventDefault();

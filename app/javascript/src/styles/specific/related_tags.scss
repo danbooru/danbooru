@@ -1,7 +1,7 @@
 div#related-tags-container {
   &.visible a#show-related-tags-link,
-  &.hidden a#hide-related-tags-link,
-  &.hidden div.related-tags {
+  &.collapsed a#hide-related-tags-link,
+  &.collapsed div.related-tags {
     display: none;
   }
 }
