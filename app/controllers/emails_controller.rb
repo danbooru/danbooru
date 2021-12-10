@@ -2,6 +2,8 @@ class EmailsController < ApplicationController
   before_action :requires_reauthentication, only: [:edit, :update]
   respond_to :html, :xml, :json
 
+  rate_limit :update, rate: 1.0/1.minute, burst: 10
+
   def index
     @email_addresses = authorize EmailAddress.visible(CurrentUser.user).paginated_search(params, count_pages: true)
     @email_addresses = @email_addresses.includes(:user)

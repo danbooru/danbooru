@@ -1,6 +1,9 @@
 class CommentVotesController < ApplicationController
   respond_to :js, :json, :xml, :html
 
+  rate_limit :create,  rate: 1.0/1.second, burst: 200
+  rate_limit :destroy, rate: 1.0/1.second, burst: 200
+
   def index
     @comment_votes = authorize CommentVote.visible(CurrentUser.user).paginated_search(params, count_pages: true)
     @comment_votes = @comment_votes.includes(:user, comment: [:creator, { post: [:uploader, :media_asset] }]) if request.format.html?

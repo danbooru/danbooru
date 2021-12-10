@@ -8,7 +8,7 @@ class ApplicationController < ActionController::Base
   before_action :reset_current_user
   before_action :set_current_user
   before_action :normalize_search
-  before_action :check_rate_limit
+  before_action :check_default_rate_limit
   before_action :ip_ban_check
   before_action :set_variant
   before_action :add_headers
@@ -23,6 +23,23 @@ class ApplicationController < ActionController::Base
     rescue_from(*klasses) do |exception|
       render_error_page(status, exception)
     end
+  end
+
+  # Define a rate limit for the given controller action.
+  #
+  # @example
+  #   rate_limit :index, 1.0/1.minute, 50, if: -> { request.format.atom? }
+  def self.rate_limit(action, rate:, burst:, key: "#{controller_name}:#{action}", if: nil)
+    if_proc = binding.local_variable_get(:if)
+
+    before_action(only: action, if: if_proc) do
+      key = "#{controller_name}:#{action}"
+      rate_limiter = RateLimiter.build(action: key, rate: rate, burst: burst, user: CurrentUser.user, ip_addr: CurrentUser.ip_addr)
+      headers["X-Rate-Limit"] = rate_limiter.to_json
+      rate_limiter.limit!
+    end
+
+    skip_before_action :check_default_rate_limit, only: action, if: if_proc
   end
 
   private
@@ -69,12 +86,20 @@ class ApplicationController < ActionController::Base
     response.headers["X-Git-Hash"] = Rails.application.config.x.git_hash
   end
 
-  def check_rate_limit
+  # Apply the default rate limit to all update actions (POST, PUT, or DELETE), unless the
+  # endpoint already declared a more specific rate limit using the `rate_limit` macro above.
+  def check_default_rate_limit
     return if request.get? || request.head?
 
-    rate_limiter = RateLimiter.for_action(controller_name, action_name, CurrentUser.user, CurrentUser.ip_addr)
-    headers["X-Rate-Limit"] = rate_limiter.to_json
+    rate_limiter = RateLimiter.build(
+      action: "#{controller_name}:#{action_name}",
+      rate: CurrentUser.user.api_regen_multiplier,
+      burst: 200,
+      user: CurrentUser.user,
+      ip_addr: CurrentUser.ip_addr,
+    )
 
+    headers["X-Rate-Limit"] = rate_limiter.to_json
     rate_limiter.limit!
   end
 

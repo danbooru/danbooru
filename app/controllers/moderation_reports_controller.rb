@@ -1,6 +1,8 @@
 class ModerationReportsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
+  rate_limit :create, rate: 1.0/1.minute, burst: 10
+
   def new
     @moderation_report = authorize ModerationReport.new(permitted_attributes(ModerationReport))
     respond_with(@moderation_report)

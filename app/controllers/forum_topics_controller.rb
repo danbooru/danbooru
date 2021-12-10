@@ -3,6 +3,8 @@ class ForumTopicsController < ApplicationController
   respond_to :atom, only: [:index, :show]
   before_action :normalize_search, :only => :index
 
+  rate_limit :create, rate: 1.0/1.minute, burst: 50
+
   def new
     @forum_topic = authorize ForumTopic.new
     @forum_topic.original_post = ForumPost.new

@@ -1,6 +1,9 @@
 class PostVotesController < ApplicationController
   respond_to :js, :json, :xml, :html
 
+  rate_limit :create,  rate: 1.0/1.second, burst: 200
+  rate_limit :destroy, rate: 1.0/1.second, burst: 200
+
   def index
     @post_votes = authorize PostVote.visible(CurrentUser.user).paginated_search(params)
     @post_votes = @post_votes.includes(:user, post: [:uploader, :media_asset]) if request.format.html?

@@ -1,6 +1,9 @@
 class FavoritesController < ApplicationController
   respond_to :js, :json, :html, :xml
 
+  rate_limit :create,  rate: 1.0/1.second, burst: 200
+  rate_limit :destroy, rate: 1.0/1.second, burst: 200
+
   def index
     post_id = params[:post_id] || params[:search][:post_id]
     user_id = params[:user_id] || params[:search][:user_id]

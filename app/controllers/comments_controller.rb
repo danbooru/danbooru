@@ -2,6 +2,8 @@ class CommentsController < ApplicationController
   respond_to :html, :xml, :json, :atom
   respond_to :js, only: [:new, :update, :destroy, :undelete]
 
+  rate_limit :create, rate: 1.0/1.minute, burst: 50
+
   def index
     params[:group_by] ||= "comment" if params[:search].present?
 
