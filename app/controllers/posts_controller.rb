@@ -2,6 +2,8 @@ class PostsController < ApplicationController
   respond_to :html, :xml, :json, :js
   layout "sidebar"
 
+  rate_limit :index, rate: 1.0/2.seconds, burst: 50, if: -> { request.format.atom? }, key: "posts:index.atom"
+
   def index
     if params[:md5].present?
       @post = authorize Post.find_by!(md5: params[:md5])
