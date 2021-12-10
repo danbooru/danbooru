@@ -9,6 +9,7 @@ class SessionLoaderTest < ActiveSupport::TestCase
       @request.stubs(:path).returns("/")
       @request.stubs(:authorization).returns(nil)
       @request.stubs(:cookie_jar).returns({})
+      @request.stubs(:cookies).returns({})
       @request.stubs(:parameters).returns({})
       @request.stubs(:session).returns({})
       @request.stubs(:headers).returns({})
