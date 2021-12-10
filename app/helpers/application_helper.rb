@@ -252,7 +252,7 @@ module ApplicationHelper
     render "table_builder/table", table: table
   end
 
-  def body_attributes(user, params, current_item = nil)
+  def body_attributes(current_user, params, current_item = nil)
     controller_param = params[:controller].parameterize.dasherize
     action_param = params[:action].parameterize.dasherize
 
@@ -265,7 +265,8 @@ module ApplicationHelper
         action: action_param,
         layout: controller.class.send(:_layout),
         "current-user-ip-addr": request.remote_ip,
-        **current_user_data_attributes(user),
+        "current-user-save-data": CurrentUser.save_data,
+        **current_user_data_attributes(current_user),
         **cookie_data_attributes,
         **current_item_data_attributes(current_item),
       }

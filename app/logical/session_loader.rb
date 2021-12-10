@@ -80,6 +80,7 @@ class SessionLoader
     set_time_zone
     set_country
     set_safe_mode
+    set_save_data_mode
     initialize_session_cookies
     CurrentUser.user.unban! if CurrentUser.user.ban_expired?
   ensure
@@ -175,6 +176,13 @@ class SessionLoader
   def set_safe_mode
     safe_mode = request.host.match?(/safebooru/i) || params[:safe_mode].to_s.truthy? || CurrentUser.user.enable_safe_mode?
     CurrentUser.safe_mode = safe_mode
+  end
+
+  # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Save-Data
+  # https://www.keycdn.com/blog/save-data
+  def set_save_data_mode
+    save_data = params[:save_data].presence || request.cookies[:save_data].presence || request.headers["Save-Data"].presence || "false"
+    CurrentUser.save_data = save_data.truthy?
   end
 
   def initialize_session_cookies

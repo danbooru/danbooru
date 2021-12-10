@@ -1,5 +1,6 @@
 # A global variable containing the current user, the current IP address, the
-# current user's country code, and whether safe mode is enabled.
+# current user's country code, whether safe mode is enabled, and whether
+# save-data mode is enabled.
 #
 # The current user is set during a request by {ApplicationController#set_current_user},
 # which calls {SessionLoader#load}. The current user will not be set outside of
@@ -11,7 +12,7 @@
 # @see ApplicationController#set_current_user
 # @see SessionLoader#load
 class CurrentUser < ActiveSupport::CurrentAttributes
-  attribute :user, :ip_addr, :country, :safe_mode
+  attribute :user, :ip_addr, :country, :safe_mode, :save_data
 
   alias_method :safe_mode?, :safe_mode
   delegate :id, to: :user, allow_nil: true
