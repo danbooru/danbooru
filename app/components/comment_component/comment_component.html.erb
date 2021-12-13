@@ -24,7 +24,7 @@
         <% end %>
       <% end %>
     </div>
-    <%= link_to time_ago_in_words_tagged(comment.created_at), comment, class: "message-timestamp" %>
+    <%= link_to time_ago_in_words_tagged(comment.created_at), comment, class: "message-timestamp", rel: "nofollow" %>
   </div>
 
   <div class="content">
