@@ -7,6 +7,10 @@
 #   seen in parent/child post sets.
 #
 class PostGalleryComponent < ApplicationComponent
+  # The default size of thumbnails in a gallery. See also PostPreviewComponent::DEFAULT_SIZE
+  # for the default size of standalone thumbnails.
+  DEFAULT_SIZE = "180"
+
   attr_reader :inline, :size, :options
 
   # The list of posts in the gallery.
@@ -20,7 +24,7 @@ class PostGalleryComponent < ApplicationComponent
   # @param size [String] The size of thumbnails in the gallery. Can be "150",
   #   "180", "225", "225w", "270", "270w", or "360".
   # @param options [Hash] A set of options given to the PostPreviewComponent.
-  def initialize(inline: false, size: PostPreviewComponent::DEFAULT_SIZE, **options)
+  def initialize(inline: false, size: DEFAULT_SIZE, **options)
     super
     @inline = inline
     @options = options
@@ -28,7 +32,7 @@ class PostGalleryComponent < ApplicationComponent
     if size.to_s.in?(PostPreviewComponent::SIZES)
       @size = size
     else
-      @size = PostPreviewComponent::DEFAULT_SIZE
+      @size = DEFAULT_SIZE
     end
   end
 

@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class PostPreviewComponent < ApplicationComponent
-  DEFAULT_SIZE = "150"
+  # The default size of standalone thumbnails not in a gallery. See also
+  # PostGalleryComponent::DEFAULT_SIZE for the default size of thumbnails in a gallery.
+  DEFAULT_SIZE = "180"
 
   SIZES = %w[150 180 225 225w 270 270w 360]
 

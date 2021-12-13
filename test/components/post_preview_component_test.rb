@@ -14,7 +14,7 @@ class PostPreviewComponentTest < ViewComponent::TestCase
         node = render_preview(@post, current_user: User.anonymous)
 
         assert_equal(post_path(@post), node.css("article a").attr("href").value)
-        assert_equal(@post.preview_file_url, node.css("article img").attr("src").value)
+        assert_equal(@post.media_asset.variant("180x180").file_url, node.css("article img").attr("src").value)
       end
     end
 
@@ -24,7 +24,7 @@ class PostPreviewComponentTest < ViewComponent::TestCase
         node = render_preview(@post, current_user: User.anonymous)
 
         assert_equal(post_path(@post), node.css("article a").attr("href").value)
-        assert_equal(@post.preview_file_url, node.css("article img").attr("src").value)
+        assert_equal(@post.media_asset.variant("180x180").file_url, node.css("article img").attr("src").value)
         assert_equal("0:01", node.css("article .post-duration").text.strip)
       end
     end
@@ -35,7 +35,7 @@ class PostPreviewComponentTest < ViewComponent::TestCase
         node = render_preview(@post, current_user: User.anonymous)
 
         assert_equal(post_path(@post), node.css("article a").attr("href").value)
-        assert_equal(@post.preview_file_url, node.css("article img").attr("src").value)
+        assert_equal(@post.media_asset.variant("180x180").file_url, node.css("article img").attr("src").value)
         assert(node.css("article .sound-icon").present?)
       end
     end
@@ -50,7 +50,7 @@ class PostPreviewComponentTest < ViewComponent::TestCase
         node = render_preview(@post, current_user: create(:gold_user))
 
         assert_equal(post_path(@post), node.css("article a").attr("href").value)
-        assert_equal(@post.preview_file_url, node.css("article img").attr("src").value)
+        assert_equal(@post.media_asset.variant("180x180").file_url, node.css("article img").attr("src").value)
       end
 
       should "not be visible to Members" do
@@ -68,7 +68,7 @@ class PostPreviewComponentTest < ViewComponent::TestCase
         node = render_preview(@post, current_user: create(:gold_user))
 
         assert_equal(post_path(@post), node.css("article a").attr("href").value)
-        assert_equal(@post.preview_file_url, node.css("article img").attr("src").value)
+        assert_equal(@post.media_asset.variant("180x180").file_url, node.css("article img").attr("src").value)
       end
 
       should "not be visible to Members" do
@@ -86,7 +86,7 @@ class PostPreviewComponentTest < ViewComponent::TestCase
         node = render_preview(@post, current_user: create(:approver))
 
         assert_equal(post_path(@post), node.css("article a").attr("href").value)
-        assert_equal(@post.preview_file_url, node.css("article img").attr("src").value)
+        assert_equal(@post.media_asset.variant("180x180").file_url, node.css("article img").attr("src").value)
       end
 
       should "not be visible to Gold users" do
@@ -104,7 +104,7 @@ class PostPreviewComponentTest < ViewComponent::TestCase
         node = render_preview(@post, current_user: User.anonymous)
 
         assert_equal(post_path(@post), node.css("article a").attr("href").value)
-        assert_equal(@post.preview_file_url, node.css("article img").attr("src").value)
+        assert_equal(@post.media_asset.variant("180x180").file_url, node.css("article img").attr("src").value)
       end
 
       should "not be visible to users with safe mode on" do
@@ -124,7 +124,7 @@ class PostPreviewComponentTest < ViewComponent::TestCase
         node = render_preview(@post, current_user: User.anonymous, show_deleted: true)
 
         assert_equal(post_path(@post), node.css("article a").attr("href").value)
-        assert_equal(@post.preview_file_url, node.css("article img").attr("src").value)
+        assert_equal(@post.media_asset.variant("180x180").file_url, node.css("article img").attr("src").value)
       end
 
       should "not be visible to users normally" do

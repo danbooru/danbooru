@@ -43,7 +43,7 @@
       gap: 0.25rem;
     }
 
-    &.post-gallery-150  .posts-container { grid-template-columns: repeat(2, auto); }
+    &.post-gallery-150  .posts-container { grid-template-columns: repeat(3, minmax(0, 150px)); }
     &.post-gallery-180  .posts-container { grid-template-columns: repeat(2, auto); }
     &.post-gallery-225  .posts-container { grid-template-columns: repeat(2, auto); }
     &.post-gallery-225w .posts-container { grid-template-columns: repeat(2, auto); }

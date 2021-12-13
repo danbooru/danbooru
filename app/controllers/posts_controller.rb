@@ -18,7 +18,7 @@ class PostsController < ApplicationController
       tag_query = params[:tags] || params.dig(:post, :tags)
       @show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?
       @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], format: request.format.symbol, show_votes: @show_votes)
-      @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostPreviewComponent::DEFAULT_SIZE
+      @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
       @posts = authorize @post_set.posts, policy_class: PostPolicy
       @post_set.log!
       respond_with(@posts) do |format|
@@ -60,7 +60,7 @@ class PostsController < ApplicationController
     @post = authorize Post.find(params[:id])
     @post.update(permitted_attributes(@post))
     @show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?
-    @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostPreviewComponent::DEFAULT_SIZE
+    @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
     respond_with_post_after_update(@post)
   end
 
