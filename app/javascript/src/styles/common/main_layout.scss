@@ -31,7 +31,14 @@ footer#page-footer {
 
   #sidebar {
     flex: 0;
-    min-width: 20em;
+
+    @media (min-width: 1080px) {
+      min-width: 245px;
+    }
+
+    @media (min-width: 1920px) {
+      min-width: 280px;
+    }
   }
 
   #content {
