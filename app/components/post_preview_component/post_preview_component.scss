@@ -1,35 +1,15 @@
 @import "../../javascript/src/styles/base/000_vars.scss";
 
 article.post-preview {
-  display: inline-flex;
-  flex-direction: column;
-  place-items: center;
-  position: relative;
-  overflow: hidden;
-
   .post-preview-link {
-    display: inline-block;
+    display: block;
     position: relative;
+    margin: 0 auto;
 
     .post-animation-icon {
       color: var(--preview-icon-color);
       background: var(--preview-icon-background);
     }
-  }
-
-  &.captioned {
-    height: auto;
-    vertical-align: text-top;
-  }
-
-  &.post-preview-fit-fixed {
-    &.post-preview-150  { min-width: 150px; min-height: 150px; }
-    &.post-preview-180  { min-width: 180px; min-height: 180px; }
-    &.post-preview-225  { min-width: 225px; min-height: 225px; }
-    &.post-preview-225w { min-width: 225px; min-height: 360px; }
-    &.post-preview-270  { min-width: 270px; min-height: 270px; }
-    &.post-preview-270w { min-width: 270px; min-height: 360px; }
-    &.post-preview-360  { min-width: 360px; min-height: 360px; }
   }
 
   .desc {
@@ -44,10 +24,27 @@ article.post-preview {
   height: auto;
 }
 
-@media screen and (min-width: 660px) {
-  .post-preview-225 .post-preview-image { max-height: 225px; width: auto; }
-  .post-preview-270 .post-preview-image { max-height: 270px; width: auto; }
+.post-preview-fit-fixed {
+  display: inline-flex;
+  flex-direction: column;
+  place-items: center;
+
+  &.post-preview-150  { width: 150px; }
+  &.post-preview-180  { width: 180px; }
+  &.post-preview-225  { width: 225px; }
+  &.post-preview-225w { width: 225px; }
+  &.post-preview-270  { width: 270px; }
+  &.post-preview-270w { width: 270px; }
+  &.post-preview-360  { width: 360px; }
 }
+
+.post-preview-150  .post-preview-image { max-height: 150px; width: auto; }
+.post-preview-180  .post-preview-image { max-height: 180px; width: auto; }
+.post-preview-225  .post-preview-image { max-height: 225px; width: auto; }
+.post-preview-225w .post-preview-image { max-height: 360px; width: auto; }
+.post-preview-270  .post-preview-image { max-height: 270px; width: auto; }
+.post-preview-270w .post-preview-image { max-height: 360px; width: auto; }
+.post-preview-360  .post-preview-image { max-height: 360px; width: auto; }
 
 .post-preview {
   img {
