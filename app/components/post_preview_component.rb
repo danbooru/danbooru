@@ -56,9 +56,7 @@ class PostPreviewComponent < ApplicationComponent
 
   def variant
     case size
-    when "150"
-      media_asset.variant("preview")
-    when "180"
+    when "150", "180"
       media_asset.variant("180x180")
     when "225", "225w"
       media_asset.variant("360x360")

@@ -26,9 +26,9 @@ class DiscordSlashCommand
       if is_censored?
         nil
       elsif post.file_ext.match?(/jpe?g|png|gif/)
-        post.file_url
+        post.media_asset.variant("original").file_url
       else
-        post.preview_file_url
+        post.media_asset.variant("360x360").file_url
       end
     end
 

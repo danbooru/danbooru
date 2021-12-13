@@ -11,7 +11,7 @@ atom_feed(root_url: comments_url(host: Danbooru.config.hostname)) do |feed|
     feed.entry(comment, published: comment.created_at, updated: comment.updated_at) do |entry|
       entry.title("@#{comment.creator.name} on post ##{comment.post_id} (#{comment.post.presenter.humanized_essential_tag_string})")
       entry.content(<<-EOS.strip_heredoc, type: "html")
-        <img src="#{comment.post.preview_file_url}"/>
+        <img src="#{comment.post.media_asset.variant("360x360").file_url}"/>
 
         #{format_text(comment.body)}
       EOS

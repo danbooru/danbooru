@@ -23,7 +23,7 @@
       <content type="xhtml">
         <div xmlns="http://www.w3.org/1999/xhtml">
           <%= link_to post_url(post) do %>
-            <%= image_tag post.preview_file_url %>
+            <%= image_tag post.media_asset.variant("360x360").file_url %>
           <% end %>
           <p><%= post.tag_string %></p>
         </div>

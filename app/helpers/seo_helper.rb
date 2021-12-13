@@ -20,7 +20,7 @@ module SeoHelper
       name: page_title,
       description: meta_description,
       uploadDate: post.created_at.iso8601,
-      thumbnailUrl: post.preview_file_url,
+      thumbnailUrl: post.media_asset.variant("360x360").file_url,
       contentUrl: post.file_url,
     })
   end

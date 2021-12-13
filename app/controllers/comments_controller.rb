@@ -93,7 +93,7 @@ class CommentsController < ApplicationController
     @comments = Comment.paginated_search(params)
 
     if request.format.atom?
-      @comments = @comments.includes(:creator, :post)
+      @comments = @comments.includes(:creator, post: [:media_asset])
       @comments = @comments.select { |comment| comment.post.visible? }
     elsif request.format.html?
       @comments = @comments.includes(:creator, :updater, post: [:uploader, :media_asset])

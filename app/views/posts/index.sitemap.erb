@@ -12,12 +12,12 @@
       <% if post.visible? %>
         <% if post.is_image? %>
           <image:image>
-            <image:loc><%= post.file_url %></image:loc>
+            <image:loc><%= post.media_asset.variant("original").file_url %></image:loc>
           </image:image>
         <% elsif post.is_video? %>
           <video:video>
-            <video:thumbnail_loc><%= post.preview_file_url %></video:thumbnail_loc>
-            <video:content_loc><%= post.file_url %></video:content_loc>
+            <video:thumbnail_loc><%= post.media_asset.variant("360x360").file_url %></video:thumbnail_loc>
+            <video:content_loc><%= post.media_asset.variant("original").file_url %></video:content_loc>
             <video:publication_date><%= post.created_at.iso8601 %></video:publication_date>
             <video:title><%= "Post ##{post.id}" %></video:title>
             <video:description><%= post.tag_string %></video:description>
