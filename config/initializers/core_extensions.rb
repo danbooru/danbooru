@@ -62,3 +62,10 @@ end
 class String
   include Danbooru::Extensions::String
 end
+
+# Make Symbol#to_s return a frozen string. This reduces allocations, but may be
+# incompatible with some libraries.
+#
+# https://bugs.ruby-lang.org/issues/16150
+# https://github.com/Shopify/symbol-fstring
+Symbol.alias_method(:to_s, :name)
