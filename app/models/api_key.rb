@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApiKey < ApplicationRecord
   attribute :permitted_ip_addresses, :ip_address, array: true
   attribute :last_ip_address, :ip_address

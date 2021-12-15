@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IpBanPolicy < ApplicationPolicy
   def create?
     user.is_moderator?

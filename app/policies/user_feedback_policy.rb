@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UserFeedbackPolicy < ApplicationPolicy
   def create?
     unbanned? && user.is_gold? && record.user_id != user.id

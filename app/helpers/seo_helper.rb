@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # https://yoast.com/structured-data-schema-ultimate-guide/
 # https://technicalseo.com/tools/schema-markup-generator/
 # https://developers.google.com/search/docs/data-types/sitelinks-searchbox

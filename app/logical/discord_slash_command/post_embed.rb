@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DiscordSlashCommand
   class PostEmbed
     attr_reader :post, :command

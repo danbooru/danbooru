@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ComponentsHelper
   def post_preview(post, fit: :fixed, **options)
     render PostPreviewComponent.new(post: post, fit: fit, **options)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BanPolicy < ApplicationPolicy
   def bannable?
     user.is_moderator? && (record.user.blank? || (record.user.level < user.level))

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moderator
   module Post
     class PostsController < ApplicationController

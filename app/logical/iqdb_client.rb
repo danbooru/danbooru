@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # An API client for Danbooru's internal IQDB instance. Can add images, remove
 # images, and search for images in IQDB.
 #

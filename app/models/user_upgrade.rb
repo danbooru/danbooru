@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UserUpgrade < ApplicationRecord
   belongs_to :recipient, class_name: "User"
   belongs_to :purchaser, class_name: "User"

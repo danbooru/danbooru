@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Loads the current user from their session cookies or API key. Used by the
 # ApplicationController to set the CurrentUser global early during the HTTP
 # request cycle.

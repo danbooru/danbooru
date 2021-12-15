@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # An API client for the post recommendation service. The recommendation service
 # is a separate Python microservice that generates recommended posts for users
 # and posts. This client merely fetches the pre-generated recommendations from

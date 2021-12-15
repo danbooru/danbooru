@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CommentVote < ApplicationRecord
   attr_accessor :updater
 

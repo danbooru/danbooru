@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Parses a user agent string and tries to determine whether it's a known bot or a known web browser.
 #
 # @see https://developers.whatismybrowser.com/

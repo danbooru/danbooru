@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DiscordSlashCommand
   class RandomCommand < DiscordSlashCommand
     self.name = "random"

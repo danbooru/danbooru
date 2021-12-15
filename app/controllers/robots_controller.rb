@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RobotsController < ApplicationController
   respond_to :text
 

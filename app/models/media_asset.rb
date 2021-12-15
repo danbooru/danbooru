@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MediaAsset < ApplicationRecord
   class Error < StandardError; end
 

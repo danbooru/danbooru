@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ImageProxy
   class Error < StandardError; end
 

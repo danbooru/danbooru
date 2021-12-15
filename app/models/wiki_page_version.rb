@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WikiPageVersion < ApplicationRecord
   array_attribute :other_names
   belongs_to :wiki_page

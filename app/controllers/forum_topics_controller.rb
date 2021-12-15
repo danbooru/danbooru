@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ForumTopicsController < ApplicationController
   respond_to :html, :xml, :json
   respond_to :atom, only: [:index, :show]

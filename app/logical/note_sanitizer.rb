@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Sanitizes the HTML used in notes. Only safe HTML tags, HTML attributes, and
 # CSS properties are allowed.
 module NoteSanitizer

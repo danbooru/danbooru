@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ArtistVersionsHelper
   def artist_version_other_names_diff(artist_version, type)
     other = artist_version.send(type)

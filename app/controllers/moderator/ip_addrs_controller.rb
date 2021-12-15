@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moderator
   class IpAddrsController < ApplicationController
     respond_to :html, :json

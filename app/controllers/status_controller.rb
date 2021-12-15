@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class StatusController < ApplicationController
   respond_to :html, :json, :xml
 

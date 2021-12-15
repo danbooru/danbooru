@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module IpAddressesHelper
   # https://www.bing.com/maps/embed-a-map
   # https://docs.microsoft.com/en-us/bingmaps/articles/create-a-custom-map-url

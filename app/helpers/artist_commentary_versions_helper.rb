@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ArtistCommentaryVersionsHelper
   def commentary_version_field_diff(commentary_version, type, field)
     other = commentary_version.send(params[:type])

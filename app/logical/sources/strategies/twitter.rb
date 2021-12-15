@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Sources::Strategies
   class Twitter < Base
     PAGE = %r{\Ahttps?://(?:mobile\.)?twitter\.com}i

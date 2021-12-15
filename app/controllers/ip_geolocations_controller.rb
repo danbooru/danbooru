@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IpGeolocationsController < ApplicationController
   respond_to :html, :json, :xml
 

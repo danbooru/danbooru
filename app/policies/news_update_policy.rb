@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class NewsUpdatePolicy < ApplicationPolicy
   def index?
     user.is_admin?

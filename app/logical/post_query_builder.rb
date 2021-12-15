@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "strscan"
 
 # A PostQueryBuilder represents a post search. It contains all logic for parsing

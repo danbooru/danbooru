@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ArtistPolicy < ApplicationPolicy
   def ban?
     user.is_admin? && !record.is_banned?

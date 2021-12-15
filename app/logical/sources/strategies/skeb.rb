@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Image URLS
 ## Non-watermarked:
 # * https://skeb.imgix.net/requests/199886_0?bg=%23fff&auto=format&w=800&s=5a6a908ab964fcdfc4713fad179fe715

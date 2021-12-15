@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Perform a daily database dump to BigQuery and to Google Cloud Storage. This
 # contains all data visible to anonymous users.
 #

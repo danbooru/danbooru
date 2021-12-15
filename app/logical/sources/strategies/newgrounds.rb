@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Image Urls
 # * https://art.ngfiles.com/images/1254000/1254722_natthelich_pandora.jpg
 # * https://art.ngfiles.com/images/1033000/1033622_natthelich_fire-emblem-marth-plus-progress-pic.png?f1569487181

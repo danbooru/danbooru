@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CommentsController < ApplicationController
   respond_to :html, :xml, :json, :atom
   respond_to :js, only: [:new, :update, :destroy, :undelete]

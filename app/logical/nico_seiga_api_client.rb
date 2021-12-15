@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # An API client for the NicoSeiga XML API.
 class NicoSeigaApiClient
   extend Memoist

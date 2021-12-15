@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # An API client for the Reportbooru service. Reportbooru tracks post view
 # counts, post search counts, and missed search counts.
 #

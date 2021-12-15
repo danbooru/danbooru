@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Calculate the tags similar to a given tag. Two tags are similar if they have
 # nearly the same set of posts, and nearly the same size.
 #

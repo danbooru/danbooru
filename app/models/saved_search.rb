@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SavedSearch < ApplicationRecord
   REDIS_EXPIRY = 1.hour
   QUERY_LIMIT = 1000

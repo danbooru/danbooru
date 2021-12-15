@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A DeviantArt API client.
 #
 # Authentication is via OAuth2 with the client credentials grant. Register a

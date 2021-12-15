@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module NoteVersionsHelper
   def note_version_position_diff(note_version, type)
     other = note_version.send(type)

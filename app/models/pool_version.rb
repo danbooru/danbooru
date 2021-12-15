@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PoolVersion < ApplicationRecord
   belongs_to :updater, :class_name => "User"
   belongs_to :pool

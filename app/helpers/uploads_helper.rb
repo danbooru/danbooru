@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module UploadsHelper
   def render_status(upload)
     case upload.status

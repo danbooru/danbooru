@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BulkUpdateRequestPolicy < ApplicationPolicy
   def create?
     unbanned? && (record.forum_topic.blank? || policy(record.forum_topic).reply?)

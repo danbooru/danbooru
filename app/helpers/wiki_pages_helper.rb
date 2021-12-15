@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module WikiPagesHelper
   def wiki_page_other_names_list(wiki_page)
     names_html = wiki_page.other_names.map do |name|

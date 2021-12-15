@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # An IpGeolocation contains metadata associated with an IP address, primarily geolocation data.
 
 class IpGeolocation < ApplicationRecord

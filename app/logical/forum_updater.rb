@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Add a post to a forum topic.
 class ForumUpdater
   attr_reader :forum_topic

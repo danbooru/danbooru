@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DtextLink < ApplicationRecord
   belongs_to :model, polymorphic: true
   belongs_to :linked_wiki, primary_key: :title, foreign_key: :link_target, class_name: "WikiPage", optional: true

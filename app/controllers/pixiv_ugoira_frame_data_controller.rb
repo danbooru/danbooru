@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PixivUgoiraFrameDataController < ApplicationController
   respond_to :json, :xml
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Moderator
   class IpAddrSearch
     attr_reader :params

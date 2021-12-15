@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module UsersHelper
   def unread_dmail_indicator(user)
     "(#{user.unread_dmail_count})" if user.unread_dmail_count > 0

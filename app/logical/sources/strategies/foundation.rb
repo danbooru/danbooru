@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Image URLs
 # * https://f8n-ipfs-production.imgix.net/QmX4MotNAAj9Rcyew43KdgGDxU1QtXemMHoUTNacMLLSjQ/nft.png
 #

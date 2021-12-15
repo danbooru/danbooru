@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SourcesController < ApplicationController
   respond_to :js, :json, :xml
 

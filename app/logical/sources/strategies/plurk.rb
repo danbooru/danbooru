@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Image URLs
 #
 # * https://images.plurk.com/5wj6WD0r6y4rLN0DL3sqag.jpg

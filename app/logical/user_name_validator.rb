@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Define a custom validator for user names.
 #
 # @example

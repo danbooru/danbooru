@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A job that tries to resume a preprocessed image upload job.
 class UploadServiceDelayedStartJob < ApplicationJob
   queue_as :default

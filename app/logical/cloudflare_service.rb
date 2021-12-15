@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A simple Cloudflare API client for purging cached images after they're
 # regenerated or deleted.
 class CloudflareService

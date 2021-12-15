@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostVersionPolicy < ApplicationPolicy
   def undo?
     unbanned? && record.version > 1 && record.post.present? && policy(record.post).visible?

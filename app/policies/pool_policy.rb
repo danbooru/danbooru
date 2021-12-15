@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PoolPolicy < ApplicationPolicy
   def gallery?
     index?

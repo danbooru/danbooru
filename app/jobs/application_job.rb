@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # The base class for all background jobs on Danbooru.
 #
 # @see https://guides.rubyonrails.org/active_job_basics.html

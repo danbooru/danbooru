@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A PostSet is a set of posts returned by a search.  This contains helper
 # methods used on the post index page.
 #

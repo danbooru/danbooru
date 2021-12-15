@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ApiKeyPolicy < ApplicationPolicy
   def new?
     !user.is_anonymous?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DiscordSlashCommand
   class WikiCommand < DiscordSlashCommand
     extend Memoist

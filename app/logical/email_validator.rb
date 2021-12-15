@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'resolv'
 
 # Validates that an email address is well-formed, is deliverable, and is not a

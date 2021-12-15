@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A custom SimpleForm input for DText fields.
 #
 # Usage:

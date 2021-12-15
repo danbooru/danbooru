@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A service object for uploading an image.
 class UploadService
   attr_reader :params, :post, :upload

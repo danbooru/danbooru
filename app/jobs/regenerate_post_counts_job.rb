@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A job that runs hourly to fix all incorrect tag counts.
 # Spawned by {DanbooruMaintenance}.
 class RegeneratePostCountsJob < ApplicationJob

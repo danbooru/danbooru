@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class NewsUpdate < ApplicationRecord
   belongs_to :creator, class_name: "User"
   belongs_to_updater

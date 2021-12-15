@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A helper class for building HTML tables. Used in views.
 #
 # @example

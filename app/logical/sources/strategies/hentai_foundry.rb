@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Image URLs
 #
 # * https://pictures.hentai-foundry.com/a/Afrobull/795025/Afrobull-795025-kuroeda.png

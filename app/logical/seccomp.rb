@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This is a wrapper around seccomp, a Linux kernel feature used to limit the
 # system calls the current process is allowed to make. This is used for
 # sandboxing code when processing user-uploaded files.

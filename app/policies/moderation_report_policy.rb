@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ModerationReportPolicy < ApplicationPolicy
   def index?
     !user.is_anonymous?

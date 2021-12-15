@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Checks whether a new account requires verification. An account requires
 # verification if the IP is a proxy, or the IP is under a partial (signup) IP
 # ban, or it was used to create another account recently.

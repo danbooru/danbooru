@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class NotePreviewsController < ApplicationController
   respond_to :json
 

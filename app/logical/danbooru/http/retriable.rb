@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A HTTP::Feature that automatically retries requests that return a 429 error
 # or a Retry-After header.
 #

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DelayedJobsHelper
   def print_name(job)
     case job.name

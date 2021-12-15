@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Find the artist entry for a given artist profile URL.
 module ArtistFinder
   module_function

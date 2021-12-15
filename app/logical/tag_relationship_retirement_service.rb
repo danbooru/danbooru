@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Removes inactive aliases and implications. 'Inactive' means aliases to empty
 # tags, implications from empty tags, and gentag and artist aliases that
 # haven't had any new posts in the last two years.

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A mixin that adds a `#paginate` method to an ActiveRecord relation.
 #
 # There are two pagination techniques. The first is page-based (numbered):

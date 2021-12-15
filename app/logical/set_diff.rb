@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Calculate a diff between two sets of strings. Used to calculate diffs between
 # artist URLs and between other names. Tries to compare each set to detect which
 # strings were added, which were removed, and which were changed.

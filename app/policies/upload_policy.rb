@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UploadPolicy < ApplicationPolicy
   def show?
     record.is_completed? || user.is_admin? || record.uploader_id == user.id

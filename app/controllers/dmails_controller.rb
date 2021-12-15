@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DmailsController < ApplicationController
   respond_to :html, :xml, :js, :json
 

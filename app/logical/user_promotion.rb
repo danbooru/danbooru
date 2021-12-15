@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Promotes the user to a higher level, or grants them approver or unlimited
 # uploader privileges. Also validates that the promotion is allowed, gives the
 # user a feedback, sends them a notification dmail, and creates a mod action for

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DtextPreviewsController < ApplicationController
   def create
     @inline = params[:inline].to_s.truthy?

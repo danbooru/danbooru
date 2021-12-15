@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Post < ApplicationRecord
   class RevertError < StandardError; end
   class DeletionError < StandardError; end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UserUpgradePolicy < ApplicationPolicy
   def create?
     !user.is_anonymous?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SessionsController < ApplicationController
   respond_to :html, :json
   skip_forgery_protection only: :create, if: -> { !request.format.html? }

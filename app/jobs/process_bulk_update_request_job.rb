@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A job that applies a bulk update request after it is approved.
 #
 # @see {BulkUpdateRequestProcessor}

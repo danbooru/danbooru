@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DmailPolicy < ApplicationPolicy
   def create?
     unbanned?

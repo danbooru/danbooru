@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ParameterBuilder
   def self.serial_parameters(only_string, object)
     only_array = split_only_string(only_string)

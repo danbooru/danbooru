@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Delete a user's account. Deleting an account really just deactivates the
 # account, it doesn't fully delete the user from the database. It wipes their
 # username, password, account settings, favorites, and saved searches, and logs

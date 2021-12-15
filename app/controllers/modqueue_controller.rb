@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ModqueueController < ApplicationController
   respond_to :html, :json, :xml
   layout "sidebar"

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Used for posting notifications to Discord about new forum posts.
 # https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks
 

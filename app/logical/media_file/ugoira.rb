@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A MediaFile for a Pixiv ugoira file.
 #
 # A Pixiv ugoira is an animation format that consists of a zip file containing

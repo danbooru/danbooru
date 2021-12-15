@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Generates a set of CSS variables for site's color palette.
 #
 # The CSS variables are named like `var(--{hue}-{i})`, where `hue` is the color

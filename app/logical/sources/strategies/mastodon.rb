@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Image URLS:
 # * https://img.pawoo.net/media_attachments/files/001/297/997/small/c4272a09570757c2.png
 # * https://img.pawoo.net/media_attachments/files/001/297/997/original/c4272a09570757c2.png

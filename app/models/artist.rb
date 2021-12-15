@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Artist < ApplicationRecord
   extend Memoist
   class RevertError < StandardError; end

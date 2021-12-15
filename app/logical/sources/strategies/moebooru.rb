@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Original images:
 #
 # * https://yande.re/image/b4b1d11facd1700544554e4805d47bb6/.png

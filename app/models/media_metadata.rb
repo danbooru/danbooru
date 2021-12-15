@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # MediaMetadata represents the EXIF and other metadata associated with a
 # MediaAsset (an uploaded image or video file). The `metadata` field contains a
 # JSON hash of the file's metadata as returned by ExifTool.

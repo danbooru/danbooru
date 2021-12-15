@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This component represents the tooltip that displays when you hover over a comment's score.
 class CommentVotesTooltipComponent < ApplicationComponent
   attr_reader :comment, :current_user

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PixivUgoiraFrameData < ApplicationRecord
   belongs_to :post, optional: true, foreign_key: :md5, primary_key: :md5
   belongs_to :media_asset, foreign_key: :md5, primary_key: :md5

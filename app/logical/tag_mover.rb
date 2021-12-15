@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Rename a tag and move everything associated with it. Used when renaming or
 # aliasing a tag in a bulk update request. Moves everything associated with the
 # tag, including aliases, implications, *_(cosplay) and *_(style) tags, artist

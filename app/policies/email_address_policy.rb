@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EmailAddressPolicy < ApplicationPolicy
   def index?
     user.is_moderator?

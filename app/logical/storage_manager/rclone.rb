@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A StorageManager that stores file on remote filesystem using rclone. Rclone
 # can store files on most cloud storage systems. Requires the `rclone` binary to
 # be installed and configured.

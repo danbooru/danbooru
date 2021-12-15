@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Favorite < ApplicationRecord
   belongs_to :post, counter_cache: :fav_count
   belongs_to :user, counter_cache: :favorite_count

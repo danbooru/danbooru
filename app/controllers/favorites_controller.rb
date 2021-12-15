@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FavoritesController < ApplicationController
   respond_to :js, :json, :html, :xml
 

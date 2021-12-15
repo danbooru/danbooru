@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostFlag < ApplicationRecord
   module Reasons
     UNAPPROVED = "Unapproved in three days"

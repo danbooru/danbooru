@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PoolVersionsController < ApplicationController
   respond_to :html, :xml, :json
   before_action :check_availabililty

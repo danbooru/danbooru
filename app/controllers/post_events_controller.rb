@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostEventsController < ApplicationController
   respond_to :html, :xml, :json
 

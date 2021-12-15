@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WikiPagePolicy < ApplicationPolicy
   def update?
     unbanned? && (can_edit_locked? || !record.is_locked?)

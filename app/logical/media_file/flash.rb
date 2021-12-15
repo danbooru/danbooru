@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This file contains code derived from
 # https://github.com/dim/ruby-imagespec/blob/f2f3ce8bb5b1b411f8658e66a891a095261d94c0/lib/image_spec/parser/swf.rb
 #

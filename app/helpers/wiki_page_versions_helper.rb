@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module WikiPageVersionsHelper
   def wiki_version_show_diff(wiki_page_version, type)
     other = wiki_page_version.send(type)

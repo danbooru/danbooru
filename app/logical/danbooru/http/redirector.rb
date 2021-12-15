@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A HTTP::Feature that automatically follows HTTP redirects.
 #
 # @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Redirections

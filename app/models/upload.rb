@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Upload < ApplicationRecord
   class Error < StandardError; end
 

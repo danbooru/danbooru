@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UploadsController < ApplicationController
   respond_to :html, :xml, :json, :js
   skip_before_action :verify_authenticity_token, only: [:preprocess]

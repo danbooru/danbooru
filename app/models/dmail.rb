@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Dmail < ApplicationRecord
   validate :validate_sender_is_not_limited, on: :create
   validates :title, presence: true, length: { maximum: 200 }, if: :title_changed?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TagAlias < TagRelationship
   # Validate that the alias doesn't exist yet when it's created or when a BUR
   # is requested, but not when a BUR is approved (to allow failed BURs to be reapproved)

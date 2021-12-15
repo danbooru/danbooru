@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SavedSearchPolicy < ApplicationPolicy
   def index?
     !user.is_anonymous?

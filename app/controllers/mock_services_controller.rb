@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MockServicesController < ApplicationController
   skip_forgery_protection
   respond_to :json

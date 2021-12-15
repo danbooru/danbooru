@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Explore
   class PostsController < ApplicationController
     respond_to :html, :xml, :json

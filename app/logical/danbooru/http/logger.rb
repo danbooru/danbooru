@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Danbooru
   class Http
     class Logger < HTTP::Feature

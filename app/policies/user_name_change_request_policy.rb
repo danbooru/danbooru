@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UserNameChangeRequestPolicy < ApplicationPolicy
   def index?
     !user.is_anonymous?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostVotePolicy < ApplicationPolicy
   def create?
     unbanned? && user.is_member?

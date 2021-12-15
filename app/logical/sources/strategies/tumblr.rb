@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # https://marmaladica.tumblr.com/post/188237914346/saved
 # https://66.media.tumblr.com/2c6f55531618b4335c67e29157f5c1fc/tumblr_pz4a44xdVj1ssucdno1_1280.png
 # https://66.media.tumblr.com/11700cab20d65d5a6acc470e284dbd3a/tumblr_pz4a44xdVj1ssucdno2_1280.png

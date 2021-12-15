@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Handle finding related tags by the {RelatedTagsController}. Used for finding
 # related tags when tagging a post.
 class RelatedTagQuery

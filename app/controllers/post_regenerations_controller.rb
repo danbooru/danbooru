@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostRegenerationsController < ApplicationController
   respond_to :xml, :json, :html
 

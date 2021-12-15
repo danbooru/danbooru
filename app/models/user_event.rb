@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A UserEvent is used to track important events related to a user's account,
 # such as signups, logins, password changes, etc. A UserEvent is associated
 # with a UserSession, which contains the IP and browser information associated

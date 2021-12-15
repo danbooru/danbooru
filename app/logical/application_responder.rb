@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Hooks into `respond_with` to add some custom behavior, including support for
 # the `expires_in`, `expiry`, and `only` params.
 #

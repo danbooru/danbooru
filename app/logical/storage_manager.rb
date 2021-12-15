@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # StorageManager is an abstract superclass that defines a simple interface for
 # storing files on local or remote backends. All image files stored by Danbooru
 # are handled by a StorageManager.

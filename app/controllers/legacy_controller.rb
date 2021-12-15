@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class LegacyController < ApplicationController
   respond_to :json, :xml
 

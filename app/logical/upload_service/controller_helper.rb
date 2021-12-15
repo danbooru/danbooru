@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UploadService
   module ControllerHelper
     def self.prepare(url: nil, file: nil, ref: nil)

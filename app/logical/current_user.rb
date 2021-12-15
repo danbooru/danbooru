@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A global variable containing the current user, the current IP address, the
 # current user's country code, whether safe mode is enabled, and whether
 # save-data mode is enabled.

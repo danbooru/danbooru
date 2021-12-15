@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A job that runs daily to vacuum the database. Spawned by {DanbooruMaintenance}.
 class VacuumDatabaseJob < ApplicationJob
   def perform

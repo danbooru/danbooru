@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Define a custom validator for tag names. Tags must be plain ASCII, no spaces,
 # no redundant underscores, no conflicts with metatags, and can't begin with
 # certain special characters.

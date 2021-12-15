@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Returns status information about the running server, including software
 # versions, basic load info, and Redis and Postgres info.
 #

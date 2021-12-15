@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UserNameChangeRequest < ApplicationRecord
   belongs_to :user
   belongs_to :approver, class_name: "User", optional: true

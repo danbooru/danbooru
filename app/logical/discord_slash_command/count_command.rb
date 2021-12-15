@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DiscordSlashCommand
   class CountCommand < DiscordSlashCommand
     self.name = "count"

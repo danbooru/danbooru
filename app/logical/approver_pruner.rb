@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Demote all approvers who haven't approved at least 30 posts in the last 45
 # days. Moderators and recently promoted approvers are exempt. Runs as a monthly
 # maintenance task. Approvers who are facing demotion are sent a weekly warning

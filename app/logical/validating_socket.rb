@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A TCPSocket wrapper that disallows connections to local or private IPs. Used
 # by {Danbooru::Http} to prevent server-side request forgery (SSRF) attacks. For
 # example, if we try to download an image from http://example.com/image.jpg, but

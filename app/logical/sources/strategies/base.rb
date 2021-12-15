@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This is a collection of strategies for extracting information about a
 # resource. At a minimum it tries to extract the artist name and a canonical
 # URL to download the image from. But it can also be used to normalize a URL

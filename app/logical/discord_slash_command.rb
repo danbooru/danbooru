@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # The parent class for a Discord slash command. Each slash command handled by
 # Danbooru is a subclass of this class. Subclasses should set the {#name},
 # {#description}, and {#options} class attributes defining the slash command's

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A client for Pixiv's AJAX API.
 #
 # Notes on the API:

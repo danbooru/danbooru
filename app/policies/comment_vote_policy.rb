@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CommentVotePolicy < ApplicationPolicy
   def create?
     unbanned? && !record.comment.is_deleted?

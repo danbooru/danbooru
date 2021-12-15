@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ForumTopicVisitsController < ApplicationController
   respond_to :xml, :json
 

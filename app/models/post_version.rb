@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostVersion < ApplicationRecord
   class RevertError < StandardError; end
   extend Memoist

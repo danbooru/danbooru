@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ForumPostVotePolicy < ApplicationPolicy
   def create?
     unbanned? && policy(record.forum_post).votable?

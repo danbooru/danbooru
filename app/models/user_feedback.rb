@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UserFeedback < ApplicationRecord
   self.table_name = "user_feedback"
 

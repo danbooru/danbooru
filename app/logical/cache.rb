@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A wrapper around `Rails.cache` that adds some extra helper methods. All
 # Danbooru code should use this class instead of using `Rails.cache` directly.
 #

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A StorageManager that mirrors files across multiple storage backends.
 class StorageManager::Mirror < StorageManager
   attr_reader :services

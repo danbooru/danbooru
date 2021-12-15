@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Parse the output of the Postgres EXPLAIN command to get how many rows Postgres
 # *thinks* a SQL query will return. This is an estimate, and only accurate for
 # queries that have a single condition. If the query has multiple conditions,

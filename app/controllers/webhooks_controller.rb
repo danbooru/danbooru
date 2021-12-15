@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WebhooksController < ApplicationController
   skip_forgery_protection only: :receive
   rescue_with Stripe::SignatureVerificationError, status: 400

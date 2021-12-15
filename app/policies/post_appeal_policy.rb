@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostAppealPolicy < ApplicationPolicy
   def edit?
     update?

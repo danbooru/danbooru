@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A job that runs hourly to check the database for corruption. Spawned by {DanbooruMaintenance}.
 # Requires at least PostgreSQL 14.0 to be installed for pg_amcheck to be available.
 #

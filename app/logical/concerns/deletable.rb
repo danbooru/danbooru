@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A concern that adds common helper methods to models that are soft deletable.
 #
 # @example

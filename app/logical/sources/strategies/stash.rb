@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Page URLs:
 # * https://sta.sh/0wxs31o7nn2 (single image)
 # * https://sta.sh/21leo8mz87ue (folder)

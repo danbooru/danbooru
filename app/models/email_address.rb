@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EmailAddress < ApplicationRecord
   belongs_to :user, inverse_of: :email_address
 

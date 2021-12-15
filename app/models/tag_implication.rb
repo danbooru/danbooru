@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class TagImplication < TagRelationship
   MINIMUM_TAG_COUNT = 10
   MINIMUM_TAG_PERCENTAGE = 0.0001

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module IconHelper
   def icon_tag(icon_class, class: nil, **options)
     klass = binding.local_variable_get(:class)

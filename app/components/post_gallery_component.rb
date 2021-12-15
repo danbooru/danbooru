@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+#
 # A component that displays a gallery of post thumbnails.
 #
 # There are two types of galleries:

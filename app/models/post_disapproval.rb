@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostDisapproval < ApplicationRecord
   DELETION_THRESHOLD = 1.month
   REASONS = %w[breaks_rules poor_quality disinterest]

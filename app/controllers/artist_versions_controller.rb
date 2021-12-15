@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ArtistVersionsController < ApplicationController
   respond_to :html, :xml, :json
 

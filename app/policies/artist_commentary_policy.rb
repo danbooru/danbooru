@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ArtistCommentaryPolicy < ApplicationPolicy
   def create_or_update?
     unbanned?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ForumPostVote < ApplicationRecord
   belongs_to :creator, class_name: "User"
   belongs_to :forum_post

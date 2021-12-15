@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ArtistUrl < ApplicationRecord
   before_validation :initialize_normalized_url, on: :create
   before_validation :normalize

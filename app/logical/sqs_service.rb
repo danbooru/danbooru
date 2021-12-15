@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A wrapper for the Amazon SQS API. Used by the PostArchive and PoolArchive
 # service to record post and pool versions.
 #

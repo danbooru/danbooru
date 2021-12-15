@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MediaMetadataController < ApplicationController
   respond_to :json, :xml
 

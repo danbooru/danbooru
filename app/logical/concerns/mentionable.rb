@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A concern that handles @mentions in comments and forum posts. Sends a DMail
 # to mentioned users when a comment or forum post is created or edited to add
 # new mentions.

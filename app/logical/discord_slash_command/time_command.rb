@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DiscordSlashCommand
   class TimeCommand < DiscordSlashCommand
     self.name = "time"

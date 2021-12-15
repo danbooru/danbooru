@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BulkUpdateRequest < ApplicationRecord
   STATUSES = %w[pending approved rejected processing failed]
 

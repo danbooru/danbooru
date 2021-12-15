@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Calculates a user's upload limit:
 #
 # * Each status:pending post takes up one upload slot.

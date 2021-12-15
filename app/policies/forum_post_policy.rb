@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ForumPostPolicy < ApplicationPolicy
   def index?
     true

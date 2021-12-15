@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Run a program inside an isolated sandbox, much like a Docker container. Inside the sandbox,
 # the program doesn't have network access, can't see other programs, and can only see read-only
 # OS directories like /usr and /lib. It can only communicate by reading from stdin and printing

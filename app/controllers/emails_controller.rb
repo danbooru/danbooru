@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class EmailsController < ApplicationController
   before_action :requires_reauthentication, only: [:edit, :update]
   respond_to :html, :xml, :json

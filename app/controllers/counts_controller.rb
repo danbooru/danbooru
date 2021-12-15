@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CountsController < ApplicationController
   respond_to :html, :xml, :json
 

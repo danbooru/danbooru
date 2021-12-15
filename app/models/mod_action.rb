@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ModAction < ApplicationRecord
   belongs_to :creator, :class_name => "User"
 

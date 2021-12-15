@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostPresenter
   attr_reader :pool, :next_post_in_pool
 

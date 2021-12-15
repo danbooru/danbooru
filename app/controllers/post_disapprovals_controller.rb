@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostDisapprovalsController < ApplicationController
   respond_to :js, :html, :json, :xml
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Utility methods for working with tag categories (general, character,
 # copyright, artist, meta).
 

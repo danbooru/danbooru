@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Detect sites using Cloudflare Polish and bypass it by adding a random
 # cache-busting URL param.
 #

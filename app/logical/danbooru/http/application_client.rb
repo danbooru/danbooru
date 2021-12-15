@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # An extension to HTTP::Client that lets us write Rack-style middlewares that
 # hook into the request/response cycle and override how requests are made. This
 # works by extending http.rb's concept of features (HTTP::Feature) to give them

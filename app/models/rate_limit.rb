@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RateLimit < ApplicationRecord
   scope :expired, -> { where("updated_at < ?", 1.hour.ago) }
 

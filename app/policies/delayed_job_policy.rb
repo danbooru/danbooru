@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DelayedJobPolicy < ApplicationPolicy
   def update?
     user.is_admin?

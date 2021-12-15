@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A simple Twitter API client that can authenticate to Twitter and fetch tweets by ID.
 # @see https://developer.twitter.com/en/docs/getting-started
 class TwitterApiClient

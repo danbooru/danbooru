@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Tag < ApplicationRecord
   ABBREVIATION_REGEXP = /([a-z0-9])[a-z0-9']*($|[^a-z0-9']+)/
 

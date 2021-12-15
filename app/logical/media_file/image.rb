@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A MediaFile for a JPEG, PNG, or GIF file. Uses libvips for resizing images.
 #
 # @see https://github.com/libvips/ruby-vips

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A Discord API Client.
 #
 # @see https://discord.com/developers/docs/intro

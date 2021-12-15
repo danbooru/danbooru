@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A job that downloads and generates thumbnails in the background for an image
 # uploaded with the upload bookmarklet.
 class UploadPreprocessorDelayedStartJob < ApplicationJob

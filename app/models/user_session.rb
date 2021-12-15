@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A UserSession contains browser and IP metadata associated with a UserEvent. This
 # includes the user's session ID from their session cookie, their IP address,
 # and their browser user agent. This is used to track logins and other events.

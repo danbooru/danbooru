@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class NewsUpdatesController < ApplicationController
   respond_to :html, :json, :xml
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class DelayedJobsController < ApplicationController
   respond_to :html, :xml, :json, :js
 

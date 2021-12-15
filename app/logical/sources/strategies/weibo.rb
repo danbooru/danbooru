@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Image URLS
 # * http://ww1.sinaimg.cn/large/69917555gw1f6ggdghk28j20c87lbhdt.jpg
 # * https://wx1.sinaimg.cn/large/002NQ2vhly1gqzqfk1agfj62981aw4qr02.jpg (more than 32 characters in hash)

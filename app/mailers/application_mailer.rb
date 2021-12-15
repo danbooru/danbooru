@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # The base class for emails sent by Danbooru.
 #
 # @see https://guides.rubyonrails.org/action_mailer_basics.html

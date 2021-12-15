@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PopularPostsHelper
   def next_date_for_scale(date, scale)
     case scale

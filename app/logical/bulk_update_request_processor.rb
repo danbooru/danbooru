@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Process a bulk update request. Parses the request and applies each line in
 # sequence.
 class BulkUpdateRequestProcessor

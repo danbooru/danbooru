@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostPolicy < ApplicationPolicy
   def show_seq?
     true

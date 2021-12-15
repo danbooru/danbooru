@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PostVersionsHelper
   def post_version_diff(post_version, type)
     return "" if type == "previous" && post_version.version == 1
@@ -22,7 +24,7 @@ module PostVersionsHelper
       obsolete_added_tags = added_tags - other_tags
       obsolete_removed_tags = removed_tags & other_tags
     end
-    html = '<span class="diff-list">'
+    html = '<span class="diff-list">'.dup
 
     added_tags.each do |tag|
       obsolete_class = (obsolete_added_tags.include?(tag) ? "diff-obsolete" : "")

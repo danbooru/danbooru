@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A RateLimiter handles HTTP rate limits for controller actions. Rate limits are
 # based on the user, the user's IP, and the controller action.
 #

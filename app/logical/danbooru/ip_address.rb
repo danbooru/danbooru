@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A wrapper around the IPAddress gem that adds some extra utility methods.
 #
 # @see https://github.com/ipaddress-gem/ipaddress

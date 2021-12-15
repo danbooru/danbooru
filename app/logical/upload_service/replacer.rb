@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class UploadService
   class Replacer
     extend Memoist

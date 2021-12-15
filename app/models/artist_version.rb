@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ArtistVersion < ApplicationRecord
   array_attribute :urls
   array_attribute :other_names

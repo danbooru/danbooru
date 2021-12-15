@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PostsHelper
   def reportbooru_enabled?
     Danbooru.config.reportbooru_server.present? && Danbooru.config.reportbooru_key.present?

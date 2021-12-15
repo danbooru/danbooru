@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # An API client for https://ipregistry.co. Looks up IP address information,
 # including the geolocation and whether the IP is a proxy.
 #

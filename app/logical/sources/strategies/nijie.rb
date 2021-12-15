@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Image URLs:
 #
 # * https://pic03.nijie.info/nijie_picture/28310_20131101215959.jpg (page: https://www.nijie.info/view.php?id=64240)

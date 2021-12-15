@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Autocomplete tags, usernames, pools, and more.
 #
 # @example

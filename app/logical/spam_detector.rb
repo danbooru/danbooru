@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Detects whether a dmail, comment, or forum post seems like spam. Autobans
 # users who receive more than 10 spam reports in an hour. Uses the Akismet spam
 # detection service.

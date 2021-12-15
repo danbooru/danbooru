@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class IpAddress < ApplicationRecord
   belongs_to :model, polymorphic: true
   belongs_to :user

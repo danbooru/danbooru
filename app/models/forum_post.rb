@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ForumPost < ApplicationRecord
   attr_readonly :topic_id
 

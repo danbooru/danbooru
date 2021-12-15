@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Danbooru
   class MessageVerifier
     attr_reader :purpose, :secret, :verifier

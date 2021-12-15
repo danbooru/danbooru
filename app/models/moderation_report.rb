@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ModerationReport < ApplicationRecord
   MODEL_TYPES = %w[Dmail Comment ForumPost]
 

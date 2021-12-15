@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module PoolVersionsHelper
   def pool_version_show_diff(pool_version, type)
     other = pool_version.send(type)

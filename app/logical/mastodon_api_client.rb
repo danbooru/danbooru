@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # An API client for Mastodon.
 #
 # @see https://docs.joinmastodon.org/api
@@ -50,7 +52,7 @@ class MastodonApiClient
   end
 
   def commentary
-    commentary = ""
+    commentary = "".dup
     commentary << "<p>#{json["spoiler_text"]}</p>" if json["spoiler_text"].present?
     commentary << json["content"] if json["content"].present?
     commentary

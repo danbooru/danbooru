@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostEvent
   include ActiveModel::Model
   include ActiveModel::Serializers::JSON

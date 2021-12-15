@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostVersionsController < ApplicationController
   before_action :check_availabililty
   around_action :set_timeout

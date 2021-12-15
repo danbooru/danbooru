@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Page URLs:
 #
 # * https://www.artstation.com/artwork/04XA4

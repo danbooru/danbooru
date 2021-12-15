@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module ArtistCommentariesHelper
   def format_commentary_title(title, classes: "")
     tag.h3 do

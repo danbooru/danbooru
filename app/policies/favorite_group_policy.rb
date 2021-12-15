@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class FavoriteGroupPolicy < ApplicationPolicy
   def show?
     record.creator_id == user.id || record.is_public

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Allow Rails URL helpers to be used outside of views.
 #
 # @example

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # The DanbooruLogger class handles logging messages to the Rails log and to NewRelic.
 #
 # @see https://guides.rubyonrails.org/debugging_rails_applications.html#the-logger

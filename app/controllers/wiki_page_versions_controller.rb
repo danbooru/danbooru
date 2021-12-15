@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WikiPageVersionsController < ApplicationController
   respond_to :html, :xml, :json
   layout "sidebar"

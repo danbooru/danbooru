@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A PostSearchContext handles navigating to the next or previous post in a
 # search. This is used in the search navbar above or below posts.
 #

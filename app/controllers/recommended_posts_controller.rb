@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RecommendedPostsController < ApplicationController
   respond_to :html, :json, :xml, :js
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class NoteVersion < ApplicationRecord
   belongs_to :post
   belongs_to :note

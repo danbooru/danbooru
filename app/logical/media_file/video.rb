@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # A MediaFile for a webm or mp4 video. Uses ffmpeg to generate preview
 # thumbnails.
 #

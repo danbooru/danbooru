@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class PostApproval < ApplicationRecord
   belongs_to :user
   belongs_to :post, inverse_of: :approvals
