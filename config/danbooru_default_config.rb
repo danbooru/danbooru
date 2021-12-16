@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+#
 # This file contains all the configuration settings for Danbooru.
 #
 # Don't edit this file. Instead, to configure your Danbooru instance, copy this

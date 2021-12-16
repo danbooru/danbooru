@@ -123,6 +123,6 @@ class PostPreviewComponent < ApplicationComponent
   end
 
   def has_sound?
-    post.has_tag?("sound")
+    is_animated? && post.has_tag?("sound")
   end
 end

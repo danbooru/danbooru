@@ -8,6 +8,8 @@ class Post < ApplicationRecord
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation
                       annotated partially_annotated check_annotation annotation_request]
 
+  RESTRICTED_TAGS = Danbooru.config.restricted_tags
+
   self.ignored_columns = [:pool_string, :fav_string]
 
   deletable
@@ -292,11 +294,11 @@ class Post < ApplicationRecord
 
   module TagMethods
     def tag_array
-      @tag_array ||= tag_string.split
+      tag_string.split
     end
 
     def tag_array_was
-      @tag_array_was ||= (tag_string_in_database.presence || tag_string_before_last_save || "").split
+      (tag_string_in_database.presence || tag_string_before_last_save || "").split
     end
 
     def tags
@@ -346,7 +348,6 @@ class Post < ApplicationRecord
     end
 
     def merge_old_changes
-      reset_tag_array_cache
       @removed_tags = []
 
       if old_tag_string
@@ -380,14 +381,8 @@ class Post < ApplicationRecord
       end
     end
 
-    def reset_tag_array_cache
-      @tag_array = nil
-      @tag_array_was = nil
-    end
-
     def set_tag_string(string)
       self.tag_string = string
-      reset_tag_array_cache
     end
 
     def normalize_tags
@@ -1298,7 +1293,7 @@ class Post < ApplicationRecord
   end
 
   def levelblocked?(user = CurrentUser.user)
-    !user.is_gold? && Danbooru.config.restricted_tags.any? { |tag| tag.in?(tag_array) }
+    !user.is_gold? && RESTRICTED_TAGS.any? { |tag| tag.in?(tag_array) }
   end
 
   def banblocked?(user = CurrentUser.user)
@@ -1312,7 +1307,6 @@ class Post < ApplicationRecord
 
   def reload(options = nil)
     super
-    reset_tag_array_cache
     @pools = nil
     @tag_categories = nil
     @typed_tags = nil

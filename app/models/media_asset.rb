@@ -4,6 +4,9 @@ class MediaAsset < ApplicationRecord
   class Error < StandardError; end
 
   VARIANTS = %i[preview crop 180x180 360x360 720x720 sample original]
+  ENABLE_SEO_POST_URLS = Danbooru.config.enable_seo_post_urls
+  LARGE_IMAGE_WIDTH = Danbooru.config.large_image_width
+  STORAGE_SERVICE = Danbooru.config.storage_manager
 
   has_one :media_metadata, dependent: :destroy
   has_one :pixiv_ugoira_frame_data, class_name: "PixivUgoiraFrameData", foreign_key: :md5, primary_key: :md5
@@ -88,7 +91,7 @@ class MediaAsset < ApplicationRecord
         "/images/download-preview.png"
       else
         slug = "__#{slug}__" if slug.present?
-        slug = nil if !Danbooru.config.enable_seo_post_urls
+        slug = nil if !ENABLE_SEO_POST_URLS
         "/#{variant}/#{md5[0..1]}/#{md5[2..3]}/#{slug}#{file_name}"
       end
     end
@@ -166,7 +169,7 @@ class MediaAsset < ApplicationRecord
       when :"720x720"
         true
       when :sample
-        media_asset.is_ugoira? || (media_asset.is_static_image? && media_asset.image_width > Danbooru.config.large_image_width)
+        media_asset.is_ugoira? || (media_asset.is_static_image? && media_asset.image_width > LARGE_IMAGE_WIDTH)
       when :original
         true
       end
@@ -271,7 +274,7 @@ class MediaAsset < ApplicationRecord
     end
 
     def storage_service
-      Danbooru.config.storage_manager
+      STORAGE_SERVICE
     end
 
     def backup_storage_service
