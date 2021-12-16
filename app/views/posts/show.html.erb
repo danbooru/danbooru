@@ -44,7 +44,7 @@
 
   <%= render "posts/partials/show/notices", :post => @post %>
 
-  <%= tag.section class: ["image-container", "note-container", ("danbirthday" if is_danbirthday?(@post))], **PostPreviewComponent.new(post: @post).data_attributes do -%>
+  <%= tag.section class: ["image-container", "note-container", ("danbirthday" if is_danbirthday?(@post))], **image_container_data_attributes(@post, CurrentUser.user) do -%>
     <%= render "posts/partials/show/embedded", post: @post %>
     <div id="note-preview"></div>
   <% end -%>

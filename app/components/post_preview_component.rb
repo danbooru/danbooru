@@ -90,36 +90,14 @@ class PostPreviewComponent < ApplicationComponent
   end
 
   def data_attributes
-    attributes = {
+    {
       "data-id" => post.id,
-      "data-has-sound" => has_sound?,
       "data-tags" => post.tag_string,
-      "data-approver-id" => post.approver_id,
       "data-rating" => post.rating,
-      "data-large-width" => post.large_image_width,
-      "data-large-height" => post.large_image_height,
-      "data-width" => post.image_width,
-      "data-height" => post.image_height,
       "data-flags" => post.status_flags,
-      "data-parent-id" => post.parent_id,
-      "data-has-children" => post.has_children?,
       "data-score" => post.score,
-      "data-fav-count" => post.fav_count,
-      "data-pixiv-id" => post.pixiv_id,
-      "data-file-ext" => post.file_ext,
-      "data-source" => post.source,
       "data-uploader-id" => post.uploader_id,
-      "data-normalized-source" => post.normalized_source,
     }
-
-    if post.visible?(current_user)
-      attributes["data-md5"] = post.md5
-      attributes["data-file-url"] = post.file_url
-      attributes["data-large-file-url"] = post.large_file_url
-      attributes["data-preview-file-url"] = post.preview_file_url
-    end
-
-    attributes
   end
 
   def has_sound?

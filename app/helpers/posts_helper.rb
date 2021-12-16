@@ -43,4 +43,27 @@ module PostsHelper
   def is_danbirthday?(post)
     post.id == 1 && post.created_at.strftime("%m-%d") == Time.zone.today.strftime("%m-%d")
   end
+
+  def image_container_data_attributes(post, current_user)
+    attributes = {
+      "data-id" => post.id,
+      "data-tags" => post.tag_string,
+      "data-rating" => post.rating,
+      "data-large-width" => post.large_image_width,
+      "data-large-height" => post.large_image_height,
+      "data-width" => post.image_width,
+      "data-height" => post.image_height,
+      "data-flags" => post.status_flags,
+      "data-score" => post.score,
+      "data-uploader-id" => post.uploader_id,
+      "data-source" => post.source,
+      "data-normalized-source" => post.normalized_source,
+    }
+
+    if post.visible?(current_user)
+      attributes["data-file-url"] = post.file_url
+    end
+
+    attributes
+  end
 end
