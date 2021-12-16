@@ -30,10 +30,6 @@ class MediaFile::Ugoira < MediaFile
     preview_frame.preview(width, height, **options)
   end
 
-  def crop(width, height)
-    preview_frame.crop(width, height)
-  end
-
   def duration
     (frame_delays.sum / 1000.0)
   end

@@ -3,7 +3,7 @@
 class MediaAsset < ApplicationRecord
   class Error < StandardError; end
 
-  VARIANTS = %i[preview crop 180x180 360x360 720x720 sample original]
+  VARIANTS = %i[preview 180x180 360x360 720x720 sample original]
   ENABLE_SEO_POST_URLS = Danbooru.config.enable_seo_post_urls
   LARGE_IMAGE_WIDTH = Danbooru.config.large_image_width
   STORAGE_SERVICE = Danbooru.config.storage_manager
@@ -71,8 +71,6 @@ class MediaAsset < ApplicationRecord
         media_file.preview(width, height, format: :jpeg, quality: 85)
       in :"720x720"
         media_file.preview(width, height, format: :webp, quality: 75)
-      in :crop
-        media_file.crop(width, height)
       in :sample if media_asset.is_ugoira?
         media_file.convert
       in :sample if media_asset.is_static_image?
@@ -87,7 +85,7 @@ class MediaAsset < ApplicationRecord
     end
 
     def file_path(slug = "")
-      if variant.in?(%i[preview crop 180x180 360x360 720x720]) && media_asset.is_flash?
+      if variant.in?(%i[preview 180x180 360x360 720x720]) && media_asset.is_flash?
         "/images/download-preview.png"
       else
         slug = "__#{slug}__" if slug.present?
@@ -109,7 +107,7 @@ class MediaAsset < ApplicationRecord
     # The file extension of this variant.
     def file_ext
       case variant
-      when :preview, :crop, :"180x180", :"360x360"
+      when :preview, :"180x180", :"360x360"
         "jpg"
       when :"720x720"
         "webp"
@@ -123,8 +121,6 @@ class MediaAsset < ApplicationRecord
     def max_dimensions
       case variant
       when :preview
-        [150, 150]
-      when :crop
         [150, 150]
       when :"180x180"
         [180, 180]
@@ -140,12 +136,7 @@ class MediaAsset < ApplicationRecord
     end
 
     def dimensions
-      case variant
-      when :crop
-        max_dimensions
-      else
-        MediaFile.scale_dimensions(media_asset.image_width, media_asset.image_height, max_dimensions[0], max_dimensions[1])
-      end
+      MediaFile.scale_dimensions(media_asset.image_width, media_asset.image_height, max_dimensions[0], max_dimensions[1])
     end
 
     def width
@@ -159,8 +150,6 @@ class MediaAsset < ApplicationRecord
     def self.exists?(media_asset, variant)
       case variant
       when :preview
-        true
-      when :crop
         true
       when :"180x180"
         true

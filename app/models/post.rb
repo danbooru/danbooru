@@ -117,10 +117,6 @@ class Post < ApplicationRecord
       media_asset.variant(:preview).file_url
     end
 
-    def crop_file_url
-      media_asset.variant(:crop).file_url
-    end
-
     def open_graph_image_url
       if is_image?
         if has_large?
@@ -1183,7 +1179,7 @@ class Post < ApplicationRecord
 
     def purge_cached_urls!
       urls = [
-        preview_file_url, crop_file_url, large_file_url, file_url,
+        preview_file_url, large_file_url, file_url,
         tagged_file_url(tagged_filenames: true), tagged_large_file_url(tagged_filenames: true),
       ]
 
@@ -1286,7 +1282,7 @@ class Post < ApplicationRecord
   include PixivMethods
   include ValidationMethods
 
-  has_bit_flags ["has_embedded_notes", "has_cropped"]
+  has_bit_flags ["has_embedded_notes"]
 
   def safeblocked?
     CurrentUser.safe_mode? && (rating != "s" || Danbooru.config.safe_mode_restricted_tags.any? { |tag| tag.in?(tag_array) })

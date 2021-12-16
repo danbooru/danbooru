@@ -98,7 +98,6 @@ namespace :danbooru do
 
       posts.parallel_each do |post|
         sm.store_file(post.file(:preview), post, :preview) if post.has_preview?
-        sm.store_file(post.file(:crop), post, :crop) if post.has_cropped?
         sm.store_file(post.file(:sample), post, :sample) if post.has_large?
         sm.store_file(post.file(:original), post, :original)
       end

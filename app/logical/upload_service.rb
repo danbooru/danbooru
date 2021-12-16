@@ -84,7 +84,6 @@ class UploadService
 
   def convert_to_post(upload)
     Post.new.tap do |p|
-      p.has_cropped = true
       p.tag_string = upload.tag_string
       p.md5 = upload.md5
       p.file_ext = upload.file_ext

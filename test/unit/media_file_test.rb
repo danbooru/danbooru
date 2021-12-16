@@ -140,20 +140,6 @@ class MediaFileTest < ActiveSupport::TestCase
     end
   end
 
-  context "#crop" do
-    should "generate a cropped preview image" do
-      assert_equal([150, 150], MediaFile.open("test/files/test.jpg").crop(150, 150).dimensions)
-      assert_equal([150, 150], MediaFile.open("test/files/test.png").crop(150, 150).dimensions)
-      assert_equal([150, 150], MediaFile.open("test/files/test.gif").crop(150, 150).dimensions)
-    end
-
-    should "generate a cropped preview image for a video" do
-      skip unless MediaFile.videos_enabled?
-      assert_equal([150, 150], MediaFile.open("test/files/test-512x512.webm").crop(150, 150).dimensions)
-      assert_equal([150, 150], MediaFile.open("test/files/test-300x300.mp4").crop(150, 150).dimensions)
-    end
-  end
-
   context "for a ugoira" do
     setup do
       skip unless MediaFile::Ugoira.videos_enabled?
@@ -163,7 +149,6 @@ class MediaFileTest < ActiveSupport::TestCase
 
     should "generate a preview" do
       assert_equal([60, 60], @ugoira.preview(150, 150).dimensions)
-      assert_equal([150, 150], @ugoira.crop(150, 150).dimensions)
     end
 
     should "get the duration" do

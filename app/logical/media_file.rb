@@ -181,17 +181,6 @@ class MediaFile
     nil
   end
 
-  # Return a cropped preview version of the file, sized to fit exactly within
-  # the given width and height.
-  #
-  # @param width [Integer] the width of the cropped image
-  # @param height [Integer] the height of the cropped image
-  # @param options [Hash] extra options when generating the preview
-  # @return [MediaFile] a cropped preview file
-  def crop(width, height, **options)
-    nil
-  end
-
   def attributes
     {
       path: path,

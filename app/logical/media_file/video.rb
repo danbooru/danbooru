@@ -15,10 +15,6 @@ class MediaFile::Video < MediaFile
     preview_frame.preview(max_width, max_height, **options)
   end
 
-  def crop(max_width, max_height)
-    preview_frame.crop(max_width, max_height)
-  end
-
   private
 
   def video
