@@ -1,0 +1,7 @@
+# This is the config file for Active Storage. Danbooru doesn't use Active
+# Storage, but we still need this file anyway because the derailed_benchmarks
+# gem doesn't work without it. derailed_benchmarks does `require "rails/all"`,
+# which loads Active Storage, which fails if this config file isn't present.
+#
+# https://edgeguides.rubyonrails.org/active_storage_overview.html#setup
+# https://github.com/zombocom/derailed_benchmarks

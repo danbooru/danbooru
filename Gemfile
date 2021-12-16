@@ -69,6 +69,7 @@ group :development do
   gem 'benchmark-ips', require: "benchmark/ips"
   gem 'listen'
   gem 'solargraph'
+  gem 'derailed_benchmarks'
 end
 
 group :test do
