@@ -412,17 +412,18 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
       context "with restricted posts" do
         setup do
-          Danbooru.config.stubs(:restricted_tags).returns(["tagme"])
           as(@user) { @post.update!(tag_string: "tagme") }
         end
 
         should "not show restricted posts if user doesn't have permission" do
+          Post.any_instance.stubs(:levelblocked?).returns(true)
           get posts_path
           assert_response :success
           assert_select "#post_#{@post.id}", 0
         end
 
         should "show restricted posts if user has permission" do
+          Post.any_instance.stubs(:levelblocked?).returns(false)
           get_auth posts_path, create(:gold_user)
           assert_response :success
           assert_select "#post_#{@post.id}", 1

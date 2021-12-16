@@ -42,11 +42,11 @@ class PostPreviewComponentTest < ViewComponent::TestCase
 
     context "for a post with restricted tags" do
       setup do
-        Danbooru.config.stubs(:restricted_tags).returns(["touhou"])
         @post = create(:post, tag_string: "touhou")
       end
 
       should "should be visible to Gold users" do
+        @post.stubs(:levelblocked?).returns(false)
         node = render_preview(@post, current_user: create(:gold_user))
 
         assert_equal(post_path(@post), node.css("article a").attr("href").value)
@@ -54,6 +54,7 @@ class PostPreviewComponentTest < ViewComponent::TestCase
       end
 
       should "not be visible to Members" do
+        @post.stubs(:levelblocked?).returns(true)
         node = render_preview(@post, current_user: create(:user))
         assert_equal("", node.to_s)
       end
