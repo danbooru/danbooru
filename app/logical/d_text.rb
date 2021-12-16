@@ -271,7 +271,7 @@ class DText
   # @return [String] the DText output
   def self.strip_blocks(string, tag)
     n = 0
-    stripped = ""
+    stripped = "".dup
     string = string.dup
 
     string.gsub!(/\s*\[#{tag}\](?!\])\s*/mi, "\n\n[#{tag}]\n\n")

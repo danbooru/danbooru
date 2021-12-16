@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require "shellwords"
 
 # A wrapper for the exiftool command.
