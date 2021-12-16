@@ -8,7 +8,7 @@ class Post < ApplicationRecord
   NOTE_COPY_TAGS = %w[translated partially_translated check_translation translation_request reverse_translation
                       annotated partially_annotated check_annotation annotation_request]
 
-  RESTRICTED_TAGS = Danbooru.config.restricted_tags
+  RESTRICTED_TAGS_REGEX = /(?:^| )(?:#{Danbooru.config.restricted_tags.join("|")})(?:$| )/o
 
   self.ignored_columns = [:pool_string, :fav_string]
 
@@ -1289,7 +1289,8 @@ class Post < ApplicationRecord
   end
 
   def levelblocked?(user = CurrentUser.user)
-    !user.is_gold? && RESTRICTED_TAGS.any? { |tag| tag.in?(tag_array) }
+    #!user.is_gold? && RESTRICTED_TAGS.any? { |tag| has_tag?(tag) }
+    !user.is_gold? && tag_string.match?(RESTRICTED_TAGS_REGEX)
   end
 
   def banblocked?(user = CurrentUser.user)
