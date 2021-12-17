@@ -306,6 +306,7 @@ GEM
       multi_json (~> 1.3)
       multi_xml (~> 0.5)
       rack (>= 1.2, < 3)
+    optimist (3.0.1)
     os (1.1.4)
     parallel (1.21.0)
     parser (3.0.3.2)
@@ -374,6 +375,10 @@ GEM
     rb-fsevent (0.11.0)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
+    rbtrace (0.4.14)
+      ffi (>= 1.0.6)
+      msgpack (>= 0.4.3)
+      optimist (>= 3.0.0)
     recaptcha (5.8.1)
       json
     redis (4.5.1)
@@ -559,6 +564,7 @@ DEPENDENCIES
   rails (~> 6.0)
   rake
   rakismet
+  rbtrace
   recaptcha
   redis
   responders

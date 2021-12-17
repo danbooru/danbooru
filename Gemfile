@@ -55,6 +55,7 @@ gem "parallel"
 gem "pry-byebug"
 gem "pry-rails"
 gem "ffi"
+gem "rbtrace"
 
 group :development do
   gem 'rubocop', require: false
