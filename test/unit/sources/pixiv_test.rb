@@ -359,6 +359,10 @@ module Sources
           assert_nil_illust_id("https://i.pximg.net/c/600x600/novel-cover-master/img/2019/01/14/01/15/05/10617324_d84daae89092d96bbe66efafec136e42_master1200.jpg")
           assert_nil_illust_id("https://www.pixiv.net/novel/show.php?id=10617324")
         end
+
+        should "not misparse /member_illust.php urls" do
+          assert_nil_illust_id("https://www.pixiv.net/member_illust.php")
+        end
       end
     end
 

@@ -232,7 +232,7 @@ module Sources
           # http://www.pixiv.net/member_illust.php?mode=big&illust_id=18557054
           # http://www.pixiv.net/member_illust.php?mode=manga&illust_id=18557054
           # http://www.pixiv.net/member_illust.php?mode=manga_big&illust_id=18557054&page=1
-          if url.host == "www.pixiv.net" && url.path == "/member_illust.php" && url.query_values["illust_id"].present?
+          if url.host == "www.pixiv.net" && url.path == "/member_illust.php" && url.query_values&.has_key?("illust_id")
             return url.query_values["illust_id"].to_i
 
           # http://www.pixiv.net/en/artworks/46324488
