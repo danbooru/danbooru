@@ -25,7 +25,7 @@ DANBOORU_RUNTIME_DEPS="
   ca-certificates mkvtoolnix rclone libpq5 openssl libgmpxx4ldbl
   zlib1g libfftw3-3 libwebp6 libwebpmux3 libwebpdemux2 liborc-0.4.0 liblcms2-2
   libpng16-16 libexpat1 libglib2.0 libgif7 libexif12 libheif1 libvpx6
-  libseccomp2 libseccomp-dev
+  libseccomp2 libseccomp-dev libjemalloc2
 "
 COMMON_RUNTIME_DEPS="
   $DANBOORU_RUNTIME_DEPS $EXIFTOOL_RUNTIME_DEPS tini busybox less ncdu
