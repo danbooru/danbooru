@@ -26,6 +26,14 @@
       their profile page and look for a "Gift Upgrade" link.</p>
     <% end %>
 
+    <% if Danbooru.config.is_promotion? %>
+      <p>
+        <%= tag.img src: "/images/padoru.gif", width: 24, height: 24 %>
+        <b>Danbooru Winter Sale! Gold and Platinum upgrades are 25% off. Sale ends <%= time_ago_in_words_tagged(Time.utc("2022-01-01")) %>.</b>
+        <%= tag.img src: "/images/padoru.gif", width: 24, height: 24 %>
+      </p>
+    <% end %>
+
     <table id="feature-comparison" class="w-full text-center table-md mt-8 mb-8">
       <thead>
         <tr>
@@ -44,19 +52,25 @@
           <td></td>
           <td>Free</td>
           <td>
+            <% if Danbooru.config.is_promotion? %>
+              <s>$20</s>
+            <% end %>
             <%= cents_to_usd(UserUpgrade.gold_price) %>
             <div class="fineprint">One time fee</div>
           </td>
           <td>
+            <% if Danbooru.config.is_promotion? %>
+              <s>$40</s>
+            <% end %>
             <%= cents_to_usd(UserUpgrade.platinum_price) %>
             <div class="fineprint">One time fee</div>
           </td>
         </tr>
         <tr>
           <td>Tag Limit</td>
-          <td><%= User.tag_query_limit(User::Levels::MEMBER) %></td>
-          <td><%= User.tag_query_limit(User::Levels::GOLD) %></td>
-          <td><%= User.tag_query_limit(User::Levels::PLATINUM) %></td>
+          <td>2</td>
+          <td>6</td>
+          <td>12</td>
         </tr>
         <tr>
           <td>See Hidden Tags</td>

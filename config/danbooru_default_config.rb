@@ -516,6 +516,19 @@ module Danbooru
     # https://docs.newrelic.com/docs/accounts/accounts-billing/account-setup/new-relic-license-key/
     def new_relic_license_key
     end
+
+    # True if the Winter Sale is active.
+    def is_promotion?
+      false
+    end
+
+    # The end date of the Winter Sale.
+    def winter_sale_end_date
+    end
+
+    # The forum topic linked to in the Winter Sale notice.
+    def winter_sale_forum_topic_id
+    end
   end
 
   EnvironmentConfiguration = Struct.new(:config) do

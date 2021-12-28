@@ -80,7 +80,20 @@
   <div id="page">
     <%= render "users/verification_notice" %>
 
-    <% if !CurrentUser.is_anonymous? && !CurrentUser.is_gold? && !CurrentUser.user.is_banned? && cookies[:hide_upgrade_account_notice].blank? && params[:action] != "upgrade_information" %>
+    <% if Danbooru.config.is_promotion? && cookies[:hide_promotion_notice].blank? %>
+      <div class="notice notice-info notice-small flex text-center items-center justify-center gap-2" id="promotion-notice">
+        <% file = %w[provgift.png kemogift.png padoru.gif ablobgift.gif].sample %>
+        <%= tag.img src: "/images/#{file}", width: 32, height: 32 %>
+
+        <span>
+          <%= link_to "Danbooru Winter Sale", forum_topic_path(Danbooru.config.winter_sale_forum_topic_id) %> ends <%= time_ago_in_words_tagged(Danbooru.config.winter_sale_end_date) %>!
+          <br>
+          <%= link_to "Get 25% off Gold & Platinum", new_user_upgrade_path %>
+        </span>
+
+        <span>(<%= link_to "hide", "#", id: "hide-promotion-notice" %>)</span>
+      </div>
+    <% elsif !CurrentUser.is_anonymous? && !CurrentUser.is_gold? && !CurrentUser.user.is_banned? && cookies[:hide_upgrade_account_notice].blank? && params[:action] != "upgrade_information" %>
       <%= render "users/upgrade_notice" %>
     <% end %>
 

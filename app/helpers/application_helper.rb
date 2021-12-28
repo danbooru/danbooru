@@ -151,8 +151,14 @@ module ApplicationHelper
       end
 
       time_tag(text, time, class: klass)
-    else
-      time_tag("in " + distance_of_time_in_words(Time.now, time), time)
+    elsif time.future?
+      if compact
+        text = distance_of_time_in_words(Time.now, time)
+        text = text.gsub(/almost|about|over/, "").gsub(/less than a/, "<1").strip
+        time_tag(text, time)
+      else
+        time_tag("in " + distance_of_time_in_words(Time.now, time), time)
+      end
     end
   end
 
