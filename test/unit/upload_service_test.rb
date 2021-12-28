@@ -224,12 +224,6 @@ class UploadServiceTest < ActiveSupport::TestCase
       end
 
       context "#process!" do
-        should "create a comment" do
-          assert_difference(-> { @post.reload.comments.count }) do
-            as(@user) { @post.reload.replace!(replacement_url: "", replacement_file: @new_file) }
-          end
-        end
-
         should "not create a new post" do
           assert_difference(-> { Post.count }, 0) do
             as(@user) { @post.reload.replace!(replacement_url: "", replacement_file: @new_file) }
@@ -400,12 +394,6 @@ class UploadServiceTest < ActiveSupport::TestCase
       end
 
       context "#process!" do
-        should "create a comment" do
-          assert_difference(-> { @post.reload.comments.count }) do
-            as(@user) { @post.reload.replace!(replacement_url: @new_url) }
-          end
-        end
-
         should "not create a new post" do
           assert_difference(-> { Post.count }, 0) do
             as(@user) { @post.reload.replace!(replacement_url: @new_url) }
@@ -430,14 +418,6 @@ class UploadServiceTest < ActiveSupport::TestCase
             as(@user) { @post.reload.replace!(replacement_url: @new_url) }
             @post.reload
           end
-        end
-
-        should "leave a system comment" do
-          as(@user) { @post.reload.replace!(replacement_url: @new_url) }
-          comment = @post.comments.last
-          assert_not_nil(comment)
-          assert_equal(User.system.id, comment.creator_id)
-          assert_match(/replaced this post/, comment.body)
         end
       end
 

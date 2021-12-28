@@ -2,7 +2,6 @@
 
 class UploadService
   class Replacer
-    extend Memoist
     class Error < StandardError; end
 
     attr_reader :post, :replacement
@@ -10,51 +9,6 @@ class UploadService
     def initialize(post:, replacement:)
       @post = post
       @replacement = replacement
-    end
-
-    def comment_replacement_message(post, replacement)
-      %{"#{replacement.creator.name}":[#{Routes.user_path(replacement.creator)}] replaced this post with a new file:\n\n#{replacement_message(post, replacement)}}
-    end
-
-    def replacement_message(post, replacement)
-      linked_source = linked_source(replacement.replacement_url)
-      linked_source_was = linked_source(post.source_was)
-
-      <<-EOS.strip_heredoc
-        [table]
-          [tbody]
-            [tr]
-              [th]Old[/th]
-              [td]#{linked_source_was}[/td]
-              [td]#{post.md5_was}[/td]
-              [td]#{post.file_ext_was}[/td]
-              [td]#{post.image_width_was} x #{post.image_height_was}[/td]
-              [td]#{post.file_size_was.to_s(:human_size, precision: 4)}[/td]
-            [/tr]
-            [tr]
-              [th]New[/th]
-              [td]#{linked_source}[/td]
-              [td]#{post.md5}[/td]
-              [td]#{post.file_ext}[/td]
-              [td]#{post.image_width} x #{post.image_height}[/td]
-              [td]#{post.file_size.to_s(:human_size, precision: 4)}[/td]
-            [/tr]
-          [/tbody]
-        [/table]
-      EOS
-    end
-
-    def linked_source(source)
-      return nil if source.nil?
-
-      # truncate long sources in the middle: "www.pixiv.net...lust_id=23264933"
-      truncated_source = source.gsub(%r{\Ahttps?://}, "").truncate(64, omission: "...#{source.last(32)}")
-
-      if source =~ %r{\Ahttps?://}i
-        %{"#{truncated_source}":[#{source}]}
-      else
-        truncated_source
-      end
     end
 
     def undo!
@@ -98,8 +52,6 @@ class UploadService
       post.tag_string = replacement.tags
 
       rescale_notes(post)
-
-      CurrentUser.scoped(User.system) { Comment.create!(post: post, creator: User.system, updater: User.system, body: comment_replacement_message(post, replacement), do_not_bump_post: true, creator_ip_addr: "127.0.0.1") }
 
       replacement.save!
       post.save!
