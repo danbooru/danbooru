@@ -55,7 +55,7 @@ class Upload < ApplicationRecord
     end
 
     def validate_video_duration(record)
-      if !record.uploader.is_admin? && record.file.is_video? && record.file.duration > MAX_VIDEO_DURATION
+      if !record.uploader.is_admin? && record.file.is_video? && record.file.duration.to_i > MAX_VIDEO_DURATION
         record.errors.add(:base, "video must not be longer than #{MAX_VIDEO_DURATION.seconds.inspect}")
       end
     end
