@@ -80,7 +80,7 @@
   <div id="page">
     <%= render "users/verification_notice" %>
 
-    <% if Danbooru.config.is_promotion? && cookies[:hide_promotion_notice].blank? %>
+    <% if Danbooru.config.is_promotion? && cookies[:hide_winter_sale_notice].blank? %>
       <div class="notice notice-info notice-small flex text-center items-center justify-center gap-2" id="promotion-notice">
         <% file = %w[provgift.png kemogift.png padoru.gif ablobgift.gif].sample %>
         <%= tag.img src: "/images/#{file}", width: 32, height: 32 %>
