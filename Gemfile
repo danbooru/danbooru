@@ -56,6 +56,7 @@ gem "pry-byebug"
 gem "pry-rails"
 gem "ffi"
 gem "rbtrace"
+gem "good_job"
 
 group :development do
   gem 'rubocop', require: false

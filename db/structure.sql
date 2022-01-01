@@ -38,6 +38,20 @@ COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching
 
 
 --
+-- Name: pgcrypto; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pgcrypto; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pgcrypto IS 'cryptographic functions';
+
+
+--
 -- Name: pgstattuple; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -819,6 +833,41 @@ CREATE SEQUENCE public.forum_topics_id_seq
 --
 
 ALTER SEQUENCE public.forum_topics_id_seq OWNED BY public.forum_topics.id;
+
+
+--
+-- Name: good_job_processes; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.good_job_processes (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    state jsonb
+);
+
+
+--
+-- Name: good_jobs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.good_jobs (
+    id uuid DEFAULT gen_random_uuid() NOT NULL,
+    queue_name text,
+    priority integer,
+    serialized_params jsonb,
+    scheduled_at timestamp without time zone,
+    performed_at timestamp without time zone,
+    finished_at timestamp without time zone,
+    error text,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    active_job_id uuid,
+    concurrency_key text,
+    cron_key text,
+    retried_good_job_id uuid,
+    cron_at timestamp without time zone
+);
 
 
 --
@@ -2759,6 +2808,22 @@ ALTER TABLE ONLY public.forum_topics
 
 
 --
+-- Name: good_job_processes good_job_processes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.good_job_processes
+    ADD CONSTRAINT good_job_processes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: good_jobs good_jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.good_jobs
+    ADD CONSTRAINT good_jobs_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: ip_bans ip_bans_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3603,6 +3668,48 @@ CREATE INDEX index_forum_topics_on_title_tsvector ON public.forum_topics USING g
 --
 
 CREATE INDEX index_forum_topics_on_updated_at ON public.forum_topics USING btree (updated_at);
+
+
+--
+-- Name: index_good_jobs_on_active_job_id_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_jobs_on_active_job_id_and_created_at ON public.good_jobs USING btree (active_job_id, created_at);
+
+
+--
+-- Name: index_good_jobs_on_concurrency_key_when_unfinished; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_jobs_on_concurrency_key_when_unfinished ON public.good_jobs USING btree (concurrency_key) WHERE (finished_at IS NULL);
+
+
+--
+-- Name: index_good_jobs_on_cron_key_and_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_jobs_on_cron_key_and_created_at ON public.good_jobs USING btree (cron_key, created_at);
+
+
+--
+-- Name: index_good_jobs_on_cron_key_and_cron_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_good_jobs_on_cron_key_and_cron_at ON public.good_jobs USING btree (cron_key, cron_at);
+
+
+--
+-- Name: index_good_jobs_on_queue_name_and_scheduled_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_jobs_on_queue_name_and_scheduled_at ON public.good_jobs USING btree (queue_name, scheduled_at) WHERE (finished_at IS NULL);
+
+
+--
+-- Name: index_good_jobs_on_scheduled_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_jobs_on_scheduled_at ON public.good_jobs USING btree (scheduled_at) WHERE (finished_at IS NULL);
 
 
 --
@@ -5073,6 +5180,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211018045429'),
 ('20211018062916'),
 ('20211023225730'),
-('20211121080239');
+('20211121080239'),
+('20220101224048');
 
 
