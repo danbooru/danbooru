@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class UserMailer < ApplicationMailer
-  helper :application
-  helper :users
-
   # The email sent when a user receives a DMail.
   def dmail_notice(dmail)
     @dmail = dmail

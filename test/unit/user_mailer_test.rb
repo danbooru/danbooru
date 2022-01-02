@@ -10,6 +10,7 @@ class UserMailerTest < ActionMailer::TestCase
       should "work" do
         @dmail = create(:dmail, owner: @user, to: @user)
         mail = UserMailer.dmail_notice(@dmail)
+        assert_not_nil(mail.header["List-Unsubscribe"])
         assert_emails(1) { mail.deliver_now }
       end
 

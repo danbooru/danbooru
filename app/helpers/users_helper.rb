@@ -13,9 +13,11 @@ module UsersHelper
     user.dmails.active.unread.first
   end
 
-  def email_sig(user)
+  def disable_email_notifications_url(user)
     verifier = ActiveSupport::MessageVerifier.new(Danbooru.config.email_key, serializer: JSON, digest: "SHA256")
-    verifier.generate(user.id.to_s)
+    sig = verifier.generate(user.id.to_s)
+
+    maintenance_user_email_notification_url(user_id: user.id, sig: sig)
   end
 
   def email_verification_url(user)
