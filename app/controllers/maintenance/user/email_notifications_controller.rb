@@ -5,6 +5,8 @@ module Maintenance
     class EmailNotificationsController < ApplicationController
       class VerificationError < StandardError; end
 
+      respond_to :html, :json, :xml
+
       before_action :validate_sig, :only => [:destroy]
       rescue_from VerificationError, with: :render_verification_error
 
@@ -12,9 +14,9 @@ module Maintenance
       end
 
       def destroy
-        @user = User.find(params[:user_id])
-        @user.receive_email_notifications = false
-        @user.save
+        @user = ::User.find(params[:user_id])
+        @user.update!(receive_email_notifications: false)
+        respond_with(@user)
       end
 
       private
