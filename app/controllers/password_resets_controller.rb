@@ -9,7 +9,7 @@ class PasswordResetsController < ApplicationController
     if @user.blank?
       flash[:notice] = "That account does not exist"
       redirect_to password_reset_path
-    elsif @user.can_receive_email?(require_verification: false)
+    elsif @user.can_receive_email?(require_verified_email: false)
       UserMailer.password_reset(@user).deliver_later
       UserEvent.create_from_request!(@user, :password_reset, request)
       flash[:notice] = "Password reset email sent. Check your email"

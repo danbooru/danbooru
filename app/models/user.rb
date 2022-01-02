@@ -361,11 +361,7 @@ class User < ApplicationRecord
   end
 
   module EmailMethods
-    def email_with_name
-      "#{name} <#{email_address.address}>"
-    end
-
-    def can_receive_email?(require_verification: true)
+    def can_receive_email?(require_verified_email: true)
       email_address.present? && email_address.is_deliverable? && (email_address.is_verified? || !require_verification)
     end
 

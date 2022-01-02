@@ -259,7 +259,7 @@ class UsersControllerTest < ActionDispatch::IntegrationTest
         assert_equal(User::Levels::MEMBER, User.last.level)
         assert_equal(User.last, User.last.authenticate_password("xxxxx1"))
         assert_nil(User.last.email_address)
-        assert_no_enqueued_emails
+        assert_enqueued_email_with UserMailer, :welcome_user, args: [User.last], queue: "default"
         assert_equal(true, User.last.user_events.user_creation.exists?)
       end
 
