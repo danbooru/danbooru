@@ -10,7 +10,7 @@ module EmailValidator
   module_function
 
   # https://www.regular-expressions.info/email.html
-  EMAIL_REGEX = /\A[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\z/
+  EMAIL_REGEX = /\A[a-z0-9._%+-]+@(?:[a-z0-9][a-z0-9-]{0,61}\.)+[a-z]{2,}\z/i
 
   # Sites that ignore dots in email addresses, e.g. where `te.st@gmail.com` is
   # the same as `test@gmail.com`.
