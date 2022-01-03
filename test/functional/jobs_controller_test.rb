@@ -1,7 +1,7 @@
 require 'test_helper'
 
-class DelayedJobsControllerTest < ActionDispatch::IntegrationTest
-  context "The delayed jobs controller" do
+class JobsControllerTest < ActionDispatch::IntegrationTest
+  context "The jobs controller" do
     setup do
       @user = create(:admin_user)
       @job = create(:good_job)
@@ -9,7 +9,7 @@ class DelayedJobsControllerTest < ActionDispatch::IntegrationTest
 
     context "index action" do
       should "render" do
-        get delayed_jobs_path
+        get jobs_path
         assert_response :success
       end
     end
@@ -17,7 +17,7 @@ class DelayedJobsControllerTest < ActionDispatch::IntegrationTest
     context "cancel action" do
       should "work" do
         GoodJob::ActiveJobJob.any_instance.stubs(:status).returns(:queued)
-        put_auth cancel_delayed_job_path(@job), @user, xhr: true
+        put_auth cancel_job_path(@job), @user, xhr: true
         assert_response :success
       end
     end
@@ -26,7 +26,7 @@ class DelayedJobsControllerTest < ActionDispatch::IntegrationTest
       should "work" do
         @job.head_execution.active_job.class.stubs(:queue_adapter).returns(GoodJob::Adapter.new)
         GoodJob::ActiveJobJob.any_instance.stubs(:status).returns(:discarded)
-        put_auth retry_delayed_job_path(@job), @user, xhr: true
+        put_auth retry_job_path(@job), @user, xhr: true
         assert_response :success
       end
     end
@@ -34,14 +34,14 @@ class DelayedJobsControllerTest < ActionDispatch::IntegrationTest
     context "run action" do
       should "work" do
         GoodJob::ActiveJobJob.any_instance.stubs(:status).returns(:queued)
-        put_auth run_delayed_job_path(@job), @user, xhr: true
+        put_auth run_job_path(@job), @user, xhr: true
         assert_response :success
       end
     end
 
     context "destroy action" do
       should "work" do
-        delete_auth delayed_job_path(@job), @user, xhr: true
+        delete_auth job_path(@job), @user, xhr: true
         assert_response :success
       end
     end

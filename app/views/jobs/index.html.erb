@@ -1,6 +1,6 @@
-<div id="c-delayed-jobs">
+<div id="c-jobs">
   <div id="a-index">
-    <h1>Delayed Jobs</h1>
+    <h1>Jobs</h1>
 
     <%= table_for @jobs, class: "striped autofit" do |t| %>
       <% t.column "Name" do |job| %>
@@ -29,10 +29,10 @@
 
       <% t.column column: "control" do |job| %>
         <% if GoodJobPolicy.new(CurrentUser.user, job).update? %>
-          <%= link_to "Run", run_delayed_job_path(job), method: :put, remote: true %> |
-          <%= link_to "Retry", retry_delayed_job_path(job), method: :put, remote: true %> |
-          <%= link_to "Cancel", cancel_delayed_job_path(job), method: :put, remote: true %> |
-          <%= link_to "Delete", delayed_job_path(job), method: :delete, remote: true %>
+          <%= link_to "Run", run_job_path(job), method: :put, remote: true %> |
+          <%= link_to "Retry", retry_job_path(job), method: :put, remote: true %> |
+          <%= link_to "Cancel", cancel_job_path(job), method: :put, remote: true %> |
+          <%= link_to "Delete", job_path(job), method: :delete, remote: true %>
         <% end %>
       <% end %>
     <% end %>

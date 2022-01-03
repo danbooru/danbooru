@@ -106,7 +106,7 @@ Rails.application.routes.draw do
       get :posts
     end
   end
-  resources :delayed_jobs, :only => [:index, :destroy] do
+  resources :jobs, only: [:index, :destroy] do
     member do
       put :run
       put :retry
@@ -337,6 +337,7 @@ Rails.application.routes.draw do
   get "/static/dtext_help" => "static#dtext_help", :as => "dtext_help"
   get "/static/terms_of_service", to: redirect("/terms_of_service")
   get "/user_upgrade/new", to: redirect("/user_upgrades/new")
+  get "/delayed_jobs", to: redirect("/jobs")
 
   get "/mock/recommender/recommend/:user_id" => "mock_services#recommender_recommend", as: "mock_recommender_recommend"
   get "/mock/recommender/similiar/:post_id" => "mock_services#recommender_similar", as: "mock_recommender_similar"
