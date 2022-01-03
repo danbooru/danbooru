@@ -19,8 +19,10 @@
           <% case size %>
           <% when "150", "180" %>
             <%= tag.source type: "image/jpeg", srcset: "#{media_asset.variant("180x180").file_url} 1x, #{media_asset.variant("360x360").file_url} 2x" %>
-          <% when "225", "225w", "270", "270w", "360" %>
+          <% when "225", "225w", "270", "270w" %>
             <%= tag.source type: "image/webp", srcset: "#{media_asset.variant("360x360").file_url} 1x, #{media_asset.variant("720x720").file_url} 2x" %>
+          <% when "360" %>
+            <%= tag.source type: "image/webp", srcset: "#{media_asset.variant("720x720").file_url} 1x" %>
           <% end %>
         <% end %>
 
