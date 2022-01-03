@@ -4,7 +4,7 @@ class DelayedJobsControllerTest < ActionDispatch::IntegrationTest
   context "The delayed jobs controller" do
     setup do
       @user = create(:admin_user)
-      @job = create(:delayed_job)
+      @job = create(:good_job)
     end
 
     context "index action" do
@@ -16,6 +16,7 @@ class DelayedJobsControllerTest < ActionDispatch::IntegrationTest
 
     context "cancel action" do
       should "work" do
+        GoodJob::ActiveJobJob.any_instance.stubs(:status).returns(:queued)
         put_auth cancel_delayed_job_path(@job), @user, xhr: true
         assert_response :success
       end
@@ -23,6 +24,8 @@ class DelayedJobsControllerTest < ActionDispatch::IntegrationTest
 
     context "retry action" do
       should "work" do
+        @job.head_execution.active_job.class.stubs(:queue_adapter).returns(GoodJob::Adapter.new)
+        GoodJob::ActiveJobJob.any_instance.stubs(:status).returns(:discarded)
         put_auth retry_delayed_job_path(@job), @user, xhr: true
         assert_response :success
       end
@@ -30,6 +33,7 @@ class DelayedJobsControllerTest < ActionDispatch::IntegrationTest
 
     context "run action" do
       should "work" do
+        GoodJob::ActiveJobJob.any_instance.stubs(:status).returns(:queued)
         put_auth run_delayed_job_path(@job), @user, xhr: true
         assert_response :success
       end

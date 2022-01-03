@@ -2,42 +2,41 @@
   <div id="a-index">
     <h1>Delayed Jobs</h1>
 
-    <%= table_for @delayed_jobs, class: "striped autofit" do |t| %>
-      <% t.column :queue %>
+    <%= table_for @jobs, class: "striped autofit" do |t| %>
       <% t.column "Name" do |job| %>
-        <%= raw print_name(job) %>
+        <%= job.job_class.titleize.delete_suffix(" Job") %>
       <% end %>
-      <% t.column "Handler", td: {class: "col-expand"} do |job| %>
-        <%= raw print_handler(job) %>
+
+      <% t.column "Details", td: { class: "col-expand" } do |job| %>
+        <%= job.serialized_params["arguments"] %>
       <% end %>
-      <% t.column :attempts %>
-      <% t.column "Last error", td: {class: "col-expand"} do |job| %>
-        <% if job.last_error %>
-          <%= job.last_error.split(/\n/)[0] %>
-          <%= job.last_error.split(/\n/)[1..-1].grep(/releases/).join("\n") %>
+
+      <% t.column "Error", td: { class: "col-expand" } do |job| %>
+        <% if job.error.present? %>
+          <%= job.error %>
         <% end %>
       <% end %>
-      <% t.column "Failed at" do |job| %>
-        <%= time_ago_in_words_tagged(job.failed_at) if job.failed_at %>
+
+      <% t.column "Attempts" do |job| %>
+        <%= job.executions_count %>
       <% end %>
-      <% t.column "Run at" do |job| %>
-        <%= time_ago_in_words_tagged(job.run_at) %>
+
+      <% t.column :status %>
+
+      <% t.column "Created" do |job| %>
+        <%= time_ago_in_words_tagged(job.created_at) %>
       <% end %>
+
       <% t.column column: "control" do |job| %>
-        <% if DelayedJobPolicy.new(CurrentUser.user, job).update? %>
-          <% if job.locked_at? %>
-            Running
-          <% elsif job.failed? %>
-            <%= link_to "Retry", retry_delayed_job_path(job), method: :put, remote: true %> |
-            <%= link_to "Delete", delayed_job_path(job), method: :delete, remote: true %>
-          <% else %>
-            <%= link_to "Run", run_delayed_job_path(job), method: :put, remote: true %> |
-            <%= link_to "Cancel", cancel_delayed_job_path(job), method: :put, remote: true %>
-          <% end %>
+        <% if GoodJobPolicy.new(CurrentUser.user, job).update? %>
+          <%= link_to "Run", run_delayed_job_path(job), method: :put, remote: true %> |
+          <%= link_to "Retry", retry_delayed_job_path(job), method: :put, remote: true %> |
+          <%= link_to "Cancel", cancel_delayed_job_path(job), method: :put, remote: true %> |
+          <%= link_to "Delete", delayed_job_path(job), method: :delete, remote: true %>
         <% end %>
       <% end %>
     <% end %>
 
-    <%= numbered_paginator(@delayed_jobs) %>
+    <%= numbered_paginator(@jobs) %>
   </div>
 </div>

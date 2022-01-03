@@ -4,31 +4,31 @@ class DelayedJobsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def index
-    @delayed_jobs = authorize Delayed::Job.order("run_at asc").extending(PaginationExtension).paginate(params[:page], :limit => params[:limit]), policy_class: DelayedJobPolicy
-    respond_with(@delayed_jobs)
+    @jobs = authorize GoodJob::ActiveJobJob.order(created_at: :desc).extending(PaginationExtension).paginate(params[:page], limit: params[:limit]), policy_class: GoodJobPolicy
+    respond_with(@jobs)
   end
 
   def cancel
-    @job = authorize Delayed::Job.find(params[:id]), policy_class: DelayedJobPolicy
-    @job.fail! unless @job.locked_at?
+    @job = authorize GoodJob::ActiveJobJob.find(params[:id]), policy_class: GoodJobPolicy
+    @job.discard_job("Canceled")
     respond_with(@job)
   end
 
   def retry
-    @job = authorize Delayed::Job.find(params[:id]), policy_class: DelayedJobPolicy
-    @job.update(failed_at: nil, attempts: 0) unless @job.locked_at?
+    @job = authorize GoodJob::ActiveJobJob.find(params[:id]), policy_class: GoodJobPolicy
+    @job.retry_job
     respond_with(@job)
   end
 
   def run
-    @job = authorize Delayed::Job.find(params[:id]), policy_class: DelayedJobPolicy
-    @job.update(run_at: Time.zone.now) unless @job.locked_at?
+    @job = authorize GoodJob::ActiveJobJob.find(params[:id]), policy_class: GoodJobPolicy
+    @job.reschedule_job
     respond_with(@job)
   end
 
   def destroy
-    @job = authorize Delayed::Job.find(params[:id]), policy_class: DelayedJobPolicy
-    @job.destroy unless @job.locked_at?
+    @job = authorize GoodJob::ActiveJobJob.find(params[:id]), policy_class: GoodJobPolicy
+    @job.destroy
     respond_with(@job)
   end
 end
