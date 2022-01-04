@@ -14,11 +14,13 @@
       <% end %>
 
       <% t.column "Details", td: { class: "col-expand" } do |job| %>
-        <%= job.serialized_params["arguments"] %>
+        <% if policy(job).can_see_params? %>
+          <%= job.serialized_params["arguments"] %>
+        <% end %>
       <% end %>
 
       <% t.column "Error", td: { class: "col-expand" } do |job| %>
-        <% if job.error.present? %>
+        <% if policy(job).can_see_params? && job.error.present? %>
           <%= job.error %>
         <% end %>
       <% end %>
