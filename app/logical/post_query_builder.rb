@@ -117,24 +117,19 @@ class PostQueryBuilder
   end
 
   def metatags_match(metatags, relation)
-    fix_negated_ordered_metatags(metatags)
-    metatags.each do |metatag|
-      clause = metatag_matches(metatag.name, metatag.value, quoted: metatag.quoted)
-      clause = clause.negate_relation if metatag.negated
-      relation = relation.and_relation(clause)
-    end
-
-    relation
-  end
-  
-  def fix_negated_ordered_metatags(metatag)
     metatags.each do |metatag|
       if metatag.negated
         metatag.name = "fav" if metatag.name == "ordfav"
         metatag.name = "favgroup" if metatag.name == "ordfavgroup"
         metatag.name = "pool" if metatag.name == "ordpool"
       end
+      
+      clause = metatag_matches(metatag.name, metatag.value, quoted: metatag.quoted)
+      clause = clause.negate_relation if metatag.negated
+      relation = relation.and_relation(clause)
     end
+
+    relation
   end
 
   def metatag_matches(name, value, quoted: false)
