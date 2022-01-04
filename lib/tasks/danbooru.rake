@@ -15,8 +15,8 @@ namespace :danbooru do
 
   # Usage: bin/rails danbooru:reindex_iqdb
   #
-  # Schedules all posts to be reindexed in IQDB. Requires the delayed jobs
-  # worker (bin/delayed_job) to be running.
+  # Schedules all posts to be reindexed in IQDB. Requires the jobs
+  # worker (bin/good_job) to be running.
   desc "Reindex all posts in IQDB"
   task reindex_iqdb: :environment do
     Post.find_each do |post|

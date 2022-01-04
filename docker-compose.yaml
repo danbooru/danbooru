@@ -56,7 +56,7 @@ services:
       - "danbooru-images:/danbooru/public/data"
     command: ["bash", "-c", "bin/wait-for-http http://danbooru:3000 5s && bin/rails danbooru:cron"]
 
-  delayed_jobs:
+  jobs:
     # We need root to write temp upload files in the images directory (/danbooru/public/data)
     user: root
     image: ghcr.io/danbooru/danbooru:production
@@ -71,7 +71,7 @@ services:
     volumes:
       # We need access to images so we can add/remove images to IQDB.
       - "danbooru-images:/danbooru/public/data"
-    command: ["bash", "-c", "bin/wait-for-http http://danbooru:3000 5s && bin/delayed_job run"]
+    command: ["bash", "-c", "bin/wait-for-http http://danbooru:3000 5s && bin/good_job start"]
 
   # https://github.com/danbooru/iqdb
   # https://hub.docker.com/repository/docker/evazion/iqdb

@@ -12,7 +12,7 @@ module DanbooruMaintenance
   end
 
   def daily
-    queue PruneDelayedJobsJob
+    queue PruneJobsJob
     queue PrunePostDisapprovalsJob
     queue PruneBulkUpdateRequestsJob
     queue PruneBansJob
