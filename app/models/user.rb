@@ -362,7 +362,7 @@ class User < ApplicationRecord
 
   module EmailMethods
     def can_receive_email?(require_verified_email: true)
-      email_address.present? && email_address.is_deliverable? && (email_address.is_verified? || !require_verification)
+      email_address.present? && email_address.is_deliverable? && (email_address.is_verified? || !require_verified_email)
     end
 
     def change_email(new_email, request)

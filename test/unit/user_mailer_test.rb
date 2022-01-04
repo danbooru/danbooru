@@ -27,6 +27,13 @@ class UserMailerTest < ActionMailer::TestCase
         mail = UserMailer.dmail_notice(@dmail)
         assert_emails(0) { mail.deliver_now }
       end
+
+      should "not send an email for a user with an unverified address" do
+        @user = create(:user, email_address: build(:email_address, is_verified: false))
+        @dmail = create(:dmail, owner: @user, to: @user)
+        mail = UserMailer.dmail_notice(@dmail)
+        assert_emails(0) { mail.deliver_now }
+      end
     end
 
     context "password_reset method" do
