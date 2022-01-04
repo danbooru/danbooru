@@ -42,7 +42,20 @@ class BackgroundJob < GoodJob::ActiveJobJob
           q = q.status_matches(params[:status])
         end
 
-        q.apply_default_order(params)
+        case params[:order]
+        when "created_at"
+          q = q.order(created_at: :desc)
+        when "updated_at"
+          q = q.order(updated_at: :desc)
+        when "scheduled_at"
+          q = q.order(scheduled_at: :desc)
+        when "performed_at"
+          q = q.order(performed_at: :desc)
+        when "finished_at"
+          q = q.order(finished_at: :desc)
+        else
+          q = q.apply_default_order(params)
+        end
       end
     end
   end
