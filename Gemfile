@@ -4,8 +4,6 @@ gem 'dotenv-rails', :require => "dotenv/rails-now"
 
 gem "rails", "~> 6.0"
 gem "pg"
-gem "delayed_job"
-gem "delayed_job_active_record"
 gem "simple_form"
 gem "sanitize"
 gem 'ruby-vips'

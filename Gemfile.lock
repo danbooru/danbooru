@@ -135,11 +135,6 @@ GEM
     dead_end (3.1.0)
     debug_inspector (1.1.0)
     declarative (0.0.20)
-    delayed_job (4.1.9)
-      activesupport (>= 3.0, < 6.2)
-    delayed_job_active_record (4.1.6)
-      activerecord (>= 3.0, < 6.2)
-      delayed_job (>= 3.0, < 5)
     derailed_benchmarks (2.1.1)
       benchmark-ips (~> 2)
       dead_end
@@ -537,8 +532,6 @@ DEPENDENCIES
   clockwork
   codecov
   daemons
-  delayed_job
-  delayed_job_active_record
   derailed_benchmarks
   diff-lcs
   dotenv-rails

@@ -476,46 +476,6 @@ ALTER SEQUENCE public.comments_id_seq OWNED BY public.comments.id;
 
 
 --
--- Name: delayed_jobs; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.delayed_jobs (
-    id integer NOT NULL,
-    priority integer DEFAULT 0,
-    attempts integer DEFAULT 0,
-    handler text,
-    last_error text,
-    run_at timestamp without time zone,
-    locked_at timestamp without time zone,
-    failed_at timestamp without time zone,
-    locked_by character varying,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL,
-    queue character varying
-);
-
-
---
--- Name: delayed_jobs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.delayed_jobs_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: delayed_jobs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.delayed_jobs_id_seq OWNED BY public.delayed_jobs.id;
-
-
---
 -- Name: dmails; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2332,13 +2292,6 @@ ALTER TABLE ONLY public.comments ALTER COLUMN id SET DEFAULT nextval('public.com
 
 
 --
--- Name: delayed_jobs id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.delayed_jobs ALTER COLUMN id SET DEFAULT nextval('public.delayed_jobs_id_seq'::regclass);
-
-
---
 -- Name: dmails id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2725,14 +2678,6 @@ ALTER TABLE ONLY public.comment_votes
 
 ALTER TABLE ONLY public.comments
     ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
-
-
---
--- Name: delayed_jobs delayed_jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.delayed_jobs
-    ADD CONSTRAINT delayed_jobs_pkey PRIMARY KEY (id);
 
 
 --
@@ -3381,27 +3326,6 @@ CREATE INDEX index_comments_on_creator_ip_addr ON public.comments USING btree (c
 --
 
 CREATE INDEX index_comments_on_post_id ON public.comments USING btree (post_id);
-
-
---
--- Name: index_delayed_jobs_on_locked_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_delayed_jobs_on_locked_at ON public.delayed_jobs USING btree (locked_at);
-
-
---
--- Name: index_delayed_jobs_on_locked_by; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_delayed_jobs_on_locked_by ON public.delayed_jobs USING btree (locked_by);
-
-
---
--- Name: index_delayed_jobs_on_run_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_delayed_jobs_on_run_at ON public.delayed_jobs USING btree (run_at);
 
 
 --
@@ -5181,6 +5105,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211018062916'),
 ('20211023225730'),
 ('20211121080239'),
-('20220101224048');
+('20220101224048'),
+('20220104214319');
 
 
