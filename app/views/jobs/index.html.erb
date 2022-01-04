@@ -2,6 +2,12 @@
   <div id="a-index">
     <h1>Jobs</h1>
 
+    <%= search_form_for(jobs_path) do |f| %>
+      <%= f.input :name, collection: ApplicationJob.job_classes.map { |klass| klass.name.titleize.delete_suffix(" Job") }, include_blank: true, selected: params[:search][:name] %>
+      <%= f.input :status, collection: %w[Running Queued Finished Discarded], include_blank: true, selected: params[:search][:status] %>
+      <%= f.submit "Search" %>
+    <% end %>
+
     <%= table_for @jobs, class: "striped autofit" do |t| %>
       <% t.column "Name" do |job| %>
         <%= job.job_class.titleize.delete_suffix(" Job") %>
@@ -28,7 +34,7 @@
       <% end %>
 
       <% t.column column: "control" do |job| %>
-        <% if GoodJobPolicy.new(CurrentUser.user, job).update? %>
+        <% if policy(job).update? %>
           <%= link_to "Run", run_job_path(job), method: :put, remote: true %> |
           <%= link_to "Retry", retry_job_path(job), method: :put, remote: true %> |
           <%= link_to "Cancel", cancel_job_path(job), method: :put, remote: true %> |

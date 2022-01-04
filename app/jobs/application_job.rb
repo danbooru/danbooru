@@ -23,4 +23,19 @@ class ApplicationJob < ActiveJob::Base
   discard_on ActiveJob::DeserializationError do |_job, error|
     DanbooruLogger.log(error)
   end
+
+  # A list of all available job types. Used by the /jobs search form.
+  def self.job_classes
+    [
+      AmcheckDatabaseJob, BigqueryExportAllJob, DeleteFavoritesJob,
+      DmailInactiveApproversJob, IqdbAddPostJob, IqdbRemovePostJob,
+      PopulateSavedSearchJob, PruneApproversJob, PruneBansJob,
+      PruneBulkUpdateRequestsJob, PrunePostDisapprovalsJob, PrunePostsJob,
+      PruneRateLimitsJob, PruneUploadsJob, RegeneratePostCountsJob,
+      RegeneratePostJob, RetireTagRelationshipsJob,
+      UploadPreprocessorDelayedStartJob, UploadServiceDelayedStartJob,
+      VacuumDatabaseJob, DiscordNotificationJob, BigqueryExportJob,
+      ProcessBulkUpdateRequestJob, PruneJobsJob
+    ]
+  end
 end

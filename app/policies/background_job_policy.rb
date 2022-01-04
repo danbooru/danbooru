@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class GoodJobPolicy < ApplicationPolicy
+class BackgroundJobPolicy < ApplicationPolicy
   def index?
     true
   end

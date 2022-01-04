@@ -4,30 +4,30 @@ class JobsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def index
-    @jobs = authorize GoodJob::ActiveJobJob.order(created_at: :desc).extending(PaginationExtension).paginate(params[:page], limit: params[:limit]), policy_class: GoodJobPolicy
+    @jobs = authorize BackgroundJob.paginated_search(params)
     respond_with(@jobs)
   end
 
   def cancel
-    @job = authorize GoodJob::ActiveJobJob.find(params[:id]), policy_class: GoodJobPolicy
+    @job = authorize BackgroundJob.find(params[:id])
     @job.discard_job("Canceled")
     respond_with(@job)
   end
 
   def retry
-    @job = authorize GoodJob::ActiveJobJob.find(params[:id]), policy_class: GoodJobPolicy
+    @job = authorize BackgroundJob.find(params[:id])
     @job.retry_job
     respond_with(@job)
   end
 
   def run
-    @job = authorize GoodJob::ActiveJobJob.find(params[:id]), policy_class: GoodJobPolicy
+    @job = authorize BackgroundJob.find(params[:id])
     @job.reschedule_job
     respond_with(@job)
   end
 
   def destroy
-    @job = authorize GoodJob::ActiveJobJob.find(params[:id]), policy_class: GoodJobPolicy
+    @job = authorize BackgroundJob.find(params[:id])
     @job.destroy
     respond_with(@job)
   end

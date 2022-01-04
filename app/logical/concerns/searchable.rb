@@ -256,6 +256,8 @@ module Searchable
     case type
     when :string, :text
       search_text_attribute(name, params)
+    when :uuid
+      search_uuid_attribute(name, params)
     when :boolean
       search_boolean_attribute(name, params)
     when :integer, :float, :datetime, :interval
@@ -380,6 +382,24 @@ module Searchable
 
     if params[:"#{attr}_lower_space"].present?
       relation = relation.where_text_includes_lower(attr, params[:"#{attr}_lower_space"].split(' '))
+    end
+
+    relation
+  end
+
+  def search_uuid_attribute(attr, params)
+    relation = all
+
+    if params[attr].present?
+      relation = relation.where(attr => params[attr])
+    end
+
+    if params[:"#{attr}_eq"].present?
+      relation = relation.where(attr => params[:"#{attr}_eq"])
+    end
+
+    if params[:"#{attr}_not_eq"].present?
+      relation = relation.where.not(attr => params[:"#{attr}_not_eq"])
     end
 
     relation
