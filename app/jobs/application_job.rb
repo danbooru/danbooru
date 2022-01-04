@@ -35,7 +35,7 @@ class ApplicationJob < ActiveJob::Base
       RegeneratePostJob, RetireTagRelationshipsJob,
       UploadPreprocessorDelayedStartJob, UploadServiceDelayedStartJob,
       VacuumDatabaseJob, DiscordNotificationJob, BigqueryExportJob,
-      ProcessBulkUpdateRequestJob, PruneJobsJob
+      ProcessBulkUpdateRequestJob, PruneJobsJob, ActionMailer::MailDeliveryJob
     ]
   end
 end

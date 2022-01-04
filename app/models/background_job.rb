@@ -27,7 +27,7 @@ class BackgroundJob < GoodJob::ActiveJobJob
       end
 
       def name_matches(name)
-        class_name = name.tr(" ", "_").camelize + "Job"
+        class_name = name.tr(" ", "_").classify + "Job"
         where_json_contains(:serialized_params, { job_class: class_name })
       end
 

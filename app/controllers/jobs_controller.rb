@@ -4,7 +4,7 @@ class JobsController < ApplicationController
   respond_to :html, :xml, :json, :js
 
   def index
-    @jobs = authorize BackgroundJob.paginated_search(params)
+    @jobs = authorize BackgroundJob.unscoped.paginated_search(params)
     respond_with(@jobs)
   end
 
