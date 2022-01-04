@@ -48,12 +48,24 @@ class UserMailerTest < ActionMailer::TestCase
         mail = UserMailer.email_change_confirmation(@user)
         assert_emails(1) { mail.deliver_now }
       end
+
+      should "not fail for a user without an email address" do
+        @user = create(:user)
+        mail = UserMailer.email_change_confirmation(@user)
+        assert_emails(0) { mail.deliver_now }
+      end
     end
 
     context "welcome_user method" do
       should "work" do
         mail = UserMailer.welcome_user(@user)
         assert_emails(1) { mail.deliver_now }
+      end
+
+      should "not fail for a user without an email address" do
+        @user = create(:user)
+        mail = UserMailer.welcome_user(@user)
+        assert_emails(0) { mail.deliver_now }
       end
     end
   end
