@@ -2,7 +2,7 @@ source 'https://rubygems.org/'
 
 gem 'dotenv-rails', :require => "dotenv/rails-now"
 
-gem "rails", "~> 6.0"
+gem "rails", "~> 7.0"
 gem "pg"
 gem "simple_form"
 gem "sanitize"
@@ -31,7 +31,7 @@ gem 'puma'
 gem 'scenic'
 gem 'ipaddress_2'
 gem 'http', "~> 4.4.1"
-gem 'activerecord-hierarchical_query'
+gem 'activerecord-hierarchical_query', git: "https://github.com/danbooru/activerecord-hierarchical_query"
 gem 'http-cookie', git: "https://github.com/danbooru/http-cookie"
 gem 'pundit'
 gem 'mail'
