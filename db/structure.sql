@@ -443,7 +443,6 @@ CREATE TABLE public.comments (
     creator_id integer NOT NULL,
     body text NOT NULL,
     creator_ip_addr inet NOT NULL,
-    body_index tsvector NOT NULL,
     score integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -486,7 +485,6 @@ CREATE TABLE public.dmails (
     to_id integer NOT NULL,
     title text NOT NULL,
     body text NOT NULL,
-    message_index tsvector NOT NULL,
     is_read boolean DEFAULT false NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
@@ -693,7 +691,6 @@ CREATE TABLE public.forum_posts (
     creator_id integer NOT NULL,
     updater_id integer NOT NULL,
     body text NOT NULL,
-    text_index tsvector NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
@@ -767,7 +764,6 @@ CREATE TABLE public.forum_topics (
     is_sticky boolean DEFAULT false NOT NULL,
     is_locked boolean DEFAULT false NOT NULL,
     is_deleted boolean DEFAULT false NOT NULL,
-    text_index tsvector NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     category_id integer DEFAULT 0 NOT NULL,
@@ -1303,7 +1299,6 @@ CREATE TABLE public.notes (
     height integer NOT NULL,
     is_active boolean DEFAULT true NOT NULL,
     body text NOT NULL,
-    body_index tsvector NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     version integer DEFAULT 0 NOT NULL
@@ -2192,7 +2187,6 @@ CREATE TABLE public.wiki_pages (
     id integer NOT NULL,
     title character varying NOT NULL,
     body text NOT NULL,
-    body_index tsvector NOT NULL,
     is_locked boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
@@ -3287,13 +3281,6 @@ CREATE UNIQUE INDEX index_comment_votes_on_user_id_and_comment_id ON public.comm
 
 
 --
--- Name: index_comments_on_body_index; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_comments_on_body_index ON public.comments USING gin (body_index);
-
-
---
 -- Name: index_comments_on_body_tsvector; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3361,13 +3348,6 @@ CREATE INDEX index_dmails_on_is_deleted ON public.dmails USING btree (is_deleted
 --
 
 CREATE INDEX index_dmails_on_is_read ON public.dmails USING btree (is_read);
-
-
---
--- Name: index_dmails_on_message_index; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_dmails_on_message_index ON public.dmails USING gin (message_index);
 
 
 --
@@ -3518,13 +3498,6 @@ CREATE INDEX index_forum_posts_on_creator_id ON public.forum_posts USING btree (
 
 
 --
--- Name: index_forum_posts_on_text_index; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_forum_posts_on_text_index ON public.forum_posts USING gin (text_index);
-
-
---
 -- Name: index_forum_posts_on_topic_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3571,13 +3544,6 @@ CREATE INDEX index_forum_topics_on_creator_id ON public.forum_topics USING btree
 --
 
 CREATE INDEX index_forum_topics_on_is_sticky_and_updated_at ON public.forum_topics USING btree (is_sticky, updated_at);
-
-
---
--- Name: index_forum_topics_on_text_index; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_forum_topics_on_text_index ON public.forum_topics USING gin (text_index);
 
 
 --
@@ -3914,13 +3880,6 @@ CREATE INDEX index_note_versions_on_updater_id_and_post_id ON public.note_versio
 --
 
 CREATE INDEX index_note_versions_on_updater_ip_addr ON public.note_versions USING btree (updater_ip_addr);
-
-
---
--- Name: index_notes_on_body_index; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_notes_on_body_index ON public.notes USING gin (body_index);
 
 
 --
@@ -4751,13 +4710,6 @@ CREATE INDEX index_wiki_pages_on_array_to_tsvector_other_names ON public.wiki_pa
 
 
 --
--- Name: index_wiki_pages_on_body_index_index; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_wiki_pages_on_body_index_index ON public.wiki_pages USING gin (body_index);
-
-
---
 -- Name: index_wiki_pages_on_other_names; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5106,6 +5058,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211023225730'),
 ('20211121080239'),
 ('20220101224048'),
-('20220104214319');
+('20220104214319'),
+('20220106171727');
 
 
