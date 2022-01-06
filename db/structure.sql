@@ -865,23 +865,17 @@ CREATE TABLE public.posts (
     image_height integer NOT NULL,
     uploader_ip_addr inet NOT NULL,
     tag_string text DEFAULT ''::text NOT NULL,
-    is_note_locked boolean DEFAULT false NOT NULL,
     fav_count integer DEFAULT 0 NOT NULL,
     file_ext character varying NOT NULL,
     last_noted_at timestamp without time zone,
-    is_rating_locked boolean DEFAULT false NOT NULL,
     parent_id integer,
     has_children boolean DEFAULT false NOT NULL,
     approver_id integer,
-    tag_index tsvector,
     tag_count_general integer DEFAULT 0 NOT NULL,
     tag_count_artist integer DEFAULT 0 NOT NULL,
     tag_count_character integer DEFAULT 0 NOT NULL,
     tag_count_copyright integer DEFAULT 0 NOT NULL,
     file_size integer NOT NULL,
-    is_status_locked boolean DEFAULT false NOT NULL,
-    fav_string text DEFAULT ''::text NOT NULL,
-    pool_string text DEFAULT ''::text NOT NULL,
     up_score integer DEFAULT 0 NOT NULL,
     down_score integer DEFAULT 0 NOT NULL,
     is_pending boolean DEFAULT false NOT NULL,
@@ -5059,6 +5053,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211121080239'),
 ('20220101224048'),
 ('20220104214319'),
-('20220106171727');
+('20220106171727'),
+('20220106172910');
 
 
