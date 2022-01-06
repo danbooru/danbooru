@@ -109,9 +109,9 @@ module Sources
 
     context "A cover image" do
       should "still work" do
-        post = Sources::Strategies.find("https://pixiv.pximg.net/c/1620x580_90_a2_g5/fanbox/public/images/creator/1566167/cover/WPqKsvKVGRq4qUjKFAMi23Z5.jpeg")
+        post = Sources::Strategies.find("https://pixiv.pximg.net/c/1620x580_90_a2_g5/fanbox/public/images/creator/1566167/cover/QqxYtuWdy4XWQx1ZLIqr4wvA.jpeg")
         assert_nothing_raised { post.to_h }
-        assert_downloaded(276_301, post.image_url)
+        assert_downloaded(366_291, post.image_url)
         assert_equal("https://omu001.fanbox.cc", post.profile_url)
         assert_equal(post.profile_url, post.canonical_url)
         artist = FactoryBot.create(:artist, name: "omu", url_string: "https://omu001.fanbox.cc")
