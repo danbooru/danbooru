@@ -29,7 +29,7 @@
 
   <%= stylesheet_pack_tag "application" %>
   <% if CurrentUser.user.custom_style.present? && params.fetch(:css, "true").truthy?  %>
-    <%= stylesheet_link_tag custom_style_users_path(md5: Digest::MD5.hexdigest(CurrentUser.user.custom_style)), media: "screen" %>
+    <%= stylesheet_link_tag custom_style_users_path(md5: Digest::MD5.hexdigest(CurrentUser.user.custom_style)) %>
   <% end %>
 
   <% if current_page?(root_url) %>
