@@ -17,7 +17,6 @@ require "active_job/railtie"
 # require "action_mailbox/engine"
 # require "action_text/engine"
 require "rails/test_unit/railtie"
-# require "sprockets/railtie"
 
 # Load the gems for the current Rails environment from the Gemfile.
 Bundler.require(*Rails.groups)
