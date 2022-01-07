@@ -890,7 +890,6 @@ CREATE TABLE public.posts (
     bit_flags bigint DEFAULT 0 NOT NULL,
     tag_count_meta integer DEFAULT 0 NOT NULL
 );
-ALTER TABLE ONLY public.posts ALTER COLUMN tag_index SET STATISTICS 3000;
 
 
 --
@@ -4746,48 +4745,6 @@ CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING b
 
 
 --
--- Name: comments trigger_comments_on_update; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER trigger_comments_on_update BEFORE INSERT OR UPDATE ON public.comments FOR EACH ROW EXECUTE FUNCTION tsvector_update_trigger('body_index', 'pg_catalog.english', 'body');
-
-
---
--- Name: dmails trigger_dmails_on_update; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER trigger_dmails_on_update BEFORE INSERT OR UPDATE ON public.dmails FOR EACH ROW EXECUTE FUNCTION tsvector_update_trigger('message_index', 'pg_catalog.english', 'title', 'body');
-
-
---
--- Name: forum_posts trigger_forum_posts_on_update; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER trigger_forum_posts_on_update BEFORE INSERT OR UPDATE ON public.forum_posts FOR EACH ROW EXECUTE FUNCTION tsvector_update_trigger('text_index', 'pg_catalog.english', 'body');
-
-
---
--- Name: forum_topics trigger_forum_topics_on_update; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER trigger_forum_topics_on_update BEFORE INSERT OR UPDATE ON public.forum_topics FOR EACH ROW EXECUTE FUNCTION tsvector_update_trigger('text_index', 'pg_catalog.english', 'title');
-
-
---
--- Name: notes trigger_notes_on_update; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER trigger_notes_on_update BEFORE INSERT OR UPDATE ON public.notes FOR EACH ROW EXECUTE FUNCTION tsvector_update_trigger('body_index', 'pg_catalog.english', 'body');
-
-
---
--- Name: wiki_pages trigger_wiki_pages_on_update; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER trigger_wiki_pages_on_update BEFORE INSERT OR UPDATE ON public.wiki_pages FOR EACH ROW EXECUTE FUNCTION tsvector_update_trigger('body_index', 'pg_catalog.english', 'body', 'title');
-
-
---
 -- PostgreSQL database dump complete
 --
 
@@ -5054,6 +5011,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220101224048'),
 ('20220104214319'),
 ('20220106171727'),
-('20220106172910');
+('20220106172910'),
+('20220107014433');
 
 
