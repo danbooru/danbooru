@@ -189,7 +189,7 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
           # try to submit a form with cookies but without the csrf token
           put user_path(@user), headers: { HTTP_COOKIE: headers["Set-Cookie"] }, params: { user: { enable_safe_mode: "true" } }
           assert_response 403
-          assert_equal("ActionController::InvalidAuthenticityToken", css_select("p").first.content)
+          assert_equal("Can't verify CSRF token authenticity.", css_select("p").first.content)
           assert_equal(false, @user.reload.enable_safe_mode)
         end
       end
