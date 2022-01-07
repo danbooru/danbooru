@@ -592,7 +592,7 @@ module Searchable
     if params[:order] == "custom"
       parse_ids = PostQueryBuilder.new(nil).parse_range(params[:id], :integer)
       if parse_ids[0] == :in
-        return find_ordered(parse_ids[1])
+        return in_order_of(:id, parse_ids[1])
       end
     end
 
@@ -601,14 +601,6 @@ module Searchable
 
   def default_order
     order(id: :desc)
-  end
-
-  def find_ordered(ids)
-    order_clause = []
-    ids.each do |id|
-      order_clause << sanitize_sql_array(["#{qualified_column_for(:id)} = ? DESC", id])
-    end
-    where(id: ids).order(Arel.sql(order_clause.join(', ')))
   end
 
   private

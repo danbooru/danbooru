@@ -736,7 +736,7 @@ class PostQueryBuilder
     operator, ids = parse_range(id_metatags.first, :integer)
     return relation.none unless operator == :in
 
-    relation.find_ordered(ids)
+    relation.in_order_of(:id, ids)
   end
 
   # @raise [TagLimitError] if the number of tags exceeds the user's tag limit
