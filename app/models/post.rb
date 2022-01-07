@@ -10,8 +10,6 @@ class Post < ApplicationRecord
 
   RESTRICTED_TAGS_REGEX = /(?:^| )(?:#{Danbooru.config.restricted_tags.join("|")})(?:$| )/o
 
-  self.ignored_columns = [:pool_string, :fav_string]
-
   deletable
 
   before_validation :merge_old_changes
