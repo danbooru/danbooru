@@ -52,7 +52,7 @@
   },
   "scripts": {
     "eslint-all": "yarn run eslint --plugin eslint-plugin-ignore-erb --ext .js,.js.erb app/javascript/src/javascripts",
-    "stylelint-all": "yarn run stylelint 'app/javascript/src/styles/**/*.scss'"
+    "stylelint-all": "yarn run stylelint 'app/**/*.scss'"
   },
   "babel": {
     "presets": [

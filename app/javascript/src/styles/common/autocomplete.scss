@@ -21,8 +21,8 @@
     }
   }
 
-  /* Display a red wavy underline beneath misspelled tags. */
-  /* https://stackoverflow.com/a/28152272 */
+  // Display a red wavy underline beneath misspelled tags.
+  // https://stackoverflow.com/a/28152272
   li[data-autocomplete-type="tag-autocorrect"] .autocomplete-antecedent {
     position: relative;
     display: inline-block;

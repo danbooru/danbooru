@@ -13,12 +13,12 @@ div[data-tippy-root].tooltip-loading {
 
   /* bordered arrow styling; see https://github.com/atomiks/tippyjs/blob/master/src/scss/themes/light-border.scss */
   &[data-placement^=bottom] {
-    > .tippy-arrow:before {
+    > .tippy-arrow::before {
       border-bottom-color: var(--post-tooltip-background-color);
       bottom: 16px;
     }
 
-    > .tippy-arrow:after {
+    > .tippy-arrow::after {
       border-bottom-color: var(--post-tooltip-border-color);
       border-width: 0 7px 7px;
       top: -8px;
@@ -27,11 +27,11 @@ div[data-tippy-root].tooltip-loading {
   }
 
   &[data-placement^=top] {
-    > .tippy-arrow:before {
+    > .tippy-arrow::before {
       border-top-color: var(--post-tooltip-background-color);
     }
 
-    > .tippy-arrow:after {
+    > .tippy-arrow::after {
       border-top-color: var(--post-tooltip-border-color);
       border-width: 7px 7px 0;
       top: 17px;
@@ -39,7 +39,7 @@ div[data-tippy-root].tooltip-loading {
     }
   }
 
-  > .tippy-arrow:after {
+  > .tippy-arrow::after {
     border-color: transparent;
     border-style: solid;
     content: "";

@@ -1,13 +1,9 @@
 extends: "stylelint-config-standard"
 rules:
-  at-rule-empty-line-before: null
   at-rule-no-unknown: [true, ignoreAtRules: [extend, include, mixin]]
-  color-hex-case: null
-  color-hex-length: null
-  comment-empty-line-before: null
-  comment-whitespace-inside: null
-  custom-property-empty-line-before: null
-  declaration-colon-space-after: null
+  block-opening-brace-space-before: null
+  declaration-block-single-line-max-declarations: null
   declaration-empty-line-before: null
   no-descending-specificity: null
-  selector-list-comma-newline-after: always-multi-line
+  selector-descendant-combinator-no-non-space: null
+  selector-list-comma-newline-after: null

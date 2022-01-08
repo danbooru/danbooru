@@ -16,10 +16,9 @@ div.related-tags {
   }
 
   li.selected a {
-    /* https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-stroke */
-    /* https://caniuse.com/text-stroke */
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-text-stroke
+    // https://caniuse.com/text-stroke
     -webkit-text-stroke: 0.5px;
-    text-stroke: 0.5px;
   }
 
   /* On computers with a mouse, hide the related tag checkbox unless it's checked or hovered. */

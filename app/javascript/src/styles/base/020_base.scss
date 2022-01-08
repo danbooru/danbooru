@@ -141,6 +141,7 @@ a.link-plain {
 
   .column-expand { flex: 1; }
   .column-shrink { flex: 0; }
+
   @media (max-width: 660px) { display: block; }
 }
 
@@ -172,6 +173,7 @@ ul.list-inline {
 
 .mobile-only {
   display: none !important;
+
   @media (max-width: 660px) { display: initial !important; }
 }
 
