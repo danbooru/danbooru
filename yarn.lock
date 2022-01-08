@@ -7352,15 +7352,6 @@ fsevents@~2.3.2:
   languageName: node
   linkType: hard
 
-"postcss-flexbugs-fixes@npm:^5.0.2":
-  version: 5.0.2
-  resolution: "postcss-flexbugs-fixes@npm:5.0.2"
-  peerDependencies:
-    postcss: ^8.1.4
-  checksum: fb4167a757e52760b2071472be301289b435f011173acf84ca82d4dfefa41e3aabb6d7d3661bc8bc9c4fda9df9299414f40802d3ed3df1cd8f0a4fd805ca152d
-  languageName: node
-  linkType: hard
-
 "postcss-focus-visible@npm:^4.0.0":
   version: 4.0.0
   resolution: "postcss-focus-visible@npm:4.0.0"
@@ -8383,7 +8374,6 @@ fsevents@~2.3.2:
     lodash: ^4.17.21
     mini-css-extract-plugin: ^2.2.0
     postcss: ^8.3.6
-    postcss-flexbugs-fixes: ^5.0.2
     postcss-import: ^14.0.2
     postcss-loader: ^6.1.1
     postcss-preset-env: ^6.7.0
