@@ -1,6 +1,6 @@
 <%= tag.article id: "post_#{post.id}", **article_attrs do -%>
   <div class="post-preview-container">
-    <%= link_to polymorphic_path(link_target, q: tags), class: "post-preview-link" do -%>
+    <%= link_to polymorphic_path(link_target, q: tags), class: "post-preview-link", draggable: "false" do -%>
       <% if is_animated? || has_sound? %>
         <div class="post-animation-icon absolute top-0.5 left-0.5 p-0.5 m-0.5 leading-none rounded text-xs font-arial font-bold">
           <% if is_animated? %>
@@ -24,7 +24,7 @@
           <% end %>
         <% end %>
 
-        <%= tag.img src: variant.file_url, width: variant.width, height: variant.height, class: "post-preview-image", title: tooltip, alt: "post ##{post.id}", crossorigin: "anonymous" -%>
+        <%= tag.img src: variant.file_url, width: variant.width, height: variant.height, class: "post-preview-image", title: tooltip, alt: "post ##{post.id}", crossorigin: "anonymous", draggable: "false" -%>
       </picture>
     <% end -%>
   </div>
