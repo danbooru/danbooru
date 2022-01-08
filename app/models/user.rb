@@ -540,7 +540,7 @@ class User < ApplicationRecord
     end
   end
 
-  module CountMethods
+  concerning :CountMethods do
     def wiki_page_version_count
       wiki_page_versions.count
     end
@@ -597,6 +597,22 @@ class User < ApplicationRecord
           post_update_count: post_versions.count,
           note_update_count: note_versions.count
         )
+      end
+    end
+
+    class_methods do
+      def fix_favorite_counts!
+        User.find_by_sql(<<~SQL.squish)
+          UPDATE users
+          SET favorite_count = true_count
+          FROM (
+            SELECT user_id, COUNT(*) AS true_count
+            FROM favorites
+            GROUP BY user_id
+          ) true_counts
+          WHERE users.id = user_id AND users.favorite_count != true_count
+          RETURNING users.*
+        SQL
       end
     end
   end
@@ -662,7 +678,6 @@ class User < ApplicationRecord
   include EmailMethods
   include ForumMethods
   include ApiMethods
-  include CountMethods
   extend SearchMethods
 
   def initialize_attributes
