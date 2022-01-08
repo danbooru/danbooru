@@ -115,7 +115,7 @@ class ApplicationController < ActionController::Base
       render_error_page(400, exception)
     when SessionLoader::AuthenticationFailure
       render_error_page(401, exception, template: "sessions/new")
-    when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest
+    when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest, ActionController::Redirecting::UnsafeRedirectError
       render_error_page(403, exception)
     when ActiveSupport::MessageVerifier::InvalidSignature, # raised by `find_signed!`
          User::PrivilegeError,

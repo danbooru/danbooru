@@ -43,6 +43,11 @@ class SessionsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to tags_path
       end
 
+      should "not allow redirects to protocol-relative URLs" do
+        post session_path, params: { name: @user.name, password: "password", url: "//example.com" }
+        assert_response 403
+      end
+
       should "not allow IP banned users to login" do
         @ip_ban = create(:ip_ban, category: :full, ip_addr: "1.2.3.4")
         post session_path, params: { name: @user.name, password: "password" }, headers: { REMOTE_ADDR: "1.2.3.4" }
