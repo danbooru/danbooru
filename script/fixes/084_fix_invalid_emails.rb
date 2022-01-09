@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require_relative "../../config/environment"
+require_relative "base"
 
 def fix(email, regex, replacement)
   email.update!(address: email.address.gsub(regex, replacement))
@@ -10,7 +10,7 @@ rescue StandardError => e
   email.reload.update_attribute(:is_deliverable, false)
 end
 
-EmailAddress.transaction do
+with_confirmation do
   # `foo@gmail.com `
   EmailAddress.where("address ~ '[[:space:]]'").find_each do |email|
     fix(email, /[[:space:]]/, "")
@@ -76,16 +76,24 @@ EmailAddress.transaction do
     fix(email, /@g[^m]ail\.com$/, "@gmail.com")
   end
 
+  # foo@gamil.com
+  EmailAddress.where("address ~ '@gamil\\.com$'").find_each do |email|
+    fix(email, /@gamil\.com$/, "@gmail.com")
+  end
+
   # foo@gmai;.com
   EmailAddress.where("address ~ '@gmai[^l]\\.com$'").find_each do |email|
     fix(email, /@gmai[^l]\.com$/, "@gmail.com")
   end
 
   # foo@gmail@com
-  EmailAddress.where("address ~ 'gmail[^.]com$'").find_each do |email|
-    fix(email, /gmail[^.]com$/, "@gmail.com")
+  EmailAddress.where("address ~ '@gmail[^.]com$'").find_each do |email|
+    fix(email, /@gmail[^.]com$/, "@gmail.com")
   end
 
-  print "Commit? (yes/no): "
-  raise "abort" unless STDIN.readline.chomp == "yes"
+  # Mark all other invalid emails as undeliverable.
+  EmailAddress.where(is_deliverable: true).where("address !~ '^[a-zA-Z0-9._%+-]+@([a-zA-Z0-9][a-zA-Z0-9-]{0,61}\\.)+[a-zA-Z]{2,}$'").find_each do |email|
+    email.update_attribute(:is_deliverable, false)
+    puts ({ address: email.address, is_deliverable: false }).to_json
+  end
 end
