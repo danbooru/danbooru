@@ -599,26 +599,6 @@ class User < ApplicationRecord
         )
       end
     end
-
-    class_methods do
-      def fix_favorite_counts!
-        # Fix users that have a non-zero favorite_count but no favorites.
-        User.where("favorite_count != 0").where.not(id: Favorite.select(:user_id).distinct).update_all(favorite_count: 0)
-
-        # Fix users that have a favorite_count inconsistent with the favorites table.
-        User.find_by_sql(<<~SQL.squish)
-          UPDATE users
-          SET favorite_count = true_count
-          FROM (
-            SELECT user_id, COUNT(*) AS true_count
-            FROM favorites
-            GROUP BY user_id
-          ) true_counts
-          WHERE users.id = user_id AND users.favorite_count != true_count
-          RETURNING users.*
-        SQL
-      end
-    end
   end
 
   module SearchMethods
