@@ -41,12 +41,12 @@ class UserUpgradesController < ApplicationController
 
   def receipt
     @user_upgrade = authorize UserUpgrade.find(params[:id])
-    redirect_to @user_upgrade.receipt_url
+    redirect_to @user_upgrade.receipt_url, allow_other_host: true
   end
 
   def payment
     @user_upgrade = authorize UserUpgrade.find(params[:id])
-    redirect_to @user_upgrade.payment_url
+    redirect_to @user_upgrade.payment_url, allow_other_host: true
   end
 
   private
