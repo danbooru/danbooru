@@ -97,7 +97,7 @@ class PostVersionTest < ActiveSupport::TestCase
       end
 
       should "not create a version if updating the post fails" do
-        @post.stubs(:set_tag_counts).raises(NotImplementedError)
+        @post.stubs(:update_tag_category_counts).raises(NotImplementedError)
 
         assert_equal(2, @post.versions.size)
         assert_raise(NotImplementedError) { @post.update(rating: "s") }

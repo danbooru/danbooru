@@ -29,7 +29,7 @@ class Post < ApplicationRecord
   validate :post_is_not_its_own_parent
   validate :uploader_is_not_limited, on: :create
   before_save :update_tag_post_counts
-  before_save :set_tag_counts
+  before_save :update_tag_category_counts
   before_create :autoban
   after_save :create_version
   after_save :update_parent_on_save
@@ -323,22 +323,14 @@ class Post < ApplicationRecord
       end
     end
 
-    def set_tag_count(category, tagcount)
-      send("tag_count_#{category}=", tagcount)
-    end
-
-    def inc_tag_count(category)
-      set_tag_count(category, send("tag_count_#{category}") + 1)
-    end
-
-    def set_tag_counts
-      self.tag_count = 0
-      TagCategory.categories.each {|x| set_tag_count(x, 0)}
-      categories = Tag.categories_for(tag_array, disable_caching: true)
-      categories.each_value do |category|
-        self.tag_count += 1
-        inc_tag_count(TagCategory.reverse_mapping[category])
+    # Update tag_count_general, tag_count_copyright, etc.
+    def update_tag_category_counts
+      TagCategory.categories.each do |category_name|
+        tag_count = tags.select { |t| t.category_name.downcase == category_name }.size
+        send("tag_count_#{category_name}=", tag_count)
       end
+
+      self.tag_count = tag_array.size
     end
 
     def merge_old_changes

@@ -129,16 +129,9 @@ class Tag < ApplicationRecord
         Tag.where(name: tag_name).pick(:category).to_i
       end
 
-      def categories_for(tag_names, options = {})
-        if options[:disable_caching]
-          Array(tag_names).inject({}) do |hash, tag_name|
-            hash[tag_name] = select_category_for(tag_name)
-            hash
-          end
-        else
-          Cache.get_multi(Array(tag_names), "tc") do |tag|
-            Tag.select_category_for(tag)
-          end
+      def categories_for(tag_names)
+        Cache.get_multi(Array(tag_names), "tc") do |tag|
+          Tag.select_category_for(tag)
         end
       end
     end
@@ -157,7 +150,7 @@ class Tag < ApplicationRecord
     def update_category_post_counts
       Post.with_timeout(30_000) do
         Post.raw_tag_match(name).find_each do |post|
-          post.set_tag_counts
+          post.update_tag_category_counts
           post.save!
         end
       end
