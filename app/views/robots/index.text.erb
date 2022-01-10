@@ -63,8 +63,13 @@ Allow: /images
 Allow: /packs
 
 <%# Static %>
-Allow: /terms_of_service
-Allow: /privacy
+Allow: <%= site_map_path %>
+Allow: <%= contact_path %>
+Allow: <%= keyboard_shortcuts_path %>
+Allow: <%= bookmarklet_path %>
+Allow: <%= terms_of_service_path %>
+Allow: <%= privacy_policy_path %>
+Allow: <%= not_found_path %>
 Allow: /sitemap.xml
 Allow: /favicon.ico
 
