@@ -3554,6 +3554,20 @@ CREATE INDEX index_forum_topics_on_updated_at ON public.forum_topics USING btree
 
 
 --
+-- Name: index_good_jobs_jobs_on_finished_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_jobs_jobs_on_finished_at ON public.good_jobs USING btree (finished_at) WHERE ((retried_good_job_id IS NULL) AND (finished_at IS NOT NULL));
+
+
+--
+-- Name: index_good_jobs_on_active_job_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_good_jobs_on_active_job_id ON public.good_jobs USING btree (active_job_id);
+
+
+--
 -- Name: index_good_jobs_on_active_job_id_and_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5670,6 +5684,10 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220106172910'),
 ('20220107014433'),
 ('20220109032042'),
-('20220109163815');
+('20220109163815'),
+('20220110171021'),
+('20220110171022'),
+('20220110171023'),
+('20220110171024');
 
 
