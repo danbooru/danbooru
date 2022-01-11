@@ -314,8 +314,8 @@ module Sources
       should "clear the cached cookie after failing to fetch the data" do
         site = Sources::Strategies.find("https://nijie.info/view.php?id=203688")
 
-        Cache.put("nijie-session-cookie", HTTP::Cookie.new(name: "NIJIEIJIEID", value: "fake", domain: "nijie.info", path: "/"))
-        assert_equal("fake", site.cached_session_cookie.value)
+        Cache.put("nijie-session-cookie", { "NIJIEIJIEID" => "fake", "nijie_tok" => "fake" })
+        assert_equal({ "NIJIEIJIEID" => "fake", "nijie_tok" => "fake" }, site.cached_session_cookie)
 
         assert_equal([], site.image_urls)
         assert_nil(Cache.get("nijie-session-cookie"))

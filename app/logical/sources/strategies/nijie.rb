@@ -226,13 +226,14 @@ module Sources
 
       def client
         return nil if cached_session_cookie.nil?
-        http.cookies(NIJIEIJIEID: cached_session_cookie, R18: 1)
+        http.cookies(R18: 1, **cached_session_cookie)
       end
 
       def http
         super.timeout(60).use(retriable: { max_retries: 20 })
       end
 
+      # { "NIJIEIJIEID" => "5ca3f816c0c1f3e647940b08b8ab7a45", "nijie_tok" => <long-base64-string> }
       def cached_session_cookie
         Cache.get("nijie-session-cookie", 60.minutes, skip_nil: true) do
           session_cookie
@@ -258,7 +259,7 @@ module Sources
         response = http.post("https://nijie.info/login_int.php", form: form)
 
         if response.status == 200
-          response.cookies.select { |c| c.name == "NIJIEIJIEID" }.compact.first
+          response.cookies.cookies.map { |cookie| [cookie.name, cookie.value] }.to_h
         else
           DanbooruLogger.info "Nijie login failed (#{url}, #{response.status})"
           nil
