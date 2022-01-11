@@ -458,7 +458,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       context "for a search that times out" do
         context "during numbered pagination" do
           should "show the search timeout error page" do
-            Post::const_get(:ActiveRecord_Relation).any_instance.stubs(:records).raises(ActiveRecord::QueryCanceled)
+            PostSets::Post.any_instance.stubs(:posts).raises(ActiveRecord::QueryCanceled)
 
             get posts_path(page: "1")
             assert_response 500
@@ -468,7 +468,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
         context "during sequential pagination" do
           should "show the search timeout error page" do
-            Post::const_get(:ActiveRecord_Relation).any_instance.stubs(:records).raises(ActiveRecord::QueryCanceled)
+            PostSets::Post.any_instance.stubs(:posts).raises(ActiveRecord::QueryCanceled)
 
             get posts_path(page: "a0")
             assert_response 500

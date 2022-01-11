@@ -968,7 +968,7 @@ class PostQueryBuilder
 
   concerning :CountMethods do
     def post_count
-      fast_count
+      @post_count ||= fast_count
     end
 
     # Return an estimate of the number of posts returned by the search.  By

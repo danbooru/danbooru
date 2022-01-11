@@ -137,24 +137,6 @@ module PostSets
       end
     end
 
-    def search_stats
-      {
-        query: normalized_query.to_s,
-        count: post_count,
-        page: current_page,
-        limit: per_page,
-        term_count: normalized_query.terms.count,
-        tag_count: normalized_query.tags.count,
-        metatag_count: normalized_query.metatags.count,
-        censored_posts: censored_posts.count,
-        hidden_posts: hidden_posts.count,
-      }
-    end
-
-    def log!
-      DanbooruLogger.add_attributes("search", search_stats)
-    end
-
     concerning :TagListMethods do
       def related_tags
         if query.is_wildcard_search?

@@ -4,6 +4,8 @@ class PostsController < ApplicationController
   respond_to :html, :xml, :json, :js
   layout "sidebar"
 
+  before_action :log_search_query, only: :index
+  after_action :log_search_count, only: :index, if: -> { request.format.html? && response.successful? }
   rate_limit :index, rate: 1.0/2.seconds, burst: 50, if: -> { request.format.atom? }, key: "posts:index.atom"
 
   def index
@@ -13,16 +15,11 @@ class PostsController < ApplicationController
         format.html { redirect_to(@post) }
       end
     elsif params[:random].to_s.truthy?
-      post_set = PostSets::Post.new(params[:tags], params[:page], params[:limit], format: request.format.symbol)
       query = "#{post_set.normalized_query.to_s} random:#{post_set.per_page}".strip
       redirect_to posts_path(tags: query, page: params[:page], limit: params[:limit], format: request.format.symbol)
     else
-      tag_query = params[:tags] || params.dig(:post, :tags)
-      @show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?
-      @post_set = PostSets::Post.new(tag_query, params[:page], params[:limit], format: request.format.symbol, show_votes: @show_votes)
       @preview_size = params[:size].presence || cookies[:post_preview_size].presence || PostGalleryComponent::DEFAULT_SIZE
-      @posts = authorize @post_set.posts, policy_class: PostPolicy
-      @post_set.log!
+      @posts = authorize post_set.posts, policy_class: PostPolicy
       respond_with(@posts) do |format|
         format.atom
       end
@@ -117,6 +114,29 @@ class PostsController < ApplicationController
   end
 
   private
+
+  def post_set
+    @post_set ||= begin
+      tag_query = params[:tags] || params.dig(:post, :tags)
+      show_votes = (params[:show_votes].presence || cookies[:post_preview_show_votes].presence || "false").truthy?
+      PostSets::Post.new(tag_query, params[:page], params[:limit], format: request.format.symbol, show_votes: show_votes)
+    end
+  end
+
+  def log_search_query
+    DanbooruLogger.add_attributes("search", {
+      query: post_set.normalized_query.to_s,
+      page: post_set.current_page,
+      limit: post_set.per_page,
+      term_count: post_set.normalized_query.terms.count,
+      tag_count: post_set.normalized_query.tags.count,
+      metatag_count: post_set.normalized_query.metatags.count,
+    })
+  end
+
+  def log_search_count
+    DanbooruLogger.add_attributes("search", { count: post_set.post_count, })
+  end
 
   def respond_with_post_after_update(post)
     respond_with(post) do |format|
