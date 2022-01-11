@@ -248,6 +248,17 @@ class TagAliasTest < ActiveSupport::TestCase
         assert_equal(%w[-https://twitter.com/222 -https://twitter.com/333 https://twitter.com/111 https://twitter.com/444], @artist2.url_array)
       end
 
+      should "move the is_banned flag from the old artist entry to the new artist entry" do
+        @old_artist = create(:artist, name: "old_artist", is_banned: true)
+        @new_artist = create(:artist, name: "new_artist", is_banned: false)
+
+        TagAlias.approve!(antecedent_name: "old_artist", consequent_name: "new_artist", approver: @admin)
+        perform_enqueued_jobs
+
+        assert_equal(true, @new_artist.reload.is_banned)
+        assert_equal(false, @old_artist.reload.is_banned)
+      end
+
       should "ignore the old artist if it has been deleted" do
         @artist1 = create(:artist, name: "aaa", group_name: "g_aaa", other_names: "111 222", url_string: "https://twitter.com/111\n-https://twitter.com/222", is_deleted: true)
         @artist2 = create(:artist, name: "bbb", other_names: "111 333", url_string: "https://twitter.com/111\n-https://twitter.com/333\nhttps://twitter.com/444")
