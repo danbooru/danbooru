@@ -356,6 +356,14 @@ class Tag < ApplicationRecord
     cosplay_tags.grep(/\A(.+)_\(cosplay\)\Z/) { "#{TagAlias.to_aliased([$1]).first}_(cosplay)" } + other_tags
   end
 
+  def implied_tags
+    TagImplication.tags_implied_by([name])
+  end
+
+  def implies?(tag_name)
+    implied_tags.exists?(name: tag_name)
+  end
+
   def posts
     Post.system_tag_match(name)
   end

@@ -101,5 +101,16 @@ class RetireTagRelationshipsJobTest < ActiveJob::TestCase
       assert_equal(true, ta3.reload.is_retired?)
       assert_equal(true, ta4.reload.is_retired?)
     end
+
+    should "not retire empty banned_artist implications" do
+      bkub = create(:tag, name: "bkub", post_count: 0, category: Tag.categories.artist)
+      banned_artist = create(:tag, name: "banned_artist", post_count: 0, category: Tag.categories.artist)
+      ti = create(:tag_implication, antecedent_name: "bkub", consequent_name: "banned_artist")
+
+      RetireTagRelationshipsJob.perform_now
+
+      assert_equal(false, ti.reload.is_retired?)
+      assert_equal(true, bkub.implies?("banned_artist"))
+    end
   end
 end
