@@ -129,6 +129,20 @@ class BulkUpdateRequestTest < ActiveSupport::TestCase
           assert_equal(true, TagAlias.active.exists?(antecedent_name: "bbb", consequent_name: "aaa"))
         end
 
+        should "allow aliasing together two tags with the same implication" do
+          ti1 = create(:tag_implication, antecedent_name: "gigantamax_flapple", consequent_name: "gigantamax")
+          ti2 = create(:tag_implication, antecedent_name: "gigantamax_appletun", consequent_name: "gigantamax")
+          bur = create_bur!("alias gigantamax_flapple -> gigantamax_flapple/appletun\nalias gigantamax_appletun -> gigantamax_flapple/appletun", @admin)
+
+          assert_equal(true, TagAlias.active.exists?(antecedent_name: "gigantamax_flapple", consequent_name: "gigantamax_flapple/appletun"))
+          assert_equal(true, TagAlias.active.exists?(antecedent_name: "gigantamax_appletun", consequent_name: "gigantamax_flapple/appletun"))
+          assert_equal(true, TagImplication.active.exists?(antecedent_name: "gigantamax_flapple/appletun", consequent_name: "gigantamax"))
+          assert_equal(false, TagImplication.active.exists?(antecedent_name: "gigantamax_flapple", consequent_name: "gigantamax"))
+          assert_equal(false, TagImplication.active.exists?(antecedent_name: "gigantamax_appletun", consequent_name: "gigantamax"))
+          assert_equal("deleted", ti1.reload.status)
+          assert_equal("deleted", ti2.reload.status)
+        end
+
         should "fail if the alias is invalid" do
           @alias = create(:tag_alias, antecedent_name: "bbb", consequent_name: "ccc")
           @bur = build(:bulk_update_request, script: "create alias aaa -> bbb")
