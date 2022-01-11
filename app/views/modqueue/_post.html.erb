@@ -6,7 +6,7 @@
   <section class="column column-expand">
     <div class="row quick-mod-row">
       <%= render "modqueue/quick_mod", post: post %>
-      <%= render "post_disapprovals/compact_counts", disapprovals: post.disapprovals, post: post %>
+      <%= render "post_disapprovals/compact_counts", disapprovals: post.disapprovals.order(id: :asc), post: post %>
     </div>
 
     <div class="row">

@@ -16,7 +16,7 @@
       <%= render "post_appeals/reasons", appeal: post.appeals.select(&:pending?).last %>
     <% end %>
 
-    <%= render "post_disapprovals/counts", :disapprovals => post.disapprovals, :post => post %>
+    <%= render "post_disapprovals/counts", disapprovals: post.disapprovals.order(id: :asc), post: post %>
 
     <% if policy(PostDisapproval).create? && !post.disapproved_by?(CurrentUser.user) %>
       <%= render "modqueue/quick_mod", post: post %>
@@ -32,7 +32,7 @@
       <p>This post was deleted</p>
     <% end %>
 
-    <%= render "post_disapprovals/counts", :disapprovals => post.disapprovals, :post => post %>
+    <%= render "post_disapprovals/counts", disapprovals: post.disapprovals.order(id: :asc), post: post %>
 
     <% if CurrentUser.id == post.uploader_id %>
       <p>If you don't understand why your upload was deleted, you can ask for
