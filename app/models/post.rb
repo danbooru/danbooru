@@ -346,7 +346,7 @@ class Post < ApplicationRecord
         kept_tags = current_tags & new_tags
         @removed_tags = old_tags - kept_tags
 
-        set_tag_string(((current_tags + new_tags) - old_tags + (current_tags & new_tags)).uniq.sort.join(" "))
+        self.tag_string = ((current_tags + new_tags) - old_tags + (current_tags & new_tags)).uniq.sort.join(" ")
       end
 
       if old_parent_id == ""
@@ -367,10 +367,6 @@ class Post < ApplicationRecord
       end
     end
 
-    def set_tag_string(string)
-      self.tag_string = string
-    end
-
     def normalize_tags
       normalized_tags = PostQueryBuilder.new(tag_string).parse_tag_edit
       normalized_tags = apply_casesensitive_metatags(normalized_tags)
@@ -385,7 +381,7 @@ class Post < ApplicationRecord
       normalized_tags += TagImplication.tags_implied_by(normalized_tags).map(&:name)
       normalized_tags = normalized_tags.compact.uniq.sort
       normalized_tags = Tag.create_for_list(normalized_tags)
-      set_tag_string(normalized_tags.join(" "))
+      self.tag_string = normalized_tags.join(" ")
     end
 
     def remove_invalid_tags(tag_names)
@@ -618,11 +614,11 @@ class Post < ApplicationRecord
     end
 
     def add_tag(tag)
-      set_tag_string("#{tag_string} #{tag}")
+      self.tag_string = "#{tag_string} #{tag}"
     end
 
     def remove_tag(tag)
-      set_tag_string((tag_array - Array(tag)).join(" "))
+      self.tag_string = (tag_array - Array(tag)).join(" ")
     end
 
     def tag_categories

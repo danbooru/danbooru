@@ -1049,7 +1049,7 @@ class PostTest < ActiveSupport::TestCase
       should "have an array representation of its tags" do
         post = FactoryBot.create(:post)
         post.reload
-        post.set_tag_string("aaa bbb")
+        post.tag_string = "aaa bbb"
         assert_equal(%w(aaa bbb), post.tag_array)
         assert_equal(%w(tag1 tag2), post.tag_array_was)
       end
