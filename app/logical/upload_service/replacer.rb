@@ -28,13 +28,15 @@ class UploadService
     def process!
       media_file = Utils::get_file_for_upload(replacement.replacement_url, nil, replacement.replacement_file&.tempfile)
 
-      if media_file.md5 == post.md5
-        raise Error, "Can't replace a post with itself; regenerate the post instead"
-      elsif Post.exists?(md5: media_file.md5)
+      if Post.where.not(id: post.id).exists?(md5: media_file.md5)
         raise Error, "Duplicate: post with md5 #{media_file.md5} already exists"
       end
 
-      media_asset = MediaAsset.upload!(media_file)
+      if media_file.md5 == post.md5
+        media_asset = post.media_asset
+      else
+        media_asset = MediaAsset.upload!(media_file)
+      end
 
       replacement.replacement_url = replacement_url
       replacement.file_ext = media_asset.file_ext

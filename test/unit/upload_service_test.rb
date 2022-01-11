@@ -272,11 +272,11 @@ class UploadServiceTest < ActiveSupport::TestCase
       end
 
       context "a post with the same file" do
-        should "raise an error" do
+        should "update the source" do
           upload_file("test/files/test.png") do |file|
-            assert_raises(UploadService::Replacer::Error) do
-              as(@user) { @post.reload.replace!(replacement_file: file, replacement_url: "") }
-            end
+            as(@user) { @post.reload.replace!(replacement_file: file, replacement_url: "", final_source: "blah") }
+
+            assert_equal("blah", @post.reload.source)
           end
         end
       end
@@ -314,16 +314,18 @@ class UploadServiceTest < ActiveSupport::TestCase
         end
         as(@user) do
           @post_md5 = "710fd9cba4ef37260f9152ffa9d154d8"
-          @post = FactoryBot.create(:post, source: "https://cdn.donmai.us/original/71/0f/#{@post_md5}.png", file_ext: "png", md5: @post_md5, uploader_ip_addr: "127.0.0.2")
+          @post_source = "https://cdn.donmai.us/original/71/0f/#{@post_md5}.png"
+          @post = FactoryBot.create(:post, source: @post_source, file_ext: "png", md5: @post_md5, uploader_ip_addr: "127.0.0.2")
           @replacement = FactoryBot.create(:post_replacement, post: @post, replacement_url: @new_url)
         end
       end
 
-      context "when replacing with its own source" do
-        should "raise an error" do
-          assert_raises(UploadService::Replacer::Error) do
-            as(@user) { @post.reload.replace!(replacement_url: @post.source) }
-          end
+      context "when replacing a post with the same file as itself" do
+        should "update the source" do
+          @post.update!(source: "blah")
+
+          as(@user) { @post.reload.replace!(replacement_url: @post_source) }
+          assert_equal(@post_source, @post.reload.source)
         end
       end
 
