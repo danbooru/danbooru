@@ -41,6 +41,6 @@ class PaginatorComponent < ApplicationComponent
   end
 
   def url_for_page(page)
-    url_for(**params.merge(page: page).permit!)
+    url_for(**params.merge(page: page).except(:z).permit!)
   end
 end
