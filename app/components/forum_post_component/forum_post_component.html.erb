@@ -1,8 +1,4 @@
-<article class="forum-post message" id="forum_post_<%= forum_post.id %>"
-          data-forum-post-id="<%= forum_post.id %>"
-          data-is-reported="<%= has_moderation_reports? %>"
-          data-creator-id="<%= forum_post.creator_id %>">
-
+<%= tag.article class: "forum-post message", id: "forum_post_#{forum_post.id}", data: { "is-reported": has_moderation_reports?, **data_attributes_for(forum_post, "", forum_post.html_data_attributes) } do %>
   <div class="author">
     <div class="author-name">
       <%= link_to_user forum_post.creator %>
@@ -63,4 +59,4 @@
       <% end %>
     <% end %>
   </div>
-</article>
+<% end %>

@@ -3,6 +3,14 @@ article.forum-post {
     background-color: var(--moderation-report-background-color);
   }
 
+  &[data-is-deleted="true"] {
+    opacity: 0.3;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
   a.voted {
     font-weight: bold;
   }
