@@ -1,1 +1,1 @@
-location.reload();
+$("#forum_post_<%= @forum_post.id %>").replaceWith("<%= j render(ForumPostComponent.new(forum_post: @forum_post, current_user: CurrentUser.user)) %>");
