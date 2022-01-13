@@ -16,32 +16,60 @@
     <%= render "application/update_notice", record: forum_post %>
 
     <menu>
-      <% if policy(forum_post).create? %>
-        <li><%= link_to "Reply", new_forum_post_path(post_id: forum_post.id), method: :get, remote: true %></li>
-      <% end %>
-
-      <% if policy(forum_post).destroy? && !forum_post.is_original_post?(original_forum_post_id) %>
-        <% if forum_post.is_deleted %>
-          <li><%= link_to "Undelete", undelete_forum_post_path(forum_post.id), method: :post, remote: true %></li>
+      <% if policy(forum_post).reply? %>
+        <% if current_user.is_anonymous? %>
+          <li><%= link_to "Reply", login_path(url: request.fullpath) %></li>
         <% else %>
-          <li><%= link_to "Delete", forum_post_path(forum_post.id), "data-confirm": "Are you sure you want to delete this forum post?", method: :delete, remote: true %></li>
+          <li><%= link_to "Reply", new_forum_post_path(post_id: forum_post.id), method: :get, remote: true %></li>
         <% end %>
-      <% end %>
-
-      <% if policy(forum_post).update? %>
-        <% if forum_post.is_original_post?(original_forum_post_id) %>
-          <li><%= link_to "Edit", edit_forum_topic_path(forum_post.topic), id: "edit_forum_topic_link_#{forum_post.topic.id}", class: "edit_forum_topic_link" %></li>
-        <% else %>
-          <li><%= link_to "Edit", edit_forum_post_path(forum_post.id), id: "edit_forum_post_link_#{forum_post.id}", class: "edit_forum_post_link" %></li>
-        <% end %>
-      <% end %>
-
-      <% if policy(forum_post).reportable? %>
-        <li><%= link_to "Report", new_moderation_report_path(moderation_report: { model_type: "ForumPost", model_id: forum_post.id }), remote: true, title: "Report this forum post to the moderators" %></li>
       <% end %>
 
       <% if has_moderation_reports? %>
         <li class="moderation-report-notice">Reported (<%= link_to pluralize(forum_post.moderation_reports.length, "report"), moderation_reports_path(search: { model_type: "ForumPost", model_id: forum_post.id }) %>)</li>
+      <% end %>
+
+      <%= render PopupMenuComponent.new do |menu| %>
+        <% if policy(forum_post).update? %>
+          <% menu.item do %>
+            <% if forum_post.is_original_post?(original_forum_post_id) %>
+              <%= link_to edit_forum_topic_path(forum_post.topic), id: "edit_forum_topic_link_#{forum_post.topic_id}", class: "edit_forum_topic_link" do %>
+                <%= edit_icon %> Edit
+              <% end %>
+            <% else %>
+              <%= link_to edit_forum_post_path(forum_post.id), id: "edit_forum_post_link_#{forum_post.id}", class: "edit_forum_post_link" do %>
+                <%= edit_icon %> Edit
+              <% end %>
+            <% end %>
+          <% end %>
+
+        <% if policy(forum_post).destroy? && !forum_post.is_original_post?(original_forum_post_id) %>
+            <% menu.item do %>
+              <% if forum_post.is_deleted? %>
+                <%= link_to undelete_forum_post_path(forum_post.id), method: :post, remote: true do %>
+                  <%= undelete_icon %> Undelete
+                <% end %>
+              <% else %>
+                <%= link_to forum_post_path(forum_post.id), "data-confirm": "Are you sure you want to delete this forum post?", method: :delete, remote: true do %>
+                  <%= delete_icon %> Delete
+                <% end %>
+              <% end %>
+            <% end %>
+          <% end %>
+        <% end %>
+
+        <% if policy(forum_post).reportable? %>
+          <% menu.item do %>
+            <%= link_to new_moderation_report_path(moderation_report: { model_type: "ForumPost", model_id: forum_post.id }), remote: true do %>
+              <%= flag_icon %> Report
+            <% end %>
+          <% end %>
+        <% end %>
+
+        <% menu.item do %>
+          <%= link_to forum_post_path(forum_post.id), class: "forum-post-copy-link" do %>
+            <%= link_icon %> Copy ID
+          <% end %>
+        <% end %>
       <% end %>
 
       <% if forum_post.bulk_update_request.present? %>

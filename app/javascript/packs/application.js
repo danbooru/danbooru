@@ -39,6 +39,7 @@ import CommentVotesTooltipComponent from "../../components/comment_votes_tooltip
 import CurrentUser from "../src/javascripts/current_user.js";
 import Dtext from "../src/javascripts/dtext.js";
 import FavoritesTooltipComponent from "../../components/favorites_tooltip_component/favorites_tooltip_component.js";
+import ForumPostComponent from "../../components/forum_post_component/forum_post_component.js";
 import IqdbQuery from "../src/javascripts/iqdb_queries.js";
 import Note from "../src/javascripts/notes.js";
 import PopupMenuComponent from "../../components/popup_menu_component/popup_menu_component.js";
@@ -63,6 +64,7 @@ Danbooru.CommentVotesTooltipComponent = CommentVotesTooltipComponent;
 Danbooru.CurrentUser = CurrentUser;
 Danbooru.Dtext = Dtext;
 Danbooru.FavoritesTooltipComponent = FavoritesTooltipComponent;
+Danbooru.ForumPostComponent = ForumPostComponent;
 Danbooru.IqdbQuery = IqdbQuery;
 Danbooru.Note = Note;
 Danbooru.PopupMenuComponent = PopupMenuComponent;

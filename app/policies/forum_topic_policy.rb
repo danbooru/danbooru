@@ -26,7 +26,7 @@ class ForumTopicPolicy < ApplicationPolicy
   end
 
   def reply?
-    unbanned? && show? && (user.is_moderator? || !record.is_locked?)
+    show? && (user.is_moderator? || !record.is_locked?)
   end
 
   def moderate?
