@@ -133,8 +133,14 @@
         <% end %>
 
         <% menu.item do %>
+          <%= link_to comment_path(comment.id), class: "comment-copy-id" do %>
+            <%= hashtag_icon %> Copy ID
+          <% end %>
+        <% end %>
+
+        <% menu.item do %>
           <%= link_to comment_path(comment.id), class: "comment-copy-link" do %>
-            <%= link_icon %> Copy ID
+            <%= link_icon %> Copy Link
           <% end %>
         <% end %>
 

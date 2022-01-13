@@ -118,6 +118,15 @@ Utility.splitWords = function(string) {
   return words(string, /\S+/g);
 }
 
+Utility.copyToClipboard = async function(text, message = "Copied!") {
+  try {
+    await navigator.clipboard.writeText(text);
+    Utility.notice(message);
+  } catch (error) {
+    Utility.error("Couldn't copy to clipboard");
+  }
+}
+
 $.fn.selectEnd = function() {
   return this.each(function() {
     this.focus();

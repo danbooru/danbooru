@@ -66,8 +66,14 @@
         <% end %>
 
         <% menu.item do %>
+          <%= link_to forum_post_path(forum_post.id), class: "forum-post-copy-id" do %>
+            <%= hashtag_icon %> Copy ID
+          <% end %>
+        <% end %>
+
+        <% menu.item do %>
           <%= link_to forum_post_path(forum_post.id), class: "forum-post-copy-link" do %>
-            <%= link_icon %> Copy ID
+            <%= link_icon %> Copy Link
           <% end %>
         <% end %>
       <% end %>

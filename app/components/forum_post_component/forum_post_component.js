@@ -6,6 +6,7 @@ class ForumPostComponent {
       $(document).on("click.danbooru.forum_post", ".edit_forum_post_link", ForumPostComponent.showEditPostForm);
       $(document).on("click.danbooru.forum_post", ".edit_forum_topic_link", ForumPostComponent.showEditTopicForm);
       $(document).on("click.danbooru.forum_post", "#new-response-link", ForumPostComponent.showNewForumPostForm);
+      $(document).on("click.danbooru.forum_post", ".forum-post-copy-id", ForumPostComponent.copyID);
       $(document).on("click.danbooru.forum_post", ".forum-post-copy-link", ForumPostComponent.copyLink);
     }
   }
@@ -26,17 +27,18 @@ class ForumPostComponent {
     e.preventDefault();
   }
 
-  static async copyLink(e) {
-    let $forumPost = $(this).closest(".forum-post");
-    let link = `forum #${$forumPost.data("id")}`;
+  static async copyID(e) {
+    let id = $(this).closest(".forum-post").data("id");
+    let link = `forum #${id}`;
+    Utility.copyToClipboard(link);
     e.preventDefault();
+  }
 
-    try {
-      await navigator.clipboard.writeText(link);
-      Utility.notice(`Copied ${link} to clipboard.`);
-    } catch (error) {
-      Utility.error("Couldn't copy link to clipboard");
-    }
+  static async copyLink(e) {
+    let id = $(this).closest(".forum-post").data("id");
+    let link = `${window.location.origin}/forum_posts/${id}`;
+    Utility.copyToClipboard(link);
+    e.preventDefault();
   }
 }
 

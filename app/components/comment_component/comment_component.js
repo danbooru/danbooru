@@ -6,6 +6,7 @@ class CommentComponent {
       $(document).on("click.danbooru.comment", ".edit_comment_link", CommentComponent.showEditForm);
       $(document).on("click.danbooru.comment", ".expand-comment-response", CommentComponent.showNewCommentForm);
       $(document).on("click.danbooru.comment", ".unhide-comment-link", CommentComponent.unhideComment);
+      $(document).on("click.danbooru.comment", ".comment-copy-id", CommentComponent.copyID);
       $(document).on("click.danbooru.comment", ".comment-copy-link", CommentComponent.copyLink);
     }
   }
@@ -30,17 +31,18 @@ class CommentComponent {
     e.preventDefault();
   }
 
-  static async copyLink(e) {
-    let $comment = $(this).closest(".comment");
-    let link = `comment #${$comment.data("id")}`;
+  static async copyID(e) {
+    let id = $(this).closest(".comment").data("id");
+    let link = `comment #${id}`;
+    Utility.copyToClipboard(link);
     e.preventDefault();
+  }
 
-    try {
-      await navigator.clipboard.writeText(link);
-      Utility.notice(`Copied ${link} to clipboard.`);
-    } catch (error) {
-      Utility.error("Couldn't copy link to clipboard");
-    }
+  static async copyLink(e) {
+    let id = $(this).closest(".comment").data("id");
+    let link = `${window.location.origin}/comments/${id}`;
+    Utility.copyToClipboard(link);
+    e.preventDefault();
   }
 }
 
