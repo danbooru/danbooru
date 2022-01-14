@@ -96,7 +96,7 @@ class BigqueryExportService
 
   # Find or create the Google Storage bucket.
   def bucket
-    storage.bucket(dataset_name) || storage.create_bucket(dataset_name, acl: "public", default_acl: "public", storage_class: "standard", location: "us-east1")
+    storage.bucket(dataset_name, user_project: true) || storage.create_bucket(dataset_name, acl: "public", default_acl: "public", storage_class: "standard", location: "us-east1", requester_pays: true, user_project: true)
   end
 
   # The BigQuery API client.
