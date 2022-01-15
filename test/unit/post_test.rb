@@ -1046,6 +1046,30 @@ class PostTest < ActiveSupport::TestCase
         end
       end
 
+      context "a post with a non-web source" do
+        should "automatically add the non-web_source tag" do
+          @post.update!(source: "this was once revealed to me in a dream")
+          @post.save!
+          assert_equal("non-web_source tag1 tag2", @post.tag_string)
+        end
+      end
+
+      context "a post with a blank source" do
+        should "remove the non-web_source tag" do
+          @post.update!(source: "", tag_string: "non-web_source")
+          @post.save!
+          assert_equal("tagme", @post.tag_string)
+        end
+      end
+
+      context "a post with a https:// source" do
+        should "remove the non-web_source tag" do
+          @post.update!(source: "https://www.google.com", tag_string: "non-web_source")
+          @post.save!
+          assert_equal("tagme", @post.tag_string)
+        end
+      end
+
       should "have an array representation of its tags" do
         post = FactoryBot.create(:post)
         post.reload

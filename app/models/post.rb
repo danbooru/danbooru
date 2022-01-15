@@ -404,7 +404,7 @@ class Post < ApplicationRecord
     end
 
     def add_automatic_tags(tags)
-      tags -= %w[incredibly_absurdres absurdres highres lowres flash video ugoira animated_gif animated_png exif_rotation non-repeating_animation]
+      tags -= %w[incredibly_absurdres absurdres highres lowres flash video ugoira animated_gif animated_png exif_rotation non-repeating_animation non-web_source]
 
       if tags.size >= 30
         tags -= ["tagme"]
@@ -441,6 +441,10 @@ class Post < ApplicationRecord
 
       if is_ugoira?
         tags << "ugoira"
+      end
+
+      if source.present? && source !~ %r{\Ahttps?://}i
+        tags << "non-web_source"
       end
 
       # Allow only Flash files to be manually tagged as `animated`; GIFs, PNGs, videos, and ugoiras are automatically tagged.
