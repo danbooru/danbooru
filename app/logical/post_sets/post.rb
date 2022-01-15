@@ -67,12 +67,6 @@ module PostSets
       posts.any? {|x| x.rating == "e"}
     end
 
-    def shown_posts
-      shown_posts = posts.select(&:visible?)
-      shown_posts = shown_posts.reject(&:is_deleted?) unless show_deleted?
-      shown_posts
-    end
-
     def hidden_posts
       posts.reject(&:visible?)
     end

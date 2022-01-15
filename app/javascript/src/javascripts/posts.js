@@ -355,7 +355,7 @@ Post.initialize_excerpt = function() {
     e.preventDefault();
   });
 
-  if (!$(".post-preview").length && /Nobody here but us chickens/.test($("#posts").html())) {
+  if (!$(".post-preview").length && /No posts found/.test($("#posts").html())) {
     $("#show-excerpt-link").click();
   }
 }
