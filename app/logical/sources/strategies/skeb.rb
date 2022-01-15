@@ -26,18 +26,21 @@ module Sources
   module Strategies
     class Skeb < Base
       PROFILE_URL = %r{https?://(?:www\.)?skeb\.jp/@(?<artist_name>\w+)}i
-
       PAGE_URL    = %r{#{PROFILE_URL}/works/(?<illust_id>\d+)}i
-
-      IMAGE_URL   = %r{https?://(?:www\.)?skeb\.imgix\.net/(requests|uploads/origins)/.*}i
+      IMAGE_URL   = %r{https?://(?:(?:www\.)?skeb\.imgix\.net|skeb-production.s3.ap-northeast-1.amazonaws.com/)/.+}i
+      UUID_REGEX  = %r{/(?<uuid>(?:(?:\w+-)+\w+|(?:\d+_\d+))).*(?:fm=(?<type>\w+))?.*}
 
       def domains
         ["skeb.jp"]
       end
 
+      def image_domains
+        ["skeb.imgix.net", "skeb-production.s3.ap-northeast-1.amazonaws.com"]
+      end
+
       def match?
         return false if parsed_url.nil?
-        parsed_url.domain.in?(domains) || parsed_url.host == "skeb.imgix.net"
+        parsed_url.domain.in?(domains) || parsed_url.host.in?(image_domains)
       end
 
       def site_name
@@ -47,33 +50,41 @@ module Sources
       def image_urls
         if url =~ IMAGE_URL
           [url]
-        elsif page.present?
-          # Heavy heuristic to extract the uncropped image among the nighmare that is the skeb minified json
-          candidates = page&.css("script")&.map { |script| script.text&.scan(/(https:\\u002F\\u002Fskeb\.imgix\.net.*?)(?:"|,|\s)/) }
-          candidates = candidates.to_a.flatten.compact.uniq.reject { |match| match.include? "crop=" }
-          # sometimes skeb offers a slightly-smaller, non-watermarked version picture
-          unwatermarked = candidates.reject { |match| match.include? "=SAMPLE" }
-          unsampled = unwatermarked.reject { |match| match.include? "q=" }
+        elsif api_response.present?
+          previews = api_response["previews"].to_a.map { |preview| preview&.dig("url") }.compact.uniq
 
-          final_candidates = [unsampled, unwatermarked, candidates].reject(&:empty?).first&.to_a
-          final_candidates.map { |img| img.gsub("\\u002F", "/") }
+          unwatermarked = api_response["article_image_url"]
+          return previews unless unwatermarked.present?
+          previews.map do |p|
+            next p unless p[UUID_REGEX, :uuid].present? && p[UUID_REGEX, :uuid] == unwatermarked[UUID_REGEX, :uuid]
+            next p if p[/fm=(\w+)/, 1].in?(["gif", "mp4"])
+            next p unless p.include?("&txt=")
+
+            unwatermarked
+          end
         else
           []
         end
       end
 
       def page_url
-        urls.map { |u| u if u =~ PAGE_URL }.compact.first
+        return unless artist_name.present? && illust_id.present?
+        "https://skeb.jp/@#{artist_name}/works/#{illust_id}"
       end
 
       def normalize_for_source
         page_url
       end
 
-      def page
-        return if page_url.blank?
-        response = http.cache(1.minute).get(page_url)
-        return nil unless response.status == 200
+      def api_response
+        return {} unless artist_name.present? && illust_id.present?
+        headers = {
+          Referer: profile_url,
+          Authorization: "Bearer null",
+        }
+        api_url = "https://skeb.jp/api/users/#{artist_name}/works/#{illust_id}"
+        response = http.cache(1.minute).headers(headers).get(api_url)
+        return {} unless response.status == 200
         # The status check is required for private commissions, which return 404
 
         response.parse
@@ -89,7 +100,11 @@ module Sources
       end
 
       def display_name
-        page&.at("title")&.text&.match(/.*by (.*?) \| skeb/i).to_a[1]
+        api_response&.dig("creator", "name")
+      end
+
+      def illust_id
+        urls.map { |u| u[PAGE_URL, :illust_id] }.compact.first
       end
 
       def other_names
@@ -97,19 +112,17 @@ module Sources
       end
 
       def artist_commentary_desc
+        api_response&.dig("source_body") || api_response&.dig("body")
         # skeb "titles" are not needed: it's just the first few characters of the description
-        return if page.blank?
-        page.at("[property='og:description']")["content"]
       end
 
       def client_response
-        return if page.blank?
-        page.text[/window\.__NUXT__=.*,thanks:"(.*?)",/, 1]&.gsub(/\\n/, "\n")
+        api_response&.dig("source_thanks") || api_response&.dig("thanks")
       end
 
       def dtext_artist_commentary_desc
         if client_response.present? && artist_commentary_desc.present?
-          "h5. Original Request:\n#{artist_commentary_desc}\n\nh5. Client Response:\n#{client_response}"
+          "h6. Original Request:\n\n#{artist_commentary_desc}\n\nh6. Client Response:\n\n#{client_response}"
         else
           artist_commentary_desc
         end
