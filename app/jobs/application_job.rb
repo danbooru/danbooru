@@ -13,7 +13,7 @@ class ApplicationJob < ActiveJob::Base
   around_perform do |_job, block|
     CurrentUser.scoped(User.system, "127.0.0.1") do
       ApplicationRecord.without_timeout do
-        Timeout.timeout(8.hours, JobTimeoutError) do
+        Timeout.timeout(24.hours, JobTimeoutError) do
           block.call
         end
       end
