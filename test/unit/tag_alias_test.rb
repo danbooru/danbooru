@@ -217,6 +217,15 @@ class TagAliasTest < ActiveSupport::TestCase
 
         assert_equal("foo [[bbb]] bar", @wiki.reload.body)
       end
+
+      should "rewrite links in pool descriptions to use the new tag" do
+        @pool = create(:pool, description: "foo [[aaa]] bar")
+
+        TagAlias.approve!(antecedent_name: "aaa", consequent_name: "bbb", approver: @admin)
+        perform_enqueued_jobs
+
+        assert_equal("foo [[bbb]] bar", @pool.reload.description)
+      end
     end
 
     context "when the tags have artist entries" do

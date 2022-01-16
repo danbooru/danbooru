@@ -254,4 +254,10 @@ class Pool < ApplicationRecord
       errors.add(:name, "cannot contain only digits")
     end
   end
+
+  def self.rewrite_wiki_links!(old_name, new_name)
+    Pool.linked_to(old_name).each do |pool|
+      pool.lock!.update!(description: DText.rewrite_wiki_links(pool.description, old_name, new_name))
+    end
+  end
 end

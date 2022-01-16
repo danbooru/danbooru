@@ -212,12 +212,8 @@ class WikiPage < ApplicationRecord
   end
 
   def self.rewrite_wiki_links!(old_name, new_name)
-    broken_wikis = WikiPage.linked_to(old_name)
-
-    broken_wikis.each do |wiki|
-      wiki.lock!
-      wiki.body = DText.rewrite_wiki_links(wiki.body, old_name, new_name)
-      wiki.save!
+    WikiPage.linked_to(old_name).each do |wiki|
+      wiki.lock!.update!(body: DText.rewrite_wiki_links(wiki.body, old_name, new_name))
     end
   end
 

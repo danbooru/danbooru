@@ -139,9 +139,10 @@ class TagMover
     User.rewrite_blacklists!(old_tag.name, new_tag.name)
   end
 
-  # Update any wiki pages linking to the old tag, to link to the new tag.
+  # Update any wiki pages or pools linking to the old tag, to link to the new tag.
   def rewrite_wiki_links!
     WikiPage.rewrite_wiki_links!(old_tag.name, new_tag.name)
+    Pool.rewrite_wiki_links!(old_tag.name, new_tag.name)
   end
 
   # Merge two artist entries, copying everything from the old entry to the new
