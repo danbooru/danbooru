@@ -15,6 +15,7 @@ class Tag < ApplicationRecord
   validates :name, tag_name: true, on: :name
   validates :category, inclusion: { in: TagCategory.category_ids }
 
+  before_create :create_character_tag_for_cosplay_tag, if: :is_cosplay_tag?
   after_save :update_category_cache, if: :saved_change_to_category?
   after_save :update_category_post_counts, if: :saved_change_to_category?
 
@@ -344,16 +345,29 @@ class Tag < ApplicationRecord
 
   def self.automatic_tags_for(names)
     tags = []
-    tags += names.grep(/\A(.+)_\(cosplay\)\z/i) { "char:#{TagAlias.to_aliased([$1]).first}" }
+    tags += names.grep(/\A(.+)_\(cosplay\)\z/i) { TagAlias.to_aliased([$1]).first }
     tags << "cosplay" if names.any?(/_\(cosplay\)\z/i)
     tags << "school_uniform" if names.any?(/_school_uniform\z/i)
     tags << "meme" if names.any?(/_\(meme\)\z/i)
     tags.uniq
   end
 
-  def self.convert_cosplay_tags(tags)
-    cosplay_tags, other_tags = tags.partition {|tag| tag.match(/\A(.+)_\(cosplay\)\Z/) }
-    cosplay_tags.grep(/\A(.+)_\(cosplay\)\Z/) { "#{TagAlias.to_aliased([$1]).first}_(cosplay)" } + other_tags
+  concerning :CosplayTagMethods do
+    class_methods do
+      def convert_cosplay_tags(tags)
+        cosplay_tags, other_tags = tags.partition {|tag| tag.match(/\A(.+)_\(cosplay\)\Z/) }
+        cosplay_tags.grep(/\A(.+)_\(cosplay\)\Z/) { "#{TagAlias.to_aliased([$1]).first}_(cosplay)" } + other_tags
+      end
+    end
+
+    def create_character_tag_for_cosplay_tag
+      character_name = name.delete_suffix("_(cosplay)")
+      Tag.find_or_create_by_name("char:#{character_name}")
+    end
+
+    def is_cosplay_tag?
+      name.end_with?("_(cosplay)")
+    end
   end
 
   def implied_tags
