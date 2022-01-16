@@ -16,6 +16,8 @@ class WikiPage < ApplicationRecord
 
   validates :title, tag_name: true, presence: true, uniqueness: true, if: :title_changed?
   validates :body, presence: true, unless: -> { is_deleted? || other_names.present? }
+  validates :body, length: { maximum: 2_000 }, if: ->(rec) { body_changed? && rec.tag&.category == 4 }
+
   validate :validate_rename
   validate :validate_other_names
 
