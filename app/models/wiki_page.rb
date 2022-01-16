@@ -5,7 +5,6 @@ class WikiPage < ApplicationRecord
 
   META_WIKIS = ["list_of_", "tag_group:", "pool_group:", "howto:", "about:", "help:", "template:"]
 
-  before_save :update_dtext_links, if: :dtext_links_changed?
   after_save :create_version
 
   normalize :title, :normalize_title
@@ -22,9 +21,9 @@ class WikiPage < ApplicationRecord
   has_one :tag, :foreign_key => "name", :primary_key => "title"
   has_one :artist, -> { active }, foreign_key: "name", primary_key: "title"
   has_many :versions, -> {order("wiki_page_versions.id ASC")}, :class_name => "WikiPageVersion", :dependent => :destroy
-  has_many :dtext_links, as: :model, dependent: :destroy
 
   deletable
+  has_dtext_links :body
 
   module SearchMethods
     def find_by_id_or_title(id)
@@ -56,14 +55,6 @@ class WikiPage < ApplicationRecord
       else
         other_names_include(name)
       end
-    end
-
-    def linked_to(title)
-      where(dtext_links: DtextLink.wiki_page.wiki_link.where(link_target: normalize_title(title)))
-    end
-
-    def not_linked_to(title)
-      where.not(dtext_links: DtextLink.wiki_page.wiki_link.where(link_target: normalize_title(title)))
     end
 
     def default_order
@@ -211,14 +202,6 @@ class WikiPage < ApplicationRecord
         create_new_version
       end
     end
-  end
-
-  def dtext_links_changed?
-    body_changed? && DText.dtext_links_differ?(body, body_was)
-  end
-
-  def update_dtext_links
-    self.dtext_links = DtextLink.new_from_dtext(body)
   end
 
   def tags

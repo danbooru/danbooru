@@ -7,7 +7,6 @@ class ForumPost < ApplicationRecord
   belongs_to_updater
   belongs_to :topic, class_name: "ForumTopic", inverse_of: :forum_posts
 
-  has_many :dtext_links, as: :model, dependent: :destroy
   has_many :moderation_reports, as: :model
   has_many :votes, class_name: "ForumPostVote"
   has_one :tag_alias
@@ -16,7 +15,6 @@ class ForumPost < ApplicationRecord
 
   validates :body, presence: true, length: { maximum: 200_000 }, if: :body_changed?
 
-  before_save :update_dtext_links, if: :dtext_links_changed?
   before_create :autoreport_spam
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
@@ -31,6 +29,7 @@ class ForumPost < ApplicationRecord
   after_create_commit :async_send_discord_notification
 
   deletable
+  has_dtext_links :body
   mentionable(
     message_field: :body,
     title: ->(_user_name) {%{#{creator.name} mentioned you in topic ##{topic_id} (#{topic.title})}},
@@ -110,14 +109,6 @@ class ForumPost < ApplicationRecord
   def undelete!
     update(is_deleted: false)
     update_topic_updated_at_on_undelete
-  end
-
-  def dtext_links_changed?
-    body_changed? && DText.dtext_links_differ?(body, body_was)
-  end
-
-  def update_dtext_links
-    self.dtext_links = DtextLink.new_from_dtext(body)
   end
 
   def update_topic_updated_at_on_delete

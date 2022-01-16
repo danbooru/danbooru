@@ -12,15 +12,16 @@ class DtextLink < ApplicationRecord
 
   scope :wiki_page, -> { where(model_type: "WikiPage") }
   scope :forum_post, -> { where(model_type: "ForumPost") }
+  scope :pool, -> { where(model_type: "Pool") }
 
   def self.visible(user)
     # XXX the double negation is to prevent postgres from choosing a bad query
     # plan (it doesn't know that most forum posts aren't mod-only posts).
-    wiki_page.or(forum_post.where.not(model_id: ForumPost.not_visible(user)))
+    wiki_page.or(forum_post.where.not(model_id: ForumPost.not_visible(user))).or(pool)
   end
 
   def self.model_types
-    %w[WikiPage ForumPost]
+    %w[WikiPage ForumPost Pool]
   end
 
   def self.new_from_dtext(dtext)

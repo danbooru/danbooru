@@ -7,6 +7,7 @@ class ApplicationRecord < ActiveRecord::Base
   include Mentionable
   include Normalizable
   include ArrayAttribute
+  include HasDtextLinks
   extend HasBitFlags
   extend Searchable
 

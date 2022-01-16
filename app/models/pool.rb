@@ -15,6 +15,7 @@ class Pool < ApplicationRecord
   after_save :create_version
 
   deletable
+  has_dtext_links :description
 
   scope :series, -> { where(category: "series") }
   scope :collection, -> { where(category: "collection") }
@@ -37,7 +38,7 @@ class Pool < ApplicationRecord
     end
 
     def search(params)
-      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :name, :description, :post_ids)
+      q = search_attributes(params, :id, :created_at, :updated_at, :is_deleted, :name, :description, :post_ids, :dtext_links)
       q = q.text_attribute_matches(:description, params[:description_matches])
 
       if params[:post_tags_match]
@@ -46,6 +47,14 @@ class Pool < ApplicationRecord
 
       if params[:name_matches].present?
         q = q.name_matches(params[:name_matches])
+      end
+
+      if params[:linked_to].present?
+        q = q.linked_to(params[:linked_to])
+      end
+
+      if params[:not_linked_to].present?
+        q = q.not_linked_to(params[:not_linked_to])
       end
 
       case params[:category]

@@ -9,7 +9,7 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
       end
       as(@user) do
         @post = create(:post)
-        @pool = create(:pool)
+        @pool = create(:pool, name: "pool", description: "[[touhou]]")
       end
     end
 
@@ -19,17 +19,15 @@ class PoolsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      should "list all pools (with search)" do
-        get pools_path, params: {:search => {:name_matches => @pool.name}}
-        assert_response :success
-      end
-
       should "render for a sitemap" do
         get pools_path(format: :sitemap)
         assert_response :success
         assert_equal(Pool.count, response.parsed_body.css("urlset url loc").size)
       end
 
+      should respond_to_search(name_matches: "pool").with { @pool }
+      should respond_to_search(linked_to: "touhou").with { @pool }
+      should respond_to_search(not_linked_to: "touhou").with { [] }
     end
 
     context "show action" do

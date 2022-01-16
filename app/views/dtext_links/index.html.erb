@@ -2,7 +2,7 @@
   <div id="a-index">
     <%= search_form_for(dtext_links_path) do |f| %>
       <%= f.input :link_target_ilike, label: "Link", hint: "Use * for wildcard", input_html: { value: params[:search][:link_target_ilike], data: { autocomplete: "wiki-page" } } %>
-      <%= f.input :model_type, label: "Page Type", collection: [["Wiki Page", "WikiPage"], ["Forum Post", "ForumPost"]], include_blank: true, selected: params[:search][:model_type] %>
+      <%= f.input :model_type, label: "Page Type", collection: DtextLink.model_types.map { [_1.titleize, _1] }, include_blank: true, selected: params[:search][:model_type] %>
       <%= f.input :link_type, label: "Link Type", collection: [["Wiki", "0"], ["External", "1"]], include_blank: true, selected: params[:search][:link_type] %>
       <%= f.input :has_linked_wiki, label: "Wiki Exists?", collection: ["Yes", "No"], include_blank: true, selected: params[:search][:has_linked_wiki] %>
       <%= f.input :has_linked_tag, label: "Tag Exists?", collection: ["Yes", "No"], include_blank: true, selected: params[:search][:has_linked_tag] %>
@@ -16,8 +16,8 @@
             <%= link_to(dtext_link.model.title, dtext_link.model) %>
             <%= link_to("»", dtext_links_path(search: { model_type: "WikiPage", model: { title: dtext_link.model.title }})) %>
           </span>
-        <% elsif dtext_link.model_type == "ForumPost" %>
-          <%= link_to("forum ##{dtext_link.model_id}", dtext_link.model) %>
+        <% else %>
+          <%= link_to(dtext_link.model.dtext_shortlink, dtext_link.model) %>
         <% end %>
       <% end %>
 
