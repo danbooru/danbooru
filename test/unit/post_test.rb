@@ -1640,13 +1640,13 @@ class PostTest < ActiveSupport::TestCase
     context "a post that has been updated" do
       setup do
         PostVersion.sqs_service.stubs(:merge?).returns(false)
-        @post = FactoryBot.create(:post, :rating => "q", :tag_string => "aaa", :source => "")
+        @post = create(:post, rating: "q", tag_string: "aaa", source: "")
         @post.reload
-        @post.update(:tag_string => "aaa bbb ccc ddd")
+        @post.update(tag_string: "aaa bbb ccc ddd")
         @post.reload
-        @post.update(:tag_string => "bbb xxx yyy", :source => "xyz")
+        @post.update(tag_string: "bbb xxx yyy", source: "http://xyz.com")
         @post.reload
-        @post.update(:tag_string => "bbb mmm yyy", :source => "abc")
+        @post.update(tag_string: "bbb mmm yyy", source: "http://abc.com")
         @post.reload
       end
 
@@ -1669,7 +1669,7 @@ class PostTest < ActiveSupport::TestCase
 
         should "correctly revert all fields" do
           assert_equal("bbb xxx yyy", @post.tag_string)
-          assert_equal("xyz", @post.source)
+          assert_equal("http://xyz.com", @post.source)
           assert_equal("q", @post.rating)
         end
       end

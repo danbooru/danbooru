@@ -5,8 +5,8 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
     @user = create(:user)
 
     as(@user) do
-      @post = create(:post, tag_string: "tagme", rating: "s", source: "blah")
-      travel(2.hours) { @post.update(tag_string: "1 2", source: "xxx") }
+      @post = create(:post, tag_string: "tagme", rating: "s", source: "http://blah.com")
+      travel(2.hours) { @post.update(tag_string: "1 2", source: "http://xxx.com") }
       travel(4.hours) { @post.update(tag_string: "2 3", rating: "e") }
       @post2 = create(:post)
     end
@@ -56,7 +56,7 @@ class PostVersionsControllerTest < ActionDispatch::IntegrationTest
         assert_response :redirect
         assert_equal("e", @post.reload.rating)
         assert_equal("3 tagme", @post.tag_string)
-        assert_equal("blah", @post.source)
+        assert_equal("http://blah.com", @post.source)
       end
 
       should "not allow non-members to undo edits" do

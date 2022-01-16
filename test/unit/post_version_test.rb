@@ -38,7 +38,7 @@ class PostVersionTest < ActiveSupport::TestCase
     context "that has been created" do
       setup do
         @parent = FactoryBot.create(:post)
-        @post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc", :rating => "e", :parent => @parent, :source => "xyz")
+        @post = create(:post, tag_string: "aaa bbb ccc", rating: "e", parent: @parent, source: "http://xyz.com")
       end
 
       should "also create a version" do
@@ -54,7 +54,7 @@ class PostVersionTest < ActiveSupport::TestCase
     context "that should be merged" do
       setup do
         @parent = FactoryBot.create(:post)
-        @post = FactoryBot.create(:post, :tag_string => "aaa bbb ccc", :rating => "q", :source => "xyz")
+        @post = create(:post, tag_string: "aaa bbb ccc", rating: "q", source: "http://xyz.com")
       end
 
       should "delete the previous version" do
@@ -83,7 +83,7 @@ class PostVersionTest < ActiveSupport::TestCase
     context "that has been updated" do
       setup do
         PostVersion.sqs_service.stubs(:merge?).returns(false)
-        @post = create(:post, created_at: 1.minute.ago, tag_string: "aaa bbb ccc", rating: "q", source: "xyz")
+        @post = create(:post, created_at: 1.minute.ago, tag_string: "aaa bbb ccc", rating: "q", source: "http://xyz.com")
         @post.update(tag_string: "bbb ccc xxx", source: "")
       end
 
