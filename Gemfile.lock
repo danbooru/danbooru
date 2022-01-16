@@ -553,6 +553,7 @@ DEPENDENCIES
   capybara
   clockwork
   codecov
+  crass
   daemons
   derailed_benchmarks
   diff-lcs

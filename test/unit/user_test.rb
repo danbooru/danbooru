@@ -268,5 +268,20 @@ class UserTest < ActiveSupport::TestCase
         assert_equal([user3.id], User.search(name: "bar\\\*baz").map(&:id))
       end
     end
+
+    context "custom CSS" do
+      should "raise a validation error on invalid custom CSS" do
+        user = build(:user, custom_style: "}}}")
+
+        assert_equal(true, user.invalid?)
+        assert_match(/Custom CSS contains a syntax error/, user.errors[:base].first)
+      end
+
+      should "allow blank CSS" do
+        user = build(:user, custom_style: " ")
+
+        assert_equal(true, user.valid?)
+      end
+    end
   end
 end

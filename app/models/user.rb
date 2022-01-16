@@ -106,6 +106,7 @@ class User < ApplicationRecord
   validates :password, confirmation: true
   validates :comment_threshold, inclusion: { in: (-100..5) }
   validate  :validate_enable_private_favorites, on: :update
+  validate  :validate_custom_css, if: :custom_style_changed?
   before_validation :normalize_blacklisted_tags
   before_create :promote_to_owner_if_first_user
   has_many :artist_versions, foreign_key: :updater_id
@@ -597,6 +598,18 @@ class User < ApplicationRecord
           post_update_count: post_versions.count,
           note_update_count: note_versions.count
         )
+      end
+    end
+  end
+
+  concerning :CustomCssMethods do
+    def custom_css
+      CustomCss.new(custom_style)
+    end
+
+    def validate_custom_css
+      if !custom_css.valid?
+        errors.add(:base, "Custom CSS contains a syntax error. Validate it with https://codebeautify.org/cssvalidate")
       end
     end
   end

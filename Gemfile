@@ -55,6 +55,7 @@ gem "pry-rails"
 gem "ffi"
 gem "rbtrace"
 gem "good_job"
+gem "crass"
 
 group :development do
   gem 'rubocop', require: false
