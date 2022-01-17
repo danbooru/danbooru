@@ -1,41 +1,27 @@
-@import "../base/000_vars";
-
 div.prose {
   line-height: 1.4em;
   word-break: break-word;
 
-  h1, h2, h3 {
-    line-height: 1em;
+  p {
+    margin-bottom: 0.75rem;
   }
 
-  h1 {
-    font-size: var(--text-xl);
-    padding: $h1_padding;
+  h1, h2, h3, h4, h5, h6 {
+    line-height: 1;
+    margin-bottom: 0.75rem;
   }
 
-  h2 {
+  h1, h2, h3, h4 {
     font-size: var(--text-xl);
-    padding: $h2_padding;
-  }
-
-  h3 {
-    font-size: var(--text-xl);
-    padding: $h3_padding;
-  }
-
-  h4 {
-    font-size: var(--text-xl);
-    padding: $h4_padding;
+    margin-top: 1.75rem;
   }
 
   h5 {
     font-size: var(--text-lg);
-    padding: $h4_padding;
   }
 
   h6 {
     font-size: var(--text-md);
-    padding: $h4_padding;
   }
 
   table {
@@ -46,7 +32,7 @@ div.prose {
 
   ul {
     margin-left: 1em;
-    margin-bottom: 1em;
+    margin-bottom: 0.75rem;
 
     ul {
       margin-bottom: 0;
@@ -109,7 +95,16 @@ div.prose {
 
   a.dtext-named-external-link::after {
     // https://fontawesome.com/icons/external-link-alt?style=solid
-    @include fa-solid-icon("\f35d");
+    // https://fontawesome.com/how-to-use/on-the-web/advanced/css-pseudo-elements
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    -webkit-font-smoothing: antialiased;
+
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    content: "\f35d";
 
     font-size: 0.6em;
     padding: 0 0.2em 0 0.3em;

@@ -12,25 +12,6 @@
   --arial-font: "Arial", "Helvetica", sans-serif;
 }
 
-$h1_padding: 0.8em 0 0.25em 0;
-$h2_padding: 0.8em 0 0.25em 0;
-$h3_padding: 0.8em 0 0.25em 0;
-$h4_padding: 0.8em 0 0.25em 0;
-
-// https://fontawesome.com/how-to-use/on-the-web/advanced/css-pseudo-elements
-@mixin fa-solid-icon($content) {
-  display: inline-block;
-  font-style: normal;
-  font-variant: normal;
-  text-rendering: auto;
-  -webkit-font-smoothing: antialiased;
-
-  /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
-  font-family: "Font Awesome 5 Free";
-  font-weight: 900;
-  content: $content;
-}
-
 @mixin active-link {
   color: var(--link-color);
 
