@@ -174,7 +174,23 @@ module Danbooru
     # How long pending posts stay in the modqueue before being deleted.
     def moderation_period
       3.days
-    end
+		end
+
+		# Upload points can be earned or lost by users. They punish and reward users by adding and removing upload slots.
+		# 1000 points is enough for 10 uploads. See app/logical/upload_limit.rb for details on the level system.
+		def initial_upload_points
+			1000
+		end
+
+		# The cap on how many upload points a user can earn.
+		def maximum_upload_points
+			10_000
+		end
+
+		# These slots are added to the ones earned by upload levels and guaranteed to all users, even those at level 0.
+		def extra_upload_slots
+			5
+		end
 
     # https://guides.rubyonrails.org/action_mailer_basics.html#action-mailer-configuration
     # https://guides.rubyonrails.org/configuring.html#configuring-action-mailer
