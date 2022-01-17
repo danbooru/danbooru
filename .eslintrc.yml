@@ -8,7 +8,7 @@ parserOptions:
 globals:
   $: false
   require: false
-parser: babel-eslint
+parser: "@babel/eslint-parser"
 plugins:
   - babel
 ignorePatterns:

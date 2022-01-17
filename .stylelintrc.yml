@@ -1,4 +1,4 @@
-extends: "stylelint-config-standard"
+extends: "stylelint-config-standard-scss"
 rules:
   at-rule-no-unknown: [true, ignoreAtRules: [extend, include, mixin]]
   block-opening-brace-space-before: null
