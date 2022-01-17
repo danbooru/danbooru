@@ -13,7 +13,10 @@ html, body {
   padding: 0;
 }
 
-h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, cite, code, del, dfn, em, img, q, s, samp, small, strike, strong, sub, sup, tt, var, dd, dl, dt, li, ol, ul, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td {
+h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, cite,
+code, del, dfn, em, img, q, s, samp, small, strike, strong, sub, sup, tt, var,
+dd, dl, dt, li, ol, ul, fieldset, form, label, legend, table, caption, tbody,
+tfoot, thead, tr, th, td {
   margin: 0;
   padding: 0;
   border: 0;
@@ -45,8 +48,7 @@ q::before, q::after, blockquote::before, blockquote::after {
 html {
   overflow-y: scroll;
   font-size: 100%;
-  -webkit-text-size-adjust: 100%;
-  -ms-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 // Focus states
@@ -103,7 +105,7 @@ sub {
 // Source: http://github.com/necolas/normalize.css
 img {
   border: 0;
-  -ms-interpolation-mode: bicubic;
+  image-rendering: smooth;
 }
 
 // Forms
@@ -124,9 +126,6 @@ textarea {
 button,
 input {
   line-height: normal;
-  // FF3/4 have !important on line-height in UA stylesheet
-  *overflow: visible;
-  // Inner spacing ie IE6/7
 }
 
 button::-moz-focus-inner,
@@ -140,28 +139,20 @@ button,
 input[type="button"],
 input[type="reset"],
 input[type="submit"] {
-  cursor: pointer;
-  // Cursors on all buttons applied consistently
-  -webkit-appearance: button;
-  // Style clickable inputs in iOS
+  cursor: pointer; // Cursors on all buttons applied consistently
+  appearance: button; // Style clickable inputs in iOS
 }
 
 input[type="search"] {
-  // Appearance in Safari/Chrome
-  -webkit-appearance: textfield;
-  -webkit-box-sizing: content-box;
-  -moz-box-sizing: content-box;
+  appearance: textfield;
   box-sizing: content-box;
 }
 
 input[type="search"]::-webkit-search-decoration {
-  -webkit-appearance: none;
-  // Inner-padding issues in Chrome OSX, Safari 5
+  appearance: none; // Inner-padding issues in Chrome OSX, Safari 5
 }
 
 textarea {
-  overflow: auto;
-  // Remove vertical scrollbar in IE6-9
-  vertical-align: top;
-  // Readability and alignment cross-browser
+  overflow: auto; // Remove vertical scrollbar in IE6-9
+  vertical-align: top; // Readability and alignment cross-browser
 }

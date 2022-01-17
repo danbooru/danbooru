@@ -7,3 +7,9 @@ rules:
   no-descending-specificity: null
   selector-descendant-combinator-no-non-space: null
   selector-list-comma-newline-after: null
+  selector-class-pattern: "[a-z_-]+"
+  selector-id-pattern: "[a-z_-]+"
+  scss/dollar-variable-pattern: "[a-z_-]+"
+  scss/operator-no-unspaced: null
+  scss/comment-no-empty: null
+  shorthand-property-no-redundant-values: null

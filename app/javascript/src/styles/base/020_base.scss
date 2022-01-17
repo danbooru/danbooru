@@ -18,7 +18,7 @@ body {
   line-height: 1.25em;
 }
 
-abbr[title=required] {
+abbr[title="required"] {
   display: none;
 }
 
@@ -82,7 +82,8 @@ textarea {
   padding-left: 0.5em;
 }
 
-/* Highlight link anchor targets (e.g. /forum_topics/123#forum_post_456). Use !important to override even table row backgrounds. */
+/* Highlight link anchor targets (e.g. /forum_topics/123#forum_post_456). Use
+ * !important to override even table row backgrounds. */
 :target {
   background: var(--target-background) !important;
 }
@@ -118,7 +119,7 @@ details {
   }
 }
 
-.fineprint {
+.fineprint, %fineprint {
   color: var(--muted-text-color);
   font-style: italic;
   font-size: 0.8em;

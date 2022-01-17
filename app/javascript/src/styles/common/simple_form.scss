@@ -1,4 +1,4 @@
-@import "../base/020_base.scss";
+@import "../base/020_base";
 
 form.simple_form {
   margin: 0 0 1em 0;
@@ -30,13 +30,13 @@ form.simple_form {
   div.input {
     margin-bottom: 1em;
 
-    input[type=text], input[type=file], input[type=password], input[type=email], input[type=url] {
+    input[type="text"], input[type="file"], input[type="password"], input[type="email"], input[type="url"] {
       width: 100%;
       max-width: 25em;
     }
 
     .hint {
-      @extend .fineprint;
+      @extend %fineprint;
       padding-left: 1em;
 
       @media (max-width: 660px) {
