@@ -1,7 +1,3 @@
-*, ::before, ::after {
-  box-sizing: border-box;
-}
-
 /*
  * Make sure elements with the HTML5 [hidden] attribute (e.g. <span hidden>blah</span>)
  * really are hidden. Otherwise the `display` property can override the [hidden] attribute.
@@ -16,10 +12,6 @@ body {
   font-family: var(--body-font);
   font-size: 87.5%;
   line-height: 1.25em;
-}
-
-abbr[title="required"] {
-  display: none;
 }
 
 dd {
@@ -50,17 +42,15 @@ h3, h4, h5, h6 {
 }
 
 fieldset {
-  margin-bottom: 1em;
-}
-
-header {
-  margin: 0 0 1em 0;
+  border: 0;
   padding: 0;
+  margin-bottom: 1em;
 }
 
 img {
   border: none;
   vertical-align: middle;
+  image-rendering: smooth;
 }
 
 input, select, textarea {
@@ -89,16 +79,13 @@ textarea {
 }
 
 menu {
-  margin: 0;
   padding: 0;
 
   ul {
-    margin: 0;
     padding: 0;
   }
 
   > li {
-    margin: 0;
     display: inline;
   }
 }

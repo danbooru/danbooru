@@ -59,7 +59,7 @@
 <%= tag.body **body_attributes(CurrentUser.user, params, @current_item) do %>
   <%= render "news_updates/listing" %>
 
-  <header id="top">
+  <header id="top" class="mb-4">
     <%= link_to Danbooru.config.app_name, root_path, id: "app-name-header", class: "heading" %>
 
     <div id="maintoggle" class="mobile-only">
