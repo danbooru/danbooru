@@ -5,9 +5,9 @@ module ApplicationHelper
     (fields.reduce(false) { |acc, field| acc || params.dig(:search, field).present? } && (!member_check || CurrentUser.is_member?) ? types[0] : types[1])
   end
 
-  def diff_list_html(this_list, other_list, ul_class: ["diff-list"], li_class: [])
+  def diff_list_html(this_list, other_list, ul_class: ["diff-list"], li_class: [], show_unchanged: true)
     diff = SetDiff.new(this_list, other_list)
-    render "diff_list", diff: diff, ul_class: ul_class, li_class: li_class
+    render "diff_list", diff: diff, ul_class: ul_class, li_class: li_class, show_unchanged: show_unchanged
   end
 
   def diff_name_html(this_name, other_name)

@@ -15,7 +15,9 @@
     <% end %>
   <% end %>
 
-  <% diff.unchanged.each do |item| %>
-    <%= tag.li item, class: ["unchanged", *li_class] %>
+  <% if show_unchanged %>
+    <% diff.unchanged.each do |item| %>
+      <%= tag.li item, class: ["unchanged", *li_class] %>
+    <% end %>
   <% end %>
 <% end %>
