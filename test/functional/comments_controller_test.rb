@@ -243,6 +243,18 @@ class CommentsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, @comment.reload.is_deleted)
         assert_redirected_to @comment
       end
+
+      should "mark all pending moderation reports against the comment as handled" do
+        @comment = create(:comment, post: @post)
+        report1 = create(:moderation_report, model: @comment, status: :pending)
+        report2 = create(:moderation_report, model: @comment, status: :rejected)
+        delete_auth comment_path(@comment.id), @mod
+
+        assert_redirected_to @comment
+        assert_equal(true, @comment.reload.is_deleted)
+        assert_equal(true, report1.reload.handled?)
+        assert_equal(true, report2.reload.rejected?)
+      end
     end
 
     context "undelete action" do

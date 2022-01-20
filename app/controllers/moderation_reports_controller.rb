@@ -29,4 +29,12 @@ class ModerationReportsController < ApplicationController
     flash.now[:notice] = @moderation_report.valid? ? "Report submitted" : @moderation_report.errors.full_messages.join("; ")
     respond_with(@moderation_report)
   end
+
+  def update
+    @moderation_report = authorize ModerationReport.find(params[:id])
+    @moderation_report.update(permitted_attributes(@moderation_report))
+
+    flash.now[:notice] = @moderation_report.valid? ? "Report updated" : @moderation_report.errors.full_messages.join("; ")
+    respond_with(@moderation_report)
+  end
 end

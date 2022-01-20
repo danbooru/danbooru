@@ -42,6 +42,6 @@ class CommentComponent < ApplicationComponent
   end
 
   def reported?
-    policy(ModerationReport).can_see_moderation_reports? && comment.moderation_reports.present?
+    policy(ModerationReport).can_see_moderation_reports? && comment.pending_moderation_reports.present?
   end
 end

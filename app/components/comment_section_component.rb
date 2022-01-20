@@ -12,7 +12,7 @@ class CommentSectionComponent < ApplicationComponent
     @comments = @post.comments.order(id: :asc)
     @comments = @comments.includes(:creator)
     @comments = @comments.includes(:votes) if !current_user.is_anonymous?
-    @comments = @comments.includes(:moderation_reports) if policy(ModerationReport).can_see_moderation_reports?
+    @comments = @comments.includes(:pending_moderation_reports) if policy(ModerationReport).can_see_moderation_reports?
     @comments = @comments.last(limit) if limit.present?
 
     @dtext_data = DText.preprocess(@comments.map(&:body))

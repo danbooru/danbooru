@@ -6,11 +6,13 @@ class Comment < ApplicationRecord
   belongs_to_updater
 
   has_many :moderation_reports, as: :model, dependent: :destroy
+  has_many :pending_moderation_reports, -> { pending }, as: :model, class_name: "ModerationReport"
   has_many :votes, class_name: "CommentVote", dependent: :destroy
 
   validates :body, presence: true, length: { maximum: 15_000 }, if: :body_changed?
 
   before_create :autoreport_spam
+  before_save :handle_reports_on_deletion
   after_create :update_last_commented_at_on_create
   after_update(:if => ->(rec) {(!rec.is_deleted? || !rec.saved_change_to_is_deleted?) && CurrentUser.id != rec.creator_id}) do |rec|
     ModAction.log("comment ##{rec.id} updated by #{CurrentUser.user.name}", :comment_update)
@@ -76,6 +78,13 @@ class Comment < ApplicationRecord
     else
       Post.where(:id => post_id).update_all(:last_comment_bumped_at => other_comments.first.created_at)
     end
+  end
+
+  def handle_reports_on_deletion
+    return unless Pundit.policy!(updater, ModerationReport).update?
+    return unless moderation_reports.pending.present? && is_deleted_change == [false, true]
+
+    moderation_reports.pending.update!(status: :handled)
   end
 
   def quoted_response

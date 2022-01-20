@@ -1,4 +1,4 @@
-<%= tag.article class: "forum-post message", id: "forum_post_#{forum_post.id}", data: { "is-reported": has_moderation_reports?, **data_attributes_for(forum_post, "", forum_post.html_data_attributes) } do %>
+<%= tag.article class: "forum-post message", id: "forum_post_#{forum_post.id}", data: { "is-reported": reported?, **data_attributes_for(forum_post, "", forum_post.html_data_attributes) } do %>
   <div class="author">
     <div class="author-name">
       <%= link_to_user forum_post.creator %>
@@ -24,8 +24,10 @@
         <% end %>
       <% end %>
 
-      <% if has_moderation_reports? %>
-        <li class="moderation-report-notice">Reported (<%= link_to pluralize(forum_post.moderation_reports.length, "report"), moderation_reports_path(search: { model_type: "ForumPost", model_id: forum_post.id }) %>)</li>
+      <% if reported? %>
+        <li class="moderation-report-notice">
+          Reported (<%= link_to pluralize(forum_post.pending_moderation_reports.length, "report"), moderation_reports_path(search: { model_type: "ForumPost", model_id: forum_post.id, status: "pending" }) %>)
+        </li>
       <% end %>
 
       <%= render PopupMenuComponent.new do |menu| %>

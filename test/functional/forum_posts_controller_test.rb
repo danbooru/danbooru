@@ -229,6 +229,17 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
         assert_response 403
         assert_equal(false, @forum_post.reload.is_deleted?)
       end
+
+      should "mark all pending moderation reports against the post as handled" do
+        report1 = create(:moderation_report, model: @forum_post, status: :pending)
+        report2 = create(:moderation_report, model: @forum_post, status: :rejected)
+        delete_auth forum_post_path(@forum_post), @mod
+
+        assert_redirected_to(forum_post_path(@forum_post))
+        assert_equal(true, @forum_post.reload.is_deleted?)
+        assert_equal(true, report1.reload.handled?)
+        assert_equal(true, report2.reload.rejected?)
+      end
     end
 
     context "undelete action" do

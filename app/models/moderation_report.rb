@@ -12,11 +12,18 @@ class ModerationReport < ApplicationRecord
 
   after_create :create_forum_post!
   after_create :autoban_reported_user
+  after_save :notify_reporter
 
   scope :dmail, -> { where(model_type: "Dmail") }
   scope :comment, -> { where(model_type: "Comment") }
   scope :forum_post, -> { where(model_type: "ForumPost") }
   scope :recent, -> { where("moderation_reports.created_at >= ?", 1.week.ago) }
+
+  enum status: {
+    pending: 0,
+    rejected: 1,
+    handled: 2,
+  }
 
   def self.model_types
     MODEL_TYPES
@@ -73,6 +80,15 @@ class ModerationReport < ApplicationRecord
     end
   end
 
+  def notify_reporter
+    return if creator == User.system
+    return unless handled? && status_before_last_save != :handled
+
+    Dmail.create_automated(to: creator, title: "Thank you for reporting #{model.dtext_shortlink}", body: <<~EOS)
+      Thank you for reporting #{model.dtext_shortlink}. Action has been taken against the user.
+    EOS
+  end
+
   def reported_user
     case model
     when Comment, ForumPost
@@ -85,7 +101,7 @@ class ModerationReport < ApplicationRecord
   end
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :reason, :creator, :model)
+    q = search_attributes(params, :id, :created_at, :updated_at, :reason, :creator, :model, :status)
     q = q.text_attribute_matches(:reason, params[:reason_matches])
 
     q.apply_default_order(params)

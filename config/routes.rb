@@ -158,7 +158,7 @@ Rails.application.routes.draw do
   resources :media_assets, only: [:index, :show]
   resources :media_metadata, only: [:index]
   resources :mod_actions
-  resources :moderation_reports, only: [:new, :create, :index, :show]
+  resources :moderation_reports, only: [:new, :create, :index, :show, :update]
   resources :modqueue, only: [:index]
   resources :news_updates
   resources :notes do

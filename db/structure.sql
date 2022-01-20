@@ -1202,7 +1202,8 @@ CREATE TABLE public.moderation_reports (
     model_type character varying NOT NULL,
     model_id bigint NOT NULL,
     creator_id integer NOT NULL,
-    reason text NOT NULL
+    reason text NOT NULL,
+    status integer DEFAULT 0 NOT NULL
 );
 
 
@@ -3848,6 +3849,13 @@ CREATE INDEX index_moderation_reports_on_model_type_and_model_id ON public.moder
 
 
 --
+-- Name: index_moderation_reports_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_moderation_reports_on_status ON public.moderation_reports USING btree (status);
+
+
+--
 -- Name: index_news_updates_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5688,6 +5696,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220110171021'),
 ('20220110171022'),
 ('20220110171023'),
-('20220110171024');
+('20220110171024'),
+('20220120233850');
 
 

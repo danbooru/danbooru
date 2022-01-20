@@ -85,7 +85,7 @@
 
       <% if reported? %>
         <li class="moderation-report-notice">
-          Reported (<%= link_to pluralize(comment.moderation_reports.length, "report"), moderation_reports_path(search: { model_type: "Comment", model_id: comment.id }) %>)
+          Reported (<%= link_to pluralize(comment.pending_moderation_reports.length, "report"), moderation_reports_path(search: { model_type: "Comment", model_id: comment.id, status: "pending" }) %>)
         </li>
       <% end %>
 

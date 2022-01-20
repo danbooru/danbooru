@@ -8,6 +8,7 @@ class ForumPost < ApplicationRecord
   belongs_to :topic, class_name: "ForumTopic", inverse_of: :forum_posts
 
   has_many :moderation_reports, as: :model
+  has_many :pending_moderation_reports, -> { pending }, as: :model, class_name: "ModerationReport"
   has_many :votes, class_name: "ForumPostVote"
   has_one :tag_alias
   has_one :tag_implication
@@ -16,6 +17,7 @@ class ForumPost < ApplicationRecord
   validates :body, presence: true, length: { maximum: 200_000 }, if: :body_changed?
 
   before_create :autoreport_spam
+  before_save :handle_reports_on_deletion
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
   after_destroy :update_topic_updated_at_on_destroy
@@ -155,6 +157,12 @@ class ForumPost < ApplicationRecord
     if is_deleted? && is_original_post?
       topic.update_attribute(:is_deleted, true)
     end
+  end
+
+  def handle_reports_on_deletion
+    return unless moderation_reports.pending.present? && is_deleted_change == [false, true]
+
+    moderation_reports.pending.update!(status: :handled)
   end
 
   def async_send_discord_notification

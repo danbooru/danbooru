@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 class ForumPostComponent < ApplicationComponent
-  attr_reader :forum_post, :original_forum_post_id, :dtext_data, :moderation_reports, :current_user
+  attr_reader :forum_post, :original_forum_post_id, :dtext_data, :current_user
 
-  delegate :link_to_user, :time_ago_in_words_tagged, :format_text, :policy, :data_attributes_for, to: :helpers
+  delegate :link_to_user, :time_ago_in_words_tagged, :format_text, :data_attributes_for, to: :helpers
 
   with_collection_parameter :forum_post
 
@@ -12,7 +12,7 @@ class ForumPostComponent < ApplicationComponent
     original_forum_post_id = forum_topic.original_post&.id
 
     forum_posts = forum_posts.includes(:creator, :bulk_update_request)
-    forum_posts = forum_posts.includes(:moderation_reports) if Pundit.policy!(current_user, ModerationReport).show?
+    forum_posts = forum_posts.includes(:pending_moderation_reports) if Pundit.policy(current_user, ModerationReport).can_see_moderation_reports?
 
     super(forum_posts, dtext_data: dtext_data, original_forum_post_id: original_forum_post_id, current_user: current_user)
   end
@@ -29,7 +29,7 @@ class ForumPostComponent < ApplicationComponent
     policy(forum_post).show_deleted?
   end
 
-  def has_moderation_reports?
-    policy(ModerationReport).can_see_moderation_reports? && forum_post.moderation_reports.present?
+  def reported?
+    policy(ModerationReport).can_see_moderation_reports? && forum_post.pending_moderation_reports.present?
   end
 end

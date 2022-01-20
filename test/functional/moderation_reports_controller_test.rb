@@ -104,5 +104,32 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
         end
       end
     end
+
+    context "update action" do
+      should "not allow non-mods to update moderation reports" do
+        report = create(:moderation_report, model: @comment, creator: @user)
+        put_auth moderation_report_path(report), @user, params: { moderation_report: { status: "handled" }}, xhr: true
+
+        assert_response 403
+      end
+
+      should "allow a moderator to mark a moderation report as handled" do
+        report = create(:moderation_report, model: @comment, creator: @user)
+        put_auth moderation_report_path(report), @mod, params: { moderation_report: { status: "handled" }}, xhr: true
+
+        assert_response :success
+        assert_equal("handled", report.reload.status)
+        assert_equal(true, @user.dmails.received.exists?(from: User.system, title: "Thank you for reporting comment ##{@comment.id}"))
+      end
+
+      should "allow a moderator to mark a moderation report as rejected" do
+        report = create(:moderation_report, model: @comment, creator: @user)
+        put_auth moderation_report_path(report), @mod, params: { moderation_report: { status: "rejected" }}, xhr: true
+
+        assert_response :success
+        assert_equal("rejected", report.reload.status)
+        assert_equal(false, @user.dmails.received.exists?(from: User.system))
+      end
+    end
   end
 end
