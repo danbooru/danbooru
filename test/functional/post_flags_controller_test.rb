@@ -105,6 +105,8 @@ class PostFlagsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should respond_to_search(creator_id: 999).with { @post_flag }
+        should respond_to_search(creator_id: 999, status: "pending").with { @post_flag }
+        should respond_to_search(creator_id: 999, status: PostFlag.statuses["pending"].to_s).with { @post_flag }
       end
     end
 
