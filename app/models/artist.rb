@@ -9,6 +9,7 @@ class Artist < ApplicationRecord
   deletable
 
   normalize :name, :normalize_name
+  normalize :group_name, :normalize_other_name
   normalize :other_names, :normalize_other_names
   array_attribute :other_names # XXX must come after `normalize :other_names`
 

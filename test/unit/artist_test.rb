@@ -412,6 +412,22 @@ class ArtistTest < ActiveSupport::TestCase
       should normalize_attribute(:other_names).from("_foo_ Bar").to(["_foo_", "Bar"])
     end
 
+    context "group name" do
+      should normalize_attribute(:group_name).from("   ").to("")
+      should normalize_attribute(:group_name).from("   foo").to("foo")
+      should normalize_attribute(:group_name).from("foo   ").to("foo")
+      should normalize_attribute(:group_name).from("___foo").to("___foo")
+      should normalize_attribute(:group_name).from("foo___").to("foo___")
+      should normalize_attribute(:group_name).from("foo\n").to("foo")
+      should normalize_attribute(:group_name).from("foo bar").to("foo_bar")
+      should normalize_attribute(:group_name).from("foo   bar").to("foo_bar")
+      should normalize_attribute(:group_name).from("foo___bar").to("foo___bar")
+      should normalize_attribute(:group_name).from(" _Foo Bar_ ").to("_Foo_Bar_")
+      should normalize_attribute(:group_name).from("_foo_ Bar").to("_foo__Bar")
+      should normalize_attribute(:group_name).from("pokémon".unicode_normalize(:nfd)).to("pokémon".unicode_normalize(:nfkc))
+      should normalize_attribute(:group_name).from("🏳️‍🌈").to("🏳️‍🌈")
+    end
+
     should "search on its name should return results" do
       artist = FactoryBot.create(:artist, :name => "artist")
 
