@@ -19,9 +19,7 @@
       <% t.column "Updated" do |artist_version| %>
         <%= link_to_user artist_version.updater %>
         <%= link_to "»", artist_versions_path(search: { updater_name: artist_version.updater.name }) %>
-        <p>
-          <%= compact_time(artist_version.updated_at) %>
-        </p>
+        <div><%= compact_time(artist_version.updated_at) %></div>
       <% end %>
       <% if listing_type(:artist_id) == :revert %>
         <% t.column column: "control" do |artist_version| %>

@@ -19,12 +19,9 @@
         <%= status_diff_html(pool_version, params[:type]) %>
       <% end %>
       <% t.column "Updated", width: "10%" do |pool_version| %>
-        <div>
-          <%= compact_time pool_version.updated_at %>
-        </div>
-        by
         <%= link_to_user pool_version.updater %>
         <%= link_to "»", pool_versions_path(search: params[:search].merge({ updater_id: pool_version.updater_id })) %>
+        <div><%= compact_time pool_version.updated_at %></div>
       <% end %>
       <% if listing_type(:pool_id) == :revert %>
         <% t.column column: "control" do |pool_version| %>

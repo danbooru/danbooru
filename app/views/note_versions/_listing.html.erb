@@ -26,12 +26,9 @@
         <%= status_diff_html(note_version, params[:type]) %>
       <% end %>
       <% t.column "Updated", width: "10%" do |note_version| %>
-        <div>
-          <%= compact_time note_version.updated_at %>
-        </div>
-        by
         <%= link_to_user note_version.updater %>
         <%= link_to "»", note_versions_path(search: params[:search].merge({ updater_id: note_version.updater_id })) %>
+        <div><%= compact_time note_version.updated_at %></div>
       <% end %>
       <% if listing_type(:post_id, :note_id) == :revert %>
         <% t.column column: "control", width: "7%" do |note_version| %>

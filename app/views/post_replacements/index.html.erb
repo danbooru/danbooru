@@ -57,9 +57,9 @@
         <% end %>
       <% end %>
       <% t.column "Replacer" do |post_replacement| %>
-        <%= compact_time post_replacement.created_at %>
-        <br> by <%= link_to_user post_replacement.creator %>
+        <%= link_to_user post_replacement.creator %>
         <%= link_to "»", post_replacements_path(search: params[:search].merge(creator_name: post_replacement.creator.name)) %>
+        <div><%= compact_time post_replacement.created_at %></div>
       <% end %>
     <% end %>
 

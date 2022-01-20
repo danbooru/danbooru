@@ -43,12 +43,9 @@
       <%= status_diff_html(commentary_version, params[:type]) %>
     <% end %>
     <% t.column "Updated", width: "10%" do |commentary_version| %>
-      <div>
-        <%= compact_time commentary_version.updated_at %>
-      </div>
-      by
       <%= link_to_user commentary_version.updater %>
       <%= link_to "»", artist_commentary_versions_path(search: params[:search].merge({ updater_id: commentary_version.updater_id })) %>
+      <div><%= compact_time commentary_version.updated_at %></div>
     <% end %>
     <% if listing_type(:post_id) == :revert %>
       <% t.column column: "control", width: "7%" do |commentary_version| %>

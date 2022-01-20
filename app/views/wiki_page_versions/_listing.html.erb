@@ -26,10 +26,9 @@
         <%= status_diff_html(wiki_page_version, params[:type]) %>
       <% end %>
       <% t.column "Updated", width: "26%" do |wiki_page_version| %>
-        <%= compact_time(wiki_page_version.updated_at) %>
-        by
         <%= link_to_user wiki_page_version.updater %>
         <%= link_to "»", wiki_page_versions_path(search: { updater_id: wiki_page_version.updater.id }) %>
+        <div><%= compact_time(wiki_page_version.updated_at) %></div>
       <% end %>
     <% end %>
 

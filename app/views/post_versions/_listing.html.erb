@@ -39,9 +39,7 @@
       <% t.column "Updated", width: "5%" do |post_version| %>
         <%= link_to_user post_version.updater %>
         <%= link_to "»", post_versions_path(search: params[:search].merge({ updater_name: post_version.updater&.name })) %>
-        <div>
-          <%= compact_time(post_version.updated_at) %>
-        </div>
+        <div><%= compact_time(post_version.updated_at) %></div>
       <% end %>
       <% t.column column: "action", width: "5%" do |post_version| %>
         <% if policy(post_version).undo? %>

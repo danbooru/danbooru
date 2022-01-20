@@ -32,9 +32,7 @@
           <%= link_to "»", post_disapprovals_path(search: params[:search].merge(user_name: post_disapproval.user&.name)) %>
         <% end %>
 
-        <p>
-          <%= compact_time(post_disapproval.updated_at) %>
-        </p>
+        <div><%= compact_time(post_disapproval.updated_at) %></div>
       <% end %>
     <% end %>
 

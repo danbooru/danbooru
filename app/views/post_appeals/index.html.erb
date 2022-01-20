@@ -20,14 +20,14 @@
         <%= link_to post_appeal.status, post_appeals_path(search: { status: post_appeal.status }) %>
       <% end %>
       <% t.column "Uploaded", width: "15%" do |post_appeal| %>
-        <%= compact_time post_appeal.post.created_at %>
-        <br> by <%= link_to_user post_appeal.post.uploader %>
+        <%= link_to_user post_appeal.post.uploader %>
         <%= link_to "»", post_appeals_path(search: params[:search].merge(post_tags_match: "#{params[:search][:post_tags_match]} user:#{post_appeal.post.uploader.name}".strip)) %>
+        <div><%= compact_time post_appeal.post.created_at %></div>
       <% end %>
       <% t.column "Appealed", width: "15%" do |post_appeal| %>
-        <%= compact_time post_appeal.created_at %>
-        <br> by <%= link_to_user post_appeal.creator %>
+        <%= link_to_user post_appeal.creator %>
         <%= link_to "»", post_appeals_path(search: params[:search].merge(creator_name: post_appeal.creator.name)) %>
+        <div><%= compact_time post_appeal.created_at %></div>
       <% end %>
       <% t.column "Approver", width: "15%" do |post_appeal| %>
         <% if post_appeal.post.approver %>
