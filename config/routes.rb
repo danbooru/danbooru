@@ -280,7 +280,7 @@ Rails.application.routes.draw do
   resources :webhooks do
     post :receive, on: :collection
   end
-  resources :wiki_pages, id: /.+?(?=\.json|\.xml|\.html)|.+/ do
+  resources :wiki_pages, id: /.+/, format: false do
     put :revert, on: :member
     get :search, on: :collection
     get :show_or_new, on: :collection

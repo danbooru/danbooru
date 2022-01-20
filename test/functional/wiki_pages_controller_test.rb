@@ -122,6 +122,35 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
+      should "work for a title containing a file extension" do
+        as(@user) { create(:wiki_page, title: "rnd.jpg") }
+        as(@user) { create(:wiki_page, title: "touhou") }
+
+        get wiki_page_path("rnd.jpg")
+        assert_response :success
+        assert_equal("text/html", response.media_type)
+
+        get wiki_page_path("rnd.jpg.json")
+        assert_response :success
+        assert_equal("application/json", response.media_type)
+
+        get wiki_page_path("rnd.jpg.xml")
+        assert_response :success
+        assert_equal("application/xml", response.media_type)
+
+        get wiki_page_path("rnd.jpg.html")
+        assert_response :success
+        assert_equal("text/html", response.media_type)
+
+        get wiki_page_path("rnd.jpg", format: "json")
+        assert_response :success
+        assert_equal("application/json", response.media_type)
+
+        get wiki_page_path("touhou.json")
+        assert_response :success
+        assert_equal("application/json", response.media_type)
+      end
+
       should "mark banned artists as noindex" do
         @artist = create(:artist, name: @wiki_page.title, is_banned: true)
         get wiki_page_path(@wiki_page.title)
