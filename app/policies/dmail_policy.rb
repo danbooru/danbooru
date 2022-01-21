@@ -23,7 +23,7 @@ class DmailPolicy < ApplicationPolicy
   end
 
   def reportable?
-    unbanned? && record.owner_id == user.id && record.is_recipient? && !record.is_automated? && !record.from.is_moderator?
+    unbanned? && record.owner_id == user.id && record.is_recipient? && !record.is_automated? && !record.from.is_moderator? && record.created_at.after?(1.year.ago)
   end
 
   def permitted_attributes_for_create

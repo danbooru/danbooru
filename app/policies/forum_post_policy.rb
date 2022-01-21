@@ -34,7 +34,7 @@ class ForumPostPolicy < ApplicationPolicy
   end
 
   def reportable?
-    unbanned? && show? && record.creator_id != user.id && !record.creator.is_moderator?
+    unbanned? && show? && record.creator_id != user.id && !record.creator.is_moderator? && record.created_at.after?(1.year.ago)
   end
 
   def show_deleted?

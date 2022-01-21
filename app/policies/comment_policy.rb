@@ -10,7 +10,7 @@ class CommentPolicy < ApplicationPolicy
   end
 
   def reportable?
-    unbanned? && record.creator_id != user.id && !record.creator.is_moderator? && !record.is_deleted?
+    unbanned? && record.creator_id != user.id && !record.creator.is_moderator? && !record.is_deleted? && record.created_at.after?(1.year.ago)
   end
 
   def can_sticky_comment?
