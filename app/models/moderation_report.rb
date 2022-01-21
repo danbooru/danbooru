@@ -3,6 +3,8 @@
 class ModerationReport < ApplicationRecord
   MODEL_TYPES = %w[Dmail Comment ForumPost]
 
+  attr_accessor :updater
+
   belongs_to :model, polymorphic: true
   belongs_to :creator, class_name: "User"
 
@@ -13,6 +15,7 @@ class ModerationReport < ApplicationRecord
   after_create :create_forum_post!
   after_create :autoban_reported_user
   after_save :notify_reporter
+  after_save :create_modaction
 
   scope :dmail, -> { where(model_type: "Dmail") }
   scope :comment, -> { where(model_type: "Comment") }
@@ -87,6 +90,16 @@ class ModerationReport < ApplicationRecord
     Dmail.create_automated(to: creator, title: "Thank you for reporting #{model.dtext_shortlink}", body: <<~EOS)
       Thank you for reporting #{model.dtext_shortlink}. Action has been taken against the user.
     EOS
+  end
+
+  def create_modaction
+    return unless saved_change_to_status? && status != :pending
+
+    if handled?
+      ModAction.log("handled modreport ##{id}", :moderation_report_handled, updater)
+    elsif rejected?
+      ModAction.log("rejected modreport ##{id}", :moderation_report_rejected, updater)
+    end
   end
 
   def reported_user

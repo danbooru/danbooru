@@ -52,6 +52,8 @@ class ModAction < ApplicationRecord
     forum_topic_lock: 206,
     forum_post_update: 101,
     forum_post_delete: 102,
+    moderation_report_handled: 306,
+    moderation_report_rejected: 307,
     tag_alias_create: 120,
     tag_alias_update: 121, # XXX unused
     tag_alias_delete: 122,

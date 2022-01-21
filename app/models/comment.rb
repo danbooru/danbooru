@@ -84,7 +84,7 @@ class Comment < ApplicationRecord
     return unless Pundit.policy!(updater, ModerationReport).update?
     return unless moderation_reports.pending.present? && is_deleted_change == [false, true]
 
-    moderation_reports.pending.update!(status: :handled)
+    moderation_reports.pending.update!(status: :handled, updater: updater)
   end
 
   def quoted_response

@@ -32,7 +32,7 @@ class ModerationReportsController < ApplicationController
 
   def update
     @moderation_report = authorize ModerationReport.find(params[:id])
-    @moderation_report.update(permitted_attributes(@moderation_report))
+    @moderation_report.update(updater: CurrentUser.user, **permitted_attributes(@moderation_report))
 
     flash.now[:notice] = @moderation_report.valid? ? "Report updated" : @moderation_report.errors.full_messages.join("; ")
     respond_with(@moderation_report)

@@ -162,7 +162,7 @@ class ForumPost < ApplicationRecord
   def handle_reports_on_deletion
     return unless moderation_reports.pending.present? && is_deleted_change == [false, true]
 
-    moderation_reports.pending.update!(status: :handled)
+    moderation_reports.pending.update!(status: :handled, updater: updater)
   end
 
   def async_send_discord_notification

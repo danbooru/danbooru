@@ -239,6 +239,7 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal(true, @forum_post.reload.is_deleted?)
         assert_equal(true, report1.reload.handled?)
         assert_equal(true, report2.reload.rejected?)
+        assert_equal(1, ModAction.moderation_report_handled.where(creator: @mod).count)
       end
     end
 
