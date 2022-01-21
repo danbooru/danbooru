@@ -123,7 +123,7 @@ class PostQueryBuilder
         metatag.name = "favgroup" if metatag.name == "ordfavgroup"
         metatag.name = "pool" if metatag.name == "ordpool"
       end
-      
+
       clause = metatag_matches(metatag.name, metatag.value, quoted: metatag.quoted)
       clause = clause.negate_relation if metatag.negated
       relation = relation.and_relation(clause)
