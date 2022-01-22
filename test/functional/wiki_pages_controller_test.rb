@@ -31,6 +31,13 @@ class WikiPagesControllerTest < ActionDispatch::IntegrationTest
         assert_equal(WikiPage.count, response.parsed_body.css("urlset url loc").size)
       end
 
+      should "render for a JSON response" do
+        get wiki_pages_path(format: :json)
+
+        assert_response :success
+        assert_equal("application/json", response.media_type)
+      end
+
       should "redirect the legacy title param to the show page" do
         get wiki_pages_path(title: "tagme")
         assert_redirected_to wiki_pages_path(search: { title_normalize: "tagme" }, redirect: true)

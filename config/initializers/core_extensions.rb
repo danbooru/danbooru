@@ -63,6 +63,23 @@ class String
   include Danbooru::Extensions::String
 end
 
+module MimeNegotationExtension
+  # Ignore all file extensions except for .html, .js, .json, and .xml when
+  # parsing the file extension from the URL. Needed for wiki pages (e.g.
+  # /wiki_pages/rnd.jpg).
+  private def format_from_path_extension
+    mime = super
+
+    if mime&.symbol.in?(%i[html js json xml])
+      mime
+    else
+      nil
+    end
+  end
+end
+
+ActionDispatch::Http::MimeNegotiation.prepend(MimeNegotationExtension)
+
 # Make Symbol#to_s return a frozen string. This reduces allocations, but may be
 # incompatible with some libraries.
 #
