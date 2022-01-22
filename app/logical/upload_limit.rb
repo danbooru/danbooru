@@ -24,8 +24,8 @@
 class UploadLimit
   extend Memoist
 
-  INITIAL_POINTS = Danbooru.config.initial_upload_points
-  MAXIMUM_POINTS = Danbooru.config.maximum_upload_points
+  INITIAL_POINTS = Danbooru.config.initial_upload_points.to_i
+  MAXIMUM_POINTS = Danbooru.config.maximum_upload_points.to_i
   APPEAL_COST = 3
   DELETION_COST = 5
 
@@ -65,7 +65,7 @@ class UploadLimit
 
   # @return [Integer] The user's total number of upload slots. Ranges from 5 to 40.
   def upload_slots
-    upload_level + Danbooru.config.extra_upload_slots
+    upload_level + Danbooru.config.extra_upload_slots.to_i
   end
 
   # @return [Integer] The user's current upload level. Ranges from 0 to 35.
@@ -121,7 +121,7 @@ class UploadLimit
       points += upload_value(points, is_deleted)
       points = points.clamp(0, MAXIMUM_POINTS)
 
-      # warn "slots: %2d, points: %3d, value: %2d" % [UploadLimit.points_to_level(points) + Danbooru.config.extra_upload_slots, points, UploadLimit.upload_value(level, is_deleted)]
+      # warn "slots: %2d, points: %3d, value: %2d" % [UploadLimit.points_to_level(points) + Danbooru.config.extra_upload_slots.to_i, points, UploadLimit.upload_value(level, is_deleted)]
     end
 
     points
