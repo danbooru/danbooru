@@ -24,12 +24,13 @@ class ForumTopic < ApplicationRecord
   has_many :tag_implications
 
   validates :title, presence: true, length: { maximum: 200 }, if: :title_changed?
-  validates_associated :original_post
   validates :category_id, inclusion: { in: CATEGORIES.keys }
   validates :min_level, inclusion: { in: MIN_LEVELS.values }
 
   accepts_nested_attributes_for :original_post
-  after_update :update_orignal_post
+
+  after_update :update_posts_on_deletion_or_undeletion
+  after_update :update_original_post
   after_save(:if => ->(rec) {rec.is_locked? && rec.saved_change_to_is_locked?}) do |rec|
     ModAction.log("locked forum topic ##{id} (title: #{title})", :forum_topic_lock)
   end
@@ -179,7 +180,14 @@ class ForumTopic < ApplicationRecord
     (response_count / Danbooru.config.posts_per_page.to_f).ceil
   end
 
-  def update_orignal_post
+  # Delete all posts when the topic is deleted. Undelete all posts when the topic is undeleted.
+  def update_posts_on_deletion_or_undeletion
+    if saved_change_to_is_deleted?
+      forum_posts.update!(is_deleted: is_deleted) # XXX depends on current user
+    end
+  end
+
+  def update_original_post
     original_post&.update_columns(:updater_id => updater.id, :updated_at => Time.now)
   end
 

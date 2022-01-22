@@ -18,11 +18,11 @@ class ForumPostPolicy < ApplicationPolicy
   end
 
   def destroy?
-    unbanned? && show? && user.is_moderator?
+    unbanned? && show? && !record.is_deleted? && user.is_moderator?
   end
 
   def undelete?
-    unbanned? && show? && user.is_moderator?
+    unbanned? && show? && record.is_deleted? && !record.topic.is_deleted? && user.is_moderator?
   end
 
   def reply?

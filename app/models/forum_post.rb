@@ -15,13 +15,14 @@ class ForumPost < ApplicationRecord
   has_one :bulk_update_request
 
   validates :body, presence: true, length: { maximum: 200_000 }, if: :body_changed?
+  validate :validate_deletion_of_original_post
+  validate :validate_undeletion_of_post
 
   before_create :autoreport_spam
   before_save :handle_reports_on_deletion
   after_create :update_topic_updated_at_on_create
   after_update :update_topic_updated_at_on_update_for_original_posts
   after_destroy :update_topic_updated_at_on_destroy
-  after_save :delete_topic_if_original_post
   after_update(:if => ->(rec) {rec.updater_id != rec.creator_id}) do |rec|
     ModAction.log("#{CurrentUser.user.name} updated forum ##{rec.id}", :forum_post_update)
   end
@@ -81,6 +82,18 @@ class ForumPost < ApplicationRecord
 
   def voted?(user, score)
     votes.exists?(creator_id: user.id, score: score)
+  end
+
+  def validate_deletion_of_original_post
+    if is_original_post? && is_deleted? && !topic.is_deleted?
+      errors.add(:base, "Can't delete original post without deleting the topic first")
+    end
+  end
+
+  def validate_undeletion_of_post
+    if topic.is_deleted? && !is_deleted?
+      errors.add(:base, "Can't undelete post without undeleting the topic first")
+    end
   end
 
   def autoreport_spam
@@ -150,12 +163,6 @@ class ForumPost < ApplicationRecord
       id == original_post_id
     else
       ForumPost.exists?(["id = ? and id = (select _.id from forum_posts _ where _.topic_id = ? order by _.id asc limit 1)", id, topic_id])
-    end
-  end
-
-  def delete_topic_if_original_post
-    if is_deleted? && is_original_post?
-      topic.update_attribute(:is_deleted, true)
     end
   end
 

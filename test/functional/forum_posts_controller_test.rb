@@ -219,24 +219,36 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
 
     context "destroy action" do
       should "allow mods to delete posts" do
-        delete_auth forum_post_path(@forum_post), @mod
-        assert_redirected_to(forum_post_path(@forum_post))
-        assert_equal(true, @forum_post.reload.is_deleted?)
+        @forum_reply = as(@user) { create(:forum_post, topic: @forum_topic, creator: @user) }
+        delete_auth forum_post_path(@forum_reply), @mod
+
+        assert_redirected_to(@forum_reply)
+        assert_equal(true, @forum_reply.reload.is_deleted?)
       end
 
       should "not allow users to delete their own posts" do
-        delete_auth forum_post_path(@forum_post), @user
+        @forum_reply = as(@user) { create(:forum_post, topic: @forum_topic, creator: @user) }
+        delete_auth forum_post_path(@forum_reply), @user
+
         assert_response 403
-        assert_equal(false, @forum_post.reload.is_deleted?)
+        assert_equal(false, @forum_reply.reload.is_deleted?)
+      end
+
+      should "not allow deleting the OP of an active topic" do
+        delete_auth forum_post_path(@forum_topic.original_post), @mod
+
+        assert_redirected_to(@forum_topic.original_post)
+        assert_equal(false, @forum_topic.original_post.is_deleted?)
       end
 
       should "mark all pending moderation reports against the post as handled" do
-        report1 = create(:moderation_report, model: @forum_post, status: :pending)
-        report2 = create(:moderation_report, model: @forum_post, status: :rejected)
-        delete_auth forum_post_path(@forum_post), @mod
+        forum_reply = as(@user) { create(:forum_post, topic: @forum_topic, creator: @user) }
+        report1 = create(:moderation_report, model: forum_reply, status: :pending)
+        report2 = create(:moderation_report, model: forum_reply, status: :rejected)
+        delete_auth forum_post_path(forum_reply), @mod
 
-        assert_redirected_to(forum_post_path(@forum_post))
-        assert_equal(true, @forum_post.reload.is_deleted?)
+        assert_redirected_to(forum_post_path(forum_reply))
+        assert_equal(true, forum_reply.reload.is_deleted?)
         assert_equal(true, report1.reload.handled?)
         assert_equal(true, report2.reload.rejected?)
         assert_equal(1, ModAction.moderation_report_handled.where(creator: @mod).count)
@@ -245,17 +257,30 @@ class ForumPostsControllerTest < ActionDispatch::IntegrationTest
 
     context "undelete action" do
       should "allow mods to undelete posts" do
-        as(@mod) { @forum_post.update!(is_deleted: true) }
-        post_auth undelete_forum_post_path(@forum_post), @mod
-        assert_redirected_to(forum_post_path(@forum_post))
-        assert_equal(false, @forum_post.reload.is_deleted?)
+        @forum_reply = as(@user) { create(:forum_post, topic: @forum_topic, creator: @user, is_deleted: true) }
+        post_auth undelete_forum_post_path(@forum_reply), @mod
+
+        assert_redirected_to(@forum_reply)
+        assert_equal(false, @forum_reply.reload.is_deleted?)
       end
 
       should "not allow users to undelete their own posts" do
-        as(@mod) { @forum_post.update!(is_deleted: true) }
-        post_auth undelete_forum_post_path(@forum_post), @user
+        @forum_reply = as(@user) { create(:forum_post, topic: @forum_topic, creator: @user, is_deleted: true) }
+        post_auth undelete_forum_post_path(@forum_reply), @user
+
         assert_response 403
-        assert_equal(true, @forum_post.reload.is_deleted?)
+        assert_equal(true, @forum_reply.reload.is_deleted?)
+      end
+
+      should "not allow undeleting posts in deleted topics" do
+        @forum_reply = as(@user) { create(:forum_post, topic: @forum_topic, creator: @user) }
+        as(@user) { @forum_topic.update!(is_deleted: true) }
+        assert_equal(true, @forum_reply.reload.is_deleted?)
+
+        post_auth undelete_forum_post_path(@forum_reply), @mod
+
+        assert_response 403
+        assert_equal(true, @forum_reply.reload.is_deleted?)
       end
     end
   end
