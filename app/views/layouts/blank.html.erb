@@ -8,7 +8,7 @@
   <link rel="top" title="<%= Danbooru.config.app_name %>" href="/">
   <%= csrf_meta_tag %>
   <%= raw Danbooru.config.custom_html_header_content %>
-  <%= javascript_pack_tag "application" %>
+  <%= javascript_pack_tag "application", defer: false %>
   <%= stylesheet_pack_tag "application" %>
   <%= yield :html_header %>
 </head>
