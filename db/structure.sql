@@ -1907,6 +1907,38 @@ ALTER SEQUENCE public.tags_id_seq OWNED BY public.tags.id;
 
 
 --
+-- Name: upload_media_assets; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.upload_media_assets (
+    id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    upload_id bigint NOT NULL,
+    media_asset_id bigint NOT NULL
+);
+
+
+--
+-- Name: upload_media_assets_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.upload_media_assets_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: upload_media_assets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.upload_media_assets_id_seq OWNED BY public.upload_media_assets.id;
+
+
+--
 -- Name: uploads; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2518,6 +2550,13 @@ ALTER TABLE ONLY public.tags ALTER COLUMN id SET DEFAULT nextval('public.tags_id
 
 
 --
+-- Name: upload_media_assets id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.upload_media_assets ALTER COLUMN id SET DEFAULT nextval('public.upload_media_assets_id_seq'::regclass);
+
+
+--
 -- Name: uploads id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2962,6 +3001,14 @@ ALTER TABLE ONLY public.tag_implications
 
 ALTER TABLE ONLY public.tags
     ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: upload_media_assets upload_media_assets_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.upload_media_assets
+    ADD CONSTRAINT upload_media_assets_pkey PRIMARY KEY (id);
 
 
 --
@@ -4494,6 +4541,20 @@ CREATE INDEX index_tags_on_post_count ON public.tags USING btree (post_count);
 
 
 --
+-- Name: index_upload_media_assets_on_media_asset_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upload_media_assets_on_media_asset_id ON public.upload_media_assets USING btree (media_asset_id);
+
+
+--
+-- Name: index_upload_media_assets_on_upload_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upload_media_assets_on_upload_id ON public.upload_media_assets USING btree (upload_id);
+
+
+--
 -- Name: index_uploads_on_referer_url; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4804,6 +4865,14 @@ ALTER TABLE ONLY public.uploads
 
 ALTER TABLE ONLY public.uploads
     ADD CONSTRAINT fk_rails_127111e6ac FOREIGN KEY (post_id) REFERENCES public.posts(id) DEFERRABLE INITIALLY DEFERRED NOT VALID;
+
+
+--
+-- Name: upload_media_assets fk_rails_171271f781; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.upload_media_assets
+    ADD CONSTRAINT fk_rails_171271f781 FOREIGN KEY (upload_id) REFERENCES public.uploads(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -5415,6 +5484,14 @@ ALTER TABLE ONLY public.post_votes
 
 
 --
+-- Name: upload_media_assets fk_rails_f6bce0ea3f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.upload_media_assets
+    ADD CONSTRAINT fk_rails_f6bce0ea3f FOREIGN KEY (media_asset_id) REFERENCES public.media_assets(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
 -- Name: user_upgrades fk_rails_f9349ed07b; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5697,6 +5774,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220110171022'),
 ('20220110171023'),
 ('20220110171024'),
-('20220120233850');
+('20220120233850'),
+('20220124195900');
 
 
