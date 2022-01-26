@@ -14,7 +14,6 @@ module Sources
       assert_equal(page_url, site.page_url) if page_url.present?
       assert_equal(tags.sort, site.tags.map(&:first).sort)
       assert_equal(profile_url.to_s, site.profile_url.to_s)
-      assert_equal(size, site.remote_size)
       assert_nothing_raised { site.to_h }
     end
 

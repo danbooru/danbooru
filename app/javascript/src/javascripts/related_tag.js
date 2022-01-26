@@ -9,7 +9,7 @@ RelatedTag.initialize_all = function() {
   $(document).on("click.danbooru", ".related-tags a", RelatedTag.toggle_tag);
   $(document).on("click.danbooru", "#show-related-tags-link", RelatedTag.show);
   $(document).on("click.danbooru", "#hide-related-tags-link", RelatedTag.hide);
-  $(document).on("keyup.danbooru.relatedTags", "#upload_tag_string, #post_tag_string", RelatedTag.update_selected);
+  $(document).on("keyup.danbooru.relatedTags", "#post_tag_string", RelatedTag.update_selected);
 
   $(document).on("danbooru:update-source-data", RelatedTag.on_update_source_data);
   $(document).on("danbooru:open-post-edit-dialog", RelatedTag.hide);
@@ -21,7 +21,7 @@ RelatedTag.initialize_all = function() {
 
   // Show the related tags automatically when the "Edit" tab is opened, or by default on the uploads page.
   $(document).on("danbooru:open-post-edit-tab", RelatedTag.show);
-  if ($("#c-uploads #a-new").length) {
+  if ($("#c-uploads #a-show").length) {
     RelatedTag.show();
   }
 }
@@ -50,7 +50,7 @@ RelatedTag.current_tag = function() {
   // 7. |abc def   -> abc
   // 8. | abc def  -> abc
 
-  var $field = $("#upload_tag_string,#post_tag_string");
+  var $field = $("#post_tag_string");
   var string = $field.val();
   var n = string.length;
   var a = $field.prop('selectionStart');
@@ -105,12 +105,12 @@ RelatedTag.update_selected = function(e) {
 }
 
 RelatedTag.current_tags = function() {
-  let tagString = $("#upload_tag_string,#post_tag_string").val().toLowerCase();
+  let tagString = $("#post_tag_string").val().toLowerCase();
   return Utility.splitWords(tagString);
 }
 
 RelatedTag.toggle_tag = function(e) {
-  var $field = $("#upload_tag_string,#post_tag_string");
+  var $field = $("#post_tag_string");
   var tag = $(e.target).closest("li").text().trim().replace(/ /g, "_");
 
   if (RelatedTag.current_tags().includes(tag)) {

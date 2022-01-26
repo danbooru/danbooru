@@ -1,7 +1,7 @@
 <% content_for(:secondary_links) do %>
-  <%= subnav_link_to "Listing", uploads_path %>
-  <%= subnav_link_to "New", new_upload_path %>
+  <%= subnav_link_to "My Uploads", uploads_path %>
+  <%= subnav_link_to "New Upload", new_upload_path %>
   <%= subnav_link_to "Batch Upload", batch_uploads_path %>
-  <%= subnav_link_to "Similar Images Search", iqdb_queries_path %>
+  <%= subnav_link_to "Reverse Image Search", iqdb_queries_path %>
   <%= subnav_link_to "Help", wiki_page_path("help:upload") %>
 <% end %>

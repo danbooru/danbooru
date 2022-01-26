@@ -1,19 +1,5 @@
 div#c-uploads {
-  div#a-new {
-    #no-image-available {
-      display: none;
-    }
-
-    &.no-image-available {
-      #upload-image-metadata, #image, #iqdb-similar {
-        display: none;
-      }
-
-      #no-image-available {
-        display: block !important;
-      }
-    }
-
+  div#a-show {
     &[data-image-size="small"] {
       #image {
         cursor: zoom-in;
@@ -72,10 +58,6 @@ div#c-uploads {
       input {
         margin-right: 0.5em;
       }
-    }
-
-    textarea#upload_tag_string {
-      width: 100%;
     }
 
     div.field_with_errors {

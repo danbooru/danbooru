@@ -40,6 +40,8 @@ en:
         user_id: "You"
       forum_post_vote:
         creator_id: "Your vote"
+      media_asset:
+        file_ext: ""
       moderation_report:
         creator: "You"
       post:
@@ -48,6 +50,7 @@ en:
         updater_id: "You"
         uploader: "You"
         uploader_id: "You"
+        md5: ""
       post_flag:
         creator: "You"
         creator_id: "You"
@@ -72,6 +75,8 @@ en:
         user: "You"
         user_id: "You"
     errors:
+      messages:
+        record_invalid: "%{errors}"
       models:
         tag_implication:
           attributes:

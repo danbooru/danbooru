@@ -1,61 +1,70 @@
 <div id="c-uploads">
   <div id="a-index">
-    <%= render "uploads/search" %>
-    <%= render "posts/partials/common/inline_blacklist" %>
+    <%= search_form_for(uploads_path) do |f| %>
+      <%= f.input :uploader_name, label: "Uploader", input_html: { value: params[:search][:uploader_name], data: { autocomplete: "user" } } %>
+      <%= f.input :source_like, label: "Source", input_html: { value: params[:search][:source_like] } %>
+      <%= f.input :status_like, label: "Status", collection: [%w[Completed completed], %w[Processing processing], %w[Pending pending], %w[Error error*]], include_blank: true, selected: params[:search][:status_like] %>
+
+      <%= f.submit "Search" %>
+    <% end %>
 
     <%= table_for @uploads, class: "striped autofit", width: "100%" do |t| %>
-      <% t.column "Upload" do |upload| %>
-        <%= post_preview(upload.post, tags: "user:#{upload.uploader.name}", show_deleted: true) %>
-      <% end %>
-      <% t.column "Info", td: {class: "col-expand upload-info"} do |upload| %>
-        <span class="info">
-          <strong>Upload</strong>
-          <%= link_to "##{upload.id}", upload %>
-        </span>
-
-        <span class="info">
-          <strong>Rating</strong>
-          <%= upload.rating %>
-        </span>
-
-        <% if upload.post.present? %>
-          <span class="info">
-            <strong>Size</strong>
-            <%= link_to "#{upload.post.file_size.to_formatted_s(:human_size, precision: 4)} #{upload.post.file_ext}", upload.post.file_url %>
-            (<%= upload.post.image_width %>x<%= upload.post.image_height %>)
-          </span>
+      <% t.column "File" do |upload| %>
+        <% upload.media_assets.first.tap do |media_asset| %>
+          <% if media_asset.present? %>
+            <%= link_to upload, class: "inline-block" do %>
+              <%= tag.img src: media_asset.variant("180x180").file_url %>
+            <% end %>
+          <% end %>
         <% end %>
-        <br>
+      <% end %>
 
-        <span class="info">
+      <% t.column "Info", td: {class: "col-expand upload-info"} do |upload| %>
+        <div>
+          <strong>Upload</strong>
+          <span><%= link_to "##{upload.id}", upload %></span>
+        </div>
+
+        <div>
           <strong>Source</strong>
-          <%= link_to_if (upload.source =~ %r!\Ahttps?://!i), (upload.source.presence.try(:truncate, 50) || content_tag(:em, "none")), upload.source %>
-          <%= link_to "»", uploads_path(search: params[:search].merge(source_matches: upload.source)) %>
-        </span>
-        <br>
+          <span>
+            <% if upload.source.present? %>
+              <%= external_link_to upload.source %>
+              <%= link_to "»", uploads_path(search: params[:search].merge(source_like: upload.source)) %>
+            <% else %>
+              <em>none</em>
+            <% end %>
+          </span>
+        </div>
 
         <% if upload.referer_url.present? %>
-          <span class="info">
-            <strong>Referer</strong>
-            <%= URI.parse(upload.referer_url).host rescue nil %>
-          </span>
-          <br>
+          <div>
+            <strong>Referrer</strong>
+            <span>
+              <%= external_link_to upload.referer_url %>
+              <%= link_to "»", uploads_path(search: params[:search].merge(referer_url: upload.referer_url)) %>
+            </span>
+          </div>
         <% end %>
 
-        <% if policy(upload).can_view_tags? %>
-          <span class="info">
-            <strong>Tags</strong>
-            <%= render_inline_tag_list_from_names(upload.tag_string.split) %>
-          </span>
+        <% if upload.is_errored? %>
+          <div>
+            <strong>Error</strong>
+            <span>
+              <%= upload.status.delete_prefix("error: ") %>
+            </span>
+          </div>
         <% end %>
       <% end %>
+
       <% t.column "Uploader" do |upload| %>
         <%= link_to_user upload.uploader %>
         <%= link_to "»", uploads_path(search: params[:search].merge(uploader_name: upload.uploader.name)) %>
-        <br><%= time_ago_in_words_tagged  upload.created_at %>
+        <div><%= time_ago_in_words_tagged upload.created_at %></div>
       <% end %>
-      <% t.column "Status", td: {class: "col-normal"} do |upload| %>
-        <%= render_status(upload) %>
+
+      <% t.column :status do |upload| %>
+        <%= upload.is_errored? ? "error" : upload.status %>
       <% end %>
     <% end %>
 

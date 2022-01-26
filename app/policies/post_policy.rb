@@ -13,6 +13,10 @@ class PostPolicy < ApplicationPolicy
     unbanned? && record.visible?
   end
 
+  def create?
+    unbanned? && record.uploader == user
+  end
+
   def revert?
     update?
   end
@@ -66,11 +70,14 @@ class PostPolicy < ApplicationPolicy
     user.is_gold?
   end
 
-  def permitted_attributes
-    [
-      :tag_string, :old_tag_string, :parent_id, :old_parent_id,
-      :source, :old_source, :rating, :old_rating, :has_embedded_notes,
-    ].compact
+  def permitted_attributes_for_create
+    %i[upload_media_asset_id tag_string rating parent_id source is_pending
+    artist_commentary_desc artist_commentary_title translated_commentary_desc
+    translated_commentary_title]
+  end
+
+  def permitted_attributes_for_update
+    %i[tag_string old_tag_string parent_id old_parent_id source old_source rating old_rating has_embedded_notes]
   end
 
   def api_attributes

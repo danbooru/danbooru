@@ -18,8 +18,9 @@ class Post < ApplicationRecord
   before_validation :parse_pixiv_id
   before_validation :blank_out_nonexistent_parents
   before_validation :remove_parent_loops
-  validates :md5, uniqueness: { message: ->(post, _data) { "duplicate: #{Post.find_by_md5(post.md5).id}" }}, on: :create
-  validates :rating, inclusion: { in: %w[s q e], message: "rating must be s, q, or e" }
+  validates :md5, uniqueness: { message: ->(post, _data) { "Duplicate of post ##{Post.find_by_md5(post.md5).id}" }}, on: :create
+  validates :rating, presence: { message: "not selected" }
+  validates :rating, inclusion: { in: %w[s q e], message: "must be S, Q, or E" }, if: -> { rating.present? }
   validates :source, length: { maximum: 1200 }
   validate :added_tags_are_valid
   validate :removed_tags_are_valid
@@ -34,6 +35,7 @@ class Post < ApplicationRecord
   after_save :create_version
   after_save :update_parent_on_save
   after_save :apply_post_metatags
+  after_create_commit :update_iqdb
 
   belongs_to :approver, class_name: "User", optional: true
   belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
@@ -71,6 +73,36 @@ class Post < ApplicationRecord
 
   if PostVersion.enabled?
     has_many :versions, -> { Rails.env.test? ? order("post_versions.updated_at ASC, post_versions.id ASC") : order("post_versions.updated_at ASC") }, class_name: "PostVersion", dependent: :destroy
+  end
+
+  def self.new_from_upload(params)
+    upload_media_asset = UploadMediaAsset.find(params[:upload_media_asset_id])
+    media_asset = upload_media_asset.media_asset
+    upload = upload_media_asset.upload
+
+    # XXX depends on CurrentUser
+    commentary = ArtistCommentary.new(
+      original_title: params[:artist_commentary_title],
+      original_description: params[:artist_commentary_desc],
+      translated_title: params[:translated_commentary_title],
+      translated_description: params[:translated_commentary_desc],
+    )
+
+    post = Post.new(
+      uploader: upload.uploader,
+      uploader_ip_addr: upload.uploader_ip_addr,
+      md5: media_asset.md5,
+      file_ext: media_asset.file_ext,
+      file_size: media_asset.file_size,
+      image_width: media_asset.image_width,
+      image_height: media_asset.image_height,
+      source: Sources::Strategies.find(upload.source, upload.referer_url).canonical_url || upload.source,
+      tag_string: params[:tag_string],
+      rating: params[:rating],
+      parent_id: params[:parent_id],
+      is_pending: !upload.uploader.can_upload_free? || params[:is_pending].to_s.truthy?,
+      artist_commentary: (commentary if commentary.any_field_present?),
+    )
   end
 
   module FileMethods

@@ -63,6 +63,19 @@ class PostsController < ApplicationController
     respond_with_post_after_update(@post)
   end
 
+  def create
+    @post = authorize Post.new_from_upload(permitted_attributes(Post))
+    @post.save
+
+    if @post.errors.any?
+      @upload = UploadMediaAsset.find(params[:post][:upload_media_asset_id]).upload
+      flash[:notice] = @post.errors.full_messages.join("; ")
+      respond_with(@post, render: { template: "uploads/show" })
+    else
+      respond_with(@post)
+    end
+  end
+
   def destroy
     @post = authorize Post.find(params[:id])
 

@@ -26,7 +26,7 @@ class UploadService
     end
 
     def process!
-      media_file = Utils::get_file_for_upload(replacement.replacement_url, nil, replacement.replacement_file&.tempfile)
+      media_file = get_file_for_upload(replacement.replacement_url, nil, replacement.replacement_file&.tempfile)
 
       if Post.where.not(id: post.id).exists?(md5: media_file.md5)
         raise Error, "Duplicate: post with md5 #{media_file.md5} already exists"
@@ -68,6 +68,16 @@ class UploadService
       post.notes.each do |note|
         note.rescale!(x_scale, y_scale)
       end
+    end
+
+    def get_file_for_upload(source_url, referer_url, file)
+      return MediaFile.open(file) if file.present?
+      raise "No file or source URL provided" if source_url.blank?
+
+      strategy = Sources::Strategies.find(source_url, referer_url)
+      raise NotImplementedError, "No login credentials configured for #{strategy.site_name}." unless strategy.class.enabled?
+
+      strategy.download_file!
     end
   end
 end

@@ -99,10 +99,6 @@ module Sources
           assert_equal("uroobnad", @site.artist_name)
         end
 
-        should "get the remote image size" do
-          assert_equal(863_758, @site.remote_size)
-        end
-
         should "get the full size image url" do
           assert_equal("https://i.pximg.net/img-original/img/2017/11/21/05/12/37/65981735_p0.jpg", @site.image_url)
         end

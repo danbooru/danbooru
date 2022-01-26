@@ -39,7 +39,7 @@ Post.initialize_all = function() {
     this.initialize_ruffle_player();
   }
 
-  if ($("#c-posts #a-show, #c-uploads #a-new").length) {
+  if ($("#c-posts #a-show, #c-uploads #a-show").length) {
     this.initialize_edit_dialog();
   }
 
@@ -102,7 +102,7 @@ Post.open_edit_dialog = function() {
   $("#post-sections li").removeClass("active");
   $("#post-edit-link").parent("li").addClass("active");
 
-  var $tag_string = $("#post_tag_string,#upload_tag_string");
+  var $tag_string = $("#post_tag_string");
   $("#open-edit-dialog").hide();
 
   var dialog = $("<div/>").attr("id", "edit-dialog");
@@ -157,9 +157,9 @@ Post.open_edit_dialog = function() {
 }
 
 Post.close_edit_dialog = function(e, ui) {
-  $("#form").appendTo($("#c-posts #edit,#c-uploads #a-new"));
+  $("#form").appendTo($("#c-posts #edit,#c-uploads #a-show"));
   $("#edit-dialog").remove();
-  var $tag_string = $("#post_tag_string,#upload_tag_string");
+  var $tag_string = $("#post_tag_string");
   $("div.input").has($tag_string).prevAll().show();
   $("#open-edit-dialog").show();
   $tag_string.css({"resize": "", "width": ""});

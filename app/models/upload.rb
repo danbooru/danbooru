@@ -1,100 +1,28 @@
 # frozen_string_literal: true
 
 class Upload < ApplicationRecord
-  class Error < StandardError; end
-
   MAX_VIDEO_DURATION = 140
 
-  class FileValidator < ActiveModel::Validator
-    def validate(record)
-      validate_file_ext(record)
-      validate_integrity(record)
-      validate_md5_uniqueness(record)
-      validate_video_duration(record)
-      validate_resolution(record)
-    end
+  attr_accessor :file
 
-    def validate_file_ext(record)
-      if record.file_ext.in?(["bin", "swf"])
-        record.errors.add(:file_ext, "is invalid (only JPEG, PNG, GIF, MP4, and WebM files are allowed")
-      end
-    end
+  belongs_to :uploader, class_name: "User"
+  has_many :upload_media_assets, dependent: :destroy
+  has_many :media_assets, through: :upload_media_assets
 
-    def validate_integrity(record)
-      if record.file.is_corrupt?
-        record.errors.add(:file, "is corrupted")
-      end
-    end
+  validates :source, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, if: -> { source.present? }
+  validates :referer_url, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, if: -> { referer_url.present? }
 
-    def validate_md5_uniqueness(record)
-      if record.md5.nil?
-        return
-      end
-
-      md5_post = Post.find_by_md5(record.md5)
-
-      if md5_post.nil?
-        return
-      end
-
-      if record.replaced_post && record.replaced_post == md5_post
-        return
-      end
-
-      record.errors.add(:md5, "duplicate: #{md5_post.id}")
-    end
-
-    def validate_resolution(record)
-      resolution = record.image_width.to_i * record.image_height.to_i
-
-      if resolution > Danbooru.config.max_image_resolution
-        record.errors.add(:base, "image resolution is too large (resolution: #{(resolution / 1_000_000.0).round(1)} megapixels (#{record.image_width}x#{record.image_height}); max: #{Danbooru.config.max_image_resolution / 1_000_000} megapixels)")
-      elsif record.image_width > Danbooru.config.max_image_width
-        record.errors.add(:image_width, "is too large (width: #{record.image_width}; max width: #{Danbooru.config.max_image_width})")
-      elsif record.image_height > Danbooru.config.max_image_height
-        record.errors.add(:image_height, "is too large (height: #{record.image_height}; max height: #{Danbooru.config.max_image_height})")
-      end
-    end
-
-    def validate_video_duration(record)
-      if !record.uploader.is_admin? && record.file.is_video? && record.file.duration.to_i > MAX_VIDEO_DURATION
-        record.errors.add(:base, "video must not be longer than #{MAX_VIDEO_DURATION.seconds.inspect}")
-      end
-    end
-  end
-
-  attr_accessor :as_pending, :replaced_post, :file
-
-  belongs_to :uploader, :class_name => "User"
-  belongs_to :post, optional: true
-  has_one :media_asset, foreign_key: :md5, primary_key: :md5
-
-  before_validation :initialize_attributes, on: :create
-  before_validation :assign_rating_from_tags
-  # validates :source, format: { with: /\Ahttps?/ }, if: ->(record) {record.file.blank?}, on: :create
-  validates :rating, inclusion: { in: %w[q e s] }, allow_nil: true
-  validates :md5, confirmation: true, if: ->(rec) { rec.md5_confirmation.present? }
-  validates_with FileValidator, on: :file
-  serialize :context, JSON
+  after_create :async_process_upload!
 
   scope :pending, -> { where(status: "pending") }
   scope :preprocessed, -> { where(status: "preprocessed") }
   scope :completed, -> { where(status: "completed") }
-  scope :uploaded_by, ->(user_id) { where(uploader_id: user_id) }
-
-  def initialize_attributes
-    self.uploader_id = CurrentUser.id
-    self.uploader_ip_addr = CurrentUser.ip_addr
-    self.server = Socket.gethostname
-  end
 
   def self.visible(user)
     if user.is_admin?
       all
-    elsif user.is_anonymous?
-      completed
     else
-      completed.or(where(uploader: user))
+      where(uploader: user)
     end
   end
 
@@ -111,98 +39,44 @@ class Upload < ApplicationRecord
       status == "completed"
     end
 
-    def is_preprocessed?
-      status == "preprocessed"
-    end
-
-    def is_preprocessing?
-      status == "preprocessing"
-    end
-
-    def is_duplicate?
-      status.match?(/duplicate: \d+/)
-    end
-
     def is_errored?
       status.match?(/error:/)
-    end
-
-    def sanitized_status
-      if is_errored?
-        status.sub(/DETAIL:.+/m, "...")
-      else
-        status
-      end
-    end
-
-    def duplicate_post_id
-      @duplicate_post_id ||= status[/duplicate: (\d+)/, 1]
-    end
-  end
-
-  concerning :SourceMethods do
-    def source=(source)
-      source = source.unicode_normalize(:nfc)
-
-      # percent encode unicode characters in urls
-      if source =~ %r{\Ahttps?://}i
-        source = Addressable::URI.normalized_encode(source) rescue source
-      end
-
-      super(source)
-    end
-
-    def source_url
-      return nil unless source =~ %r{\Ahttps?://}i
-      Addressable::URI.heuristic_parse(source) rescue nil
     end
   end
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :source, :rating, :parent_id, :server, :md5, :server, :file_ext, :file_size, :image_width, :image_height, :referer_url, :uploader, :post)
-
-    if params[:source_matches].present?
-      q = q.where_like(:source, params[:source_matches])
-    end
-
-    if params[:has_post].to_s.truthy?
-      q = q.where.not(post_id: nil)
-    elsif params[:has_post].to_s.falsy?
-      q = q.where(post_id: nil)
-    end
-
-    if params[:status].present?
-      q = q.where_like(:status, params[:status])
-    end
-
-    if params[:backtrace].present?
-      q = q.where_like(:backtrace, params[:backtrace])
-    end
-
-    if params[:tag_string].present?
-      q = q.where_like(:tag_string, params[:tag_string])
-    end
-
+    q = search_attributes(params, :id, :created_at, :updated_at, :source, :referer_url, :uploader, :status, :backtrace, :upload_media_assets, :media_assets)
     q.apply_default_order(params)
   end
 
-  def assign_rating_from_tags
-    rating = PostQueryBuilder.new(tag_string).find_metatag(:rating)
-
-    if rating.present?
-      self.rating = rating.downcase.first
+  def async_process_upload!
+    if file.present?
+      ProcessUploadJob.perform_now(self)
+    else
+      ProcessUploadJob.perform_later(self)
     end
   end
 
-  def upload_as_pending?
-    as_pending.to_s.truthy?
-  end
+  def process_upload!
+    update!(status: "processing")
 
-  def has_commentary?
-    artist_commentary_title.present? || artist_commentary_desc.present? || translated_commentary_title.present? || translated_commentary_desc.present?
+    if file.present?
+      media_file = MediaFile.open(file.tempfile)
+    elsif source.present?
+      strategy = Sources::Strategies.find(source, referer_url)
+      media_file = strategy.download_file!(strategy.image_url)
+    else
+      raise "No file or source provided"
+    end
+
+    media_asset = MediaAsset.upload!(media_file)
+    update!(media_assets: [media_asset], status: "completed")
+  rescue Exception => e
+    update!(status: "error: #{e.message}", backtrace: e.backtrace.join("\n"))
+    raise
   end
 
   def self.available_includes
-    [:uploader, :post]
+    [:uploader, :upload_media_assets, :media_assets]
   end
 end

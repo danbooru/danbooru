@@ -1,100 +1,11 @@
-<%= content_for :html_header do %>
-  <meta name="max-file-size" content="<%= Danbooru.config.max_file_size %>">
-<% end %>
-
 <div id="c-uploads">
   <div id="a-new" data-image-size="small">
-    <h1>Upload</h1>
+    <h1 class="text-center mb-4">Upload</h1>
 
-    <% if CurrentUser.user.upload_limit.limited? %>
-      <h2 style="margin-bottom: 1em;">You have reached your upload limit</h2>
-    <% else %>
-      <%= embed_wiki("help:upload_notice", id: "upload-guide-notice") %>
-
-      <% unless CurrentUser.can_upload_free? %>
-        <p id="upload-limit">
-          Upload Limit: <%= render "users/upload_limit", user: CurrentUser.user %>
-        </p>
-      <% end %>
-
-      <%= render "image" %>
-      <%= render "related_posts", source: @source %>
-      <%= render_source_data(nil) %>
-
-      <div id="client-errors" class="error-messages ui-state-error ui-corner-all" style="display:none"></div>
-
-      <%= edit_form_for(@upload, html: { id: "form" }) do |f| %>
-        <%= f.input :md5_confirmation, as: :hidden %>
-        <%= f.input :referer_url, as: :hidden, input_html: { value: params[:ref] } %>
-
-        <% if CurrentUser.can_upload_free? %>
-          <%= f.input :as_pending, as: :boolean, label: "Upload for approval", input_html: { checked: params[:as_pending].present? } %>
-        <% end %>
-
-        <%= f.input :file, as: :file, size: 50, wrapper_html: { class: "fallback" } %>
-
-        <div class="input" id="filedropzone">
-          <div class="dropzone-hint">Click or drag and drop to upload a file</div>
-          <div class="dropzone-hint hint">Max size: <%= number_to_human_size(Danbooru.config.max_file_size) %>. Supported filetypes: jpg, png, gif, mp4, webm.</div>
-        </div>
-
-        <div class="input string optional upload_source">
-          <%= f.label :source %>
-          <%= f.input_field :source, as: :string, placeholder: "Enter the URL to upload here", value: params[:url] %>
-          <%= tag.button "Similar", id: "similar-button" %>
-        </div>
-
-        <%= f.input :rating, collection: [["Explicit", "e"], ["Questionable", "q"], ["Safe", "s"]], as: :radio_buttons, selected: params[:rating] %>
-
-        <%= f.input :parent_id, label: "Parent ID", as: :string, input_html: { value: params[:parent_id] } %>
-
-        <div class="input upload_artist_commentary_container">
-          <strong>Commentary</strong>
-          <a href="#" id="toggle-artist-commentary">show »</a>
-
-          <div class="artist-commentary" style="display: none;">
-            <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { value: params[:artist_commentary_title] } %>
-            <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { value: params[:artist_commentary_desc] } %>
-          </div>
-        </div>
-
-        <div class="input upload_commentary_translation_container" style="display: none;">
-          <strong>Translation</strong>
-          <a href="#" id="toggle-commentary-translation">show »</a>
-
-          <div class="commentary-translation" style="display: none;">
-            <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { value: params[:translated_commentary_title] } %>
-            <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { value: params[:translated_commentary_desc] } %>
-          </div>
-        </div>
-
-        <div class="input fixed-width-container" id="tags-container">
-          <div class="header">
-            <%= f.label :tag_string, "Tags" %>
-
-            <span data-tag-counter data-for="#upload_tag_string">
-              <span class="tag-count"></span>
-              <img>
-            </span>
-            <a href="javascript:void(0)">
-              <%= external_link_icon(id: "open-edit-dialog", "data-shortcut": "shift+e") %>
-            </a>
-          </div>
-
-          <%= f.input :tag_string, label: false, hint: "Ctrl+Enter to submit", input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: params[:tag_string] } %>
-          <%= render "related_tags/buttons" %>
-        </div>
-
-        <%= f.submit "Submit", id: "submit-button", data: { disable_with: false } %>
-
-        <%= render "related_tags/container" %>
-      <% end %>
-    <% end %>
+    <div class="flex items-center justify-center">
+      <%= render FileUploadComponent.new(url: @upload.source, referer_url: @upload.referer_url, drop_target: "body") %>
+    </div>
   </div>
 </div>
-
-<template id="dropzone-preview-template">
-  <%= render "dropzone_preview" %>
-</template>
 
 <%= render "uploads/secondary_links" %>

@@ -5,8 +5,8 @@ $(document).trigger("danbooru:update-source-data", {
   related_tags_html: "<%= j render "related_tags/source_tags", source: @source %>",
 });
 
-if ($("#c-uploads #a-new").length) {
-  $("#upload_artist_commentary_title").val(<%= raw @source.dtext_artist_commentary_title.to_json %>);
-  $("#upload_artist_commentary_desc").val(<%= raw @source.dtext_artist_commentary_desc.to_json %>);
+if ($("#c-uploads #a-show").length) {
+  $("#post_artist_commentary_title").val(<%= raw @source.dtext_artist_commentary_title.to_json %>);
+  $("#post_artist_commentary_desc").val(<%= raw @source.dtext_artist_commentary_desc.to_json %>);
   Danbooru.Upload.toggle_commentary();
 }

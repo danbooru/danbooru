@@ -1,0 +1,32 @@
+.file-upload-component {
+  form {
+    margin: 0;
+  }
+
+  progress {
+    height: 6px;
+  }
+
+  .dropzone-container {
+    background: var(--uploads-dropzone-background);
+
+    &.error {
+      background: var(--error-background-color);
+    }
+
+    &.success {
+      background: var(--success-background-color);
+    }
+  }
+
+  .dz-progress {
+    bottom: 0;
+    left: 0;
+
+    background-color: var(--uploads-dropzone-progress-bar-background-color);
+
+    .dz-upload {
+      background-color: var(--uploads-dropzone-progress-bar-foreground-color);
+    }
+  }
+}

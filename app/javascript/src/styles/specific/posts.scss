@@ -25,7 +25,7 @@
 #edit-dialog {
   /* Hide everything but the rating and tags fields. */
   .post_has_embedded_notes_fieldset, .post_lock_fieldset, .post_parent_id,
-  .post_source, #filedropzone, .upload_as_pending, .upload_source_container,
+  .post_source, .dropzone-container, .upload_as_pending, .upload_source_container,
   .upload_parent_id, .upload_artist_commentary_container, .upload_commentary_translation_container {
     display: none;
   }

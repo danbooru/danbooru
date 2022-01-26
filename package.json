@@ -29,7 +29,6 @@
     "ruffle-mirror": "^2022.1.13",
     "sass": "^1.48.0",
     "sass-loader": "^12.4.0",
-    "spark-md5": "^3.0.2",
     "tippy.js": "^6.3.7",
     "typopro-web": "^4.2.6",
     "webpack": "^5.66.0",

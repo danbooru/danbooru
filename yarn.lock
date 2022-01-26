@@ -6983,7 +6983,6 @@ fsevents@~2.3.2:
     ruffle-mirror: ^2022.1.13
     sass: ^1.48.0
     sass-loader: ^12.4.0
-    spark-md5: ^3.0.2
     stylelint: ^14.2.0
     stylelint-config-standard: ^24.0.0
     stylelint-config-standard-scss: ^3.0.0
@@ -7413,13 +7412,6 @@ fsevents@~2.3.2:
   version: 0.7.3
   resolution: "source-map@npm:0.7.3"
   checksum: 351ce26ffa1ebf203660c0d70d7566c81e65d2d994d1c2d94da140808e02da34961673ce12ecea9b40797b96fbeb8c70bf71a4ad9f779f1a4fdbba75530bb386
-  languageName: node
-  linkType: hard
-
-"spark-md5@npm:^3.0.2":
-  version: 3.0.2
-  resolution: "spark-md5@npm:3.0.2"
-  checksum: f36020b068e82800b240a4aed779a11e4a31ff21a0da14a75ca37ec856b6238e5c397c07d4ce99cd23a2113fea2855cf177b024ae2612cb47003e786768680b0
   languageName: node
   linkType: hard
 

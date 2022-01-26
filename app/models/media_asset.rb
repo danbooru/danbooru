@@ -4,6 +4,10 @@ class MediaAsset < ApplicationRecord
   class Error < StandardError; end
 
   VARIANTS = %i[preview 180x180 360x360 720x720 sample original]
+  MAX_VIDEO_DURATION = 140 # 2:20
+  MAX_IMAGE_RESOLUTION = Danbooru.config.max_image_resolution
+  MAX_IMAGE_WIDTH = Danbooru.config.max_image_width
+  MAX_IMAGE_HEIGHT = Danbooru.config.max_image_height
   ENABLE_SEO_POST_URLS = Danbooru.config.enable_seo_post_urls
   LARGE_IMAGE_WIDTH = Danbooru.config.large_image_width
   STORAGE_SERVICE = Danbooru.config.storage_manager
@@ -30,6 +34,9 @@ class MediaAsset < ApplicationRecord
   }
 
   validates :md5, uniqueness: { conditions: -> { where(status: [:processing, :active]) } }
+  validates :file_ext, inclusion: { in: %w[jpg png gif mp4 webm swf zip], message: "Not an image or video" }
+  validates :duration, numericality: { less_than_or_equal_to: MAX_VIDEO_DURATION, message: "must be less than #{MAX_VIDEO_DURATION} seconds", allow_nil: true }, on: :create # XXX should allow admins to bypass
+  validate :validate_resolution, on: :create
 
   class Variant
     extend Memoist
@@ -194,6 +201,8 @@ class MediaAsset < ApplicationRecord
       # This can't be called inside a transaction because the transaction will
       # fail if there's a RecordNotUnique error when the asset already exists.
       def upload!(media_file)
+        raise Error, "File is corrupt" if media_file.is_corrupt?
+
         media_asset = create!(file: media_file, status: :processing)
         media_asset.distribute_files!(media_file)
         media_asset.update!(status: :active)
@@ -316,6 +325,20 @@ class MediaAsset < ApplicationRecord
 
     def is_animated_png?
       is_animated? && file_ext == "png"
+    end
+  end
+
+  concerning :ValidationMethods do
+    def validate_resolution
+      resolution = image_width * image_height
+
+      if resolution > MAX_IMAGE_RESOLUTION
+        errors.add(:base, "Image resolution is too large (resolution: #{(resolution / 1_000_000.0).round(1)} megapixels (#{image_width}x#{image_height}); max: #{MAX_IMAGE_RESOLUTION / 1_000_000} megapixels)")
+      elsif image_width > MAX_IMAGE_WIDTH
+        errors.add(:image_width, "is too large (width: #{image_width}; max width: #{MAX_IMAGE_WIDTH})")
+      elsif image_height > MAX_IMAGE_HEIGHT
+        errors.add(:image_height, "is too large (height: #{image_height}; max height: #{MAX_IMAGE_HEIGHT})")
+      end
     end
   end
 end

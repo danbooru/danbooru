@@ -8,7 +8,7 @@
 # @see https://guides.rubyonrails.org/routing.html
 # @see http://localhost:3000/rails/info/routes
 Rails.application.routes.draw do
-  resources :posts, only: [:index, :show, :update, :destroy] do
+  resources :posts, only: [:index, :show, :update, :destroy, :new, :create] do
     get :random, on: :collection
   end
 

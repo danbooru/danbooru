@@ -1,12 +1,11 @@
 class SourceDataComponent {
   static initialize() {
-    $(document).on("change.danbooru", "#upload_source", SourceDataComponent.fetchData);
     $(document).on("click.danbooru", ".source-data-fetch", SourceDataComponent.fetchData);
   }
 
   static async fetchData(e) {
-    let url = $("#upload_source,#post_source").val();
-    let ref = $("#upload_referer_url").val();
+    let url = $("#post_source").val();
+    let ref = $("#post_referer_url").val();
 
     e.preventDefault();
 

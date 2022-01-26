@@ -1,51 +1,110 @@
 <div id="c-uploads">
-  <div id="a-show">
-    <h1>Upload #<%= @upload.id %></h1>
+  <div id="a-show" data-image-size="small">
+    <h1>Upload</h1>
 
-    <ul>
-      <li>Date: <%= @upload.created_at %></li>
-      <li>Source: <%= @upload.source %></li>
-      <% if policy(@upload).can_view_tags? %>
-        <li>Tags: <%= @upload.tag_string %></li>
-      <% end %>
-      <% if @upload.md5.present? %>
-        <li>MD5: <%= @upload.md5 %>
-      <% end %>
-      <% if @upload.file_size.present? %>
-        <li>
-          Size: <%= number_to_human_size(@upload.file_size) %></li>
-          <% if @upload.image_width.present? %>
-            (<%= @upload.image_width %>x<%= @upload.image_height %>)
-          <% end %>
-        </li>
-      <% end %>
-    </ul>
-
-    <% if @upload.is_completed? %>
-      <p>This upload has finished processing. <%= link_to "View the post", post_path(@upload.post_id) %>.</p>
-    <% elsif @upload.is_pending? %>
-      <p>This upload is waiting to be processed. Please wait a few seconds.</p>
-    <% elsif @upload.is_processing? || @upload.is_preprocessing? || @upload.is_preprocessed? %>
-      <p>This upload is being processed. Please wait a few seconds.</p>
-    <% elsif @upload.is_duplicate? %>
-      <p>This upload is a duplicate: <%= link_to "post ##{@upload.duplicate_post_id}", post_path(@upload.duplicate_post_id) %></p>
-    <% else %>
-      <p>An error occurred: <%= render_status(@upload) %></p>
-      <% if CurrentUser.user.is_builder? %>
-        <%= render "static/backtrace", backtrace: @upload.backtrace.to_s.split(/\n/) %>
+    <% if @upload.is_pending? || @upload.is_processing? %>
+      <% content_for(:html_header) do %>
+        <meta http-equiv="refresh" content="1">
       <% end %>
     <% end %>
 
-    <p>
-      You can <%= link_to "upload another file", new_upload_path %> or <%= link_to "view your current uploads", uploads_path(:search => {:uploader_id => CurrentUser.id}) %>.
-    </p>
+    <% if @upload.is_errored? %>
+      <p><%= @upload.status %></p>
+    <% elsif @upload.is_pending? && @upload.source.present? %>
+      <p>Preparing to upload <%= external_link_to @upload.source %>...</p>
+    <% elsif @upload.is_processing? && @upload.source.present? %>
+      <p>Processing <%= external_link_to @upload.source %>...</p>
+    <% elsif !@upload.is_completed? %>
+      <p>Processing upload...</p>
+    <% elsif CurrentUser.user.upload_limit.limited? %>
+      <p>You have reached your upload limit. Please wait for your pending uploads to be approved before uploading more.</p>
+
+      <p id="upload-limit">Upload Limit: <%= render "users/upload_limit", user: CurrentUser.user %></p>
+    <% else %>
+      <%= embed_wiki("help:upload_notice", id: "upload-guide-notice") %>
+
+      <% unless CurrentUser.can_upload_free? %>
+        <p id="upload-limit">Upload Limit: <%= render "users/upload_limit", user: CurrentUser.user %></p>
+      <% end %>
+
+      <div id="client-errors" class="error-messages ui-state-error ui-corner-all" style="display:none"></div>
+
+      <% @upload_media_asset = @upload.upload_media_assets.first %>
+      <% @media_asset = @upload_media_asset.media_asset %>
+
+      <p id="upload-image-metadata">
+        <strong>Size</strong>
+        <span id="upload-image-metadata-filesize"><%= number_to_human_size(@media_asset.file_size) %></span>
+        <span id="upload-image-metadata-resolution"><%= @media_asset.image_width %>x<%= @media_asset.image_height %></span>
+        <span id="upload-image-metadata-size-links">
+          (<a id="upload-image-view-small" href="">small</a> | <a id="upload-image-view-large" href="">large</a> | <a id="upload-image-view-full" href="">full</a>)
+        </span>
+      </p>
+
+      <div id="upload-image">
+        <%= tag.img src: @media_asset.variant("original").file_url, title: "Preview", id: "image", class: "fit-width fit-height", "data-shortcut": "z"  %>
+      </div>
+
+      <% if @upload.source.present? %>
+        <% @source = ::Sources::Strategies.find(@upload.source, @upload.referer_url) %>
+        <%= render "uploads/related_posts", source: @source %>
+        <%= render_source_data(@source) %>
+      <% end %>
+
+      <%= edit_form_for(@post, html: { id: "form" }) do |f| %>
+        <%= f.input :upload_media_asset_id, as: :hidden, input_html: { value: @upload_media_asset.id } %>
+
+        <%= f.input :source, as: :string %>
+        <%= f.input :rating, collection: [["Explicit", "e"], ["Questionable", "q"], ["Safe", "s"]], as: :radio_buttons, selected: @post.rating %>
+        <%= f.input :parent_id, label: "Parent ID", as: :string, input_html: { value: @post.parent_id } %>
+
+        <div class="input upload_artist_commentary_container">
+          <strong>Commentary</strong>
+          <a href="#" id="toggle-artist-commentary">show »</a>
+
+          <div class="artist-commentary" style="display: none;">
+            <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { value: @post&.artist_commentary&.original_title } %>
+            <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { value: @post&.artist_commentary&.original_description } %>
+          </div>
+        </div>
+
+        <div class="input upload_commentary_translation_container" style="display: none;">
+          <strong>Translation</strong>
+          <a href="#" id="toggle-commentary-translation">show »</a>
+
+          <div class="commentary-translation" style="display: none;">
+            <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { value: @post&.artist_commentary&.translated_title } %>
+            <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { value: @post&.artist_commentary&.translated_description } %>
+          </div>
+        </div>
+
+        <div class="input fixed-width-container" id="tags-container">
+          <div class="header">
+            <%= f.label :tag_string, "Tags" %>
+
+            <span data-tag-counter data-for="#post_tag_string">
+              <span class="tag-count"></span>
+              <img>
+            </span>
+            <a href="javascript:void(0)">
+              <%= external_link_icon(id: "open-edit-dialog", "data-shortcut": "shift+e") %>
+            </a>
+          </div>
+
+          <%= f.input :tag_string, label: false, hint: "Ctrl+Enter to submit", input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: @post.tag_string } %>
+          <%= render "related_tags/buttons" %>
+        </div>
+
+        <%= f.submit "Upload", id: "submit-button", data: { disable_with: false } %>
+
+        <% if CurrentUser.can_upload_free? %>
+          <%= f.input :is_pending, as: :boolean, label: "Upload for approval", wrapper_html: { class: "inline-block" }, input_html: { checked: @post.is_pending? } %>
+        <% end %>
+
+        <%= render "related_tags/container" %>
+      <% end %>
+    <% end %>
   </div>
 </div>
 
 <%= render "uploads/secondary_links" %>
-
-<% if @upload.is_pending? || @upload.is_processing? || @upload.is_preprocessing? || @upload.is_preprocessed? %>
-  <% content_for(:html_header) do %>
-    <meta http-equiv="refresh" content="2">
-  <% end %>
-<% end %>
