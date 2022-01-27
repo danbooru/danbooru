@@ -266,7 +266,7 @@ module ApplicationHelper
 
     {
       lang: "en",
-      class: "c-#{controller_param} a-#{action_param}",
+      class: "c-#{controller_param} a-#{action_param} flex flex-col",
       spellcheck: "false",
       data: {
         controller: controller_param,

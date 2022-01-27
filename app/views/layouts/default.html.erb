@@ -78,7 +78,7 @@
     </nav>
   </header>
 
-  <div id="page">
+  <div id="page" class="flex-1">
     <%= render "users/verification_notice" %>
 
     <% if Danbooru.config.is_promotion? && cookies[:hide_winter_sale_notice].blank? %>

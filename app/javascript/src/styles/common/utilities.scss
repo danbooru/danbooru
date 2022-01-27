@@ -95,7 +95,9 @@ $spacer: 0.25rem; /* 4px */
 
 .flex-1 { flex: 1 1 0%; }
 .flex-auto { flex: 1 1 auto; }
+.flex-initial { flex: 0 1 auto; }
 .flex-grow-1 { flex-grow: 1; }
+.flex-col { flex-direction: column; }
 .items-center { align-items: center; }
 .justify-center { justify-content: center; }
 
