@@ -55,12 +55,16 @@ class ForumPostsController < ApplicationController
   def destroy
     @forum_post = authorize ForumPost.find(params[:id])
     @forum_post.delete!
+
+    flash[:notice] = @forum_post.errors.none? ? "Post deleted" : @forum_post.errors.full_messages.join("; ")
     respond_with(@forum_post)
   end
 
   def undelete
     @forum_post = authorize ForumPost.find(params[:id])
     @forum_post.undelete!
+
+    flash[:notice] = @forum_post.errors.none? ? "Post undeleted" : @forum_post.errors.full_messages.join("; ")
     respond_with(@forum_post)
   end
 end

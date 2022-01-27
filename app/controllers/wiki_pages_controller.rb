@@ -30,15 +30,6 @@ class WikiPagesController < ApplicationController
   end
 
   def show
-    if params[:format].present?
-      request.format = params[:format]
-    elsif params[:id].ends_with?(".html", ".json", ".xml")
-      request.format = params[:id].split(".").last
-      params[:id].delete_suffix!(".#{request.format.symbol}")
-    else
-      request.format = "html"
-    end
-
     @wiki_page, found_by = WikiPage.find_by_id_or_title(params[:id])
 
     if request.format.html? && @wiki_page.blank? && found_by == :title

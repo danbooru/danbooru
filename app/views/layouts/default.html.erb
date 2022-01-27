@@ -5,7 +5,8 @@
   <meta charset="utf-8">
   <title><%= page_title %></title>
 
-  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/favicon.ico" sizes="16x16" type="image/x-icon">
+  <link rel="icon" href="/favicon.svg" sizes="any" type="image/svg+xml">
   <%= render_meta_links @current_item if @current_item.respond_to?(:paginate) %>
   <%= tag.link rel: "canonical", href: canonical_url %>
   <%= tag.link rel: "search", type: "application/opensearchdescription+xml", href: opensearch_url(format: :xml, version: 2), title: "Search posts" %>
@@ -22,9 +23,9 @@
 
   <%# XXX hack to only load Ruffle on Flash posts %>
   <% if controller_name == "posts" && action_name == "show" && @post&.is_flash? %>
-    <%= javascript_pack_tag "application", "flash" %>
+    <%= javascript_pack_tag "application", "flash", defer: false %>
   <% else %>
-    <%= javascript_pack_tag "application" %>
+    <%= javascript_pack_tag "application", defer: false %>
   <% end %>
 
   <%= stylesheet_pack_tag "application" %>

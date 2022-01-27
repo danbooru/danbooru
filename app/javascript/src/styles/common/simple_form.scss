@@ -83,6 +83,11 @@ form.simple_form {
       line-height: 1.5em;
     }
 
+    // Hide "*" in label next to required fields.
+    &.required abbr[title="required"] {
+      display: none;
+    }
+
     &.radio_buttons {
       span.radio label {
         font-weight: normal;

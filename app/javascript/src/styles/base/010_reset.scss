@@ -1,8 +1,16 @@
+html {
+  // Disable font boosting on mobile. By default, when desktop mode is enabled
+  // on mobile, mobile browsers will automagically increase the size of text.
+  // Usually they do so poorly, making things like headers smaller than body
+  // text, which breaks the layout.
+  text-size-adjust: none;
+}
+
 *, ::before, ::after {
   box-sizing: border-box;
 }
 
-body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, blockquote, dl, dd, menu {
+body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, blockquote, dl, dd, menu, input {
   margin: 0;
 }
 

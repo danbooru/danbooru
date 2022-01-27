@@ -306,11 +306,13 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      should "destroy the topic and any associated posts" do
+      should "mark the topic and all posts as deleted" do
         delete_auth forum_topic_path(@forum_topic), @mod
-        assert_redirected_to(forum_topic_path(@forum_topic))
-        @forum_topic.reload
-        assert(@forum_topic.is_deleted?)
+
+        assert_redirected_to(@forum_topic)
+        assert_equal(true, @forum_topic.reload.is_deleted?)
+        assert_equal(true, @forum_topic.original_post.is_deleted?)
+        assert_equal(true, @forum_topic.forum_posts.all?(&:is_deleted?))
       end
     end
 
@@ -321,11 +323,13 @@ class ForumTopicsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
-      should "restore the topic" do
+      should "mark the topic and all posts as undeleted" do
         post_auth undelete_forum_topic_path(@forum_topic), @mod
-        assert_redirected_to(forum_topic_path(@forum_topic))
-        @forum_topic.reload
-        assert(!@forum_topic.is_deleted?)
+
+        assert_redirected_to(@forum_topic)
+        assert_equal(false, @forum_topic.reload.is_deleted?)
+        assert_equal(false, @forum_topic.original_post.is_deleted?)
+        assert_equal(false, @forum_topic.forum_posts.all?(&:is_deleted?))
       end
     end
   end

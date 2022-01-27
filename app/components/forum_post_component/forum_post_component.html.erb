@@ -43,18 +43,20 @@
               <% end %>
             <% end %>
           <% end %>
+        <% end %>
 
-        <% if policy(forum_post).destroy? && !forum_post.is_original_post?(original_forum_post_id) %>
-            <% menu.item do %>
-              <% if forum_post.is_deleted? %>
-                <%= link_to undelete_forum_post_path(forum_post.id), method: :post, remote: true do %>
-                  <%= undelete_icon %> Undelete
-                <% end %>
-              <% else %>
-                <%= link_to forum_post_path(forum_post.id), "data-confirm": "Are you sure you want to delete this forum post?", method: :delete, remote: true do %>
-                  <%= delete_icon %> Delete
-                <% end %>
-              <% end %>
+        <% if forum_post.is_deleted? && policy(forum_post).undelete? && !forum_post.is_original_post?(original_forum_post_id) %>
+          <% menu.item do %>
+            <%= link_to undelete_forum_post_path(forum_post.id), method: :post, remote: true do %>
+              <%= undelete_icon %> Undelete
+            <% end %>
+          <% end %>
+        <% end %>
+
+        <% if !forum_post.is_deleted? && policy(forum_post).destroy? && !forum_post.is_original_post?(original_forum_post_id) %>
+          <% menu.item do %>
+            <%= link_to forum_post_path(forum_post.id), "data-confirm": "Are you sure you want to delete this forum post?", method: :delete, remote: true do %>
+              <%= delete_icon %> Delete
             <% end %>
           <% end %>
         <% end %>
