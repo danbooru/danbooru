@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class UploadService
+module UploadService
   class Replacer
     class Error < StandardError; end
 

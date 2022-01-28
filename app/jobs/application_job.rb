@@ -31,11 +31,10 @@ class ApplicationJob < ActiveJob::Base
       DmailInactiveApproversJob, IqdbAddPostJob, IqdbRemovePostJob,
       PopulateSavedSearchJob, PruneApproversJob, PruneBansJob,
       PruneBulkUpdateRequestsJob, PrunePostDisapprovalsJob, PrunePostsJob,
-      PruneRateLimitsJob, PruneUploadsJob, RegeneratePostCountsJob,
-      RegeneratePostJob, RetireTagRelationshipsJob,
-      UploadPreprocessorDelayedStartJob, UploadServiceDelayedStartJob,
-      VacuumDatabaseJob, DiscordNotificationJob, BigqueryExportJob,
-      ProcessBulkUpdateRequestJob, PruneJobsJob, ActionMailer::MailDeliveryJob
+      PruneRateLimitsJob, ProcessUploadJob, RegeneratePostCountsJob,
+      RegeneratePostJob, RetireTagRelationshipsJob, VacuumDatabaseJob,
+      DiscordNotificationJob, BigqueryExportJob, ProcessBulkUpdateRequestJob,
+      PruneJobsJob, ActionMailer::MailDeliveryJob
     ]
   end
 end
