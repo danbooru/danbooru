@@ -88,12 +88,6 @@ class Upload < ApplicationRecord
     self.server = Socket.gethostname
   end
 
-  def self.prune!
-    completed.where("created_at < ?", 1.hour.ago).lock.destroy_all
-    preprocessed.where("created_at < ?", 1.day.ago).lock.destroy_all
-    where("created_at < ?", 3.days.ago).lock.destroy_all
-  end
-
   def self.visible(user)
     if user.is_admin?
       all

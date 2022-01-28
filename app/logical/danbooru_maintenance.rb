@@ -4,7 +4,6 @@ module DanbooruMaintenance
   module_function
 
   def hourly
-    queue PruneUploadsJob
     queue PrunePostsJob
     queue PruneRateLimitsJob
     queue RegeneratePostCountsJob
