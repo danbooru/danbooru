@@ -1,5 +1,5 @@
 <% if !CurrentUser.favorite_groups.present? %>
-  <p>Add this post to a new a favorite group (<%= link_to_wiki "help:favorite_groups" %>):</p>
+  <p>Add this post to a new favorite group (<%= link_to_wiki "help:favorite_groups" %>):</p>
 
   <%= edit_form_for(FavoriteGroup.new, html: { class: "one-line-form" }) do |f| %>
     <%= f.input :name, as: :string, required: true, input_html: { style: "width: 20em" } %>
