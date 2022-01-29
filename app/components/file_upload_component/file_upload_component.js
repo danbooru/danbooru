@@ -81,6 +81,8 @@ export default class FileUploadComponent {
     if (/^https?:\/\//.test(url)) {
       this.$component.find("input[type='submit']:not([disabled])").click();
     }
+
+    e.preventDefault();
   }
 
   // Called after the upload is submitted via AJAX. Polls the upload until it
