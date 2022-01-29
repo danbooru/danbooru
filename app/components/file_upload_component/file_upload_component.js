@@ -110,7 +110,13 @@ export default class FileUploadComponent {
   async onError(e) {
     let errors = e.originalEvent.detail[0].errors;
     let message = Object.keys(errors).map(attribute => {
-      return errors[attribute].map(error => `${capitalize(attribute)} ${error}`);
+      return errors[attribute].map(error => {
+        if (attribute === "base") {
+          return `${error}`;
+        } else {
+          return `${capitalize(attribute)} ${error}`;
+        }
+      });
     }).join("; ");
 
     Utility.error(message);

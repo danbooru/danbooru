@@ -3,7 +3,7 @@ require 'test_helper'
 class UploadsControllerTest < ActionDispatch::IntegrationTest
   context "The uploads controller" do
     setup do
-      @user = create(:contributor_user, name: "marisa")
+      @user = create(:user)
     end
 
     context "image proxy action" do
@@ -48,218 +48,171 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_response :success
       end
 
-      context "with a url" do
-        should "preprocess" do
-          assert_difference(-> { Upload.count }) do
-            get_auth new_upload_path, @user, params: {:url => "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"}
-            perform_enqueued_jobs
-            assert_response :success
-          end
-        end
-      end
-
-      context "for a direct link twitter post" do
-        setup do
-          skip "Twitter credentials not configured" unless Sources::Strategies::Twitter.enabled?
-
-          @ref = "https://twitter.com/onsen_musume_jp/status/865534101918330881"
-          @source = "https://pbs.twimg.com/media/DAL-ntWV0AEbhes.jpg:orig"
-        end
-
-        should "trigger the preprocessor" do
-          assert_difference(-> { Upload.preprocessed.count }, 1) do
-            get_auth new_upload_path, @user, params: {:url => @source, :ref => @ref}
-            perform_enqueued_jobs
-          end
-        end
-      end
-
-      context "for a twitter post" do
-        setup do
-          @source = "https://twitter.com/onsen_musume_jp/status/865534101918330881"
-        end
-
-        should "render" do
-          skip "Twitter keys are not set" unless Danbooru.config.twitter_api_key
-          get_auth new_upload_path, @user, params: {:url => @source}
-          assert_response :success
-        end
-
-        should "set the correct source" do
-          skip "Twitter keys are not set" unless Danbooru.config.twitter_api_key
-          get_auth new_upload_path, @user, params: {:url => @source}
-          assert_response :success
-          perform_enqueued_jobs
-          upload = Upload.last
-          assert_equal(@source, upload.source)
-        end
-      end
-
-      context "for a pixiv post" do
-        setup do
-          skip "Pixiv credentials not configured" unless Sources::Strategies::Pixiv.enabled?
-          @ref = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=49270482"
-          @source = "https://i.pximg.net/img-original/img/2015/03/14/17/53/32/49270482_p0.jpg"
-        end
-
-        should "trigger the preprocessor" do
-          assert_difference(-> { Upload.preprocessed.count }, 1) do
-            get_auth new_upload_path, @user, params: {:url => @source, :ref => @ref}
-            perform_enqueued_jobs
-          end
-        end
-      end
-
-      context "for a post that has already been uploaded" do
-        setup do
-          @post = as(@user) { create(:post, source: "http://google.com/aaa") }
-        end
-
-        should "initialize the post" do
-          assert_difference(-> { Upload.count }, 0) do
-            get_auth new_upload_path, @user, params: {:url => "http://google.com/aaa"}
-            assert_response :success
-          end
-        end
+      should "render with an url" do
+        get_auth new_upload_path(url: "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"), @user
+        assert_response :success
       end
     end
 
     context "index action" do
-      setup do
-        as(@user) do
-          @upload = create(:upload, tag_string: "foo bar", source: "http://example.com/foobar")
-          @post_upload = create(:source_upload, status: "completed", post: build(:post, tag_string: "touhou"), rating: "e")
-        end
-        as(create(:user)) do
-          @upload3 = create(:upload)
-        end
-      end
-
-      should "render" do
+      should "render as an anonymous user" do
+        create(:completed_source_upload, uploader: @user)
         get uploads_path
+
         assert_response :success
       end
 
-      context "as an uploader" do
-        setup do
-          CurrentUser.user = @user
-        end
+      should "render as an uploader" do
+        create(:completed_source_upload, uploader: @user)
+        get_auth uploads_path, @user
 
-        should respond_to_search({}).with { [@post_upload, @upload] }
-        should respond_to_search(source: "http://example.com/foobar").with { @upload }
-        should respond_to_search(rating: "e").with { @post_upload }
-        should respond_to_search(tag_string: "*foo*").with { @upload }
-
-        context "using includes" do
-          should respond_to_search(post_tags_match: "touhou").with { @post_upload }
-          should respond_to_search(uploader: {name: "marisa"}).with { [@post_upload, @upload] }
-        end
+        assert_response :success
       end
 
-      context "as an admin" do
+      should "render as an admin" do
+        create(:completed_source_upload, uploader: @user)
+        get_auth uploads_path, create(:admin_user)
+
+        assert_response :success
+      end
+
+      context "for a search" do
         setup do
-          CurrentUser.user = create(:admin_user)
+          CurrentUser.user = @user
+          @upload = create(:completed_source_upload, uploader: @user, source: "http://example.com/foobar")
         end
 
-        should respond_to_search({}).with { [@upload3, @post_upload, @upload] }
+        should respond_to_search({}).with { [@upload] }
+        should respond_to_search(source: "http://example.com/foobar").with { @upload }
+        should respond_to_search(status: "completed").with { @upload }
       end
     end
 
     context "show action" do
-      setup do
-        @upload = as(@user) { create(:jpg_upload) }
+      should "not show uploads to other users" do
+        upload = create(:completed_source_upload, uploader: @user)
+        get_auth upload_path(upload), create(:user)
+
+        assert_response 403
       end
 
-      should "render" do
-        get_auth upload_path(@upload), @user
+      should "render a completed source upload for the uploader" do
+        upload = create(:completed_source_upload, uploader: @user)
+        get_auth upload_path(upload), @user
+
+        assert_response :success
+      end
+
+      should "render a completed file upload for the uploader" do
+        upload = create(:completed_file_upload, uploader: @user)
+        get_auth upload_path(upload), @user
+
+        assert_response :success
+      end
+
+      should "render a failed upload" do
+        upload = create(:upload, uploader: @user, status: "error: Not an image or video")
+        get_auth upload_path(upload), @user
+
+        assert_response :success
+      end
+
+      should "render a pending upload" do
+        upload = create(:upload, uploader: @user, status: "pending", source: "https://www.google.com")
+        get_auth upload_path(upload), @user
+
+        assert_response :success
+      end
+
+      should "render a processing upload" do
+        upload = create(:upload, uploader: @user, status: "processing")
+        get_auth upload_path(upload), @user
+
         assert_response :success
       end
     end
 
     context "create action" do
-      context "when a preprocessed upload already exists" do
-        context "for twitter" do
-          setup do
-            as(@user) do
-              @ref = "https://twitter.com/onsen_musume_jp/status/865534101918330881"
-              @source = "https://pbs.twimg.com/media/DAL-ntWV0AEbhes.jpg:orig"
-              @upload = create(:upload, status: "preprocessed", source: @source, referer_url: @ref, image_width: 0, image_height: 0, file_size: 0, md5: "something", file_ext: "jpg")
-            end
-          end
+      should "fail if not given a file or a source" do
+        assert_no_difference("Upload.count") do
+          post_auth uploads_path(format: :json), @user
 
-          should "update the predecessor" do
-            assert_difference(-> { Post.count }, 1) do
-              assert_difference(-> { Upload.count }, 0) do
-                post_auth uploads_path, @user, params: {:upload => {:tag_string => "aaa", :rating => "q", :source => @source, :referer_url => @ref}}
-              end
-            end
-            post = Post.last
-            assert_match(/aaa/, post.tag_string)
-          end
-        end
-
-        context "for pixiv" do
-          setup do
-            @ref = "http://www.pixiv.net/member_illust.php?mode=medium&illust_id=49270482"
-            @source = "https://i.pximg.net/img-original/img/2015/03/14/17/53/32/49270482_p0.jpg"
-            @upload = as(@user) { create(:upload, status: "preprocessed", source: @source, referer_url: @ref, image_width: 0, image_height: 0, file_size: 0, md5: "something", file_ext: "jpg") }
-          end
-
-          should "update the predecessor" do
-            assert_difference(-> { Post.count }, 1) do
-              assert_difference(-> { Upload.count }, 0) do
-                post_auth uploads_path, @user, params: {:upload => {:tag_string => "aaa", :rating => "q", :source => @source, :referer_url => @ref}}
-              end
-            end
-            post = Post.last
-            assert_match(/aaa/, post.tag_string)
-          end
+          assert_response 422
+          assert_equal(["No file or source given"], response.parsed_body.dig("errors", "base"))
         end
       end
 
-      context "when the uploader is limited" do
-        should "not allow uploading" do
-          @member = create(:user, created_at: 2.weeks.ago, upload_points: 0)
-          create_list(:post, @member.upload_limit.upload_slots, uploader: @member, is_pending: true)
+      should "fail if given both a file and source" do
+        assert_no_difference("Upload.count") do
+          file = File.open("test/files/test.jpg")
+          source = "https://files.catbox.moe/om3tcw.webm"
+          post_auth uploads_path(format: :json), @user, params: { upload: { file: file, source: source }}
+        end
 
-          assert_no_difference("Post.count") do
-            file = Rack::Test::UploadedFile.new("#{Rails.root}/test/files/test.jpg", "image/jpeg")
-            post_auth uploads_path, @member, params: { upload: { file: file, tag_string: "aaa", rating: "q" }}
-          end
+        assert_response 422
+        assert_equal(["Can't give both a file and a source"], response.parsed_body.dig("errors", "base"))
+      end
 
-          @upload = Upload.last
-          assert_redirected_to @upload
-          assert_match(/have reached your upload limit/, @upload.status)
+      should "fail if given an unsupported filetype" do
+        file = Rack::Test::UploadedFile.new("test/files/ugoira.json")
+        post_auth uploads_path(format: :json), @user, params: { upload: { file: file }}
+
+        assert_response 201
+        assert_match("Not an image or video", Upload.last.status)
+      end
+
+      should "fail if the file size is too large" do
+        skip "flaky test"
+        Danbooru.config.stubs(:max_file_size).returns(1.kilobyte)
+
+        file = Rack::Test::UploadedFile.new("test/files/test.jpg")
+        post_auth uploads_path(format: :json), @user, params: { upload: { file: file }}
+        perform_enqueued_jobs
+
+        assert_response 201
+        assert_match("File size must be less than or equal to", Upload.last.status)
+
+        Danbooru.config.unstub(:max_file_size)
+      end
+
+      context "for a corrupted image" do
+        should "fail for a corrupted jpeg" do
+          create_upload!("test/files/test-corrupt.jpg", user: @user)
+          assert_match("corrupt", Upload.last.status)
+        end
+
+        should "fail for a corrupted gif" do
+          create_upload!("test/files/test-corrupt.gif", user: @user)
+          assert_match("corrupt", Upload.last.status)
+        end
+
+        # https://schaik.com/pngsuite/pngsuite_xxx_png.html
+        should "fail for a corrupted png" do
+          create_upload!("test/files/test-corrupt.png", user: @user)
+          assert_match("corrupt", Upload.last.status)
         end
       end
 
-      context "for a 2+ minute long video" do
-        should "allow the upload if the user is an admin" do
-          skip "Twitter keys are not set" unless Danbooru.config.twitter_api_key
+      context "for a video longer than the video length limit" do
+        should "fail for a regular user" do
+          @source = "https://cdn.donmai.us/original/63/cb/63cb09f2526ef3ac14f11c011516ad9b.webm"
+          post_auth uploads_path(format: :json), @user, params: { upload: { source: @source }}
+          perform_enqueued_jobs
 
-          @source = "https://twitter.com/7u_NABY/status/1269599527700295681"
-          post_auth uploads_path, create(:admin_user, created_at: 1.week.ago), params: { upload: { tag_string: "aaa", rating: "q", source: @source }}
-          assert_redirected_to Upload.last
+          assert_response 201
+          assert_match("Duration must be less than", Upload.last.status)
+        end
+      end
 
-          assert_equal("mp4", Upload.last.file_ext)
+      # XXX fixme
+      context "for a video longer than the video length limit" do
+        should_eventually "work for an admin" do
+          @source = "https://cdn.donmai.us/original/63/cb/63cb09f2526ef3ac14f11c011516ad9b.webm"
+          post_auth uploads_path(format: :json), create(:admin_user), params: { upload: { source: @source }}
+          perform_enqueued_jobs
+
+          assert_response 201
           assert_equal("completed", Upload.last.status)
-          assert_equal(1280, Upload.last.image_width)
-          assert_equal(720, Upload.last.image_height)
-          assert_equal("mp4", Upload.last.post.file_ext)
-        end
-      end
-
-      context "when the upload is tagged banned_artist" do
-        should "autoban the post" do
-          upload = assert_successful_upload("test/files/test.jpg", tag_string: "banned_artist")
-          assert_equal(true, upload.post.is_banned?)
-        end
-      end
-
-      context "when the upload is tagged paid_reward" do
-        should "autoban the post" do
-          upload = assert_successful_upload("test/files/test.jpg", tag_string: "paid_reward")
-          assert_equal(true, upload.post.is_banned?)
         end
       end
 
@@ -268,13 +221,21 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           asset = create(:media_asset, file: File.open("test/files/test.jpg"), status: "processing")
           file = Rack::Test::UploadedFile.new("test/files/test.jpg")
 
-          post_auth uploads_path, @user, params: { upload: { file: file, tag_string: "abc", rating: "e", }}
+          post_auth uploads_path, @user, params: { upload: { file: file }}
           upload = Upload.last
 
           assert_redirected_to upload
-          assert_match("MediaAsset::Error", upload.reload.status)
+          assert_match("Upload failed, try again", upload.reload.status)
           assert_equal("failed", asset.reload.status)
         end
+      end
+
+      should "work for a source URL containing unicode characters" do
+        source1 = "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg?one=東方&two=a%20b"
+        source2 = "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg?one=%E6%9D%B1%E6%96%B9&two=a%20b"
+
+        upload = assert_successful_upload(source1, user: @user)
+        assert_equal(source2, upload.source)
       end
 
       context "uploading a file from your computer" do
@@ -325,6 +286,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("https://img.pawoo.net/media_attachments/files/000/128/953/original/4c0a06087b03343f.png") if Danbooru.config.pawoo_client_id.present? # XXX
 
         should_upload_successfully("https://www.pixiv.net/en/artworks/64476642")
+        should_upload_successfully("https://www.pixiv.net/member_illust.php?mode=medium&illust_id=62247364")
         should_upload_successfully("https://i.pximg.net/img-original/img/2017/08/18/00/09/21/64476642_p0.jpg")
 
         should_upload_successfully("https://noizave.tumblr.com/post/162206271767")

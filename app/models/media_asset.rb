@@ -35,6 +35,7 @@ class MediaAsset < ApplicationRecord
 
   validates :md5, uniqueness: { conditions: -> { where(status: [:processing, :active]) } }
   validates :file_ext, inclusion: { in: %w[jpg png gif mp4 webm swf zip], message: "Not an image or video" }
+  validates :file_size, numericality: { less_than_or_equal_to: Danbooru.config.max_file_size }
   validates :duration, numericality: { less_than_or_equal_to: MAX_VIDEO_DURATION, message: "must be less than #{MAX_VIDEO_DURATION} seconds", allow_nil: true }, on: :create # XXX should allow admins to bypass
   validate :validate_resolution, on: :create
 
@@ -228,7 +229,7 @@ class MediaAsset < ApplicationRecord
         # failed state, then mark the asset as failed so the user can try the upload again later.
         if !media_asset.active?
           media_asset.update!(status: :failed)
-          raise Error, "Upload failed, try again (upload was stuck in 'processing' state)"
+          raise Error, "Upload failed, try again (timed out while waiting for file to be processed)"
         end
 
         media_asset

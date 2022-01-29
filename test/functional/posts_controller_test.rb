@@ -5,6 +5,14 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     assert_equal(expected, response.parsed_body.css("link[rel=canonical]").attribute("href").value)
   end
 
+  def create_post!(user: create(:user), rating: "q", tag_string: "tagme", **params)
+    upload = build(:upload, uploader: user)
+    asset = create(:upload_media_asset, upload: upload)
+    post_auth posts_path, user, params: { post: { upload_media_asset_id: asset.id, rating: rating, tag_string: tag_string, **params }}
+
+    Post.last
+  end
+
   context "The posts controller" do
     setup do
       @user = travel_to(1.month.ago) {create(:user)}
@@ -635,6 +643,32 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
         assert_equal("#{@post.md5}.#{@post.file_ext}", response.parsed_body.css("#post-option-download a").attr("download").value)
+      end
+    end
+
+    context "create action" do
+      should "autoban the post when it is tagged banned_artist" do
+        @post = create_post!(tag_string: "banned_artist")
+        assert_equal(true, @post.is_banned?)
+      end
+
+      should "autoban the post if it is tagged paid_reward" do
+        @post = create_post!(tag_string: "paid_reward")
+        assert_equal(true, @post.is_banned?)
+      end
+
+      should "not create a post when the uploader is upload-limited" do
+        @user = create(:user, upload_points: 0)
+
+        @user.upload_limit.upload_slots.times do
+          assert_difference("Post.count", 1) do
+            create_post!(user: @user)
+          end
+        end
+
+        assert_no_difference("Post.count") do
+          create_post!(user: @user)
+        end
       end
     end
 

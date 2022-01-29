@@ -11,8 +11,11 @@ class Upload < ApplicationRecord
   has_many :upload_media_assets, dependent: :destroy
   has_many :media_assets, through: :upload_media_assets
 
+  normalize :source, :normalize_source
+
   validates :source, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, if: -> { source.present? }
   validates :referer_url, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, if: -> { referer_url.present? }
+  validate :validate_file_and_source, on: :create
 
   after_create :async_process_upload!
 
@@ -46,6 +49,31 @@ class Upload < ApplicationRecord
     end
   end
 
+  concerning :ValidationMethods do
+    def validate_file_and_source
+      if file.present? && source.present?
+        errors.add(:base, "Can't give both a file and a source")
+      elsif file.blank? && source.blank?
+        errors.add(:base, "No file or source given")
+      end
+    end
+  end
+
+  concerning :SourceMethods do
+    class_methods do
+      # percent-encode unicode characters in the URL
+      def normalize_source(url)
+        return nil if url.nil?
+        Addressable::URI.normalized_encode(url)
+      end
+    end
+
+    def source_strategy
+      return nil if source.blank?
+      Sources::Strategies.find(source, referer_url)
+    end
+  end
+
   def self.search(params)
     q = search_attributes(params, :id, :created_at, :updated_at, :source, :referer_url, :uploader, :status, :backtrace, :upload_media_assets, :media_assets)
     q.apply_default_order(params)
@@ -54,8 +82,10 @@ class Upload < ApplicationRecord
   def async_process_upload!
     if file.present?
       ProcessUploadJob.perform_now(self)
-    else
+    elsif source.present?
       ProcessUploadJob.perform_later(self)
+    else
+      raise "No file or source given" # Should never happen
     end
   end
 
@@ -68,19 +98,13 @@ class Upload < ApplicationRecord
       strategy = Sources::Strategies.find(source, referer_url)
       media_file = strategy.download_file!(strategy.image_url)
     else
-      raise "No file or source provided"
+      raise "No file or source given" # Should never happen
     end
 
     media_asset = MediaAsset.upload!(media_file)
     update!(media_assets: [media_asset], status: "completed")
   rescue Exception => e
     update!(status: "error: #{e.message}", backtrace: e.backtrace.join("\n"))
-    raise
-  end
-
-  def source_strategy
-    return nil if source.blank?
-    Sources::Strategies.find(source, referer_url)
   end
 
   def self.available_includes
