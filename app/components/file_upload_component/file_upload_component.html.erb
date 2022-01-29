@@ -2,8 +2,8 @@
   <%= simple_form_for(Upload.new, url: uploads_path(format: :json), html: { class: "flex flex-col", autocomplete: "off" }, remote: true) do |f| %>
     <%= f.input :file, as: :file, wrapper_html: { class: "hidden" } %>
 
-    <div class="dropzone-container input flex flex-col text-center items-center justify-center rounded-t-lg cursor-pointer">
-      <div class="dropzone-hint py-8">
+    <div class="dropzone-container input flex flex-col text-center items-center justify-center rounded-t-lg cursor-pointer p-4">
+      <div class="dropzone-hint py-4">
         <div>Choose file or drag image here</div>
         <div class="hint">Max size: <%= number_to_human_size(Danbooru.config.max_file_size) %>.</div>
       </div>
@@ -19,11 +19,11 @@
   <% end %>
 
   <template class="dropzone-preview-template">
-    <div class="dz-preview dz-file-preview flex flex-col text-center space-y-4 pt-8">
+    <div class="dz-preview dz-file-preview flex flex-col text-center space-y-4">
       <img class="object-contain px-8 max-h-360px max-w-full" data-dz-thumbnail>
 
       <div class="dz-details">
-        <div class="dz-filename">
+        <div class="dz-filename break-all">
           <span data-dz-name></span>
         </div>
         <div class="dz-size" data-dz-size></div>
