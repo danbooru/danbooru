@@ -16,12 +16,4 @@
   </div>
 <% end %>
 
-<% if Danbooru.config.iqdb_url %>
-  <% if params[:url] %>
-    <div class="input" id="iqdb-similar">
-      <p><em>Loading similar...</em></p>
-    </div>
-  <% else %>
-    <div class="input" id="iqdb-similar" style="display: none;"></div>
-  <% end %>
-<% end %>
+<div class="input" id="iqdb-similar" style="display: none;"></div>

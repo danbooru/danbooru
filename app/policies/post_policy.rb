@@ -71,9 +71,9 @@ class PostPolicy < ApplicationPolicy
   end
 
   def permitted_attributes_for_create
-    %i[upload_media_asset_id tag_string rating parent_id source is_pending
-    artist_commentary_desc artist_commentary_title translated_commentary_desc
-    translated_commentary_title]
+    %i[upload_id media_asset_id upload_media_asset_id tag_string rating
+    parent_id source is_pending artist_commentary_desc artist_commentary_title
+    translated_commentary_desc translated_commentary_title]
   end
 
   def permitted_attributes_for_update

@@ -18,7 +18,7 @@ class IqdbClient
 
   concerning :QueryMethods do
     # Search for an image by file, URL, hash, or post ID.
-    def search(post_id: nil, file: nil, hash: nil, url: nil, image_url: nil, file_url: nil, similarity: 0.0, high_similarity: 65.0, limit: 20)
+    def search(post_id: nil, media_asset_id: nil, file: nil, hash: nil, url: nil, image_url: nil, file_url: nil, similarity: 0.0, high_similarity: 65.0, limit: 20)
       limit = limit.to_i.clamp(1, 1000)
       similarity = similarity.to_f.clamp(0.0, 100.0)
       high_similarity = high_similarity.to_f.clamp(0.0, 100.0)
@@ -33,6 +33,8 @@ class IqdbClient
         file = download(file_url, :image_url)
       elsif post_id.present?
         file = Post.find(post_id).file(:preview)
+      elsif media_asset_id.present?
+        file = MediaAsset.find(media_asset_id).variant("360x360").open_file
       end
 
       if hash.present?

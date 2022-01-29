@@ -45,13 +45,15 @@
         <%= tag.img src: @media_asset.variant("original").file_url, title: "Preview", id: "image", class: "fit-width fit-height", "data-shortcut": "z"  %>
       </div>
 
-      <% if @upload.source.present? %>
-        <% @source = ::Sources::Strategies.find(@upload.source, @upload.referer_url) %>
-        <%= render "uploads/related_posts", source: @source %>
-        <%= render_source_data(@source) %>
+      <%= render "uploads/related_posts", source: @upload.source_strategy %>
+
+      <% if @upload.source_strategy.present? %>
+        <%= render_source_data(@upload.source_strategy) %>
       <% end %>
 
       <%= edit_form_for(@post, html: { id: "form" }) do |f| %>
+        <%= f.input :upload_id, as: :hidden, input_html: { value: @upload.id } %>
+        <%= f.input :media_asset_id, as: :hidden, input_html: { value: @media_asset.id } %>
         <%= f.input :upload_media_asset_id, as: :hidden, input_html: { value: @upload_media_asset.id } %>
 
         <%= f.input :source, as: :string %>

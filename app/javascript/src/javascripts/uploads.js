@@ -26,18 +26,16 @@ Upload.initialize_all = function() {
 }
 
 Upload.initialize_similar = function() {
-  let source = $("#post_source").val();
+  let media_asset_id = $("input[name='post[media_asset_id]']").val();
 
-  if (/^https?:\/\//.test(source)) {
-    $.get("/iqdb_queries.js", {
-      limit: Upload.IQDB_LIMIT,
-      search: {
-        url: source,
-        similarity: Upload.IQDB_MIN_SIMILARITY,
-        high_similarity: Upload.IQDB_HIGH_SIMILARITY
-      }
-    });
-  }
+  $.get("/iqdb_queries.js", {
+    limit: Upload.IQDB_LIMIT,
+    search: {
+      media_asset_id: media_asset_id,
+      similarity: Upload.IQDB_MIN_SIMILARITY,
+      high_similarity: Upload.IQDB_HIGH_SIMILARITY
+    }
+  });
 }
 
 Upload.initialize_image = function() {

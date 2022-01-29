@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Upload < ApplicationRecord
+  extend Memoist
+
   MAX_VIDEO_DURATION = 140
 
   attr_accessor :file
@@ -76,7 +78,14 @@ class Upload < ApplicationRecord
     raise
   end
 
+  def source_strategy
+    return nil if source.blank?
+    Sources::Strategies.find(source, referer_url)
+  end
+
   def self.available_includes
     [:uploader, :upload_media_assets, :media_assets]
   end
+
+  memoize :source_strategy
 end
