@@ -164,6 +164,7 @@ html {
 
   --modqueue-tag-warning-color: var(--red-1);
 
+  --file-upload-component-background-color: var(--body-background-color);
   --uploads-dropzone-background: var(--grey-1);
   --uploads-dropzone-progress-bar-foreground-color: var(--link-color);
   --uploads-dropzone-progress-bar-background-color: var(--link-hover-color);
@@ -368,7 +369,8 @@ body[data-current-user-theme="dark"] {
 
   --modqueue-tag-warning-color: var(--red-7);
 
-  --uploads-dropzone-background: var(--grey-8);
+  --file-upload-component-background-color: var(--grey-8);
+  --uploads-dropzone-background: var(--grey-7);
   --uploads-dropzone-progress-bar-foreground-color: var(--link-color);
   --uploads-dropzone-progress-bar-background-color: var(--link-hover-color);
 
