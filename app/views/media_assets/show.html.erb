@@ -2,13 +2,21 @@
   <div id="a-show" class="fixed-width-container">
     <h1 class="mb-4">Media Asset</h1>
 
-    <% if @post.present? %>
-      <%= post_preview(@post, show_deleted: true) %>
-    <% else %>
-      <p>MD5: <%= link_to @media_asset.md5, posts_path(md5: @media_asset.md5) %></p>
-    <% end %>
+    <%= render MediaAssetPreviewComponent.new(media_asset: @media_asset, link_target: @media_asset.variant("original").file_url, save_data: CurrentUser.save_data) %>
 
     <table class="striped aligned-vertical">
+      <% if @post.present? %>
+        <tr>
+          <th>Post</th>
+          <td><%= link_to "##{@post.id}", @post %></td>
+        </tr>
+      <% end %>
+
+      <tr>
+        <th>MD5</th>
+        <td><%= @media_asset.md5 %></td>
+      </tr>
+
       <% @media_asset.metadata.sort.each do |key, value| %>
         <tr>
           <th><%= key %></th>

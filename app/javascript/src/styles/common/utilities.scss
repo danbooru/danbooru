@@ -97,6 +97,7 @@ $spacer: 0.25rem; /* 4px */
 .pr-2 { padding-right: 2 * $spacer; }
 .pr-4 { padding-right: 4 * $spacer; }
 
+.w-auto { width: auto; }
 .w-sm   { width: 24rem; }
 .w-md   { width: 28rem; }
 .w-1\/4 { width: 25%; }
@@ -104,11 +105,17 @@ $spacer: 0.25rem; /* 4px */
 
 .max-w-full { max-width: 100%; }
 
-.h-1  { height: 1  * $spacer; }
-.h-3  { height: 3  * $spacer; }
-.h-10 { height: 10 * $spacer; }
+.h-auto { height: auto; }
+.h-1    { height: 1  * $spacer; }
+.h-3    { height: 3  * $spacer; }
+.h-10   { height: 10 * $spacer; }
 
+.max-h-150px { max-height: 150px; }
+.max-h-180px { max-height: 180px; }
+.max-h-225px { max-height: 225px; }
+.max-h-270px { max-height: 270px; }
 .max-h-360px { max-height: 360px; }
+.max-h-720px { max-height: 720px; }
 
 .space-x-1 > * + * { margin-left: 1 * $spacer; }
 .space-x-2 > * + * { margin-left: 2 * $spacer; }

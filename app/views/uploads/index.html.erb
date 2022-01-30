@@ -8,18 +8,16 @@
       <%= f.submit "Search" %>
     <% end %>
 
-    <%= table_for @uploads, class: "striped autofit", width: "100%" do |t| %>
-      <% t.column "File" do |upload| %>
+    <%= table_for @uploads, class: "striped autofit" do |t| %>
+      <% t.column "File", td: { class: "text-center" } do |upload| %>
         <% upload.media_assets.first.tap do |media_asset| %>
           <% if media_asset.present? %>
-            <%= link_to upload, class: "inline-block" do %>
-              <%= tag.img src: media_asset.variant("180x180").file_url %>
-            <% end %>
+            <%= render MediaAssetPreviewComponent.new(media_asset: media_asset, link_target: upload, save_data: CurrentUser.save_data, shrink_to_fit: false) %>
           <% end %>
         <% end %>
       <% end %>
 
-      <% t.column "Info", td: {class: "col-expand upload-info"} do |upload| %>
+      <% t.column "Info", td: {class: "upload-info"} do |upload| %>
         <div>
           <strong>Upload</strong>
           <span><%= link_to "##{upload.id}", upload %></span>

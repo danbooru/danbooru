@@ -17,9 +17,10 @@
     <% end %>
 
     <%= table_for @media_assets, class: "striped autofit" do |t| %>
-      <% t.column "MD5", td: { class: "font-monospace" } do |media_asset| %>
-        <%= link_to media_asset.md5, posts_path(md5: media_asset.md5) %>
+      <% t.column "File", td: { class: "text-center" } do |media_asset| %>
+        <%= render MediaAssetPreviewComponent.new(media_asset: media_asset, save_data: CurrentUser.save_data, shrink_to_fit: false) %>
       <% end %>
+
       <% t.column :image_width %>
       <% t.column :image_height %>
       <% t.column :file_size %>
