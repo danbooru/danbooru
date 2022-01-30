@@ -130,6 +130,14 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
       end
+
+      should "redirect a completed upload to the original post if it's a duplicate of an existing post" do
+        @upload = create(:completed_file_upload, uploader: @user)
+        @post = create(:post, md5: @upload.media_assets.first.md5, media_asset: @upload.media_assets.first)
+        get_auth upload_path(@upload), @user
+
+        assert_redirected_to @post
+      end
     end
 
     context "create action" do

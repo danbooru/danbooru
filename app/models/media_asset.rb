@@ -12,6 +12,7 @@ class MediaAsset < ApplicationRecord
   LARGE_IMAGE_WIDTH = Danbooru.config.large_image_width
   STORAGE_SERVICE = Danbooru.config.storage_manager
 
+  has_one :post, foreign_key: :md5, primary_key: :md5
   has_one :media_metadata, dependent: :destroy
   has_one :pixiv_ugoira_frame_data, class_name: "PixivUgoiraFrameData", foreign_key: :md5, primary_key: :md5
 

@@ -38,6 +38,12 @@ class UploadsController < ApplicationController
   def show
     @upload = authorize Upload.find(params[:id])
     @post = Post.new(uploader: @upload.uploader, uploader_ip_addr: @upload.uploader_ip_addr, source: @upload.source, rating: nil, **permitted_attributes(Post))
-    respond_with(@upload)
+
+    if request.format.html? && @upload.is_completed? && @upload.media_assets.first&.post.present?
+      flash[:notice] = "Duplicate of post ##{@upload.media_assets.first.post.id}"
+      redirect_to @upload.media_assets.first.post
+    else
+      respond_with(@upload)
+    end
   end
 end

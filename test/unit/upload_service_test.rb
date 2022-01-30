@@ -311,27 +311,6 @@ class UploadServiceTest < ActiveSupport::TestCase
       CurrentUser.ip_addr = nil
     end
 
-    context "with a preprocessed predecessor" do
-      setup do
-        @predecessor = FactoryBot.create(:source_upload, status: "preprocessed", source: @source, image_height: 0, image_width: 0, file_size: 1, md5: 'd34e4cf0a437a5d65f8e82b7bcd02606', file_ext: "jpg")
-        @tags = 'hello world'
-      end
-
-      context "when the file has already been uploaded" do
-        setup do
-          @asset = MediaAsset.find_by_md5("d34e4cf0a437a5d65f8e82b7bcd02606")
-          @post = create(:post, md5: "d34e4cf0a437a5d65f8e82b7bcd02606", media_asset: @asset)
-          @service = subject.new(source: @source)
-        end
-
-        should "point to the dup post in the upload" do
-          @upload = subject.new(source: @source, tag_string: @tags).start!
-          @predecessor.reload
-          assert_equal("error: ActiveRecord::RecordInvalid - Validation failed: Md5 duplicate: #{@post.id}", @predecessor.status)
-        end
-      end
-    end
-
     context "with a source containing unicode characters" do
       should "normalize unicode characters in the source field" do
         source1 = "poke\u0301mon" # pokémon (nfd form)

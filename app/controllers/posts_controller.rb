@@ -67,12 +67,17 @@ class PostsController < ApplicationController
     @post = authorize Post.new_from_upload(permitted_attributes(Post))
     @post.save
 
-    if @post.errors.any?
+    if @post.errors.none?
+      respond_with(@post)
+    elsif @post.errors.of_kind?(:md5, :taken)
+      @original_post = Post.find_by!(md5: @post.md5)
+      @original_post.update(rating: @post.rating, parent_id: @post.parent_id, tag_string: "#{@original_post.tag_string} #{@post.tag_string}")
+      flash[:notice] = "Duplicate of post ##{@original_post.id}; merging tags"
+      redirect_to @original_post
+    else
       @upload = UploadMediaAsset.find(params[:post][:upload_media_asset_id]).upload
       flash[:notice] = @post.errors.full_messages.join("; ")
       respond_with(@post, render: { template: "uploads/show" })
-    else
-      respond_with(@post)
     end
   end
 

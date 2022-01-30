@@ -5,9 +5,9 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     assert_equal(expected, response.parsed_body.css("link[rel=canonical]").attribute("href").value)
   end
 
-  def create_post!(user: create(:user), rating: "q", tag_string: "tagme", **params)
+  def create_post!(user: create(:user), media_asset: build(:media_asset), rating: "q", tag_string: "tagme", **params)
     upload = build(:upload, uploader: user)
-    asset = create(:upload_media_asset, upload: upload)
+    asset = create(:upload_media_asset, upload: upload, media_asset: media_asset)
     post_auth posts_path, user, params: { post: { upload_media_asset_id: asset.id, rating: rating, tag_string: tag_string, **params }}
 
     Post.last
@@ -653,6 +653,21 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_redirected_to @post
         assert_equal("s", @post.rating)
         assert_equal("test", @post.tag_string)
+      end
+
+      should "re-render the upload page if the upload fails" do
+        @post = create_post!(rating: "z", tag_string: "tagme")
+        assert_response :success
+      end
+
+      should "merge the tags and redirect to the original post if the upload is a duplicate of an existing post" do
+        media_asset = create(:media_asset)
+        post1 = create_post!(rating: "s", tag_string: "post1", media_asset: media_asset)
+        post2 = create_post!(rating: "e", tag_string: "post2", media_asset: media_asset)
+
+        assert_redirected_to post1
+        assert_equal("post1 post2", post1.reload.tag_string)
+        assert_equal("e", post1.rating)
       end
 
       should "apply the rating from the tags" do
