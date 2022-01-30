@@ -56,7 +56,7 @@
         <%= f.input :media_asset_id, as: :hidden, input_html: { value: @media_asset.id } %>
         <%= f.input :upload_media_asset_id, as: :hidden, input_html: { value: @upload_media_asset.id } %>
 
-        <%= f.input :source, as: :string %>
+        <%= f.input :source, as: :string, input_html: { value: @upload.source_strategy&.canonical_url } %>
         <%= f.input :rating, collection: [["Explicit", "e"], ["Questionable", "q"], ["Safe", "s"]], as: :radio_buttons, selected: @post.rating %>
         <%= f.input :parent_id, label: "Parent ID", as: :string, input_html: { value: @post.parent_id } %>
 

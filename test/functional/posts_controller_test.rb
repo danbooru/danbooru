@@ -663,6 +663,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_equal("tagme", @post.tag_string)
       end
 
+      should "set the source" do
+        @post = create_post!(source: "https://www.example.com")
+
+        assert_redirected_to @post
+        assert_equal("https://www.example.com", @post.source)
+      end
+
       should "autoban the post when it is tagged banned_artist" do
         @post = create_post!(tag_string: "banned_artist")
         assert_equal(true, @post.is_banned?)

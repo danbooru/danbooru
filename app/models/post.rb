@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+# normalize unicode in non-web sources
+# normalize percent-encode unicode in source urls
 
 class Post < ApplicationRecord
   class RevertError < StandardError; end
@@ -96,7 +98,7 @@ class Post < ApplicationRecord
       file_size: media_asset.file_size,
       image_width: media_asset.image_width,
       image_height: media_asset.image_height,
-      source: Sources::Strategies.find(upload.source, upload.referer_url).canonical_url || upload.source,
+      source: params[:source].to_s,
       tag_string: params[:tag_string],
       rating: params[:rating],
       parent_id: params[:parent_id],
