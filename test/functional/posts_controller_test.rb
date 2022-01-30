@@ -647,6 +647,22 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
     end
 
     context "create action" do
+      should "create a post" do
+        @post = create_post!(rating: "s", tag_string: "test")
+
+        assert_redirected_to @post
+        assert_equal("s", @post.rating)
+        assert_equal("test", @post.tag_string)
+      end
+
+      should "apply the rating from the tags" do
+        @post = create_post!(rating: nil, tag_string: "rating:s")
+
+        assert_redirected_to @post
+        assert_equal("s", @post.rating)
+        assert_equal("tagme", @post.tag_string)
+      end
+
       should "autoban the post when it is tagged banned_artist" do
         @post = create_post!(tag_string: "banned_artist")
         assert_equal(true, @post.is_banned?)
@@ -669,6 +685,53 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
         assert_no_difference("Post.count") do
           create_post!(user: @user)
         end
+      end
+
+      should "mark the post as pending for Member users" do
+        @post = create_post!(user: create(:user), is_pending: false)
+        assert_equal(true, @post.is_pending?)
+      end
+
+      should "mark the post as active for users with unrestricted uploads" do
+        @post = create_post!(user: create(:contributor_user))
+        assert_equal(false, @post.is_pending?)
+      end
+
+      should "mark the post as pending for users with unrestricted uploads who upload for approval" do
+        @post = create_post!(user: create(:contributor_user), is_pending: true)
+        assert_equal(true, @post.is_pending?)
+      end
+
+      should "create a commentary record if the commentary is present" do
+        assert_difference("ArtistCommentary.count", 1) do
+          @post = create_post!(
+            user: @user,
+            artist_commentary_title: "original title",
+            artist_commentary_desc: "original desc",
+            translated_commentary_title: "translated title",
+            translated_commentary_desc: "translated desc",
+          )
+        end
+
+        assert_equal(true, @post.artist_commentary.present?)
+        assert_equal("original title", @post.artist_commentary.original_title)
+        assert_equal("original desc", @post.artist_commentary.original_description)
+        assert_equal("translated title", @post.artist_commentary.translated_title)
+        assert_equal("translated desc", @post.artist_commentary.translated_description)
+      end
+
+      should "not create a commentary record if the commentary is blank" do
+        assert_no_difference("ArtistCommentary.count") do
+          @post = create_post!(
+            user: @user,
+            artist_commentary_title: "",
+            artist_commentary_desc: "",
+            translated_commentary_title: "",
+            translated_commentary_desc: "",
+          )
+        end
+
+        assert_equal(false, @post.artist_commentary.present?)
       end
     end
 

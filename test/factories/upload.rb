@@ -2,14 +2,14 @@ FactoryBot.define do
   factory(:upload) do
     uploader factory: :user
     uploader_ip_addr { "127.0.0.1" }
-    status { "pending" }
     rating { "s" }
     tag_string { "" }
-    source { "https://files.catbox.moe/om3tcw.webm" }
+
+    status { "pending" }
+    source { "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg" }
 
     factory(:completed_source_upload) do
       status { "completed" }
-      source { "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg" }
       upload_media_assets { [build(:upload_media_asset)] }
     end
 
