@@ -1,6 +1,4 @@
 # frozen_string_literal: true
-# normalize unicode in non-web sources
-# normalize percent-encode unicode in source urls
 
 class Post < ApplicationRecord
   class RevertError < StandardError; end
@@ -14,9 +12,9 @@ class Post < ApplicationRecord
 
   deletable
 
+  normalize :source, :normalize_source
   before_validation :merge_old_changes
   before_validation :normalize_tags
-  before_validation :strip_source
   before_validation :parse_pixiv_id
   before_validation :blank_out_nonexistent_parents
   before_validation :remove_parent_loops
@@ -1334,8 +1332,8 @@ class Post < ApplicationRecord
     self
   end
 
-  def strip_source
-    self.source = source.try(:strip)
+  def self.normalize_source(source)
+    source.to_s.strip.unicode_normalize(:nfc)
   end
 
   def mark_as_translated(params)

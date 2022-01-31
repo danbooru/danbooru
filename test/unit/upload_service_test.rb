@@ -294,32 +294,4 @@ class UploadServiceTest < ActiveSupport::TestCase
       end
     end
   end
-
-  context "#start!" do
-    subject { UploadService }
-
-    setup do
-      @source = "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg"
-      CurrentUser.user = travel_to(1.month.ago) do
-        FactoryBot.create(:user)
-      end
-      CurrentUser.ip_addr = "127.0.0.1"
-    end
-
-    teardown do
-      CurrentUser.user = nil
-      CurrentUser.ip_addr = nil
-    end
-
-    context "with a source containing unicode characters" do
-      should "normalize unicode characters in the source field" do
-        source1 = "poke\u0301mon" # pokémon (nfd form)
-        source2 = "pok\u00e9mon"  # pokémon (nfc form)
-        service = subject.new(source: source1, rating: "s", file: upload_file("test/files/test.jpg"))
-
-        assert_nothing_raised { @upload = service.start! }
-        assert_equal(source2, @upload.source)
-      end
-    end
-  end
 end

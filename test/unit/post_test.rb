@@ -1340,6 +1340,15 @@ class PostTest < ActiveSupport::TestCase
       end
 
       context "with a source" do
+        context "that contains unicode characters" do
+          should "normalize the source to NFC form" do
+            source1 = "poke\u0301mon" # pokémon (nfd form)
+            source2 = "pok\u00e9mon"  # pokémon (nfc form)
+            @post.update!(source: source1)
+            assert_equal(source2, @post.source)
+          end
+        end
+
         context "that is not from pixiv" do
           should "clear the pixiv id" do
             @post.pixiv_id = 1234
