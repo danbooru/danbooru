@@ -13,6 +13,8 @@ $spacer: 0.25rem; /* 4px */
 .font-bold { font-weight: bold; }
 
 .cursor-pointer { cursor: pointer; }
+.cursor-zoom-in { cursor: zoom-in; }
+.cursor-zoom-out { cursor: zoom-out; }
 
 .hidden { display: none !important; }
 .inline-block { display: inline-block; }
@@ -36,6 +38,8 @@ $spacer: 0.25rem; /* 4px */
 .break-all { word-break: break-all; }
 .whitespace-nowrap { white-space: nowrap; }
 
+.pointer-events-none { pointer-events: none; }
+.select-none { user-select: none; }
 .leading-none { line-height: 1; }
 
 .absolute { position: absolute; }
@@ -83,6 +87,7 @@ $spacer: 0.25rem; /* 4px */
 .p-0    { padding: 0; }
 .p-px   { padding: 1px; }
 .p-0\.5 { padding: 0.5 * $spacer; }
+.p-1  { padding: 1 * $spacer; }
 .p-4  { padding: 4 * $spacer; }
 
 .px-4 { padding-left: 4 * $spacer; padding-right: 4 * $spacer; }
@@ -116,6 +121,7 @@ $spacer: 0.25rem; /* 4px */
 .max-h-270px { max-height: 270px; }
 .max-h-360px { max-height: 360px; }
 .max-h-720px { max-height: 720px; }
+.max-h-screen { max-height: 100vh; }
 
 .space-x-1 > * + * { margin-left: 1 * $spacer; }
 .space-x-2 > * + * { margin-left: 2 * $spacer; }

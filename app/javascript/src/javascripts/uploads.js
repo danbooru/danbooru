@@ -6,7 +6,6 @@ Upload.IQDB_HIGH_SIMILARITY = 70;
 
 Upload.initialize_all = function() {
   if ($("#c-uploads #a-show").length) {
-    this.initialize_image();
     this.initialize_similar();
 
     $("#toggle-artist-commentary").on("click.danbooru", function(e) {
@@ -36,47 +35,6 @@ Upload.initialize_similar = function() {
       high_similarity: Upload.IQDB_HIGH_SIMILARITY
     }
   });
-}
-
-Upload.initialize_image = function() {
-  $(document).on("click.danbooru", "#image", Upload.toggle_size);
-  $(document).on("click.danbooru", "#upload-image-view-small", Upload.view_small);
-  $(document).on("click.danbooru", "#upload-image-view-large", Upload.view_large);
-  $(document).on("click.danbooru", "#upload-image-view-full", Upload.view_full);
-}
-
-Upload.view_small = function(e) {
-  $("#image").addClass("fit-width fit-height");
-  $("#a-show").attr("data-image-size", "small");
-  e.preventDefault();
-}
-
-Upload.view_large = function(e) {
-  $("#image").removeClass("fit-height").addClass("fit-width");
-  $("#a-show").attr("data-image-size", "large");
-  e.preventDefault();
-}
-
-Upload.view_full = function(e) {
-  $("#image").removeClass("fit-width fit-height");
-  $("#a-show").attr("data-image-size", "full");
-  e.preventDefault();
-}
-
-Upload.toggle_size = function(e) {
-  let window_aspect_ratio = $(window).width() / $(window).height();
-  let image_aspect_ratio = $("#image").width() / $("#image").height();
-  let image_size = $("#a-show").attr("data-image-size");
-
-  if (image_size === "small" && image_aspect_ratio >= window_aspect_ratio) {
-    Upload.view_full(e);
-  } else if (image_size === "small" && image_aspect_ratio < window_aspect_ratio) {
-    Upload.view_large(e);
-  } else if (image_size === "large") {
-    Upload.view_small(e);
-  } else if (image_size === "full") {
-    Upload.view_small(e);
-  }
 }
 
 Upload.toggle_commentary = function() {

@@ -1,5 +1,5 @@
 <div id="c-uploads">
-  <div id="a-show" data-image-size="small">
+  <div id="a-show">
     <h1>Upload</h1>
 
     <% if @upload.is_pending? || @upload.is_processing? %>
@@ -32,17 +32,16 @@
       <% @upload_media_asset = @upload.upload_media_assets.first %>
       <% @media_asset = @upload_media_asset.media_asset %>
 
-      <p id="upload-image-metadata">
-        <strong>Size</strong>
-        <span id="upload-image-metadata-filesize"><%= number_to_human_size(@media_asset.file_size) %></span>
-        <span id="upload-image-metadata-resolution"><%= @media_asset.image_width %>x<%= @media_asset.image_height %></span>
-        <span id="upload-image-metadata-size-links">
-          (<a id="upload-image-view-small" href="">small</a> | <a id="upload-image-view-large" href="">large</a> | <a id="upload-image-view-full" href="">full</a>)
-        </span>
-      </p>
-
       <div id="upload-image">
-        <%= tag.img src: @media_asset.variant("original").file_url, title: "Preview", id: "image", class: "fit-width fit-height", "data-shortcut": "z"  %>
+        <%= render MediaAssetComponent.new(media_asset: @media_asset) %>
+
+        <p>
+          <strong>Size</strong>
+          <%= link_to @media_asset.variant(:original).file_url do %>
+            <%= number_to_human_size(@media_asset.file_size) %> .<%= @media_asset.file_ext %>
+          <% end %>
+          (<%= @media_asset.image_width %>x<%= @media_asset.image_height %>)
+        </p>
       </div>
 
       <%= render "uploads/related_posts", source: @upload.source_strategy %>

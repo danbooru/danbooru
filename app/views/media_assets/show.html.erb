@@ -2,7 +2,7 @@
   <div id="a-show" class="fixed-width-container">
     <h1 class="mb-4">Media Asset</h1>
 
-    <%= render MediaAssetPreviewComponent.new(media_asset: @media_asset, link_target: @media_asset.variant("original").file_url, save_data: CurrentUser.save_data) %>
+    <%= render MediaAssetComponent.new(media_asset: @media_asset) %>
 
     <table class="striped aligned-vertical">
       <% if @post.present? %>

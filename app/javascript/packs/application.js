@@ -43,6 +43,7 @@ import FileUploadComponent from "../../components/file_upload_component/file_upl
 import ForumPostComponent from "../../components/forum_post_component/forum_post_component.js";
 import IqdbQuery from "../src/javascripts/iqdb_queries.js";
 import Note from "../src/javascripts/notes.js";
+import MediaAssetComponent from "../../components/media_asset_component/media_asset_component.js";
 import PopupMenuComponent from "../../components/popup_menu_component/popup_menu_component.js";
 import Post from "../src/javascripts/posts.js";
 import PostModeMenu from "../src/javascripts/post_mode_menu.js";
@@ -68,6 +69,7 @@ Danbooru.FavoritesTooltipComponent = FavoritesTooltipComponent;
 Danbooru.FileUploadComponent = FileUploadComponent;
 Danbooru.ForumPostComponent = ForumPostComponent;
 Danbooru.IqdbQuery = IqdbQuery;
+Danbooru.MediaAssetComponent = MediaAssetComponent;
 Danbooru.Note = Note;
 Danbooru.PopupMenuComponent = PopupMenuComponent;
 Danbooru.Post = Post;

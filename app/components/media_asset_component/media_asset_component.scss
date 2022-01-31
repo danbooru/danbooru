@@ -1,0 +1,11 @@
+.media-asset-component.fit-screen img, .media-asset-component.fit-screen video {
+  max-width: 100%;
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+}
+
+.media-asset-zoom-level {
+  color: var(--preview-icon-color);
+  background: var(--preview-icon-background);
+}

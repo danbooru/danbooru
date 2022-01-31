@@ -1,0 +1,15 @@
+<div class="media-asset-component relative fit-screen">
+  <div class="media-asset-zoom-level hidden absolute top-0.5 left-0.5 p-1 m-0.5 leading-none rounded text-xs font-arial font-bold pointer-events-none">
+    100%
+  </div>
+
+  <% if is_image? %>
+    <%= tag.img src: variant(:original).file_url, width: image_width, height: image_height, draggable: "false", class: "media-asset-image select-none" -%>
+  <% elsif is_video? %>
+    <%= tag.video src: variant(:original).file_url, width: image_width, height: image_height, autoplay: true, loop: true, controls: "controls" %>
+  <% elsif is_ugoira? %>
+    <%= tag.video src: variant(:sample).file_url, width: image_width, height: image_height, autoplay: true, loop: true, controls: "controls" %>
+  <% elsif is_flash? %>
+    <%= tag.div class: "ruffle-container", "data-swf": variant(:original).file_url %>
+  <% end %>
+</div>

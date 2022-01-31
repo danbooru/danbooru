@@ -1,35 +1,5 @@
 div#c-uploads {
   div#a-show {
-    &[data-image-size="small"] {
-      #image {
-        cursor: zoom-in;
-      }
-
-      a#upload-image-view-small {
-        font-weight: bold;
-      }
-    }
-
-    &[data-image-size="large"] {
-      #image {
-        cursor: zoom-out;
-      }
-
-      a#upload-image-view-large {
-        font-weight: bold;
-      }
-    }
-
-    &[data-image-size="full"] {
-      #image {
-        cursor: zoom-out;
-      }
-
-      a#upload-image-view-full {
-        font-weight: bold;
-      }
-    }
-
     .artist-commentary {
       margin-top: 1em;
     }
@@ -42,7 +12,7 @@ div#c-uploads {
       margin-bottom: 2em;
     }
 
-    ul#upload-image-metadata, ul#links {
+    ul#links {
       margin-bottom: 1em;
     }
 
