@@ -68,6 +68,10 @@ class PostsController < ApplicationController
     @post.save
 
     if @post.errors.none?
+      if @post.warnings.any?
+        flash[:notice] = @post.warnings.full_messages.join(".\n \n")
+      end
+
       respond_with(@post)
     elsif @post.errors.of_kind?(:md5, :taken)
       @original_post = Post.find_by!(md5: @post.md5)
