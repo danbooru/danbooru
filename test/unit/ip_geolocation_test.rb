@@ -57,13 +57,13 @@ class IpGeolocationTest < ActiveSupport::TestCase
 
       should "work for a proxy IP" do
         @ip = IpGeolocation.create_or_update!("31.214.184.59")
-        assert_equal("Soluciones Corporativas IP, SL", @ip.organization)
+        assert_match(/Soluciones Corporativas IP, SL/i, @ip.organization.downcase)
         assert_equal(true, @ip.is_proxy?)
       end
 
       should "work for a cloud hosting IP" do
         @ip = IpGeolocation.create_or_update!("157.230.244.215")
-        assert_equal("DigitalOcean, LLC", @ip.organization)
+        assert_match(/DigitalOcean, LLC/i, @ip.organization)
         assert_equal(true, @ip.is_proxy?)
       end
 

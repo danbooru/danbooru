@@ -16,6 +16,10 @@ class IqdbClient
     @http = http
   end
 
+  def enabled?
+    iqdb_url.present?
+  end
+
   concerning :QueryMethods do
     # Search for an image by file, URL, hash, or post ID.
     def search(post_id: nil, media_asset_id: nil, file: nil, hash: nil, url: nil, image_url: nil, file_url: nil, similarity: 0.0, high_similarity: 65.0, limit: 20)
@@ -85,7 +89,7 @@ class IqdbClient
   # Add a post to IQDB.
   # @param post [Post] the post to add
   def add_post(post)
-    return unless post.has_preview?
+    return unless enabled? && post.has_preview?
     preview_file = post.file(:preview)
     add(post.id, preview_file)
   end
@@ -125,7 +129,7 @@ class IqdbClient
     # @param url [String] the IQDB url
     # @param options [Hash] the URL params to send
     def request(method, url, **options)
-      return [] if iqdb_url.blank? # do nothing if iqdb isn't configured
+      return [] if !enabled?
       response = http.timeout(30).send(method, "#{iqdb_url}/#{url}", **options)
       raise Error, "IQDB error: #{response.parse}" if response.status != 200
       response.parse

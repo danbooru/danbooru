@@ -4,8 +4,7 @@ class PostRegenerationsControllerTest < ActionDispatch::IntegrationTest
   context "The post regenerations controller" do
     setup do
       @mod = create(:moderator_user, name: "yukari", created_at: 1.month.ago)
-      @upload = assert_successful_upload("test/files/test.jpg", user: @mod)
-      @post = @upload.post
+      @post = create(:post_with_file, filename: "test.jpg")
       perform_enqueued_jobs # add post to iqdb
     end
 
@@ -60,8 +59,7 @@ class PostRegenerationsControllerTest < ActionDispatch::IntegrationTest
         end
 
         should "fix the width and height of exif-rotated images" do
-          @upload = assert_successful_upload("test/files/test-rotation-90cw.jpg", user: @mod)
-          @post = @upload.post
+          @post = create(:post_with_file, filename: "test-rotation-90cw.jpg")
 
           post_auth post_regenerations_path, @mod, params: { post_id: @post.id }
           perform_enqueued_jobs

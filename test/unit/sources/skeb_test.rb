@@ -84,7 +84,7 @@ module Sources
     context "A post with a video" do
       should "get it correctly" do
         site = Sources::Strategies.find("https://skeb.jp/@kaisouafuro/works/112")
-        assert_equal(site.image_url, "https://skeb-production.s3.ap-northeast-1.amazonaws.com/uploads/outputs/20f9d68f-50ec-44ae-8630-173fc38a2d6a?response-content-disposition=attachment%3B%20filename%3D%22458093-1.output.mp4%22%3B%20filename%2A%3DUTF-8%27%27458093-1.output.mp4&response-content-type=video%2Fmp4&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIVPUTFQBBL7UDSUA%2F20220113%2Fap-northeast-1%2Fs3%2Faws4_request&X-Amz-Date=20220113T141927Z&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=260c90b0755d894493fef478f806ac3fac0b94f4c8efb3df4f4f2a98309d09f0")
+        assert_match(%r{\Ahttps://skeb-production.s3.ap-northeast-1.amazonaws.com/uploads/outputs/20f9d68f-50ec-44ae-8630-173fc38a2d6a\?response-content-disposition=attachment%3B%20filename%3D%22458093-1.output.mp4%22%3B%20filename%2A%3DUTF-8%27%27458093-1.output.mp4&response-content-type=video%2Fmp4&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=.*&X-Amz-Date=.*&X-Amz-Expires=604800&X-Amz-SignedHeaders=host&X-Amz-Signature=.*}, site.image_url)
       end
     end
 
