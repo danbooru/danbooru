@@ -1517,6 +1517,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ruffle-rs/ruffle@npm:0.1.0-nightly.2022.1.31":
+  version: 0.1.0-nightly.2022.1.31
+  resolution: "@ruffle-rs/ruffle@npm:0.1.0-nightly.2022.1.31"
+  checksum: c9ae7adf6f89b41c43d347464aabcd604ed455a41394dc222f97d2b1728e80de2da8c3b71d7e46140aa8d59d99e649e2e3e30f56d4f1e7ecc2b8092da3c6e9b8
+  languageName: node
+  linkType: hard
+
 "@sindresorhus/is@npm:^4.0.0":
   version: 4.3.0
   resolution: "@sindresorhus/is@npm:4.3.0"
@@ -6962,6 +6969,7 @@ fsevents@~2.3.2:
     "@fortawesome/fontawesome-free": ^5.11.2
     "@rails/ujs": ^7.0.1
     "@rails/webpacker": =6.0.0-rc.6
+    "@ruffle-rs/ruffle": 0.1.0-nightly.2022.1.31
     "@webpack-cli/serve": ^1.6.0
     core-js: ^3.20.3
     css-loader: ^6.5.1
@@ -6980,7 +6988,6 @@ fsevents@~2.3.2:
     postcss-import: ^14.0.2
     postcss-loader: ^6.2.1
     postcss-preset-env: ^7.2.3
-    ruffle-mirror: ^2022.1.13
     sass: ^1.48.0
     sass-loader: ^12.4.0
     stylelint: ^14.2.0
@@ -6993,13 +7000,6 @@ fsevents@~2.3.2:
     webpack-dev-server: ^4.7.3
   languageName: unknown
   linkType: soft
-
-"ruffle-mirror@npm:2022.1.13":
-  version: 2022.1.13
-  resolution: "ruffle-mirror@npm:2022.1.13"
-  checksum: e4de7a2667b62dc117497707b1577030ae150cbd43a66e7728f00f22faf35023a2352474904a6bb8c5c03d14be3ca84689f7563fa52ab716c4a3da08a6b32c35
-  languageName: node
-  linkType: hard
 
 "run-parallel@npm:^1.1.9":
   version: 1.2.0
