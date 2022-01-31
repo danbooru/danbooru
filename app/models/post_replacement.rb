@@ -6,8 +6,9 @@ class PostReplacement < ApplicationRecord
   before_validation :initialize_fields, on: :create
   attr_accessor :replacement_file, :final_source, :tags
 
+  attribute :replacement_url, default: ""
+
   def initialize_fields
-    self.creator = CurrentUser.user
     self.original_url = post.source
     self.tags = "#{post.tag_string} #{tags}"
 
@@ -25,6 +26,10 @@ class PostReplacement < ApplicationRecord
         q.apply_default_order(params)
       end
     end
+  end
+
+  def process!
+    PostReplacementProcessor.new(post: post, replacement: self).process!
   end
 
   def suggested_tags_for_removal

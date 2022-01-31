@@ -3,5 +3,6 @@ FactoryBot.define do
     post factory: :post, source: FFaker::Internet.http_url
     original_url { FFaker::Internet.http_url }
     replacement_url { FFaker::Internet.http_url }
+    creator
   end
 end

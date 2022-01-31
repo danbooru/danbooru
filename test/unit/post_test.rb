@@ -1694,18 +1694,4 @@ class PostTest < ActiveSupport::TestCase
       assert_equal("https://www.example.com/data/original/77/d8/77d89bda37ea3af09158ed3282f8334f.gif", @post.file_url)
     end
   end
-
-  context "#replace!" do
-    subject { @post.replace!(tags: "something", replacement_url: "https://danbooru.donmai.us/images/download-preview.png") }
-
-    setup do
-      @post = FactoryBot.create(:post)
-    end
-
-    should "update the post" do
-      assert_changes(-> { @post.md5 }) do
-        subject
-      end
-    end
-  end
 end

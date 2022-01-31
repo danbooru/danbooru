@@ -842,13 +842,6 @@ class Post < ApplicationRecord
         end
       end
     end
-
-    def replace!(params)
-      replacement = replacements.create(params)
-      processor = UploadService::Replacer.new(post: self, replacement: replacement)
-      processor.process!
-      replacement
-    end
   end
 
   module VersionMethods

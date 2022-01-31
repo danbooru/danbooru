@@ -9,11 +9,11 @@ class PostReplacementsController < ApplicationController
   end
 
   def create
-    @post = authorize Post.find(params[:post_id]), policy_class: PostReplacementPolicy
-    @post_replacement = @post.replace!(permitted_attributes(PostReplacement))
+    @post_replacement = authorize PostReplacement.new(creator: CurrentUser.user, post_id: params[:post_id], **permitted_attributes(PostReplacement))
+    @post_replacement.save
+    @post_replacement.process!
 
-    flash[:notice] = "Post replaced"
-    respond_with(@post_replacement, location: @post)
+    respond_with(@post_replacement, location: @post_replacement.post, notice: "Post replaced")
   end
 
   def update
