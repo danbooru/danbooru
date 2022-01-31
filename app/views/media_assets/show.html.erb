@@ -2,7 +2,9 @@
   <div id="a-show" class="fixed-width-container">
     <h1 class="mb-4">Media Asset</h1>
 
-    <%= render MediaAssetComponent.new(media_asset: @media_asset) %>
+    <% if policy(@media_asset).can_see_image? %>
+      <%= render MediaAssetComponent.new(media_asset: @media_asset) %>
+    <% end %>
 
     <table class="striped aligned-vertical">
       <% if @post.present? %>
@@ -12,10 +14,12 @@
         </tr>
       <% end %>
 
-      <tr>
-        <th>MD5</th>
-        <td><%= @media_asset.md5 %></td>
-      </tr>
+      <% if policy(@media_asset).can_see_image? %>
+        <tr>
+          <th>MD5</th>
+          <td><%= @media_asset.md5 %></td>
+        </tr>
+      <% end %>
 
       <% @media_asset.metadata.sort.each do |key, value| %>
         <tr>

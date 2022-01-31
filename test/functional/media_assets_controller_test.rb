@@ -25,6 +25,15 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
 
         assert_response :success
       end
+
+      should "not show the md5 for assets belonging to posts not visible to the current user" do
+        @media_asset = create(:media_asset)
+        @post = create(:post, md5: @media_asset.md5, is_banned: true)
+        get media_asset_path(@media_asset), as: :json
+
+        assert_response :success
+        assert_equal(nil, response.parsed_body[:md5])
+      end
     end
   end
 end
