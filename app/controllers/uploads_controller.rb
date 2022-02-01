@@ -38,6 +38,7 @@ class UploadsController < ApplicationController
   def show
     @upload = authorize Upload.find(params[:id])
     @post = Post.new(uploader: @upload.uploader, uploader_ip_addr: @upload.uploader_ip_addr, source: @upload.source, rating: nil, **permitted_attributes(Post))
+    @post.tag_string = "#{@post.tag_string} #{@upload.source_strategy.artists.map(&:tag).map(&:name).join(" ")}".strip
 
     if request.format.html? && @upload.is_completed? && @upload.media_assets.first&.post.present?
       flash[:notice] = "Duplicate of post ##{@upload.media_assets.first.post.id}"
