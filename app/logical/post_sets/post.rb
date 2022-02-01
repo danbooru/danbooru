@@ -119,7 +119,7 @@ module PostSets
 
     def show_deleted?
       query.select_metatags("status").any? do |metatag|
-        metatag.value.in?(%w[all any active unmoderated modqueue deleted appealed])
+        metatag.value.downcase.in?(%w[all any active unmoderated modqueue deleted appealed])
       end
     end
 

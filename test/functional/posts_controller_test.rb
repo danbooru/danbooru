@@ -184,6 +184,12 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           get_auth posts_path(tags: "foo"), @user
           assert_select ".tag-change-notice"
         end
+
+        should "show deleted posts for a status:DELETED search" do
+          create(:post, is_deleted: true)
+          get_auth posts_path(tags: "status:DELETED"), @user
+          assert_select ".post-preview.post-status-deleted", count: 1
+        end
       end
 
       context "with a multi-tag search" do
