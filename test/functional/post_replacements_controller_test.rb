@@ -6,13 +6,14 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
       context "replacing a post from a source url" do
         should "replace the post" do
           assert_difference("PostReplacement.count") do
-            @post = create(:post)
+            @post = create(:post, tag_string: "image_sample")
 
             post_auth post_replacements_path, create(:moderator_user), params: {
               format: :json,
               post_id: @post.id,
               post_replacement: {
                 replacement_url: "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg",
+                tags: "replaced -image_sample"
               }
             }
 
@@ -31,6 +32,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(@post.file_size, @replacement.old_file_size)
           assert_equal(@post.file_ext, @replacement.old_file_ext)
           assert_equal(@post.md5, @replacement.old_md5)
+          assert_equal(@post.tag_string, "image_sample")
 
           @post.reload
           assert_equal("d34e4cf0a437a5d65f8e82b7bcd02606", @post.md5)
@@ -40,6 +42,7 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
           assert_equal(650, @post.image_height)
           assert_equal(127_238, @post.file_size)
           assert_equal("jpg", @post.file_ext)
+          assert_equal("replaced", @post.tag_string)
         end
       end
 

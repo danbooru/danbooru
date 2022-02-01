@@ -12,8 +12,6 @@ class PostReplacement < ApplicationRecord
 
   def initialize_fields
     self.original_url = post.source
-    self.tags = "#{post.tag_string} #{tags}"
-
     self.old_file_ext = post.file_ext
     self.old_file_size = post.file_size
     self.old_image_width = post.image_width

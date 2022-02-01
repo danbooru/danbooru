@@ -34,13 +34,14 @@ class PostReplacementProcessor
     replacement.image_width = media_asset.image_width
     replacement.md5 = media_asset.md5
 
+    post.lock!
     post.md5 = media_asset.md5
     post.file_ext = media_asset.file_ext
     post.image_width = media_asset.image_width
     post.image_height = media_asset.image_height
     post.file_size = media_asset.file_size
     post.source = replacement.final_source.presence || replacement.replacement_url
-    post.tag_string = replacement.tags
+    post.tag_string = "#{post.tag_string} #{replacement.tags}"
 
     rescale_notes(post)
     post.save!
