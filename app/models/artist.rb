@@ -13,7 +13,7 @@ class Artist < ApplicationRecord
   normalize :other_names, :normalize_other_names
   array_attribute :other_names # XXX must come after `normalize :other_names`
 
-  validate :validate_tag_category
+  validate :validate_artist_name
   validates :name, tag_name: true, uniqueness: true
 
   before_save :update_tag_category
@@ -23,8 +23,8 @@ class Artist < ApplicationRecord
   has_many :members, :class_name => "Artist", :foreign_key => "group_name", :primary_key => "name"
   has_many :urls, :dependent => :destroy, :class_name => "ArtistUrl", :autosave => true
   has_many :versions, -> {order("artist_versions.id ASC")}, :class_name => "ArtistVersion"
-  has_one :wiki_page, :foreign_key => "title", :primary_key => "name"
-  has_one :tag_alias, :foreign_key => "antecedent_name", :primary_key => "name"
+  has_one :wiki_page, -> { active }, foreign_key: "title", primary_key: "name"
+  has_one :tag_alias, -> { active }, foreign_key: "antecedent_name", primary_key: "name"
   belongs_to :tag, foreign_key: "name", primary_key: "name", default: -> { Tag.new(name: name, category: Tag.categories.artist) }
 
   scope :banned, -> { where(is_banned: true) }
@@ -155,11 +155,15 @@ class Artist < ApplicationRecord
   end
 
   module TagMethods
-    def validate_tag_category
-      return unless !is_deleted? && name_changed? && tag.present?
+    def validate_artist_name
+      return unless !is_deleted? && name_changed?
 
-      if tag.category_name != "Artist" && !tag.empty?
+      if tag.present? && tag.category_name != "Artist" && !tag.empty?
         errors.add(:name, "'#{name}' is a #{tag.category_name.downcase} tag; artist entries can only be created for artist tags")
+      end
+
+      if tag_alias.present?
+        errors.add(:name, "'#{name}' is aliased to '#{tag_alias.consequent_name}'")
       end
     end
 

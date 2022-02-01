@@ -517,6 +517,14 @@ class ArtistTest < ActiveSupport::TestCase
         assert(artist.invalid?)
         assert_match(/'touhou' is a copyright tag/, artist.errors.full_messages.join)
       end
+
+      should "not allow creating artist entries for aliased tags" do
+        tag_alias = create(:tag_alias, antecedent_name: "foo", consequent_name: "bar")
+        artist = build(:artist, name: "foo")
+
+        assert_equal(true, artist.invalid?)
+        assert_match(/'foo' is aliased to 'bar'/, artist.errors.full_messages.join)
+      end
     end
 
     context "when renaming" do
