@@ -240,6 +240,16 @@
         <td><%= presenter.feedbacks(self) %></td>
       </tr>
 
+      <% if policy(ModerationReport).can_see_moderation_reports? %>
+        <tr>
+          <th>Mod Reports</th>
+          <td>
+            <%= link_to "received:#{ModerationReport.received_by(user).count}", moderation_reports_path(search: { recipient_name: user.name }) %>
+            <%= link_to "submitted:#{ModerationReport.where(creator: user).count}", moderation_reports_path(search: { creator_name: user.name }) %>
+          </td>
+        </tr>
+      <% end %>
+
       <% if policy(UserNameChangeRequest.new(user: user)).show? %>
         <% user.user_name_change_requests.visible(CurrentUser.user).tap do |changes| %>
           <% if changes.present? %>

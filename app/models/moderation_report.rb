@@ -113,9 +113,19 @@ class ModerationReport < ApplicationRecord
     end
   end
 
+  def self.received_by(user)
+    where(model: Comment.where(creator: user)).or(where(model: ForumPost.where(creator: user))).or(where(model: Dmail.received.where(from: user)))
+  end
+
   def self.search(params)
     q = search_attributes(params, :id, :created_at, :updated_at, :reason, :creator, :model, :status)
     q = q.text_attribute_matches(:reason, params[:reason_matches])
+
+    if params[:recipient_id].present?
+      q = q.received_by(User.search(id: params[:recipient_id]))
+    elsif params[:recipient_name].present?
+      q = q.received_by(User.search(name_matches: params[:recipient_name]))
+    end
 
     q.apply_default_order(params)
   end

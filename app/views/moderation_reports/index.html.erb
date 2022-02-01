@@ -3,6 +3,7 @@
     <h1>Moderation reports</h1>
 
     <%= search_form_for(moderation_reports_path) do |f| %>
+      <%= f.input :recipient_name, label: "Reported user", input_html: { value: params[:search][:recipient_name], "data-autocomplete": "user" } %>
       <%= f.input :creator_name, label: "Reporter", input_html: { value: params[:search][:creator_name], "data-autocomplete": "user" } %>
       <%= f.input :reason_matches, label: "Reason", input_html: { value: params[:search][:reason_matches] } %>
       <%= f.input :model_id, label: "ID", input_html: { value: params[:search][:model_id] } %>
@@ -33,6 +34,7 @@
 
       <% t.column "Reported user" do |report| %>
         <%= link_to_user report.reported_user %>
+        <%= link_to "»", moderation_reports_path(search: { recipient_name: report.reported_user.name }) %>
       <% end %>
 
       <% t.column "Reporter" do |report| %>
