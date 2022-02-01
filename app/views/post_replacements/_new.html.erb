@@ -1,7 +1,7 @@
 <div class="replace-image-dialog-body">
   <%= embed_wiki("help:replacement_notice") %>
 
-  <%= edit_form_for(post_replacement, url: post_replacements_path(post_id: post_replacement.post_id), method: :post, remote: true) do |f| %>
+  <%= edit_form_for(post_replacement, url: post_replacements_path(post_id: post_replacement.post_id), method: :post) do |f| %>
     <%= f.input :replacement_file, label: "File", as: :file %>
     <%= f.input :replacement_url, label: "Replacement URL", hint: "The source URL to download the replacement from.", as: :string, input_html: { value: post_replacement.post.normalized_source } %>
     <%= f.input :final_source, label: "Final Source", hint: "If present, the source field will be changed to this after replacement.", as: :string %>

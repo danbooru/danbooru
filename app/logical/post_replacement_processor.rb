@@ -12,8 +12,7 @@ class PostReplacementProcessor
     media_file = get_file_for_upload(replacement.replacement_url, nil, replacement.replacement_file&.tempfile)
 
     if Post.where.not(id: post.id).exists?(md5: media_file.md5)
-      replacement.errors.add(:base, "Duplicate: post with md5 #{media_file.md5} already exists")
-      return
+      raise "Duplicate of post ##{Post.find_by_md5(media_file.md5).id}"
     end
 
     if media_file.md5 == post.md5
@@ -44,11 +43,11 @@ class PostReplacementProcessor
     post.tag_string = replacement.tags
 
     rescale_notes(post)
-
-    replacement.save!
     post.save!
-
     post.update_iqdb
+  rescue Exception => exception
+    replacement.errors.add(:base, exception.message)
+    raise ActiveRecord::Rollback
   end
 
   def rescale_notes(post)

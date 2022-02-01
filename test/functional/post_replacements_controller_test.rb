@@ -154,6 +154,23 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         end
       end
 
+      context "a replacement that fails" do
+        should "not create a post replacement record" do
+          @post = create(:post)
+
+          assert_no_difference("PostReplacement.count") do
+            post_auth post_replacements_path, create(:moderator_user), params: {
+              post_id: @post.id,
+              post_replacement: {
+                replacement_file: Rack::Test::UploadedFile.new("test/files/ugoira.json"),
+              }
+            }
+
+            assert_redirected_to @post
+          end
+        end
+      end
+
       should "not allow non-mods to replace posts" do
         assert_difference("PostReplacement.count", 0) do
           @post = create(:post)
@@ -187,8 +204,8 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
         @admin = create(:admin_user)
         @mod = create(:moderator_user, name: "yukari")
 
-        @post_replacement = create(:post_replacement, creator: @mod, post: create(:post, tag_string: "touhou"))
-        @admin_replacement = create(:post_replacement, creator: create(:admin_user), replacement_url: "https://danbooru.donmai.us")
+        @post_replacement = create(:post_replacement, creator: @mod, post: create(:post, tag_string: "touhou"), replacement_file: Rack::Test::UploadedFile.new("test/files/test.png"))
+        @admin_replacement = create(:post_replacement, creator: @admin, replacement_file: Rack::Test::UploadedFile.new("test/files/test.jpg"))
       end
 
       should "render" do
@@ -197,7 +214,6 @@ class PostReplacementsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should respond_to_search({}).with { [@admin_replacement, @post_replacement] }
-      should respond_to_search(replacement_url_like: "*danbooru*").with { @admin_replacement }
 
       context "using includes" do
         should respond_to_search(post_tags_match: "touhou").with { @post_replacement }

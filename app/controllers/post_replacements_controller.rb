@@ -11,9 +11,14 @@ class PostReplacementsController < ApplicationController
   def create
     @post_replacement = authorize PostReplacement.new(creator: CurrentUser.user, post_id: params[:post_id], **permitted_attributes(PostReplacement))
     @post_replacement.save
-    @post_replacement.process!
 
-    respond_with(@post_replacement, location: @post_replacement.post, notice: "Post replaced")
+    if request.format.html? && @post_replacement.errors.any?
+      flash[:notice] = @post_replacement.errors.full_messages.join("; ")
+      redirect_to @post_replacement.post
+    else
+      flash[:notice] = "Post replaced"
+      respond_with(@post_replacement, location: @post_replacement.post)
+    end
   end
 
   def update

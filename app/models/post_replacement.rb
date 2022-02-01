@@ -3,9 +3,11 @@
 class PostReplacement < ApplicationRecord
   belongs_to :post
   belongs_to :creator, class_name: "User"
-  before_validation :initialize_fields, on: :create
-  attr_accessor :replacement_file, :final_source, :tags
 
+  before_validation :initialize_fields, on: :create
+  before_create :process!
+
+  attr_accessor :replacement_file, :final_source, :tags
   attribute :replacement_url, default: ""
 
   def initialize_fields
