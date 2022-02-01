@@ -64,7 +64,7 @@ export default class FileUploadComponent {
     dropzone.on("success", file => {
       this.$dropzone.addClass("success");
       let upload = JSON.parse(file.xhr.response)
-      location.href = `/uploads/${upload.id}`;
+      this.pollStatus(upload);
     });
 
     dropzone.on("error", (file, msg) => {
@@ -85,11 +85,14 @@ export default class FileUploadComponent {
     e.preventDefault();
   }
 
+  onSubmit(e) {
+    let upload = e.originalEvent.detail[0];
+    this.pollStatus(upload);
+  }
+
   // Called after the upload is submitted via AJAX. Polls the upload until it
   // is complete, then redirects to the upload page.
-  async onSubmit(e) {
-    let upload = e.originalEvent.detail[0];
-
+  async pollStatus(upload) {
     this.$component.find("progress").removeClass("hidden");
     this.$component.find("input").attr("disabled", "disabled");
 
@@ -101,6 +104,7 @@ export default class FileUploadComponent {
     if (upload.status === "completed") {
       location.href = `/uploads/${upload.id}`;
     } else {
+      this.$dropzone.removeClass("success");
       this.$component.find("progress").addClass("hidden");
       this.$component.find("input").removeAttr("disabled");
 
