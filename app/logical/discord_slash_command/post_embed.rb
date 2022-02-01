@@ -52,7 +52,7 @@ class DiscordSlashCommand
 
     def embed_footer
       dimensions = "#{post.image_width}x#{post.image_height}"
-      file_size = post.file_size.to_s(:human_size, precision: 4)
+      file_size = post.file_size.to_formatted_s(:human_size, precision: 4)
       text = "#{post.fav_count} ❤ | Rating: #{post.rating.upcase} | #{dimensions} (#{file_size} #{post.file_ext})"
 
       { text: text }
