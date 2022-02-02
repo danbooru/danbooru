@@ -1,72 +1,10 @@
 <div id="c-uploads">
   <div id="a-index">
-    <%= search_form_for(uploads_path) do |f| %>
-      <%= f.input :uploader_name, label: "Uploader", input_html: { value: params[:search][:uploader_name], data: { autocomplete: "user" } } %>
-      <%= f.input :source_like, label: "Source", input_html: { value: params[:search][:source_like] } %>
-      <%= f.input :status_like, label: "Status", collection: [%w[Completed completed], %w[Processing processing], %w[Pending pending], %w[Error error*]], include_blank: true, selected: params[:search][:status_like] %>
-
-      <%= f.submit "Search" %>
+    <% if @mode == "gallery" %>
+      <%= render "uploads/gallery" %>
+    <% elsif @mode == "table" %>
+      <%= render "uploads/table" %>
     <% end %>
-
-    <%= table_for @uploads, class: "striped autofit" do |t| %>
-      <% t.column "File", td: { class: "text-center" } do |upload| %>
-        <% upload.media_assets.first.tap do |media_asset| %>
-          <% if media_asset.present? %>
-            <%= render MediaAssetPreviewComponent.new(media_asset: media_asset, link_target: upload, save_data: CurrentUser.save_data, shrink_to_fit: false) %>
-          <% end %>
-        <% end %>
-      <% end %>
-
-      <% t.column "Info", td: {class: "upload-info"} do |upload| %>
-        <div>
-          <strong>Upload</strong>
-          <span><%= link_to "##{upload.id}", upload %></span>
-        </div>
-
-        <div>
-          <strong>Source</strong>
-          <span>
-            <% if upload.source.present? %>
-              <%= external_link_to upload.source %>
-              <%= link_to "»", uploads_path(search: params[:search].merge(source_like: upload.source)) %>
-            <% else %>
-              <em>none</em>
-            <% end %>
-          </span>
-        </div>
-
-        <% if upload.referer_url.present? %>
-          <div>
-            <strong>Referrer</strong>
-            <span>
-              <%= external_link_to upload.referer_url %>
-              <%= link_to "»", uploads_path(search: params[:search].merge(referer_url: upload.referer_url)) %>
-            </span>
-          </div>
-        <% end %>
-
-        <% if upload.is_errored? %>
-          <div>
-            <strong>Error</strong>
-            <span>
-              <%= upload.status.delete_prefix("error: ") %>
-            </span>
-          </div>
-        <% end %>
-      <% end %>
-
-      <% t.column "Uploader" do |upload| %>
-        <%= link_to_user upload.uploader %>
-        <%= link_to "»", uploads_path(search: params[:search].merge(uploader_name: upload.uploader.name)) %>
-        <div><%= time_ago_in_words_tagged upload.created_at %></div>
-      <% end %>
-
-      <% t.column :status do |upload| %>
-        <%= upload.is_errored? ? "error" : upload.status %>
-      <% end %>
-    <% end %>
-
-    <%= numbered_paginator(@uploads) %>
   </div>
 </div>
 

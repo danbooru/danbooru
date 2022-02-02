@@ -1,0 +1,83 @@
+<div class="flex items-center mb-2">
+  <h1 class="flex-1">My Uploads</h1>
+
+  <span>
+    <%= link_to "Gallery", uploads_path(mode: "gallery") %> |
+    <strong>Table</strong>
+  </span>
+</div>
+
+<%= table_for @uploads, class: "striped autofit", width: "100%" do |t| %>
+  <% t.column "Upload", td: { class: "text-center" } do |upload| %>
+    <% upload.media_assets.first.tap do |media_asset| %>
+      <% if media_asset.present? %>
+        <% if media_asset.post.present? %>
+          <%= render MediaAssetPreviewComponent.new(media_asset: media_asset, link_target: media_asset.post, save_data: CurrentUser.save_data, shrink_to_fit: false) %>
+        <% else %>
+          <%= render MediaAssetPreviewComponent.new(media_asset: media_asset, link_target: upload, save_data: CurrentUser.save_data, shrink_to_fit: false) %>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% t.column "Info", td: { class: "col-expand" } do |upload| %>
+    <div>
+      <% upload.media_assets.first.tap do |media_asset| %>
+        <% if media_asset&.post.present? %>
+          <strong>Post</strong>
+          <span><%= link_to "##{media_asset.post.id}", media_asset.post %></span>
+        <% else %>
+          <strong>Upload</strong>
+          <span><%= link_to "##{upload.id}", upload %></span>
+        <% end %>
+      <% end %>
+    </div>
+
+    <div>
+      <strong>Source</strong>
+      <span>
+        <% if upload.source.present? %>
+          <%= external_link_to upload.source %>
+          <%= link_to "»", uploads_path(mode: "table", search: params[:search].merge(source_like: upload.source)) %>
+        <% else %>
+          <em>none</em>
+        <% end %>
+      </span>
+    </div>
+
+    <% if upload.referer_url.present? %>
+      <div>
+        <strong>Referrer</strong>
+        <span>
+          <%= external_link_to upload.referer_url %>
+          <%= link_to "»", uploads_path(mode: "table", search: params[:search].merge(referer_url: upload.referer_url)) %>
+        </span>
+      </div>
+    <% end %>
+
+    <% if upload.is_errored? %>
+      <div>
+        <strong>Error</strong>
+        <span>
+          <%= upload.status.delete_prefix("error: ") %>
+        </span>
+      </div>
+    <% end %>
+  <% end %>
+
+  <% t.column "Uploader" do |upload| %>
+    <%= link_to_user upload.uploader %>
+    <%= link_to "»", uploads_path(mode: "table", search: params[:search].merge(uploader_name: upload.uploader.name)) %>
+    <div><%= time_ago_in_words_tagged upload.created_at %></div>
+  <% end %>
+
+  <% t.column :status do |upload| %>
+    <% if upload.is_errored? %>
+      error
+    <% elsif !upload.is_completed? %>
+      <%= upload.status %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<%= numbered_paginator(@uploads) %>

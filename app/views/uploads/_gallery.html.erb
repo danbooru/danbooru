@@ -1,0 +1,33 @@
+<div class="flex items-center mb-2">
+  <h1 class="flex-1">My Uploads</h1>
+
+  <span>
+    <strong>Gallery</strong> |
+    <%= link_to "Table", uploads_path(mode: "table") %>
+  </span>
+</div>
+
+<%= render(MediaAssetGalleryComponent.new) do |gallery| %>
+  <% @media_assets.each do |media_asset| %>
+    <% gallery.media_asset(media_asset: media_asset, size: gallery.size, link_target: media_asset.post || media_asset.uploads.first) do |preview| %>
+      <% preview.footer do %>
+        <div class="text-center text-muted text-xs h-12">
+          <% if media_asset.post.present? %>
+            <div class="leading-none">
+              <%= link_to "post ##{media_asset.post.id}", media_asset.post, class: "leading-none" %>
+            </div>
+          <% end %>
+
+          <% if media_asset.uploads.first.source.present? %>
+            <%= external_link_to media_asset.uploads.first.source, Addressable::URI.parse(media_asset.uploads.first.source).domain %>
+          <% else %>
+            <em>No source</em>
+          <% end %>
+
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<%= numbered_paginator(@media_assets) %>
