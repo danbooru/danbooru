@@ -1,0 +1,13 @@
+<div class="media-asset-gallery media-asset-gallery-<%= size %>">
+  <% if media_assets.empty? %>
+    <p>No results found.</p>
+  <% else %>
+    <div class="media-assets-container grid justify-items-center items-end">
+      <% media_assets.each do |media_asset| -%>
+<%    %><%= media_asset -%>
+      <% end -%>
+    </div>
+  <% end %>
+
+  <%= footer %>
+</div>

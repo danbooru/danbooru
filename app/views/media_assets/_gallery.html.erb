@@ -1,0 +1,15 @@
+<%= render(MediaAssetGalleryComponent.new) do |gallery| %>
+  <% @media_assets.each do |media_asset| %>
+    <% if policy(media_asset).can_see_image? %>
+      <% gallery.media_asset(media_asset: media_asset, size: gallery.size, link_target: media_asset) do |preview| %>
+        <% preview.footer do %>
+          <div class="text-center text-xs h-8">
+            <% if media_asset.post.present? %>
+              <%= link_to "post ##{media_asset.post.id}", media_asset.post %>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

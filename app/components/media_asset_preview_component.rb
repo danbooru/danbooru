@@ -8,6 +8,8 @@ class MediaAssetPreviewComponent < ApplicationComponent
   attr_reader :media_asset, :size, :fit, :link_target, :shrink_to_fit, :save_data
   delegate :duration_to_hhmmss, :sound_icon, to: :helpers
 
+  renders_one :footer
+
   # @param media_asset [MediaAsset] The media asset to show the thumbnail for.
   # @param size [String] The size of the thumbnail. One of 150, 180, 225, 270, or 360.
   # @param link_target [ApplicationRecord] What the thumbnail links to (default: the media asset).

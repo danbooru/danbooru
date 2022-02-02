@@ -1,42 +1,27 @@
 <div id="c-media-assets">
   <div id="a-index">
-    <%= search_form_for(media_assets_path) do |f| %>
-      <%= f.input :md5, input_html: { value: params[:search][:md5] } %>
-      <%= f.input :image_width, input_html: { value: params[:search][:image_width] } %>
-      <%= f.input :image_height, input_html: { value: params[:search][:image_height] } %>
-      <%= f.input :file_size, input_html: { value: params[:search][:file_size] } %>
-      <%= f.input :file_ext, input_html: { value: params[:search][:file_ext] } %>
+    <h1>All Uploads</h1>
 
-      <%= f.simple_fields_for :metadata do |meta| %>
-        <% params.dig(:search, :metadata).to_h.each do |key, value| %>
-          <%= meta.input key, label: key, input_html: { value: value } %>
+    <% if params[:search].present? %>
+      <%= search_form_for(media_assets_path) do |f| %>
+        <%= f.simple_fields_for :metadata do |meta| %>
+          <% params.dig(:search, :metadata).to_h.each do |key, value| %>
+            <%= meta.input key, label: key, input_html: { value: value } %>
+          <% end %>
         <% end %>
-      <% end %>
 
-      <%= f.submit "Search" %>
+        <%= f.submit "Search" %>
+      <% end %>
     <% end %>
 
-    <%= table_for @media_assets, class: "striped autofit" do |t| %>
-      <% t.column "File", td: { class: "text-center" } do |media_asset| %>
-        <% if policy(media_asset).can_see_image? %>
-          <%= render MediaAssetPreviewComponent.new(media_asset: media_asset, save_data: CurrentUser.save_data, shrink_to_fit: false) %>
-        <% end %>
-      <% end %>
-
-      <% t.column :image_width %>
-      <% t.column :image_height %>
-      <% t.column :file_size %>
-      <% t.column :file_ext %>
-
-      <% t.column "Metadata" do |media_asset| %>
-        <%= link_to pluralize(media_asset.metadata.size, "tags"), media_asset %>
-      <% end %>
-
-      <% t.column "Created" do |media_asset| %>
-        <%= time_ago_in_words_tagged(media_asset.created_at) %>
-      <% end %>
+    <% if params[:mode] == "table" %>
+      <%= render "media_assets/table" %>
+    <% else %>
+      <%= render "media_assets/gallery" %>
     <% end %>
 
     <%= numbered_paginator(@media_assets) %>
   </div>
 </div>
+
+<%= render "uploads/secondary_links" %>
