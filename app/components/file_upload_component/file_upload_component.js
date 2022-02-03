@@ -102,7 +102,7 @@ export default class FileUploadComponent {
     }
 
     if (upload.status === "completed") {
-      location.href = `/uploads/${upload.id}`;
+      window.location.replace(`/uploads/${upload.id}`);
     } else {
       this.$dropzone.removeClass("success");
       this.$component.find("progress").addClass("hidden");
