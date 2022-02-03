@@ -16,6 +16,7 @@ class CommentComponent {
     var $form = $(e.target).closest("div.new-comment").find("form");
     $form.show();
     $form[0].scrollIntoView(false);
+    $form.find("textarea").selectEnd();
     e.preventDefault();
   }
 

@@ -13,7 +13,8 @@ class ForumPostComponent {
 
   static showNewForumPostForm(e) {
     $("#topic-response").show();
-    document.body.scrollIntoView(false);
+    $("#forum_post_body").get(0).scrollIntoView(false);
+    $("#forum_post_body").selectEnd();
     e.preventDefault();
   }
 

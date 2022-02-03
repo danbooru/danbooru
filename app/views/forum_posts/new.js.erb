@@ -4,5 +4,5 @@ if ($("#forum_post_body").val().length > 0) {
 }
 $("#forum_post_body").val(msg);
 $("#topic-response").show();
-document.body.scrollIntoView(false);
+$("#forum_post_body").get(0).scrollIntoView(false);
 $("#forum_post_body").selectEnd();
