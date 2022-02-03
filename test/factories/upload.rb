@@ -2,8 +2,6 @@ FactoryBot.define do
   factory(:upload) do
     uploader factory: :user
     uploader_ip_addr { "127.0.0.1" }
-    rating { "s" }
-    tag_string { "" }
 
     status { "pending" }
     source { "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg" }

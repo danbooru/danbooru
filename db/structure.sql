@@ -1947,10 +1947,10 @@ CREATE TABLE public.uploads (
     source text,
     file_path character varying,
     content_type character varying,
-    rating character(1) NOT NULL,
+    rating character(1),
     uploader_id integer NOT NULL,
     uploader_ip_addr inet NOT NULL,
-    tag_string text NOT NULL,
+    tag_string text,
     status text DEFAULT 'pending'::text NOT NULL,
     backtrace text,
     post_id integer,
@@ -5775,6 +5775,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220110171023'),
 ('20220110171024'),
 ('20220120233850'),
-('20220124195900');
+('20220124195900'),
+('20220203040648');
 
 

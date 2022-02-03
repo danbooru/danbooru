@@ -3,7 +3,12 @@
 class Upload < ApplicationRecord
   extend Memoist
 
-  MAX_VIDEO_DURATION = 140
+  self.ignored_columns = %i[
+    file_path content_type rating tag_string backtrace post_id md5_confirmation
+    server parent_id md5 file_ext file_size image_width image_height
+    artist_commentary_desc artist_commentary_title include_artist_commentary
+    context translated_commentary_title translated_commentary_desc
+  ]
 
   attr_accessor :file
 
@@ -75,7 +80,7 @@ class Upload < ApplicationRecord
   end
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :source, :referer_url, :uploader, :status, :backtrace, :upload_media_assets, :media_assets)
+    q = search_attributes(params, :id, :created_at, :updated_at, :source, :referer_url, :status, :uploader, :upload_media_assets, :media_assets)
     q.apply_default_order(params)
   end
 
@@ -104,7 +109,7 @@ class Upload < ApplicationRecord
     media_asset = MediaAsset.upload!(media_file)
     update!(media_assets: [media_asset], status: "completed")
   rescue Exception => e
-    update!(status: "error: #{e.message}", backtrace: e.backtrace.join("\n"))
+    update!(status: "error: #{e.message}")
   end
 
   def self.available_includes
