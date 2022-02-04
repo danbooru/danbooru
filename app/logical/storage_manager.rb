@@ -30,7 +30,7 @@ class StorageManager
   # written, or an error is raised and the original file is left unchanged. The
   # file should never be in a partially written state.
   #
-  # @param io [IO] a file (or a readable IO object)
+  # @param src_file [File] the file to store
   # @param path [String] the remote path where the file should be stored
   def store(io, path)
     raise NotImplementedError, "store not implemented"

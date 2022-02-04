@@ -12,13 +12,12 @@ class StorageManager::Local < StorageManager
     super(**options)
   end
 
-  def store(io, dest_path)
+  def store(src_file, dest_path)
     temp_path = full_path(dest_path) + "-" + SecureRandom.uuid + ".tmp"
 
     FileUtils.mkdir_p(File.dirname(temp_path))
-    io.rewind
-    bytes_copied = IO.copy_stream(io, temp_path)
-    raise Error, "store failed: #{bytes_copied}/#{io.size} bytes copied" if bytes_copied != io.size
+    bytes_copied = IO.copy_stream(src_file.path, temp_path)
+    raise Error, "store failed: #{bytes_copied}/#{src_file.size} bytes copied" if bytes_copied != src_file.size
 
     FileUtils.chmod(DEFAULT_PERMISSIONS, temp_path)
     File.rename(temp_path, full_path(dest_path))

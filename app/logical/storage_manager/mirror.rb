@@ -9,14 +9,14 @@ class StorageManager::Mirror < StorageManager
     super(**options)
   end
 
-  def store(io, dest_path)
-    services.each do |service|
-      service.store(io, dest_path)
+  def store(src_file, dest_path)
+    Parallel.each(services, in_threads: Etc.nprocessors) do |service|
+      service.store(src_file, dest_path)
     end
   end
 
   def delete(path)
-    services.each do |service|
+    Parallel.each(services, in_threads: Etc.nprocessors) do |service|
       service.delete(path)
     end
   end

@@ -271,7 +271,7 @@ class MediaAsset < ApplicationRecord
     end
 
     def distribute_files!(media_file)
-      variants.each do |variant|
+      Parallel.each(variants, in_threads: Etc.nprocessors) do |variant|
         variant.store_file!(media_file)
       end
     end

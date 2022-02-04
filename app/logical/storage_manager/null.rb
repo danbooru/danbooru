@@ -7,7 +7,7 @@ class StorageManager::Null < StorageManager
     super(base_url: nil)
   end
 
-  def store(io, path)
+  def store(src_file, path)
     # no-op
   end
 
