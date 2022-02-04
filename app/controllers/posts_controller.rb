@@ -64,7 +64,8 @@ class PostsController < ApplicationController
   end
 
   def create
-    @post = authorize Post.new_from_upload(permitted_attributes(Post))
+    @upload_media_asset = UploadMediaAsset.find(params[:upload_media_asset_id])
+    @post = authorize Post.new_from_upload(@upload_media_asset.upload, @upload_media_asset.media_asset, **permitted_attributes(Post).to_h.symbolize_keys)
     @post.save
 
     if @post.errors.none?
@@ -79,7 +80,8 @@ class PostsController < ApplicationController
       flash[:notice] = "Duplicate of post ##{@original_post.id}; merging tags"
       redirect_to @original_post
     else
-      @upload = UploadMediaAsset.find(params[:post][:upload_media_asset_id]).upload
+      @upload = @upload_media_asset.upload
+      @media_asset = @upload_media_asset.media_asset
       flash[:notice] = @post.errors.full_messages.join("; ")
       respond_with(@post, render: { template: "uploads/show" })
     end

@@ -29,9 +29,6 @@
 
       <div id="client-errors" class="error-messages ui-state-error ui-corner-all" style="display:none"></div>
 
-      <% @upload_media_asset = @upload.upload_media_assets.first %>
-      <% @media_asset = @upload_media_asset.media_asset %>
-
       <div id="upload-image">
         <%= render MediaAssetComponent.new(media_asset: @media_asset) %>
 
@@ -51,9 +48,7 @@
       <% end %>
 
       <%= edit_form_for(@post, html: { id: "form" }) do |f| %>
-        <%= f.input :upload_id, as: :hidden, input_html: { value: @upload.id } %>
-        <%= f.input :media_asset_id, as: :hidden, input_html: { value: @media_asset.id } %>
-        <%= f.input :upload_media_asset_id, as: :hidden, input_html: { value: @upload_media_asset.id } %>
+        <%= hidden_field_tag :upload_media_asset_id, @upload_media_asset.id %>
 
         <%= f.input :source, as: :string, input_html: { value: @upload.source_strategy&.canonical_url } %>
         <%= f.input :rating, collection: [["Explicit", "e"], ["Questionable", "q"], ["Safe", "s"]], as: :radio_buttons, selected: @post.rating %>

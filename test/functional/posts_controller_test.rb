@@ -8,7 +8,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
   def create_post!(user: create(:user), media_asset: build(:media_asset), rating: "q", tag_string: "tagme", **params)
     upload = build(:upload, uploader: user)
     asset = create(:upload_media_asset, upload: upload, media_asset: media_asset)
-    post_auth posts_path, user, params: { post: { upload_media_asset_id: asset.id, rating: rating, tag_string: tag_string, **params }}
+    post_auth posts_path, user, params: { upload_media_asset_id: asset.id, post: { rating: rating, tag_string: tag_string, **params }}
 
     Post.last
   end

@@ -138,6 +138,14 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         assert_redirected_to @post
       end
+
+      should "prefill the upload form with the URL parameters" do
+        upload = create(:completed_source_upload, uploader: @user)
+        get_auth upload_path(upload, post: { rating: "s" }), @user
+
+        assert_response :success
+        assert_select "#post_rating_s[checked]"
+      end
     end
 
     context "create action" do

@@ -75,32 +75,28 @@ class Post < ApplicationRecord
     has_many :versions, -> { Rails.env.test? ? order("post_versions.updated_at ASC, post_versions.id ASC") : order("post_versions.updated_at ASC") }, class_name: "PostVersion", dependent: :destroy
   end
 
-  def self.new_from_upload(params)
-    upload_media_asset = UploadMediaAsset.find(params[:upload_media_asset_id])
-    media_asset = upload_media_asset.media_asset
-    upload = upload_media_asset.upload
-
+  def self.new_from_upload(upload, media_asset, tag_string: nil, rating: nil, parent_id: nil, source: nil, artist_commentary_title: nil, artist_commentary_desc: nil, translated_commentary_title: nil, translated_commentary_desc: nil, is_pending: nil)
     # XXX depends on CurrentUser
     commentary = ArtistCommentary.new(
-      original_title: params[:artist_commentary_title],
-      original_description: params[:artist_commentary_desc],
-      translated_title: params[:translated_commentary_title],
-      translated_description: params[:translated_commentary_desc],
+      original_title: artist_commentary_title,
+      original_description: artist_commentary_desc,
+      translated_title: translated_commentary_title,
+      translated_description: translated_commentary_desc,
     )
 
     post = Post.new(
       uploader: upload.uploader,
       uploader_ip_addr: upload.uploader_ip_addr,
-      md5: media_asset.md5,
-      file_ext: media_asset.file_ext,
-      file_size: media_asset.file_size,
-      image_width: media_asset.image_width,
-      image_height: media_asset.image_height,
-      source: params[:source].to_s,
-      tag_string: params[:tag_string],
-      rating: params[:rating],
-      parent_id: params[:parent_id],
-      is_pending: !upload.uploader.can_upload_free? || params[:is_pending].to_s.truthy?,
+      md5: media_asset&.md5,
+      file_ext: media_asset&.file_ext,
+      file_size: media_asset&.file_size,
+      image_width: media_asset&.image_width,
+      image_height: media_asset&.image_height,
+      source: source.to_s,
+      tag_string: tag_string,
+      rating: rating,
+      parent_id: parent_id,
+      is_pending: !upload.uploader.can_upload_free? || is_pending.to_s.truthy?,
       artist_commentary: (commentary if commentary.any_field_present?),
     )
   end

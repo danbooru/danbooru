@@ -102,7 +102,14 @@ export default class FileUploadComponent {
     }
 
     if (upload.status === "completed") {
-      window.location.replace(`/uploads/${upload.id}`);
+      let params = new URLSearchParams(window.location.search);
+      params.delete("url");
+      params.delete("ref");
+
+      let url = new URL(`/uploads/${upload.id}`, window.location.origin);
+      url.search = params.toString();
+
+      window.location.replace(url);
     } else {
       this.$dropzone.removeClass("success");
       this.$component.find("progress").addClass("hidden");
