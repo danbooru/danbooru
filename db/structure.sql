@@ -1945,32 +1945,12 @@ ALTER SEQUENCE public.upload_media_assets_id_seq OWNED BY public.upload_media_as
 CREATE TABLE public.uploads (
     id integer NOT NULL,
     source text,
-    file_path character varying,
-    content_type character varying,
-    rating character(1),
     uploader_id integer NOT NULL,
     uploader_ip_addr inet NOT NULL,
-    tag_string text,
     status text DEFAULT 'pending'::text NOT NULL,
-    backtrace text,
-    post_id integer,
-    md5_confirmation character varying,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    server text,
-    parent_id integer,
-    md5 character varying,
-    file_ext character varying,
-    file_size integer,
-    image_width integer,
-    image_height integer,
-    artist_commentary_desc text,
-    artist_commentary_title text,
-    include_artist_commentary boolean,
-    context text,
-    referer_url text,
-    translated_commentary_title text DEFAULT ''::text NOT NULL,
-    translated_commentary_desc text DEFAULT ''::text NOT NULL
+    referer_url text
 );
 
 
@@ -4852,22 +4832,6 @@ ALTER TABLE ONLY public.comment_votes
 
 
 --
--- Name: uploads fk_rails_0e5f710d62; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.uploads
-    ADD CONSTRAINT fk_rails_0e5f710d62 FOREIGN KEY (parent_id) REFERENCES public.posts(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: uploads fk_rails_127111e6ac; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.uploads
-    ADD CONSTRAINT fk_rails_127111e6ac FOREIGN KEY (post_id) REFERENCES public.posts(id) DEFERRABLE INITIALLY DEFERRED NOT VALID;
-
-
---
 -- Name: upload_media_assets fk_rails_171271f781; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5776,6 +5740,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220110171024'),
 ('20220120233850'),
 ('20220124195900'),
-('20220203040648');
+('20220203040648'),
+('20220204075610');
 
 

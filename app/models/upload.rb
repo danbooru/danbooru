@@ -3,13 +3,6 @@
 class Upload < ApplicationRecord
   extend Memoist
 
-  self.ignored_columns = %i[
-    file_path content_type rating tag_string backtrace post_id md5_confirmation
-    server parent_id md5 file_ext file_size image_width image_height
-    artist_commentary_desc artist_commentary_title include_artist_commentary
-    context translated_commentary_title translated_commentary_desc
-  ]
-
   attr_accessor :file
 
   belongs_to :uploader, class_name: "User"
