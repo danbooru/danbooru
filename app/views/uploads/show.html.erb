@@ -48,6 +48,7 @@
       <% end %>
 
       <%= edit_form_for(@post, html: { id: "form" }) do |f| %>
+        <%= hidden_field_tag :media_asset_id, @media_asset.id %> <%# used by iqdb javascript %>
         <%= hidden_field_tag :upload_media_asset_id, @upload_media_asset.id %>
 
         <%= f.input :source, as: :string, input_html: { value: @upload.source_strategy&.canonical_url } %>

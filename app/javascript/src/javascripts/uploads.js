@@ -25,7 +25,7 @@ Upload.initialize_all = function() {
 }
 
 Upload.initialize_similar = function() {
-  let media_asset_id = $("input[name='post[media_asset_id]']").val();
+  let media_asset_id = $("input[name='media_asset_id']").val();
 
   $.get("/iqdb_queries.js", {
     limit: Upload.IQDB_LIMIT,
