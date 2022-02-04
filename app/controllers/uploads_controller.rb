@@ -40,7 +40,7 @@ class UploadsController < ApplicationController
       @media_assets = authorize MediaAsset.active.visible(CurrentUser.user).includes(:post, uploads: [:uploader]).where(uploads: { uploader: CurrentUser.user }).paginated_search(params, count_pages: true).reorder("uploads.id DESC")
       respond_with(@media_assets)
     else
-      raise "Invalid mode '#{mode}'"
+      raise "Invalid mode '#{@mode}'"
     end
   end
 
