@@ -73,7 +73,6 @@ class TagAliasTest < ActiveSupport::TestCase
       ta = create(:tag_alias, antecedent_name: "aaa", consequent_name: "bbb")
 
       assert_equal(["bbb"], TagAlias.to_aliased("aaa"))
-      assert_equal(["bbb"], TagAlias.to_aliased("aaa".mb_chars))
       assert_equal(["bbb", "ccc"], TagAlias.to_aliased(["aaa", "ccc"]))
       assert_equal(["ccc", "bbb"], TagAlias.to_aliased(["ccc", "bbb"]))
       assert_equal(["bbb", "bbb"], TagAlias.to_aliased(["aaa", "aaa"]))

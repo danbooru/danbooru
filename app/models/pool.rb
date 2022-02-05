@@ -86,7 +86,7 @@ class Pool < ApplicationRecord
   end
 
   def self.normalize_name_for_search(name)
-    normalize_name(name).mb_chars.downcase
+    normalize_name(name).downcase
   end
 
   def self.named(name)

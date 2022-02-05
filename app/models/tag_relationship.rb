@@ -33,8 +33,8 @@ class TagRelationship < ApplicationRecord
   validate :antecedent_and_consequent_are_different
 
   def normalize_names
-    self.antecedent_name = antecedent_name.mb_chars.downcase.tr(" ", "_")
-    self.consequent_name = consequent_name.mb_chars.downcase.tr(" ", "_")
+    self.antecedent_name = antecedent_name.downcase.tr(" ", "_")
+    self.consequent_name = consequent_name.downcase.tr(" ", "_")
   end
 
   def is_rejected?
