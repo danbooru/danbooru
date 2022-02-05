@@ -7,6 +7,7 @@ module Sources
         @img = "https://imglf4.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJUFczb2RKSVlpMHJkNy9kc3BSQVQvQm5DNzB4eVhxay9nPT0.png?imageView&thumbnail=1680x0&quality=96&stripmeta=0"
         @ref = "https://gengar563.lofter.com/post/1e82da8c_1c98dae1b"
         @source = Sources::Strategies.find(@img, @ref)
+        @source2 = Sources::Strategies.find(@ref)
       end
 
       should "get the artist name" do
@@ -31,7 +32,7 @@ module Sources
           https://imglf3.lf127.net/img/S1d2QlVsWkJhSW1qcnpIS0ZSa3ZJSzFCWFlnUWgzb01DcUdpT1lreG5yQjJVMkhGS09HNGR3PT0.png
         ]
 
-        assert_equal(images, @source.image_urls)
+        assert_equal(images, @source2.image_urls)
       end
 
       should "download the full-size image" do
