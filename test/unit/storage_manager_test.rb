@@ -1,8 +1,11 @@
 require 'test_helper'
 
 class StorageManagerTest < ActiveSupport::TestCase
-  setup do
-    CurrentUser.ip_addr = "127.0.0.1"
+  def tempfile(data)
+    file = Tempfile.new
+    file.write(data)
+    file.flush
+    file
   end
 
   context "StorageManager::Local" do
@@ -12,22 +15,22 @@ class StorageManagerTest < ActiveSupport::TestCase
 
     context "#store method" do
       should "store the file" do
-        @storage_manager.store(StringIO.new("data"), "test.txt")
+        @storage_manager.store(tempfile("data"), "test.txt")
 
-        assert("data", File.read("#{@temp_dir}/test.txt"))
+        assert_equal("data", File.read("#{@temp_dir}/test.txt"))
       end
 
       should "overwrite the file if it already exists" do
-        @storage_manager.store(StringIO.new("foo"), "test.txt")
-        @storage_manager.store(StringIO.new("bar"), "test.txt")
+        @storage_manager.store(tempfile("foo"), "test.txt")
+        @storage_manager.store(tempfile("bar"), "test.txt")
 
-        assert("bar", File.read("#{@temp_dir}/test.txt"))
+        assert_equal("bar", File.read("#{@temp_dir}/test.txt"))
       end
     end
 
     context "#delete method" do
       should "delete the file" do
-        @storage_manager.store(StringIO.new("data"), "test.txt")
+        @storage_manager.store(tempfile("data"), "test.txt")
         @storage_manager.delete("test.txt")
 
         assert_not(File.exist?("#{@temp_dir}/test.txt"))
@@ -57,16 +60,16 @@ class StorageManagerTest < ActiveSupport::TestCase
 
     context "#store method" do
       should "store the file on both backends" do
-        @storage_manager.store(StringIO.new("data"), "test.txt")
+        @storage_manager.store(tempfile("data"), "test.txt")
 
-        assert("data", File.read("#{@temp_dir1}/test.txt"))
-        assert("data", File.read("#{@temp_dir2}/test.txt"))
+        assert_equal("data", File.read("#{@temp_dir1}/test.txt"))
+        assert_equal("data", File.read("#{@temp_dir2}/test.txt"))
       end
     end
 
     context "#delete method" do
       should "delete the file from both backends" do
-        @storage_manager.store(StringIO.new("data"), "test.txt")
+        @storage_manager.store(tempfile("data"), "test.txt")
         @storage_manager.delete("test.txt")
 
         assert_not(File.exist?("#{@temp_dir1}/test.txt"))
@@ -76,7 +79,7 @@ class StorageManagerTest < ActiveSupport::TestCase
 
     context "#open method" do
       should "open the file from the first backend" do
-        @storage_manager.store(StringIO.new("data"), "test.txt")
+        @storage_manager.store(tempfile("data"), "test.txt")
 
         assert_equal("data", @storage_manager.open("test.txt").read)
       end

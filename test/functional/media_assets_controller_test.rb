@@ -32,7 +32,7 @@ class MediaAssetsControllerTest < ActionDispatch::IntegrationTest
         get media_asset_path(@media_asset), as: :json
 
         assert_response :success
-        assert_equal(nil, response.parsed_body[:md5])
+        assert_nil(response.parsed_body[:md5])
       end
     end
   end
