@@ -109,7 +109,7 @@ class SessionLoader
     elsif params[:login].present? && params[:api_key].present?
       authenticate_api_key(params[:login], params[:api_key])
     else
-      raise AuthenticationFailure
+      raise AuthenticationFailure, "Missing `login` or `api_key`"
     end
   end
 
@@ -129,7 +129,7 @@ class SessionLoader
   #   permissions for this endpoint
   def authenticate_api_key(name, key)
     user, api_key = User.find_by_name(name)&.authenticate_api_key(key)
-    raise AuthenticationFailure if user.blank?
+    raise AuthenticationFailure, "Invalid API key" if user.blank?
     update_api_key(api_key)
     raise User::PrivilegeError if !api_key.has_permission?(request.remote_ip, request.params[:controller], request.params[:action])
     CurrentUser.user = user

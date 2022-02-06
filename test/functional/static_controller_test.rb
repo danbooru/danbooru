@@ -68,7 +68,7 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
       get "/qwoiqogieqg", as: :xml
 
       assert_response 404
-      assert_equal("Page not found", response.parsed_body.at("result").text)
+      assert_equal("Page not found", response.parsed_body.xpath("result/message").text)
     end
 
     should "render the 404 page when page_not_found_pool_id is configured" do

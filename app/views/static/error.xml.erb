@@ -1,2 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<result success="false"><%= @message %></result>
+<%= raw @api_response.to_xml(root: "result") %>

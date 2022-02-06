@@ -1,9 +1,19 @@
-<% page_title "Error: #{@message}" %>
+<% page_title "Error: #{@exception.class}" %>
 
 <h1>Error</h1>
-<p><%= @message %></p>
 
-<% unless @expected %>
+<% if @message.present? %>
+  <p><%= @message %></p>
+<% else %>
+  <p>Unexpected error: <%= @exception.class %>.</p>
+
   <h3>Details</h3>
-  <%= render "static/backtrace", exception: @exception, backtrace: @backtrace %>
+
+  <ul class="backtrace font-monospace p-4 mb-4">
+    <li><%= @exception.class.to_s %> exception raised</li>
+
+    <% Rails.backtrace_cleaner.clean(@backtrace).each do |b| %>
+      <li class="backtrace-line"><%= b %></li>
+    <% end %>
+  </ul>
 <% end %>

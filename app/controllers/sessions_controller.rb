@@ -22,7 +22,7 @@ class SessionsController < ApplicationController
       respond_with(user, location: url)
     else
       flash.now[:notice] = "Password was incorrect"
-      raise SessionLoader::AuthenticationFailure
+      raise SessionLoader::AuthenticationFailure, "Username or password incorrect"
     end
   end
 

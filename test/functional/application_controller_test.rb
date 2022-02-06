@@ -36,6 +36,45 @@ class ApplicationControllerTest < ActionDispatch::IntegrationTest
       end
     end
 
+    context "on an unexpected error" do
+      setup do
+        User.stubs(:find).raises(NoMethodError.new("pwned"))
+        @user = create(:user)
+      end
+
+      should "not return the error message in the HTML response" do
+        get user_path(@user)
+
+        assert_response 500
+        assert_match(/NoMethodError/, response.body.to_s)
+        assert_no_match(/pwned/, response.body.to_s)
+      end
+
+      should "not return the error message in the JSON response" do
+        get user_path(@user, format: :json)
+
+        assert_response 500
+        assert_match(/NoMethodError/, response.body.to_s)
+        assert_no_match(/pwned/, response.body.to_s)
+      end
+
+      should "not return the error message in the XML response" do
+        get user_path(@user, format: :xml)
+
+        assert_response 500
+        assert_match(/NoMethodError/, response.body.to_s)
+        assert_no_match(/pwned/, response.body.to_s)
+      end
+
+      should "not return the error message in the JS response" do
+        get user_path(@user, format: :js)
+
+        assert_response 500
+        assert_match(/NoMethodError/, response.body.to_s)
+        assert_no_match(/pwned/, response.body.to_s)
+      end
+    end
+
     context "on api authentication" do
       setup do
         @user = create(:user, password: "password")

@@ -112,11 +112,11 @@ class ApplicationController < ActionController::Base
     when ActiveRecord::QueryCanceled
       render_error_page(500, exception, template: "static/search_timeout", message: "The database timed out running your query.")
     when ActionController::BadRequest
-      render_error_page(400, exception)
+      render_error_page(400, exception, message: exception.message)
     when SessionLoader::AuthenticationFailure
-      render_error_page(401, exception, template: "sessions/new")
+      render_error_page(401, exception, message: exception.message, template: "sessions/new")
     when ActionController::InvalidAuthenticityToken, ActionController::UnpermittedParameters, ActionController::InvalidCrossOriginRequest, ActionController::Redirecting::UnsafeRedirectError
-      render_error_page(403, exception)
+      render_error_page(403, exception, message: exception.message)
     when ActiveSupport::MessageVerifier::InvalidSignature, # raised by `find_signed!`
          User::PrivilegeError,
          Pundit::NotAuthorizedError
@@ -124,7 +124,7 @@ class ApplicationController < ActionController::Base
     when ActiveRecord::RecordNotFound
       render_error_page(404, exception, message: "That record was not found.")
     when ActionController::RoutingError
-      render_error_page(405, exception)
+      render_error_page(405, exception, message: exception.message)
     when ActionController::UnknownFormat, ActionView::MissingTemplate
       render_error_page(406, exception, message: "#{request.format} is not a supported format for this page")
     when PaginationExtension::PaginationError
@@ -132,7 +132,7 @@ class ApplicationController < ActionController::Base
     when PostQueryBuilder::TagLimitError
       render_error_page(422, exception, template: "static/tag_limit_error", message: "You cannot search for more than #{CurrentUser.tag_query_limit} tags at a time.")
     when RateLimiter::RateLimitError
-      render_error_page(429, exception)
+      render_error_page(429, exception, message: "Rate limit exceeded. You're doing that too fast")
     when Rack::Timeout::RequestTimeoutException
       render_error_page(500, exception, message: "Your request took too long to complete and was canceled.")
     when NotImplementedError
@@ -140,17 +140,19 @@ class ApplicationController < ActionController::Base
     when PG::ConnectionBad
       render_error_page(503, exception, message: "The database is unavailable. Try again later.")
     else
-      raise exception if !Rails.env.production? || Danbooru.config.debug_mode
+      raise exception if Rails.env.development? || Danbooru.config.debug_mode
       render_error_page(500, exception)
     end
   end
 
-  def render_error_page(status, exception = nil, message: exception.message, template: "static/error", format: request.format.symbol)
+  def render_error_page(status, exception = nil, message: "", template: "static/error", format: request.format.symbol)
     @exception = exception
     @expected = status < 500
-    @message = message.encode("utf-8", invalid: :replace, undef: :replace)
+    @message = message.to_s.encode("utf-8", invalid: :replace, undef: :replace)
     @backtrace = Rails.backtrace_cleaner.clean(@exception.backtrace) if @exception
     format = :html unless format.in?(%i[html json xml js atom])
+
+    @api_response = { success: false, error: @exception.class.to_s, message: @message, backtrace: @backtrace }
 
     # if InvalidAuthenticityToken was raised, CurrentUser isn't set so we have to use the blank layout.
     layout = CurrentUser.user.present? ? "default" : "blank"

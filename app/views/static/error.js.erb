@@ -1,10 +1,7 @@
-var klass = <%= raw @exception.class.to_s.to_json %>;
-var message = <%= raw @message.to_json %>;
-var backtrace = <%= raw @backtrace.to_json %>;
+console.error(<%= raw @api_response.to_json %>);
 
-<% if @expected %>
-  Danbooru.Utility.error(message);
+<% if @message.present? %>
+  Danbooru.Utility.error("<%= j @message %>");
 <% else %>
-  console.error(klass, message, backtrace);
-  Danbooru.Utility.error(message);
+  Danbooru.Utility.error("<%= j "Unexpected error: #{@exception.class}" %>");
 <% end %>
