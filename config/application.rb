@@ -48,7 +48,14 @@ module Danbooru
     config.load_defaults 6.1
     config.active_record.schema_format = :sql
     config.encoding = "utf-8"
-    config.filter_parameters += [:password, :password_confirmation, :password_hash, :api_key]
+
+    # Hide sensitive model attributes and request params in exception messages,
+    # log files, and in NewRelic. These are substring matches, so they match
+    # any attribute or request param containing the word 'password' etc.
+    #
+    # https://guides.rubyonrails.org/configuring.html#config-filter-parameters
+    config.filter_parameters += [:password, :api_key, :secret, :ip_addr, :address, :email_verification_key, :signed_user_id] if Rails.env.production?
+
     # config.assets.enabled = true
     # config.assets.version = '1.0'
     config.autoload_paths += %W(#{config.root}/app/presenters #{config.root}/app/logical/concerns #{config.root}/app/logical #{config.root}/app/mailers)
