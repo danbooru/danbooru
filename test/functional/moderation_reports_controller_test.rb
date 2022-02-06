@@ -24,6 +24,12 @@ class ModerationReportsControllerTest < ActionDispatch::IntegrationTest
         get_auth new_moderation_report_path, @user, params: {:moderation_report => {:model_id => @comment.id, :model_type => "Comment"}}
         assert_response :success
       end
+
+      should "not raise an exception when given an invalid model" do
+        @user = create(:user)
+        get_auth new_moderation_report_path(moderation_report: { model_type: "User", model_id: @user.id }), @user
+        assert_response 403
+      end
     end
 
     context "index action" do
