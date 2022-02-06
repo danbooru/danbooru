@@ -41,7 +41,6 @@ class Post < ApplicationRecord
   belongs_to :uploader, :class_name => "User", :counter_cache => "post_upload_count"
   belongs_to :parent, class_name: "Post", optional: true
   has_one :media_asset, -> { active }, foreign_key: :md5, primary_key: :md5
-  has_one :upload, :dependent => :destroy
   has_one :artist_commentary, :dependent => :destroy
   has_one :pixiv_ugoira_frame_data, class_name: "PixivUgoiraFrameData", foreign_key: :md5, primary_key: :md5
   has_one :vote_by_current_user, -> { active.where(user_id: CurrentUser.id) }, class_name: "PostVote" # XXX using current user here is wrong
@@ -1123,7 +1122,7 @@ class Post < ApplicationRecord
         :image_height, :tag_count, :has_children, :has_active_children,
         :is_pending, :is_flagged, :is_deleted, :is_banned,
         :last_comment_bumped_at, :last_commented_at, :last_noted_at,
-        :uploader_ip_addr, :uploader, :approver, :parent, :upload,
+        :uploader_ip_addr, :uploader, :approver, :parent,
         :artist_commentary, :flags, :appeals, :notes, :comments, :children,
         :approvals, :replacements, :pixiv_ugoira_frame_data
       )
@@ -1350,7 +1349,7 @@ class Post < ApplicationRecord
   def self.available_includes
     # attributes accessible through the ?only= parameter
     %i[
-      uploader approver upload flags appeals parent children notes
+      uploader approver flags appeals parent children notes
       comments approvals disapprovals replacements pixiv_ugoira_frame_data
       artist_commentary
     ]
