@@ -40,17 +40,13 @@ module Sources
         parsed_url.domain.in?(domains) || parsed_url.host =~ IMAGE_HOST
       end
 
-      def image_url
-        if url =~ IMAGE_HOST
-          get_full_version(url)
-        else
-          image_urls.first
-        end
-      end
-
       def image_urls
-        images = page&.search(".imgclasstag img")
-        images.to_a.map { |img| get_full_version(img["src"]) }
+        if url =~ IMAGE_HOST
+          [get_full_version(url)]
+        else
+          images = page&.search(".imgclasstag img")
+          images.to_a.map { |img| get_full_version(img["src"]) }
+        end
       end
 
       def get_full_version(url)
