@@ -103,13 +103,18 @@ export default class FileUploadComponent {
 
     if (upload.status === "completed") {
       let params = new URLSearchParams(window.location.search);
+      let isBookmarklet = params.has("url");
       params.delete("url");
       params.delete("ref");
 
       let url = new URL(`/uploads/${upload.id}`, window.location.origin);
       url.search = params.toString();
 
-      window.location.replace(url);
+      if (isBookmarklet) {
+        window.location.replace(url);
+      } else {
+        window.location.assign(url);
+      }
     } else {
       this.$dropzone.removeClass("success");
       this.$component.find("progress").addClass("hidden");
