@@ -42,7 +42,7 @@
       <% end %>
     </p>
     <p class="desc">
-      <%= link_to number_to_human_size(file_size), post.file_url %>
+      <%= link_to "#{number_to_human_size(file_size)} .#{file_ext}", post.file_url %>
       (<%= post.image_width %>x<%= post.image_height %>)
     </p>
     <p class="desc">
@@ -50,7 +50,7 @@
     </p>
   <% elsif show_size -%>
     <p class="desc">
-      <%= link_to number_to_human_size(file_size), post.file_url %>
+      <%= link_to "#{number_to_human_size(file_size)} .#{file_ext}", post.file_url %>
       (<%= post.image_width %>x<%= post.image_height %>)
     </p>
   <% elsif recommended -%>
