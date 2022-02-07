@@ -261,6 +261,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("test/files/test-animated-86x52.gif")
         should_upload_successfully("test/files/test-300x300.mp4")
         should_upload_successfully("test/files/test-512x512.webm")
+        should_upload_successfully("test/files/test-audio.m4v")
         # should_upload_successfully("test/files/compressed.swf")
       end
 
