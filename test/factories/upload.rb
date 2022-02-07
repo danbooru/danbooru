@@ -5,6 +5,7 @@ FactoryBot.define do
 
     status { "pending" }
     source { "https://cdn.donmai.us/original/d3/4e/d34e4cf0a437a5d65f8e82b7bcd02606.jpg" }
+    error { nil }
 
     factory(:completed_source_upload) do
       status { "completed" }

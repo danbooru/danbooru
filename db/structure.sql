@@ -1950,7 +1950,8 @@ CREATE TABLE public.uploads (
     status text DEFAULT 'pending'::text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
-    referer_url text
+    referer_url text,
+    error text
 );
 
 
@@ -4535,6 +4536,13 @@ CREATE INDEX index_upload_media_assets_on_upload_id ON public.upload_media_asset
 
 
 --
+-- Name: index_uploads_on_error; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_uploads_on_error ON public.uploads USING btree (error) WHERE (error IS NOT NULL);
+
+
+--
 -- Name: index_uploads_on_referer_url; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -5741,6 +5749,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220120233850'),
 ('20220124195900'),
 ('20220203040648'),
-('20220204075610');
+('20220204075610'),
+('20220207195123');
 
 

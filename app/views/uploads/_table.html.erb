@@ -59,7 +59,7 @@
       <div>
         <strong>Error</strong>
         <span>
-          <%= upload.status.delete_prefix("error: ") %>
+          <%= upload.error %>
         </span>
       </div>
     <% end %>
@@ -72,11 +72,7 @@
   <% end %>
 
   <% t.column :status do |upload| %>
-    <% if upload.is_errored? %>
-      error
-    <% elsif !upload.is_completed? %>
-      <%= upload.status %>
-    <% end %>
+    <%= upload.status %>
   <% end %>
 <% end %>
 

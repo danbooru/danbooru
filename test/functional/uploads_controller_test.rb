@@ -111,7 +111,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       end
 
       should "render a failed upload" do
-        upload = create(:upload, uploader: @user, status: "error: Not an image or video")
+        upload = create(:upload, uploader: @user, status: "error", error: "Not an image or video")
         get_auth upload_path(upload), @user
 
         assert_response :success
@@ -174,7 +174,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         post_auth uploads_path(format: :json), @user, params: { upload: { file: file }}
 
         assert_response 201
-        assert_match("Not an image or video", Upload.last.status)
+        assert_match("Not an image or video", Upload.last.error)
       end
 
       should "fail if the file size is too large" do
@@ -186,7 +186,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         perform_enqueued_jobs
 
         assert_response 201
-        assert_match("File size must be less than or equal to", Upload.last.status)
+        assert_match("File size must be less than or equal to", Upload.last.error)
 
         Danbooru.config.unstub(:max_file_size)
       end
@@ -194,18 +194,18 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       context "for a corrupted image" do
         should "fail for a corrupted jpeg" do
           create_upload!("test/files/test-corrupt.jpg", user: @user)
-          assert_match("corrupt", Upload.last.status)
+          assert_match("corrupt", Upload.last.error)
         end
 
         should "fail for a corrupted gif" do
           create_upload!("test/files/test-corrupt.gif", user: @user)
-          assert_match("corrupt", Upload.last.status)
+          assert_match("corrupt", Upload.last.error)
         end
 
         # https://schaik.com/pngsuite/pngsuite_xxx_png.html
         should "fail for a corrupted png" do
           create_upload!("test/files/test-corrupt.png", user: @user)
-          assert_match("corrupt", Upload.last.status)
+          assert_match("corrupt", Upload.last.error)
         end
       end
 
@@ -216,7 +216,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           perform_enqueued_jobs
 
           assert_response 201
-          assert_match("Duration must be less than", Upload.last.status)
+          assert_match("Duration must be less than", Upload.last.error)
         end
       end
 
@@ -241,7 +241,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
           upload = Upload.last
 
           assert_redirected_to upload
-          assert_match("Upload failed, try again", upload.reload.status)
+          assert_match("Upload failed, try again", upload.reload.error)
           assert_equal("failed", asset.reload.status)
         end
       end

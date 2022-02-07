@@ -115,12 +115,12 @@ export default class FileUploadComponent {
       } else {
         window.location.assign(url);
       }
-    } else {
+    } else if (upload.status === "error") {
       this.$dropzone.removeClass("success");
       this.$component.find("progress").addClass("hidden");
       this.$component.find("input").removeAttr("disabled");
 
-      Utility.error(upload.status);
+      Utility.error(`Upload failed: ${upload.error}.`);
     }
   }
 

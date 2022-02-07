@@ -20,6 +20,7 @@ class Upload < ApplicationRecord
   scope :pending, -> { where(status: "pending") }
   scope :preprocessed, -> { where(status: "preprocessed") }
   scope :completed, -> { where(status: "completed") }
+  scope :failed, -> { where(status: "error") }
 
   def self.visible(user)
     if user.is_admin?
@@ -43,7 +44,7 @@ class Upload < ApplicationRecord
     end
 
     def is_errored?
-      status.match?(/error:/)
+      status == "error"
     end
   end
 
@@ -102,7 +103,7 @@ class Upload < ApplicationRecord
     media_asset = MediaAsset.upload!(media_file)
     update!(media_assets: [media_asset], status: "completed")
   rescue Exception => e
-    update!(status: "error: #{e.message}")
+    update!(status: "error", error: e.message)
   end
 
   def self.available_includes

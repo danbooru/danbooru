@@ -9,7 +9,7 @@
     <% end %>
 
     <% if @upload.is_errored? %>
-      <p><%= @upload.status %></p>
+      <p>Error: <%= @upload.error %>.</p>
     <% elsif @upload.is_pending? && @upload.source.present? %>
       <p>Preparing to upload <%= external_link_to @upload.source %>...</p>
     <% elsif @upload.is_processing? && @upload.source.present? %>
