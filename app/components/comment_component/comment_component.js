@@ -1,0 +1,1 @@
+../../javascript/src/javascripts/comment_component.js

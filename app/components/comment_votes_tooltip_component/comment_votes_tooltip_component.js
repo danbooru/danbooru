@@ -1,0 +1,1 @@
+../../javascript/src/javascripts/comment_votes_tooltip_component.js
