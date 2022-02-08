@@ -129,6 +129,7 @@ html {
   --form-input-validation-error-text-color: var(--red-5);
 
   --form-button-text-color: var(--text-color);
+  --form-button-disabled-text-color: var(--grey-5);
   --form-button-background: var(--grey-1);
   --form-button-border-color: var(--grey-2);
   --form-button-hover-background: var(--grey-0);
@@ -337,6 +338,7 @@ body[data-current-user-theme="dark"] {
   --form-input-validation-error-text-color: var(--red-5);
 
   --form-button-text-color: var(--grey-9);
+  --form-button-disabled-text-color: var(--grey-5);
   --form-button-background: var(--grey-2);
   --form-button-border-color: var(--grey-4);
   --form-button-hover-background: var(--grey-0);

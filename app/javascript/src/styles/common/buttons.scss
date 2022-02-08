@@ -13,18 +13,27 @@ input[type="button"], input[type="submit"], button {
   border-radius: 3px;
   padding: 0.25em 1em;
 
-  background: var(--form-button-background);
+  cursor: pointer;
   border: 1px solid var(--form-button-border-color);
+  background: var(--form-button-background);
   color: var(--form-button-text-color);
 
-  &:hover {
-    box-shadow: 0 0 2px var(--form-button-hover-box-shadow-color);
+  &:disabled {
+    cursor: wait;
     background: var(--form-button-hover-background);
+    color: var(--form-button-disabled-text-color);
   }
 
-  &:active {
-    box-shadow: 0 0 2px var(--form-button-hover-box-shadow-color);
-    background: var(--form-button-active-background);
+  &:not(:disabled) {
+    &:hover {
+      box-shadow: 0 0 2px var(--form-button-hover-box-shadow-color);
+      background: var(--form-button-hover-background);
+    }
+
+    &:active {
+      box-shadow: 0 0 2px var(--form-button-hover-box-shadow-color);
+      background: var(--form-button-active-background);
+    }
   }
 }
 
