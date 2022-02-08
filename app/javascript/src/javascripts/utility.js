@@ -61,7 +61,13 @@ Utility.dialog = function(title, html) {
     buttons: {
       "Submit": function() {
         let form = $dialog.find("form").get(0);
-        Rails.fire(form, "submit");
+
+        if (form.requestSubmit) {
+          form.requestSubmit();
+        } else {
+          form.submit();
+          Rails.fire(form, "submit");
+        }
       },
       "Cancel": function() {
         $dialog.dialog("close");
