@@ -71,6 +71,13 @@ class StaticControllerTest < ActionDispatch::IntegrationTest
       assert_equal("Page not found", response.parsed_body.xpath("result/message").text)
     end
 
+    should "return a JS response for a 404'd .js request" do
+      get "/qwoiqogieqg.js"
+
+      assert_response 404
+      assert_equal("", response.body)
+    end
+
     should "render the 404 page when page_not_found_pool_id is configured" do
       as(create(:user)) do
         @post = create(:post, tag_string: "artist:bkub")
