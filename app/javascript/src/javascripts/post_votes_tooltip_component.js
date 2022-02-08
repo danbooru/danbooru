@@ -1,33 +1,33 @@
-import Utility from "../../javascript/src/javascripts/utility.js";
+import Utility from "./utility";
 import { delegate, hideAll } from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 
-class FavoritesTooltipComponent {
-  // Trigger on the post favcount link.
-  static TARGET_SELECTOR = "span.post-favcount a";
+class PostVotesTooltipComponent {
+  // Trigger on the post score link; see PostVotesComponent.
+  static TARGET_SELECTOR = "span.post-votes span.post-score a";
   static SHOW_DELAY = 125;
   static HIDE_DELAY = 125;
   static DURATION = 250;
   static instance = null;
 
   static initialize() {
-    if ($(FavoritesTooltipComponent.TARGET_SELECTOR).length === 0) {
+    if ($(PostVotesTooltipComponent.TARGET_SELECTOR).length === 0) {
       return;
     }
 
-    FavoritesTooltipComponent.instance = delegate("body", {
+    PostVotesTooltipComponent.instance = delegate("body", {
       allowHTML: true,
-      appendTo: document.querySelector("#post-favorites-tooltips"),
-      delay: [FavoritesTooltipComponent.SHOW_DELAY, FavoritesTooltipComponent.HIDE_DELAY],
-      duration: FavoritesTooltipComponent.DURATION,
+      appendTo: document.querySelector("#post-votes-tooltips"),
+      delay: [PostVotesTooltipComponent.SHOW_DELAY, PostVotesTooltipComponent.HIDE_DELAY],
+      duration: PostVotesTooltipComponent.DURATION,
       interactive: true,
       maxWidth: "none",
-      target: FavoritesTooltipComponent.TARGET_SELECTOR,
+      target: PostVotesTooltipComponent.TARGET_SELECTOR,
       theme: "common-tooltip",
       touch: false,
 
-      onShow: FavoritesTooltipComponent.onShow,
-      onHide: FavoritesTooltipComponent.onHide,
+      onShow: PostVotesTooltipComponent.onShow,
+      onHide: PostVotesTooltipComponent.onHide,
     });
   }
 
@@ -41,14 +41,14 @@ class FavoritesTooltipComponent {
     try {
       $tooltip.addClass("tooltip-loading");
 
-      instance._request = $.get(`/posts/${postId}/favorites?variant=tooltip`);
+      instance._request = $.get(`/post_votes?search[post_id]=${postId}`, { variant: "tooltip" });
       let html = await instance._request;
       instance.setContent(html);
 
       $tooltip.removeClass("tooltip-loading");
     } catch (error) {
       if (error.status !== 0 && error.statusText !== "abort") {
-        Utility.error(`Error displaying favorites for post #${postId} (error: ${error.status} ${error.statusText})`);
+        Utility.error(`Error displaying votes for post #${postId} (error: ${error.status} ${error.statusText})`);
       }
     }
   }
@@ -60,6 +60,6 @@ class FavoritesTooltipComponent {
   }
 }
 
-$(document).ready(FavoritesTooltipComponent.initialize);
+$(document).ready(PostVotesTooltipComponent.initialize);
 
-export default FavoritesTooltipComponent;
+export default PostVotesTooltipComponent;

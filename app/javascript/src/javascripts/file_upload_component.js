@@ -1,5 +1,5 @@
 import Dropzone from 'dropzone';
-import Utility from "../../javascript/src/javascripts/utility.js";
+import Utility from "./utility";
 import capitalize from "lodash/capitalize";
 
 export default class FileUploadComponent {

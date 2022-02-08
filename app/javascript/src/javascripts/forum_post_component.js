@@ -1,4 +1,4 @@
-import Utility from "../../javascript/src/javascripts/utility.js";
+import Utility from "./utility";
 
 class ForumPostComponent {
   static initialize() {

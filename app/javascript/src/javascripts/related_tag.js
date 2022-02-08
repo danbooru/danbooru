@@ -1,4 +1,4 @@
-import SourceDataComponent from '../../../components/source_data_component/source_data_component.js';
+import SourceDataComponent from "./source_data_component.js";
 import Utility from './utility';
 
 let RelatedTag = {};

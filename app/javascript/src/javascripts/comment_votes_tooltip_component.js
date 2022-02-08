@@ -1,4 +1,4 @@
-import Utility from "../../javascript/src/javascripts/utility.js";
+import Utility from "./utility";
 import { delegate, hideAll } from 'tippy.js';
 import 'tippy.js/dist/tippy.css';
 
