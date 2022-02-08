@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class ArtistUrl < ApplicationRecord
-  before_validation :initialize_normalized_url, on: :create
-  before_validation :normalize
+  normalize :url, :normalize_url
+
   validates :url, presence: true, uniqueness: { scope: :artist_id }
   validate :validate_url_format
   belongs_to :artist, :touch => true
@@ -18,7 +18,7 @@ class ArtistUrl < ApplicationRecord
     [is_active, url]
   end
 
-  def self.normalize(url)
+  def self.normalize_normalized_url(url)
     if url.nil?
       nil
     else
@@ -29,7 +29,7 @@ class ArtistUrl < ApplicationRecord
       url = url.sub(%r{^http://pictures.hentai-foundry.com//}, "http://pictures.hentai-foundry.com/")
 
       # the strategy won't always work for twitter because it looks for a status
-      url = url.downcase if url =~ %r{^https?://(?:mobile\.)?twitter\.com}
+      url = url.downcase if url =~ %r{^https?://(?:mobile\.)?twitter\.com}i
 
       url = Sources::Strategies.find(url).normalize_for_artist_finder
 
@@ -67,7 +67,7 @@ class ArtistUrl < ApplicationRecord
     elsif url.include?("*")
       where_ilike(attr, url)
     else
-      where(attr => normalize(url))
+      where(attr => normalize_normalized_url(url))
     end
   end
 
@@ -118,20 +118,17 @@ class ArtistUrl < ApplicationRecord
     sites.index(site_name) || 1000
   end
 
-  def normalize
-    # Perform some normalization with Addressable on the URL itself
-    # - Converts scheme and hostname to downcase
-    # - Converts unicode hostname to Punycode
+  def self.normalize_url(url)
     uri = Addressable::URI.parse(url)
     uri.site = uri.normalized_site
-    self.url = uri.to_s
-    self.normalized_url = self.class.normalize(url)
+    uri.to_s
   rescue Addressable::URI::InvalidURIError
-    # Don't bother normalizing the URL if there is errors
+    url
   end
 
-  def initialize_normalized_url
-    self.normalized_url = url
+  def url=(url)
+    super(url)
+    self.normalized_url = self.class.normalize_normalized_url(self.url)
   end
 
   def to_s

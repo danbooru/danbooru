@@ -158,6 +158,13 @@ class ArtistTest < ActiveSupport::TestCase
       assert_equal(old_url_ids, ArtistUrl.order("id").pluck(&:id))
     end
 
+    should "normalize urls before removing duplicates" do
+      @artist = create(:artist, url_string: "https://Twitter.com/o8q https://twitter.com/o8q")
+
+      assert_equal(1, @artist.urls.count)
+      assert_equal(["https://twitter.com/o8q"], @artist.urls.map(&:to_s))
+    end
+
     should "ignore pixiv.net/ and pixiv.net/img/ url matches" do
       a1 = FactoryBot.create(:artist, :name => "yomosaka", :url_string => "http://i2.pixiv.net/img18/img/evazion/14901720.png")
       a2 = FactoryBot.create(:artist, :name => "niwatazumi_bf", :url_string => "http://i2.pixiv.net/img18/img/evazion/14901720_big_p0.png")

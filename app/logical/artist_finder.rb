@@ -149,7 +149,7 @@ module ArtistFinder
   # @param url [String] the artist profile URL
   # @return [Array<Artist>] the list of matching artists
   def find_artists(url)
-    url = ArtistUrl.normalize(url)
+    url = ArtistUrl.normalize_normalized_url(url)
     artists = []
 
     while artists.empty? && url.size > 10
