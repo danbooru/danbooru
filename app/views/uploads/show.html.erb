@@ -92,7 +92,7 @@
           <%= render "related_tags/buttons" %>
         </div>
 
-        <%= f.submit "Upload", id: "submit-button", data: { disable_with: false } %>
+        <%= f.submit "Post" %>
 
         <% if CurrentUser.can_upload_free? %>
           <%= f.input :is_pending, as: :boolean, label: "Upload for approval", wrapper_html: { class: "inline-block" }, input_html: { checked: @post.is_pending? } %>

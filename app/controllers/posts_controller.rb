@@ -66,7 +66,7 @@ class PostsController < ApplicationController
   def create
     @upload_media_asset = UploadMediaAsset.find(params[:upload_media_asset_id])
     @post = authorize Post.new_from_upload(@upload_media_asset.upload, @upload_media_asset.media_asset, **permitted_attributes(Post).to_h.symbolize_keys)
-    @post.save
+    @post.save_if_unique(:md5)
 
     if @post.errors.none?
       if @post.warnings.any?

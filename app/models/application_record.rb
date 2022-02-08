@@ -172,6 +172,16 @@ class ApplicationRecord < ActiveRecord::Base
         end
       end
     end
+
+    # Save the record, but convert RecordNotUnique exceptions thrown by the database into
+    # Rails validation errors. This way duplicate records only return one type of error.
+    # This assumes the table only has one uniqueness constraint in the database.
+    def save_if_unique(column)
+      save
+    rescue ActiveRecord::RecordNotUnique => e
+      self.errors.add(column, :taken)
+      false
+    end
   end
 
   concerning :UserMethods do
