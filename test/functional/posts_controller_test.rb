@@ -93,7 +93,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           create(:post, tag_string: "artist:bkub", rating: "s")
           get posts_path, params: { tags: "bkub" }
           assert_response :success
-          assert_select "#show-excerpt-link", count: 1, text: "Wiki"
+          assert_select "#show-excerpt-link", count: 1, text: "Artist"
 
           artist = create(:artist, name: "bkub")
           get posts_path, params: { tags: "bkub" }
@@ -110,13 +110,13 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
           artist.update(is_banned: false, is_deleted: true)
           get posts_path, params: { tags: "bkub" }
           assert_response :success
-          assert_select "#show-excerpt-link", count: 1, text: "Wiki"
+          assert_select "#show-excerpt-link", count: 1, text: "Artist"
 
           as(@user) { create(:wiki_page, title: "bkub") }
           get posts_path, params: { tags: "bkub" }
           assert_response :success
-          assert_select "#show-excerpt-link", count: 1, text: "Wiki"
-          assert_select "#view-wiki-link", count: 1
+          assert_select "#show-excerpt-link", count: 1, text: "Artist"
+          assert_select "#view-wiki-link", count: 0
           assert_select "#view-artist-link", count: 0
         end
 
