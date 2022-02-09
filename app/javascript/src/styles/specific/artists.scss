@@ -1,0 +1,19 @@
+.inactive-artist-url {
+  &:link, &:visited {
+    color: var(--inactive-artist-url-color);
+  }
+
+  &:hover {
+    color: var(--inactive-artist-url-hover-color);
+  }
+}
+
+.banned-artist-label {
+  background-color: var(--banned-artist-label-color);
+  color: var(--inverse-text-color);
+}
+
+.deleted-artist-label {
+  background-color: var(--deleted-artist-label-color);
+  color: var(--inverse-text-color);
+}

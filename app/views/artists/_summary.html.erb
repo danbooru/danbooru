@@ -1,53 +1,79 @@
 <%# artist %>
-<ul>
-  <% if artist.is_banned? || artist.is_deleted? %>
-    <li>
-      <strong>Status</strong>
 
-      <% if artist.is_banned? %>
-        Banned
-      <% end %>
-
-      <% if artist.is_deleted? %>
-        Deleted
-      <% end %>
-    </li>
+<div class="flex items-center gap-2">
+  <% if artist.is_banned? %>
+    <span class="banned-artist-label text-xxs px-2 rounded">BANNED</span>
   <% end %>
 
+  <% if artist.is_deleted? %>
+    <span class="deleted-artist-label text-xxs px-2 rounded">DELETED</span>
+  <% end %>
+
+  <%= link_to artist.pretty_name, posts_path(tags: artist.name), class: [tag_class(artist.tag), "heading text-xl"] %>
+
+  <span class="text-sm post-count"><%= artist.tag.post_count %></span>
+</div>
+
+<% if artist.is_banned? && !policy(artist).can_view_banned? %>
+  <p>The artist requested removal of this page.</p>
+<% else %>
+
   <% if artist.other_names.present? %>
-    <li>
-      <strong>Other Names</strong>
+    <div>
       <% artist.other_names.map do |other_name| %>
         <%= link_to other_name, artists_path(search: { any_name_matches: other_name }), class: "artist-other-name" %>
       <% end %>
-    </li>
+    </div>
   <% end %>
+
   <% if artist.group_name.present? %>
-    <li>
+    <div>
       <strong>Group</strong>
-      <%= link_to artist.group_name, artists_path(search: { group_name: artist.group_name }) %>
-    </li>
+      <%= link_to artist.group_name, artists_path(search: { group_name: artist.group_name }), class: "artist-other-name" %>
+    </div>
   <% end %>
+
   <% if artist.members.present? %>
-    <li>
+    <div>
       <strong>Members</strong>
       <% artist.members.each do |member| %>
-        <%= link_to member.name, artists_path(search: { name: member.name }) %>
+        <%= link_to member.name, artists_path(search: { name: member.name }), class: "artist-other-name" %>
       <% end %>
-    </li>
+    </div>
   <% end %>
+
+  <% if artist.wiki_page.present? && !artist.wiki_page.is_deleted? %>
+    <div class="artist-wiki prose mt-4">
+      <%= format_text(artist.wiki_page.body, disable_mentions: true) %>
+    </div>
+  <% end %>
+
   <% if artist.urls.present? %>
-    <li><strong>URLs</strong></li>
-    <ul class="list-bulleted">
-      <% artist.urls.each do |url| %>
-        <li>
-          <% if url.is_active? %>
-            <%= link_to h(url.to_s), h(url) %>
-          <% else %>
-            <del><%= h(url.url) %></del>
-          <% end %>
-        </li>
-      <% end %>
-    </ul>
+    <p>
+      <h6>URLs</h6>
+
+      <ul>
+        <% artist.sorted_urls.each do |url| %>
+          <li>
+            <%= external_link_to url.url, external_site_icon(url.site_name, class: "h-4") %>
+            <% if url.is_active? %>
+              <%= external_link_to url.url %>
+            <% else %>
+              <%= external_link_to url.url, class: "inactive-artist-url underline decoration-dotted" %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </p>
   <% end %>
-</ul>
+
+  <p>
+    <% if artist.wiki_page.present? %>
+      <%= link_to "Edit wiki", edit_wiki_page_path(artist.wiki_page), id: "view-wiki-link" %> |
+    <% end %>
+
+    <%= link_to "Edit artist", edit_artist_path(artist), id: "view-artist-link" %>
+  </p>
+
+  <%= render "tag_relationships/alias_and_implication_list", tag: artist.tag %>
+<% end %>

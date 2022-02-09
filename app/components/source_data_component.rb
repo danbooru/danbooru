@@ -11,8 +11,6 @@ class SourceDataComponent < ApplicationComponent
   end
 
   def profile_urls(artist)
-    artist.urls.active.reject(&:secondary_url?).sort_by do |artist_url|
-      [artist_url.priority, artist_url.domain, artist_url.url]
-    end
+    artist.sorted_urls.select(&:is_active?).reject(&:secondary_url?)
   end
 end
