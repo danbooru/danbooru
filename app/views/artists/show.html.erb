@@ -1,7 +1,25 @@
+<% page_title "#{@artist.pretty_name.titleize} | Artist Profile" %>
 <% noindex if @artist.is_banned? %>
+<%= render "secondary_links" %>
 
-<%= render layout: "show" do %>
-  <div>
-    <%= render "summary", artist: @artist %>
+<div id="c-artists">
+  <div id="a-show">
+    <% if @artist.is_banned? && !policy(@artist).can_view_banned? %>
+      <p>The artist requested removal of this page.</p>
+    <% else %>
+      <%= render "artists/summary", artist: @artist %>
+
+      <% if @artist.tag.present? && @artist.tag.post_count > 0 %>
+        <div class="recent-posts">
+          <h2 class="recent-posts-header">
+            <%= link_to "Posts", posts_path(tags: @artist.name) %>
+          </h2>
+
+          <%= render "posts/partials/common/inline_blacklist" %>
+
+          <%= render_post_gallery(@artist.tag.posts.limit(8), tags: @artist.name) %>
+        </div>
+      <% end %>
+    <% end%>
   </div>
-<% end %>
+</div>

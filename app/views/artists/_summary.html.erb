@@ -16,8 +16,9 @@
 
 <% if artist.is_banned? && !policy(artist).can_view_banned? %>
   <p>The artist requested removal of this page.</p>
+<% elsif artist.new_record? %>
+  <p>This artist entry does not exist. <%= link_to "Create new artist entry", new_artist_path(artist: { name: artist.name }), rel: "nofollow" %>.</p>
 <% else %>
-
   <% if artist.other_names.present? %>
     <div>
       <% artist.other_names.map do |other_name| %>
