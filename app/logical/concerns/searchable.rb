@@ -436,7 +436,7 @@ module Searchable
     end
 
     if parameter_hash?(params[attr])
-      relation = relation.where(attr => model.visible(current_user).search(params[attr]).reorder(nil))
+      relation = relation.includes(attr).references(attr).where(attr => model.visible(current_user).search(params[attr]).reorder(nil))
     end
 
     relation

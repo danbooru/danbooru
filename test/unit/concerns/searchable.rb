@@ -252,5 +252,17 @@ class SearchableTest < ActiveSupport::TestCase
         assert_search_equals(@p1, has_comments: true, comments: { id: @p1.comments.first.id })
       end
     end
+
+    context "for a `has_many through: ...` association" do
+      subject { Upload }
+
+      should "work" do
+        @media_asset = create(:media_asset)
+        @upload1 = create(:upload, media_assets: [@media_asset])
+        @upload2 = create(:upload, media_assets: [@media_asset])
+
+        assert_search_equals([@upload2, @upload1], media_asset: { md5: @media_asset.md5 })
+      end
+    end
   end
 end
