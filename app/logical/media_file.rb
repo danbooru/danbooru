@@ -60,10 +60,11 @@ class MediaFile
     # https://www.ftyps.com
     # isom (common) - MP4 Base Media v1 [IS0 14496-12:2003]
     # mp42 (common) - MP4 v2 [ISO 14496-14]
+    # iso5 (rare) - MP4 Base Media v5 (used by Twitter)
     # 3gp5 (rare) - 3GPP Media (.3GP) Release 5
     # avc1 (rare) - MP4 Base w/ AVC ext [ISO 14496-12:2005]
     # M4V (rare) - Apple iTunes Video (https://en.wikipedia.org/wiki/M4V)
-    when /\A....ftyp(?:isom|3gp5|mp42|avc1|M4V)/
+    when /\A....ftyp(?:isom|iso5|3gp5|mp42|avc1|M4V)/
       :mp4
     when /\APK\x03\x04/
       :zip

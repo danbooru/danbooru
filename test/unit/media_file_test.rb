@@ -97,6 +97,10 @@ class MediaFileTest < ActiveSupport::TestCase
       assert_equal(:mp4, MediaFile.open("test/files/test-audio.m4v").file_ext)
     end
 
+    should "determine the correct extension for an iso5 mp4 file" do
+      assert_equal(:mp4, MediaFile.open("test/files/test-iso5.mp4").file_ext)
+    end
+
     should "determine the correct extension for a ugoira file" do
       assert_equal(:zip, MediaFile.open("test/files/ugoira.zip").file_ext)
     end
