@@ -10,6 +10,7 @@ $spacer: 0.25rem; /* 4px */
 
 .font-arial { font-family: var(--arial-font); }
 .font-monospace { font: var(--monospace-font); }
+.font-header { font-family: var(--header-font); }
 .font-bold { font-weight: bold; }
 
 .cursor-pointer { cursor: pointer; }
@@ -46,7 +47,9 @@ $spacer: 0.25rem; /* 4px */
 
 .pointer-events-none { pointer-events: none; }
 .select-none { user-select: none; }
-.leading-none { line-height: 1; }
+
+.leading-none   { line-height: 1; }
+.leading-normal { line-height: 1.5; }
 
 .absolute { position: absolute; }
 .relative { position: relative; }
