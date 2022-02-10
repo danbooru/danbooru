@@ -90,7 +90,7 @@ class User < ApplicationRecord
   attribute :favorite_count, default: 0
   attribute :per_page, default: 20
   attribute :theme, default: :light
-  attribute :upload_points, default: 1000
+  attribute :upload_points, default: Danbooru.config.initial_upload_points.to_i
   attribute :bit_prefs, default: 0
 
   has_bit_flags BOOLEAN_ATTRIBUTES, :field => "bit_prefs"
