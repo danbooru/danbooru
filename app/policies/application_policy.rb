@@ -78,7 +78,7 @@ class ApplicationPolicy
   # in tables and in the <body> tag on show pages.
   def html_data_attributes
     data_attributes = record.class.columns.select do |column|
-      column.type.in?([:integer, :boolean]) && !column.array?
+      column.type.in?(%i[integer boolean datetime float uuid interval]) && !column.array?
     end.map(&:name).map(&:to_sym)
 
     api_attributes & data_attributes
