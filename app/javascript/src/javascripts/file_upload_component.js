@@ -96,12 +96,12 @@ export default class FileUploadComponent {
     this.$component.find("progress").removeClass("hidden");
     this.$component.find("input").attr("disabled", "disabled");
 
-    while (upload.status === "pending" || upload.status === "processing") {
+    while (upload.media_asset_count <= 1 && upload.status !== "completed" && upload.status !== "error") {
       await Utility.delay(500);
       upload = await $.get(`/uploads/${upload.id}.json`);
     }
 
-    if (upload.status === "completed") {
+    if (upload.media_asset_count > 0) {
       let params = new URLSearchParams(window.location.search);
       let isBookmarklet = params.has("url");
       params.delete("url");

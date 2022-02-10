@@ -205,10 +205,11 @@ class MediaAsset < ApplicationRecord
       #
       # This can't be called inside a transaction because the transaction will
       # fail if there's a RecordNotUnique error when the asset already exists.
-      def upload!(media_file)
+      def upload!(media_file, &block)
         raise Error, "File is corrupt" if media_file.is_corrupt?
 
         media_asset = create!(file: media_file, status: :processing)
+        yield media_asset if block_given?
         media_asset.distribute_files!(media_file)
         media_asset.update!(status: :active)
         media_asset
@@ -218,6 +219,7 @@ class MediaAsset < ApplicationRecord
         raise if e.is_a?(ActiveRecord::RecordInvalid) && !e.record.errors.of_kind?(:md5, :taken)
 
         media_asset = find_by!(md5: media_file.md5, status: [:processing, :active])
+        yield media_asset if block_given?
 
         # XXX If the asset is still being processed by another thread, wait up
         # to 30 seconds for it to finish.

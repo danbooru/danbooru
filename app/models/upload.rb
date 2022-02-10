@@ -95,14 +95,13 @@ class Upload < ApplicationRecord
       update!(upload_media_assets: [upload_media_asset], status: "completed", media_asset_count: 1)
     elsif source.present?
       strategy = Sources::Strategies.find(source, referer_url)
-      image_url = strategy.image_url
       page_url = strategy.page_url
 
-      media_file = strategy.download_file!(strategy.image_url)
-      media_asset = MediaAsset.upload!(media_file)
-      upload_media_asset = UploadMediaAsset.new(media_asset: media_asset, source_url: image_url, page_url: page_url, status: "active")
+      upload_media_assets = strategy.image_urls.map do |image_url|
+        UploadMediaAsset.new(source_url: image_url, page_url: page_url, media_asset: nil)
+      end
 
-      update!(upload_media_assets: [upload_media_asset], status: "completed", media_asset_count: 1)
+      update!(upload_media_assets: upload_media_assets, media_asset_count: upload_media_assets.size)
     else
       raise "No file or source given" # Should never happen
     end
