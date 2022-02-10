@@ -74,7 +74,7 @@ class Upload < ApplicationRecord
   end
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :source, :referer_url, :status, :uploader, :upload_media_assets, :media_assets)
+    q = search_attributes(params, :id, :created_at, :updated_at, :source, :referer_url, :status, :media_asset_count, :uploader, :upload_media_assets, :media_assets)
     q.apply_default_order(params)
   end
 

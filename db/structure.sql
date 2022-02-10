@@ -1915,7 +1915,10 @@ CREATE TABLE public.upload_media_assets (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     upload_id bigint NOT NULL,
-    media_asset_id bigint NOT NULL
+    media_asset_id bigint NOT NULL,
+    status integer DEFAULT 0 NOT NULL,
+    source_url character varying DEFAULT ''::character varying NOT NULL,
+    error character varying
 );
 
 
@@ -1951,7 +1954,8 @@ CREATE TABLE public.uploads (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL,
     referer_url text,
-    error text
+    error text,
+    media_asset_count integer DEFAULT 0 NOT NULL
 );
 
 
@@ -4522,10 +4526,24 @@ CREATE INDEX index_tags_on_post_count ON public.tags USING btree (post_count);
 
 
 --
+-- Name: index_upload_media_assets_on_error; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upload_media_assets_on_error ON public.upload_media_assets USING btree (error) WHERE (error IS NOT NULL);
+
+
+--
 -- Name: index_upload_media_assets_on_media_asset_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_upload_media_assets_on_media_asset_id ON public.upload_media_assets USING btree (media_asset_id);
+
+
+--
+-- Name: index_upload_media_assets_on_status; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_upload_media_assets_on_status ON public.upload_media_assets USING btree (status);
 
 
 --
@@ -4540,6 +4558,13 @@ CREATE INDEX index_upload_media_assets_on_upload_id ON public.upload_media_asset
 --
 
 CREATE INDEX index_uploads_on_error ON public.uploads USING btree (error) WHERE (error IS NOT NULL);
+
+
+--
+-- Name: index_uploads_on_media_asset_count; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_uploads_on_media_asset_count ON public.uploads USING btree (media_asset_count);
 
 
 --
@@ -5750,6 +5775,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220124195900'),
 ('20220203040648'),
 ('20220204075610'),
-('20220207195123');
+('20220207195123'),
+('20220210171310');
 
 
