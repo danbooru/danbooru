@@ -2,7 +2,7 @@
 
 class UploadMediaAsset < ApplicationRecord
   belongs_to :upload
-  belongs_to :media_asset
+  belongs_to :media_asset, optional: true
 
   enum status: {
     pending: 0,

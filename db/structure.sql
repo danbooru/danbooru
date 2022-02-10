@@ -1915,7 +1915,7 @@ CREATE TABLE public.upload_media_assets (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     upload_id bigint NOT NULL,
-    media_asset_id bigint NOT NULL,
+    media_asset_id bigint,
     status integer DEFAULT 0 NOT NULL,
     source_url character varying DEFAULT ''::character varying NOT NULL,
     error character varying
@@ -5776,6 +5776,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220203040648'),
 ('20220204075610'),
 ('20220207195123'),
-('20220210171310');
+('20220210171310'),
+('20220210200157');
 
 
