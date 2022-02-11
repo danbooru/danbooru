@@ -8,27 +8,33 @@
 </div>
 
 <%= render(MediaAssetGalleryComponent.new) do |gallery| %>
-  <% @media_assets.each do |media_asset| %>
-    <% upload = media_asset.uploads.order(id: :desc).select { |upload| upload.uploader == CurrentUser.user }.first %>
+  <% @upload_media_assets.each do |upload_media_asset| %>
+    <% media_asset = upload_media_asset.media_asset %>
 
-    <% gallery.media_asset(media_asset: media_asset, size: gallery.size, link_target: media_asset.post || upload) do |preview| %>
-      <% preview.footer do %>
-        <div class="text-center text-muted text-xs h-12">
-          <% if media_asset.post.present? %>
-            <div class="leading-none">
-              <%= link_to "post ##{media_asset.post.id}", media_asset.post, class: "leading-none" %>
-            </div>
-          <% end %>
+    <% if media_asset.present? %>
+      <% gallery.media_asset(media_asset: media_asset, size: gallery.size, link_target: [upload_media_asset.upload, upload_media_asset]) do |preview| %>
+        <% preview.footer do %>
+          <div class="text-center text-muted text-xs h-12">
+            <% if media_asset.post.present? %>
+              <div class="leading-none">
+                <%= link_to "post ##{media_asset.post.id}", media_asset.post, class: "leading-none" %>
+              </div>
+            <% else %>
+              <div class="leading-none">
+                <%= link_to "upload ##{upload_media_asset.upload.id}", upload_media_asset.upload, class: "leading-none" %>
+              </div>
+            <% end %>
 
-          <% if upload.source.present? %>
-            <%= external_link_to upload.source, Addressable::URI.parse(upload.source).domain %>
-          <% else %>
-            <em>No source</em>
-          <% end %>
-        </div>
+            <% if upload_media_asset.source_url.present? %>
+              <%= external_link_to upload_media_asset.source_url, Addressable::URI.parse(upload_media_asset.source_url).domain %>
+            <% else %>
+              <em>No source</em>
+            <% end %>
+          </div>
+        <% end %>
       <% end %>
     <% end %>
   <% end %>
 <% end %>
 
-<%= numbered_paginator(@media_assets) %>
+<%= numbered_paginator(@upload_media_assets) %>

@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
 class UploadMediaAsset < ApplicationRecord
-  belongs_to :upload, counter_cache: :media_asset_count
+  extend Memoist
+
+  belongs_to :upload
   belongs_to :media_asset, optional: true
 
   after_create :async_process_upload!
@@ -21,6 +23,11 @@ class UploadMediaAsset < ApplicationRecord
 
   def finished?
     active? || failed?
+  end
+
+  def source_strategy
+    return nil if source_url.blank?
+    Sources::Strategies.find(source_url, page_url)
   end
 
   def async_process_upload!
@@ -46,4 +53,6 @@ class UploadMediaAsset < ApplicationRecord
       upload.update!(status: "completed") if upload.upload_media_assets.all?(&:finished?)
     end
   end
+
+  memoize :source_strategy
 end

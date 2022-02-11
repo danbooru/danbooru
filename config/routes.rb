@@ -252,7 +252,9 @@ Rails.application.routes.draw do
       get :batch
       get :image_proxy
     end
+    resources :upload_media_assets, only: [:show, :index], path: "assets"
   end
+  resources :upload_media_assets, only: [:show, :index]
   resources :users do
     resources :favorites, only: [:index, :create, :destroy]
     resources :favorite_groups, controller: "favorite_groups", only: [:index], as: "favorite_groups"

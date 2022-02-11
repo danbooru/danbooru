@@ -5,9 +5,10 @@
 class MediaAssetPreviewComponent < ApplicationComponent
   DEFAULT_SIZE = 180
 
-  attr_reader :media_asset, :size, :fit, :link_target, :shrink_to_fit, :save_data
+  attr_reader :media_asset, :size, :link_target, :classes, :shrink_to_fit, :save_data
   delegate :duration_to_hhmmss, :sound_icon, to: :helpers
 
+  renders_one :header
   renders_one :footer
 
   # @param media_asset [MediaAsset] The media asset to show the thumbnail for.
@@ -17,11 +18,12 @@ class MediaAssetPreviewComponent < ApplicationComponent
   #   If false, make the thumbnail a fixed width and height.
   # @param save_data [Boolean] If true, save data by not serving higher quality thumbnails
   #   on 2x pixel density displays. Default: false.
-  def initialize(media_asset:, size: DEFAULT_SIZE, link_target: media_asset, shrink_to_fit: true, save_data: CurrentUser.save_data)
+  def initialize(media_asset:, size: DEFAULT_SIZE, link_target: media_asset, classes: [], shrink_to_fit: true, save_data: CurrentUser.save_data)
     super
     @media_asset = media_asset
     @size = size.presence&.to_i || DEFAULT_SIZE
     @link_target = link_target
+    @classes = classes
     @save_data = save_data
     @shrink_to_fit = shrink_to_fit
   end

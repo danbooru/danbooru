@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class Upload < ApplicationRecord
-  extend Memoist
-
   attr_accessor :file
 
   belongs_to :uploader, class_name: "User"
@@ -45,6 +43,10 @@ class Upload < ApplicationRecord
     def is_errored?
       status == "error"
     end
+
+    def is_finished?
+      is_completed? || is_errored?
+    end
   end
 
   concerning :ValidationMethods do
@@ -64,11 +66,6 @@ class Upload < ApplicationRecord
         return nil if url.nil?
         Addressable::URI.normalized_encode(url)
       end
-    end
-
-    def source_strategy
-      return nil if source.blank?
-      Sources::Strategies.find(source, referer_url)
     end
   end
 
@@ -102,7 +99,7 @@ class Upload < ApplicationRecord
         UploadMediaAsset.new(source_url: image_url, page_url: page_url, media_asset: nil)
       end
 
-      update!(upload_media_assets: upload_media_assets)
+      update!(upload_media_assets: upload_media_assets, media_asset_count: upload_media_assets.size)
     else
       raise "No file or source given" # Should never happen
     end
@@ -113,6 +110,4 @@ class Upload < ApplicationRecord
   def self.available_includes
     [:uploader, :upload_media_assets, :media_assets]
   end
-
-  memoize :source_strategy
 end

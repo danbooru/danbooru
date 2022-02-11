@@ -1,0 +1,95 @@
+<% if CurrentUser.user.upload_limit.limited? %>
+  <p>You have reached your upload limit. Please wait for your pending uploads to be approved before uploading more.</p>
+
+  <p id="upload-limit">Upload Limit: <%= render "users/upload_limit", user: CurrentUser.user %></p>
+<% elsif upload_media_asset.pending? %>
+  <p>Preparing to upload <%= external_link_to upload_media_asset.source %>...</p>
+<% elsif upload_media_asset.processing? %>
+  <p>Processing <%= external_link_to upload_media_asset.source %>...</p>
+<% elsif upload_media_asset.failed? %>
+  <p>Error: <%= upload_media_asset.error %>.</p>
+<% else %>
+  <% upload = upload_media_asset.upload %>
+  <% media_asset = upload_media_asset.media_asset %>
+
+  <%= embed_wiki("help:upload_notice", id: "upload-guide-notice") %>
+
+  <% unless CurrentUser.can_upload_free? %>
+    <p id="upload-limit">Upload Limit: <%= render "users/upload_limit", user: CurrentUser.user %></p>
+  <% end %>
+
+  <div id="client-errors" class="error-messages ui-state-error ui-corner-all" style="display:none"></div>
+
+  <div id="upload-image">
+    <%= render MediaAssetComponent.new(media_asset: media_asset) %>
+
+    <p>
+      <strong>Size</strong>
+      <%= link_to media_asset.variant(:original).file_url do %>
+        <%= number_to_human_size(media_asset.file_size) %> .<%= media_asset.file_ext %>
+      <% end %>
+      (<%= media_asset.image_width %>x<%= media_asset.image_height %>)
+    </p>
+  </div>
+
+  <%= render "uploads/related_posts", source: upload_media_asset.source_strategy %>
+
+  <% if upload_media_asset.source_strategy.present? %>
+    <%= render_source_data(upload_media_asset.source_strategy) %>
+  <% end %>
+
+  <% post = Post.new_from_upload(upload_media_asset, add_artist_tag: true, source: upload_media_asset.source_strategy.canonical_url, **permitted_attributes(Post).to_h.symbolize_keys) %>
+  <%= edit_form_for(post, html: { id: "form" }) do |f| %>
+    <%= hidden_field_tag :media_asset_id, media_asset.id %> <%# used by iqdb javascript %>
+    <%= hidden_field_tag :upload_media_asset_id, upload_media_asset.id %>
+
+    <%= f.input :source, as: :string, input_html: { value: post.source } %>
+    <%= f.input :rating, collection: [["Explicit", "e"], ["Questionable", "q"], ["Safe", "s"]], as: :radio_buttons, selected: post.rating %>
+    <%= f.input :parent_id, label: "Parent ID", as: :string, input_html: { value: post.parent_id } %>
+
+    <div class="input upload_artist_commentary_container">
+      <strong>Commentary</strong>
+      <a href="#" id="toggle-artist-commentary">show »</a>
+
+      <div class="artist-commentary" style="display: none;">
+        <%= f.input :artist_commentary_title, as: :string, label: "Original Title", input_html: { value: post&.artist_commentary&.original_title } %>
+        <%= f.input :artist_commentary_desc, as: :text, label: "Original Description", input_html: { value: post&.artist_commentary&.original_description } %>
+      </div>
+    </div>
+
+    <div class="input upload_commentary_translation_container" style="display: none;">
+      <strong>Translation</strong>
+      <a href="#" id="toggle-commentary-translation">show »</a>
+
+      <div class="commentary-translation" style="display: none;">
+        <%= f.input :translated_commentary_title, as: :string, label: "Translated Title", input_html: { value: post&.artist_commentary&.translated_title } %>
+        <%= f.input :translated_commentary_desc, as: :text, label: "Translated Description", input_html: { value: post&.artist_commentary&.translated_description } %>
+      </div>
+    </div>
+
+    <div class="input fixed-width-container" id="tags-container">
+      <div class="header">
+        <%= f.label :tag_string, "Tags" %>
+
+        <span data-tag-counter data-for="#post_tag_string">
+          <span class="tag-count"></span>
+          <img>
+        </span>
+        <a href="javascript:void(0)">
+          <%= external_link_icon(id: "open-edit-dialog", "data-shortcut": "shift+e") %>
+        </a>
+      </div>
+
+      <%= f.input :tag_string, label: false, hint: "Ctrl+Enter to submit", input_html: { "data-autocomplete": "tag-edit", "data-shortcut": "e", value: post.tag_string } %>
+      <%= render "related_tags/buttons" %>
+    </div>
+
+    <%= f.submit "Post" %>
+
+    <% if CurrentUser.can_upload_free? %>
+      <%= f.input :is_pending, as: :boolean, label: "Upload for approval", wrapper_html: { class: "inline-block" }, input_html: { checked: post.is_pending? } %>
+    <% end %>
+
+    <%= render "related_tags/container" %>
+  <% end %>
+<% end %>

@@ -74,7 +74,10 @@ class Post < ApplicationRecord
     has_many :versions, -> { Rails.env.test? ? order("post_versions.updated_at ASC, post_versions.id ASC") : order("post_versions.updated_at ASC") }, class_name: "PostVersion", dependent: :destroy
   end
 
-  def self.new_from_upload(upload, media_asset, tag_string: nil, rating: nil, parent_id: nil, source: nil, artist_commentary_title: nil, artist_commentary_desc: nil, translated_commentary_title: nil, translated_commentary_desc: nil, is_pending: nil)
+  def self.new_from_upload(upload_media_asset, tag_string: nil, rating: nil, parent_id: nil, source: nil, artist_commentary_title: nil, artist_commentary_desc: nil, translated_commentary_title: nil, translated_commentary_desc: nil, is_pending: nil, add_artist_tag: false)
+    upload = upload_media_asset.upload
+    media_asset = upload_media_asset.media_asset
+
     # XXX depends on CurrentUser
     commentary = ArtistCommentary.new(
       original_title: artist_commentary_title,
@@ -82,6 +85,11 @@ class Post < ApplicationRecord
       translated_title: translated_commentary_title,
       translated_description: translated_commentary_desc,
     )
+
+    if add_artist_tag
+      tag_string = "#{tag_string} #{upload_media_asset.source_strategy&.artists.to_a.map(&:tag).map(&:name).join(" ")}".strip
+      tag_string += " " if tag_string.present?
+    end
 
     post = Post.new(
       uploader: upload.uploader,

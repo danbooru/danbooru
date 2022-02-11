@@ -2,7 +2,7 @@
 
 class ApplicationController < ActionController::Base
   include Pundit
-  helper_method :search_params
+  helper_method :search_params, :permitted_attributes
 
   self.responder = ApplicationResponder
 

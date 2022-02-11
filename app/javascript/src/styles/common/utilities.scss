@@ -116,6 +116,7 @@ $spacer: 0.25rem; /* 4px */
 .pr-4 { padding-right: 4 * $spacer; }
 
 .w-auto { width: auto; }
+.w-min  { width: min-content; }
 .w-sm   { width: 24rem; }
 .w-md   { width: 28rem; }
 .w-1\/4 { width: 25%; }

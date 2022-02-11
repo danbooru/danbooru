@@ -1,5 +1,7 @@
-<%= tag.article class: "media-asset-preview media-asset-preview-#{size}" do -%>
+<%= tag.article class: ["media-asset-preview media-asset-preview-#{size}", *classes] do -%>
   <%= link_to link_target, class: "inline-block relative flex justify-center", draggable: "false" do -%>
+    <%= header %>
+
     <% if media_asset.is_animated? %>
       <div class="media-asset-animation-icon absolute top-0.5 left-0.5 p-0.5 m-0.5 leading-none rounded text-xs font-arial font-bold">
         <span class="media-asset-duration align-middle">
