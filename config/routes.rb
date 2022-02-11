@@ -249,7 +249,6 @@ Rails.application.routes.draw do
   resources :tag_implications, only: [:show, :index, :destroy]
   resources :uploads do
     collection do
-      post :preprocess
       get :batch
       get :image_proxy
     end

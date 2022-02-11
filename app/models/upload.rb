@@ -18,7 +18,6 @@ class Upload < ApplicationRecord
   after_create :async_process_upload!
 
   scope :pending, -> { where(status: "pending") }
-  scope :preprocessed, -> { where(status: "preprocessed") }
   scope :completed, -> { where(status: "completed") }
   scope :failed, -> { where(status: "error") }
 
