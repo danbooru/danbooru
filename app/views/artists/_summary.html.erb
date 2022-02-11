@@ -11,7 +11,7 @@
 
   <%= link_to artist.pretty_name, posts_path(tags: artist.name), class: [tag_class(artist.tag), "heading text-xl"] %>
 
-  <span class="text-sm post-count"><%= artist.tag.post_count %></span>
+  <span class="text-sm post-count"><%= artist.tag&.post_count %></span>
 </div>
 
 <% if artist.is_banned? && !policy(artist).can_view_banned? %>
