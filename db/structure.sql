@@ -1918,7 +1918,8 @@ CREATE TABLE public.upload_media_assets (
     media_asset_id bigint,
     status integer DEFAULT 0 NOT NULL,
     source_url character varying DEFAULT ''::character varying NOT NULL,
-    error character varying
+    error character varying,
+    page_url character varying
 );
 
 
@@ -5777,6 +5778,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20220204075610'),
 ('20220207195123'),
 ('20220210171310'),
-('20220210200157');
+('20220210200157'),
+('20220211075129');
 
 

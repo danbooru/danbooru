@@ -12,7 +12,7 @@ class UploadMediaAsset < ApplicationRecord
   }
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :status, :source_url, :error, :upload, :media_asset)
+    q = search_attributes(params, :id, :created_at, :updated_at, :status, :source_url, :page_url, :error, :upload, :media_asset)
     q.apply_default_order(params)
   end
 end
