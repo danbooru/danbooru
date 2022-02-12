@@ -174,17 +174,17 @@ module Danbooru
     def request(method, url, **options)
       http.send(method, url, **options)
     rescue OpenSSL::SSL::SSLError
-      fake_response(590, "")
+      fake_response(590)
     rescue ValidatingSocket::ProhibitedIpError
-      fake_response(591, "")
+      fake_response(591)
     rescue HTTP::Redirector::TooManyRedirectsError
-      fake_response(596, "")
+      fake_response(596)
     rescue HTTP::TimeoutError
-      fake_response(597, "")
+      fake_response(597)
     rescue HTTP::ConnectionError
-      fake_response(598, "")
+      fake_response(598)
     rescue HTTP::Error
-      fake_response(599, "")
+      fake_response(599)
     end
 
     # Perform a HTTP request for the given URL, raising an error on 4xx or 5xx
@@ -205,8 +205,8 @@ module Danbooru
       end
     end
 
-    def fake_response(status, body)
-      ::HTTP::Response.new(status: status, version: "1.1", body: ::HTTP::Response::Body.new(body))
+    def fake_response(status)
+      ::HTTP::Response.new(status: status, version: "1.1", body: "")
     end
   end
 end

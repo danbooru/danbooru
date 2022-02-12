@@ -22,11 +22,13 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       should "fail if redirected too many times" do
         response = Danbooru::Http.get(httpbin_url("absolute-redirect/10"))
         assert_equal(596, response.status)
+        assert_equal("", response.body.to_s)
       end
 
       should "fail if the request takes too long to connect" do
         response = Danbooru::Http.timeout(1).get(httpbin_url("delay/5"))
         assert_equal(597, response.status)
+        assert_equal("", response.body.to_s)
       end
 
       should "fail if the request takes too long to download" do
@@ -39,11 +41,13 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       should "return a 5xx error if the domain can't be resolved" do
         response = Danbooru::Http.get("http://doesnotexist.donmai.us")
         assert_equal(598, response.status)
+        assert_equal("", response.body.to_s)
       end
 
       should "return a 5xx error if the SSL certificate is expired" do
         response = Danbooru::Http.get("https://expired.badssl.com")
         assert_equal(590, response.status)
+        assert_equal("", response.body.to_s)
       end
 
       should "automatically decompress gzipped responses" do
