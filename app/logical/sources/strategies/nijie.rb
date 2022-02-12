@@ -251,7 +251,7 @@ module Sources
         form = {
           email: Danbooru.config.nijie_login,
           password: Danbooru.config.nijie_password,
-          url: login_page.at("input[name='url']")["value"],
+          url: login_page.at("input[name='url']")&.fetch("value"),
           save: "on",
           ticket: ""
         }
