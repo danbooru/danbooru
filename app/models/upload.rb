@@ -100,7 +100,7 @@ class Upload < ApplicationRecord
     end
 
     media_asset = MediaAsset.upload!(media_file)
-    update!(media_assets: [media_asset], status: "completed")
+    update!(media_assets: [media_asset], status: "completed", media_asset_count: 1)
   rescue Exception => e
     update!(status: "error", error: e.message)
   end
