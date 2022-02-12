@@ -92,15 +92,23 @@ class Upload < ApplicationRecord
 
     if file.present?
       media_file = MediaFile.open(file.tempfile)
+      media_asset = MediaAsset.upload!(media_file)
+      upload_media_asset = UploadMediaAsset.new(media_asset: media_asset, source_url: "file://#{file.original_filename}")
+
+      update!(upload_media_assets: [upload_media_asset], status: "completed", media_asset_count: 1)
     elsif source.present?
       strategy = Sources::Strategies.find(source, referer_url)
+      image_url = strategy.image_url
+      page_url = strategy.page_url
+
       media_file = strategy.download_file!(strategy.image_url)
+      media_asset = MediaAsset.upload!(media_file)
+      upload_media_asset = UploadMediaAsset.new(media_asset: media_asset, source_url: image_url, page_url: page_url)
+
+      update!(upload_media_assets: [upload_media_asset], status: "completed", media_asset_count: 1)
     else
       raise "No file or source given" # Should never happen
     end
-
-    media_asset = MediaAsset.upload!(media_file)
-    update!(media_assets: [media_asset], status: "completed", media_asset_count: 1)
   rescue Exception => e
     update!(status: "error", error: e.message)
   end

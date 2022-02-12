@@ -19,8 +19,9 @@ module UploadTestHelper
 
     upload = Upload.last
     assert_response 201
-    assert_operator(upload.media_assets.count, :>, 0)
+    assert_equal("", upload&.error.to_s)
     assert_equal("completed", upload.status)
+    assert_operator(upload.media_assets.count, :>, 0)
     upload
   end
 
