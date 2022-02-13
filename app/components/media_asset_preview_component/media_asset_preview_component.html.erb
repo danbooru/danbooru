@@ -1,28 +1,44 @@
-<%= tag.article class: "media-asset-preview media-asset-preview-#{size}" do -%>
-  <%= link_to link_target, class: "inline-block relative flex justify-center", draggable: "false" do -%>
-    <% if media_asset.is_animated? %>
-      <div class="media-asset-animation-icon absolute top-0.5 left-0.5 p-0.5 m-0.5 leading-none rounded text-xs font-arial font-bold">
-        <span class="media-asset-duration align-middle">
-          <%= duration_to_hhmmss(media_asset.duration) %>
-        </span>
-      </div>
-    <% end %>
+<%= tag.article class: ["media-asset-preview media-asset-preview-#{size}", *classes] do -%>
+  <%= link_to link_target, class: "inline-block relative", draggable: "false" do -%>
+    <%= header %>
 
-    <picture>
-      <% unless save_data %>
-        <% case size %>
-        <% when 150, 180 %>
-          <%= tag.source type: "image/jpeg", srcset: "#{media_asset.variant("180x180").file_url} 1x, #{media_asset.variant("360x360").file_url} 2x" %>
-        <% when 225, 270, 360 %>
-          <%= tag.source type: "image/webp", srcset: "#{media_asset.variant("360x360").file_url} 1x, #{media_asset.variant("720x720").file_url} 2x" %>
-        <% end %>
+    <% if media_asset.nil? %>
+      <div class="media-asset-placeholder rounded border border-solid flex items-center justify-center w-<%= size %>px h-<%= size %>px">
+        <%= missing_image || "No image" %>
+      </div>
+    <% elsif media_asset.active? %>
+      <% if media_asset.is_animated? %>
+        <div class="media-asset-animation-icon absolute top-0.5 left-0.5 p-0.5 m-0.5 leading-none rounded text-xs font-arial font-bold">
+          <span class="media-asset-duration align-middle">
+            <%= duration_to_hhmmss(media_asset.duration) %>
+          </span>
+        </div>
       <% end %>
 
-      <%= tag.img src: variant.file_url, width: variant.width, height: variant.height, class: "media-asset-preview-image w-auto h-auto max-h-#{size}px #{"max-w-full" if shrink_to_fit}", crossorigin: "anonymous", draggable: "false" -%>
-    </picture>
+      <picture>
+        <% unless save_data %>
+          <% case size %>
+          <% when 150, 180 %>
+            <%= tag.source type: "image/jpeg", srcset: "#{media_asset.variant("180x180").file_url} 1x, #{media_asset.variant("360x360").file_url} 2x" %>
+          <% when 225, 270, 360 %>
+            <%= tag.source type: "image/webp", srcset: "#{media_asset.variant("360x360").file_url} 1x, #{media_asset.variant("720x720").file_url} 2x" %>
+          <% end %>
+        <% end %>
+
+        <%= tag.img src: variant.file_url, width: variant.width, height: variant.height, class: "media-asset-preview-image w-auto h-auto max-h-#{size}px max-w-full", crossorigin: "anonymous", draggable: "false" -%>
+      </picture>
+    <% else %>
+      <div class="media-asset-placeholder rounded border border-solid flex items-center justify-center w-<%= size %>px h-<%= size %>px">
+        <% if media_asset.processing? %>
+          Loading
+        <% elsif media_asset.failed? %>
+          Failed
+        <% else %>
+          Deleted
+        <% end %>
+      </div>
+    <% end %>
   <% end %>
 
-  <div>
-    <%= footer %>
-  </div>
+  <%= footer %>
 <% end %>

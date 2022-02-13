@@ -1,7 +1,7 @@
 <%= table_for @media_assets, class: "striped autofit" do |t| %>
   <% t.column "File", td: { class: "text-center" } do |media_asset| %>
     <% if policy(media_asset).can_see_image? %>
-      <%= render MediaAssetPreviewComponent.new(media_asset: media_asset, save_data: CurrentUser.save_data, shrink_to_fit: false) %>
+      <%= render MediaAssetPreviewComponent.new(media_asset: media_asset, save_data: CurrentUser.save_data) %>
     <% end %>
   <% end %>
 

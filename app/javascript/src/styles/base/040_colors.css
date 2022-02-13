@@ -163,6 +163,8 @@ html {
   --preview-icon-color: var(--inverse-text-color);
   --preview-icon-background: rgba(0, 0, 0, 0.7);
 
+  --media-asset-placeholder-background-color: var(--grey-1);
+
   --modqueue-tag-warning-color: var(--red-1);
 
   --file-upload-component-background-color: var(--body-background-color);
@@ -373,6 +375,8 @@ body[data-current-user-theme="dark"] {
   --preview-has-children-color: var(--green-3);
   --preview-has-parent-color: var(--orange-3);
   --preview-selected-color: rgba(255, 255, 255, 0.25);
+
+  --media-asset-placeholder-background-color: var(--grey-8);
 
   --modqueue-tag-warning-color: var(--red-7);
 
