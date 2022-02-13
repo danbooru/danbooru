@@ -11,6 +11,14 @@ class UploadMediaAsset < ApplicationRecord
     failed: 300,
   }
 
+  def self.visible(user)
+    if user.is_admin?
+      all
+    else
+      where(upload: { uploader: user })
+    end
+  end
+
   def self.search(params)
     q = search_attributes(params, :id, :created_at, :updated_at, :status, :source_url, :page_url, :error, :upload, :media_asset)
     q.apply_default_order(params)
