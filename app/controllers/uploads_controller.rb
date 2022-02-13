@@ -39,14 +39,8 @@ class UploadsController < ApplicationController
 
   def show
     @upload = authorize Upload.find(params[:id])
-    @upload_media_asset = @upload.upload_media_assets.first
-    @media_asset = @upload_media_asset&.media_asset
 
-    @post = Post.new_from_upload(@upload, @media_asset, source: @upload.source, **permitted_attributes(Post).to_h.symbolize_keys)
-    @post.tag_string = "#{@post.tag_string} #{@upload.source_strategy&.artists.to_a.map(&:tag).map(&:name).join(" ")}".strip
-    @post.tag_string += " " if @post.tag_string.present?
-
-    if request.format.html? && @upload.is_completed? && @upload.media_assets.first&.post.present?
+    if request.format.html? && @upload.media_asset_count == 1 && @upload.media_assets.first&.post.present?
       flash[:notice] = "Duplicate of post ##{@upload.media_assets.first.post.id}"
       redirect_to @upload.media_assets.first.post
     else
