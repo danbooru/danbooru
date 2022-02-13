@@ -30,18 +30,11 @@ class UploadsController < ApplicationController
 
   def index
     @mode = params.fetch(:mode, "table")
+    @uploads = authorize Upload.visible(CurrentUser.user).paginated_search(params, count_pages: true)
+    @uploads = @uploads.includes(:uploader, upload_media_assets: { media_asset: :post }) if request.format.html?
 
-    case @mode
-    when "table"
-      @uploads = authorize Upload.visible(CurrentUser.user).paginated_search(params, count_pages: true)
-      @uploads = @uploads.includes(:uploader, media_assets: :post, upload_media_assets: { media_asset: :post }) if request.format.html?
-      respond_with(@uploads, include: { upload_media_assets: { include: :media_asset }})
-    when "gallery"
-      @media_assets = authorize MediaAsset.active.visible(CurrentUser.user).includes(:post, uploads: [:uploader]).where(uploads: { uploader: CurrentUser.user }).paginated_search(params, count_pages: true).reorder("uploads.id DESC")
-      respond_with(@media_assets)
-    else
-      raise "Invalid mode '#{@mode}'"
-    end
+    @uploads = @uploads.includes(:uploader, media_assets: :post, upload_media_assets: { media_asset: :post }) if request.format.html?
+    respond_with(@uploads, include: { upload_media_assets: { include: :media_asset }})
   end
 
   def show

@@ -5,13 +5,12 @@ class MediaAssetGalleryComponent < ApplicationComponent
 
   attr_reader :inline, :size, :options
 
-  renders_many :media_assets, MediaAssetPreviewComponent
+  renders_many :media_assets
   renders_one :footer
 
-  def initialize(inline: false, size: DEFAULT_SIZE, **options)
+  def initialize(inline: false, size: DEFAULT_SIZE)
     super
     @inline = inline
     @size = size
-    @option = options
   end
 end

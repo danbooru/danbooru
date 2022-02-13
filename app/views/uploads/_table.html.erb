@@ -9,28 +9,13 @@
 
 <%= table_for @uploads, class: "striped", width: "100%" do |t| %>
   <% t.column "Upload", td: { class: "text-center" } do |upload| %>
-    <% upload.media_assets.first.tap do |media_asset| %>
-      <% if media_asset.present? %>
-        <% if media_asset.post.present? %>
-          <%= render MediaAssetPreviewComponent.new(media_asset: media_asset, link_target: media_asset.post, save_data: CurrentUser.save_data) %>
-        <% else %>
-          <%= render MediaAssetPreviewComponent.new(media_asset: media_asset, link_target: upload, save_data: CurrentUser.save_data) %>
-        <% end %>
-      <% end %>
-    <% end %>
+    <%= render "uploads/preview", upload: upload, size: "180" %>
   <% end %>
 
   <% t.column "Info", td: { class: "col-expand" } do |upload| %>
     <div>
-      <% upload.media_assets.first.tap do |media_asset| %>
-        <% if media_asset&.post.present? %>
-          <strong>Post</strong>
-          <span><%= link_to "##{media_asset.post.id}", media_asset.post %></span>
-        <% else %>
-          <strong>Upload</strong>
-          <span><%= link_to "##{upload.id}", upload %></span>
-        <% end %>
-      <% end %>
+      <strong>Upload</strong>
+      <span><%= link_to "##{upload.id}", upload %></span>
     </div>
 
     <div>
