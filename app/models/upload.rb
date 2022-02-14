@@ -93,7 +93,7 @@ class Upload < ApplicationRecord
     if file.present?
       media_file = MediaFile.open(file.tempfile)
       media_asset = MediaAsset.upload!(media_file)
-      upload_media_asset = UploadMediaAsset.new(media_asset: media_asset, source_url: "file://#{file.original_filename}")
+      upload_media_asset = UploadMediaAsset.new(media_asset: media_asset, source_url: "file://#{file.original_filename}", status: "active")
 
       update!(upload_media_assets: [upload_media_asset], status: "completed", media_asset_count: 1)
     elsif source.present?
@@ -103,7 +103,7 @@ class Upload < ApplicationRecord
 
       media_file = strategy.download_file!(strategy.image_url)
       media_asset = MediaAsset.upload!(media_file)
-      upload_media_asset = UploadMediaAsset.new(media_asset: media_asset, source_url: image_url, page_url: page_url)
+      upload_media_asset = UploadMediaAsset.new(media_asset: media_asset, source_url: image_url, page_url: page_url, status: "active")
 
       update!(upload_media_assets: [upload_media_asset], status: "completed", media_asset_count: 1)
     else
