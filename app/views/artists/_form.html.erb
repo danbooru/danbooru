@@ -3,7 +3,7 @@
 
   <%= f.input :other_names_string, label: "Other names", as: :string, hint: "Separate names with spaces, not commas. Use underscores for spaces inside names." %>
   <%= f.input :group_name %>
-  <%= f.input :url_string, label: "URLs", as: :text, input_html: { value: params.dig(:artist, :url_string) || @artist.urls.join("\n")}, hint: "You can prefix a URL with - to mark it as dead." %>
+  <%= f.input :url_string, label: "URLs", as: :text, input_html: { value: params.dig(:artist, :url_string) || @artist.sorted_urls.join("\n")}, hint: "You can prefix a URL with - to mark it as dead." %>
 
   <% if @artist.tag&.artist? && @artist.wiki_page.present? %>
     <div class="input">
