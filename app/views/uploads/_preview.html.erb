@@ -1,6 +1,15 @@
-<% media_asset = upload.upload_media_assets.sort_by(&:id).first&.media_asset %>
+<% upload_media_asset = upload.upload_media_assets.sort_by(&:id).first %>
+<% media_asset = upload_media_asset&.media_asset %>
 
 <%= render(MediaAssetPreviewComponent.new(media_asset: media_asset, size: size, link_target: upload, save_data: CurrentUser.save_data)) do |preview| %>
+  <% preview.missing_image do %>
+    <% if upload.is_errored? || upload_media_asset.failed? %>
+      Upload failed
+    <% else %>
+      Loading
+    <% end %>
+  <% end %>
+
   <% if upload.media_asset_count > 1 %>
     <% preview.header do %>
       <div class="media-asset-image-count-icon absolute top-0.5 right-0.5 p-1 m-0.5 leading-none rounded text-xs font-arial font-bold">
