@@ -13,6 +13,7 @@
   <%= nav_link_to("Wiki", wiki_page_path("help:home")) %>
   <%= nav_link_to("Forum", forum_topics_path, :class => (CurrentUser.has_forum_been_updated? ? "forum-updated" : nil)) %>
   <% if CurrentUser.is_moderator? %>
+    <%= nav_link_to("Reports", moderation_reports_path, :class => (ModerationReport.where(status: "pending").present? ? "reports-pending" : nil)) %>
     <%= nav_link_to("Dashboard", moderator_dashboard_path) %>
   <% end %>
   <%= nav_link_to("More »", site_map_path) %>
