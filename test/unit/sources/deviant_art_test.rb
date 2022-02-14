@@ -14,7 +14,7 @@ module Sources
 
       should "work" do
         # http://origin-orig.deviantart.net/d533/f/2014/004/8/d/holiday_elincia_by_aeror404-d70rm0s.jpg (md5: a7651a6586b95c62fd593dd34bb13618, size: 877987)
-        assert_match(%r!\Ahttps://api-da.wixmp.com/_api/download/file\?downloadToken=!, @site.image_url)
+        assert_match(%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/11a24395-0f24-446d-ae73-a9f812e79e55/d70rm0s-e5b6b5e6-5795-44bb-a0ba-27b5c2349be7\.jpg}, @site.image_url)
         assert_downloaded(877_987, @site.image_url)
 
         assert_equal("aeror404", @site.artist_name)
@@ -64,7 +64,7 @@ module Sources
         @site = Sources::Strategies.find("https://www.deviantart.com/len1/art/All-that-Glitters-II-774592781")
 
         # http://origin-orig.deviantart.net/a713/f/2018/333/3/6/all_that_glitters_ii_by_len1-dct67m5.jpg (md5: d16bb8620600334caa029ebb9bc426a6, size: 1402017)
-        assert_match(%r!\Ahttps://api-da.wixmp.com/_api/download/file\?downloadToken=!, @site.image_url)
+        assert_match(%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/a6289ca5-2205-4118-af55-c6934fba0930/dct67m5-51e8db38-9167-4f5c-931d-561ea4d3810d\.jpg}, @site.image_url)
         assert_downloaded(1402017, @site.image_url)
 
         assert_equal("len1", @site.artist_name)
@@ -80,7 +80,7 @@ module Sources
         @site = Sources::Strategies.find("https://pre00.deviantart.net/b5e6/th/pre/f/2016/265/3/5/legend_of_galactic_heroes_by_hideyoshi-daihpha.jpg")
 
         # http://origin-orig.deviantart.net/9e1f/f/2016/265/3/5/legend_of_galactic_heroes_by_hideyoshi-daihpha.jpg (md5: 4cfec3d50ebbb924077cc5c90e705d4e, size: 906621)
-        assert_match(%r!\Ahttps://api-da.wixmp.com/_api/download/file\?downloadToken=!, @site.image_url)
+        assert_match(%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/b1f96af6-56a3-47a8-b7f4-406f243af3a3/daihpha-9f1fcd2e-7557-4db5-951b-9aedca9a3ae7\.jpg}, @site.image_url)
         assert_downloaded(906_621, @site.image_url)
 
         assert_equal("hideyoshi", @site.artist_name)
@@ -97,7 +97,7 @@ module Sources
         @site = Sources::Strategies.find("http://origin-orig.deviantart.net/7b5b/f/2017/160/c/5/test_post_please_ignore_by_noizave-dbc3a48.png")
 
         # md5: 9dec050536dbdb09ab63cb9c5a48f8b7
-        assert_match(%r!\Ahttps://api-da.wixmp.com/_api/download/file\?downloadToken=!, @site.image_url)
+        assert_match(%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9\.png}, @site.image_url)
         assert_downloaded(3619, @site.image_url)
 
         assert_equal("https://www.deviantart.com/noizave/art/test-post-please-ignore-685436408", @site.page_url)
@@ -115,7 +115,7 @@ module Sources
       should "return the full size image url" do
         @site = Sources::Strategies.find("https://img00.deviantart.net/a233/i/2017/160/5/1/test_post_please_ignore_by_noizave-dbc3a48.png")
 
-        assert_match(%r!\Ahttps://api-da.wixmp.com/_api/download/file\?downloadToken=!, @site.image_url)
+        assert_match(%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9\.png}, @site.image_url)
         assert_downloaded(3619, @site.image_url)
 
         assert_equal("https://www.deviantart.com/noizave/art/Test-Post-Please-Ignore-685436408", @site.page_url_from_image_url)
@@ -127,7 +127,7 @@ module Sources
         @site = Sources::Strategies.find("http://th00.deviantart.net/fs71/PRE/f/2014/065/3/b/goruto_by_xyelkiltrox-d797tit.png")
 
         # http://origin-orig.deviantart.net/0f1e/f/2014/065/3/b/goruto_by_xyelkiltrox-d797tit.png (md5: d779f5a7da29ec90d777a8db38d07994, size: 3391584)
-        assert_match(%r!\Ahttps://api-da.wixmp.com/_api/download/file\?downloadToken=!, @site.image_url)
+        assert_match(%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/d8995973-0b32-4a7d-8cd8-d847d083689a/d797tit-1eac22e0-38b6-4eae-adcb-1b72843fd62a\.png}, @site.image_url)
         assert_downloaded(3_391_584, @site.image_url)
 
         assert_equal("https://www.deviantart.com/xyelkiltrox/art/Goruto-438744629", @site.page_url_from_image_url)
@@ -172,7 +172,7 @@ module Sources
           @site = Sources::Strategies.find(@url, @ref)
 
           # http://origin-orig.deviantart.net/a418/f/2007/120/c/9/cool_like_me_by_47ness.jpg (md5: da78e7c192d42470acda7d87ade64849, size: 265496)
-          assert_match(%r!\Ahttps://api-da.wixmp.com/_api/download/file\?downloadToken=!, @site.image_url)
+          assert_match(%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/ece2238f-5c8f-48e4-afda-304cab294acd/dwcohb-8189be91-691d-4212-b3a0-0b77e86a57d1\.jpg}, @site.image_url)
           assert_downloaded(265_496, @site.image_url)
 
           assert_equal("47ness", @site.artist_name)
@@ -301,7 +301,7 @@ module Sources
 
       should "get the image url" do
         # https://origin-orig.deviantart.net/7b5b/f/2017/160/c/5/test_post_please_ignore_by_noizave-dbc3a48.png
-        assert_match(%r!\Ahttps://api-da.wixmp.com/_api/download/file\?downloadToken=!, @site.image_url)
+        assert_match(%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3a48-10b9e2e8-b176-4820-ab9e-23449c11e7c9\.png}, @site.image_url)
         assert_downloaded(3619, @site.image_url)
       end
 
@@ -361,7 +361,7 @@ module Sources
 
       should "get the image url" do
         # https://origin-orig.deviantart.net/cb25/f/2017/160/1/9/hidden_work_by_noizave-dbc3r29.png
-        assert_match(%r!\Ahttps://api-da.wixmp.com/_api/download/file\?downloadToken=!, @site.image_url)
+        assert_match(%r{\Ahttps://wixmp-ed30a86b8c4ca887773594c2\.wixmp\.com/f/83d3eb4d-13e5-4aea-a08f-8d4331d033c4/dbc3r29-10c99118-5cfe-4402-ad55-7b57e7c0ca43\.png}, @site.image_url)
         assert_downloaded(3619, @site.image_url)
       end
     end

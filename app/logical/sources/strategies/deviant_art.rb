@@ -88,7 +88,7 @@ module Sources
       end
 
       def wixmp_hosts
-        ["images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com", "api-da.wixmp.com"]
+        %w[images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com wixmp-ed30a86b8c4ca887773594c2.wixmp.com api-da.wixmp.com]
       end
 
       def site_name
