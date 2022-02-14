@@ -30,10 +30,10 @@ class UploadsController < ApplicationController
 
   def index
     @mode = params.fetch(:mode, "table")
-    @uploads = authorize Upload.visible(CurrentUser.user).paginated_search(params, count_pages: true)
-    @uploads = @uploads.includes(:uploader, upload_media_assets: { media_asset: :post }) if request.format.html?
-
+    @defaults = { defaults: { status: "completed" }} if request.format.html?
+    @uploads = authorize Upload.visible(CurrentUser.user).paginated_search(params, count_pages: true, **@defaults.to_h)
     @uploads = @uploads.includes(:uploader, media_assets: :post, upload_media_assets: { media_asset: :post }) if request.format.html?
+
     respond_with(@uploads, include: { upload_media_assets: { include: :media_asset }})
   end
 
