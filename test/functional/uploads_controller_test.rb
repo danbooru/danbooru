@@ -177,18 +177,32 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_match("Not an image or video", Upload.last.error)
       end
 
-      should "fail if the file size is too large" do
-        skip "flaky test"
-        Danbooru.config.stubs(:max_file_size).returns(1.kilobyte)
+      context "for a file larger than the file size limit" do
+        setup do
+          skip "flaky test"
+          Danbooru.config.stubs(:max_file_size).returns(1.kilobyte)
+        end
 
-        file = Rack::Test::UploadedFile.new("test/files/test.jpg")
-        post_auth uploads_path(format: :json), @user, params: { upload: { file: file }}
-        perform_enqueued_jobs
+        should "fail for a direct file upload" do
+          create_upload!("test/files/test.jpg", user: @user)
 
-        assert_response 201
-        assert_match("File size must be less than or equal to", Upload.last.error)
+          assert_response 201
+          assert_match("File size too large", Upload.last.error)
+        end
 
-        Danbooru.config.unstub(:max_file_size)
+        should "fail for a source upload with a Content-Length header" do
+          create_upload!("https://nghttp2.org/httpbin/bytes/2000", user: @user)
+
+          assert_response 201
+          assert_match("File size too large", Upload.last.error)
+        end
+
+        should "fail for a source upload without a Content-Length header" do
+          create_upload!("https://nghttp2.org/httpbin/stream-bytes/2000", user: @user)
+
+          assert_response 201
+          assert_match("File size too large", Upload.last.error)
+        end
       end
 
       context "for a corrupted image" do

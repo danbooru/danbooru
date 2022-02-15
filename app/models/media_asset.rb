@@ -39,7 +39,7 @@ class MediaAsset < ApplicationRecord
 
   validates :md5, uniqueness: { conditions: -> { where(status: [:processing, :active]) } }
   validates :file_ext, inclusion: { in: %w[jpg png gif mp4 webm swf zip], message: "Not an image or video" }
-  validates :file_size, numericality: { less_than_or_equal_to: Danbooru.config.max_file_size }
+  validates :file_size, numericality: { less_than_or_equal_to: Danbooru.config.max_file_size, message: ->(asset, _) { "too large (size: #{asset.file_size.to_formatted_s(:human_size)}; max size: #{Danbooru.config.max_file_size.to_formatted_s(:human_size)})" } }
   validates :duration, numericality: { less_than_or_equal_to: MAX_VIDEO_DURATION, message: "must be less than #{MAX_VIDEO_DURATION} seconds", allow_nil: true }, on: :create # XXX should allow admins to bypass
   validate :validate_resolution, on: :create
 
