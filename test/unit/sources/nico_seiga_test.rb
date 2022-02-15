@@ -37,19 +37,20 @@ module Sources
         assert_match(%r{^https?://lohas\.nicoseiga\.jp/priv/}, @site_1.image_url)
         assert_match(%r{^https?://lohas\.nicoseiga\.jp/priv/}, @site_2.image_url)
 
-        expected = %w[
-          https://seiga.nicovideo.jp/image/source/10315315
-          https://seiga.nicovideo.jp/image/source/10315318
-          https://seiga.nicovideo.jp/image/source/10315319
-          https://seiga.nicovideo.jp/image/source/10315320
-          https://seiga.nicovideo.jp/image/source/10315321
-          https://seiga.nicovideo.jp/image/source/10315322
-          https://seiga.nicovideo.jp/image/source/10315323
-          https://seiga.nicovideo.jp/image/source/10315324
-          https://seiga.nicovideo.jp/image/source/10315316
+        expected = [
+          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315315},
+          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315318},
+          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315319},
+          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315320},
+          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315321},
+          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315322},
+          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315323},
+          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315324},
+          %r{https://lohas\.nicoseiga\.jp/priv/\h+/\d+/10315316},
         ]
-        assert_equal(expected.sort, @site_3.image_urls.sort)
-        assert_match(%r{^https?://lohas\.nicoseiga\.jp/priv/}, @site_3.image_url)
+
+        assert_equal(9, @site_3.image_urls.size)
+        9.times { |n| assert_match(expected[n], @site_3.image_urls[n]) }
       end
 
       should "get the canonical url" do

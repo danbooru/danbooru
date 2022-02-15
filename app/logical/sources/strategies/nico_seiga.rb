@@ -65,33 +65,25 @@ module Sources
       end
 
       def image_urls
-        urls = []
-        return urls if api_client&.api_response.blank?
-
         if image_id.present?
-          urls << "https://seiga.nicovideo.jp/image/source/#{image_id}"
+          [image_url_for("https://seiga.nicovideo.jp/image/source/#{image_id}")]
         elsif illust_id.present?
-          urls << "https://seiga.nicovideo.jp/image/source/#{illust_id}"
+          [image_url_for("https://seiga.nicovideo.jp/image/source/#{illust_id}")]
         elsif manga_id.present? && api_client.image_ids.present?
-          urls += api_client.image_ids.map { |id| "https://seiga.nicovideo.jp/image/source/#{id}" }
+          api_client.image_ids.map { |id| image_url_for("https://seiga.nicovideo.jp/image/source/#{id}") }
+        else
+          [image_url_for(url)]
         end
-        urls
       end
 
-      def image_url
-        return url if image_urls.blank? || api_client.blank?
+      def image_url_for(url)
+        return url if api_client.blank?
 
-        img = case url
-        when DIRECT || CDN_DIRECT then "https://seiga.nicovideo.jp/image/source/#{image_id_from_url(url)}"
-        when SOURCE then url
-        else image_urls.first
-        end
-
-        resp = api_client.login.head(img)
+        resp = api_client.login.head(url)
         if resp.uri.to_s =~ %r{https?://.+/(\w+/\d+/\d+)\z}i
           "https://lohas.nicoseiga.jp/priv/#{$1}"
         else
-          img
+          url
         end
       end
 
