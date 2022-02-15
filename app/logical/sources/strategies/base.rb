@@ -18,6 +18,9 @@ module Sources
     class Base
       class DownloadError < StandardError; end
 
+      # The http timeout to download a file.
+      DOWNLOAD_TIMEOUT = 60
+
       attr_reader :url, :referer_url, :urls, :parsed_url, :parsed_referer, :parsed_urls
 
       extend Memoist
@@ -228,14 +231,9 @@ module Sources
       end
       memoize :http
 
-      # The http timeout to download a file. Overrideable by each site
-      def download_timeout
-        30
-      end
-
       # A http client for downloading files.
       def http_downloader
-        http.timeout(download_timeout).max_size(Danbooru.config.max_file_size).use(:spoof_referrer).use(:unpolish_cloudflare)
+        http.timeout(DOWNLOAD_TIMEOUT).max_size(Danbooru.config.max_file_size).use(:spoof_referrer).use(:unpolish_cloudflare)
       end
       memoize :http_downloader
 

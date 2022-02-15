@@ -103,10 +103,6 @@ module Sources
       def artist_name
         urls.map { |u| u[PROFILE_URL, :artist_name] || u[PAGE_URL, :artist_name] }.compact.first
       end
-
-      def download_timeout
-        60
-      end
     end
   end
 end
