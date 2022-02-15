@@ -8,7 +8,7 @@ module Sources
       end
 
       def page_url
-        url
+        nil
       end
 
       def canonical_url
