@@ -37,16 +37,22 @@ class UploadMediaAsset < ApplicationRecord
     active? || failed?
   end
 
+  def file_upload?
+    source_url.starts_with?("file://")
+  end
+
   def source_strategy
     return nil if source_url.blank?
     Sources::Strategies.find(source_url, page_url)
   end
 
   def async_process_upload!
+    return if file_upload?
     ProcessUploadMediaAssetJob.perform_later(self)
   end
 
   def process_upload!
+    return if file_upload?
     update!(status: :processing)
 
     strategy = Sources::Strategies.find(source_url)

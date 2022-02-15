@@ -10,12 +10,13 @@ module UploadTestHelper
       source = { file: file }
     end
 
-    post_auth uploads_path(format: :json), user, params: { upload: { **source, **params }}
+    perform_enqueued_jobs do
+      post_auth uploads_path(format: :json), user, params: { upload: { **source, **params }}
+    end
   end
 
   def assert_successful_upload(source_or_file_path, user: create(:user), **params)
     create_upload!(source_or_file_path, user: user, **params)
-    perform_enqueued_jobs
 
     upload = Upload.last
     assert_response 201
