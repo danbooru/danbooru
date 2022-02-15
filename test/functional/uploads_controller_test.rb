@@ -211,9 +211,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       context "for a video longer than the video length limit" do
         should "fail for a regular user" do
-          @source = "https://cdn.donmai.us/original/63/cb/63cb09f2526ef3ac14f11c011516ad9b.webm"
-          post_auth uploads_path(format: :json), @user, params: { upload: { source: @source }}
-          perform_enqueued_jobs
+          create_upload!("https://cdn.donmai.us/original/63/cb/63cb09f2526ef3ac14f11c011516ad9b.webm", user: @user)
 
           assert_response 201
           assert_match("Duration must be less than", Upload.last.error)

@@ -101,7 +101,13 @@ export default class FileUploadComponent {
       upload = await $.get(`/uploads/${upload.id}.json`);
     }
 
-    if (upload.media_asset_count > 0) {
+    if (upload.status === "error") {
+      this.$dropzone.removeClass("success");
+      this.$component.find("progress").addClass("hidden");
+      this.$component.find("input").removeAttr("disabled");
+
+      Utility.error(`Upload failed: ${upload.error}.`);
+    } else {
       let params = new URLSearchParams(window.location.search);
       let isBookmarklet = params.has("url");
       params.delete("url");
@@ -115,12 +121,6 @@ export default class FileUploadComponent {
       } else {
         window.location.assign(url);
       }
-    } else if (upload.status === "error") {
-      this.$dropzone.removeClass("success");
-      this.$component.find("progress").addClass("hidden");
-      this.$component.find("input").removeAttr("disabled");
-
-      Utility.error(`Upload failed: ${upload.error}.`);
     }
   }
 

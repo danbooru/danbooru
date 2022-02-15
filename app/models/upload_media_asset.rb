@@ -68,7 +68,11 @@ class UploadMediaAsset < ApplicationRecord
 
   def update_upload_status
     upload.with_lock do
-      upload.update!(status: "completed") if upload.upload_media_assets.all?(&:finished?)
+      if upload.upload_media_assets.all?(&:failed?)
+        upload.update!(status: "error", error: upload.upload_media_assets.map(&:error).join("; "))
+      elsif upload.upload_media_assets.all?(&:finished?)
+        upload.update!(status: "completed")
+      end
     end
   end
 
