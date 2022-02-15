@@ -21,7 +21,7 @@ RelatedTag.initialize_all = function() {
 
   // Show the related tags automatically when the "Edit" tab is opened, or by default on the uploads page.
   $(document).on("danbooru:open-post-edit-tab", RelatedTag.show);
-  if ($("#c-uploads #a-show").length) {
+  if ($("#c-uploads #a-show #p-single-asset-upload").length) {
     RelatedTag.show();
   }
 }

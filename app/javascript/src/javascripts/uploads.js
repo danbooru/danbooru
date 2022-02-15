@@ -7,7 +7,7 @@ Upload.IQDB_MIN_SIMILARITY = 50;
 Upload.IQDB_HIGH_SIMILARITY = 70;
 
 Upload.initialize_all = function() {
-  if ($("#c-uploads #a-show").length) {
+  if ($("#c-uploads #a-show #p-single-asset-upload").length) {
     this.initialize_similar();
 
     $("#toggle-artist-commentary").on("click.danbooru", function(e) {
