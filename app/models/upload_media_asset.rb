@@ -29,6 +29,10 @@ class UploadMediaAsset < ApplicationRecord
     q.apply_default_order(params)
   end
 
+  def loading?
+    pending? || processing?
+  end
+
   def finished?
     active? || failed?
   end

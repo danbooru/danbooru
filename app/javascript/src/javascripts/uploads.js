@@ -1,3 +1,5 @@
+import Utility from "./utility";
+
 let Upload = {};
 
 Upload.IQDB_LIMIT = 5;
@@ -21,6 +23,17 @@ Upload.initialize_all = function() {
 
   if ($("#c-uploads #a-batch").length) {
     $(document).on("click.danbooru", "#c-uploads #a-batch #link", Upload.batch_open_all);
+  }
+
+  Upload.loadAssets();
+}
+
+Upload.loadAssets = async function() {
+  while ($(".upload-media-asset-loading").length) {
+    let ids = $(".upload-media-asset-loading").map((i, el) => $(el).attr("data-id")).toArray().join(",");
+    let size = $(".upload-media-asset-gallery").attr("data-size");
+    $.get("/upload_media_assets.js", { search: { status: "active failed", id: ids }, size: size });
+    await Utility.delay(250);
   }
 }
 

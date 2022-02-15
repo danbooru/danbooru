@@ -1,4 +1,4 @@
-<%= render(MediaAssetGalleryComponent.new) do |gallery| %>
+<%= render(MediaAssetGalleryComponent.new(classes: ["upload-media-asset-gallery"])) do |gallery| %>
   <% upload_media_assets.each do |upload_media_asset| %>
     <% gallery.media_asset do %>
       <%= render "upload_media_assets/preview", upload_media_asset: upload_media_asset, size: gallery.size %>

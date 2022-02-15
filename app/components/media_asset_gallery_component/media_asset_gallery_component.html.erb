@@ -1,4 +1,4 @@
-<div class="media-asset-gallery media-asset-gallery-<%= size %>">
+<%= tag.div class: ["media-asset-gallery", "media-asset-gallery-#{size}", *classes], "data-size": size do %>
   <% if media_assets.empty? %>
     <p>No results found.</p>
   <% else %>
@@ -10,4 +10,4 @@
   <% end %>
 
   <%= footer %>
-</div>
+<% end %>
