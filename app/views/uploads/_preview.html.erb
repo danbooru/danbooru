@@ -3,7 +3,7 @@
 
 <%= render(MediaAssetPreviewComponent.new(media_asset: media_asset, size: size, link_target: upload, save_data: CurrentUser.save_data)) do |preview| %>
   <% preview.missing_image do %>
-    <% if upload.is_errored? || upload_media_asset.failed? %>
+    <% if upload.is_errored? || upload_media_asset&.failed? %>
       Upload failed
     <% else %>
       Loading
