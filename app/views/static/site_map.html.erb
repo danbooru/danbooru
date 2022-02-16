@@ -8,7 +8,6 @@
         <li><%= link_to_wiki "Help", "help:posts" %></li>
         <li><%= link_to("Listing", posts_path) %></li>
         <li><%= link_to("Upload", new_upload_path) %></li>
-        <li><%= link_to("Upload Listing", uploads_path) %></li>
         <li><%= link_to("Popular", popular_explore_posts_path) %></li>
         <li><%= link_to("Curated", curated_explore_posts_path) %></li>
         <li><%= link_to("Most Viewed", viewed_explore_posts_path) %></li>
@@ -121,6 +120,7 @@
           <% if policy(UserNameChangeRequest).create? %>
             <li><%= link_to "Change name", new_user_name_change_request_path %></li>
           <% end %>
+          <li><%= link_to "Uploads", user_uploads_path(CurrentUser.user) %></li>
           <li><%= link_to "Dmails", dmails_path(search: { folder: "received" }) %></li>
           <li><%= link_to "Favorites", favorites_path %></li>
           <li><%= link_to "Favorite groups", favorite_groups_path %></li>

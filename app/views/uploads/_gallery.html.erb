@@ -3,7 +3,7 @@
 
   <span>
     <strong>Gallery</strong> |
-    <%= link_to "Table", uploads_path(mode: "table") %>
+    <%= link_to "Table", user_uploads_path(CurrentUser.user.id.to_i, mode: "table") %>
   </span>
 </div>
 

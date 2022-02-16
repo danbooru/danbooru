@@ -264,6 +264,7 @@ Rails.application.routes.draw do
     end
     resource :password, only: [:edit, :update]
     resources :api_keys, only: [:new, :create, :edit, :update, :index, :destroy]
+    resources :uploads, only: [:index]
 
     collection do
       get :custom_style
