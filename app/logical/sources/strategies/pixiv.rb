@@ -223,7 +223,7 @@ module Sources
 
       def is_ugoira?
         # https://i.pximg.net/img-original/img/2019/05/27/17/59/33/74932152_ugoira0.jpg
-        url.match?(UGOIRA) || api_illust.dig(:urls, :original)&.match?(/ugoira/)
+        url.match?(UGOIRA) || original_urls&.any?(/ugoira/)
       end
 
       def illust_id
