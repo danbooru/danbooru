@@ -174,7 +174,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         post_auth uploads_path(format: :json), @user, params: { upload: { file: file }}
 
         assert_response 201
-        assert_match("Not an image or video", Upload.last.error)
+        assert_match("File is not an image or video", Upload.last.error)
       end
 
       context "for a file larger than the file size limit" do

@@ -147,7 +147,7 @@ module Danbooru
       def download_media(url, file: Tempfile.new("danbooru-download-", binmode: true))
         response = get(url)
 
-        raise DownloadError, "Downloading #{response.uri} failed with code #{response.status}" if response.status != 200
+        raise DownloadError, "#{url} failed with code #{response.status}" if response.status != 200
         raise FileTooLargeError, "File size too large (size: #{response.content_length.to_i.to_formatted_s(:human_size)}; max size: #{@max_size.to_formatted_s(:human_size)})" if @max_size && response.content_length.to_i > @max_size
 
         size = 0

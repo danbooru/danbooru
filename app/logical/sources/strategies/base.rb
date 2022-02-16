@@ -219,9 +219,7 @@ module Sources
 
       # Download the file at the given url, or at the main image url by default.
       def download_file!(download_url = image_url)
-        raise DownloadError, "Download failed: couldn't find download url for #{url}" if download_url.blank?
         response, file = http_downloader.download_media(download_url)
-        raise DownloadError, "Download failed: #{download_url} returned error #{response.status}" if response.status != 200
         file
       end
 
