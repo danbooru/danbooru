@@ -319,7 +319,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
         should_upload_successfully("http://nijie.info/view.php?id=213043")
         should_upload_successfully("https://nijie.info/view_popup.php?id=213043")
-        should_upload_successfully("https://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg")
+        should_upload_successfully("https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg")
 
         should_upload_successfully("https://pawoo.net/web/statuses/1202176") if Danbooru.config.pawoo_client_id.present? # XXX
         should_upload_successfully("https://img.pawoo.net/media_attachments/files/000/128/953/original/4c0a06087b03343f.png") if Danbooru.config.pawoo_client_id.present? # XXX

@@ -102,7 +102,7 @@ module Sources
 
         # Can't use URI.join here because nijie urls may contain japanese characters
         images = images.map { |img| "https:#{img}" }
-        images = [url] if url.match?(IMAGE_URL) && images.empty?
+        images = [url] if images.empty?
         images.map(&method(:to_full_image_url)).uniq
       end
 

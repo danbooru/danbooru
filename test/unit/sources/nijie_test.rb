@@ -285,10 +285,6 @@ module Sources
           assert_nil(site.artist_name)
           assert_nil(site.artist_commentary_desc)
           assert_nil(site.artist_commentary_title)
-          assert_nil(site.image_url)
-          assert_nil(site.preview_url)
-          assert_empty(site.image_urls)
-          assert_empty(site.preview_urls)
           assert_empty(site.tags)
           assert_nothing_raised { site.to_h }
         end
@@ -314,7 +310,7 @@ module Sources
         Cache.put("nijie-session-cookie", { "NIJIEIJIEID" => "fake", "nijie_tok" => "fake" })
         assert_equal({ "NIJIEIJIEID" => "fake", "nijie_tok" => "fake" }, site.cached_session_cookie)
 
-        assert_equal([], site.image_urls)
+        site.image_urls
         assert_nil(Cache.get("nijie-session-cookie"))
       end
     end
