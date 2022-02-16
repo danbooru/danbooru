@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Upload < ApplicationRecord
+  class Error < StandardError; end
+
   attr_accessor :file
 
   belongs_to :uploader, class_name: "User"
@@ -96,14 +98,19 @@ class Upload < ApplicationRecord
     elsif source.present?
       strategy = Sources::Strategies.find(source, referer_url)
       page_url = strategy.page_url
+      image_urls = strategy.image_urls
 
-      upload_media_assets = strategy.image_urls.map do |image_url|
+      if image_urls.empty?
+        raise Error, "#{source} doesn't contain any images"
+      end
+
+      upload_media_assets = image_urls.map do |image_url|
         UploadMediaAsset.new(source_url: image_url, page_url: page_url, media_asset: nil)
       end
 
       update!(upload_media_assets: upload_media_assets, media_asset_count: upload_media_assets.size)
     else
-      raise "No file or source given" # Should never happen
+      raise Error, "No file or source given" # Should never happen
     end
   rescue Exception => e
     update!(status: "error", error: e.message)
