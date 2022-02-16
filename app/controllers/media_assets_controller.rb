@@ -4,7 +4,8 @@ class MediaAssetsController < ApplicationController
   respond_to :html, :json, :xml
 
   def index
-    @media_assets = authorize MediaAsset.visible(CurrentUser.user).paginated_search(params, count_pages: false)
+    @limit = params.fetch(:limit, CurrentUser.user.per_page).to_i.clamp(0, PostSets::Post::MAX_PER_PAGE)
+    @media_assets = authorize MediaAsset.visible(CurrentUser.user).paginated_search(params, limit: @limit, count_pages: false)
     @media_assets = @media_assets.includes(:media_metadata, :post)
     respond_with(@media_assets)
   end
