@@ -4,27 +4,27 @@ module Sources
   class SkebTest < ActiveSupport::TestCase
     context "The source for a skeb picture" do
       setup do
-        @site = Sources::Strategies.find("https://skeb.jp/@kai_chiisame/works/6")
+        @site = Sources::Strategies.find("https://skeb.jp/@kokuzou593/works/45")
       end
 
       should "get the artist name" do
-        assert_equal("kai_chiisame", @site.artist_name)
+        assert_equal("kokuzou593", @site.artist_name)
       end
 
       should "get profile url" do
-        assert_equal("https://skeb.jp/@kai_chiisame", @site.profile_url)
+        assert_equal("https://skeb.jp/@kokuzou593", @site.profile_url)
       end
 
       should "get the image url" do
-        assert_equal("https://skeb.imgix.net/requests/229088_2?bg=%23fff&auto=format&txtfont=bold&txtshad=70&txtclr=BFFFFFFF&txtalign=middle%2Ccenter&txtsize=150&txt=SAMPLE&w=800&s=32a275893cf5362d51e5744ff5d8f88b", @site.image_url)
+        assert_equal(["https://skeb.imgix.net/uploads/origins/307941e9-dbe0-4e4b-93d4-94accdaff9a0?bg=%23fff&auto=format&w=800&s=e0ddfb1fa0d9f23797b338598aae78fa"], @site.image_urls)
       end
 
       should "get the canonical url" do
-        assert_equal("https://skeb.jp/@kai_chiisame/works/6", @site.canonical_url)
+        assert_equal("https://skeb.jp/@kokuzou593/works/45", @site.canonical_url)
       end
 
       should "find the correct artist" do
-        artist = FactoryBot.create(:artist, name: "kai_chiisame", url_string: @site.url)
+        artist = create(:artist, name: "kokuzou593", url_string: @site.url)
         assert_equal([artist], @site.artists)
       end
 

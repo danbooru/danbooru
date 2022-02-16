@@ -10,7 +10,7 @@ module Sources
     context "downloading a 'http://nijie.info/view.php?id=:id' url" do
       should "download the original file" do
         @source = "http://nijie.info/view.php?id=213043"
-        @rewrite = "https://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg"
+        @rewrite = "https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"
         assert_rewritten(@rewrite, @source)
         assert_downloaded(132_555, @source)
       end
@@ -18,7 +18,7 @@ module Sources
 
     context "downloading a 'https://pic*.nijie.info/nijie_picture/:id.jpg' url" do
       should "download the original file" do
-        @source = "https://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg"
+        @source = "https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"
         assert_not_rewritten(@source)
         assert_downloaded(132_555, @source)
       end
@@ -47,7 +47,7 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
+        assert_equal("https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg", @site.image_url)
         assert_downloaded(132_555, @site.image_url)
       end
 
@@ -56,7 +56,7 @@ module Sources
       end
 
       should "get the preview url" do
-        assert_equal("https://pic.nijie.net/03/__rs_l170x170/nijie_picture/728995_20170505014820_0.jpg", @site.preview_url)
+        assert_equal("https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg", @site.preview_url)
         assert_equal([@site.preview_url], @site.preview_urls)
         assert_downloaded(132_555, @site.preview_url)
       end
@@ -128,7 +128,7 @@ module Sources
 
       should "get the preview urls" do
         assert_equal("https://pic.nijie.net/03/__rs_l170x170/nijie_picture/728995_20170505014820_0.jpg", @site.preview_url)
-        assert_equal([@site.preview_url], @site.preview_urls)
+        assert_equal(["https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg"], @site.preview_urls)
       end
 
       should "get the canonical url" do
@@ -150,11 +150,11 @@ module Sources
       end
 
       should "get the image url" do
-        assert_equal("https://pic.nijie.net/03/nijie_picture/728995_20170505014820_0.jpg", @site.image_url)
+        assert_equal("https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg", @site.image_url)
       end
 
       should "get the preview urls" do
-        assert_equal("https://pic.nijie.net/03/__rs_l170x170/nijie_picture/728995_20170505014820_0.jpg", @site.preview_url)
+        assert_equal("https://pic.nijie.net/07/nijie/17/95/728995/illust/0_0_403fdd541191110c_c25585.jpg", @site.preview_url)
         assert_equal([@site.preview_url], @site.preview_urls)
       end
 
@@ -178,12 +178,12 @@ module Sources
 
       should "get the image urls" do
         urls = %w[
-          https://pic.nijie.net/03/nijie_picture/236014_20170620101426_0.png
-          https://pic.nijie.net/01/nijie_picture/diff/main/218856_0_236014_20170620101329.png
-          https://pic.nijie.net/01/nijie_picture/diff/main/218856_1_236014_20170620101330.png
-          https://pic.nijie.net/01/nijie_picture/diff/main/218856_2_236014_20170620101331.png
-          https://pic.nijie.net/03/nijie_picture/diff/main/218856_3_236014_20170620101331.png
-          https://pic.nijie.net/03/nijie_picture/diff/main/218856_4_236014_20170620101333.png
+          https://pic.nijie.net/02/nijie/17/14/236014/illust/0_0_5a51fc32aa2e13a5_1d8d06.png
+          https://pic.nijie.net/06/nijie/17/14/236014/illust/218856_0_d1c29eff823097a1_2449d1.png
+          https://pic.nijie.net/06/nijie/17/14/236014/illust/218856_1_7646cf57f6f1c695_f2ed81.png
+          https://pic.nijie.net/07/nijie/17/14/236014/illust/218856_2_fba142a9dfda41e3_1c0259.png
+          https://pic.nijie.net/08/nijie/17/14/236014/illust/218856_3_2074431327728df6_6ae716.png
+          https://pic.nijie.net/05/nijie/17/14/236014/illust/218856_4_6233f9240df78826_14bec9.png
         ]
 
         assert_equal(urls, @site.image_urls)
@@ -210,9 +210,6 @@ module Sources
         assert_equal(image_url, site.canonical_url)
         assert_equal("https://nijie.info/members.php?id=236014", site.profile_url)
         assert_nothing_raised { site.to_h }
-
-        assert_downloaded(3619, site.image_url)
-        assert_downloaded(3619, site.preview_url)
       end
     end
 
@@ -247,7 +244,7 @@ module Sources
       should "find the mp4 file" do
         site = Sources::Strategies.find("http://nijie.info/view.php?id=324604")
 
-        assert_equal("https://pic.nijie.net/01/nijie_picture/1349569_20190727172205_0.mp4", site.image_urls[0])
+        assert_equal("https://pic.nijie.net/01/nijie/19/69/1349569/illust/0_0_a20b709587eb7713_30b409.mp4", site.image_urls[0])
       end
     end
 
@@ -303,8 +300,8 @@ module Sources
         site = Sources::Strategies.find("https://nijie.info/view.php?id=203688")
 
         urls = %w[
-          https://pic.nijie.net/01/nijie_picture/676327_20170216212803_0.jpg
-          https://pic.nijie.net/04/nijie_picture/diff/main/676327_20170216212806_0.jpg
+          https://pic.nijie.net/07/nijie/17/27/676327/illust/0_0_2e46f254324c90c8_dbfc1a.jpg
+          https://pic.nijie.net/01/nijie/17/27/676327/illust/203688_0_6f7baf9290a2b1d9_3badf7.jpg
         ]
         assert_equal(urls, site.image_urls)
       end
@@ -329,9 +326,9 @@ module Sources
         site = Sources::Strategies.find(image, page)
 
         images = %w[
-          https://pic.nijie.net/01/dojin_main/20120213044700表紙サンプル.jpg
-          https://pic.nijie.net/01/dojin_main/dojin_sam/20120213044700コピー\ ～\ 0006のコピー.jpg
-          https://pic.nijie.net/01/dojin_main/dojin_sam/20120213044700コピー\ ～\ 0011のコピー.jpg
+          https://pic.nijie.net/06/nijie/12/34/334/illust/0_0_f16b3c9eac5b1c03_bbe7a0.jpg
+          https://pic.nijie.net/06/nijie/12/34/334/illust/53023_1_76769657f10e5d57_3e00d7.jpg
+          https://pic.nijie.net/06/nijie/12/34/334/illust/53023_2_9cb4d9bdf9cc75a6_872020.jpg
         ]
         tags = [%w[中出し https://nijie.info/search_dojin.php?word=%E4%B8%AD%E5%87%BA%E3%81%97],
                 %w[フェラ https://nijie.info/search_dojin.php?word=%E3%83%95%E3%82%A7%E3%83%A9],
