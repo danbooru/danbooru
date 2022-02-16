@@ -29,7 +29,7 @@ class UploadsController < ApplicationController
   end
 
   def index
-    @mode = params.fetch(:mode, "table")
+    @mode = params.fetch(:mode, "gallery")
 
     @defaults = {}
     @defaults[:uploader_id] = params[:user_id]
