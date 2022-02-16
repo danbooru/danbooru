@@ -1,6 +1,12 @@
 <div id="c-uploads">
   <div id="a-show">
-    <h1>Upload</h1>
+    <div class="flex mb-4">
+      <h1 class="flex-grow-1">Upload</h1>
+
+      <% if @upload.media_asset_count > 1 %>
+        <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+      <% end %>
+    </div>
 
     <% if @upload.is_errored? %>
       <p>Error: <%= @upload.error %>.</p>
@@ -12,7 +18,7 @@
       <% end %>
     <% elsif @upload.media_asset_count > 1 %>
       <div id="p-multiple-asset-upload">
-        <%= render "multiple_asset_upload", upload: @upload %>
+        <%= render "multiple_asset_upload", upload: @upload, size: @preview_size %>
       </div>
     <% elsif @upload.media_asset_count == 1 %>
       <div id="p-single-asset-upload">

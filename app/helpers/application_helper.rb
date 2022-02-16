@@ -62,6 +62,10 @@ module ApplicationHelper
     html.join(" | ").html_safe
   end
 
+  def current_page_path(**params)
+    url_for(request.query_parameters.merge(params))
+  end
+
   def nav_link_to(text, url, **options)
     klass = options.delete(:class)
 

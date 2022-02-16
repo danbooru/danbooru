@@ -1,6 +1,9 @@
 <div id="c-media-assets">
   <div id="a-index">
-    <h1>All Uploads</h1>
+    <div class="flex mb-4">
+      <h1 class="flex-grow-1">All Uploads</h1>
+      <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+    </div>
 
     <% if params[:search].present? %>
       <%= search_form_for(media_assets_path) do |f| %>
@@ -17,7 +20,7 @@
     <% if params[:mode] == "table" %>
       <%= render "media_assets/table" %>
     <% else %>
-      <%= render "media_assets/gallery" %>
+      <%= render "media_assets/gallery", media_assets: @media_assets, size: @preview_size %>
     <% end %>
 
     <%= numbered_paginator(@media_assets) %>

@@ -35,6 +35,7 @@ class UploadsController < ApplicationController
     @defaults[:uploader_id] = params[:user_id]
     @defaults[:status] = "completed" if request.format.html?
     @limit = params.fetch(:limit, CurrentUser.user.per_page).to_i.clamp(0, PostSets::Post::MAX_PER_PAGE)
+    @preview_size = params[:size].presence || cookies[:post_preview_size].presence || MediaAssetGalleryComponent::DEFAULT_SIZE
 
     @uploads = authorize Upload.visible(CurrentUser.user).paginated_search(params, limit: @limit, count_pages: true, defaults: @defaults)
     @uploads = @uploads.includes(:uploader, media_assets: :post, upload_media_assets: { media_asset: :post }) if request.format.html?
@@ -44,6 +45,7 @@ class UploadsController < ApplicationController
 
   def show
     @upload = authorize Upload.find(params[:id])
+    @preview_size = params[:size].presence || cookies[:post_preview_size].presence || MediaAssetGalleryComponent::DEFAULT_SIZE
 
     if request.format.html? && @upload.media_asset_count == 1 && @upload.media_assets.first&.post.present?
       flash[:notice] = "Duplicate of post ##{@upload.media_assets.first.post.id}"

@@ -1,5 +1,5 @@
-<%= render(MediaAssetGalleryComponent.new) do |gallery| %>
-  <% @media_assets.each do |media_asset| %>
+<%= render(MediaAssetGalleryComponent.new(size: size)) do |gallery| %>
+  <% media_assets.each do |media_asset| %>
     <% if policy(media_asset).can_see_image? %>
       <% gallery.media_asset do %>
         <%= render "media_assets/preview", media_asset: media_asset, size: gallery.size %>

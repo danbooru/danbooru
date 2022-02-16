@@ -1,9 +1,23 @@
 <div id="c-uploads">
   <div id="a-index">
+    <div class="flex items-center mb-4">
+      <h1 class="flex-1">My Uploads</h1>
+
+      <span>
+        <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+
+        <% if @mode == "table" %>
+          <%= link_to grid_icon, current_page_path(mode: nil), title: "Gallery", class: "inactive-link" %>
+        <% else %>
+          <%= link_to list_icon, current_page_path(mode: "table"), title: "Table", class: "inactive-link" %>
+        <% end %>
+      </span>
+    </div>
+
     <% if @mode == "gallery" %>
-      <%= render "uploads/gallery" %>
+      <%= render "uploads/gallery", uploads: @uploads, size: @preview_size %>
     <% elsif @mode == "table" %>
-      <%= render "uploads/table" %>
+      <%= render "uploads/table", uploads: @uploads %>
     <% end %>
   </div>
 </div>

@@ -77,62 +77,7 @@
       <a class="mobile-only" href="#search-box">Search &raquo;</a>
     </li>
 
-    <%= render PopupMenuComponent.new(classes: "post-preview-size-menu") do |menu| %>
-      <% menu.button do %>
-        <span class="text-sm">Size <%= caret_down_icon %></span>
-      <% end %>
-
-      <% menu.item do %>
-        <% if @preview_size == "150" %>
-          <%= link_to "Small", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: params[:show_votes], size: "150"), class: "font-bold", rel: "nofollow" %>
-        <% else %>
-          <%= link_to "Small", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: params[:show_votes], size: "150"), rel: "nofollow" %>
-        <% end %>
-      <% end %>
-
-      <% menu.item do %>
-        <% if @preview_size == "180" %>
-          <%= link_to "Medium", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: params[:show_votes], size: "180"), class: "font-bold", rel: "nofollow" %>
-        <% else %>
-          <%= link_to "Medium", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: params[:show_votes], size: "180"), rel: "nofollow" %>
-        <% end %>
-      <% end %>
-
-      <% menu.item do %>
-        <% if @preview_size == "225" %>
-          <%= link_to "Large", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: params[:show_votes], size: "225"), class: "font-bold", rel: "nofollow" %>
-        <% else %>
-          <%= link_to "Large", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: params[:show_votes], size: "225"), rel: "nofollow" %>
-        <% end %>
-      <% end %>
-
-      <%# Mobile only %>
-      <% menu.item do %>
-        <% if @preview_size == "360" %>
-          <%= link_to "Huge", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: params[:show_votes], size: "360"), class: "mobile-only font-bold", rel: "nofollow" %>
-        <% else %>
-          <%= link_to "Huge", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: params[:show_votes], size: "360"), class: "mobile-only", rel: "nofollow" %>
-        <% end %>
-      <% end %>
-
-      <%# Desktop only %>
-      <% menu.item do %>
-        <% if @preview_size == "270" %>
-          <%= link_to "Huge", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: params[:show_votes], size: "270"), class: "desktop-only font-bold", rel: "nofollow" %>
-        <% else %>
-          <%= link_to "Huge", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: params[:show_votes], size: "270"), class: "desktop-only", rel: "nofollow" %>
-        <% end %>
-      <% end %>
-
-      <%# Desktop only %>
-      <% menu.item do %>
-        <% if @preview_size == "360" %>
-          <%= link_to "Gigantic", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: params[:show_votes], size: "360"), class: "desktop-only font-bold", rel: "nofollow" %>
-        <% else %>
-          <%= link_to "Gigantic", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: params[:show_votes], size: "360"), class: "desktop-only", rel: "nofollow" %>
-        <% end %>
-      <% end %>
-    <% end %>
+    <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
 
     <%= render PopupMenuComponent.new(classes: "post-preview-options-menu") do |menu| %>
       <% menu.item do %>

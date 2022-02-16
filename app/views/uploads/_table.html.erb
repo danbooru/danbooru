@@ -1,13 +1,4 @@
-<div class="flex items-center mb-2">
-  <h1 class="flex-1">My Uploads</h1>
-
-  <span>
-    <%= link_to "Gallery", user_uploads_path(CurrentUser.user.id.to_i) %> |
-    <strong>Table</strong>
-  </span>
-</div>
-
-<%= table_for @uploads, class: "striped", width: "100%" do |t| %>
+<%= table_for uploads, class: "striped", width: "100%" do |t| %>
   <% t.column "Upload", td: { class: "text-center" } do |upload| %>
     <%= render "uploads/preview", upload: upload, size: "180" %>
   <% end %>
@@ -61,4 +52,4 @@
   <% end %>
 <% end %>
 
-<%= numbered_paginator(@uploads) %>
+<%= numbered_paginator(uploads) %>
