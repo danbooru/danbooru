@@ -92,7 +92,7 @@ class NicoSeigaApiClient
 
     # XXX should fail gracefully instead of raising exception
     resp = http.cache(1.hour).post("https://account.nicovideo.jp/login/redirector?site=seiga", form: form)
-    raise "NicoSeiga login failed (status=#{resp.status} url=#{url})" if resp.status != 200
+    raise "NicoSeiga login failed (status=#{resp.status})" if resp.status != 200
 
     http
   end
