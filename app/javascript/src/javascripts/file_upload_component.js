@@ -3,6 +3,8 @@ import Utility from "./utility";
 import capitalize from "lodash/capitalize";
 
 export default class FileUploadComponent {
+  static POLL_DELAY = 250;
+
   static initialize() {
     $(".file-upload-component").toArray().forEach(element => {
       new FileUploadComponent($(element));
@@ -97,7 +99,7 @@ export default class FileUploadComponent {
     this.$component.find("input").attr("disabled", "disabled");
 
     while (upload.media_asset_count <= 1 && upload.status !== "completed" && upload.status !== "error") {
-      await Utility.delay(500);
+      await Utility.delay(FileUploadComponent.POLL_DELAY);
       upload = await $.get(`/uploads/${upload.id}.json`);
     }
 
