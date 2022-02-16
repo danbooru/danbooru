@@ -6,6 +6,10 @@
       <p>Error: <%= @upload.error %>.</p>
     <% elsif @upload.media_asset_count == 0 %>
       <p>Processing upload...</p>
+
+      <% content_for(:html_header) do %>
+        <meta http-equiv="refresh" content="1">
+      <% end %>
     <% elsif @upload.media_asset_count > 1 %>
       <div id="p-multiple-asset-upload">
         <%= render "multiple_asset_upload", upload: @upload %>

@@ -2,10 +2,12 @@
   <p>You have reached your upload limit. Please wait for your pending uploads to be approved before uploading more.</p>
 
   <p id="upload-limit">Upload Limit: <%= render "users/upload_limit", user: CurrentUser.user %></p>
-<% elsif upload_media_asset.pending? %>
-  <p>Preparing to upload <%= external_link_to upload_media_asset.source_url %>...</p>
-<% elsif upload_media_asset.processing? %>
+<% elsif upload_media_asset.loading? %>
   <p>Processing <%= external_link_to upload_media_asset.source_url %>...</p>
+
+  <% content_for(:html_header) do %>
+    <meta http-equiv="refresh" content="1">
+  <% end %>
 <% elsif upload_media_asset.failed? %>
   <p>Error: <%= upload_media_asset.error %>.</p>
 <% else %>
