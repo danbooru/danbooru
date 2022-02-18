@@ -1,11 +1,8 @@
 <div id="c-media-assets">
   <div id="a-index">
-    <div class="flex mb-4">
-      <h1 class="flex-grow-1">All Uploads</h1>
-      <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
-    </div>
+    <h1 class="mb-2">All Uploads</h1>
 
-    <% if params[:search].present? %>
+    <% if search_params[:metadata].present? %>
       <%= search_form_for(media_assets_path) do |f| %>
         <%= f.simple_fields_for :metadata do |meta| %>
           <% params.dig(:search, :metadata).to_h.each do |key, value| %>
@@ -16,6 +13,14 @@
         <%= f.submit "Search" %>
       <% end %>
     <% end %>
+
+    <div class="border-b mb-4 flex flex-wrap gap-4">
+      <%= link_to "All", current_page_path(search: search_params.to_h.without("is_posted")), class: ["inline-block p-1 pb-2", (search_params[:is_posted].nil? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
+      <%= link_to "Posted", current_page_path(search: { is_posted: true }), class: ["inline-block p-1 pb-2", (search_params[:is_posted].to_s.truthy? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
+      <%= link_to "Unposted", current_page_path(search: { is_posted: false }), class: ["inline-block p-1 pb-2", (search_params[:is_posted].to_s.falsy? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
+      <span class="flex-grow-1"></span>
+      <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+    </div>
 
     <% if params[:mode] == "table" %>
       <%= render "media_assets/table" %>

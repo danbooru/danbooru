@@ -5,6 +5,7 @@ class UploadMediaAsset < ApplicationRecord
 
   belongs_to :upload
   belongs_to :media_asset, optional: true
+  has_one :post, through: :media_asset
 
   after_create :async_process_upload!
   after_save :update_upload_status, if: :saved_change_to_status?
@@ -25,8 +26,22 @@ class UploadMediaAsset < ApplicationRecord
   end
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :status, :source_url, :page_url, :error, :upload, :media_asset)
-    q.apply_default_order(params)
+    q = search_attributes(params, :id, :created_at, :updated_at, :status, :source_url, :page_url, :error, :upload, :media_asset, :post)
+
+    if params[:is_posted].to_s.truthy?
+      q = q.where.associated(:post)
+    elsif params[:is_posted].to_s.falsy?
+      q = q.where.missing(:post)
+    end
+
+    case params[:order]
+    when "id_desc"
+      q = q.order(id: :desc)
+    when "id_asc"
+      q = q.order(id: :asc)
+    else
+      q.apply_default_order(params)
+    end
   end
 
   def loading?

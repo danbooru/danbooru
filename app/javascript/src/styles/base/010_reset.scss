@@ -12,6 +12,9 @@ html, body {
 
 *, ::before, ::after {
   box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: var(--default-border-color);
 }
 
 body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, blockquote, dl, dd, menu, input {

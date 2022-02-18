@@ -10,17 +10,11 @@
   <% end %>
 
   <% preview.footer do %>
-    <div class="text-center text-muted text-xs h-12">
-      <% if media_asset&.post.present? %>
+    <div class="text-center text-xs h-8">
+      <% if upload_media_asset.post.present? %>
         <div class="leading-none">
-          <%= link_to "post ##{media_asset.post.id}", media_asset.post, class: "leading-none" %>
+          <%= link_to "post ##{upload_media_asset.post.id}", upload_media_asset.post, class: "leading-none" %>
         </div>
-      <% end %>
-
-      <% if upload_media_asset.source_url.present? %>
-        <%= external_link_to upload_media_asset.source_url, Addressable::URI.parse(upload_media_asset.source_url).domain %>
-      <% else %>
-        <em>No source</em>
       <% end %>
     </div>
   <% end %>

@@ -38,7 +38,7 @@ class UploadsController < ApplicationController
     @preview_size = params[:size].presence || cookies[:post_preview_size].presence || MediaAssetGalleryComponent::DEFAULT_SIZE
 
     @uploads = authorize Upload.visible(CurrentUser.user).paginated_search(params, limit: @limit, count_pages: true, defaults: @defaults)
-    @uploads = @uploads.includes(:uploader, media_assets: :post, upload_media_assets: { media_asset: :post }) if request.format.html?
+    @uploads = @uploads.includes(:uploader, :posts, upload_media_assets: :media_asset) if request.format.html?
 
     respond_with(@uploads, include: { upload_media_assets: { include: :media_asset }})
   end
@@ -50,6 +50,8 @@ class UploadsController < ApplicationController
     if request.format.html? && @upload.media_asset_count == 1 && @upload.media_assets.first&.post.present?
       flash[:notice] = "Duplicate of post ##{@upload.media_assets.first.post.id}"
       redirect_to @upload.media_assets.first.post
+    elsif request.format.html? && @upload.media_asset_count > 1
+      redirect_to [@upload, UploadMediaAsset]
     else
       respond_with(@upload, include: { upload_media_assets: { include: :media_asset }})
     end

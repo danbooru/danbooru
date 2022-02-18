@@ -1,17 +1,20 @@
 <div id="c-uploads">
   <div id="a-index">
-    <div class="flex items-center mb-4">
-      <h1 class="flex-1">My Uploads</h1>
+    <h1 class="mb-2">My Uploads</h1>
 
-      <span>
-        <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+    <div class="border-b mb-4 flex flex-wrap gap-4">
+      <%= link_to "All", current_page_path(search: search_params.to_h.without("is_posted")), class: ["inline-block p-1 pb-2", (search_params[:is_posted].nil? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
+      <%= link_to "Posted", current_page_path(search: { is_posted: true }), class: ["inline-block p-1 pb-2", (search_params[:is_posted].to_s.truthy? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
+      <%= link_to "Unposted", current_page_path(search: { is_posted: false }), class: ["inline-block p-1 pb-2", (search_params[:is_posted].to_s.falsy? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
 
-        <% if @mode == "table" %>
-          <%= link_to grid_icon, current_page_path(mode: nil), title: "Gallery", class: "inactive-link" %>
-        <% else %>
-          <%= link_to list_icon, current_page_path(mode: "table"), title: "Table", class: "inactive-link" %>
-        <% end %>
-      </span>
+      <span class="flex-1"></span>
+
+      <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+      <% if @mode == "table" %>
+        <%= link_to grid_icon, current_page_path(mode: nil), title: "Gallery", class: "inline-block p-1 pb-2 rounded inactive-link" %>
+      <% else %>
+        <%= link_to list_icon, current_page_path(mode: "table"), title: "Table", class: "inline-block p-1 pb-2 rounded inactive-link" %>
+      <% end %>
     </div>
 
     <% if @mode == "gallery" %>

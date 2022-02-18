@@ -114,6 +114,8 @@ html {
   --link-color: var(--blue-5);
   --link-hover-color: var(--blue-3);
 
+  --default-border-color: var(--grey-1);
+
   --error-background-color: var(--red-1);
   --success-background-color: var(--green-0);
   --target-background: var(--yellow-0);
@@ -329,6 +331,8 @@ body[data-current-user-theme="dark"] {
   --header-color: var(--grey-1);
   --link-color: var(--azure-4);
   --link-hover-color: var(--azure-3);
+
+  --default-border-color: var(--grey-7);
 
   --error-background-color: var(--red-9);
   --success-background-color: var(--green-9);

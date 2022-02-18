@@ -188,6 +188,12 @@ class MediaAsset < ApplicationRecord
           q = q.joins(:media_metadata).merge(MediaMetadata.search(metadata: params[:metadata]))
         end
 
+        if params[:is_posted].to_s.truthy?
+          q = q.where.associated(:post)
+        elsif params[:is_posted].to_s.falsy?
+          q = q.where.missing(:post)
+        end
+
         q.apply_default_order(params)
       end
     end

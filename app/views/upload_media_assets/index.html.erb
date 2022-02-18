@@ -1,16 +1,23 @@
 <div id="c-upload-media-assets">
   <div id="a-index">
-    <div class="flex items-center mb-2">
-      <h1 class="flex-1">My Uploads</h1>
+    <h1>Upload</h1>
 
-      <span>
-        <strong>Gallery</strong> |
-        <%= link_to "Table", user_uploads_path(CurrentUser.user.id.to_i, mode: "table") %>
-      </span>
+    <% if policy(@upload).show? && @upload.source_strategy.present? %>
+      <%= render_source_data(@upload.source_strategy) %>
+    <% end %>
+
+    <div class="border-b mb-4 flex flex-wrap gap-4">
+      <%= link_to "All", current_page_path(search: search_params.to_h.without("is_posted")), class: ["inline-block p-1 pb-2", (search_params[:is_posted].nil? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
+      <%= link_to "Posted", current_page_path(search: { is_posted: true }), class: ["inline-block p-1 pb-2", (search_params[:is_posted].to_s.truthy? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
+      <%= link_to "Unposted", current_page_path(search: { is_posted: false }), class: ["inline-block p-1 pb-2", (search_params[:is_posted].to_s.falsy? ? "border-current border-b-2 -mb-px" : "inactive-link")] %>
+      <span class="flex-1"></span>
+      <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
     </div>
 
-    <%= render "upload_media_assets/gallery", upload_media_assets: @upload_media_assets %>
+    <%= render "upload_media_assets/gallery", upload_media_assets: @upload_media_assets, size: @preview_size %>
 
     <%= numbered_paginator(@upload_media_assets) %>
   </div>
 </div>
+
+<%= render "uploads/secondary_links" %>

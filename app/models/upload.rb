@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Upload < ApplicationRecord
+  extend Memoist
   class Error < StandardError; end
 
   attr_accessor :file
@@ -8,6 +9,7 @@ class Upload < ApplicationRecord
   belongs_to :uploader, class_name: "User"
   has_many :upload_media_assets, dependent: :destroy
   has_many :media_assets, through: :upload_media_assets
+  has_many :posts, through: :media_assets
 
   normalize :source, :normalize_source
 
@@ -72,7 +74,14 @@ class Upload < ApplicationRecord
   end
 
   def self.search(params)
-    q = search_attributes(params, :id, :created_at, :updated_at, :source, :referer_url, :status, :media_asset_count, :uploader, :upload_media_assets, :media_assets)
+    q = search_attributes(params, :id, :created_at, :updated_at, :source, :referer_url, :status, :media_asset_count, :uploader, :upload_media_assets, :media_assets, :posts)
+
+    if params[:is_posted].to_s.truthy?
+      q = q.where.not(id: Upload.where.missing(:posts))
+    elsif params[:is_posted].to_s.falsy?
+      q = q.where(id: Upload.where.missing(:posts))
+    end
+
     q.apply_default_order(params)
   end
 
@@ -96,9 +105,8 @@ class Upload < ApplicationRecord
 
       update!(upload_media_assets: [upload_media_asset], status: "completed", media_asset_count: 1)
     elsif source.present?
-      strategy = Sources::Strategies.find(source, referer_url)
-      page_url = strategy.page_url
-      image_urls = strategy.image_urls
+      page_url = source_strategy.page_url
+      image_urls = source_strategy.image_urls
 
       if image_urls.empty?
         raise Error, "#{source} doesn't contain any images"
@@ -116,7 +124,14 @@ class Upload < ApplicationRecord
     update!(status: "error", error: e.message)
   end
 
-  def self.available_includes
-    [:uploader, :upload_media_assets, :media_assets]
+  def source_strategy
+    return nil if source.blank?
+    Sources::Strategies.find(source, referer_url)
   end
+
+  def self.available_includes
+    [:uploader, :upload_media_assets, :media_assets, :posts]
+  end
+
+  memoize :source_strategy
 end
