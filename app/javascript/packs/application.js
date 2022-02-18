@@ -9,6 +9,7 @@ import "core-js/web/dom-collections";
 require('@rails/ujs').start();
 require('hammerjs');
 require('jquery-hotkeys');
+import morphdom from 'morphdom';
 
 // should start looking for nodejs replacements
 importAll(require.context('../vendor', true, /\.js$/));
@@ -91,4 +92,5 @@ Danbooru.error = Utility.error;
 
 window.$ = jQuery;
 window.jQuery = jQuery;
+window.morphdom = morphdom;
 window.Danbooru = Danbooru;

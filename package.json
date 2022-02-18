@@ -23,6 +23,7 @@
     "jquery-ui": "^1.13.0",
     "lodash": "^4.17.21",
     "mini-css-extract-plugin": "^2.5.1",
+    "morphdom": "^2.6.1",
     "postcss": "^8.4.5",
     "postcss-import": "^14.0.2",
     "postcss-loader": "^6.2.1",

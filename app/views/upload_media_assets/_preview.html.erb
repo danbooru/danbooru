@@ -5,7 +5,7 @@
     <% if upload_media_asset.failed? %>
       Failed
     <% else %>
-      Loading
+      <%= spinner_icon(class: "animate-spin h-8") %>
     <% end %>
   <% end %>
 

@@ -30,7 +30,7 @@
     <% else %>
       <div class="media-asset-placeholder rounded border border-solid flex items-center justify-center w-<%= size %>px h-<%= size %>px">
         <% if media_asset.processing? %>
-          Loading
+          <%= spinner_icon(class: "animate-spin h-8") %>
         <% elsif media_asset.failed? %>
           Failed
         <% else %>
