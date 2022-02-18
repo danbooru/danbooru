@@ -14,9 +14,9 @@
     <%= f.input :source, label: false, as: :string, placeholder: "Paste URL here", input_html: { value: url, class: "text-center" }, wrapper_html: { class: "px-4 text-center" } %>
     <%= f.input :referer_url, as: :hidden, input_html: { value: referer_url } %>
     <%= f.submit "Upload", class: "button-primary text-center mx-auto hidden", "data-disable-with": false %>
-
-    <progress class="w-full hidden"></progress>
   <% end %>
+
+  <%= spinner_icon(class: "hidden animate-spin absolute inset-0 m-auto h-12 link-color") %>
 
   <template class="dropzone-preview-template">
     <div class="dz-preview dz-file-preview flex flex-col text-center space-y-4">

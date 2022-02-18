@@ -92,11 +92,22 @@ export default class FileUploadComponent {
     this.pollStatus(upload);
   }
 
+  loadingStart() {
+    this.$component.find(".spinner-icon").removeClass("hidden");
+    this.$component.find("input").attr("disabled", "disabled");
+    this.$component.find("form").addClass("pointer-events-none cursor-wait opacity-50");
+  }
+
+  loadingStop() {
+    this.$component.find(".spinner-icon").addClass("hidden");
+    this.$component.find("input").removeAttr("disabled");
+    this.$component.find("form").removeClass("pointer-events-none cursor-wait opacity-50");
+  }
+
   // Called after the upload is submitted via AJAX. Polls the upload until it
   // is complete, then redirects to the upload page.
   async pollStatus(upload) {
-    this.$component.find("progress").removeClass("hidden");
-    this.$component.find("input").attr("disabled", "disabled");
+    this.loadingStart();
 
     while (upload.media_asset_count <= 1 && upload.status !== "completed" && upload.status !== "error") {
       await Utility.delay(FileUploadComponent.POLL_DELAY);
@@ -105,8 +116,7 @@ export default class FileUploadComponent {
 
     if (upload.status === "error") {
       this.$dropzone.removeClass("success");
-      this.$component.find("progress").addClass("hidden");
-      this.$component.find("input").removeAttr("disabled");
+      this.loadingStop();
 
       Utility.error(`Upload failed: ${upload.error}.`);
     } else {

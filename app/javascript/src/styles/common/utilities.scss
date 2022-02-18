@@ -16,6 +16,7 @@ $spacer: 0.25rem; /* 4px */
 .cursor-pointer { cursor: pointer; }
 .cursor-zoom-in { cursor: zoom-in; }
 .cursor-zoom-out { cursor: zoom-out; }
+.cursor-wait { cursor: wait; }
 
 .hidden { display: none !important; }
 .inline-block { display: inline-block; }
@@ -48,6 +49,8 @@ $spacer: 0.25rem; /* 4px */
 .pointer-events-none { pointer-events: none; }
 .select-none { user-select: none; }
 
+.opacity-50 { opacity: 0.5; }
+
 .leading-none   { line-height: 1; }
 .leading-normal { line-height: 1.5; }
 
@@ -58,6 +61,8 @@ $spacer: 0.25rem; /* 4px */
 .bottom-0\.5 { bottom: 0.5 * $spacer; }
 .left-0\.5   { left: 0.5 * $spacer; }
 .right-0\.5  { right: 0.5 * $spacer; }
+
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0 }
 
 .border, %border { border-width: 1px; }
 
@@ -79,6 +84,7 @@ $spacer: 0.25rem; /* 4px */
 
 .object-contain { object-fit: contain; }
 
+.m-auto { margin: auto; }
 .m-0    { margin: 0; }
 .m-px   { margin: 1px; }
 .m-0\.5 { margin: 0.5 * $spacer; }
@@ -199,6 +205,8 @@ $spacer: 0.25rem; /* 4px */
 .grid-cols-8  { grid-template-columns: repeat(8, minmax(0, 1fr)); }
 .grid-cols-12 { grid-template-columns: repeat(12, minmax(0, 1fr)); }
 
+.link-color { color: var(--link-color); }
+
 .card {
   @extend %border;
   @extend %rounded-lg;
@@ -256,6 +264,20 @@ $spacer: 0.25rem; /* 4px */
 
   &::-webkit-scrollbar-corner {
     background: transparent;
+  }
+}
+
+.animate-spin {
+  animation: animate-spin 1s linear infinite;
+}
+
+@keyframes animate-spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
   }
 }
 
