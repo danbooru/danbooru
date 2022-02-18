@@ -119,7 +119,7 @@ class TableBuilder
     {
       id: "#{item.model_name.singular.dasherize}-#{item.id}",
       **row_attributes,
-      **ApplicationController.helpers.data_attributes_for(item, "data", item.html_data_attributes)
+      **ApplicationController.helpers.data_attributes_for(item)
     }
   end
 end

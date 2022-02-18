@@ -317,7 +317,7 @@ module ApplicationHelper
     end
   end
 
-  def data_attributes_for(record, prefix, attributes)
+  def data_attributes_for(record, prefix = "data", attributes = record.html_data_attributes)
     attributes.map do |attr|
       if attr.is_a?(Array)
         name = attr.map {|sym| sym.to_s.dasherize.delete("?")}.join('-')

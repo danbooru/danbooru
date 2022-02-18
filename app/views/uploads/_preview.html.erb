@@ -2,7 +2,7 @@
 <% media_asset = upload_media_asset&.media_asset %>
 <% link_target = upload.media_asset_count > 1 ? [upload, UploadMediaAsset] : upload %>
 
-<%= render(MediaAssetPreviewComponent.new(media_asset: media_asset, size: size, link_target: link_target, save_data: CurrentUser.save_data)) do |preview| %>
+<%= render(MediaAssetPreviewComponent.new(media_asset: media_asset, size: size, link_target: link_target, save_data: CurrentUser.save_data, classes: "upload-preview", html: { **data_attributes_for(upload), "data-is-posted": upload.media_asset_count == upload.posts.length })) do |preview| %>
   <% preview.missing_image do %>
     <% if upload.is_errored? || upload_media_asset&.failed? %>
       Upload failed
