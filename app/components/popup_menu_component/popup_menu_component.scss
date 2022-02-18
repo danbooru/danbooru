@@ -1,16 +1,7 @@
 @import "../../javascript/src/styles/base/000_vars";
 
 div.popup-menu {
-  display: inline-block;
-
   a.popup-menu-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-    border-radius: 4px;
-    padding: 4px 8px;
     color: var(--muted-text-color);
 
     // the popup menu is open

@@ -15,7 +15,7 @@
     </div>
     <%= render "application/update_notice", record: forum_post %>
 
-    <menu>
+    <menu class="mt-2">
       <% if policy(forum_post).reply? %>
         <% if current_user.is_anonymous? %>
           <li><%= link_to "Reply", login_path(url: request.fullpath) %></li>

@@ -42,7 +42,7 @@
       <%= render "application/update_notice", record: comment %>
     <% end %>
 
-    <menu>
+    <menu class="mt-2">
       <% if votable? %>
         <li class="comment-votes">
           <% if current_user.is_anonymous? %>

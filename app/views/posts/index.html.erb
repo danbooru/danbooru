@@ -77,17 +77,19 @@
       <a class="mobile-only" href="#search-box">Search &raquo;</a>
     </li>
 
-    <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
+    <li class="flex items-center gap-2">
+      <%= render PreviewSizeMenuComponent.new(current_size: @preview_size) %>
 
-    <%= render PopupMenuComponent.new(classes: "post-preview-options-menu") do |menu| %>
-      <% menu.item do %>
-        <% if @post_set.show_votes %>
-          <%= link_to "Hide scores", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: nil, size: params[:size]), class: "post-preview-hide-votes", rel: "nofollow" %>
-        <% else %>
-          <%= link_to "Show scores", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: true, size: params[:size]), class: "post-preview-show-votes", rel: "nofollow" %>
+      <%= render PopupMenuComponent.new(classes: "post-preview-options-menu") do |menu| %>
+        <% menu.item do %>
+          <% if @post_set.show_votes %>
+            <%= link_to "Hide scores", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: nil, size: params[:size]), class: "post-preview-hide-votes", rel: "nofollow" %>
+          <% else %>
+            <%= link_to "Show scores", posts_path(tags: params[:tags], page: params[:page], limit: params[:limit], show_votes: true, size: params[:size]), class: "post-preview-show-votes", rel: "nofollow" %>
+          <% end %>
         <% end %>
       <% end %>
-    <% end %>
+    </li>
   </menu>
 
   <div id="quick-edit-div" style="display: none;">
