@@ -189,9 +189,11 @@ class MediaAsset < ApplicationRecord
         end
 
         if params[:is_posted].to_s.truthy?
-          q = q.where.associated(:post)
+          #q = q.where.associated(:post)
+          q = q.where(Post.where("posts.md5 = media_assets.md5").arel.exists)
         elsif params[:is_posted].to_s.falsy?
-          q = q.where.missing(:post)
+          #q = q.where.missing(:post)
+          q = q.where.not(Post.where("posts.md5 = media_assets.md5").arel.exists)
         end
 
         q.apply_default_order(params)
