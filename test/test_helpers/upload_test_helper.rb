@@ -7,7 +7,7 @@ module UploadTestHelper
       source = { source: source_or_file_path }
     else
       file = Rack::Test::UploadedFile.new(Rails.root.join(source_or_file_path))
-      source = { file: file }
+      source = { files: { "0" => file } }
     end
 
     perform_enqueued_jobs do

@@ -3,6 +3,8 @@
 class UploadMediaAsset < ApplicationRecord
   extend Memoist
 
+  attr_accessor :file
+
   belongs_to :upload
   belongs_to :media_asset, optional: true
   has_one :post, through: :media_asset
@@ -62,16 +64,22 @@ class UploadMediaAsset < ApplicationRecord
   end
 
   def async_process_upload!
-    return if file_upload?
-    ProcessUploadMediaAssetJob.perform_later(self)
+    if file.present?
+      process_upload!
+    else
+      ProcessUploadMediaAssetJob.perform_later(self)
+    end
   end
 
   def process_upload!
-    return if file_upload?
     update!(status: :processing)
 
-    strategy = Sources::Strategies.find(source_url)
-    media_file = strategy.download_file!(source_url)
+    if file.present?
+      media_file = MediaFile.open(file)
+    else
+      media_file = source_strategy.download_file!(source_url)
+    end
+
     MediaAsset.upload!(media_file) do |media_asset|
       update!(media_asset: media_asset)
     end

@@ -162,7 +162,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         assert_no_difference("Upload.count") do
           file = File.open("test/files/test.jpg")
           source = "https://files.catbox.moe/om3tcw.webm"
-          post_auth uploads_path(format: :json), @user, params: { upload: { file: file, source: source }}
+          post_auth uploads_path(format: :json), @user, params: { upload: { files: { "0" => file }, source: source }}
         end
 
         assert_response 422
@@ -171,7 +171,7 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
 
       should "fail if given an unsupported filetype" do
         file = Rack::Test::UploadedFile.new("test/files/ugoira.json")
-        post_auth uploads_path(format: :json), @user, params: { upload: { file: file }}
+        post_auth uploads_path(format: :json), @user, params: { upload: { files: { "0" => file } }}
 
         assert_response 201
         assert_match("File is not an image or video", Upload.last.error)
@@ -247,12 +247,9 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       context "when re-uploading a media asset stuck in the 'processing' state" do
         should "mark the asset as failed" do
           asset = create(:media_asset, file: File.open("test/files/test.jpg"), status: "processing")
-          file = Rack::Test::UploadedFile.new("test/files/test.jpg")
+          create_upload!("test/files/test.jpg", user: @user)
 
-          post_auth uploads_path, @user, params: { upload: { file: file }}
           upload = Upload.last
-
-          assert_redirected_to upload
           assert_match("Upload failed, try again", upload.reload.error)
           assert_equal("failed", asset.reload.status)
         end
@@ -285,6 +282,24 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
         should_upload_successfully("test/files/test-512x512.webm")
         should_upload_successfully("test/files/test-audio.m4v")
         # should_upload_successfully("test/files/compressed.swf")
+      end
+
+      context "uploading multiple files from your computer" do
+        should "work" do
+          files = {
+            "0" => Rack::Test::UploadedFile.new("test/files/test.jpg"),
+            "1" => Rack::Test::UploadedFile.new("test/files/test.png"),
+            "2" => Rack::Test::UploadedFile.new("test/files/test.gif"),
+          }
+
+          post_auth uploads_path(format: :json), @user, params: { upload: { files: files }}
+
+          upload = Upload.last
+          assert_response 201
+          assert_equal("", upload.error.to_s)
+          assert_equal("completed", upload.status)
+          assert_equal(3, upload.media_asset_count)
+        end
       end
 
       context "uploading a file from a source" do

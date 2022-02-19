@@ -4,7 +4,9 @@ class Upload < ApplicationRecord
   extend Memoist
   class Error < StandardError; end
 
-  attr_accessor :file
+  MAX_FILES_PER_UPLOAD = 100
+
+  attr_accessor :files
 
   belongs_to :uploader, class_name: "User"
   has_many :upload_media_assets, dependent: :destroy
@@ -13,6 +15,7 @@ class Upload < ApplicationRecord
 
   normalize :source, :normalize_source
 
+  validates :files, length: { maximum: MAX_FILES_PER_UPLOAD, message: "can't have more than #{MAX_FILES_PER_UPLOAD} files per upload" }
   validates :source, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, if: -> { source.present? }
   validates :referer_url, format: { with: %r{\Ahttps?://}i, message: "is not a valid URL" }, if: -> { referer_url.present? }
   validate :validate_file_and_source, on: :create
@@ -55,9 +58,9 @@ class Upload < ApplicationRecord
 
   concerning :ValidationMethods do
     def validate_file_and_source
-      if file.present? && source.present?
+      if files.present? && source.present?
         errors.add(:base, "Can't give both a file and a source")
-      elsif file.blank? && source.blank?
+      elsif files.blank? && source.blank?
         errors.add(:base, "No file or source given")
       end
     end
@@ -86,8 +89,8 @@ class Upload < ApplicationRecord
   end
 
   def async_process_upload!
-    if file.present?
-      ProcessUploadJob.perform_now(self)
+    if files.present?
+      process_upload!
     elsif source.present?
       ProcessUploadJob.perform_later(self)
     else
@@ -98,12 +101,10 @@ class Upload < ApplicationRecord
   def process_upload!
     update!(status: "processing")
 
-    if file.present?
-      media_file = MediaFile.open(file.tempfile)
-      media_asset = MediaAsset.upload!(media_file)
-      upload_media_asset = UploadMediaAsset.new(media_asset: media_asset, source_url: "file://#{file.original_filename}", status: "active")
-
-      update!(upload_media_assets: [upload_media_asset], status: "completed", media_asset_count: 1)
+    if files.present?
+      upload_media_assets = files.map do |_index, file|
+        UploadMediaAsset.new(file: file.tempfile, source_url: "file://#{file.original_filename}")
+      end
     elsif source.present?
       page_url = source_strategy.page_url
       image_urls = source_strategy.image_urls
@@ -115,11 +116,11 @@ class Upload < ApplicationRecord
       upload_media_assets = image_urls.map do |image_url|
         UploadMediaAsset.new(source_url: image_url, page_url: page_url, media_asset: nil)
       end
-
-      update!(upload_media_assets: upload_media_assets, media_asset_count: upload_media_assets.size)
     else
       raise Error, "No file or source given" # Should never happen
     end
+
+    update!(upload_media_assets: upload_media_assets, media_asset_count: upload_media_assets.size)
   rescue Exception => e
     update!(status: "error", error: e.message)
   end

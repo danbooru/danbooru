@@ -31,4 +31,8 @@
       background-color: var(--uploads-dropzone-progress-bar-foreground-color);
     }
   }
+
+  &.dz-error .dz-error-message {
+    display: block;
+  }
 }

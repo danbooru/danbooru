@@ -17,7 +17,7 @@ FactoryBot.define do
       status { "completed" }
       source { nil }
       media_asset_count { 1 }
-      file { Rack::Test::UploadedFile.new("#{Rails.root}/test/files/test.jpg") }
+      files { { "0" => Rack::Test::UploadedFile.new("#{Rails.root}/test/files/test.jpg") } }
 
       upload_media_assets do
         [build(:upload_media_asset, media_asset: build(:media_asset, file: "test/files/test.jpg"), source_url: "file://test.jpg", status: "active")]

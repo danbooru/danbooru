@@ -33,16 +33,19 @@ export default class FileUploadComponent {
 
     let dropzone = new Dropzone(this.$dropTarget.get(0), {
       url: "/uploads.json",
-      paramName: "upload[file]",
+      paramName: "upload[files]",
       clickable: this.$dropzone.get(0),
       previewsContainer: this.$dropzone.get(0),
       thumbnailHeight: null,
       thumbnailWidth: null,
       addRemoveLinks: false,
-      maxFiles: 1,
+      parallelUploads: this.maxFiles,
+      maxFiles: this.maxFiles,
       maxFilesize: this.maxFileSize,
       maxThumbnailFilesize: this.maxFileSize,
       timeout: 0,
+      uploadMultiple: true,
+      createImageThumbnails: false,
       acceptedFiles: "image/jpeg,image/png,image/gif,video/mp4,video/webm",
       previewTemplate: this.$component.find(".dropzone-preview-template").html(),
     });
@@ -54,13 +57,6 @@ export default class FileUploadComponent {
     dropzone.on("addedfile", file => {
       this.$dropzone.removeClass("error");
       this.$dropzone.find(".dropzone-hint").hide();
-
-      // Remove all files except the file just added.
-      dropzone.files.forEach(f => {
-        if (f !== file) {
-          dropzone.removeFile(f);
-        }
-      });
     });
 
     dropzone.on("success", file => {
@@ -70,7 +66,9 @@ export default class FileUploadComponent {
     });
 
     dropzone.on("error", (file, msg) => {
-      this.$dropzone.addClass("error");
+      this.$dropzone.find(".dropzone-hint").show();
+      dropzone.removeFile(file);
+      Utility.error(msg);
     });
 
     return dropzone;
@@ -162,6 +160,10 @@ export default class FileUploadComponent {
 
   get maxFileSize() {
     return Number(this.$component.attr("data-max-file-size")) / (1024 * 1024);
+  }
+
+  get maxFiles() {
+    return Number(this.$component.attr("data-max-files-per-upload"));
   }
 
   // The element to listen for drag and drop events and paste events. By default,
