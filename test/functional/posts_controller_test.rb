@@ -6,7 +6,7 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
   end
 
   def create_post!(user: create(:user), media_asset: build(:media_asset), rating: "q", tag_string: "tagme", **params)
-    upload = build(:upload, uploader: user)
+    upload = build(:upload, uploader: user, media_asset_count: 1, status: "completed")
     asset = create(:upload_media_asset, upload: upload, media_asset: media_asset)
     post_auth posts_path, user, params: { upload_media_asset_id: asset.id, post: { rating: rating, tag_string: tag_string, **params }}
 
@@ -664,6 +664,15 @@ class PostsControllerTest < ActionDispatch::IntegrationTest
       should "re-render the upload page if the upload fails" do
         @post = create_post!(rating: "z", tag_string: "tagme")
         assert_response :success
+      end
+
+      should "re-render the upload page if the rating is not selected" do
+        assert_no_difference("Post.count") do
+          @post = create_post!(rating: "", tag_string: "tagme")
+        end
+
+        assert_response :success
+        assert_equal("Rating not selected", flash[:notice])
       end
 
       should "merge the tags and redirect to the original post if the upload is a duplicate of an existing post" do
