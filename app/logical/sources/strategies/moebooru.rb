@@ -100,10 +100,6 @@ module Sources
         tags.map(&:first).flat_map(&method(:translate_tag)).uniq.sort
       end
 
-      def headers
-        { "Referer" => "http://#{site_name}" }
-      end
-
       # Moebooru returns an empty array when doing an md5:<hash> search for a
       # deleted post. Because of this, api_response may be empty in some cases.
       def api_response

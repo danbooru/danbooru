@@ -93,10 +93,6 @@ module Sources
         image_urls.map { |img| img.gsub(%r{.cn/\w+/(\w+)}, '.cn/orj360/\1') }
       end
 
-      def headers
-        { "Referer" => "https://weibo.com" }
-      end
-
       def page_url
         if api_response.present?
           artist_id = api_response["user"]["id"]

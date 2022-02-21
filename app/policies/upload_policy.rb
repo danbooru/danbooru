@@ -9,14 +9,6 @@ class UploadPolicy < ApplicationPolicy
     user.is_admin? || record.uploader_id == user.id
   end
 
-  def batch?
-    unbanned?
-  end
-
-  def image_proxy?
-    unbanned?
-  end
-
   def permitted_attributes
     [:source, :referer_url, files: {}]
   end

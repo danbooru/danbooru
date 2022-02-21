@@ -249,8 +249,7 @@ Rails.application.routes.draw do
   resources :tag_implications, only: [:show, :index, :destroy]
   resources :uploads do
     collection do
-      get :batch
-      get :image_proxy
+      get :batch, to: redirect(path: "/uploads/new")
     end
     resources :upload_media_assets, only: [:show, :index], path: "assets"
   end

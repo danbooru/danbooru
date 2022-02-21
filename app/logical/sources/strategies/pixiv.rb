@@ -177,10 +177,6 @@ module Sources
         api_illust[:description]
       end
 
-      def headers
-        { "Referer" => "https://www.pixiv.net" }
-      end
-
       def normalize_for_source
         return nil if illust_id.blank?
         "https://www.pixiv.net/artworks/#{illust_id}"

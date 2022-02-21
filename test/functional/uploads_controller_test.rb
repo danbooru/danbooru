@@ -6,39 +6,11 @@ class UploadsControllerTest < ActionDispatch::IntegrationTest
       @user = create(:user)
     end
 
-    context "image proxy action" do
-      should "work" do
-        url = "https://i.pximg.net/img-original/img/2017/11/21/17/06/44/65985331_p0.png"
-        get_auth image_proxy_uploads_path, @user, params: { url: url }
-
-        assert_response :success
-        assert_equal("image/png", response.media_type)
-        assert_equal(15_573, response.body.size)
-      end
-    end
-
     context "batch action" do
-      context "for twitter galleries" do
-        should "render" do
-          skip "Twitter keys are not set" unless Danbooru.config.twitter_api_key
-          get_auth batch_uploads_path, @user, params: {:url => "https://twitter.com/lvlln/status/567054278486151168"}
-          assert_response :success
-        end
-      end
+      should "redirect to the new upload page" do
+        get batch_uploads_path(url: "https://twitter.com/lvlln/status/567054278486151168")
 
-      context "for pixiv ugoira galleries" do
-        should "render" do
-          get_auth batch_uploads_path, @user, params: {:url => "https://www.pixiv.net/member_illust.php?mode=medium&illust_id=59523577"}
-          assert_response :success
-          assert_no_match(/59523577_ugoira0\.jpg/, response.body)
-        end
-      end
-
-      context "for a blank source" do
-        should "render" do
-          get_auth batch_uploads_path, @user
-          assert_response :success
-        end
+        assert_redirected_to new_upload_path(url: "https://twitter.com/lvlln/status/567054278486151168")
       end
     end
 

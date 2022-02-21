@@ -211,12 +211,6 @@ module Sources
         nil
       end
 
-      # Subclasses should merge in any required headers needed to access resources
-      # on the site.
-      def headers
-        {}
-      end
-
       # Download the file at the given url, or at the main image url by default.
       def download_file!(download_url = image_url)
         response, file = http_downloader.download_media(download_url)

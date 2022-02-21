@@ -15,19 +15,6 @@ class UploadsController < ApplicationController
     respond_with(@upload)
   end
 
-  def batch
-    authorize Upload
-    @url = params.dig(:batch, :url) || params[:url]
-    @source = Sources::Strategies.find(@url, params[:ref]) if @url.present?
-    respond_with(@source)
-  end
-
-  def image_proxy
-    authorize Upload
-    resp = ImageProxy.get_image(params[:url])
-    send_data resp.body, type: resp.mime_type, disposition: "inline"
-  end
-
   def index
     @mode = params.fetch(:mode, "gallery")
 

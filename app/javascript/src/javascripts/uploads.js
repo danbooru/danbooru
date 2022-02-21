@@ -21,10 +21,6 @@ Upload.initialize_all = function() {
     });
   }
 
-  if ($("#c-uploads #a-batch").length) {
-    $(document).on("click.danbooru", "#c-uploads #a-batch #link", Upload.batch_open_all);
-  }
-
   Upload.loadAssets();
 }
 
@@ -69,10 +65,6 @@ Upload.toggle_translation = function() {
   }
 
   $(".commentary-translation").slideToggle();
-};
-
-Upload.batch_open_all = function() {
-  $(".upload-preview > a").each((_i, link) => window.open(link.href));
 };
 
 $(function() {

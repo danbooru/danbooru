@@ -6,7 +6,6 @@
 
     <p>
       <%= link_to "Post to #{Danbooru.config.app_name}", "javascript:location.href='#{request.protocol + request.host_with_port}/uploads/new?url='+encodeURIComponent(location.href)+'&ref='+encodeURIComponent(document.referrer)" %>
-      | <%= link_to "Batch to #{Danbooru.config.app_name}", "javascript:location.href='#{request.protocol + request.host_with_port}/uploads/batch?url='+encodeURIComponent(location.href)" %>
     </p>
 
     <div class="prose">
