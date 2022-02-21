@@ -1,6 +1,6 @@
 module ReportbooruHelper
   def mock_request(url, method: :get, status: 200, body: nil, http: Danbooru::Http.any_instance, **options)
-    response = HTTP::Response.new(status: status, body: body, version: "1.1")
+    response = HTTP::Response.new(status: status, body: body, version: "1.1", request: nil)
     http.stubs(method).with(url, **options).returns(response)
   end
 

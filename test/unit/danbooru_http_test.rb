@@ -123,8 +123,8 @@ class DanbooruHttpTest < ActiveSupport::TestCase
 
     context "retriable feature" do
       should "retry immediately if no Retry-After header is sent" do
-        response_429 = ::HTTP::Response.new(status: 429, version: "1.1", body: "")
-        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "")
+        response_429 = ::HTTP::Response.new(status: 429, version: "1.1", body: "", request: nil)
+        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
         HTTP::Client.any_instance.expects(:perform).times(2).returns(response_429, response_200)
 
         response = Danbooru::Http.use(:retriable).get(httpbin_url("status/429"))
@@ -132,8 +132,8 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
 
       should "retry if the Retry-After header is an integer" do
-        response_503 = ::HTTP::Response.new(status: 503, version: "1.1", headers: { "Retry-After": "1" }, body: "")
-        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "")
+        response_503 = ::HTTP::Response.new(status: 503, version: "1.1", headers: { "Retry-After": "1" }, body: "", request: nil)
+        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
         HTTP::Client.any_instance.expects(:perform).times(2).returns(response_503, response_200)
 
         response = Danbooru::Http.use(:retriable).get(httpbin_url("status/503"))
@@ -141,8 +141,8 @@ class DanbooruHttpTest < ActiveSupport::TestCase
       end
 
       should "retry if the Retry-After header is a date" do
-        response_503 = ::HTTP::Response.new(status: 503, version: "1.1", headers: { "Retry-After": 2.seconds.from_now.httpdate }, body: "")
-        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "")
+        response_503 = ::HTTP::Response.new(status: 503, version: "1.1", headers: { "Retry-After": 2.seconds.from_now.httpdate }, body: "", request: nil)
+        response_200 = ::HTTP::Response.new(status: 200, version: "1.1", body: "", request: nil)
         HTTP::Client.any_instance.expects(:perform).times(2).returns(response_503, response_200)
 
         response = Danbooru::Http.use(:retriable).get(httpbin_url("status/503"))
@@ -166,7 +166,7 @@ class DanbooruHttpTest < ActiveSupport::TestCase
         url = "https://cdnb.artstation.com/p/assets/images/images/025/273/307/4k/atey-ghailan-a-sage-keyart-s-ch-04-outlined-1.jpg?1585246642"
         response = Danbooru::Http.use(:unpolish_cloudflare).get(url)
 
-        assert_equal(200, response.status)
+        assert_equal(200, response.status.to_i)
         assert_equal(622_784, response.content_length)
       end
     end

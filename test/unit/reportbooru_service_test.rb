@@ -16,8 +16,8 @@ class ReportbooruServiceTest < ActiveSupport::TestCase
     end
 
     should "return nothing on failure" do
-      Danbooru::Http.any_instance.expects(:get).with("http://localhost:1234/post_views/rank?date=#{@date}").returns(HTTP::Response.new(status: 500, body: "", version: "1.1"))
-      Danbooru::Http.any_instance.expects(:get).with("http://localhost:1234/post_views/rank?date=#{@date.yesterday}").returns(HTTP::Response.new(status: 500, body: "", version: "1.1"))
+      Danbooru::Http.any_instance.expects(:get).with("http://localhost:1234/post_views/rank?date=#{@date}").returns(HTTP::Response.new(status: 500, body: "", version: "1.1", request: nil))
+      Danbooru::Http.any_instance.expects(:get).with("http://localhost:1234/post_views/rank?date=#{@date.yesterday}").returns(HTTP::Response.new(status: 500, body: "", version: "1.1", request: nil))
 
       assert_equal([], @service.popular_posts(@date))
     end

@@ -206,7 +206,7 @@ module Danbooru
     end
 
     def fake_response(status)
-      ::HTTP::Response.new(status: status, version: "1.1", body: "")
+      ::HTTP::Response.new(status: status, version: "1.1", body: "", request: nil)
     end
   end
 end
