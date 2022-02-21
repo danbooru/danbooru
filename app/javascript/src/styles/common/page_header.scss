@@ -46,7 +46,8 @@ header#top {
       color: var(--login-link-color);
     }
 
-    li.forum-updated a {
+    li.forum-updated a,
+    li.reports-pending a {
       font-style: italic;
     }
   }
